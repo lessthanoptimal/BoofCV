@@ -1,0 +1,6 @@
+- FAST
+- KLT
+- Harris
+- Multi scale harris
+- LoG DoG DoH blob detectors
+- SURF

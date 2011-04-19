@@ -1,0 +1,20 @@
+- Add signed/unsigned flag to ImageBase?
+
+- Why is Laplacian second derivative?  Adjust its class name
+
+- GUI application for showing different image derivatives
+ * derivative X and Y
+ * intensity
+
+- Generic convolutions
+*   generic with precomputed image offsets
+*   benchmark for speed
+- Specialized Convolutions
+*   Gaussian
+*   Table
+
+
+
+- Write SSD and FAST feature detectors
+- Profile for feature detectors
+- Create an application which shows detected features in images

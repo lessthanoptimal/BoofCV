@@ -1,0 +1,11 @@
+Description of what type of code goes into each GECV package:
+
+- alg:
+             Where algorithms go.  Algorithms should be written for ease of implementation and speed.  They should only
+             use data structures which make sense from the algorithms perspective alone.  No generalization.
+- interface
+             Interfaces which generalize families of algorithms go here.  This is where abstraction takes place.
+- core
+             Random crap that doesn't go anywhere else
+- struct
+             Commonly used data structures that are used across the code base go here.  For example images.

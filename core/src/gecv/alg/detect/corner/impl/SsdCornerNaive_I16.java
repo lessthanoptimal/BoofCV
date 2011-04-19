@@ -1,0 +1,74 @@
+package gecv.alg.detect.corner.impl;
+
+import gecv.alg.detect.corner.KltCornerDetector;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageInt16;
+
+/**
+ * Naive implementation of {@link gecv.alg.detect.corner.KltCornerDetector} which performs computations in a straight
+ * forward but inefficient manor.  This class is used to validate the correctness of more complex but efficient
+ * implementations.
+ *
+ * @author Peter Abeles
+ */
+@SuppressWarnings({"ForLoopReplaceableByForEach"})
+public class SsdCornerNaive_I16 implements KltCornerDetector<ImageInt16> {
+
+	// feature's radius
+	private int radius;
+
+	// the intensity of the found features in the image
+	private ImageFloat32 featureIntensity;
+
+	public SsdCornerNaive_I16(int imageWidth, int imageHeight,
+							  int windowRadius) {
+		this.radius = windowRadius;
+
+		featureIntensity = new ImageFloat32(imageWidth, imageHeight);
+	}
+
+	@Override
+	public int getRadius() {
+		return radius;
+	}
+
+	@Override
+	public ImageFloat32 getIntensity() {
+		return featureIntensity;
+	}
+
+
+	@Override
+	public void process(ImageInt16 derivX, ImageInt16 derivY) {
+
+		final int imgHeight = derivX.getHeight();
+		final int imgWidth = derivX.getWidth();
+
+		for (int row = radius; row < imgHeight - radius; row++) {
+			for (int col = radius; col < imgWidth - radius; col++) {
+				int dxdx = 0;
+				int dxdy = 0;
+				int dydy = 0;
+
+				for (int i = -radius; i <= radius; i++) {
+					for (int j = -radius; j <= radius; j++) {
+						int dx = derivX.get(col + j, row + i);
+						int dy = derivY.get(col + j, row + i);
+
+						dxdx += dx * dx;
+						dydy += dy * dy;
+						dxdy += dx * dy;
+					}
+				}
+
+				// compute the eigen values
+				double left = (dxdx + dydy) * 0.5;
+				double b = (dxdx - dydy) * 0.5;
+				double right = Math.sqrt(b * b + (double)dxdy * dxdy);
+
+				featureIntensity.set(col, row, (float) (left - right));
+			}
+		}
+	}
+
+}
