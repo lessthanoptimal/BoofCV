@@ -19,13 +19,27 @@ package gecv.alg.filter.blur;
 import gecv.struct.image.ImageBase;
 
 /**
- * TODO define the filter
+ * A median image filter is a non-linear filter that selects the median value for each pixel from the values
+ * of the surrounding pixels.  The surrounding region is square in shape, with an odd width, and centered around the
+ * pixel currently being considered.  Median filters tend to be less sensitive to outliers than mean filters or Gaussian
+ * filters, but are computationally expensive to compute.
  *
  * @author Peter Abeles
  */
 public interface MedianImageFilter<T extends ImageBase> {
 
+	/**
+	 * Radius of the square region.  The width is defined as the radius*2 + 1.
+	 *
+	 * @return Square's radius.
+	 */
 	public int getRadius();
 
+	/**
+	 * Processes the input image to produce the median filtered output.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output Output filtered image.  Modified.
+	 */
 	public void process( T input , T output );
 }

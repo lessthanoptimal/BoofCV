@@ -66,6 +66,9 @@ public class QueueCorner {
 		return points.length;
 	}
 
+	/**
+	 * Increases the size of the list while maintaining the values of existing elements
+	 */
 	public void resize(int newSize) {
 		Point2D_I16[] adj = new Point2D_I16[newSize];
 
@@ -80,4 +83,7 @@ public class QueueCorner {
 		this.num = m;
 	}
 
+	public boolean isFull() {
+		return points.length == num;
+	}
 }

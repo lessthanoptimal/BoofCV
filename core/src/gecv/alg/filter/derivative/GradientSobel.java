@@ -80,6 +80,7 @@ public class GradientSobel {
 								   ImageFloat32 derivY) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 
+//		GradientSobel_Outer.process_F32(orig, derivX, derivY);
 		GradientSobel_UnrolledOuter.process_F32_sub(orig, derivX, derivY);
 	}
 }

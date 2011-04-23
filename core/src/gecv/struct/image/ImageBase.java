@@ -127,9 +127,28 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable {
 		return ret;
 	}
 
+	/**
+	 * Changes the image's width and height without declaring new memory.  If the internal array
+	 * is not large enough to store the new image an IllegalArgumentException is thrown.
+	 *
+	 * @param width The new width.
+	 * @param height The new height.
+	 */
 	public void reshape(int width, int height) {
-		// todo add unit tests for this too
-		throw new RuntimeException("implement");
+		if( isSubimage() )
+			throw new IllegalArgumentException("Can't reshape sub-images");
+		
+		Object data = _getData();
+
+		if( Array.getLength(data) < width*height ) {
+			// declare a new larger image to store the data
+			ImageBase a = _createNew(width,height);
+			_setData(a._getData());
+		}
+
+		this.stride = width;
+		this.width = width;
+		this.height = height;
 	}
 
 	/**

@@ -13,7 +13,8 @@
 *   Gaussian
 *   Table
 
-
+- Improve Median Filter
+*   Use bubble sort to avoid resorting each time
 
 - Write SSD and FAST feature detectors
 - Profile for feature detectors

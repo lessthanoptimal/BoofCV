@@ -1,0 +1,53 @@
+/*
+ * Copyright 2011 Peter Abeles
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package gecv.alg.detect.corner.impl;
+
+import gecv.alg.detect.corner.HarrisCornerIntensity;
+import gecv.struct.image.ImageFloat32;
+
+/**
+ * <p>
+ * Implementation of {@link gecv.alg.detect.corner.HarrisCornerIntensity} based off of {@link SsdCorner_F32}.
+ * </p>
+ *
+ * @author Peter Abeles
+ */
+public class HarrisCorner_F32 extends SsdCorner_F32 implements HarrisCornerIntensity<ImageFloat32> {
+
+	float kappa;
+
+	public HarrisCorner_F32(int imageWidth, int imageHeight, int windowRadius, float kappa) {
+		super(imageWidth, imageHeight, windowRadius);
+		this.kappa = kappa;
+	}
+
+	@Override
+	public void setKappa(float kappa) {
+		this.kappa = kappa;
+	}
+
+	@Override
+	protected float computeIntensity() {
+		// det(A) + kappa*trace(A)
+		return totalXX * totalYY - totalXY * totalXY + kappa * (totalXX + totalYY);
+	}
+
+	@Override
+	public float getKappa() {
+		return kappa;
+	}
+}

@@ -19,6 +19,9 @@ package gecv.alg.filter.convolve;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.filter.convolve.impl.*;
+import gecv.core.image.UtilImageFloat32;
+import gecv.core.image.UtilImageInt16;
+import gecv.core.image.UtilImageInt8;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -27,6 +30,8 @@ import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt32;
 import gecv.struct.image.ImageInt8;
+
+import java.util.Random;
 
 /**
  * Benchmark for different convolution operations.
@@ -74,6 +79,15 @@ public class BenchmarkConvolve {
 		}
 	}
 
+	public static class HorizontalUnroll_I8_I8_div extends PerformerBase
+	{
+		@Override
+		public void process() {
+			if( !ConvolveImageUnrolled_I8_I8.horizontal(kernelI32,imgInt8,out_I8,10,false) )
+				throw new RuntimeException();
+		}
+	}
+
 	public static class Horizontal_I8_I16 extends PerformerBase
 	{
 		@Override
@@ -96,6 +110,23 @@ public class BenchmarkConvolve {
 		@Override
 		public void process() {
 			ConvolveImageStandard.vertical(kernelF32,imgFloat32,out_F32,false);
+		}
+	}
+
+	public static class Vertical_I8_I8_div extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ConvolveImageStandard.vertical(kernelI32,imgInt8,out_I8,10,false);
+		}
+	}
+
+	public static class VerticalUnrolled_I8_I8_div extends PerformerBase
+	{
+		@Override
+		public void process() {
+			if( !ConvolveImageUnrolled_I8_I8.vertical(kernelI32,imgInt8,out_I8,10,false) )
+				throw new RuntimeException();
 		}
 	}
 
@@ -210,6 +241,11 @@ public class BenchmarkConvolve {
 		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
 		out_F32 = new ImageFloat32(imgWidth,imgHeight);
 
+		Random rand = new Random(234234);
+		UtilImageInt8.randomize(imgInt8,rand);
+		UtilImageInt16.randomize(imgInt16,rand,0,200);
+		UtilImageFloat32.randomize(imgFloat32,rand,0,200);
+
 
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
 		System.out.println();
@@ -230,12 +266,15 @@ public class BenchmarkConvolve {
 			ProfileOperation.printOpsPerSec(new Horizontal_F32_Border(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new HorizontalUnrolled_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new HorizontalUnrolled_I8(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new HorizontalUnroll_I8_I8_div(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new HorizontalUnrolled_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Vertical_F32(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Vertical_I8_I8_div(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Vertical_I8_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Vertical_I16_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I8(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I8_I8_div(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Vertical_F32_Border(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Box_I8_I32_Vertical(),TEST_TIME);

@@ -20,18 +20,23 @@ import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.filter.blur.impl.MedianHistogramNaive_I8;
 import gecv.alg.filter.blur.impl.MedianHistogram_I8;
+import gecv.alg.filter.blur.impl.MedianSortNaive_F32;
 import gecv.alg.filter.blur.impl.MedianSortNaive_I8;
 import gecv.alg.filter.convolve.ConvolveImage;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.filter.convolve.impl.ConvolveBox_F32_F32;
 import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I16;
 import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I32;
+import gecv.core.image.UtilImageFloat32;
+import gecv.core.image.UtilImageInt8;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt32;
 import gecv.struct.image.ImageInt8;
+
+import java.util.Random;
 
 /**
  * Benchmark for different convolution operations.
@@ -78,6 +83,15 @@ public class BenchmarkMedianFilter {
 		}
 	}
 
+	public static class SortNaive_F32 extends PerformerBase
+	{
+		MedianSortNaive_F32 alg = new MedianSortNaive_F32(radius);
+		@Override
+		public void process() {
+			alg.process(imgFloat32,out_F32);
+		}
+	}
+
 	public static void main( String args[] ) {
 		imgInt8 = new ImageInt8(imgWidth,imgHeight);
 		imgInt16 = new ImageInt16(imgWidth,imgHeight);
@@ -87,6 +101,9 @@ public class BenchmarkMedianFilter {
 		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
 		out_F32 = new ImageFloat32(imgWidth,imgHeight);
 
+		Random rand = new Random(234);
+		UtilImageInt8.randomize(imgInt8,rand);
+		UtilImageFloat32.randomize(imgFloat32,rand,0,200);
 
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
 		System.out.println();
@@ -100,7 +117,7 @@ public class BenchmarkMedianFilter {
 			ProfileOperation.printOpsPerSec(new HistogramNaive_I8(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Histogram_I8(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new SortNaive_I8(),TEST_TIME);
-
+		    ProfileOperation.printOpsPerSec(new SortNaive_F32(),TEST_TIME);
 		}
 
 

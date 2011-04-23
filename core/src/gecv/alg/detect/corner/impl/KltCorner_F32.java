@@ -16,20 +16,19 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.detect.corner.KltCornerDetector;
-import gecv.alg.detect.corner.impl.SsdCorner_F32;
+import gecv.alg.detect.corner.KltCornerIntensity;
 import gecv.struct.image.ImageFloat32;
 
 
 /**
  * <p>
- * Implementation of {@link gecv.alg.detect.corner.KltCornerDetector} based off of {@link SsdCorner_F32}.
+ * Implementation of {@link gecv.alg.detect.corner.KltCornerIntensity} based off of {@link SsdCorner_F32}.
  * </p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class KltCorner_F32 extends SsdCorner_F32 implements KltCornerDetector<ImageFloat32> {
+public class KltCorner_F32 extends SsdCorner_F32 implements KltCornerIntensity<ImageFloat32> {
 
 
 	public KltCorner_F32(int imageWidth, int imageHeight, int windowRadius) {

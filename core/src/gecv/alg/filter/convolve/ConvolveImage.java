@@ -17,10 +17,7 @@
 package gecv.alg.filter.convolve;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.filter.convolve.impl.ConvolveImageStandard;
-import gecv.alg.filter.convolve.impl.ConvolveImageUnrolled_F32_F32;
-import gecv.alg.filter.convolve.impl.ConvolveImageUnrolled_I16_I16;
-import gecv.alg.filter.convolve.impl.ConvolveImageUnrolled_I8_I16;
+import gecv.alg.filter.convolve.impl.*;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -82,8 +79,8 @@ public class ConvolveImage {
 								  ImageInt8 image, ImageInt8 dest, int divisor, boolean includeBorder) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		// todo unroll with divisor
-		ConvolveImageStandard.horizontal(kernel, image, dest, divisor, includeBorder);
+		if( !ConvolveImageUnrolled_I8_I8.horizontal(kernel, image, dest, divisor, includeBorder))
+			ConvolveImageStandard.horizontal(kernel, image, dest, divisor, includeBorder);
 	}
 
 	/**
@@ -173,8 +170,9 @@ public class ConvolveImage {
 	public static void vertical(Kernel1D_I32 kernel,
 								ImageInt8 image, ImageInt8 dest, int divisor, boolean includeBorder) {
 		InputSanityCheck.checkSameShape(image, dest);
-		// todo unroll with divisor
-		ConvolveImageStandard.vertical(kernel, image, dest, divisor, includeBorder);
+
+		if( !ConvolveImageUnrolled_I8_I8.vertical(kernel, image, dest, divisor, includeBorder))
+			ConvolveImageStandard.vertical(kernel, image, dest, divisor, includeBorder);
 	}
 
 	/**

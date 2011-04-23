@@ -16,8 +16,7 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.detect.corner.impl.KltCorner_F32;
-import gecv.alg.detect.corner.impl.SsdCornerNaive_I16;
+import gecv.alg.detect.corner.GenericCornerIntensityTests;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.core.image.ConvertImage;
 import gecv.core.image.UtilImageInt8;
@@ -39,6 +38,22 @@ public class TestKltCorner_F32 {
 
 	int width = 15;
 	int height = 15;
+
+
+	@Test
+	public void genericTests() {
+		GenericCornerIntensityTests generic = new GenericCornerIntensityTests(){
+
+			@Override
+			public ImageFloat32 computeIntensity() {
+				KltCorner_F32 alg = new KltCorner_F32(width,height,1);
+				alg.process(derivX_F32,derivY_F32);
+				return alg.getIntensity();
+			}
+		};
+
+		generic.performAllTests();
+	}
 
 	/**
 	 * Sees if the integer version and this version produce the same results.

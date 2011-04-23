@@ -276,7 +276,7 @@ public class GecvTesting {
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
 				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("value not equal");
+					throw new RuntimeException("value not equal: "+imgA.get(x,y)+" "+imgB.get(x,y)+" at ("+x+" , "+y+")");
 			}
 		}
 	}

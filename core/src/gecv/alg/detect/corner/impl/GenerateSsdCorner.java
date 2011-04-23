@@ -63,7 +63,7 @@ public class GenerateSsdCorner {
 	private void printPreamble() {
 		out.print("package gecv.alg.detect.corner.impl;\n" +
 				"\n" +
-				"import gecv.alg.detect.corner.GradientCornerDetector;\n" +
+				"import gecv.alg.detect.corner.GradientCornerIntensity;\n" +
 				"import gecv.struct.image." + typeInput + ";\n");
 		if (typeInput.compareTo(typeOutput) != 0)
 			out.print("import gecv.struct.image." + typeOutput + ";\n");

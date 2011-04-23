@@ -38,12 +38,37 @@ public class TestKernelFactory {
 
 	@Test
 	public void table1D_I32() {
-		fail("implement");
+		Kernel1D_I32 kernel = KernelFactory.table1D_I32(3);
+
+		assertEquals(7,kernel.width);
+
+		for( int i = 0; i < kernel.width; i++ ) {
+			assertEquals(1,kernel.get(i));
+		}
 	}
 
 	@Test
-	public void table1D_F32() {
-		fail("implement");
+	public void table1D_F32_unnormalized() {
+		Kernel1D_F32 kernel = KernelFactory.table1D_F32(3,false);
+
+		assertEquals(7,kernel.width);
+
+		for( int i = 0; i < kernel.width; i++ ) {
+			assertEquals(1.0,kernel.get(i),1e-8);
+		}
+	}
+
+	@Test
+	public void table1D_F32_normalized() {
+		Kernel1D_F32 kernel = KernelFactory.table1D_F32(3,true);
+
+		assertEquals(7,kernel.width);
+
+		double expected = 1.0/kernel.width;
+
+		for( int i = 0; i < kernel.width; i++ ) {
+			assertEquals(expected,kernel.get(i),1e-8);
+		}
 	}
 
 	@Test

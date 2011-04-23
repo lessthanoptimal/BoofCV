@@ -83,6 +83,23 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	}
 
 	@Override
+	public void reshape(int width, int height) {
+		if( isSubimage() )
+			throw new IllegalArgumentException("Can't reshape sub-images");
+
+		Object data = _getData();
+
+		if( Array.getLength(data) < width*height*numBands ) {
+			ImageInterleaved<?> a = _createNew(width,height);
+			_setData(a);
+		}
+
+		this.width = width;
+		this.height = height;
+		this.stride = width;
+	}
+
+	@Override
 	public int getIndex(int x, int y) {
 		return startIndex + y * stride + x * numBands;
 	}

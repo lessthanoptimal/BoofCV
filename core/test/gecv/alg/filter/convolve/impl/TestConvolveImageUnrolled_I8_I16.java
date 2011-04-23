@@ -54,14 +54,4 @@ public class TestConvolveImageUnrolled_I8_I16 {
 			TestConvolveImage.checkAgainstStandard(m, "vertical", 5, 7, i + 1, rand);
 		}
 	}
-
-	@Test
-	public void horizontal_divide() {
-		fail("implement");
-	}
-
-	@Test
-	public void vertical_divide() {
-		fail("implement");
-	}
 }

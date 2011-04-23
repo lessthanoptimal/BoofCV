@@ -67,4 +67,13 @@ public class UtilImageFloat32 {
 			}
 		}
 	}
+
+	public static void print(ImageFloat32 a) {
+		for( int y = 0; y < a.height; y++ ) {
+			for( int x = 0; x < a.width; x++ ) {
+				System.out.printf("%5.2f ",a.get(x,y));
+			}
+			System.out.println();
+		}
+	}
 }

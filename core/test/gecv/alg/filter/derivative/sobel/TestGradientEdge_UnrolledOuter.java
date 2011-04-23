@@ -42,20 +42,25 @@ public class TestGradientEdge_UnrolledOuter {
 	 */
 	@Test
 	public void process_I8_naive() {
-		ImageInt8 img = new ImageInt8(width, height);
-		UtilImageInt8.randomize(img, new Random(0xfeed));
+		for( int offY = 0; offY < 3; offY++ ) {
+			for( int offX = 0; offX < 3; offX++ ) {
+				int w = width+offX; int h = height+offY;
+				ImageInt8 img = new ImageInt8(w, h);
+				UtilImageInt8.randomize(img, new Random(0xfeed));
 
-		ImageInt16 derivX = new ImageInt16(width, height);
-		ImageInt16 derivY = new ImageInt16(width, height);
+				ImageInt16 derivX = new ImageInt16(w, h);
+				ImageInt16 derivY = new ImageInt16(w, h);
 
-		ImageInt16 derivX2 = new ImageInt16(width, height);
-		ImageInt16 derivY2 = new ImageInt16(width, height);
+				ImageInt16 derivX2 = new ImageInt16(w, h);
+				ImageInt16 derivY2 = new ImageInt16(w, h);
 
-		GradientSobel_Naive.process_I8(img, derivX2, derivY2);
-		GradientSobel_UnrolledOuter.process_I8(img, derivX, derivY);
+				GradientSobel_Naive.process_I8(img, derivX2, derivY2);
+				GradientSobel_UnrolledOuter.process_I8(img, derivX, derivY);
 
-		GecvTesting.assertEquals(derivX2, derivX, 0);
-		GecvTesting.assertEquals(derivY2, derivY, 0);
+				GecvTesting.assertEquals(derivX2, derivX, 0);
+				GecvTesting.assertEquals(derivY2, derivY, 0);
+			}
+		}
 	}
 
 	/**
@@ -63,36 +68,47 @@ public class TestGradientEdge_UnrolledOuter {
 	 */
 	@Test
 	public void process_F32_naive() {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0f, 255f);
+		for( int offY = 0; offY < 3; offY++ ) {
+			for( int offX = 0; offX < 3; offX++ ) {
+				int w = width+offX; int h = height+offY;
 
-		ImageFloat32 derivX = new ImageFloat32(width, height);
-		ImageFloat32 derivY = new ImageFloat32(width, height);
+				ImageFloat32 img = new ImageFloat32(w, h);
+				UtilImageFloat32.randomize(img, rand, 0f, 255f);
 
-		ImageFloat32 derivX2 = new ImageFloat32(width, height);
-		ImageFloat32 derivY2 = new ImageFloat32(width, height);
+				ImageFloat32 derivX = new ImageFloat32(w, h);
+				ImageFloat32 derivY = new ImageFloat32(w, h);
 
-		GradientSobel_Naive.process_F32(img, derivX2, derivY2);
-		GradientSobel_UnrolledOuter.process_F32(img, derivX, derivY);
+				ImageFloat32 derivX2 = new ImageFloat32(w, h);
+				ImageFloat32 derivY2 = new ImageFloat32(w, h);
 
-		GecvTesting.assertEquals(derivX2, derivX, 0, 1e-4f);
-		GecvTesting.assertEquals(derivY2, derivY, 0, 1e-4f);
+				GradientSobel_Naive.process_F32(img, derivX2, derivY2);
+				GradientSobel_UnrolledOuter.process_F32(img, derivX, derivY);
+
+				GecvTesting.assertEquals(derivX2, derivX, 0, 1e-4f);
+				GecvTesting.assertEquals(derivY2, derivY, 0, 1e-4f);
+			}
+		}
 	}
 
 	@Test
 	public void process_F32_sub_naive() {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0f, 255f);
+		for( int offY = 0; offY < 3; offY++ ) {
+			for( int offX = 0; offX < 3; offX++ ) {
+				int w = width+offX; int h = height+offY;
+				ImageFloat32 img = new ImageFloat32(w, h);
+				UtilImageFloat32.randomize(img, rand, 0f, 255f);
 
-		ImageFloat32 derivX = new ImageFloat32(width, height);
-		ImageFloat32 derivY = new ImageFloat32(width, height);
+				ImageFloat32 derivX = new ImageFloat32(w, h);
+				ImageFloat32 derivY = new ImageFloat32(w, h);
 
-		GecvTesting.checkSubImage(this, "process_F32_sub_naive", true, img, derivX, derivY);
+				GecvTesting.checkSubImage(this, "process_F32_sub_naive", true, img, derivX, derivY);
+			}
+		}
 	}
 
 	public void process_F32_sub_naive(ImageFloat32 img, ImageFloat32 derivX, ImageFloat32 derivY) {
-		ImageFloat32 derivX2 = new ImageFloat32(width, height);
-		ImageFloat32 derivY2 = new ImageFloat32(width, height);
+		ImageFloat32 derivX2 = new ImageFloat32(derivX.width, derivX.height);
+		ImageFloat32 derivY2 = new ImageFloat32(derivX.width, derivX.height);
 
 		GradientSobel_Naive.process_F32(img, derivX2, derivY2);
 		GradientSobel_UnrolledOuter.process_F32_sub(img, derivX, derivY);

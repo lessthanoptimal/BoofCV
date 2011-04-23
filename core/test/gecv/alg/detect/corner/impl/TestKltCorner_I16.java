@@ -16,10 +16,10 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.detect.corner.impl.KltCorner_I16;
-import gecv.alg.detect.corner.impl.SsdCornerNaive_I16;
+import gecv.alg.detect.corner.GenericCornerIntensityTests;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.core.image.UtilImageInt8;
+import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt8;
 import gecv.testing.GecvTesting;
@@ -36,6 +36,21 @@ import static org.junit.Assert.fail;
 public class TestKltCorner_I16 {
 	int width = 15;
 	int height = 15;
+
+	@Test
+	public void genericTests() {
+		GenericCornerIntensityTests generic = new GenericCornerIntensityTests(){
+
+			@Override
+			public ImageFloat32 computeIntensity() {
+				KltCorner_I16 alg = new KltCorner_I16(width,height,1);
+				alg.process(derivX_I16,derivY_I16);
+				return alg.getIntensity();
+			}
+		};
+
+		generic.performAllTests();
+	}
 
 	/**
 	 * Creates a random image and looks for corners in it.  Sees if the naive

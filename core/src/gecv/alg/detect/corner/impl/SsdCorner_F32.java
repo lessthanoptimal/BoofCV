@@ -16,7 +16,7 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.detect.corner.GradientCornerDetector;
+import gecv.alg.detect.corner.GradientCornerIntensity;
 import gecv.struct.image.ImageFloat32;
 
 
@@ -34,7 +34,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public abstract class SsdCorner_F32 implements GradientCornerDetector<ImageFloat32> {
+public abstract class SsdCorner_F32 implements GradientCornerIntensity<ImageFloat32> {
 
 	// input image gradient
 	protected ImageFloat32 derivX;

@@ -16,6 +16,8 @@
 
 package gecv.alg.filter.convolve.impl;
 
+import gecv.misc.CodeGeneratorUtil;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -37,9 +39,11 @@ public class GenerateConvolvedUnrolled {
 	String dataOutput;
 	String bitWise;
 	String sumType;
+	boolean hasDivisor;
 
 	public void createAll() throws FileNotFoundException {
 		createF32();
+		createI8_I8();
 		createI8_I16();
 		createI16_I16();
 	}
@@ -54,6 +58,22 @@ public class GenerateConvolvedUnrolled {
 		dataOutput = "float";
 		sumType = "float";
 		bitWise = "";
+		hasDivisor = false;
+
+		createFile();
+	}
+
+	public void createI8_I8() throws FileNotFoundException {
+		className = "ConvolveImageUnrolled_I8_I8";
+		typeKernel = "Kernel1D_I32";
+		typeInput = "ImageInt8";
+		typeOutput = "ImageInt8";
+		dataKernel = "int";
+		dataInput = "byte";
+		dataOutput = "byte";
+		sumType = "int";
+		bitWise = " & 0xFF";
+		hasDivisor = true;
 
 		createFile();
 	}
@@ -68,6 +88,7 @@ public class GenerateConvolvedUnrolled {
 		dataOutput = "short";
 		sumType = "int";
 		bitWise = " & 0xFF";
+		hasDivisor = false;
 
 		createFile();
 	}
@@ -82,6 +103,7 @@ public class GenerateConvolvedUnrolled {
 		dataOutput = "short";
 		sumType = "int";
 		bitWise = "";
+		hasDivisor = false;
 
 		createFile();
 	}
@@ -90,18 +112,21 @@ public class GenerateConvolvedUnrolled {
 		out = new PrintStream(new FileOutputStream(className + ".java"));
 
 		printPreamble();
-		createMaster("horizontal");
-		createMaster("vertical");
+		createMaster("horizontal",hasDivisor);
+		createMaster("vertical",hasDivisor);
+
 		for (int i = 0; i < numUnrolled; i++) {
-			addHorizontal(3 + i * 2);
+			addHorizontal(3 + i * 2,hasDivisor);
 		}
 		for (int i = 0; i < numUnrolled; i++) {
-			addVertical(3 + i * 2);
+			addVertical(3 + i * 2, hasDivisor);
 		}
+
 		out.println("}");
 	}
 
 	public void printPreamble() {
+		out.print(CodeGeneratorUtil.copyright);
 		out.print("package gecv.alg.filter.convolve.impl;\n");
 		out.println();
 		out.print("import gecv.struct.convolve." + typeKernel + ";\n");
@@ -129,16 +154,24 @@ public class GenerateConvolvedUnrolled {
 				"public class " + className + " {\n");
 	}
 
-	public void createMaster(String opName) {
+	public void createMaster(String opName, boolean hasDivisor ) {
 		out.print("\tpublic static boolean " + opName + "( " + typeKernel + " kernel ,\n" +
-				"\t\t\t\t\t\t\t\t   " + typeInput + " image, " + typeOutput + " dest,\n" +
-				"\t\t\t\t\t\t\t\t   boolean includeBorder) {\n" +
-				"\t\tswitch( kernel.width ) {\n");
+				"\t\t\t\t\t\t\t\t   " + typeInput + " image, " + typeOutput + " dest,\n");
+		if( hasDivisor ) {
+			out.print("\t\t\t\t\t\t\t\t   int divisor, boolean includeBorder) {\n");
+		} else {
+			out.print("\t\t\t\t\t\t\t\t   boolean includeBorder) {\n");
+		}
+
+		out.print("\t\tswitch( kernel.width ) {\n");
 		for (int i = 0; i < numUnrolled; i++) {
 			int num = 3 + i * 2;
 			out.print("\t\t\tcase " + num + ":\n");
-			out.print("\t\t\t\t" + opName + num + "(kernel,image,dest,includeBorder);\n" +
-					"\t\t\t\tbreak;\n" +
+			if( hasDivisor )
+				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest,divisor,includeBorder);\n");
+			else
+				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest,includeBorder);\n");
+			out.print("\t\t\t\tbreak;\n" +
 					"\n");
 		}
 		out.print("\t\t\tdefault:\n" +
@@ -148,13 +181,18 @@ public class GenerateConvolvedUnrolled {
 				"\t}\n\n");
 	}
 
-	public void addHorizontal(int num) {
+	public void addHorizontal(int num, boolean hasDivisor ) {
 		String typeCast = generateTypeCast();
 
 		out.print("\tpublic static void horizontal" + num + "( " + typeKernel + " kernel ,\n" +
-				"\t\t\t\t\t\t\t\t\t" + typeInput + " image, " + typeOutput + " dest,\n" +
-				"\t\t\t\t\t\t\t\t\tboolean includeBorder) {\n" +
-				"\t\tfinal " + dataInput + "[] dataSrc = image.data;\n" +
+				"\t\t\t\t\t\t\t\t\t" + typeInput + " image, " + typeOutput + " dest,\n");
+
+		if( hasDivisor ) {
+			out.print("\t\t\t\t\t\t\t\t\tint divisor, boolean includeBorder) {\n");
+		} else {
+			out.print("\t\t\t\t\t\t\t\t\tboolean includeBorder) {\n");
+		}
+		out.print("\t\tfinal " + dataInput + "[] dataSrc = image.data;\n" +
 				"\t\tfinal " + dataOutput + "[] dataDst = dest.data;\n" +
 				"\n");
 		for (int i = 0; i < num; i++) {
@@ -180,20 +218,28 @@ public class GenerateConvolvedUnrolled {
 			out.printf("\t\t\t\ttotal += (dataSrc[indexSrc++]" + bitWise + ")*k%d;\n", (i + 1));
 		}
 		out.printf("\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWise + ")*k%d;\n", num);
-		out.printf("\n" +
-				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n" +
-				"\t\t\t}\n" +
+		out.printf("\n");
+		if( hasDivisor ) {
+			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "(total/divisor);\n");
+		} else {
+			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n");
+		}
+
+		out.print("\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
-	public void addVertical(int num) {
+	public void addVertical(int num, boolean hasDivisor) {
 		String typeCast = generateTypeCast();
 
 		out.print("\tpublic static void vertical" + num + "( " + typeKernel + " kernel,\n" +
-				"\t\t\t\t\t\t\t\t " + typeInput + " image, " + typeOutput + " dest,\n" +
-				"\t\t\t\t\t\t\t\t boolean includeBorder)\n" +
-				"\t{\n" +
+				"\t\t\t\t\t\t\t\t " + typeInput + " image, " + typeOutput + " dest,\n");
+		if( hasDivisor )
+			out.print("\t\t\t\t\t\t\t\t int divisor , boolean includeBorder)\n");
+		else
+			out.print("\t\t\t\t\t\t\t\t boolean includeBorder)\n");
+		out.print("\t{\n" +
 				"\t\tfinal " + dataInput + "[] dataSrc = image.data;\n" +
 				"\t\tfinal " + dataOutput + "[] dataDst = dest.data;\n" +
 				"\n");
@@ -223,9 +269,12 @@ public class GenerateConvolvedUnrolled {
 			out.printf("\t\t\t\tindexSrc += image.stride;\n");
 			out.printf("\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWise + ")*k%d;\n", (i + 1));
 		}
-		out.print("\n" +
-				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n" +
-				"\t\t\t}\n" +
+		out.print("\n");
+		if( hasDivisor )
+			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "(total/divisor);\n");
+		else
+			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n");
+		out.print("\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}

@@ -18,11 +18,10 @@ package gecv.alg.filter.blur.impl;
 
 import gecv.alg.filter.blur.MedianImageFilter;
 import gecv.struct.image.ImageInt8;
-
-import java.util.Arrays;
+import pja.sorting.QuickSelectI;
 
 /**
- * Median filter which uses Arrays.sort() to sort its inputs.  It is naive becaues the sort operation is started
+ * Median filter which uses Arrays.sort() to sort its inputs.  It is naive because the sort operation is started
  * from scratch for each pixel, discarding any information learned previously.
  *
  * @author Peter Abeles
@@ -55,10 +54,10 @@ public class MedianSortNaive_I8 implements MedianImageFilter<ImageInt8> {
 						values[index++] = input.getU(x+j,y+i);
 					}
 				}
-
-				Arrays.sort(values);
-
-				output.set(x,y, values[ values.length/2 ]);
+				
+				// use quick select to avoid sorting the whole list
+				int median = QuickSelectI.select(values,values.length/2,values.length);
+				output.set(x,y, median );
 			}
 		}
 	}

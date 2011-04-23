@@ -26,6 +26,35 @@ import static org.junit.Assert.*;
 public class TestImageBase {
 
 	@Test
+	public void reshape() {
+		DummyImage a = new DummyImage(10,30);
+		// b has the expected values
+		DummyImage b = new DummyImage(11,12);
+
+		a.reshape(11,12);
+
+		assertEquals(b.stride,a.stride);
+		assertEquals(b.width,a.width);
+		assertEquals(b.height,a.height);
+
+		// see if it will grow
+		b = new DummyImage(100,120);
+		a.reshape(100,120);
+
+		assertEquals(b.stride,a.stride);
+		assertEquals(b.width,a.width);
+		assertEquals(b.height,a.height);
+
+
+		// should throw an exception if a sub-image is reshaped
+		try {
+			a.subimage(1,2,1,2).reshape(100,200);
+
+			fail("should have thrown an exception");
+		} catch( IllegalArgumentException e ) {}
+	}
+
+	@Test
 	public void setTo() {
 		DummyImage a = new DummyImage(10, 20);
 

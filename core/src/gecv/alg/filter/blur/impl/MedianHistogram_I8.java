@@ -20,6 +20,16 @@ import gecv.alg.filter.blur.MedianImageFilter;
 import gecv.struct.image.ImageInt8;
 
 /**
+ * <p>
+ * A faster version of the histogram median filter.  Instead of rebuilding the histogram from scratch for each pixel
+ * the histogram is updated using results from the previous pixel.  
+ * </p>
+ *
+ * <p>
+ * Based on the description in some papers I believe this algorithm is similar to the one proposed in:<br>
+ * Huang, T.S., Yang, G.J. and Tang, G.Y. (1979) A fast two-dimensional median filtering algorithm. IEEE Trans.
+ * Acoust. Speech Signal Process. 27, 13-18
+ * </p>
  * @author Peter Abeles
  */
 public class MedianHistogram_I8 implements MedianImageFilter<ImageInt8> {
@@ -92,7 +102,7 @@ public class MedianHistogram_I8 implements MedianImageFilter<ImageInt8> {
 				}
 				output.data[ output.startIndex+y*output.stride+x] = (byte)median;
 
-				// remove the left most pixel from the histogram
+				// remove the left most pixels from the histogram
 				for( int i = 0; i < offset.length; i += boxWidth ) {
 					int val = input.data[seed+offset[i]] & 0xFF;
 					histogram[val]--;

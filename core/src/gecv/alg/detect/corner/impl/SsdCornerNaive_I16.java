@@ -16,19 +16,19 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.detect.corner.KltCornerDetector;
+import gecv.alg.detect.corner.KltCornerIntensity;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt16;
 
 /**
- * Naive implementation of {@link gecv.alg.detect.corner.KltCornerDetector} which performs computations in a straight
+ * Naive implementation of {@link gecv.alg.detect.corner.KltCornerIntensity} which performs computations in a straight
  * forward but inefficient manor.  This class is used to validate the correctness of more complex but efficient
  * implementations.
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class SsdCornerNaive_I16 implements KltCornerDetector<ImageInt16> {
+public class SsdCornerNaive_I16 implements KltCornerIntensity<ImageInt16> {
 
 	// feature's radius
 	private int radius;

@@ -1,0 +1,2 @@
+- create a "max" filter (like median but for max)
+- see if that leads to a faster non-max supression
