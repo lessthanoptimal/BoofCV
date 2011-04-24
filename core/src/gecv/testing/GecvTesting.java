@@ -231,7 +231,7 @@ public class GecvTesting {
 			return found.get(0);
 		}
 
-		throw new RuntimeException("Couldn't find matching function to " + name);
+		throw new RuntimeException("Couldn't find matching *public* function to " + name);
 	}
 
 	/**
@@ -276,7 +276,7 @@ public class GecvTesting {
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
 				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("value not equal: "+imgA.get(x,y)+" "+imgB.get(x,y)+" at ("+x+" , "+y+")");
+					throw new RuntimeException("value not equal: " + imgA.get(x, y) + " " + imgB.get(x, y) + " at (" + x + " , " + y + ")");
 			}
 		}
 	}
@@ -344,7 +344,7 @@ public class GecvTesting {
 		for (int y = 0; y < imgA.getHeight(); y++) {
 			for (int x = 0; x < imgA.getWidth(); x++) {
 				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") "+imgA.get(x,y) + "  "+imgB.get(x,y));
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + imgA.get(x, y) + "  " + imgB.get(x, y));
 			}
 		}
 	}
