@@ -18,6 +18,7 @@ package gecv.alg.interpolate;
 
 import gecv.alg.interpolate.impl.BilinearPixel_F32;
 import gecv.alg.interpolate.impl.BilinearRegion_F32;
+import gecv.struct.image.ImageFloat32;
 
 /**
  * Simplified interface for creating interpolation classes.
@@ -26,11 +27,11 @@ import gecv.alg.interpolate.impl.BilinearRegion_F32;
  */
 public class FactoryInterpolation {
 
-	public static InterpolatePixel_F32 bilinearPixel_F32() {
+	public static InterpolatePixel<ImageFloat32> bilinearPixel_F32() {
 		return new BilinearPixel_F32();
 	}
 
-	public static InterpolateRegion_F32 bilinearRegion_F32() {
+	public static InterpolateRegion<ImageFloat32> bilinearRegion_F32() {
 		return new BilinearRegion_F32();
 	}
 }

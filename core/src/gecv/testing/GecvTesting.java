@@ -33,6 +33,19 @@ import java.util.List;
 public class GecvTesting {
 
 	/**
+	 * Returns an image which is a sub-image but contains the same values of the input image.  Use for
+	 * testing compliance with sub-images.
+	 */
+	@SuppressWarnings({"unchecked"})
+	public static <T extends ImageBase> T createSubImageOf(T input) {
+		T ret = (T) input._createNew(input.width + 10, input.height + 12);
+		ret = (T) ret.subimage(5, 7, input.width + 5, input.height + 7);
+		ret.setTo(input);
+
+		return ret;
+	}
+
+	/**
 	 * Searches for functions that accept only images and makes sure they only accept
 	 * images which have he same width and height.
 	 *

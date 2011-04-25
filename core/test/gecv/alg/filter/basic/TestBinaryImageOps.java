@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.binary;
+package gecv.alg.filter.basic;
 
 import org.junit.Test;
 

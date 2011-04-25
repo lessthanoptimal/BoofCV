@@ -23,6 +23,18 @@ import gecv.struct.image.ImageBase;
  */
 public class InputSanityCheck {
 
+	/**
+	 * If the output has not been declared a new instance is declared.  If an instance of the output
+	 * is provided its bounds are checked.
+	 */
+	public static <T extends ImageBase> T checkDeclare(T input, T output) {
+		if (output == null) {
+			output = (T) input._createNew(input.width, input.height);
+		} else if (output.width != input.width || output.height != input.height)
+			throw new IllegalArgumentException("Width and/or height of input and output do not match.");
+		return output;
+	}
+
 	public static void checkSameShape(ImageBase<?> imgA, ImageBase<?> imgB) {
 		if (imgA.width != imgB.width)
 			throw new IllegalArgumentException("Image widths do not match.");

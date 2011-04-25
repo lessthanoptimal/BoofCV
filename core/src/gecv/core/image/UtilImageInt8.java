@@ -31,7 +31,7 @@ public class UtilImageInt8 {
 	 * @param img   An image.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(ImageInt8 img, byte value) {
+	public static void fill(ImageInt8 img, int value) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -40,7 +40,7 @@ public class UtilImageInt8 {
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			for (int x = 0; x < w; x++) {
-				data[index++] = value;
+				data[index++] = (byte) value;
 			}
 		}
 	}

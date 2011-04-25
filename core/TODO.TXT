@@ -7,15 +7,25 @@
  * intensity
 
 - Generic convolutions
-*   generic with precomputed image offsets
-*   benchmark for speed
+* generic with precomputed image offsets
+* Handle edge conditions
+  - Renormalize the kernel for blur operations
+  -
+* benchmark for speed
+
+- Edges
+ * Whole image:
+    - Intensity and orientation
+ * Connected Segments
+    - Canny?
+
+- Thresholding
+ * Global Threshold
+ * Adaptively select global threshold
+ * Local Threshold
+
 - Specialized Convolutions
 *   Gaussian
-*   Table
 
 - Improve Median Filter
 *   Use bubble sort to avoid resorting each time
-
-- Write SSD and FAST feature detectors
-- Profile for feature detectors
-- Create an application which shows detected features in images

@@ -16,7 +16,7 @@
 
 package gecv.alg.interpolate.impl;
 
-import gecv.alg.interpolate.InterpolateRegion_F32;
+import gecv.alg.interpolate.InterpolateRegion;
 import gecv.struct.image.ImageFloat32;
 
 
@@ -25,7 +25,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class BilinearRegion_F32 implements InterpolateRegion_F32 {
+public class BilinearRegion_F32 implements InterpolateRegion<ImageFloat32> {
 
 	private ImageFloat32 orig;
 
@@ -67,12 +67,9 @@ public class BilinearRegion_F32 implements InterpolateRegion_F32 {
 		float a3 = bx * ay;
 
 		// make sure it is in bounds
-//        if( xt+regWidth >= width ) {
-//            regWidth = width - xt;
-//        }
-//        if( yt+regHeight >= height ) {
-//            regHeight = height - yt;
-//        }
+		if (xt + regWidth >= orig.width || yt + regHeight >= orig.height) {
+			throw new RuntimeException("reguested region is out of bounds");
+		}
 
 		// perform the interpolation while reducing the number of times the image needs to be accessed
 		int indexResults = 0;

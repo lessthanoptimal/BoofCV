@@ -14,34 +14,27 @@
  *    limitations under the License.
  */
 
-package gecv.alg.track.klt;
+package gecv.alg.tracker.klt;
+
+import gecv.struct.image.ImageFloat32;
+
+import java.util.List;
 
 /**
+ * Automatically selects KLT features and creates descriptions of them.  There are many different ways to do this
+ * for different applications.
+ *
  * @author Peter Abeles
  */
-public class KltFeature {
+public interface KltFeatureSelector {
 
 	/**
-	 * The feature's size.  Each feature is square with a width equal to its
-	 * radius*2+1.
+	 * Given the image and its gradient select features for the tracker to track.
+	 *
+	 * @param image  Original image.
+	 * @param derivX Image derivative along the x-axis.
+	 * @param derivY Image derivative along the y-axis.
+	 * @return List of KLT features.
 	 */
-	public int radius;
-
-	/**
-	 * Pixel intensity around the feature
-	 */
-	public float pixel[];
-	/**
-	 * Image derivative around the feature in the x-direction
-	 */
-	public float derivX[];
-	/**
-	 * Image derivative around the feature in the y-direction
-	 */
-	public float derivY[];
-
-	/**
-	 * spatial gradient matrix used in updating the feature's position
-	 */
-	public float Gxx, Gxy, Gyy;
+	public List<KltFeature> select(ImageFloat32 image, ImageFloat32 derivX, ImageFloat32 derivY);
 }

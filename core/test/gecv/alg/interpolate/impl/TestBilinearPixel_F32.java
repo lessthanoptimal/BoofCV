@@ -134,4 +134,62 @@ public class TestBilinearPixel_F32 {
 		assertEquals(interp.get(10.8f, 10.6f), interp.get_unsafe(10.8f, 10.6f), 1e-6);
 	}
 
+	@Test
+	public void getImage() {
+		ImageFloat32 img = new ImageFloat32(width, height);
+		BilinearPixel_F32 interp = new BilinearPixel_F32(img);
+		assertTrue(img == interp.getImage());
+	}
+
+	@Test
+	public void getBorderOffsets() {
+		ImageFloat32 img = new ImageFloat32(width, height);
+		BilinearPixel_F32 interp = new BilinearPixel_F32(img);
+
+		int[] border = interp.getBorderOffsets();
+
+		// top border
+		if (border[0] > 0) {
+			try {
+				interp.get(40, border[0] - 1);
+				fail("Should have thrown exception");
+			} catch (RuntimeException e) {
+			}
+		} else {
+			interp.get(40, 0);
+		}
+
+		// right border
+		if (border[1] > 0) {
+			try {
+				interp.get(width - border[1], 40);
+				fail("Should have thrown exception");
+			} catch (RuntimeException e) {
+			}
+		} else {
+			interp.get(width - 1, 40);
+		}
+
+		// bottom border
+		if (border[2] > 0) {
+			try {
+				interp.get(40, height - border[2]);
+				fail("Should have thrown exception");
+			} catch (RuntimeException e) {
+			}
+		} else {
+			interp.get(40, height - 1);
+		}
+
+		// left border
+		if (border[3] > 0) {
+			try {
+				interp.get(border[3] - 1, 40);
+				fail("Should have thrown exception");
+			} catch (RuntimeException e) {
+			}
+		} else {
+			interp.get(0, 40);
+		}
+	}
 }

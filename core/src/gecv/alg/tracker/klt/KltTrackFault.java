@@ -14,27 +14,30 @@
  *    limitations under the License.
  */
 
-package gecv.alg.track.klt;
-
-import gecv.struct.image.ImageFloat32;
-
-import java.util.List;
+package gecv.alg.tracker.klt;
 
 /**
- * Automatically selects KLT features and creates descriptions of them.  There are many different ways to do this
- * for different applications.
- *
  * @author Peter Abeles
  */
-public interface KltFeatureSelector {
-
+public enum KltTrackFault {
 	/**
-	 * Given the image and its gradient select features for the tracker to track.
-	 *
-	 * @param image  Original image.
-	 * @param derivX Image derivative along the x-axis.
-	 * @param derivY Image derivative along the y-axis.
-	 * @return List of KLT features.
+	 * The feature was successfully tracked
 	 */
-	public List<KltFeature> select(ImageFloat32 image, ImageFloat32 derivX, ImageFloat32 derivY);
+	SUCCESS,
+	/**
+	 * The feature has moved farther than it could possibly be tracked
+	 */
+	DRIFTED,
+	/**
+	 * The tracked move out of the image bounds.
+	 */
+	OUT_OF_BOUNDS,
+	/**
+	 * Miscellaneous track failure
+	 */
+	FAILED,
+	/**
+	 * The feature's error was too large
+	 */
+	LARGE_ERROR
 }

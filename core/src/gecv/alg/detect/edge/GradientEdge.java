@@ -14,27 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.alg.track.klt;
-
-import gecv.alg.InputSanityCheck;
-import gecv.struct.image.ImageFloat32;
+package gecv.alg.detect.edge;
 
 /**
  * @author Peter Abeles
  */
-public class KltFeatureGenerator {
-	// input image
-	ImageFloat32 image;
-
-	// image gradient
-	ImageFloat32 derivX;
-	ImageFloat32 derivY;
-
-	public void setImage(ImageFloat32 image, ImageFloat32 derivX, ImageFloat32 derivY) {
-		InputSanityCheck.checkSameShape(image, derivX, derivY);
-	}
-
-	public void setDescription(KltFeature feature, float x, float y) {
-
-	}
+public class GradientEdge {
 }

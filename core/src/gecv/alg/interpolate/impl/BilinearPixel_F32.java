@@ -16,16 +16,17 @@
 
 package gecv.alg.interpolate.impl;
 
-import gecv.alg.interpolate.InterpolatePixel_F32;
+import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.image.ImageFloat32;
 
 
 /**
- * Performs bilinear interpolation to extract values between pixels in an image.
+ * Performs bilinear interpolation to extract values between pixels in an image.  When a boundary is encountered
+ * the number of pixels used to interpolate is automatically reduced.
  *
  * @author Peter Abeles
  */
-public class BilinearPixel_F32 implements InterpolatePixel_F32 {
+public class BilinearPixel_F32 implements InterpolatePixel<ImageFloat32> {
 
 	private ImageFloat32 orig;
 
@@ -34,7 +35,7 @@ public class BilinearPixel_F32 implements InterpolatePixel_F32 {
 	private int width;
 	private int height;
 
-	private int borderOffsets[] = new int[]{0, 1, 1, 0};
+	private int borderOffsets[] = new int[]{0, 0, 0, 0};
 
 	public BilinearPixel_F32() {
 	}
@@ -92,6 +93,7 @@ public class BilinearPixel_F32 implements InterpolatePixel_F32 {
 
 		int index = orig.startIndex + yt * stride + xt;
 
+		// throw allows borders to be interpolated gracefully by double counting appropriate pixels
 		int dx = xt == width - 1 ? 0 : 1;
 		int dy = yt == height - 1 ? 0 : stride;
 

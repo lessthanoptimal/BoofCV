@@ -16,30 +16,30 @@
 
 package gecv.alg.interpolate;
 
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageBase;
 
 
 /**
  * Interface for interpolation between pixels on a per-pixel basis.  If a whole rectangular region needs
- * to be interpolated then {@link InterpolateRegion_F32} should be considered for performance reasons.
+ * to be interpolated then {@link InterpolateRegion} should be considered for performance reasons.
  *
  * @author Peter Abeles
  */
-public interface InterpolatePixel_F32 {
+public interface InterpolatePixel<T extends ImageBase> {
 
 	/**
 	 * Change the image that is being interpolated.
 	 *
 	 * @param image An image.
 	 */
-	public void setImage(ImageFloat32 image);
+	public void setImage(T image);
 
 	/**
 	 * Returns the image which is being interpolated.
 	 *
 	 * @return A reference to the image being interpolated.
 	 */
-	public ImageFloat32 getImage();
+	public T getImage();
 
 	/**
 	 * Returns true of the point is inside the image.

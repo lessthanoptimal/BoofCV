@@ -1,0 +1,10 @@
+- Asymmetric
+- Symmetric
+- Light invariant
+- Asymmetric with edges
+
+- benchmark with real images
+
+- Gray scale pyramid
+- Color images?
+- benchmark pyramid

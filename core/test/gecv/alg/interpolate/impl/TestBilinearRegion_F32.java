@@ -36,14 +36,38 @@ public class TestBilinearRegion_F32 {
 	int width = 320;
 	int height = 240;
 
+	int regionWidth;
+	int regionHeight;
+	float tl_x;
+	float tl_y;
+
+	/**
+	 * Tell it to copy a region in the center
+	 */
+	@Test
+	public void checkCenter() {
+		checkRegion(10, 15, 2.11f, 5.23f);
+	}
+
+	/**
+	 * See if it handles edge conditions gracefully
+	 */
+	@Test
+	public void checkBottomRightEdge() {
+		checkRegion(10, 15, width - 10, height - 15);
+	}
+
 	/**
 	 * Compare region against the value returned by get BilinearPixel_F32
 	 */
-	@Test
-	public void region() {
+	public void checkRegion(int regionWidth, int regionHeight, float x, float y) {
 		ImageFloat32 img = new ImageFloat32(width, height);
 		UtilImageFloat32.randomize(img, rand, 0, 100);
 
+		this.regionWidth = regionWidth;
+		this.regionHeight = regionHeight;
+		this.tl_x = x;
+		this.tl_y = y;
 		GecvTesting.checkSubImage(this, "region", false, img);
 	}
 
@@ -53,18 +77,13 @@ public class TestBilinearRegion_F32 {
 		interp.setImage(img);
 		interpPt.setImage(img);
 
-		int width = 10;
-		int height = 5;
-		float data[] = new float[50];
+		float data[] = new float[regionWidth * regionHeight];
 
-		float tl_x = 2.11f;
-		float tl_y = 5.23f;
-
-		interp.region(tl_x, tl_y, data, width, height);
+		interp.region(tl_x, tl_y, data, regionWidth, regionHeight);
 
 		int i = 0;
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
+		for (int y = 0; y < regionHeight; y++) {
+			for (int x = 0; x < regionWidth; x++) {
 				assertEquals(interpPt.get(x + tl_x, y + tl_y), data[i++], 1e-4);
 			}
 		}

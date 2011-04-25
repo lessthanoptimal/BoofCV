@@ -16,7 +16,7 @@
 
 package gecv.alg.interpolate;
 
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageBase;
 
 /**
  * Performs interpolation across a whole rectangular region inside the image.  This can be significantly faster than
@@ -24,21 +24,21 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public interface InterpolateRegion_F32 {
+public interface InterpolateRegion<T extends ImageBase> {
 
 	/**
 	 * Change the image that is being interpolated.
 	 *
 	 * @param image An image.
 	 */
-	public void setImage(ImageFloat32 image);
+	public void setImage(T image);
 
 	/**
 	 * Returns the image which is being interpolated.
 	 *
 	 * @return A reference to the image being interpolated.
 	 */
-	public ImageFloat32 getImage();
+	public T getImage();
 
 	/**
 	 * There is a certain amount of overhead involved with repeat calls to get.  If a grid

@@ -17,7 +17,6 @@
 package gecv.core.image;
 
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
 
 import java.util.Random;
 
@@ -68,10 +67,21 @@ public class UtilImageFloat32 {
 		}
 	}
 
+	/**
+	 * Sets a rectangle inside the image with the specified value.
+	 */
+	public static void fillRectangle(ImageFloat32 img, float value, int x0, int y0, int x1, int y1) {
+		for (int y = y0; y < y1; y++) {
+			for (int x = x0; x < x1; x++) {
+				img.set(x, y, value);
+			}
+		}
+	}
+
 	public static void print(ImageFloat32 a) {
-		for( int y = 0; y < a.height; y++ ) {
-			for( int x = 0; x < a.width; x++ ) {
-				System.out.printf("%5.2f ",a.get(x,y));
+		for (int y = 0; y < a.height; y++) {
+			for (int x = 0; x < a.width; x++) {
+				System.out.printf("%5.2f ", a.get(x, y));
 			}
 			System.out.println();
 		}

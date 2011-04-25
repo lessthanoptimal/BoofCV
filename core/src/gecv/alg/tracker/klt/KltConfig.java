@@ -14,30 +14,21 @@
  *    limitations under the License.
  */
 
-package gecv.alg.track.klt;
+package gecv.alg.tracker.klt;
 
 /**
  * @author Peter Abeles
  */
-public enum KltTrackFault {
+public class KltConfig {
+
 	/**
-	 * The feature was successfully tracked
+	 * Due to how the image derivative and interpolation is performed outer most pixels. Features are
+	 * not allowed to overlap this close to the image's edge.
 	 */
-	ALL_GOOD,
-	/**
-	 * The feature drifted away
-	 */
-	DRIFTED,
-	/**
-	 * The tracked move out of the image bounds.
-	 */
-	OUT_OF_BOUNDS,
-	/**
-	 * Miscellaneous track failure
-	 */
-	FAILED,
-	/**
-	 * The feature's error was too large
-	 */
-	LARGE_ERROR
+	int forbiddenBorder;
+
+	float maxError;
+	int maxIterations;
+	float minDeterminant;
+	float minPositionDelta;
 }
