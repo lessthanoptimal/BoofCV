@@ -14,18 +14,18 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.convolve;
+package gecv.alg.filter.convolve.edge;
 
 import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestConvolveImage {
-
+public class TestConvolveNormalized {
 	@Test
-	public void compareToStandard() {
-		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImage.class);
-		a.performTests(16);
+	public void compareToNaive() {
+		CompareToStandardConvolutionNormalized test = new CompareToStandardConvolutionNormalized(ConvolveNormalized.class);
+
+		test.performTests(6);
 	}
 }

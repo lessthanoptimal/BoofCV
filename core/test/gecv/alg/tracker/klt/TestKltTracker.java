@@ -117,13 +117,20 @@ public class TestKltTracker {
 	 */
 	@Test
 	public void testBorder() {
+		image = new ImageFloat32(imageWidth, imageHeight);
+		derivX = new ImageFloat32(imageWidth, imageHeight);
+		derivY = new ImageFloat32(imageWidth, imageHeight);
+
 		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 		KltFeature feature = new KltFeature(2);
 
 		// put a feature right on the corner
-		feature.setPosition(imageWidth, imageHeight);
+		feature.setPosition(imageWidth/2, imageHeight/2);
 		tracker.setDescription(feature);
+
+		// this should make the feature be out of bounds
+		tracker.getConfig().forbiddenBorder=10000;
 
 		// update the feature's position
 		tracker.setImage(image, derivX, derivY);
@@ -135,13 +142,18 @@ public class TestKltTracker {
 	 */
 	@Test
 	public void handleOutOfBounds() {
+		image = new ImageFloat32(imageWidth, imageHeight);
+		derivX = new ImageFloat32(imageWidth, imageHeight);
+		derivY = new ImageFloat32(imageWidth, imageHeight);
+
 		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 		KltFeature feature = new KltFeature(2);
 
 		// put a feature right on the corner
-		feature.setPosition(imageWidth, imageHeight);
+		feature.setPosition(imageWidth/2, imageHeight/2);
 		tracker.setDescription(feature);
+		feature.setPosition(imageWidth, imageHeight);
 
 		// update the feature's position
 		tracker.setImage(image, derivX, derivY);
@@ -153,6 +165,9 @@ public class TestKltTracker {
 	 */
 	@Test
 	public void detectBadFeature() {
+		image = new ImageFloat32(imageWidth, imageHeight);
+		derivX = new ImageFloat32(imageWidth, imageHeight);
+		derivY = new ImageFloat32(imageWidth, imageHeight);
 		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 		KltFeature feature = new KltFeature(2);

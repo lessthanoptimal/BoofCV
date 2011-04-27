@@ -16,6 +16,8 @@
 
 package gecv.alg.filter.convolve.impl;
 
+import gecv.misc.CodeGeneratorUtil;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -88,6 +90,7 @@ public class GenerateConvolveBox {
 	}
 
 	public void printPreamble() {
+		out.print(CodeGeneratorUtil.copyright);
 		out.print("package gecv.alg.filter.convolve.impl;\n" +
 				"\n" +
 				"import gecv.struct.image." + typeInput + ";\n" +

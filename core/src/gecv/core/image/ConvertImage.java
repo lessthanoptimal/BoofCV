@@ -17,7 +17,6 @@
 package gecv.core.image;
 
 import gecv.alg.InputSanityCheck;
-import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt8;
@@ -191,6 +190,47 @@ public class ConvertImage {
 
 			for (int i = 0; i < N; i++) {
 				dst.data[i] = (byte) src.data[i];
+			}
+		}
+
+		return dst;
+	}
+
+/**
+	 * <p>
+	 * Converts {@link gecv.struct.image.ImageFloat32} into {@link ImageInt16}.  No additional
+	 * scaling is done, just a straight conversion.
+	 * </p>
+	 * <p/>
+	 * <p>
+	 * dst(x,y) = (byte)src(x,y)
+	 * </p>
+	 *
+	 * @param src
+	 * @param dst
+	 */
+	public static ImageInt16 convert(ImageFloat32 src, ImageInt16 dst) {
+		if (dst == null) {
+			dst = new ImageInt16(src.width, src.height);
+		} else {
+			InputSanityCheck.checkSameShape(src, dst);
+		}
+
+		if (src.isSubimage() || dst.isSubimage()) {
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.getIndex(0, y);
+				int indexDst = dst.getIndex(0, y);
+
+				for (int x = 0; x < src.width; x++) {
+					dst.data[indexDst++] = (short) src.data[indexSrc++];
+				}
+			}
+
+		} else {
+			final int N = src.width * src.height;
+
+			for (int i = 0; i < N; i++) {
+				dst.data[i] = (short) src.data[i];
 			}
 		}
 

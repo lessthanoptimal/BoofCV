@@ -30,7 +30,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static gecv.core.image.GeneralizedImageOps.*;
+import static gecv.core.image.GeneralizedImageOps.get;
+import static gecv.core.image.GeneralizedImageOps.isFloatingPoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -86,6 +87,15 @@ public class TestConvolveImageStandard {
 	}
 
 	@Test
+	public void horizontal_I16_div() {
+		ImageInt16 img = new ImageInt16(width, height);
+		UtilImageInt16.randomize(img, rand, (short) 0, (short) 100);
+		ImageInt16 dest = new ImageInt16(width, height);
+
+		GecvTesting.checkSubImage(this, "horizontalDiv", true, img, dest);
+	}
+
+	@Test
 	public void vertical_F32() {
 		ImageFloat32 img = new ImageFloat32(width, height);
 		UtilImageFloat32.randomize(img, rand, 0, 1);
@@ -119,6 +129,15 @@ public class TestConvolveImageStandard {
 		ImageInt16 dest = new ImageInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "vertical", true, img, dest);
+	}
+
+	@Test
+	public void vertical_I16_div() {
+		ImageInt16 img = new ImageInt16(width, height);
+		UtilImageInt16.randomize(img, rand, (short) 0, (short) 100);
+		ImageInt16 dest = new ImageInt16(width, height);
+
+		GecvTesting.checkSubImage(this, "verticalDiv", true, img, dest);
 	}
 
 	@Test
@@ -156,9 +175,17 @@ public class TestConvolveImageStandard {
 	@Test
 	public void convolve_I16() {
 		ImageInt16 img = new ImageInt16(width, height);
-		UtilImageInt16.randomize(img, rand, (short) 0, (short) 100);
+		UtilImageInt16.randomize(img, rand, 0, 100);
 		ImageInt16 dest = new ImageInt16(width, height);
 		GecvTesting.checkSubImage(this, "convolve", true, img, dest);
+	}
+
+	@Test
+	public void convolve_I16_div() {
+		ImageInt16 img = new ImageInt16(width, height);
+		UtilImageInt16.randomize(img, rand, 0, 100);
+		ImageInt16 dest = new ImageInt16(width, height);
+		GecvTesting.checkSubImage(this, "convolveDiv", true, img, dest);
 	}
 
 	/**

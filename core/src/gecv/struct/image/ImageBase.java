@@ -60,7 +60,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public abstract class ImageBase<T extends ImageBase> implements Serializable {
+public abstract class ImageBase<T extends ImageBase> implements Serializable, Cloneable {
 
 	/**
 	 * Index of the first pixel in the data array
@@ -227,6 +227,22 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable {
 				indexDst += stride;
 			}
 		}
+	}
+
+	/**
+	 * Creates an identical image.  Note that if this image is a sub-image portions of hte image which are not part
+	 * of the sub-image are not copied.
+	 *
+	 * @return Clone of this image.
+	 */
+	@SuppressWarnings({"unchecked", "CloneDoesntDeclareCloneNotSupportedException", "CloneDoesntCallSuperClone"})
+	@Override
+	public T clone() {
+		T ret = _createNew(width,height);
+
+		ret.setTo(this);
+
+		return ret;
 	}
 
 	/**

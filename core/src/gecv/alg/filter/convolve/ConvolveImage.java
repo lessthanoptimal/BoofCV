@@ -33,11 +33,16 @@ import gecv.struct.image.ImageInt8;
  * Provides functions for convolving 1D and 2D kernels across an image.  1D kernels can either
  * be convolved along each row or column in the image.  No checks are done for overflow or underflow.
  * </p>
- * <p/>
  * <p>
  * When convolving with division the convolution is computed as usual, but then the result is divided by
  * the divisor.  This is typically done when performing convolution inside of integer images to normalize
  * it by the sum of all the elements in the convolution kernel.
+ * </p>
+ *
+ * <p>
+ * Image Edges:  There is no general purpose way for handling convolutions along the image edges.  Therefor unless
+ * the whole kernel can be convolved image borders are skipped.  In special cases where there is a clear way to
+ * handle image edges specialized functions are provided.
  * </p>
  *
  * @author Peter Abeles
@@ -50,9 +55,9 @@ public class ConvolveImage {
 	 * is not processed and the vertical border is optionally processed.  The border is as wide
 	 * as the radius of the kernel.
 	 *
-	 * @param image		 The original image. Not modified.
-	 * @param dest		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
+	 * @param image	 The original image. Not modified.
+	 * @param dest	 Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param includeBorder Should the vertical border of the image be processed?
 	 */
 	public static void horizontal(Kernel1D_F32 kernel,
@@ -79,7 +84,7 @@ public class ConvolveImage {
 								  ImageInt8 image, ImageInt8 dest, int divisor, boolean includeBorder) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		if( !ConvolveImageUnrolled_I8_I8.horizontal(kernel, image, dest, divisor, includeBorder))
+		if( !ConvolveImageUnrolled_I8_I8_Div.horizontal(kernel, image, dest, divisor, includeBorder))
 			ConvolveImageStandard.horizontal(kernel, image, dest, divisor, includeBorder);
 	}
 
@@ -137,6 +142,25 @@ public class ConvolveImage {
 			ConvolveImageStandard.horizontal(kernel, image, dest, includeBorder);
 	}
 
+/**
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border
+	 * is not processed and the vertical border is optionally processed.  The border is as wide
+	 * as the radius of the kernel.
+	 *
+	 * @param image		 The original image. Not modified.
+	 * @param dest		  Where the resulting image is written to. Modified.
+	 * @param kernel		The kernel that is being convolved. Not modified.
+	 * @param divisor	   The value that the convolved image is divided by.
+	 * @param includeBorder Should the vertical border of the image be processed?
+	 */
+	public static void horizontal(Kernel1D_I32 kernel,
+								  ImageInt16 image, ImageInt16 dest, int divisor, boolean includeBorder) {
+		InputSanityCheck.checkSameShape(image, dest);
+
+		if (!ConvolveImageUnrolled_I16_I16_Div.horizontal(kernel, image, dest, divisor , includeBorder))
+			ConvolveImageStandard.horizontal(kernel, image, dest, divisor, includeBorder);
+	}
+
 	/**
 	 * Performs a vertical 1D convolution across the image.  The vertical border
 	 * is not processed and the horizontal border is optionally processed.  The border is as wide
@@ -171,7 +195,7 @@ public class ConvolveImage {
 								ImageInt8 image, ImageInt8 dest, int divisor, boolean includeBorder) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		if( !ConvolveImageUnrolled_I8_I8.vertical(kernel, image, dest, divisor, includeBorder))
+		if( !ConvolveImageUnrolled_I8_I8_Div.vertical(kernel, image, dest, divisor, includeBorder))
 			ConvolveImageStandard.vertical(kernel, image, dest, divisor, includeBorder);
 	}
 
@@ -230,6 +254,26 @@ public class ConvolveImage {
 
 		if (!ConvolveImageUnrolled_I16_I16.vertical(kernel, image, dest, includeBorder))
 			ConvolveImageStandard.vertical(kernel, image, dest, includeBorder);
+	}
+
+/**
+	 * Performs a vertical 1D convolution across the image.  The vertical border
+	 * is not processed and the horizontal border is optionally processed.  The border is as wide
+	 * as the radius of the kernel.
+	 *
+	 * @param image		 The original image. Not modified.
+	 * @param dest		  Where the resulting image is written to. Modified.
+	 * @param kernel		The kernel that is being convolved. Not modified.
+	 * @param divisor	   The value that the convolved image is divided by.
+	 * @param includeBorder Should the horizontal border of the image be processed?
+	 */
+	public static void vertical(Kernel1D_I32 kernel,
+								ImageInt16 image, ImageInt16 dest,
+								int divisor , boolean includeBorder) {
+		InputSanityCheck.checkSameShape(image, dest);
+
+		if (!ConvolveImageUnrolled_I16_I16_Div.vertical(kernel, image, dest, divisor , includeBorder))
+			ConvolveImageStandard.vertical(kernel, image, dest, divisor , includeBorder);
 	}
 
 	/**

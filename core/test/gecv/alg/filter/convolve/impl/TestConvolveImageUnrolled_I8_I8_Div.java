@@ -16,42 +16,38 @@
 
 package gecv.alg.filter.convolve.impl;
 
-import gecv.alg.filter.convolve.TestConvolveImage;
+import gecv.alg.filter.convolve.CompareToStandardConvolution;
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt8;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestConvolveImageUnrolled_I8_I8 {
+public class TestConvolveImageUnrolled_I8_I8_Div {
+	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_I8_I8_Div.class);
+
 	@Test
 	public void horizontal_divide() throws NoSuchMethodException {
-		Random rand = new Random(234);
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_I8_I8.class.getMethod("horizontal",
+			Method m = ConvolveImageUnrolled_I8_I8_Div.class.getMethod("horizontal",
 					Kernel1D_I32.class, ImageInt8.class, ImageInt8.class, int.class, boolean.class);
 
-			TestConvolveImage.checkAgainstStandard(m, "horizontal", 5, 7, i + 1, rand);
+			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
 	}
 
 	@Test
 	public void vertical_divide() throws NoSuchMethodException {
-		Random rand = new Random(234);
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_I8_I8.class.getMethod("vertical",
+			Method m = ConvolveImageUnrolled_I8_I8_Div.class.getMethod("vertical",
 					Kernel1D_I32.class, ImageInt8.class, ImageInt8.class, int.class, boolean.class);
 
-			TestConvolveImage.checkAgainstStandard(m, "vertical", 5, 7, i + 1, rand);
+			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}
 	}
 }

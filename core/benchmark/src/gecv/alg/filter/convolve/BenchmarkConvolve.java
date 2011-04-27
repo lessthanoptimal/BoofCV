@@ -63,14 +63,6 @@ public class BenchmarkConvolve {
 		}
 	}
 
-	public static class Horizontal_F32_Border extends PerformerBase
-	{
-		@Override
-		public void process() {
-			Convolve1DBorders.horizontal(kernelF32,imgFloat32,out_F32,false);
-		}
-	}
-
 	public static class Horizontal_I8_I8_div extends PerformerBase
 	{
 		@Override
@@ -83,7 +75,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_I8_I8.horizontal(kernelI32,imgInt8,out_I8,10,false) )
+			if( !ConvolveImageUnrolled_I8_I8_Div.horizontal(kernelI32,imgInt8,out_I8,10,false) )
 				throw new RuntimeException();
 		}
 	}
@@ -125,16 +117,8 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_I8_I8.vertical(kernelI32,imgInt8,out_I8,10,false) )
+			if( !ConvolveImageUnrolled_I8_I8_Div.vertical(kernelI32,imgInt8,out_I8,10,false) )
 				throw new RuntimeException();
-		}
-	}
-
-	public static class Vertical_F32_Border extends PerformerBase
-	{
-		@Override
-		public void process() {
-			Convolve1DBorders.vertical(kernelF32,imgFloat32,out_F32,false);
 		}
 	}
 
@@ -263,7 +247,6 @@ public class BenchmarkConvolve {
 			ProfileOperation.printOpsPerSec(new Horizontal_I8_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Horizontal_I8_I8_div(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Horizontal_I16_I16(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Horizontal_F32_Border(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new HorizontalUnrolled_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new HorizontalUnrolled_I8(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new HorizontalUnroll_I8_I8_div(),TEST_TIME);
@@ -276,7 +259,6 @@ public class BenchmarkConvolve {
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I8(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I8_I8_div(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I16(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Vertical_F32_Border(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Box_I8_I32_Vertical(),TEST_TIME);
 //
 			ProfileOperation.printOpsPerSec(new Convolve2D_F32(),TEST_TIME);

@@ -254,4 +254,8 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 
 		return true;
 	}
+
+	public KltConfig getConfig() {
+		return config;
+	}
 }

@@ -16,6 +16,8 @@
 
 package gecv.alg.filter.convolve.impl;
 
+import gecv.misc.CodeGeneratorUtil;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -51,10 +53,14 @@ public class GenerateConvolveStandard {
 		printAllOps("I32", "ImageInt8", "ImageInt8",
 				"int", "byte", "byte",
 				"int", "(byte)", "& 0xFF", true);
+		printAllOps("I32", "ImageInt16", "ImageInt16",
+				"int", "short", "short",
+				"int", "(short)", "", true);
 		out.println("}");
 	}
 
 	private void printPreamble() {
+		out.print(CodeGeneratorUtil.copyright);
 		out.print("package gecv.alg.filter.convolve.impl;\n");
 		out.println();
 		out.print("import gecv.struct.convolve.Kernel1D_F32;\n" +
@@ -75,7 +81,6 @@ public class GenerateConvolveStandard {
 				" * <p>\n" +
 				" * NOTE: This code was automatically generated using {@link GenerateConvolveStandard}.\n" +
 				" * </p>\n" +
-				" * \n" +
 				" * \n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
@@ -137,8 +142,8 @@ public class GenerateConvolveStandard {
 		String totalDiv = hasDivide ? "(total/divisor)" : "total";
 
 		out.print("\tpublic static void vertical( Kernel1D_" + kernelType + " kernel,\n" +
-				"\t\t\t\t\t\t\t\t" + inputType + " image, " + outputType + " dest," + paramDiv + "\n" +
-				"\t\t\t\t\t\t\t\tboolean includeBorder)\n" +
+				"\t\t\t\t\t\t\t\t " + inputType + " image, " + outputType + " dest," + paramDiv + "\n" +
+				"\t\t\t\t\t\t\t\t boolean includeBorder)\n" +
 				"\t{\n" +
 				"\t\tfinal " + inputData + "[] dataSrc = image.data;\n" +
 				"\t\tfinal " + outputData + "[] dataDst = dest.data;\n" +

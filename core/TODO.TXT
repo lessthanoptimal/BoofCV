@@ -27,5 +27,12 @@
 - Specialized Convolutions
 *   Gaussian
 
+- Corners
+ * Evaluate for accuracy
+ * See corner section
+
+- Convolve
+ * Change TestConvolveImageStandard into a completely automated test using reflections
+
 - Improve Median Filter
 *   Use bubble sort to avoid resorting each time

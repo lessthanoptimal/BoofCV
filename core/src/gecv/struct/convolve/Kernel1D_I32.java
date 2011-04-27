@@ -119,4 +119,13 @@ public class Kernel1D_I32 {
 	public int get(int i) {
 		return data[i];
 	}
+
+	public int computeSum() {
+		int sum = 0;
+		for( int i = 0; i < data.length; i++ ) {
+			sum += data[i];
+		}
+
+		return sum;
+	}
 }

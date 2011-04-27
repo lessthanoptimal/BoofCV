@@ -26,7 +26,6 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -144,6 +143,32 @@ public class TestConvertImage {
 	}
 
 	public void convert_float32_int8(ImageFloat32 orig, ImageInt8 conv) {
+		ConvertImage.convert(orig, conv);
+
+		// quick sanity check to make sure randomize worked
+		assertTrue(orig.get(0, 0) != 0);
+
+		// see if the conversion was done correctly
+		for (int i = 0; i < imgHeight; i++) {
+			for (int j = 0; j < imgWidth; j++) {
+				int b = conv.get(j, i);
+
+				assertEquals(b, (int) orig.get(j, i), 1e-8);
+			}
+		}
+	}
+
+@Test
+	public void convert_float32_int16() {
+		ImageFloat32 orig = new ImageFloat32(imgWidth, imgHeight);
+		UtilImageFloat32.randomize(orig, rand, -100, 100);
+
+		ImageInt16 conv = new ImageInt16(imgWidth, imgHeight);
+
+		GecvTesting.checkSubImage(this, "convert_float32_int16", true, orig, conv);
+	}
+
+	public void convert_float32_int16(ImageFloat32 orig, ImageInt16 conv) {
 		ConvertImage.convert(orig, conv);
 
 		// quick sanity check to make sure randomize worked

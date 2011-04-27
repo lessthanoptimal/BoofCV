@@ -28,6 +28,25 @@ import java.util.Random;
  */
 public class GeneralizedImageOps {
 
+	public static ImageBase<?> convert( ImageFloat32 input , Class<?> outputType )
+	{
+		if( ImageInt8.class == outputType ) {
+			ImageInt8 ret = new ImageInt8(input.width,input.height);
+			ConvertImage.convert(input,ret);
+			return ret;
+		} else if( ImageInt16.class == outputType ) {
+			ImageInt16 ret = new ImageInt16(input.width,input.height);
+			ConvertImage.convert(input,ret);
+			return ret;
+		} else if( ImageFloat32.class == outputType ) {
+			ImageFloat32 ret = new ImageFloat32(input.width,input.height);
+			ret.setTo(input);
+			return ret;
+		} else {
+			throw new RuntimeException("Add output type: "+outputType);
+		}
+	}
+
 	public static void randomize(ImageBase img, int min, int max, Random rand) {
 		if (img.getClass() == ImageInt8.class) {
 			UtilImageInt8.randomize((ImageInt8) img, rand, min, max);

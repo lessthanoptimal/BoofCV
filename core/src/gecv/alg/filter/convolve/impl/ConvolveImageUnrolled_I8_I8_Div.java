@@ -36,7 +36,7 @@ import gecv.struct.image.ImageInt8;
  *
  * @author Peter Abeles
  */
-public class ConvolveImageUnrolled_I8_I8 {
+public class ConvolveImageUnrolled_I8_I8_Div {
 	public static boolean horizontal( Kernel1D_I32 kernel ,
 								   ImageInt8 image, ImageInt8 dest,
 								   int divisor, boolean includeBorder) {

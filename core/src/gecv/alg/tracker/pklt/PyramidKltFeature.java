@@ -14,18 +14,23 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.convolve;
+package gecv.alg.tracker.pklt;
 
-import org.junit.Test;
+import gecv.alg.tracker.klt.KltFeature;
 
 /**
+ * Feature which is tracked by the {@link PyramidKltTracker}.  Each layer has its own feature description.
+ *
  * @author Peter Abeles
  */
-public class TestConvolveImage {
+public class PyramidKltFeature {
+	KltFeature desc[];
 
-	@Test
-	public void compareToStandard() {
-		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImage.class);
-		a.performTests(16);
+	public PyramidKltFeature( int numLayers , int radius ) {
+		desc = new KltFeature[numLayers];
+
+		for( int i = 0; i < numLayers; i++ ) {
+			desc[i] = new KltFeature(radius);
+		}
 	}
 }

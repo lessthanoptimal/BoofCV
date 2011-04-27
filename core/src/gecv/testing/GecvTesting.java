@@ -138,7 +138,7 @@ public class GecvTesting {
 	 * @param testClass   Instance of the class that contains the function being tested.
 	 * @param function	The name of the function being tested.
 	 * @param checkEquals Checks to see if the two images have been modified the same way on output
-	 * @param orig		The original input image
+	 * @param inputParam	The original input parameters
 	 */
 	// TODO make sure pixels outside are not modified of sub-matrix
 	// todo have the submatrices be from different shaped inputs
@@ -146,46 +146,60 @@ public class GecvTesting {
 	public static void checkSubImage(Object testClass,
 									 String function,
 									 boolean checkEquals,
-									 ImageBase... orig) {
+									 Object... inputParam) {
 		try {
-			ImageBase[] larger = new ImageBase[orig.length];
-			ImageBase[] subImg = new ImageBase[orig.length];
-			Class<?> param[] = new Class<?>[orig.length];
+			ImageBase[] larger = new ImageBase[inputParam.length];
+			ImageBase[] subImg = new ImageBase[inputParam.length];
+			Class<?> paramDesc[] = new Class<?>[inputParam.length];
+			Object[] inputModified = new Object[inputParam.length];
 
-			for (int i = 0; i < orig.length; i++) {
-				// copy the original image inside of a larger image
-				larger[i] = orig[i]._createNew(orig[i].getWidth() + 10, orig[i].getHeight() + 12);
-				// extract a sub-image and make it equivalent to the original image.
-				subImg[i] = larger[i].subimage(5, 6, 5 + orig[i].getWidth(), 6 + orig[i].getHeight());
-				subImg[i].setTo(orig[i]);
+			for (int i = 0; i < inputParam.length; i++) {
+				if( ImageBase.class.isAssignableFrom(inputParam[i].getClass())) {
+					ImageBase<?> img = (ImageBase<?>)inputParam[i];
 
-				param[i] = orig[i].getClass();
+					// copy the original image inside of a larger image
+					larger[i] = img._createNew(img.getWidth() + 10, img.getHeight() + 12);
+					// extract a sub-image and make it equivalent to the original image.
+					subImg[i] = larger[i].subimage(5, 6, 5 + img.getWidth(), 6 + img.getHeight());
+					subImg[i].setTo(img);
+
+				}
+				
+				// the first time it is called use the original inputs
+				inputModified[i] = inputParam[i];
+				paramDesc[i] = inputParam[i].getClass();
 			}
 
 
 			// first try it with the original image
-			Method m = findMethod(testClass.getClass(), function, param);
+			Method m = findMethod(testClass.getClass(), function, paramDesc);
 
-			m.invoke(testClass, orig);
+			m.invoke(testClass, inputModified);
 
 			// now try it with the sub-image
-			m.invoke(testClass, subImg);
+			for( int i = 0; i < inputModified.length; i++ ) {
+				if( subImg[i] != null )
+					inputModified[i] = subImg[i];
+			}
+			m.invoke(testClass, inputModified);
 
 			// the result should be the identical
 			if (checkEquals) {
-				for (int i = 0; i < orig.length; i++) {
-					if (orig[i] instanceof ImageInt8)
-						assertEquals((ImageInt8) orig[i], (ImageInt8) subImg[i], 0);
-					else if (orig[i] instanceof ImageInt16)
-						assertEquals((ImageInt16) orig[i], (ImageInt16) subImg[i], 0);
-					else if (orig[i] instanceof ImageInt32)
-						assertEquals((ImageInt32) orig[i], (ImageInt32) subImg[i], 0);
-					else if (orig[i] instanceof ImageInterleavedInt8)
-						assertEquals((ImageInterleavedInt8) orig[i], (ImageInterleavedInt8) subImg[i]);
-					else if (orig[i] instanceof ImageFloat32)
-						assertEquals((ImageFloat32) orig[i], (ImageFloat32) subImg[i]);
+				for (int i = 0; i < inputParam.length; i++) {
+					if( subImg[i] == null )
+						continue;
+					if (inputParam[i] instanceof ImageInt8)
+						assertEquals((ImageInt8) inputModified[i], (ImageInt8) subImg[i], 0);
+					else if (inputParam[i] instanceof ImageInt16)
+						assertEquals((ImageInt16) inputParam[i], (ImageInt16) subImg[i], 0);
+					else if (inputParam[i] instanceof ImageInt32)
+						assertEquals((ImageInt32) inputParam[i], (ImageInt32) subImg[i], 0);
+					else if (inputParam[i] instanceof ImageInterleavedInt8)
+						assertEquals((ImageInterleavedInt8) inputParam[i], (ImageInterleavedInt8) subImg[i]);
+					else if (inputParam[i] instanceof ImageFloat32)
+						assertEquals((ImageFloat32) inputParam[i], (ImageFloat32) subImg[i]);
 					else
-						throw new RuntimeException("Unknown type " + orig[i].getClass().getSimpleName() + ".  Add it here");
+						throw new RuntimeException("Unknown type " + inputParam[i].getClass().getSimpleName() + ".  Add it here");
 				}
 			}
 
