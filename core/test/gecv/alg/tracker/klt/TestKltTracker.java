@@ -18,7 +18,7 @@ package gecv.alg.tracker.klt;
 
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.interpolate.FactoryInterpolation;
-import gecv.alg.interpolate.InterpolateRegion;
+import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.core.image.UtilImageFloat32;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
@@ -189,7 +189,7 @@ public class TestKltTracker {
 		config.minDeterminant = 0.01f;
 		config.minPositionDelta = 0.01f;
 
-		InterpolateRegion<ImageFloat32> interp = FactoryInterpolation.bilinearRegion_F32();
+		InterpolateRectangle<ImageFloat32> interp = FactoryInterpolation.bilinearRectangle_F32();
 
 		return new KltTracker<ImageFloat32, ImageFloat32>(interp, interp, config);
 	}

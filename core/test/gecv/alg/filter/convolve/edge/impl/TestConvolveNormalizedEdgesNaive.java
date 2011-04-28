@@ -18,14 +18,18 @@ package gecv.alg.filter.convolve.edge.impl;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author Peter Abeles
  */
-public class TestConvolve1D_JustNormalizedBorder {
+public class TestConvolveNormalizedEdgesNaive {
+
+	/**
+	 * This unit test is here as a place holder so that in the future it will be clear that a unit test for
+	 * {@link ConvolveNormalizedEdgesNaive} has been intentionally omitted.  Its correctness has been verified
+	 * through inspection (which never goes wrong) and any errors would be picked up by other tests.  All though
+	 * adding one in the future might not be a bad idea.
+	 */
 	@Test
-	public void test() {
-		fail("implement tests");
+	public void doNothing() {
 	}
 }

@@ -16,16 +16,91 @@
 
 package gecv.alg.filter.convolve.edge;
 
+import gecv.alg.filter.convolve.ConvolutionTestHelper;
+import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.edge.impl.ConvolveNormalizedStandardSparse;
+import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.convolve.Kernel1D_F32;
+import gecv.struct.convolve.Kernel1D_I32;
+import gecv.struct.image.ImageBase;
+import gecv.testing.CompareIdenticalFunctions;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestConvolveNormalizedSparse {
+	Random rand = new Random(0xFF);
+
+	int width = 10;
+	int height = 15;
+	int kernelRadius = 1;
+
+	int testX = 0;
+	int testY = 3;
+
 	@Test
-	public void test() {
-		fail("implement tests");
+	public void compareToStandard() {
+		CompareToStandard a = new CompareToStandard();
+		testX = 0; testY = 3;
+		a.performTests(3);
+		testX = 3; testY = 0;
+		a.performTests(3);
+		testX = width-1; testY = 3;
+		a.performTests(3);
+		testX = 3; testY = height-1;
+		a.performTests(3);
+	}
+
+	public class CompareToStandard extends CompareIdenticalFunctions
+	{
+		protected CompareToStandard() {
+			super(ConvolveNormalizedSparse.class, ConvolveNormalizedStandardSparse.class);
+		}
+
+		@Override
+		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
+			Number a = (Number)targetResult;
+			Number b = (Number)validationResult;
+
+			assertEquals(a.doubleValue(),b.doubleValue(),1e-4);
+		}
+
+		@Override
+		protected Object[][] createInputParam(Method m) {
+			Class<?> paramTypes[] = m.getParameterTypes();
+
+			Object storage;
+			Object kernel;
+			if (Kernel1D_F32.class == paramTypes[0]) {
+				kernel = KernelFactory.gaussian1D_F32(kernelRadius,true);
+				storage = new float[ kernelRadius*2+1];
+			} else if (Kernel1D_I32.class == paramTypes[0]) {
+				kernel = KernelFactory.gaussian1D_I32(kernelRadius);
+				storage = new int[ kernelRadius*2+1];
+			} else {
+				throw new RuntimeException("Unknown kernel type");
+			}
+
+			ImageBase src = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
+			GeneralizedImageOps.randomize(src, 0, 5, rand);
+
+
+			Object[][] ret = new Object[1][paramTypes.length];
+
+			ret[0][0] = kernel;
+			ret[0][1] = kernel;
+			ret[0][2] = src;
+			ret[0][3] = testX;
+			ret[0][4] = testY;
+			ret[0][5] = storage;
+
+			return ret;
+		}
 	}
 }

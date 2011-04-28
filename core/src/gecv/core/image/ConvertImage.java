@@ -93,6 +93,69 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link ImageInt8} into a {@link ImageInt16}.  If the {@link ImageInt8}
+	 * is treated as a signed image or not is specified.
+	 * </p>
+	 * <p/>
+	 * <p>
+	 * If signed:<br>
+	 * dst(x,y) = (short)src(x,y)<br>
+	 * If unsigned:<br>
+	 * dst(x,y) = (short)( src(x,y) & 0xFF )
+	 * </p>
+	 *
+	 * @param src	Input image which is being converted.
+	 * @param dst	The output image.  If null a new image is created.
+	 * @param signed
+	 */
+	public static ImageInt16 convert(ImageInt8 src, ImageInt16 dst, boolean signed) {
+		if (dst == null) {
+			dst = new ImageInt16(src.width, src.height);
+		} else {
+			InputSanityCheck.checkSameShape(src, dst);
+		}
+
+		if (src.isSubimage() || dst.isSubimage()) {
+
+			if (signed) {
+				for (int y = 0; y < src.height; y++) {
+					int indexSrc = src.getIndex(0, y);
+					int indexDst = dst.getIndex(0, y);
+
+					for (int x = 0; x < src.width; x++) {
+						dst.data[indexDst++] = src.data[indexSrc++];
+					}
+				}
+			} else {
+				for (int y = 0; y < src.height; y++) {
+					int indexSrc = src.getIndex(0, y);
+					int indexDst = dst.getIndex(0, y);
+
+					for (int x = 0; x < src.width; x++) {
+						dst.data[indexDst++] = (short)(src.data[indexSrc++] & 0xFF);
+					}
+				}
+			}
+
+		} else {
+			final int N = src.width * src.height;
+
+			if (signed) {
+				for (int i = 0; i < N; i++) {
+					dst.data[i] = src.data[i];
+				}
+			} else {
+				for (int i = 0; i < N; i++) {
+					dst.data[i] = (short)(src.data[i] & 0xFF);
+				}
+			}
+		}
+
+		return dst;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link ImageInt16} into a {@link ImageFloat32}.  If the {@link ImageInt16}
 	 * is treated as a signed image or not is specified.
 	 * </p>

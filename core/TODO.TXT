@@ -34,5 +34,8 @@
 - Convolve
  * Change TestConvolveImageStandard into a completely automated test using reflections
 
-- Improve Median Filter
+- Improve Sort Median Filter
 *   Use bubble sort to avoid resorting each time
+
+- InterpolateRectangle
+ * Have output be an image

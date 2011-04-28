@@ -127,7 +127,7 @@ public class GenerateConvolveNormalizedEdgesNaive {
 				"\t\t\t\tint endY = y + radius;\n" +
 				"\n" +
 				"\t\t\t\tif( startY < 0 ) startY = 0;\n" +
-				"\t\t\t\tif( endY >= width ) endY = height-1;\n" +
+				"\t\t\t\tif( endY >= height ) endY = height-1;\n" +
 				"\n" +
 				"\t\t\t\tfor( int i = startY; i <= endY; i++ ) {\n" +
 				"\t\t\t\t\t"+kernelData+" v = kernel.get(i-y+radius);\n" +

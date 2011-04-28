@@ -78,7 +78,7 @@ public class ConvolveNormalizedEdgesNaive {
 				int endY = y + radius;
 
 				if( startY < 0 ) startY = 0;
-				if( endY >= width ) endY = height-1;
+				if( endY >= height ) endY = height-1;
 
 				for( int i = startY; i <= endY; i++ ) {
 					float v = kernel.get(i-y+radius);
@@ -134,7 +134,7 @@ public class ConvolveNormalizedEdgesNaive {
 				int endY = y + radius;
 
 				if( startY < 0 ) startY = 0;
-				if( endY >= width ) endY = height-1;
+				if( endY >= height ) endY = height-1;
 
 				for( int i = startY; i <= endY; i++ ) {
 					int v = kernel.get(i-y+radius);
@@ -190,7 +190,7 @@ public class ConvolveNormalizedEdgesNaive {
 				int endY = y + radius;
 
 				if( startY < 0 ) startY = 0;
-				if( endY >= width ) endY = height-1;
+				if( endY >= height ) endY = height-1;
 
 				for( int i = startY; i <= endY; i++ ) {
 					int v = kernel.get(i-y+radius);

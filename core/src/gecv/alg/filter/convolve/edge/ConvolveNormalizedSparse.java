@@ -16,57 +16,82 @@
 
 package gecv.alg.filter.convolve.edge;
 
+import gecv.alg.filter.convolve.edge.impl.ConvolveNormalizedStandardSparse;
 import gecv.struct.convolve.Kernel1D_F32;
+import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageInt8;
 
 /**
- * Performs a convolution around a single pixel only.  Borders are checked and if on an edge the kernel is truncated
- * and renormalized.
+ * Performs a convolution around a single pixel only using two 1D kernels in the horizontal and vertical direction.
+ * Borders are checked and if on an edge the kernel is truncated and re-normalized.  Only to be used with kernels
+ * that can be re-normalized
  *
  * @author Peter Abeles
  */
 public class ConvolveNormalizedSparse {
-	public static float horizontal(Kernel1D_F32 kernel, ImageFloat32 input, int x , int y ) {
-		int radius = kernel.getRadius();
 
-		int x0 = x - radius;
-		int x1 = x + radius+1;
+	/**
+	 * Convolves around the specified point in the horizontal and vertical direction.  When at the border of
+	 * the image the kernel is re-normalized.
+	 *
+	 * @param horizontal Kernel convolved across the point in the horizontal direction.
+	 * @param vertical Kernel convolved across the point in the vertical direction.
+	 * @param input Image being convolved.
+	 * @param c_x The x-coordinate of the point being convolved.
+	 * @param c_y The y-coordinate of the point being convolved.
+	 * @param storage Temporary storage.  Needs to be the same size as the kernels being convolved.
+	 * @return Result of the convolution.
+	 */
+	public static float convolve( Kernel1D_F32 horizontal, Kernel1D_F32 vertical,
+								  ImageFloat32 input, int c_x , int c_y, float storage[] )
+	{
+		if( horizontal.width != vertical.width )
+			throw new IllegalArgumentException("Both kernels need to be the same width.  Change code if this is a problem.");
 
-		if( x0 < 0 ) x0 = 0;
-		if( x1 > input.width ) x1 = input.width;
-
-		float total = 0;
-		float div = 0;
-		int indexSrc = input.startIndex + input.stride*y + x0;
-		int indexEnd = indexSrc + (x1-x0);
-		int indexKer = x0 - (x-radius);
-		for( ; indexSrc < indexEnd; indexSrc++ ) {
-			float v = kernel.data[indexKer++];
-			total += input.data[indexSrc]*v;
-			div += v;
-		}
-		return total/div;
+		return ConvolveNormalizedStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage);
 	}
 
-	public static float vertical(Kernel1D_F32 kernel, ImageFloat32 input, int x , int y ) {
-		int radius = kernel.getRadius();
+	/**
+	 * Convolves around the specified point in the horizontal and vertical direction.  When at the border of
+	 * the image the kernel is re-normalized.
+	 *
+	 * @param horizontal Kernel convolved across the point in the horizontal direction.
+	 * @param vertical Kernel convolved across the point in the vertical direction.
+	 * @param input Image being convolved.
+	 * @param c_x The x-coordinate of the point being convolved.
+	 * @param c_y The y-coordinate of the point being convolved.
+	 * @param storage Temporary storage.  Needs to be the same size as the kernels being convolved.
+	 * @return Result of the convolution.
+	 */
+	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+								ImageInt8 input, int c_x , int c_y, int storage[] )
+	{
+		if( horizontal.width != vertical.width )
+			throw new IllegalArgumentException("Both kernels need to be the same width.  Change code if this is a problem.");
 
-		int y0 = y - radius;
-		int y1 = y + radius+1;
+		return ConvolveNormalizedStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage);
+	}
 
-		if( y0 < 0 ) y0 = 0;
-		if( y1 > input.height ) y1 = input.height;
+	/**
+	 * Convolves around the specified point in the horizontal and vertical direction.  When at the border of
+	 * the image the kernel is re-normalized.
+	 *
+	 * @param horizontal Kernel convolved across the point in the horizontal direction.
+	 * @param vertical Kernel convolved across the point in the vertical direction.
+	 * @param input Image being convolved.
+	 * @param c_x The x-coordinate of the point being convolved.
+	 * @param c_y The y-coordinate of the point being convolved.
+	 * @param storage Temporary storage.  Needs to be the same size as the kernels being convolved.
+	 * @return Result of the convolution.
+	 */
+	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+								ImageInt16 input, int c_x , int c_y, int storage[] )
+	{
+		if( horizontal.width != vertical.width )
+			throw new IllegalArgumentException("Both kernels need to be the same width.  Change code if this is a problem.");
 
-		float total = 0;
-		float div = 0;
-		int indexSrc = input.startIndex + input.stride*y0 + x;
-		int indexEnd = indexSrc + input.stride*(y1-y0);
-		int indexKer = y0 - (y-radius);
-		for( ; indexSrc < indexEnd; indexSrc += input.stride ) {
-			float v = kernel.data[indexKer++];
-			total += input.data[indexSrc]*v;
-			div += v;
-		}
-		return total/div;
+		return ConvolveNormalizedStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage);
 	}
 }

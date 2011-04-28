@@ -16,7 +16,7 @@
 
 package gecv.alg.interpolate.impl;
 
-import gecv.alg.interpolate.InterpolateRegion;
+import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.struct.image.ImageFloat32;
 
 
@@ -25,7 +25,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class BilinearRegion_F32 implements InterpolateRegion<ImageFloat32> {
+public class BilinearRegion_F32 implements InterpolateRectangle<ImageFloat32> {
 
 	private ImageFloat32 orig;
 

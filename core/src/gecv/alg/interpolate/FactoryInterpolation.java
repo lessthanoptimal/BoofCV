@@ -31,7 +31,7 @@ public class FactoryInterpolation {
 		return new BilinearPixel_F32();
 	}
 
-	public static InterpolateRegion<ImageFloat32> bilinearRegion_F32() {
+	public static InterpolateRectangle<ImageFloat32> bilinearRectangle_F32() {
 		return new BilinearRegion_F32();
 	}
 }

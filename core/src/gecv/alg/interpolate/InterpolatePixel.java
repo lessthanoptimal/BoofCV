@@ -21,7 +21,7 @@ import gecv.struct.image.ImageBase;
 
 /**
  * Interface for interpolation between pixels on a per-pixel basis.  If a whole rectangular region needs
- * to be interpolated then {@link InterpolateRegion} should be considered for performance reasons.
+ * to be interpolated then {@link InterpolateRectangle} should be considered for performance reasons.
  *
  * @author Peter Abeles
  */

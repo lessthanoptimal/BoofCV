@@ -24,7 +24,7 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface InterpolateRegion<T extends ImageBase> {
+public interface InterpolateRectangle<T extends ImageBase> {
 
 	/**
 	 * Change the image that is being interpolated.
@@ -51,5 +51,6 @@ public interface InterpolateRegion<T extends ImageBase> {
 	 * @param regWidth  subregion width
 	 * @param regHeight subregion height
 	 */
+	// TODO change the output into an image
 	public void region(float tl_x, float tl_y, float[] results, int regWidth, int regHeight);
 }

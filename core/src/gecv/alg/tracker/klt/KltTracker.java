@@ -17,7 +17,7 @@
 package gecv.alg.tracker.klt;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.interpolate.InterpolateRegion;
+import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.struct.image.ImageBase;
 
 /**
@@ -50,8 +50,8 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 	protected DerivativeImage derivX, derivY;
 
 	// Used to interpolate the image and gradient
-	protected InterpolateRegion<InputImage> interpInput;
-	protected InterpolateRegion<DerivativeImage> interpDeriv;
+	protected InterpolateRectangle<InputImage> interpInput;
+	protected InterpolateRectangle<DerivativeImage> interpDeriv;
 
 	// tracker configuration
 	KltConfig config;
@@ -76,8 +76,8 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 	float allowedTop;
 	float allowedBottom;
 
-	public KltTracker(InterpolateRegion<InputImage> interpInput,
-					  InterpolateRegion<DerivativeImage> interpDeriv,
+	public KltTracker(InterpolateRectangle<InputImage> interpInput,
+					  InterpolateRectangle<DerivativeImage> interpDeriv,
 					  KltConfig config) {
 		this.interpInput = interpInput;
 		this.interpDeriv = interpDeriv;

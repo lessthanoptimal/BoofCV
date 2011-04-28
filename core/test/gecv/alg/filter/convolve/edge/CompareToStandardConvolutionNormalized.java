@@ -50,6 +50,10 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 		this.height = height;
 	}
 
+	public void setKernelRadius(int kernelRadius) {
+		this.kernelRadius = kernelRadius;
+	}
+
 	public void compareMethod( Method target , String validationName , int radius ) {
 		this.kernelRadius = radius;
 		super.compareMethod(target,validationName);

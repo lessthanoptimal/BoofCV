@@ -14,18 +14,23 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.convolve.edge.impl;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package gecv.struct.image.generalized;
 
 /**
+ * Generalized interface for single banded images.  Due to the slow performance associated with working with this
+ * interface its usage is not recommended except for testing purposes.
+ *
  * @author Peter Abeles
  */
-public class TestConvolveImageNormalizeEdgesNaive {
-	@Test
-	public void test() {
-		fail("implement tests");
-	}
+public interface SingleBandImage {
+
+	int getWidth();
+
+	int getHeight();
+
+	boolean isFloatingPoint();
+
+	Number get( int x , int y );
+
+	void set( int x , int y , Number num );
 }
