@@ -19,6 +19,7 @@ package gecv.alg.interpolate;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.interpolate.impl.BilinearPixel_F32;
+import gecv.alg.interpolate.impl.NearestNeighborPixel_F32;
 import gecv.core.image.UtilImageFloat32;
 import gecv.core.image.UtilImageInt8;
 import gecv.struct.image.ImageFloat32;
@@ -66,6 +67,17 @@ public class BenchmarkInterpolatePixel {
 		}
 	}
 
+	public static class NearestNeighbor_Safe_F32 extends PerformerBase {
+		NearestNeighborPixel_F32 alg = new NearestNeighborPixel_F32(imgFloat32);
+
+		@Override
+		public void process() {
+			for (float x = start; x <= end; x += step)
+				for (float y = start; y <= end; y += step)
+					alg.get(x, y);
+		}
+	}
+
 	public static void main(String args[]) {
 		imgInt8 = new ImageInt8(imgWidth, imgHeight);
 		imgFloat32 = new ImageFloat32(imgWidth, imgHeight);
@@ -79,5 +91,6 @@ public class BenchmarkInterpolatePixel {
 
 		ProfileOperation.printOpsPerSec(new Bilinear_Safe_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Bilinear_UnSafe_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new NearestNeighbor_Safe_F32(), TEST_TIME);
 	}
 }

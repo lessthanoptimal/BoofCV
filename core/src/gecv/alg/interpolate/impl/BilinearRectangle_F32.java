@@ -25,18 +25,18 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class BilinearRegion_F32 implements InterpolateRectangle<ImageFloat32> {
+public class BilinearRectangle_F32 implements InterpolateRectangle<ImageFloat32> {
 
 	private ImageFloat32 orig;
 
 	private float data[];
 	private int stride;
 
-	public BilinearRegion_F32(ImageFloat32 image) {
+	public BilinearRectangle_F32(ImageFloat32 image) {
 		setImage(image);
 	}
 
-	public BilinearRegion_F32() {
+	public BilinearRectangle_F32() {
 	}
 
 	@Override

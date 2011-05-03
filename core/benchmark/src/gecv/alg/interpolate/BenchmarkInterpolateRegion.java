@@ -18,7 +18,7 @@ package gecv.alg.interpolate;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.interpolate.impl.BilinearRegion_F32;
+import gecv.alg.interpolate.impl.BilinearRectangle_F32;
 import gecv.core.image.UtilImageFloat32;
 import gecv.core.image.UtilImageInt8;
 import gecv.struct.image.ImageFloat32;
@@ -45,7 +45,7 @@ public class BenchmarkInterpolateRegion {
 	static float[] results = new float[regionSize * regionSize];
 
 	public static class Bilinear_F32 extends PerformerBase {
-		BilinearRegion_F32 alg = new BilinearRegion_F32(imgFloat32);
+		BilinearRectangle_F32 alg = new BilinearRectangle_F32(imgFloat32);
 
 		@Override
 		public void process() {

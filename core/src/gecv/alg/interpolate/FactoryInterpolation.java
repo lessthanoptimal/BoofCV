@@ -17,7 +17,8 @@
 package gecv.alg.interpolate;
 
 import gecv.alg.interpolate.impl.BilinearPixel_F32;
-import gecv.alg.interpolate.impl.BilinearRegion_F32;
+import gecv.alg.interpolate.impl.BilinearRectangle_F32;
+import gecv.alg.interpolate.impl.NearestNeighborPixel_F32;
 import gecv.struct.image.ImageFloat32;
 
 /**
@@ -32,6 +33,10 @@ public class FactoryInterpolation {
 	}
 
 	public static InterpolateRectangle<ImageFloat32> bilinearRectangle_F32() {
-		return new BilinearRegion_F32();
+		return new BilinearRectangle_F32();
+	}
+
+	public static InterpolatePixel<ImageFloat32> nearestNeighborPixel_F32() {
+		return new NearestNeighborPixel_F32();
 	}
 }

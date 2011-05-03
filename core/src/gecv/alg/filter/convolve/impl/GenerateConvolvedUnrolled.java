@@ -280,7 +280,7 @@ public class GenerateConvolvedUnrolled {
 				"\t\t\tfor( i += xBorder; i < iEnd; i++ ) {\n" +
 				"\t\t\t\tint indexSrc = i-radius*image.stride;\n" +
 				"\n" +
-				"\t\t\t\t" + sumType + " total = dataSrc[indexSrc] * k1;\n");
+				"\t\t\t\t" + sumType + " total = (dataSrc[indexSrc]"+bitWise+") * k1;\n");
 		for (int i = 1; i < num; i++) {
 			out.printf("\t\t\t\tindexSrc += image.stride;\n");
 			out.printf("\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWise + ")*k%d;\n", (i + 1));

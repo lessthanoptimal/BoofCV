@@ -330,7 +330,7 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i-radius*image.stride;
 
-				int total = dataSrc[indexSrc] * k1;
+				int total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -371,7 +371,7 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i-radius*image.stride;
 
-				int total = dataSrc[indexSrc] * k1;
+				int total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -418,7 +418,7 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i-radius*image.stride;
 
-				int total = dataSrc[indexSrc] * k1;
+				int total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -471,7 +471,7 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i-radius*image.stride;
 
-				int total = dataSrc[indexSrc] * k1;
+				int total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -530,7 +530,7 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i-radius*image.stride;
 
-				int total = dataSrc[indexSrc] * k1;
+				int total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;

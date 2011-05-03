@@ -16,7 +16,12 @@
 
 package gecv.alg.filter.blur;
 
+import gecv.alg.InputSanityCheck;
+import gecv.alg.filter.convolve.edge.ConvolveNormalized;
+import gecv.struct.convolve.Kernel1D_F32;
+import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt8;
 
 /**
@@ -26,6 +31,30 @@ import gecv.struct.image.ImageInt8;
 // well three: naive to double check
 // mean: naive and highly optimized
 public class BlurImageOps {
+
+	public static void kernel(ImageInt8 input, ImageInt8 output, Kernel1D_I32 kernel ,
+								   ImageInt8 storage ) {
+		InputSanityCheck.checkSameShape(input,output,storage);
+
+		ConvolveNormalized.horizontal(kernel,input,storage);
+		ConvolveNormalized.vertical(kernel,storage,output);
+	}
+
+	public static void kernel(ImageInt16 input, ImageInt16 output, Kernel1D_I32 kernel ,
+								   ImageInt16 storage ) {
+		InputSanityCheck.checkSameShape(input,output,storage);
+
+		ConvolveNormalized.horizontal(kernel,input,storage);
+		ConvolveNormalized.vertical(kernel,storage,output);
+	}
+
+	public static void kernel(ImageFloat32 input, ImageFloat32 output, Kernel1D_F32 kernel ,
+							  ImageFloat32 storage ) {
+		InputSanityCheck.checkSameShape(input,output,storage);
+
+		ConvolveNormalized.horizontal(kernel,input,storage);
+		ConvolveNormalized.vertical(kernel,storage,output);
+	}
 
 	public static ImageInt8 mean(ImageInt8 input, ImageInt8 output, int radius) {
 		return null;

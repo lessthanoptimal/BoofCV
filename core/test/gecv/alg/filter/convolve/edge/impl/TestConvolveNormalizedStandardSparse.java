@@ -58,18 +58,20 @@ public class TestConvolveNormalizedStandardSparse {
 	public void compareToGeneral() {
 		// try different edges in the image as test points
 		for( int i = 0; i < 2; i++ ) {
-			targetX = i; targetY = 5;
-			performCaparison();
-			targetX = 5; targetY = i;
-			performCaparison();
-			targetX = width-1-i; targetY = 5;
-			performCaparison();
-			targetX = 5; targetY = height-1-i;
-			performCaparison();
+//			targetX = i; targetY = 5;
+//			performComparision();
+//			targetX = 5; targetY = i;
+//			performComparision();
+//			targetX = width-1-i; targetY = 5;
+//			performComparision();
+//			targetX = 5; targetY = height-1-i;
+//			performComparision();
+			targetX = 5; targetY = 5;
+			performComparision();
 		}
 	}
 
-	private void performCaparison() {
+	private void performComparision() {
 		Method methods[] = ConvolveNormalizedStandardSparse.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -80,7 +82,7 @@ public class TestConvolveNormalizedStandardSparse {
 			if (paramTypes.length < 3) {
 				continue;
 			}
-//			System.out.println("Checking "+m.getName()+"  type "+paramTypes[2].getSimpleName());
+			System.out.println("Checking "+m.getName()+"  type "+paramTypes[2].getSimpleName());
 
 			checkMethod(m, width, height, kernelRadius, rand);
 			numFound++;

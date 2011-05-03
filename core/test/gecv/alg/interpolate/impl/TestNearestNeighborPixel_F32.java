@@ -20,13 +20,11 @@ import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.UtilImageFloat32;
 import gecv.struct.image.ImageFloat32;
 
-
 /**
  * @author Peter Abeles
  */
-public class TestBilinearPixel_F32 extends GeneralInterpolationPixelChecks<ImageFloat32>
+public class TestNearestNeighborPixel_F32 extends GeneralInterpolationPixelChecks<ImageFloat32>
 {
-
 	@Override
 	protected ImageFloat32 createImage(int width, int height) {
 		return new ImageFloat32(width, height);
@@ -39,7 +37,7 @@ public class TestBilinearPixel_F32 extends GeneralInterpolationPixelChecks<Image
 
 	@Override
 	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image) {
-		return new BilinearPixel_F32(image);
+		return new NearestNeighborPixel_F32(image);
 	}
 
 	/**
@@ -47,20 +45,6 @@ public class TestBilinearPixel_F32 extends GeneralInterpolationPixelChecks<Image
 	 */
 	@Override
 	protected float compute(ImageFloat32 img, float x, float y) {
-		int gX = (int) x;
-		int gY = (int) y;
-
-		float v0 = img.get(gX, gY);
-		float v1 = img.get(gX + 1, gY);
-		float v2 = img.get(gX, gY + 1);
-		float v3 = img.get(gX + 1, gY + 1);
-
-		x %= 1f;
-		y %= 1f;
-
-		float a = 1f - x;
-		float b = 1f - y;
-
-		return a * b * v0 + x * b * v1 + a * y * v2 + x * y * v3;
+		return img.get((int)x,(int)y);
 	}
 }

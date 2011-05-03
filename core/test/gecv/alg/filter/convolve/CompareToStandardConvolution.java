@@ -68,7 +68,7 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 		}
 
 		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
-		GeneralizedImageOps.randomize(src, 0, 5, rand);
+		GeneralizedImageOps.randomize(src, 0, 130, rand);
 		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 
 		if( m.getName().compareTo("convolve") != 0 ) {

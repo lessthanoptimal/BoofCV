@@ -18,16 +18,13 @@ package gecv.struct.convolve;
 
 
 /**
- * This is a kernel in a 1D convolution.  The kernel's width is the number of elements in it
- * and must be an odd number.  A kernel's radius is defined as the width divided by two.
- * All elements in this kernel are floating point numbers.
+ * Floating point 1D convolution kernel that extends {@link Kernel1D}.
  *
  * @author Peter Abeles
  */
-public class Kernel1D_F32 {
+public class Kernel1D_F32 extends Kernel1D {
 
 	public float data[];
-	public int width;
 
 	/**
 	 * Creates a new kernel whose initial values are specified by data and width.  The length
@@ -100,24 +97,6 @@ public class Kernel1D_F32 {
 
 	public float[] getData() {
 		return data;
-	}
-
-	/**
-	 * The kernel's width.  This is an odd number.
-	 *
-	 * @return Kernel's width.
-	 */
-	public int getWidth() {
-		return width;
-	}
-
-	/**
-	 * The radius is defined as the width divided by two.
-	 *
-	 * @return The kernel's radius.
-	 */
-	public int getRadius() {
-		return width / 2;
 	}
 
 	public void print() {

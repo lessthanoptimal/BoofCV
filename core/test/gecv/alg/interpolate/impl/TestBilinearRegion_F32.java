@@ -73,7 +73,7 @@ public class TestBilinearRegion_F32 {
 
 	public void region(ImageFloat32 img) {
 		BilinearPixel_F32 interpPt = new BilinearPixel_F32();
-		BilinearRegion_F32 interp = new BilinearRegion_F32();
+		BilinearRectangle_F32 interp = new BilinearRectangle_F32();
 		interp.setImage(img);
 		interpPt.setImage(img);
 

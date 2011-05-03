@@ -23,7 +23,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -89,22 +88,82 @@ public class TestBinaryNaiveOps {
 
 	@Test
 	public void erode8() {
-		fail("implement");
+		ImageInt8 input;
+
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		checkOutput("erode8", input, 1);
+
+		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
+		checkOutput("erode8", input, 0);
+		input = createInput(1, 1, 1, 1, 1, 1, 0, 1, 1);
+		checkOutput("erode8", input, 0);
+		input = createInput(1, 1, 0, 1, 1, 1, 1, 1, 1);
+		checkOutput("erode8", input, 0);
 	}
 
 	@Test
 	public void dilate8() {
-		fail("implement");
+		ImageInt8 input;
+
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		checkOutput("dilate8", input, 1);
+		input = createInput(1, 1, 1, 1, 0, 1, 1, 1, 1);
+		checkOutput("dilate8", input, 1);
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 0);
+		checkOutput("dilate8", input, 1);
+		for( int i = 0; i < 9; i++ ) {
+			int image[] = new int[9];
+			image[i] = 1;
+			input = createInput(image);
+			checkOutput("dilate8", input, 1);
+		}
+
+		input = createInput(0, 0, 0, 0, 0, 0, 0, 0, 0);
+		checkOutput("dilate8", input, 0);
 	}
 
 	@Test
 	public void edge8() {
-		fail("implement");
+		ImageInt8 input;
+
+		input = createInput(0, 0, 0, 0, 1, 0, 0, 0, 0);
+		checkOutput("edge8", input, 1);
+		input = createInput(0, 1, 0, 0, 1, 0, 0, 0, 0);
+		checkOutput("edge8", input, 1);
+		input = createInput(1, 0, 1, 0, 1, 0, 1, 0, 1);
+		checkOutput("edge8", input, 1);
+		input = createInput(1, 1, 0, 1, 1, 1, 1, 1, 1);
+		checkOutput("edge8", input, 1);
+
+		input = createInput(0, 0, 0, 0, 0, 0, 0, 0, 0);
+		checkOutput("edge8", input, 0);
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		checkOutput("edge8", input, 0);
 	}
 
 	@Test
 	public void removePointNoise() {
-		fail("implement");
+		ImageInt8 input;
+
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		checkOutput("removePointNoise", input, 1);
+		input = createInput(1, 1, 1, 1, 0, 1, 1, 1, 1);
+		checkOutput("removePointNoise", input, 1);
+		input = createInput(1, 1, 1, 1, 0, 1, 0, 1, 1);
+		checkOutput("removePointNoise", input, 1);
+		input = createInput(0, 1, 1, 1, 1, 0, 0, 1, 0);
+		checkOutput("removePointNoise", input, 1);
+		input = createInput(0, 1, 0, 1, 1, 0, 1, 1, 1);
+		checkOutput("removePointNoise", input, 1);
+
+		input = createInput(0, 1, 0, 1, 0, 0, 0, 1, 0);
+		checkOutput("removePointNoise", input, 0);
+		input = createInput(0, 1, 0, 1, 0, 0, 0, 1, 1);
+		checkOutput("removePointNoise", input, 0);
+		input = createInput(0, 1, 0, 0, 1, 0, 0, 0, 0);
+		checkOutput("removePointNoise", input, 0);
+		input = createInput(0, 0, 0, 1, 1, 0, 0, 0, 0);
+		checkOutput("removePointNoise", input, 0);
 	}
 
 	private void checkOutput(String methodName, ImageInt8 input, int expected) {

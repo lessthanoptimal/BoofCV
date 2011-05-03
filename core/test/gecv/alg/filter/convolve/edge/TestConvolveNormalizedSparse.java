@@ -55,6 +55,8 @@ public class TestConvolveNormalizedSparse {
 		a.performTests(3);
 		testX = 3; testY = height-1;
 		a.performTests(3);
+		testX = 5; testY = 5;
+		a.performTests(3);
 	}
 
 	public class CompareToStandard extends CompareIdenticalFunctions

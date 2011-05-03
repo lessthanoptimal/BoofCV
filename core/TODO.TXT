@@ -6,13 +6,6 @@
  * derivative X and Y
  * intensity
 
-- Generic convolutions
-* generic with precomputed image offsets
-* Handle edge conditions
-  - Renormalize the kernel for blur operations
-  -
-* benchmark for speed
-
 - Edges
  * Whole image:
     - Intensity and orientation
@@ -24,18 +17,26 @@
  * Adaptively select global threshold
  * Local Threshold
 
-- Specialized Convolutions
-*   Gaussian
-
 - Corners
  * Evaluate for accuracy
  * See corner section
 
 - Convolve
  * Change TestConvolveImageStandard into a completely automated test using reflections
+ * Add a new implementation for horizontal and vertical which are "in-place"
+   Uses an array one row/column long in which the image is locally copied.
 
 - Improve Sort Median Filter
 *   Use bubble sort to avoid resorting each time
 
 - InterpolateRectangle
  * Have output be an image
+
+- Convolution Downsampling
+ * Optimize a bit more by only running the re-normalize code on the outer most regions.
+
+- Have a morphological filter section?
+ * Add gray scale morphological operators
+ * Handle image edges for binary and gray scale
+   - Create a wrapper around image for naive implementation.
+     + zeros or ones when outside of image for dilation and erosion

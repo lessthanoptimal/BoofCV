@@ -148,11 +148,11 @@ public class BinaryNaiveOps {
 
 		for (int y = 1; y < input.height - 1; y++) {
 			for (int x = 1; x < input.width - 1; x++) {
-				if (input.get(x, y) != 0 && (
+				if (input.get(x, y) != 0 ||
 						input.get(x - 1, y) != 0 || input.get(x + 1, y) != 0 ||
 								input.get(x, y - 1) != 0 || input.get(x, y + 1) != 0 ||
 								input.get(x - 1, y + 1) != 0 || input.get(x + 1, y + 1) != 0 ||
-								input.get(x - 1, y - 1) != 0 || input.get(x + 1, y - 1) != 0))
+								input.get(x - 1, y - 1) != 0 || input.get(x + 1, y - 1) != 0)
 					output.set(x, y, 1);
 				else
 					output.set(x, y, 0);

@@ -17,8 +17,8 @@
 package gecv.alg.filter.convolve.impl;
 
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.image.ImageInt8;
 import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageInt8;
 
 /**
  * <p>
@@ -331,7 +331,7 @@ public class ConvolveImageUnrolled_I8_I16 {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i-radius*image.stride;
 
-				int total = dataSrc[indexSrc] * k1;
+				int total = (dataSrc[indexSrc] & 0xFF) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc] & 0xFF)*k2;
 				indexSrc += image.stride;
@@ -372,7 +372,7 @@ public class ConvolveImageUnrolled_I8_I16 {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i-radius*image.stride;
 
-				int total = dataSrc[indexSrc] * k1;
+				int total = (dataSrc[indexSrc] & 0xFF) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc] & 0xFF)*k2;
 				indexSrc += image.stride;
@@ -419,7 +419,7 @@ public class ConvolveImageUnrolled_I8_I16 {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i-radius*image.stride;
 
-				int total = dataSrc[indexSrc] * k1;
+				int total = (dataSrc[indexSrc] & 0xFF) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc] & 0xFF)*k2;
 				indexSrc += image.stride;
@@ -472,7 +472,7 @@ public class ConvolveImageUnrolled_I8_I16 {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i-radius*image.stride;
 
-				int total = dataSrc[indexSrc] * k1;
+				int total = (dataSrc[indexSrc] & 0xFF) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc] & 0xFF)*k2;
 				indexSrc += image.stride;
@@ -531,7 +531,7 @@ public class ConvolveImageUnrolled_I8_I16 {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i-radius*image.stride;
 
-				int total = dataSrc[indexSrc] * k1;
+				int total = (dataSrc[indexSrc] & 0xFF) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc] & 0xFF)*k2;
 				indexSrc += image.stride;
