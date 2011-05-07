@@ -23,173 +23,90 @@ import gecv.struct.image.ImageInt8;
  * Simple unoptimized implementations of binary operations.
  *
  * @author Peter Abeles
+ * @see gecv.alg.filter.basic.BinaryImageOps
  */
 public class BinaryNaiveOps {
-	/**
-	 * <p>
-	 * Erodes an image according to a 4-neighborhood.  Unless a pixel is connected to all its neighbors its value
-	 * is set to zero.
-	 * </p>
-	 *
-	 * @param input  Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
-	 * @return Output image.
-	 */
-	public static ImageInt8 erode4(ImageInt8 input, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
-
-		for (int y = 1; y < input.height - 1; y++) {
-			for (int x = 1; x < input.width - 1; x++) {
+	public static void erode4(ImageInt8 input, ImageInt8 output) {
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
 				if (input.get(x, y) != 0 &&
-						input.get(x - 1, y) != 0 && input.get(x + 1, y) != 0 &&
-						input.get(x, y - 1) != 0 && input.get(x, y + 1) != 0)
+						getT(input, x - 1, y) && getT(input, x + 1, y) &&
+						getT(input, x, y - 1) && getT(input, x, y + 1))
 					output.set(x, y, 1);
 				else
 					output.set(x, y, 0);
 			}
 		}
-		return output;
 	}
 
-	/**
-	 * <p>
-	 * Dilates an image according to a 4-neighborhood.  If a pixel is connected to any other pixel then its output
-	 * value will be one.
-	 * </p>
-	 *
-	 * @param input  Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
-	 * @return Output image.
-	 */
-	public static ImageInt8 dilate4(ImageInt8 input, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
-
-		for (int y = 1; y < input.height - 1; y++) {
-			for (int x = 1; x < input.width - 1; x++) {
-				if (input.get(x, y) != 0 || input.get(x - 1, y) != 0 || input.get(x + 1, y) != 0 ||
-						input.get(x, y - 1) != 0 || input.get(x, y + 1) != 0)
+	public static void dilate4(ImageInt8 input, ImageInt8 output) {
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
+				if (input.get(x, y) != 0 || getF(input, x - 1, y) || getF(input, x + 1, y) ||
+						getF(input, x, y - 1) || getF(input, x, y + 1))
 					output.set(x, y, 1);
 				else
 					output.set(x, y, 0);
 			}
 		}
-		return output;
 	}
 
-	/**
-	 * <p>
-	 * Binary operation which is designed to remove all pixels but ones which are on the edge of an object.
-	 * The edge is defined as lying on the object and not being entirely surrounded by pixels in a 4-neighborhood.
-	 * </p>
-	 * <p/>
-	 * <p>
-	 * NOTE: There are many ways to define an edge, this is just one of them.
-	 * </p>
-	 *
-	 * @param input  Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
-	 * @return Output image.
-	 */
-	public static ImageInt8 edge4(ImageInt8 input, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
-
-		for (int y = 1; y < input.height - 1; y++) {
-			for (int x = 1; x < input.width - 1; x++) {
-				if (input.get(x - 1, y) != 0 && input.get(x + 1, y) != 0 &&
-						input.get(x, y - 1) != 0 && input.get(x, y + 1) != 0)
+	public static void edge4(ImageInt8 input, ImageInt8 output) {
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
+				if (getT(input, x - 1, y) && getT(input, x + 1, y) &&
+						getT(input, x, y - 1) && getT(input, x, y + 1))
 					output.set(x, y, 0);
 				else
 					output.set(x, y, input.get(x, y));
 			}
 		}
-		return output;
 	}
 
-	/**
-	 * <p>
-	 * Erodes an image according to a 8-neighborhood.  Unless a pixel is connected to all its neighbors its value
-	 * is set to zero.
-	 * </p>
-	 *
-	 * @param input  Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
-	 * @return Output image.
-	 */
-	public static ImageInt8 erode8(ImageInt8 input, ImageInt8 output) {
+	public static void erode8(ImageInt8 input, ImageInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		for (int y = 1; y < input.height - 1; y++) {
-			for (int x = 1; x < input.width - 1; x++) {
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
 				if (input.get(x, y) != 0 &&
-						input.get(x - 1, y) != 0 && input.get(x + 1, y) != 0 &&
-						input.get(x, y - 1) != 0 && input.get(x, y + 1) != 0 &&
-						input.get(x - 1, y + 1) != 0 && input.get(x + 1, y + 1) != 0 &&
-						input.get(x - 1, y - 1) != 0 && input.get(x + 1, y - 1) != 0)
+						getT(input, x - 1, y) && getT(input, x + 1, y) &&
+						getT(input, x, y - 1) && getT(input, x, y + 1) &&
+						getT(input, x - 1, y + 1) && getT(input, x + 1, y + 1) &&
+						getT(input, x - 1, y - 1) && getT(input, x + 1, y - 1))
 					output.set(x, y, 1);
 				else
 					output.set(x, y, 0);
 			}
 		}
-		return output;
 	}
 
-	/**
-	 * <p>
-	 * Dilates an image according to a 8-neighborhood.  If a pixel is connected to any other pixel then its output
-	 * value will be one.
-	 * </p>
-	 *
-	 * @param input  Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
-	 * @return Output image.
-	 */
-	public static ImageInt8 dilate8(ImageInt8 input, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
-
-		for (int y = 1; y < input.height - 1; y++) {
-			for (int x = 1; x < input.width - 1; x++) {
+	public static void dilate8(ImageInt8 input, ImageInt8 output) {
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
 				if (input.get(x, y) != 0 ||
-						input.get(x - 1, y) != 0 || input.get(x + 1, y) != 0 ||
-								input.get(x, y - 1) != 0 || input.get(x, y + 1) != 0 ||
-								input.get(x - 1, y + 1) != 0 || input.get(x + 1, y + 1) != 0 ||
-								input.get(x - 1, y - 1) != 0 || input.get(x + 1, y - 1) != 0)
+						getF(input, x - 1, y) || getF(input, x + 1, y) ||
+						getF(input, x, y - 1) || getF(input, x, y + 1) ||
+						getF(input, x - 1, y + 1) || getF(input, x + 1, y + 1) ||
+						getF(input, x - 1, y - 1) || getF(input, x + 1, y - 1))
 					output.set(x, y, 1);
 				else
 					output.set(x, y, 0);
 			}
 		}
-		return output;
 	}
 
-	/**
-	 * <p>
-	 * Binary operation which is designed to remove all pixels but ones which are on the edge of an object.
-	 * The edge is defined as lying on the object and not being surrounded by 8 pixels.
-	 * </p>
-	 * <p/>
-	 * <p>
-	 * NOTE: There are many ways to define an edge, this is just one of them.
-	 * </p>
-	 *
-	 * @param input  Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
-	 * @return Output image.
-	 */
-	public static ImageInt8 edge8(ImageInt8 input, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
-
-		for (int y = 1; y < input.height - 1; y++) {
-			for (int x = 1; x < input.width - 1; x++) {
-				if (input.get(x - 1, y) != 0 && input.get(x + 1, y) != 0 &&
-						input.get(x, y - 1) != 0 && input.get(x, y + 1) != 0 &&
-						input.get(x - 1, y + 1) != 0 && input.get(x + 1, y + 1) != 0 &&
-						input.get(x - 1, y - 1) != 0 && input.get(x + 1, y - 1) != 0)
+	public static void edge8(ImageInt8 input, ImageInt8 output) {
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
+				if (getT(input, x - 1, y) && getT(input, x + 1, y) &&
+						getT(input, x, y - 1) && getT(input, x, y + 1) &&
+						getT(input, x - 1, y + 1) && getT(input, x + 1, y + 1) &&
+						getT(input, x - 1, y - 1) && getT(input, x + 1, y - 1))
 					output.set(x, y, 0);
 				else
 					output.set(x, y, input.get(x, y));
 			}
 		}
-		return output;
 	}
 
 	/**
@@ -201,20 +118,18 @@ public class BinaryNaiveOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 removePointNoise(ImageInt8 input, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
-
-		for (int y = 1; y < input.height - 1; y++) {
-			for (int x = 1; x < input.width - 1; x++) {
+	public static void removePointNoise(ImageInt8 input, ImageInt8 output) {
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
 				int num = 0;
-				if (input.get(x - 1, y + 1) != 0) num++;
-				if (input.get(x, y + 1) != 0) num++;
-				if (input.get(x + 1, y + 1) != 0) num++;
-				if (input.get(x + 1, y) != 0) num++;
-				if (input.get(x + 1, y - 1) != 0) num++;
-				if (input.get(x, y - 1) != 0) num++;
-				if (input.get(x - 1, y - 1) != 0) num++;
-				if (input.get(x - 1, y) != 0) num++;
+				if (getF(input, x - 1, y + 1)) num++;
+				if (getF(input, x, y + 1)) num++;
+				if (getF(input, x + 1, y + 1)) num++;
+				if (getF(input, x + 1, y)) num++;
+				if (getF(input, x + 1, y - 1)) num++;
+				if (getF(input, x, y - 1)) num++;
+				if (getF(input, x - 1, y - 1)) num++;
+				if (getF(input, x - 1, y)) num++;
 
 				if (num < 2)
 					output.set(x, y, 0);
@@ -224,7 +139,27 @@ public class BinaryNaiveOps {
 					output.set(x, y, input.get(x, y));
 			}
 		}
+	}
 
-		return output;
+	/**
+	 * If a point is inside the image true is returned if its value is not zero, otherwise true is returned.
+	 */
+	public static boolean getT(ImageInt8 image, int x, int y) {
+		if (image.isInBounds(x, y)) {
+			return image.get(x, y) != 0;
+		} else {
+			return true;
+		}
+	}
+
+	/**
+	 * If a point is inside the image true is returned if its value is not zero, otherwise false is returned.
+	 */
+	public static boolean getF(ImageInt8 image, int x, int y) {
+		if (image.isInBounds(x, y)) {
+			return image.get(x, y) != 0;
+		} else {
+			return false;
+		}
 	}
 }

@@ -22,10 +22,10 @@ import pja.geometry.struct.point.Point2D_I16;
 
 
 /**
- * <p>
+ * <p/>
  * Only examine around candidate regions for corners
  * <p/>
- * 
+ *
  * @author Peter Abeles
  */
 public class NonMaxCornerCandidateExtractor {
@@ -51,18 +51,22 @@ public class NonMaxCornerCandidateExtractor {
 	/**
 	 * Selects a set of features from the provided intensity image and corner candidates.
 	 *
-	 * @param intensityImage feature intensity image.
-	 * @param candidates List of candidate locations for features.
-	 * @param corners List of selected features.
+	 * @param intensityImage feature intensity image. Can be modified.
+	 * @param candidates	 List of candidate locations for features.
+	 * @param corners		List of selected features.  If not empty, previously found features will be skipped.
 	 */
-	public void process(ImageFloat32 intensityImage, QueueCorner candidates , QueueCorner corners) {
-		corners.reset();
+	public void process(ImageFloat32 intensityImage, QueueCorner candidates, QueueCorner corners) {
+		// mark corners which have already been found
+		for (int i = 0; i < corners.num; i++) {
+			Point2D_I16 pt = corners.get(i);
+			intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
+		}
 
 		final int stride = intensityImage.stride;
 
 		final float inten[] = intensityImage.data;
 
-		for( int iter = 0; iter < candidates.num; iter++ ) {
+		for (int iter = 0; iter < candidates.num; iter++) {
 			Point2D_I16 pt = candidates.points[iter];
 
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;
@@ -74,8 +78,8 @@ public class NonMaxCornerCandidateExtractor {
 
 			escape:
 			for (int i = -radius; i <= radius; i++) {
-				int index = center +i*stride-radius;
-				for (int j = -radius; j <= radius; j++,index++) {
+				int index = center + i * stride - radius;
+				for (int j = -radius; j <= radius; j++, index++) {
 					// don't compare the center point against itself
 					if (i == 0 && j == 0)
 						continue;
@@ -87,7 +91,7 @@ public class NonMaxCornerCandidateExtractor {
 				}
 			}
 
-			if (max) {
+			if (max && val != Float.MAX_VALUE) {
 				corners.add(pt.x, pt.y);
 			}
 		}

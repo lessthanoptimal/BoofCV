@@ -26,9 +26,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -118,6 +116,11 @@ public class TestConvertBufferedImage {
 		BufferedImage img = ConvertBufferedImage.extractBuffered(srcImg);
 
 		GecvTesting.checkEquals(img, srcImg);
+	}
+
+	@Test
+	public void convertFrom_generic() {
+		fail("implement");
 	}
 
 	@Test

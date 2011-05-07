@@ -18,18 +18,19 @@ package gecv.alg.detect.extract;
 
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
+import pja.geometry.struct.point.Point2D_I16;
 
 /**
- * <p>
+ * <p/>
  * This is a faster version of non-max suppression that remember the value of the last largest
  * known value.  If that value could still be in the window it is compared to the current
  * value of the center of the window.  If it is larger it moves on.  If it is smaller
  * it does the same check as the standard algorithm.
  * <p/>
- * 
+ *
  * @author Peter Abeles
  */
-public class FastNonMaxCornerExtractor  {
+public class FastNonMaxCornerExtractor implements NonMaxCornerExtractor {
 
 	// search region
 	private int radius;
@@ -51,15 +52,32 @@ public class FastNonMaxCornerExtractor  {
 			this.border = radius;
 	}
 
+	@Override
+	public void setThresh(float thresh) {
+		this.thresh = thresh;
+	}
+
+	@Override
 	public void setMinSeparation(int minSeparation) {
 		this.radius = minSeparation;
 	}
 
-	public void process(ImageFloat32 intensityImage,  QueueCorner corners) {
+	/**
+	 * Detects corners in the image while excluding corners which are already contained in the corners list.
+	 *
+	 * @param intensityImage Feature intensity image. Can be modified.
+	 * @param corners		Where found corners are stored.  Corners which are already in the list will not be added twice.
+	 */
+	@Override
+	public void process(ImageFloat32 intensityImage, QueueCorner corners) {
 		int imgWidth = intensityImage.getWidth();
 		int imgHeight = intensityImage.getHeight();
 
-		corners.reset();
+		// mark corners which have already been found
+		for (int i = 0; i < corners.num; i++) {
+			Point2D_I16 pt = corners.get(i);
+			intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
+		}
 
 		final float inten[] = intensityImage.data;
 
@@ -76,6 +94,7 @@ public class FastNonMaxCornerExtractor  {
 				if (maxX < x || maxValue <= val) {
 					boolean isMax = true;
 
+					// todo can this be speed up by cropping the search along the x-axis?
 					escape:
 					for (int i = -radius; i <= radius; i++) {
 						for (int j = -radius; j <= radius; j++) {
@@ -92,7 +111,7 @@ public class FastNonMaxCornerExtractor  {
 						}
 					}
 
-					if (isMax) {
+					if (isMax && val != Float.MAX_VALUE) {
 						maxValue = val;
 						maxX = x;
 						corners.add(x, y);

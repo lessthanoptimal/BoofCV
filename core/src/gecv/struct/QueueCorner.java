@@ -46,7 +46,7 @@ public class QueueCorner {
 
 	public final void add(int x, int y) {
 		if (num >= points.length) {
-			resize(num * 2);
+			resize(num * 2 + 1);
 		}
 
 		points[num++].set((short) x, (short) y);

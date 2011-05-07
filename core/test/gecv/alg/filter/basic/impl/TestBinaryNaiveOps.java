@@ -45,6 +45,16 @@ public class TestBinaryNaiveOps {
 	}
 
 	@Test
+	public void erode4_border() {
+		ImageInt8 input;
+
+		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
+		checkImage("erode4", input, 0, 0, 0, 0, 1, 0, 0, 0, 0);
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		checkImage("erode4", input, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	}
+
+	@Test
 	public void dilate4() {
 		ImageInt8 input;
 
@@ -61,6 +71,16 @@ public class TestBinaryNaiveOps {
 		checkOutput("dilate4", input, 0);
 		input = createInput(1, 0, 1, 0, 0, 0, 1, 0, 1);
 		checkOutput("dilate4", input, 0);
+	}
+
+	@Test
+	public void dilate4_border() {
+		ImageInt8 input;
+
+		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
+		checkImage("dilate4", input, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		input = createInput(0, 0, 0, 0, 1, 0, 0, 0, 0);
+		checkImage("dilate4", input, 0, 1, 0, 1, 1, 1, 0, 1, 0);
 	}
 
 	@Test
@@ -87,6 +107,16 @@ public class TestBinaryNaiveOps {
 	}
 
 	@Test
+	public void edge4_border() {
+		ImageInt8 input;
+
+		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
+		checkImage("edge4", input, 0, 1, 0, 1, 0, 1, 0, 1, 0);
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		checkImage("edge4", input, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	}
+
+	@Test
 	public void erode8() {
 		ImageInt8 input;
 
@@ -102,6 +132,16 @@ public class TestBinaryNaiveOps {
 	}
 
 	@Test
+	public void erode8_border() {
+		ImageInt8 input;
+
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		checkImage("erode8", input, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
+		checkImage("erode8", input, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	}
+
+	@Test
 	public void dilate8() {
 		ImageInt8 input;
 
@@ -111,7 +151,7 @@ public class TestBinaryNaiveOps {
 		checkOutput("dilate8", input, 1);
 		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 0);
 		checkOutput("dilate8", input, 1);
-		for( int i = 0; i < 9; i++ ) {
+		for (int i = 0; i < 9; i++) {
 			int image[] = new int[9];
 			image[i] = 1;
 			input = createInput(image);
@@ -120,6 +160,18 @@ public class TestBinaryNaiveOps {
 
 		input = createInput(0, 0, 0, 0, 0, 0, 0, 0, 0);
 		checkOutput("dilate8", input, 0);
+	}
+
+	@Test
+	public void dilate8_border() {
+		ImageInt8 input;
+
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		checkImage("dilate8", input, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
+		checkImage("dilate8", input, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		input = createInput(0, 0, 0, 0, 1, 0, 0, 0, 0);
+		checkImage("dilate8", input, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	}
 
 	@Test
@@ -139,6 +191,18 @@ public class TestBinaryNaiveOps {
 		checkOutput("edge8", input, 0);
 		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
 		checkOutput("edge8", input, 0);
+	}
+
+	@Test
+	public void edge8_border() {
+		ImageInt8 input;
+
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		checkImage("edge8", input, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		input = createInput(0, 0, 0, 0, 1, 0, 0, 0, 0);
+		checkImage("edge8", input, 0, 0, 0, 0, 1, 0, 0, 0, 0);
+		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
+		checkImage("edge8", input, 0, 1, 0, 1, 1, 1, 0, 1, 0);
 	}
 
 	@Test
@@ -166,10 +230,26 @@ public class TestBinaryNaiveOps {
 		checkOutput("removePointNoise", input, 0);
 	}
 
+	@Test
+	public void removePointNoise_border() {
+		ImageInt8 input;
+
+		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
+		checkImage("removePointNoise", input, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+		input = createInput(0, 0, 0, 0, 1, 0, 0, 0, 0);
+		checkImage("removePointNoise", input, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
+		checkImage("removePointNoise", input, 0, 1, 0, 1, 1, 1, 0, 1, 0);
+	}
+
 	private void checkOutput(String methodName, ImageInt8 input, int expected) {
+		checkOutput(methodName, input, 1, 1, expected);
+	}
+
+	private void checkOutput(String methodName, ImageInt8 input, int x, int y, int expected) {
 		ImageInt8 output = createOutput(methodName, input);
 
-		assertEquals(expected, output.getU(1, 1));
+		assertEquals(expected, output.getU(x, y));
 
 		// check it against sub-images
 		ImageInt8 temp = new ImageInt8(3 + output.width, 4 + output.height);
@@ -177,7 +257,25 @@ public class TestBinaryNaiveOps {
 		temp.setTo(input);
 
 		output = createOutput(methodName, temp);
-		assertEquals(output.getU(1, 1), expected);
+		assertEquals(output.getU(x, y), expected);
+	}
+
+	private void checkImage(String methodName, ImageInt8 input, int... expected) {
+		ImageInt8 output = createOutput(methodName, input);
+
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
+				assertEquals(expected[i * 3 + j], output.getU(j, i));
+
+		// check it against sub-images
+		ImageInt8 temp = new ImageInt8(3 + output.width, 4 + output.height);
+		temp = temp.subimage(0, 0, output.width, output.height);
+		temp.setTo(input);
+
+		output = createOutput(methodName, temp);
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
+				assertEquals(expected[i * 3 + j], output.getU(j, i));
 	}
 
 	private ImageInt8 createInput(int... image) {
@@ -190,8 +288,10 @@ public class TestBinaryNaiveOps {
 
 	private ImageInt8 createOutput(String methodName, ImageInt8 input) {
 		try {
+			ImageInt8 output = new ImageInt8(input.width, input.height);
 			Method m = BinaryNaiveOps.class.getMethod(methodName, ImageInt8.class, ImageInt8.class);
-			return (ImageInt8) m.invoke(null, input, (ImageInt8) null);
+			m.invoke(null, input, output);
+			return output;
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {

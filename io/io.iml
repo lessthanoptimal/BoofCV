@@ -18,6 +18,17 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../thirdparty/xuggle_home/share/java/jars/xuggle-xuggler.jar!/" />
+          <root url="file://$MODULE_DIR$/../../thirdparty/xuggle_home/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/../../thirdparty/xuggle_home/lib" recursive="false" />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

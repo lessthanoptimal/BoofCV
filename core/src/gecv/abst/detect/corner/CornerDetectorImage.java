@@ -17,22 +17,22 @@
 package gecv.abst.detect.corner;
 
 import gecv.abst.detect.extract.CornerExtractor;
-import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 
 /**
- * Extracts corners from a single image.
+ * Extracts corners from a single image. Can be configured to return all
+ * the found features or just the ones with the largest intensity.
  *
  * @author Peter Abeles
  */
-public class CornerDetectorImage <I extends ImageBase> extends CornerDetectorBase<I>{
+public class CornerDetectorImage<I extends ImageBase> extends CornerDetectorBase<I> {
 
 	// computes the corner intensity image
 	CornerIntensityImage<I> intensity;
 
 	public CornerDetectorImage(CornerIntensityImage<I> intensity, CornerExtractor extractor,
-								  int maxFoundCorners) {
-		super(extractor,maxFoundCorners);
+							   int maxFoundCorners) {
+		super(extractor, maxFoundCorners);
 		this.intensity = intensity;
 	}
 
@@ -41,8 +41,12 @@ public class CornerDetectorImage <I extends ImageBase> extends CornerDetectorBas
 	 *
 	 * @param inputImage
 	 */
-	public void process( I inputImage) {
+	public void process(I inputImage) {
 		intensity.process(inputImage);
-		extractor.process( intensity.getIntensity(), candidateCorners,requestedFeatureNumber,foundCorners);
+		foundCorners.reset();
+		extractor.process(intensity.getIntensity(), candidateCorners, requestedFeatureNumber, foundCorners);
+		if (selectBest != null) {
+			selectBest.process(intensity.getIntensity(), foundCorners);
+		}
 	}
 }

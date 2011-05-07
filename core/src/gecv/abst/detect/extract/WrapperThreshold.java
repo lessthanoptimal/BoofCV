@@ -16,7 +16,6 @@
 
 package gecv.abst.detect.extract;
 
-import gecv.alg.detect.extract.NonMaxCornerExtractor;
 import gecv.alg.detect.extract.ThresholdCornerExtractor;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
@@ -30,13 +29,13 @@ public class WrapperThreshold implements CornerExtractor {
 
 	ThresholdCornerExtractor extractor;
 
-	public WrapperThreshold( ThresholdCornerExtractor extractor ) {
+	public WrapperThreshold(ThresholdCornerExtractor extractor) {
 		this.extractor = extractor;
 	}
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner foundCorners) {
-		extractor.process(intensity,foundCorners);
+		extractor.process(intensity, foundCorners);
 	}
 
 	@Override

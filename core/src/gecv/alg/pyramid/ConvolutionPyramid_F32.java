@@ -21,50 +21,37 @@ import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * Convolves a re-normalizable blur kernel across the image before down sampling.  This is usefull for creating
- * a Gaussian pyramid as well as other standard pyramids.
+ * Implementation of {@link gecv.alg.pyramid.ConvolutionPyramid} for {@link ImageFloat32}.
  *
  * @author Peter Abeles
  */
-public class ConvolutionPyramid_F32 extends ImagePyramid<ImageFloat32> {
+public class ConvolutionPyramid_F32 extends ConvolutionPyramid<ImageFloat32> {
 	// convolution kernel used to blur the input image before down sampling
 	private Kernel1D_F32 kernel;
 	// storage for computing the down sampled image
 	private float storage[];
 
-	public ConvolutionPyramid_F32( int topWidth, int topHeight , boolean saveOriginalReference , Kernel1D_F32 kernel) {
-		super(topWidth,topHeight,saveOriginalReference);
+	public ConvolutionPyramid_F32(Kernel1D_F32 kernel) {
 		this.kernel = kernel;
-		storage = new float[ kernel.width ];
+		storage = new float[kernel.width];
 	}
 
 	@Override
-	public void _update( ImageFloat32 original ) {
+	public void _update(ImageFloat32 original) {
 
-		if( scale[0] == 1 ) {
-			if( saveOriginalReference ) {
-				layers[0] = original;
-			}
-			else {
-				layers[0].setTo(original);
+		if (pyramid.scale[0] == 1) {
+			if (pyramid.saveOriginalReference) {
+				pyramid.layers[0] = original;
+			} else {
+				pyramid.layers[0].setTo(original);
 			}
 		} else {
-			DownSampleConvolve.downSample(kernel,original,layers[0],scale[0],storage);
+			DownSampleConvolve.downSample(kernel, original, pyramid.layers[0], pyramid.scale[0], storage);
 		}
 
-		for( int index = 1 ; index < layers.length; index++ ) {
-			int skip = scale[index];
-			DownSampleConvolve.downSample(kernel,layers[index-1],layers[index],skip,storage);
+		for (int index = 1; index < pyramid.layers.length; index++) {
+			int skip = pyramid.scale[index];
+			DownSampleConvolve.downSample(kernel, pyramid.layers[index - 1], pyramid.layers[index], skip, storage);
 		}
-	}
-
-	@Override
-	protected ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width,height);
-	}
-
-	@Override
-	public Class<ImageFloat32> getImageType() {
-		return ImageFloat32.class;
 	}
 }

@@ -17,25 +17,24 @@
 package gecv.abst.detect.corner;
 
 import gecv.abst.detect.extract.CornerExtractor;
-import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 
 /**
- * Abstracted class for extracting corners from a the image's gradient.
- *
- * @see gecv.alg.detect.corner
- * @see gecv.abst.detect.extract
+ * Abstracted class for extracting corners from the image's gradient. Can be configured to return all
+ * the found features or just the ones with the largest intensity.
  *
  * @author Peter Abeles
+ * @see gecv.alg.detect.corner
+ * @see gecv.abst.detect.extract
  */
-public class CornerDetectorGradient<I extends ImageBase> extends CornerDetectorBase<I>{
+public class CornerDetectorGradient<I extends ImageBase> extends CornerDetectorBase<I> {
 
 	// computes the corner intensity image
-	CornerIntensityGradient<I> intensity;
+	protected CornerIntensityGradient<I> intensity;
 
 	public CornerDetectorGradient(CornerIntensityGradient<I> intensity, CornerExtractor extractor,
 								  int maxFoundCorners) {
-		super(extractor,maxFoundCorners);
+		super(extractor, maxFoundCorners);
 		this.intensity = intensity;
 	}
 
@@ -45,8 +44,12 @@ public class CornerDetectorGradient<I extends ImageBase> extends CornerDetectorB
 	 * @param derivX image derivative in along the x-axis.
 	 * @param derivY image derivative in along the y-axis.
 	 */
-	public void process( I derivX , I derivY ) {
-		intensity.process(derivX,derivY);
-		extractor.process( intensity.getIntensity(), candidateCorners,requestedFeatureNumber,foundCorners);
+	public void process(I derivX, I derivY) {
+		intensity.process(derivX, derivY);
+		foundCorners.reset();
+		extractor.process(intensity.getIntensity(), candidateCorners, requestedFeatureNumber, foundCorners);
+		if (selectBest != null) {
+			selectBest.process(intensity.getIntensity(), foundCorners);
+		}
 	}
 }

@@ -16,24 +16,32 @@
 
 package gecv.alg.filter.basic;
 
+import gecv.alg.InputSanityCheck;
+import gecv.alg.filter.basic.impl.BinaryEdgeOps;
+import gecv.alg.filter.basic.impl.BinaryInnerOps;
 import gecv.alg.filter.basic.impl.BinaryNaiveOps;
 import gecv.struct.image.ImageInt8;
 
 /**
  * <p>
- * Contains a standard set of operations performed on binary images.
+ * Contains a standard set of operations performed on binary images. A pixel has a value of false if it is equal
+ * to zero or true equal to one.
  * </p>
  * <p/>
  * <p>
- * DESIGN NOTE: 8-bit integer images ({@link ImageInt8}) are used instead of images composed of boolean values because
- * there is no performance advantage.  According to the virtual machines specification binary arrays are stored as
- * byte arrays with 1 representing true and 0 representing false.
+ * NOTE: If an element's value is not zero or one then each function's behavior is undefined.
  * </p>
  *
  * @author Peter Abeles
  */
-// todo benchmark byte and boolean images to see which one is fastest to work with
-// stronger typing of a binary image would be good...
+/*
+ * DESIGN NOTE: 8-bit integer images ({@link ImageInt8}) are used instead of images composed of boolean values because
+ * there is no performance advantage.  According to the virtual machines specification binary arrays are stored as
+ * byte arrays with 1 representing true and 0 representing false.
+
+ * DESIGN NOTE: Restricting input values to zero and one was tested was compared against defining true as not zero.
+ * The former allowed a 2x to 3x performance boost by allowing numbers to be summed instead of compared.
+ */
 public class BinaryImageOps {
 
 	/**
@@ -47,7 +55,12 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static ImageInt8 erode4(ImageInt8 input, ImageInt8 output) {
-		return BinaryNaiveOps.erode4(input, output);
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		BinaryInnerOps.erode4(input, output);
+		BinaryEdgeOps.erode4(input, output);
+
+		return output;
 	}
 
 	/**
@@ -61,7 +74,12 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static ImageInt8 dilate4(ImageInt8 input, ImageInt8 output) {
-		return BinaryNaiveOps.dilate4(input, output);
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		BinaryInnerOps.dilate4(input, output);
+		BinaryEdgeOps.dilate4(input, output);
+
+		return output;
 	}
 
 	/**
@@ -79,7 +97,13 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static ImageInt8 edge4(ImageInt8 input, ImageInt8 output) {
-		return BinaryNaiveOps.edge4(input, output);
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		BinaryNaiveOps.edge4(input, output);
+		BinaryInnerOps.edge4(input, output);
+		BinaryEdgeOps.edge4(input, output);
+
+		return output;
 	}
 
 	/**
@@ -93,7 +117,12 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static ImageInt8 erode8(ImageInt8 input, ImageInt8 output) {
-		return BinaryNaiveOps.erode8(input, output);
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		BinaryInnerOps.erode8(input, output);
+		BinaryEdgeOps.erode8(input, output);
+
+		return output;
 	}
 
 	/**
@@ -107,7 +136,12 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static ImageInt8 dilate8(ImageInt8 input, ImageInt8 output) {
-		return BinaryNaiveOps.dilate8(input, output);
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		BinaryInnerOps.dilate8(input, output);
+		BinaryEdgeOps.dilate8(input, output);
+
+		return output;
 	}
 
 	/**
@@ -125,7 +159,12 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static ImageInt8 edge8(ImageInt8 input, ImageInt8 output) {
-		return BinaryNaiveOps.edge8(input, output);
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		BinaryInnerOps.edge8(input, output);
+		BinaryEdgeOps.edge8(input, output);
+
+		return output;
 	}
 
 	/**
@@ -138,6 +177,11 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static ImageInt8 removePointNoise(ImageInt8 input, ImageInt8 output) {
-		return BinaryNaiveOps.removePointNoise(input, output);
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		BinaryInnerOps.removePointNoise(input, output);
+		BinaryEdgeOps.removePointNoise(input, output);
+
+		return output;
 	}
 }

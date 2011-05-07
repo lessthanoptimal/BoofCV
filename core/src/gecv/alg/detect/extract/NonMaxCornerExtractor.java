@@ -19,71 +19,35 @@ package gecv.alg.detect.extract;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 
-
 /**
- * <p>
- * Extracts corners at local maximums that are above a threshold.  Basic unoptimized implementation.
- * <p/>
- * 
+ * Extracts features from the intensity image by finding local maximums.  Previously found corners are automatically
+ * excluded and not added again.  Features below an intensity threshold are automatically ignored and no two
+ * features can be closer than the minSeparation apart.
+ *
  * @author Peter Abeles
  */
-public class NonMaxCornerExtractor {
+public interface NonMaxCornerExtractor {
 
-	// size of the search area
-	int radius;
-	// the threshold which points must be above to be a feature
-	float thresh;
+	/**
+	 * Sets the minimum distance two features can be.  This is the local region which is searched in non-max
+	 * suppression.
+	 *
+	 * @param minSeparation How close two features can be.
+	 */
+	public void setMinSeparation(int minSeparation);
 
-	public NonMaxCornerExtractor(int minSeparation, float thresh) {
-		this.radius = minSeparation;
-		this.thresh = thresh;
-	}
+	/**
+	 * The minimum intensity a feature can have.
+	 *
+	 * @param thresh Minimum intensity a feature can have to be valid.
+	 */
+	public void setThresh(float thresh);
 
-	public void setMinSeparation(int minSeparation) {
-		this.radius = minSeparation;
-	}
-
-	public void setThresh(float thresh) {
-		this.thresh = thresh;
-	}
-
-	public void process(ImageFloat32 intensityImage, QueueCorner corners) {
-		corners.reset();
-
-		final int imgWidth = intensityImage.getWidth();
-		final int imgHeight = intensityImage.getHeight();
-		final int stride = intensityImage.stride;
-
-		final float inten[] = intensityImage.data;
-
-		for (int y = radius; y < imgHeight - radius; y++) {
-			for (int x = radius; x < imgWidth - radius; x++) {
-				int center = intensityImage.startIndex + y * stride + x;
-
-				float val = inten[center];
-				if (val < thresh) continue;
-
-				boolean max = true;
-
-				escape:
-				for (int i = -radius; i <= radius; i++) {
-					int index = center +i*stride-radius;
-					for (int j = -radius; j <= radius; j++,index++) {
-						// don't compare the center point against itself
-						if (i == 0 && j == 0)
-							continue;
-
-						if (val <= inten[index]) {
-							max = false;
-							break escape;
-						}
-					}
-				}
-
-				if (max) {
-					corners.add(x, y);
-				}
-			}
-		}
-	}
+	/**
+	 * Detects corners in the image while excluding corners which are already contained in the corners list.
+	 *
+	 * @param intensityImage Feature intensity image. Can be modified.
+	 * @param corners		Where found corners are stored.  Corners which are already in the list will not be added twice.
+	 */
+	public void process(ImageFloat32 intensityImage, QueueCorner corners);
 }

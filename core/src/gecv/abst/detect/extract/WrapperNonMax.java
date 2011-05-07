@@ -16,13 +16,12 @@
 
 package gecv.abst.detect.extract;
 
-import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
 import gecv.alg.detect.extract.NonMaxCornerExtractor;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * Wrapper around the {@link gecv.alg.detect.extract.NonMaxCornerExtractor} class.
+ * Wrapper around the {@link gecv.alg.detect.extract.NonMaxCornerExtractorNaive} class.
  *
  * @author Peter Abeles
  */
@@ -30,13 +29,13 @@ public class WrapperNonMax implements CornerExtractor {
 
 	NonMaxCornerExtractor extractor;
 
-	public WrapperNonMax( NonMaxCornerExtractor extractor ) {
+	public WrapperNonMax(NonMaxCornerExtractor extractor) {
 		this.extractor = extractor;
 	}
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner foundCorners) {
-		extractor.process(intensity,foundCorners);
+		extractor.process(intensity, foundCorners);
 	}
 
 	@Override
@@ -46,7 +45,7 @@ public class WrapperNonMax implements CornerExtractor {
 
 	@Override
 	public boolean getIgnoreExistingCorners() {
-		return false;
+		return true;
 	}
 
 	@Override

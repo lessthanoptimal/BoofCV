@@ -21,6 +21,7 @@ import gecv.alg.filter.convolve.KernelFactory;
 import gecv.core.image.UtilImageInt8;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageInt8;
+import gecv.struct.pyramid.ImagePyramid_I8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -43,28 +44,32 @@ public class TestConvolutionPyramid_I8 {
 	 */
 	@Test
 	public void saveOriginalReference() {
-		ImageInt8 img = new ImageInt8(width,height);
-		UtilImageInt8.randomize(img,rand);
+		ImageInt8 img = new ImageInt8(width, height);
+		UtilImageInt8.randomize(img, rand);
 
 		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(3);
+		ImagePyramid_I8 pyramid = new ImagePyramid_I8(width, height, true);
+		pyramid.setScaling(1, 2, 2);
 
-		ConvolutionPyramid_I8 alg = new ConvolutionPyramid_I8(width,height,true,kernel);
-		alg.setScaling(1,2,2);
+		ConvolutionPyramid_I8 alg = new ConvolutionPyramid_I8(kernel);
+		alg.setPyramid(pyramid);
 		alg.update(img);
 
-		assertTrue(img==alg.getLayer(0));
+		assertTrue(img == pyramid.getLayer(0));
 
-		alg = new ConvolutionPyramid_I8(width,height,false,kernel);
-		alg.setScaling(1,2,2);
+		pyramid = new ImagePyramid_I8(width, height, false);
+		pyramid.setScaling(1, 2, 2);
+		alg.setPyramid(pyramid);
 		alg.update(img);
 
-		assertTrue(img!=alg.getLayer(0));
+		assertTrue(img != pyramid.getLayer(0));
 
-		alg = new ConvolutionPyramid_I8(width,height,true,kernel);
-		alg.setScaling(2,2);
+		pyramid = new ImagePyramid_I8(width, height, true);
+		pyramid.setScaling(2, 2);
+		alg.setPyramid(pyramid);
 		alg.update(img);
 
-		assertTrue(img!=alg.getLayer(0));
+		assertTrue(img != pyramid.getLayer(0));
 	}
 
 	/**
@@ -72,31 +77,33 @@ public class TestConvolutionPyramid_I8 {
 	 */
 	@Test
 	public void _update() {
-		ImageInt8 img = new ImageInt8(width,height);
-		UtilImageInt8.randomize(img,rand);
+		ImageInt8 img = new ImageInt8(width, height);
+		UtilImageInt8.randomize(img, rand);
 
-		GecvTesting.checkSubImage(this,"_update",true, img );
+		GecvTesting.checkSubImage(this, "_update", true, img);
 	}
 
 	public void _update(ImageInt8 img) {
 		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(3);
-		ImageInt8 convImg = new ImageInt8(width,height);
+		ImageInt8 convImg = new ImageInt8(width, height);
 
-		BlurImageOps.kernel(img,convImg,kernel,new ImageInt8(width,height));
+		BlurImageOps.kernel(img, convImg, kernel, new ImageInt8(width, height));
 
-		ConvolutionPyramid_I8 alg = new ConvolutionPyramid_I8(width,height,false,kernel);
-		alg.setScaling(1,2,2);
+		ImagePyramid_I8 pyramid = new ImagePyramid_I8(width, height, false);
+		pyramid.setScaling(1, 2, 2);
+		ConvolutionPyramid_I8 alg = new ConvolutionPyramid_I8(kernel);
+		alg.setPyramid(pyramid);
 		alg.update(img);
 
 		// top layer should be the same as the input layer
-		GecvTesting.assertEquals(img,alg.getLayer(0),1);
+		GecvTesting.assertEquals(img, pyramid.getLayer(0), 1);
 
-		for( int i = 0; i < height; i += 2 ) {
-			for( int j = 0; j < width; j += 2 ) {
-				int a = convImg.get(j,i);
-				int b = alg.getLayer(1).get(j/2,i/2);
+		for (int i = 0; i < height; i += 2) {
+			for (int j = 0; j < width; j += 2) {
+				int a = convImg.get(j, i);
+				int b = pyramid.getLayer(1).get(j / 2, i / 2);
 
-				assertEquals(a,b);
+				assertEquals(a, b);
 			}
 		}
 	}

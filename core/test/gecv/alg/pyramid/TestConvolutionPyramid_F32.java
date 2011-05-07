@@ -21,6 +21,7 @@ import gecv.alg.filter.convolve.KernelFactory;
 import gecv.core.image.UtilImageFloat32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.pyramid.ImagePyramid_F32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -42,28 +43,32 @@ public class TestConvolutionPyramid_F32 {
 	 */
 	@Test
 	public void saveOriginalReference() {
-		ImageFloat32 img = new ImageFloat32(width,height);
-		UtilImageFloat32.randomize(img,rand,0,200);
+		ImageFloat32 img = new ImageFloat32(width, height);
+		UtilImageFloat32.randomize(img, rand, 0, 100);
 
-		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(3,true);
+		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(3, true);
+		ImagePyramid_F32 pyramid = new ImagePyramid_F32(width, height, true);
+		pyramid.setScaling(1, 2, 2);
 
-		ConvolutionPyramid_F32 alg = new ConvolutionPyramid_F32(width,height,true,kernel);
-		alg.setScaling(1,2,2);
+		ConvolutionPyramid_F32 alg = new ConvolutionPyramid_F32(kernel);
+		alg.setPyramid(pyramid);
 		alg.update(img);
 
-		assertTrue(img==alg.getLayer(0));
+		assertTrue(img == pyramid.getLayer(0));
 
-		alg = new ConvolutionPyramid_F32(width,height,false,kernel);
-		alg.setScaling(1,2,2);
+		pyramid = new ImagePyramid_F32(width, height, false);
+		pyramid.setScaling(1, 2, 2);
+		alg.setPyramid(pyramid);
 		alg.update(img);
 
-		assertTrue(img!=alg.getLayer(0));
+		assertTrue(img != pyramid.getLayer(0));
 
-		alg = new ConvolutionPyramid_F32(width,height,true,kernel);
-		alg.setScaling(2,2);
+		pyramid = new ImagePyramid_F32(width, height, true);
+		pyramid.setScaling(2, 2);
+		alg.setPyramid(pyramid);
 		alg.update(img);
 
-		assertTrue(img!=alg.getLayer(0));
+		assertTrue(img != pyramid.getLayer(0));
 	}
 
 	/**
@@ -71,31 +76,33 @@ public class TestConvolutionPyramid_F32 {
 	 */
 	@Test
 	public void _update() {
-		ImageFloat32 img = new ImageFloat32(width,height);
-		UtilImageFloat32.randomize(img,rand,0,200);
+		ImageFloat32 img = new ImageFloat32(width, height);
+		UtilImageFloat32.randomize(img, rand, 0, 100);
 
-		GecvTesting.checkSubImage(this,"_update",true, img );
+		GecvTesting.checkSubImage(this, "_update", true, img);
 	}
 
 	public void _update(ImageFloat32 img) {
-		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(3,true);
-		ImageFloat32 convImg = new ImageFloat32(width,height);
+		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(3, true);
+		ImageFloat32 convImg = new ImageFloat32(width, height);
 
-		BlurImageOps.kernel(img,convImg,kernel,new ImageFloat32(width,height));
+		BlurImageOps.kernel(img, convImg, kernel, new ImageFloat32(width, height));
 
-		ConvolutionPyramid_F32 alg = new ConvolutionPyramid_F32(width,height,false,kernel);
-		alg.setScaling(1,2,2);
+		ImagePyramid_F32 pyramid = new ImagePyramid_F32(width, height, false);
+		pyramid.setScaling(1, 2, 2);
+		ConvolutionPyramid_F32 alg = new ConvolutionPyramid_F32(kernel);
+		alg.setPyramid(pyramid);
 		alg.update(img);
 
 		// top layer should be the same as the input layer
-		GecvTesting.assertEquals(img,alg.getLayer(0),0,1e-4f);
+		GecvTesting.assertEquals(img, pyramid.getLayer(0), 1, 1e-4f);
 
-		for( int i = 0; i < height; i += 2 ) {
-			for( int j = 0; j < width; j += 2 ) {
-				float a = convImg.get(j,i);
-				float b = alg.getLayer(1).get(j/2,i/2);
+		for (int i = 0; i < height; i += 2) {
+			for (int j = 0; j < width; j += 2) {
+				float a = convImg.get(j, i);
+				float b = pyramid.getLayer(1).get(j / 2, i / 2);
 
-				assertEquals(a,b,1e-5);
+				assertEquals(a, b, 1e-4);
 			}
 		}
 	}

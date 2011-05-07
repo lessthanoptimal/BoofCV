@@ -16,6 +16,8 @@
 
 package gecv.core.image;
 
+import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt8;
 import gecv.struct.image.ImageInterleavedInt8;
 import sun.awt.image.ByteInterleavedRaster;
@@ -171,6 +173,20 @@ public class ConvertBufferedImage {
 
 		// Combine the color model and raster into a buffered image
 		return new BufferedImage(colorModel, raster, false, null);
+	}
+
+	/**
+	 * Converts a buffered image into an image of the specified type.  In a 'dst' image is provided
+	 * it will be used for output, otherwise a new image will be created.
+	 */
+	public static <T extends ImageBase> T convertFrom(BufferedImage src, T dst, Class<T> type) {
+		if (type == ImageInt8.class) {
+			return (T) convertFrom(src, (ImageInt8) dst);
+		} else if (type == ImageFloat32.class) {
+			throw new RuntimeException("Not supported yet");
+		} else {
+			throw new IllegalArgumentException("Unknown type " + type);
+		}
 	}
 
 	/**

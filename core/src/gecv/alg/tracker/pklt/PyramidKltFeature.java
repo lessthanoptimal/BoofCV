@@ -25,12 +25,19 @@ import gecv.alg.tracker.klt.KltFeature;
  */
 public class PyramidKltFeature {
 	KltFeature desc[];
+	float x;
+	float y;
 
-	public PyramidKltFeature( int numLayers , int radius ) {
+	public PyramidKltFeature(int numLayers, int radius) {
 		desc = new KltFeature[numLayers];
 
-		for( int i = 0; i < numLayers; i++ ) {
+		for (int i = 0; i < numLayers; i++) {
 			desc[i] = new KltFeature(radius);
 		}
+	}
+
+	public void setPosition(float x, float y) {
+		this.x = x;
+		this.y = y;
 	}
 }

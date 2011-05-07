@@ -107,7 +107,7 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 	/**
 	 * Does the tracker require image derivatives to be passed in?
 	 *
-	 * @return
+	 * @return true if image derivatives are required.
 	 */
 	public boolean getRequiresDerivative() {
 		return false;

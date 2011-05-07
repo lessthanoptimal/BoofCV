@@ -28,4 +28,9 @@ public class TestNonMaxCornerCandidateExtractor {
 	public void test() {
 		fail("implement tests");
 	}
+
+	@Test
+	public void excludePreExisting() {
+		fail("implement");
+	}
 }

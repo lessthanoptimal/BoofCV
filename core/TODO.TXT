@@ -20,6 +20,7 @@
 - Corners
  * Evaluate for accuracy
  * See corner section
+ * See in code comment on speeding up fast-non-max
 
 - Convolve
  * Change TestConvolveImageStandard into a completely automated test using reflections

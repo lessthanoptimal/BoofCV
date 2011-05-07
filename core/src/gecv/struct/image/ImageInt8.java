@@ -111,4 +111,16 @@ public class ImageInt8 extends ImageBase<ImageInt8> {
 	protected Class<?> _getPrimitiveType() {
 		return byte.class;
 	}
+
+	public void printBinary() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (get(x, y) == 0)
+					System.out.print("0");
+				else
+					System.out.print("1");
+			}
+			System.out.println();
+		}
+	}
 }

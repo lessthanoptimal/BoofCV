@@ -16,8 +16,10 @@
 
 package gecv.alg.tracker.pklt;
 
+import gecv.alg.tracker.klt.KltTrackFault;
 import gecv.alg.tracker.klt.KltTracker;
 import gecv.struct.image.ImageBase;
+import gecv.struct.pyramid.ImagePyramid;
 
 /**
  * <p>
@@ -37,4 +39,95 @@ import gecv.struct.image.ImageBase;
 public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage extends ImageBase> {
 
 	KltTracker<InputImage, DerivativeImage> tracker;
+	ImagePyramid<InputImage> image;
+	DerivativeImage[] derivX;
+	DerivativeImage[] derivY;
+
+	public PyramidKltTracker(KltTracker<InputImage, DerivativeImage> tracker) {
+		this.tracker = tracker;
+	}
+
+	/**
+	 * Does the tracker require image derivatives to be passed in?
+	 *
+	 * @return true if image derivatives are required.
+	 */
+	public boolean getRequiresDerivative() {
+		return tracker.getRequiresDerivative();
+	}
+
+	public void setDescription(PyramidKltFeature feature) {
+		float x = feature.x;
+		float y = feature.y;
+
+		for (int layer = 0; layer < image.getNumLayers(); layer++) {
+			x /= image.scale[layer];
+			y /= image.scale[layer];
+
+			setupKltTracker(layer);
+
+			feature.desc[layer].setPosition(x, y);
+			tracker.setDescription(feature.desc[layer]);
+		}
+	}
+
+	public void setImage(ImagePyramid<InputImage> image, DerivativeImage[] derivX, DerivativeImage[] derivY) {
+		this.image = image;
+		if (derivX != null) {
+			if (derivX.length != image.getNumLayers() || derivY.length != image.getNumLayers())
+				throw new IllegalArgumentException("Unexpected number of images in derivX and/or derivY");
+			this.derivX = derivX;
+			this.derivY = derivY;
+		}
+	}
+
+	public KltTrackFault track(PyramidKltFeature feature) {
+		boolean worked = false;
+
+		float x = feature.x;
+		float y = feature.y;
+
+		// estimate the position in the top most layer
+		int scaleAtTop = image.getScalingAtLayer(image.getNumLayers() - 1);
+		x /= scaleAtTop;
+		y /= scaleAtTop;
+
+		// track from the top of the pyramid to the bottom
+		for (int layer = image.getNumLayers() - 1; layer >= 0; layer--) {
+			setupKltTracker(layer);
+
+			feature.desc[layer].setPosition(x, y);
+			KltTrackFault ret = tracker.track(feature.desc[layer]);
+			if (ret == KltTrackFault.OUT_OF_BOUNDS) {
+				// if out of bounds try tracking on a lower layer
+				continue;
+			} else if (ret == KltTrackFault.SUCCESS) {
+				// nothing bad happened, save this result
+				x = feature.desc[layer].x;
+				y = feature.desc[layer].y;
+				worked = true;
+			} else {
+				// tracking failed
+				return ret;
+			}
+
+			// put the position estimate into the next layer
+			x *= image.scale[layer];
+			y *= image.scale[layer];
+		}
+
+		feature.setPosition(x, y);
+
+		if (worked)
+			return KltTrackFault.SUCCESS;
+		else
+			return KltTrackFault.OUT_OF_BOUNDS;
+	}
+
+	private void setupKltTracker(int layer) {
+		if (derivX != null)
+			tracker.setImage(image.getLayer(layer), derivX[layer], derivY[layer]);
+		else
+			tracker.setImage(image.getLayer(layer), null, null);
+	}
 }

@@ -24,9 +24,7 @@ import pja.geometry.struct.point.Point2D_I16;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 
 /**
@@ -35,9 +33,14 @@ import static org.junit.Assert.fail;
 public class TestFastNonMaxCornerExtractor {
 	Random rand = new Random(0x334);
 
+	@Test
+	public void excludePreExisting() {
+		fail("implement");
+	}
+
 	/**
 	 * Checks to see if {@link FastNonMaxCornerExtractor} produces exactly the same results as
-	 * {@link NonMaxCornerExtractor}
+	 * {@link NonMaxCornerExtractorNaive}
 	 */
 	@Test
 	public void compareToNaive() {
@@ -47,16 +50,16 @@ public class TestFastNonMaxCornerExtractor {
 		QueueCorner fastCorners = new QueueCorner(inten.getWidth() * inten.getHeight());
 		QueueCorner regCorners = new QueueCorner(inten.getWidth() * inten.getHeight());
 
-		for( int useSubImage = 0; useSubImage < 2; useSubImage++ ) {
+		for (int useSubImage = 0; useSubImage < 2; useSubImage++) {
 			// make sure it handles sub images correctly
-			if( useSubImage == 1 ) {
-				ImageFloat32 larger = new ImageFloat32(inten.width+10,inten.height+8);
-				inten = larger.subimage(0,0,30,40);
+			if (useSubImage == 1) {
+				ImageFloat32 larger = new ImageFloat32(inten.width + 10, inten.height + 8);
+				inten = larger.subimage(0, 0, 30, 40);
 			}
 
 			for (int nonMaxWidth = 3; nonMaxWidth <= 9; nonMaxWidth += 2) {
 				FastNonMaxCornerExtractor fast = new FastNonMaxCornerExtractor(nonMaxWidth / 2, 0, 0.6F);
-				NonMaxCornerExtractor reg = new NonMaxCornerExtractor(nonMaxWidth / 2, 0.6F);
+				NonMaxCornerExtractorNaive reg = new NonMaxCornerExtractorNaive(nonMaxWidth / 2, 0.6F);
 
 				for (int i = 0; i < 10; i++) {
 					UtilImageFloat32.randomize(inten, rand, 0, 10);

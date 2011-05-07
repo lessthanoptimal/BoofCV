@@ -28,6 +28,12 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestNonMaxCornerExtractor {
+
+	@Test
+	public void excludePreExisting() {
+		fail("implement");
+	}
+
 	/**
 	 * See if it produces the correct answers after adjusting the width
 	 */
@@ -50,8 +56,8 @@ public class TestNonMaxCornerExtractor {
 	public void testRegionWidth(ImageFloat32 img) {
 		QueueCorner corners = new QueueCorner(100);
 
-		NonMaxCornerExtractor extractor;
-		extractor = new NonMaxCornerExtractor(1, 0);
+		NonMaxCornerExtractorNaive extractor;
+		extractor = new NonMaxCornerExtractorNaive(1, 0);
 		extractor.process(img, corners);
 		assertEquals(5, corners.size());
 
@@ -89,8 +95,8 @@ public class TestNonMaxCornerExtractor {
 	public void testThreshold(ImageFloat32 img) {
 		QueueCorner corners = new QueueCorner(100);
 
-		NonMaxCornerExtractor extractor;
-		extractor = new NonMaxCornerExtractor(0, 0);
+		NonMaxCornerExtractorNaive extractor;
+		extractor = new NonMaxCornerExtractorNaive(0, 0);
 		extractor.process(img, corners);
 		assertEquals(9 * 8, corners.size());
 

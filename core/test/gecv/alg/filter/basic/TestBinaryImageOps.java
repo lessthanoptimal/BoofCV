@@ -16,9 +16,8 @@
 
 package gecv.alg.filter.basic;
 
+import gecv.alg.filter.basic.impl.CompareToBinaryNaive;
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -26,17 +25,8 @@ import static org.junit.Assert.fail;
 public class TestBinaryImageOps {
 
 	@Test
-	public void erode() {
-		fail("implement");
-	}
-
-	@Test
-	public void dilate() {
-		fail("implement");
-	}
-
-	@Test
-	public void removePointNoise() {
-		fail("implement");
+	public void compareToNaive() {
+		CompareToBinaryNaive tests = new CompareToBinaryNaive(BinaryImageOps.class);
+		tests.performTests(7);
 	}
 }

@@ -71,7 +71,7 @@ public class UtilImageInt8 {
 		final int w = img.getWidth();
 
 		byte[] data = img.data;
-		int range = max - min;
+		int range = 1 + max - min;
 
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
