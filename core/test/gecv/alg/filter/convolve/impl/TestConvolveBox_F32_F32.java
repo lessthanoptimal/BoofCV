@@ -17,12 +17,8 @@
 package gecv.alg.filter.convolve.impl;
 
 import gecv.core.image.UtilImageFloat32;
-import gecv.core.image.UtilImageInt8;
 import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt32;
-import gecv.struct.image.ImageInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 

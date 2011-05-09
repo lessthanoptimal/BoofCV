@@ -17,7 +17,6 @@
 package gecv.core.image;
 
 import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
 
 import java.util.Random;
 
@@ -57,7 +56,7 @@ public class UtilImageInt16 {
 		final int w = img.getWidth();
 
 		short[] data = img.data;
-		int range = max - min;
+		int range = 1 + max - min;
 
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();

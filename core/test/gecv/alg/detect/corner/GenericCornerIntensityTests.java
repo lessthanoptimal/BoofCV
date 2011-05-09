@@ -17,7 +17,6 @@
 package gecv.alg.detect.corner;
 
 import gecv.alg.filter.derivative.GradientSobel;
-import gecv.core.image.UtilImageFloat32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt8;
@@ -37,8 +36,8 @@ public abstract class GenericCornerIntensityTests {
 	protected ImageInt8 imageI = new ImageInt8(width,height);
 	protected ImageFloat32 imageF = new ImageFloat32(width,height);
 
-	protected ImageInt16 derivX_I16 = new ImageInt16(width,height);
-	protected ImageInt16 derivY_I16 = new ImageInt16(width,height);
+	protected ImageInt16 derivX_I16 = new ImageInt16(width,height, true);
+	protected ImageInt16 derivY_I16 = new ImageInt16(width,height, true);
 
 	protected ImageFloat32 derivX_F32 = new ImageFloat32(width,height);
 	protected ImageFloat32 derivY_F32 = new ImageFloat32(width,height);

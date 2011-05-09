@@ -63,7 +63,7 @@ public class GradientSobel {
 	public static void process_I8(ImageInt8 orig,
 								  ImageInt16 derivX,
 								  ImageInt16 derivY) {
-		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		InputSanityCheck.checkSameShape(orig, false, derivX, true, derivY, true);
 
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 	}

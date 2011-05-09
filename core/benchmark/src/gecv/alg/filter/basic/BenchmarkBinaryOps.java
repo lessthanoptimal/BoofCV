@@ -18,9 +18,9 @@ package gecv.alg.filter.basic;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.basic.impl.BinaryInnerOps;
 import gecv.alg.filter.basic.impl.BinaryNaiveOps;
-import gecv.core.image.UtilImageInt8;
 import gecv.struct.image.ImageInt8;
 
 import java.util.Random;
@@ -189,7 +189,7 @@ public class BenchmarkBinaryOps {
 		input = new ImageInt8(imgWidth, imgHeight);
 		output = new ImageInt8(imgWidth, imgHeight);
 		Random rand = new Random(234);
-		UtilImageInt8.randomize(input, rand, 0, 1);
+		BasicDrawing_I8.randomize(input, rand, 0, 1);
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();

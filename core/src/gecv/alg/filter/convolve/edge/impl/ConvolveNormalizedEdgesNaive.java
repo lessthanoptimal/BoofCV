@@ -110,7 +110,7 @@ public class ConvolveNormalizedEdgesNaive {
 
 				for( int j = startX; j <= endX; j++ ) {
 					int v = kernel.get(j-x+radius);
-					total += input.getU(j,y)*v;
+					total += input.get(j,y)*v;
 					div += v;
 				}
 				output.set(x,y, total/div );
@@ -138,7 +138,7 @@ public class ConvolveNormalizedEdgesNaive {
 
 				for( int i = startY; i <= endY; i++ ) {
 					int v = kernel.get(i-y+radius);
-					total += input.getU(x,i)*v;
+					total += input.get(x,i)*v;
 					div += v;
 				}
 				output.set(x,y, total/div );

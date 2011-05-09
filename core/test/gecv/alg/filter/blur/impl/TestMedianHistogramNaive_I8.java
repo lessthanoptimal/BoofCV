@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.blur.impl;
 
-import gecv.core.image.UtilImageInt8;
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.struct.image.ImageInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class TestMedianHistogramNaive_I8 {
 	@Test
 	public void compareToSort() {
 		ImageInt8 image = new ImageInt8(20,30);
-		UtilImageInt8.randomize(image,new Random(234));
+		BasicDrawing_I8.randomize(image,new Random(234));
 
 		ImageInt8 found = new ImageInt8( image.width , image.height );
 		ImageInt8 expected = new ImageInt8( image.width , image.height );

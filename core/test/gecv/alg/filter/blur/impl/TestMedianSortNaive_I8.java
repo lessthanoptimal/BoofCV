@@ -46,9 +46,9 @@ public class TestMedianSortNaive_I8 {
 
 		alg.process(image,found);
 
-		assertEquals(5,found.getU(1,1));
-		assertEquals(6,found.getU(2,1));
-		assertEquals(9,found.getU(1,2));
-		assertEquals(10,found.getU(2,2));
+		assertEquals(5,found.get(1,1));
+		assertEquals(6,found.get(2,1));
+		assertEquals(9,found.get(1,2));
+		assertEquals(10,found.get(2,2));
 	}
 }

@@ -49,7 +49,7 @@ public class FastCorner12_F32 implements FastCornerIntensity<ImageFloat32> {
 	 * @param pixelTol The difference in intensity value from the center pixel the circle needs to be.
 	 * @param minCont  The minimum number of continuous pixels that a circle needs to be a corner.
 	 */
-	public FastCorner12_F32( int imgWidth , int imgHeight , int pixelTol, int minCont) {
+	public FastCorner12_F32( int imgWidth , int imgHeight , float pixelTol, int minCont) {
 		this.pixelTol = pixelTol;
 		this.minCont = minCont;
 
@@ -96,7 +96,7 @@ public class FastCorner12_F32 implements FastCornerIntensity<ImageFloat32> {
 			int rowStart = img.startIndex + stride * y;
 			int endX = rowStart + width - radius;
 			int intenIndex = featureIntensity.startIndex + y*featureIntensity.stride+radius;
-			for (int index = rowStart + radius; index < endX; index++) {
+			for (int index = rowStart + radius; index < endX; index++,intenIndex++) {
 
 				// quickly eliminate bad choices by examining 4 points spread out
 				float center = data[index];

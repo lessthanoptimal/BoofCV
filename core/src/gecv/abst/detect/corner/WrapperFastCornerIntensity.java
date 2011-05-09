@@ -17,7 +17,7 @@
 package gecv.abst.detect.corner;
 
 import gecv.alg.detect.corner.FastCornerIntensity;
-import gecv.alg.detect.corner.GradientCornerIntensity;
+import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 
@@ -26,7 +26,7 @@ import gecv.struct.image.ImageFloat32;
  * 
  * @author Peter Abeles
  */
-public class WrapperFastCornerIntensity<I extends ImageBase> implements CornerIntensityImage<I> {
+public class WrapperFastCornerIntensity<I extends ImageBase, D extends ImageBase> implements GeneralCornerIntensity<I,D> {
 
 	FastCornerIntensity<I> alg;
 
@@ -35,12 +35,27 @@ public class WrapperFastCornerIntensity<I extends ImageBase> implements CornerIn
 	}
 
 	@Override
-	public void process(I input) {
+	public void process(I input, D derivX , D derivY ) {
 		alg.process(input);
 	}
 
 	@Override
 	public ImageFloat32 getIntensity() {
 		return alg.getIntensity();
+	}
+
+	@Override
+	public QueueCorner getCandidates() {
+		return alg.getCandidates();
+	}
+
+	@Override
+	public boolean getRequiresGradient() {
+		return false;
+	}
+
+	@Override
+	public boolean hasCandidates() {
+		return true;
 	}
 }

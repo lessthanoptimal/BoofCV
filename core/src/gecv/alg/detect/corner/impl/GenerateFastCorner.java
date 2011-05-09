@@ -109,7 +109,7 @@ public class GenerateFastCorner {
 				"\t * @param pixelTol The difference in intensity value from the center pixel the circle needs to be.\n" +
 				"\t * @param minCont  The minimum number of continuous pixels that a circle needs to be a corner.\n" +
 				"\t */\n" +
-				"\tpublic "+className+"( int imgWidth , int imgHeight , int pixelTol, int minCont) {\n" +
+				"\tpublic "+className+"( int imgWidth , int imgHeight , "+dataTol+" pixelTol, int minCont) {\n" +
 				"\t\tthis.pixelTol = pixelTol;\n" +
 				"\t\tthis.minCont = minCont;\n" +
 				"\n" +
@@ -159,7 +159,7 @@ public class GenerateFastCorner {
 				"\t\t\tint endX = rowStart + width - radius;\n" +
 				"\t\t\tint intenIndex = featureIntensity.startIndex + y*featureIntensity.stride+radius;"+
 				"\n" +
-				"\t\t\tfor (int index = rowStart + radius; index < endX; index++) {\n" +
+				"\t\t\tfor (int index = rowStart + radius; index < endX; index++,intenIndex++) {\n" +
 				"\n" +
 				"\t\t\t\t// quickly eliminate bad choices by examining 4 points spread out\n" +
 				"\t\t\t\t"+dataTol+" center = data[index]"+bitWise+";\n" +

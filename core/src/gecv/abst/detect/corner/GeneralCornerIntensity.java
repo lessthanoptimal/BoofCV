@@ -21,7 +21,7 @@ import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * Extracts corners from a the image's gradient.  This is a generalized interface and lacks some of the functionality
+ * Extracts corners from a the image and or its gradient.  This is a generalized interface and lacks some of the functionality
  * of more specialized classes.
  *
  * @see gecv.alg.detect.corner
@@ -29,15 +29,34 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public interface CornerIntensityGradient<I extends ImageBase> {
+public interface GeneralCornerIntensity<I extends ImageBase,D extends ImageBase > {
 
 	/**
-	 * Computes corners from image gradients.
 	 *
+	 * @param image
 	 * @param derivX
 	 * @param derivY
 	 */
-	public void process( I derivX , I derivY );
+	public void process( I image , D derivX , D derivY );
 
 	public ImageFloat32 getIntensity();
+
+	/**
+	 * Optional: Returns a list of candidate locations for corners.  All other pixels are assumed to not be corners.
+	 *
+	 * @return List of potential corners.
+	 */
+	public QueueCorner getCandidates();
+
+	/**
+	 * If the image gradient is required for calculations.
+	 *
+	 * @return true if the image gradient is required.
+	 */
+	public boolean getRequiresGradient();
+
+	/**
+	 * If true a list of candidate corners is returned.
+	 */
+	public boolean hasCandidates();
 }

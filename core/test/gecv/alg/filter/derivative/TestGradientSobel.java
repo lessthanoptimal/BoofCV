@@ -16,9 +16,9 @@
 
 package gecv.alg.filter.derivative;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.convolve.ConvolveImage;
 import gecv.core.image.UtilImageFloat32;
-import gecv.core.image.UtilImageInt8;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -28,8 +28,6 @@ import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.util.Random;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -48,10 +46,10 @@ public class TestGradientSobel {
 	@Test
 	public void process_I8() {
 		ImageInt8 img = new ImageInt8(width, height);
-		UtilImageInt8.randomize(img, rand, 0, 10);
+		BasicDrawing_I8.randomize(img, rand, 0, 10);
 
-		ImageInt16 derivX = new ImageInt16(width, height);
-		ImageInt16 derivY = new ImageInt16(width, height);
+		ImageInt16 derivX = new ImageInt16(width, height, true);
+		ImageInt16 derivY = new ImageInt16(width, height, true);
 
 		GecvTesting.checkSubImage(this, "process_I8", true, img, derivX, derivY);
 	}
@@ -63,9 +61,9 @@ public class TestGradientSobel {
 		Kernel1D_I32 kernel1 = new Kernel1D_I32(3, 1, 2, 1);
 		Kernel1D_I32 kernel2 = new Kernel1D_I32(3, -1, 0, 1);
 
-		ImageInt16 temp = new ImageInt16(width, height);
-		ImageInt16 convX = new ImageInt16(width, height);
-		ImageInt16 convY = new ImageInt16(width, height);
+		ImageInt16 temp = new ImageInt16(width, height, true);
+		ImageInt16 convX = new ImageInt16(width, height, true);
+		ImageInt16 convY = new ImageInt16(width, height, true);
 
 		ConvolveImage.horizontal(kernel1, img, temp, true);
 		ConvolveImage.vertical(kernel2, temp, convY, true);

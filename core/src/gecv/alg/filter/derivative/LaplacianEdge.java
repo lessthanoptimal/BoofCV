@@ -26,20 +26,20 @@ import gecv.struct.image.ImageInt8;
  * The Laplacian is convolved across an image to find second derivative of the image.
  * It is often a faster way to compute the intensity of an edge than first derivative algorithms.
  * </p>
- * <p/>
+ * <p>
  * <pre>
  * This implementation of the laplacian has a 3 by 3 kernel.
- * <p/>
+ *
  *            partial^2 f     partial^2 f
  * f(x,y) =   ~~~~~~~~~~~  +  ~~~~~~~~~~~
  *            partial x^2     partial x^2
- * <p/>
+ *
  *          Integer Images    Floating Point Images
  *          [ 0   1   0 ]      [  0   0.25  0   ]
  * kernel = [ 1  -4   1 ]  or  [ 0.25  -1  0.25 ]
  *          [ 0   1   0 ]      [  0   0.25  0   ]
  * </pre>
- * <p/>
+ * </p>
  * <p>
  * DEVELOPER NOTE:  This is still a strong candidate for further optimizations due to redundant
  * array accesses.
@@ -57,7 +57,7 @@ public class LaplacianEdge {
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
 	public static void process_I8(ImageInt8 orig, ImageInt16 deriv) {
-		InputSanityCheck.checkSameShape(orig, deriv);
+		InputSanityCheck.checkSameShape(orig, false, deriv, true );
 
 		final byte[] data = orig.data;
 		final short[] out = deriv.data;

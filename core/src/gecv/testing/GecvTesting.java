@@ -121,7 +121,7 @@ public class GecvTesting {
 		if (type == ImageInt8.class) {
 			return new ImageInt8(width, height);
 		} else if (type == ImageInt16.class) {
-			return new ImageInt16(width, height);
+			return new ImageInt16(width, height, true);
 		} else if (type == ImageFloat32.class) {
 			return new ImageFloat32(width, height);
 		} else if (type == ImageInterleavedInt8.class) {
@@ -435,7 +435,9 @@ public class GecvTesting {
 					for (int j = 0; j < imgA.getWidth(); j++) {
 						int valB = imgB.get(j, i);
 						int valA = raster.getDataStorage()[i * imgA.getWidth() + j];
-
+						if( !imgB.isSigned() )
+							valA &= 0xFF;
+						
 						if (valA != valB)
 							throw new RuntimeException("Images are not equal");
 					}

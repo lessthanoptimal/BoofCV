@@ -16,8 +16,8 @@
 
 package gecv.alg.filter.derivative.sobel;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.core.image.UtilImageFloat32;
-import gecv.core.image.UtilImageInt8;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt8;
@@ -25,9 +25,6 @@ import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.util.Random;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -49,13 +46,13 @@ public class TestGradientEdge_Outer {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
 				ImageInt8 img = new ImageInt8(w, h);
-				UtilImageInt8.randomize(img, new Random(0xfeed));
+				BasicDrawing_I8.randomize(img, new Random(0xfeed));
 
-				ImageInt16 derivX = new ImageInt16(w, h);
-				ImageInt16 derivY = new ImageInt16(w, h);
+				ImageInt16 derivX = new ImageInt16(w, h, true);
+				ImageInt16 derivY = new ImageInt16(w, h, true);
 
-				ImageInt16 derivX2 = new ImageInt16(w, h);
-				ImageInt16 derivY2 = new ImageInt16(w, h);
+				ImageInt16 derivX2 = new ImageInt16(w, h, true);
+				ImageInt16 derivY2 = new ImageInt16(w, h, true);
 
 				GradientSobel_Naive.process_I8(img, derivX2, derivY2);
 				GradientSobel_Outer.process_I8(img, derivX, derivY);
@@ -72,10 +69,10 @@ public class TestGradientEdge_Outer {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
 				ImageInt8 img = new ImageInt8(w, h);
-				UtilImageInt8.randomize(img, new Random(0xfeed));
+				BasicDrawing_I8.randomize(img, new Random(0xfeed));
 
-				ImageInt16 derivX = new ImageInt16(w, h);
-				ImageInt16 derivY = new ImageInt16(w, h);
+				ImageInt16 derivX = new ImageInt16(w, h, true);
+				ImageInt16 derivY = new ImageInt16(w, h, true);
 
 				GecvTesting.checkSubImage(this, "process_I8_sub_naive", true, img, derivX, derivY);
 			}
@@ -83,8 +80,8 @@ public class TestGradientEdge_Outer {
 	}
 
 	public void process_I8_sub_naive(ImageInt8 img, ImageInt16 derivX, ImageInt16 derivY) {
-		ImageInt16 derivX2 = new ImageInt16(derivX.width, derivX.height);
-		ImageInt16 derivY2 = new ImageInt16(derivX.width, derivX.height);
+		ImageInt16 derivX2 = new ImageInt16(derivX.width, derivX.height, true);
+		ImageInt16 derivY2 = new ImageInt16(derivX.width, derivX.height, true);
 
 		GradientSobel_Naive.process_I8(img, derivX2, derivY2);
 		GradientSobel_Outer.process_I8_sub(img, derivX, derivY);

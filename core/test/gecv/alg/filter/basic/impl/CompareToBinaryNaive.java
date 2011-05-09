@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.basic.impl;
 
-import gecv.core.image.UtilImageInt8;
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.struct.image.ImageInt8;
 import gecv.testing.CompareIdenticalFunctions;
 
@@ -43,7 +43,7 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 		ImageInt8 input = new ImageInt8(width, height);
 		ImageInt8 output = new ImageInt8(width, height);
 
-		UtilImageInt8.randomize(input, rand, 0, 1);
+		BasicDrawing_I8.randomize(input, rand, 0, 1);
 
 		return new Object[][]{{input, output}};
 	}

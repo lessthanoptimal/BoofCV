@@ -20,6 +20,7 @@ import gecv.abst.detect.extract.CornerExtractor;
 import gecv.alg.detect.extract.SelectNBestCorners;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageFloat32;
 
 /**
  * Base class for extracting corners. Can return all the found corners or just the corners with the highest
@@ -27,26 +28,34 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class CornerDetectorBase<I extends ImageBase> {
+// todo exclude previously found features
+public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 
 	// selects the features with the largest intensity
 	protected SelectNBestCorners selectBest;
 
 	// extracts corners from the intensity image
 	protected CornerExtractor extractor;
+
 	// list of corners found by the extractor
 	protected QueueCorner foundCorners;
 
-	// optional: list of candidate corners
-	protected QueueCorner candidateCorners;
 	// optional: number of corners it should try to find
 	protected int requestedFeatureNumber;
 
+	// computes the corner intensity image
+	protected GeneralCornerIntensity<I,D> intensity;
+
 	/**
+	 * @param intensity Computes how much like the feature the region around each pixel is.
 	 * @param extractor   Extracts the corners from intensity image
 	 * @param maxFeatures If not zero then only the best features are returned up to this number
 	 */
-	public CornerDetectorBase(CornerExtractor extractor, int maxFeatures) {
+	public GeneralCornerDetector(GeneralCornerIntensity<I,D> intensity , CornerExtractor extractor, int maxFeatures) {
+		if( extractor.getUsesCandidates() && !intensity.hasCandidates() )
+			throw new IllegalArgumentException("The extractor requires candidate features, which the intensity does not provide.");
+
+		this.intensity = intensity;
 		this.extractor = extractor;
 		this.foundCorners = new QueueCorner(maxFeatures);
 		if (maxFeatures > 0) {
@@ -55,21 +64,22 @@ public class CornerDetectorBase<I extends ImageBase> {
 	}
 
 	/**
-	 * <p>
-	 * If a candidate list of corners is provided then only corners at the specified location are considered.
-	 * </p>
-	 * <p/>
-	 * <p>
-	 * If the provided corner extractor does not support this feature then an exception is thrown.
-	 * </p>
+	 * Computes corners from image gradients.
 	 *
-	 * @param candidateCorners A list of pixels were corners might exist.
+	 * @param derivX image derivative in along the x-axis.
+	 * @param derivY image derivative in along the y-axis.
 	 */
-	public void setCandidateCorners(QueueCorner candidateCorners) {
-		if (!extractor.getUsesCandidates())
-			throw new IllegalArgumentException("The provided corner extractor use candidate corners");
-
-		this.candidateCorners = candidateCorners;
+	public void process(I image , D derivX, D derivY) {
+		intensity.process(image,derivX, derivY);
+		foundCorners.reset();
+		if( intensity.hasCandidates() ) {
+			extractor.process(intensity.getIntensity(), intensity.getCandidates(), requestedFeatureNumber, foundCorners);
+		} else {
+			extractor.process(intensity.getIntensity(), null, requestedFeatureNumber, foundCorners);
+		}
+		if (selectBest != null) {
+			selectBest.process(intensity.getIntensity(), foundCorners);
+		}
 	}
 
 	/**
@@ -95,5 +105,18 @@ public class CornerDetectorBase<I extends ImageBase> {
 			return selectBest.getBestCorners();
 		} else
 			return foundCorners;
+	}
+
+	/**
+	 * If the image gradient is required for calculations.
+	 *
+	 * @return true if the image gradient is required.
+	 */
+	public boolean getRequiresGradient() {
+		return intensity.getRequiresGradient();
+	}
+
+	public ImageFloat32 getIntensity() {
+		return intensity.getIntensity();
 	}
 }

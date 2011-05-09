@@ -16,11 +16,11 @@
 
 package gecv.alg.filter.convolve.impl;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.convolve.ConvolveImage;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.core.image.ConvertImage;
 import gecv.core.image.GeneralizedImageOps;
-import gecv.core.image.UtilImageInt8;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageBase;
@@ -76,11 +76,11 @@ public class TestConvolveImageStandardSparse {
 
 	private void checkMethod(Method method, int width, int height, int kernelRadius, Random rand) {
 		ImageInt8 seedImage = new ImageInt8(width,height);
-		UtilImageInt8.randomize(seedImage,rand,0,255);
+		BasicDrawing_I8.randomize(seedImage,rand,0,255);
 
 		// creates a floating point image with integer elements
 		ImageFloat32 floatImage = new ImageFloat32(width,height);
-		ConvertImage.convert(seedImage,floatImage,false);
+		ConvertImage.convert(seedImage,floatImage);
 
 		kernelI32 = KernelFactory.gaussian1D_I32(kernelRadius);
 		kernelF32 = new Kernel1D_F32(kernelI32.width);

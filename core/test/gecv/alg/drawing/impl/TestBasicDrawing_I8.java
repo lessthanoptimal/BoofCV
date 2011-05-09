@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.core.image;
+package gecv.alg.drawing.impl;
 
 import gecv.struct.image.ImageInt8;
 import gecv.testing.GecvTesting;
@@ -29,8 +29,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestUtilImageInt8 {
-
+public class TestBasicDrawing_I8 {
 	Random rand = new Random(234234);
 
 	@Test
@@ -41,13 +40,18 @@ public class TestUtilImageInt8 {
 	}
 
 	public void checkFill(ImageInt8 image) {
-		UtilImageInt8.fill(image, (byte) 6);
+		BasicDrawing_I8.fill(image, (byte) 6);
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {
 				assertEquals(image.get(x, y), (byte) 6);
 			}
 		}
+	}
+
+	@Test
+	public void rectangle() {
+		fail("implement");
 	}
 
 	@Test
@@ -58,7 +62,7 @@ public class TestUtilImageInt8 {
 	}
 
 	public void checkRandomize(ImageInt8 image) {
-		UtilImageInt8.randomize(image, rand);
+		BasicDrawing_I8.randomize(image, rand);
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {

@@ -16,6 +16,7 @@
 
 package gecv.alg.filter.convolve;
 
+import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.impl.ConvolveBox_F32_F32;
 import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I16;
 import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I32;
@@ -41,6 +42,8 @@ public class ConvolveBoxImage {
 	 * @param includeBorder Should the vertical border of the image be processed?
 	 */
 	public static void horizontal(ImageFloat32 input, ImageFloat32 output, int radius, boolean includeBorder) {
+		InputSanityCheck.checkSameShape(input , output);
+
 		ConvolveBox_F32_F32.horizontal(input, output, radius, includeBorder);
 	}
 
@@ -53,6 +56,8 @@ public class ConvolveBoxImage {
 	 * @param includeBorder Should the vertical border of the image be processed?
 	 */
 	public static void horizontal(ImageInt8 input, ImageInt16 output, int radius, boolean includeBorder) {
+		InputSanityCheck.checkSameShape(input , false , output, true);
+
 		ConvolveBox_I8_I16.horizontal(input, output, radius, includeBorder);
 	}
 
@@ -65,6 +70,8 @@ public class ConvolveBoxImage {
 	 * @param includeBorder Should the vertical border of the image be processed?
 	 */
 	public static void horizontal(ImageInt8 input, ImageInt32 output, int radius, boolean includeBorder) {
+		InputSanityCheck.checkSameShape(input , false , output, true);
+
 		ConvolveBox_I8_I32.horizontal(input, output, radius, includeBorder);
 	}
 
@@ -77,6 +84,8 @@ public class ConvolveBoxImage {
 	 * @param includeBorder Should the horizontal border of the image be processed?
 	 */
 	public static void vertical(ImageFloat32 input, ImageFloat32 output, int radius, boolean includeBorder) {
+		InputSanityCheck.checkSameShape(input , output );
+
 		ConvolveBox_F32_F32.vertical(input, output, radius, includeBorder);
 	}
 
@@ -89,6 +98,8 @@ public class ConvolveBoxImage {
 	 * @param includeBorder Should the horizontal border of the image be processed?
 	 */
 	public static void vertical(ImageInt8 input, ImageInt16 output, int radius, boolean includeBorder) {
+		InputSanityCheck.checkSameShape(input , false , output, true);
+		
 		ConvolveBox_I8_I16.vertical(input, output, radius, includeBorder);
 	}
 
@@ -101,6 +112,8 @@ public class ConvolveBoxImage {
 	 * @param includeBorder Should the horizontal border of the image be processed?
 	 */
 	public static void vertical(ImageInt8 input, ImageInt32 output, int radius, boolean includeBorder) {
+		InputSanityCheck.checkSameShape(input , false , output, true);
+		
 		ConvolveBox_I8_I32.vertical(input, output, radius, includeBorder);
 	}
 }

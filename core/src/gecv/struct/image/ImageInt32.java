@@ -23,7 +23,7 @@ package gecv.struct.image;
  *
  * @author Peter Abeles
  */
-public class ImageInt32 extends ImageBase<ImageInt32> {
+public class ImageInt32 extends ImageInteger<ImageInt32> {
 
 	public int data[];
 
@@ -34,7 +34,7 @@ public class ImageInt32 extends ImageBase<ImageInt32> {
 	 * @param height number of rows in the image.
 	 */
 	public ImageInt32(int width, int height) {
-		super(width, height);
+		super(width, height,true);
 	}
 
 	public ImageInt32() {
@@ -47,6 +47,7 @@ public class ImageInt32 extends ImageBase<ImageInt32> {
 	 * @param y pixel coordinate.
 	 * @return an intensity value.
 	 */
+	@Override
 	public int get(int x, int y) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
@@ -61,6 +62,7 @@ public class ImageInt32 extends ImageBase<ImageInt32> {
 	 * @param y	 pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
+	@Override
 	public void set(int x, int y, int value) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");

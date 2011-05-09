@@ -29,7 +29,7 @@ package gecv.struct.image;
  *
  * @author Peter Abeles
  */
-public class ImageInt8 extends ImageBase<ImageInt8> {
+public class ImageInt8 extends ImageInteger<ImageInt8> {
 
 	public byte data[];
 
@@ -40,7 +40,11 @@ public class ImageInt8 extends ImageBase<ImageInt8> {
 	 * @param height number of rows in the image.
 	 */
 	public ImageInt8(int width, int height) {
-		super(width, height);
+		super(width, height,false);
+	}
+
+	public ImageInt8(int width, int height , boolean signed) {
+		super(width, height,signed);
 	}
 
 	public ImageInt8() {
@@ -55,25 +59,15 @@ public class ImageInt8 extends ImageBase<ImageInt8> {
 	 * @param y pixel coordinate.
 	 * @return an intensity value.
 	 */
+	@Override
 	public int get(int x, int y) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		return data[getIndex(x, y)];
-	}
-
-	/**
-	 * Returns the value of the specified pixel as an unsigned value.
-	 *
-	 * @param x pixel coordinate.
-	 * @param y pixel coordinate.
-	 * @return an intensity value.
-	 */
-	public int getU(int x, int y) {
-		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
-
-		return data[getIndex(x, y)] & 0xFF;
+		if( signed )
+			return data[getIndex(x, y)];
+		else
+			return data[getIndex(x, y)] & 0xFF;
 	}
 
 	/**
@@ -83,6 +77,7 @@ public class ImageInt8 extends ImageBase<ImageInt8> {
 	 * @param y	 pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
+	@Override
 	public void set(int x, int y, int value) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
@@ -102,9 +97,12 @@ public class ImageInt8 extends ImageBase<ImageInt8> {
 
 	@Override
 	public ImageInt8 _createNew(int imgWidth, int imgHeight) {
-		if (imgWidth == -1 || imgHeight == -1)
-			return new ImageInt8();
-		return new ImageInt8(imgWidth, imgHeight);
+		if (imgWidth == -1 || imgHeight == -1) {
+			ImageInt8 ret = new ImageInt8();
+			ret.signed = signed;
+			return ret;
+		}
+		return new ImageInt8(imgWidth, imgHeight, signed);
 	}
 
 	@Override

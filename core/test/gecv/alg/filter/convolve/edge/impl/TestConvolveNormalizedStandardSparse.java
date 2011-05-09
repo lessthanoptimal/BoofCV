@@ -16,10 +16,10 @@
 
 package gecv.alg.filter.convolve.edge.impl;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.filter.convolve.edge.ConvolveNormalized;
 import gecv.core.image.ConvertImage;
-import gecv.core.image.UtilImageInt8;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageBase;
@@ -94,13 +94,13 @@ public class TestConvolveNormalizedStandardSparse {
 
 	private void checkMethod(Method method, int width, int height, int kernelRadius, Random rand) {
 		ImageInt8 seedImage = new ImageInt8(width,height);
-		UtilImageInt8.randomize(seedImage,rand,0,255);
+		BasicDrawing_I8.randomize(seedImage,rand,0,255);
 
 		// creates a floating point image with integer elements
 		ImageFloat32 floatImage = new ImageFloat32(width,height);
-		ConvertImage.convert(seedImage,floatImage,false);
-		ImageInt16 shortImage = new ImageInt16(width,height);
-		ConvertImage.convert(seedImage,shortImage,false);
+		ConvertImage.convert(seedImage,floatImage);
+		ImageInt16 shortImage = new ImageInt16(width,height, true);
+		ConvertImage.convert(seedImage,shortImage);
 
 		kernelI32 = KernelFactory.gaussian1D_I32(kernelRadius);
 		kernelF32 = KernelFactory.gaussian1D_F32(kernelRadius,true);
@@ -155,12 +155,12 @@ public class TestConvolveNormalizedStandardSparse {
 		ConvolveNormalized.horizontal(kernelI32,image,temp);
 		ConvolveNormalized.vertical(kernelI32,temp,temp2);
 
-		return temp2.getU(targetX,targetY);
+		return temp2.get(targetX,targetY);
 	}
 
 	private float computeExpected( ImageInt16 image ) {
-		ImageInt16 temp = new ImageInt16(image.width,image.height);
-		ImageInt16 temp2 = new ImageInt16(image.width,image.height);
+		ImageInt16 temp = new ImageInt16(image.width,image.height, true);
+		ImageInt16 temp2 = new ImageInt16(image.width,image.height, true);
 
 		ConvolveNormalized.horizontal(kernelI32,image,temp);
 		ConvolveNormalized.vertical(kernelI32,temp,temp2);

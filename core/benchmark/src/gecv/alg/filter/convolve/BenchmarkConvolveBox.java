@@ -18,11 +18,11 @@ package gecv.alg.filter.convolve;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.filter.convolve.impl.*;
+import gecv.alg.filter.convolve.impl.ConvolveBox_F32_F32;
+import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I16;
+import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt32;
@@ -114,9 +114,9 @@ public class BenchmarkConvolveBox {
 
 	public static void main( String args[] ) {
 		imgInt8 = new ImageInt8(imgWidth,imgHeight);
-		imgInt16 = new ImageInt16(imgWidth,imgHeight);
+		imgInt16 = new ImageInt16(imgWidth,imgHeight, true);
 		out_I32 = new ImageInt32(imgWidth,imgHeight);
-		out_I16 = new ImageInt16(imgWidth,imgHeight);
+		out_I16 = new ImageInt16(imgWidth,imgHeight, true);
 		out_I8 = new ImageInt8(imgWidth,imgHeight);
 		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
 		out_F32 = new ImageFloat32(imgWidth,imgHeight);

@@ -16,6 +16,7 @@
 
 package gecv.core.image;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.struct.image.ImageInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -24,9 +25,6 @@ import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;
-
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -89,7 +87,7 @@ public class TestConvertRaster {
 	@Test
 	public void grayToBuffered_ByteInterleaved() {
 		ImageInt8 result = new ImageInt8(imgWidth, imgHeight);
-		UtilImageInt8.randomize(result, rand);
+		BasicDrawing_I8.randomize(result, rand);
 
 		GecvTesting.checkSubImage(this, "grayToBuffered_ByteInterleaved", true, result);
 	}
@@ -110,7 +108,7 @@ public class TestConvertRaster {
 	@Test
 	public void grayToBuffered_IntegerInterleaved() {
 		ImageInt8 result = new ImageInt8(imgWidth, imgHeight);
-		UtilImageInt8.randomize(result, rand);
+		BasicDrawing_I8.randomize(result, rand);
 
 		GecvTesting.checkSubImage(this, "grayToBuffered_IntegerInterleaved", true, result);
 	}
@@ -125,7 +123,7 @@ public class TestConvertRaster {
 	@Test
 	public void grayToBuffered_BufferedImage() {
 		ImageInt8 result = new ImageInt8(imgWidth, imgHeight);
-		UtilImageInt8.randomize(result, rand);
+		BasicDrawing_I8.randomize(result, rand);
 
 		GecvTesting.checkSubImage(this, "grayToBuffered_BufferedImage", true, result);
 	}

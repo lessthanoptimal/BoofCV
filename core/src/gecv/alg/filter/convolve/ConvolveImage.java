@@ -74,15 +74,15 @@ public class ConvolveImage {
 	 * is not processed and the vertical border is optionally processed.  The border is as wide
 	 * as the radius of the kernel.
 	 *
-	 * @param image		 The original image. Not modified.
-	 * @param dest		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param divisor	   The value that the convolved image is divided by.
+	 * @param image		The original image. Not modified.
+	 * @param dest		Where the resulting image is written to. Modified.
+	 * @param kernel	The kernel that is being convolved. Not modified.
+	 * @param divisor	The value that the convolved image is divided by.
 	 * @param includeBorder Should the vertical border of the image be processed?
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
 								  ImageInt8 image, ImageInt8 dest, int divisor, boolean includeBorder) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, false, dest);
 
 		if( !ConvolveImageUnrolled_I8_I8_Div.horizontal(kernel, image, dest, divisor, includeBorder))
 			ConvolveImageStandard.horizontal(kernel, image, dest, divisor, includeBorder);
@@ -100,7 +100,7 @@ public class ConvolveImage {
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
 								  ImageInt8 image, ImageInt16 dest, boolean includeBorder) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, false , dest);
 
 		if (!ConvolveImageUnrolled_I8_I16.horizontal(kernel, image, dest, includeBorder))
 			ConvolveImageStandard.horizontal(kernel, image, dest, includeBorder);
@@ -118,7 +118,7 @@ public class ConvolveImage {
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
 								  ImageInt8 image, ImageInt32 dest, boolean includeBorder) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, false , dest);
 
 		// todo add unroll
 		ConvolveImageStandard.horizontal(kernel, image, dest, includeBorder);
@@ -136,7 +136,7 @@ public class ConvolveImage {
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
 								  ImageInt16 image, ImageInt16 dest, boolean includeBorder) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, true , dest);
 
 		if (!ConvolveImageUnrolled_I16_I16.horizontal(kernel, image, dest, includeBorder))
 			ConvolveImageStandard.horizontal(kernel, image, dest, includeBorder);
@@ -155,7 +155,7 @@ public class ConvolveImage {
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
 								  ImageInt16 image, ImageInt16 dest, int divisor, boolean includeBorder) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, true, dest);
 
 		if (!ConvolveImageUnrolled_I16_I16_Div.horizontal(kernel, image, dest, divisor , includeBorder))
 			ConvolveImageStandard.horizontal(kernel, image, dest, divisor, includeBorder);
@@ -193,7 +193,7 @@ public class ConvolveImage {
 	 */
 	public static void vertical(Kernel1D_I32 kernel,
 								ImageInt8 image, ImageInt8 dest, int divisor, boolean includeBorder) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, false , dest);
 
 		if( !ConvolveImageUnrolled_I8_I8_Div.vertical(kernel, image, dest, divisor, includeBorder))
 			ConvolveImageStandard.vertical(kernel, image, dest, divisor, includeBorder);
@@ -212,7 +212,7 @@ public class ConvolveImage {
 	public static void vertical(Kernel1D_I32 kernel,
 								ImageInt8 image, ImageInt16 dest,
 								boolean includeBorder) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, false , dest);
 
 		if (!ConvolveImageUnrolled_I8_I16.vertical(kernel, image, dest, includeBorder))
 			ConvolveImageStandard.vertical(kernel, image, dest, includeBorder);
@@ -231,7 +231,7 @@ public class ConvolveImage {
 	public static void vertical(Kernel1D_I32 kernel,
 								ImageInt8 image, ImageInt32 dest,
 								boolean includeBorder) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, false , dest);
 
 		// todo add unroll
 		ConvolveImageStandard.vertical(kernel, image, dest, includeBorder);
@@ -250,7 +250,7 @@ public class ConvolveImage {
 	public static void vertical(Kernel1D_I32 kernel,
 								ImageInt16 image, ImageInt16 dest,
 								boolean includeBorder) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, true , dest);
 
 		if (!ConvolveImageUnrolled_I16_I16.vertical(kernel, image, dest, includeBorder))
 			ConvolveImageStandard.vertical(kernel, image, dest, includeBorder);
@@ -270,7 +270,7 @@ public class ConvolveImage {
 	public static void vertical(Kernel1D_I32 kernel,
 								ImageInt16 image, ImageInt16 dest,
 								int divisor , boolean includeBorder) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, true , dest);
 
 		if (!ConvolveImageUnrolled_I16_I16_Div.vertical(kernel, image, dest, divisor , includeBorder))
 			ConvolveImageStandard.vertical(kernel, image, dest, divisor , includeBorder);
@@ -299,7 +299,7 @@ public class ConvolveImage {
 	 */
 	public static void convolve(Kernel2D_I32 kernel,
 								ImageInt8 image, ImageInt8 dest, int divisor) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, false , dest);
 
 		ConvolveImageStandard.convolve(kernel, image, dest, divisor);
 	}
@@ -312,7 +312,7 @@ public class ConvolveImage {
 	 * @param dest   The results of the convolution
 	 */
 	public static void convolve(Kernel2D_I32 kernel, ImageInt8 image, ImageInt16 dest) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, false , dest);
 
 		ConvolveImageStandard.convolve(kernel, image, dest);
 	}
@@ -325,7 +325,7 @@ public class ConvolveImage {
 	 * @param dest   The results of the convolution
 	 */
 	public static void convolve(Kernel2D_I32 kernel, ImageInt16 image, ImageInt16 dest) {
-		InputSanityCheck.checkSameShape(image, dest);
+		InputSanityCheck.checkSameShape(image, true , dest);
 
 		ConvolveImageStandard.convolve(kernel, image, dest);
 	}

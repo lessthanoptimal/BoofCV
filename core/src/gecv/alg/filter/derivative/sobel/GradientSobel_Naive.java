@@ -48,12 +48,12 @@ public class GradientSobel_Naive {
 
 			for (int x = 1; x < width - 1; x++) {
 
-				int dy = -(orig.getU(x - 1, y - 1) + 2 * orig.getU(x, y - 1) + orig.getU(x + 1, y - 1));
-				dy += (orig.getU(x - 1, y + 1) + 2 * orig.getU(x, y + 1) + orig.getU(x + 1, y + 1));
+				int dy = -(orig.get(x - 1, y - 1) + 2 * orig.get(x, y - 1) + orig.get(x + 1, y - 1));
+				dy += (orig.get(x - 1, y + 1) + 2 * orig.get(x, y + 1) + orig.get(x + 1, y + 1));
 
 
-				int dx = -(orig.getU(x - 1, y - 1) + 2 * orig.getU(x - 1, y) + orig.getU(x - 1, y + 1));
-				dx += (orig.getU(x + 1, y - 1) + 2 * orig.getU(x + 1, y) + orig.getU(x + 1, y + 1));
+				int dx = -(orig.get(x - 1, y - 1) + 2 * orig.get(x - 1, y) + orig.get(x - 1, y + 1));
+				dx += (orig.get(x + 1, y - 1) + 2 * orig.get(x + 1, y) + orig.get(x + 1, y + 1));
 
 				derivX.set(x, y, (short) dx);
 				derivY.set(x, y, (short) dy);

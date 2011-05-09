@@ -16,6 +16,7 @@
 
 package gecv.core.image;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt8;
@@ -37,17 +38,23 @@ public class TestConvertImage {
 	int imgHeight = 20;
 
 	@Test
-	public void convert_int8_float32_signed() {
-		ImageInt8 orig = new ImageInt8(imgWidth, imgHeight);
-		UtilImageInt8.randomize(orig, rand);
-
+	public void convert_int8_float32() {
 		ImageFloat32 conv = new ImageFloat32(imgWidth, imgHeight);
 
-		GecvTesting.checkSubImage(this, "convert_int8_float32_signed", true, orig, conv);
+		// test it with a signed image
+		ImageInt8 orig = new ImageInt8(imgWidth, imgHeight, true);
+		BasicDrawing_I8.randomize(orig, rand);
+
+		GecvTesting.checkSubImage(this, "convert_int8_float32", true, orig, conv);
+
+		// test it with an unsigned image
+		orig = new ImageInt8(imgWidth, imgHeight, false);
+		BasicDrawing_I8.randomize(orig, rand);
+		GecvTesting.checkSubImage(this, "convert_int8_float32", true, orig, conv);
 	}
 
-	public void convert_int8_float32_signed(ImageInt8 orig, ImageFloat32 conv) {
-		ConvertImage.convert(orig, conv, true);
+	public void convert_int8_float32(ImageInt8 orig, ImageFloat32 conv) {
+		ConvertImage.convert(orig, conv);
 
 		int numPositive = 0;
 		int numNegative = 0;
@@ -65,21 +72,30 @@ public class TestConvertImage {
 		}
 
 		assertTrue(numPositive > 0);
-		assertTrue(numNegative > 0);
+		if( orig.isSigned())
+			assertTrue(numNegative > 0);
+		else
+			assertTrue(numNegative == 0);
 	}
 
 	@Test
-	public void convert_int16_float32_signed() {
-		ImageInt16 orig = new ImageInt16(imgWidth, imgHeight);
+	public void convert_int16_float32() {
+		// test it against a signed image
+		ImageInt16 orig = new ImageInt16(imgWidth, imgHeight, true);
 		UtilImageInt16.randomize(orig, rand, -20, 20);
 
 		ImageFloat32 conv = new ImageFloat32(imgWidth, imgHeight);
 
-		GecvTesting.checkSubImage(this, "convert_int16_float32_signed", true, orig, conv);
+		GecvTesting.checkSubImage(this, "convert_int16_float32", true, orig, conv);
+
+		// test it against an unsigned image
+		orig = new ImageInt16(imgWidth, imgHeight, false);
+		UtilImageInt16.randomize(orig, rand, 0, 40);
+		GecvTesting.checkSubImage(this, "convert_int16_float32", true, orig, conv);
 	}
 
-	public void convert_int16_float32_signed(ImageInt16 orig, ImageFloat32 conv) {
-		ConvertImage.convert(orig, conv, true);
+	public void convert_int16_float32(ImageInt16 orig, ImageFloat32 conv) {
+		ConvertImage.convert(orig, conv);
 
 		int numPositive = 0;
 		int numNegative = 0;
@@ -97,39 +113,51 @@ public class TestConvertImage {
 		}
 
 		assertTrue(numPositive > 0);
-		assertTrue(numNegative > 0);
+		if( orig.isSigned() )
+			assertTrue(numNegative > 0);
+		else
+			assertTrue(numNegative == 0);
 	}
 
 	@Test
-	public void convert_int8_float32_unsigned() {
-		ImageInt8 orig = new ImageInt8(imgWidth, imgHeight);
-		UtilImageInt8.randomize(orig, rand);
+	public void convert_int16_int8() {
+		// test it against a signed image
+		ImageInt16 orig = new ImageInt16(imgWidth, imgHeight, true);
+		UtilImageInt16.randomize(orig, rand, -20, 20);
 
-		ImageFloat32 conv = new ImageFloat32(imgWidth, imgHeight);
+		ImageInt8 conv = new ImageInt8(imgWidth, imgHeight,true);
 
-		GecvTesting.checkSubImage(this, "convert_int8_float32_unsigned", true, orig, conv);
+		GecvTesting.checkSubImage(this, "convert_int16_int8", true, orig, conv);
+
+		// test it against an unsigned image
+		orig = new ImageInt16(imgWidth, imgHeight, false);
+		UtilImageInt16.randomize(orig, rand, 0, 40);
+		GecvTesting.checkSubImage(this, "convert_int16_int8", true, orig, conv);
 	}
 
-	public void convert_int8_float32_unsigned(ImageInt8 orig, ImageFloat32 conv) {
-		ConvertImage.convert(orig, conv, false);
+	public void convert_int16_int8(ImageInt16 orig, ImageInt8 conv) {
+		ConvertImage.convert(orig, conv);
 
 		int numPositive = 0;
 		int numNegative = 0;
 
 		for (int i = 0; i < imgHeight; i++) {
 			for (int j = 0; j < imgWidth; j++) {
-				float f = conv.get(j, i);
+				int f = conv.get(j, i);
 				if (f >= 0)
 					numPositive++;
 				else
 					numNegative++;
 
-				assertEquals(f, (float) (orig.get(j, i) & 0xFF), 1e-8);
+				assertEquals(f, orig.get(j, i), 1e-8);
 			}
 		}
 
 		assertTrue(numPositive > 0);
-		assertTrue(numNegative == 0);
+		if( orig.isSigned() )
+			assertTrue(numNegative > 0);
+		else
+			assertTrue(numNegative == 0);
 	}
 
 	@Test
@@ -137,7 +165,7 @@ public class TestConvertImage {
 		ImageFloat32 orig = new ImageFloat32(imgWidth, imgHeight);
 		UtilImageFloat32.randomize(orig, rand, -100, 100);
 
-		ImageInt8 conv = new ImageInt8(imgWidth, imgHeight);
+		ImageInt8 conv = new ImageInt8(imgWidth, imgHeight,true);
 
 		GecvTesting.checkSubImage(this, "convert_float32_int8", true, orig, conv);
 	}
@@ -158,12 +186,12 @@ public class TestConvertImage {
 		}
 	}
 
-@Test
+	@Test
 	public void convert_float32_int16() {
 		ImageFloat32 orig = new ImageFloat32(imgWidth, imgHeight);
 		UtilImageFloat32.randomize(orig, rand, -100, 100);
 
-		ImageInt16 conv = new ImageInt16(imgWidth, imgHeight);
+		ImageInt16 conv = new ImageInt16(imgWidth, imgHeight, true);
 
 		GecvTesting.checkSubImage(this, "convert_float32_int16", true, orig, conv);
 	}

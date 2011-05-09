@@ -16,6 +16,7 @@
 
 package gecv.core.image;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.struct.image.*;
 
 import java.util.Random;
@@ -35,7 +36,7 @@ public class GeneralizedImageOps {
 			ConvertImage.convert(input,ret);
 			return ret;
 		} else if( ImageInt16.class == outputType ) {
-			ImageInt16 ret = new ImageInt16(input.width,input.height);
+			ImageInt16 ret = new ImageInt16(input.width,input.height, true);
 			ConvertImage.convert(input,ret);
 			return ret;
 		} else if( ImageFloat32.class == outputType ) {
@@ -49,7 +50,7 @@ public class GeneralizedImageOps {
 
 	public static void randomize(ImageBase img, int min, int max, Random rand) {
 		if (img.getClass() == ImageInt8.class) {
-			UtilImageInt8.randomize((ImageInt8) img, rand, min, max);
+			BasicDrawing_I8.randomize((ImageInt8) img, rand, min, max);
 		} else if (img.getClass() == ImageInt16.class) {
 			UtilImageInt16.randomize((ImageInt16) img, rand, (short) min, (short) max);
 		} else if (img.getClass() == ImageFloat32.class) {
@@ -71,7 +72,7 @@ public class GeneralizedImageOps {
 
 	public static double get(ImageBase img, int x, int y) {
 		if (img instanceof ImageInt8) {
-			return ((ImageInt8) img).getU(x, y);
+			return ((ImageInt8) img).get(x, y);
 		} else if (img instanceof ImageInt16) {
 			return ((ImageInt16) img).get(x, y);
 		} else if (img instanceof ImageInt32) {

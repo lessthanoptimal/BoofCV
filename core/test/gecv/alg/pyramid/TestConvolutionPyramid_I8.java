@@ -16,9 +16,9 @@
 
 package gecv.alg.pyramid;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.blur.BlurImageOps;
 import gecv.alg.filter.convolve.KernelFactory;
-import gecv.core.image.UtilImageInt8;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageInt8;
 import gecv.struct.pyramid.ImagePyramid_I8;
@@ -45,7 +45,7 @@ public class TestConvolutionPyramid_I8 {
 	@Test
 	public void saveOriginalReference() {
 		ImageInt8 img = new ImageInt8(width, height);
-		UtilImageInt8.randomize(img, rand);
+		BasicDrawing_I8.randomize(img, rand);
 
 		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(3);
 		ImagePyramid_I8 pyramid = new ImagePyramid_I8(width, height, true);
@@ -78,7 +78,7 @@ public class TestConvolutionPyramid_I8 {
 	@Test
 	public void _update() {
 		ImageInt8 img = new ImageInt8(width, height);
-		UtilImageInt8.randomize(img, rand);
+		BasicDrawing_I8.randomize(img, rand);
 
 		GecvTesting.checkSubImage(this, "_update", true, img);
 	}

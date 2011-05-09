@@ -16,8 +16,7 @@
 
 package gecv.alg.filter.convolve.impl;
 
-import gecv.alg.filter.convolve.ConvolveImage;
-import gecv.core.image.UtilImageInt8;
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt8;
@@ -39,10 +38,10 @@ public class TestConvolveBox_I8_I16 {
 	@Test
 	public void horizontal() {
 		ImageInt8 input = new ImageInt8(width, height);
-		ImageInt16 outputA = new ImageInt16(width, height);
-		ImageInt16 outputB = new ImageInt16(width, height);
+		ImageInt16 outputA = new ImageInt16(width, height, true);
+		ImageInt16 outputB = new ImageInt16(width, height, true);
 
-		UtilImageInt8.randomize(input, rand);
+		BasicDrawing_I8.randomize(input, rand);
 
 		GecvTesting.checkSubImage(this, "horizontal", true, input, outputA, outputB);
 	}
@@ -66,10 +65,10 @@ public class TestConvolveBox_I8_I16 {
 	@Test
 	public void vertical() {
 		ImageInt8 input = new ImageInt8(width, height);
-		ImageInt16 outputA = new ImageInt16(width, height);
-		ImageInt16 outputB = new ImageInt16(width, height);
+		ImageInt16 outputA = new ImageInt16(width, height, true);
+		ImageInt16 outputB = new ImageInt16(width, height, true);
 
-		UtilImageInt8.randomize(input, rand);
+		BasicDrawing_I8.randomize(input, rand);
 
 		GecvTesting.checkSubImage(this, "vertical", true, input, outputA, outputB);
 	}

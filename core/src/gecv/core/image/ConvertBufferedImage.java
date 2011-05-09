@@ -194,7 +194,7 @@ public class ConvertBufferedImage {
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
-	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
 	public static ImageInt8 convertFrom(BufferedImage src, ImageInt8 dst) {
@@ -203,7 +203,7 @@ public class ConvertBufferedImage {
 				throw new IllegalArgumentException("image dimension are different");
 			}
 		} else {
-			dst = new ImageInt8(src.getWidth(), src.getHeight());
+			dst = new ImageInt8(src.getWidth(), src.getHeight(),false);
 		}
 
 		if (src.getRaster() instanceof ByteInterleavedRaster) {
@@ -226,13 +226,7 @@ public class ConvertBufferedImage {
 	 * @return Converted image.
 	 */
 	public static BufferedImage convertTo(ImageInt8 src, BufferedImage dst) {
-		if (dst != null) {
-			if (dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
-			}
-		} else {
-			dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-		}
+		dst = checkInputs(src, dst);
 
 		if (dst.getRaster() instanceof ByteInterleavedRaster) {
 			ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
@@ -242,6 +236,20 @@ public class ConvertBufferedImage {
 			ConvertRaster.grayToBuffered(src, dst);
 		}
 
+		return dst;
+	}
+
+	/**
+	 * If null the dst is declared, otherwise it checks to see if the 'dst' as the same shape as 'src'.
+	 */
+	public static BufferedImage checkInputs(ImageBase src, BufferedImage dst) {
+		if (dst != null) {
+			if (dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight()) {
+				throw new IllegalArgumentException("image dimension are different");
+			}
+		} else {
+			dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+		}
 		return dst;
 	}
 

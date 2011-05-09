@@ -16,6 +16,8 @@
 
 package gecv.core.image;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt8;
 import gecv.struct.image.ImageInterleavedInt8;
 import gecv.testing.GecvTesting;
@@ -110,8 +112,9 @@ public class TestConvertBufferedImage {
 
 	@Test
 	public void extractBuffered_Int8() {
-		ImageInt8 srcImg = new ImageInt8(imgWidth, imgHeight);
-		UtilImageInt8.randomize(srcImg, rand);
+		// use a signed image because it is checked against a byte array
+		ImageInt8 srcImg = new ImageInt8(imgWidth, imgHeight,true);
+		BasicDrawing_I8.randomize(srcImg, rand);
 
 		BufferedImage img = ConvertBufferedImage.extractBuffered(srcImg);
 
@@ -120,7 +123,15 @@ public class TestConvertBufferedImage {
 
 	@Test
 	public void convertFrom_generic() {
-		fail("implement");
+		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
+
+		ImageInt8 imgInt8 = ConvertBufferedImage.convertFrom(origImg,null,ImageInt8.class);
+		assertEquals(imgWidth,imgInt8.width);
+		assertEquals(imgHeight,imgInt8.height);
+
+		ImageFloat32 imgF32 = ConvertBufferedImage.convertFrom(origImg,null,ImageFloat32.class);
+		assertEquals(imgWidth,imgF32.width);
+		assertEquals(imgHeight,imgF32.height);
 	}
 
 	@Test
@@ -140,7 +151,7 @@ public class TestConvertBufferedImage {
 	@Test
 	public void convertTo_Int8() {
 		ImageInt8 srcImg = new ImageInt8(imgWidth, imgHeight);
-		UtilImageInt8.randomize(srcImg, rand);
+		BasicDrawing_I8.randomize(srcImg, rand);
 
 		GecvTesting.checkSubImage(this, "convertTo_Int8", true, srcImg);
 	}

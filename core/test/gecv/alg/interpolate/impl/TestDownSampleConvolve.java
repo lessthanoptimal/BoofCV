@@ -16,12 +16,12 @@
 
 package gecv.alg.interpolate.impl;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.blur.BlurImageOps;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.interpolate.DownSampleConvolve;
 import gecv.core.image.UtilImageFloat32;
 import gecv.core.image.UtilImageInt16;
-import gecv.core.image.UtilImageInt8;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -48,7 +48,7 @@ public class TestDownSampleConvolve {
 	public void downSample_I8() {
 
 		ImageInt8 img = new ImageInt8(width,height);
-		UtilImageInt8.randomize(img,rand);
+		BasicDrawing_I8.randomize(img,rand);
 		ImageInt8 downSampled = new ImageInt8(width,height);
 
 		GecvTesting.checkSubImage(this,"downSampled_I8",true, img, downSampled);
@@ -76,18 +76,18 @@ public class TestDownSampleConvolve {
 	@Test
 	public void downSample_I16() {
 
-		ImageInt16 img = new ImageInt16(width,height);
+		ImageInt16 img = new ImageInt16(width,height, true);
 		UtilImageInt16.randomize(img,rand,0,200);
-		ImageInt16 downSampled = new ImageInt16(width,height);
+		ImageInt16 downSampled = new ImageInt16(width,height, true);
 
 		GecvTesting.checkSubImage(this,"downSampled_I16",true, img, downSampled);
 	}
 
 	public void downSampled_I16( ImageInt16 img, ImageInt16 downSampled) {
-		ImageInt16 convImg = new ImageInt16(width,height);
+		ImageInt16 convImg = new ImageInt16(width,height, true);
 		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(3);
 
-		BlurImageOps.kernel(img,convImg,kernel,new ImageInt16(width,height));
+		BlurImageOps.kernel(img,convImg,kernel,new ImageInt16(width,height, true));
 
 		int storage[] = new int[ kernel.width ];
 		DownSampleConvolve.downSample(kernel,img,downSampled, N,storage);

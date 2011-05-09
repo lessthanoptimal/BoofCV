@@ -62,12 +62,20 @@ public class NonMaxCornerCandidateExtractor {
 			intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
 		}
 
+		final int w = intensityImage.width-radius;
+		final int h = intensityImage.height-radius;
+
 		final int stride = intensityImage.stride;
 
 		final float inten[] = intensityImage.data;
 
 		for (int iter = 0; iter < candidates.num; iter++) {
 			Point2D_I16 pt = candidates.points[iter];
+
+			// see if its too close to the image edge
+			// TODO could truncate the search region instead?
+			if( pt.x < radius || pt.y < radius || pt.x >= w || pt.y >= h )
+				continue;
 
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;
 

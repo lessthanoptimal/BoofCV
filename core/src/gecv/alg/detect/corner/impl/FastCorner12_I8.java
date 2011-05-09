@@ -97,7 +97,7 @@ public class FastCorner12_I8 implements FastCornerIntensity<ImageInt8> {
 			int rowStart = img.startIndex + stride * y;
 			int endX = rowStart + width - radius;
 			int intenIndex = featureIntensity.startIndex + y*featureIntensity.stride+radius;
-			for (int index = rowStart + radius; index < endX; index++) {
+			for (int index = rowStart + radius; index < endX; index++,intenIndex++) {
 
 				// quickly eliminate bad choices by examining 4 points spread out
 				int center = data[index] & 0xFF;

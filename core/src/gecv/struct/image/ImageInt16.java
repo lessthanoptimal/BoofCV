@@ -23,7 +23,7 @@ package gecv.struct.image;
  *
  * @author Peter Abeles
  */
-public class ImageInt16 extends ImageBase<ImageInt16> {
+public class ImageInt16 extends ImageInteger<ImageInt16> {
 
 	public short data[];
 
@@ -32,12 +32,18 @@ public class ImageInt16 extends ImageBase<ImageInt16> {
 	 *
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
+	 * @param signed
 	 */
-	public ImageInt16(int width, int height) {
-		super(width, height);
+	public ImageInt16(int width, int height, boolean signed) {
+		super(width, height, signed);
+	}
+
+	public ImageInt16( boolean signed ) {
+		this.signed = signed;
 	}
 
 	public ImageInt16() {
+		this.signed = true;
 	}
 
 	/**
@@ -47,11 +53,15 @@ public class ImageInt16 extends ImageBase<ImageInt16> {
 	 * @param y pixel coordinate.
 	 * @return an intensity value.
 	 */
+	@Override
 	public int get(int x, int y) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		return data[getIndex(x, y)];
+		if( signed )
+			return data[getIndex(x, y)];
+		else
+			return data[getIndex(x, y)] & 0xFFFF;
 	}
 
 	/**
@@ -61,6 +71,7 @@ public class ImageInt16 extends ImageBase<ImageInt16> {
 	 * @param y	 pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
+	@Override
 	public void set(int x, int y, int value) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
@@ -81,16 +92,12 @@ public class ImageInt16 extends ImageBase<ImageInt16> {
 	@Override
 	public ImageInt16 _createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
-			return new ImageInt16();
-		return new ImageInt16(imgWidth, imgHeight);
+			return new ImageInt16(signed);
+		return new ImageInt16(imgWidth, imgHeight,signed);
 	}
 
 	@Override
 	protected Class<?> _getPrimitiveType() {
 		return short.class;
-	}
-
-	public int getU(int x, int y) {
-		return get(x, y) & 0xFFFF;
 	}
 }

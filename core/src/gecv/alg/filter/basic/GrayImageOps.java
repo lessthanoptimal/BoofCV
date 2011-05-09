@@ -37,11 +37,11 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static ImageInt8 invert(ImageInt8 input, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.checkDeclare(input, false , output);
 
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
-				output.set(x, y, (byte) (255 - input.getU(x, y)));
+				output.set(x, y, (byte) (255 - input.get(x, y)));
 			}
 		}
 
@@ -63,11 +63,11 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static ImageInt8 brighten(ImageInt8 input, int beta, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.checkDeclare(input, false , output);
 
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
-				int val = input.getU(x, y) + beta;
+				int val = input.get(x, y) + beta;
 				if (val > 255) val = 255;
 				if (val < 0) val = 0;
 				output.set(x, y, (byte) val);
@@ -91,11 +91,11 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static ImageInt8 stretch(ImageInt8 input, double gamma, int beta, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.checkDeclare(input, false , output);
 
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
-				int val = (int) (input.getU(x, y) * gamma + beta);
+				int val = (int) (input.get(x, y) * gamma + beta);
 				if (val > 255) val = 255;
 				if (val < 0) val = 0;
 				output.set(x, y, (byte) val);

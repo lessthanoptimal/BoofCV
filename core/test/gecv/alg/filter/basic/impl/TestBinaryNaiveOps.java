@@ -249,7 +249,7 @@ public class TestBinaryNaiveOps {
 	private void checkOutput(String methodName, ImageInt8 input, int x, int y, int expected) {
 		ImageInt8 output = createOutput(methodName, input);
 
-		assertEquals(expected, output.getU(x, y));
+		assertEquals(expected, output.get(x, y));
 
 		// check it against sub-images
 		ImageInt8 temp = new ImageInt8(3 + output.width, 4 + output.height);
@@ -257,7 +257,7 @@ public class TestBinaryNaiveOps {
 		temp.setTo(input);
 
 		output = createOutput(methodName, temp);
-		assertEquals(output.getU(x, y), expected);
+		assertEquals(output.get(x, y), expected);
 	}
 
 	private void checkImage(String methodName, ImageInt8 input, int... expected) {
@@ -265,7 +265,7 @@ public class TestBinaryNaiveOps {
 
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
-				assertEquals(expected[i * 3 + j], output.getU(j, i));
+				assertEquals(expected[i * 3 + j], output.get(j, i));
 
 		// check it against sub-images
 		ImageInt8 temp = new ImageInt8(3 + output.width, 4 + output.height);
@@ -275,7 +275,7 @@ public class TestBinaryNaiveOps {
 		output = createOutput(methodName, temp);
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
-				assertEquals(expected[i * 3 + j], output.getU(j, i));
+				assertEquals(expected[i * 3 + j], output.get(j, i));
 	}
 
 	private ImageInt8 createInput(int... image) {

@@ -22,7 +22,8 @@ import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt8;
 
 /**
- * Functions for converting between different image types.
+ * Functions for converting between different image types. Numerical values do not change or are closely approximated
+ * in these functions.  
  *
  * @author Peter Abeles
  */
@@ -43,9 +44,8 @@ public class ConvertImage {
 	 *
 	 * @param src	Input image which is being converted.
 	 * @param dst	The output image.  If null a new image is created.
-	 * @param signed
 	 */
-	public static ImageFloat32 convert(ImageInt8 src, ImageFloat32 dst, boolean signed) {
+	public static ImageFloat32 convert(ImageInt8 src, ImageFloat32 dst ) {
 		if (dst == null) {
 			dst = new ImageFloat32(src.width, src.height);
 		} else {
@@ -54,7 +54,7 @@ public class ConvertImage {
 
 		if (src.isSubimage() || dst.isSubimage()) {
 
-			if (signed) {
+			if (src.isSigned()) {
 				for (int y = 0; y < src.height; y++) {
 					int indexSrc = src.getIndex(0, y);
 					int indexDst = dst.getIndex(0, y);
@@ -77,7 +77,7 @@ public class ConvertImage {
 		} else {
 			final int N = src.width * src.height;
 
-			if (signed) {
+			if (src.isSigned()) {
 				for (int i = 0; i < N; i++) {
 					dst.data[i] = src.data[i];
 				}
@@ -106,18 +106,17 @@ public class ConvertImage {
 	 *
 	 * @param src	Input image which is being converted.
 	 * @param dst	The output image.  If null a new image is created.
-	 * @param signed
 	 */
-	public static ImageInt16 convert(ImageInt8 src, ImageInt16 dst, boolean signed) {
+	public static ImageInt16 convert(ImageInt8 src, ImageInt16 dst ) {
 		if (dst == null) {
-			dst = new ImageInt16(src.width, src.height);
+			dst = new ImageInt16(src.width, src.height, src.isSigned());
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}
 
 		if (src.isSubimage() || dst.isSubimage()) {
 
-			if (signed) {
+			if (src.isSigned()) {
 				for (int y = 0; y < src.height; y++) {
 					int indexSrc = src.getIndex(0, y);
 					int indexDst = dst.getIndex(0, y);
@@ -140,7 +139,7 @@ public class ConvertImage {
 		} else {
 			final int N = src.width * src.height;
 
-			if (signed) {
+			if (src.isSigned()) {
 				for (int i = 0; i < N; i++) {
 					dst.data[i] = src.data[i];
 				}
@@ -169,9 +168,8 @@ public class ConvertImage {
 	 *
 	 * @param src	Input image which is being converted.
 	 * @param dst	The output image.  If null a new image is created.
-	 * @param signed
 	 */
-	public static ImageFloat32 convert(ImageInt16 src, ImageFloat32 dst, boolean signed) {
+	public static ImageFloat32 convert(ImageInt16 src, ImageFloat32 dst ) {
 		if (dst == null) {
 			dst = new ImageFloat32(src.width, src.height);
 		} else {
@@ -180,7 +178,7 @@ public class ConvertImage {
 
 		if (src.isSubimage() || dst.isSubimage()) {
 
-			if (signed) {
+			if (src.isSigned()) {
 				for (int y = 0; y < src.height; y++) {
 					int indexSrc = src.getIndex(0, y);
 					int indexDst = dst.getIndex(0, y);
@@ -203,13 +201,75 @@ public class ConvertImage {
 		} else {
 			final int N = src.width * src.height;
 
-			if (signed) {
+			if (src.isSigned()) {
 				for (int i = 0; i < N; i++) {
 					dst.data[i] = src.data[i];
 				}
 			} else {
 				for (int i = 0; i < N; i++) {
 					dst.data[i] = src.data[i] & 0xFFFF;
+				}
+			}
+		}
+
+		return dst;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link ImageInt16} into a {@link ImageInt8}.  If the {@link ImageInt16}
+	 * is treated as a signed image or not is specified.
+	 * </p>
+	 * <p/>
+	 * <p>
+	 * If signed:<br>
+	 * dst(x,y) = (byte)src(x,y)<br>
+	 * If unsigned:<br>
+	 * dst(x,y) = (byte)( src(x,y) & 0xFFFF )
+	 * </p>
+	 *
+	 * @param src	Input image which is being converted.
+	 * @param dst	The output image.  If null a new image is created.
+	 */
+	public static ImageInt8 convert(ImageInt16 src, ImageInt8 dst ) {
+		if (dst == null) {
+			dst = new ImageInt8(src.width, src.height);
+		} else {
+			InputSanityCheck.checkSameShape(src, dst);
+		}
+
+		if (src.isSubimage() || dst.isSubimage()) {
+
+			if (src.isSigned()) {
+				for (int y = 0; y < src.height; y++) {
+					int indexSrc = src.getIndex(0, y);
+					int indexDst = dst.getIndex(0, y);
+
+					for (int x = 0; x < src.width; x++) {
+						dst.data[indexDst++] = (byte)src.data[indexSrc++];
+					}
+				}
+			} else {
+				for (int y = 0; y < src.height; y++) {
+					int indexSrc = src.getIndex(0, y);
+					int indexDst = dst.getIndex(0, y);
+
+					for (int x = 0; x < src.width; x++) {
+						dst.data[indexDst++] = (byte)(src.data[indexSrc++] & 0xFFFF);
+					}
+				}
+			}
+
+		} else {
+			final int N = src.width * src.height;
+
+			if (src.isSigned()) {
+				for (int i = 0; i < N; i++) {
+					dst.data[i] = (byte)src.data[i];
+				}
+			} else {
+				for (int i = 0; i < N; i++) {
+					dst.data[i] = (byte)(src.data[i] & 0xFFFF);
 				}
 			}
 		}
@@ -274,7 +334,7 @@ public class ConvertImage {
 	 */
 	public static ImageInt16 convert(ImageFloat32 src, ImageInt16 dst) {
 		if (dst == null) {
-			dst = new ImageInt16(src.width, src.height);
+			dst = new ImageInt16(src.width, src.height, true);
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}

@@ -22,7 +22,6 @@ import org.junit.Test;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -73,8 +72,12 @@ public abstract class StandardImageTests {
 		Number found = (Number) call(img, "get", 0, null, 1, 1);
 		if (GeneralizedImageOps.isFloatingPoint(img))
 			assertEquals(expected.doubleValue(), found.doubleValue(), 1e-4);
-		else
-			assertTrue(expected.intValue() == found.intValue());
+		else {
+			if( ((ImageInteger)img).isSigned() )
+				assertTrue(expected.intValue() == found.intValue());
+			else
+				assertTrue((expected.intValue() & 0xFFFF) == found.intValue());
+		}
 	}
 
 	/**

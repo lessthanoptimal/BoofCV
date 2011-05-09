@@ -111,8 +111,8 @@ public class BenchmarkSsdCornerIntensity {
 	public static void main(String args[]) {
 		derivX_F32 = new ImageFloat32(imgWidth, imgHeight);
 		derivY_F32 = new ImageFloat32(imgWidth, imgHeight);
-		derivX_I16 = new ImageInt16(imgWidth, imgHeight);
-		derivY_I16 = new ImageInt16(imgWidth, imgHeight);
+		derivX_I16 = new ImageInt16(imgWidth, imgHeight, true);
+		derivY_I16 = new ImageInt16(imgWidth, imgHeight, true);
 
 		UtilImageFloat32.randomize(derivX_F32, rand, 0, 255);
 		UtilImageFloat32.randomize(derivY_F32, rand, 0, 255);

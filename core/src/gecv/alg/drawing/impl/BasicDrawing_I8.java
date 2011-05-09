@@ -14,23 +14,41 @@
  *    limitations under the License.
  */
 
-package gecv.core.image;
+package gecv.alg.drawing.impl;
 
 import gecv.struct.image.ImageInt8;
 
 import java.util.Random;
 
 /**
+ * Basic drawing operations for {@link ImageInt8}.
+ *
+ * @see gecv.alg.drawing.BasicDrawing
+ *
  * @author Peter Abeles
  */
-public class UtilImageInt8 {
+public class BasicDrawing_I8 {
 
-	/**
-	 * Fills the whole image with the specified pixel value
-	 *
-	 * @param img   An image.
-	 * @param value The value that the image is being filled with.
-	 */
+	public static void addNoise(ImageInt8 img, Random rand , int min , int max) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int range = 1+max-min;
+
+		byte[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				int value = (data[index] & 0xFF) + rand.nextInt(range)+min;
+				if( value < 0 ) value = 0;
+				if( value > 255 ) value = 255;
+
+				data[index++] = (byte) value;
+			}
+		}
+	}
+
 	public static void fill(ImageInt8 img, int value) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
@@ -41,6 +59,14 @@ public class UtilImageInt8 {
 			int index = img.getStartIndex() + y * img.getStride();
 			for (int x = 0; x < w; x++) {
 				data[index++] = (byte) value;
+			}
+		}
+	}
+
+	public static void rectangle( ImageInt8 img , int value , int x0 , int y0 , int x1 , int y1 ) {
+		for( int y = y0; y < y1; y++ ) {
+			for( int x = x0; x < x1; x++ ) {
+				img.set(x,y,value);
 			}
 		}
 	}

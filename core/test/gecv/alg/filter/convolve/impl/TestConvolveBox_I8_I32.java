@@ -16,9 +16,8 @@
 
 package gecv.alg.filter.convolve.impl;
 
-import gecv.core.image.UtilImageInt8;
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageInt32;
 import gecv.struct.image.ImageInt8;
 import gecv.testing.GecvTesting;
@@ -42,7 +41,7 @@ public class TestConvolveBox_I8_I32 {
 		ImageInt32 outputA = new ImageInt32(width, height);
 		ImageInt32 outputB = new ImageInt32(width, height);
 
-		UtilImageInt8.randomize(input, rand);
+		BasicDrawing_I8.randomize(input, rand);
 
 		GecvTesting.checkSubImage(this, "horizontal", true, input, outputA, outputB);
 	}
@@ -69,7 +68,7 @@ public class TestConvolveBox_I8_I32 {
 		ImageInt32 outputA = new ImageInt32(width, height);
 		ImageInt32 outputB = new ImageInt32(width, height);
 
-		UtilImageInt8.randomize(input, rand);
+		BasicDrawing_I8.randomize(input, rand);
 
 		GecvTesting.checkSubImage(this, "vertical", true, input, outputA, outputB);
 	}

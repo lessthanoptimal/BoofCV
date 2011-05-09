@@ -19,6 +19,7 @@ package gecv.alg.detect.corner;
 import gecv.alg.detect.corner.impl.*;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageInt8;
 
 /**
  * Factory for creating various types of corner intensity detectors.
@@ -31,6 +32,12 @@ public class FactoryCornerIntensity {
 																	  int pixelTol, int minCont)
 	{
 		return new FastCorner12_F32(imageWidth,imageHeight,pixelTol,minCont);
+	}
+
+	public static FastCornerIntensity<ImageInt8> createFast12_I8( int imageWidth, int imageHeight,
+																	 int pixelTol, int minCont)
+	{
+		return new FastCorner12_I8(imageWidth,imageHeight,pixelTol,minCont);
 	}
 
 	public static HarrisCornerIntensity<ImageFloat32> createHarris_F32( int imageWidth, int imageHeight,

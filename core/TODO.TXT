@@ -21,7 +21,7 @@
  * Evaluate for accuracy
  * See corner section
  * See in code comment on speeding up fast-non-max
-
+ 
 - Convolve
  * Change TestConvolveImageStandard into a completely automated test using reflections
  * Add a new implementation for horizontal and vertical which are "in-place"

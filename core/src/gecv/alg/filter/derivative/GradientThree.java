@@ -50,7 +50,7 @@ public class GradientThree {
 	public static void deriv_I8(ImageInt8 orig,
 								ImageInt16 derivX,
 								ImageInt16 derivY) {
-		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		InputSanityCheck.checkSameShape(orig, false, derivX, true, derivY, true);
 		GradientThree_Standard.deriv_I8(orig, derivX, derivY);
 	}
 
@@ -62,7 +62,7 @@ public class GradientThree {
 	 */
 	public static void derivX_I8(ImageInt8 orig,
 								 ImageInt16 derivX) {
-		InputSanityCheck.checkSameShape(orig, derivX);
+		InputSanityCheck.checkSameShape(orig, false, derivX, true);
 		GradientThree_Standard.derivX_I8(orig, derivX);
 	}
 
@@ -74,7 +74,7 @@ public class GradientThree {
 	 */
 	public static void derivY_I8(ImageInt8 orig,
 								 ImageInt16 derivY) {
-		InputSanityCheck.checkSameShape(orig, derivY);
+		InputSanityCheck.checkSameShape(orig, false, derivY, true);
 		GradientThree_Standard.derivY_I8(orig, derivY);
 	}
 

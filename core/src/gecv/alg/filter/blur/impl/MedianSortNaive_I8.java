@@ -51,7 +51,7 @@ public class MedianSortNaive_I8 implements MedianImageFilter<ImageInt8> {
 				int index = 0;
 				for( int i = -radius; i <= radius; i++ ) {
 					for( int j = -radius; j <= radius; j++ ) {
-						values[index++] = input.getU(x+j,y+i);
+						values[index++] = input.get(x+j,y+i);
 					}
 				}
 				

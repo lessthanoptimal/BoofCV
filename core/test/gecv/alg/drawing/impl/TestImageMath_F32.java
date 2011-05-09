@@ -14,20 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.abst.detect.corner;
+package gecv.alg.drawing.impl;
 
-import gecv.struct.QueueCorner;
-import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Extracts corners from a single image.
- *
  * @author Peter Abeles
  */
-public interface CornerIntensityImage<I extends ImageBase> {
+public class TestImageMath_F32 {
 
-	public void process( I input );
-
-	public ImageFloat32 getIntensity();
+	@Test
+	public void implement() {
+		fail("implement");
+	}
 }

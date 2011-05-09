@@ -18,11 +18,11 @@ package gecv.alg.filter.convolve;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
+import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.convolve.edge.ConvolveNormalized;
 import gecv.alg.filter.convolve.edge.impl.ConvolveNormalizedEdgesNaive;
 import gecv.core.image.UtilImageFloat32;
 import gecv.core.image.UtilImageInt16;
-import gecv.core.image.UtilImageInt8;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -116,15 +116,15 @@ public class BenchmarkConvolveNormalizeEdge {
 
 	public static void main( String args[] ) {
 		imgInt8 = new ImageInt8(imgWidth,imgHeight);
-		imgInt16 = new ImageInt16(imgWidth,imgHeight);
+		imgInt16 = new ImageInt16(imgWidth,imgHeight, true);
 		out_I32 = new ImageInt32(imgWidth,imgHeight);
-		out_I16 = new ImageInt16(imgWidth,imgHeight);
+		out_I16 = new ImageInt16(imgWidth,imgHeight, true);
 		out_I8 = new ImageInt8(imgWidth,imgHeight);
 		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
 		out_F32 = new ImageFloat32(imgWidth,imgHeight);
 
 		Random rand = new Random(234234);
-		UtilImageInt8.randomize(imgInt8,rand);
+		BasicDrawing_I8.randomize(imgInt8,rand);
 		UtilImageInt16.randomize(imgInt16,rand,0,200);
 		UtilImageFloat32.randomize(imgFloat32,rand,0,200);
 

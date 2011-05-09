@@ -141,8 +141,8 @@ public class BenchmarkImageDerivative {
 
 	public static void main( String args[] ) {
 		imgInt8 = new ImageInt8(imgWidth,imgHeight);
-		derivX_I16 = new ImageInt16(imgWidth,imgHeight);
-		derivY_I16 = new ImageInt16(imgWidth,imgHeight);
+		derivX_I16 = new ImageInt16(imgWidth,imgHeight, true);
+		derivY_I16 = new ImageInt16(imgWidth,imgHeight, true);
 		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
 		derivX_F32 = new ImageFloat32(imgWidth,imgHeight);
 		derivY_F32 = new ImageFloat32(imgWidth,imgHeight);
