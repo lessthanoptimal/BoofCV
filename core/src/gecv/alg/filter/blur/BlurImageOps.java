@@ -21,8 +21,8 @@ import gecv.alg.filter.convolve.edge.ConvolveNormalized;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
@@ -32,16 +32,16 @@ import gecv.struct.image.ImageInt8;
 // mean: naive and highly optimized
 public class BlurImageOps {
 
-	public static void kernel(ImageInt8 input, ImageInt8 output, Kernel1D_I32 kernel ,
-								   ImageInt8 storage ) {
+	public static void kernel(ImageUInt8 input, ImageUInt8 output, Kernel1D_I32 kernel ,
+								   ImageUInt8 storage ) {
 		InputSanityCheck.checkSameShape(input,output,storage);
 
 		ConvolveNormalized.horizontal(kernel,input,storage);
 		ConvolveNormalized.vertical(kernel,storage,output);
 	}
 
-	public static void kernel(ImageInt16 input, ImageInt16 output, Kernel1D_I32 kernel ,
-								   ImageInt16 storage ) {
+	public static void kernel(ImageSInt16 input, ImageSInt16 output, Kernel1D_I32 kernel ,
+								   ImageSInt16 storage ) {
 		InputSanityCheck.checkSameShape(input,output,storage);
 
 		ConvolveNormalized.horizontal(kernel,input,storage);
@@ -56,15 +56,15 @@ public class BlurImageOps {
 		ConvolveNormalized.vertical(kernel,storage,output);
 	}
 
-	public static ImageInt8 mean(ImageInt8 input, ImageInt8 output, int radius) {
+	public static ImageUInt8 mean(ImageUInt8 input, ImageUInt8 output, int radius) {
 		return null;
 	}
 
-	public static ImageInt8 median(ImageInt8 input, ImageInt8 output, int radius) {
+	public static ImageUInt8 median(ImageUInt8 input, ImageUInt8 output, int radius) {
 		return null;
 	}
 
-	public static ImageInt8 gaussian(ImageInt8 input, ImageInt8 output, int radius) {
+	public static ImageUInt8 gaussian(ImageUInt8 input, ImageUInt8 output, int radius) {
 		return null;
 	}
 

@@ -21,8 +21,8 @@ import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.core.image.ConvertImage;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -61,13 +61,13 @@ public class TestKltCorner_F32 {
 	 */
 	@Test
 	public void compareToNaive() {
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		BasicDrawing_I8.randomize(img, new Random(0xfeed));
 
-		ImageInt16 derivX_I = new ImageInt16(img.getWidth(), img.getHeight(), true);
-		ImageInt16 derivY_I = new ImageInt16(img.getWidth(), img.getHeight(), true);
+		ImageSInt16 derivX_I = new ImageSInt16(img.getWidth(), img.getHeight());
+		ImageSInt16 derivY_I = new ImageSInt16(img.getWidth(), img.getHeight());
 
-		GradientSobel.process_I8(img, derivX_I, derivY_I);
+		GradientSobel.process(img, derivX_I, derivY_I);
 
 		ImageFloat32 derivX_F = ConvertImage.convert(derivX_I, (ImageFloat32)null);
 		ImageFloat32 derivY_F = ConvertImage.convert(derivY_I, (ImageFloat32)null);
@@ -75,7 +75,7 @@ public class TestKltCorner_F32 {
 		GecvTesting.checkSubImage(this, "compareToNaive", true, derivX_I, derivY_I, derivX_F, derivY_F);
 	}
 
-	public void compareToNaive(ImageInt16 derivX_I, ImageInt16 derivY_I, ImageFloat32 derivX_F, ImageFloat32 derivY_F) {
+	public void compareToNaive(ImageSInt16 derivX_I, ImageSInt16 derivY_I, ImageFloat32 derivX_F, ImageFloat32 derivY_F) {
 		SsdCornerNaive_I16 ssd_I = new SsdCornerNaive_I16(width, height, 3);
 		ssd_I.process(derivX_I, derivY_I);
 

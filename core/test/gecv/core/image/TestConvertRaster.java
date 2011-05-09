@@ -17,7 +17,7 @@
 package gecv.core.image;
 
 import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 import sun.awt.image.ByteInterleavedRaster;
@@ -38,12 +38,12 @@ public class TestConvertRaster {
 
 	@Test
 	public void bufferedToGray_ByteInterleaved() {
-		ImageInt8 result = new ImageInt8(imgWidth, imgHeight);
+		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
 
 		GecvTesting.checkSubImage(this, "checkBufferedToGray_ByteInterleaved", false, result);
 	}
 
-	public void checkBufferedToGray_ByteInterleaved(ImageInt8 result) {
+	public void checkBufferedToGray_ByteInterleaved(ImageUInt8 result) {
 		// check with a 3 byte image
 		BufferedImage origImg = createByteBuff(imgWidth, imgHeight, 3, rand);
 		ConvertRaster.bufferedToGray((ByteInterleavedRaster) origImg.getRaster(), result);
@@ -58,12 +58,12 @@ public class TestConvertRaster {
 
 	@Test
 	public void bufferedToGray_IntegerInterleaved() {
-		ImageInt8 result = new ImageInt8(imgWidth, imgHeight);
+		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
 
 		GecvTesting.checkSubImage(this, "bufferedToGray_IntegerInterleaved", false, result);
 	}
 
-	public void bufferedToGray_IntegerInterleaved(ImageInt8 result) {
+	public void bufferedToGray_IntegerInterleaved(ImageUInt8 result) {
 		BufferedImage origImg = createIntBuff(imgWidth, imgHeight, rand);
 		ConvertRaster.bufferedToGray((IntegerInterleavedRaster) origImg.getRaster(), result);
 
@@ -72,12 +72,12 @@ public class TestConvertRaster {
 
 	@Test
 	public void bufferedToGray_BufferedImage() {
-		ImageInt8 result = new ImageInt8(imgWidth, imgHeight);
+		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
 
 		GecvTesting.checkSubImage(this, "bufferedToGray_IntegerInterleaved", false, result);
 	}
 
-	public void bufferedToGray_BufferedImage(ImageInt8 result) {
+	public void bufferedToGray_BufferedImage(ImageUInt8 result) {
 		BufferedImage origImg = createIntBuff(imgWidth, imgHeight, rand);
 		ConvertRaster.bufferedToGray(origImg, result);
 
@@ -86,13 +86,13 @@ public class TestConvertRaster {
 
 	@Test
 	public void grayToBuffered_ByteInterleaved() {
-		ImageInt8 result = new ImageInt8(imgWidth, imgHeight);
+		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
 		BasicDrawing_I8.randomize(result, rand);
 
 		GecvTesting.checkSubImage(this, "grayToBuffered_ByteInterleaved", true, result);
 	}
 
-	public void grayToBuffered_ByteInterleaved(ImageInt8 origImg) {
+	public void grayToBuffered_ByteInterleaved(ImageUInt8 origImg) {
 		// check with a 3 byte image
 		BufferedImage result = createByteBuff(imgWidth, imgHeight, 3, rand);
 		ConvertRaster.grayToBuffered(origImg, (ByteInterleavedRaster) result.getRaster());
@@ -107,13 +107,13 @@ public class TestConvertRaster {
 
 	@Test
 	public void grayToBuffered_IntegerInterleaved() {
-		ImageInt8 result = new ImageInt8(imgWidth, imgHeight);
+		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
 		BasicDrawing_I8.randomize(result, rand);
 
 		GecvTesting.checkSubImage(this, "grayToBuffered_IntegerInterleaved", true, result);
 	}
 
-	public void grayToBuffered_IntegerInterleaved(ImageInt8 origImg) {
+	public void grayToBuffered_IntegerInterleaved(ImageUInt8 origImg) {
 		BufferedImage result = createIntBuff(imgWidth, imgHeight, rand);
 		ConvertRaster.grayToBuffered(origImg, (IntegerInterleavedRaster) result.getRaster());
 
@@ -122,13 +122,13 @@ public class TestConvertRaster {
 
 	@Test
 	public void grayToBuffered_BufferedImage() {
-		ImageInt8 result = new ImageInt8(imgWidth, imgHeight);
+		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
 		BasicDrawing_I8.randomize(result, rand);
 
 		GecvTesting.checkSubImage(this, "grayToBuffered_BufferedImage", true, result);
 	}
 
-	public void grayToBuffered_BufferedImage(ImageInt8 origImg) {
+	public void grayToBuffered_BufferedImage(ImageUInt8 origImg) {
 		BufferedImage result = createIntBuff(imgWidth, imgHeight, rand);
 		ConvertRaster.grayToBuffered(origImg, result);
 

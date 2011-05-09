@@ -16,23 +16,17 @@
 
 package gecv.abst.filter.derivative;
 
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageBase;
 
 
 /**
- * A generic interface for computing image derivative along the x and y axes for {@link ImageFloat32}.
+ * A generic interface for computing image derivative along the x and y axes.
  *
  * @author Peter Abeles
  */
-public interface DerivativeXY_F32 {
+public interface DerivativeXY<Input extends ImageBase, Output extends ImageBase> {
 
-	public void setOutputs(ImageFloat32 derivX, ImageFloat32 derivY);
-
-	public void setInputs(ImageFloat32 image);
-
-	public void createOutputs(int imageWidth, int imageHeight);
-
-	public void process();
+	public void process( Input inputImage , Output derivX, Output derivY );
 
 	/**
 	 * How many pixels wide is the region that is not processed along the outside
@@ -41,8 +35,4 @@ public interface DerivativeXY_F32 {
 	 * @return number of pixels.
 	 */
 	public int getBorder();
-
-	public ImageFloat32 getDerivX();
-
-	public ImageFloat32 getDerivY();
 }

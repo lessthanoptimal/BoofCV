@@ -16,7 +16,7 @@
 
 package gecv.core.image;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
@@ -33,7 +33,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(ByteInterleavedRaster src, ImageInt8 dst) {
+	public static void bufferedToGray(ByteInterleavedRaster src, ImageUInt8 dst) {
 		byte[] srcData = src.getDataStorage();
 
 		byte[] data = dst.data;
@@ -76,7 +76,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(IntegerInterleavedRaster src, ImageInt8 dst) {
+	public static void bufferedToGray(IntegerInterleavedRaster src, ImageUInt8 dst) {
 		int[] srcData = src.getDataStorage();
 
 		byte[] data = dst.data;
@@ -114,7 +114,7 @@ public class ConvertRaster {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void bufferedToGray(BufferedImage src, ImageInt8 dst) {
+	public static void bufferedToGray(BufferedImage src, ImageUInt8 dst) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
@@ -135,7 +135,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageInt8 src, ByteInterleavedRaster dst) {
+	public static void grayToBuffered(ImageUInt8 src, ByteInterleavedRaster dst) {
 //        dst.markDirty();
 
 		final byte[] srcData = src.data;
@@ -177,7 +177,7 @@ public class ConvertRaster {
 
 	}
 
-	public static void grayToBuffered(ImageInt8 src, IntegerInterleavedRaster dst) {
+	public static void grayToBuffered(ImageUInt8 src, IntegerInterleavedRaster dst) {
 //        dst.markDirty();
 
 		final byte[] srcData = src.data;
@@ -204,7 +204,7 @@ public class ConvertRaster {
 
 	}
 
-	public static void grayToBuffered(ImageInt8 src, BufferedImage dst) {
+	public static void grayToBuffered(ImageUInt8 src, BufferedImage dst) {
 //        dst.markDirty();
 
 		final int width = dst.getWidth();

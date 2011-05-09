@@ -17,7 +17,7 @@
 package gecv.alg.filter.basic;
 
 import gecv.alg.InputSanityCheck;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Pixel-wise operations on gray-scale images.
@@ -36,8 +36,8 @@ public class GrayImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 invert(ImageInt8 input, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, false , output);
+	public static ImageUInt8 invert(ImageUInt8 input, ImageUInt8 output) {
+		output = InputSanityCheck.checkDeclare(input, output);
 
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
@@ -62,8 +62,8 @@ public class GrayImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 brighten(ImageInt8 input, int beta, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, false , output);
+	public static ImageUInt8 brighten(ImageUInt8 input, int beta, ImageUInt8 output) {
+		output = InputSanityCheck.checkDeclare(input, output);
 
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
@@ -90,8 +90,8 @@ public class GrayImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 stretch(ImageInt8 input, double gamma, int beta, ImageInt8 output) {
-		output = InputSanityCheck.checkDeclare(input, false , output);
+	public static ImageUInt8 stretch(ImageUInt8 input, double gamma, int beta, ImageUInt8 output) {
+		output = InputSanityCheck.checkDeclare(input, output);
 
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {

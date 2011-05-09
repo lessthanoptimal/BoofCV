@@ -39,8 +39,8 @@ public class GenerateConvolveNormalized_JustBorder {
 	public void generate() {
 		printPreamble();
 		printAllOps("F32", "ImageFloat32","ImageFloat32","float","float","float","float","");
-		printAllOps("I32", "ImageInt8","ImageInt8","int","byte","byte","int"," & 0xFF");
-		printAllOps("I32", "ImageInt16","ImageInt16","int","short","short","int","");
+		printAllOps("I32", "ImageUInt8","ImageUInt8","int","byte","byte","int"," & 0xFF");
+		printAllOps("I32", "ImageSInt16","ImageSInt16","int","short","short","int","");
 		out.println("}");
 	}
 
@@ -51,8 +51,8 @@ public class GenerateConvolveNormalized_JustBorder {
 				"import gecv.struct.convolve.Kernel1D_F32;\n" +
 				"import gecv.struct.convolve.Kernel1D_I32;\n" +
 				"import gecv.struct.image.ImageFloat32;\n" +
-				"import gecv.struct.image.ImageInt16;\n" +
-				"import gecv.struct.image.ImageInt8;\n" +
+				"import gecv.struct.image.ImageSInt16;\n" +
+				"import gecv.struct.image.ImageUInt8;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +

@@ -19,8 +19,8 @@ package gecv.alg.filter.derivative.sobel;
 import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.core.image.UtilImageFloat32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -43,17 +43,17 @@ public class TestGradientEdge_Naive {
 	 */
 	@Test
 	public void compareToKnown_I8() {
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		BasicDrawing_I8.randomize(img, rand);
 
-		ImageInt16 derivX = new ImageInt16(width, height, true);
-		ImageInt16 derivY = new ImageInt16(width, height, true);
+		ImageSInt16 derivX = new ImageSInt16(width, height);
+		ImageSInt16 derivY = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "compareToKnown_I8", true, img, derivX, derivY);
 	}
 
-	public void compareToKnown_I8(ImageInt8 img, ImageInt16 derivX, ImageInt16 derivY) {
-		GradientSobel_Naive.process_I8(img, derivX, derivY);
+	public void compareToKnown_I8(ImageUInt8 img, ImageSInt16 derivX, ImageSInt16 derivY) {
+		GradientSobel_Naive.process(img, derivX, derivY);
 
 		int dX = -((img.get(0, 2) + img.get(0, 0)) + img.get(0, 1) * 2);
 		dX += (img.get(2, 2) + img.get(2, 0)) + img.get(2, 1) * 2;
@@ -81,7 +81,7 @@ public class TestGradientEdge_Naive {
 	}
 
 	public void compareToKnown_F32(ImageFloat32 img, ImageFloat32 derivX, ImageFloat32 derivY) {
-		GradientSobel_Naive.process_F32(img, derivX, derivY);
+		GradientSobel_Naive.process(img, derivX, derivY);
 
 		float dX = -((img.get(0, 2) + img.get(0, 0)) * 0.25f + img.get(0, 1) * 0.5f);
 		dX += (img.get(2, 2) + img.get(2, 0)) * 0.25f + img.get(2, 1) * 0.5f;

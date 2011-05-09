@@ -16,14 +16,14 @@
 
 package gecv.struct.pyramid;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
- * Implementation of {@link ImagePyramid} for {@link ImageInt8}.
+ * Implementation of {@link ImagePyramid} for {@link gecv.struct.image.ImageUInt8}.
  *
  * @author Peter Abeles
  */
-public class ImagePyramid_I8 extends ImagePyramid<ImageInt8> {
+public class ImagePyramid_I8 extends ImagePyramid<ImageUInt8> {
 	/**
 	 * Specifies input image size and behavior of top most layer.
 	 *
@@ -36,12 +36,12 @@ public class ImagePyramid_I8 extends ImagePyramid<ImageInt8> {
 	}
 
 	@Override
-	protected ImageInt8 createImage(int width, int height) {
-		return new ImageInt8(width, height);
+	protected ImageUInt8 createImage(int width, int height) {
+		return new ImageUInt8(width, height);
 	}
 
 	@Override
-	public Class<ImageInt8> getImageType() {
-		return ImageInt8.class;
+	public Class<ImageUInt8> getImageType() {
+		return ImageUInt8.class;
 	}
 }

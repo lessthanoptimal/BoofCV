@@ -28,8 +28,8 @@ import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.gui.image.ShowImages;
 import gecv.struct.QueueCorner;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 import java.util.Random;
 
@@ -45,35 +45,35 @@ public class BenchmarkCornerAccuracy {
 
 	Random rand = new Random(234);
 
-	ImageInt8 image= new ImageInt8(width,height);
-	ImageInt16 derivX = new ImageInt16(width,height, true);
-	ImageInt16 derivY = new ImageInt16(width,height, true);
+	ImageUInt8 image= new ImageUInt8(width,height);
+	ImageSInt16 derivX = new ImageSInt16(width,height);
+	ImageSInt16 derivY = new ImageSInt16(width,height);
 
 	public void createSquare( int x0, int y0, int x1 , int y1 ) {
 		BasicDrawing.fill(image,0);
 		BasicDrawing.rectangle(image,100,x0,y0,x1,y1);
 		BasicDrawing_I8.addNoise(image,rand,-2,2);
-		GradientSobel.process_I8(image,derivX,derivY);
+		GradientSobel.process(image,derivX,derivY);
 	}
 
-	public QueueCorner detectCorners( FastCornerIntensity<ImageInt8> intensity  ) {
-		return detectCorners(new WrapperFastCornerIntensity<ImageInt8,ImageInt16>(intensity));
+	public QueueCorner detectCorners( FastCornerIntensity<ImageUInt8> intensity  ) {
+		return detectCorners(new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(intensity));
 	}
 
-	public QueueCorner detectCorners( GradientCornerIntensity<ImageInt16> intensity  ) {
-		return detectCorners(new WrapperGradientCornerIntensity<ImageInt8,ImageInt16>(intensity));
+	public QueueCorner detectCorners( GradientCornerIntensity<ImageSInt16> intensity  ) {
+		return detectCorners(new WrapperGradientCornerIntensity<ImageUInt8, ImageSInt16>(intensity));
 	}
 
-	public QueueCorner detectCorners( GeneralCornerIntensity<ImageInt8,ImageInt16> intensity  ) {
+	public QueueCorner detectCorners( GeneralCornerIntensity<ImageUInt8, ImageSInt16> intensity  ) {
 		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(radius + 10, radius + 10, 1f));
-		GeneralCornerDetector<ImageInt8,ImageInt16> det =
-				new GeneralCornerDetector<ImageInt8,ImageInt16>(intensity, extractor, maxCorners);
+		GeneralCornerDetector<ImageUInt8, ImageSInt16> det =
+				new GeneralCornerDetector<ImageUInt8, ImageSInt16>(intensity, extractor, maxCorners);
 
 		if( det.getRequiresGradient() ) {
-			derivX = new ImageInt16(width,height, true);
-			derivY = new ImageInt16(width,height, true);
+			derivX = new ImageSInt16(width,height);
+			derivY = new ImageSInt16(width,height);
 
-			GradientSobel.process_I8(image,derivX,derivY);
+			GradientSobel.process(image,derivX,derivY);
 			det.process(image,derivX,derivY);
 		} else {
 			det.process(image,null,null);

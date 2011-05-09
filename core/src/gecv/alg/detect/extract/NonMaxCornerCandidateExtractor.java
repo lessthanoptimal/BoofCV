@@ -49,7 +49,8 @@ public class NonMaxCornerCandidateExtractor {
 	}
 
 	/**
-	 * Selects a set of features from the provided intensity image and corner candidates.
+	 * Selects a set of features from the provided intensity image and corner candidates.  If a non-empty list of
+	 * corners is passed in then those corners will not be added again and similar corners will be excluded.
 	 *
 	 * @param intensityImage feature intensity image. Can be modified.
 	 * @param candidates	 List of candidate locations for features.
@@ -73,7 +74,6 @@ public class NonMaxCornerCandidateExtractor {
 			Point2D_I16 pt = candidates.points[iter];
 
 			// see if its too close to the image edge
-			// TODO could truncate the search region instead?
 			if( pt.x < radius || pt.y < radius || pt.x >= w || pt.y >= h )
 				continue;
 

@@ -17,16 +17,17 @@
 package gecv.abst.filter.derivative;
 
 import gecv.alg.filter.derivative.GradientSobel;
+import gecv.struct.image.ImageFloat32;
 
 
 /**
  * @author Peter Abeles
  */
-public class DerivativeXY_Sobel_F32 extends DerivativeXYBase_F32 {
+public class DerivativeXY_Sobel_F32 implements DerivativeXY<ImageFloat32, ImageFloat32> {
 
 	@Override
-	public void process() {
-		GradientSobel.process_F32(image, derivX, derivY);
+	public void process(ImageFloat32 inputImage , ImageFloat32 derivX, ImageFloat32 derivY) {
+		GradientSobel.process(inputImage, derivX, derivY);
 	}
 
 	@Override

@@ -19,8 +19,8 @@ package gecv.alg.filter.convolve.edge.impl;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -90,7 +90,7 @@ public class ConvolveNormalizedEdgesNaive {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageInt8 input, ImageInt8 output ) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 input, ImageUInt8 output ) {
 
 		final int radius = kernel.getRadius();
 
@@ -118,7 +118,7 @@ public class ConvolveNormalizedEdgesNaive {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageInt8 input, ImageInt8 output ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 input, ImageUInt8 output ) {
 
 		final int radius = kernel.getRadius();
 
@@ -146,7 +146,7 @@ public class ConvolveNormalizedEdgesNaive {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageInt16 input, ImageInt16 output ) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageSInt16 input, ImageSInt16 output ) {
 
 		final int radius = kernel.getRadius();
 
@@ -174,7 +174,7 @@ public class ConvolveNormalizedEdgesNaive {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageInt16 input, ImageInt16 output ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 input, ImageSInt16 output ) {
 
 		final int radius = kernel.getRadius();
 

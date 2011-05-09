@@ -18,7 +18,7 @@ package gecv.alg.filter.convolve.impl;
 
 import gecv.alg.filter.convolve.CompareToStandardConvolution;
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -34,7 +34,7 @@ public class TestConvolveImageUnrolled_I8_I8_Div {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_I8_I8_Div.class.getMethod("horizontal",
-					Kernel1D_I32.class, ImageInt8.class, ImageInt8.class, int.class, boolean.class);
+					Kernel1D_I32.class, ImageUInt8.class, ImageUInt8.class, int.class, boolean.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
@@ -45,7 +45,7 @@ public class TestConvolveImageUnrolled_I8_I8_Div {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_I8_I8_Div.class.getMethod("vertical",
-					Kernel1D_I32.class, ImageInt8.class, ImageInt8.class, int.class, boolean.class);
+					Kernel1D_I32.class, ImageUInt8.class, ImageUInt8.class, int.class, boolean.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

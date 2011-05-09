@@ -17,17 +17,18 @@
 package gecv.abst.filter.derivative;
 
 import gecv.alg.filter.derivative.GradientThree;
+import gecv.struct.image.ImageFloat32;
 
 
 /**
  * @author Peter Abeles
  */
-public class DerivativeXY_Three_F32 extends DerivativeXYBase_F32 {
+public class DerivativeXY_Three_F32 implements DerivativeXY<ImageFloat32, ImageFloat32> {
 
 	@Override
-	public void process() {
-		GradientThree.derivX_F32(image, derivX);
-		GradientThree.derivY_F32(image, derivY);
+	public void process(ImageFloat32 inputImage , ImageFloat32 derivX, ImageFloat32 derivY) {
+		GradientThree.derivX_F32(inputImage, derivX);
+		GradientThree.derivY_F32(inputImage, derivY);
 	}
 
 	@Override

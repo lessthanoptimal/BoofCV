@@ -20,9 +20,11 @@ import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 
 /**
+ * <p>
  * Extracts features from the intensity image by finding local maximums.  Previously found corners are automatically
  * excluded and not added again.  Features below an intensity threshold are automatically ignored and no two
  * features can be closer than the minSeparation apart.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -44,10 +46,11 @@ public interface NonMaxCornerExtractor {
 	public void setThresh(float thresh);
 
 	/**
-	 * Detects corners in the image while excluding corners which are already contained in the corners list.
+	 * Detects corners in the image.  If a non-empty list of corners is passed in then those corners will not
+	 * be added again and similar corners will be excluded.
 	 *
 	 * @param intensityImage Feature intensity image. Can be modified.
-	 * @param corners		Where found corners are stored.  Corners which are already in the list will not be added twice.
+	 * @param corners	Where found corners are stored.  Corners which are already in the list will not be added twice.
 	 */
 	public void process(ImageFloat32 intensityImage, QueueCorner corners);
 }

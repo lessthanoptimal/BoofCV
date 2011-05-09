@@ -16,7 +16,6 @@
 
 package gecv.core.image;
 
-import gecv.struct.image.ImageInt8;
 import gecv.struct.image.ImageInterleavedInt8;
 
 import java.util.Random;

@@ -16,7 +16,7 @@
 
 package gecv.alg.detect.corner;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Creates an image with corners at known locations
@@ -25,7 +25,7 @@ import gecv.struct.image.ImageInt8;
  */
 public class CreateSyntheticCornerImage {
 
-	public ImageInt8 createImage() {
+	public ImageUInt8 createImage() {
 		return null;
 	}
 

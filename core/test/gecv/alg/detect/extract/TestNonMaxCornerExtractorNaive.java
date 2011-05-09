@@ -16,22 +16,54 @@
 
 package gecv.alg.detect.extract;
 
+import gecv.core.image.UtilImageFloat32;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestNonMaxCornerExtractor {
+public class TestNonMaxCornerExtractorNaive {
 
+	/**
+	 * If a non-empty list of features is passed in it should not add them again to the list nor return
+	 * any similar features.
+	 */
 	@Test
 	public void excludePreExisting() {
-		fail("implement");
+		ImageFloat32 inten = new ImageFloat32(30, 40);
+		UtilImageFloat32.randomize(inten, new Random(1231), 0, 10);
+
+		QueueCorner cornersFirst = new QueueCorner(inten.getWidth() * inten.getHeight());
+
+		NonMaxCornerExtractorNaive alg = new NonMaxCornerExtractorNaive(2, 0.6F);
+		// find corners the first time
+		alg.process(inten,cornersFirst);
+
+		// add points which should be excluded
+		QueueCorner cornersSecond = new QueueCorner(inten.getWidth() * inten.getHeight());
+		for( int i = 0; i < 20; i++ ) {
+			cornersSecond.add(cornersFirst.get(i));
+		}
+
+		// recreate the same image
+		UtilImageFloat32.randomize(inten, new Random(1231), 0, 10);
+		alg.process(inten,cornersSecond);
+		assertEquals(cornersSecond.size(),cornersFirst.size());
+
+		//make sure it isn't just clearing the list and finding the same corners again
+		UtilImageFloat32.fill(inten,0);
+		alg.process(inten,cornersSecond);
+		assertEquals(cornersSecond.size(),cornersFirst.size());
+		cornersSecond.reset();
+		alg.process(inten,cornersSecond);
+		assertEquals(cornersSecond.size(),0);
 	}
 
 	/**
@@ -61,10 +93,12 @@ public class TestNonMaxCornerExtractor {
 		extractor.process(img, corners);
 		assertEquals(5, corners.size());
 
+		corners.reset();
 		extractor.setMinSeparation(2);
 		extractor.process(img, corners);
 		assertEquals(1, corners.size());
 
+		corners.reset();
 		extractor.setMinSeparation(3);
 		extractor.process(img, corners);
 		assertEquals(1, corners.size());
@@ -100,6 +134,7 @@ public class TestNonMaxCornerExtractor {
 		extractor.process(img, corners);
 		assertEquals(9 * 8, corners.size());
 
+		corners.reset();
 		extractor.setThresh(3);
 		extractor.process(img, corners);
 		assertEquals(6, corners.size());

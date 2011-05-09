@@ -18,8 +18,8 @@ package gecv.core.image;
 
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
 import gecv.struct.image.ImageInterleavedInt8;
+import gecv.struct.image.ImageUInt8;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
@@ -69,12 +69,12 @@ public class ConvertBufferedImage {
 	 * @param img Image whose internal data is extracted and wrapped.
 	 * @return An image whose internal data is the same as the input image.
 	 */
-	public static ImageInt8 extractImageInt8(BufferedImage img) {
+	public static ImageUInt8 extractImageInt8(BufferedImage img) {
 		if (img.getRaster() instanceof ByteInterleavedRaster) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) img.getRaster();
 			if (raster.getNumBands() != 1)
 				throw new IllegalArgumentException("Input image has more than one channel");
-			ImageInt8 ret = new ImageInt8();
+			ImageUInt8 ret = new ImageUInt8();
 
 			ret.width = img.getWidth();
 			ret.height = img.getHeight();
@@ -138,7 +138,7 @@ public class ConvertBufferedImage {
 	/**
 	 * <p>
 	 * Creates a new BufferedImage that internally uses the same data as the provided
-	 * ImageInt8.  The returned BufferedImage will be of type TYPE_BYTE_GRAY.
+	 * ImageUInt8.  The returned BufferedImage will be of type TYPE_BYTE_GRAY.
 	 * </p>
 	 * <p/>
 	 * <p>
@@ -148,7 +148,7 @@ public class ConvertBufferedImage {
 	 * @param img Input image who's data will be wrapped by the returned BufferedImage.
 	 * @return BufferedImage which shared data with the input image.
 	 */
-	public static BufferedImage extractBuffered(ImageInt8 img) {
+	public static BufferedImage extractBuffered(ImageUInt8 img) {
 		if (img.isSubimage())
 			throw new IllegalArgumentException("Sub-images are not supported for this operation");
 
@@ -180,8 +180,8 @@ public class ConvertBufferedImage {
 	 * it will be used for output, otherwise a new image will be created.
 	 */
 	public static <T extends ImageBase> T convertFrom(BufferedImage src, T dst, Class<T> type) {
-		if (type == ImageInt8.class) {
-			return (T) convertFrom(src, (ImageInt8) dst);
+		if (type == ImageUInt8.class) {
+			return (T) convertFrom(src, (ImageUInt8) dst);
 		} else if (type == ImageFloat32.class) {
 			throw new RuntimeException("Not supported yet");
 		} else {
@@ -190,20 +190,20 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link ImageInt8}.  If the buffered image
+	 * Converts the buffered image into an {@link gecv.struct.image.ImageUInt8}.  If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
-	public static ImageInt8 convertFrom(BufferedImage src, ImageInt8 dst) {
+	public static ImageUInt8 convertFrom(BufferedImage src, ImageUInt8 dst) {
 		if (dst != null) {
 			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
 				throw new IllegalArgumentException("image dimension are different");
 			}
 		} else {
-			dst = new ImageInt8(src.getWidth(), src.getHeight(),false);
+			dst = new ImageUInt8(src.getWidth(), src.getHeight());
 		}
 
 		if (src.getRaster() instanceof ByteInterleavedRaster) {
@@ -218,14 +218,14 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link ImageInt8}.  If the buffered image
+	 * Converts the buffered image into an {@link gecv.struct.image.ImageUInt8}.  If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo(ImageInt8 src, BufferedImage dst) {
+	public static BufferedImage convertTo(ImageUInt8 src, BufferedImage dst) {
 		dst = checkInputs(src, dst);
 
 		if (dst.getRaster() instanceof ByteInterleavedRaster) {

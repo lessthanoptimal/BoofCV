@@ -21,7 +21,7 @@ import gecv.ProfileOperation;
 import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.basic.impl.BinaryInnerOps;
 import gecv.alg.filter.basic.impl.BinaryNaiveOps;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 import java.util.Random;
 
@@ -35,8 +35,8 @@ public class BenchmarkBinaryOps {
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
-	static ImageInt8 input;
-	static ImageInt8 output;
+	static ImageUInt8 input;
+	static ImageUInt8 output;
 
 	public static class NaiveErode4 extends PerformerBase {
 		@Override
@@ -186,8 +186,8 @@ public class BenchmarkBinaryOps {
 	}
 
 	public static void main(String args[]) {
-		input = new ImageInt8(imgWidth, imgHeight);
-		output = new ImageInt8(imgWidth, imgHeight);
+		input = new ImageUInt8(imgWidth, imgHeight);
+		output = new ImageUInt8(imgWidth, imgHeight);
 		Random rand = new Random(234);
 		BasicDrawing_I8.randomize(input, rand, 0, 1);
 

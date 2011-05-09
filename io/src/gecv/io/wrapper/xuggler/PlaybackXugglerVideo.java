@@ -17,7 +17,7 @@
 package gecv.io.wrapper.xuggler;
 
 import gecv.io.image.PlaybackImageSequence;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Displays a video after reading it in using xuggler.
@@ -35,9 +35,9 @@ public class PlaybackXugglerVideo {
 			fileName = args[0];
 		}
 
-		XugglerSimplified<ImageInt8> sequence = new XugglerSimplified<ImageInt8>(fileName, ImageInt8.class);
+		XugglerSimplified<ImageUInt8> sequence = new XugglerSimplified<ImageUInt8>(fileName, ImageUInt8.class);
 
-		PlaybackImageSequence<ImageInt8> player = new PlaybackImageSequence<ImageInt8>(sequence);
+		PlaybackImageSequence<ImageUInt8> player = new PlaybackImageSequence<ImageUInt8>(sequence);
 
 		player.process();
 

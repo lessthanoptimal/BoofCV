@@ -18,14 +18,14 @@ package gecv.alg.pyramid;
 
 import gecv.alg.interpolate.DownSampleConvolve;
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
- * Implementation of {@link gecv.alg.pyramid.ConvolutionPyramid} for {@link ImageInt8}.
+ * Implementation of {@link gecv.alg.pyramid.ConvolutionPyramid} for {@link gecv.struct.image.ImageUInt8}.
  *
  * @author Peter Abeles
  */
-public class ConvolutionPyramid_I8 extends ConvolutionPyramid<ImageInt8> {
+public class ConvolutionPyramid_I8 extends ConvolutionPyramid<ImageUInt8> {
 	// convolution kernel used to blur the input image before down sampling
 	private Kernel1D_I32 kernel;
 	// storage for computing the down sampled image
@@ -38,7 +38,7 @@ public class ConvolutionPyramid_I8 extends ConvolutionPyramid<ImageInt8> {
 	}
 
 	@Override
-	public void _update(ImageInt8 original) {
+	public void _update(ImageUInt8 original) {
 
 		if (pyramid.scale[0] == 1) {
 			if (pyramid.saveOriginalReference) {

@@ -17,7 +17,7 @@
 package gecv.alg.detect.corner.impl;
 
 import gecv.alg.detect.corner.KitRosCornerIntensity;
-import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageSInt16;
 
 /**
  * <p>
@@ -26,7 +26,7 @@ import gecv.struct.image.ImageInt16;
  *
  * @author Peter Abeles
  */
-public class KitRosCorner_I16 extends SsdCorner_I16 implements KitRosCornerIntensity<ImageInt16> {
+public class KitRosCorner_I16 extends SsdCorner_I16 implements KitRosCornerIntensity<ImageSInt16> {
 
 	public KitRosCorner_I16(int imageWidth, int imageHeight, int windowRadius) {
 		super(imageWidth, imageHeight, windowRadius);

@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.basic.impl;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Binary operations performed only along the image's edge.
@@ -24,7 +24,7 @@ import gecv.struct.image.ImageInt8;
  * @author Peter Abeles
  */
 public class BinaryEdgeOps {
-	public static void erode4(ImageInt8 input, ImageInt8 output) {
+	public static void erode4(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -58,7 +58,7 @@ public class BinaryEdgeOps {
 		}
 	}
 
-	public static void dilate4(ImageInt8 input, ImageInt8 output) {
+	public static void dilate4(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -92,7 +92,7 @@ public class BinaryEdgeOps {
 		}
 	}
 
-	public static ImageInt8 edge4(ImageInt8 input, ImageInt8 output) {
+	public static ImageUInt8 edge4(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -128,7 +128,7 @@ public class BinaryEdgeOps {
 		return output;
 	}
 
-	public static void erode8(ImageInt8 input, ImageInt8 output) {
+	public static void erode8(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -166,7 +166,7 @@ public class BinaryEdgeOps {
 		}
 	}
 
-	public static void dilate8(ImageInt8 input, ImageInt8 output) {
+	public static void dilate8(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -204,7 +204,7 @@ public class BinaryEdgeOps {
 		}
 	}
 
-	public static void edge8(ImageInt8 input, ImageInt8 output) {
+	public static void edge8(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -242,7 +242,7 @@ public class BinaryEdgeOps {
 		}
 	}
 
-	public static void removePointNoise(ImageInt8 input, ImageInt8 output) {
+	public static void removePointNoise(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -287,7 +287,7 @@ public class BinaryEdgeOps {
 	/**
 	 * If a point is inside the image true is returned if its value is not zero, otherwise true is returned.
 	 */
-	public static int get1(ImageInt8 image, int x, int y) {
+	public static int get1(ImageUInt8 image, int x, int y) {
 		if (image.isInBounds(x, y)) {
 			return image.data[image.startIndex + y * image.stride + x];
 		} else {
@@ -298,7 +298,7 @@ public class BinaryEdgeOps {
 	/**
 	 * If a point is inside the image true is returned if its value is not zero, otherwise false is returned.
 	 */
-	public static int get0(ImageInt8 image, int x, int y) {
+	public static int get0(ImageUInt8 image, int x, int y) {
 		if (image.isInBounds(x, y)) {
 			return image.data[image.startIndex + y * image.stride + x];
 		} else {

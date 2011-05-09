@@ -31,12 +31,12 @@ public class GeneralizedImageOps {
 
 	public static ImageBase<?> convert( ImageFloat32 input , Class<?> outputType )
 	{
-		if( ImageInt8.class == outputType ) {
-			ImageInt8 ret = new ImageInt8(input.width,input.height);
+		if( ImageUInt8.class == outputType ) {
+			ImageUInt8 ret = new ImageUInt8(input.width,input.height);
 			ConvertImage.convert(input,ret);
 			return ret;
-		} else if( ImageInt16.class == outputType ) {
-			ImageInt16 ret = new ImageInt16(input.width,input.height, true);
+		} else if( ImageSInt16.class == outputType ) {
+			ImageSInt16 ret = new ImageSInt16(input.width,input.height);
 			ConvertImage.convert(input,ret);
 			return ret;
 		} else if( ImageFloat32.class == outputType ) {
@@ -49,10 +49,10 @@ public class GeneralizedImageOps {
 	}
 
 	public static void randomize(ImageBase img, int min, int max, Random rand) {
-		if (img.getClass() == ImageInt8.class) {
-			BasicDrawing_I8.randomize((ImageInt8) img, rand, min, max);
-		} else if (img.getClass() == ImageInt16.class) {
-			UtilImageInt16.randomize((ImageInt16) img, rand, (short) min, (short) max);
+		if (img.getClass() == ImageUInt8.class) {
+			BasicDrawing_I8.randomize((ImageUInt8) img, rand, min, max);
+		} else if (img.getClass() == ImageSInt16.class) {
+			UtilImageInt16.randomize((ImageSInt16) img, rand, (short) min, (short) max);
 		} else if (img.getClass() == ImageFloat32.class) {
 			UtilImageFloat32.randomize((ImageFloat32) img, rand, min, max);
 		} else {
@@ -71,12 +71,12 @@ public class GeneralizedImageOps {
 	}
 
 	public static double get(ImageBase img, int x, int y) {
-		if (img instanceof ImageInt8) {
-			return ((ImageInt8) img).get(x, y);
-		} else if (img instanceof ImageInt16) {
-			return ((ImageInt16) img).get(x, y);
-		} else if (img instanceof ImageInt32) {
-			return ((ImageInt32) img).get(x, y);
+		if (img instanceof ImageUInt8) {
+			return ((ImageUInt8) img).get(x, y);
+		} else if (img instanceof ImageSInt16) {
+			return ((ImageSInt16) img).get(x, y);
+		} else if (img instanceof ImageSInt32) {
+			return ((ImageSInt32) img).get(x, y);
 		} else if (img instanceof ImageFloat32) {
 			return ((ImageFloat32) img).get(x, y);
 		} else {

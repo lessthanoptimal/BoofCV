@@ -17,8 +17,7 @@
 package gecv.alg.filter.derivative.sobel;
 
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageInteger;
 
 /**
  * <p>
@@ -38,9 +37,9 @@ public class GradientSobel_Naive {
 	/**
 	 * Computes the derivative of 'orig' along the x and y axes
 	 */
-	public static void process_I8(ImageInt8 orig,
-								  ImageInt16 derivX,
-								  ImageInt16 derivY) {
+	public static void process( ImageInteger orig,
+								ImageInteger derivX,
+								ImageInteger derivY) {
 		final int width = orig.getWidth();
 		final int height = orig.getHeight();
 
@@ -55,8 +54,8 @@ public class GradientSobel_Naive {
 				int dx = -(orig.get(x - 1, y - 1) + 2 * orig.get(x - 1, y) + orig.get(x - 1, y + 1));
 				dx += (orig.get(x + 1, y - 1) + 2 * orig.get(x + 1, y) + orig.get(x + 1, y + 1));
 
-				derivX.set(x, y, (short) dx);
-				derivY.set(x, y, (short) dy);
+				derivX.set(x, y, dx);
+				derivY.set(x, y, dy);
 			}
 		}
 	}
@@ -64,9 +63,9 @@ public class GradientSobel_Naive {
 	/**
 	 * Computes the derivative of 'orig' along the x and y axes
 	 */
-	public static void process_F32(ImageFloat32 orig,
-								   ImageFloat32 derivX,
-								   ImageFloat32 derivY) {
+	public static void process( ImageFloat32 orig,
+								ImageFloat32 derivX,
+								ImageFloat32 derivY) {
 		final int width = orig.getWidth();
 		final int height = orig.getHeight();
 

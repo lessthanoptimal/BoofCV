@@ -17,7 +17,7 @@
 package gecv.alg.filter.basic;
 
 import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import java.util.Random;
@@ -35,10 +35,10 @@ public class TestGrayImageOps {
 
 	@Test
 	public void invert() {
-		ImageInt8 input = new ImageInt8(width, height);
+		ImageUInt8 input = new ImageUInt8(width, height);
 		BasicDrawing_I8.randomize(input, rand);
 
-		ImageInt8 output = GrayImageOps.invert(input, null);
+		ImageUInt8 output = GrayImageOps.invert(input, null);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -49,10 +49,10 @@ public class TestGrayImageOps {
 
 	@Test
 	public void brighten() {
-		ImageInt8 input = new ImageInt8(width, height);
+		ImageUInt8 input = new ImageUInt8(width, height);
 		BasicDrawing_I8.fill(input, 23);
 
-		ImageInt8 output = GrayImageOps.brighten(input, 10, null);
+		ImageUInt8 output = GrayImageOps.brighten(input, 10, null);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -72,10 +72,10 @@ public class TestGrayImageOps {
 
 	@Test
 	public void stretch() {
-		ImageInt8 input = new ImageInt8(width, height);
+		ImageUInt8 input = new ImageUInt8(width, height);
 		BasicDrawing_I8.fill(input, 23);
 
-		ImageInt8 output = GrayImageOps.stretch(input, 2.5, 10, null);
+		ImageUInt8 output = GrayImageOps.stretch(input, 2.5, 10, null);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {

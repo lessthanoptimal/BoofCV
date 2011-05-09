@@ -17,9 +17,9 @@
 package gecv.alg.detect.corner.impl;
 
 import gecv.alg.detect.corner.GradientCornerIntensity;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt32;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageSInt32;
 
 
 /**
@@ -36,19 +36,19 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public abstract class SsdCorner_I16 implements GradientCornerIntensity<ImageInt16> {
+public abstract class SsdCorner_I16 implements GradientCornerIntensity<ImageSInt16> {
 
 	// input image gradient
-	protected ImageInt16 derivX;
-	protected ImageInt16 derivY;
+	protected ImageSInt16 derivX;
+	protected ImageSInt16 derivY;
 
 	// radius of detected features
 	private int radius;
 
 	// temporary storage for intensity derivatives summations
-	private ImageInt32 horizXX;
-	private ImageInt32 horizXY;
-	private ImageInt32 horizYY;
+	private ImageSInt32 horizXX;
+	private ImageSInt32 horizXY;
+	private ImageSInt32 horizYY;
 
 	// temporary storage for convolution along in the vertical axis.
 	private int tempXX[];
@@ -67,9 +67,9 @@ public abstract class SsdCorner_I16 implements GradientCornerIntensity<ImageInt1
 	public SsdCorner_I16(int imageWidth, int imageHeight, int windowRadius) {
 		this.radius = windowRadius;
 
-		horizXX = new ImageInt32(imageWidth, imageHeight);
-		horizYY = new ImageInt32(imageWidth, imageHeight);
-		horizXY = new ImageInt32(imageWidth, imageHeight);
+		horizXX = new ImageSInt32(imageWidth, imageHeight);
+		horizYY = new ImageSInt32(imageWidth, imageHeight);
+		horizXY = new ImageSInt32(imageWidth, imageHeight);
 
 		featureIntensity = new ImageFloat32(imageWidth, imageHeight);
 
@@ -95,7 +95,7 @@ public abstract class SsdCorner_I16 implements GradientCornerIntensity<ImageInt1
 	protected abstract float computeIntensity();
 
 	@Override
-	public void process(ImageInt16 derivX, ImageInt16 derivY) {
+	public void process(ImageSInt16 derivX, ImageSInt16 derivY) {
 		// adjust for the size of the input if possible
 		if (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {
 			throw new IllegalArgumentException("Unexpected input size");

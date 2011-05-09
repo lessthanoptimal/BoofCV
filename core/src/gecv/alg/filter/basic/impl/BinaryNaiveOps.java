@@ -17,7 +17,7 @@
 package gecv.alg.filter.basic.impl;
 
 import gecv.alg.InputSanityCheck;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Simple unoptimized implementations of binary operations.
@@ -26,7 +26,7 @@ import gecv.struct.image.ImageInt8;
  * @see gecv.alg.filter.basic.BinaryImageOps
  */
 public class BinaryNaiveOps {
-	public static void erode4(ImageInt8 input, ImageInt8 output) {
+	public static void erode4(ImageUInt8 input, ImageUInt8 output) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				if (input.get(x, y) != 0 &&
@@ -39,7 +39,7 @@ public class BinaryNaiveOps {
 		}
 	}
 
-	public static void dilate4(ImageInt8 input, ImageInt8 output) {
+	public static void dilate4(ImageUInt8 input, ImageUInt8 output) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				if (input.get(x, y) != 0 || getF(input, x - 1, y) || getF(input, x + 1, y) ||
@@ -51,7 +51,7 @@ public class BinaryNaiveOps {
 		}
 	}
 
-	public static void edge4(ImageInt8 input, ImageInt8 output) {
+	public static void edge4(ImageUInt8 input, ImageUInt8 output) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				if (getT(input, x - 1, y) && getT(input, x + 1, y) &&
@@ -63,7 +63,7 @@ public class BinaryNaiveOps {
 		}
 	}
 
-	public static void erode8(ImageInt8 input, ImageInt8 output) {
+	public static void erode8(ImageUInt8 input, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		for (int y = 0; y < input.height; y++) {
@@ -80,7 +80,7 @@ public class BinaryNaiveOps {
 		}
 	}
 
-	public static void dilate8(ImageInt8 input, ImageInt8 output) {
+	public static void dilate8(ImageUInt8 input, ImageUInt8 output) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				if (input.get(x, y) != 0 ||
@@ -95,7 +95,7 @@ public class BinaryNaiveOps {
 		}
 	}
 
-	public static void edge8(ImageInt8 input, ImageInt8 output) {
+	public static void edge8(ImageUInt8 input, ImageUInt8 output) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				if (getT(input, x - 1, y) && getT(input, x + 1, y) &&
@@ -118,7 +118,7 @@ public class BinaryNaiveOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static void removePointNoise(ImageInt8 input, ImageInt8 output) {
+	public static void removePointNoise(ImageUInt8 input, ImageUInt8 output) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				int num = 0;
@@ -144,7 +144,7 @@ public class BinaryNaiveOps {
 	/**
 	 * If a point is inside the image true is returned if its value is not zero, otherwise true is returned.
 	 */
-	public static boolean getT(ImageInt8 image, int x, int y) {
+	public static boolean getT(ImageUInt8 image, int x, int y) {
 		if (image.isInBounds(x, y)) {
 			return image.get(x, y) != 0;
 		} else {
@@ -155,7 +155,7 @@ public class BinaryNaiveOps {
 	/**
 	 * If a point is inside the image true is returned if its value is not zero, otherwise false is returned.
 	 */
-	public static boolean getF(ImageInt8 image, int x, int y) {
+	public static boolean getF(ImageUInt8 image, int x, int y) {
 		if (image.isInBounds(x, y)) {
 			return image.get(x, y) != 0;
 		} else {

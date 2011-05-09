@@ -20,8 +20,8 @@ import gecv.alg.filter.convolve.impl.ConvolveImageStandardSparse;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Performs a convolution around a single pixel only.  The whole kernel must be contained inside the image, border cases are not
@@ -60,7 +60,7 @@ public class ConvolveImageSparse {
 	 * @return The pixel's value after the convolution
 	 */
 	public static float convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								  ImageInt8 input, int c_x , int c_y, int storage[] )
+								  ImageUInt8 input, int c_x , int c_y, int storage[] )
 	{
 		if( input.isSigned() )
 			throw new IllegalArgumentException("Input image must be unsigned");
@@ -80,7 +80,7 @@ public class ConvolveImageSparse {
 	 * @return The pixel's value after the convolution
 	 */
 	public static float convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								  ImageInt16 input, int c_x , int c_y, int storage[] )
+								  ImageSInt16 input, int c_x , int c_y, int storage[] )
 	{
 		if( !input.isSigned() )
 			throw new IllegalArgumentException("Input image must be signed");
@@ -103,7 +103,7 @@ public class ConvolveImageSparse {
 	 * @return The pixel's value after the convolution
 	 */
 	public static float convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								  ImageInt8 input, int c_x , int c_y, int storage[] ,
+								  ImageUInt8 input, int c_x , int c_y, int storage[] ,
 								  int divisorHorizontal, int divisorVertical)
 	{
 		if( input.isSigned() )
@@ -127,7 +127,7 @@ public class ConvolveImageSparse {
 	 * @return The pixel's value after the convolution
 	 */
 	public static float convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								  ImageInt16 input, int c_x , int c_y, int storage[] ,
+								  ImageSInt16 input, int c_x , int c_y, int storage[] ,
 								  int divisorHorizontal, int divisorVertical)
 	{
 		if( !input.isSigned() ) 

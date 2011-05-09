@@ -18,8 +18,8 @@ package gecv.alg.filter.convolve.impl;
 
 import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -37,16 +37,16 @@ public class TestConvolveBox_I8_I16 {
 
 	@Test
 	public void horizontal() {
-		ImageInt8 input = new ImageInt8(width, height);
-		ImageInt16 outputA = new ImageInt16(width, height, true);
-		ImageInt16 outputB = new ImageInt16(width, height, true);
+		ImageUInt8 input = new ImageUInt8(width, height);
+		ImageSInt16 outputA = new ImageSInt16(width, height);
+		ImageSInt16 outputB = new ImageSInt16(width, height);
 
 		BasicDrawing_I8.randomize(input, rand);
 
 		GecvTesting.checkSubImage(this, "horizontal", true, input, outputA, outputB);
 	}
 
-	public void horizontal(ImageInt8 input, ImageInt16 outputA, ImageInt16 outputB) {
+	public void horizontal(ImageUInt8 input, ImageSInt16 outputA, ImageSInt16 outputB) {
 		for (int border = 0; border < 2; border++) {
 			for (int i = 1; i <= 2; i++) {
 				Kernel1D_I32 kernel = new Kernel1D_I32(2 * i + 1);
@@ -64,16 +64,16 @@ public class TestConvolveBox_I8_I16 {
 
 	@Test
 	public void vertical() {
-		ImageInt8 input = new ImageInt8(width, height);
-		ImageInt16 outputA = new ImageInt16(width, height, true);
-		ImageInt16 outputB = new ImageInt16(width, height, true);
+		ImageUInt8 input = new ImageUInt8(width, height);
+		ImageSInt16 outputA = new ImageSInt16(width, height);
+		ImageSInt16 outputB = new ImageSInt16(width, height);
 
 		BasicDrawing_I8.randomize(input, rand);
 
 		GecvTesting.checkSubImage(this, "vertical", true, input, outputA, outputB);
 	}
 
-	public void vertical(ImageInt8 input, ImageInt16 outputA, ImageInt16 outputB) {
+	public void vertical(ImageUInt8 input, ImageSInt16 outputA, ImageSInt16 outputB) {
 		for (int border = 0; border < 2; border++) {
 			for (int i = 1; i <= 2; i++) {
 				Kernel1D_I32 kernel = new Kernel1D_I32(2 * i + 1);

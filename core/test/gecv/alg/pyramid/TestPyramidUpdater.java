@@ -16,7 +16,7 @@
 
 package gecv.alg.pyramid;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import gecv.struct.pyramid.ImagePyramid_I8;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ public class TestPyramidUpdater {
 	@Test
 	public void update() {
 		// positive case
-		ImageInt8 input = new ImageInt8(width, height);
+		ImageUInt8 input = new ImageUInt8(width, height);
 		ImagePyramid_I8 pyramid = new ImagePyramid_I8(width, height, true);
 
 		Dummy updater = new Dummy();
@@ -49,18 +49,18 @@ public class TestPyramidUpdater {
 
 		// negative case
 		try {
-			input = new ImageInt8(width + 1, height + 1);
+			input = new ImageUInt8(width + 1, height + 1);
 			updater.update(input);
 			fail("Should have failed");
 		} catch (IllegalArgumentException e) {
 		}
 	}
 
-	protected static class Dummy extends PyramidUpdater<ImageInt8> {
+	protected static class Dummy extends PyramidUpdater<ImageUInt8> {
 		public int numCalled;
 
 		@Override
-		public void _update(ImageInt8 original) {
+		public void _update(ImageUInt8 original) {
 			numCalled++;
 		}
 	}

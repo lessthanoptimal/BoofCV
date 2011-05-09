@@ -18,10 +18,7 @@ package gecv.alg.filter.blur.impl;
 
 import gecv.alg.filter.blur.MedianImageFilter;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
 import pja.sorting.QuickSelectF;
-
-import java.util.Arrays;
 
 /**
  * Median filter which uses Arrays.sort() to sort its inputs.  It is naive because the sort operation is started

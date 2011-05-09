@@ -18,8 +18,8 @@ package gecv.alg.detect.corner;
 
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 import static org.junit.Assert.assertTrue;
 
@@ -33,11 +33,11 @@ public abstract class GenericCornerIntensityTests {
 	protected int width = 20;
 	protected int height = 21;
 
-	protected ImageInt8 imageI = new ImageInt8(width,height);
+	protected ImageUInt8 imageI = new ImageUInt8(width,height);
 	protected ImageFloat32 imageF = new ImageFloat32(width,height);
 
-	protected ImageInt16 derivX_I16 = new ImageInt16(width,height, true);
-	protected ImageInt16 derivY_I16 = new ImageInt16(width,height, true);
+	protected ImageSInt16 derivX_I16 = new ImageSInt16(width,height);
+	protected ImageSInt16 derivY_I16 = new ImageSInt16(width,height);
 
 	protected ImageFloat32 derivX_F32 = new ImageFloat32(width,height);
 	protected ImageFloat32 derivY_F32 = new ImageFloat32(width,height);
@@ -70,8 +70,8 @@ public abstract class GenericCornerIntensityTests {
 	}
 
 	private float getResponse() {
-		GradientSobel.process_F32(imageF,derivX_F32,derivY_F32);
-		GradientSobel.process_I8(imageI,derivX_I16,derivY_I16);
+		GradientSobel.process(imageF,derivX_F32,derivY_F32);
+		GradientSobel.process(imageI,derivX_I16,derivY_I16);
 
 		ImageFloat32 a = computeIntensity();
 
@@ -79,15 +79,15 @@ public abstract class GenericCornerIntensityTests {
 	}
 
 	private float getResponseAway() {
-		GradientSobel.process_F32(imageF,derivX_F32,derivY_F32);
-		GradientSobel.process_I8(imageI,derivX_I16,derivY_I16);
+		GradientSobel.process(imageF,derivX_F32,derivY_F32);
+		GradientSobel.process(imageI,derivX_I16,derivY_I16);
 
 		ImageFloat32 a = computeIntensity();
 
 		return a.get(2,2);
 	}
 
-	public ImageInt8 createUniformI8() {
+	public ImageUInt8 createUniformI8() {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				imageI.set(j,i,10);
@@ -107,7 +107,7 @@ public abstract class GenericCornerIntensityTests {
 		return imageF;
 	}
 
-	public ImageInt8 createCornerI8() {
+	public ImageUInt8 createCornerI8() {
 
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {

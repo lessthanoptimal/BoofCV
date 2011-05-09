@@ -19,8 +19,8 @@ package gecv.core.image;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Benchmarks related to functions inside of ConvertImage
@@ -32,10 +32,10 @@ public class BenchmarkConvertImage {
 	static int imgHeight = 480;
 
 	static ImageFloat32 imgFloat32;
-	static ImageInt8 imgUInt8;
-	static ImageInt16 imgUInt16;
-	static ImageInt8 imgSInt8;
-	static ImageInt16 imgSInt16;
+	static ImageUInt8 imgUInt8;
+	static ImageSInt16 imgUInt16;
+	static ImageUInt8 imgSInt8;
+	static ImageSInt16 imgSInt16;
 
 	public static class Float32toInt8 extends PerformerBase
 	{
@@ -47,9 +47,9 @@ public class BenchmarkConvertImage {
 
 	public static class Int8ToFloat32 extends PerformerBase
 	{
-		ImageInt8 img;
+		ImageUInt8 img;
 
-		public Int8ToFloat32(ImageInt8 img) {
+		public Int8ToFloat32(ImageUInt8 img) {
 			this.img = img;
 		}
 
@@ -61,9 +61,9 @@ public class BenchmarkConvertImage {
 
 	public static class Int16ToFloat32 extends PerformerBase
 	{
-		ImageInt16 img;
+		ImageSInt16 img;
 
-		public Int16ToFloat32(ImageInt16 img) {
+		public Int16ToFloat32(ImageSInt16 img) {
 			this.img = img;
 		}
 
@@ -75,9 +75,9 @@ public class BenchmarkConvertImage {
 
 	public static class Int16ToInt8 extends PerformerBase
 	{
-		ImageInt16 img;
+		ImageSInt16 img;
 
-		public Int16ToInt8(ImageInt16 img) {
+		public Int16ToInt8(ImageSInt16 img) {
 			this.img = img;
 		}
 
@@ -88,10 +88,10 @@ public class BenchmarkConvertImage {
 	}
 
 	public static void main( String args[] ) {
-		imgSInt8 = new ImageInt8(imgWidth,imgHeight,true);
-		imgSInt16 = new ImageInt16(imgWidth,imgHeight, true);
-		imgUInt8 = new ImageInt8(imgWidth,imgHeight,false);
-		imgUInt16 = new ImageInt16(imgWidth,imgHeight, false);
+		imgSInt8 = new ImageUInt8(imgWidth,imgHeight);
+		imgSInt16 = new ImageSInt16(imgWidth,imgHeight);
+		imgUInt8 = new ImageUInt8(imgWidth,imgHeight);
+		imgUInt16 = new ImageSInt16(imgWidth,imgHeight);
 		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
 
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");

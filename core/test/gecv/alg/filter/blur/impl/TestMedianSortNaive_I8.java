@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.blur.impl;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -29,19 +29,19 @@ public class TestMedianSortNaive_I8 {
 
 	@Test
 	public void trivialTest() {
-		ImageInt8 image = new ImageInt8(4,4);
+		ImageUInt8 image = new ImageUInt8(4,4);
 		for( int i = 0; i < image.width; i++ ) {
 			for( int j = 0; j < image.height; j++ ) {
 				image.set(j,i,i*image.width+j);
 			}
 		}
 
-		ImageInt8 found = new ImageInt8(4,4);
+		ImageUInt8 found = new ImageUInt8(4,4);
 
 		GecvTesting.checkSubImage(this, "trivialTest", true, image, found);
 	}
 
-	public void trivialTest(ImageInt8 image, ImageInt8 found) {
+	public void trivialTest(ImageUInt8 image, ImageUInt8 found) {
 		MedianSortNaive_I8 alg = new MedianSortNaive_I8(1);
 
 		alg.process(image,found);

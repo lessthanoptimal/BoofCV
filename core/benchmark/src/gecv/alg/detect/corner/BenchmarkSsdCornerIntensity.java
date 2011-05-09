@@ -22,7 +22,7 @@ import gecv.alg.detect.corner.impl.*;
 import gecv.core.image.UtilImageFloat32;
 import gecv.core.image.UtilImageInt16;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageSInt16;
 
 import java.util.Random;
 
@@ -39,8 +39,8 @@ public class BenchmarkSsdCornerIntensity {
 
 	static ImageFloat32 derivX_F32;
 	static ImageFloat32 derivY_F32;
-	static ImageInt16 derivX_I16;
-	static ImageInt16 derivY_I16;
+	static ImageSInt16 derivX_I16;
+	static ImageSInt16 derivY_I16;
 
 	static Random rand = new Random(234);
 
@@ -111,8 +111,8 @@ public class BenchmarkSsdCornerIntensity {
 	public static void main(String args[]) {
 		derivX_F32 = new ImageFloat32(imgWidth, imgHeight);
 		derivY_F32 = new ImageFloat32(imgWidth, imgHeight);
-		derivX_I16 = new ImageInt16(imgWidth, imgHeight, true);
-		derivY_I16 = new ImageInt16(imgWidth, imgHeight, true);
+		derivX_I16 = new ImageSInt16(imgWidth, imgHeight);
+		derivY_I16 = new ImageSInt16(imgWidth, imgHeight);
 
 		UtilImageFloat32.randomize(derivX_F32, rand, 0, 255);
 		UtilImageFloat32.randomize(derivY_F32, rand, 0, 255);

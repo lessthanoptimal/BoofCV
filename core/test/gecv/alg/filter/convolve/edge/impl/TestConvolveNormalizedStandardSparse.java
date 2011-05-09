@@ -24,8 +24,8 @@ import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -93,13 +93,13 @@ public class TestConvolveNormalizedStandardSparse {
 	}
 
 	private void checkMethod(Method method, int width, int height, int kernelRadius, Random rand) {
-		ImageInt8 seedImage = new ImageInt8(width,height);
+		ImageUInt8 seedImage = new ImageUInt8(width,height);
 		BasicDrawing_I8.randomize(seedImage,rand,0,255);
 
 		// creates a floating point image with integer elements
 		ImageFloat32 floatImage = new ImageFloat32(width,height);
 		ConvertImage.convert(seedImage,floatImage);
-		ImageInt16 shortImage = new ImageInt16(width,height, true);
+		ImageSInt16 shortImage = new ImageSInt16(width,height);
 		ConvertImage.convert(seedImage,shortImage);
 
 		kernelI32 = KernelFactory.gaussian1D_I32(kernelRadius);
@@ -113,7 +113,7 @@ public class TestConvolveNormalizedStandardSparse {
 		if( imageType == ImageFloat32.class) {
 			inputImage = floatImage;
 			expectedOutput = computeExpected(floatImage);
-		} else if( imageType == ImageInt8.class ){
+		} else if( imageType == ImageUInt8.class ){
 			inputImage = seedImage;
 			expectedOutput = computeExpected(seedImage);
 		} else {
@@ -148,9 +148,9 @@ public class TestConvolveNormalizedStandardSparse {
 		return temp2.get(targetX,targetY);
 	}
 
-	private float computeExpected( ImageInt8 image ) {
-		ImageInt8 temp = new ImageInt8(image.width,image.height);
-		ImageInt8 temp2 = new ImageInt8(image.width,image.height);
+	private float computeExpected( ImageUInt8 image ) {
+		ImageUInt8 temp = new ImageUInt8(image.width,image.height);
+		ImageUInt8 temp2 = new ImageUInt8(image.width,image.height);
 
 		ConvolveNormalized.horizontal(kernelI32,image,temp);
 		ConvolveNormalized.vertical(kernelI32,temp,temp2);
@@ -158,9 +158,9 @@ public class TestConvolveNormalizedStandardSparse {
 		return temp2.get(targetX,targetY);
 	}
 
-	private float computeExpected( ImageInt16 image ) {
-		ImageInt16 temp = new ImageInt16(image.width,image.height, true);
-		ImageInt16 temp2 = new ImageInt16(image.width,image.height, true);
+	private float computeExpected( ImageSInt16 image ) {
+		ImageSInt16 temp = new ImageSInt16(image.width,image.height);
+		ImageSInt16 temp2 = new ImageSInt16(image.width,image.height);
 
 		ConvolveNormalized.horizontal(kernelI32,image,temp);
 		ConvolveNormalized.vertical(kernelI32,temp,temp2);

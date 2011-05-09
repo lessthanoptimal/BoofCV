@@ -20,7 +20,7 @@ import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.basic.impl.BinaryEdgeOps;
 import gecv.alg.filter.basic.impl.BinaryInnerOps;
 import gecv.alg.filter.basic.impl.BinaryNaiveOps;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -35,7 +35,7 @@ import gecv.struct.image.ImageInt8;
  * @author Peter Abeles
  */
 /*
- * DESIGN NOTE: 8-bit integer images ({@link ImageInt8}) are used instead of images composed of boolean values because
+ * DESIGN NOTE: 8-bit integer images ({@link ImageUInt8}) are used instead of images composed of boolean values because
  * there is no performance advantage.  According to the virtual machines specification binary arrays are stored as
  * byte arrays with 1 representing true and 0 representing false.
 
@@ -54,7 +54,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 erode4(ImageInt8 input, ImageInt8 output) {
+	public static ImageUInt8 erode4(ImageUInt8 input, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.erode4(input, output);
@@ -73,7 +73,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 dilate4(ImageInt8 input, ImageInt8 output) {
+	public static ImageUInt8 dilate4(ImageUInt8 input, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.dilate4(input, output);
@@ -96,7 +96,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 edge4(ImageInt8 input, ImageInt8 output) {
+	public static ImageUInt8 edge4(ImageUInt8 input, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryNaiveOps.edge4(input, output);
@@ -116,7 +116,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 erode8(ImageInt8 input, ImageInt8 output) {
+	public static ImageUInt8 erode8(ImageUInt8 input, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.erode8(input, output);
@@ -135,7 +135,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 dilate8(ImageInt8 input, ImageInt8 output) {
+	public static ImageUInt8 dilate8(ImageUInt8 input, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.dilate8(input, output);
@@ -158,7 +158,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 edge8(ImageInt8 input, ImageInt8 output) {
+	public static ImageUInt8 edge8(ImageUInt8 input, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.edge8(input, output);
@@ -176,7 +176,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageInt8 removePointNoise(ImageInt8 input, ImageInt8 output) {
+	public static ImageUInt8 removePointNoise(ImageUInt8 input, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.removePointNoise(input, output);

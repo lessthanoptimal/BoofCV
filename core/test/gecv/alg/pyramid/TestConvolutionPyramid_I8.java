@@ -20,7 +20,7 @@ import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.blur.BlurImageOps;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import gecv.struct.pyramid.ImagePyramid_I8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class TestConvolutionPyramid_I8 {
 	 */
 	@Test
 	public void saveOriginalReference() {
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		BasicDrawing_I8.randomize(img, rand);
 
 		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(3);
@@ -77,17 +77,17 @@ public class TestConvolutionPyramid_I8 {
 	 */
 	@Test
 	public void _update() {
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		BasicDrawing_I8.randomize(img, rand);
 
 		GecvTesting.checkSubImage(this, "_update", true, img);
 	}
 
-	public void _update(ImageInt8 img) {
+	public void _update(ImageUInt8 img) {
 		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(3);
-		ImageInt8 convImg = new ImageInt8(width, height);
+		ImageUInt8 convImg = new ImageUInt8(width, height);
 
-		BlurImageOps.kernel(img, convImg, kernel, new ImageInt8(width, height));
+		BlurImageOps.kernel(img, convImg, kernel, new ImageUInt8(width, height));
 
 		ImagePyramid_I8 pyramid = new ImagePyramid_I8(width, height, false);
 		pyramid.setScaling(1, 2, 2);

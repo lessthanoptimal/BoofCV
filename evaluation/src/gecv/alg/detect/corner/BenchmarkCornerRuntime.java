@@ -27,8 +27,8 @@ import gecv.abst.detect.extract.WrapperNonMaxCandidate;
 import gecv.alg.detect.extract.NonMaxCornerCandidateExtractor;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Benchmark which scores the whole corner detection processing stack.
@@ -44,9 +44,9 @@ public class BenchmarkCornerRuntime {
 	static ImageFloat32 image_F32;
 	static ImageFloat32 derivX_F32;
 	static ImageFloat32 derivY_F32;
-	static ImageInt8 image_I8;
-	static ImageInt16 derivX_I16;
-	static ImageInt16 derivY_I16;
+	static ImageUInt8 image_I8;
+	static ImageSInt16 derivX_I16;
+	static ImageSInt16 derivY_I16;
 
 	public static class Detector_F32 extends PerformerBase {
 		GeneralCornerDetector<ImageFloat32,ImageFloat32> alg;
@@ -110,8 +110,8 @@ public class BenchmarkCornerRuntime {
 
 		derivX_F32 = new ImageFloat32(imgWidth, imgHeight);
 		derivY_F32 = new ImageFloat32(imgWidth, imgHeight);
-		derivX_I16 = new ImageInt16(imgWidth, imgHeight, true);
-		derivY_I16 = new ImageInt16(imgWidth, imgHeight, true);
+		derivX_I16 = new ImageSInt16(imgWidth, imgHeight);
+		derivY_I16 = new ImageSInt16(imgWidth, imgHeight);
 
 		FileImageSequence sequence = new FileImageSequence("data/indoors01.jpg", "data/outdoors01.jpg", "data/particles01.jpg");
 
@@ -131,8 +131,8 @@ public class BenchmarkCornerRuntime {
 			derivX_I16.reshape(imgWidth, imgHeight);
 			derivY_I16.reshape(imgWidth, imgHeight);
 
-			GradientSobel.process_F32(image_F32, derivX_F32, derivY_F32);
-			GradientSobel.process_I8(image_I8, derivX_I16, derivY_I16);
+			GradientSobel.process(image_F32, derivX_F32, derivY_F32);
+			GradientSobel.process(image_I8, derivX_I16, derivY_I16);
 
 
 			benchmark(createKlt_F32(), "KLT F32");

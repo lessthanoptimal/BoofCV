@@ -16,7 +16,7 @@
 
 package gecv.struct.pyramid;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -64,19 +64,19 @@ public class TestImagePyramid {
 	}
 
 
-	protected static class Dummy extends ImagePyramid<ImageInt8> {
+	protected static class Dummy extends ImagePyramid<ImageUInt8> {
 		public Dummy(int topWidth, int topHeight, boolean saveOriginalReference) {
 			super(topWidth, topHeight, saveOriginalReference);
 		}
 
 		@Override
-		protected ImageInt8 createImage(int width, int height) {
-			return new ImageInt8(width, height);
+		protected ImageUInt8 createImage(int width, int height) {
+			return new ImageUInt8(width, height);
 		}
 
 		@Override
-		public Class<ImageInt8> getImageType() {
-			return ImageInt8.class;
+		public Class<ImageUInt8> getImageType() {
+			return ImageUInt8.class;
 		}
 	}
 }

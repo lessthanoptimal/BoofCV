@@ -18,8 +18,8 @@ package gecv.core.image;
 
 import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -42,18 +42,18 @@ public class TestConvertImage {
 		ImageFloat32 conv = new ImageFloat32(imgWidth, imgHeight);
 
 		// test it with a signed image
-		ImageInt8 orig = new ImageInt8(imgWidth, imgHeight, true);
+		ImageUInt8 orig = new ImageUInt8(imgWidth, imgHeight);
 		BasicDrawing_I8.randomize(orig, rand);
 
 		GecvTesting.checkSubImage(this, "convert_int8_float32", true, orig, conv);
 
 		// test it with an unsigned image
-		orig = new ImageInt8(imgWidth, imgHeight, false);
+		orig = new ImageUInt8(imgWidth, imgHeight);
 		BasicDrawing_I8.randomize(orig, rand);
 		GecvTesting.checkSubImage(this, "convert_int8_float32", true, orig, conv);
 	}
 
-	public void convert_int8_float32(ImageInt8 orig, ImageFloat32 conv) {
+	public void convert_int8_float32(ImageUInt8 orig, ImageFloat32 conv) {
 		ConvertImage.convert(orig, conv);
 
 		int numPositive = 0;
@@ -81,7 +81,7 @@ public class TestConvertImage {
 	@Test
 	public void convert_int16_float32() {
 		// test it against a signed image
-		ImageInt16 orig = new ImageInt16(imgWidth, imgHeight, true);
+		ImageSInt16 orig = new ImageSInt16(imgWidth, imgHeight);
 		UtilImageInt16.randomize(orig, rand, -20, 20);
 
 		ImageFloat32 conv = new ImageFloat32(imgWidth, imgHeight);
@@ -89,12 +89,12 @@ public class TestConvertImage {
 		GecvTesting.checkSubImage(this, "convert_int16_float32", true, orig, conv);
 
 		// test it against an unsigned image
-		orig = new ImageInt16(imgWidth, imgHeight, false);
+		orig = new ImageSInt16(imgWidth, imgHeight);
 		UtilImageInt16.randomize(orig, rand, 0, 40);
 		GecvTesting.checkSubImage(this, "convert_int16_float32", true, orig, conv);
 	}
 
-	public void convert_int16_float32(ImageInt16 orig, ImageFloat32 conv) {
+	public void convert_int16_float32(ImageSInt16 orig, ImageFloat32 conv) {
 		ConvertImage.convert(orig, conv);
 
 		int numPositive = 0;
@@ -122,20 +122,20 @@ public class TestConvertImage {
 	@Test
 	public void convert_int16_int8() {
 		// test it against a signed image
-		ImageInt16 orig = new ImageInt16(imgWidth, imgHeight, true);
+		ImageSInt16 orig = new ImageSInt16(imgWidth, imgHeight);
 		UtilImageInt16.randomize(orig, rand, -20, 20);
 
-		ImageInt8 conv = new ImageInt8(imgWidth, imgHeight,true);
+		ImageUInt8 conv = new ImageUInt8(imgWidth, imgHeight);
 
 		GecvTesting.checkSubImage(this, "convert_int16_int8", true, orig, conv);
 
 		// test it against an unsigned image
-		orig = new ImageInt16(imgWidth, imgHeight, false);
+		orig = new ImageSInt16(imgWidth, imgHeight);
 		UtilImageInt16.randomize(orig, rand, 0, 40);
 		GecvTesting.checkSubImage(this, "convert_int16_int8", true, orig, conv);
 	}
 
-	public void convert_int16_int8(ImageInt16 orig, ImageInt8 conv) {
+	public void convert_int16_int8(ImageSInt16 orig, ImageUInt8 conv) {
 		ConvertImage.convert(orig, conv);
 
 		int numPositive = 0;
@@ -165,12 +165,12 @@ public class TestConvertImage {
 		ImageFloat32 orig = new ImageFloat32(imgWidth, imgHeight);
 		UtilImageFloat32.randomize(orig, rand, -100, 100);
 
-		ImageInt8 conv = new ImageInt8(imgWidth, imgHeight,true);
+		ImageUInt8 conv = new ImageUInt8(imgWidth, imgHeight);
 
 		GecvTesting.checkSubImage(this, "convert_float32_int8", true, orig, conv);
 	}
 
-	public void convert_float32_int8(ImageFloat32 orig, ImageInt8 conv) {
+	public void convert_float32_int8(ImageFloat32 orig, ImageUInt8 conv) {
 		ConvertImage.convert(orig, conv);
 
 		// quick sanity check to make sure randomize worked
@@ -191,12 +191,12 @@ public class TestConvertImage {
 		ImageFloat32 orig = new ImageFloat32(imgWidth, imgHeight);
 		UtilImageFloat32.randomize(orig, rand, -100, 100);
 
-		ImageInt16 conv = new ImageInt16(imgWidth, imgHeight, true);
+		ImageSInt16 conv = new ImageSInt16(imgWidth, imgHeight);
 
 		GecvTesting.checkSubImage(this, "convert_float32_int16", true, orig, conv);
 	}
 
-	public void convert_float32_int16(ImageFloat32 orig, ImageInt16 conv) {
+	public void convert_float32_int16(ImageFloat32 orig, ImageSInt16 conv) {
 		ConvertImage.convert(orig, conv);
 
 		// quick sanity check to make sure randomize worked

@@ -19,8 +19,8 @@ package gecv.alg.filter.convolve.edge.impl;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -82,7 +82,7 @@ public class ConvolveNormalizedStandardSparse {
 	}
 
 	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								ImageInt8 input, int c_x , int c_y, int storage[] )
+								ImageUInt8 input, int c_x , int c_y, int storage[] )
 	{
 		// convolve horizontally first
 		int width = horizontal.getWidth();
@@ -127,7 +127,7 @@ public class ConvolveNormalizedStandardSparse {
 	}
 
 	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								ImageInt16 input, int c_x , int c_y, int storage[] )
+								ImageSInt16 input, int c_x , int c_y, int storage[] )
 	{
 		// convolve horizontally first
 		int width = horizontal.getWidth();

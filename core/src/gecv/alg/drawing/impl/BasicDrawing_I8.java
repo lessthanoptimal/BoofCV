@@ -16,12 +16,12 @@
 
 package gecv.alg.drawing.impl;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 import java.util.Random;
 
 /**
- * Basic drawing operations for {@link ImageInt8}.
+ * Basic drawing operations for {@link gecv.struct.image.ImageUInt8}.
  *
  * @see gecv.alg.drawing.BasicDrawing
  *
@@ -29,7 +29,7 @@ import java.util.Random;
  */
 public class BasicDrawing_I8 {
 
-	public static void addNoise(ImageInt8 img, Random rand , int min , int max) {
+	public static void addNoise(ImageUInt8 img, Random rand , int min , int max) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -49,7 +49,7 @@ public class BasicDrawing_I8 {
 		}
 	}
 
-	public static void fill(ImageInt8 img, int value) {
+	public static void fill(ImageUInt8 img, int value) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -63,7 +63,7 @@ public class BasicDrawing_I8 {
 		}
 	}
 
-	public static void rectangle( ImageInt8 img , int value , int x0 , int y0 , int x1 , int y1 ) {
+	public static void rectangle( ImageUInt8 img , int value , int x0 , int y0 , int x1 , int y1 ) {
 		for( int y = y0; y < y1; y++ ) {
 			for( int x = x0; x < x1; x++ ) {
 				img.set(x,y,value);
@@ -77,7 +77,7 @@ public class BasicDrawing_I8 {
 	 * @param img  An image.
 	 * @param rand The value that the image is being filled with.
 	 */
-	public static void randomize(ImageInt8 img, Random rand) {
+	public static void randomize(ImageUInt8 img, Random rand) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -92,7 +92,7 @@ public class BasicDrawing_I8 {
 		}
 	}
 
-	public static void randomize(ImageInt8 img, Random rand, int min, int max) {
+	public static void randomize(ImageUInt8 img, Random rand, int min, int max) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 

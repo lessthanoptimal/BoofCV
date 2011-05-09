@@ -14,21 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.struct.image;
+package gecv.alg.drawing.impl;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageInt8 extends StandardImageIntegerTests {
+public class TestPixelMath_F32 {
 
-
-	@Override
-	public ImageBase createImage(int width, int height) {
-		return new ImageInt8(width, height);
-	}
-
-	@Override
-	public Number randomNumber() {
-		return (byte)rand.nextInt(255);
+	@Test
+	public void implement() {
+		fail("implement");
 	}
 }

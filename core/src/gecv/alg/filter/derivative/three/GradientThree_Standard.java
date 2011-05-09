@@ -17,8 +17,8 @@
 package gecv.alg.filter.derivative.three;
 
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 
 /**
@@ -60,9 +60,9 @@ public class GradientThree_Standard {
 	/**
 	 * Computes the derivative along the x and y axes
 	 */
-	public static void deriv_I8(ImageInt8 orig,
-								ImageInt16 derivX,
-								ImageInt16 derivY) {
+	public static void deriv_I8(ImageUInt8 orig,
+								ImageSInt16 derivX,
+								ImageSInt16 derivY) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -133,8 +133,8 @@ public class GradientThree_Standard {
 	/**
 	 * Computes the derivative along the x axis
 	 */
-	public static void derivX_I8(ImageInt8 orig,
-								 ImageInt16 derivX) {
+	public static void derivX_I8(ImageUInt8 orig,
+								 ImageSInt16 derivX) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;
 
@@ -156,8 +156,8 @@ public class GradientThree_Standard {
 	/**
 	 * Computes the derivative along the y axis
 	 */
-	public static void derivY_I8(ImageInt8 orig,
-								 ImageInt16 derivY) {
+	public static void derivY_I8(ImageUInt8 orig,
+								 ImageSInt16 derivY) {
 		final byte[] data = orig.data;
 		final short[] imgY = derivY.data;
 

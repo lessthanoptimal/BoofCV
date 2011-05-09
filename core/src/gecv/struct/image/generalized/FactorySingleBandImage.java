@@ -26,21 +26,21 @@ import gecv.struct.image.*;
 public class FactorySingleBandImage {
 
 	public static SingleBandImage wrap( ImageBase image ) {
-		if( image.getClass() == ImageInt8.class )
-			return new SingleBandInt8( (ImageInt8)image );
-		else if( image.getClass() == ImageInt16.class )
-			return new SingleBandInt16( (ImageInt16)image );
-		else if( image.getClass() == ImageInt32.class )
-			return new SingleBandInt32( (ImageInt32)image );
+		if( image.getClass() == ImageUInt8.class )
+			return new SingleBandInt8( (ImageUInt8)image );
+		else if( image.getClass() == ImageSInt16.class )
+			return new SingleBandInt16( (ImageSInt16)image );
+		else if( image.getClass() == ImageSInt32.class )
+			return new SingleBandInt32( (ImageSInt32)image );
 		else if( image.getClass() == ImageFloat32.class )
 			return new SingleBandFloat32( (ImageFloat32)image );
 		else
 			throw new IllegalArgumentException("Unknown image type");
 	}
 
-	public static class SingleBandInt8 extends SingleBaseInt<ImageInt8>
+	public static class SingleBandInt8 extends SingleBaseInt<ImageUInt8>
 	{
-		public SingleBandInt8(ImageInt8 image) {
+		public SingleBandInt8(ImageUInt8 image) {
 			super(image);
 		}
 
@@ -55,9 +55,9 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static class SingleBandInt16 extends SingleBaseInt<ImageInt16>
+	public static class SingleBandInt16 extends SingleBaseInt<ImageSInt16>
 	{
-		public SingleBandInt16(ImageInt16 image) {
+		public SingleBandInt16(ImageSInt16 image) {
 			super(image);
 		}
 
@@ -72,9 +72,9 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static class SingleBandInt32 extends SingleBaseInt<ImageInt32>
+	public static class SingleBandInt32 extends SingleBaseInt<ImageSInt32>
 	{
-		public SingleBandInt32(ImageInt32 image) {
+		public SingleBandInt32(ImageSInt32 image) {
 			super(image);
 		}
 

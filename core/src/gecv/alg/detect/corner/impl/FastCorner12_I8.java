@@ -20,7 +20,7 @@ import gecv.alg.detect.corner.FastCornerIntensity;
 import gecv.misc.DiscretizedCircle;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -30,7 +30,7 @@ import gecv.struct.image.ImageInt8;
  *
  * @author Peter Abeles
  */
-public class FastCorner12_I8 implements FastCornerIntensity<ImageInt8> {
+public class FastCorner12_I8 implements FastCornerIntensity<ImageUInt8> {
 
 	private int minCont;
 	private final static int radius = 3;
@@ -75,7 +75,7 @@ public class FastCorner12_I8 implements FastCornerIntensity<ImageInt8> {
 	}
 
 	@Override
-	public void process( ImageInt8 img ) {
+	public void process( ImageUInt8 img ) {
 		candidates.reset();
 		final byte[] data = img.data;
 

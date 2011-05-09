@@ -17,7 +17,6 @@
 package gecv.core.image;
 
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 

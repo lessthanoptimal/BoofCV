@@ -17,7 +17,7 @@
 package gecv.alg.detect.corner.impl;
 
 import gecv.alg.detect.corner.HarrisCornerIntensity;
-import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageSInt16;
 
 /**
  * <p>
@@ -26,7 +26,7 @@ import gecv.struct.image.ImageInt16;
  *
  * @author Peter Abeles
  */
-public class HarrisCorner_I16 extends SsdCorner_I16 implements HarrisCornerIntensity<ImageInt16> {
+public class HarrisCorner_I16 extends SsdCorner_I16 implements HarrisCornerIntensity<ImageSInt16> {
 
 	// tuning parameter
 	float kappa;

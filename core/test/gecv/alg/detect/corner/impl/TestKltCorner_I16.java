@@ -20,8 +20,8 @@ import gecv.alg.detect.corner.GenericCornerIntensityTests;
 import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -55,18 +55,18 @@ public class TestKltCorner_I16 {
 	 */
 	@Test
 	public void compareToNaive() {
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		BasicDrawing_I8.randomize(img, new Random(0xfeed));
 
-		ImageInt16 derivX = new ImageInt16(img.getWidth(), img.getHeight(), true);
-		ImageInt16 derivY = new ImageInt16(img.getWidth(), img.getHeight(), true);
+		ImageSInt16 derivX = new ImageSInt16(img.getWidth(), img.getHeight());
+		ImageSInt16 derivY = new ImageSInt16(img.getWidth(), img.getHeight());
 
-		GradientSobel.process_I8(img, derivX, derivY);
+		GradientSobel.process(img, derivX, derivY);
 
 		GecvTesting.checkSubImage(this, "compareToNaive", true, derivX, derivY);
 	}
 
-	public void compareToNaive(ImageInt16 derivX, ImageInt16 derivY) {
+	public void compareToNaive(ImageSInt16 derivX, ImageSInt16 derivY) {
 		SsdCornerNaive_I16 naive = new SsdCornerNaive_I16(width, height, 3);
 		naive.process(derivX, derivY);
 

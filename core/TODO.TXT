@@ -1,10 +1,12 @@
-- Add signed/unsigned flag to ImageBase?
-
 - Why is Laplacian second derivative?  Adjust its class name
 
 - GUI application for showing different image derivatives
  * derivative X and Y
  * intensity
+
+- Derivative
+ * Gaussian derivative kernel 1D
+ * put into FactoryDerivative
 
 - Edges
  * Whole image:

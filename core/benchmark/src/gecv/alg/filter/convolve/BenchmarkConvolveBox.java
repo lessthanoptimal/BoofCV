@@ -24,9 +24,9 @@ import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageSInt32;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Benchmark for different convolution operations.
@@ -42,11 +42,11 @@ public class BenchmarkConvolveBox {
 	static ImageFloat32 imgFloat32;
 	static ImageFloat32 out_F32;
 	static Kernel1D_I32 kernelI32;
-	static ImageInt8 imgInt8;
-	static ImageInt16 imgInt16;
-	static ImageInt8 out_I8;
-	static ImageInt16 out_I16;
-	static ImageInt32 out_I32;
+	static ImageUInt8 imgInt8;
+	static ImageSInt16 imgInt16;
+	static ImageUInt8 out_I8;
+	static ImageSInt16 out_I16;
+	static ImageSInt32 out_I32;
 
 	public static class Convolve_Vertical_I8_I16 extends PerformerBase
 	{
@@ -113,11 +113,11 @@ public class BenchmarkConvolveBox {
 	}
 
 	public static void main( String args[] ) {
-		imgInt8 = new ImageInt8(imgWidth,imgHeight);
-		imgInt16 = new ImageInt16(imgWidth,imgHeight, true);
-		out_I32 = new ImageInt32(imgWidth,imgHeight);
-		out_I16 = new ImageInt16(imgWidth,imgHeight, true);
-		out_I8 = new ImageInt8(imgWidth,imgHeight);
+		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
+		imgInt16 = new ImageSInt16(imgWidth,imgHeight);
+		out_I32 = new ImageSInt32(imgWidth,imgHeight);
+		out_I16 = new ImageSInt16(imgWidth,imgHeight);
+		out_I8 = new ImageUInt8(imgWidth,imgHeight);
 		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
 		out_F32 = new ImageFloat32(imgWidth,imgHeight);
 

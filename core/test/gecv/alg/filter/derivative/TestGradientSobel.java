@@ -22,8 +22,8 @@ import gecv.core.image.UtilImageFloat32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -45,25 +45,25 @@ public class TestGradientSobel {
 
 	@Test
 	public void process_I8() {
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		BasicDrawing_I8.randomize(img, rand, 0, 10);
 
-		ImageInt16 derivX = new ImageInt16(width, height, true);
-		ImageInt16 derivY = new ImageInt16(width, height, true);
+		ImageSInt16 derivX = new ImageSInt16(width, height);
+		ImageSInt16 derivY = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "process_I8", true, img, derivX, derivY);
 	}
 
-	public void process_I8(ImageInt8 img, ImageInt16 derivX, ImageInt16 derivY) {
-		GradientSobel.process_I8(img, derivX, derivY);
+	public void process_I8(ImageUInt8 img, ImageSInt16 derivX, ImageSInt16 derivY) {
+		GradientSobel.process(img, derivX, derivY);
 
 		// compare to the equivalent convolution
 		Kernel1D_I32 kernel1 = new Kernel1D_I32(3, 1, 2, 1);
 		Kernel1D_I32 kernel2 = new Kernel1D_I32(3, -1, 0, 1);
 
-		ImageInt16 temp = new ImageInt16(width, height, true);
-		ImageInt16 convX = new ImageInt16(width, height, true);
-		ImageInt16 convY = new ImageInt16(width, height, true);
+		ImageSInt16 temp = new ImageSInt16(width, height);
+		ImageSInt16 convX = new ImageSInt16(width, height);
+		ImageSInt16 convY = new ImageSInt16(width, height);
 
 		ConvolveImage.horizontal(kernel1, img, temp, true);
 		ConvolveImage.vertical(kernel2, temp, convY, true);
@@ -87,7 +87,7 @@ public class TestGradientSobel {
 	}
 
 	public void process_F32(ImageFloat32 img, ImageFloat32 derivX, ImageFloat32 derivY) {
-		GradientSobel.process_F32(img, derivX, derivY);
+		GradientSobel.process(img, derivX, derivY);
 
 		// compare to the equivalent convolution
 		Kernel1D_F32 kernel1 = new Kernel1D_F32(3, 0.25f, 0.5f, 0.25f);

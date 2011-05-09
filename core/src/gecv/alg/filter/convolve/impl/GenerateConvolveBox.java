@@ -45,8 +45,8 @@ public class GenerateConvolveBox {
 
 	public void createI8_I16() throws FileNotFoundException {
 		className = "ConvolveBox_I8_I16";
-		typeInput = "ImageInt8";
-		typeOutput = "ImageInt16";
+		typeInput = "ImageUInt8";
+		typeOutput = "ImageSInt16";
 		dataInput = "byte";
 		dataOutput = "short";
 		bitWise = "& 0xFF";
@@ -57,8 +57,8 @@ public class GenerateConvolveBox {
 
 	public void createI8_I32() throws FileNotFoundException {
 		className = "ConvolveBox_I8_I32";
-		typeInput = "ImageInt8";
-		typeOutput = "ImageInt32";
+		typeInput = "ImageUInt8";
+		typeOutput = "ImageSInt32";
 		dataInput = "byte";
 		dataOutput = "int";
 		bitWise = "& 0xFF";

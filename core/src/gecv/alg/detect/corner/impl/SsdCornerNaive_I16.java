@@ -18,7 +18,7 @@ package gecv.alg.detect.corner.impl;
 
 import gecv.alg.detect.corner.KltCornerIntensity;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageSInt16;
 
 /**
  * Naive implementation of {@link gecv.alg.detect.corner.KltCornerIntensity} which performs computations in a straight
@@ -28,7 +28,7 @@ import gecv.struct.image.ImageInt16;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class SsdCornerNaive_I16 implements KltCornerIntensity<ImageInt16> {
+public class SsdCornerNaive_I16 implements KltCornerIntensity<ImageSInt16> {
 
 	// feature's radius
 	private int radius;
@@ -55,7 +55,7 @@ public class SsdCornerNaive_I16 implements KltCornerIntensity<ImageInt16> {
 
 
 	@Override
-	public void process(ImageInt16 derivX, ImageInt16 derivY) {
+	public void process(ImageSInt16 derivX, ImageSInt16 derivY) {
 
 		final int imgHeight = derivX.getHeight();
 		final int imgWidth = derivX.getWidth();

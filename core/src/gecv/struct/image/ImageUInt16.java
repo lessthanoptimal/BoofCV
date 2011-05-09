@@ -18,14 +18,15 @@ package gecv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is an 'int'.
+ * An image where the primitive type is an unsigned 8-bit byte.  By default all operations treat elements
+ * in this image as an unsigned bytes.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImageInt32 extends ImageInteger<ImageInt32> {
+public class ImageUInt16 extends ImageInteger<ImageUInt16> {
 
-	public int data[];
+	public short data[];
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
@@ -33,11 +34,11 @@ public class ImageInt32 extends ImageInteger<ImageInt32> {
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public ImageInt32(int width, int height) {
-		super(width, height,true);
+	public ImageUInt16(int width, int height ) {
+		super(width, height);
 	}
 
-	public ImageInt32() {
+	public ImageUInt16() {
 	}
 
 	/**
@@ -52,7 +53,7 @@ public class ImageInt32 extends ImageInteger<ImageInt32> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		return data[getIndex(x, y)];
+		return data[getIndex(x, y)] & 0xFFFF;
 	}
 
 	/**
@@ -70,6 +71,12 @@ public class ImageInt32 extends ImageInteger<ImageInt32> {
 		data[getIndex(x, y)] = (short) value;
 	}
 
+
+	@Override
+	public boolean isSigned() {
+		return false;
+	}
+
 	@Override
 	protected Object _getData() {
 		return data;
@@ -77,18 +84,18 @@ public class ImageInt32 extends ImageInteger<ImageInt32> {
 
 	@Override
 	protected void _setData(Object data) {
-		this.data = (int[]) data;
+		this.data = (short[]) data;
 	}
 
 	@Override
-	public ImageInt32 _createNew(int imgWidth, int imgHeight) {
+	public ImageUInt16 _createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
-			return new ImageInt32();
-		return new ImageInt32(imgWidth, imgHeight);
+			return new ImageUInt16();
+		return new ImageUInt16(imgWidth, imgHeight);
 	}
 
 	@Override
 	protected Class<?> _getPrimitiveType() {
-		return int.class;
+		return short.class;
 	}
 }

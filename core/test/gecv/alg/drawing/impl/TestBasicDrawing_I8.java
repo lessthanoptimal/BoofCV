@@ -16,7 +16,7 @@
 
 package gecv.alg.drawing.impl;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -34,12 +34,12 @@ public class TestBasicDrawing_I8 {
 
 	@Test
 	public void fill() {
-		ImageInt8 image = new ImageInt8(10, 20);
+		ImageUInt8 image = new ImageUInt8(10, 20);
 
 		GecvTesting.checkSubImage(this, "checkFill", true, image);
 	}
 
-	public void checkFill(ImageInt8 image) {
+	public void checkFill(ImageUInt8 image) {
 		BasicDrawing_I8.fill(image, (byte) 6);
 
 		for (int y = 0; y < image.getHeight(); y++) {
@@ -56,12 +56,12 @@ public class TestBasicDrawing_I8 {
 
 	@Test
 	public void randomize() {
-		ImageInt8 image = new ImageInt8(10, 20);
+		ImageUInt8 image = new ImageUInt8(10, 20);
 
 		GecvTesting.checkSubImage(this, "checkRandomize", false, image);
 	}
 
-	public void checkRandomize(ImageInt8 image) {
+	public void checkRandomize(ImageUInt8 image) {
 		BasicDrawing_I8.randomize(image, rand);
 
 		for (int y = 0; y < image.getHeight(); y++) {

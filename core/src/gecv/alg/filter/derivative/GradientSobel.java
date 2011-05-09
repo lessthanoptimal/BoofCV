@@ -17,11 +17,13 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.InputSanityCheck;
+import gecv.alg.filter.derivative.sobel.GradientSobel_Naive;
 import gecv.alg.filter.derivative.sobel.GradientSobel_Outer;
 import gecv.alg.filter.derivative.sobel.GradientSobel_UnrolledOuter;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageInteger;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -60,12 +62,24 @@ public class GradientSobel {
 	 * @param derivX Storage for image derivative along the x-axis. Modified.
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 */
-	public static void process_I8(ImageInt8 orig,
-								  ImageInt16 derivX,
-								  ImageInt16 derivY) {
-		InputSanityCheck.checkSameShape(orig, false, derivX, true, derivY, true);
+	public static void process( ImageUInt8 orig, ImageSInt16 derivX, ImageSInt16 derivY) {
+		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
+	}
+
+	/**
+	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.
+	 * Uses a slower generic implementation.
+	 *
+	 * @param orig   Input image.  Not modified.
+	 * @param derivX Storage for image derivative along the x-axis. Modified.
+	 * @param derivY Storage for image derivative along the y-axis. Modified.
+	 */
+	public static void process( ImageInteger orig, ImageInteger derivX, ImageInteger derivY) {
+		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+
+		GradientSobel_Naive.process(orig, derivX, derivY);
 	}
 
 	/**
@@ -75,9 +89,7 @@ public class GradientSobel {
 	 * @param derivX Storage for image derivative along the x-axis. Modified.
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 */
-	public static void process_F32(ImageFloat32 orig,
-								   ImageFloat32 derivX,
-								   ImageFloat32 derivY) {
+	public static void process( ImageFloat32 orig, ImageFloat32 derivX, ImageFloat32 derivY) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 
 //		GradientSobel_Outer.process_F32(orig, derivX, derivY);

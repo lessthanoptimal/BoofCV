@@ -25,8 +25,8 @@ import gecv.core.image.UtilImageInt16;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -47,18 +47,18 @@ public class TestDownSampleConvolve {
 	@Test
 	public void downSample_I8() {
 
-		ImageInt8 img = new ImageInt8(width,height);
+		ImageUInt8 img = new ImageUInt8(width,height);
 		BasicDrawing_I8.randomize(img,rand);
-		ImageInt8 downSampled = new ImageInt8(width,height);
+		ImageUInt8 downSampled = new ImageUInt8(width,height);
 
 		GecvTesting.checkSubImage(this,"downSampled_I8",true, img, downSampled);
 	}
 
-	public void downSampled_I8( ImageInt8 img, ImageInt8 downSampled) {
-		ImageInt8 convImg = new ImageInt8(width,height);
+	public void downSampled_I8( ImageUInt8 img, ImageUInt8 downSampled) {
+		ImageUInt8 convImg = new ImageUInt8(width,height);
 		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(3);
 
-		BlurImageOps.kernel(img,convImg,kernel,new ImageInt8(width,height));
+		BlurImageOps.kernel(img,convImg,kernel,new ImageUInt8(width,height));
 
 		int storage[] = new int[ kernel.width ];
 		DownSampleConvolve.downSample(kernel,img,downSampled, N,storage);
@@ -76,18 +76,18 @@ public class TestDownSampleConvolve {
 	@Test
 	public void downSample_I16() {
 
-		ImageInt16 img = new ImageInt16(width,height, true);
+		ImageSInt16 img = new ImageSInt16(width,height);
 		UtilImageInt16.randomize(img,rand,0,200);
-		ImageInt16 downSampled = new ImageInt16(width,height, true);
+		ImageSInt16 downSampled = new ImageSInt16(width,height);
 
 		GecvTesting.checkSubImage(this,"downSampled_I16",true, img, downSampled);
 	}
 
-	public void downSampled_I16( ImageInt16 img, ImageInt16 downSampled) {
-		ImageInt16 convImg = new ImageInt16(width,height, true);
+	public void downSampled_I16( ImageSInt16 img, ImageSInt16 downSampled) {
+		ImageSInt16 convImg = new ImageSInt16(width,height);
 		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(3);
 
-		BlurImageOps.kernel(img,convImg,kernel,new ImageInt16(width,height, true));
+		BlurImageOps.kernel(img,convImg,kernel,new ImageSInt16(width,height));
 
 		int storage[] = new int[ kernel.width ];
 		DownSampleConvolve.downSample(kernel,img,downSampled, N,storage);

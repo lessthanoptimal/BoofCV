@@ -16,8 +16,8 @@
 
 package gecv.alg.filter.convolve.impl;
 
-import gecv.struct.image.ImageInt8;
-import gecv.struct.image.ImageInt32;
+import gecv.struct.image.ImageSInt32;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -30,7 +30,7 @@ import gecv.struct.image.ImageInt32;
  * @author Peter Abeles
  */
 public class ConvolveBox_I8_I32 {
-	public static void horizontal(ImageInt8 input, ImageInt32 output, int radius, boolean includeBorder) {
+	public static void horizontal(ImageUInt8 input, ImageSInt32 output, int radius, boolean includeBorder) {
 		final int kernelWidth = radius * 2 + 1;
 
 		final int startY = includeBorder ? 0 : radius;
@@ -59,7 +59,7 @@ public class ConvolveBox_I8_I32 {
 		}
 	}
 
-	public static void vertical(ImageInt8 input, ImageInt32 output, int radius, boolean includeBorder) {
+	public static void vertical(ImageUInt8 input, ImageSInt32 output, int radius, boolean includeBorder) {
 		final int kernelWidth = radius * 2 + 1;
 
 		final int startX = includeBorder ? 0 : radius;

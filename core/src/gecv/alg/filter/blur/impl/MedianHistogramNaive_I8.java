@@ -17,12 +17,12 @@
 package gecv.alg.filter.blur.impl;
 
 import gecv.alg.filter.blur.MedianImageFilter;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class MedianHistogramNaive_I8 implements MedianImageFilter<ImageInt8> {
+public class MedianHistogramNaive_I8 implements MedianImageFilter<ImageUInt8> {
 
 	int radius;
 	int histogram[] = new int[ 256 ];
@@ -43,7 +43,7 @@ public class MedianHistogramNaive_I8 implements MedianImageFilter<ImageInt8> {
 	}
 
 	@Override
-	public void process(ImageInt8 input, ImageInt8 output) {
+	public void process(ImageUInt8 input, ImageUInt8 output) {
 		initialize(input);
 
 		for( int y = radius; y < input.height-radius; y++ ) {
@@ -68,7 +68,7 @@ public class MedianHistogramNaive_I8 implements MedianImageFilter<ImageInt8> {
 		}
 	}
 
-	private void initialize(ImageInt8 input) {
+	private void initialize(ImageUInt8 input) {
 		int index = 0;
 		for( int i = -radius; i <= radius; i++ ) {
 			for( int j = -radius; j <= radius; j++ ) {

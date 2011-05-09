@@ -22,8 +22,8 @@ import gecv.alg.filter.convolve.edge.impl.ConvolveNormalized_JustBorder;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Performs a convolution for kernels which can be renormalized depending on which elements in the kernel are used.
@@ -73,7 +73,7 @@ public class ConvolveNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageInt8 image, ImageInt8 dest ) {
+								  ImageUInt8 image, ImageUInt8 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 
@@ -90,7 +90,7 @@ public class ConvolveNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_I32 kernel,
-								ImageInt8 image, ImageInt8 dest ) {
+								ImageUInt8 image, ImageUInt8 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImage.vertical(kernel,image,dest,kernel.computeSum(),true);
@@ -106,7 +106,7 @@ public class ConvolveNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageInt16 image, ImageInt16 dest ) {
+								  ImageSInt16 image, ImageSInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 
@@ -123,7 +123,7 @@ public class ConvolveNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_I32 kernel,
-								ImageInt16 image, ImageInt16 dest ) {
+								ImageSInt16 image, ImageSInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImage.vertical(kernel,image,dest,kernel.computeSum(),true);

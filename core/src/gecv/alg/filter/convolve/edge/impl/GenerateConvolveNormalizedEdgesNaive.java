@@ -39,8 +39,8 @@ public class GenerateConvolveNormalizedEdgesNaive {
 	public void generate() {
 		printPreamble();
 		printAllOps("F32", "ImageFloat32","ImageFloat32","float","float",false);
-		printAllOps("I32", "ImageInt8","ImageInt8","int","int",true);
-		printAllOps("I32", "ImageInt16","ImageInt16","int","int",false);
+		printAllOps("I32", "ImageUInt8","ImageUInt8","int","int",true);
+		printAllOps("I32", "ImageSInt16","ImageSInt16","int","int",false);
 		out.println("}");
 	}
 
@@ -51,8 +51,8 @@ public class GenerateConvolveNormalizedEdgesNaive {
 				"import gecv.struct.convolve.Kernel1D_F32;\n" +
 				"import gecv.struct.convolve.Kernel1D_I32;\n" +
 				"import gecv.struct.image.ImageFloat32;\n" +
-				"import gecv.struct.image.ImageInt16;\n" +
-				"import gecv.struct.image.ImageInt8;\n" +
+				"import gecv.struct.image.ImageSInt16;\n" +
+				"import gecv.struct.image.ImageUInt8;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +

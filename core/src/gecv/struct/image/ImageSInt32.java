@@ -18,32 +18,27 @@ package gecv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is a short.
+ * An image where the primitive type is a signed 32-bit int.  By default all operations treat elements
+ * in this image as an unsigned bytes.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImageInt16 extends ImageInteger<ImageInt16> {
+public class ImageSInt32 extends ImageInteger<ImageSInt32> {
 
-	public short data[];
+	public int data[];
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
 	 *
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
-	 * @param signed
 	 */
-	public ImageInt16(int width, int height, boolean signed) {
-		super(width, height, signed);
+	public ImageSInt32(int width, int height) {
+		super(width, height);
 	}
 
-	public ImageInt16( boolean signed ) {
-		this.signed = signed;
-	}
-
-	public ImageInt16() {
-		this.signed = true;
+	public ImageSInt32() {
 	}
 
 	/**
@@ -58,10 +53,7 @@ public class ImageInt16 extends ImageInteger<ImageInt16> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		if( signed )
-			return data[getIndex(x, y)];
-		else
-			return data[getIndex(x, y)] & 0xFFFF;
+		return data[getIndex(x, y)];
 	}
 
 	/**
@@ -80,24 +72,29 @@ public class ImageInt16 extends ImageInteger<ImageInt16> {
 	}
 
 	@Override
+	public boolean isSigned() {
+		return true;
+	}
+
+	@Override
 	protected Object _getData() {
 		return data;
 	}
 
 	@Override
 	protected void _setData(Object data) {
-		this.data = (short[]) data;
+		this.data = (int[]) data;
 	}
 
 	@Override
-	public ImageInt16 _createNew(int imgWidth, int imgHeight) {
+	public ImageSInt32 _createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
-			return new ImageInt16(signed);
-		return new ImageInt16(imgWidth, imgHeight,signed);
+			return new ImageSInt32();
+		return new ImageSInt32(imgWidth, imgHeight);
 	}
 
 	@Override
 	protected Class<?> _getPrimitiveType() {
-		return short.class;
+		return int.class;
 	}
 }

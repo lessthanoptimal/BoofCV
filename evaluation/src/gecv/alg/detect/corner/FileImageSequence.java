@@ -20,7 +20,7 @@ import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.ConvertImage;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -61,15 +61,15 @@ public class FileImageSequence implements EvaluationImageSequence {
 	}
 
 	@Override
-	public ImageInt8 getImage_I8() {
-		ImageInt8 img8 = new ImageInt8(image.getWidth(), image.getHeight());
+	public ImageUInt8 getImage_I8() {
+		ImageUInt8 img8 = new ImageUInt8(image.getWidth(), image.getHeight());
 		ConvertBufferedImage.convertFrom(image, img8);
 		return img8;
 	}
 
 	@Override
 	public ImageFloat32 getImage_F32() {
-		ImageInt8 img8 = new ImageInt8(image.getWidth(), image.getHeight());
+		ImageUInt8 img8 = new ImageUInt8(image.getWidth(), image.getHeight());
 		ImageFloat32 imgF32 = new ImageFloat32(image.getWidth(), image.getHeight());
 		ConvertBufferedImage.convertFrom(image, img8);
 		ConvertImage.convert(img8, imgF32);

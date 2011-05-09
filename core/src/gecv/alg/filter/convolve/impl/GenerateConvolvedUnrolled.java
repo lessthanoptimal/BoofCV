@@ -67,8 +67,8 @@ public class GenerateConvolvedUnrolled {
 	public void createI8_I8() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I8_I8_Div";
 		typeKernel = "Kernel1D_I32";
-		typeInput = "ImageInt8";
-		typeOutput = "ImageInt8";
+		typeInput = "ImageUInt8";
+		typeOutput = "ImageUInt8";
 		dataKernel = "int";
 		dataInput = "byte";
 		dataOutput = "byte";
@@ -82,8 +82,8 @@ public class GenerateConvolvedUnrolled {
 	public void createI8_I16() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I8_I16";
 		typeKernel = "Kernel1D_I32";
-		typeInput = "ImageInt8";
-		typeOutput = "ImageInt16";
+		typeInput = "ImageUInt8";
+		typeOutput = "ImageSInt16";
 		dataKernel = "int";
 		dataInput = "byte";
 		dataOutput = "short";
@@ -97,8 +97,8 @@ public class GenerateConvolvedUnrolled {
 	public void createI16_I16() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I16_I16";
 		typeKernel = "Kernel1D_I32";
-		typeInput = "ImageInt16";
-		typeOutput = "ImageInt16";
+		typeInput = "ImageSInt16";
+		typeOutput = "ImageSInt16";
 		dataKernel = "int";
 		dataInput = "short";
 		dataOutput = "short";
@@ -112,8 +112,8 @@ public class GenerateConvolvedUnrolled {
 	public void createI16_I16_div() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I16_I16_Div";
 		typeKernel = "Kernel1D_I32";
-		typeInput = "ImageInt16";
-		typeOutput = "ImageInt16";
+		typeInput = "ImageSInt16";
+		typeOutput = "ImageSInt16";
 		dataKernel = "int";
 		dataInput = "short";
 		dataOutput = "short";

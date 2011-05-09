@@ -20,8 +20,8 @@ import gecv.alg.filter.convolve.edge.ConvolveNormalizedSparse;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -73,7 +73,7 @@ public class DownSampleConvolve {
 	 * @param storage Storage array the same width as the kernel.
 	 */
 	public static void downSample( Kernel1D_I32 kernel ,
-								   ImageInt8 original ,  ImageInt8 downSampled ,
+								   ImageUInt8 original ,  ImageUInt8 downSampled ,
 								   int skip , int storage[] )
 	{
 		for( int y = 0, destY = 0; y < original.height; y += skip , destY++ ) {
@@ -98,7 +98,7 @@ public class DownSampleConvolve {
 	 * @param storage Storage array the same width as the kernel.
 	 */
 	public static void downSample( Kernel1D_I32 kernel ,
-								   ImageInt16 original ,  ImageInt16 downSampled ,
+								   ImageSInt16 original ,  ImageSInt16 downSampled ,
 								   int skip , int storage[] )
 	{
 		for( int y = 0, destY = 0; y < original.height; y += skip , destY++ ) {

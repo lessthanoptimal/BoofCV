@@ -16,7 +16,7 @@
 
 package gecv.core.image;
 
-import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageSInt16;
 
 import java.util.Random;
 
@@ -31,7 +31,7 @@ public class UtilImageInt16 {
 	 * @param img   An image.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(ImageInt16 img, int value) {
+	public static void fill(ImageSInt16 img, int value) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -51,7 +51,7 @@ public class UtilImageInt16 {
 	 * @param img  An image.
 	 * @param rand The value that the image is being filled with.
 	 */
-	public static void randomize(ImageInt16 img, Random rand, int min, int max) {
+	public static void randomize(ImageSInt16 img, Random rand, int min, int max) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 

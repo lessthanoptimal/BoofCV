@@ -17,7 +17,7 @@
 package gecv.alg.detect.corner;
 
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
@@ -26,7 +26,7 @@ public interface EvaluationImageSequence {
 
 	public boolean next();
 
-	public ImageInt8 getImage_I8();
+	public ImageUInt8 getImage_I8();
 
 	public ImageFloat32 getImage_F32();
 

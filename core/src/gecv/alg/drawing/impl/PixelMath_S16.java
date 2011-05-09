@@ -16,14 +16,14 @@
 
 package gecv.alg.drawing.impl;
 
-import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageSInt16;
 
 /**
  * @author Peter Abeles
  */
-public class PixelMath_Unsigned_I16 {
+public class PixelMath_S16 {
 
-	public static int max( ImageInt16 image ) {
+	public static int maxAbs( ImageSInt16 image ) {
 
 		int max = 0;
 
@@ -32,7 +32,7 @@ public class PixelMath_Unsigned_I16 {
 			int end = index + image.width;
 
 			for( ; index < end; index++ ) {
-				int v = image.data[index] & 0xFFFF;
+				int v = Math.abs(image.data[index]);
 				if( v > max )
 					max = v;
 			}
@@ -40,67 +40,55 @@ public class PixelMath_Unsigned_I16 {
 		return max;
 	}
 
-	public static int min( ImageInt16 image ) {
-
-		int min = Integer.MAX_VALUE;
-
+	public static void abs( ImageSInt16 image ) {
 		for( int y = 0; y < image.height; y++ ) {
 			int index = image.startIndex + y*image.stride;
 			int end = index + image.width;
 
 			for( ; index < end; index++ ) {
-				int v = image.data[index] & 0xFFFF;
-				if( v < min )
-					min = v;
-			}
-		}
-		return min;
-	}
-
-	public static void divide( ImageInt16 image , int denominator ) {
-
-		if( denominator < 0 )
-			throw new IllegalArgumentException("Can't divide an unsigned image by a negative number.");
-
-		for( int y = 0; y < image.height; y++ ) {
-			int index = image.startIndex + y*image.stride;
-			int end = index + image.width;
-
-			for( ; index < end; index++ ) {
-				int r = (image.data[index] & 0xFFFF) / denominator;
-				image.data[index] = (short)r;
+				image.data[index] = (short)Math.abs(image.data[index]);
 			}
 		}
 	}
 
-	public static void mult( ImageInt16 image , int scale ) {
-
-		if( scale < 0 )
-			throw new IllegalArgumentException("Can't scale an unsigned image by a negative number.");
+	public static void divide( ImageSInt16 image , int denominator ) {
 
 		for( int y = 0; y < image.height; y++ ) {
 			int index = image.startIndex + y*image.stride;
 			int end = index + image.width;
 
 			for( ; index < end; index++ ) {
-				int val = (image.data[index] & 0xFFFF) * scale;
-				if( val > 0xFFFF ) val = 0xFFFF;
+				image.data[index] /= denominator;
+			}
+		}
+	}
+
+	public static void mult( ImageSInt16 image , int scale ) {
+
+		for( int y = 0; y < image.height; y++ ) {
+			int index = image.startIndex + y*image.stride;
+			int end = index + image.width;
+
+			for( ; index < end; index++ ) {
+				int val = image.data[index] * scale;
+				if( val < Short.MIN_VALUE ) val = Short.MIN_VALUE;
+				else if( val > Short.MAX_VALUE ) val = Short.MAX_VALUE;
 
 				image.data[index] = (short)val;
 			}
 		}
 	}
 
-	public static void plus( ImageInt16 image , int value )
+	public static void plus( ImageSInt16 image , int value )
 	{
 		for( int y = 0; y < image.height; y++ ) {
 			int index = image.startIndex + y*image.stride;
 			int end = index + image.width;
 
 			for( ; index < end; index++ ) {
-				int val = (image.data[index] & 0xFFFF) + value;
-				if( val < 0 ) val = 0;
-				else if( val > 0xFFFF ) val = 0xFFFF;
+				int val = image.data[index] + value;
+				if( val < Short.MIN_VALUE ) val = Short.MIN_VALUE;
+				else if( val > Short.MAX_VALUE ) val = Short.MAX_VALUE;
 
 				image.data[index] = (short)val;
 			}

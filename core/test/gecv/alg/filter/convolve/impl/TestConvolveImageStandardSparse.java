@@ -25,7 +25,7 @@ import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -75,7 +75,7 @@ public class TestConvolveImageStandardSparse {
 	}
 
 	private void checkMethod(Method method, int width, int height, int kernelRadius, Random rand) {
-		ImageInt8 seedImage = new ImageInt8(width,height);
+		ImageUInt8 seedImage = new ImageUInt8(width,height);
 		BasicDrawing_I8.randomize(seedImage,rand,0,255);
 
 		// creates a floating point image with integer elements

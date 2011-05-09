@@ -19,8 +19,8 @@ package gecv.alg.filter.derivative.sobel;
 import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.core.image.UtilImageFloat32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -43,16 +43,16 @@ public class TestGradientEdge_UnrolledOuter {
 		for( int offY = 0; offY < 3; offY++ ) {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
-				ImageInt8 img = new ImageInt8(w, h);
+				ImageUInt8 img = new ImageUInt8(w, h);
 				BasicDrawing_I8.randomize(img, new Random(0xfeed));
 
-				ImageInt16 derivX = new ImageInt16(w, h, true);
-				ImageInt16 derivY = new ImageInt16(w, h, true);
+				ImageSInt16 derivX = new ImageSInt16(w, h);
+				ImageSInt16 derivY = new ImageSInt16(w, h);
 
-				ImageInt16 derivX2 = new ImageInt16(w, h, true);
-				ImageInt16 derivY2 = new ImageInt16(w, h, true);
+				ImageSInt16 derivX2 = new ImageSInt16(w, h);
+				ImageSInt16 derivY2 = new ImageSInt16(w, h);
 
-				GradientSobel_Naive.process_I8(img, derivX2, derivY2);
+				GradientSobel_Naive.process(img, derivX2, derivY2);
 				GradientSobel_UnrolledOuter.process_I8(img, derivX, derivY);
 
 				GecvTesting.assertEquals(derivX2, derivX, 0);
@@ -79,7 +79,7 @@ public class TestGradientEdge_UnrolledOuter {
 				ImageFloat32 derivX2 = new ImageFloat32(w, h);
 				ImageFloat32 derivY2 = new ImageFloat32(w, h);
 
-				GradientSobel_Naive.process_F32(img, derivX2, derivY2);
+				GradientSobel_Naive.process(img, derivX2, derivY2);
 				GradientSobel_UnrolledOuter.process_F32(img, derivX, derivY);
 
 				GecvTesting.assertEquals(derivX2, derivX, 0, 1e-4f);
@@ -108,7 +108,7 @@ public class TestGradientEdge_UnrolledOuter {
 		ImageFloat32 derivX2 = new ImageFloat32(derivX.width, derivX.height);
 		ImageFloat32 derivY2 = new ImageFloat32(derivX.width, derivX.height);
 
-		GradientSobel_Naive.process_F32(img, derivX2, derivY2);
+		GradientSobel_Naive.process(img, derivX2, derivY2);
 		GradientSobel_UnrolledOuter.process_F32_sub(img, derivX, derivY);
 
 		GecvTesting.assertEquals(derivX2, derivX, 0, 1e-4f);

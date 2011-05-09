@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.basic.impl;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,8 +39,8 @@ public class TestBinaryInnerOps {
 
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-			ImageInt8 t = (ImageInt8) targetParam[1];
-			ImageInt8 v = (ImageInt8) validationParam[1];
+			ImageUInt8 t = (ImageUInt8) targetParam[1];
+			ImageUInt8 v = (ImageUInt8) validationParam[1];
 
 			for (int y = 1; y < t.height - 1; y++) {
 				for (int x = 1; x < t.width - 1; x++) {

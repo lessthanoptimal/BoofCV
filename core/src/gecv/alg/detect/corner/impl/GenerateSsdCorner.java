@@ -40,8 +40,8 @@ public class GenerateSsdCorner {
 
 	public void create_I16() throws FileNotFoundException {
 		className = "SsdCorner_I16";
-		typeInput = "ImageInt16";
-		typeOutput = "ImageInt32";
+		typeInput = "ImageSInt16";
+		typeOutput = "ImageSInt32";
 		dataInput = "short";
 		dataOutput = "int";
 		sumType = "int";

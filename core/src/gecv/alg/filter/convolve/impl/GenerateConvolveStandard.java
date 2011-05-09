@@ -41,19 +41,19 @@ public class GenerateConvolveStandard {
 		printAllOps("F32", "ImageFloat32", "ImageFloat32",
 				"float", "float", "float",
 				"float", "", "", false);
-		printAllOps("I32", "ImageInt8", "ImageInt16",
+		printAllOps("I32", "ImageUInt8", "ImageSInt16",
 				"int", "byte", "short",
 				"int", "(short)", "& 0xFF", false);
-		printAllOps("I32", "ImageInt8", "ImageInt32",
+		printAllOps("I32", "ImageUInt8", "ImageSInt32",
 				"int", "byte", "int",
 				"int", "", "& 0xFF", false);
-		printAllOps("I32", "ImageInt16", "ImageInt16",
+		printAllOps("I32", "ImageSInt16", "ImageSInt16",
 				"int", "short", "short",
 				"int", "(short)", "", false);
-		printAllOps("I32", "ImageInt8", "ImageInt8",
+		printAllOps("I32", "ImageUInt8", "ImageUInt8",
 				"int", "byte", "byte",
 				"int", "(byte)", "& 0xFF", true);
-		printAllOps("I32", "ImageInt16", "ImageInt16",
+		printAllOps("I32", "ImageSInt16", "ImageSInt16",
 				"int", "short", "short",
 				"int", "(short)", "", true);
 		out.println("}");
@@ -68,9 +68,9 @@ public class GenerateConvolveStandard {
 				"import gecv.struct.convolve.Kernel2D_F32;\n" +
 				"import gecv.struct.convolve.Kernel2D_I32;\n" +
 				"import gecv.struct.image.ImageFloat32;\n" +
-				"import gecv.struct.image.ImageInt32;\n" +
-				"import gecv.struct.image.ImageInt16;\n" +
-				"import gecv.struct.image.ImageInt8;\n");
+				"import gecv.struct.image.ImageSInt32;\n" +
+				"import gecv.struct.image.ImageSInt16;\n" +
+				"import gecv.struct.image.ImageUInt8;\n");
 		out.println();
 		out.println();
 		out.print("/**\n" +

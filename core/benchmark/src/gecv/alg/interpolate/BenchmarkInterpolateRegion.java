@@ -22,7 +22,7 @@ import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.interpolate.impl.BilinearRectangle_F32;
 import gecv.core.image.UtilImageFloat32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 import java.util.Random;
 
@@ -37,7 +37,7 @@ public class BenchmarkInterpolateRegion {
 	static long TEST_TIME = 1000;
 
 	static ImageFloat32 imgFloat32;
-	static ImageInt8 imgInt8;
+	static ImageUInt8 imgInt8;
 
 	// defines the region its interpolation
 	static float start = 10.1f;
@@ -54,7 +54,7 @@ public class BenchmarkInterpolateRegion {
 	}
 
 	public static void main(String args[]) {
-		imgInt8 = new ImageInt8(imgWidth, imgHeight);
+		imgInt8 = new ImageUInt8(imgWidth, imgHeight);
 		imgFloat32 = new ImageFloat32(imgWidth, imgHeight);
 
 		Random rand = new Random(234);

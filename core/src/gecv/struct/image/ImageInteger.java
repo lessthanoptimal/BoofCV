@@ -27,24 +27,29 @@ package gecv.struct.image;
  * the JavaVM converts all integer types into an int when not in an array.
  * </p>
  *
+ * <p>
+ * DESIGN NOTE: Java does not support unsigned data.  IF an image is unsigned this is only directly enforced by the get()
+ * function.  When directly accessing the data array the data's unsigned nature must be enforced manually using the
+ * bitwise and operator.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public abstract class ImageInteger<T extends ImageInteger> extends ImageBase<T>{
 
-	// if pixels are signed or unsigned variables
-	protected boolean signed;
-
-	protected ImageInteger(int width, int height, boolean signed) {
+	protected ImageInteger(int width, int height ) {
 		super(width, height);
-		this.signed = signed;
 	}
 
 	protected ImageInteger() {
 	}
 
-	public boolean isSigned() {
-		return signed;
-	}
+	/**
+	 * If the data is assumed to be signed or unsigned.
+	 *
+	 * @return true for signed and false for unsigned.
+	 */
+	public abstract boolean isSigned();
 
 	/**
 	 * Returns the value of the specified pixel.

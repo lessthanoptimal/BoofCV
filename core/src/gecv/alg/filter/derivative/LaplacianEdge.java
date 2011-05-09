@@ -18,8 +18,8 @@ package gecv.alg.filter.derivative;
 
 import gecv.alg.InputSanityCheck;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -56,8 +56,8 @@ public class LaplacianEdge {
 	 * @param orig  Input image.  Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
-	public static void process_I8(ImageInt8 orig, ImageInt16 deriv) {
-		InputSanityCheck.checkSameShape(orig, false, deriv, true );
+	public static void process_I8(ImageUInt8 orig, ImageSInt16 deriv) {
+		InputSanityCheck.checkSameShape(orig, deriv);
 
 		final byte[] data = orig.data;
 		final short[] out = deriv.data;

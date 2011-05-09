@@ -19,7 +19,6 @@ package gecv.struct.image;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Adds tests specific to integer images
@@ -28,38 +27,16 @@ import static org.junit.Assert.assertTrue;
  */
 @SuppressWarnings({"PointlessBooleanExpression"})
 public abstract class StandardImageIntegerTests extends StandardImageTests {
-	/**
-	 * Makes sure the image being signed/unsigned is correctly set by the function _createNew()
-	 */
-	@Test
-	public void createNew_Signedness() {
-		ImageInteger<?> image = (ImageInteger<?>)createImage(10,20);
+	boolean expectedSign;
 
-		// first check with no data being declared
-		image.signed = true;
-		ImageInteger<?> a = image._createNew(-1,-1);
-		assertTrue(true == a.signed);
-		image.signed = false;
-		a = image._createNew(-1,-1);
-		assertTrue(false == a.signed);
-
-		// now check with data being declared
-		image.signed = true;
-		a = image._createNew(10,20);
-		assertTrue(true == a.signed);
-		image.signed = false;
-		a = image._createNew(10,20);
-		assertTrue(false == a.signed);
+	protected StandardImageIntegerTests(boolean expectedSign) {
+		this.expectedSign = expectedSign;
 	}
 
 	@Test
-	public void checkDataIsUnsigned() {
-		ImageInteger<?> image = (ImageInteger<?>)createImage(10,20);
+	public void checkSign() {
+		ImageInteger<?> img = (ImageInteger<?>)createImage(10,10);
 
-		image.signed = true;
-		image.set(0,0,-1);
-		assertEquals(-1,image.get(0,0));
-		image.signed = false;
-		assertTrue(-1 != image.get(0,0));
+		assertEquals(expectedSign,img.isSigned());
 	}
 }

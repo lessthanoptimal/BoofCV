@@ -19,7 +19,7 @@ package gecv.alg.filter.blur;
 import gecv.alg.filter.blur.impl.MedianHistogram_I8;
 import gecv.alg.filter.blur.impl.MedianSortNaive_F32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Factory for creating median filters.  It automatically selects the best general purpose filter for the
@@ -29,7 +29,7 @@ import gecv.struct.image.ImageInt8;
  */
 public class MedianFilterFactory {
 
-	public MedianImageFilter<ImageInt8> create_I8( int radius ) {
+	public MedianImageFilter<ImageUInt8> create_I8( int radius ) {
 		return new MedianHistogram_I8(radius);
 	}
 

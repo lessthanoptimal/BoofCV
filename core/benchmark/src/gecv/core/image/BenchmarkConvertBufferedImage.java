@@ -18,8 +18,7 @@ package gecv.core.image;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.struct.image.ImageInt8;
-import sun.awt.image.ByteInterleavedRaster;
+import gecv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -36,7 +35,7 @@ public class BenchmarkConvertBufferedImage {
 	static int imgHeight = 480;
 
 	static BufferedImage imgBuff;
-	static ImageInt8 imgInt8;
+	static ImageUInt8 imgInt8;
 
 	public static class FromBuffToInt8 extends PerformerBase
 	{
@@ -90,29 +89,29 @@ public class BenchmarkConvertBufferedImage {
 	}
 
 	public static void main( String args[] ) {
-		imgInt8 = new ImageInt8(imgWidth,imgHeight);
+		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
 
-		System.out.println("=========  Profiling for ImageInt8 ==========");
+		System.out.println("=========  Profiling for ImageUInt8 ==========");
 		System.out.println();
 
 		createBufferedImage(BufferedImage.TYPE_3BYTE_BGR);
-		System.out.printf("BufferedImage to ImageInt8   %10.2f ops/sec\n",
+		System.out.printf("BufferedImage to ImageUInt8   %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new FromInt8ToGenericBuff(),1000));
-		System.out.printf("TYPE_3BYTE_BGR to ImageInt8  %10.2f ops/sec\n",
+		System.out.printf("TYPE_3BYTE_BGR to ImageUInt8  %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000));
-		System.out.printf("ImageInt8 to TYPE_3BYTE_BGR  %10.2f ops/sec\n",
+		System.out.printf("ImageUInt8 to TYPE_3BYTE_BGR  %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000));
 
 		createBufferedImage(BufferedImage.TYPE_INT_RGB);
-		System.out.printf("TYPE_INT_RGB to ImageInt8    %10.2f ops/sec\n",
+		System.out.printf("TYPE_INT_RGB to ImageUInt8    %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000));
-		System.out.printf("ImageInt8 to TYPE_INT_RGB    %10.2f ops/sec\n",
+		System.out.printf("ImageUInt8 to TYPE_INT_RGB    %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000));
 
 		createBufferedImage(BufferedImage.TYPE_BYTE_GRAY);
-		System.out.printf("TYPE_BYTE_GRAY to ImageInt8  %10.2f ops/sec\n",
+		System.out.printf("TYPE_BYTE_GRAY to ImageUInt8  %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000));
-		System.out.printf("ImageInt8 to TYPE_BYTE_GRAY  %10.2f ops/sec\n",
+		System.out.printf("ImageUInt8 to TYPE_BYTE_GRAY  %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000));
 
 		System.out.printf("extractImageInt8             %10.2f ops/sec\n",

@@ -22,8 +22,8 @@ import gecv.core.image.UtilImageFloat32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -51,18 +51,18 @@ public class TestGradientThree {
 	 */
 	@Test
 	public void deriv_I8() {
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		BasicDrawing_I8.randomize(img, rand, 0, 10);
 
-		ImageInt16 derivX = new ImageInt16(width, height, true);
-		ImageInt16 derivY = new ImageInt16(width, height, true);
+		ImageSInt16 derivX = new ImageSInt16(width, height);
+		ImageSInt16 derivY = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "deriv_I8", true, img, derivX, derivY);
 	}
 
-	public void deriv_I8(ImageInt8 img, ImageInt16 derivX, ImageInt16 derivY) {
-		ImageInt16 derivX_a = new ImageInt16(width, height, true);
-		ImageInt16 derivY_a = new ImageInt16(width, height, true);
+	public void deriv_I8(ImageUInt8 img, ImageSInt16 derivX, ImageSInt16 derivY) {
+		ImageSInt16 derivX_a = new ImageSInt16(width, height);
+		ImageSInt16 derivY_a = new ImageSInt16(width, height);
 
 		GradientThree.derivX_I8(img, derivX_a);
 		GradientThree.derivY_I8(img, derivY_a);
@@ -108,16 +108,16 @@ public class TestGradientThree {
 
 	@Test
 	public void derivX_I8() {
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		BasicDrawing_I8.randomize(img, rand, 0, 10);
 
-		ImageInt16 derivX = new ImageInt16(width, height, true);
-		ImageInt16 convX = new ImageInt16(width, height, true);
+		ImageSInt16 derivX = new ImageSInt16(width, height);
+		ImageSInt16 convX = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "derivX_I8", true, img, derivX, convX);
 	}
 
-	public void derivX_I8(ImageInt8 img, ImageInt16 derivX, ImageInt16 convX) {
+	public void derivX_I8(ImageUInt8 img, ImageSInt16 derivX, ImageSInt16 convX) {
 		GradientThree.derivX_I8(img, derivX);
 
 		// compare to the equivalent convolution
@@ -129,16 +129,16 @@ public class TestGradientThree {
 
 	@Test
 	public void derivY_I8() {
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		BasicDrawing_I8.randomize(img, rand, 0, 10);
 
-		ImageInt16 derivY = new ImageInt16(width, height, true);
-		ImageInt16 convY = new ImageInt16(width, height, true);
+		ImageSInt16 derivY = new ImageSInt16(width, height);
+		ImageSInt16 convY = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "derivY_I8", true, img, derivY, convY);
 	}
 
-	public void derivY_I8(ImageInt8 img, ImageInt16 derivY, ImageInt16 convY) {
+	public void derivY_I8(ImageUInt8 img, ImageSInt16 derivY, ImageSInt16 convY) {
 		GradientThree.derivY_I8(img, derivY);
 
 		// compare to the equivalent convolution

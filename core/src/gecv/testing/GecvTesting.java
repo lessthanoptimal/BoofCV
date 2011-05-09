@@ -118,10 +118,10 @@ public class GecvTesting {
 	}
 
 	public static ImageBase createImage(Class<?> type, int width, int height) {
-		if (type == ImageInt8.class) {
-			return new ImageInt8(width, height);
-		} else if (type == ImageInt16.class) {
-			return new ImageInt16(width, height, true);
+		if (type == ImageUInt8.class) {
+			return new ImageUInt8(width, height);
+		} else if (type == ImageSInt16.class) {
+			return new ImageSInt16(width, height);
 		} else if (type == ImageFloat32.class) {
 			return new ImageFloat32(width, height);
 		} else if (type == ImageInterleavedInt8.class) {
@@ -133,7 +133,7 @@ public class GecvTesting {
 	/**
 	 * Tests the specified function with the original image provided and with an equivalent
 	 * sub-image.  The two results are then compared. The function being tested must only
-	 * have one input parameter of type {@link ImageInt8}.
+	 * have one input parameter of type {@link gecv.struct.image.ImageUInt8}.
 	 *
 	 * @param testClass   Instance of the class that contains the function being tested.
 	 * @param function	The name of the function being tested.
@@ -188,12 +188,12 @@ public class GecvTesting {
 				for (int i = 0; i < inputParam.length; i++) {
 					if( subImg[i] == null )
 						continue;
-					if (inputParam[i] instanceof ImageInt8)
-						assertEquals((ImageInt8) inputModified[i], (ImageInt8) subImg[i], 0);
-					else if (inputParam[i] instanceof ImageInt16)
-						assertEquals((ImageInt16) inputParam[i], (ImageInt16) subImg[i], 0);
-					else if (inputParam[i] instanceof ImageInt32)
-						assertEquals((ImageInt32) inputParam[i], (ImageInt32) subImg[i], 0);
+					if (inputParam[i] instanceof ImageUInt8)
+						assertEquals((ImageUInt8) inputModified[i], (ImageUInt8) subImg[i], 0);
+					else if (inputParam[i] instanceof ImageSInt16)
+						assertEquals((ImageSInt16) inputParam[i], (ImageSInt16) subImg[i], 0);
+					else if (inputParam[i] instanceof ImageSInt32)
+						assertEquals((ImageSInt32) inputParam[i], (ImageSInt32) subImg[i], 0);
 					else if (inputParam[i] instanceof ImageInterleavedInt8)
 						assertEquals((ImageInterleavedInt8) inputParam[i], (ImageInterleavedInt8) subImg[i]);
 					else if (inputParam[i] instanceof ImageFloat32)
@@ -272,12 +272,12 @@ public class GecvTesting {
 		if (imgA.getClass() != imgB.getClass())
 			throw new RuntimeException("Images are of different types");
 
-		if (imgA.getClass() == ImageInt8.class)
-			assertEquals((ImageInt8) imgA, (ImageInt8) imgB, 0);
-		else if (imgA.getClass() == ImageInt16.class)
-			assertEquals((ImageInt16) imgA, (ImageInt16) imgB, 0);
-		else if (imgA.getClass() == ImageInt32.class)
-			assertEquals((ImageInt32) imgA, (ImageInt32) imgB, 0);
+		if (imgA.getClass() == ImageUInt8.class)
+			assertEquals((ImageUInt8) imgA, (ImageUInt8) imgB, 0);
+		else if (imgA.getClass() == ImageSInt16.class)
+			assertEquals((ImageSInt16) imgA, (ImageSInt16) imgB, 0);
+		else if (imgA.getClass() == ImageSInt32.class)
+			assertEquals((ImageSInt32) imgA, (ImageSInt32) imgB, 0);
 		else if (imgA.getClass() == ImageFloat32.class)
 			assertEquals((ImageFloat32) imgA, (ImageFloat32) imgB, 0, (float) tolFloat);
 		else
@@ -293,7 +293,7 @@ public class GecvTesting {
 	 * @param imgB		 An image.
 	 * @param ignoreBorder Pixels this close to the border will not be compared.
 	 */
-	public static void assertEquals(ImageInt8 imgA, ImageInt8 imgB, int ignoreBorder) {
+	public static void assertEquals(ImageUInt8 imgA, ImageUInt8 imgB, int ignoreBorder) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -316,7 +316,7 @@ public class GecvTesting {
 	 * @param imgB		 An image.
 	 * @param ignoreBorder
 	 */
-	public static void assertEquals(ImageInt16 imgA, ImageInt16 imgB, int ignoreBorder) {
+	public static void assertEquals(ImageSInt16 imgA, ImageSInt16 imgB, int ignoreBorder) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -339,7 +339,7 @@ public class GecvTesting {
 	 * @param imgB		 An image.
 	 * @param ignoreBorder
 	 */
-	public static void assertEquals(ImageInt32 imgA, ImageInt32 imgB, int ignoreBorder) {
+	public static void assertEquals(ImageSInt32 imgA, ImageSInt32 imgB, int ignoreBorder) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -419,12 +419,12 @@ public class GecvTesting {
 	}
 
 	/**
-	 * Checks to see if the BufferedImage has the same intensity values as the ImageInt8
+	 * Checks to see if the BufferedImage has the same intensity values as the ImageUInt8
 	 *
 	 * @param imgA BufferedImage
-	 * @param imgB ImageInt8
+	 * @param imgB ImageUInt8
 	 */
-	public static void checkEquals(BufferedImage imgA, ImageInt8 imgB) {
+	public static void checkEquals(BufferedImage imgA, ImageUInt8 imgB) {
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
@@ -452,6 +452,8 @@ public class GecvTesting {
 
 				int gray = (byte) ((((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3);
 				int grayB = imgB.get(x, y);
+				if( !imgB.isSigned() )
+					gray &= 0xFF;
 
 				if (Math.abs(gray - grayB) != 0) {
 					throw new RuntimeException("images are not equal: ");
@@ -461,10 +463,10 @@ public class GecvTesting {
 	}
 
 	/**
-	 * Checks to see if the BufferedImage has the same intensity values as the ImageInt8
+	 * Checks to see if the BufferedImage has the same intensity values as the ImageUInt8
 	 *
 	 * @param imgA BufferedImage
-	 * @param imgB ImageInt8
+	 * @param imgB ImageUInt8
 	 */
 	public static void checkEquals(BufferedImage imgA, ImageInterleavedInt8 imgB) {
 

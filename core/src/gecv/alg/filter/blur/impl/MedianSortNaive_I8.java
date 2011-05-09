@@ -17,7 +17,7 @@
 package gecv.alg.filter.blur.impl;
 
 import gecv.alg.filter.blur.MedianImageFilter;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import pja.sorting.QuickSelectI;
 
 /**
@@ -26,7 +26,7 @@ import pja.sorting.QuickSelectI;
  *
  * @author Peter Abeles
  */
-public class MedianSortNaive_I8 implements MedianImageFilter<ImageInt8> {
+public class MedianSortNaive_I8 implements MedianImageFilter<ImageUInt8> {
 
 	// size of the filter box
 	private int radius;
@@ -45,7 +45,7 @@ public class MedianSortNaive_I8 implements MedianImageFilter<ImageInt8> {
 	}
 
 	@Override
-	public void process(ImageInt8 input, ImageInt8 output) {
+	public void process(ImageUInt8 input, ImageUInt8 output) {
 		for( int y = radius; y < input.height-radius; y++ ) {
 			for( int x = radius; x < input.width-radius; x++ ) {
 				int index = 0;

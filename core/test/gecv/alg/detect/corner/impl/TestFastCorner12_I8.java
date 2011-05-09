@@ -18,7 +18,7 @@ package gecv.alg.detect.corner.impl;
 
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 import pja.geometry.struct.point.Point2D_I16;
 
@@ -65,12 +65,12 @@ public class TestFastCorner12_I8 {
 	@Test
 	public void testPositive() {
 		FastCorner12_I8 corner = new FastCorner12_I8(width,height,20, 12);
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 
 		for( int subImage = 0; subImage < 2; subImage++ ) {
 			// see if it can handle a sub image correctly
 			if( subImage == 1 ) {
-				ImageInt8 tmp = new ImageInt8( width+4,height+5);
+				ImageUInt8 tmp = new ImageUInt8( width+4,height+5);
 				img = tmp.subimage(2,3,2+width,3+height);
 			}
 			setOffsets(img);
@@ -133,7 +133,7 @@ public class TestFastCorner12_I8 {
 	@Test
 	public void testNegativeShort() {
 		FastCorner12_I8 corner = new FastCorner12_I8(width,height, 20, 12);
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		setOffsets(img);
 
 		for (int i = 0; i < 15; i++) {
@@ -152,7 +152,7 @@ public class TestFastCorner12_I8 {
 	@Test
 	public void testNegativeMixed() {
 		FastCorner12_I8 corner = new FastCorner12_I8(width,height, 20, 12);
-		ImageInt8 img = new ImageInt8(width, height);
+		ImageUInt8 img = new ImageUInt8(width, height);
 		setOffsets(img);
 
 		for (int i = 0; i < 15; i++) {
@@ -166,7 +166,7 @@ public class TestFastCorner12_I8 {
 		}
 	}
 
-	private void setSynthetic(ImageInt8 img, int start, int length, int outerVal) {
+	private void setSynthetic(ImageUInt8 img, int start, int length, int outerVal) {
 		byte data[] = img.data;
 
 		int endA = start + length;

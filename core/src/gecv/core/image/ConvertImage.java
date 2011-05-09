@@ -18,8 +18,8 @@ package gecv.core.image;
 
 import gecv.alg.InputSanityCheck;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Functions for converting between different image types. Numerical values do not change or are closely approximated
@@ -31,7 +31,7 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link ImageInt8} into a {@link ImageFloat32}.  If the {@link ImageInt8}
+	 * Converts an {@link gecv.struct.image.ImageUInt8} into a {@link ImageFloat32}.  If the {@link gecv.struct.image.ImageUInt8}
 	 * is treated as a signed image or not is specified.
 	 * </p>
 	 * <p/>
@@ -45,7 +45,7 @@ public class ConvertImage {
 	 * @param src	Input image which is being converted.
 	 * @param dst	The output image.  If null a new image is created.
 	 */
-	public static ImageFloat32 convert(ImageInt8 src, ImageFloat32 dst ) {
+	public static ImageFloat32 convert(ImageUInt8 src, ImageFloat32 dst ) {
 		if (dst == null) {
 			dst = new ImageFloat32(src.width, src.height);
 		} else {
@@ -93,7 +93,7 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link ImageInt8} into a {@link ImageInt16}.  If the {@link ImageInt8}
+	 * Converts an {@link gecv.struct.image.ImageUInt8} into a {@link gecv.struct.image.ImageSInt16}.  If the {@link gecv.struct.image.ImageUInt8}
 	 * is treated as a signed image or not is specified.
 	 * </p>
 	 * <p/>
@@ -107,9 +107,9 @@ public class ConvertImage {
 	 * @param src	Input image which is being converted.
 	 * @param dst	The output image.  If null a new image is created.
 	 */
-	public static ImageInt16 convert(ImageInt8 src, ImageInt16 dst ) {
+	public static ImageSInt16 convert(ImageUInt8 src, ImageSInt16 dst ) {
 		if (dst == null) {
-			dst = new ImageInt16(src.width, src.height, src.isSigned());
+			dst = new ImageSInt16(src.width, src.height);
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}
@@ -155,7 +155,7 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link ImageInt16} into a {@link ImageFloat32}.  If the {@link ImageInt16}
+	 * Converts an {@link gecv.struct.image.ImageSInt16} into a {@link ImageFloat32}.  If the {@link gecv.struct.image.ImageSInt16}
 	 * is treated as a signed image or not is specified.
 	 * </p>
 	 * <p/>
@@ -169,7 +169,7 @@ public class ConvertImage {
 	 * @param src	Input image which is being converted.
 	 * @param dst	The output image.  If null a new image is created.
 	 */
-	public static ImageFloat32 convert(ImageInt16 src, ImageFloat32 dst ) {
+	public static ImageFloat32 convert(ImageSInt16 src, ImageFloat32 dst ) {
 		if (dst == null) {
 			dst = new ImageFloat32(src.width, src.height);
 		} else {
@@ -217,7 +217,7 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link ImageInt16} into a {@link ImageInt8}.  If the {@link ImageInt16}
+	 * Converts an {@link gecv.struct.image.ImageSInt16} into a {@link gecv.struct.image.ImageUInt8}.  If the {@link gecv.struct.image.ImageSInt16}
 	 * is treated as a signed image or not is specified.
 	 * </p>
 	 * <p/>
@@ -231,9 +231,9 @@ public class ConvertImage {
 	 * @param src	Input image which is being converted.
 	 * @param dst	The output image.  If null a new image is created.
 	 */
-	public static ImageInt8 convert(ImageInt16 src, ImageInt8 dst ) {
+	public static ImageUInt8 convert(ImageSInt16 src, ImageUInt8 dst ) {
 		if (dst == null) {
-			dst = new ImageInt8(src.width, src.height);
+			dst = new ImageUInt8(src.width, src.height);
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}
@@ -279,7 +279,7 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts {@link gecv.struct.image.ImageFloat32} into {@link ImageInt8}.  No additional
+	 * Converts {@link gecv.struct.image.ImageFloat32} into {@link gecv.struct.image.ImageUInt8}.  No additional
 	 * scaling is done, just a straight conversion.
 	 * </p>
 	 * <p/>
@@ -290,9 +290,9 @@ public class ConvertImage {
 	 * @param src
 	 * @param dst
 	 */
-	public static ImageInt8 convert(ImageFloat32 src, ImageInt8 dst) {
+	public static ImageUInt8 convert(ImageFloat32 src, ImageUInt8 dst) {
 		if (dst == null) {
-			dst = new ImageInt8(src.width, src.height);
+			dst = new ImageUInt8(src.width, src.height);
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}
@@ -321,7 +321,7 @@ public class ConvertImage {
 
 /**
 	 * <p>
-	 * Converts {@link gecv.struct.image.ImageFloat32} into {@link ImageInt16}.  No additional
+	 * Converts {@link gecv.struct.image.ImageFloat32} into {@link gecv.struct.image.ImageSInt16}.  No additional
 	 * scaling is done, just a straight conversion.
 	 * </p>
 	 * <p/>
@@ -332,9 +332,9 @@ public class ConvertImage {
 	 * @param src
 	 * @param dst
 	 */
-	public static ImageInt16 convert(ImageFloat32 src, ImageInt16 dst) {
+	public static ImageSInt16 convert(ImageFloat32 src, ImageSInt16 dst) {
 		if (dst == null) {
-			dst = new ImageInt16(src.width, src.height, true);
+			dst = new ImageSInt16(src.width, src.height);
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}

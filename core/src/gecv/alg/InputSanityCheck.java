@@ -17,7 +17,6 @@
 package gecv.alg;
 
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageInteger;
 
 /**
  * @author Peter Abeles
@@ -36,18 +35,6 @@ public class InputSanityCheck {
 		return output;
 	}
 
-	public static <T extends ImageInteger> T checkDeclare(T input, boolean signedInput , T output ) {
-		if (output == null) {
-			output = (T) input._createNew(input.width, input.height);
-		} else if (output.width != input.width || output.height != input.height)
-			throw new IllegalArgumentException("Width and/or height of input and output do not match.");
-		if( input.isSigned() != signedInput )
-			throw new IllegalArgumentException("Input image should be "+s(signedInput)+".");
-		if( output.isSigned() != signedInput )
-			throw new IllegalArgumentException("Output image should be "+s(signedInput)+".");
-		return output;
-	}
-
 	public static void checkSameShape(ImageBase<?> imgA, ImageBase<?> imgB) {
 		if (imgA.width != imgB.width)
 			throw new IllegalArgumentException("Image widths do not match.");
@@ -60,47 +47,5 @@ public class InputSanityCheck {
 			throw new IllegalArgumentException("Image widths do not match.");
 		if (imgA.height != imgB.height || imgA.height != imgC.height)
 			throw new IllegalArgumentException("Image heights do not match.");
-	}
-
-	public static void checkSameShape(ImageInteger<?> imgA, boolean signedA , ImageInteger<?> imgB ) {
-		if (imgA.width != imgB.width)
-			throw new IllegalArgumentException("Image widths do not match.");
-		if (imgA.height != imgB.height)
-			throw new IllegalArgumentException("Image heights do not match.");
-		if( imgA.isSigned() != signedA )
-			throw new IllegalArgumentException("First input image should be "+s(signedA)+".");
-	}
-
-	public static void checkSameShape(ImageInteger<?> imgA, boolean signedA , ImageInteger<?> imgB , boolean signedB) {
-		if (imgA.width != imgB.width)
-			throw new IllegalArgumentException("Image widths do not match.");
-		if (imgA.height != imgB.height)
-			throw new IllegalArgumentException("Image heights do not match.");
-		if( imgA.isSigned() != signedA )
-			throw new IllegalArgumentException("First input image should be "+s(signedA)+".");
-		if( imgB.isSigned() != signedB )
-			throw new IllegalArgumentException("Second input image should be "+s(signedB)+".");
-	}
-
-	public static void checkSameShape(ImageInteger<?> imgA, boolean signedA ,
-									  ImageInteger<?> imgB, boolean signedB ,
-									  ImageInteger<?> imgC, boolean signedC) {
-		if (imgA.width != imgB.width || imgA.width != imgC.width)
-			throw new IllegalArgumentException("Image widths do not match.");
-		if (imgA.height != imgB.height || imgA.height != imgC.height)
-			throw new IllegalArgumentException("Image heights do not match.");
-		if( imgA.isSigned() != signedA )
-			throw new IllegalArgumentException("First input image should be "+s(signedA)+".");
-		if( imgB.isSigned() != signedB )
-			throw new IllegalArgumentException("Second input image should be "+s(signedB)+".");
-		if( imgC.isSigned() != signedC )
-			throw new IllegalArgumentException("Third input image should be "+s(signedC)+".");
-	}
-
-	public static String s( boolean signed ) {
-		if( signed )
-			return "signed";
-		else
-			return "unsigned";
 	}
 }

@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.basic.impl;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -33,7 +33,7 @@ import gecv.struct.image.ImageInt8;
  */
 public class BinaryInnerOps {
 
-	public static void erode4(ImageInt8 input, ImageInt8 output) {
+	public static void erode4(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -54,7 +54,7 @@ public class BinaryInnerOps {
 		}
 	}
 
-	public static void dilate4(ImageInt8 input, ImageInt8 output) {
+	public static void dilate4(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -76,7 +76,7 @@ public class BinaryInnerOps {
 		}
 	}
 
-	public static void edge4(ImageInt8 input, ImageInt8 output) {
+	public static void edge4(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -97,7 +97,7 @@ public class BinaryInnerOps {
 		}
 	}
 
-	public static void erode8(ImageInt8 input, ImageInt8 output) {
+	public static void erode8(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -119,7 +119,7 @@ public class BinaryInnerOps {
 		}
 	}
 
-	public static void dilate8(ImageInt8 input, ImageInt8 output) {
+	public static void dilate8(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -141,7 +141,7 @@ public class BinaryInnerOps {
 		}
 	}
 
-	public static void edge8(ImageInt8 input, ImageInt8 output) {
+	public static void edge8(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -163,7 +163,7 @@ public class BinaryInnerOps {
 		}
 	}
 
-	public static void removePointNoise(ImageInt8 input, ImageInt8 output) {
+	public static void removePointNoise(ImageUInt8 input, ImageUInt8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;

@@ -43,7 +43,7 @@ public class GenerateFastCorner {
 
 	public void create_I8() throws FileNotFoundException {
 		className = "FastCorner12_I8";
-		typeInput = "ImageInt8";
+		typeInput = "ImageUInt8";
 		dataInput = "byte";
 		dataTol = "int";
 		bitWise = " & 0xFF";

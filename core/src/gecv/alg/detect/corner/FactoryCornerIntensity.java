@@ -18,8 +18,8 @@ package gecv.alg.detect.corner;
 
 import gecv.alg.detect.corner.impl.*;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Factory for creating various types of corner intensity detectors.
@@ -34,7 +34,7 @@ public class FactoryCornerIntensity {
 		return new FastCorner12_F32(imageWidth,imageHeight,pixelTol,minCont);
 	}
 
-	public static FastCornerIntensity<ImageInt8> createFast12_I8( int imageWidth, int imageHeight,
+	public static FastCornerIntensity<ImageUInt8> createFast12_I8( int imageWidth, int imageHeight,
 																	 int pixelTol, int minCont)
 	{
 		return new FastCorner12_I8(imageWidth,imageHeight,pixelTol,minCont);
@@ -46,7 +46,7 @@ public class FactoryCornerIntensity {
 		return new HarrisCorner_F32(imageWidth,imageHeight,windowRadius,kappa);
 	}
 
-	public static HarrisCornerIntensity<ImageInt16> createHarris_I16( int imageWidth, int imageHeight,
+	public static HarrisCornerIntensity<ImageSInt16> createHarris_I16( int imageWidth, int imageHeight,
 															   int windowRadius, float kappa )
 	{
 		return new HarrisCorner_I16(imageWidth,imageHeight,windowRadius,kappa);
@@ -58,7 +58,7 @@ public class FactoryCornerIntensity {
 		return new KitRosCorner_F32(imageWidth,imageHeight,windowRadius);
 	}
 
-	public static KitRosCornerIntensity<ImageInt16> createKitRos_I16( int imageWidth, int imageHeight,
+	public static KitRosCornerIntensity<ImageSInt16> createKitRos_I16( int imageWidth, int imageHeight,
 															   int windowRadius)
 	{
 		return new KitRosCorner_I16(imageWidth,imageHeight,windowRadius);
@@ -70,7 +70,7 @@ public class FactoryCornerIntensity {
 		return new KltCorner_F32(imageWidth,imageHeight,windowRadius);
 	}
 
-	public static KltCornerIntensity<ImageInt16> createKlt_I16( int imageWidth, int imageHeight,
+	public static KltCornerIntensity<ImageSInt16> createKlt_I16( int imageWidth, int imageHeight,
 															   int windowRadius)
 	{
 		return new KltCorner_I16(imageWidth,imageHeight,windowRadius);

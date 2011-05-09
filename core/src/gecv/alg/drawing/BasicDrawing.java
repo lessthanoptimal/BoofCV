@@ -18,9 +18,9 @@ package gecv.alg.drawing;
 
 import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt32;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageSInt32;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Basic operations for drawing shapes and other patterns into different image types.  
@@ -36,15 +36,15 @@ public class BasicDrawing {
 	 * @param image The image which is to be filled image.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill( ImageInt8 image , int value ) {
+	public static void fill( ImageUInt8 image , int value ) {
 		BasicDrawing_I8.fill(image,value);
 	}
 
-	public static void fill( ImageInt16 image , int value ) {
+	public static void fill( ImageSInt16 image , int value ) {
 
 	}
 
-	public static void fill( ImageInt32 image , int value ) {
+	public static void fill( ImageSInt32 image , int value ) {
 
 	}
 
@@ -62,7 +62,7 @@ public class BasicDrawing {
 	 * @param x1 Bottom right corner x-axis.
 	 * @param y1 Bottom right corner y-axis.
 	 */
-	public static void rectangle( ImageInt8 img , int value , int x0 , int y0 , int x1 , int y1 ) {
+	public static void rectangle( ImageUInt8 img , int value , int x0 , int y0 , int x1 , int y1 ) {
 		BasicDrawing_I8.rectangle(img,value,x0,y0,x1,y1);
 	}
 }

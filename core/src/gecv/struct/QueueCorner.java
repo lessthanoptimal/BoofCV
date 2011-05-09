@@ -52,6 +52,10 @@ public class QueueCorner {
 		points[num++].set((short) x, (short) y);
 	}
 
+	public final void add( Point2D_I16 pt ) {
+		add( pt.x , pt.y );
+	}
+
 	public Point2D_I16 get(int index) {
 		if (index >= num) throw new IllegalArgumentException("Out of range.");
 

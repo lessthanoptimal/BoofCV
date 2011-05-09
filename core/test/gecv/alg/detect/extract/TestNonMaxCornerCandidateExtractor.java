@@ -24,13 +24,27 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestNonMaxCornerCandidateExtractor {
-	@Test
-	public void test() {
-		fail("implement tests");
-	}
 
+	/**
+	 * If a list of pre-existing corners is added they should not be added again to the found list
+	 */
 	@Test
 	public void excludePreExisting() {
 		fail("implement");
+	}
+
+/**
+	 * See if it produces the correct answers after adjusting the width
+	 */
+	@Test
+	public void testRegionWidth() {
+	}
+
+	/**
+	 * Make sure it does the threshold thing correctly
+	 */
+	@Test
+	public void testThreshold() {
+		
 	}
 }
