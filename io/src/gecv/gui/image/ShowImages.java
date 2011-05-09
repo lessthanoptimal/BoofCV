@@ -16,6 +16,12 @@
 
 package gecv.gui.image;
 
+import gecv.alg.drawing.PixelMath;
+import gecv.core.image.ConvertBufferedImage;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageInt8;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -51,5 +57,33 @@ public class ShowImages {
 		frame.setVisible(true);
 
 		return panel;
+	}
+
+	public static ImagePanel showWindow( ImageInt8 img , String title ) {
+		BufferedImage buff = ConvertBufferedImage.convertTo(img,null);
+
+		return showWindow(buff,title);
+	}
+
+	public static ImagePanel showWindow( ImageInt16 img , String title ) {
+		int max = PixelMath.maxAbs(img);
+		BufferedImage buff;
+		if( img.isSigned() )
+			buff = VisualizeImageData.colorizeSign(img,null,max);
+		else
+			buff = VisualizeImageData.grayUnsigned(img,null,max);
+
+		return showWindow(buff,title);
+	}
+
+	public static ImagePanel showWindow( ImageFloat32 img , String title , boolean showMagnitude) {
+		float max = PixelMath.maxAbs(img);
+		BufferedImage buff;
+		if( showMagnitude )
+			buff = VisualizeImageData.grayMagnitude(img,null,max);
+		else
+			buff = VisualizeImageData.colorizeSign(img,null,max);
+
+		return showWindow(buff,title);
 	}
 }

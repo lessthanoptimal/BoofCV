@@ -304,7 +304,6 @@
       <module fileurl="file://$PROJECT_DIR$/evaluation/evaluation.iml" filepath="$PROJECT_DIR$/evaluation/evaluation.iml" />
       <module fileurl="file://$PROJECT_DIR$/io/io.iml" filepath="$PROJECT_DIR$/io/io.iml" />
       <module fileurl="file://$PROJECT_DIR$/../libpjajava/libpja.iml" filepath="$PROJECT_DIR$/../libpjajava/libpja.iml" />
-      <module fileurl="file://$PROJECT_DIR$/visualize/visualize.iml" filepath="$PROJECT_DIR$/visualize/visualize.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">

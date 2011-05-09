@@ -72,7 +72,7 @@ public class FileImageSequence implements EvaluationImageSequence {
 		ImageInt8 img8 = new ImageInt8(image.getWidth(), image.getHeight());
 		ImageFloat32 imgF32 = new ImageFloat32(image.getWidth(), image.getHeight());
 		ConvertBufferedImage.convertFrom(image, img8);
-		ConvertImage.convert(img8, imgF32, false);
+		ConvertImage.convert(img8, imgF32);
 		return imgF32;
 	}
 

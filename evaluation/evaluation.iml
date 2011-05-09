@@ -13,7 +13,6 @@
     <orderEntry type="module" module-name="ejml" />
     <orderEntry type="module" module-name="io" />
     <orderEntry type="module" module-name="libpja" />
-    <orderEntry type="module" module-name="visualize" />
   </component>
 </module>
 
