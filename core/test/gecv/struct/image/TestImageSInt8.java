@@ -19,19 +19,18 @@ package gecv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageUInt16 extends StandardImageIntegerTests {
-
-	public TestImageUInt16() {
-		super(false);
+public class TestImageSInt8 extends StandardImageIntegerTests {
+	public TestImageSInt8() {
+		super(true);
 	}
 
 	@Override
 	public ImageBase createImage(int width, int height) {
-		return new ImageUInt16(width, height);
+		return new ImageSInt8(width, height);
 	}
 
 	@Override
 	public Number randomNumber() {
-		return (short) rand.nextInt(Short.MAX_VALUE);
+		return (byte)(rand.nextInt(255)-126);
 	}
 }

@@ -17,11 +17,9 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.filter.derivative.sobel.GradientSobel_Naive;
 import gecv.alg.filter.derivative.sobel.GradientSobel_Outer;
 import gecv.alg.filter.derivative.sobel.GradientSobel_UnrolledOuter;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInteger;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 
@@ -66,20 +64,6 @@ public class GradientSobel {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
-	}
-
-	/**
-	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.
-	 * Uses a slower generic implementation.
-	 *
-	 * @param orig   Input image.  Not modified.
-	 * @param derivX Storage for image derivative along the x-axis. Modified.
-	 * @param derivY Storage for image derivative along the y-axis. Modified.
-	 */
-	public static void process( ImageInteger orig, ImageInteger derivX, ImageInteger derivY) {
-		InputSanityCheck.checkSameShape(orig, derivX, derivY);
-
-		GradientSobel_Naive.process(orig, derivX, derivY);
 	}
 
 	/**

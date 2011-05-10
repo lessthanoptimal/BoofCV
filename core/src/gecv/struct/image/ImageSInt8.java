@@ -18,12 +18,12 @@ package gecv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is an unsigned 8-bit byte.
+ * An image where the primitive type is an signed 8-bit byte.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImageUInt8 extends ImageInt8<ImageUInt8> {
+public class ImageSInt8 extends ImageInt8<ImageSInt8> {
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
@@ -31,11 +31,11 @@ public class ImageUInt8 extends ImageInt8<ImageUInt8> {
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public ImageUInt8(int width, int height) {
+	public ImageSInt8(int width, int height) {
 		super(width, height);
 	}
 
-	public ImageUInt8() {
+	public ImageSInt8() {
 	}
 
 	/**
@@ -52,19 +52,19 @@ public class ImageUInt8 extends ImageInt8<ImageUInt8> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		return data[getIndex(x, y)] & 0xFF;
+		return data[getIndex(x, y)];
 	}
 
 	@Override
 	public boolean isSigned() {
-		return false;
+		return true;
 	}
 
 	@Override
-	public ImageUInt8 _createNew(int imgWidth, int imgHeight) {
+	public ImageSInt8 _createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1) {
-			return new ImageUInt8();
+			return new ImageSInt8();
 		}
-		return new ImageUInt8(imgWidth, imgHeight);
+		return new ImageSInt8(imgWidth, imgHeight);
 	}
 }

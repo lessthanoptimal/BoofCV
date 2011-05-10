@@ -91,6 +91,7 @@ public class GenerateFastCorner {
 				" */\n" +
 				"public class "+className+" implements FastCornerIntensity<"+typeInput+"> {\n" +
 				"\n" +
+				"\t// minimum number of continuous pixels\n"+
 				"\tprivate int minCont;\n" +
 				"\tprivate final static int radius = 3;\n" +
 				"\n" +

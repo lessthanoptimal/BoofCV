@@ -16,13 +16,13 @@
 
 package gecv.core.image;
 
-import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageInteger;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -38,177 +38,65 @@ public class TestConvertImage {
 	int imgHeight = 20;
 
 	@Test
-	public void convert_int8_float32() {
-		ImageFloat32 conv = new ImageFloat32(imgWidth, imgHeight);
+	public void checkAllConvert() {
+		int count = 0;
+		Method methods[] = ConvertImage.class.getMethods();
 
-		// test it with a signed image
-		ImageUInt8 orig = new ImageUInt8(imgWidth, imgHeight);
-		BasicDrawing_I8.randomize(orig, rand);
+		for (Method m : methods) {
+			if( !m.getName().contains("convert"))
+				continue;
 
-		GecvTesting.checkSubImage(this, "convert_int8_float32", true, orig, conv);
+			Class<?> inputType = m.getParameterTypes()[0];
+			Class<?> outputType = m.getParameterTypes()[1];
 
-		// test it with an unsigned image
-		orig = new ImageUInt8(imgWidth, imgHeight);
-		BasicDrawing_I8.randomize(orig, rand);
-		GecvTesting.checkSubImage(this, "convert_int8_float32", true, orig, conv);
-	}
+//			System.out.println(m.getName()+" "+inputType.getSimpleName()+" "+outputType.getSimpleName()+" "+m.getReturnType());
+			
+			// make sure the return type equals the output type
+			assertTrue( outputType == m.getReturnType() );
 
-	public void convert_int8_float32(ImageUInt8 orig, ImageFloat32 conv) {
-		ConvertImage.convert(orig, conv);
-
-		int numPositive = 0;
-		int numNegative = 0;
-
-		for (int i = 0; i < imgHeight; i++) {
-			for (int j = 0; j < imgWidth; j++) {
-				float f = conv.get(j, i);
-				if (f >= 0)
-					numPositive++;
-				else
-					numNegative++;
-
-				assertEquals(f, (float) orig.get(j, i), 1e-8);
-			}
+			checkConvert(m,inputType,outputType);
+			count++;
 		}
 
-		assertTrue(numPositive > 0);
-		if( orig.isSigned())
-			assertTrue(numNegative > 0);
-		else
-			assertTrue(numNegative == 0);
+		assertEquals(11,count);
 	}
 
-	@Test
-	public void convert_int16_float32() {
-		// test it against a signed image
-		ImageSInt16 orig = new ImageSInt16(imgWidth, imgHeight);
-		UtilImageInt16.randomize(orig, rand, -20, 20);
+	private void checkConvert( Method m , Class<?> inputType , Class<?> outputType ) {
+		ImageBase<?> input = GecvTesting.createImage(inputType,imgWidth,imgHeight);
+		ImageBase<?> output = GecvTesting.createImage(outputType,imgWidth,imgHeight);
 
-		ImageFloat32 conv = new ImageFloat32(imgWidth, imgHeight);
+		boolean inputSigned = true;
+		boolean outputSigned = true;
 
-		GecvTesting.checkSubImage(this, "convert_int16_float32", true, orig, conv);
+		if( ImageInteger.class.isAssignableFrom(inputType) )
+			inputSigned = ((ImageInteger)input).isSigned();
+		if( ImageInteger.class.isAssignableFrom(outputType) )
+			outputSigned = ((ImageInteger)output).isSigned();
 
-		// test it against an unsigned image
-		orig = new ImageSInt16(imgWidth, imgHeight);
-		UtilImageInt16.randomize(orig, rand, 0, 40);
-		GecvTesting.checkSubImage(this, "convert_int16_float32", true, orig, conv);
-	}
-
-	public void convert_int16_float32(ImageSInt16 orig, ImageFloat32 conv) {
-		ConvertImage.convert(orig, conv);
-
-		int numPositive = 0;
-		int numNegative = 0;
-
-		for (int i = 0; i < imgHeight; i++) {
-			for (int j = 0; j < imgWidth; j++) {
-				float f = conv.get(j, i);
-				if (f >= 0)
-					numPositive++;
-				else
-					numNegative++;
-
-				assertEquals(f, (float) orig.get(j, i), 1e-8);
-			}
+	   // only provide signed numbers of both data types can handle them
+		if( inputSigned && outputSigned ) {
+			GeneralizedImageOps.randomize(input,-10,10,rand);
+		} else {
+			GeneralizedImageOps.randomize(input,0,20,rand);
 		}
 
-		assertTrue(numPositive > 0);
-		if( orig.isSigned() )
-			assertTrue(numNegative > 0);
-		else
-			assertTrue(numNegative == 0);
+		GecvTesting.checkSubImage(this,"checkConvert",true,m,input,output);
 	}
 
-	@Test
-	public void convert_int16_int8() {
-		// test it against a signed image
-		ImageSInt16 orig = new ImageSInt16(imgWidth, imgHeight);
-		UtilImageInt16.randomize(orig, rand, -20, 20);
+	public void checkConvert( Method m , ImageBase<?> input , ImageBase<?> output ) {
+		try {
+			// check it with a non-null output
+			ImageBase<?> ret = (ImageBase<?>)m.invoke(null,input,output);
+			GecvTesting.assertEqualsGeneric(input,ret,0,1e-4);
 
-		ImageUInt8 conv = new ImageUInt8(imgWidth, imgHeight);
+			// check it with a null output
+			ret = (ImageBase<?>)m.invoke(null,input,null);
+			GecvTesting.assertEqualsGeneric(input,ret,0,1e-4);
 
-		GecvTesting.checkSubImage(this, "convert_int16_int8", true, orig, conv);
-
-		// test it against an unsigned image
-		orig = new ImageSInt16(imgWidth, imgHeight);
-		UtilImageInt16.randomize(orig, rand, 0, 40);
-		GecvTesting.checkSubImage(this, "convert_int16_int8", true, orig, conv);
-	}
-
-	public void convert_int16_int8(ImageSInt16 orig, ImageUInt8 conv) {
-		ConvertImage.convert(orig, conv);
-
-		int numPositive = 0;
-		int numNegative = 0;
-
-		for (int i = 0; i < imgHeight; i++) {
-			for (int j = 0; j < imgWidth; j++) {
-				int f = conv.get(j, i);
-				if (f >= 0)
-					numPositive++;
-				else
-					numNegative++;
-
-				assertEquals(f, orig.get(j, i), 1e-8);
-			}
-		}
-
-		assertTrue(numPositive > 0);
-		if( orig.isSigned() )
-			assertTrue(numNegative > 0);
-		else
-			assertTrue(numNegative == 0);
-	}
-
-	@Test
-	public void convert_float32_int8() {
-		ImageFloat32 orig = new ImageFloat32(imgWidth, imgHeight);
-		UtilImageFloat32.randomize(orig, rand, -100, 100);
-
-		ImageUInt8 conv = new ImageUInt8(imgWidth, imgHeight);
-
-		GecvTesting.checkSubImage(this, "convert_float32_int8", true, orig, conv);
-	}
-
-	public void convert_float32_int8(ImageFloat32 orig, ImageUInt8 conv) {
-		ConvertImage.convert(orig, conv);
-
-		// quick sanity check to make sure randomize worked
-		assertTrue(orig.get(0, 0) != 0);
-
-		// see if the conversion was done correctly
-		for (int i = 0; i < imgHeight; i++) {
-			for (int j = 0; j < imgWidth; j++) {
-				int b = conv.get(j, i);
-
-				assertEquals(b, (int) orig.get(j, i), 1e-8);
-			}
-		}
-	}
-
-	@Test
-	public void convert_float32_int16() {
-		ImageFloat32 orig = new ImageFloat32(imgWidth, imgHeight);
-		UtilImageFloat32.randomize(orig, rand, -100, 100);
-
-		ImageSInt16 conv = new ImageSInt16(imgWidth, imgHeight);
-
-		GecvTesting.checkSubImage(this, "convert_float32_int16", true, orig, conv);
-	}
-
-	public void convert_float32_int16(ImageFloat32 orig, ImageSInt16 conv) {
-		ConvertImage.convert(orig, conv);
-
-		// quick sanity check to make sure randomize worked
-		assertTrue(orig.get(0, 0) != 0);
-
-		// see if the conversion was done correctly
-		for (int i = 0; i < imgHeight; i++) {
-			for (int j = 0; j < imgWidth; j++) {
-				int b = conv.get(j, i);
-
-				assertEquals(b, (int) orig.get(j, i), 1e-8);
-			}
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }

@@ -149,6 +149,20 @@ public class TestConvertBufferedImage {
 	}
 
 	@Test
+	public void convertFrom_F32() {
+		ImageFloat32 dstImg = new ImageFloat32(imgWidth, imgHeight);
+
+		GecvTesting.checkSubImage(this, "convertFrom_F32", false, dstImg);
+	}
+
+	public void convertFrom_F32(ImageFloat32 dstImg) {
+		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
+		ConvertBufferedImage.convertFrom(origImg, dstImg);
+
+		GecvTesting.checkEquals(origImg, dstImg, 1e-3f);
+	}
+
+	@Test
 	public void convertTo_Int8() {
 		ImageUInt8 srcImg = new ImageUInt8(imgWidth, imgHeight);
 		BasicDrawing_I8.randomize(srcImg, rand);

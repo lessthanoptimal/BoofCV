@@ -16,6 +16,7 @@
 
 package gecv.alg.drawing.impl;
 
+import gecv.struct.image.ImageInt8;
 import gecv.struct.image.ImageUInt8;
 
 import java.util.Random;
@@ -92,7 +93,7 @@ public class BasicDrawing_I8 {
 		}
 	}
 
-	public static void randomize(ImageUInt8 img, Random rand, int min, int max) {
+	public static void randomize(ImageInt8 img, Random rand, int min, int max) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 

@@ -24,10 +24,7 @@ package gecv.struct.image;
  *
  * @author Peter Abeles
  */
-public class ImageSInt16 extends ImageInteger<ImageSInt16> {
-
-	public short data[];
-
+public class ImageSInt16 extends ImageInt16<ImageSInt16> {
 	/**
 	 * Creates a new gray scale (single band/color) image.
 	 *
@@ -56,34 +53,9 @@ public class ImageSInt16 extends ImageInteger<ImageSInt16> {
 		return data[getIndex(x, y)];
 	}
 
-	/**
-	 * Sets the value of the specified pixel.
-	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
-	 * @param value The pixel's new value.
-	 */
-	@Override
-	public void set(int x, int y, int value) {
-		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
-
-		data[getIndex(x, y)] = (short) value;
-	}
-
 	@Override
 	public boolean isSigned() {
 		return true;
-	}
-
-	@Override
-	protected Object _getData() {
-		return data;
-	}
-
-	@Override
-	protected void _setData(Object data) {
-		this.data = (short[]) data;
 	}
 
 	@Override
@@ -91,10 +63,5 @@ public class ImageSInt16 extends ImageInteger<ImageSInt16> {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new ImageSInt16();
 		return new ImageSInt16(imgWidth, imgHeight);
-	}
-
-	@Override
-	protected Class<?> _getPrimitiveType() {
-		return short.class;
 	}
 }

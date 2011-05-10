@@ -120,14 +120,21 @@ public class GecvTesting {
 	public static ImageBase createImage(Class<?> type, int width, int height) {
 		if (type == ImageUInt8.class) {
 			return new ImageUInt8(width, height);
+		} else if (type == ImageSInt8.class) {
+			return new ImageSInt8(width, height);
 		} else if (type == ImageSInt16.class) {
 			return new ImageSInt16(width, height);
+		} else if (type == ImageUInt16.class) {
+			return new ImageUInt16(width, height);
 		} else if (type == ImageFloat32.class) {
 			return new ImageFloat32(width, height);
 		} else if (type == ImageInterleavedInt8.class) {
 			return new ImageInterleavedInt8(width, height, 1);
+		} else if( type == ImageInteger.class ) {
+			// ImageInteger is a generic type, so just create something
+			return new ImageSInt32(width,height);
 		}
-		throw new RuntimeException("Unknown type");
+		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}
 
 	/**
@@ -188,12 +195,8 @@ public class GecvTesting {
 				for (int i = 0; i < inputParam.length; i++) {
 					if( subImg[i] == null )
 						continue;
-					if (inputParam[i] instanceof ImageUInt8)
-						assertEquals((ImageUInt8) inputModified[i], (ImageUInt8) subImg[i], 0);
-					else if (inputParam[i] instanceof ImageSInt16)
-						assertEquals((ImageSInt16) inputParam[i], (ImageSInt16) subImg[i], 0);
-					else if (inputParam[i] instanceof ImageSInt32)
-						assertEquals((ImageSInt32) inputParam[i], (ImageSInt32) subImg[i], 0);
+					if( ImageInteger.class.isAssignableFrom(inputParam[i].getClass()))
+						assertEquals((ImageInteger) inputModified[i], (ImageInteger) subImg[i], 0);
 					else if (inputParam[i] instanceof ImageInterleavedInt8)
 						assertEquals((ImageInterleavedInt8) inputParam[i], (ImageInterleavedInt8) subImg[i]);
 					else if (inputParam[i] instanceof ImageFloat32)
@@ -243,7 +246,9 @@ public class GecvTesting {
 			// see if it could be called with these parameters
 			match = true;
 			for (int i = 0; i < a.length; i++) {
-				if (params[i].isAssignableFrom(a[i])) {
+				if( params[i] == a[i] )
+					continue;
+				if ( params[i].isAssignableFrom(a[i])) {
 					match = false;
 					break;
 				}
@@ -269,54 +274,29 @@ public class GecvTesting {
 	 * @param imgB An image.
 	 */
 	public static void assertEqualsGeneric(ImageBase imgA, ImageBase imgB, int tolInt, double tolFloat) {
-		if (imgA.getClass() != imgB.getClass())
-			throw new RuntimeException("Images are of different types");
 
-		if (imgA.getClass() == ImageUInt8.class)
-			assertEquals((ImageUInt8) imgA, (ImageUInt8) imgB, 0);
-		else if (imgA.getClass() == ImageSInt16.class)
-			assertEquals((ImageSInt16) imgA, (ImageSInt16) imgB, 0);
-		else if (imgA.getClass() == ImageSInt32.class)
-			assertEquals((ImageSInt32) imgA, (ImageSInt32) imgB, 0);
-		else if (imgA.getClass() == ImageFloat32.class)
-			assertEquals((ImageFloat32) imgA, (ImageFloat32) imgB, 0, (float) tolFloat);
-		else
-			throw new RuntimeException("Unknown type");
-
-	}
-
-	/**
-	 * Checks to see if thw two images are equivalent.  Note that this is not the same
-	 * as identical since they can be sub-images.
-	 *
-	 * @param imgA		 An image.
-	 * @param imgB		 An image.
-	 * @param ignoreBorder Pixels this close to the border will not be compared.
-	 */
-	public static void assertEquals(ImageUInt8 imgA, ImageUInt8 imgB, int ignoreBorder) {
-		if (imgA.getWidth() != imgB.getWidth())
-			throw new RuntimeException("Widths are not equals");
-
-		if (imgA.getHeight() != imgB.getHeight())
-			throw new RuntimeException("Heights are not equals");
-
-		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
-			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("value not equal: " + imgA.get(x, y) + " " + imgB.get(x, y) + " at (" + x + " , " + y + ")");
+		if (ImageInteger.class.isAssignableFrom(imgA.getClass())) {
+			if( ImageInteger.class.isAssignableFrom(imgB.getClass()) ) {
+				assertEquals((ImageInteger) imgA, (ImageInteger) imgB, 0);
+			} else {
+				assertEquals((ImageInteger) imgA, (ImageFloat32) imgB, 0);
 			}
+		} else if( ImageInteger.class.isAssignableFrom(imgB.getClass()) ) {
+			assertEquals((ImageInteger) imgB, (ImageFloat32) imgA, 0);
+		} else {
+			assertEquals((ImageFloat32) imgA, (ImageFloat32) imgB, 0, (float)tolFloat);
 		}
 	}
 
 	/**
-	 * Checks to see if thw two images are equivalent.  Note that this is not the same
+	 * Checks to see if two images are equivalent.  Note that this is not the same
 	 * as identical since they can be sub-images.
 	 *
 	 * @param imgA		 An image.
 	 * @param imgB		 An image.
 	 * @param ignoreBorder
 	 */
-	public static void assertEquals(ImageSInt16 imgA, ImageSInt16 imgB, int ignoreBorder) {
+	public static void assertEquals(ImageInteger imgA, ImageInteger imgB, int ignoreBorder) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -331,15 +311,7 @@ public class GecvTesting {
 		}
 	}
 
-	/**
-	 * Checks to see if thw two images are equivalent.  Note that this is not the same
-	 * as identical since they can be sub-images.
-	 *
-	 * @param imgA		 An image.
-	 * @param imgB		 An image.
-	 * @param ignoreBorder
-	 */
-	public static void assertEquals(ImageSInt32 imgA, ImageSInt32 imgB, int ignoreBorder) {
+	public static void assertEquals(ImageInteger imgA, ImageFloat32 imgB, int ignoreBorder) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -348,8 +320,8 @@ public class GecvTesting {
 
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + imgB.get(x, y));
+				if (imgA.get(x, y) != (int)imgB.get(x, y))
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + (int)imgB.get(x, y));
 			}
 		}
 	}
@@ -424,7 +396,7 @@ public class GecvTesting {
 	 * @param imgA BufferedImage
 	 * @param imgB ImageUInt8
 	 */
-	public static void checkEquals(BufferedImage imgA, ImageUInt8 imgB) {
+	public static void checkEquals(BufferedImage imgA, ImageUInt8 imgB ) {
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
@@ -450,13 +422,54 @@ public class GecvTesting {
 			for (int x = 0; x < imgA.getWidth(); x++) {
 				int rgb = imgA.getRGB(x, y);
 
-				int gray = (byte) ((((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3);
+				int gray = (byte) ((((rgb >>> 16) & 0xFF) + ((rgb >>> 8) & 0xFF) + (rgb & 0xFF)) / 3);
 				int grayB = imgB.get(x, y);
 				if( !imgB.isSigned() )
 					gray &= 0xFF;
 
 				if (Math.abs(gray - grayB) != 0) {
-					throw new RuntimeException("images are not equal: ");
+					throw new RuntimeException("images are not equal: ("+x+" , "+y+") A = "+gray+" B = "+grayB);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Checks to see if the BufferedImage has the same intensity values as the ImageUInt8
+	 *
+	 * @param imgA BufferedImage
+	 * @param imgB ImageUInt8
+	 */
+	public static void checkEquals(BufferedImage imgA, ImageFloat32 imgB, float tol ) {
+
+		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
+			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
+
+			if (raster.getNumBands() == 1) {
+				// handle a special case where the RGB conversion is screwed
+				for (int i = 0; i < imgA.getHeight(); i++) {
+					for (int j = 0; j < imgA.getWidth(); j++) {
+						float valB = imgB.get(j, i);
+						int valA = raster.getDataStorage()[i * imgA.getWidth() + j];
+						valA &= 0xFF;
+
+						if (Math.abs(valA - valB) > tol)
+							throw new RuntimeException("Images are not equal: A = "+valA+" B = "+valB);
+					}
+				}
+				return;
+			}
+		}
+
+		for (int y = 0; y < imgA.getHeight(); y++) {
+			for (int x = 0; x < imgA.getWidth(); x++) {
+				int rgb = imgA.getRGB(x, y);
+
+				float gray = (((rgb >>> 16) & 0xFF) + ((rgb >>> 8) & 0xFF) + (rgb & 0xFF)) / 3.0f;
+				float grayB = imgB.get(x, y);
+
+				if (Math.abs(gray - grayB) > tol) {
+					throw new RuntimeException("images are not equal: A = "+gray+" B = "+grayB);
 				}
 			}
 		}
@@ -492,8 +505,8 @@ public class GecvTesting {
 			for (int x = 0; x < imgA.getWidth(); x++) {
 				int rgb = imgA.getRGB(x, y);
 
-				int r = (rgb >> 16) & 0xFF;
-				int g = (rgb >> 8) & 0xFF;
+				int r = (rgb >>> 16) & 0xFF;
+				int g = (rgb >>> 8) & 0xFF;
 				int b = rgb & 0xFF;
 
 				if (Math.abs(b - imgB.getBand(x, y, 0) & 0xFF) != 0)

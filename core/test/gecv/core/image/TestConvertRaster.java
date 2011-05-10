@@ -17,6 +17,7 @@
 package gecv.core.image;
 
 import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -37,13 +38,13 @@ public class TestConvertRaster {
 	int imgHeight = 20;
 
 	@Test
-	public void bufferedToGray_ByteInterleaved() {
+	public void bufferedToGray_U8_ByteInterleaved() {
 		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
 
-		GecvTesting.checkSubImage(this, "checkBufferedToGray_ByteInterleaved", false, result);
+		GecvTesting.checkSubImage(this, "bufferedToGray_U8_ByteInterleaved", false, result);
 	}
 
-	public void checkBufferedToGray_ByteInterleaved(ImageUInt8 result) {
+	public void bufferedToGray_U8_ByteInterleaved(ImageUInt8 result) {
 		// check with a 3 byte image
 		BufferedImage origImg = createByteBuff(imgWidth, imgHeight, 3, rand);
 		ConvertRaster.bufferedToGray((ByteInterleavedRaster) origImg.getRaster(), result);
@@ -57,13 +58,33 @@ public class TestConvertRaster {
 	}
 
 	@Test
-	public void bufferedToGray_IntegerInterleaved() {
-		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
+	public void bufferedToGray_F32_ByteInterleaved() {
+		ImageFloat32 result = new ImageFloat32(imgWidth, imgHeight);
 
-		GecvTesting.checkSubImage(this, "bufferedToGray_IntegerInterleaved", false, result);
+		GecvTesting.checkSubImage(this, "bufferedToGray_F32_ByteInterleaved", false, result);
 	}
 
-	public void bufferedToGray_IntegerInterleaved(ImageUInt8 result) {
+	public void bufferedToGray_F32_ByteInterleaved(ImageFloat32 result) {
+		// check with a 3 byte image
+		BufferedImage origImg = createByteBuff(imgWidth, imgHeight, 3, rand);
+		ConvertRaster.bufferedToGray((ByteInterleavedRaster) origImg.getRaster(), result);
+
+		GecvTesting.checkEquals(origImg, result,1e-4f);
+
+		// check with a 1 byte image
+		origImg = createByteBuff(imgWidth, imgHeight, 1, rand);
+		ConvertRaster.bufferedToGray((ByteInterleavedRaster) origImg.getRaster(), result);
+		GecvTesting.checkEquals(origImg, result,1e-4f);
+	}
+
+	@Test
+	public void bufferedToGray_U8_IntegerInterleaved() {
+		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
+
+		GecvTesting.checkSubImage(this, "bufferedToGray_U8_IntegerInterleaved", false, result);
+	}
+
+	public void bufferedToGray_U8_IntegerInterleaved(ImageUInt8 result) {
 		BufferedImage origImg = createIntBuff(imgWidth, imgHeight, rand);
 		ConvertRaster.bufferedToGray((IntegerInterleavedRaster) origImg.getRaster(), result);
 
@@ -71,17 +92,45 @@ public class TestConvertRaster {
 	}
 
 	@Test
-	public void bufferedToGray_BufferedImage() {
-		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
+	public void bufferedToGray_F32_IntegerInterleaved() {
+		ImageFloat32 result = new ImageFloat32(imgWidth, imgHeight);
 
-		GecvTesting.checkSubImage(this, "bufferedToGray_IntegerInterleaved", false, result);
+		GecvTesting.checkSubImage(this, "bufferedToGray_F32_IntegerInterleaved", false, result);
 	}
 
-	public void bufferedToGray_BufferedImage(ImageUInt8 result) {
+	public void bufferedToGray_F32_IntegerInterleaved(ImageFloat32 result) {
+		BufferedImage origImg = createIntBuff(imgWidth, imgHeight, rand);
+		ConvertRaster.bufferedToGray((IntegerInterleavedRaster) origImg.getRaster(), result);
+
+		GecvTesting.checkEquals(origImg, result,1e-4f);
+	}
+
+	@Test
+	public void bufferedToGray_U8_BufferedImage() {
+		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
+
+		GecvTesting.checkSubImage(this, "bufferedToGray_U8_BufferedImage", false, result);
+	}
+
+	public void bufferedToGray_U8_BufferedImage(ImageUInt8 result) {
 		BufferedImage origImg = createIntBuff(imgWidth, imgHeight, rand);
 		ConvertRaster.bufferedToGray(origImg, result);
 
 		GecvTesting.checkEquals(origImg, result);
+	}
+
+	@Test
+	public void bufferedToGray_F32_BufferedImage() {
+		ImageFloat32 result = new ImageFloat32(imgWidth, imgHeight);
+
+		GecvTesting.checkSubImage(this, "bufferedToGray_F32_BufferedImage", false, result);
+	}
+
+	public void bufferedToGray_F32_BufferedImage(ImageFloat32 result) {
+		BufferedImage origImg = createIntBuff(imgWidth, imgHeight, rand);
+		ConvertRaster.bufferedToGray(origImg, result);
+
+		GecvTesting.checkEquals(origImg, result, 1e-3f);
 	}
 
 	@Test
@@ -158,7 +207,7 @@ public class TestConvertRaster {
 	public static void randomize(BufferedImage img, Random rand) {
 		for (int i = 0; i < img.getWidth(); i++) {
 			for (int j = 0; j < img.getHeight(); j++) {
-				img.setRGB(i, j, rand.nextInt() & 0xFFFFFF);
+				img.setRGB(i, j, rand.nextInt() & 0xFFFFFF );
 			}
 		}
 	}

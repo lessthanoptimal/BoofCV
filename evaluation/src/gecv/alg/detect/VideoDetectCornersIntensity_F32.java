@@ -18,11 +18,11 @@ package gecv.alg.detect;
 
 import gecv.abst.detect.corner.GeneralCornerDetector;
 import gecv.abst.detect.corner.GeneralCornerIntensity;
-import gecv.abst.detect.corner.WrapperFastCornerIntensity;
+import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.extract.CornerExtractor;
-import gecv.abst.detect.extract.WrapperNonMaxCandidate;
+import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
-import gecv.alg.detect.extract.NonMaxCornerCandidateExtractor;
+import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
@@ -31,8 +31,7 @@ import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageFloat32;
 import pja.geometry.struct.point.Point2D_I16;
 
 import java.awt.*;
@@ -43,18 +42,18 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoDetectCornersIntensity extends ProcessImageSequence<ImageUInt8> {
+public class VideoDetectCornersIntensity_F32 extends ProcessImageSequence<ImageFloat32> {
 
-	GeneralCornerDetector<ImageUInt8, ImageSInt16> detector;
-	ImageSInt16 derivX;
-	ImageSInt16 derivY;
+	GeneralCornerDetector<ImageFloat32, ImageFloat32> detector;
+	ImageFloat32 derivX;
+	ImageFloat32 derivY;
 
 	QueueCorner corners;
 
 	ImagePanel panel;
 
-	public VideoDetectCornersIntensity(SimpleImageSequence<ImageUInt8> sequence,
-									   GeneralCornerDetector<ImageUInt8, ImageSInt16> detector) {
+	public VideoDetectCornersIntensity_F32(SimpleImageSequence<ImageFloat32> sequence,
+									   GeneralCornerDetector<ImageFloat32, ImageFloat32> detector) {
 		super(sequence);
 
 		this.detector = detector;
@@ -62,12 +61,12 @@ public class VideoDetectCornersIntensity extends ProcessImageSequence<ImageUInt8
 
 
 	@Override
-	public void processFrame(ImageUInt8 image) {
+	public void processFrame(ImageFloat32 image) {
 
 		if( detector.getRequiresGradient() ) {
 			if (derivX == null) {
-				derivX = new ImageSInt16(image.width, image.height);
-				derivY = new ImageSInt16(image.width, image.height);
+				derivX = new ImageFloat32(image.width, image.height);
+				derivY = new ImageFloat32(image.width, image.height);
 			}
 
 			// compute the image gradient
@@ -79,7 +78,7 @@ public class VideoDetectCornersIntensity extends ProcessImageSequence<ImageUInt8
 	}
 
 	@Override
-	public void updateGUI(BufferedImage guiImage, ImageUInt8 origImage) {
+	public void updateGUI(BufferedImage guiImage, ImageFloat32 origImage) {
 		Graphics2D g2 = guiImage.createGraphics();
 
 		for (int i = 0; i < corners.size(); i++) {
@@ -108,7 +107,7 @@ public class VideoDetectCornersIntensity extends ProcessImageSequence<ImageUInt8
 		} else {
 			fileName = args[0];
 		}
-		SimpleImageSequence<ImageUInt8> sequence = new XugglerSimplified<ImageUInt8>(fileName, ImageUInt8.class);
+		SimpleImageSequence<ImageFloat32> sequence = new XugglerSimplified<ImageFloat32>(fileName, ImageFloat32.class);
 
 		ImageBase<?> image = sequence.next();
 
@@ -117,18 +116,18 @@ public class VideoDetectCornersIntensity extends ProcessImageSequence<ImageUInt8
 		int width = image.width;
 		int height = image.height;
 
-//		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity = new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(FactoryCornerIntensity.createKlt_I16(width, height, radius));
-		GeneralCornerIntensity<ImageUInt8, ImageSInt16> intensity =
-				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryCornerIntensity.createFast12_I8(width, height, 8 , 12));
+		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKlt_F32(width, height, radius));
+//		GeneralCornerIntensity<ImageUInt8, ImageSInt16> intensity =
+//				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryCornerIntensity.createFast12_I8(width, height, 8 , 12));
 
-//		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(radius + 10, radius + 10, 10f));
+		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(radius + 10, radius + 10, 10f));
 //		CornerExtractor extractor = new WrapperNonMax( new NonMaxCornerExtractorNaive(radius+10,10f));
-		CornerExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(radius+10, 10f));
+//		CornerExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(radius+10, 10f));
 
-		GeneralCornerDetector<ImageUInt8, ImageSInt16> detector = new GeneralCornerDetector<ImageUInt8, ImageSInt16>(intensity, extractor, maxCorners);
+		GeneralCornerDetector<ImageFloat32, ImageFloat32> detector = new GeneralCornerDetector<ImageFloat32, ImageFloat32>(intensity, extractor, maxCorners);
 
 
-		VideoDetectCornersIntensity display = new VideoDetectCornersIntensity(sequence, detector);
+		VideoDetectCornersIntensity_F32 display = new VideoDetectCornersIntensity_F32(sequence, detector);
 
 		display.process();
 	}

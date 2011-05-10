@@ -21,7 +21,7 @@ package gecv.struct.image;
  */
 public class TestImageSInt32 extends StandardImageIntegerTests {
 
-	protected TestImageSInt32() {
+	public TestImageSInt32() {
 		super(true);
 	}
 

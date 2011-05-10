@@ -20,7 +20,7 @@ package gecv.struct.image;
  * @author Peter Abeles
  */
 public class TestImageUInt8 extends StandardImageIntegerTests {
-	protected TestImageUInt8() {
+	public TestImageUInt8() {
 		super(false);
 	}
 

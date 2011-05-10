@@ -29,10 +29,10 @@ import pja.sorting.QuickSelectF;
  */
 public class SelectNBestCorners {
 
+	// list of the found best corners
 	QueueCorner bestCorners;
 	int indexes[];
 	float inten[];
-	private QueueCorner corners;
 
 	public SelectNBestCorners(int maxCorners) {
 		bestCorners = new QueueCorner(maxCorners);

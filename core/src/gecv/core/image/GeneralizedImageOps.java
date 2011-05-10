@@ -49,14 +49,14 @@ public class GeneralizedImageOps {
 	}
 
 	public static void randomize(ImageBase img, int min, int max, Random rand) {
-		if (img.getClass() == ImageUInt8.class) {
-			BasicDrawing_I8.randomize((ImageUInt8) img, rand, min, max);
-		} else if (img.getClass() == ImageSInt16.class) {
-			UtilImageInt16.randomize((ImageSInt16) img, rand, (short) min, (short) max);
+		if (img.getClass() == ImageUInt8.class || img.getClass() == ImageSInt8.class ) {
+			BasicDrawing_I8.randomize((ImageInt8) img, rand, min, max);
+		} else if (img.getClass() == ImageSInt16.class || img.getClass() == ImageUInt16.class) {
+			UtilImageInt16.randomize((ImageInt16) img, rand, min, max);
 		} else if (img.getClass() == ImageFloat32.class) {
 			UtilImageFloat32.randomize((ImageFloat32) img, rand, min, max);
 		} else {
-			throw new RuntimeException("Adsasd");
+			throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
 		}
 	}
 

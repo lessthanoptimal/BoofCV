@@ -42,8 +42,8 @@ import gecv.struct.image.ImageUInt8;
 public class ConvolveImageStandard {
 
 	public static void horizontal( Kernel1D_F32 kernel ,
-								  ImageFloat32 image, ImageFloat32 dest,
-								  boolean includeBorder) {
+								   ImageFloat32 image, ImageFloat32 dest,
+								   boolean includeBorder) {
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
 		final float[] dataKer = kernel.data;

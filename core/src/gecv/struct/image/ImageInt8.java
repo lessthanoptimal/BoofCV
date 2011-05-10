@@ -18,12 +18,14 @@ package gecv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is an unsigned 8-bit byte.
+ * Base class for 8-bit images.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImageUInt8 extends ImageInt8<ImageUInt8> {
+public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
+
+	public byte data[];
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
@@ -31,40 +33,52 @@ public class ImageUInt8 extends ImageInt8<ImageUInt8> {
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public ImageUInt8(int width, int height) {
+	public ImageInt8(int width, int height) {
 		super(width, height);
 	}
 
-	public ImageUInt8() {
+	public ImageInt8() {
 	}
 
 	/**
-	 * <p>
-	 * Returns the value of the specified pixel.
-	 * </p>
+	 * Sets the value of the specified pixel.
 	 *
-	 * @param x pixel coordinate.
-	 * @param y pixel coordinate.
-	 * @return an intensity value.
+	 * @param x	 pixel coordinate.
+	 * @param y	 pixel coordinate.
+	 * @param value The pixel's new value.
 	 */
 	@Override
-	public int get(int x, int y) {
+	public void set(int x, int y, int value) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		return data[getIndex(x, y)] & 0xFF;
+		data[getIndex(x, y)] = (byte) value;
 	}
 
 	@Override
-	public boolean isSigned() {
-		return false;
+	protected Object _getData() {
+		return data;
 	}
 
 	@Override
-	public ImageUInt8 _createNew(int imgWidth, int imgHeight) {
-		if (imgWidth == -1 || imgHeight == -1) {
-			return new ImageUInt8();
+	protected void _setData(Object data) {
+		this.data = (byte[]) data;
+	}
+
+	@Override
+	protected Class<?> _getPrimitiveType() {
+		return byte.class;
+	}
+
+	public void printBinary() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (get(x, y) == 0)
+					System.out.print("0");
+				else
+					System.out.print("1");
+			}
+			System.out.println();
 		}
-		return new ImageUInt8(imgWidth, imgHeight);
 	}
 }

@@ -25,7 +25,12 @@ import static org.junit.Assert.fail;
  */
 public class TestSelectNBestCorners {
 	@Test
-	public void test() {
+	public void testLessThanN() {
+		fail("implement tests");
+	}
+
+	@Test
+	public void testMoreThanN() {
 		fail("implement tests");
 	}
 }

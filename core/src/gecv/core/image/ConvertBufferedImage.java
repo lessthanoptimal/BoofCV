@@ -183,7 +183,7 @@ public class ConvertBufferedImage {
 		if (type == ImageUInt8.class) {
 			return (T) convertFrom(src, (ImageUInt8) dst);
 		} else if (type == ImageFloat32.class) {
-			throw new RuntimeException("Not supported yet");
+			return (T) convertFrom(src, (ImageFloat32) dst);
 		} else {
 			throw new IllegalArgumentException("Unknown type " + type);
 		}
@@ -204,6 +204,34 @@ public class ConvertBufferedImage {
 			}
 		} else {
 			dst = new ImageUInt8(src.getWidth(), src.getHeight());
+		}
+
+		if (src.getRaster() instanceof ByteInterleavedRaster) {
+			ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
+		} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
+			ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
+		} else {
+			ConvertRaster.bufferedToGray(src, dst);
+		}
+
+		return dst;
+	}
+
+	/**
+	 * Converts the buffered image into an {@link gecv.struct.image.ImageUInt8}.  If the buffered image
+	 * has multiple channels the intensities of each channel are averaged together.
+	 *
+	 * @param src Input image.
+	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
+	 * @return Converted image.
+	 */
+	public static ImageFloat32 convertFrom(BufferedImage src, ImageFloat32 dst) {
+		if (dst != null) {
+			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
+				throw new IllegalArgumentException("image dimension are different");
+			}
+		} else {
+			dst = new ImageFloat32(src.getWidth(), src.getHeight());
 		}
 
 		if (src.getRaster() instanceof ByteInterleavedRaster) {

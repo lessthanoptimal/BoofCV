@@ -16,6 +16,7 @@
 
 package gecv.core.image;
 
+import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -73,6 +74,46 @@ public class ConvertRaster {
 		}
 	}
 
+/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToGray(ByteInterleavedRaster src, ImageFloat32 dst) {
+		byte[] srcData = src.getDataStorage();
+
+		float[] data = dst.data;
+
+		int numBands = src.getNumBands();
+
+		if (numBands == 3) {
+			int indexSrc = 0;
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + dst.stride * y;
+				int indexDstEnd = indexDst + dst.width;
+				for (; indexDst < indexDstEnd; indexDst++) {
+					int r = srcData[indexSrc++] & 0xFF;
+					int g = srcData[indexSrc++] & 0xFF;
+					int b = srcData[indexSrc++] & 0xFF;
+
+					float ave = (r + g + b) / 3.0f;
+
+					data[indexDst] = ave;
+				}
+			}
+		} else if (numBands == 1) {
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + dst.stride * y;
+				int indexDstEnd = indexDst + dst.width;
+				int indexSrc = dst.width * y;
+
+				for (; indexDst < indexDstEnd; indexDst++) {
+					data[indexDst] = srcData[indexSrc++] & 0xFF;
+				}
+			}
+		} else {
+			throw new RuntimeException("Write more code here.");
+		}
+}
+
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
@@ -88,13 +129,68 @@ public class ConvertRaster {
 
 				int rgb = srcData[indexSrc++];
 
-				int r = (rgb >> 16) & 0xFF;
-				int g = (rgb >> 8) & 0xFF;
+				int r = (rgb >>> 16) & 0xFF;
+				int g = (rgb >>> 8) & 0xFF;
 				int b = rgb & 0xFF;
 
 				int ave = (r + g + b) / 3;
 
 				data[indexDst++] = (byte) ave;
+			}
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToGray(IntegerInterleavedRaster src, ImageFloat32 dst) {
+		int[] srcData = src.getDataStorage();
+
+		float[] data = dst.data;
+
+		int indexSrc = 0;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + y * dst.stride;
+			for (int x = 0; x < dst.width; x++) {
+
+				int rgb = srcData[indexSrc++];
+
+				int r = (rgb >>> 16) & 0xFF;
+				int g = (rgb >>> 8) & 0xFF;
+				int b = rgb & 0xFF;
+
+				float ave = (r + g + b) / 3.0f;
+
+				data[indexDst++] = ave;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Converts a buffered image into an 8bit intensity image using the
+	 * BufferedImage's RGB interface.
+	 * </p>
+	 * <p>
+	 * This is much slower than working
+	 * directly with the BufferedImage's internal raster and should be
+	 * avoided if possible.
+	 * </p>
+	 *
+	 * @param src Input image.
+	 * @param dst Output image.
+	 */
+	public static void bufferedToGray(BufferedImage src, ImageUInt8 dst) {
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		byte[] data = dst.data;
+		for (int y = 0; y < height; y++) {
+			int index = dst.startIndex + y*dst.stride;
+			for (int x = 0; x < width; x++) {
+				int argb = src.getRGB(x, y);
+
+				data[index++] = (byte) ((((argb >>> 16) & 0xFF) + ((argb >>> 8) & 0xFF) + (argb & 0xFF)) / 3);
 			}
 		}
 	}
@@ -114,23 +210,23 @@ public class ConvertRaster {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void bufferedToGray(BufferedImage src, ImageUInt8 dst) {
+	public static void bufferedToGray(BufferedImage src, ImageFloat32 dst) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
-		byte[] data = dst.data;
-		int index = dst.startIndex;
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				int argb = src.getRGB(j, i);
+		float[] data = dst.data;
+		for (int y = 0; y < height; y++) {
+			int index = dst.startIndex + y*dst.stride;
+			for (int x = 0; x < width; x++) {
+				int argb = src.getRGB(x, y);
 
-				int r = (argb >> 16) & 0xFF;
-				int g = (argb >> 8) & 0xFF;
+				int r = (argb >>> 16) & 0xFF;
+				int g = (argb >>> 8) & 0xFF;
 				int b = argb & 0xFF;
 
-				int ave = (r + g + b) / 3;
+				float ave = (r + g + b) / 3.0f;
 
-				data[index++] = (byte) ave;
+				data[index++] = ave;
 			}
 		}
 	}
