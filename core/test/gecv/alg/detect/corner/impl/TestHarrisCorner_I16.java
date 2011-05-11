@@ -16,16 +16,14 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.detect.corner.GenericCornerIntensityTests;
+import gecv.alg.detect.corner.GenericCornerIntensityGradientTests;
 import gecv.struct.image.ImageFloat32;
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestHarrisCorner_I16 extends GenericCornerIntensityTests {
+public class TestHarrisCorner_I16 extends GenericCornerIntensityGradientTests {
 	HarrisCorner_I16 detector = new HarrisCorner_I16(width,height,1,0.04f);
 
 	@Test

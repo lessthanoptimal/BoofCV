@@ -16,7 +16,7 @@
 
 package gecv.alg.interpolate;
 
-import gecv.alg.filter.convolve.edge.ConvolveNormalizedSparse;
+import gecv.alg.filter.convolve.ConvolveNormalizedSparse;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;

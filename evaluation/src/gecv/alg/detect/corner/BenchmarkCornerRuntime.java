@@ -55,6 +55,8 @@ public class BenchmarkCornerRuntime {
 	static ImageSInt16 derivYY_I16;
 	static ImageSInt16 derivXY_I16;
 
+	static int maxFeatures = imgWidth * imgHeight / (windowRadius * windowRadius);
+
 	// should it include the gradient calculation in the benchmark?
 	static boolean includeGradient = true;
 
@@ -88,6 +90,13 @@ public class BenchmarkCornerRuntime {
 		System.out.printf("%30s ops/sec = %6.2f\n", name, opsPerSec);
 	}
 
+	public static GeneralCornerDetector<ImageFloat32,ImageFloat32> createMedian_F32() {
+		WrapperMedianCornerIntensity<ImageFloat32, ImageFloat32> alg;
+		alg = WrapperMedianCornerIntensity.create(ImageFloat32.class,imgWidth,imgHeight,2);
+		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(windowRadius,windowRadius, 1));
+
+		return new GeneralCornerDetector<ImageFloat32,ImageFloat32>(alg,extractor,maxFeatures);
+	}
 
 	public static GeneralCornerDetector<ImageFloat32,ImageFloat32> createFast12_F32() {
 		FastCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createFast12_F32(imgWidth, imgHeight, 30, 12);
@@ -115,23 +124,23 @@ public class BenchmarkCornerRuntime {
 
 	private static GeneralCornerDetector<ImageFloat32,ImageFloat32> createGradientDetector(GradientCornerIntensity<ImageFloat32> alg) {
 		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(alg);
-		CornerExtractor extractorCandidate = new WrapperNonMax(new FastNonMaxCornerExtractor(windowRadius,windowRadius, 1));
+		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(windowRadius,windowRadius, 1));
 
-		return new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity, extractorCandidate, imgWidth * imgHeight / (windowRadius * windowRadius));
+		return new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity, extractor, maxFeatures);
 	}
 
 	private static GeneralCornerDetector<ImageFloat32,ImageFloat32> createDetector(KitRosCornerIntensity<ImageFloat32> alg) {
 		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperKitRosCornerIntensity<ImageFloat32,ImageFloat32>(alg);
-		CornerExtractor extractorCandidate = new WrapperNonMax(new FastNonMaxCornerExtractor(windowRadius,windowRadius, 1));
+		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(windowRadius,windowRadius, 1));
 
-		return new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity, extractorCandidate, imgWidth * imgHeight / (windowRadius * windowRadius));
+		return new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity, extractor, maxFeatures);
 	}
 
 	private static GeneralCornerDetector<ImageFloat32,ImageFloat32> createFastDetector(FastCornerIntensity<ImageFloat32> alg) {
 		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperFastCornerIntensity<ImageFloat32,ImageFloat32>(alg);
 		CornerExtractor extractorCandidate = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(windowRadius, 1));
 
-		return new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity, extractorCandidate, imgWidth * imgHeight / (windowRadius * windowRadius));
+		return new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity, extractorCandidate, maxFeatures);
 	}
 
 	public static void main(String args[]) {
@@ -181,6 +190,7 @@ public class BenchmarkCornerRuntime {
 			benchmark(createFast12_F32(), "Fast F32");
 			benchmark(createHarris_F32(), "Harris F32");
 			benchmark(createKitRos_F32(), "Kit Ros F32");
+			benchmark(createMedian_F32(), "Median F32");
 
 			System.out.println();
 		}

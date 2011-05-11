@@ -46,17 +46,29 @@ public class MedianSortNaive_I8 implements MedianImageFilter<ImageUInt8> {
 
 	@Override
 	public void process(ImageUInt8 input, ImageUInt8 output) {
-		for( int y = radius; y < input.height-radius; y++ ) {
-			for( int x = radius; x < input.width-radius; x++ ) {
+		for( int y = 0; y < input.height; y++ ) {
+			for( int x = 0; x < input.width; x++ ) {
+				int minI = y - radius;
+				int maxI = y + radius+1;
+				int minJ = x - radius;
+				int maxJ = x + radius+1;
+
+				// bound it ot be inside the image
+				if( minI < 0 ) minI = 0;
+				if( minJ < 0 ) minJ = 0;
+				if( maxI > input.height ) maxI = input.height;
+				if( maxJ > input.width ) maxJ = input.width;
+
 				int index = 0;
-				for( int i = -radius; i <= radius; i++ ) {
-					for( int j = -radius; j <= radius; j++ ) {
-						values[index++] = input.get(x+j,y+i);
+
+				for( int i = minI; i < maxI; i++ ) {
+					for( int j = minJ; j < maxJ; j++ ) {
+						values[index++] = input.get(j,i);
 					}
 				}
 				
 				// use quick select to avoid sorting the whole list
-				int median = QuickSelectI.select(values,values.length/2,values.length);
+				int median = QuickSelectI.select(values,index/2,index);
 				output.set(x,y, median );
 			}
 		}

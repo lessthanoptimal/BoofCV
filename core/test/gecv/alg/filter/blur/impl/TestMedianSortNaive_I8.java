@@ -50,5 +50,10 @@ public class TestMedianSortNaive_I8 {
 		assertEquals(6,found.get(2,1));
 		assertEquals(9,found.get(1,2));
 		assertEquals(10,found.get(2,2));
+
+		// check the edges
+		assertEquals(4,found.get(0,0));
+		assertEquals(5,found.get(2,0));
+		assertEquals(13,found.get(2,3));
 	}
 }

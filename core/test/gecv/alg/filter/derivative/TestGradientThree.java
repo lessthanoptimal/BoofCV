@@ -17,7 +17,7 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.alg.filter.convolve.ConvolveImage;
+import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.core.image.UtilImageFloat32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
@@ -122,7 +122,7 @@ public class TestGradientThree {
 
 		// compare to the equivalent convolution
 		Kernel1D_I32 kernel = new Kernel1D_I32(3, -1, 0, 1);
-		ConvolveImage.horizontal(kernel, img, convX, true);
+		ConvolveImageNoBorder.horizontal(kernel, img, convX, true);
 
 		GecvTesting.assertEquals(derivX, convX, 1);
 	}
@@ -143,7 +143,7 @@ public class TestGradientThree {
 
 		// compare to the equivalent convolution
 		Kernel1D_I32 kernel = new Kernel1D_I32(3, -1, 0, 1);
-		ConvolveImage.vertical(kernel, img, convY, true);
+		ConvolveImageNoBorder.vertical(kernel, img, convY, true);
 
 		GecvTesting.assertEquals(derivY, convY, 1);
 	}
@@ -164,7 +164,7 @@ public class TestGradientThree {
 
 		// compare to the equivalent convolution
 		Kernel1D_F32 kernel = new Kernel1D_F32(3, -0.5f, 0f, 0.5f);
-		ConvolveImage.horizontal(kernel, img, convX, true);
+		ConvolveImageNoBorder.horizontal(kernel, img, convX, true);
 
 		GecvTesting.assertEquals(derivX, convX, 0, 1);
 	}
@@ -185,7 +185,7 @@ public class TestGradientThree {
 
 		// compare to the equivalent convolution
 		Kernel1D_F32 kernel = new Kernel1D_F32(3, -0.5f, 0, 0.5f);
-		ConvolveImage.vertical(kernel, img, convY, true);
+		ConvolveImageNoBorder.vertical(kernel, img, convY, true);
 
 		GecvTesting.assertEquals(derivY, convY, 0, 1);
 	}

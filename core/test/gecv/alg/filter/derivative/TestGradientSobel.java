@@ -17,7 +17,7 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.alg.filter.convolve.ConvolveImage;
+import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.core.image.UtilImageFloat32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
@@ -65,11 +65,11 @@ public class TestGradientSobel {
 		ImageSInt16 convX = new ImageSInt16(width, height);
 		ImageSInt16 convY = new ImageSInt16(width, height);
 
-		ConvolveImage.horizontal(kernel1, img, temp, true);
-		ConvolveImage.vertical(kernel2, temp, convY, true);
+		ConvolveImageNoBorder.horizontal(kernel1, img, temp, true);
+		ConvolveImageNoBorder.vertical(kernel2, temp, convY, true);
 
-		ConvolveImage.vertical(kernel1, img, temp, true);
-		ConvolveImage.horizontal(kernel2, temp, convX, true);
+		ConvolveImageNoBorder.vertical(kernel1, img, temp, true);
+		ConvolveImageNoBorder.horizontal(kernel2, temp, convX, true);
 
 		GecvTesting.assertEquals(derivX, convX, 1);
 		GecvTesting.assertEquals(derivY, convY, 1);
@@ -97,11 +97,11 @@ public class TestGradientSobel {
 		ImageFloat32 convX = new ImageFloat32(width, height);
 		ImageFloat32 convY = new ImageFloat32(width, height);
 
-		ConvolveImage.horizontal(kernel1, img, temp, true);
-		ConvolveImage.vertical(kernel2, temp, convY, true);
+		ConvolveImageNoBorder.horizontal(kernel1, img, temp, true);
+		ConvolveImageNoBorder.vertical(kernel2, temp, convY, true);
 
-		ConvolveImage.vertical(kernel1, img, temp, true);
-		ConvolveImage.horizontal(kernel2, temp, convX, true);
+		ConvolveImageNoBorder.vertical(kernel1, img, temp, true);
+		ConvolveImageNoBorder.horizontal(kernel2, temp, convX, true);
 
 		GecvTesting.assertEquals(derivX, convX, 1, 1e-4f);
 		GecvTesting.assertEquals(derivY, convY, 1, 1e-4f);

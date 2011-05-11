@@ -49,14 +49,16 @@ public abstract class CompareEquivalentFunctions {
 			Method candidates[] = validationClass.getMethods();
 			Method matched = null;
 			for( Method c : candidates ) {
-				if( isEquivalent(m,c)) {
+				if( isEquivalent(c, m)) {
 					matched = c;
 					break;
 				}
 			}
 
-			if( matched == null )
+			if( matched == null ) {
+				System.out.println("Can't find an equivalent function in validation class");
 				continue;
+			}
 
 			System.out.println("Examining: "+m.getName());
 			compareMethods(m, matched);
@@ -65,7 +67,7 @@ public abstract class CompareEquivalentFunctions {
 
 		// update this as needed when new functions are added
 		if(numMethods != numFound)
-			throw new RuntimeException("Unexpected number of methods");
+			throw new RuntimeException("Unexpected number of methods: Found "+numFound+"  expected "+numMethods);
 	}
 
 	/**
@@ -84,7 +86,7 @@ public abstract class CompareEquivalentFunctions {
 	}
 
 	private void compareMethods( Method target , Method validation ) {
-		Object [][]targetParamArray = createInputParam(target);
+		Object [][]targetParamArray = createInputParam(target,validation);
 
 		for( int i = 0; i < targetParamArray.length; i++  ) {
 			compareMethods(target, validation, targetParamArray[i]);
@@ -130,14 +132,31 @@ public abstract class CompareEquivalentFunctions {
 		return ret;
 	}
 
+	/**
+	 * Checks to see if the provided method from the test class is a method that should be tested
+	 */
 	protected abstract boolean isTestMethod( Method m );
 
-	protected abstract boolean isEquivalent( Method evaluation , Method candidate );
+	/**
+	 * Returns two if the two methods provide results that should be compared
+	 */
+	protected abstract boolean isEquivalent(Method candidate, Method validation);
 
-	protected abstract Object[][] createInputParam( Method m );
+	/**
+	 * Creates the set of input parameters for the functions.  Tests on multiple inputs are
+	 * handled by returning multiple sets of parameters
+	 */
+	protected abstract Object[][] createInputParam( Method candidate, Method validation );
 
+	/**
+	 * Adjusts the input for the validation method.  Allows methods with different paramter
+	 * sets to be used.
+	 */
 	protected abstract Object[] reformatForValidation( Method m , Object[] targetParam);
 
+	/**
+	 * Compares the two sets of results from the target and validation methods.
+	 */
 	protected abstract void compareResults( Object targetResult, Object[] targetParam,
 											Object validationResult, Object[] validationParam );
 

@@ -16,19 +16,22 @@
 
 package gecv.alg.drawing;
 
+import gecv.alg.InputSanityCheck;
 import gecv.alg.drawing.impl.PixelMath_F32;
 import gecv.alg.drawing.impl.PixelMath_S16;
 import gecv.alg.drawing.impl.PixelMath_U16;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * Standard mathematical operations performed on a per-pixel basis or computed across the whole image.
  *
  * @author Peter Abeles
  */
-// todo make sure an image can be rescaled from 16bit to 8bit 
+// todo make sure an image can be rescaled from 16bit to 8bit
+// todo plus, minus, times, divide
 public class PixelMath {
 
 	public static float maxAbs( ImageFloat32 image ) {
@@ -85,5 +88,32 @@ public class PixelMath {
 
 	public static void plus( ImageUInt16 image , int value ) {
 		PixelMath_U16.plus(image,value);
+	}
+
+	/**
+	 *
+	 * output = ||A-B||
+	 *
+	 * @param imgA
+	 * @param imgB
+	 * @param output
+	 * @return
+	 */
+	public static ImageUInt8 differenceMagnitude(ImageUInt8 imgA, ImageUInt8 imgB, ImageUInt8 output) {
+		if( output == null ) {
+			InputSanityCheck.checkSameShape(imgA,imgB);
+			output = new ImageUInt8(imgA.width,imgB.height);
+		} else {
+			InputSanityCheck.checkSameShape(imgA,imgB,output);
+		}
+
+		for( int y = 0; y < imgA.height; y++ ) {
+			for( int x = 0; x < imgA.width; x++ ) {
+				int val = Math.abs(imgA.get(x,y) - imgB.get(x,y));
+				output.set(x,y,val);
+			}
+		}
+
+		return output;
 	}
 }

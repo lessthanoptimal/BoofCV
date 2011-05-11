@@ -17,9 +17,9 @@
 package gecv.alg.filter.convolve;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.filter.convolve.impl.ConvolveBox_F32_F32;
-import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I16;
-import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I32;
+import gecv.alg.filter.convolve.noborder.ConvolveBox_F32_F32;
+import gecv.alg.filter.convolve.noborder.ConvolveBox_I8_I16;
+import gecv.alg.filter.convolve.noborder.ConvolveBox_I8_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageSInt32;

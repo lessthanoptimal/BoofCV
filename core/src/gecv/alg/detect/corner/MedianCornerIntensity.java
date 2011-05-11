@@ -16,6 +16,8 @@
 
 package gecv.alg.detect.corner;
 
+import gecv.struct.image.ImageBase;
+
 /**
  * <p>
  * Corner detector based on median filter.  First a median filter is run on the input image then the difference
@@ -25,5 +27,7 @@ package gecv.alg.detect.corner;
  *
  * @author Peter Abeles
  */
-public class MedianCornerIntensity {
+public interface MedianCornerIntensity<T extends ImageBase> extends CornerIntensity<T> {
+
+	public void process( T originalImage , T medianImage );
 }

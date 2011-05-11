@@ -1,12 +1,11 @@
-- Why is Laplacian second derivative?  Adjust its class name
 
-- GUI application for showing different image derivatives
- * derivative X and Y
- * intensity
+- Median Filter
+ * Image Edges, handle them
 
 - Derivative
  * Gaussian derivative kernel 1D
  * put into FactoryDerivative
+ * Add a Sobel based Hessian
 
 - Edges
  * Whole image:
@@ -26,9 +25,11 @@
  
 - Convolve
  * Change TestConvolveImageStandard into a completely automated test using reflections
- * Can 2D convolution be speed up by inlining a single row?
  * Add a new implementation for horizontal and vertical which are "in-place"
    Uses an array one row/column long in which the image is locally copied.
+ * Sparse Kernel Convolve for when there is a lot of zeros
+   - Unroll
+   - Compare speed to hand derived kernels in gradient
 
 - Improve Sort Median Filter
 *   Use bubble sort to avoid resorting each time

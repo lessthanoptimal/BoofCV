@@ -38,7 +38,7 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method m) {
+	protected Object[][] createInputParam(Method candidate, Method validation) {
 
 		ImageUInt8 input = new ImageUInt8(width, height);
 		ImageUInt8 output = new ImageUInt8(width, height);

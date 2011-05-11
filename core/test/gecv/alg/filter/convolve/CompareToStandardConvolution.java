@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.convolve;
 
-import gecv.alg.filter.convolve.impl.ConvolveImageStandard;
+import gecv.alg.filter.convolve.noborder.ConvolveImageStandard;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
@@ -51,8 +51,8 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method m) {
-		Class<?> paramTypes[] = m.getParameterTypes();
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		Class<?> paramTypes[] = candidate.getParameterTypes();
 
 		Object kernel;
 		if (Kernel1D_F32.class == paramTypes[0]) {
@@ -71,7 +71,7 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 		GeneralizedImageOps.randomize(src, 0, 130, rand);
 		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 
-		if( m.getName().compareTo("convolve") != 0 ) {
+		if( candidate.getName().compareTo("convolve") != 0 ) {
 			Object[][] ret = new Object[2][paramTypes.length];
 			int i = 0;
 			ret[0][i] = ret[1][i] = kernel; i++;

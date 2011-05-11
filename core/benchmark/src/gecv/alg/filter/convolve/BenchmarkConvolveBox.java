@@ -18,9 +18,9 @@ package gecv.alg.filter.convolve;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.filter.convolve.impl.ConvolveBox_F32_F32;
-import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I16;
-import gecv.alg.filter.convolve.impl.ConvolveBox_I8_I32;
+import gecv.alg.filter.convolve.noborder.ConvolveBox_F32_F32;
+import gecv.alg.filter.convolve.noborder.ConvolveBox_I8_I16;
+import gecv.alg.filter.convolve.noborder.ConvolveBox_I8_I32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -52,7 +52,7 @@ public class BenchmarkConvolveBox {
 	{
 		@Override
 		public void process() {
-			ConvolveImage.vertical(kernelI32,imgInt8,out_I16,false);
+			ConvolveImageNoBorder.vertical(kernelI32,imgInt8,out_I16,false);
 		}
 	}
 
@@ -60,7 +60,7 @@ public class BenchmarkConvolveBox {
 	{
 		@Override
 		public void process() {
-			ConvolveImage.vertical(kernelI32,imgInt8,out_I32,false);
+			ConvolveImageNoBorder.vertical(kernelI32,imgInt8,out_I32,false);
 		}
 	}
 

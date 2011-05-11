@@ -26,6 +26,7 @@ import gecv.alg.filter.derivative.HessianThree;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.ShowImages;
 import gecv.struct.QueueCorner;
+import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 import pja.geometry.struct.point.Point2D_F64;
@@ -49,7 +50,7 @@ public class BenchmarkCornerAccuracy {
 	int height = 300;
 	int radius = 2;
 
-	double distTol = 3;
+	double distTol = 8;
 
 	Random rand = new Random(234);
 
@@ -61,7 +62,13 @@ public class BenchmarkCornerAccuracy {
 	ImageSInt16 derivXY = new ImageSInt16(width,height);
 
 	List<Point2D_F64> corners = new ArrayList<Point2D_F64>();
-	
+
+	ImageFloat32 imageIntensity;
+
+	public QueueCorner detectMedianCorners( int imgWidth , int imgHeight , int medianRadius  ) {
+		return detectCorners(WrapperMedianCornerIntensity.<ImageUInt8, ImageSInt16>create(ImageUInt8.class,imgWidth,imgHeight,medianRadius));
+	}
+
 	public QueueCorner detectCorners( FastCornerIntensity<ImageUInt8> intensity  ) {
 		return detectCorners(new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(intensity));
 	}
@@ -77,7 +84,7 @@ public class BenchmarkCornerAccuracy {
 	public QueueCorner detectCorners( GeneralCornerIntensity<ImageUInt8, ImageSInt16> intensity  ) {
 		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(radius + 10, radius + 10, 1f));
 		GeneralCornerDetector<ImageUInt8, ImageSInt16> det =
-				new GeneralCornerDetector<ImageUInt8, ImageSInt16>(intensity, extractor, corners.size()+2);
+				new GeneralCornerDetector<ImageUInt8, ImageSInt16>(intensity, extractor, corners.size()*2);
 
 		if( det.getRequiresGradient() ) {
 			GradientSobel.process(image,derivX,derivY);
@@ -87,7 +94,7 @@ public class BenchmarkCornerAccuracy {
 		}
 
 		det.process(image,derivX,derivY,derivXX,derivYY,derivXY);
-		ShowImages.showWindow(det.getIntensity(),"Intensity",true);
+		imageIntensity = det.getIntensity();
 
 		return det.getCorners();
 	}
@@ -106,6 +113,7 @@ public class BenchmarkCornerAccuracy {
 		evaluate(detectCorners(FactoryCornerIntensity.createHarris_I16(width, height, radius, 0.04f)),"Harris");
 		evaluate(detectCorners(FactoryCornerIntensity.createKitRos_I16(width, height)),"KitRos");
 		evaluate(detectCorners(FactoryCornerIntensity.createKlt_I16(width, height, radius )),"KLT");
+		evaluate(detectMedianCorners(width, height, radius ),"Median");
 	}
 
 	private void createTestImage() {
@@ -133,10 +141,11 @@ public class BenchmarkCornerAccuracy {
 		g2.setTransform(tran);
 		g2.fillRect(x0,y0,w,h);
 
+		// -1 is added for w and h because it is drawn before that point
 		corners.add( new Point2D_F64(x0,y0));
-		corners.add( new Point2D_F64(x0+w,y0));
-		corners.add( new Point2D_F64(x0+w,y0+h));
-		corners.add( new Point2D_F64(x0,y0+h));
+		corners.add( new Point2D_F64(x0+w-1,y0));
+		corners.add( new Point2D_F64(x0+w-1,y0+h-1));
+		corners.add( new Point2D_F64(x0,y0+h-1));
 		for( int i = corners.size()-4; i < corners.size(); i++ ) {
 			Point2D_F64 c = corners.get(i);
 			Point2D src = new Point2D.Double(c.x,c.y);
@@ -148,6 +157,9 @@ public class BenchmarkCornerAccuracy {
 	}
 
 	public void evaluate( QueueCorner foundCorners , String name ) {
+
+		
+		ShowImages.showWindow(imageIntensity,"Intensity of "+name,true);
 
 		int numMatched = 0;
 		double error = 0;

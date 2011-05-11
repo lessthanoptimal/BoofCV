@@ -19,7 +19,7 @@ package gecv.alg.filter.convolve;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.alg.filter.convolve.impl.*;
+import gecv.alg.filter.convolve.noborder.*;
 import gecv.core.image.UtilImageFloat32;
 import gecv.core.image.UtilImageInt16;
 import gecv.struct.convolve.Kernel1D_F32;
@@ -142,7 +142,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImage.convolve(kernel2D_F32,imgFloat32,out_F32);
+			ConvolveImageNoBorder.convolve(kernel2D_F32,imgFloat32,out_F32);
 		}
 	}
 
@@ -167,7 +167,15 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImage.convolve(kernel2D_I32,imgInt8,out_I16);
+			ConvolveImageNoBorder.convolve(kernel2D_I32,imgInt8,out_I16);
+		}
+	}
+
+	public static class Convolve2D_Extend_I8_I16 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ConvolveExtended.convolve(kernel2D_I32,imgInt8,out_I16);
 		}
 	}
 
@@ -183,7 +191,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImage.convolve(kernel2D_I32,imgInt8,out_I8,10);
+			ConvolveImageNoBorder.convolve(kernel2D_I32,imgInt8,out_I8,10);
 		}
 	}
 
@@ -301,12 +309,13 @@ public class BenchmarkConvolve {
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I8_I8_div(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Box_I8_I32_Vertical(),TEST_TIME);
-//
+
 			ProfileOperation.printOpsPerSec(new Convolve2D_Std_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve2D_Unrolled_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve2D_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve2D_Std_I8_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve2D_I8_I16(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Convolve2D_Extend_I8_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve2D_Std_I8_I8_DIV(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve2D_I8_I8_DIV(),TEST_TIME);
 		}

@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.blur;
 
-import gecv.alg.filter.blur.impl.MedianHistogram_I8;
+import gecv.alg.filter.blur.impl.MedianHistogramInner_I8;
 import gecv.alg.filter.blur.impl.MedianSortNaive_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
@@ -29,11 +29,12 @@ import gecv.struct.image.ImageUInt8;
  */
 public class MedianFilterFactory {
 
-	public MedianImageFilter<ImageUInt8> create_I8( int radius ) {
-		return new MedianHistogram_I8(radius);
+	public static MedianImageFilter<ImageUInt8> create_I8( int radius ) {
+		// todo process outer part of the image
+		return new MedianHistogramInner_I8(radius);
 	}
 
-	public MedianImageFilter<ImageFloat32> create_F32( int radius ) {
+	public static MedianImageFilter<ImageFloat32> create_F32( int radius ) {
 		return new MedianSortNaive_F32(radius);
 	}
 }

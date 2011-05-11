@@ -17,7 +17,7 @@
 package gecv.alg.filter.basic;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.filter.basic.impl.BinaryEdgeOps;
+import gecv.alg.filter.basic.impl.BinaryBorderOps;
 import gecv.alg.filter.basic.impl.BinaryInnerOps;
 import gecv.alg.filter.basic.impl.BinaryNaiveOps;
 import gecv.struct.image.ImageUInt8;
@@ -58,7 +58,7 @@ public class BinaryImageOps {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.erode4(input, output);
-		BinaryEdgeOps.erode4(input, output);
+		BinaryBorderOps.erode4(input, output);
 
 		return output;
 	}
@@ -77,7 +77,7 @@ public class BinaryImageOps {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.dilate4(input, output);
-		BinaryEdgeOps.dilate4(input, output);
+		BinaryBorderOps.dilate4(input, output);
 
 		return output;
 	}
@@ -101,7 +101,7 @@ public class BinaryImageOps {
 
 		BinaryNaiveOps.edge4(input, output);
 		BinaryInnerOps.edge4(input, output);
-		BinaryEdgeOps.edge4(input, output);
+		BinaryBorderOps.edge4(input, output);
 
 		return output;
 	}
@@ -120,7 +120,7 @@ public class BinaryImageOps {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.erode8(input, output);
-		BinaryEdgeOps.erode8(input, output);
+		BinaryBorderOps.erode8(input, output);
 
 		return output;
 	}
@@ -139,7 +139,7 @@ public class BinaryImageOps {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.dilate8(input, output);
-		BinaryEdgeOps.dilate8(input, output);
+		BinaryBorderOps.dilate8(input, output);
 
 		return output;
 	}
@@ -162,7 +162,7 @@ public class BinaryImageOps {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.edge8(input, output);
-		BinaryEdgeOps.edge8(input, output);
+		BinaryBorderOps.edge8(input, output);
 
 		return output;
 	}
@@ -180,7 +180,7 @@ public class BinaryImageOps {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		BinaryInnerOps.removePointNoise(input, output);
-		BinaryEdgeOps.removePointNoise(input, output);
+		BinaryBorderOps.removePointNoise(input, output);
 
 		return output;
 	}

@@ -50,5 +50,10 @@ public class TestMedianSortNaive_F32 {
 		assertEquals(6,found.get(2,1),1e-6);
 		assertEquals(9,found.get(1,2),1e-6);
 		assertEquals(10,found.get(2,2),1e-6);
+
+		// check the edges
+		assertEquals(4,found.get(0,0),1e-6);
+		assertEquals(5,found.get(2,0),1e-6);
+		assertEquals(13,found.get(2,3),1e-6);
 	}
 }

@@ -70,6 +70,16 @@ public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
 		return byte.class;
 	}
 
+	public void print() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf("%3d ",get(x,y));
+			}
+			System.out.println();
+		}
+	}
+
+
 	public void printBinary() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {

@@ -16,7 +16,7 @@
 
 package gecv.abst.filter.derivative;
 
-import gecv.alg.filter.convolve.ConvolveImage;
+import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
@@ -43,8 +43,8 @@ public class DerivativeXY_Gaussian_F32 implements DerivativeXY<ImageFloat32, Ima
 
 	@Override
 	public void process( ImageFloat32 inputImage , ImageFloat32 derivX, ImageFloat32 derivY ) {
-		ConvolveImage.horizontal(kernel, inputImage, derivX, true);
-		ConvolveImage.vertical(kernel, inputImage, derivY, false);
+		ConvolveImageNoBorder.horizontal(kernel, inputImage, derivX, true);
+		ConvolveImageNoBorder.vertical(kernel, inputImage, derivY, false);
 	}
 
 	@Override

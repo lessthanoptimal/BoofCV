@@ -16,9 +16,7 @@
 
 package gecv.alg.detect.corner;
 
-import gecv.alg.filter.derivative.GradientSobel;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 
 import static org.junit.Assert.assertTrue;
@@ -35,12 +33,6 @@ public abstract class GenericCornerIntensityTests {
 
 	protected ImageUInt8 imageI = new ImageUInt8(width,height);
 	protected ImageFloat32 imageF = new ImageFloat32(width,height);
-
-	protected ImageSInt16 derivX_I16 = new ImageSInt16(width,height);
-	protected ImageSInt16 derivY_I16 = new ImageSInt16(width,height);
-
-	protected ImageFloat32 derivX_F32 = new ImageFloat32(width,height);
-	protected ImageFloat32 derivY_F32 = new ImageFloat32(width,height);
 
 	public abstract ImageFloat32 computeIntensity();
 
@@ -69,18 +61,30 @@ public abstract class GenericCornerIntensityTests {
 		assertTrue(cornerResponse>awayResponse);
 	}
 
+	/**
+	 * Computes image derivatives or other derived components from the input image needed for
+	 * calculating corners.
+	 */
+	protected abstract void computeDerivatives();
+
 	private float getResponse() {
-		GradientSobel.process(imageF,derivX_F32,derivY_F32);
-		GradientSobel.process(imageI,derivX_I16,derivY_I16);
+		computeDerivatives();
 
 		ImageFloat32 a = computeIntensity();
 
-		return a.get(width/2,height/2);
+		// return the sum of the region around the corner
+		// so that the intensity doesn't have to be right on the corner.
+		float sum = 0;
+		for( int i = -1; i <= 1; i++ ) {
+			for( int j = -1; j <= 1; j++ ) {
+				sum += a.get(width/2+j,height/2+j);
+			}
+		}
+		return sum;
 	}
 
 	private float getResponseAway() {
-		GradientSobel.process(imageF,derivX_F32,derivY_F32);
-		GradientSobel.process(imageI,derivX_I16,derivY_I16);
+		computeDerivatives();
 
 		ImageFloat32 a = computeIntensity();
 

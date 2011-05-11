@@ -44,7 +44,7 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 	}
 
 	@Override
-	protected boolean isEquivalent(Method evaluation, Method candidate) {
+	protected boolean isEquivalent(Method candidate, Method evaluation) {
 		if( evaluation.getName().compareTo(candidate.getName()) != 0 )
 			return false;
 

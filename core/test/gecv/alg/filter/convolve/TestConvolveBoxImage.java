@@ -74,7 +74,7 @@ public class TestConvolveBoxImage {
 
 			Class<?> kernelType = ConvolutionTestHelper.kernelTypeByInputType(inputType);
 
-			return ConvolveImage.class.getMethod(m.getName(), kernelType,inputType,outputType,boolean.class);
+			return ConvolveImageNoBorder.class.getMethod(m.getName(), kernelType,inputType,outputType,boolean.class);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}

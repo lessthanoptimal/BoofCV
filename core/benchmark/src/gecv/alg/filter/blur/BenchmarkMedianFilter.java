@@ -19,8 +19,8 @@ package gecv.alg.filter.blur;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.alg.filter.blur.impl.MedianHistogramNaive_I8;
-import gecv.alg.filter.blur.impl.MedianHistogram_I8;
+import gecv.alg.filter.blur.impl.MedianHistogramInnerNaive_I8;
+import gecv.alg.filter.blur.impl.MedianHistogramInner_I8;
 import gecv.alg.filter.blur.impl.MedianSortNaive_F32;
 import gecv.alg.filter.blur.impl.MedianSortNaive_I8;
 import gecv.core.image.UtilImageFloat32;
@@ -51,7 +51,7 @@ public class BenchmarkMedianFilter {
 
 	public static class HistogramNaive_I8 extends PerformerBase
 	{
-		MedianHistogramNaive_I8 alg = new MedianHistogramNaive_I8(radius);
+		MedianHistogramInnerNaive_I8 alg = new MedianHistogramInnerNaive_I8(radius);
 		@Override
 		public void process() {
 			alg.process(imgInt8,out_I8);
@@ -60,7 +60,7 @@ public class BenchmarkMedianFilter {
 
 	public static class Histogram_I8 extends PerformerBase
 	{
-		MedianHistogram_I8 alg = new MedianHistogram_I8(radius);
+		MedianHistogramInner_I8 alg = new MedianHistogramInner_I8(radius);
 		@Override
 		public void process() {
 			alg.process(imgInt8,out_I8);

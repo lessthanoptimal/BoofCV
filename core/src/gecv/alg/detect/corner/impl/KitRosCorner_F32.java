@@ -64,7 +64,7 @@ public class KitRosCorner_F32 implements KitRosCornerIntensity<ImageFloat32> {
 				float dy2 = dy*dy;
 
 
-				float top = dxx*dy2 - 2*dxy*dx*dy + dyy*dx2;
+				float top = Math.abs(dxx*dy2 - 2*dxy*dx*dy + dyy*dx2);
 				float bottom = dx2 + dy2;
 
 				if( bottom == 0.0 )

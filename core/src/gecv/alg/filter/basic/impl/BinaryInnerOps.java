@@ -22,7 +22,6 @@ import gecv.struct.image.ImageUInt8;
  * <p>
  * Optimized binary operations for the interior of an image only.  Allows less bounds checking
  * </p>
- * <p/>
  * <p>
  * DESIGN NOTE: Minimizing logical operations seems to boost performance significantly.  Even if this means increasing
  * the number of array accesses.  So always summing the neighbors is faster than checking one and then summing

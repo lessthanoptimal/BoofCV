@@ -16,6 +16,7 @@
 
 package gecv.alg.detect.corner.impl;
 
+import gecv.alg.detect.corner.GenericCornerIntensityGradientTests;
 import gecv.alg.detect.corner.GenericCornerIntensityTests;
 import gecv.alg.drawing.impl.BasicDrawing_I8;
 import gecv.alg.filter.derivative.GradientSobel;
@@ -36,7 +37,7 @@ public class TestKltCorner_I16 {
 
 	@Test
 	public void genericTests() {
-		GenericCornerIntensityTests generic = new GenericCornerIntensityTests(){
+		GenericCornerIntensityTests generic = new GenericCornerIntensityGradientTests(){
 
 			@Override
 			public ImageFloat32 computeIntensity() {

@@ -17,7 +17,7 @@
 package gecv.alg.filter.blur;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.filter.convolve.edge.ConvolveNormalized;
+import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
