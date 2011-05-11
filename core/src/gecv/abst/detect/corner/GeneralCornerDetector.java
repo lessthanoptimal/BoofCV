@@ -69,8 +69,8 @@ public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 	 * @param derivX image derivative in along the x-axis.
 	 * @param derivY image derivative in along the y-axis.
 	 */
-	public void process(I image , D derivX, D derivY) {
-		intensity.process(image,derivX, derivY);
+	public void process(I image , D derivX, D derivY, D derivXX, D derivYY , D derivXY ) {
+		intensity.process(image,derivX, derivY, derivXX, derivYY, derivXY );
 		foundCorners.reset();
 		if( intensity.hasCandidates() ) {
 			extractor.process(intensity.getIntensity(), intensity.getCandidates(), requestedFeatureNumber, foundCorners);
@@ -114,6 +114,15 @@ public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 	 */
 	public boolean getRequiresGradient() {
 		return intensity.getRequiresGradient();
+	}
+
+	/**
+	 * If the image Hessian is required for calculations.
+	 *
+	 * @return true if the image Hessian is required.
+	 */
+	public boolean getRequiresHessian() {
+		return intensity.getRequiresHessian();
 	}
 
 	public ImageFloat32 getIntensity() {

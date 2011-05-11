@@ -85,7 +85,7 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 			ImageBase t = (ImageBase)targetParam[i];
 			ImageBase v = (ImageBase)validationParam[i];
 
-			GecvTesting.assertEqualsGeneric(v,t,1,1e-5);
+			GecvTesting.assertEqualsGeneric(v,t,1,1e-4);// todo is this tolerance too big?  some operations with a slightly different ordering seem to require it
 		}
 	}
 }

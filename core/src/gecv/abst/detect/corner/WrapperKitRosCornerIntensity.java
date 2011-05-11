@@ -16,27 +16,27 @@
 
 package gecv.abst.detect.corner;
 
-import gecv.alg.detect.corner.FastCornerIntensity;
+import gecv.alg.detect.corner.KitRosCornerIntensity;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * Wrapper around children of {@link gecv.alg.detect.corner.FastCornerIntensity}.
+ * Wrapper around children of {@link gecv.alg.detect.corner.GradientCornerIntensity}.
  * 
  * @author Peter Abeles
  */
-public class WrapperFastCornerIntensity<I extends ImageBase, D extends ImageBase> implements GeneralCornerIntensity<I,D> {
+public class WrapperKitRosCornerIntensity<I extends ImageBase,D extends ImageBase> implements GeneralCornerIntensity<I,D> {
 
-	FastCornerIntensity<I> alg;
+	KitRosCornerIntensity<D> alg;
 
-	public WrapperFastCornerIntensity(FastCornerIntensity<I> alg) {
+	public WrapperKitRosCornerIntensity(KitRosCornerIntensity<D> alg) {
 		this.alg = alg;
 	}
 
 	@Override
-	public void process(I input, D derivX , D derivY , D derivXX , D derivYY , D derivXY ) {
-		alg.process(input);
+	public void process(I image , D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+		alg.process(derivX,derivY,derivXX,derivYY,derivXY);
 	}
 
 	@Override
@@ -46,21 +46,21 @@ public class WrapperFastCornerIntensity<I extends ImageBase, D extends ImageBase
 
 	@Override
 	public QueueCorner getCandidates() {
-		return alg.getCandidates();
+		return null;
 	}
 
 	@Override
 	public boolean getRequiresGradient() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean getRequiresHessian() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean hasCandidates() {
-		return true;
+		return false;
 	}
 }

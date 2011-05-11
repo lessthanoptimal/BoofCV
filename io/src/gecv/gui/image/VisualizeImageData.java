@@ -41,6 +41,9 @@ public class VisualizeImageData {
 		if( !src.isSigned() )
 			throw new IllegalArgumentException("Can only convert signed images.");
 
+		if( maxValue == 0 )
+			return dst;
+
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
 				int v = src.get(x,y);

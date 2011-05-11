@@ -37,7 +37,6 @@ import gecv.struct.image.ImageUInt8;
  * 
  * @author Peter Abeles
  */
-// todo add integer convolutions which divide
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
 public class ConvolveImageStandard {
 

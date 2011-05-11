@@ -40,11 +40,19 @@ public class FactoryDerivative {
 		return new DerivativeXY_Three_F32();
 	}
 
+	public static HessianXY<ImageFloat32,ImageFloat32> hessianThree_F32() {
+		return new HessianXY_Three_F32();
+	}
+
 	public static DerivativeXY<ImageUInt8, ImageSInt16> sobel_I8() {
 		return new DerivativeXY_Sobel_I8();
 	}
 
 	public static DerivativeXY<ImageUInt8, ImageSInt16> three_I8() {
 		return new DerivativeXY_Three_I8();
+	}
+
+	public static HessianXY<ImageUInt8, ImageSInt16> hessianThree_I8() {
+		return new HessianXY_Three_I8();
 	}
 }

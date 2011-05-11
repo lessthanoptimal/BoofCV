@@ -32,13 +32,24 @@ import gecv.struct.image.ImageFloat32;
 public interface GeneralCornerIntensity<I extends ImageBase,D extends ImageBase > {
 
 	/**
+	 * Computes the corner's intensity.  Before computing the various image derivatives call
+	 * {@link #getRequiresGradient()} and {@link #getRequiresHessian()} to see if they are needed.
 	 *
-	 * @param image
-	 * @param derivX
-	 * @param derivY
+	 * @param image Original input image
+	 * @param derivX First derivative x-axis
+	 * @param derivY First derivative x-axis
+	 * @param derivXX Second derivative x-axis x-axis
+	 * @param derivYY Second derivative x-axis y-axis
+	 * @param derivXY Second derivative x-axis y-axis
+	 *
 	 */
-	public void process( I image , D derivX , D derivY );
+	public void process( I image , D derivX , D derivY , D derivXX , D derivYY , D derivXY );
 
+	/**
+	 * Returns an image containing an intensity mapping showing how corner like each pixel is
+	 *
+	 * @return Corner intenisty image.
+	 */
 	public ImageFloat32 getIntensity();
 
 	/**
@@ -54,6 +65,13 @@ public interface GeneralCornerIntensity<I extends ImageBase,D extends ImageBase 
 	 * @return true if the image gradient is required.
 	 */
 	public boolean getRequiresGradient();
+
+	/**
+	 * Is the image's second derivative required?
+	 *
+	 * @return is the hessian required.
+	 */
+	public boolean getRequiresHessian();
 
 	/**
 	 * If true a list of candidate corners is returned.

@@ -16,38 +16,72 @@
 
 package gecv.alg.detect.corner.impl;
 
+import gecv.alg.InputSanityCheck;
 import gecv.alg.detect.corner.KitRosCornerIntensity;
 import gecv.struct.image.ImageFloat32;
 
 /**
  * <p>
- * Implementation of {@link gecv.alg.detect.corner.KitRosCornerIntensity} based off of {@link SsdCorner_F32}.
+ * Implementation of {@link gecv.alg.detect.corner.KitRosCornerIntensity}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class KitRosCorner_F32 extends SsdCorner_F32 implements KitRosCornerIntensity<ImageFloat32> {
+public class KitRosCorner_F32 implements KitRosCornerIntensity<ImageFloat32> {
 
-	public KitRosCorner_F32(int imageWidth, int imageHeight, int windowRadius) {
-		super(imageWidth, imageHeight, windowRadius);
+	// the intensity of the found features in the image
+	private ImageFloat32 featureIntensity;
+
+	public KitRosCorner_F32( int imgWidth , int imgHeight ) {
+		featureIntensity = new ImageFloat32(imgWidth,imgHeight);
 	}
 
-	protected float computeIntensity() {
-		// accessing the derivative images in this fashion is likely causes a large performance hit
-		// in benchmark tests it does perform significantly slower than Harris and this is the most likely
-		// culprit.
-		double dX = derivX.get(x, y);
-		double dY = derivY.get(x, y);
+	@Override
+	public void process(ImageFloat32 derivX, ImageFloat32 derivY,
+					 ImageFloat32 hessianXX, ImageFloat32 hessianYY , ImageFloat32 hessianXY ) {
+		InputSanityCheck.checkSameShape(derivX,derivY,hessianXX,hessianYY);
 
-		double xx = dX * dX;
-		double yy = dY * dY;
+		final int width = derivX.width;
+		final int height = derivY.height;
 
-		double bottom = xx + yy;
+		for( int y = 0; y < height; y++ ) {
+			int indexX = derivX.startIndex + y*derivX.stride;
+			int indexY = derivY.startIndex + y*derivY.stride;
+			int indexXX = hessianXX.startIndex + y*hessianYY.stride;
+			int indexYY = hessianYY.startIndex + y*hessianYY.stride;
+			int indexXY = hessianXY.startIndex + y*hessianXY.stride;
 
-		if (bottom == 0.0)
-			return 0;
+			int indexInten = featureIntensity.startIndex + y*featureIntensity.stride;
 
-		double top = totalXX * yy - 2 * totalXY * dX * dY + totalYY * xx;
-		return (float)(top / bottom);
+			for( int x = 0; x < width; x++ ) {
+				float dx = derivX.data[indexX++];
+				float dy = derivY.data[indexY++];
+				float dxx = hessianXX.data[indexXX++];
+				float dyy = hessianYY.data[indexYY++];
+				float dxy = hessianXY.data[indexXY++];
+
+				float dx2 = dx*dx;
+				float dy2 = dy*dy;
+
+
+				float top = dxx*dy2 - 2*dxy*dx*dy + dyy*dx2;
+				float bottom = dx2 + dy2;
+
+				if( bottom == 0.0 )
+					featureIntensity.data[indexInten++] = 0;
+				else
+					featureIntensity.data[indexInten++] = top/bottom;
+			}
+		}
+	}
+
+	@Override
+	public int getRadius() {
+		return 0;
+	}
+
+	@Override
+	public ImageFloat32 getIntensity() {
+		return featureIntensity;
 	}
 }

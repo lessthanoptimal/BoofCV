@@ -25,10 +25,10 @@ public class KltConfig {
 	 * Due to how the image derivative and interpolation is performed outer most pixels. Features are
 	 * not allowed to overlap this close to the image's edge.
 	 */
-	int forbiddenBorder;
+	public int forbiddenBorder;
 
-	float maxError;
-	int maxIterations;
-	float minDeterminant;
-	float minPositionDelta;
+	public float maxError;
+	public int maxIterations;
+	public float minDeterminant;
+	public float minPositionDelta;
 }

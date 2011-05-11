@@ -107,7 +107,7 @@ public abstract class ImagePyramid<T extends ImageBase> {
 		int scale = 1;
 
 		for (int i = 0; i <= layer; i++) {
-			scale += this.scale[i];
+			scale *= this.scale[i];
 		}
 
 		return scale;

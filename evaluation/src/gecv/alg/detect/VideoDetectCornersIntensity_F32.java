@@ -24,6 +24,7 @@ import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
 import gecv.alg.filter.derivative.GradientSobel;
+import gecv.alg.filter.derivative.HessianThree;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.ProcessImageSequence;
@@ -47,6 +48,9 @@ public class VideoDetectCornersIntensity_F32 extends ProcessImageSequence<ImageF
 	GeneralCornerDetector<ImageFloat32, ImageFloat32> detector;
 	ImageFloat32 derivX;
 	ImageFloat32 derivY;
+	ImageFloat32 derivXX;
+	ImageFloat32 derivYY;
+	ImageFloat32 derivXY;
 
 	QueueCorner corners;
 
@@ -73,7 +77,18 @@ public class VideoDetectCornersIntensity_F32 extends ProcessImageSequence<ImageF
 			GradientSobel.process(image, derivX, derivY);
 		}
 
-		detector.process(image,derivX, derivY);
+		if( detector.getRequiresHessian() ) {
+			if (derivXX == null) {
+				derivXX = new ImageFloat32(image.width, image.height);
+				derivYY = new ImageFloat32(image.width, image.height);
+				derivXY = new ImageFloat32(image.width, image.height);
+			}
+
+			// compute the image gradient
+			HessianThree.process(image, derivXX, derivYY,derivXY);
+		}
+
+		detector.process(image,derivX, derivY,derivXX,derivYY,derivXY);
 		corners = detector.getCorners();
 	}
 
@@ -117,10 +132,11 @@ public class VideoDetectCornersIntensity_F32 extends ProcessImageSequence<ImageF
 		int height = image.height;
 
 		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKlt_F32(width, height, radius));
+//		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperKitRosCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKitRos_F32(width, height));
 //		GeneralCornerIntensity<ImageUInt8, ImageSInt16> intensity =
 //				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryCornerIntensity.createFast12_I8(width, height, 8 , 12));
 
-		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(radius + 10, radius + 10, 10f));
+		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(radius + 10, radius + 10, 1f));
 //		CornerExtractor extractor = new WrapperNonMax( new NonMaxCornerExtractorNaive(radius+10,10f));
 //		CornerExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(radius+10, 10f));
 

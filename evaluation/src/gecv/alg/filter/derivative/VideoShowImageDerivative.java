@@ -91,7 +91,7 @@ public class VideoShowImageDerivative extends ProcessImageSequence<ImageUInt8> {
 		}
 		SimpleImageSequence<ImageUInt8> sequence = new XugglerSimplified<ImageUInt8>(fileName, ImageUInt8.class);
 
-		DerivativeXY<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.three_I8();
+		DerivativeXY<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.sobel_I8();
 
 		VideoShowImageDerivative display = new VideoShowImageDerivative(sequence, gradient);
 

@@ -39,8 +39,14 @@ public class BenchmarkSsdCornerIntensity {
 
 	static ImageFloat32 derivX_F32;
 	static ImageFloat32 derivY_F32;
+	static ImageFloat32 derivXX_F32;
+	static ImageFloat32 derivYY_F32;
+	static ImageFloat32 derivXY_F32;
 	static ImageSInt16 derivX_I16;
 	static ImageSInt16 derivY_I16;
+	static ImageSInt16 derivXX_I16;
+	static ImageSInt16 derivYY_I16;
+	static ImageSInt16 derivXY_I16;
 
 	static Random rand = new Random(234);
 
@@ -90,20 +96,20 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KitRos_F32 extends PerformerBase {
-		KitRosCorner_F32 corner = new KitRosCorner_F32(imgWidth, imgHeight, windowRadius);
+		KitRosCorner_F32 corner = new KitRosCorner_F32(imgWidth, imgHeight);
 
 		@Override
 		public void process() {
-			corner.process(derivX_F32, derivY_F32);
+			corner.process(derivX_F32, derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32);
 		}
 	}
 
 	public static class KitRos_I16 extends PerformerBase {
-		KitRosCorner_I16 corner = new KitRosCorner_I16(imgWidth, imgHeight, windowRadius);
+		KitRosCorner_I16 corner = new KitRosCorner_I16(imgWidth, imgHeight );
 
 		@Override
 		public void process() {
-			corner.process(derivX_I16, derivY_I16);
+			corner.process(derivX_I16, derivY_I16, derivXX_I16,derivYY_I16, derivXY_I16);
 		}
 	}
 
@@ -111,13 +117,25 @@ public class BenchmarkSsdCornerIntensity {
 	public static void main(String args[]) {
 		derivX_F32 = new ImageFloat32(imgWidth, imgHeight);
 		derivY_F32 = new ImageFloat32(imgWidth, imgHeight);
+		derivXX_F32 = new ImageFloat32(imgWidth, imgHeight);
+		derivYY_F32 = new ImageFloat32(imgWidth, imgHeight);
+		derivXY_F32 = new ImageFloat32(imgWidth, imgHeight);
 		derivX_I16 = new ImageSInt16(imgWidth, imgHeight);
 		derivY_I16 = new ImageSInt16(imgWidth, imgHeight);
+		derivXX_I16 = new ImageSInt16(imgWidth, imgHeight);
+		derivYY_I16 = new ImageSInt16(imgWidth, imgHeight);
+		derivXY_I16 = new ImageSInt16(imgWidth, imgHeight);
 
 		UtilImageFloat32.randomize(derivX_F32, rand, 0, 255);
 		UtilImageFloat32.randomize(derivY_F32, rand, 0, 255);
+		UtilImageFloat32.randomize(derivXX_F32, rand, 0, 255);
+		UtilImageFloat32.randomize(derivYY_F32, rand, 0, 255);
+		UtilImageFloat32.randomize(derivXY_F32, rand, 0, 255);
 		UtilImageInt16.randomize(derivX_I16, rand, 0, 255);
 		UtilImageInt16.randomize(derivY_I16, rand, 0, 255);
+		UtilImageInt16.randomize(derivXX_I16, rand, 0, 255);
+		UtilImageInt16.randomize(derivYY_I16, rand, 0, 255);
+		UtilImageInt16.randomize(derivXY_I16, rand, 0, 255);
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();

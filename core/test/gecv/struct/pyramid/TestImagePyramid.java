@@ -19,8 +19,7 @@ package gecv.struct.pyramid;
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -29,6 +28,11 @@ public class TestImagePyramid {
 
 	int width = 80;
 	int height = 160;
+
+	@Test
+	public void getScalingAtLayer() {
+		fail("implement");
+	}
 
 	@Test
 	public void setScaling() {

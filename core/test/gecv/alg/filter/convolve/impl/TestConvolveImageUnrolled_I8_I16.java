@@ -18,6 +18,7 @@ package gecv.alg.filter.convolve.impl;
 
 import gecv.alg.filter.convolve.CompareToStandardConvolution;
 import gecv.struct.convolve.Kernel1D_I32;
+import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -29,6 +30,16 @@ import java.lang.reflect.Method;
  */
 public class TestConvolveImageUnrolled_I8_I16 {
 	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_I8_I16.class);
+
+	@Test
+	public void convolve() throws NoSuchMethodException {
+		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
+			Method m = ConvolveImageUnrolled_I8_I16.class.getMethod("convolve",
+					Kernel2D_I32.class, ImageUInt8.class, ImageSInt16.class );
+
+			compareToStandard.compareMethod(m, "convolve", i + 1);
+		}
+	}
 
 	@Test
 	public void horizontal() throws NoSuchMethodException {

@@ -246,7 +246,7 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 	/**
 	 * Returns true if the features is entirely enclosed inside of the image.
 	 */
-	protected boolean isFullyInside(float x, float y) {
+	public boolean isFullyInside(float x, float y) {
 		if (x < allowedLeft || x >= allowedRight)
 			return false;
 		if (y < allowedTop || y >= allowedBottom)

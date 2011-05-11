@@ -17,6 +17,7 @@
 package gecv.alg.filter.convolve.impl;
 
 import gecv.struct.convolve.Kernel1D_F32;
+import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.image.ImageFloat32;
 
 /**
@@ -38,8 +39,8 @@ import gecv.struct.image.ImageFloat32;
  */
 public class ConvolveImageUnrolled_F32_F32 {
 	public static boolean horizontal( Kernel1D_F32 kernel ,
-									  ImageFloat32 image, ImageFloat32 dest,
-									  boolean includeBorder) {
+								   ImageFloat32 image, ImageFloat32 dest,
+								   boolean includeBorder) {
 		switch( kernel.width ) {
 			case 3:
 				horizontal3(kernel,image,dest,includeBorder);
@@ -89,6 +90,35 @@ public class ConvolveImageUnrolled_F32_F32 {
 
 			case 11:
 				vertical11(kernel,image,dest,includeBorder);
+				break;
+
+			default:
+				return false;
+		}
+		return true;
+	}
+
+	public static boolean convolve( Kernel2D_F32 kernel ,
+								   ImageFloat32 image, ImageFloat32 dest) {
+		switch( kernel.width ) {
+			case 3:
+				convolve3(kernel,image,dest);
+				break;
+
+			case 5:
+				convolve5(kernel,image,dest);
+				break;
+
+			case 7:
+				convolve7(kernel,image,dest);
+				break;
+
+			case 9:
+				convolve9(kernel,image,dest);
+				break;
+
+			case 11:
+				convolve11(kernel,image,dest);
 				break;
 
 			default:
@@ -553,6 +583,351 @@ public class ConvolveImageUnrolled_F32_F32 {
 				total += (dataSrc[indexSrc])*k11;
 
 				dataDst[indexDst++] = total;
+			}
+		}
+	}
+
+	public static void convolve3( Kernel2D_F32 kernel, ImageFloat32 src, ImageFloat32 dest)
+	{
+		final float[] dataSrc = src.data;
+		final float[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		final int kernelRadius = kernel.getRadius();
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+
+			// first time through the value needs to be set
+			float k1 = kernel.data[0];
+			float k2 = kernel.data[1];
+			float k3 = kernel.data[2];
+
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				float total = 0;
+				total += (dataSrc[indexSrc++] )* k1;
+				total += (dataSrc[indexSrc++] )* k2;
+				total += (dataSrc[indexSrc] )* k3;
+
+				dataDst[indexDst++] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < 3; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
+				
+				k1 = kernel.data[i*3 + 0];
+				k2 = kernel.data[i*3 + 1];
+				k3 = kernel.data[i*3 + 2];
+
+				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					float total = 0;
+					total += (dataSrc[indexSrc++] )* k1;
+					total += (dataSrc[indexSrc++] )* k2;
+					total += (dataSrc[indexSrc] )* k3;
+
+					dataDst[indexDst++] += total;
+				}
+			}
+		}
+	}
+
+	public static void convolve5( Kernel2D_F32 kernel, ImageFloat32 src, ImageFloat32 dest)
+	{
+		final float[] dataSrc = src.data;
+		final float[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		final int kernelRadius = kernel.getRadius();
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+
+			// first time through the value needs to be set
+			float k1 = kernel.data[0];
+			float k2 = kernel.data[1];
+			float k3 = kernel.data[2];
+			float k4 = kernel.data[3];
+			float k5 = kernel.data[4];
+
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				float total = 0;
+				total += (dataSrc[indexSrc++] )* k1;
+				total += (dataSrc[indexSrc++] )* k2;
+				total += (dataSrc[indexSrc++] )* k3;
+				total += (dataSrc[indexSrc++] )* k4;
+				total += (dataSrc[indexSrc] )* k5;
+
+				dataDst[indexDst++] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < 5; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
+				
+				k1 = kernel.data[i*5 + 0];
+				k2 = kernel.data[i*5 + 1];
+				k3 = kernel.data[i*5 + 2];
+				k4 = kernel.data[i*5 + 3];
+				k5 = kernel.data[i*5 + 4];
+
+				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					float total = 0;
+					total += (dataSrc[indexSrc++] )* k1;
+					total += (dataSrc[indexSrc++] )* k2;
+					total += (dataSrc[indexSrc++] )* k3;
+					total += (dataSrc[indexSrc++] )* k4;
+					total += (dataSrc[indexSrc] )* k5;
+
+					dataDst[indexDst++] += total;
+				}
+			}
+		}
+	}
+
+	public static void convolve7( Kernel2D_F32 kernel, ImageFloat32 src, ImageFloat32 dest)
+	{
+		final float[] dataSrc = src.data;
+		final float[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		final int kernelRadius = kernel.getRadius();
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+
+			// first time through the value needs to be set
+			float k1 = kernel.data[0];
+			float k2 = kernel.data[1];
+			float k3 = kernel.data[2];
+			float k4 = kernel.data[3];
+			float k5 = kernel.data[4];
+			float k6 = kernel.data[5];
+			float k7 = kernel.data[6];
+
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				float total = 0;
+				total += (dataSrc[indexSrc++] )* k1;
+				total += (dataSrc[indexSrc++] )* k2;
+				total += (dataSrc[indexSrc++] )* k3;
+				total += (dataSrc[indexSrc++] )* k4;
+				total += (dataSrc[indexSrc++] )* k5;
+				total += (dataSrc[indexSrc++] )* k6;
+				total += (dataSrc[indexSrc] )* k7;
+
+				dataDst[indexDst++] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < 7; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
+				
+				k1 = kernel.data[i*7 + 0];
+				k2 = kernel.data[i*7 + 1];
+				k3 = kernel.data[i*7 + 2];
+				k4 = kernel.data[i*7 + 3];
+				k5 = kernel.data[i*7 + 4];
+				k6 = kernel.data[i*7 + 5];
+				k7 = kernel.data[i*7 + 6];
+
+				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					float total = 0;
+					total += (dataSrc[indexSrc++] )* k1;
+					total += (dataSrc[indexSrc++] )* k2;
+					total += (dataSrc[indexSrc++] )* k3;
+					total += (dataSrc[indexSrc++] )* k4;
+					total += (dataSrc[indexSrc++] )* k5;
+					total += (dataSrc[indexSrc++] )* k6;
+					total += (dataSrc[indexSrc] )* k7;
+
+					dataDst[indexDst++] += total;
+				}
+			}
+		}
+	}
+
+	public static void convolve9( Kernel2D_F32 kernel, ImageFloat32 src, ImageFloat32 dest)
+	{
+		final float[] dataSrc = src.data;
+		final float[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		final int kernelRadius = kernel.getRadius();
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+
+			// first time through the value needs to be set
+			float k1 = kernel.data[0];
+			float k2 = kernel.data[1];
+			float k3 = kernel.data[2];
+			float k4 = kernel.data[3];
+			float k5 = kernel.data[4];
+			float k6 = kernel.data[5];
+			float k7 = kernel.data[6];
+			float k8 = kernel.data[7];
+			float k9 = kernel.data[8];
+
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				float total = 0;
+				total += (dataSrc[indexSrc++] )* k1;
+				total += (dataSrc[indexSrc++] )* k2;
+				total += (dataSrc[indexSrc++] )* k3;
+				total += (dataSrc[indexSrc++] )* k4;
+				total += (dataSrc[indexSrc++] )* k5;
+				total += (dataSrc[indexSrc++] )* k6;
+				total += (dataSrc[indexSrc++] )* k7;
+				total += (dataSrc[indexSrc++] )* k8;
+				total += (dataSrc[indexSrc] )* k9;
+
+				dataDst[indexDst++] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < 9; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
+				
+				k1 = kernel.data[i*9 + 0];
+				k2 = kernel.data[i*9 + 1];
+				k3 = kernel.data[i*9 + 2];
+				k4 = kernel.data[i*9 + 3];
+				k5 = kernel.data[i*9 + 4];
+				k6 = kernel.data[i*9 + 5];
+				k7 = kernel.data[i*9 + 6];
+				k8 = kernel.data[i*9 + 7];
+				k9 = kernel.data[i*9 + 8];
+
+				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					float total = 0;
+					total += (dataSrc[indexSrc++] )* k1;
+					total += (dataSrc[indexSrc++] )* k2;
+					total += (dataSrc[indexSrc++] )* k3;
+					total += (dataSrc[indexSrc++] )* k4;
+					total += (dataSrc[indexSrc++] )* k5;
+					total += (dataSrc[indexSrc++] )* k6;
+					total += (dataSrc[indexSrc++] )* k7;
+					total += (dataSrc[indexSrc++] )* k8;
+					total += (dataSrc[indexSrc] )* k9;
+
+					dataDst[indexDst++] += total;
+				}
+			}
+		}
+	}
+
+	public static void convolve11( Kernel2D_F32 kernel, ImageFloat32 src, ImageFloat32 dest)
+	{
+		final float[] dataSrc = src.data;
+		final float[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		final int kernelRadius = kernel.getRadius();
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+
+			// first time through the value needs to be set
+			float k1 = kernel.data[0];
+			float k2 = kernel.data[1];
+			float k3 = kernel.data[2];
+			float k4 = kernel.data[3];
+			float k5 = kernel.data[4];
+			float k6 = kernel.data[5];
+			float k7 = kernel.data[6];
+			float k8 = kernel.data[7];
+			float k9 = kernel.data[8];
+			float k10 = kernel.data[9];
+			float k11 = kernel.data[10];
+
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				float total = 0;
+				total += (dataSrc[indexSrc++] )* k1;
+				total += (dataSrc[indexSrc++] )* k2;
+				total += (dataSrc[indexSrc++] )* k3;
+				total += (dataSrc[indexSrc++] )* k4;
+				total += (dataSrc[indexSrc++] )* k5;
+				total += (dataSrc[indexSrc++] )* k6;
+				total += (dataSrc[indexSrc++] )* k7;
+				total += (dataSrc[indexSrc++] )* k8;
+				total += (dataSrc[indexSrc++] )* k9;
+				total += (dataSrc[indexSrc++] )* k10;
+				total += (dataSrc[indexSrc] )* k11;
+
+				dataDst[indexDst++] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < 11; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
+				
+				k1 = kernel.data[i*11 + 0];
+				k2 = kernel.data[i*11 + 1];
+				k3 = kernel.data[i*11 + 2];
+				k4 = kernel.data[i*11 + 3];
+				k5 = kernel.data[i*11 + 4];
+				k6 = kernel.data[i*11 + 5];
+				k7 = kernel.data[i*11 + 6];
+				k8 = kernel.data[i*11 + 7];
+				k9 = kernel.data[i*11 + 8];
+				k10 = kernel.data[i*11 + 9];
+				k11 = kernel.data[i*11 + 10];
+
+				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					float total = 0;
+					total += (dataSrc[indexSrc++] )* k1;
+					total += (dataSrc[indexSrc++] )* k2;
+					total += (dataSrc[indexSrc++] )* k3;
+					total += (dataSrc[indexSrc++] )* k4;
+					total += (dataSrc[indexSrc++] )* k5;
+					total += (dataSrc[indexSrc++] )* k6;
+					total += (dataSrc[indexSrc++] )* k7;
+					total += (dataSrc[indexSrc++] )* k8;
+					total += (dataSrc[indexSrc++] )* k9;
+					total += (dataSrc[indexSrc++] )* k10;
+					total += (dataSrc[indexSrc] )* k11;
+
+					dataDst[indexDst++] += total;
+				}
 			}
 		}
 	}

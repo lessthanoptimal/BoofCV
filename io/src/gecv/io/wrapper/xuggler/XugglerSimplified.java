@@ -53,6 +53,8 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 	// reference to the output BufferedImage
 	BufferedImage imageGUI;
 
+	int frameID=-1;
+
 	{
 //		UtilIO.loadLibrarySmart("libxuggle-xuggler.so");
 	}
@@ -141,6 +143,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 
 	public boolean hasNext() {
 		while (container.readNextPacket(packet) >= 0) {
+			frameID++;
 
 			// Now we have a packet, let's see if it belongs to our video strea
 
@@ -216,6 +219,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 		} else {
 			imageGUI = bufferedImage;
 		}
+
 		image = ConvertBufferedImage.convertFrom(imageGUI, image, typeOutput);
 		return image;
 	}
@@ -228,6 +232,11 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 	@Override
 	public Class<T> getType() {
 		return typeOutput;
+	}
+
+	@Override
+	public int getFrameNumber() {
+		return frameID;
 	}
 
 	@Override

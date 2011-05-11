@@ -35,7 +35,7 @@ public class WrapperGradientCornerIntensity <I extends ImageBase,D extends Image
 	}
 
 	@Override
-	public void process(I image , D derivX, D derivY) {
+	public void process(I image , D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
 		alg.process(derivX,derivY);
 	}
 
@@ -52,6 +52,11 @@ public class WrapperGradientCornerIntensity <I extends ImageBase,D extends Image
 	@Override
 	public boolean getRequiresGradient() {
 		return true;
+	}
+
+	@Override
+	public boolean getRequiresHessian() {
+		return false;
 	}
 
 	@Override

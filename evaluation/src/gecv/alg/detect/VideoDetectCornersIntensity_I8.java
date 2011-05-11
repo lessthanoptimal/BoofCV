@@ -24,6 +24,7 @@ import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
 import gecv.alg.filter.derivative.GradientSobel;
+import gecv.alg.filter.derivative.HessianThree;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.ProcessImageSequence;
@@ -48,6 +49,9 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 	GeneralCornerDetector<ImageUInt8, ImageSInt16> detector;
 	ImageSInt16 derivX;
 	ImageSInt16 derivY;
+	ImageSInt16 derivXX;
+	ImageSInt16 derivYY;
+	ImageSInt16 derivXY;
 
 	QueueCorner corners;
 
@@ -74,7 +78,18 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 			GradientSobel.process(image, derivX, derivY);
 		}
 
-		detector.process(image,derivX, derivY);
+		if( detector.getRequiresHessian() ) {
+			if (derivXX == null) {
+				derivXX = new ImageSInt16(image.width, image.height);
+				derivYY = new ImageSInt16(image.width, image.height);
+				derivXY = new ImageSInt16(image.width, image.height);
+			}
+
+			// compute the image gradient
+			HessianThree.process(image, derivXX, derivYY,derivXY);
+		}
+
+		detector.process(image,derivX, derivY, derivXX , derivYY, derivXY);
 		corners = detector.getCorners();
 	}
 

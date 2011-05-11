@@ -55,6 +55,13 @@ public interface SimpleImageSequence<T extends ImageBase> {
 	public void close();
 
 	/**
+	 * Returns the number of the current frame in the sequence.
+	 *
+	 * @return Frame ID number.
+	 */
+	public int getFrameNumber();
+
+	/**
 	 * Returns the type of class used to store the output image
 	 */
 	public Class<T> getType();

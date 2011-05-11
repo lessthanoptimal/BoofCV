@@ -17,6 +17,7 @@
 package gecv.alg.filter.convolve.impl;
 
 import gecv.struct.convolve.Kernel1D_I32;
+import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageSInt16;
 
 /**
@@ -89,6 +90,35 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 
 			case 11:
 				vertical11(kernel,image,dest,divisor,includeBorder);
+				break;
+
+			default:
+				return false;
+		}
+		return true;
+	}
+
+	public static boolean convolve( Kernel2D_I32 kernel ,
+								   ImageSInt16 image, ImageSInt16 dest, int divisor ) {
+		switch( kernel.width ) {
+			case 3:
+				convolve3(kernel,image,dest,divisor);
+				break;
+
+			case 5:
+				convolve5(kernel,image,dest,divisor);
+				break;
+
+			case 7:
+				convolve7(kernel,image,dest,divisor);
+				break;
+
+			case 9:
+				convolve9(kernel,image,dest,divisor);
+				break;
+
+			case 11:
+				convolve11(kernel,image,dest,divisor);
 				break;
 
 			default:
@@ -553,6 +583,366 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				total += (dataSrc[indexSrc])*k11;
 
 				dataDst[indexDst++] = ( short )(total/divisor);
+			}
+		}
+	}
+
+	public static void convolve3( Kernel2D_I32 kernel, ImageSInt16 src, ImageSInt16 dest , int divisor )
+	{
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		final int kernelRadius = kernel.getRadius();
+		final int totalRow[] = new int[ width ];
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+
+			// first time through the value needs to be set
+			int k1 = kernel.data[0];
+			int k2 = kernel.data[1];
+			int k3 = kernel.data[2];
+
+			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				int total = 0;
+				total += (dataSrc[indexSrc++] )* k1;
+				total += (dataSrc[indexSrc++] )* k2;
+				total += (dataSrc[indexSrc] )* k3;
+
+				totalRow[x] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < 3; i++ ) {
+				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
+				
+				k1 = kernel.data[i*3 + 0];
+				k2 = kernel.data[i*3 + 1];
+				k3 = kernel.data[i*3 + 2];
+
+				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					int total = 0;
+					total += (dataSrc[indexSrc++] )* k1;
+					total += (dataSrc[indexSrc++] )* k2;
+					total += (dataSrc[indexSrc] )* k3;
+
+					totalRow[x] += total;
+				}
+			}
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
+			}
+		}
+	}
+
+	public static void convolve5( Kernel2D_I32 kernel, ImageSInt16 src, ImageSInt16 dest , int divisor )
+	{
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		final int kernelRadius = kernel.getRadius();
+		final int totalRow[] = new int[ width ];
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+
+			// first time through the value needs to be set
+			int k1 = kernel.data[0];
+			int k2 = kernel.data[1];
+			int k3 = kernel.data[2];
+			int k4 = kernel.data[3];
+			int k5 = kernel.data[4];
+
+			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				int total = 0;
+				total += (dataSrc[indexSrc++] )* k1;
+				total += (dataSrc[indexSrc++] )* k2;
+				total += (dataSrc[indexSrc++] )* k3;
+				total += (dataSrc[indexSrc++] )* k4;
+				total += (dataSrc[indexSrc] )* k5;
+
+				totalRow[x] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < 5; i++ ) {
+				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
+				
+				k1 = kernel.data[i*5 + 0];
+				k2 = kernel.data[i*5 + 1];
+				k3 = kernel.data[i*5 + 2];
+				k4 = kernel.data[i*5 + 3];
+				k5 = kernel.data[i*5 + 4];
+
+				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					int total = 0;
+					total += (dataSrc[indexSrc++] )* k1;
+					total += (dataSrc[indexSrc++] )* k2;
+					total += (dataSrc[indexSrc++] )* k3;
+					total += (dataSrc[indexSrc++] )* k4;
+					total += (dataSrc[indexSrc] )* k5;
+
+					totalRow[x] += total;
+				}
+			}
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
+			}
+		}
+	}
+
+	public static void convolve7( Kernel2D_I32 kernel, ImageSInt16 src, ImageSInt16 dest , int divisor )
+	{
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		final int kernelRadius = kernel.getRadius();
+		final int totalRow[] = new int[ width ];
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+
+			// first time through the value needs to be set
+			int k1 = kernel.data[0];
+			int k2 = kernel.data[1];
+			int k3 = kernel.data[2];
+			int k4 = kernel.data[3];
+			int k5 = kernel.data[4];
+			int k6 = kernel.data[5];
+			int k7 = kernel.data[6];
+
+			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				int total = 0;
+				total += (dataSrc[indexSrc++] )* k1;
+				total += (dataSrc[indexSrc++] )* k2;
+				total += (dataSrc[indexSrc++] )* k3;
+				total += (dataSrc[indexSrc++] )* k4;
+				total += (dataSrc[indexSrc++] )* k5;
+				total += (dataSrc[indexSrc++] )* k6;
+				total += (dataSrc[indexSrc] )* k7;
+
+				totalRow[x] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < 7; i++ ) {
+				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
+				
+				k1 = kernel.data[i*7 + 0];
+				k2 = kernel.data[i*7 + 1];
+				k3 = kernel.data[i*7 + 2];
+				k4 = kernel.data[i*7 + 3];
+				k5 = kernel.data[i*7 + 4];
+				k6 = kernel.data[i*7 + 5];
+				k7 = kernel.data[i*7 + 6];
+
+				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					int total = 0;
+					total += (dataSrc[indexSrc++] )* k1;
+					total += (dataSrc[indexSrc++] )* k2;
+					total += (dataSrc[indexSrc++] )* k3;
+					total += (dataSrc[indexSrc++] )* k4;
+					total += (dataSrc[indexSrc++] )* k5;
+					total += (dataSrc[indexSrc++] )* k6;
+					total += (dataSrc[indexSrc] )* k7;
+
+					totalRow[x] += total;
+				}
+			}
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
+			}
+		}
+	}
+
+	public static void convolve9( Kernel2D_I32 kernel, ImageSInt16 src, ImageSInt16 dest , int divisor )
+	{
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		final int kernelRadius = kernel.getRadius();
+		final int totalRow[] = new int[ width ];
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+
+			// first time through the value needs to be set
+			int k1 = kernel.data[0];
+			int k2 = kernel.data[1];
+			int k3 = kernel.data[2];
+			int k4 = kernel.data[3];
+			int k5 = kernel.data[4];
+			int k6 = kernel.data[5];
+			int k7 = kernel.data[6];
+			int k8 = kernel.data[7];
+			int k9 = kernel.data[8];
+
+			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				int total = 0;
+				total += (dataSrc[indexSrc++] )* k1;
+				total += (dataSrc[indexSrc++] )* k2;
+				total += (dataSrc[indexSrc++] )* k3;
+				total += (dataSrc[indexSrc++] )* k4;
+				total += (dataSrc[indexSrc++] )* k5;
+				total += (dataSrc[indexSrc++] )* k6;
+				total += (dataSrc[indexSrc++] )* k7;
+				total += (dataSrc[indexSrc++] )* k8;
+				total += (dataSrc[indexSrc] )* k9;
+
+				totalRow[x] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < 9; i++ ) {
+				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
+				
+				k1 = kernel.data[i*9 + 0];
+				k2 = kernel.data[i*9 + 1];
+				k3 = kernel.data[i*9 + 2];
+				k4 = kernel.data[i*9 + 3];
+				k5 = kernel.data[i*9 + 4];
+				k6 = kernel.data[i*9 + 5];
+				k7 = kernel.data[i*9 + 6];
+				k8 = kernel.data[i*9 + 7];
+				k9 = kernel.data[i*9 + 8];
+
+				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					int total = 0;
+					total += (dataSrc[indexSrc++] )* k1;
+					total += (dataSrc[indexSrc++] )* k2;
+					total += (dataSrc[indexSrc++] )* k3;
+					total += (dataSrc[indexSrc++] )* k4;
+					total += (dataSrc[indexSrc++] )* k5;
+					total += (dataSrc[indexSrc++] )* k6;
+					total += (dataSrc[indexSrc++] )* k7;
+					total += (dataSrc[indexSrc++] )* k8;
+					total += (dataSrc[indexSrc] )* k9;
+
+					totalRow[x] += total;
+				}
+			}
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
+			}
+		}
+	}
+
+	public static void convolve11( Kernel2D_I32 kernel, ImageSInt16 src, ImageSInt16 dest , int divisor )
+	{
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		final int kernelRadius = kernel.getRadius();
+		final int totalRow[] = new int[ width ];
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+
+			// first time through the value needs to be set
+			int k1 = kernel.data[0];
+			int k2 = kernel.data[1];
+			int k3 = kernel.data[2];
+			int k4 = kernel.data[3];
+			int k5 = kernel.data[4];
+			int k6 = kernel.data[5];
+			int k7 = kernel.data[6];
+			int k8 = kernel.data[7];
+			int k9 = kernel.data[8];
+			int k10 = kernel.data[9];
+			int k11 = kernel.data[10];
+
+			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				int total = 0;
+				total += (dataSrc[indexSrc++] )* k1;
+				total += (dataSrc[indexSrc++] )* k2;
+				total += (dataSrc[indexSrc++] )* k3;
+				total += (dataSrc[indexSrc++] )* k4;
+				total += (dataSrc[indexSrc++] )* k5;
+				total += (dataSrc[indexSrc++] )* k6;
+				total += (dataSrc[indexSrc++] )* k7;
+				total += (dataSrc[indexSrc++] )* k8;
+				total += (dataSrc[indexSrc++] )* k9;
+				total += (dataSrc[indexSrc++] )* k10;
+				total += (dataSrc[indexSrc] )* k11;
+
+				totalRow[x] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < 11; i++ ) {
+				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
+				
+				k1 = kernel.data[i*11 + 0];
+				k2 = kernel.data[i*11 + 1];
+				k3 = kernel.data[i*11 + 2];
+				k4 = kernel.data[i*11 + 3];
+				k5 = kernel.data[i*11 + 4];
+				k6 = kernel.data[i*11 + 5];
+				k7 = kernel.data[i*11 + 6];
+				k8 = kernel.data[i*11 + 7];
+				k9 = kernel.data[i*11 + 8];
+				k10 = kernel.data[i*11 + 9];
+				k11 = kernel.data[i*11 + 10];
+
+				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					int total = 0;
+					total += (dataSrc[indexSrc++] )* k1;
+					total += (dataSrc[indexSrc++] )* k2;
+					total += (dataSrc[indexSrc++] )* k3;
+					total += (dataSrc[indexSrc++] )* k4;
+					total += (dataSrc[indexSrc++] )* k5;
+					total += (dataSrc[indexSrc++] )* k6;
+					total += (dataSrc[indexSrc++] )* k7;
+					total += (dataSrc[indexSrc++] )* k8;
+					total += (dataSrc[indexSrc++] )* k9;
+					total += (dataSrc[indexSrc++] )* k10;
+					total += (dataSrc[indexSrc] )* k11;
+
+					totalRow[x] += total;
+				}
+			}
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
 			}
 		}
 	}

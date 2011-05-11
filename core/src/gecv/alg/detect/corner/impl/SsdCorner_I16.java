@@ -43,7 +43,7 @@ public abstract class SsdCorner_I16 implements GradientCornerIntensity<ImageSInt
 	protected ImageSInt16 derivY;
 
 	// radius of detected features
-	private int radius;
+	protected int radius;
 
 	// temporary storage for intensity derivatives summations
 	private ImageSInt32 horizXX;

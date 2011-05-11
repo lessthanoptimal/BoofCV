@@ -142,11 +142,52 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
+			ConvolveImage.convolve(kernel2D_F32,imgFloat32,out_F32);
+		}
+	}
+
+	public static class Convolve2D_Std_F32 extends PerformerBase
+	{
+		@Override
+		public void process() {
 			ConvolveImageStandard.convolve(kernel2D_F32,imgFloat32,out_F32);
 		}
 	}
 
+	public static class Convolve2D_Unrolled_F32 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			if( !ConvolveImageUnrolled_F32_F32.convolve(kernel2D_F32,imgFloat32,out_F32) )
+				throw new RuntimeException();
+		}
+	}
+
 	public static class Convolve2D_I8_I16 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ConvolveImage.convolve(kernel2D_I32,imgInt8,out_I16);
+		}
+	}
+
+	public static class Convolve2D_Std_I8_I8_DIV extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ConvolveImageStandard.convolve(kernel2D_I32,imgInt8,out_I8,10);
+		}
+	}
+
+	public static class Convolve2D_I8_I8_DIV extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ConvolveImage.convolve(kernel2D_I32,imgInt8,out_I8,10);
+		}
+	}
+
+	public static class Convolve2D_Std_I8_I16 extends PerformerBase
 	{
 		@Override
 		public void process() {
@@ -261,8 +302,13 @@ public class BenchmarkConvolve {
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Box_I8_I32_Vertical(),TEST_TIME);
 //
+			ProfileOperation.printOpsPerSec(new Convolve2D_Std_F32(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Convolve2D_Unrolled_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve2D_F32(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Convolve2D_Std_I8_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve2D_I8_I16(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Convolve2D_Std_I8_I8_DIV(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Convolve2D_I8_I8_DIV(),TEST_TIME);
 		}
 
 

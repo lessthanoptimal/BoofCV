@@ -52,16 +52,14 @@ public class FactoryCornerIntensity {
 		return new HarrisCorner_I16(imageWidth,imageHeight,windowRadius,kappa);
 	}
 
-	public static KitRosCornerIntensity<ImageFloat32> createKitRos_F32( int imageWidth, int imageHeight,
-																 int windowRadius)
+	public static KitRosCornerIntensity<ImageFloat32> createKitRos_F32( int imageWidth, int imageHeight )
 	{
-		return new KitRosCorner_F32(imageWidth,imageHeight,windowRadius);
+		return new KitRosCorner_F32(imageWidth,imageHeight);
 	}
 
-	public static KitRosCornerIntensity<ImageSInt16> createKitRos_I16( int imageWidth, int imageHeight,
-															   int windowRadius)
+	public static KitRosCornerIntensity<ImageSInt16> createKitRos_I16( int imageWidth, int imageHeight )
 	{
-		return new KitRosCorner_I16(imageWidth,imageHeight,windowRadius);
+		return new KitRosCorner_I16(imageWidth,imageHeight);
 	}
 
 	public static KltCornerIntensity<ImageFloat32> createKlt_F32( int imageWidth, int imageHeight,

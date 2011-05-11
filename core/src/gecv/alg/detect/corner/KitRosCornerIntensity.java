@@ -21,16 +21,17 @@ import gecv.struct.image.ImageBase;
 /**
  * <p>
  * Implementation of the Kitchen and Rosenfeld corner detector as described in [1].  Unlike the KLT or Harris corner
- * detectors this corner detector is designed to detect corners on the actual corner.  This operator is mathematically
- * identical to calculating the horizontal curvature of the intensity image.  A reasonable indication of the corner's
- * strength is obtained by multiplying the curvature by the local intensity gradient.
+ * detectors this corner detector is designed to detect corners on the actual corner.  Because it uses requires the
+ * image's local curvature it uses the second derivative, also known as the Hessian.
  * </p>
- * <p/>
+ *
  * <p>
  * [1] Page 393 of E.R. Davies, "Machine Vision Theory Algorithms Practicalities," 3rd ed. 2005
  * </p>
  *
  * @author Peter Abeles
  */
-public interface KitRosCornerIntensity<T extends ImageBase> extends GradientCornerIntensity<T> {
+public interface KitRosCornerIntensity<T extends ImageBase> extends CornerIntensity<T> {
+
+	public void process(T derivX, T derivY, T hessianXX , T hessianYY , T hessianXY);
 }

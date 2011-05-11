@@ -16,8 +16,6 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.detect.corner.GenericCornerIntensityTests;
-import gecv.struct.image.ImageFloat32;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
@@ -25,17 +23,10 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestKitRosCorner_I16 extends GenericCornerIntensityTests {
-	KitRosCorner_I16 detector = new KitRosCorner_I16(width,height,1);
-
+public class TestKitRosCorner_I16 {
 	@Test
 	public void genericTests() {
-		performAllTests();
+		fail("implement");
 	}
 
-	@Override
-	public ImageFloat32 computeIntensity() {
-		detector.process(derivX_I16,derivY_I16);
-		return detector.getIntensity();
-	}
 }

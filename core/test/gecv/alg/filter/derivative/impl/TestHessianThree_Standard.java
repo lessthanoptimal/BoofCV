@@ -14,25 +14,18 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.derivative;
+package gecv.alg.filter.derivative.impl;
 
-import gecv.alg.filter.derivative.GradientThree;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class DerivativeXY_Three_I8 implements DerivativeXY<ImageUInt8, ImageSInt16> {
-
-	@Override
-	public void process(ImageUInt8 inputImage , ImageSInt16 derivX, ImageSInt16 derivY) {
-		GradientThree.deriv_I8(inputImage, derivX, derivY);
-	}
-
-	@Override
-	public int getBorder() {
-		return 1;
+public class TestHessianThree_Standard {
+	@Test
+	public void test() {
+		fail("implement tests");
 	}
 }

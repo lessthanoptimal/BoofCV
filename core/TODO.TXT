@@ -26,6 +26,7 @@
  
 - Convolve
  * Change TestConvolveImageStandard into a completely automated test using reflections
+ * Can 2D convolution be speed up by inlining a single row?
  * Add a new implementation for horizontal and vertical which are "in-place"
    Uses an array one row/column long in which the image is locally copied.
 

@@ -43,8 +43,9 @@ public class HarrisCorner_I16 extends SsdCorner_I16 implements HarrisCornerInten
 
 	@Override
 	protected float computeIntensity() {
-		// det(A) + kappa*trace(A)
-		return totalXX * totalYY - totalXY * totalXY + kappa * (totalXX + totalYY);
+		// det(A) + kappa*trace(A)^2
+		float trace = totalXX + totalYY;
+		return (totalXX * totalYY - totalXY * totalXY) + kappa * trace*trace;
 	}
 
 	@Override

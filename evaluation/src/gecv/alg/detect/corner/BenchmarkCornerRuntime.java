@@ -18,14 +18,14 @@ package gecv.alg.detect.corner;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.abst.detect.corner.GeneralCornerDetector;
-import gecv.abst.detect.corner.GeneralCornerIntensity;
-import gecv.abst.detect.corner.WrapperFastCornerIntensity;
-import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
+import gecv.abst.detect.corner.*;
 import gecv.abst.detect.extract.CornerExtractor;
+import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.abst.detect.extract.WrapperNonMaxCandidate;
+import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
 import gecv.alg.detect.extract.NonMaxCornerCandidateExtractor;
 import gecv.alg.filter.derivative.GradientSobel;
+import gecv.alg.filter.derivative.HessianThree;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -44,9 +44,19 @@ public class BenchmarkCornerRuntime {
 	static ImageFloat32 image_F32;
 	static ImageFloat32 derivX_F32;
 	static ImageFloat32 derivY_F32;
+	static ImageFloat32 derivXX_F32;
+	static ImageFloat32 derivYY_F32;
+	static ImageFloat32 derivXY_F32;
+
 	static ImageUInt8 image_I8;
 	static ImageSInt16 derivX_I16;
 	static ImageSInt16 derivY_I16;
+	static ImageSInt16 derivXX_I16;
+	static ImageSInt16 derivYY_I16;
+	static ImageSInt16 derivXY_I16;
+
+	// should it include the gradient calculation in the benchmark?
+	static boolean includeGradient = true;
 
 	public static class Detector_F32 extends PerformerBase {
 		GeneralCornerDetector<ImageFloat32,ImageFloat32> alg;
@@ -57,7 +67,18 @@ public class BenchmarkCornerRuntime {
 
 		@Override
 		public void process() {
-			alg.process(image_F32,derivX_F32, derivY_F32);
+
+			if( includeGradient ) {
+				if( alg.getRequiresGradient() ) {
+					GradientSobel.process(image_F32, derivX_F32, derivY_F32);
+				}
+
+				if( alg.getRequiresHessian()) {
+					HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32);
+				}
+			}
+
+			alg.process(image_F32,derivX_F32, derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32);
 		}
 	}
 
@@ -81,9 +102,9 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static GeneralCornerDetector<ImageFloat32,ImageFloat32> createKitRos_F32() {
-		KitRosCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createKitRos_F32(imgWidth, imgHeight, windowRadius);
+		KitRosCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createKitRos_F32(imgWidth, imgHeight);
 
-		return createGradientDetector(alg);
+		return createDetector(alg);
 	}
 
 	public static GeneralCornerDetector<ImageFloat32,ImageFloat32> createKlt_F32() {
@@ -94,7 +115,14 @@ public class BenchmarkCornerRuntime {
 
 	private static GeneralCornerDetector<ImageFloat32,ImageFloat32> createGradientDetector(GradientCornerIntensity<ImageFloat32> alg) {
 		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(alg);
-		CornerExtractor extractorCandidate = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(windowRadius, 1));
+		CornerExtractor extractorCandidate = new WrapperNonMax(new FastNonMaxCornerExtractor(windowRadius,windowRadius, 1));
+
+		return new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity, extractorCandidate, imgWidth * imgHeight / (windowRadius * windowRadius));
+	}
+
+	private static GeneralCornerDetector<ImageFloat32,ImageFloat32> createDetector(KitRosCornerIntensity<ImageFloat32> alg) {
+		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperKitRosCornerIntensity<ImageFloat32,ImageFloat32>(alg);
+		CornerExtractor extractorCandidate = new WrapperNonMax(new FastNonMaxCornerExtractor(windowRadius,windowRadius, 1));
 
 		return new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity, extractorCandidate, imgWidth * imgHeight / (windowRadius * windowRadius));
 	}
@@ -110,8 +138,15 @@ public class BenchmarkCornerRuntime {
 
 		derivX_F32 = new ImageFloat32(imgWidth, imgHeight);
 		derivY_F32 = new ImageFloat32(imgWidth, imgHeight);
+		derivXX_F32 = new ImageFloat32(imgWidth, imgHeight);
+		derivYY_F32 = new ImageFloat32(imgWidth, imgHeight);
+		derivXY_F32 = new ImageFloat32(imgWidth, imgHeight);
+
 		derivX_I16 = new ImageSInt16(imgWidth, imgHeight);
 		derivY_I16 = new ImageSInt16(imgWidth, imgHeight);
+		derivXX_I16 = new ImageSInt16(imgWidth, imgHeight);
+		derivYY_I16 = new ImageSInt16(imgWidth, imgHeight);
+		derivXY_I16 = new ImageSInt16(imgWidth, imgHeight);
 
 		FileImageSequence sequence = new FileImageSequence("data/indoors01.jpg", "data/outdoors01.jpg", "data/particles01.jpg");
 
@@ -128,12 +163,19 @@ public class BenchmarkCornerRuntime {
 
 			derivX_F32.reshape(imgWidth, imgHeight);
 			derivY_F32.reshape(imgWidth, imgHeight);
+			derivXX_F32.reshape(imgWidth, imgHeight);
+			derivYY_F32.reshape(imgWidth, imgHeight);
+			derivXY_F32.reshape(imgWidth, imgHeight);
 			derivX_I16.reshape(imgWidth, imgHeight);
 			derivY_I16.reshape(imgWidth, imgHeight);
+			derivXX_I16.reshape(imgWidth, imgHeight);
+			derivYY_I16.reshape(imgWidth, imgHeight);
+			derivXY_I16.reshape(imgWidth, imgHeight);
 
 			GradientSobel.process(image_F32, derivX_F32, derivY_F32);
 			GradientSobel.process(image_I8, derivX_I16, derivY_I16);
-
+			HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32);
+			HessianThree.process(image_I8,derivXX_I16,derivYY_I16,derivXY_I16);
 
 			benchmark(createKlt_F32(), "KLT F32");
 			benchmark(createFast12_F32(), "Fast F32");

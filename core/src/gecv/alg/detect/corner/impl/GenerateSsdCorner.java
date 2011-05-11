@@ -94,7 +94,7 @@ public class GenerateSsdCorner {
 				"\tprotected " + typeInput + " derivY;\n" +
 				"\n" +
 				"\t// radius of detected features\n" +
-				"\tprivate int radius;\n" +
+				"\tprotected int radius;\n" +
 				"\n" +
 				"\t// temporary storage for intensity derivatives summations\n" +
 				"\tprivate " + typeOutput + " horizXX;\n" +

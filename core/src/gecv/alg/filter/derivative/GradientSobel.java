@@ -17,17 +17,19 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.filter.derivative.sobel.GradientSobel_Outer;
-import gecv.alg.filter.derivative.sobel.GradientSobel_UnrolledOuter;
+import gecv.alg.filter.derivative.impl.GradientSobel_Outer;
+import gecv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
- * The sobel edge detector computes the images derivative in the x and y direction.  Inner most pixels are
- * weighted more than ones farther away.  This tends to produce better results, but not as good as a gaussian
- * kernel with larger kernel.  However, it can be optimized so that it is much faster than a Gaussian.
+ * Computes the image's first derivative along the x and y axises using the Sobel operator.
+ * </p>
+ * <p>
+ * The Sobel kernel weights the inner most pixels more than ones farther away.  This tends to produce better results,
+ * but not as good as a gaussian kernel with larger kernel.  However, it can be optimized so that it is much faster than a Gaussian.
  * </p>
  * <p>
  * For integer images, the derivatives in the x and y direction are computed by convolving the following kernels:<br>

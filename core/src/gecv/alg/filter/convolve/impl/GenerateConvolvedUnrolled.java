@@ -51,7 +51,7 @@ public class GenerateConvolvedUnrolled {
 
 	public void createF32() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_F32_F32";
-		typeKernel = "Kernel1D_F32";
+		typeKernel = "F32";
 		typeInput = "ImageFloat32";
 		typeOutput = "ImageFloat32";
 		dataKernel = "float";
@@ -66,7 +66,7 @@ public class GenerateConvolvedUnrolled {
 
 	public void createI8_I8() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I8_I8_Div";
-		typeKernel = "Kernel1D_I32";
+		typeKernel = "I32";
 		typeInput = "ImageUInt8";
 		typeOutput = "ImageUInt8";
 		dataKernel = "int";
@@ -81,7 +81,7 @@ public class GenerateConvolvedUnrolled {
 
 	public void createI8_I16() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I8_I16";
-		typeKernel = "Kernel1D_I32";
+		typeKernel = "I32";
 		typeInput = "ImageUInt8";
 		typeOutput = "ImageSInt16";
 		dataKernel = "int";
@@ -96,7 +96,7 @@ public class GenerateConvolvedUnrolled {
 
 	public void createI16_I16() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I16_I16";
-		typeKernel = "Kernel1D_I32";
+		typeKernel = "I32";
 		typeInput = "ImageSInt16";
 		typeOutput = "ImageSInt16";
 		dataKernel = "int";
@@ -111,7 +111,7 @@ public class GenerateConvolvedUnrolled {
 
 	public void createI16_I16_div() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I16_I16_Div";
-		typeKernel = "Kernel1D_I32";
+		typeKernel = "I32";
 		typeInput = "ImageSInt16";
 		typeOutput = "ImageSInt16";
 		dataKernel = "int";
@@ -128,14 +128,21 @@ public class GenerateConvolvedUnrolled {
 		out = new PrintStream(new FileOutputStream(className + ".java"));
 
 		printPreamble();
-		createMaster("horizontal",hasDivisor);
-		createMaster("vertical",hasDivisor);
+		createMaster("horizontal",1,hasDivisor);
+		createMaster("vertical",1,hasDivisor);
+		createMaster("convolve",2,hasDivisor);
 
 		for (int i = 0; i < numUnrolled; i++) {
 			addHorizontal(3 + i * 2,hasDivisor);
 		}
 		for (int i = 0; i < numUnrolled; i++) {
 			addVertical(3 + i * 2, hasDivisor);
+		}
+		for (int i = 0; i < numUnrolled; i++) {
+			if( hasDivisor )
+				addConvolveDiv(3 + i * 2 );
+			else
+				addConvolve(3 + i * 2 );
 		}
 
 		out.println("}");
@@ -145,7 +152,8 @@ public class GenerateConvolvedUnrolled {
 		out.print(CodeGeneratorUtil.copyright);
 		out.print("package gecv.alg.filter.convolve.impl;\n");
 		out.println();
-		out.print("import gecv.struct.convolve." + typeKernel + ";\n");
+		out.print("import gecv.struct.convolve.Kernel1D_" + typeKernel + ";\n");
+		out.print("import gecv.struct.convolve.Kernel2D_" + typeKernel + ";\n");
 		out.print("import gecv.struct.image." + typeInput + ";\n");
 		if (typeInput.compareTo(typeOutput) != 0)
 			out.print("import gecv.struct.image." + typeOutput + ";\n");
@@ -170,13 +178,29 @@ public class GenerateConvolvedUnrolled {
 				"public class " + className + " {\n");
 	}
 
-	public void createMaster(String opName, boolean hasDivisor ) {
-		out.print("\tpublic static boolean " + opName + "( " + typeKernel + " kernel ,\n" +
-				"\t\t\t\t\t\t\t\t   " + typeInput + " image, " + typeOutput + " dest,\n");
-		if( hasDivisor ) {
-			out.print("\t\t\t\t\t\t\t\t   int divisor, boolean includeBorder) {\n");
+	public void createMaster(String opName, int kernelDOF , boolean hasDivisor ) {
+		String kernel = "Kernel"+kernelDOF+"D_"+typeKernel;
+
+		out.print("\tpublic static boolean " + opName + "( " + kernel + " kernel ,\n" +
+				"\t\t\t\t\t\t\t\t   " + typeInput + " image, " + typeOutput + " dest");
+
+		String includeBorderStr;
+
+		if( kernelDOF == 1 ) {
+			includeBorderStr= ",includeBorder";
+			out.println(",");
+			if( hasDivisor ) {
+				out.print("\t\t\t\t\t\t\t\t   int divisor, boolean includeBorder) {\n");
+			} else {
+				out.print("\t\t\t\t\t\t\t\t   boolean includeBorder) {\n");
+			}
 		} else {
-			out.print("\t\t\t\t\t\t\t\t   boolean includeBorder) {\n");
+			includeBorderStr="";
+			if( hasDivisor ) {
+				out.print(", int divisor ) {\n");
+			} else {
+				out.print(") {\n");
+			}
 		}
 
 		out.print("\t\tswitch( kernel.width ) {\n");
@@ -184,9 +208,9 @@ public class GenerateConvolvedUnrolled {
 			int num = 3 + i * 2;
 			out.print("\t\t\tcase " + num + ":\n");
 			if( hasDivisor )
-				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest,divisor,includeBorder);\n");
+				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest,divisor"+includeBorderStr+");\n");
 			else
-				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest,includeBorder);\n");
+				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest"+includeBorderStr+");\n");
 			out.print("\t\t\t\tbreak;\n" +
 					"\n");
 		}
@@ -200,7 +224,7 @@ public class GenerateConvolvedUnrolled {
 	public void addHorizontal(int num, boolean hasDivisor ) {
 		String typeCast = generateTypeCast();
 
-		out.print("\tpublic static void horizontal" + num + "( " + typeKernel + " kernel ,\n" +
+		out.print("\tpublic static void horizontal" + num + "( Kernel1D_" + typeKernel + " kernel ,\n" +
 				"\t\t\t\t\t\t\t\t\t" + typeInput + " image, " + typeOutput + " dest,\n");
 
 		if( hasDivisor ) {
@@ -249,7 +273,7 @@ public class GenerateConvolvedUnrolled {
 	public void addVertical(int num, boolean hasDivisor) {
 		String typeCast = generateTypeCast();
 
-		out.print("\tpublic static void vertical" + num + "( " + typeKernel + " kernel,\n" +
+		out.print("\tpublic static void vertical" + num + "( Kernel1D_" + typeKernel + " kernel,\n" +
 				"\t\t\t\t\t\t\t\t " + typeInput + " image, " + typeOutput + " dest,\n");
 		if( hasDivisor )
 			out.print("\t\t\t\t\t\t\t\t int divisor , boolean includeBorder)\n");
@@ -291,6 +315,129 @@ public class GenerateConvolvedUnrolled {
 		else
 			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n");
 		out.print("\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void addConvolve(int num ) {
+		String typeCast = generateTypeCast();
+
+		out.print("\tpublic static void convolve" + num + "( Kernel2D_" + typeKernel + " kernel, " + typeInput + " src, " + typeOutput + " dest);\n");
+
+		out.print("\t{\n" +
+				"\t\tfinal " + dataInput + "[] dataSrc = src.data;\n" +
+				"\t\tfinal " + dataOutput + "[] dataDst = dest.data;\n" +
+				"\n");
+		out.print("\t\tfinal int width = src.getWidth();\n" +
+				"\t\tfinal int height = src.getHeight();\n" +
+				"\n" +
+				"\t\tfinal int kernelRadius = kernel.getRadius();\n" +
+				"\n" +
+				"\t\tfor( int y = kernelRadius; y < height-kernelRadius; y++ ) {\n" +
+				"\n" +
+				"\t\t\t// first time through the value needs to be set\n");
+		for( int i = 0; i < num; i++ ) {
+			out.print("\t\t\t"+sumType+" k"+(i+1)+" = kernel.data["+i+"];\n");
+		}
+		out.print("\n" +
+				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+kernelRadius;\n" +
+				"\t\t\tint indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;\n" +
+				"\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
+				"\t\t\t\tint indexSrc = indexSrcRow + x;\n" +
+				"\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n");
+		for( int i = 0; i < num-1; i++ ) {
+			out.print("\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* k"+(i+1)+";\n");
+		}
+		out.print("\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* k"+num+";\n");
+		out.print("\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"total;\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\t// rest of the convolution rows are an addition\n" +
+				"\t\t\tfor( int i = 1; i < "+num+"; i++ ) {\n" +
+				"\t\t\t\tindexDst = dest.startIndex + y*dest.stride+kernelRadius;\n" +
+				"\t\t\t\tindexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;\n" +
+				"\t\t\t\t\n");
+		for( int i = 0; i < num; i++ ) {
+			out.print("\t\t\t\tk"+(i+1)+" = kernel.data[i*"+num+" + "+i+"];\n");
+		}
+		out.print("\n" +
+				"\t\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
+				"\t\t\t\t\tint indexSrc = indexSrcRow+x;\n" +
+				"\n" +
+				"\t\t\t\t\t"+sumType+" total = 0;\n");
+		for( int i = 0; i < num-1; i++ ) {
+			out.print("\t\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* k"+(i+1)+";\n");
+		}
+		out.print("\t\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* k"+(num)+";\n");
+		out.print("\n" +
+				"\t\t\t\t\tdataDst[indexDst++] += "+typeCast+"total;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void addConvolveDiv(int num ) {
+		String typeCast = generateTypeCast();
+
+		out.print("\tpublic static void convolve" + num + "( Kernel2D_" + typeKernel + " kernel, " + typeInput + " src, " + typeOutput + " dest , int divisor )\n");
+
+		out.print("\t{\n" +
+				"\t\tfinal " + dataInput + "[] dataSrc = src.data;\n" +
+				"\t\tfinal " + dataOutput + "[] dataDst = dest.data;\n" +
+				"\n");
+		out.print("\t\tfinal int width = src.getWidth();\n" +
+				"\t\tfinal int height = src.getHeight();\n" +
+				"\n" +
+				"\t\tfinal int kernelRadius = kernel.getRadius();\n");
+		out.print("\t\tfinal "+sumType+" totalRow[] = new int[ width ];\n");
+		out.print("\n" +
+				"\t\tfor( int y = kernelRadius; y < height-kernelRadius; y++ ) {\n" +
+				"\n" +
+				"\t\t\t// first time through the value needs to be set\n");
+		for( int i = 0; i < num; i++ ) {
+			out.print("\t\t\t"+sumType+" k"+(i+1)+" = kernel.data["+i+"];\n");
+		}
+		out.print("\n" +
+				"\t\t\tint indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;\n" +
+				"\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
+				"\t\t\t\tint indexSrc = indexSrcRow + x;\n" +
+				"\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n");
+		for( int i = 0; i < num-1; i++ ) {
+			out.print("\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* k"+(i+1)+";\n");
+		}
+		out.print("\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* k"+num+";\n");
+		out.print("\n" +
+				"\t\t\t\ttotalRow[x] = total;\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\t// rest of the convolution rows are an addition\n" +
+				"\t\t\tfor( int i = 1; i < "+num+"; i++ ) {\n" +
+				"\t\t\t\tindexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;\n" +
+				"\t\t\t\t\n");
+		for( int i = 0; i < num; i++ ) {
+			out.print("\t\t\t\tk"+(i+1)+" = kernel.data[i*"+num+" + "+i+"];\n");
+		}
+		out.print("\n" +
+				"\t\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
+				"\t\t\t\t\tint indexSrc = indexSrcRow+x;\n" +
+				"\n" +
+				"\t\t\t\t\t"+sumType+" total = 0;\n");
+		for( int i = 0; i < num-1; i++ ) {
+			out.print("\t\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* k"+(i+1)+";\n");
+		}
+		out.print("\t\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* k"+(num)+";\n");
+		out.print("\n" +
+				"\t\t\t\t\ttotalRow[x] += total;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+kernelRadius;\n" +
+				"\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"(totalRow[x] / divisor);\n" +
+				"\t\t\t}\n"+
 				"\t\t}\n" +
 				"\t}\n\n");
 	}

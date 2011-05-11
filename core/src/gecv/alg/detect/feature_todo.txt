@@ -1,6 +1,5 @@
-- FAST
-- KLT
-- Harris
+- Is Kit/Ros implemented correctly?
+  * Should it be just the local values not a window for derivatives?
 - Multi scale harris
 - LoG DoG DoH blob detectors
 - SURF

@@ -365,7 +365,9 @@ public class GecvTesting {
 
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				if (Math.abs(imgA.get(x, y) - imgB.get(x, y)) > tol)
+				float normalizer = Math.abs(imgA.get(x, y)) + Math.abs(imgB.get(x, y));
+				if( normalizer < 1.0f ) normalizer = 1.0f;
+				if (Math.abs(imgA.get(x, y) - imgB.get(x, y))/normalizer > tol)
 					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + imgA.get(x, y) + "  " + imgB.get(x, y));
 			}
 		}

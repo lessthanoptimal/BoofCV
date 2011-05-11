@@ -17,7 +17,7 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.filter.derivative.three.GradientThree_Standard;
+import gecv.alg.filter.derivative.impl.GradientThree_Standard;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -25,10 +25,11 @@ import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
- * Computes an edge by convolving a 1D kernel, shown below, across the image.  Note this is NOT
- * the same as a prewitt edge detector.   kernel = [-1 0 1]
+ * Computes the image's first derivative along the x and y axises using [-1 0 1] kernel.
  * </p>
- * <p/>
+ * <p>
+ * Th 1-D kernel allows the image's gradient to be computed efficiently but is more sensitive to local noise.
+ * </p>
  * <p>
  * For example in an integer image:<br>
  * derivX(x,y) = img(x+1,y) - img(x-1,y)<br>

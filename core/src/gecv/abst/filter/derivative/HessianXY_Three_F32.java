@@ -16,23 +16,22 @@
 
 package gecv.abst.filter.derivative;
 
-import gecv.alg.filter.derivative.GradientThree;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.alg.filter.derivative.HessianThree;
+import gecv.struct.image.ImageFloat32;
 
 
 /**
  * @author Peter Abeles
  */
-public class DerivativeXY_Three_I8 implements DerivativeXY<ImageUInt8, ImageSInt16> {
+public class HessianXY_Three_F32 implements HessianXY<ImageFloat32, ImageFloat32> {
 
 	@Override
-	public void process(ImageUInt8 inputImage , ImageSInt16 derivX, ImageSInt16 derivY) {
-		GradientThree.deriv_I8(inputImage, derivX, derivY);
+	public void process(ImageFloat32 inputImage , ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY ) {
+		HessianThree.process(inputImage, derivXX ,derivYY, derivXY);
 	}
 
 	@Override
 	public int getBorder() {
-		return 1;
+		return 2;
 	}
 }

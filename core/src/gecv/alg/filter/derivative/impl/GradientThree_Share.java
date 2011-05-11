@@ -14,16 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.derivative.three;
+package gecv.alg.filter.derivative.impl;
 
 import gecv.struct.image.ImageFloat32;
 
 
 /**
+ * <p>
  * This is an attempt to improve the performance by minimizing the number of times arrays are accessed
  * and partially unrolling loops.
- * <p/>
+ * </p>
+ * <p>
  * While faster than the standard algorithm, the standard appears to be fast enough.
+ * </p>
  *
  * @author Peter Abeles
  */

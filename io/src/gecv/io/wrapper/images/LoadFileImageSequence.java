@@ -152,6 +152,11 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 	}
 
 	@Override
+	public int getFrameNumber() {
+		return index-1;
+	}
+
+	@Override
 	public void close() {
 	}
 

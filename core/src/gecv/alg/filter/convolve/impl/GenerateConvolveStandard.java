@@ -84,7 +84,6 @@ public class GenerateConvolveStandard {
 				" * \n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"// todo add integer convolutions which divide\n" +
 				"@SuppressWarnings({\"ForLoopReplaceableByForEach\"})\n" +
 				"public class " + className + " {\n\n");
 	}

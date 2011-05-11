@@ -47,7 +47,6 @@ public class SelectNBestCorners {
 		if (numFoundFeatures <= bestCorners.getMaxSize()) {
 			// make a copy of the results with no pruning since it already
 			// has the desired number, or less
-			origCorners.reset();
 			for (int i = 0; i < numFoundFeatures; i++) {
 				Point2D_I16 pt = origCorners.points[i];
 				bestCorners.add(pt.x, pt.y);

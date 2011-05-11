@@ -26,6 +26,6 @@ public class TestConvolveImage {
 	@Test
 	public void compareToStandard() {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImage.class);
-		a.performTests(16);
+		a.performTests(17);
 	}
 }

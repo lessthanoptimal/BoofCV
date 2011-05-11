@@ -41,7 +41,7 @@ public abstract class SsdCorner_F32 implements GradientCornerIntensity<ImageFloa
 	protected ImageFloat32 derivY;
 
 	// radius of detected features
-	private int radius;
+	protected int radius;
 
 	// temporary storage for intensity derivatives summations
 	private ImageFloat32 horizXX;

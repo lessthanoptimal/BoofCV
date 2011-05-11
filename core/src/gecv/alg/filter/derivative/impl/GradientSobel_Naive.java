@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.derivative.sobel;
+package gecv.alg.filter.derivative.impl;
 
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInteger;
