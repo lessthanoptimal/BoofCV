@@ -88,7 +88,7 @@ public class TestKltTracker {
 	private void checkMovement(int radius, int deltaX, int deltaY) {
 		UtilImageFloat32.fill(image, 0);
 		UtilImageFloat32.fillRectangle(image, 100, 20, 20, imageWidth, imageHeight);
-		GradientSobel.process(image, derivX, derivY);
+		GradientSobel.process(image, derivX, derivY, true);
 
 		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
@@ -101,7 +101,7 @@ public class TestKltTracker {
 		// move the rectangle a bit
 		UtilImageFloat32.fill(image, 0);
 		UtilImageFloat32.fillRectangle(image, 100, 20 + deltaX, 20 + deltaY, imageWidth, imageHeight);
-		GradientSobel.process(image, derivX, derivY);
+		GradientSobel.process(image, derivX, derivY, true);
 
 		// update the feature's position
 		tracker.setImage(image, derivX, derivY);

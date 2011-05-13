@@ -41,18 +41,8 @@ public class ImageSInt32 extends ImageInteger<ImageSInt32> {
 	public ImageSInt32() {
 	}
 
-	/**
-	 * Returns the value of the specified pixel.
-	 *
-	 * @param x pixel coordinate.
-	 * @param y pixel coordinate.
-	 * @return an intensity value.
-	 */
 	@Override
-	public int get(int x, int y) {
-		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
-
+	protected int unsafe_get(int x, int y) {
 		return data[getIndex(x, y)];
 	}
 

@@ -16,16 +16,72 @@
 
 package gecv.core.image.border;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.core.image.UtilImageFloat32;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestImageBorderExtended {
+
+	Random rand = new Random(234);
+
+	int width = 20;
+	int height = 25;
+
 	@Test
-	public void test() {
-		fail("implement tests");
+	public void test_I8() {
+		ImageUInt8 img = new ImageUInt8(width,height);
+		BasicDrawing_I8.randomize(img,rand);
+
+		ImageBorder_I foo = ImageBorderExtended.wrap(img);
+
+		assertEquals(img.get(1,1),foo.get(1,1));
+		assertEquals(img.get(0,0),foo.get(0,0));
+		assertEquals(img.get(width-1,height-1),foo.get(width-1,height-1));
+
+		assertEquals(img.get(0,0),foo.get(-1,0));
+		assertEquals(img.get(0,0),foo.get(-5,0));
+		assertEquals(img.get(0,0),foo.get(0,-1));
+		assertEquals(img.get(0,0),foo.get(0,-5));
+		assertEquals(img.get(1,0),foo.get(1,-1));
+		assertEquals(img.get(0,1),foo.get(-1,1));
+		assertEquals(img.get(width-1,height-1),foo.get(width,height));
+		assertEquals(img.get(width-1,height-1),foo.get(width+2,height));
+		assertEquals(img.get(width-1,height-1),foo.get(width,height+2));
+		assertEquals(img.get(width-1,5),foo.get(width+1,5));
+		assertEquals(img.get(5,height-1),foo.get(5,height+1));
+	}
+
+	@Test
+	public void test_F32() {
+		ImageFloat32 img = new ImageFloat32(width,height);
+		UtilImageFloat32.randomize(img,rand,0,5);
+
+		ImageBorder_F32 foo = ImageBorderExtended.wrap(img);
+
+		assertEquals(img.get(1,1),foo.get(1,1),1e-4f);
+		assertEquals(img.get(0,0),foo.get(0,0),1e-4f);
+		assertEquals(img.get(width-1,height-1),foo.get(width-1,height-1),1e-4f);
+
+		assertEquals(img.get(0,0),foo.get(-1,0),1e-4f);
+		assertEquals(img.get(0,0),foo.get(-5,0),1e-4f);
+		assertEquals(img.get(0,0),foo.get(0,-1),1e-4f);
+		assertEquals(img.get(0,0),foo.get(0,-5),1e-4f);
+		assertEquals(img.get(1,0),foo.get(1,-1),1e-4f);
+		assertEquals(img.get(0,1),foo.get(-1,1),1e-4f);
+		assertEquals(img.get(width-1,height-1),foo.get(width,height),1e-4f);
+		assertEquals(img.get(width-1,height-1),foo.get(width+2,height),1e-4f);
+		assertEquals(img.get(width-1,height-1),foo.get(width,height+2),1e-4f);
+		assertEquals(img.get(width-1,5),foo.get(width+1,5),1e-4f);
+		assertEquals(img.get(5,height-1),foo.get(5,height+1),1e-4f);
 	}
 }

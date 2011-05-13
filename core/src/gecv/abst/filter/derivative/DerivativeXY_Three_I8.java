@@ -28,7 +28,7 @@ public class DerivativeXY_Three_I8 implements DerivativeXY<ImageUInt8, ImageSInt
 
 	@Override
 	public void process(ImageUInt8 inputImage , ImageSInt16 derivX, ImageSInt16 derivY) {
-		GradientThree.deriv_I8(inputImage, derivX, derivY);
+		GradientThree.process(inputImage, derivX, derivY, false);
 	}
 
 	@Override

@@ -69,7 +69,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 
 	@Override
 	protected void computeDerivatives(ImageFloat32 input, ImageFloat32 derivX, ImageFloat32 derivY) {
-		GradientSobel.process(input,derivX,derivY);
+		GradientSobel.process(input,derivX,derivY, true);
 	}
 
 	public static void main( String args[] ) {

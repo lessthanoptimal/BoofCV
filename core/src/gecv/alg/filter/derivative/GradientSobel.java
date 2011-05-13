@@ -17,8 +17,13 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.InputSanityCheck;
+import gecv.alg.filter.convolve.ConvolveExtended;
+import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import gecv.alg.filter.derivative.impl.GradientSobel_Outer;
 import gecv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter;
+import gecv.core.image.border.ImageBorderExtended;
+import gecv.struct.convolve.Kernel2D_F32;
+import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -55,17 +60,28 @@ import gecv.struct.image.ImageUInt8;
  */
 public class GradientSobel {
 
+	public static Kernel2D_I32 kernelDerivX_I32 = new Kernel2D_I32(new int[]{-1,0,1,-2,0,2,-1,0,1},3);
+	public static Kernel2D_I32 kernelDerivY_I32 = new Kernel2D_I32(new int[]{-1,-2,-1,0,0,0,1,2,1},3);
+	public static Kernel2D_F32 kernelDerivX_F32 = new Kernel2D_F32(
+			new float[]{-0.25f,0,0.25f,-0.5f,0,0.5f,-0.25f,0,0.25f},3);
+	public static Kernel2D_F32 kernelDerivY_F32 = new Kernel2D_F32(
+			new float[]{-0.25f,-0.5f,-0.25f,0,0,0,0.25f,0.5f,0.25f},3);
 	/**
 	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.
 	 *
 	 * @param orig   Input image.  Not modified.
 	 * @param derivX Storage for image derivative along the x-axis. Modified.
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
+	 * @param processBorder If the image's border is processed or not.
 	 */
-	public static void process( ImageUInt8 orig, ImageSInt16 derivX, ImageSInt16 derivY) {
+	public static void process(ImageUInt8 orig, ImageSInt16 derivX, ImageSInt16 derivY, boolean processBorder) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
-
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
+
+		if( processBorder ) {
+			ConvolveJustBorder_General.convolve(kernelDerivX_I32, ImageBorderExtended.wrap(orig),derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_I32, ImageBorderExtended.wrap(orig),derivY,1);
+		}
 	}
 
 	/**
@@ -74,11 +90,17 @@ public class GradientSobel {
 	 * @param orig   Input image.  Not modified.
 	 * @param derivX Storage for image derivative along the x-axis. Modified.
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
+	 * @param processBorder If the image's border is processed or not.
 	 */
-	public static void process( ImageFloat32 orig, ImageFloat32 derivX, ImageFloat32 derivY) {
+	public static void process(ImageFloat32 orig, ImageFloat32 derivX, ImageFloat32 derivY, boolean processBorder) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 
 //		GradientSobel_Outer.process_F32(orig, derivX, derivY);
 		GradientSobel_UnrolledOuter.process_F32_sub(orig, derivX, derivY);
+
+		if( processBorder ) {
+			ConvolveJustBorder_General.convolve(kernelDerivX_F32, ImageBorderExtended.wrap(orig),derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_F32, ImageBorderExtended.wrap(orig),derivY,1);
+		}
 	}
 }

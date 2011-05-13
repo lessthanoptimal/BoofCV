@@ -28,97 +28,37 @@ import gecv.struct.image.ImageUInt8;
  * 
  * @author Peter Abeles
  */
-public class BenchmarkImageDerivative {
-	static int imgWidth = 640;
-	static int imgHeight = 480;
-	static long TEST_TIME = 1000;
+public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 
-	static ImageFloat32 imgFloat32;
-	static ImageFloat32 derivX_F32;
-	static ImageFloat32 derivY_F32;
-	static ImageFloat32 derivXY_F32;
-	static ImageUInt8 imgInt8;
-	static ImageSInt16 derivX_I16;
-	static ImageSInt16 derivY_I16;
-	static ImageSInt16 derivXY_I16;
-
-	public static class SobelNaive_I8 extends PerformerBase
+	public static class Sobel_I8 extends PerformerBase
 	{
 		@Override
 		public void process() {
-			GradientSobel_Naive.process(imgInt8,derivX_I16,derivY_I16);
+			GradientSobel.process(imgInt8,derivX_I16,derivY_I16,border);
 		}
 	}
 
-	public static class SobelNaive_F32 extends PerformerBase
+	public static class Sobel_F32 extends PerformerBase
 	{
 		@Override
 		public void process() {
-			GradientSobel_Naive.process(imgFloat32,derivX_F32,derivY_F32);
+			GradientSobel.process(imgFloat32,derivX_F32,derivY_F32,border);
 		}
 	}
 
-	public static class SobelOuter_I8 extends PerformerBase
+	public static class DerivativeThree_F32 extends PerformerBase
 	{
 		@Override
 		public void process() {
-			GradientSobel_Outer.process_I8(imgInt8,derivX_I16,derivY_I16);
+			GradientThree.process(imgFloat32,derivX_F32,derivY_F32,border);
 		}
 	}
 
-	public static class SobelOuter_I8_Sub extends PerformerBase
+	public static class DerivativeThree_I8 extends PerformerBase
 	{
 		@Override
 		public void process() {
-			GradientSobel_Outer.process_I8_sub(imgInt8,derivX_I16,derivY_I16);
-		}
-	}
-
-	public static class SobelOuter_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			GradientSobel_Outer.process_F32(imgFloat32,derivX_F32,derivY_F32);
-		}
-	}
-
-	public static class SobelUnrolledOuter_I8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			GradientSobel_UnrolledOuter.process_I8(imgInt8,derivX_I16,derivY_I16);
-		}
-	}
-
-	public static class SobelUnrolledOuter_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			GradientSobel_UnrolledOuter.process_F32(imgFloat32,derivX_F32,derivY_F32);
-		}
-	}
-
-	public static class SobelUnrolledOuter_F32_Sub extends PerformerBase
-	{
-		@Override
-		public void process() {
-			GradientSobel_UnrolledOuter.process_F32_sub(imgFloat32,derivX_F32,derivY_F32);
-		}
-	}
-
-	public static class DerivativeThree_Std_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			GradientThree_Standard.deriv_F32(imgFloat32,derivX_F32,derivY_F32);
-		}
-	}
-
-	public static class DerivativeThree_Std_I8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			GradientThree_Standard.deriv_I8(imgInt8,derivX_I16,derivY_I16);
+			GradientThree.process(imgInt8,derivX_I16,derivY_I16,border);
 		}
 	}
 
@@ -126,7 +66,15 @@ public class BenchmarkImageDerivative {
 	{
 		@Override
 		public void process() {
-			HessianThree_Standard.deriv_I8(imgInt8,derivX_I16,derivY_I16,derivXY_I16);
+			HessianThree_Standard.process(imgInt8,derivX_I16,derivY_I16,derivXY_I16);
+		}
+	}
+
+	public static class HessianThree_I8 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			HessianThree.process(imgInt8,derivX_I16,derivY_I16,derivXY_I16,border);
 		}
 	}
 
@@ -134,7 +82,31 @@ public class BenchmarkImageDerivative {
 	{
 		@Override
 		public void process() {
-			HessianThree_Standard.deriv_F32(imgFloat32,derivX_F32,derivY_F32,derivXY_F32);
+			HessianThree_Standard.process(imgFloat32,derivX_F32,derivY_F32,derivXY_F32);
+		}
+	}
+
+	public static class HessianThree_F32 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			HessianThree.process(imgFloat32,derivX_F32,derivY_F32,derivXY_F32,border);
+		}
+	}
+
+	public static class HessianSobel_I8 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			HessianSobel.process(imgInt8,derivX_I16,derivY_I16,derivXY_I16,border);
+		}
+	}
+
+	public static class HessianSobel_F32 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			HessianSobel.process(imgFloat32,derivX_F32,derivY_F32,derivXY_F32,border);
 		}
 	}
 
@@ -154,37 +126,47 @@ public class BenchmarkImageDerivative {
 		}
 	}
 
-	public static void main( String args[] ) {
-		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
-		derivX_I16 = new ImageSInt16(imgWidth,imgHeight);
-		derivY_I16 = new ImageSInt16(imgWidth,imgHeight);
-		derivXY_I16 = new ImageSInt16(imgWidth,imgHeight);
-		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
-		derivX_F32 = new ImageFloat32(imgWidth,imgHeight);
-		derivY_F32 = new ImageFloat32(imgWidth,imgHeight);
-		derivXY_F32 = new ImageFloat32(imgWidth,imgHeight);
+	public static class Prewitt_I8 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			GradientPrewitt.process(imgInt8,derivX_I16,derivY_I16,border);
+		}
+	}
 
-		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
-		System.out.println();
-		System.out.println("             ImageUInt8");
-		System.out.println();
+	public static class Prewitt_F32 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			GradientPrewitt.process(imgFloat32,derivX_F32,derivY_F32,border);
+		}
+	}
 
-		ProfileOperation.printOpsPerSec(new SobelNaive_I8(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new SobelOuter_I8(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new SobelOuter_I8_Sub(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new SobelUnrolledOuter_I8(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new DerivativeThree_Std_I8(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new HessianThree_Std_I8(),TEST_TIME);
+	@Override
+	public void profile_I8() {
+		ProfileOperation.printOpsPerSec(new Sobel_I8(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Prewitt_I8(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new DerivativeThree_I8(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new HessianThree_I8(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new HessianSobel_I8(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new LaplacianEdge_I8(),TEST_TIME);
+	}
 
-		System.out.println("\n             ImageFloat32");
-		System.out.println();
-		ProfileOperation.printOpsPerSec(new SobelNaive_F32(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new SobelOuter_F32(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new SobelUnrolledOuter_F32(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new SobelUnrolledOuter_F32_Sub(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new DerivativeThree_Std_F32(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new HessianThree_Std_F32(),TEST_TIME);
+	@Override
+	public void profile_F32() {
+		ProfileOperation.printOpsPerSec(new Sobel_F32(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Prewitt_F32(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new DerivativeThree_F32(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new HessianThree_F32(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new HessianSobel_F32(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new LaplacianEdge_F32(),TEST_TIME);
 	}
+
+	public static void main( String args[] ) {
+		BenchmarkImageDerivative benchmark = new BenchmarkImageDerivative();
+
+		BenchmarkImageDerivative.border = true;
+		benchmark.process();
+	}
+
 }

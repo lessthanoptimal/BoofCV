@@ -17,14 +17,10 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.core.image.UtilImageFloat32;
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
-import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.util.Random;
@@ -35,75 +31,45 @@ import java.util.Random;
 public class TestGradientSobel {
 	Random rand = new Random(234);
 
-	int width = 5;
-	int height = 7;
+	int width = 20;
+	int height = 25;
+
+//	@Test
+//	public void checkInputShape() {
+//		GenericDerivativeTests.checkImageDimensionValidation(new GradientSobel(), 2);
+//	}
 
 	@Test
-	public void checkInputShape() {
-		GecvTesting.checkImageDimensionValidation(new GradientSobel(), 2);
+	public void compareToConvolve_I8() throws NoSuchMethodException {
+		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
+		validator.setTarget(GradientSobel.class.getMethod("process",
+				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, boolean.class ));
+
+		validator.setKernel(0,GradientSobel.kernelDerivX_I32);
+		validator.setKernel(1,GradientSobel.kernelDerivY_I32);
+
+		ImageUInt8 input = new ImageUInt8(width,height);
+		BasicDrawing_I8.randomize(input, rand, 0, 10);
+		ImageSInt16 derivX = new ImageSInt16(width,height);
+		ImageSInt16 derivY = new ImageSInt16(width,height);
+
+		validator.compare(input,derivX,derivY);
 	}
 
-	@Test
-	public void process_I8() {
-		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand, 0, 10);
+@	Test
+	public void compareToConvolve_F32() throws NoSuchMethodException {
+		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
+		validator.setTarget(GradientSobel.class.getMethod("process",
+				ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, boolean.class ));
 
-		ImageSInt16 derivX = new ImageSInt16(width, height);
-		ImageSInt16 derivY = new ImageSInt16(width, height);
+		validator.setKernel(0,GradientSobel.kernelDerivX_F32);
+		validator.setKernel(1,GradientSobel.kernelDerivY_F32);
 
-		GecvTesting.checkSubImage(this, "process_I8", true, img, derivX, derivY);
-	}
+		ImageFloat32 input = new ImageFloat32(width,height);
+		UtilImageFloat32.randomize(input, rand, 0, 10);
+		ImageFloat32 derivX = new ImageFloat32(width,height);
+		ImageFloat32 derivY = new ImageFloat32(width,height);
 
-	public void process_I8(ImageUInt8 img, ImageSInt16 derivX, ImageSInt16 derivY) {
-		GradientSobel.process(img, derivX, derivY);
-
-		// compare to the equivalent convolution
-		Kernel1D_I32 kernel1 = new Kernel1D_I32(3, 1, 2, 1);
-		Kernel1D_I32 kernel2 = new Kernel1D_I32(3, -1, 0, 1);
-
-		ImageSInt16 temp = new ImageSInt16(width, height);
-		ImageSInt16 convX = new ImageSInt16(width, height);
-		ImageSInt16 convY = new ImageSInt16(width, height);
-
-		ConvolveImageNoBorder.horizontal(kernel1, img, temp, true);
-		ConvolveImageNoBorder.vertical(kernel2, temp, convY, true);
-
-		ConvolveImageNoBorder.vertical(kernel1, img, temp, true);
-		ConvolveImageNoBorder.horizontal(kernel2, temp, convX, true);
-
-		GecvTesting.assertEquals(derivX, convX, 1);
-		GecvTesting.assertEquals(derivY, convY, 1);
-	}
-
-	@Test
-	public void process_F32() {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0, 10);
-
-		ImageFloat32 derivX = new ImageFloat32(width, height);
-		ImageFloat32 derivY = new ImageFloat32(width, height);
-
-		GecvTesting.checkSubImage(this, "process_F32", true, img, derivX, derivY);
-	}
-
-	public void process_F32(ImageFloat32 img, ImageFloat32 derivX, ImageFloat32 derivY) {
-		GradientSobel.process(img, derivX, derivY);
-
-		// compare to the equivalent convolution
-		Kernel1D_F32 kernel1 = new Kernel1D_F32(3, 0.25f, 0.5f, 0.25f);
-		Kernel1D_F32 kernel2 = new Kernel1D_F32(3, -1, 0, 1);
-
-		ImageFloat32 temp = new ImageFloat32(width, height);
-		ImageFloat32 convX = new ImageFloat32(width, height);
-		ImageFloat32 convY = new ImageFloat32(width, height);
-
-		ConvolveImageNoBorder.horizontal(kernel1, img, temp, true);
-		ConvolveImageNoBorder.vertical(kernel2, temp, convY, true);
-
-		ConvolveImageNoBorder.vertical(kernel1, img, temp, true);
-		ConvolveImageNoBorder.horizontal(kernel2, temp, convX, true);
-
-		GecvTesting.assertEquals(derivX, convX, 1, 1e-4f);
-		GecvTesting.assertEquals(derivY, convY, 1, 1e-4f);
+		validator.compare(input,derivX,derivY);
 	}
 }

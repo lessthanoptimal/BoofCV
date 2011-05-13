@@ -17,6 +17,8 @@
 package gecv.testing;
 
 import gecv.struct.image.*;
+import gecv.struct.image.generalized.FactorySingleBandImage;
+import gecv.struct.image.generalized.SingleBandImage;
 import sun.awt.image.ByteInterleavedRaster;
 
 import java.awt.image.BufferedImage;
@@ -288,6 +290,22 @@ public class GecvTesting {
 		}
 	}
 
+	public static void assertEqualsGeneric(ImageBase imgA, ImageBase imgB, int tolInt, double tolFloat,
+										   int ignoreBorder ) {
+
+		if (ImageInteger.class.isAssignableFrom(imgA.getClass())) {
+			if( ImageInteger.class.isAssignableFrom(imgB.getClass()) ) {
+				assertEquals((ImageInteger) imgA, (ImageInteger) imgB, ignoreBorder);
+			} else {
+				assertEquals((ImageInteger) imgA, (ImageFloat32) imgB, ignoreBorder);
+			}
+		} else if( ImageInteger.class.isAssignableFrom(imgB.getClass()) ) {
+			assertEquals((ImageInteger) imgB, (ImageFloat32) imgA, ignoreBorder);
+		} else {
+			assertEquals((ImageFloat32) imgA, (ImageFloat32) imgB, ignoreBorder, (float)tolFloat);
+		}
+	}
+
 	/**
 	 * Checks to see if two images are equivalent.  Note that this is not the same
 	 * as identical since they can be sub-images.
@@ -517,6 +535,22 @@ public class GecvTesting {
 					throw new RuntimeException("images are not equal: ");
 				if (Math.abs(r - imgB.getBand(x, y, 2) & 0xFF) != 0)
 					throw new RuntimeException("images are not equal: ");
+			}
+		}
+	}
+
+	public static void checkBorderZero(ImageBase outputImage, int border) {
+		SingleBandImage img = FactorySingleBandImage.wrap(outputImage);
+
+		for (int y = 0; y < img.getHeight(); y++) {
+			if( y >= border && y < img.getHeight()-border )
+				continue;
+
+			for (int x = 0; x < img.getWidth(); x++) {
+				if( x >= border && x < img.getWidth()-border )
+					continue;
+				if( img.get(x,y).intValue() != 0 )
+					throw new RuntimeException("The border is not zero");
 			}
 		}
 	}

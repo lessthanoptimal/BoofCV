@@ -41,69 +41,43 @@ public class TestGradientThree {
 	int width = 5;
 	int height = 7;
 
+//	@Test
+//	public void checkInputShape() {
+//		GenericDerivativeTests.checkImageDimensionValidation(new GradientThree(), 2);
+//	}
+
 	@Test
-	public void checkInputShape() {
-		GecvTesting.checkImageDimensionValidation(new GradientThree(), 6);
+	public void compareToConvolve_I8() throws NoSuchMethodException {
+		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
+		validator.setTarget(GradientThree.class.getMethod("process",
+				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, boolean.class ));
+
+		validator.setKernel(0,GradientThree.kernelDeriv_I32,true);
+		validator.setKernel(1,GradientThree.kernelDeriv_I32,false);
+
+		ImageUInt8 input = new ImageUInt8(width,height);
+		BasicDrawing_I8.randomize(input, rand, 0, 10);
+		ImageSInt16 derivX = new ImageSInt16(width,height);
+		ImageSInt16 derivY = new ImageSInt16(width,height);
+
+		validator.compare(input,derivX,derivY);
 	}
 
-	/**
-	 * Compare the results to individually computed derivative along x and y axis.
-	 */
-	@Test
-	public void deriv_I8() {
-		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand, 0, 10);
+@	Test
+	public void compareToConvolve_F32() throws NoSuchMethodException {
+		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
+		validator.setTarget(GradientThree.class.getMethod("process",
+				ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, boolean.class ));
 
-		ImageSInt16 derivX = new ImageSInt16(width, height);
-		ImageSInt16 derivY = new ImageSInt16(width, height);
+		validator.setKernel(0,GradientThree.kernelDeriv_F32,true);
+		validator.setKernel(1,GradientThree.kernelDeriv_F32,false);
 
-		GecvTesting.checkSubImage(this, "deriv_I8", true, img, derivX, derivY);
-	}
+		ImageFloat32 input = new ImageFloat32(width,height);
+		UtilImageFloat32.randomize(input, rand, 0, 10);
+		ImageFloat32 derivX = new ImageFloat32(width,height);
+		ImageFloat32 derivY = new ImageFloat32(width,height);
 
-	public void deriv_I8(ImageUInt8 img, ImageSInt16 derivX, ImageSInt16 derivY) {
-		ImageSInt16 derivX_a = new ImageSInt16(width, height);
-		ImageSInt16 derivY_a = new ImageSInt16(width, height);
-
-		GradientThree.derivX_I8(img, derivX_a);
-		GradientThree.derivY_I8(img, derivY_a);
-		GradientThree.deriv_I8(img, derivX, derivY);
-
-		for (int i = 1; i < height - 1; i++) {
-			for (int j = 1; j < width - 1; j++) {
-				assertEquals(derivX.get(j, i), derivX_a.get(j, i), 1e-5);
-				assertEquals(derivY.get(j, i), derivY_a.get(j, i), 1e-5);
-			}
-		}
-	}
-
-	/**
-	 * Compare the results to individually computed derivative along x and y axis.
-	 */
-	@Test
-	public void deriv_F32() {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0f, 1.0f);
-
-		ImageFloat32 derivX = new ImageFloat32(width, height);
-		ImageFloat32 derivY = new ImageFloat32(width, height);
-
-		GecvTesting.checkSubImage(this, "deriv_F32", true, img, derivX, derivY);
-	}
-
-	public void deriv_F32(ImageFloat32 img, ImageFloat32 derivX, ImageFloat32 derivY) {
-		ImageFloat32 derivX_a = new ImageFloat32(width, height);
-		ImageFloat32 derivY_a = new ImageFloat32(width, height);
-
-		GradientThree.derivX_F32(img, derivX_a);
-		GradientThree.derivY_F32(img, derivY_a);
-		GradientThree.deriv_F32(img, derivX, derivY);
-
-		for (int i = 1; i < height - 1; i++) {
-			for (int j = 1; j < width - 1; j++) {
-				assertEquals(derivX.get(j, i), derivX_a.get(j, i), 1e-5);
-				assertEquals(derivY.get(j, i), derivY_a.get(j, i), 1e-5);
-			}
-		}
+		validator.compare(input,derivX,derivY);
 	}
 
 	@Test

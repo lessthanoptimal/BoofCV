@@ -22,7 +22,7 @@ import java.lang.reflect.Array;
 
 /**
  * <p>Image pyramids represent the same image at multiple resolutions allowing scale space searches to performed.</p>
- * <p/>
+ * 
  * <p>
  * When updating the pyramid, if the top most layer is at the same resolution as the original image then a reference
  * can optionally be saved, avoiding an unnecissary image copy.  This is done by setting the saveOriginalReference
@@ -59,7 +59,7 @@ public abstract class ImagePyramid<T extends ImageBase> {
 
 	/**
 	 * <p>Sets the scale factor for each layer in the pyramid.</p>
-	 * <p/>
+     *
 	 * <p>
 	 * The scaling is relative to the previous layer.  For
 	 * example, scale = [1,2,2] would be three layers which have scaling of 1,2, and 4 relative to the original image.

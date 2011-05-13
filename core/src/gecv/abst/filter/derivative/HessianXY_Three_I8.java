@@ -28,7 +28,7 @@ public class HessianXY_Three_I8 implements HessianXY<ImageUInt8, ImageSInt16> {
 
 	@Override
 	public void process(ImageUInt8 inputImage , ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY) {
-		HessianThree.process(inputImage, derivXX, derivYY, derivXY);
+		HessianThree.process(inputImage, derivXX, derivYY, derivXY,true);
 	}
 
 	@Override

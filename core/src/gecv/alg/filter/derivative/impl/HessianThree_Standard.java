@@ -33,10 +33,10 @@ public class HessianThree_Standard {
 	/**
 	 * Computes the derivative along the x and y axes
 	 */
-	public static void deriv_F32(ImageFloat32 orig,
-								 ImageFloat32 derivXX,
-								 ImageFloat32 derivYY,
-								 ImageFloat32 derivXY) {
+	public static void process(ImageFloat32 orig,
+							   ImageFloat32 derivXX,
+							   ImageFloat32 derivYY,
+							   ImageFloat32 derivXY) {
 		final float[] data = orig.data;
 		final float[] imgX = derivXX.data;
 		final float[] imgY = derivYY.data;
@@ -68,10 +68,10 @@ public class HessianThree_Standard {
 	/**
 	 * Computes the derivative along the x and y axes
 	 */
-	public static void deriv_I8(ImageUInt8 orig,
-								ImageSInt16 derivXX,
-								ImageSInt16 derivYY,
-								ImageSInt16 derivXY) {
+	public static void process(ImageUInt8 orig,
+							   ImageSInt16 derivXX,
+							   ImageSInt16 derivYY,
+							   ImageSInt16 derivXY) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivXX.data;
 		final short[] imgY = derivYY.data;

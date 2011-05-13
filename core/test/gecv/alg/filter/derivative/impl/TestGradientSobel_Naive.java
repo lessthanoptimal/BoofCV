@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestGradientEdge_Naive {
+public class TestGradientSobel_Naive {
 
 	Random rand = new Random(0xfeed);
 

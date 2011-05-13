@@ -29,7 +29,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestGradientEdge_Outer {
+public class TestGradientSobel_Outer {
 
 	Random rand = new Random(234);
 

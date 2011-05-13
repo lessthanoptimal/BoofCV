@@ -115,6 +115,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		ret[0][1] = ImageFloat32.class == src.getClass() ?
 				ImageBorderValue.wrap((ImageFloat32)src,fillValue) : ImageBorderValue.wrap((ImageInteger)src,fillValue);
 		ret[0][2] = dst;
+		ret[0][3] = kernelRadius;
 
 		return ret;
 	}

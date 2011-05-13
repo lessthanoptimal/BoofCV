@@ -42,9 +42,9 @@ public abstract class GenericCornerIntensityGradientTests extends GenericCornerI
 
 	@Override
 	protected void computeDerivatives() {
-		GradientSobel.process(imageF,derivX_F32,derivY_F32);
-		GradientSobel.process(imageI,derivX_I16,derivY_I16);
-		HessianThree.process(imageF,derivXX_F32,derivYY_F32,derivXY_F32);
-		HessianThree.process(imageI,derivXX_I16,derivYY_I16,derivXY_I16);
+		GradientSobel.process(imageF,derivX_F32,derivY_F32, true);
+		GradientSobel.process(imageI,derivX_I16,derivY_I16, true);
+		HessianThree.process(imageF,derivXX_F32,derivYY_F32,derivXY_F32,true);
+		HessianThree.process(imageI,derivXX_I16,derivYY_I16,derivXY_I16,true);
 	}
 }

@@ -40,19 +40,18 @@ import gecv.struct.image.ImageSInt32;
  */
 public class ConvolveJustBorder_General {
 
-	public static void horizontal(Kernel1D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output ) {
+	public static void horizontal(Kernel1D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output , int border ) {
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
 
 		final int radius = kernel.getRadius();
-
 		final int width = output.getWidth();
 		final int height = output.getHeight();
 
 		for (int y = 0; y < height; y++) {
 			int indexDest = output.startIndex + y * output.stride;
 
-			for ( int x = 0; x < radius; x++ ) {
+			for ( int x = 0; x < border; x++ ) {
 				float total = 0;
 				for (int k = -radius; k <= radius; k++) {
 					total += input.get(x+k,y) * dataKer[k+radius];
@@ -60,8 +59,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest++] = total;
 			}
 
-			indexDest = output.startIndex + y * output.stride + width-radius;
-			for ( int x = width-radius; x < width; x++ ) {
+			indexDest = output.startIndex + y * output.stride + width-border;
+			for ( int x = width-border; x < width; x++ ) {
 				float total = 0;
 				for (int k = -radius; k <= radius; k++) {
 					total += input.get(x+k,y) * dataKer[k+radius];
@@ -71,19 +70,18 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void vertical(Kernel1D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output ) {
+	public static void vertical(Kernel1D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output , int border ) {
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
 
 		final int radius = kernel.getRadius();
-
 		final int width = output.getWidth();
 		final int height = output.getHeight();
 
 		for ( int x = 0; x < width; x++ ) {
 			int indexDest = output.startIndex + x;
 
-			for (int y = 0; y < radius; y++, indexDest += output.stride) {
+			for (int y = 0; y < border; y++, indexDest += output.stride) {
 				float total = 0;
 				for (int k = -radius; k <= radius; k++) {
 					total += input.get(x,y+k) * dataKer[k+radius];
@@ -91,8 +89,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest] = total;
 			}
 
-			indexDest = output.startIndex + (height-radius) * output.stride + x;
-			for (int y = height-radius; y < height; y++, indexDest += output.stride) {
+			indexDest = output.startIndex + (height-border) * output.stride + x;
+			for (int y = height-border; y < height; y++, indexDest += output.stride) {
 				float total = 0;
 				for (int k = -radius; k <= radius; k++ ) {
 					total += input.get(x,y+k) * dataKer[k+radius];
@@ -102,12 +100,11 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void convolve(Kernel2D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output ) {
+	public static void convolve(Kernel2D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output , int border ) {
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
 
 		final int radius = kernel.getRadius();
-
 		final int width = output.getWidth();
 		final int height = output.getHeight();
 
@@ -115,7 +112,7 @@ public class ConvolveJustBorder_General {
 		for (int y = 0; y < height; y++) {
 			int indexDest = output.startIndex + y * output.stride;
 
-			for ( int x = 0; x < radius; x++ ) {
+			for ( int x = 0; x < border; x++ ) {
 				float total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -126,8 +123,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest++] = total;
 			}
 
-			indexDest = output.startIndex + y * output.stride + width-radius;
-			for ( int x = width-radius; x < width; x++ ) {
+			indexDest = output.startIndex + y * output.stride + width-border;
+			for ( int x = width-border; x < width; x++ ) {
 				float total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -140,10 +137,10 @@ public class ConvolveJustBorder_General {
 		}
 
 		// convolve along the top and bottom borders
-		for ( int x = radius; x < width-radius; x++ ) {
+		for ( int x = border; x < width-border; x++ ) {
 			int indexDest = output.startIndex + x;
 
-			for (int y = 0; y < radius; y++, indexDest += output.stride) {
+			for (int y = 0; y < border; y++, indexDest += output.stride) {
 				float total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -154,8 +151,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest] = total;
 			}
 
-			indexDest = output.startIndex + (height-radius) * output.stride + x;
-			for (int y = height-radius; y < height; y++, indexDest += output.stride) {
+			indexDest = output.startIndex + (height-border) * output.stride + x;
+			for (int y = height-border; y < height; y++, indexDest += output.stride) {
 				float total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -168,19 +165,18 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_I input, ImageInt16 output ) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_I input, ImageInt16 output , int border ) {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
 		final int radius = kernel.getRadius();
-
 		final int width = output.getWidth();
 		final int height = output.getHeight();
 
 		for (int y = 0; y < height; y++) {
 			int indexDest = output.startIndex + y * output.stride;
 
-			for ( int x = 0; x < radius; x++ ) {
+			for ( int x = 0; x < border; x++ ) {
 				int total = 0;
 				for (int k = -radius; k <= radius; k++) {
 					total += input.get(x+k,y) * dataKer[k+radius];
@@ -188,8 +184,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest++] = (short)total;
 			}
 
-			indexDest = output.startIndex + y * output.stride + width-radius;
-			for ( int x = width-radius; x < width; x++ ) {
+			indexDest = output.startIndex + y * output.stride + width-border;
+			for ( int x = width-border; x < width; x++ ) {
 				int total = 0;
 				for (int k = -radius; k <= radius; k++) {
 					total += input.get(x+k,y) * dataKer[k+radius];
@@ -199,19 +195,18 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageBorder_I input, ImageInt16 output ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageBorder_I input, ImageInt16 output , int border ) {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
 		final int radius = kernel.getRadius();
-
 		final int width = output.getWidth();
 		final int height = output.getHeight();
 
 		for ( int x = 0; x < width; x++ ) {
 			int indexDest = output.startIndex + x;
 
-			for (int y = 0; y < radius; y++, indexDest += output.stride) {
+			for (int y = 0; y < border; y++, indexDest += output.stride) {
 				int total = 0;
 				for (int k = -radius; k <= radius; k++) {
 					total += input.get(x,y+k) * dataKer[k+radius];
@@ -219,8 +214,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest] = (short)total;
 			}
 
-			indexDest = output.startIndex + (height-radius) * output.stride + x;
-			for (int y = height-radius; y < height; y++, indexDest += output.stride) {
+			indexDest = output.startIndex + (height-border) * output.stride + x;
+			for (int y = height-border; y < height; y++, indexDest += output.stride) {
 				int total = 0;
 				for (int k = -radius; k <= radius; k++ ) {
 					total += input.get(x,y+k) * dataKer[k+radius];
@@ -230,12 +225,11 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, ImageBorder_I input, ImageInt16 output ) {
+	public static void convolve(Kernel2D_I32 kernel, ImageBorder_I input, ImageInt16 output , int border ) {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
 		final int radius = kernel.getRadius();
-
 		final int width = output.getWidth();
 		final int height = output.getHeight();
 
@@ -243,7 +237,7 @@ public class ConvolveJustBorder_General {
 		for (int y = 0; y < height; y++) {
 			int indexDest = output.startIndex + y * output.stride;
 
-			for ( int x = 0; x < radius; x++ ) {
+			for ( int x = 0; x < border; x++ ) {
 				int total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -254,8 +248,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest++] = (short)total;
 			}
 
-			indexDest = output.startIndex + y * output.stride + width-radius;
-			for ( int x = width-radius; x < width; x++ ) {
+			indexDest = output.startIndex + y * output.stride + width-border;
+			for ( int x = width-border; x < width; x++ ) {
 				int total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -268,10 +262,10 @@ public class ConvolveJustBorder_General {
 		}
 
 		// convolve along the top and bottom borders
-		for ( int x = radius; x < width-radius; x++ ) {
+		for ( int x = border; x < width-border; x++ ) {
 			int indexDest = output.startIndex + x;
 
-			for (int y = 0; y < radius; y++, indexDest += output.stride) {
+			for (int y = 0; y < border; y++, indexDest += output.stride) {
 				int total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -282,8 +276,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest] = (short)total;
 			}
 
-			indexDest = output.startIndex + (height-radius) * output.stride + x;
-			for (int y = height-radius; y < height; y++, indexDest += output.stride) {
+			indexDest = output.startIndex + (height-border) * output.stride + x;
+			for (int y = height-border; y < height; y++, indexDest += output.stride) {
 				int total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -296,19 +290,18 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_I input, ImageSInt32 output ) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_I input, ImageSInt32 output , int border ) {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
 		final int radius = kernel.getRadius();
-
 		final int width = output.getWidth();
 		final int height = output.getHeight();
 
 		for (int y = 0; y < height; y++) {
 			int indexDest = output.startIndex + y * output.stride;
 
-			for ( int x = 0; x < radius; x++ ) {
+			for ( int x = 0; x < border; x++ ) {
 				int total = 0;
 				for (int k = -radius; k <= radius; k++) {
 					total += input.get(x+k,y) * dataKer[k+radius];
@@ -316,8 +309,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest++] = total;
 			}
 
-			indexDest = output.startIndex + y * output.stride + width-radius;
-			for ( int x = width-radius; x < width; x++ ) {
+			indexDest = output.startIndex + y * output.stride + width-border;
+			for ( int x = width-border; x < width; x++ ) {
 				int total = 0;
 				for (int k = -radius; k <= radius; k++) {
 					total += input.get(x+k,y) * dataKer[k+radius];
@@ -327,19 +320,18 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageBorder_I input, ImageSInt32 output ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageBorder_I input, ImageSInt32 output , int border ) {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
 		final int radius = kernel.getRadius();
-
 		final int width = output.getWidth();
 		final int height = output.getHeight();
 
 		for ( int x = 0; x < width; x++ ) {
 			int indexDest = output.startIndex + x;
 
-			for (int y = 0; y < radius; y++, indexDest += output.stride) {
+			for (int y = 0; y < border; y++, indexDest += output.stride) {
 				int total = 0;
 				for (int k = -radius; k <= radius; k++) {
 					total += input.get(x,y+k) * dataKer[k+radius];
@@ -347,8 +339,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest] = total;
 			}
 
-			indexDest = output.startIndex + (height-radius) * output.stride + x;
-			for (int y = height-radius; y < height; y++, indexDest += output.stride) {
+			indexDest = output.startIndex + (height-border) * output.stride + x;
+			for (int y = height-border; y < height; y++, indexDest += output.stride) {
 				int total = 0;
 				for (int k = -radius; k <= radius; k++ ) {
 					total += input.get(x,y+k) * dataKer[k+radius];
@@ -358,12 +350,11 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, ImageBorder_I input, ImageSInt32 output ) {
+	public static void convolve(Kernel2D_I32 kernel, ImageBorder_I input, ImageSInt32 output , int border ) {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
 		final int radius = kernel.getRadius();
-
 		final int width = output.getWidth();
 		final int height = output.getHeight();
 
@@ -371,7 +362,7 @@ public class ConvolveJustBorder_General {
 		for (int y = 0; y < height; y++) {
 			int indexDest = output.startIndex + y * output.stride;
 
-			for ( int x = 0; x < radius; x++ ) {
+			for ( int x = 0; x < border; x++ ) {
 				int total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -382,8 +373,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest++] = total;
 			}
 
-			indexDest = output.startIndex + y * output.stride + width-radius;
-			for ( int x = width-radius; x < width; x++ ) {
+			indexDest = output.startIndex + y * output.stride + width-border;
+			for ( int x = width-border; x < width; x++ ) {
 				int total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -396,10 +387,10 @@ public class ConvolveJustBorder_General {
 		}
 
 		// convolve along the top and bottom borders
-		for ( int x = radius; x < width-radius; x++ ) {
+		for ( int x = border; x < width-border; x++ ) {
 			int indexDest = output.startIndex + x;
 
-			for (int y = 0; y < radius; y++, indexDest += output.stride) {
+			for (int y = 0; y < border; y++, indexDest += output.stride) {
 				int total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {
@@ -410,8 +401,8 @@ public class ConvolveJustBorder_General {
 				dataDst[indexDest] = total;
 			}
 
-			indexDest = output.startIndex + (height-radius) * output.stride + x;
-			for (int y = height-radius; y < height; y++, indexDest += output.stride) {
+			indexDest = output.startIndex + (height-border) * output.stride + x;
+			for (int y = height-border; y < height; y++, indexDest += output.stride) {
 				int total = 0;
 				int indexKer = 0;
 				for( int i = -radius; i <= radius; i++ ) {

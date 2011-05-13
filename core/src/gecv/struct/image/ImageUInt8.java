@@ -38,20 +38,8 @@ public class ImageUInt8 extends ImageInt8<ImageUInt8> {
 	public ImageUInt8() {
 	}
 
-	/**
-	 * <p>
-	 * Returns the value of the specified pixel.
-	 * </p>
-	 *
-	 * @param x pixel coordinate.
-	 * @param y pixel coordinate.
-	 * @return an intensity value.
-	 */
 	@Override
-	public int get(int x, int y) {
-		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
-
+	protected int unsafe_get(int x, int y) {
 		return data[getIndex(x, y)] & 0xFF;
 	}
 

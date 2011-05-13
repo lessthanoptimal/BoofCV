@@ -75,7 +75,7 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 			}
 
 			// compute the image gradient
-			GradientSobel.process(image, derivX, derivY);
+			GradientSobel.process(image, derivX, derivY, true);
 		}
 
 		if( detector.getRequiresHessian() ) {
@@ -86,7 +86,7 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 			}
 
 			// compute the image gradient
-			HessianThree.process(image, derivXX, derivYY,derivXY);
+			HessianThree.process(image, derivXX, derivYY,derivXY,true);
 		}
 
 		detector.process(image,derivX, derivY, derivXX , derivYY, derivXY);

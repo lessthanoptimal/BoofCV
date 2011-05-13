@@ -16,7 +16,16 @@
 
 package gecv.alg.filter.derivative.impl;
 
+import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.alg.filter.derivative.CompareDerivativeToConvolution;
+import gecv.alg.filter.derivative.HessianThree;
+import gecv.core.image.UtilImageFloat32;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
+
+import java.util.Random;
 
 import static org.junit.Assert.fail;
 
@@ -24,8 +33,46 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestHessianThree_Standard {
+
+	Random rand = new Random(234);
+	int width = 20;
+	int height = 25;
+
 	@Test
-	public void test() {
-		fail("implement tests");
+	public void compareToConvolve_I8() throws NoSuchMethodException {
+		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
+		validator.setTarget(HessianThree_Standard.class.getMethod("process",
+				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class));
+
+		validator.setKernel(0,HessianThree.kernelXXYY_I32,true);
+		validator.setKernel(1,HessianThree.kernelXXYY_I32,false);
+		validator.setKernel(2,HessianThree.kernelCross_I32);
+
+		ImageUInt8 input = new ImageUInt8(width,height);
+		BasicDrawing_I8.randomize(input, rand, 0, 10);
+		ImageSInt16 derivXX = new ImageSInt16(width,height);
+		ImageSInt16 derivYY = new ImageSInt16(width,height);
+		ImageSInt16 derivXY = new ImageSInt16(width,height);
+
+		validator.compare(false,input,derivXX,derivYY,derivXY);
+	}
+
+	@Test
+	public void compareToConvolve_F32() throws NoSuchMethodException {
+		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
+		validator.setTarget(HessianThree_Standard.class.getMethod("process",
+				ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageFloat32.class ));
+
+		validator.setKernel(0,HessianThree.kernelXXYY_F32,true);
+		validator.setKernel(1,HessianThree.kernelXXYY_F32,false);
+		validator.setKernel(2,HessianThree.kernelCross_F32);
+
+		ImageFloat32 input = new ImageFloat32(width,height);
+		UtilImageFloat32.randomize(input, rand, 0, 10);
+		ImageFloat32 derivXX = new ImageFloat32(width,height);
+		ImageFloat32 derivYY = new ImageFloat32(width,height);
+		ImageFloat32 derivXY = new ImageFloat32(width,height);
+
+		validator.compare(false,input,derivXX,derivYY,derivXY);
 	}
 }

@@ -51,6 +51,10 @@ public class ImageFloat32 extends ImageBase<ImageFloat32> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds: ( " + x + " , " + y + " )");
 
+		return unsafe_get(x,y);
+	}
+
+	protected float unsafe_get(int x, int y) {
 		return data[getIndex(x, y)];
 	}
 

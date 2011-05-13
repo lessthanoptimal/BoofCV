@@ -22,24 +22,10 @@ package gecv.struct.convolve;
  *
  * @author Peter Abeles
  */
-public class Kernel1D {
-	public int width;
+public class Kernel1D extends KernelBase {
 
-	/**
-	 * The kernel's width.  This is an odd number.
-	 *
-	 * @return Kernel's width.
-	 */
-	public int getWidth() {
-		return width;
-	}
-
-	/**
-	 * The radius is defined as the width divided by two.
-	 *
-	 * @return The kernel's radius.
-	 */
-	public int getRadius() {
-		return width / 2;
+	@Override
+	public int getDimension() {
+		return 1;
 	}
 }

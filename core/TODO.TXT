@@ -4,8 +4,8 @@
 
 - Derivative
  * Gaussian derivative kernel 1D
- * put into FactoryDerivative
  * Add a Sobel based Hessian
+ * Improve performance of derivative edge calculation
 
 - Edges
  * Whole image:

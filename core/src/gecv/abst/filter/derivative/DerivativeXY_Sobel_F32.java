@@ -27,7 +27,7 @@ public class DerivativeXY_Sobel_F32 implements DerivativeXY<ImageFloat32, ImageF
 
 	@Override
 	public void process(ImageFloat32 inputImage , ImageFloat32 derivX, ImageFloat32 derivY) {
-		GradientSobel.process(inputImage, derivX, derivY);
+		GradientSobel.process(inputImage, derivX, derivY, true);
 	}
 
 	@Override

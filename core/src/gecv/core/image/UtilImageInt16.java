@@ -32,7 +32,7 @@ public class UtilImageInt16 {
 	 * @param img   An image.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(ImageSInt16 img, int value) {
+	public static void fill(ImageInt16 img, int value) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 

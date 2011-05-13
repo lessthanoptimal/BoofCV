@@ -58,7 +58,12 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageBase<T>{
 	 * @param y pixel coordinate.
 	 * @return an intensity value.
 	 */
-	public abstract int get(int x, int y);
+	public int get(int x, int y) {
+		if (!isInBounds(x, y))
+			throw new ImageAccessException("Requested pixel is out of bounds");
+
+		return unsafe_get(x,y);
+	}
 
 	/**
 	 * Sets the value of the specified pixel.
@@ -68,4 +73,18 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageBase<T>{
 	 * @param value The pixel's new value.
 	 */
 	public abstract void set(int x, int y, int value );
+
+	protected abstract int unsafe_get( int x , int y );
+
+	public void printBinary() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (get(x, y) == 0)
+					System.out.print("0");
+				else
+					System.out.print("1");
+			}
+			System.out.println();
+		}
+	}
 }

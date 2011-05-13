@@ -25,10 +25,9 @@ package gecv.struct.convolve;
  *
  * @author Peter Abeles
  */
-public class Kernel2D_F32 {
+public class Kernel2D_F32 extends Kernel2D {
 
 	public float data[];
-	public int width;
 
 	/**
 	 * Creates a new kernel whose initial values are specified by data and width.  The length
@@ -88,23 +87,5 @@ public class Kernel2D_F32 {
 
 	public float[] getData() {
 		return data;
-	}
-
-	/**
-	 * The kernel's width.  This is an odd number.
-	 *
-	 * @return Kernel's width.
-	 */
-	public int getWidth() {
-		return width;
-	}
-
-	/**
-	 * The radius is defined as the width divided by two.
-	 *
-	 * @return The kernel's radius.
-	 */
-	public int getRadius() {
-		return width / 2;
 	}
 }

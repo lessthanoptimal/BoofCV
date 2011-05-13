@@ -62,7 +62,7 @@ public class TestKltCorner_I16 {
 		ImageSInt16 derivX = new ImageSInt16(img.getWidth(), img.getHeight());
 		ImageSInt16 derivY = new ImageSInt16(img.getWidth(), img.getHeight());
 
-		GradientSobel.process(img, derivX, derivY);
+		GradientSobel.process(img, derivX, derivY, true);
 
 		GecvTesting.checkSubImage(this, "compareToNaive", true, derivX, derivY);
 	}

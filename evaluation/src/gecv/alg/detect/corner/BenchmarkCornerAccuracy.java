@@ -87,10 +87,10 @@ public class BenchmarkCornerAccuracy {
 				new GeneralCornerDetector<ImageUInt8, ImageSInt16>(intensity, extractor, corners.size()*2);
 
 		if( det.getRequiresGradient() ) {
-			GradientSobel.process(image,derivX,derivY);
+			GradientSobel.process(image,derivX,derivY, true);
 		}
 		if( det.getRequiresHessian() ) {
-			HessianThree.process(image,derivXX,derivYY,derivXY);
+			HessianThree.process(image,derivXX,derivYY,derivXY,true);
 		}
 
 		det.process(image,derivX,derivY,derivXX,derivYY,derivXY);
@@ -133,7 +133,7 @@ public class BenchmarkCornerAccuracy {
 
 		ConvertBufferedImage.convertFrom(workImg,image);
 		BasicDrawing_I8.addNoise(image,rand,-2,2);
-		GradientSobel.process(image,derivX,derivY);
+		GradientSobel.process(image,derivX,derivY, false);
 	}
 
 	private void addRectangle( Graphics2D g2 , AffineTransform tran , int x0 , int y0 , int w , int h )

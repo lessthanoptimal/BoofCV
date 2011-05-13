@@ -68,7 +68,7 @@ public class TestKltCorner_F32 {
 		ImageSInt16 derivX_I = new ImageSInt16(img.getWidth(), img.getHeight());
 		ImageSInt16 derivY_I = new ImageSInt16(img.getWidth(), img.getHeight());
 
-		GradientSobel.process(img, derivX_I, derivY_I);
+		GradientSobel.process(img, derivX_I, derivY_I, true);
 
 		ImageFloat32 derivX_F = ConvertImage.convert(derivX_I, (ImageFloat32)null);
 		ImageFloat32 derivY_F = ConvertImage.convert(derivY_I, (ImageFloat32)null);

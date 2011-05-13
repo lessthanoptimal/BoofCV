@@ -31,7 +31,13 @@ public class TestImagePyramid {
 
 	@Test
 	public void getScalingAtLayer() {
-		fail("implement");
+		Dummy pyramid = new Dummy(width,height,true);
+
+		pyramid.setScaling(1,2,3);
+
+		assertEquals(1,pyramid.getScalingAtLayer(0));
+		assertEquals(2,pyramid.getScalingAtLayer(1));
+		assertEquals(6,pyramid.getScalingAtLayer(2));
 	}
 
 	@Test

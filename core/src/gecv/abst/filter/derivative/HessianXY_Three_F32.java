@@ -27,7 +27,7 @@ public class HessianXY_Three_F32 implements HessianXY<ImageFloat32, ImageFloat32
 
 	@Override
 	public void process(ImageFloat32 inputImage , ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY ) {
-		HessianThree.process(inputImage, derivXX ,derivYY, derivXY);
+		HessianThree.process(inputImage, derivXX ,derivYY, derivXY,true);
 	}
 
 	@Override

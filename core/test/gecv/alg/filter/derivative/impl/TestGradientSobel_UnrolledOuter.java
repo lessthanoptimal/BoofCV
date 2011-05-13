@@ -29,7 +29,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestGradientEdge_UnrolledOuter {
+public class TestGradientSobel_UnrolledOuter {
 	Random rand = new Random(234);
 
 	int width = 200;

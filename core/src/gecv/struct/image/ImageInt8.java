@@ -78,17 +78,4 @@ public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
 			System.out.println();
 		}
 	}
-
-
-	public void printBinary() {
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				if (get(x, y) == 0)
-					System.out.print("0");
-				else
-					System.out.print("1");
-			}
-			System.out.println();
-		}
-	}
 }

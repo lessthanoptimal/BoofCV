@@ -27,7 +27,7 @@ public class DerivativeXY_Three_F32 implements DerivativeXY<ImageFloat32, ImageF
 
 	@Override
 	public void process(ImageFloat32 inputImage , ImageFloat32 derivX, ImageFloat32 derivY) {
-		GradientThree.deriv_F32(inputImage, derivX,derivY);
+		GradientThree.process(inputImage, derivX,derivY, false);
 	}
 
 	@Override

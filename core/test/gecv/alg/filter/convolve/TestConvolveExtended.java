@@ -21,6 +21,7 @@ import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.generalized.FactorySingleBandImage;
 import gecv.struct.image.generalized.SingleBandImage;
+import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.lang.reflect.Method;

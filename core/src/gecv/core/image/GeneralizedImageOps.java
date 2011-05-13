@@ -84,4 +84,17 @@ public class GeneralizedImageOps {
 		}
 	}
 
+	public static void setAll(ImageBase img, double value) {
+		if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
+			BasicDrawing_I8.fill((ImageUInt8)img,(int)value);
+		} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
+			UtilImageInt16.fill((ImageInt16)img,(int)value);
+		} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
+			UtilImageInt32.fill((ImageSInt32)img,(int)value);
+		} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
+			UtilImageFloat32.fill((ImageFloat32)img,(int)value);
+		} else {
+			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+		}
+	}
 }

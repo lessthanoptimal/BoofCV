@@ -72,11 +72,11 @@ public class BenchmarkCornerRuntime {
 
 			if( includeGradient ) {
 				if( alg.getRequiresGradient() ) {
-					GradientSobel.process(image_F32, derivX_F32, derivY_F32);
+					GradientSobel.process(image_F32, derivX_F32, derivY_F32, true);
 				}
 
 				if( alg.getRequiresHessian()) {
-					HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32);
+					HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32,true);
 				}
 			}
 
@@ -181,10 +181,10 @@ public class BenchmarkCornerRuntime {
 			derivYY_I16.reshape(imgWidth, imgHeight);
 			derivXY_I16.reshape(imgWidth, imgHeight);
 
-			GradientSobel.process(image_F32, derivX_F32, derivY_F32);
-			GradientSobel.process(image_I8, derivX_I16, derivY_I16);
-			HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32);
-			HessianThree.process(image_I8,derivXX_I16,derivYY_I16,derivXY_I16);
+			GradientSobel.process(image_F32, derivX_F32, derivY_F32, true);
+			GradientSobel.process(image_I8, derivX_I16, derivY_I16, true);
+			HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32,true);
+			HessianThree.process(image_I8,derivXX_I16,derivYY_I16,derivXY_I16,true);
 
 			benchmark(createKlt_F32(), "KLT F32");
 			benchmark(createFast12_F32(), "Fast F32");

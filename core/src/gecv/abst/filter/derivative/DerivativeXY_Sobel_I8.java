@@ -28,7 +28,7 @@ public class DerivativeXY_Sobel_I8 implements DerivativeXY<ImageUInt8, ImageSInt
 
 	@Override
 	public void process(ImageUInt8 inputImage , ImageSInt16 derivX, ImageSInt16 derivY) {
-		GradientSobel.process(inputImage, derivX, derivY);
+		GradientSobel.process(inputImage, derivX, derivY, true);
 	}
 
 	@Override
