@@ -16,6 +16,7 @@
 
 package gecv.abst.filter.derivative;
 
+import gecv.alg.filter.convolve.ConvolveExtended;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.struct.convolve.Kernel1D_F32;
@@ -31,9 +32,11 @@ import gecv.struct.image.ImageFloat32;
 public class DerivativeXY_Gaussian_F32 implements DerivativeXY<ImageFloat32, ImageFloat32> {
 
 	private Kernel1D_F32 kernel;
+	private boolean processBorder;
 
-	public DerivativeXY_Gaussian_F32(double sigma, int radius) {
+	public DerivativeXY_Gaussian_F32(double sigma, int radius, boolean processBorder) {
 		kernel = KernelFactory.gaussianDerivative1D_F32(sigma, radius, true);
+		this.processBorder = processBorder;
 	}
 
 	public DerivativeXY_Gaussian_F32(int radius) {
@@ -43,12 +46,20 @@ public class DerivativeXY_Gaussian_F32 implements DerivativeXY<ImageFloat32, Ima
 
 	@Override
 	public void process( ImageFloat32 inputImage , ImageFloat32 derivX, ImageFloat32 derivY ) {
-		ConvolveImageNoBorder.horizontal(kernel, inputImage, derivX, true);
-		ConvolveImageNoBorder.vertical(kernel, inputImage, derivY, false);
+		if( processBorder ) {
+			ConvolveExtended.horizontal(kernel, inputImage, derivX);
+			ConvolveExtended.vertical(kernel, inputImage, derivY);
+		} else {
+			ConvolveImageNoBorder.horizontal(kernel, inputImage, derivX, true);
+			ConvolveImageNoBorder.vertical(kernel, inputImage, derivY, false);
+		}
 	}
 
 	@Override
 	public int getBorder() {
-		return kernel.getRadius();
+		if( processBorder )
+			return 0;
+		else
+			return kernel.getRadius();
 	}
 }

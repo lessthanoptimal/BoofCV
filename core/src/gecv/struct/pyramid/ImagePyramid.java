@@ -142,4 +142,12 @@ public abstract class ImagePyramid<T extends ImageBase> {
 	public int getNumLayers() {
 		return layers.length;
 	}
+
+	public int getWidth(int layer) {
+		return bottomWidth / getScalingAtLayer(layer);
+	}
+
+	public int getHeight(int layer) {
+		return bottomHeight / getScalingAtLayer(layer);
+	}
 }

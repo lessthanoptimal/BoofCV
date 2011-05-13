@@ -30,18 +30,18 @@ import java.lang.reflect.Method;
 
 
 /**
- * Compares a specialized image derivative function to the equivalent convolution
+ * Compares a specialized image derivative function to the equivalent convolution.
+ * Designed to test functions from {@link HessianFromGradient}.
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class CompareDerivativeToConvolution {
+public class CompareHessianToConvolution {
 
 	Method m;
-	FilterInterface outputFilters[];
+	FilterInterface outputFilters[] = new FilterInterface[2];
 
 	Class<ImageBase> inputType;
-	Class<ImageBase> outputType;
 
 	boolean processBorder;
 	int borderSize = 0;
@@ -49,15 +49,13 @@ public class CompareDerivativeToConvolution {
 	public void setTarget( Method m )  {
 		this.m = m;
 		Class<?> []param = m.getParameterTypes();
-		outputFilters = new FilterInterface<?,?>[ param.length ];
 
 		inputType = (Class<ImageBase>)param[0];
-		outputType = (Class<ImageBase>)param[1];
 	}
 
 	public void setKernel( int which , Kernel1D horizontal , Kernel1D vertical ) {
-		FilterInterface<?,?> f1 = FactoryConvolution.convolve(horizontal,inputType,outputType, BorderType.EXTENDED,true);
-		FilterInterface<?,?> f2 = FactoryConvolution.convolve(vertical,outputType,outputType, BorderType.EXTENDED,false);
+		FilterInterface<?,?> f1 = FactoryConvolution.convolve(horizontal,inputType,inputType, BorderType.EXTENDED,true);
+		FilterInterface<?,?> f2 = FactoryConvolution.convolve(vertical,inputType,inputType, BorderType.EXTENDED,false);
 
 		outputFilters[which] = new FilterSequence(f1,f2);
 
@@ -69,54 +67,59 @@ public class CompareDerivativeToConvolution {
 
 	public void setKernel( int which , Kernel1D kernel , boolean isHorizontal) {
 		outputFilters[which] =
-				FactoryConvolution.convolve(kernel,inputType,outputType, BorderType.EXTENDED,isHorizontal);
+				FactoryConvolution.convolve(kernel,inputType,inputType, BorderType.EXTENDED,isHorizontal);
 		if( borderSize < kernel.getRadius() )
 			borderSize = kernel.getRadius();
 	}
 
 	public void setKernel( int which , Kernel2D kernel ) {
 		outputFilters[which] =
-				FactoryConvolution.convolve(kernel,inputType,outputType, BorderType.EXTENDED);
+				FactoryConvolution.convolve(kernel,inputType,inputType, BorderType.EXTENDED);
 		if( borderSize < kernel.getRadius() )
 			borderSize = kernel.getRadius();
 	}
-	public void compare( ImageBase inputImage , ImageBase ...outputImages)  {
-		compare(false,inputImage,outputImages);
-		compare(true,inputImage,outputImages);
+	public void compare( ImageBase ...images)  {
+		compare(false,images);
+		compare(true,images);
 	}
 
-	public void compare( boolean processBorder , ImageBase inputImage , ImageBase ...outputImages)  {
+	public void compare( boolean processBorder , ImageBase ...images)  {
 		this.processBorder = processBorder;
-		innerCompare(inputImage,outputImages);
+		innerCompare(images);
 
-		inputImage = GecvTesting.createSubImageOf(inputImage);
-		ImageBase subOut[] = new ImageBase[ outputImages.length ];
-		for( int i = 0; i < outputImages.length; i++ )
-			subOut[i] = GecvTesting.createSubImageOf(outputImages[i]);
-		innerCompare(inputImage,subOut);
+		ImageBase subOut[] = new ImageBase[ images.length ];
+		for( int i = 0; i < images.length; i++ )
+			subOut[i] = GecvTesting.createSubImageOf(images[i]);
+		innerCompare(subOut);
 	}
 
-	protected void innerCompare( ImageBase inputImage , ImageBase ...outputImages)  {
-		Class<?> []param = m.getParameterTypes();
-		int numImageOutputs = countImageOutputs(param);
-		if( outputImages.length != numImageOutputs )
-			throw new RuntimeException("Unexpected number of outputImages passed in");
 
-		// declare and compute the validation results
-		ImageBase expectedOutput[] = new ImageBase[param.length-2];
+
+	protected void innerCompare( ImageBase ...images)  {
+		Class<?> []param = m.getParameterTypes();
+
+		if( images.length != 5 )
+			throw new RuntimeException("Unexpected number of outputImages passed in: "+images.length);
+
+		int width = images[0].width;
+		int height = images[0].height;
+
+		// now compute the second derivative using provided convolution filters
+		ImageBase expectedOutput[] = new ImageBase[3];
 		for( int i = 0; i < expectedOutput.length; i++ ) {
-			expectedOutput[i] = outputImages[i]._createNew(inputImage.width,inputImage.height);
-			outputFilters[i].process(inputImage,expectedOutput[i]);
+			expectedOutput[i] = images[0]._createNew(width,height);
 		}
+		outputFilters[0].process(images[0],expectedOutput[0]);
+		outputFilters[1].process(images[1],expectedOutput[1]);
+		outputFilters[1].process(images[0],expectedOutput[2]);
 
 		// compute results from the test function
 		Object testInputs[] = new Object[ param.length ];
-		testInputs[0] = inputImage;
-		for( int i = 1; i < numImageOutputs+1; i++ ) {
-			testInputs[i] = outputImages[i-1];
+		for( int i = 0; i < 5; i++ ) {
+			testInputs[i] = images[i];
 		}
-		if( param.length == numImageOutputs + 2 )
-			testInputs[param.length-1] = processBorder;
+		testInputs[5] = processBorder;
+
 		try {
 			m.invoke(null,testInputs);
 		} catch (IllegalAccessException e) {
@@ -125,31 +128,16 @@ public class CompareDerivativeToConvolution {
 			throw new RuntimeException(e);
 		}
 
+		// sanity check.  The derivatives should be the same
+
 		// compare the results
 		for( int i = 0; i < expectedOutput.length; i++ ) {
 			int border = processBorder ? 0 : borderSize;
-			GecvTesting.assertEqualsGeneric(expectedOutput[i],outputImages[i],0,1e-4f,border);
+			GecvTesting.assertEqualsGeneric(expectedOutput[i],images[i+2],0,1e-4f,border);
 
 			if( !processBorder )
-				GecvTesting.checkBorderZero(outputImages[i],border);
+				GecvTesting.checkBorderZero(images[i+2],border);
 		}
 	}
 
-	/**
-	 * Counts the number of derivative images it takes in as an output.
-	 * @param param
-	 * @return
-	 */
-	private int countImageOutputs(Class<?>[] param) {
-
-		int count = 0;
-
-		for( int i = 1; i < param.length; i++ ) {
-			if( ImageBase.class.isAssignableFrom(param[i])) {
-				count++;
-			}
-		}
-
-		return count;
-	}
 }

@@ -56,6 +56,24 @@ public class GradientPrewitt {
 	}
 
 	/**
+	 * Computes the derivative in the X and Y direction using an integer Prewitt edge detector.
+	 *
+	 * @param orig   Input image.  Not modified.
+	 * @param derivX Storage for image derivative along the x-axis. Modified.
+	 * @param derivY Storage for image derivative along the y-axis. Modified.
+	 * @param processBorder If the image's border is processed or not.
+	 */
+	public static void process(ImageSInt16 orig, ImageSInt16 derivX, ImageSInt16 derivY, boolean processBorder) {
+		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		GradientPrewitt_Shared.process(orig, derivX, derivY);
+
+		if( processBorder ) {
+			ConvolveJustBorder_General.convolve(kernelDerivX_I32, ImageBorderExtended.wrap(orig),derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_I32, ImageBorderExtended.wrap(orig),derivY,1);
+		}
+	}
+
+	/**
 	 * Computes the derivative in the X and Y direction using a floating point Prewitt edge detector.
 	 *
 	 * @param orig   Input image.  Not modified.

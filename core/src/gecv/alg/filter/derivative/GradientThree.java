@@ -56,7 +56,7 @@ public class GradientThree {
 							   ImageSInt16 derivX,
 							   ImageSInt16 derivY, boolean processBorder) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
-		GradientThree_Standard.deriv_I8(orig, derivX, derivY);
+		GradientThree_Standard.process(orig, derivX, derivY);
 
 		if( processBorder ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, 1 );
@@ -65,27 +65,23 @@ public class GradientThree {
 	}
 
 	/**
-	 * Computes the derivative of an {@link gecv.struct.image.ImageUInt8} along the x axis.
+	 * Computes the derivative of an {@link gecv.struct.image.ImageSInt16} along the x and y axes.
 	 *
 	 * @param orig   Which which is to be differentiated. Not Modified.
 	 * @param derivX Derivative along the x-axis. Modified.
-	 */
-	public static void derivX_I8(ImageUInt8 orig,
-								 ImageSInt16 derivX) {
-		InputSanityCheck.checkSameShape(orig, derivX);
-		GradientThree_Standard.derivX_I8(orig, derivX);
-	}
-
-	/**
-	 * Computes the derivative of an {@link gecv.struct.image.ImageUInt8} along the y axis.
-	 *
-	 * @param orig   Which which is to be differentiated. Not Modified.
 	 * @param derivY Derivative along the y-axis. Modified.
+	 * @param processBorder
 	 */
-	public static void derivY_I8(ImageUInt8 orig,
-								 ImageSInt16 derivY) {
-		InputSanityCheck.checkSameShape(orig, derivY);
-		GradientThree_Standard.derivY_I8(orig, derivY);
+	public static void process(ImageSInt16 orig,
+							   ImageSInt16 derivX,
+							   ImageSInt16 derivY, boolean processBorder) {
+		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		GradientThree_Standard.process(orig, derivX, derivY);
+
+		if( processBorder ) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, 1 );
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, 1 );
+		}
 	}
 
 	/**
@@ -100,7 +96,7 @@ public class GradientThree {
 							   ImageFloat32 derivX,
 							   ImageFloat32 derivY, boolean processBorder) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
-		GradientThree_Standard.deriv_F32(orig, derivX, derivY);
+		GradientThree_Standard.process(orig, derivX, derivY);
 
 		if( processBorder ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX ,kernelDeriv_F32, 1 );
@@ -108,27 +104,4 @@ public class GradientThree {
 		}
 	}
 
-	/**
-	 * Computes the derivative of an {@link ImageFloat32} along the x axis.
-	 *
-	 * @param orig   Which which is to be differentiated. Not Modified.
-	 * @param derivX Derivative along the x-axis. Modified.
-	 */
-	public static void derivX_F32(ImageFloat32 orig,
-								  ImageFloat32 derivX) {
-		InputSanityCheck.checkSameShape(orig, derivX);
-		GradientThree_Standard.derivX_F32(orig, derivX);
-	}
-
-	/**
-	 * Computes the derivative of an {@link ImageFloat32} along the y axis.
-	 *
-	 * @param orig   Which which is to be differentiated. Not Modified.
-	 * @param derivY Derivative along the y-axis. Modified.
-	 */
-	public static void derivY_F32(ImageFloat32 orig,
-								  ImageFloat32 derivY) {
-		InputSanityCheck.checkSameShape(orig, derivY);
-		GradientThree_Standard.derivY_F32(orig, derivY);
-	}
 }

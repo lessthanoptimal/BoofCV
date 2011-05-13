@@ -16,8 +16,8 @@
 
 package gecv.alg.filter.derivative.impl;
 
-import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.core.image.UtilImageFloat32;
+import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -44,7 +44,7 @@ public class TestGradientSobel_Naive {
 	@Test
 	public void compareToKnown_I8() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand);
+		ImageInitialization_I8.randomize(img, rand);
 
 		ImageSInt16 derivX = new ImageSInt16(width, height);
 		ImageSInt16 derivY = new ImageSInt16(width, height);
@@ -71,7 +71,7 @@ public class TestGradientSobel_Naive {
 	@Test
 	public void compareToKnown_F32() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0, 255);
+		ImageInitialization_F32.randomize(img, rand, 0, 255);
 
 		ImageFloat32 derivX = new ImageFloat32(width, height);
 		ImageFloat32 derivY = new ImageFloat32(width, height);

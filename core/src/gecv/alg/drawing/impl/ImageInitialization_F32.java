@@ -14,16 +14,16 @@
  *    limitations under the License.
  */
 
-package gecv.core.image;
+package gecv.alg.drawing.impl;
 
-import gecv.struct.image.ImageSInt32;
+import gecv.struct.image.ImageFloat32;
 
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class UtilImageInt32 {
+public class ImageInitialization_F32 {
 
 	/**
 	 * Fills the whole image with the specified pixel value
@@ -31,11 +31,11 @@ public class UtilImageInt32 {
 	 * @param img   An image.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(ImageSInt32 img, int value) {
+	public static void fill(ImageFloat32 img, float value) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
-		int[] data = img.data;
+		float[] data = img.data;
 
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
@@ -51,18 +51,39 @@ public class UtilImageInt32 {
 	 * @param img  An image.
 	 * @param rand The value that the image is being filled with.
 	 */
-	public static void randomize(ImageSInt32 img, Random rand, int min, int max) {
+	public static void randomize(ImageFloat32 img, Random rand,
+								 float min, float max) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
-		int[] data = img.data;
-		int range = 1 + max - min;
+		float[] data = img.data;
+		float range = max - min;
 
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			for (int x = 0; x < w; x++) {
-				data[index++] = rand.nextInt(range) + min;
+				data[index++] = rand.nextFloat() * range + min;
 			}
+		}
+	}
+
+	/**
+	 * Sets a rectangle inside the image with the specified value.
+	 */
+	public static void fillRectangle(ImageFloat32 img, float value, int x0, int y0, int x1, int y1) {
+		for (int y = y0; y < y1; y++) {
+			for (int x = x0; x < x1; x++) {
+				img.set(x, y, value);
+			}
+		}
+	}
+
+	public static void print(ImageFloat32 a) {
+		for (int y = 0; y < a.height; y++) {
+			for (int x = 0; x < a.width; x++) {
+				System.out.printf("%5.2f ", a.get(x, y));
+			}
+			System.out.println();
 		}
 	}
 }

@@ -16,8 +16,8 @@
 
 package gecv.core.image.border;
 
-import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.core.image.UtilImageFloat32;
+import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -25,7 +25,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -40,7 +39,7 @@ public class TestImageBorderExtended {
 	@Test
 	public void test_I8() {
 		ImageUInt8 img = new ImageUInt8(width,height);
-		BasicDrawing_I8.randomize(img,rand);
+		ImageInitialization_I8.randomize(img,rand);
 
 		ImageBorder_I foo = ImageBorderExtended.wrap(img);
 
@@ -64,7 +63,7 @@ public class TestImageBorderExtended {
 	@Test
 	public void test_F32() {
 		ImageFloat32 img = new ImageFloat32(width,height);
-		UtilImageFloat32.randomize(img,rand,0,5);
+		ImageInitialization_F32.randomize(img,rand,0,5);
 
 		ImageBorder_F32 foo = ImageBorderExtended.wrap(img);
 

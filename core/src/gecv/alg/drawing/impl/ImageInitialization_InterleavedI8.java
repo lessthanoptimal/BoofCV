@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.core.image;
+package gecv.alg.drawing.impl;
 
 import gecv.struct.image.ImageInterleavedInt8;
 
@@ -23,7 +23,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class UtilImageInterleavedInt8 {
+public class ImageInitialization_InterleavedI8 {
 
 	/**
 	 * Fills the whole image with the specified pixel value

@@ -40,7 +40,7 @@ public class TestBasicDrawing_I8 {
 	}
 
 	public void checkFill(ImageUInt8 image) {
-		BasicDrawing_I8.fill(image, (byte) 6);
+		ImageInitialization_I8.fill(image, (byte) 6);
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {
@@ -62,7 +62,7 @@ public class TestBasicDrawing_I8 {
 	}
 
 	public void checkRandomize(ImageUInt8 image) {
-		BasicDrawing_I8.randomize(image, rand);
+		ImageInitialization_I8.randomize(image, rand);
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {

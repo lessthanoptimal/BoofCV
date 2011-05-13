@@ -67,9 +67,7 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 			setupKltTracker(layer);
 
 			feature.desc[layer].setPosition(x, y);
-			if( tracker.isFullyInside(x,y))
-				tracker.setDescription(feature.desc[layer]);
-			else
+			if( !tracker.setDescription(feature.desc[layer]) )
 				break;
 			// TODO need to handle case where a feature is too close to the border in one layer, but then goes back into the zone
 		}

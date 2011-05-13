@@ -113,8 +113,14 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 		return false;
 	}
 
+	/**
+	 * Sets the features description using the current image and the location of the feature stored in the feature.
+	 * If the feature is an illegal location and cannot be set then false is returned.
+	 * @param feature Feature description which is to be set.  Location must be specified.
+	 * @return true if the feature's description was modified.
+	 */
 	@SuppressWarnings({"SuspiciousNameCombination"})
-	public void setDescription(KltFeature feature) {
+	public boolean setDescription(KltFeature feature) {
 		if (derivX == null || derivY == null)
 			throw new IllegalArgumentException("Image derivatives must be set");
 
@@ -123,7 +129,7 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 		int size = regionWidth * regionWidth;
 
 		if (!isFullyInside(feature.x, feature.y))
-			throw new IllegalArgumentException("Feature is too close to the image's border");
+			return false;
 
 		float tl_x = feature.x - feature.radius;
 		float tl_y = feature.y - feature.radius;
@@ -147,6 +153,8 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 		feature.Gxx = Gxx;
 		feature.Gyy = Gyy;
 		feature.Gxy = Gxy;
+
+		return true;
 	}
 
 	public KltTrackFault track(KltFeature feature) {

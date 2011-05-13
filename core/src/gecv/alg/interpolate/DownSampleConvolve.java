@@ -51,11 +51,11 @@ public class DownSampleConvolve {
 								   ImageFloat32 original ,  ImageFloat32 downSampled ,
 								   int skip , float storage[] )
 	{
-		for( int y = 0, destY = 0; y < original.height; y += skip , destY++ ) {
+		for( int y = 0, destY = 0; destY < downSampled.height; y += skip , destY++ ) {
 
 			int indexDest = downSampled.startIndex + destY*downSampled.stride;
-
-			for( int x = 0; x < original.width; x += skip , indexDest++) {
+			int indexDestEnd = indexDest + downSampled.width;
+			for( int x = 0; indexDest < indexDestEnd; x += skip , indexDest++) {
 				float val = ConvolveNormalizedSparse.convolve(kernel,kernel,original,x,y,storage);
 				downSampled.data[ indexDest ] = val;
 			}
@@ -76,11 +76,11 @@ public class DownSampleConvolve {
 								   ImageUInt8 original ,  ImageUInt8 downSampled ,
 								   int skip , int storage[] )
 	{
-		for( int y = 0, destY = 0; y < original.height; y += skip , destY++ ) {
+		for( int y = 0, destY = 0; destY < downSampled.height; y += skip , destY++ ) {
 
 			int indexDest = downSampled.startIndex + destY*downSampled.stride;
-
-			for( int x = 0; x < original.width; x += skip , indexDest++) {
+			int indexDestEnd = indexDest + downSampled.width;
+			for( int x = 0; indexDest < indexDestEnd; x += skip , indexDest++) {
 				int val = ConvolveNormalizedSparse.convolve(kernel,kernel,original,x,y,storage);
 				downSampled.data[ indexDest ] = (byte)val;
 			}
@@ -101,11 +101,11 @@ public class DownSampleConvolve {
 								   ImageSInt16 original ,  ImageSInt16 downSampled ,
 								   int skip , int storage[] )
 	{
-		for( int y = 0, destY = 0; y < original.height; y += skip , destY++ ) {
+		for( int y = 0, destY = 0; destY < downSampled.height; y += skip , destY++ ) {
 
 			int indexDest = downSampled.startIndex + destY*downSampled.stride;
-
-			for( int x = 0; x < original.width; x += skip , indexDest++) {
+			int indexDestEnd = indexDest + downSampled.width;
+			for( int x = 0; indexDest < indexDestEnd; x += skip , indexDest++) {
 				int val = ConvolveNormalizedSparse.convolve(kernel,kernel,original,x,y,storage);
 				downSampled.data[ indexDest ] = (short)val;
 			}

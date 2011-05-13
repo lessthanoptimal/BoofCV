@@ -20,9 +20,10 @@ import gecv.abst.detect.corner.*;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
-import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.alg.filter.derivative.GradientSobel;
-import gecv.alg.filter.derivative.HessianThree;
+import gecv.alg.filter.derivative.GradientThree;
+import gecv.alg.filter.derivative.HessianFromGradient;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.ShowImages;
 import gecv.struct.QueueCorner;
@@ -87,10 +88,11 @@ public class BenchmarkCornerAccuracy {
 				new GeneralCornerDetector<ImageUInt8, ImageSInt16>(intensity, extractor, corners.size()*2);
 
 		if( det.getRequiresGradient() ) {
-			GradientSobel.process(image,derivX,derivY, true);
+			GradientThree.process(image,derivX,derivY, true);
 		}
 		if( det.getRequiresHessian() ) {
-			HessianThree.process(image,derivXX,derivYY,derivXY,true);
+			HessianFromGradient.hessianThree(derivX,derivY,derivXX,derivYY,derivXY,true);
+//			HessianThree.process(image,derivXX,derivYY,derivXY,true);
 		}
 
 		det.process(image,derivX,derivY,derivXX,derivYY,derivXY);
@@ -132,7 +134,7 @@ public class BenchmarkCornerAccuracy {
 		addRectangle(g2,tran,-120,200,60,40);
 
 		ConvertBufferedImage.convertFrom(workImg,image);
-		BasicDrawing_I8.addNoise(image,rand,-2,2);
+		ImageInitialization_I8.addNoise(image,rand,-2,2);
 		GradientSobel.process(image,derivX,derivY, false);
 	}
 

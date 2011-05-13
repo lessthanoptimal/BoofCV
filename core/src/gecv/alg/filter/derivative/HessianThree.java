@@ -35,7 +35,12 @@ import gecv.struct.image.ImageUInt8;
  * </p>
  *
  * <p>
- * 
+ * WARNING: It is computationally more expensive to compute the Hessian with this operation than applying the
+ * gradient operator multiple times.  However, this does not require the creation additional storage to save
+ * intermediate results.
+ * </p>
+ *
+ * <p>
  * Kernel for &part; <sup>2</sup>f/&part; x<sup>2</sup> and &part;<sup>2</sup>f /&part; y<sup>2</sup> is
  * [1 0 -2 0 1] and &part;<sup>2</sup>f/&part; x&part;y is:<br>
  * <table border="1">

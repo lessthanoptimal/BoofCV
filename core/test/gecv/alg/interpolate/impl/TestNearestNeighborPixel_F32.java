@@ -16,8 +16,8 @@
 
 package gecv.alg.interpolate.impl;
 
+import gecv.alg.drawing.impl.ImageInitialization_F32;
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.core.image.UtilImageFloat32;
 import gecv.struct.image.ImageFloat32;
 
 /**
@@ -32,7 +32,7 @@ public class TestNearestNeighborPixel_F32 extends GeneralInterpolationPixelCheck
 
 	@Override
 	protected void randomize(ImageFloat32 image) {
-		UtilImageFloat32.randomize(image, rand, 0, 100);
+		ImageInitialization_F32.randomize(image, rand, 0, 100);
 	}
 
 	@Override

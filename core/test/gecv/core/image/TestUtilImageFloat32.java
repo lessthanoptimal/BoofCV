@@ -16,6 +16,7 @@
 
 package gecv.core.image;
 
+import gecv.alg.drawing.impl.ImageInitialization_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class TestUtilImageFloat32 {
 	}
 
 	public void checkFill(ImageFloat32 image) {
-		UtilImageFloat32.fill(image, 1.1f);
+		ImageInitialization_F32.fill(image, 1.1f);
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {
@@ -57,7 +58,7 @@ public class TestUtilImageFloat32 {
 	}
 
 	public void checkRandomize(ImageFloat32 image) {
-		UtilImageFloat32.randomize(image, rand, -20f, 20f);
+		ImageInitialization_F32.randomize(image, rand, -20f, 20f);
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {

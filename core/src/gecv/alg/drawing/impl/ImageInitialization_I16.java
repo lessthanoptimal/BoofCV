@@ -14,17 +14,16 @@
  *    limitations under the License.
  */
 
-package gecv.core.image;
+package gecv.alg.drawing.impl;
 
 import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageSInt16;
 
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class UtilImageInt16 {
+public class ImageInitialization_I16 {
 
 	/**
 	 * Fills the whole image with the specified pixel value

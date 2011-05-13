@@ -21,8 +21,6 @@ import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import gecv.core.image.border.ImageBorderExtended;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -49,12 +47,44 @@ public class DerivativeHelperFunctions {
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
 	}
 
+	public static void processBorderHorizontal( ImageSInt16 orig , ImageSInt16 deriv ,
+												Kernel1D_I32 kernel , int border )
+	{
+		ConvolveJustBorder_General.horizontal(kernel, ImageBorderExtended.wrap(orig),deriv,border);
+
+		ImageSInt16 origSub;
+		ImageSInt16 derivSub;
+
+		origSub = orig.subimage(0,0,orig.width,2);
+		derivSub = deriv.subimage(0,0,orig.width,2);
+		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
+		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height);
+		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height);
+		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
+	}
+
 	public static void processBorderVertical( ImageUInt8 orig , ImageSInt16 deriv ,
 											  Kernel1D_I32 kernel , int border )
 	{
 		ConvolveJustBorder_General.vertical(kernel, ImageBorderExtended.wrap(orig),deriv,border);
 
 		ImageUInt8 origSub;
+		ImageSInt16 derivSub;
+
+		origSub = orig.subimage(0,0,2,orig.height);
+		derivSub = deriv.subimage(0,0,2,orig.height);
+		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
+		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height);
+		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height);
+		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
+	}
+
+	public static void processBorderVertical( ImageSInt16 orig , ImageSInt16 deriv ,
+											  Kernel1D_I32 kernel , int border )
+	{
+		ConvolveJustBorder_General.vertical(kernel, ImageBorderExtended.wrap(orig),deriv,border);
+
+		ImageSInt16 origSub;
 		ImageSInt16 derivSub;
 
 		origSub = orig.subimage(0,0,2,orig.height);

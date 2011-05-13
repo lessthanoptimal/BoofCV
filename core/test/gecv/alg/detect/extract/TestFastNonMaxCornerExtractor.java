@@ -16,7 +16,7 @@
 
 package gecv.alg.detect.extract;
 
-import gecv.core.image.UtilImageFloat32;
+import gecv.alg.drawing.impl.ImageInitialization_F32;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class TestFastNonMaxCornerExtractor {
 	@Test
 	public void excludePreExisting() {
 		ImageFloat32 inten = new ImageFloat32(30, 40);
-		UtilImageFloat32.randomize(inten, new Random(1231), 0, 10);
+		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
 
 		QueueCorner cornersFirst = new QueueCorner(inten.getWidth() * inten.getHeight());
 
@@ -56,12 +56,12 @@ public class TestFastNonMaxCornerExtractor {
 		}
 
 		// recreate the same image
-		UtilImageFloat32.randomize(inten, new Random(1231), 0, 10);
+		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
 		alg.process(inten,cornersSecond);
 		assertEquals(cornersSecond.size(),cornersFirst.size());
 		
 		//make sure it isn't just clearing the list and finding the same corners again
-		UtilImageFloat32.fill(inten,0);
+		ImageInitialization_F32.fill(inten,0);
 		alg.process(inten,cornersSecond);
 		assertEquals(cornersSecond.size(),cornersFirst.size());
 		cornersSecond.reset();
@@ -93,7 +93,7 @@ public class TestFastNonMaxCornerExtractor {
 				NonMaxCornerExtractorNaive reg = new NonMaxCornerExtractorNaive(nonMaxWidth / 2, 0.6F);
 
 				for (int i = 0; i < 10; i++) {
-					UtilImageFloat32.randomize(inten, rand, 0, 10);
+					ImageInitialization_F32.randomize(inten, rand, 0, 10);
 
 					fast.process(inten, fastCorners);
 					reg.process(inten, regCorners);

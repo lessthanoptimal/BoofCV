@@ -16,10 +16,10 @@
 
 package gecv.alg.tracker.klt;
 
+import gecv.alg.drawing.impl.ImageInitialization_F32;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
-import gecv.core.image.UtilImageFloat32;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -86,8 +86,8 @@ public class TestKltTracker {
 	 * @param deltaY motion in y direction
 	 */
 	private void checkMovement(int radius, int deltaX, int deltaY) {
-		UtilImageFloat32.fill(image, 0);
-		UtilImageFloat32.fillRectangle(image, 100, 20, 20, imageWidth, imageHeight);
+		ImageInitialization_F32.fill(image, 0);
+		ImageInitialization_F32.fillRectangle(image, 100, 20, 20, imageWidth, imageHeight);
 		GradientSobel.process(image, derivX, derivY, true);
 
 		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
@@ -99,8 +99,8 @@ public class TestKltTracker {
 		tracker.setDescription(feature);
 
 		// move the rectangle a bit
-		UtilImageFloat32.fill(image, 0);
-		UtilImageFloat32.fillRectangle(image, 100, 20 + deltaX, 20 + deltaY, imageWidth, imageHeight);
+		ImageInitialization_F32.fill(image, 0);
+		ImageInitialization_F32.fillRectangle(image, 100, 20 + deltaX, 20 + deltaY, imageWidth, imageHeight);
 		GradientSobel.process(image, derivX, derivY, true);
 
 		// update the feature's position
@@ -181,7 +181,7 @@ public class TestKltTracker {
 		assertTrue(tracker.track(feature) != KltTrackFault.SUCCESS);
 	}
 
-	public KltTracker<ImageFloat32, ImageFloat32> createDefaultTracker() {
+	public static KltTracker<ImageFloat32, ImageFloat32> createDefaultTracker() {
 		KltConfig config = new KltConfig();
 		config.forbiddenBorder = 1;
 		config.maxError = 10;

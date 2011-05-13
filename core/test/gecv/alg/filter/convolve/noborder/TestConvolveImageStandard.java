@@ -16,10 +16,10 @@
 
 package gecv.alg.filter.convolve.noborder;
 
-import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.drawing.impl.ImageInitialization_I16;
+import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.alg.filter.convolve.KernelFactory;
-import gecv.core.image.UtilImageFloat32;
-import gecv.core.image.UtilImageInt16;
 import gecv.struct.image.*;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void horizontal_F32() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0, 1);
+		ImageInitialization_F32.randomize(img, rand, 0, 1);
 		ImageFloat32 dest = new ImageFloat32(width, height);
 
 		GecvTesting.checkSubImage(this, "horizontal", true, img, dest);
@@ -62,7 +62,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void horizontal_I8() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand);
+		ImageInitialization_I8.randomize(img, rand);
 		ImageSInt16 dest = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "horizontal", true, img, dest);
@@ -71,7 +71,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void horizontal_I8_div() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand);
+		ImageInitialization_I8.randomize(img, rand);
 		ImageUInt8 dest = new ImageUInt8(width, height);
 
 		GecvTesting.checkSubImage(this, "horizontalDiv", true, img, dest);
@@ -80,7 +80,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void horizontal_I16() {
 		ImageSInt16 img = new ImageSInt16(width, height);
-		UtilImageInt16.randomize(img, rand, (short) 0, (short) 100);
+		ImageInitialization_I16.randomize(img, rand, (short) 0, (short) 100);
 		ImageSInt16 dest = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "horizontal", true, img, dest);
@@ -89,7 +89,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void horizontal_I16_div() {
 		ImageSInt16 img = new ImageSInt16(width, height);
-		UtilImageInt16.randomize(img, rand, (short) 0, (short) 100);
+		ImageInitialization_I16.randomize(img, rand, (short) 0, (short) 100);
 		ImageSInt16 dest = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "horizontalDiv", true, img, dest);
@@ -98,7 +98,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void vertical_F32() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0, 1);
+		ImageInitialization_F32.randomize(img, rand, 0, 1);
 		ImageFloat32 dest = new ImageFloat32(width, height);
 
 		GecvTesting.checkSubImage(this, "vertical", true, img, dest);
@@ -107,7 +107,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void vertical_I8() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand);
+		ImageInitialization_I8.randomize(img, rand);
 		ImageSInt16 dest = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "vertical", true, img, dest);
@@ -116,7 +116,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void vertical_I8_div() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand);
+		ImageInitialization_I8.randomize(img, rand);
 		ImageUInt8 dest = new ImageUInt8(width, height);
 
 		GecvTesting.checkSubImage(this, "verticalDiv", true, img, dest);
@@ -125,7 +125,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void vertical_I16() {
 		ImageSInt16 img = new ImageSInt16(width, height);
-		UtilImageInt16.randomize(img, rand, (short) 0, (short) 100);
+		ImageInitialization_I16.randomize(img, rand, (short) 0, (short) 100);
 		ImageSInt16 dest = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "vertical", true, img, dest);
@@ -134,7 +134,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void vertical_I16_div() {
 		ImageSInt16 img = new ImageSInt16(width, height);
-		UtilImageInt16.randomize(img, rand, (short) 0, (short) 100);
+		ImageInitialization_I16.randomize(img, rand, (short) 0, (short) 100);
 		ImageSInt16 dest = new ImageSInt16(width, height);
 
 		GecvTesting.checkSubImage(this, "verticalDiv", true, img, dest);
@@ -143,7 +143,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void convolve_F32() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0, 1);
+		ImageInitialization_F32.randomize(img, rand, 0, 1);
 		ImageFloat32 dest = new ImageFloat32(width, height);
 		GecvTesting.checkSubImage(this, "convolve", true, img, dest);
 	}
@@ -151,7 +151,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void convolve_I8() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand);
+		ImageInitialization_I8.randomize(img, rand);
 		ImageSInt16 dest = new ImageSInt16(width, height);
 		GecvTesting.checkSubImage(this, "convolve", true, img, dest);
 	}
@@ -159,7 +159,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void convolve_I8_I32() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand);
+		ImageInitialization_I8.randomize(img, rand);
 		ImageSInt32 dest = new ImageSInt32(width, height);
 		GecvTesting.checkSubImage(this, "convolve", true, img, dest);
 	}
@@ -167,7 +167,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void convolve_I8_div() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand, 0, 50);
+		ImageInitialization_I8.randomize(img, rand, 0, 50);
 		ImageUInt8 dest = new ImageUInt8(width, height);
 		GecvTesting.checkSubImage(this, "convolveDiv", true, img, dest);
 	}
@@ -175,7 +175,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void convolve_I16() {
 		ImageSInt16 img = new ImageSInt16(width, height);
-		UtilImageInt16.randomize(img, rand, 0, 100);
+		ImageInitialization_I16.randomize(img, rand, 0, 100);
 		ImageSInt16 dest = new ImageSInt16(width, height);
 		GecvTesting.checkSubImage(this, "convolve", true, img, dest);
 	}
@@ -183,7 +183,7 @@ public class TestConvolveImageStandard {
 	@Test
 	public void convolve_I16_div() {
 		ImageSInt16 img = new ImageSInt16(width, height);
-		UtilImageInt16.randomize(img, rand, 0, 100);
+		ImageInitialization_I16.randomize(img, rand, 0, 100);
 		ImageSInt16 dest = new ImageSInt16(width, height);
 		GecvTesting.checkSubImage(this, "convolveDiv", true, img, dest);
 	}

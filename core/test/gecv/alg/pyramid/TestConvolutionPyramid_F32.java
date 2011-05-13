@@ -16,9 +16,9 @@
 
 package gecv.alg.pyramid;
 
+import gecv.alg.drawing.impl.ImageInitialization_F32;
 import gecv.alg.filter.blur.BlurImageOps;
 import gecv.alg.filter.convolve.KernelFactory;
-import gecv.core.image.UtilImageFloat32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid_F32;
@@ -44,7 +44,7 @@ public class TestConvolutionPyramid_F32 {
 	@Test
 	public void saveOriginalReference() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0, 100);
+		ImageInitialization_F32.randomize(img, rand, 0, 100);
 
 		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(3, true);
 		ImagePyramid_F32 pyramid = new ImagePyramid_F32(width, height, true);
@@ -77,7 +77,7 @@ public class TestConvolutionPyramid_F32 {
 	@Test
 	public void _update() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0, 100);
+		ImageInitialization_F32.randomize(img, rand, 0, 100);
 
 		GecvTesting.checkSubImage(this, "_update", true, img);
 	}

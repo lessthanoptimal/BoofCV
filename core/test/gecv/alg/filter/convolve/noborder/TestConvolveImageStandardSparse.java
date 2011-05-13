@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.convolve.noborder;
 
-import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.core.image.ConvertImage;
@@ -76,7 +76,7 @@ public class TestConvolveImageStandardSparse {
 
 	private void checkMethod(Method method, int width, int height, int kernelRadius, Random rand) {
 		ImageUInt8 seedImage = new ImageUInt8(width,height);
-		BasicDrawing_I8.randomize(seedImage,rand,0,255);
+		ImageInitialization_I8.randomize(seedImage,rand,0,255);
 
 		// creates a floating point image with integer elements
 		ImageFloat32 floatImage = new ImageFloat32(width,height);

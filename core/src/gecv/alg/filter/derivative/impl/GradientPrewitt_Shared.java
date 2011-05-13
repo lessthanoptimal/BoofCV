@@ -60,6 +60,39 @@ public class GradientPrewitt_Shared {
 		}
 	}
 
+	public static void process(ImageSInt16 orig,
+							   ImageSInt16 derivX,
+							   ImageSInt16 derivY) {
+		final short[] data = orig.data;
+		final short[] imgX = derivX.data;
+		final short[] imgY = derivY.data;
+
+		final int width = orig.getWidth();
+		final int height = orig.getHeight() - 1;
+		final int strideSrc = orig.getStride();
+
+		for (int y = 1; y < height; y++) {
+			int indexSrc = orig.startIndex + orig.stride * y + 1;
+			final int endX = indexSrc + width - 2;
+
+			int indexX = derivX.startIndex + derivX.stride * y + 1;
+			int indexY = derivY.startIndex + derivY.stride * y + 1;
+
+			for (; indexSrc < endX; indexSrc++) {
+				// a33 - a11
+				int w = (data[indexSrc + strideSrc + 1] ) -(data[indexSrc - strideSrc - 1] );
+				// a31 - a13
+				int v = (data[indexSrc + strideSrc - 1] ) -(data[indexSrc - strideSrc + 1] );
+
+				//a32 + w + v - a12
+				imgY[indexY++] = (short) ((data[indexSrc + strideSrc ] )+w+v-(data[indexSrc - strideSrc ] ));
+
+				//a23 + w - v - a21
+				imgX[indexX++] = (short) ((data[indexSrc + 1] )+w-v-(data[indexSrc - 1] ));
+			}
+		}
+	}
+
 	public static void process(ImageFloat32 orig,
 							   ImageFloat32 derivX,
 							   ImageFloat32 derivY) {

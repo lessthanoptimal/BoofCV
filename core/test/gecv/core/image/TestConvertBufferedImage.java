@@ -16,7 +16,8 @@
 
 package gecv.core.image;
 
-import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.drawing.impl.ImageInitialization_InterleavedI8;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInterleavedInt8;
 import gecv.struct.image.ImageUInt8;
@@ -96,7 +97,7 @@ public class TestConvertBufferedImage {
 	public void extractBuffered_InterleavedInt8() {
 		// test it with 3 bands
 		ImageInterleavedInt8 srcImg = new ImageInterleavedInt8(imgWidth, imgHeight, 3);
-		UtilImageInterleavedInt8.randomize(srcImg, rand);
+		ImageInitialization_InterleavedI8.randomize(srcImg, rand);
 
 		BufferedImage img = ConvertBufferedImage.extractBuffered(srcImg);
 
@@ -104,7 +105,7 @@ public class TestConvertBufferedImage {
 
 		// now test it with a single band
 		srcImg = new ImageInterleavedInt8(imgWidth, imgHeight, 1);
-		UtilImageInterleavedInt8.randomize(srcImg, rand);
+		ImageInitialization_InterleavedI8.randomize(srcImg, rand);
 		img = ConvertBufferedImage.extractBuffered(srcImg);
 		GecvTesting.checkEquals(img, srcImg);
 
@@ -114,7 +115,7 @@ public class TestConvertBufferedImage {
 	public void extractBuffered_Int8() {
 		// use a signed image because it is checked against a byte array
 		ImageUInt8 srcImg = new ImageUInt8(imgWidth, imgHeight);
-		BasicDrawing_I8.randomize(srcImg, rand);
+		ImageInitialization_I8.randomize(srcImg, rand);
 
 		BufferedImage img = ConvertBufferedImage.extractBuffered(srcImg);
 
@@ -165,7 +166,7 @@ public class TestConvertBufferedImage {
 	@Test
 	public void convertTo_Int8() {
 		ImageUInt8 srcImg = new ImageUInt8(imgWidth, imgHeight);
-		BasicDrawing_I8.randomize(srcImg, rand);
+		ImageInitialization_I8.randomize(srcImg, rand);
 
 		GecvTesting.checkSubImage(this, "convertTo_Int8", true, srcImg);
 	}

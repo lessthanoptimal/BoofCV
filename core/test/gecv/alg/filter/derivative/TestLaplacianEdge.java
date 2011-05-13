@@ -16,8 +16,8 @@
 
 package gecv.alg.filter.derivative;
 
-import gecv.alg.drawing.impl.BasicDrawing_I8;
-import gecv.core.image.UtilImageFloat32;
+import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -46,7 +46,7 @@ public class TestLaplacianEdge {
 	@Test
 	public void process_I8() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		BasicDrawing_I8.randomize(img, rand);
+		ImageInitialization_I8.randomize(img, rand);
 
 		ImageSInt16 deriv = new ImageSInt16(width, height);
 		GecvTesting.checkSubImage(this, "process_I8", true, img, deriv);
@@ -64,7 +64,7 @@ public class TestLaplacianEdge {
 	@Test
 	public void process_F32() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		UtilImageFloat32.randomize(img, rand, 0, 1);
+		ImageInitialization_F32.randomize(img, rand, 0, 1);
 
 		ImageFloat32 deriv = new ImageFloat32(width, height);
 		GecvTesting.checkSubImage(this, "process_F32", true, img, deriv);

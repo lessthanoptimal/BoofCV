@@ -25,6 +25,7 @@ import gecv.abst.detect.extract.WrapperNonMaxCandidate;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
 import gecv.alg.detect.extract.NonMaxCornerCandidateExtractor;
 import gecv.alg.filter.derivative.GradientSobel;
+import gecv.alg.filter.derivative.HessianFromGradient;
 import gecv.alg.filter.derivative.HessianThree;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
@@ -76,7 +77,8 @@ public class BenchmarkCornerRuntime {
 				}
 
 				if( alg.getRequiresHessian()) {
-					HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32,true);
+					HessianFromGradient.hessianThree(derivX_F32,derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32,true);
+//					HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32,true);
 				}
 			}
 

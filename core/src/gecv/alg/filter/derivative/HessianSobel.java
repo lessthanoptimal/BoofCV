@@ -18,8 +18,6 @@ package gecv.alg.filter.derivative;
 
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
-import gecv.alg.filter.derivative.impl.GradientSobel_Outer;
-import gecv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter;
 import gecv.alg.filter.derivative.impl.HessianSobel_Shared;
 import gecv.core.image.border.ImageBorderExtended;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -36,7 +34,12 @@ import gecv.struct.image.ImageUInt8;
  * </p>
  *
  * <p>
+ * WARNING: It is computationally more expensive to compute the Hessian with this operation than applying the Sobel
+ * gradient operator multiple times.  However, this does not require the creation additional storage to save
+ * intermediate results.
+ * </p>
  *
+ * <p>
  * Kernel for &part; <sup>2</sup>f/&part; y<sup>2</sup>:
  * <table border="1">
  * <tr> <td> 1 </td> <td> 4 </td> <td> 6 </td> <td> 4 </td> <td> 1 </td> </tr>

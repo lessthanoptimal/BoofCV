@@ -16,7 +16,10 @@
 
 package gecv.core.image;
 
-import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.drawing.impl.ImageInitialization_I16;
+import gecv.alg.drawing.impl.ImageInitialization_I32;
+import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.struct.image.*;
 
 import java.util.Random;
@@ -50,11 +53,11 @@ public class GeneralizedImageOps {
 
 	public static void randomize(ImageBase img, int min, int max, Random rand) {
 		if (img.getClass() == ImageUInt8.class || img.getClass() == ImageSInt8.class ) {
-			BasicDrawing_I8.randomize((ImageInt8) img, rand, min, max);
+			ImageInitialization_I8.randomize((ImageInt8) img, rand, min, max);
 		} else if (img.getClass() == ImageSInt16.class || img.getClass() == ImageUInt16.class) {
-			UtilImageInt16.randomize((ImageInt16) img, rand, min, max);
+			ImageInitialization_I16.randomize((ImageInt16) img, rand, min, max);
 		} else if (img.getClass() == ImageFloat32.class) {
-			UtilImageFloat32.randomize((ImageFloat32) img, rand, min, max);
+			ImageInitialization_F32.randomize((ImageFloat32) img, rand, min, max);
 		} else {
 			throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
 		}
@@ -86,13 +89,13 @@ public class GeneralizedImageOps {
 
 	public static void setAll(ImageBase img, double value) {
 		if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
-			BasicDrawing_I8.fill((ImageUInt8)img,(int)value);
+			ImageInitialization_I8.fill((ImageUInt8)img,(int)value);
 		} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
-			UtilImageInt16.fill((ImageInt16)img,(int)value);
+			ImageInitialization_I16.fill((ImageInt16)img,(int)value);
 		} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
-			UtilImageInt32.fill((ImageSInt32)img,(int)value);
+			ImageInitialization_I32.fill((ImageSInt32)img,(int)value);
 		} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
-			UtilImageFloat32.fill((ImageFloat32)img,(int)value);
+			ImageInitialization_F32.fill((ImageFloat32)img,(int)value);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}

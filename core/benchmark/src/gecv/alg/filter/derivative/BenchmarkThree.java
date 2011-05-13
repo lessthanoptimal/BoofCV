@@ -18,11 +18,7 @@ package gecv.alg.filter.derivative;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.filter.derivative.impl.GradientThree_Share;
 import gecv.alg.filter.derivative.impl.GradientThree_Standard;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
 
 /**
  * Benchmarks related to computing image derivatives
@@ -51,7 +47,7 @@ public class BenchmarkThree extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientThree_Standard.deriv_I8(imgInt8,derivX_I16,derivY_I16);
+			GradientThree_Standard.process(imgInt8,derivX_I16,derivY_I16);
 		}
 	}
 
@@ -59,7 +55,7 @@ public class BenchmarkThree extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientThree_Standard.deriv_F32(imgFloat32,derivX_F32,derivY_F32);
+			GradientThree_Standard.process(imgFloat32,derivX_F32,derivY_F32);
 		}
 	}
 

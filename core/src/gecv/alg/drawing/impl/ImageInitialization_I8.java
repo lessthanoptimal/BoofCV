@@ -17,18 +17,15 @@
 package gecv.alg.drawing.impl;
 
 import gecv.struct.image.ImageInt8;
-import gecv.struct.image.ImageUInt8;
 
 import java.util.Random;
 
 /**
  * Basic drawing operations for {@link gecv.struct.image.ImageUInt8}.
  *
- * @see gecv.alg.drawing.BasicDrawing
- *
  * @author Peter Abeles
  */
-public class BasicDrawing_I8 {
+public class ImageInitialization_I8 {
 
 	public static void addNoise(ImageInt8 img, Random rand , int min , int max) {
 		final int h = img.getHeight();
@@ -60,14 +57,6 @@ public class BasicDrawing_I8 {
 			int index = img.getStartIndex() + y * img.getStride();
 			for (int x = 0; x < w; x++) {
 				data[index++] = (byte) value;
-			}
-		}
-	}
-
-	public static void rectangle( ImageInt8 img , int value , int x0 , int y0 , int x1 , int y1 ) {
-		for( int y = y0; y < y1; y++ ) {
-			for( int x = x0; x < x1; x++ ) {
-				img.set(x,y,value);
 			}
 		}
 	}

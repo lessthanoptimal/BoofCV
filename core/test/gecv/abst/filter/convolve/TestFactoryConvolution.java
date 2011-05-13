@@ -17,23 +17,25 @@
 package gecv.abst.filter.convolve;
 
 import gecv.abst.filter.FilterInterface;
-import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.alg.filter.convolve.ConvolveExtended;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.alg.filter.convolve.KernelFactory;
-import gecv.core.image.UtilImageFloat32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
-import gecv.struct.image.*;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -58,7 +60,7 @@ public class TestFactoryConvolution {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		UtilImageFloat32.randomize(input,rand,0,5);
+		ImageInitialization_F32.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolution.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP,true);
@@ -90,7 +92,7 @@ public class TestFactoryConvolution {
 		ImageSInt16 found = new ImageSInt16(width,height);
 		ImageSInt16 expected = new ImageSInt16(width,height);
 
-		BasicDrawing_I8.randomize(input,rand,0,5);
+		ImageInitialization_I8.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageSInt16.class,BorderType.SKIP,true);
@@ -123,7 +125,7 @@ public class TestFactoryConvolution {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		UtilImageFloat32.randomize(input,rand,0,5);
+		ImageInitialization_F32.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolution.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP);
@@ -156,7 +158,7 @@ public class TestFactoryConvolution {
 		ImageSInt16 found = new ImageSInt16(width,height);
 		ImageSInt16 expected = new ImageSInt16(width,height);
 
-		BasicDrawing_I8.randomize(input,rand,0,5);
+		ImageInitialization_I8.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageSInt16.class,BorderType.SKIP);

@@ -96,6 +96,35 @@ public class GradientSobel_Outer {
 		}
 	}
 
+	public static void process_I8_sub(ImageSInt16 orig,
+									  ImageSInt16 derivX,
+									  ImageSInt16 derivY) {
+		final short[] data = orig.data;
+		final short[] imgX = derivX.data;
+		final short[] imgY = derivY.data;
+
+		final int width = orig.getWidth();
+		final int height = orig.getHeight() - 1;
+		final int strideSrc = orig.getStride();
+
+		for (int y = 1; y < height; y++) {
+			int indexSrc = orig.startIndex + orig.stride * y + 1;
+			final int endX = indexSrc + width - 2;
+
+			int indexX = derivX.startIndex + derivX.stride * y + 1;
+			int indexY = derivY.startIndex + derivY.stride * y + 1;
+
+			for (; indexSrc < endX; indexSrc++) {
+				int v = (data[indexSrc + strideSrc + 1] ) - (data[indexSrc - strideSrc - 1] );
+				int w = (data[indexSrc + strideSrc - 1] ) - (data[indexSrc - strideSrc + 1] );
+
+				imgY[indexY++] = (short) (((data[indexSrc + strideSrc] ) - (data[indexSrc - strideSrc] )) * 2 + v + w);
+
+				imgX[indexX++] = (short) (((data[indexSrc + 1] ) - (data[indexSrc - 1] )) * 2 + v - w);
+			}
+		}
+	}
+
 	/**
 	 * Computes derivative of ImageFloat32.  None of the images can be sub-images.
 	 */

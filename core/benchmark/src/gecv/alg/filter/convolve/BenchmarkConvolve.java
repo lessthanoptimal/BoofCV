@@ -18,10 +18,10 @@ package gecv.alg.filter.convolve;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.drawing.impl.BasicDrawing_I8;
+import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.drawing.impl.ImageInitialization_I16;
+import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.alg.filter.convolve.noborder.*;
-import gecv.core.image.UtilImageFloat32;
-import gecv.core.image.UtilImageInt16;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -275,9 +275,9 @@ public class BenchmarkConvolve {
 		out_F32 = new ImageFloat32(imgWidth,imgHeight);
 
 		Random rand = new Random(234234);
-		BasicDrawing_I8.randomize(imgInt8,rand);
-		UtilImageInt16.randomize(imgInt16,rand,0,200);
-		UtilImageFloat32.randomize(imgFloat32,rand,0,200);
+		ImageInitialization_I8.randomize(imgInt8,rand);
+		ImageInitialization_I16.randomize(imgInt16,rand,0,200);
+		ImageInitialization_F32.randomize(imgFloat32,rand,0,200);
 
 
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
