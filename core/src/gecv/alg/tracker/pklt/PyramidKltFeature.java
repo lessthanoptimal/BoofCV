@@ -23,10 +23,12 @@ import gecv.alg.tracker.klt.KltFeature;
  *
  * @author Peter Abeles
  */
+// todo comment
 public class PyramidKltFeature {
 	KltFeature desc[];
 	float x;
 	float y;
+	int maxLayer;
 
 	public PyramidKltFeature(int numLayers, int radius) {
 		desc = new KltFeature[numLayers];

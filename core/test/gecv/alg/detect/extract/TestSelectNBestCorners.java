@@ -23,6 +23,7 @@ import pja.geometry.struct.point.Point2D_I16;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -33,7 +34,15 @@ public class TestSelectNBestCorners {
 	int height = 20;
 
 	int N = 50;
-	
+
+	@Test
+	public void setN() {
+		// make sure N can grow with no problems
+
+		// shrinking should be no problem too
+		fail("Implement");
+	}
+
 	@Test
 	public void testLessThanN() {
 		ImageFloat32 intensity = new ImageFloat32(width,height);

@@ -25,6 +25,7 @@ import pja.geometry.struct.point.Point2D_I16;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -35,6 +36,21 @@ public class TestFastNonMaxCornerExtractor {
 	Random rand = new Random(0x334);
 
 	/**
+	 * Pass in a null list and see if it blows up
+	 */
+	@Test
+	public void checkNullExcludeList() {
+		ImageFloat32 inten = new ImageFloat32(30, 40);
+		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
+
+		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
+
+		FastNonMaxCornerExtractor alg = new FastNonMaxCornerExtractor(2, 2,0.6F);
+		alg.process(inten,null,foundList);
+		// if it doesn't blow up it passed!
+	}
+
+	/**
 	 * If a non-empty list of features is passed in it should not add them again to the list nor return
 	 * any similar features.
 	 */
@@ -43,30 +59,34 @@ public class TestFastNonMaxCornerExtractor {
 		ImageFloat32 inten = new ImageFloat32(30, 40);
 		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
 
-		QueueCorner cornersFirst = new QueueCorner(inten.getWidth() * inten.getHeight());
+		QueueCorner excludeList = new QueueCorner(inten.getWidth() * inten.getHeight());
+		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 
-		FastNonMaxCornerExtractor alg = new FastNonMaxCornerExtractor(2, 0, 0.6F);
+
+		FastNonMaxCornerExtractor alg = new FastNonMaxCornerExtractor(2, 2,0.6F);
 		// find corners the first time
-		alg.process(inten,cornersFirst);
+		alg.process(inten,excludeList,foundList);
 
 		// add points which should be excluded
 		QueueCorner cornersSecond = new QueueCorner(inten.getWidth() * inten.getHeight());
 		for( int i = 0; i < 20; i++ ) {
-			cornersSecond.add(cornersFirst.get(i));
+			excludeList.add(foundList.get(i));
 		}
 
 		// recreate the same image
 		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
-		alg.process(inten,cornersSecond);
-		assertEquals(cornersSecond.size(),cornersFirst.size());
-		
-		//make sure it isn't just clearing the list and finding the same corners again
-		ImageInitialization_F32.fill(inten,0);
-		alg.process(inten,cornersSecond);
-		assertEquals(cornersSecond.size(),cornersFirst.size());
-		cornersSecond.reset();
-		alg.process(inten,cornersSecond);
-		assertEquals(cornersSecond.size(),0);
+		alg.process(inten,excludeList,cornersSecond);
+
+		// make sure none of the features in the exclude list are in the second list
+		for( int i = 0; i < excludeList.num; i++ ) {
+			Point2D_I16 p = excludeList.get(i);
+
+			for( int j = 0; j < cornersSecond.num; j++ ) {
+				Point2D_I16 c = cornersSecond.get(i);
+
+				assertFalse(c.x == p.x && p.y == c.y);
+			}
+		}
 	}
 
 	/**
@@ -95,8 +115,8 @@ public class TestFastNonMaxCornerExtractor {
 				for (int i = 0; i < 10; i++) {
 					ImageInitialization_F32.randomize(inten, rand, 0, 10);
 
-					fast.process(inten, fastCorners);
-					reg.process(inten, regCorners);
+					fast.process(inten, null,fastCorners);
+					reg.process(inten, null,regCorners);
 
 					assertTrue(fastCorners.size() > 0);
 

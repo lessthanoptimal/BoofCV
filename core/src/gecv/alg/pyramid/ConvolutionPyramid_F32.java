@@ -46,12 +46,12 @@ public class ConvolutionPyramid_F32 extends ConvolutionPyramid<ImageFloat32> {
 				pyramid.layers[0].setTo(original);
 			}
 		} else {
-			DownSampleConvolve.downSample(kernel, original, pyramid.layers[0], pyramid.scale[0], storage);
+			DownSampleConvolve.downSampleNoBorder(kernel, original, pyramid.layers[0], pyramid.scale[0], storage);
 		}
 
 		for (int index = 1; index < pyramid.layers.length; index++) {
 			int skip = pyramid.scale[index];
-			DownSampleConvolve.downSample(kernel, pyramid.layers[index - 1], pyramid.layers[index], skip, storage);
+			DownSampleConvolve.downSampleNoBorder(kernel, pyramid.layers[index - 1], pyramid.layers[index], skip, storage);
 		}
 	}
 }

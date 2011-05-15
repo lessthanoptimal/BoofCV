@@ -40,6 +40,9 @@ public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 	// list of corners found by the extractor
 	protected QueueCorner foundCorners;
 
+	// Corners which should be excluded
+	protected QueueCorner excludedCorners;
+
 	// optional: number of corners it should try to find
 	protected int requestedFeatureNumber;
 
@@ -51,7 +54,10 @@ public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 	 * @param extractor   Extracts the corners from intensity image
 	 * @param maxFeatures If not zero then only the best features are returned up to this number
 	 */
-	public GeneralCornerDetector(GeneralCornerIntensity<I,D> intensity , CornerExtractor extractor, int maxFeatures) {
+	public GeneralCornerDetector(GeneralCornerIntensity<I,D> intensity ,
+								 CornerExtractor extractor,
+								 int maxFeatures)
+	{
 		if( extractor.getUsesCandidates() && !intensity.hasCandidates() )
 			throw new IllegalArgumentException("The extractor requires candidate features, which the intensity does not provide.");
 
@@ -61,6 +67,10 @@ public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 		if (maxFeatures > 0) {
 			selectBest = new SelectNBestCorners(maxFeatures);
 		}
+	}
+
+	public void setExcludedCorners(QueueCorner excludedCorners) {
+		this.excludedCorners = excludedCorners;
 	}
 
 	/**
@@ -73,12 +83,27 @@ public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 		intensity.process(image,derivX, derivY, derivXX, derivYY, derivXY );
 		foundCorners.reset();
 		if( intensity.hasCandidates() ) {
-			extractor.process(intensity.getIntensity(), intensity.getCandidates(), requestedFeatureNumber, foundCorners);
+			extractor.process(intensity.getIntensity(), intensity.getCandidates(), requestedFeatureNumber,
+					excludedCorners,foundCorners);
 		} else {
-			extractor.process(intensity.getIntensity(), null, requestedFeatureNumber, foundCorners);
+			extractor.process(intensity.getIntensity(), null, requestedFeatureNumber, 
+					excludedCorners,foundCorners);
 		}
 		if (selectBest != null) {
 			selectBest.process(intensity.getIntensity(), foundCorners);
+		}
+	}
+
+	/**
+	 * Turns on select best features and sets the number it should return.
+	 *
+	 * @param numFeatures Return at most this many features, which are the best.
+	 */
+	public void setBestNumber(int numFeatures) {
+		if( selectBest == null ) {
+			selectBest = new SelectNBestCorners(numFeatures);
+		} else {
+			selectBest.setN(numFeatures);
 		}
 	}
 

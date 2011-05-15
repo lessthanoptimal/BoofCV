@@ -67,7 +67,7 @@ public class ImageFloat32 extends ImageBase<ImageFloat32> {
 	 */
 	public void set(int x, int y, float value) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
+			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
 
 		data[getIndex(x, y)] = value;
 	}

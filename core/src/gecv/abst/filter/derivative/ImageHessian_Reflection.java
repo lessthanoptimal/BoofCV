@@ -23,27 +23,27 @@ import java.lang.reflect.Method;
 
 
 /**
- * Generic implementation which uses reflections to call derivative functions
+ * Generic implementation which uses reflections to call hessian functions
  *
  * @author Peter Abeles
  */
-public class DerivativeXY_Reflection<Input extends ImageBase, Output extends ImageBase> 
-		implements DerivativeXY<Input, Output>
+public class ImageHessian_Reflection<Output extends ImageBase>
+		implements ImageHessian<Output>
 {
 	// if the image border should be processed or not
 	private boolean processBorder;
-	// the image derivative function
+	// the image hessian function
 	private Method m;
 
-	public DerivativeXY_Reflection(Method m , boolean processBorder) {
+	public ImageHessian_Reflection(Method m , boolean processBorder) {
 		this.m = m;
 		this.processBorder = processBorder;
 	}
 
 	@Override
-	public void process(Input inputImage , Output derivX, Output derivY) {
+	public void process(Output inputDerivX, Output inputDerivY , Output derivXX, Output derivYY, Output derivXY) {
 		try {
-			m.invoke(null,inputImage, derivX, derivY, processBorder);
+			m.invoke(null,inputDerivX, inputDerivY, derivXX, derivYY, derivXY, processBorder);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {

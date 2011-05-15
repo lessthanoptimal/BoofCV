@@ -16,10 +16,12 @@
 
 package gecv.alg.tracker.pklt;
 
+import gecv.abst.detect.corner.GeneralCornerDetector;
 import gecv.abst.detect.corner.GeneralCornerIntensity;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
 import pja.geometry.struct.point.Point2D_I16;
 
@@ -32,42 +34,54 @@ import java.util.List;
 public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeImage extends ImageBase> 
 		implements PyramidKltFeatureSelector<InputImage,DerivativeImage>
 {
-	int numFeatures;
-	QueueCorner found;
-	GeneralCornerIntensity<InputImage,DerivativeImage> intensity;
-	CornerExtractor extractor;
+	GeneralCornerDetector<InputImage,DerivativeImage> detector;
 	PyramidKltTracker<InputImage,DerivativeImage> tracker;
 
-	public GenericPkltFeatSelector(int numFeatures,
-									 GeneralCornerIntensity<InputImage, DerivativeImage> intensity,
-									 CornerExtractor extractor,
-									 PyramidKltTracker<InputImage, DerivativeImage> tracker) {
-		this.numFeatures = numFeatures;
-		this.intensity = intensity;
-		this.extractor = extractor;
+	QueueCorner excludeList = new QueueCorner(10);
+
+	ImagePyramid<InputImage> image;
+	DerivativeImage[] derivX;
+	DerivativeImage[] derivY;
+
+	public GenericPkltFeatSelector( GeneralCornerDetector<InputImage,DerivativeImage> detector,
+									PyramidKltTracker<InputImage, DerivativeImage> tracker) {
+		this.detector = detector;
 		this.tracker = tracker;
 
-		found = new QueueCorner(numFeatures);
 
-		if( intensity.getRequiresGradient() )
+		if( detector.getRequiresHessian() )
 			throw new IllegalArgumentException("Corner selectors which require the Hessian are not allowed");
 	}
 
-	@Override
-	public void setInputs(ImagePyramid<InputImage> image, DerivativeImage[] derivX, DerivativeImage[] derivY) {
-		intensity.process(image.getLayer(0),derivX[0],derivY[0],null,null,null);
+	public void setTracker(PyramidKltTracker<InputImage, DerivativeImage> tracker) {
+		this.tracker = tracker;
 	}
 
 	@Override
-	public void compute(List<PyramidKltFeature> active, List<PyramidKltFeature> availableData) {
-		found.reset();
-		// exclude active
+	public void setInputs(ImagePyramid<InputImage> image,
+					   DerivativeImage[] derivX, DerivativeImage[] derivY)
+	{
+		this.image = image;
+		this.derivX = derivX;
+		this.derivY = derivY;
+	}
+
+	@Override
+	public void compute(List<PyramidKltFeature> active, List<PyramidKltFeature> availableData ) {
+
+		// exclude active tracks
+		excludeList.reset();
 		for( int i = 0; i < active.size(); i++ ) {
 			PyramidKltFeature f = active.get(i);
-			found.add((int)f.x,(int)f.y);
+			excludeList.add((int)f.x,(int)f.y);
 		}
-		// extract the feaures
-		extractor.process(intensity.getIntensity(),intensity.getCandidates(),numFeatures,found);
+		// find new tracks
+		detector.setExcludedCorners(excludeList);
+		detector.setBestNumber(availableData.size());
+		detector.process(image.getLayer(0),derivX[0],derivY[0],null,null,null);
+
+		// extract the features
+		QueueCorner found = detector.getCorners();
 
 		for( int i = 0; i < found.size() && !availableData.isEmpty(); i++ ) {
 			Point2D_I16 pt = found.get(i);

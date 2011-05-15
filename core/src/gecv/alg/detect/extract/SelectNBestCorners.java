@@ -34,17 +34,27 @@ public class SelectNBestCorners {
 	int indexes[];
 	float inten[];
 
+	int N;
+
 	public SelectNBestCorners(int maxCorners) {
 		bestCorners = new QueueCorner(maxCorners);
-		indexes = new int[maxCorners];
-		inten = new float[maxCorners];
+		setN(maxCorners);
+	}
+
+	public void setN( int N ) {
+		if( N > this.N ) {
+			indexes = new int[N];
+			inten = new float[N];
+		}
+		this.N = N;
+
 	}
 
 	public void process(ImageFloat32 intensityImage, QueueCorner origCorners) {
 		final int numFoundFeatures = origCorners.num;
 		bestCorners.reset();
 
-		if (numFoundFeatures <= bestCorners.getMaxSize()) {
+		if (numFoundFeatures <= N) {
 			// make a copy of the results with no pruning since it already
 			// has the desired number, or less
 			for (int i = 0; i < numFoundFeatures; i++) {
@@ -72,9 +82,9 @@ public class SelectNBestCorners {
 
 			}
 
-			QuickSelectF.selectIndex(inten, bestCorners.getMaxSize(), size, indexes);
+			QuickSelectF.selectIndex(inten, N, size, indexes);
 
-			for (int i = 0; i < bestCorners.getMaxSize(); i++) {
+			for (int i = 0; i < N; i++) {
 				Point2D_I16 pt = origCorners.points[indexes[i]];
 				bestCorners.add(pt.x, pt.y);
 			}

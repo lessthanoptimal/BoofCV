@@ -56,11 +56,13 @@ public class NonMaxCornerCandidateExtractor {
 	 * @param candidates	 List of candidate locations for features.
 	 * @param corners		List of selected features.  If not empty, previously found features will be skipped.
 	 */
-	public void process(ImageFloat32 intensityImage, QueueCorner candidates, QueueCorner corners) {
+	public void process(ImageFloat32 intensityImage, QueueCorner candidates, QueueCorner excludeCorners, QueueCorner corners) {
 		// mark corners which have already been found
-		for (int i = 0; i < corners.num; i++) {
-			Point2D_I16 pt = corners.get(i);
-			intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
+		if( excludeCorners != null ) {
+			for (int i = 0; i < excludeCorners.num; i++) {
+				Point2D_I16 pt = excludeCorners.get(i);
+				intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
+			}
 		}
 
 		final int w = intensityImage.width-radius;

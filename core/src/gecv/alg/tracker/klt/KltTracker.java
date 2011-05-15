@@ -19,6 +19,7 @@ package gecv.alg.tracker.klt;
 import gecv.alg.InputSanityCheck;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.struct.image.ImageBase;
+import pja.geometry.struct.point.UtilPoint2D;
 
 /**
  * <p>
@@ -125,15 +126,24 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 			throw new IllegalArgumentException("Image derivatives must be set");
 
 		setAllowedBounds(feature);
+
+		if (!isFullyInside(feature.x, feature.y)) {
+			return false;
+		}
+
+		internalSetDescription(feature);
+
+		return true;
+	}
+
+	private void internalSetDescription(KltFeature feature) {
 		int regionWidth = feature.radius * 2 + 1;
 		int size = regionWidth * regionWidth;
-
-		if (!isFullyInside(feature.x, feature.y))
-			return false;
-
+		
 		float tl_x = feature.x - feature.radius;
 		float tl_y = feature.y - feature.radius;
 
+		interpInput.setImage(image);
 		interpInput.region(tl_x, tl_y, feature.pixel, regionWidth, regionWidth);
 		interpDeriv.setImage(derivX);
 		interpDeriv.region(tl_x, tl_y, feature.derivX, regionWidth, regionWidth);
@@ -153,19 +163,16 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 		feature.Gxx = Gxx;
 		feature.Gyy = Gyy;
 		feature.Gxy = Gxy;
-
-		return true;
 	}
 
 	public KltTrackFault track(KltFeature feature) {
 		// save the original location so that a drifting fault can be detected
 		float origX = feature.x, origY = feature.y;
-		float x = feature.x, y = feature.y;
 
 		setAllowedBounds(feature);
 
 		// make sure its inside this image
-		if (!isFullyInside(x, y)) {
+		if (!isFullyInside(feature.x, feature.y)) {
 			return KltTrackFault.OUT_OF_BOUNDS;
 		}
 
@@ -185,23 +192,23 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 			descFeature = new float[lengthFeature];
 
 		for (int iter = 0; iter < config.maxIterations; iter++) {
-			computeE(feature, x, y);
+			computeE(feature, feature.x, feature.y);
 
 			// solve for D
 			float dx = (Gyy * Ex - Gxy * Ey) / det;
 			float dy = (Gxx * Ey - Gxy * Ex) / det;
 
-			x += dx;
-			y += dy;
+			feature.x += dx;
+			feature.y += dy;
 
 			// see if it move outside of the image
-			if (!isFullyInside(x, y))
+			if (!isFullyInside(feature.x, feature.y))
 				return KltTrackFault.OUT_OF_BOUNDS;
 
 			// see if it has moved more than possible if it is really tracking a target
 			// this happens in regions with little texture
-			if (Math.abs(x - origX) > widthFeature
-					|| Math.abs(y - origY) > widthFeature)
+			if (Math.abs(feature.x - origX) > widthFeature
+					|| Math.abs(feature.y - origY) > widthFeature)
 				return KltTrackFault.DRIFTED;
 
 			if (Math.abs(dx) < config.minPositionDelta && Math.abs(dy) < config.minPositionDelta) {
@@ -209,11 +216,8 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 			}
 		}
 
-		if (computeError(feature) > config.maxError)
+		if (computeError(feature) > config.maxPerPixelError)
 			return KltTrackFault.LARGE_ERROR;
-
-		feature.x = x;
-		feature.y = y;
 
 		return KltTrackFault.SUCCESS;
 	}

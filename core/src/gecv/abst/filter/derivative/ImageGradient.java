@@ -20,23 +20,21 @@ import gecv.struct.image.ImageBase;
 
 
 /**
- * A generic interface for computing image's second derivatives directly from the source image.  This is typically
- * slower than computing it from the image's gradient {@link HessianXY}, even when the time to compute the image's
- * gradient is taken in account.
+ * A generic interface for computing first order image derivative along the x and y axes.
  *
  * @author Peter Abeles
  */
-public interface HessianDirectXY<Input extends ImageBase, Output extends ImageBase> {
+public interface ImageGradient<Input extends ImageBase, Output extends ImageBase> {
 
 	/**
-	 * Computes all the second derivative terms in the image.
+	 * Compues the image gradient from the input image and stores the results into
+	 * 'derivX' and 'derivY'
 	 *
-	 * @param inputImage Original image.
-	 * @param derivXX Second derivative x-axis x-axis
-	 * @param derivYY Second derivative x-axis y-axis
-	 * @param derivXY Second derivative x-axis y-axis
+	 * @param inputImage Original input image. Not modified.
+	 * @param derivX First order image derivative along the x-axis. Modified.
+	 * @param derivY First order image derivative along the y-axis. Modified.
 	 */
-	public void process( Input inputImage , Output derivXX, Output derivYY, Output derivXY  );
+	public void process( Input inputImage , Output derivX, Output derivY );
 
 	/**
 	 * How many pixels wide is the region that is not processed along the outside

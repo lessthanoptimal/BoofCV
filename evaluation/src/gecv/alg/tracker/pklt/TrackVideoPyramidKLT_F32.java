@@ -16,60 +16,32 @@
 
 package gecv.alg.tracker.pklt;
 
+import gecv.abst.detect.corner.GeneralCornerDetector;
 import gecv.abst.detect.corner.GeneralCornerIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
+import gecv.abst.filter.derivative.FactoryDerivative;
+import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
 import gecv.alg.filter.convolve.KernelFactory;
-import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.pyramid.ConvolutionPyramid_F32;
-import gecv.alg.pyramid.PyramidUpdater;
 import gecv.alg.tracker.klt.KltConfig;
-import gecv.alg.tracker.klt.KltTracker;
 import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramid_F32;
 
 /**
  * @author Peter Abeles
  */
 public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32, ImageFloat32>{
 	public TrackVideoPyramidKLT_F32(SimpleImageSequence<ImageFloat32> imageSequence,
-									PyramidKltTracker<ImageFloat32, ImageFloat32> tracker,
-									PyramidKltFeatureSelector<ImageFloat32, ImageFloat32> featureSelector,
-									PyramidUpdater<ImageFloat32> pyramidUpdater) {
-		super(imageSequence, tracker, featureSelector, pyramidUpdater);
-	}
-
-	@Override
-	protected ImagePyramid<ImageFloat32> createPyramid(int width, int height, int... scales) {
-		ImagePyramid_F32 ret = new ImagePyramid_F32(width,height,true);
-		ret.setScaling(scales);
-		derivX = new ImageFloat32[ scales.length ];
-		derivY = new ImageFloat32[ scales.length ];
-
-		for( int i = 0; i < scales.length; i++ ) {
-			int scale = ret.getScalingAtLayer(i);
-			int layerWidth = width/scale;
-			int layerHeight = height/scale;
-
-			derivX[i] = new ImageFloat32(layerWidth,layerHeight);
-			derivY[i] = new ImageFloat32(layerWidth,layerHeight);
-		}
-
-		return ret;
-	}
-
-	@Override
-	protected void computeDerivatives(ImageFloat32 input, ImageFloat32 derivX, ImageFloat32 derivY) {
-		GradientSobel.process(input,derivX,derivY, true);
+									PkltManager<ImageFloat32, ImageFloat32> tracker ) {
+		super(imageSequence, tracker );
 	}
 
 	public static void main( String args[] ) {
@@ -77,7 +49,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 		String fileName;
 
 		if (args.length == 0) {
-			fileName = "/home/pja/uav_video.avi";
+			fileName = "/mnt/data/datasets/2010/snow_videos/snow_norail_stabilization.avi";
 		} else {
 			fileName = args[0];
 		}
@@ -85,37 +57,46 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 
 		ImageBase<?> image = sequence.next();
 
-		// todo this needs to get pushed down into base class
-		int maxFeatures = 200;
-		int minFeatures = 100;
-		int featureRadius = 2;
+		KltConfig configKLt = new KltConfig();
+		configKLt.forbiddenBorder = 2;
+		configKLt.maxPerPixelError = 25.0f;
+		configKLt.maxIterations = 15;
+		configKLt.minDeterminant = 0.001f;
+		configKLt.minPositionDelta = 0.01f;
 
-		KltConfig config = new KltConfig();
-		config.forbiddenBorder = 2;
-		config.maxError = 0.01f;
-		config.maxIterations = 20;
-		config.minDeterminant = 0.01f;
-		config.minPositionDelta = 0.01f;
-
-		int imgWidth = image.width;
-		int imgHeight = image.height;
+		PkltManagerConfig<ImageFloat32,ImageFloat32> config = new PkltManagerConfig<ImageFloat32,ImageFloat32>();
+		config.config = configKLt;
+		config.typeInput = ImageFloat32.class;
+		config.typeDeriv = ImageFloat32.class;
+		config.pyramidScaling = new int[]{1,2,2,2};
+		config.imgWidth = image.width;
+		config.imgHeight = image.height;
+		config.minFeatures = 80;
+		config.maxFeatures = 100;
+		config.featureRadius = 3;
 
 		InterpolateRectangle<ImageFloat32> interp = FactoryInterpolation.bilinearRectangle_F32();
 
-		KltTracker<ImageFloat32, ImageFloat32> kltTracker = new KltTracker<ImageFloat32, ImageFloat32>(interp,interp,config);
-		PyramidKltTracker<ImageFloat32, ImageFloat32> pyrTracker = new PyramidKltTracker<ImageFloat32, ImageFloat32>(kltTracker);
-
 		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity =
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
-						FactoryCornerIntensity.createKlt_F32(imgWidth, imgHeight, featureRadius));
-		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(featureRadius + 10, featureRadius + 10, 0.1f));
-		
-		PyramidKltFeatureSelector<ImageFloat32, ImageFloat32> featureSelector =
-				new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(maxFeatures,intensity,extractor,pyrTracker);
+						FactoryCornerIntensity.createKlt_F32(image.width, image.height, config.featureRadius));
+		CornerExtractor extractor = new WrapperNonMax(
+				new FastNonMaxCornerExtractor(config.featureRadius+2, config.featureRadius*8, configKLt.minDeterminant));
+		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,config.maxFeatures);
+
+		GenericPkltFeatSelector<ImageFloat32, ImageFloat32> featureSelector =
+				new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,null);
 
 		ConvolutionPyramid_F32 pyrUpdater = new ConvolutionPyramid_F32(KernelFactory.gaussian1D_F32(2,true));
 
-		TrackVideoPyramidKLT_F32 alg = new TrackVideoPyramidKLT_F32(sequence,pyrTracker,featureSelector,pyrUpdater);
+		ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.sobel_F32();
+
+		PkltManager<ImageFloat32,ImageFloat32> manager =
+				new PkltManager<ImageFloat32,ImageFloat32>(config,interp,interp,
+						gradient,featureSelector,pyrUpdater);
+
+		TrackVideoPyramidKLT_F32 alg = new TrackVideoPyramidKLT_F32(sequence,manager);
 
 		alg.process();
 	}

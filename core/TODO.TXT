@@ -4,7 +4,6 @@
 
 - Derivative
  * Gaussian derivative kernel 1D
- * Add a Sobel based Hessian
  * Improve performance of derivative edge calculation
 
 - Edges
@@ -19,7 +18,6 @@
  * Local Threshold
 
 - Corners
- * Evaluate for accuracy
  * See corner section
  * See in code comment on speeding up fast-non-max
  

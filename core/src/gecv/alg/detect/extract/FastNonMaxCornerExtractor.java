@@ -69,14 +69,16 @@ public class FastNonMaxCornerExtractor implements NonMaxCornerExtractor {
 	 * @param corners		Where found corners are stored.  Corners which are already in the list will not be added twice.
 	 */
 	@Override
-	public void process(ImageFloat32 intensityImage, QueueCorner corners) {
+	public void process(ImageFloat32 intensityImage, QueueCorner excludeCorners, QueueCorner corners) {
 		int imgWidth = intensityImage.getWidth();
 		int imgHeight = intensityImage.getHeight();
 
 		// mark corners which have already been found
-		for (int i = 0; i < corners.num; i++) {
-			Point2D_I16 pt = corners.get(i);
-			intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
+		if( excludeCorners != null ) {
+			for (int i = 0; i < excludeCorners.num; i++) {
+				Point2D_I16 pt = excludeCorners.get(i);
+				intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
+			}
 		}
 
 		final float inten[] = intensityImage.data;

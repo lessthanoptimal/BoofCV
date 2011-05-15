@@ -46,11 +46,11 @@ public interface NonMaxCornerExtractor {
 	public void setThresh(float thresh);
 
 	/**
-	 * Detects corners in the image.  If a non-empty list of corners is passed in then those corners will not
-	 * be added again and similar corners will be excluded.
+	 * Detects corners in the image.  Features that are in the exclude list will be avoided
 	 *
 	 * @param intensityImage Feature intensity image. Can be modified.
-	 * @param corners	Where found corners are stored.  Corners which are already in the list will not be added twice.
+	 * @param excludeCorners List of features which should be excluded and not added to the list
+	 * @param corners	Where found corners are stored.
 	 */
-	public void process(ImageFloat32 intensityImage, QueueCorner corners);
+	public void process(ImageFloat32 intensityImage, QueueCorner excludeCorners , QueueCorner corners);
 }
