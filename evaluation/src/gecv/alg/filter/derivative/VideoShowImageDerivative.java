@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.derivative;
 
-import gecv.abst.filter.derivative.DerivativeXY;
+import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.alg.drawing.PixelMath;
 import gecv.gui.image.ImagePanel;
@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
  */
 public class VideoShowImageDerivative extends ProcessImageSequence<ImageUInt8> {
 
-	DerivativeXY<ImageUInt8, ImageSInt16> gradient;
+	ImageGradient<ImageUInt8, ImageSInt16> gradient;
 	ImageSInt16 derivX;
 	ImageSInt16 derivY;
 
@@ -45,7 +45,7 @@ public class VideoShowImageDerivative extends ProcessImageSequence<ImageUInt8> {
 	ImagePanel panelY;
 
 	public VideoShowImageDerivative(SimpleImageSequence<ImageUInt8> sequence,
-									DerivativeXY<ImageUInt8, ImageSInt16> gradient) {
+									ImageGradient<ImageUInt8, ImageSInt16> gradient) {
 		super(sequence);
 
 		this.gradient = gradient;
@@ -91,7 +91,7 @@ public class VideoShowImageDerivative extends ProcessImageSequence<ImageUInt8> {
 		}
 		SimpleImageSequence<ImageUInt8> sequence = new XugglerSimplified<ImageUInt8>(fileName, ImageUInt8.class);
 
-		DerivativeXY<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.sobel_I8();
+		ImageGradient<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.sobel_I8();
 
 		VideoShowImageDerivative display = new VideoShowImageDerivative(sequence, gradient);
 

@@ -70,10 +70,14 @@ public class ImageInitialization_F32 {
 	/**
 	 * Sets a rectangle inside the image with the specified value.
 	 */
-	public static void fillRectangle(ImageFloat32 img, float value, int x0, int y0, int x1, int y1) {
+	public static void fillRectangle(ImageFloat32 img, float value, int x0, int y0, int width, int height) {
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				img.set(x, y, value);
+				if( img.isInBounds(x,y ))
+					img.set(x, y, value);
 			}
 		}
 	}

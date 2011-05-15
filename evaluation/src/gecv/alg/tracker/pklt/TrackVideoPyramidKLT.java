@@ -16,8 +16,6 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.alg.pyramid.PyramidUpdater;
-import gecv.alg.tracker.klt.KltTrackFault;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.ProcessImageSequence;
@@ -27,8 +25,7 @@ import gecv.struct.pyramid.ImagePyramid;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Peter Abeles
@@ -37,88 +34,32 @@ import java.util.List;
 public abstract class TrackVideoPyramidKLT<InputImage extends ImageBase, DerivativeImage extends ImageBase>
 		extends ProcessImageSequence<InputImage> {
 
-	private PyramidKltTracker<InputImage, DerivativeImage> tracker;
-	private PyramidKltFeatureSelector<InputImage, DerivativeImage> featureSelector;
-
-	private PyramidUpdater<InputImage> pyramidUpdater;
-	private ImagePyramid<InputImage> pyramid;
-	protected DerivativeImage derivX[];
-	protected DerivativeImage derivY[];
-
-	private int maxFeatures = 200;
-	private int minFeatures = 100;
-	private int radius=2;
-	private List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
-	private List<PyramidKltFeature> unused = new ArrayList<PyramidKltFeature>();
-
+	private PkltManager<InputImage,DerivativeImage> tracker;
 
 	ImagePanel panel;
+	int totalRespawns;
 
 	public TrackVideoPyramidKLT(SimpleImageSequence<InputImage> sequence,
-								PyramidKltTracker<InputImage, DerivativeImage> tracker,
-								PyramidKltFeatureSelector<InputImage, DerivativeImage> featureSelector,
-								PyramidUpdater<InputImage> pyramidUpdater ) {
+								PkltManager<InputImage,DerivativeImage> tracker ) {
 		super(sequence);
 		this.tracker = tracker;
-		this.featureSelector = featureSelector;
-		this.pyramidUpdater = pyramidUpdater;
 	}
+
 
 	@Override
 	public void processFrame(InputImage image) {
-		if (pyramid == null) {
-			pyramid = createPyramid(image.width, image.height, 1, 2);
-			int numLayers = pyramid.getNumLayers();
-			for (int i = 0; i < maxFeatures; i++) {
-				unused.add(new PyramidKltFeature(numLayers, radius));
-			}
-			pyramidUpdater.setPyramid(pyramid);
-			tracker.setImage(pyramid, derivX, derivY);
-		}
 
-		pyramidUpdater.update(image);
-		if (tracker.getRequiresDerivative() || active.size() < minFeatures ) {
-			for (int i = 0; i < pyramid.getNumLayers(); i++) {
-				InputImage img = pyramid.getLayer(i);
-				computeDerivatives(img, derivX[i], derivY[i]);
-			}
-		}
+		tracker.processFrame(image);
 
-		if( active.size() < minFeatures ) {
-			System.out.println("   Selecting New Features");
-			featureSelector.setInputs(pyramid,derivX,derivY);
-			featureSelector.compute(active,unused);
-		} else {
-			tracker.setImage(pyramid,derivX,derivY);
-			for( int i = 0; i < active.size(); ) {
-				PyramidKltFeature f = active.get(i);
-				KltTrackFault result = tracker.track(f);
-				if( result != KltTrackFault.SUCCESS ) {
-					unused.add(f);
-					active.remove(i);
-				} else {
-					i++;
-				}
-			}
-		}
-		System.out.println(" total features: "+active.size());
+
 	}
 
 	@Override
 	public void updateGUI(BufferedImage guiImage, InputImage origImage) {
 		Graphics2D g2 = guiImage.createGraphics();
-
-		for (int i = 0; i < active.size(); i++) {
-			PyramidKltFeature pt = active.get(i);
-
-			int x = (int)pt.x;
-			int y = (int)pt.y;
-
-			g2.setColor(Color.BLACK);
-			g2.fillOval(x - 4, y - 4, 9, 9);
-			g2.setColor(Color.RED);
-			g2.fillOval(x - 2, y - 2, 5, 5);
-		}
+		
+		drawFeatures(g2, tracker.getFeatures(), Color.RED);
+		drawFeatures(g2, tracker.getSpawned(), Color.BLUE);
 
 		if (panel == null) {
 			panel = ShowImages.showWindow(guiImage, "KLT Pyramidal Tracker");
@@ -127,9 +68,30 @@ public abstract class TrackVideoPyramidKLT<InputImage extends ImageBase, Derivat
 			panel.setBufferedImage(guiImage);
 			panel.repaint();
 		}
+
+		if( tracker.getSpawned().size() != 0 )
+			totalRespawns++;
+		System.out.println(" total features: "+tracker.getFeatures().size()+" totalRespawns "+totalRespawns);
 	}
 
-	protected abstract ImagePyramid<InputImage> createPyramid(int width, int height, int... scales);
+	private void drawFeatures(Graphics2D g2,
+							  java.util.List<PyramidKltFeature> list,
+							  Color color ) {
+		int r = 3;
+		int w = r*2+1;
+		int ro = r+2;
+		int wo = ro*2+1;
 
-	protected abstract void computeDerivatives(InputImage input, DerivativeImage derivX, DerivativeImage derivY);
+		for (int i = 0; i < list.size(); i++) {
+			PyramidKltFeature pt = list.get(i);
+
+			int x = (int)pt.x;
+			int y = (int)pt.y;
+
+			g2.setColor(Color.BLACK);
+			g2.fillOval(x - ro, y - ro, wo, wo);
+			g2.setColor(color);
+			g2.fillOval(x - r, y - r, w, w);
+		}
+	}
 }

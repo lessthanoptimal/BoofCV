@@ -68,7 +68,6 @@ public class WrapperMedianCornerIntensity<I extends ImageBase, D extends ImageBa
 	public void process(I input, D derivX , D derivY , D derivXX , D derivYY , D derivXY ) {
 		medianFilter.process(input,medianImage);
 		alg.process(input,medianImage);
-//		ShowImages.showWindow((ImageUInt8)medianImage,"Median");
 	}
 
 	@Override

@@ -87,7 +87,7 @@ public class TestKltTracker {
 	 */
 	private void checkMovement(int radius, int deltaX, int deltaY) {
 		ImageInitialization_F32.fill(image, 0);
-		ImageInitialization_F32.fillRectangle(image, 100, 20, 20, imageWidth, imageHeight);
+		ImageInitialization_F32.fillRectangle(image, 100, 20, 20, imageWidth-20, imageHeight-20);
 		GradientSobel.process(image, derivX, derivY, true);
 
 		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
@@ -184,7 +184,7 @@ public class TestKltTracker {
 	public static KltTracker<ImageFloat32, ImageFloat32> createDefaultTracker() {
 		KltConfig config = new KltConfig();
 		config.forbiddenBorder = 1;
-		config.maxError = 10;
+		config.maxPerPixelError = 10;
 		config.maxIterations = 30;
 		config.minDeterminant = 0.01f;
 		config.minPositionDelta = 0.01f;

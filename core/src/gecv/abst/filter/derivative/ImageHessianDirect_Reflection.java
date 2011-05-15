@@ -27,23 +27,23 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class HessianXY_Reflection<Output extends ImageBase>
-		implements HessianXY<Output>
+public class ImageHessianDirect_Reflection<Input extends ImageBase, Output extends ImageBase>
+		implements ImageHessianDirect<Input, Output>
 {
 	// if the image border should be processed or not
 	private boolean processBorder;
 	// the image hessian function
 	private Method m;
 
-	public HessianXY_Reflection(Method m , boolean processBorder) {
+	public ImageHessianDirect_Reflection(Method m , boolean processBorder) {
 		this.m = m;
 		this.processBorder = processBorder;
 	}
 
 	@Override
-	public void process(Output inputDerivX, Output inputDerivY , Output derivXX, Output derivYY, Output derivXY) {
+	public void process(Input inputImage , Output derivXX, Output derivYY, Output derivXY) {
 		try {
-			m.invoke(null,inputDerivX, inputDerivY, derivXX, derivYY, derivXY, processBorder);
+			m.invoke(null,inputImage, derivXX, derivYY, derivXY, processBorder);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {

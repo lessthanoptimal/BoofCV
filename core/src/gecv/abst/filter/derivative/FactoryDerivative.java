@@ -24,75 +24,75 @@ import gecv.struct.image.ImageUInt8;
 import java.lang.reflect.Method;
 
 /**
- * Factory for creating different types of {@link DerivativeXY}, which are used to compute
+ * Factory for creating different types of {@link ImageGradient}, which are used to compute
  * the image's derivative.
  *
  * @author Peter Abeles
  */
 public class FactoryDerivative {
 
-	public static DerivativeXY<ImageFloat32,ImageFloat32> gaussian_F32( int radius ) {
-		return new DerivativeXY_Gaussian_F32(radius);
+	public static ImageGradient<ImageFloat32,ImageFloat32> gaussian_F32( int radius ) {
+		return new ImageGradient_Gaussian_F32(radius);
 	}
 
-	public static DerivativeXY<ImageFloat32,ImageFloat32> sobel_F32() {
+	public static ImageGradient<ImageFloat32,ImageFloat32> sobel_F32() {
 		Method m = findDerivative_F(GradientSobel.class);
-		return new DerivativeXY_Reflection<ImageFloat32,ImageFloat32>(m,true);
+		return new ImageGradient_Reflection<ImageFloat32,ImageFloat32>(m,false);
 	}
 
-	public static DerivativeXY<ImageFloat32,ImageFloat32> three_F32() {
+	public static ImageGradient<ImageFloat32,ImageFloat32> three_F32() {
 		Method m = findDerivative_F(GradientThree.class);
-		return new DerivativeXY_Reflection<ImageFloat32,ImageFloat32>(m,true);
+		return new ImageGradient_Reflection<ImageFloat32,ImageFloat32>(m,true);
 	}
 
-	public static HessianDirectXY<ImageFloat32,ImageFloat32> hessianDirectThree_F32() {
+	public static ImageHessianDirect<ImageFloat32,ImageFloat32> hessianDirectThree_F32() {
 		Method m = findHessian_F(HessianThree.class);
-		return new HessianDirectXY_Reflection<ImageFloat32,ImageFloat32>(m,true);
+		return new ImageHessianDirect_Reflection<ImageFloat32,ImageFloat32>(m,true);
 	}
 
-	public static HessianDirectXY<ImageFloat32,ImageFloat32> hessianDirectSobel_F32() {
+	public static ImageHessianDirect<ImageFloat32,ImageFloat32> hessianDirectSobel_F32() {
 		Method m = findHessian_F(HessianSobel.class);
-		return new HessianDirectXY_Reflection<ImageFloat32,ImageFloat32>(m,true);
+		return new ImageHessianDirect_Reflection<ImageFloat32,ImageFloat32>(m,true);
 	}
 
-	public static DerivativeXY<ImageUInt8, ImageSInt16> sobel_I8() {
+	public static ImageGradient<ImageUInt8, ImageSInt16> sobel_I8() {
 		Method m = findDerivative_I(GradientSobel.class);
-		return new DerivativeXY_Reflection<ImageUInt8,ImageSInt16>(m,true);
+		return new ImageGradient_Reflection<ImageUInt8,ImageSInt16>(m,true);
 	}
 
-	public static DerivativeXY<ImageUInt8, ImageSInt16> three_I8() {
+	public static ImageGradient<ImageUInt8, ImageSInt16> three_I8() {
 		Method m = findDerivative_I(GradientThree.class);
-		return new DerivativeXY_Reflection<ImageUInt8,ImageSInt16>(m,true);
+		return new ImageGradient_Reflection<ImageUInt8,ImageSInt16>(m,true);
 	}
 
-	public static HessianDirectXY<ImageUInt8, ImageSInt16> hessianDirectThree_I8() {
+	public static ImageHessianDirect<ImageUInt8, ImageSInt16> hessianDirectThree_I8() {
 		Method m = findHessian_I(HessianThree.class);
-		return new HessianDirectXY_Reflection<ImageUInt8,ImageSInt16>(m,true);
+		return new ImageHessianDirect_Reflection<ImageUInt8,ImageSInt16>(m,true);
 	}
 
-	public static HessianDirectXY<ImageUInt8, ImageSInt16> hessianDirectSobel_I8() {
+	public static ImageHessianDirect<ImageUInt8, ImageSInt16> hessianDirectSobel_I8() {
 		Method m = findHessian_I(HessianSobel.class);
-		return new HessianDirectXY_Reflection<ImageUInt8,ImageSInt16>(m,true);
+		return new ImageHessianDirect_Reflection<ImageUInt8,ImageSInt16>(m,true);
 	}
 
-	public static HessianXY<ImageSInt16> hessianThree_I16() {
+	public static ImageHessian<ImageSInt16> hessianThree_I16() {
 		Method m = findHessianFromGradient(GradientThree.class,short.class);
-		return new HessianXY_Reflection<ImageSInt16>(m,true);
+		return new ImageHessian_Reflection<ImageSInt16>(m,true);
 	}
 
-	public static HessianXY< ImageSInt16> hessianSobel_I16() {
+	public static ImageHessian< ImageSInt16> hessianSobel_I16() {
 		Method m = findHessianFromGradient(GradientSobel.class,short.class);
-		return new HessianXY_Reflection<ImageSInt16>(m,true);
+		return new ImageHessian_Reflection<ImageSInt16>(m,true);
 	}
 
-	public static HessianXY<ImageFloat32> hessianThree_F32() {
+	public static ImageHessian<ImageFloat32> hessianThree_F32() {
 		Method m = findHessianFromGradient(GradientThree.class,float.class);
-		return new HessianXY_Reflection<ImageFloat32>(m,true);
+		return new ImageHessian_Reflection<ImageFloat32>(m,true);
 	}
 
-	public static HessianXY< ImageFloat32> hessianSobel_F32() {
+	public static ImageHessian< ImageFloat32> hessianSobel_F32() {
 		Method m = findHessianFromGradient(GradientSobel.class,float.class);
-		return new HessianXY_Reflection<ImageFloat32>(m,true);
+		return new ImageHessian_Reflection<ImageFloat32>(m,true);
 	}
 
 	private static Method findDerivative_F(Class<?> derivativeClass) {

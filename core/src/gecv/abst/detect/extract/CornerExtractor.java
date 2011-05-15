@@ -50,8 +50,13 @@ public interface CornerExtractor {
 	 * @param intensity	Feature intensity image.  Can be modified.
 	 * @param foundCorners	List of existing features (not always supported) and where new features are stored.
 	 * @param requestedNumber Number of features it should find.  Not always supported.
+	 * @param excludeCorners Features which should not be selected again.  Can be null. Not always supported.
+	 * @param foundCorners Features which were found.
 	 */
-	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber , QueueCorner foundCorners);
+	public void process(ImageFloat32 intensity, QueueCorner candidate,
+						int requestedNumber ,
+						QueueCorner excludeCorners ,
+						QueueCorner foundCorners);
 
 	/**
 	 * If it requires a list of candidate corners.
@@ -61,10 +66,11 @@ public interface CornerExtractor {
 	public boolean getUsesCandidates();
 
 	/**
-	 * Returns if features passed in with the corners list are ignored or not.
-	 * @return If previously found features are ignored or not.
+	 * Returns if the excluded list is used or not.
+	 *
+	 * @return true if features can be excluded.
 	 */
-	public boolean getIgnoreExistingCorners();
+	public boolean getCanExclude();
 
 	/**
 	 * If it accepts requests to find a specific number of features or not.

@@ -46,7 +46,7 @@ public class BenchmarkExtractors {
 		@Override
 		public void process() {
 			corners.reset();
-			corner.process(intensity, corners);
+			corner.process(intensity, null , corners);
 		}
 	}
 
@@ -56,7 +56,7 @@ public class BenchmarkExtractors {
 		@Override
 		public void process() {
 			corners.reset();
-			corner.process(intensity, corners);
+			corner.process(intensity, null , corners);
 		}
 	}
 

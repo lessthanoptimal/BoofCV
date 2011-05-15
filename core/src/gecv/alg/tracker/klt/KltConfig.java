@@ -27,7 +27,7 @@ public class KltConfig {
 	 */
 	public int forbiddenBorder;
 
-	public float maxError;
+	public float maxPerPixelError;
 	public int maxIterations;
 	public float minDeterminant;
 	public float minPositionDelta;

@@ -69,7 +69,7 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 			feature.desc[layer].setPosition(x, y);
 			if( !tracker.setDescription(feature.desc[layer]) )
 				break;
-			// TODO need to handle case where a feature is too close to the border in one layer, but then goes back into the zone
+			feature.maxLayer = layer;
 		}
 	}
 
@@ -89,21 +89,30 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 		float x = feature.x;
 		float y = feature.y;
 
+
 		// estimate the position in the top most layer
-		int scaleAtTop = image.getScalingAtLayer(image.getNumLayers() - 1);
+		int scaleAtTop = image.getScalingAtLayer(feature.maxLayer);
 		x /= scaleAtTop;
 		y /= scaleAtTop;
 
+		// this is the first level it was able to track the feature at
+		int firstLevelTracked = -1;
+
 		// track from the top of the pyramid to the bottom
-		for (int layer = image.getNumLayers() - 1; layer >= 0; layer--) {
+		for (int layer = feature.maxLayer; layer >= 0; layer--) {
 			setupKltTracker(layer);
 
 			feature.desc[layer].setPosition(x, y);
 			KltTrackFault ret = tracker.track(feature.desc[layer]);
-			boolean skipLayer=false;
+
 			if (ret == KltTrackFault.OUT_OF_BOUNDS) {
+				x = feature.desc[layer].x;
+				y = feature.desc[layer].y;
+				feature.maxLayer = layer-1;
 				// if out of bounds try tracking on a lower layer
 			} else if (ret == KltTrackFault.SUCCESS) {
+				if( firstLevelTracked == -1 )
+					firstLevelTracked = layer;
 				// nothing bad happened, save this result
 				x = feature.desc[layer].x;
 				y = feature.desc[layer].y;
@@ -118,12 +127,14 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 			y *= image.scale[layer];
 		}
 
-		feature.setPosition(x, y);
 
-		if (worked)
+
+		if (worked) {
+			feature.setPosition(x, y);
 			return KltTrackFault.SUCCESS;
-		else
+		} else {
 			return KltTrackFault.OUT_OF_BOUNDS;
+		}
 	}
 
 	private void setupKltTracker(int layer) {

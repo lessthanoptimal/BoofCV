@@ -39,6 +39,9 @@ public class ConvolveImageStandardSparse {
 	public static float convolve( Kernel1D_F32 horizontal, Kernel1D_F32 vertical,
 								ImageFloat32 input, int c_x , int c_y, float storage[] )
 	{
+//		if( c_x == 2 && c_y == 2 )
+//			System.out.println("stp here");
+
 		// convolve horizontally first
 		int width = horizontal.getWidth();
 		int radius = width/2;

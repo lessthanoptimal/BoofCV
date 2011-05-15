@@ -14,25 +14,32 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.derivative;
+package gecv.alg.tracker.pklt;
 
+import gecv.alg.tracker.klt.KltConfig;
 import gecv.struct.image.ImageBase;
 
 
 /**
- * A generic interface for computing image derivative along the x and y axes.
- *
  * @author Peter Abeles
  */
-public interface DerivativeXY<Input extends ImageBase, Output extends ImageBase> {
+// todo comment
+public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
+	public KltConfig config;
+	public int maxFeatures = 100;
+	public int minFeatures = 80;
+	public int featureRadius = 3;
 
-	public void process( Input inputImage , Output derivX, Output derivY );
+	// if in sequential mode the feature descriptions are updated after every cycle
+	public boolean sequentialMode;
 
-	/**
-	 * How many pixels wide is the region that is not processed along the outside
-	 * border of the image.
-	 *
-	 * @return number of pixels.
-	 */
-	public int getBorder();
+	public int imgWidth;
+	public int imgHeight;
+
+	public int pyramidScaling[];
+
+	public Class<I> typeInput;
+	public Class<D> typeDeriv;
+
+
 }

@@ -34,7 +34,8 @@ public class WrapperThreshold implements CornerExtractor {
 	}
 
 	@Override
-	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner foundCorners) {
+	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
+					 QueueCorner excludeCorners, QueueCorner foundCorners) {
 		extractor.process(intensity, foundCorners);
 	}
 
@@ -44,7 +45,7 @@ public class WrapperThreshold implements CornerExtractor {
 	}
 
 	@Override
-	public boolean getIgnoreExistingCorners() {
+	public boolean getCanExclude() {
 		return false;
 	}
 

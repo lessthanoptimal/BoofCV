@@ -34,8 +34,9 @@ public class WrapperNonMax implements CornerExtractor {
 	}
 
 	@Override
-	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner foundCorners) {
-		extractor.process(intensity, foundCorners);
+	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
+					 QueueCorner excludeCorners, QueueCorner foundCorners) {
+		extractor.process(intensity, excludeCorners, foundCorners);
 	}
 
 	@Override
@@ -44,7 +45,7 @@ public class WrapperNonMax implements CornerExtractor {
 	}
 
 	@Override
-	public boolean getIgnoreExistingCorners() {
+	public boolean getCanExclude() {
 		return true;
 	}
 

@@ -16,6 +16,7 @@
 
 package gecv.alg.interpolate;
 
+import gecv.alg.filter.convolve.ConvolveImageNoBorderSparse;
 import gecv.alg.filter.convolve.ConvolveNormalizedSparse;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
@@ -57,6 +58,27 @@ public class DownSampleConvolve {
 			int indexDestEnd = indexDest + downSampled.width;
 			for( int x = 0; indexDest < indexDestEnd; x += skip , indexDest++) {
 				float val = ConvolveNormalizedSparse.convolve(kernel,kernel,original,x,y,storage);
+				downSampled.data[ indexDest ] = val;
+			}
+		}
+	}
+
+	public static void downSampleNoBorder( Kernel1D_F32 kernel ,
+										   ImageFloat32 original ,  ImageFloat32 downSampled ,
+										   int skip , float storage[] )
+	{
+		int radius = kernel.getRadius();
+		int border = radius + (radius % skip);
+		int borderDown = border/skip;
+
+		for( int y = border, destY = borderDown; destY < downSampled.height-borderDown; y += skip , destY++ ) {
+
+			int indexDest = downSampled.startIndex + destY*downSampled.stride;
+			int indexDestEnd = indexDest + downSampled.width;
+			indexDest += borderDown;
+			indexDestEnd -= borderDown;
+			for( int x = border; indexDest < indexDestEnd; x += skip , indexDest++) {
+				float val = ConvolveImageNoBorderSparse.convolve(kernel,kernel,original,x,y,storage);
 				downSampled.data[ indexDest ] = val;
 			}
 		}

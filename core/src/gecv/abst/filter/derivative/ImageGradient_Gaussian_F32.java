@@ -29,17 +29,17 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class DerivativeXY_Gaussian_F32 implements DerivativeXY<ImageFloat32, ImageFloat32> {
+public class ImageGradient_Gaussian_F32 implements ImageGradient<ImageFloat32, ImageFloat32> {
 
 	private Kernel1D_F32 kernel;
 	private boolean processBorder;
 
-	public DerivativeXY_Gaussian_F32(double sigma, int radius, boolean processBorder) {
+	public ImageGradient_Gaussian_F32(double sigma, int radius, boolean processBorder) {
 		kernel = KernelFactory.gaussianDerivative1D_F32(sigma, radius, true);
 		this.processBorder = processBorder;
 	}
 
-	public DerivativeXY_Gaussian_F32(int radius) {
+	public ImageGradient_Gaussian_F32(int radius) {
 		kernel = KernelFactory.gaussianDerivative1D_F32((2 * radius + 1) / 5.0, radius, true);
 	}
 

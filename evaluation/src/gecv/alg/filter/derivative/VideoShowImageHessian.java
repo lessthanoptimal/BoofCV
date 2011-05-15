@@ -17,7 +17,7 @@
 package gecv.alg.filter.derivative;
 
 import gecv.abst.filter.derivative.FactoryDerivative;
-import gecv.abst.filter.derivative.HessianDirectXY;
+import gecv.abst.filter.derivative.ImageHessianDirect;
 import gecv.alg.drawing.PixelMath;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
  */
 public class VideoShowImageHessian extends ProcessImageSequence<ImageUInt8> {
 
-	HessianDirectXY<ImageUInt8, ImageSInt16> hessian;
+	ImageHessianDirect<ImageUInt8, ImageSInt16> hessian;
 	ImageSInt16 derivXX;
 	ImageSInt16 derivYY;
 	ImageSInt16 derivXY;
@@ -47,7 +47,7 @@ public class VideoShowImageHessian extends ProcessImageSequence<ImageUInt8> {
 	ImagePanel panelXY;
 
 	public VideoShowImageHessian(SimpleImageSequence<ImageUInt8> sequence,
-									HessianDirectXY<ImageUInt8, ImageSInt16> hessian) {
+									ImageHessianDirect<ImageUInt8, ImageSInt16> hessian) {
 		super(sequence);
 
 		this.hessian = hessian;
@@ -99,7 +99,7 @@ public class VideoShowImageHessian extends ProcessImageSequence<ImageUInt8> {
 		}
 		SimpleImageSequence<ImageUInt8> sequence = new XugglerSimplified<ImageUInt8>(fileName, ImageUInt8.class);
 
-		HessianDirectXY<ImageUInt8, ImageSInt16> hessian = FactoryDerivative.hessianDirectSobel_I8();
+		ImageHessianDirect<ImageUInt8, ImageSInt16> hessian = FactoryDerivative.hessianDirectSobel_I8();
 
 		VideoShowImageHessian display = new VideoShowImageHessian(sequence, hessian);
 
