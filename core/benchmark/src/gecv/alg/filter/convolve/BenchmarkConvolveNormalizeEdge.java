@@ -21,7 +21,7 @@ import gecv.ProfileOperation;
 import gecv.alg.drawing.impl.ImageInitialization_F32;
 import gecv.alg.drawing.impl.ImageInitialization_I16;
 import gecv.alg.drawing.impl.ImageInitialization_I8;
-import gecv.alg.filter.convolve.normalized.ConvolveNormalizedBorderNaive;
+import gecv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -60,7 +60,7 @@ public class BenchmarkConvolveNormalizeEdge {
 	{
 		@Override
 		public void process() {
-			ConvolveNormalizedBorderNaive.horizontal(kernelF32,imgFloat32,out_F32);
+			ConvolveNormalizedNaive.horizontal(kernelF32,imgFloat32,out_F32);
 		}
 	}
 

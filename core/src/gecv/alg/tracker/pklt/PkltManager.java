@@ -113,7 +113,7 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 		computeGradient();
 		tracker.setImage(pyramid,derivX,derivY);
 		
-		for( int i = 0; i < active.size(); ) {
+		for( int i = active.size()-1; i >= 0; i-- ) {
 			PyramidKltFeature f = active.get(i);
 			KltTrackFault result = tracker.track(f);
 			if( result != KltTrackFault.SUCCESS ) {
@@ -122,7 +122,6 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 				active.remove(i);
 			} else {
 				tracker.setDescription(f);
-				i++;
 			}
 		}
 

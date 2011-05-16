@@ -32,10 +32,10 @@ public class TestConvolveNormalized_JustBorder {
 		CompareToNaive test = new CompareToNaive();
 		test.setImageDimension(10,12);
 		test.setKernelRadius(1);
-		test.performTests(6);
+		test.performTests(7);
 
 		test.setKernelRadius(2);
-		test.performTests(6);
+		test.performTests(7);
 	}
 
 	public static class CompareToNaive extends CompareToStandardConvolutionNormalized {
@@ -50,7 +50,7 @@ public class TestConvolveNormalized_JustBorder {
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 			SingleBandImage t = FactorySingleBandImage.wrap((ImageBase)targetParam[2]);
-			SingleBandImage e = FactorySingleBandImage.wrap((ImageBase)targetParam[2]);
+			SingleBandImage e = FactorySingleBandImage.wrap((ImageBase)validationParam[2]);
 
 			final int width = t.getWidth();
 			final int height = t.getHeight();
