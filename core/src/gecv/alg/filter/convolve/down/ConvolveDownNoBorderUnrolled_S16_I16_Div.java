@@ -16,9 +16,10 @@
 
 package gecv.alg.filter.convolve.down;
 
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.convolve.Kernel1D_I32;
+import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageSInt16;
 
 /**
  * <p>
@@ -31,28 +32,28 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class ConvolveDownNoBorderUnrolled_F32_F32 {
-	public static boolean horizontal( Kernel1D_F32 kernel ,
-								   ImageFloat32 image, ImageFloat32 dest , int skip) {
+public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
+	public static boolean horizontal( Kernel1D_I32 kernel ,
+								   ImageSInt16 image, ImageInt16 dest , int skip, int divisor) {
 		switch( kernel.width ) {
 			case 3:
-				horizontal3(kernel,image,dest,skip);
+				horizontal3(kernel,image,dest,skip,divisor);
 				break;
 
 			case 5:
-				horizontal5(kernel,image,dest,skip);
+				horizontal5(kernel,image,dest,skip,divisor);
 				break;
 
 			case 7:
-				horizontal7(kernel,image,dest,skip);
+				horizontal7(kernel,image,dest,skip,divisor);
 				break;
 
 			case 9:
-				horizontal9(kernel,image,dest,skip);
+				horizontal9(kernel,image,dest,skip,divisor);
 				break;
 
 			case 11:
-				horizontal11(kernel,image,dest,skip);
+				horizontal11(kernel,image,dest,skip,divisor);
 				break;
 
 			default:
@@ -61,27 +62,27 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static boolean vertical( Kernel1D_F32 kernel ,
-								   ImageFloat32 image, ImageFloat32 dest , int skip) {
+	public static boolean vertical( Kernel1D_I32 kernel ,
+								   ImageSInt16 image, ImageInt16 dest , int skip, int divisor) {
 		switch( kernel.width ) {
 			case 3:
-				vertical3(kernel,image,dest,skip);
+				vertical3(kernel,image,dest,skip,divisor);
 				break;
 
 			case 5:
-				vertical5(kernel,image,dest,skip);
+				vertical5(kernel,image,dest,skip,divisor);
 				break;
 
 			case 7:
-				vertical7(kernel,image,dest,skip);
+				vertical7(kernel,image,dest,skip,divisor);
 				break;
 
 			case 9:
-				vertical9(kernel,image,dest,skip);
+				vertical9(kernel,image,dest,skip,divisor);
 				break;
 
 			case 11:
-				vertical11(kernel,image,dest,skip);
+				vertical11(kernel,image,dest,skip,divisor);
 				break;
 
 			default:
@@ -90,27 +91,27 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static boolean convolve( Kernel2D_F32 kernel ,
-								   ImageFloat32 image, ImageFloat32 dest , int skip ) {
+	public static boolean convolve( Kernel2D_I32 kernel ,
+								   ImageSInt16 image, ImageInt16 dest , int skip , int divisor ) {
 		switch( kernel.width ) {
 			case 3:
-				convolve3(kernel,image,dest,skip);
+				convolve3(kernel,image,dest,skip,divisor);
 				break;
 
 			case 5:
-				convolve5(kernel,image,dest,skip);
+				convolve5(kernel,image,dest,skip,divisor);
 				break;
 
 			case 7:
-				convolve7(kernel,image,dest,skip);
+				convolve7(kernel,image,dest,skip,divisor);
 				break;
 
 			case 9:
-				convolve9(kernel,image,dest,skip);
+				convolve9(kernel,image,dest,skip,divisor);
 				break;
 
 			case 11:
-				convolve11(kernel,image,dest,skip);
+				convolve11(kernel,image,dest,skip,divisor);
 				break;
 
 			default:
@@ -119,15 +120,15 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static void horizontal3( Kernel1D_F32 kernel ,
-									ImageFloat32 input, ImageFloat32 output ,
-									int skip ) {
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+	public static void horizontal3( Kernel1D_I32 kernel ,
+									ImageSInt16 input, ImageInt16 output ,
+									int skip , int divisor ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
+		final int k1 = kernel.data[0];
+		final int k2 = kernel.data[1];
+		final int k3 = kernel.data[2];
 
 		final int radius = kernel.getRadius();
 
@@ -144,26 +145,26 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 			for( j += offsetX; j < jEnd; j += skip ) {
 				int indexSrc = j-radius;
 
-				float total = (dataSrc[indexSrc++] ) * k1;
+				int total = (dataSrc[indexSrc++] ) * k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc])*k3;
 
-				dataDst[indexDst++] = total;
+				dataDst[indexDst++] = ( short )(total/divisor);
 			}
 		}
 	}
 
-	public static void horizontal5( Kernel1D_F32 kernel ,
-									ImageFloat32 input, ImageFloat32 output ,
-									int skip ) {
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+	public static void horizontal5( Kernel1D_I32 kernel ,
+									ImageSInt16 input, ImageInt16 output ,
+									int skip , int divisor ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
+		final int k1 = kernel.data[0];
+		final int k2 = kernel.data[1];
+		final int k3 = kernel.data[2];
+		final int k4 = kernel.data[3];
+		final int k5 = kernel.data[4];
 
 		final int radius = kernel.getRadius();
 
@@ -180,30 +181,30 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 			for( j += offsetX; j < jEnd; j += skip ) {
 				int indexSrc = j-radius;
 
-				float total = (dataSrc[indexSrc++] ) * k1;
+				int total = (dataSrc[indexSrc++] ) * k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
 				total += (dataSrc[indexSrc])*k5;
 
-				dataDst[indexDst++] = total;
+				dataDst[indexDst++] = ( short )(total/divisor);
 			}
 		}
 	}
 
-	public static void horizontal7( Kernel1D_F32 kernel ,
-									ImageFloat32 input, ImageFloat32 output ,
-									int skip ) {
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+	public static void horizontal7( Kernel1D_I32 kernel ,
+									ImageSInt16 input, ImageInt16 output ,
+									int skip , int divisor ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
+		final int k1 = kernel.data[0];
+		final int k2 = kernel.data[1];
+		final int k3 = kernel.data[2];
+		final int k4 = kernel.data[3];
+		final int k5 = kernel.data[4];
+		final int k6 = kernel.data[5];
+		final int k7 = kernel.data[6];
 
 		final int radius = kernel.getRadius();
 
@@ -220,7 +221,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 			for( j += offsetX; j < jEnd; j += skip ) {
 				int indexSrc = j-radius;
 
-				float total = (dataSrc[indexSrc++] ) * k1;
+				int total = (dataSrc[indexSrc++] ) * k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
@@ -228,26 +229,26 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				total += (dataSrc[indexSrc++])*k6;
 				total += (dataSrc[indexSrc])*k7;
 
-				dataDst[indexDst++] = total;
+				dataDst[indexDst++] = ( short )(total/divisor);
 			}
 		}
 	}
 
-	public static void horizontal9( Kernel1D_F32 kernel ,
-									ImageFloat32 input, ImageFloat32 output ,
-									int skip ) {
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+	public static void horizontal9( Kernel1D_I32 kernel ,
+									ImageSInt16 input, ImageInt16 output ,
+									int skip , int divisor ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
-		final float k8 = kernel.data[7];
-		final float k9 = kernel.data[8];
+		final int k1 = kernel.data[0];
+		final int k2 = kernel.data[1];
+		final int k3 = kernel.data[2];
+		final int k4 = kernel.data[3];
+		final int k5 = kernel.data[4];
+		final int k6 = kernel.data[5];
+		final int k7 = kernel.data[6];
+		final int k8 = kernel.data[7];
+		final int k9 = kernel.data[8];
 
 		final int radius = kernel.getRadius();
 
@@ -264,7 +265,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 			for( j += offsetX; j < jEnd; j += skip ) {
 				int indexSrc = j-radius;
 
-				float total = (dataSrc[indexSrc++] ) * k1;
+				int total = (dataSrc[indexSrc++] ) * k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
@@ -274,28 +275,28 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				total += (dataSrc[indexSrc++])*k8;
 				total += (dataSrc[indexSrc])*k9;
 
-				dataDst[indexDst++] = total;
+				dataDst[indexDst++] = ( short )(total/divisor);
 			}
 		}
 	}
 
-	public static void horizontal11( Kernel1D_F32 kernel ,
-									ImageFloat32 input, ImageFloat32 output ,
-									int skip ) {
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+	public static void horizontal11( Kernel1D_I32 kernel ,
+									ImageSInt16 input, ImageInt16 output ,
+									int skip , int divisor ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
-		final float k8 = kernel.data[7];
-		final float k9 = kernel.data[8];
-		final float k10 = kernel.data[9];
-		final float k11 = kernel.data[10];
+		final int k1 = kernel.data[0];
+		final int k2 = kernel.data[1];
+		final int k3 = kernel.data[2];
+		final int k4 = kernel.data[3];
+		final int k5 = kernel.data[4];
+		final int k6 = kernel.data[5];
+		final int k7 = kernel.data[6];
+		final int k8 = kernel.data[7];
+		final int k9 = kernel.data[8];
+		final int k10 = kernel.data[9];
+		final int k11 = kernel.data[10];
 
 		final int radius = kernel.getRadius();
 
@@ -312,7 +313,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 			for( j += offsetX; j < jEnd; j += skip ) {
 				int indexSrc = j-radius;
 
-				float total = (dataSrc[indexSrc++] ) * k1;
+				int total = (dataSrc[indexSrc++] ) * k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
@@ -324,20 +325,20 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				total += (dataSrc[indexSrc++])*k10;
 				total += (dataSrc[indexSrc])*k11;
 
-				dataDst[indexDst++] = total;
+				dataDst[indexDst++] = ( short )(total/divisor);
 			}
 		}
 	}
 
-	public static void vertical3( Kernel1D_F32 kernel,
-								 ImageFloat32 input, ImageFloat32 output,
-									int skip ) {
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+	public static void vertical3( Kernel1D_I32 kernel,
+								 ImageSInt16 input, ImageInt16 output,
+									int skip , int divisor) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
+		final int k1 = kernel.data[0];
+		final int k2 = kernel.data[1];
+		final int k3 = kernel.data[2];
 
 		final int radius = kernel.getRadius();
 
@@ -355,28 +356,28 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i-radius*input.stride;
-				float total = (dataSrc[indexSrc] )*k1;
+				int total = (dataSrc[indexSrc] )*k1;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k3;
 
-				dataDst[indexDst++] = total;
+				dataDst[indexDst++] = ( short )(total/divisor);
 			}
 		}
 	}
 
-	public static void vertical5( Kernel1D_F32 kernel,
-								 ImageFloat32 input, ImageFloat32 output,
-									int skip ) {
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+	public static void vertical5( Kernel1D_I32 kernel,
+								 ImageSInt16 input, ImageInt16 output,
+									int skip , int divisor) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
+		final int k1 = kernel.data[0];
+		final int k2 = kernel.data[1];
+		final int k3 = kernel.data[2];
+		final int k4 = kernel.data[3];
+		final int k5 = kernel.data[4];
 
 		final int radius = kernel.getRadius();
 
@@ -394,7 +395,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i-radius*input.stride;
-				float total = (dataSrc[indexSrc] )*k1;
+				int total = (dataSrc[indexSrc] )*k1;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += input.stride;
@@ -404,24 +405,24 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k5;
 
-				dataDst[indexDst++] = total;
+				dataDst[indexDst++] = ( short )(total/divisor);
 			}
 		}
 	}
 
-	public static void vertical7( Kernel1D_F32 kernel,
-								 ImageFloat32 input, ImageFloat32 output,
-									int skip ) {
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+	public static void vertical7( Kernel1D_I32 kernel,
+								 ImageSInt16 input, ImageInt16 output,
+									int skip , int divisor) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
+		final int k1 = kernel.data[0];
+		final int k2 = kernel.data[1];
+		final int k3 = kernel.data[2];
+		final int k4 = kernel.data[3];
+		final int k5 = kernel.data[4];
+		final int k6 = kernel.data[5];
+		final int k7 = kernel.data[6];
 
 		final int radius = kernel.getRadius();
 
@@ -439,7 +440,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i-radius*input.stride;
-				float total = (dataSrc[indexSrc] )*k1;
+				int total = (dataSrc[indexSrc] )*k1;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += input.stride;
@@ -453,26 +454,26 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k7;
 
-				dataDst[indexDst++] = total;
+				dataDst[indexDst++] = ( short )(total/divisor);
 			}
 		}
 	}
 
-	public static void vertical9( Kernel1D_F32 kernel,
-								 ImageFloat32 input, ImageFloat32 output,
-									int skip ) {
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+	public static void vertical9( Kernel1D_I32 kernel,
+								 ImageSInt16 input, ImageInt16 output,
+									int skip , int divisor) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
-		final float k8 = kernel.data[7];
-		final float k9 = kernel.data[8];
+		final int k1 = kernel.data[0];
+		final int k2 = kernel.data[1];
+		final int k3 = kernel.data[2];
+		final int k4 = kernel.data[3];
+		final int k5 = kernel.data[4];
+		final int k6 = kernel.data[5];
+		final int k7 = kernel.data[6];
+		final int k8 = kernel.data[7];
+		final int k9 = kernel.data[8];
 
 		final int radius = kernel.getRadius();
 
@@ -490,7 +491,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i-radius*input.stride;
-				float total = (dataSrc[indexSrc] )*k1;
+				int total = (dataSrc[indexSrc] )*k1;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += input.stride;
@@ -508,28 +509,28 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k9;
 
-				dataDst[indexDst++] = total;
+				dataDst[indexDst++] = ( short )(total/divisor);
 			}
 		}
 	}
 
-	public static void vertical11( Kernel1D_F32 kernel,
-								 ImageFloat32 input, ImageFloat32 output,
-									int skip ) {
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+	public static void vertical11( Kernel1D_I32 kernel,
+								 ImageSInt16 input, ImageInt16 output,
+									int skip , int divisor) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
-		final float k8 = kernel.data[7];
-		final float k9 = kernel.data[8];
-		final float k10 = kernel.data[9];
-		final float k11 = kernel.data[10];
+		final int k1 = kernel.data[0];
+		final int k2 = kernel.data[1];
+		final int k3 = kernel.data[2];
+		final int k4 = kernel.data[3];
+		final int k5 = kernel.data[4];
+		final int k6 = kernel.data[5];
+		final int k7 = kernel.data[6];
+		final int k8 = kernel.data[7];
+		final int k9 = kernel.data[8];
+		final int k10 = kernel.data[9];
+		final int k11 = kernel.data[10];
 
 		final int radius = kernel.getRadius();
 
@@ -547,7 +548,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i-radius*input.stride;
-				float total = (dataSrc[indexSrc] )*k1;
+				int total = (dataSrc[indexSrc] )*k1;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += input.stride;
@@ -569,46 +570,45 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k11;
 
-				dataDst[indexDst++] = total;
+				dataDst[indexDst++] = ( short )(total/divisor);
 			}
 		}
 	}
 
-	public static void convolve3( Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output, int skip )
+	public static void convolve3( Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output, int skip , int divisor )
 	{
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
 
 		final int radius = kernel.getRadius();
+		final int totalRow[] = new int[ width ];
 
 		final int offset = radius <= skip ? skip : radius + radius % skip;
 
 		for( int y = offset; y < height-radius; y += skip) {
 
 			// first time through the value needs to be set
-			float k1 = kernel.data[0];
-			float k2 = kernel.data[1];
-			float k3 = kernel.data[2];
+			int k1 = kernel.data[0];
+			int k2 = kernel.data[1];
+			int k3 = kernel.data[2];
 
-			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 			int indexSrcRow = input.startIndex + (y-radius)*input.stride - radius;
 			for( int x = offset; x < width-radius; x += skip ) {
 				int indexSrc = indexSrcRow + x;
 
-				float total = 0;
+				int total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc] )* k3;
 
-				dataDst[indexDst++] = total;
+				totalRow[x] = total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 3; i++ ) {
-				indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 				indexSrcRow = input.startIndex + (y+i-radius)*input.stride - radius;
 				
 				k1 = kernel.data[i*3 + 0];
@@ -618,56 +618,59 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				for( int x = offset; x < width-radius; x += skip ) {
 					int indexSrc = indexSrcRow+x;
 
-					float total = 0;
+					int total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc] )* k3;
 
-					dataDst[indexDst++] += total;
+					totalRow[x] += total;
 				}
+			}
+			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
+			for( int x = offset; x < width-radius; x += skip ) {
+				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve5( Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output, int skip )
+	public static void convolve5( Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output, int skip , int divisor )
 	{
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
 
 		final int radius = kernel.getRadius();
+		final int totalRow[] = new int[ width ];
 
 		final int offset = radius <= skip ? skip : radius + radius % skip;
 
 		for( int y = offset; y < height-radius; y += skip) {
 
 			// first time through the value needs to be set
-			float k1 = kernel.data[0];
-			float k2 = kernel.data[1];
-			float k3 = kernel.data[2];
-			float k4 = kernel.data[3];
-			float k5 = kernel.data[4];
+			int k1 = kernel.data[0];
+			int k2 = kernel.data[1];
+			int k3 = kernel.data[2];
+			int k4 = kernel.data[3];
+			int k5 = kernel.data[4];
 
-			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 			int indexSrcRow = input.startIndex + (y-radius)*input.stride - radius;
 			for( int x = offset; x < width-radius; x += skip ) {
 				int indexSrc = indexSrcRow + x;
 
-				float total = 0;
+				int total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
 				total += (dataSrc[indexSrc++] )* k4;
 				total += (dataSrc[indexSrc] )* k5;
 
-				dataDst[indexDst++] = total;
+				totalRow[x] = total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 5; i++ ) {
-				indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 				indexSrcRow = input.startIndex + (y+i-radius)*input.stride - radius;
 				
 				k1 = kernel.data[i*5 + 0];
@@ -679,48 +682,52 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				for( int x = offset; x < width-radius; x += skip ) {
 					int indexSrc = indexSrcRow+x;
 
-					float total = 0;
+					int total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
 					total += (dataSrc[indexSrc++] )* k4;
 					total += (dataSrc[indexSrc] )* k5;
 
-					dataDst[indexDst++] += total;
+					totalRow[x] += total;
 				}
+			}
+			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
+			for( int x = offset; x < width-radius; x += skip ) {
+				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve7( Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output, int skip )
+	public static void convolve7( Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output, int skip , int divisor )
 	{
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
 
 		final int radius = kernel.getRadius();
+		final int totalRow[] = new int[ width ];
 
 		final int offset = radius <= skip ? skip : radius + radius % skip;
 
 		for( int y = offset; y < height-radius; y += skip) {
 
 			// first time through the value needs to be set
-			float k1 = kernel.data[0];
-			float k2 = kernel.data[1];
-			float k3 = kernel.data[2];
-			float k4 = kernel.data[3];
-			float k5 = kernel.data[4];
-			float k6 = kernel.data[5];
-			float k7 = kernel.data[6];
+			int k1 = kernel.data[0];
+			int k2 = kernel.data[1];
+			int k3 = kernel.data[2];
+			int k4 = kernel.data[3];
+			int k5 = kernel.data[4];
+			int k6 = kernel.data[5];
+			int k7 = kernel.data[6];
 
-			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 			int indexSrcRow = input.startIndex + (y-radius)*input.stride - radius;
 			for( int x = offset; x < width-radius; x += skip ) {
 				int indexSrc = indexSrcRow + x;
 
-				float total = 0;
+				int total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
@@ -729,12 +736,11 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				total += (dataSrc[indexSrc++] )* k6;
 				total += (dataSrc[indexSrc] )* k7;
 
-				dataDst[indexDst++] = total;
+				totalRow[x] = total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 7; i++ ) {
-				indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 				indexSrcRow = input.startIndex + (y+i-radius)*input.stride - radius;
 				
 				k1 = kernel.data[i*7 + 0];
@@ -748,7 +754,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				for( int x = offset; x < width-radius; x += skip ) {
 					int indexSrc = indexSrcRow+x;
 
-					float total = 0;
+					int total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
@@ -757,43 +763,47 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 					total += (dataSrc[indexSrc++] )* k6;
 					total += (dataSrc[indexSrc] )* k7;
 
-					dataDst[indexDst++] += total;
+					totalRow[x] += total;
 				}
+			}
+			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
+			for( int x = offset; x < width-radius; x += skip ) {
+				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve9( Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output, int skip )
+	public static void convolve9( Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output, int skip , int divisor )
 	{
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
 
 		final int radius = kernel.getRadius();
+		final int totalRow[] = new int[ width ];
 
 		final int offset = radius <= skip ? skip : radius + radius % skip;
 
 		for( int y = offset; y < height-radius; y += skip) {
 
 			// first time through the value needs to be set
-			float k1 = kernel.data[0];
-			float k2 = kernel.data[1];
-			float k3 = kernel.data[2];
-			float k4 = kernel.data[3];
-			float k5 = kernel.data[4];
-			float k6 = kernel.data[5];
-			float k7 = kernel.data[6];
-			float k8 = kernel.data[7];
-			float k9 = kernel.data[8];
+			int k1 = kernel.data[0];
+			int k2 = kernel.data[1];
+			int k3 = kernel.data[2];
+			int k4 = kernel.data[3];
+			int k5 = kernel.data[4];
+			int k6 = kernel.data[5];
+			int k7 = kernel.data[6];
+			int k8 = kernel.data[7];
+			int k9 = kernel.data[8];
 
-			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 			int indexSrcRow = input.startIndex + (y-radius)*input.stride - radius;
 			for( int x = offset; x < width-radius; x += skip ) {
 				int indexSrc = indexSrcRow + x;
 
-				float total = 0;
+				int total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
@@ -804,12 +814,11 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				total += (dataSrc[indexSrc++] )* k8;
 				total += (dataSrc[indexSrc] )* k9;
 
-				dataDst[indexDst++] = total;
+				totalRow[x] = total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 9; i++ ) {
-				indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 				indexSrcRow = input.startIndex + (y+i-radius)*input.stride - radius;
 				
 				k1 = kernel.data[i*9 + 0];
@@ -825,7 +834,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				for( int x = offset; x < width-radius; x += skip ) {
 					int indexSrc = indexSrcRow+x;
 
-					float total = 0;
+					int total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
@@ -836,45 +845,49 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 					total += (dataSrc[indexSrc++] )* k8;
 					total += (dataSrc[indexSrc] )* k9;
 
-					dataDst[indexDst++] += total;
+					totalRow[x] += total;
 				}
+			}
+			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
+			for( int x = offset; x < width-radius; x += skip ) {
+				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve11( Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output, int skip )
+	public static void convolve11( Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output, int skip , int divisor )
 	{
-		final float[] dataSrc = input.data;
-		final float[] dataDst = output.data;
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
 
 		final int radius = kernel.getRadius();
+		final int totalRow[] = new int[ width ];
 
 		final int offset = radius <= skip ? skip : radius + radius % skip;
 
 		for( int y = offset; y < height-radius; y += skip) {
 
 			// first time through the value needs to be set
-			float k1 = kernel.data[0];
-			float k2 = kernel.data[1];
-			float k3 = kernel.data[2];
-			float k4 = kernel.data[3];
-			float k5 = kernel.data[4];
-			float k6 = kernel.data[5];
-			float k7 = kernel.data[6];
-			float k8 = kernel.data[7];
-			float k9 = kernel.data[8];
-			float k10 = kernel.data[9];
-			float k11 = kernel.data[10];
+			int k1 = kernel.data[0];
+			int k2 = kernel.data[1];
+			int k3 = kernel.data[2];
+			int k4 = kernel.data[3];
+			int k5 = kernel.data[4];
+			int k6 = kernel.data[5];
+			int k7 = kernel.data[6];
+			int k8 = kernel.data[7];
+			int k9 = kernel.data[8];
+			int k10 = kernel.data[9];
+			int k11 = kernel.data[10];
 
-			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 			int indexSrcRow = input.startIndex + (y-radius)*input.stride - radius;
 			for( int x = offset; x < width-radius; x += skip ) {
 				int indexSrc = indexSrcRow + x;
 
-				float total = 0;
+				int total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
@@ -887,12 +900,11 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				total += (dataSrc[indexSrc++] )* k10;
 				total += (dataSrc[indexSrc] )* k11;
 
-				dataDst[indexDst++] = total;
+				totalRow[x] = total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 11; i++ ) {
-				indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 				indexSrcRow = input.startIndex + (y+i-radius)*input.stride - radius;
 				
 				k1 = kernel.data[i*11 + 0];
@@ -910,7 +922,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 				for( int x = offset; x < width-radius; x += skip ) {
 					int indexSrc = indexSrcRow+x;
 
-					float total = 0;
+					int total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
@@ -923,8 +935,12 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 					total += (dataSrc[indexSrc++] )* k10;
 					total += (dataSrc[indexSrc] )* k11;
 
-					dataDst[indexDst++] += total;
+					totalRow[x] += total;
 				}
+			}
+			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
+			for( int x = offset; x < width-radius; x += skip ) {
+				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
 			}
 		}
 	}

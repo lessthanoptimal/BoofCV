@@ -28,8 +28,6 @@ import java.io.PrintStream;
  */
 public class GenerateConvolveDownNoBorderStandard {
 
-	public static int numUnrolled = 1;
-
 	String className = "ConvolveDownNoBorderStandard";
 
 	PrintStream out;

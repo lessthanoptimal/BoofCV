@@ -16,20 +16,22 @@
 
 package gecv.alg.filter.convolve.down;
 
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.convolve.Kernel1D_I32;
+import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageUInt8;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestConvolveDownNoBorderUnrolled_F32_F32 extends StandardConvolveUnrolledTests {
+public class TestConvolveDownNoBorderUnrolled_U8_I8_Div extends StandardConvolveUnrolledTests {
 
-	public TestConvolveDownNoBorderUnrolled_F32_F32() {
+	public TestConvolveDownNoBorderUnrolled_U8_I8_Div() {
 		this.numUnrolled = GenerateConvolvedDownNoBorderUnrolled.numUnrolled;
-		this.target = ConvolveDownNoBorderUnrolled_F32_F32.class;
-		this.param1D = new Class<?>[]{Kernel1D_F32.class, ImageFloat32.class, ImageFloat32.class , int.class };
-		this.param2D = new Class<?>[]{Kernel2D_F32.class, ImageFloat32.class, ImageFloat32.class , int.class };
+		this.target = ConvolveDownNoBorderUnrolled_U8_I8_Div.class;
+		this.param1D = new Class<?>[]{Kernel1D_I32.class, ImageUInt8.class, ImageInt8.class , int.class , int.class};
+		this.param2D = new Class<?>[]{Kernel2D_I32.class, ImageUInt8.class, ImageInt8.class , int.class , int.class};
 	}
+
 }
