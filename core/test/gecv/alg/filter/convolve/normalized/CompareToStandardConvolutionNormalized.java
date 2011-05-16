@@ -41,7 +41,7 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 	protected int kernelRadius = 1;
 
 	public CompareToStandardConvolutionNormalized( Class<?> targetClass ) {
-		super(targetClass, ConvolveNormalizedBorderNaive.class);
+		super(targetClass, ConvolveNormalizedNaive.class);
 	}
 
 	public void setImageDimension( int width , int height ) {
@@ -62,14 +62,7 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		Object kernel;
-		if (Kernel1D_F32.class == paramTypes[0]) {
-			kernel = KernelFactory.gaussian1D_F32(kernelRadius,true);
-		} else if (Kernel1D_I32.class == paramTypes[0]) {
-			kernel = KernelFactory.gaussian1D_I32(kernelRadius);
-		} else {
-			throw new RuntimeException("Unknown kernel type");
-		}
+		Object kernel = KernelFactory.gaussian(paramTypes[0],kernelRadius,true);
 
 		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 		GeneralizedImageOps.randomize(src, 0, 5, rand);

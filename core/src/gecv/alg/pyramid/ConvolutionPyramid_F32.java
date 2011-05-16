@@ -16,6 +16,7 @@
 
 package gecv.alg.pyramid;
 
+import gecv.alg.filter.convolve.ConvolveDownNoBorder;
 import gecv.alg.interpolate.DownSampleConvolve;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
@@ -28,16 +29,17 @@ import gecv.struct.image.ImageFloat32;
 public class ConvolutionPyramid_F32 extends ConvolutionPyramid<ImageFloat32> {
 	// convolution kernel used to blur the input image before down sampling
 	private Kernel1D_F32 kernel;
-	// storage for computing the down sampled image
-	private float storage[];
+	// stores the results from the first convolution
+	private ImageFloat32 temp;
 
 	public ConvolutionPyramid_F32(Kernel1D_F32 kernel) {
 		this.kernel = kernel;
-		storage = new float[kernel.width];
 	}
 
 	@Override
 	public void _update(ImageFloat32 original) {
+		if( temp == null )
+			temp = new ImageFloat32(original.width/2,original.height);
 
 		if (pyramid.scale[0] == 1) {
 			if (pyramid.saveOriginalReference) {
@@ -46,12 +48,18 @@ public class ConvolutionPyramid_F32 extends ConvolutionPyramid<ImageFloat32> {
 				pyramid.layers[0].setTo(original);
 			}
 		} else {
-			DownSampleConvolve.downSampleNoBorder(kernel, original, pyramid.layers[0], pyramid.scale[0], storage);
+			int skip = pyramid.scale[0];
+			temp.reshape(original.width/skip,original.height);
+			ConvolveDownNoBorder.horizontal(kernel,original,temp,skip);
+			ConvolveDownNoBorder.vertical(kernel,temp,pyramid.layers[0],skip);
 		}
 
 		for (int index = 1; index < pyramid.layers.length; index++) {
 			int skip = pyramid.scale[index];
-			DownSampleConvolve.downSampleNoBorder(kernel, pyramid.layers[index - 1], pyramid.layers[index], skip, storage);
+			ImageFloat32 prev = pyramid.layers[index-1];
+			temp.reshape(prev.width/skip,prev.height);
+			ConvolveDownNoBorder.horizontal(kernel,prev,temp,skip);
+			ConvolveDownNoBorder.vertical(kernel,temp,pyramid.layers[index],skip);
 		}
 	}
 }
