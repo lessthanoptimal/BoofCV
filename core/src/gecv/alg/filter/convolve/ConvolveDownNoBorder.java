@@ -14,29 +14,18 @@
  *    limitations under the License.
  */
 
-package gecv.alg.tracker.pklt;
-
-import gecv.alg.tracker.klt.KltConfig;
-import gecv.struct.image.ImageBase;
+package gecv.alg.filter.convolve;
 
 
 /**
+ * <p>
+ * Specialized convolution where the center of the convolution skips over a constant number
+ * of pixels in the x and/or y axis.  The output it written into an image in a dense fashion,
+ * resulting in it being at a lower resolution.  A typical application for this is down sampling
+ * inside an image pyramid.
+ * </p>
+ * 
  * @author Peter Abeles
  */
-// todo comment
-public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
-	public KltConfig config;
-	public int maxFeatures = 100;
-	public int minFeatures = 80;
-	public int featureRadius = 3;
-
-	public int imgWidth;
-	public int imgHeight;
-
-	public int pyramidScaling[];
-
-	public Class<I> typeInput;
-	public Class<D> typeDeriv;
-
-
+public class ConvolveDownNoBorder {
 }

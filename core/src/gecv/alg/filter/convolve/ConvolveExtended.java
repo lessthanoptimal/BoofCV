@@ -23,10 +23,7 @@ import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageSInt32;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.*;
 
 /**
  * <p>
@@ -92,7 +89,7 @@ public class ConvolveExtended {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 image, ImageSInt16 dest ) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
@@ -107,8 +104,7 @@ public class ConvolveExtended {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel,
-								ImageUInt8 image, ImageSInt16 dest ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
@@ -123,7 +119,7 @@ public class ConvolveExtended {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 image, ImageSInt16 dest ) {
+	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
@@ -153,8 +149,7 @@ public class ConvolveExtended {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel,
-								ImageUInt8 image, ImageSInt32 dest ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 image, ImageSInt32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
@@ -184,7 +179,7 @@ public class ConvolveExtended {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, ImageSInt16 image, ImageSInt16 dest ) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
@@ -199,8 +194,7 @@ public class ConvolveExtended {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel,
-								ImageSInt16 image, ImageSInt16 dest ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
@@ -215,7 +209,7 @@ public class ConvolveExtended {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, ImageSInt16 image, ImageSInt16 dest ) {
+	public static void convolve(Kernel2D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.convolve(kernel,image,dest);

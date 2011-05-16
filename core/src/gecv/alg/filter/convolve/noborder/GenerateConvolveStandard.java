@@ -41,19 +41,19 @@ public class GenerateConvolveStandard {
 		printAllOps("F32", "ImageFloat32", "ImageFloat32",
 				"float", "float", "float",
 				"float", "", "", false);
-		printAllOps("I32", "ImageUInt8", "ImageSInt16",
+		printAllOps("I32", "ImageUInt8", "ImageInt16",
 				"int", "byte", "short",
 				"int", "(short)", "& 0xFF", false);
 		printAllOps("I32", "ImageUInt8", "ImageSInt32",
 				"int", "byte", "int",
 				"int", "", "& 0xFF", false);
-		printAllOps("I32", "ImageSInt16", "ImageSInt16",
+		printAllOps("I32", "ImageSInt16", "ImageInt16",
 				"int", "short", "short",
 				"int", "(short)", "", false);
-		printAllOps("I32", "ImageUInt8", "ImageUInt8",
+		printAllOps("I32", "ImageUInt8", "ImageInt8",
 				"int", "byte", "byte",
 				"int", "(byte)", "& 0xFF", true);
-		printAllOps("I32", "ImageSInt16", "ImageSInt16",
+		printAllOps("I32", "ImageSInt16", "ImageInt16",
 				"int", "short", "short",
 				"int", "(short)", "", true);
 		out.println("}");
@@ -70,6 +70,8 @@ public class GenerateConvolveStandard {
 				"import gecv.struct.image.ImageFloat32;\n" +
 				"import gecv.struct.image.ImageSInt32;\n" +
 				"import gecv.struct.image.ImageSInt16;\n" +
+				"import gecv.struct.image.ImageInt16;\n" +
+				"import gecv.struct.image.ImageInt8;\n" +
 				"import gecv.struct.image.ImageUInt8;\n");
 		out.println();
 		out.println();

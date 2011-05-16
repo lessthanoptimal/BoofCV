@@ -16,6 +16,8 @@
 
 package gecv.struct.image;
 
+import pja.geometry.struct.point.Point2D_I32;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 
@@ -243,6 +245,12 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 		ret.setTo(this);
 
 		return ret;
+	}
+
+	public Point2D_I32 indexToPixel( int index )
+	{
+		index -= startIndex;
+		return new Point2D_I32( index % stride , index / stride );
 	}
 
 	/**

@@ -43,10 +43,10 @@ public class GenerateConvolvedUnrolled {
 
 	public void createAll() throws FileNotFoundException {
 		createF32();
-		createI8_I8();
-		createI8_I16();
-		createI16_I16();
-		createI16_I16_div();
+		createU8_I8();
+		createU8_I16();
+		createS16_I16();
+		createS16_I16_div();
 	}
 
 	public void createF32() throws FileNotFoundException {
@@ -64,11 +64,11 @@ public class GenerateConvolvedUnrolled {
 		createFile();
 	}
 
-	public void createI8_I8() throws FileNotFoundException {
+	public void createU8_I8() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I8_I8_Div";
 		typeKernel = "I32";
 		typeInput = "ImageUInt8";
-		typeOutput = "ImageUInt8";
+		typeOutput = "ImageInt8";
 		dataKernel = "int";
 		dataInput = "byte";
 		dataOutput = "byte";
@@ -79,11 +79,11 @@ public class GenerateConvolvedUnrolled {
 		createFile();
 	}
 
-	public void createI8_I16() throws FileNotFoundException {
+	public void createU8_I16() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I8_I16";
 		typeKernel = "I32";
 		typeInput = "ImageUInt8";
-		typeOutput = "ImageSInt16";
+		typeOutput = "ImageInt16";
 		dataKernel = "int";
 		dataInput = "byte";
 		dataOutput = "short";
@@ -94,11 +94,11 @@ public class GenerateConvolvedUnrolled {
 		createFile();
 	}
 
-	public void createI16_I16() throws FileNotFoundException {
+	public void createS16_I16() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I16_I16";
 		typeKernel = "I32";
 		typeInput = "ImageSInt16";
-		typeOutput = "ImageSInt16";
+		typeOutput = "ImageInt16";
 		dataKernel = "int";
 		dataInput = "short";
 		dataOutput = "short";
@@ -109,11 +109,11 @@ public class GenerateConvolvedUnrolled {
 		createFile();
 	}
 
-	public void createI16_I16_div() throws FileNotFoundException {
+	public void createS16_I16_div() throws FileNotFoundException {
 		className = "ConvolveImageUnrolled_I16_I16_Div";
 		typeKernel = "I32";
 		typeInput = "ImageSInt16";
-		typeOutput = "ImageSInt16";
+		typeOutput = "ImageInt16";
 		dataKernel = "int";
 		dataInput = "short";
 		dataOutput = "short";
@@ -322,7 +322,7 @@ public class GenerateConvolvedUnrolled {
 	public void addConvolve(int num ) {
 		String typeCast = generateTypeCast();
 
-		out.print("\tpublic static void convolve" + num + "( Kernel2D_" + typeKernel + " kernel, " + typeInput + " src, " + typeOutput + " dest);\n");
+		out.print("\tpublic static void convolve" + num + "( Kernel2D_" + typeKernel + " kernel, " + typeInput + " src, " + typeOutput + " dest)\n");
 
 		out.print("\t{\n" +
 				"\t\tfinal " + dataInput + "[] dataSrc = src.data;\n" +

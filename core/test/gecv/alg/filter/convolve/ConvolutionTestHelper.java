@@ -18,8 +18,7 @@ package gecv.alg.filter.convolve;
 
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.*;
 
 /**
  * @author Peter Abeles
@@ -40,6 +39,14 @@ public class ConvolutionTestHelper {
 	 * Creates an image of the specified type
 	 */
 	public static ImageBase createImage(Class<?> imageType, int width, int height) {
+
+		// swap generic types with an arbitrary specific one
+		if( imageType == ImageInt8.class )
+			imageType = ImageUInt8.class;
+		else if( imageType == ImageInt16.class )
+			imageType = ImageSInt16.class;
+
+
 		try {
 			ImageBase img = (ImageBase) imageType.newInstance();
 			return img._createNew(width, height);

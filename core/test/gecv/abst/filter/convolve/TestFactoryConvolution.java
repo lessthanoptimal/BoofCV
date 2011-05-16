@@ -27,9 +27,7 @@ import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.*;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -95,13 +93,13 @@ public class TestFactoryConvolution {
 		ImageInitialization_I8.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
-		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageSInt16.class,BorderType.SKIP,true);
+		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.SKIP,true);
 		conv.process(input,found);
 		ConvolveImageNoBorder.horizontal(kernel,input,expected,false);
 		GecvTesting.assertEquals(expected,found,0);
 
 		// CHECK EXTENDED
-		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageSInt16.class,BorderType.EXTENDED,true);
+		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class, ImageInt16.class,BorderType.EXTENDED,true);
 		conv.process(input,found);
 		ConvolveExtended.horizontal(kernel,input,expected);
 		GecvTesting.assertEquals(expected,found,0);
@@ -109,7 +107,7 @@ public class TestFactoryConvolution {
 		// CHECK NORMALIZED
 		ImageUInt8 found8 = new ImageUInt8(width,height);
 		ImageUInt8 expected8 = new ImageUInt8(width,height);
-		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageUInt8.class,BorderType.NORMALIZED,true);
+		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class, ImageInt8.class,BorderType.NORMALIZED,true);
 		conv.process(input,found8);
 		ConvolveNormalized.horizontal(kernel,input,expected8);
 		GecvTesting.assertEquals(expected8,found8,0);
@@ -161,13 +159,13 @@ public class TestFactoryConvolution {
 		ImageInitialization_I8.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
-		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageSInt16.class,BorderType.SKIP);
+		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.SKIP);
 		conv.process(input,found);
 		ConvolveImageNoBorder.convolve(kernel,input,expected);
 		GecvTesting.assertEquals(expected,found,0);
 
 		// CHECK EXTENDED
-		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageSInt16.class,BorderType.EXTENDED);
+		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.EXTENDED);
 		conv.process(input,found);
 		ConvolveExtended.convolve(kernel,input,expected);
 		GecvTesting.assertEquals(expected,found,0);
