@@ -20,7 +20,7 @@ import gecv.alg.filter.convolve.ConvolutionTestHelper;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.core.image.GeneralizedImageOps;
-import gecv.struct.convolve.*;
+import gecv.struct.convolve.KernelBase;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.generalized.FactorySingleBandImage;
 import gecv.struct.image.generalized.SingleBandImage;
@@ -30,7 +30,6 @@ import org.junit.Test;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
@@ -44,10 +43,6 @@ public class TestConvolveDownNoBorderStandard {
 	static int height = 25;
 	static int kernelRadius = 2;
 	static int skip;
-
-	static Kernel1D_F32 kernelF32;
-	static Kernel1D_I32 kernelI32;
-	static float expectedOutput;
 
 	/**
 	 * Automatically compares all the box filters against a generalize convolution
