@@ -32,7 +32,16 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked"})
 public class GecvTesting {
+
+	public static <T>T convertToGenericType( Class<?> type ) {
+		if( type == ImageSInt8.class || type == ImageUInt8.class )
+			return (T)ImageInt8.class;
+		if( type == ImageSInt16.class || type == ImageUInt16.class )
+			return (T)ImageInt16.class;
+		return (T)type;
+	}
 
 	/**
 	 * Returns an image which is a sub-image but contains the same values of the input image.  Use for

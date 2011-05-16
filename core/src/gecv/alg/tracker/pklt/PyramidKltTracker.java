@@ -47,15 +47,6 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 		this.tracker = tracker;
 	}
 
-	/**
-	 * Does the tracker require image derivatives to be passed in?
-	 *
-	 * @return true if image derivatives are required.
-	 */
-	public boolean getRequiresDerivative() {
-		return tracker.getRequiresDerivative();
-	}
-
 	public void setDescription(PyramidKltFeature feature) {
 		float x = feature.x;
 		float y = feature.y;

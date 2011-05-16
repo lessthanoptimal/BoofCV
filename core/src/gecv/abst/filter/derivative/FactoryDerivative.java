@@ -37,7 +37,7 @@ public class FactoryDerivative {
 
 	public static ImageGradient<ImageFloat32,ImageFloat32> sobel_F32() {
 		Method m = findDerivative_F(GradientSobel.class);
-		return new ImageGradient_Reflection<ImageFloat32,ImageFloat32>(m,false);
+		return new ImageGradient_Reflection<ImageFloat32,ImageFloat32>(m,true);
 	}
 
 	public static ImageGradient<ImageFloat32,ImageFloat32> three_F32() {

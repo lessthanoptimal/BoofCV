@@ -110,15 +110,9 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 		spawned.clear();
 		pyramidUpdater.update(image);
 
-		boolean hasComputedGradient = false;
-
-		// See if the image derivative needs to be calculated
-		if( config.sequentialMode || tracker.getRequiresDerivative() ) {
-			hasComputedGradient = true;
-			computeGradient();
-		}
-
+		computeGradient();
 		tracker.setImage(pyramid,derivX,derivY);
+		
 		for( int i = 0; i < active.size(); ) {
 			PyramidKltFeature f = active.get(i);
 			KltTrackFault result = tracker.track(f);
@@ -127,21 +121,13 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 				unused.add(f);
 				active.remove(i);
 			} else {
-				// update the track's description
-				if( config.sequentialMode ) {
-					tracker.setDescription(f);
-				}
+				tracker.setDescription(f);
 				i++;
 			}
 		}
 
 		// if there are too few features spawn new ones
 		if( active.size() < config.minFeatures ) {
-			// if the gradient has not already been computed, compute it now
-			if( !hasComputedGradient  ) {
-				computeGradient();
-			}
-
 			int numBefore = active.size();
 			featureSelector.setInputs(pyramid,derivX,derivY);
 			featureSelector.compute(active,unused);

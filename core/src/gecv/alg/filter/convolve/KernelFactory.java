@@ -16,10 +16,7 @@
 
 package gecv.alg.filter.convolve;
 
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.convolve.*;
 import pja.stats.UtilGaussian;
 
 import java.util.Random;
@@ -37,7 +34,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach"})
+@SuppressWarnings({"ForLoopReplaceableByForEach", "unchecked"})
 public class KernelFactory {
 
 	/**
@@ -73,6 +70,32 @@ public class KernelFactory {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * Creates a random kernel of the specified type where each element is drawn from an uniform
+	 * distribution.
+	 *
+	 * @param type Class of the kernel which is to be created.
+	 * @param radius The kernel's radius.
+	 * @param min Min value.
+	 * @param max Max value.
+	 * @param rand Random number generator.
+	 * @return The generated kernel.
+	 */
+	public static <T extends KernelBase> T random( Class<?> type , int radius , int min , int max , Random rand )
+	{
+		if (Kernel1D_F32.class == type) {
+			return (T)KernelFactory.random1D_F32(radius, min, max, rand);
+		} else if (Kernel1D_I32.class == type) {
+			return (T)KernelFactory.random1D_I32(radius, min, max, rand);
+		} else if (Kernel2D_I32.class == type) {
+			return (T)KernelFactory.random2D_I32(radius, min, max, rand);
+		} else if (Kernel2D_F32.class == type) {
+			return (T)KernelFactory.random2D_F32(radius, min, max, rand);
+		} else {
+			throw new RuntimeException("Unknown kernel type");
+		}
 	}
 
 	/**
@@ -153,6 +176,29 @@ public class KernelFactory {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * Creates a Gaussian kernel of the specified type.
+	 *
+	 * @param type Class of the kernel which is to be created.
+	 * @param radius The kernel's radius.
+	 * @param normalize If applicable, should the kernel be normalized.
+	 * @return The generated kernel.
+	 */
+	public static <T extends KernelBase> T gaussian( Class<?> type , int radius , boolean normalize)
+	{
+		if (Kernel1D_F32.class == type) {
+			return (T)KernelFactory.gaussian1D_F32(radius,radius, normalize);
+		} else if (Kernel1D_I32.class == type) {
+			return (T)KernelFactory.gaussian1D_I32(radius, radius );
+		} else if (Kernel2D_I32.class == type) {
+			return (T)KernelFactory.gaussian2D_I32(radius, radius );
+		} else if (Kernel2D_F32.class == type) {
+			return (T)KernelFactory.gaussian2D_F32(radius, radius, normalize);
+		} else {
+			throw new RuntimeException("Unknown kernel type");
+		}
 	}
 
 	/**

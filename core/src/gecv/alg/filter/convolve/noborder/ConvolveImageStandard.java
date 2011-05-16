@@ -21,8 +21,10 @@ import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageSInt32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageInt16;
+import gecv.struct.image.ImageInt8;
 import gecv.struct.image.ImageUInt8;
 
 
@@ -41,8 +43,8 @@ import gecv.struct.image.ImageUInt8;
 public class ConvolveImageStandard {
 
 	public static void horizontal( Kernel1D_F32 kernel ,
-								   ImageFloat32 image, ImageFloat32 dest,
-								   boolean includeBorder) {
+								  ImageFloat32 image, ImageFloat32 dest,
+								  boolean includeBorder) {
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
 		final float[] dataKer = kernel.data;
@@ -134,7 +136,7 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageUInt8 image, ImageSInt16 dest,
+								  ImageUInt8 image, ImageInt16 dest,
 								  boolean includeBorder) {
 		final byte[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -165,7 +167,7 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageSInt16 dest,
+								 ImageUInt8 image, ImageInt16 dest,
 								 boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
@@ -199,7 +201,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , ImageUInt8 src , ImageSInt16 dest )
+	public static void convolve( Kernel2D_I32 kernel , ImageUInt8 src , ImageInt16 dest )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -320,7 +322,7 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageSInt16 image, ImageSInt16 dest,
+								  ImageSInt16 image, ImageInt16 dest,
 								  boolean includeBorder) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -351,7 +353,7 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageSInt16 dest,
+								 ImageSInt16 image, ImageInt16 dest,
 								 boolean includeBorder)
 	{
 		final short[] dataSrc = image.data;
@@ -385,7 +387,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , ImageSInt16 src , ImageSInt16 dest )
+	public static void convolve( Kernel2D_I32 kernel , ImageSInt16 src , ImageInt16 dest )
 	{
 		final int[] dataKernel = kernel.data;
 		final short[] dataSrc = src.data;
@@ -413,7 +415,7 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageUInt8 image, ImageUInt8 dest, int divisor,
+								  ImageUInt8 image, ImageInt8 dest, int divisor,
 								  boolean includeBorder) {
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -444,7 +446,7 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageUInt8 dest, int divisor,
+								 ImageUInt8 image, ImageInt8 dest, int divisor,
 								 boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
@@ -478,7 +480,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , ImageUInt8 src , ImageUInt8 dest , int divisor )
+	public static void convolve( Kernel2D_I32 kernel , ImageUInt8 src , ImageInt8 dest , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -506,7 +508,7 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageSInt16 image, ImageSInt16 dest, int divisor,
+								  ImageSInt16 image, ImageInt16 dest, int divisor,
 								  boolean includeBorder) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -537,7 +539,7 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageSInt16 dest, int divisor,
+								 ImageSInt16 image, ImageInt16 dest, int divisor,
 								 boolean includeBorder)
 	{
 		final short[] dataSrc = image.data;
@@ -571,7 +573,7 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve( Kernel2D_I32 kernel , ImageSInt16 src , ImageSInt16 dest , int divisor )
+	public static void convolve( Kernel2D_I32 kernel , ImageSInt16 src , ImageInt16 dest , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final short[] dataSrc = src.data;

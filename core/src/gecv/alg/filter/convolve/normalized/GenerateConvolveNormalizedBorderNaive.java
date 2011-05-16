@@ -38,9 +38,9 @@ public class GenerateConvolveNormalizedBorderNaive {
 
 	public void generate() {
 		printPreamble();
-		printAllOps("F32", "ImageFloat32","ImageFloat32","float","float",false);
-		printAllOps("I32", "ImageUInt8","ImageUInt8","int","int",true);
-		printAllOps("I32", "ImageSInt16","ImageSInt16","int","int",false);
+		printAllOps("F32", "ImageFloat32","ImageFloat32","float","float");
+		printAllOps("I32", "ImageUInt8","ImageInt8","int","int");
+		printAllOps("I32", "ImageSInt16","ImageInt16","int","int");
 		out.println("}");
 	}
 
@@ -50,9 +50,7 @@ public class GenerateConvolveNormalizedBorderNaive {
 				"\n" +
 				"import gecv.struct.convolve.Kernel1D_F32;\n" +
 				"import gecv.struct.convolve.Kernel1D_I32;\n" +
-				"import gecv.struct.image.ImageFloat32;\n" +
-				"import gecv.struct.image.ImageSInt16;\n" +
-				"import gecv.struct.image.ImageUInt8;\n" +
+				"import gecv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -68,16 +66,14 @@ public class GenerateConvolveNormalizedBorderNaive {
 	}
 
 	private void printAllOps( String kernelType , String inputType , String outputType ,
-							  String kernelData, String sumType, boolean isUnsigned )
+							  String kernelData, String sumType)
 	{
-		printHorizontal(kernelType,inputType,outputType,kernelData,sumType,isUnsigned);
-		printVertical(kernelType,inputType,outputType,kernelData,sumType,isUnsigned);
+		printHorizontal(kernelType,inputType,outputType,kernelData,sumType);
+		printVertical(kernelType,inputType,outputType,kernelData,sumType);
 	}
 
 	private void printHorizontal( String kernelType , String inputType , String outputType ,
-								  String kernelData, String sumType, boolean isUnsigned ) {
-		String stringGet = isUnsigned ? "getU" : "get";
-
+								  String kernelData, String sumType ) {
 		out.print("\tpublic static void horizontal(Kernel1D_"+kernelType+" kernel, "+inputType+" input, "+outputType+" output ) {\n" +
 				"\n" +
 				"\t\tfinal int radius = kernel.getRadius();\n" +
@@ -98,7 +94,7 @@ public class GenerateConvolveNormalizedBorderNaive {
 				"\n" +
 				"\t\t\t\tfor( int j = startX; j <= endX; j++ ) {\n" +
 				"\t\t\t\t\t"+kernelData+" v = kernel.get(j-x+radius);\n" +
-				"\t\t\t\t\ttotal += input."+stringGet+"(j,y)*v;\n" +
+				"\t\t\t\t\ttotal += input.get(j,y)*v;\n" +
 				"\t\t\t\t\tdiv += v;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\toutput.set(x,y, total/div );\n" +
@@ -108,8 +104,7 @@ public class GenerateConvolveNormalizedBorderNaive {
 	}
 
 	private void printVertical( String kernelType , String inputType , String outputType ,
-								  String kernelData, String sumType, boolean isUnsigned ) {
-		String stringGet = isUnsigned ? "getU" : "get";
+								  String kernelData, String sumType ) {
 
 		out.print("\tpublic static void vertical(Kernel1D_"+kernelType+" kernel, "+inputType+" input, "+outputType+" output ) {\n" +
 				"\n" +
@@ -131,7 +126,7 @@ public class GenerateConvolveNormalizedBorderNaive {
 				"\n" +
 				"\t\t\t\tfor( int i = startY; i <= endY; i++ ) {\n" +
 				"\t\t\t\t\t"+kernelData+" v = kernel.get(i-y+radius);\n" +
-				"\t\t\t\t\ttotal += input."+stringGet+"(x,i)*v;\n" +
+				"\t\t\t\t\ttotal += input.get(x,i)*v;\n" +
 				"\t\t\t\t\tdiv += v;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\toutput.set(x,y, total/div );\n" +

@@ -22,7 +22,8 @@ import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.convolve.Kernel2D;
-import gecv.struct.image.ImageBase;
+import gecv.struct.image.*;
+import gecv.testing.GecvTesting;
 
 import java.lang.reflect.Method;
 
@@ -30,6 +31,7 @@ import java.lang.reflect.Method;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked"})
 public class FactoryConvolution {
 
 	/**
@@ -45,6 +47,8 @@ public class FactoryConvolution {
 	FilterInterface<Input,Output>
 	convolve( Kernel1D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border , boolean isHorizontal )
 	{
+		outputType = GecvTesting.convertToGenericType(outputType);
+
 		String direction = isHorizontal ? "horizontal" : "vertical";
 		Method m;
 		try {
@@ -88,6 +92,8 @@ public class FactoryConvolution {
 	FilterInterface<Input,Output>
 	convolve( Kernel2D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border )
 	{
+		outputType = GecvTesting.convertToGenericType(outputType);
+
 		Method m;
 		try {
 			switch( border ) {

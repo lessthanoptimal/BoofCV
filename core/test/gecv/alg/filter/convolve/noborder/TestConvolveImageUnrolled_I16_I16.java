@@ -19,6 +19,7 @@ package gecv.alg.filter.convolve.noborder;
 import gecv.alg.filter.convolve.CompareToStandardConvolution;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.image.ImageInt16;
 import gecv.struct.image.ImageSInt16;
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ public class TestConvolveImageUnrolled_I16_I16 {
 	public void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_I16_I16.class.getMethod("convolve",
-					Kernel2D_I32.class, ImageSInt16.class, ImageSInt16.class );
+					Kernel2D_I32.class, ImageSInt16.class, ImageInt16.class );
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
 		}
@@ -45,7 +46,7 @@ public class TestConvolveImageUnrolled_I16_I16 {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_I16_I16.class.getMethod("horizontal",
-					Kernel1D_I32.class, ImageSInt16.class, ImageSInt16.class, boolean.class);
+					Kernel1D_I32.class, ImageSInt16.class, ImageInt16.class, boolean.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
@@ -56,7 +57,7 @@ public class TestConvolveImageUnrolled_I16_I16 {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_I16_I16.class.getMethod("vertical",
-					Kernel1D_I32.class, ImageSInt16.class, ImageSInt16.class, boolean.class);
+					Kernel1D_I32.class, ImageSInt16.class, ImageInt16.class, boolean.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

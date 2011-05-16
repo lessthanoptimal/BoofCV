@@ -27,7 +27,12 @@ import pja.geometry.struct.point.UtilPoint2D;
  * across a sequence of images by having each feature individually follow the image's gradient.  Feature locations
  * are estimated to within sub-pixel accuracy.
  * </p>
- * <p/>
+ *
+ * <p>
+ * For this particular implementation of KLT image derivatives only need to be computed when setDescription() is called.
+ * Tracker will degrade if features change orientation, but can be significantly faster.
+ * </p>
+ *
  * <p>
  * Citations:<br>
  * <br>
@@ -55,21 +60,19 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 	protected InterpolateRectangle<DerivativeImage> interpDeriv;
 
 	// tracker configuration
-	KltConfig config;
+	protected KltConfig config;
 
 	// feature description curvature information
-	float Gxx, Gyy, Gxy;
+	protected float Gxx, Gyy, Gxy;
 	// residual times the gradient
-	float Ex, Ey;
-	// residual error
-	float error;
+	protected float Ex, Ey;
 
 	// width of the feature
-	int widthFeature;
+	protected int widthFeature;
 	// length of the feature description
-	int lengthFeature;
+	protected int lengthFeature;
 	// the feature in the current image
-	float descFeature[];
+	protected float descFeature[];
 
 	// allowed feature bounds
 	float allowedLeft;
@@ -86,9 +89,7 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 	}
 
 	/**
-	 * Sets the current image it should be tracking with.  In some situations the image derivative might not be set.
-	 * If {@link #setDescription(KltFeature)} is used they must always be set.  Otherwise {@link #getRequiresDerivative()}
-	 * can be called to see.
+	 * Sets the current image it should be tracking with.
 	 *
 	 * @param image  Original input image.
 	 * @param derivX Image derivative along the x-axis
@@ -103,15 +104,6 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 
 		this.derivX = derivX;
 		this.derivY = derivY;
-	}
-
-	/**
-	 * Does the tracker require image derivatives to be passed in?
-	 *
-	 * @return true if image derivatives are required.
-	 */
-	public boolean getRequiresDerivative() {
-		return false;
 	}
 
 	/**
@@ -211,6 +203,7 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 					|| Math.abs(feature.y - origY) > widthFeature)
 				return KltTrackFault.DRIFTED;
 
+			// see if it has converged to a solution
 			if (Math.abs(dx) < config.minPositionDelta && Math.abs(dy) < config.minPositionDelta) {
 				break;
 			}
@@ -244,7 +237,6 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 
 		Ex = 0;
 		Ey = 0;
-		error = 0;
 		for (int i = 0; i < lengthFeature; i++) {
 			// compute the difference between the previous and the current image
 			float d = feature.pixel[i] - descFeature[i];

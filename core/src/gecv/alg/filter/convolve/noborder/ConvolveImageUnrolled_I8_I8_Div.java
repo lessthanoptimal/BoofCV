@@ -19,6 +19,7 @@ package gecv.alg.filter.convolve.noborder;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageInt8;
 
 /**
  * <p>
@@ -39,7 +40,7 @@ import gecv.struct.image.ImageUInt8;
  */
 public class ConvolveImageUnrolled_I8_I8_Div {
 	public static boolean horizontal( Kernel1D_I32 kernel ,
-								   ImageUInt8 image, ImageUInt8 dest,
+								   ImageUInt8 image, ImageInt8 dest,
 								   int divisor, boolean includeBorder) {
 		switch( kernel.width ) {
 			case 3:
@@ -69,7 +70,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static boolean vertical( Kernel1D_I32 kernel ,
-								   ImageUInt8 image, ImageUInt8 dest,
+								   ImageUInt8 image, ImageInt8 dest,
 								   int divisor, boolean includeBorder) {
 		switch( kernel.width ) {
 			case 3:
@@ -99,7 +100,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static boolean convolve( Kernel2D_I32 kernel ,
-								   ImageUInt8 image, ImageUInt8 dest, int divisor ) {
+								   ImageUInt8 image, ImageInt8 dest, int divisor ) {
 		switch( kernel.width ) {
 			case 3:
 				convolve3(kernel,image,dest,divisor);
@@ -128,7 +129,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void horizontal3( Kernel1D_I32 kernel ,
-									ImageUInt8 image, ImageUInt8 dest,
+									ImageUInt8 image, ImageInt8 dest,
 									int divisor, boolean includeBorder) {
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -161,7 +162,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void horizontal5( Kernel1D_I32 kernel ,
-									ImageUInt8 image, ImageUInt8 dest,
+									ImageUInt8 image, ImageInt8 dest,
 									int divisor, boolean includeBorder) {
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -198,7 +199,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void horizontal7( Kernel1D_I32 kernel ,
-									ImageUInt8 image, ImageUInt8 dest,
+									ImageUInt8 image, ImageInt8 dest,
 									int divisor, boolean includeBorder) {
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -239,7 +240,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void horizontal9( Kernel1D_I32 kernel ,
-									ImageUInt8 image, ImageUInt8 dest,
+									ImageUInt8 image, ImageInt8 dest,
 									int divisor, boolean includeBorder) {
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -284,7 +285,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void horizontal11( Kernel1D_I32 kernel ,
-									ImageUInt8 image, ImageUInt8 dest,
+									ImageUInt8 image, ImageInt8 dest,
 									int divisor, boolean includeBorder) {
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -333,7 +334,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void vertical3( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageUInt8 dest,
+								 ImageUInt8 image, ImageInt8 dest,
 								 int divisor , boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
@@ -372,7 +373,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void vertical5( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageUInt8 dest,
+								 ImageUInt8 image, ImageInt8 dest,
 								 int divisor , boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
@@ -417,7 +418,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void vertical7( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageUInt8 dest,
+								 ImageUInt8 image, ImageInt8 dest,
 								 int divisor , boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
@@ -468,7 +469,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void vertical9( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageUInt8 dest,
+								 ImageUInt8 image, ImageInt8 dest,
 								 int divisor , boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
@@ -525,7 +526,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void vertical11( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageUInt8 dest,
+								 ImageUInt8 image, ImageInt8 dest,
 								 int divisor , boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
@@ -587,7 +588,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 		}
 	}
 
-	public static void convolve3( Kernel2D_I32 kernel, ImageUInt8 src, ImageUInt8 dest , int divisor )
+	public static void convolve3( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
 	{
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
@@ -643,7 +644,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 		}
 	}
 
-	public static void convolve5( Kernel2D_I32 kernel, ImageUInt8 src, ImageUInt8 dest , int divisor )
+	public static void convolve5( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
 	{
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
@@ -707,7 +708,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 		}
 	}
 
-	public static void convolve7( Kernel2D_I32 kernel, ImageUInt8 src, ImageUInt8 dest , int divisor )
+	public static void convolve7( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
 	{
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
@@ -779,7 +780,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 		}
 	}
 
-	public static void convolve9( Kernel2D_I32 kernel, ImageUInt8 src, ImageUInt8 dest , int divisor )
+	public static void convolve9( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
 	{
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
@@ -859,7 +860,7 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 		}
 	}
 
-	public static void convolve11( Kernel2D_I32 kernel, ImageUInt8 src, ImageUInt8 dest , int divisor )
+	public static void convolve11( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
 	{
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;

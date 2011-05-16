@@ -19,6 +19,7 @@ package gecv.alg.filter.convolve.noborder;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageInt16;
 
 /**
  * <p>
@@ -39,7 +40,7 @@ import gecv.struct.image.ImageSInt16;
  */
 public class ConvolveImageUnrolled_I16_I16 {
 	public static boolean horizontal( Kernel1D_I32 kernel ,
-								   ImageSInt16 image, ImageSInt16 dest,
+								   ImageSInt16 image, ImageInt16 dest,
 								   boolean includeBorder) {
 		switch( kernel.width ) {
 			case 3:
@@ -69,7 +70,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static boolean vertical( Kernel1D_I32 kernel ,
-								   ImageSInt16 image, ImageSInt16 dest,
+								   ImageSInt16 image, ImageInt16 dest,
 								   boolean includeBorder) {
 		switch( kernel.width ) {
 			case 3:
@@ -99,7 +100,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static boolean convolve( Kernel2D_I32 kernel ,
-								   ImageSInt16 image, ImageSInt16 dest) {
+								   ImageSInt16 image, ImageInt16 dest) {
 		switch( kernel.width ) {
 			case 3:
 				convolve3(kernel,image,dest);
@@ -128,7 +129,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static void horizontal3( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageSInt16 dest,
+									ImageSInt16 image, ImageInt16 dest,
 									boolean includeBorder) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -161,7 +162,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static void horizontal5( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageSInt16 dest,
+									ImageSInt16 image, ImageInt16 dest,
 									boolean includeBorder) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -198,7 +199,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static void horizontal7( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageSInt16 dest,
+									ImageSInt16 image, ImageInt16 dest,
 									boolean includeBorder) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -239,7 +240,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static void horizontal9( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageSInt16 dest,
+									ImageSInt16 image, ImageInt16 dest,
 									boolean includeBorder) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -284,7 +285,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static void horizontal11( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageSInt16 dest,
+									ImageSInt16 image, ImageInt16 dest,
 									boolean includeBorder) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -333,7 +334,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static void vertical3( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageSInt16 dest,
+								 ImageSInt16 image, ImageInt16 dest,
 								 boolean includeBorder)
 	{
 		final short[] dataSrc = image.data;
@@ -372,7 +373,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static void vertical5( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageSInt16 dest,
+								 ImageSInt16 image, ImageInt16 dest,
 								 boolean includeBorder)
 	{
 		final short[] dataSrc = image.data;
@@ -417,7 +418,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static void vertical7( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageSInt16 dest,
+								 ImageSInt16 image, ImageInt16 dest,
 								 boolean includeBorder)
 	{
 		final short[] dataSrc = image.data;
@@ -468,7 +469,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static void vertical9( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageSInt16 dest,
+								 ImageSInt16 image, ImageInt16 dest,
 								 boolean includeBorder)
 	{
 		final short[] dataSrc = image.data;
@@ -525,7 +526,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 	}
 
 	public static void vertical11( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageSInt16 dest,
+								 ImageSInt16 image, ImageInt16 dest,
 								 boolean includeBorder)
 	{
 		final short[] dataSrc = image.data;
@@ -587,7 +588,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 		}
 	}
 
-	public static void convolve3( Kernel2D_I32 kernel, ImageSInt16 src, ImageSInt16 dest)
+	public static void convolve3( Kernel2D_I32 kernel, ImageSInt16 src, ImageInt16 dest)
 	{
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
@@ -640,7 +641,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 		}
 	}
 
-	public static void convolve5( Kernel2D_I32 kernel, ImageSInt16 src, ImageSInt16 dest)
+	public static void convolve5( Kernel2D_I32 kernel, ImageSInt16 src, ImageInt16 dest)
 	{
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
@@ -701,7 +702,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 		}
 	}
 
-	public static void convolve7( Kernel2D_I32 kernel, ImageSInt16 src, ImageSInt16 dest)
+	public static void convolve7( Kernel2D_I32 kernel, ImageSInt16 src, ImageInt16 dest)
 	{
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
@@ -770,7 +771,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 		}
 	}
 
-	public static void convolve9( Kernel2D_I32 kernel, ImageSInt16 src, ImageSInt16 dest)
+	public static void convolve9( Kernel2D_I32 kernel, ImageSInt16 src, ImageInt16 dest)
 	{
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
@@ -847,7 +848,7 @@ public class ConvolveImageUnrolled_I16_I16 {
 		}
 	}
 
-	public static void convolve11( Kernel2D_I32 kernel, ImageSInt16 src, ImageSInt16 dest)
+	public static void convolve11( Kernel2D_I32 kernel, ImageSInt16 src, ImageInt16 dest)
 	{
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;

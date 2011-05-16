@@ -20,10 +20,7 @@ import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.noborder.ConvolveBox_F32_F32;
 import gecv.alg.filter.convolve.noborder.ConvolveBox_I8_I16;
 import gecv.alg.filter.convolve.noborder.ConvolveBox_I8_I32;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageSInt32;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.*;
 
 /**
  * Convolves a kernel which is composed entirely of 1's across an image.  This special kernel can be highly optimized
@@ -55,7 +52,7 @@ public class ConvolveBoxImage {
 	 * @param radius Kernel size.
 	 * @param includeBorder Should the vertical border of the image be processed?
 	 */
-	public static void horizontal(ImageUInt8 input, ImageSInt16 output, int radius, boolean includeBorder) {
+	public static void horizontal(ImageUInt8 input, ImageInt16 output, int radius, boolean includeBorder) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		ConvolveBox_I8_I16.horizontal(input, output, radius, includeBorder);
@@ -97,7 +94,7 @@ public class ConvolveBoxImage {
 	 * @param radius Kernel size.
 	 * @param includeBorder Should the horizontal border of the image be processed?
 	 */
-	public static void vertical(ImageUInt8 input, ImageSInt16 output, int radius, boolean includeBorder) {
+	public static void vertical(ImageUInt8 input, ImageInt16 output, int radius, boolean includeBorder) {
 		InputSanityCheck.checkSameShape(input , output);
 		
 		ConvolveBox_I8_I16.vertical(input, output, radius, includeBorder);
