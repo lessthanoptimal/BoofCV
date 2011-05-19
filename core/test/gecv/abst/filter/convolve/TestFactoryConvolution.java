@@ -33,8 +33,6 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.fail;
-
 
 /**
  * @author Peter Abeles
@@ -50,7 +48,7 @@ public class TestFactoryConvolution {
 
 	@Test
 	public void convolve1D_F32() {
-		Kernel1D_F32 kernel = KernelFactory.random1D_F32(radius,0,5,rand);
+		Kernel1D_F32 kernel = KernelFactory.random1D_F32(radius,1,6,rand);
 
 		FilterInterface<ImageFloat32,ImageFloat32> conv;
 
@@ -82,7 +80,7 @@ public class TestFactoryConvolution {
 	@Test
 	public void convolve1D_I32() {
 
-		Kernel1D_I32 kernel = KernelFactory.random1D_I32(radius,0,5,rand);
+		Kernel1D_I32 kernel = KernelFactory.random1D_I32(radius,1,6,rand);
 
 		FilterInterface conv;
 
@@ -115,7 +113,7 @@ public class TestFactoryConvolution {
 
 	@Test
 	public void convolve2D_F32() {
-		Kernel2D_F32 kernel = KernelFactory.random2D_F32(radius,0,5,rand);
+		Kernel2D_F32 kernel = KernelFactory.random2D_F32(radius,1,6,rand);
 
 		FilterInterface<ImageFloat32,ImageFloat32> conv;
 
@@ -138,17 +136,16 @@ public class TestFactoryConvolution {
 		GecvTesting.assertEquals(expected,found,0,1e-4f);
 
 		// CHECK NORMALIZED
-//		conv = FactoryConvolution.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.NORMALIZED);
-//		conv.process(input,found);
-//		ConvolveNormalized.convolve(kernel,input,expected);
-//		GecvTesting.assertEquals(expected,found,0,1e-4f);
-		fail("Add renormalizing 2D kernels");
+		conv = FactoryConvolution.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.NORMALIZED);
+		conv.process(input,found);
+		ConvolveNormalized.convolve(kernel,input,expected);
+		GecvTesting.assertEquals(expected,found,0,1e-4f);
 	}
 
 	@Test
 	public void convolve2D_I32() {
 
-		Kernel2D_I32 kernel = KernelFactory.random2D_I32(radius,0,5,rand);
+		Kernel2D_I32 kernel = KernelFactory.random2D_I32(radius,1,6,rand);
 
 		FilterInterface conv;
 
@@ -171,12 +168,11 @@ public class TestFactoryConvolution {
 		GecvTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED
-//		ImageUInt8 found8 = new ImageUInt8(width,height);
-//		ImageUInt8 expected8 = new ImageUInt8(width,height);
-//		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageUInt8.class,BorderType.NORMALIZED);
-//		conv.process(input,found8);
-//		ConvolveNormalized.convolve(kernel,input,expected8);
-//		GecvTesting.assertEquals(expected8,found8,0);
-		fail("Add renormalizing 2D kernels");
+		ImageUInt8 found8 = new ImageUInt8(width,height);
+		ImageUInt8 expected8 = new ImageUInt8(width,height);
+		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageUInt8.class,BorderType.NORMALIZED);
+		conv.process(input,found8);
+		ConvolveNormalized.convolve(kernel,input,expected8);
+		GecvTesting.assertEquals(expected8,found8,0);
 	}
 }

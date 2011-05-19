@@ -32,6 +32,11 @@ public abstract class CompareEquivalentFunctions {
 	// class being validated
 	Class<?> validationClass;
 
+	// the method being tested
+	protected Method methodTest;
+	// the method being used to validate the test
+	protected Method methodValidation;
+
 	protected CompareEquivalentFunctions(Class<?> testClass, Class<?> validationClass) {
 		this.testClass = testClass;
 		this.validationClass = validationClass;
@@ -86,6 +91,10 @@ public abstract class CompareEquivalentFunctions {
 	}
 
 	private void compareMethods( Method target , Method validation ) {
+
+		methodTest = target;
+		methodValidation = validation;
+
 		Object [][]targetParamArray = createInputParam(target,validation);
 
 		for( int i = 0; i < targetParamArray.length; i++  ) {

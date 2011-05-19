@@ -20,10 +20,6 @@ import gecv.alg.filter.convolve.ConvolutionTestHelper;
 import gecv.alg.filter.convolve.ConvolveDownNoBorder;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.core.image.GeneralizedImageOps;
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageBase;
 import gecv.testing.CompareIdenticalFunctions;
 
@@ -35,7 +31,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class CompareToStandardConvolveDown extends CompareIdenticalFunctions
+public class CompareToStandardConvolveDownNoBorder extends CompareIdenticalFunctions
 {
 	protected Random rand = new Random(0xFF);
 
@@ -44,7 +40,7 @@ public class CompareToStandardConvolveDown extends CompareIdenticalFunctions
 	protected int kernelRadius = 1;
 	protected int skip = 2;
 
-	public CompareToStandardConvolveDown( Class<?> targetClass ) {
+	public CompareToStandardConvolveDownNoBorder( Class<?> targetClass ) {
 		super(targetClass, ConvolveDownNoBorderStandard.class);
 	}
 
@@ -53,26 +49,37 @@ public class CompareToStandardConvolveDown extends CompareIdenticalFunctions
 		super.compareMethod(target,validationName);
 	}
 
+	public void setImageDimention( int width , int height ) {
+		this.width = width;
+		this.height = height;
+	}
+
+	public void setKernelRadius(int kernelRadius) {
+		this.kernelRadius = kernelRadius;
+	}
+
+	public void setSkip(int skip) {
+		this.skip = skip;
+	}
+
 	@Override
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		Object kernel;
-		if (Kernel1D_F32.class == paramTypes[0]) {
-			kernel = KernelFactory.random1D_F32(kernelRadius, -1, 1, rand);
-		} else if (Kernel1D_I32.class == paramTypes[0]) {
-			kernel = KernelFactory.random1D_I32(kernelRadius, 0, 5, rand);
-		} else if (Kernel2D_I32.class == paramTypes[0]) {
-			kernel = KernelFactory.random2D_I32(kernelRadius, -1, 1, rand);
-		} else if (Kernel2D_F32.class == paramTypes[0]) {
-			kernel = KernelFactory.random2D_F32(kernelRadius, 0, 5, rand);
+		Object kernel = KernelFactory.random(paramTypes[0],kernelRadius,0,10,rand);
+
+		int divW,divH;
+		if( candidate.getName().compareTo("horizontal") == 0) {
+			divW = skip; divH = 1;
+		} else if( candidate.getName().compareTo("vertical") == 0) {
+			divW = 1; divH = skip;
 		} else {
-			throw new RuntimeException("Unknown kernel type");
+			divW = divH = skip;
 		}
 
 		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 		GeneralizedImageOps.randomize(src, 0, 130, rand);
-		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
+		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
 
 		Object[][] ret = new Object[1][paramTypes.length];
 		ret[0][0] = kernel;

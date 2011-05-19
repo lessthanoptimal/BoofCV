@@ -97,4 +97,13 @@ public class Kernel2D_I32 extends Kernel2D {
 	public int get(int x, int y) {
 		return data[y * width + x];
 	}
+
+	public int computeSum() {
+		int N = width*width;
+		int total = 0;
+		for( int i = 0; i < N; i++ ) {
+			total += data[i];
+		}
+		return total;
+	}
 }

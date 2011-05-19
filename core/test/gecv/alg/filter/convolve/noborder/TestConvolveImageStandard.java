@@ -16,11 +16,10 @@
 
 package gecv.alg.filter.convolve.noborder;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
-import gecv.alg.drawing.impl.ImageInitialization_I16;
-import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.alg.filter.convolve.KernelFactory;
-import gecv.struct.image.*;
+import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.convolve.KernelBase;
+import gecv.struct.image.ImageBase;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -32,8 +31,7 @@ import java.util.Random;
 
 import static gecv.core.image.GeneralizedImageOps.get;
 import static gecv.core.image.GeneralizedImageOps.isFloatingPoint;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * To reduce the amount of code reflects are heavily used.  If any more functions are added reflections should be
@@ -50,143 +48,74 @@ public class TestConvolveImageStandard {
 	int height = 5;
 	int kernelRadius = 1;
 
+	/**
+	 * Using reflections get a list of all the functions and test each of them
+	 */
 	@Test
-	public void horizontal_F32() {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageInitialization_F32.randomize(img, rand, 0, 1);
-		ImageFloat32 dest = new ImageFloat32(width, height);
+	public void checkAll() {
+		int numExpected = 18;
+		Method methods[] = ConvolveImageStandard.class.getMethods();
 
-		GecvTesting.checkSubImage(this, "horizontal", true, img, dest);
+		// sanity check to make sure the functions are being found
+		int numFound = 0;
+		for (Method m : methods) {
+			if( !isTestMethod(m))
+				continue;
+
+			System.out.println("Testing "+m.getName());
+			testMethod(m);
+			numFound++;
+		}
+
+		// update this as needed when new functions are added
+		if(numExpected != numFound)
+			throw new RuntimeException("Unexpected number of methods: Found "+numFound+"  expected "+numExpected);
 	}
 
-	@Test
-	public void horizontal_I8() {
-		ImageUInt8 img = new ImageUInt8(width, height);
-		ImageInitialization_I8.randomize(img, rand);
-		ImageSInt16 dest = new ImageSInt16(width, height);
+	private boolean isTestMethod(Method m ) {
 
-		GecvTesting.checkSubImage(this, "horizontal", true, img, dest);
+		Class<?> param[] = m.getParameterTypes();
+
+		if( param.length < 3 )
+			return false;
+
+		return KernelBase.class.isAssignableFrom(param[0]);
 	}
 
-	@Test
-	public void horizontal_I8_div() {
-		ImageUInt8 img = new ImageUInt8(width, height);
-		ImageInitialization_I8.randomize(img, rand);
-		ImageUInt8 dest = new ImageUInt8(width, height);
+	/**
+	 * Using the method's name and the number of parameters invoke the appropriate test function
+	 */
+	private void testMethod( Method m ) {
+		Class<?> param[] = m.getParameterTypes();
 
-		GecvTesting.checkSubImage(this, "horizontalDiv", true, img, dest);
+		ImageBase input = GecvTesting.createImage(param[1],width,height);
+		ImageBase output = GecvTesting.createImage(param[2],width,height);
+
+		GeneralizedImageOps.randomize(input,1,10,rand);
+
+		if( m.getName().contentEquals("horizontal")) {
+			if( param.length == 4 ) {
+				GecvTesting.checkSubImage(this, "horizontal", true, input, output);
+			} else {
+				GecvTesting.checkSubImage(this, "horizontalDiv", true, input, output);
+			}
+		} else if( m.getName().contentEquals("vertical")) {
+			if( param.length == 4 ) {
+				GecvTesting.checkSubImage(this, "vertical", true, input, output);
+			} else {
+				GecvTesting.checkSubImage(this, "verticalDiv", true, input, output);
+			}
+		} else if( m.getName().contentEquals("convolve")) {
+			if( param.length == 3 ) {
+				GecvTesting.checkSubImage(this, "convolve", true, input, output);
+			} else {
+				GecvTesting.checkSubImage(this, "convolveDiv", true, input, output);
+			}
+		} else {
+			fail("Unknown method name: "+m.getName());
+		}
 	}
 
-	@Test
-	public void horizontal_I16() {
-		ImageSInt16 img = new ImageSInt16(width, height);
-		ImageInitialization_I16.randomize(img, rand, (short) 0, (short) 100);
-		ImageSInt16 dest = new ImageSInt16(width, height);
-
-		GecvTesting.checkSubImage(this, "horizontal", true, img, dest);
-	}
-
-	@Test
-	public void horizontal_I16_div() {
-		ImageSInt16 img = new ImageSInt16(width, height);
-		ImageInitialization_I16.randomize(img, rand, (short) 0, (short) 100);
-		ImageSInt16 dest = new ImageSInt16(width, height);
-
-		GecvTesting.checkSubImage(this, "horizontalDiv", true, img, dest);
-	}
-
-	@Test
-	public void vertical_F32() {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageInitialization_F32.randomize(img, rand, 0, 1);
-		ImageFloat32 dest = new ImageFloat32(width, height);
-
-		GecvTesting.checkSubImage(this, "vertical", true, img, dest);
-	}
-
-	@Test
-	public void vertical_I8() {
-		ImageUInt8 img = new ImageUInt8(width, height);
-		ImageInitialization_I8.randomize(img, rand);
-		ImageSInt16 dest = new ImageSInt16(width, height);
-
-		GecvTesting.checkSubImage(this, "vertical", true, img, dest);
-	}
-
-	@Test
-	public void vertical_I8_div() {
-		ImageUInt8 img = new ImageUInt8(width, height);
-		ImageInitialization_I8.randomize(img, rand);
-		ImageUInt8 dest = new ImageUInt8(width, height);
-
-		GecvTesting.checkSubImage(this, "verticalDiv", true, img, dest);
-	}
-
-	@Test
-	public void vertical_I16() {
-		ImageSInt16 img = new ImageSInt16(width, height);
-		ImageInitialization_I16.randomize(img, rand, (short) 0, (short) 100);
-		ImageSInt16 dest = new ImageSInt16(width, height);
-
-		GecvTesting.checkSubImage(this, "vertical", true, img, dest);
-	}
-
-	@Test
-	public void vertical_I16_div() {
-		ImageSInt16 img = new ImageSInt16(width, height);
-		ImageInitialization_I16.randomize(img, rand, (short) 0, (short) 100);
-		ImageSInt16 dest = new ImageSInt16(width, height);
-
-		GecvTesting.checkSubImage(this, "verticalDiv", true, img, dest);
-	}
-
-	@Test
-	public void convolve_F32() {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageInitialization_F32.randomize(img, rand, 0, 1);
-		ImageFloat32 dest = new ImageFloat32(width, height);
-		GecvTesting.checkSubImage(this, "convolve", true, img, dest);
-	}
-
-	@Test
-	public void convolve_I8() {
-		ImageUInt8 img = new ImageUInt8(width, height);
-		ImageInitialization_I8.randomize(img, rand);
-		ImageSInt16 dest = new ImageSInt16(width, height);
-		GecvTesting.checkSubImage(this, "convolve", true, img, dest);
-	}
-
-	@Test
-	public void convolve_I8_I32() {
-		ImageUInt8 img = new ImageUInt8(width, height);
-		ImageInitialization_I8.randomize(img, rand);
-		ImageSInt32 dest = new ImageSInt32(width, height);
-		GecvTesting.checkSubImage(this, "convolve", true, img, dest);
-	}
-
-	@Test
-	public void convolve_I8_div() {
-		ImageUInt8 img = new ImageUInt8(width, height);
-		ImageInitialization_I8.randomize(img, rand, 0, 50);
-		ImageUInt8 dest = new ImageUInt8(width, height);
-		GecvTesting.checkSubImage(this, "convolveDiv", true, img, dest);
-	}
-
-	@Test
-	public void convolve_I16() {
-		ImageSInt16 img = new ImageSInt16(width, height);
-		ImageInitialization_I16.randomize(img, rand, 0, 100);
-		ImageSInt16 dest = new ImageSInt16(width, height);
-		GecvTesting.checkSubImage(this, "convolve", true, img, dest);
-	}
-
-	@Test
-	public void convolve_I16_div() {
-		ImageSInt16 img = new ImageSInt16(width, height);
-		ImageInitialization_I16.randomize(img, rand, 0, 100);
-		ImageSInt16 dest = new ImageSInt16(width, height);
-		GecvTesting.checkSubImage(this, "convolveDiv", true, img, dest);
-	}
 
 	/**
 	 * Unit test for horizontal convolution.
@@ -198,7 +127,7 @@ public class TestConvolveImageStandard {
 		else
 			ker = KernelFactory.gaussian1D_I32(kernelRadius);
 
-		convolve1D("horizontal", ker, img, dest, false);
+		invokeMethod("horizontal", ker, img, dest, false);
 		// the top border should not be convolved yet
 		assertEquals(0, get(dest, 1, 0), 1e-6);
 
@@ -208,7 +137,7 @@ public class TestConvolveImageStandard {
 		assertEquals(val, get(dest, 1, 1), 1e-6);
 
 		// now let it process the vertical border
-		convolve1D("horizontal", ker, img, dest, true);
+		invokeMethod("horizontal", ker, img, dest, true);
 		assertEquals(val, get(dest, 1, 1), 1e-6);
 		assertTrue(0 != get(dest, 1, 0));
 	}
@@ -224,7 +153,7 @@ public class TestConvolveImageStandard {
 		else
 			ker = KernelFactory.gaussian1D_I32(kernelRadius);
 
-		convolve1D("horizontal", ker, img, dest, divisor, false);
+		invokeMethod("horizontal", ker, img, dest, divisor, false);
 		// the top border should not be convolved yet
 		assertEquals(0, get(dest, 1, 0), 1e-6);
 
@@ -236,7 +165,7 @@ public class TestConvolveImageStandard {
 		assertEquals(val, get(dest, 1, 1), 1e-6);
 
 		// now let it process the vertical border
-		convolve1D("horizontal", ker, img, dest, divisor, true);
+		invokeMethod("horizontal", ker, img, dest, divisor, true);
 		assertEquals(val, get(dest, 1, 1), 1e-6);
 		assertTrue(0 != get(dest, 1, 0));
 	}
@@ -251,7 +180,7 @@ public class TestConvolveImageStandard {
 		else
 			ker = KernelFactory.gaussian1D_I32(kernelRadius);
 
-		convolve1D("vertical", ker, img, dest, false);
+		invokeMethod("vertical", ker, img, dest, false);
 
 		// the left border should not be convolved yet
 		assertEquals(0, get(dest, 0, 1), 1e-6);
@@ -261,7 +190,7 @@ public class TestConvolveImageStandard {
 		assertEquals(val, get(dest, 1, 1), 1e-6);
 
 		// now let it process the vertical border
-		convolve1D("vertical", ker, img, dest, true);
+		invokeMethod("vertical", ker, img, dest, true);
 		assertEquals(val, get(dest, 1, 1), 1e-6);
 		assertTrue(0 != get(dest, 0, 1));
 	}
@@ -277,7 +206,7 @@ public class TestConvolveImageStandard {
 			ker = KernelFactory.gaussian1D_I32(kernelRadius);
 
 		int divisor = 11;
-		convolve1D("vertical", ker, img, dest, divisor, false);
+		invokeMethod("vertical", ker, img, dest, divisor, false);
 
 		// the left border should not be convolved yet
 		assertEquals(0, get(dest, 0, 1), 1e-6);
@@ -288,8 +217,8 @@ public class TestConvolveImageStandard {
 
 		assertEquals(val, get(dest, 1, 1), 1e-6);
 
-		// now let it process the vertical border
-		convolve1D("vertical", ker, img, dest, divisor, true);
+		// invokeMethod let it process the vertical border
+		invokeMethod("vertical", ker, img, dest, divisor, true);
 		assertEquals(val, get(dest, 1, 1), 1e-6);
 		assertTrue(0 != get(dest, 0, 1));
 	}
@@ -315,7 +244,7 @@ public class TestConvolveImageStandard {
 			}
 		}
 
-		convolve2D(ker, img, dest);
+		invokeMethod("convolve",ker, img, dest);
 
 		// is the test point the same as the expected?
 		assertEquals(expected, get(dest, testX, testY), 1e-5);
@@ -354,7 +283,7 @@ public class TestConvolveImageStandard {
 		if (!isFloatingPoint(dest))
 			expected = (int) expected;
 
-		convolve2D(ker, img, dest, divisor);
+		invokeMethod("convolve",ker, img, dest, divisor);
 
 		// is the test point the same as the expected?
 		assertEquals(expected, get(dest, testX, testY), 1e-5);
@@ -396,51 +325,24 @@ public class TestConvolveImageStandard {
 		}
 	}
 
-	private void convolve1D(String name, Object kernel, ImageBase input, ImageBase output, boolean border) {
-		try {
-			Method m = ConvolveImageStandard.class.getMethod("" +
-					name, kernel.getClass(), input.getClass(), output.getClass(), boolean.class);
-			m.invoke(null, kernel, input, output, border);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	private void invokeMethod(String name, Object ...inputs ) {
 
-	private void convolve1D(String name, Object kernel, ImageBase input, ImageBase output, int divisor, boolean border) {
-		try {
-			Method m = ConvolveImageStandard.class.getMethod("" +
-					name, kernel.getClass(), input.getClass(), output.getClass(), int.class, boolean.class);
-			m.invoke(null, kernel, input, output, divisor, border);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
+		Class<?> inputTypes[] = new Class<?>[ inputs.length ];
+		for( int i = 0; i < inputs.length; i++ ) {
+			if( inputs[i].getClass() == Boolean.class ) {
+				inputTypes[i] = boolean.class;
+			} else if( inputs[i].getClass() == Integer.class ) {
+				inputTypes[i] = int.class;
+			} else {
+				inputTypes[i] = inputs[i].getClass();
+			}
 		}
-	}
 
-	private void convolve2D(Object kernel, ImageBase input, ImageBase output) {
-		try {
-			Method m = ConvolveImageStandard.class.getMethod("convolve", kernel.getClass(), input.getClass(), output.getClass());
-			m.invoke(null, kernel, input, output);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
+		inputTypes[2] = GecvTesting.convertToGenericType(inputTypes[2]);
 
-	private void convolve2D(Object kernel, ImageBase input, ImageBase output, int divisor) {
 		try {
-			Method m = ConvolveImageStandard.class.getMethod("convolve", kernel.getClass(), input.getClass(), output.getClass(), int.class);
-			m.invoke(null, kernel, input, output, divisor);
+			Method m = ConvolveImageStandard.class.getMethod(name, inputTypes);
+			m.invoke(null, inputs);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {

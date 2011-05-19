@@ -44,6 +44,18 @@ public class GecvTesting {
 	}
 
 	/**
+	 * If an image is to be created then the generic type can't be used a specific one needs to be.  An arbitrary
+	 * specific image type is returned here. 
+	 */
+	public static <T>T convertGenericToSpecificType( Class<?> type ) {
+		if( type == ImageInt8.class )
+			return (T)ImageUInt8.class;
+		if( type == ImageInt16.class )
+			return (T)ImageSInt16.class;
+		return (T)type;
+	}
+
+	/**
 	 * Returns an image which is a sub-image but contains the same values of the input image.  Use for
 	 * testing compliance with sub-images.
 	 */
@@ -129,6 +141,8 @@ public class GecvTesting {
 	}
 
 	public static ImageBase createImage(Class<?> type, int width, int height) {
+		type = GecvTesting.convertGenericToSpecificType(type);
+
 		if (type == ImageUInt8.class) {
 			return new ImageUInt8(width, height);
 		} else if (type == ImageSInt8.class) {
@@ -137,6 +151,8 @@ public class GecvTesting {
 			return new ImageSInt16(width, height);
 		} else if (type == ImageUInt16.class) {
 			return new ImageUInt16(width, height);
+		} else if (type == ImageSInt32.class) {
+			return new ImageSInt32(width, height);
 		} else if (type == ImageFloat32.class) {
 			return new ImageFloat32(width, height);
 		} else if (type == ImageInterleavedInt8.class) {
