@@ -17,9 +17,12 @@
 package gecv.alg.filter.convolve;
 
 import gecv.alg.InputSanityCheck;
+import gecv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
 import gecv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
+import gecv.struct.convolve.Kernel2D_F32;
+import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.*;
 
 /**
@@ -40,8 +43,12 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_F32 kernel, ImageFloat32 image, ImageFloat32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveNormalized_JustBorder.horizontal(kernel,image,dest);
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.horizontal(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
+			ConvolveNormalized_JustBorder.horizontal(kernel,image,dest);
+		}
 	}
 
 	/**
@@ -55,8 +62,31 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_F32 kernel, ImageFloat32 image, ImageFloat32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.vertical(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.vertical(kernel,image,dest,true);
+			ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
+		}
+	}
+
+	/**
+	 * Performs a 2D convolution across the image while re-normalizing the kernel depending on its
+	 * overlap with the image.
+	 *
+	 * @param image	 The original image. Not modified.
+	 * @param dest	 Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void convolve(Kernel2D_F32 kernel, ImageFloat32 image, ImageFloat32 dest ) {
+		InputSanityCheck.checkSameShape(image, dest);
+
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.convolve(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.convolve(kernel,image,dest);
+			ConvolveNormalized_JustBorder.convolve(kernel,image,dest);
+		}
 	}
 
 	/**
@@ -70,9 +100,12 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt8 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-
-		ConvolveImageNoBorder.horizontal(kernel,image,dest,kernel.computeSum(),true);
-		ConvolveNormalized_JustBorder.horizontal(kernel,image,dest);
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.horizontal(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.horizontal(kernel,image,dest,kernel.computeSum(),true);
+			ConvolveNormalized_JustBorder.horizontal(kernel,image,dest);
+		}
 	}
 
 	/**
@@ -86,8 +119,31 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt8 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		ConvolveImageNoBorder.vertical(kernel,image,dest,kernel.computeSum(),true);
-		ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.vertical(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.vertical(kernel,image,dest,kernel.computeSum(),true);
+			ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
+		}
+	}
+
+	/**
+	 * Performs a 2D convolution across the image while re-normalizing the kernel depending on its
+	 * overlap with the image.
+	 *
+	 * @param image	 The original image. Not modified.
+	 * @param dest	 Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 image, ImageInt8 dest ) {
+		InputSanityCheck.checkSameShape(image, dest);
+
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.convolve(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.convolve(kernel,image,dest,kernel.computeSum());
+			ConvolveNormalized_JustBorder.convolve(kernel,image,dest);
+		}
 	}
 
 	/**
@@ -101,9 +157,12 @@ public class ConvolveNormalized {
 	public static void horizontal(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-
-		ConvolveImageNoBorder.horizontal(kernel,image,dest,kernel.computeSum(),true);
-		ConvolveNormalized_JustBorder.horizontal(kernel,image,dest);
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.horizontal(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.horizontal(kernel,image,dest,kernel.computeSum(),true);
+			ConvolveNormalized_JustBorder.horizontal(kernel,image,dest);
+		}
 	}
 
 	/**
@@ -117,7 +176,30 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		ConvolveImageNoBorder.vertical(kernel,image,dest,kernel.computeSum(),true);
-		ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.vertical(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.vertical(kernel,image,dest,kernel.computeSum(),true);
+			ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
+		}
+	}
+
+	/**
+	 * Performs a 2D convolution across the image while re-normalizing the kernel depending on its
+	 * overlap with the image.
+	 *
+	 * @param image	 The original image. Not modified.
+	 * @param dest	 Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void convolve(Kernel2D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
+		InputSanityCheck.checkSameShape(image, dest);
+
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.convolve(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.convolve(kernel,image,dest,kernel.computeSum());
+			ConvolveNormalized_JustBorder.convolve(kernel,image,dest);
+		}
 	}
 }

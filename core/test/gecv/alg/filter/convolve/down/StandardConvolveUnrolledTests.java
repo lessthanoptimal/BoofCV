@@ -20,47 +20,53 @@ import org.junit.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * Standard unit tests to perform on unrolled convolution classes
  *
  * @author Peter Abeles
  */
-public class StandardConvolveUnrolledTests {
+public abstract class StandardConvolveUnrolledTests {
 
-	int numUnrolled;
+	int numUnrolled=-1;
 	Class<?> target;
 	Class<?>[] param1D;
 	Class<?>[] param2D;
 
-	CompareToStandardConvolveDown compareToStandard = new CompareToStandardConvolveDown(target);
-
-	public StandardConvolveUnrolledTests() {
-	}
+	CompareToStandardConvolveDownNoBorder compareToStandard = new CompareToStandardConvolveDownNoBorder(target);
 
 	@Test
 	public void convolve() throws NoSuchMethodException {
-		for (int i = 0; i < numUnrolled; i++) {
-			Method m = target.getMethod("convolve", param2D);
-
-			compareToStandard.compareMethod(m, "convolve", i + 1);
-		}
+		testMethod("convolve",param2D);
 	}
 
 	@Test
 	public void horizontal() throws NoSuchMethodException {
-		for (int i = 0; i < numUnrolled; i++) {
-			Method m = target.getMethod("horizontal", param1D);
-
-			compareToStandard.compareMethod(m, "horizontal", i + 1);
-		}
+		testMethod("horizontal",param1D);
 	}
 
 	@Test
 	public void vertical() throws NoSuchMethodException {
-		for (int i = 0; i < numUnrolled; i++) {
-			Method m = target.getMethod("vertical", param1D);
+		testMethod("vertical",param1D);
+	}
 
-			compareToStandard.compareMethod(m, "vertical", i + 1);
+	private void testMethod( String methodName , Class<?> param[] ) throws NoSuchMethodException {
+		assertTrue(numUnrolled>0);
+
+		for( int enlarge = 0; enlarge < 2; enlarge++ ) {
+			for( int skip = 1; skip <= 4; skip++ ) {
+				for( int kernel = 1; kernel <= 2; kernel++ ) {
+					compareToStandard.setSkip(skip);
+					compareToStandard.setKernelRadius(kernel);
+					compareToStandard.setImageDimention(20+enlarge,25+enlarge);
+					for (int i = 0; i < numUnrolled; i++) {
+						Method m = target.getMethod(methodName, param );
+
+						compareToStandard.compareMethod(m, methodName , i + 1);
+					}
+				}
+			}
 		}
 	}
 }

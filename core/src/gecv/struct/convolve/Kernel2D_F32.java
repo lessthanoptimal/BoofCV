@@ -88,4 +88,13 @@ public class Kernel2D_F32 extends Kernel2D {
 	public float[] getData() {
 		return data;
 	}
+
+	public float computeSum() {
+		int N = width*width;
+		float total = 0;
+		for( int i = 0; i < N; i++ ) {
+			total += data[i];
+		}
+		return total;
+	}
 }

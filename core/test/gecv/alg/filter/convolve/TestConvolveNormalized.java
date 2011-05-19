@@ -27,6 +27,19 @@ public class TestConvolveNormalized {
 	public void compareToNaive() {
 		CompareToStandardConvolutionNormalized test = new CompareToStandardConvolutionNormalized(ConvolveNormalized.class);
 
-		test.performTests(6);
+		for( int i = 0; i < 2; i++ ) {
+			test.setImageDimension(15+i,20+i);
+			// convolve with different kernel sizes relative to the skip amount
+			test.setKernelRadius(1);
+			test.performTests(9);
+			test.setKernelRadius(2);
+			test.performTests(9);
+			test.setKernelRadius(3);
+			test.performTests(9);
+
+			// now try a pathological case where the kernel is larger than the image
+			test.setKernelRadius(10);
+			test.performTests(9);
+		}
 	}
 }

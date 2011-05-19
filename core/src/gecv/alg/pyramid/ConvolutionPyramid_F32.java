@@ -16,8 +16,7 @@
 
 package gecv.alg.pyramid;
 
-import gecv.alg.filter.convolve.ConvolveDownNoBorder;
-import gecv.alg.interpolate.DownSampleConvolve;
+import gecv.alg.filter.convolve.ConvolveDownNormalized;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 
@@ -34,11 +33,17 @@ public class ConvolutionPyramid_F32 extends ConvolutionPyramid<ImageFloat32> {
 
 	public ConvolutionPyramid_F32(Kernel1D_F32 kernel) {
 		this.kernel = kernel;
+
+		// make sure it has been normalized to one
+		float error = Math.abs(kernel.computeSum()-1);
+		if( error > 1e-2 )
+			throw new IllegalArgumentException("Kernel must be normalized to one");
 	}
 
 	@Override
 	public void _update(ImageFloat32 original) {
 		if( temp == null )
+			// declare it to be hte latest image that it might need to be, resize below
 			temp = new ImageFloat32(original.width/2,original.height);
 
 		if (pyramid.scale[0] == 1) {
@@ -50,16 +55,16 @@ public class ConvolutionPyramid_F32 extends ConvolutionPyramid<ImageFloat32> {
 		} else {
 			int skip = pyramid.scale[0];
 			temp.reshape(original.width/skip,original.height);
-			ConvolveDownNoBorder.horizontal(kernel,original,temp,skip);
-			ConvolveDownNoBorder.vertical(kernel,temp,pyramid.layers[0],skip);
+			ConvolveDownNormalized.horizontal(kernel,original,temp,skip);
+			ConvolveDownNormalized.vertical(kernel,temp,pyramid.layers[0],skip);
 		}
 
 		for (int index = 1; index < pyramid.layers.length; index++) {
 			int skip = pyramid.scale[index];
 			ImageFloat32 prev = pyramid.layers[index-1];
 			temp.reshape(prev.width/skip,prev.height);
-			ConvolveDownNoBorder.horizontal(kernel,prev,temp,skip);
-			ConvolveDownNoBorder.vertical(kernel,temp,pyramid.layers[index],skip);
+			ConvolveDownNormalized.horizontal(kernel,prev,temp,skip);
+			ConvolveDownNormalized.vertical(kernel,temp,pyramid.layers[index],skip);
 		}
 	}
 }

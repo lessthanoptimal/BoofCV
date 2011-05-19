@@ -47,17 +47,17 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = input.getWidth();
-		final int height = input.getHeight();
+		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
+		final int height = input.height;
 
-		final int offsetX = radius <= skip ? skip : radius + radius % skip; 
+		final int offsetX = UtilDownConvolve.computeOffset(skip,radius); 
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
 			int j = input.startIndex+ i*input.stride;
-			final int jEnd = j+width-radius;
+			final int jEnd = j+widthEnd;
 
-			for( j += offsetX; j < jEnd; j += skip ) {
+			for( j += offsetX; j <= jEnd; j += skip ) {
 				float total = 0;
 				int indexSrc = j-radius;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -79,17 +79,15 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = input.getWidth();
-		final int imgHeight = input.getHeight();
+		final int width = input.width;
+		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
 
-		final int yEnd = imgHeight-radius;
+		final int offsetY = UtilDownConvolve.computeOffset(skip,radius);
 
-		final int offsetY = radius <= skip ? skip : radius + radius % skip;
-
-		for( int y = offsetY; y < yEnd; y += skip ) {
+		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
 			int i = input.startIndex + y*input.stride;
-			final int iEnd = i + imgWidth;
+			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
 				float total = 0;
@@ -111,15 +109,15 @@ public class ConvolveDownNoBorderStandard {
 		final float[] dataDst = output.data;
 		final float[] dataKernel = kernel.data;
 
-		final int width = input.getWidth();
-		final int height = input.getHeight();
+		final int radius = kernel.getRadius();
+		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
+		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
 
-		final int radius = kernel.width/2;
-		final int offset = radius <= skip ? skip : radius + radius % skip; 
+		final int offset = UtilDownConvolve.computeOffset(skip,radius); 
 
-		for( int y = offset; y < height-radius; y += skip ) {
+		for( int y = offset; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
-			for( int x = offset; x < width-radius; x += skip ) {
+			for( int x = offset; x <= widthEnd; x += skip ) {
 				float total = 0;
 				int indexKer = 0;
 				for( int ki = -radius; ki <= radius; ki++ ) {
@@ -143,17 +141,17 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = input.getWidth();
-		final int height = input.getHeight();
+		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
+		final int height = input.height;
 
-		final int offsetX = radius <= skip ? skip : radius + radius % skip; 
+		final int offsetX = UtilDownConvolve.computeOffset(skip,radius); 
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
 			int j = input.startIndex+ i*input.stride;
-			final int jEnd = j+width-radius;
+			final int jEnd = j+widthEnd;
 
-			for( j += offsetX; j < jEnd; j += skip ) {
+			for( j += offsetX; j <= jEnd; j += skip ) {
 				int total = 0;
 				int indexSrc = j-radius;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -175,17 +173,15 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = input.getWidth();
-		final int imgHeight = input.getHeight();
+		final int width = input.width;
+		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
 
-		final int yEnd = imgHeight-radius;
+		final int offsetY = UtilDownConvolve.computeOffset(skip,radius);
 
-		final int offsetY = radius <= skip ? skip : radius + radius % skip;
-
-		for( int y = offsetY; y < yEnd; y += skip ) {
+		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
 			int i = input.startIndex + y*input.stride;
-			final int iEnd = i + imgWidth;
+			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
 				int total = 0;
@@ -207,15 +203,15 @@ public class ConvolveDownNoBorderStandard {
 		final short[] dataDst = output.data;
 		final int[] dataKernel = kernel.data;
 
-		final int width = input.getWidth();
-		final int height = input.getHeight();
+		final int radius = kernel.getRadius();
+		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
+		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
 
-		final int radius = kernel.width/2;
-		final int offset = radius <= skip ? skip : radius + radius % skip; 
+		final int offset = UtilDownConvolve.computeOffset(skip,radius); 
 
-		for( int y = offset; y < height-radius; y += skip ) {
+		for( int y = offset; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
-			for( int x = offset; x < width-radius; x += skip ) {
+			for( int x = offset; x <= widthEnd; x += skip ) {
 				int total = 0;
 				int indexKer = 0;
 				for( int ki = -radius; ki <= radius; ki++ ) {
@@ -239,17 +235,17 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = input.getWidth();
-		final int height = input.getHeight();
+		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
+		final int height = input.height;
 
-		final int offsetX = radius <= skip ? skip : radius + radius % skip; 
+		final int offsetX = UtilDownConvolve.computeOffset(skip,radius); 
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
 			int j = input.startIndex+ i*input.stride;
-			final int jEnd = j+width-radius;
+			final int jEnd = j+widthEnd;
 
-			for( j += offsetX; j < jEnd; j += skip ) {
+			for( j += offsetX; j <= jEnd; j += skip ) {
 				int total = 0;
 				int indexSrc = j-radius;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -271,17 +267,15 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = input.getWidth();
-		final int imgHeight = input.getHeight();
+		final int width = input.width;
+		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
 
-		final int yEnd = imgHeight-radius;
+		final int offsetY = UtilDownConvolve.computeOffset(skip,radius);
 
-		final int offsetY = radius <= skip ? skip : radius + radius % skip;
-
-		for( int y = offsetY; y < yEnd; y += skip ) {
+		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
 			int i = input.startIndex + y*input.stride;
-			final int iEnd = i + imgWidth;
+			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
 				int total = 0;
@@ -303,15 +297,15 @@ public class ConvolveDownNoBorderStandard {
 		final short[] dataDst = output.data;
 		final int[] dataKernel = kernel.data;
 
-		final int width = input.getWidth();
-		final int height = input.getHeight();
+		final int radius = kernel.getRadius();
+		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
+		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
 
-		final int radius = kernel.width/2;
-		final int offset = radius <= skip ? skip : radius + radius % skip; 
+		final int offset = UtilDownConvolve.computeOffset(skip,radius); 
 
-		for( int y = offset; y < height-radius; y += skip ) {
+		for( int y = offset; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
-			for( int x = offset; x < width-radius; x += skip ) {
+			for( int x = offset; x <= widthEnd; x += skip ) {
 				int total = 0;
 				int indexKer = 0;
 				for( int ki = -radius; ki <= radius; ki++ ) {
@@ -335,17 +329,17 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = input.getWidth();
-		final int height = input.getHeight();
+		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
+		final int height = input.height;
 
-		final int offsetX = radius <= skip ? skip : radius + radius % skip; 
+		final int offsetX = UtilDownConvolve.computeOffset(skip,radius); 
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
 			int j = input.startIndex+ i*input.stride;
-			final int jEnd = j+width-radius;
+			final int jEnd = j+widthEnd;
 
-			for( j += offsetX; j < jEnd; j += skip ) {
+			for( j += offsetX; j <= jEnd; j += skip ) {
 				int total = 0;
 				int indexSrc = j-radius;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -367,17 +361,15 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = input.getWidth();
-		final int imgHeight = input.getHeight();
+		final int width = input.width;
+		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
 
-		final int yEnd = imgHeight-radius;
+		final int offsetY = UtilDownConvolve.computeOffset(skip,radius);
 
-		final int offsetY = radius <= skip ? skip : radius + radius % skip;
-
-		for( int y = offsetY; y < yEnd; y += skip ) {
+		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
 			int i = input.startIndex + y*input.stride;
-			final int iEnd = i + imgWidth;
+			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
 				int total = 0;
@@ -399,15 +391,15 @@ public class ConvolveDownNoBorderStandard {
 		final byte[] dataDst = output.data;
 		final int[] dataKernel = kernel.data;
 
-		final int width = input.getWidth();
-		final int height = input.getHeight();
+		final int radius = kernel.getRadius();
+		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
+		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
 
-		final int radius = kernel.width/2;
-		final int offset = radius <= skip ? skip : radius + radius % skip; 
+		final int offset = UtilDownConvolve.computeOffset(skip,radius); 
 
-		for( int y = offset; y < height-radius; y += skip ) {
+		for( int y = offset; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
-			for( int x = offset; x < width-radius; x += skip ) {
+			for( int x = offset; x <= widthEnd; x += skip ) {
 				int total = 0;
 				int indexKer = 0;
 				for( int ki = -radius; ki <= radius; ki++ ) {
@@ -431,17 +423,17 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = input.getWidth();
-		final int height = input.getHeight();
+		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
+		final int height = input.height;
 
-		final int offsetX = radius <= skip ? skip : radius + radius % skip; 
+		final int offsetX = UtilDownConvolve.computeOffset(skip,radius); 
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
 			int j = input.startIndex+ i*input.stride;
-			final int jEnd = j+width-radius;
+			final int jEnd = j+widthEnd;
 
-			for( j += offsetX; j < jEnd; j += skip ) {
+			for( j += offsetX; j <= jEnd; j += skip ) {
 				int total = 0;
 				int indexSrc = j-radius;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -463,17 +455,15 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = input.getWidth();
-		final int imgHeight = input.getHeight();
+		final int width = input.width;
+		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
 
-		final int yEnd = imgHeight-radius;
+		final int offsetY = UtilDownConvolve.computeOffset(skip,radius);
 
-		final int offsetY = radius <= skip ? skip : radius + radius % skip;
-
-		for( int y = offsetY; y < yEnd; y += skip ) {
+		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
 			int i = input.startIndex + y*input.stride;
-			final int iEnd = i + imgWidth;
+			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
 				int total = 0;
@@ -495,15 +485,15 @@ public class ConvolveDownNoBorderStandard {
 		final short[] dataDst = output.data;
 		final int[] dataKernel = kernel.data;
 
-		final int width = input.getWidth();
-		final int height = input.getHeight();
+		final int radius = kernel.getRadius();
+		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
+		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
 
-		final int radius = kernel.width/2;
-		final int offset = radius <= skip ? skip : radius + radius % skip; 
+		final int offset = UtilDownConvolve.computeOffset(skip,radius); 
 
-		for( int y = offset; y < height-radius; y += skip ) {
+		for( int y = offset; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
-			for( int x = offset; x < width-radius; x += skip ) {
+			for( int x = offset; x <= widthEnd; x += skip ) {
 				int total = 0;
 				int indexKer = 0;
 				for( int ki = -radius; ki <= radius; ki++ ) {

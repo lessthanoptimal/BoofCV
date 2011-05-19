@@ -17,8 +17,8 @@
 package gecv.alg.filter.convolve.down;
 
 import gecv.alg.filter.convolve.ConvolutionTestHelper;
-import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.convolve.KernelBase;
 import gecv.struct.image.ImageBase;
@@ -30,36 +30,33 @@ import org.junit.Test;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestConvolveDownNoBorderStandard {
+public class TestConvolveDownNormalized_JustBorder {
+
 	Random rand = new Random(0xFF);
 
-	int width;
-	int height;
-	int kernelRadius = 2;
-	int skip;
+	static int width;
+	static int height;
+	static int kernelRadius = 2;
+	static int skip;
 
-	/**
-	 * Automatically compares all the box filters against a generalize convolution
-	 */
 	@Test
-	public void compareToGeneral() {
-		// try different image sizes
-		for( int plus = 0; plus <= kernelRadius+1; plus++ ) {
-			width = 10 + plus;
-			height = 10 + plus;
-			// try different edges in the image as test points
-			for( skip = 1; skip <= 4; skip++ ) {
-				System.out.println(width+" "+height+" skip "+skip);
-				CompareToFull tests = new CompareToFull(ConvolveDownNoBorderStandard.class);
+	public void compareToFullNaive() {
+		CompareToFull compare = new CompareToFull(ConvolveDownNormalized_JustBorder.class);
 
-				tests.performTests(15);
-			}
+		for( int i = 0; i < 2; i++ ) {
+		    width = 20 + i;
+			height = 25 + i;
+			skip = 1;
+			compare.performTests(9);
+			skip = 2;
+			compare.performTests(9);
+			skip = 3;
+			compare.performTests(9);
 		}
 	}
 
@@ -69,7 +66,7 @@ public class TestConvolveDownNoBorderStandard {
 		int DIV = 10;
 
 		protected CompareToFull(Class<?> testClass ) {
-			super(testClass, ConvolveImageNoBorder.class );
+			super(testClass, ConvolveNormalizedNaive.class );
 		}
 
 		@Override
@@ -146,7 +143,7 @@ public class TestConvolveDownNoBorderStandard {
 		protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 
 			int kernelDimen = ((KernelBase)targetParam[0]).getDimension();
-			int validationParams = kernelDimen == 1 ? targetParam.length : targetParam.length-1;
+			int validationParams = targetParam.length-1;
 
 			ImageBase input = (ImageBase)targetParam[1];
 			ImageBase output = (ImageBase)targetParam[2];
@@ -173,46 +170,54 @@ public class TestConvolveDownNoBorderStandard {
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
-			ImageBase input = (ImageBase)targetParam[1];
-
 			SingleBandImage t = FactorySingleBandImage.wrap((ImageBase)targetParam[2]);
 			SingleBandImage v = FactorySingleBandImage.wrap((ImageBase)validationParam[2]);
-
-
-			int minY=0,minX=0,maxX=input.width,maxY=input.height;
 
 			int ratioWidth = v.getWidth() != t.getWidth() ? skip : 1;
 			int ratioHeight = v.getHeight() != t.getHeight() ? skip : 1;
 
+			int begin = UtilDownConvolve.computeOffset(skip,kernelRadius);
+			int endX = UtilDownConvolve.computeMaxSide(width,skip,kernelRadius);
+			int endY = UtilDownConvolve.computeMaxSide(height,skip,kernelRadius);
+
+			begin /= skip;
+			endX /= skip;
+			endY /= skip;
+
 			if( methodTest.getName().contentEquals("convolve")) {
-				minX = minY = UtilDownConvolve.computeOffset(skip,kernelRadius);
-				maxX = UtilDownConvolve.computeMaxSide(input.width,skip,kernelRadius);
-				maxY = UtilDownConvolve.computeMaxSide(input.width,skip,kernelRadius);
-			} else if( methodTest.getName().contentEquals("horizontal")) {
-				minX = UtilDownConvolve.computeOffset(skip,kernelRadius);
-				maxX = UtilDownConvolve.computeMaxSide(input.width,skip,kernelRadius);
+				for( int y = 0; y < height/skip; y++ ) {
+					for( int x = 0; x < width/skip; x++ ) {
+						if( y < begin || y > endY || x < begin || x > endX)
+						{
+							Number numT = t.get(x,y);
+							Number numV = v.get(x*ratioWidth,y*ratioHeight);
+
+							assertEquals( "("+x+" , "+y+")",numV.doubleValue() , numT.doubleValue() , 1e-4 );
+						}
+					}
+				}
+			} else if( methodTest.getName().contentEquals("horizontal") ) {
+				for( int y = 0; y < height; y++ ) {
+					for( int x = 0; x < width/skip; x++ ) {
+						if( x < begin || x > endX )
+						{
+							Number numT = t.get(x,y);
+							Number numV = v.get(x*ratioWidth,y*ratioHeight);
+
+							assertEquals( x+" "+y,numV.doubleValue() , numT.doubleValue() , 1e-4 );
+						}
+					}
+				}
 			} else if( methodTest.getName().contentEquals("vertical")) {
-				minY = UtilDownConvolve.computeOffset(skip,kernelRadius);
-				maxY = UtilDownConvolve.computeMaxSide(input.height,skip,kernelRadius);
-			}
+				for( int y = 0; y < height/skip; y++ ) {
+					for( int x = 0; x < width; x++ ) {
+						if( y < begin || y > endY )
+						{
+							Number numT = t.get(x,y);
+							Number numV = v.get(x*ratioWidth,y*ratioHeight);
 
-			for( int y = 0; y < t.getHeight(); y++ ) {
-				for( int x = 0; x < t.getWidth(); x++ ) {
-					int xx = x*ratioWidth;
-					int yy = y*ratioHeight;
-
-					double valT = t.get(x,y).doubleValue();
-					double valV = v.get(x*ratioWidth,y*ratioHeight).doubleValue();
-					if( xx < minX || xx > maxX || yy < minY || y > maxY )
-						valV = 0;
-
-					double sum = Math.abs(valT)+Math.abs(valV);
-					if( sum > 0 ) {
-						// normalizing the magnitude is needed for floating point numbers
-						double diff = Math.abs(valV-valT)/sum;
-						if( diff > 1e-4 )
-							System.out.println("sadfasfd");
-						assertTrue(valV+" "+valT+"  diff "+diff+"  at ( "+x+" "+y+" )",diff<=1e-4);
+							assertEquals( x+" "+y,numV.doubleValue() , numT.doubleValue() , 1e-4 );
+						}
 					}
 				}
 			}
