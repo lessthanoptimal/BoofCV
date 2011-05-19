@@ -16,28 +16,33 @@
 
 package gecv.alg.filter.convolve;
 
-import gecv.alg.filter.convolve.down.CompareToStandardConvolveDownNoBorder;
+import gecv.alg.filter.convolve.down.CompareToStandardConvolveDownNormalized;
 import org.junit.Test;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestConvolveDownNoBorder {
+public class TestConvolveDownNormalized {
+
 	@Test
 	public void compareToStandard() {
-		CompareToStandardConvolveDownNoBorder test = new CompareToStandardConvolveDownNoBorder(ConvolveDownNoBorder.class);
-		test.setSkip(2);
+		CompareToStandardConvolveDownNormalized test = new CompareToStandardConvolveDownNormalized(ConvolveDownNormalized.class);
 
+		test.setSkip(2);
 		for( int i = 0; i < 2; i++ ) {
-			test.setImageDimention(15+i,20+i);
+			test.setImageDimension(15+i,20+i);
 			// convolve with different kernel sizes relative to the skip amount
 			test.setKernelRadius(1);
-			test.performTests(15);
+			test.performTests(9);
 			test.setKernelRadius(2);
-			test.performTests(15);
+			test.performTests(9);
 			test.setKernelRadius(3);
-			test.performTests(15);
+			test.performTests(9);
+
+			// now try a pathological case where the kernel is larger than the image
+			test.setKernelRadius(10);
+			test.performTests(9);
 		}
 	}
 }
