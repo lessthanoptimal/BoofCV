@@ -28,7 +28,7 @@ import gecv.struct.image.ImageUInt8;
 public class TestConvolveDownNoBorderUnrolled_U8_I8_Div extends StandardConvolveUnrolledTests {
 
 	public TestConvolveDownNoBorderUnrolled_U8_I8_Div() {
-		this.numUnrolled = GenerateConvolvedDownNoBorderUnrolled.numUnrolled;
+		this.numUnrolled = GenerateConvolveDownNoBorderUnrolled.numUnrolled;
 		this.target = ConvolveDownNoBorderUnrolled_U8_I8_Div.class;
 		this.param1D = new Class<?>[]{Kernel1D_I32.class, ImageUInt8.class, ImageInt8.class , int.class , int.class};
 		this.param2D = new Class<?>[]{Kernel2D_I32.class, ImageUInt8.class, ImageInt8.class , int.class , int.class};

@@ -16,20 +16,25 @@
 
 package gecv.alg.filter.convolve.down;
 
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.image.ImageFloat32;
-
-
 /**
  * @author Peter Abeles
  */
-public class TestConvolveDownNoBorderUnrolled_F32_F32 extends StandardConvolveUnrolledTests {
+public class UtilDownConvolve {
+	public static int computeMaxSide( int sideLength , int skip , int radius ) {
+		// length of size of output image in input image coordinates
+		int ret = sideLength - (sideLength % skip);
 
-	public TestConvolveDownNoBorderUnrolled_F32_F32() {
-		this.numUnrolled = GenerateConvolveDownNoBorderUnrolled.numUnrolled;
-		this.target = ConvolveDownNoBorderUnrolled_F32_F32.class;
-		this.param1D = new Class<?>[]{Kernel1D_F32.class, ImageFloat32.class, ImageFloat32.class , int.class };
-		this.param2D = new Class<?>[]{Kernel2D_F32.class, ImageFloat32.class, ImageFloat32.class , int.class };
+		if( ret + radius >= sideLength ) {
+			ret = sideLength - radius - 1;
+			ret = ret - (ret%skip);
+		} else {
+			ret -= skip;
+		}
+
+		return ret;
+	}
+
+	public static int computeOffset( int skip , int radius ) {
+		return radius <= skip ? skip : radius + radius % skip;
 	}
 }

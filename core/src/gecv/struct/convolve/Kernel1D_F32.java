@@ -95,6 +95,15 @@ public class Kernel1D_F32 extends Kernel1D {
 		return data[i];
 	}
 
+	public float computeSum() {
+		float sum = 0;
+		for( int i = 0; i < data.length; i++ ) {
+			sum += data[i];
+		}
+
+		return sum;
+	}
+
 	public float[] getData() {
 		return data;
 	}

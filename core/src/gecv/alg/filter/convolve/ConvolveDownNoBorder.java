@@ -37,92 +37,133 @@ import gecv.struct.image.*;
 public class ConvolveDownNoBorder {
 
 	public static void horizontal( Kernel1D_F32 kernel , ImageFloat32 input, ImageFloat32 output , int skip ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_F32_F32.horizontal(kernel,input,output,skip)) {
 			ConvolveDownNoBorderStandard.horizontal(kernel,input,output,skip);
 		}
 	}
 
 	public static void vertical( Kernel1D_F32 kernel , ImageFloat32 input, ImageFloat32 output , int skip ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_F32_F32.vertical(kernel,input,output,skip)) {
 			ConvolveDownNoBorderStandard.vertical(kernel,input,output,skip);
 		}
 	}
 
 	public static void convolve( Kernel2D_F32 kernel , ImageFloat32 input, ImageFloat32 output , int skip ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_F32_F32.convolve(kernel,input,output,skip)) {
 			ConvolveDownNoBorderStandard.convolve(kernel,input,output,skip);
 		}
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel , ImageUInt8 input, ImageInt16 output , int skip ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_U8_I16.horizontal(kernel,input,output,skip)) {
 			ConvolveDownNoBorderStandard.horizontal(kernel,input,output,skip);
 		}
 	}
 
 	public static void vertical( Kernel1D_I32 kernel , ImageUInt8 input, ImageInt16 output , int skip ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_U8_I16.vertical(kernel,input,output,skip)) {
 			ConvolveDownNoBorderStandard.vertical(kernel,input,output,skip);
 		}
 	}
 
 	public static void convolve( Kernel2D_I32 kernel , ImageUInt8 input, ImageInt16 output , int skip ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_U8_I16.convolve(kernel,input,output,skip)) {
 			ConvolveDownNoBorderStandard.convolve(kernel,input,output,skip);
 		}
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel , ImageSInt16 input, ImageInt16 output , int skip ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_S16_I16.horizontal(kernel,input,output,skip)) {
 			ConvolveDownNoBorderStandard.horizontal(kernel,input,output,skip);
 		}
 	}
 
 	public static void vertical( Kernel1D_I32 kernel , ImageSInt16 input, ImageInt16 output , int skip ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_S16_I16.vertical(kernel,input,output,skip)) {
 			ConvolveDownNoBorderStandard.vertical(kernel,input,output,skip);
 		}
 	}
 
 	public static void convolve( Kernel2D_I32 kernel , ImageSInt16 input, ImageInt16 output , int skip ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_S16_I16.convolve(kernel,input,output,skip)) {
 			ConvolveDownNoBorderStandard.convolve(kernel,input,output,skip);
 		}
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel , ImageUInt8 input, ImageInt8 output , int skip , int divisor ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_U8_I8_Div.horizontal(kernel,input,output,skip,divisor)) {
 			ConvolveDownNoBorderStandard.horizontal(kernel,input,output,skip,divisor);
 		}
 	}
 
 	public static void vertical( Kernel1D_I32 kernel , ImageUInt8 input, ImageInt8 output , int skip , int divisor ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_U8_I8_Div.vertical(kernel,input,output,skip,divisor)) {
 			ConvolveDownNoBorderStandard.vertical(kernel,input,output,skip,divisor);
 		}
 	}
 
 	public static void convolve( Kernel2D_I32 kernel , ImageUInt8 input, ImageInt8 output , int skip , int divisor ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_U8_I8_Div.convolve(kernel,input,output,skip,divisor)) {
 			ConvolveDownNoBorderStandard.convolve(kernel,input,output,skip,divisor);
 		}
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel , ImageSInt16 input, ImageInt16 output , int skip , int divisor ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_S16_I16_Div.horizontal(kernel,input,output,skip,divisor)) {
 			ConvolveDownNoBorderStandard.horizontal(kernel,input,output,skip,divisor);
 		}
 	}
 
 	public static void vertical( Kernel1D_I32 kernel , ImageSInt16 input, ImageInt16 output , int skip , int divisor ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_S16_I16_Div.vertical(kernel,input,output,skip,divisor)) {
 			ConvolveDownNoBorderStandard.vertical(kernel,input,output,skip,divisor);
 		}
 	}
 
 	public static void convolve( Kernel2D_I32 kernel , ImageSInt16 input, ImageInt16 output , int skip , int divisor ) {
+		checkParameters(input,output,skip);
+
 		if( !ConvolveDownNoBorderUnrolled_S16_I16_Div.convolve(kernel,input,output,skip,divisor)) {
 			ConvolveDownNoBorderStandard.convolve(kernel,input,output,skip,divisor);
 		}
 	}
+
+	public static void checkParameters( ImageBase input , ImageBase output , int skip ) {
+		if( skip <= 0  )
+			throw new IllegalArgumentException("Skip must be >= 1");
+		if( output.width < input.width/skip )
+			throw new IllegalArgumentException("Output width is too small: output.width = "+output.width+" input.widht/skip "+ input.width/skip);
+		if( output.height < input.height/skip )
+			throw new IllegalArgumentException("Output height is too small");
+
+	}
+
 }

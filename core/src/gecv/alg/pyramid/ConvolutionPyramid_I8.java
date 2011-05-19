@@ -16,7 +16,7 @@
 
 package gecv.alg.pyramid;
 
-import gecv.alg.interpolate.DownSampleConvolve;
+import gecv.alg.filter.convolve.ConvolveDownNormalized;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageUInt8;
 
@@ -28,17 +28,21 @@ import gecv.struct.image.ImageUInt8;
 public class ConvolutionPyramid_I8 extends ConvolutionPyramid<ImageUInt8> {
 	// convolution kernel used to blur the input image before down sampling
 	private Kernel1D_I32 kernel;
-	// storage for computing the down sampled image
-	private int storage[];
+	// stores the results from the first convolution
+	private ImageUInt8 temp;
 
 	public ConvolutionPyramid_I8(Kernel1D_I32 kernel) {
 
 		this.kernel = kernel;
-		storage = new int[kernel.width];
 	}
 
 	@Override
 	public void _update(ImageUInt8 original) {
+
+		if( temp == null )
+			// declare it to be hte latest image that it might need to be, resize below
+			temp = new ImageUInt8(original.width/2,original.height);
+
 
 		if (pyramid.scale[0] == 1) {
 			if (pyramid.saveOriginalReference) {
@@ -47,12 +51,18 @@ public class ConvolutionPyramid_I8 extends ConvolutionPyramid<ImageUInt8> {
 				pyramid.layers[0].setTo(original);
 			}
 		} else {
-			DownSampleConvolve.downSample(kernel, original, pyramid.layers[0], pyramid.scale[0], storage);
+			int skip = pyramid.scale[0];
+			temp.reshape(original.width/skip,original.height);
+			ConvolveDownNormalized.horizontal(kernel,original,temp,skip);
+			ConvolveDownNormalized.vertical(kernel,temp,pyramid.layers[0],skip);
 		}
 
 		for (int index = 1; index < pyramid.layers.length; index++) {
 			int skip = pyramid.scale[index];
-			DownSampleConvolve.downSample(kernel, pyramid.layers[index - 1], pyramid.layers[index], skip, storage);
+			ImageUInt8 prev = pyramid.layers[index-1];
+			temp.reshape(prev.width/skip,prev.height);
+			ConvolveDownNormalized.horizontal(kernel,prev,temp,skip);
+			ConvolveDownNormalized.vertical(kernel,temp,pyramid.layers[index],skip);
 		}
 	}
 }

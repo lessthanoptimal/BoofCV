@@ -24,6 +24,8 @@ import java.io.PrintStream;
 
 
 /**
+ * Generates straight forward unoptimized implementations of {@link gecv.alg.filter.convolve.ConvolveDownNoBorder}.
+ *
  * @author Peter Abeles
  */
 public class GenerateConvolveDownNoBorderStandard {
@@ -169,17 +171,17 @@ public class GenerateConvolveDownNoBorderStandard {
 				"\t\tfinal int radius = kernel.getRadius();\n" +
 				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
 				"\n" +
-				"\t\tfinal int width = input.getWidth();\n" +
-				"\t\tfinal int height = input.getHeight();\n" +
+				"\t\tfinal int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);\n" +
+				"\t\tfinal int height = input.height;\n" +
 				"\n" +
-				"\t\tfinal int offsetX = radius <= skip ? skip : radius + radius % skip; \n" +
+				"\t\tfinal int offsetX = UtilDownConvolve.computeOffset(skip,radius); \n" +
 				"\n" +
 				"\t\tfor( int i = 0; i < height; i++ ) {\n" +
 				"\t\t\tint indexDst = output.startIndex + i*output.stride + offsetX/skip;\n" +
 				"\t\t\tint j = input.startIndex+ i*input.stride;\n" +
-				"\t\t\tfinal int jEnd = j+width-radius;\n" +
+				"\t\t\tfinal int jEnd = j+widthEnd;\n" +
 				"\n" +
-				"\t\t\tfor( j += offsetX; j < jEnd; j += skip ) {\n" +
+				"\t\t\tfor( j += offsetX; j <= jEnd; j += skip ) {\n" +
 				"\t\t\t\t"+kernelData+" total = 0;\n" +
 				"\t\t\t\tint indexSrc = j-radius;\n" +
 				"\t\t\t\tfor( int k = 0; k < kernelWidth; k++ ) {\n" +
@@ -211,17 +213,15 @@ public class GenerateConvolveDownNoBorderStandard {
 				"\t\tfinal int radius = kernel.getRadius();\n" +
 				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
 				"\n" +
-				"\t\tfinal int imgWidth = input.getWidth();\n" +
-				"\t\tfinal int imgHeight = input.getHeight();\n" +
+				"\t\tfinal int width = input.width;\n" +
+				"\t\tfinal int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);\n" +
 				"\n" +
-				"\t\tfinal int yEnd = imgHeight-radius;\n" +
+				"\t\tfinal int offsetY = UtilDownConvolve.computeOffset(skip,radius);\n" +
 				"\n" +
-				"\t\tfinal int offsetY = radius <= skip ? skip : radius + radius % skip;\n" +
-				"\n" +
-				"\t\tfor( int y = offsetY; y < yEnd; y += skip ) {\n" +
+				"\t\tfor( int y = offsetY; y <= heightEnd; y += skip ) {\n" +
 				"\t\t\tint indexDst = output.startIndex + (y/skip)*output.stride;\n" +
 				"\t\t\tint i = input.startIndex + y*input.stride;\n" +
-				"\t\t\tfinal int iEnd = i + imgWidth;\n" +
+				"\t\t\tfinal int iEnd = i + width;\n" +
 				"\n" +
 				"\t\t\tfor( ; i < iEnd; i++ ) {\n" +
 				"\t\t\t\t"+kernelData+" total = 0;\n" +
@@ -254,15 +254,15 @@ public class GenerateConvolveDownNoBorderStandard {
 				"\t\tfinal "+outputData+"[] dataDst = output.data;\n" +
 				"\t\tfinal "+kernelData+"[] dataKernel = kernel.data;\n" +
 				"\n" +
-				"\t\tfinal int width = input.getWidth();\n" +
-				"\t\tfinal int height = input.getHeight();\n" +
+				"\t\tfinal int radius = kernel.getRadius();\n" +
+				"\t\tfinal int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);\n" +
+				"\t\tfinal int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);\n" +
 				"\n" +
-				"\t\tfinal int radius = kernel.width/2;\n" +
-				"\t\tfinal int offset = radius <= skip ? skip : radius + radius % skip; \n" +
+				"\t\tfinal int offset = UtilDownConvolve.computeOffset(skip,radius); \n" +
 				"\n" +
-				"\t\tfor( int y = offset; y < height-radius; y += skip ) {\n" +
+				"\t\tfor( int y = offset; y <= heightEnd; y += skip ) {\n" +
 				"\t\t\tint indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;\n" +
-				"\t\t\tfor( int x = offset; x < width-radius; x += skip ) {\n" +
+				"\t\t\tfor( int x = offset; x <= widthEnd; x += skip ) {\n" +
 				"\t\t\t\t"+kernelData+" total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
 				"\t\t\t\tfor( int ki = -radius; ki <= radius; ki++ ) {\n" +
