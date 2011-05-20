@@ -40,42 +40,11 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidKltTracker {
-
-	Random rand = new Random(234);
-
-	int width = 50;
-	int height = 60;
-
-	int featureReadius = 2;
-
-	ImageFloat32 image = new ImageFloat32(width,height);
-	PyramidUpdater<ImageFloat32> updater = createPyramidUpdater();
-	ImagePyramid<ImageFloat32> pyramid = createPyramid();
-	ImageFloat32[] derivX;
-	ImageFloat32[] derivY;
-	PyramidKltTracker<ImageFloat32,ImageFloat32> tracker = createDefaultTracker();
-
-	int cornerX = 20;
-	int cornerY = 22;
+public class TestPyramidKltTracker extends PyramidKltTestBase {
 
 	@Before
 	public void setup() {
-		ImageInitialization_F32.randomize(image,rand,0,1);
-		ImageInitialization_F32.fillRectangle(image,100,cornerX,cornerY,20,20);
-		updater.setPyramid(pyramid);
-		updater.update(image);
-
-		derivX = new ImageFloat32[pyramid.getNumLayers()];
-		derivY = new ImageFloat32[pyramid.getNumLayers()];
-		for( int i = 0; i < derivX.length; i++ ) {
-			int w = pyramid.getWidth(i);
-			int h = pyramid.getHeight(i);
-			derivX[i] = new ImageFloat32(w,h);
-			derivY[i] = new ImageFloat32(w,h);
-
-			GradientSobel.process(pyramid.getLayer(i),derivX[i],derivY[i],true);
-		}
+		super.setup();
 	}
 
 	private void setTargetLocation( int x , int y ) {
@@ -191,35 +160,45 @@ public class TestPyramidKltTracker {
 		assertEquals(21,feature.x,0.2);
 		assertEquals(22,feature.y,0.2);
 
-		// see if it updated the tracks description to allow more layers
-		assertTrue(feature.desc[2].Gxx != 0);
+		// outside layers should not be updated automatically
+		assertTrue(feature.desc[2].Gxx == 0);
 	}
 
 	/**
-	 * The feature being tracked will have a fault.
+	 * See if a track out of bounds error is returned
 	 */
 	@Test
-	public void track_fault() {
-		fail("implement tests");
+	public void track_OOB() {
+		setTargetLocation(5*4+1,22);
+
+		// set the feature right on the corner
+		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),4);
+		feature.setPosition(21,22);
+		tracker.setImage(pyramid,derivX,derivY);
+		tracker.setDescription(feature);
+
+		// put the feature out of bounds
+		feature.setPosition(5,0);
+
+		assertTrue( tracker.track(feature) == KltTrackFault.OUT_OF_BOUNDS);
 	}
 
-	private ImagePyramid<ImageFloat32> createPyramid() {
+	/**
+	 * See if a track out of bounds error is returned
+	 */
+	@Test
+	public void track_LargeError() {
+		setTargetLocation(5*4+1,22);
 
-		ImagePyramid<ImageFloat32> pyramid = new ImagePyramid_F32(width,height,false);
-		pyramid.setScaling(1,2,2);
+		// set the feature right on the corner
+		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),4);
+		feature.setPosition(21,22);
+		tracker.setImage(pyramid,derivX,derivY);
+		tracker.setDescription(feature);
 
-		return pyramid;
-	}
+		// mess up the description so that it will produce a large error
+		feature.desc[0].desc.set(0,0,1000);
 
-	private PyramidUpdater<ImageFloat32> createPyramidUpdater() {
-
-		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(2,true);
-		return new ConvolutionPyramid_F32(kernel);
-	}
-
-	private PyramidKltTracker<ImageFloat32,ImageFloat32> createDefaultTracker() {
-		KltTracker<ImageFloat32, ImageFloat32> klt = TestKltTracker.createDefaultTracker();
-
-		return new PyramidKltTracker<ImageFloat32,ImageFloat32>(klt);
+		assertTrue( tracker.track(feature) == KltTrackFault.LARGE_ERROR);
 	}
 }

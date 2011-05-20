@@ -23,12 +23,11 @@ import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * Base class for extracting corners. Can return all the found corners or just the corners with the highest
+ * Generic class for extracting corners of different types. Can return all the found corners or just the corners with the highest
  * intensity.
  *
  * @author Peter Abeles
  */
-// todo exclude previously found features
 public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 
 	// selects the features with the largest intensity
@@ -76,8 +75,12 @@ public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 	/**
 	 * Computes corners from image gradients.
 	 *
-	 * @param derivX image derivative in along the x-axis.
-	 * @param derivY image derivative in along the y-axis.
+	 * @param image Original image.
+	 * @param derivX image derivative in along the x-axis. Only needed if {@link #getRequiresGradient()} is true.
+	 * @param derivY image derivative in along the y-axis. Only needed if {@link #getRequiresGradient()} is true.
+	 * @param derivXX Second derivative.  Only needed if {@link #getRequiresHessian()} ()} is true.
+	 * @param derivXY Second derivative.  Only needed if {@link #getRequiresHessian()} ()} is true.
+	 * @param derivYY Second derivative.  Only needed if {@link #getRequiresHessian()} ()} is true.
 	 */
 	public void process(I image , D derivX, D derivY, D derivXX, D derivYY , D derivXY ) {
 		intensity.process(image,derivX, derivY, derivXX, derivYY, derivXY );

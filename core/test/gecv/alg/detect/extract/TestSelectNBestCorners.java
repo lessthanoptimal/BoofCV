@@ -37,10 +37,22 @@ public class TestSelectNBestCorners {
 
 	@Test
 	public void setN() {
+		ImageFloat32 intensity = new ImageFloat32(width,height);
+		SelectNBestCorners alg = new SelectNBestCorners(1);
+
 		// make sure N can grow with no problems
+		alg.setN(N);
+
+		QueueCorner origCorners = new QueueCorner(N+20);
+		for( int i = 0; i < origCorners.getMaxSize(); i++ ) {
+			origCorners.add(0,0);
+		}
+
+		alg.process(intensity,origCorners);
 
 		// shrinking should be no problem too
-		fail("Implement");
+		alg.setN(N-10);
+		alg.process(intensity,origCorners);
 	}
 
 	@Test
@@ -52,7 +64,7 @@ public class TestSelectNBestCorners {
 			}
 		}
 
-		QueueCorner origCorners = new QueueCorner(N+30);
+		QueueCorner origCorners = new QueueCorner(N);
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width && origCorners.size() < N-10; x++ ) {
 				origCorners.add(x,y);

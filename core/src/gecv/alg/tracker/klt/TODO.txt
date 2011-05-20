@@ -1,9 +1,10 @@
 - Asymmetric
+- Create KLT Factory
+- Benchmark for performance
+
 - Symmetric
 - Light invariant
 - Asymmetric with edges
-
-- benchmark with real images
 
 - Gray scale pyramid
 - Color images?

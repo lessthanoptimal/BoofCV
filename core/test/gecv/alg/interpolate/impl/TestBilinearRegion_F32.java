@@ -24,6 +24,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -55,6 +56,18 @@ public class TestBilinearRegion_F32 {
 	@Test
 	public void checkBottomRightEdge() {
 		checkRegion(10, 15, width - 10, height - 15);
+		checkRegion(10, 15, width - 9.9f, height - 14.8f);
+	}
+
+
+	@Test(expected=IllegalArgumentException.class)
+	public void outsideImageBorder() {
+		ImageFloat32 img = new ImageFloat32(width, height);
+		BilinearRectangle_F32 interp = new BilinearRectangle_F32();
+		interp.setImage(img);
+
+		ImageFloat32 out = new ImageFloat32(20,20);
+		interp.region(width-1, height-1, out );
 	}
 
 	/**
@@ -77,14 +90,14 @@ public class TestBilinearRegion_F32 {
 		interp.setImage(img);
 		interpPt.setImage(img);
 
-		float data[] = new float[regionWidth * regionHeight];
+		ImageFloat32 out = new ImageFloat32(regionWidth,regionHeight);
 
-		interp.region(tl_x, tl_y, data, regionWidth, regionHeight);
+		interp.region(tl_x, tl_y, out );
 
 		int i = 0;
 		for (int y = 0; y < regionHeight; y++) {
 			for (int x = 0; x < regionWidth; x++) {
-				assertEquals(interpPt.get(x + tl_x, y + tl_y), data[i++], 1e-4);
+				assertEquals("( "+x+" , "+y+" )",interpPt.get(x + tl_x, y + tl_y), out.get(x,y), 1e-4);
 			}
 		}
 	}

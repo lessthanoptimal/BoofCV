@@ -19,7 +19,7 @@ package gecv.alg.tracker.klt;
 import gecv.alg.InputSanityCheck;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.struct.image.ImageBase;
-import pja.geometry.struct.point.UtilPoint2D;
+import gecv.struct.image.ImageFloat32;
 
 /**
  * <p>
@@ -48,6 +48,7 @@ import pja.geometry.struct.point.UtilPoint2D;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"SuspiciousNameCombination"})
 public class KltTracker<InputImage extends ImageBase, DerivativeImage extends ImageBase> {
 
 	// input image
@@ -72,7 +73,7 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 	// length of the feature description
 	protected int lengthFeature;
 	// the feature in the current image
-	protected float descFeature[];
+	protected ImageFloat32 descFeature = new ImageFloat32(1,1);
 
 	// allowed feature bounds
 	float allowedLeft;
@@ -136,16 +137,16 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 		float tl_y = feature.y - feature.radius;
 
 		interpInput.setImage(image);
-		interpInput.region(tl_x, tl_y, feature.pixel, regionWidth, regionWidth);
+		interpInput.region(tl_x, tl_y, feature.desc);
 		interpDeriv.setImage(derivX);
-		interpDeriv.region(tl_x, tl_y, feature.derivX, regionWidth, regionWidth);
+		interpDeriv.region(tl_x, tl_y, feature.derivX);
 		interpDeriv.setImage(derivY);
-		interpDeriv.region(tl_x, tl_y, feature.derivY, regionWidth, regionWidth);
+		interpDeriv.region(tl_x, tl_y, feature.derivY);
 
 		float Gxx = 0, Gyy = 0, Gxy = 0;
 		for (int i = 0; i < size; i++) {
-			float dX = feature.derivX[i];
-			float dY = feature.derivY[i];
+			float dX = feature.derivX.data[i];
+			float dY = feature.derivY.data[i];
 
 			Gxx += dX * dX;
 			Gyy += dY * dY;
@@ -180,8 +181,9 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 		// compute the feature's width and temporary storage related to it
 		widthFeature = feature.radius * 2 + 1;
 		lengthFeature = widthFeature * widthFeature;
-		if (descFeature == null || descFeature.length < lengthFeature)
-			descFeature = new float[lengthFeature];
+
+		if (descFeature.data.length < lengthFeature)
+			descFeature.reshape(widthFeature,widthFeature);
 
 		for (int iter = 0; iter < config.maxIterations; iter++) {
 			computeE(feature, feature.x, feature.y);
@@ -226,23 +228,23 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 		float error = 0;
 		for (int i = 0; i < lengthFeature; i++) {
 			// compute the difference between the previous and the current image
-			error += Math.abs(feature.pixel[i] - descFeature[i]);
+			error += Math.abs(feature.desc.data[i] - descFeature.data[i]);
 		}
 		return error / lengthFeature;
 	}
 
 	private void computeE(KltFeature feature, float x, float y) {
 		// extract the region in the current image
-		interpInput.region(x - feature.radius, y - feature.radius, descFeature, widthFeature, widthFeature);
+		interpInput.region(x - feature.radius, y - feature.radius, descFeature);
 
 		Ex = 0;
 		Ey = 0;
 		for (int i = 0; i < lengthFeature; i++) {
 			// compute the difference between the previous and the current image
-			float d = feature.pixel[i] - descFeature[i];
+			float d = feature.desc.data[i] - descFeature.data[i];
 
-			Ex += d * feature.derivX[i];
-			Ey += d * feature.derivY[i];
+			Ex += d * feature.derivX.data[i];
+			Ey += d * feature.derivY.data[i];
 		}
 	}
 

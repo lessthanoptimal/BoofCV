@@ -100,6 +100,7 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 				x = feature.desc[layer].x;
 				y = feature.desc[layer].y;
 				feature.maxLayer = layer-1;
+				worked = false;
 				// if out of bounds try tracking on a lower layer
 			} else if (ret == KltTrackFault.SUCCESS) {
 				if( firstLevelTracked == -1 )
@@ -117,8 +118,6 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 			x *= image.scale[layer];
 			y *= image.scale[layer];
 		}
-
-
 
 		if (worked) {
 			feature.setPosition(x, y);

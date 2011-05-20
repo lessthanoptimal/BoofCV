@@ -17,6 +17,7 @@
 package gecv.alg.interpolate;
 
 import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageFloat32;
 
 /**
  * Performs interpolation across a whole rectangular region inside the image.  This can be significantly faster than
@@ -41,16 +42,13 @@ public interface InterpolateRectangle<T extends ImageBase> {
 	public T getImage();
 
 	/**
-	 * There is a certain amount of overhead involved with repeat calls to get.  If a grid
-	 * of points is being copied then this can be avoided by calling this function.  Here
-	 * it is assumed that a set of points needs to be copied that are all one pixel apart.
+	 * Copies a grid from the source image starting at the specified coordinate
+	 * into the destination image.  The 'dest' image must be within the original image.
 	 *
 	 * @param tl_x	  upper left corner of the region in the image.
 	 * @param tl_y	  upper left corner of the region in the image.
-	 * @param results   The subregion's data
-	 * @param regWidth  subregion width
-	 * @param regHeight subregion height
+	 * @param dest Where the interpolated region is to be copied into
 	 */
-	// TODO change the output into an image
-	public void region(float tl_x, float tl_y, float[] results, int regWidth, int regHeight);
+	public void region(float tl_x, float tl_y, ImageFloat32 dest );
+//	public void region(float tl_x, float tl_y, float[] results, int regWidth, int regHeight);
 }

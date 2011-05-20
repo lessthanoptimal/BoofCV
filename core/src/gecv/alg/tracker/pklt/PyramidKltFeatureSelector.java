@@ -22,15 +22,14 @@ import gecv.struct.pyramid.ImagePyramid;
 import java.util.List;
 
 /**
- * Automatically selects KLT features and creates descriptions of them.  There are many different ways to do this
- * for different applications.
+ * Interface for automatically selects {@link PyramidKltFeature} from an image.
  *
  * @author Peter Abeles
  */
 public interface PyramidKltFeatureSelector<InputImage extends ImageBase, DerivativeImage extends ImageBase> {
 
 	/**
-	 * Given the image and its gradient select features for the tracker to track.
+	 * Given the image and its gradient, select features for the tracker to track.
 	 *
 	 * @param image  Original image.
 	 * @param derivX Image derivative along the x-axis.
