@@ -28,17 +28,22 @@ import pja.geometry.struct.point.Point2D_I16;
 import java.util.List;
 
 /**
+ * Automatically selects features for the {@link PyramidKltTracker} using a {@link gecv.abst.detect.corner.GeneralCornerDetector}.
+ *
  * @author Peter Abeles
  */
-// todo comment and unit test
-public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeImage extends ImageBase> 
+public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeImage extends ImageBase>
 		implements PyramidKltFeatureSelector<InputImage,DerivativeImage>
 {
+	// selects corners
 	GeneralCornerDetector<InputImage,DerivativeImage> detector;
+	// used to set feature decription
 	PyramidKltTracker<InputImage,DerivativeImage> tracker;
 
+	// list of corners which should be ignored by the corner detector
 	QueueCorner excludeList = new QueueCorner(10);
 
+	// input images
 	ImagePyramid<InputImage> image;
 	DerivativeImage[] derivX;
 	DerivativeImage[] derivY;
@@ -75,6 +80,7 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 			PyramidKltFeature f = active.get(i);
 			excludeList.add((int)f.x,(int)f.y);
 		}
+		
 		// find new tracks
 		detector.setExcludedCorners(excludeList);
 		detector.setBestNumber(availableData.size());

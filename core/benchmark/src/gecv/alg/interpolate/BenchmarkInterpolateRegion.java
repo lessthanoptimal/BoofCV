@@ -23,6 +23,7 @@ import gecv.alg.drawing.impl.ImageInitialization_I8;
 import gecv.alg.interpolate.impl.BilinearRectangle_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
+import gecv.testing.GecvTesting;
 
 import java.util.Random;
 
@@ -38,24 +39,26 @@ public class BenchmarkInterpolateRegion {
 
 	static ImageFloat32 imgFloat32;
 	static ImageUInt8 imgInt8;
+	static ImageFloat32 outputImage;
 
 	// defines the region its interpolation
 	static float start = 10.1f;
 	static int regionSize = 300;
-	static float[] results = new float[regionSize * regionSize];
 
 	public static class Bilinear_F32 extends PerformerBase {
 		BilinearRectangle_F32 alg = new BilinearRectangle_F32(imgFloat32);
 
 		@Override
 		public void process() {
-			alg.region(start, start, results, regionSize, regionSize);
+			alg.region(start, start, outputImage);
 		}
 	}
 
 	public static void main(String args[]) {
 		imgInt8 = new ImageUInt8(imgWidth, imgHeight);
 		imgFloat32 = new ImageFloat32(imgWidth, imgHeight);
+
+		outputImage = new ImageFloat32(regionSize,regionSize);
 
 		Random rand = new Random(234);
 		ImageInitialization_I8.randomize(imgInt8, rand);
@@ -64,6 +67,10 @@ public class BenchmarkInterpolateRegion {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
+		ProfileOperation.printOpsPerSec(new Bilinear_F32(), TEST_TIME);
+
+		System.out.println("   ---- Sub-Image ----");
+		outputImage = GecvTesting.createSubImageOf(outputImage);
 		ProfileOperation.printOpsPerSec(new Bilinear_F32(), TEST_TIME);
 
 	}

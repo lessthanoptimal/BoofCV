@@ -22,6 +22,7 @@ import gecv.struct.image.ImageFloat32;
 
 /**
  * Performs bilinear interpolation to extract values between pixels in an image.
+ * Image borders are detected and handled appropriately.
  *
  * @author Peter Abeles
  */
@@ -52,7 +53,7 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<ImageFloat32>
 	}
 
 	@Override
-	public void region(float lt_x, float tl_y, float[] results, int regWidth, int regHeight) {
+	public void region(float lt_x, float tl_y, ImageFloat32 output ) {
 		int xt = (int) lt_x;
 		int yt = (int) tl_y;
 		float ax = lt_x - xt;
@@ -66,15 +67,30 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<ImageFloat32>
 		float a2 = ax * ay;
 		float a3 = bx * ay;
 
-		// make sure it is in bounds
+		int regWidth = output.width;
+		int regHeight = output.height;
+		final float results[] = output.data;
+		boolean borderRight = false;
+		boolean borderBottom = false;
+
+		// make sure it is in bounds or if its right on the image border
 		if (xt + regWidth >= orig.width || yt + regHeight >= orig.height) {
-			throw new RuntimeException("reguested region is out of bounds");
+			if( (xt + regWidth > orig.width || yt + regHeight > orig.height) )
+				throw new IllegalArgumentException("requested region is out of bounds");
+			if( xt+regWidth == orig.width ) {
+				regWidth--;
+				borderRight = true;
+			}
+			if( yt+regHeight == orig.height ) {
+				regHeight--;
+				borderBottom = true;
+			}
 		}
 
 		// perform the interpolation while reducing the number of times the image needs to be accessed
-		int indexResults = 0;
 		for (int i = 0; i < regHeight; i++) {
 			int index = orig.startIndex + (yt + i) * stride + xt;
+			int indexResults = output.startIndex + i*output.stride;
 
 			float XY = data[index];
 			float Xy = data[index + stride];
@@ -92,5 +108,56 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<ImageFloat32>
 				Xy = xy;
 			}
 		}
+		
+		// if touching the image border handle the special case
+		if( borderBottom || borderRight )
+			handleBorder(output, xt, yt, ax, ay, bx, by, regWidth, regHeight, results, borderRight, borderBottom);
 	}
+
+	private void handleBorder(ImageFloat32 output,
+							  int xt, int yt,
+							  float ax, float ay, float bx, float by,
+							  int regWidth, int regHeight, float[] results,
+							  boolean borderRight, boolean borderBottom) {
+
+		if( borderRight ) {
+			for( int y = 0; y < regHeight; y++ ) {
+				int index = orig.startIndex + (yt + y) * stride + xt + regWidth;
+				int indexResults = output.startIndex + y*output.stride + regWidth;
+
+				float XY = data[index];
+				float Xy = data[index + stride];
+
+				results[indexResults] = by*XY + ay*Xy;
+			}
+
+			if( borderBottom ) {
+				output.set(regWidth,regHeight, orig.get(xt+ regWidth,yt+regHeight));
+			} else {
+				float XY = orig.get(xt+ regWidth,yt+regHeight-1);
+				float Xy = orig.get(xt+ regWidth,yt+regHeight);
+
+				output.set(regWidth,regHeight-1, by*XY + ay*Xy);
+			}
+		}
+		if( borderBottom ) {
+			for( int x = 0; x < regWidth; x++ ) {
+				int index = orig.startIndex + (yt + regHeight) * stride + xt + x;
+				int indexResults = output.startIndex + regHeight *output.stride + x;
+
+				float XY = data[index];
+				float Xy = data[index + 1];
+
+				results[indexResults] = bx*XY + ax*Xy;
+			}
+
+			if( !borderRight ) {
+				float XY = orig.get(xt+regWidth-1,yt+ regHeight);
+				float Xy = orig.get(xt+regWidth, regHeight);
+
+				output.set(regWidth-1, regHeight, by*XY + ay*Xy);
+			}
+		}
+	}
+
 }

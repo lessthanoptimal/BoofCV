@@ -16,6 +16,8 @@
 
 package gecv.alg.tracker.klt;
 
+import gecv.struct.image.ImageFloat32;
+
 /**
  * @author Peter Abeles
  */
@@ -35,15 +37,15 @@ public class KltFeature {
 	/**
 	 * Pixel intensity around the feature
 	 */
-	public float pixel[];
+	public ImageFloat32 desc;
 	/**
 	 * Image derivative around the feature in the x-direction
 	 */
-	public float derivX[];
+	public ImageFloat32 derivX;
 	/**
 	 * Image derivative around the feature in the y-direction
 	 */
-	public float derivY[];
+	public ImageFloat32 derivY;
 
 	/**
 	 * spatial gradient matrix used in updating the feature's position
@@ -52,12 +54,11 @@ public class KltFeature {
 
 	public KltFeature(int radius) {
 		this.radius = radius;
-		int width = radius * 2 + 1;
-		int size = width * width;
+		int sideLength = radius * 2 + 1;
 
-		pixel = new float[size];
-		derivX = new float[size];
-		derivY = new float[size];
+		desc = new ImageFloat32(sideLength,sideLength);
+		derivX = new ImageFloat32(sideLength,sideLength);
+		derivY = new ImageFloat32(sideLength,sideLength);
 	}
 
 	public void setPosition(float x, float y) {

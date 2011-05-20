@@ -28,7 +28,7 @@ public class PyramidKltFeature {
 	KltFeature desc[];
 	float x;
 	float y;
-	int maxLayer;
+	int maxLayer=-1;
 
 	public PyramidKltFeature(int numLayers, int radius) {
 		desc = new KltFeature[numLayers];
