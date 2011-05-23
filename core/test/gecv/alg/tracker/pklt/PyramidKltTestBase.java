@@ -16,7 +16,7 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.pyramid.ConvolutionPyramid_F32;
@@ -27,7 +27,6 @@ import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
 import gecv.struct.pyramid.ImagePyramid_F32;
-import org.junit.Before;
 
 import java.util.Random;
 
@@ -56,8 +55,8 @@ public class PyramidKltTestBase {
 	int cornerY = 22;
 
 	public void setup() {
-		ImageInitialization_F32.randomize(image,rand,0,1);
-		ImageInitialization_F32.fillRectangle(image,100,cornerX,cornerY,20,20);
+		ImageTestingOps.randomize(image,rand,0,1);
+		ImageTestingOps.fillRectangle(image,100,cornerX,cornerY,20,20);
 		updater.setPyramid(pyramid);
 		updater.update(image);
 

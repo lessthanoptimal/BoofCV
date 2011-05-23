@@ -19,8 +19,7 @@ package gecv.alg.detect.corner;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.detect.corner.impl.*;
-import gecv.alg.drawing.impl.ImageInitialization_F32;
-import gecv.alg.drawing.impl.ImageInitialization_I16;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 
@@ -126,16 +125,16 @@ public class BenchmarkSsdCornerIntensity {
 		derivYY_I16 = new ImageSInt16(imgWidth, imgHeight);
 		derivXY_I16 = new ImageSInt16(imgWidth, imgHeight);
 
-		ImageInitialization_F32.randomize(derivX_F32, rand, 0, 255);
-		ImageInitialization_F32.randomize(derivY_F32, rand, 0, 255);
-		ImageInitialization_F32.randomize(derivXX_F32, rand, 0, 255);
-		ImageInitialization_F32.randomize(derivYY_F32, rand, 0, 255);
-		ImageInitialization_F32.randomize(derivXY_F32, rand, 0, 255);
-		ImageInitialization_I16.randomize(derivX_I16, rand, 0, 255);
-		ImageInitialization_I16.randomize(derivY_I16, rand, 0, 255);
-		ImageInitialization_I16.randomize(derivXX_I16, rand, 0, 255);
-		ImageInitialization_I16.randomize(derivYY_I16, rand, 0, 255);
-		ImageInitialization_I16.randomize(derivXY_I16, rand, 0, 255);
+		ImageTestingOps.randomize(derivX_F32, rand, 0, 255);
+		ImageTestingOps.randomize(derivY_F32, rand, 0, 255);
+		ImageTestingOps.randomize(derivXX_F32, rand, 0, 255);
+		ImageTestingOps.randomize(derivYY_F32, rand, 0, 255);
+		ImageTestingOps.randomize(derivXY_F32, rand, 0, 255);
+		ImageTestingOps.randomize(derivX_I16, rand, 0, 255);
+		ImageTestingOps.randomize(derivY_I16, rand, 0, 255);
+		ImageTestingOps.randomize(derivXX_I16, rand, 0, 255);
+		ImageTestingOps.randomize(derivYY_I16, rand, 0, 255);
+		ImageTestingOps.randomize(derivXY_I16, rand, 0, 255);
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();

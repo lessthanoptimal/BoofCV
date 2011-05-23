@@ -16,9 +16,9 @@
 
 package gecv.testing;
 
+import gecv.core.image.FactorySingleBandImage;
+import gecv.core.image.SingleBandImage;
 import gecv.struct.image.*;
-import gecv.struct.image.generalized.FactorySingleBandImage;
-import gecv.struct.image.generalized.SingleBandImage;
 import sun.awt.image.ByteInterleavedRaster;
 
 import java.awt.image.BufferedImage;

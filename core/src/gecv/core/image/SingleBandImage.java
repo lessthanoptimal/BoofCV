@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.struct.image.generalized;
+package gecv.core.image;
 
 /**
  * Generalized interface for single banded images.  Due to the slow performance associated with working with this

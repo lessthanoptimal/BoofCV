@@ -16,8 +16,7 @@
 
 package gecv.alg.filter.derivative.impl;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -44,7 +43,7 @@ public class TestGradientSobel_UnrolledOuter {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
 				ImageUInt8 img = new ImageUInt8(w, h);
-				ImageInitialization_I8.randomize(img, new Random(0xfeed));
+				ImageTestingOps.randomize(img, new Random(0xfeed), 0, 100);
 
 				ImageSInt16 derivX = new ImageSInt16(w, h);
 				ImageSInt16 derivY = new ImageSInt16(w, h);
@@ -71,7 +70,7 @@ public class TestGradientSobel_UnrolledOuter {
 				int w = width+offX; int h = height+offY;
 
 				ImageFloat32 img = new ImageFloat32(w, h);
-				ImageInitialization_F32.randomize(img, rand, 0f, 255f);
+				ImageTestingOps.randomize(img, rand, 0f, 255f);
 
 				ImageFloat32 derivX = new ImageFloat32(w, h);
 				ImageFloat32 derivY = new ImageFloat32(w, h);
@@ -94,7 +93,7 @@ public class TestGradientSobel_UnrolledOuter {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
 				ImageFloat32 img = new ImageFloat32(w, h);
-				ImageInitialization_F32.randomize(img, rand, 0f, 255f);
+				ImageTestingOps.randomize(img, rand, 0f, 255f);
 
 				ImageFloat32 derivX = new ImageFloat32(w, h);
 				ImageFloat32 derivY = new ImageFloat32(w, h);

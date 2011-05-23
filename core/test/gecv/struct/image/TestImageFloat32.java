@@ -16,10 +16,6 @@
 
 package gecv.struct.image;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
-
 /**
  * @author Peter Abeles
  */

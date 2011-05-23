@@ -14,40 +14,27 @@
  *    limitations under the License.
  */
 
-package gecv.alg.drawing.impl;
+package gecv.alg.misc;
 
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.ImageInterleavedInt8;
 
 import java.util.Random;
 
+
 /**
- * Basic drawing operations for {@link gecv.struct.image.ImageUInt8}.
- *
  * @author Peter Abeles
  */
-public class ImageInitialization_I8 {
+public class ImageInterleavedTestingOps {
+	/**
+	 * Fills the whole image with the specified pixel value
+	 *
+	 * @param img   An image.
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fill(ImageInterleavedInt8 img, byte... value) {
+		if (value.length != img.numBands)
+			throw new IllegalArgumentException("Unexpected number of bands");
 
-	public static void addNoise(ImageInt8 img, Random rand , int min , int max) {
-		final int h = img.getHeight();
-		final int w = img.getWidth();
-
-		int range = 1+max-min;
-
-		byte[] data = img.data;
-
-		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < w; x++) {
-				int value = (data[index] & 0xFF) + rand.nextInt(range)+min;
-				if( value < 0 ) value = 0;
-				if( value > 255 ) value = 255;
-
-				data[index++] = (byte) value;
-			}
-		}
-	}
-
-	public static void fill(ImageInt8 img, int value) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -56,7 +43,8 @@ public class ImageInitialization_I8 {
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			for (int x = 0; x < w; x++) {
-				data[index++] = (byte) value;
+				for (int k = 0; k < img.numBands; k++)
+					data[index++] = value[k];
 			}
 		}
 	}
@@ -67,7 +55,7 @@ public class ImageInitialization_I8 {
 	 * @param img  An image.
 	 * @param rand The value that the image is being filled with.
 	 */
-	public static void randomize(ImageInt8 img, Random rand) {
+	public static void randomize(ImageInterleavedInt8 img, Random rand) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -77,22 +65,8 @@ public class ImageInitialization_I8 {
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			for (int x = 0; x < w; x++) {
-				data[index++] = (byte) (rand.nextInt(range) + Byte.MIN_VALUE);
-			}
-		}
-	}
-
-	public static void randomize(ImageInt8 img, Random rand, int min, int max) {
-		final int h = img.getHeight();
-		final int w = img.getWidth();
-
-		byte[] data = img.data;
-		int range = 1 + max - min;
-
-		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < w; x++) {
-				data[index++] = (byte) (rand.nextInt(range) + min);
+				for (int k = 0; k < img.numBands; k++)
+					data[index++] = (byte) (rand.nextInt(range) + Byte.MIN_VALUE);
 			}
 		}
 	}

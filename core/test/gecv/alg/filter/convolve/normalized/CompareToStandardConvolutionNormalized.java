@@ -19,8 +19,6 @@ package gecv.alg.filter.convolve.normalized;
 import gecv.alg.filter.convolve.ConvolutionTestHelper;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.core.image.GeneralizedImageOps;
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageBase;
 import gecv.testing.CompareIdenticalFunctions;
 

@@ -16,7 +16,7 @@
 
 package gecv.core.image;
 
-import gecv.alg.drawing.impl.ImageInitialization_InterleavedI8;
+import gecv.alg.misc.ImageInterleavedTestingOps;
 import gecv.struct.image.ImageInterleavedInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class TestUtilImageInterleavedInt8 {
 	}
 
 	public void checkFill(ImageInterleavedInt8 image) {
-		ImageInitialization_InterleavedI8.fill(image, (byte) 6, (byte) 7, (byte) 8);
+		ImageInterleavedTestingOps.fill(image, (byte) 6, (byte) 7, (byte) 8);
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {
@@ -60,7 +60,7 @@ public class TestUtilImageInterleavedInt8 {
 	}
 
 	public void checkRandomize(ImageInterleavedInt8 image) {
-		ImageInitialization_InterleavedI8.randomize(image, rand);
+		ImageInterleavedTestingOps.randomize(image, rand);
 
 		int totalZero = 0;
 		for (int y = 0; y < image.getHeight(); y++) {

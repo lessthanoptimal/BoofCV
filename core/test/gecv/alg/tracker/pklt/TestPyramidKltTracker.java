@@ -16,26 +16,14 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.derivative.GradientSobel;
-import gecv.alg.pyramid.ConvolutionPyramid_F32;
-import gecv.alg.pyramid.PyramidUpdater;
 import gecv.alg.tracker.klt.KltTrackFault;
-import gecv.alg.tracker.klt.KltTracker;
-import gecv.alg.tracker.klt.TestKltTracker;
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramid_F32;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Random;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -48,8 +36,8 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	}
 
 	private void setTargetLocation( int x , int y ) {
-		ImageInitialization_F32.randomize(image,rand,0,1);
-		ImageInitialization_F32.fillRectangle(image,100,cornerX,cornerY,20,20);
+		ImageTestingOps.randomize(image,rand,0,1);
+		ImageTestingOps.fillRectangle(image,100,cornerX,cornerY,20,20);
 		updater.update(image);
 
 		for( int i = 0; i < derivX.length; i++ ) {

@@ -19,7 +19,8 @@ package gecv.struct.pyramid;
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles

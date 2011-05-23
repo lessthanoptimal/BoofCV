@@ -17,11 +17,10 @@
 package gecv.alg.filter.convolve;
 
 import gecv.alg.filter.convolve.border.CompareImageBorder;
+import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.generalized.FactorySingleBandImage;
-import gecv.struct.image.generalized.SingleBandImage;
-import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.lang.reflect.Method;

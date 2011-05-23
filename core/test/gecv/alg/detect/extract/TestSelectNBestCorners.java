@@ -23,7 +23,6 @@ import pja.geometry.struct.point.Point2D_I16;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles

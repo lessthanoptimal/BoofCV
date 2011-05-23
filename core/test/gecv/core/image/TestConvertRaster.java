@@ -16,7 +16,7 @@
 
 package gecv.core.image;
 
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
@@ -136,7 +136,7 @@ public class TestConvertRaster {
 	@Test
 	public void grayToBuffered_ByteInterleaved() {
 		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
-		ImageInitialization_I8.randomize(result, rand);
+		ImageTestingOps.randomize(result, rand, 0, 100);
 
 		GecvTesting.checkSubImage(this, "grayToBuffered_ByteInterleaved", true, result);
 	}
@@ -157,7 +157,7 @@ public class TestConvertRaster {
 	@Test
 	public void grayToBuffered_IntegerInterleaved() {
 		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
-		ImageInitialization_I8.randomize(result, rand);
+		ImageTestingOps.randomize(result, rand, 0, 100);
 
 		GecvTesting.checkSubImage(this, "grayToBuffered_IntegerInterleaved", true, result);
 	}
@@ -172,7 +172,7 @@ public class TestConvertRaster {
 	@Test
 	public void grayToBuffered_BufferedImage() {
 		ImageUInt8 result = new ImageUInt8(imgWidth, imgHeight);
-		ImageInitialization_I8.randomize(result, rand);
+		ImageTestingOps.randomize(result, rand, 0, 100);
 
 		GecvTesting.checkSubImage(this, "grayToBuffered_BufferedImage", true, result);
 	}

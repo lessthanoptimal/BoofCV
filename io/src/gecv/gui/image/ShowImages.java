@@ -16,7 +16,7 @@
 
 package gecv.gui.image;
 
-import gecv.alg.drawing.PixelMath;
+import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;

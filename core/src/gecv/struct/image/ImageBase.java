@@ -254,6 +254,20 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/**
+	 * Returns true if the image stores pixel values as integers.
+	 *
+	 * @return True if it is an integer image.
+	 */
+	public abstract boolean isInteger();
+
+	/**
+	 * If the data is assumed to be signed or unsigned.
+	 *
+	 * @return true for signed and false for unsigned.
+	 */
+	public abstract boolean isSigned();
+
+	/**
 	 * Returns the data array the image is stored in.
 	 *
 	 * @return data array;
@@ -265,7 +279,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 *
 	 * @return primitive data type
 	 */
-	protected abstract Class<?> _getPrimitiveType();
+	public abstract Class<?> _getPrimitiveType();
 
 	/**
 	 * Sets the image's internal data array.

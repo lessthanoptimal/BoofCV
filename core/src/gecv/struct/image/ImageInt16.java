@@ -60,7 +60,7 @@ public abstract class ImageInt16<T extends ImageInt16> extends ImageInteger<T> {
 	}
 
 	@Override
-	protected Class<?> _getPrimitiveType() {
+	public Class<?> _getPrimitiveType() {
 		return short.class;
 	}
 }

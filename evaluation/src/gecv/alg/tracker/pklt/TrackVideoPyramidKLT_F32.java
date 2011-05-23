@@ -59,7 +59,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 		ImageBase<?> image = sequence.next();
 
 		KltConfig configKLt = new KltConfig();
-		configKLt.forbiddenBorder = 1;
+		configKLt.forbiddenBorder = 0;
 		configKLt.maxPerPixelError = 25.0f;
 		configKLt.maxIterations = 15;
 		configKLt.minDeterminant = 0.001f;
@@ -76,7 +76,6 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 		config.maxFeatures = 100;
 		config.featureRadius = 3;
 
-		// todo fix bilinear to remove forbidden boundary
 		InterpolateRectangle<ImageFloat32> interp = FactoryInterpolation.bilinearRectangle_F32();
 
 		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity =

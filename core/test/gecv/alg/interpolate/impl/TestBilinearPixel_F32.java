@@ -16,7 +16,7 @@
 
 package gecv.alg.interpolate.impl;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.image.ImageFloat32;
 
@@ -34,7 +34,7 @@ public class TestBilinearPixel_F32 extends GeneralInterpolationPixelChecks<Image
 
 	@Override
 	protected void randomize(ImageFloat32 image) {
-		ImageInitialization_F32.randomize(image, rand, 0, 100);
+		ImageTestingOps.randomize(image, rand, 0, 100);
 	}
 
 	@Override

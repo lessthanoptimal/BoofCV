@@ -44,12 +44,10 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageBase<T>{
 	protected ImageInteger() {
 	}
 
-	/**
-	 * If the data is assumed to be signed or unsigned.
-	 *
-	 * @return true for signed and false for unsigned.
-	 */
-	public abstract boolean isSigned();
+	@Override
+	public boolean isInteger() {
+		return true;
+	}
 
 	/**
 	 * Returns the value of the specified pixel.
@@ -74,6 +72,13 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageBase<T>{
 	 */
 	public abstract void set(int x, int y, int value );
 
+	/**
+	 * Get function which does not perform bounds checking.
+	 *
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
+	 * @return an intensity value.
+	 */
 	protected abstract int unsafe_get( int x , int y );
 
 	public void printBinary() {

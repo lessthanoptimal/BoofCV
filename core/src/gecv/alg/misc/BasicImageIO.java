@@ -14,19 +14,21 @@
  *    limitations under the License.
  */
 
-package gecv.alg.drawing.impl;
+package gecv.alg.misc;
 
-import org.junit.Test;
+import gecv.struct.image.ImageFloat32;
 
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestPixelMath_F32 {
-
-	@Test
-	public void implement() {
-		fail("implement");
+public class BasicImageIO {
+	public static void print(ImageFloat32 a) {
+		for (int y = 0; y < a.height; y++) {
+			for (int x = 0; x < a.width; x++) {
+				System.out.printf("%5.2f ", a.get(x, y));
+			}
+			System.out.println();
+		}
 	}
 }

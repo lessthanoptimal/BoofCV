@@ -125,12 +125,22 @@ public class TestImageInterleaved {
 		}
 
 		@Override
+		public boolean isInteger() {
+			return true;
+		}
+
+		@Override
+		public boolean isSigned() {
+			return true;
+		}
+
+		@Override
 		protected Object _getData() {
 			return data;
 		}
 
 		@Override
-		protected Class<?> _getPrimitiveType() {
+		public Class<?> _getPrimitiveType() {
 			return int.class;
 		}
 

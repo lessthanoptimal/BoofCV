@@ -16,7 +16,7 @@
 
 package gecv.alg.detect.extract;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
@@ -27,7 +27,6 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -40,7 +39,7 @@ public class TestNonMaxCornerExtractorNaive {
 	@Test
 	public void checkNullExcludeList() {
 		ImageFloat32 inten = new ImageFloat32(30, 40);
-		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
+		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
 
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 
@@ -55,7 +54,7 @@ public class TestNonMaxCornerExtractorNaive {
 	@Test
 	public void excludePreExisting() {
 		ImageFloat32 inten = new ImageFloat32(30, 40);
-		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
+		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
 
 		QueueCorner excludeList = new QueueCorner(inten.getWidth() * inten.getHeight());
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
@@ -72,7 +71,7 @@ public class TestNonMaxCornerExtractorNaive {
 		}
 
 		// recreate the same image
-		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
+		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
 		alg.process(inten,excludeList,cornersSecond);
 
 		// make sure none of the features in the exclude list are in the second list

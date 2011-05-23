@@ -16,9 +16,9 @@
 
 package gecv.alg.filter.convolve.normalized;
 
+import gecv.core.image.FactorySingleBandImage;
+import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.generalized.FactorySingleBandImage;
-import gecv.struct.image.generalized.SingleBandImage;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
