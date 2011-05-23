@@ -18,13 +18,13 @@ package gecv.alg.filter.convolve.border;
 
 import gecv.alg.filter.convolve.ConvolutionTestHelper;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.SingleBandImage;
 import gecv.core.image.border.ImageBorder;
 import gecv.core.image.border.ImageBorderValue;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInteger;
-import gecv.struct.image.generalized.FactorySingleBandImage;
-import gecv.struct.image.generalized.SingleBandImage;
+import gecv.core.image.FactorySingleBandImage;
 import org.junit.Test;
 
 import java.lang.reflect.Method;

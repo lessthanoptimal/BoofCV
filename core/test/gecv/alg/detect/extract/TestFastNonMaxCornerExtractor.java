@@ -16,7 +16,7 @@
 
 package gecv.alg.detect.extract;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -24,9 +24,7 @@ import pja.geometry.struct.point.Point2D_I16;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -41,7 +39,7 @@ public class TestFastNonMaxCornerExtractor {
 	@Test
 	public void checkNullExcludeList() {
 		ImageFloat32 inten = new ImageFloat32(30, 40);
-		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
+		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
 
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 
@@ -57,7 +55,7 @@ public class TestFastNonMaxCornerExtractor {
 	@Test
 	public void excludePreExisting() {
 		ImageFloat32 inten = new ImageFloat32(30, 40);
-		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
+		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
 
 		QueueCorner excludeList = new QueueCorner(inten.getWidth() * inten.getHeight());
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
@@ -74,7 +72,7 @@ public class TestFastNonMaxCornerExtractor {
 		}
 
 		// recreate the same image
-		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
+		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
 		alg.process(inten,excludeList,cornersSecond);
 
 		// make sure none of the features in the exclude list are in the second list
@@ -113,7 +111,7 @@ public class TestFastNonMaxCornerExtractor {
 				NonMaxCornerExtractorNaive reg = new NonMaxCornerExtractorNaive(nonMaxWidth / 2, 0.6F);
 
 				for (int i = 0; i < 10; i++) {
-					ImageInitialization_F32.randomize(inten, rand, 0, 10);
+					ImageTestingOps.randomize(inten, rand, 0, 10);
 
 					fast.process(inten, null,fastCorners);
 					reg.process(inten, null,regCorners);

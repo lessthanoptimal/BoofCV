@@ -40,6 +40,16 @@ public class ImageFloat32 extends ImageBase<ImageFloat32> {
 	public ImageFloat32() {
 	}
 
+	@Override
+	public boolean isInteger() {
+		return false;
+	}
+
+	@Override
+	public boolean isSigned() {
+		return true;
+	}
+
 	/**
 	 * Returns the value of the specified pixel.
 	 *
@@ -90,7 +100,7 @@ public class ImageFloat32 extends ImageBase<ImageFloat32> {
 	}
 
 	@Override
-	protected Class<?> _getPrimitiveType() {
+	public Class<?> _getPrimitiveType() {
 		return float.class;
 	}
 }

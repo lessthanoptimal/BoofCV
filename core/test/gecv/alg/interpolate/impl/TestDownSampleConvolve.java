@@ -16,9 +16,7 @@
 
 package gecv.alg.interpolate.impl;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
-import gecv.alg.drawing.impl.ImageInitialization_I16;
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.blur.BlurImageOps;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.interpolate.DownSampleConvolve;
@@ -92,7 +90,7 @@ public class TestDownSampleConvolve {
 	@Test
 	public void downSample_I8() {
 		ImageUInt8 img = new ImageUInt8(width,height);
-		ImageInitialization_I8.randomize(img,rand);
+		ImageTestingOps.randomize(img,rand, 0, 100);
 		ImageUInt8 downSampled = new ImageUInt8(width/N,height/N);
 
 		GecvTesting.checkSubImage(this,"downSampled_I8",true, img, downSampled);
@@ -121,7 +119,7 @@ public class TestDownSampleConvolve {
 	public void downSample_I16() {
 
 		ImageSInt16 img = new ImageSInt16(width,height);
-		ImageInitialization_I16.randomize(img,rand,0,200);
+		ImageTestingOps.randomize(img,rand,0,200);
 		ImageSInt16 downSampled = new ImageSInt16(width/N,height/N);
 
 		GecvTesting.checkSubImage(this,"downSampled_I16",true, img, downSampled);
@@ -150,7 +148,7 @@ public class TestDownSampleConvolve {
 	public void downSample_F32() {
 
 		ImageFloat32 img = new ImageFloat32(width,height);
-		ImageInitialization_F32.randomize(img,rand,0,200);
+		ImageTestingOps.randomize(img,rand,0,200);
 		ImageFloat32 downSampled = new ImageFloat32(width/N,height/N);
 
 		GecvTesting.checkSubImage(this,"downSampled_F32",true, img, downSampled);

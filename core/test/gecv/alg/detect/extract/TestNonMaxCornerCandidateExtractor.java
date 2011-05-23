@@ -16,7 +16,7 @@
 
 package gecv.alg.detect.extract;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
@@ -37,7 +37,7 @@ public class TestNonMaxCornerCandidateExtractor {
 	@Test
 	public void checkNullExcludeList() {
 		ImageFloat32 inten = new ImageFloat32(30, 40);
-		ImageInitialization_F32.randomize(inten, new Random(1231), 0, 10);
+		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
 
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 		QueueCorner candidates = new QueueCorner(100);

@@ -17,8 +17,7 @@
 package gecv.abst.filter.convolve;
 
 import gecv.abst.filter.FilterInterface;
-import gecv.alg.drawing.impl.ImageInitialization_F32;
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.convolve.ConvolveExtended;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.ConvolveNormalized;
@@ -56,7 +55,7 @@ public class TestFactoryConvolution {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		ImageInitialization_F32.randomize(input,rand,0,5);
+		ImageTestingOps.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolution.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP,true);
@@ -88,7 +87,7 @@ public class TestFactoryConvolution {
 		ImageSInt16 found = new ImageSInt16(width,height);
 		ImageSInt16 expected = new ImageSInt16(width,height);
 
-		ImageInitialization_I8.randomize(input,rand,0,5);
+		ImageTestingOps.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.SKIP,true);
@@ -121,7 +120,7 @@ public class TestFactoryConvolution {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		ImageInitialization_F32.randomize(input,rand,0,5);
+		ImageTestingOps.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolution.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP);
@@ -153,7 +152,7 @@ public class TestFactoryConvolution {
 		ImageSInt16 found = new ImageSInt16(width,height);
 		ImageSInt16 expected = new ImageSInt16(width,height);
 
-		ImageInitialization_I8.randomize(input,rand,0,5);
+		ImageTestingOps.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolution.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.SKIP);

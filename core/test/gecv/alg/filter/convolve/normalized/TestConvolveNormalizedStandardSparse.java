@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.convolve.normalized;
 
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.core.image.ConvertImage;
@@ -94,7 +94,7 @@ public class TestConvolveNormalizedStandardSparse {
 
 	private void checkMethod(Method method, int width, int height, int kernelRadius, Random rand) {
 		ImageUInt8 seedImage = new ImageUInt8(width,height);
-		ImageInitialization_I8.randomize(seedImage,rand,0,255);
+		ImageTestingOps.randomize(seedImage,rand,0,255);
 
 		// creates a floating point image with integer elements
 		ImageFloat32 floatImage = new ImageFloat32(width,height);

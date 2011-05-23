@@ -84,7 +84,7 @@ public class ImageSInt32 extends ImageInteger<ImageSInt32> {
 	}
 
 	@Override
-	protected Class<?> _getPrimitiveType() {
+	public Class<?> _getPrimitiveType() {
 		return int.class;
 	}
 }

@@ -20,7 +20,7 @@ import gecv.abst.detect.corner.*;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.filter.derivative.GradientThree;
 import gecv.alg.filter.derivative.HessianFromGradient;
@@ -134,7 +134,7 @@ public class BenchmarkCornerAccuracy {
 		addRectangle(g2,tran,-120,200,60,40);
 
 		ConvertBufferedImage.convertFrom(workImg,image);
-		ImageInitialization_I8.addNoise(image,rand,-2,2);
+		ImageTestingOps.addUniform(image,rand,-2,2);
 		GradientSobel.process(image,derivX,derivY, false);
 	}
 

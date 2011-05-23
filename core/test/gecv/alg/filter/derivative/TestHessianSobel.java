@@ -16,8 +16,7 @@
 
 package gecv.alg.filter.derivative;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -46,7 +45,7 @@ public class TestHessianSobel {
 		validator.setKernel(2, HessianSobel.kernelXY_I32);
 
 		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageInitialization_I8.randomize(input, rand, 0, 10);
+		ImageTestingOps.randomize(input, rand, 0, 10);
 		ImageSInt16 derivXX = new ImageSInt16(width,height);
 		ImageSInt16 derivYY = new ImageSInt16(width,height);
 		ImageSInt16 derivXY = new ImageSInt16(width,height);
@@ -65,7 +64,7 @@ public class TestHessianSobel {
 		validator.setKernel(2, HessianSobel.kernelXY_F32);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageInitialization_F32.randomize(input, rand, 0, 10);
+		ImageTestingOps.randomize(input, rand, 0, 10);
 		ImageFloat32 derivXX = new ImageFloat32(width,height);
 		ImageFloat32 derivYY = new ImageFloat32(width,height);
 		ImageFloat32 derivXY = new ImageFloat32(width,height);

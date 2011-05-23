@@ -20,7 +20,6 @@ import gecv.alg.filter.convolve.CompareToStandardConvolution;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 

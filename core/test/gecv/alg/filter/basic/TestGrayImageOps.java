@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.basic;
 
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class TestGrayImageOps {
 	@Test
 	public void invert() {
 		ImageUInt8 input = new ImageUInt8(width, height);
-		ImageInitialization_I8.randomize(input, rand);
+		ImageTestingOps.randomize(input, rand, 0, 100);
 
 		ImageUInt8 output = GrayImageOps.invert(input, null);
 
@@ -50,7 +50,7 @@ public class TestGrayImageOps {
 	@Test
 	public void brighten() {
 		ImageUInt8 input = new ImageUInt8(width, height);
-		ImageInitialization_I8.fill(input, 23);
+		ImageTestingOps.fill(input, 23);
 
 		ImageUInt8 output = GrayImageOps.brighten(input, 10, null);
 
@@ -65,7 +65,7 @@ public class TestGrayImageOps {
 		assertEquals(255, output.get(5, 6));
 
 		// check it flooring to zero
-		ImageInitialization_I8.fill(input, 23);
+		ImageTestingOps.fill(input, 23);
 		output = GrayImageOps.brighten(input, -50, null);
 		assertEquals(0, output.get(5, 6));
 	}
@@ -73,7 +73,7 @@ public class TestGrayImageOps {
 	@Test
 	public void stretch() {
 		ImageUInt8 input = new ImageUInt8(width, height);
-		ImageInitialization_I8.fill(input, 23);
+		ImageTestingOps.fill(input, 23);
 
 		ImageUInt8 output = GrayImageOps.stretch(input, 2.5, 10, null);
 
@@ -88,7 +88,7 @@ public class TestGrayImageOps {
 		assertEquals(255, output.get(5, 6));
 
 		// check it flooring to zero
-		ImageInitialization_I8.fill(input, 23);
+		ImageTestingOps.fill(input, 23);
 		output = GrayImageOps.stretch(input, -1, 2, null);
 		assertEquals(0, output.get(5, 6));
 	}

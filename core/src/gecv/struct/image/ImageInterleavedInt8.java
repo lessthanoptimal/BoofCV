@@ -41,6 +41,16 @@ public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8>
 	public ImageInterleavedInt8() {
 	}
 
+	@Override
+	public boolean isInteger() {
+		return true;
+	}
+
+	@Override
+	public boolean isSigned() {
+		return true;
+	}
+
 	/**
 	 * Returns the pixel's value for all the bands as an array.
 	 *
@@ -144,7 +154,7 @@ public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8>
 	}
 
 	@Override
-	protected Class<?> _getPrimitiveType() {
+	public Class<?> _getPrimitiveType() {
 		return byte.class;
 	}
 }

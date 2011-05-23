@@ -16,7 +16,7 @@
 
 package gecv.alg.interpolate.impl;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -24,7 +24,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -75,7 +74,7 @@ public class TestBilinearRegion_F32 {
 	 */
 	public void checkRegion(int regionWidth, int regionHeight, float x, float y) {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageInitialization_F32.randomize(img, rand, 0, 100);
+		ImageTestingOps.randomize(img, rand, 0, 100);
 
 		this.regionWidth = regionWidth;
 		this.regionHeight = regionHeight;

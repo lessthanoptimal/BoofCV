@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.convolve.noborder;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
@@ -40,7 +40,7 @@ public class TestConvolveBox_F32_F32 {
 		ImageFloat32 outputA = new ImageFloat32(width, height);
 		ImageFloat32 outputB = new ImageFloat32(width, height);
 
-		ImageInitialization_F32.randomize(input, rand, 0, 10);
+		ImageTestingOps.randomize(input, rand, 0, 10);
 
 		GecvTesting.checkSubImage(this, "horizontal", true, input, outputA, outputB);
 	}
@@ -67,7 +67,7 @@ public class TestConvolveBox_F32_F32 {
 		ImageFloat32 outputA = new ImageFloat32(width, height);
 		ImageFloat32 outputB = new ImageFloat32(width, height);
 
-		ImageInitialization_F32.randomize(input, rand, 0, 10);
+		ImageTestingOps.randomize(input, rand, 0, 10);
 
 		GecvTesting.checkSubImage(this, "vertical", true, input, outputA, outputB);
 	}

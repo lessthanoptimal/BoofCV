@@ -16,8 +16,7 @@
 
 package gecv.alg.filter.derivative.impl;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.derivative.CompareDerivativeToConvolution;
 import gecv.alg.filter.derivative.GradientThree;
 import gecv.struct.image.ImageFloat32;
@@ -47,7 +46,7 @@ public class TestGradientThree_Standard {
 		validator.setKernel(1, GradientThree.kernelDeriv_I32,false);
 
 		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageInitialization_I8.randomize(input, rand, 0, 10);
+		ImageTestingOps.randomize(input, rand, 0, 10);
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
 
@@ -64,7 +63,7 @@ public class TestGradientThree_Standard {
 		validator.setKernel(1, GradientThree.kernelDeriv_F32,false);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageInitialization_F32.randomize(input, rand, 0, 10);
+		ImageTestingOps.randomize(input, rand, 0, 10);
 		ImageFloat32 derivX = new ImageFloat32(width,height);
 		ImageFloat32 derivY = new ImageFloat32(width,height);
 

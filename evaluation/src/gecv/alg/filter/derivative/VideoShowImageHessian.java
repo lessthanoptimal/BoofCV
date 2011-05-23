@@ -18,7 +18,7 @@ package gecv.alg.filter.derivative;
 
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageHessianDirect;
-import gecv.alg.drawing.PixelMath;
+import gecv.alg.misc.PixelMath;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;

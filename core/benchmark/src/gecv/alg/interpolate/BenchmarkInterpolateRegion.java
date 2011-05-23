@@ -18,8 +18,7 @@ package gecv.alg.interpolate;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.drawing.impl.ImageInitialization_F32;
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.interpolate.impl.BilinearRectangle_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
@@ -61,8 +60,8 @@ public class BenchmarkInterpolateRegion {
 		outputImage = new ImageFloat32(regionSize,regionSize);
 
 		Random rand = new Random(234);
-		ImageInitialization_I8.randomize(imgInt8, rand);
-		ImageInitialization_F32.randomize(imgFloat32, rand, 0, 200);
+		ImageTestingOps.randomize(imgInt8, rand, 0, 100);
+		ImageTestingOps.randomize(imgFloat32, rand, 0, 200);
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();

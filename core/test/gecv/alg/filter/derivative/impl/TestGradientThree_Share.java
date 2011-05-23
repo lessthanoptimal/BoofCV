@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.derivative.impl;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class TestGradientThree_Share {
 	@Test
 	public void derivX_F32() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageInitialization_F32.randomize(img, rand, 0f, 255f);
+		ImageTestingOps.randomize(img, rand, 0f, 255f);
 
 		ImageFloat32 derivX = new ImageFloat32(width, height);
 

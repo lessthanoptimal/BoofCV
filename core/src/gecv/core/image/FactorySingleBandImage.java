@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.struct.image.generalized;
+package gecv.core.image;
 
 import gecv.struct.image.*;
 
@@ -26,55 +26,17 @@ import gecv.struct.image.*;
 public class FactorySingleBandImage {
 
 	public static SingleBandImage wrap( ImageBase image ) {
-		if( image.getClass() == ImageUInt8.class )
-			return new SingleBandInt8( (ImageUInt8)image );
-		else if( image.getClass() == ImageSInt16.class )
-			return new SingleBandInt16( (ImageSInt16)image );
-		else if( image.getClass() == ImageSInt32.class )
-			return new SingleBandInt32( (ImageSInt32)image );
+		if( ImageInteger.class.isAssignableFrom(image.getClass()) )
+			return new SingleBandInt( (ImageInteger)image );
 		else if( image.getClass() == ImageFloat32.class )
 			return new SingleBandFloat32( (ImageFloat32)image );
 		else
-			throw new IllegalArgumentException("Unknown image type");
+			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 	}
 
-	public static class SingleBandInt8 extends SingleBaseInt<ImageUInt8>
+	public static class SingleBandInt extends SingleBaseInt<ImageInteger>
 	{
-		public SingleBandInt8(ImageUInt8 image) {
-			super(image);
-		}
-
-		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
-		}
-
-		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.intValue());
-		}
-	}
-
-	public static class SingleBandInt16 extends SingleBaseInt<ImageSInt16>
-	{
-		public SingleBandInt16(ImageSInt16 image) {
-			super(image);
-		}
-
-		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
-		}
-
-		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.intValue());
-		}
-	}
-
-	public static class SingleBandInt32 extends SingleBaseInt<ImageSInt32>
-	{
-		public SingleBandInt32(ImageSInt32 image) {
+		public SingleBandInt(ImageInteger image) {
 			super(image);
 		}
 

@@ -18,7 +18,7 @@ package gecv.alg.detect.extract;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.drawing.impl.ImageInitialization_F32;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 
@@ -75,7 +75,7 @@ public class BenchmarkExtractors {
 		corners = new QueueCorner(imgWidth * imgHeight);
 
 		// have about 1/20 the image below threshold
-		ImageInitialization_F32.randomize(intensity, rand, 0, threshold * 20.0f);
+		ImageTestingOps.randomize(intensity, rand, 0, threshold * 20.0f);
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();

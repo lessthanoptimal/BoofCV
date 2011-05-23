@@ -16,8 +16,7 @@
 
 package gecv.alg.filter.derivative;
 
-import gecv.alg.drawing.impl.ImageInitialization_F32;
-import gecv.alg.drawing.impl.ImageInitialization_I16;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import org.junit.Test;
@@ -45,8 +44,8 @@ public class TestHessianFromGradient {
 
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
-		ImageInitialization_I16.randomize(derivX, rand, -10, 10);
-		ImageInitialization_I16.randomize(derivY, rand, -10, 10);
+		ImageTestingOps.randomize(derivX, rand, -10, 10);
+		ImageTestingOps.randomize(derivY, rand, -10, 10);
 		ImageSInt16 derivXX = new ImageSInt16(width,height);
 		ImageSInt16 derivYY = new ImageSInt16(width,height);
 		ImageSInt16 derivXY = new ImageSInt16(width,height);
@@ -65,8 +64,8 @@ public class TestHessianFromGradient {
 
 		ImageFloat32 derivX = new ImageFloat32(width,height);
 		ImageFloat32 derivY = new ImageFloat32(width,height);
-		ImageInitialization_F32.randomize(derivX, rand, -10, 10);
-		ImageInitialization_F32.randomize(derivY, rand, -10, 10);
+		ImageTestingOps.randomize(derivX, rand, -10, 10);
+		ImageTestingOps.randomize(derivY, rand, -10, 10);
 		ImageFloat32 derivXX = new ImageFloat32(width,height);
 		ImageFloat32 derivYY = new ImageFloat32(width,height);
 		ImageFloat32 derivXY = new ImageFloat32(width,height);
@@ -85,8 +84,8 @@ public class TestHessianFromGradient {
 
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
-		ImageInitialization_I16.randomize(derivX, rand, -10, 10);
-		ImageInitialization_I16.randomize(derivY, rand, -10, 10);
+		ImageTestingOps.randomize(derivX, rand, -10, 10);
+		ImageTestingOps.randomize(derivY, rand, -10, 10);
 		ImageSInt16 derivXX = new ImageSInt16(width,height);
 		ImageSInt16 derivYY = new ImageSInt16(width,height);
 		ImageSInt16 derivXY = new ImageSInt16(width,height);
@@ -105,8 +104,8 @@ public class TestHessianFromGradient {
 
 		ImageFloat32 derivX = new ImageFloat32(width,height);
 		ImageFloat32 derivY = new ImageFloat32(width,height);
-		ImageInitialization_F32.randomize(derivX, rand, -10, 10);
-		ImageInitialization_F32.randomize(derivY, rand, -10, 10);
+		ImageTestingOps.randomize(derivX, rand, -10, 10);
+		ImageTestingOps.randomize(derivY, rand, -10, 10);
 		ImageFloat32 derivXX = new ImageFloat32(width,height);
 		ImageFloat32 derivYY = new ImageFloat32(width,height);
 		ImageFloat32 derivXY = new ImageFloat32(width,height);
@@ -125,8 +124,8 @@ public class TestHessianFromGradient {
 
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
-		ImageInitialization_I16.randomize(derivX, rand, -10, 10);
-		ImageInitialization_I16.randomize(derivY, rand, -10, 10);
+		ImageTestingOps.randomize(derivX, rand, -10, 10);
+		ImageTestingOps.randomize(derivY, rand, -10, 10);
 		ImageSInt16 derivXX = new ImageSInt16(width,height);
 		ImageSInt16 derivYY = new ImageSInt16(width,height);
 		ImageSInt16 derivXY = new ImageSInt16(width,height);
@@ -145,8 +144,8 @@ public class TestHessianFromGradient {
 
 		ImageFloat32 derivX = new ImageFloat32(width,height);
 		ImageFloat32 derivY = new ImageFloat32(width,height);
-		ImageInitialization_F32.randomize(derivX, rand, -10, 10);
-		ImageInitialization_F32.randomize(derivY, rand, -10, 10);
+		ImageTestingOps.randomize(derivX, rand, -10, 10);
+		ImageTestingOps.randomize(derivY, rand, -10, 10);
 		ImageFloat32 derivXX = new ImageFloat32(width,height);
 		ImageFloat32 derivYY = new ImageFloat32(width,height);
 		ImageFloat32 derivXY = new ImageFloat32(width,height);

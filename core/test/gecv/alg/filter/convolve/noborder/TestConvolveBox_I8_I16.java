@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.convolve.noborder;
 
-import gecv.alg.drawing.impl.ImageInitialization_I8;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -41,7 +41,7 @@ public class TestConvolveBox_I8_I16 {
 		ImageSInt16 outputA = new ImageSInt16(width, height);
 		ImageSInt16 outputB = new ImageSInt16(width, height);
 
-		ImageInitialization_I8.randomize(input, rand);
+		ImageTestingOps.randomize(input, rand, 0, 100);
 
 		GecvTesting.checkSubImage(this, "horizontal", true, input, outputA, outputB);
 	}
@@ -68,7 +68,7 @@ public class TestConvolveBox_I8_I16 {
 		ImageSInt16 outputA = new ImageSInt16(width, height);
 		ImageSInt16 outputB = new ImageSInt16(width, height);
 
-		ImageInitialization_I8.randomize(input, rand);
+		ImageTestingOps.randomize(input, rand, 0, 100);
 
 		GecvTesting.checkSubImage(this, "vertical", true, input, outputA, outputB);
 	}
