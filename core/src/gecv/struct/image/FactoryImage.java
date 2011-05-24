@@ -33,6 +33,8 @@ public class FactoryImage {
 			return (T)new ImageSInt8(width,height);
 		} else if( type == ImageUInt16.class) {
 			return (T)new ImageUInt16(width,height);
+		} else if( type == ImageSInt16.class) {
+			return (T)new ImageSInt16(width,height);
 		} else if( type == ImageSInt32.class) {
 			return (T)new ImageSInt32(width,height);
 		} else if( type == ImageFloat32.class) {

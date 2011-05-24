@@ -14,11 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.testing;
+package gecv.misc;
 
 import gecv.struct.image.*;
-
-import java.util.List;
 
 
 /**

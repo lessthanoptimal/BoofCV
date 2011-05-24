@@ -189,7 +189,7 @@ public class TestKltTracker {
 		config.minDeterminant = 0.01f;
 		config.minPositionDelta = 0.01f;
 
-		InterpolateRectangle<ImageFloat32> interp = FactoryInterpolation.bilinearRectangle_F32();
+		InterpolateRectangle<ImageFloat32> interp = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
 
 		return new KltTracker<ImageFloat32, ImageFloat32>(interp, interp, config);
 	}

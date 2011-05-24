@@ -42,15 +42,6 @@ public interface InterpolatePixel<T extends ImageBase> {
 	public T getImage();
 
 	/**
-	 * Returns true of the point is inside the image.
-	 *
-	 * @param x Point's x-coordinate.
-	 * @param y Point's y-coordinate.
-	 * @return True if it is inside the image and false if it is not.
-	 */
-	public boolean inBounds(float x, float y);
-
-	/**
 	 * Returns the intensity value of the image at the specified coordinate.
 	 * This value is computed using interpolation.  Bounds checking is performed
 	 * to make sure a point that can be interpolated inside the image is requested.
@@ -62,9 +53,9 @@ public interface InterpolatePixel<T extends ImageBase> {
 	public float get(float x, float y);
 
 	/**
-	 * Returns the intensity value of the image at the specified coordinate.
-	 * This value is computed using interpolation.  No checks are done to make
-	 * sure
+	 * Returns the intensity value of the image at the specified coordinate using
+	 * interpolation.  No bounds checks are done to see if it is inside the image
+	 * and the image border might not be handled.
 	 *
 	 * @param x Point's x-coordinate.
 	 * @param y Point's y-coordinate.
@@ -72,11 +63,4 @@ public interface InterpolatePixel<T extends ImageBase> {
 	 */
 	public float get_unsafe(float x, float y);
 
-	/**
-	 * Edge conditions are often a problem for interpolation algorithms.  This returns
-	 * the border around the image that unsafe will fail on.
-	 *
-	 * @return [top,right,bottom,left] in pixels
-	 */
-	public int[] getBorderOffsets();
 }

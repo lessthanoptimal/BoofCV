@@ -14,12 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.alg.interpolate.impl;
+package gecv.alg.pyramid;
 
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.blur.BlurImageOps;
 import gecv.alg.filter.convolve.KernelFactory;
-import gecv.alg.interpolate.DownSampleConvolve;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;

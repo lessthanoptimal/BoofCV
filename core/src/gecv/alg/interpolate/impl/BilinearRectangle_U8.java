@@ -17,6 +17,7 @@
 package gecv.alg.interpolate.impl;
 
 import gecv.alg.interpolate.InterpolateRectangle;
+import gecv.struct.image.ImageUInt8;
 import gecv.struct.image.ImageFloat32;
 
 
@@ -32,29 +33,29 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class BilinearRectangle_F32 implements InterpolateRectangle<ImageFloat32> {
+public class BilinearRectangle_U8 implements InterpolateRectangle<ImageUInt8> {
 
-	private ImageFloat32 orig;
+	private ImageUInt8 orig;
 
-	private float data[];
+	private byte data[];
 	private int stride;
 
-	public BilinearRectangle_F32(ImageFloat32 image) {
+	public BilinearRectangle_U8(ImageUInt8 image) {
 		setImage(image);
 	}
 
-	public BilinearRectangle_F32() {
+	public BilinearRectangle_U8() {
 	}
 
 	@Override
-	public void setImage(ImageFloat32 image) {
+	public void setImage(ImageUInt8 image) {
 		this.orig = image;
 		this.data = orig.data;
 		this.stride = orig.getStride();
 	}
 
 	@Override
-	public ImageFloat32 getImage() {
+	public ImageUInt8 getImage() {
 		return orig;
 	}
 
@@ -98,14 +99,14 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<ImageFloat32>
 			int index = orig.startIndex + (yt + i) * stride + xt;
 			int indexResults = output.startIndex + i*output.stride;
 
-			float XY = data[index];
-			float Xy = data[index + stride];
+			float XY = data[index]& 0xFF;
+			float Xy = data[index + stride]& 0xFF;
 
 			int indexEnd = index + regWidth;
 			// for( int j = 0; j < regWidth; j++, index++ ) {
 			for (; index < indexEnd; index++) {
-				float xY = data[index + 1];
-				float xy = data[index + stride + 1];
+				float xY = data[index + 1]& 0xFF;
+				float xy = data[index + stride + 1]& 0xFF;
 
 				float val = a0 * XY + a1 * xY + a2 * xy + a3 * Xy;
 
@@ -131,8 +132,8 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<ImageFloat32>
 				int index = orig.startIndex + (yt + y) * stride + xt + regWidth;
 				int indexResults = output.startIndex + y*output.stride + regWidth;
 
-				float XY = data[index];
-				float Xy = data[index + stride];
+				float XY = data[index]& 0xFF;
+				float Xy = data[index + stride]& 0xFF;
 
 				results[indexResults] = by*XY + ay*Xy;
 			}
@@ -151,8 +152,8 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<ImageFloat32>
 				int index = orig.startIndex + (yt + regHeight) * stride + xt + x;
 				int indexResults = output.startIndex + regHeight *output.stride + x;
 
-				float XY = data[index];
-				float Xy = data[index + 1];
+				float XY = data[index]& 0xFF;
+				float Xy = data[index + 1]& 0xFF;
 
 				results[indexResults] = bx*XY + ax*Xy;
 			}

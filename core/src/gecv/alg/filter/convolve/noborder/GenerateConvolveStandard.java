@@ -16,6 +16,7 @@
 
 package gecv.alg.filter.convolve.noborder;
 
+import gecv.misc.CodeGeneratorBase;
 import gecv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
@@ -27,7 +28,7 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public class GenerateConvolveStandard {
+public class GenerateConvolveStandard extends CodeGeneratorBase {
 	String className = "ConvolveImageStandard";
 
 	PrintStream out;
@@ -36,6 +37,7 @@ public class GenerateConvolveStandard {
 		out = new PrintStream(new FileOutputStream(className + ".java"));
 	}
 
+	@Override
 	public void generate() {
 		printPreamble();
 		printAllOps("F32", "ImageFloat32", "ImageFloat32",

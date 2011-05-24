@@ -17,7 +17,7 @@
 package gecv.alg.interpolate.impl;
 
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageUInt8;
 
 
 /**
@@ -32,24 +32,24 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class BilinearPixel_F32 implements InterpolatePixel<ImageFloat32> {
+public class BilinearPixel_U8 implements InterpolatePixel<ImageUInt8> {
 
-	private ImageFloat32 orig;
+	private ImageUInt8 orig;
 
-	private float data[];
+	private byte data[];
 	private int stride;
 	private int width;
 	private int height;
 
-	public BilinearPixel_F32() {
+	public BilinearPixel_U8() {
 	}
 
-	public BilinearPixel_F32(ImageFloat32 orig) {
+	public BilinearPixel_U8(ImageUInt8 orig) {
 		setImage(orig);
 	}
 
 	@Override
-	public void setImage(ImageFloat32 image) {
+	public void setImage(ImageUInt8 image) {
 		this.orig = image;
 		this.data = orig.data;
 		this.stride = orig.getStride();
@@ -58,7 +58,7 @@ public class BilinearPixel_F32 implements InterpolatePixel<ImageFloat32> {
 	}
 
 	@Override
-	public ImageFloat32 getImage() {
+	public ImageUInt8 getImage() {
 		return orig;
 	}
 
@@ -71,10 +71,10 @@ public class BilinearPixel_F32 implements InterpolatePixel<ImageFloat32> {
 
 		int index = orig.startIndex + yt * stride + xt;
 
-		float val = (1.0f - ax) * (1.0f - ay) * (data[index]);
-		val += ax * (1.0f - ay) * (data[index + 1]);
-		val += ax * ay * (data[index + 1 + stride]);
-		val += (1.0f - ax) * ay * (data[index + stride]);
+		float val = (1.0f - ax) * (1.0f - ay) * (data[index]& 0xFF);
+		val += ax * (1.0f - ay) * (data[index + 1]& 0xFF);
+		val += ax * ay * (data[index + 1 + stride]& 0xFF);
+		val += (1.0f - ax) * ay * (data[index + stride]& 0xFF);
 
 		return val;
 	}
@@ -96,10 +96,10 @@ public class BilinearPixel_F32 implements InterpolatePixel<ImageFloat32> {
 		int dx = xt == width - 1 ? 0 : 1;
 		int dy = yt == height - 1 ? 0 : stride;
 
-		float val = (1.0f - ax) * (1.0f - ay) * (data[index] ); // (x,y)
-		val += ax * (1.0f - ay) * (data[index + dx] ); // (x+1,y)
-		val += ax * ay * (data[index + dx + dy] ); // (x+1,y+1)
-		val += (1.0f - ax) * ay * (data[index + dy] ); // (x,y+1)
+		float val = (1.0f - ax) * (1.0f - ay) * (data[index] & 0xFF); // (x,y)
+		val += ax * (1.0f - ay) * (data[index + dx] & 0xFF); // (x+1,y)
+		val += ax * ay * (data[index + dx + dy] & 0xFF); // (x+1,y+1)
+		val += (1.0f - ax) * ay * (data[index + dy] & 0xFF); // (x,y+1)
 
 		return val;
 	}

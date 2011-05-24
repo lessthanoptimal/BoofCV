@@ -34,8 +34,6 @@ public class NearestNeighborPixel_F32 implements InterpolatePixel<ImageFloat32> 
 	private int width;
 	private int height;
 
-	private int borderOffsets[] = new int[]{0, 0, 0, 0};
-
 	public NearestNeighborPixel_F32() {
 	}
 
@@ -58,11 +56,6 @@ public class NearestNeighborPixel_F32 implements InterpolatePixel<ImageFloat32> 
 	}
 
 	@Override
-	public boolean inBounds(float x, float y) {
-		return (x >= 0 && y >= 0 && x < width - 1 && y < height - 1);
-	}
-
-	@Override
 	public float get_unsafe(float x, float y) {
 		return data[ orig.startIndex + ((int)y)*stride + (int)x];
 	}
@@ -75,10 +68,5 @@ public class NearestNeighborPixel_F32 implements InterpolatePixel<ImageFloat32> 
 			throw new IllegalArgumentException("Point is outside of the image");
 
 		return data[ orig.startIndex + yy*stride + xx];
-	}
-
-	@Override
-	public int[] getBorderOffsets() {
-		return borderOffsets;
 	}
 }

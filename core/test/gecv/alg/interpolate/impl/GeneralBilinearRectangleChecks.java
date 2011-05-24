@@ -16,7 +16,11 @@
 
 package gecv.alg.interpolate.impl;
 
-import gecv.alg.misc.ImageTestingOps;
+import gecv.alg.interpolate.FactoryInterpolation;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.interpolate.InterpolateRectangle;
+import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -29,7 +33,8 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestBilinearRegion_F32 {
+public abstract class GeneralBilinearRectangleChecks<T extends ImageBase> {
+	Class<?> imageType;
 
 	Random rand = new Random(0xff34);
 
@@ -40,6 +45,20 @@ public class TestBilinearRegion_F32 {
 	int regionHeight;
 	float tl_x;
 	float tl_y;
+
+	protected GeneralBilinearRectangleChecks(Class<?> imageType) {
+		this.imageType = imageType;
+	}
+
+	protected abstract T createImage( int width , int height );
+
+	public InterpolatePixel<T> createPixelInterpolate() {
+		return FactoryInterpolation.bilinearPixel(imageType);
+	}
+
+	public InterpolateRectangle<T> createRectangleInterpolate() {
+		return FactoryInterpolation.bilinearRectangle(imageType);
+	}
 
 	/**
 	 * Tell it to copy a region in the center
@@ -61,8 +80,8 @@ public class TestBilinearRegion_F32 {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void outsideImageBorder() {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		BilinearRectangle_F32 interp = new BilinearRectangle_F32();
+		T img = createImage(width, height);
+		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 
 		ImageFloat32 out = new ImageFloat32(20,20);
@@ -73,8 +92,8 @@ public class TestBilinearRegion_F32 {
 	 * Compare region against the value returned by get BilinearPixel_F32
 	 */
 	public void checkRegion(int regionWidth, int regionHeight, float x, float y) {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageTestingOps.randomize(img, rand, 0, 100);
+		T img = createImage(width, height);
+		GeneralizedImageOps.randomize(img,0,20,rand);
 
 		this.regionWidth = regionWidth;
 		this.regionHeight = regionHeight;
@@ -83,9 +102,9 @@ public class TestBilinearRegion_F32 {
 		GecvTesting.checkSubImage(this, "region", false, img);
 	}
 
-	public void region(ImageFloat32 img) {
-		BilinearPixel_F32 interpPt = new BilinearPixel_F32();
-		BilinearRectangle_F32 interp = new BilinearRectangle_F32();
+	public void region(T img) {
+		InterpolatePixel<T> interpPt = createPixelInterpolate();
+		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 		interpPt.setImage(img);
 
