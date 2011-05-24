@@ -16,17 +16,34 @@
 
 package gecv.alg.interpolate.impl;
 
+import gecv.alg.interpolate.FactoryInterpolation;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.struct.image.ImageFloat32;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestBilinearPixel_F32 extends GeneralBilinearPixelChecks<ImageFloat32>
-{
+public class TestNearestNeighborRectangle_F32 extends GeneralBilinearRectangleChecks<ImageFloat32>{
+
+
+	public TestNearestNeighborRectangle_F32() {
+		super(ImageFloat32.class);
+	}
+
+	@Override
+	public InterpolatePixel<ImageFloat32> createPixelInterpolate() {
+		return FactoryInterpolation.nearestNeighborPixel(imageType);
+	}
+
+	@Override
+	public InterpolateRectangle<ImageFloat32> createRectangleInterpolate() {
+		return FactoryInterpolation.nearestNeighborRectangle(imageType);
+	}
 
 	@Override
 	protected ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width, height);
+		return new ImageFloat32(width,height);
 	}
 }

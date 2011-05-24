@@ -29,18 +29,21 @@ import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.pyramid.ConvolutionPyramid_F32;
+import gecv.alg.pyramid.ConvolutionPyramid_I8;
 import gecv.alg.tracker.klt.KltConfig;
 import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32, ImageFloat32>{
-	public TrackVideoPyramidKLT_F32(SimpleImageSequence<ImageFloat32> imageSequence,
-									PkltManager<ImageFloat32, ImageFloat32> tracker ) {
+public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, ImageSInt16>{
+	public TrackVideoPyramidKLT_U8(SimpleImageSequence<ImageUInt8> imageSequence,
+									PkltManager<ImageUInt8, ImageSInt16> tracker ) {
 		super(imageSequence, tracker );
 	}
 
@@ -54,7 +57,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 		} else {
 			fileName = args[0];
 		}
-		SimpleImageSequence<ImageFloat32> sequence = new XugglerSimplified<ImageFloat32>(fileName, ImageFloat32.class);
+		SimpleImageSequence<ImageUInt8> sequence = new XugglerSimplified<ImageUInt8>(fileName, ImageUInt8.class);
 
 		ImageBase<?> image = sequence.next();
 
@@ -65,10 +68,10 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 		configKLt.minDeterminant = 0.001f;
 		configKLt.minPositionDelta = 0.01f;
 
-		PkltManagerConfig<ImageFloat32,ImageFloat32> config = new PkltManagerConfig<ImageFloat32,ImageFloat32>();
+		PkltManagerConfig<ImageUInt8, ImageSInt16> config = new PkltManagerConfig<ImageUInt8,ImageSInt16>();
 		config.config = configKLt;
-		config.typeInput = ImageFloat32.class;
-		config.typeDeriv = ImageFloat32.class;
+		config.typeInput = ImageUInt8.class;
+		config.typeDeriv = ImageSInt16.class;
 		config.pyramidScaling = new int[]{1,2,2,2};
 		config.imgWidth = image.width;
 		config.imgHeight = image.height;
@@ -76,28 +79,30 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 		config.maxFeatures = 100;
 		config.featureRadius = 3;
 
-		InterpolateRectangle<ImageFloat32> interp = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
+		InterpolateRectangle<ImageUInt8> interp = FactoryInterpolation.bilinearRectangle(ImageUInt8.class);
+		InterpolateRectangle<ImageSInt16> interpD = FactoryInterpolation.bilinearRectangle(ImageSInt16.class);
 
-		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity =
-				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
-						FactoryCornerIntensity.createKlt_F32(image.width, image.height, config.featureRadius));
+
+		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity =
+				new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(
+						FactoryCornerIntensity.createKlt_I16(image.width, image.height, config.featureRadius));
 		CornerExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(config.featureRadius+2, config.featureRadius*8, configKLt.minDeterminant));
-		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,config.maxFeatures);
+		GeneralCornerDetector<ImageUInt8,ImageSInt16> detector =
+				new GeneralCornerDetector<ImageUInt8,ImageSInt16>(intensity,extractor,config.maxFeatures);
 
-		GenericPkltFeatSelector<ImageFloat32, ImageFloat32> featureSelector =
-				new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,null);
+		GenericPkltFeatSelector<ImageUInt8, ImageSInt16> featureSelector =
+				new GenericPkltFeatSelector<ImageUInt8,ImageSInt16>(detector,null);
 
-		ConvolutionPyramid_F32 pyrUpdater = new ConvolutionPyramid_F32(KernelFactory.gaussian1D_F32(2,true));
+		ConvolutionPyramid_I8 pyrUpdater = new ConvolutionPyramid_I8(KernelFactory.gaussian1D_I32(2));
 
-		ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.sobel_F32();
+		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel_I8();
 
-		PkltManager<ImageFloat32,ImageFloat32> manager =
-				new PkltManager<ImageFloat32,ImageFloat32>(config,interp,interp,
+		PkltManager<ImageUInt8,ImageSInt16> manager =
+				new PkltManager<ImageUInt8,ImageSInt16>(config,interp,interpD,
 						gradient,featureSelector,pyrUpdater);
 
-		TrackVideoPyramidKLT_F32 alg = new TrackVideoPyramidKLT_F32(sequence,manager);
+		TrackVideoPyramidKLT_U8 alg = new TrackVideoPyramidKLT_U8(sequence,manager);
 
 		alg.process();
 	}

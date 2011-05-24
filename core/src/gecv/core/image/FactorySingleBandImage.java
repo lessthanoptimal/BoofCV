@@ -16,6 +16,9 @@
 
 package gecv.core.image;
 
+import gecv.core.image.border.ImageBorder;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I;
 import gecv.struct.image.*;
 
 /**
@@ -32,6 +35,59 @@ public class FactorySingleBandImage {
 			return new SingleBandFloat32( (ImageFloat32)image );
 		else
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
+	}
+
+	public static SingleBandImage wrap( ImageBorder image ) {
+		if( ImageInteger.class.isAssignableFrom(image.getImage().getClass()) )
+			return new SingleBandBorderInt( (ImageBorder_I)image );
+		else if( image.getImage().getClass() == ImageFloat32.class )
+			return new SingleBandBorderFloat( (ImageBorder_F32)image );
+		else
+			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
+	}
+
+	public static class SingleBandBorderInt extends SingleBorder<ImageBorder_I>
+	{
+		public SingleBandBorderInt(ImageBorder_I image) {
+			super(image);
+		}
+
+		@Override
+		public boolean isFloatingPoint() {
+			return false;
+		}
+
+		@Override
+		public Number get(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public void set(int x, int y, Number num) {
+			image.getImage().set(x,y,num.intValue());
+		}
+	}
+
+	public static class SingleBandBorderFloat extends SingleBorder<ImageBorder_F32>
+	{
+		public SingleBandBorderFloat(ImageBorder_F32 image) {
+			super(image);
+		}
+
+		@Override
+		public boolean isFloatingPoint() {
+			return true;
+		}
+
+		@Override
+		public Number get(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public void set(int x, int y, Number num) {
+			image.getImage().set(x,y,num.floatValue());
+		}
 	}
 
 	public static class SingleBandInt extends SingleBaseInt<ImageInteger>
@@ -101,6 +157,25 @@ public class FactorySingleBandImage {
 		@Override
 		public int getHeight() {
 			return image.getHeight();
+		}
+	}
+
+	public static abstract class SingleBorder<T extends ImageBorder> implements SingleBandImage {
+
+		protected T image;
+
+		public SingleBorder(T image) {
+			this.image = image;
+		}
+
+		@Override
+		public int getWidth() {
+			return image.getImage().getWidth();
+		}
+
+		@Override
+		public int getHeight() {
+			return image.getImage().getHeight();
 		}
 	}
 }

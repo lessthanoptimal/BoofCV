@@ -16,17 +16,17 @@
 
 package gecv.alg.interpolate.impl;
 
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestBilinearPixel_F32 extends GeneralBilinearPixelChecks<ImageFloat32>
+public class TestBilinearPixel_S16 extends GeneralBilinearPixelChecks<ImageSInt16>
 {
 
 	@Override
-	protected ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width, height);
+	protected ImageSInt16 createImage(int width, int height) {
+		return new ImageSInt16(width, height);
 	}
 }

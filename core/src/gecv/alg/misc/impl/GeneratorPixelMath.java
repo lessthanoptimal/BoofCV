@@ -17,7 +17,7 @@
 package gecv.alg.misc.impl;
 
 import gecv.misc.CodeGeneratorUtil;
-import gecv.testing.TypeImage;
+import gecv.misc.TypeImage;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

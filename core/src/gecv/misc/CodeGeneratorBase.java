@@ -14,19 +14,22 @@
  *    limitations under the License.
  */
 
-package gecv.alg.interpolate.impl;
+package gecv.misc;
 
-import gecv.struct.image.ImageFloat32;
+import java.io.FileNotFoundException;
 
 
 /**
+ * <p>Base class for code generators.</p>
+ *
  * @author Peter Abeles
  */
-public class TestBilinearPixel_F32 extends GeneralBilinearPixelChecks<ImageFloat32>
-{
+public abstract class CodeGeneratorBase {
 
-	@Override
-	protected ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width, height);
-	}
+	/**
+	 * Creates 
+	 *
+	 * @throws FileNotFoundException
+	 */
+	public abstract void generate() throws FileNotFoundException;
 }

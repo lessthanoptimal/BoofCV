@@ -17,7 +17,7 @@
 package gecv.alg.interpolate.impl;
 
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
 
 
 /**
@@ -32,24 +32,24 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class BilinearPixel_F32 implements InterpolatePixel<ImageFloat32> {
+public class BilinearPixel_S16 implements InterpolatePixel<ImageSInt16> {
 
-	private ImageFloat32 orig;
+	private ImageSInt16 orig;
 
-	private float data[];
+	private short data[];
 	private int stride;
 	private int width;
 	private int height;
 
-	public BilinearPixel_F32() {
+	public BilinearPixel_S16() {
 	}
 
-	public BilinearPixel_F32(ImageFloat32 orig) {
+	public BilinearPixel_S16(ImageSInt16 orig) {
 		setImage(orig);
 	}
 
 	@Override
-	public void setImage(ImageFloat32 image) {
+	public void setImage(ImageSInt16 image) {
 		this.orig = image;
 		this.data = orig.data;
 		this.stride = orig.getStride();
@@ -58,7 +58,7 @@ public class BilinearPixel_F32 implements InterpolatePixel<ImageFloat32> {
 	}
 
 	@Override
-	public ImageFloat32 getImage() {
+	public ImageSInt16 getImage() {
 		return orig;
 	}
 

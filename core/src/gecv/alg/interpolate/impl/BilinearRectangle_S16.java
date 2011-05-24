@@ -17,6 +17,7 @@
 package gecv.alg.interpolate.impl;
 
 import gecv.alg.interpolate.InterpolateRectangle;
+import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageFloat32;
 
 
@@ -32,29 +33,29 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class BilinearRectangle_F32 implements InterpolateRectangle<ImageFloat32> {
+public class BilinearRectangle_S16 implements InterpolateRectangle<ImageSInt16> {
 
-	private ImageFloat32 orig;
+	private ImageSInt16 orig;
 
-	private float data[];
+	private short data[];
 	private int stride;
 
-	public BilinearRectangle_F32(ImageFloat32 image) {
+	public BilinearRectangle_S16(ImageSInt16 image) {
 		setImage(image);
 	}
 
-	public BilinearRectangle_F32() {
+	public BilinearRectangle_S16() {
 	}
 
 	@Override
-	public void setImage(ImageFloat32 image) {
+	public void setImage(ImageSInt16 image) {
 		this.orig = image;
 		this.data = orig.data;
 		this.stride = orig.getStride();
 	}
 
 	@Override
-	public ImageFloat32 getImage() {
+	public ImageSInt16 getImage() {
 		return orig;
 	}
 

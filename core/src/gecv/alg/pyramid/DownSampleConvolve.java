@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.interpolate;
+package gecv.alg.pyramid;
 
 import gecv.alg.filter.convolve.ConvolveImageNoBorderSparse;
 import gecv.alg.filter.convolve.ConvolveNormalizedSparse;
@@ -35,7 +35,6 @@ import gecv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-// todo make fancier and use non normalized in the inner portion
 public class DownSampleConvolve {
 
 	/**
@@ -63,6 +62,16 @@ public class DownSampleConvolve {
 		}
 	}
 
+	/**
+	 * Down samples an image by convolving the specified kernel across the original image and sampling
+	 * every "skip" pixels.  The image's border is ignored.
+	 *
+	 * @param kernel 1D blur convolution kernel.
+	 * @param original Image being down sampled. Not modified.
+	 * @param downSampled The output down sampled image. Modified.
+	 * @param skip How many rows/columns should be skipped.
+	 * @param storage Storage array the same width as the kernel.
+	 */
 	public static void downSampleNoBorder( Kernel1D_F32 kernel ,
 										   ImageFloat32 original ,  ImageFloat32 downSampled ,
 										   int skip , float storage[] )

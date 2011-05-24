@@ -36,38 +36,11 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 	protected int width = 320;
 	protected int height = 240;
 
-
 	protected abstract T createImage( int width , int height );
 
 	protected abstract void randomize( T image );
 
 	protected abstract InterpolatePixel<T> wrap( T image );
-
-
-	/**
-	 * Checks to see if inBounds correctly determines if a point is in bounds with positive
-	 * and negative examples
-	 */
-	@Test
-	public void inBounds() {
-		T img = createImage(width, height);
-		randomize(img);
-
-		GecvTesting.checkSubImage(this, "inBounds", false, img);
-	}
-
-	public void inBounds(T img) {
-		InterpolatePixel<T> interp = wrap(img);
-
-		assertTrue(interp.inBounds(0, 0));
-		assertTrue(interp.inBounds(10, 0));
-		assertTrue(interp.inBounds(0, 10));
-		assertTrue(interp.inBounds(0.001f, 0.002f));
-		assertTrue(interp.inBounds(width - 1.1f, height - 1.1f));
-
-		assertFalse(interp.inBounds(width - 0.1f, height - 0.1f));
-		assertFalse(interp.inBounds(-0.1f, -0.1f));
-	}
 
 	/**
 	 * Checks value returned by get()
@@ -88,6 +61,34 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 		assertEquals(compute(img, 10, 10.6f), interp.get(10, 10.6f), 1e-5f);
 		assertEquals(compute(img, 10.8f, 10.6f), interp.get(10.8f, 10.6f), 1e-5f);
 	}
+
+	/**
+	 * See if accessing the image edge causes it to blow up.
+	 */
+	@Test
+	public void get_edges() {
+		T img = createImage(width, height);
+		randomize(img);
+
+		GecvTesting.checkSubImage(this, "get_edges", false, img);
+	}
+
+	public void get_edges(T img) {
+		InterpolatePixel<T> interp = wrap(img);
+
+		compare(interp,img, width-0.01f, height/2);
+		compare(interp,img, 0, height/2);
+		compare(interp,img, width/2, height-0.01f);
+		compare(interp,img, width/2, 0);
+		compare(interp,img, 0, 0);
+		compare(interp,img, width-0.01f, height-0.01f);
+	}
+
+	protected void compare( InterpolatePixel<T> interp , T img , float x , float y )
+	{
+		assertEquals(compute(img, x,y), interp.get(x, y), 1e-5f);
+	}
+
 
 	/**
 	 * Compute a bilinear interpolation manually
@@ -131,57 +132,5 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 		T img = createImage(width, height);
 		InterpolatePixel<T> interp = wrap(img);
 		assertTrue(img == interp.getImage());
-	}
-
-	@Test
-	public void getBorderOffsets() {
-		T img = createImage(width, height);
-		InterpolatePixel<T> interp = wrap(img);
-
-		int[] border = interp.getBorderOffsets();
-
-		// top border
-		if (border[0] > 0) {
-			try {
-				interp.get(40, border[0] - 1);
-				fail("Should have thrown exception");
-			} catch (RuntimeException e) {
-			}
-		} else {
-			interp.get(40, 0);
-		}
-
-		// right border
-		if (border[1] > 0) {
-			try {
-				interp.get(width - border[1], 40);
-				fail("Should have thrown exception");
-			} catch (RuntimeException e) {
-			}
-		} else {
-			interp.get(width - 1, 40);
-		}
-
-		// bottom border
-		if (border[2] > 0) {
-			try {
-				interp.get(40, height - border[2]);
-				fail("Should have thrown exception");
-			} catch (RuntimeException e) {
-			}
-		} else {
-			interp.get(40, height - 1);
-		}
-
-		// left border
-		if (border[3] > 0) {
-			try {
-				interp.get(border[3] - 1, 40);
-				fail("Should have thrown exception");
-			} catch (RuntimeException e) {
-			}
-		} else {
-			interp.get(0, 40);
-		}
 	}
 }

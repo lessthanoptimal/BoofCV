@@ -22,11 +22,15 @@ import gecv.struct.image.ImageFloat32;
 /**
  * @author Peter Abeles
  */
-public class TestBilinearPixel_F32 extends GeneralBilinearPixelChecks<ImageFloat32>
-{
+public class TestBilinearRectangle_F32 extends GeneralBilinearRectangleChecks<ImageFloat32>{
+
+
+	public TestBilinearRectangle_F32() {
+		super(ImageFloat32.class);
+	}
 
 	@Override
 	protected ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width, height);
+		return new ImageFloat32(width,height);
 	}
 }

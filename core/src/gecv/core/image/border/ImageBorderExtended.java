@@ -16,6 +16,7 @@
 
 package gecv.core.image.border;
 
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInteger;
 
@@ -26,6 +27,17 @@ import gecv.struct.image.ImageInteger;
  * @author Peter Abeles
  */
 public class ImageBorderExtended {
+
+	@SuppressWarnings({"unchecked"})
+	public static <T extends ImageBase> ImageBorder<T> wrap( T image ) {
+		if( ImageFloat32.class == image.getClass()) {
+			return (ImageBorder<T>)wrap(((ImageFloat32)image));
+		} else if( ImageInteger.class.isAssignableFrom(image.getClass())) {
+			return (ImageBorder<T>)wrap(((ImageInteger)image));
+		} else {
+			throw new IllegalArgumentException("Unknown image type");
+		}
+	}
 
 	public static ImageBorder_F32 wrap( ImageFloat32 image ) {
 		return new ImageBorder_F32( image ) {

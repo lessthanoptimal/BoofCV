@@ -35,7 +35,7 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestPixelMath {
-int width = 10;
+	int width = 10;
 	int height = 15;
 	Random rand = new Random(234);
 

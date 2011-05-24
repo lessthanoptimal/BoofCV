@@ -23,7 +23,7 @@ import gecv.alg.filter.convolve.down.ConvolveDownNoBorderStandard;
 import gecv.alg.filter.convolve.down.ConvolveDownNoBorderUnrolled_F32_F32;
 import gecv.alg.filter.convolve.down.ConvolveDownNoBorderUnrolled_U8_I16;
 import gecv.alg.filter.convolve.down.ConvolveDownNoBorderUnrolled_U8_I8_Div;
-import gecv.alg.interpolate.DownSampleConvolve;
+import gecv.alg.pyramid.DownSampleConvolve;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
