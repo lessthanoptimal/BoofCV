@@ -19,7 +19,7 @@ package gecv.alg.filter.derivative;
 import gecv.abst.filter.FilterInterface;
 import gecv.abst.filter.FilterSequence;
 import gecv.abst.filter.convolve.BorderType;
-import gecv.abst.filter.convolve.FactoryConvolution;
+import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.convolve.Kernel2D;
 import gecv.struct.image.ImageBase;
@@ -56,8 +56,8 @@ public class CompareDerivativeToConvolution {
 	}
 
 	public void setKernel( int which , Kernel1D horizontal , Kernel1D vertical ) {
-		FilterInterface<?,?> f1 = FactoryConvolution.convolve(horizontal,inputType,outputType, BorderType.EXTENDED,true);
-		FilterInterface<?,?> f2 = FactoryConvolution.convolve(vertical,outputType,outputType, BorderType.EXTENDED,false);
+		FilterInterface<?,?> f1 = FactoryConvolve.convolve(horizontal,inputType,outputType, BorderType.EXTENDED,true);
+		FilterInterface<?,?> f2 = FactoryConvolve.convolve(vertical,outputType,outputType, BorderType.EXTENDED,false);
 
 		outputFilters[which] = new FilterSequence(f1,f2);
 
@@ -69,14 +69,14 @@ public class CompareDerivativeToConvolution {
 
 	public void setKernel( int which , Kernel1D kernel , boolean isHorizontal) {
 		outputFilters[which] =
-				FactoryConvolution.convolve(kernel,inputType,outputType, BorderType.EXTENDED,isHorizontal);
+				FactoryConvolve.convolve(kernel,inputType,outputType, BorderType.EXTENDED,isHorizontal);
 		if( borderSize < kernel.getRadius() )
 			borderSize = kernel.getRadius();
 	}
 
 	public void setKernel( int which , Kernel2D kernel ) {
 		outputFilters[which] =
-				FactoryConvolution.convolve(kernel,inputType,outputType, BorderType.EXTENDED);
+				FactoryConvolve.convolve(kernel,inputType,outputType, BorderType.EXTENDED);
 		if( borderSize < kernel.getRadius() )
 			borderSize = kernel.getRadius();
 	}

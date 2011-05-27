@@ -17,10 +17,10 @@
 package gecv.abst.filter;
 
 import gecv.abst.filter.convolve.BorderType;
-import gecv.abst.filter.convolve.FactoryConvolution;
-import gecv.alg.misc.ImageTestingOps;
+import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
@@ -56,9 +56,9 @@ public class TestFilterSequence {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		FilterInterface f1 = FactoryConvolution.convolve(ker1,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
-		FilterInterface f2 = FactoryConvolution.convolve(ker2,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
-		FilterInterface f3 = FactoryConvolution.convolve(ker3,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
+		FilterInterface f1 = FactoryConvolve.convolve(ker1,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
+		FilterInterface f2 = FactoryConvolve.convolve(ker2,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
+		FilterInterface f3 = FactoryConvolve.convolve(ker3,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
 
 		FilterSequence sequence = new FilterSequence(f1,f2,f3);
 		sequence.process(input,found);

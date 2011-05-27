@@ -18,12 +18,11 @@ package gecv.alg.filter.convolve;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.convolve.down.ConvolveDownNoBorderStandard;
 import gecv.alg.filter.convolve.down.ConvolveDownNoBorderUnrolled_F32_F32;
 import gecv.alg.filter.convolve.down.ConvolveDownNoBorderUnrolled_U8_I16;
 import gecv.alg.filter.convolve.down.ConvolveDownNoBorderUnrolled_U8_I8_Div;
-import gecv.alg.pyramid.DownSampleConvolve;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -58,16 +57,6 @@ public class BenchmarkConvolveDown {
 	static ImageUInt8 out_I8;
 	static ImageSInt16 out_I16;
 	static ImageSInt32 out_I32;
-
-	public static class Convolve2D_Original_F32 extends PerformerBase
-	{
-		float tmp[] = new float[ radius*2+1];
-
-		@Override
-		public void process() {
-			DownSampleConvolve.downSample(kernelF32,imgFloat32,out_F32_D,skip,tmp);
-		}
-	}
 
 	public static class HorizontalStandard_F32 extends PerformerBase
 	{
@@ -186,7 +175,6 @@ public class BenchmarkConvolveDown {
 			kernel2D_F32 = KernelFactory.gaussian2D_F32(1.0,radius,true);
 			kernel2D_I32 = KernelFactory.gaussian2D_I32(1.0,radius);
 			
-			ProfileOperation.printOpsPerSec(new Convolve2D_Original_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new HorizontalStandard_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new HorizontalUnrolled_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new VerticalStandard_F32(),TEST_TIME);
