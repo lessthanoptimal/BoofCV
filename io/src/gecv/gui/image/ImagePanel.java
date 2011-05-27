@@ -37,6 +37,9 @@ public class ImagePanel extends JPanel {
 		setMaximumSize(getPreferredSize());
 	}
 
+	protected ImagePanel() {
+	}
+
 	@Override
 	public void paintComponent(Graphics g) {
 		//draw the image

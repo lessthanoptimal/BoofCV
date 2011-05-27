@@ -86,4 +86,14 @@ public class ShowImages {
 
 		return showWindow(buff,title);
 	}
+
+	public static void showWindow( JComponent component , String title ) {
+		JFrame frame = new JFrame(title);
+
+
+		frame.add(component, BorderLayout.CENTER);
+
+		frame.pack();
+		frame.setVisible(true);
+	}
 }

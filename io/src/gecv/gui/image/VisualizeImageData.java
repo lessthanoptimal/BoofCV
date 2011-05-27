@@ -16,9 +16,12 @@
 
 package gecv.gui.image;
 
+import gecv.abst.misc.GenericPixelMath;
+import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageInteger;
 
 import java.awt.image.BufferedImage;
 
@@ -28,6 +31,22 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizeImageData {
+
+	public static BufferedImage standard( ImageBase<?> src , BufferedImage dst )
+	{
+		if( ImageInteger.class.isAssignableFrom(src.getClass()) ) {
+			ImageInteger srcInt = (ImageInteger)src;
+
+			double max = GenericPixelMath.maxAbs(srcInt);
+			return colorizeSign(srcInt,dst,(int)max);
+		} else if( ImageFloat32.class.isAssignableFrom(src.getClass()) ) {
+			float max = PixelMath.maxAbs((ImageFloat32)src);
+			return grayMagnitude((ImageFloat32)src,dst,max);
+		}
+
+		return null;
+	}
+
 	/**
 	 * 
 	 * @param src
@@ -35,7 +54,7 @@ public class VisualizeImageData {
 	 * @param maxValue
 	 * @return
 	 */
-	public static BufferedImage colorizeSign( ImageSInt16 src, BufferedImage dst, int maxValue ) {
+	public static BufferedImage colorizeSign( ImageInteger src, BufferedImage dst, int maxValue ) {
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
 		if( !src.isSigned() )
@@ -61,7 +80,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage grayUnsigned( ImageSInt16 src, BufferedImage dst, int maxValue )
+	public static BufferedImage grayUnsigned( ImageInteger src, BufferedImage dst, int maxValue )
 	{
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
@@ -81,7 +100,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage grayMagnitude( ImageSInt16 src, BufferedImage dst, int maxValue )
+	public static BufferedImage grayMagnitude( ImageInteger src, BufferedImage dst, int maxValue )
 	{
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
