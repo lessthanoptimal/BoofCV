@@ -22,7 +22,7 @@ import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.convolve.Kernel2D;
-import gecv.struct.image.*;
+import gecv.struct.image.ImageBase;
 import gecv.testing.GecvTesting;
 
 import java.lang.reflect.Method;
@@ -32,7 +32,7 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FactoryConvolution {
+public class FactoryConvolve {
 
 	/**
 	 * Creates a filter for convolving 1D kernels along the image.
@@ -76,7 +76,7 @@ public class FactoryConvolution {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolution<Input,Output>(m,kernel,border);
+		return new GenericConvolve<Input,Output>(m,kernel,border);
 	}
 
 	/**
@@ -120,6 +120,6 @@ public class FactoryConvolution {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolution<Input,Output>(m,kernel,border);
+		return new GenericConvolve<Input,Output>(m,kernel,border);
 	}
 }

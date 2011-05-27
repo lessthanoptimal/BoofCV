@@ -145,6 +145,10 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 		}
 	}
 
+	public ImagePyramid<I> getPyramid() {
+		return pyramid;
+	}
+
 	public List<PyramidKltFeature> getFeatures() {
 		return active;
 	}

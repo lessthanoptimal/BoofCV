@@ -17,15 +17,14 @@
 package gecv.alg.tracker.pklt;
 
 import gecv.gui.image.ImagePanel;
+import gecv.gui.image.ImagePyramidPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.ProcessImageSequence;
 import gecv.io.image.SimpleImageSequence;
 import gecv.struct.image.ImageBase;
-import gecv.struct.pyramid.ImagePyramid;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.*;
 
 /**
  * @author Peter Abeles
@@ -37,6 +36,7 @@ public abstract class TrackVideoPyramidKLT<InputImage extends ImageBase, Derivat
 	private PkltManager<InputImage,DerivativeImage> tracker;
 
 	ImagePanel panel;
+	ImagePyramidPanel pyramidPanel;
 	int totalRespawns;
 
 	public TrackVideoPyramidKLT(SimpleImageSequence<InputImage> sequence,
@@ -68,6 +68,15 @@ public abstract class TrackVideoPyramidKLT<InputImage extends ImageBase, Derivat
 			panel.setBufferedImage(guiImage);
 			panel.repaint();
 		}
+
+//		if( pyramidPanel == null ) {
+//			pyramidPanel = new ImagePyramidPanel(tracker.getPyramid());
+//			ShowImages.showWindow(pyramidPanel,"Pyramid");
+//			addComponent(pyramidPanel);
+//		} else {
+//			pyramidPanel.render();
+//			pyramidPanel.repaint();
+//		}
 
 		if( tracker.getSpawned().size() != 0 )
 			totalRespawns++;

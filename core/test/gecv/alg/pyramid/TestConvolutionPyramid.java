@@ -16,9 +16,9 @@
 
 package gecv.alg.pyramid;
 
-import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.blur.BlurImageOps;
 import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid_F32;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestConvolutionPyramid_F32 {
+public class TestConvolutionPyramid {
 	Random rand = new Random(234);
 	int width = 80;
 	int height = 160;
@@ -50,7 +50,7 @@ public class TestConvolutionPyramid_F32 {
 		ImagePyramid_F32 pyramid = new ImagePyramid_F32(width, height, true);
 		pyramid.setScaling(1, 2, 2);
 
-		ConvolutionPyramid_F32 alg = new ConvolutionPyramid_F32(kernel);
+		ConvolutionPyramid<ImageFloat32> alg = new ConvolutionPyramid<ImageFloat32>(kernel,ImageFloat32.class);
 		alg.setPyramid(pyramid);
 		alg.update(img);
 
@@ -90,7 +90,7 @@ public class TestConvolutionPyramid_F32 {
 
 		ImagePyramid_F32 pyramid = new ImagePyramid_F32(width, height, false);
 		pyramid.setScaling(1, 2, 2);
-		ConvolutionPyramid_F32 alg = new ConvolutionPyramid_F32(kernel);
+		ConvolutionPyramid<ImageFloat32> alg = new ConvolutionPyramid<ImageFloat32>(kernel,ImageFloat32.class);
 		alg.setPyramid(pyramid);
 		alg.update(img);
 

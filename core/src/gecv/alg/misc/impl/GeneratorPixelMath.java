@@ -89,7 +89,6 @@ public class GeneratorPixelMath {
 		}
 	}
 
-
 	public void printAbs()
 	{
 		out.print("\t/**\n" +

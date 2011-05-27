@@ -25,40 +25,38 @@ import java.lang.reflect.Method;
 
 
 /**
- * Generalized interface for filtering images with convolution kernels.  Can invoke different
- * techniques for handling image borders.
+ * Generalized interface for filtering images with convolution kernels while skipping pixels.
+ * Can invoke different techniques for handling image borders.
  *
  * @author Peter Abeles
  */
-public class GenericConvolution<Input extends ImageBase, Output extends ImageBase>
+public class GenericConvolveDown<Input extends ImageBase, Output extends ImageBase>
 	implements FilterInterface<Input,Output>
 {
 	Method m;
 	KernelBase kernel;
 	BorderType type;
+	int skip;
 
-	public GenericConvolution(Method m, KernelBase kernel, BorderType type) {
+	public GenericConvolveDown(Method m, KernelBase kernel, BorderType type, int skip ) {
 		this.m = m;
 		this.kernel = kernel;
 		this.type = type;
+		this.skip = skip;
+	}
+
+	public int getSkip() {
+		return skip;
+	}
+
+	public void setSkip(int skip) {
+		this.skip = skip;
 	}
 
 	@Override
 	public void process(Input input, Output output) {
 		try {
-			if( kernel.getDimension() == 1 ) {
-				switch( type ) {
-					case SKIP:
-						m.invoke(null,kernel,input,output,false);
-						break;
-
-					default:
-						m.invoke(null,kernel,input,output);
-						break;
-				}
-			} else {
-				m.invoke(null,kernel,input,output);
-			}
+			m.invoke(null,kernel,input,output,skip);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
