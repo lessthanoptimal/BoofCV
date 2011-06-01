@@ -14,22 +14,26 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.convolve;
+package gecv.numerics.fitting.modelset.ransac;
 
-import org.junit.Test;
+import gecv.numerics.fitting.modelset.DistanceFromModel;
+
+import java.util.List;
 
 
 /**
+ * Used to compute the score metric that is used in model selection with {@link SimpleScoreRansac}.
+ *
  * @author Peter Abeles
  */
-public class TestGenericConvolution {
+public interface RansacFitScore<T> {
 
-	/**
-	 * No test is provided here since {@link TestFactoryConvolution} already does an exhaustive test
-	 * of this class.
-	 */
-	@Test
-	public void emptyTest() {
-		// intentionally empty
-	}
+    /**
+     * The fit score for the samples.
+     *
+     * @return The score.
+     */
+    double computeFitScore( List<T> samples, double[] param ,
+                            DistanceFromModel<T> modelDistance );
+
 }

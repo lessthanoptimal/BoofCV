@@ -292,13 +292,15 @@
         <w>convolving</w>
         <w>discretized</w>
         <w>laplacian</w>
+        <w>renormalized</w>
       </words>
     </dictionary>
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/sfm/Geometric Vision.iml" filepath="$PROJECT_DIR$/sfm/Geometric Vision.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/Image Processing.iml" filepath="$PROJECT_DIR$/core/Image Processing.iml" />
       <module fileurl="file://$PROJECT_DIR$/apps/apps.iml" filepath="$PROJECT_DIR$/apps/apps.iml" />
-      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/../cv/cv.iml" filepath="$PROJECT_DIR$/../cv/cv.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
       <module fileurl="file://$PROJECT_DIR$/evaluation/evaluation.iml" filepath="$PROJECT_DIR$/evaluation/evaluation.iml" />
@@ -310,10 +312,78 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="SvnBranchConfigurationManager">
+    <option name="myConfigurationMap">
+      <map>
+        <entry key="$PROJECT_DIR$/../cv">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="file:///opt/repos/cv/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="file:///opt/repos/cv/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="branchUrls">
+                <list>
+                  <option value="file:///opt/repos/cv/branches" />
+                  <option value="file:///opt/repos/cv/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="file:///opt/repos/cv/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../ejml">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="https://efficient-java-matrix-library.googlecode.com/svn" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../libpjajava">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="svn+ssh://127.0.0.1/opt/repos/libpjajava/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="svn+ssh://127.0.0.1/opt/repos/libpjajava/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="branchUrls">
+                <list>
+                  <option value="svn+ssh://127.0.0.1/opt/repos/libpjajava/branches" />
+                  <option value="svn+ssh://127.0.0.1/opt/repos/libpjajava/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="svn+ssh://127.0.0.1/opt/repos/libpjajava/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../cv" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../ejml" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../libpjajava" vcs="svn" />
   </component>
 </project>
 

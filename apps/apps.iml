@@ -8,9 +8,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="core" />
+    <orderEntry type="module" module-name="Image Processing" />
     <orderEntry type="module" module-name="io" />
-    <orderEntry type="module" module-name="visualize" />
   </component>
 </module>
 
