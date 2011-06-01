@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.sfm;
+package gecv.alg.geo;
 
 
 import gecv.struct.image.ImageBase;

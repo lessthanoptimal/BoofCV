@@ -298,7 +298,9 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/feature/Feature.iml" filepath="$PROJECT_DIR$/feature/Feature.iml" />
       <module fileurl="file://$PROJECT_DIR$/sfm/Geometric Vision.iml" filepath="$PROJECT_DIR$/sfm/Geometric Vision.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Image Processing/Image Processing.iml" filepath="$PROJECT_DIR$/Image Processing/Image Processing.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/Image Processing.iml" filepath="$PROJECT_DIR$/core/Image Processing.iml" />
       <module fileurl="file://$PROJECT_DIR$/apps/apps.iml" filepath="$PROJECT_DIR$/apps/apps.iml" />
       <module fileurl="file://$PROJECT_DIR$/../cv/cv.iml" filepath="$PROJECT_DIR$/../cv/cv.iml" />
