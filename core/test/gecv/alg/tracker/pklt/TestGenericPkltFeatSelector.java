@@ -23,9 +23,11 @@ import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
+import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import org.junit.Before;
 import org.junit.Test;
+import pja.geometry.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,58 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 	@Before
 	public void setup() {
 		super.setup();
+	}
+
+	/**
+	 * Sees if it correctly handles the situation where the bottom most layer in the pyramid
+	 * is not one.
+	 */
+	@Test
+	public void handlesBottomLayerNotOne() {
+		pyramid.setScaling(2,2);
+		derivX.setScaling(2,2);
+		derivY.setScaling(2,2);
+
+		// set the first layer to not be one
+		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(new DummyIntensity(), new DummyExtractor(),100);
+		GenericPkltFeatSelector<ImageFloat32, ImageFloat32> selector =
+				new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,tracker);
+
+		List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
+		List<PyramidKltFeature> available = new ArrayList<PyramidKltFeature>();
+		for( int i = 0; i < maxFeatures-5; i++ ) {
+			available.add( new PyramidKltFeature(pyramid.getNumLayers(),featureReadius));
+		}
+		for( int i = 0; i < 5; i++ ) {
+			active.add( new PyramidKltFeature(pyramid.getNumLayers(),featureReadius));
+		}
+
+		// set some features along the border
+		active.get(0).setPosition(width-1,height-1);
+		active.get(1).setPosition(width-1,2);
+		active.get(2).setPosition(2,height-1);
+
+		tracker.setImage(pyramid,derivX,derivY);
+		selector.setInputs(pyramid,derivX,derivY);
+		selector.compute(active,available);
+
+		// check to see that feature descriptions were removed from the available list
+		// and added to the active list
+		assertTrue(active.size()>0);
+		assertTrue((available.size()+active.size())==maxFeatures);
+
+		// see how many features are in the outside quadrant
+		int numOutside = 0;
+		for( PyramidKltFeature f : active ) {
+			if( f.x > width/2 )
+				numOutside++;
+			else if( f.y > height/2 )
+				numOutside++;
+		}
+
+		// the three known before and the one added by the extractor
+		assertTrue(numOutside==4);
 	}
 
 	/**
@@ -121,5 +175,70 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,maxFeatures);
 
 		return new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,tracker);
+	}
+
+	private static class DummyIntensity implements GeneralCornerIntensity<ImageFloat32,ImageFloat32> {
+		ImageFloat32 intensity;
+
+		@Override
+		public void process(ImageFloat32 image, ImageFloat32 derivX, ImageFloat32 derivY, ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY) {
+			intensity = new ImageFloat32(image.width,image.height);
+		}
+
+		@Override
+		public ImageFloat32 getIntensity() {
+			return intensity;
+		}
+
+		@Override
+		public QueueCorner getCandidates() {
+			return null;
+		}
+
+		@Override
+		public boolean getRequiresGradient() {
+			return true;
+		}
+
+		@Override
+		public boolean getRequiresHessian() {
+			return false;
+		}
+
+		@Override
+		public boolean hasCandidates() {
+			return false;
+		}
+	}
+
+	private class DummyExtractor implements CornerExtractor
+	{
+
+		@Override
+		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner excludeCorners, QueueCorner foundCorners) {
+			// if the feature's position isn't scaled then this test will fail
+			for( int i = 0; i < excludeCorners.num; i++ ) {
+				Point2D_I16 p = excludeCorners.get(i);
+				assertTrue(intensity.isInBounds(p.x,p.y));
+			}
+
+			// add a corner on the image boundary for scaled down
+			foundCorners.add(width/2-2,height/2-2);
+		}
+
+		@Override
+		public boolean getUsesCandidates() {
+			return false;
+		}
+
+		@Override
+		public boolean getCanExclude() {
+			return true;
+		}
+
+		@Override
+		public boolean getAcceptRequest() {
+			return false;
+		}
 	}
 }

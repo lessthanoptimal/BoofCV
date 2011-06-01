@@ -38,8 +38,11 @@ import gecv.struct.pyramid.ImagePyramid;
  */
 public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage extends ImageBase> {
 
+	// basic KLT tracker which works on a single image
 	KltTracker<InputImage, DerivativeImage> tracker;
+	// image pyramid for raw input image
 	ImagePyramid<InputImage> image;
+	// image pyramid for image gradient
 	ImagePyramid<DerivativeImage> derivX;
 	ImagePyramid<DerivativeImage> derivY;
 
@@ -47,6 +50,12 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 		this.tracker = tracker;
 	}
 
+	/**
+	 * Sets the feature's description up.  The feature's (x,y) must have already been set
+	 * and {@link #setImage} been called.
+	 *
+	 * @param feature Feature's whose description is being setup.
+	 */
 	public void setDescription(PyramidKltFeature feature) {
 		float x = feature.x;
 		float y = feature.y;
@@ -64,6 +73,12 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 		}
 	}
 
+	/**
+	 * Sets the current input images for the tracker to use.
+	 * @param image Original image pyramid.
+	 * @param derivX Derivative along x-axis.
+	 * @param derivY Derivative along y-axis.
+	 */
 	public void setImage(ImagePyramid<InputImage> image,
 						 ImagePyramid<DerivativeImage> derivX, ImagePyramid<DerivativeImage> derivY) {
 		if( image.getNumLayers() != derivX.getNumLayers() || image.getNumLayers() != derivY.getNumLayers() )
@@ -74,6 +89,20 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 		this.derivY = derivY;
 	}
 
+	/**
+	 * <p>
+	 * Finds the feature's new location in the image. The feature's position can be modified even if
+	 * tracking fails.
+	 * </p>
+	 *
+	 * <p>
+	 * NOTE: The feature's description is not updated and tracking over several frames can break down
+	 * if its description is not updated.
+	 * </p>
+	 *
+	 * @param feature The feature being tracked.
+	 * @return If tracking failed or not.
+	 */
 	public KltTrackFault track(PyramidKltFeature feature) {
 		boolean worked = false;
 
