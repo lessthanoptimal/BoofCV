@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.sfm;
+package gecv.alg.geo;
 
 import pja.geometry.struct.point.Point2D_F64;
 
