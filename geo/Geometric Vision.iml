@@ -5,11 +5,12 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/benchmark/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" scope="TEST">
+    <orderEntry type="module" module-name="core" />
+    <orderEntry type="module" module-name="libpja" />
+    <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="jar://$APPLICATION_HOME_DIR$/lib/junit-4.7.jar!/" />
@@ -18,7 +19,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="libpja" />
   </component>
 </module>
 

@@ -14,37 +14,31 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter;
+package gecv.numerics.fitting.modelset;
 
-import gecv.struct.image.ImageBase;
+import java.util.List;
 
 
 /**
- * Generalized interface for processing images.
+ * Given a set of points, compute a set of model parameters which can describe that observation.
  *
  * @author Peter Abeles
  */
-public interface FilterInterface<Input extends ImageBase, Output extends ImageBase> 
-{
-	/**
-	 * Processes the input image and writes the results to the output image.
-	 *
-	 * @param input Input image.
-	 * @param output Output image.
-	 */
-	public void process( Input input , Output output );
+public interface ModelFitter<T> {
 
 	/**
-	 * How many pixels are not processed along the horizontal border.
+	 * Returns the number of elements in the parameters array.
 	 *
-	 * @return Border size in pixels.
+	 * @return Number of elements in the parameter array.
 	 */
-	public int getHorizontalBorder();
+	int getParameterLength();
 
 	/**
-	 * How many pixels are not processed along the vertical border.
+	 * Computes a set of model parameters for the given set of points.
 	 *
-	 * @return Border size in pixels.
+	 * @param dataSet Points that the model is to be fit to.
+	 * @param foundParam Where the computed model parameters are written to.
+	 * @return true if successful, false otherwise.
 	 */
-	public int getVerticalBorder();
+	boolean fitModel(List<T> dataSet, double[] foundParam);
 }
