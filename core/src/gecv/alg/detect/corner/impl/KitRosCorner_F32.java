@@ -32,8 +32,7 @@ public class KitRosCorner_F32 implements KitRosCornerIntensity<ImageFloat32> {
 	// the intensity of the found features in the image
 	private ImageFloat32 featureIntensity;
 
-	public KitRosCorner_F32( int imgWidth , int imgHeight ) {
-		featureIntensity = new ImageFloat32(imgWidth,imgHeight);
+	public KitRosCorner_F32() {
 	}
 
 	@Override
@@ -43,6 +42,10 @@ public class KitRosCorner_F32 implements KitRosCornerIntensity<ImageFloat32> {
 
 		final int width = derivX.width;
 		final int height = derivY.height;
+
+		if( featureIntensity == null ) {
+			featureIntensity = new ImageFloat32(width,height);
+		}
 
 		for( int y = 0; y < height; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;

@@ -29,8 +29,8 @@ import gecv.struct.image.ImageSInt16;
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
 public class KltCorner_I16 extends SsdCorner_I16 implements KltCornerIntensity<ImageSInt16> {
-	public KltCorner_I16(int imageWidth, int imageHeight, int windowRadius) {
-		super(imageWidth, imageHeight, windowRadius);
+	public KltCorner_I16(int windowRadius) {
+		super(windowRadius);
 	}
 
 	@Override

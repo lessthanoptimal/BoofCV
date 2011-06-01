@@ -14,36 +14,37 @@
  *    limitations under the License.
  */
 
-package gecv.alg.tracker.pklt;
+package gecv.abst.filter;
 
-import gecv.alg.tracker.klt.KltConfig;
 import gecv.struct.image.ImageBase;
 
 
 /**
+ * Generalized interface for processing images.
+ *
  * @author Peter Abeles
  */
-// todo comment
-public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
-	public KltConfig config;
-	public int maxFeatures = 100;
-	public int minFeatures = 80;
-	public int featureRadius = 3;
+public interface FilterImageInterface<Input extends ImageBase, Output extends ImageBase>
+{
+	/**
+	 * Processes the input image and writes the results to the output image.
+	 *
+	 * @param input Input image.
+	 * @param output Output image.
+	 */
+	public void process( Input input , Output output );
 
-	public int imgWidth;
-	public int imgHeight;
+	/**
+	 * How many pixels are not processed along the horizontal border.
+	 *
+	 * @return Border size in pixels.
+	 */
+	public int getHorizontalBorder();
 
-	public int pyramidScaling[];
-
-	public Class<I> typeInput;
-	public Class<D> typeDeriv;
-
-
-	public int computeScalingTop() {
-		int ret = 1;
-		for( int i = 0; i < pyramidScaling.length; i++ ) {
-			ret *= pyramidScaling[i];
-		}
-		return ret;
-	}
+	/**
+	 * How many pixels are not processed along the vertical border.
+	 *
+	 * @return Border size in pixels.
+	 */
+	public int getVerticalBorder();
 }

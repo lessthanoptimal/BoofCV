@@ -28,49 +28,43 @@ import gecv.struct.image.ImageUInt8;
  */
 public class FactoryCornerIntensity {
 
-	public static FastCornerIntensity<ImageFloat32> createFast12_F32( int imageWidth, int imageHeight,
-																	  int pixelTol, int minCont)
+	public static FastCornerIntensity<ImageFloat32> createFast12_F32( int pixelTol, int minCont)
 	{
-		return new FastCorner12_F32(imageWidth,imageHeight,pixelTol,minCont);
+		return new FastCorner12_F32(pixelTol,minCont);
 	}
 
-	public static FastCornerIntensity<ImageUInt8> createFast12_I8( int imageWidth, int imageHeight,
-																	 int pixelTol, int minCont)
+	public static FastCornerIntensity<ImageUInt8> createFast12_I8( int pixelTol, int minCont)
 	{
-		return new FastCorner12_I8(imageWidth,imageHeight,pixelTol,minCont);
+		return new FastCorner12_I8(pixelTol,minCont);
 	}
 
-	public static HarrisCornerIntensity<ImageFloat32> createHarris_F32( int imageWidth, int imageHeight,
-																 int windowRadius, float kappa )
+	public static HarrisCornerIntensity<ImageFloat32> createHarris_F32( int windowRadius, float kappa )
 	{
-		return new HarrisCorner_F32(imageWidth,imageHeight,windowRadius,kappa);
+		return new HarrisCorner_F32(windowRadius,kappa);
 	}
 
-	public static HarrisCornerIntensity<ImageSInt16> createHarris_I16( int imageWidth, int imageHeight,
-															   int windowRadius, float kappa )
+	public static HarrisCornerIntensity<ImageSInt16> createHarris_I16( int windowRadius, float kappa )
 	{
-		return new HarrisCorner_I16(imageWidth,imageHeight,windowRadius,kappa);
+		return new HarrisCorner_I16(windowRadius,kappa);
 	}
 
-	public static KitRosCornerIntensity<ImageFloat32> createKitRos_F32( int imageWidth, int imageHeight )
+	public static KitRosCornerIntensity<ImageFloat32> createKitRos_F32()
 	{
-		return new KitRosCorner_F32(imageWidth,imageHeight);
+		return new KitRosCorner_F32();
 	}
 
-	public static KitRosCornerIntensity<ImageSInt16> createKitRos_I16( int imageWidth, int imageHeight )
+	public static KitRosCornerIntensity<ImageSInt16> createKitRos_I16()
 	{
-		return new KitRosCorner_I16(imageWidth,imageHeight);
+		return new KitRosCorner_I16();
 	}
 
-	public static KltCornerIntensity<ImageFloat32> createKlt_F32( int imageWidth, int imageHeight,
-																 int windowRadius)
+	public static KltCornerIntensity<ImageFloat32> createKlt_F32( int windowRadius)
 	{
-		return new KltCorner_F32(imageWidth,imageHeight,windowRadius);
+		return new KltCorner_F32(windowRadius);
 	}
 
-	public static KltCornerIntensity<ImageSInt16> createKlt_I16( int imageWidth, int imageHeight,
-															   int windowRadius)
+	public static KltCornerIntensity<ImageSInt16> createKlt_I16( int windowRadius)
 	{
-		return new KltCorner_I16(imageWidth,imageHeight,windowRadius);
+		return new KltCorner_I16(windowRadius);
 	}
 }

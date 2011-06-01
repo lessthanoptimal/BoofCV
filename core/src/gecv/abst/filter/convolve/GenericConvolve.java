@@ -16,7 +16,7 @@
 
 package gecv.abst.filter.convolve;
 
-import gecv.abst.filter.FilterInterface;
+import gecv.abst.filter.FilterImageInterface;
 import gecv.struct.convolve.KernelBase;
 import gecv.struct.image.ImageBase;
 
@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 public class GenericConvolve<Input extends ImageBase, Output extends ImageBase>
-	implements FilterInterface<Input,Output>
+	implements FilterImageInterface<Input,Output>
 {
 	Method m;
 	KernelBase kernel;

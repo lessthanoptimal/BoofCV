@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.derivative;
 
-import gecv.abst.filter.FilterInterface;
+import gecv.abst.filter.FilterImageInterface;
 import gecv.abst.filter.FilterSequence;
 import gecv.abst.filter.convolve.BorderType;
 import gecv.abst.filter.convolve.FactoryConvolve;
@@ -38,7 +38,7 @@ import java.lang.reflect.Method;
 public class CompareDerivativeToConvolution {
 
 	Method m;
-	FilterInterface outputFilters[];
+	FilterImageInterface outputFilters[];
 
 	Class<ImageBase> inputType;
 	Class<ImageBase> outputType;
@@ -49,15 +49,15 @@ public class CompareDerivativeToConvolution {
 	public void setTarget( Method m )  {
 		this.m = m;
 		Class<?> []param = m.getParameterTypes();
-		outputFilters = new FilterInterface<?,?>[ param.length ];
+		outputFilters = new FilterImageInterface<?,?>[ param.length ];
 
 		inputType = (Class<ImageBase>)param[0];
 		outputType = (Class<ImageBase>)param[1];
 	}
 
 	public void setKernel( int which , Kernel1D horizontal , Kernel1D vertical ) {
-		FilterInterface<?,?> f1 = FactoryConvolve.convolve(horizontal,inputType,outputType, BorderType.EXTENDED,true);
-		FilterInterface<?,?> f2 = FactoryConvolve.convolve(vertical,outputType,outputType, BorderType.EXTENDED,false);
+		FilterImageInterface<?,?> f1 = FactoryConvolve.convolve(horizontal,inputType,outputType, BorderType.EXTENDED,true);
+		FilterImageInterface<?,?> f2 = FactoryConvolve.convolve(vertical,outputType,outputType, BorderType.EXTENDED,false);
 
 		outputFilters[which] = new FilterSequence(f1,f2);
 

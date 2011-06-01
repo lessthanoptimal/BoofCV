@@ -40,8 +40,8 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 
 	KltTracker<InputImage, DerivativeImage> tracker;
 	ImagePyramid<InputImage> image;
-	DerivativeImage[] derivX;
-	DerivativeImage[] derivY;
+	ImagePyramid<DerivativeImage> derivX;
+	ImagePyramid<DerivativeImage> derivY;
 
 	public PyramidKltTracker(KltTracker<InputImage, DerivativeImage> tracker) {
 		this.tracker = tracker;
@@ -64,14 +64,14 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 		}
 	}
 
-	public void setImage(ImagePyramid<InputImage> image, DerivativeImage[] derivX, DerivativeImage[] derivY) {
+	public void setImage(ImagePyramid<InputImage> image,
+						 ImagePyramid<DerivativeImage> derivX, ImagePyramid<DerivativeImage> derivY) {
+		if( image.getNumLayers() != derivX.getNumLayers() || image.getNumLayers() != derivY.getNumLayers() )
+			throw new IllegalArgumentException("Number of layers does not match.");
+
 		this.image = image;
-		if (derivX != null) {
-			if (derivX.length != image.getNumLayers() || derivY.length != image.getNumLayers())
-				throw new IllegalArgumentException("Unexpected number of images in derivX and/or derivY");
-			this.derivX = derivX;
-			this.derivY = derivY;
-		}
+		this.derivX = derivX;
+		this.derivY = derivY;
 	}
 
 	public KltTrackFault track(PyramidKltFeature feature) {
@@ -129,7 +129,7 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 
 	private void setupKltTracker(int layer) {
 		if (derivX != null)
-			tracker.setImage(image.getLayer(layer), derivX[layer], derivY[layer]);
+			tracker.setImage(image.getLayer(layer), derivX.getLayer(layer), derivY.getLayer(layer));
 		else
 			tracker.setImage(image.getLayer(layer), null, null);
 	}

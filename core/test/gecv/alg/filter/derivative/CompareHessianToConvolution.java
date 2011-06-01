@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.derivative;
 
-import gecv.abst.filter.FilterInterface;
+import gecv.abst.filter.FilterImageInterface;
 import gecv.abst.filter.FilterSequence;
 import gecv.abst.filter.convolve.BorderType;
 import gecv.abst.filter.convolve.FactoryConvolve;
@@ -39,7 +39,7 @@ import java.lang.reflect.Method;
 public class CompareHessianToConvolution {
 
 	Method m;
-	FilterInterface outputFilters[] = new FilterInterface[2];
+	FilterImageInterface outputFilters[] = new FilterImageInterface[2];
 
 	Class<ImageBase> inputType;
 
@@ -54,8 +54,8 @@ public class CompareHessianToConvolution {
 	}
 
 	public void setKernel( int which , Kernel1D horizontal , Kernel1D vertical ) {
-		FilterInterface<?,?> f1 = FactoryConvolve.convolve(horizontal,inputType,inputType, BorderType.EXTENDED,true);
-		FilterInterface<?,?> f2 = FactoryConvolve.convolve(vertical,inputType,inputType, BorderType.EXTENDED,false);
+		FilterImageInterface<?,?> f1 = FactoryConvolve.convolve(horizontal,inputType,inputType, BorderType.EXTENDED,true);
+		FilterImageInterface<?,?> f2 = FactoryConvolve.convolve(vertical,inputType,inputType, BorderType.EXTENDED,false);
 
 		outputFilters[which] = new FilterSequence(f1,f2);
 

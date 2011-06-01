@@ -21,7 +21,8 @@ import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.pyramid.ImagePyramid_F32;
+import gecv.struct.pyramid.ImagePyramid;
+import gecv.struct.pyramid.ImagePyramidFactory;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -47,7 +48,7 @@ public class TestConvolutionPyramid {
 		ImageTestingOps.randomize(img, rand, 0, 100);
 
 		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(3, true);
-		ImagePyramid_F32 pyramid = new ImagePyramid_F32(width, height, true);
+		ImagePyramid<ImageFloat32> pyramid = ImagePyramidFactory.create_F32(width, height, true);
 		pyramid.setScaling(1, 2, 2);
 
 		ConvolutionPyramid<ImageFloat32> alg = new ConvolutionPyramid<ImageFloat32>(kernel,ImageFloat32.class);
@@ -56,14 +57,14 @@ public class TestConvolutionPyramid {
 
 		assertTrue(img == pyramid.getLayer(0));
 
-		pyramid = new ImagePyramid_F32(width, height, false);
+		pyramid = ImagePyramidFactory.create_F32(width, height, false);
 		pyramid.setScaling(1, 2, 2);
 		alg.setPyramid(pyramid);
 		alg.update(img);
 
 		assertTrue(img != pyramid.getLayer(0));
 
-		pyramid = new ImagePyramid_F32(width, height, true);
+		pyramid = ImagePyramidFactory.create_F32(width, height, true);
 		pyramid.setScaling(2, 2);
 		alg.setPyramid(pyramid);
 		alg.update(img);
@@ -88,7 +89,7 @@ public class TestConvolutionPyramid {
 
 		BlurImageOps.kernel(img, convImg, kernel, new ImageFloat32(width, height));
 
-		ImagePyramid_F32 pyramid = new ImagePyramid_F32(width, height, false);
+		ImagePyramid<ImageFloat32> pyramid = ImagePyramidFactory.create_F32(width, height, false);
 		pyramid.setScaling(1, 2, 2);
 		ConvolutionPyramid<ImageFloat32> alg = new ConvolutionPyramid<ImageFloat32>(kernel,ImageFloat32.class);
 		alg.setPyramid(pyramid);

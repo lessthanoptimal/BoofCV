@@ -31,8 +31,8 @@ import gecv.struct.image.ImageFloat32;
 public class KltCorner_F32 extends SsdCorner_F32 implements KltCornerIntensity<ImageFloat32> {
 
 
-	public KltCorner_F32(int imageWidth, int imageHeight, int windowRadius) {
-		super(imageWidth, imageHeight, windowRadius);
+	public KltCorner_F32(int windowRadius) {
+		super(windowRadius);
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public class TestImagePyramid {
 
 	@Test
 	public void getScalingAtLayer() {
-		Dummy pyramid = new Dummy(width,height,true);
+		ImagePyramid<ImageUInt8> pyramid = ImagePyramidFactory.create_U8(width,height,true);
 
 		pyramid.setScaling(1,2,3);
 
@@ -44,7 +44,7 @@ public class TestImagePyramid {
 	@Test
 	public void setScaling() {
 		// see if all the layers are set correctly
-		Dummy pyramid = new Dummy(width, height, true);
+		ImagePyramid<ImageUInt8> pyramid = ImagePyramidFactory.create_U8(width, height, true);
 		pyramid.setScaling(1, 2, 2);
 
 		assertTrue(null == pyramid.getLayer(0));
@@ -57,7 +57,7 @@ public class TestImagePyramid {
 
 
 		// tell it to creates a new image in the first layer
-		pyramid = new Dummy(width, height, false);
+		pyramid = ImagePyramidFactory.create_U8(width, height, false);
 		pyramid.setScaling(1, 2, 2);
 
 		assertTrue(null != pyramid.getLayer(0));
@@ -75,19 +75,4 @@ public class TestImagePyramid {
 	}
 
 
-	protected static class Dummy extends ImagePyramid<ImageUInt8> {
-		public Dummy(int topWidth, int topHeight, boolean saveOriginalReference) {
-			super(topWidth, topHeight, saveOriginalReference);
-		}
-
-		@Override
-		protected ImageUInt8 createImage(int width, int height) {
-			return new ImageUInt8(width, height);
-		}
-
-		@Override
-		public Class<ImageUInt8> getImageType() {
-			return ImageUInt8.class;
-		}
-	}
 }

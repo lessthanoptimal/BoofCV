@@ -36,7 +36,8 @@ public interface PyramidKltFeatureSelector<InputImage extends ImageBase, Derivat
 	 * @param derivY Image derivative along the y-axis.
 	 * @return List of KLT features.
 	 */
-	public void setInputs(ImagePyramid<InputImage> image, DerivativeImage[] derivX, DerivativeImage[] derivY);
+	public void setInputs(ImagePyramid<InputImage> image,
+						  ImagePyramid<DerivativeImage> derivX, ImagePyramid<DerivativeImage> derivY);
 
 	/**
 	 * Selects new features using provided data structures.

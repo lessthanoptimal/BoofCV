@@ -62,9 +62,11 @@ public abstract class SsdCorner_F32 implements GradientCornerIntensity<ImageFloa
 	// used to keep track of where it is in the image
 	protected int x, y;
 
-	public SsdCorner_F32(int imageWidth, int imageHeight, int windowRadius) {
+	public SsdCorner_F32( int windowRadius) {
 		this.radius = windowRadius;
+	}
 
+	public void setImageShape( int imageWidth, int imageHeight ) {
 		horizXX = new ImageFloat32(imageWidth, imageHeight);
 		horizYY = new ImageFloat32(imageWidth, imageHeight);
 		horizXY = new ImageFloat32(imageWidth, imageHeight);
@@ -85,18 +87,22 @@ public abstract class SsdCorner_F32 implements GradientCornerIntensity<ImageFloa
 	public ImageFloat32 getIntensity() {
 		return featureIntensity;
 	}
-
+	
 	/**
 	 * Computes the pixel's corner intensity.
-	 *
 	 * @return corner intensity.
 	 */
 	protected abstract float computeIntensity();
 
 	@Override
 	public void process(ImageFloat32 derivX, ImageFloat32 derivY) {
-		// adjust for the size of the input if possible
-		if (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {
+		if( tempXX == null ) {
+			if (derivX.getWidth() != derivY.getWidth() || derivX.getHeight() != derivY.getHeight()) {
+				throw new IllegalArgumentException("Input image sizes do not match");
+			}
+			setImageShape(derivX.getWidth(),derivX.getHeight());
+		} else if (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {
+			// adjust for the size of the input if possible
 			throw new IllegalArgumentException("Unexpected input size");
 		}
 		this.derivX = derivX;
@@ -106,7 +112,7 @@ public abstract class SsdCorner_F32 implements GradientCornerIntensity<ImageFloa
 		vertical();
 	}
 
-	/**
+/**
 	 * Compute the derivative sum along the x-axis while taking advantage of duplicate
 	 * calculations for each window.
 	 */

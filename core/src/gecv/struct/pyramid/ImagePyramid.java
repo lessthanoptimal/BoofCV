@@ -16,6 +16,7 @@
 
 package gecv.struct.pyramid;
 
+import gecv.core.image.ImageGenerator;
 import gecv.struct.image.ImageBase;
 
 import java.lang.reflect.Array;
@@ -32,7 +33,7 @@ import java.lang.reflect.Array;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class ImagePyramid<T extends ImageBase> {
+public class ImagePyramid<T extends ImageBase> {
 	// shape of full resolution input image
 	public int bottomWidth;
 	public int bottomHeight;
@@ -44,17 +45,23 @@ public abstract class ImagePyramid<T extends ImageBase> {
 	// if the top layer is full resolution, should a copy be made or a reference to the original be saved?i
 	public boolean saveOriginalReference;
 
+	// used to create the image layers
+	protected ImageGenerator<T> generator;
+
 	/**
 	 * Specifies input image size and behavior of top most layer.
 	 *
 	 * @param bottomWidth		   Width of original full resolution image.
 	 * @param bottomHeight		  Height of original full resolution image.
 	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of  copied.
+	 * @param generator Creates new images for each layer
 	 */
-	public ImagePyramid(int bottomWidth, int bottomHeight, boolean saveOriginalReference) {
+	public ImagePyramid(int bottomWidth, int bottomHeight, boolean saveOriginalReference,
+						ImageGenerator<T> generator ) {
 		this.saveOriginalReference = saveOriginalReference;
 		this.bottomWidth = bottomWidth;
 		this.bottomHeight = bottomHeight;
+		this.generator = generator;
 	}
 
 	/**
@@ -85,15 +92,15 @@ public abstract class ImagePyramid<T extends ImageBase> {
 
 		if (scale[0] == 1) {
 			if (!saveOriginalReference) {
-				layers[0] = createImage(bottomWidth, bottomHeight);
+				layers[0] = generator.createInstance(bottomWidth, bottomHeight);
 			}
 		} else {
-			layers[0] = createImage(bottomWidth / scaleFactor, bottomHeight / scaleFactor);
+			layers[0] = generator.createInstance(bottomWidth / scaleFactor, bottomHeight / scaleFactor);
 		}
 
 		for (int i = 1; i < scale.length; i++) {
 			scaleFactor *= scale[i];
-			layers[i] = createImage(bottomWidth / scaleFactor, bottomHeight / scaleFactor);
+			layers[i] = generator.createInstance(bottomWidth / scaleFactor, bottomHeight / scaleFactor);
 		}
 	}
 
@@ -114,20 +121,13 @@ public abstract class ImagePyramid<T extends ImageBase> {
 	}
 
 	/**
-	 * Internally used to create a new layer in an abstract way.
-	 *
-	 * @param width  Image's width.
-	 * @param height Image's height.
-	 * @return The new image.
-	 */
-	protected abstract T createImage(int width, int height);
-
-	/**
 	 * Type of image in each layer of the pyramid.
 	 *
 	 * @return Image type.
 	 */
-	public abstract Class<T> getImageType();
+	public Class<T> getImageType() {
+		return generator.getType();
+	}
 
 	/**
 	 * Returns a layer in the pyramid.

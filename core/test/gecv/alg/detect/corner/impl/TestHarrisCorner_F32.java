@@ -25,7 +25,7 @@ import org.junit.Test;
  */
 public class TestHarrisCorner_F32 extends GenericCornerIntensityGradientTests {
 
-	HarrisCorner_F32 detector = new HarrisCorner_F32(width,height,1,0.04f);
+	HarrisCorner_F32 detector = new HarrisCorner_F32(1,0.04f);
 
 	@Test
 	public void genericTests() {

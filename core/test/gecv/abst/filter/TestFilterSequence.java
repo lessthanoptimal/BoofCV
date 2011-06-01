@@ -56,9 +56,9 @@ public class TestFilterSequence {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		FilterInterface f1 = FactoryConvolve.convolve(ker1,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
-		FilterInterface f2 = FactoryConvolve.convolve(ker2,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
-		FilterInterface f3 = FactoryConvolve.convolve(ker3,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
+		FilterImageInterface f1 = FactoryConvolve.convolve(ker1,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
+		FilterImageInterface f2 = FactoryConvolve.convolve(ker2,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
+		FilterImageInterface f3 = FactoryConvolve.convolve(ker3,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
 
 		FilterSequence sequence = new FilterSequence(f1,f2,f3);
 		sequence.process(input,found);

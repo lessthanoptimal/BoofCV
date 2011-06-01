@@ -26,7 +26,7 @@ import gecv.alg.tracker.klt.TestKltTracker;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramid_F32;
+import gecv.struct.pyramid.ImagePyramidFactory;
 
 import java.util.Random;
 
@@ -47,8 +47,8 @@ public class PyramidKltTestBase {
 	ImageFloat32 image = new ImageFloat32(width,height);
 	PyramidUpdater<ImageFloat32> updater = createPyramidUpdater();
 	ImagePyramid<ImageFloat32> pyramid = createPyramid();
-	ImageFloat32[] derivX;
-	ImageFloat32[] derivY;
+	ImagePyramid<ImageFloat32> derivX = createPyramid();
+	ImagePyramid<ImageFloat32> derivY = createPyramid();
 	PyramidKltTracker<ImageFloat32,ImageFloat32> tracker = createDefaultTracker();
 
 	int cornerX = 20;
@@ -60,21 +60,16 @@ public class PyramidKltTestBase {
 		updater.setPyramid(pyramid);
 		updater.update(image);
 
-		derivX = new ImageFloat32[pyramid.getNumLayers()];
-		derivY = new ImageFloat32[pyramid.getNumLayers()];
-		for( int i = 0; i < derivX.length; i++ ) {
-			int w = pyramid.getWidth(i);
-			int h = pyramid.getHeight(i);
-			derivX[i] = new ImageFloat32(w,h);
-			derivY[i] = new ImageFloat32(w,h);
+		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
 
-			GradientSobel.process(pyramid.getLayer(i),derivX[i],derivY[i],true);
+			GradientSobel.process(pyramid.getLayer(i),
+					derivX.getLayer(i),derivY.getLayer(i),true);
 		}
 	}
 
 		private ImagePyramid<ImageFloat32> createPyramid() {
 
-		ImagePyramid<ImageFloat32> pyramid = new ImagePyramid_F32(width,height,false);
+		ImagePyramid<ImageFloat32> pyramid = ImagePyramidFactory.create_F32(width,height,false);
 		pyramid.setScaling(1,2,2);
 
 		return pyramid;

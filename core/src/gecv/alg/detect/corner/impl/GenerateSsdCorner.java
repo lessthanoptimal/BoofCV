@@ -31,11 +31,22 @@ public class GenerateSsdCorner {
 	String typeOutput;
 	String dataInput;
 	String dataOutput;
-	String bitWise;
 	String sumType;
 
 	public void createAll() throws FileNotFoundException {
+		create_F32();
 		create_I16();
+	}
+
+		public void create_F32() throws FileNotFoundException {
+		className = "SsdCorner_F32";
+		typeInput = "ImageFloat32";
+		typeOutput = "ImageFloat32";
+		dataInput = "float";
+		dataOutput = "float";
+		sumType = "float";
+
+		createFile();
 	}
 
 	public void create_I16() throws FileNotFoundException {
@@ -87,7 +98,7 @@ public class GenerateSsdCorner {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public abstract class "+className+" implements GradientCornerDetector<"+typeInput+"> {\n" +
+				"public abstract class "+className+" implements GradientCornerIntensity<"+typeInput+"> {\n" +
 				"\n" +
 				"\t// input image gradient\n" +
 				"\tprotected " + typeInput + " derivX;\n" +
@@ -115,9 +126,11 @@ public class GenerateSsdCorner {
 				"\t// used to keep track of where it is in the image\n" +
 				"\tprotected int x, y;\n" +
 				"\n" +
-				"\tpublic "+className+"(int imageWidth, int imageHeight, int windowRadius) {\n" +
+				"\tpublic "+className+"( int windowRadius) {\n" +
 				"\t\tthis.radius = windowRadius;\n" +
+				"\t}\n" +
 				"\n" +
+				"\tpublic void setImageShape( int imageWidth, int imageHeight ) {\n" +
 				"\t\thorizXX = new " + typeOutput + "(imageWidth, imageHeight);\n" +
 				"\t\thorizYY = new " + typeOutput + "(imageWidth, imageHeight);\n" +
 				"\t\thorizXY = new " + typeOutput + "(imageWidth, imageHeight);\n" +
@@ -127,7 +140,7 @@ public class GenerateSsdCorner {
 				"\t\ttempXX = new " + sumType + "[imageWidth];\n" +
 				"\t\ttempXY = new " + sumType + "[imageWidth];\n" +
 				"\t\ttempYY = new " + sumType + "[imageWidth];\n" +
-				"\t}\n" +
+				"\t}\n"+
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic int getRadius() {\n" +
@@ -149,8 +162,13 @@ public class GenerateSsdCorner {
 	public void printProcess() {
 		out.print("\t@Override\n" +
 				"\tpublic void process("+typeInput+" derivX, "+typeInput+" derivY) {\n" +
-				"\t\t// adjust for the size of the input if possible\n" +
-				"\t\tif (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {\n" +
+				"\t\tif( tempXX == null ) {\n" +
+				"\t\t\tif (derivX.getWidth() != derivY.getWidth() || derivX.getHeight() != derivY.getHeight()) {\n" +
+				"\t\t\t\tthrow new IllegalArgumentException(\"Input image sizes do not match\");\n" +
+				"\t\t\t}\n" +
+				"\t\t\tsetImageShape(derivX.getWidth(),derivX.getHeight());\n" +
+				"\t\t} else if (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {\n" +
+				"\t\t\t// adjust for the size of the input if possible\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Unexpected input size\");\n" +
 				"\t\t}\n" +
 				"\t\tthis.derivX = derivX;\n" +

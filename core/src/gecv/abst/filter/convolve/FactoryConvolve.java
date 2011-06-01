@@ -16,7 +16,7 @@
 
 package gecv.abst.filter.convolve;
 
-import gecv.abst.filter.FilterInterface;
+import gecv.abst.filter.FilterImageInterface;
 import gecv.alg.filter.convolve.ConvolveExtended;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.ConvolveNormalized;
@@ -44,7 +44,7 @@ public class FactoryConvolve {
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
 	public static <Input extends ImageBase, Output extends ImageBase>
-	FilterInterface<Input,Output>
+	FilterImageInterface<Input,Output>
 	convolve( Kernel1D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border , boolean isHorizontal )
 	{
 		outputType = GecvTesting.convertToGenericType(outputType);
@@ -89,7 +89,7 @@ public class FactoryConvolve {
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
 	public static <Input extends ImageBase, Output extends ImageBase>
-	FilterInterface<Input,Output>
+	FilterImageInterface<Input,Output>
 	convolve( Kernel2D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border )
 	{
 		outputType = GecvTesting.convertToGenericType(outputType);

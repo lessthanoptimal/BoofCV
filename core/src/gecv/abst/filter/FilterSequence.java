@@ -28,16 +28,16 @@ import gecv.struct.image.ImageBase;
  */
 @SuppressWarnings({"unchecked"})
 public class FilterSequence<Input extends ImageBase, Output extends ImageBase>
-		implements FilterInterface<Input,Output> {
+		implements FilterImageInterface<Input,Output> {
 
-	FilterInterface<Input,Output> firstFilter;
-	FilterInterface<Output,Output> sequence[];
+	FilterImageInterface<Input,Output> firstFilter;
+	FilterImageInterface<Output,Output> sequence[];
 
 	int borderHorizontal = 0;
 	int borderVertical = 0;
 
-	public FilterSequence( FilterInterface<Input,Output> first,
-						   FilterInterface<Output,Output> ... sequence )
+	public FilterSequence( FilterImageInterface<Input,Output> first,
+						   FilterImageInterface<Output,Output>... sequence )
 	{
 		this.firstFilter = first;
 		this.sequence = sequence;
@@ -47,7 +47,7 @@ public class FilterSequence<Input extends ImageBase, Output extends ImageBase>
 		if( first.getVerticalBorder() > borderVertical)
 			borderVertical = first.getVerticalBorder();
 
-		for( FilterInterface<Output,Output> f : sequence ) {
+		for( FilterImageInterface<Output,Output> f : sequence ) {
 			if( f.getHorizontalBorder() > borderHorizontal )
 				borderHorizontal = f.getHorizontalBorder();
 			if( f.getVerticalBorder() > borderVertical )
@@ -62,7 +62,7 @@ public class FilterSequence<Input extends ImageBase, Output extends ImageBase>
 
 		firstFilter.process(input,temp1);
 
-		for( FilterInterface<Output,Output> f : sequence ) {
+		for( FilterImageInterface<Output,Output> f : sequence ) {
 			f.process(temp1,temp2);
 			Output swap = temp1;
 			temp1 = temp2;

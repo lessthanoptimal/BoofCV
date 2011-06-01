@@ -33,17 +33,20 @@ public class KitRosCorner_I16 implements KitRosCornerIntensity<ImageSInt16> {
 	// the intensity of the found features in the image
 	private ImageFloat32 featureIntensity;
 
-	public KitRosCorner_I16( int imgWidth , int imgHeight ) {
-		featureIntensity = new ImageFloat32(imgWidth,imgHeight);
+	public KitRosCorner_I16() {
 	}
 
 	@Override
 	public void process(ImageSInt16 derivX, ImageSInt16 derivY,
 					 ImageSInt16 hessianXX, ImageSInt16 hessianYY , ImageSInt16 hessianXY ) {
 		InputSanityCheck.checkSameShape(derivX,derivY,hessianXX,hessianYY);
-
+		
 		final int width = derivX.width;
 		final int height = derivY.height;
+
+		if( featureIntensity == null ) {
+			featureIntensity = new ImageFloat32(width,height);
+		}
 
 		for( int y = 0; y < height; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;

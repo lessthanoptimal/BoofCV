@@ -18,7 +18,7 @@ package gecv.abst.filter.convolve;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.abst.filter.FilterInterface;
+import gecv.abst.filter.FilterImageInterface;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.struct.convolve.Kernel1D_F32;
@@ -60,7 +60,7 @@ public class BenchmarkConvolveAbstracted {
 	{
 		@Override
 		public void process() {
-			FilterInterface<ImageUInt8,ImageSInt16> filter =
+			FilterImageInterface<ImageUInt8,ImageSInt16> filter =
 			FactoryConvolve.convolve(kernelI32,ImageUInt8.class,ImageSInt16.class,BorderType.SKIP,false);
 			filter.process(imgInt8,out_I16);
 		}
@@ -68,7 +68,7 @@ public class BenchmarkConvolveAbstracted {
 
 	public static class Pre_Vertical_I8_I16 extends PerformerBase
 	{
-		FilterInterface<ImageUInt8,ImageSInt16> filter =
+		FilterImageInterface<ImageUInt8,ImageSInt16> filter =
 					FactoryConvolve.convolve(kernelI32,ImageUInt8.class,ImageSInt16.class,BorderType.SKIP,false);
 
 		@Override

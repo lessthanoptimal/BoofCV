@@ -67,7 +67,7 @@ public class TestFastCorner12_F32 {
 	 */
 	@Test
 	public void testPositive() {
-		FastCorner12_F32 corner = new FastCorner12_F32(width,height,20, 12);
+		FastCorner12_F32 corner = new FastCorner12_F32(20, 12);
 		ImageFloat32 img = new ImageFloat32(width, height);
 
 		for( int subImage = 0; subImage < 2; subImage++ ) {
@@ -135,7 +135,7 @@ public class TestFastCorner12_F32 {
 	 */
 	@Test
 	public void testNegativeShort() {
-		FastCorner12_F32 corner = new FastCorner12_F32(width,height, 20, 12);
+		FastCorner12_F32 corner = new FastCorner12_F32(20, 12);
 		ImageFloat32 img = new ImageFloat32(width, height);
 		setOffsets(img);
 
@@ -154,7 +154,7 @@ public class TestFastCorner12_F32 {
 	 */
 	@Test
 	public void testNegativeMixed() {
-		FastCorner12_F32 corner = new FastCorner12_F32(width,height, 20, 12);
+		FastCorner12_F32 corner = new FastCorner12_F32( 20, 12);
 		ImageFloat32 img = new ImageFloat32(width, height);
 		setOffsets(img);
 

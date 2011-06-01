@@ -16,12 +16,16 @@
 
 package gecv.alg.tracker.pklt;
 
+import gecv.alg.pyramid.GradientPyramid;
+import gecv.alg.pyramid.PyramidUpdater;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ImagePyramidPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.ProcessImageSequence;
 import gecv.io.image.SimpleImageSequence;
 import gecv.struct.image.ImageBase;
+import gecv.struct.pyramid.ImagePyramid;
+import gecv.struct.pyramid.ImagePyramidFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -30,32 +34,61 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 
-public abstract class TrackVideoPyramidKLT<InputImage extends ImageBase, DerivativeImage extends ImageBase>
-		extends ProcessImageSequence<InputImage> {
+public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
+		extends ProcessImageSequence<I> {
 
-	private PkltManager<InputImage,DerivativeImage> tracker;
+	private PkltManager<I, D> tracker;
 
 	ImagePanel panel;
 	ImagePyramidPanel pyramidPanel;
 	int totalRespawns;
 
-	public TrackVideoPyramidKLT(SimpleImageSequence<InputImage> sequence,
-								PkltManager<InputImage,DerivativeImage> tracker ) {
+	PyramidUpdater<I> pyramidUpdater;
+	GradientPyramid<I,D> updateGradient;
+
+	ImagePyramid<I> basePyramid;
+	ImagePyramid<D> derivX;
+	ImagePyramid<D> derivY;
+
+
+	@SuppressWarnings({"unchecked"})
+	public TrackVideoPyramidKLT(SimpleImageSequence<I> sequence,
+								PkltManager<I, D> tracker ,
+								PyramidUpdater<I> pyramidUpdater ,
+								GradientPyramid<I,D> updateGradient) {
 		super(sequence);
 		this.tracker = tracker;
+		this.pyramidUpdater = pyramidUpdater;
+		this.updateGradient = updateGradient;
+		PkltManagerConfig<I, D> config = tracker.getConfig();
+
+		// declare the image pyramid
+		basePyramid = ImagePyramidFactory.create(
+				config.imgWidth,config.imgHeight,true,config.typeInput);
+		derivX = ImagePyramidFactory.create(
+				config.imgWidth,config.imgHeight,false,config.typeDeriv);
+		derivY = ImagePyramidFactory.create(
+				config.imgWidth,config.imgHeight,false,config.typeDeriv);
+
+		basePyramid.setScaling(config.pyramidScaling);
+		derivX.setScaling(config.pyramidScaling);
+		derivY.setScaling(config.pyramidScaling);
+
+		pyramidUpdater.setPyramid(basePyramid);
 	}
 
 
 	@Override
-	public void processFrame(InputImage image) {
+	public void processFrame(I image) {
 
-		tracker.processFrame(image);
+		pyramidUpdater.update(image);
+		updateGradient.update(basePyramid,derivX,derivY);
 
-
+		tracker.processFrame(basePyramid,derivX,derivY);
 	}
 
 	@Override
-	public void updateGUI(BufferedImage guiImage, InputImage origImage) {
+	public void updateGUI(BufferedImage guiImage, I origImage) {
 		Graphics2D g2 = guiImage.createGraphics();
 		
 		drawFeatures(g2, tracker.getFeatures(), Color.RED);
