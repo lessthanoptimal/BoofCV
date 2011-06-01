@@ -14,32 +14,24 @@
  *    limitations under the License.
  */
 
-package gecv.struct.pyramid;
+package gecv.core.image.inst;
 
+import gecv.core.image.ImageGenerator;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageUInt8;
 
 
 /**
- * Creates an image pyramid given an image type.
+ * Factory for creating common image types
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FactoryImagePyramid {
+public class FactoryImageGenerator {
 
-	public static <T extends ImageBase>
-	ImagePyramid<T> create( Class<T> type ,
-							int width , int height ,
-							boolean saveOriginalReference )
+	public static <T extends ImageBase> ImageGenerator<T> create( Class<T> type )
 	{
-		if( type == ImageUInt8.class ) {
-			return (ImagePyramid<T>)new ImagePyramid_I8(width,height,saveOriginalReference);
-		} else if( type == ImageFloat32.class ) {
-			return (ImagePyramid<T>)new ImagePyramid_F32(width,height,saveOriginalReference);
-		} else {
-			throw new IllegalArgumentException("Unknown image type");
-		}
+		return new SingleBandGenerator(type);
 	}
+
+	
 }

@@ -33,10 +33,8 @@ public class ConvolutionPyramid<T extends ImageBase> extends PyramidUpdater<T> {
 
 	// stores the results from the first convolution
 	private T temp;
-	Class<T> imageType;
 	GenericConvolveDown<T,T> horizontal;
 	GenericConvolveDown<T,T> vertical;
-
 
 	public ConvolutionPyramid(Kernel1D kernel, Class<T> imageType ) {
 

@@ -17,7 +17,8 @@
 package gecv.alg.pyramid;
 
 import gecv.struct.image.ImageUInt8;
-import gecv.struct.pyramid.ImagePyramid_I8;
+import gecv.struct.pyramid.ImagePyramid;
+import gecv.struct.pyramid.ImagePyramidFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -38,7 +39,7 @@ public class TestPyramidUpdater {
 	public void update() {
 		// positive case
 		ImageUInt8 input = new ImageUInt8(width, height);
-		ImagePyramid_I8 pyramid = new ImagePyramid_I8(width, height, true);
+		ImagePyramid<ImageUInt8> pyramid = ImagePyramidFactory.create_U8(width, height, true);
 
 		Dummy updater = new Dummy();
 		updater.setPyramid(pyramid);

@@ -105,18 +105,12 @@ public class GenerateFastCorner {
 				"\tprivate QueueCorner candidates;\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * @param imgWidth Input image width.\n" +
-				"\t * @param imgHeight input image height.\n" +
 				"\t * @param pixelTol The difference in intensity value from the center pixel the circle needs to be.\n" +
 				"\t * @param minCont  The minimum number of continuous pixels that a circle needs to be a corner.\n" +
 				"\t */\n" +
-				"\tpublic "+className+"( int imgWidth , int imgHeight , "+dataTol+" pixelTol, int minCont) {\n" +
+				"\tpublic "+className+"( "+dataTol+" pixelTol, int minCont) {\n" +
 				"\t\tthis.pixelTol = pixelTol;\n" +
 				"\t\tthis.minCont = minCont;\n" +
-				"\n" +
-				"\t\tfeatureIntensity = new ImageFloat32(imgWidth, imgHeight);\n" +
-				"\n" +
-				"\t\tcandidates = new QueueCorner(imgWidth);\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
@@ -138,6 +132,10 @@ public class GenerateFastCorner {
 	public void printDetection() {
 		out.print("\t@Override\n" +
 				"\tpublic void process( "+typeInput+" img ) {\n" +
+				"\t\tif( featureIntensity == null ) {\n" +
+				"\t\t\tfeatureIntensity = new ImageFloat32(img.getWidth(), img.getHeight());\n" +
+				"\t\t\tcandidates = new QueueCorner(img.getWidth());\n" +
+				"\t\t}\n"+
 				"\t\tcandidates.reset();\n" +
 				"\t\tfinal "+dataInput+"[] data = img.data;\n" +
 				"\n" +

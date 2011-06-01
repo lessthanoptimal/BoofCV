@@ -50,7 +50,7 @@ public class BenchmarkSsdCornerIntensity {
 	static Random rand = new Random(234);
 
 	public static class KLT_F32 extends PerformerBase {
-		KltCorner_F32 corner = new KltCorner_F32(imgWidth, imgHeight, windowRadius);
+		KltCorner_F32 corner = new KltCorner_F32(windowRadius);
 
 		@Override
 		public void process() {
@@ -59,7 +59,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KLT_I16 extends PerformerBase {
-		KltCorner_I16 corner = new KltCorner_I16(imgWidth, imgHeight, windowRadius);
+		KltCorner_I16 corner = new KltCorner_I16(windowRadius);
 
 		@Override
 		public void process() {
@@ -77,7 +77,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class Harris_F32 extends PerformerBase {
-		HarrisCorner_F32 corner = new HarrisCorner_F32(imgWidth, imgHeight, windowRadius, 0.04f);
+		HarrisCorner_F32 corner = new HarrisCorner_F32(windowRadius, 0.04f);
 
 		@Override
 		public void process() {
@@ -86,7 +86,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class Harris_I16 extends PerformerBase {
-		HarrisCorner_I16 corner = new HarrisCorner_I16(imgWidth, imgHeight, windowRadius, 0.04f);
+		HarrisCorner_I16 corner = new HarrisCorner_I16( windowRadius, 0.04f);
 
 		@Override
 		public void process() {
@@ -95,7 +95,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KitRos_F32 extends PerformerBase {
-		KitRosCorner_F32 corner = new KitRosCorner_F32(imgWidth, imgHeight);
+		KitRosCorner_F32 corner = new KitRosCorner_F32();
 
 		@Override
 		public void process() {
@@ -104,7 +104,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KitRos_I16 extends PerformerBase {
-		KitRosCorner_I16 corner = new KitRosCorner_I16(imgWidth, imgHeight );
+		KitRosCorner_I16 corner = new KitRosCorner_I16();
 
 		@Override
 		public void process() {

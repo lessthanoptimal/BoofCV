@@ -31,6 +31,7 @@ import gecv.struct.image.ImageFloat32;
  */
 public class FastCorner12_F32 implements FastCornerIntensity<ImageFloat32> {
 
+	// minimum number of continuous pixels
 	private int minCont;
 	private final static int radius = 3;
 
@@ -49,13 +50,9 @@ public class FastCorner12_F32 implements FastCornerIntensity<ImageFloat32> {
 	 * @param pixelTol The difference in intensity value from the center pixel the circle needs to be.
 	 * @param minCont  The minimum number of continuous pixels that a circle needs to be a corner.
 	 */
-	public FastCorner12_F32( int imgWidth , int imgHeight , float pixelTol, int minCont) {
+	public FastCorner12_F32( float pixelTol, int minCont) {
 		this.pixelTol = pixelTol;
 		this.minCont = minCont;
-
-		featureIntensity = new ImageFloat32(imgWidth, imgHeight);
-
-		candidates = new QueueCorner(imgWidth);
 	}
 
 	@Override
@@ -75,6 +72,10 @@ public class FastCorner12_F32 implements FastCornerIntensity<ImageFloat32> {
 
 	@Override
 	public void process( ImageFloat32 img ) {
+		if( featureIntensity == null ) {
+			featureIntensity = new ImageFloat32(img.getWidth(), img.getHeight());
+			candidates = new QueueCorner(img.getWidth());
+		}
 		candidates.reset();
 		final float[] data = img.data;
 

@@ -16,8 +16,8 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.derivative.GradientSobel;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.tracker.klt.KltTrackFault;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,8 +40,8 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 		ImageTestingOps.fillRectangle(image,100,cornerX,cornerY,20,20);
 		updater.update(image);
 
-		for( int i = 0; i < derivX.length; i++ ) {
-			GradientSobel.process(pyramid.getLayer(i),derivX[i],derivY[i],true);
+		for( int i = 0; i < derivX.getNumLayers(); i++ ) {
+			GradientSobel.process(pyramid.getLayer(i),derivX.getLayer(i),derivY.getLayer(i),true);
 		}
 	}
 

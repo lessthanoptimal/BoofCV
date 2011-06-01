@@ -18,8 +18,8 @@ package gecv.alg.detect.corner.impl;
 
 import gecv.alg.detect.corner.GenericCornerIntensityGradientTests;
 import gecv.alg.detect.corner.GenericCornerIntensityTests;
-import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.derivative.GradientSobel;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -41,7 +41,7 @@ public class TestKltCorner_I16 {
 
 			@Override
 			public ImageFloat32 computeIntensity() {
-				KltCorner_I16 alg = new KltCorner_I16(width,height,1);
+				KltCorner_I16 alg = new KltCorner_I16(1);
 				alg.process(derivX_I16,derivY_I16);
 				return alg.getIntensity();
 			}
@@ -71,7 +71,7 @@ public class TestKltCorner_I16 {
 		SsdCornerNaive_I16 naive = new SsdCornerNaive_I16(width, height, 3);
 		naive.process(derivX, derivY);
 
-		KltCorner_I16 fast = new KltCorner_I16(width, height, 3);
+		KltCorner_I16 fast = new KltCorner_I16(3);
 		fast.process(derivX, derivY);
 
 		GecvTesting.assertEquals(naive.getIntensity(), fast.getIntensity());

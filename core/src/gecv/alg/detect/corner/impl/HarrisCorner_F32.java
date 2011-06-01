@@ -30,8 +30,8 @@ public class HarrisCorner_F32 extends SsdCorner_F32 implements HarrisCornerInten
 
 	float kappa;
 
-	public HarrisCorner_F32(int imageWidth, int imageHeight, int windowRadius, float kappa) {
-		super(imageWidth, imageHeight, windowRadius);
+	public HarrisCorner_F32(int windowRadius, float kappa) {
+		super(windowRadius);
 		this.kappa = kappa;
 	}
 

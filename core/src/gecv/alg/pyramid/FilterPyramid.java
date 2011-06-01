@@ -14,36 +14,36 @@
  *    limitations under the License.
  */
 
-package gecv.alg.tracker.pklt;
+package gecv.alg.pyramid;
 
-import gecv.alg.tracker.klt.KltConfig;
+import gecv.abst.filter.FilterImageInterface;
 import gecv.struct.image.ImageBase;
+import gecv.struct.pyramid.ImagePyramid;
 
 
 /**
+ * Updates a pyramid by filtering another image pyramid.  For example, computing the
+ * derivative from another pyramid.
+ *
  * @author Peter Abeles
  */
-// todo comment
-public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
-	public KltConfig config;
-	public int maxFeatures = 100;
-	public int minFeatures = 80;
-	public int featureRadius = 3;
-
-	public int imgWidth;
-	public int imgHeight;
-
-	public int pyramidScaling[];
-
-	public Class<I> typeInput;
-	public Class<D> typeDeriv;
+public class FilterPyramid<In extends ImageBase , Out extends ImageBase> {
 
 
-	public int computeScalingTop() {
-		int ret = 1;
-		for( int i = 0; i < pyramidScaling.length; i++ ) {
-			ret *= pyramidScaling[i];
-		}
-		return ret;
+	protected FilterImageInterface<In,Out> filter;
+
+	public FilterPyramid(FilterImageInterface<In, Out> filter ) {
+		this.filter = filter;
 	}
+
+	public void update( ImagePyramid<In> input , ImagePyramid<Out> output) {
+
+		for( int i = 0; i < output.getNumLayers(); i++ ) {
+			In imageIn = input.getLayer(i);
+			Out imageOut = output.getLayer(i);
+
+			filter.process(imageIn,imageOut);
+		}
+	}
+
 }

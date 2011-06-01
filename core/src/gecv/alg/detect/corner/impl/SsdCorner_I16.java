@@ -64,9 +64,11 @@ public abstract class SsdCorner_I16 implements GradientCornerIntensity<ImageSInt
 	// used to keep track of where it is in the image
 	protected int x, y;
 
-	public SsdCorner_I16(int imageWidth, int imageHeight, int windowRadius) {
+	public SsdCorner_I16( int windowRadius) {
 		this.radius = windowRadius;
+	}
 
+	public void setImageShape( int imageWidth, int imageHeight ) {
 		horizXX = new ImageSInt32(imageWidth, imageHeight);
 		horizYY = new ImageSInt32(imageWidth, imageHeight);
 		horizXY = new ImageSInt32(imageWidth, imageHeight);
@@ -96,8 +98,13 @@ public abstract class SsdCorner_I16 implements GradientCornerIntensity<ImageSInt
 
 	@Override
 	public void process(ImageSInt16 derivX, ImageSInt16 derivY) {
-		// adjust for the size of the input if possible
-		if (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {
+		if( tempXX == null ) {
+			if (derivX.getWidth() != derivY.getWidth() || derivX.getHeight() != derivY.getHeight()) {
+				throw new IllegalArgumentException("Input image sizes do not match");
+			}
+			setImageShape(derivX.getWidth(),derivX.getHeight());
+		} else if (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {
+			// adjust for the size of the input if possible
 			throw new IllegalArgumentException("Unexpected input size");
 		}
 		this.derivX = derivX;

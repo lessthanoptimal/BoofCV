@@ -31,8 +31,8 @@ public class HarrisCorner_I16 extends SsdCorner_I16 implements HarrisCornerInten
 	// tuning parameter
 	float kappa;
 
-	public HarrisCorner_I16(int imageWidth, int imageHeight, int windowRadius, float kappa) {
-		super(imageWidth, imageHeight, windowRadius);
+	public HarrisCorner_I16(int windowRadius, float kappa) {
+		super(windowRadius);
 		this.kappa = kappa;
 	}
 

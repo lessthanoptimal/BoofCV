@@ -25,7 +25,7 @@ import org.junit.Test;
  */
 public class TestKitRosCorner_I16 extends GenericCornerIntensityGradientTests {
 
-	KitRosCorner_I16 detector = new KitRosCorner_I16(width,height);
+	KitRosCorner_I16 detector = new KitRosCorner_I16();
 
 	@Test
 	public void genericTests() {

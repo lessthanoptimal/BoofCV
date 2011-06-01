@@ -29,6 +29,8 @@ import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.pyramid.ConvolutionPyramid;
+import gecv.alg.pyramid.GradientPyramid;
+import gecv.alg.pyramid.PyramidUpdater;
 import gecv.alg.tracker.klt.KltConfig;
 import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
@@ -41,8 +43,10 @@ import gecv.struct.image.ImageUInt8;
  */
 public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, ImageSInt16>{
 	public TrackVideoPyramidKLT_U8(SimpleImageSequence<ImageUInt8> imageSequence,
-									PkltManager<ImageUInt8, ImageSInt16> tracker ) {
-		super(imageSequence, tracker );
+									PkltManager<ImageUInt8, ImageSInt16> tracker,
+									PyramidUpdater<ImageUInt8> pyramidUpdater ,
+									GradientPyramid<ImageUInt8, ImageSInt16> updateGradient) {
+		super(imageSequence, tracker , pyramidUpdater , updateGradient);
 	}
 
 	public static void main( String args[] ) {
@@ -77,15 +81,17 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 		config.maxFeatures = 100;
 		config.featureRadius = 3;
 
+		int scalingTop = config.computeScalingTop();
+
 		InterpolateRectangle<ImageUInt8> interp = FactoryInterpolation.bilinearRectangle(ImageUInt8.class);
 		InterpolateRectangle<ImageSInt16> interpD = FactoryInterpolation.bilinearRectangle(ImageSInt16.class);
 
-
 		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity =
 				new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(
-						FactoryCornerIntensity.createKlt_I16(image.width, image.height, config.featureRadius));
+						FactoryCornerIntensity.createKlt_I16(config.featureRadius));
 		CornerExtractor extractor = new WrapperNonMax(
-				new FastNonMaxCornerExtractor(config.featureRadius+2, config.featureRadius*8, configKLt.minDeterminant));
+				new FastNonMaxCornerExtractor(config.featureRadius+2,
+						config.featureRadius*scalingTop, configKLt.minDeterminant));
 		GeneralCornerDetector<ImageUInt8,ImageSInt16> detector =
 				new GeneralCornerDetector<ImageUInt8,ImageSInt16>(intensity,extractor,config.maxFeatures);
 
@@ -97,11 +103,14 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 
 		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel_I8();
 
+		GradientPyramid<ImageUInt8,ImageSInt16> gradientUpdater =
+				new GradientPyramid<ImageUInt8,ImageSInt16>(gradient);
+
 		PkltManager<ImageUInt8,ImageSInt16> manager =
 				new PkltManager<ImageUInt8,ImageSInt16>(config,interp,interpD,
-						gradient,featureSelector,pyrUpdater);
+						gradient,featureSelector);
 
-		TrackVideoPyramidKLT_U8 alg = new TrackVideoPyramidKLT_U8(sequence,manager);
+		TrackVideoPyramidKLT_U8 alg = new TrackVideoPyramidKLT_U8(sequence,manager,pyrUpdater,gradientUpdater);
 
 		alg.process();
 	}

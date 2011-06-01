@@ -14,27 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.corner.impl;
+package gecv.core.image;
 
-import gecv.alg.detect.corner.GenericCornerIntensityGradientTests;
-import gecv.struct.image.ImageFloat32;
-import org.junit.Test;
+import gecv.struct.image.ImageBase;
+
 
 /**
+ * Creates a new instance of an image of a specific configuration.
+ *
  * @author Peter Abeles
  */
-public class TestKitRosCorner_F32 extends GenericCornerIntensityGradientTests {
+public interface ImageGenerator<T extends ImageBase> {
 
-	KitRosCorner_F32 detector = new KitRosCorner_F32();
+	public T createInstance( int width , int height );
 
-	@Test
-	public void genericTests() {
-		performAllTests();
-	}
-
-	@Override
-	public ImageFloat32 computeIntensity() {
-		detector.process(derivX_F32,derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32);
-		return detector.getIntensity();
-	}
+	public Class<T> getType();
 }

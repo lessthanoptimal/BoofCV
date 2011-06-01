@@ -17,11 +17,8 @@
 package gecv.alg.tracker.pklt;
 
 import gecv.abst.detect.corner.GeneralCornerDetector;
-import gecv.abst.detect.corner.GeneralCornerIntensity;
-import gecv.abst.detect.extract.CornerExtractor;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
 import pja.geometry.struct.point.Point2D_I16;
 
@@ -45,8 +42,8 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 
 	// input images
 	ImagePyramid<InputImage> image;
-	DerivativeImage[] derivX;
-	DerivativeImage[] derivY;
+	ImagePyramid<DerivativeImage> derivX;
+	ImagePyramid<DerivativeImage> derivY;
 
 	public GenericPkltFeatSelector( GeneralCornerDetector<InputImage,DerivativeImage> detector,
 									PyramidKltTracker<InputImage, DerivativeImage> tracker) {
@@ -63,8 +60,9 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 	}
 
 	@Override
-	public void setInputs(ImagePyramid<InputImage> image,
-					   DerivativeImage[] derivX, DerivativeImage[] derivY)
+	public void setInputs( ImagePyramid<InputImage> image,
+						ImagePyramid<DerivativeImage> derivX,
+						ImagePyramid<DerivativeImage> derivY)
 	{
 		this.image = image;
 		this.derivX = derivX;
@@ -84,7 +82,7 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 		// find new tracks
 		detector.setExcludedCorners(excludeList);
 		detector.setBestNumber(availableData.size());
-		detector.process(image.getLayer(0),derivX[0],derivY[0],null,null,null);
+		detector.process(image.getLayer(0),derivX.getLayer(0),derivY.getLayer(0),null,null,null);
 
 		// extract the features
 		QueueCorner found = detector.getCorners();

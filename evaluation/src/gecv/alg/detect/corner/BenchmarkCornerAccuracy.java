@@ -20,10 +20,10 @@ import gecv.abst.detect.corner.*;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
-import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.filter.derivative.GradientThree;
 import gecv.alg.filter.derivative.HessianFromGradient;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.ShowImages;
 import gecv.struct.QueueCorner;
@@ -111,10 +111,10 @@ public class BenchmarkCornerAccuracy {
 
 		// todo try different noise levels
 
-		evaluate(detectCorners(FactoryCornerIntensity.createFast12_I8(width, height, 10 , 11)),"FAST");
-		evaluate(detectCorners(FactoryCornerIntensity.createHarris_I16(width, height, radius, 0.04f)),"Harris");
-		evaluate(detectCorners(FactoryCornerIntensity.createKitRos_I16(width, height)),"KitRos");
-		evaluate(detectCorners(FactoryCornerIntensity.createKlt_I16(width, height, radius )),"KLT");
+		evaluate(detectCorners(FactoryCornerIntensity.createFast12_I8( 10 , 11)),"FAST");
+		evaluate(detectCorners(FactoryCornerIntensity.createHarris_I16(radius, 0.04f)),"Harris");
+		evaluate(detectCorners(FactoryCornerIntensity.createKitRos_I16()),"KitRos");
+		evaluate(detectCorners(FactoryCornerIntensity.createKlt_I16(radius )),"KLT");
 		evaluate(detectMedianCorners(width, height, radius ),"Median");
 	}
 
