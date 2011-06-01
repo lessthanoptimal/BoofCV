@@ -72,11 +72,13 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 	@Override
 	public void compute(List<PyramidKltFeature> active, List<PyramidKltFeature> availableData ) {
 
+		float scaleBottom = image.getScalingAtLayer(0);
+
 		// exclude active tracks
 		excludeList.reset();
 		for( int i = 0; i < active.size(); i++ ) {
 			PyramidKltFeature f = active.get(i);
-			excludeList.add((int)f.x,(int)f.y);
+			excludeList.add((int)(f.x/scaleBottom),(int)(f.y/scaleBottom));
 		}
 		
 		// find new tracks
@@ -91,8 +93,8 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 			Point2D_I16 pt = found.get(i);
 
 			PyramidKltFeature feat = availableData.remove( availableData.size()-1);
-			feat.x = pt.x;
-			feat.y = pt.y;
+			feat.x = pt.x*scaleBottom;
+			feat.y = pt.y*scaleBottom;
 
 			tracker.setDescription(feat);
 			active.add(feat);

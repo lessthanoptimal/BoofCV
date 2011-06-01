@@ -158,6 +158,15 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 		feature.Gxy = Gxy;
 	}
 
+	/**
+	 * <p>
+	 * Updates the feature's location inside the image.  The feature's positon can be modified
+	 * even if tracking fails.
+	 * </p>
+	 *
+	 * @param feature Feature being tracked.
+	 * @return If the tracking was successful or not.
+	 */
 	public KltTrackFault track(KltFeature feature) {
 		// save the original location so that a drifting fault can be detected
 		float origX = feature.x, origY = feature.y;
@@ -177,6 +186,9 @@ public class KltTracker<InputImage extends ImageBase, DerivativeImage extends Im
 		if (det < config.minDeterminant) {
 			return KltTrackFault.FAILED;
 		}
+
+		float x = feature.x;
+		float y = feature.y;
 
 		// compute the feature's width and temporary storage related to it
 		widthFeature = feature.radius * 2 + 1;

@@ -46,15 +46,18 @@ public class PyramidKltTestBase {
 
 	ImageFloat32 image = new ImageFloat32(width,height);
 	PyramidUpdater<ImageFloat32> updater = createPyramidUpdater();
-	ImagePyramid<ImageFloat32> pyramid = createPyramid();
-	ImagePyramid<ImageFloat32> derivX = createPyramid();
-	ImagePyramid<ImageFloat32> derivY = createPyramid();
+	ImagePyramid<ImageFloat32> pyramid;
+	ImagePyramid<ImageFloat32> derivX;
+	ImagePyramid<ImageFloat32> derivY;
 	PyramidKltTracker<ImageFloat32,ImageFloat32> tracker = createDefaultTracker();
 
 	int cornerX = 20;
 	int cornerY = 22;
 
 	public void setup() {
+		pyramid = createPyramid();
+		derivX = createPyramid();
+		derivY = createPyramid();
 		ImageTestingOps.randomize(image,rand,0,1);
 		ImageTestingOps.fillRectangle(image,100,cornerX,cornerY,20,20);
 		updater.setPyramid(pyramid);
@@ -67,7 +70,7 @@ public class PyramidKltTestBase {
 		}
 	}
 
-		private ImagePyramid<ImageFloat32> createPyramid() {
+	private ImagePyramid<ImageFloat32> createPyramid() {
 
 		ImagePyramid<ImageFloat32> pyramid = ImagePyramidFactory.create_F32(width,height,false);
 		pyramid.setScaling(1,2,2);
