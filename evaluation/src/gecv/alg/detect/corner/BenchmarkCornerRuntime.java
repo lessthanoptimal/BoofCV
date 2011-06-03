@@ -101,25 +101,25 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static GeneralCornerDetector<ImageFloat32,ImageFloat32> createFast12_F32() {
-		FastCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createFast12_F32( 30, 12);
+		FastCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createFast12( ImageFloat32.class , 30, 12);
 
 		return createFastDetector(alg);
 	}
 
 	public static GeneralCornerDetector<ImageFloat32,ImageFloat32> createHarris_F32() {
-		HarrisCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createHarris_F32(windowRadius, 0.04f);
+		HarrisCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createHarris( ImageFloat32.class , windowRadius, 0.04f);
 
 		return createGradientDetector(alg);
 	}
 
 	public static GeneralCornerDetector<ImageFloat32,ImageFloat32> createKitRos_F32() {
-		KitRosCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createKitRos_F32();
+		KitRosCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createKitRos( ImageFloat32.class );
 
 		return createDetector(alg);
 	}
 
 	public static GeneralCornerDetector<ImageFloat32,ImageFloat32> createKlt_F32() {
-		KltCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createKlt_F32(windowRadius);
+		KltCornerIntensity<ImageFloat32> alg = FactoryCornerIntensity.createKlt( ImageFloat32.class , windowRadius);
 
 		return createGradientDetector(alg);
 	}

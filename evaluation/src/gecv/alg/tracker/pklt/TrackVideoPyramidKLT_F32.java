@@ -86,7 +86,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 
 		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity =
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
-						FactoryCornerIntensity.createKlt_F32(config.featureRadius));
+						FactoryCornerIntensity.createKlt(ImageFloat32.class , config.featureRadius));
 		CornerExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(config.featureRadius+2,
 						config.featureRadius*scalingTop, configKLt.minDeterminant));
@@ -105,8 +105,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 				new GradientPyramid<ImageFloat32,ImageFloat32>(gradient);
 
 		PkltManager<ImageFloat32,ImageFloat32> manager =
-				new PkltManager<ImageFloat32,ImageFloat32>(config,interp,interp,
-						gradient,featureSelector);
+				new PkltManager<ImageFloat32,ImageFloat32>(config,interp,interp,featureSelector);
 
 		TrackVideoPyramidKLT_F32 alg = new TrackVideoPyramidKLT_F32(sequence,manager,
 				pyrUpdater,gradientUpdater);

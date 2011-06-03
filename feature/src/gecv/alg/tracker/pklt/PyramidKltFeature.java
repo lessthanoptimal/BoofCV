@@ -23,12 +23,17 @@ import gecv.alg.tracker.klt.KltFeature;
  *
  * @author Peter Abeles
  */
-// todo comment
 public class PyramidKltFeature {
-	KltFeature desc[];
-	float x;
-	float y;
+	// KLT feature description for each layer in the pyramid
+	public KltFeature desc[];
+	// the feature's location in the original image
+	public float x;
+	public float y;
+	// the maximum layer in which this description is valid
 	int maxLayer=-1;
+
+	// user specified data, not used by the tracker
+	public Object cookie;
 
 	public PyramidKltFeature(int numLayers, int radius) {
 		desc = new KltFeature[numLayers];
@@ -41,5 +46,13 @@ public class PyramidKltFeature {
 	public void setPosition(float x, float y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	public void setCookie(Object cookie) {
+		this.cookie = cookie;
+	}
+
+	public <T> T getCookie() {
+		return (T)cookie;
 	}
 }

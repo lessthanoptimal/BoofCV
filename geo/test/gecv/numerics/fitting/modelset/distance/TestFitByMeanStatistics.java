@@ -29,27 +29,27 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 public class TestFitByMeanStatistics {
-    @Test
-    public void metric_and_prune() {
-        List<Double> inliers = new ArrayList<Double>();
+	@Test
+	public void metric_and_prune() {
+		List<Double> inliers = new ArrayList<Double>();
 
-        for( int i = 0; i < 200; i++ ) {
-            inliers.add((double)i);
-        }
+		for (int i = 0; i < 200; i++) {
+			inliers.add((double) i);
+		}
 
-        // randomize the inputs
-        Collections.sort(inliers);
+		// randomize the inputs
+		Collections.sort(inliers);
 
-        FitByMeanStatistics<Double> fit = new FitByMeanStatistics<Double>(1);
+		FitByMeanStatistics<Double> fit = new FitByMeanStatistics<Double>(1);
 
-        fit.init(new DistanceFromMeanModel(),inliers);
+		fit.init(new DistanceFromMeanModel(), inliers);
 
-        fit.computeStatistics();
+		fit.computeStatistics();
 
-        assertEquals(99.5,fit.getErrorMetric(),1e-8);
+		assertEquals(99.5, fit.getErrorMetric(), 1e-8);
 
-        fit.prune();
+		fit.prune();
 
-        assertEquals(158,inliers.size());
-    }
+		assertEquals(158, inliers.size());
+	}
 }

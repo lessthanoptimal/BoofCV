@@ -62,14 +62,12 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	/**
-	 * Returns true if the input image is a floating point image.
-	 *
-	 * @param img A image of unknown type.
-	 * @return true if floating point.
-	 */
-	public static boolean isFloatingPoint(ImageBase img) {
-		return ImageFloat32.class.isAssignableFrom(img.getClass());
+	public static boolean isFloatingPoint(Class<?> imgType) {
+		if( imgType == ImageFloat32.class ) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public static double get(ImageBase img, int x, int y) {

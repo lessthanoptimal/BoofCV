@@ -28,83 +28,82 @@ import java.util.List;
  */
 public class FitByMeanStatistics<T> implements StatisticalFit<T> {
 
-    private DistanceFromModel<T> modelError;
-    private List<T> inliers;
+	private DistanceFromModel<T> modelError;
+	private List<T> inliers;
 
-    // the number of standard deviations away that points are pruned
-    private double pruneThreshold;
+	// the number of standard deviations away that points are pruned
+	private double pruneThreshold;
 
-    // the mean error
-    private double meanError;
-    // the standard deviation of the error
-    private double stdError;
+	// the mean error
+	private double meanError;
+	// the standard deviation of the error
+	private double stdError;
 
-    /**
-     *
-     * @param pruneThreshold Number of standard deviations away that points will be pruned.
-     */
-    public FitByMeanStatistics( double pruneThreshold ) {
-        this.pruneThreshold = pruneThreshold;
-    }
+	/**
+	 * @param pruneThreshold Number of standard deviations away that points will be pruned.
+	 */
+	public FitByMeanStatistics(double pruneThreshold) {
+		this.pruneThreshold = pruneThreshold;
+	}
 
-    @Override
-    public void init( DistanceFromModel<T> modelError , List<T> inliers ) {
-        this.modelError = modelError;
-        this.inliers = inliers;
-    }
+	@Override
+	public void init(DistanceFromModel<T> modelError, List<T> inliers) {
+		this.modelError = modelError;
+		this.inliers = inliers;
+	}
 
-    @Override
-    public void computeStatistics() {
-        computeMean();
-        computeStandardDeviation();
-    }
+	@Override
+	public void computeStatistics() {
+		computeMean();
+		computeStandardDeviation();
+	}
 
-    @Override
-    public void prune() {
-        double thresh = stdError* pruneThreshold;
+	@Override
+	public void prune() {
+		double thresh = stdError * pruneThreshold;
 
-        for( int j = inliers.size()-1; j >= 0; j-- ){
-            T pt = inliers.get(j);
+		for (int j = inliers.size() - 1; j >= 0; j--) {
+			T pt = inliers.get(j);
 
-            // only prune points which are less accurate than the mean
-            if( modelError.computeDistance(pt)-meanError > thresh ) {
-                inliers.remove(j);
-            }
-        }
-    }
+			// only prune points which are less accurate than the mean
+			if (modelError.computeDistance(pt) - meanError > thresh) {
+				inliers.remove(j);
+			}
+		}
+	}
 
-    @Override
-    public double getErrorMetric() {
-        return meanError;
-    }
+	@Override
+	public double getErrorMetric() {
+		return meanError;
+	}
 
-    /**
-     * Computes the mean and standard deviation of the points from the model
-     */
-    private void computeMean() {
-        meanError = 0;
+	/**
+	 * Computes the mean and standard deviation of the points from the model
+	 */
+	private void computeMean() {
+		meanError = 0;
 
-        int size = inliers.size();
-        for( int i = 0; i < size; i++ ) {
-            T pt = inliers.get(i);
+		int size = inliers.size();
+		for (int i = 0; i < size; i++) {
+			T pt = inliers.get(i);
 
-            meanError += modelError.computeDistance(pt);
-        }
+			meanError += modelError.computeDistance(pt);
+		}
 
-        meanError /= size;
+		meanError /= size;
 
-    }
+	}
 
-    private void computeStandardDeviation() {
-        stdError = 0;
-        int size = inliers.size();
-        for( int i = 0; i < size; i++ ) {
-            T pt = inliers.get(i);
+	private void computeStandardDeviation() {
+		stdError = 0;
+		int size = inliers.size();
+		for (int i = 0; i < size; i++) {
+			T pt = inliers.get(i);
 
-            double e = modelError.computeDistance(pt) - meanError;
-            stdError += e*e;
-        }
+			double e = modelError.computeDistance(pt) - meanError;
+			stdError += e * e;
+		}
 
-        stdError = Math.sqrt(stdError/size);
-    }
+		stdError = Math.sqrt(stdError / size);
+	}
 }

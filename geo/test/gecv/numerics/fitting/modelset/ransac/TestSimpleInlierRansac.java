@@ -29,19 +29,18 @@ import org.junit.Test;
 public class TestSimpleInlierRansac extends GenericModelSetTests {
 
 
-    @Test
-    public void performStandardTests() {
-        configure(0.9,0.05, true);
-        performSimpleModelFit();
-        runMultipleTimes();
-    }
+	@Test
+	public void performStandardTests() {
+		configure(0.9, 0.05, true);
+		performSimpleModelFit();
+		runMultipleTimes();
+	}
 
-    @Override
-    public ModelMatcher<Double> createModelMatcher(DistanceFromModel<Double> distance,
-                                                   ModelFitter<Double> fitter,
-                                                   int minPoints,
-                                                   double fitThreshold)
-    {
-        return new SimpleInlierRansac<Double>(344,fitter,distance,200,2,minPoints,1000,fitThreshold);
-    }
+	@Override
+	public ModelMatcher<Double> createModelMatcher(DistanceFromModel<Double> distance,
+												   ModelFitter<Double> fitter,
+												   int minPoints,
+												   double fitThreshold) {
+		return new SimpleInlierRansac<Double>(344, fitter, distance, 200, 2, minPoints, 1000, fitThreshold);
+	}
 }

@@ -24,7 +24,7 @@ import org.junit.Test;
  * @author Peter Abeles
  */
 public class TestHarrisCorner_I16 extends GenericCornerIntensityGradientTests {
-	HarrisCorner_I16 detector = new HarrisCorner_I16(1,0.04f);
+	HarrisCorner_S16 detector = new HarrisCorner_S16(1,0.04f);
 
 	@Test
 	public void genericTests() {

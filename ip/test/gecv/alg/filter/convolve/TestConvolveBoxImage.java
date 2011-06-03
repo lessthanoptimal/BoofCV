@@ -116,7 +116,7 @@ public class TestConvolveBoxImage {
 	protected static void performTest(Method target, Method check, Object kernel, ImageBase input , ImageBase output , boolean includeBorder) {
 		Object[] foundInput = new Object[]{input,output,kernelRadius,includeBorder};
 		Object[] foundOutput;
-		if( GeneralizedImageOps.isFloatingPoint(input) ) {
+		if( !input.isInteger() ) {
 			foundOutput = new Object[]{kernel,input,output,includeBorder};
 		} else {
 			foundOutput = new Object[]{kernel,input,output,includeBorder};

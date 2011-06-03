@@ -23,17 +23,17 @@ import gecv.struct.image.ImageSInt16;
 
 /**
  * <p>
- * Implementation of {@link gecv.alg.detect.corner.KitRosCornerIntensity} based off of {@link SsdCorner_I16}.
+ * Implementation of {@link gecv.alg.detect.corner.KitRosCornerIntensity} based off of {@link SsdCorner_S16}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class KitRosCorner_I16 implements KitRosCornerIntensity<ImageSInt16> {
+public class KitRosCorner_S16 implements KitRosCornerIntensity<ImageSInt16> {
 
 	// the intensity of the found features in the image
 	private ImageFloat32 featureIntensity;
 
-	public KitRosCorner_I16() {
+	public KitRosCorner_S16() {
 	}
 
 	@Override

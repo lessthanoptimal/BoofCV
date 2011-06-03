@@ -131,7 +131,7 @@ public class VideoDetectCornersIntensity_F32 extends ProcessImageSequence<ImageF
 		int width = image.width;
 		int height = image.height;
 
-		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKlt_F32(radius));
+		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKlt( ImageFloat32.class , radius));
 //		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperKitRosCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKitRos_F32(width, height));
 //		GeneralCornerIntensity<ImageUInt8, ImageSInt16> intensity =
 //				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryCornerIntensity.createFast12_I8(width, height, 8 , 12));

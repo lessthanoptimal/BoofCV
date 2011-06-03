@@ -16,6 +16,7 @@
 
 package gecv.alg.filter.convolve;
 
+import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.convolve.*;
 import pja.stats.UtilGaussian;
 
@@ -199,6 +200,20 @@ public class KernelFactory {
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}
+	}
+
+	/**
+	 * <p>
+	 * Creates an integer Gaussian kernel with the specified width.  A default sigma of width/ 5.0 is used.
+	 * </p>
+	 *
+	 * @param radius The kernel's radius.
+	 */
+	public static Kernel1D gaussian1D( Class<?> imageType , int radius) {
+		if( GeneralizedImageOps.isFloatingPoint(imageType) )
+			return gaussian1D_F32(radius,true);
+		else
+			return gaussian1D_I32(radius);
 	}
 
 	/**

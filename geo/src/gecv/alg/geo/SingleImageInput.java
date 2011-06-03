@@ -14,21 +14,22 @@
  *    limitations under the License.
  */
 
-package gecv.numerics.fitting.modelset.distance;
+package gecv.alg.geo;
+
+import gecv.struct.image.ImageBase;
 
 
 /**
- * Statistic used by {@link StatisticalDistanceModelMatcher}.
+ * Generic interface for classes which take a single image as an input.
  *
  * @author Peter Abeles
  */
-public enum StatisticalDistance {
+public interface SingleImageInput <T extends ImageBase> {
+
 	/**
-	 * Mean metric is used to evaluate goodness.  Threshold is in standard deviations. 2
+	 * Process the next image.
+	 *
+	 * @param image Input image.
 	 */
-	MEAN,
-	/**
-	 * Median is used to evaluate goodness.  Threshold is fraction of points saved. 0.95
-	 */
-	PERCENTILE
+	public void process( T image );
 }

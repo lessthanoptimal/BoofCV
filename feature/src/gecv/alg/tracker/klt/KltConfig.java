@@ -31,4 +31,19 @@ public class KltConfig {
 	public int maxIterations;
 	public float minDeterminant;
 	public float minPositionDelta;
+
+	/**
+	 * Creates a config with reasonable values for most applications.  These should be tuned
+	 * for better performance.
+	 *
+	 */
+	public static KltConfig createDefault() {
+		KltConfig ret = new KltConfig();
+		ret.maxPerPixelError = 20;
+		ret.maxIterations = 15;
+		ret.minDeterminant = 0.001f;
+		ret.minPositionDelta = 0.01f;
+
+		return ret;
+	}
 }

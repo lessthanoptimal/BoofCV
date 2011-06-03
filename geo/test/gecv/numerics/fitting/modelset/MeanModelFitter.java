@@ -20,29 +20,28 @@ import java.util.List;
 
 
 /**
- *  Computes the mean of a set of points.
+ * Computes the mean of a set of points.
  *
- *  @author Peter Abeles
+ * @author Peter Abeles
  */
-public class MeanModelFitter implements ModelFitter<Double>
-{
-    @Override
-    public int getParameterLength() {
-        return 1;
-    }
+public class MeanModelFitter implements ModelFitter<Double> {
+	@Override
+	public int getParameterLength() {
+		return 1;
+	}
 
-    @Override
-    public boolean fitModel(List<Double> dataSet, double[] foundParam) {
-        double mean = 0;
+	@Override
+	public boolean fitModel(List<Double> dataSet, double[] foundParam) {
+		double mean = 0;
 
-        for( double d : dataSet ) {
-            mean += d;
-        }
+		for (double d : dataSet) {
+			mean += d;
+		}
 
-        mean /= dataSet.size();
+		mean /= dataSet.size();
 
-        foundParam[0] = mean;
+		foundParam[0] = mean;
 
-        return true;
-    }
+		return true;
+	}
 }

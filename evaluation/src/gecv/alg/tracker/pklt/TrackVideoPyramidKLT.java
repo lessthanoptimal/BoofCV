@@ -91,7 +91,7 @@ public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageB
 	public void updateGUI(BufferedImage guiImage, I origImage) {
 		Graphics2D g2 = guiImage.createGraphics();
 		
-		drawFeatures(g2, tracker.getFeatures(), Color.RED);
+		drawFeatures(g2, tracker.getTracks(), Color.RED);
 		drawFeatures(g2, tracker.getSpawned(), Color.BLUE);
 
 		if (panel == null) {
@@ -113,7 +113,7 @@ public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageB
 
 		if( tracker.getSpawned().size() != 0 )
 			totalRespawns++;
-		System.out.println(" total features: "+tracker.getFeatures().size()+" totalRespawns "+totalRespawns);
+		System.out.println(" total features: "+tracker.getTracks().size()+" totalRespawns "+totalRespawns);
 	}
 
 	private void drawFeatures(Graphics2D g2,

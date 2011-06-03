@@ -17,6 +17,7 @@
 package gecv.alg.detect.corner;
 
 import gecv.alg.detect.corner.impl.*;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -26,45 +27,50 @@ import gecv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked"})
 public class FactoryCornerIntensity {
 
-	public static FastCornerIntensity<ImageFloat32> createFast12_F32( int pixelTol, int minCont)
+	public static <T extends ImageBase>
+	FastCornerIntensity<T> createFast12( Class<T> imageType , int pixelTol, int minCont)
 	{
-		return new FastCorner12_F32(pixelTol,minCont);
+		if( imageType == ImageFloat32.class )
+			return (FastCornerIntensity<T>)new FastCorner12_F32(pixelTol,minCont);
+		else if( imageType == ImageUInt8.class )
+			return (FastCornerIntensity<T>)new FastCorner12_U8(pixelTol,minCont);
+		else
+			throw new IllegalArgumentException("Unknown image type "+imageType);
 	}
 
-	public static FastCornerIntensity<ImageUInt8> createFast12_I8( int pixelTol, int minCont)
+	public static <T extends ImageBase>
+	HarrisCornerIntensity<T> createHarris( Class<T> imageType , int windowRadius, float kappa)
 	{
-		return new FastCorner12_I8(pixelTol,minCont);
+		if( imageType == ImageFloat32.class )
+			return (HarrisCornerIntensity<T>)new HarrisCorner_F32(windowRadius,kappa);
+		else if( imageType == ImageSInt16.class )
+			return (HarrisCornerIntensity<T>)new HarrisCorner_S16(windowRadius,kappa);
+		else
+			throw new IllegalArgumentException("Unknown image type "+imageType);
 	}
 
-	public static HarrisCornerIntensity<ImageFloat32> createHarris_F32( int windowRadius, float kappa )
+	public static <T extends ImageBase>
+	KitRosCornerIntensity<T> createKitRos( Class<T> imageType )
 	{
-		return new HarrisCorner_F32(windowRadius,kappa);
+		if( imageType == ImageFloat32.class )
+			return (KitRosCornerIntensity<T>)new KitRosCorner_F32();
+		else if( imageType == ImageSInt16.class )
+			return (KitRosCornerIntensity<T>)new KitRosCorner_S16();
+		else
+			throw new IllegalArgumentException("Unknown image type "+imageType);
 	}
 
-	public static HarrisCornerIntensity<ImageSInt16> createHarris_I16( int windowRadius, float kappa )
+	public static <T extends ImageBase>
+	KltCornerIntensity<T> createKlt( Class<T> imageType , int windowRadius)
 	{
-		return new HarrisCorner_I16(windowRadius,kappa);
-	}
-
-	public static KitRosCornerIntensity<ImageFloat32> createKitRos_F32()
-	{
-		return new KitRosCorner_F32();
-	}
-
-	public static KitRosCornerIntensity<ImageSInt16> createKitRos_I16()
-	{
-		return new KitRosCorner_I16();
-	}
-
-	public static KltCornerIntensity<ImageFloat32> createKlt_F32( int windowRadius)
-	{
-		return new KltCorner_F32(windowRadius);
-	}
-
-	public static KltCornerIntensity<ImageSInt16> createKlt_I16( int windowRadius)
-	{
-		return new KltCorner_I16(windowRadius);
+		if( imageType == ImageFloat32.class )
+			return (KltCornerIntensity<T>)new KltCorner_F32(windowRadius);
+		else if( imageType == ImageSInt16.class )
+			return (KltCornerIntensity<T>)new KltCorner_S16(windowRadius);
+		else
+			throw new IllegalArgumentException("Unknown image type "+imageType);
 	}
 }

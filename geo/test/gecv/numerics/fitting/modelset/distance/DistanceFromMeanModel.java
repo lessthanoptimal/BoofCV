@@ -26,26 +26,25 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceFromMeanModel implements DistanceFromModel<Double>
-{
-    double mean;
+public class DistanceFromMeanModel implements DistanceFromModel<Double> {
+	double mean;
 
-    @Override
-    public void setParameters(double[] param) {
-        mean = param[0];
-    }
+	@Override
+	public void setParameters(double[] param) {
+		mean = param[0];
+	}
 
-    @Override
-    public double computeDistance(Double pt) {
-        return Math.abs(pt-mean);
-    }
+	@Override
+	public double computeDistance(Double pt) {
+		return Math.abs(pt - mean);
+	}
 
-    @Override
-    public void computeDistance(List<Double> points, double[] distance) {
-        for( int i = 0; i < points.size(); i++ ) {
-            double d = points.get(i);
+	@Override
+	public void computeDistance(List<Double> points, double[] distance) {
+		for (int i = 0; i < points.size(); i++) {
+			double d = points.get(i);
 
-            distance[i] = Math.abs(d-mean);
-        }
-    }
+			distance[i] = Math.abs(d - mean);
+		}
+	}
 }

@@ -26,12 +26,12 @@ import gecv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class MedianCorner_I8 implements MedianCornerIntensity<ImageUInt8> {
+public class MedianCorner_U8 implements MedianCornerIntensity<ImageUInt8> {
 
 	// the intensity of the found features in the image
 	private ImageFloat32 featureIntensity;
 
-	public MedianCorner_I8( int imgWidth , int imgHeight ) {
+	public MedianCorner_U8( int imgWidth , int imgHeight ) {
 		featureIntensity = new ImageFloat32(imgWidth,imgHeight);
 	}
 

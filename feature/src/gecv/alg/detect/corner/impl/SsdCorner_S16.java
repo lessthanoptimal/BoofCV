@@ -36,7 +36,7 @@ import gecv.struct.image.ImageSInt32;
  *
  * @author Peter Abeles
  */
-public abstract class SsdCorner_I16 implements GradientCornerIntensity<ImageSInt16> {
+public abstract class SsdCorner_S16 implements GradientCornerIntensity<ImageSInt16> {
 
 	// input image gradient
 	protected ImageSInt16 derivX;
@@ -64,7 +64,7 @@ public abstract class SsdCorner_I16 implements GradientCornerIntensity<ImageSInt
 	// used to keep track of where it is in the image
 	protected int x, y;
 
-	public SsdCorner_I16( int windowRadius) {
+	public SsdCorner_S16( int windowRadius) {
 		this.radius = windowRadius;
 	}
 

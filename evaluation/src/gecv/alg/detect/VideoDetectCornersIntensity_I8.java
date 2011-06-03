@@ -132,7 +132,7 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 		int width = image.width;
 		int height = image.height;
 
-		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity = new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(FactoryCornerIntensity.createKlt_I16(radius));
+		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity = new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(FactoryCornerIntensity.createKlt(ImageSInt16.class , radius));
 //		GeneralCornerIntensity<ImageUInt8, ImageSInt16> intensity =
 //				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryCornerIntensity.createFast12_I8(width, height, 8 , 12));
 

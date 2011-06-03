@@ -77,7 +77,7 @@ public class TestKltCorner_F32 {
 	}
 
 	public void compareToNaive(ImageSInt16 derivX_I, ImageSInt16 derivY_I, ImageFloat32 derivX_F, ImageFloat32 derivY_F) {
-		SsdCornerNaive_I16 ssd_I = new SsdCornerNaive_I16(width, height, 3);
+		SsdCornerNaive_S16 ssd_I = new SsdCornerNaive_S16(width, height, 3);
 		ssd_I.process(derivX_I, derivY_I);
 
 		KltCorner_F32 ssd_F = new KltCorner_F32( 3);

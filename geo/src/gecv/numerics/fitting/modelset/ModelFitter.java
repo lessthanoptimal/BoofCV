@@ -36,7 +36,7 @@ public interface ModelFitter<T> {
 	/**
 	 * Computes a set of model parameters for the given set of points.
 	 *
-	 * @param dataSet Points that the model is to be fit to.
+	 * @param dataSet	Points that the model is to be fit to.
 	 * @param foundParam Where the computed model parameters are written to.
 	 * @return true if successful, false otherwise.
 	 */
