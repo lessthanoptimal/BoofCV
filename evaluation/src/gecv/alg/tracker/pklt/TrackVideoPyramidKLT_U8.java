@@ -88,7 +88,7 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 
 		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity =
 				new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(
-						FactoryCornerIntensity.createKlt_I16(config.featureRadius));
+						FactoryCornerIntensity.createKlt(ImageSInt16.class,config.featureRadius));
 		CornerExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(config.featureRadius+2,
 						config.featureRadius*scalingTop, configKLt.minDeterminant));
@@ -107,8 +107,7 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 				new GradientPyramid<ImageUInt8,ImageSInt16>(gradient);
 
 		PkltManager<ImageUInt8,ImageSInt16> manager =
-				new PkltManager<ImageUInt8,ImageSInt16>(config,interp,interpD,
-						gradient,featureSelector);
+				new PkltManager<ImageUInt8,ImageSInt16>(config,interp,interpD,featureSelector);
 
 		TrackVideoPyramidKLT_U8 alg = new TrackVideoPyramidKLT_U8(sequence,manager,pyrUpdater,gradientUpdater);
 

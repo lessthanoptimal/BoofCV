@@ -45,7 +45,7 @@ public interface DistanceFromModel<T> {
 	 * Computes the distance a set of points is from the model and saves the results
 	 * in the provided array.
 	 *
-	 * @param points Set of points which are to be evaluated.
+	 * @param points   Set of points which are to be evaluated.
 	 * @param distance Where model distance is stored.
 	 */
 	public void computeDistance(List<T> points, double distance[]);

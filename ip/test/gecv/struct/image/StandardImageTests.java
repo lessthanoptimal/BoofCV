@@ -16,7 +16,6 @@
 
 package gecv.struct.image;
 
-import gecv.core.image.GeneralizedImageOps;
 import org.junit.Test;
 
 import java.lang.reflect.Array;
@@ -70,7 +69,7 @@ public abstract class StandardImageTests {
 		// set the expected to the point in the image
 		call(img, "set", 1, expected, 1, 1);
 		Number found = (Number) call(img, "get", 0, null, 1, 1);
-		if (GeneralizedImageOps.isFloatingPoint(img))
+		if (!img.isInteger())
 			assertEquals(expected.doubleValue(), found.doubleValue(), 1e-4);
 		else {
 			if( ((ImageInteger)img).isSigned() )
@@ -125,7 +124,7 @@ public abstract class StandardImageTests {
 				args[index] = where[index];
 			}
 			if (type == 1) {
-				if (GeneralizedImageOps.isFloatingPoint(img)) {
+				if (!img.isInteger()) {
 					paramTypes[index] = float.class;
 					args[index] = typeData;
 				} else {

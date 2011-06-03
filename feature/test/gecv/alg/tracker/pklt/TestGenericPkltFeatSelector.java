@@ -166,7 +166,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 	private GenericPkltFeatSelector<ImageFloat32, ImageFloat32> createSelector() {
 		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity =
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
-						FactoryCornerIntensity.createKlt_F32( 3));
+						FactoryCornerIntensity.createKlt( ImageFloat32.class,3));
 
 		CornerExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(3, 3, 0.001f));

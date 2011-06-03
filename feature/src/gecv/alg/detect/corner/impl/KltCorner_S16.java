@@ -16,40 +16,31 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.detect.corner.HarrisCornerIntensity;
+import gecv.alg.detect.corner.KltCornerIntensity;
 import gecv.struct.image.ImageSInt16;
+
 
 /**
  * <p>
- * Implementation of {@link gecv.alg.detect.corner.HarrisCornerIntensity} based off of {@link SsdCorner_I16}.
+ * Implementation of {@link gecv.alg.detect.corner.KltCornerIntensity} based off of {@link SsdCornerNaive_S16}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class HarrisCorner_I16 extends SsdCorner_I16 implements HarrisCornerIntensity<ImageSInt16> {
-
-	// tuning parameter
-	float kappa;
-
-	public HarrisCorner_I16(int windowRadius, float kappa) {
+@SuppressWarnings({"ForLoopReplaceableByForEach"})
+public class KltCorner_S16 extends SsdCorner_S16 implements KltCornerIntensity<ImageSInt16> {
+	public KltCorner_S16(int windowRadius) {
 		super(windowRadius);
-		this.kappa = kappa;
-	}
-
-	@Override
-	public void setKappa(float kappa) {
-		this.kappa = kappa;
 	}
 
 	@Override
 	protected float computeIntensity() {
-		// det(A) + kappa*trace(A)^2
-		float trace = totalXX + totalYY;
-		return (totalXX * totalYY - totalXY * totalXY) + kappa * trace*trace;
-	}
+		// compute the smallest eigenvalue
+		double left = (totalXX + totalYY) * 0.5f;
+		double b = (totalXX - totalYY) * 0.5f;
+		double right = Math.sqrt(b * b + (double)totalXY * totalXY);
 
-	@Override
-	public float getKappa() {
-		return kappa;
+		// the smallest eigenvalue will be minus the right side
+		return (float)(left - right);
 	}
 }

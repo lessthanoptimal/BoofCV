@@ -16,7 +16,12 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.abst.filter.derivative.ImageGradient;
+import gecv.abst.detect.corner.GeneralCornerDetector;
+import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
+import gecv.abst.detect.extract.WrapperNonMax;
+import gecv.alg.detect.corner.FactoryCornerIntensity;
+import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
+import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.tracker.klt.KltTrackFault;
 import gecv.alg.tracker.klt.KltTracker;
@@ -28,39 +33,39 @@ import java.util.List;
 
 
 /**
+ * <p>
+ * Provides a simplified interface for working with {@link gecv.alg.tracker.pklt.PyramidKltTracker}
+ * by performing basic track management,
+ * </p>
+ *
  * @author Peter Abeles
  */
-// todo flag to save old feature locations
-// todo assign a unique ID to each feature
 @SuppressWarnings({"unchecked"})
 public class PkltManager<I extends ImageBase, D extends ImageBase> {
-	PkltManagerConfig<I,D> config;
+	// configuration for the track manager
+	protected PkltManagerConfig<I,D> config;
 
-	private List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
-	private List<PyramidKltFeature> spawned = new ArrayList<PyramidKltFeature>();
-	private List<PyramidKltFeature> unused = new ArrayList<PyramidKltFeature>();
+	// list of features which are actively being tracked
+	protected List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
+	// list of features which were just spawned
+	protected List<PyramidKltFeature> spawned = new ArrayList<PyramidKltFeature>();
+	// list of features which were just dropped
+	protected List<PyramidKltFeature> dropped = new ArrayList<PyramidKltFeature>();
+	// feature data available for future tracking
+	protected List<PyramidKltFeature> unused = new ArrayList<PyramidKltFeature>();
 
-	PyramidKltTracker<I, D> tracker;
-	protected D derivX[];
-	protected D derivY[];
+	// the tracker
+	protected PyramidKltTracker<I, D> tracker;
 
-	InterpolateRectangle<I> interpInput;
-	InterpolateRectangle<D> interpDeriv;
-
-	ImageGradient<I,D> gradient;
-
-	GenericPkltFeatSelector<I, D> featureSelector; // todo generalize again
+	// used to automatically select new features in the image
+	protected PyramidKltFeatureSelector<I, D> featureSelector;
 
 	public PkltManager(PkltManagerConfig<I,D> config,
 					   InterpolateRectangle<I> interpInput,
 					   InterpolateRectangle<D> interpDeriv,
-					   ImageGradient<I,D> gradient,
 					   GenericPkltFeatSelector<I, D> featureSelector) {
 
 		this.config = config;
-		this.interpInput = interpInput;
-		this.interpDeriv = interpDeriv;
-		this.gradient = gradient;
 		this.featureSelector = featureSelector;
 
 		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput,interpDeriv,config.config);
@@ -74,11 +79,60 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 		}
 	}
 
+	/**
+	 * Creates a PkltManager with a default interpolation and feature selector
+	 *
+	 * @param config Configuration for the tracker/manager.
+	 */
+	public PkltManager(PkltManagerConfig<I,D> config )
+	{
+		this(config,
+				FactoryInterpolation.<I>bilinearRectangle(config.typeInput),
+				FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv),
+				new GenericPkltFeatSelector<I,D>(
+				new GeneralCornerDetector<I,D>(
+						new WrapperGradientCornerIntensity<I,D>(FactoryCornerIntensity.createKlt(config.typeDeriv,config.featureRadius)),
+						new WrapperNonMax(
+				new FastNonMaxCornerExtractor(config.featureRadius+2,
+						config.featureRadius*config.computeScalingTop(), config.config.minDeterminant)),config.maxFeatures),null));
+	}
+
+	/**
+	 * Adds a new feature at the specified location.
+	 *
+	 * @return if the new feature was added or not.
+	 */
+	public boolean addTrack( float x , float y ) {
+		if( unused.isEmpty() )
+			return false;
+
+		PyramidKltFeature f = unused.remove( unused.size()-1 );
+		f.setPosition(x,y);
+		tracker.setDescription(f);
+		if( f.maxLayer == -1 ) {
+			unused.add(f);
+			return false;
+		}
+
+		spawned.add(f);
+		active.add(f);
+
+		return true;
+	}
+
+	/**
+	 * Processes the next image in the sequence.  Updates tracks.
+	 *
+	 * @param image Image
+	 * @param derivX Image derivative x-axis
+	 * @param derivY Image derivative y-axis
+	 */
 	public void processFrame( ImagePyramid<I> image ,
 							  ImagePyramid<D> derivX ,
-							  ImagePyramid<D> derivY) {
+							  ImagePyramid<D> derivY ) {
 
 		spawned.clear();
+		dropped.clear();
 		tracker.setImage(image,derivX,derivY);
 		
 		for( int i = active.size()-1; i >= 0; i-- ) {
@@ -88,6 +142,7 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 //				System.out.println("Dropping feature: "+result);
 				unused.add(f);
 				active.remove(i);
+				dropped.add(f);
 			} else {
 				tracker.setDescription(f);
 			}
@@ -106,15 +161,48 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 		}
 	}
 
-	public List<PyramidKltFeature> getFeatures() {
+	/**
+	 * Drops all the active tracks.
+	 */
+	public void dropAllTracks() {
+		unused.addAll(active);
+		active.clear();
+	}
+
+	/**
+	 * Returns a list of features being actively tracked.
+	 *
+	 * @return List of features.
+	 */
+	public List<PyramidKltFeature> getTracks() {
 		return active;
 	}
 
+	/**
+	 * Returns a list of features that were recently spawned tracked.
+	 *
+	 * @return List of features.
+	 */
 	public List<PyramidKltFeature> getSpawned() {
 		return spawned;
 	}
 
+	/**
+	 * Returns a list of features that were dropped on the last call to {@link #processFrame}.
+	 *
+	 * @return List of features.
+	 */
+	public List<PyramidKltFeature> getDropped() {
+		return dropped;
+	}
+
 	public PkltManagerConfig<I, D> getConfig() {
 		return config;
+	}
+
+	public void dropTrack(PyramidKltFeature feature) {
+		if( !active.remove(feature))
+			throw new IllegalArgumentException("Feature not in active list");
+		dropped.add(feature);
 	}
 }

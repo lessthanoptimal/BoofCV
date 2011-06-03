@@ -28,7 +28,7 @@ import gecv.struct.image.ImageSInt16;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class SsdCornerNaive_I16 implements KltCornerIntensity<ImageSInt16> {
+public class SsdCornerNaive_S16 implements KltCornerIntensity<ImageSInt16> {
 
 	// feature's radius
 	private int radius;
@@ -36,7 +36,7 @@ public class SsdCornerNaive_I16 implements KltCornerIntensity<ImageSInt16> {
 	// the intensity of the found features in the image
 	private ImageFloat32 featureIntensity;
 
-	public SsdCornerNaive_I16(int imageWidth, int imageHeight,
+	public SsdCornerNaive_S16(int imageWidth, int imageHeight,
 							  int windowRadius) {
 		this.radius = windowRadius;
 

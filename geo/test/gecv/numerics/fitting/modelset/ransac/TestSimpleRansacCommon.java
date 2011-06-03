@@ -32,183 +32,181 @@ import static org.junit.Assert.*;
  */
 public class TestSimpleRansacCommon {
 
-    Random rand = new Random(345);
+	Random rand = new Random(345);
 
-    /**
-     * See if it correctly randomly selects points when the initial set size is
-     * similar to the data set size
-     */
-    @SuppressWarnings({"NumberEquality"})
-    @Test
-    public void randomDraw_large() {
-        List<Integer> dataSet = new ArrayList<Integer>();
+	/**
+	 * See if it correctly randomly selects points when the initial set size is
+	 * similar to the data set size
+	 */
+	@SuppressWarnings({"NumberEquality"})
+	@Test
+	public void randomDraw_large() {
+		List<Integer> dataSet = new ArrayList<Integer>();
 
-        for( int i = 0; i < 200; i++ ){
-            dataSet.add(i);
-        }
+		for (int i = 0; i < 200; i++) {
+			dataSet.add(i);
+		}
 
-        List<Integer> initSet = new ArrayList<Integer>();
-        SimpleRansacCommon.randomDraw(dataSet,150,initSet,rand);
+		List<Integer> initSet = new ArrayList<Integer>();
+		SimpleRansacCommon.randomDraw(dataSet, 150, initSet, rand);
 
-        assertEquals(150,initSet.size());
+		assertEquals(150, initSet.size());
 
-        // make sure the item is in the original data set and that it is only contained once
-        int numTheSame = 0;
-        for( int i = 0; i < initSet.size(); i++ ) {
-            Integer o = initSet.get(i);
-            // make sure it is in the original data set
-            assertTrue(dataSet.contains(o));
+		// make sure the item is in the original data set and that it is only contained once
+		int numTheSame = 0;
+		for (int i = 0; i < initSet.size(); i++) {
+			Integer o = initSet.get(i);
+			// make sure it is in the original data set
+			assertTrue(dataSet.contains(o));
 
-            // make sure the order has been changed
-            if( o == i )
-                numTheSame++;
+			// make sure the order has been changed
+			if (o == i)
+				numTheSame++;
 
-            // make sure only one copy is in the init set
-            for( int j = i+1; j < initSet.size(); j++ ) {
-                if( o == initSet.get(j) ) {
-                    fail("Multiple copies in initSet");
-                }
-            }
-        }
+			// make sure only one copy is in the init set
+			for (int j = i + 1; j < initSet.size(); j++) {
+				if (o == initSet.get(j)) {
+					fail("Multiple copies in initSet");
+				}
+			}
+		}
 
-        // if the order has been randomized then very few should be in the original order
-        assertTrue(numTheSame < initSet.size()*0.9);
+		// if the order has been randomized then very few should be in the original order
+		assertTrue(numTheSame < initSet.size() * 0.9);
 
-        // call get init set once more and see if it was cleared
-        SimpleRansacCommon.randomDraw(dataSet,150,initSet,rand);
-        assertEquals(150,initSet.size());
-    }
+		// call get init set once more and see if it was cleared
+		SimpleRansacCommon.randomDraw(dataSet, 150, initSet, rand);
+		assertEquals(150, initSet.size());
+	}
 
-    /**
-     * See if it correctly randomly selects points when the initial set size is
-     * much smaller than the data set size
-     */
-    @SuppressWarnings({"NumberEquality"})
-    @Test
-    public void randomDraw_small() {
-        List<Integer> dataSet = new ArrayList<Integer>();
+	/**
+	 * See if it correctly randomly selects points when the initial set size is
+	 * much smaller than the data set size
+	 */
+	@SuppressWarnings({"NumberEquality"})
+	@Test
+	public void randomDraw_small() {
+		List<Integer> dataSet = new ArrayList<Integer>();
 
-        for( int i = 0; i < 200; i++ ){
-            dataSet.add(i);
-        }
+		for (int i = 0; i < 200; i++) {
+			dataSet.add(i);
+		}
 
-        List<Integer> initSet = new ArrayList<Integer>();
-        SimpleRansacCommon.randomDraw(dataSet,15,initSet,rand);
+		List<Integer> initSet = new ArrayList<Integer>();
+		SimpleRansacCommon.randomDraw(dataSet, 15, initSet, rand);
 
-        assertEquals(15,initSet.size());
+		assertEquals(15, initSet.size());
 
-        // make sure the item is in the original data set and that it is only contained once
-        for( int i = 0; i < initSet.size(); i++ ) {
-            Integer o = initSet.get(i);
-            // make sure it is in the original dataset
-            assertTrue(dataSet.contains(o));
+		// make sure the item is in the original data set and that it is only contained once
+		for (int i = 0; i < initSet.size(); i++) {
+			Integer o = initSet.get(i);
+			// make sure it is in the original dataset
+			assertTrue(dataSet.contains(o));
 
-            // make sure the order has been changed
-            assertTrue(dataSet.get(i) != o );
+			// make sure the order has been changed
+			assertTrue(dataSet.get(i) != o);
 
-            // make sure only one copy is in the init set
-            for( int j = i+1; j < initSet.size(); j++ ) {
-                if( o == initSet.get(j) ) {
-                    fail("Multiple copies in initSet");
-                }
-            }
-        }
+			// make sure only one copy is in the init set
+			for (int j = i + 1; j < initSet.size(); j++) {
+				if (o == initSet.get(j)) {
+					fail("Multiple copies in initSet");
+				}
+			}
+		}
 
-        // call get init set once more and see if it was cleared
-        SimpleRansacCommon.randomDraw(dataSet,15,initSet,rand);
-        assertEquals(15,initSet.size());
-    }
+		// call get init set once more and see if it was cleared
+		SimpleRansacCommon.randomDraw(dataSet, 15, initSet, rand);
+		assertEquals(15, initSet.size());
+	}
 
-    /**
-     * See if it will select models with more of the correct points in it
-     */
-    @Test
-    public void selectMatchSet() {
-        double modelVal = 50;
+	/**
+	 * See if it will select models with more of the correct points in it
+	 */
+	@Test
+	public void selectMatchSet() {
+		double modelVal = 50;
 
-        List<Integer> dataSet = new ArrayList<Integer>();
+		List<Integer> dataSet = new ArrayList<Integer>();
 
-        for( int i = 0; i < 200; i++ ){
-            dataSet.add(i);
-        }
+		for (int i = 0; i < 200; i++) {
+			dataSet.add(i);
+		}
 
-        DebugModelStuff stuff = new DebugModelStuff((int)modelVal);
-        SimpleRansacCommon<Integer> ransac = new RandsacDebug(stuff,stuff);
-        double param[] = new double[]{modelVal};
+		DebugModelStuff stuff = new DebugModelStuff((int) modelVal);
+		SimpleRansacCommon<Integer> ransac = new RandsacDebug(stuff, stuff);
+		double param[] = new double[]{modelVal};
 
-        ransac.selectMatchSet(dataSet,4,5,param);
+		ransac.selectMatchSet(dataSet, 4, 5, param);
 
-        assertTrue(ransac.candidatePoints.size() == 7 );
-    }
+		assertTrue(ransac.candidatePoints.size() == 7);
+	}
 
-    public static class RandsacDebug extends SimpleRansacCommon<Integer>
-    {
+	public static class RandsacDebug extends SimpleRansacCommon<Integer> {
 
-        public RandsacDebug(ModelFitter<Integer> integerModelFitter,
-                            DistanceFromModel<Integer> modelDistance ) {
-            super(integerModelFitter, modelDistance, 0, 0);
-        }
+		public RandsacDebug(ModelFitter<Integer> integerModelFitter,
+							DistanceFromModel<Integer> modelDistance) {
+			super(integerModelFitter, modelDistance, 0, 0);
+		}
 
-        @Override
-        public boolean process(List<Integer> dataSet, double[] paramInital) {
-            return false;
-        }
+		@Override
+		public boolean process(List<Integer> dataSet, double[] paramInital) {
+			return false;
+		}
 
-        @Override
-        public double getError() {
-            return 0;
-        }
-    }
+		@Override
+		public double getError() {
+			return 0;
+		}
+	}
 
-    public static class DebugModelStuff implements
-            DistanceFromModel<Integer> , ModelFitter<Integer>
-    {
+	public static class DebugModelStuff implements
+			DistanceFromModel<Integer>, ModelFitter<Integer> {
 
-        int threshold;
+		int threshold;
 
-        double error;
+		double error;
 
-        double[] param;
+		double[] param;
 
-        public DebugModelStuff( int threshold ) {
-            this.threshold = threshold;
-        }
+		public DebugModelStuff(int threshold) {
+			this.threshold = threshold;
+		}
 
-        @Override
-        public void setParameters(double[] param) {
-            this.param = param;
-        }
+		@Override
+		public void setParameters(double[] param) {
+			this.param = param;
+		}
 
-        @Override
-        public double computeDistance(Integer pt) {
-            return Math.abs(pt-param[0]);
-        }
+		@Override
+		public double computeDistance(Integer pt) {
+			return Math.abs(pt - param[0]);
+		}
 
-        @Override
-        public void computeDistance(List<Integer> points, double[] distance) {
-            throw new RuntimeException("Why was this called?");
-        }
+		@Override
+		public void computeDistance(List<Integer> points, double[] distance) {
+			throw new RuntimeException("Why was this called?");
+		}
 
-        @Override
-        public int getParameterLength() {
-            return 1;
-        }
+		@Override
+		public int getParameterLength() {
+			return 1;
+		}
 
-        @Override
-        public boolean fitModel(List<Integer> dataSet, double[] p) {
-            error = 0;
+		@Override
+		public boolean fitModel(List<Integer> dataSet, double[] p) {
+			error = 0;
 
-            int offset = (int)p[0];
+			int offset = (int) p[0];
 
-            for( Integer a : dataSet ) {
-                if( a+offset >= threshold ) {
-                    error++;
-                }
-            }
+			for (Integer a : dataSet) {
+				if (a + offset >= threshold) {
+					error++;
+				}
+			}
 
-            error += offset;
-            p[0] = error;
-            return true;
-        }
-    }
+			error += offset;
+			p[0] = error;
+			return true;
+		}
+	}
 }

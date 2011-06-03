@@ -29,27 +29,28 @@ import java.util.List;
  */
 public interface StatisticalFit<T> {
 
-    /**
-     * This is called once to provide access to internal data structures of the owner.
-     *
-     * @param modelDistance Computes the error between a point and the model
-     * @param inliers Contains all the points which are currently considered part of the model.
-     */
-    void init( DistanceFromModel<T> modelDistance , List<T> inliers );
+	/**
+	 * This is called once to provide access to internal data structures of the owner.
+	 *
+	 * @param modelDistance Computes the error between a point and the model
+	 * @param inliers	   Contains all the points which are currently considered part of the model.
+	 */
+	void init(DistanceFromModel<T> modelDistance, List<T> inliers);
 
-    /**
-     * Returns the computed statistical error.
-     * @return The error.
-     */
-    double getErrorMetric();
+	/**
+	 * Returns the computed statistical error.
+	 *
+	 * @return The error.
+	 */
+	double getErrorMetric();
 
-    /**
-     * Computes the statistic error of the model to the data points.
-     */
-    void computeStatistics();
+	/**
+	 * Computes the statistic error of the model to the data points.
+	 */
+	void computeStatistics();
 
-    /**
-     * Prunes points based on the error and the computed statistics.
-     */
-    void prune();
+	/**
+	 * Prunes points based on the error and the computed statistics.
+	 */
+	void prune();
 }

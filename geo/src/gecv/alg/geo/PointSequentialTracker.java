@@ -26,14 +26,14 @@ import java.util.List;
  * <p>
  * Interface for tracking point features in a sequence of images for SFM applications.
  * </p>
- *
+ * <p/>
  * <p>
  * Lower level/mundane track maintenance is handled by implementations of this interface. This
  * includes selecting features, dropping features, and updating features. THe ability to manually
  * add tracks has intentionally been omitted from this interface for simplicity.  If that level
  * of control is needed then a more complex tracker should be used.
  * </p>
- *
+ * <p/>
  * <p>
  * Contract:
  * <ul>
@@ -48,16 +48,16 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface PointSequentialTracker< T extends ImageBase> {
+public interface PointSequentialTracker<T extends ImageBase> {
 
 	/**
-	 * Updates the location of each feature and its description using information
-	 * from the provided image.
+	 * Adds a new feature to be tracked at the specified location.
 	 *
-	 * @param image Latest image in the sequence.
-	 * @return List of tracked feature locations.
+	 * @param x coordinate of the new feature being tracked.
+	 * @param y coordinate of the new feature being tracked.
+	 * @return If a new track was added or not.
 	 */
-	public void trackFeatures( T image );
+	public boolean addTrack( float x , float y );
 
 	/**
 	 * Sets the current frame to be the key frame.  If configured to spawn new features, a new
@@ -70,7 +70,7 @@ public interface PointSequentialTracker< T extends ImageBase> {
 	 *
 	 * @param track The track which is to be dropped
 	 */
-	public void dropTrack( AssociatedPair track );
+	public void dropTrack(AssociatedPair track);
 
 	/**
 	 * Returns a list of active tracks.
@@ -78,7 +78,7 @@ public interface PointSequentialTracker< T extends ImageBase> {
 	public List<AssociatedPair> getActiveTracks();
 
 	/**
-	 * Returns a list of tracks that were dropped the last time {@link #trackFeatures(gecv.struct.image.ImageBase)} was
+	 * Returns a list of tracks that were dropped the last time track features was
 	 * called.
 	 */
 	public List<AssociatedPair> getDroppedTracks();

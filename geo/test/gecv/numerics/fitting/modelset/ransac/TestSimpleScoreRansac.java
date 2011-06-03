@@ -29,41 +29,40 @@ import java.util.List;
  */
 public class TestSimpleScoreRansac extends GenericModelSetTests {
 
-    @Test
-    public void performStandardTests() {
-        configure(0.8,0.2, true);
-        performSimpleModelFit();
-        runMultipleTimes();
-    }
+	@Test
+	public void performStandardTests() {
+		configure(0.8, 0.2, true);
+		performSimpleModelFit();
+		runMultipleTimes();
+	}
 
-    @Override
-    public ModelMatcher<Double> createModelMatcher(DistanceFromModel<Double> distance,
-                                                   ModelFitter<Double> fitter,
-                                                   int minPoints, double fitThreshold) {
+	@Override
+	public ModelMatcher<Double> createModelMatcher(DistanceFromModel<Double> distance,
+												   ModelFitter<Double> fitter,
+												   int minPoints, double fitThreshold) {
 
 
-        MyScorer scorer = new MyScorer();
+		MyScorer scorer = new MyScorer();
 
-        return new SimpleScoreRansac<Double>(3443,fitter,distance,scorer,300,2,
-                fitThreshold,minPoints,fitThreshold,0.0);
-    }
+		return new SimpleScoreRansac<Double>(3443, fitter, distance, scorer, 300, 2,
+				fitThreshold, minPoints, fitThreshold, 0.0);
+	}
 
-    private static class MyScorer implements RansacFitScore<Double>
-    {
+	private static class MyScorer implements RansacFitScore<Double> {
 
-        @Override
-        public double computeFitScore(List<Double> samples,
-                                      double[] param,
-                                      DistanceFromModel<Double> modelDistance) {
-            double total = 0;
+		@Override
+		public double computeFitScore(List<Double> samples,
+									  double[] param,
+									  DistanceFromModel<Double> modelDistance) {
+			double total = 0;
 
-            modelDistance.setParameters(param);
+			modelDistance.setParameters(param);
 
-            for( Double d : samples ) {
-                total += modelDistance.computeDistance(d);
-            }
+			for (Double d : samples) {
+				total += modelDistance.computeDistance(d);
+			}
 
-            return total;
-        }
-    }
+			return total;
+		}
+	}
 }

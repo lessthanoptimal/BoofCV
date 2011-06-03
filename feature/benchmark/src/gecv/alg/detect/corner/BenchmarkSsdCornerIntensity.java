@@ -59,7 +59,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KLT_I16 extends PerformerBase {
-		KltCorner_I16 corner = new KltCorner_I16(windowRadius);
+		KltCorner_S16 corner = new KltCorner_S16(windowRadius);
 
 		@Override
 		public void process() {
@@ -68,7 +68,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KLT_Naive_I16 extends PerformerBase {
-		SsdCornerNaive_I16 corner = new SsdCornerNaive_I16(imgWidth, imgHeight, windowRadius);
+		SsdCornerNaive_S16 corner = new SsdCornerNaive_S16(imgWidth, imgHeight, windowRadius);
 
 		@Override
 		public void process() {
@@ -86,7 +86,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class Harris_I16 extends PerformerBase {
-		HarrisCorner_I16 corner = new HarrisCorner_I16( windowRadius, 0.04f);
+		HarrisCorner_S16 corner = new HarrisCorner_S16( windowRadius, 0.04f);
 
 		@Override
 		public void process() {
@@ -104,7 +104,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KitRos_I16 extends PerformerBase {
-		KitRosCorner_I16 corner = new KitRosCorner_I16();
+		KitRosCorner_S16 corner = new KitRosCorner_S16();
 
 		@Override
 		public void process() {

@@ -64,7 +64,7 @@ public class TestFastCorner12_I8 {
 	 */
 	@Test
 	public void testPositive() {
-		FastCorner12_I8 corner = new FastCorner12_I8(20, 12);
+		FastCorner12_U8 corner = new FastCorner12_U8(20, 12);
 		ImageUInt8 img = new ImageUInt8(width, height);
 
 		for( int subImage = 0; subImage < 2; subImage++ ) {
@@ -132,7 +132,7 @@ public class TestFastCorner12_I8 {
 	 */
 	@Test
 	public void testNegativeShort() {
-		FastCorner12_I8 corner = new FastCorner12_I8( 20, 12);
+		FastCorner12_U8 corner = new FastCorner12_U8( 20, 12);
 		ImageUInt8 img = new ImageUInt8(width, height);
 		setOffsets(img);
 
@@ -151,7 +151,7 @@ public class TestFastCorner12_I8 {
 	 */
 	@Test
 	public void testNegativeMixed() {
-		FastCorner12_I8 corner = new FastCorner12_I8(20, 12);
+		FastCorner12_U8 corner = new FastCorner12_U8(20, 12);
 		ImageUInt8 img = new ImageUInt8(width, height);
 		setOffsets(img);
 

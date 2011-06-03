@@ -36,130 +36,128 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class GenericModelSetTests {
 
-    Random rand = new Random(0x353456);
+	Random rand = new Random(0x353456);
 
-    // how many of the points is it expected to match
-    protected double minMatchFrac = 1.0;
-    // how close does the parameter set need to be
-    protected double parameterTol = 1e-8;
-    // should it check the inlier set for accuracy
-    protected boolean checkInlierSet = true;
+	// how many of the points is it expected to match
+	protected double minMatchFrac = 1.0;
+	// how close does the parameter set need to be
+	protected double parameterTol = 1e-8;
+	// should it check the inlier set for accuracy
+	protected boolean checkInlierSet = true;
 
-    // mean of the true inlier set
-    // this value is the best estimate that can possibly be done
-    private double inlierMean;
+	// mean of the true inlier set
+	// this value is the best estimate that can possibly be done
+	private double inlierMean;
 
-    protected void configure(double minMatchFrac, double parameterTol, boolean checkInlierSet)
-    {
-        this.minMatchFrac = minMatchFrac;
-        this.parameterTol = parameterTol;
-        this.checkInlierSet = checkInlierSet;
-    }
+	protected void configure(double minMatchFrac, double parameterTol, boolean checkInlierSet) {
+		this.minMatchFrac = minMatchFrac;
+		this.parameterTol = parameterTol;
+		this.checkInlierSet = checkInlierSet;
+	}
 
-    /**
-     * Sees if it can correctly select a model set and determine the best fit parameters for
-     * a simpel test case.
-     */
-    public void performSimpleModelFit() {
-        double mean = 2.5;
-        double tol = 0.2;
+	/**
+	 * Sees if it can correctly select a model set and determine the best fit parameters for
+	 * a simpel test case.
+	 */
+	public void performSimpleModelFit() {
+		double mean = 2.5;
+		double tol = 0.2;
 
-        // generate the points with a smaller tolerance to account for fitting error
-        // later on.
-        ModelMatcher<Double> alg = createModel(4,tol*0.95);
+		// generate the points with a smaller tolerance to account for fitting error
+		// later on.
+		ModelMatcher<Double> alg = createModel(4, tol * 0.95);
 
-        List<Double> samples = createSampleSet(100,mean,tol,0.1);
+		List<Double> samples = createSampleSet(100, mean, tol, 0.1);
 
-        assertTrue(alg.process(samples,new double[1]));
+		assertTrue(alg.process(samples, new double[1]));
 
-        List<Double> matchSet = alg.getMatchSet();
+		List<Double> matchSet = alg.getMatchSet();
 
-        if( checkInlierSet )
-            assertTrue(matchSet.size()/90.0 >= minMatchFrac );
-        assertEquals(inlierMean,alg.getParameters()[0],parameterTol);
-    }
+		if (checkInlierSet)
+			assertTrue(matchSet.size() / 90.0 >= minMatchFrac);
+		assertEquals(inlierMean, alg.getParameters()[0], parameterTol);
+	}
 
-    /**
-     * Multiple data sets are processed in an attempt to see if it is properly reinitializing
-     * itself and returns the correct solutions.
-     */
-    public void runMultipleTimes() {
-        double mean = 2.5;
-        double tol = 0.2;
+	/**
+	 * Multiple data sets are processed in an attempt to see if it is properly reinitializing
+	 * itself and returns the correct solutions.
+	 */
+	public void runMultipleTimes() {
+		double mean = 2.5;
+		double tol = 0.2;
 
-        // generate the points with a smaller tolerance to account for fitting error
-        // later on.
-        ModelMatcher<Double> alg = createModel(4,tol);
+		// generate the points with a smaller tolerance to account for fitting error
+		// later on.
+		ModelMatcher<Double> alg = createModel(4, tol);
 
-        for( int i = 0; i < 10; i++ ) {
-            // try different sample sizes in each trial.  a bug was found once where
-            // a small value of N than previous caused a problem
-            int N = 200-i*10;
-            List<Double> samples = createSampleSet(N,mean,tol*0.90,0.1);
+		for (int i = 0; i < 10; i++) {
+			// try different sample sizes in each trial.  a bug was found once where
+			// a small value of N than previous caused a problem
+			int N = 200 - i * 10;
+			List<Double> samples = createSampleSet(N, mean, tol * 0.90, 0.1);
 
-            assertTrue(alg.process(samples,new double[1]));
+			assertTrue(alg.process(samples, new double[1]));
 
-            List<Double> matchSet = alg.getMatchSet();
+			List<Double> matchSet = alg.getMatchSet();
 
-            double foundMean = alg.getParameters()[0];
+			double foundMean = alg.getParameters()[0];
 
-            if( checkInlierSet )
-                assertTrue(matchSet.size()/(N*0.9) >= minMatchFrac );
-            assertEquals(inlierMean,foundMean,parameterTol);
-        }
-    }
+			if (checkInlierSet)
+				assertTrue(matchSet.size() / (N * 0.9) >= minMatchFrac);
+			assertEquals(inlierMean, foundMean, parameterTol);
+		}
+	}
 
-    /**
-     * Creates a set of sample points that are part of the model and some outliers
-     * 
-     * @param numPoints
-     * @param mean The model.
-     * @param modelDist How close to the model do the points need to be.
-     * @param fracOutlier Fraction of the points which will be outliers.
-     * @return Set of sample points
-     */
-    private List<Double> createSampleSet( int numPoints , double mean , double modelDist , double fracOutlier )
-    {
-        List<Double> ret = new ArrayList<Double>();
+	/**
+	 * Creates a set of sample points that are part of the model and some outliers
+	 *
+	 * @param numPoints
+	 * @param mean		The model.
+	 * @param modelDist   How close to the model do the points need to be.
+	 * @param fracOutlier Fraction of the points which will be outliers.
+	 * @return Set of sample points
+	 */
+	private List<Double> createSampleSet(int numPoints, double mean, double modelDist, double fracOutlier) {
+		List<Double> ret = new ArrayList<Double>();
 
-        double numOutlier = (int)(numPoints*fracOutlier);
+		double numOutlier = (int) (numPoints * fracOutlier);
 
-        inlierMean = 0;
+		inlierMean = 0;
 
-        for( int i =0; i < numPoints-numOutlier; i++ ) {
-            double d = mean + (rand.nextDouble()-0.5)*2.0*modelDist;
+		for (int i = 0; i < numPoints - numOutlier; i++) {
+			double d = mean + (rand.nextDouble() - 0.5) * 2.0 * modelDist;
 
-            inlierMean += d;
+			inlierMean += d;
 
-            ret.add(d);
-        }
+			ret.add(d);
+		}
 
-        inlierMean/=ret.size();
+		inlierMean /= ret.size();
 
-        while( ret.size() < numPoints ) {
-            double d = (rand.nextDouble()-0.5)*200*modelDist;
+		while (ret.size() < numPoints) {
+			double d = (rand.nextDouble() - 0.5) * 200 * modelDist;
 
-            // add a point if its sufficiently far away from the model
-            if( Math.abs(d) > modelDist*10 ) {
-                ret.add(d);
-            }
-        }
+			// add a point if its sufficiently far away from the model
+			if (Math.abs(d) > modelDist * 10) {
+				ret.add(d);
+			}
+		}
 
-        // randomize the order
-        Collections.shuffle(ret,rand);
+		// randomize the order
+		Collections.shuffle(ret, rand);
 
-        return ret;
-    }
+		return ret;
+	}
 
-    private ModelMatcher<Double> createModel( int minPoints , double fitThreshold ) {
-        DistanceFromMeanModel dist = new DistanceFromMeanModel();
-        MeanModelFitter fitter = new MeanModelFitter();
+	private ModelMatcher<Double> createModel(int minPoints, double fitThreshold) {
+		DistanceFromMeanModel dist = new DistanceFromMeanModel();
+		MeanModelFitter fitter = new MeanModelFitter();
 
-        return createModelMatcher(dist,fitter,minPoints,fitThreshold);
-    }
+		return createModelMatcher(dist, fitter, minPoints, fitThreshold);
+	}
 
-    public abstract ModelMatcher<Double> createModelMatcher(
-            DistanceFromModel<Double> distance, ModelFitter<Double> fitter , int minPoints , double fitThreshold );
+	public abstract ModelMatcher<Double> createModelMatcher(
+			DistanceFromModel<Double> distance, ModelFitter<Double> fitter, int minPoints, double fitThreshold);
 
 
 }

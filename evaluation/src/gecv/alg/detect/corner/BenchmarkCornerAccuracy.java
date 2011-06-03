@@ -111,10 +111,10 @@ public class BenchmarkCornerAccuracy {
 
 		// todo try different noise levels
 
-		evaluate(detectCorners(FactoryCornerIntensity.createFast12_I8( 10 , 11)),"FAST");
-		evaluate(detectCorners(FactoryCornerIntensity.createHarris_I16(radius, 0.04f)),"Harris");
-		evaluate(detectCorners(FactoryCornerIntensity.createKitRos_I16()),"KitRos");
-		evaluate(detectCorners(FactoryCornerIntensity.createKlt_I16(radius )),"KLT");
+		evaluate(detectCorners(FactoryCornerIntensity.createFast12( ImageUInt8.class , 10 , 11)),"FAST");
+		evaluate(detectCorners(FactoryCornerIntensity.createHarris( ImageSInt16.class , radius, 0.04f)),"Harris");
+		evaluate(detectCorners(FactoryCornerIntensity.createKitRos( ImageSInt16.class )),"KitRos");
+		evaluate(detectCorners(FactoryCornerIntensity.createKlt( ImageSInt16.class , radius )),"KLT");
 		evaluate(detectMedianCorners(width, height, radius ),"Median");
 	}
 

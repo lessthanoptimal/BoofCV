@@ -17,6 +17,7 @@
 package gecv.abst.filter.derivative;
 
 import gecv.alg.filter.derivative.*;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -31,114 +32,117 @@ import java.lang.reflect.Method;
  */
 public class FactoryDerivative {
 
+	public static <I extends ImageBase, D extends ImageBase>
+	ImageGradient<I,D> sobel( Class<I> inputType , Class<D> derivType)
+	{
+		Method m = findDerivative(GradientSobel.class,inputType,derivType);
+		return new ImageGradient_Reflection<I,D>(m,true);
+	}
+
+	public static <I extends ImageBase, D extends ImageBase>
+	ImageGradient<I,D> three( Class<I> inputType , Class<D> derivType)
+	{
+		Method m = findDerivative(GradientThree.class,inputType,derivType);
+		return new ImageGradient_Reflection<I,D>(m,true);
+	}
+
+	public static <I extends ImageBase, D extends ImageBase>
+	ImageHessianDirect<I,D> hessianDirectThree( Class<I> inputType , Class<D> derivType)
+	{
+		Method m = findHessian(HessianThree.class,inputType,derivType);
+		return new ImageHessianDirect_Reflection<I,D>(m,true);
+	}
+
+	public static <I extends ImageBase, D extends ImageBase>
+	ImageHessianDirect<I,D> hessianDirectSobel( Class<I> inputType , Class<D> derivType)
+	{
+		Method m = findHessian(HessianSobel.class,inputType,derivType);
+		return new ImageHessianDirect_Reflection<I,D>(m,true);
+	}
+
+	public static <D extends ImageBase>
+	ImageHessian<D> hessian( Class<?> gradientType , Class<D> derivType ) {
+		Method m = findHessianFromGradient(gradientType,derivType);
+		return new ImageHessian_Reflection<D>(m,true);
+	}
+
 	public static ImageGradient<ImageFloat32,ImageFloat32> gaussian_F32( int radius ) {
 		return new ImageGradient_Gaussian_F32(radius);
 	}
 
 	public static ImageGradient<ImageFloat32,ImageFloat32> sobel_F32() {
-		Method m = findDerivative_F(GradientSobel.class);
-		return new ImageGradient_Reflection<ImageFloat32,ImageFloat32>(m,true);
+		return sobel(ImageFloat32.class,ImageFloat32.class);
 	}
 
 	public static ImageGradient<ImageFloat32,ImageFloat32> three_F32() {
-		Method m = findDerivative_F(GradientThree.class);
-		return new ImageGradient_Reflection<ImageFloat32,ImageFloat32>(m,true);
+		return three(ImageFloat32.class,ImageFloat32.class);
 	}
 
 	public static ImageHessianDirect<ImageFloat32,ImageFloat32> hessianDirectThree_F32() {
-		Method m = findHessian_F(HessianThree.class);
-		return new ImageHessianDirect_Reflection<ImageFloat32,ImageFloat32>(m,true);
+		return hessianDirectThree(ImageFloat32.class,ImageFloat32.class);
 	}
 
 	public static ImageHessianDirect<ImageFloat32,ImageFloat32> hessianDirectSobel_F32() {
-		Method m = findHessian_F(HessianSobel.class);
-		return new ImageHessianDirect_Reflection<ImageFloat32,ImageFloat32>(m,true);
+		return hessianDirectSobel(ImageFloat32.class,ImageFloat32.class);
 	}
 
 	public static ImageGradient<ImageUInt8, ImageSInt16> sobel_I8() {
-		Method m = findDerivative_I(GradientSobel.class);
-		return new ImageGradient_Reflection<ImageUInt8,ImageSInt16>(m,true);
+		return sobel(ImageUInt8.class,ImageSInt16.class);
 	}
 
 	public static ImageGradient<ImageUInt8, ImageSInt16> three_I8() {
-		Method m = findDerivative_I(GradientThree.class);
-		return new ImageGradient_Reflection<ImageUInt8,ImageSInt16>(m,true);
+		return three(ImageUInt8.class,ImageSInt16.class);
 	}
 
 	public static ImageHessianDirect<ImageUInt8, ImageSInt16> hessianDirectThree_I8() {
-		Method m = findHessian_I(HessianThree.class);
-		return new ImageHessianDirect_Reflection<ImageUInt8,ImageSInt16>(m,true);
+		return hessianDirectThree(ImageUInt8.class,ImageSInt16.class);
 	}
 
 	public static ImageHessianDirect<ImageUInt8, ImageSInt16> hessianDirectSobel_I8() {
-		Method m = findHessian_I(HessianSobel.class);
-		return new ImageHessianDirect_Reflection<ImageUInt8,ImageSInt16>(m,true);
+		return hessianDirectSobel(ImageUInt8.class,ImageSInt16.class);
 	}
 
 	public static ImageHessian<ImageSInt16> hessianThree_I16() {
-		Method m = findHessianFromGradient(GradientThree.class,short.class);
-		return new ImageHessian_Reflection<ImageSInt16>(m,true);
+		return hessian(GradientThree.class,ImageSInt16.class);
 	}
 
 	public static ImageHessian< ImageSInt16> hessianSobel_I16() {
-		Method m = findHessianFromGradient(GradientSobel.class,short.class);
-		return new ImageHessian_Reflection<ImageSInt16>(m,true);
+		return hessian(GradientSobel.class,ImageSInt16.class);
 	}
 
 	public static ImageHessian<ImageFloat32> hessianThree_F32() {
-		Method m = findHessianFromGradient(GradientThree.class,float.class);
-		return new ImageHessian_Reflection<ImageFloat32>(m,true);
+		return hessian(GradientThree.class,ImageFloat32.class);
 	}
 
 	public static ImageHessian< ImageFloat32> hessianSobel_F32() {
-		Method m = findHessianFromGradient(GradientSobel.class,float.class);
-		return new ImageHessian_Reflection<ImageFloat32>(m,true);
+		return hessian(GradientSobel.class,ImageFloat32.class);
 	}
 
-	private static Method findDerivative_F(Class<?> derivativeClass) {
+	private static Method findDerivative(Class<?> derivativeClass,
+										 Class<?> inputType , Class<?> derivType ) {
 		Method m;
 		try {
-			m = derivativeClass.getDeclaredMethod("process", ImageFloat32.class,ImageFloat32.class,ImageFloat32.class,boolean.class);
+			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,boolean.class);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
 		return m;
 	}
 
-	private static Method findDerivative_I(Class<?> derivativeClass) {
+	private static Method findHessian(Class<?> derivativeClass,
+										Class<?> inputType , Class<?> derivType ) {
 		Method m;
 		try {
-			m = derivativeClass.getDeclaredMethod("process", ImageUInt8.class,ImageSInt16.class,ImageSInt16.class,boolean.class);
+			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,derivType,boolean.class);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
 		return m;
 	}
 
-	private static Method findHessian_F(Class<?> derivativeClass) {
-		Method m;
-		try {
-			m = derivativeClass.getDeclaredMethod("process", ImageFloat32.class,ImageFloat32.class,ImageFloat32.class,ImageFloat32.class,boolean.class);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		}
-		return m;
-	}
-
-	private static Method findHessian_I(Class<?> derivativeClass) {
-		Method m;
-		try {
-			m = derivativeClass.getDeclaredMethod("process", ImageUInt8.class,ImageSInt16.class,ImageSInt16.class,ImageSInt16.class,boolean.class);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		}
-		return m;
-	}
-
-	private static Method findHessianFromGradient(Class<?> derivativeClass, Class<?> dataType ) {
+	private static Method findHessianFromGradient(Class<?> derivativeClass, Class<?> imageType ) {
 		String name = derivativeClass.getSimpleName().substring(8);
 		Method m;
-		Class<?> imageType = dataType == float.class ? ImageFloat32.class : ImageSInt16.class;
 		try {
 			m = HessianFromGradient.class.getDeclaredMethod("hessian"+name, imageType,imageType,imageType,imageType,imageType,boolean.class);
 		} catch (NoSuchMethodException e) {

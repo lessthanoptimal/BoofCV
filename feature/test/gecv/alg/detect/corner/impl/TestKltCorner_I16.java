@@ -41,7 +41,7 @@ public class TestKltCorner_I16 {
 
 			@Override
 			public ImageFloat32 computeIntensity() {
-				KltCorner_I16 alg = new KltCorner_I16(1);
+				KltCorner_S16 alg = new KltCorner_S16(1);
 				alg.process(derivX_I16,derivY_I16);
 				return alg.getIntensity();
 			}
@@ -68,10 +68,10 @@ public class TestKltCorner_I16 {
 	}
 
 	public void compareToNaive(ImageSInt16 derivX, ImageSInt16 derivY) {
-		SsdCornerNaive_I16 naive = new SsdCornerNaive_I16(width, height, 3);
+		SsdCornerNaive_S16 naive = new SsdCornerNaive_S16(width, height, 3);
 		naive.process(derivX, derivY);
 
-		KltCorner_I16 fast = new KltCorner_I16(3);
+		KltCorner_S16 fast = new KltCorner_S16(3);
 		fast.process(derivX, derivY);
 
 		GecvTesting.assertEquals(naive.getIntensity(), fast.getIntensity());

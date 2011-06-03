@@ -28,12 +28,12 @@ import java.util.List;
  */
 public interface RansacFitScore<T> {
 
-    /**
-     * The fit score for the samples.
-     *
-     * @return The score.
-     */
-    double computeFitScore( List<T> samples, double[] param ,
-                            DistanceFromModel<T> modelDistance );
+	/**
+	 * The fit score for the samples.
+	 *
+	 * @return The score.
+	 */
+	double computeFitScore(List<T> samples, double[] param,
+						   DistanceFromModel<T> modelDistance);
 
 }

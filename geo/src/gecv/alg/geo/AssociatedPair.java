@@ -20,67 +20,77 @@ import pja.geometry.struct.point.Point2D_F64;
 
 
 /**
+ * <p>
  * Contains the location of a point feature in an image in the key frame and the current frame.
  * Useful for applications where the motion or structure of a scene is computed between
  * two images.
- * 
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class AssociatedPair {
-    /**
-     * Unique ID associated with this feature
-     */
-    public long featureId;
+	/**
+	 * Unique ID associated with this feature
+	 */
+	public long featureId;
 
-    /**
-     * Where tracker specific information is stored on this feature.
-     */
-    public Object description;
+	/**
+	 * Where tracker specific information is stored on this feature.
+	 */
+	public Object description;
 
-    /**
-     * Location of the feature in the key frame.
-     */
-    public Point2D_F64 keyLoc;
-    /**
-     * Location of the feature in the current.
-     */
-    public Point2D_F64 currLoc;
+	/**
+	 * Location of the feature in the key frame.
+	 */
+	public Point2D_F64 keyLoc;
+	/**
+	 * Location of the feature in the current.
+	 */
+	public Point2D_F64 currLoc;
 
-    public AssociatedPair(){
-        keyLoc = new Point2D_F64();
-        currLoc = new Point2D_F64();
-    }
+	public AssociatedPair() {
+		keyLoc = new Point2D_F64();
+		currLoc = new Point2D_F64();
+	}
 
-    public AssociatedPair(long featureId, double x1, double y1,
-                          double x2, double y2)
-    {
-        this.featureId = featureId;
-        keyLoc = new Point2D_F64(x1,y1);
-        currLoc = new Point2D_F64(x2,y2);
-    }
+	/**
+	 * Creates a new associated point from the two provided points.
+	 *
+	 * @param featureId feature ID number
+	 * @param x1 keyframe location x-axis.
+	 * @param y1 keyframe location y-axis.
+	 * @param x2 current location x-axis.
+	 * @param y2 current location y-axis.
+	 */
+	public AssociatedPair(long featureId, double x1, double y1,
+						  double x2, double y2) {
+		this.featureId = featureId;
+		keyLoc = new Point2D_F64(x1, y1);
+		currLoc = new Point2D_F64(x2, y2);
+	}
 
-    /**
-     * Creates a new associated point from the two provided points.
-     *
-     * @param keyLoc first point
-     * @param currLoc second point
-     * @param newInstance Should it create new points or save a reference to these instances.
-     */
-    public AssociatedPair(Point2D_F64 keyLoc, Point2D_F64 currLoc, boolean newInstance ) {
-        if( newInstance ) {
-            this.keyLoc = new Point2D_F64(keyLoc);
-            this.currLoc = new Point2D_F64(currLoc);
-        } else {
-            this.keyLoc = keyLoc;
-            this.currLoc = currLoc;
-        }
-    }
+	/**
+	 * Creates a new associated point from the two provided points.
+	 *
+	 * @param keyLoc keyframe location
+	 * @param currLoc current location
+	 * @param newInstance Should it create new points or save a reference to these instances.
+	 */
+	public AssociatedPair(Point2D_F64 keyLoc, Point2D_F64 currLoc, boolean newInstance) {
+		if (newInstance) {
+			this.keyLoc = new Point2D_F64(keyLoc);
+			this.currLoc = new Point2D_F64(currLoc);
+		} else {
+			this.keyLoc = keyLoc;
+			this.currLoc = currLoc;
+		}
+	}
 
-    public <T> T getDescription() {
-        return (T) description;
-    }
+	public <T> T getDescription() {
+		return (T) description;
+	}
 
-    public void setDescription(Object description) {
-        this.description = description;
-    }
+	public void setDescription(Object description) {
+		this.description = description;
+	}
 }
