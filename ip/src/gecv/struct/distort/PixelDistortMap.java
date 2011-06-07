@@ -16,7 +16,7 @@
 
 package gecv.struct.distort;
 
-import pja.geometry.struct.point.Point2D_F64;
+import jgrl.struct.point.Point2D_F64;
 
 
 /**

@@ -20,9 +20,9 @@ import gecv.alg.geo.AssociatedPair;
 import gecv.alg.geo.PointSequentialTracker;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
+import jgrl.struct.point.Point2D_F32;
 import org.junit.Before;
 import org.junit.Test;
-import pja.geometry.struct.point.Point2D_F32;
 
 import java.util.ArrayList;
 import java.util.List;

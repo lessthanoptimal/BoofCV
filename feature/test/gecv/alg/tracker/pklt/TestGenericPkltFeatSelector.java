@@ -25,9 +25,9 @@ import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
+import jgrl.struct.point.Point2D_I16;
 import org.junit.Before;
 import org.junit.Test;
-import pja.geometry.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
 import java.util.List;

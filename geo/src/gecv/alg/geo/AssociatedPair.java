@@ -16,7 +16,7 @@
 
 package gecv.alg.geo;
 
-import pja.geometry.struct.point.Point2D_F32;
+import jgrl.struct.point.Point2D_F32;
 
 
 /**

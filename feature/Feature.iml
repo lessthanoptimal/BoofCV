@@ -10,7 +10,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Image Processing" />
-    <orderEntry type="module" module-name="libpja" />
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
@@ -20,6 +19,8 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="Java Geometric Regression Library" />
+    <orderEntry type="module" module-name="libpja" />
   </component>
 </module>
 

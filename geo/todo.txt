@@ -1,0 +1,14 @@
+- Image Stabilization
+  * more error functions
+  * compare different robustness
+  * evaluation app
+
+- Camera Calibration
+
+
+- Visual Odometry
+
+
+
+- Various
+ * Sparse Bundle Adjustment

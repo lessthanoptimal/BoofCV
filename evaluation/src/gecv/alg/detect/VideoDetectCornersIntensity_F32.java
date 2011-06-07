@@ -33,7 +33,7 @@ import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import pja.geometry.struct.point.Point2D_I16;
+import jgrl.struct.point.Point2D_I16;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

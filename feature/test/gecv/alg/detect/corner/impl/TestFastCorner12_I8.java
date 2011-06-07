@@ -19,8 +19,8 @@ package gecv.alg.detect.corner.impl;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
+import jgrl.struct.point.Point2D_I16;
 import org.junit.Test;
-import pja.geometry.struct.point.Point2D_I16;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
