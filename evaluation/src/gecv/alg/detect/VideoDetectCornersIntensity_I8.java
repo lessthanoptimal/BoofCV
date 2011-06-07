@@ -34,7 +34,7 @@ import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
-import pja.geometry.struct.point.Point2D_I16;
+import jgrl.struct.point.Point2D_I16;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

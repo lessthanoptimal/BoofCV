@@ -17,9 +17,9 @@
 package gecv.alg.geo.d2;
 
 import gecv.struct.distort.PixelDistort;
-import pja.geometry.struct.affine.Affine2D_F32;
-import pja.geometry.struct.point.Point2D_F32;
-import pja.geometry.transform.affine.AffinePointOps;
+import jgrl.struct.affine.Affine2D_F32;
+import jgrl.struct.point.Point2D_F32;
+import jgrl.transform.affine.AffinePointOps;
 
 
 /**

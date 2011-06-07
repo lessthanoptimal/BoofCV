@@ -17,7 +17,7 @@
 package gecv.gui.geo;
 
 import gecv.alg.geo.AssociatedPair;
-import pja.geometry.struct.point.Point2D_F32;
+import jgrl.struct.point.Point2D_F32;
 
 import java.awt.*;
 

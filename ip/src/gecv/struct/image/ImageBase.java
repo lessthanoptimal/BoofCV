@@ -16,7 +16,7 @@
 
 package gecv.struct.image;
 
-import pja.geometry.struct.point.Point2D_I32;
+import jgrl.struct.point.Point2D_I32;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;

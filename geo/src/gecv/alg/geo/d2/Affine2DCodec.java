@@ -17,11 +17,11 @@
 package gecv.alg.geo.d2;
 
 import gecv.numerics.fitting.modelset.ModelCodec;
-import pja.geometry.struct.affine.Affine2D_F64;
+import jgrl.struct.affine.Affine2D_F64;
 
 
 /**
- * Converts an {@link pja.geometry.struct.affine.Affine2D_F64} to and from an array
+ * Converts an {@link jgrl.struct.affine.Affine2D_F64} to and from an array
  * parameterized format.
  *
  * @author Peter Abeles

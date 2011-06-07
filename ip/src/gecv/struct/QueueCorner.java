@@ -16,7 +16,7 @@
 
 package gecv.struct;
 
-import pja.geometry.struct.point.Point2D_I16;
+import jgrl.struct.point.Point2D_I16;
 
 
 /**

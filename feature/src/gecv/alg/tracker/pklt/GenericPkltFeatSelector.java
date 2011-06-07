@@ -20,7 +20,7 @@ import gecv.abst.detect.corner.GeneralCornerDetector;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
-import pja.geometry.struct.point.Point2D_I16;
+import jgrl.struct.point.Point2D_I16;
 
 import java.util.List;
 

@@ -18,7 +18,7 @@ package gecv.alg.detect.extract;
 
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
-import pja.geometry.struct.point.Point2D_I16;
+import jgrl.struct.point.Point2D_I16;
 
 /**
  * <p/>

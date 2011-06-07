@@ -19,8 +19,8 @@ package gecv.alg.detect.extract;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
+import jgrl.struct.point.Point2D_I16;
 import org.junit.Test;
-import pja.geometry.struct.point.Point2D_I16;
 
 import java.util.Random;
 

@@ -26,9 +26,9 @@ import gecv.alg.misc.FactoryImageDistort;
 import gecv.alg.misc.ImageDistort;
 import gecv.numerics.fitting.modelset.ModelMatcher;
 import gecv.struct.image.ImageBase;
-import pja.geometry.struct.affine.Affine2D_F32;
-import pja.geometry.struct.point.Point2D_F32;
-import pja.geometry.transform.affine.AffinePointOps;
+import jgrl.struct.affine.Affine2D_F32;
+import jgrl.struct.point.Point2D_F32;
+import jgrl.transform.affine.AffinePointOps;
 
 import java.util.List;
 

@@ -28,7 +28,7 @@ import gecv.numerics.fitting.modelset.ModelMatcher;
 import gecv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import pja.geometry.struct.affine.Affine2D_F32;
+import jgrl.struct.affine.Affine2D_F32;
 
 
 /**

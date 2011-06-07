@@ -18,9 +18,9 @@ package gecv.alg.geo.d2;
 
 import gecv.alg.geo.AssociatedPair;
 import gecv.numerics.fitting.modelset.ModelFitter;
-import pja.geometry.fitting.affine.MotionAffinePoint2D_F32;
-import pja.geometry.struct.affine.Affine2D_F32;
-import pja.geometry.struct.point.Point2D_F32;
+import jgrl.fitting.affine.MotionAffinePoint2D_F32;
+import jgrl.struct.affine.Affine2D_F32;
+import jgrl.struct.point.Point2D_F32;
 
 import java.util.ArrayList;
 import java.util.List;
