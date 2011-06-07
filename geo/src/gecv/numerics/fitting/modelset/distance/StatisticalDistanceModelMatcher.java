@@ -17,6 +17,7 @@
 package gecv.numerics.fitting.modelset.distance;
 
 import gecv.numerics.fitting.modelset.DistanceFromModel;
+import gecv.numerics.fitting.modelset.ModelCodec;
 import gecv.numerics.fitting.modelset.ModelFitter;
 import gecv.numerics.fitting.modelset.ModelMatcher;
 
@@ -34,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class StatisticalDistanceModelMatcher<T> implements ModelMatcher<T> {
+public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatcher<Model,Point> {
 
 	// maximum number of times it will perform the pruning process
 	private int maxIterations;
@@ -42,14 +43,14 @@ public class StatisticalDistanceModelMatcher<T> implements ModelMatcher<T> {
 	private double minChange;
 
 	// current best fit parameters
-	protected double[] param;
-	protected double[] currParam;
+	protected Model param;
+	protected Model currParam;
 
 	// set of points which fit the model
-	private List<T> inliers = new ArrayList<T>();
+	private List<Point> inliers = new ArrayList<Point>();
 
 	// what computes the error metrics
-	private StatisticalFit<T> errorAlg;
+	private StatisticalFit<Model,Point> errorAlg;
 
 	// error in previous iteration
 	protected double oldCenter;
@@ -63,9 +64,12 @@ public class StatisticalDistanceModelMatcher<T> implements ModelMatcher<T> {
 	private int minFitPoints;
 
 	// computes a set of model parameters from a list of points
-	ModelFitter<T> modelFitter;
+	ModelFitter<Model,Point> modelFitter;
 	// computes the difference between the model and a point
-	DistanceFromModel<T> modelError;
+	DistanceFromModel<Model,Point> modelError;
+
+	// converts the model into an array parameter format
+	private ModelCodec<Model> codec;
 
 	/**
 	 * Creates a new model matcher.  The type of statistics it uses is specified by "statistics".
@@ -90,8 +94,9 @@ public class StatisticalDistanceModelMatcher<T> implements ModelMatcher<T> {
 										   int minFitPoints,
 										   StatisticalDistance statistics,
 										   double pruneThreshold,
-										   ModelFitter<T> modelFitter,
-										   DistanceFromModel<T> modelError) {
+										   ModelFitter<Model,Point> modelFitter,
+										   DistanceFromModel<Model,Point> modelError,
+										   ModelCodec<Model> codec ) {
 		this.maxIterations = maxIterations;
 		this.minChange = minChange;
 		this.exitCenterError = exitCenterError;
@@ -99,14 +104,18 @@ public class StatisticalDistanceModelMatcher<T> implements ModelMatcher<T> {
 		this.minFitPoints = minFitPoints;
 		this.modelFitter = modelFitter;
 		this.modelError = modelError;
+		this.codec = codec;
+
+		param = modelFitter.declareModel();
+		currParam = modelFitter.declareModel();
 
 		switch (statistics) {
 			case MEAN:
-				errorAlg = new FitByMeanStatistics<T>(pruneThreshold);
+				errorAlg = new FitByMeanStatistics<Model,Point>(pruneThreshold);
 				break;
 
 			case PERCENTILE:
-				errorAlg = new FitByMedianStatistics<T>(pruneThreshold);
+				errorAlg = new FitByMedianStatistics<Model,Point>(pruneThreshold);
 				break;
 
 			default:
@@ -115,17 +124,12 @@ public class StatisticalDistanceModelMatcher<T> implements ModelMatcher<T> {
 	}
 
 	@Override
-	public boolean process(List<T> dataSet, double[] paramInital) {
+	public boolean process(List<Point> dataSet, Model paramInital) {
 		// there must be at least the minFitPoints for it to run
 		if (dataSet.size() < minFitPoints)
 			return false;
 
 		errorAlg.init(modelError, inliers);
-
-		param = new double[modelFitter.getParameterLength()];
-		currParam = new double[modelFitter.getParameterLength()];
-		if (paramInital != null)
-			System.arraycopy(paramInital, 0, currParam, 0, currParam.length);
 
 		inliers.clear();
 		inliers.addAll(dataSet);
@@ -136,12 +140,12 @@ public class StatisticalDistanceModelMatcher<T> implements ModelMatcher<T> {
 		// iterate until it converges or the maximum number of iterations has been exceeded
 		int i = 0;
 		for (; i < maxIterations && !converged && inliers.size() >= minFitPoints; i++) {
-			if (!modelFitter.fitModel(inliers, currParam)) {
+			if (!modelFitter.fitModel(inliers, paramInital, currParam)) {
 				// failed to fit the model, so stop before it screws things up
 				break;
 			}
 
-			modelError.setParameters(currParam);
+			modelError.setModel(currParam);
 			errorAlg.computeStatistics();
 			centerError = errorAlg.getErrorMetric();
 
@@ -152,7 +156,9 @@ public class StatisticalDistanceModelMatcher<T> implements ModelMatcher<T> {
 			else if (computeDiff(currParam, param) <= minChange) {
 				converged = true;
 			}
-			System.arraycopy(currParam, 0, param, 0, param.length);
+			Model temp = param;
+			param = currParam;
+			currParam = temp;
 
 			if (!converged) {
 				errorAlg.prune();
@@ -171,7 +177,11 @@ public class StatisticalDistanceModelMatcher<T> implements ModelMatcher<T> {
 	/**
 	 * Computes the difference between the two parameters.
 	 */
-	protected double computeDiff(double[] paramA, double[] paramB) {
+	protected double computeDiff(Model modelA, Model modelB ) {
+
+		double paramA[] = codec.encode(modelA,null);
+		double paramB[] = codec.encode(modelB,null);
+
 		double total = 0;
 
 		for (int i = 0; i < paramA.length; i++) {
@@ -182,12 +192,12 @@ public class StatisticalDistanceModelMatcher<T> implements ModelMatcher<T> {
 	}
 
 	@Override
-	public double[] getParameters() {
+	public Model getModel() {
 		return param;
 	}
 
 	@Override
-	public List<T> getMatchSet() {
+	public List<Point> getMatchSet() {
 		return inliers;
 	}
 

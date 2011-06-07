@@ -17,13 +17,15 @@
 package gecv.alg.interpolate.impl;
 
 import gecv.alg.interpolate.InterpolatePixel;
+import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.image.ImageBase;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Several standardized tests that ensure correct implementations of {@link gecv.alg.interpolate.InterpolatePixel}.
@@ -38,8 +40,6 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 
 	protected abstract T createImage( int width , int height );
 
-	protected abstract void randomize( T image );
-
 	protected abstract InterpolatePixel<T> wrap( T image );
 
 	/**
@@ -48,7 +48,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 	@Test
 	public void get() {
 		T img = createImage(width, height);
-		randomize(img);
+		GeneralizedImageOps.randomize(img,0,100,rand);
 
 		GecvTesting.checkSubImage(this, "get", false, img);
 	}
@@ -68,7 +68,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 	@Test
 	public void get_edges() {
 		T img = createImage(width, height);
-		randomize(img);
+		GeneralizedImageOps.randomize(img,0,100,rand);
 
 		GecvTesting.checkSubImage(this, "get_edges", false, img);
 	}
@@ -113,7 +113,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 	@Test
 	public void get_unsafe() {
 		T img = createImage(width, height);
-		randomize(img);
+		GeneralizedImageOps.randomize(img,0,100,rand);
 
 		GecvTesting.checkSubImage(this, "get_unsafe", false, img);
 	}

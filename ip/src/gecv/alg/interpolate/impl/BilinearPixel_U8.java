@@ -71,10 +71,13 @@ public class BilinearPixel_U8 implements InterpolatePixel<ImageUInt8> {
 
 		int index = orig.startIndex + yt * stride + xt;
 
-		float val = (1.0f - ax) * (1.0f - ay) * (data[index]& 0xFF);
-		val += ax * (1.0f - ay) * (data[index + 1]& 0xFF);
-		val += ax * ay * (data[index + 1 + stride]& 0xFF);
-		val += (1.0f - ax) * ay * (data[index + stride]& 0xFF);
+		int dx = xt == width - 1 ? 0 : 1;
+		int dy = yt == height - 1 ? 0 : stride;
+
+		float val = (1.0f - ax) * (1.0f - ay) * (data[index] & 0xFF); // (x,y)
+		val += ax * (1.0f - ay) * (data[index + dx] & 0xFF); // (x+1,y)
+		val += ax * ay * (data[index + dx + dy] & 0xFF); // (x+1,y+1)
+		val += (1.0f - ax) * ay * (data[index + dy] & 0xFF); // (x,y+1)
 
 		return val;
 	}

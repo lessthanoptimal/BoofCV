@@ -27,6 +27,9 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="Feature" />
+    <orderEntry type="module" module-name="Geometric Vision" />
+    <orderEntry type="module" module-name="libpja" />
   </component>
 </module>
 

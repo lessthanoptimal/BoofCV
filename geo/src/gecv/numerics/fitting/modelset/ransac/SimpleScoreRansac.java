@@ -28,10 +28,10 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class SimpleScoreRansac<T> extends SimpleRansacCommon<T> {
+public class SimpleScoreRansac<Model, Point> extends SimpleRansacCommon<Model, Point> {
 
 	// computes how good of a fit the points are to the model
-	RansacFitScore<T> fitScorer;
+	RansacFitScore<Model,Point> fitScorer;
 
 	// how many points are drawn to generate the initial model
 	protected int numInitialSample;
@@ -65,9 +65,9 @@ public class SimpleScoreRansac<T> extends SimpleRansacCommon<T> {
 	 * @param exitIterThreshold  If the match set is better than this threshold it will stop running.
 	 */
 	public SimpleScoreRansac(long randSeed,
-							 ModelFitter<T> modelFitter,
-							 DistanceFromModel<T> modelDistance,
-							 RansacFitScore<T> fitScorer,
+							 ModelFitter<Model,Point> modelFitter,
+							 DistanceFromModel<Model,Point> modelDistance,
+							 RansacFitScore<Model,Point> fitScorer,
 							 int maxIterations,
 							 int numInitialSample, double initialModelThresh,
 							 int minMatchSetSize, double matchSetThreshold,
@@ -96,21 +96,8 @@ public class SimpleScoreRansac<T> extends SimpleRansacCommon<T> {
 		return bestFitError;
 	}
 
-	/**
-	 * Runs the RANSAC algortihm on the provided data set.
-	 *
-	 * @param dataSet	  The list of points that are to be processed.  This can be modified.
-	 * @param paramInitial An initial value that can be used by the optimization algorithm.
-	 *                     If null it will use all zeros.
-	 * @return True if it sucessed in finding a good model, false otherwise.
-	 */
 	@Override
-	public boolean process(List<T> dataSet, double[] paramInitial) {
-		if (paramInitial == null) {
-			paramInitial = new double[bestFitParam.length];
-		} else if (paramInitial.length != bestFitParam.length) {
-			throw new IllegalArgumentException("Parameter has an unexpected length");
-		}
+	public boolean process(List<Point> dataSet, Model initialModel ) {
 
 		bestFitError = Double.MAX_VALUE;
 		bestFitPoints.clear();
@@ -123,29 +110,36 @@ public class SimpleScoreRansac<T> extends SimpleRansacCommon<T> {
 		for (i = 0; i < maxIterations; i++) {
 			randomDraw(dataSet, numInitialSample, initialSample, rand);
 
-			if (!modelFitter.fitModel(initialSample, paramInitial))
+			if (!modelFitter.fitModel(initialSample, initialModel, candidateParam))
 				continue;
 
-//            System.out.println("init error = "+optimizer.getFitError());
+			modelDistance.setModel(candidateParam);
 
 			// see if the fit to the initial set is good enough
-			if (fitScorer.computeFitScore(initialSample, paramInitial, modelDistance) < initialModelThresh) {
+			if (fitScorer.computeFitScore(initialSample, modelDistance) < initialModelThresh) {
 
 				// select points which match that fit
-				if (!selectMatchSet(dataSet, matchSetThreshold, minMatchSetSize, paramInitial)) {
+				if (!selectMatchSet(dataSet, matchSetThreshold, minMatchSetSize, candidateParam)) {
 					continue;
 				}
 
-				if (!modelFitter.fitModel(candidatePoints, paramInitial))
+				// fit a model to all the candidates points
+				if (!modelFitter.fitModel(candidatePoints, initialModel, candidateParam))
 					continue;
 
+
 				// see if the results are better than the previous results
-				double score = fitScorer.computeFitScore(initialSample, paramInitial, modelDistance);
+				modelDistance.setModel(candidateParam);
+				double score = fitScorer.computeFitScore(initialSample, modelDistance);
 				if (score < bestFitError) {
 					bestFitError = score;
-					System.arraycopy(paramInitial, 0, bestFitParam, 0, bestFitParam.length);
 					bestFitPoints.clear();
 					bestFitPoints.addAll(candidatePoints);
+
+					// set the current model to be the best
+					Model temp = bestFitParam;
+					bestFitParam = candidateParam;
+					candidateParam = temp;
 
 					if (bestFitError < exitIterThreshold) {
 						break;

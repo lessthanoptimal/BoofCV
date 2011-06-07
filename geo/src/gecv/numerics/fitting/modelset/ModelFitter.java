@@ -24,21 +24,27 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface ModelFitter<T> {
+public interface ModelFitter<Model, Point> {
 
 	/**
-	 * Returns the number of elements in the parameters array.
+	 * Declares a new model in which the results can be written to
 	 *
-	 * @return Number of elements in the parameter array.
+	 * @return New instance of the model.
 	 */
-	int getParameterLength();
+	Model declareModel();
 
 	/**
 	 * Computes a set of model parameters for the given set of points.
 	 *
 	 * @param dataSet	Points that the model is to be fit to.
-	 * @param foundParam Where the computed model parameters are written to.
+	 * @param initParam Implementation dependent/optional initial seed for fitting the model.  If not used set to null.
+	 * @param foundModel Where the found model parameters.
 	 * @return true if successful, false otherwise.
 	 */
-	boolean fitModel(List<T> dataSet, double[] foundParam);
+	boolean fitModel(List<Point> dataSet, Model initParam , Model foundModel);
+
+	/**
+	 * Returns the minimum number of points needed to compute a set of model parameters.
+	 */
+	public int getMinimumPoints();
 }

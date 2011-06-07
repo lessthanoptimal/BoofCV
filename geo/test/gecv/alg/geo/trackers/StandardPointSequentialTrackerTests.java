@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.numerics.fitting.modelset.trackers;
+package gecv.alg.geo.trackers;
 
 import gecv.alg.geo.AssociatedPair;
 import gecv.alg.geo.PointSequentialTracker;
@@ -22,14 +22,13 @@ import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import org.junit.Before;
 import org.junit.Test;
-import pja.geometry.struct.point.Point2D_F64;
+import pja.geometry.struct.point.Point2D_F32;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -69,6 +68,16 @@ public abstract class StandardPointSequentialTrackerTests {
 	 * Creates a new tracker with the specified number of tracks initially.
 	 */
 	public abstract PointSequentialTracker createTracker();
+
+	@Test
+	public void spawnTracks() {
+		fail("implement");
+	}
+
+	@Test
+	public void dropAllTracks() {
+		fail("implement");
+	}
 
 	@Test
 	public void testTrackDrop() {
@@ -130,7 +139,7 @@ public abstract class StandardPointSequentialTrackerTests {
 
 		// the initial location and the current location should be different
 		assertEquals(5,tracker.getActiveTracks().size());
-		List<Point2D_F64> currPts = new ArrayList<Point2D_F64>();
+		List<Point2D_F32> currPts = new ArrayList<Point2D_F32>();
 		for( AssociatedPair p : tracker.getActiveTracks() ) {
 			currPts.add(p.currLoc.copy());
 			assertTrue(p.currLoc.x != p.keyLoc.x);
@@ -140,7 +149,7 @@ public abstract class StandardPointSequentialTrackerTests {
 		// after set to keyframe is called they should be the same
 		tracker.setCurrentToKeyFrame();
 		for( int i = 0; i < currPts.size(); i++ ) {
-			Point2D_F64 c = currPts.get(i);
+			Point2D_F32 c = currPts.get(i);
 			AssociatedPair p = tracker.getActiveTracks().get(i);
 
 			assertTrue(c.x == p.keyLoc.x);

@@ -119,10 +119,13 @@ public class GenerateBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\t\tint index = orig.startIndex + yt * stride + xt;\n" +
 				"\n" +
-				"\t\tfloat val = (1.0f - ax) * (1.0f - ay) * (data[index]"+bitWise+");\n" +
-				"\t\tval += ax * (1.0f - ay) * (data[index + 1]"+bitWise+");\n" +
-				"\t\tval += ax * ay * (data[index + 1 + stride]"+bitWise+");\n" +
-				"\t\tval += (1.0f - ax) * ay * (data[index + stride]"+bitWise+");\n" +
+				"\t\tint dx = xt == width - 1 ? 0 : 1;\n" +
+				"\t\tint dy = yt == height - 1 ? 0 : stride;\n" +
+				"\n" +
+				"\t\tfloat val = (1.0f - ax) * (1.0f - ay) * (data[index] "+bitWise+"); // (x,y)\n" +
+				"\t\tval += ax * (1.0f - ay) * (data[index + dx] "+bitWise+"); // (x+1,y)\n" +
+				"\t\tval += ax * ay * (data[index + dx + dy] "+bitWise+"); // (x+1,y+1)\n" +
+				"\t\tval += (1.0f - ax) * ay * (data[index + dy] "+bitWise+"); // (x,y+1)\n" +
 				"\n" +
 				"\t\treturn val;\n" +
 				"\t}\n" +

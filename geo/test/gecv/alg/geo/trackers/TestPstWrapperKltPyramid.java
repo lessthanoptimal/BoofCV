@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.numerics.fitting.modelset.trackers;
+package gecv.alg.geo.trackers;
 
 import gecv.alg.geo.PointSequentialTracker;
-import gecv.alg.geo.trackers.PstWrapperKltPyramid;
 import gecv.alg.tracker.pklt.PkltManager;
 import gecv.alg.tracker.pklt.PkltManagerConfig;
 import gecv.alg.tracker.pklt.PyramidKltFeature;

@@ -69,10 +69,24 @@ public class FactoryInterpolation {
 	}
 
 	public static <T extends ImageBase> InterpolatePixel<T> nearestNeighborPixel( Class<?> type ) {
-		return (InterpolatePixel<T>)new NearestNeighborPixel_F32();
+		if( type == ImageFloat32.class )
+			return (InterpolatePixel<T>)new NearestNeighborPixel_F32();
+		else if( type == ImageUInt8.class )
+			return (InterpolatePixel<T>)new NearestNeighborPixel_U8();
+		else if( type == ImageSInt16.class )
+			return (InterpolatePixel<T>)new NearestNeighborPixel_S16();
+		else
+			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
 	public static <T extends ImageBase> InterpolateRectangle<T> nearestNeighborRectangle( Class<?> type ) {
-		return (InterpolateRectangle<T>)new NearestNeighborRectangle_F32();
+		if( type == ImageFloat32.class )
+			return (InterpolateRectangle<T>)new NearestNeighborRectangle_F32();
+//		else if( type == ImageUInt8.class )
+//			return (InterpolateRectangle<T>)new NearestNeighborRectangle_U8();
+//		else if( type == ImageSInt16.class )
+//			return (InterpolateRectangle<T>)new NearestNeighborRectangle_S16();
+		else
+			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 }

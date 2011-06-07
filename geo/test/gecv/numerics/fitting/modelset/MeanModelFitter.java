@@ -24,14 +24,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class MeanModelFitter implements ModelFitter<Double> {
+public class MeanModelFitter implements ModelFitter<double[],Double> {
 	@Override
-	public int getParameterLength() {
-		return 1;
+	public double[] declareModel() {
+		return new double[1];
 	}
 
 	@Override
-	public boolean fitModel(List<Double> dataSet, double[] foundParam) {
+	public boolean fitModel(List<Double> dataSet, double[] initParam, double[] foundParam) {
 		double mean = 0;
 
 		for (double d : dataSet) {
@@ -43,5 +43,10 @@ public class MeanModelFitter implements ModelFitter<Double> {
 		foundParam[0] = mean;
 
 		return true;
+	}
+
+	@Override
+	public int getMinimumPoints() {
+		return 1;
 	}
 }

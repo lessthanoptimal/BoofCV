@@ -37,26 +37,23 @@ public class TestSimpleScoreRansac extends GenericModelSetTests {
 	}
 
 	@Override
-	public ModelMatcher<Double> createModelMatcher(DistanceFromModel<Double> distance,
-												   ModelFitter<Double> fitter,
+	public ModelMatcher<double[],Double> createModelMatcher(DistanceFromModel<double[],Double> distance,
+												   ModelFitter<double[],Double> fitter,
 												   int minPoints, double fitThreshold) {
 
 
 		MyScorer scorer = new MyScorer();
 
-		return new SimpleScoreRansac<Double>(3443, fitter, distance, scorer, 300, 2,
+		return new SimpleScoreRansac<double[],Double>(3443, fitter, distance, scorer, 300, 2,
 				fitThreshold, minPoints, fitThreshold, 0.0);
 	}
 
-	private static class MyScorer implements RansacFitScore<Double> {
+	private static class MyScorer implements RansacFitScore<double[],Double> {
 
 		@Override
 		public double computeFitScore(List<Double> samples,
-									  double[] param,
-									  DistanceFromModel<Double> modelDistance) {
+									  DistanceFromModel<double[],Double> modelDistance) {
 			double total = 0;
-
-			modelDistance.setParameters(param);
 
 			for (Double d : samples) {
 				total += modelDistance.computeDistance(d);

@@ -123,6 +123,11 @@ public class TestConvertBufferedImage {
 	}
 
 	@Test
+	public void stuff() {
+		fail("Automate convert with reflection and add new floating point");
+	}
+
+	@Test
 	public void convertFrom_generic() {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
 

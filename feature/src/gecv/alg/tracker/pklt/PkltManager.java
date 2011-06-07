@@ -150,14 +150,7 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 
 		// if there are too few features spawn new ones
 		if( active.size() < config.minFeatures ) {
-			int numBefore = active.size();
-			featureSelector.setInputs(image,derivX,derivY);
-			featureSelector.compute(active,unused);
-
-			// add new features which were just added
-			for( int i = numBefore; i < active.size(); i++ ) {
-				spawned.add( active.get(i));
-			}
+			spawnTracks( image , derivX , derivY );
 		}
 	}
 
@@ -204,5 +197,21 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 		if( !active.remove(feature))
 			throw new IllegalArgumentException("Feature not in active list");
 		dropped.add(feature);
+	}
+
+	/**
+	 * Automatically detects and creates new tracks.
+	 */
+	public void spawnTracks( ImagePyramid<I> image ,
+							 ImagePyramid<D> derivX ,
+							 ImagePyramid<D> derivY ) {
+		int numBefore = active.size();
+		featureSelector.setInputs(image,derivX,derivY);
+		featureSelector.compute(active,unused);
+
+		// add new features which were just added
+		for( int i = numBefore; i < active.size(); i++ ) {
+			spawned.add( active.get(i));
+		}
 	}
 }

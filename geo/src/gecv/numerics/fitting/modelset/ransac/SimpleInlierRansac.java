@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class SimpleInlierRansac<T> extends SimpleRansacCommon<T> {
+public class SimpleInlierRansac<Model, Point> extends SimpleRansacCommon<Model, Point> {
 	// how many points are drawn to generate the initial model
 	protected int numInitialSample;
 	// how many points must fit a set of model parameters for it to be accepted
@@ -55,14 +55,14 @@ public class SimpleInlierRansac<T> extends SimpleRansacCommon<T> {
 	 * @param thresholdFit	 How close of a fit a points needs to be to the model to be considered a fit.  In pixels.
 	 */
 	public SimpleInlierRansac(long randSeed,
-							  ModelFitter<T> modelFitter,
-							  DistanceFromModel<T> modelDistance,
+							  ModelFitter<Model,Point> modelFitter,
+							  DistanceFromModel<Model,Point> modelDistance,
 							  int maxIterations,
 							  int numInitialSample,
 							  int minFitPoints,
 							  int exitFitPoints,
 							  double thresholdFit) {
-		super(modelFitter, modelDistance, randSeed, maxIterations);
+		super(modelFitter, modelDistance,randSeed, maxIterations);
 		this.numInitialSample = numInitialSample;
 		this.minFitPoints = minFitPoints;
 		this.exitFitPoints = exitFitPoints;
@@ -84,22 +84,8 @@ public class SimpleInlierRansac<T> extends SimpleRansacCommon<T> {
 		return bestFitCount;
 	}
 
-
-	/**
-	 * Extracts the model set and associated parameters from the provided data set.
-	 *
-	 * @param dataSet	 The list of points that are to be processed.  This can be modified.
-	 * @param paramInital An initial value that can be used by the optimization algorithm.
-	 *                    If null it will use all zeros.
-	 * @return True if it succeeds in finding a good model, false otherwise.
-	 */
 	@Override
-	public boolean process(List<T> dataSet, double[] paramInital) {
-		if (paramInital == null) {
-			paramInital = new double[bestFitParam.length];
-		} else if (paramInital.length != bestFitParam.length) {
-			throw new IllegalArgumentException("Parameter has an unexpected length");
-		}
+	public boolean process(List<Point> dataSet, Model paramInitial ) {
 
 		bestFitCount = 0;
 		bestFitPoints.clear();
@@ -118,7 +104,7 @@ public class SimpleInlierRansac<T> extends SimpleRansacCommon<T> {
 			randomDraw(dataSet, numInitialSample, initialSample, rand);
 
 			// compute the best fit model parameters to this set
-			if (!modelFitter.fitModel(initialSample, paramInital))
+			if (!modelFitter.fitModel(initialSample, paramInitial, candidateParam))
 				continue;
 
 			// determine how may points are needed to either produce a valid model set or beat the
@@ -126,7 +112,7 @@ public class SimpleInlierRansac<T> extends SimpleRansacCommon<T> {
 			int numFitPoints = bestFitCount < minFitPoints ? minFitPoints : bestFitCount + 1;
 
 			// see if the minimum number of points fit this set
-			if (!selectMatchSet(dataSet, thresholdFit, numFitPoints, paramInital)) {
+			if (!selectMatchSet(dataSet, thresholdFit, numFitPoints, candidateParam)) {
 				continue;
 			}
 
@@ -135,7 +121,11 @@ public class SimpleInlierRansac<T> extends SimpleRansacCommon<T> {
 				bestFitCount = candidatePoints.size();
 				bestFitPoints.clear();
 				bestFitPoints.addAll(candidatePoints);
-				System.arraycopy(paramInital, 0, bestFitParam, 0, bestFitParam.length);
+
+				// set the current model to be the best
+				Model temp = bestFitParam;
+				bestFitParam = candidateParam;
+				candidateParam = temp;
 
 				// see if it has reached an exit condition
 				if (bestFitCount >= exitFitPoints)
@@ -143,9 +133,9 @@ public class SimpleInlierRansac<T> extends SimpleRansacCommon<T> {
 			}
 		}
 
-		// compute model parameters for the best fit
+		// compute model parameters for the best fit using all the inlier sample points
 		if (bestFitCount > 0) {
-			if (modelFitter.fitModel(bestFitPoints, bestFitParam)) {
+			if (modelFitter.fitModel(bestFitPoints, paramInitial , bestFitParam)) {
 				return true;
 			}
 		}

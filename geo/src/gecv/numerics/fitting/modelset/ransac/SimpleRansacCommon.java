@@ -44,37 +44,40 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public abstract class SimpleRansacCommon<T> implements ModelMatcher<T> {
+public abstract class SimpleRansacCommon<Model, Point> implements ModelMatcher<Model, Point> {
 	// fits a model to the set of points its provided
-	protected ModelFitter<T> modelFitter;
+	protected ModelFitter<Model,Point> modelFitter;
 	// computes the distance a point is from the model
-	protected DistanceFromModel<T> modelDistance;
+	protected DistanceFromModel<Model,Point> modelDistance;
 
 	// used to randomly select points/samples
 	protected Random rand;
 
 	// list of points which are a candidate for the best fit set
-	protected List<T> candidatePoints = new ArrayList<T>();
+	protected List<Point> candidatePoints = new ArrayList<Point>();
 
 	// list of samples from the best fit model
-	protected List<T> bestFitPoints = new ArrayList<T>();
-	protected double bestFitParam[];
+	protected List<Point> bestFitPoints = new ArrayList<Point>();
+	protected Model bestFitParam;
+	protected Model candidateParam;
 
 	// the maximum number of iterations it will perform
 	protected int maxIterations;
 
 	// the set of points which were initially sampled
-	protected List<T> initialSample = new ArrayList<T>();
+	protected List<Point> initialSample = new ArrayList<Point>();
 
-	public SimpleRansacCommon(ModelFitter<T> modelFitter,
-							  DistanceFromModel<T> modelDistance,
+
+	public SimpleRansacCommon(ModelFitter<Model,Point> modelFitter,
+							  DistanceFromModel<Model,Point> modelDistance,
 							  long randSeed, int maxIterations) {
 		this.modelFitter = modelFitter;
 		this.modelDistance = modelDistance;
 
 		rand = new Random(randSeed);
 		this.maxIterations = maxIterations;
-		bestFitParam = new double[modelFitter.getParameterLength()];
+		bestFitParam = modelFitter.declareModel();
+		candidateParam = modelFitter.declareModel();
 	}
 
 	public SimpleRansacCommon() {
@@ -83,14 +86,15 @@ public abstract class SimpleRansacCommon<T> implements ModelMatcher<T> {
 	/**
 	 * Returns the set of points which matched this model.
 	 */
-	public List<T> getMatchSet() {
+	public List<Point> getMatchSet() {
 		return bestFitPoints;
 	}
 
 	/**
 	 * Returns the set of parameters that it found.
 	 */
-	public double[] getParameters() {
+	@Override
+	public Model getModel() {
 		return bestFitParam;
 	}
 
@@ -129,12 +133,12 @@ public abstract class SimpleRansacCommon<T> implements ModelMatcher<T> {
 	 * @return true if enough points were matched, false otherwise
 	 */
 	@SuppressWarnings({"ForLoopReplaceableByForEach"})
-	protected boolean selectMatchSet(List<T> dataSet, double threshold, int minSize,
-									 double[] param) {
+	protected boolean selectMatchSet(List<Point> dataSet, double threshold, int minSize,
+									 Model param) {
 		candidatePoints.clear();
-		modelDistance.setParameters(param);
+		modelDistance.setModel(param);
 		for (int i = 0; i < dataSet.size(); i++) {
-			T point = dataSet.get(i);
+			Point point = dataSet.get(i);
 
 			double distance = modelDistance.computeDistance(point);
 			if (distance < threshold) {

@@ -246,7 +246,24 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link gecv.struct.image.ImageUInt8}.  If the buffered image
+	 * Converts an image which extends {@link ImageBase} into a BufferedImage.
+	 *
+	 * @param src Input image.
+	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @return Converted image.
+	 */
+	public static BufferedImage convertTo( ImageBase src, BufferedImage dst) {
+		if( ImageUInt8.class == src.getClass() ) {
+			return convertTo((ImageUInt8)src,dst);
+		} else if( ImageFloat32.class == src.getClass() ) {
+			return convertTo((ImageFloat32)src,dst);
+		} else {
+			throw new IllegalArgumentException("Image type is not yet supported: "+src.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Converts a {@link gecv.struct.image.ImageUInt8} into a BufferedImage.  If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
@@ -254,6 +271,29 @@ public class ConvertBufferedImage {
 	 * @return Converted image.
 	 */
 	public static BufferedImage convertTo(ImageUInt8 src, BufferedImage dst) {
+		dst = checkInputs(src, dst);
+
+		if (dst.getRaster() instanceof ByteInterleavedRaster) {
+			ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
+		} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
+			ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
+		} else {
+			ConvertRaster.grayToBuffered(src, dst);
+		}
+
+		return dst;
+	}
+
+	/**
+	 * Converts the buffered image into an {@link gecv.struct.image.ImageFloat32}.  If the buffered image
+	 * has multiple channels the intensities of each channel are averaged together.  The floating
+	 * point image is assumed to be between 0 and 255.
+	 *
+	 * @param src Input image.
+	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @return Converted image.
+	 */
+	public static BufferedImage convertTo(ImageFloat32 src, BufferedImage dst) {
 		dst = checkInputs(src, dst);
 
 		if (dst.getRaster() instanceof ByteInterleavedRaster) {
