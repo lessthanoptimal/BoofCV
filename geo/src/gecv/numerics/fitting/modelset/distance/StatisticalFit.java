@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface StatisticalFit<T> {
+public interface StatisticalFit<Model, Point> {
 
 	/**
 	 * This is called once to provide access to internal data structures of the owner.
@@ -35,7 +35,7 @@ public interface StatisticalFit<T> {
 	 * @param modelDistance Computes the error between a point and the model
 	 * @param inliers	   Contains all the points which are currently considered part of the model.
 	 */
-	void init(DistanceFromModel<T> modelDistance, List<T> inliers);
+	void init(DistanceFromModel<Model,Point> modelDistance, List<Point> inliers);
 
 	/**
 	 * Returns the computed statistical error.

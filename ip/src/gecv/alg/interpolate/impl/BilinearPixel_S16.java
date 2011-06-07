@@ -71,10 +71,13 @@ public class BilinearPixel_S16 implements InterpolatePixel<ImageSInt16> {
 
 		int index = orig.startIndex + yt * stride + xt;
 
-		float val = (1.0f - ax) * (1.0f - ay) * (data[index]);
-		val += ax * (1.0f - ay) * (data[index + 1]);
-		val += ax * ay * (data[index + 1 + stride]);
-		val += (1.0f - ax) * ay * (data[index + stride]);
+		int dx = xt == width - 1 ? 0 : 1;
+		int dy = yt == height - 1 ? 0 : stride;
+
+		float val = (1.0f - ax) * (1.0f - ay) * (data[index] ); // (x,y)
+		val += ax * (1.0f - ay) * (data[index + dx] ); // (x+1,y)
+		val += ax * ay * (data[index + dx + dy] ); // (x+1,y+1)
+		val += (1.0f - ax) * ay * (data[index + dy] ); // (x,y+1)
 
 		return val;
 	}

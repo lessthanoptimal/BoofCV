@@ -26,11 +26,11 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceFromMeanModel implements DistanceFromModel<Double> {
+public class DistanceFromMeanModel implements DistanceFromModel<double[],Double> {
 	double mean;
 
 	@Override
-	public void setParameters(double[] param) {
+	public void setModel(double[] param) {
 		mean = param[0];
 	}
 

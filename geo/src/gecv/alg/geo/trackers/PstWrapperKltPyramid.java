@@ -78,6 +78,9 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 
 		PkltManagerConfig<I, D> config = trackManager.getConfig();
 
+		// force the min number of features to be zero to prevent automatic feature spawning
+		config.minFeatures = 0;
+
 		// declare the image pyramid
 		basePyramid = ImagePyramidFactory.create(
 				config.imgWidth,config.imgHeight,true,config.typeInput);
@@ -109,6 +112,26 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 		setup(trackManager,
 				new ConvolutionPyramid<I>(KernelFactory.gaussian1D(typeInput,2),typeInput),
 				gradientUpdater);
+	}
+
+	@Override
+	public void spawnTracks() {
+		spawned.clear();
+		
+		trackManager.spawnTracks(basePyramid,derivX,derivY);
+
+		// add new ones
+		for( PyramidKltFeature t : trackManager.getSpawned() ) {
+			// create the AssociatedPair, add it to the active and spawned track lists
+			addSpawnedFeature(t);
+		}
+	}
+
+	@Override
+	public void dropTracks() {
+		trackManager.dropAllTracks();
+		dropped.addAll(active);
+		active.clear();
 	}
 
 	@Override
@@ -157,11 +180,8 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 			t.currLoc.set(p.x,p.y);
 		}
 
-		// add new ones
-		for( PyramidKltFeature t : trackManager.getSpawned() ) {
-			// create the AssociatedPair, add it to the active and spawned track lists
-			addSpawnedFeature(t);
-		}
+		if( !trackManager.getSpawned().isEmpty() )
+			throw new RuntimeException("Bug.  nothing should be spawned here");
 
 	}
 

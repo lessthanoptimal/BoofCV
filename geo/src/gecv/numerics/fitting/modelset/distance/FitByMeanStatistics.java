@@ -26,10 +26,10 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FitByMeanStatistics<T> implements StatisticalFit<T> {
+public class FitByMeanStatistics<Model, Point> implements StatisticalFit<Model,Point> {
 
-	private DistanceFromModel<T> modelError;
-	private List<T> inliers;
+	private DistanceFromModel<Model,Point> modelError;
+	private List<Point> inliers;
 
 	// the number of standard deviations away that points are pruned
 	private double pruneThreshold;
@@ -47,7 +47,7 @@ public class FitByMeanStatistics<T> implements StatisticalFit<T> {
 	}
 
 	@Override
-	public void init(DistanceFromModel<T> modelError, List<T> inliers) {
+	public void init(DistanceFromModel<Model,Point> modelError, List<Point> inliers) {
 		this.modelError = modelError;
 		this.inliers = inliers;
 	}
@@ -63,7 +63,7 @@ public class FitByMeanStatistics<T> implements StatisticalFit<T> {
 		double thresh = stdError * pruneThreshold;
 
 		for (int j = inliers.size() - 1; j >= 0; j--) {
-			T pt = inliers.get(j);
+			Point pt = inliers.get(j);
 
 			// only prune points which are less accurate than the mean
 			if (modelError.computeDistance(pt) - meanError > thresh) {
@@ -85,7 +85,7 @@ public class FitByMeanStatistics<T> implements StatisticalFit<T> {
 
 		int size = inliers.size();
 		for (int i = 0; i < size; i++) {
-			T pt = inliers.get(i);
+			Point pt = inliers.get(i);
 
 			meanError += modelError.computeDistance(pt);
 		}
@@ -98,7 +98,7 @@ public class FitByMeanStatistics<T> implements StatisticalFit<T> {
 		stdError = 0;
 		int size = inliers.size();
 		for (int i = 0; i < size; i++) {
-			T pt = inliers.get(i);
+			Point pt = inliers.get(i);
 
 			double e = modelError.computeDistance(pt) - meanError;
 			stdError += e * e;

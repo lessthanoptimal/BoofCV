@@ -13,6 +13,7 @@
     <orderEntry type="module" module-name="io" />
     <orderEntry type="module" module-name="libpja" />
     <orderEntry type="module" module-name="Feature" />
+    <orderEntry type="module" module-name="Geometric Vision" />
   </component>
 </module>
 

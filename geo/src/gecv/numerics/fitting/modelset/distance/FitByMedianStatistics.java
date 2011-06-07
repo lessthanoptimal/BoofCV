@@ -28,11 +28,11 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FitByMedianStatistics<T> implements StatisticalFit<T> {
+public class FitByMedianStatistics<Model, Point> implements StatisticalFit<Model, Point> {
 
-	private DistanceFromModel<T> modelError;
+	private DistanceFromModel<Model, Point> modelError;
 	// set of points which contains all the inliers
-	private List<T> inliers;
+	private List<Point> inliers;
 
 	// The fraction of samples that are not pruned
 	private double pruneThreshold;
@@ -61,7 +61,7 @@ public class FitByMedianStatistics<T> implements StatisticalFit<T> {
 	}
 
 	@Override
-	public void init(DistanceFromModel<T> modelError, List<T> inliers) {
+	public void init(DistanceFromModel<Model, Point> modelError, List<Point> inliers) {
 		this.modelError = modelError;
 		this.inliers = inliers;
 	}

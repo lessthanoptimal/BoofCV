@@ -40,7 +40,7 @@ public class TestFitByMeanStatistics {
 		// randomize the inputs
 		Collections.sort(inliers);
 
-		FitByMeanStatistics<Double> fit = new FitByMeanStatistics<Double>(1);
+		FitByMeanStatistics<double[],Double> fit = new FitByMeanStatistics<double[],Double>(1);
 
 		fit.init(new DistanceFromMeanModel(), inliers);
 

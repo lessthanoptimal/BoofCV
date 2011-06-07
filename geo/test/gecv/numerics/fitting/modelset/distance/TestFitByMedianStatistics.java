@@ -40,7 +40,7 @@ public class TestFitByMedianStatistics {
 		// randomize the inputs
 		Collections.sort(inliers);
 
-		FitByMedianStatistics<Double> fit = new FitByMedianStatistics<Double>(0.90);
+		FitByMedianStatistics<double[],Double> fit = new FitByMedianStatistics<double[],Double>(0.90);
 
 		fit.init(new DistanceFromMeanModel(), inliers);
 

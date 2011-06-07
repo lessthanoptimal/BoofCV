@@ -37,10 +37,10 @@ public class TestSimpleInlierRansac extends GenericModelSetTests {
 	}
 
 	@Override
-	public ModelMatcher<Double> createModelMatcher(DistanceFromModel<Double> distance,
-												   ModelFitter<Double> fitter,
+	public ModelMatcher<double[],Double> createModelMatcher(DistanceFromModel<double[],Double> distance,
+												   ModelFitter<double[],Double> fitter,
 												   int minPoints,
 												   double fitThreshold) {
-		return new SimpleInlierRansac<Double>(344, fitter, distance, 200, 2, minPoints, 1000, fitThreshold);
+		return new SimpleInlierRansac<double[],Double>(344, fitter, distance, 200, 2, minPoints, 1000, fitThreshold);
 	}
 }

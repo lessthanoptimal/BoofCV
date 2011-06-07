@@ -133,7 +133,7 @@ public class TestSimpleRansacCommon {
 		}
 
 		DebugModelStuff stuff = new DebugModelStuff((int) modelVal);
-		SimpleRansacCommon<Integer> ransac = new RandsacDebug(stuff, stuff);
+		SimpleRansacCommon<double[],Integer> ransac = new RandsacDebug(stuff, stuff);
 		double param[] = new double[]{modelVal};
 
 		ransac.selectMatchSet(dataSet, 4, 5, param);
@@ -141,10 +141,10 @@ public class TestSimpleRansacCommon {
 		assertTrue(ransac.candidatePoints.size() == 7);
 	}
 
-	public static class RandsacDebug extends SimpleRansacCommon<Integer> {
+	public static class RandsacDebug extends SimpleRansacCommon<double[],Integer> {
 
-		public RandsacDebug(ModelFitter<Integer> integerModelFitter,
-							DistanceFromModel<Integer> modelDistance) {
+		public RandsacDebug(ModelFitter<double[],Integer> integerModelFitter,
+							DistanceFromModel<double[],Integer> modelDistance) {
 			super(integerModelFitter, modelDistance, 0, 0);
 		}
 
@@ -160,7 +160,7 @@ public class TestSimpleRansacCommon {
 	}
 
 	public static class DebugModelStuff implements
-			DistanceFromModel<Integer>, ModelFitter<Integer> {
+			DistanceFromModel<double[],Integer>, ModelFitter<double[],Integer> {
 
 		int threshold;
 
@@ -173,7 +173,7 @@ public class TestSimpleRansacCommon {
 		}
 
 		@Override
-		public void setParameters(double[] param) {
+		public void setModel(double[] param) {
 			this.param = param;
 		}
 
@@ -188,12 +188,12 @@ public class TestSimpleRansacCommon {
 		}
 
 		@Override
-		public int getParameterLength() {
-			return 1;
+		public double[] declareModel() {
+			return new double[1];
 		}
 
 		@Override
-		public boolean fitModel(List<Integer> dataSet, double[] p) {
+		public boolean fitModel(List<Integer> dataSet, double []initP, double[] p) {
 			error = 0;
 
 			int offset = (int) p[0];
@@ -207,6 +207,11 @@ public class TestSimpleRansacCommon {
 			error += offset;
 			p[0] = error;
 			return true;
+		}
+
+		@Override
+		public int getMinimumPoints() {
+			return 1;
 		}
 	}
 }

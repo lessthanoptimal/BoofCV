@@ -60,6 +60,16 @@ public interface PointSequentialTracker<T extends ImageBase> {
 	public boolean addTrack( float x , float y );
 
 	/**
+	 * Automatically selects new features in the image to track.
+	 */
+	public void spawnTracks();
+
+	/**
+	 * Drops all feature currently being tracked
+	 */
+	public void dropTracks();
+
+	/**
 	 * Sets the current frame to be the key frame.  If configured to spawn new features, a new
 	 * feature will be spawned here.
 	 */

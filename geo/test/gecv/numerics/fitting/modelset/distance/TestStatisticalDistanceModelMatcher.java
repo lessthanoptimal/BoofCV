@@ -16,10 +16,7 @@
 
 package gecv.numerics.fitting.modelset.distance;
 
-import gecv.numerics.fitting.modelset.DistanceFromModel;
-import gecv.numerics.fitting.modelset.GenericModelSetTests;
-import gecv.numerics.fitting.modelset.ModelFitter;
-import gecv.numerics.fitting.modelset.ModelMatcher;
+import gecv.numerics.fitting.modelset.*;
 import org.junit.Test;
 
 /**
@@ -34,11 +31,30 @@ public class TestStatisticalDistanceModelMatcher extends GenericModelSetTests {
 	}
 
 	@Override
-	public ModelMatcher<Double> createModelMatcher(DistanceFromModel<Double> distance,
-												   ModelFitter<Double> fitter,
+	public ModelMatcher<double[],Double> createModelMatcher(DistanceFromModel<double[],Double> distance,
+												   ModelFitter<double[],Double> fitter,
 												   int minPoints, double fitThreshold) {
-		return new StatisticalDistanceModelMatcher<Double>(5, 0, 0, 10000, minPoints,
+		return new StatisticalDistanceModelMatcher<double[],Double>(5, 0, 0, 10000, minPoints,
 				StatisticalDistance.PERCENTILE,
-				0.95, fitter, distance);
+				0.95, fitter, distance, new ArrayCodec());
+	}
+
+	private static class ArrayCodec implements ModelCodec<double[]>
+	{
+
+		@Override
+		public double[] decode(double[] param, double[] outputModel) {
+			return param;
+		}
+
+		@Override
+		public double[] encode(double[] model, double[] param) {
+			return model;
+		}
+
+		@Override
+		public int getParamLength() {
+			return 1;
+		}
 	}
 }

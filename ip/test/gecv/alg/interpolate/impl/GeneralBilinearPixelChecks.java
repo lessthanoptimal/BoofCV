@@ -19,7 +19,6 @@ package gecv.alg.interpolate.impl;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.FactorySingleBandImage;
-import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
 import gecv.core.image.border.ImageBorder;
 import gecv.core.image.border.ImageBorderExtended;
@@ -32,11 +31,6 @@ import gecv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 public abstract class GeneralBilinearPixelChecks<T extends ImageBase> extends GeneralInterpolationPixelChecks<T> {
-
-	@Override
-	protected void randomize(T image) {
-		GeneralizedImageOps.randomize(image,0,20,rand);
-	}
 
 	@Override
 	protected InterpolatePixel<T> wrap(T image) {

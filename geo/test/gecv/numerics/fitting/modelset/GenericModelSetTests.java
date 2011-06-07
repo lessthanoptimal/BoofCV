@@ -65,7 +65,7 @@ public abstract class GenericModelSetTests {
 
 		// generate the points with a smaller tolerance to account for fitting error
 		// later on.
-		ModelMatcher<Double> alg = createModel(4, tol * 0.95);
+		ModelMatcher<double[],Double> alg = createModel(4, tol * 0.95);
 
 		List<Double> samples = createSampleSet(100, mean, tol, 0.1);
 
@@ -75,7 +75,7 @@ public abstract class GenericModelSetTests {
 
 		if (checkInlierSet)
 			assertTrue(matchSet.size() / 90.0 >= minMatchFrac);
-		assertEquals(inlierMean, alg.getParameters()[0], parameterTol);
+		assertEquals(inlierMean, alg.getModel()[0], parameterTol);
 	}
 
 	/**
@@ -88,7 +88,7 @@ public abstract class GenericModelSetTests {
 
 		// generate the points with a smaller tolerance to account for fitting error
 		// later on.
-		ModelMatcher<Double> alg = createModel(4, tol);
+		ModelMatcher<double[],Double> alg = createModel(4, tol);
 
 		for (int i = 0; i < 10; i++) {
 			// try different sample sizes in each trial.  a bug was found once where
@@ -100,7 +100,7 @@ public abstract class GenericModelSetTests {
 
 			List<Double> matchSet = alg.getMatchSet();
 
-			double foundMean = alg.getParameters()[0];
+			double foundMean = alg.getModel()[0];
 
 			if (checkInlierSet)
 				assertTrue(matchSet.size() / (N * 0.9) >= minMatchFrac);
@@ -149,15 +149,15 @@ public abstract class GenericModelSetTests {
 		return ret;
 	}
 
-	private ModelMatcher<Double> createModel(int minPoints, double fitThreshold) {
+	private ModelMatcher<double[],Double> createModel(int minPoints, double fitThreshold) {
 		DistanceFromMeanModel dist = new DistanceFromMeanModel();
 		MeanModelFitter fitter = new MeanModelFitter();
 
 		return createModelMatcher(dist, fitter, minPoints, fitThreshold);
 	}
 
-	public abstract ModelMatcher<Double> createModelMatcher(
-			DistanceFromModel<Double> distance, ModelFitter<Double> fitter, int minPoints, double fitThreshold);
+	public abstract ModelMatcher<double[],Double> createModelMatcher(
+			DistanceFromModel<double[],Double> distance, ModelFitter<double[],Double> fitter, int minPoints, double fitThreshold);
 
 
 }

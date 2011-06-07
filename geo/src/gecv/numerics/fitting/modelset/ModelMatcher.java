@@ -24,34 +24,37 @@ import java.util.List;
  * Finds a set of points and parameters which fit a model.  Some of the points are assumed to be noise
  * and are pruned.  Different {@link ModelMatcher}s will do better jobs depending on the noise's characteristics.
  * </p>
- * 
+ *
+ * @param <Model> Type of model being fitted.
+ * @param <Point> Type of data point being fitted.
+ *
  * @author Peter Abeles
  */
-public interface ModelMatcher<T> {
+public interface ModelMatcher<Model, Point> {
 
 	/**
 	 * Finds a set of points from the provided list that are a good fit for the internal model and
 	 * computes the fit parameters for the model.
 	 *
 	 * @param dataSet Set of points (with noise) that are to be fit.
-	 * @param paramInital An initial guess for what the model parameters might be.
+	 * @param initialGuess An initial guess for what the model parameters might be. Can be null.
 	 * @return If it found a solution or not.
 	 */
-	public boolean process(List<T> dataSet, double[] paramInital);
+	public boolean process(List<Point> dataSet, Model initialGuess);
 
 	/**
-	 * Parameters of the matched set.
+	 * Model for the match set
 	 *
-	 * @return parameters.
+	 * @return model.
 	 */
-	public double[] getParameters();
+	public Model getModel();
 
 	/**
 	 * A set of points which match the provided parameters.
 	 *
 	 * @return List of points in the match set.
 	 */
-	public List<T> getMatchSet();
+	public List<Point> getMatchSet();
 
 	/**
 	 * Returns the error of the matched set of points.  No guarantee is made for a larger

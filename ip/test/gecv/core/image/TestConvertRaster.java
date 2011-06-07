@@ -27,6 +27,8 @@ import sun.awt.image.IntegerInterleavedRaster;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import static org.junit.Assert.fail;
+
 /**
  * @author Peter Abeles
  */
@@ -36,6 +38,11 @@ public class TestConvertRaster {
 
 	int imgWidth = 10;
 	int imgHeight = 20;
+
+	@Test
+	public void stuff() {
+		fail("Automate with reflection and add new floating point");
+	}
 
 	@Test
 	public void bufferedToGray_U8_ByteInterleaved() {

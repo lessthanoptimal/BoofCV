@@ -100,7 +100,16 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage grayMagnitude( ImageInteger src, BufferedImage dst, int maxValue )
+	public static BufferedImage grayMagnitude( ImageBase src, BufferedImage dst, float maxValue )
+	{
+		if( src.isInteger() ) {
+			return grayMagnitude((ImageInteger)src,dst,(int)maxValue);
+		} else {
+			return grayMagnitude((ImageFloat32)src,dst,maxValue);
+		}
+	}
+
+	private static BufferedImage grayMagnitude( ImageInteger src, BufferedImage dst, int maxValue )
 	{
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
