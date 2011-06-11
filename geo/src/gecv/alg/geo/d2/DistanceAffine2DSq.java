@@ -26,9 +26,16 @@ import java.util.List;
 
 
 /**
+ * <p>
+ * Applies an affine transformation to the associated pair and computes the euclidean distance
+ * squared between their locations.  This reduces computations by avoiding the square root
+ * functions, which is computationally expensive. While both this error metric and euclidean
+ * distance have the same minimum, this exaggerates the magnitude of outliers.
+ * </p>
+ * 
  * @author Peter Abeles
  */
-public class DistanceAffine2D_N2 implements DistanceFromModel<Affine2D_F32,AssociatedPair> {
+public class DistanceAffine2DSq implements DistanceFromModel<Affine2D_F32,AssociatedPair> {
 
 	Affine2D_F32 model;
 	Point2D_F32 expected = new Point2D_F32();

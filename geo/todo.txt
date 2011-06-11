@@ -3,6 +3,8 @@
   * compare different robustness
   * evaluation app
 
+- Panoramic Images
+
 - Camera Calibration
 
 

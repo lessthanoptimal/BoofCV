@@ -41,6 +41,8 @@ import java.awt.image.BufferedImage;
 public class StabilizeImageSequenceBase <I extends ImageBase>
 		extends ProcessImageSequence<I>
 {
+	EvaluateImageStabilization<I> evaluator = new EvaluateImageStabilization<I>();
+
 	DrawAssociatedPairs drawFeatures = new DrawAssociatedPairs(3);
 	PointImageStabilization<I> stabilizer;
 
@@ -64,6 +66,7 @@ public class StabilizeImageSequenceBase <I extends ImageBase>
 
 	@Override
 	public void updateGUI(BufferedImage guiImage, I origImage) {
+		evaluator.update(origImage,stabilizer.getDistortion(),stabilizer.isKeyFrame());
 
 		I stabilizedImage = stabilizer.getStabilizedImage();
 		stabilizedBuff = ConvertBufferedImage.convertTo(stabilizedImage,stabilizedBuff);
@@ -85,5 +88,10 @@ public class StabilizeImageSequenceBase <I extends ImageBase>
 			panelOriginal.setBufferedImage(guiImage);
 			panelOriginal.repaint();
 		}
+	}
+
+	@Override
+	public void finishedSequence() {
+		evaluator.printMetrics();
 	}
 }

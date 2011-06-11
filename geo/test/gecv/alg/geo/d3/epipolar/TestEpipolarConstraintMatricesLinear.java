@@ -14,33 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.alg.geo.d2;
+package gecv.alg.geo.d3.epipolar;
 
-import gecv.struct.distort.PixelDistort;
-import jgrl.struct.affine.Affine2D_F32;
-import jgrl.struct.point.Point2D_F32;
-import jgrl.transform.affine.AffinePointOps;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
 /**
- * Distorts pixels using {@link Affine2D_F32}.
- *
  * @author Peter Abeles
  */
-public class PixelDistortAffine extends PixelDistort {
-
-	Affine2D_F32 affine = new Affine2D_F32();
-	Point2D_F32 tran = new Point2D_F32();
-
-	public void set( Affine2D_F32 affine ) {
-		this.affine.set(affine);
-	}
-
-
-	@Override
-	public void distort(int x, int y) {
-		AffinePointOps.transform(affine,x,y,tran);
-		distX = tran.x;
-		distY = tran.y;
+public class TestEpipolarConstraintMatricesLinear {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

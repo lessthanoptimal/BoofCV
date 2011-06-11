@@ -121,6 +121,7 @@ public abstract class ProcessImageSequence<T extends ImageBase> implements Mouse
 			}
 		}
 
+		finishedSequence();
 		printFPS(totalTime, numFrames, startNano);
 		sequence.close();
 	}
@@ -136,6 +137,11 @@ public abstract class ProcessImageSequence<T extends ImageBase> implements Mouse
 	public abstract void processFrame(T image);
 
 	public abstract void updateGUI(BufferedImage guiImage, T origImage);
+
+	/**
+	 * Called after all the frames in the sequence have been processed.
+	 */
+	public void finishedSequence(){}
 
 
 	@Override
