@@ -29,6 +29,7 @@ import gecv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import jgrl.struct.affine.Affine2D_F32;
+import jgrl.struct.affine.Affine2D_F64;
 
 
 /**
@@ -54,7 +55,7 @@ public class StabilizeImageSequence_F32 extends StabilizeImageSequenceBase<Image
 		thresholdDistance = 50;
 	}
 
-	private ModelMatcher<Affine2D_F32,AssociatedPair> createModelMatcher() {
+	private ModelMatcher<Affine2D_F64,AssociatedPair> createModelMatcher() {
 		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
 		DistanceAffine2DSq distance = new DistanceAffine2DSq();
 //		DistanceAffine2D distance = new DistanceAffine2D();
@@ -62,7 +63,7 @@ public class StabilizeImageSequence_F32 extends StabilizeImageSequenceBase<Image
 
 		int numSample =  modelFitter.getMinimumPoints();
 
-		return new SimpleInlierRansac<Affine2D_F32,AssociatedPair>(123123,
+		return new SimpleInlierRansac<Affine2D_F64,AssociatedPair>(123123,
 				modelFitter,distance,30,numSample,numSample,10000,1.0);
 
 //		return new LeastMedianOfSquares<Affine2D_F32,AssociatedPair>(123123,
@@ -85,7 +86,7 @@ public class StabilizeImageSequence_F32 extends StabilizeImageSequenceBase<Image
 
 		PointSequentialTracker<ImageFloat32> tracker =
 				new PstWrapperKltPyramid<ImageFloat32,ImageFloat32>(trackManager);
-		ModelMatcher<Affine2D_F32,AssociatedPair> fitter = createModelMatcher();
+		ModelMatcher<Affine2D_F64,AssociatedPair> fitter = createModelMatcher();
 
 		PointImageStabilization<ImageFloat32> app = new PointImageStabilization<ImageFloat32>(
 				ImageFloat32.class,tracker,fitter,thresholdChange,thresholdReset,thresholdDistance);

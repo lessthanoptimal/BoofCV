@@ -18,7 +18,6 @@ package gecv.alg.geo.d3.epipolar;
 
 import gecv.alg.geo.AssociatedPair;
 import jgrl.geometry.GeometryMath;
-import jgrl.struct.point.Point2D_F32;
 import jgrl.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -128,17 +127,17 @@ public class UtilEpipolar {
             AssociatedPair pixelPair = pixels.get(i);
             AssociatedPair normPair = norms.get(i);
 
-            Point2D_F32 p = pixelPair.keyLoc;
-            Point2D_F32 n = normPair.keyLoc;
+            Point2D_F64 p = pixelPair.keyLoc;
+            Point2D_F64 n = normPair.keyLoc;
 
-            n.x = (float)((p.x*k00 + p.y*k01 + k02)/k22);
-            n.y = (float)((p.y*k11 + k12)/k22);
+            n.x = (p.x*k00 + p.y*k01 + k02)/k22;
+            n.y = (p.y*k11 + k12)/k22;
 
             p = pixelPair.currLoc;
             n = normPair.currLoc;
 
-            n.x = (float)((p.x*k00 + p.y*k01 + k02)/k22);
-            n.y = (float)((p.y*k11 + k12)/k22);
+            n.x = (p.x*k00 + p.y*k01 + k02)/k22;
+            n.y = (p.y*k11 + k12)/k22;
 
 //            System.out.println("normed "+n.x+" "+n.y);
         }

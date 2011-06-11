@@ -17,7 +17,7 @@
 package gecv.alg.geo.d3.epipolar;
 
 import gecv.alg.geo.AssociatedPair;
-import jgrl.struct.point.Point2D_F32;
+import jgrl.struct.point.Point2D_F64;
 import org.ejml.alg.dense.decomposition.DecompositionFactory;
 import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.alg.dense.mult.VectorVectorMult;
@@ -247,15 +247,15 @@ public class EpipolarConstraintMatricesLinear {
         A.reshape(points.size(),9, false);
         A.zero();
 
-        Point2D_F32 f_norm = new Point2D_F32();
-        Point2D_F32 s_norm = new Point2D_F32();
+        Point2D_F64 f_norm = new Point2D_F64();
+        Point2D_F64 s_norm = new Point2D_F64();
 
         final int size = points.size();
         for( int i = 0; i < size; i++ ) {
             AssociatedPair p = points.get(i);
 
-            Point2D_F32 f = p.keyLoc;
-            Point2D_F32 s = p.currLoc;
+            Point2D_F64 f = p.keyLoc;
+            Point2D_F64 s = p.currLoc;
 
             // normalize the points
             normalize(f,f_norm,N1);
@@ -288,8 +288,8 @@ public class EpipolarConstraintMatricesLinear {
         for( int i = 0; i < size; i++ ) {
             AssociatedPair p = points.get(i);
 
-            Point2D_F32 f = p.keyLoc;
-            Point2D_F32 s = p.currLoc;
+            Point2D_F64 f = p.keyLoc;
+            Point2D_F64 s = p.currLoc;
 
             // perform the Kronecker product with the two points being in
             // homogeneous coordinates (z=1)
@@ -315,17 +315,17 @@ public class EpipolarConstraintMatricesLinear {
         A.reshape(points.size()*2,9, false);
         A.zero();
 
-        Point2D_F32 f_norm = new Point2D_F32();
-        Point2D_F32 s_norm = new Point2D_F32();
+        Point2D_F64 f_norm = new Point2D_F64();
+        Point2D_F64 s_norm = new Point2D_F64();
 
         final int size = points.size();
         for( int i = 0; i < size; i++ ) {
             AssociatedPair p = points.get(i);
 
             // the first image
-            Point2D_F32 f = p.keyLoc;
+            Point2D_F64 f = p.keyLoc;
             // the second image
-            Point2D_F32 s = p.currLoc;
+            Point2D_F64 s = p.currLoc;
 
             // normalize the points
             normalize(f,f_norm,N1);
@@ -398,10 +398,10 @@ public class EpipolarConstraintMatricesLinear {
     /**
      * Given the normalization matrix it will normalize the point
      */
-    private void normalize( Point2D_F32 orig , Point2D_F32 normed , DenseMatrix64F N ) {
+    private void normalize( Point2D_F64 orig , Point2D_F64 normed , DenseMatrix64F N ) {
         
-        normed.x = (float)(orig.x * N.get(0,0) + N.get(0,2));
-        normed.y = (float)(orig.y * N.get(1,1) + N.get(1,2));
+        normed.x = orig.x * N.get(0,0) + N.get(0,2);
+        normed.y = orig.y * N.get(1,1) + N.get(1,2);
 
 //        normed.x = orig.x;
 //        normed.y = orig.y;

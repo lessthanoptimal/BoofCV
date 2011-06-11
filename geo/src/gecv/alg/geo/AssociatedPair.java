@@ -16,7 +16,7 @@
 
 package gecv.alg.geo;
 
-import jgrl.struct.point.Point2D_F32;
+import jgrl.struct.point.Point2D_F64;
 
 
 /**
@@ -42,15 +42,15 @@ public class AssociatedPair {
 	/**
 	 * Location of the feature in the key frame.
 	 */
-	public Point2D_F32 keyLoc;
+	public Point2D_F64 keyLoc;
 	/**
 	 * Location of the feature in the current.
 	 */
-	public Point2D_F32 currLoc;
+	public Point2D_F64 currLoc;
 
 	public AssociatedPair() {
-		keyLoc = new Point2D_F32();
-		currLoc = new Point2D_F32();
+		keyLoc = new Point2D_F64();
+		currLoc = new Point2D_F64();
 	}
 
 	/**
@@ -62,11 +62,11 @@ public class AssociatedPair {
 	 * @param x2 current location x-axis.
 	 * @param y2 current location y-axis.
 	 */
-	public AssociatedPair(long featureId, float x1, float y1,
-						  float x2, float y2) {
+	public AssociatedPair(long featureId, double x1, double y1,
+						  double x2, double y2) {
 		this.featureId = featureId;
-		keyLoc = new Point2D_F32(x1, y1);
-		currLoc = new Point2D_F32(x2, y2);
+		keyLoc = new Point2D_F64(x1, y1);
+		currLoc = new Point2D_F64(x2, y2);
 	}
 
 	/**
@@ -76,10 +76,10 @@ public class AssociatedPair {
 	 * @param currLoc current location
 	 * @param newInstance Should it create new points or save a reference to these instances.
 	 */
-	public AssociatedPair(Point2D_F32 keyLoc, Point2D_F32 currLoc, boolean newInstance) {
+	public AssociatedPair(Point2D_F64 keyLoc, Point2D_F64 currLoc, boolean newInstance) {
 		if (newInstance) {
-			this.keyLoc = new Point2D_F32(keyLoc);
-			this.currLoc = new Point2D_F32(currLoc);
+			this.keyLoc = new Point2D_F64(keyLoc);
+			this.currLoc = new Point2D_F64(currLoc);
 		} else {
 			this.keyLoc = keyLoc;
 			this.currLoc = currLoc;

@@ -20,7 +20,7 @@ import gecv.alg.geo.AssociatedPair;
 import gecv.alg.geo.PointSequentialTracker;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
-import jgrl.struct.point.Point2D_F32;
+import jgrl.struct.point.Point2D_F64;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -139,7 +139,7 @@ public abstract class StandardPointSequentialTrackerTests {
 
 		// the initial location and the current location should be different
 		assertEquals(5,tracker.getActiveTracks().size());
-		List<Point2D_F32> currPts = new ArrayList<Point2D_F32>();
+		List<Point2D_F64> currPts = new ArrayList<Point2D_F64>();
 		for( AssociatedPair p : tracker.getActiveTracks() ) {
 			currPts.add(p.currLoc.copy());
 			assertTrue(p.currLoc.x != p.keyLoc.x);
@@ -149,7 +149,7 @@ public abstract class StandardPointSequentialTrackerTests {
 		// after set to keyframe is called they should be the same
 		tracker.setCurrentToKeyFrame();
 		for( int i = 0; i < currPts.size(); i++ ) {
-			Point2D_F32 c = currPts.get(i);
+			Point2D_F64 c = currPts.get(i);
 			AssociatedPair p = tracker.getActiveTracks().get(i);
 
 			assertTrue(c.x == p.keyLoc.x);

@@ -17,7 +17,7 @@
 package gecv.gui.geo;
 
 import gecv.alg.geo.AssociatedPair;
-import jgrl.struct.point.Point2D_F32;
+import jgrl.struct.point.Point2D_F64;
 
 import java.awt.*;
 
@@ -54,9 +54,9 @@ public class DrawAssociatedPairs {
 
 		for (int i = 0; i < list.size(); i++) {
 			AssociatedPair p = list.get(i);
-			Point2D_F32 pt = p.currLoc;
+			Point2D_F64 pt = p.currLoc;
 
-			g2.drawString(""+p.featureId,pt.x-10,pt.y-10);
+			g2.drawString(""+p.featureId,(float)(pt.x-10),(float)(pt.y-10));
 		}
 	}
 
@@ -66,7 +66,7 @@ public class DrawAssociatedPairs {
 			return;
 
 		for (int i = 0; i < list.size(); i++) {
-			Point2D_F32 pt = list.get(i).currLoc;
+			Point2D_F64 pt = list.get(i).currLoc;
 
 			int x = (int)pt.x;
 			int y = (int)pt.y;
@@ -84,7 +84,7 @@ public class DrawAssociatedPairs {
 			return;
 
 		for (int i = 0; i < list.size(); i++) {
-			Point2D_F32 pt = list.get(i).keyLoc;
+			Point2D_F64 pt = list.get(i).keyLoc;
 
 			int x = (int)pt.x;
 			int y = (int)pt.y;

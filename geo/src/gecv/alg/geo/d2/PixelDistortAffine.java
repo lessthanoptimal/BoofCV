@@ -18,6 +18,7 @@ package gecv.alg.geo.d2;
 
 import gecv.struct.distort.PixelDistort;
 import jgrl.struct.affine.Affine2D_F32;
+import jgrl.struct.affine.Affine2D_F64;
 import jgrl.struct.point.Point2D_F32;
 import jgrl.transform.affine.AffinePointOps;
 
@@ -34,6 +35,16 @@ public class PixelDistortAffine extends PixelDistort {
 
 	public void set( Affine2D_F32 affine ) {
 		this.affine.set(affine);
+	}
+
+	public void set( Affine2D_F64 affine ) {
+		this.affine.a11 = (float)affine.a11;
+		this.affine.a12 = (float)affine.a12;
+		this.affine.a21 = (float)affine.a21;
+		this.affine.a22 = (float)affine.a22;
+
+		this.affine.tx = (float)affine.tx;
+		this.affine.ty = (float)affine.ty;
 	}
 
 
