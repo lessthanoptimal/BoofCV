@@ -18,8 +18,8 @@ package gecv.alg.geo.d2;
 
 import gecv.alg.geo.AssociatedPair;
 import gecv.numerics.fitting.modelset.DistanceFromModel;
-import jgrl.struct.affine.Affine2D_F32;
-import jgrl.struct.point.Point2D_F32;
+import jgrl.struct.affine.Affine2D_F64;
+import jgrl.struct.point.Point2D_F64;
 import jgrl.transform.affine.AffinePointOps;
 
 import java.util.List;
@@ -35,13 +35,13 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class DistanceAffine2DSq implements DistanceFromModel<Affine2D_F32,AssociatedPair> {
+public class DistanceAffine2DSq implements DistanceFromModel<Affine2D_F64,AssociatedPair> {
 
-	Affine2D_F32 model;
-	Point2D_F32 expected = new Point2D_F32();
+	Affine2D_F64 model;
+	Point2D_F64 expected = new Point2D_F64();
 
 	@Override
-	public void setModel(Affine2D_F32 model ) {
+	public void setModel(Affine2D_F64 model ) {
 		this.model = model;
 	}
 

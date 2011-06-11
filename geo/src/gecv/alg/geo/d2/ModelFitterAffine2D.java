@@ -18,37 +18,37 @@ package gecv.alg.geo.d2;
 
 import gecv.alg.geo.AssociatedPair;
 import gecv.numerics.fitting.modelset.ModelFitter;
-import jgrl.fitting.affine.MotionAffinePoint2D_F32;
-import jgrl.struct.affine.Affine2D_F32;
-import jgrl.struct.point.Point2D_F32;
+import jgrl.fitting.affine.MotionAffinePoint2D_F64;
+import jgrl.struct.affine.Affine2D_F64;
+import jgrl.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 /**
- * Fits an {@link Affine2D_F32} motion model to a list of {@link AssociatedPair}.
+ * Fits an {@link Affine2D_F64} motion model to a list of {@link AssociatedPair}.
  *
  * @author Peter Abeles
  */
-public class ModelFitterAffine2D implements ModelFitter<Affine2D_F32,AssociatedPair> {
+public class ModelFitterAffine2D implements ModelFitter<Affine2D_F64,AssociatedPair> {
 
 	// model affine fitter
-	MotionAffinePoint2D_F32 fitter = new MotionAffinePoint2D_F32();
+	MotionAffinePoint2D_F64 fitter = new MotionAffinePoint2D_F64();
 
 	// key frame points
-	List<Point2D_F32> from = new ArrayList<Point2D_F32>();
+	List<Point2D_F64> from = new ArrayList<Point2D_F64>();
 	// current frame points
-	List<Point2D_F32> to = new ArrayList<Point2D_F32>();
+	List<Point2D_F64> to = new ArrayList<Point2D_F64>();
 
 	@Override
-	public Affine2D_F32 declareModel() {
-		return new Affine2D_F32();
+	public Affine2D_F64 declareModel() {
+		return new Affine2D_F64();
 	}
 
 	@Override
 	public boolean fitModel(List<AssociatedPair> dataSet,
-						 Affine2D_F32 initParam , Affine2D_F32 foundParam) {
+						 Affine2D_F64 initParam , Affine2D_F64 foundParam) {
 		from.clear();
 		to.clear();
 

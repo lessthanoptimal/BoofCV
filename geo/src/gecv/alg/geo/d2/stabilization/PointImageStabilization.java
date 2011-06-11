@@ -27,8 +27,8 @@ import gecv.alg.misc.ImageDistort;
 import gecv.numerics.fitting.modelset.ModelMatcher;
 import gecv.struct.distort.PixelDistort;
 import gecv.struct.image.ImageBase;
-import jgrl.struct.affine.Affine2D_F32;
-import jgrl.struct.point.Point2D_F32;
+import jgrl.struct.affine.Affine2D_F64;
+import jgrl.struct.point.Point2D_F64;
 import jgrl.transform.affine.AffinePointOps;
 
 import java.util.List;
@@ -63,7 +63,7 @@ public class PointImageStabilization<I extends ImageBase > {
 	private PointSequentialTracker<I> tracker;
 
 	// computes the image motion robustly
-	private ModelMatcher<Affine2D_F32,AssociatedPair> fitter;
+	private ModelMatcher<Affine2D_F64,AssociatedPair> fitter;
 	// Computes the location of each pixel in the stabilized image from the current frame
 	private PixelDistortAffine transform = new PixelDistortAffine();
 
@@ -80,17 +80,17 @@ public class PointImageStabilization<I extends ImageBase > {
 	private int thresholdReset;
 
 	// total motion (excluding the current frame) to the reference frame
-	private Affine2D_F32 totalMotion = new Affine2D_F32();
+	private Affine2D_F64 totalMotion = new Affine2D_F64();
 	// predeclared location values used to test if the image motion is too great
-	private Point2D_F32 testPoint = new Point2D_F32();
-	private Point2D_F32 testResult = new Point2D_F32();
+	private Point2D_F64 testPoint = new Point2D_F64();
+	private Point2D_F64 testResult = new Point2D_F64();
 
 	// true if the keyframe has been changed to this frame
 	private boolean referenceFrameChanged;
 
 	public PointImageStabilization( Class<I> imageType ,
 								  PointSequentialTracker tracker ,
-								  ModelMatcher<Affine2D_F32,AssociatedPair> fitter ,
+								  ModelMatcher<Affine2D_F64,AssociatedPair> fitter ,
 								  int thresholdChange ,
 								  int thresholdReset ,
 								  double thresholdDistance ) {
@@ -134,7 +134,7 @@ public class PointImageStabilization<I extends ImageBase > {
 			if( fitter.process(tracks,null) ) {
 
 				// find the transform from the current frame to the keyframe
-				Affine2D_F32 m = totalMotion.concat(fitter.getModel(),null);
+				Affine2D_F64 m = totalMotion.concat(fitter.getModel(),null);
 
 				// see if the distortion is too great
 				AffinePointOps.transform(m,testPoint,testResult);
