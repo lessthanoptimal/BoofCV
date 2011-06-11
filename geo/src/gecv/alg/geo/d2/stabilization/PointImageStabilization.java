@@ -25,6 +25,7 @@ import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.misc.FactoryImageDistort;
 import gecv.alg.misc.ImageDistort;
 import gecv.numerics.fitting.modelset.ModelMatcher;
+import gecv.struct.distort.PixelDistort;
 import gecv.struct.image.ImageBase;
 import jgrl.struct.affine.Affine2D_F32;
 import jgrl.struct.point.Point2D_F32;
@@ -93,7 +94,7 @@ public class PointImageStabilization<I extends ImageBase > {
 								  int thresholdChange ,
 								  int thresholdReset ,
 								  double thresholdDistance ) {
-		if( !(tracker instanceof SingleImageInput) ) {
+		if( !SingleImageInput.class.isAssignableFrom(tracker.getClass()) ) {
 			throw new IllegalArgumentException("Tracker must implement "+SingleImageInput.class);
 		}
 
@@ -123,19 +124,17 @@ public class PointImageStabilization<I extends ImageBase > {
 
 		List<AssociatedPair> tracks = tracker.getActiveTracks();
 
-		boolean reset = false;
+		referenceFrameChanged = false;
 
 		if( tracks.size() < thresholdReset ) {
 			// too few feature remaining to track
-			reset = true;
+			referenceFrameChanged = true;
 		} else {
 			// compute the image motion from the tracks
 			if( fitter.process(tracks,null) ) {
 
 				// find the transform from the current frame to the keyframe
 				Affine2D_F32 m = totalMotion.concat(fitter.getModel(),null);
-				transform.set(m);
-				distort.apply(input,imageOut);
 
 				// see if the distortion is too great
 				AffinePointOps.transform(m,testPoint,testResult);
@@ -143,19 +142,25 @@ public class PointImageStabilization<I extends ImageBase > {
 
 				if( distance2 > thresholdDistance2 ) {
 					// not enough overlap with the reference frame
-					reset = true;
-				} else if( fitter.getMatchSet().size() < thresholdChange ) {
-					// too few features in the inlier set, so change the keyframe
-					totalMotion.set(m);
-					tracker.setCurrentToKeyFrame();
-					tracker.spawnTracks();
+					referenceFrameChanged = true;
+				} else {
+					// render stabilized image
+					transform.set(m);
+					distort.apply(input,imageOut);
+					
+					if( fitter.getMatchSet().size() < thresholdChange ) {
+						// too few features in the inlier set, so change the keyframe
+						totalMotion.set(m);
+						tracker.setCurrentToKeyFrame();
+						tracker.spawnTracks();
+					}
 				}
 			} else {
-				reset = true;
+				referenceFrameChanged = true;
 			}
 		}
 
-		if( reset ) {
+		if( referenceFrameChanged ) {
 			// track has been lost, make this the new keyframe
 			tracker.setCurrentToKeyFrame();
 			tracker.spawnTracks();
@@ -174,5 +179,13 @@ public class PointImageStabilization<I extends ImageBase > {
 
 	public List<AssociatedPair> getInlierFeatures() {
 		return fitter.getMatchSet();
+	}
+
+	public PixelDistort getDistortion() {
+		return transform;
+	}
+
+	public boolean isKeyFrame() {
+		return referenceFrameChanged;
 	}
 }

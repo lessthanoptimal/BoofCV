@@ -49,6 +49,9 @@ public class DrawAssociatedPairs {
 
 	public void drawNumber(Graphics2D g2, java.util.List<AssociatedPair> list ) {
 
+		if( list == null )
+			return;
+
 		for (int i = 0; i < list.size(); i++) {
 			AssociatedPair p = list.get(i);
 			Point2D_F32 pt = p.currLoc;
@@ -58,6 +61,9 @@ public class DrawAssociatedPairs {
 	}
 
 	public void drawCurrent(Graphics2D g2, java.util.List<AssociatedPair> list ) {
+
+		if( list == null )
+			return;
 
 		for (int i = 0; i < list.size(); i++) {
 			Point2D_F32 pt = list.get(i).currLoc;
@@ -73,6 +79,9 @@ public class DrawAssociatedPairs {
 	}
 
 	public void drawKey(Graphics2D g2, java.util.List<AssociatedPair> list ) {
+
+		if( list == null )
+			return;
 
 		for (int i = 0; i < list.size(); i++) {
 			Point2D_F32 pt = list.get(i).keyLoc;

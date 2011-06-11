@@ -54,25 +54,38 @@ public class StabilizeImageSequence_F32 extends StabilizeImageSequenceBase<Image
 		thresholdDistance = 50;
 	}
 
-	public void createAlg( int width , int height ) {
-		stabilizer = new PointImageStabilization<ImageFloat32>(
-				ImageFloat32.class,tracker,fitter,thresholdChange,thresholdReset,thresholdDistance);
+	private ModelMatcher<Affine2D_F32,AssociatedPair> createModelMatcher() {
+		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
+		DistanceAffine2DSq distance = new DistanceAffine2DSq();
+//		DistanceAffine2D distance = new DistanceAffine2D();
+		Affine2DCodec codec = new Affine2DCodec();
 
+		int numSample =  modelFitter.getMinimumPoints();
+
+		return new SimpleInlierRansac<Affine2D_F32,AssociatedPair>(123123,
+				modelFitter,distance,30,numSample,numSample,10000,1.0);
+
+//		return new LeastMedianOfSquares<Affine2D_F32,AssociatedPair>(123123,
+//				numSample,25,1.1,0.6,modelFitter,distance);
+
+//		return new StatisticalDistanceModelMatcher<Affine2D_F32,AssociatedPair>(25,0.001,0.001,1.2,
+//				numSample, StatisticalDistance.MEAN,2,modelFitter,distance,codec);
+
+//		return new StatisticalDistanceModelMatcher<Affine2D_F32,AssociatedPair>(25,0.001,0.001,1.2,
+//				numSample, StatisticalDistance.PERCENTILE,0.9,modelFitter,distance,codec);
+
+	}
+
+	public void createAlg( int width , int height ) {
 		PkltManagerConfig<ImageFloat32, ImageFloat32> config =
 				PkltManagerConfig.createDefault(ImageFloat32.class,ImageFloat32.class,width,height);
-		config.minFeatures = 0;
+//		config.pyramidScaling = new int[]{2,2,2};
 		config.maxFeatures = maxFeatures;
-		PkltManager<ImageFloat32, ImageFloat32> trackManager =
-				new PkltManager<ImageFloat32, ImageFloat32>(config);
-
-		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
-		DistanceAffine2D_N2 distance = new DistanceAffine2D_N2();
+		PkltManager<ImageFloat32, ImageFloat32> trackManager = new PkltManager<ImageFloat32, ImageFloat32>(config);
 
 		PointSequentialTracker<ImageFloat32> tracker =
 				new PstWrapperKltPyramid<ImageFloat32,ImageFloat32>(trackManager);
-		ModelMatcher<Affine2D_F32,AssociatedPair> fitter =
-				new SimpleInlierRansac<Affine2D_F32,AssociatedPair>(123123,
-				modelFitter,distance,30,modelFitter.getMinimumPoints(),modelFitter.getMinimumPoints(),10000,1.0);
+		ModelMatcher<Affine2D_F32,AssociatedPair> fitter = createModelMatcher();
 
 		PointImageStabilization<ImageFloat32> app = new PointImageStabilization<ImageFloat32>(
 				ImageFloat32.class,tracker,fitter,thresholdChange,thresholdReset,thresholdDistance);
@@ -84,8 +97,9 @@ public class StabilizeImageSequence_F32 extends StabilizeImageSequenceBase<Image
 		String fileName;
 
 		if (args.length == 0) {
+//			fileName = "/home/pja/00004.MTS";
+//			fileName = "/home/pja/kayak_shake.mpg";
 			fileName = "/mnt/data/datasets/2010/snow_videos/snow_norail_stabilization.avi";
-//			fileName = "/mnt/data/datasets/2010/snow_videos/snow_long_drive.avi";
 		} else {
 			fileName = args[0];
 		}

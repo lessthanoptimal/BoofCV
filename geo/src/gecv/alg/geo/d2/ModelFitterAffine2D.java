@@ -27,9 +27,10 @@ import java.util.List;
 
 
 /**
+ * Fits an {@link Affine2D_F32} motion model to a list of {@link AssociatedPair}.
+ *
  * @author Peter Abeles
  */
-// todo comment
 public class ModelFitterAffine2D implements ModelFitter<Affine2D_F32,AssociatedPair> {
 
 	// model affine fitter

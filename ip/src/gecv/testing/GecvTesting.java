@@ -435,6 +435,16 @@ public class GecvTesting {
 		}
 	}
 
+	public static void checkEquals(BufferedImage imgA, ImageBase imgB , double tol ) {
+		if( ImageUInt8.class == imgB.getClass()) {
+			checkEquals(imgA,(ImageUInt8)imgB);
+		} else if( ImageFloat32.class == imgB.getClass()) {
+			checkEquals(imgA,(ImageFloat32)imgB,(float)tol);
+		} else if( ImageInterleavedInt8.class == imgB.getClass()) {
+			checkEquals(imgA,(ImageInterleavedInt8)imgB);
+		}
+	}
+
 	/**
 	 * Checks to see if the BufferedImage has the same intensity values as the ImageUInt8
 	 *

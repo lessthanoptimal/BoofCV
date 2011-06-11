@@ -123,11 +123,6 @@ public class TestConvertBufferedImage {
 	}
 
 	@Test
-	public void stuff() {
-		fail("Automate convert with reflection and add new floating point");
-	}
-
-	@Test
 	public void convertFrom_generic() {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
 
@@ -181,6 +176,21 @@ public class TestConvertBufferedImage {
 		ConvertBufferedImage.convertTo(srcImg, dstImg);
 
 		GecvTesting.checkEquals(dstImg, srcImg);
+	}
+
+	@Test
+	public void convertTo_F32() {
+		ImageFloat32 srcImg = new ImageFloat32(imgWidth, imgHeight);
+		ImageTestingOps.randomize(srcImg, rand, 0, 100);
+
+		GecvTesting.checkSubImage(this, "convertTo_F32", true, srcImg);
+	}
+
+	public void convertTo_F32( ImageFloat32 srcImg) {
+		BufferedImage dstImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
+		ConvertBufferedImage.convertTo(srcImg, dstImg);
+
+		GecvTesting.checkEquals(dstImg, srcImg, 1f);
 	}
 
 	@Test
