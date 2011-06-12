@@ -31,6 +31,7 @@ import java.util.List;
  * squared between their locations.  This reduces computations by avoiding the square root
  * functions, which is computationally expensive. While both this error metric and euclidean
  * distance have the same minimum, this exaggerates the magnitude of outliers.
+ * The transform is applied to the "keyLoc".
  * </p>
  * 
  * @author Peter Abeles

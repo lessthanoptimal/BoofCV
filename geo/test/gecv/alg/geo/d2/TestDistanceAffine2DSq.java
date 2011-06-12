@@ -16,17 +16,30 @@
 
 package gecv.alg.geo.d2;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import gecv.alg.geo.AssociatedPair;
+import gecv.numerics.fitting.modelset.DistanceFromModel;
+import jgrl.struct.affine.Affine2D_F64;
+import jgrl.struct.point.Point2D_F64;
+import jgrl.transform.affine.AffinePointOps;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestDistanceAffine2D_N2 {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestDistanceAffine2DSq extends TestDistanceAffine2D {
+
+	@Override
+	public DistanceFromModel<Affine2D_F64, AssociatedPair> create() {
+		return new DistanceAffine2DSq();
+	}
+
+	@Override
+	public double distance(Affine2D_F64 affine, AssociatedPair associatedPair) {
+
+		Point2D_F64 result = new Point2D_F64();
+
+		AffinePointOps.transform(affine,associatedPair.keyLoc,result);
+
+		return result.distance2(associatedPair.currLoc);
 	}
 }

@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * Applies an affine transformation to the associated pair and computes the euclidean distance
- * between their locations.
+ * between their locations.  The transform is applied to the "keyLoc".
  *
  * @author Peter Abeles
  */

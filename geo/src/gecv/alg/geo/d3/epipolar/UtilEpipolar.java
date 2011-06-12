@@ -17,7 +17,7 @@
 package gecv.alg.geo.d3.epipolar;
 
 import gecv.alg.geo.AssociatedPair;
-import jgrl.geometry.GeometryMath;
+import jgrl.geometry.GeometryMath_F64;
 import jgrl.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -96,7 +96,7 @@ public class UtilEpipolar {
     }
 
     public static void pixelToNormalized( DenseMatrix64F K_inv , Point2D_F64 pixel , Point2D_F64 norm ) {
-        GeometryMath.mult(K_inv,pixel,norm);
+        GeometryMath_F64.mult(K_inv,pixel,norm);
     }
 
     /**

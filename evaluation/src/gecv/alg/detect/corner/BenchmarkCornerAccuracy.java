@@ -32,7 +32,7 @@ import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 import jgrl.struct.point.Point2D_F64;
 import jgrl.struct.point.Point2D_I16;
-import jgrl.struct.point.UtilPoint2D;
+import jgrl.struct.point.UtilPoint2D_F64;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -173,7 +173,7 @@ public class BenchmarkCornerAccuracy {
 			for( int i = 0; i < foundCorners.size(); i++ ) {
 				Point2D_I16 p = foundCorners.get(i);
 
-				double dist = UtilPoint2D.distance(c.x,c.y,p.x,p.y);
+				double dist = UtilPoint2D_F64.distance(c.x,c.y,p.x,p.y);
 
 				if( bestPoint == null || dist < bestDistance ) {
 					bestDistance = dist;
