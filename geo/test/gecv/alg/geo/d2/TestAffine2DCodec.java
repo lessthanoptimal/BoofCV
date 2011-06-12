@@ -16,17 +16,61 @@
 
 package gecv.alg.geo.d2;
 
+import jgrl.struct.affine.Affine2D_F32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 
 /**
  * @author Peter Abeles
  */
 public class TestAffine2DCodec {
+
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void encode() {
+		Affine2DCodec codec = new Affine2DCodec();
+
+		Affine2D_F32 model = new Affine2D_F32(1,2,3,4,5,6);
+		double param[] = new double[6];
+
+		codec.encode(model,param);
+
+		for( int i = 0; i < 6; i++ ) {
+			assertEquals(i+1,param[i],1e-6);
+		}
+
+		// decode
+		model = new Affine2D_F32();
+		codec.decode(param,model);
+
+		assertEquals(1,model.a11,1e-4);
+		assertEquals(2,model.a12,1e-4);
+		assertEquals(3,model.a21,1e-4);
+		assertEquals(4,model.a22,1e-4);
+		assertEquals(5,model.tx,1e-4);
+		assertEquals(6,model.ty,1e-4);
+	}
+
+	@Test
+	public void decode() {
+		Affine2DCodec codec = new Affine2DCodec();
+
+		Affine2D_F32 model = new Affine2D_F32();
+		double param[] = new double[6];
+
+
+		for( int i = 0; i < 6; i++ ) {
+			param[i] = i+1;
+		}
+
+		codec.decode(param,model);
+
+		assertEquals(1,model.a11,1e-4);
+		assertEquals(2,model.a12,1e-4);
+		assertEquals(3,model.a21,1e-4);
+		assertEquals(4,model.a22,1e-4);
+		assertEquals(5,model.tx,1e-4);
+		assertEquals(6,model.ty,1e-4);
 	}
 }
