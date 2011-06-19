@@ -16,7 +16,7 @@
 
 package gecv.struct.distort;
 
-import jgrl.struct.point.Point2D_F64;
+import jgrl.struct.point.Point2D_F32;
 
 
 /**
@@ -26,10 +26,57 @@ import jgrl.struct.point.Point2D_F64;
  */
 public class PixelDistortMap extends PixelDistort {
 
-	Point2D_F64 map[];
+	int width;
+	int height;
+	Point2D_F32 map[];
+
+	public PixelDistortMap( int width , int height ) {
+		this.width = width;
+		this.height = height;
+
+		map = new Point2D_F32[width*height];
+		for( int i = 0; i < map.length; i++ ) {
+			map[i] = new Point2D_F32();
+		}
+	}
+
+	/**
+	 * Sets the map using another {@link PixelDistort} to compute the distortion.
+	 *
+	 * @param distortion Distortion which is being precomputed.
+	 */
+	public void set( PixelDistort distortion ) {
+		int index = 0;
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				distortion.distort(x,y);
+				map[index++].set(distortion.distX,distortion.distY);
+			}
+		}
+	}
+
+	/**
+	 * Sets the transform for a specific pixel.
+	 *
+	 * @param x Original pixel x-coordinate.
+	 * @param y Original pixel y-coordinate.
+	 * @param distX Distorted pixel x-coordinate.
+	 * @param distY Distorted pixel y-coordinate.
+	 */
+	public void set( int x , int y , float distX , float distY ) {
+		if( x < 0 || x >= width )
+			throw new IllegalArgumentException("x is out of bounds");
+		if( y < 0 || y >= height )
+			throw new IllegalArgumentException("y is out of bounds");
+
+		map[y*width + x].set(distX,distY);
+	}
 
 	@Override
 	public void distort(int x, int y) {
+		Point2D_F32 p = map[y*width+x];
+		distX = p.x;
+		distY = p.y;
 	}
 
 }

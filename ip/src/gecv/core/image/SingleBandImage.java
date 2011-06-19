@@ -16,6 +16,8 @@
 
 package gecv.core.image;
 
+import gecv.struct.image.ImageBase;
+
 /**
  * Generalized interface for single banded images.  Due to the slow performance associated with working with this
  * interface its usage is not recommended except for testing purposes.
@@ -33,4 +35,6 @@ public interface SingleBandImage {
 	Number get( int x , int y );
 
 	void set( int x , int y , Number num );
+
+	ImageBase getImage();
 }

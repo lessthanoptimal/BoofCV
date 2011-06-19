@@ -41,8 +41,15 @@ public class ImageBorderValue {
 			super(image);
 			this.value = value;
 		}
+
+		@Override
 		public float getOutside( int x , int y ) {
 			return value;
+		}
+
+		@Override
+		public void setOutside(int x, int y, float val) {
+			// do nothing since it is a constant value
 		}
 	}
 
@@ -53,8 +60,15 @@ public class ImageBorderValue {
 			super(image);
 			this.value = value;
 		}
+
+		@Override
 		public int getOutside( int x , int y ) {
 			return value;
+		}
+
+		@Override
+		public void setOutside(int x, int y, int value) {
+			// do nothing since it is a constant
 		}
 	}
 }

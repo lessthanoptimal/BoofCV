@@ -54,12 +54,12 @@ public class ConvolveDownNoBorderStandard {
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
-			int j = input.startIndex+ i*input.stride;
+			int j = input.startIndex + i*input.stride - radius;
 			final int jEnd = j+widthEnd;
 
 			for( j += offsetX; j <= jEnd; j += skip ) {
 				float total = 0;
-				int indexSrc = j-radius;
+				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc++] ) * dataKer[k];
 				}
@@ -86,12 +86,12 @@ public class ConvolveDownNoBorderStandard {
 
 		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
-			int i = input.startIndex + y*input.stride;
+			int i = input.startIndex + (y-radius)*input.stride;
 			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
 				float total = 0;
-				int indexSrc = i-radius*input.stride;
+				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc] ) * dataKer[k];
 					indexSrc += input.stride;
@@ -148,12 +148,12 @@ public class ConvolveDownNoBorderStandard {
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
-			int j = input.startIndex+ i*input.stride;
+			int j = input.startIndex + i*input.stride - radius;
 			final int jEnd = j+widthEnd;
 
 			for( j += offsetX; j <= jEnd; j += skip ) {
 				int total = 0;
-				int indexSrc = j-radius;
+				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc++] & 0xFF) * dataKer[k];
 				}
@@ -180,12 +180,12 @@ public class ConvolveDownNoBorderStandard {
 
 		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
-			int i = input.startIndex + y*input.stride;
+			int i = input.startIndex + (y-radius)*input.stride;
 			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
 				int total = 0;
-				int indexSrc = i-radius*input.stride;
+				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc] & 0xFF) * dataKer[k];
 					indexSrc += input.stride;
@@ -242,12 +242,12 @@ public class ConvolveDownNoBorderStandard {
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
-			int j = input.startIndex+ i*input.stride;
+			int j = input.startIndex + i*input.stride - radius;
 			final int jEnd = j+widthEnd;
 
 			for( j += offsetX; j <= jEnd; j += skip ) {
 				int total = 0;
-				int indexSrc = j-radius;
+				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc++] ) * dataKer[k];
 				}
@@ -274,12 +274,12 @@ public class ConvolveDownNoBorderStandard {
 
 		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
-			int i = input.startIndex + y*input.stride;
+			int i = input.startIndex + (y-radius)*input.stride;
 			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
 				int total = 0;
-				int indexSrc = i-radius*input.stride;
+				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc] ) * dataKer[k];
 					indexSrc += input.stride;
@@ -336,12 +336,12 @@ public class ConvolveDownNoBorderStandard {
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
-			int j = input.startIndex+ i*input.stride;
+			int j = input.startIndex + i*input.stride - radius;
 			final int jEnd = j+widthEnd;
 
 			for( j += offsetX; j <= jEnd; j += skip ) {
 				int total = 0;
-				int indexSrc = j-radius;
+				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc++] & 0xFF) * dataKer[k];
 				}
@@ -368,12 +368,12 @@ public class ConvolveDownNoBorderStandard {
 
 		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
-			int i = input.startIndex + y*input.stride;
+			int i = input.startIndex + (y-radius)*input.stride;
 			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
 				int total = 0;
-				int indexSrc = i-radius*input.stride;
+				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc] & 0xFF) * dataKer[k];
 					indexSrc += input.stride;
@@ -430,12 +430,12 @@ public class ConvolveDownNoBorderStandard {
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
-			int j = input.startIndex+ i*input.stride;
+			int j = input.startIndex + i*input.stride - radius;
 			final int jEnd = j+widthEnd;
 
 			for( j += offsetX; j <= jEnd; j += skip ) {
 				int total = 0;
-				int indexSrc = j-radius;
+				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc++] ) * dataKer[k];
 				}
@@ -462,12 +462,12 @@ public class ConvolveDownNoBorderStandard {
 
 		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
-			int i = input.startIndex + y*input.stride;
+			int i = input.startIndex + (y-radius)*input.stride;
 			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
 				int total = 0;
-				int indexSrc = i-radius*input.stride;
+				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc] ) * dataKer[k];
 					indexSrc += input.stride;

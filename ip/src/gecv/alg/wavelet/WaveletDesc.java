@@ -14,32 +14,31 @@
  *    limitations under the License.
  */
 
-package gecv.core.image.border;
+package gecv.alg.wavelet;
 
-import gecv.struct.image.ImageBase;
 
 /**
- * A wrapper around a normal image that returns a numeric value if a pixel is requested that is outside of the image
- * boundary.  The additional sanity checks can significantly slow down algorithms and should only be used when needed.
+ * Base class for wavelet descriptions.
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder<T extends ImageBase> {
+public abstract class WaveletDesc {
 
-	T image;
+	// offset of wavelet numbers from start of signal array
+	public int offsetScaling;
 
-	protected ImageBorder(T image) {
-		setImage(image);
-	}
+	// offset of wavelet numbers from start of signal array
+	public int offsetWavelet;
 
-	protected ImageBorder() {
-	}
+	/**
+	 * Returns the primitive type of the coefficients.
+	 *
+	 * @return Coefficient data type.
+	 */
+	public abstract Class<?> getType();
 
-	public void setImage( T image ) {
-		this.image = image;
-	}
+	public abstract int getScalingLength();
 
-	public T getImage() {
-		return image;
-	}
+	public abstract int getWaveletLength();
+
 }

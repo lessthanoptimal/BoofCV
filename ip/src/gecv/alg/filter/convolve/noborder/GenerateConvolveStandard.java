@@ -123,12 +123,12 @@ public class GenerateConvolveStandard extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfor( int i = yBorder; i < height; i++ ) {\n" +
 				"\t\t\tint indexDst = dest.startIndex + i*dest.stride+radius;\n" +
-				"\t\t\tint j = image.startIndex+ i*image.stride;\n" +
+				"\t\t\tint j = image.startIndex + i*image.stride - radius;\n" +
 				"\t\t\tfinal int jEnd = j+width-radius;\n" +
 				"\n" +
 				"\t\t\tfor( j += radius; j < jEnd; j++ ) {\n" +
 				"\t\t\t\t" + sumType + " total = 0;\n" +
-				"\t\t\t\tint indexSrc = j-radius;\n" +
+				"\t\t\t\tint indexSrc = j;\n" +
 				"\t\t\t\tfor( int k = 0; k < kernelWidth; k++ ) {\n" +
 				"\t\t\t\t\ttotal += (dataSrc[indexSrc++] " + bitWise + ") * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
@@ -164,12 +164,12 @@ public class GenerateConvolveStandard extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfor( int y = radius; y < yEnd; y++ ) {\n" +
 				"\t\t\tint indexDst = dest.startIndex+y*dest.stride+xBorder;\n" +
-				"\t\t\tint i = image.startIndex+y*image.stride;\n" +
+				"\t\t\tint i = image.startIndex + (y-radius)*image.stride;\n" +
 				"\t\t\tfinal int iEnd = i+imgWidth-xBorder;\n" +
 				"\n" +
 				"\t\t\tfor( i += xBorder; i < iEnd; i++ ) {\n" +
 				"\t\t\t\t" + sumType + " total = 0;\n" +
-				"\t\t\t\tint indexSrc = i-radius*image.stride;\n" +
+				"\t\t\t\tint indexSrc = i;\n" +
 				"\t\t\t\tfor( int k = 0; k < kernelWidth; k++ ) {\n" +
 				"\t\t\t\t\ttotal += (dataSrc[indexSrc] " + bitWise + ")* dataKer[k];\n" +
 				"\t\t\t\t\tindexSrc += image.stride;\n" +

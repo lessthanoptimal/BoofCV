@@ -139,11 +139,11 @@ public class ConvolveDownNoBorderUnrolled_S16_I16 {
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
-			int j = input.startIndex+ i*input.stride;
+			int j = input.startIndex + i*input.stride - radius;
 			final int jEnd = j+widthEnd;
 
 			for( j += offsetX; j <= jEnd; j += skip ) {
-				int indexSrc = j-radius;
+				int indexSrc = j;
 
 				int total = (dataSrc[indexSrc++] ) * k1;
 				total += (dataSrc[indexSrc++])*k2;
@@ -175,11 +175,11 @@ public class ConvolveDownNoBorderUnrolled_S16_I16 {
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
-			int j = input.startIndex+ i*input.stride;
+			int j = input.startIndex + i*input.stride - radius;
 			final int jEnd = j+widthEnd;
 
 			for( j += offsetX; j <= jEnd; j += skip ) {
-				int indexSrc = j-radius;
+				int indexSrc = j;
 
 				int total = (dataSrc[indexSrc++] ) * k1;
 				total += (dataSrc[indexSrc++])*k2;
@@ -215,11 +215,11 @@ public class ConvolveDownNoBorderUnrolled_S16_I16 {
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
-			int j = input.startIndex+ i*input.stride;
+			int j = input.startIndex + i*input.stride - radius;
 			final int jEnd = j+widthEnd;
 
 			for( j += offsetX; j <= jEnd; j += skip ) {
-				int indexSrc = j-radius;
+				int indexSrc = j;
 
 				int total = (dataSrc[indexSrc++] ) * k1;
 				total += (dataSrc[indexSrc++])*k2;
@@ -259,11 +259,11 @@ public class ConvolveDownNoBorderUnrolled_S16_I16 {
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
-			int j = input.startIndex+ i*input.stride;
+			int j = input.startIndex + i*input.stride - radius;
 			final int jEnd = j+widthEnd;
 
 			for( j += offsetX; j <= jEnd; j += skip ) {
-				int indexSrc = j-radius;
+				int indexSrc = j;
 
 				int total = (dataSrc[indexSrc++] ) * k1;
 				total += (dataSrc[indexSrc++])*k2;
@@ -307,11 +307,11 @@ public class ConvolveDownNoBorderUnrolled_S16_I16 {
 
 		for( int i = 0; i < height; i++ ) {
 			int indexDst = output.startIndex + i*output.stride + offsetX/skip;
-			int j = input.startIndex+ i*input.stride;
+			int j = input.startIndex + i*input.stride - radius;
 			final int jEnd = j+widthEnd;
 
 			for( j += offsetX; j <= jEnd; j += skip ) {
-				int indexSrc = j-radius;
+				int indexSrc = j;
 
 				int total = (dataSrc[indexSrc++] ) * k1;
 				total += (dataSrc[indexSrc++])*k2;
@@ -349,11 +349,11 @@ public class ConvolveDownNoBorderUnrolled_S16_I16 {
 
 		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
-			int i = input.startIndex + y*input.stride;
+			int i = input.startIndex + (y-radius)*input.stride;
 			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
-				int indexSrc = i-radius*input.stride;
+				int indexSrc = i;
 				int total = (dataSrc[indexSrc] )*k1;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k2;
@@ -386,11 +386,11 @@ public class ConvolveDownNoBorderUnrolled_S16_I16 {
 
 		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
-			int i = input.startIndex + y*input.stride;
+			int i = input.startIndex + (y-radius)*input.stride;
 			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
-				int indexSrc = i-radius*input.stride;
+				int indexSrc = i;
 				int total = (dataSrc[indexSrc] )*k1;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k2;
@@ -429,11 +429,11 @@ public class ConvolveDownNoBorderUnrolled_S16_I16 {
 
 		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
-			int i = input.startIndex + y*input.stride;
+			int i = input.startIndex + (y-radius)*input.stride;
 			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
-				int indexSrc = i-radius*input.stride;
+				int indexSrc = i;
 				int total = (dataSrc[indexSrc] )*k1;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k2;
@@ -478,11 +478,11 @@ public class ConvolveDownNoBorderUnrolled_S16_I16 {
 
 		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
-			int i = input.startIndex + y*input.stride;
+			int i = input.startIndex + (y-radius)*input.stride;
 			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
-				int indexSrc = i-radius*input.stride;
+				int indexSrc = i;
 				int total = (dataSrc[indexSrc] )*k1;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k2;
@@ -533,11 +533,11 @@ public class ConvolveDownNoBorderUnrolled_S16_I16 {
 
 		for( int y = offsetY; y <= heightEnd; y += skip ) {
 			int indexDst = output.startIndex + (y/skip)*output.stride;
-			int i = input.startIndex + y*input.stride;
+			int i = input.startIndex + (y-radius)*input.stride;
 			final int iEnd = i + width;
 
 			for( ; i < iEnd; i++ ) {
-				int indexSrc = i-radius*input.stride;
+				int indexSrc = i;
 				int total = (dataSrc[indexSrc] )*k1;
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc])*k2;

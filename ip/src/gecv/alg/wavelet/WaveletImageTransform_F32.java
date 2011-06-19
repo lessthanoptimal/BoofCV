@@ -14,19 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.alg.geo.d2;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package gecv.alg.wavelet;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestPixelTransformAffine {
-	@Test
-	public void stuff() {
-		fail("implement");
-	}
+public class WaveletImageTransform_F32 {
 }

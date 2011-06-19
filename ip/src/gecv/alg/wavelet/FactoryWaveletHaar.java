@@ -14,39 +14,33 @@
  *    limitations under the License.
  */
 
-package gecv.core.image.border;
+package gecv.alg.wavelet;
 
-import gecv.struct.image.ImageInteger;
 
 /**
- * Child of {@link ImageBorder} for {@link ImageInteger}.
+ * Coefficients for Haar wavelet.
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_I extends ImageBorder<ImageInteger> {
+public class FactoryWaveletHaar {
 
-	public ImageBorder_I(ImageInteger<?> image) {
-		super(image);
+	public static WaveletDesc_F32 generate_F32() {
+		WaveletDesc_F32 ret = new WaveletDesc_F32();
+
+		ret.scaling = new float[]{(float)(1.0/Math.sqrt(2)),(float)(1.0/Math.sqrt(2))};
+		ret.wavelet = new float[]{ret.scaling[0],-ret.scaling[0]};
+
+		return ret;
 	}
 
-	protected ImageBorder_I() {
+	public static WaveletDesc_I32 generate_I32() {
+		WaveletDesc_I32 ret = new WaveletDesc_I32();
+
+		ret.scaling = new int[]{1,1};
+		ret.wavelet = new int[]{ret.scaling[0],-ret.scaling[0]};
+		ret.denominatorScaling = 1;
+		ret.denominatorWavelet = 1;
+
+		return ret;
 	}
-
-	public int get( int x , int y ) {
-		if( image.isInBounds(x,y) )
-			return image.get(x,y);
-
-		return getOutside( x , y );
-	}
-
-	public abstract int getOutside( int x , int y );
-
-	public void set( int x , int y , int value ) {
-		if( image.isInBounds(x,y) )
-			image.set(x,y,value);
-
-		setOutside( x , y , value);
-	}
-
-	public abstract void setOutside( int x , int y , int value );
 }
