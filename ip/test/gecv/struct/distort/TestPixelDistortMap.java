@@ -18,15 +18,50 @@ package gecv.struct.distort;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static junit.framework.Assert.assertEquals;
 
 
 /**
  * @author Peter Abeles
  */
 public class TestPixelDistortMap {
+
+	int width = 10;
+	int height = 20;
+
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void set_FromDistort() {
+		PixelDistortMap map = new PixelDistortMap(width,height);
+		map.set(new TestDistort());
+
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				map.distort(x,y);
+				assertEquals(x+2f,map.distX);
+				assertEquals(y+2f,map.distY);
+			}
+		}
+	}
+
+	@Test
+	public void set_Pixel() {
+		PixelDistortMap map = new PixelDistortMap(width,height);
+
+		map.set(1,2,3.1f,4.1f);
+
+		map.distort(1,2);
+
+		assertEquals(3.1f,map.distX,1e-4f);
+		assertEquals(4.1f,map.distY,1e-4f);
+	}
+
+	private static class TestDistort extends PixelDistort
+	{
+
+		@Override
+		public void distort(int x, int y) {
+			distX = x + 2;
+			distY = y + 2;
+		}
 	}
 }

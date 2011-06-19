@@ -16,10 +16,8 @@
 
 package gecv.alg.misc;
 
-import gecv.struct.image.*;
-
 import gecv.alg.InputSanityCheck;
-import java.util.Random;
+import gecv.struct.image.*;
 
 
 /**
@@ -218,6 +216,33 @@ public class PixelMath {
 	}
 
 	/**
+	 * Bounds image pixels to be between these two values
+	 * 
+	 * @param img Image
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 */
+	public static void boundImage( ImageUInt8 img , int min , int max ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int range = max-min;
+
+		byte[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++,index++) {
+				int value = data[index];
+				if( value < min )
+					data[index] = (byte)min;
+				else if( value > max )
+					data[index] = (byte)max;
+			}
+		}
+	}
+
+	/**
 	 * Returns the absolute value of the element with the largest absolute value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -311,6 +336,33 @@ public class PixelMath {
 				if( val < -128 ) val = -128;
 				else if( val > 127 ) val = 127;
 				output.data[indexDst] = (byte)val;
+			}
+		}
+	}
+
+	/**
+	 * Bounds image pixels to be between these two values
+	 * 
+	 * @param img Image
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 */
+	public static void boundImage( ImageSInt8 img , int min , int max ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int range = max-min;
+
+		byte[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++,index++) {
+				int value = data[index];
+				if( value < min )
+					data[index] = (byte)min;
+				else if( value > max )
+					data[index] = (byte)max;
 			}
 		}
 	}
@@ -414,6 +466,33 @@ public class PixelMath {
 	}
 
 	/**
+	 * Bounds image pixels to be between these two values
+	 * 
+	 * @param img Image
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 */
+	public static void boundImage( ImageUInt16 img , int min , int max ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int range = max-min;
+
+		short[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++,index++) {
+				int value = data[index];
+				if( value < min )
+					data[index] = (short)min;
+				else if( value > max )
+					data[index] = (short)max;
+			}
+		}
+	}
+
+	/**
 	 * Returns the absolute value of the element with the largest absolute value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -507,6 +586,33 @@ public class PixelMath {
 				if( val < -32768 ) val = -32768;
 				else if( val > 32767 ) val = 32767;
 				output.data[indexDst] = (short)val;
+			}
+		}
+	}
+
+	/**
+	 * Bounds image pixels to be between these two values
+	 * 
+	 * @param img Image
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 */
+	public static void boundImage( ImageSInt16 img , int min , int max ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int range = max-min;
+
+		short[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++,index++) {
+				int value = data[index];
+				if( value < min )
+					data[index] = (short)min;
+				else if( value > max )
+					data[index] = (short)max;
 			}
 		}
 	}
@@ -606,6 +712,33 @@ public class PixelMath {
 	}
 
 	/**
+	 * Bounds image pixels to be between these two values
+	 * 
+	 * @param img Image
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 */
+	public static void boundImage( ImageSInt32 img , int min , int max ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int range = max-min;
+
+		int[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++,index++) {
+				int value = data[index];
+				if( value < min )
+					data[index] = min;
+				else if( value > max )
+					data[index] = max;
+			}
+		}
+	}
+
+	/**
 	 * Returns the absolute value of the element with the largest absolute value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -693,6 +826,33 @@ public class PixelMath {
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
 				output.data[indexDst] = input.data[indexSrc] + value;
+			}
+		}
+	}
+
+	/**
+	 * Bounds image pixels to be between these two values
+	 * 
+	 * @param img Image
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 */
+	public static void boundImage( ImageFloat32 img , float min , float max ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		float range = max-min;
+
+		float[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++,index++) {
+				float value = data[index];
+				if( value < min )
+					data[index] = min;
+				else if( value > max )
+					data[index] = max;
 			}
 		}
 	}

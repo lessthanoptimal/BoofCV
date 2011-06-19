@@ -77,6 +77,7 @@ public class GeneratorPixelMath {
 			printDivide();
 			printMult();
 			printPlus();
+			printBoundImage();
 		}
 	}
 
@@ -245,6 +246,38 @@ public class GeneratorPixelMath {
 			out.print("\t\t\t\toutput.data[indexDst] = input.data[indexSrc] + value;\n");
 		}
 		out.print("\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printBoundImage() {
+
+		String sumType = input.getSumType();
+
+		out.print("\t/**\n" +
+				"\t * Bounds image pixels to be between these two values\n" +
+				"\t * \n" +
+				"\t * @param img Image\n" +
+				"\t * @param min minimum value.\n" +
+				"\t * @param max maximum value.\n" +
+				"\t */\n" +
+				"\tpublic static void boundImage( "+input.getImageName()+" img , "+sumType+" min , "+sumType+" max ) {\n" +
+				"\t\tfinal int h = img.getHeight();\n" +
+				"\t\tfinal int w = img.getWidth();\n" +
+				"\n" +
+				"\t\t"+sumType+" range = max-min;\n" +
+				"\n" +
+				"\t\t"+input.getDataType()+"[] data = img.data;\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
+				"\t\t\tfor (int x = 0; x < w; x++,index++) {\n" +
+				"\t\t\t\t"+sumType+" value = data[index];\n" +
+				"\t\t\t\tif( value < min )\n" +
+				"\t\t\t\t\tdata[index] = "+input.getTypeCastFromSum()+"min;\n" +
+				"\t\t\t\telse if( value > max )\n" +
+				"\t\t\t\t\tdata[index] = "+input.getTypeCastFromSum()+"max;\n" +
+				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}

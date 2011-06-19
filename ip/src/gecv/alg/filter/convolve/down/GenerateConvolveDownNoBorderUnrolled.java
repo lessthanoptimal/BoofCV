@@ -239,11 +239,11 @@ public class GenerateConvolveDownNoBorderUnrolled {
 				"\n" +
 				"\t\tfor( int i = 0; i < height; i++ ) {\n" +
 				"\t\t\tint indexDst = output.startIndex + i*output.stride + offsetX/skip;\n" +
-				"\t\t\tint j = input.startIndex+ i*input.stride;\n" +
+				"\t\t\tint j = input.startIndex + i*input.stride - radius;\n" +
 				"\t\t\tfinal int jEnd = j+widthEnd;\n" +
 				"\n" +
 				"\t\t\tfor( j += offsetX; j <= jEnd; j += skip ) {\n" +
-				"\t\t\t\tint indexSrc = j-radius;\n" +
+				"\t\t\t\tint indexSrc = j;\n" +
 				"\n"+
 				"\t\t\t\t"+sumType+" total = (dataSrc[indexSrc++] "+bitWise+") * k1;\n");
 		for (int i = 1; i < num - 1; i++) {
@@ -288,11 +288,11 @@ public class GenerateConvolveDownNoBorderUnrolled {
 				"\n" +
 				"\t\tfor( int y = offsetY; y <= heightEnd; y += skip ) {\n" +
 				"\t\t\tint indexDst = output.startIndex + (y/skip)*output.stride;\n" +
-				"\t\t\tint i = input.startIndex + y*input.stride;\n" +
+				"\t\t\tint i = input.startIndex + (y-radius)*input.stride;\n" +
 				"\t\t\tfinal int iEnd = i + width;\n" +
 				"\n" +
 				"\t\t\tfor( ; i < iEnd; i++ ) {\n" +
-				"\t\t\t\tint indexSrc = i-radius*input.stride;\n" +
+				"\t\t\t\tint indexSrc = i;\n" +
 				"\t\t\t\t"+sumType+" total = (dataSrc[indexSrc] "+bitWise+")*k1;\n");
 		for (int i = 1; i < num; i++) {
 			out.printf("\t\t\t\tindexSrc += input.stride;\n");

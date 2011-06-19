@@ -30,6 +30,16 @@ public abstract class ImageBorder_F32 extends ImageBorder<ImageFloat32> {
 		super(image);
 	}
 
+	protected ImageBorder_F32() {
+	}
+
+	public void set( int x , int y , float val ) {
+		if( image.isInBounds(x,y) )
+			image.set(x,y,val);
+
+		setOutside(x,y,val);
+	}
+
 	public float get( int x , int y ) {
 		if( image.isInBounds(x,y) )
 			return image.get(x,y);
@@ -38,4 +48,6 @@ public abstract class ImageBorder_F32 extends ImageBorder<ImageFloat32> {
 	}
 
 	public abstract float getOutside( int x , int y );
+
+	public abstract void setOutside( int x , int y , float val );
 }

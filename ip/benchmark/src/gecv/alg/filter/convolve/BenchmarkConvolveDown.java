@@ -176,17 +176,17 @@ public class BenchmarkConvolveDown {
 			kernel2D_I32 = KernelFactory.gaussian2D_I32(1.0,radius);
 			
 			ProfileOperation.printOpsPerSec(new HorizontalStandard_F32(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new HorizontalUnrolled_F32(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new VerticalStandard_F32(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new VerticalUnrolled_F32(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Convolve2DStandard_F32(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Convolve2DUnrolled_F32(),TEST_TIME);
-
-			ProfileOperation.printOpsPerSec(new VerticalStandard_U8_I16(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new VerticalUnrolled_U8_I16(),TEST_TIME);
-
-			ProfileOperation.printOpsPerSec(new VerticalStandard_U8_I8_Div(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new VerticalUnrolled_U8_I8_Div(),TEST_TIME);
+//			ProfileOperation.printOpsPerSec(new HorizontalUnrolled_F32(),TEST_TIME);
+//			ProfileOperation.printOpsPerSec(new VerticalStandard_F32(),TEST_TIME);
+//			ProfileOperation.printOpsPerSec(new VerticalUnrolled_F32(),TEST_TIME);
+//			ProfileOperation.printOpsPerSec(new Convolve2DStandard_F32(),TEST_TIME);
+//			ProfileOperation.printOpsPerSec(new Convolve2DUnrolled_F32(),TEST_TIME);
+//
+//			ProfileOperation.printOpsPerSec(new VerticalStandard_U8_I16(),TEST_TIME);
+//			ProfileOperation.printOpsPerSec(new VerticalUnrolled_U8_I16(),TEST_TIME);
+//
+//			ProfileOperation.printOpsPerSec(new VerticalStandard_U8_I8_Div(),TEST_TIME);
+//			ProfileOperation.printOpsPerSec(new VerticalUnrolled_U8_I8_Div(),TEST_TIME);
 
 		}
 

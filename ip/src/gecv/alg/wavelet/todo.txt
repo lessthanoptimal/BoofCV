@@ -1,0 +1,9 @@
+- standard wavelet algorithms
+  * inner
+  * border
+- unrolled
+  * benchmark to see if scale and wavelet can be processed in two cycles and not inside the same loop
+- Create integer implementations using code generator
+- WaveletTransformOps
+  * call these optimized inner functions
+- Abstracted object oriented wrapper for all of this

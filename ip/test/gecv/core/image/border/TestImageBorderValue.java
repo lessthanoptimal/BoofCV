@@ -16,61 +16,37 @@
 
 package gecv.core.image.border;
 
-import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
-import org.junit.Test;
-
-import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageBorderValue {
-	Random rand = new Random(234);
+public class TestImageBorderValue extends GenericImageBorderTests {
 
-	int width = 20;
-	int height = 25;
+	float value = 43;
 
-	@Test
-	public void test_I8() {
-		ImageUInt8 img = new ImageUInt8(width,height);
-		ImageTestingOps.randomize(img,rand, 0, 100);
-
-		int value = 43;
-
-		ImageBorder_I foo = ImageBorderValue.wrap(img,value);
-
-		assertEquals(img.get(1,1),foo.get(1,1));
-		assertEquals(img.get(0,0),foo.get(0,0));
-		assertEquals(img.get(width-1,height-1),foo.get(width-1,height-1));
-
-		assertEquals(value,foo.get(-1,0));
-		assertEquals(value,foo.get(0,-1));
-		assertEquals(value,foo.get(width,height));
-		assertEquals(value,foo.get(width+2,height));
-		assertEquals(value,foo.get(width,height+2));
+	@Override
+	public ImageBorder_I wrap(ImageUInt8 image) {
+		return ImageBorderValue.wrap(image,(int)value);
 	}
 
-	@Test
-	public void test_F32() {
-		ImageFloat32 img = new ImageFloat32(width,height);
-		ImageTestingOps.randomize(img,rand,0,5);
+	@Override
+	public ImageBorder_F32 wrap(ImageFloat32 image) {
+		return ImageBorderValue.wrap(image,value);
+	}
 
-		float value = 43;
+	@Override
+	public Number get(SingleBandImage img, int x, int y) {
+		if( img.getImage().isInBounds(x,y))
+			return img.get(x,y);
+		return value;
+	}
 
-		ImageBorder_F32 foo = ImageBorderValue.wrap(img,value);
-
-		assertEquals(img.get(1,1),foo.get(1,1),1e-4f);
-		assertEquals(img.get(0,0),foo.get(0,0),1e-4f);
-		assertEquals(img.get(width-1,height-1),foo.get(width-1,height-1),1e-4f);
-
-		assertEquals(value,foo.get(-1,0),1e-4f);
-		assertEquals(value,foo.get(0,-1),1e-4f);
-		assertEquals(value,foo.get(width,height),1e-4f);
-		assertEquals(value,foo.get(width+2,height),1e-4f);
-		assertEquals(value,foo.get(width,height+2),1e-4f);
+	@Override
+	public void checkBorderSet(int x, int y, Number val,
+							SingleBandImage border, SingleBandImage orig) {
+		// the original image should not be modified
 	}
 }

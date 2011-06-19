@@ -19,7 +19,9 @@ package gecv.core.image;
 import gecv.core.image.border.ImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.core.image.border.ImageBorder_I;
-import gecv.struct.image.*;
+import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageInteger;
 
 /**
  * Factory for creating generalized images
@@ -64,7 +66,7 @@ public class FactorySingleBandImage {
 
 		@Override
 		public void set(int x, int y, Number num) {
-			image.getImage().set(x,y,num.intValue());
+			image.set(x,y,num.intValue());
 		}
 	}
 
@@ -86,7 +88,7 @@ public class FactorySingleBandImage {
 
 		@Override
 		public void set(int x, int y, Number num) {
-			image.getImage().set(x,y,num.floatValue());
+			image.set(x,y,num.floatValue());
 		}
 	}
 
@@ -158,6 +160,11 @@ public class FactorySingleBandImage {
 		public int getHeight() {
 			return image.getHeight();
 		}
+
+		@Override
+		public ImageBase getImage() {
+			return image;
+		}
 	}
 
 	public static abstract class SingleBorder<T extends ImageBorder> implements SingleBandImage {
@@ -176,6 +183,11 @@ public class FactorySingleBandImage {
 		@Override
 		public int getHeight() {
 			return image.getImage().getHeight();
+		}
+
+		@Override
+		public ImageBase getImage() {
+			return image.getImage();
 		}
 	}
 }

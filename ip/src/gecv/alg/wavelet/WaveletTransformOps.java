@@ -14,32 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.core.image.border;
+package gecv.alg.wavelet;
 
-import gecv.struct.image.ImageBase;
 
 /**
- * A wrapper around a normal image that returns a numeric value if a pixel is requested that is outside of the image
- * boundary.  The additional sanity checks can significantly slow down algorithms and should only be used when needed.
- *
  * @author Peter Abeles
  */
-public abstract class ImageBorder<T extends ImageBase> {
-
-	T image;
-
-	protected ImageBorder(T image) {
-		setImage(image);
-	}
-
-	protected ImageBorder() {
-	}
-
-	public void setImage( T image ) {
-		this.image = image;
-	}
-
-	public T getImage() {
-		return image;
-	}
+public class WaveletTransformOps {
 }

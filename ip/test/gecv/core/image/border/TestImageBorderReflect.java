@@ -22,38 +22,51 @@ import gecv.struct.image.ImageUInt8;
 
 import static org.junit.Assert.assertEquals;
 
+
 /**
  * @author Peter Abeles
  */
-public class TestImageBorderExtended extends GenericImageBorderTests {
+public class TestImageBorderReflect extends GenericImageBorderTests{
+
 
 	@Override
 	public ImageBorder_I wrap(ImageUInt8 image) {
-		return ImageBorderExtended.wrap(image);
+		return ImageBorderReflect.wrap(image);
 	}
 
 	@Override
 	public ImageBorder_F32 wrap(ImageFloat32 image) {
-		return ImageBorderExtended.wrap(image);
+		return ImageBorderReflect.wrap(image);
 	}
 
 	@Override
 	public Number get(SingleBandImage img, int x, int y) {
-		if( x < 0 ) x = 0;
-		if( y < 0 ) y = 0;
-		if( x >= width ) x = width-1;
-		if( y >= height ) y = height-1;
+		if( x < 0 )
+			x = -x-1;
+		else if( x >= width )
+			x = width-1-(x-width);
 
+		if( y < 0 )
+			y = -y-1;
+		else if( y >= height )
+			y = height-1-(y-height);
+		
 		return img.get(x,y);
 	}
 
 	@Override
-	public void checkBorderSet(int x, int y, Number val, SingleBandImage border, SingleBandImage orig) {
-		if( x < 0 ) x = 0;
-		if( y < 0 ) y = 0;
-		if( x >= width ) x = width-1;
-		if( y >= height ) y = height-1;
+	public void checkBorderSet(int x, int y, Number val,
+							SingleBandImage border, SingleBandImage orig) {
+		if( x < 0 )
+			x = -x-1;
+		else if( x >= width )
+			x = width-1-(x-width);
 
-		assertEquals(val.floatValue(),orig.get(x,y).floatValue(),1e-4);
+		if( y < 0 )
+			y = -y-1;
+		else if( y >= height )
+			y = height-1-(y-height);
+
+		assertEquals(val.floatValue(),orig.get(x,y).floatValue(),1e-4f);
 	}
 }

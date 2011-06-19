@@ -1,3 +1,12 @@
+- Wavelet
+ * All wavelets from the primer
+ * Generalized wavelet object
+ * optimized wavelet code
+   * float and integer images
+ * TAWS denoiser
+ * Generate coefficients for arbitrary daub and coiflet wavelets
+ * Add other wavelet image ops
+ * GUI Panel to display wavelets
 
 - Median Filter
  * Image Edges, handle them
@@ -9,6 +18,7 @@
 - Edges
  * Whole image:
     - Intensity and orientation
+ * Wavelet based detector
  * Connected Segments
     - Canny?
 
@@ -22,7 +32,6 @@
  * See in code comment on speeding up fast-non-max
  
 - Convolve
- * Change TestConvolveImageStandard into a completely automated test using reflections
  * Add a new implementation for horizontal and vertical which are "in-place"
    Uses an array one row/column long in which the image is locally copied.
  * Sparse Kernel Convolve for when there is a lot of zeros

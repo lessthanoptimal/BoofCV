@@ -20,7 +20,6 @@ import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageInteger;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -29,7 +28,7 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -41,7 +40,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 28;
+		int numExpected = 34;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -61,8 +60,10 @@ public class TestPixelMath {
 				    testMultiply(m);
 				} else if( m.getName().compareTo("plus") == 0 ) {
 				    testPlus(m);
+				} else if( m.getName().compareTo("boundImage") == 0 ) {
+				    testBound(m);
 				} else {
-					throw new RuntimeException("Unknown function");
+					throw new RuntimeException("Unknown function: "+m.getName());
 				}
 			} catch (InvocationTargetException e) {
 				throw new RuntimeException(e);
@@ -197,7 +198,6 @@ public class TestPixelMath {
 		Class<?> paramTypes[] = m.getParameterTypes();
 		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
 		ImageBase output = GecvTesting.createImage(paramTypes[0],width,height);
-		GeneralizedImageOps.randomize(input,0,20,rand);
 
 		if( input.isSigned() ) {
 			GeneralizedImageOps.randomize(input,-20,20,rand);
@@ -222,6 +222,40 @@ public class TestPixelMath {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
 					assertEquals(a.get(j,i).doubleValue()+2f,b.get(j,i).doubleValue(),1e-4);
+				}
+			}
+		}
+	}
+
+	private void testBound( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
+		GeneralizedImageOps.randomize(input,0,20,rand);
+
+		if( input.isSigned() ) {
+			GeneralizedImageOps.randomize(input,-20,20,rand);
+		} else {
+			GeneralizedImageOps.randomize(input,0,20,rand);
+		}
+
+		if( input.isInteger() )
+			m.invoke(null,input,2,10);
+		else
+			m.invoke(null,input,2.0f,10.0f);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(input);
+		if( input.isInteger() ) {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					int v = a.get(j,i).intValue();
+					assertTrue(v >= 2 && v <= 10);
+				}
+			}
+		} else {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					float v = a.get(j,i).floatValue();
+					assertTrue(v >= 2f && v <= 10f);
 				}
 			}
 		}
