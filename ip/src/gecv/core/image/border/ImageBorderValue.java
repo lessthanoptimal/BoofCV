@@ -30,7 +30,7 @@ public class ImageBorderValue {
 		return new Value_F32(image,value);
 	}
 
-	public static ImageBorder_I wrap( ImageInteger image , int value ) {
+	public static ImageBorder_I32 wrap( ImageInteger image , int value ) {
 		return new Value_I(image,value);
 	}
 
@@ -53,7 +53,7 @@ public class ImageBorderValue {
 		}
 	}
 
-	public static class Value_I extends ImageBorder_I {
+	public static class Value_I extends ImageBorder_I32 {
 		int value;
 
 		public Value_I( ImageInteger image , int value ) {

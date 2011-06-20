@@ -19,8 +19,7 @@ package gecv.alg.wavelet.impl;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.wavelet.UtilWavelet;
 import gecv.alg.wavelet.WaveletDesc_F32;
-import gecv.core.image.border.ImageBorderReflect;
-import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.BorderIndex1D_Wrap;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -35,15 +34,13 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 // todo test sub-image
-public class TestLevelWaveletTransformInner {
+public class TestImplWaveletTransformInner {
 
 	Random rand = new Random(234);
 
 	int width = 20;
 	int height = 30;
 
-	// used by naive algorithm only
-	ImageBorder_F32 border = ImageBorderReflect.wrap((ImageFloat32)null);
 
 	@Test
 	public void horizontal() {
@@ -63,8 +60,8 @@ public class TestLevelWaveletTransformInner {
 					ImageTestingOps.fill(expected,0);
 					WaveletDesc_F32 desc = createDesc(-o,l);
 
-					LevelWaveletTransformNaive.horizontal(border,desc,input,expected);
-					LevelWaveletTransformInner.horizontal(desc,input,found);
+					ImplWaveletTransformNaive.horizontal(desc,input,expected);
+					ImplWaveletTransformInner.horizontal(desc,input,found);
 
 					this.equalsTranHorizontal(desc,expected,found,shrink != 0);
 				}
@@ -90,8 +87,8 @@ public class TestLevelWaveletTransformInner {
 					ImageTestingOps.fill(expected,0);
 					WaveletDesc_F32 desc = createDesc(-o,l);
 
-					LevelWaveletTransformNaive.vertical(border,desc,input,expected);
-					LevelWaveletTransformInner.vertical(desc,input,found);
+					ImplWaveletTransformNaive.vertical(desc,input,expected);
+					ImplWaveletTransformInner.vertical(desc,input,found);
 
 					equalsTranVertical(desc,expected,found,shrink != 0);
 				}
@@ -110,18 +107,48 @@ public class TestLevelWaveletTransformInner {
 			ImageTestingOps.randomize(transform,rand,0,50);
 
 			// test different descriptions lengths and offsets
-			for( int o = 1; o <= 2; o++ ) {
-				for( int l = Math.min(2,2+o); l <= 5; l++ ) {
-//					System.out.println("shrink "+shrink+" o = "+o+" l = "+l);
+			for( int o = 0; o <= 2; o++ ) {
+				for( int l = Math.min(3,2+o); l <= 5; l++ ) {
+					System.out.println("shrink "+shrink+" o = "+o+" l = "+l);
 					ImageTestingOps.fill(found,2);
 					ImageTestingOps.fill(expected,2);
 					WaveletDesc_F32 desc = createDesc(-o,l);
 
-					LevelWaveletTransformNaive.horizontalInverse(desc,transform,expected);
-					LevelWaveletTransformInner.horizontalInverse(desc,transform,found);
+					ImplWaveletTransformNaive.horizontalInverse(desc,transform,expected);
+					ImplWaveletTransformInner.horizontalInverse(desc,transform,found);
 
 					int border = Math.max(UtilWavelet.computeBorderStart(desc),
 							UtilWavelet.computeBorderEnd(desc,width-shrink))+o*2;
+
+					GecvTesting.assertEquals(expected,found,border,1e-4f);
+				}
+			}
+		}
+	}
+
+	@Test
+	public void verticalInverse() {
+		// test even and odd width images
+		for( int shrink = 0; shrink <= 1; shrink++ ) {
+			ImageFloat32 transform = new ImageFloat32(width,height);
+			ImageFloat32 found = new ImageFloat32(width-shrink,height);
+			ImageFloat32 expected = new ImageFloat32(width-shrink,height);
+
+			ImageTestingOps.randomize(transform,rand,0,50);
+
+			// test different descriptions lengths and offsets
+			for( int o = 0; o <= 2; o++ ) {
+				for( int l = Math.min(3,2+o); l <= 5; l++ ) {
+					System.out.println("shrink "+shrink+" o = "+o+" l = "+l);
+					ImageTestingOps.fill(found,2);
+					ImageTestingOps.fill(expected,2);
+					WaveletDesc_F32 desc = createDesc(-o,l);
+
+					ImplWaveletTransformNaive.verticalInverse(desc,transform,expected);
+					ImplWaveletTransformInner.verticalInverse(desc,transform,found);
+
+					int border = Math.max(UtilWavelet.computeBorderStart(desc),
+							UtilWavelet.computeBorderEnd(desc,height-shrink))+o*2;
 
 					GecvTesting.assertEquals(expected,found,border,1e-4f);
 				}
@@ -191,6 +218,7 @@ public class TestLevelWaveletTransformInner {
 
 	private WaveletDesc_F32 createDesc(int offset, int length) {
 		WaveletDesc_F32 ret = new WaveletDesc_F32();
+		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = offset;
 		ret.offsetWavelet = offset;
 		ret.scaling = new float[length];

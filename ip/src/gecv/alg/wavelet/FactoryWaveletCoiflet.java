@@ -16,6 +16,8 @@
 
 package gecv.alg.wavelet;
 
+import gecv.core.image.border.BorderIndex1D_Wrap;
+
 
 /**
  * <p>
@@ -58,6 +60,7 @@ public class FactoryWaveletCoiflet {
 		ret.offsetScaling = -2;
 		ret.offsetWavelet = -2;
 
+		ret.border = new BorderIndex1D_Wrap();
 		ret.scaling = new float[6];
 		ret.wavelet = new float[6];
 

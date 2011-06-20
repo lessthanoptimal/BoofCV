@@ -25,13 +25,27 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFactoryWaveletDaub extends CommonFactoryWavelet{
+public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
+
+
+	/**
+	 * Sees if the DaubJ transform can reconstruct an image.
+	 */
+	@Test
+	public void transform_standard_F32() {
+
+		for( int i = 4; i <= 4; i += 2 ) {
+			WaveletDesc_F32 desc = FactoryWaveletDaub.standard_F32(i);
+
+			checkEncodeDecode_F32(desc,desc);
+		}
+	}
+
 	/**
 	 * Sees if the standard DaubJ wavelets have the expected characteristics
 	 */
 	@Test
 	public void standard_F32() {
-
 		for( int i = 4; i <= 4; i += 2 ) {
 
 			WaveletDesc_F32 desc = FactoryWaveletDaub.standard_F32(i);
@@ -56,6 +70,17 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet{
 				checkBiorthogonal(offset,desc.scaling,desc.offsetScaling,desc.scaling,desc.offsetScaling);
 				checkBiorthogonal(offset,desc.wavelet,desc.offsetWavelet,desc.wavelet,desc.offsetWavelet);
 			}
+		}
+	}
+
+	@Test
+	public void transform_biorthogonal_F32() {
+
+		for( int i = 5; i <= 5; i += 2 ) {
+			WaveletDesc_F32 forward = FactoryWaveletDaub.biorthogonal_F32(i);
+			WaveletDesc_F32 inverse = FactoryWaveletDaub.biorthogonalInv_F32(i);
+
+			checkEncodeDecode_F32(forward,inverse);
 		}
 	}
 
@@ -86,6 +111,17 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet{
 	}
 
 	@Test
+	public void transform_biorthogonal_I32() {
+
+		for( int i = 5; i <= 5; i += 2 ) {
+			WaveletDesc_I32 forward = FactoryWaveletDaub.biorthogonal_I32(i);
+			WaveletDesc_I32 inverse = FactoryWaveletDaub.biorthogonalInv_I32(i);
+
+			checkEncodeDecode_I32(forward,inverse);
+		}
+	}
+
+	@Test
 	public void biorthogonal_I32() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
@@ -93,9 +129,9 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet{
 			WaveletDesc_I32 desc = FactoryWaveletDaub.biorthogonal_I32(i);
 
 			int sumScaling = UtilWavelet.sumCoefficients(desc.scaling)/desc.denominatorScaling;
-			int sumWavelet = UtilWavelet.sumCoefficients(desc.wavelet);
-
 			assertEquals(1,sumScaling);
+
+			int sumWavelet = UtilWavelet.sumCoefficients(desc.wavelet);
 			assertEquals(0,sumWavelet);
 
 			double energyScaling = UtilWavelet.computeEnergy(desc.scaling,desc.denominatorScaling);

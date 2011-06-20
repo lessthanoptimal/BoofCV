@@ -18,6 +18,7 @@ package gecv.alg.wavelet.impl;
 
 import gecv.alg.wavelet.UtilWavelet;
 import gecv.alg.wavelet.WaveletDesc_F32;
+import gecv.core.image.border.BorderIndex1D;
 import gecv.struct.image.ImageFloat32;
 
 
@@ -27,7 +28,7 @@ import gecv.struct.image.ImageFloat32;
  * @author Peter Abeles
  */
 // todo add other image types
-public class LevelWaveletTransformInner {
+public class ImplWaveletTransformInner {
 
 	/**
 	 * Performs a single level wavelet transform along the horizontal axis.
@@ -133,69 +134,137 @@ public class LevelWaveletTransformInner {
 
 		UtilWavelet.checkShape(output,input);
 
-		// NOTE it is assumed the 'A' begins and ends at the same time or before 'B'
-		final int lengthA_minus1 = coefficients.scaling.length-1;
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final float[] alpha = coefficients.scaling;
 		final float[] beta = coefficients.wavelet;
 
-		final float dataIn[] = input.data;
-		final float dataOut[] = output.data;
+		float []trends = new float[ input.width ];
+		float []details = new float[ input.width ];
 
 		final int width = input.width;
 		final int height = output.height;
 		final int widthD2 = width/2;
 		final int startX = UtilWavelet.computeBorderStart(coefficients);
-		final int endOffsetX = input.width - UtilWavelet.computeBorderEnd(coefficients,output.width) - startX;
+		final int endX = output.width - UtilWavelet.computeBorderEnd(coefficients,input.width);
 
-		final int numZerosEnd = input.width-endOffsetX-startX-offsetA-(output.width%2);
-
-		int initLength = Math.min(2,alpha.length);
+		BorderIndex1D border = coefficients.getBorder();
+		border.setLength(input.width);
 
 		for( int y = 0; y < height; y++ ) {
 
-			int indexIn = input.startIndex + input.stride*y + startX/2;
-			int indexOut = output.startIndex + output.stride*y + startX;
-
-			int end = indexOut + endOffsetX;
-
-			// ---------- Do initial assignment
-			int index = indexOut-startX;
-			for( int i = 0; i < startX+offsetA; i++ ) {
-				dataOut[index++] = 0;
+			// initialize details and trends arrays
+			for( int i = 0; i < startX; i++ ) {
+				details[i] = 0;
+				trends[i] = 0;
 			}
-			for( ; indexOut < end; indexIn++ , indexOut += 2) {
-				// add the 'average' signal
-				float a = dataIn[indexIn];
-				index = indexOut+offsetA;
-				for( int i = 0; i < initLength; i++ ) {
-					dataOut[index++] = a*alpha[i];
-				}
-			}
-			
-			for( int i = 0; i < numZerosEnd; i++ ) {
-				dataOut[index++] = 0;
+			int indexSrc = input.startIndex + y*input.stride+startX/2;
+			for( int x = startX; x < endX; x += 2 , indexSrc++ ) {
+				float a = input.data[ indexSrc ];
+				float d = input.data[ indexSrc + widthD2 ];
+
+				// add the trend
+				for( int i = 0; i < 2; i++ )
+					trends[i+x+offsetA] = a*alpha[i];
+
+				// add the detail signal
+				for( int i = 0; i < 2; i++ )
+					details[i+x+offsetB] = d*beta[i];
 			}
 
-			indexIn = input.startIndex + input.stride*y + startX/2;
-			indexOut = output.startIndex + output.stride*y + startX;
+			for( int i = endX; i < width; i++ ) {
+				details[i] = 0;
+				trends[i] = 0;
+			}
 
-			for( ; indexOut < end; indexIn++ , indexOut += 2) {
+			// perform the normal inverse transform
+			indexSrc = input.startIndex + y*input.stride+startX/2;
+			for( int x = startX; x < endX; x += 2 , indexSrc++ ) {
+				float a = input.data[ indexSrc ];
+				float d = input.data[ indexSrc + widthD2 ];
 
-				// add the 'average' signal
-				float a = dataIn[indexIn];
-				index = indexOut+offsetA+2;
+				// add the trend
 				for( int i = 2; i < alpha.length; i++ ) {
-					dataOut[index++] += a*alpha[i];
+					trends[i+x+offsetA] += a*alpha[i];
 				}
 
 				// add the detail signal
-				float d = dataIn[indexIn+widthD2];
-				index = indexOut+offsetB;
-				for( int i = 0; i < beta.length; i++ ) {
-					dataOut[index++] += d*beta[i];
+				for( int i = 2; i < beta.length; i++ ) {
+					details[i+x+offsetB] += d*beta[i];
 				}
+			}
+
+			int indexDst = output.startIndex + y*output.stride;
+			for( int x = 0; x < output.width; x++ ) {
+				output.data[ indexDst++ ] = trends[x] + details[x];
+			}
+		}
+	}
+
+	public static void verticalInverse( WaveletDesc_F32 coefficients , ImageFloat32 input , ImageFloat32 output ) {
+		UtilWavelet.checkShape(output,input);
+
+		final int offsetA = coefficients.offsetScaling;
+		final int offsetB = coefficients.offsetWavelet;
+		final float[] alpha = coefficients.scaling;
+		final float[] beta = coefficients.wavelet;
+
+		float []trends = new float[ input.height ];
+		float []details = new float[ input.height ];
+
+		final int width = output.width;
+		final int height = input.height;
+		final int heightD2 = (height/2)*input.stride;
+		final int startY = UtilWavelet.computeBorderStart(coefficients);
+		final int endY = output.height - UtilWavelet.computeBorderEnd(coefficients,input.height);
+
+		for( int x = 0; x < width; x++) {
+
+			// initialize details and trends arrays
+			for( int i = 0; i < startY; i++ ) {
+				details[i] = 0;
+				trends[i] = 0;
+			}
+			int indexSrc = input.startIndex + (startY/2)*input.stride + x;
+			for( int y = startY; y < endY; y += 2 , indexSrc += input.stride ) {
+				float a = input.data[ indexSrc ];
+				float d = input.data[ indexSrc + heightD2 ];
+
+				// add the trend
+				for( int i = 0; i < 2; i++ )
+					trends[i+y+offsetA] = a*alpha[i];
+
+				// add the detail signal
+				for( int i = 0; i < 2; i++ )
+					details[i+y+offsetB] = d*beta[i];
+			}
+
+			for( int i = endY; i < height; i++ ) {
+				details[i] = 0;
+				trends[i] = 0;
+			}
+
+			// perform the normal inverse transform
+			indexSrc = input.startIndex + (startY/2)*input.stride + x;
+
+			for( int y = startY; y < endY; y += 2 , indexSrc += input.stride ) {
+				float a = input.data[indexSrc];
+				float d = input.data[indexSrc+heightD2];
+
+				// add the 'average' signal
+				for( int i = 2; i < alpha.length; i++ ) {
+					trends[y+offsetA+i] += a*alpha[i];
+				}
+
+				// add the detail signal
+				for( int i = 2; i < beta.length; i++ ) {
+					details[y+offsetB+i] += d*beta[i];
+				}
+			}
+
+			int indexDst = output.startIndex + x;
+			for( int y = 0; y < output.height; y++ , indexDst += output.stride ) {
+				output.data[indexDst] = trends[y] + details[y];
 			}
 		}
 	}

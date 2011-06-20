@@ -26,47 +26,43 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestImageBorderReflect extends GenericImageBorderTests{
+public class TestImageBorder1D extends GenericImageBorderTests {
 
+	BorderIndex1D_Wrap wrap = new BorderIndex1D_Wrap();
 
 	@Override
-	public ImageBorder_I wrap(ImageUInt8 image) {
-		return ImageBorderReflect.wrap(image);
+	public ImageBorder_I32 wrap(ImageUInt8 image) {
+		ImageBorder_I32 ret = new ImageBorder1D_I32(BorderIndex1D_Wrap.class);
+		ret.setImage(image);
+		return ret;
 	}
 
 	@Override
 	public ImageBorder_F32 wrap(ImageFloat32 image) {
-		return ImageBorderReflect.wrap(image);
+		ImageBorder_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Wrap.class);
+		ret.setImage(image);
+		return ret;
 	}
 
 	@Override
 	public Number get(SingleBandImage img, int x, int y) {
-		if( x < 0 )
-			x = -x-1;
-		else if( x >= width )
-			x = width-1-(x-width);
+		wrap.setLength(img.getWidth());
+		x = wrap.getIndex(x);
+		wrap.setLength(img.getHeight());
+		y = wrap.getIndex(y);
 
-		if( y < 0 )
-			y = -y-1;
-		else if( y >= height )
-			y = height-1-(y-height);
-		
 		return img.get(x,y);
 	}
 
 	@Override
-	public void checkBorderSet(int x, int y, Number val,
-							SingleBandImage border, SingleBandImage orig) {
-		if( x < 0 )
-			x = -x-1;
-		else if( x >= width )
-			x = width-1-(x-width);
+	public void checkBorderSet(int x, int y, Number val, SingleBandImage border, SingleBandImage orig) {
+		border.set(x,y,val);
 
-		if( y < 0 )
-			y = -y-1;
-		else if( y >= height )
-			y = height-1-(y-height);
+		wrap.setLength(orig.getWidth());
+		x = wrap.getIndex(x);
+		wrap.setLength(orig.getHeight());
+		y = wrap.getIndex(y);
 
-		assertEquals(val.floatValue(),orig.get(x,y).floatValue(),1e-4f);
+		assertEquals(val.floatValue(),orig.get(x,y).floatValue(),1e-4);
 	}
 }

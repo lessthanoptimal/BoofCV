@@ -14,37 +14,32 @@
  *    limitations under the License.
  */
 
-package gecv.alg.wavelet;
+package gecv.core.image.border;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 
 /**
- * Description of an integer wavelet.
- *
  * @author Peter Abeles
  */
-public class WaveletDesc_I32 extends WaveletDesc {
+public class TestBorderIndex1D_Reflect {
 
-	// scaling numbers
-	public int scaling[];
-	// wavelet numbers
-	public int wavelet[];
+	int length = 10;
 
-	// denominator for scaling coefficients
-	public int denominatorScaling;
-	// denominator for wavelet coefficients
-	public int denominatorWavelet;
+	@Test
+	public void simple() {
+		BorderIndex1D_Reflect alg = new BorderIndex1D_Reflect();
+		alg.setLength(length);
 
-	@Override
-	public Class<?> getType() {
-		return int.class;
-	}
+		for( int i = 0; i < 10; i++ ) {
+			assertEquals(i,alg.getIndex(i));
+		}
 
-	@Override
-	public int getScalingLength() {
-		return scaling.length;
-	}
-
-	@Override
-	public int getWaveletLength() {
-		return wavelet.length;
+		assertEquals(1,alg.getIndex(-1));
+		assertEquals(2,alg.getIndex(-2));
+		assertEquals(8,alg.getIndex(length));
+		assertEquals(7,alg.getIndex(length+1));
 	}
 }

@@ -30,9 +30,9 @@ import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
+import jgrl.geometry.UtilPoint2D_F64;
 import jgrl.struct.point.Point2D_F64;
 import jgrl.struct.point.Point2D_I16;
-import jgrl.struct.point.UtilPoint2D_F64;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

@@ -16,37 +16,26 @@
 
 package gecv.core.image.border;
 
-import gecv.struct.image.ImageInteger;
 
 /**
- * Child of {@link ImageBorder} for {@link ImageInteger}.
+ * <p>
+ * Access to outside the array are reflected back into the array around the closest border.  This
+ * is an even symmetric function, e.g. f(-1) = f(1) = 1, f(-2) = f(2) = 2.
+ * </p>
+ *
+ * <p
+ *
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_I extends ImageBorder<ImageInteger> {
-
-	public ImageBorder_I(ImageInteger<?> image) {
-		super(image);
+public class BorderIndex1D_Reflect extends BorderIndex1D{
+	@Override
+	public int getIndex(int index) {
+		if( index < 0 )
+			return -index;
+		else if( index >= length)
+			return length-2-(index-length);
+		else
+			return index;
 	}
-
-	protected ImageBorder_I() {
-	}
-
-	public int get( int x , int y ) {
-		if( image.isInBounds(x,y) )
-			return image.get(x,y);
-
-		return getOutside( x , y );
-	}
-
-	public abstract int getOutside( int x , int y );
-
-	public void set( int x , int y , int value ) {
-		if( image.isInBounds(x,y) )
-			image.set(x,y,value);
-
-		setOutside( x , y , value);
-	}
-
-	public abstract void setOutside( int x , int y , int value );
 }

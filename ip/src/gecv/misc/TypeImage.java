@@ -25,6 +25,7 @@ import gecv.struct.image.*;
  * @author Peter Abeles
  */
 public enum TypeImage {
+	I("ImageInteger","int",true),
 	I8("ImageInt8","byte",true),
 	U8(ImageUInt8.class),
 	S8(ImageSInt8.class),

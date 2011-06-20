@@ -80,7 +80,7 @@ public class EpipolarConstraintMatricesLinear {
     /**
      * Sets points normalization on and off.  Turn normalization on if dealing with pixels
      * and off if with normalized image coordinates.  Note that having normalization on when
-     * it is not needed will not adversly affect the solution, except make it more computationally
+     * it is not needed will not adversely affect the solution, except make it more computationally
      * expensive to compute.
      *
      * @param normalize The new normalization value

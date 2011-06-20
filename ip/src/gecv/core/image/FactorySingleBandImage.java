@@ -18,7 +18,7 @@ package gecv.core.image;
 
 import gecv.core.image.border.ImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
-import gecv.core.image.border.ImageBorder_I;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInteger;
@@ -41,16 +41,16 @@ public class FactorySingleBandImage {
 
 	public static SingleBandImage wrap( ImageBorder image ) {
 		if( ImageInteger.class.isAssignableFrom(image.getImage().getClass()) )
-			return new SingleBandBorderInt( (ImageBorder_I)image );
+			return new SingleBandBorderInt( (ImageBorder_I32)image );
 		else if( image.getImage().getClass() == ImageFloat32.class )
 			return new SingleBandBorderFloat( (ImageBorder_F32)image );
 		else
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 	}
 
-	public static class SingleBandBorderInt extends SingleBorder<ImageBorder_I>
+	public static class SingleBandBorderInt extends SingleBorder<ImageBorder_I32>
 	{
-		public SingleBandBorderInt(ImageBorder_I image) {
+		public SingleBandBorderInt(ImageBorder_I32 image) {
 			super(image);
 		}
 

@@ -20,7 +20,7 @@ import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import gecv.alg.filter.derivative.impl.GradientSobel_Outer;
 import gecv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter;
-import gecv.core.image.border.ImageBorderExtended;
+import gecv.core.image.border.FactoryImageBorder;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -79,8 +79,8 @@ public class GradientSobel {
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 
 		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelDerivX_I32, ImageBorderExtended.wrap(orig),derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_I32, ImageBorderExtended.wrap(orig),derivY,1);
+			ConvolveJustBorder_General.convolve(kernelDerivX_I32, FactoryImageBorder.extend(orig),derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_I32, FactoryImageBorder.extend(orig),derivY,1);
 		}
 	}
 
@@ -97,8 +97,8 @@ public class GradientSobel {
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 
 		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelDerivX_I32, ImageBorderExtended.wrap(orig),derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_I32, ImageBorderExtended.wrap(orig),derivY,1);
+			ConvolveJustBorder_General.convolve(kernelDerivX_I32, FactoryImageBorder.extend(orig),derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_I32, FactoryImageBorder.extend(orig),derivY,1);
 		}
 	}
 
@@ -117,8 +117,8 @@ public class GradientSobel {
 		GradientSobel_UnrolledOuter.process_F32_sub(orig, derivX, derivY);
 
 		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelDerivX_F32, ImageBorderExtended.wrap(orig),derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_F32, ImageBorderExtended.wrap(orig),derivY,1);
+			ConvolveJustBorder_General.convolve(kernelDerivX_F32, FactoryImageBorder.extend(orig),derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_F32, FactoryImageBorder.extend(orig),derivY,1);
 		}
 	}
 }

@@ -56,6 +56,7 @@
       <option name="myLocal" value="true" />
     </copyright>
     <module2copyright>
+      <element module="GECV" copyright="GECV" />
       <element module="All" copyright="GECV" />
     </module2copyright>
     <LanguageOptions name="HTML">
@@ -102,6 +103,8 @@
     </LanguageOptions>
   </component>
   <component name="DependencyValidationManager">
+    <scope name="GECV" pattern="file[Feature]:*//*||file[Geometric Vision]:*//*||file[apps]:*//*||file[evaluation]:*//*||file[io]:*//*||file[Image Processing]:*//*" />
+    <scope name="JGRL" pattern="file[Java Geometric Regression Library]:*//*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
@@ -301,7 +304,7 @@
       <module fileurl="file://$PROJECT_DIR$/feature/Feature.iml" filepath="$PROJECT_DIR$/feature/Feature.iml" />
       <module fileurl="file://$PROJECT_DIR$/sfm/Geometric Vision.iml" filepath="$PROJECT_DIR$/sfm/Geometric Vision.iml" />
       <module fileurl="file://$PROJECT_DIR$/Image Processing/Image Processing.iml" filepath="$PROJECT_DIR$/Image Processing/Image Processing.iml" />
-      <module fileurl="file://$PROJECT_DIR$/core/Image Processing.iml" filepath="$PROJECT_DIR$/core/Image Processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../jgrl/Java Geometric Regression Library.iml" filepath="$PROJECT_DIR$/../jgrl/Java Geometric Regression Library.iml" />
       <module fileurl="file://$PROJECT_DIR$/apps/apps.iml" filepath="$PROJECT_DIR$/apps/apps.iml" />
       <module fileurl="file://$PROJECT_DIR$/../cv/cv.iml" filepath="$PROJECT_DIR$/../cv/cv.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
@@ -310,7 +313,7 @@
       <module fileurl="file://$PROJECT_DIR$/../libpjajava/libpja.iml" filepath="$PROJECT_DIR$/../libpjajava/libpja.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0_26" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="SvnBranchConfigurationManager">

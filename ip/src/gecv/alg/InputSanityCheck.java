@@ -21,6 +21,7 @@ import gecv.struct.image.ImageBase;
 /**
  * @author Peter Abeles
  */
+// todo move to misc?
 public class InputSanityCheck {
 
 	/**

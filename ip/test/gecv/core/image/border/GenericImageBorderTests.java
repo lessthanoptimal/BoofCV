@@ -40,7 +40,7 @@ public abstract class GenericImageBorderTests {
 	int width = 20;
 	int height = 25;
 
-	public abstract ImageBorder_I wrap( ImageUInt8 image );
+	public abstract ImageBorder_I32 wrap( ImageUInt8 image );
 
 	public abstract ImageBorder_F32 wrap( ImageFloat32 image );
 
@@ -58,7 +58,7 @@ public abstract class GenericImageBorderTests {
 		ImageUInt8 imgA = new ImageUInt8(width,height);
 		ImageTestingOps.randomize(imgA,rand, 0, 100);
 
-		ImageBorder_I fooA = wrap(imgA);
+		ImageBorder_I32 fooA = wrap(imgA);
 
 		SingleBandImage orig = FactorySingleBandImage.wrap(imgA);
 		SingleBandImage border = FactorySingleBandImage.wrap(fooA);
@@ -106,7 +106,7 @@ public abstract class GenericImageBorderTests {
 		ImageUInt8 imgA = new ImageUInt8(width,height);
 		ImageTestingOps.randomize(imgA,rand, 0, 100);
 
-		ImageBorder_I fooA = wrap(imgA);
+		ImageBorder_I32 fooA = wrap(imgA);
 
 		SingleBandImage orig = FactorySingleBandImage.wrap(imgA);
 		SingleBandImage border = FactorySingleBandImage.wrap(fooA);

@@ -19,10 +19,8 @@ package gecv.alg.wavelet;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.misc.ImageTestingOps;
-import gecv.alg.wavelet.impl.LevelWaveletTransformInner;
-import gecv.alg.wavelet.impl.LevelWaveletTransformNaive;
-import gecv.core.image.border.ImageBorderReflect;
-import gecv.core.image.border.ImageBorder_F32;
+import gecv.alg.wavelet.impl.ImplWaveletTransformInner;
+import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
 
@@ -39,7 +37,6 @@ public class BenchmarkWaveletTransform {
 
 	static WaveletDesc_F32 forward_F32 = FactoryWaveletDaub.standard_F32(4);
 	static WaveletDesc_F32 reverse_F32 = forward_F32;
-	static ImageBorder_F32 border_F32 = ImageBorderReflect.wrap((ImageFloat32)null);
 
 	static ImageFloat32 orig_F32 = new ImageFloat32(imgWidth,imgHeight);
 	static ImageFloat32 temp1_F32 = new ImageFloat32(imgWidth,imgHeight);
@@ -50,8 +47,8 @@ public class BenchmarkWaveletTransform {
 
 		@Override
 		public void process() {
-			LevelWaveletTransformNaive.horizontal(border_F32,forward_F32,orig_F32,temp1_F32);
-			LevelWaveletTransformNaive.vertical(border_F32,forward_F32,temp1_F32,temp2_F32);
+			ImplWaveletTransformNaive.horizontal(forward_F32,orig_F32,temp1_F32);
+			ImplWaveletTransformNaive.vertical(forward_F32,temp1_F32,temp2_F32);
 		}
 	}
 
@@ -59,8 +56,8 @@ public class BenchmarkWaveletTransform {
 
 		@Override
 		public void process() {
-			LevelWaveletTransformInner.horizontal(forward_F32,orig_F32,temp1_F32);
-			LevelWaveletTransformInner.vertical(forward_F32,orig_F32,temp1_F32);
+			ImplWaveletTransformInner.horizontal(forward_F32,orig_F32,temp1_F32);
+			ImplWaveletTransformInner.vertical(forward_F32,orig_F32,temp1_F32);
 		}
 	}
 

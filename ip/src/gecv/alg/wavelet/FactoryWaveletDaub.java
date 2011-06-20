@@ -16,6 +16,8 @@
 
 package gecv.alg.wavelet;
 
+import gecv.core.image.border.BorderIndex1D_Wrap;
+
 
 /**
  * <p>
@@ -52,6 +54,7 @@ public class FactoryWaveletDaub {
 
 		WaveletDesc_F32 ret = new WaveletDesc_F32();
 
+		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = 0;
 		ret.offsetWavelet = 0;
 
@@ -99,8 +102,9 @@ public class FactoryWaveletDaub {
 
 		WaveletDesc_F32 ret = new WaveletDesc_F32();
 
+		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = -2;
-		ret.offsetWavelet = -1;
+		ret.offsetWavelet = 0;
 
 		ret.scaling = new float[5];
 		ret.wavelet = new float[3];
@@ -132,8 +136,9 @@ public class FactoryWaveletDaub {
 
 		WaveletDesc_I32 ret = new WaveletDesc_I32();
 
+		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = -2;
-		ret.offsetWavelet = -1;
+		ret.offsetWavelet = 0;
 
 		ret.scaling = new int[5];
 		ret.wavelet = new int[3];
@@ -167,8 +172,9 @@ public class FactoryWaveletDaub {
 
 		WaveletDesc_F32 ret = new WaveletDesc_F32();
 
+		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = -1;
-		ret.offsetWavelet = -2;
+		ret.offsetWavelet = -1;
 
 		ret.scaling = new float[3];
 		ret.wavelet = new float[5];
@@ -200,8 +206,9 @@ public class FactoryWaveletDaub {
 
 		WaveletDesc_I32 ret = new WaveletDesc_I32();
 
+		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = -1;
-		ret.offsetWavelet = -2;
+		ret.offsetWavelet = -1;
 
 		ret.scaling = new int[3];
 		ret.wavelet = new int[5];

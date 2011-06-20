@@ -16,6 +16,15 @@
 
 package gecv.alg.wavelet;
 
+import gecv.alg.misc.ImageTestingOps;
+import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
+import gecv.testing.GecvTesting;
+
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -26,6 +35,61 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class CommonFactoryWavelet {
+
+	Random rand = new Random(234);
+	int width = 20;
+	int height = 30;
+
+	/**
+	 * See if the provided wavelets can be used to transform the image and change it back without error
+	 *
+	 * @param encodeDesc Wavelet used to transform the image
+	 * @param decodeDesc Wavelet used to restore the image
+	 */
+	public void checkEncodeDecode_F32(WaveletDesc_F32 encodeDesc , WaveletDesc_F32 decodeDesc ) {
+
+		// test both even and odd images
+		for( int makeOdd = 0; makeOdd <= 1; makeOdd++ ) {
+			ImageFloat32 orig = new ImageFloat32(width-makeOdd,height-makeOdd);
+			ImageFloat32 tran = new ImageFloat32(width,height);
+			ImageFloat32 rev = new ImageFloat32(width-makeOdd,height-makeOdd);
+
+			ImageTestingOps.randomize(orig,rand,0,50);
+
+			ImplWaveletTransformNaive.horizontal(encodeDesc,orig,tran);
+			ImplWaveletTransformNaive.horizontalInverse(decodeDesc,tran,rev);
+
+//			GecvTesting.printDiff(orig,rev);
+
+			GecvTesting.assertEquals(orig,rev,0,1e-4f);
+		}
+	}
+
+	/**
+	 * See if the provided wavelets can be used to transform the image and change it back without error
+	 *
+	 * @param encodeDesc Wavelet used to transform the image
+	 * @param decodeDesc Wavelet used to restore the image
+	 */
+	public void checkEncodeDecode_I32(WaveletDesc_I32 encodeDesc , WaveletDesc_I32 decodeDesc ) {
+
+		// test both even and odd images
+		for( int makeOdd = 0; makeOdd <= 1; makeOdd++ ) {
+			ImageUInt8 orig = new ImageUInt8(width-makeOdd,height-makeOdd);
+			ImageSInt16 tran = new ImageSInt16(width,height);
+			ImageUInt8 rev = new ImageUInt8(width-makeOdd,height-makeOdd);
+
+			ImageTestingOps.randomize(orig,rand,0,50);
+
+			ImplWaveletTransformNaive.horizontal(encodeDesc,orig,tran);
+			ImplWaveletTransformNaive.horizontalInverse(decodeDesc,tran,rev);
+
+//			GecvTesting.printDiff(orig,rev);
+
+			GecvTesting.assertEquals(orig,rev,0);
+		}
+	}
+
 	/**
 	 * Computes the dot product of two wavelets separated by different offsets.  If
 	 * the offset is zero and they have an orthogonal/biorothogonal relationship then
