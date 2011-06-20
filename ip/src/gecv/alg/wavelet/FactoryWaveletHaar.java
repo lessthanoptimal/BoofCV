@@ -16,6 +16,8 @@
 
 package gecv.alg.wavelet;
 
+import gecv.core.image.border.BorderIndex1D_Extend;
+
 
 /**
  * Coefficients for Haar wavelet.
@@ -27,6 +29,7 @@ public class FactoryWaveletHaar {
 	public static WaveletDesc_F32 generate_F32() {
 		WaveletDesc_F32 ret = new WaveletDesc_F32();
 
+		ret.border = new BorderIndex1D_Extend();
 		ret.scaling = new float[]{(float)(1.0/Math.sqrt(2)),(float)(1.0/Math.sqrt(2))};
 		ret.wavelet = new float[]{ret.scaling[0],-ret.scaling[0]};
 
@@ -40,6 +43,23 @@ public class FactoryWaveletHaar {
 		ret.wavelet = new int[]{ret.scaling[0],-ret.scaling[0]};
 		ret.denominatorScaling = 1;
 		ret.denominatorWavelet = 1;
+
+		return ret;
+	}
+
+	/**
+	 * Create a description for the inverse transform.  Note that this will NOT produce
+	 * an exact copy of the original due to rounding error.
+	 *
+	 * @return Wavelet inverse coefficient description.
+	 */
+	public static WaveletDesc_I32 generateInv_I32() {
+		WaveletDesc_I32 ret = new WaveletDesc_I32();
+
+		ret.scaling = new int[]{1,1};
+		ret.wavelet = new int[]{ret.scaling[0],-ret.scaling[0]};
+		ret.denominatorScaling = 2;
+		ret.denominatorWavelet = 2;
 
 		return ret;
 	}

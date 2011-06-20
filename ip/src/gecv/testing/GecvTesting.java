@@ -589,4 +589,28 @@ public class GecvTesting {
 			}
 		}
 	}
+
+	public static void printDiff( ImageFloat32 imgA , ImageFloat32 imgB ) {
+		for( int y = 0; y < imgA.getHeight(); y++ ) {
+			for( int x = 0; x < imgA.getWidth(); x++ ) {
+				float diff = Math.abs(imgA.get(x,y)-imgB.get(x,y));
+				System.out.printf("%2d ",(int)diff);
+			}
+			System.out.println();
+		}
+	}
+
+	public static void printDiff( ImageInteger imgA , ImageInteger imgB ) {
+		for( int y = 0; y < imgA.getHeight(); y++ ) {
+			for( int x = 0; x < imgA.getWidth(); x++ ) {
+				int diff = Math.abs(imgA.get(x,y)-imgB.get(x,y));
+				if( diff > 60 ) {
+					System.out.println("A = "+imgA.get(x,y)+"  B = "+imgB.get(x,y));
+					System.out.println("Egads");
+				}
+				System.out.printf("%2d ",diff);
+			}
+			System.out.println();
+		}
+	}
 }

@@ -19,7 +19,7 @@ package gecv.alg.filter.derivative;
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import gecv.alg.filter.derivative.impl.HessianSobel_Shared;
-import gecv.core.image.border.ImageBorderExtended;
+import gecv.core.image.border.FactoryImageBorder;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -115,9 +115,9 @@ public class HessianSobel {
 		HessianSobel_Shared.process(orig, derivXX, derivYY, derivXY);
 
 		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelXX_I32, ImageBorderExtended.wrap(orig),derivXX,2);
-			ConvolveJustBorder_General.convolve(kernelYY_I32, ImageBorderExtended.wrap(orig),derivYY,2);
-			ConvolveJustBorder_General.convolve(kernelXY_I32, ImageBorderExtended.wrap(orig),derivXY,2);
+			ConvolveJustBorder_General.convolve(kernelXX_I32, FactoryImageBorder.extend(orig),derivXX,2);
+			ConvolveJustBorder_General.convolve(kernelYY_I32, FactoryImageBorder.extend(orig),derivYY,2);
+			ConvolveJustBorder_General.convolve(kernelXY_I32, FactoryImageBorder.extend(orig),derivXY,2);
 		}
 	}
 
@@ -137,9 +137,9 @@ public class HessianSobel {
 		HessianSobel_Shared.process(orig, derivXX, derivYY, derivXY);
 
 		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelXX_F32, ImageBorderExtended.wrap(orig),derivXX,2);
-			ConvolveJustBorder_General.convolve(kernelYY_F32, ImageBorderExtended.wrap(orig),derivYY,2);
-			ConvolveJustBorder_General.convolve(kernelXY_F32, ImageBorderExtended.wrap(orig),derivXY,2);
+			ConvolveJustBorder_General.convolve(kernelXX_F32, FactoryImageBorder.extend(orig),derivXX,2);
+			ConvolveJustBorder_General.convolve(kernelYY_F32, FactoryImageBorder.extend(orig),derivYY,2);
+			ConvolveJustBorder_General.convolve(kernelXY_F32, FactoryImageBorder.extend(orig),derivXY,2);
 		}
 	}
 }

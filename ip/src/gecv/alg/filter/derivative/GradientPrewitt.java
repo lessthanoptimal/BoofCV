@@ -19,7 +19,7 @@ package gecv.alg.filter.derivative;
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import gecv.alg.filter.derivative.impl.GradientPrewitt_Shared;
-import gecv.core.image.border.ImageBorderExtended;
+import gecv.core.image.border.FactoryImageBorder;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -50,8 +50,8 @@ public class GradientPrewitt {
 		GradientPrewitt_Shared.process(orig, derivX, derivY);
 
 		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelDerivX_I32, ImageBorderExtended.wrap(orig),derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_I32, ImageBorderExtended.wrap(orig),derivY,1);
+			ConvolveJustBorder_General.convolve(kernelDerivX_I32, FactoryImageBorder.extend(orig),derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_I32, FactoryImageBorder.extend(orig),derivY,1);
 		}
 	}
 
@@ -68,8 +68,8 @@ public class GradientPrewitt {
 		GradientPrewitt_Shared.process(orig, derivX, derivY);
 
 		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelDerivX_I32, ImageBorderExtended.wrap(orig),derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_I32, ImageBorderExtended.wrap(orig),derivY,1);
+			ConvolveJustBorder_General.convolve(kernelDerivX_I32, FactoryImageBorder.extend(orig),derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_I32, FactoryImageBorder.extend(orig),derivY,1);
 		}
 	}
 
@@ -87,8 +87,8 @@ public class GradientPrewitt {
 		GradientPrewitt_Shared.process(orig, derivX, derivY);
 
 		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelDerivX_F32, ImageBorderExtended.wrap(orig),derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_F32, ImageBorderExtended.wrap(orig),derivY,1);
+			ConvolveJustBorder_General.convolve(kernelDerivX_F32, FactoryImageBorder.extend(orig),derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_F32, FactoryImageBorder.extend(orig),derivY,1);
 		}
 	}
 }

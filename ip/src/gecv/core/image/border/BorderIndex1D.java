@@ -14,39 +14,25 @@
  *    limitations under the License.
  */
 
-package gecv.alg.wavelet;
-
-import gecv.core.image.border.BorderIndex1D;
+package gecv.core.image.border;
 
 
 /**
- * Base class for wavelet descriptions.
+ * Remaps references to elements outside of an array to elements inside of the array.
  *
  * @author Peter Abeles
  */
-public abstract class WaveletDesc {
+public abstract class BorderIndex1D {
 
-	// offset of wavelet numbers from start of signal array
-	public int offsetScaling;
-
-	// offset of wavelet numbers from start of signal array
-	public int offsetWavelet;
-
-	// how image boundaries are handled
-	public BorderIndex1D border;
-
-	/**
-	 * Returns the primitive type of the coefficients.
-	 *
-	 * @return Coefficient data type.
-	 */
-	public abstract Class<?> getType();
-
-	public abstract int getScalingLength();
-
-	public abstract int getWaveletLength();
-
-	public BorderIndex1D getBorder() {
-		return border;
+	public void setLength( int length ) {
+		this.length = length;
 	}
+
+	public int getLength() {
+		return length;
+	}
+
+	public abstract int getIndex( int index );
+
+	protected int length;
 }

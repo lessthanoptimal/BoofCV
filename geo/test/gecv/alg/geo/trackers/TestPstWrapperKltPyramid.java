@@ -55,13 +55,6 @@ public class TestPstWrapperKltPyramid extends StandardPointSequentialTrackerTest
 	}
 
 	@Override
-	public void trackUpdateSpawn(PointSequentialTracker tracker) {
-		// since there are no tracks it should spawn new ones
-		config.minFeatures = 10;
-		((PstWrapperKltPyramid)tracker).process(image);
-	}
-
-	@Override
 	public void trackUpdateChangePosition(PointSequentialTracker tracker) {
 		((PstWrapperKltPyramid)tracker).process(image);
 	}

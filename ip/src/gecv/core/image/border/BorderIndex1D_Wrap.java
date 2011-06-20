@@ -14,37 +14,20 @@
  *    limitations under the License.
  */
 
-package gecv.alg.wavelet;
+package gecv.core.image.border;
+
 
 /**
- * Description of an integer wavelet.
- *
  * @author Peter Abeles
  */
-public class WaveletDesc_I32 extends WaveletDesc {
-
-	// scaling numbers
-	public int scaling[];
-	// wavelet numbers
-	public int wavelet[];
-
-	// denominator for scaling coefficients
-	public int denominatorScaling;
-	// denominator for wavelet coefficients
-	public int denominatorWavelet;
-
+public class BorderIndex1D_Wrap extends BorderIndex1D {
 	@Override
-	public Class<?> getType() {
-		return int.class;
-	}
-
-	@Override
-	public int getScalingLength() {
-		return scaling.length;
-	}
-
-	@Override
-	public int getWaveletLength() {
-		return wavelet.length;
+	public int getIndex(int index) {
+		if( index < 0 )
+			return length+index;
+		else if( index >= length)
+			return index-length;
+		else
+			return index;
 	}
 }

@@ -28,7 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -55,11 +56,6 @@ public abstract class StandardPointSequentialTrackerTests {
 	public abstract void trackUpdateDrop( PointSequentialTracker tracker );
 
 	/**
-	 * Tracker should spawn new tracks
-	 */
-	public abstract void trackUpdateSpawn( PointSequentialTracker tracker );
-
-	/**
 	 * Tracker should change the position of existing tracks
 	 */
 	public abstract void trackUpdateChangePosition( PointSequentialTracker tracker );
@@ -71,12 +67,25 @@ public abstract class StandardPointSequentialTrackerTests {
 
 	@Test
 	public void spawnTracks() {
-		fail("implement");
+		tracker = createTracker();
+
+		assertEquals(0,tracker.getActiveTracks().size());
+		assertTrue(tracker.getNewTracks().size() == 0 );
+
+		tracker.spawnTracks();
+
+		assertTrue(tracker.getActiveTracks().size()>0);
+		assertTrue(tracker.getNewTracks().size() > 0 );
 	}
 
 	@Test
 	public void dropAllTracks() {
-		fail("implement");
+		tracker = createTracker();
+		addTracks(5);
+		assertEquals(5,tracker.getActiveTracks().size());
+		tracker.dropTracks();
+		assertEquals(0,tracker.getActiveTracks().size());
+		assertEquals(5,tracker.getDroppedTracks().size());
 	}
 
 	@Test
@@ -90,17 +99,6 @@ public abstract class StandardPointSequentialTrackerTests {
 
 		assertEquals(0,tracker.getActiveTracks().size());
 		assertEquals(5,tracker.getDroppedTracks().size());
-	}
-
-	@Test
-	public void testTrackSpawn() {
-		tracker = createTracker();
-		assertEquals(0,tracker.getActiveTracks().size());
-
-		trackUpdateSpawn(tracker);
-		checkUniqueFeatureID();
-
-		assertTrue(tracker.getActiveTracks().size()>0);
 	}
 
 	@Test

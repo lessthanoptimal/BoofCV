@@ -19,7 +19,7 @@ package gecv.alg.filter.derivative;
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import gecv.alg.filter.derivative.impl.HessianThree_Standard;
-import gecv.core.image.border.ImageBorderExtended;
+import gecv.core.image.border.FactoryImageBorder;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -80,7 +80,7 @@ public class HessianThree {
 		if( processBorder ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_I32, 2 );
 			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_I32, 2 );
-			ConvolveJustBorder_General.convolve(kernelCross_I32, ImageBorderExtended.wrap(orig),derivXY,2);
+			ConvolveJustBorder_General.convolve(kernelCross_I32, FactoryImageBorder.extend(orig),derivXY,2);
 		}
 	}
 
@@ -102,7 +102,7 @@ public class HessianThree {
 		if( processBorder ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_F32, 2 );
 			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_F32, 2 );
-			ConvolveJustBorder_General.convolve(kernelCross_F32, ImageBorderExtended.wrap(orig),derivXY,2);
+			ConvolveJustBorder_General.convolve(kernelCross_F32, FactoryImageBorder.extend(orig),derivXY,2);
 		}
 	}
 }

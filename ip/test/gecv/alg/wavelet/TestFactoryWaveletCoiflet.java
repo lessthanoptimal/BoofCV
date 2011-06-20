@@ -24,7 +24,18 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestFactoryWaveletCoiflet extends CommonFactoryWavelet{
+public class TestFactoryWaveletCoiflet extends CommonFactoryWavelet {
+
+	@Test
+	public void transform_generate_F32() {
+
+		for( int i = 6; i <= 6; i += 2 ) {
+			WaveletDesc_F32 desc = FactoryWaveletCoiflet.generate_F32(i);
+
+			checkEncodeDecode_F32(desc,desc);
+		}
+	}
+
 	/**
 	 * Sees if the standard CoifI wavelets have the expected characteristics
 	 */

@@ -1,3 +1,5 @@
+- Rename all low level classes the user should not interact with with Low*
+
 - Wavelet
  * All wavelets from the primer
  * Generalized wavelet object

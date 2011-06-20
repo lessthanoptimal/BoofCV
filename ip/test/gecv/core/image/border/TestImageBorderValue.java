@@ -28,7 +28,7 @@ public class TestImageBorderValue extends GenericImageBorderTests {
 	float value = 43;
 
 	@Override
-	public ImageBorder_I wrap(ImageUInt8 image) {
+	public ImageBorder_I32 wrap(ImageUInt8 image) {
 		return ImageBorderValue.wrap(image,(int)value);
 	}
 

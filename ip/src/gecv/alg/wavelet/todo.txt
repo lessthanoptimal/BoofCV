@@ -1,6 +1,11 @@
 - standard wavelet algorithms
   * inner
+    - float
+    - int
   * border
+    - float
+    - int
+* Add int to benchmark
 - unrolled
   * benchmark to see if scale and wavelet can be processed in two cycles and not inside the same loop
 - Create integer implementations using code generator

@@ -18,7 +18,7 @@ package gecv.alg.filter.convolve;
 
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
-import gecv.core.image.border.ImageBorderExtended;
+import gecv.core.image.border.FactoryImageBorder;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -46,7 +46,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -198,7 +198,7 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 
 	/**
@@ -213,6 +213,6 @@ public class ConvolveExtended {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,ImageBorderExtended.wrap(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,FactoryImageBorder.extend(image),dest,kernel.getRadius());
 	}
 }

@@ -25,6 +25,18 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 public class TestFactoryWaveletHaar extends CommonFactoryWavelet {
+
+
+
+	/**
+	 * Encode and decode an image using the Haar wavelet
+	 */
+	@Test
+	public void transform_F32() {
+		WaveletDesc_F32 desc = FactoryWaveletHaar.generate_F32();
+		checkEncodeDecode_F32(desc,desc);
+	}
+
 	@Test
 	public void checkProperties_F32() {
 		WaveletDesc_F32 desc = FactoryWaveletHaar.generate_F32();

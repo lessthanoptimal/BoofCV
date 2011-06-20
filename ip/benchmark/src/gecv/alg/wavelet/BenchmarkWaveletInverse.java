@@ -19,10 +19,8 @@ package gecv.alg.wavelet;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.misc.ImageTestingOps;
-import gecv.alg.wavelet.impl.LevelWaveletTransformInner;
-import gecv.alg.wavelet.impl.LevelWaveletTransformNaive;
-import gecv.core.image.border.ImageBorderReflect;
-import gecv.core.image.border.ImageBorder_F32;
+import gecv.alg.wavelet.impl.ImplWaveletTransformInner;
+import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
 
@@ -39,7 +37,6 @@ public class BenchmarkWaveletInverse {
 
 	static WaveletDesc_F32 forward_F32 = FactoryWaveletDaub.standard_F32(4);
 	static WaveletDesc_F32 reverse_F32 = forward_F32;
-	static ImageBorder_F32 border_F32 = ImageBorderReflect.wrap((ImageFloat32)null);
 
 	static ImageFloat32 tran_F32 = new ImageFloat32(imgWidth,imgHeight);
 	static ImageFloat32 temp1_F32 = new ImageFloat32(imgWidth,imgHeight);
@@ -50,17 +47,18 @@ public class BenchmarkWaveletInverse {
 
 		@Override
 		public void process() {
-			LevelWaveletTransformNaive.verticalInverse(forward_F32, tran_F32,temp1_F32);
-			LevelWaveletTransformNaive.horizontalInverse(forward_F32,temp1_F32,temp2_F32);
+			ImplWaveletTransformNaive.verticalInverse(forward_F32, tran_F32,temp1_F32);
+			ImplWaveletTransformNaive.horizontalInverse(forward_F32,temp1_F32,temp2_F32);
 		}
 	}
+
 
 	public static class Inner_F32 extends PerformerBase {
 
 		@Override
 		public void process() {
-//			LevelWaveletTransformInner.verticalInverse(forward_F32,orig_F32,temp1_F32);
-			LevelWaveletTransformInner.horizontalInverse(forward_F32, tran_F32,temp1_F32);
+			ImplWaveletTransformInner.verticalInverse(forward_F32,tran_F32,temp1_F32);
+			ImplWaveletTransformInner.horizontalInverse(forward_F32, tran_F32,temp1_F32);
 		}
 	}
 
@@ -73,7 +71,7 @@ public class BenchmarkWaveletInverse {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-//		ProfileOperation.printOpsPerSec(new Naive_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Naive_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Inner_F32(), TEST_TIME);
 	}
 }
