@@ -21,6 +21,8 @@ import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
+import gecv.struct.wavelet.WaveletDesc_F32;
+import gecv.struct.wavelet.WaveletDesc_I32;
 import gecv.testing.GecvTesting;
 
 import java.util.Random;

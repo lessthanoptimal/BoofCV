@@ -19,10 +19,12 @@ package gecv.alg.wavelet;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.misc.ImageTestingOps;
+import gecv.alg.wavelet.impl.ImplWaveletTransformBorder;
 import gecv.alg.wavelet.impl.ImplWaveletTransformInner;
 import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
+import gecv.struct.wavelet.WaveletDesc_F32;
 
 import java.util.Random;
 
@@ -58,7 +60,9 @@ public class BenchmarkWaveletInverse {
 		@Override
 		public void process() {
 			ImplWaveletTransformInner.verticalInverse(forward_F32,tran_F32,temp1_F32);
+			ImplWaveletTransformBorder.verticalInverse(forward_F32,tran_F32,temp1_F32);
 			ImplWaveletTransformInner.horizontalInverse(forward_F32, tran_F32,temp1_F32);
+			ImplWaveletTransformBorder.horizontalInverse(forward_F32, tran_F32,temp1_F32);
 		}
 	}
 

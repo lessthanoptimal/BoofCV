@@ -17,6 +17,7 @@
 package gecv.alg.wavelet;
 
 import gecv.core.image.border.BorderIndex1D_Wrap;
+import gecv.struct.wavelet.WaveletDesc_F32;
 
 
 /**
