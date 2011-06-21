@@ -1,7 +1,6 @@
-- Rename all low level classes the user should not interact with with Low*
+- Rename all low level implementation classes to have Impl* in their name
 
 - Wavelet
- * All wavelets from the primer
  * Generalized wavelet object
  * optimized wavelet code
    * float and integer images

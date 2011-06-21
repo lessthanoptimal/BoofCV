@@ -18,11 +18,11 @@ package gecv.alg.wavelet.impl;
 
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.wavelet.FactoryWaveletDaub;
-import gecv.alg.wavelet.WaveletDesc_F32;
-import gecv.alg.wavelet.WaveletDesc_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
+import gecv.struct.wavelet.WaveletDesc_F32;
+import gecv.struct.wavelet.WaveletDesc_I32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 

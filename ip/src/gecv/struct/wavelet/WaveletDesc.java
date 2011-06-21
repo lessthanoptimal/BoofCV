@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.wavelet;
+package gecv.struct.wavelet;
 
 import gecv.core.image.border.BorderIndex1D;
 

@@ -17,6 +17,7 @@
 package gecv.alg.wavelet;
 
 import gecv.struct.image.ImageBase;
+import gecv.struct.wavelet.WaveletDesc;
 
 
 /**

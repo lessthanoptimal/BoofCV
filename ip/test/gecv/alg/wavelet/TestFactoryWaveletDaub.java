@@ -16,6 +16,8 @@
 
 package gecv.alg.wavelet;
 
+import gecv.struct.wavelet.WaveletDesc_F32;
+import gecv.struct.wavelet.WaveletDesc_I32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

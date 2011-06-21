@@ -14,23 +14,28 @@
  *    limitations under the License.
  */
 
-package gecv.alg.wavelet;
+package gecv.struct.wavelet;
 
 /**
- * Description of a floating point wavelet.
+ * Description of an integer wavelet.
  *
  * @author Peter Abeles
  */
-public class WaveletDesc_F32 extends WaveletDesc {
+public class WaveletDesc_I32 extends WaveletDesc {
 
 	// scaling numbers
-	public float scaling[];
+	public int scaling[];
 	// wavelet numbers
-	public float wavelet[];
+	public int wavelet[];
+
+	// denominator for scaling coefficients
+	public int denominatorScaling;
+	// denominator for wavelet coefficients
+	public int denominatorWavelet;
 
 	@Override
 	public Class<?> getType() {
-		return float.class;
+		return int.class;
 	}
 
 	@Override
