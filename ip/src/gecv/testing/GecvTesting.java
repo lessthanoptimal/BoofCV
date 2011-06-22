@@ -245,7 +245,7 @@ public class GecvTesting {
 	 * to see if any matches that could accept an input of the specified type.  If there
 	 * is only one such match that is returned.
 	 */
-	private static Method findMethod(Class<?> type, String name, Class<?>[] params) {
+	public static Method findMethod(Class<?> type, String name,  Class<?>... params ) {
 		Method methods[] = type.getMethods();
 
 		List<Method> found = new ArrayList<Method>();
@@ -275,7 +275,7 @@ public class GecvTesting {
 			for (int i = 0; i < a.length; i++) {
 				if( params[i] == a[i] )
 					continue;
-				if ( params[i].isAssignableFrom(a[i])) {
+				if ( !a[i].isAssignableFrom(params[i])) {
 					match = false;
 					break;
 				}

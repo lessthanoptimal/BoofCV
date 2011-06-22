@@ -14,16 +14,20 @@
  *    limitations under the License.
  */
 
-package gecv.alg.wavelet;
+package gecv.alg.denoise;
 
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.misc.PixelMath;
-import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
+import gecv.alg.wavelet.FactoryWaveletDaub;
+import gecv.alg.wavelet.UtilWavelet;
+import gecv.alg.wavelet.WaveletTransformOps;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
+import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -34,10 +38,12 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
+// todo compute SNR before and after
 public class WaveletDenoiseApp {
 
 	int width;
 	int height;
+	int numLevels = 3;
 	float noiseLevel = 50;
 
 	Random rand = new Random(2234);
@@ -48,69 +54,49 @@ public class WaveletDenoiseApp {
 	ImageFloat32 imageWavelet;
 	ImageFloat32 imageInv;
 
-	WaveletDesc_F32 coefF = FactoryWaveletHaar.generate_F32();
-	WaveletDesc_F32 coefR = FactoryWaveletHaar.generate_F32();
+//	WaveletCoefficient_F32 coefF = FactoryWaveletHaar.generate_F32();
+//	WaveletCoefficient_F32 coefR = FactoryWaveletHaar.generate_F32();
 //
-//	WaveletDesc_F32 coefF = FactoryWaveletDaub.standard_F32(4);
-//	WaveletDesc_F32 coefR = FactoryWaveletDaub.standard_F32(4);
+	WaveletCoefficient_F32 coefF = FactoryWaveletDaub.standard_F32(4);
+	WaveletCoefficient_F32 coefR = FactoryWaveletDaub.standard_F32(4);
 
-//	WaveletDesc_F32 coefF = FactoryWaveletDaub.biorthogonal_F32(5);
-//	WaveletDesc_F32 coefR = FactoryWaveletDaub.biorthogonalInv_F32(5);
+//	WaveletCoefficient_F32 coefF = FactoryWaveletDaub.biorthogonal_F32(5);
+//	WaveletCoefficient_F32 coefR = FactoryWaveletDaub.biorthogonalInv_F32(5);
 
 	public void process() {
-//		createTestImage();
-		loadImage();
+		createTestImage();
+//		loadImage();
 
 		width = image.getWidth();
 		height = image.getHeight();
-		temp = new ImageFloat32(width,height);
-		imageWavelet = new ImageFloat32(width,height);
+
+		ImageDimension d = UtilWavelet.transformDimension(image,numLevels);
+
+		imageWavelet = new ImageFloat32(d.width,d.height);
 		ImageFloat32 imageInv = new ImageFloat32(width,height);
 
 		panelInput = ShowImages.showWindow(image,"Input Image",true);
 		ConvertBufferedImage.convertTo(image,panelInput.getImage());
 		panelInput.repaint();
 
-
-		ImplWaveletTransformNaive.horizontal(coefF,image,temp);
-		ImplWaveletTransformNaive.vertical(coefF,temp,imageWavelet);
+		WaveletTransformOps.transformN(coefF,image.clone(),imageWavelet,null,numLevels);
 
 		ShowImages.showWindow(imageWavelet,"Transformed",true);
 
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x++ ) {
-				if( x < width/2 && y < height/2 )
-					continue;
-				float v = Math.abs(imageWavelet.get(x,y));
-				if( v < 5 )
-					imageWavelet.set(x,y,0);
-			}
-		}
+		float threshold[] = new float[ imageWavelet.width*imageWavelet.height ];
+		float thresh = DenoiseVisuShrink.computeThreshold(imageWavelet,numLevels,threshold);
+		DenoiseVisuShrink.process(imageWavelet,numLevels,thresh);
 
-//		for( int y = 0; y < height; y++ ) {
-//			for( int x = 0; x < width; x++ ) {
-//				if( x < width/2 && y < height/2 )
-//					continue;
-//				float v = imageWavelet.get(x,y)*4;
-//				imageWavelet.set(x,y,v);
-//			}
-//		}
-
-//		for( int y = 0; y < height; y++ ) {
-//			for( int x = 0; x < width; x++ ) {
-//				if( x < width/2 && y < height/2 ) {
-//					imageWavelet.set(x,y,0);
-//				}
-//			}
-//		}
-
-		ImplWaveletTransformNaive.verticalInverse(coefR,imageWavelet,temp);
-		ImplWaveletTransformNaive.horizontalInverse(coefR,temp,imageInv);
+		WaveletTransformOps.inverseN(coefR,imageWavelet,imageInv,null,numLevels);
 
 		PixelMath.boundImage(imageInv,0,255);
 
 		ShowImages.showWindow(imageInv,"Inverted",true);
 
+		ImageFloat32 diff = new ImageFloat32(width,height);
+		PixelMath.diffAbs(image,imageInv,diff);
+		ShowImages.showWindow(diff,"Difference",true);
+		
 		double error = 0;
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {

@@ -62,7 +62,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 		T src = generator.createInstance(width,height);
 		T dst = generator.createInstance(width,height);
 
-		GeneralizedImageOps.randomize(src,0,10,rand);
+		GeneralizedImageOps.randomize(src, rand, 0,10);
 
 		ImageDistort<T> tran = createDistort(new BasicTransform(),interp);
 		tran.apply(src,dst);
@@ -89,7 +89,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 		T src = generator.createInstance(width,height);
 		T dst = generator.createInstance(width,height);
 
-		GeneralizedImageOps.randomize(src,0,10,rand);
+		GeneralizedImageOps.randomize(src, rand, 0,10);
 
 		int fillValue = 5;
 

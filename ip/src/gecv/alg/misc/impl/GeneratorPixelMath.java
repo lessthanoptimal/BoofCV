@@ -78,6 +78,7 @@ public class GeneratorPixelMath {
 			printMult();
 			printPlus();
 			printBoundImage();
+			printDiffAbs();
 		}
 	}
 
@@ -265,18 +266,53 @@ public class GeneratorPixelMath {
 				"\t\tfinal int h = img.getHeight();\n" +
 				"\t\tfinal int w = img.getWidth();\n" +
 				"\n" +
-				"\t\t"+sumType+" range = max-min;\n" +
-				"\n" +
 				"\t\t"+input.getDataType()+"[] data = img.data;\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
-				"\t\t\tfor (int x = 0; x < w; x++,index++) {\n" +
+				"\t\t\tint indexEnd = index+w;\n" +
+				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
+				"\t\t\tfor (; index < indexEnd; index++) {\n" +
 				"\t\t\t\t"+sumType+" value = data[index];\n" +
 				"\t\t\t\tif( value < min )\n" +
 				"\t\t\t\t\tdata[index] = "+input.getTypeCastFromSum()+"min;\n" +
 				"\t\t\t\telse if( value > max )\n" +
 				"\t\t\t\t\tdata[index] = "+input.getTypeCastFromSum()+"max;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printDiffAbs() {
+
+		String bitWise = input.getBitWise();
+		String typeCast = input.isInteger() ? "("+input.getDataType()+")" : "";
+
+		out.print("\t/**\n" +
+				"\t * <p>\n" +
+				"\t * Computes the absolute value of the difference between each pixel in the two images.<br>\n" +
+				"\t * d(x,y) = |img1(x,y) - img2(x,y)|\n" +
+				"\t * </p>\n" +
+				"\t * @param imgA Input image. Not modified.\n" +
+				"\t * @param imgB Input image. Not modified.\n" +
+				"\t * @param diff Absolute value of difference image. Modified.\n" +
+				"\t */\n" +
+				"\tpublic static void diffAbs( "+input.getImageName()+" imgA , "+input.getImageName()+" imgB , "+input.getImageName()+" diff ) {\n" +
+				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,diff);\n" +
+				"\t\t\n" +
+				"\t\tfinal int h = imgA.getHeight();\n" +
+				"\t\tfinal int w = imgA.getWidth();\n" +
+				"\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
+				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
+				"\t\t\tint indexDiff = diff.getStartIndex() + y * diff.getStride();\n" +
+				"\t\t\t\n" +
+				"\t\t\tint indexEnd = indexA+w;\n" +
+				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
+				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {\n" +
+				"\t\t\t\tdiff.data[indexDiff] = "+typeCast+"Math.abs((imgA.data[indexA] "+bitWise+") - (imgB.data[indexB] "+bitWise+"));\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

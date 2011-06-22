@@ -21,9 +21,9 @@ import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.SingleBandImage;
 import gecv.struct.convolve.KernelBase;
 import gecv.struct.image.ImageBase;
-import gecv.core.image.SingleBandImage;
 import gecv.testing.CompareEquivalentFunctions;
 import org.junit.Test;
 
@@ -85,7 +85,7 @@ Random rand = new Random(0xFF);
 			}
 
 			ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
-			GeneralizedImageOps.randomize(src, 0, 130, rand);
+			GeneralizedImageOps.randomize(src, rand, 0, 130);
 			ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
 
 			Object[][] ret = new Object[1][paramTypes.length];

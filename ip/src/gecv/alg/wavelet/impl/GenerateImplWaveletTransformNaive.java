@@ -106,7 +106,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t * @param input Input image which is being transform. Not modified.\n" +
 				"\t * @param output where the output is written to. Modified\n" +
 				"\t */\n" +
-				"\tpublic static void horizontal( WaveletDesc_"+genName+" coefficients ,\n" +
+				"\tpublic static void horizontal( WaveletCoefficient_"+genName+" coefficients ,\n" +
 				"\t\t\t\t\t\t\t\t   "+imageIn.getImageName()+" input , "+imageIn.getImageName()+" output ) {\n" +
 				"\n" +
 				"\t\tUtilWavelet.checkShape(input,output);\n" +
@@ -120,11 +120,9 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t\tborder.setLength(output.width);\n" +
 				"\n" +
 				"\t\tfinal boolean isLarger = output.width > input.width;\n" +
-				"\t\tfinal int width = output.width;\n" +
-				"\t\tfinal int height = input.height;\n" +
 				"\n" +
-				"\t\tfor( int y = 0; y < height; y++ ) {\n" +
-				"\t\t\tfor( int x = 0; x < width; x += 2 ) {\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tfor( int x = 0; x < output.width; x += 2 ) {\n" +
 				"\n" +
 				"\t\t\t\t"+sumType+" scale = 0;\n" +
 				"\t\t\t\t"+sumType+" wavelet = 0;\n" +
@@ -152,7 +150,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 		}
 
 		out.print("\t\t\t\toutput.set(outX,y,scale);\n" +
-				"\t\t\t\toutput.set(width/2 + outX , y , wavelet );\n" +
+				"\t\t\t\toutput.set(output.width/2 + outX , y , wavelet );\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -166,7 +164,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t * @param input Input image which is being transform. Not modified.\n" +
 				"\t * @param output where the output is written to. Modified\n" +
 				"\t */\n" +
-				"\tpublic static void vertical( WaveletDesc_"+genName+" coefficients ,\n" +
+				"\tpublic static void vertical( WaveletCoefficient_"+genName+" coefficients ,\n" +
 				"\t\t\t\t\t\t\t\t "+imageIn.getImageName()+" input , "+imageIn.getImageName()+" output ) {\n" +
 				"\n" +
 				"\t\tUtilWavelet.checkShape(input,output);\n" +
@@ -180,11 +178,9 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t\tborder.setLength(output.height);\n" +
 				"\n" +
 				"\t\tboolean isLarger = output.height > input.height;\n" +
-				"\t\tfinal int width = input.width;\n" +
-				"\t\tfinal int height = output.height;\n" +
 				"\n" +
-				"\t\tfor( int x = 0; x < width; x++) {\n" +
-				"\t\t\tfor( int y = 0; y < height; y += 2 ) {\n" +
+				"\t\tfor( int x = 0; x < input.width; x++) {\n" +
+				"\t\t\tfor( int y = 0; y < output.height; y += 2 ) {\n" +
 				"\t\t\t\t"+sumType+" scale = 0;\n" +
 				"\t\t\t\t"+sumType+" wavelet = 0;\n" +
 				"\n" +
@@ -209,7 +205,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 					"\n");
 		}
 				out.print("\t\t\t\toutput.set(x , outY,scale);\n" +
-				"\t\t\t\toutput.set(x , height/2 + outY , wavelet );\n" +
+				"\t\t\t\toutput.set(x , output.height/2 + outY , wavelet );\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -223,7 +219,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t * @param input Transformed image. Not modified.\n" +
 				"\t * @param output Reconstruction of original image. Modified\n" +
 				"\t */\n" +
-				"\tpublic static void horizontalInverse( WaveletDesc_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageIn.getImageName()+" output ) {\n" +
+				"\tpublic static void horizontalInverse( WaveletCoefficient_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageIn.getImageName()+" output ) {\n" +
 				"\n" +
 				"\t\tUtilWavelet.checkShape(output,input);\n" +
 				"\n" +
@@ -232,12 +228,10 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
 				"\t\tfinal "+sumType+"[] beta = coefficients.wavelet;\n" +
 				"\n" +
-				"\t\t"+sumType+" []trends = new "+sumType+"[ input.width ];\n" +
-				"\t\t"+sumType+" []details = new "+sumType+"[ input.width ];\n" +
+				"\t\t"+sumType+" []trends = new "+sumType+"[ output.width ];\n" +
+				"\t\t"+sumType+" []details = new "+sumType+"[ output.width ];\n" +
 				"\n" +
 				"\t\tboolean isLarger = input.width >= output.width;\n" +
-				"\t\tfinal int width = input.width;\n" +
-				"\t\tfinal int height = output.height;\n" +
 				"\n" +
 				"\t\tBorderIndex1D border = coefficients.getBorder();\n" +
 				"\t\tborder.setLength(input.width);\n" +
@@ -249,16 +243,16 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 					"\t\tfinal int ef2 = ef/2;\n\n");
 		}
 
-		out.print("\t\tfor( int y = 0; y < height; y++ ) {\n" +
+		out.print("\t\tfor( int y = 0; y < output.height; y++ ) {\n" +
 				"\n" +
 				"\t\t\tfor( int i = 0; i < details.length; i++ ) {\n" +
 				"\t\t\t\tdetails[i] = 0;\n" +
 				"\t\t\t\ttrends[i] = 0;\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tfor( int x = 0; x < width; x += 2 ) {\n" +
+				"\t\t\tfor( int x = 0; x < input.width; x += 2 ) {\n" +
 				"\t\t\t\t"+sumType+" a = input.get(x/2,y);\n" +
-				"\t\t\t\t"+sumType+" d = input.get(width/2+x/2,y);\n" +
+				"\t\t\t\t"+sumType+" d = input.get(input.width/2+x/2,y);\n" +
 				"\n" +
 				"\t\t\t\t// add the trend\n" +
 				"\t\t\t\tfor( int i = 0; i < alpha.length; i++ ) {\n" +
@@ -297,7 +291,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t * @param input Transformed image. Not modified.\n" +
 				"\t * @param output Reconstruction of original image. Modified\n" +
 				"\t */\n" +
-				"\tpublic static void verticalInverse( WaveletDesc_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageIn.getImageName()+" output ) {\n" +
+				"\tpublic static void verticalInverse( WaveletCoefficient_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageIn.getImageName()+" output ) {\n" +
 				"\n" +
 				"\t\tUtilWavelet.checkShape(output,input);\n" +
 				"\n" +
@@ -306,12 +300,10 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
 				"\t\tfinal "+sumType+"[] beta = coefficients.wavelet;\n" +
 				"\n" +
-				"\t\t"+sumType+" []trends = new "+sumType+"[ input.height ];\n" +
-				"\t\t"+sumType+" []details = new "+sumType+"[ input.height ];\n" +
+				"\t\t"+sumType+" []trends = new "+sumType+"[ output.height ];\n" +
+				"\t\t"+sumType+" []details = new "+sumType+"[ output.height ];\n" +
 				"\n" +
 				"\t\tboolean isLarger = input.height > output.height;\n" +
-				"\t\tfinal int width = output.width;\n" +
-				"\t\tfinal int height = input.height;\n" +
 				"\n" +
 				"\t\tBorderIndex1D border = coefficients.getBorder();\n" +
 				"\t\tborder.setLength(input.height);\n" +
@@ -323,16 +315,16 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 					"\t\tfinal int ef = e*f;\n" +
 					"\t\tfinal int ef2 = ef/2;\n\n");
 		}
-		out.print("\t\tfor( int x = 0; x < width; x++) {\n" +
+		out.print("\t\tfor( int x = 0; x < output.width; x++) {\n" +
 				"\n" +
 				"\t\t\tfor( int i = 0; i < details.length; i++ ) {\n" +
 				"\t\t\t\tdetails[i] = 0;\n" +
 				"\t\t\t\ttrends[i] = 0;\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tfor( int y = 0; y < height; y += 2 ) {\n" +
+				"\t\t\tfor( int y = 0; y < input.height; y += 2 ) {\n" +
 				"\t\t\t\t"+sumType+" a = input.get(x,y/2);\n" +
-				"\t\t\t\t"+sumType+" d = input.get(x,y/2+height/2);\n" +
+				"\t\t\t\t"+sumType+" d = input.get(x,y/2+input.height/2);\n" +
 				"\n" +
 				"\t\t\t\t// add the 'average' signal\n" +
 				"\t\t\t\tfor( int i = 0; i < alpha.length; i++ ) {\n" +

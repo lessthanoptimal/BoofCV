@@ -79,7 +79,7 @@ public class TestConvolveImageNoBorderSparse {
 			}
 
 			ImageBase src = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
-			GeneralizedImageOps.randomize(src, 0, 5, rand);
+			GeneralizedImageOps.randomize(src, rand, 0, 5);
 
 
 			Object[][] ret = new Object[1][paramTypes.length];

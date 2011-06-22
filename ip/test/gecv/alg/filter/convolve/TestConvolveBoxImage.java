@@ -87,7 +87,7 @@ public class TestConvolveBoxImage {
 		Object kernel = createTableKernel(check.getParameterTypes()[0], kernelRadius, rand);
 
 		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[0], width, height);
-		GeneralizedImageOps.randomize(src, 0, 5, rand);
+		GeneralizedImageOps.randomize(src, rand, 0, 5);
 		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 
 		if (target.getName().compareTo("horizontal") == 0 || target.getName().compareTo("vertical") == 0) {

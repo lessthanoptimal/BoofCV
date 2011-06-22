@@ -93,7 +93,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageBase> {
 	 */
 	public void checkRegion(int regionWidth, int regionHeight, float x, float y) {
 		T img = createImage(width, height);
-		GeneralizedImageOps.randomize(img,0,20,rand);
+		GeneralizedImageOps.randomize(img, rand, 0,20);
 
 		this.regionWidth = regionWidth;
 		this.regionHeight = regionHeight;

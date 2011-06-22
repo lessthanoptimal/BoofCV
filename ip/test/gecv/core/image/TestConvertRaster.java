@@ -138,7 +138,7 @@ public class TestConvertRaster {
 		Class<?> paramTypes[] = m.getParameterTypes();
 
 		ImageBase input = GecvTesting.createImage(paramTypes[0],imgWidth,imgHeight);
-		GeneralizedImageOps.randomize(input,0,50,rand);
+		GeneralizedImageOps.randomize(input, rand, 0,50);
 
 		BufferedImage output[] = createBufferedTestImages(paramTypes[1]);
 
