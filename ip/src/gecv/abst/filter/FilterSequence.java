@@ -67,7 +67,7 @@ public class FilterSequence<Input extends ImageBase, Output extends ImageBase>
 			Output swap = temp1;
 			temp1 = temp2;
 			temp2 = swap;
-			GeneralizedImageOps.setAll(temp2,0);
+			GeneralizedImageOps.fill(temp2,0);
 		}
 
 		output.setTo(temp1);

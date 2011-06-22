@@ -75,9 +75,9 @@ public class TestConvertImage {
 
 	   // only provide signed numbers of both data types can handle them
 		if( inputSigned && outputSigned ) {
-			GeneralizedImageOps.randomize(input,-10,10,rand);
+			GeneralizedImageOps.randomize(input, rand, -10,10);
 		} else {
-			GeneralizedImageOps.randomize(input,0,20,rand);
+			GeneralizedImageOps.randomize(input, rand, 0,20);
 		}
 
 		GecvTesting.checkSubImage(this,"checkConvert",true,m,input,output);

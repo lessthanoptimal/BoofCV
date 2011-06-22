@@ -64,7 +64,7 @@ public class CompareToStandardConvolveDownNormalized extends CompareIdenticalFun
 		}
 
 		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
-		GeneralizedImageOps.randomize(src, 1, 10, rand);
+		GeneralizedImageOps.randomize(src, rand, 1, 10);
 		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
 
 		Object[][] ret = new Object[1][paramTypes.length];

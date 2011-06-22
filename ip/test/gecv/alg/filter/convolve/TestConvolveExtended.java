@@ -104,7 +104,7 @@ public class TestConvolveExtended extends CompareImageBorder {
 		Object kernel = createKernel(paramTypes[0]);
 
 		ImageBase src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
-		GeneralizedImageOps.randomize(src, 0, 5, rand);
+		GeneralizedImageOps.randomize(src, rand, 0, 5);
 		ImageBase dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
 		Object[][] ret = new Object[1][paramTypes.length];

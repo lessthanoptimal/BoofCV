@@ -48,7 +48,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void randomize(ImageBase img, int min, int max, Random rand) {
+	public static void randomize(ImageBase img, Random rand, int min, int max) {
 		if (img.getClass() == ImageUInt8.class || img.getClass() == ImageSInt8.class ) {
 			ImageTestingOps.randomize((ImageInt8) img, rand, min, max);
 		} else if (img.getClass() == ImageSInt16.class || img.getClass() == ImageUInt16.class) {
@@ -84,7 +84,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void setAll(ImageBase img, double value) {
+	public static void fill(ImageBase img, double value) {
 		if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
 			ImageTestingOps.fill((ImageInt8)img,(int)value);
 		} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {

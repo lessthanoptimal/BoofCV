@@ -16,25 +16,34 @@
 
 package gecv.alg.wavelet.impl;
 
-import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.BorderIndex1D_Wrap;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.wavelet.WaveletCoefficient;
 import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletCoefficient_I32;
+import gecv.testing.GecvTesting;
 
 import java.util.Random;
 
 
 /**
- * todo comment
+ * Generalized wavelet test which allows one algorithm to be compared against another one across
+ * a wide variety of image shapes, wavelet sizes, and sub-images.
  *
  * @author Peter Abeles
  */
-// todo add sub-image test
 public abstract class PermuteWaveletCompare {
 	Random rand = new Random(234);
 
-	int width = 20;
-	int height = 30;
+	Class<?> inputType;
+	Class<?> outputType;
+
+	protected PermuteWaveletCompare(Class<?> inputType, Class<?> outputType) {
+		this.inputType = inputType;
+		this.outputType = outputType;
+	}
 
 	public void runTests( boolean swapSizes ) {
 
@@ -62,36 +71,50 @@ public abstract class PermuteWaveletCompare {
 			heightOut = t;
 		}
 
-		ImageFloat32 input = new ImageFloat32(widthIn,heightIn);
-		ImageFloat32 found = new ImageFloat32(widthOut,heightOut);
-		ImageFloat32 expected = new ImageFloat32(widthOut,heightOut);
+		ImageBase input = GecvTesting.createImage(inputType,widthIn,heightIn);
+		ImageBase found = GecvTesting.createImage(outputType,widthOut,heightOut);
+		ImageBase expected = GecvTesting.createImage(outputType,widthOut,heightOut);
 
-		ImageTestingOps.randomize(input,rand,0,50);
+		GeneralizedImageOps.randomize(input, rand, 0 , 50);
 
 		// test different descriptions lengths and offsets
 		for( int o = 0; o <= 2; o++ ) {
 			for( int l = 2+o; l <= 5; l++ ) {
 //					System.out.println("shrink "+shrink+" o = "+o+" l = "+l);
-				ImageTestingOps.fill(found,0);
-				ImageTestingOps.fill(expected,0);
-				WaveletCoefficient_F32 desc = createDesc(-o,l);
-
+				GeneralizedImageOps.fill(found,0);
+				GeneralizedImageOps.fill(expected,0);
+				// create a random wavelet.  does not have to be a real once
+				// since it just is checking that two functions produce the same output
+				WaveletCoefficient desc = createDesc(-o,l);
 				applyValidation(desc,input,expected);
-				applyTransform(desc,input,found);
 
-				compareResults(desc, input , expected , found);
+				// make sure it works on sub-images
+				GecvTesting.checkSubImage(this,"innerTest",false,input,found, expected, desc);
 			}
 		}
 	}
 
-	public abstract void applyValidation( WaveletCoefficient_F32 desc , ImageFloat32 input , ImageFloat32 output );
+	public void innerTest(ImageBase input, ImageBase found, ImageBase expected,
+						   WaveletCoefficient desc) {
+		applyTransform(desc,input,found);
+		compareResults(desc, input , expected , found);
+	}
 
+	public abstract void applyValidation( WaveletCoefficient desc , ImageBase input , ImageBase output );
 
-	public abstract void applyTransform( WaveletCoefficient_F32 desc , ImageFloat32 input , ImageFloat32 output );
+	public abstract void applyTransform( WaveletCoefficient desc , ImageBase input , ImageBase output );
 
-	public abstract void compareResults(WaveletCoefficient_F32 desc, ImageFloat32 input , ImageFloat32 expected, ImageFloat32 found );
+	public abstract void compareResults( WaveletCoefficient desc, ImageBase input , ImageBase expected, ImageBase found );
 
-	private WaveletCoefficient_F32 createDesc(int offset, int length) {
+	private WaveletCoefficient createDesc(int offset, int length) {
+		if( inputType == ImageFloat32.class ) {
+			return createDesc_F32(offset,length);
+		} else {
+			return createDesc_I32(offset,length);
+		}
+	}
+
+	private WaveletCoefficient_F32 createDesc_F32(int offset, int length) {
 		WaveletCoefficient_F32 ret = new WaveletCoefficient_F32();
 		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = offset;
@@ -102,6 +125,24 @@ public abstract class PermuteWaveletCompare {
 		for( int i = 0; i < length; i++ ) {
 			ret.scaling[i] = (float)rand.nextGaussian();
 			ret.wavelet[i] = (float)rand.nextGaussian();
+		}
+
+		return ret;
+	}
+
+	private WaveletCoefficient_I32 createDesc_I32(int offset, int length) {
+		WaveletCoefficient_I32 ret = new WaveletCoefficient_I32();
+		ret.border = new BorderIndex1D_Wrap();
+		ret.offsetScaling = offset;
+		ret.offsetWavelet = offset;
+		ret.scaling = new int[length];
+		ret.wavelet = new int[length];
+		ret.denominatorScaling = 2;
+		ret.denominatorWavelet = 3;
+
+		for( int i = 0; i < length; i++ ) {
+			ret.scaling[i] = rand.nextInt(6)-3;
+			ret.wavelet[i] = rand.nextInt(6)-3;
 		}
 
 		return ret;

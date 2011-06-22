@@ -59,11 +59,9 @@ public class ImplWaveletTransformNaive {
 		border.setLength(output.width);
 
 		final boolean isLarger = output.width > input.width;
-		final int width = output.width;
-		final int height = input.height;
 
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x += 2 ) {
+		for( int y = 0; y < input.height; y++ ) {
+			for( int x = 0; x < output.width; x += 2 ) {
 
 				float scale = 0;
 				float wavelet = 0;
@@ -84,7 +82,7 @@ public class ImplWaveletTransformNaive {
 				int outX = x/2;
 
 				output.set(outX,y,scale);
-				output.set(width/2 + outX , y , wavelet );
+				output.set(output.width/2 + outX , y , wavelet );
 			}
 		}
 	}
@@ -110,11 +108,9 @@ public class ImplWaveletTransformNaive {
 		border.setLength(output.height);
 
 		boolean isLarger = output.height > input.height;
-		final int width = input.width;
-		final int height = output.height;
 
-		for( int x = 0; x < width; x++) {
-			for( int y = 0; y < height; y += 2 ) {
+		for( int x = 0; x < input.width; x++) {
+			for( int y = 0; y < output.height; y += 2 ) {
 				float scale = 0;
 				float wavelet = 0;
 
@@ -134,7 +130,7 @@ public class ImplWaveletTransformNaive {
 				int outY = y/2;
 
 				output.set(x , outY,scale);
-				output.set(x , height/2 + outY , wavelet );
+				output.set(x , output.height/2 + outY , wavelet );
 			}
 		}
 	}
@@ -155,26 +151,24 @@ public class ImplWaveletTransformNaive {
 		final float[] alpha = coefficients.scaling;
 		final float[] beta = coefficients.wavelet;
 
-		float []trends = new float[ input.width ];
-		float []details = new float[ input.width ];
+		float []trends = new float[ output.width ];
+		float []details = new float[ output.width ];
 
 		boolean isLarger = input.width >= output.width;
-		final int width = input.width;
-		final int height = output.height;
 
 		BorderIndex1D border = coefficients.getBorder();
 		border.setLength(input.width);
 
-		for( int y = 0; y < height; y++ ) {
+		for( int y = 0; y < output.height; y++ ) {
 
 			for( int i = 0; i < details.length; i++ ) {
 				details[i] = 0;
 				trends[i] = 0;
 			}
 
-			for( int x = 0; x < width; x += 2 ) {
+			for( int x = 0; x < input.width; x += 2 ) {
 				float a = input.get(x/2,y);
-				float d = input.get(width/2+x/2,y);
+				float d = input.get(input.width/2+x/2,y);
 
 				// add the trend
 				for( int i = 0; i < alpha.length; i++ ) {
@@ -216,26 +210,24 @@ public class ImplWaveletTransformNaive {
 		final float[] alpha = coefficients.scaling;
 		final float[] beta = coefficients.wavelet;
 
-		float []trends = new float[ input.height ];
-		float []details = new float[ input.height ];
+		float []trends = new float[ output.height ];
+		float []details = new float[ output.height ];
 
 		boolean isLarger = input.height > output.height;
-		final int width = output.width;
-		final int height = input.height;
 
 		BorderIndex1D border = coefficients.getBorder();
 		border.setLength(input.height);
 
-		for( int x = 0; x < width; x++) {
+		for( int x = 0; x < output.width; x++) {
 
 			for( int i = 0; i < details.length; i++ ) {
 				details[i] = 0;
 				trends[i] = 0;
 			}
 
-			for( int y = 0; y < height; y += 2 ) {
+			for( int y = 0; y < input.height; y += 2 ) {
 				float a = input.get(x,y/2);
-				float d = input.get(x,y/2+height/2);
+				float d = input.get(x,y/2+input.height/2);
 
 				// add the 'average' signal
 				for( int i = 0; i < alpha.length; i++ ) {
@@ -282,11 +274,9 @@ public class ImplWaveletTransformNaive {
 		border.setLength(output.width);
 
 		final boolean isLarger = output.width > input.width;
-		final int width = output.width;
-		final int height = input.height;
 
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x += 2 ) {
+		for( int y = 0; y < input.height; y++ ) {
+			for( int x = 0; x < output.width; x += 2 ) {
 
 				int scale = 0;
 				int wavelet = 0;
@@ -310,7 +300,7 @@ public class ImplWaveletTransformNaive {
 				wavelet = 2*wavelet/coefficients.denominatorWavelet;
 
 				output.set(outX,y,scale);
-				output.set(width/2 + outX , y , wavelet );
+				output.set(output.width/2 + outX , y , wavelet );
 			}
 		}
 	}
@@ -336,11 +326,9 @@ public class ImplWaveletTransformNaive {
 		border.setLength(output.height);
 
 		boolean isLarger = output.height > input.height;
-		final int width = input.width;
-		final int height = output.height;
 
-		for( int x = 0; x < width; x++) {
-			for( int y = 0; y < height; y += 2 ) {
+		for( int x = 0; x < input.width; x++) {
+			for( int y = 0; y < output.height; y += 2 ) {
 				int scale = 0;
 				int wavelet = 0;
 
@@ -363,7 +351,7 @@ public class ImplWaveletTransformNaive {
 				wavelet = 2*wavelet/coefficients.denominatorWavelet;
 
 				output.set(x , outY,scale);
-				output.set(x , height/2 + outY , wavelet );
+				output.set(x , output.height/2 + outY , wavelet );
 			}
 		}
 	}
@@ -384,12 +372,10 @@ public class ImplWaveletTransformNaive {
 		final int[] alpha = coefficients.scaling;
 		final int[] beta = coefficients.wavelet;
 
-		int []trends = new int[ input.width ];
-		int []details = new int[ input.width ];
+		int []trends = new int[ output.width ];
+		int []details = new int[ output.width ];
 
 		boolean isLarger = input.width >= output.width;
-		final int width = input.width;
-		final int height = output.height;
 
 		BorderIndex1D border = coefficients.getBorder();
 		border.setLength(input.width);
@@ -399,16 +385,16 @@ public class ImplWaveletTransformNaive {
 		final int ef = e*f;
 		final int ef2 = ef/2;
 
-		for( int y = 0; y < height; y++ ) {
+		for( int y = 0; y < output.height; y++ ) {
 
 			for( int i = 0; i < details.length; i++ ) {
 				details[i] = 0;
 				trends[i] = 0;
 			}
 
-			for( int x = 0; x < width; x += 2 ) {
+			for( int x = 0; x < input.width; x += 2 ) {
 				int a = input.get(x/2,y);
-				int d = input.get(width/2+x/2,y);
+				int d = input.get(input.width/2+x/2,y);
 
 				// add the trend
 				for( int i = 0; i < alpha.length; i++ ) {
@@ -450,12 +436,10 @@ public class ImplWaveletTransformNaive {
 		final int[] alpha = coefficients.scaling;
 		final int[] beta = coefficients.wavelet;
 
-		int []trends = new int[ input.height ];
-		int []details = new int[ input.height ];
+		int []trends = new int[ output.height ];
+		int []details = new int[ output.height ];
 
 		boolean isLarger = input.height > output.height;
-		final int width = output.width;
-		final int height = input.height;
 
 		BorderIndex1D border = coefficients.getBorder();
 		border.setLength(input.height);
@@ -465,16 +449,16 @@ public class ImplWaveletTransformNaive {
 		final int ef = e*f;
 		final int ef2 = ef/2;
 
-		for( int x = 0; x < width; x++) {
+		for( int x = 0; x < output.width; x++) {
 
 			for( int i = 0; i < details.length; i++ ) {
 				details[i] = 0;
 				trends[i] = 0;
 			}
 
-			for( int y = 0; y < height; y += 2 ) {
+			for( int y = 0; y < input.height; y += 2 ) {
 				int a = input.get(x,y/2);
-				int d = input.get(x,y/2+height/2);
+				int d = input.get(x,y/2+input.height/2);
 
 				// add the 'average' signal
 				for( int i = 0; i < alpha.length; i++ ) {

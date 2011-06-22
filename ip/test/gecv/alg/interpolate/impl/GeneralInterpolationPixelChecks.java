@@ -48,7 +48,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 	@Test
 	public void get() {
 		T img = createImage(width, height);
-		GeneralizedImageOps.randomize(img,0,100,rand);
+		GeneralizedImageOps.randomize(img, rand, 0,100);
 
 		GecvTesting.checkSubImage(this, "get", false, img);
 	}
@@ -68,7 +68,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 	@Test
 	public void get_edges() {
 		T img = createImage(width, height);
-		GeneralizedImageOps.randomize(img,0,100,rand);
+		GeneralizedImageOps.randomize(img, rand, 0,100);
 
 		GecvTesting.checkSubImage(this, "get_edges", false, img);
 	}
@@ -113,7 +113,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 	@Test
 	public void get_unsafe() {
 		T img = createImage(width, height);
-		GeneralizedImageOps.randomize(img,0,100,rand);
+		GeneralizedImageOps.randomize(img, rand, 0,100);
 
 		GecvTesting.checkSubImage(this, "get_unsafe", false, img);
 	}

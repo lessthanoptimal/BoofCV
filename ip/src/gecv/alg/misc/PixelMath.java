@@ -226,18 +226,47 @@ public class PixelMath {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
-		int range = max-min;
-
 		byte[] data = img.data;
 
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < w; x++,index++) {
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++) {
 				int value = data[index];
 				if( value < min )
 					data[index] = (byte)min;
 				else if( value > max )
 					data[index] = (byte)max;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Computes the absolute value of the difference between each pixel in the two images.<br>
+	 * d(x,y) = |img1(x,y) - img2(x,y)|
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param diff Absolute value of difference image. Modified.
+	 */
+	public static void diffAbs( ImageUInt8 imgA , ImageUInt8 imgB , ImageUInt8 diff ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,diff);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
+				diff.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] & 0xFF) - (imgB.data[indexB] & 0xFF));
 			}
 		}
 	}
@@ -351,18 +380,47 @@ public class PixelMath {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
-		int range = max-min;
-
 		byte[] data = img.data;
 
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < w; x++,index++) {
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++) {
 				int value = data[index];
 				if( value < min )
 					data[index] = (byte)min;
 				else if( value > max )
 					data[index] = (byte)max;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Computes the absolute value of the difference between each pixel in the two images.<br>
+	 * d(x,y) = |img1(x,y) - img2(x,y)|
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param diff Absolute value of difference image. Modified.
+	 */
+	public static void diffAbs( ImageSInt8 imgA , ImageSInt8 imgB , ImageSInt8 diff ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,diff);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
+				diff.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
 	}
@@ -476,18 +534,47 @@ public class PixelMath {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
-		int range = max-min;
-
 		short[] data = img.data;
 
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < w; x++,index++) {
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++) {
 				int value = data[index];
 				if( value < min )
 					data[index] = (short)min;
 				else if( value > max )
 					data[index] = (short)max;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Computes the absolute value of the difference between each pixel in the two images.<br>
+	 * d(x,y) = |img1(x,y) - img2(x,y)|
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param diff Absolute value of difference image. Modified.
+	 */
+	public static void diffAbs( ImageUInt16 imgA , ImageUInt16 imgB , ImageUInt16 diff ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,diff);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
+				diff.data[indexDiff] = (short)Math.abs((imgA.data[indexA] & 0xFFFF) - (imgB.data[indexB] & 0xFFFF));
 			}
 		}
 	}
@@ -601,18 +688,47 @@ public class PixelMath {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
-		int range = max-min;
-
 		short[] data = img.data;
 
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < w; x++,index++) {
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++) {
 				int value = data[index];
 				if( value < min )
 					data[index] = (short)min;
 				else if( value > max )
 					data[index] = (short)max;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Computes the absolute value of the difference between each pixel in the two images.<br>
+	 * d(x,y) = |img1(x,y) - img2(x,y)|
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param diff Absolute value of difference image. Modified.
+	 */
+	public static void diffAbs( ImageSInt16 imgA , ImageSInt16 imgB , ImageSInt16 diff ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,diff);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
+				diff.data[indexDiff] = (short)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
 	}
@@ -722,18 +838,47 @@ public class PixelMath {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
-		int range = max-min;
-
 		int[] data = img.data;
 
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < w; x++,index++) {
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++) {
 				int value = data[index];
 				if( value < min )
 					data[index] = min;
 				else if( value > max )
 					data[index] = max;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Computes the absolute value of the difference between each pixel in the two images.<br>
+	 * d(x,y) = |img1(x,y) - img2(x,y)|
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param diff Absolute value of difference image. Modified.
+	 */
+	public static void diffAbs( ImageSInt32 imgA , ImageSInt32 imgB , ImageSInt32 diff ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,diff);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
+				diff.data[indexDiff] = (int)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
 	}
@@ -841,18 +986,47 @@ public class PixelMath {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
-		float range = max-min;
-
 		float[] data = img.data;
 
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < w; x++,index++) {
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++) {
 				float value = data[index];
 				if( value < min )
 					data[index] = min;
 				else if( value > max )
 					data[index] = max;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Computes the absolute value of the difference between each pixel in the two images.<br>
+	 * d(x,y) = |img1(x,y) - img2(x,y)|
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param diff Absolute value of difference image. Modified.
+	 */
+	public static void diffAbs( ImageFloat32 imgA , ImageFloat32 imgB , ImageFloat32 diff ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,diff);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
+				diff.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
 	}

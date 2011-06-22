@@ -90,7 +90,7 @@ public class TestConvolveImageStandard {
 		ImageBase input = GecvTesting.createImage(param[1],width,height);
 		ImageBase output = GecvTesting.createImage(param[2],width,height);
 
-		GeneralizedImageOps.randomize(input,1,10,rand);
+		GeneralizedImageOps.randomize(input, rand, 1,10);
 
 		if( m.getName().contentEquals("horizontal")) {
 			if( param.length == 4 ) {

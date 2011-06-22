@@ -40,7 +40,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 34;
+		int numExpected = 40;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -62,6 +62,8 @@ public class TestPixelMath {
 				    testPlus(m);
 				} else if( m.getName().compareTo("boundImage") == 0 ) {
 				    testBound(m);
+				} else if( m.getName().compareTo("diffAbs") == 0 ) {
+				    testDiffAbs(m);
 				} else {
 					throw new RuntimeException("Unknown function: "+m.getName());
 				}
@@ -93,7 +95,7 @@ public class TestPixelMath {
 		Class<?> paramTypes[] = m.getParameterTypes();
 		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
 		ImageBase output = GecvTesting.createImage(paramTypes[0],width,height);
-		GeneralizedImageOps.randomize(input,-20,20,rand);
+		GeneralizedImageOps.randomize(input, rand, -20,20);
 
 		m.invoke(null,input,output);
 
@@ -113,10 +115,10 @@ public class TestPixelMath {
 		SingleBandImage a = FactorySingleBandImage.wrap(input);
 
 		if( input.isSigned() ) {
-			GeneralizedImageOps.randomize(input,-20,20,rand);
+			GeneralizedImageOps.randomize(input, rand, -20,20);
 			a.set(0,3,-100);
 		} else {
-			GeneralizedImageOps.randomize(input,0,20,rand);
+			GeneralizedImageOps.randomize(input, rand, 0,20);
 			a.set(0,3,100);
 		}
 
@@ -130,12 +132,12 @@ public class TestPixelMath {
 		Class<?> paramTypes[] = m.getParameterTypes();
 		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
 		ImageBase output = GecvTesting.createImage(paramTypes[0],width,height);
-		GeneralizedImageOps.randomize(input,0,20,rand);
+		GeneralizedImageOps.randomize(input, rand, 0,20);
 
 		if( input.isSigned() ) {
-			GeneralizedImageOps.randomize(input,-20,20,rand);
+			GeneralizedImageOps.randomize(input, rand, -20,20);
 		} else {
-			GeneralizedImageOps.randomize(input,0,20,rand);
+			GeneralizedImageOps.randomize(input, rand, 0,20);
 		}
 
 		if( input.isInteger() )
@@ -164,12 +166,12 @@ public class TestPixelMath {
 		Class<?> paramTypes[] = m.getParameterTypes();
 		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
 		ImageBase output = GecvTesting.createImage(paramTypes[0],width,height);
-		GeneralizedImageOps.randomize(input,0,20,rand);
+		GeneralizedImageOps.randomize(input, rand, 0,20);
 
 		if( input.isSigned() ) {
-			GeneralizedImageOps.randomize(input,-20,20,rand);
+			GeneralizedImageOps.randomize(input, rand, -20,20);
 		} else {
-			GeneralizedImageOps.randomize(input,0,20,rand);
+			GeneralizedImageOps.randomize(input, rand, 0,20);
 		}
 
 		if( input.isInteger() )
@@ -200,9 +202,9 @@ public class TestPixelMath {
 		ImageBase output = GecvTesting.createImage(paramTypes[0],width,height);
 
 		if( input.isSigned() ) {
-			GeneralizedImageOps.randomize(input,-20,20,rand);
+			GeneralizedImageOps.randomize(input, rand, -20,20);
 		} else {
-			GeneralizedImageOps.randomize(input,0,20,rand);
+			GeneralizedImageOps.randomize(input, rand, 0,20);
 		}
 
 		if( input.isInteger() )
@@ -230,12 +232,11 @@ public class TestPixelMath {
 	private void testBound( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
 		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
-		GeneralizedImageOps.randomize(input,0,20,rand);
 
 		if( input.isSigned() ) {
-			GeneralizedImageOps.randomize(input,-20,20,rand);
+			GeneralizedImageOps.randomize(input, rand, -20,20);
 		} else {
-			GeneralizedImageOps.randomize(input,0,20,rand);
+			GeneralizedImageOps.randomize(input, rand, 0,20);
 		}
 
 		if( input.isInteger() )
@@ -257,6 +258,34 @@ public class TestPixelMath {
 					float v = a.get(j,i).floatValue();
 					assertTrue(v >= 2f && v <= 10f);
 				}
+			}
+		}
+	}
+
+	private void testDiffAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase inputA = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase inputB = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase inputC = GecvTesting.createImage(paramTypes[0],width,height);
+
+		if( inputA.isSigned() ) {
+			GeneralizedImageOps.randomize(inputA, rand, -20,20);
+			GeneralizedImageOps.randomize(inputB, rand, -20,20);
+		} else {
+			GeneralizedImageOps.randomize(inputA, rand, 0,20);
+			GeneralizedImageOps.randomize(inputB, rand, -20,20);
+		}
+
+		m.invoke(null,inputA,inputB,inputC);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(inputA);
+		SingleBandImage b = FactorySingleBandImage.wrap(inputB);
+		SingleBandImage c = FactorySingleBandImage.wrap(inputC);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				float v = a.get(j,i).floatValue()-b.get(j,i).floatValue();
+				assertEquals(Math.abs(v),c.get(j,i).floatValue(),1e-4);
 			}
 		}
 	}

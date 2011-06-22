@@ -28,7 +28,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -89,7 +90,7 @@ public class TestImageTestingOps {
 	private void testFill( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
 		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
-		GeneralizedImageOps.randomize(orig,0,20,rand);
+		GeneralizedImageOps.randomize(orig, rand, 0,20);
 
 		if( paramTypes[1] == int.class ) {
 			m.invoke(null,orig,10);
@@ -163,7 +164,7 @@ public class TestImageTestingOps {
 	private void testAddUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
 		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
-		GeneralizedImageOps.setAll(orig,1);
+		GeneralizedImageOps.fill(orig,1);
 
 		if( orig.isInteger() ) {
 			m.invoke(null,orig,rand,1,10);

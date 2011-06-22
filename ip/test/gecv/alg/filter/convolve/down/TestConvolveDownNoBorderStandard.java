@@ -89,7 +89,7 @@ public class TestConvolveDownNoBorderStandard {
 			}
 
 			ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
-			GeneralizedImageOps.randomize(src, 0, 130, rand);
+			GeneralizedImageOps.randomize(src, rand, 0, 130);
 			ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
 
 			Object[][] ret = new Object[1][paramTypes.length];

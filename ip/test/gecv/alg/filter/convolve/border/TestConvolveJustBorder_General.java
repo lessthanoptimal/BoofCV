@@ -17,6 +17,7 @@
 package gecv.alg.filter.convolve.border;
 
 import gecv.alg.filter.convolve.ConvolutionTestHelper;
+import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
 import gecv.core.image.border.ImageBorder;
@@ -24,7 +25,6 @@ import gecv.core.image.border.ImageBorderValue;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInteger;
-import gecv.core.image.FactorySingleBandImage;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -107,7 +107,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		Object kernel = createKernel(paramTypes[0]);
 
 		ImageBase src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
-		GeneralizedImageOps.randomize(src, 0, 5, rand);
+		GeneralizedImageOps.randomize(src, rand, 0, 5);
 		ImageBase dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
 		Object[][] ret = new Object[1][paramTypes.length];
