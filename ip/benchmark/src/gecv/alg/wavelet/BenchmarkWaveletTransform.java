@@ -22,9 +22,10 @@ import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.wavelet.impl.ImplWaveletTransformBorder;
 import gecv.alg.wavelet.impl.ImplWaveletTransformInner;
 import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
+import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
-import gecv.struct.wavelet.WaveletDesc_F32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
 
 import java.util.Random;
 
@@ -37,8 +38,8 @@ public class BenchmarkWaveletTransform {
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
-	static WaveletDesc_F32 forward_F32 = FactoryWaveletDaub.standard_F32(4);
-	static WaveletDesc_F32 reverse_F32 = forward_F32;
+	static WaveletCoefficient_F32 forward_F32 = FactoryWaveletDaub.standard_F32(4);
+	static WaveletCoefficient_F32 reverse_F32 = forward_F32;
 
 	static ImageFloat32 orig_F32 = new ImageFloat32(imgWidth,imgHeight);
 	static ImageFloat32 temp1_F32 = new ImageFloat32(imgWidth,imgHeight);
@@ -65,6 +66,26 @@ public class BenchmarkWaveletTransform {
 		}
 	}
 
+	public static class FullLevel3_F32 extends PerformerBase {
+
+		static ImageFloat32 copy = new ImageFloat32(imgWidth,imgHeight);
+		ImageFloat32 tran;
+		ImageFloat32 storage;
+
+		public FullLevel3_F32() {
+			ImageDimension dim = UtilWavelet.transformDimension(copy,3);
+			tran = new ImageFloat32(dim.width,dim.height);
+			storage = new ImageFloat32(dim.width,dim.height);
+		}
+
+		@Override
+		public void process() {
+			// don't modify the input image
+			copy.setTo(orig_F32);
+			WaveletTransformOps.transformN(forward_F32,copy,tran,storage,3);
+		}
+	}
+
 
 	public static void main(String args[]) {
 
@@ -74,6 +95,7 @@ public class BenchmarkWaveletTransform {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
+		ProfileOperation.printOpsPerSec(new FullLevel3_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Naive_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Inner_F32(), TEST_TIME);
 	}

@@ -17,7 +17,7 @@
 package gecv.alg.wavelet;
 
 import gecv.core.image.border.BorderIndex1D_Wrap;
-import gecv.struct.wavelet.WaveletDesc_F32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
 
 
 /**
@@ -51,12 +51,12 @@ public class FactoryWaveletCoiflet {
 	 * @param I order of the wavelet.
 	 * @return Wavelet description.
 	 */
-	public static WaveletDesc_F32 generate_F32( int I ) {
+	public static WaveletCoefficient_F32 generate_F32( int I ) {
 		if( I != 6 ) {
 			throw new IllegalArgumentException("Only 6 is currently supported");
 		}
 
-		WaveletDesc_F32 ret = new WaveletDesc_F32();
+		WaveletCoefficient_F32 ret = new WaveletCoefficient_F32();
 
 		ret.offsetScaling = -2;
 		ret.offsetWavelet = -2;

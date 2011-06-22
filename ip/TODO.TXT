@@ -23,6 +23,9 @@
  * Connected Segments
     - Canny?
 
+- Denoise
+ * Weiner
+
 - Thresholding
  * Global Threshold
  * Adaptively select global threshold

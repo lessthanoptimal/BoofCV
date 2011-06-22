@@ -21,7 +21,7 @@ package gecv.struct.wavelet;
  *
  * @author Peter Abeles
  */
-public class WaveletDesc_F32 extends WaveletDesc {
+public class WaveletCoefficient_F32 extends WaveletCoefficient {
 
 	// scaling numbers
 	public float scaling[];

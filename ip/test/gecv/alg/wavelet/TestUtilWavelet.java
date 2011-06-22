@@ -17,7 +17,7 @@
 package gecv.alg.wavelet;
 
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.wavelet.WaveletDesc_F32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -87,29 +87,30 @@ public class TestUtilWavelet {
 				{-2,3,0},{-2,4,0},{-2,5,2},{-2,6,2},{-2,7,4}};
 
 		for (int[] w : O) {
-			checkEnd(w[0], 0, w[1], 1, 8, w[2]);
-			checkEnd(0, w[0], 1, w[1], 8, w[2]);
+			checkEnd(w[0], 0, w[1], 1, 8, 8 , w[2]);
+			checkEnd(0, w[0], 1, w[1], 8, 8 , w[2]);
 		}
 
 		// check odd lengths
 		O = new int[][]{{0,1,0},{0,2,2},{0,3,2},{0,4,4}};
 		for (int[] w : O) {
-			checkEnd(w[0], 0, w[1], 1, 7, w[2]);
-			checkEnd(0, w[0], 1, w[1], 7, w[2]);
+			checkEnd(w[0], 0, w[1], 1, 7, 8 , w[2]);
+			checkEnd(0, w[0], 1, w[1], 7, 8 , w[2]);
 		}
 	}
 
 	private void checkEnd( int offsetA , int offsetB ,
 						   int lengthA , int lengthB ,
 						   int imgLength ,
+						   int tranLength ,
 						   int expected ) {
-		WaveletDesc_F32 desc = new WaveletDesc_F32();
+		WaveletCoefficient_F32 desc = new WaveletCoefficient_F32();
 		desc.offsetScaling = offsetA;
 		desc.offsetWavelet = offsetB;
 		desc.scaling = new float[lengthA];
 		desc.wavelet = new float[lengthB];
 
-		assertEquals(expected,UtilWavelet.computeBorderEnd(desc,imgLength));
+		assertEquals(expected,UtilWavelet.computeBorderEnd(desc,imgLength,tranLength));
 	}
 
 	@Test
@@ -127,7 +128,7 @@ public class TestUtilWavelet {
 
 	private void checkStart( int offsetA , int offsetB ,
 							int expected ) {
-		WaveletDesc_F32 desc = new WaveletDesc_F32();
+		WaveletCoefficient_F32 desc = new WaveletCoefficient_F32();
 		desc.offsetScaling = offsetA;
 		desc.offsetWavelet = offsetB;
 

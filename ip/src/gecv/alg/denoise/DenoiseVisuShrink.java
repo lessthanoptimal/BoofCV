@@ -14,39 +14,25 @@
  *    limitations under the License.
  */
 
-package gecv.struct.wavelet;
+package gecv.alg.denoise;
 
-import gecv.core.image.border.BorderIndex1D;
+import gecv.struct.image.ImageFloat32;
 
 
 /**
- * Base class for wavelet descriptions.
- *
  * @author Peter Abeles
  */
-public abstract class WaveletDesc {
+public class DenoiseVisuShrink {
 
-	// offset of wavelet numbers from start of signal array
-	public int offsetScaling;
+	public static float computeThreshold( ImageFloat32 transform , int numLevels ) {
+		return 0;
+	}
 
-	// offset of wavelet numbers from start of signal array
-	public int offsetWavelet;
+	public static void process( ImageFloat32 transform , int numLevels , float threshold ) {
 
-	// how image boundaries are handled
-	public BorderIndex1D border;
+	}
 
-	/**
-	 * Returns the primitive type of the coefficients.
-	 *
-	 * @return Coefficient data type.
-	 */
-	public abstract Class<?> getType();
-
-	public abstract int getScalingLength();
-
-	public abstract int getWaveletLength();
-
-	public BorderIndex1D getBorder() {
-		return border;
+	public static void process( ImageFloat32 transform , int numLevels ) {
+		process(transform,numLevels,computeThreshold(transform,numLevels));
 	}
 }

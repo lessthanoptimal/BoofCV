@@ -16,7 +16,7 @@
 
 package gecv.alg.wavelet;
 
-import gecv.struct.wavelet.WaveletDesc_F32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +31,7 @@ public class TestFactoryWaveletCoiflet extends CommonFactoryWavelet {
 	public void transform_generate_F32() {
 
 		for( int i = 6; i <= 6; i += 2 ) {
-			WaveletDesc_F32 desc = FactoryWaveletCoiflet.generate_F32(i);
+			WaveletCoefficient_F32 desc = FactoryWaveletCoiflet.generate_F32(i);
 
 			checkEncodeDecode_F32(desc,desc);
 		}
@@ -45,7 +45,7 @@ public class TestFactoryWaveletCoiflet extends CommonFactoryWavelet {
 
 		for( int i = 6; i <= 6; i += 2 ) {
 
-			WaveletDesc_F32 desc = FactoryWaveletCoiflet.generate_F32(i);
+			WaveletCoefficient_F32 desc = FactoryWaveletCoiflet.generate_F32(i);
 
 			double sumScaling = UtilWavelet.sumCoefficients(desc.scaling);
 			double sumWavelet = UtilWavelet.sumCoefficients(desc.wavelet);

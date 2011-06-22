@@ -19,7 +19,7 @@ package gecv.alg.wavelet.impl;
 import gecv.alg.wavelet.UtilWavelet;
 import gecv.core.image.border.BorderIndex1D;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.wavelet.WaveletDesc_F32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
 
 
 /**
@@ -32,18 +32,8 @@ import gecv.struct.wavelet.WaveletDesc_F32;
  */
 public class ImplWaveletTransformInner {
 
-	/**
-	 * Performs a single level wavelet transform along the horizontal axis.
-	 *
-	 * @param coefficients Description of wavelet coefficients.
-	 * @param input Input image which is being transform. Not modified.
-	 * @param output where the output is written to. Modified
-	 */
-	public static void horizontal( WaveletDesc_F32 coefficients ,
-								   ImageFloat32 input , ImageFloat32 output ) {
-
-		UtilWavelet.checkShape(input,output);
-
+	public static void horizontal( WaveletCoefficient_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final float[] alpha = coefficients.scaling;
@@ -56,7 +46,7 @@ public class ImplWaveletTransformInner {
 		final int height = input.height;
 		final int widthD2 = width/2;
 		final int startX = UtilWavelet.computeBorderStart(coefficients);
-		final int endOffsetX = output.width - UtilWavelet.computeBorderEnd(coefficients,input.width) - startX;
+		final int endOffsetX = output.width - UtilWavelet.computeBorderEnd(coefficients,input.width,output.width) - startX;
 
 		for( int y = 0; y < height; y++ ) {
 
@@ -85,11 +75,8 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void vertical( WaveletDesc_F32 coefficients ,
-								 ImageFloat32 input , ImageFloat32 output ) {
-
-		UtilWavelet.checkShape(input,output);
-
+	public static void vertical( WaveletCoefficient_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	{
 		final int offsetA = coefficients.offsetScaling*input.stride;
 		final int offsetB = coefficients.offsetWavelet*input.stride;
 		final float[] alpha = coefficients.scaling;
@@ -102,7 +89,7 @@ public class ImplWaveletTransformInner {
 		final int height = output.height;
 		final int heightD2 = (height/2)*output.stride;
 		final int startY = UtilWavelet.computeBorderStart(coefficients);
-		final int endY = output.height - UtilWavelet.computeBorderEnd(coefficients,input.height);
+		final int endY = output.height - UtilWavelet.computeBorderEnd(coefficients,input.height,output.height);
 
 		for( int y = startY; y < endY; y += 2 ) {
 
@@ -132,10 +119,8 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontalInverse( WaveletDesc_F32 coefficients , ImageFloat32 input , ImageFloat32 output ) {
-
-		UtilWavelet.checkShape(output,input);
-
+	public static void horizontalInverse( WaveletCoefficient_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final float[] alpha = coefficients.scaling;
@@ -148,7 +133,7 @@ public class ImplWaveletTransformInner {
 		final int height = output.height;
 		final int widthD2 = width/2;
 		final int startX = UtilWavelet.computeBorderStart(coefficients);
-		final int endX = input.width - UtilWavelet.computeBorderEnd(coefficients,output.width);
+		final int endX = input.width - UtilWavelet.computeBorderEnd(coefficients,output.width,input.width);
 		final int zeroStart = startX+Math.min(offsetA,offsetB);
 		final int zeroEnd = endX+Math.min(offsetA,offsetB);
 
@@ -204,9 +189,8 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void verticalInverse( WaveletDesc_F32 coefficients , ImageFloat32 input , ImageFloat32 output ) {
-		UtilWavelet.checkShape(output,input);
-
+	public static void verticalInverse( WaveletCoefficient_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final float[] alpha = coefficients.scaling;
@@ -219,7 +203,7 @@ public class ImplWaveletTransformInner {
 		final int height = input.height;
 		final int heightD2 = (height/2)*input.stride;
 		final int startY = UtilWavelet.computeBorderStart(coefficients);
-		final int endY = input.height - UtilWavelet.computeBorderEnd(coefficients,output.height);
+		final int endY = input.height - UtilWavelet.computeBorderEnd(coefficients,output.height,input.height);
 		final int zeroStart = startY+Math.min(offsetA,offsetB);
 		final int zeroEnd = endY+Math.min(offsetA,offsetB);
 
