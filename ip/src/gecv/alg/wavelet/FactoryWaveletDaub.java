@@ -17,8 +17,8 @@
 package gecv.alg.wavelet;
 
 import gecv.core.image.border.BorderIndex1D_Wrap;
-import gecv.struct.wavelet.WaveletDesc_F32;
-import gecv.struct.wavelet.WaveletDesc_I32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletCoefficient_I32;
 
 
 /**
@@ -49,12 +49,12 @@ public class FactoryWaveletDaub {
 	 * @param J The wavelet's degree.
 	 * @return Description of the DaubJ wavelet.
 	 */
-	public static WaveletDesc_F32 standard_F32( int J ) {
+	public static WaveletCoefficient_F32 standard_F32( int J ) {
 		if( J != 4 ) {
 			throw new IllegalArgumentException("Only 4 is currently supported");
 		}
 
-		WaveletDesc_F32 ret = new WaveletDesc_F32();
+		WaveletCoefficient_F32 ret = new WaveletCoefficient_F32();
 
 		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = 0;
@@ -97,12 +97,12 @@ public class FactoryWaveletDaub {
 	 * @param J The wavelet's degree. K = J-2.
 	 * @return Description of the Daub J/K wavelet.
 	 */
-	public static WaveletDesc_F32 biorthogonal_F32( int J ) {
+	public static WaveletCoefficient_F32 biorthogonal_F32( int J ) {
 		if( J != 5 ) {
 			throw new IllegalArgumentException("Only 5 is currently supported");
 		}
 
-		WaveletDesc_F32 ret = new WaveletDesc_F32();
+		WaveletCoefficient_F32 ret = new WaveletCoefficient_F32();
 
 		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = -2;
@@ -131,12 +131,12 @@ public class FactoryWaveletDaub {
 	 * @param J The wavelet's degree. K = J-2.
 	 * @return Description of the Daub J/K wavelet.
 	 */
-	public static WaveletDesc_I32 biorthogonal_I32( int J ) {
+	public static WaveletCoefficient_I32 biorthogonal_I32( int J ) {
 		if( J != 5 ) {
 			throw new IllegalArgumentException("Only 5 is currently supported");
 		}
 
-		WaveletDesc_I32 ret = new WaveletDesc_I32();
+		WaveletCoefficient_I32 ret = new WaveletCoefficient_I32();
 
 		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = -2;
@@ -167,12 +167,12 @@ public class FactoryWaveletDaub {
 	 * @param J The wavelet's degree. K = J-2.
 	 * @return Description of the Daub J/K wavelet.
 	 */
-	public static WaveletDesc_F32 biorthogonalInv_F32( int J ) {
+	public static WaveletCoefficient_F32 biorthogonalInv_F32( int J ) {
 		if( J != 5 ) {
 			throw new IllegalArgumentException("Only 5 is currently supported");
 		}
 
-		WaveletDesc_F32 ret = new WaveletDesc_F32();
+		WaveletCoefficient_F32 ret = new WaveletCoefficient_F32();
 
 		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = -1;
@@ -201,12 +201,12 @@ public class FactoryWaveletDaub {
 	 * @param J The wavelet's degree. K = J-2.
 	 * @return Description of the Daub J/K wavelet.
 	 */
-	public static WaveletDesc_I32 biorthogonalInv_I32( int J ) {
+	public static WaveletCoefficient_I32 biorthogonalInv_I32( int J ) {
 		if( J != 5 ) {
 			throw new IllegalArgumentException("Only 5 is currently supported");
 		}
 
-		WaveletDesc_I32 ret = new WaveletDesc_I32();
+		WaveletCoefficient_I32 ret = new WaveletCoefficient_I32();
 
 		ret.border = new BorderIndex1D_Wrap();
 		ret.offsetScaling = -1;

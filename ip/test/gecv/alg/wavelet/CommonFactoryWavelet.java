@@ -21,8 +21,8 @@ import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
-import gecv.struct.wavelet.WaveletDesc_F32;
-import gecv.struct.wavelet.WaveletDesc_I32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletCoefficient_I32;
 import gecv.testing.GecvTesting;
 
 import java.util.Random;
@@ -48,7 +48,7 @@ public class CommonFactoryWavelet {
 	 * @param encodeDesc Wavelet used to transform the image
 	 * @param decodeDesc Wavelet used to restore the image
 	 */
-	public void checkEncodeDecode_F32(WaveletDesc_F32 encodeDesc , WaveletDesc_F32 decodeDesc ) {
+	public void checkEncodeDecode_F32(WaveletCoefficient_F32 encodeDesc , WaveletCoefficient_F32 decodeDesc ) {
 
 		// test both even and odd images
 		for( int makeOdd = 0; makeOdd <= 1; makeOdd++ ) {
@@ -61,7 +61,10 @@ public class CommonFactoryWavelet {
 			ImplWaveletTransformNaive.horizontal(encodeDesc,orig,tran);
 			ImplWaveletTransformNaive.horizontalInverse(decodeDesc,tran,rev);
 
-//			GecvTesting.printDiff(orig,rev);
+			GecvTesting.assertEquals(orig,rev,0,1e-4f);
+
+			ImplWaveletTransformNaive.vertical(encodeDesc,orig,tran);
+			ImplWaveletTransformNaive.verticalInverse(decodeDesc,tran,rev);
 
 			GecvTesting.assertEquals(orig,rev,0,1e-4f);
 		}
@@ -73,7 +76,7 @@ public class CommonFactoryWavelet {
 	 * @param encodeDesc Wavelet used to transform the image
 	 * @param decodeDesc Wavelet used to restore the image
 	 */
-	public void checkEncodeDecode_I32(WaveletDesc_I32 encodeDesc , WaveletDesc_I32 decodeDesc ) {
+	public void checkEncodeDecode_I32(WaveletCoefficient_I32 encodeDesc , WaveletCoefficient_I32 decodeDesc ) {
 
 		// test both even and odd images
 		for( int makeOdd = 0; makeOdd <= 1; makeOdd++ ) {

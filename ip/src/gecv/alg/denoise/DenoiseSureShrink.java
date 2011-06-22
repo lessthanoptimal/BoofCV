@@ -14,37 +14,13 @@
  *    limitations under the License.
  */
 
-package gecv.struct.wavelet;
+package gecv.alg.denoise;
+
 
 /**
- * Description of an integer wavelet.
- *
  * @author Peter Abeles
  */
-public class WaveletDesc_I32 extends WaveletDesc {
+public class DenoiseSureShrink {
 
-	// scaling numbers
-	public int scaling[];
-	// wavelet numbers
-	public int wavelet[];
 
-	// denominator for scaling coefficients
-	public int denominatorScaling;
-	// denominator for wavelet coefficients
-	public int denominatorWavelet;
-
-	@Override
-	public Class<?> getType() {
-		return int.class;
-	}
-
-	@Override
-	public int getScalingLength() {
-		return scaling.length;
-	}
-
-	@Override
-	public int getWaveletLength() {
-		return wavelet.length;
-	}
 }

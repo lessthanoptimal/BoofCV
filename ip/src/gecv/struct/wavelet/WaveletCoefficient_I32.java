@@ -14,11 +14,37 @@
  *    limitations under the License.
  */
 
-package gecv.alg.wavelet;
-
+package gecv.struct.wavelet;
 
 /**
+ * Description of an integer wavelet.
+ *
  * @author Peter Abeles
  */
-public class WaveletImageTransform_F32 {
+public class WaveletCoefficient_I32 extends WaveletCoefficient {
+
+	// scaling numbers
+	public int scaling[];
+	// wavelet numbers
+	public int wavelet[];
+
+	// denominator for scaling coefficients
+	public int denominatorScaling;
+	// denominator for wavelet coefficients
+	public int denominatorWavelet;
+
+	@Override
+	public Class<?> getType() {
+		return int.class;
+	}
+
+	@Override
+	public int getScalingLength() {
+		return scaling.length;
+	}
+
+	@Override
+	public int getWaveletLength() {
+		return wavelet.length;
+	}
 }

@@ -17,7 +17,7 @@
 package gecv.alg.wavelet.impl;
 
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.wavelet.WaveletDesc_F32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -29,45 +29,69 @@ public class TestImplWaveletTransformBorder  {
 
 	@Test
 	public void horizontal() {
-		PermuteWaveletCompareToNaive test = new PermuteWaveletCompareToNaive() {
+		PermuteWaveletCompare test = new PermuteWaveletCompare() {
 
 			@Override
-			public void applyValidation(WaveletDesc_F32 desc, ImageFloat32 input, ImageFloat32 output) {
+			public void applyValidation(WaveletCoefficient_F32 desc, ImageFloat32 input, ImageFloat32 output) {
 				ImplWaveletTransformNaive.horizontal(desc,input,output);
 			}
 
 			@Override
-			public void applyTransform(WaveletDesc_F32 desc, ImageFloat32 input, ImageFloat32 output) {
+			public void applyTransform(WaveletCoefficient_F32 desc, ImageFloat32 input, ImageFloat32 output) {
 				ImplWaveletTransformInner.horizontal(desc,input,output);
 				ImplWaveletTransformBorder.horizontal(desc,input,output);
 			}
 
 			@Override
-			public void compareResults(WaveletDesc_F32 desc, ImageFloat32 expected, ImageFloat32 found, boolean shrunk) {
+			public void compareResults(WaveletCoefficient_F32 desc, ImageFloat32 input , ImageFloat32 expected, ImageFloat32 found ) {
 				GecvTesting.assertEquals(expected,found,0,1e-4f);
 			}
 		};
 
-		test.runTests(true);
+		test.runTests(false);
 	}
 
 	@Test
 	public void vertical() {
-		PermuteWaveletCompareToNaive test = new PermuteWaveletCompareToNaive() {
+		PermuteWaveletCompare test = new PermuteWaveletCompare() {
 
 			@Override
-			public void applyValidation(WaveletDesc_F32 desc, ImageFloat32 input, ImageFloat32 output) {
+			public void applyValidation(WaveletCoefficient_F32 desc, ImageFloat32 input, ImageFloat32 output) {
 				ImplWaveletTransformNaive.vertical(desc,input,output);
 			}
 
 			@Override
-			public void applyTransform(WaveletDesc_F32 desc, ImageFloat32 input, ImageFloat32 output) {
+			public void applyTransform(WaveletCoefficient_F32 desc, ImageFloat32 input, ImageFloat32 output) {
 				ImplWaveletTransformInner.vertical(desc,input,output);
 				ImplWaveletTransformBorder.vertical(desc,input,output);
 			}
 
 			@Override
-			public void compareResults(WaveletDesc_F32 desc, ImageFloat32 expected, ImageFloat32 found, boolean shrunk) {
+			public void compareResults(WaveletCoefficient_F32 desc, ImageFloat32 input , ImageFloat32 expected, ImageFloat32 found ) {
+				GecvTesting.assertEquals(expected,found,0,1e-4f);
+			}
+		};
+
+		test.runTests(false);
+	}
+
+	@Test
+	public void horizontalInverse() {
+		PermuteWaveletCompare test = new PermuteWaveletCompare() {
+
+			@Override
+			public void applyValidation(WaveletCoefficient_F32 desc, ImageFloat32 input, ImageFloat32 output) {
+				ImplWaveletTransformNaive.horizontalInverse(desc,input,output);
+			}
+
+			@Override
+			public void applyTransform(WaveletCoefficient_F32 desc, ImageFloat32 input, ImageFloat32 output) {
+				ImplWaveletTransformInner.horizontalInverse(desc,input,output);
+				ImplWaveletTransformBorder.horizontalInverse(desc,input,output);
+			}
+
+			@Override
+			public void compareResults(WaveletCoefficient_F32 desc, ImageFloat32 input , ImageFloat32 expected, ImageFloat32 found ) {
 				GecvTesting.assertEquals(expected,found,0,1e-4f);
 			}
 		};
@@ -76,50 +100,26 @@ public class TestImplWaveletTransformBorder  {
 	}
 
 	@Test
-	public void horizontalInverse() {
-		PermuteWaveletCompareToNaive test = new PermuteWaveletCompareToNaive() {
-
-			@Override
-			public void applyValidation(WaveletDesc_F32 desc, ImageFloat32 input, ImageFloat32 output) {
-				ImplWaveletTransformNaive.horizontalInverse(desc,input,output);
-			}
-
-			@Override
-			public void applyTransform(WaveletDesc_F32 desc, ImageFloat32 input, ImageFloat32 output) {
-				ImplWaveletTransformInner.horizontalInverse(desc,input,output);
-				ImplWaveletTransformBorder.horizontalInverse(desc,input,output);
-			}
-
-			@Override
-			public void compareResults(WaveletDesc_F32 desc, ImageFloat32 expected, ImageFloat32 found, boolean shrunk) {
-				GecvTesting.assertEquals(expected,found,0,1e-4f);
-			}
-		};
-
-		test.runTests(false);
-	}
-
-	@Test
 	public void verticalInverse() {
-		PermuteWaveletCompareToNaive test = new PermuteWaveletCompareToNaive() {
+		PermuteWaveletCompare test = new PermuteWaveletCompare() {
 
 			@Override
-			public void applyValidation(WaveletDesc_F32 desc, ImageFloat32 input, ImageFloat32 output) {
+			public void applyValidation(WaveletCoefficient_F32 desc, ImageFloat32 input, ImageFloat32 output) {
 				ImplWaveletTransformNaive.verticalInverse(desc,input,output);
 			}
 
 			@Override
-			public void applyTransform(WaveletDesc_F32 desc, ImageFloat32 input, ImageFloat32 output) {
+			public void applyTransform(WaveletCoefficient_F32 desc, ImageFloat32 input, ImageFloat32 output) {
 				ImplWaveletTransformInner.verticalInverse(desc,input,output);
 				ImplWaveletTransformBorder.verticalInverse(desc,input,output);
 			}
 
 			@Override
-			public void compareResults(WaveletDesc_F32 desc, ImageFloat32 expected, ImageFloat32 found, boolean shrunk) {
+			public void compareResults(WaveletCoefficient_F32 desc, ImageFloat32 input , ImageFloat32 expected, ImageFloat32 found ) {
 				GecvTesting.assertEquals(expected,found,0,1e-4f);
 			}
 		};
 
-		test.runTests(false);
+		test.runTests(true);
 	}
 }

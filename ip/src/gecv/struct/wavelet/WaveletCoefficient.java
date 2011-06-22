@@ -14,29 +14,39 @@
  *    limitations under the License.
  */
 
-package gecv.alg.wavelet;
+package gecv.struct.wavelet;
 
-import gecv.struct.image.ImageBase;
-import gecv.struct.wavelet.WaveletDesc;
+import gecv.core.image.border.BorderIndex1D;
 
 
 /**
+ * Base class that defines a set of wavelet coefficients.
+ *
  * @author Peter Abeles
  */
-public interface WaveletImageTransform<T extends ImageBase, D extends WaveletDesc> {
+public abstract class WaveletCoefficient {
 
-	public void configure( D desc , int levels );
+	// offset of wavelet numbers from start of signal array
+	public int offsetScaling;
+
+	// offset of wavelet numbers from start of signal array
+	public int offsetWavelet;
+
+	// how image boundaries are handled
+	public BorderIndex1D border;
 
 	/**
+	 * Returns the primitive type of the coefficients.
 	 *
-	 * @param image Input image. Not modified.
-	 * @param transformed Wavelet transformation of input image.
+	 * @return Coefficient data type.
 	 */
-	public void transform( T image , T transformed );
+	public abstract Class<?> getType();
 
-	public void transform( T image );
+	public abstract int getScalingLength();
 
-	public void inverse( T transformed , T reconstructedImage );
+	public abstract int getWaveletLength();
 
-	public void inverse( T transformed );
+	public BorderIndex1D getBorder() {
+		return border;
+	}
 }

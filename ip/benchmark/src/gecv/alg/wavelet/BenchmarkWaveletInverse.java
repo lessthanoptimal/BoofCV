@@ -24,7 +24,7 @@ import gecv.alg.wavelet.impl.ImplWaveletTransformInner;
 import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
-import gecv.struct.wavelet.WaveletDesc_F32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
 
 import java.util.Random;
 
@@ -37,8 +37,8 @@ public class BenchmarkWaveletInverse {
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
-	static WaveletDesc_F32 forward_F32 = FactoryWaveletDaub.standard_F32(4);
-	static WaveletDesc_F32 reverse_F32 = forward_F32;
+	static WaveletCoefficient_F32 forward_F32 = FactoryWaveletDaub.standard_F32(4);
+	static WaveletCoefficient_F32 reverse_F32 = forward_F32;
 
 	static ImageFloat32 tran_F32 = new ImageFloat32(imgWidth,imgHeight);
 	static ImageFloat32 temp1_F32 = new ImageFloat32(imgWidth,imgHeight);

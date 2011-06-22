@@ -16,8 +16,8 @@
 
 package gecv.alg.wavelet;
 
-import gecv.struct.wavelet.WaveletDesc_F32;
-import gecv.struct.wavelet.WaveletDesc_I32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletCoefficient_I32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -37,7 +37,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	public void transform_standard_F32() {
 
 		for( int i = 4; i <= 4; i += 2 ) {
-			WaveletDesc_F32 desc = FactoryWaveletDaub.standard_F32(i);
+			WaveletCoefficient_F32 desc = FactoryWaveletDaub.standard_F32(i);
 
 			checkEncodeDecode_F32(desc,desc);
 		}
@@ -50,7 +50,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	public void standard_F32() {
 		for( int i = 4; i <= 4; i += 2 ) {
 
-			WaveletDesc_F32 desc = FactoryWaveletDaub.standard_F32(i);
+			WaveletCoefficient_F32 desc = FactoryWaveletDaub.standard_F32(i);
 
 			double sumScaling = UtilWavelet.sumCoefficients(desc.scaling);
 			double sumWavelet = UtilWavelet.sumCoefficients(desc.wavelet);
@@ -79,8 +79,8 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	public void transform_biorthogonal_F32() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
-			WaveletDesc_F32 forward = FactoryWaveletDaub.biorthogonal_F32(i);
-			WaveletDesc_F32 inverse = FactoryWaveletDaub.biorthogonalInv_F32(i);
+			WaveletCoefficient_F32 forward = FactoryWaveletDaub.biorthogonal_F32(i);
+			WaveletCoefficient_F32 inverse = FactoryWaveletDaub.biorthogonalInv_F32(i);
 
 			checkEncodeDecode_F32(forward,inverse);
 		}
@@ -91,7 +91,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 
 		for( int i = 5; i <= 5; i += 2 ) {
 
-			WaveletDesc_F32 desc = FactoryWaveletDaub.biorthogonal_F32(i);
+			WaveletCoefficient_F32 desc = FactoryWaveletDaub.biorthogonal_F32(i);
 
 			double sumScaling = UtilWavelet.sumCoefficients(desc.scaling);
 			double sumWavelet = UtilWavelet.sumCoefficients(desc.wavelet);
@@ -116,8 +116,8 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	public void transform_biorthogonal_I32() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
-			WaveletDesc_I32 forward = FactoryWaveletDaub.biorthogonal_I32(i);
-			WaveletDesc_I32 inverse = FactoryWaveletDaub.biorthogonalInv_I32(i);
+			WaveletCoefficient_I32 forward = FactoryWaveletDaub.biorthogonal_I32(i);
+			WaveletCoefficient_I32 inverse = FactoryWaveletDaub.biorthogonalInv_I32(i);
 
 			checkEncodeDecode_I32(forward,inverse);
 		}
@@ -128,7 +128,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 
 		for( int i = 5; i <= 5; i += 2 ) {
 
-			WaveletDesc_I32 desc = FactoryWaveletDaub.biorthogonal_I32(i);
+			WaveletCoefficient_I32 desc = FactoryWaveletDaub.biorthogonal_I32(i);
 
 			int sumScaling = UtilWavelet.sumCoefficients(desc.scaling)/desc.denominatorScaling;
 			assertEquals(1,sumScaling);
@@ -153,8 +153,8 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	public void biorthogonalInv_F32() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
-			WaveletDesc_F32 desc = FactoryWaveletDaub.biorthogonal_F32(i);
-			WaveletDesc_F32 descInv = FactoryWaveletDaub.biorthogonalInv_F32(i);
+			WaveletCoefficient_F32 desc = FactoryWaveletDaub.biorthogonal_F32(i);
+			WaveletCoefficient_F32 descInv = FactoryWaveletDaub.biorthogonalInv_F32(i);
 
 			for( int offset = 0; offset <= 4; offset += 2 ) {
 				checkBiorthogonal(offset,desc.scaling,desc.offsetScaling,descInv.scaling,descInv.offsetScaling);
@@ -167,8 +167,8 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	public void biorthogonalInv_I32() {
 		
 		for( int i = 5; i <= 5; i += 2 ) {
-			WaveletDesc_I32 desc = FactoryWaveletDaub.biorthogonal_I32(i);
-			WaveletDesc_I32 descInv = FactoryWaveletDaub.biorthogonalInv_I32(i);
+			WaveletCoefficient_I32 desc = FactoryWaveletDaub.biorthogonal_I32(i);
+			WaveletCoefficient_I32 descInv = FactoryWaveletDaub.biorthogonalInv_I32(i);
 
 			for( int offset = 0; offset <= 4; offset += 2 ) {
 				checkBiorthogonal(offset,desc.scaling,desc.offsetScaling,desc.denominatorScaling,

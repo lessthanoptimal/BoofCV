@@ -17,8 +17,8 @@
 package gecv.alg.wavelet;
 
 import gecv.core.image.border.BorderIndex1D_Extend;
-import gecv.struct.wavelet.WaveletDesc_F32;
-import gecv.struct.wavelet.WaveletDesc_I32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletCoefficient_I32;
 
 
 /**
@@ -28,8 +28,8 @@ import gecv.struct.wavelet.WaveletDesc_I32;
  */
 public class FactoryWaveletHaar {
 
-	public static WaveletDesc_F32 generate_F32() {
-		WaveletDesc_F32 ret = new WaveletDesc_F32();
+	public static WaveletCoefficient_F32 generate_F32() {
+		WaveletCoefficient_F32 ret = new WaveletCoefficient_F32();
 
 		ret.border = new BorderIndex1D_Extend();
 		ret.scaling = new float[]{(float)(1.0/Math.sqrt(2)),(float)(1.0/Math.sqrt(2))};
@@ -38,8 +38,8 @@ public class FactoryWaveletHaar {
 		return ret;
 	}
 
-	public static WaveletDesc_I32 generate_I32() {
-		WaveletDesc_I32 ret = new WaveletDesc_I32();
+	public static WaveletCoefficient_I32 generate_I32() {
+		WaveletCoefficient_I32 ret = new WaveletCoefficient_I32();
 
 		ret.scaling = new int[]{1,1};
 		ret.wavelet = new int[]{ret.scaling[0],-ret.scaling[0]};
@@ -55,8 +55,8 @@ public class FactoryWaveletHaar {
 	 *
 	 * @return Wavelet inverse coefficient description.
 	 */
-	public static WaveletDesc_I32 generateInv_I32() {
-		WaveletDesc_I32 ret = new WaveletDesc_I32();
+	public static WaveletCoefficient_I32 generateInv_I32() {
+		WaveletCoefficient_I32 ret = new WaveletCoefficient_I32();
 
 		ret.scaling = new int[]{1,1};
 		ret.wavelet = new int[]{ret.scaling[0],-ret.scaling[0]};

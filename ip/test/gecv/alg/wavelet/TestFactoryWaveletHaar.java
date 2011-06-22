@@ -16,8 +16,8 @@
 
 package gecv.alg.wavelet;
 
-import gecv.struct.wavelet.WaveletDesc_F32;
-import gecv.struct.wavelet.WaveletDesc_I32;
+import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletCoefficient_I32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,13 +35,13 @@ public class TestFactoryWaveletHaar extends CommonFactoryWavelet {
 	 */
 	@Test
 	public void transform_F32() {
-		WaveletDesc_F32 desc = FactoryWaveletHaar.generate_F32();
+		WaveletCoefficient_F32 desc = FactoryWaveletHaar.generate_F32();
 		checkEncodeDecode_F32(desc,desc);
 	}
 
 	@Test
 	public void checkProperties_F32() {
-		WaveletDesc_F32 desc = FactoryWaveletHaar.generate_F32();
+		WaveletCoefficient_F32 desc = FactoryWaveletHaar.generate_F32();
 
 		double energyScaling = UtilWavelet.computeEnergy(desc.scaling);
 		double energyWavelet = UtilWavelet.computeEnergy(desc.wavelet);
@@ -59,7 +59,7 @@ public class TestFactoryWaveletHaar extends CommonFactoryWavelet {
 
 	@Test
 	public void checkProperties_I32() {
-		WaveletDesc_I32 desc = FactoryWaveletHaar.generate_I32();
+		WaveletCoefficient_I32 desc = FactoryWaveletHaar.generate_I32();
 
 		double energyScaling = UtilWavelet.computeEnergy(desc.scaling,desc.denominatorScaling);
 		double energyWavelet = UtilWavelet.computeEnergy(desc.wavelet,desc.denominatorWavelet);
