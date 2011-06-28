@@ -18,6 +18,7 @@ package gecv.alg.wavelet.impl;
 
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.wavelet.FactoryWaveletDaub;
+import gecv.alg.wavelet.WaveletBorderType;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
@@ -41,7 +42,7 @@ public class TestImplWaveletTransformNaive {
 
 	WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.daubJ_F32(4);
 
-	WaveletDescription<WlCoef_I32> desc_I32 = FactoryWaveletDaub.biorthogonal_I32(5);
+	WaveletDescription<WlCoef_I32> desc_I32 = FactoryWaveletDaub.biorthogonal_I32(5, WaveletBorderType.WRAP);
 
 	/**
 	 * See if it can handle odd image sizes and output with extra padding

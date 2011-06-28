@@ -29,6 +29,11 @@ public interface WlBorderCoef<T extends WlCoef> {
 	// negative is distance from upper border
 	T getBorderCoefficients( int index );
 
+
+	public int getLowerLength();
+
+	public int getUpperLength();
+
 	/**
 	 * Set of coefficients used inside the image where the scaling and wavelet signals do
 	 * not go outside the image borders.

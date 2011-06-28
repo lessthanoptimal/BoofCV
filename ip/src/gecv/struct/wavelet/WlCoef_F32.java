@@ -28,6 +28,16 @@ public class WlCoef_F32 extends WlCoef {
 	// wavelet numbers
 	public float wavelet[];
 
+	public WlCoef_F32() {
+	}
+
+	public WlCoef_F32(float[] scaling, int offsetScaling , float[] wavelet , int offsetWavelet ) {
+		this.scaling = scaling;
+		this.wavelet = wavelet;
+		this.offsetScaling = offsetScaling;
+		this.offsetWavelet = offsetWavelet;
+	}
+
 	@Override
 	public Class<?> getType() {
 		return float.class;

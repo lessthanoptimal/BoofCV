@@ -42,39 +42,33 @@ public class TestFactoryWaveletHaar extends CommonFactoryWavelet {
 
 	@Test
 	public void checkProperties_F32() {
-		WlCoef_F32 desc = FactoryWaveletHaar.generate_F32().getForward();
+		WaveletDescription<WlCoef_F32> desc = FactoryWaveletHaar.generate_F32();
+		WlCoef_F32 coef = desc.getForward();
 
-		double energyScaling = UtilWavelet.computeEnergy(desc.scaling);
-		double energyWavelet = UtilWavelet.computeEnergy(desc.wavelet);
+		double energyScaling = UtilWavelet.computeEnergy(coef.scaling);
+		double energyWavelet = UtilWavelet.computeEnergy(coef.wavelet);
 		assertEquals(1,energyScaling,1e-4);
 		assertEquals(1,energyWavelet,1e-4);
 
-		double sumWavelet = UtilWavelet.sumCoefficients(desc.wavelet);
+		double sumWavelet = UtilWavelet.sumCoefficients(coef.wavelet);
 		assertEquals(0,sumWavelet,1e-4);
 
-		for( int offset = 0; offset <= 4; offset += 2 ) {
-			checkBiorthogonal(offset,desc.scaling,desc.offsetScaling,desc.scaling,desc.offsetScaling);
-			checkBiorthogonal(offset,desc.wavelet,desc.offsetWavelet,desc.wavelet,desc.offsetWavelet);
-		}
+		checkBiorthogonal_F32(desc);
 	}
 
 	@Test
 	public void checkProperties_I32() {
-		WlCoef_I32 desc = FactoryWaveletHaar.generate_I32().getForward();
+		WaveletDescription<WlCoef_I32> desc = FactoryWaveletHaar.generate_I32();
+		WlCoef_I32 coef = desc.getForward();
 
-		double energyScaling = UtilWavelet.computeEnergy(desc.scaling,desc.denominatorScaling);
-		double energyWavelet = UtilWavelet.computeEnergy(desc.wavelet,desc.denominatorWavelet);
+		double energyScaling = UtilWavelet.computeEnergy(coef.scaling,coef.denominatorScaling);
+		double energyWavelet = UtilWavelet.computeEnergy(coef.wavelet,coef.denominatorWavelet);
 
 		assertEquals(energyWavelet,energyScaling,1e-4);
 
-		double sumWavelet = UtilWavelet.sumCoefficients(desc.wavelet);
+		double sumWavelet = UtilWavelet.sumCoefficients(coef.wavelet);
 		assertEquals(0,sumWavelet,1e-4);
 
-		for( int offset = 0; offset <= 4; offset += 2 ) {
-			checkBiorthogonal(offset,desc.scaling,desc.offsetScaling,desc.denominatorScaling,
-					desc.scaling,desc.offsetScaling,desc.denominatorScaling, false);
-			checkBiorthogonal(offset,desc.wavelet,desc.offsetWavelet,desc.denominatorWavelet,
-					desc.wavelet,desc.offsetWavelet,desc.denominatorWavelet, false);
-		}
+		checkBiorthogonal_I32(desc);
 	}
 }

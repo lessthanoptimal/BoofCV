@@ -296,8 +296,8 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfinal boolean isLarger = input.width > output.width;\n" +
 				"\t\tfinal int width = input.width;\n" +
 				"\t\tfinal int height = output.height;\n" +
-				"\t\tfinal int lowerBorder = UtilWavelet.computeBorderStart(coefficients);\n" +
-				"\t\tfinal int upperBorder = input.width - UtilWavelet.computeBorderEnd(coefficients,output.width,input.width);\n" +
+				"\t\tfinal int lowerBorder = desc.getLowerLength()*2;\n" +
+				"\t\tfinal int upperBorder = input.width - desc.getUpperLength()*2;\n" +
 				"\n" +
 				"\t\tborder.setLength(input.width);\n" +
 				"\n" +
@@ -408,8 +408,8 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfinal boolean isLarger = input.height > output.height;\n" +
 				"\t\tfinal int width = output.width;\n" +
 				"\t\tfinal int height = input.height;\n" +
-				"\t\tfinal int lowerBorder = UtilWavelet.computeBorderStart(coefficients);\n" +
-				"\t\tfinal int upperBorder = input.height - UtilWavelet.computeBorderEnd(coefficients,output.height,input.height);\n" +
+				"\t\tfinal int lowerBorder = desc.getLowerLength()*2;\n" +
+				"\t\tfinal int upperBorder = input.height - desc.getUpperLength()*2;\n" +
 				"\n" +
 				"\t\t// need to take in account the possibility of a border wrapping around\n" +
 				"\t\tint zeroLower = lowerBorder+Math.max(alpha.length,beta.length);\n" +

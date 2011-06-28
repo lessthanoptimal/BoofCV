@@ -26,6 +26,9 @@ import gecv.struct.wavelet.WaveletDescription;
 import gecv.struct.wavelet.WlCoef_F32;
 import gecv.struct.wavelet.WlCoef_I32;
 import gecv.testing.GecvTesting;
+import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
+import org.ejml.ops.MatrixFeatures;
 
 import java.util.Random;
 
@@ -63,6 +66,12 @@ public class CommonFactoryWavelet {
 
 			ImplWaveletTransformNaive.horizontal(border,waveletDesc.forward,orig,tran);
 			ImplWaveletTransformNaive.horizontalInverse(border,waveletDesc.inverse,tran,rev);
+
+//			BasicImageIO.print(orig);
+//			System.out.println();
+//			BasicImageIO.print(rev);
+
+//			GecvTesting.printDiff(orig,rev);
 
 			GecvTesting.assertEquals(orig,rev,0,1e-4f);
 
@@ -104,76 +113,122 @@ public class CommonFactoryWavelet {
 	 * the offset is zero and they have an orthogonal/biorothogonal relationship then
 	 * the dot product should be one.  Otherwise it will be zero.
 	 */
-	public static void checkBiorthogonal( int offset ,
-										  float supportA[] , int startA ,
-										  float supportB[] , int startB )
+	public static void checkBiorthogonal_F32( WaveletDescription<WlCoef_F32> desc )
 	{
-		int length = Math.max(supportA.length,supportB.length)+offset;
+		WlCoef_F32 forward = desc.getForward();
+		BorderIndex1D border = desc.getBorder();
 
-		float valA[] = new float[length];
-		float valB[] = new float[length];
+		int N = Math.max(forward.getScalingLength(),forward.getWaveletLength());
+		N += N%2;
+		N *= 2;
+		border.setLength(N);
 
-		int m = Math.min(startA,startB);
+		DenseMatrix64F A = new DenseMatrix64F(N,N);
+		DenseMatrix64F B = new DenseMatrix64F(N,N);
 
-		for( int i = 0; i < supportA.length; i++ ) {
-			valA[i+startA-m] = supportA[i];
+		// using the wrapping rule construct a matrix with the coefficients
+		for( int i = 0; i < N; i += 2 ) {
+			for( int j = 0; j < forward.scaling.length; j++ ) {
+				int index = border.getIndex(i+j+forward.offsetScaling);
+				A.add(i,index,forward.scaling[j]);
+			}
+			for( int j = 0; j < forward.wavelet.length; j++ ) {
+				int index = border.getIndex(i+j+forward.offsetWavelet);
+				A.add(i+1,index,forward.wavelet[j]);
+			}
 		}
 
-		for( int i = 0; i < supportB.length; i++ ) {
-			valB[i+startB-m+offset] = supportB[i];
+		// the inverse coefficients should be a matrix which is the inverse of the forward coefficients
+		final int lowerBorder = desc.getInverse().getLowerLength()*2;
+		final int upperBorder = N-desc.getInverse().getUpperLength()*2;
+
+		for( int i = 0; i < N; i += 2 ) {
+			WlCoef_F32 inverse;
+			
+			if( i < lowerBorder ) {
+				inverse = desc.getInverse().getBorderCoefficients(i);
+			} else if( i >= upperBorder ) {
+				inverse = desc.getInverse().getBorderCoefficients(i-N);
+			} else {
+				inverse = desc.getInverse().getInnerCoefficients();
+			}
+
+			for( int j = 0; j < inverse.scaling.length; j++ ) {
+				int index = border.getIndex(i+j+inverse.offsetScaling);
+				B.add(index,i,inverse.scaling[j]);
+			}
+			for( int j = 0; j < inverse.wavelet.length; j++ ) {
+				int index = border.getIndex(i+j+inverse.offsetWavelet);
+				B.add(index,i+1,inverse.wavelet[j]);
+			}
 		}
 
-		double total = 0;
+		DenseMatrix64F C = new DenseMatrix64F(N,N);
 
-		for( int i = 0; i < length; i++ ) {
-			total += valA[i]*valB[i];
-		}
+		CommonOps.mult(A,B,C);
 
-		if( offset == 0 )
-			assertEquals(1.0,total,1e-4);
-		else
-			assertEquals(0.0,total,1e-4);
+//		A.print();
+//		B.print();
+//		C.print();
+
+		assertTrue(MatrixFeatures.isIdentity(C,1e-4));
 	}
 
-	/**
-	 * Computes the dot product of two wavelets separated by different offsets.  If
-	 * the offset is zero and they have an orthogonal/biorothogonal relationship then
-	 * the dot product should be one.  Otherwise it will be zero.
-	 *
-	 * @param strict When offset is zero should the dot product be one or just not zero.
-	 */
-	public static void checkBiorthogonal(int offset,
-										 int supportA[], int startA, int divA,
-										 int supportB[], int startB, int divB, boolean strict)
+	public static void checkBiorthogonal_I32( WaveletDescription<WlCoef_I32> desc )
 	{
-		int length = Math.max(supportA.length,supportB.length)+offset;
+		WlCoef_I32 forward = desc.getForward();
+		BorderIndex1D border = desc.getBorder();
 
-		int valA[] = new int[length];
-		int valB[] = new int[length];
+		int N = Math.max(forward.getScalingLength(),forward.getWaveletLength());
+		N += N%2;
+		N *= 2;
+		border.setLength(N);
 
-		int m = Math.min(startA,startB);
+		DenseMatrix64F A = new DenseMatrix64F(N,N);
+		DenseMatrix64F B = new DenseMatrix64F(N,N);
 
-		for( int i = 0; i < supportA.length; i++ ) {
-			valA[i+startA-m] = supportA[i];
+		// using the wrapping rule construct a matrix with the coefficients
+		for( int i = 0; i < N; i += 2 ) {
+			for( int j = 0; j < forward.scaling.length; j++ ) {
+				int index = border.getIndex(i+j+forward.offsetScaling);
+				A.add(i,index,(double)forward.scaling[j]/forward.denominatorScaling);
+			}
+			for( int j = 0; j < forward.wavelet.length; j++ ) {
+				int index = border.getIndex(i+j+forward.offsetWavelet);
+				A.add(i+1,index,(double)forward.wavelet[j]/forward.denominatorWavelet);
+			}
 		}
 
-		for( int i = 0; i < supportB.length; i++ ) {
-			valB[i+startB-m+offset] = supportB[i];
+		// the inverse coefficients should be a matrix which is the inverse of the forward coefficients
+		final int lowerBorder = desc.getInverse().getLowerLength()*2;
+		final int upperBorder = N-desc.getInverse().getUpperLength()*2;
+
+		for( int i = 0; i < N; i += 2 ) {
+			WlCoef_I32 inverse;
+
+			if( i < lowerBorder ) {
+				inverse = desc.getInverse().getBorderCoefficients(i);
+			} else if( i >= upperBorder ) {
+				inverse = desc.getInverse().getBorderCoefficients(i-N);
+			} else {
+				inverse = desc.getInverse().getInnerCoefficients();
+			}
+
+			for( int j = 0; j < inverse.scaling.length; j++ ) {
+				int index = border.getIndex(i+j+inverse.offsetScaling);
+				B.add(index,i,(double)inverse.scaling[j]/inverse.denominatorScaling);
+			}
+			for( int j = 0; j < inverse.wavelet.length; j++ ) {
+				int index = border.getIndex(i+j+inverse.offsetWavelet);
+				B.add(index,i+1,(double)inverse.wavelet[j]/inverse.denominatorWavelet);
+			}
 		}
 
-		int total = 0;
+		DenseMatrix64F C = new DenseMatrix64F(N,N);
 
-		for( int i = 0; i < length; i++ ) {
-			total += valA[i]*valB[i];
-		}
+		CommonOps.mult(A,B,C);
 
-		if( offset == 0 ) {
-			if( strict )
-				assertEquals(divA*divB,total);
-			else
-				assertTrue(total != 1);
-		} else
-			assertEquals(0,total);
+		assertTrue(MatrixFeatures.isIdentity(C,1e-4));
 	}
 
 	public static void checkPolySumToZero(float support[], int polyOrder, int offset ) {

@@ -153,8 +153,8 @@ public class ImplWaveletTransformNaive {
 		boolean isLarger = input.width >= output.width;
 		int paddedWidth = output.width + output.width%2;
 
-		final int lowerBorder = UtilWavelet.computeBorderStart(coefficients);
-		final int upperBorder = output.width - UtilWavelet.computeBorderEnd(coefficients,input.width,output.width);
+		final int lowerBorder = inverseCoef.getLowerLength()*2;
+		final int upperBorder = output.width - inverseCoef.getUpperLength()*2;
 
 		border.setLength(input.width);
 
@@ -225,8 +225,8 @@ public class ImplWaveletTransformNaive {
 		boolean isLarger = input.height > output.height;
 		int paddedHeight = output.height + output.height%2;
 
-		final int lowerBorder = UtilWavelet.computeBorderStart(coefficients);
-		final int upperBorder = output.height - UtilWavelet.computeBorderEnd(coefficients,input.height,output.height);
+		final int lowerBorder = inverseCoef.getLowerLength()*2;
+		final int upperBorder = output.height - inverseCoef.getUpperLength()*2;
 
 		border.setLength(input.height);
 
@@ -398,8 +398,8 @@ public class ImplWaveletTransformNaive {
 		boolean isLarger = input.width >= output.width;
 		int paddedWidth = output.width + output.width%2;
 
-		final int lowerBorder = UtilWavelet.computeBorderStart(coefficients);
-		final int upperBorder = output.width - UtilWavelet.computeBorderEnd(coefficients,input.width,output.width);
+		final int lowerBorder = inverseCoef.getLowerLength()*2;
+		final int upperBorder = output.width - inverseCoef.getUpperLength()*2;
 
 		border.setLength(input.width);
 
@@ -475,8 +475,8 @@ public class ImplWaveletTransformNaive {
 		boolean isLarger = input.height > output.height;
 		int paddedHeight = output.height + output.height%2;
 
-		final int lowerBorder = UtilWavelet.computeBorderStart(coefficients);
-		final int upperBorder = output.height - UtilWavelet.computeBorderEnd(coefficients,input.height,output.height);
+		final int lowerBorder = inverseCoef.getLowerLength()*2;
+		final int upperBorder = output.height - inverseCoef.getUpperLength()*2;
 
 		border.setLength(input.height);
 
