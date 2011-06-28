@@ -229,8 +229,8 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t\tboolean isLarger = input.width >= output.width;\n" +
 				"\t\tint paddedWidth = output.width + output.width%2;\n" +
 				"\n" +
-				"\t\tfinal int lowerBorder = UtilWavelet.computeBorderStart(coefficients);\n" +
-				"\t\tfinal int upperBorder = output.width - UtilWavelet.computeBorderEnd(coefficients,input.width,output.width);\n"+
+				"\t\tfinal int lowerBorder = inverseCoef.getLowerLength()*2;\n" +
+				"\t\tfinal int upperBorder = output.width - inverseCoef.getUpperLength()*2;\n" +
 				"\n" +
 				"\t\tborder.setLength(input.width);\n" +
 				"\n");
@@ -314,8 +314,8 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t\tboolean isLarger = input.height > output.height;\n" +
 				"\t\tint paddedHeight = output.height + output.height%2;\n" +
 				"\n" +
-				"\t\tfinal int lowerBorder = UtilWavelet.computeBorderStart(coefficients);\n" +
-				"\t\tfinal int upperBorder = output.height - UtilWavelet.computeBorderEnd(coefficients,input.height,output.height);\n"+
+				"\t\tfinal int lowerBorder = inverseCoef.getLowerLength()*2;\n" +
+				"\t\tfinal int upperBorder = output.height - inverseCoef.getUpperLength()*2;\n" +
 				"\n" +
 				"\t\tborder.setLength(input.height);\n" +
 				"\n");

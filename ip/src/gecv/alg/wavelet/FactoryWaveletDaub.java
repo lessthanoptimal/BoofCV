@@ -16,8 +16,13 @@
 
 package gecv.alg.wavelet;
 
+import gecv.core.image.border.BorderIndex1D;
+import gecv.core.image.border.BorderIndex1D_Reflect;
 import gecv.core.image.border.BorderIndex1D_Wrap;
 import gecv.struct.wavelet.*;
+import org.ejml.alg.dense.linsol.LinearSolver;
+import org.ejml.alg.dense.linsol.LinearSolverFactory;
+import org.ejml.data.DenseMatrix64F;
 
 
 /**
@@ -94,9 +99,11 @@ public class FactoryWaveletDaub {
 	 * </p>
 	 *
 	 * @param J The wavelet's degree. K = J-2.
+	 * @param borderType How image borders are handled.
 	 * @return Description of the Daub J/K wavelet.
 	 */
-	public static WaveletDescription<WlCoef_F32> biorthogonal_F32( int J ) {
+	public static WaveletDescription<WlCoef_F32> biorthogonal_F32( int J ,
+																   WaveletBorderType borderType ) {
 		if( J != 5 ) {
 			throw new IllegalArgumentException("Only 5 is currently supported");
 		}
@@ -119,17 +126,20 @@ public class FactoryWaveletDaub {
 		forward.wavelet[1] = 1;
 		forward.wavelet[2] = -1.0f/2.0f;
 
-		WlBorderCoef<WlCoef_F32> inverse = invertBiorthogonalJ(forward);
+		BorderIndex1D border;
+		WlBorderCoef<WlCoef_F32> inverse;
 
-		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),forward,inverse);
+		if( borderType == WaveletBorderType.REFLECT ) {
+			WlCoef_F32 inner = computeInnerInverseBiorthogonal(forward);
+			border = new BorderIndex1D_Reflect();
+			inverse = computeBorderCoefficients(border,forward,inner);
+		} else {
+			WlCoef_F32 inner = computeInnerInverseBiorthogonal(forward);
+			inverse = new WlBorderCoefStandard<WlCoef_F32>(inner);
+			border = new BorderIndex1D_Wrap();
+		}
+		return new WaveletDescription<WlCoef_F32>(border,forward,inverse);
 
-	}
-
-	private static WlBorderCoef<WlCoef_F32> invertBiorthogonalJ( WlCoef_F32 coef ) {
-
-		WlCoef_F32 inner = computeInnerInverseBiorthogonal(coef);
-
-		return new WlBorderCoefStandard<WlCoef_F32>(inner);
 	}
 
 	private static WlCoef_F32 computeInnerInverseBiorthogonal(WlCoef_F32 coef) {
@@ -160,13 +170,110 @@ public class FactoryWaveletDaub {
 	}
 
 	/**
-	 * Integer version of {@link #biorthogonal_F32}.  Use {@link #invertBiorthogonalJ}
-	 * when computing the inverse transform.
+	 * Computes inverse coefficients 
+	 *
+	 * @param border
+	 * @param forward Forward coefficients.
+	 * @param inverse Inverse used in the inner portion of the data stream.
+	 * @return
+	 */
+	private static WlBorderCoef<WlCoef_F32> computeBorderCoefficients( BorderIndex1D border ,
+																	   WlCoef_F32 forward ,
+																	   WlCoef_F32 inverse ) {
+		int N = Math.max(forward.getScalingLength(),forward.getWaveletLength());
+		N += N%2;
+		N *= 2;
+		border.setLength(N);
+
+		// Because the wavelet transform is a linear invertible system the inverse coefficients
+		// can be found by creating a matrix and inverting the matrix.  Boundary conditions are then
+		// extracted from this inverted matrix.
+		DenseMatrix64F A = new DenseMatrix64F(N,N);
+		for( int i = 0; i < N; i += 2 ) {
+			
+			for( int j = 0; j < forward.scaling.length; j++ ) {
+				int index = border.getIndex(j+i+forward.offsetScaling);
+				A.add(i,index,forward.scaling[j]);
+			}
+
+			for( int j = 0; j < forward.wavelet.length; j++ ) {
+				int index = border.getIndex(j+i+forward.offsetWavelet);
+				A.add(i+1,index,forward.wavelet[j]);
+			}
+		}
+
+		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.linear(N);
+		if( !solver.setA(A) || solver.quality() < 1e-5) {
+			throw new IllegalArgumentException("Can't invert matrix");
+		}
+
+		DenseMatrix64F A_inv = new DenseMatrix64F(N,N);
+		solver.invert(A_inv);
+
+		int numBorder = UtilWavelet.computeBorderStart(inverse)/2;
+
+		WlBorderCoefFixed<WlCoef_F32> ret = new WlBorderCoefFixed<WlCoef_F32>(numBorder,numBorder+1);
+		ret.setInnerCoef(inverse);
+
+		// add the lower coefficients first
+		for( int i = 0; i < ret.getLowerLength(); i++) {
+			computeLowerCoef(inverse, A_inv, ret, i*2);
+		}
+
+		// add upper coefficients
+		for( int i = 0; i < ret.getUpperLength(); i++) {
+			computeUpperCoef(inverse, N, A_inv, ret, i*2);
+		}
+
+		return ret;
+	}
+
+	private static void computeLowerCoef(WlCoef_F32 inverse, DenseMatrix64F a_inv, WlBorderCoefFixed ret, int col) {
+		int lengthWavelet = inverse.wavelet.length + inverse.offsetWavelet + col;
+		int lengthScaling = inverse.scaling.length + inverse.offsetScaling + col;
+		lengthWavelet = Math.min(lengthWavelet,inverse.wavelet.length);
+		lengthScaling = Math.min(lengthScaling,inverse.scaling.length);
+
+		float []coefScaling = new float[lengthScaling];
+		float []coefWavelet = new float[lengthWavelet];
+
+		for( int j = 0; j < lengthScaling; j++ ) {
+			coefScaling[j] = (float) a_inv.get(j,col);
+		}
+		for( int j = 0; j < lengthWavelet; j++ ) {
+			coefWavelet[j] = (float) a_inv.get(j,col+1);
+		}
+		ret.lowerCoef[col] = new WlCoef_F32(coefScaling,0,coefWavelet,0);
+	}
+
+	private static void computeUpperCoef(WlCoef_F32 inverse, int n, DenseMatrix64F a_inv, WlBorderCoefFixed ret, int col) {
+		int indexEnd = n - col - 2;
+		int lengthWavelet = indexEnd+inverse.offsetWavelet+inverse.wavelet.length;
+		int lengthScaling = indexEnd+inverse.offsetScaling+inverse.scaling.length;
+		lengthWavelet = lengthWavelet > n ? inverse.wavelet.length - (lengthWavelet-n) : inverse.wavelet.length;
+		lengthScaling = lengthScaling > n ? inverse.scaling.length - (lengthScaling-n) : inverse.scaling.length;
+
+		float []coefScaling = new float[lengthScaling];
+		float []coefWavelet = new float[lengthWavelet];
+
+		for( int j = 0; j < lengthScaling; j++ ) {
+			coefScaling[j] = (float) a_inv.get(indexEnd+j+inverse.offsetScaling, n -2-col);
+		}
+		for( int j = 0; j < lengthWavelet; j++ ) {
+			coefWavelet[j] = (float) a_inv.get(indexEnd+j+inverse.offsetWavelet, n -2-col+1);
+		}
+		ret.upperCoef[col/2] = new WlCoef_F32(coefScaling,inverse.offsetScaling,coefWavelet,inverse.offsetWavelet);
+	}
+
+	/**
+	 * Integer version of {@link #biorthogonal_F32}.
 	 *
 	 * @param J The wavelet's degree. K = J-2.
+	 * @param borderType How image borders are handled.
 	 * @return Description of the Daub J/K wavelet.
 	 */
-	public static WaveletDescription<WlCoef_I32> biorthogonal_I32( int J ) {
+	public static WaveletDescription<WlCoef_I32> biorthogonal_I32( int J ,
+																   WaveletBorderType borderType ) {
 		if( J != 5 ) {
 			throw new IllegalArgumentException("Only 5 is currently supported");
 		}
@@ -191,25 +298,23 @@ public class FactoryWaveletDaub {
 		forward.wavelet[1] = 2;
 		forward.wavelet[2] = -1;
 
-		WlBorderCoef<WlCoef_I32> inverse = invertBiorthogonalJ(forward);
+		BorderIndex1D border;
+		WlBorderCoef<WlCoef_I32> inverse;
 
-		return new WaveletDescription<WlCoef_I32>(new BorderIndex1D_Wrap(),forward,inverse);
+		if( borderType == WaveletBorderType.WRAP ) {
+			WlCoef_I32 inner = computeInnerBiorthogonalInverse(forward);
+			inverse = new WlBorderCoefStandard<WlCoef_I32>(inner);
+			border = new BorderIndex1D_Wrap();
+		} else {
+			WlCoef_I32 inner = computeInnerBiorthogonalInverse(forward);
+			inverse = convertToInt((WlBorderCoefFixed<WlCoef_F32>)biorthogonal_F32(J,borderType).getInverse(),inner);
+			border = new BorderIndex1D_Reflect();
+		}
+		return new WaveletDescription<WlCoef_I32>(border,forward,inverse);
+
 	}
 
-	/**
-	 * Computes the inverse of a biorthogonal wavelet.
-	 *
-	 * @param coef
-	 * @return
-	 */
-	private static WlBorderCoef<WlCoef_I32> invertBiorthogonalJ( WlCoef_I32 coef ) {
-
-		WlCoef_I32 inner = computeInnerBiorthogonal(coef);
-
-		return new WlBorderCoefStandard<WlCoef_I32>(inner);
-	}
-
-	private static WlCoef_I32 computeInnerBiorthogonal(WlCoef_I32 coef) {
+	private static WlCoef_I32 computeInnerBiorthogonalInverse(WlCoef_I32 coef) {
 		WlCoef_I32 ret = new WlCoef_I32();
 
 		// center at zero
@@ -236,5 +341,45 @@ public class FactoryWaveletDaub {
 				ret.wavelet[i] = coef.scaling[i];
 		}
 		return ret;
+	}
+
+	// todo rename and move to a utility function?
+	public static WlBorderCoefFixed<WlCoef_I32> convertToInt( WlBorderCoefFixed<WlCoef_F32> orig ,
+															  WlCoef_I32 inner ) {
+		WlBorderCoefFixed<WlCoef_I32> ret =
+				new WlBorderCoefFixed<WlCoef_I32>(orig.getLowerLength(),orig.getUpperLength());
+
+		for( int i = 0; i < orig.getLowerLength(); i++ ) {
+			WlCoef_F32 o = orig.getLower(i);
+			WlCoef_I32 r = new WlCoef_I32();
+			ret.setLower(i,r);
+			convertCoef_F32_to_I32(inner.denominatorScaling, inner.denominatorWavelet, o, r);
+		}
+		for( int i = 0; i < orig.getUpperLength(); i++ ) {
+			WlCoef_F32 o = orig.getUpper(i);
+			WlCoef_I32 r = new WlCoef_I32();
+			ret.setUpper(i,r);
+			convertCoef_F32_to_I32(inner.denominatorScaling, inner.denominatorWavelet, o, r);
+		}
+
+		ret.setInnerCoef(inner);
+
+		return ret;
+	}
+
+	private static void convertCoef_F32_to_I32(int denominatorScaling, int denominatorWavelet, WlCoef_F32 o, WlCoef_I32 r) {
+		r.denominatorScaling = denominatorScaling;
+		r.denominatorWavelet = denominatorWavelet;
+		r.scaling = new int[ o.scaling.length ];
+		r.wavelet = new int[ o.wavelet.length ];
+		r.offsetScaling = o.offsetScaling;
+		r.offsetWavelet = o.offsetWavelet;
+
+		for( int j = 0; j < o.scaling.length; j++ ) {
+			r.scaling[j] = (int)Math.round(o.scaling[j]*denominatorScaling);
+		}
+		for( int j = 0; j < o.wavelet.length; j++ ) {
+			r.wavelet[j] = (int)Math.round(o.wavelet[j]*denominatorWavelet);
+		}
 	}
 }

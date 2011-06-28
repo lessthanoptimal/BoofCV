@@ -14,39 +14,15 @@
  *    limitations under the License.
  */
 
-package gecv.struct.wavelet;
+package gecv.alg.wavelet;
 
 
 /**
- * Inverse wavelet description which simply returns the same set of coefficients at all time.
+ * Different types of borders supported by wavelets
  *
  * @author Peter Abeles
  */
-public class WlBorderCoefStandard<T extends WlCoef> implements WlBorderCoef<T> {
-
-	T coef;
-
-	public WlBorderCoefStandard(T coef ) {
-		this.coef = coef;
-	}
-
-	@Override
-	public T getBorderCoefficients(int index) {
-		return coef;
-	}
-
-	@Override
-	public int getLowerLength() {
-		return 0;
-	}
-
-	@Override
-	public int getUpperLength() {
-		return 0;
-	}
-
-	@Override
-	public T getInnerCoefficients() {
-		return coef;
-	}
+public enum WaveletBorderType {
+	WRAP,
+	REFLECT
 }
