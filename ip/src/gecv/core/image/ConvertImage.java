@@ -413,4 +413,60 @@ public class ConvertImage {
 			}
 		}
 	}
+
+	/**
+	 * <p>
+	 * Converts {@link gecv.struct.image.ImageFloat32} into {@link gecv.struct.image.ImageFloat64}.  No additional
+	 * scaling is done, just a straight conversion.
+	 * </p>
+	 *
+	 * @param src	Input image which is being converted.
+	 * @param dst	The output image.  If null a new image is created.
+	 */
+	public static ImageFloat64 convert(ImageFloat32 src, ImageFloat64 dst) {
+		if (dst == null) {
+			dst = new ImageFloat64(src.width, src.height);
+		} else {
+			InputSanityCheck.checkSameShape(src, dst);
+		}
+
+		for (int y = 0; y < src.height; y++) {
+			int indexSrc = src.getIndex(0, y);
+			int indexDst = dst.getIndex(0, y);
+
+			for (int x = 0; x < src.width; x++) {
+				dst.data[indexDst++] = src.data[indexSrc++];
+			}
+		}
+
+		return dst;
+	}
+
+	/**
+	 * <p>
+	 * Converts {@link gecv.struct.image.ImageFloat64} into {@link gecv.struct.image.ImageFloat32}.  No additional
+	 * scaling is done, just a straight conversion.
+	 * </p>
+	 *
+	 * @param src	Input image which is being converted.
+	 * @param dst	The output image.  If null a new image is created.
+	 */
+	public static ImageFloat32 convert(ImageFloat64 src, ImageFloat32 dst) {
+		if (dst == null) {
+			dst = new ImageFloat32(src.width, src.height);
+		} else {
+			InputSanityCheck.checkSameShape(src, dst);
+		}
+
+		for (int y = 0; y < src.height; y++) {
+			int indexSrc = src.getIndex(0, y);
+			int indexDst = dst.getIndex(0, y);
+
+			for (int x = 0; x < src.width; x++) {
+				dst.data[indexDst++] = (float)src.data[indexSrc++];
+			}
+		}
+
+		return dst;
+	}
 }

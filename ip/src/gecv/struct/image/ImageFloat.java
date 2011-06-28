@@ -14,39 +14,32 @@
  *    limitations under the License.
  */
 
-package gecv.core.image.border;
-
-import gecv.struct.image.ImageFloat32;
+package gecv.struct.image;
 
 /**
- * Child of {@link ImageBorder} for {@link ImageFloat32}.
+ * <p>
+ * Base class for floating point images
+ * </p>
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_F32 extends ImageBorder<ImageFloat32> {
+public abstract class ImageFloat <T extends ImageFloat> extends ImageBase<T> {
 
-	public ImageBorder_F32(ImageFloat32 image) {
-		super(image);
+	protected ImageFloat(int width, int height) {
+		super(width, height);
 	}
 
-	protected ImageBorder_F32() {
+	protected ImageFloat() {
 	}
 
-	public void set( int x , int y , float val ) {
-		if( image.isInBounds(x,y) )
-			image.set(x,y,val);
-
-		setOutside(x,y,val);
+	@Override
+	public boolean isInteger() {
+		return false;
 	}
 
-	public float get( int x , int y ) {
-		if( image.isInBounds(x,y) )
-			return image.get(x,y);
-
-		return getOutside( x , y );
+	@Override
+	public boolean isSigned() {
+		return true;
 	}
 
-	public abstract float getOutside( int x , int y );
-
-	public abstract void setOutside( int x , int y , float val );
 }

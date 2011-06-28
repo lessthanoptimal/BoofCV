@@ -17,10 +17,10 @@
 package gecv.alg.wavelet.impl;
 
 import gecv.alg.wavelet.UtilWavelet;
-import gecv.core.image.border.BorderIndex1D;
 import gecv.struct.image.*;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
-import gecv.struct.wavelet.WaveletCoefficient_I32;
+import gecv.struct.wavelet.WlBorderCoef;
+import gecv.struct.wavelet.WlCoef_F32;
+import gecv.struct.wavelet.WlCoef_I32;
 
 
 /**
@@ -37,7 +37,7 @@ import gecv.struct.wavelet.WaveletCoefficient_I32;
  */
 public class ImplWaveletTransformInner {
 
-	public static void horizontal( WaveletCoefficient_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	public static void horizontal( WlCoef_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -80,7 +80,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void vertical( WaveletCoefficient_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	public static void vertical( WlCoef_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
 	{
 		final int offsetA = coefficients.offsetScaling*input.stride;
 		final int offsetB = coefficients.offsetWavelet*input.stride;
@@ -124,8 +124,9 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontalInverse( WaveletCoefficient_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	public static void horizontalInverse( WlBorderCoef<WlCoef_F32> invDesc , ImageFloat32 input , ImageFloat32 output )
 	{
+		WlCoef_F32 coefficients = invDesc.getInnerCoefficients();
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final float[] alpha = coefficients.scaling;
@@ -141,9 +142,6 @@ public class ImplWaveletTransformInner {
 		final int endX = input.width - UtilWavelet.computeBorderEnd(coefficients,output.width,input.width);
 		final int zeroStart = startX+Math.min(offsetA,offsetB);
 		final int zeroEnd = endX+Math.min(offsetA,offsetB);
-
-		BorderIndex1D border = coefficients.getBorder();
-		border.setLength(input.width);
 
 		for( int y = 0; y < height; y++ ) {
 
@@ -194,8 +192,9 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void verticalInverse( WaveletCoefficient_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	public static void verticalInverse( WlBorderCoef<WlCoef_F32> invDesc , ImageFloat32 input , ImageFloat32 output )
 	{
+		WlCoef_F32 coefficients = invDesc.getInnerCoefficients();
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final float[] alpha = coefficients.scaling;
@@ -262,7 +261,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontal( WaveletCoefficient_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
+	public static void horizontal( WlCoef_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -308,7 +307,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void vertical( WaveletCoefficient_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
+	public static void vertical( WlCoef_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
 	{
 		final int offsetA = coefficients.offsetScaling*input.stride;
 		final int offsetB = coefficients.offsetWavelet*input.stride;
@@ -355,8 +354,9 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontalInverse( WaveletCoefficient_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
+	public static void horizontalInverse( WlBorderCoef<WlCoef_I32> invDesc , ImageUInt8 input , ImageSInt16 output )
 	{
+		WlCoef_I32 coefficients = invDesc.getInnerCoefficients();
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final int[] alpha = coefficients.scaling;
@@ -372,9 +372,6 @@ public class ImplWaveletTransformInner {
 		final int endX = input.width - UtilWavelet.computeBorderEnd(coefficients,output.width,input.width);
 		final int zeroStart = startX+Math.min(offsetA,offsetB);
 		final int zeroEnd = endX+Math.min(offsetA,offsetB);
-
-		BorderIndex1D border = coefficients.getBorder();
-		border.setLength(input.width);
 
 		final int e = coefficients.denominatorScaling*2;
 		final int f = coefficients.denominatorWavelet*2;
@@ -430,8 +427,9 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void verticalInverse( WaveletCoefficient_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
+	public static void verticalInverse( WlBorderCoef<WlCoef_I32> invDesc , ImageUInt8 input , ImageSInt16 output )
 	{
+		WlCoef_I32 coefficients = invDesc.getInnerCoefficients();
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final int[] alpha = coefficients.scaling;
@@ -503,7 +501,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontal( WaveletCoefficient_I32 coefficients , ImageUInt16 input , ImageSInt32 output )
+	public static void horizontal( WlCoef_I32 coefficients , ImageUInt16 input , ImageSInt32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -549,7 +547,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void vertical( WaveletCoefficient_I32 coefficients , ImageUInt16 input , ImageSInt32 output )
+	public static void vertical( WlCoef_I32 coefficients , ImageUInt16 input , ImageSInt32 output )
 	{
 		final int offsetA = coefficients.offsetScaling*input.stride;
 		final int offsetB = coefficients.offsetWavelet*input.stride;
@@ -596,8 +594,9 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontalInverse( WaveletCoefficient_I32 coefficients , ImageUInt16 input , ImageSInt32 output )
+	public static void horizontalInverse( WlBorderCoef<WlCoef_I32> invDesc , ImageUInt16 input , ImageSInt32 output )
 	{
+		WlCoef_I32 coefficients = invDesc.getInnerCoefficients();
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final int[] alpha = coefficients.scaling;
@@ -613,9 +612,6 @@ public class ImplWaveletTransformInner {
 		final int endX = input.width - UtilWavelet.computeBorderEnd(coefficients,output.width,input.width);
 		final int zeroStart = startX+Math.min(offsetA,offsetB);
 		final int zeroEnd = endX+Math.min(offsetA,offsetB);
-
-		BorderIndex1D border = coefficients.getBorder();
-		border.setLength(input.width);
 
 		final int e = coefficients.denominatorScaling*2;
 		final int f = coefficients.denominatorWavelet*2;
@@ -671,8 +667,9 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void verticalInverse( WaveletCoefficient_I32 coefficients , ImageUInt16 input , ImageSInt32 output )
+	public static void verticalInverse( WlBorderCoef<WlCoef_I32> invDesc , ImageUInt16 input , ImageSInt32 output )
 	{
+		WlCoef_I32 coefficients = invDesc.getInnerCoefficients();
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final int[] alpha = coefficients.scaling;

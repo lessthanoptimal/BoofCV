@@ -24,7 +24,8 @@ import gecv.alg.wavelet.impl.ImplWaveletTransformInner;
 import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlCoef_F32;
 
 import java.util.Random;
 
@@ -37,8 +38,7 @@ public class BenchmarkWaveletInverse {
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
-	static WaveletCoefficient_F32 forward_F32 = FactoryWaveletDaub.standard_F32(4);
-	static WaveletCoefficient_F32 reverse_F32 = forward_F32;
+	static WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.daubJ_F32(4);
 
 	static ImageFloat32 tran_F32 = new ImageFloat32(imgWidth,imgHeight);
 	static ImageFloat32 temp1_F32 = new ImageFloat32(imgWidth,imgHeight);
@@ -49,8 +49,8 @@ public class BenchmarkWaveletInverse {
 
 		@Override
 		public void process() {
-			ImplWaveletTransformNaive.verticalInverse(forward_F32, tran_F32,temp1_F32);
-			ImplWaveletTransformNaive.horizontalInverse(forward_F32,temp1_F32,temp2_F32);
+			ImplWaveletTransformNaive.verticalInverse(desc_F32.getBorder(),desc_F32.getInverse(), tran_F32,temp1_F32);
+			ImplWaveletTransformNaive.horizontalInverse(desc_F32.getBorder(),desc_F32.getInverse(),temp1_F32,temp2_F32);
 		}
 	}
 
@@ -59,10 +59,10 @@ public class BenchmarkWaveletInverse {
 
 		@Override
 		public void process() {
-			ImplWaveletTransformInner.verticalInverse(forward_F32,tran_F32,temp1_F32);
-			ImplWaveletTransformBorder.verticalInverse(forward_F32,tran_F32,temp1_F32);
-			ImplWaveletTransformInner.horizontalInverse(forward_F32, tran_F32,temp1_F32);
-			ImplWaveletTransformBorder.horizontalInverse(forward_F32, tran_F32,temp1_F32);
+			ImplWaveletTransformInner.verticalInverse(desc_F32.getInverse(),tran_F32,temp1_F32);
+			ImplWaveletTransformBorder.verticalInverse(desc_F32.getBorder(),desc_F32.getInverse(),tran_F32,temp1_F32);
+			ImplWaveletTransformInner.horizontalInverse(desc_F32.getInverse(), tran_F32,temp1_F32);
+			ImplWaveletTransformBorder.horizontalInverse(desc_F32.getBorder(),desc_F32.getInverse(), tran_F32,temp1_F32);
 		}
 	}
 

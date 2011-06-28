@@ -19,7 +19,8 @@ package gecv.alg.wavelet;
 import gecv.alg.wavelet.impl.ImplWaveletTransformBorder;
 import gecv.alg.wavelet.impl.ImplWaveletTransformInner;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlCoef_F32;
 
 
 /**
@@ -54,21 +55,24 @@ public class WaveletTransformOps {
 	 * @param storage Optional storage image.  Should be the same size as output image. If null then
 	 * an image is declared internally.
 	 */
-	public static void transform1( WaveletCoefficient_F32 desc ,
+	public static void transform1( WaveletDescription<WlCoef_F32> desc ,
 								   ImageFloat32 input , ImageFloat32 output ,
 								   ImageFloat32 storage )
 	{
 		UtilWavelet.checkShape(input,output);
-		if( output.width < desc.scaling.length || output.width < desc.wavelet.length )
+
+		WlCoef_F32 coef = desc.getForward();
+
+		if( output.width < coef.scaling.length || output.width < coef.wavelet.length )
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
-		if( output.height < desc.scaling.length || output.height < desc.wavelet.length )
+		if( output.height < coef.scaling.length || output.height < coef.wavelet.length )
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		storage = checkDeclareStorage(output.width, output.height, storage,"storage1");
 
-		ImplWaveletTransformInner.horizontal(desc,input,storage);
-		ImplWaveletTransformBorder.horizontal(desc,input,storage);
-		ImplWaveletTransformInner.vertical(desc,storage,output);
-		ImplWaveletTransformBorder.vertical(desc,storage,output);
+		ImplWaveletTransformInner.horizontal(coef,input,storage);
+		ImplWaveletTransformBorder.horizontal(desc.getBorder(),coef,input,storage);
+		ImplWaveletTransformInner.vertical(coef,storage,output);
+		ImplWaveletTransformBorder.vertical(desc.getBorder(),coef,storage,output);
 	}
 
 	/**
@@ -85,7 +89,7 @@ public class WaveletTransformOps {
 	 * an image is declared internally.
 	 * @param numLevels Number of levels which should be computed in the transform.
 	 */
-	public static void transformN( WaveletCoefficient_F32 desc ,
+	public static void transformN( WaveletDescription<WlCoef_F32> desc ,
 								   ImageFloat32 input , ImageFloat32 output ,
 								   ImageFloat32 storage ,
 								   int numLevels )
@@ -94,7 +98,8 @@ public class WaveletTransformOps {
 			transform1(desc,input,output, storage);
 			return;
 		}
-		UtilWavelet.checkShape(desc,input,output,numLevels);
+
+		UtilWavelet.checkShape(desc.getForward(),input,output,numLevels);
 		storage = checkDeclareStorage(output.width, output.height, storage,"storage");
 		// modify the shape of a temporary image not the original
 		storage = storage.subimage(0,0,output.width,output.height);
@@ -128,21 +133,22 @@ public class WaveletTransformOps {
 	 * @param storage Optional storage image.  Should be the same size as the input image. If null then
 	 * an image is declared internally.
 	 */
-	public static void inverse1( WaveletCoefficient_F32 desc ,
+	public static void inverse1( WaveletDescription<WlCoef_F32> desc ,
 								 ImageFloat32 input , ImageFloat32 output ,
 								 ImageFloat32 storage )
 	{
 		UtilWavelet.checkShape(output,input);
-		if( output.width < desc.scaling.length || output.width < desc.wavelet.length )
+		WlCoef_F32 coef = desc.getForward();
+		if( output.width < coef.scaling.length || output.width < coef.wavelet.length )
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
-		if( output.height < desc.scaling.length || output.height < desc.wavelet.length )
+		if( output.height < coef.scaling.length || output.height < coef.wavelet.length )
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		storage = checkDeclareStorage(input.width, input.height, storage,"storage");
 
-		ImplWaveletTransformInner.verticalInverse(desc,input,storage);
-		ImplWaveletTransformBorder.verticalInverse(desc,input,storage);
-		ImplWaveletTransformInner.horizontalInverse(desc,storage,output);
-		ImplWaveletTransformBorder.horizontalInverse(desc,storage,output);
+		ImplWaveletTransformInner.verticalInverse(desc.getInverse(),input,storage);
+		ImplWaveletTransformBorder.verticalInverse(desc.getBorder(),desc.getInverse(),input,storage);
+		ImplWaveletTransformInner.horizontalInverse(desc.getInverse(),storage,output);
+		ImplWaveletTransformBorder.horizontalInverse(desc.getBorder(),desc.getInverse(),storage,output);
 	}
 
 	/**
@@ -157,7 +163,7 @@ public class WaveletTransformOps {
 	 * an image is declared internally.
 	 * @param numLevels Number of levels in the transform.
 	 */
-	public static void inverseN( WaveletCoefficient_F32 desc ,
+	public static void inverseN( WaveletDescription<WlCoef_F32> desc ,
 								 ImageFloat32 input , ImageFloat32 output ,
 								 ImageFloat32 storage,
 								 int numLevels )
@@ -167,7 +173,7 @@ public class WaveletTransformOps {
 			return;
 		}
 
-		UtilWavelet.checkShape(desc,output,input,numLevels);
+		UtilWavelet.checkShape(desc.getForward(),output,input,numLevels);
 		storage = checkDeclareStorage(input.width, input.height, storage,"storage");
 		// modify the shape of a temporary image not the original
 		storage = storage.subimage(0,0,input.width,input.height);

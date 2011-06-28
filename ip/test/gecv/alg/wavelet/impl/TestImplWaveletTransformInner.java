@@ -20,8 +20,9 @@ import gecv.alg.wavelet.UtilWavelet;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageBase;
-import gecv.struct.wavelet.WaveletCoefficient;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlBorderCoef;
+import gecv.struct.wavelet.WlCoef;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -35,13 +36,11 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestImplWaveletTransformInner {
-	int numExpected = 3;
+public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 
-	boolean isFloat;
-	Class<?> typeInput;
-	Class<?> typeOutput;
-	String functionName;
+	public TestImplWaveletTransformInner() {
+		super(3,ImplWaveletTransformInner.class);
+	}
 
 	@Test
 	public void checkAllHorizontal() {
@@ -63,52 +62,13 @@ public class TestImplWaveletTransformInner {
 		checkAll("verticalInverse","checkVerticalInverse");
 	}
 
-	private void checkAll( String functionName , String testMethodName ) {
-		this.functionName = functionName;
-		Method methods[] = ImplWaveletTransformInner.class.getMethods();
-		Method testMethod;
-
-		try {
-			testMethod = getClass().getMethod(testMethodName,Method.class);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		}
-
-		// sanity check to make sure the functions are being found
-		int numFound = 0;
-		for (Method m : methods) {
-			if( m.getName().compareTo(functionName) != 0)
-				continue;
-
-			isFloat = m.getParameterTypes()[0] == WaveletCoefficient_F32.class;
-			typeInput = m.getParameterTypes()[1];
-			typeOutput = m.getParameterTypes()[2];
-
-//			System.out.println(typeInput.getSimpleName()+" "+typeOutput.getSimpleName());
-
-			try {
-				testMethod.invoke(this,m);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
-			}
-
-			numFound++;
-		}
-
-		// update this as needed when new functions are added
-		if(numExpected != numFound)
-			throw new RuntimeException("Unexpected number of methods: Found "+numFound+"  expected "+numExpected);
-	}
-
-
 	public void checkHorizontal( Method m ) {
-		PermuteWaveletCompare test = new BaseCompare() {
+		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletCoefficient desc, ImageBase input,
+			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				equalsTranHorizontal(desc,input,expected,found );
+				WlCoef coef = desc.getForward();
+				equalsTranHorizontal(coef,input,expected,found );
 			}
 		};
 
@@ -116,11 +76,12 @@ public class TestImplWaveletTransformInner {
 	}
 
 	public void checkVertical( Method m ) {
-		PermuteWaveletCompare test = new BaseCompare() {
+		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletCoefficient desc, ImageBase input,
+			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				equalsTranVertical(desc,input,expected,found );
+				WlCoef coef = desc.getForward();
+				equalsTranVertical(coef,input,expected,found );
 			}
 		};
 
@@ -128,12 +89,13 @@ public class TestImplWaveletTransformInner {
 	}
 
 	public void checkHorizontalInverse( Method m ) {
-		PermuteWaveletCompare test = new BaseCompare() {
+		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletCoefficient desc, ImageBase input,
+			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				int border = Math.max(UtilWavelet.computeBorderStart(desc),
-						UtilWavelet.computeBorderEnd(desc,expected.width,input.width))-desc.offsetScaling*2;
+				WlCoef coef = desc.getForward();
+				int border = Math.max(UtilWavelet.computeBorderStart(coef),
+						UtilWavelet.computeBorderEnd(coef,expected.width,input.width))-coef.offsetScaling*2;
 
 				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f,border);
 			}
@@ -143,12 +105,13 @@ public class TestImplWaveletTransformInner {
 	}
 
 	public void checkVerticalInverse( Method m ) {
-		PermuteWaveletCompare test = new BaseCompare() {
+		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletCoefficient desc, ImageBase input,
+			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				int border = Math.max(UtilWavelet.computeBorderStart(desc),
-						UtilWavelet.computeBorderEnd(desc,expected.height,input.height))-desc.offsetScaling*2;
+				WlCoef coef = desc.getForward();
+				int border = Math.max(UtilWavelet.computeBorderStart(coef),
+						UtilWavelet.computeBorderEnd(coef,expected.height,input.height))-coef.offsetScaling*2;
 
 				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f,border);
 			}
@@ -158,46 +121,10 @@ public class TestImplWaveletTransformInner {
 	}
 
 	/**
-	 * Invokes test validation methods using reflections
-	 */
-	private abstract class BaseCompare extends PermuteWaveletCompare {
-		protected BaseCompare() {
-			super(typeInput, typeOutput);
-		}
-
-		@Override
-		public void applyValidation(WaveletCoefficient desc, ImageBase input, ImageBase output) {
-			Method m = GecvTesting.findMethod(ImplWaveletTransformNaive.class,functionName,desc.getClass(),input.getClass(),output.getClass());
-			try {
-				m.invoke(null,desc,input,output);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		@Override
-		public void applyTransform(WaveletCoefficient desc, ImageBase input, ImageBase output) {
-			try {
-				Method m = ImplWaveletTransformInner.class.getMethod(functionName,desc.getClass(),input.getClass(),output.getClass());
-				m.invoke(null,desc,input,output);
-			} catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-	}
-
-	/**
 	 * Compares two wavelet transformations while ignoring the input image borders.  Input borders
 	 * affect the borders of internal segments inside the transformation.
 	 */
-	private void equalsTranHorizontal( WaveletCoefficient desc,
+	private void equalsTranHorizontal( WlCoef desc,
 									   ImageBase input ,
 									   ImageBase expected , ImageBase found ) {
 
@@ -233,7 +160,7 @@ public class TestImplWaveletTransformInner {
 		}
 	}
 
-	private void equalsTranVertical( WaveletCoefficient desc,
+	private void equalsTranVertical( WlCoef desc,
 									 ImageBase input ,
 									 ImageBase expected , ImageBase found ) {
 		int begin = UtilWavelet.computeBorderStart(desc);
@@ -264,6 +191,35 @@ public class TestImplWaveletTransformInner {
 					assertTrue(quad+" ( "+x+" , "+y+" ) 0 != "+f.get(x,y),0 == f.get(x,y).floatValue());
 				}
 			}
+		}
+	}
+
+	private abstract class InnerCompare extends BaseCompare {
+		@Override
+		public void applyTransform(WaveletDescription<?> desc, ImageBase input, ImageBase output) {
+			applyInnerMethod(functionName,desc, input, output);
+		}
+	}
+
+	public static void applyInnerMethod( String functionName , WaveletDescription<?> desc, ImageBase input, ImageBase output) {
+		Method m;
+		Object args[];
+		if( functionName.contains("Inverse")) {
+			WlBorderCoef<?> inv = desc.getInverse();
+			m = GecvTesting.findMethod(ImplWaveletTransformInner.class,functionName,inv.getClass(),input.getClass(),output.getClass());
+			args = new Object[]{inv,input,output};
+		} else {
+			Class<?> coefClass = desc.getForward().getClass();
+			m = GecvTesting.findMethod(ImplWaveletTransformInner.class,functionName,coefClass,input.getClass(),output.getClass());
+			args = new Object[]{desc.getForward(),input,output};
+		}
+
+		try {
+			m.invoke(null,args);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

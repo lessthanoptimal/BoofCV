@@ -19,7 +19,8 @@ package gecv.alg.wavelet;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlCoef_F32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -47,7 +48,7 @@ public class TestWaveletTransformOps {
 			ImageFloat32 found = new ImageFloat32(input.width,input.height);
 
 			ImageTestingOps.randomize(input,rand,0,50);
-			WaveletCoefficient_F32 desc = FactoryWaveletDaub.standard_F32(4);
+			WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(4);
 
 			WaveletTransformOps.transform1(desc,input,output,null);
 			WaveletTransformOps.inverse1(desc,output,found,null);
@@ -66,7 +67,7 @@ public class TestWaveletTransformOps {
 			ImageFloat32 found = new ImageFloat32(w,h);
 
 			ImageTestingOps.randomize(input,rand,0,50);
-			WaveletCoefficient_F32 desc = FactoryWaveletDaub.standard_F32(4);
+			WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(4);
 
 			for( int level = 1; level <= 5; level++ ) {
 				ImageDimension dim = UtilWavelet.transformDimension(w,h,level);

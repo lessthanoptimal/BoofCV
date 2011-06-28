@@ -16,39 +16,53 @@
 
 package gecv.alg.wavelet.impl;
 
+import gecv.core.image.border.BorderIndex1D;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.wavelet.WaveletCoefficient;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlBorderCoef;
+import gecv.struct.wavelet.WlCoef;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplWaveletTransformBorder  {
+public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 
-	Class<?> typeInput = ImageFloat32.class;
-	Class<?> typeOutput  = ImageFloat32.class;
-	
+
+	public TestImplWaveletTransformBorder() {
+		super(2,ImplWaveletTransformBorder.class);
+	}
+
 	@Test
-	public void horizontal() {
-		PermuteWaveletCompare test = new PermuteWaveletCompare(typeInput,typeOutput) {
+	public void checkAllHorizontal() {
+		checkAll("horizontal","checkHorizontal");
+	}
 
-			@Override
-			public void applyValidation(WaveletCoefficient desc, ImageBase input, ImageBase output) {
-				ImplWaveletTransformNaive.horizontal((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-			}
+	@Test
+	public void checkAllVertical() {
+		checkAll("vertical","checkVertical");
+	}
 
-			@Override
-			public void applyTransform(WaveletCoefficient desc, ImageBase input, ImageBase output) {
-				ImplWaveletTransformInner.horizontal((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-				ImplWaveletTransformBorder.horizontal((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-			}
+	@Test
+	public void checkAllHorizontalInverse() {
+		checkAll("horizontalInverse","checkHorizontalInverse");
+	}
 
+	@Test
+	public void checkAllVerticalInverse() {
+		checkAll("verticalInverse","checkVerticalInverse");
+	}
+
+	public void checkHorizontal( Method m ) {
+		PermuteWaveletCompare test = new BorderCompare() {
 			@Override
-			public void compareResults(WaveletCoefficient desc, ImageBase input , ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageBase input,
+									   ImageBase expected, ImageBase found ) {
 				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};
@@ -56,23 +70,11 @@ public class TestImplWaveletTransformBorder  {
 		test.runTests(false);
 	}
 
-	@Test
-	public void vertical() {
-		PermuteWaveletCompare test = new PermuteWaveletCompare(typeInput,typeOutput) {
-
+	public void checkVertical( Method m ) {
+		PermuteWaveletCompare test = new BorderCompare() {
 			@Override
-			public void applyValidation(WaveletCoefficient desc, ImageBase input, ImageBase output) {
-				ImplWaveletTransformNaive.vertical((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-			}
-
-			@Override
-			public void applyTransform(WaveletCoefficient desc, ImageBase input, ImageBase output) {
-				ImplWaveletTransformInner.vertical((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-				ImplWaveletTransformBorder.vertical((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-			}
-
-			@Override
-			public void compareResults(WaveletCoefficient desc, ImageBase input , ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageBase input,
+									   ImageBase expected, ImageBase found ) {
 				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};
@@ -80,23 +82,12 @@ public class TestImplWaveletTransformBorder  {
 		test.runTests(false);
 	}
 
-	@Test
-	public void horizontalInverse() {
-		PermuteWaveletCompare test = new PermuteWaveletCompare(typeInput,typeOutput) {
-
+	public void checkHorizontalInverse( Method m ) {
+		PermuteWaveletCompare test = new BorderCompare() {
 			@Override
-			public void applyValidation(WaveletCoefficient desc, ImageBase input, ImageBase output) {
-				ImplWaveletTransformNaive.horizontalInverse((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-			}
-
-			@Override
-			public void applyTransform(WaveletCoefficient desc, ImageBase input, ImageBase output) {
-				ImplWaveletTransformInner.horizontalInverse((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-				ImplWaveletTransformBorder.horizontalInverse((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-			}
-
-			@Override
-			public void compareResults(WaveletCoefficient desc, ImageBase input , ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageBase input,
+									   ImageBase expected, ImageBase found ) {
+//				GecvTesting.printDiff(expected,found);
 				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};
@@ -104,27 +95,45 @@ public class TestImplWaveletTransformBorder  {
 		test.runTests(true);
 	}
 
-	@Test
-	public void verticalInverse() {
-		PermuteWaveletCompare test = new PermuteWaveletCompare(typeInput,typeOutput) {
-
+	public void checkVerticalInverse( Method m ) {
+		PermuteWaveletCompare test = new BorderCompare() {
 			@Override
-			public void applyValidation(WaveletCoefficient desc, ImageBase input, ImageBase output) {
-				ImplWaveletTransformNaive.verticalInverse((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-			}
-
-			@Override
-			public void applyTransform(WaveletCoefficient desc, ImageBase input, ImageBase output) {
-				ImplWaveletTransformInner.verticalInverse((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-				ImplWaveletTransformBorder.verticalInverse((WaveletCoefficient_F32)desc,(ImageFloat32)input,(ImageFloat32)output);
-			}
-
-			@Override
-			public void compareResults(WaveletCoefficient desc, ImageBase input , ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageBase input,
+									   ImageBase expected, ImageBase found ) {
 				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};
 
 		test.runTests(true);
+	}
+
+	private abstract class BorderCompare extends BaseCompare {
+		@Override
+		public void applyTransform(WaveletDescription<?> desc, ImageBase input, ImageBase output) {
+			TestImplWaveletTransformInner.applyInnerMethod(functionName,desc,input,output);
+			
+			Method m;
+			Object args[];
+
+			BorderIndex1D border = desc.getBorder();
+
+			if( functionName.contains("Inverse")) {
+				WlBorderCoef<?> inv = desc.getInverse();
+				m = GecvTesting.findMethod(ImplWaveletTransformBorder.class,functionName,border.getClass(),inv.getClass(),input.getClass(),output.getClass());
+				args = new Object[]{border,inv,input,output};
+			} else {
+				WlCoef forward = desc.getForward();
+				m = GecvTesting.findMethod(ImplWaveletTransformBorder.class,functionName,border.getClass(),forward.getClass(),input.getClass(),output.getClass());
+				args = new Object[]{border,forward,input,output};
+			}
+
+			try {
+				m.invoke(null,args);
+			} catch (InvocationTargetException e) {
+				throw new RuntimeException(e);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 }

@@ -40,7 +40,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 40;
+		int numExpected = 47;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found

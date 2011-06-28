@@ -17,11 +17,11 @@
 package gecv.struct.wavelet;
 
 /**
- * Description of a floating point wavelet.
+ * Description of a 32-bit floating point wavelet.
  *
  * @author Peter Abeles
  */
-public class WaveletCoefficient_F32 extends WaveletCoefficient {
+public class WlCoef_F32 extends WlCoef {
 
 	// scaling numbers
 	public float scaling[];

@@ -17,7 +17,7 @@
 package gecv.alg.wavelet;
 
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WlCoef_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -104,7 +104,7 @@ public class TestUtilWavelet {
 						   int imgLength ,
 						   int tranLength ,
 						   int expected ) {
-		WaveletCoefficient_F32 desc = new WaveletCoefficient_F32();
+		WlCoef_F32 desc = new WlCoef_F32();
 		desc.offsetScaling = offsetA;
 		desc.offsetWavelet = offsetB;
 		desc.scaling = new float[lengthA];
@@ -128,7 +128,7 @@ public class TestUtilWavelet {
 
 	private void checkStart( int offsetA , int offsetB ,
 							int expected ) {
-		WaveletCoefficient_F32 desc = new WaveletCoefficient_F32();
+		WlCoef_F32 desc = new WlCoef_F32();
 		desc.offsetScaling = offsetA;
 		desc.offsetWavelet = offsetB;
 

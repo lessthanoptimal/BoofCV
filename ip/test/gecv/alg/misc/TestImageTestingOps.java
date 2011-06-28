@@ -43,7 +43,7 @@ public class TestImageTestingOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 18;
+		int numExpected = 22;
 		Method methods[] = ImageTestingOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found

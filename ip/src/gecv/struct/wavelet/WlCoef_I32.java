@@ -14,39 +14,37 @@
  *    limitations under the License.
  */
 
-package gecv.core.image.border;
-
-import gecv.struct.image.ImageFloat32;
+package gecv.struct.wavelet;
 
 /**
- * Child of {@link ImageBorder} for {@link ImageFloat32}.
+ * Description of an integer wavelet.
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_F32 extends ImageBorder<ImageFloat32> {
+public class WlCoef_I32 extends WlCoef {
 
-	public ImageBorder_F32(ImageFloat32 image) {
-		super(image);
+	// scaling numbers
+	public int scaling[];
+	// wavelet numbers
+	public int wavelet[];
+
+	// denominator for scaling coefficients
+	public int denominatorScaling;
+	// denominator for wavelet coefficients
+	public int denominatorWavelet;
+
+	@Override
+	public Class<?> getType() {
+		return int.class;
 	}
 
-	protected ImageBorder_F32() {
+	@Override
+	public int getScalingLength() {
+		return scaling.length;
 	}
 
-	public void set( int x , int y , float val ) {
-		if( image.isInBounds(x,y) )
-			image.set(x,y,val);
-
-		setOutside(x,y,val);
+	@Override
+	public int getWaveletLength() {
+		return wavelet.length;
 	}
-
-	public float get( int x , int y ) {
-		if( image.isInBounds(x,y) )
-			return image.get(x,y);
-
-		return getOutside( x , y );
-	}
-
-	public abstract float getOutside( int x , int y );
-
-	public abstract void setOutside( int x , int y , float val );
 }

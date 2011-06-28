@@ -1,7 +1,4 @@
 - standard wavelet algorithms
-  * inner
-    - float
-    - int
   * border
     - float
     - int

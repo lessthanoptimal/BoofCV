@@ -118,6 +118,28 @@ public class PixelMath {
 	}
 
 	/**
+	 * Sets each pixel in the output image to be the absolute value of the input image.
+	 * Both the input and output image can be the same instance.
+	 * 
+	 * @param input The input image. Not modified.
+	 * @param output Where the absolute value image is written to. Modified.
+	 */
+	public static void abs( ImageFloat64 input , ImageFloat64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+		
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = Math.abs(input.data[indexSrc]);
+			}
+		}
+	}
+
+	/**
 	 * Returns the absolute value of the element with the largest absolute value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -1012,6 +1034,154 @@ public class PixelMath {
 	 * @param diff Absolute value of difference image. Modified.
 	 */
 	public static void diffAbs( ImageFloat32 imgA , ImageFloat32 imgB , ImageFloat32 diff ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,diff);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
+				diff.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
+			}
+		}
+	}
+
+	/**
+	 * Returns the absolute value of the element with the largest absolute value.
+	 * 
+	 * @param input Input image. Not modified.
+	 * @return Largest pixel absolute value.
+	 */
+	public static double maxAbs( ImageFloat64 input ) {
+
+		double max = 0;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			for( ; index < end; index++ ) {
+				double v = Math.abs(input.data[index]);
+				if( v > max )
+					max = v;
+			}
+		}
+		return max;
+	}
+
+	/**
+	 * Divides each element by the denominator. Both input and output images can
+	 * be the same.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 * @param denominator What each element is divided by.
+	 */
+	public static void divide( ImageFloat64 input , ImageFloat64 output, double denominator ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = input.data[indexSrc] / denominator;
+			}
+		}
+	}
+
+	/**
+	 * Multiplied each element by the scale factor. Both input and output images can
+	 * be the same.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 * @param scale What each element is divided by.
+	 */
+	public static void multiply( ImageFloat64 input , ImageFloat64 output, double scale ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = input.data[indexSrc] * scale;
+			}
+		}
+	}
+
+	/**
+	 * Each element has the specified number added to it. Both input and output images can
+	 * be the same.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 * @param value What is added to each element.
+	 */
+	public static void plus( ImageFloat64 input , ImageFloat64 output, double value ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = input.data[indexSrc] + value;
+			}
+		}
+	}
+
+	/**
+	 * Bounds image pixels to be between these two values
+	 * 
+	 * @param img Image
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 */
+	public static void boundImage( ImageFloat64 img , double min , double max ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		double[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++) {
+				double value = data[index];
+				if( value < min )
+					data[index] = min;
+				else if( value > max )
+					data[index] = max;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Computes the absolute value of the difference between each pixel in the two images.<br>
+	 * d(x,y) = |img1(x,y) - img2(x,y)|
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param diff Absolute value of difference image. Modified.
+	 */
+	public static void diffAbs( ImageFloat64 imgA , ImageFloat64 imgB , ImageFloat64 diff ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,diff);
 		
 		final int h = imgA.getHeight();

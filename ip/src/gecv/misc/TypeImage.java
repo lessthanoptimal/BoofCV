@@ -33,7 +33,8 @@ public enum TypeImage {
 	U16(ImageUInt16.class),
 	S16(ImageSInt16.class),
 	S32(ImageSInt32.class),
-	F32(ImageFloat32.class);
+	F32(ImageFloat32.class),
+	F64(ImageFloat64.class);
 
 	private String imageName;
 	private String dataType;
@@ -41,6 +42,7 @@ public enum TypeImage {
 	private String sumType;
 	private boolean isInteger;
 	private boolean isSigned;
+	private int numBits;
 
 	private Class<?> primativeType;
 
@@ -68,7 +70,21 @@ public enum TypeImage {
 			} else {
 				isSigned = true;
 				isInteger = false;
-				sumType = "float";
+				if( imageType == ImageFloat32.class )
+					sumType = "float";
+				else
+					sumType = "double";
+			}
+			if( primativeType == byte.class ) {
+				numBits = 8;
+			} else if( primativeType == short.class ) {
+				numBits = 16;
+			} else if( primativeType == int.class || primativeType == float.class ) {
+				numBits = 32;
+			} else if( primativeType == long.class || primativeType == double.class ) {
+				numBits = 64;
+			} else {
+				throw new IllegalArgumentException("Unknown number of bits");
 			}
 
 		} catch (InstantiationException e) {
@@ -85,7 +101,7 @@ public enum TypeImage {
 		if( isInteger )
 			this.sumType = "int";
 		else
-			this.sumType = "float";
+			this.sumType = "double";
 
 	}
 
@@ -93,16 +109,20 @@ public enum TypeImage {
 		return new TypeImage[]{U8,S8,U16,S16,S32};
 	}
 
+	public static TypeImage[] getFloatingTypes() {
+		return new TypeImage[]{F32,F64};
+	}
+
 	public static TypeImage[] getGenericTypes() {
-		return new TypeImage[]{I8,I16,S32,F32};
+		return new TypeImage[]{I8,I16,S32,F32,F64};
 	}
 
 	public static TypeImage[] getSpecificTypes() {
-		return new TypeImage[]{U8,S8,U16,S16,S32,F32};
+		return new TypeImage[]{U8,S8,U16,S16,S32,F32,F64};
 	}
 
 	public static TypeImage[] getSigned() {
-		return new TypeImage[]{S8,S16,S32,F32};
+		return new TypeImage[]{S8,S16,S32,F32,F64};
 	}
 
 	public static TypeImage[] getUnsigned() {
@@ -133,6 +153,10 @@ public enum TypeImage {
 		return isSigned;
 	}
 
+	public int getNumBits() {
+		return numBits;
+	}
+
 	public Class<?> getPrimativeType() {
 		return primativeType;
 	}
@@ -142,6 +166,10 @@ public enum TypeImage {
 			return "("+dataType+")";
 		else
 			return "";
+	}
+
+	public String getRandType() {
+		return primativeType == float.class ? "Float" : "Double";
 	}
 
 	public Number getMax() {
@@ -161,8 +189,10 @@ public enum TypeImage {
 			} else {
 				return Integer.MAX_VALUE;
 			}
-		} else {
+		} else if( float.class == primativeType ) {
 			return Float.MAX_VALUE;
+		} else {
+			return Double.MAX_VALUE;
 		}
 	}
 
@@ -183,8 +213,10 @@ public enum TypeImage {
 			} else {
 				return Integer.MIN_VALUE;
 			}
-		} else {
+		} else if( float.class == primativeType ) {
 			return Float.MIN_VALUE;
+		} else {
+			return Double.MIN_VALUE;
 		}
 	}
 }

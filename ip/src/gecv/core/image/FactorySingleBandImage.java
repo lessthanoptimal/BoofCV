@@ -18,9 +18,11 @@ package gecv.core.image;
 
 import gecv.core.image.border.ImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_F64;
 import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageFloat64;
 import gecv.struct.image.ImageInteger;
 
 /**
@@ -35,6 +37,8 @@ public class FactorySingleBandImage {
 			return new SingleBandInt( (ImageInteger)image );
 		else if( image.getClass() == ImageFloat32.class )
 			return new SingleBandFloat32( (ImageFloat32)image );
+		else if( image.getClass() == ImageFloat64.class )
+			return new SingleBandFloat64( (ImageFloat64)image );
 		else
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 	}
@@ -43,7 +47,9 @@ public class FactorySingleBandImage {
 		if( ImageInteger.class.isAssignableFrom(image.getImage().getClass()) )
 			return new SingleBandBorderInt( (ImageBorder_I32)image );
 		else if( image.getImage().getClass() == ImageFloat32.class )
-			return new SingleBandBorderFloat( (ImageBorder_F32)image );
+			return new SingleBandBorderFloat32( (ImageBorder_F32)image );
+		else if( image.getImage().getClass() == ImageFloat64.class )
+			return new SingleBandBorderFloat64( (ImageBorder_F64)image );
 		else
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 	}
@@ -70,9 +76,31 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static class SingleBandBorderFloat extends SingleBorder<ImageBorder_F32>
+	public static class SingleBandBorderFloat32 extends SingleBorder<ImageBorder_F32>
 	{
-		public SingleBandBorderFloat(ImageBorder_F32 image) {
+		public SingleBandBorderFloat32(ImageBorder_F32 image) {
+			super(image);
+		}
+
+		@Override
+		public boolean isFloatingPoint() {
+			return true;
+		}
+
+		@Override
+		public Number get(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public void set(int x, int y, Number num) {
+			image.set(x,y,num.floatValue());
+		}
+	}
+
+	public static class SingleBandBorderFloat64 extends SingleBorder<ImageBorder_F64>
+	{
+		public SingleBandBorderFloat64(ImageBorder_F64 image) {
 			super(image);
 		}
 
@@ -128,6 +156,28 @@ public class FactorySingleBandImage {
 		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.floatValue());
+		}
+	}
+
+	public static class SingleBandFloat64 extends SingleBase<ImageFloat64>
+	{
+		public SingleBandFloat64(ImageFloat64 image) {
+			super(image);
+		}
+
+		@Override
+		public boolean isFloatingPoint() {
+			return true;
+		}
+
+		@Override
+		public Number get(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public void set(int x, int y, Number num) {
+			image.set(x,y,num.doubleValue());
 		}
 	}
 

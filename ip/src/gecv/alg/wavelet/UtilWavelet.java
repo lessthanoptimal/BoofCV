@@ -18,8 +18,8 @@ package gecv.alg.wavelet;
 
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageDimension;
-import gecv.struct.wavelet.WaveletCoefficient;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WlCoef;
+import gecv.struct.wavelet.WlCoef_F32;
 
 
 /**
@@ -49,7 +49,7 @@ public class UtilWavelet {
 	}
 
 
-	public static void checkShape( WaveletCoefficient_F32 desc , ImageBase original , ImageBase transformed , int level )
+	public static void checkShape( WlCoef_F32 desc , ImageBase original , ImageBase transformed , int level )
 	{
 		ImageDimension tranDim = UtilWavelet.transformDimension(original,level);
 
@@ -154,13 +154,13 @@ public class UtilWavelet {
 		return total;
 	}
 
-	public static int computeBorderStart( WaveletCoefficient desc ) {
+	public static int computeBorderStart( WlCoef desc ) {
 		int ret =  -Math.min(desc.offsetScaling,desc.offsetWavelet);
 
 		return ret + (ret % 2);
 	}
 
-	public static int computeBorderEnd( WaveletCoefficient desc , int dataLength , int tranLength ) {
+	public static int computeBorderEnd( WlCoef desc , int dataLength , int tranLength ) {
 		int w = Math.max( desc.offsetScaling+desc.getScalingLength() , desc.offsetWavelet+desc.getWaveletLength());
 		w += (tranLength - dataLength);
 

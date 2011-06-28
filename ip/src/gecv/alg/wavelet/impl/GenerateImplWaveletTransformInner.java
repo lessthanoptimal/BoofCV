@@ -61,10 +61,10 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 		out.print("package gecv.alg.wavelet.impl;\n" +
 				"\n" +
 				"import gecv.alg.wavelet.UtilWavelet;\n" +
-				"import gecv.core.image.border.BorderIndex1D;\n" +
 				"import gecv.struct.image.*;\n" +
-				"import gecv.struct.wavelet.WaveletCoefficient_F32;\n" +
-				"import gecv.struct.wavelet.WaveletCoefficient_I32;\n" +
+				"import gecv.struct.wavelet.WlBorderCoef;\n" +
+				"import gecv.struct.wavelet.WlCoef_F32;\n" +
+				"import gecv.struct.wavelet.WlCoef_I32;\n" +
 				"\n" +
 				"\n" +
 				"/**\n" +
@@ -89,7 +89,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 		if( imageIn.isInteger() )
 			genName = "I32";
 		else
-			genName = "F32";
+			genName = "F"+imageIn.getNumBits();
 
 		sumType = imageIn.getSumType();
 		bitWise = imageIn.getBitWise();
@@ -107,7 +107,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printHorizontal() {
-		out.print("\tpublic static void horizontal( WaveletCoefficient_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void horizontal( WlCoef_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
 				"\t{\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
@@ -156,7 +156,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printVertical() {
-		out.print("\tpublic static void vertical( WaveletCoefficient_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void vertical( WlCoef_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
 				"\t{\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling*input.stride;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet*input.stride;\n" +
@@ -206,8 +206,9 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printHorizontalInverse() {
-		out.print("\tpublic static void horizontalInverse( WaveletCoefficient_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void horizontalInverse( WlBorderCoef<WlCoef_"+genName+"> invDesc , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
 				"\t{\n" +
+				"\t\tWlCoef_"+genName+" coefficients = invDesc.getInnerCoefficients();\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
 				"\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
@@ -223,9 +224,6 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\tfinal int endX = input.width - UtilWavelet.computeBorderEnd(coefficients,output.width,input.width);\n" +
 				"\t\tfinal int zeroStart = startX+Math.min(offsetA,offsetB);\n" +
 				"\t\tfinal int zeroEnd = endX+Math.min(offsetA,offsetB);\n" +
-				"\n" +
-				"\t\tBorderIndex1D border = coefficients.getBorder();\n" +
-				"\t\tborder.setLength(input.width);\n" +
 				"\n");
 		if( imageIn.isInteger() ) {
 			out.print("\t\tfinal int e = coefficients.denominatorScaling*2;\n" +
@@ -292,8 +290,9 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printVerticalInverse() {
-		out.print("\tpublic static void verticalInverse( WaveletCoefficient_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void verticalInverse( WlBorderCoef<WlCoef_"+genName+"> invDesc , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
 				"\t{\n" +
+				"\t\tWlCoef_"+genName+" coefficients = invDesc.getInnerCoefficients();\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
 				"\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +

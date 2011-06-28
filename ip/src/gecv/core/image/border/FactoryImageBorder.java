@@ -18,6 +18,7 @@ package gecv.core.image.border;
 
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageFloat64;
 import gecv.struct.image.ImageInteger;
 
 
@@ -33,6 +34,28 @@ public class FactoryImageBorder {
 			return extend( (ImageInteger)image );
 		else
 			throw new IllegalArgumentException("Unknown image type");
+	}
+
+	public static ImageBorder1D_F64 extend( ImageFloat64 image ) {
+		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Extend.class);
+		ret.setImage(image);
+		return ret;
+	}
+
+	public static ImageBorder1D_F64 reflect( ImageFloat64 image ) {
+		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Reflect.class);
+		ret.setImage(image);
+		return ret;
+	}
+
+	public static ImageBorder1D_F64 wrap( ImageFloat64 image ) {
+		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Wrap.class);
+		ret.setImage(image);
+		return ret;
+	}
+
+	public static ImageBorder_F64 value( ImageFloat64 image , float value ) {
+		return ImageBorderValue.wrap(image,value);
 	}
 
 	public static ImageBorder1D_F32 extend( ImageFloat32 image ) {

@@ -18,11 +18,13 @@ package gecv.alg.wavelet;
 
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
+import gecv.core.image.border.BorderIndex1D;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
-import gecv.struct.wavelet.WaveletCoefficient_I32;
+import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlCoef_F32;
+import gecv.struct.wavelet.WlCoef_I32;
 import gecv.testing.GecvTesting;
 
 import java.util.Random;
@@ -45,10 +47,9 @@ public class CommonFactoryWavelet {
 	/**
 	 * See if the provided wavelets can be used to transform the image and change it back without error
 	 *
-	 * @param encodeDesc Wavelet used to transform the image
-	 * @param decodeDesc Wavelet used to restore the image
+	 * @param waveletDesc The wavelet being tested
 	 */
-	public void checkEncodeDecode_F32(WaveletCoefficient_F32 encodeDesc , WaveletCoefficient_F32 decodeDesc ) {
+	public void checkEncodeDecode_F32( WaveletDescription<WlCoef_F32> waveletDesc ) {
 
 		// test both even and odd images
 		for( int makeOdd = 0; makeOdd <= 1; makeOdd++ ) {
@@ -58,13 +59,15 @@ public class CommonFactoryWavelet {
 
 			ImageTestingOps.randomize(orig,rand,0,50);
 
-			ImplWaveletTransformNaive.horizontal(encodeDesc,orig,tran);
-			ImplWaveletTransformNaive.horizontalInverse(decodeDesc,tran,rev);
+			BorderIndex1D border = waveletDesc.getBorder();
+
+			ImplWaveletTransformNaive.horizontal(border,waveletDesc.forward,orig,tran);
+			ImplWaveletTransformNaive.horizontalInverse(border,waveletDesc.inverse,tran,rev);
 
 			GecvTesting.assertEquals(orig,rev,0,1e-4f);
 
-			ImplWaveletTransformNaive.vertical(encodeDesc,orig,tran);
-			ImplWaveletTransformNaive.verticalInverse(decodeDesc,tran,rev);
+			ImplWaveletTransformNaive.vertical(border,waveletDesc.forward,orig,tran);
+			ImplWaveletTransformNaive.verticalInverse(border,waveletDesc.inverse,tran,rev);
 
 			GecvTesting.assertEquals(orig,rev,0,1e-4f);
 		}
@@ -73,10 +76,9 @@ public class CommonFactoryWavelet {
 	/**
 	 * See if the provided wavelets can be used to transform the image and change it back without error
 	 *
-	 * @param encodeDesc Wavelet used to transform the image
-	 * @param decodeDesc Wavelet used to restore the image
+	 * @param waveletDesc The wavelet being tested
 	 */
-	public void checkEncodeDecode_I32(WaveletCoefficient_I32 encodeDesc , WaveletCoefficient_I32 decodeDesc ) {
+	public void checkEncodeDecode_I32(WaveletDescription<WlCoef_I32> waveletDesc ) {
 
 		// test both even and odd images
 		for( int makeOdd = 0; makeOdd <= 1; makeOdd++ ) {
@@ -86,8 +88,10 @@ public class CommonFactoryWavelet {
 
 			ImageTestingOps.randomize(orig,rand,0,50);
 
-			ImplWaveletTransformNaive.horizontal(encodeDesc,orig,tran);
-			ImplWaveletTransformNaive.horizontalInverse(decodeDesc,tran,rev);
+			BorderIndex1D border = waveletDesc.getBorder();
+
+			ImplWaveletTransformNaive.horizontal(border,waveletDesc.forward,orig,tran);
+			ImplWaveletTransformNaive.horizontalInverse(border,waveletDesc.inverse,tran,rev);
 
 //			GecvTesting.printDiff(orig,rev);
 

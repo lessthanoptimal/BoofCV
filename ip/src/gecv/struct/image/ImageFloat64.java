@@ -18,14 +18,14 @@ package gecv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is a 32-bit floating point number.
+ * An image where the primitive type is a 64-bit floating point number.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImageFloat32 extends ImageFloat<ImageFloat32> {
+public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 
-	public float data[];
+	public double data[];
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
@@ -33,11 +33,11 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public ImageFloat32(int width, int height) {
+	public ImageFloat64(int width, int height) {
 		super(width, height);
 	}
 
-	public ImageFloat32() {
+	public ImageFloat64() {
 	}
 
 	/**
@@ -47,14 +47,14 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 	 * @param y pixel coordinate.
 	 * @return an intensity value.
 	 */
-	public float get(int x, int y) {
+	public double get(int x, int y) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds: ( " + x + " , " + y + " )");
 
 		return unsafe_get(x,y);
 	}
 
-	protected float unsafe_get(int x, int y) {
+	protected double unsafe_get(int x, int y) {
 		return data[getIndex(x, y)];
 	}
 
@@ -65,7 +65,7 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 	 * @param y	 pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
-	public void set(int x, int y, float value) {
+	public void set(int x, int y, double value) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
 
@@ -79,18 +79,18 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 
 	@Override
 	protected void _setData(Object data) {
-		this.data = (float[]) data;
+		this.data = (double[]) data;
 	}
 
 	@Override
-	public ImageFloat32 _createNew(int imgWidth, int imgHeight) {
+	public ImageFloat64 _createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
-			return new ImageFloat32();
-		return new ImageFloat32(imgWidth, imgHeight);
+			return new ImageFloat64();
+		return new ImageFloat64(imgWidth, imgHeight);
 	}
 
 	@Override
 	public Class<?> _getPrimitiveType() {
-		return float.class;
+		return double.class;
 	}
 }
