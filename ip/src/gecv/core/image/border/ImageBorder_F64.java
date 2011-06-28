@@ -16,37 +16,37 @@
 
 package gecv.core.image.border;
 
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageFloat64;
 
 /**
- * Child of {@link ImageBorder} for {@link ImageFloat32}.
+ * Child of {@link gecv.core.image.border.ImageBorder} for {@link gecv.struct.image.ImageFloat64}.
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_F32 extends ImageBorder<ImageFloat32> {
+public abstract class ImageBorder_F64 extends ImageBorder<ImageFloat64> {
 
-	public ImageBorder_F32(ImageFloat32 image) {
+	public ImageBorder_F64(ImageFloat64 image) {
 		super(image);
 	}
 
-	protected ImageBorder_F32() {
+	protected ImageBorder_F64() {
 	}
 
-	public void set( int x , int y , float val ) {
+	public void set( int x , int y , double val ) {
 		if( image.isInBounds(x,y) )
 			image.set(x,y,val);
 
 		setOutside(x,y,val);
 	}
 
-	public float get( int x , int y ) {
+	public double get( int x , int y ) {
 		if( image.isInBounds(x,y) )
 			return image.get(x,y);
 
 		return getOutside( x , y );
 	}
 
-	public abstract float getOutside( int x , int y );
+	public abstract double getOutside( int x , int y );
 
-	public abstract void setOutside( int x , int y , float val );
+	public abstract void setOutside( int x , int y , double val );
 }

@@ -16,37 +16,30 @@
 
 package gecv.struct.wavelet;
 
-import gecv.core.image.border.BorderIndex1D;
-
-
 /**
- * Base class that defines a set of wavelet coefficients.
+ * Description of a 64-bit floating point wavelet.
  *
  * @author Peter Abeles
  */
-public abstract class WaveletCoefficient {
+public class WlCoef_F64 extends WlCoef {
 
-	// offset of wavelet numbers from start of signal array
-	public int offsetScaling;
+	// scaling numbers
+	public double scaling[];
+	// wavelet numbers
+	public double wavelet[];
 
-	// offset of wavelet numbers from start of signal array
-	public int offsetWavelet;
+	@Override
+	public Class<?> getType() {
+		return double.class;
+	}
 
-	// how image boundaries are handled
-	public BorderIndex1D border;
+	@Override
+	public int getScalingLength() {
+		return scaling.length;
+	}
 
-	/**
-	 * Returns the primitive type of the coefficients.
-	 *
-	 * @return Coefficient data type.
-	 */
-	public abstract Class<?> getType();
-
-	public abstract int getScalingLength();
-
-	public abstract int getWaveletLength();
-
-	public BorderIndex1D getBorder() {
-		return border;
+	@Override
+	public int getWaveletLength() {
+		return wavelet.length;
 	}
 }

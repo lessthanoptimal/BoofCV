@@ -17,8 +17,7 @@
 package gecv.alg.wavelet;
 
 import gecv.core.image.border.BorderIndex1D_Wrap;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
-import gecv.struct.wavelet.WaveletCoefficient_I32;
+import gecv.struct.wavelet.*;
 
 
 /**
@@ -49,33 +48,33 @@ public class FactoryWaveletDaub {
 	 * @param J The wavelet's degree.
 	 * @return Description of the DaubJ wavelet.
 	 */
-	public static WaveletCoefficient_F32 standard_F32( int J ) {
+	public static WaveletDescription<WlCoef_F32> daubJ_F32( int J ) {
 		if( J != 4 ) {
 			throw new IllegalArgumentException("Only 4 is currently supported");
 		}
 
-		WaveletCoefficient_F32 ret = new WaveletCoefficient_F32();
+		WlCoef_F32 coef = new WlCoef_F32();
 
-		ret.border = new BorderIndex1D_Wrap();
-		ret.offsetScaling = 0;
-		ret.offsetWavelet = 0;
+		coef.offsetScaling = 0;
+		coef.offsetWavelet = 0;
 
-		ret.scaling = new float[4];
-		ret.wavelet = new float[4];
+		coef.scaling = new float[4];
+		coef.wavelet = new float[4];
 
 		double sqrt3 = Math.sqrt(3);
 		double div = 4.0*Math.sqrt(2);
-		ret.scaling[0] = (float)((1+sqrt3)/div);
-		ret.scaling[1] = (float)((3+sqrt3)/div);
-		ret.scaling[2] = (float)((3-sqrt3)/div);
-		ret.scaling[3] = (float)((1-sqrt3)/div);
+		coef.scaling[0] = (float)((1+sqrt3)/div);
+		coef.scaling[1] = (float)((3+sqrt3)/div);
+		coef.scaling[2] = (float)((3-sqrt3)/div);
+		coef.scaling[3] = (float)((1-sqrt3)/div);
 
-		ret.wavelet[0] = ret.scaling[3];
-		ret.wavelet[1] = -ret.scaling[2];
-		ret.wavelet[2] = ret.scaling[1];
-		ret.wavelet[3] = -ret.scaling[0];
+		coef.wavelet[0] = coef.scaling[3];
+		coef.wavelet[1] = -coef.scaling[2];
+		coef.wavelet[2] = coef.scaling[1];
+		coef.wavelet[3] = -coef.scaling[0];
 
-		return ret;
+		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),
+		coef,new WlBorderCoefStandard<WlCoef_F32>(coef));
 	}
 
 	/**
@@ -91,142 +90,151 @@ public class FactoryWaveletDaub {
 	 *
 	 * <p>
 	 * NOTE a different set of coefficients is required when computing the inverse transform.
-	 * See {@Link #biorthogonalInv_F32}.
+	 * See {@Link #invertBiorthogonalJ}.
 	 * </p>
 	 *
 	 * @param J The wavelet's degree. K = J-2.
 	 * @return Description of the Daub J/K wavelet.
 	 */
-	public static WaveletCoefficient_F32 biorthogonal_F32( int J ) {
+	public static WaveletDescription<WlCoef_F32> biorthogonal_F32( int J ) {
 		if( J != 5 ) {
 			throw new IllegalArgumentException("Only 5 is currently supported");
 		}
 
-		WaveletCoefficient_F32 ret = new WaveletCoefficient_F32();
+		WlCoef_F32 forward = new WlCoef_F32();
 
-		ret.border = new BorderIndex1D_Wrap();
-		ret.offsetScaling = -2;
-		ret.offsetWavelet = 0;
+		forward.offsetScaling = -2;
+		forward.offsetWavelet = 0;
 
-		ret.scaling = new float[5];
-		ret.wavelet = new float[3];
+		forward.scaling = new float[5];
+		forward.wavelet = new float[3];
 
-		ret.scaling[0] = (float)(-1.0/8.0);
-		ret.scaling[1] = (float)(2.0/8.0);
-		ret.scaling[2] = (float)(6.0/8.0);
-		ret.scaling[3] = (float)(2.0/8.0);
-		ret.scaling[4] = (float)(-1.0/8.0);
+		forward.scaling[0] = (float)(-1.0/8.0);
+		forward.scaling[1] = (float)(2.0/8.0);
+		forward.scaling[2] = (float)(6.0/8.0);
+		forward.scaling[3] = (float)(2.0/8.0);
+		forward.scaling[4] = (float)(-1.0/8.0);
 
-		ret.wavelet[0] = -1.0f/2.0f;
-		ret.wavelet[1] = 1;
-		ret.wavelet[2] = -1.0f/2.0f;
+		forward.wavelet[0] = -1.0f/2.0f;
+		forward.wavelet[1] = 1;
+		forward.wavelet[2] = -1.0f/2.0f;
+
+		WlBorderCoef<WlCoef_F32> inverse = invertBiorthogonalJ(forward);
+
+		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),forward,inverse);
+
+	}
+
+	private static WlBorderCoef<WlCoef_F32> invertBiorthogonalJ( WlCoef_F32 coef ) {
+
+		WlCoef_F32 inner = computeInnerInverseBiorthogonal(coef);
+
+		return new WlBorderCoefStandard<WlCoef_F32>(inner);
+	}
+
+	private static WlCoef_F32 computeInnerInverseBiorthogonal(WlCoef_F32 coef) {
+		WlCoef_F32 ret = new WlCoef_F32();
+
+		// center at zero
+		ret.offsetScaling = -coef.wavelet.length/2;
+		// center at one
+		ret.offsetWavelet = 1-coef.scaling.length/2;
+
+		ret.scaling = new float[coef.wavelet.length];
+		ret.wavelet = new float[coef.scaling.length];
+
+		for( int i = 0; i < ret.scaling.length; i++ ) {
+			if( i % 2 == 0 )
+				ret.scaling[i] = -coef.wavelet[i];
+			else
+				ret.scaling[i] = coef.wavelet[i];
+		}
+		for( int i = 0; i < ret.wavelet.length; i++ ) {
+			if( i % 2 == 1 )
+				ret.wavelet[i] = -coef.scaling[i];
+			else
+				ret.wavelet[i] = coef.scaling[i];
+		}
 
 		return ret;
 	}
 
 	/**
-	 * Integer version of {@link #biorthogonal_F32}.  Use {@link #biorthogonalInv_I32}
+	 * Integer version of {@link #biorthogonal_F32}.  Use {@link #invertBiorthogonalJ}
 	 * when computing the inverse transform.
 	 *
 	 * @param J The wavelet's degree. K = J-2.
 	 * @return Description of the Daub J/K wavelet.
 	 */
-	public static WaveletCoefficient_I32 biorthogonal_I32( int J ) {
+	public static WaveletDescription<WlCoef_I32> biorthogonal_I32( int J ) {
 		if( J != 5 ) {
 			throw new IllegalArgumentException("Only 5 is currently supported");
 		}
 
-		WaveletCoefficient_I32 ret = new WaveletCoefficient_I32();
+		WlCoef_I32 forward = new WlCoef_I32();
 
-		ret.border = new BorderIndex1D_Wrap();
-		ret.offsetScaling = -2;
-		ret.offsetWavelet = 0;
+		forward.offsetScaling = -2;
+		forward.offsetWavelet = 0;
 
-		ret.scaling = new int[5];
-		ret.wavelet = new int[3];
+		forward.scaling = new int[5];
+		forward.wavelet = new int[3];
 
-		ret.denominatorScaling = 8;
-		ret.scaling[0] = -1;
-		ret.scaling[1] = 2;
-		ret.scaling[2] = 6;
-		ret.scaling[3] = 2;
-		ret.scaling[4] = -1;
+		forward.denominatorScaling = 8;
+		forward.scaling[0] = -1;
+		forward.scaling[1] = 2;
+		forward.scaling[2] = 6;
+		forward.scaling[3] = 2;
+		forward.scaling[4] = -1;
 
-		ret.denominatorWavelet = 2;
-		ret.wavelet[0] = -1;
-		ret.wavelet[1] = 2;
-		ret.wavelet[2] = -1;
+		forward.denominatorWavelet = 2;
+		forward.wavelet[0] = -1;
+		forward.wavelet[1] = 2;
+		forward.wavelet[2] = -1;
 
-		return ret;
+		WlBorderCoef<WlCoef_I32> inverse = invertBiorthogonalJ(forward);
+
+		return new WaveletDescription<WlCoef_I32>(new BorderIndex1D_Wrap(),forward,inverse);
 	}
 
 	/**
-	 * See {@link #biorthogonal_F32} for more information.  Used when
-	 * computing the inverse transformation.
+	 * Computes the inverse of a biorthogonal wavelet.
 	 *
-	 * @param J The wavelet's degree. K = J-2.
-	 * @return Description of the Daub J/K wavelet.
+	 * @param coef
+	 * @return
 	 */
-	public static WaveletCoefficient_F32 biorthogonalInv_F32( int J ) {
-		if( J != 5 ) {
-			throw new IllegalArgumentException("Only 5 is currently supported");
-		}
+	private static WlBorderCoef<WlCoef_I32> invertBiorthogonalJ( WlCoef_I32 coef ) {
 
-		WaveletCoefficient_F32 ret = new WaveletCoefficient_F32();
+		WlCoef_I32 inner = computeInnerBiorthogonal(coef);
 
-		ret.border = new BorderIndex1D_Wrap();
-		ret.offsetScaling = -1;
-		ret.offsetWavelet = -1;
-
-		ret.scaling = new float[3];
-		ret.wavelet = new float[5];
-
-		ret.scaling[0] = 1.0f/2.0f;
-		ret.scaling[1] = 1;
-		ret.scaling[2] = 1.0f/2.0f;
-
-		ret.wavelet[0] = (float)(-1.0/8.0);
-		ret.wavelet[1] = (float)(-2.0/8.0);
-		ret.wavelet[2] = (float)(6.0/8.0);
-		ret.wavelet[3] = (float)(-2.0/8.0);
-		ret.wavelet[4] = (float)(-1.0/8.0);
-		
-		return ret;
+		return new WlBorderCoefStandard<WlCoef_I32>(inner);
 	}
 
-	/**
-	 * See {@link #biorthogonal_I32} for more information.  Used when
-	 * computing the inverse transformation.
-	 *
-	 * @param J The wavelet's degree. K = J-2.
-	 * @return Description of the Daub J/K wavelet.
-	 */
-	public static WaveletCoefficient_I32 biorthogonalInv_I32( int J ) {
-		if( J != 5 ) {
-			throw new IllegalArgumentException("Only 5 is currently supported");
+	private static WlCoef_I32 computeInnerBiorthogonal(WlCoef_I32 coef) {
+		WlCoef_I32 ret = new WlCoef_I32();
+
+		// center at zero
+		ret.offsetScaling = -coef.wavelet.length/2;
+		// center at one
+		ret.offsetWavelet = 1-coef.scaling.length/2;
+
+		ret.denominatorScaling = coef.denominatorWavelet;
+		ret.denominatorWavelet = coef.denominatorScaling;
+
+		ret.scaling = new int[coef.wavelet.length];
+		ret.wavelet = new int[coef.scaling.length];
+
+		for( int i = 0; i < ret.scaling.length; i++ ) {
+			if( i % 2 == 0 )
+				ret.scaling[i] = -coef.wavelet[i];
+			else
+				ret.scaling[i] = coef.wavelet[i];
 		}
-
-		WaveletCoefficient_I32 ret = new WaveletCoefficient_I32();
-
-		ret.border = new BorderIndex1D_Wrap();
-		ret.offsetScaling = -1;
-		ret.offsetWavelet = -1;
-
-		ret.scaling = new int[3];
-		ret.wavelet = new int[5];
-
-		ret.denominatorScaling = 2;
-		ret.scaling[0] = 1;
-		ret.scaling[1] = 2;
-		ret.scaling[2] = 1;
-
-		ret.denominatorWavelet = 8;
-		ret.wavelet[0] = -1;
-		ret.wavelet[1] = -2;
-		ret.wavelet[2] = 6;
-		ret.wavelet[3] = -2;
-		ret.wavelet[4] = -1;
-
+		for( int i = 0; i < ret.wavelet.length; i++ ) {
+			if( i % 2 == 1 )
+				ret.wavelet[i] = -coef.scaling[i];
+			else
+				ret.wavelet[i] = coef.scaling[i];
+		}
 		return ret;
 	}
 }

@@ -16,35 +16,27 @@
 
 package gecv.struct.wavelet;
 
+
 /**
- * Description of an integer wavelet.
+ * Inverse wavelet description which simply returns the same set of coefficients at all time.
  *
  * @author Peter Abeles
  */
-public class WaveletCoefficient_I32 extends WaveletCoefficient {
+public class WlBorderCoefStandard<T extends WlCoef> implements WlBorderCoef<T> {
 
-	// scaling numbers
-	public int scaling[];
-	// wavelet numbers
-	public int wavelet[];
+	T coef;
 
-	// denominator for scaling coefficients
-	public int denominatorScaling;
-	// denominator for wavelet coefficients
-	public int denominatorWavelet;
-
-	@Override
-	public Class<?> getType() {
-		return int.class;
+	public WlBorderCoefStandard(T coef ) {
+		this.coef = coef;
 	}
 
 	@Override
-	public int getScalingLength() {
-		return scaling.length;
+	public T getBorderCoefficients(int index) {
+		return coef;
 	}
 
 	@Override
-	public int getWaveletLength() {
-		return wavelet.length;
+	public T getInnerCoefficients() {
+		return coef;
 	}
 }

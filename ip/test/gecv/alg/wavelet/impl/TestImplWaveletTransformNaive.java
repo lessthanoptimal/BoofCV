@@ -21,8 +21,9 @@ import gecv.alg.wavelet.FactoryWaveletDaub;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
-import gecv.struct.wavelet.WaveletCoefficient_I32;
+import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlCoef_F32;
+import gecv.struct.wavelet.WlCoef_I32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -38,11 +39,9 @@ public class TestImplWaveletTransformNaive {
 	int width = 20;
 	int height = 30;
 
-	WaveletCoefficient_F32 forward_F32 = FactoryWaveletDaub.standard_F32(4);
-	WaveletCoefficient_F32 reverse_F32 = FactoryWaveletDaub.standard_F32(4);
+	WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.daubJ_F32(4);
 
-	WaveletCoefficient_I32 forward_I32 = FactoryWaveletDaub.biorthogonal_I32(5);
-	WaveletCoefficient_I32 reverse_I32 = FactoryWaveletDaub.biorthogonalInv_I32(5);
+	WaveletDescription<WlCoef_I32> desc_I32 = FactoryWaveletDaub.biorthogonal_I32(5);
 
 	/**
 	 * See if it can handle odd image sizes and output with extra padding
@@ -86,14 +85,14 @@ public class TestImplWaveletTransformNaive {
 									ImageFloat32 transformed,
 									ImageFloat32 reconstructed ) {
 		// Test horizontal transformation
-		ImplWaveletTransformNaive.horizontal(forward_F32,orig,transformed);
-		ImplWaveletTransformNaive.horizontalInverse(reverse_F32,transformed,reconstructed);
-		GecvTesting.assertEquals(orig,reconstructed,0,1e-2f);
+		ImplWaveletTransformNaive.horizontal(desc_F32.getBorder(),desc_F32.getForward(),orig,transformed);
+		ImplWaveletTransformNaive.horizontalInverse(desc_F32.getBorder(),desc_F32.getInverse(),transformed,reconstructed);
+		GecvTesting.assertEquals(orig,reconstructed,0,1e-2);
 
 		// Test vertical transformation
-		ImplWaveletTransformNaive.vertical(forward_F32,orig,transformed);
-		ImplWaveletTransformNaive.verticalInverse(reverse_F32,transformed,reconstructed);
-		GecvTesting.assertEquals(orig,reconstructed,0,1e-2f);
+		ImplWaveletTransformNaive.vertical(desc_F32.getBorder(),desc_F32.getForward(),orig,transformed);
+		ImplWaveletTransformNaive.verticalInverse(desc_F32.getBorder(),desc_F32.getInverse(),transformed,reconstructed);
+		GecvTesting.assertEquals(orig,reconstructed,0,1e-2);
 	}
 
 	private void testEncodeDecode_I32( int widthOrig , int heightOrig ,
@@ -112,15 +111,15 @@ public class TestImplWaveletTransformNaive {
 								  ImageSInt32 transformed,
 								  ImageUInt8 reconstructed ) {
 		// Test horizontal transformation
-		ImplWaveletTransformNaive.horizontal( forward_I32,orig,transformed);
-		ImplWaveletTransformNaive.horizontalInverse(reverse_I32,transformed,reconstructed);
+		ImplWaveletTransformNaive.horizontal(desc_I32.getBorder(),desc_I32.getForward(),orig,transformed);
+		ImplWaveletTransformNaive.horizontalInverse(desc_I32.getBorder(),desc_I32.getInverse(),transformed,reconstructed);
 
 //		GecvTesting.printDiff(orig,reconstructed);
 		GecvTesting.assertEquals(orig,reconstructed,1);
 
 		// Test vertical transformation
-		ImplWaveletTransformNaive.vertical( forward_I32,orig,transformed);
-		ImplWaveletTransformNaive.verticalInverse(reverse_I32,transformed,reconstructed);
+		ImplWaveletTransformNaive.vertical(desc_I32.getBorder(),desc_I32.getForward(),orig,transformed);
+		ImplWaveletTransformNaive.verticalInverse(desc_I32.getBorder(),desc_I32.getInverse(),transformed,reconstructed);
 		GecvTesting.assertEquals(orig,reconstructed,0);
 	}
 }

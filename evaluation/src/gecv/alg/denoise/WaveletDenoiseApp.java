@@ -27,7 +27,8 @@ import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlCoef_F32;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -54,14 +55,14 @@ public class WaveletDenoiseApp {
 	ImageFloat32 imageWavelet;
 	ImageFloat32 imageInv;
 
-//	WaveletCoefficient_F32 coefF = FactoryWaveletHaar.generate_F32();
-//	WaveletCoefficient_F32 coefR = FactoryWaveletHaar.generate_F32();
+//	WaveletDescription<WlCoef_F32> coefF = FactoryWaveletHaar.generate_F32();
+//	WaveletDescription<WlCoef_F32> coefR = FactoryWaveletHaar.generate_F32();
 //
-	WaveletCoefficient_F32 coefF = FactoryWaveletDaub.standard_F32(4);
-	WaveletCoefficient_F32 coefR = FactoryWaveletDaub.standard_F32(4);
+	WaveletDescription<WlCoef_F32> coefF = FactoryWaveletDaub.daubJ_F32(4);
+	WaveletDescription<WlCoef_F32> coefR = FactoryWaveletDaub.daubJ_F32(4);
 
-//	WaveletCoefficient_F32 coefF = FactoryWaveletDaub.biorthogonal_F32(5);
-//	WaveletCoefficient_F32 coefR = FactoryWaveletDaub.biorthogonalInv_F32(5);
+//	WaveletDescription<WlCoef_F32> coefF = FactoryWaveletDaub.biorthogonal_F32(5);
+//	WaveletDescription<WlCoef_F32> coefR = FactoryWaveletDaub.biorthogonalInv_F32(5);
 
 	public void process() {
 		createTestImage();

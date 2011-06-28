@@ -155,6 +155,8 @@ public class GecvTesting {
 			return new ImageSInt32(width, height);
 		} else if (type == ImageFloat32.class) {
 			return new ImageFloat32(width, height);
+		} else if (type == ImageFloat64.class) {
+			return new ImageFloat64(width, height);
 		} else if (type == ImageInterleavedInt8.class) {
 			return new ImageInterleavedInt8(width, height, 1);
 		} else if( type == ImageInteger.class ) {
@@ -228,6 +230,8 @@ public class GecvTesting {
 						assertEquals((ImageInterleavedInt8) inputParam[i], (ImageInterleavedInt8) subImg[i]);
 					else if (inputParam[i] instanceof ImageFloat32)
 						assertEquals((ImageFloat32) inputParam[i], (ImageFloat32) subImg[i]);
+					else if (inputParam[i] instanceof ImageFloat64)
+						assertEquals((ImageFloat64) inputParam[i], (ImageFloat64) subImg[i]);
 					else
 						throw new RuntimeException("Unknown type " + inputParam[i].getClass().getSimpleName() + ".  Add it here");
 				}
@@ -302,17 +306,20 @@ public class GecvTesting {
 	 */
 	public static void assertEqualsGeneric(ImageBase imgA, ImageBase imgB, int tolInt, double tolFloat) {
 
-		if (ImageInteger.class.isAssignableFrom(imgA.getClass())) {
+		if ( imgA.isInteger() ) {
 			if( ImageInteger.class.isAssignableFrom(imgB.getClass()) ) {
 				assertEquals((ImageInteger) imgA, (ImageInteger) imgB, 0);
-			} else {
+			} else if( imgB.getClass() == ImageFloat32.class ) {
 				assertEquals((ImageInteger) imgA, (ImageFloat32) imgB, 0);
+			} else {
+				assertEquals((ImageInteger) imgA, (ImageFloat64) imgB, 0);
 			}
 		} else if( ImageInteger.class.isAssignableFrom(imgB.getClass()) ) {
 			assertEquals((ImageInteger) imgB, (ImageFloat32) imgA, 0);
-		} else {
-			assertEquals((ImageFloat32) imgA, (ImageFloat32) imgB, 0, (float)tolFloat);
-		}
+		} else if( !imgA.isInteger() && !imgB.isInteger() ) {
+			assertEquals((ImageFloat) imgA, (ImageFloat) imgB, 0, (float)tolFloat);
+		} else
+			throw new RuntimeException("Not supported yet");
 	}
 
 	public static void assertEqualsGeneric(ImageBase imgA, ImageBase imgB, int tolInt, double tolFloat,
@@ -369,6 +376,21 @@ public class GecvTesting {
 		}
 	}
 
+	public static void assertEquals(ImageInteger imgA, ImageFloat64 imgB, int ignoreBorder) {
+		if (imgA.getWidth() != imgB.getWidth())
+			throw new RuntimeException("Widths are not equals");
+
+		if (imgA.getHeight() != imgB.getHeight())
+			throw new RuntimeException("Heights are not equals");
+
+		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
+			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
+				if (imgA.get(x, y) != (int)imgB.get(x, y))
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + (int)imgB.get(x, y));
+			}
+		}
+	}
+
 	/**
 	 * Checks to see if thw two images are equivalent.  Note that this is not the same
 	 * as identical since they can be sub-images.
@@ -391,27 +413,37 @@ public class GecvTesting {
 		}
 	}
 
-	/**
-	 * Checks to see if thw two images are equivalent.  Note that this is not the same
-	 * as identical since they can be sub-images.
-	 *
-	 * @param imgA		 An image.
-	 * @param imgB		 An image.
-	 * @param ignoreBorder
-	 */
-	public static void assertEquals(ImageFloat32 imgA, ImageFloat32 imgB, int ignoreBorder, float tol) {
+	public static void assertEquals(ImageFloat64 imgA, ImageFloat64 imgB) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
 		if (imgA.getHeight() != imgB.getHeight())
 			throw new RuntimeException("Heights are not equals");
 
+		for (int y = 0; y < imgA.getHeight(); y++) {
+			for (int x = 0; x < imgA.getWidth(); x++) {
+				if (imgA.get(x, y) != imgB.get(x, y))
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + imgA.get(x, y) + "  " + imgB.get(x, y));
+			}
+		}
+	}
+
+	public static void assertEquals( ImageFloat imgA, ImageFloat imgB, int ignoreBorder, double tol) {
+		if (imgA.getWidth() != imgB.getWidth())
+			throw new RuntimeException("Widths are not equals");
+
+		if (imgA.getHeight() != imgB.getHeight())
+			throw new RuntimeException("Heights are not equals");
+
+		SingleBandImage a = FactorySingleBandImage.wrap(imgA);
+		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
+
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				float normalizer = Math.abs(imgA.get(x, y)) + Math.abs(imgB.get(x, y));
-				if( normalizer < 1.0f ) normalizer = 1.0f;
-				if (Math.abs(imgA.get(x, y) - imgB.get(x, y))/normalizer > tol)
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + imgA.get(x, y) + "  " + imgB.get(x, y));
+				double normalizer = Math.abs(a.get(x, y).doubleValue()) + Math.abs(b.get(x, y).doubleValue());
+				if( normalizer < 1.0 ) normalizer = 1.0;
+				if (Math.abs(a.get(x, y).doubleValue() - b.get(x, y).doubleValue())/normalizer > tol)
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
 			}
 		}
 	}
@@ -590,25 +622,15 @@ public class GecvTesting {
 		}
 	}
 
-	public static void printDiff( ImageFloat32 imgA , ImageFloat32 imgB ) {
-		for( int y = 0; y < imgA.getHeight(); y++ ) {
-			for( int x = 0; x < imgA.getWidth(); x++ ) {
-				float diff = Math.abs(imgA.get(x,y)-imgB.get(x,y));
-				System.out.printf("%2d ",(int)diff);
-			}
-			System.out.println();
-		}
-	}
+	public static void printDiff( ImageBase imgA , ImageBase imgB ) {
 
-	public static void printDiff( ImageInteger imgA , ImageInteger imgB ) {
+		SingleBandImage a = FactorySingleBandImage.wrap(imgA);
+		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
+
 		for( int y = 0; y < imgA.getHeight(); y++ ) {
 			for( int x = 0; x < imgA.getWidth(); x++ ) {
-				int diff = Math.abs(imgA.get(x,y)-imgB.get(x,y));
-				if( diff > 60 ) {
-					System.out.println("A = "+imgA.get(x,y)+"  B = "+imgB.get(x,y));
-					System.out.println("Egads");
-				}
-				System.out.printf("%2d ",diff);
+				double diff = Math.abs(a.get(x,y).doubleValue()-b.get(x,y).doubleValue());
+				System.out.printf("%2d ",(int)diff);
 			}
 			System.out.println();
 		}

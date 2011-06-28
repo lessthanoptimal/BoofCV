@@ -1,12 +1,10 @@
 - Rename all low level implementation classes to have Impl* in their name
 
 - Wavelet
- * Generalized wavelet object
- * optimized wavelet code
-   * float and integer images
- * TAWS denoiser
+ * Allow orthogonal daub using reflection
+   - Will require borders to be handled differently
+   - Values of coefficients will need to be precomputed and dependent on the type of border used
  * Generate coefficients for arbitrary daub and coiflet wavelets
- * Add other wavelet image ops
  * GUI Panel to display wavelets
 
 - Median Filter
@@ -25,6 +23,8 @@
 
 - Denoise
  * Weiner
+ * TAWS denoiser
+ * SureShrink
 
 - Thresholding
  * Global Threshold

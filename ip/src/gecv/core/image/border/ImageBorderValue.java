@@ -17,6 +17,7 @@
 package gecv.core.image.border;
 
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageFloat64;
 import gecv.struct.image.ImageInteger;
 
 /**
@@ -26,12 +27,35 @@ import gecv.struct.image.ImageInteger;
  */
 public class ImageBorderValue {
 
+	public static ImageBorder_F64 wrap( ImageFloat64 image , float value ) {
+		return new Value_F64(image,value);
+	}
+
 	public static ImageBorder_F32 wrap( ImageFloat32 image , float value ) {
 		return new Value_F32(image,value);
 	}
 
 	public static ImageBorder_I32 wrap( ImageInteger image , int value ) {
 		return new Value_I(image,value);
+	}
+
+	public static class Value_F64 extends ImageBorder_F64 {
+		float value;
+
+		public Value_F64( ImageFloat64 image , float value ) {
+			super(image);
+			this.value = value;
+		}
+
+		@Override
+		public double getOutside( int x , int y ) {
+			return value;
+		}
+
+		@Override
+		public void setOutside(int x, int y, double val) {
+			// do nothing since it is a constant value
+		}
 	}
 
 	public static class Value_F32 extends ImageBorder_F32 {

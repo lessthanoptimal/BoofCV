@@ -58,7 +58,7 @@ public class TestConvertImage {
 			count++;
 		}
 
-		assertEquals(11,count);
+		assertEquals(13,count);
 	}
 
 	private void checkConvert( Method m , Class<?> inputType , Class<?> outputType ) {

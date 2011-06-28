@@ -20,9 +20,7 @@ import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.BorderIndex1D_Wrap;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.wavelet.WaveletCoefficient;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
-import gecv.struct.wavelet.WaveletCoefficient_I32;
+import gecv.struct.wavelet.*;
 import gecv.testing.GecvTesting;
 
 import java.util.Random;
@@ -85,7 +83,7 @@ public abstract class PermuteWaveletCompare {
 				GeneralizedImageOps.fill(expected,0);
 				// create a random wavelet.  does not have to be a real once
 				// since it just is checking that two functions produce the same output
-				WaveletCoefficient desc = createDesc(-o,l);
+				WaveletDescription<?> desc = createDesc(-o,l);
 				applyValidation(desc,input,expected);
 
 				// make sure it works on sub-images
@@ -95,18 +93,18 @@ public abstract class PermuteWaveletCompare {
 	}
 
 	public void innerTest(ImageBase input, ImageBase found, ImageBase expected,
-						   WaveletCoefficient desc) {
+						   WaveletDescription<?> desc) {
 		applyTransform(desc,input,found);
 		compareResults(desc, input , expected , found);
 	}
 
-	public abstract void applyValidation( WaveletCoefficient desc , ImageBase input , ImageBase output );
+	public abstract void applyValidation( WaveletDescription<?> desc , ImageBase input , ImageBase output );
 
-	public abstract void applyTransform( WaveletCoefficient desc , ImageBase input , ImageBase output );
+	public abstract void applyTransform( WaveletDescription<?> desc , ImageBase input , ImageBase output );
 
-	public abstract void compareResults( WaveletCoefficient desc, ImageBase input , ImageBase expected, ImageBase found );
+	public abstract void compareResults( WaveletDescription<?> desc, ImageBase input , ImageBase expected, ImageBase found );
 
-	private WaveletCoefficient createDesc(int offset, int length) {
+	private WaveletDescription<?> createDesc(int offset, int length) {
 		if( inputType == ImageFloat32.class ) {
 			return createDesc_F32(offset,length);
 		} else {
@@ -114,37 +112,44 @@ public abstract class PermuteWaveletCompare {
 		}
 	}
 
-	private WaveletCoefficient_F32 createDesc_F32(int offset, int length) {
-		WaveletCoefficient_F32 ret = new WaveletCoefficient_F32();
-		ret.border = new BorderIndex1D_Wrap();
-		ret.offsetScaling = offset;
-		ret.offsetWavelet = offset;
-		ret.scaling = new float[length];
-		ret.wavelet = new float[length];
+	private WaveletDescription<WlCoef_F32> createDesc_F32(int offset, int length) {
+		WlCoef_F32 forward = new WlCoef_F32();
+		forward.offsetScaling = offset;
+		forward.offsetWavelet = offset;
+		forward.scaling = new float[length];
+		forward.wavelet = new float[length];
 
 		for( int i = 0; i < length; i++ ) {
-			ret.scaling[i] = (float)rand.nextGaussian();
-			ret.wavelet[i] = (float)rand.nextGaussian();
+			forward.scaling[i] = (float)rand.nextGaussian();
+			forward.wavelet[i] = (float)rand.nextGaussian();
 		}
 
-		return ret;
+		WlBorderCoef<WlCoef_F32> inverse = new WlBorderCoefStandard<WlCoef_F32>(forward); 
+
+		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),forward,inverse);
 	}
 
-	private WaveletCoefficient_I32 createDesc_I32(int offset, int length) {
-		WaveletCoefficient_I32 ret = new WaveletCoefficient_I32();
-		ret.border = new BorderIndex1D_Wrap();
-		ret.offsetScaling = offset;
-		ret.offsetWavelet = offset;
-		ret.scaling = new int[length];
-		ret.wavelet = new int[length];
-		ret.denominatorScaling = 2;
-		ret.denominatorWavelet = 3;
+	private WaveletDescription<WlCoef_I32> createDesc_I32(int offset, int length) {
+		WlCoef_I32 forward = new WlCoef_I32();
+		forward.offsetScaling = offset;
+		forward.offsetWavelet = offset;
+		forward.scaling = new int[length];
+		forward.wavelet = new int[length];
+		forward.denominatorScaling = 2;
+		forward.denominatorWavelet = 3;
 
 		for( int i = 0; i < length; i++ ) {
-			ret.scaling[i] = rand.nextInt(6)-3;
-			ret.wavelet[i] = rand.nextInt(6)-3;
+			forward.scaling[i] = rand.nextInt(6)-3;
+			forward.wavelet[i] = rand.nextInt(6)-3;
+			// it would never be zero in practice
+			if( forward.scaling[i] == 0 )
+				forward.scaling[i] = 1;
+			if( forward.wavelet[i] == 0 )
+				forward.wavelet[i] = 1;
 		}
 
-		return ret;
+		WlBorderCoef<WlCoef_I32> inverse = new WlBorderCoefStandard<WlCoef_I32>(forward);
+
+		return new WaveletDescription<WlCoef_I32>(new BorderIndex1D_Wrap(),forward,inverse);
 	}
 }

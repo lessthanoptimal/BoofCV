@@ -57,13 +57,15 @@ public class GeneralizedImageOps {
 			ImageTestingOps.randomize((ImageSInt32) img, rand, min, max);
 		} else if (img.getClass() == ImageFloat32.class) {
 			ImageTestingOps.randomize((ImageFloat32) img, rand, min, max);
+		} else if (img.getClass() == ImageFloat64.class) {
+			ImageTestingOps.randomize((ImageFloat64) img, rand, min, max);
 		} else {
 			throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
 		}
 	}
 
 	public static boolean isFloatingPoint(Class<?> imgType) {
-		if( imgType == ImageFloat32.class ) {
+		if( ImageFloat.class.isAssignableFrom(imgType) ) {
 			return true;
 		} else {
 			return false;
@@ -79,6 +81,8 @@ public class GeneralizedImageOps {
 			return ((ImageSInt32) img).get(x, y);
 		} else if (img instanceof ImageFloat32) {
 			return ((ImageFloat32) img).get(x, y);
+		} else if (img instanceof ImageFloat64) {
+			return ((ImageFloat64) img).get(x, y);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}
@@ -93,6 +97,8 @@ public class GeneralizedImageOps {
 			ImageTestingOps.fill((ImageSInt32)img,(int)value);
 		} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
 			ImageTestingOps.fill((ImageFloat32)img,(int)value);
+		} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
+			ImageTestingOps.fill((ImageFloat64)img,(int)value);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}

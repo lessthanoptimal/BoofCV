@@ -159,7 +159,8 @@ public class GeneratorImageTestingOps {
 		if( imageType.isInteger() ) {
 			out.print("\t\t\t\tdata[index++] = "+typeCast+"(rand.nextInt(range)+min);\n");
 		} else {
-			out.print("\t\t\t\tdata[index++] = rand.nextFloat()*range+min;\n");
+			String randType = imageType.getRandType();
+			out.print("\t\t\t\tdata[index++] = rand.next"+randType+"()*range+min;\n");
 		}
 		out.print("\t\t\t}\n" +
 				"\t\t}\n" +
@@ -196,13 +197,15 @@ public class GeneratorImageTestingOps {
 						"\n");
 			}
 		} else {
-			out.print("\t\t\t\t"+sumType+" value = data[index] + rand.nextFloat()*range+min;\n");
+			String randType = imageType.getRandType();
+			out.print("\t\t\t\t"+sumType+" value = data[index] + rand.next"+randType+"()*range+min;\n");
 		}
-			out.print("\t\t\t\tdata[index++] = "+typeCast+" value;\n" +
+		out.print("\t\t\t\tdata[index++] = "+typeCast+" value;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
+
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GeneratorImageTestingOps gen = new GeneratorImageTestingOps();

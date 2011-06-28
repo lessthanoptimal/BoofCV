@@ -16,8 +16,9 @@
 
 package gecv.alg.wavelet;
 
-import gecv.struct.wavelet.WaveletCoefficient_F32;
-import gecv.struct.wavelet.WaveletCoefficient_I32;
+import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlCoef_F32;
+import gecv.struct.wavelet.WlCoef_I32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,12 +35,12 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	 * Sees if the DaubJ transform can reconstruct an image.
 	 */
 	@Test
-	public void transform_standard_F32() {
+	public void transform_daubJ_F32() {
 
 		for( int i = 4; i <= 4; i += 2 ) {
-			WaveletCoefficient_F32 desc = FactoryWaveletDaub.standard_F32(i);
+			WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(i);
 
-			checkEncodeDecode_F32(desc,desc);
+			checkEncodeDecode_F32(desc);
 		}
 	}
 
@@ -47,30 +48,31 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	 * Sees if the standard DaubJ wavelets have the expected characteristics
 	 */
 	@Test
-	public void standard_F32() {
+	public void daubJ_F32_forward() {
 		for( int i = 4; i <= 4; i += 2 ) {
 
-			WaveletCoefficient_F32 desc = FactoryWaveletDaub.standard_F32(i);
+			// test forward coefficients for the expected properties
+			WlCoef_F32 forwardCoef = FactoryWaveletDaub.daubJ_F32(i).forward;
 
-			double sumScaling = UtilWavelet.sumCoefficients(desc.scaling);
-			double sumWavelet = UtilWavelet.sumCoefficients(desc.wavelet);
+			double sumScaling = UtilWavelet.sumCoefficients(forwardCoef.scaling);
+			double sumWavelet = UtilWavelet.sumCoefficients(forwardCoef.wavelet);
 
 			assertEquals(Math.sqrt(2),sumScaling,1e-4);
 			assertEquals(0,sumWavelet,1e-4);
 
-			double energyScaling = UtilWavelet.computeEnergy(desc.scaling);
-			double energyWavelet = UtilWavelet.computeEnergy(desc.wavelet);
+			double energyScaling = UtilWavelet.computeEnergy(forwardCoef.scaling);
+			double energyWavelet = UtilWavelet.computeEnergy(forwardCoef.wavelet);
 
 			assertEquals(1,energyScaling,1e-4);
 			assertEquals(1,energyWavelet,1e-4);
 
 			int polyOrder = i/2-1;
 
-			checkPolySumToZero(desc.wavelet, polyOrder,0);
+			checkPolySumToZero(forwardCoef.wavelet, polyOrder,0);
 
 			for( int offset = 0; offset <= 4; offset += 2 ) {
-				checkBiorthogonal(offset,desc.scaling,desc.offsetScaling,desc.scaling,desc.offsetScaling);
-				checkBiorthogonal(offset,desc.wavelet,desc.offsetWavelet,desc.wavelet,desc.offsetWavelet);
+				checkBiorthogonal(offset,forwardCoef.scaling,forwardCoef.offsetScaling,forwardCoef.scaling,forwardCoef.offsetScaling);
+				checkBiorthogonal(offset,forwardCoef.wavelet,forwardCoef.offsetWavelet,forwardCoef.wavelet,forwardCoef.offsetWavelet);
 			}
 		}
 	}
@@ -79,36 +81,35 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	public void transform_biorthogonal_F32() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
-			WaveletCoefficient_F32 forward = FactoryWaveletDaub.biorthogonal_F32(i);
-			WaveletCoefficient_F32 inverse = FactoryWaveletDaub.biorthogonalInv_F32(i);
+			WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(i);
 
-			checkEncodeDecode_F32(forward,inverse);
+			checkEncodeDecode_F32(desc);
 		}
 	}
 
 	@Test
-	public void biorthogonal_F32() {
+	public void biorthogonal_F32_forward() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
 
-			WaveletCoefficient_F32 desc = FactoryWaveletDaub.biorthogonal_F32(i);
+			WlCoef_F32 forward = FactoryWaveletDaub.biorthogonal_F32(i).getForward();
 
-			double sumScaling = UtilWavelet.sumCoefficients(desc.scaling);
-			double sumWavelet = UtilWavelet.sumCoefficients(desc.wavelet);
+			double sumScaling = UtilWavelet.sumCoefficients(forward.scaling);
+			double sumWavelet = UtilWavelet.sumCoefficients(forward.wavelet);
 
 			assertEquals(1,sumScaling,1e-4);
 			assertEquals(0,sumWavelet,1e-4);
 
-			double energyScaling = UtilWavelet.computeEnergy(desc.scaling);
-			double energyWavelet = UtilWavelet.computeEnergy(desc.wavelet);
+			double energyScaling = UtilWavelet.computeEnergy(forward.scaling);
+			double energyWavelet = UtilWavelet.computeEnergy(forward.wavelet);
 
 			assertTrue(Math.abs(1-energyScaling) > 1e-4);
 			assertTrue(Math.abs(1-energyWavelet) > 1e-4);
 
 			int polyOrder = i/2-1;
 
-			checkPolySumToZero(desc.wavelet, polyOrder,-1);
-			checkPolySumToZero(desc.scaling, polyOrder,-2);
+			checkPolySumToZero(forward.wavelet, polyOrder,-1);
+			checkPolySumToZero(forward.scaling, polyOrder,-2);
 		}
 	}
 
@@ -116,65 +117,68 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	public void transform_biorthogonal_I32() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
-			WaveletCoefficient_I32 forward = FactoryWaveletDaub.biorthogonal_I32(i);
-			WaveletCoefficient_I32 inverse = FactoryWaveletDaub.biorthogonalInv_I32(i);
+			WaveletDescription<WlCoef_I32> desc = FactoryWaveletDaub.biorthogonal_I32(i);
 
-			checkEncodeDecode_I32(forward,inverse);
+			checkEncodeDecode_I32(desc);
 		}
 	}
 
 	@Test
-	public void biorthogonal_I32() {
+	public void biorthogonal_I32_forward() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
 
-			WaveletCoefficient_I32 desc = FactoryWaveletDaub.biorthogonal_I32(i);
+			WlCoef_I32 forward = FactoryWaveletDaub.biorthogonal_I32(i).getForward();
 
-			int sumScaling = UtilWavelet.sumCoefficients(desc.scaling)/desc.denominatorScaling;
+			int sumScaling = UtilWavelet.sumCoefficients(forward.scaling)/forward.denominatorScaling;
 			assertEquals(1,sumScaling);
 
-			int sumWavelet = UtilWavelet.sumCoefficients(desc.wavelet);
+			int sumWavelet = UtilWavelet.sumCoefficients(forward.wavelet);
 			assertEquals(0,sumWavelet);
 
-			double energyScaling = UtilWavelet.computeEnergy(desc.scaling,desc.denominatorScaling);
-			double energyWavelet = UtilWavelet.computeEnergy(desc.wavelet,desc.denominatorWavelet);
+			double energyScaling = UtilWavelet.computeEnergy(forward.scaling,forward.denominatorScaling);
+			double energyWavelet = UtilWavelet.computeEnergy(forward.wavelet,forward.denominatorWavelet);
 
 			assertTrue(Math.abs(1-energyScaling) > 1e-4);
 			assertTrue(Math.abs(1-energyWavelet) > 1e-4);
 
 			int polyOrder = i/2-1;
 
-			checkPolySumToZero(desc.wavelet, polyOrder,-1);
-			checkPolySumToZero(desc.scaling, polyOrder,-2);
+			checkPolySumToZero(forward.wavelet, polyOrder,-1);
+			checkPolySumToZero(forward.scaling, polyOrder,-2);
 		}
 	}
 
 	@Test
-	public void biorthogonalInv_F32() {
+	public void biorthogonal_F32_inverse() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
-			WaveletCoefficient_F32 desc = FactoryWaveletDaub.biorthogonal_F32(i);
-			WaveletCoefficient_F32 descInv = FactoryWaveletDaub.biorthogonalInv_F32(i);
+			WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(i);
+
+			WlCoef_F32 forward = desc.getForward();
+			WlCoef_F32 inverse = desc.getInverse().getInnerCoefficients();
 
 			for( int offset = 0; offset <= 4; offset += 2 ) {
-				checkBiorthogonal(offset,desc.scaling,desc.offsetScaling,descInv.scaling,descInv.offsetScaling);
-				checkBiorthogonal(offset,desc.wavelet,desc.offsetWavelet,descInv.wavelet,descInv.offsetWavelet);
+				checkBiorthogonal(offset,forward.scaling,forward.offsetScaling,inverse.scaling,inverse.offsetScaling);
+				checkBiorthogonal(offset,forward.wavelet,forward.offsetWavelet,inverse.wavelet,inverse.offsetWavelet);
 			}
 		}
 	}
 
 	@Test
-	public void biorthogonalInv_I32() {
+	public void biorthogonal_I32_inverse() {
 		
 		for( int i = 5; i <= 5; i += 2 ) {
-			WaveletCoefficient_I32 desc = FactoryWaveletDaub.biorthogonal_I32(i);
-			WaveletCoefficient_I32 descInv = FactoryWaveletDaub.biorthogonalInv_I32(i);
+			WaveletDescription<WlCoef_I32> desc = FactoryWaveletDaub.biorthogonal_I32(i);
+
+			WlCoef_I32 forward = desc.getForward();
+			WlCoef_I32 inverse = desc.getInverse().getInnerCoefficients();
 
 			for( int offset = 0; offset <= 4; offset += 2 ) {
-				checkBiorthogonal(offset,desc.scaling,desc.offsetScaling,desc.denominatorScaling,
-						descInv.scaling,descInv.offsetScaling,descInv.denominatorScaling, true);
-				checkBiorthogonal(offset,desc.wavelet,desc.offsetWavelet,desc.denominatorWavelet,
-						descInv.wavelet,descInv.offsetWavelet,descInv.denominatorWavelet, true);
+				checkBiorthogonal(offset,forward.scaling,forward.offsetScaling,forward.denominatorScaling,
+						inverse.scaling,inverse.offsetScaling,inverse.denominatorScaling, true);
+				checkBiorthogonal(offset,forward.wavelet,forward.offsetWavelet,forward.denominatorWavelet,
+						inverse.wavelet,inverse.offsetWavelet,inverse.denominatorWavelet, true);
 			}
 		}
 	}

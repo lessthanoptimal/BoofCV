@@ -25,7 +25,8 @@ import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
-import gecv.struct.wavelet.WaveletCoefficient_F32;
+import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlCoef_F32;
 
 import java.util.Random;
 
@@ -38,8 +39,7 @@ public class BenchmarkWaveletTransform {
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
-	static WaveletCoefficient_F32 forward_F32 = FactoryWaveletDaub.standard_F32(4);
-	static WaveletCoefficient_F32 reverse_F32 = forward_F32;
+	static WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.daubJ_F32(4);
 
 	static ImageFloat32 orig_F32 = new ImageFloat32(imgWidth,imgHeight);
 	static ImageFloat32 temp1_F32 = new ImageFloat32(imgWidth,imgHeight);
@@ -50,8 +50,8 @@ public class BenchmarkWaveletTransform {
 
 		@Override
 		public void process() {
-			ImplWaveletTransformNaive.horizontal(forward_F32,orig_F32,temp1_F32);
-			ImplWaveletTransformNaive.vertical(forward_F32,temp1_F32,temp2_F32);
+			ImplWaveletTransformNaive.horizontal(desc_F32.getBorder(),desc_F32.getForward(),orig_F32,temp1_F32);
+			ImplWaveletTransformNaive.vertical(desc_F32.getBorder(),desc_F32.getForward(),temp1_F32,temp2_F32);
 		}
 	}
 
@@ -59,10 +59,10 @@ public class BenchmarkWaveletTransform {
 
 		@Override
 		public void process() {
-			ImplWaveletTransformInner.horizontal(forward_F32,orig_F32,temp1_F32);
-			ImplWaveletTransformBorder.horizontal(forward_F32,orig_F32,temp1_F32);
-			ImplWaveletTransformInner.vertical(forward_F32,orig_F32,temp1_F32);
-			ImplWaveletTransformBorder.vertical(forward_F32,orig_F32,temp1_F32);
+			ImplWaveletTransformInner.horizontal(desc_F32.getForward(),orig_F32,temp1_F32);
+			ImplWaveletTransformBorder.horizontal(desc_F32.getBorder(),desc_F32.getForward(),orig_F32,temp1_F32);
+			ImplWaveletTransformInner.vertical(desc_F32.getForward(),orig_F32,temp1_F32);
+			ImplWaveletTransformBorder.vertical(desc_F32.getBorder(),desc_F32.getForward(),orig_F32,temp1_F32);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class BenchmarkWaveletTransform {
 		public void process() {
 			// don't modify the input image
 			copy.setTo(orig_F32);
-			WaveletTransformOps.transformN(forward_F32,copy,tran,storage,3);
+			WaveletTransformOps.transformN(desc_F32,copy,tran,storage,3);
 		}
 	}
 
