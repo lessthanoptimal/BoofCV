@@ -80,29 +80,18 @@ public class TestUtilWavelet {
 	}
 
 	@Test
-	public void computeBorderEnd() {
-		int O[][]=new int[][]{
-				{0,1,0},{0,2,0},{0,3,2},{0,4,2},{0,5,4},{0,6,4},
-				{-1,2,0},{-1,3,0},{-1,4,2},{-1,5,2},{-1,6,4},{-1,7,4},
-				{-2,3,0},{-2,4,0},{-2,5,2},{-2,6,2},{-2,7,4}};
-
-		for (int[] w : O) {
-			checkEnd(w[0], 0, w[1], 1, 8, 8 , w[2]);
-			checkEnd(0, w[0], 1, w[1], 8, 8 , w[2]);
-		}
-
-		// check odd lengths
-		O = new int[][]{{0,1,0},{0,2,2},{0,3,2},{0,4,4}};
-		for (int[] w : O) {
-			checkEnd(w[0], 0, w[1], 1, 7, 8 , w[2]);
-			checkEnd(0, w[0], 1, w[1], 7, 8 , w[2]);
-		}
+	public void borderForwardUpper() {
+		checkForwardUpper(0,0,2,2,0);
+		checkForwardUpper(0,0,3,3,2);
+		checkForwardUpper(0,0,4,4,2);
+		checkForwardUpper(0,0,5,5,4);
+		checkForwardUpper(-1,-1,5,5,2);
+		checkForwardUpper(-1,-1,4,4,2);
+		checkForwardUpper(-1,0,4,2,2);
 	}
 
-	private void checkEnd( int offsetA , int offsetB ,
+	private void checkForwardUpper( int offsetA , int offsetB ,
 						   int lengthA , int lengthB ,
-						   int imgLength ,
-						   int tranLength ,
 						   int expected ) {
 		WlCoef_F32 desc = new WlCoef_F32();
 		desc.offsetScaling = offsetA;
@@ -110,28 +99,28 @@ public class TestUtilWavelet {
 		desc.scaling = new float[lengthA];
 		desc.wavelet = new float[lengthB];
 
-		assertEquals(expected,UtilWavelet.computeBorderEnd(desc,imgLength,tranLength));
+		assertEquals(expected,UtilWavelet.borderForwardUpper(desc));
 	}
 
 	@Test
-	public void computeBorderStart() {
-		checkStart(0,0,0);
-		checkStart(-1,0,2);
-		checkStart(0,-1,2);
-		checkStart(-2,0,2);
-		checkStart(0,-2,2);
-		checkStart(-3,0,4);
-		checkStart(0,-3,4);
-		checkStart(-3,0,4);
-		checkStart(-4,-4,4);
+	public void borderForwardLower() {
+		checkForwardLower(0,0,0);
+		checkForwardLower(-1,0,2);
+		checkForwardLower(0,-1,2);
+		checkForwardLower(-2,0,2);
+		checkForwardLower(0,-2,2);
+		checkForwardLower(-3,0,4);
+		checkForwardLower(0,-3,4);
+		checkForwardLower(-3,0,4);
+		checkForwardLower(-4,-4,4);
 	}
 
-	private void checkStart( int offsetA , int offsetB ,
+	private void checkForwardLower( int offsetA , int offsetB ,
 							int expected ) {
 		WlCoef_F32 desc = new WlCoef_F32();
 		desc.offsetScaling = offsetA;
 		desc.offsetWavelet = offsetB;
 
-		assertEquals(expected,UtilWavelet.computeBorderStart(desc));
+		assertEquals(expected,UtilWavelet.borderForwardLower(desc));
 	}
 }

@@ -51,6 +51,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 		printFuncs(TypeImage.F32,TypeImage.F32);
 		printFuncs(TypeImage.U8,TypeImage.S16);
 		printFuncs(TypeImage.U16,TypeImage.S32);
+//		printFuncs(TypeImage.S8,TypeImage.S16);
+//		printFuncs(TypeImage.S16,TypeImage.S32);
 
 		out.print("\n" +
 				"}\n");
@@ -120,8 +122,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\tfinal int width = output.width;\n" +
 				"\t\tfinal int height = input.height;\n" +
 				"\t\tfinal int widthD2 = width/2;\n" +
-				"\t\tfinal int startX = UtilWavelet.computeBorderStart(coefficients);\n" +
-				"\t\tfinal int endOffsetX = output.width - UtilWavelet.computeBorderEnd(coefficients,input.width,output.width) - startX;\n" +
+				"\t\tfinal int startX = UtilWavelet.borderForwardLower(coefficients);\n" +
+				"\t\tfinal int endOffsetX = input.width - input.width%2 - UtilWavelet.borderForwardUpper(coefficients) - startX;\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < height; y++ ) {\n" +
 				"\n" +
@@ -169,8 +171,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\tfinal int width = input.width;\n" +
 				"\t\tfinal int height = output.height;\n" +
 				"\t\tfinal int heightD2 = (height/2)*output.stride;\n" +
-				"\t\tfinal int startY = UtilWavelet.computeBorderStart(coefficients);\n" +
-				"\t\tfinal int endY = output.height - UtilWavelet.computeBorderEnd(coefficients,input.height,output.height);\n" +
+				"\t\tfinal int startY = UtilWavelet.borderForwardLower(coefficients);\n" +
+				"\t\tfinal int endY = input.height - input.height%2 - UtilWavelet.borderForwardUpper(coefficients);\n" +
 				"\n" +
 				"\t\tfor( int y = startY; y < endY; y += 2 ) {\n" +
 				"\n" +
@@ -206,9 +208,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printHorizontalInverse() {
-		out.print("\tpublic static void horizontalInverse( WlBorderCoef<WlCoef_"+genName+"> invDesc , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void horizontalInverse( WlCoef_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
 				"\t{\n" +
-				"\t\tWlCoef_"+genName+" coefficients = invDesc.getInnerCoefficients();\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
 				"\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
@@ -220,10 +221,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\tfinal int width = input.width;\n" +
 				"\t\tfinal int height = output.height;\n" +
 				"\t\tfinal int widthD2 = width/2;\n" +
-				"\t\tfinal int startX = UtilWavelet.computeBorderStart(coefficients);\n" +
-				"\t\tfinal int endX = input.width - UtilWavelet.computeBorderEnd(coefficients,output.width,input.width);\n" +
-				"\t\tfinal int zeroStart = startX+Math.min(offsetA,offsetB);\n" +
-				"\t\tfinal int zeroEnd = endX+Math.min(offsetA,offsetB);\n" +
+				"\t\tfinal int lowerBorder = UtilWavelet.borderForwardLower(coefficients);\n" +
+				"\t\tfinal int upperBorder = output.width - output.width%2 - UtilWavelet.borderForwardUpper(coefficients);" +
 				"\n");
 		if( imageIn.isInteger() ) {
 			out.print("\t\tfinal int e = coefficients.denominatorScaling*2;\n" +
@@ -236,12 +235,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 		out.print("\t\tfor( int y = 0; y < height; y++ ) {\n" +
 				"\n" +
 				"\t\t\t// initialize details and trends arrays\n" +
-				"\t\t\tfor( int i = 0; i < zeroStart; i++ ) {\n" +
-				"\t\t\t\tdetails[i] = 0; trends[i] = 0;\n" +
-				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\tint indexSrc = input.startIndex + y*input.stride+startX/2;\n" +
-				"\t\t\tfor( int x = startX; x < endX; x += 2 , indexSrc++ ) {\n" +
+				"\t\t\tint indexSrc = input.startIndex + y*input.stride+lowerBorder/2;\n" +
+				"\t\t\tfor( int x = lowerBorder; x < upperBorder; x += 2 , indexSrc++ ) {\n" +
 				"\t\t\t\t"+sumType+" a = input.data[ indexSrc ] "+bitWise+";\n" +
 				"\t\t\t\t"+sumType+" d = input.data[ indexSrc + widthD2 ] "+bitWise+";\n" +
 				"\n" +
@@ -254,13 +249,9 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\t\t\t\tdetails[i+x+offsetB] = d*beta[i];\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tfor( int i = zeroEnd; i < output.width; i++ ) {\n" +
-				"\t\t\t\tdetails[i] = 0; trends[i] = 0;\n" +
-				"\t\t\t}\n" +
-				"\n" +
 				"\t\t\t// perform the normal inverse transform\n" +
-				"\t\t\tindexSrc = input.startIndex + y*input.stride+startX/2;\n" +
-				"\t\t\tfor( int x = startX; x < endX; x += 2 , indexSrc++ ) {\n" +
+				"\t\t\tindexSrc = input.startIndex + y*input.stride+lowerBorder/2;\n" +
+				"\t\t\tfor( int x = lowerBorder; x < upperBorder; x += 2 , indexSrc++ ) {\n" +
 				"\t\t\t\t"+sumType+" a = input.data[ indexSrc ] "+bitWise+";\n" +
 				"\t\t\t\t"+sumType+" d = input.data[ indexSrc + widthD2 ] "+bitWise+";\n" +
 				"\n" +
@@ -275,8 +266,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tint indexDst = output.startIndex + y*output.stride;\n" +
-				"\t\t\tfor( int x = 0; x < output.width; x++ ) {\n");
+				"\t\t\tint indexDst = output.startIndex + y*output.stride + lowerBorder;\n" +
+				"\t\t\tfor( int x = lowerBorder; x < upperBorder; x++ ) {\n");
 
 		if( imageIn.isInteger() ) {
 			out.print("\t\t\t\toutput.data[ indexDst++ ] = "+outputCast+"((trends[x]*f + details[x]*e + ef2)/ef);\n" );
@@ -290,9 +281,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printVerticalInverse() {
-		out.print("\tpublic static void verticalInverse( WlBorderCoef<WlCoef_"+genName+"> invDesc , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void verticalInverse( WlCoef_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
 				"\t{\n" +
-				"\t\tWlCoef_"+genName+" coefficients = invDesc.getInnerCoefficients();\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
 				"\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
@@ -304,10 +294,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\tfinal int width = output.width;\n" +
 				"\t\tfinal int height = input.height;\n" +
 				"\t\tfinal int heightD2 = (height/2)*input.stride;\n" +
-				"\t\tfinal int startY = UtilWavelet.computeBorderStart(coefficients);\n" +
-				"\t\tfinal int endY = input.height - UtilWavelet.computeBorderEnd(coefficients,output.height,input.height);\n" +
-				"\t\tfinal int zeroStart = startY+Math.min(offsetA,offsetB);\n" +
-				"\t\tfinal int zeroEnd = endY+Math.min(offsetA,offsetB);\n" +
+				"\t\tfinal int lowerBorder = UtilWavelet.borderForwardLower(coefficients);\n" +
+				"\t\tfinal int upperBorder = output.height - output.height%2 - UtilWavelet.borderForwardUpper(coefficients);" +
 				"\n");
 
 		if( imageIn.isInteger() ) {
@@ -319,13 +307,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 		}
 		out.print("\t\tfor( int x = 0; x < width; x++) {\n" +
 				"\n" +
-				"\t\t\t// initialize details and trends arrays\n" +
-				"\t\t\tfor( int i = 0; i < zeroStart; i++ ) {\n" +
-				"\t\t\t\tdetails[i] = 0; trends[i] = 0;\n" +
-				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\tint indexSrc = input.startIndex + (startY/2)*input.stride + x;\n" +
-				"\t\t\tfor( int y = startY; y < endY; y += 2 , indexSrc += input.stride ) {\n" +
+				"\t\t\tint indexSrc = input.startIndex + (lowerBorder/2)*input.stride + x;\n" +
+				"\t\t\tfor( int y = lowerBorder; y < upperBorder; y += 2 , indexSrc += input.stride ) {\n" +
 				"\t\t\t\t"+sumType+" a = input.data[ indexSrc ] "+bitWise+";\n" +
 				"\t\t\t\t"+sumType+" d = input.data[ indexSrc + heightD2 ] "+bitWise+";\n" +
 				"\n" +
@@ -338,14 +321,10 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\t\t\t\tdetails[i+y+offsetB] = d*beta[i];\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tfor( int i = zeroEnd; i < output.height; i++ ) {\n" +
-				"\t\t\t\tdetails[i] = 0; trends[i] = 0;\n" +
-				"\t\t\t}\n" +
-				"\n" +
 				"\t\t\t// perform the normal inverse transform\n" +
-				"\t\t\tindexSrc = input.startIndex + (startY/2)*input.stride + x;\n" +
+				"\t\t\tindexSrc = input.startIndex + (lowerBorder/2)*input.stride + x;\n" +
 				"\n" +
-				"\t\t\tfor( int y = startY; y < endY; y += 2 , indexSrc += input.stride ) {\n" +
+				"\t\t\tfor( int y = lowerBorder; y < upperBorder; y += 2 , indexSrc += input.stride ) {\n" +
 				"\t\t\t\t"+sumType+" a = input.data[indexSrc] "+bitWise+";\n" +
 				"\t\t\t\t"+sumType+" d = input.data[indexSrc+heightD2] "+bitWise+";\n" +
 				"\n" +
@@ -360,8 +339,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tint indexDst = output.startIndex + x;\n" +
-				"\t\t\tfor( int y = 0; y < output.height; y++ , indexDst += output.stride ) {\n");
+				"\t\t\tint indexDst = output.startIndex + x + lowerBorder*output.stride;\n" +
+				"\t\t\tfor( int y = lowerBorder; y < upperBorder; y++ , indexDst += output.stride ) {\n");
 		if( imageIn.isInteger() ) {
 			out.print("\t\t\t\toutput.data[ indexDst ] = "+outputCast+"((trends[y]*f + details[y]*e + ef2)/ef);\n" );
 		} else {

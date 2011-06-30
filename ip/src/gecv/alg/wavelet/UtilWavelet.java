@@ -18,6 +18,7 @@ package gecv.alg.wavelet;
 
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageDimension;
+import gecv.struct.wavelet.WlBorderCoef;
 import gecv.struct.wavelet.WlCoef;
 import gecv.struct.wavelet.WlCoef_F32;
 
@@ -154,16 +155,40 @@ public class UtilWavelet {
 		return total;
 	}
 
-	public static int computeBorderStart( WlCoef desc ) {
+	/**
+	 * Returns the lower border for a forward wavelet transform.
+	 */
+	public static int borderForwardLower( WlCoef desc ) {
 		int ret =  -Math.min(desc.offsetScaling,desc.offsetWavelet);
 
 		return ret + (ret % 2);
 	}
 
-	public static int computeBorderEnd( WlCoef desc , int dataLength , int tranLength ) {
+	/**
+	 * Returns the upper border (offset from image edge) for a forward wavelet transform.
+	 */
+	public static int borderForwardUpper( WlCoef desc ) {
 		int w = Math.max( desc.offsetScaling+desc.getScalingLength() , desc.offsetWavelet+desc.getWaveletLength());
-		w += (tranLength - dataLength);
 
 		return Math.max((w + (w%2))-2,0);
+	}
+
+	/**
+	 * Returns the lower border for an inverse wavelet transform.
+	 */
+	public static int borderInverseLower( WlBorderCoef<?> desc ) {
+		WlCoef c = desc.getInnerCoefficients();
+		int m = Math.max(c.getScalingLength()+c.offsetScaling,c.getWaveletLength()+c.offsetWavelet);
+		int ret = borderForwardLower(c)-2+m;
+		return ret + ret%2;
+	}
+
+	/**
+	 * Returns the upper border (offset from image edge) for an inverse wavelet transform.
+	 */
+	public static int borderInverseUpper( WlBorderCoef<?> desc ) {
+		WlCoef c = desc.getInnerCoefficients();
+		int ret = borderForwardUpper(c)-Math.min(c.offsetScaling,c.offsetWavelet);
+		return ret + ret%2;
 	}
 }

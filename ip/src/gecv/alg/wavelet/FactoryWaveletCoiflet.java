@@ -82,7 +82,8 @@ public class FactoryWaveletCoiflet {
 		coef.wavelet[4] = coef.scaling[1];
 		coef.wavelet[5] = -coef.scaling[0];
 
-		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),
-				coef,new WlBorderCoefStandard<WlCoef_F32>(coef));
+		WlBorderCoefStandard<WlCoef_F32> inverse = new WlBorderCoefStandard<WlCoef_F32>(coef);
+
+		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),coef,inverse);
 	}
 }

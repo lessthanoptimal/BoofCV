@@ -19,8 +19,11 @@ package gecv.alg.wavelet;
 import gecv.alg.wavelet.impl.ImplWaveletTransformBorder;
 import gecv.alg.wavelet.impl.ImplWaveletTransformInner;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 import gecv.struct.wavelet.WaveletDescription;
 import gecv.struct.wavelet.WlCoef_F32;
+import gecv.struct.wavelet.WlCoef_I32;
 
 
 /**
@@ -69,10 +72,48 @@ public class WaveletTransformOps {
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		storage = checkDeclareStorage(output.width, output.height, storage,"storage1");
 
+//		ImplWaveletTransformNaive.horizontal(desc.getBorder(),coef,input,storage);
+//		ImplWaveletTransformNaive.vertical(desc.getBorder(),coef,storage,output);
+
 		ImplWaveletTransformInner.horizontal(coef,input,storage);
 		ImplWaveletTransformBorder.horizontal(desc.getBorder(),coef,input,storage);
 		ImplWaveletTransformInner.vertical(coef,storage,output);
 		ImplWaveletTransformBorder.vertical(desc.getBorder(),coef,storage,output);
+	}
+
+	/**
+	 * <p>
+	 * Performs a single level wavelet transform.
+	 * </p>
+	 *
+	 * @param desc Description of the wavelet.
+	 * @param input Input image. Not modified.
+	 * @param output Where the wavelet transform is written to. Modified.
+	 * @param storage Optional storage image.  Should be the same size as output image. If null then
+	 * an image is declared internally.
+	 */
+	// todo add unit tests
+	public static void transform1( WaveletDescription<WlCoef_I32> desc ,
+								   ImageUInt8 input , ImageSInt16 output ,
+								   ImageSInt16 storage )
+	{
+		UtilWavelet.checkShape(input,output);
+
+		WlCoef_I32 coef = desc.getForward();
+
+		if( output.width < coef.scaling.length || output.width < coef.wavelet.length )
+			throw new IllegalArgumentException("Wavelet is too large for provided image.");
+		if( output.height < coef.scaling.length || output.height < coef.wavelet.length )
+			throw new IllegalArgumentException("Wavelet is too large for provided image.");
+		storage = checkDeclareStorage(output.width, output.height, storage,"storage1");
+
+//		ImplWaveletTransformNaive.horizontal(desc.getBorder(),coef,input,storage);
+//		ImplWaveletTransformNaive.vertical(desc.getBorder(),coef,storage,output);
+
+		ImplWaveletTransformInner.horizontal(coef,input,storage);
+		ImplWaveletTransformBorder.horizontal(desc.getBorder(),coef,input,storage);
+//		ImplWaveletTransformInner.vertical(coef,storage,output);
+//		ImplWaveletTransformBorder.vertical(desc.getBorder(),coef,storage,output);
 	}
 
 	/**
@@ -145,9 +186,12 @@ public class WaveletTransformOps {
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		storage = checkDeclareStorage(input.width, input.height, storage,"storage");
 
-		ImplWaveletTransformInner.verticalInverse(desc.getInverse(),input,storage);
+//		ImplWaveletTransformNaive.verticalInverse(desc.getBorder(),desc.getInverse(),input,storage);
+//		ImplWaveletTransformNaive.horizontalInverse(desc.getBorder(),desc.getInverse(),storage,output);
+
+		ImplWaveletTransformInner.verticalInverse(desc.getInverse().getInnerCoefficients(),input,storage);
 		ImplWaveletTransformBorder.verticalInverse(desc.getBorder(),desc.getInverse(),input,storage);
-		ImplWaveletTransformInner.horizontalInverse(desc.getInverse(),storage,output);
+		ImplWaveletTransformInner.horizontalInverse(desc.getInverse().getInnerCoefficients(),storage,output);
 		ImplWaveletTransformBorder.horizontalInverse(desc.getBorder(),desc.getInverse(),storage,output);
 	}
 
@@ -217,6 +261,15 @@ public class WaveletTransformOps {
 	private static ImageFloat32 checkDeclareStorage(int width , int height, ImageFloat32 s, String name ) {
 		if( s == null  ) {
 			s = new ImageFloat32(width,height);
+		} else if( s.width != width || s.height != height ) {
+			throw new IllegalArgumentException("'"+name+"' needs to be "+width+"x"+ height+" not "+s.width+"x"+s.height);
+		}
+		return s;
+	}
+
+	private static ImageSInt16 checkDeclareStorage(int width , int height, ImageSInt16 s, String name ) {
+		if( s == null  ) {
+			s = new ImageSInt16(width,height);
 		} else if( s.width != width || s.height != height ) {
 			throw new IllegalArgumentException("'"+name+"' needs to be "+width+"x"+ height+" not "+s.width+"x"+s.height);
 		}

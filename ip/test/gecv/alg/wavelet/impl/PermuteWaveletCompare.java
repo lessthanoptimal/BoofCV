@@ -16,6 +16,7 @@
 
 package gecv.alg.wavelet.impl;
 
+import gecv.alg.wavelet.WaveletBorderType;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.BorderIndex1D_Wrap;
 import gecv.struct.image.ImageBase;
@@ -37,6 +38,7 @@ public abstract class PermuteWaveletCompare {
 
 	Class<?> inputType;
 	Class<?> outputType;
+	
 
 	protected PermuteWaveletCompare(Class<?> inputType, Class<?> outputType) {
 		this.inputType = inputType;
@@ -75,26 +77,31 @@ public abstract class PermuteWaveletCompare {
 
 		GeneralizedImageOps.randomize(input, rand, 0 , 50);
 
-		// test different descriptions lengths and offsets
-		for( int o = 0; o <= 2; o++ ) {
-			for( int l = 2+o; l <= 5; l++ ) {
-//					System.out.println("shrink "+shrink+" o = "+o+" l = "+l);
-				GeneralizedImageOps.fill(found,0);
-				GeneralizedImageOps.fill(expected,0);
-				// create a random wavelet.  does not have to be a real once
-				// since it just is checking that two functions produce the same output
-				WaveletDescription<?> desc = createDesc(-o,l);
-				applyValidation(desc,input,expected);
+		System.out.println("In [ "+widthIn+" , "+heightIn+" ]  Out [ "+widthOut+" , "+heightOut+" ]");
 
-				// make sure it works on sub-images
-				GecvTesting.checkSubImage(this,"innerTest",false,input,found, expected, desc);
+		// test different descriptions lengths and offsets, and borders
+		for( WaveletBorderType type : WaveletBorderType.values() ) {
+			for( int o = 0; o <= 2; o++ ) {
+				for( int l = 2+o; l <= 5; l++ ) {
+					System.out.println("type "+type+" o = "+o+" l = "+l);
+					GeneralizedImageOps.fill(found,0);
+					GeneralizedImageOps.fill(expected,0);
+					// create a random wavelet.  does not have to be a real once
+					// since it just is checking that two functions produce the same output
+					WaveletDescription<?> desc = createDesc(-o,l,type);
+					applyValidation(desc,input,expected);
+
+					// make sure it works on sub-images
+					GecvTesting.checkSubImage(this,"innerTest",false,input,found, expected, desc);
+				}
 			}
 		}
 	}
 
 	public void innerTest(ImageBase input, ImageBase found, ImageBase expected,
-						   WaveletDescription<?> desc) {
+						  WaveletDescription<?> desc) {
 		applyTransform(desc,input,found);
+//		GecvTesting.printDiff(found,expected);
 		compareResults(desc, input , expected , found);
 	}
 
@@ -104,15 +111,29 @@ public abstract class PermuteWaveletCompare {
 
 	public abstract void compareResults( WaveletDescription<?> desc, ImageBase input , ImageBase expected, ImageBase found );
 
-	private WaveletDescription<?> createDesc(int offset, int length) {
+	private WaveletDescription<?> createDesc(int offset, int length, WaveletBorderType type ) {
 		if( inputType == ImageFloat32.class ) {
-			return createDesc_F32(offset,length);
+			return createDesc_F32(offset,length,type);
 		} else {
-			return createDesc_I32(offset,length);
+			return createDesc_I32(offset,length,type);
 		}
 	}
 
-	private WaveletDescription<WlCoef_F32> createDesc_F32(int offset, int length) {
+	private WaveletDescription<WlCoef_F32> createDesc_F32(int offset, int length, WaveletBorderType type ) {
+		WlCoef_F32 forward = createRandomCoef_F32(offset, length);
+
+		WlBorderCoef<WlCoef_F32> inverse;
+
+		if( type == WaveletBorderType.WRAP )
+			inverse = new WlBorderCoefStandard<WlCoef_F32>(forward);
+		else {
+			inverse = createWrappingCoef_F32(forward);
+		}
+
+		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),forward,inverse);
+	}
+
+	private WlCoef_F32 createRandomCoef_F32(int offset, int length) {
 		WlCoef_F32 forward = new WlCoef_F32();
 		forward.offsetScaling = offset;
 		forward.offsetWavelet = offset;
@@ -123,13 +144,22 @@ public abstract class PermuteWaveletCompare {
 			forward.scaling[i] = (float)rand.nextGaussian();
 			forward.wavelet[i] = (float)rand.nextGaussian();
 		}
-
-		WlBorderCoef<WlCoef_F32> inverse = new WlBorderCoefStandard<WlCoef_F32>(forward); 
-
-		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),forward,inverse);
+		return forward;
 	}
 
-	private WaveletDescription<WlCoef_I32> createDesc_I32(int offset, int length) {
+	private WlBorderCoef<WlCoef_F32> createWrappingCoef_F32(WlCoef_F32 forward) {
+		WlBorderCoefFixed<WlCoef_F32> ret = new WlBorderCoefFixed<WlCoef_F32>(2,2);
+		ret.setInnerCoef(forward);
+
+		ret.setLower(0,createRandomCoef_F32(1, forward.getScalingLength()));
+		ret.setLower(1,createRandomCoef_F32(2, forward.getScalingLength()));
+		ret.setUpper(0,createRandomCoef_F32(1, forward.getScalingLength()));
+		ret.setUpper(1,createRandomCoef_F32(2, forward.getScalingLength()));
+
+		return ret;
+	}
+
+	private WaveletDescription<WlCoef_I32> createDesc_I32(int offset, int length, WaveletBorderType type ) {
 		WlCoef_I32 forward = new WlCoef_I32();
 		forward.offsetScaling = offset;
 		forward.offsetWavelet = offset;

@@ -78,8 +78,9 @@ public class FactoryWaveletDaub {
 		coef.wavelet[2] = coef.scaling[1];
 		coef.wavelet[3] = -coef.scaling[0];
 
-		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),
-		coef,new WlBorderCoefStandard<WlCoef_F32>(coef));
+		WlBorderCoefStandard<WlCoef_F32> inverse = new WlBorderCoefStandard<WlCoef_F32>(coef);
+
+		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),coef,inverse);
 	}
 
 	/**
@@ -210,7 +211,7 @@ public class FactoryWaveletDaub {
 		DenseMatrix64F A_inv = new DenseMatrix64F(N,N);
 		solver.invert(A_inv);
 
-		int numBorder = UtilWavelet.computeBorderStart(inverse)/2;
+		int numBorder = UtilWavelet.borderForwardLower(inverse)/2;
 
 		WlBorderCoefFixed<WlCoef_F32> ret = new WlBorderCoefFixed<WlCoef_F32>(numBorder,numBorder+1);
 		ret.setInnerCoef(inverse);

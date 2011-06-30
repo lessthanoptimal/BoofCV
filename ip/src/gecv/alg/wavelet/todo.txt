@@ -1,3 +1,5 @@
+- Go through all files and comment + clean up
+- PermuteWaveletCompare test reflect
 - standard wavelet algorithms
   * border
     - float

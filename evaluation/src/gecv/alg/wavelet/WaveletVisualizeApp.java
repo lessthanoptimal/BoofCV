@@ -51,21 +51,21 @@ public class WaveletVisualizeApp {
 	ImageFloat32 imageWavelet;
 	ImageFloat32 imageInv;
 
-//	WaveletDescription<WlCoef_F32> coefF = FactoryWaveletHaar.generate_F32();
-//	WaveletDescription<WlCoef_F32> coefR = FactoryWaveletHaar.generate_F32();
+//	WaveletDescription<WlCoef_F32> desc = FactoryWaveletHaar.generate_F32();
 //
-	WaveletDescription<WlCoef_F32> coefF = FactoryWaveletDaub.daubJ_F32(4);
-	WaveletDescription<WlCoef_F32> coefR = FactoryWaveletDaub.daubJ_F32(4);
+//	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(4);
 
-//	WaveletDescription<WlCoef_F32> coefF = FactoryWaveletDaub.biorthogonal_F32(5);
-//	WaveletDescription<WlCoef_F32> coefR = FactoryWaveletDaub.biorthogonalInv_F32(5);
+//	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5,WaveletBorderType.WRAP);
+	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5,WaveletBorderType.REFLECT);
 
 	public void process() {
-//		createTestImage();
-		loadImage();
+		createTestImage();
+//		loadImage();
 
 		width = image.getWidth();
 		height = image.getHeight();
+
+		System.out.println("width "+width+"  height "+height);
 
 		ImageDimension d = UtilWavelet.transformDimension(image,numLevels);
 
@@ -76,7 +76,7 @@ public class WaveletVisualizeApp {
 		ConvertBufferedImage.convertTo(image,panelInput.getImage());
 		panelInput.repaint();
 
-		WaveletTransformOps.transformN(coefF,image.clone(),imageWavelet,null,numLevels);
+		WaveletTransformOps.transformN(desc,image.clone(),imageWavelet,null,numLevels);
 
 		ShowImages.showWindow(imageWavelet,"Transformed",true);
 
@@ -113,7 +113,7 @@ public class WaveletVisualizeApp {
 //			}
 //		}
 
-		WaveletTransformOps.inverseN(coefR,imageWavelet,imageInv,null,numLevels);
+		WaveletTransformOps.inverseN(desc,imageWavelet,imageInv,null,numLevels);
 
 		PixelMath.boundImage(imageInv,0,255);
 
