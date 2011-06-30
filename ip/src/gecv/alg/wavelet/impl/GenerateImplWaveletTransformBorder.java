@@ -51,6 +51,8 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 		printFuncs(TypeImage.F32,TypeImage.F32);
 		printFuncs(TypeImage.U8,TypeImage.S16);
 //		printFuncs(TypeImage.U16,TypeImage.S32);
+//		printFuncs(TypeImage.S16,TypeImage.S16);
+//		printFuncs(TypeImage.S32,TypeImage.S32);
 
 		out.print("\n" +
 				"}\n");
@@ -130,11 +132,11 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfinal boolean isLarger = output.width > input.width;\n" +
 				"\t\tfinal int width = output.width;\n" +
 				"\t\tfinal int height = input.height;\n" +
-				"\t\tfinal int leftBorder = UtilWavelet.computeBorderStart(coefficients);\n" +
-				"\t\tfinal int rightBorder = output.width - UtilWavelet.computeBorderEnd(coefficients,input.width,output.width);\n" +
+				"\t\tfinal int lowerBorder = UtilWavelet.borderForwardLower(coefficients);\n" +
+				"\t\tfinal int upperBorder = input.width - input.width%2 - UtilWavelet.borderForwardUpper(coefficients);\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < height; y++ ) {\n" +
-				"\t\t\tfor( int x = 0; x < leftBorder; x += 2 ) {\n" +
+				"\t\t\tfor( int x = 0; x < lowerBorder; x += 2 ) {\n" +
 				"\t\t\t\t"+sumType+" scale = 0;\n" +
 				"\t\t\t\t"+sumType+" wavelet = 0;\n" +
 				"\n" +
@@ -162,7 +164,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\t\t\toutput.set(outX,y,scale);\n" +
 				"\t\t\t\toutput.set(width/2 + outX , y , wavelet );\n" +
 				"\t\t\t}\n" +
-				"\t\t\tfor( int x = rightBorder; x < width; x += 2 ) {\n" +
+				"\t\t\tfor( int x = upperBorder; x < width; x += 2 ) {\n" +
 				"\t\t\t\t"+sumType+" scale = 0;\n" +
 				"\t\t\t\t"+sumType+" wavelet = 0;\n" +
 				"\n" +
@@ -207,8 +209,8 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfinal boolean isLarger = output.height > input.height;\n" +
 				"\t\tfinal int width = input.width;\n" +
 				"\t\tfinal int height = output.height;\n" +
-				"\t\tfinal int lowerBorder = UtilWavelet.computeBorderStart(coefficients);\n" +
-				"\t\tfinal int upperBorder = output.height - UtilWavelet.computeBorderEnd(coefficients,input.height,output.height);\n" +
+				"\t\tfinal int lowerBorder = UtilWavelet.borderForwardLower(coefficients);\n" +
+				"\t\tfinal int upperBorder = input.height - input.height%2 - UtilWavelet.borderForwardUpper(coefficients);\n" +
 				"\n" +
 				"\t\tfor( int x = 0; x < width; x++) {\n" +
 				"\t\t\tfor( int y = 0; y < lowerBorder; y += 2 ) {\n" +
@@ -277,108 +279,105 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 		String outputSum;
 
 		if( imageIn.isInteger() ) {
-			outputSum = "\t\t\t\toutput.data[ index++ ] += "+outputCast+"((trends[x]*f + details[x]*e + ef2)/ef);\n";
+			outputSum = "\t\t\t\toutput.data[ indexDst + x ] = "+outputCast+"((trends[x]*f + details[x]*e + ef2)/ef);\n";
 		} else {
-			outputSum = "\t\t\t\toutput.data[ index++ ] += "+outputCast+"(trends[x] + details[x]);\n";
+			outputSum = "\t\t\t\toutput.data[ indexDst + x ] = "+outputCast+"(trends[x] + details[x]);\n";
 		}
 
 		out.print("\tpublic static void horizontalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_"+genName+"> desc , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
 				"\t{\n" +
-				"\t\tfinal WlCoef_"+genName+" coefficients = desc.getInnerCoefficients();\n" +
-				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
-				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
-				"\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
-				"\t\tfinal "+sumType+"[] beta = coefficients.wavelet;\n" +
+				"\t\t"+sumType+" []trends = new "+sumType+"[ input.width ];\n" +
+				"\t\t"+sumType+" []details = new "+sumType+"[ input.width ];\n" +
 				"\n" +
-				"\t\tfinal "+sumType+" []trends = new "+sumType+"[ input.width ];\n" +
-				"\t\tfinal "+sumType+" []details = new "+sumType+"[ input.width ];\n" +
-				"\n" +
-				"\t\tfinal boolean isLarger = input.width > output.width;\n" +
 				"\t\tfinal int width = input.width;\n" +
 				"\t\tfinal int height = output.height;\n" +
-				"\t\tfinal int lowerBorder = desc.getLowerLength()*2;\n" +
-				"\t\tfinal int upperBorder = input.width - desc.getUpperLength()*2;\n" +
+				"\t\tfinal int paddedWidth = output.width + output.width%2;\n" +
 				"\n" +
+				"\t\tint lowerBorder = UtilWavelet.borderInverseLower(desc)/2;\n" +
+				"\t\tint upperBorder = output.width%2 + UtilWavelet.borderInverseUpper(desc)/2;\n" +
+				"\n" +
+				"\t\tint indexes[] = new int[lowerBorder+upperBorder];\n" +
+				"\t\tfor( int i = 0; i < lowerBorder; i++ )\n" +
+				"\t\t\tindexes[i] = i*2;\n" +
+				"\t\tfor( int i = lowerBorder; i < indexes.length; i++ )\n" +
+				"\t\t\tindexes[i] = paddedWidth-(indexes.length-i)*2;\n" +
+				"\n"+
 				"\t\tborder.setLength(input.width);\n" +
 				"\n" +
-				"\t\t// need to take in account the possibility of a border wrapping around\n" +
-				"\t\tint zeroLower = lowerBorder+Math.max(alpha.length,beta.length);\n" +
-				"\t\tint zeroUpper = upperBorder-Math.max(alpha.length,beta.length);\n" +
+				"\t\tfor( int y = 0; y < height; y++ ) {\n" +
 				"\n" +
-				"\t\tif( zeroLower > output.width ) zeroLower = output.width;\n" +
-				"\t\tif( zeroUpper < 0 ) zeroUpper = 0;\n" +
-				"\n");
+				"\t\t\t// initialize details and trends arrays\n" +
+				"\t\t\tfor( int i = 0; i < indexes.length; i++ ) {\n" +
+				"\t\t\t\tint x = indexes[i];\n" +
+				"\t\t\t\tdetails[x] = 0; trends[x] = 0;\n" +
+				"\t\t\t\tx++;\n" +
+				"\t\t\t\tdetails[x] = 0; trends[x] = 0;\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tfor( int i = 0; i < indexes.length; i++ ) {\n" +
+				"\t\t\t\tint x = indexes[i];\n" +
+				"\t\t\t\tWlCoef_"+genName+" coef;\n" +
+				"\t\t\t\tif( x < desc.getLowerLength()*2 )\n" +
+				"\t\t\t\t\tcoef = desc.getBorderCoefficients(x);\n" +
+				"\t\t\t\telse\n" +
+				"\t\t\t\t\tcoef = desc.getBorderCoefficients(x-paddedWidth);\n" +
+				"\n" +
+				"\t\t\t\tint s = coef.offsetScaling; s -= s%2;\n" +
+				"\t\t\t\tint e = coef.getScalingLength()+coef.offsetScaling;\n" +
+				"\n" +
+				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
+				"\t\t\t\t\tint xx = border.getIndex(x-j);\n" +
+				"\t\t\t\t\ttrends[x] += input.get(xx/2,y)*coef.scaling[j-coef.offsetScaling];\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\ts = coef.offsetScaling-1; s -= s%2;\n" +
+				"\t\t\t\te = coef.getScalingLength()+coef.offsetScaling-1;\n" +
+				"\n" +
+				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
+				"\t\t\t\t\tint xx = border.getIndex(x-j);\n" +
+				"\t\t\t\t\ttrends[x+1] += input.get(xx/2,y)*coef.scaling[j-coef.offsetScaling+1];\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\ts = coef.offsetScaling; s -= s%2;\n" +
+				"\t\t\t\te = coef.getWaveletLength()+coef.offsetWavelet;\n" +
+				"\n" +
+				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
+				"\t\t\t\t\tint xx = border.getIndex(x-j);\n" +
+				"\t\t\t\t\tdetails[x] += input.get(xx/2+width/2,y)*coef.wavelet[j-coef.offsetWavelet];\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\ts = coef.offsetScaling-1; s -= s%2;\n" +
+				"\t\t\t\te = coef.getWaveletLength()+coef.offsetWavelet-1;\n" +
+				"\n" +
+				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
+				"\t\t\t\t\tint xx = border.getIndex(x-j+1);\n" +
+				"\t\t\t\t\tdetails[x+1] += input.get(xx/2+width/2,y)*coef.wavelet[j-coef.offsetWavelet+1];\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tint indexDst = output.startIndex + y*output.stride;\n" +
+				"\t\t\tfor( int i = 0; i < indexes.length; i++ ) {\n" +
+				"\t\t\t\tint x = indexes[i];\n");
 		if( imageIn.isInteger() ) {
-			out.print("\t\tfinal int e = coefficients.denominatorScaling*2;\n" +
-					"\t\tfinal int f = coefficients.denominatorWavelet*2;\n" +
-					"\t\tfinal int ef = e*f;\n" +
-					"\t\tfinal int ef2 = ef/2;\n" +
+			out.print("\t\t\t\tWlCoef_"+genName+" coef;\n" +
+				"\t\t\t\tif( x < desc.getLowerLength()*2 )\n" +
+				"\t\t\t\t\tcoef = desc.getBorderCoefficients(x);\n" +
+				"\t\t\t\telse\n" +
+				"\t\t\t\t\tcoef = desc.getBorderCoefficients(x-paddedWidth);\n" +
+				"\n");
+			out.print("\t\t\t\tfinal int e = coef.denominatorScaling*2;\n" +
+					"\t\t\t\tfinal int f = coef.denominatorWavelet*2;\n" +
+					"\t\t\t\tfinal int ef = e*f;\n" +
+					"\t\t\t\tfinal int ef2 = ef/2;\n" +
 					"\n");
 		}
-		out.print("\t\tfor( int y = 0; y < height; y++ ) {\n" +
-				"\n" +
-				"\t\t\tfor( int i = 0; i < zeroLower; i++ ) {\n" +
-				"\t\t\t\tdetails[i] = 0; trends[i] = 0;\n" +
+		out.print(outputSum+
+				"\t\t\t\tx++;\n" +
+				"\t\t\t\tif( x >= output.width )\n" +
+				"\t\t\t\t\tcontinue;\n" +
+				outputSum+
 				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\tfor( int i = zeroUpper; i < width; i++ ) {\n" +
-				"\t\t\t\tdetails[i] = 0; trends[i] = 0;\n" +
-				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\tfor( int x = 0; x < lowerBorder; x += 2 ) {\n" +
-				"\t\t\t\t"+sumType+" a = input.get(x/2,y);\n" +
-				"\t\t\t\t"+sumType+" d = input.get(width/2+x/2,y);\n" +
-				"\n" +
-				"\t\t\t\t// add the trend\n" +
-				"\t\t\t\tfor( int i = 0; i < alpha.length; i++ ) {\n" +
-				"\t\t\t\t\t// if an odd image don't update the outer edge\n" +
-				"\t\t\t\t\tint xx = border.getIndex(x+offsetA+i);\n" +
-				"\t\t\t\t\tif( isLarger && xx >= output.width )\n" +
-				"\t\t\t\t\t\tcontinue;\n" +
-				"\t\t\t\t\ttrends[xx] += a*alpha[i];\n" +
-				"\t\t\t\t}\n" +
-				"\n" +
-				"\t\t\t\t// add the detail signal\n" +
-				"\t\t\t\tfor( int i = 0; i < beta.length; i++ ) {\n" +
-				"\t\t\t\t\tint xx = border.getIndex(x+offsetB+i);\n" +
-				"\t\t\t\t\tif( isLarger && xx >= output.width )\n" +
-				"\t\t\t\t\t\tcontinue;\n" +
-				"\t\t\t\t\tdetails[xx] += d*beta[i];\n" +
-				"\t\t\t\t}\n" +
-				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\tfor( int x = upperBorder; x < width; x += 2 ) {\n" +
-				"\t\t\t\t"+sumType+" a = input.get(x/2,y);\n" +
-				"\t\t\t\t"+sumType+" d = input.get(width/2+x/2,y);\n" +
-				"\n" +
-				"\t\t\t\t// add the trend\n" +
-				"\t\t\t\tfor( int i = 0; i < alpha.length; i++ ) {\n" +
-				"\t\t\t\t\t// if an odd image don't update the outer edge\n" +
-				"\t\t\t\t\tint xx = border.getIndex(x+offsetA+i);\n" +
-				"\t\t\t\t\tif( isLarger && xx == output.width )\n" +
-				"\t\t\t\t\t\tcontinue;\n" +
-				"\t\t\t\t\ttrends[xx] += a*alpha[i];\n" +
-				"\t\t\t\t}\n" +
-				"\n" +
-				"\t\t\t\t// add the detail signal\n" +
-				"\t\t\t\tfor( int i = 0; i < beta.length; i++ ) {\n" +
-				"\t\t\t\t\tint xx = border.getIndex(x+offsetB+i);\n" +
-				"\t\t\t\t\tif( isLarger && xx >= output.width )\n" +
-				"\t\t\t\t\t\tcontinue;\n" +
-				"\t\t\t\t\tdetails[xx] += d*beta[i];\n" +
-				"\t\t\t\t}\n" +
-				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\t// some of the values from the \"inner\" transformation bleed into the border\n" +
-				"\t\t\tint index = output.startIndex + y*output.stride;\n" +
-				"\t\t\tfor( int x = 0; x < zeroLower; x++ ) {\n" +
-				outputSum +
-				"\t\t\t}\n" +
-				"\t\t\tindex = output.startIndex + y*output.stride + zeroUpper;\n" +
-				"\t\t\tfor( int x = zeroUpper; x < output.width; x++ ) {\n" +
-				outputSum +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
+				"\t\t}\n"+
 				"\t}\n\n");
 	}
 
@@ -387,110 +386,106 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 		String outputSum;
 
 		if( imageIn.isInteger() ) {
-			outputSum = "\t\t\t\toutput.data[ index ] += "+outputCast+"((trends[y]*f + details[y]*e + ef2)/ef);\n";
+			outputSum = "\t\t\t\toutput.data[ indexDst + y*output.stride ] = "+outputCast+"((trends[y]*f + details[y]*e + ef2)/ef);\n";
 		} else {
-			outputSum = "\t\t\t\toutput.data[ index ] += "+outputCast+"(trends[y] + details[y]);\n";
+			outputSum = "\t\t\t\toutput.data[ indexDst + y*output.stride ] = "+outputCast+"(trends[y] + details[y]);\n";
 		}
 
 		out.print("\tpublic static void verticalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_"+genName+"> desc , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
 				"\t{\n" +
-				"\t\tUtilWavelet.checkShape(output,input);\n" +
+				"\t\t"+sumType+" []trends = new "+sumType+"[ input.height ];\n" +
+				"\t\t"+sumType+" []details = new "+sumType+"[ input.height ];\n" +
 				"\n" +
-				"\t\tfinal WlCoef_"+genName+" coefficients = desc.getInnerCoefficients();\n" +
-				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
-				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
-				"\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
-				"\t\tfinal "+sumType+"[] beta = coefficients.wavelet;\n" +
-				"\n" +
-				"\t\tfinal "+sumType+" []trends = new "+sumType+"[ output.height ];\n" +
-				"\t\tfinal "+sumType+" []details = new "+sumType+"[ output.height ];\n" +
-				"\n" +
-				"\t\tfinal boolean isLarger = input.height > output.height;\n" +
 				"\t\tfinal int width = output.width;\n" +
 				"\t\tfinal int height = input.height;\n" +
-				"\t\tfinal int lowerBorder = desc.getLowerLength()*2;\n" +
-				"\t\tfinal int upperBorder = input.height - desc.getUpperLength()*2;\n" +
+				"\t\tfinal int paddedHeight = output.height + output.height%2;\n" +
 				"\n" +
-				"\t\t// need to take in account the possibility of a border wrapping around\n" +
-				"\t\tint zeroLower = lowerBorder+Math.max(alpha.length,beta.length);\n" +
-				"\t\tint zeroUpper = upperBorder-Math.max(alpha.length,beta.length);\n" +
+				"\t\tint lowerBorder = UtilWavelet.borderInverseLower(desc)/2;\n" +
+				"\t\tint upperBorder = output.height%2 + UtilWavelet.borderInverseUpper(desc)/2;\n" +
 				"\n" +
-				"\t\tif( zeroLower > output.height ) zeroLower = output.height;\n" +
-				"\t\tif( zeroUpper < 0 ) zeroUpper = 0;\n" +
-				"\n");
+				"\t\tint indexes[] = new int[lowerBorder+upperBorder];\n" +
+				"\t\tfor( int i = 0; i < lowerBorder; i++ )\n" +
+				"\t\t\tindexes[i] = i*2;\n" +
+				"\t\tfor( int i = lowerBorder; i < indexes.length; i++ )\n" +
+				"\t\t\tindexes[i] = paddedHeight-(indexes.length-i)*2;\n" +
+				"\n" +
+				"\t\tborder.setLength(input.height);\n" +
+				"\n" +
+				"\t\tfor( int x = 0; x < width; x++ ) {\n" +
+				"\n" +
+				"\t\t\t// initialize details and trends arrays\n" +
+				"\t\t\tfor( int i = 0; i < indexes.length; i++ ) {\n" +
+				"\t\t\t\tint y = indexes[i];\n" +
+				"\t\t\t\tdetails[y] = 0; trends[y] = 0;\n" +
+				"\t\t\t\ty++;\n" +
+				"\t\t\t\tdetails[y] = 0; trends[y] = 0;\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tfor( int i = 0; i < indexes.length; i++ ) {\n" +
+				"\t\t\t\tint y = indexes[i];\n" +
+				"\t\t\t\tWlCoef_"+genName+" coef;\n" +
+				"\t\t\t\tif( y < desc.getLowerLength()*2 )\n" +
+				"\t\t\t\t\tcoef = desc.getBorderCoefficients(y);\n" +
+				"\t\t\t\telse\n" +
+				"\t\t\t\t\tcoef = desc.getBorderCoefficients(y-paddedHeight);\n" +
+				"\n" +
+				"\t\t\t\tint s = coef.offsetScaling; s -= s%2;\n" +
+				"\t\t\t\tint e = coef.getScalingLength()+coef.offsetScaling;\n" +
+				"\n" +
+				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
+				"\t\t\t\t\tint yy = border.getIndex(y-j);\n" +
+				"\t\t\t\t\ttrends[y] += input.get(x,yy/2)*coef.scaling[j-coef.offsetScaling];\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\ts = coef.offsetScaling-1; s -= s%2;\n" +
+				"\t\t\t\te = coef.getScalingLength()+coef.offsetScaling-1;\n" +
+				"\n" +
+				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
+				"\t\t\t\t\tint yy = border.getIndex(y-j);\n" +
+				"\t\t\t\t\ttrends[y+1] += input.get(x,yy/2)*coef.scaling[j-coef.offsetScaling+1];\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\ts = coef.offsetScaling; s -= s%2;\n" +
+				"\t\t\t\te = coef.getWaveletLength()+coef.offsetWavelet;\n" +
+				"\n" +
+				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
+				"\t\t\t\t\tint yy = border.getIndex(y-j);\n" +
+				"\t\t\t\t\tdetails[y] += input.get(x,yy/2+height/2)*coef.wavelet[j-coef.offsetWavelet];\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\ts = coef.offsetScaling-1; s -= s%2;\n" +
+				"\t\t\t\te = coef.getWaveletLength()+coef.offsetWavelet-1;\n" +
+				"\n" +
+				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
+				"\t\t\t\t\tint yy = border.getIndex(y-j+1);\n" +
+				"\t\t\t\t\tdetails[y+1] += input.get(x,yy/2+height/2)*coef.wavelet[j-coef.offsetWavelet+1];\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tint indexDst = output.startIndex + x;\n" +
+				"\t\t\tfor( int i = 0; i < indexes.length; i++ ) {\n" +
+				"\t\t\t\tint y = indexes[i];\n");
+
 		if( imageIn.isInteger() ) {
-			out.print("\t\tfinal int e = coefficients.denominatorScaling*2;\n" +
-					"\t\tfinal int f = coefficients.denominatorWavelet*2;\n" +
-					"\t\tfinal int ef = e*f;\n" +
-					"\t\tfinal int ef2 = ef/2;\n" +
+			out.print("\t\t\t\tWlCoef_"+genName+" coef;\n" +
+					"\t\t\t\tif( y < desc.getLowerLength()*2 )\n" +
+					"\t\t\t\t\tcoef = desc.getBorderCoefficients(y);\n" +
+					"\t\t\t\telse\n" +
+					"\t\t\t\t\tcoef = desc.getBorderCoefficients(y-paddedHeight);\n" );
+			out.print("\t\t\t\tfinal int e = coef.denominatorScaling*2;\n" +
+					"\t\t\t\tfinal int f = coef.denominatorWavelet*2;\n" +
+					"\t\t\t\tfinal int ef = e*f;\n" +
+					"\t\t\t\tfinal int ef2 = ef/2;\n" +
 					"\n");
 		}
-		out.print("\t\tborder.setLength(input.height);\n" +
-				"\n" +
-				"\t\tfor( int x = 0; x < width; x++) {\n" +
-				"\n" +
-				"\t\t\tfor( int i = 0; i < zeroLower; i++ ) {\n" +
-				"\t\t\t\tdetails[i] = 0; trends[i] = 0;\n" +
-				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\tfor( int i = zeroUpper; i < output.height; i++ ) {\n" +
-				"\t\t\t\tdetails[i] = 0; trends[i] = 0;\n" +
-				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\tfor( int y = 0; y < lowerBorder; y += 2 ) {\n" +
-				"\t\t\t\t"+sumType+" a = input.get(x,y/2);\n" +
-				"\t\t\t\t"+sumType+" d = input.get(x,y/2+height/2);\n" +
-				"\n" +
-				"\t\t\t\t// add the 'average' signal\n" +
-				"\t\t\t\tfor( int i = 0; i < alpha.length; i++ ) {\n" +
-				"\t\t\t\t\t// if an odd image don't update the outer edge\n" +
-				"\t\t\t\t\tint yy = border.getIndex(y+offsetA+i);\n" +
-				"\t\t\t\t\tif( isLarger && yy >= output.height )\n" +
-				"\t\t\t\t\t\tcontinue;\n" +
-				"\t\t\t\t\ttrends[yy] += a*alpha[i];\n" +
-				"\t\t\t\t}\n" +
-				"\n" +
-				"\t\t\t\t// add the detail signal\n" +
-				"\t\t\t\tfor( int i = 0; i < beta.length; i++ ) {\n" +
-				"\t\t\t\t\tint yy = border.getIndex(y+offsetB+i);\n" +
-				"\t\t\t\t\tif( isLarger && yy >= output.height )\n" +
-				"\t\t\t\t\t\tcontinue;\n" +
-				"\t\t\t\t\tdetails[yy] += d*beta[i];\n" +
-				"\t\t\t\t}\n" +
-				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\tfor( int y = upperBorder; y < height; y += 2 ) {\n" +
-				"\t\t\t\t"+sumType+" a = input.get(x,y/2);\n" +
-				"\t\t\t\t"+sumType+" d = input.get(x,y/2+height/2);\n" +
-				"\n" +
-				"\t\t\t\t// add the 'average' signal\n" +
-				"\t\t\t\tfor( int i = 0; i < alpha.length; i++ ) {\n" +
-				"\t\t\t\t\t// if an odd image don't update the outer edge\n" +
-				"\t\t\t\t\tint yy = border.getIndex(y+offsetA+i);\n" +
-				"\t\t\t\t\tif( isLarger && yy >= output.height )\n" +
-				"\t\t\t\t\t\tcontinue;\n" +
-				"\t\t\t\t\ttrends[yy] += a*alpha[i];\n" +
-				"\t\t\t\t}\n" +
-				"\n" +
-				"\t\t\t\t// add the detail signal\n" +
-				"\t\t\t\tfor( int i = 0; i < beta.length; i++ ) {\n" +
-				"\t\t\t\t\tint yy = border.getIndex(y+offsetB+i);\n" +
-				"\t\t\t\t\tif( isLarger && yy >= output.height )\n" +
-				"\t\t\t\t\t\tcontinue;\n" +
-				"\t\t\t\t\tdetails[yy] += d*beta[i];\n" +
-				"\t\t\t\t}\n" +
-				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\t// some of the values from the \"inner\" transformation bleed into the border\n" +
-				"\t\t\tint index = output.startIndex + x;\n" +
-				"\t\t\tfor( int y = 0; y < zeroLower; y++ , index += output.stride ) {\n" +
+
+		out.print(outputSum +
+				"\t\t\t\ty++;\n" +
+				"\t\t\t\tif( y >= output.height )\n" +
+				"\t\t\t\t\tcontinue;\n" +
 				outputSum +
 				"\t\t\t}\n" +
-				"\t\t\tindex = output.startIndex + zeroUpper*output.stride + x;\n" +
-				"\t\t\tfor( int y = zeroUpper; y < output.height; y++ , index += output.stride ) {\n" +
-				outputSum +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
+				"\t\t}\n"+
 				"\t}\n\n");
 	}
 

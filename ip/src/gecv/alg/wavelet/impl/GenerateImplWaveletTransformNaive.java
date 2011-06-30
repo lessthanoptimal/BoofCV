@@ -306,7 +306,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\n" +
 				"\t\tUtilWavelet.checkShape(output,input);\n" +
 				"\n" +
-				"\t\tWlCoef_"+genName+" coefficients = inverseCoef.getInnerCoefficients();\n"+
+				"\t\tWlCoef_"+genName+" coefficients;\n"+
 				"\n" +
 				"\t\t"+sumType+" []trends = new "+sumType+"[ output.height ];\n" +
 				"\t\t"+sumType+" []details = new "+sumType+"[ output.height ];\n" +

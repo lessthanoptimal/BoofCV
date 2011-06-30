@@ -21,7 +21,6 @@ import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageBase;
 import gecv.struct.wavelet.WaveletDescription;
-import gecv.struct.wavelet.WlBorderCoef;
 import gecv.struct.wavelet.WlCoef;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -67,8 +66,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 			@Override
 			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				WlCoef coef = desc.getForward();
-				equalsTranHorizontal(coef,input,expected,found );
+				equalsTranHorizontal(desc,input,expected,found );
 			}
 		};
 
@@ -80,8 +78,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 			@Override
 			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				WlCoef coef = desc.getForward();
-				equalsTranVertical(coef,input,expected,found );
+				equalsTranVertical(desc,input,expected,found );
 			}
 		};
 
@@ -93,10 +90,9 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 			@Override
 			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				WlCoef coef = desc.getForward();
-				int border = Math.max(UtilWavelet.computeBorderStart(coef),
-						UtilWavelet.computeBorderEnd(coef,expected.width,input.width))-coef.offsetScaling*2;
-
+				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse());
+				int upperBorder = UtilWavelet.borderInverseLower(desc.getInverse());
+				int border = Math.max(lowerBorder,upperBorder+found.getWidth()%2);
 				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f,border);
 			}
 		};
@@ -109,9 +105,9 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 			@Override
 			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				WlCoef coef = desc.getForward();
-				int border = Math.max(UtilWavelet.computeBorderStart(coef),
-						UtilWavelet.computeBorderEnd(coef,expected.height,input.height))-coef.offsetScaling*2;
+				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse());
+				int upperBorder = UtilWavelet.borderInverseUpper(desc.getInverse());
+				int border = Math.max(lowerBorder,upperBorder+found.getHeight()%2);
 
 				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f,border);
 			}
@@ -124,18 +120,17 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	 * Compares two wavelet transformations while ignoring the input image borders.  Input borders
 	 * affect the borders of internal segments inside the transformation.
 	 */
-	private void equalsTranHorizontal( WlCoef desc,
+	private void equalsTranHorizontal( WaveletDescription<?> desc,
 									   ImageBase input ,
 									   ImageBase expected , ImageBase found ) {
-
-		int begin = UtilWavelet.computeBorderStart(desc);
-		int end = expected.getWidth()-UtilWavelet.computeBorderEnd(desc,input.width,expected.width);
-
 		int w = expected.width;
 		int h = expected.height;
 
-		equalsTranHorizontal(expected.subimage(0,0,w/2,h),found.subimage(0,0,w/2,h),begin/2,end/2,"left");
-		equalsTranHorizontal(expected.subimage(w/2,0,w,h),found.subimage(w/2,0,w,h),begin/2,end/2,"right");
+		int lowerBorder = UtilWavelet.borderForwardLower(desc.getInverse().getInnerCoefficients());
+		int upperBorder = input.width-input.width%2-UtilWavelet.borderForwardUpper(desc.getInverse().getInnerCoefficients());
+
+		equalsTranHorizontal(expected.subimage(0,0,w/2,h),found.subimage(0,0,w/2,h),lowerBorder/2,upperBorder/2,"left");
+		equalsTranHorizontal(expected.subimage(w/2,0,w,h),found.subimage(w/2,0,w,h),lowerBorder/2,upperBorder/2,"right");
 	}
 
 	/**
@@ -160,17 +155,17 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		}
 	}
 
-	private void equalsTranVertical( WlCoef desc,
+	private void equalsTranVertical( WaveletDescription<?> desc,
 									 ImageBase input ,
 									 ImageBase expected , ImageBase found ) {
-		int begin = UtilWavelet.computeBorderStart(desc);
-		int end = expected.getHeight()-UtilWavelet.computeBorderEnd(desc,input.height,expected.height);
-
 		int w = expected.width;
 		int h = expected.height;
 
-		equalsTranVertical(expected.subimage(0,0,w,h/2),found.subimage(0,0,w,h/2),begin/2,end/2,"top");
-		equalsTranVertical(expected.subimage(0,h/2,w,h),found.subimage(0,h/2,w,h),begin/2,end/2,"bottom");
+		int lowerBorder = UtilWavelet.borderForwardLower(desc.getInverse().getInnerCoefficients());
+		int upperBorder = input.height-input.height%2-UtilWavelet.borderForwardUpper(desc.getInverse().getInnerCoefficients());
+
+		equalsTranVertical(expected.subimage(0,0,w,h/2),found.subimage(0,0,w,h/2),lowerBorder/2,upperBorder/2,"top");
+		equalsTranVertical(expected.subimage(0,h/2,w,h),found.subimage(0,h/2,w,h),lowerBorder/2,upperBorder/2,"bottom");
 	}
 
 	private void equalsTranVertical( ImageBase expected , ImageBase found ,
@@ -201,17 +196,18 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		}
 	}
 
-	public static void applyInnerMethod( String functionName , WaveletDescription<?> desc, ImageBase input, ImageBase output) {
+	public static void applyInnerMethod( String functionName , WaveletDescription<?> desc, ImageBase input, ImageBase output ) {
+
 		Method m;
 		Object args[];
 		if( functionName.contains("Inverse")) {
-			WlBorderCoef<?> inv = desc.getInverse();
-			m = GecvTesting.findMethod(ImplWaveletTransformInner.class,functionName,inv.getClass(),input.getClass(),output.getClass());
-			args = new Object[]{inv,input,output};
+			WlCoef coef = desc.getInverse().getInnerCoefficients();
+			m = GecvTesting.findMethod(ImplWaveletTransformInner.class,functionName,coef.getClass(),input.getClass(),output.getClass());
+			args = new Object[]{coef,input,output};
 		} else {
-			Class<?> coefClass = desc.getForward().getClass();
-			m = GecvTesting.findMethod(ImplWaveletTransformInner.class,functionName,coefClass,input.getClass(),output.getClass());
-			args = new Object[]{desc.getForward(),input,output};
+			WlCoef coef = desc.getForward();
+			m = GecvTesting.findMethod(ImplWaveletTransformInner.class,functionName,coef.getClass(),input.getClass(),output.getClass());
+			args = new Object[]{coef,input,output};
 		}
 
 		try {

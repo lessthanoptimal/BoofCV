@@ -627,6 +627,7 @@ public class GecvTesting {
 		SingleBandImage a = FactorySingleBandImage.wrap(imgA);
 		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
 
+		System.out.println("------- Difference -----------");
 		for( int y = 0; y < imgA.getHeight(); y++ ) {
 			for( int x = 0; x < imgA.getWidth(); x++ ) {
 				double diff = Math.abs(a.get(x,y).doubleValue()-b.get(x,y).doubleValue());

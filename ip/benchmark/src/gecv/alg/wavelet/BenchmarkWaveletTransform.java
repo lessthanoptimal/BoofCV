@@ -19,8 +19,6 @@ package gecv.alg.wavelet;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.misc.ImageTestingOps;
-import gecv.alg.wavelet.impl.ImplWaveletTransformBorder;
-import gecv.alg.wavelet.impl.ImplWaveletTransformInner;
 import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
@@ -55,14 +53,11 @@ public class BenchmarkWaveletTransform {
 		}
 	}
 
-	public static class Inner_F32 extends PerformerBase {
+	public static class Standard_F32 extends PerformerBase {
 
 		@Override
 		public void process() {
-			ImplWaveletTransformInner.horizontal(desc_F32.getForward(),orig_F32,temp1_F32);
-			ImplWaveletTransformBorder.horizontal(desc_F32.getBorder(),desc_F32.getForward(),orig_F32,temp1_F32);
-			ImplWaveletTransformInner.vertical(desc_F32.getForward(),orig_F32,temp1_F32);
-			ImplWaveletTransformBorder.vertical(desc_F32.getBorder(),desc_F32.getForward(),orig_F32,temp1_F32);
+			WaveletTransformOps.transform1(desc_F32,orig_F32,temp1_F32,temp1_F32);
 		}
 	}
 
@@ -97,6 +92,6 @@ public class BenchmarkWaveletTransform {
 
 		ProfileOperation.printOpsPerSec(new FullLevel3_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Naive_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Inner_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Standard_F32(), TEST_TIME);
 	}
 }

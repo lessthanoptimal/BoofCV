@@ -64,19 +64,22 @@ public class CommonFactoryWavelet {
 
 			BorderIndex1D border = waveletDesc.getBorder();
 
+			// First test again naive transform operations, which are the standard implementation
 			ImplWaveletTransformNaive.horizontal(border,waveletDesc.forward,orig,tran);
 			ImplWaveletTransformNaive.horizontalInverse(border,waveletDesc.inverse,tran,rev);
-
-//			BasicImageIO.print(orig);
-//			System.out.println();
-//			BasicImageIO.print(rev);
-
-//			GecvTesting.printDiff(orig,rev);
 
 			GecvTesting.assertEquals(orig,rev,0,1e-4f);
 
 			ImplWaveletTransformNaive.vertical(border,waveletDesc.forward,orig,tran);
 			ImplWaveletTransformNaive.verticalInverse(border,waveletDesc.inverse,tran,rev);
+
+			GecvTesting.assertEquals(orig,rev,0,1e-4f);
+
+			// quick sanity check to make sure that WaveletTransformOps
+			// also correctly does a transform with these wavelets
+			// more of a robustness test of WaveletTransformOps than anything else
+			WaveletTransformOps.transform1(waveletDesc,orig,tran,null);
+			WaveletTransformOps.inverse1(waveletDesc,tran,rev,null);
 
 			GecvTesting.assertEquals(orig,rev,0,1e-4f);
 		}
@@ -126,7 +129,7 @@ public class CommonFactoryWavelet {
 		DenseMatrix64F A = new DenseMatrix64F(N,N);
 		DenseMatrix64F B = new DenseMatrix64F(N,N);
 
-		// using the wrapping rule construct a matrix with the coefficients
+		// using the provided wrapping rule to construct a matrix with the coefficients
 		for( int i = 0; i < N; i += 2 ) {
 			for( int j = 0; j < forward.scaling.length; j++ ) {
 				int index = border.getIndex(i+j+forward.offsetScaling);
@@ -138,7 +141,7 @@ public class CommonFactoryWavelet {
 			}
 		}
 
-		// the inverse coefficients should be a matrix which is the inverse of the forward coefficients
+		// the inverse coefficients should create a matrix that is the inverse of the forward coefficients
 		final int lowerBorder = desc.getInverse().getLowerLength()*2;
 		final int upperBorder = N-desc.getInverse().getUpperLength()*2;
 
