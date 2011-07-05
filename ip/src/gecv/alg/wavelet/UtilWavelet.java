@@ -171,7 +171,10 @@ public class UtilWavelet {
 	public static int borderForwardUpper( WlCoef desc , int dataLength) {
 		int w = Math.max( desc.offsetScaling+desc.getScalingLength() , desc.offsetWavelet+desc.getWaveletLength());
 
-		return Math.max((w + (w%2))-2,0) + dataLength%2;
+		int a = dataLength%2;
+		w -= a;
+
+		return Math.max((w + (w%2))-2,0)+a;
 	}
 
 	/**
@@ -253,14 +256,9 @@ public class UtilWavelet {
 		}
 
 		border.setLength(2000);
-		int initial = borderSize;
-		borderSize = checkInverseUpper(uu,1998,border,borderSize);
+		borderSize = checkInverseUpper(uu,2000-borderSize,border,borderSize);
 		borderSize = checkInverseUpper(ul,indexUL,border,borderSize);
 		borderSize = checkInverseUpper(ll,0,border,borderSize);
-
-//		if( borderSize != initial ) {
-//			borderSize += 2*(dataLength%2);
-//		}
 
 		return borderSize;
 	}

@@ -90,17 +90,18 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 			@Override
 			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				GecvTesting.printDiff(expected,found);
+//				GecvTesting.printDiff(expected,found);
 				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse(),desc.getBorder());
 				int upperBorder = UtilWavelet.borderInverseUpper(desc.getInverse(),desc.getBorder(),found.getWidth());
 
 				int w = expected.getWidth();
 				int h = expected.getHeight();
+				
+//				System.out.print("lb "+lowerBorder+" ub "+upperBorder);
 
 				// only compare the relevant portion of the images
 				expected = expected.subimage(lowerBorder,0,w+w%2-upperBorder,h);
 				found = found.subimage(lowerBorder,0,w+w%2-upperBorder,h);
-				System.out.print("lb "+lowerBorder+" ub "+upperBorder);
 				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};

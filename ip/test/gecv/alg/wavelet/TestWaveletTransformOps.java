@@ -37,6 +37,27 @@ public class TestWaveletTransformOps {
 	int height = 300;
 
 	/**
+	 * See if images which are the smallest possible can be transformed.
+	 */
+	@Test
+	public void smallImage(){
+		for( int i = 4; i < 20; i++ ) {
+			WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(4);
+
+			ImageFloat32 input = new ImageFloat32(i,i);
+			ImageFloat32 output = new ImageFloat32(input.width+(input.width%2),input.height+(input.height%2));
+			ImageFloat32 found = new ImageFloat32(input.width,input.height);
+
+			ImageTestingOps.randomize(input,rand,0,50);
+
+			WaveletTransformOps.transform1(desc,input,output,null);
+			WaveletTransformOps.inverse1(desc,output,found,null);
+
+			GecvTesting.assertEquals(input,found,0,1e-4f);
+		}
+	}
+
+	/**
 	 * Performs a forward and reverse transform and sees if it gets the original image back
 	 */
 	@Test

@@ -22,6 +22,7 @@ import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 import gecv.struct.wavelet.WlBorderCoef;
+import gecv.struct.wavelet.WlCoef;
 import gecv.struct.wavelet.WlCoef_F32;
 import gecv.struct.wavelet.WlCoef_I32;
 
@@ -55,10 +56,10 @@ public class ImplWaveletTransformBorder {
 		final float[] alpha = coefficients.scaling;
 		final float[] beta = coefficients.wavelet;
 
-		border.setLength(output.width);
+		border.setLength(input.width + input.width%2);
 
 		final boolean isLarger = output.width > input.width;
-		final int width = output.width;
+		final int width = input.width+input.width%2;
 		final int height = input.height;
 		final int lowerBorder = UtilWavelet.borderForwardLower(coefficients);
 		final int upperBorder = input.width - UtilWavelet.borderForwardUpper(coefficients,input.width);
@@ -84,7 +85,7 @@ public class ImplWaveletTransformBorder {
 				int outX = x/2;
 
 				output.set(outX,y,scale);
-				output.set(width/2 + outX , y , wavelet );
+				output.set(output.width/2 + outX , y , wavelet );
 			}
 			for( int x = upperBorder; x < width; x += 2 ) {
 				float scale = 0;
@@ -106,7 +107,7 @@ public class ImplWaveletTransformBorder {
 				int outX = x/2;
 
 				output.set(outX,y,scale);
-				output.set(width/2 + outX , y , wavelet );
+				output.set(output.width/2 + outX , y , wavelet );
 			}
 		}
 	}
@@ -118,11 +119,11 @@ public class ImplWaveletTransformBorder {
 		final float[] alpha = coefficients.scaling;
 		final float[] beta = coefficients.wavelet;
 
-		border.setLength(output.height);
+		border.setLength(input.height + input.height%2);
 
 		final boolean isLarger = output.height > input.height;
 		final int width = input.width;
-		final int height = output.height;
+		final int height = input.height+input.height%2;
 		final int lowerBorder = UtilWavelet.borderForwardLower(coefficients);
 		final int upperBorder = input.height - UtilWavelet.borderForwardUpper(coefficients,input.height);
 
@@ -147,7 +148,7 @@ public class ImplWaveletTransformBorder {
 				int outY = y/2;
 
 				output.set(x , outY,scale);
-				output.set(x , height/2 + outY , wavelet );
+				output.set(x , output.height/2 + outY , wavelet );
 			}
 
 			for( int y = upperBorder; y < height; y += 2 ) {
@@ -170,7 +171,7 @@ public class ImplWaveletTransformBorder {
 				int outY = y/2;
 
 				output.set(x , outY,scale);
-				output.set(x , height/2 + outY , wavelet );
+				output.set(x , output.height/2 + outY , wavelet );
 			}
 		}
 	}
@@ -180,14 +181,24 @@ public class ImplWaveletTransformBorder {
 		float []trends = new float[ input.width ];
 		float []details = new float[ input.width ];
 
-		final int width = input.width;
 		final int height = output.height;
 		final int paddedWidth = output.width + output.width%2;
 
-		int lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;
-		// todo remove hack
-//		int upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.width)/2;
-		int upperBorder = (paddedWidth-lowerBorder)/2;
+		WlCoef inner = desc.getInnerCoefficients();
+		// need to convolve coefficients that influence the ones being updated
+		int lowerExtra = -Math.min(inner.offsetScaling,inner.offsetWavelet);
+		int upperExtra = Math.max(inner.getScalingLength()+inner.offsetScaling,inner.getWaveletLength()+inner.offsetWavelet);
+		lowerExtra += lowerExtra%2;
+		upperExtra += upperExtra%2;
+
+		int lowerBorder = (UtilWavelet.borderInverseLower(desc,border)+lowerExtra)/2;
+		int upperBorder = (UtilWavelet.borderInverseUpper(desc,border,output.width)+upperExtra)/2;
+
+		boolean isLarger = input.width >= output.width;
+		
+		// where updated wavelet values are stored
+		int lowerCompute = lowerBorder*2-lowerExtra;
+		int upperCompute = upperBorder*2-upperExtra;
 
 		int indexes[] = new int[lowerBorder+upperBorder];
 		for( int i = 0; i < lowerBorder; i++ )
@@ -195,7 +206,9 @@ public class ImplWaveletTransformBorder {
 		for( int i = lowerBorder; i < indexes.length; i++ )
 			indexes[i] = paddedWidth-(indexes.length-i)*2;
 
-		border.setLength(input.width);
+		border.setLength(output.width+output.width%2);
+
+		WlCoef_F32 coefficients;
 
 		for( int y = 0; y < height; y++ ) {
 
@@ -209,52 +222,45 @@ public class ImplWaveletTransformBorder {
 
 			for( int i = 0; i < indexes.length; i++ ) {
 				int x = indexes[i];
-				WlCoef_F32 coef;
-				if( x < desc.getLowerLength()*2 )
-					coef = desc.getBorderCoefficients(x);
-				else
-					coef = desc.getBorderCoefficients(x-paddedWidth);
+				float a = input.get(x/2,y);
+				float d = input.get(input.width/2+x/2,y);
 
-				int s = coef.offsetScaling; s -= s%2;
-				int e = coef.getScalingLength()+coef.offsetScaling;
-
-				for( int j = s; j < e; j += 2 ) {
-					int xx = border.getIndex(x-j);
-					trends[x] += input.get(xx/2,y)*coef.scaling[j-coef.offsetScaling];
+				if( x < lowerBorder ) {
+					coefficients = desc.getBorderCoefficients(x);
+				} else if( x >= upperBorder ) {
+					coefficients = desc.getBorderCoefficients(x-paddedWidth);
+				} else {
+					coefficients = desc.getInnerCoefficients();
 				}
 
-				s = coef.offsetScaling-1; s -= s%2;
-				e = coef.getScalingLength()+coef.offsetScaling-1;
+				final int offsetA = coefficients.offsetScaling;
+				final int offsetB = coefficients.offsetWavelet;
+				final float[] alpha = coefficients.scaling;
+				final float[] beta = coefficients.wavelet;
 
-				for( int j = s; j < e; j += 2 ) {
-					int xx = border.getIndex(x-j);
-					trends[x+1] += input.get(xx/2,y)*coef.scaling[j-coef.offsetScaling+1];
+				// add the trend
+				for( int j = 0; j < alpha.length; j++ ) {
+					// if an odd image don't update the outer edge
+					int xx = border.getIndex(x+offsetA+j);
+					if( isLarger && xx >= output.width )
+						continue;
+					trends[xx] += a*alpha[j];
 				}
 
-				s = coef.offsetScaling; s -= s%2;
-				e = coef.getWaveletLength()+coef.offsetWavelet;
-
-				for( int j = s; j < e; j += 2 ) {
-					int xx = border.getIndex(x-j);
-					details[x] += input.get(xx/2+width/2,y)*coef.wavelet[j-coef.offsetWavelet];
-				}
-
-				s = coef.offsetScaling-1; s -= s%2;
-				e = coef.getWaveletLength()+coef.offsetWavelet-1;
-
-				for( int j = s; j < e; j += 2 ) {
-					int xx = border.getIndex(x-j+1);
-					details[x+1] += input.get(xx/2+width/2,y)*coef.wavelet[j-coef.offsetWavelet+1];
+				// add the detail signal
+				for( int j = 0; j < beta.length; j++ ) {
+					int xx = border.getIndex(x+offsetB+j);
+					if( isLarger && xx >= output.width )
+						continue;
+					details[xx] += d*beta[j];
 				}
 			}
 
 			int indexDst = output.startIndex + y*output.stride;
-			for( int i = 0; i < indexes.length; i++ ) {
-				int x = indexes[i];
+			for( int x = 0; x < lowerCompute; x++ ) {
 				output.data[ indexDst + x ] = (trends[x] + details[x]);
-				x++;
-				if( x >= output.width )
-					continue;
+			}
+			for( int x = paddedWidth-upperCompute; x < output.width; x++) {
 				output.data[ indexDst + x ] = (trends[x] + details[x]);
 			}
 		}
@@ -266,11 +272,23 @@ public class ImplWaveletTransformBorder {
 		float []details = new float[ input.height ];
 
 		final int width = output.width;
-		final int height = input.height;
 		final int paddedHeight = output.height + output.height%2;
 
-		int lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;
-		int upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.height)/2;
+		WlCoef inner = desc.getInnerCoefficients();
+		// need to convolve coefficients that influence the ones being updated
+		int lowerExtra = -Math.min(inner.offsetScaling,inner.offsetWavelet);
+		int upperExtra = Math.max(inner.getScalingLength()+inner.offsetScaling,inner.getWaveletLength()+inner.offsetWavelet);
+		lowerExtra += lowerExtra%2;
+		upperExtra += upperExtra%2;
+
+		int lowerBorder = (UtilWavelet.borderInverseLower(desc,border)+lowerExtra)/2;
+		int upperBorder = (UtilWavelet.borderInverseUpper(desc,border,output.height)+upperExtra)/2;
+
+		boolean isLarger = input.height >= output.height;
+		
+		// where updated wavelet values are stored
+		int lowerCompute = lowerBorder*2-lowerExtra;
+		int upperCompute = upperBorder*2-upperExtra;
 
 		int indexes[] = new int[lowerBorder+upperBorder];
 		for( int i = 0; i < lowerBorder; i++ )
@@ -278,7 +296,9 @@ public class ImplWaveletTransformBorder {
 		for( int i = lowerBorder; i < indexes.length; i++ )
 			indexes[i] = paddedHeight-(indexes.length-i)*2;
 
-		border.setLength(input.height);
+		border.setLength(output.height+output.height%2);
+
+		WlCoef_F32 coefficients;
 
 		for( int x = 0; x < width; x++ ) {
 
@@ -292,52 +312,45 @@ public class ImplWaveletTransformBorder {
 
 			for( int i = 0; i < indexes.length; i++ ) {
 				int y = indexes[i];
-				WlCoef_F32 coef;
-				if( y < desc.getLowerLength()*2 )
-					coef = desc.getBorderCoefficients(y);
-				else
-					coef = desc.getBorderCoefficients(y-paddedHeight);
+				float a = input.get(x,y/2);
+				float d = input.get(x,input.height/2+y/2);
 
-				int s = coef.offsetScaling; s -= s%2;
-				int e = coef.getScalingLength()+coef.offsetScaling;
-
-				for( int j = s; j < e; j += 2 ) {
-					int yy = border.getIndex(y-j);
-					trends[y] += input.get(x,yy/2)*coef.scaling[j-coef.offsetScaling];
+				if( y < lowerBorder ) {
+					coefficients = desc.getBorderCoefficients(y);
+				} else if( y >= upperBorder ) {
+					coefficients = desc.getBorderCoefficients(y-paddedHeight);
+				} else {
+					coefficients = desc.getInnerCoefficients();
 				}
 
-				s = coef.offsetScaling-1; s -= s%2;
-				e = coef.getScalingLength()+coef.offsetScaling-1;
+				final int offsetA = coefficients.offsetScaling;
+				final int offsetB = coefficients.offsetWavelet;
+				final float[] alpha = coefficients.scaling;
+				final float[] beta = coefficients.wavelet;
 
-				for( int j = s; j < e; j += 2 ) {
-					int yy = border.getIndex(y-j);
-					trends[y+1] += input.get(x,yy/2)*coef.scaling[j-coef.offsetScaling+1];
+				// add the trend
+				for( int j = 0; j < alpha.length; j++ ) {
+					// if an odd image don't update the outer edge
+					int yy = border.getIndex(y+offsetA+j);
+					if( isLarger && yy >= output.height )
+						continue;
+					trends[yy] += a*alpha[j];
 				}
 
-				s = coef.offsetScaling; s -= s%2;
-				e = coef.getWaveletLength()+coef.offsetWavelet;
-
-				for( int j = s; j < e; j += 2 ) {
-					int yy = border.getIndex(y-j);
-					details[y] += input.get(x,yy/2+height/2)*coef.wavelet[j-coef.offsetWavelet];
-				}
-
-				s = coef.offsetScaling-1; s -= s%2;
-				e = coef.getWaveletLength()+coef.offsetWavelet-1;
-
-				for( int j = s; j < e; j += 2 ) {
-					int yy = border.getIndex(y-j+1);
-					details[y+1] += input.get(x,yy/2+height/2)*coef.wavelet[j-coef.offsetWavelet+1];
+				// add the detail signal
+				for( int j = 0; j < beta.length; j++ ) {
+					int yy = border.getIndex(y+offsetB+j);
+					if( isLarger && yy >= output.height )
+						continue;
+					details[yy] += d*beta[j];
 				}
 			}
 
 			int indexDst = output.startIndex + x;
-			for( int i = 0; i < indexes.length; i++ ) {
-				int y = indexes[i];
+			for( int y = 0; y < lowerCompute; y++ ) {
 				output.data[ indexDst + y*output.stride ] = (trends[y] + details[y]);
-				y++;
-				if( y >= output.height )
-					continue;
+			}
+			for( int y = paddedHeight-upperCompute; y < output.height; y++) {
 				output.data[ indexDst + y*output.stride ] = (trends[y] + details[y]);
 			}
 		}
@@ -350,10 +363,10 @@ public class ImplWaveletTransformBorder {
 		final int[] alpha = coefficients.scaling;
 		final int[] beta = coefficients.wavelet;
 
-		border.setLength(output.width);
+		border.setLength(input.width + input.width%2);
 
 		final boolean isLarger = output.width > input.width;
-		final int width = output.width;
+		final int width = input.width+input.width%2;
 		final int height = input.height;
 		final int lowerBorder = UtilWavelet.borderForwardLower(coefficients);
 		final int upperBorder = input.width - UtilWavelet.borderForwardUpper(coefficients,input.width);
@@ -382,7 +395,7 @@ public class ImplWaveletTransformBorder {
 				int outX = x/2;
 
 				output.set(outX,y,scale);
-				output.set(width/2 + outX , y , wavelet );
+				output.set(output.width/2 + outX , y , wavelet );
 			}
 			for( int x = upperBorder; x < width; x += 2 ) {
 				int scale = 0;
@@ -407,7 +420,7 @@ public class ImplWaveletTransformBorder {
 				wavelet = 2*wavelet/coefficients.denominatorWavelet;
 
 				output.set(outX,y,scale);
-				output.set(width/2 + outX , y , wavelet );
+				output.set(output.width/2 + outX , y , wavelet );
 			}
 		}
 	}
@@ -419,11 +432,11 @@ public class ImplWaveletTransformBorder {
 		final int[] alpha = coefficients.scaling;
 		final int[] beta = coefficients.wavelet;
 
-		border.setLength(output.height);
+		border.setLength(input.height + input.height%2);
 
 		final boolean isLarger = output.height > input.height;
 		final int width = input.width;
-		final int height = output.height;
+		final int height = input.height+input.height%2;
 		final int lowerBorder = UtilWavelet.borderForwardLower(coefficients);
 		final int upperBorder = input.height - UtilWavelet.borderForwardUpper(coefficients,input.height);
 
@@ -451,7 +464,7 @@ public class ImplWaveletTransformBorder {
 				wavelet = 2*wavelet/coefficients.denominatorWavelet;
 
 				output.set(x , outY,scale);
-				output.set(x , height/2 + outY , wavelet );
+				output.set(x , output.height/2 + outY , wavelet );
 			}
 
 			for( int y = upperBorder; y < height; y += 2 ) {
@@ -477,7 +490,7 @@ public class ImplWaveletTransformBorder {
 				wavelet = 2*wavelet/coefficients.denominatorWavelet;
 
 				output.set(x , outY,scale);
-				output.set(x , height/2 + outY , wavelet );
+				output.set(x , output.height/2 + outY , wavelet );
 			}
 		}
 	}
@@ -487,12 +500,24 @@ public class ImplWaveletTransformBorder {
 		int []trends = new int[ input.width ];
 		int []details = new int[ input.width ];
 
-		final int width = input.width;
 		final int height = output.height;
 		final int paddedWidth = output.width + output.width%2;
 
-		int lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;
-		int upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.width)/2;
+		WlCoef inner = desc.getInnerCoefficients();
+		// need to convolve coefficients that influence the ones being updated
+		int lowerExtra = -Math.min(inner.offsetScaling,inner.offsetWavelet);
+		int upperExtra = Math.max(inner.getScalingLength()+inner.offsetScaling,inner.getWaveletLength()+inner.offsetWavelet);
+		lowerExtra += lowerExtra%2;
+		upperExtra += upperExtra%2;
+
+		int lowerBorder = (UtilWavelet.borderInverseLower(desc,border)+lowerExtra)/2;
+		int upperBorder = (UtilWavelet.borderInverseUpper(desc,border,output.width)+upperExtra)/2;
+
+		boolean isLarger = input.width >= output.width;
+		
+		// where updated wavelet values are stored
+		int lowerCompute = lowerBorder*2-lowerExtra;
+		int upperCompute = upperBorder*2-upperExtra;
 
 		int indexes[] = new int[lowerBorder+upperBorder];
 		for( int i = 0; i < lowerBorder; i++ )
@@ -500,7 +525,13 @@ public class ImplWaveletTransformBorder {
 		for( int i = lowerBorder; i < indexes.length; i++ )
 			indexes[i] = paddedWidth-(indexes.length-i)*2;
 
-		border.setLength(input.width);
+		border.setLength(output.width+output.width%2);
+
+		WlCoef_I32 coefficients = desc.getInnerCoefficients();
+		final int e = coefficients.denominatorScaling*2;
+		final int f = coefficients.denominatorWavelet*2;
+		final int ef = e*f;
+		final int ef2 = ef/2;
 
 		for( int y = 0; y < height; y++ ) {
 
@@ -514,63 +545,45 @@ public class ImplWaveletTransformBorder {
 
 			for( int i = 0; i < indexes.length; i++ ) {
 				int x = indexes[i];
-				WlCoef_I32 coef;
-				if( x < desc.getLowerLength()*2 )
-					coef = desc.getBorderCoefficients(x);
-				else
-					coef = desc.getBorderCoefficients(x-paddedWidth);
+				float a = input.get(x/2,y);
+				float d = input.get(input.width/2+x/2,y);
 
-				int s = coef.offsetScaling; s -= s%2;
-				int e = coef.getScalingLength()+coef.offsetScaling;
-
-				for( int j = s; j < e; j += 2 ) {
-					int xx = border.getIndex(x-j);
-					trends[x] += input.get(xx/2,y)*coef.scaling[j-coef.offsetScaling];
+				if( x < lowerBorder ) {
+					coefficients = desc.getBorderCoefficients(x);
+				} else if( x >= upperBorder ) {
+					coefficients = desc.getBorderCoefficients(x-paddedWidth);
+				} else {
+					coefficients = desc.getInnerCoefficients();
 				}
 
-				s = coef.offsetScaling-1; s -= s%2;
-				e = coef.getScalingLength()+coef.offsetScaling-1;
+				final int offsetA = coefficients.offsetScaling;
+				final int offsetB = coefficients.offsetWavelet;
+				final int[] alpha = coefficients.scaling;
+				final int[] beta = coefficients.wavelet;
 
-				for( int j = s; j < e; j += 2 ) {
-					int xx = border.getIndex(x-j);
-					trends[x+1] += input.get(xx/2,y)*coef.scaling[j-coef.offsetScaling+1];
+				// add the trend
+				for( int j = 0; j < alpha.length; j++ ) {
+					// if an odd image don't update the outer edge
+					int xx = border.getIndex(x+offsetA+j);
+					if( isLarger && xx >= output.width )
+						continue;
+					trends[xx] += a*alpha[j];
 				}
 
-				s = coef.offsetScaling; s -= s%2;
-				e = coef.getWaveletLength()+coef.offsetWavelet;
-
-				for( int j = s; j < e; j += 2 ) {
-					int xx = border.getIndex(x-j);
-					details[x] += input.get(xx/2+width/2,y)*coef.wavelet[j-coef.offsetWavelet];
-				}
-
-				s = coef.offsetScaling-1; s -= s%2;
-				e = coef.getWaveletLength()+coef.offsetWavelet-1;
-
-				for( int j = s; j < e; j += 2 ) {
-					int xx = border.getIndex(x-j+1);
-					details[x+1] += input.get(xx/2+width/2,y)*coef.wavelet[j-coef.offsetWavelet+1];
+				// add the detail signal
+				for( int j = 0; j < beta.length; j++ ) {
+					int xx = border.getIndex(x+offsetB+j);
+					if( isLarger && xx >= output.width )
+						continue;
+					details[xx] += d*beta[j];
 				}
 			}
 
 			int indexDst = output.startIndex + y*output.stride;
-			for( int i = 0; i < indexes.length; i++ ) {
-				int x = indexes[i];
-				WlCoef_I32 coef;
-				if( x < desc.getLowerLength()*2 )
-					coef = desc.getBorderCoefficients(x);
-				else
-					coef = desc.getBorderCoefficients(x-paddedWidth);
-
-				final int e = coef.denominatorScaling*2;
-				final int f = coef.denominatorWavelet*2;
-				final int ef = e*f;
-				final int ef2 = ef/2;
-
+			for( int x = 0; x < lowerCompute; x++ ) {
 				output.data[ indexDst + x ] = (short)((trends[x]*f + details[x]*e + ef2)/ef);
-				x++;
-				if( x >= output.width )
-					continue;
+			}
+			for( int x = paddedWidth-upperCompute; x < output.width; x++) {
 				output.data[ indexDst + x ] = (short)((trends[x]*f + details[x]*e + ef2)/ef);
 			}
 		}
@@ -582,11 +595,23 @@ public class ImplWaveletTransformBorder {
 		int []details = new int[ input.height ];
 
 		final int width = output.width;
-		final int height = input.height;
 		final int paddedHeight = output.height + output.height%2;
 
-		int lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;
-		int upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.height)/2;
+		WlCoef inner = desc.getInnerCoefficients();
+		// need to convolve coefficients that influence the ones being updated
+		int lowerExtra = -Math.min(inner.offsetScaling,inner.offsetWavelet);
+		int upperExtra = Math.max(inner.getScalingLength()+inner.offsetScaling,inner.getWaveletLength()+inner.offsetWavelet);
+		lowerExtra += lowerExtra%2;
+		upperExtra += upperExtra%2;
+
+		int lowerBorder = (UtilWavelet.borderInverseLower(desc,border)+lowerExtra)/2;
+		int upperBorder = (UtilWavelet.borderInverseUpper(desc,border,output.height)+upperExtra)/2;
+
+		boolean isLarger = input.height >= output.height;
+		
+		// where updated wavelet values are stored
+		int lowerCompute = lowerBorder*2-lowerExtra;
+		int upperCompute = upperBorder*2-upperExtra;
 
 		int indexes[] = new int[lowerBorder+upperBorder];
 		for( int i = 0; i < lowerBorder; i++ )
@@ -594,7 +619,13 @@ public class ImplWaveletTransformBorder {
 		for( int i = lowerBorder; i < indexes.length; i++ )
 			indexes[i] = paddedHeight-(indexes.length-i)*2;
 
-		border.setLength(input.height);
+		border.setLength(output.height+output.height%2);
+
+		WlCoef_I32 coefficients = desc.getInnerCoefficients();
+		final int e = coefficients.denominatorScaling*2;
+		final int f = coefficients.denominatorWavelet*2;
+		final int ef = e*f;
+		final int ef2 = ef/2;
 
 		for( int x = 0; x < width; x++ ) {
 
@@ -608,62 +639,45 @@ public class ImplWaveletTransformBorder {
 
 			for( int i = 0; i < indexes.length; i++ ) {
 				int y = indexes[i];
-				WlCoef_I32 coef;
-				if( y < desc.getLowerLength()*2 )
-					coef = desc.getBorderCoefficients(y);
-				else
-					coef = desc.getBorderCoefficients(y-paddedHeight);
+				float a = input.get(x,y/2);
+				float d = input.get(x,input.height/2+y/2);
 
-				int s = coef.offsetScaling; s -= s%2;
-				int e = coef.getScalingLength()+coef.offsetScaling;
-
-				for( int j = s; j < e; j += 2 ) {
-					int yy = border.getIndex(y-j);
-					trends[y] += input.get(x,yy/2)*coef.scaling[j-coef.offsetScaling];
+				if( y < lowerBorder ) {
+					coefficients = desc.getBorderCoefficients(y);
+				} else if( y >= upperBorder ) {
+					coefficients = desc.getBorderCoefficients(y-paddedHeight);
+				} else {
+					coefficients = desc.getInnerCoefficients();
 				}
 
-				s = coef.offsetScaling-1; s -= s%2;
-				e = coef.getScalingLength()+coef.offsetScaling-1;
+				final int offsetA = coefficients.offsetScaling;
+				final int offsetB = coefficients.offsetWavelet;
+				final int[] alpha = coefficients.scaling;
+				final int[] beta = coefficients.wavelet;
 
-				for( int j = s; j < e; j += 2 ) {
-					int yy = border.getIndex(y-j);
-					trends[y+1] += input.get(x,yy/2)*coef.scaling[j-coef.offsetScaling+1];
+				// add the trend
+				for( int j = 0; j < alpha.length; j++ ) {
+					// if an odd image don't update the outer edge
+					int yy = border.getIndex(y+offsetA+j);
+					if( isLarger && yy >= output.height )
+						continue;
+					trends[yy] += a*alpha[j];
 				}
 
-				s = coef.offsetScaling; s -= s%2;
-				e = coef.getWaveletLength()+coef.offsetWavelet;
-
-				for( int j = s; j < e; j += 2 ) {
-					int yy = border.getIndex(y-j);
-					details[y] += input.get(x,yy/2+height/2)*coef.wavelet[j-coef.offsetWavelet];
-				}
-
-				s = coef.offsetScaling-1; s -= s%2;
-				e = coef.getWaveletLength()+coef.offsetWavelet-1;
-
-				for( int j = s; j < e; j += 2 ) {
-					int yy = border.getIndex(y-j+1);
-					details[y+1] += input.get(x,yy/2+height/2)*coef.wavelet[j-coef.offsetWavelet+1];
+				// add the detail signal
+				for( int j = 0; j < beta.length; j++ ) {
+					int yy = border.getIndex(y+offsetB+j);
+					if( isLarger && yy >= output.height )
+						continue;
+					details[yy] += d*beta[j];
 				}
 			}
 
 			int indexDst = output.startIndex + x;
-			for( int i = 0; i < indexes.length; i++ ) {
-				int y = indexes[i];
-				WlCoef_I32 coef;
-				if( y < desc.getLowerLength()*2 )
-					coef = desc.getBorderCoefficients(y);
-				else
-					coef = desc.getBorderCoefficients(y-paddedHeight);
-				final int e = coef.denominatorScaling*2;
-				final int f = coef.denominatorWavelet*2;
-				final int ef = e*f;
-				final int ef2 = ef/2;
-
+			for( int y = 0; y < lowerCompute; y++ ) {
 				output.data[ indexDst + y*output.stride ] = (short)((trends[y]*f + details[y]*e + ef2)/ef);
-				y++;
-				if( y >= output.height )
-					continue;
+			}
+			for( int y = paddedHeight-upperCompute; y < output.height; y++) {
 				output.data[ indexDst + y*output.stride ] = (short)((trends[y]*f + details[y]*e + ef2)/ef);
 			}
 		}
