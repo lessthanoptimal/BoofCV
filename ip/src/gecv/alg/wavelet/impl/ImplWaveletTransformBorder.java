@@ -61,7 +61,7 @@ public class ImplWaveletTransformBorder {
 		final int width = output.width;
 		final int height = input.height;
 		final int lowerBorder = UtilWavelet.borderForwardLower(coefficients);
-		final int upperBorder = input.width - input.width%2 - UtilWavelet.borderForwardUpper(coefficients);
+		final int upperBorder = input.width - UtilWavelet.borderForwardUpper(coefficients,input.width);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < lowerBorder; x += 2 ) {
@@ -124,7 +124,7 @@ public class ImplWaveletTransformBorder {
 		final int width = input.width;
 		final int height = output.height;
 		final int lowerBorder = UtilWavelet.borderForwardLower(coefficients);
-		final int upperBorder = input.height - input.height%2 - UtilWavelet.borderForwardUpper(coefficients);
+		final int upperBorder = input.height - UtilWavelet.borderForwardUpper(coefficients,input.height);
 
 		for( int x = 0; x < width; x++) {
 			for( int y = 0; y < lowerBorder; y += 2 ) {
@@ -184,8 +184,10 @@ public class ImplWaveletTransformBorder {
 		final int height = output.height;
 		final int paddedWidth = output.width + output.width%2;
 
-		int lowerBorder = UtilWavelet.borderInverseLower(desc)/2;
-		int upperBorder = output.width%2 + UtilWavelet.borderInverseUpper(desc)/2;
+		int lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;
+		// todo remove hack
+//		int upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.width)/2;
+		int upperBorder = (paddedWidth-lowerBorder)/2;
 
 		int indexes[] = new int[lowerBorder+upperBorder];
 		for( int i = 0; i < lowerBorder; i++ )
@@ -267,8 +269,8 @@ public class ImplWaveletTransformBorder {
 		final int height = input.height;
 		final int paddedHeight = output.height + output.height%2;
 
-		int lowerBorder = UtilWavelet.borderInverseLower(desc)/2;
-		int upperBorder = output.height%2 + UtilWavelet.borderInverseUpper(desc)/2;
+		int lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;
+		int upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.height)/2;
 
 		int indexes[] = new int[lowerBorder+upperBorder];
 		for( int i = 0; i < lowerBorder; i++ )
@@ -354,7 +356,7 @@ public class ImplWaveletTransformBorder {
 		final int width = output.width;
 		final int height = input.height;
 		final int lowerBorder = UtilWavelet.borderForwardLower(coefficients);
-		final int upperBorder = input.width - input.width%2 - UtilWavelet.borderForwardUpper(coefficients);
+		final int upperBorder = input.width - UtilWavelet.borderForwardUpper(coefficients,input.width);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < lowerBorder; x += 2 ) {
@@ -423,7 +425,7 @@ public class ImplWaveletTransformBorder {
 		final int width = input.width;
 		final int height = output.height;
 		final int lowerBorder = UtilWavelet.borderForwardLower(coefficients);
-		final int upperBorder = input.height - input.height%2 - UtilWavelet.borderForwardUpper(coefficients);
+		final int upperBorder = input.height - UtilWavelet.borderForwardUpper(coefficients,input.height);
 
 		for( int x = 0; x < width; x++) {
 			for( int y = 0; y < lowerBorder; y += 2 ) {
@@ -489,8 +491,8 @@ public class ImplWaveletTransformBorder {
 		final int height = output.height;
 		final int paddedWidth = output.width + output.width%2;
 
-		int lowerBorder = UtilWavelet.borderInverseLower(desc)/2;
-		int upperBorder = output.width%2 + UtilWavelet.borderInverseUpper(desc)/2;
+		int lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;
+		int upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.width)/2;
 
 		int indexes[] = new int[lowerBorder+upperBorder];
 		for( int i = 0; i < lowerBorder; i++ )
@@ -583,8 +585,8 @@ public class ImplWaveletTransformBorder {
 		final int height = input.height;
 		final int paddedHeight = output.height + output.height%2;
 
-		int lowerBorder = UtilWavelet.borderInverseLower(desc)/2;
-		int upperBorder = output.height%2 + UtilWavelet.borderInverseUpper(desc)/2;
+		int lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;
+		int upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.height)/2;
 
 		int indexes[] = new int[lowerBorder+upperBorder];
 		for( int i = 0; i < lowerBorder; i++ )

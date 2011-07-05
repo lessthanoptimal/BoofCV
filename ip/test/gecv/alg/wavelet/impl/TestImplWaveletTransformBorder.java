@@ -87,7 +87,7 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
 //				System.out.println();
-//				GecvTesting.printDiff(expected,found);
+				GecvTesting.printDiff(expected,found);
 				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};

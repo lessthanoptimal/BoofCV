@@ -99,7 +99,7 @@ public class TestUtilWavelet {
 		desc.scaling = new float[lengthA];
 		desc.wavelet = new float[lengthB];
 
-		assertEquals(expected,UtilWavelet.borderForwardUpper(desc));
+		assertEquals(expected,UtilWavelet.borderForwardUpper(desc,-1));
 	}
 
 	@Test

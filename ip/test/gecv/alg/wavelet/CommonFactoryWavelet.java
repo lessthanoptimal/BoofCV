@@ -81,6 +81,7 @@ public class CommonFactoryWavelet {
 			WaveletTransformOps.transform1(waveletDesc,orig,tran,null);
 			WaveletTransformOps.inverse1(waveletDesc,tran,rev,null);
 
+//			GecvTesting.printDiff(orig,rev);
 			GecvTesting.assertEquals(orig,rev,0,1e-4f);
 		}
 	}

@@ -18,6 +18,8 @@ package gecv.alg.wavelet.impl;
 
 import gecv.alg.wavelet.WaveletBorderType;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.border.BorderIndex1D;
+import gecv.core.image.border.BorderIndex1D_Reflect;
 import gecv.core.image.border.BorderIndex1D_Wrap;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -81,6 +83,7 @@ public abstract class PermuteWaveletCompare {
 
 		// test different descriptions lengths and offsets, and borders
 		for( WaveletBorderType type : WaveletBorderType.values() ) {
+//		WaveletBorderType type = WaveletBorderType.WRAP; {
 			for( int o = 0; o <= 2; o++ ) {
 				for( int l = 2+o; l <= 5; l++ ) {
 					System.out.println("type "+type+" o = "+o+" l = "+l);
@@ -92,6 +95,7 @@ public abstract class PermuteWaveletCompare {
 					applyValidation(desc,input,expected);
 
 					// make sure it works on sub-images
+//					innerTest(input,found,expected,desc);
 					GecvTesting.checkSubImage(this,"innerTest",false,input,found, expected, desc);
 				}
 			}
@@ -123,14 +127,17 @@ public abstract class PermuteWaveletCompare {
 		WlCoef_F32 forward = createRandomCoef_F32(offset, length);
 
 		WlBorderCoef<WlCoef_F32> inverse;
+		BorderIndex1D border;
 
-		if( type == WaveletBorderType.WRAP )
+		if( type == WaveletBorderType.WRAP ) {
 			inverse = new WlBorderCoefStandard<WlCoef_F32>(forward);
-		else {
+			border = new BorderIndex1D_Wrap();
+		} else {
 			inverse = createWrappingCoef_F32(forward);
+			border = new BorderIndex1D_Reflect();
 		}
 
-		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),forward,inverse);
+		return new WaveletDescription<WlCoef_F32>(border,forward,inverse);
 	}
 
 	private WlCoef_F32 createRandomCoef_F32(int offset, int length) {
@@ -148,13 +155,25 @@ public abstract class PermuteWaveletCompare {
 	}
 
 	private WlBorderCoef<WlCoef_F32> createWrappingCoef_F32(WlCoef_F32 forward) {
-		WlBorderCoefFixed<WlCoef_F32> ret = new WlBorderCoefFixed<WlCoef_F32>(2,2);
+
+		int l = Math.max(forward.getScalingLength()+forward.offsetScaling,forward.getWaveletLength()+forward.offsetWavelet);
+
+		int numLower = -Math.max(forward.offsetScaling,forward.offsetWavelet);
+		int numUpper = Math.max(0,l-2);
+
+		numLower = (numLower + numLower%2)/2;
+		numUpper = (numUpper + numUpper%2)/2;
+
+
+		WlBorderCoefFixed<WlCoef_F32> ret = new WlBorderCoefFixed<WlCoef_F32>(numLower,numUpper);
 		ret.setInnerCoef(forward);
 
-		ret.setLower(0,createRandomCoef_F32(1, forward.getScalingLength()));
-		ret.setLower(1,createRandomCoef_F32(2, forward.getScalingLength()));
-		ret.setUpper(0,createRandomCoef_F32(1, forward.getScalingLength()));
-		ret.setUpper(1,createRandomCoef_F32(2, forward.getScalingLength()));
+		for( int i = 0; i < numLower; i++ ) {
+			ret.setLower(i,createRandomCoef_F32(forward.offsetScaling, forward.getScalingLength()));
+		}
+		for( int j = 0; j < numUpper; j++ ) {
+			ret.setUpper(j,createRandomCoef_F32(forward.offsetScaling, forward.getScalingLength()));
+		}
 
 		return ret;
 	}
@@ -178,8 +197,11 @@ public abstract class PermuteWaveletCompare {
 				forward.wavelet[i] = 1;
 		}
 
+		BorderIndex1D border = new BorderIndex1D_Wrap();
+
+		// todo add support for reflect
 		WlBorderCoef<WlCoef_I32> inverse = new WlBorderCoefStandard<WlCoef_I32>(forward);
 
-		return new WaveletDescription<WlCoef_I32>(new BorderIndex1D_Wrap(),forward,inverse);
+		return new WaveletDescription<WlCoef_I32>(border,forward,inverse);
 	}
 }

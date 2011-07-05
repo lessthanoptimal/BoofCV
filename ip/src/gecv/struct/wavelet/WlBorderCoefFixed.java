@@ -76,7 +76,11 @@ public class WlBorderCoefFixed<T extends WlCoef> implements WlBorderCoef<T> {
 			else
 				return innerCoef;
 		} else {
-			return upperCoef[(-index)/2-1];
+			index = (-index)/2-1;
+			if( index < upperCoef.length )
+				return upperCoef[index];
+			else
+				return innerCoef;
 		}
 	}
 

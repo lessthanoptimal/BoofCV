@@ -16,6 +16,7 @@
 
 package gecv.alg.wavelet;
 
+import gecv.core.image.border.BorderIndex1D;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.wavelet.WlBorderCoef;
@@ -167,28 +168,122 @@ public class UtilWavelet {
 	/**
 	 * Returns the upper border (offset from image edge) for a forward wavelet transform.
 	 */
-	public static int borderForwardUpper( WlCoef desc ) {
+	public static int borderForwardUpper( WlCoef desc , int dataLength) {
 		int w = Math.max( desc.offsetScaling+desc.getScalingLength() , desc.offsetWavelet+desc.getWaveletLength());
 
-		return Math.max((w + (w%2))-2,0);
+		return Math.max((w + (w%2))-2,0) + dataLength%2;
 	}
 
 	/**
 	 * Returns the lower border for an inverse wavelet transform.
 	 */
-	public static int borderInverseLower( WlBorderCoef<?> desc ) {
-		WlCoef c = desc.getInnerCoefficients();
-		int m = Math.max(c.getScalingLength()+c.offsetScaling,c.getWaveletLength()+c.offsetWavelet);
-		int ret = borderForwardLower(c)-2+m;
-		return ret + ret%2;
+	public static int borderInverseLower( WlBorderCoef<?> desc, BorderIndex1D border  ) {
+
+		WlCoef inner = desc.getInnerCoefficients();
+		int borderSize = borderForwardLower(inner);
+
+		WlCoef ll = borderSize > 0 ? inner : null;
+		WlCoef lu = ll;
+		WlCoef uu = inner;
+		int indexLU = 0;
+
+		if( desc.getLowerLength() > 0 ) {
+			ll = desc.getBorderCoefficients(0);
+			indexLU = desc.getLowerLength()*2-2;
+			lu = desc.getBorderCoefficients(indexLU);
+		}
+
+		if( desc.getUpperLength() > 0 ) {
+			uu = desc.getBorderCoefficients(-2);
+		}
+
+		border.setLength(2000);
+		borderSize = checkInverseLower(ll,0,border,borderSize);
+		borderSize = checkInverseLower(lu,indexLU,border,borderSize);
+		borderSize = checkInverseLower(uu,1998,border,borderSize);
+
+		return borderSize;
+	}
+
+	public static int checkInverseLower( WlCoef coef, int index , BorderIndex1D border , int current ) {
+		if( coef == null )
+			return current;
+
+		// how far up and down the coefficients go
+		int a = index + Math.max( coef.getScalingLength()+coef.offsetScaling,coef.getWaveletLength()+coef.offsetScaling);
+		int b = index + Math.min( coef.offsetScaling , coef.offsetWavelet ) -1;
+		// the above -1 is needed because the lower bound is becoming an upper bound.
+		// lower bounds are inclusive and upper bounds are exclusive
+
+		// take in account the border
+		a = border.getIndex(a);
+		b = border.getIndex(b);
+
+		if( a > 1000 ) a = -1;
+		if( b > 1000 ) b = -1;
+
+		a = Math.max(a,b);
+		a += a%2;
+
+		return Math.max(a,current);
 	}
 
 	/**
 	 * Returns the upper border (offset from image edge) for an inverse wavelet transform.
 	 */
-	public static int borderInverseUpper( WlBorderCoef<?> desc ) {
-		WlCoef c = desc.getInnerCoefficients();
-		int ret = borderForwardUpper(c)-Math.min(c.offsetScaling,c.offsetWavelet);
-		return ret + ret%2;
+	public static int borderInverseUpper( WlBorderCoef<?> desc , BorderIndex1D border, int dataLength ) {
+
+		WlCoef inner = desc.getInnerCoefficients();
+		int borderSize = borderForwardUpper(inner,dataLength);
+		borderSize += borderSize%2;
+
+		WlCoef uu = borderSize > 0 ? inner : null;
+		WlCoef ul = uu;
+		WlCoef ll = inner;
+		int indexUL = 1998;
+
+		if( desc.getUpperLength() > 0 ) {
+			uu = desc.getBorderCoefficients(-2);
+			indexUL = 2000-desc.getUpperLength()*2;
+			ul = desc.getBorderCoefficients(2000-indexUL);
+		}
+
+		if( desc.getLowerLength() > 0 ) {
+			ll = desc.getBorderCoefficients(0);
+		}
+
+		border.setLength(2000);
+		int initial = borderSize;
+		borderSize = checkInverseUpper(uu,1998,border,borderSize);
+		borderSize = checkInverseUpper(ul,indexUL,border,borderSize);
+		borderSize = checkInverseUpper(ll,0,border,borderSize);
+
+//		if( borderSize != initial ) {
+//			borderSize += 2*(dataLength%2);
+//		}
+
+		return borderSize;
+	}
+
+	public static int checkInverseUpper( WlCoef coef, int index , BorderIndex1D border , int current ) {
+		if( coef == null )
+			return current;
+
+		// how far up and down the coefficients go
+		int a = index + Math.max( coef.getScalingLength()+coef.offsetScaling,coef.getWaveletLength()+coef.offsetScaling)-1;
+		int b = index + Math.min( coef.offsetScaling , coef.offsetWavelet );
+		// the plus 1 for 'a' is needed because the lower bound is inclusive not exclusive
+
+		// take in account the border
+		a = border.getIndex(a);
+		b = border.getIndex(b);
+
+		if( a < 1000 ) a = 10000;
+		if( b < 1000 ) b = 10000;
+
+		a = 2000-Math.min(a,b);
+		a += a%2;
+
+		return Math.max(a,current);
 	}
 }
