@@ -90,10 +90,18 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 			@Override
 			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse());
-				int upperBorder = UtilWavelet.borderInverseLower(desc.getInverse());
-				int border = Math.max(lowerBorder,upperBorder+found.getWidth()%2);
-				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f,border);
+				GecvTesting.printDiff(expected,found);
+				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse(),desc.getBorder());
+				int upperBorder = UtilWavelet.borderInverseUpper(desc.getInverse(),desc.getBorder(),found.getWidth());
+
+				int w = expected.getWidth();
+				int h = expected.getHeight();
+
+				// only compare the relevant portion of the images
+				expected = expected.subimage(lowerBorder,0,w+w%2-upperBorder,h);
+				found = found.subimage(lowerBorder,0,w+w%2-upperBorder,h);
+				System.out.print("lb "+lowerBorder+" ub "+upperBorder);
+				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};
 
@@ -105,11 +113,17 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 			@Override
 			public void compareResults(WaveletDescription<?> desc, ImageBase input,
 									   ImageBase expected, ImageBase found ) {
-				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse());
-				int upperBorder = UtilWavelet.borderInverseUpper(desc.getInverse());
-				int border = Math.max(lowerBorder,upperBorder+found.getHeight()%2);
+				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse(),desc.getBorder());
+				int upperBorder = UtilWavelet.borderInverseUpper(desc.getInverse(),desc.getBorder(),found.getHeight());
 
-				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f,border);
+				int w = expected.getWidth();
+				int h = expected.getWidth();
+
+				// only compare the relevant portion of the images
+				expected = expected.subimage(0,lowerBorder,w,h+h%2-upperBorder);
+				found = found.subimage(0,lowerBorder,w,h+h%2-upperBorder);
+
+				GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};
 
@@ -127,7 +141,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		int h = expected.height;
 
 		int lowerBorder = UtilWavelet.borderForwardLower(desc.getInverse().getInnerCoefficients());
-		int upperBorder = input.width-input.width%2-UtilWavelet.borderForwardUpper(desc.getInverse().getInnerCoefficients());
+		int upperBorder = input.width-UtilWavelet.borderForwardUpper(desc.getInverse().getInnerCoefficients(),input.width);
 
 		equalsTranHorizontal(expected.subimage(0,0,w/2,h),found.subimage(0,0,w/2,h),lowerBorder/2,upperBorder/2,"left");
 		equalsTranHorizontal(expected.subimage(w/2,0,w,h),found.subimage(w/2,0,w,h),lowerBorder/2,upperBorder/2,"right");
@@ -162,7 +176,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		int h = expected.height;
 
 		int lowerBorder = UtilWavelet.borderForwardLower(desc.getInverse().getInnerCoefficients());
-		int upperBorder = input.height-input.height%2-UtilWavelet.borderForwardUpper(desc.getInverse().getInnerCoefficients());
+		int upperBorder = input.height-UtilWavelet.borderForwardUpper(desc.getInverse().getInnerCoefficients(),input.height);
 
 		equalsTranVertical(expected.subimage(0,0,w,h/2),found.subimage(0,0,w,h/2),lowerBorder/2,upperBorder/2,"top");
 		equalsTranVertical(expected.subimage(0,h/2,w,h),found.subimage(0,h/2,w,h),lowerBorder/2,upperBorder/2,"bottom");

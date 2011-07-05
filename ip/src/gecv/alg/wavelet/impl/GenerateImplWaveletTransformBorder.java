@@ -133,7 +133,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfinal int width = output.width;\n" +
 				"\t\tfinal int height = input.height;\n" +
 				"\t\tfinal int lowerBorder = UtilWavelet.borderForwardLower(coefficients);\n" +
-				"\t\tfinal int upperBorder = input.width - input.width%2 - UtilWavelet.borderForwardUpper(coefficients);\n" +
+				"\t\tfinal int upperBorder = input.width - UtilWavelet.borderForwardUpper(coefficients,input.width);\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < height; y++ ) {\n" +
 				"\t\t\tfor( int x = 0; x < lowerBorder; x += 2 ) {\n" +
@@ -210,7 +210,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfinal int width = input.width;\n" +
 				"\t\tfinal int height = output.height;\n" +
 				"\t\tfinal int lowerBorder = UtilWavelet.borderForwardLower(coefficients);\n" +
-				"\t\tfinal int upperBorder = input.height - input.height%2 - UtilWavelet.borderForwardUpper(coefficients);\n" +
+				"\t\tfinal int upperBorder = input.height - UtilWavelet.borderForwardUpper(coefficients,input.height);\n" +
 				"\n" +
 				"\t\tfor( int x = 0; x < width; x++) {\n" +
 				"\t\t\tfor( int y = 0; y < lowerBorder; y += 2 ) {\n" +
@@ -293,8 +293,8 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfinal int height = output.height;\n" +
 				"\t\tfinal int paddedWidth = output.width + output.width%2;\n" +
 				"\n" +
-				"\t\tint lowerBorder = UtilWavelet.borderInverseLower(desc)/2;\n" +
-				"\t\tint upperBorder = output.width%2 + UtilWavelet.borderInverseUpper(desc)/2;\n" +
+				"\t\tint lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;\n" +
+				"\t\tint upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.width)/2;\n" +
 				"\n" +
 				"\t\tint indexes[] = new int[lowerBorder+upperBorder];\n" +
 				"\t\tfor( int i = 0; i < lowerBorder; i++ )\n" +
@@ -400,8 +400,8 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfinal int height = input.height;\n" +
 				"\t\tfinal int paddedHeight = output.height + output.height%2;\n" +
 				"\n" +
-				"\t\tint lowerBorder = UtilWavelet.borderInverseLower(desc)/2;\n" +
-				"\t\tint upperBorder = output.height%2 + UtilWavelet.borderInverseUpper(desc)/2;\n" +
+				"\t\tint lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;\n" +
+				"\t\tint upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.height)/2;\n" +
 				"\n" +
 				"\t\tint indexes[] = new int[lowerBorder+upperBorder];\n" +
 				"\t\tfor( int i = 0; i < lowerBorder; i++ )\n" +
