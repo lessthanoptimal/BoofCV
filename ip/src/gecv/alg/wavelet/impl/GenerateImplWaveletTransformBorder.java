@@ -67,6 +67,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"import gecv.struct.image.ImageFloat32;\n" +
 				"import gecv.struct.image.ImageSInt16;\n" +
 				"import gecv.struct.image.ImageUInt8;\n" +
+				"import gecv.struct.wavelet.WlCoef;\n" +
 				"import gecv.struct.wavelet.WlCoef_F32;\n" +
 				"import gecv.struct.wavelet.WlCoef_I32;\n" +
 				"import gecv.struct.wavelet.WlBorderCoef;\n" +
@@ -127,10 +128,10 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
 				"\t\tfinal "+sumType+"[] beta = coefficients.wavelet;\n" +
 				"\n" +
-				"\t\tborder.setLength(output.width);\n" +
+				"\t\tborder.setLength(input.width + input.width%2);\n" +
 				"\n" +
 				"\t\tfinal boolean isLarger = output.width > input.width;\n" +
-				"\t\tfinal int width = output.width;\n" +
+				"\t\tfinal int width = input.width+input.width%2;\n" +
 				"\t\tfinal int height = input.height;\n" +
 				"\t\tfinal int lowerBorder = UtilWavelet.borderForwardLower(coefficients);\n" +
 				"\t\tfinal int upperBorder = input.width - UtilWavelet.borderForwardUpper(coefficients,input.width);\n" +
@@ -162,7 +163,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 		out.print("\t\t\t\tint outX = x/2;\n" +
 				"\n" +
 				"\t\t\t\toutput.set(outX,y,scale);\n" +
-				"\t\t\t\toutput.set(width/2 + outX , y , wavelet );\n" +
+				"\t\t\t\toutput.set(output.width/2 + outX , y , wavelet );\n" +
 				"\t\t\t}\n" +
 				"\t\t\tfor( int x = upperBorder; x < width; x += 2 ) {\n" +
 				"\t\t\t\t"+sumType+" scale = 0;\n" +
@@ -190,7 +191,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 		}
 
 		out.print("\t\t\t\toutput.set(outX,y,scale);\n" +
-				"\t\t\t\toutput.set(width/2 + outX , y , wavelet );\n" +
+				"\t\t\t\toutput.set(output.width/2 + outX , y , wavelet );\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -204,11 +205,11 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
 				"\t\tfinal "+sumType+"[] beta = coefficients.wavelet;\n" +
 				"\n" +
-				"\t\tborder.setLength(output.height);\n" +
+				"\t\tborder.setLength(input.height + input.height%2);\n" +
 				"\n" +
 				"\t\tfinal boolean isLarger = output.height > input.height;\n" +
 				"\t\tfinal int width = input.width;\n" +
-				"\t\tfinal int height = output.height;\n" +
+				"\t\tfinal int height = input.height+input.height%2;\n" +
 				"\t\tfinal int lowerBorder = UtilWavelet.borderForwardLower(coefficients);\n" +
 				"\t\tfinal int upperBorder = input.height - UtilWavelet.borderForwardUpper(coefficients,input.height);\n" +
 				"\n" +
@@ -239,7 +240,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 		}
 
 		out.print("\t\t\t\toutput.set(x , outY,scale);\n" +
-				"\t\t\t\toutput.set(x , height/2 + outY , wavelet );\n" +
+				"\t\t\t\toutput.set(x , output.height/2 + outY , wavelet );\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\tfor( int y = upperBorder; y < height; y += 2 ) {\n" +
@@ -268,7 +269,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 		}
 
 		out.print("\t\t\t\toutput.set(x , outY,scale);\n" +
-				"\t\t\t\toutput.set(x , height/2 + outY , wavelet );\n" +
+				"\t\t\t\toutput.set(x , output.height/2 + outY , wavelet );\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -289,21 +290,45 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\t"+sumType+" []trends = new "+sumType+"[ input.width ];\n" +
 				"\t\t"+sumType+" []details = new "+sumType+"[ input.width ];\n" +
 				"\n" +
-				"\t\tfinal int width = input.width;\n" +
 				"\t\tfinal int height = output.height;\n" +
 				"\t\tfinal int paddedWidth = output.width + output.width%2;\n" +
 				"\n" +
-				"\t\tint lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;\n" +
-				"\t\tint upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.width)/2;\n" +
+				"\t\tWlCoef inner = desc.getInnerCoefficients();\n" +
+				"\t\t// need to convolve coefficients that influence the ones being updated\n" +
+				"\t\tint lowerExtra = -Math.min(inner.offsetScaling,inner.offsetWavelet);\n" +
+				"\t\tint upperExtra = Math.max(inner.getScalingLength()+inner.offsetScaling,inner.getWaveletLength()+inner.offsetWavelet);\n" +
+				"\t\tlowerExtra += lowerExtra%2;\n" +
+				"\t\tupperExtra += upperExtra%2;\n" +
+				"\n" +
+				"\t\tint lowerBorder = (UtilWavelet.borderInverseLower(desc,border)+lowerExtra)/2;\n" +
+				"\t\tint upperBorder = (UtilWavelet.borderInverseUpper(desc,border,output.width)+upperExtra)/2;\n" +
+				"\n" +
+				"\t\tboolean isLarger = input.width >= output.width;\n" +
+				"\t\t\n" +
+				"\t\t// where updated wavelet values are stored\n" +
+				"\t\tint lowerCompute = lowerBorder*2-lowerExtra;\n" +
+				"\t\tint upperCompute = upperBorder*2-upperExtra;\n" +
 				"\n" +
 				"\t\tint indexes[] = new int[lowerBorder+upperBorder];\n" +
 				"\t\tfor( int i = 0; i < lowerBorder; i++ )\n" +
 				"\t\t\tindexes[i] = i*2;\n" +
 				"\t\tfor( int i = lowerBorder; i < indexes.length; i++ )\n" +
 				"\t\t\tindexes[i] = paddedWidth-(indexes.length-i)*2;\n" +
-				"\n"+
-				"\t\tborder.setLength(input.width);\n" +
 				"\n" +
+				"\t\tborder.setLength(output.width+output.width%2);\n" +
+				"\n");
+
+		if( imageIn.isInteger() ) {
+			out.print("\t\tWlCoef_"+genName+" coefficients = desc.getInnerCoefficients();\n");
+			out.print("\t\tfinal int e = coefficients.denominatorScaling*2;\n" +
+					"\t\tfinal int f = coefficients.denominatorWavelet*2;\n" +
+					"\t\tfinal int ef = e*f;\n" +
+					"\t\tfinal int ef2 = ef/2;\n");
+		} else {
+			out.print("\t\tWlCoef_"+genName+" coefficients;\n");
+		}
+
+		out.print("\n" +
 				"\t\tfor( int y = 0; y < height; y++ ) {\n" +
 				"\n" +
 				"\t\t\t// initialize details and trends arrays\n" +
@@ -316,68 +341,48 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\tfor( int i = 0; i < indexes.length; i++ ) {\n" +
 				"\t\t\t\tint x = indexes[i];\n" +
-				"\t\t\t\tWlCoef_"+genName+" coef;\n" +
-				"\t\t\t\tif( x < desc.getLowerLength()*2 )\n" +
-				"\t\t\t\t\tcoef = desc.getBorderCoefficients(x);\n" +
-				"\t\t\t\telse\n" +
-				"\t\t\t\t\tcoef = desc.getBorderCoefficients(x-paddedWidth);\n" +
+				"\t\t\t\tfloat a = input.get(x/2,y);\n" +
+				"\t\t\t\tfloat d = input.get(input.width/2+x/2,y);\n" +
 				"\n" +
-				"\t\t\t\tint s = coef.offsetScaling; s -= s%2;\n" +
-				"\t\t\t\tint e = coef.getScalingLength()+coef.offsetScaling;\n" +
-				"\n" +
-				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
-				"\t\t\t\t\tint xx = border.getIndex(x-j);\n" +
-				"\t\t\t\t\ttrends[x] += input.get(xx/2,y)*coef.scaling[j-coef.offsetScaling];\n" +
+				"\t\t\t\tif( x < lowerBorder ) {\n" +
+				"\t\t\t\t\tcoefficients = desc.getBorderCoefficients(x);\n" +
+				"\t\t\t\t} else if( x >= upperBorder ) {\n" +
+				"\t\t\t\t\tcoefficients = desc.getBorderCoefficients(x-paddedWidth);\n" +
+				"\t\t\t\t} else {\n" +
+				"\t\t\t\t\tcoefficients = desc.getInnerCoefficients();\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
-				"\t\t\t\ts = coef.offsetScaling-1; s -= s%2;\n" +
-				"\t\t\t\te = coef.getScalingLength()+coef.offsetScaling-1;\n" +
+				"\t\t\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
+				"\t\t\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
+				"\t\t\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
+				"\t\t\t\tfinal "+sumType+"[] beta = coefficients.wavelet;\n" +
 				"\n" +
-				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
-				"\t\t\t\t\tint xx = border.getIndex(x-j);\n" +
-				"\t\t\t\t\ttrends[x+1] += input.get(xx/2,y)*coef.scaling[j-coef.offsetScaling+1];\n" +
+				"\t\t\t\t// add the trend\n" +
+				"\t\t\t\tfor( int j = 0; j < alpha.length; j++ ) {\n" +
+				"\t\t\t\t\t// if an odd image don't update the outer edge\n" +
+				"\t\t\t\t\tint xx = border.getIndex(x+offsetA+j);\n" +
+				"\t\t\t\t\tif( isLarger && xx >= output.width )\n" +
+				"\t\t\t\t\t\tcontinue;\n" +
+				"\t\t\t\t\ttrends[xx] += a*alpha[j];\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
-				"\t\t\t\ts = coef.offsetScaling; s -= s%2;\n" +
-				"\t\t\t\te = coef.getWaveletLength()+coef.offsetWavelet;\n" +
-				"\n" +
-				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
-				"\t\t\t\t\tint xx = border.getIndex(x-j);\n" +
-				"\t\t\t\t\tdetails[x] += input.get(xx/2+width/2,y)*coef.wavelet[j-coef.offsetWavelet];\n" +
-				"\t\t\t\t}\n" +
-				"\n" +
-				"\t\t\t\ts = coef.offsetScaling-1; s -= s%2;\n" +
-				"\t\t\t\te = coef.getWaveletLength()+coef.offsetWavelet-1;\n" +
-				"\n" +
-				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
-				"\t\t\t\t\tint xx = border.getIndex(x-j+1);\n" +
-				"\t\t\t\t\tdetails[x+1] += input.get(xx/2+width/2,y)*coef.wavelet[j-coef.offsetWavelet+1];\n" +
+				"\t\t\t\t// add the detail signal\n" +
+				"\t\t\t\tfor( int j = 0; j < beta.length; j++ ) {\n" +
+				"\t\t\t\t\tint xx = border.getIndex(x+offsetB+j);\n" +
+				"\t\t\t\t\tif( isLarger && xx >= output.width )\n" +
+				"\t\t\t\t\t\tcontinue;\n" +
+				"\t\t\t\t\tdetails[xx] += d*beta[j];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\tint indexDst = output.startIndex + y*output.stride;\n" +
-				"\t\t\tfor( int i = 0; i < indexes.length; i++ ) {\n" +
-				"\t\t\t\tint x = indexes[i];\n");
-		if( imageIn.isInteger() ) {
-			out.print("\t\t\t\tWlCoef_"+genName+" coef;\n" +
-				"\t\t\t\tif( x < desc.getLowerLength()*2 )\n" +
-				"\t\t\t\t\tcoef = desc.getBorderCoefficients(x);\n" +
-				"\t\t\t\telse\n" +
-				"\t\t\t\t\tcoef = desc.getBorderCoefficients(x-paddedWidth);\n" +
-				"\n");
-			out.print("\t\t\t\tfinal int e = coef.denominatorScaling*2;\n" +
-					"\t\t\t\tfinal int f = coef.denominatorWavelet*2;\n" +
-					"\t\t\t\tfinal int ef = e*f;\n" +
-					"\t\t\t\tfinal int ef2 = ef/2;\n" +
-					"\n");
-		}
-		out.print(outputSum+
-				"\t\t\t\tx++;\n" +
-				"\t\t\t\tif( x >= output.width )\n" +
-				"\t\t\t\t\tcontinue;\n" +
-				outputSum+
+				"\t\t\tfor( int x = 0; x < lowerCompute; x++ ) {\n" +
+				outputSum +
 				"\t\t\t}\n" +
-				"\t\t}\n"+
+				"\t\t\tfor( int x = paddedWidth-upperCompute; x < output.width; x++) {\n" +
+				outputSum +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
@@ -397,11 +402,23 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\t"+sumType+" []details = new "+sumType+"[ input.height ];\n" +
 				"\n" +
 				"\t\tfinal int width = output.width;\n" +
-				"\t\tfinal int height = input.height;\n" +
 				"\t\tfinal int paddedHeight = output.height + output.height%2;\n" +
 				"\n" +
-				"\t\tint lowerBorder = UtilWavelet.borderInverseLower(desc,border)/2;\n" +
-				"\t\tint upperBorder = UtilWavelet.borderInverseUpper(desc,border,output.height)/2;\n" +
+				"\t\tWlCoef inner = desc.getInnerCoefficients();\n" +
+				"\t\t// need to convolve coefficients that influence the ones being updated\n" +
+				"\t\tint lowerExtra = -Math.min(inner.offsetScaling,inner.offsetWavelet);\n" +
+				"\t\tint upperExtra = Math.max(inner.getScalingLength()+inner.offsetScaling,inner.getWaveletLength()+inner.offsetWavelet);\n" +
+				"\t\tlowerExtra += lowerExtra%2;\n" +
+				"\t\tupperExtra += upperExtra%2;\n" +
+				"\n" +
+				"\t\tint lowerBorder = (UtilWavelet.borderInverseLower(desc,border)+lowerExtra)/2;\n" +
+				"\t\tint upperBorder = (UtilWavelet.borderInverseUpper(desc,border,output.height)+upperExtra)/2;\n" +
+				"\n" +
+				"\t\tboolean isLarger = input.height >= output.height;\n" +
+				"\t\t\n" +
+				"\t\t// where updated wavelet values are stored\n" +
+				"\t\tint lowerCompute = lowerBorder*2-lowerExtra;\n" +
+				"\t\tint upperCompute = upperBorder*2-upperExtra;\n" +
 				"\n" +
 				"\t\tint indexes[] = new int[lowerBorder+upperBorder];\n" +
 				"\t\tfor( int i = 0; i < lowerBorder; i++ )\n" +
@@ -409,8 +426,20 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t\tfor( int i = lowerBorder; i < indexes.length; i++ )\n" +
 				"\t\t\tindexes[i] = paddedHeight-(indexes.length-i)*2;\n" +
 				"\n" +
-				"\t\tborder.setLength(input.height);\n" +
-				"\n" +
+				"\t\tborder.setLength(output.height+output.height%2);\n" +
+				"\n");
+
+		if( imageIn.isInteger() ) {
+			out.print("\t\tWlCoef_"+genName+" coefficients = desc.getInnerCoefficients();\n");
+			out.print("\t\tfinal int e = coefficients.denominatorScaling*2;\n" +
+					"\t\tfinal int f = coefficients.denominatorWavelet*2;\n" +
+					"\t\tfinal int ef = e*f;\n" +
+					"\t\tfinal int ef2 = ef/2;\n");
+		} else {
+			out.print("\t\tWlCoef_"+genName+" coefficients;\n");
+		}
+
+		out.print("\n" +
 				"\t\tfor( int x = 0; x < width; x++ ) {\n" +
 				"\n" +
 				"\t\t\t// initialize details and trends arrays\n" +
@@ -423,69 +452,48 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\tfor( int i = 0; i < indexes.length; i++ ) {\n" +
 				"\t\t\t\tint y = indexes[i];\n" +
-				"\t\t\t\tWlCoef_"+genName+" coef;\n" +
-				"\t\t\t\tif( y < desc.getLowerLength()*2 )\n" +
-				"\t\t\t\t\tcoef = desc.getBorderCoefficients(y);\n" +
-				"\t\t\t\telse\n" +
-				"\t\t\t\t\tcoef = desc.getBorderCoefficients(y-paddedHeight);\n" +
+				"\t\t\t\tfloat a = input.get(x,y/2);\n" +
+				"\t\t\t\tfloat d = input.get(x,input.height/2+y/2);\n" +
 				"\n" +
-				"\t\t\t\tint s = coef.offsetScaling; s -= s%2;\n" +
-				"\t\t\t\tint e = coef.getScalingLength()+coef.offsetScaling;\n" +
-				"\n" +
-				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
-				"\t\t\t\t\tint yy = border.getIndex(y-j);\n" +
-				"\t\t\t\t\ttrends[y] += input.get(x,yy/2)*coef.scaling[j-coef.offsetScaling];\n" +
+				"\t\t\t\tif( y < lowerBorder ) {\n" +
+				"\t\t\t\t\tcoefficients = desc.getBorderCoefficients(y);\n" +
+				"\t\t\t\t} else if( y >= upperBorder ) {\n" +
+				"\t\t\t\t\tcoefficients = desc.getBorderCoefficients(y-paddedHeight);\n" +
+				"\t\t\t\t} else {\n" +
+				"\t\t\t\t\tcoefficients = desc.getInnerCoefficients();\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
-				"\t\t\t\ts = coef.offsetScaling-1; s -= s%2;\n" +
-				"\t\t\t\te = coef.getScalingLength()+coef.offsetScaling-1;\n" +
+				"\t\t\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
+				"\t\t\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
+				"\t\t\t\tfinal "+sumType+"[] alpha = coefficients.scaling;\n" +
+				"\t\t\t\tfinal "+sumType+"[] beta = coefficients.wavelet;\n" +
 				"\n" +
-				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
-				"\t\t\t\t\tint yy = border.getIndex(y-j);\n" +
-				"\t\t\t\t\ttrends[y+1] += input.get(x,yy/2)*coef.scaling[j-coef.offsetScaling+1];\n" +
+				"\t\t\t\t// add the trend\n" +
+				"\t\t\t\tfor( int j = 0; j < alpha.length; j++ ) {\n" +
+				"\t\t\t\t\t// if an odd image don't update the outer edge\n" +
+				"\t\t\t\t\tint yy = border.getIndex(y+offsetA+j);\n" +
+				"\t\t\t\t\tif( isLarger && yy >= output.height )\n" +
+				"\t\t\t\t\t\tcontinue;\n" +
+				"\t\t\t\t\ttrends[yy] += a*alpha[j];\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
-				"\t\t\t\ts = coef.offsetScaling; s -= s%2;\n" +
-				"\t\t\t\te = coef.getWaveletLength()+coef.offsetWavelet;\n" +
-				"\n" +
-				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
-				"\t\t\t\t\tint yy = border.getIndex(y-j);\n" +
-				"\t\t\t\t\tdetails[y] += input.get(x,yy/2+height/2)*coef.wavelet[j-coef.offsetWavelet];\n" +
-				"\t\t\t\t}\n" +
-				"\n" +
-				"\t\t\t\ts = coef.offsetScaling-1; s -= s%2;\n" +
-				"\t\t\t\te = coef.getWaveletLength()+coef.offsetWavelet-1;\n" +
-				"\n" +
-				"\t\t\t\tfor( int j = s; j < e; j += 2 ) {\n" +
-				"\t\t\t\t\tint yy = border.getIndex(y-j+1);\n" +
-				"\t\t\t\t\tdetails[y+1] += input.get(x,yy/2+height/2)*coef.wavelet[j-coef.offsetWavelet+1];\n" +
+				"\t\t\t\t// add the detail signal\n" +
+				"\t\t\t\tfor( int j = 0; j < beta.length; j++ ) {\n" +
+				"\t\t\t\t\tint yy = border.getIndex(y+offsetB+j);\n" +
+				"\t\t\t\t\tif( isLarger && yy >= output.height )\n" +
+				"\t\t\t\t\t\tcontinue;\n" +
+				"\t\t\t\t\tdetails[yy] += d*beta[j];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\tint indexDst = output.startIndex + x;\n" +
-				"\t\t\tfor( int i = 0; i < indexes.length; i++ ) {\n" +
-				"\t\t\t\tint y = indexes[i];\n");
-
-		if( imageIn.isInteger() ) {
-			out.print("\t\t\t\tWlCoef_"+genName+" coef;\n" +
-					"\t\t\t\tif( y < desc.getLowerLength()*2 )\n" +
-					"\t\t\t\t\tcoef = desc.getBorderCoefficients(y);\n" +
-					"\t\t\t\telse\n" +
-					"\t\t\t\t\tcoef = desc.getBorderCoefficients(y-paddedHeight);\n" );
-			out.print("\t\t\t\tfinal int e = coef.denominatorScaling*2;\n" +
-					"\t\t\t\tfinal int f = coef.denominatorWavelet*2;\n" +
-					"\t\t\t\tfinal int ef = e*f;\n" +
-					"\t\t\t\tfinal int ef2 = ef/2;\n" +
-					"\n");
-		}
-
-		out.print(outputSum +
-				"\t\t\t\ty++;\n" +
-				"\t\t\t\tif( y >= output.height )\n" +
-				"\t\t\t\t\tcontinue;\n" +
+				"\t\t\tfor( int y = 0; y < lowerCompute; y++ ) {\n" +
 				outputSum +
 				"\t\t\t}\n" +
-				"\t\t}\n"+
+				"\t\t\tfor( int y = paddedHeight-upperCompute; y < output.height; y++) {\n" +
+				outputSum +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
 				"\t}\n\n");
 	}
 

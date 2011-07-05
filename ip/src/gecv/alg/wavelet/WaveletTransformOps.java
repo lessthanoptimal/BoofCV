@@ -18,6 +18,7 @@ package gecv.alg.wavelet;
 
 import gecv.alg.wavelet.impl.ImplWaveletTransformBorder;
 import gecv.alg.wavelet.impl.ImplWaveletTransformInner;
+import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -72,13 +73,18 @@ public class WaveletTransformOps {
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		storage = checkDeclareStorage(output.width, output.height, storage,"storage1");
 
-//		ImplWaveletTransformNaive.horizontal(desc.getBorder(),coef,input,storage);
-//		ImplWaveletTransformNaive.vertical(desc.getBorder(),coef,storage,output);
+		// the faster routines can only be run on images which are not too small
+		int minSize = Math.max(coef.getScalingLength(),coef.getWaveletLength())*3;
 
-		ImplWaveletTransformInner.horizontal(coef,input,storage);
-		ImplWaveletTransformBorder.horizontal(desc.getBorder(),coef,input,storage);
-		ImplWaveletTransformInner.vertical(coef,storage,output);
-		ImplWaveletTransformBorder.vertical(desc.getBorder(),coef,storage,output);
+		if( input.getWidth() <= minSize || input.getHeight() <= minSize ) {
+			ImplWaveletTransformNaive.horizontal(desc.getBorder(),coef,input,storage);
+			ImplWaveletTransformNaive.vertical(desc.getBorder(),coef,storage,output);
+		} else {
+			ImplWaveletTransformInner.horizontal(coef,input,storage);
+			ImplWaveletTransformBorder.horizontal(desc.getBorder(),coef,input,storage);
+			ImplWaveletTransformInner.vertical(coef,storage,output);
+			ImplWaveletTransformBorder.vertical(desc.getBorder(),coef,storage,output);
+		}
 	}
 
 	/**
@@ -107,13 +113,21 @@ public class WaveletTransformOps {
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		storage = checkDeclareStorage(output.width, output.height, storage,"storage1");
 
-//		ImplWaveletTransformNaive.horizontal(desc.getBorder(),coef,input,storage);
-//		ImplWaveletTransformNaive.vertical(desc.getBorder(),coef,storage,output);
+		// the faster routines can only be run on images which are not too small
+		int borderLower = UtilWavelet.borderForwardLower(desc.forward);
 
-		ImplWaveletTransformInner.horizontal(coef,input,storage);
-		ImplWaveletTransformBorder.horizontal(desc.getBorder(),coef,input,storage);
-//		ImplWaveletTransformInner.vertical(coef,storage,output);
-//		ImplWaveletTransformBorder.vertical(desc.getBorder(),coef,storage,output);
+		int smallW = Math.max(borderLower,UtilWavelet.borderForwardUpper(desc.forward,output.width));
+		int smallH = Math.max(borderLower,UtilWavelet.borderForwardUpper(desc.forward,output.height));
+
+		if( input.getWidth() <= smallW*2 || input.getHeight() <= smallH*2 ) {
+			ImplWaveletTransformNaive.horizontal(desc.getBorder(),coef,input,storage);
+			ImplWaveletTransformNaive.vertical(desc.getBorder(),coef,storage,output);
+		} else {
+			ImplWaveletTransformInner.horizontal(coef,input,storage);
+			ImplWaveletTransformBorder.horizontal(desc.getBorder(),coef,input,storage);
+//			ImplWaveletTransformInner.vertical(coef,storage,output);
+//			ImplWaveletTransformBorder.vertical(desc.getBorder(),coef,storage,output);
+		}
 	}
 
 	/**
@@ -186,13 +200,18 @@ public class WaveletTransformOps {
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		storage = checkDeclareStorage(input.width, input.height, storage,"storage");
 
-//		ImplWaveletTransformNaive.verticalInverse(desc.getBorder(),desc.getInverse(),input,storage);
-//		ImplWaveletTransformNaive.horizontalInverse(desc.getBorder(),desc.getInverse(),storage,output);
+		// the faster routines can only be run on images which are not too small
+		int minSize = Math.max(coef.getScalingLength(),coef.getWaveletLength())*3;
 
-		ImplWaveletTransformInner.verticalInverse(desc.getInverse().getInnerCoefficients(),input,storage);
-		ImplWaveletTransformBorder.verticalInverse(desc.getBorder(),desc.getInverse(),input,storage);
-		ImplWaveletTransformInner.horizontalInverse(desc.getInverse().getInnerCoefficients(),storage,output);
-		ImplWaveletTransformBorder.horizontalInverse(desc.getBorder(),desc.getInverse(),storage,output);
+		if( output.getWidth() <= minSize || output.getHeight() <= minSize ) {
+			ImplWaveletTransformNaive.verticalInverse(desc.getBorder(),desc.getInverse(),input,storage);
+			ImplWaveletTransformNaive.horizontalInverse(desc.getBorder(),desc.getInverse(),storage,output);
+		} else {
+			ImplWaveletTransformInner.verticalInverse(desc.getInverse().getInnerCoefficients(),input,storage);
+			ImplWaveletTransformBorder.verticalInverse(desc.getBorder(),desc.getInverse(),input,storage);
+			ImplWaveletTransformInner.horizontalInverse(desc.getInverse().getInnerCoefficients(),storage,output);
+			ImplWaveletTransformBorder.horizontalInverse(desc.getBorder(),desc.getInverse(),storage,output);
+		}
 	}
 
 	/**
