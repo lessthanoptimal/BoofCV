@@ -105,14 +105,7 @@ public class CommonFactoryWavelet {
 			ImplWaveletTransformNaive.horizontal(border,waveletDesc.forward,orig,tran);
 			ImplWaveletTransformNaive.horizontalInverse(border,waveletDesc.inverse,tran,rev);
 
-//			GecvTesting.printDiff(orig,rev);
 			GecvTesting.assertEquals(orig,rev,0);
-
-			ImplWaveletTransformNaive.vertical(border,waveletDesc.forward,orig,tran);
-			ImplWaveletTransformNaive.verticalInverse(border,waveletDesc.inverse,tran,rev);
-
-			GecvTesting.assertEquals(orig,rev,0);
-
 
 			// quick sanity check to make sure that WaveletTransformOps
 			// also correctly does a transform with these wavelets
@@ -120,7 +113,6 @@ public class CommonFactoryWavelet {
 			WaveletTransformOps.transform1(waveletDesc,orig,tran,null);
 			WaveletTransformOps.inverse1(waveletDesc,tran,rev,null);
 
-//			GecvTesting.printDiff(orig,rev);
 			GecvTesting.assertEquals(orig,rev,0);
 		}
 	}

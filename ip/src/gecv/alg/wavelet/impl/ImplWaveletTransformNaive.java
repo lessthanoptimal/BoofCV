@@ -450,7 +450,7 @@ public class ImplWaveletTransformNaive {
 			}
 
 			for( int x = 0; x < output.width; x++ ) {
-				output.set(x,y, (trends[x]*f + details[x]*e + ef2)/ef);
+				output.set(x,y, UtilWavelet.round(trends[x]*f + details[x]*e ,ef2,ef));
 			}
 		}
 	}
@@ -526,7 +526,7 @@ public class ImplWaveletTransformNaive {
 			}
 
 			for( int y = 0; y < output.height; y++ ) {
-				output.set(x,y, (trends[y]*f + details[y]*e + ef2)/ef);
+				output.set(x,y, UtilWavelet.round(trends[y]*f + details[y]*e,ef2,ef));
 			}
 		}
 	}

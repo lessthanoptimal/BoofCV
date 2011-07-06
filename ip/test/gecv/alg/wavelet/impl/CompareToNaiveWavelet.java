@@ -68,7 +68,7 @@ public class CompareToNaiveWavelet {
 			isFloat = GeneralizedImageOps.isFloatingPoint(typeInput);
 			typeOutput = p[p.length-1];
 
-			System.out.println(typeInput.getSimpleName()+" "+typeOutput.getSimpleName());
+//			System.out.println(typeInput.getSimpleName()+" "+typeOutput.getSimpleName());
 
 			try {
 				testMethod.invoke(this,m);

@@ -286,7 +286,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\tfor( int x = 0; x < output.width; x++ ) {\n");
 		if( imageIn.isInteger() ) {
-			out.print("\t\t\t\toutput.set(x,y, (trends[x]*f + details[x]*e + ef2)/ef);\n");
+			out.print("\t\t\t\toutput.set(x,y, UtilWavelet.round(trends[x]*f + details[x]*e ,ef2,ef));\n");
 		} else {
 			out.print("\t\t\t\toutput.set(x,y, trends[x] + details[x]);\n");
 		}
@@ -373,7 +373,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\tfor( int y = 0; y < output.height; y++ ) {\n");
 		if( imageIn.isInteger() ) {
-			out.print("\t\t\t\toutput.set(x,y, (trends[y]*f + details[y]*e + ef2)/ef);\n");
+			out.print("\t\t\t\toutput.set(x,y, UtilWavelet.round(trends[y]*f + details[y]*e,ef2,ef));\n");
 		} else {
 			out.print("\t\t\t\toutput.set(x,y, trends[y] + details[y]);\n");
 		}

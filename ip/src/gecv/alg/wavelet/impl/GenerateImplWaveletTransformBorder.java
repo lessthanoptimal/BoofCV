@@ -276,7 +276,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 		String outputSum;
 
 		if( imageIn.isInteger() ) {
-			outputSum = "\t\t\t\toutput.data[ indexDst + x ] = "+outputCast+"((trends[x]*f + details[x]*e + ef2)/ef);\n";
+			outputSum = "\t\t\t\toutput.data[ indexDst + x ] = "+outputCast+"UtilWavelet.round(trends[x]*f + details[x]*e , ef2 , ef);\n";
 		} else {
 			outputSum = "\t\t\t\toutput.data[ indexDst + x ] = "+outputCast+"(trends[x] + details[x]);\n";
 		}
@@ -387,7 +387,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 		String outputSum;
 
 		if( imageIn.isInteger() ) {
-			outputSum = "\t\t\t\toutput.data[ indexDst + y*output.stride ] = "+outputCast+"((trends[y]*f + details[y]*e + ef2)/ef);\n";
+			outputSum = "\t\t\t\toutput.data[ indexDst + y*output.stride ] = "+outputCast+"UtilWavelet.round(trends[y]*f + details[y]*e , ef2 , ef);\n";
 		} else {
 			outputSum = "\t\t\t\toutput.data[ indexDst + y*output.stride ] = "+outputCast+"(trends[y] + details[y]);\n";
 		}
