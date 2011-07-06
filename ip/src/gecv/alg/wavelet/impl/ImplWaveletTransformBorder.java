@@ -581,10 +581,10 @@ public class ImplWaveletTransformBorder {
 
 			int indexDst = output.startIndex + y*output.stride;
 			for( int x = 0; x < lowerCompute; x++ ) {
-				output.data[ indexDst + x ] = ((trends[x]*f + details[x]*e + ef2)/ef);
+				output.data[ indexDst + x ] = UtilWavelet.round(trends[x]*f + details[x]*e , ef2 , ef);
 			}
 			for( int x = paddedWidth-upperCompute; x < output.width; x++) {
-				output.data[ indexDst + x ] = ((trends[x]*f + details[x]*e + ef2)/ef);
+				output.data[ indexDst + x ] = UtilWavelet.round(trends[x]*f + details[x]*e , ef2 , ef);
 			}
 		}
 	}
@@ -675,10 +675,10 @@ public class ImplWaveletTransformBorder {
 
 			int indexDst = output.startIndex + x;
 			for( int y = 0; y < lowerCompute; y++ ) {
-				output.data[ indexDst + y*output.stride ] = ((trends[y]*f + details[y]*e + ef2)/ef);
+				output.data[ indexDst + y*output.stride ] = UtilWavelet.round(trends[y]*f + details[y]*e , ef2 , ef);
 			}
 			for( int y = paddedHeight-upperCompute; y < output.height; y++) {
-				output.data[ indexDst + y*output.stride ] = ((trends[y]*f + details[y]*e + ef2)/ef);
+				output.data[ indexDst + y*output.stride ] = UtilWavelet.round(trends[y]*f + details[y]*e , ef2 , ef);
 			}
 		}
 	}

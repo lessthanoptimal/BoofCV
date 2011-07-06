@@ -272,7 +272,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\t\tfor( int x = lowerBorder; x < upperBorder; x++ ) {\n");
 
 		if( imageIn.isInteger() ) {
-			out.print("\t\t\t\toutput.data[ indexDst++ ] = "+outputCast+"((trends[x]*f + details[x]*e + ef2)/ef);\n" );
+			out.print("\t\t\t\toutput.data[ indexDst++ ] = "+outputCast+"UtilWavelet.round(trends[x]*f + details[x]*e , ef2,ef);\n" );
 		} else {
 			out.print("\t\t\t\toutput.data[ indexDst++ ] = "+outputCast+"(trends[x] + details[x]);\n" );
 		}
@@ -349,7 +349,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t\t\tint indexDst = output.startIndex + x + lowerBorder*output.stride;\n" +
 				"\t\t\tfor( int y = lowerBorder; y < upperBorder; y++ , indexDst += output.stride ) {\n");
 		if( imageIn.isInteger() ) {
-			out.print("\t\t\t\toutput.data[ indexDst ] = "+outputCast+"((trends[y]*f + details[y]*e + ef2)/ef);\n" );
+			out.print("\t\t\t\toutput.data[ indexDst ] = "+outputCast+"UtilWavelet.round(trends[y]*f + details[y]*e , ef2 , ef);\n" );
 		} else {
 			out.print("\t\t\t\toutput.data[ indexDst ] = "+outputCast+"(trends[y] + details[y]);\n" );
 		}

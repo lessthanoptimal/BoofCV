@@ -401,7 +401,7 @@ public class ImplWaveletTransformInner {
 
 			int indexDst = output.startIndex + y*output.stride + lowerBorder;
 			for( int x = lowerBorder; x < upperBorder; x++ ) {
-				output.data[ indexDst++ ] = ((trends[x]*f + details[x]*e + ef2)/ef);
+				output.data[ indexDst++ ] = UtilWavelet.round(trends[x]*f + details[x]*e , ef2,ef);
 			}
 		}
 	}
@@ -467,7 +467,7 @@ public class ImplWaveletTransformInner {
 
 			int indexDst = output.startIndex + x + lowerBorder*output.stride;
 			for( int y = lowerBorder; y < upperBorder; y++ , indexDst += output.stride ) {
-				output.data[ indexDst ] = ((trends[y]*f + details[y]*e + ef2)/ef);
+				output.data[ indexDst ] = UtilWavelet.round(trends[y]*f + details[y]*e , ef2 , ef);
 			}
 		}
 	}

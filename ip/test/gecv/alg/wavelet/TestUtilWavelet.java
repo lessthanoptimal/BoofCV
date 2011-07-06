@@ -81,17 +81,21 @@ public class TestUtilWavelet {
 
 	@Test
 	public void borderForwardUpper() {
-		checkForwardUpper(0,0,2,2,0);
-		checkForwardUpper(0,0,3,3,2);
-		checkForwardUpper(0,0,4,4,2);
-		checkForwardUpper(0,0,5,5,4);
-		checkForwardUpper(-1,-1,5,5,2);
-		checkForwardUpper(-1,-1,4,4,2);
-		checkForwardUpper(-1,0,4,2,2);
+		checkForwardUpper(0,0,2,2,10,0);
+		checkForwardUpper(0,0,3,3,10,2);
+		checkForwardUpper(0,0,4,4,10,2);
+		checkForwardUpper(0,0,5,5,10,4);
+		checkForwardUpper(-1,-1,5,5,10,2);
+		checkForwardUpper(-1,-1,4,4,10,2);
+		checkForwardUpper(-1,0,4,2,10,2);
+
+		checkForwardUpper(0,0,2,2,11,1);
+		checkForwardUpper(0,0,3,3,11,1);
+		checkForwardUpper(0,0,4,4,11,3);
 	}
 
 	private void checkForwardUpper( int offsetA , int offsetB ,
-						   int lengthA , int lengthB ,
+						   int lengthA , int lengthB , int dataLength ,
 						   int expected ) {
 		WlCoef_F32 desc = new WlCoef_F32();
 		desc.offsetScaling = offsetA;
@@ -99,7 +103,7 @@ public class TestUtilWavelet {
 		desc.scaling = new float[lengthA];
 		desc.wavelet = new float[lengthB];
 
-		assertEquals(expected,UtilWavelet.borderForwardUpper(desc,-1));
+		assertEquals(expected,UtilWavelet.borderForwardUpper(desc,dataLength));
 	}
 
 	@Test

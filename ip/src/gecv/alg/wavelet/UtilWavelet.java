@@ -288,6 +288,13 @@ public class UtilWavelet {
 		if( top > 0 )
 			return top/divisor;
 		else
-			return (top - (divisor - top%divisor))/divisor;
+			return (top - (divisor + top%divisor))/divisor;
+	}
+
+	public static int round( int top , int div2 , int divisor ) {
+		if( top > 0 )
+			return (top + div2)/divisor;
+		else
+			return (top - div2)/divisor;
 	}
 }
