@@ -19,8 +19,7 @@ package gecv.alg.wavelet.impl;
 import gecv.alg.wavelet.UtilWavelet;
 import gecv.core.image.border.BorderIndex1D;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageSInt32;
 import gecv.struct.wavelet.WlBorderCoef;
 import gecv.struct.wavelet.WlCoef;
 import gecv.struct.wavelet.WlCoef_F32;
@@ -47,6 +46,7 @@ import gecv.struct.wavelet.WlCoef_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"ForLoopReplaceableByForEach"})
 public class ImplWaveletTransformBorder {
 
 	public static void horizontal( BorderIndex1D border , WlCoef_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
@@ -356,7 +356,7 @@ public class ImplWaveletTransformBorder {
 		}
 	}
 
-	public static void horizontal( BorderIndex1D border , WlCoef_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
+	public static void horizontal( BorderIndex1D border , WlCoef_I32 coefficients , ImageSInt32 input , ImageSInt32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -425,7 +425,7 @@ public class ImplWaveletTransformBorder {
 		}
 	}
 
-	public static void vertical( BorderIndex1D border , WlCoef_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
+	public static void vertical( BorderIndex1D border , WlCoef_I32 coefficients , ImageSInt32 input , ImageSInt32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -495,7 +495,7 @@ public class ImplWaveletTransformBorder {
 		}
 	}
 
-	public static void horizontalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_I32> desc , ImageUInt8 input , ImageSInt16 output )
+	public static void horizontalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_I32> desc , ImageSInt32 input , ImageSInt32 output )
 	{
 		int []trends = new int[ input.width ];
 		int []details = new int[ input.width ];
@@ -581,15 +581,15 @@ public class ImplWaveletTransformBorder {
 
 			int indexDst = output.startIndex + y*output.stride;
 			for( int x = 0; x < lowerCompute; x++ ) {
-				output.data[ indexDst + x ] = (short)((trends[x]*f + details[x]*e + ef2)/ef);
+				output.data[ indexDst + x ] = ((trends[x]*f + details[x]*e + ef2)/ef);
 			}
 			for( int x = paddedWidth-upperCompute; x < output.width; x++) {
-				output.data[ indexDst + x ] = (short)((trends[x]*f + details[x]*e + ef2)/ef);
+				output.data[ indexDst + x ] = ((trends[x]*f + details[x]*e + ef2)/ef);
 			}
 		}
 	}
 
-	public static void verticalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_I32> desc , ImageUInt8 input , ImageSInt16 output )
+	public static void verticalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_I32> desc , ImageSInt32 input , ImageSInt32 output )
 	{
 		int []trends = new int[ input.height ];
 		int []details = new int[ input.height ];
@@ -675,10 +675,10 @@ public class ImplWaveletTransformBorder {
 
 			int indexDst = output.startIndex + x;
 			for( int y = 0; y < lowerCompute; y++ ) {
-				output.data[ indexDst + y*output.stride ] = (short)((trends[y]*f + details[y]*e + ef2)/ef);
+				output.data[ indexDst + y*output.stride ] = ((trends[y]*f + details[y]*e + ef2)/ef);
 			}
 			for( int y = paddedHeight-upperCompute; y < output.height; y++) {
-				output.data[ indexDst + y*output.stride ] = (short)((trends[y]*f + details[y]*e + ef2)/ef);
+				output.data[ indexDst + y*output.stride ] = ((trends[y]*f + details[y]*e + ef2)/ef);
 			}
 		}
 	}

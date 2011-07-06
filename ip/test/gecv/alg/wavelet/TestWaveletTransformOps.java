@@ -16,14 +16,17 @@
 
 package gecv.alg.wavelet;
 
-import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt32;
 import gecv.struct.wavelet.WaveletDescription;
-import gecv.struct.wavelet.WlCoef_F32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Random;
 
 
@@ -36,69 +39,116 @@ public class TestWaveletTransformOps {
 	int width = 250;
 	int height = 300;
 
+   Class<?> typeInput;
+
+	Class<?> types[]={ImageFloat32.class,ImageSInt32.class};
+
 	/**
 	 * See if images which are the smallest possible can be transformed.
 	 */
 	@Test
 	public void smallImage(){
-		for( int i = 4; i < 20; i++ ) {
-			WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(4);
-
-			ImageFloat32 input = new ImageFloat32(i,i);
-			ImageFloat32 output = new ImageFloat32(input.width+(input.width%2),input.height+(input.height%2));
-			ImageFloat32 found = new ImageFloat32(input.width,input.height);
-
-			ImageTestingOps.randomize(input,rand,0,50);
-
-			WaveletTransformOps.transform1(desc,input,output,null);
-			WaveletTransformOps.inverse1(desc,output,found,null);
-
-			GecvTesting.assertEquals(input,found,0,1e-4f);
+		for( Class<?> t : types ) {
+			testSmallImage(t);
 		}
 	}
 
-	/**
-	 * Performs a forward and reverse transform and sees if it gets the original image back
-	 */
-	@Test
-	public void singleLevel() {
-		// try different sized images
-		for( int adjust = 0; adjust < 5; adjust++ ) {
-			ImageFloat32 input = new ImageFloat32(width+adjust,height+adjust);
-			ImageFloat32 output = new ImageFloat32(input.width+(input.width%2),input.height+(input.height%2));
-			ImageFloat32 found = new ImageFloat32(input.width,input.height);
+	public void testSmallImage( Class<?> typeInput ) {
+		this.typeInput = typeInput;
+		WaveletDescription<?> desc = createDesc(typeInput);
 
-			ImageTestingOps.randomize(input,rand,0,50);
-			WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(4);
+		int length = Math.max(desc.getForward().getScalingLength(),desc.getForward().getWaveletLength());
 
-			WaveletTransformOps.transform1(desc,input,output,null);
-			WaveletTransformOps.inverse1(desc,output,found,null);
+		for( int i = length; i < 20; i++ ) {
 
-			GecvTesting.assertEquals(input,found,0,1e-4f);
+			ImageBase input = GecvTesting.createImage(typeInput,i,i);
+			ImageBase output = GecvTesting.createImage(typeInput,input.width+(input.width%2),input.height+(input.height%2));
+			ImageBase found = GecvTesting.createImage(typeInput,input.width,input.height);
+
+			GeneralizedImageOps.randomize(input,rand,0,50);
+
+			invokeTransform("transform1","inverse1",desc, input, output, found);
+
+			GecvTesting.assertEqualsGeneric(input,found,0,1e-4f);
 		}
 	}
+
+	private WaveletDescription<?> createDesc(Class<?> typeInput) {
+		boolean isFloat = GeneralizedImageOps.isFloatingPoint(typeInput);
+
+		WaveletDescription<?> desc;
+
+		if( isFloat )
+			desc = FactoryWaveletDaub.daubJ_F32(4);
+		else
+			desc = FactoryWaveletDaub.biorthogonal_I32(5, WaveletBorderType.WRAP);
+		return desc;
+	}
+
 
 	@Test
 	public void multipleLevel() {
+		for( Class<?> t : types ) {
+			testMultipleLEvels(t);
+		}
+	}
+
+	private void testMultipleLEvels( Class<?> typeInput ) {
+		this.typeInput = typeInput;
+
+		WaveletDescription<?> desc = createDesc(typeInput);
+
 		// try different sized images
 		for( int adjust = 0; adjust < 5; adjust++ ) {
 			int w = width+adjust;
 			int h = height+adjust;
-			ImageFloat32 input = new ImageFloat32(w,h);
-			ImageFloat32 found = new ImageFloat32(w,h);
+			ImageBase input = GecvTesting.createImage(typeInput,w,h);
+			ImageBase found = GecvTesting.createImage(typeInput,w,h);
 
-			ImageTestingOps.randomize(input,rand,0,50);
-			WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(4);
+			GeneralizedImageOps.randomize(input,rand,0,50);
 
 			for( int level = 1; level <= 5; level++ ) {
 				ImageDimension dim = UtilWavelet.transformDimension(w,h,level);
-				ImageFloat32 output = new ImageFloat32(dim.width,dim.height);
+				ImageBase output = GecvTesting.createImage(typeInput,dim.width,dim.height);
 //				System.out.println("adjust "+adjust+" level "+level+" scale "+ div);
-				WaveletTransformOps.transformN(desc,input.clone(),output,null,level);
-				WaveletTransformOps.inverseN(desc,output,found,null,level);
 
-				GecvTesting.assertEquals(input,found,0,1e-4f);
+				invokeTransform("transformN","inverseN",desc, input.clone(), output, found,level);
+
+				GecvTesting.assertEqualsGeneric(input,found,0,1e-4f);
 			}
+		}
+	}
+
+	private void invokeTransform(String nameTran , String nameInv , WaveletDescription<?> desc, ImageBase input, ImageBase output, ImageBase found) {
+		try {
+			Method m = WaveletTransformOps.class.getMethod(nameTran,desc.getClass(),typeInput,typeInput,typeInput);
+			m.invoke(null,desc,input,output,null);
+			m = WaveletTransformOps.class.getMethod(nameInv,desc.getClass(),typeInput,typeInput,typeInput);
+			m.invoke(null,desc,output,found,null);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void invokeTransform(String nameTran , String nameInv ,
+								 WaveletDescription<?> desc,
+								 ImageBase input, ImageBase output, ImageBase found,
+								 int level) {
+		try {
+			Method m = WaveletTransformOps.class.getMethod(nameTran,desc.getClass(),typeInput,typeInput,typeInput,int.class);
+			m.invoke(null,desc,input,output,null,level);
+			m = WaveletTransformOps.class.getMethod(nameInv,desc.getClass(),typeInput,typeInput,typeInput,int.class);
+			m.invoke(null,desc,output,found,null,level);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }

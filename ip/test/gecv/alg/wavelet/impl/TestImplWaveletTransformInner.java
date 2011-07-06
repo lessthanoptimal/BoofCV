@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 
 	public TestImplWaveletTransformInner() {
-		super(3,ImplWaveletTransformInner.class);
+		super(2,ImplWaveletTransformInner.class);
 	}
 
 	@Test

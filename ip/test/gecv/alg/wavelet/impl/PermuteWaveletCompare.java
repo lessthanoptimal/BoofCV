@@ -203,8 +203,8 @@ public abstract class PermuteWaveletCompare {
 		forward.denominatorWavelet = 3;
 
 		for( int i = 0; i < length; i++ ) {
-			forward.scaling[i] = rand.nextInt(6)-3;
-			forward.wavelet[i] = rand.nextInt(6)-3;
+			forward.scaling[i] = rand.nextInt(8)-3;
+			forward.wavelet[i] = rand.nextInt(8)-3;
 			// it would never be zero in practice
 			if( forward.scaling[i] == 0 )
 				forward.scaling[i] = 1;
