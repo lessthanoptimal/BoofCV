@@ -22,9 +22,10 @@ import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageSInt32;
 import gecv.struct.wavelet.WaveletDescription;
 import gecv.struct.wavelet.WlCoef_F32;
+import gecv.struct.wavelet.WlCoef_I32;
 
 import java.util.Random;
 
@@ -37,12 +38,15 @@ public class BenchmarkWaveletTransform {
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
-	static WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.daubJ_F32(4);
+	static WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.biorthogonal_F32(5,WaveletBorderType.REFLECT);
+	static WaveletDescription<WlCoef_I32> desc_I32 = FactoryWaveletDaub.biorthogonal_I32(5,WaveletBorderType.REFLECT);
 
 	static ImageFloat32 orig_F32 = new ImageFloat32(imgWidth,imgHeight);
 	static ImageFloat32 temp1_F32 = new ImageFloat32(imgWidth,imgHeight);
 	static ImageFloat32 temp2_F32 = new ImageFloat32(imgWidth,imgHeight);
-	static ImageUInt8 orig_I8;
+	static ImageSInt32 orig_I32 = new ImageSInt32(imgWidth,imgHeight);
+	static ImageSInt32 temp1_I32 = new ImageSInt32(imgWidth,imgHeight);
+	static ImageSInt32 temp2_I32 = new ImageSInt32(imgWidth,imgHeight);
 
 	public static class Naive_F32 extends PerformerBase {
 
@@ -58,6 +62,23 @@ public class BenchmarkWaveletTransform {
 		@Override
 		public void process() {
 			WaveletTransformOps.transform1(desc_F32,orig_F32,temp1_F32,temp1_F32);
+		}
+	}
+
+	public static class Naive_I32 extends PerformerBase {
+
+		@Override
+		public void process() {
+			ImplWaveletTransformNaive.horizontal(desc_I32.getBorder(),desc_I32.getForward(),orig_I32,temp1_I32);
+			ImplWaveletTransformNaive.vertical(desc_I32.getBorder(),desc_I32.getForward(),temp1_I32,temp2_I32);
+		}
+	}
+
+	public static class Standard_I32 extends PerformerBase {
+
+		@Override
+		public void process() {
+			WaveletTransformOps.transform1(desc_I32,orig_I32,temp1_I32,temp1_I32);
 		}
 	}
 
@@ -86,6 +107,7 @@ public class BenchmarkWaveletTransform {
 
 		Random rand = new Random(234);
 		ImageTestingOps.randomize(orig_F32, rand, 0, 100);
+		ImageTestingOps.randomize(orig_I32, rand, 0, 100);
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
@@ -93,5 +115,7 @@ public class BenchmarkWaveletTransform {
 		ProfileOperation.printOpsPerSec(new FullLevel3_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Naive_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Standard_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Naive_I32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Standard_I32(), TEST_TIME);
 	}
 }

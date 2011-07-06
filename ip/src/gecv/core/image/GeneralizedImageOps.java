@@ -16,35 +16,69 @@
 
 package gecv.core.image;
 
+import gecv.alg.InputSanityCheck;
 import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.impl.ImplConvertImage;
 import gecv.struct.image.*;
+import gecv.testing.GecvTesting;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Random;
 
 /**
+ * <p>
  * Operations that return information about the specific image.  Useful when writing highly abstracted code
  * which is independent of the input image.
+ * </p>
  *
  * @author Peter Abeles
  */
 public class GeneralizedImageOps {
 
-	public static ImageBase<?> convert( ImageFloat32 input , Class<?> outputType )
+	/**
+	 * Converts an image from one type to another type.  Creates a new image instance if
+	 * an output is not provided.
+	 *
+	 * @param src Input image. Not modified.
+	 * @param dst Converted output image. If null a new one will be declared. Modified.
+	 * @param typeDst The type of output image.
+	 * @return Converted image.
+	 */
+	public static <T extends ImageBase> T convert( ImageBase<?> src , T dst , Class<?> typeDst  )
 	{
-		if( ImageUInt8.class == outputType ) {
-			ImageUInt8 ret = new ImageUInt8(input.width,input.height);
-			ConvertImage.convert(input,ret);
-			return ret;
-		} else if( ImageSInt16.class == outputType ) {
-			ImageSInt16 ret = new ImageSInt16(input.width,input.height);
-			ConvertImage.convert(input,ret);
-			return ret;
-		} else if( ImageFloat32.class == outputType ) {
-			ImageFloat32 ret = new ImageFloat32(input.width,input.height);
-			ret.setTo(input);
-			return ret;
+		if (dst == null) {
+			dst = GecvTesting.createImage(typeDst,src.width, src.height);
 		} else {
-			throw new RuntimeException("Add output type: "+outputType);
+			InputSanityCheck.checkSameShape(src, dst);
+		}
+		convert(src,dst);
+
+		return dst;
+	}
+
+	/**
+	 * Converts an image from one type to another type.
+	 *
+	 * @param src Input image. Not modified.
+	 * @param dst Converted output image. Modified.
+	 * @return Converted image.
+	 */
+	@SuppressWarnings({"unchecked"})
+	public static void convert( ImageBase<?> src , ImageBase<?> dst )
+	{
+		if( src.getClass() == dst.getClass()) {
+			((ImageBase)dst).setTo(src);
+			return;
+		}
+
+		Method m = GecvTesting.findMethod(ImplConvertImage.class,"convert",src.getClass(),dst.getClass());
+		try {
+			m.invoke(null,src,dst);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

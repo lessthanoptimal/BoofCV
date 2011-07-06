@@ -32,6 +32,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// todo remove all compare with border functions and use sub-images instead
 @SuppressWarnings({"unchecked"})
 public class GecvTesting {
 
@@ -140,28 +141,28 @@ public class GecvTesting {
 		return true;
 	}
 
-	public static ImageBase createImage(Class<?> type, int width, int height) {
+	public static <T extends ImageBase> T createImage(Class<?> type, int width, int height) {
 		type = GecvTesting.convertGenericToSpecificType(type);
 
 		if (type == ImageUInt8.class) {
-			return new ImageUInt8(width, height);
+			return (T)new ImageUInt8(width, height);
 		} else if (type == ImageSInt8.class) {
-			return new ImageSInt8(width, height);
+			return (T)new ImageSInt8(width, height);
 		} else if (type == ImageSInt16.class) {
-			return new ImageSInt16(width, height);
+			return (T)new ImageSInt16(width, height);
 		} else if (type == ImageUInt16.class) {
-			return new ImageUInt16(width, height);
+			return (T)new ImageUInt16(width, height);
 		} else if (type == ImageSInt32.class) {
-			return new ImageSInt32(width, height);
+			return (T)new ImageSInt32(width, height);
 		} else if (type == ImageFloat32.class) {
-			return new ImageFloat32(width, height);
+			return (T)new ImageFloat32(width, height);
 		} else if (type == ImageFloat64.class) {
-			return new ImageFloat64(width, height);
+			return (T)new ImageFloat64(width, height);
 		} else if (type == ImageInterleavedInt8.class) {
-			return new ImageInterleavedInt8(width, height, 1);
+			return (T)new ImageInterleavedInt8(width, height, 1);
 		} else if( type == ImageInteger.class ) {
 			// ImageInteger is a generic type, so just create something
-			return new ImageSInt32(width,height);
+			return (T)new ImageSInt32(width,height);
 		}
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}
@@ -306,20 +307,16 @@ public class GecvTesting {
 	 */
 	public static void assertEqualsGeneric(ImageBase imgA, ImageBase imgB, int tolInt, double tolFloat) {
 
-		if ( imgA.isInteger() ) {
-			if( ImageInteger.class.isAssignableFrom(imgB.getClass()) ) {
-				assertEquals((ImageInteger) imgA, (ImageInteger) imgB, 0);
-			} else if( imgB.getClass() == ImageFloat32.class ) {
-				assertEquals((ImageInteger) imgA, (ImageFloat32) imgB, 0);
-			} else {
-				assertEquals((ImageInteger) imgA, (ImageFloat64) imgB, 0);
-			}
-		} else if( ImageInteger.class.isAssignableFrom(imgB.getClass()) ) {
-			assertEquals((ImageInteger) imgB, (ImageFloat32) imgA, 0);
-		} else if( !imgA.isInteger() && !imgB.isInteger() ) {
+		if( imgA.isInteger() && imgB.isInteger() ) {
+			assertEquals((ImageInteger)imgA,(ImageInteger)imgB,tolInt);
+		} else if( imgA.isInteger() || imgB.isInteger() ) {
+			ImageInteger imgInt = (ImageInteger)(imgA.isInteger() ? imgA : imgB);
+			ImageFloat imgFloat = (ImageFloat)(imgA.isInteger() ? imgB : imgA);
+
+			assertEquals(imgInt,imgFloat,tolInt);
+		} else {
 			assertEquals((ImageFloat) imgA, (ImageFloat) imgB, 0, (float)tolFloat);
-		} else
-			throw new RuntimeException("Not supported yet");
+		}
 	}
 
 	public static void assertEqualsGeneric(ImageBase imgA, ImageBase imgB, int tolInt, double tolFloat,
@@ -424,6 +421,24 @@ public class GecvTesting {
 			for (int x = 0; x < imgA.getWidth(); x++) {
 				if (imgA.get(x, y) != imgB.get(x, y))
 					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + imgA.get(x, y) + "  " + imgB.get(x, y));
+			}
+		}
+	}
+
+	public static void assertEquals( ImageInteger imgA, ImageFloat imgB, int tol) {
+		if (imgA.getWidth() != imgB.getWidth())
+			throw new RuntimeException("Widths are not equals");
+
+		if (imgA.getHeight() != imgB.getHeight())
+			throw new RuntimeException("Heights are not equals");
+
+		SingleBandImage a = FactorySingleBandImage.wrap(imgA);
+		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
+
+		for (int y = 0; y < imgA.getHeight(); y++) {
+			for (int x = 0; x < imgA.getWidth(); x++) {
+				if( Math.abs(a.get(x, y).intValue() - b.get(x, y).intValue()) > tol)
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
 			}
 		}
 	}

@@ -1,11 +1,15 @@
+- Name Ideas
+ * Able Vision
+
 - Rename all low level implementation classes to have Impl* in their name
 
 - Wavelet
- * Allow orthogonal daub using reflection
-   - Will require borders to be handled differently
-   - Values of coefficients will need to be precomputed and dependent on the type of border used
  * Generate coefficients for arbitrary daub and coiflet wavelets
+ * Support for Image64F
+ * Unrolled inner image
  * GUI Panel to display wavelets
+   * change the level being viewed
+   * display detail on a log scale
 
 - Median Filter
  * Image Edges, handle them

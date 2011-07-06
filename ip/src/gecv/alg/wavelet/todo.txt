@@ -1,5 +1,0 @@
-- Go through all files and comment + clean up
-* Add int to benchmark
-- unrolled
-- Abstracted object oriented wrapper for all of this
-- Add support for 64bit images
