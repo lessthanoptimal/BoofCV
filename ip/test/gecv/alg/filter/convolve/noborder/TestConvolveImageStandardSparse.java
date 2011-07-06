@@ -16,9 +16,9 @@
 
 package gecv.alg.filter.convolve.noborder;
 
-import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.ConvertImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.convolve.Kernel1D_F32;
@@ -90,7 +90,7 @@ public class TestConvolveImageStandardSparse {
 		expectedOutput = computeExpected(floatImage);
 		boolean isFloatingKernel = method.getParameterTypes()[0] == Kernel1D_F32.class;
 
-		ImageBase<?> inputImage = GeneralizedImageOps.convert(floatImage,method.getParameterTypes()[2]);
+		ImageBase<?> inputImage = GeneralizedImageOps.convert(floatImage,null,method.getParameterTypes()[2]);
 		Object inputKernel = isFloatingKernel ? kernelF32 : kernelI32;
 		Object inputStorage = isFloatingKernel ? new float[kernelI32.width] : new int[ kernelI32.width];
 

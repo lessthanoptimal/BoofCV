@@ -16,6 +16,8 @@
 
 package gecv.alg.wavelet;
 
+import gecv.core.image.border.BorderIndex1D_Reflect;
+import gecv.core.image.border.BorderIndex1D_Wrap;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.wavelet.WlCoef_F32;
 import org.junit.Test;
@@ -126,5 +128,11 @@ public class TestUtilWavelet {
 		desc.offsetWavelet = offsetB;
 
 		assertEquals(expected,UtilWavelet.borderForwardLower(desc));
+	}
+
+	@Test
+	public void convertToType() {
+		assertEquals(WaveletBorderType.REFLECT,UtilWavelet.convertToType(new BorderIndex1D_Reflect()));
+		assertEquals(WaveletBorderType.WRAP,UtilWavelet.convertToType(new BorderIndex1D_Wrap()));
 	}
 }

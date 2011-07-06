@@ -17,6 +17,8 @@
 package gecv.alg.wavelet;
 
 import gecv.core.image.border.BorderIndex1D;
+import gecv.core.image.border.BorderIndex1D_Reflect;
+import gecv.core.image.border.BorderIndex1D_Wrap;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.wavelet.WlBorderCoef;
@@ -24,6 +26,8 @@ import gecv.struct.wavelet.WlCoef;
 
 
 /**
+ * Various functions which are useful when working with or computing wavelet transforms.
+ *
  * @author Peter Abeles
  */
 public class UtilWavelet {
@@ -80,6 +84,10 @@ public class UtilWavelet {
 		return (int)Math.pow(2,level-1);
 	}
 
+	/**
+	 * Returns dimension which is required for the transformed image in a multilevel
+	 * wavelet transform.
+	 */
 	public static ImageDimension transformDimension( ImageBase orig , int level )
 	{
 		return transformDimension(orig.width,orig.height,level);
@@ -284,17 +292,31 @@ public class UtilWavelet {
 		return Math.max(a,current);
 	}
 
-	public static int floor( int top , int divisor ) {
-		if( top > 0 )
-			return top/divisor;
-		else
-			return (top - (divisor + top%divisor))/divisor;
-	}
-
+	/**
+	 * Specialized rounding for use with integer wavelet transform.
+	 *
+	 * return (top +- div2) / divisor;
+	 *
+	 * @param top Top part of the equation.
+	 * @param div2 The divisor divided by two.
+	 * @param divisor The divisor.
+	 * @return
+	 */
 	public static int round( int top , int div2 , int divisor ) {
 		if( top > 0 )
 			return (top + div2)/divisor;
 		else
 			return (top - div2)/divisor;
+	}
+
+	public static WaveletBorderType convertToType( BorderIndex1D b ) {
+
+		if( b instanceof BorderIndex1D_Reflect) {
+			return WaveletBorderType.REFLECT;
+		} else if( b instanceof BorderIndex1D_Wrap) {
+			return WaveletBorderType.WRAP;
+		} else {
+			throw new RuntimeException("Unknown border type: "+b.getClass().getSimpleName());
+		}
 	}
 }
