@@ -21,7 +21,6 @@ import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.wavelet.WlBorderCoef;
 import gecv.struct.wavelet.WlCoef;
-import gecv.struct.wavelet.WlCoef_F32;
 
 
 /**
@@ -51,7 +50,7 @@ public class UtilWavelet {
 	}
 
 
-	public static void checkShape( WlCoef_F32 desc , ImageBase original , ImageBase transformed , int level )
+	public static void checkShape( WlCoef desc , ImageBase original , ImageBase transformed , int level )
 	{
 		ImageDimension tranDim = UtilWavelet.transformDimension(original,level);
 
@@ -59,10 +58,10 @@ public class UtilWavelet {
 			throw new IllegalArgumentException("Image containing the wavelet transform must be "+tranDim.width+" x "+tranDim.height);
 		}
 
-		if( original.width < desc.scaling.length || original.height < desc.scaling.length )
+		if( original.width < desc.getScalingLength() || original.height < desc.getScalingLength() )
 			throw new IllegalArgumentException("Original image's width and height must be large enough the number of scaling coefficients.");
 
-		if( original.width < desc.wavelet.length || original.height < desc.wavelet.length )
+		if( original.width < desc.getWaveletLength() || original.height < desc.getWaveletLength() )
 			throw new IllegalArgumentException("Original image's width and height must be large enough the number of wavelet coefficients.");
 	}
 	
@@ -283,5 +282,12 @@ public class UtilWavelet {
 		a += a%2;
 
 		return Math.max(a,current);
+	}
+
+	public static int floor( int top , int divisor ) {
+		if( top > 0 )
+			return top/divisor;
+		else
+			return (top - (divisor - top%divisor))/divisor;
 	}
 }

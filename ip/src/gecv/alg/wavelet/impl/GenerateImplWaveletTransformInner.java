@@ -49,10 +49,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 		printPreamble();
 
 		printFuncs(TypeImage.F32,TypeImage.F32);
-		printFuncs(TypeImage.U8,TypeImage.S16);
-		printFuncs(TypeImage.U16,TypeImage.S32);
-//		printFuncs(TypeImage.S8,TypeImage.S16);
-//		printFuncs(TypeImage.S16,TypeImage.S32);
+		printFuncs(TypeImage.S32,TypeImage.S32);
 
 		out.print("\n" +
 				"}\n");
@@ -64,7 +61,6 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\n" +
 				"import gecv.alg.wavelet.UtilWavelet;\n" +
 				"import gecv.struct.image.*;\n" +
-				"import gecv.struct.wavelet.WlBorderCoef;\n" +
 				"import gecv.struct.wavelet.WlCoef_F32;\n" +
 				"import gecv.struct.wavelet.WlCoef_I32;\n" +
 				"\n" +
@@ -81,6 +77,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
+				"@SuppressWarnings({\"ForLoopReplaceableByForEach\"})\n" +
 				"public class ImplWaveletTransformInner {\n\n");
 	}
 

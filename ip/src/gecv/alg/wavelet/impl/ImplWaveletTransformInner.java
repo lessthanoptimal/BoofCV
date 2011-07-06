@@ -17,7 +17,8 @@
 package gecv.alg.wavelet.impl;
 
 import gecv.alg.wavelet.UtilWavelet;
-import gecv.struct.image.*;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt32;
 import gecv.struct.wavelet.WlCoef_F32;
 import gecv.struct.wavelet.WlCoef_I32;
 
@@ -34,6 +35,7 @@ import gecv.struct.wavelet.WlCoef_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"ForLoopReplaceableByForEach"})
 public class ImplWaveletTransformInner {
 
 	public static void horizontal( WlCoef_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
@@ -245,239 +247,14 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontal( WlCoef_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
+	public static void horizontal( WlCoef_I32 coefficients , ImageSInt32 input , ImageSInt32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
 		final int[] alpha = coefficients.scaling;
 		final int[] beta = coefficients.wavelet;
 
-		final byte dataIn[] = input.data;
-		final short dataOut[] = output.data;
-
-		final int width = output.width;
-		final int height = input.height;
-		final int widthD2 = width/2;
-		final int startX = UtilWavelet.borderForwardLower(coefficients);
-		final int endOffsetX = input.width - UtilWavelet.borderForwardUpper(coefficients,input.width) - startX;
-
-		for( int y = 0; y < height; y++ ) {
-
-			int indexIn = input.startIndex + input.stride*y + startX;
-			int indexOut = output.startIndex + output.stride*y + startX/2;
-
-			int end = indexIn + endOffsetX;
-
-			for( ; indexIn < end; indexIn += 2 ) {
-
-				int scale = 0;
-				int index = indexIn+offsetA;
-				for( int i = 0; i < alpha.length; i++ ) {
-					scale += (dataIn[index++]& 0xFF)*alpha[i];
-				}
-
-				int wavelet = 0;
-				index = indexIn+offsetB;
-				for( int i = 0; i < beta.length; i++ ) {
-					wavelet += (dataIn[index++]& 0xFF)*beta[i];
-				}
-
-				scale = 2*scale/coefficients.denominatorScaling;
-				wavelet = 2*wavelet/coefficients.denominatorWavelet;
-
-				dataOut[ indexOut+widthD2] = (short)wavelet;
-				dataOut[ indexOut++ ] = (short)scale;
-			}
-		}
-	}
-
-	public static void vertical( WlCoef_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
-	{
-		final int offsetA = coefficients.offsetScaling*input.stride;
-		final int offsetB = coefficients.offsetWavelet*input.stride;
-		final int[] alpha = coefficients.scaling;
-		final int[] beta = coefficients.wavelet;
-
-		final byte dataIn[] = input.data;
-		final short dataOut[] = output.data;
-
-		final int width = input.width;
-		final int height = output.height;
-		final int heightD2 = (height/2)*output.stride;
-		final int startY = UtilWavelet.borderForwardLower(coefficients);
-		final int endY = input.height - UtilWavelet.borderForwardUpper(coefficients,input.width);
-
-		for( int y = startY; y < endY; y += 2 ) {
-
-			int indexIn = input.startIndex + input.stride*y;
-			int indexOut = output.startIndex + output.stride*(y/2);
-
-			for( int x = 0; x < width; x++, indexIn++) {
-
-				int scale = 0;
-				int index = indexIn + offsetA;
-				for( int i = 0; i < alpha.length; i++ ) {
-					scale += (dataIn[index]& 0xFF)*alpha[i];
-					index += input.stride;
-				}
-
-				int wavelet = 0;
-				index = indexIn + offsetB;
-				for( int i = 0; i < beta.length; i++ ) {
-					wavelet += (dataIn[index]& 0xFF)*beta[i];
-					index += input.stride;
-				}
-
-				scale = 2*scale/coefficients.denominatorScaling;
-				wavelet = 2*wavelet/coefficients.denominatorWavelet;
-
-				dataOut[indexOut+heightD2] = (short)wavelet;
-				dataOut[indexOut++] = (short)scale;
-
-			}
-		}
-	}
-
-	public static void horizontalInverse( WlCoef_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
-	{
-		final int offsetA = coefficients.offsetScaling;
-		final int offsetB = coefficients.offsetWavelet;
-		final int[] alpha = coefficients.scaling;
-		final int[] beta = coefficients.wavelet;
-
-		int []trends = new int[ output.width ];
-		int []details = new int[ output.width ];
-
-		final int width = input.width;
-		final int height = output.height;
-		final int widthD2 = width/2;
-		final int lowerBorder = UtilWavelet.borderForwardLower(coefficients);
-		final int upperBorder = output.width - UtilWavelet.borderForwardUpper(coefficients,output.width);
-		final int e = coefficients.denominatorScaling*2;
-		final int f = coefficients.denominatorWavelet*2;
-		final int ef = e*f;
-		final int ef2 = ef/2;
-
-		for( int y = 0; y < height; y++ ) {
-
-			// initialize details and trends arrays
-			int indexSrc = input.startIndex + y*input.stride+lowerBorder/2;
-			for( int x = lowerBorder; x < upperBorder; x += 2 , indexSrc++ ) {
-				int a = input.data[ indexSrc ] & 0xFF;
-				int d = input.data[ indexSrc + widthD2 ] & 0xFF;
-
-				// add the trend
-				for( int i = 0; i < 2; i++ )
-					trends[i+x+offsetA] = a*alpha[i];
-
-				// add the detail signal
-				for( int i = 0; i < 2; i++ )
-					details[i+x+offsetB] = d*beta[i];
-			}
-
-			for( int i = upperBorder+offsetA; i < upperBorder; i++ )
-				trends[i] = 0;
-			for( int i = upperBorder+offsetB; i < upperBorder; i++ )
-				details[i] = 0;
-
-			// perform the normal inverse transform
-			indexSrc = input.startIndex + y*input.stride+lowerBorder/2;
-			for( int x = lowerBorder; x < upperBorder; x += 2 , indexSrc++ ) {
-				int a = input.data[ indexSrc ] & 0xFF;
-				int d = input.data[ indexSrc + widthD2 ] & 0xFF;
-
-				// add the trend
-				for( int i = 2; i < alpha.length; i++ ) {
-					trends[i+x+offsetA] += a*alpha[i];
-				}
-
-				// add the detail signal
-				for( int i = 2; i < beta.length; i++ ) {
-					details[i+x+offsetB] += d*beta[i];
-				}
-			}
-
-			int indexDst = output.startIndex + y*output.stride + lowerBorder;
-			for( int x = lowerBorder; x < upperBorder; x++ ) {
-				output.data[ indexDst++ ] = (short)((trends[x]*f + details[x]*e + ef2)/ef);
-			}
-		}
-	}
-
-	public static void verticalInverse( WlCoef_I32 coefficients , ImageUInt8 input , ImageSInt16 output )
-	{
-		final int offsetA = coefficients.offsetScaling;
-		final int offsetB = coefficients.offsetWavelet;
-		final int[] alpha = coefficients.scaling;
-		final int[] beta = coefficients.wavelet;
-
-		int []trends = new int[ output.height ];
-		int []details = new int[ output.height ];
-
-		final int width = output.width;
-		final int height = input.height;
-		final int heightD2 = (height/2)*input.stride;
-		final int lowerBorder = UtilWavelet.borderForwardLower(coefficients);
-		final int upperBorder = output.height - UtilWavelet.borderForwardUpper(coefficients,output.height);
-		final int e = coefficients.denominatorScaling*2;
-		final int f = coefficients.denominatorWavelet*2;
-		final int ef = e*f;
-		final int ef2 = ef/2;
-
-		for( int x = 0; x < width; x++) {
-
-			int indexSrc = input.startIndex + (lowerBorder/2)*input.stride + x;
-			for( int y = lowerBorder; y < upperBorder; y += 2 , indexSrc += input.stride ) {
-				int a = input.data[ indexSrc ] & 0xFF;
-				int d = input.data[ indexSrc + heightD2 ] & 0xFF;
-
-				// add the trend
-				for( int i = 0; i < 2; i++ )
-					trends[i+y+offsetA] = a*alpha[i];
-
-				// add the detail signal
-				for( int i = 0; i < 2; i++ )
-					details[i+y+offsetB] = d*beta[i];
-			}
-
-			for( int i = upperBorder+offsetA; i < upperBorder; i++ )
-				trends[i] = 0;
-			for( int i = upperBorder+offsetB; i < upperBorder; i++ )
-				details[i] = 0;
-
-			// perform the normal inverse transform
-			indexSrc = input.startIndex + (lowerBorder/2)*input.stride + x;
-
-			for( int y = lowerBorder; y < upperBorder; y += 2 , indexSrc += input.stride ) {
-				int a = input.data[indexSrc] & 0xFF;
-				int d = input.data[indexSrc+heightD2] & 0xFF;
-
-				// add the 'average' signal
-				for( int i = 2; i < alpha.length; i++ ) {
-					trends[y+offsetA+i] += a*alpha[i];
-				}
-
-				// add the detail signal
-				for( int i = 2; i < beta.length; i++ ) {
-					details[y+offsetB+i] += d*beta[i];
-				}
-			}
-
-			int indexDst = output.startIndex + x + lowerBorder*output.stride;
-			for( int y = lowerBorder; y < upperBorder; y++ , indexDst += output.stride ) {
-				output.data[ indexDst ] = (short)((trends[y]*f + details[y]*e + ef2)/ef);
-			}
-		}
-	}
-
-	public static void horizontal( WlCoef_I32 coefficients , ImageUInt16 input , ImageSInt32 output )
-	{
-		final int offsetA = coefficients.offsetScaling;
-		final int offsetB = coefficients.offsetWavelet;
-		final int[] alpha = coefficients.scaling;
-		final int[] beta = coefficients.wavelet;
-
-		final short dataIn[] = input.data;
+		final int dataIn[] = input.data;
 		final int dataOut[] = output.data;
 
 		final int width = output.width;
@@ -498,13 +275,13 @@ public class ImplWaveletTransformInner {
 				int scale = 0;
 				int index = indexIn+offsetA;
 				for( int i = 0; i < alpha.length; i++ ) {
-					scale += (dataIn[index++]& 0xFFFF)*alpha[i];
+					scale += (dataIn[index++])*alpha[i];
 				}
 
 				int wavelet = 0;
 				index = indexIn+offsetB;
 				for( int i = 0; i < beta.length; i++ ) {
-					wavelet += (dataIn[index++]& 0xFFFF)*beta[i];
+					wavelet += (dataIn[index++])*beta[i];
 				}
 
 				scale = 2*scale/coefficients.denominatorScaling;
@@ -516,14 +293,14 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void vertical( WlCoef_I32 coefficients , ImageUInt16 input , ImageSInt32 output )
+	public static void vertical( WlCoef_I32 coefficients , ImageSInt32 input , ImageSInt32 output )
 	{
 		final int offsetA = coefficients.offsetScaling*input.stride;
 		final int offsetB = coefficients.offsetWavelet*input.stride;
 		final int[] alpha = coefficients.scaling;
 		final int[] beta = coefficients.wavelet;
 
-		final short dataIn[] = input.data;
+		final int dataIn[] = input.data;
 		final int dataOut[] = output.data;
 
 		final int width = input.width;
@@ -542,14 +319,14 @@ public class ImplWaveletTransformInner {
 				int scale = 0;
 				int index = indexIn + offsetA;
 				for( int i = 0; i < alpha.length; i++ ) {
-					scale += (dataIn[index]& 0xFFFF)*alpha[i];
+					scale += (dataIn[index])*alpha[i];
 					index += input.stride;
 				}
 
 				int wavelet = 0;
 				index = indexIn + offsetB;
 				for( int i = 0; i < beta.length; i++ ) {
-					wavelet += (dataIn[index]& 0xFFFF)*beta[i];
+					wavelet += (dataIn[index])*beta[i];
 					index += input.stride;
 				}
 
@@ -563,7 +340,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontalInverse( WlCoef_I32 coefficients , ImageUInt16 input , ImageSInt32 output )
+	public static void horizontalInverse( WlCoef_I32 coefficients , ImageSInt32 input , ImageSInt32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -588,8 +365,8 @@ public class ImplWaveletTransformInner {
 			// initialize details and trends arrays
 			int indexSrc = input.startIndex + y*input.stride+lowerBorder/2;
 			for( int x = lowerBorder; x < upperBorder; x += 2 , indexSrc++ ) {
-				int a = input.data[ indexSrc ] & 0xFFFF;
-				int d = input.data[ indexSrc + widthD2 ] & 0xFFFF;
+				int a = input.data[ indexSrc ] ;
+				int d = input.data[ indexSrc + widthD2 ] ;
 
 				// add the trend
 				for( int i = 0; i < 2; i++ )
@@ -608,8 +385,8 @@ public class ImplWaveletTransformInner {
 			// perform the normal inverse transform
 			indexSrc = input.startIndex + y*input.stride+lowerBorder/2;
 			for( int x = lowerBorder; x < upperBorder; x += 2 , indexSrc++ ) {
-				int a = input.data[ indexSrc ] & 0xFFFF;
-				int d = input.data[ indexSrc + widthD2 ] & 0xFFFF;
+				int a = input.data[ indexSrc ] ;
+				int d = input.data[ indexSrc + widthD2 ] ;
 
 				// add the trend
 				for( int i = 2; i < alpha.length; i++ ) {
@@ -629,7 +406,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void verticalInverse( WlCoef_I32 coefficients , ImageUInt16 input , ImageSInt32 output )
+	public static void verticalInverse( WlCoef_I32 coefficients , ImageSInt32 input , ImageSInt32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -653,8 +430,8 @@ public class ImplWaveletTransformInner {
 
 			int indexSrc = input.startIndex + (lowerBorder/2)*input.stride + x;
 			for( int y = lowerBorder; y < upperBorder; y += 2 , indexSrc += input.stride ) {
-				int a = input.data[ indexSrc ] & 0xFFFF;
-				int d = input.data[ indexSrc + heightD2 ] & 0xFFFF;
+				int a = input.data[ indexSrc ] ;
+				int d = input.data[ indexSrc + heightD2 ] ;
 
 				// add the trend
 				for( int i = 0; i < 2; i++ )
@@ -674,8 +451,8 @@ public class ImplWaveletTransformInner {
 			indexSrc = input.startIndex + (lowerBorder/2)*input.stride + x;
 
 			for( int y = lowerBorder; y < upperBorder; y += 2 , indexSrc += input.stride ) {
-				int a = input.data[indexSrc] & 0xFFFF;
-				int d = input.data[indexSrc+heightD2] & 0xFFFF;
+				int a = input.data[indexSrc] ;
+				int d = input.data[indexSrc+heightD2] ;
 
 				// add the 'average' signal
 				for( int i = 2; i < alpha.length; i++ ) {

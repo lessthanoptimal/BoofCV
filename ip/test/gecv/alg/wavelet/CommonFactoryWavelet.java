@@ -20,8 +20,7 @@ import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.core.image.border.BorderIndex1D;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageSInt32;
 import gecv.struct.wavelet.WaveletDescription;
 import gecv.struct.wavelet.WlCoef_F32;
 import gecv.struct.wavelet.WlCoef_I32;
@@ -95,11 +94,11 @@ public class CommonFactoryWavelet {
 
 		// test both even and odd images
 		for( int makeOdd = 0; makeOdd <= 1; makeOdd++ ) {
-			ImageUInt8 orig = new ImageUInt8(width-makeOdd,height-makeOdd);
-			ImageSInt16 tran = new ImageSInt16(width,height);
-			ImageUInt8 rev = new ImageUInt8(width-makeOdd,height-makeOdd);
+			ImageSInt32 orig = new ImageSInt32(width-makeOdd,height-makeOdd);
+			ImageSInt32 tran = new ImageSInt32(width,height);
+			ImageSInt32 rev = new ImageSInt32(width-makeOdd,height-makeOdd);
 
-			ImageTestingOps.randomize(orig,rand,0,50);
+			ImageTestingOps.randomize(orig,rand,-50,50);
 
 			BorderIndex1D border = waveletDesc.getBorder();
 
@@ -107,7 +106,21 @@ public class CommonFactoryWavelet {
 			ImplWaveletTransformNaive.horizontalInverse(border,waveletDesc.inverse,tran,rev);
 
 //			GecvTesting.printDiff(orig,rev);
+			GecvTesting.assertEquals(orig,rev,0);
 
+			ImplWaveletTransformNaive.vertical(border,waveletDesc.forward,orig,tran);
+			ImplWaveletTransformNaive.verticalInverse(border,waveletDesc.inverse,tran,rev);
+
+			GecvTesting.assertEquals(orig,rev,0);
+
+
+			// quick sanity check to make sure that WaveletTransformOps
+			// also correctly does a transform with these wavelets
+			// more of a robustness test of WaveletTransformOps than anything else
+			WaveletTransformOps.transform1(waveletDesc,orig,tran,null);
+			WaveletTransformOps.inverse1(waveletDesc,tran,rev,null);
+
+//			GecvTesting.printDiff(orig,rev);
 			GecvTesting.assertEquals(orig,rev,0);
 		}
 	}
