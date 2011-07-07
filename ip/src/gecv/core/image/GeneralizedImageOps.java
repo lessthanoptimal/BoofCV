@@ -48,7 +48,7 @@ public class GeneralizedImageOps {
 	public static <T extends ImageBase> T convert( ImageBase<?> src , T dst , Class<?> typeDst  )
 	{
 		if (dst == null) {
-			dst = GecvTesting.createImage(typeDst,src.width, src.height);
+			dst =(T) GecvTesting.createImage(typeDst,src.width, src.height);
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}

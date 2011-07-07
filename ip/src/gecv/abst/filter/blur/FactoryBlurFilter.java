@@ -14,27 +14,25 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.blur;
+package gecv.abst.filter.blur;
 
-import gecv.alg.filter.blur.impl.MedianHistogramInner_I8;
-import gecv.alg.filter.blur.impl.MedianSortNaive_F32;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageBase;
 
 /**
- * Factory for creating median filters.  It automatically selects the best general purpose filter for the
- * specific radius.
+ * Factory for creating different blur image filters.
  *
  * @author Peter Abeles
  */
-public class MedianFilterFactory {
+public class FactoryBlurFilter {
 
-	public static MedianImageFilter<ImageUInt8> create_I8( int radius ) {
-		// todo process outer part of the image
-		return new MedianHistogramInner_I8(radius);
-	}
-
-	public static MedianImageFilter<ImageFloat32> create_F32( int radius ) {
-		return new MedianSortNaive_F32(radius);
+	/**
+	 * Creates a median filter for the specified image type.
+	 *
+	 * @param type Image type.
+	 * @param radius Size of the filter.
+	 * @return Median image filter.
+	 */
+	public static <T extends ImageBase> MedianImageFilter<T> median( Class<?> type , int radius ) {
+		return new MedianImageFilter<T>(type,radius);
 	}
 }

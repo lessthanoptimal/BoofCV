@@ -49,7 +49,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 		printPreamble();
 
 		printFuncs(TypeImage.F32,TypeImage.F32);
-		printFuncs(TypeImage.S32,TypeImage.S32);
+		printFuncs(TypeImage.S32, TypeImage.S32);
 
 		out.print("\n" +
 				"}\n");
