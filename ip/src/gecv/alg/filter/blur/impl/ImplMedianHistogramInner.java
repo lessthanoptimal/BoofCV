@@ -16,7 +16,6 @@
 
 package gecv.alg.filter.blur.impl;
 
-import gecv.alg.filter.blur.MedianImageFilter;
 import gecv.struct.image.ImageUInt8;
 
 /**
@@ -32,36 +31,50 @@ import gecv.struct.image.ImageUInt8;
  * </p>
  * @author Peter Abeles
  */
-public class MedianHistogramInner_I8 implements MedianImageFilter<ImageUInt8> {
+public class ImplMedianHistogramInner {
 
-	int radius;
-	int histogram[] = new int[ 256 ];
-	int offset[];
-	int threshold;
 
-	public MedianHistogramInner_I8(int radius) {
-		this.radius = radius;
+	/**
+	 * Applies a median image filter.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param output Filtered output image. Modified.
+	 * @param radius Size of the filter region.
+	 * @param offset Array used to store relative pixel offsets.
+	 * @param histogram Saves the image histogram.  Must be at least 256 elements.
+	 */
+	public static void process(ImageUInt8 input, ImageUInt8 output , int radius, int offset[], int histogram[] ) {
 
-		int w = radius*2+1;
-		offset = new int[w*w];
-		threshold = offset.length/2+1;
-	}
+		if( histogram == null )
+			histogram = new int[ 256 ];
+		else if( histogram.length < 256 )
+			throw new IllegalArgumentException("'histogram' must have at least 256 elements.");
 
-	@Override
-	public int getRadius() {
-		return radius;
-	}
+		int w = 2*radius+1;
+		if( offset == null ) {
+			offset = new int[ w*w ];
+		} else if( offset.length < w*w ) {
+			throw new IllegalArgumentException("'offset' must be at least of length "+(w*w));
+		}
+		int threshold = (w*w)/2+1;
 
-	@Override
-	public void process(ImageUInt8 input, ImageUInt8 output) {
-		initialize(input);
+		// compute image offsets
+		int index = 0;
+		for( int i = -radius; i <= radius; i++ ) {
+			for( int j = -radius; j <= radius; j++ ) {
+				offset[index++] = i*input.stride + j;
+			}
+		}
 
 		int boxWidth = radius*2+1;
 
 		for( int y = radius; y < input.height-radius; y++ ) {
 			int seed = input.startIndex + y*input.stride+radius;
 
-			zeroHistogram();
+			for( int i =0; i < 256; i++ ) {
+				histogram[i] = 0;
+			}
+
 			// compute the median value for the first x component and initialize the system
 			for( int i = 0; i < offset.length; i++ ) {
 				int val = input.data[seed+offset[i]] & 0xFF;
@@ -107,29 +120,6 @@ public class MedianHistogramInner_I8 implements MedianImageFilter<ImageUInt8> {
 					int val = input.data[seed+offset[i]] & 0xFF;
 					histogram[val]--;
 				}
-			}
-		}
-	}
-
-	private void initialize(ImageUInt8 input) {
-		int index = 0;
-		for( int i = -radius; i <= radius; i++ ) {
-			for( int j = -radius; j <= radius; j++ ) {
-				offset[index++] = i*input.stride + j;
-			}
-		}
-	}
-
-	private void zeroHistogram() {
-		for( int i =0; i < histogram.length; i++ ) {
-			histogram[i] = 0;
-		}
-	}
-
-	private void printHistogram() {
-		for( int i = 0; i < histogram.length; i++ ) {
-			if( histogram[i] != 0 ) {
-				System.out.printf("[%d] = %d\n",i,histogram[i]);
 			}
 		}
 	}

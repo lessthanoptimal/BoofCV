@@ -17,7 +17,7 @@
 package gecv.numerics.fitting.modelset.distance;
 
 import gecv.numerics.fitting.modelset.DistanceFromModel;
-import pja.sorting.QuickSortD;
+import pja.sorting.QuickSort_F64;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ public class FitByMedianStatistics<Model, Point> implements StatisticalFit<Model
 	double[] errors = new double[100];
 	double[] origErrors = new double[100];
 
-	QuickSortD sorter = new QuickSortD();
+	QuickSort_F64 sorter = new QuickSort_F64();
 
 	/**
 	 * Creates a new FitByMedianStatistics.

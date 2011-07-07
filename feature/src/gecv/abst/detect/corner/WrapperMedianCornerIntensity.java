@@ -16,11 +16,11 @@
 
 package gecv.abst.detect.corner;
 
+import gecv.abst.filter.blur.FactoryBlurFilter;
+import gecv.abst.filter.blur.MedianImageFilter;
 import gecv.alg.detect.corner.MedianCornerIntensity;
 import gecv.alg.detect.corner.impl.MedianCorner_F32;
 import gecv.alg.detect.corner.impl.MedianCorner_U8;
-import gecv.alg.filter.blur.MedianFilterFactory;
-import gecv.alg.filter.blur.MedianImageFilter;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -43,12 +43,12 @@ public class WrapperMedianCornerIntensity<I extends ImageBase, D extends ImageBa
 	WrapperMedianCornerIntensity<I,D> create( Class<I> imageType , int imgWidth , int imgHeight , int medianRadius ) {
 		if( imageType == ImageUInt8.class ) {
 			ImageUInt8 medianImage = new ImageUInt8(imgWidth,imgHeight);
-			MedianImageFilter<ImageUInt8> medianFilter = MedianFilterFactory.create_I8(medianRadius);
+			MedianImageFilter<ImageUInt8> medianFilter = FactoryBlurFilter.median(ImageUInt8.class,medianRadius);
 			MedianCornerIntensity<ImageUInt8> alg = new MedianCorner_U8(imgWidth,imgHeight);
 			return new WrapperMedianCornerIntensity(alg,medianFilter,medianImage);
 		} else if( imageType == ImageFloat32.class ) {
 			ImageFloat32 medianImage = new ImageFloat32(imgWidth,imgHeight);
-			MedianImageFilter<ImageFloat32> medianFilter = MedianFilterFactory.create_F32(medianRadius);
+			MedianImageFilter<ImageFloat32> medianFilter = FactoryBlurFilter.median(ImageFloat32.class,medianRadius);
 			MedianCornerIntensity<ImageFloat32> alg = new MedianCorner_F32(imgWidth,imgHeight);
 			return new WrapperMedianCornerIntensity(alg,medianFilter,medianImage);
 		} else {

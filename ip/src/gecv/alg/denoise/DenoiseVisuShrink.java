@@ -18,7 +18,7 @@ package gecv.alg.denoise;
 
 import gecv.alg.wavelet.UtilWavelet;
 import gecv.struct.image.ImageFloat32;
-import pja.sorting.QuickSelectF;
+import pja.sorting.QuickSelectArray;
 
 
 /**
@@ -76,7 +76,7 @@ public class DenoiseVisuShrink {
 		}
 
 		// select the median value
-		float median = QuickSelectF.select(coefs,index/2,index);
+		float median = QuickSelectArray.select(coefs,index/2,index);
 
 		// estimate the sigma of the distribution
 		float sigma = median/0.6475f;

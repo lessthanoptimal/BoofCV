@@ -17,6 +17,9 @@
 package gecv.alg.filter.blur;
 
 import gecv.alg.InputSanityCheck;
+import gecv.alg.filter.blur.impl.ImplMedianHistogramInner;
+import gecv.alg.filter.blur.impl.ImplMedianSortEdgeNaive;
+import gecv.alg.filter.blur.impl.ImplMedianSortNaive;
 import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.struct.convolve.Kernel1D_F32;
@@ -63,28 +66,22 @@ public class BlurImageOps {
 	}
 
 	public static ImageUInt8 median(ImageUInt8 input, ImageUInt8 output, int radius) {
-		if( output == null ) {
-			output = new ImageUInt8(input.width,input.height);
-		}
-		InputSanityCheck.checkSameShape(input,output);
+		output = InputSanityCheck.checkDeclare(input,output);
 
-		MedianImageFilter<ImageUInt8> filter = MedianFilterFactory.create_I8(radius);
-		filter.process(input,output);
+		int w = radius*2+1;
+		int offset[] = new int[ w*w ];
+		int histogram[] = new int[ 256 ];
+
+		ImplMedianHistogramInner.process(input,output,radius,offset,histogram);
+		ImplMedianSortEdgeNaive.process(input,output,radius,offset);
 
 		return output;
 	}
 
 	public static ImageUInt8 gaussian(ImageUInt8 input, ImageUInt8 output, int radius,
 									  ImageUInt8 storage ) {
-		if( output == null ) {
-			output = new ImageUInt8(input.width,input.height);
-		}
-
-		if( storage == null ) {
-			storage = new ImageUInt8(input.width,input.height);
-		}
-
-		InputSanityCheck.checkSameShape(input,output,storage);
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
 
 		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(radius);
 
@@ -99,13 +96,9 @@ public class BlurImageOps {
 	}
 
 	public static ImageFloat32 median(ImageFloat32 input, ImageFloat32 output, int radius) {
-		if( output == null ) {
-			output = new ImageFloat32(input.width,input.height);
-		}
-		InputSanityCheck.checkSameShape(input,output);
+		output = InputSanityCheck.checkDeclare(input,output);
 
-		MedianImageFilter<ImageFloat32> filter = MedianFilterFactory.create_F32(radius);
-		filter.process(input,output);
+		ImplMedianSortNaive.process(input,output,radius,null);
 
 		return output;
 	}

@@ -46,7 +46,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 	public void generate() throws FileNotFoundException {
 		printPreamble();
 
-		printFuncs(TypeImage.F32,TypeImage.F32);
+		printFuncs(TypeImage.F32, TypeImage.F32);
 		printFuncs(TypeImage.I,TypeImage.I);
 
 		out.print("\n" +

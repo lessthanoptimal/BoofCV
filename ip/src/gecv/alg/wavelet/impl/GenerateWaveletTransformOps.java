@@ -28,7 +28,7 @@ import java.io.PrintStream;
 /**
  * @author Peter Abeles
  */
-public class GenerateWaveletTransformOps extends CodeGeneratorBase  {
+public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 	String className = "WaveletTransformOps";
 
 	PrintStream out;
@@ -48,7 +48,7 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase  {
 	public void generate() throws FileNotFoundException {
 		printPreamble();
 
-		printFuncs(TypeImage.F32,TypeImage.F32);
+		printFuncs(TypeImage.F32, TypeImage.F32);
 		printFuncs(TypeImage.S32,TypeImage.S32);
 
 		out.print("\n" +

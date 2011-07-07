@@ -26,7 +26,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestMedianHistogramInner_I8 {
+public class TestImplMedianHistogramInnerNaive {
 
 	@Test
 	public void compareToSort() {
@@ -40,14 +40,12 @@ public class TestMedianHistogramInner_I8 {
 	}
 
 	public void compareToSort(ImageUInt8 image, ImageUInt8 found, ImageUInt8 expected) {
-		for( int i = 1; i <= 3; i++ ) {
-			MedianHistogramInner_I8 alg = new MedianHistogramInner_I8(i);
-			MedianSortNaive_I8 testAlg = new MedianSortNaive_I8(i);
+		for( int radius = 1; radius <= 3; radius++ ) 
+		{
+			ImplMedianHistogramInnerNaive.process(image,found,radius,null,null);
+			ImplMedianSortNaive.process(image,expected,radius,null);
 
-			alg.process(image,found);
-			testAlg.process(image,expected);
-
-			GecvTesting.assertEquals(expected,found,i);
+			GecvTesting.assertEquals(expected,found,radius);
 		}
 	}
 }

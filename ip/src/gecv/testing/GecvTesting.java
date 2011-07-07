@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// todo remove all compare with border functions and use sub-images instead
+// todo remove all comwapare with border functions and use sub-images instead
 @SuppressWarnings({"unchecked"})
 public class GecvTesting {
 

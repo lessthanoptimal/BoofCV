@@ -21,7 +21,7 @@ import gecv.numerics.fitting.modelset.DistanceFromModel;
 import gecv.numerics.fitting.modelset.ModelFitter;
 import gecv.numerics.fitting.modelset.ModelMatcher;
 import gecv.numerics.fitting.modelset.ransac.SimpleRansacCommon;
-import pja.sorting.QuickSelectD;
+import pja.sorting.QuickSelectArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +127,7 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 			errorMetric.setModel(param);
 			errorMetric.computeDistance(dataSet,errors);
 
-			double median = QuickSelectD.select(errors,N/2,N);
+			double median = QuickSelectArray.select(errors,N/2,N);
 
 			if( median < bestMedian ) {
 				bestMedian = median;
@@ -152,7 +152,7 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 			errorMetric.computeDistance(dataSet,errors);
 
 			int []indexes = new int[n];
-			QuickSelectD.selectIndex(errors,numPts, n,indexes);
+			QuickSelectArray.selectIndex(errors,numPts, n,indexes);
 			for( int i = 0; i < numPts; i++ ) {
 				inlierSet.add( dataSet.get(indexes[i]) );
 			}

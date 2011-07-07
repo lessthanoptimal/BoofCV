@@ -16,8 +16,8 @@
 
 package gecv.alg.detect.corner.impl;
 
+import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.alg.detect.corner.GenericCornerIntensityTests;
-import gecv.alg.filter.blur.MedianFilterFactory;
 import gecv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -42,6 +42,6 @@ public class TestMedianCorner_F32 extends GenericCornerIntensityTests
 
 	@Override
 	protected void computeDerivatives() {
-		MedianFilterFactory.create_F32(2).process(imageF,median);
+		FactoryBlurFilter.median(ImageFloat32.class,2).process(imageF,median);
 	}
 }
