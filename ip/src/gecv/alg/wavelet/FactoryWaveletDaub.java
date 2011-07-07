@@ -377,10 +377,10 @@ public class FactoryWaveletDaub {
 		r.offsetWavelet = o.offsetWavelet;
 
 		for( int j = 0; j < o.scaling.length; j++ ) {
-			r.scaling[j] = (int)Math.round(o.scaling[j]*denominatorScaling);
+			r.scaling[j] = Math.round(o.scaling[j]*denominatorScaling);
 		}
 		for( int j = 0; j < o.wavelet.length; j++ ) {
-			r.wavelet[j] = (int)Math.round(o.wavelet[j]*denominatorWavelet);
+			r.wavelet[j] = Math.round(o.wavelet[j]*denominatorWavelet);
 		}
 	}
 }

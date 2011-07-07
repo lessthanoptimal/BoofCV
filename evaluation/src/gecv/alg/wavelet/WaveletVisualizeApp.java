@@ -16,13 +16,14 @@
 
 package gecv.alg.wavelet;
 
+import gecv.abst.wavelet.FactoryWaveletTransform;
+import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.wavelet.WaveletDescription;
 import gecv.struct.wavelet.WlCoef_F32;
@@ -47,16 +48,15 @@ public class WaveletVisualizeApp {
 
 	ImagePanel panelInput;
 	ImageFloat32 image;
-	ImageFloat32 temp;
 	ImageFloat32 imageWavelet;
-	ImageFloat32 imageInv;
-
 //	WaveletDescription<WlCoef_F32> desc = FactoryWaveletHaar.generate_F32();
+
 //
 //	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(4);
-
 //	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5,WaveletBorderType.WRAP);
+
 	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5,WaveletBorderType.REFLECT);
+	WaveletTransform<ImageFloat32,ImageFloat32,WlCoef_F32> tran = FactoryWaveletTransform.create_F32(desc,numLevels);
 
 	public void process() {
 		createTestImage();
@@ -67,53 +67,40 @@ public class WaveletVisualizeApp {
 
 		System.out.println("width "+width+"  height "+height);
 
-		ImageDimension d = UtilWavelet.transformDimension(image,numLevels);
-
-		imageWavelet = new ImageFloat32(d.width,d.height);
 		ImageFloat32 imageInv = new ImageFloat32(width,height);
 
 		panelInput = ShowImages.showWindow(image,"Input Image",true);
 		ConvertBufferedImage.convertTo(image,panelInput.getImage());
 		panelInput.repaint();
 
-		WaveletTransformOps.transformN(desc,image.clone(),imageWavelet,null,numLevels);
+		imageWavelet = tran.transform(image,imageWavelet);
 
-		ShowImages.showWindow(imageWavelet,"Transformed",true);
-
-		int scaleW = width/UtilWavelet.computeScale(numLevels);
-		int scaleH = height/UtilWavelet.computeScale(numLevels);
+		int scaleW = imageWavelet.width/UtilWavelet.computeScale(numLevels);
+		int scaleH = imageWavelet.height/UtilWavelet.computeScale(numLevels);
 		scaleW += scaleW%2;
 		scaleH += scaleH%2;
 
-		float thresh = 25;
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x++ ) {
-				if( x < scaleW && y < scaleH )
+//		float thresh = 25;
+//		for( int y = 0; y < height; y++ ) {
+//			for( int x = 0; x < width; x++ ) {
+//				if( x < scaleW && y < scaleH )
+//					continue;
+//				float v = Math.abs(imageWavelet.get(x,y));
+//				if( v < thresh )
+//					imageWavelet.set(x,y,0);
+//			}
+//		}
+
+		for( int y = 0; y < imageWavelet.height; y++ ) {
+			for( int x = 0; x < imageWavelet.width; x++ ) {
+				if( x < imageWavelet.width/2 && y < imageWavelet.height/2 )
 					continue;
-				float v = Math.abs(imageWavelet.get(x,y));
-				if( v < thresh )
-					imageWavelet.set(x,y,0);
+				imageWavelet.set(x,y,0);
 			}
 		}
 
-//		for( int y = 0; y < height; y++ ) {
-//			for( int x = 0; x < width; x++ ) {
-//				if( x < width/2 && y < height/2 )
-//					continue;
-//				float v = imageWavelet.get(x,y)*4;
-//				imageWavelet.set(x,y,v);
-//			}
-//		}
-
-//		for( int y = 0; y < height; y++ ) {
-//			for( int x = 0; x < width; x++ ) {
-//				if( x < width/2 && y < height/2 ) {
-//					imageWavelet.set(x,y,0);
-//				}
-//			}
-//		}
-
-		WaveletTransformOps.inverseN(desc,imageWavelet,imageInv,null,numLevels);
+		ShowImages.showWindow(imageWavelet,"Transformed",true);
+		tran.invert(imageWavelet,imageInv);
 
 		PixelMath.boundImage(imageInv,0,255);
 

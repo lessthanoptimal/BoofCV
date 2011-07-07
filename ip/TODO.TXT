@@ -42,7 +42,7 @@
 - Convolve
  * Add a new implementation for horizontal and vertical which are "in-place"
    Uses an array one row/column long in which the image is locally copied.
- * Sparse Kernel Convolve for when there is a lot of zeros
+ * Sparse Kernel Convolve for when there is a lot of zeros in the kernel
    - Unroll
    - Compare speed to hand derived kernels in gradient
 
@@ -52,8 +52,9 @@
 - InterpolateRectangle
  * Have output be an image
 
-- Convolution Downsampling
+- Convolve Sparse
  * Optimize a bit more by only running the re-normalize code on the outer most regions.
+ * Delete if nothing is using it
 
 - Have a morphological filter section?
  * Add gray scale morphological operators
