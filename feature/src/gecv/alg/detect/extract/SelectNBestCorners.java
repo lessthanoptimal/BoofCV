@@ -19,7 +19,7 @@ package gecv.alg.detect.extract;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I16;
-import pja.sorting.QuickSelectF;
+import pja.sorting.QuickSelectArray;
 
 
 /**
@@ -82,7 +82,7 @@ public class SelectNBestCorners {
 
 			}
 
-			QuickSelectF.selectIndex(inten, N, size, indexes);
+			QuickSelectArray.selectIndex(inten, N, size, indexes);
 
 			for (int i = 0; i < N; i++) {
 				Point2D_I16 pt = origCorners.points[indexes[i]];

@@ -18,11 +18,10 @@ package gecv.alg.filter.blur;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
+import gecv.alg.filter.blur.impl.ImplMedianHistogramInner;
+import gecv.alg.filter.blur.impl.ImplMedianHistogramInnerNaive;
+import gecv.alg.filter.blur.impl.ImplMedianSortNaive;
 import gecv.alg.misc.ImageTestingOps;
-import gecv.alg.filter.blur.impl.MedianHistogramInnerNaive_I8;
-import gecv.alg.filter.blur.impl.MedianHistogramInner_I8;
-import gecv.alg.filter.blur.impl.MedianSortNaive_F32;
-import gecv.alg.filter.blur.impl.MedianSortNaive_I8;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageSInt32;
@@ -48,39 +47,51 @@ public class BenchmarkMedianFilter {
 	static ImageSInt16 out_I16;
 	static ImageSInt32 out_I32;
 
-	public static class HistogramNaive_I8 extends PerformerBase
+	public static class BlurOps_I8 extends PerformerBase
 	{
-		MedianHistogramInnerNaive_I8 alg = new MedianHistogramInnerNaive_I8(radius);
 		@Override
 		public void process() {
-			alg.process(imgInt8,out_I8);
+			BlurImageOps.median(imgInt8,out_I8,radius);
+		}
+	}
+
+	public static class BlurOps_F32 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			BlurImageOps.median(imgFloat32,out_F32,radius);
+		}
+	}
+
+	public static class HistogramNaive_I8 extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ImplMedianHistogramInnerNaive.process(imgInt8,out_I8,radius,null,null);
 		}
 	}
 
 	public static class Histogram_I8 extends PerformerBase
 	{
-		MedianHistogramInner_I8 alg = new MedianHistogramInner_I8(radius);
 		@Override
 		public void process() {
-			alg.process(imgInt8,out_I8);
+			ImplMedianHistogramInner.process(imgInt8,out_I8,radius,null,null);
 		}
 	}
 
 	public static class SortNaive_I8 extends PerformerBase
 	{
-		MedianSortNaive_I8 alg = new MedianSortNaive_I8(radius);
 		@Override
 		public void process() {
-			alg.process(imgInt8,out_I8);
+			ImplMedianSortNaive.process(imgInt8,out_I8,radius,null);
 		}
 	}
 
 	public static class SortNaive_F32 extends PerformerBase
 	{
-		MedianSortNaive_F32 alg = new MedianSortNaive_F32(radius);
 		@Override
 		public void process() {
-			alg.process(imgFloat32,out_F32);
+			ImplMedianSortNaive.process(imgFloat32,out_F32,radius,null);
 		}
 	}
 
@@ -105,7 +116,8 @@ public class BenchmarkMedianFilter {
 			System.out.println();
 			BenchmarkMedianFilter.radius = radius;
 			
-
+			ProfileOperation.printOpsPerSec(new BlurOps_I8(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new BlurOps_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new HistogramNaive_I8(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Histogram_I8(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new SortNaive_I8(),TEST_TIME);
