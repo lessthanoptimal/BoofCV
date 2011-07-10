@@ -293,9 +293,13 @@
       <words>
         <w>bilinear</w>
         <w>convolving</w>
+        <w>denoises</w>
+        <w>denoising</w>
         <w>discretized</w>
         <w>laplacian</w>
         <w>renormalized</w>
+        <w>thresholded</w>
+        <w>thresholding</w>
       </words>
     </dictionary>
   </component>
@@ -303,7 +307,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/feature/Feature.iml" filepath="$PROJECT_DIR$/feature/Feature.iml" />
       <module fileurl="file://$PROJECT_DIR$/sfm/Geometric Vision.iml" filepath="$PROJECT_DIR$/sfm/Geometric Vision.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Image Processing/Image Processing.iml" filepath="$PROJECT_DIR$/Image Processing/Image Processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ip/Image Processing.iml" filepath="$PROJECT_DIR$/ip/Image Processing.iml" />
       <module fileurl="file://$PROJECT_DIR$/../jgrl/Java Geometric Regression Library.iml" filepath="$PROJECT_DIR$/../jgrl/Java Geometric Regression Library.iml" />
       <module fileurl="file://$PROJECT_DIR$/apps/apps.iml" filepath="$PROJECT_DIR$/apps/apps.iml" />
       <module fileurl="file://$PROJECT_DIR$/../cv/cv.iml" filepath="$PROJECT_DIR$/../cv/cv.iml" />

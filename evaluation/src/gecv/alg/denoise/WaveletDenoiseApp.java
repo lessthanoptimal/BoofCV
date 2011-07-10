@@ -16,7 +16,7 @@
 
 package gecv.alg.denoise;
 
-import gecv.alg.misc.ImageTestingOps;
+import gecv.alg.filter.derivative.LaplacianEdge;
 import gecv.alg.misc.PixelMath;
 import gecv.alg.wavelet.FactoryWaveletDaub;
 import gecv.alg.wavelet.UtilWavelet;
@@ -45,28 +45,29 @@ public class WaveletDenoiseApp {
 	int width;
 	int height;
 	int numLevels = 3;
-	float noiseLevel = 50;
+	float noiseSigma = 30;
 
 	Random rand = new Random(2234);
 
 	ImagePanel panelInput;
 	ImageFloat32 image;
+	ImageFloat32 imageNoisy;
 	ImageFloat32 temp;
 	ImageFloat32 imageWavelet;
 	ImageFloat32 imageInv;
 
-//	WaveletDescription<WlCoef_F32> coefF = FactoryWaveletHaar.generate_F32();
-//	WaveletDescription<WlCoef_F32> coefR = FactoryWaveletHaar.generate_F32();
+//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletHaar.generate_F32();
 //
-	WaveletDescription<WlCoef_F32> coefF = FactoryWaveletDaub.daubJ_F32(4);
-	WaveletDescription<WlCoef_F32> coefR = FactoryWaveletDaub.daubJ_F32(4);
+	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.daubJ_F32(4);
 
-//	WaveletDescription<WlCoef_F32> coefF = FactoryWaveletDaub.biorthogonal_F32(5);
-//	WaveletDescription<WlCoef_F32> coefR = FactoryWaveletDaub.biorthogonalInv_F32(5);
+//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.biorthogonal_F32(5, WaveletBorderType.REFLECT);
 
 	public void process() {
-		createTestImage();
-//		loadImage();
+//		createTestImage();
+		loadImage();
+
+		addNoiseToImage();
+//		imageNoisy = image.clone();
 
 		width = image.getWidth();
 		height = image.getHeight();
@@ -80,36 +81,72 @@ public class WaveletDenoiseApp {
 		ConvertBufferedImage.convertTo(image,panelInput.getImage());
 		panelInput.repaint();
 
-		WaveletTransformOps.transformN(coefF,image.clone(),imageWavelet,null,numLevels);
+		WaveletTransformOps.transformN(waveletDesc,imageNoisy.clone(),imageWavelet,null,numLevels);
 
 		ShowImages.showWindow(imageWavelet,"Transformed",true);
 
-		float threshold[] = new float[ imageWavelet.width*imageWavelet.height ];
-		float thresh = DenoiseVisuShrink.computeThreshold(imageWavelet,numLevels,threshold);
-		DenoiseVisuShrink.process(imageWavelet,numLevels,thresh);
+//		DenoiseVisuShrink visu = new DenoiseVisuShrink();
+//		visu.process(imageWavelet,numLevels);
 
-		WaveletTransformOps.inverseN(coefR,imageWavelet,imageInv,null,numLevels);
+		DenoiseBayesShrink bayes = new DenoiseBayesShrink();
+		bayes.process(imageWavelet,numLevels);
+
+//		DenoiseSureShrink sure = new DenoiseSureShrink();
+//		sure.process(imageWavelet,numLevels);
+
+		WaveletTransformOps.inverseN(waveletDesc,imageWavelet,imageInv,null,numLevels);
+
+//		BlurImageOps.gaussian(imageNoisy,imageInv,1,imageNoisy.clone());
+
 
 		PixelMath.boundImage(imageInv,0,255);
 
+		ShowImages.showWindow(imageNoisy,"Noisy",true);
 		ShowImages.showWindow(imageInv,"Inverted",true);
 
 		ImageFloat32 diff = new ImageFloat32(width,height);
 		PixelMath.diffAbs(image,imageInv,diff);
 		ShowImages.showWindow(diff,"Difference",true);
-		
+
+		System.out.println("noisy  error per pixel   "+computeMSE(imageNoisy));
+		System.out.println("noisy  edge error        "+computeEdgeMSE(imageNoisy));
+		System.out.println("denoised error per pixel "+computeMSE(imageInv));
+		System.out.println("denoised edge error      "+computeEdgeMSE(imageInv));
+	}
+
+	private double computeMSE(ImageFloat32 imageInv) {
 		double error = 0;
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
 				double e = image.get(x,y)-imageInv.get(x,y);
-				error += Math.abs(e);
+				error += e*e;
 			}
 		}
-		System.out.println("average error per pixel "+(error/(width*height)));
+		return error/(width*height);
+	}
+
+	private double computeEdgeMSE(ImageFloat32 imageInv) {
+		ImageFloat32 edge = new ImageFloat32(imageInv.width,imageInv.height);
+		LaplacianEdge.process_F32(image,edge);
+		PixelMath.abs(edge,edge);
+		float max = PixelMath.maxAbs(edge);
+		PixelMath.divide(edge,edge,max);
+		float total = PixelMath.sum(edge);
+
+		double error = 0;
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				double w = edge.get(x,y)/total;
+				double e = (image.get(x,y)-imageInv.get(x,y));
+				error += (e*e)*w;
+			}
+		}
+		return error;
 	}
 
 	private void loadImage() {
-		BufferedImage in = UtilImageIO.loadImage("/home/pja/rgb.jpg");
+//		BufferedImage in = UtilImageIO.loadImage("/home/pja/rgb.jpg");
+		BufferedImage in = UtilImageIO.loadImage("/home/pja/projects/gecv/evaluation/data/lena512.bmp");
 		image = ConvertBufferedImage.convertFrom(in,image);
 	}
 
@@ -131,9 +168,27 @@ public class WaveletDenoiseApp {
 		addRectangle(g2,tran,-120,200,60,40);
 
 		image = ConvertBufferedImage.convertFrom(workImg,image);
-		ImageTestingOps.addUniform(image,rand,-noiseLevel,noiseLevel);
-		PixelMath.boundImage(image,0,255);
+	}
 
+	private void addNoiseToImage() {
+		imageNoisy = image.clone();
+		addNormal(imageNoisy,rand,noiseSigma);
+//		ImageTestingOps.addUniform(imageNoisy,rand,-noiseLevel,noiseLevel);
+		PixelMath.boundImage(imageNoisy,0,255);
+	}
+
+	public static void addNormal(ImageFloat32 img, Random rand , float sigma ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		float[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				data[index++] += (float)(rand.nextGaussian()*sigma);
+			}
+		}
 	}
 
 	private void addRectangle( Graphics2D g2 , AffineTransform tran , int x0 , int y0 , int w , int h )

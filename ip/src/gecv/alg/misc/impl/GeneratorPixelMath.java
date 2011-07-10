@@ -79,6 +79,7 @@ public class GeneratorPixelMath {
 			printPlus();
 			printBoundImage();
 			printDiffAbs();
+			printSum();
 		}
 	}
 
@@ -303,7 +304,6 @@ public class GeneratorPixelMath {
 				"\t\tfinal int h = imgA.getHeight();\n" +
 				"\t\tfinal int w = imgA.getWidth();\n" +
 				"\n" +
-				"\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
 				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
@@ -315,6 +315,38 @@ public class GeneratorPixelMath {
 				"\t\t\t\tdiff.data[indexDiff] = "+typeCast+"Math.abs((imgA.data[indexA] "+bitWise+") - (imgB.data[indexB] "+bitWise+"));\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printSum() {
+
+		String bitWise = input.getBitWise();
+
+		out.print("\t/**\n" +
+				"\t * <p>\n" +
+				"\t * Returns the sum of all the pixels in the image.\n" +
+				"\t * </p>\n" +
+				"\t * \n" +
+				"\t * @param img Input image. Not modified.\n" +
+				"\t */\n" +
+				"\tpublic static "+input.getSumType()+" sum( "+input.getImageName()+" img ) {\n" +
+				"\n" +
+				"\t\tfinal int h = img.getHeight();\n" +
+				"\t\tfinal int w = img.getWidth();\n" +
+				"\n" +
+				"\t\t"+input.getSumType()+" total = 0;\n" +
+				"\t\t\n" +
+				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
+				"\t\t\t\n" +
+				"\t\t\tint indexEnd = index+w;\n" +
+				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
+				"\t\t\tfor (; index < indexEnd; index++ ) {\n" +
+				"\t\t\t\ttotal += img.data[index] "+bitWise+";\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\t\n" +
+				"\t\treturn total;\n" +
 				"\t}\n\n");
 	}
 

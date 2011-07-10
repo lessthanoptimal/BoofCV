@@ -62,6 +62,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked"})
 public abstract class ImageBase<T extends ImageBase> implements Serializable, Cloneable {
 
 	/**

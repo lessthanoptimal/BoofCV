@@ -32,8 +32,10 @@ import java.lang.reflect.Method;
  */
 public class MedianImageFilter<T extends ImageBase> implements FilterImageInterface<T,T> {
 
-	Method m;
-	int radius;
+	// the blur function inside of BlurImageOps being invoked
+	private Method m;
+	// size of the blur region
+	private int radius;
 
 	public MedianImageFilter( Class<?> imageType , int radius) {
 		this.radius = radius;
@@ -47,7 +49,7 @@ public class MedianImageFilter<T extends ImageBase> implements FilterImageInterf
 	/**
 	 * Radius of the square region.  The width is defined as the radius*2 + 1.
 	 *
-	 * @return Square's radius.
+	 * @return Blur region's radius.
 	 */
 	public int getRadius() {
 		return radius;
