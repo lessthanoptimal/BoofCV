@@ -1,0 +1,4 @@
+- face detection
+- moving target tracking
+- structure from motion
+- denoising

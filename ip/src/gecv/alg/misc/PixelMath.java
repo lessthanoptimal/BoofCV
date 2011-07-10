@@ -279,7 +279,6 @@ public class PixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -291,6 +290,33 @@ public class PixelMath {
 				diff.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] & 0xFF) - (imgB.data[indexB] & 0xFF));
 			}
 		}
+	}
+
+	/**
+	 * <p>
+	 * Returns the sum of all the pixels in the image.
+	 * </p>
+	 * 
+	 * @param img Input image. Not modified.
+	 */
+	public static int sum( ImageUInt8 img ) {
+
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int total = 0;
+		
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++ ) {
+				total += img.data[index] & 0xFF;
+			}
+		}
+		
+		return total;
 	}
 
 	/**
@@ -433,7 +459,6 @@ public class PixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -445,6 +470,33 @@ public class PixelMath {
 				diff.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
+	}
+
+	/**
+	 * <p>
+	 * Returns the sum of all the pixels in the image.
+	 * </p>
+	 * 
+	 * @param img Input image. Not modified.
+	 */
+	public static int sum( ImageSInt8 img ) {
+
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int total = 0;
+		
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++ ) {
+				total += img.data[index] ;
+			}
+		}
+		
+		return total;
 	}
 
 	/**
@@ -587,7 +639,6 @@ public class PixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -599,6 +650,33 @@ public class PixelMath {
 				diff.data[indexDiff] = (short)Math.abs((imgA.data[indexA] & 0xFFFF) - (imgB.data[indexB] & 0xFFFF));
 			}
 		}
+	}
+
+	/**
+	 * <p>
+	 * Returns the sum of all the pixels in the image.
+	 * </p>
+	 * 
+	 * @param img Input image. Not modified.
+	 */
+	public static int sum( ImageUInt16 img ) {
+
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int total = 0;
+		
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++ ) {
+				total += img.data[index] & 0xFFFF;
+			}
+		}
+		
+		return total;
 	}
 
 	/**
@@ -741,7 +819,6 @@ public class PixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -753,6 +830,33 @@ public class PixelMath {
 				diff.data[indexDiff] = (short)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
+	}
+
+	/**
+	 * <p>
+	 * Returns the sum of all the pixels in the image.
+	 * </p>
+	 * 
+	 * @param img Input image. Not modified.
+	 */
+	public static int sum( ImageSInt16 img ) {
+
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int total = 0;
+		
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++ ) {
+				total += img.data[index] ;
+			}
+		}
+		
+		return total;
 	}
 
 	/**
@@ -891,7 +995,6 @@ public class PixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -903,6 +1006,33 @@ public class PixelMath {
 				diff.data[indexDiff] = (int)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
+	}
+
+	/**
+	 * <p>
+	 * Returns the sum of all the pixels in the image.
+	 * </p>
+	 * 
+	 * @param img Input image. Not modified.
+	 */
+	public static int sum( ImageSInt32 img ) {
+
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int total = 0;
+		
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++ ) {
+				total += img.data[index] ;
+			}
+		}
+		
+		return total;
 	}
 
 	/**
@@ -1039,7 +1169,6 @@ public class PixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -1051,6 +1180,33 @@ public class PixelMath {
 				diff.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
+	}
+
+	/**
+	 * <p>
+	 * Returns the sum of all the pixels in the image.
+	 * </p>
+	 * 
+	 * @param img Input image. Not modified.
+	 */
+	public static float sum( ImageFloat32 img ) {
+
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		float total = 0;
+		
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++ ) {
+				total += img.data[index] ;
+			}
+		}
+		
+		return total;
 	}
 
 	/**
@@ -1187,7 +1343,6 @@ public class PixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -1199,6 +1354,33 @@ public class PixelMath {
 				diff.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
+	}
+
+	/**
+	 * <p>
+	 * Returns the sum of all the pixels in the image.
+	 * </p>
+	 * 
+	 * @param img Input image. Not modified.
+	 */
+	public static double sum( ImageFloat64 img ) {
+
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		double total = 0;
+		
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			
+			int indexEnd = index+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; index < indexEnd; index++ ) {
+				total += img.data[index] ;
+			}
+		}
+		
+		return total;
 	}
 
 }
