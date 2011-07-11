@@ -20,49 +20,32 @@ import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.blur.impl.ImplMedianHistogramInner;
 import gecv.alg.filter.blur.impl.ImplMedianSortEdgeNaive;
 import gecv.alg.filter.blur.impl.ImplMedianSortNaive;
+import gecv.alg.filter.convolve.ConvolveImageMean;
 import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 
 /**
+ * Catch all class for function which "blur" an image, typically used to "reduce" the amount
+ * of noise in the image.
+ *
  * @author Peter Abeles
  */
-// median: two implementations.  bubble sort and what's in the book
-// well three: naive to double check
-// mean: naive and highly optimized
 public class BlurImageOps {
 
-	// todo move these kernel ops some place else
-	public static void kernel(ImageUInt8 input, ImageUInt8 output, Kernel1D_I32 kernel ,
-								   ImageUInt8 storage ) {
-		InputSanityCheck.checkSameShape(input,output,storage);
 
-		ConvolveNormalized.horizontal(kernel,input,storage);
-		ConvolveNormalized.vertical(kernel,storage,output);
-	}
+	public static ImageUInt8 mean(ImageUInt8 input, ImageUInt8 output, int radius, ImageUInt8 storage) {
 
-	public static void kernel(ImageSInt16 input, ImageSInt16 output, Kernel1D_I32 kernel ,
-								   ImageSInt16 storage ) {
-		InputSanityCheck.checkSameShape(input,output,storage);
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		ConvolveNormalized.horizontal(kernel,input,storage);
-		ConvolveNormalized.vertical(kernel,storage,output);
-	}
+		ConvolveImageMean.horizontal(input,storage,radius);
+		ConvolveImageMean.vertical(storage,output,radius);
 
-	public static void kernel(ImageFloat32 input, ImageFloat32 output, Kernel1D_F32 kernel ,
-							  ImageFloat32 storage ) {
-		InputSanityCheck.checkSameShape(input,output,storage);
-
-		ConvolveNormalized.horizontal(kernel,input,storage);
-		ConvolveNormalized.vertical(kernel,storage,output);
-	}
-
-	public static ImageUInt8 mean(ImageUInt8 input, ImageUInt8 output, int radius) {
-		return null;
+		return output;
 	}
 
 	public static ImageUInt8 median(ImageUInt8 input, ImageUInt8 output, int radius) {
@@ -91,8 +74,15 @@ public class BlurImageOps {
 		return output;
 	}
 
-	public static ImageFloat32 mean(ImageFloat32 input, ImageFloat32 output, int radius) {
-		return null;
+	public static ImageFloat32 mean(ImageFloat32 input, ImageFloat32 output, int radius, ImageFloat32 storage) {
+
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		ConvolveImageMean.horizontal(input,storage,radius);
+		ConvolveImageMean.vertical(storage,output,radius);
+
+		return output;
 	}
 
 	public static ImageFloat32 median(ImageFloat32 input, ImageFloat32 output, int radius) {
@@ -105,15 +95,8 @@ public class BlurImageOps {
 
 	public static ImageFloat32 gaussian(ImageFloat32 input, ImageFloat32 output, int radius,
 										ImageFloat32 storage ) {
-		if( output == null ) {
-			output = new ImageFloat32(input.width,input.height);
-		}
-
-		if( storage == null ) {
-			storage = new ImageFloat32(input.width,input.height);
-		}
-
-		InputSanityCheck.checkSameShape(input,output,storage);
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
 
 		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(radius,true);
 

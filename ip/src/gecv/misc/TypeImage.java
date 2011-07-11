@@ -25,11 +25,11 @@ import gecv.struct.image.*;
  * @author Peter Abeles
  */
 public enum TypeImage {
-	I("ImageInteger","int",true),
-	I8("ImageInt8","byte",true),
+	I("ImageInteger","int",true,0),
+	I8("ImageInt8","byte",true,8),
 	U8(ImageUInt8.class),
 	S8(ImageSInt8.class),
-	I16("ImageInt16","short",true),
+	I16("ImageInt16","short",true,16),
 	U16(ImageUInt16.class),
 	S16(ImageSInt16.class),
 	S32(ImageSInt32.class),
@@ -43,8 +43,9 @@ public enum TypeImage {
 	private boolean isInteger;
 	private boolean isSigned;
 	private int numBits;
+	private String abbreviatedType;
 
-	private Class<?> primativeType;
+	private Class<?> primitiveType;
 
 	TypeImage( Class<?> imageType ) {
 
@@ -52,40 +53,45 @@ public enum TypeImage {
 		bitWise = "";
 		try {
 			ImageBase img = (ImageBase)imageType.newInstance();
-			primativeType = img._getPrimitiveType();
-			dataType = primativeType.getSimpleName();
+			primitiveType = img._getPrimitiveType();
+			dataType = primitiveType.getSimpleName();
 			if( ImageInteger.class.isAssignableFrom(imageType)) {
 				isInteger = true;
 				sumType = "int";
 				if( !((ImageInteger)img).isSigned() ) {
+					abbreviatedType = "U";
 					isSigned = false;
-					if( byte.class == primativeType ) {
+					if( byte.class == primitiveType) {
 						bitWise = "& 0xFF";
-					} else if( short.class == primativeType ) {
+					} else if( short.class == primitiveType) {
 						bitWise = "& 0xFFFF";
 					}
 				} else {
+					abbreviatedType = "S";
 					isSigned = true;
 				}
 			} else {
+				abbreviatedType = "F";
 				isSigned = true;
 				isInteger = false;
-				if( imageType == ImageFloat32.class )
+				if( imageType == ImageFloat32.class ) {
 					sumType = "float";
-				else
+				} else {
 					sumType = "double";
+				}
 			}
-			if( primativeType == byte.class ) {
+			if( primitiveType == byte.class ) {
 				numBits = 8;
-			} else if( primativeType == short.class ) {
+			} else if( primitiveType == short.class ) {
 				numBits = 16;
-			} else if( primativeType == int.class || primativeType == float.class ) {
+			} else if( primitiveType == int.class || primitiveType == float.class ) {
 				numBits = 32;
-			} else if( primativeType == long.class || primativeType == double.class ) {
+			} else if( primitiveType == long.class || primitiveType == double.class ) {
 				numBits = 64;
 			} else {
 				throw new IllegalArgumentException("Unknown number of bits");
 			}
+			abbreviatedType += numBits;
 
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
@@ -94,14 +100,19 @@ public enum TypeImage {
 		}
 	}
 
-	TypeImage(String imageName, String dataType, boolean isInteger ) {
+	TypeImage(String imageName, String dataType, boolean isInteger , int numBits ) {
 		this.imageName = imageName;
 		this.dataType = dataType;
 		this.isInteger = isInteger;
-		if( isInteger )
+		this.numBits = numBits;
+
+		if( isInteger ) {
+			this.abbreviatedType = "I";
 			this.sumType = "int";
-		else
+		} else {
 			this.sumType = "double";
+		}
+		abbreviatedType += numBits;
 
 	}
 
@@ -157,8 +168,8 @@ public enum TypeImage {
 		return numBits;
 	}
 
-	public Class<?> getPrimativeType() {
-		return primativeType;
+	public Class<?> getPrimitiveType() {
+		return primitiveType;
 	}
 
 	public String getTypeCastFromSum() {
@@ -168,19 +179,23 @@ public enum TypeImage {
 			return "";
 	}
 
+	public String getAbbreviatedType() {
+		return abbreviatedType;
+	}
+
 	public String getRandType() {
-		return primativeType == float.class ? "Float" : "Double";
+		return primitiveType == float.class ? "Float" : "Double";
 	}
 
 	public Number getMax() {
 		if( isInteger ) {
-			if( byte.class == primativeType ) {
+			if( byte.class == primitiveType) {
 				if( isSigned ) {
 					return Byte.MAX_VALUE;
 				} else {
 					return 0xFF;
 				}
-			} else if( short.class == primativeType ) {
+			} else if( short.class == primitiveType) {
 				if( isSigned ) {
 					return Short.MAX_VALUE;
 				} else {
@@ -189,7 +204,7 @@ public enum TypeImage {
 			} else {
 				return Integer.MAX_VALUE;
 			}
-		} else if( float.class == primativeType ) {
+		} else if( float.class == primitiveType) {
 			return Float.MAX_VALUE;
 		} else {
 			return Double.MAX_VALUE;
@@ -198,13 +213,13 @@ public enum TypeImage {
 
 	public Number getMin() {
 		if( isInteger ) {
-			if( byte.class == primativeType ) {
+			if( byte.class == primitiveType) {
 				if( isSigned ) {
 					return Byte.MIN_VALUE;
 				} else {
 					return 0;
 				}
-			} else if( short.class == primativeType ) {
+			} else if( short.class == primitiveType) {
 				if( isSigned ) {
 					return Short.MIN_VALUE;
 				} else {
@@ -213,7 +228,7 @@ public enum TypeImage {
 			} else {
 				return Integer.MIN_VALUE;
 			}
-		} else if( float.class == primativeType ) {
+		} else if( float.class == primitiveType) {
 			return Float.MIN_VALUE;
 		} else {
 			return Double.MIN_VALUE;

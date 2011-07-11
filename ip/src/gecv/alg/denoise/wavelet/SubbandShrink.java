@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.alg.denoise;
+package gecv.alg.denoise.wavelet;
 
+import gecv.alg.denoise.DenoiseWavelet;
+import gecv.alg.denoise.ShrinkThresholdRule;
 import gecv.struct.image.ImageBase;
 
 
@@ -25,7 +27,7 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class SubbandShrink<I extends ImageBase<I>> {
+public abstract class SubbandShrink<I extends ImageBase<I>> implements DenoiseWavelet<I> {
 
 	// specifies how the threshold is applied to each pixel in the image
 	protected ShrinkThresholdRule<I> rule;

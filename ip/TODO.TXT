@@ -23,9 +23,7 @@
     - Canny?
 
 - Denoise
- * Weiner
  * TAWS denoiser
- * SureShrink
 
 - Thresholding
  * Global Threshold
@@ -45,9 +43,6 @@
 
 - Improve Sort Median Filter
 *   Use bubble sort to avoid resorting each time
-
-- InterpolateRectangle
- * Have output be an image
 
 - Convolve Sparse
  * Optimize a bit more by only running the re-normalize code on the outer most regions.

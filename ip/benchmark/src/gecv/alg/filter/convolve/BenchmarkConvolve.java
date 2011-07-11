@@ -18,8 +18,10 @@ package gecv.alg.filter.convolve;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.convolve.noborder.*;
+import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.border.BorderIndex1D_Extend;
+import gecv.core.image.border.ImageBorder1D_I32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -173,7 +175,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveExtended.convolve(kernel2D_I32,imgInt8,out_I16);
+			ConvolveWithBorder.convolve(kernel2D_I32,imgInt8,out_I16,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		}
 	}
 
@@ -255,11 +257,11 @@ public class BenchmarkConvolve {
 		}
 	}
 
-	public static class Box_I8_I32_Vertical extends PerformerBase
+	public static class Box_U8_S32_Vertical extends PerformerBase
 	{
 		@Override
 		public void process() {
-			ConvolveBox_I8_I32.vertical(imgInt8,out_I32,radius,false);
+			ImplConvolveBox.vertical(imgInt8,out_I32,radius,false);
 		}
 	}
 
@@ -306,7 +308,7 @@ public class BenchmarkConvolve {
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I8(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I8_I8_div(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new VerticalUnrolled_I16(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_I8_I32_Vertical(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Box_U8_S32_Vertical(),TEST_TIME);
 
 			ProfileOperation.printOpsPerSec(new Convolve2D_Std_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve2D_Unrolled_F32(),TEST_TIME);

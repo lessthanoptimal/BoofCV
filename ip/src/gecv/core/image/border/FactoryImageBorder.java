@@ -36,6 +36,34 @@ public class FactoryImageBorder {
 			throw new IllegalArgumentException("Unknown image type");
 	}
 
+	public static ImageBorder extend( Class<?> imageType ) {
+		if( imageType == ImageFloat32.class )
+			return new ImageBorder1D_F32(BorderIndex1D_Extend.class);
+		if( imageType == ImageFloat64.class )
+			return new ImageBorder1D_F64(BorderIndex1D_Extend.class);
+		else if( ImageInteger.class.isAssignableFrom(imageType) )
+			return new ImageBorder1D_I32(BorderIndex1D_Extend.class);
+		else
+			throw new IllegalArgumentException("Unknown image type");
+	}
+
+	public static ImageBorder general( Class<?> imageType , Class<?> borderType ) {
+		if( imageType == ImageFloat32.class )
+			return new ImageBorder1D_F32(borderType);
+		if( imageType == ImageFloat64.class )
+			return new ImageBorder1D_F64(borderType);
+		else if( ImageInteger.class.isAssignableFrom(imageType) )
+			return new ImageBorder1D_I32(borderType);
+		else
+			throw new IllegalArgumentException("Unknown image type");
+	}
+
+	public static ImageBorder1D_F64 general( ImageFloat64 image , BorderIndex1D type) {
+		ImageBorder1D_F64 ret = new ImageBorder1D_F64(type,type);
+		ret.setImage(image);
+		return ret;
+	}
+
 	public static ImageBorder1D_F64 extend( ImageFloat64 image ) {
 		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Extend.class);
 		ret.setImage(image);
@@ -58,6 +86,12 @@ public class FactoryImageBorder {
 		return ImageBorderValue.wrap(image,value);
 	}
 
+	public static ImageBorder1D_F32 general( ImageFloat32 image , BorderIndex1D type) {
+		ImageBorder1D_F32 ret = new ImageBorder1D_F32(type,type);
+		ret.setImage(image);
+		return ret;
+	}
+
 	public static ImageBorder1D_F32 extend( ImageFloat32 image ) {
 		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
 		ret.setImage(image);
@@ -78,6 +112,12 @@ public class FactoryImageBorder {
 
 	public static ImageBorder_F32 value( ImageFloat32 image , float value ) {
 		return ImageBorderValue.wrap(image,value);
+	}
+
+	public static ImageBorder1D_I32 general( ImageInteger image , BorderIndex1D type ) {
+		ImageBorder1D_I32 ret = new ImageBorder1D_I32(type,type);
+		ret.setImage(image);
+		return ret;
 	}
 
 	public static ImageBorder1D_I32 extend( ImageInteger image ) {

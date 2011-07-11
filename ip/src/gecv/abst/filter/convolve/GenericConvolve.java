@@ -17,6 +17,8 @@
 package gecv.abst.filter.convolve;
 
 import gecv.abst.filter.FilterImageInterface;
+import gecv.core.image.border.BorderType;
+import gecv.core.image.border.ImageBorder;
 import gecv.struct.convolve.KernelBase;
 import gecv.struct.image.ImageBase;
 
@@ -36,11 +38,13 @@ public class GenericConvolve<Input extends ImageBase, Output extends ImageBase>
 	Method m;
 	KernelBase kernel;
 	BorderType type;
+	ImageBorder borderRule;
 
-	public GenericConvolve(Method m, KernelBase kernel, BorderType type) {
+	public GenericConvolve(Method m, KernelBase kernel, BorderType type, ImageBorder borderRule) {
 		this.m = m;
 		this.kernel = kernel;
 		this.type = type;
+		this.borderRule = borderRule;
 	}
 
 	@Override
@@ -53,11 +57,17 @@ public class GenericConvolve<Input extends ImageBase, Output extends ImageBase>
 						break;
 
 					default:
-						m.invoke(null,kernel,input,output);
+						if( borderRule == null )
+							m.invoke(null,kernel,input,output);
+						else
+							m.invoke(null,kernel,input,output, borderRule);
 						break;
 				}
 			} else {
-				m.invoke(null,kernel,input,output);
+				if( borderRule == null )
+					m.invoke(null,kernel,input,output);
+				else
+					m.invoke(null,kernel,input,output, borderRule);
 			}
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);

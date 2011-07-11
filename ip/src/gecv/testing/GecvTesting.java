@@ -353,7 +353,7 @@ public class GecvTesting {
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
 				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + imgB.get(x, y));
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + imgB.get(x, y)+" Subimages = "+imgA.isSubimage()+" "+imgB.isSubimage());
 			}
 		}
 	}

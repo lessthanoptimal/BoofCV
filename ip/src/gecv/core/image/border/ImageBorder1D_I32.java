@@ -37,6 +37,17 @@ public class ImageBorder1D_I32 extends ImageBorder_I32 {
 		}
 	}
 
+	public ImageBorder1D_I32(BorderIndex1D rowWrap, BorderIndex1D colWrap) {
+		this.rowWrap = rowWrap;
+		this.colWrap = colWrap;
+	}
+
+	public ImageBorder1D_I32(ImageInteger<?> image, BorderIndex1D rowWrap, BorderIndex1D colWrap) {
+		super(image);
+		this.rowWrap = rowWrap;
+		this.colWrap = colWrap;
+	}
+
 	public BorderIndex1D getRowWrap() {
 		return rowWrap;
 	}

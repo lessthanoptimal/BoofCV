@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.alg.denoise;
+package gecv.alg.denoise.wavelet;
 
+import gecv.alg.denoise.DenoiseWavelet;
+import gecv.alg.denoise.ShrinkThresholdRule;
 import gecv.alg.wavelet.UtilWavelet;
 import gecv.struct.image.ImageFloat32;
 
@@ -33,7 +35,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class DenoiseVisuShrink {
+public class DenoiseVisuShrink implements DenoiseWavelet<ImageFloat32> {
 
 	ShrinkThresholdRule<ImageFloat32> rule = new ShrinkThresholdSoft();
 
@@ -44,7 +46,8 @@ public class DenoiseVisuShrink {
 	 * @param transform Mult-level wavelet transform.  Modified.
 	 * @param numLevels Number of levels in the transform.
 	 */
-	public void process( ImageFloat32 transform , int numLevels ) {
+	@Override
+	public void denoise( ImageFloat32 transform , int numLevels ) {
 		int scale = UtilWavelet.computeScale(numLevels);
 
 		final int h = transform.height;

@@ -16,7 +16,7 @@
 
 package gecv.alg.pyramid;
 
-import gecv.alg.filter.blur.BlurImageOps;
+import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
@@ -87,7 +87,10 @@ public class TestConvolutionPyramid {
 		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(3, true);
 		ImageFloat32 convImg = new ImageFloat32(width, height);
 
-		BlurImageOps.kernel(img, convImg, kernel, new ImageFloat32(width, height));
+		ImageFloat32 storage = new ImageFloat32(width, height);
+
+		ConvolveNormalized.horizontal(kernel,img,storage);
+		ConvolveNormalized.vertical(kernel,storage,convImg);
 
 		ImagePyramid<ImageFloat32> pyramid = ImagePyramidFactory.create_F32(width, height, false);
 		pyramid.setScaling(1, 2, 2);

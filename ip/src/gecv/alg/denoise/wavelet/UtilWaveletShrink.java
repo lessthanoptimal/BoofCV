@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.denoise;
+package gecv.alg.denoise.wavelet;
 
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;

@@ -17,15 +17,18 @@
 package gecv.alg.filter.blur;
 
 import gecv.alg.filter.blur.impl.ImplMedianSortNaive;
+import gecv.alg.filter.convolve.ConvolveNormalized;
+import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.convolve.Kernel1D_F32;
+import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.util.Random;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -34,12 +37,55 @@ public class TestBlurImageOps {
 
 	Random rand = new Random(234);
 
-	int width = 20;
-	int height = 30;
+	int width = 10;
+	int height = 12;
 
 	@Test
-	public void mean() {
-		fail("implement");
+	public void mean_U8() {
+		ImageUInt8 input = new ImageUInt8(width,height);
+		ImageUInt8 found = new ImageUInt8(width,height);
+		ImageUInt8 expected = new ImageUInt8(width,height);
+
+		ImageUInt8 storage = new ImageUInt8(width,height);
+
+		GeneralizedImageOps.randomize(input,rand,0,20);
+
+		for( int radius = 1; radius <= 4; radius++ ) {
+			ImageTestingOps.fill(expected,0);
+			ImageTestingOps.fill(found,0);
+
+			Kernel1D_I32 kernel = KernelFactory.table1D_I32(radius);
+			ConvolveNormalized.horizontal(kernel,input,storage);
+			ConvolveNormalized.vertical(kernel,storage,expected);
+
+			BlurImageOps.mean(input,found, radius, null);
+
+			GecvTesting.assertEquals(expected,found,0);
+		}
+	}
+
+	@Test
+	public void mean_F32() {
+		ImageFloat32 input = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+		ImageFloat32 expected = new ImageFloat32(width,height);
+
+		ImageFloat32 storage = new ImageFloat32(width,height);
+
+		GeneralizedImageOps.randomize(input,rand,0,20);
+
+		for( int radius = 1; radius <= 4; radius++ ) {
+			ImageTestingOps.fill(expected,0);
+			ImageTestingOps.fill(found,0);
+
+			Kernel1D_F32 kernel = KernelFactory.table1D_F32(radius,true);
+			ConvolveNormalized.horizontal(kernel,input,storage);
+			ConvolveNormalized.vertical(kernel,storage,expected);
+
+			BlurImageOps.mean(input,found, radius, null);
+
+			GecvTesting.assertEquals(expected,found,0,1e-4);
+		}
 	}
 
 	@Test
@@ -76,7 +122,50 @@ public class TestBlurImageOps {
 	}
 
 	@Test
-	public void gaussian() {
-		fail("implement");
+	public void gaussian_U8() {
+		ImageUInt8 input = new ImageUInt8(width,height);
+		ImageUInt8 found = new ImageUInt8(width,height);
+		ImageUInt8 expected = new ImageUInt8(width,height);
+
+		ImageUInt8 storage = new ImageUInt8(width,height);
+
+		GeneralizedImageOps.randomize(input,rand,0,20);
+
+		for( int radius = 1; radius <= 4; radius++ ) {
+			ImageTestingOps.fill(expected,0);
+			ImageTestingOps.fill(found,0);
+
+			Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(radius);
+			ConvolveNormalized.horizontal(kernel,input,storage);
+			ConvolveNormalized.vertical(kernel,storage,expected);
+
+			BlurImageOps.gaussian(input,found,radius,null);
+
+			GecvTesting.assertEquals(expected,found,0);
+		}
+	}
+
+	@Test
+	public void gaussian_F32() {
+		ImageFloat32 input = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+		ImageFloat32 expected = new ImageFloat32(width,height);
+
+		ImageFloat32 storage = new ImageFloat32(width,height);
+
+		GeneralizedImageOps.randomize(input,rand,0,20);
+
+		for( int radius = 1; radius <= 4; radius++ ) {
+			ImageTestingOps.fill(expected,0);
+			ImageTestingOps.fill(found,0);
+
+			Kernel1D_F32 kernel =KernelFactory.gaussian1D_F32(radius,true);
+			ConvolveNormalized.horizontal(kernel,input,storage);
+			ConvolveNormalized.vertical(kernel,storage,expected);
+
+			BlurImageOps.gaussian(input,found,radius,null);
+
+			GecvTesting.assertEquals(expected,found,0,1e-4);
+		}
 	}
 }

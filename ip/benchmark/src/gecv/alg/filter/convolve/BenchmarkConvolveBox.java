@@ -18,9 +18,7 @@ package gecv.alg.filter.convolve;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.filter.convolve.noborder.ConvolveBox_F32_F32;
-import gecv.alg.filter.convolve.noborder.ConvolveBox_I8_I16;
-import gecv.alg.filter.convolve.noborder.ConvolveBox_I8_I32;
+import gecv.alg.filter.convolve.noborder.ImplConvolveBox;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -64,19 +62,27 @@ public class BenchmarkConvolveBox {
 		}
 	}
 
-	public static class Box_I8_I16_Vertical extends PerformerBase
+	public static class Box_U8_I16_Vertical extends PerformerBase
 	{
 		@Override
 		public void process() {
-			ConvolveBox_I8_I16.vertical(imgInt8,out_I16,radius,false);
+			ImplConvolveBox.vertical(imgInt8,out_I16,radius,false);
 		}
 	}
 
-	public static class Box_I8_I32_Vertical extends PerformerBase
+	public static class Box_U8_I32_Vertical extends PerformerBase
 	{
 		@Override
 		public void process() {
-			ConvolveBox_I8_I32.vertical(imgInt8,out_I32,radius,false);
+			ImplConvolveBox.vertical(imgInt8,out_I32,radius,false);
+		}
+	}
+
+	public static class Box_S16_I16_Vertical extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ImplConvolveBox.vertical(imgInt16,out_I16,radius,false);
 		}
 	}
 
@@ -84,23 +90,39 @@ public class BenchmarkConvolveBox {
 	{
 		@Override
 		public void process() {
-			ConvolveBox_F32_F32.vertical(imgFloat32,out_F32,radius,false);
+			ImplConvolveBox.vertical(imgFloat32,out_F32,radius,false);
 		}
 	}
 
-	public static class Box_I8_I16_Horizontal extends PerformerBase
+	public static class BoxAlt_F32_F32_Vertical extends PerformerBase
 	{
 		@Override
 		public void process() {
-			ConvolveBox_I8_I16.horizontal(imgInt8,out_I16,radius,false);
+			ConvolveBoxAlt.vertical(imgFloat32,out_F32,radius,false);
 		}
 	}
 
-	public static class Box_I8_I32_Horizontal extends PerformerBase
+	public static class Box_U8_I16_Horizontal extends PerformerBase
 	{
 		@Override
 		public void process() {
-			ConvolveBox_I8_I32.horizontal(imgInt8,out_I32,radius,false);
+			ImplConvolveBox.horizontal(imgInt8,out_I16,radius,false);
+		}
+	}
+
+	public static class Box_U8_I32_Horizontal extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ImplConvolveBox.horizontal(imgInt8,out_I32,radius,false);
+		}
+	}
+
+	public static class Box_S16_I16_Horizontal extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ImplConvolveBox.horizontal(imgInt16,out_I16,radius,false);
 		}
 	}
 
@@ -108,7 +130,7 @@ public class BenchmarkConvolveBox {
 	{
 		@Override
 		public void process() {
-			ConvolveBox_F32_F32.horizontal(imgFloat32,out_F32,radius,false);
+			ImplConvolveBox.horizontal(imgFloat32,out_F32,radius,false);
 		}
 	}
 
@@ -129,15 +151,18 @@ public class BenchmarkConvolveBox {
 			System.out.println("Radius: "+radius);
 			System.out.println();
 			BenchmarkConvolveBox.radius = radius;
-			kernelF32 = KernelFactory.table1D_F32(radius,true);
+			kernelF32 = KernelFactory.table1D_F32(radius,false);
 			kernelI32 = KernelFactory.table1D_I32(radius);
 			
 
-			ProfileOperation.printOpsPerSec(new Box_I8_I16_Vertical(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_I8_I32_Vertical(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Box_U8_I16_Vertical(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Box_U8_I32_Vertical(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Box_S16_I16_Vertical(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Box_F32_F32_Vertical(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_I8_I16_Horizontal(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_I8_I32_Horizontal(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new BoxAlt_F32_F32_Vertical(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Box_U8_I16_Horizontal(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Box_U8_I32_Horizontal(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Box_S16_I16_Horizontal(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Box_F32_F32_Horizontal(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve_Vertical_I8_I16(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Convolve_Vertical_I8_I32(),TEST_TIME);

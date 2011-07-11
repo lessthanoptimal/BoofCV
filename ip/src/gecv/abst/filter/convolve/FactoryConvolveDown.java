@@ -18,6 +18,7 @@ package gecv.abst.filter.convolve;
 
 import gecv.alg.filter.convolve.ConvolveDownNoBorder;
 import gecv.alg.filter.convolve.ConvolveDownNormalized;
+import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.convolve.Kernel2D;
 import gecv.struct.image.ImageBase;

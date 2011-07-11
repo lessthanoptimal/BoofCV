@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.alg.denoise;
+package gecv.alg.denoise.wavelet;
 
+import gecv.alg.denoise.ShrinkThresholdRule;
 import gecv.alg.misc.PixelMath;
 import gecv.struct.image.ImageFloat32;
 
@@ -43,12 +44,16 @@ public class DenoiseBayesShrink extends SubbandShrink<ImageFloat32> {
 
 	float noiseVariance;
 
-	protected DenoiseBayesShrink() {
+	public DenoiseBayesShrink() {
 		super(new ShrinkThresholdSoft());
 	}
 
+	public DenoiseBayesShrink( ShrinkThresholdRule<ImageFloat32> rule ) {
+		super(rule);
+	}
+
 	@Override
-	protected float computeThreshold( ImageFloat32 subband )
+	protected Number computeThreshold( ImageFloat32 subband )
 	{
 		// the maximum magnitude coefficient is used to normalize all the other coefficients
 		// and reduce numerical round-off error
@@ -77,7 +82,8 @@ public class DenoiseBayesShrink extends SubbandShrink<ImageFloat32> {
 			return noiseVariance/(float)Math.sqrt(inner);
 	}
 
-	public void process( ImageFloat32 transform , int numLevels ) {
+	@Override
+	public void denoise( ImageFloat32 transform , int numLevels ) {
 
 		int w = transform.width;
 		int h = transform.height;

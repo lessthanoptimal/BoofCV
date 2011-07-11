@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.denoise;
+package gecv.alg.denoise.wavelet;
 
 import gecv.struct.image.ImageFloat32;
 
@@ -43,12 +43,12 @@ public class DenoiseSureShrink extends SubbandShrink<ImageFloat32> {
 
 	float noiseSigma;
 
-	protected DenoiseSureShrink() {
+	public DenoiseSureShrink() {
 		super(new ShrinkThresholdSoft());
 	}
 
 	@Override
-	protected float computeThreshold( ImageFloat32 subband  )
+	protected Number computeThreshold( ImageFloat32 subband  )
 	{
 		float coef[] = new float[ subband.width*subband.height ];
 		UtilWaveletShrink.subbandAbsVal(subband,coef);
@@ -80,7 +80,8 @@ public class DenoiseSureShrink extends SubbandShrink<ImageFloat32> {
 		return noiseSigma*threshold;
 	}
 
-	public void process( ImageFloat32 transform , int numLevels ) {
+	@Override
+	public void denoise( ImageFloat32 transform , int numLevels ) {
 
 		int w = transform.width;
 		int h = transform.height;

@@ -16,6 +16,8 @@
 
 package gecv.abst.filter.blur;
 
+import gecv.abst.filter.blur.impl.BlurStorageFilter;
+import gecv.abst.filter.blur.impl.MedianImageFilter;
 import gecv.struct.image.ImageBase;
 
 /**
@@ -34,5 +36,27 @@ public class FactoryBlurFilter {
 	 */
 	public static <T extends ImageBase> MedianImageFilter<T> median( Class<?> type , int radius ) {
 		return new MedianImageFilter<T>(type,radius);
+	}
+
+	/**
+	 * Creates a mean filter for the specified image type.
+	 *
+	 * @param type Image type.
+	 * @param radius Size of the filter.
+	 * @return mean image filter.
+	 */
+	public static <T extends ImageBase> BlurStorageFilter<T> mean( Class<?> type , int radius ) {
+		return new BlurStorageFilter<T>("mean",type,radius);
+	}
+
+	/**
+	 * Creates a Gaussian filter for the specified image type.
+	 *
+	 * @param type Image type.
+	 * @param radius Size of the filter.
+	 * @return mean image filter.
+	 */
+	public static <T extends ImageBase> BlurStorageFilter<T> gaussian( Class<?> type , int radius ) {
+		return new BlurStorageFilter<T>("gaussian",type,radius);
 	}
 }
