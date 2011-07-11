@@ -20,6 +20,7 @@ import gecv.alg.filter.convolve.border.CompareImageBorder;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
+import gecv.core.image.border.FactoryImageBorder;
 import gecv.struct.image.ImageBase;
 import org.junit.Test;
 
@@ -34,9 +35,9 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class TestConvolveExtended extends CompareImageBorder {
-	public TestConvolveExtended() {
-		super(ConvolveExtended.class);
+public class TestConvolveWithBorder extends CompareImageBorder {
+	public TestConvolveWithBorder() {
+		super(ConvolveWithBorder.class);
 	}
 
 	@Test
@@ -111,6 +112,7 @@ public class TestConvolveExtended extends CompareImageBorder {
 		ret[0][0] = kernel;
 		ret[0][1] = src;
 		ret[0][2] = dst;
+		ret[0][3] = FactoryImageBorder.extend(src);
 
 		return ret;
 	}

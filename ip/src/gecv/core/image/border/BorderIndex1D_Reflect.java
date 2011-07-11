@@ -23,9 +23,6 @@ package gecv.core.image.border;
  * is an even symmetric function, e.g. f(-1) = f(1) = 1, f(-2) = f(2) = 2.
  * </p>
  *
- * <p
- *
- *
  * @author Peter Abeles
  */
 public class BorderIndex1D_Reflect extends BorderIndex1D{

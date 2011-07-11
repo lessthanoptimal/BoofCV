@@ -1,4 +1,38 @@
-- face detection
-- moving target tracking
-- structure from motion
-- denoising
+SURF
+SFM
+---------------------------------
+
+ - face detection
+ - Tracking
+   * people
+#  * point features
+   * line features
+ - Geometry 3D
+   * Visual Odometry
+     - stereo
+     - mono
+   * Sparse Bundle Adjustment
+ - Geometry 2D
+#  * Image Stabilization
+   * Image Mosaic
+ - Camera Calibration
+   * From calibration grid
+ - denoising
+ - Detect Features
+#  * point
+   * line
+   * blobs
+   * SURF
+ - Color
+   * images
+   * color space conversion
+#- pyramid
+#- filters
+#  * convolution
+#  * median
+#- image derivative
+ - edge detection
+#- interpolation
+ - Image Transforms
+   * FFT
+#  * Wavelet

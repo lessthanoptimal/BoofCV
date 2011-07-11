@@ -40,7 +40,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 47;
+		int numExpected = 54;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -64,6 +64,8 @@ public class TestPixelMath {
 				    testBound(m);
 				} else if( m.getName().compareTo("diffAbs") == 0 ) {
 				    testDiffAbs(m);
+				} else if( m.getName().compareTo("sum") == 0 ) {
+					testSum(m);
 				} else {
 					throw new RuntimeException("Unknown function: "+m.getName());
 				}
@@ -288,5 +290,29 @@ public class TestPixelMath {
 				assertEquals(Math.abs(v),c.get(j,i).floatValue(),1e-4);
 			}
 		}
+	}
+
+	private void testSum( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase inputA = GecvTesting.createImage(paramTypes[0],width,height);
+
+		if( inputA.isSigned() ) {
+			GeneralizedImageOps.randomize(inputA, rand, -20,20);
+		} else {
+			GeneralizedImageOps.randomize(inputA, rand, 0,20);
+		}
+
+		Object result = m.invoke(null,inputA);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(inputA);
+
+		double total = 0;
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				total += a.get(j,i).doubleValue();
+			}
+		}
+
+		assertEquals(total,((Number)result).doubleValue(),1e-4);
 	}
 }

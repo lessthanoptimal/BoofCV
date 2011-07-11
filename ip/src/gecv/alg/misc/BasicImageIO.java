@@ -16,13 +16,25 @@
 
 package gecv.alg.misc;
 
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageInteger;
 
 
 /**
  * @author Peter Abeles
  */
 public class BasicImageIO {
+
+	public static void print(ImageBase a) {
+
+		if( a.isInteger() ) {
+			print((ImageInteger)a);
+		} else {
+			print((ImageFloat32)a);
+		}
+	}
+
 	public static void print(ImageFloat32 a) {
 		for (int y = 0; y < a.height; y++) {
 			for (int x = 0; x < a.width; x++) {
@@ -30,5 +42,16 @@ public class BasicImageIO {
 			}
 			System.out.println();
 		}
+		System.out.println();
+	}
+
+	public static void print(ImageInteger a) {
+		for (int y = 0; y < a.height; y++) {
+			for (int x = 0; x < a.width; x++) {
+				System.out.printf("%4d ", a.get(x, y));
+			}
+			System.out.println();
+		}
+		System.out.println();
 	}
 }

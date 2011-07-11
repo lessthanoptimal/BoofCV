@@ -17,7 +17,7 @@
 package gecv.abst.detect.corner;
 
 import gecv.abst.filter.blur.FactoryBlurFilter;
-import gecv.abst.filter.blur.MedianImageFilter;
+import gecv.abst.filter.blur.impl.MedianImageFilter;
 import gecv.alg.detect.corner.MedianCornerIntensity;
 import gecv.alg.detect.corner.impl.MedianCorner_F32;
 import gecv.alg.detect.corner.impl.MedianCorner_U8;

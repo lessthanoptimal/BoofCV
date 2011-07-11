@@ -14,20 +14,21 @@
  *    limitations under the License.
  */
 
-package gecv.alg.denoise;
+package gecv.alg.denoise.wavelet;
 
+import gecv.alg.denoise.ShrinkThresholdRule;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 
 
 /**
  * <p>
- * Soft rule for shrinking an image: T(x) = sgn(x)*max(|x|-T,0)
+ * Hard rule for shrinking an image: T(x) = x*1(|x|>T)
  * </p>
  *
  * @author Peter Abeles
  */
-public class ShrinkThresholdSoft implements ShrinkThresholdRule<ImageFloat32> {
+public class ShrinkThresholdHard implements ShrinkThresholdRule<ImageFloat32> {
 
 	@Override
 	public void process(ImageFloat32 image, Number threshold) {
@@ -47,10 +48,6 @@ public class ShrinkThresholdSoft implements ShrinkThresholdRule<ImageFloat32> {
 				float v = image.data[index];
 				if( Math.abs(v) < f ) {
 					image.data[index] = 0;
-				} else if( v >= f ) {
-					image.data[index] -= f;
-				} else {
-					image.data[index] += f;
 				}
 			}
 		}

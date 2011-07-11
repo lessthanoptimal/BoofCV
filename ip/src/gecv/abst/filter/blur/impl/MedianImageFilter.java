@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.blur;
+package gecv.abst.filter.blur.impl;
 
 import gecv.abst.filter.FilterImageInterface;
 import gecv.alg.filter.blur.BlurImageOps;

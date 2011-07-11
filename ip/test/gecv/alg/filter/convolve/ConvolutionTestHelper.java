@@ -46,7 +46,6 @@ public class ConvolutionTestHelper {
 		else if( imageType == ImageInt16.class )
 			imageType = ImageSInt16.class;
 
-
 		try {
 			ImageBase img = (ImageBase) imageType.newInstance();
 			return img._createNew(width, height);

@@ -19,6 +19,7 @@ package gecv.alg.filter.convolve;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.border.*;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -35,7 +36,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class BenchmarkConvolveExtended {
+public class BenchmarkConvolveWithBorder {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 	static int radius;
@@ -52,6 +53,8 @@ public class BenchmarkConvolveExtended {
 	static ImageUInt8 out_I8;
 	static ImageSInt16 out_I16;
 	static ImageSInt32 out_I32;
+	static ImageBorder_I32 border_I32 = new ImageBorder1D_I32(BorderIndex1D_Extend.class);
+	static ImageBorder_F32 border_F32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
 
 	public static class Horizontal_NoBorder_F32 extends PerformerBase
 	{
@@ -65,7 +68,7 @@ public class BenchmarkConvolveExtended {
 	{
 		@Override
 		public void process() {
-			ConvolveExtended.horizontal(kernelF32,imgFloat32,out_F32);
+			ConvolveWithBorder.horizontal(kernelF32,imgFloat32,out_F32,border_F32);
 		}
 	}
 
@@ -73,7 +76,7 @@ public class BenchmarkConvolveExtended {
 	{
 		@Override
 		public void process() {
-			ConvolveExtended.horizontal(kernelI32,imgInt8,out_I16);
+			ConvolveWithBorder.horizontal(kernelI32,imgInt8,out_I16,border_I32);
 		}
 	}
 
@@ -81,7 +84,7 @@ public class BenchmarkConvolveExtended {
 	{
 		@Override
 		public void process() {
-			ConvolveExtended.horizontal(kernelI32,imgInt16,out_I16);
+			ConvolveWithBorder.horizontal(kernelI32,imgInt16,out_I16,border_I32);
 		}
 	}
 
@@ -97,7 +100,7 @@ public class BenchmarkConvolveExtended {
 	{
 		@Override
 		public void process() {
-			ConvolveExtended.vertical(kernelF32,imgFloat32,out_F32);
+			ConvolveWithBorder.vertical(kernelF32,imgFloat32,out_F32,border_F32);
 		}
 	}
 
@@ -105,7 +108,7 @@ public class BenchmarkConvolveExtended {
 	{
 		@Override
 		public void process() {
-			ConvolveExtended.vertical(kernelI32,imgInt8,out_I16);
+			ConvolveWithBorder.vertical(kernelI32,imgInt8,out_I16,border_I32);
 		}
 	}
 
@@ -113,7 +116,7 @@ public class BenchmarkConvolveExtended {
 	{
 		@Override
 		public void process() {
-			ConvolveExtended.vertical(kernelI32,imgInt16,out_I16);
+			ConvolveWithBorder.vertical(kernelI32,imgInt16,out_I16,border_I32);
 		}
 	}
 
@@ -129,7 +132,7 @@ public class BenchmarkConvolveExtended {
 	{
 		@Override
 		public void process() {
-			ConvolveExtended.convolve(kernel2D_F32,imgFloat32,out_F32);
+			ConvolveWithBorder.convolve(kernel2D_F32,imgFloat32,out_F32,border_F32);
 		}
 	}
 
@@ -137,7 +140,7 @@ public class BenchmarkConvolveExtended {
 	{
 		@Override
 		public void process() {
-			ConvolveExtended.convolve(kernel2D_I32,imgInt8,out_I16);
+			ConvolveWithBorder.convolve(kernel2D_I32,imgInt8,out_I16,border_I32);
 		}
 	}
 
@@ -145,7 +148,7 @@ public class BenchmarkConvolveExtended {
 	{
 		@Override
 		public void process() {
-			ConvolveExtended.convolve(kernel2D_I32,imgInt16,out_I16);
+			ConvolveWithBorder.convolve(kernel2D_I32,imgInt16,out_I16,border_I32);
 		}
 	}
 
@@ -170,7 +173,7 @@ public class BenchmarkConvolveExtended {
 		for( int radius = 2; radius < 10; radius += 1 ) {
 			System.out.println("Radius: "+radius);
 			System.out.println();
-			BenchmarkConvolveExtended.radius = radius;
+			BenchmarkConvolveWithBorder.radius = radius;
 			kernelF32 = KernelFactory.gaussian1D_F32(radius,true);
 			kernelI32 = KernelFactory.gaussian1D_I32(radius);
 			kernel2D_F32 = KernelFactory.gaussian2D_F32(1.0,radius,true);

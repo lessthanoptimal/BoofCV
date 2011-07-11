@@ -14,14 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.convolve;
+package gecv.alg.filter.convolve;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.abst.filter.FilterImageInterface;
-import gecv.alg.filter.convolve.ConvolveImageNoBorder;
-import gecv.alg.filter.convolve.KernelFactory;
-import gecv.core.image.border.BorderType;
+import gecv.alg.filter.convolve.noborder.ImplConvolveMean;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -33,7 +30,7 @@ import gecv.struct.image.ImageUInt8;
  * Benchmark for different convolution operations.
  * @author Peter Abeles
  */
-public class BenchmarkConvolveAbstracted {
+public class BenchmarkConvolveMean {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 	static int radius;
@@ -49,32 +46,51 @@ public class BenchmarkConvolveAbstracted {
 	static ImageSInt16 out_I16;
 	static ImageSInt32 out_I32;
 
-	public static class Convolve_Vertical_I8_I16 extends PerformerBase
+	public static class Convolve_Vertical_U8_I8 extends PerformerBase
 	{
 		@Override
 		public void process() {
-			ConvolveImageNoBorder.vertical(kernelI32,imgInt8,out_I16,false);
+			ConvolveImageNoBorder.vertical(kernelI32,imgInt8,out_I8,radius*2+1,false);
 		}
 	}
 
-	public static class Abstracted_Vertical_I8_I16 extends PerformerBase
+	public static class Convolve_Horizontal_U8_I8 extends PerformerBase
 	{
 		@Override
 		public void process() {
-			FilterImageInterface<ImageUInt8,ImageSInt16> filter =
-			FactoryConvolve.convolve(kernelI32,ImageUInt8.class,ImageSInt16.class, BorderType.SKIP,false);
-			filter.process(imgInt8,out_I16);
+			ConvolveImageNoBorder.horizontal(kernelI32,imgInt8,out_I8,radius*2+1,false);
 		}
 	}
 
-	public static class Pre_Vertical_I8_I16 extends PerformerBase
+	public static class Mean_U8_I8_Vertical extends PerformerBase
 	{
-		FilterImageInterface<ImageUInt8,ImageSInt16> filter =
-					FactoryConvolve.convolve(kernelI32,ImageUInt8.class,ImageSInt16.class,BorderType.SKIP,false);
-
 		@Override
 		public void process() {
-			filter.process(imgInt8,out_I16);
+			ImplConvolveMean.vertical(imgInt8,out_I8,radius,false);
+		}
+	}
+
+	public static class Mean_U8_I8_Horizontal extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ImplConvolveMean.horizontal(imgInt8,out_I8,radius,false);
+		}
+	}
+
+	public static class Mean_F32_F32_Vertical extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ImplConvolveMean.vertical(imgFloat32,out_F32,radius,false);
+		}
+	}
+
+	public static class Mean_F32_F32_Horizontal extends PerformerBase
+	{
+		@Override
+		public void process() {
+			ImplConvolveMean.horizontal(imgFloat32,out_F32,radius,false);
 		}
 	}
 
@@ -95,14 +111,18 @@ public class BenchmarkConvolveAbstracted {
 		for( int radius = 1; radius < 10; radius += 1 ) {
 			System.out.println("Radius: "+radius);
 			System.out.println();
-			BenchmarkConvolveAbstracted.radius = radius;
+			BenchmarkConvolveMean.radius = radius;
 			kernelF32 = KernelFactory.table1D_F32(radius,true);
 			kernelI32 = KernelFactory.table1D_I32(radius);
 			
 
-			ProfileOperation.printOpsPerSec(new Convolve_Vertical_I8_I16(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Abstracted_Vertical_I8_I16(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Pre_Vertical_I8_I16(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Mean_U8_I8_Horizontal(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Mean_F32_F32_Horizontal(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Mean_U8_I8_Vertical(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Mean_F32_F32_Vertical(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Convolve_Horizontal_U8_I8(),TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Convolve_Vertical_U8_I8(),TEST_TIME);
+
 		}
 
 

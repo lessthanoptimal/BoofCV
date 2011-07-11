@@ -18,7 +18,8 @@ package gecv.alg.filter.convolve;
 
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
-import gecv.core.image.border.FactoryImageBorder;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -27,192 +28,225 @@ import gecv.struct.image.*;
 
 /**
  * <p>
- * Convolves a kernel across an image and handles the image border by extended the last pixel outwards.
+ * Convolves a kernel across an image and handles the image border using the specified method.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ConvolveExtended {
+public class ConvolveWithBorder {
 	/**
-	 * Performs a horizontal 1D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a horizontal 1D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
 	public static void horizontal(Kernel1D_F32 kernel,
-								  ImageFloat32 image, ImageFloat32 dest ) {
+								  ImageFloat32 image, ImageFloat32 dest , ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.horizontal(kernel, border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a vertical 1D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
 	public static void vertical(Kernel1D_F32 kernel,
-								ImageFloat32 image, ImageFloat32 dest ) {
+								ImageFloat32 image, ImageFloat32 dest , ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.vertical(kernel, border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a 2D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a 2D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
 	public static void convolve(Kernel2D_F32 kernel,
-								ImageFloat32 image, ImageFloat32 dest ) {
+								ImageFloat32 image, ImageFloat32 dest , ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a horizontal 1D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt16 dest ) {
+	public static void horizontal(Kernel1D_I32 kernel,
+								  ImageUInt8 image, ImageInt16 dest , ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.horizontal(kernel, border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a vertical 1D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt16 dest ) {
+	public static void vertical(Kernel1D_I32 kernel,
+								ImageUInt8 image, ImageInt16 dest , ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.vertical(kernel, border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a 2D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a 2D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 image, ImageInt16 dest ) {
+	public static void convolve(Kernel2D_I32 kernel,
+								ImageUInt8 image, ImageInt16 dest , ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a horizontal 1D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 image, ImageSInt32 dest ) {
+	public static void horizontal(Kernel1D_I32 kernel,
+								  ImageUInt8 image, ImageSInt32 dest , ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.horizontal(kernel, border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a vertical 1D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 image, ImageSInt32 dest ) {
+	public static void vertical(Kernel1D_I32 kernel,
+								ImageUInt8 image, ImageSInt32 dest , ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.vertical(kernel, border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a 2D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a 2D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 image, ImageSInt32 dest ) {
+	public static void convolve(Kernel2D_I32 kernel,
+								ImageUInt8 image, ImageSInt32 dest , ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a horizontal 1D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
+	public static void horizontal(Kernel1D_I32 kernel,
+								  ImageSInt16 image, ImageInt16 dest , ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.horizontal(kernel, border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a vertical 1D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
+	public static void vertical(Kernel1D_I32 kernel,
+								ImageSInt16 image, ImageInt16 dest , ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.vertical(kernel, border,dest,kernel.getRadius());
 	}
 
 	/**
-	 * Performs a 2D convolution across the image.  Borders are handled by extending outwards to the closest
-	 * pixel along the image border.
+	 * Performs a 2D convolution across the image.  Borders are handled as specified by the 'border'
+	 * parameter.
 	 *
 	 * @param image	 The original image. Not modified.
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
+	public static void convolve(Kernel2D_I32 kernel,
+								ImageSInt16 image, ImageInt16 dest , ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
+		border.setImage(image);
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,FactoryImageBorder.extend(image),dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,border,dest,kernel.getRadius());
 	}
 }

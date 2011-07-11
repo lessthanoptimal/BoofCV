@@ -16,6 +16,7 @@
 
 package gecv.alg.denoise;
 
+import gecv.alg.denoise.wavelet.DenoiseBayesShrink;
 import gecv.alg.filter.derivative.LaplacianEdge;
 import gecv.alg.misc.PixelMath;
 import gecv.alg.wavelet.FactoryWaveletDaub;
@@ -86,13 +87,13 @@ public class WaveletDenoiseApp {
 		ShowImages.showWindow(imageWavelet,"Transformed",true);
 
 //		DenoiseVisuShrink visu = new DenoiseVisuShrink();
-//		visu.process(imageWavelet,numLevels);
+//		visu.denoise(imageWavelet,numLevels);
 
 		DenoiseBayesShrink bayes = new DenoiseBayesShrink();
-		bayes.process(imageWavelet,numLevels);
+		bayes.denoise(imageWavelet,numLevels);
 
 //		DenoiseSureShrink sure = new DenoiseSureShrink();
-//		sure.process(imageWavelet,numLevels);
+//		sure.denoise(imageWavelet,numLevels);
 
 		WaveletTransformOps.inverseN(waveletDesc,imageWavelet,imageInv,null,numLevels);
 

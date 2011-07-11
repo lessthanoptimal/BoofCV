@@ -37,6 +37,11 @@ public class ImageBorder1D_F32 extends ImageBorder_F32 {
 		}
 	}
 
+	public ImageBorder1D_F32(BorderIndex1D rowWrap, BorderIndex1D colWrap) {
+		this.rowWrap = rowWrap;
+		this.colWrap = colWrap;
+	}
+
 	public BorderIndex1D getRowWrap() {
 		return rowWrap;
 	}

@@ -16,9 +16,11 @@
 
 package gecv.abst.filter.derivative;
 
-import gecv.alg.filter.convolve.ConvolveExtended;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
+import gecv.alg.filter.convolve.ConvolveWithBorder;
 import gecv.alg.filter.convolve.KernelFactory;
+import gecv.core.image.border.BorderIndex1D_Extend;
+import gecv.core.image.border.ImageBorder1D_F32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 
@@ -47,8 +49,8 @@ public class ImageGradient_Gaussian_F32 implements ImageGradient<ImageFloat32, I
 	@Override
 	public void process( ImageFloat32 inputImage , ImageFloat32 derivX, ImageFloat32 derivY ) {
 		if( processBorder ) {
-			ConvolveExtended.horizontal(kernel, inputImage, derivX);
-			ConvolveExtended.vertical(kernel, inputImage, derivY);
+			ConvolveWithBorder.horizontal(kernel, inputImage, derivX,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+			ConvolveWithBorder.vertical(kernel, inputImage, derivY,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, inputImage, derivX, true);
 			ConvolveImageNoBorder.vertical(kernel, inputImage, derivY, false);

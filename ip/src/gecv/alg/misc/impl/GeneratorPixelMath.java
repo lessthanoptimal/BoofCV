@@ -202,7 +202,7 @@ public class GeneratorPixelMath {
 				out.print("\t\t\t\tint val = input.data[indexSrc] * scale;\n");
 			else
 				out.print("\t\t\t\tint val = (input.data[indexSrc] "+input.getBitWise()+")* scale;\n");
-			if( input.getPrimativeType() != int.class) {
+			if( input.getPrimitiveType() != int.class) {
 				out.print("\t\t\t\tif( val < "+input.getMin()+" ) val = "+input.getMin()+";\n" +
 						"\t\t\t\telse if( val > "+input.getMax()+" ) val = "+input.getMax()+";\n");
 			}
@@ -239,7 +239,7 @@ public class GeneratorPixelMath {
 				out.print("\t\t\t\tint val = input.data[indexSrc] + value;\n");
 			else
 				out.print("\t\t\t\tint val = (input.data[indexSrc] "+input.getBitWise()+") + value;\n");
-			if( input.getPrimativeType() != int.class) {
+			if( input.getPrimitiveType() != int.class) {
 				out.print("\t\t\t\tif( val < "+input.getMin()+" ) val = "+input.getMin()+";\n" +
 						"\t\t\t\telse if( val > "+input.getMax()+" ) val = "+input.getMax()+";\n");
 			}

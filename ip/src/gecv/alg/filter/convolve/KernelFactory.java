@@ -39,7 +39,13 @@ import java.util.Random;
 public class KernelFactory {
 
 	/**
+	 * <p>
 	 * Create an integer table convolution kernel.  All the elements are equal to one.
+	 * </p>
+	 *
+	 * <p>
+	 * See {@link ConvolveImageBox} for faster ways to convolve these kernels.
+	 * </p>
 	 *
 	 * @param radius kernel's radius.
 	 * @return table kernel.
@@ -55,8 +61,14 @@ public class KernelFactory {
 	}
 
 	/**
+	 * <p>
 	 * Create an floating point table convolution kernel.  If un-normalized then all
 	 * the elements are equal to one, otherwise they are equal to one over the width.
+	 * </p>
+	 *
+	 * <p>
+	 * See {@link ConvolveImageBox} or {@link ConvolveImageMean} for faster ways to convolve these kernels.
+	 * </p>
 	 *
 	 * @param radius kernel's radius.
 	 * @return table kernel.

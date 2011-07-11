@@ -17,8 +17,11 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.filter.convolve.ConvolveExtended;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
+import gecv.alg.filter.convolve.ConvolveWithBorder;
+import gecv.core.image.border.BorderIndex1D_Extend;
+import gecv.core.image.border.ImageBorder1D_F32;
+import gecv.core.image.border.ImageBorder1D_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 
@@ -50,7 +53,7 @@ public class HessianFromGradient {
 		GradientPrewitt.process(inputDerivX,derivXX,derivXY,processBorder);
 
 		if( processBorder )
-			ConvolveExtended.convolve(GradientPrewitt.kernelDerivY_I32,inputDerivY,derivYY);
+			ConvolveWithBorder.convolve(GradientPrewitt.kernelDerivY_I32,inputDerivY,derivYY,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.convolve(GradientPrewitt.kernelDerivY_I32,inputDerivY,derivYY);
 	}
@@ -73,7 +76,7 @@ public class HessianFromGradient {
 		GradientPrewitt.process(inputDerivX,derivXX,derivXY,processBorder);
 
 		if( processBorder )
-			ConvolveExtended.convolve(GradientPrewitt.kernelDerivY_F32,inputDerivY,derivYY);
+			ConvolveWithBorder.convolve(GradientPrewitt.kernelDerivY_F32,inputDerivY,derivYY,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.convolve(GradientPrewitt.kernelDerivY_F32,inputDerivY,derivYY);
 	}
@@ -96,7 +99,7 @@ public class HessianFromGradient {
 		GradientSobel.process(inputDerivX,derivXX,derivXY,processBorder);
 
 		if( processBorder )
-			ConvolveExtended.convolve(GradientSobel.kernelDerivY_I32,inputDerivY,derivYY);
+			ConvolveWithBorder.convolve(GradientSobel.kernelDerivY_I32,inputDerivY,derivYY,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.convolve(GradientSobel.kernelDerivY_I32,inputDerivY,derivYY);
 	}
@@ -119,7 +122,7 @@ public class HessianFromGradient {
 		GradientSobel.process(inputDerivX,derivXX,derivXY,processBorder);
 
 		if( processBorder )
-			ConvolveExtended.convolve(GradientSobel.kernelDerivY_F32,inputDerivY,derivYY);
+			ConvolveWithBorder.convolve(GradientSobel.kernelDerivY_F32,inputDerivY,derivYY,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.convolve(GradientSobel.kernelDerivY_F32,inputDerivY,derivYY);
 	}
@@ -142,7 +145,7 @@ public class HessianFromGradient {
 		GradientThree.process(inputDerivX,derivXX,derivXY,processBorder);
 
 		if( processBorder )
-			ConvolveExtended.vertical(GradientThree.kernelDeriv_I32,inputDerivY,derivYY);
+			ConvolveWithBorder.vertical(GradientThree.kernelDeriv_I32,inputDerivY,derivYY,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.vertical(GradientThree.kernelDeriv_I32,inputDerivY,derivYY,false);
 	}
@@ -165,7 +168,7 @@ public class HessianFromGradient {
 		GradientThree.process(inputDerivX,derivXX,derivXY,processBorder);
 
 		if( processBorder )
-			ConvolveExtended.vertical(GradientThree.kernelDeriv_F32,inputDerivY,derivYY);
+			ConvolveWithBorder.vertical(GradientThree.kernelDeriv_F32,inputDerivY,derivYY,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.vertical(GradientThree.kernelDeriv_F32,inputDerivY,derivYY,false);
 	}

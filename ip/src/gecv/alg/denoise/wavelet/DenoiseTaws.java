@@ -14,25 +14,26 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.convolve;
+package gecv.alg.denoise.wavelet;
+
+import gecv.alg.denoise.DenoiseWavelet;
+import gecv.struct.image.ImageFloat32;
 
 
 /**
- * How the image border is handled by a convolution filter
+ * <p>
+ * Wavelet based image-denoising algorithm
+ * </p>
+ *
+ * <p>
+ * J. S. Walker, "Tree-Adapted Wavelet Shrinkage," Advances in Imaging and Electron Physics, 2003
+ * </p>
  *
  * @author Peter Abeles
  */
-public enum BorderType {
-	/**
-	 * Image borders are not processed
-	 */
-	SKIP,
-	/**
-	 * The pixels along the image border are extended outwards
-	 */
-	EXTENDED,
-	/**
-	 * The kernel is renormalized to take in account that parts of it are not inside the image.
-	 */
-	NORMALIZED
+public class DenoiseTaws implements DenoiseWavelet<ImageFloat32> {
+	@Override
+	public void denoise(ImageFloat32 transform, int numLevels) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 }

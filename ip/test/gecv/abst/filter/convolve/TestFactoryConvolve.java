@@ -17,11 +17,15 @@
 package gecv.abst.filter.convolve;
 
 import gecv.abst.filter.FilterImageInterface;
-import gecv.alg.filter.convolve.ConvolveExtended;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.ConvolveNormalized;
+import gecv.alg.filter.convolve.ConvolveWithBorder;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.border.BorderIndex1D_Extend;
+import gecv.core.image.border.BorderType;
+import gecv.core.image.border.ImageBorder1D_F32;
+import gecv.core.image.border.ImageBorder1D_I32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -66,7 +70,7 @@ public class TestFactoryConvolve {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.EXTENDED,true);
 		conv.process(input,found);
-		ConvolveExtended.horizontal(kernel,input,expected);
+		ConvolveWithBorder.horizontal(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		GecvTesting.assertEquals(expected,found,0,1e-4f);
 
 		// CHECK NORMALIZED
@@ -90,7 +94,7 @@ public class TestFactoryConvolve {
 		ImageTestingOps.randomize(input,rand,0,5);
 
 		// CHECK NO BORDER
-		conv = FactoryConvolve.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.SKIP,true);
+		conv = FactoryConvolve.convolve( kernel,ImageUInt8.class,ImageInt16.class, BorderType.SKIP,true);
 		conv.process(input,found);
 		ConvolveImageNoBorder.horizontal(kernel,input,expected,false);
 		GecvTesting.assertEquals(expected,found,0);
@@ -98,7 +102,7 @@ public class TestFactoryConvolve {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,ImageUInt8.class, ImageInt16.class,BorderType.EXTENDED,true);
 		conv.process(input,found);
-		ConvolveExtended.horizontal(kernel,input,expected);
+		ConvolveWithBorder.horizontal(kernel,input,expected,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		GecvTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED
@@ -131,7 +135,7 @@ public class TestFactoryConvolve {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.EXTENDED);
 		conv.process(input,found);
-		ConvolveExtended.convolve(kernel,input,expected);
+		ConvolveWithBorder.convolve(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		GecvTesting.assertEquals(expected,found,0,1e-4f);
 
 		// CHECK NORMALIZED
@@ -163,7 +167,7 @@ public class TestFactoryConvolve {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.EXTENDED);
 		conv.process(input,found);
-		ConvolveExtended.convolve(kernel,input,expected);
+		ConvolveWithBorder.convolve(kernel,input,expected,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		GecvTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED

@@ -191,7 +191,7 @@ public class GeneratorImageTestingOps {
 				"\t\t\tfor (int x = 0; x < w; x++) {\n");
 		if( imageType.isInteger() ) {
 			out.print("\t\t\t\t"+sumType+" value = (data[index] "+bitWise+") + rand.nextInt(range)+min;\n");
-			if( imageType.getPrimativeType() != int.class ) {
+			if( imageType.getPrimitiveType() != int.class ) {
 				out.print("\t\t\t\tif( value < "+min+" ) value = "+min+";\n" +
 						"\t\t\t\tif( value > "+max+" ) value = "+max+";\n" +
 						"\n");

@@ -16,9 +16,9 @@
 
 package gecv.alg.pyramid;
 
-import gecv.abst.filter.convolve.BorderType;
 import gecv.abst.filter.convolve.FactoryConvolveDown;
 import gecv.abst.filter.convolve.GenericConvolveDown;
+import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.image.ImageBase;
 

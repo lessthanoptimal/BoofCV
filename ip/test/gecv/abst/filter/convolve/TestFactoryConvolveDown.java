@@ -21,6 +21,7 @@ import gecv.alg.filter.convolve.ConvolveDownNoBorder;
 import gecv.alg.filter.convolve.ConvolveDownNormalized;
 import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -66,7 +67,7 @@ public class TestFactoryConvolveDown {
 		// CHECK EXTENDED
 //		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.EXTENDED,true);
 //		conv.process(input,found);
-//		ConvolveExtended.horizontal(kernel,input,expected);
+//		ConvolveWithBorder.horizontal(kernel,input,expected);
 //		GecvTesting.assertEquals(expected,found,0,1e-4f);
 
 		// CHECK NORMALIZED
@@ -98,7 +99,7 @@ public class TestFactoryConvolveDown {
 		// CHECK EXTENDED
 //		conv = FactoryConvolveDown.convolve( kernel,ImageUInt8.class, ImageInt16.class,BorderType.EXTENDED,true);
 //		conv.process(input,found);
-//		ConvolveExtended.horizontal(kernel,input,expected);
+//		ConvolveWithBorder.horizontal(kernel,input,expected);
 //		GecvTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED
@@ -131,11 +132,11 @@ public class TestFactoryConvolveDown {
 		// CHECK EXTENDED
 //		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.EXTENDED);
 //		conv.process(input,found);
-//		ConvolveExtended.convolve(kernel,input,expected);
+//		ConvolveWithBorder.convolve(kernel,input,expected);
 //		GecvTesting.assertEquals(expected,found,0,1e-4f);
 
 		// CHECK NORMALIZED
-		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.NORMALIZED,skip);
+		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class, BorderType.NORMALIZED,skip);
 		conv.process(input,found);
 		ConvolveDownNormalized.convolve(kernel,input,expected,skip);
 		GecvTesting.assertEquals(expected,found,0,1e-4f);
@@ -163,7 +164,7 @@ public class TestFactoryConvolveDown {
 		// CHECK EXTENDED
 //		conv = FactoryConvolveDown.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.EXTENDED);
 //		conv.process(input,found);
-//		ConvolveExtended.convolve(kernel,input,expected);
+//		ConvolveWithBorder.convolve(kernel,input,expected);
 //		GecvTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED

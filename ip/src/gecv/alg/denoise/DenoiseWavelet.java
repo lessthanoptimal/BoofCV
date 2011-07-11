@@ -16,17 +16,22 @@
 
 package gecv.alg.denoise;
 
+import gecv.struct.image.ImageBase;
+
 
 /**
- * <p>
- * Wavelet based image-denoising algorithm
- * </p>
- *
- * <p>
- * J. S. Walker, "Tree-Adapted Wavelet Shrinkage," Advances in Imaging and Electron Physics, 2003
- * </p>
+ * Interface for algorithms which "denoise" the wavelet transform of an image.  Typically
+ * this is done by setting insignificant coefficients to zero.
  *
  * @author Peter Abeles
  */
-public class DenoiseTaws {
+public interface DenoiseWavelet <T extends ImageBase<T>>  {
+
+	/**
+	 * Removes noise from the multi-level wavelet transform.
+	 *
+	 * @param transform Transform of the original image.
+	 * @param numLevels NUmber of levels in the transform.
+	 */
+	public void denoise( T transform , int numLevels );
 }
