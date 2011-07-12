@@ -18,7 +18,6 @@ package gecv.core.image.inst;
 
 import gecv.core.image.ImageGenerator;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageTypeInfo;
 
 
 /**
@@ -29,7 +28,7 @@ import gecv.struct.image.ImageTypeInfo;
 @SuppressWarnings({"unchecked"})
 public class FactoryImageGenerator {
 
-	public static <T extends ImageBase> ImageGenerator<T> create( ImageTypeInfo<T> type )
+	public static <T extends ImageBase> ImageGenerator<T> create( Class<T> type )
 	{
 		return new SingleBandGenerator(type);
 	}

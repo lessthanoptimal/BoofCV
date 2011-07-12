@@ -69,9 +69,9 @@ public class TestConvertImage {
 		boolean outputSigned = true;
 
 		if( ImageInteger.class.isAssignableFrom(inputType) )
-			inputSigned = ((ImageInteger)input).isSigned();
+			inputSigned = ((ImageInteger)input).getTypeInfo().isSigned();
 		if( ImageInteger.class.isAssignableFrom(outputType) )
-			outputSigned = ((ImageInteger)output).isSigned();
+			outputSigned = ((ImageInteger)output).getTypeInfo().isSigned();
 
 	   // only provide signed numbers of both data types can handle them
 		if( inputSigned && outputSigned ) {
