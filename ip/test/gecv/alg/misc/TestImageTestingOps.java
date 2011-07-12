@@ -136,8 +136,8 @@ public class TestImageTestingOps {
 		Class<?> paramTypes[] = m.getParameterTypes();
 		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
 
-		if( orig.isInteger() ) {
-			if( ((ImageInteger)orig).isSigned() )
+		if( orig.getTypeInfo().isInteger() ) {
+			if( ((ImageInteger)orig).getTypeInfo().isSigned() )
 				m.invoke(null,orig,rand,-10,10);
 			else {
 				m.invoke(null,orig,rand,1,10);
@@ -166,7 +166,7 @@ public class TestImageTestingOps {
 		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.fill(orig,1);
 
-		if( orig.isInteger() ) {
+		if( orig.getTypeInfo().isInteger() ) {
 			m.invoke(null,orig,rand,1,10);
 		} else {
 			m.invoke(null,orig,rand,1,10);

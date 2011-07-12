@@ -19,6 +19,7 @@ package gecv.struct.pyramid;
 import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 
 
@@ -38,8 +39,10 @@ public class ImagePyramidFactory {
 			return (ImagePyramid<T>)create_F32(width,height,saveOriginalReference);
 		} else if( type == ImageUInt8.class ) {
 			return (ImagePyramid<T>)create_U8(width,height,saveOriginalReference);
+		} else if( type == ImageSInt16.class ) {
+			return (ImagePyramid<T>)create_S16(width,height,saveOriginalReference);
 		} else {
-			throw new IllegalArgumentException("Add image type");
+			throw new IllegalArgumentException("Add image type: "+type.getSimpleName());
 		}
 	}
 
@@ -48,6 +51,13 @@ public class ImagePyramidFactory {
 	{
 		return new ImagePyramid<ImageFloat32>(bottomWidth,bottomHeight,saveOriginalReference,
 				FactoryImageGenerator.create(ImageFloat32.class));
+	}
+
+	public static ImagePyramid<ImageSInt16> create_S16( int bottomWidth, int bottomHeight,
+												  boolean saveOriginalReference )
+	{
+		return new ImagePyramid<ImageSInt16>(bottomWidth,bottomHeight,saveOriginalReference,
+				FactoryImageGenerator.create(ImageSInt16.class));
 	}
 
 	public static ImagePyramid<ImageUInt8> create_U8( int bottomWidth, int bottomHeight,

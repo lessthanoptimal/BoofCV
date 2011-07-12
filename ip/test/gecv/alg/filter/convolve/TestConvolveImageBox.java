@@ -99,7 +99,7 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 
 		ImageBase output = ((ImageBase)targetParam[1]).clone();
 
-		ImageBorder border = output.isInteger() ? new ImageBorderValue.Value_I(0) : new ImageBorderValue.Value_F32(0);
+		ImageBorder border = output.getTypeInfo().isInteger() ? new ImageBorderValue.Value_I(0) : new ImageBorderValue.Value_F32(0);
 
 		return new Object[]{kernel,targetParam[0],output,border };
 	}

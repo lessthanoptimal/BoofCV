@@ -105,7 +105,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 		ImageBase output = ((ImageBase)targetParam[1]).clone();
 
-		if( output.isInteger() )
+		if( output.getTypeInfo().isInteger() )
 			return new Object[]{kernel,targetParam[0],output,kernelRadius*2+1,targetParam[3]};
 		else
 			return new Object[]{kernel,targetParam[0],output,targetParam[3]};
