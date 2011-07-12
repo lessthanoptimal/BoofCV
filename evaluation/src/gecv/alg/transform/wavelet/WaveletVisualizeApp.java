@@ -14,10 +14,12 @@
  *    limitations under the License.
  */
 
-package gecv.alg.wavelet;
+package gecv.alg.transform.wavelet;
 
 import gecv.abst.wavelet.FactoryWaveletTransform;
 import gecv.abst.wavelet.WaveletTransform;
+import gecv.alg.denoise.DenoiseWavelet;
+import gecv.alg.denoise.wavelet.DenoiseSureShrink_F32;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
@@ -43,21 +45,24 @@ public class WaveletVisualizeApp {
 	int width;
 	int height;
 	int numLevels = 4;
-	float noiseLevel = 50;
+	float noiseLevel = 10;
 
 	Random rand = new Random(2234);
 
 	ImagePanel panelInput;
 	ImageFloat32 image;
 	ImageFloat32 imageWavelet;
-//	WaveletDescription<WlCoef_F32> desc = FactoryWaveletHaar.generate_F32();
 
-//
-//	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(4);
-//	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5,BorderType.WRAP);
+//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletHaar.generate_F32();
+//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.daubJ_F32(4);
+	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.biorthogonal_F32(5, BorderType.REFLECT);
 
-	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5, BorderType.REFLECT);
-	WaveletTransform<ImageFloat32,ImageFloat32,WlCoef_F32> tran = FactoryWaveletTransform.create_F32(desc,numLevels);
+//	DenoiseWavelet<ImageFloat32> denoiser = new DenoiseVisuShrink_F32();
+//	DenoiseWavelet<ImageFloat32> denoiser = new DenoiseBayesShrink_F32();
+	DenoiseWavelet<ImageFloat32> denoiser = new DenoiseSureShrink_F32();
+
+	WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32> waveletTran = FactoryWaveletTransform.create_F32(waveletDesc,numLevels);
+
 
 	public void process() {
 		createTestImage();
@@ -74,34 +79,10 @@ public class WaveletVisualizeApp {
 		ConvertBufferedImage.convertTo(image,panelInput.getImage());
 		panelInput.repaint();
 
-		imageWavelet = tran.transform(image,imageWavelet);
-
-		int scaleW = imageWavelet.width/UtilWavelet.computeScale(numLevels);
-		int scaleH = imageWavelet.height/UtilWavelet.computeScale(numLevels);
-		scaleW += scaleW%2;
-		scaleH += scaleH%2;
-
-//		float thresh = 25;
-//		for( int y = 0; y < height; y++ ) {
-//			for( int x = 0; x < width; x++ ) {
-//				if( x < scaleW && y < scaleH )
-//					continue;
-//				float v = Math.abs(imageWavelet.get(x,y));
-//				if( v < thresh )
-//					imageWavelet.set(x,y,0);
-//			}
-//		}
-
-		for( int y = 0; y < imageWavelet.height; y++ ) {
-			for( int x = 0; x < imageWavelet.width; x++ ) {
-				if( x < imageWavelet.width/2 && y < imageWavelet.height/2 )
-					continue;
-				imageWavelet.set(x,y,0);
-			}
-		}
+		imageWavelet = waveletTran.transform(image,imageWavelet);
 
 		ShowImages.showWindow(imageWavelet,"Transformed",true);
-		tran.invert(imageWavelet,imageInv);
+		waveletTran.invert(imageWavelet,imageInv);
 
 		PixelMath.boundImage(imageInv,0,255);
 
