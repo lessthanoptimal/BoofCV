@@ -36,7 +36,6 @@ import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageTypeInfo;
 
 /**
  * @author Peter Abeles
@@ -72,8 +71,8 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 
 		PkltManagerConfig<ImageFloat32,ImageFloat32> config = new PkltManagerConfig<ImageFloat32,ImageFloat32>();
 		config.config = configKLt;
-		config.typeInput = ImageTypeInfo.F32;
-		config.typeDeriv = ImageTypeInfo.F32;
+		config.typeInput = ImageFloat32.class;
+		config.typeDeriv = ImageFloat32.class;
 		config.pyramidScaling = new int[]{1,2,2,2};
 		config.imgWidth = image.width;
 		config.imgHeight = image.height;
@@ -83,11 +82,11 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 
 		int scalingTop = config.computeScalingTop();
 
-		InterpolateRectangle<ImageFloat32> interp = FactoryInterpolation.bilinearRectangle(ImageTypeInfo.F32);
+		InterpolateRectangle<ImageFloat32> interp = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
 
 		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity =
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
-						FactoryCornerIntensity.createKlt(ImageTypeInfo.F32 , config.featureRadius));
+						FactoryCornerIntensity.createKlt(ImageFloat32.class , config.featureRadius));
 		CornerExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(config.featureRadius+2,
 						config.featureRadius*scalingTop, configKLt.minDeterminant));
@@ -98,7 +97,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 				new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,null);
 
 		ConvolutionPyramid<ImageFloat32> pyrUpdater =
-				new ConvolutionPyramid<ImageFloat32>(KernelFactory.gaussian1D_F32(2,true),ImageTypeInfo.F32);
+				new ConvolutionPyramid<ImageFloat32>(KernelFactory.gaussian1D_F32(2,true),ImageFloat32.class);
 
 		ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.sobel_F32();
 

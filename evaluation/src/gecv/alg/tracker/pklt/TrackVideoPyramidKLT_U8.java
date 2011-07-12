@@ -36,7 +36,6 @@ import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageTypeInfo;
 import gecv.struct.image.ImageUInt8;
 
 /**
@@ -73,8 +72,8 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 
 		PkltManagerConfig<ImageUInt8, ImageSInt16> config = new PkltManagerConfig<ImageUInt8,ImageSInt16>();
 		config.config = configKLt;
-		config.typeInput = ImageTypeInfo.U8;
-		config.typeDeriv = ImageTypeInfo.S16;
+		config.typeInput = ImageUInt8.class;
+		config.typeDeriv = ImageSInt16.class;
 		config.pyramidScaling = new int[]{1,2,2,2};
 		config.imgWidth = image.width;
 		config.imgHeight = image.height;
