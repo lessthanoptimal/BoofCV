@@ -62,8 +62,8 @@ public class ImageSInt32 extends ImageInteger<ImageSInt32> {
 	}
 
 	@Override
-	public boolean isSigned() {
-		return true;
+	public ImageTypeInfo<ImageSInt32> getTypeInfo() {
+		return ImageTypeInfo.S32;
 	}
 
 	@Override
@@ -81,10 +81,5 @@ public class ImageSInt32 extends ImageInteger<ImageSInt32> {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new ImageSInt32();
 		return new ImageSInt32(imgWidth, imgHeight);
-	}
-
-	@Override
-	public Class<?> _getPrimitiveType() {
-		return int.class;
 	}
 }

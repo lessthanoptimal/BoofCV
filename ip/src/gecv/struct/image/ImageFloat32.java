@@ -90,7 +90,7 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 	}
 
 	@Override
-	public Class<?> _getPrimitiveType() {
-		return float.class;
+	public ImageTypeInfo<ImageFloat32> getTypeInfo() {
+		return ImageTypeInfo.F32;
 	}
 }

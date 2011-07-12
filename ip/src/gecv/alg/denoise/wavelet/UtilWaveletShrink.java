@@ -22,6 +22,8 @@ import pja.sorting.QuickSelectArray;
 
 
 /**
+ * Various functions useful for denoising wavelet transforms.
+ *
  * @author Peter Abeles
  */
 public class UtilWaveletShrink {

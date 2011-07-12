@@ -29,9 +29,9 @@ import gecv.struct.image.ImageInteger;
 public class ImageBorderValue {
 
 	public static ImageBorder wrap( ImageBase image , double value ) {
-		if( image.isInteger() ) {
+		if( image.getTypeInfo().isInteger() ) {
 			return wrap((ImageInteger)image,(int)value);
-		} else if( image._getPrimitiveType() == float.class ) {
+		} else if( image.getTypeInfo().getDataType() == float.class ) {
 			return wrap((ImageFloat32)image,(float)value);
 		} else {
 			return wrap((ImageFloat64)image,value);

@@ -33,6 +33,7 @@ import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageTypeInfo;
 import gecv.struct.image.ImageUInt8;
 import jgrl.struct.point.Point2D_I16;
 
@@ -132,7 +133,7 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 		int width = image.width;
 		int height = image.height;
 
-		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity = new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(FactoryCornerIntensity.createKlt(ImageSInt16.class , radius));
+		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity = new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(FactoryCornerIntensity.createKlt(ImageTypeInfo.S16 , radius));
 //		GeneralCornerIntensity<ImageUInt8, ImageSInt16> intensity =
 //				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryCornerIntensity.createFast12_I8(width, height, 8 , 12));
 

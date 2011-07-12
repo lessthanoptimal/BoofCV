@@ -29,6 +29,7 @@ import gecv.gui.image.ShowImages;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageTypeInfo;
 import gecv.struct.image.ImageUInt8;
 import jgrl.geometry.UtilPoint2D_F64;
 import jgrl.struct.point.Point2D_F64;
@@ -111,10 +112,10 @@ public class BenchmarkCornerAccuracy {
 
 		// todo try different noise levels
 
-		evaluate(detectCorners(FactoryCornerIntensity.createFast12( ImageUInt8.class , 10 , 11)),"FAST");
-		evaluate(detectCorners(FactoryCornerIntensity.createHarris( ImageSInt16.class , radius, 0.04f)),"Harris");
-		evaluate(detectCorners(FactoryCornerIntensity.createKitRos( ImageSInt16.class )),"KitRos");
-		evaluate(detectCorners(FactoryCornerIntensity.createKlt( ImageSInt16.class , radius )),"KLT");
+		evaluate(detectCorners(FactoryCornerIntensity.createFast12( ImageTypeInfo.U8 , 10 , 11)),"FAST");
+		evaluate(detectCorners(FactoryCornerIntensity.createHarris( ImageTypeInfo.S16 , radius, 0.04f)),"Harris");
+		evaluate(detectCorners(FactoryCornerIntensity.createKitRos( ImageTypeInfo.S16 )),"KitRos");
+		evaluate(detectCorners(FactoryCornerIntensity.createKlt( ImageTypeInfo.S16 , radius )),"KLT");
 		evaluate(detectMedianCorners(width, height, radius ),"Median");
 	}
 

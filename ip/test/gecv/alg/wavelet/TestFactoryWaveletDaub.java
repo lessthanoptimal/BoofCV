@@ -16,6 +16,7 @@
 
 package gecv.alg.wavelet;
 
+import gecv.core.image.border.BorderType;
 import gecv.struct.wavelet.WaveletDescription;
 import gecv.struct.wavelet.WlCoef_F32;
 import gecv.struct.wavelet.WlCoef_I32;
@@ -30,7 +31,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 
-	WaveletBorderType borderDefault = WaveletBorderType.WRAP;
+	BorderType borderDefault = BorderType.WRAP;
+
+	BorderType[] borderTypes = new BorderType[]{BorderType.WRAP,BorderType.REFLECT};
 
 	/**
 	 * Sees if the DaubJ transform can reconstruct an image.
@@ -80,7 +83,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	@Test
 	public void transform_biorthogonal_F32() {
 
-		for( WaveletBorderType type : WaveletBorderType.values() )
+		for( BorderType type : borderTypes  )
 		{
 			for( int i = 5; i <= 5; i += 2 ) {
 				WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(i,type);
@@ -119,7 +122,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	@Test
 	public void transform_biorthogonal_I32() {
 
-		for( WaveletBorderType type : WaveletBorderType.values() ) {
+		for( BorderType type : borderTypes ) {
 			for( int i = 5; i <= 5; i += 2 ) {
 				WaveletDescription<WlCoef_I32> desc = FactoryWaveletDaub.biorthogonal_I32(i,type);
 
@@ -157,7 +160,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	@Test
 	public void biorthogonal_F32_inverse() {
 
-		for( WaveletBorderType type : WaveletBorderType.values() ) {
+		for( BorderType type : borderTypes ) {
 			for( int i = 5; i <= 5; i += 2 ) {
 				WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(i,type );
 
@@ -169,7 +172,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	@Test
 	public void biorthogonal_I32_inverse() {
 
-		for( WaveletBorderType type : WaveletBorderType.values() ) {
+		for( BorderType type : borderTypes  ) {
 			for( int i = 5; i <= 5; i += 2 ) {
 				WaveletDescription<WlCoef_I32> desc = FactoryWaveletDaub.biorthogonal_I32(i,type);
 

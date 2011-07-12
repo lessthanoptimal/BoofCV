@@ -19,6 +19,7 @@ package gecv.alg.wavelet;
 import gecv.core.image.border.BorderIndex1D;
 import gecv.core.image.border.BorderIndex1D_Reflect;
 import gecv.core.image.border.BorderIndex1D_Wrap;
+import gecv.core.image.border.BorderType;
 import gecv.struct.wavelet.*;
 import org.ejml.alg.dense.linsol.LinearSolver;
 import org.ejml.alg.dense.linsol.LinearSolverFactory;
@@ -104,7 +105,7 @@ public class FactoryWaveletDaub {
 	 * @return Description of the Daub J/K wavelet.
 	 */
 	public static WaveletDescription<WlCoef_F32> biorthogonal_F32( int J ,
-																   WaveletBorderType borderType ) {
+																   BorderType borderType ) {
 		if( J != 5 ) {
 			throw new IllegalArgumentException("Only 5 is currently supported");
 		}
@@ -130,14 +131,16 @@ public class FactoryWaveletDaub {
 		BorderIndex1D border;
 		WlBorderCoef<WlCoef_F32> inverse;
 
-		if( borderType == WaveletBorderType.REFLECT ) {
+		if( borderType == BorderType.REFLECT ) {
 			WlCoef_F32 inner = computeInnerInverseBiorthogonal(forward);
 			border = new BorderIndex1D_Reflect();
 			inverse = computeBorderCoefficients(border,forward,inner);
-		} else {
+		} else if( borderType == BorderType.WRAP ) {
 			WlCoef_F32 inner = computeInnerInverseBiorthogonal(forward);
 			inverse = new WlBorderCoefStandard<WlCoef_F32>(inner);
 			border = new BorderIndex1D_Wrap();
+		} else {
+			throw new IllegalArgumentException("Unsupported border type: "+borderType);
 		}
 		return new WaveletDescription<WlCoef_F32>(border,forward,inverse);
 
@@ -274,7 +277,7 @@ public class FactoryWaveletDaub {
 	 * @return Description of the Daub J/K wavelet.
 	 */
 	public static WaveletDescription<WlCoef_I32> biorthogonal_I32( int J ,
-																   WaveletBorderType borderType ) {
+																   BorderType borderType ) {
 		if( J != 5 ) {
 			throw new IllegalArgumentException("Only 5 is currently supported");
 		}
@@ -302,14 +305,16 @@ public class FactoryWaveletDaub {
 		BorderIndex1D border;
 		WlBorderCoef<WlCoef_I32> inverse;
 
-		if( borderType == WaveletBorderType.WRAP ) {
+		if( borderType == BorderType.WRAP ) {
 			WlCoef_I32 inner = computeInnerBiorthogonalInverse(forward);
 			inverse = new WlBorderCoefStandard<WlCoef_I32>(inner);
 			border = new BorderIndex1D_Wrap();
-		} else {
+		} else if( borderType == BorderType.REFLECT ) {
 			WlCoef_I32 inner = computeInnerBiorthogonalInverse(forward);
 			inverse = convertToInt((WlBorderCoefFixed<WlCoef_F32>)biorthogonal_F32(J,borderType).getInverse(),inner);
 			border = new BorderIndex1D_Reflect();
+		} else {
+			throw new IllegalArgumentException("Unsupported border type: "+borderType);
 		}
 		return new WaveletDescription<WlCoef_I32>(border,forward,inverse);
 

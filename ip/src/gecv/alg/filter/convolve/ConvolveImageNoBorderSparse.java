@@ -62,9 +62,6 @@ public class ConvolveImageNoBorderSparse {
 	public static float convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
 								  ImageUInt8 input, int c_x , int c_y, int storage[] )
 	{
-		if( input.isSigned() )
-			throw new IllegalArgumentException("Input image must be unsigned");
-
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage);
 	}
 
@@ -82,9 +79,6 @@ public class ConvolveImageNoBorderSparse {
 	public static float convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
 								  ImageSInt16 input, int c_x , int c_y, int storage[] )
 	{
-		if( !input.isSigned() )
-			throw new IllegalArgumentException("Input image must be signed");
-
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage);
 	}
 
@@ -106,9 +100,6 @@ public class ConvolveImageNoBorderSparse {
 								  ImageUInt8 input, int c_x , int c_y, int storage[] ,
 								  int divisorHorizontal, int divisorVertical)
 	{
-		if( input.isSigned() )
-			throw new IllegalArgumentException("Input image must be unsigned");
-
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage,divisorHorizontal,divisorVertical);
 	}
 
@@ -130,9 +121,6 @@ public class ConvolveImageNoBorderSparse {
 								  ImageSInt16 input, int c_x , int c_y, int storage[] ,
 								  int divisorHorizontal, int divisorVertical)
 	{
-		if( !input.isSigned() ) 
-			throw new IllegalArgumentException("Input image must be signed");
-
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage,divisorHorizontal,divisorVertical);
 	}
 

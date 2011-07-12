@@ -16,9 +16,9 @@
 
 package gecv.core.image.impl;
 
+import gecv.misc.AutoTypeImage;
 import gecv.misc.CodeGeneratorBase;
 import gecv.misc.CodeGeneratorUtil;
-import gecv.misc.TypeImage;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -42,8 +42,8 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 	public void generate() throws FileNotFoundException {
 		printPreamble();
 
-		for( TypeImage in : TypeImage.getSpecificTypes()) {
-			for( TypeImage out : TypeImage.getGenericTypes() ) {
+		for( AutoTypeImage in : AutoTypeImage.getSpecificTypes()) {
+			for( AutoTypeImage out : AutoTypeImage.getGenericTypes() ) {
 				if( in == out )
 					continue;
 
@@ -77,7 +77,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"public class "+className+" {\n\n");
 	}
 
-	private void printConvert( TypeImage imageIn , TypeImage imageOut ) {
+	private void printConvert( AutoTypeImage imageIn , AutoTypeImage imageOut ) {
 
 		String typeCast = "( "+imageOut.getDataType()+" )";
 		String bitWise = imageIn.getBitWise();

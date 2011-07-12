@@ -18,9 +18,9 @@ package gecv.abst.wavelet.impl;
 
 import gecv.alg.wavelet.FactoryWaveletDaub;
 import gecv.alg.wavelet.UtilWavelet;
-import gecv.alg.wavelet.WaveletBorderType;
 import gecv.alg.wavelet.WaveletTransformOps;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.wavelet.WaveletDescription;
@@ -51,7 +51,7 @@ public class TestWaveletTransformFloat32 {
 		ImageFloat32 found = new ImageFloat32(dimen.width,dimen.height);
 		ImageFloat32 expected = new ImageFloat32(dimen.width,dimen.height);
 
-		WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5, WaveletBorderType.REFLECT);
+		WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5, BorderType.REFLECT);
 
 		ImageFloat32 storage = new ImageFloat32(dimen.width,dimen.height);
 		WaveletTransformOps.transformN(desc,orig.clone(),expected,storage,N);

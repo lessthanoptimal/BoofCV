@@ -16,9 +16,9 @@
 
 package gecv.alg.wavelet.impl;
 
+import gecv.misc.AutoTypeImage;
 import gecv.misc.CodeGeneratorBase;
 import gecv.misc.CodeGeneratorUtil;
-import gecv.misc.TypeImage;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -33,8 +33,8 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 
 	PrintStream out;
 
-	TypeImage imageIn;
-	TypeImage imageOut;
+	AutoTypeImage imageIn;
+	AutoTypeImage imageOut;
 	String genName;
 	String sumType;
 
@@ -46,8 +46,8 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 	public void generate() throws FileNotFoundException {
 		printPreamble();
 
-		printFuncs(TypeImage.F32, TypeImage.F32);
-		printFuncs(TypeImage.I,TypeImage.I);
+		printFuncs(AutoTypeImage.F32, AutoTypeImage.F32);
+		printFuncs(AutoTypeImage.I, AutoTypeImage.I);
 
 		out.print("\n" +
 				"}\n");
@@ -81,7 +81,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"public class "+className+" {\n\n");
 	}
 
-	private void printFuncs( TypeImage imageIn , TypeImage imageOut ) {
+	private void printFuncs( AutoTypeImage imageIn , AutoTypeImage imageOut ) {
 		this.imageIn = imageIn;
 		this.imageOut = imageOut;
 

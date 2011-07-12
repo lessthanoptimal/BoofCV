@@ -33,13 +33,8 @@ public abstract class ImageFloat <T extends ImageFloat> extends ImageBase<T> {
 	}
 
 	@Override
-	public boolean isInteger() {
-		return false;
-	}
-
-	@Override
-	public boolean isSigned() {
-		return true;
+	public ImageTypeInfo<T> getTypeInfo() {
+		return (ImageTypeInfo<T>)ImageTypeInfo.F;
 	}
 
 }

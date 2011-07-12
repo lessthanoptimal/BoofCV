@@ -44,6 +44,17 @@ public class GecvTesting {
 		return (T)type;
 	}
 
+	public static ImageTypeInfo convertToGenericType( ImageTypeInfo<?> type ) {
+		if( type.isInteger() ) {
+			if( type.getNumBits() == 8 )
+				return ImageTypeInfo.I8;
+			else if( type.getNumBits() == 16 )
+				return ImageTypeInfo.I16;
+		}
+
+		return type;
+	}
+
 	/**
 	 * If an image is to be created then the generic type can't be used a specific one needs to be.  An arbitrary
 	 * specific image type is returned here. 
@@ -307,11 +318,11 @@ public class GecvTesting {
 	 */
 	public static void assertEqualsGeneric(ImageBase imgA, ImageBase imgB, int tolInt, double tolFloat) {
 
-		if( imgA.isInteger() && imgB.isInteger() ) {
+		if( imgA.getTypeInfo().isInteger() && imgB.getTypeInfo().isInteger() ) {
 			assertEquals((ImageInteger)imgA,(ImageInteger)imgB,tolInt);
-		} else if( imgA.isInteger() || imgB.isInteger() ) {
-			ImageInteger imgInt = (ImageInteger)(imgA.isInteger() ? imgA : imgB);
-			ImageFloat imgFloat = (ImageFloat)(imgA.isInteger() ? imgB : imgA);
+		} else if( imgA.getTypeInfo().isInteger() || imgB.getTypeInfo().isInteger() ) {
+			ImageInteger imgInt = (ImageInteger)(imgA.getTypeInfo().isInteger() ? imgA : imgB);
+			ImageFloat imgFloat = (ImageFloat)(imgA.getTypeInfo().isInteger() ? imgB : imgA);
 
 			assertEquals(imgInt,imgFloat,tolInt);
 		} else {
@@ -509,7 +520,7 @@ public class GecvTesting {
 					for (int j = 0; j < imgA.getWidth(); j++) {
 						int valB = imgB.get(j, i);
 						int valA = raster.getDataStorage()[i * imgA.getWidth() + j];
-						if( !imgB.isSigned() )
+						if( !imgB.getTypeInfo().isSigned() )
 							valA &= 0xFF;
 						
 						if (valA != valB)
@@ -526,7 +537,7 @@ public class GecvTesting {
 
 				int gray = (byte) ((((rgb >>> 16) & 0xFF) + ((rgb >>> 8) & 0xFF) + (rgb & 0xFF)) / 3);
 				int grayB = imgB.get(x, y);
-				if( !imgB.isSigned() )
+				if( !imgB.getTypeInfo().isSigned() )
 					gray &= 0xFF;
 
 				if (Math.abs(gray - grayB) != 0) {

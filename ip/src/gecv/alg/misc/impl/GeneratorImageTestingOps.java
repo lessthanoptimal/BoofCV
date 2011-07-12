@@ -16,8 +16,8 @@
 
 package gecv.alg.misc.impl;
 
+import gecv.misc.AutoTypeImage;
 import gecv.misc.CodeGeneratorUtil;
-import gecv.misc.TypeImage;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -35,7 +35,7 @@ public class GeneratorImageTestingOps {
 
 	PrintStream out;
 
-	private TypeImage imageType;
+	private AutoTypeImage imageType;
 	private String imageName;
 	private String dataType;
 	private String bitWise;
@@ -71,9 +71,9 @@ public class GeneratorImageTestingOps {
 	}
 
 	public void printAllGeneric() {
-		TypeImage types[] = TypeImage.getGenericTypes();
+		AutoTypeImage types[] = AutoTypeImage.getGenericTypes();
 
-		for( TypeImage t : types ) {
+		for( AutoTypeImage t : types ) {
 			imageType = t;
 			imageName = t.getImageName();
 			dataType = t.getDataType();
@@ -84,9 +84,9 @@ public class GeneratorImageTestingOps {
 	}
 
 	public void printAllSpecific() {
-		TypeImage types[] = TypeImage.getSpecificTypes();
+		AutoTypeImage types[] = AutoTypeImage.getSpecificTypes();
 
-		for( TypeImage t : types ) {
+		for( AutoTypeImage t : types ) {
 			imageType = t;
 			imageName = t.getImageName();
 			dataType = t.getDataType();

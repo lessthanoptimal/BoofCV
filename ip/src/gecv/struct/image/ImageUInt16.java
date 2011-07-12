@@ -46,8 +46,8 @@ public class ImageUInt16 extends ImageInt16<ImageUInt16> {
 	}
 
 	@Override
-	public boolean isSigned() {
-		return false;
+	public ImageTypeInfo<ImageUInt16> getTypeInfo() {
+		return ImageTypeInfo.U16;
 	}
 
 	@Override

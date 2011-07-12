@@ -16,9 +16,9 @@
 
 package gecv.alg.filter.blur.impl;
 
+import gecv.misc.AutoTypeImage;
 import gecv.misc.CodeGeneratorBase;
 import gecv.misc.CodeGeneratorUtil;
-import gecv.misc.TypeImage;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,7 +32,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 
 	PrintStream out;
 
-	TypeImage imageIn;
+	AutoTypeImage imageIn;
 
 	public GenerateImplMedianSortEdgeNaive() throws FileNotFoundException {
 		out = new PrintStream(new FileOutputStream(className + ".java"));
@@ -42,8 +42,8 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 	public void generate() throws FileNotFoundException {
 		printPreamble();
 
-		printFunction(TypeImage.F32);
-		printFunction(TypeImage.I);
+		printFunction(AutoTypeImage.F32);
+		printFunction(AutoTypeImage.I);
 
 		out.print("\n" +
 				"}\n");
@@ -76,7 +76,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 				"public class "+className+" {\n\n");
 	}
 
-	private void printFunction( TypeImage image ) {
+	private void printFunction( AutoTypeImage image ) {
 
 		String primitiveType = image.getDataType();
 		String sumType = image.getSumType();

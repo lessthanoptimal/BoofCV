@@ -17,6 +17,7 @@
 package gecv.core.image;
 
 import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageTypeInfo;
 
 
 /**
@@ -28,5 +29,5 @@ public interface ImageGenerator<T extends ImageBase> {
 
 	public T createInstance( int width , int height );
 
-	public Class<T> getType();
+	public ImageTypeInfo<T> getType();
 }

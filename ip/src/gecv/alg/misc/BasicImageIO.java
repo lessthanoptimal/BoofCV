@@ -28,7 +28,7 @@ public class BasicImageIO {
 
 	public static void print(ImageBase a) {
 
-		if( a.isInteger() ) {
+		if( a.getTypeInfo().isInteger() ) {
 			print((ImageInteger)a);
 		} else {
 			print((ImageFloat32)a);

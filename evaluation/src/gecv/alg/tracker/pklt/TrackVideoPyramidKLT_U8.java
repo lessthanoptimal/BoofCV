@@ -36,6 +36,7 @@ import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageTypeInfo;
 import gecv.struct.image.ImageUInt8;
 
 /**
@@ -72,8 +73,8 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 
 		PkltManagerConfig<ImageUInt8, ImageSInt16> config = new PkltManagerConfig<ImageUInt8,ImageSInt16>();
 		config.config = configKLt;
-		config.typeInput = ImageUInt8.class;
-		config.typeDeriv = ImageSInt16.class;
+		config.typeInput = ImageTypeInfo.U8;
+		config.typeDeriv = ImageTypeInfo.S16;
 		config.pyramidScaling = new int[]{1,2,2,2};
 		config.imgWidth = image.width;
 		config.imgHeight = image.height;
@@ -83,12 +84,12 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 
 		int scalingTop = config.computeScalingTop();
 
-		InterpolateRectangle<ImageUInt8> interp = FactoryInterpolation.bilinearRectangle(ImageUInt8.class);
-		InterpolateRectangle<ImageSInt16> interpD = FactoryInterpolation.bilinearRectangle(ImageSInt16.class);
+		InterpolateRectangle<ImageUInt8> interp = FactoryInterpolation.bilinearRectangle(config.typeInput);
+		InterpolateRectangle<ImageSInt16> interpD = FactoryInterpolation.bilinearRectangle(config.typeDeriv);
 
 		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity =
 				new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(
-						FactoryCornerIntensity.createKlt(ImageSInt16.class,config.featureRadius));
+						FactoryCornerIntensity.createKlt(config.typeDeriv,config.featureRadius));
 		CornerExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(config.featureRadius+2,
 						config.featureRadius*scalingTop, configKLt.minDeterminant));
@@ -99,7 +100,7 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 				new GenericPkltFeatSelector<ImageUInt8,ImageSInt16>(detector,null);
 
 		ConvolutionPyramid<ImageUInt8> pyrUpdater =
-				new ConvolutionPyramid<ImageUInt8>(KernelFactory.gaussian1D_I32(2),ImageUInt8.class);
+				new ConvolutionPyramid<ImageUInt8>(KernelFactory.gaussian1D_I32(2),config.typeInput);
 
 		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel_I8();
 

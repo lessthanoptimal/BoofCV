@@ -39,12 +39,12 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class DenoiseSureShrink extends SubbandShrink<ImageFloat32> {
+public class DenoiseSureShrink_F32 extends SubbandShrink<ImageFloat32> {
 
 	float noiseSigma;
 
-	public DenoiseSureShrink() {
-		super(new ShrinkThresholdSoft());
+	public DenoiseSureShrink_F32() {
+		super(new ShrinkThresholdSoft_F32());
 	}
 
 	@Override

@@ -44,8 +44,8 @@ public class ImageSInt8 extends ImageInt8<ImageSInt8> {
 	}
 
 	@Override
-	public boolean isSigned() {
-		return true;
+	public ImageTypeInfo<ImageSInt8> getTypeInfo() {
+		return ImageTypeInfo.S8;
 	}
 
 	@Override

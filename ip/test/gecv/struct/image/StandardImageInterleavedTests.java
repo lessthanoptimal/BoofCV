@@ -162,10 +162,10 @@ public abstract class StandardImageInterleavedTests {
 				args[index] = where[index];
 			}
 			if (type == 1) {
-				paramTypes[index] = img._getPrimitiveType();
+				paramTypes[index] = img.getTypeInfo().getDataType();
 				args[index] = typeData;
 			} else if (type == 2) {
-				String name = "[" + img._getPrimitiveType().getName().toUpperCase().charAt(0);
+				String name = "[" + img.getTypeInfo().getDataType().getName().toUpperCase().charAt(0);
 				paramTypes[index] = Class.forName(name);
 				args[index] = typeData;
 			}
@@ -188,7 +188,7 @@ public abstract class StandardImageInterleavedTests {
 	private Object createPixelArray(ImageInterleaved img) {
 		int numBands = img.getNumBands();
 
-		Object ret = Array.newInstance(img._getPrimitiveType(), numBands);
+		Object ret = Array.newInstance(img.getTypeInfo().getDataType(), numBands);
 
 		for (int i = 0; i < numBands; i++)
 			Array.set(ret, i, randomNumber());

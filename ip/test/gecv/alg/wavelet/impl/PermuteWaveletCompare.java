@@ -16,11 +16,11 @@
 
 package gecv.alg.wavelet.impl;
 
-import gecv.alg.wavelet.WaveletBorderType;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.BorderIndex1D;
 import gecv.core.image.border.BorderIndex1D_Reflect;
 import gecv.core.image.border.BorderIndex1D_Wrap;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.wavelet.*;
@@ -82,7 +82,7 @@ public abstract class PermuteWaveletCompare {
 //		System.out.println("In [ "+widthIn+" , "+heightIn+" ]  Out [ "+widthOut+" , "+heightOut+" ]");
 
 		// test different descriptions lengths and offsets, and borders
-		for( WaveletBorderType type : WaveletBorderType.values() ) {
+		for( BorderType type : BorderType.values() ) {
 			for( int o = 0; o <= 2; o++ ) {
 				for( int l = 2+o; l <= 5; l++ ) {
 //					System.out.println("type "+type+" o = "+o+" l = "+l);
@@ -113,7 +113,7 @@ public abstract class PermuteWaveletCompare {
 
 	public abstract void compareResults( WaveletDescription<?> desc, ImageBase input , ImageBase expected, ImageBase found );
 
-	private WaveletDescription<?> createDesc(int offset, int length, WaveletBorderType type ) {
+	private WaveletDescription<?> createDesc(int offset, int length, BorderType type ) {
 		if( inputType == ImageFloat32.class ) {
 			return createDesc_F32(offset,length,type);
 		} else {
@@ -121,13 +121,13 @@ public abstract class PermuteWaveletCompare {
 		}
 	}
 
-	private WaveletDescription<WlCoef_F32> createDesc_F32(int offset, int length, WaveletBorderType type ) {
+	private WaveletDescription<WlCoef_F32> createDesc_F32(int offset, int length, BorderType type ) {
 		WlCoef_F32 forward = createRandomCoef_F32(offset, length);
 
 		WlBorderCoef<WlCoef_F32> inverse;
 		BorderIndex1D border;
 
-		if( type == WaveletBorderType.WRAP ) {
+		if( type == BorderType.WRAP ) {
 			inverse = new WlBorderCoefStandard<WlCoef_F32>(forward);
 			border = new BorderIndex1D_Wrap();
 		} else {
@@ -176,13 +176,13 @@ public abstract class PermuteWaveletCompare {
 		return ret;
 	}
 
-	private WaveletDescription<WlCoef_I32> createDesc_I32(int offset, int length, WaveletBorderType type ) {
+	private WaveletDescription<WlCoef_I32> createDesc_I32(int offset, int length, BorderType type ) {
 		WlCoef_I32 forward = createRandomCoef_I32(offset, length);
 
 		BorderIndex1D border;
 		WlBorderCoef<WlCoef_I32> inverse;
 
-		if( type == WaveletBorderType.WRAP ) {
+		if( type == BorderType.WRAP ) {
 			inverse = new WlBorderCoefStandard<WlCoef_I32>(forward);
 			border = new BorderIndex1D_Wrap();
 		} else {

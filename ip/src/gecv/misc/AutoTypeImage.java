@@ -24,7 +24,7 @@ import gecv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public enum TypeImage {
+public enum AutoTypeImage {
 	I("ImageInteger","int",true,0),
 	I8("ImageInt8","byte",true,8),
 	U8(ImageUInt8.class),
@@ -47,18 +47,18 @@ public enum TypeImage {
 
 	private Class<?> primitiveType;
 
-	TypeImage( Class<?> imageType ) {
+	AutoTypeImage( Class<?> imageType ) {
 
 		imageName = imageType.getSimpleName();
 		bitWise = "";
 		try {
 			ImageBase img = (ImageBase)imageType.newInstance();
-			primitiveType = img._getPrimitiveType();
+			primitiveType = img.getTypeInfo().getDataType();
 			dataType = primitiveType.getSimpleName();
 			if( ImageInteger.class.isAssignableFrom(imageType)) {
 				isInteger = true;
 				sumType = "int";
-				if( !((ImageInteger)img).isSigned() ) {
+				if( !((ImageInteger)img).getTypeInfo().isSigned() ) {
 					abbreviatedType = "U";
 					isSigned = false;
 					if( byte.class == primitiveType) {
@@ -100,7 +100,7 @@ public enum TypeImage {
 		}
 	}
 
-	TypeImage(String imageName, String dataType, boolean isInteger , int numBits ) {
+	AutoTypeImage(String imageName, String dataType, boolean isInteger , int numBits ) {
 		this.imageName = imageName;
 		this.dataType = dataType;
 		this.isInteger = isInteger;
@@ -116,28 +116,28 @@ public enum TypeImage {
 
 	}
 
-	public static TypeImage[] getIntegerTypes() {
-		return new TypeImage[]{U8,S8,U16,S16,S32};
+	public static AutoTypeImage[] getIntegerTypes() {
+		return new AutoTypeImage[]{U8,S8,U16,S16,S32};
 	}
 
-	public static TypeImage[] getFloatingTypes() {
-		return new TypeImage[]{F32,F64};
+	public static AutoTypeImage[] getFloatingTypes() {
+		return new AutoTypeImage[]{F32,F64};
 	}
 
-	public static TypeImage[] getGenericTypes() {
-		return new TypeImage[]{I8,I16,S32,F32,F64};
+	public static AutoTypeImage[] getGenericTypes() {
+		return new AutoTypeImage[]{I8,I16,S32,F32,F64};
 	}
 
-	public static TypeImage[] getSpecificTypes() {
-		return new TypeImage[]{U8,S8,U16,S16,S32,F32,F64};
+	public static AutoTypeImage[] getSpecificTypes() {
+		return new AutoTypeImage[]{U8,S8,U16,S16,S32,F32,F64};
 	}
 
-	public static TypeImage[] getSigned() {
-		return new TypeImage[]{S8,S16,S32,F32,F64};
+	public static AutoTypeImage[] getSigned() {
+		return new AutoTypeImage[]{S8,S16,S32,F32,F64};
 	}
 
-	public static TypeImage[] getUnsigned() {
-		return new TypeImage[]{U8,U16};
+	public static AutoTypeImage[] getUnsigned() {
+		return new AutoTypeImage[]{U8,U16};
 	}
 
 	public String getImageName() {

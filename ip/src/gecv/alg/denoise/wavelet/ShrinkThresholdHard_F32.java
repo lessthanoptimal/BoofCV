@@ -16,24 +16,40 @@
 
 package gecv.alg.denoise.wavelet;
 
-import gecv.alg.denoise.DenoiseWavelet;
+import gecv.alg.denoise.ShrinkThresholdRule;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 
 
 /**
  * <p>
- * Wavelet based image-denoising algorithm
- * </p>
- *
- * <p>
- * J. S. Walker, "Tree-Adapted Wavelet Shrinkage," Advances in Imaging and Electron Physics, 2003
+ * Hard rule for shrinking an image: T(x) = x*1(|x|>T)
  * </p>
  *
  * @author Peter Abeles
  */
-public class DenoiseTaws implements DenoiseWavelet<ImageFloat32> {
+public class ShrinkThresholdHard_F32 implements ShrinkThresholdRule<ImageFloat32> {
+
 	@Override
-	public void denoise(ImageFloat32 transform, int numLevels) {
-		//To change body of implemented methods use File | Settings | File Templates.
+	public void process(ImageFloat32 image, Number threshold) {
+		float f = threshold.floatValue();
+
+		// see if all the coefficients should be set to zero
+		if( Float.isInfinite(f)) {
+			ImageTestingOps.fill(image,0);
+			return;
+		}
+
+		for( int y = 0; y < image.height; y++ ) {
+			int index = image.startIndex + y*image.stride;
+		    int end = index + image.width;
+
+			for( ; index < end; index++ ) {
+				float v = image.data[index];
+				if( Math.abs(v) < f ) {
+					image.data[index] = 0;
+				}
+			}
+		}
 	}
 }
