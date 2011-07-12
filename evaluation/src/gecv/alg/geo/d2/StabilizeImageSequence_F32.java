@@ -28,7 +28,6 @@ import gecv.numerics.fitting.modelset.ModelMatcher;
 import gecv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageTypeInfo;
 import jgrl.struct.affine.Affine2D_F32;
 import jgrl.struct.affine.Affine2D_F64;
 
@@ -80,7 +79,7 @@ public class StabilizeImageSequence_F32 extends StabilizeImageSequenceBase<Image
 
 	public void createAlg( int width , int height ) {
 		PkltManagerConfig<ImageFloat32, ImageFloat32> config =
-				PkltManagerConfig.createDefault(ImageTypeInfo.F32, ImageTypeInfo.F32,width,height);
+				PkltManagerConfig.createDefault(ImageFloat32.class,ImageFloat32.class,width,height);
 //		config.pyramidScaling = new int[]{2,2,2};
 		config.maxFeatures = maxFeatures;
 		PkltManager<ImageFloat32, ImageFloat32> trackManager = new PkltManager<ImageFloat32, ImageFloat32>(config);
@@ -90,7 +89,7 @@ public class StabilizeImageSequence_F32 extends StabilizeImageSequenceBase<Image
 		ModelMatcher<Affine2D_F64,AssociatedPair> fitter = createModelMatcher();
 
 		PointImageStabilization<ImageFloat32> app = new PointImageStabilization<ImageFloat32>(
-				ImageTypeInfo.F32,tracker,fitter,thresholdChange,thresholdReset,thresholdDistance);
+				ImageFloat32.class,tracker,fitter,thresholdChange,thresholdReset,thresholdDistance);
 
 		setStabilizer(app);
 	}

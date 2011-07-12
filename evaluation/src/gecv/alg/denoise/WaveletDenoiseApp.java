@@ -147,7 +147,7 @@ public class WaveletDenoiseApp {
 
 	private void loadImage() {
 //		BufferedImage in = UtilImageIO.loadImage("/home/pja/rgb.jpg");
-		BufferedImage in = UtilImageIO.loadImage("/home/pja/projects/gecv/evaluation/data/lena512.bmp");
+		BufferedImage in = UtilImageIO.loadImage("/home/pja/projects/gecv/evaluation/data/standard/lena512.bmp");
 		image = ConvertBufferedImage.convertFrom(in,image);
 	}
 
