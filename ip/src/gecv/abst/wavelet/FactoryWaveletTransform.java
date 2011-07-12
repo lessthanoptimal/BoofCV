@@ -34,6 +34,19 @@ import gecv.struct.wavelet.WlCoef_I32;
  */
 public class FactoryWaveletTransform {
 
+
+	@SuppressWarnings({"unchecked"})
+	public static WaveletTransform create( WaveletDescription waveletDesc , int numLevels )
+	{
+		if( waveletDesc.getForward().getType() == float.class ) {
+			return create_F32(waveletDesc,numLevels);
+		} else if( waveletDesc.getForward().getType() == byte.class ) {
+			return create_I(waveletDesc,numLevels);
+		} else {
+			throw new RuntimeException("Add support for this image type");
+		}
+	}
+
 	/**
 	 * Creates a wavelet transform for images that are derived from {@link ImageInteger}.
 	 *

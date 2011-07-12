@@ -20,7 +20,6 @@ import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageInteger;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -43,7 +42,7 @@ public class TestImageTestingOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 22;
+		int numExpected = 40;
 		Method methods[] = ImageTestingOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -60,6 +59,10 @@ public class TestImageTestingOps {
 					testRandomize(m);
 				} else if( m.getName().compareTo("addUniform") == 0 ) {
 				    testAddUniform(m);
+				} else if( m.getName().compareTo("addGaussian") == 0 ) {
+					testAddGaussian(m);
+				} else if( m.getName().compareTo("computeMeanSquaredError") == 0 ) {
+					testComputeMSE(m);
 				} else {
 					throw new RuntimeException("Unknown function");
 				}
@@ -92,7 +95,7 @@ public class TestImageTestingOps {
 		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.randomize(orig, rand, 0,20);
 
-		if( paramTypes[1] == int.class ) {
+		if( orig.getTypeInfo().isInteger()) {
 			m.invoke(null,orig,10);
 		} else {
 			m.invoke(null,orig,10.0f);
@@ -115,7 +118,7 @@ public class TestImageTestingOps {
 		int width = 5;
 		int height = 6;
 
-		if( paramTypes[1] == int.class ) {
+		if( orig.getTypeInfo().isInteger() ) {
 			m.invoke(null,orig,10,x0,y0,width,height);
 		} else {
 			m.invoke(null,orig,10.0f,x0,y0,width,height);
@@ -137,7 +140,7 @@ public class TestImageTestingOps {
 		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
 
 		if( orig.getTypeInfo().isInteger() ) {
-			if( ((ImageInteger)orig).getTypeInfo().isSigned() )
+			if( orig.getTypeInfo().isSigned() )
 				m.invoke(null,orig,rand,-10,10);
 			else {
 				m.invoke(null,orig,rand,1,10);
@@ -179,5 +182,56 @@ public class TestImageTestingOps {
 				assertTrue(value>=-2 && value <= 11);
 			}
 		}
+	}
+
+	private void testAddGaussian( Method m ) throws InvocationTargetException, IllegalAccessException {
+
+		double mean = 10;
+
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
+
+		GeneralizedImageOps.fill(orig,mean);
+		m.invoke(null,orig,rand,2.0);
+
+		double stdev2 = 0;
+		SingleBandImage a = FactorySingleBandImage.wrap(orig);
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double value = a.get(j,i).doubleValue();
+				stdev2 += (value-mean)*(value-mean);
+			}
+		}
+
+		GeneralizedImageOps.fill(orig,mean);
+		m.invoke(null,orig,rand,10.0);
+
+		double stdev10 = 0;
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double value = a.get(j,i).doubleValue();
+				stdev10 += (value-mean)*(value-mean);
+			}
+		}
+
+		// see if the gaussian with the larger variance creates a noisier image
+		assertTrue(stdev2<stdev10);
+	}
+
+	private void testComputeMSE( Method m ) throws InvocationTargetException, IllegalAccessException {
+
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase imgA = GecvTesting.createImage(paramTypes[0],width,height);
+
+		GeneralizedImageOps.fill(imgA,10);
+		ImageBase imgB = imgA.clone();
+
+		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
+		b.set(5,5,20);
+
+		Number error = (Number)m.invoke(null,imgA,imgB);
+		double expected = (10.0*10.0)/(width*height);
+
+		assertEquals(expected,error.doubleValue(),1e-8);
 	}
 }

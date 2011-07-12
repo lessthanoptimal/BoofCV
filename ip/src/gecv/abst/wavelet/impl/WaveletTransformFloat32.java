@@ -17,8 +17,8 @@
 package gecv.abst.wavelet.impl;
 
 import gecv.abst.wavelet.WaveletTransform;
-import gecv.alg.wavelet.UtilWavelet;
-import gecv.alg.wavelet.WaveletTransformOps;
+import gecv.alg.transform.wavelet.UtilWavelet;
+import gecv.alg.transform.wavelet.WaveletTransformOps;
 import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;

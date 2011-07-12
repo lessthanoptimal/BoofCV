@@ -19,7 +19,7 @@ package gecv.abst.denoise;
 import gecv.abst.filter.FilterImageInterface;
 import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.denoise.DenoiseWavelet;
-import gecv.alg.wavelet.UtilWavelet;
+import gecv.alg.transform.wavelet.UtilWavelet;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageDimension;
 
@@ -49,9 +49,9 @@ public class WaveletDenoiseFilter<T extends ImageBase > implements FilterImageIn
 	 * @param wavelet Description of the wavelet transform.
 	 * @param denoiser Algorithm used to remove noise
 	 */
-	public WaveletDenoiseFilter(WaveletTransform<T, ImageBase, ?> wavelet,
+	public WaveletDenoiseFilter(WaveletTransform<T, ?, ?> wavelet,
 								DenoiseWavelet denoiser) {
-		this.wavelet = wavelet;
+		this.wavelet = (WaveletTransform<T,ImageBase,?>)wavelet;
 		this.alg = denoiser;
 	}
 

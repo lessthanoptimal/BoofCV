@@ -116,7 +116,7 @@ public class FactoryConvolve {
 					break;
 
 				case EXTENDED:
-					borderRule = FactoryImageBorder.extend(inputType);
+					borderRule = FactoryImageBorder.general(inputType,BorderIndex1D_Extend.class);
 					m = GecvTesting.findMethod(ConvolveWithBorder.class,"convolve",kernel.getClass(),inputType,outputType,borderRule.getClass());
 					break;
 

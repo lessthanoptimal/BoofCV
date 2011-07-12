@@ -16,44 +16,61 @@
 
 package gecv.core.image.border;
 
-import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageFloat64;
-import gecv.struct.image.ImageInteger;
+import gecv.struct.image.*;
 
 
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked"})
 public class FactoryImageBorder {
 
-	public static ImageBorder extend( ImageBase image ) {
-		if( image instanceof ImageFloat32 )
-			return extend( (ImageFloat32)image );
-		else if( image instanceof ImageInteger )
-			return extend( (ImageInteger)image );
-		else
-			throw new IllegalArgumentException("Unknown image type");
+//	public static <T extends ImageBase> ImageBorder<T> extend( T image ) {
+//		ImageBorder<T> ret = general(image.getClass(),BorderIndex1D_Extend.class);
+//		ret.setImage(image);
+//		return ret;
+//	}
+//
+//	public static <T extends ImageBase> ImageBorder<T> reflect( T image ) {
+//		ImageBorder<T> ret = general(image.getClass(),BorderIndex1D_Reflect.class);
+//		ret.setImage(image);
+//		return ret;
+//	}
+//
+//	public static <T extends ImageBase> ImageBorder<T> wrap( T image ) {
+//		ImageBorder<T> ret = general(image.getClass(),BorderIndex1D_Wrap.class);
+//		ret.setImage(image);
+//		return ret;
+//	}
+//
+//	public static ImageBorder extend( Class<?> imageType ) {
+//		if( imageType == ImageFloat32.class )
+//			return new ImageBorder1D_F32(BorderIndex1D_Extend.class);
+//		if( imageType == ImageFloat64.class )
+//			return new ImageBorder1D_F64(BorderIndex1D_Extend.class);
+//		else if( ImageInteger.class.isAssignableFrom(imageType) )
+//			return new ImageBorder1D_I32(BorderIndex1D_Extend.class);
+//		else if( imageType == ImageSInt64.class )
+//			return new ImageBorder1D_I64(BorderIndex1D_Extend.class);
+//		else
+//			throw new IllegalArgumentException("Unknown image type");
+//	}
+
+	public static <T extends ImageBase> ImageBorder<T> general( T image , Class<?> borderType ) {
+		ImageBorder<T> ret = general(image.getClass(),borderType);
+		ret.setImage(image);
+		return ret;
 	}
 
-	public static ImageBorder extend( Class<?> imageType ) {
+	public static <T extends ImageBase> ImageBorder<T> general( Class<?> imageType , Class<?> borderType ) {
 		if( imageType == ImageFloat32.class )
-			return new ImageBorder1D_F32(BorderIndex1D_Extend.class);
+			return (ImageBorder<T>)new ImageBorder1D_F32(borderType);
 		if( imageType == ImageFloat64.class )
-			return new ImageBorder1D_F64(BorderIndex1D_Extend.class);
+			return (ImageBorder<T>)new ImageBorder1D_F64(borderType);
 		else if( ImageInteger.class.isAssignableFrom(imageType) )
-			return new ImageBorder1D_I32(BorderIndex1D_Extend.class);
-		else
-			throw new IllegalArgumentException("Unknown image type");
-	}
-
-	public static ImageBorder general( Class<?> imageType , Class<?> borderType ) {
-		if( imageType == ImageFloat32.class )
-			return new ImageBorder1D_F32(borderType);
-		if( imageType == ImageFloat64.class )
-			return new ImageBorder1D_F64(borderType);
-		else if( ImageInteger.class.isAssignableFrom(imageType) )
-			return new ImageBorder1D_I32(borderType);
+			return (ImageBorder<T>)new ImageBorder1D_I32(borderType);
+		else if( imageType == ImageSInt64.class )
+			return (ImageBorder<T>)new ImageBorder1D_I64(borderType);
 		else
 			throw new IllegalArgumentException("Unknown image type");
 	}

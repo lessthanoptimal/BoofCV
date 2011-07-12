@@ -165,6 +165,8 @@ public class GecvTesting {
 			return (T)new ImageUInt16(width, height);
 		} else if (type == ImageSInt32.class) {
 			return (T)new ImageSInt32(width, height);
+		} else if (type == ImageSInt64.class) {
+			return (T)new ImageSInt64(width, height);
 		} else if (type == ImageFloat32.class) {
 			return (T)new ImageFloat32(width, height);
 		} else if (type == ImageFloat64.class) {

@@ -1,6 +1,3 @@
-- write generic denoise unit test
-- unit tests
-- TAWS denoiser
 - add support for S32, F64 images
 
 - denoise evaluation application

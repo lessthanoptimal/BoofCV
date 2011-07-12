@@ -20,10 +20,7 @@ import gecv.core.image.border.ImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.core.image.border.ImageBorder_F64;
 import gecv.core.image.border.ImageBorder_I32;
-import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageFloat64;
-import gecv.struct.image.ImageInteger;
+import gecv.struct.image.*;
 
 /**
  * Factory for creating generalized images
@@ -35,6 +32,8 @@ public class FactorySingleBandImage {
 	public static SingleBandImage wrap( ImageBase image ) {
 		if( ImageInteger.class.isAssignableFrom(image.getClass()) )
 			return new SingleBandInt( (ImageInteger)image );
+		else if( image.getClass() == ImageSInt64.class )
+			return new SingleBandInt64( (ImageSInt64)image );
 		else if( image.getClass() == ImageFloat32.class )
 			return new SingleBandFloat32( (ImageFloat32)image );
 		else if( image.getClass() == ImageFloat64.class )
@@ -123,6 +122,23 @@ public class FactorySingleBandImage {
 	public static class SingleBandInt extends SingleBaseInt<ImageInteger>
 	{
 		public SingleBandInt(ImageInteger image) {
+			super(image);
+		}
+
+		@Override
+		public Number get(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public void set(int x, int y, Number num) {
+			image.set(x,y,num.intValue());
+		}
+	}
+
+	public static class SingleBandInt64 extends SingleBaseInt<ImageSInt64>
+	{
+		public SingleBandInt64(ImageSInt64 image) {
 			super(image);
 		}
 

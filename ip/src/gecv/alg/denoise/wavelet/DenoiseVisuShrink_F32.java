@@ -18,7 +18,7 @@ package gecv.alg.denoise.wavelet;
 
 import gecv.alg.denoise.DenoiseWavelet;
 import gecv.alg.denoise.ShrinkThresholdRule;
-import gecv.alg.wavelet.UtilWavelet;
+import gecv.alg.transform.wavelet.UtilWavelet;
 import gecv.struct.image.ImageFloat32;
 
 
@@ -58,8 +58,8 @@ public class DenoiseVisuShrink_F32 implements DenoiseWavelet<ImageFloat32> {
 		final int innerHeight = h/scale;
 
 		ImageFloat32 subbandHH = transform.subimage(w/2,h/2,w,h);
-		float sigma = UtilWaveletShrink.estimateNoiseStdDev(subbandHH,null);
-		float threshold = (float)UtilWaveletShrink.universalThreshold(subbandHH,sigma);
+		float sigma = UtilDenoiseWavelet.estimateNoiseStdDev(subbandHH,null);
+		float threshold = (float) UtilDenoiseWavelet.universalThreshold(subbandHH,sigma);
 
 		// apply same threshold to all wavelet coefficients
 		rule.process(transform.subimage(innerWidth,0,w,h),threshold);

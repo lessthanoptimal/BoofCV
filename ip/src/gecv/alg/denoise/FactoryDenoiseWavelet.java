@@ -43,11 +43,23 @@ public class FactoryDenoiseWavelet {
 		return new DenoiseBayesShrink_F32();
 	}
 
+	public static DenoiseWavelet<ImageSInt32> bayes_I32() {
+		return null;
+	}
+
 	public static DenoiseWavelet<ImageFloat32> sure_F32() {
 		return new DenoiseSureShrink_F32();
 	}
 
+	public static DenoiseWavelet<ImageSInt32> sure_I32() {
+		return null;
+	}
+
 	public static DenoiseWavelet<ImageFloat32> visu_F32() {
 		return new DenoiseVisuShrink_F32();
+	}
+
+	public static DenoiseWavelet<ImageSInt32> visu_I32() {
+		return null;
 	}
 }

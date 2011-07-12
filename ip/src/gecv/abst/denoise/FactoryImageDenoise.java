@@ -20,7 +20,7 @@ import gecv.abst.wavelet.FactoryWaveletTransform;
 import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.denoise.DenoiseWavelet;
 import gecv.alg.denoise.FactoryDenoiseWavelet;
-import gecv.alg.wavelet.FactoryWaveletDaub;
+import gecv.alg.transform.wavelet.FactoryWaveletDaub;
 import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageTypeInfo;

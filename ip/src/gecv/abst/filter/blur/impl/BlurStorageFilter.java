@@ -42,7 +42,7 @@ public class BlurStorageFilter<T extends ImageBase> implements FilterImageInterf
 	public BlurStorageFilter( String functionName , Class<?> imageType , int radius) {
 		this.radius = radius;
 
-		m = GecvTesting.findMethod(BlurImageOps.class,functionName,imageType,imageType,imageType,int.class);
+		m = GecvTesting.findMethod(BlurImageOps.class,functionName,imageType,imageType,int.class,imageType);
 
 		if( m == null )
 			throw new IllegalArgumentException("Can't find matching function for image type "+imageType.getSimpleName());
@@ -65,7 +65,7 @@ public class BlurStorageFilter<T extends ImageBase> implements FilterImageInterf
 			} else {
 				storage.reshape(output.width,output.height);
 			}
-			m.invoke(null,input,output,storage,radius);
+			m.invoke(null,input,output,radius,storage);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {

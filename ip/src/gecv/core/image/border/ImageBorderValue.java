@@ -16,10 +16,7 @@
 
 package gecv.core.image.border;
 
-import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageFloat64;
-import gecv.struct.image.ImageInteger;
+import gecv.struct.image.*;
 
 /**
  * All points outside of the image will return the specified value
@@ -30,12 +27,19 @@ public class ImageBorderValue {
 
 	public static ImageBorder wrap( ImageBase image , double value ) {
 		if( image.getTypeInfo().isInteger() ) {
-			return wrap((ImageInteger)image,(int)value);
+			if( image.getTypeInfo().getNumBits() <= 32 )
+				return wrap((ImageInteger)image,(int)value);
+			else
+				return wrap((ImageSInt64)image,(long)value);
 		} else if( image.getTypeInfo().getDataType() == float.class ) {
 			return wrap((ImageFloat32)image,(float)value);
 		} else {
 			return wrap((ImageFloat64)image,value);
 		}
+	}
+
+	public static ImageBorder_I64 wrap( ImageSInt64 image , long value ) {
+		return new Value_I64(image,value);
 	}
 
 	public static ImageBorder_F64 wrap( ImageFloat64 image , double value ) {
@@ -48,6 +52,29 @@ public class ImageBorderValue {
 
 	public static ImageBorder_I32 wrap( ImageInteger image , int value ) {
 		return new Value_I(image,value);
+	}
+
+	public static class Value_I64 extends ImageBorder_I64 {
+		long value;
+
+		public Value_I64( ImageSInt64 image , long value ) {
+			super(image);
+			this.value = value;
+		}
+
+		public Value_I64(long value) {
+			this.value = value;
+		}
+
+		@Override
+		public long getOutside( int x , int y ) {
+			return value;
+		}
+
+		@Override
+		public void setOutside(int x, int y, long val) {
+			// do nothing since it is a constant value
+		}
 	}
 
 	public static class Value_F64 extends ImageBorder_F64 {

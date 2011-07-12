@@ -16,11 +16,68 @@
 
 package gecv.alg.denoise;
 
+import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.image.ImageBase;
+import gecv.testing.GecvTesting;
+
+import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * Test which check to see if images actually have the noise reduced.
+ * Creates a simple image, adds noise, and sees if the error is reduced.
  *
  * @author Peter Abeles
  */
-public class GenericDenoiseTests {
+@SuppressWarnings({"unchecked"})
+public abstract class GenericDenoiseTests<T extends ImageBase> {
+
+	Random rand = new Random(10);
+	int width = 20;
+	int height = 30;
+
+	Class imageType;
+	int noiseSigma;
+
+	T image;
+	T imageNoisy;
+	T imageDenoised;
+
+	protected GenericDenoiseTests(Class imageType, int noiseSigma) {
+		this.imageType = imageType;
+		this.noiseSigma = noiseSigma;
+	}
+
+	public abstract void denoiseImage( T imageNoisy , T imageDenoised );
+
+	public void performTest() {
+		declareImages();
+
+		GecvTesting.checkSubImage(this,"performTest",false,imageNoisy,imageDenoised);
+	}
+
+	public void performTest( T imageNoisy , T imageDenoised ) {
+		denoiseImage(imageNoisy,imageDenoised);
+
+		double noisyMSE = GeneralizedImageOps.computeMeanSquaredError(image,imageNoisy);
+		double denoisedMSE = GeneralizedImageOps.computeMeanSquaredError(image,imageDenoised);
+
+		assertTrue( denoisedMSE < noisyMSE );
+	}
+
+	private void declareImages() {
+		image = GecvTesting.createImage(imageType,width,height);
+		imageDenoised = GecvTesting.createImage(imageType,width,height);
+
+		// render a simple scene
+		GeneralizedImageOps.fill(image,20);
+		GeneralizedImageOps.fillRectangle(image,10,5,5,10,10);
+		GeneralizedImageOps.fillRectangle(image,10,15,15,20,20);
+
+		// create the noisy image
+		imageNoisy = (T)image.clone();
+		GeneralizedImageOps.addGaussian(imageNoisy,rand,noiseSigma);
+	}
 }

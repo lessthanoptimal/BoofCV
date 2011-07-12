@@ -2,7 +2,7 @@ SURF
 SFM
 ---------------------------------
 
- - face detection
+ - Face detection
  - Tracking
    * people
 #  * point features
@@ -17,22 +17,26 @@ SFM
    * Image Mosaic
  - Camera Calibration
    * From calibration grid
- - denoising
+ - Denoising
  - Detect Features
-#  * point
+#  * corners
    * line
    * blobs
+   * Template Matching
    * SURF
  - Color
    * images
    * color space conversion
-#- pyramid
-#- filters
+#- Filters
 #  * convolution
 #  * median
-#- image derivative
- - edge detection
+#- Image derivative
+ - Edge detection
 #- interpolation
  - Image Transforms
    * FFT
 #  * Wavelet
+#  * pyramid
+   * Integral Image
+ - Misc
+#  * Non-Max Suppression

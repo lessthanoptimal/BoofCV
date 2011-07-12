@@ -80,6 +80,7 @@ public class GeneratorImageTestingOps {
 			printFill();
 			printFillRectangle();
 			printRandomize();
+			printComputeMSE();
 		}
 	}
 
@@ -92,6 +93,7 @@ public class GeneratorImageTestingOps {
 			dataType = t.getDataType();
 			bitWise = t.getBitWise();
 			printAddUniform();
+			printAddGaussian();
 		}
 	}
 
@@ -156,8 +158,10 @@ public class GeneratorImageTestingOps {
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
 				"\t\t\tfor (int x = 0; x < w; x++) {\n");
-		if( imageType.isInteger() ) {
+		if( imageType.isInteger() && imageType.getNumBits() < 64) {
 			out.print("\t\t\t\tdata[index++] = "+typeCast+"(rand.nextInt(range)+min);\n");
+		} else if( imageType.isInteger() ) {
+			out.print("\t\t\t\tdata[index++] = rand.nextInt((int)range)+min;\n");
 		} else {
 			String randType = imageType.getRandType();
 			out.print("\t\t\t\tdata[index++] = rand.next"+randType+"()*range+min;\n");
@@ -174,9 +178,8 @@ public class GeneratorImageTestingOps {
 		int max = imageType.getMax().intValue();
 		String typeCast = imageType.getTypeCastFromSum();
 
-
 		out.print("\t/**\n" +
-				"\t * Adds noise to the image drawn from an uniform distribution that has a range of min <= X < max.\n" +
+				"\t * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.\n" +
 				"\t */\n" +
 				"\tpublic static void addUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
 				"\t\tfinal int h = img.getHeight();\n" +
@@ -189,13 +192,15 @@ public class GeneratorImageTestingOps {
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
 				"\t\t\tfor (int x = 0; x < w; x++) {\n");
-		if( imageType.isInteger() ) {
+		if( imageType.isInteger() && imageType.getNumBits() != 64) {
 			out.print("\t\t\t\t"+sumType+" value = (data[index] "+bitWise+") + rand.nextInt(range)+min;\n");
-			if( imageType.getPrimitiveType() != int.class ) {
+			if( imageType.getNumBits() < 32 ) {
 				out.print("\t\t\t\tif( value < "+min+" ) value = "+min+";\n" +
 						"\t\t\t\tif( value > "+max+" ) value = "+max+";\n" +
 						"\n");
 			}
+		} else if( imageType.isInteger() ) {
+			out.print("\t\t\t\t"+sumType+" value = data[index] + rand.nextInt((int)range)+min;\n");
 		} else {
 			String randType = imageType.getRandType();
 			out.print("\t\t\t\t"+sumType+" value = data[index] + rand.next"+randType+"()*range+min;\n");
@@ -203,6 +208,67 @@ public class GeneratorImageTestingOps {
 		out.print("\t\t\t\tdata[index++] = "+typeCast+" value;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printAddGaussian() {
+		String sumType = imageType.getSumType();
+		int min = imageType.getMin().intValue();
+		int max = imageType.getMax().intValue();
+		String typeCast = imageType.getTypeCastFromSum();
+		String sumCast = sumType.equals("double") ? "" : "("+sumType+")";
+
+		out.print("\t/**\n" +
+				"\t * Adds Gaussian/normal i.i.d noise to each pixel in the image.\n" +
+				"\t */\n" +
+				"\tpublic static void addGaussian("+imageName+" img, Random rand , double sigma ) {\n" +
+				"\t\tfinal int h = img.getHeight();\n" +
+				"\t\tfinal int w = img.getWidth();\n" +
+				"\n" +
+				"\t\t"+dataType+"[] data = img.data;\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
+				"\t\t\tfor (int x = 0; x < w; x++) {\n");
+		out.print("\t\t\t\t"+sumType+" value = (data[index] "+bitWise+") + "+sumCast+"(rand.nextGaussian()*sigma);\n");
+		if( imageType.isInteger() && imageType.getNumBits() < 32 ) {
+			if( imageType.getPrimitiveType() != int.class ) {
+				out.print("\t\t\t\tif( value < "+min+" ) value = "+min+";\n" +
+						"\t\t\t\tif( value > "+max+" ) value = "+max+";\n" +
+						"\n");
+			}
+		}
+		out.print("\t\t\t\tdata[index++] = "+typeCast+" value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printComputeMSE() {
+
+		String sumType = imageType.getSumType();
+
+		out.print("\t/**\n" +
+				"\t * <p>Computes the mean squared error (MSE) between the two images.</p>\n" +
+				"\t *\n" +
+				"\t * @param imgA first image. Not modified.\n" +
+				"\t * @param imgB second image. Not modified.\n" +
+				"\t * @return error between the two images.\n" +
+				"\t */\n" +
+				"\tpublic static double computeMeanSquaredError("+imageName+" imgA, "+imageName+" imgB ) {\n" +
+				"\t\tfinal int h = imgA.getHeight();\n" +
+				"\t\tfinal int w = imgA.getWidth();\n" +
+				"\n" +
+				"\t\tdouble total = 0;\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tfor (int x = 0; x < w; x++) {\n" +
+				"\t\t\t\tdouble difference =  imgA.get(x,y)-imgB.get(x,y);\n" +
+				"\t\t\t\ttotal += difference*difference;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\treturn total / (w*h);\n" +
 				"\t}\n\n");
 	}
 

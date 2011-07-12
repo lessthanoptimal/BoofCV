@@ -84,6 +84,29 @@ public class ImageTestingOps {
 		}
 	}
 
+	/**
+	 * <p>Computes the mean squared error (MSE) between the two images.</p>
+	 *
+	 * @param imgA first image. Not modified.
+	 * @param imgB second image. Not modified.
+	 * @return error between the two images.
+	 */
+	public static double computeMeanSquaredError(ImageInt8 imgA, ImageInt8 imgB ) {
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		double total = 0;
+
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				double difference =  imgA.get(x,y)-imgB.get(x,y);
+				total += difference*difference;
+			}
+		}
+
+		return total / (w*h);
+	}
+
 /**
 	 * Fills the whole image with the specified pixel value
 	 *
@@ -136,6 +159,29 @@ public class ImageTestingOps {
 				data[index++] = (short)(rand.nextInt(range)+min);
 			}
 		}
+	}
+
+	/**
+	 * <p>Computes the mean squared error (MSE) between the two images.</p>
+	 *
+	 * @param imgA first image. Not modified.
+	 * @param imgB second image. Not modified.
+	 * @return error between the two images.
+	 */
+	public static double computeMeanSquaredError(ImageInt16 imgA, ImageInt16 imgB ) {
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		double total = 0;
+
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				double difference =  imgA.get(x,y)-imgB.get(x,y);
+				total += difference*difference;
+			}
+		}
+
+		return total / (w*h);
 	}
 
 /**
@@ -192,6 +238,106 @@ public class ImageTestingOps {
 		}
 	}
 
+	/**
+	 * <p>Computes the mean squared error (MSE) between the two images.</p>
+	 *
+	 * @param imgA first image. Not modified.
+	 * @param imgB second image. Not modified.
+	 * @return error between the two images.
+	 */
+	public static double computeMeanSquaredError(ImageSInt32 imgA, ImageSInt32 imgB ) {
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		double total = 0;
+
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				double difference =  imgA.get(x,y)-imgB.get(x,y);
+				total += difference*difference;
+			}
+		}
+
+		return total / (w*h);
+	}
+
+/**
+	 * Fills the whole image with the specified pixel value
+	 *
+	 * @param img   An image.
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fill(ImageSInt64 img, long value) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		long[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				data[index++] = value;
+			}
+		}
+	}
+
+	/**
+	 * Sets a rectangle inside the image with the specified value.
+	 */
+	public static void fillRectangle(ImageSInt64 img, long value, int x0, int y0, int width, int height) {
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+
+		for (int y = y0; y < y1; y++) {
+			for (int x = x0; x < x1; x++) {
+				if( img.isInBounds(x,y ))
+					img.set(x, y, value);
+			}
+		}
+	}
+
+	/**
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
+	 */
+	public static void randomize(ImageSInt64 img, Random rand , long min , long max) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		long range = max-min;
+
+		long[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				data[index++] = rand.nextInt((int)range)+min;
+			}
+		}
+	}
+
+	/**
+	 * <p>Computes the mean squared error (MSE) between the two images.</p>
+	 *
+	 * @param imgA first image. Not modified.
+	 * @param imgB second image. Not modified.
+	 * @return error between the two images.
+	 */
+	public static double computeMeanSquaredError(ImageSInt64 imgA, ImageSInt64 imgB ) {
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		double total = 0;
+
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				double difference =  imgA.get(x,y)-imgB.get(x,y);
+				total += difference*difference;
+			}
+		}
+
+		return total / (w*h);
+	}
+
 /**
 	 * Fills the whole image with the specified pixel value
 	 *
@@ -244,6 +390,29 @@ public class ImageTestingOps {
 				data[index++] = rand.nextFloat()*range+min;
 			}
 		}
+	}
+
+	/**
+	 * <p>Computes the mean squared error (MSE) between the two images.</p>
+	 *
+	 * @param imgA first image. Not modified.
+	 * @param imgB second image. Not modified.
+	 * @return error between the two images.
+	 */
+	public static double computeMeanSquaredError(ImageFloat32 imgA, ImageFloat32 imgB ) {
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		double total = 0;
+
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				double difference =  imgA.get(x,y)-imgB.get(x,y);
+				total += difference*difference;
+			}
+		}
+
+		return total / (w*h);
 	}
 
 /**
@@ -301,7 +470,30 @@ public class ImageTestingOps {
 	}
 
 	/**
-	 * Adds noise to the image drawn from an uniform distribution that has a range of min <= X < max.
+	 * <p>Computes the mean squared error (MSE) between the two images.</p>
+	 *
+	 * @param imgA first image. Not modified.
+	 * @param imgB second image. Not modified.
+	 * @return error between the two images.
+	 */
+	public static double computeMeanSquaredError(ImageFloat64 imgA, ImageFloat64 imgB ) {
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		double total = 0;
+
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				double difference =  imgA.get(x,y)-imgB.get(x,y);
+				total += difference*difference;
+			}
+		}
+
+		return total / (w*h);
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageUInt8 img, Random rand , int min , int max) {
 		final int h = img.getHeight();
@@ -324,7 +516,28 @@ public class ImageTestingOps {
 	}
 
 	/**
-	 * Adds noise to the image drawn from an uniform distribution that has a range of min <= X < max.
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.
+	 */
+	public static void addGaussian(ImageUInt8 img, Random rand , double sigma ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		byte[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				int value = (data[index] & 0xFF) + (int)(rand.nextGaussian()*sigma);
+				if( value < 0 ) value = 0;
+				if( value > 255 ) value = 255;
+
+				data[index++] = (byte) value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageSInt8 img, Random rand , int min , int max) {
 		final int h = img.getHeight();
@@ -347,7 +560,28 @@ public class ImageTestingOps {
 	}
 
 	/**
-	 * Adds noise to the image drawn from an uniform distribution that has a range of min <= X < max.
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.
+	 */
+	public static void addGaussian(ImageSInt8 img, Random rand , double sigma ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		byte[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				int value = (data[index] ) + (int)(rand.nextGaussian()*sigma);
+				if( value < -128 ) value = -128;
+				if( value > 127 ) value = 127;
+
+				data[index++] = (byte) value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageUInt16 img, Random rand , int min , int max) {
 		final int h = img.getHeight();
@@ -370,7 +604,28 @@ public class ImageTestingOps {
 	}
 
 	/**
-	 * Adds noise to the image drawn from an uniform distribution that has a range of min <= X < max.
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.
+	 */
+	public static void addGaussian(ImageUInt16 img, Random rand , double sigma ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		short[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				int value = (data[index] & 0xFFFF) + (int)(rand.nextGaussian()*sigma);
+				if( value < 0 ) value = 0;
+				if( value > 65535 ) value = 65535;
+
+				data[index++] = (short) value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageSInt16 img, Random rand , int min , int max) {
 		final int h = img.getHeight();
@@ -393,7 +648,28 @@ public class ImageTestingOps {
 	}
 
 	/**
-	 * Adds noise to the image drawn from an uniform distribution that has a range of min <= X < max.
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.
+	 */
+	public static void addGaussian(ImageSInt16 img, Random rand , double sigma ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		short[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				int value = (data[index] ) + (int)(rand.nextGaussian()*sigma);
+				if( value < -32768 ) value = -32768;
+				if( value > 32767 ) value = 32767;
+
+				data[index++] = (short) value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageSInt32 img, Random rand , int min , int max) {
 		final int h = img.getHeight();
@@ -413,7 +689,63 @@ public class ImageTestingOps {
 	}
 
 	/**
-	 * Adds noise to the image drawn from an uniform distribution that has a range of min <= X < max.
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.
+	 */
+	public static void addGaussian(ImageSInt32 img, Random rand , double sigma ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		int[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				int value = (data[index] ) + (int)(rand.nextGaussian()*sigma);
+				data[index++] =  value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 */
+	public static void addUniform(ImageSInt64 img, Random rand , long min , long max) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		long range = max-min;
+
+		long[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				long value = data[index] + rand.nextInt((int)range)+min;
+				data[index++] =  value;
+			}
+		}
+	}
+
+	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.
+	 */
+	public static void addGaussian(ImageSInt64 img, Random rand , double sigma ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		long[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				long value = (data[index] ) + (long)(rand.nextGaussian()*sigma);
+				data[index++] =  value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageFloat32 img, Random rand , float min , float max) {
 		final int h = img.getHeight();
@@ -433,7 +765,25 @@ public class ImageTestingOps {
 	}
 
 	/**
-	 * Adds noise to the image drawn from an uniform distribution that has a range of min <= X < max.
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.
+	 */
+	public static void addGaussian(ImageFloat32 img, Random rand , double sigma ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		float[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				float value = (data[index] ) + (float)(rand.nextGaussian()*sigma);
+				data[index++] =  value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageFloat64 img, Random rand , double min , double max) {
 		final int h = img.getHeight();
@@ -447,6 +797,24 @@ public class ImageTestingOps {
 			int index = img.getStartIndex() + y * img.getStride();
 			for (int x = 0; x < w; x++) {
 				double value = data[index] + rand.nextDouble()*range+min;
+				data[index++] =  value;
+			}
+		}
+	}
+
+	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.
+	 */
+	public static void addGaussian(ImageFloat64 img, Random rand , double sigma ) {
+		final int h = img.getHeight();
+		final int w = img.getWidth();
+
+		double[] data = img.data;
+
+		for (int y = 0; y < h; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			for (int x = 0; x < w; x++) {
+				double value = (data[index] ) + (rand.nextGaussian()*sigma);
 				data[index++] =  value;
 			}
 		}
