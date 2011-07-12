@@ -18,10 +18,10 @@ package gecv.abst.wavelet.impl;
 
 import gecv.alg.wavelet.FactoryWaveletDaub;
 import gecv.alg.wavelet.UtilWavelet;
-import gecv.alg.wavelet.WaveletBorderType;
 import gecv.alg.wavelet.WaveletTransformOps;
 import gecv.core.image.ConvertImage;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
@@ -54,7 +54,7 @@ public class TestWaveletTransformInt {
 		ImageSInt32 found = new ImageSInt32(dimen.width,dimen.height);
 		ImageSInt32 expected = new ImageSInt32(dimen.width,dimen.height);
 
-		WaveletDescription<WlCoef_I32> desc = FactoryWaveletDaub.biorthogonal_I32(5, WaveletBorderType.REFLECT);
+ 		WaveletDescription<WlCoef_I32> desc = FactoryWaveletDaub.biorthogonal_I32(5, BorderType.REFLECT);
 
 		ImageSInt32 storage = new ImageSInt32(dimen.width,dimen.height);
 		WaveletTransformOps.transformN(desc,orig.clone(),expected,storage,N);
@@ -90,7 +90,7 @@ public class TestWaveletTransformInt {
 		ImageSInt32 found = new ImageSInt32(dimen.width,dimen.height);
 		ImageSInt32 expected = new ImageSInt32(dimen.width,dimen.height);
 
-		WaveletDescription<WlCoef_I32> desc = FactoryWaveletDaub.biorthogonal_I32(5, WaveletBorderType.REFLECT);
+		WaveletDescription<WlCoef_I32> desc = FactoryWaveletDaub.biorthogonal_I32(5, BorderType.REFLECT);
 
 		ImageSInt32 storage = new ImageSInt32(dimen.width,dimen.height);
 		WaveletTransformOps.transformN(desc,orig.clone(),expected,storage,N);

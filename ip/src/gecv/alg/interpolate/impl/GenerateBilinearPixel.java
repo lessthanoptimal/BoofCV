@@ -16,9 +16,9 @@
 
 package gecv.alg.interpolate.impl;
 
+import gecv.misc.AutoTypeImage;
 import gecv.misc.CodeGeneratorBase;
 import gecv.misc.CodeGeneratorUtil;
-import gecv.misc.TypeImage;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,16 +32,16 @@ public class GenerateBilinearPixel extends CodeGeneratorBase {
 	String className;
 
 	PrintStream out;
-	TypeImage image;
+	AutoTypeImage image;
 
 	@Override
 	public void generate() throws FileNotFoundException {
-		createType(TypeImage.F32);
-		createType(TypeImage.U8);
-		createType(TypeImage.S16);
+		createType(AutoTypeImage.F32);
+		createType(AutoTypeImage.U8);
+		createType(AutoTypeImage.S16);
 	}
 
-	private void createType( TypeImage type ) throws FileNotFoundException {
+	private void createType( AutoTypeImage type ) throws FileNotFoundException {
 		className = "BilinearPixel_"+type.name();
 		image = type;
 

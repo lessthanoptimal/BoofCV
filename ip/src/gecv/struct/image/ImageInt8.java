@@ -66,8 +66,8 @@ public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
 	}
 
 	@Override
-	public Class<?> _getPrimitiveType() {
-		return byte.class;
+	public ImageTypeInfo<T> getTypeInfo() {
+		return (ImageTypeInfo<T>)ImageTypeInfo.I8;
 	}
 
 	public void print() {

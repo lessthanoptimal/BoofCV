@@ -42,13 +42,8 @@ public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8>
 	}
 
 	@Override
-	public boolean isInteger() {
-		return true;
-	}
-
-	@Override
-	public boolean isSigned() {
-		return true;
+	public ImageTypeInfo<ImageInterleavedInt8> getTypeInfo() {
+		return ImageTypeInfo.INTER_U8;
 	}
 
 	/**
@@ -151,10 +146,5 @@ public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8>
 		if (imgWidth == -1 || imgHeight == -1)
 			return new ImageInterleavedInt8();
 		return new ImageInterleavedInt8(imgWidth, imgHeight, numBands);
-	}
-
-	@Override
-	public Class<?> _getPrimitiveType() {
-		return byte.class;
 	}
 }

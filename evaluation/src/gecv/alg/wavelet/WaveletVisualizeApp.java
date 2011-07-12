@@ -21,6 +21,7 @@ import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.core.image.border.BorderType;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
@@ -53,9 +54,9 @@ public class WaveletVisualizeApp {
 
 //
 //	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(4);
-//	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5,WaveletBorderType.WRAP);
+//	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5,BorderType.WRAP);
 
-	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5,WaveletBorderType.REFLECT);
+	WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5, BorderType.REFLECT);
 	WaveletTransform<ImageFloat32,ImageFloat32,WlCoef_F32> tran = FactoryWaveletTransform.create_F32(desc,numLevels);
 
 	public void process() {

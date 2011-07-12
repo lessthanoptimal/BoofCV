@@ -18,9 +18,9 @@ package gecv.abst.wavelet.impl;
 
 import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.wavelet.UtilWavelet;
-import gecv.alg.wavelet.WaveletBorderType;
 import gecv.alg.wavelet.WaveletTransformOps;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageInteger;
 import gecv.struct.image.ImageSInt32;
@@ -67,7 +67,7 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 		temp.reshape(transformed.width,transformed.height);
 
 		copyInput.reshape(original.width,original.height);
-		if( original._getPrimitiveType() == int.class ) {
+		if( original.getTypeInfo().getDataType() == int.class ) {
 			copyInput.setTo((ImageSInt32)original);
 		} else {
 			GeneralizedImageOps.convert(original, copyInput);
@@ -83,7 +83,7 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 		temp.reshape(transformed.width,transformed.height);
 		copyInput.setTo(transformed);
 
-		if( original._getPrimitiveType() == int.class ) {
+		if( original.getTypeInfo().getDataType() == int.class ) {
 			WaveletTransformOps.inverseN(desc, copyInput,(ImageSInt32)original,temp,numLevels);
 		} else {
 			copyOutput.reshape(original.width,original.height);
@@ -98,7 +98,7 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 	}
 
 	@Override
-	public WaveletBorderType getBorderType() {
+	public BorderType getBorderType() {
 		return UtilWavelet.convertToType(desc.getBorder());
 	}
 

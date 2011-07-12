@@ -16,8 +16,8 @@
 
 package gecv.alg.filter.convolve.noborder;
 
+import gecv.misc.AutoTypeImage;
 import gecv.misc.CodeGeneratorUtil;
-import gecv.misc.TypeImage;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,8 +31,8 @@ public class GenerateImplConvolveBox {
 	String className = "ImplConvolveBox";
 	PrintStream out;
 
-	TypeImage imageIn;
-	TypeImage imageOut;
+	AutoTypeImage imageIn;
+	AutoTypeImage imageOut;
 
 	public GenerateImplConvolveBox() throws FileNotFoundException {
 		out = new PrintStream(new FileOutputStream(className + ".java"));
@@ -40,14 +40,14 @@ public class GenerateImplConvolveBox {
 
 	public void createAll() throws FileNotFoundException {
 		printPreamble();
-		addFunctions(TypeImage.U8,TypeImage.I16);
-		addFunctions(TypeImage.U8,TypeImage.S32);
-		addFunctions(TypeImage.S16,TypeImage.I16);
-		addFunctions(TypeImage.F32,TypeImage.F32);
+		addFunctions(AutoTypeImage.U8, AutoTypeImage.I16);
+		addFunctions(AutoTypeImage.U8, AutoTypeImage.S32);
+		addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
+		addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
 		out.println("}");
 	}
 
-	public void addFunctions( TypeImage imageIn , TypeImage imageOut ) throws FileNotFoundException {
+	public void addFunctions( AutoTypeImage imageIn , AutoTypeImage imageOut ) throws FileNotFoundException {
 
 		this.imageIn = imageIn;
 		this.imageOut = imageOut;

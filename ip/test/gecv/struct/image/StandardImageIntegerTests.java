@@ -37,6 +37,6 @@ public abstract class StandardImageIntegerTests extends StandardImageTests {
 	public void checkSign() {
 		ImageInteger<?> img = (ImageInteger<?>)createImage(10,10);
 
-		assertEquals(expectedSign,img.isSigned());
+		assertEquals(expectedSign,img.getTypeInfo().isSigned());
 	}
 }

@@ -16,11 +16,11 @@
 
 package gecv.alg.denoise;
 
-import gecv.alg.denoise.wavelet.DenoiseBayesShrink;
-import gecv.alg.denoise.wavelet.DenoiseSureShrink;
-import gecv.alg.denoise.wavelet.DenoiseTaws;
-import gecv.alg.denoise.wavelet.DenoiseVisuShrink;
-import gecv.struct.image.ImageBase;
+import gecv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
+import gecv.alg.denoise.wavelet.DenoiseSureShrink_F32;
+import gecv.alg.denoise.wavelet.DenoiseVisuShrink_F32;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt32;
 
 
 /**
@@ -31,23 +31,23 @@ import gecv.struct.image.ImageBase;
 @SuppressWarnings({"unchecked"})
 public class FactoryDenoiseWavelet {
 
-	public <T extends ImageBase<T>> DenoiseWavelet<T> bayes( Class<?> imageType , ShrinkThresholdRule<T> rule ) {
-		return (DenoiseWavelet)new DenoiseBayesShrink((ShrinkThresholdRule)rule);
+	public static DenoiseWavelet<ImageFloat32> bayes_F32( ShrinkThresholdRule<ImageFloat32> rule ) {
+		return new DenoiseBayesShrink_F32(rule);
 	}
 
-	public <T extends ImageBase<T>> DenoiseWavelet<T> bayes( Class<?> imageType ) {
-		return (DenoiseWavelet)new DenoiseBayesShrink();
+	public static DenoiseWavelet<ImageSInt32> bayes_I32( ShrinkThresholdRule<ImageSInt32> rule ) {
+		return null;
 	}
 
-	public <T extends ImageBase<T>> DenoiseWavelet<T> sure( Class<?> imageType ) {
-		return (DenoiseWavelet)new DenoiseSureShrink();
+	public static DenoiseWavelet<ImageFloat32> bayes_F32() {
+		return new DenoiseBayesShrink_F32();
 	}
 
-	public <T extends ImageBase<T>> DenoiseWavelet<T> visu( Class<?> imageType ) {
-		return (DenoiseWavelet)new DenoiseVisuShrink();
+	public static DenoiseWavelet<ImageFloat32> sure_F32() {
+		return new DenoiseSureShrink_F32();
 	}
 
-	public <T extends ImageBase<T>> DenoiseWavelet<T> taws( Class<?> imageType ) {
-		return (DenoiseWavelet)new DenoiseTaws();
+	public static DenoiseWavelet<ImageFloat32> visu_F32() {
+		return new DenoiseVisuShrink_F32();
 	}
 }

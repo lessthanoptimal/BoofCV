@@ -16,7 +16,7 @@
 
 package gecv.abst.wavelet;
 
-import gecv.alg.wavelet.WaveletBorderType;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageBase;
 import gecv.struct.wavelet.WaveletDescription;
 import gecv.struct.wavelet.WlCoef;
@@ -66,7 +66,7 @@ public interface WaveletTransform <O extends ImageBase, T extends ImageBase,
 	 *
 	 * @return Type of border used.
 	 */
-	public WaveletBorderType getBorderType();
+	public BorderType getBorderType();
 
 	/**
 	 * Description of the wavelet.

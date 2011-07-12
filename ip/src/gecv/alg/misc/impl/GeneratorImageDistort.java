@@ -16,9 +16,9 @@
 
 package gecv.alg.misc.impl;
 
+import gecv.misc.AutoTypeImage;
 import gecv.misc.CodeGeneratorBase;
 import gecv.misc.CodeGeneratorUtil;
-import gecv.misc.TypeImage;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,16 +32,16 @@ public class GeneratorImageDistort extends CodeGeneratorBase {
 	String className;
 
 	PrintStream out;
-	TypeImage image;
+	AutoTypeImage image;
 
 	@Override
 	public void generate() throws FileNotFoundException {
-		createType(TypeImage.F32);
-		createType(TypeImage.I8);
-		createType(TypeImage.I16);
+		createType(AutoTypeImage.F32);
+		createType(AutoTypeImage.I8);
+		createType(AutoTypeImage.I16);
 	}
 
-	private void createType( TypeImage type ) throws FileNotFoundException {
+	private void createType( AutoTypeImage type ) throws FileNotFoundException {
 		className = "ImageDistort_"+type.name();
 		image = type;
 

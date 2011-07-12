@@ -44,11 +44,6 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageBase<T>{
 	protected ImageInteger() {
 	}
 
-	@Override
-	public boolean isInteger() {
-		return true;
-	}
-
 	/**
 	 * Returns the value of the specified pixel.
 	 *
@@ -80,6 +75,11 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageBase<T>{
 	 * @return an intensity value.
 	 */
 	protected abstract int unsafe_get( int x , int y );
+
+	@Override
+	public ImageTypeInfo<T> getTypeInfo() {
+		return (ImageTypeInfo<T>)ImageTypeInfo.I;
+	}
 
 	public void printBinary() {
 		for (int y = 0; y < height; y++) {

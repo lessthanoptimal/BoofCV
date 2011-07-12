@@ -18,8 +18,8 @@ package gecv.abst.wavelet.impl;
 
 import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.wavelet.UtilWavelet;
-import gecv.alg.wavelet.WaveletBorderType;
 import gecv.alg.wavelet.WaveletTransformOps;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.wavelet.WaveletDescription;
@@ -74,7 +74,7 @@ public class WaveletTransformFloat32 implements WaveletTransform<ImageFloat32,Im
 	}
 
 	@Override
-	public WaveletBorderType getBorderType() {
+	public BorderType getBorderType() {
 		return UtilWavelet.convertToType(desc.getBorder());
 	}
 

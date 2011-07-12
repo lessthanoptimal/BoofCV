@@ -69,10 +69,10 @@ public abstract class StandardImageTests {
 		// set the expected to the point in the image
 		call(img, "set", 1, expected, 1, 1);
 		Number found = (Number) call(img, "get", 0, null, 1, 1);
-		if (!img.isInteger())
+		if (!img.getTypeInfo().isInteger())
 			assertEquals(expected.doubleValue(), found.doubleValue(), 1e-4);
 		else {
-			if( ((ImageInteger)img).isSigned() )
+			if( img.getTypeInfo().isSigned() )
 				assertTrue(expected.intValue() == found.intValue());
 			else
 				assertTrue((expected.intValue() & 0xFFFF) == found.intValue());
@@ -124,17 +124,17 @@ public abstract class StandardImageTests {
 				args[index] = where[index];
 			}
 			if (type == 1) {
-				if (!img.isInteger()) {
+				if (!img.getTypeInfo().isInteger()) {
 					paramTypes[index] = float.class;
 					args[index] = typeData;
 				} else {
 					paramTypes[index] = int.class;
 					args[index] = typeData;
 				}
-//				paramTypes[index] = img._getPrimitiveType();
+//				paramTypes[index] = img.getTypeInfo().getDataType();
 //				args[index] = typeData;
 			} else if (type == 2) {
-				String name = "[" + img._getPrimitiveType().getName().toUpperCase().charAt(0);
+				String name = "[" + img.getTypeInfo().getDataType().getName().toUpperCase().charAt(0);
 				paramTypes[index] = Class.forName(name);
 				args[index] = typeData;
 			}

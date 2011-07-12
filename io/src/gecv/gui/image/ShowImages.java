@@ -68,7 +68,7 @@ public class ShowImages {
 	public static ImagePanel showWindow( ImageSInt16 img , String title ) {
 		int max = PixelMath.maxAbs(img);
 		BufferedImage buff;
-		if( img.isSigned() )
+		if( img.getTypeInfo().isSigned() )
 			buff = VisualizeImageData.colorizeSign(img,null,max);
 		else
 			buff = VisualizeImageData.grayUnsigned(img,null,max);

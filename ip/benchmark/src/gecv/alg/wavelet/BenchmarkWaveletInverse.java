@@ -20,6 +20,7 @@ import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.wavelet.impl.ImplWaveletTransformNaive;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.wavelet.WaveletDescription;
@@ -37,8 +38,8 @@ public class BenchmarkWaveletInverse {
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
-	static WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.biorthogonal_F32(5,WaveletBorderType.REFLECT);
-	static WaveletDescription<WlCoef_I32> desc_I32 = FactoryWaveletDaub.biorthogonal_I32(5,WaveletBorderType.REFLECT);
+	static WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.biorthogonal_F32(5,BorderType.REFLECT);
+	static WaveletDescription<WlCoef_I32> desc_I32 = FactoryWaveletDaub.biorthogonal_I32(5, BorderType.REFLECT);
 
 	static ImageFloat32 tran_F32 = new ImageFloat32(imgWidth,imgHeight);
 	static ImageFloat32 temp1_F32 = new ImageFloat32(imgWidth,imgHeight);

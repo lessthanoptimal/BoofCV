@@ -19,6 +19,7 @@ package gecv.alg.wavelet;
 import gecv.core.image.border.BorderIndex1D;
 import gecv.core.image.border.BorderIndex1D_Reflect;
 import gecv.core.image.border.BorderIndex1D_Wrap;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.wavelet.WlBorderCoef;
@@ -309,12 +310,12 @@ public class UtilWavelet {
 			return (top - div2)/divisor;
 	}
 
-	public static WaveletBorderType convertToType( BorderIndex1D b ) {
+	public static BorderType convertToType( BorderIndex1D b ) {
 
 		if( b instanceof BorderIndex1D_Reflect) {
-			return WaveletBorderType.REFLECT;
+			return BorderType.REFLECT;
 		} else if( b instanceof BorderIndex1D_Wrap) {
-			return WaveletBorderType.WRAP;
+			return BorderType.WRAP;
 		} else {
 			throw new RuntimeException("Unknown border type: "+b.getClass().getSimpleName());
 		}

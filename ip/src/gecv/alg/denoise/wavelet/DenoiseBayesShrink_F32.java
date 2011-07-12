@@ -40,15 +40,15 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class DenoiseBayesShrink extends SubbandShrink<ImageFloat32> {
+public class DenoiseBayesShrink_F32 extends SubbandShrink<ImageFloat32> {
 
 	float noiseVariance;
 
-	public DenoiseBayesShrink() {
-		super(new ShrinkThresholdSoft());
+	public DenoiseBayesShrink_F32() {
+		super(new ShrinkThresholdSoft_F32());
 	}
 
-	public DenoiseBayesShrink( ShrinkThresholdRule<ImageFloat32> rule ) {
+	public DenoiseBayesShrink_F32( ShrinkThresholdRule<ImageFloat32> rule ) {
 		super(rule);
 	}
 
@@ -69,8 +69,7 @@ public class DenoiseBayesShrink extends SubbandShrink<ImageFloat32> {
 			}
 		}
 		// undo normalization.
-		// these coefficients are modeled as being zero mean, so the variance can be computed this
-		// way
+		// these coefficients are modeled as being zero mean, so the variance can be computed this way
 		varianceY = (varianceY/(subband.width*subband.height))*max*max;
 
 		// signal standard deviation

@@ -18,24 +18,24 @@ package gecv.alg.denoise.wavelet;
 
 import gecv.alg.denoise.ShrinkThresholdRule;
 import gecv.alg.misc.ImageTestingOps;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt32;
 
 
 /**
  * <p>
- * Soft rule for shrinking an image: T(x) = sgn(x)*max(|x|-T,0)
+ * Hard rule for shrinking an image: T(x) = x*1(|x|>T)
  * </p>
  *
  * @author Peter Abeles
  */
-public class ShrinkThresholdSoft implements ShrinkThresholdRule<ImageFloat32> {
+public class ShrinkThresholdHard_S32 implements ShrinkThresholdRule<ImageSInt32> {
 
 	@Override
-	public void process(ImageFloat32 image, Number threshold) {
-		float f = threshold.floatValue();
+	public void process(ImageSInt32 image, Number threshold) {
+		int f = threshold.intValue();
 
 		// see if all the coefficients should be set to zero
-		if( Float.isInfinite(f)) {
+		if( f == Integer.MAX_VALUE ) {
 			ImageTestingOps.fill(image,0);
 			return;
 		}
@@ -45,13 +45,9 @@ public class ShrinkThresholdSoft implements ShrinkThresholdRule<ImageFloat32> {
 		    int end = index + image.width;
 
 			for( ; index < end; index++ ) {
-				float v = image.data[index];
+				int v = image.data[index];
 				if( Math.abs(v) < f ) {
 					image.data[index] = 0;
-				} else if( v >= f ) {
-					image.data[index] -= f;
-				} else {
-					image.data[index] += f;
 				}
 			}
 		}

@@ -35,9 +35,9 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class DenoiseVisuShrink implements DenoiseWavelet<ImageFloat32> {
+public class DenoiseVisuShrink_F32 implements DenoiseWavelet<ImageFloat32> {
 
-	ShrinkThresholdRule<ImageFloat32> rule = new ShrinkThresholdSoft();
+	ShrinkThresholdRule<ImageFloat32> rule = new ShrinkThresholdSoft_F32();
 
 	/**
 	 * Applies VisuShrink denoising to the provided multilevel wavelet transform using

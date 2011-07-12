@@ -24,10 +24,7 @@ import gecv.alg.filter.convolve.KernelFactory;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageSInt32;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.*;
 
 /**
  * Benchmark for different convolution operations.
@@ -62,7 +59,7 @@ public class BenchmarkConvolveAbstracted {
 		@Override
 		public void process() {
 			FilterImageInterface<ImageUInt8,ImageSInt16> filter =
-			FactoryConvolve.convolve(kernelI32,ImageUInt8.class,ImageSInt16.class, BorderType.SKIP,false);
+			FactoryConvolve.convolve(kernelI32, ImageTypeInfo.U8,ImageTypeInfo.S16, BorderType.SKIP,false);
 			filter.process(imgInt8,out_I16);
 		}
 	}
@@ -70,7 +67,7 @@ public class BenchmarkConvolveAbstracted {
 	public static class Pre_Vertical_I8_I16 extends PerformerBase
 	{
 		FilterImageInterface<ImageUInt8,ImageSInt16> filter =
-					FactoryConvolve.convolve(kernelI32,ImageUInt8.class,ImageSInt16.class,BorderType.SKIP,false);
+					FactoryConvolve.convolve(kernelI32,ImageTypeInfo.U8,ImageTypeInfo.S16,BorderType.SKIP,false);
 
 		@Override
 		public void process() {

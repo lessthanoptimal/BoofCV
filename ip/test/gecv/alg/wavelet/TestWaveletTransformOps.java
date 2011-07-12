@@ -17,6 +17,7 @@
 package gecv.alg.wavelet;
 
 import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
@@ -81,7 +82,7 @@ public class TestWaveletTransformOps {
 		if( isFloat )
 			desc = FactoryWaveletDaub.daubJ_F32(4);
 		else
-			desc = FactoryWaveletDaub.biorthogonal_I32(5, WaveletBorderType.WRAP);
+			desc = FactoryWaveletDaub.biorthogonal_I32(5, BorderType.WRAP);
 		return desc;
 	}
 

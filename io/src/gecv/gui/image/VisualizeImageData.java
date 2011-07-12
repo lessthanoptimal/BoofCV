@@ -57,7 +57,7 @@ public class VisualizeImageData {
 	public static BufferedImage colorizeSign( ImageInteger src, BufferedImage dst, int maxValue ) {
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
-		if( !src.isSigned() )
+		if( !src.getTypeInfo().isSigned() )
 			throw new IllegalArgumentException("Can only convert signed images.");
 
 		if( maxValue == 0 )
@@ -84,7 +84,7 @@ public class VisualizeImageData {
 	{
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
-		if( src.isSigned() )
+		if( src.getTypeInfo().isSigned() )
 			throw new IllegalArgumentException("Can only convert unsigned images.");
 
 		for( int y = 0; y < src.height; y++ ) {
@@ -102,7 +102,7 @@ public class VisualizeImageData {
 
 	public static BufferedImage grayMagnitude( ImageBase src, BufferedImage dst, float maxValue )
 	{
-		if( src.isInteger() ) {
+		if( src.getTypeInfo().isInteger() ) {
 			return grayMagnitude((ImageInteger)src,dst,(int)maxValue);
 		} else {
 			return grayMagnitude((ImageFloat32)src,dst,maxValue);

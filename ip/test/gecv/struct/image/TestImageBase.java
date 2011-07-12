@@ -151,23 +151,13 @@ public class TestImageBase {
 		}
 
 		@Override
-		public boolean isInteger() {
-			return true;
-		}
-
-		@Override
-		public boolean isSigned() {
-			return true;
-		}
-
-		@Override
 		protected Object _getData() {
 			return data;
 		}
 
 		@Override
-		public Class<?> _getPrimitiveType() {
-			return int.class;
+		public ImageTypeInfo<DummyImage> getTypeInfo() {
+			return (ImageTypeInfo)ImageTypeInfo.S32;
 		}
 
 		@Override

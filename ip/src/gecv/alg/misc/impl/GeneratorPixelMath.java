@@ -16,8 +16,8 @@
 
 package gecv.alg.misc.impl;
 
+import gecv.misc.AutoTypeImage;
 import gecv.misc.CodeGeneratorUtil;
-import gecv.misc.TypeImage;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -35,7 +35,7 @@ public class GeneratorPixelMath {
 
 	PrintStream out;
 
-	private TypeImage input;
+	private AutoTypeImage input;
 
 	public GeneratorPixelMath() throws FileNotFoundException {
 		out = new PrintStream(new FileOutputStream(className + ".java"));
@@ -69,9 +69,9 @@ public class GeneratorPixelMath {
 	}
 
 	public void printAll() {
-		TypeImage types[] = TypeImage.getSpecificTypes();
+		AutoTypeImage types[] = AutoTypeImage.getSpecificTypes();
 
-		for( TypeImage t : types ) {
+		for( AutoTypeImage t : types ) {
 			input = t;
 			printMaxAbs();
 			printDivide();
@@ -84,9 +84,9 @@ public class GeneratorPixelMath {
 	}
 
 	public void printAllSigned() {
-		TypeImage types[] = TypeImage.getSigned();
+		AutoTypeImage types[] = AutoTypeImage.getSigned();
 
-		for( TypeImage t : types ) {
+		for( AutoTypeImage t : types ) {
 			input = t;
 			printAbs();
 		}

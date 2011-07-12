@@ -90,7 +90,7 @@ public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 	}
 
 	@Override
-	public Class<?> _getPrimitiveType() {
-		return double.class;
+	public ImageTypeInfo<ImageFloat64> getTypeInfo() {
+		return ImageTypeInfo.F64;
 	}
 }
