@@ -26,7 +26,7 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ShrinkThresholdRule<T extends ImageBase<T>> {
+public interface ShrinkThresholdRule<T extends ImageBase> {
 
 	/**
 	 * Applies shrinkage to entire image.  If the rule should only be applied to part

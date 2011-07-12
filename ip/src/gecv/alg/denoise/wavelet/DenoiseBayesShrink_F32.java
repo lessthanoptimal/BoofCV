@@ -88,10 +88,10 @@ public class DenoiseBayesShrink_F32 extends SubbandShrink<ImageFloat32> {
 		int h = transform.height;
 
 		// compute the noise variance using the HH_1 subband
-		noiseVariance = UtilWaveletShrink.estimateNoiseStdDev(transform.subimage(w/2,h/2,w,h),null);
+		noiseVariance = UtilDenoiseWavelet.estimateNoiseStdDev(transform.subimage(w/2,h/2,w,h),null);
 		noiseVariance *= noiseVariance;
 
-		System.out.println("Noise Variance: "+noiseVariance);
+//		System.out.println("Noise Variance: "+noiseVariance);
 
 		performShrinkage(transform,numLevels);
 	}

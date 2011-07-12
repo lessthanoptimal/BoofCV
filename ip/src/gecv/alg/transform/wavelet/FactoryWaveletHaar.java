@@ -1,0 +1,70 @@
+/*
+ * Copyright 2011 Peter Abeles
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package gecv.alg.transform.wavelet;
+
+import gecv.core.image.border.BorderIndex1D_Extend;
+import gecv.struct.wavelet.*;
+
+
+/**
+ * Coefficients for Haar wavelet.
+ *
+ * @author Peter Abeles
+ */
+public class FactoryWaveletHaar {
+
+	public static WaveletDescription<WlCoef_F32> generate_F32() {
+		WlCoef_F32 forward = new WlCoef_F32();
+
+		forward.scaling = new float[]{(float)(1.0/Math.sqrt(2)),(float)(1.0/Math.sqrt(2))};
+		forward.wavelet = new float[]{forward.scaling[0],-forward.scaling[0]};
+
+		WlBorderCoef<WlCoef_F32> inverse = new WlBorderCoefStandard<WlCoef_F32>(forward);
+
+		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Extend(),forward,inverse);
+	}
+
+	public static WaveletDescription<WlCoef_I32> generate_I32() {
+		WlCoef_I32 forward = new WlCoef_I32();
+
+		forward.scaling = new int[]{1,1};
+		forward.wavelet = new int[]{forward.scaling[0],-forward.scaling[0]};
+		forward.denominatorScaling = 1;
+		forward.denominatorWavelet = 1;
+
+		WlBorderCoef<WlCoef_I32> inverse = new WlBorderCoefStandard<WlCoef_I32>(generateInv_I32());
+
+		return new WaveletDescription<WlCoef_I32>(new BorderIndex1D_Extend(),forward,inverse);
+	}
+
+	/**
+	 * Create a description for the inverse transform.  Note that this will NOT produce
+	 * an exact copy of the original due to rounding error.
+	 *
+	 * @return Wavelet inverse coefficient description.
+	 */
+	private static WlCoef_I32 generateInv_I32() {
+		WlCoef_I32 ret = new WlCoef_I32();
+
+		ret.scaling = new int[]{1,1};
+		ret.wavelet = new int[]{ret.scaling[0],-ret.scaling[0]};
+		ret.denominatorScaling = 2;
+		ret.denominatorWavelet = 2;
+
+		return ret;
+	}
+}

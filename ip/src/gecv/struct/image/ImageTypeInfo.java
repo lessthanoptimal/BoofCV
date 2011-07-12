@@ -34,7 +34,7 @@ public final class ImageTypeInfo <T extends ImageBase> {
 	/** Single Band Signed 32-bit integer image */
 	public static ImageTypeInfo<ImageSInt32> S32 = new ImageTypeInfo<ImageSInt32>(true,int.class,ImageSInt32.class);
 	/** Single Band Signed 64-bit integer image */
-	public static ImageTypeInfo S64 = new ImageTypeInfo(true,long.class,null);
+	public static ImageTypeInfo<ImageSInt64> S64 = new ImageTypeInfo<ImageSInt64>(true,long.class,ImageSInt64.class);
 	/** Single Band 32-bit floating point image */
 	public static ImageTypeInfo<ImageFloat32> F32 = new ImageTypeInfo<ImageFloat32>(true,float.class,ImageFloat32.class);
 	/** Single Band 64-bit floating point image */
@@ -68,6 +68,8 @@ public final class ImageTypeInfo <T extends ImageBase> {
 			return S16;
 		else if( imageClass == ImageSInt32.class )
 			return S32;
+		else if( imageClass == ImageSInt64.class )
+			return S64;
 		else if( imageClass == ImageFloat32.class )
 			return F32;
 		else if( imageClass == ImageFloat64.class )

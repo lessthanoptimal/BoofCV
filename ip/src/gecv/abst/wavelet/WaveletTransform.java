@@ -29,7 +29,7 @@ import gecv.struct.wavelet.WlCoef;
  * {@link gecv.abst.wavelet.FactoryWaveletTransform}.
  * </p>
  * 
- * @see gecv.alg.wavelet.WaveletTransformOps
+ * @see gecv.alg.transform.wavelet.WaveletTransformOps
  *
  * @author Peter Abeles
  */

@@ -51,10 +51,10 @@ public class DenoiseSureShrink_F32 extends SubbandShrink<ImageFloat32> {
 	protected Number computeThreshold( ImageFloat32 subband  )
 	{
 		float coef[] = new float[ subband.width*subband.height ];
-		UtilWaveletShrink.subbandAbsVal(subband,coef);
+		UtilDenoiseWavelet.subbandAbsVal(subband,coef);
 		Arrays.sort(coef);
 
-		float maxThreshold =(float)UtilWaveletShrink.universalThreshold(subband,1.0);
+		float maxThreshold =(float) UtilDenoiseWavelet.universalThreshold(subband,1.0);
 
 		float N = coef.length;
 
@@ -87,9 +87,9 @@ public class DenoiseSureShrink_F32 extends SubbandShrink<ImageFloat32> {
 		int h = transform.height;
 
 		// compute the noise variance using the HH_1 subband
-		 noiseSigma = UtilWaveletShrink.estimateNoiseStdDev(transform.subimage(w/2,h/2,w,h),null);
+		noiseSigma = UtilDenoiseWavelet.estimateNoiseStdDev(transform.subimage(w/2,h/2,w,h),null);
 
-		System.out.println("Noise sigma: "+noiseSigma);
+//		System.out.println("Noise sigma: "+noiseSigma);
 
 		performShrinkage(transform,numLevels);
 	}

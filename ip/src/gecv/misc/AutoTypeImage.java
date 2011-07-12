@@ -33,6 +33,7 @@ public enum AutoTypeImage {
 	U16(ImageUInt16.class),
 	S16(ImageSInt16.class),
 	S32(ImageSInt32.class),
+	S64(ImageSInt64.class),
 	F32(ImageFloat32.class),
 	F64(ImageFloat64.class);
 
@@ -55,10 +56,15 @@ public enum AutoTypeImage {
 			ImageBase img = (ImageBase)imageType.newInstance();
 			primitiveType = img.getTypeInfo().getDataType();
 			dataType = primitiveType.getSimpleName();
-			if( ImageInteger.class.isAssignableFrom(imageType)) {
+			numBits = img.getTypeInfo().getNumBits();
+
+			if( img.getTypeInfo().isInteger() ) {
 				isInteger = true;
-				sumType = "int";
-				if( !((ImageInteger)img).getTypeInfo().isSigned() ) {
+				if( numBits <= 32 )
+					sumType = "int";
+				else
+					sumType = "long";
+				if( !img.getTypeInfo().isSigned() ) {
 					abbreviatedType = "U";
 					isSigned = false;
 					if( byte.class == primitiveType) {
@@ -80,17 +86,7 @@ public enum AutoTypeImage {
 					sumType = "double";
 				}
 			}
-			if( primitiveType == byte.class ) {
-				numBits = 8;
-			} else if( primitiveType == short.class ) {
-				numBits = 16;
-			} else if( primitiveType == int.class || primitiveType == float.class ) {
-				numBits = 32;
-			} else if( primitiveType == long.class || primitiveType == double.class ) {
-				numBits = 64;
-			} else {
-				throw new IllegalArgumentException("Unknown number of bits");
-			}
+
 			abbreviatedType += numBits;
 
 		} catch (InstantiationException e) {
@@ -117,7 +113,7 @@ public enum AutoTypeImage {
 	}
 
 	public static AutoTypeImage[] getIntegerTypes() {
-		return new AutoTypeImage[]{U8,S8,U16,S16,S32};
+		return new AutoTypeImage[]{U8,S8,U16,S16,S32,S64};
 	}
 
 	public static AutoTypeImage[] getFloatingTypes() {
@@ -125,15 +121,19 @@ public enum AutoTypeImage {
 	}
 
 	public static AutoTypeImage[] getGenericTypes() {
-		return new AutoTypeImage[]{I8,I16,S32,F32,F64};
+		return new AutoTypeImage[]{I8,I16,S32,S64,F32,F64};
+	}
+
+	public static AutoTypeImage[] getReallyGenericTypes() {
+		return new AutoTypeImage[]{I,S64,F32,F64};
 	}
 
 	public static AutoTypeImage[] getSpecificTypes() {
-		return new AutoTypeImage[]{U8,S8,U16,S16,S32,F32,F64};
+		return new AutoTypeImage[]{U8,S8,U16,S16,S32,S64,F32,F64};
 	}
 
 	public static AutoTypeImage[] getSigned() {
-		return new AutoTypeImage[]{S8,S16,S32,F32,F64};
+		return new AutoTypeImage[]{S8,S16,S32,S64,F32,F64};
 	}
 
 	public static AutoTypeImage[] getUnsigned() {

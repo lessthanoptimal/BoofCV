@@ -82,6 +82,66 @@ public class GeneralizedImageOps {
 		}
 	}
 
+	public static double computeMeanSquaredError(ImageBase imgA, ImageBase imgB ) {
+		if (imgA.getClass() == ImageUInt8.class ) {
+			return ImageTestingOps.computeMeanSquaredError((ImageUInt8) imgA, (ImageUInt8) imgB);
+		} else if (imgA.getClass() == ImageSInt8.class ) {
+			return ImageTestingOps.computeMeanSquaredError((ImageSInt8) imgA, (ImageSInt8) imgB);
+		} else if (imgA.getClass() == ImageUInt16.class ) {
+			return ImageTestingOps.computeMeanSquaredError((ImageUInt16) imgA, (ImageUInt16) imgB );
+		} else if (imgA.getClass() == ImageSInt16.class ) {
+			return ImageTestingOps.computeMeanSquaredError((ImageSInt16) imgA, (ImageSInt16) imgB);
+		} else if (imgA.getClass() == ImageSInt32.class ) {
+			return ImageTestingOps.computeMeanSquaredError((ImageSInt32) imgA, (ImageSInt32) imgB );
+		} else if (imgA.getClass() == ImageFloat32.class) {
+			return ImageTestingOps.computeMeanSquaredError((ImageFloat32) imgA, (ImageFloat32) imgB );
+		} else if (imgA.getClass() == ImageFloat64.class) {
+			return ImageTestingOps.computeMeanSquaredError((ImageFloat64) imgA, (ImageFloat64) imgB );
+		} else {
+			throw new RuntimeException("Unknown type: "+imgA.getClass().getSimpleName());
+		}
+	}
+
+	public static void fillRectangle(ImageBase img, double value , int x0 , int y0 , int x1 , int y1 ) {
+		if (img.getClass() == ImageUInt8.class ) {
+			ImageTestingOps.fillRectangle((ImageUInt8) img, (int)value , x0 , y0 , x1 , y1 );
+		} else if (img.getClass() == ImageSInt8.class ) {
+			ImageTestingOps.fillRectangle((ImageSInt8) img, (int)value , x0 , y0 , x1 , y1 );
+		} else if (img.getClass() == ImageUInt16.class ) {
+			ImageTestingOps.fillRectangle((ImageUInt16) img, (int)value , x0 , y0 , x1 , y1 );
+		} else if (img.getClass() == ImageSInt16.class ) {
+			ImageTestingOps.fillRectangle((ImageSInt16) img, (int)value , x0 , y0 , x1 , y1 );
+		} else if (img.getClass() == ImageSInt32.class ) {
+			ImageTestingOps.fillRectangle((ImageSInt32) img, (int)value , x0 , y0 , x1 , y1 );
+		} else if (img.getClass() == ImageFloat32.class) {
+			ImageTestingOps.fillRectangle((ImageFloat32) img, (float)value , x0 , y0 , x1 , y1 );
+		} else if (img.getClass() == ImageFloat64.class) {
+			ImageTestingOps.fillRectangle((ImageFloat64) img, value , x0 , y0 , x1 , y1 );
+		} else {
+			throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
+		}
+	}
+
+	public static void addGaussian(ImageBase img, Random rand, double sigma) {
+		if (img.getClass() == ImageUInt8.class ) {
+			ImageTestingOps.addGaussian((ImageUInt8) img, rand, sigma );
+		} else if (img.getClass() == ImageSInt8.class ) {
+			ImageTestingOps.addGaussian((ImageSInt8) img, rand, sigma );
+		} else if (img.getClass() == ImageUInt16.class ) {
+			ImageTestingOps.addGaussian((ImageUInt16) img, rand, sigma );
+		} else if (img.getClass() == ImageSInt16.class ) {
+			ImageTestingOps.addGaussian((ImageSInt16) img, rand, sigma );
+		} else if (img.getClass() == ImageSInt32.class ) {
+			ImageTestingOps.addGaussian((ImageSInt32) img, rand, sigma );
+		} else if (img.getClass() == ImageFloat32.class) {
+			ImageTestingOps.addGaussian((ImageFloat32) img, rand, sigma );
+		} else if (img.getClass() == ImageFloat64.class) {
+			ImageTestingOps.addGaussian((ImageFloat64) img, rand, sigma );
+		} else {
+			throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
+		}
+	}
+
 	public static void randomize(ImageBase img, Random rand, int min, int max) {
 		if (img.getClass() == ImageUInt8.class || img.getClass() == ImageSInt8.class ) {
 			ImageTestingOps.randomize((ImageInt8) img, rand, min, max);
@@ -89,6 +149,8 @@ public class GeneralizedImageOps {
 			ImageTestingOps.randomize((ImageInt16) img, rand, min, max);
 		} else if (img.getClass() == ImageSInt32.class ) {
 			ImageTestingOps.randomize((ImageSInt32) img, rand, min, max);
+		} else if (img.getClass() == ImageSInt64.class ) {
+			ImageTestingOps.randomize((ImageSInt64) img, rand, min, max);
 		} else if (img.getClass() == ImageFloat32.class) {
 			ImageTestingOps.randomize((ImageFloat32) img, rand, min, max);
 		} else if (img.getClass() == ImageFloat64.class) {
@@ -129,6 +191,8 @@ public class GeneralizedImageOps {
 			ImageTestingOps.fill((ImageInt16)img,(int)value);
 		} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
 			ImageTestingOps.fill((ImageSInt32)img,(int)value);
+		} else if ( ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
+			ImageTestingOps.fill((ImageSInt64)img,(int)value);
 		} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
 			ImageTestingOps.fill((ImageFloat32)img,(int)value);
 		} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {

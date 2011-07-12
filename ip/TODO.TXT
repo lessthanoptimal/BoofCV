@@ -5,11 +5,13 @@
 
 - Wavelet
  * Generate coefficients for arbitrary daub and coiflet wavelets
+ * Add Symmlet wavelet
  * Support for Image64F
  * Unrolled inner image
  * GUI Panel to display wavelets
    * change the level being viewed
    * display detail on a log scale
+ * After adding new wavelets update denoising code
 
 - Derivative
  * Gaussian derivative kernel 1D
@@ -23,7 +25,9 @@
     - Canny?
 
 - Denoise
- * TAWS denoiser
+ * After an integer wavelet has been added that is energy conserving:
+   - Create performance test and visualization apps
+ * Use high order wavelets when available
 
 - Thresholding
  * Global Threshold

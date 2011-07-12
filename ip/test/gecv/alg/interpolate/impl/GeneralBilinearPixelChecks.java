@@ -20,6 +20,7 @@ import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.SingleBandImage;
+import gecv.core.image.border.BorderIndex1D_Extend;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder;
 import gecv.struct.image.ImageBase;
@@ -39,7 +40,7 @@ public abstract class GeneralBilinearPixelChecks<T extends ImageBase> extends Ge
 
 	@Override
 	protected float compute(T _img, float x, float y) {
-		ImageBorder<?> imgB = FactoryImageBorder.extend(_img);
+		ImageBorder<?> imgB = FactoryImageBorder.general(_img, BorderIndex1D_Extend.class);
 		SingleBandImage img = FactorySingleBandImage.wrap(imgB);
 
 
