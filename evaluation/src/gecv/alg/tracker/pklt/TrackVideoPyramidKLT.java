@@ -16,8 +16,8 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.alg.pyramid.GradientPyramid;
-import gecv.alg.pyramid.PyramidUpdater;
+import gecv.alg.transform.pyramid.GradientPyramid;
+import gecv.alg.transform.pyramid.PyramidUpdater;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ImagePyramidPanel;
 import gecv.gui.image.ShowImages;
