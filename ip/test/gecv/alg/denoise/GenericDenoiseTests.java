@@ -68,8 +68,8 @@ public abstract class GenericDenoiseTests<T extends ImageBase> {
 	}
 
 	private void declareImages() {
-		image = GecvTesting.createImage(imageType,width,height);
-		imageDenoised = GecvTesting.createImage(imageType,width,height);
+		image = GeneralizedImageOps.createImage(imageType,width,height);
+		imageDenoised = GeneralizedImageOps.createImage(imageType,width,height);
 
 		// render a simple scene
 		GeneralizedImageOps.fill(image,20);

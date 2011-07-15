@@ -18,13 +18,10 @@ package gecv.alg.transform.wavelet;
 
 import gecv.abst.wavelet.FactoryWaveletTransform;
 import gecv.abst.wavelet.WaveletTransform;
-import gecv.alg.denoise.DenoiseWavelet;
-import gecv.alg.denoise.wavelet.DenoiseSureShrink_F32;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.border.BorderType;
-import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageFloat32;
@@ -45,11 +42,9 @@ public class WaveletVisualizeApp {
 	int width;
 	int height;
 	int numLevels = 4;
-	float noiseLevel = 10;
 
 	Random rand = new Random(2234);
 
-	ImagePanel panelInput;
 	ImageFloat32 image;
 	ImageFloat32 imageWavelet;
 
@@ -57,16 +52,12 @@ public class WaveletVisualizeApp {
 //	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.daubJ_F32(4);
 	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.biorthogonal_F32(5, BorderType.REFLECT);
 
-//	DenoiseWavelet<ImageFloat32> denoiser = new DenoiseVisuShrink_F32();
-//	DenoiseWavelet<ImageFloat32> denoiser = new DenoiseBayesShrink_F32();
-	DenoiseWavelet<ImageFloat32> denoiser = new DenoiseSureShrink_F32();
-
 	WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32> waveletTran = FactoryWaveletTransform.create_F32(waveletDesc,numLevels);
 
 
 	public void process() {
-		createTestImage();
-//		loadImage();
+//		createTestImage();
+		loadImage();
 
 		width = image.getWidth();
 		height = image.getHeight();
@@ -75,31 +66,23 @@ public class WaveletVisualizeApp {
 
 		ImageFloat32 imageInv = new ImageFloat32(width,height);
 
-		panelInput = ShowImages.showWindow(image,"Input Image",true);
-		ConvertBufferedImage.convertTo(image,panelInput.getImage());
-		panelInput.repaint();
-
 		imageWavelet = waveletTran.transform(image,imageWavelet);
 
-		ShowImages.showWindow(imageWavelet,"Transformed",true);
 		waveletTran.invert(imageWavelet,imageInv);
 
 		PixelMath.boundImage(imageInv,0,255);
 
+		ShowImages.showWindow(image,"Input Image",true);
+		ShowImages.showWindow(imageWavelet,"Transformed",true);
 		ShowImages.showWindow(imageInv,"Inverted",true);
 
-		double error = 0;
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x++ ) {
-				double e = image.get(x,y)-imageInv.get(x,y);
-				error += Math.abs(e);
-			}
-		}
-		System.out.println("average error per pixel "+(error/(width*height)));
+		double error = ImageTestingOps.computeMeanSquaredError(image,imageInv);
+
+		System.out.println("Mean Squared Error "+error);
 	}
 
 	private void loadImage() {
-		BufferedImage in = UtilImageIO.loadImage("/home/pja/rgb.jpg");
+		BufferedImage in = UtilImageIO.loadImage("evaluation/data/standard/lena512.bmp");
 		image = ConvertBufferedImage.convertFrom(in,image);
 	}
 
@@ -121,9 +104,6 @@ public class WaveletVisualizeApp {
 		addRectangle(g2,tran,-120,200,60,40);
 
 		image = ConvertBufferedImage.convertFrom(workImg,image);
-		ImageTestingOps.addUniform(image,rand,-noiseLevel,noiseLevel);
-		PixelMath.boundImage(image,0,255);
-
 	}
 
 	private void addRectangle( Graphics2D g2 , AffineTransform tran , int x0 , int y0 , int w , int h )

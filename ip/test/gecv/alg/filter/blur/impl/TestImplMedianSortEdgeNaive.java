@@ -17,10 +17,10 @@
 package gecv.alg.filter.blur.impl;
 
 import gecv.core.image.FactorySingleBandImage;
+import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageBase;
 import gecv.testing.CompareEquivalentFunctions;
-import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -67,8 +67,8 @@ public class TestImplMedianSortEdgeNaive extends CompareEquivalentFunctions {
 
 		Class<?> c[] = candidate.getParameterTypes();
 
-		ImageBase input = GecvTesting.createImage(c[0],width,height);
-		ImageBase output = GecvTesting.createImage(c[1],width,height);
+		ImageBase input = GeneralizedImageOps.createImage(c[0],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(c[1],width,height);
 
 
 		Object[][] ret = new Object[1][ c.length ];

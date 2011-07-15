@@ -87,8 +87,8 @@ public class TestConvolveImageStandard {
 	private void testMethod( Method m ) {
 		Class<?> param[] = m.getParameterTypes();
 
-		ImageBase input = GecvTesting.createImage(param[1],width,height);
-		ImageBase output = GecvTesting.createImage(param[2],width,height);
+		ImageBase input = GeneralizedImageOps.createImage(param[1],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(param[2],width,height);
 
 		GeneralizedImageOps.randomize(input, rand, 1,10);
 

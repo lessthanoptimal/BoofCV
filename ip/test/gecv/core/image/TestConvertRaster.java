@@ -89,7 +89,7 @@ public class TestConvertRaster {
 
 		input = createBufferedTestImages(paramTypes[0]);
 
-		ImageBase output = GecvTesting.createImage(paramTypes[1],imgWidth,imgHeight);
+		ImageBase output = GeneralizedImageOps.createImage(paramTypes[1],imgWidth,imgHeight);
 
 		for( int i = 0; i < input.length; i++ ) {
 			GecvTesting.checkSubImage(this, "performBufferedTo", true, m,input[i],output);
@@ -137,7 +137,7 @@ public class TestConvertRaster {
 
 		Class<?> paramTypes[] = m.getParameterTypes();
 
-		ImageBase input = GecvTesting.createImage(paramTypes[0],imgWidth,imgHeight);
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],imgWidth,imgHeight);
 		GeneralizedImageOps.randomize(input, rand, 0,50);
 
 		BufferedImage output[] = createBufferedTestImages(paramTypes[1]);

@@ -20,7 +20,6 @@ import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageBase;
-import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -92,7 +91,7 @@ public class TestImageTestingOps {
 
 	private void testFill( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.randomize(orig, rand, 0,20);
 
 		if( orig.getTypeInfo().isInteger()) {
@@ -111,7 +110,7 @@ public class TestImageTestingOps {
 
 	private void testFillRectangle( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		int x0 = 2;
 		int y0 = 3;
@@ -137,7 +136,7 @@ public class TestImageTestingOps {
 
 	private void testRandomize( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		if( orig.getTypeInfo().isInteger() ) {
 			if( orig.getTypeInfo().isSigned() )
@@ -166,7 +165,7 @@ public class TestImageTestingOps {
 
 	private void testAddUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.fill(orig,1);
 
 		if( orig.getTypeInfo().isInteger() ) {
@@ -189,7 +188,7 @@ public class TestImageTestingOps {
 		double mean = 10;
 
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase orig = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		GeneralizedImageOps.fill(orig,mean);
 		m.invoke(null,orig,rand,2.0);
@@ -221,7 +220,7 @@ public class TestImageTestingOps {
 	private void testComputeMSE( Method m ) throws InvocationTargetException, IllegalAccessException {
 
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase imgA = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase imgA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		GeneralizedImageOps.fill(imgA,10);
 		ImageBase imgB = imgA.clone();

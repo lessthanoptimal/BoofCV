@@ -39,6 +39,9 @@
  * See in code comment on speeding up fast-non-max
  
 - Convolve
+ * Add support for convolutions using kernels with:
+   - Even length (offset + length)
+   - Different width/height
  * Add a new implementation for horizontal and vertical which are "in-place"
    Uses an array one row/column long in which the image is locally copied.
  * Sparse Kernel Convolve for when there is a lot of zeros in the kernel

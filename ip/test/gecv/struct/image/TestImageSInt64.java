@@ -19,10 +19,9 @@ package gecv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageSInt64 extends StandardImageIntegerTests {
+public class TestImageSInt64 extends StandardImageTests {
 
 	public TestImageSInt64() {
-		super(true);
 	}
 
 	@Override
