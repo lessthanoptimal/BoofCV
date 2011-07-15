@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.basic.impl;
+package gecv.alg.filter.binary.impl;
 
 import gecv.core.image.border.ImageBorderValue;
 import gecv.core.image.border.ImageBorder_I32;
@@ -25,7 +25,7 @@ import gecv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class BinaryBorderOps {
+public class ImplBinaryBorderOps {
 	public static void erode4(ImageUInt8 input, ImageUInt8 output) {
 
 		ImageBorder_I32 in = ImageBorderValue.wrap(input,1);

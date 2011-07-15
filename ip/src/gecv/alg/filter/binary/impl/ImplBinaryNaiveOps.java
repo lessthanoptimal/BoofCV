@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.basic.impl;
+package gecv.alg.filter.binary.impl;
 
 import gecv.alg.InputSanityCheck;
 import gecv.struct.image.ImageUInt8;
@@ -23,9 +23,9 @@ import gecv.struct.image.ImageUInt8;
  * Simple unoptimized implementations of binary operations.
  *
  * @author Peter Abeles
- * @see gecv.alg.filter.basic.BinaryImageOps
+ * @see gecv.alg.filter.binary.BinaryImageOps
  */
-public class BinaryNaiveOps {
+public class ImplBinaryNaiveOps {
 	public static void erode4(ImageUInt8 input, ImageUInt8 output) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {

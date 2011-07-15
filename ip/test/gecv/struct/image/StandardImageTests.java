@@ -124,13 +124,8 @@ public abstract class StandardImageTests {
 				args[index] = where[index];
 			}
 			if (type == 1) {
-				if (!img.getTypeInfo().isInteger()) {
-					paramTypes[index] = float.class;
-					args[index] = typeData;
-				} else {
-					paramTypes[index] = int.class;
-					args[index] = typeData;
-				}
+				paramTypes[index] = img.getTypeInfo().getSumType();
+				args[index] = typeData;
 //				paramTypes[index] = img.getTypeInfo().getDataType();
 //				args[index] = typeData;
 			} else if (type == 2) {

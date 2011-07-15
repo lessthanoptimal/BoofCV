@@ -62,8 +62,8 @@ public class TestConvertImage {
 	}
 
 	private void checkConvert( Method m , Class<?> inputType , Class<?> outputType ) {
-		ImageBase<?> input = GecvTesting.createImage(inputType,imgWidth,imgHeight);
-		ImageBase<?> output = GecvTesting.createImage(outputType,imgWidth,imgHeight);
+		ImageBase<?> input = GeneralizedImageOps.createImage(inputType,imgWidth,imgHeight);
+		ImageBase<?> output = GeneralizedImageOps.createImage(outputType,imgWidth,imgHeight);
 
 		boolean inputSigned = true;
 		boolean outputSigned = true;

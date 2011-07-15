@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.basic.impl;
+package gecv.alg.filter.binary.impl;
 
 import gecv.struct.image.ImageUInt8;
 
@@ -28,9 +28,9 @@ import gecv.struct.image.ImageUInt8;
  * </p>
  *
  * @author Peter Abeles
- * @see gecv.alg.filter.basic.BinaryImageOps
+ * @see gecv.alg.filter.binary.BinaryImageOps
  */
-public class BinaryInnerOps {
+public class ImplBinaryInnerOps {
 
 	public static void erode4(ImageUInt8 input, ImageUInt8 output) {
 

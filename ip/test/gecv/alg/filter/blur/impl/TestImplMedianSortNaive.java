@@ -53,8 +53,8 @@ public class TestImplMedianSortNaive {
 
 			Class<?> params[] = m.getParameterTypes();
 
-			ImageBase input = GecvTesting.createImage(params[0],4,4);
-			ImageBase found = GecvTesting.createImage(params[1],4,4);
+			ImageBase input = GeneralizedImageOps.createImage(params[0],4,4);
+			ImageBase found = GeneralizedImageOps.createImage(params[1],4,4);
 
 			GeneralizedImageOps.convert(templateImage,input);
 

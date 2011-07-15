@@ -14,13 +14,13 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.basic;
+package gecv.alg.filter.binary;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
+import gecv.alg.filter.binary.impl.ImplBinaryInnerOps;
+import gecv.alg.filter.binary.impl.ImplBinaryNaiveOps;
 import gecv.alg.misc.ImageTestingOps;
-import gecv.alg.filter.basic.impl.BinaryInnerOps;
-import gecv.alg.filter.basic.impl.BinaryNaiveOps;
 import gecv.struct.image.ImageUInt8;
 
 import java.util.Random;
@@ -41,98 +41,98 @@ public class BenchmarkBinaryOps {
 	public static class NaiveErode4 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryNaiveOps.erode4(input, output);
+			ImplBinaryNaiveOps.erode4(input, output);
 		}
 	}
 
 	public static class NaiveErode8 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryNaiveOps.erode8(input, output);
+			ImplBinaryNaiveOps.erode8(input, output);
 		}
 	}
 
 	public static class NaiveDilate4 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryNaiveOps.dilate4(input, output);
+			ImplBinaryNaiveOps.dilate4(input, output);
 		}
 	}
 
 	public static class NaiveDilate8 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryNaiveOps.dilate8(input, output);
+			ImplBinaryNaiveOps.dilate8(input, output);
 		}
 	}
 
 	public static class NaiveEdge4 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryNaiveOps.edge4(input, output);
+			ImplBinaryNaiveOps.edge4(input, output);
 		}
 	}
 
 	public static class NaiveEdge8 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryNaiveOps.edge8(input, output);
+			ImplBinaryNaiveOps.edge8(input, output);
 		}
 	}
 
 	public static class NaiveRemovePointNoise extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryNaiveOps.removePointNoise(input, output);
+			ImplBinaryNaiveOps.removePointNoise(input, output);
 		}
 	}
 
 	public static class InnerErode4 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryInnerOps.erode4(input, output);
+			ImplBinaryInnerOps.erode4(input, output);
 		}
 	}
 
 	public static class InnerErode8 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryInnerOps.erode8(input, output);
+			ImplBinaryInnerOps.erode8(input, output);
 		}
 	}
 
 	public static class InnerDilate4 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryInnerOps.dilate4(input, output);
+			ImplBinaryInnerOps.dilate4(input, output);
 		}
 	}
 
 	public static class InnerDilate8 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryInnerOps.dilate8(input, output);
+			ImplBinaryInnerOps.dilate8(input, output);
 		}
 	}
 
 	public static class InnerEdge4 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryInnerOps.edge4(input, output);
+			ImplBinaryInnerOps.edge4(input, output);
 		}
 	}
 
 	public static class InnerEdge8 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryInnerOps.edge8(input, output);
+			ImplBinaryInnerOps.edge8(input, output);
 		}
 	}
 
 	public static class InnerRemovePointNoise extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryInnerOps.edge8(input, output);
+			ImplBinaryInnerOps.edge8(input, output);
 		}
 	}
 

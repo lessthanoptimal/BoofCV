@@ -17,6 +17,7 @@
 package gecv.testing;
 
 import gecv.core.image.FactorySingleBandImage;
+import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
 import gecv.struct.image.*;
 import sun.awt.image.ByteInterleavedRaster;
@@ -99,7 +100,7 @@ public class GecvTesting {
 			Class<?> params[] = m.getParameterTypes();
 			Object[] inputs = new Object[params.length];
 			for (int i = 0; i < params.length; i++) {
-				inputs[i] = createImage(params[i], 10, 20);
+				inputs[i] = GeneralizedImageOps.createImage(params[i], 10, 20);
 			}
 
 			try {
@@ -114,9 +115,9 @@ public class GecvTesting {
 			for (int target = 0; target < params.length; target++) {
 				for (int i = 0; i < params.length; i++) {
 					if (i != target)
-						inputs[i] = createImage(params[i], 10, 20);
+						inputs[i] = GeneralizedImageOps.createImage(params[i], 10, 20);
 					else
-						inputs[i] = createImage(params[i], 11, 22);
+						inputs[i] = GeneralizedImageOps.createImage(params[i], 11, 22);
 				}
 
 				try {
@@ -150,34 +151,6 @@ public class GecvTesting {
 		}
 
 		return true;
-	}
-
-	public static <T extends ImageBase> T createImage(Class<?> type, int width, int height) {
-		type = GecvTesting.convertGenericToSpecificType(type);
-
-		if (type == ImageUInt8.class) {
-			return (T)new ImageUInt8(width, height);
-		} else if (type == ImageSInt8.class) {
-			return (T)new ImageSInt8(width, height);
-		} else if (type == ImageSInt16.class) {
-			return (T)new ImageSInt16(width, height);
-		} else if (type == ImageUInt16.class) {
-			return (T)new ImageUInt16(width, height);
-		} else if (type == ImageSInt32.class) {
-			return (T)new ImageSInt32(width, height);
-		} else if (type == ImageSInt64.class) {
-			return (T)new ImageSInt64(width, height);
-		} else if (type == ImageFloat32.class) {
-			return (T)new ImageFloat32(width, height);
-		} else if (type == ImageFloat64.class) {
-			return (T)new ImageFloat64(width, height);
-		} else if (type == ImageInterleavedInt8.class) {
-			return (T)new ImageInterleavedInt8(width, height, 1);
-		} else if( type == ImageInteger.class ) {
-			// ImageInteger is a generic type, so just create something
-			return (T)new ImageSInt32(width,height);
-		}
-		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}
 
 	/**
@@ -309,6 +282,45 @@ public class GecvTesting {
 		}
 
 		throw new RuntimeException("Couldn't find matching *public* function to " + name);
+	}
+
+	/**
+	 * Searches for all functions with the specified name in the target class.  Once it finds
+	 * that function it invokes the specified function in the owner class. That function must
+	 * take in a Method as its one and only parameter.  The method will be one of the matching
+	 * ones in the target class.
+	 *
+	 * @param owner
+	 * @param ownerMethod
+	 * @param target
+	 * @param targetMethod
+	 * @return The number of times 'targetMethod' was found and called.
+	 */
+	public static int findMethodThenCall( Object owner ,  String ownerMethod , Class target , String targetMethod  ) {
+		int total = 0;
+		Method[] list = target.getMethods();
+
+		try {
+			Method om = owner.getClass().getMethod(ownerMethod,Method.class);
+
+
+			for( Method m : list ) {
+				if( !m.getName().equals(targetMethod))
+					continue;
+
+				om.invoke(owner,m);
+
+				total++;
+			}
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+
+		return total;
 	}
 
 	/**

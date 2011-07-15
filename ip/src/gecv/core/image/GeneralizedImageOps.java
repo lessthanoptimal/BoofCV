@@ -18,6 +18,7 @@ package gecv.core.image;
 
 import gecv.alg.InputSanityCheck;
 import gecv.alg.misc.ImageTestingOps;
+import gecv.alg.misc.PixelMath;
 import gecv.core.image.impl.ImplConvertImage;
 import gecv.struct.image.*;
 import gecv.testing.GecvTesting;
@@ -48,7 +49,7 @@ public class GeneralizedImageOps {
 	public static <T extends ImageBase> T convert( ImageBase<?> src , T dst , Class<?> typeDst  )
 	{
 		if (dst == null) {
-			dst =(T) GecvTesting.createImage(typeDst,src.width, src.height);
+			dst =(T) createImage(typeDst,src.width, src.height);
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}
@@ -79,6 +80,28 @@ public class GeneralizedImageOps {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public static double sum(ImageBase imgA ) {
+		if (imgA.getClass() == ImageUInt8.class ) {
+			return PixelMath.sum( (ImageUInt8) imgA );
+		} else if (imgA.getClass() == ImageSInt8.class ) {
+			return PixelMath.sum( (ImageSInt8) imgA );
+		} else if (imgA.getClass() == ImageUInt16.class ) {
+			return PixelMath.sum( (ImageUInt16) imgA );
+		} else if (imgA.getClass() == ImageSInt16.class ) {
+			return PixelMath.sum( (ImageSInt16) imgA );
+		} else if (imgA.getClass() == ImageSInt32.class ) {
+			return PixelMath.sum( (ImageSInt32) imgA );
+//		} else if (imgA.getClass() == ImageSInt64.class ) {
+//			return PixelMath.sum( (ImageSInt64) imgA );
+		} else if (imgA.getClass() == ImageFloat32.class) {
+			return PixelMath.sum( (ImageFloat32) imgA );
+		} else if (imgA.getClass() == ImageFloat64.class) {
+			return PixelMath.sum( (ImageFloat64) imgA );
+		} else {
+			throw new RuntimeException("Unknown type: "+imgA.getClass().getSimpleName());
 		}
 	}
 
@@ -200,5 +223,33 @@ public class GeneralizedImageOps {
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}
+	}
+
+	public static <T extends ImageBase> T createImage(Class<?> type, int width, int height) {
+		type = GecvTesting.convertGenericToSpecificType(type);
+
+		if (type == ImageUInt8.class) {
+			return (T)new ImageUInt8(width, height);
+		} else if (type == ImageSInt8.class) {
+			return (T)new ImageSInt8(width, height);
+		} else if (type == ImageSInt16.class) {
+			return (T)new ImageSInt16(width, height);
+		} else if (type == ImageUInt16.class) {
+			return (T)new ImageUInt16(width, height);
+		} else if (type == ImageSInt32.class) {
+			return (T)new ImageSInt32(width, height);
+		} else if (type == ImageSInt64.class) {
+			return (T)new ImageSInt64(width, height);
+		} else if (type == ImageFloat32.class) {
+			return (T)new ImageFloat32(width, height);
+		} else if (type == ImageFloat64.class) {
+			return (T)new ImageFloat64(width, height);
+		} else if (type == ImageInterleavedInt8.class) {
+			return (T)new ImageInterleavedInt8(width, height, 1);
+		} else if( type == ImageInteger.class ) {
+			// ImageInteger is a generic type, so just create something
+			return (T)new ImageSInt32(width,height);
+		}
+		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}
 }

@@ -76,8 +76,8 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 
 		Class<?> c[] = candidate.getParameterTypes();
 
-		ImageBase input = GecvTesting.createImage(c[0],width,height);
-		ImageBase output = GecvTesting.createImage(c[1],width,height);
+		ImageBase input = GeneralizedImageOps.createImage(c[0],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(c[1],width,height);
 
 		GeneralizedImageOps.randomize(input,rand,0,20);
 

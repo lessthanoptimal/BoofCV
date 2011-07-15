@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.basic.impl;
+package gecv.alg.filter.binary.impl;
 
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -289,7 +289,7 @@ public class TestBinaryNaiveOps {
 	private ImageUInt8 createOutput(String methodName, ImageUInt8 input) {
 		try {
 			ImageUInt8 output = new ImageUInt8(input.width, input.height);
-			Method m = BinaryNaiveOps.class.getMethod(methodName, ImageUInt8.class, ImageUInt8.class);
+			Method m = ImplBinaryNaiveOps.class.getMethod(methodName, ImageUInt8.class, ImageUInt8.class);
 			m.invoke(null, input, output);
 			return output;
 		} catch (NoSuchMethodException e) {

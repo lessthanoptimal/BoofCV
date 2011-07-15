@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.basic.impl;
+package gecv.alg.filter.binary.impl;
 
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageUInt8;
@@ -34,7 +34,7 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 	protected int height = 30;
 
 	public CompareToBinaryNaive(Class<?> testClass) {
-		super(testClass, BinaryNaiveOps.class);
+		super(testClass, ImplBinaryNaiveOps.class);
 	}
 
 	@Override

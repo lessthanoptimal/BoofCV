@@ -23,7 +23,7 @@ import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.denoise.wavelet.DenoiseSureShrink_F32;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.misc.PixelMath;
-import gecv.alg.transform.wavelet.FactoryWaveletHaar;
+import gecv.alg.transform.wavelet.FactoryWaveletDaub;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.border.BorderType;
 import gecv.gui.image.ShowImages;
@@ -55,8 +55,8 @@ public class DenoiseVisualizeApp {
 
 	BorderType borderType = BorderType.REFLECT;
 
-	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletHaar.generate_F32();
-//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.daubJ_F32(4);
+//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletHaar.generate_F32();
+	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.daubJ_F32(4);
 //	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.biorthogonal_F32(5,borderType);
 //	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletCoiflet.generate_F32(6);
 

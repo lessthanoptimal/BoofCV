@@ -16,6 +16,7 @@
 
 package gecv.alg;
 
+import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.image.ImageBase;
 
 /**
@@ -31,6 +32,14 @@ public class InputSanityCheck {
 	public static <T extends ImageBase> T checkDeclare(T input, T output) {
 		if (output == null) {
 			output = (T) input._createNew(input.width, input.height);
+		} else if (output.width != input.width || output.height != input.height)
+			throw new IllegalArgumentException("Width and/or height of input and output do not match.");
+		return output;
+	}
+
+	public static <T extends ImageBase> T checkDeclare(ImageBase<?> input, T output , Class outputType ) {
+		if (output == null) {
+			output = (T) GeneralizedImageOps.createImage(outputType,input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)
 			throw new IllegalArgumentException("Width and/or height of input and output do not match.");
 		return output;

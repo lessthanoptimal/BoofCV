@@ -62,9 +62,9 @@ public class TestWaveletTransformOps {
 
 		for( int i = length; i < 20; i++ ) {
 
-			ImageBase input = GecvTesting.createImage(typeInput,i,i);
-			ImageBase output = GecvTesting.createImage(typeInput,input.width+(input.width%2),input.height+(input.height%2));
-			ImageBase found = GecvTesting.createImage(typeInput,input.width,input.height);
+			ImageBase input = GeneralizedImageOps.createImage(typeInput,i,i);
+			ImageBase output = GeneralizedImageOps.createImage(typeInput,input.width+(input.width%2),input.height+(input.height%2));
+			ImageBase found = GeneralizedImageOps.createImage(typeInput,input.width,input.height);
 
 			GeneralizedImageOps.randomize(input,rand,0,50);
 
@@ -103,14 +103,14 @@ public class TestWaveletTransformOps {
 		for( int adjust = 0; adjust < 5; adjust++ ) {
 			int w = width+adjust;
 			int h = height+adjust;
-			ImageBase input = GecvTesting.createImage(typeInput,w,h);
-			ImageBase found = GecvTesting.createImage(typeInput,w,h);
+			ImageBase input = GeneralizedImageOps.createImage(typeInput,w,h);
+			ImageBase found = GeneralizedImageOps.createImage(typeInput,w,h);
 
 			GeneralizedImageOps.randomize(input,rand,0,50);
 
 			for( int level = 1; level <= 5; level++ ) {
 				ImageDimension dim = UtilWavelet.transformDimension(w,h,level);
-				ImageBase output = GecvTesting.createImage(typeInput,dim.width,dim.height);
+				ImageBase output = GeneralizedImageOps.createImage(typeInput,dim.width,dim.height);
 //				System.out.println("adjust "+adjust+" level "+level+" scale "+ div);
 
 				invokeTransform("transformN","inverseN",desc, input.clone(), output, found,level);

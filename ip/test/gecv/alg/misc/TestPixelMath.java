@@ -20,7 +20,6 @@ import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageBase;
-import gecv.testing.GecvTesting;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -95,8 +94,8 @@ public class TestPixelMath {
 
 	private void testAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
-		ImageBase output = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.randomize(input, rand, -20,20);
 
 		m.invoke(null,input,output);
@@ -112,7 +111,7 @@ public class TestPixelMath {
 
 	private void testMaxAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		SingleBandImage a = FactorySingleBandImage.wrap(input);
 
@@ -132,8 +131,8 @@ public class TestPixelMath {
 
 	private void testDivide( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
-		ImageBase output = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.randomize(input, rand, 0,20);
 
 		if( input.getTypeInfo().isSigned() ) {
@@ -166,8 +165,8 @@ public class TestPixelMath {
 
 	private void testMultiply( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
-		ImageBase output = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.randomize(input, rand, 0,20);
 
 		if( input.getTypeInfo().isSigned() ) {
@@ -200,8 +199,8 @@ public class TestPixelMath {
 
 	private void testPlus( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
-		ImageBase output = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		if( input.getTypeInfo().isSigned() ) {
 			GeneralizedImageOps.randomize(input, rand, -20,20);
@@ -233,7 +232,7 @@ public class TestPixelMath {
 
 	private void testBound( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase input = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		if( input.getTypeInfo().isSigned() ) {
 			GeneralizedImageOps.randomize(input, rand, -20,20);
@@ -266,9 +265,9 @@ public class TestPixelMath {
 
 	private void testDiffAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase inputA = GecvTesting.createImage(paramTypes[0],width,height);
-		ImageBase inputB = GecvTesting.createImage(paramTypes[0],width,height);
-		ImageBase inputC = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase inputB = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase inputC = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		if( inputA.getTypeInfo().isSigned() ) {
 			GeneralizedImageOps.randomize(inputA, rand, -20,20);
@@ -294,7 +293,7 @@ public class TestPixelMath {
 
 	private void testSum( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class<?> paramTypes[] = m.getParameterTypes();
-		ImageBase inputA = GecvTesting.createImage(paramTypes[0],width,height);
+		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		if( inputA.getTypeInfo().isSigned() ) {
 			GeneralizedImageOps.randomize(inputA, rand, -20,20);

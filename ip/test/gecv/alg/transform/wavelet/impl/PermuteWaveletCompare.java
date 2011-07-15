@@ -73,9 +73,9 @@ public abstract class PermuteWaveletCompare {
 			heightOut = t;
 		}
 
-		ImageBase input = GecvTesting.createImage(inputType,widthIn,heightIn);
-		ImageBase found = GecvTesting.createImage(outputType,widthOut,heightOut);
-		ImageBase expected = GecvTesting.createImage(outputType,widthOut,heightOut);
+		ImageBase input = GeneralizedImageOps.createImage(inputType,widthIn,heightIn);
+		ImageBase found = GeneralizedImageOps.createImage(outputType,widthOut,heightOut);
+		ImageBase expected = GeneralizedImageOps.createImage(outputType,widthOut,heightOut);
 
 		GeneralizedImageOps.randomize(input, rand, 0 , 50);
 

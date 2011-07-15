@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.basic.impl;
+package gecv.alg.filter.binary.impl;
 
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -24,10 +24,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestBinaryBorderOps {
+public class TestBinaryInnerOps {
 	@Test
-	public void compareToNaive() {
-		CompreToBinaryNaiveInner tests = new CompreToBinaryNaiveInner(BinaryBorderOps.class);
+	public void test() {
+		CompreToBinaryNaiveInner tests = new CompreToBinaryNaiveInner(ImplBinaryInnerOps.class);
 		tests.performTests(7);
 	}
 
@@ -42,20 +42,10 @@ public class TestBinaryBorderOps {
 			ImageUInt8 t = (ImageUInt8) targetParam[1];
 			ImageUInt8 v = (ImageUInt8) validationParam[1];
 
-			int y = 0;
-			for (int x = 0; x < t.width; x++) {
-				assertEquals(t.get(x, y), v.get(x, y));
-			}
-			y = t.height - 1;
-			for (int x = 0; x < t.width; x++) {
-				assertEquals(t.get(x, y), v.get(x, y));
-			}
-
-			for (y = 0; y < t.height; y++) {
-				int x = 0;
-				assertEquals(t.get(x, y), v.get(x, y));
-				x = t.width - 1;
-				assertEquals(t.get(x, y), v.get(x, y));
+			for (int y = 1; y < t.height - 1; y++) {
+				for (int x = 1; x < t.width - 1; x++) {
+					assertEquals(t.get(x, y), v.get(x, y));
+				}
 			}
 		}
 	}
