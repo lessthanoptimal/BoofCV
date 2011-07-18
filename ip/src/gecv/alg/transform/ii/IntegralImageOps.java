@@ -16,9 +16,31 @@
 
 package gecv.alg.transform.ii;
 
+import gecv.alg.InputSanityCheck;
+import gecv.alg.transform.ii.impl.ImplIntegralImageOps;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt32;
+import gecv.struct.image.ImageUInt8;
+
 
 /**
  * @author Peter Abeles
  */
 public class IntegralImageOps {
+
+	public ImageFloat32 transform( ImageFloat32 input , ImageFloat32 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input,transformed);
+
+		ImplIntegralImageOps.process(input,transformed);
+
+		return transformed;
+	}
+
+	public ImageSInt32 transform( ImageUInt8 input , ImageSInt32 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input,transformed,ImageSInt32.class);
+
+		ImplIntegralImageOps.process(input,transformed);
+
+		return transformed;
+	}
 }

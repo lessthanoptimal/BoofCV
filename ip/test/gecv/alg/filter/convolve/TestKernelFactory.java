@@ -269,6 +269,17 @@ public class TestKernelFactory {
 	}
 
 	@Test
+	public void gaussianDerivative1D_I32() 
+	{
+		Kernel1D_I32 deriv = KernelFactory.gaussianDerivative1D_I32(1.0, 2);
+
+		// the derivative should be symmetric
+		assertEquals(deriv.data[4], -deriv.data[0], 1e-5);
+		assertEquals(deriv.data[3], -deriv.data[1], 1e-5);
+		assertEquals(0f, deriv.data[2], 1e-5);
+	}
+
+	@Test
 	public void normalizeSumToOne() {
 		Kernel1D_F32 kernel = new Kernel1D_F32(3);
 		for (int i = 0; i < 3; i++)

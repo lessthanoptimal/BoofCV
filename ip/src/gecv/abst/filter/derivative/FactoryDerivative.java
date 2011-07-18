@@ -66,8 +66,13 @@ public class FactoryDerivative {
 		return new ImageHessian_Reflection<D>(m,true);
 	}
 
+	public static <I extends ImageBase, D extends ImageBase>
+	ImageGradient<I,D> gaussian( int radius , Class<I> inputType , Class<D> derivType) {
+		return new ImageGradient_Gaussian<I,D>(radius,inputType,derivType);
+	}
+
 	public static ImageGradient<ImageFloat32,ImageFloat32> gaussian_F32( int radius ) {
-		return new ImageGradient_Gaussian_F32(radius);
+		return gaussian(radius, ImageFloat32.class,ImageFloat32.class);
 	}
 
 	public static ImageGradient<ImageFloat32,ImageFloat32> sobel_F32() {
@@ -84,6 +89,10 @@ public class FactoryDerivative {
 
 	public static ImageHessianDirect<ImageFloat32,ImageFloat32> hessianDirectSobel_F32() {
 		return hessianDirectSobel(ImageFloat32.class,ImageFloat32.class);
+	}
+
+	public static ImageGradient<ImageUInt8, ImageSInt16> gaussian_I8( int radius ) {
+		return gaussian(radius,ImageUInt8.class,ImageSInt16.class);
 	}
 
 	public static ImageGradient<ImageUInt8, ImageSInt16> sobel_I8() {
