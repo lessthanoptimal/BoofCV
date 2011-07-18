@@ -21,8 +21,6 @@ import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
@@ -101,10 +99,9 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs8_Naive(ImageUInt8 input, ImageSInt32 found,
 											ImageSInt32 expected)
 	{
-		int coexist[][] = new int[10][10];
-		randomizeCoexist(coexist,rand);
+		int maxConnect[] = new int[10];
 
-		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,coexist);
+		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,maxConnect);
 		assertEquals(5,numFount);
 
 		GecvTesting.assertEquals(expected,found,0);
@@ -113,10 +110,9 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs8(ImageUInt8 input, ImageSInt32 found,
 									  ImageSInt32 expected)
 	{
-		int coexist[][] = new int[10][10];
-		randomizeCoexist(coexist,rand);
+		int maxConnect[] = new int[10];
 
-		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,coexist);
+		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,maxConnect);
 		assertEquals(5,numFount);
 
 		GecvTesting.assertEquals(expected,found,0);
@@ -137,8 +133,7 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs4_Naive(ImageUInt8 input, ImageSInt32 found,
 											ImageSInt32 expected)
 	{
-		int coexist[][] = new int[10][10];
-		randomizeCoexist(coexist,rand);
+		int coexist[] = new int[10];
 
 		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input,found,coexist);
 		assertEquals(7,numFount);
@@ -149,8 +144,7 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs4(ImageUInt8 input, ImageSInt32 found,
 									  ImageSInt32 expected)
 	{
-		int coexist[][] = new int[10][10];
-		randomizeCoexist(coexist,rand);
+		int coexist[] = new int[10];
 
 		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input,found,coexist);
 		assertEquals(7,numFount);
@@ -176,60 +170,33 @@ public class TestImplBinaryBlobLabeling {
 	}
 
 	@Test
-	public void optimizeCoexistTable() {
-		ImageUInt8 input = new ImageUInt8(13,8);
-		input.data = TEST1;
-		ImageSInt32 found = new ImageSInt32(13,8);
+	public void optimizeMaxConnect() {
+		int maxConnect[] = new int[]{0,2,3,5,4,5,6};
 
-		int coexist[][] = new int[10][10];
-		randomizeCoexist(coexist,rand);
-		int numBlobs = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,coexist);
-//		BasicImageIO.print(found);
-		ImplBinaryBlobLabeling.optimizeCoexistTable(coexist,numBlobs);
+		ImplBinaryBlobLabeling.optimizeMaxConnect(maxConnect,6);
 
-		// there should be only one cluster in this test image for 8-connect
-		List<Integer> ids = new ArrayList<Integer>();
-
-		for( int y = 1; y < numBlobs; y++ ) {
-			for( int x = 1; x < numBlobs; x++ ) {
-				int val = coexist[y][x];
-				if( !ids.contains(val) )
-					ids.add(val);
-			}
-		}
-
-		// zero would be included, so subtract one
-		assertEquals(1,ids.size()-1);
+		assertEquals(0,maxConnect[0]);
+		assertEquals(5,maxConnect[1]);
+		assertEquals(5,maxConnect[2]);
+		assertEquals(5,maxConnect[3]);
+		assertEquals(4,maxConnect[4]);
+		assertEquals(5,maxConnect[5]);
+		assertEquals(6,maxConnect[6]);
 	}
 
 	@Test
 	public void minimizeBlobID() {
 
-		int coexist[][] = new int[5][5];
+		int maxConnect[] = new int[]{0,5,5,5,4,5,6};
 
-		coexist[1][1] = 2;
-		coexist[2][2] = 2;
-		coexist[3][3] = 2;
-		coexist[4][4] = 5;
+		ImplBinaryBlobLabeling.minimizeBlobID(maxConnect,6);
 
-		int table[] = new int[5];
-
-		int newTotal = ImplBinaryBlobLabeling.minimizeBlobID(coexist,4,table);
-
-		assertEquals(2,newTotal);
-		assertEquals(0,table[0]);
-		assertEquals(1,table[1]);
-		assertEquals(1,table[2]);
-		assertEquals(1,table[3]);
-		assertEquals(2,table[4]);
-	}
-
-	public static void randomizeCoexist( int coexist[][] , Random rand ) {
-		int N = coexist.length;
-		for( int i = 0; i < N; i++ ) {
-			for( int j = 0; j < N; j++ ) {
-				coexist[i][j] = rand.nextInt(N);
-			}
+		int max = 0;
+		for( int v : maxConnect ) {
+			max = Math.max(max,v);
 		}
+
+		assertEquals(max,3);
 	}
+
 }

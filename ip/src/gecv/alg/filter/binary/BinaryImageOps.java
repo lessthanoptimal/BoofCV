@@ -200,19 +200,18 @@ public class BinaryImageOps {
 	 *
 	 * @param input Binary input image.
 	 * @param output The labeled blob image. Modified.
-	 * @param coexist An N by N integer[][] array.  N should be several times larger than the expected number
-	 * of blobs.  Worst case it will need to be input.width*input.height/4.
+	 * @param work Used to store intermediate labeling results.  In general it is at most 3 or 4 times larger than the
+	 * expected max number of blobs.  Worst case it will be (width*height)/4
 	 * @return How many blobs were found.
 	 */
-	public static int labelBlobs8( ImageUInt8 input , ImageSInt32 output , int coexist[][] )
+	public static int labelBlobs8( ImageUInt8 input , ImageSInt32 output , int work[] )
 	{
 		InputSanityCheck.checkSameShape(input,output);
 
-		int numBlobs = ImplBinaryBlobLabeling.quickLabelBlobs8(input,output,coexist);
-		ImplBinaryBlobLabeling.optimizeCoexistTable(coexist,numBlobs);
-		int table[] = new int[ numBlobs+1 ];
-		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(coexist,numBlobs,table);
-		ImplBinaryBlobLabeling.relabelBlobs(output,table);
+		int numBlobs = ImplBinaryBlobLabeling.quickLabelBlobs8(input,output,work);
+		ImplBinaryBlobLabeling.optimizeMaxConnect(work,numBlobs);
+		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(work,numBlobs);
+		ImplBinaryBlobLabeling.relabelBlobs(output,work);
 
 		return newNumBlobs;
 	}
@@ -231,19 +230,18 @@ public class BinaryImageOps {
 	 *
 	 * @param input Binary input image.
 	 * @param output The labeled blob image. Modified.
-	 * @param coexist An N by N integer[][] array.  N should be several times larger than the expected number
-	 * of blobs.  Worst case it will need to be input.width*input.height/4.
+	 * @param work Used to store intermediate labeling results.  In general it is at most 3 or 4 times larger than the
+	 * expected max number of blobs.  Worst case it will be (width*height)/2
 	 * @return How many blobs were found.
 	 */
-	public static int labelBlobs4( ImageUInt8 input , ImageSInt32 output , int coexist[][] )
+	public static int labelBlobs4( ImageUInt8 input , ImageSInt32 output , int work[] )
 	{
 		InputSanityCheck.checkSameShape(input,output);
 
-		int numBlobs = ImplBinaryBlobLabeling.quickLabelBlobs4(input,output,coexist);
-		ImplBinaryBlobLabeling.optimizeCoexistTable(coexist,numBlobs);
-		int table[] = new int[ numBlobs+1 ];
-		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(coexist,numBlobs,table);
-		ImplBinaryBlobLabeling.relabelBlobs(output,table);
+		int numBlobs = ImplBinaryBlobLabeling.quickLabelBlobs4(input,output,work);
+		ImplBinaryBlobLabeling.optimizeMaxConnect(work,numBlobs);
+		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(work,numBlobs);
+		ImplBinaryBlobLabeling.relabelBlobs(output,work);
 
 		return newNumBlobs;
 	}
@@ -292,11 +290,11 @@ public class BinaryImageOps {
 	 *
 	 * @param labelImage Input image. Not modified.
 	 * @param binaryImage Output image. Modified.
-	 * @param selectedBlobs List of blobs that should be copied to the binary image.
+	 * @param selectedBlobs Each index corresponds to a blob and specifies if it is included or not.
 	 * @return The binary image.
 	 */
 	public static ImageUInt8 labelToBinary( ImageSInt32 labelImage , ImageUInt8 binaryImage ,
-											int selectedBlobs[] )
+											boolean selectedBlobs[] )
 	{
 		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, ImageUInt8.class);
 
@@ -312,15 +310,7 @@ public class BinaryImageOps {
 				if( 0 == val ) {
 					binaryImage.data[indexOut] = 0;
 				} else {
-					boolean found = false;
-					for( int i = 0; i < selectedBlobs.length; i++ ) {
-						if( val == selectedBlobs[i] ) {
-							found = true;
-							break;
-						}
-					}
-
-					if( found ) {
+					if( selectedBlobs[val] ) {
 						binaryImage.data[indexOut] = 1;
 					} else {
 						binaryImage.data[indexOut] = 0;
