@@ -16,28 +16,36 @@
 
 package gecv.gui.image;
 
+import gecv.struct.image.ImageUInt8;
+import sun.awt.image.ByteInterleavedRaster;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 
 /**
- * Simple JPanel for displaying buffered images.
+ * Used for displaying binary images.
  *
  * @author Peter Abeles
  */
-public class ImagePanel extends JPanel {
+public class ImageBinaryPanel extends JPanel {
+
 	// the image being displayed
 	protected BufferedImage img;
+	protected ImageUInt8 binaryImage;
 
-	public ImagePanel(BufferedImage img) {
-		this.img = img;
-		setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
+	public ImageBinaryPanel( ImageUInt8 binaryImage ) {
+		this.binaryImage = binaryImage;
+		img = new BufferedImage(binaryImage.getWidth(),binaryImage.getHeight(),BufferedImage.TYPE_BYTE_GRAY);
+		renderImage();
+
+		setPreferredSize(new Dimension(binaryImage.getWidth(), binaryImage.getHeight()));
 		setMinimumSize(getPreferredSize());
 		setMaximumSize(getPreferredSize());
 	}
 
-	protected ImagePanel() {
+	protected ImageBinaryPanel() {
 	}
 
 	@Override
@@ -47,13 +55,26 @@ public class ImagePanel extends JPanel {
 			g.drawImage(img, 0, 0, this);
 	}
 
-	/**
-	 * Change the image being displayed.
-	 *
-	 * @param image The new image which will be displayed.
-	 */
-	public void setBufferedImage(BufferedImage image) {
-		this.img = image;
+	public void renderImage() {
+		ByteInterleavedRaster raster = (ByteInterleavedRaster)img.getRaster();
+
+		int rasterIndex = 0;
+		byte data[] = raster.getDataStorage();
+
+		int w = binaryImage.getWidth();
+		int h = binaryImage.getHeight();
+
+
+		for( int y = 0; y < h; y++ ) {
+			int indexSrc = binaryImage.startIndex + y*binaryImage.stride;
+			for( int x = 0; x < w; x++ ) {
+				 data[rasterIndex++] = binaryImage.data[indexSrc++] > 0 ? (byte)255 : (byte)0;
+			}
+		}
+	}
+
+	public void setBinaryImage(ImageUInt8 binaryImage) {
+		this.binaryImage = binaryImage;
 	}
 
 	public BufferedImage getImage() {

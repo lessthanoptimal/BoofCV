@@ -236,7 +236,7 @@ public class KernelFactory {
 	 * @param radius The kernel's radius.
 	 */
 	public static Kernel1D_I32 gaussian1D_I32(int radius) {
-		return gaussian1D_I32((radius * 2 + 1) / 5.0, radius);
+		return gaussian1D_I32(sigmaForRadius(radius), radius);
 	}
 
 	/**
@@ -393,8 +393,8 @@ public class KernelFactory {
 	/**
 	 * Computes the derivative of a Gaussian kernel.
 	 *
-	 * @param sigma	 Distributions standard deviation.
-	 * @param radius	Kernel's radius.
+	 * @param sigma Distributions standard deviation.
+	 * @param radius Kernel's radius.
 	 * @param normalize The magnitude of the largest element will be set to one.
 	 * @return The derivative of the gaussian
 	 */
@@ -423,6 +423,28 @@ public class KernelFactory {
 	}
 
 	/**
+	 * Computes the derivative of a Gaussian kernel.
+	 *
+	 * @param sigma Distributions standard deviation.
+	 * @param radius Kernel's radius.
+	 * @return The derivative of the gaussian
+	 */
+	public static Kernel1D_I32 gaussianDerivative1D_I32(double sigma, int radius ) 
+	{
+		Kernel1D_I32 ret = new Kernel1D_I32(radius * 2 + 1);
+		int[] gaussian = ret.data;
+
+		double div = Math.abs(UtilGaussian.derivativePDF(0, sigma, -radius));
+
+		int index = 0;
+		for (int i = -radius; i <= radius; i++) {
+			gaussian[index++] = (int) (UtilGaussian.derivativePDF(0, sigma, i)/div);
+		}
+
+		return ret;
+	}
+
+	/**
 	 * Normalizes the array such that it sums up to one.
 	 *
 	 * @param kernel The kernel being normalized.
@@ -433,5 +455,9 @@ public class KernelFactory {
 		float total = 0;
 		for (int i = 0; i < data.length; i++) total += data[i];
 		for (int i = 0; i < data.length; i++) data[i] /= total;
+	}
+
+	public static double sigmaForRadius( int radius ) {
+		return (radius * 2 + 1) / 5.0;
 	}
 }
