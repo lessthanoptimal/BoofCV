@@ -44,19 +44,10 @@ import gecv.struct.image.ImageUInt8;
  */
 public class ImplBinaryBlobLabeling {
 
-	public static void printCoexist( int [][]coexist , int numBlobs ) {
-		for( int i = 1; i <= numBlobs; i++ ) {
-			for( int j = 1; j <= numBlobs; j++ ) {
-				System.out.printf("%3d ",coexist[i][j]);
-			}
-			System.out.println();
-		}
-	}
-
 	/**
 	 * Simple but slower algorithm for quickLabel using an 8-connect rule.
 	 */
-	public static int quickLabelBlobs8_Naive( ImageUInt8 input , ImageSInt32 _output , int coexist[][] ) {
+	public static int quickLabelBlobs8_Naive( ImageUInt8 input , ImageSInt32 _output , int maxConnect[] ) {
 		ImageBorder_I32 output = FactoryImageBorder.value(_output,0);
 
 		int numBlobs = 0;
@@ -66,14 +57,14 @@ public class ImplBinaryBlobLabeling {
 				if( input.get(x,y) == 0 )
 					continue;
 
-				numBlobs = spotQuickLabel8(output, numBlobs, coexist, y, x);
+				numBlobs = spotQuickLabel8(output, numBlobs, maxConnect, y, x);
 			}
 		}
 
 		return numBlobs;
 	}
 
-	private static int spotQuickLabel8(ImageBorder_I32 output, int numBlobs, int[][] coexist, int y, int x) {
+	private static int spotQuickLabel8(ImageBorder_I32 output, int numBlobs, int[] maxConnect, int y, int x) {
 		final int p5 = output.get(x-1,y);
 		final int p4 = output.get(x-1,y-1);
 		final int p3 = output.get(x  ,y-1);
@@ -82,18 +73,19 @@ public class ImplBinaryBlobLabeling {
 		// see if anything around it has been labeled already
 		if( 0 == p2+p3+p4+p5 ) {
 			numBlobs++;
+			maxConnect[numBlobs] = numBlobs;
 			output.set(x,y,numBlobs);
-			zeroCoexist(coexist,numBlobs);
 		} else {
-			int val = Math.max(p2,p3);
-			val = Math.max(val,p4);
-			val = Math.max(val,p5);
+			int val = Math.max(maxConnect[p2],maxConnect[p3]);
+			val = Math.max(val,maxConnect[p4]);
+			val = Math.max(val,maxConnect[p5]);
 			output.set(x,y,val);
 
-			coexist[val][p2] = val;
-			coexist[val][p3] = val;
-			coexist[val][p4] = val;
-			coexist[val][p5] = val;
+			maxConnect[p2] = val;
+			maxConnect[p3] = val;
+			maxConnect[p4] = val;
+			maxConnect[p5] = val;
+			maxConnect[0] = 0;
 		}
 		return numBlobs;
 	}
@@ -101,7 +93,7 @@ public class ImplBinaryBlobLabeling {
 	/**
 	 * Simple but slower algorithm for quickLabel using an 8-connect rule.
 	 */
-	public static int quickLabelBlobs4_Naive( ImageUInt8 input , ImageSInt32 _output , int coexist[][] ) {
+	public static int quickLabelBlobs4_Naive( ImageUInt8 input , ImageSInt32 _output , int maxConnect[] ) {
 		ImageBorder_I32 output = FactoryImageBorder.value(_output,0);
 
 		int numBlobs = 0;
@@ -111,28 +103,29 @@ public class ImplBinaryBlobLabeling {
 				if( input.get(x,y) == 0 )
 					continue;
 
-				numBlobs = spotQuickLabel4(output, numBlobs, coexist, y, x);
+				numBlobs = spotQuickLabel4(output, numBlobs, maxConnect, y, x);
 			}
 		}
 
 		return numBlobs;
 	}
 
-	private static int spotQuickLabel4(ImageBorder_I32 output, int numBlobs, int[][] coexist, int y, int x) {
+	private static int spotQuickLabel4(ImageBorder_I32 output, int numBlobs, int maxConnect[], int y, int x) {
 		final int p5 = output.get(x-1,y);
 		final int p3 = output.get(x  ,y-1);
 
 		// see if anything around it has been labeled already
 		if( 0 == p3+p5) {
 			numBlobs++;
+			maxConnect[numBlobs] = numBlobs;
 			output.set(x,y,numBlobs);
-			zeroCoexist(coexist,numBlobs);
 		} else {
 			int val = Math.max(p3,p5);
 			output.set(x,y,val);
 
-			coexist[val][p3] = val;
-			coexist[val][p5] = val;
+			maxConnect[p3] = val;
+			maxConnect[p5] = val;
+			maxConnect[0] = 0;
 		}
 		return numBlobs;
 	}
@@ -140,7 +133,7 @@ public class ImplBinaryBlobLabeling {
 	/**
 	 * Faster algorithm for quickLabel using an 8-connect rule.
 	 */
-	public static int quickLabelBlobs8( ImageUInt8 input , ImageSInt32 output , int coexist[][] ) {
+	public static int quickLabelBlobs8( ImageUInt8 input , ImageSInt32 output , int maxConnect[] ) {
 
 		int numBlobs = 0;
 
@@ -151,14 +144,14 @@ public class ImplBinaryBlobLabeling {
 			if( input.get(x,0) == 0 )
 				continue;
 
-			numBlobs = spotQuickLabel8(outputSafe, numBlobs, coexist, 0, x);
+			numBlobs = spotQuickLabel8(outputSafe, numBlobs, maxConnect, 0, x);
 		}
 
 		for( int y = 1; y < input.height; y++ ) {
 
 			// label the left border
 			if( input.get(0,y) != 0 )
-				numBlobs = spotQuickLabel8(outputSafe, numBlobs, coexist, y, 0);
+				numBlobs = spotQuickLabel8(outputSafe, numBlobs, maxConnect, y, 0);
 
 			// label the inner portion of the row
 			int indexIn = input.startIndex + y*input.stride;
@@ -178,24 +171,25 @@ public class ImplBinaryBlobLabeling {
 				// see if anything around it has been labeled
 				if( 0 == p2+p3+p4+p5) {
 					numBlobs++;
+					maxConnect[numBlobs] = numBlobs;
 					output.data[indexOut] = numBlobs;
-					zeroCoexist(coexist,numBlobs);
 				} else {
-					int val = Math.max(p2,p3);
-					val = Math.max(val,p4);
-					val = Math.max(val,p5);
+					int val = Math.max(maxConnect[p2],maxConnect[p3]);
+					val = Math.max(val,maxConnect[p4]);
+					val = Math.max(val,maxConnect[p5]);
 					output.data[indexOut] = val;
 
-					coexist[val][p2] = val;
-					coexist[val][p3] = val;
-					coexist[val][p4] = val;
-					coexist[val][p5] = val;
+					maxConnect[p2] = val;
+					maxConnect[p3] = val;
+					maxConnect[p4] = val;
+					maxConnect[p5] = val;
+					maxConnect[0] = 0;
 				}
 			}
 
 			// label the right border
 			if( input.get(input.width - 1,y) != 0 )
-				numBlobs = spotQuickLabel8(outputSafe, numBlobs, coexist, y, input.width - 1);
+				numBlobs = spotQuickLabel8(outputSafe, numBlobs, maxConnect, y, input.width - 1);
 		}
 
 		return numBlobs;
@@ -214,7 +208,7 @@ public class ImplBinaryBlobLabeling {
 	/**
 	 * Faster algorithm for quickLabel using an 4-connect rule.
 	 */
-	public static int quickLabelBlobs4( ImageUInt8 input , ImageSInt32 output , int coexist[][] )
+	public static int quickLabelBlobs4( ImageUInt8 input , ImageSInt32 output , int maxConnect[] )
 	{
 		int numBlobs = 0;
 
@@ -225,14 +219,14 @@ public class ImplBinaryBlobLabeling {
 			if( input.get(x,0) == 0 )
 				continue;
 
-			numBlobs = spotQuickLabel4(outputSafe, numBlobs, coexist, 0, x);
+			numBlobs = spotQuickLabel4(outputSafe, numBlobs, maxConnect, 0, x);
 		}
 
 		for( int y = 1; y < input.height; y++ ) {
 
 			// label the left border
 			if( input.get(0,y) != 0 )
-				numBlobs = spotQuickLabel4(outputSafe, numBlobs, coexist, y, 0);
+				numBlobs = spotQuickLabel4(outputSafe, numBlobs, maxConnect, y, 0);
 
 			int indexIn = input.startIndex + y*input.stride;
 			int indexOut = output.startIndex + y*output.stride + 1;
@@ -249,14 +243,15 @@ public class ImplBinaryBlobLabeling {
 				// see if anything around it has been labeled
 				if( 0 == p3+p5) {
 					numBlobs++;
+					maxConnect[numBlobs] = numBlobs;
 					output.data[indexOut] = numBlobs;
-					zeroCoexist(coexist,numBlobs);
 				} else {
-					int val = Math.max(p3,p5);
+					int val = Math.max(maxConnect[p3],maxConnect[p5]);
 					output.data[indexOut] = val;
 
-					coexist[val][p3] = val;
-					coexist[val][p5] = val;
+					maxConnect[p3] = val;
+					maxConnect[p5] = val;
+					maxConnect[0] = 0;
 				}
 			}
 		}
@@ -282,96 +277,57 @@ public class ImplBinaryBlobLabeling {
 		}
 	}
 
-	/**
-	 * Modifies the coexist table to reduce the number of labels per blob down to one.
-	 */
-	public static void optimizeCoexistTable( final int coexist[][] , final int numBlobs )
+	public static void optimizeMaxConnect( final int maxConnect[] , int numBlobs )
 	{
-		// add diagonals to make computation more efficient
-		for( int i = 0; i <= numBlobs; i++ ) {
-			coexist[i][i] = i;
-			// make it symmetric
-			for( int j = i+1; j <= numBlobs; j++ ) {
-				coexist[i][j] = coexist[j][i];
+		boolean change = true;
+		while( change ) {
+			change = false;
+			for( int i = 1; i < numBlobs; i++ ) {
+				int index = maxConnect[i];
+				int max = maxConnect[index];
+//				boolean localChange = false;
+				while( max != index ) {
+					index = max;
+					max = maxConnect[index];
+					change = true;
+				}
+				maxConnect[i] = max;
+//				if( localChange ) {
+//					// save time by setting all in path to max value, avoiding multiple searches
+//					change = true;
+//					maxConnect[i] = max;
+//					index = maxConnect[i];
+//					while( index != max ) {
+//						int indexNext = maxConnect[index];
+//						maxConnect[index] = max;
+//						index = indexNext;
+//					}
+//
+//				}
 			}
 		}
-
-		// minimize the rows, can make assumptions about the ordering here
-		for( int i = 1; i <= numBlobs; i++ ) {
-			int max = -1;
-			int[] row = coexist[i];
-			for( int j = numBlobs; j >= 1; j-- ) {
-				int val = row[j];
-				if( val == 0 ) continue;
-				if( val > max ) {
-					max = val;
-				} else {
-					row[j] = max;
-				}
-			}
-		}
-
-		boolean changed = true;
-		while( changed ) {
-			changed = false;
-
-			// minimize the columns
-			for( int j = 1; j <= numBlobs; j++ ) {
-				int max = -1;
-				for( int i = numBlobs; i >= 1; i-- ) {
-					int val = coexist[i][j];
-					if( val != 0 && val > max ) {
-						max = val;
-					}
-				}
-
-				for( int i = numBlobs; i >= 1; i-- ) {
-					int val = coexist[i][j];
-					if( val != 0 ) {
-						changed |= val != max;
-						coexist[i][j] = max;
-					}
-				}
-
-			}
-
-			// minimize the rows
-			for( int i = 1; i <= numBlobs; i++ ) {
-				int max = -1;
-				int[] row = coexist[i];
-				for( int j = numBlobs; j >= 1; j-- ) {
-					int val = row[j];
-					if( val != 0 && val > max ) {
-						max = val;
-					}
-				}
-				for( int j = numBlobs; j >= 1; j-- ) {
-					int val = row[j];
-					if(  val != 0 ) {
-						changed |= val != max;
-						row[j] = max;
-					}
-				}
-			}
-		}
+		maxConnect[0] = 0;
 	}
 
 	/**
 	 * Makes sure the lowest blob ID numbers are being used.
 	 */
-	public static int minimizeBlobID( final int coexist[][] , final int numBlobs ,
-									  final int convert[] )
+	public static int minimizeBlobID( final int maxConnect[] , final int numBlobs )
 	{
 		int numFound = 0;
-		int lastValueFound = 0;
 
 		for( int i = 1; i <= numBlobs; i++ ) {
-			int val = coexist[i][i];
-			if( val != lastValueFound ) {
+			int val = maxConnect[i];
+			if( val == i ) {
 				numFound++;
-				lastValueFound = val;
+				maxConnect[i] = numFound;
 			}
-			convert[i] = numFound;
+		}
+
+		for( int i = 1; i <= numBlobs; i++ ) {
+			int val = maxConnect[i];
+			if( val >= i )
+				maxConnect[i] = maxConnect[val];
 		}
 
 		return numFound;

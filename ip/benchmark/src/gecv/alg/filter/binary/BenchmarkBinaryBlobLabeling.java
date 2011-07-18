@@ -37,48 +37,48 @@ public class BenchmarkBinaryBlobLabeling {
 
 	static ImageUInt8 input;
 	static ImageSInt32 output;
-	static int coexist[][] = new int[2000][2000];
+	static int work[] = new int[2000];
 
 
 	public static class Normal8 extends PerformerBase {
 		@Override
 		public void process() {
-			ImplBinaryBlobLabeling.quickLabelBlobs8(input, output,coexist);
+			ImplBinaryBlobLabeling.quickLabelBlobs8(input, output,work);
 		}
 	}
 
 	public static class Normal4 extends PerformerBase {
 		@Override
 		public void process() {
-			ImplBinaryBlobLabeling.quickLabelBlobs4(input, output,coexist);
+			ImplBinaryBlobLabeling.quickLabelBlobs4(input, output,work);
 		}
 	}
 
 	public static class Naive8 extends PerformerBase {
 		@Override
 		public void process() {
-			ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input, output,coexist);
+			ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input, output,work);
 		}
 	}
 
 	public static class Naive4 extends PerformerBase {
 		@Override
 		public void process() {
-			ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input, output,coexist);
+			ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input, output,work);
 		}
 	}
 
 	public static class Full8 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryImageOps.labelBlobs8(input, output,coexist);
+			BinaryImageOps.labelBlobs8(input, output,work);
 		}
 	}
 
 	public static class Full4 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryImageOps.labelBlobs4(input, output,coexist);
+			BinaryImageOps.labelBlobs4(input, output,work);
 		}
 	}
 
