@@ -18,7 +18,8 @@ package gecv.alg.filter.derivative;
 
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
-import gecv.core.image.border.FactoryImageBorder;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -32,9 +33,10 @@ import gecv.struct.image.ImageUInt8;
 public class DerivativeHelperFunctions {
 
 	public static void processBorderHorizontal( ImageUInt8 orig , ImageSInt16 deriv ,
-												Kernel1D_I32 kernel , int border )
+												Kernel1D_I32 kernel , int border , ImageBorder_I32 borderType )
 	{
-		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(orig),deriv,border);
+		borderType.setImage(orig);
+		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv,border);
 
 		ImageUInt8 origSub;
 		ImageSInt16 derivSub;
@@ -48,9 +50,10 @@ public class DerivativeHelperFunctions {
 	}
 
 	public static void processBorderHorizontal( ImageSInt16 orig , ImageSInt16 deriv ,
-												Kernel1D_I32 kernel , int border )
+												Kernel1D_I32 kernel , int border , ImageBorder_I32 borderType )
 	{
-		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(orig),deriv,border);
+		borderType.setImage(orig);
+		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv,border);
 
 		ImageSInt16 origSub;
 		ImageSInt16 derivSub;
@@ -64,9 +67,10 @@ public class DerivativeHelperFunctions {
 	}
 
 	public static void processBorderVertical( ImageUInt8 orig , ImageSInt16 deriv ,
-											  Kernel1D_I32 kernel , int border )
+											  Kernel1D_I32 kernel , int border , ImageBorder_I32 borderType)
 	{
-		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(orig),deriv,border);
+		borderType.setImage(orig);
+		ConvolveJustBorder_General.vertical(kernel,borderType,deriv,border);
 
 		ImageUInt8 origSub;
 		ImageSInt16 derivSub;
@@ -80,9 +84,10 @@ public class DerivativeHelperFunctions {
 	}
 
 	public static void processBorderVertical( ImageSInt16 orig , ImageSInt16 deriv ,
-											  Kernel1D_I32 kernel , int border )
+											  Kernel1D_I32 kernel , int border , ImageBorder_I32 borderType)
 	{
-		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(orig),deriv,border);
+		borderType.setImage(orig);
+		ConvolveJustBorder_General.vertical(kernel, borderType ,deriv,border);
 
 		ImageSInt16 origSub;
 		ImageSInt16 derivSub;
@@ -96,9 +101,10 @@ public class DerivativeHelperFunctions {
 	}
 
 	public static void processBorderHorizontal( ImageFloat32 orig , ImageFloat32 deriv ,
-												Kernel1D_F32 kernel , int border )
+												Kernel1D_F32 kernel , int border , ImageBorder_F32 borderType )
 	{
-		ConvolveJustBorder_General.horizontal(kernel, FactoryImageBorder.extend(orig),deriv,border);
+		borderType.setImage(orig);
+		ConvolveJustBorder_General.horizontal(kernel, borderType , deriv , border);
 
 		ImageFloat32 origSub;
 		ImageFloat32 derivSub;
@@ -112,9 +118,10 @@ public class DerivativeHelperFunctions {
 	}
 
 	public static void processBorderVertical( ImageFloat32 orig , ImageFloat32 deriv ,
-											  Kernel1D_F32 kernel , int border )
+											  Kernel1D_F32 kernel , int border , ImageBorder_F32 borderType)
 	{
-		ConvolveJustBorder_General.vertical(kernel, FactoryImageBorder.extend(orig),deriv,border);
+		borderType.setImage(orig);
+		ConvolveJustBorder_General.vertical(kernel, borderType ,deriv,border);
 
 		ImageFloat32 origSub;
 		ImageFloat32 derivSub;

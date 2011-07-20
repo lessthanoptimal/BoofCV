@@ -18,10 +18,7 @@ package gecv.alg.filter.derivative;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.filter.derivative.impl.*;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.alg.filter.derivative.impl.HessianThree_Standard;
 
 /**
  * Benchmarks related to computing image derivatives
@@ -34,7 +31,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientSobel.process(imgInt8,derivX_I16,derivY_I16,border);
+			GradientSobel.process(imgInt8,derivX_I16,derivY_I16,borderI32);
 		}
 	}
 
@@ -42,7 +39,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientSobel.process(imgFloat32,derivX_F32,derivY_F32,border);
+			GradientSobel.process(imgFloat32,derivX_F32,derivY_F32,borderF32);
 		}
 	}
 
@@ -50,7 +47,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientThree.process(imgFloat32,derivX_F32,derivY_F32,border);
+			GradientThree.process(imgFloat32,derivX_F32,derivY_F32,borderF32);
 		}
 	}
 
@@ -58,7 +55,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientThree.process(imgInt8,derivX_I16,derivY_I16,border);
+			GradientThree.process(imgInt8,derivX_I16,derivY_I16,borderI32);
 		}
 	}
 
@@ -74,7 +71,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			HessianThree.process(imgInt8,derivX_I16,derivY_I16,derivXY_I16,border);
+			HessianThree.process(imgInt8,derivX_I16,derivY_I16,derivXY_I16,borderI32);
 		}
 	}
 
@@ -90,7 +87,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			HessianThree.process(imgFloat32,derivX_F32,derivY_F32,derivXY_F32,border);
+			HessianThree.process(imgFloat32,derivX_F32,derivY_F32,derivXY_F32,borderF32);
 		}
 	}
 
@@ -98,7 +95,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			HessianSobel.process(imgInt8,derivX_I16,derivY_I16,derivXY_I16,border);
+			HessianSobel.process(imgInt8,derivX_I16,derivY_I16,derivXY_I16,borderI32);
 		}
 	}
 
@@ -106,7 +103,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			HessianSobel.process(imgFloat32,derivX_F32,derivY_F32,derivXY_F32,border);
+			HessianSobel.process(imgFloat32,derivX_F32,derivY_F32,derivXY_F32,borderF32);
 		}
 	}
 
@@ -130,7 +127,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientPrewitt.process(imgInt8,derivX_I16,derivY_I16,border);
+			GradientPrewitt.process(imgInt8,derivX_I16,derivY_I16,borderI32);
 		}
 	}
 
@@ -138,7 +135,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientPrewitt.process(imgFloat32,derivX_F32,derivY_F32,border);
+			GradientPrewitt.process(imgFloat32,derivX_F32,derivY_F32,borderF32);
 		}
 	}
 

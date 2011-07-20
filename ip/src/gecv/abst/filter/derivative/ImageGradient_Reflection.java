@@ -16,6 +16,10 @@
 
 package gecv.abst.filter.derivative;
 
+import gecv.core.image.border.BorderType;
+import gecv.core.image.border.FactoryImageBorder;
+import gecv.core.image.border.ImageBorder;
+import gecv.struct.GecvDefaults;
 import gecv.struct.image.ImageBase;
 
 import java.lang.reflect.InvocationTargetException;
@@ -30,20 +34,22 @@ import java.lang.reflect.Method;
 public class ImageGradient_Reflection<Input extends ImageBase, Output extends ImageBase>
 		implements ImageGradient<Input, Output>
 {
-	// if the image border should be processed or not
-	private boolean processBorder;
+	// How the image border should be handled
+	BorderType borderType = GecvDefaults.DERIV_BORDER_TYPE;
+	ImageBorder<Input> border;
+
 	// the image derivative function
 	private Method m;
 
-	public ImageGradient_Reflection(Method m , boolean processBorder) {
+	public ImageGradient_Reflection( Method m ) {
 		this.m = m;
-		this.processBorder = processBorder;
+		setBorderType(borderType);
 	}
 
 	@Override
 	public void process(Input inputImage , Output derivX, Output derivY) {
 		try {
-			m.invoke(null,inputImage, derivX, derivY, processBorder);
+			m.invoke(null,inputImage, derivX, derivY, border);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
@@ -52,8 +58,20 @@ public class ImageGradient_Reflection<Input extends ImageBase, Output extends Im
 	}
 
 	@Override
+	public void setBorderType(BorderType type) {
+		this.borderType = type;
+		Class<?> imageType = m.getParameterTypes()[0];
+		border = FactoryImageBorder.general(imageType,borderType);
+	}
+
+	@Override
+	public BorderType getBorderType() {
+		return borderType;
+	}
+
+	@Override
 	public int getBorder() {
-		if( processBorder )
+		if( borderType != BorderType.SKIP )
 			return 0;
 		else
 			return 1;

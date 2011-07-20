@@ -23,6 +23,8 @@ import gecv.alg.tracker.klt.KltTracker;
 import gecv.alg.tracker.klt.TestKltTracker;
 import gecv.alg.transform.pyramid.ConvolutionPyramid;
 import gecv.alg.transform.pyramid.PyramidUpdater;
+import gecv.core.image.border.BorderIndex1D_Extend;
+import gecv.core.image.border.ImageBorder1D_F32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
@@ -66,7 +68,7 @@ public class PyramidKltTestBase {
 		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
 
 			GradientSobel.process(pyramid.getLayer(i),
-					derivX.getLayer(i),derivY.getLayer(i),true);
+					derivX.getLayer(i),derivY.getLayer(i),new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		}
 	}
 

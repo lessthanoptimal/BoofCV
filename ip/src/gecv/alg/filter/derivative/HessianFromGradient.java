@@ -19,9 +19,7 @@ package gecv.alg.filter.derivative;
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.ConvolveWithBorder;
-import gecv.core.image.border.BorderIndex1D_Extend;
-import gecv.core.image.border.ImageBorder1D_F32;
-import gecv.core.image.border.ImageBorder1D_I32;
+import gecv.core.image.border.*;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 
@@ -43,17 +41,17 @@ public class HessianFromGradient {
 	 * @param derivXX Output second XX partial derivative.
 	 * @param derivYY Output second YY partial derivative.
 	 * @param derivXY Output second XY partial derivative.
-	 * @param processBorder If the border should be processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void hessianPrewitt( ImageSInt16 inputDerivX , ImageSInt16 inputDerivY ,
 									   ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY ,
-									   boolean processBorder ) {
+									   ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
-		GradientPrewitt.process(inputDerivX,derivXX,derivXY,processBorder);
+		GradientPrewitt.process(inputDerivX,derivXX,derivXY,border);
 
-		if( processBorder )
-			ConvolveWithBorder.convolve(GradientPrewitt.kernelDerivY_I32,inputDerivY,derivYY,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+		if( border != null )
+			ConvolveWithBorder.convolve(GradientPrewitt.kernelDerivY_I32,inputDerivY,derivYY,border);
 		else
 			ConvolveImageNoBorder.convolve(GradientPrewitt.kernelDerivY_I32,inputDerivY,derivYY);
 	}
@@ -66,17 +64,17 @@ public class HessianFromGradient {
 	 * @param derivXX Output second XX partial derivative.
 	 * @param derivYY Output second YY partial derivative.
 	 * @param derivXY Output second XY partial derivative.
-	 * @param processBorder If the border should be processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void hessianPrewitt( ImageFloat32 inputDerivX , ImageFloat32 inputDerivY,
 									   ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY ,
-									   boolean processBorder ) {
+									   ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
-		GradientPrewitt.process(inputDerivX,derivXX,derivXY,processBorder);
+		GradientPrewitt.process(inputDerivX,derivXX,derivXY,border);
 
-		if( processBorder )
-			ConvolveWithBorder.convolve(GradientPrewitt.kernelDerivY_F32,inputDerivY,derivYY,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+		if( border != null )
+			ConvolveWithBorder.convolve(GradientPrewitt.kernelDerivY_F32,inputDerivY,derivYY,border);
 		else
 			ConvolveImageNoBorder.convolve(GradientPrewitt.kernelDerivY_F32,inputDerivY,derivYY);
 	}
@@ -89,16 +87,16 @@ public class HessianFromGradient {
 	 * @param derivXX Output second XX partial derivative.
 	 * @param derivYY Output second YY partial derivative.
 	 * @param derivXY Output second XY partial derivative.
-	 * @param processBorder If the border should be processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void hessianSobel( ImageSInt16 inputDerivX , ImageSInt16 inputDerivY ,
 									 ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY ,
-									 boolean processBorder ) {
+									 ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
-		GradientSobel.process(inputDerivX,derivXX,derivXY,processBorder);
+		GradientSobel.process(inputDerivX,derivXX,derivXY,border);
 
-		if( processBorder )
+		if( border != null )
 			ConvolveWithBorder.convolve(GradientSobel.kernelDerivY_I32,inputDerivY,derivYY,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.convolve(GradientSobel.kernelDerivY_I32,inputDerivY,derivYY);
@@ -112,16 +110,16 @@ public class HessianFromGradient {
 	 * @param derivXX Output second XX partial derivative.
 	 * @param derivYY Output second YY partial derivative.
 	 * @param derivXY Output second XY partial derivative.
-	 * @param processBorder If the border should be processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void hessianSobel( ImageFloat32 inputDerivX , ImageFloat32 inputDerivY,
-									   ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY ,
-									   boolean processBorder ) {
+									 ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY ,
+									 ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
-		GradientSobel.process(inputDerivX,derivXX,derivXY,processBorder);
+		GradientSobel.process(inputDerivX,derivXX,derivXY,border);
 
-		if( processBorder )
+		if( border != null )
 			ConvolveWithBorder.convolve(GradientSobel.kernelDerivY_F32,inputDerivY,derivYY,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.convolve(GradientSobel.kernelDerivY_F32,inputDerivY,derivYY);
@@ -135,16 +133,16 @@ public class HessianFromGradient {
 	 * @param derivXX Output second XX partial derivative.
 	 * @param derivYY Output second YY partial derivative.
 	 * @param derivXY Output second XY partial derivative.
-	 * @param processBorder If the border should be processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void hessianThree( ImageSInt16 inputDerivX , ImageSInt16 inputDerivY ,
 									 ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY ,
-									 boolean processBorder ) {
+									 ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
-		GradientThree.process(inputDerivX,derivXX,derivXY,processBorder);
+		GradientThree.process(inputDerivX,derivXX,derivXY,border);
 
-		if( processBorder )
+		if( border != null )
 			ConvolveWithBorder.vertical(GradientThree.kernelDeriv_I32,inputDerivY,derivYY,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.vertical(GradientThree.kernelDeriv_I32,inputDerivY,derivYY,false);
@@ -158,16 +156,16 @@ public class HessianFromGradient {
 	 * @param derivXX Output second XX partial derivative.
 	 * @param derivYY Output second YY partial derivative.
 	 * @param derivXY Output second XY partial derivative.
-	 * @param processBorder If the border should be processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void hessianThree( ImageFloat32 inputDerivX , ImageFloat32 inputDerivY,
 									 ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY ,
-									 boolean processBorder ) {
+									 ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
-		GradientThree.process(inputDerivX,derivXX,derivXY,processBorder);
+		GradientThree.process(inputDerivX,derivXX,derivXY,border);
 
-		if( processBorder )
+		if( border != null )
 			ConvolveWithBorder.vertical(GradientThree.kernelDeriv_F32,inputDerivY,derivYY,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.vertical(GradientThree.kernelDeriv_F32,inputDerivY,derivYY,false);

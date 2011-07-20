@@ -31,7 +31,7 @@ public class BenchmarkThree extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientThree.process(imgInt8,derivX_I16,derivY_I16,border);
+			GradientThree.process(imgInt8,derivX_I16,derivY_I16,borderI32);
 		}
 	}
 
@@ -39,7 +39,7 @@ public class BenchmarkThree extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientThree.process(imgFloat32,derivX_F32,derivY_F32,border);
+			GradientThree.process(imgFloat32,derivX_F32,derivY_F32,borderF32);
 		}
 	}
 

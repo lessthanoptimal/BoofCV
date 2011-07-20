@@ -16,8 +16,8 @@
 
 package gecv.abst.filter.convolve;
 
-import gecv.abst.filter.FilterImageInterface;
 import gecv.core.image.border.BorderType;
+import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder;
 import gecv.struct.convolve.KernelBase;
 import gecv.struct.image.ImageBase;
@@ -33,18 +33,20 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 public class GenericConvolve<Input extends ImageBase, Output extends ImageBase>
-	implements FilterImageInterface<Input,Output>
+	implements ConvolveInterface<Input,Output>
 {
 	Method m;
 	KernelBase kernel;
 	BorderType type;
 	ImageBorder borderRule;
 
-	public GenericConvolve(Method m, KernelBase kernel, BorderType type, ImageBorder borderRule) {
+	public GenericConvolve(Method m, KernelBase kernel, BorderType type ) {
 		this.m = m;
 		this.kernel = kernel;
 		this.type = type;
-		this.borderRule = borderRule;
+
+		Class<?> params[] = m.getParameterTypes();
+		this.borderRule = FactoryImageBorder.general(params[1],type);
 	}
 
 	@Override
@@ -82,6 +84,11 @@ public class GenericConvolve<Input extends ImageBase, Output extends ImageBase>
 			return kernel.getRadius();
 		else
 			return 0;
+	}
+
+	@Override
+	public BorderType getBorderType() {
+		return type;
 	}
 
 	@Override

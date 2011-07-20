@@ -18,10 +18,7 @@ package gecv.alg.filter.derivative;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.filter.derivative.impl.*;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.alg.filter.derivative.impl.GradientPrewitt_Shared;
 
 /**
  * Benchmarks related to computing image derivatives
@@ -34,7 +31,7 @@ public class BenchmarkPrewitt extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientPrewitt.process(imgInt8,derivX_I16,derivY_I16,border);
+			GradientPrewitt.process(imgInt8,derivX_I16,derivY_I16,borderI32);
 		}
 	}
 
@@ -42,7 +39,7 @@ public class BenchmarkPrewitt extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientPrewitt.process(imgFloat32,derivX_F32,derivY_F32,border);
+			GradientPrewitt.process(imgFloat32,derivX_F32,derivY_F32,borderF32);
 		}
 	}
 

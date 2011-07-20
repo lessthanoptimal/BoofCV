@@ -20,6 +20,8 @@ import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import gecv.alg.filter.derivative.impl.HessianThree_Standard;
 import gecv.core.image.border.FactoryImageBorder;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -69,17 +71,17 @@ public class HessianThree {
 	 * @param derivXX Second derivative along the x-axis. Modified.
 	 * @param derivYY Second derivative along the y-axis. Modified.
 	 * @param derivXY Second cross derivative. Modified.
-	 * @param processBorder If the image's border is processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void process( ImageUInt8 orig,
 								ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY ,
-								boolean processBorder ) {
+								ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivXX, derivYY, derivXY);
 		HessianThree_Standard.process(orig, derivXX, derivYY,derivXY);
 
-		if( processBorder ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_I32, 2 );
-			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_I32, 2 );
+		if( border != null ) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_I32, 2 , border );
+			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_I32, 2 , border );
 			ConvolveJustBorder_General.convolve(kernelCross_I32, FactoryImageBorder.extend(orig),derivXY,2);
 		}
 	}
@@ -91,17 +93,17 @@ public class HessianThree {
 	 * @param derivXX Second derivative along the x-axis. Modified.
 	 * @param derivYY Second derivative along the y-axis. Modified.
 	 * @param derivXY Second cross derivative. Modified.
-	 * @param processBorder If the image's border is processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void process( ImageFloat32 orig,
 								ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY,
-								boolean processBorder ) {
+								ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivXX, derivYY, derivXY);
 		HessianThree_Standard.process(orig, derivXX, derivYY, derivXY);
 
-		if( processBorder ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_F32, 2 );
-			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_F32, 2 );
+		if( border != null ) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_F32, 2 , border );
+			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_F32, 2 , border );
 			ConvolveJustBorder_General.convolve(kernelCross_F32, FactoryImageBorder.extend(orig),derivXY,2);
 		}
 	}

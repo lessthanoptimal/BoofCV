@@ -25,7 +25,7 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ImageHessian<Output extends ImageBase> {
+public interface ImageHessian<Output extends ImageBase> extends ImageDerivative {
 
 	/**
 	 * Computes all the second derivative terms in the image.
@@ -38,11 +38,4 @@ public interface ImageHessian<Output extends ImageBase> {
 	 */
 	public void process( Output inputDerivX , Output inputDerivY, Output derivXX, Output derivYY, Output derivXY  );
 
-	/**
-	 * How many pixels wide is the region that is not processed along the outside
-	 * border of the image.
-	 *
-	 * @return number of pixels.
-	 */
-	public int getBorder();
 }

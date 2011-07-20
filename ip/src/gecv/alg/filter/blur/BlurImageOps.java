@@ -61,12 +61,12 @@ public class BlurImageOps {
 		return output;
 	}
 
-	public static ImageUInt8 gaussian(ImageUInt8 input, ImageUInt8 output, int radius,
+	public static ImageUInt8 gaussian(ImageUInt8 input, ImageUInt8 output, double sigma , int radius,
 									  ImageUInt8 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(radius);
+		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(sigma,radius);
 
 		ConvolveNormalized.horizontal(kernel,input,storage);
 		ConvolveNormalized.vertical(kernel,storage,output);
@@ -93,12 +93,13 @@ public class BlurImageOps {
 		return output;
 	}
 
-	public static ImageFloat32 gaussian(ImageFloat32 input, ImageFloat32 output, int radius,
+	public static ImageFloat32 gaussian(ImageFloat32 input, ImageFloat32 output,
+										double sigma , int radius,
 										ImageFloat32 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(radius,true);
+		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(sigma, radius,true);
 
 		ConvolveNormalized.horizontal(kernel,input,storage);
 		ConvolveNormalized.vertical(kernel,storage,output);

@@ -20,6 +20,7 @@ import gecv.abst.filter.FilterImageInterface;
 import gecv.abst.filter.FilterSequence;
 import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.core.image.border.BorderType;
+import gecv.core.image.border.FactoryImageBorder;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.convolve.Kernel2D;
 import gecv.struct.image.ImageBase;
@@ -115,9 +116,14 @@ public class CompareDerivativeToConvolution {
 		for( int i = 1; i < numImageOutputs+1; i++ ) {
 			testInputs[i] = outputImages[i-1];
 		}
-		if( param.length == numImageOutputs + 2 )
-			testInputs[param.length-1] = processBorder;
-		try {
+		if( param.length == numImageOutputs + 2 ) {
+			if( processBorder ) {
+				testInputs[param.length-1] = FactoryImageBorder.general(inputImage.getClass(),BorderType.EXTENDED);
+			} else {
+				testInputs[param.length-1] = null;
+			}
+
+		} try {
 			m.invoke(null,testInputs);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);

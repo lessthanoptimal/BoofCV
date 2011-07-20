@@ -20,7 +20,7 @@ import gecv.alg.filter.convolve.border.CompareImageBorder;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
-import gecv.core.image.border.BorderIndex1D_Extend;
+import gecv.core.image.border.BorderType;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.struct.image.ImageBase;
 import org.junit.Test;
@@ -113,7 +113,7 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		ret[0][0] = kernel;
 		ret[0][1] = src;
 		ret[0][2] = dst;
-		ret[0][3] = FactoryImageBorder.general(src, BorderIndex1D_Extend.class);
+		ret[0][3] = FactoryImageBorder.general(src, BorderType.EXTENDED);
 
 		return ret;
 	}

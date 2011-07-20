@@ -19,6 +19,8 @@ package gecv.alg.tracker.pklt;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.tracker.klt.KltTrackFault;
+import gecv.core.image.border.BorderIndex1D_Extend;
+import gecv.core.image.border.ImageBorder1D_F32;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,7 +43,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 		updater.update(image);
 
 		for( int i = 0; i < derivX.getNumLayers(); i++ ) {
-			GradientSobel.process(pyramid.getLayer(i),derivX.getLayer(i),derivY.getLayer(i),true);
+			GradientSobel.process(pyramid.getLayer(i),derivX.getLayer(i),derivY.getLayer(i),new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		}
 	}
 

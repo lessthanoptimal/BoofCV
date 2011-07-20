@@ -70,8 +70,8 @@ public class ImageShowImageDerivative {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(input,(ImageUInt8)null);
 //		ImageGradient<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.sobel_I8();
-//		ImageGradient<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.three_I8();
-		ImageGradient<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.gaussian_I8(1);
+		ImageGradient<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.three_I8();
+//		ImageGradient<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.gaussian_I8(1,-1);
 
 		ImageShowImageDerivative display = new ImageShowImageDerivative(gradient);
 
