@@ -20,6 +20,8 @@ import gecv.alg.detect.corner.GenericCornerIntensityGradientTests;
 import gecv.alg.detect.corner.GenericCornerIntensityTests;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.border.BorderIndex1D_Extend;
+import gecv.core.image.border.ImageBorder1D_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -62,7 +64,7 @@ public class TestKltCorner_I16 {
 		ImageSInt16 derivX = new ImageSInt16(img.getWidth(), img.getHeight());
 		ImageSInt16 derivY = new ImageSInt16(img.getWidth(), img.getHeight());
 
-		GradientSobel.process(img, derivX, derivY, true);
+		GradientSobel.process(img, derivX, derivY, new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 
 		GecvTesting.checkSubImage(this, "compareToNaive", true, derivX, derivY);
 	}

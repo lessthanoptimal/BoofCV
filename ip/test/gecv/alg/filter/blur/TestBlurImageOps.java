@@ -139,7 +139,9 @@ public class TestBlurImageOps {
 			ConvolveNormalized.horizontal(kernel,input,storage);
 			ConvolveNormalized.vertical(kernel,storage,expected);
 
-			BlurImageOps.gaussian(input,found,radius,null);
+			double sigma = KernelFactory.sigmaForRadius(radius);
+
+			BlurImageOps.gaussian(input,found,sigma,radius,null);
 
 			GecvTesting.assertEquals(expected,found,0);
 		}
@@ -163,7 +165,9 @@ public class TestBlurImageOps {
 			ConvolveNormalized.horizontal(kernel,input,storage);
 			ConvolveNormalized.vertical(kernel,storage,expected);
 
-			BlurImageOps.gaussian(input,found,radius,null);
+			double sigma = KernelFactory.sigmaForRadius(radius);
+
+			BlurImageOps.gaussian(input,found,sigma,radius,null);
 
 			GecvTesting.assertEquals(expected,found,0,1e-4);
 		}

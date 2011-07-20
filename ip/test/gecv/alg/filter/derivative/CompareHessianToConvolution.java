@@ -19,7 +19,10 @@ package gecv.alg.filter.derivative;
 import gecv.abst.filter.FilterImageInterface;
 import gecv.abst.filter.FilterSequence;
 import gecv.abst.filter.convolve.FactoryConvolve;
+import gecv.core.image.border.BorderIndex1D_Extend;
 import gecv.core.image.border.BorderType;
+import gecv.core.image.border.ImageBorder1D_F32;
+import gecv.core.image.border.ImageBorder1D_I32;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.convolve.Kernel2D;
 import gecv.struct.image.ImageBase;
@@ -118,7 +121,14 @@ public class CompareHessianToConvolution {
 		for( int i = 0; i < 5; i++ ) {
 			testInputs[i] = images[i];
 		}
-		testInputs[5] = processBorder;
+		if( processBorder ) {
+			if( images[0].getTypeInfo().isInteger())
+				testInputs[5] = new ImageBorder1D_I32(BorderIndex1D_Extend.class);
+			else
+				testInputs[5] = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
+		} else {
+			testInputs[5] = null;
+		}
 
 		try {
 			m.invoke(null,testInputs);

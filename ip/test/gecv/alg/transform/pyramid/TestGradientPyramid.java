@@ -17,6 +17,7 @@
 package gecv.alg.transform.pyramid;
 
 import gecv.abst.filter.derivative.ImageGradient;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
 import gecv.struct.pyramid.ImagePyramidFactory;
@@ -64,6 +65,16 @@ public class TestGradientPyramid {
 		@Override
 		public void process(ImageFloat32 inputImage, ImageFloat32 derivX, ImageFloat32 derivY) {
 			numCalls++;
+		}
+
+		@Override
+		public void setBorderType(BorderType type) {
+
+		}
+
+		@Override
+		public BorderType getBorderType() {
+			return null;
 		}
 
 		@Override

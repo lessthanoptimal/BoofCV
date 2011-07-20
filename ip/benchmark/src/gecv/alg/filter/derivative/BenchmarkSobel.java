@@ -18,10 +18,9 @@ package gecv.alg.filter.derivative;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.filter.derivative.impl.*;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.alg.filter.derivative.impl.GradientSobel_Naive;
+import gecv.alg.filter.derivative.impl.GradientSobel_Outer;
+import gecv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter;
 
 /**
  * Benchmarks related to computing image derivatives
@@ -34,7 +33,7 @@ public class BenchmarkSobel extends BenchmarkDerivativeBase{
 	{
 		@Override
 		public void process() {
-			GradientSobel.process(imgInt8,derivX_I16,derivY_I16,border);
+			GradientSobel.process(imgInt8,derivX_I16,derivY_I16,borderI32);
 		}
 	}
 
@@ -42,7 +41,7 @@ public class BenchmarkSobel extends BenchmarkDerivativeBase{
 	{
 		@Override
 		public void process() {
-			GradientSobel.process(imgFloat32,derivX_F32,derivY_F32,border);
+			GradientSobel.process(imgFloat32,derivX_F32,derivY_F32,borderF32);
 		}
 	}
 

@@ -26,6 +26,7 @@ import gecv.alg.filter.derivative.HessianFromGradient;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.ShowImages;
+import gecv.struct.GecvDefaults;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
@@ -88,10 +89,10 @@ public class BenchmarkCornerAccuracy {
 				new GeneralCornerDetector<ImageUInt8, ImageSInt16>(intensity, extractor, corners.size()*2);
 
 		if( det.getRequiresGradient() ) {
-			GradientThree.process(image,derivX,derivY, true);
+			GradientThree.process(image,derivX,derivY, GecvDefaults.DERIV_BORDER_I32);
 		}
 		if( det.getRequiresHessian() ) {
-			HessianFromGradient.hessianThree(derivX,derivY,derivXX,derivYY,derivXY,true);
+			HessianFromGradient.hessianThree(derivX,derivY,derivXX,derivYY,derivXY, GecvDefaults.DERIV_BORDER_I32);
 //			HessianThree.process(image,derivXX,derivYY,derivXY,true);
 		}
 
@@ -135,7 +136,7 @@ public class BenchmarkCornerAccuracy {
 
 		ConvertBufferedImage.convertFrom(workImg,image);
 		ImageTestingOps.addUniform(image,rand,-2,2);
-		GradientSobel.process(image,derivX,derivY, false);
+		GradientSobel.process(image,derivX,derivY, GecvDefaults.DERIV_BORDER_I32);
 	}
 
 	private void addRectangle( Graphics2D g2 , AffineTransform tran , int x0 , int y0 , int w , int h )

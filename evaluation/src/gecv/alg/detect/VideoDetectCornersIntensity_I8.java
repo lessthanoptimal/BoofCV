@@ -30,6 +30,7 @@ import gecv.gui.image.ShowImages;
 import gecv.io.image.ProcessImageSequence;
 import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
+import gecv.struct.GecvDefaults;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageSInt16;
@@ -75,7 +76,7 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 			}
 
 			// compute the image gradient
-			GradientSobel.process(image, derivX, derivY, true);
+			GradientSobel.process(image, derivX, derivY, GecvDefaults.DERIV_BORDER_I32);
 		}
 
 		if( detector.getRequiresHessian() ) {
@@ -86,7 +87,7 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 			}
 
 			// compute the image gradient
-			HessianThree.process(image, derivXX, derivYY,derivXY,true);
+			HessianThree.process(image, derivXX, derivYY,derivXY,GecvDefaults.DERIV_BORDER_I32);
 		}
 
 		detector.process(image,derivX, derivY, derivXX , derivYY, derivXY);

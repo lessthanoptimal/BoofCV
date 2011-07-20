@@ -18,6 +18,8 @@ package gecv.alg.filter.derivative;
 
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.derivative.impl.GradientThree_Standard;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -50,17 +52,17 @@ public class GradientThree {
 	 * @param orig   Which which is to be differentiated. Not Modified.
 	 * @param derivX Derivative along the x-axis. Modified.
 	 * @param derivY Derivative along the y-axis. Modified.
-	 * @param processBorder
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void process(ImageUInt8 orig,
 							   ImageSInt16 derivX,
-							   ImageSInt16 derivY, boolean processBorder) {
+							   ImageSInt16 derivY, ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientThree_Standard.process(orig, derivX, derivY);
 
-		if( processBorder ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, 1 );
-			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, 1 );
+		if( border != null ) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, 1 , border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, 1 , border);
 		}
 	}
 
@@ -70,17 +72,17 @@ public class GradientThree {
 	 * @param orig   Which which is to be differentiated. Not Modified.
 	 * @param derivX Derivative along the x-axis. Modified.
 	 * @param derivY Derivative along the y-axis. Modified.
-	 * @param processBorder
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void process(ImageSInt16 orig,
 							   ImageSInt16 derivX,
-							   ImageSInt16 derivY, boolean processBorder) {
+							   ImageSInt16 derivY, ImageBorder_I32 border) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientThree_Standard.process(orig, derivX, derivY);
 
-		if( processBorder ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, 1 );
-			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, 1 );
+		if( border != null ) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, 1 , border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, 1 , border);
 		}
 	}
 
@@ -90,17 +92,17 @@ public class GradientThree {
 	 * @param orig   Which which is to be differentiated. Not Modified.
 	 * @param derivX Derivative along the x-axis. Modified.
 	 * @param derivY Derivative along the y-axis. Modified.
-	 * @param processBorder
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void process(ImageFloat32 orig,
 							   ImageFloat32 derivX,
-							   ImageFloat32 derivY, boolean processBorder) {
+							   ImageFloat32 derivY, ImageBorder_F32 border) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientThree_Standard.process(orig, derivX, derivY);
 
-		if( processBorder ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX ,kernelDeriv_F32, 1 );
-			DerivativeHelperFunctions.processBorderVertical(orig, derivY ,kernelDeriv_F32, 1 );
+		if( border != null ) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_F32, 1 , border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_F32, 1 , border);
 		}
 	}
 

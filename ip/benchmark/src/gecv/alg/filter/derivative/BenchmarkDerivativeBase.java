@@ -16,9 +16,7 @@
 
 package gecv.alg.filter.derivative;
 
-import gecv.PerformerBase;
-import gecv.ProfileOperation;
-import gecv.alg.filter.derivative.impl.GradientThree_Standard;
+import gecv.core.image.border.*;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -33,6 +31,8 @@ public abstract class BenchmarkDerivativeBase {
 	public static int imgHeight = 480;
 	public static long TEST_TIME = 1000;
 	public static boolean border = true;
+	public static ImageBorder_I32 borderI32 = new ImageBorder1D_I32(BorderIndex1D_Extend.class);
+	public static ImageBorder_F32 borderF32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
 
 	public static ImageFloat32 imgFloat32;
 	public static ImageFloat32 derivX_F32;

@@ -16,6 +16,10 @@
 
 package gecv.abst.filter.derivative;
 
+import gecv.core.image.border.BorderType;
+import gecv.core.image.border.FactoryImageBorder;
+import gecv.core.image.border.ImageBorder;
+import gecv.struct.GecvDefaults;
 import gecv.struct.image.ImageBase;
 
 import java.lang.reflect.InvocationTargetException;
@@ -30,20 +34,21 @@ import java.lang.reflect.Method;
 public class ImageHessian_Reflection<Output extends ImageBase>
 		implements ImageHessian<Output>
 {
-	// if the image border should be processed or not
-	private boolean processBorder;
+	// How the image border should be handled
+	BorderType borderType = GecvDefaults.DERIV_BORDER_TYPE;
+	ImageBorder<Output> border;
 	// the image hessian function
 	private Method m;
 
-	public ImageHessian_Reflection(Method m , boolean processBorder) {
+	public ImageHessian_Reflection(Method m ) {
 		this.m = m;
-		this.processBorder = processBorder;
+		setBorderType(borderType);
 	}
 
 	@Override
 	public void process(Output inputDerivX, Output inputDerivY , Output derivXX, Output derivYY, Output derivXY) {
 		try {
-			m.invoke(null,inputDerivX, inputDerivY, derivXX, derivYY, derivXY, processBorder);
+			m.invoke(null,inputDerivX, inputDerivY, derivXX, derivYY, derivXY, border);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
@@ -52,8 +57,20 @@ public class ImageHessian_Reflection<Output extends ImageBase>
 	}
 
 	@Override
+	public void setBorderType(BorderType type) {
+		this.borderType = type;
+		Class<?> imageType = m.getParameterTypes()[0];
+		border = FactoryImageBorder.general(imageType,borderType);
+	}
+
+	@Override
+	public BorderType getBorderType() {
+		return borderType;
+	}
+
+	@Override
 	public int getBorder() {
-		if( processBorder )
+		if( borderType != BorderType.SKIP )
 			return 0;
 		else
 			return 1;

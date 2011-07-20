@@ -16,11 +16,11 @@
 
 package gecv.abst.filter.convolve;
 
-import gecv.abst.filter.FilterImageInterface;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.alg.filter.convolve.ConvolveWithBorder;
-import gecv.core.image.border.*;
+import gecv.core.image.border.BorderType;
+import gecv.core.image.border.FactoryImageBorder;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.convolve.Kernel2D;
 import gecv.struct.image.ImageBase;
@@ -45,12 +45,12 @@ public class FactoryConvolve {
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
 	public static <Input extends ImageBase, Output extends ImageBase>
-	FilterImageInterface<Input,Output>
+	ConvolveInterface<Input,Output>
 	convolve( Kernel1D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border , boolean isHorizontal )
 	{
 		outputType = GecvTesting.convertToGenericType(outputType);
 
-		ImageBorder borderRule = null;
+		Class<?> borderClassType = FactoryImageBorder.lookupBorderClassType(inputType);
 		String direction = isHorizontal ? "horizontal" : "vertical";
 		Method m;
 		try {
@@ -61,18 +61,15 @@ public class FactoryConvolve {
 					break;
 
 				case EXTENDED:
-					borderRule = FactoryImageBorder.general(inputType, BorderIndex1D_Extend.class);
-					m = GecvTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),inputType,outputType,borderRule.getClass());
+					m = GecvTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),inputType,outputType,borderClassType);
 					break;
 
 				case REFLECT:
-					borderRule = FactoryImageBorder.general(inputType, BorderIndex1D_Reflect.class);
-					m = GecvTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),inputType,outputType,borderRule.getClass());
+					m = GecvTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),inputType,outputType,borderClassType);
 					break;
 
 				case WRAP:
-					borderRule = FactoryImageBorder.general(inputType, BorderIndex1D_Wrap.class);
-					m = GecvTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),inputType,outputType,borderRule.getClass());
+					m = GecvTesting.findMethod(ConvolveWithBorder.class,direction,kernel.getClass(),inputType,outputType,borderClassType);
 					break;
 
 				case NORMALIZED:
@@ -88,7 +85,7 @@ public class FactoryConvolve {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolve<Input,Output>(m,kernel,border,borderRule);
+		return new GenericConvolve<Input,Output>(m,kernel,border);
 	}
 
 	/**
@@ -101,12 +98,12 @@ public class FactoryConvolve {
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
 	public static <Input extends ImageBase, Output extends ImageBase>
-	FilterImageInterface<Input,Output>
+	ConvolveInterface<Input,Output>
 	convolve( Kernel2D kernel, Class<Input> inputType, Class<Output> outputType , BorderType borderType)
 	{
 		outputType = GecvTesting.convertToGenericType(outputType);
 
-		ImageBorder borderRule = null;
+		Class<?> borderClassType = FactoryImageBorder.lookupBorderClassType(inputType);
 		Method m;
 		try {
 			switch(borderType) {
@@ -116,18 +113,15 @@ public class FactoryConvolve {
 					break;
 
 				case EXTENDED:
-					borderRule = FactoryImageBorder.general(inputType,BorderIndex1D_Extend.class);
-					m = GecvTesting.findMethod(ConvolveWithBorder.class,"convolve",kernel.getClass(),inputType,outputType,borderRule.getClass());
+					m = GecvTesting.findMethod(ConvolveWithBorder.class,"convolve",kernel.getClass(),inputType,outputType,borderClassType);
 					break;
 
 				case REFLECT:
-					borderRule = FactoryImageBorder.general(inputType, BorderIndex1D_Reflect.class);
-					m = GecvTesting.findMethod(ConvolveWithBorder.class,"convolve",kernel.getClass(),inputType,outputType,borderRule.getClass());
+					m = GecvTesting.findMethod(ConvolveWithBorder.class,"convolve",kernel.getClass(),inputType,outputType,borderClassType);
 					break;
 
 				case WRAP:
-					borderRule = FactoryImageBorder.general(inputType, BorderIndex1D_Wrap.class);
-					m = GecvTesting.findMethod(ConvolveWithBorder.class,"convolve",kernel.getClass(),inputType,outputType,borderRule.getClass());
+					m = GecvTesting.findMethod(ConvolveWithBorder.class,"convolve",kernel.getClass(),inputType,outputType,borderClassType);
 					break;
 
 				case NORMALIZED:
@@ -143,6 +137,6 @@ public class FactoryConvolve {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolve<Input,Output>(m,kernel, borderType,borderRule);
+		return new GenericConvolve<Input,Output>(m,kernel, borderType);
 	}
 }

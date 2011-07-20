@@ -20,6 +20,8 @@ import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import gecv.alg.filter.derivative.impl.HessianSobel_Shared;
 import gecv.core.image.border.FactoryImageBorder;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -106,15 +108,16 @@ public class HessianSobel {
 	 * @param derivXX Second derivative along the x-axis. Modified.
 	 * @param derivYY Second derivative along the y-axis. Modified.
 	 * @param derivXY Second cross derivative. Modified.
-	 * @param processBorder If the image's border is processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void process( ImageUInt8 orig,
 								ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY ,
-								boolean processBorder ) {
+								ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivXX, derivYY, derivXY);
 		HessianSobel_Shared.process(orig, derivXX, derivYY, derivXY);
 
-		if( processBorder ) {
+		if( border != null ) {
+			border.setImage(orig);
 			ConvolveJustBorder_General.convolve(kernelXX_I32, FactoryImageBorder.extend(orig),derivXX,2);
 			ConvolveJustBorder_General.convolve(kernelYY_I32, FactoryImageBorder.extend(orig),derivYY,2);
 			ConvolveJustBorder_General.convolve(kernelXY_I32, FactoryImageBorder.extend(orig),derivXY,2);
@@ -128,18 +131,19 @@ public class HessianSobel {
 	 * @param derivXX Second derivative along the x-axis. Modified.
 	 * @param derivYY Second derivative along the y-axis. Modified.
 	 * @param derivXY Second cross derivative. Modified.
-	 * @param processBorder If the image's border is processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
 	public static void process( ImageFloat32 orig,
 								ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY ,
-								boolean processBorder ) {
+								ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivXX, derivYY, derivXY);
 		HessianSobel_Shared.process(orig, derivXX, derivYY, derivXY);
 
-		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelXX_F32, FactoryImageBorder.extend(orig),derivXX,2);
-			ConvolveJustBorder_General.convolve(kernelYY_F32, FactoryImageBorder.extend(orig),derivYY,2);
-			ConvolveJustBorder_General.convolve(kernelXY_F32, FactoryImageBorder.extend(orig),derivXY,2);
+		if( border != null ) {
+			border.setImage(orig);
+			ConvolveJustBorder_General.convolve(kernelXX_F32, border , derivXX , 2);
+			ConvolveJustBorder_General.convolve(kernelYY_F32, border , derivYY , 2);
+			ConvolveJustBorder_General.convolve(kernelXY_F32, border , derivXY , 2);
 		}
 	}
 }

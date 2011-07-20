@@ -16,24 +16,34 @@
 
 package gecv.abst.filter.derivative;
 
-import gecv.struct.image.ImageBase;
+import gecv.core.image.border.BorderType;
 
 
 /**
- * A generic interface for computing first order image derivative along the x and y axes.
- *
  * @author Peter Abeles
  */
-public interface ImageGradient<Input extends ImageBase, Output extends ImageBase> extends ImageDerivative {
+public interface ImageDerivative {
 
 	/**
-	 * Compues the image gradient from the input image and stores the results into
-	 * 'derivX' and 'derivY'
+	 * Overrides the default border behavior.  See {@link FactoryDerivative} for a discussion
+	 * of the pros and cons of each border type.
 	 *
-	 * @param inputImage Original input image. Not modified.
-	 * @param derivX First order image derivative along the x-axis. Modified.
-	 * @param derivY First order image derivative along the y-axis. Modified.
+	 * @param type How image borders are handled.
 	 */
-	public void process( Input inputImage , Output derivX, Output derivY );
+	public void setBorderType( BorderType type );
 
+	/**
+	 * Returns how the image borders are handled.
+	 *
+	 * @return Image border type.
+	 */
+	public BorderType getBorderType();
+
+	/**
+	 * How many pixels wide is the region that is not processed along the outside
+	 * border of the image.
+	 *
+	 * @return number of pixels.
+	 */
+	public int getBorder();
 }

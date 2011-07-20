@@ -228,6 +228,20 @@ public class KernelFactory {
 			return gaussian1D_I32(radius);
 	}
 
+	public static Kernel1D gaussian1D( Class<?> imageType , double sigma , int radius) {
+		if( GeneralizedImageOps.isFloatingPoint(imageType) )
+			return gaussian1D_F32(sigma,radius,true);
+		else
+			return gaussian1D_I32(sigma,radius);
+	}
+
+	public static Kernel1D gaussianDerivative1D( Class<?> imageType , double sigma , int radius) {
+		if( GeneralizedImageOps.isFloatingPoint(imageType) )
+			return gaussianDerivative1D_F32(sigma,radius,true);
+		else
+			return gaussianDerivative1D_I32(sigma,radius);
+	}
+
 	/**
 	 * <p>
 	 * Creates an integer Gaussian kernel with the specified width.  A default sigma of width/ 5.0 is used.
@@ -459,5 +473,9 @@ public class KernelFactory {
 
 	public static double sigmaForRadius( int radius ) {
 		return (radius * 2 + 1) / 5.0;
+	}
+
+	public static int radiusForSigma( double sigma ) {
+		return (int)Math.ceil(((5*sigma)-1)/2);
 	}
 }

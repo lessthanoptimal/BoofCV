@@ -38,7 +38,7 @@ public class BenchmarkHessianSobel extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			HessianSobel.process(imgInt8,derivX_I16,derivY_I16,derivXY_I16,border);
+			HessianSobel.process(imgInt8,derivX_I16,derivY_I16,derivXY_I16,borderI32);
 		}
 	}
 
@@ -46,7 +46,7 @@ public class BenchmarkHessianSobel extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			HessianSobel.process(imgFloat32,derivX_F32,derivY_F32,derivXY_F32,border);
+			HessianSobel.process(imgFloat32,derivX_F32,derivY_F32,derivXY_F32,borderF32);
 		}
 	}
 
@@ -54,8 +54,8 @@ public class BenchmarkHessianSobel extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientSobel.process(imgInt8,tempA_I16,tempB_I16,border);
-			HessianFromGradient.hessianSobel(tempA_I16,tempB_I16,derivX_I16,derivY_I16,derivXY_I16,border);
+			GradientSobel.process(imgInt8,tempA_I16,tempB_I16,borderI32);
+			HessianFromGradient.hessianSobel(tempA_I16,tempB_I16,derivX_I16,derivY_I16,derivXY_I16,borderI32);
 		}
 	}
 
@@ -63,8 +63,8 @@ public class BenchmarkHessianSobel extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			GradientSobel.process(imgFloat32,tempA_F32,tempB_F32,border);
-			HessianFromGradient.hessianSobel(tempA_F32,tempB_F32,derivX_F32,derivY_F32,derivXY_F32,border);
+			GradientSobel.process(imgFloat32,tempA_F32,tempB_F32,borderF32);
+			HessianFromGradient.hessianSobel(tempA_F32,tempB_F32,derivX_F32,derivY_F32,derivXY_F32,borderF32);
 		}
 	}
 

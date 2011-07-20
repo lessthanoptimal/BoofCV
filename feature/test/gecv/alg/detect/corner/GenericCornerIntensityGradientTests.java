@@ -18,6 +18,7 @@ package gecv.alg.detect.corner;
 
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.filter.derivative.HessianThree;
+import gecv.core.image.border.*;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 
@@ -40,11 +41,14 @@ public abstract class GenericCornerIntensityGradientTests extends GenericCornerI
 	protected ImageFloat32 derivYY_F32 = new ImageFloat32(width,height);
 	protected ImageFloat32 derivXY_F32 = new ImageFloat32(width,height);
 
+	ImageBorder_F32 borderF32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
+	ImageBorder_I32 borderI32 = new ImageBorder1D_I32(BorderIndex1D_Extend.class);
+
 	@Override
 	protected void computeDerivatives() {
-		GradientSobel.process(imageF,derivX_F32,derivY_F32, true);
-		GradientSobel.process(imageI,derivX_I16,derivY_I16, true);
-		HessianThree.process(imageF,derivXX_F32,derivYY_F32,derivXY_F32,true);
-		HessianThree.process(imageI,derivXX_I16,derivYY_I16,derivXY_I16,true);
+		GradientSobel.process(imageF,derivX_F32,derivY_F32, borderF32);
+		GradientSobel.process(imageI,derivX_I16,derivY_I16, borderI32);
+		HessianThree.process(imageF,derivXX_F32,derivYY_F32,derivXY_F32,borderF32);
+		HessianThree.process(imageI,derivXX_I16,derivYY_I16,derivXY_I16,borderI32);
 	}
 }

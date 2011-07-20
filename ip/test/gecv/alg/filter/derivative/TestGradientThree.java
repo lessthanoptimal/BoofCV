@@ -17,6 +17,8 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -34,16 +36,17 @@ public class TestGradientThree {
 	int width = 5;
 	int height = 7;
 
-//	@Test
-//	public void checkInputShape() {
-//		GenericDerivativeTests.checkImageDimensionValidation(new GradientThree(), 2);
-//	}
+	@Test
+	public void testStandard() {
+		StandardGradientChecks standard = new StandardGradientChecks();
+		standard.secondDerivativeTest(GradientThree.class,3);
+	}
 
 	@Test
 	public void compareToConvolve_I8() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientThree.class.getMethod("process",
-				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, boolean.class ));
+				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_I32.class ));
 
 		validator.setKernel(0,GradientThree.kernelDeriv_I32,true);
 		validator.setKernel(1,GradientThree.kernelDeriv_I32,false);
@@ -60,7 +63,7 @@ public class TestGradientThree {
 	public void compareToConvolve_I16() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientThree.class.getMethod("process",
-				ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, boolean.class ));
+				ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_I32.class ));
 
 		validator.setKernel(0,GradientThree.kernelDeriv_I32,true);
 		validator.setKernel(1,GradientThree.kernelDeriv_I32,false);
@@ -77,7 +80,7 @@ public class TestGradientThree {
 	public void compareToConvolve_F32() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientThree.class.getMethod("process",
-				ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, boolean.class ));
+				ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageBorder_F32.class ));
 
 		validator.setKernel(0,GradientThree.kernelDeriv_F32,true);
 		validator.setKernel(1,GradientThree.kernelDeriv_F32,false);

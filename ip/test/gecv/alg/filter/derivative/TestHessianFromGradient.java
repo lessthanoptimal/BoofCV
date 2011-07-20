@@ -17,6 +17,8 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import org.junit.Test;
@@ -37,7 +39,7 @@ public class TestHessianFromGradient {
 	public void hessianPrewitt_I8() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianPrewitt",
-				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class,boolean.class ));
+				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_I32.class ));
 
 		validator.setKernel(0,GradientPrewitt.kernelDerivX_I32);
 		validator.setKernel(1,GradientPrewitt.kernelDerivY_I32);
@@ -57,7 +59,7 @@ public class TestHessianFromGradient {
 	public void hessianPrewitt_F32() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianPrewitt",
-				ImageFloat32.class,ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageFloat32.class,boolean.class ));
+				ImageFloat32.class,ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageBorder_F32.class ));
 
 		validator.setKernel(0,GradientPrewitt.kernelDerivX_F32);
 		validator.setKernel(1,GradientPrewitt.kernelDerivY_F32);
@@ -77,7 +79,7 @@ public class TestHessianFromGradient {
 	public void hessianSobel_I8() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianSobel",
-				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class,boolean.class ));
+				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class,ImageBorder_I32.class ));
 
 		validator.setKernel(0,GradientSobel.kernelDerivX_I32);
 		validator.setKernel(1,GradientSobel.kernelDerivY_I32);
@@ -97,7 +99,7 @@ public class TestHessianFromGradient {
 	public void hessianSobel_F32() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianSobel",
-				ImageFloat32.class,ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageFloat32.class,boolean.class ));
+				ImageFloat32.class,ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageFloat32.class,ImageBorder_F32.class ));
 
 		validator.setKernel(0,GradientSobel.kernelDerivX_F32);
 		validator.setKernel(1,GradientSobel.kernelDerivY_F32);
@@ -117,7 +119,7 @@ public class TestHessianFromGradient {
 	public void hessianThree_I8() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianThree",
-				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class,boolean.class ));
+				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class,ImageBorder_I32.class ));
 
 		validator.setKernel(0,GradientThree.kernelDeriv_I32,true);
 		validator.setKernel(1,GradientThree.kernelDeriv_I32,false);
@@ -137,7 +139,7 @@ public class TestHessianFromGradient {
 	public void hessianThree_F32() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianThree",
-				ImageFloat32.class,ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageFloat32.class,boolean.class ));
+				ImageFloat32.class,ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageFloat32.class,ImageBorder_F32.class ));
 
 		validator.setKernel(0,GradientThree.kernelDeriv_F32,true);
 		validator.setKernel(1,GradientThree.kernelDeriv_F32,false);

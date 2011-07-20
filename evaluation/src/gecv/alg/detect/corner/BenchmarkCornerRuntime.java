@@ -27,6 +27,7 @@ import gecv.alg.detect.extract.NonMaxCornerCandidateExtractor;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.filter.derivative.HessianFromGradient;
 import gecv.alg.filter.derivative.HessianThree;
+import gecv.struct.GecvDefaults;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -73,11 +74,11 @@ public class BenchmarkCornerRuntime {
 
 			if( includeGradient ) {
 				if( alg.getRequiresGradient() ) {
-					GradientSobel.process(image_F32, derivX_F32, derivY_F32, true);
+					GradientSobel.process(image_F32, derivX_F32, derivY_F32, GecvDefaults.DERIV_BORDER_F32);
 				}
 
 				if( alg.getRequiresHessian()) {
-					HessianFromGradient.hessianThree(derivX_F32,derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32,true);
+					HessianFromGradient.hessianThree(derivX_F32,derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32,GecvDefaults.DERIV_BORDER_F32);
 //					HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32,true);
 				}
 			}
@@ -183,10 +184,10 @@ public class BenchmarkCornerRuntime {
 			derivYY_I16.reshape(imgWidth, imgHeight);
 			derivXY_I16.reshape(imgWidth, imgHeight);
 
-			GradientSobel.process(image_F32, derivX_F32, derivY_F32, true);
-			GradientSobel.process(image_I8, derivX_I16, derivY_I16, true);
-			HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32,true);
-			HessianThree.process(image_I8,derivXX_I16,derivYY_I16,derivXY_I16,true);
+			GradientSobel.process(image_F32, derivX_F32, derivY_F32, GecvDefaults.DERIV_BORDER_F32);
+			GradientSobel.process(image_I8, derivX_I16, derivY_I16, GecvDefaults.DERIV_BORDER_I32);
+			HessianThree.process(image_F32,derivXX_F32,derivYY_F32,derivXY_F32,GecvDefaults.DERIV_BORDER_F32);
+			HessianThree.process(image_I8,derivXX_I16,derivYY_I16,derivXY_I16,GecvDefaults.DERIV_BORDER_I32);
 
 			benchmark(createKlt_F32(), "KLT F32");
 			benchmark(createFast12_F32(), "Fast F32");

@@ -17,6 +17,8 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -38,7 +40,7 @@ public class TestHessianSobel {
 	public void compareToConvolve_I8() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(HessianSobel.class.getMethod("process",
-				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class , boolean.class ));
+				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class , ImageBorder_I32.class ));
 
 		validator.setKernel(0, HessianSobel.kernelXX_I32);
 		validator.setKernel(1, HessianSobel.kernelYY_I32);
@@ -57,7 +59,7 @@ public class TestHessianSobel {
 	public void compareToConvolve_F32() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(HessianSobel.class.getMethod("process",
-				ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageFloat32.class , boolean.class ));
+				ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageFloat32.class , ImageBorder_F32.class ));
 
 		validator.setKernel(0, HessianSobel.kernelXX_F32);
 		validator.setKernel(1, HessianSobel.kernelYY_F32);

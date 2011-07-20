@@ -14,26 +14,23 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.derivative;
+package gecv.abst.filter.convolve;
 
+import gecv.abst.filter.FilterImageInterface;
+import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageBase;
 
 
 /**
- * A generic interface for computing first order image derivative along the x and y axes.
+ * Generic interface for performing image convolutions.
  *
  * @author Peter Abeles
  */
-public interface ImageGradient<Input extends ImageBase, Output extends ImageBase> extends ImageDerivative {
-
+public interface ConvolveInterface <Input extends ImageBase, Output extends ImageBase> 
+		extends FilterImageInterface<Input,Output>
+{
 	/**
-	 * Compues the image gradient from the input image and stores the results into
-	 * 'derivX' and 'derivY'
-	 *
-	 * @param inputImage Original input image. Not modified.
-	 * @param derivX First order image derivative along the x-axis. Modified.
-	 * @param derivY First order image derivative along the y-axis. Modified.
+	 * Returns how the image border is handled.
 	 */
-	public void process( Input inputImage , Output derivX, Output derivY );
-
+	BorderType getBorderType();
 }

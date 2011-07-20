@@ -20,7 +20,8 @@ import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import gecv.alg.filter.derivative.impl.GradientSobel_Outer;
 import gecv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter;
-import gecv.core.image.border.FactoryImageBorder;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -72,15 +73,16 @@ public class GradientSobel {
 	 * @param orig   Input image.  Not modified.
 	 * @param derivX Storage for image derivative along the x-axis. Modified.
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
-	 * @param processBorder If the image's border is processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(ImageUInt8 orig, ImageSInt16 derivX, ImageSInt16 derivY, boolean processBorder) {
+	public static void process(ImageUInt8 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 
-		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelDerivX_I32, FactoryImageBorder.extend(orig),derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_I32, FactoryImageBorder.extend(orig),derivY,1);
+		if( border != null ) {
+			border.setImage(orig);
+			ConvolveJustBorder_General.convolve(kernelDerivX_I32, border,derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_I32, border,derivY,1);
 		}
 	}
 
@@ -90,15 +92,16 @@ public class GradientSobel {
 	 * @param orig   Input image.  Not modified.
 	 * @param derivX Storage for image derivative along the x-axis. Modified.
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
-	 * @param processBorder If the image's border is processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(ImageSInt16 orig, ImageSInt16 derivX, ImageSInt16 derivY, boolean processBorder) {
+	public static void process(ImageSInt16 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_I32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 
-		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelDerivX_I32, FactoryImageBorder.extend(orig),derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_I32, FactoryImageBorder.extend(orig),derivY,1);
+		if( border != null ) {
+			border.setImage(orig);
+			ConvolveJustBorder_General.convolve(kernelDerivX_I32, border,derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_I32, border,derivY,1);
 		}
 	}
 
@@ -108,17 +111,18 @@ public class GradientSobel {
 	 * @param orig   Input image.  Not modified.
 	 * @param derivX Storage for image derivative along the x-axis. Modified.
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
-	 * @param processBorder If the image's border is processed or not.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(ImageFloat32 orig, ImageFloat32 derivX, ImageFloat32 derivY, boolean processBorder) {
+	public static void process(ImageFloat32 orig, ImageFloat32 derivX, ImageFloat32 derivY, ImageBorder_F32 border) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 
 //		GradientSobel_Outer.process_F32(orig, derivX, derivY);
 		GradientSobel_UnrolledOuter.process_F32_sub(orig, derivX, derivY);
 
-		if( processBorder ) {
-			ConvolveJustBorder_General.convolve(kernelDerivX_F32, FactoryImageBorder.extend(orig),derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_F32, FactoryImageBorder.extend(orig),derivY,1);
+		if( border != null ) {
+			border.setImage(orig);
+			ConvolveJustBorder_General.convolve(kernelDerivX_F32, border,derivX,1);
+			ConvolveJustBorder_General.convolve(kernelDerivY_F32, border,derivY,1);
 		}
 	}
 }

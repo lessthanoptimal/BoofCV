@@ -16,7 +16,6 @@
 
 package gecv.abst.filter.convolve;
 
-import gecv.abst.filter.FilterImageInterface;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.KernelBase;
 import gecv.struct.image.ImageBase;
@@ -32,7 +31,7 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 public class GenericConvolveDown<Input extends ImageBase, Output extends ImageBase>
-	implements FilterImageInterface<Input,Output>
+	implements ConvolveInterface<Input,Output>
 {
 	Method m;
 	KernelBase kernel;
@@ -76,5 +75,10 @@ public class GenericConvolveDown<Input extends ImageBase, Output extends ImageBa
 	@Override
 	public int getVerticalBorder() {
 		return getHorizontalBorder();
+	}
+
+	@Override
+	public BorderType getBorderType() {
+		return type;
 	}
 }

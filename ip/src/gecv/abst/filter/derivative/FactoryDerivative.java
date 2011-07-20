@@ -16,7 +16,11 @@
 
 package gecv.abst.filter.derivative;
 
+import gecv.alg.filter.convolve.KernelFactory;
 import gecv.alg.filter.derivative.*;
+import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
@@ -25,8 +29,25 @@ import gecv.struct.image.ImageUInt8;
 import java.lang.reflect.Method;
 
 /**
+ * <p>
  * Factory for creating different types of {@link ImageGradient}, which are used to compute
  * the image's derivative.
+ * </p>
+ *
+ * <p>
+ * If the image borders are processed then how the borders are used needs to be selected carefully.  Default
+ * values are selected to maximize visual appearance, which means sacrificing some theoretical purity.
+ * <ul>
+ * <li>No border: The border is simply ignored.  This can be problematic when dealing with small images in an image pyramid.</li>
+ * <li>Extended: Arguably introduces the fewest visible artifacts at the border by replicating the border pixels.
+ * Has the undesirable affect of breaking the associative property, e.g. second derivatives XY and YX are not equal.<li>
+ * <li>Wrap: Maintains the associative property but can introduce strange artifacts because the pixel values at the other end
+ * of the image are only loosely correlated.<li>
+ * <li>Reflect: Doesn't have any justification for its use in this application.<li>
+ * <li>Normalized: Will generate complete garbage<li>
+ * <li>Value: Is sometimes used and will generate significant artifacts along the border.<li>
+ * </ul>
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -36,43 +57,48 @@ public class FactoryDerivative {
 	ImageGradient<I,D> sobel( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findDerivative(GradientSobel.class,inputType,derivType);
-		return new ImageGradient_Reflection<I,D>(m,true);
+		return new ImageGradient_Reflection<I,D>(m);
 	}
 
 	public static <I extends ImageBase, D extends ImageBase>
 	ImageGradient<I,D> three( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findDerivative(GradientThree.class,inputType,derivType);
-		return new ImageGradient_Reflection<I,D>(m,true);
+		return new ImageGradient_Reflection<I,D>(m);
 	}
 
 	public static <I extends ImageBase, D extends ImageBase>
 	ImageHessianDirect<I,D> hessianDirectThree( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findHessian(HessianThree.class,inputType,derivType);
-		return new ImageHessianDirect_Reflection<I,D>(m,true);
+		return new ImageHessianDirect_Reflection<I,D>(m);
 	}
 
 	public static <I extends ImageBase, D extends ImageBase>
 	ImageHessianDirect<I,D> hessianDirectSobel( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findHessian(HessianSobel.class,inputType,derivType);
-		return new ImageHessianDirect_Reflection<I,D>(m,true);
+		return new ImageHessianDirect_Reflection<I,D>(m);
 	}
 
 	public static <D extends ImageBase>
 	ImageHessian<D> hessian( Class<?> gradientType , Class<D> derivType ) {
 		Method m = findHessianFromGradient(gradientType,derivType);
-		return new ImageHessian_Reflection<D>(m,true);
+		return new ImageHessian_Reflection<D>(m);
 	}
 
 	public static <I extends ImageBase, D extends ImageBase>
-	ImageGradient<I,D> gaussian( int radius , Class<I> inputType , Class<D> derivType) {
-		return new ImageGradient_Gaussian<I,D>(radius,inputType,derivType);
+	ImageGradient<I,D> gaussian( double sigma , int radius , Class<I> inputType , Class<D> derivType) {
+		if( radius <= 0 )
+			radius = KernelFactory.radiusForSigma(sigma);
+		else if( sigma <= 0 )
+			sigma = KernelFactory.sigmaForRadius(radius);
+
+		return new ImageGradient_Gaussian<I,D>(sigma,radius,inputType,derivType);
 	}
 
-	public static ImageGradient<ImageFloat32,ImageFloat32> gaussian_F32( int radius ) {
-		return gaussian(radius, ImageFloat32.class,ImageFloat32.class);
+	public static ImageGradient<ImageFloat32,ImageFloat32> gaussian_F32( double sigma , int radius ) {
+		return gaussian(sigma,radius, ImageFloat32.class,ImageFloat32.class);
 	}
 
 	public static ImageGradient<ImageFloat32,ImageFloat32> sobel_F32() {
@@ -91,8 +117,8 @@ public class FactoryDerivative {
 		return hessianDirectSobel(ImageFloat32.class,ImageFloat32.class);
 	}
 
-	public static ImageGradient<ImageUInt8, ImageSInt16> gaussian_I8( int radius ) {
-		return gaussian(radius,ImageUInt8.class,ImageSInt16.class);
+	public static ImageGradient<ImageUInt8, ImageSInt16> gaussian_I8( double sigma , int radius ) {
+		return gaussian(sigma,radius,ImageUInt8.class,ImageSInt16.class);
 	}
 
 	public static ImageGradient<ImageUInt8, ImageSInt16> sobel_I8() {
@@ -131,7 +157,8 @@ public class FactoryDerivative {
 										 Class<?> inputType , Class<?> derivType ) {
 		Method m;
 		try {
-			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,boolean.class);
+			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_I32.class;
+			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,borderType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
@@ -142,7 +169,8 @@ public class FactoryDerivative {
 										Class<?> inputType , Class<?> derivType ) {
 		Method m;
 		try {
-			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,derivType,boolean.class);
+			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_I32.class;
+			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,derivType,borderType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
@@ -153,7 +181,8 @@ public class FactoryDerivative {
 		String name = derivativeClass.getSimpleName().substring(8);
 		Method m;
 		try {
-			m = HessianFromGradient.class.getDeclaredMethod("hessian"+name, imageType,imageType,imageType,imageType,imageType,boolean.class);
+			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(imageType) ? ImageBorder_F32.class : ImageBorder_I32.class;
+			m = HessianFromGradient.class.getDeclaredMethod("hessian"+name, imageType,imageType,imageType,imageType,imageType,borderType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}

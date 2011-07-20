@@ -49,5 +49,10 @@ public enum BorderType {
 	/**
 	 * Also known as periodic, an access outside of one border is wrapped around to the other border.
 	 */
-	WRAP
+	WRAP,
+
+	/**
+	 * The image border is set to a fixed value
+	 */
+	VALUE
 }
