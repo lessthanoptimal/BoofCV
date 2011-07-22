@@ -21,7 +21,6 @@ import gecv.alg.filter.binary.ThresholdImageOps;
 import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.ImageBinaryLabeledPanel;
-import gecv.gui.image.ImageBinaryPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageSInt32;
@@ -39,6 +38,8 @@ public class DetectParticlesApp {
 		BufferedImage originalBuff = UtilImageIO.loadImage("evaluation/data/particles01.jpg");
 		ImageUInt8 original = ConvertBufferedImage.convertFrom(originalBuff,(ImageUInt8)null);
 
+		ShowImages.showWindow(original,"Original");
+
 		// todo add auto select threshold
 		double average = PixelMath.sum(original)/(double)(original.width*original.height);
 
@@ -46,8 +47,8 @@ public class DetectParticlesApp {
 		ImageUInt8 mod = BinaryImageOps.erode8(thresholded,null);
 		mod = BinaryImageOps.dilate8(mod,null);
 
-		ImageBinaryPanel panel = new ImageBinaryPanel(mod);
-		ShowImages.showWindow(panel,"Threshold");
+//		ImageBinaryPanel panel = new ImageBinaryPanel(mod);
+//		ShowImages.showWindow(panel,"Threshold");
 
 		int max = 5000;
 		ImageSInt32 labeled = new ImageSInt32(original.width,original.height);

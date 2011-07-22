@@ -38,28 +38,28 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class BenchmarkConvolve {
-	static int imgWidth = 640;
-	static int imgHeight = 480;
+	static int width = 640;
+	static int height = 480;
 	static int radius;
 	static long TEST_TIME = 1000;
 
 	static Kernel2D_F32 kernel2D_F32;
 	static Kernel1D_F32 kernelF32;
-	static ImageFloat32 imgFloat32;
-	static ImageFloat32 out_F32;
 	static Kernel1D_I32 kernelI32;
 	static Kernel2D_I32 kernel2D_I32;
-	static ImageUInt8 imgInt8;
-	static ImageSInt16 imgInt16;
-	static ImageUInt8 out_I8;
-	static ImageSInt16 out_I16;
-	static ImageSInt32 out_I32;
+	static ImageFloat32 input_F32 = new ImageFloat32(width,height);
+	static ImageFloat32 out_F32 = new ImageFloat32(width,height);
+	static ImageUInt8 input_I8 = new ImageUInt8(width,height);
+	static ImageSInt16 input_I16 = new ImageSInt16(width,height);
+	static ImageUInt8 out_I8 = new ImageUInt8(width,height);
+	static ImageSInt16 out_I16 = new ImageSInt16(width,height);
+	static ImageSInt32 out_I32 = new ImageSInt32(width,height);
 
 	public static class Horizontal_F32 extends PerformerBase
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.horizontal(kernelF32,imgFloat32,out_F32,false);
+			ConvolveImageStandard.horizontal(kernelF32, input_F32,out_F32,false);
 		}
 	}
 
@@ -67,7 +67,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.horizontal(kernelI32,imgInt8,out_I8,10,false);
+			ConvolveImageStandard.horizontal(kernelI32, input_I8,out_I8,10,false);
 		}
 	}
 
@@ -75,7 +75,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_I8_I8_Div.horizontal(kernelI32,imgInt8,out_I8,10,false) )
+			if( !ConvolveImageUnrolled_I8_I8_Div.horizontal(kernelI32, input_I8,out_I8,10,false) )
 				throw new RuntimeException();
 		}
 	}
@@ -84,7 +84,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.horizontal(kernelI32,imgInt8,out_I16,false);
+			ConvolveImageStandard.horizontal(kernelI32, input_I8,out_I16,false);
 		}
 
 	}
@@ -93,7 +93,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.horizontal(kernelI32,imgInt8,out_I16,false);
+			ConvolveImageStandard.horizontal(kernelI32, input_I8,out_I16,false);
 		}
 	}
 
@@ -101,7 +101,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.vertical(kernelF32,imgFloat32,out_F32,false);
+			ConvolveImageStandard.vertical(kernelF32, input_F32,out_F32,false);
 		}
 	}
 
@@ -109,7 +109,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.vertical(kernelI32,imgInt8,out_I8,10,false);
+			ConvolveImageStandard.vertical(kernelI32, input_I8,out_I8,10,false);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_I8_I8_Div.vertical(kernelI32,imgInt8,out_I8,10,false) )
+			if( !ConvolveImageUnrolled_I8_I8_Div.vertical(kernelI32, input_I8,out_I8,10,false) )
 				throw new RuntimeException();
 		}
 	}
@@ -126,7 +126,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.vertical(kernelI32,imgInt8,out_I16,false);
+			ConvolveImageStandard.vertical(kernelI32, input_I8,out_I16,false);
 		}
 	}
 
@@ -134,7 +134,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.vertical(kernelI32,imgInt16,out_I16,false);
+			ConvolveImageStandard.vertical(kernelI32, input_I16,out_I16,false);
 		}
 	}
 
@@ -142,7 +142,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageNoBorder.convolve(kernel2D_F32,imgFloat32,out_F32);
+			ConvolveImageNoBorder.convolve(kernel2D_F32, input_F32,out_F32);
 		}
 	}
 
@@ -150,7 +150,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.convolve(kernel2D_F32,imgFloat32,out_F32);
+			ConvolveImageStandard.convolve(kernel2D_F32, input_F32,out_F32);
 		}
 	}
 
@@ -158,7 +158,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_F32_F32.convolve(kernel2D_F32,imgFloat32,out_F32) )
+			if( !ConvolveImageUnrolled_F32_F32.convolve(kernel2D_F32, input_F32,out_F32) )
 				throw new RuntimeException();
 		}
 	}
@@ -167,7 +167,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageNoBorder.convolve(kernel2D_I32,imgInt8,out_I16);
+			ConvolveImageNoBorder.convolve(kernel2D_I32, input_I8,out_I16);
 		}
 	}
 
@@ -175,7 +175,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveWithBorder.convolve(kernel2D_I32,imgInt8,out_I16,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+			ConvolveWithBorder.convolve(kernel2D_I32, input_I8,out_I16,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		}
 	}
 
@@ -183,7 +183,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.convolve(kernel2D_I32,imgInt8,out_I8,10);
+			ConvolveImageStandard.convolve(kernel2D_I32, input_I8,out_I8,10);
 		}
 	}
 
@@ -191,7 +191,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageNoBorder.convolve(kernel2D_I32,imgInt8,out_I8,10);
+			ConvolveImageNoBorder.convolve(kernel2D_I32, input_I8,out_I8,10);
 		}
 	}
 
@@ -199,7 +199,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ConvolveImageStandard.convolve(kernel2D_I32,imgInt8,out_I16);
+			ConvolveImageStandard.convolve(kernel2D_I32, input_I8,out_I16);
 		}
 	}
 
@@ -207,7 +207,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_F32_F32.horizontal(kernelF32,imgFloat32,out_F32,false) )
+			if( !ConvolveImageUnrolled_F32_F32.horizontal(kernelF32, input_F32,out_F32,false) )
 				throw new RuntimeException();
 		}
 	}
@@ -216,7 +216,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_F32_F32.vertical(kernelF32,imgFloat32,out_F32,false) )
+			if( !ConvolveImageUnrolled_F32_F32.vertical(kernelF32, input_F32,out_F32,false) )
 				throw new RuntimeException();
 		}
 	}
@@ -225,7 +225,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_I8_I16.horizontal(kernelI32,imgInt8,out_I16,false) )
+			if( !ConvolveImageUnrolled_I8_I16.horizontal(kernelI32, input_I8,out_I16,false) )
 				throw new RuntimeException();
 		}
 	}
@@ -234,7 +234,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_I8_I16.vertical(kernelI32,imgInt8,out_I16,false) )
+			if( !ConvolveImageUnrolled_I8_I16.vertical(kernelI32, input_I8,out_I16,false) )
 				throw new RuntimeException();
 		}
 	}
@@ -243,7 +243,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_I16_I16.horizontal(kernelI32,imgInt16,out_I16,false) )
+			if( !ConvolveImageUnrolled_I16_I16.horizontal(kernelI32, input_I16,out_I16,false) )
 				throw new RuntimeException();
 		}
 	}
@@ -252,7 +252,7 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			if( !ConvolveImageUnrolled_I16_I16.vertical(kernelI32,imgInt16,out_I16,false) )
+			if( !ConvolveImageUnrolled_I16_I16.vertical(kernelI32, input_I16,out_I16,false) )
 				throw new RuntimeException();
 		}
 	}
@@ -261,26 +261,19 @@ public class BenchmarkConvolve {
 	{
 		@Override
 		public void process() {
-			ImplConvolveBox.vertical(imgInt8,out_I32,radius,false);
+			ImplConvolveBox.vertical(input_I8,out_I32,radius,false);
 		}
 	}
 
 	public static void main( String args[] ) {
-		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
-		imgInt16 = new ImageSInt16(imgWidth,imgHeight);
-		out_I32 = new ImageSInt32(imgWidth,imgHeight);
-		out_I16 = new ImageSInt16(imgWidth,imgHeight);
-		out_I8 = new ImageUInt8(imgWidth,imgHeight);
-		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
-		out_F32 = new ImageFloat32(imgWidth,imgHeight);
 
 		Random rand = new Random(234234);
-		ImageTestingOps.randomize(imgInt8,rand, 0, 100);
-		ImageTestingOps.randomize(imgInt16,rand,0,200);
-		ImageTestingOps.randomize(imgFloat32,rand,0,200);
+		ImageTestingOps.randomize(input_I8,rand, 0, 100);
+		ImageTestingOps.randomize(input_I16,rand,0,200);
+		ImageTestingOps.randomize(input_F32,rand,0,200);
 
 
-		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
+		System.out.println("=========  Profile Image Size "+ width +" x "+ height +" ==========");
 		System.out.println();
 
 		for( int radius = 1; radius < 10; radius += 1 ) {

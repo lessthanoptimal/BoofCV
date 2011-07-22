@@ -46,6 +46,11 @@ public interface NonMaxCornerExtractor {
 	public void setThresh(float thresh);
 
 	/**
+	 * Returns the current feature selection threshold.
+	 */
+	public float getThresh();
+
+	/**
 	 * Detects corners in the image.  Features that are in the exclude list will be avoided
 	 *
 	 * @param intensityImage Feature intensity image. Can be modified.

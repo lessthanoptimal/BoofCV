@@ -160,6 +160,11 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 	}
 
 	@Override
+	public int getTotalScales() {
+		return scales.length;
+	}
+
+	@Override
 	public I getScaledImage() {
 		return scaledImage;
 	}

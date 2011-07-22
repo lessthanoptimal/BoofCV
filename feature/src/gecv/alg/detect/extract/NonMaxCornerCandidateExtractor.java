@@ -44,6 +44,10 @@ public class NonMaxCornerCandidateExtractor {
 		this.radius = minSeparation;
 	}
 
+	public float getThresh() {
+		return thresh;
+	}
+
 	public void setThresh(float thresh) {
 		this.thresh = thresh;
 	}

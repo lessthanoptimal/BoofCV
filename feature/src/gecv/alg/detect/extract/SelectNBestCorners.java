@@ -23,7 +23,7 @@ import pja.sorting.QuickSelectArray;
 
 
 /**
- * This extractor selects N best results from the extractor is is wrapped around.
+ * This extractor selects N best results from the extractor that it is wrapped around.
  *
  * @author Peter Abeles
  */

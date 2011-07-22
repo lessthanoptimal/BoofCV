@@ -40,6 +40,16 @@ public class WrapperFastNonMax implements CornerExtractor {
 	}
 
 	@Override
+	public float getThreshold() {
+		return extractor.getThresh();
+	}
+
+	@Override
+	public void setThreshold(float threshold) {
+		extractor.setThresh(threshold);
+	}
+
+	@Override
 	public boolean getUsesCandidates() {
 		return false;
 	}

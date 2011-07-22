@@ -40,6 +40,16 @@ public class WrapperThreshold implements CornerExtractor {
 	}
 
 	@Override
+	public float getThreshold() {
+		return extractor.getThreshold();
+	}
+
+	@Override
+	public void setThreshold(float threshold) {
+		extractor.setThreshold(threshold);
+	}
+
+	@Override
 	public boolean getUsesCandidates() {
 		return false;
 	}
