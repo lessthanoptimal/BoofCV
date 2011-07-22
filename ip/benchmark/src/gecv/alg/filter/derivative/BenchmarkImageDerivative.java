@@ -111,7 +111,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			LaplacianEdge.process_F32(imgFloat32,derivX_F32);
+			LaplacianEdge.process(imgFloat32,derivX_F32);
 		}
 	}
 
@@ -119,7 +119,7 @@ public class BenchmarkImageDerivative extends BenchmarkDerivativeBase {
 	{
 		@Override
 		public void process() {
-			LaplacianEdge.process_I8(imgInt8,derivX_I16);
+			LaplacianEdge.process(imgInt8,derivX_I16);
 		}
 	}
 

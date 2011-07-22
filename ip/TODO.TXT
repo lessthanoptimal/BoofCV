@@ -16,6 +16,7 @@
 - Derivative
  * Gaussian derivative kernel 1D
  * Improve performance of derivative edge calculation
+ * Include the image border for the Laplacian
 
 - Edges
  * Whole image:

@@ -54,7 +54,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 
 		if (args.length == 0) {
 //			fileName = "/mnt/data/datasets/2010/snow_videos/snow_norail_stabilization.avi";
-			fileName = "/mnt/data/datasets/2010/snow_videos/snow_long_drive.avi";
+			fileName = "/home/pja/uav_video.avi";
 		} else {
 			fileName = args[0];
 		}

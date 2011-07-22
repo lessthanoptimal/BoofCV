@@ -53,6 +53,11 @@ public class FastNonMaxCornerExtractor implements NonMaxCornerExtractor {
 	}
 
 	@Override
+	public float getThresh() {
+		return thresh;
+	}
+
+	@Override
 	public void setThresh(float thresh) {
 		this.thresh = thresh;
 	}

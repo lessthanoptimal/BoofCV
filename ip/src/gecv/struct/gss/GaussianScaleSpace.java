@@ -59,6 +59,12 @@ public interface GaussianScaleSpace<T extends ImageBase, D extends ImageBase> {
 	public void setActiveScale( int index );
 
 	/**
+	 * Returns number of scaled images inside of this scale space.
+	 * @return Number of scales.
+	 */
+	public int getTotalScales();
+
+	/**
 	 * Returns the value of the current active scale.
 	 * @return active scale.
 	 */

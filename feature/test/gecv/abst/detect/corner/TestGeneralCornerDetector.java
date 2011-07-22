@@ -174,6 +174,15 @@ public class TestGeneralCornerDetector {
 		public boolean getAcceptRequest() {
 			return acceptsRequests;
 		}
+
+		@Override
+		public float getThreshold() {
+			return 0;
+		}
+
+		@Override
+		public void setThreshold(float threshold) {
+		}
 	}
 
 	public class HelperIntensity implements GeneralCornerIntensity<ImageFloat32,ImageFloat32>

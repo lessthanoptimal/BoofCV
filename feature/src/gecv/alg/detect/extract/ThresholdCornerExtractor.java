@@ -53,4 +53,12 @@ public class ThresholdCornerExtractor {
 			}
 		}
 	}
+
+	public float getThreshold() {
+		return thresh;
+	}
+
+	public void setThreshold(float threshold) {
+		this.thresh = threshold;
+	}
 }

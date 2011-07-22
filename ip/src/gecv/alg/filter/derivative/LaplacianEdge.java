@@ -17,6 +17,8 @@
 package gecv.alg.filter.derivative;
 
 import gecv.alg.InputSanityCheck;
+import gecv.struct.convolve.Kernel2D_F32;
+import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -34,11 +36,14 @@ import gecv.struct.image.ImageUInt8;
  * f(x,y) =   ~~~~~~~~~~~  +  ~~~~~~~~~~~
  *            partial x^2     partial x^2
  *
- *          Integer Images    Floating Point Images
- *          [ 0   1   0 ]      [  0   0.25  0   ]
- * kernel = [ 1  -4   1 ]  or  [ 0.25  -1  0.25 ]
- *          [ 0   1   0 ]      [  0   0.25  0   ]
+ *          [ 0   1   0 ]
+ * kernel = [ 1  -4   1 ]
+ *          [ 0   1   0 ]
  * </pre>
+ * </p>
+ * <p>
+ * This formulation is derived by using the [1 -1] difference kernel for the image derivative.  Alternative
+ * formulations can be found using other kernels.
  * </p>
  * <p>
  * DEVELOPER NOTE:  This is still a strong candidate for further optimizations due to redundant
@@ -47,8 +52,11 @@ import gecv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
+// TODO process image borders
+// TODO create a generator for these functions
 public class LaplacianEdge {
-
+	public static Kernel2D_I32 kernel_I32 = new Kernel2D_I32(new int[]{0,1,0,1,-4,1,0,1,0},3);
+	public static Kernel2D_F32 kernel_F32 = new Kernel2D_F32(new float[]{0,1,0,1,-4,1,0,1,0},3);
 
 	/**
 	 * Computes the Laplacean of 'orig'.
@@ -56,7 +64,7 @@ public class LaplacianEdge {
 	 * @param orig  Input image.  Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
-	public static void process_I8(ImageUInt8 orig, ImageSInt16 deriv) {
+	public static void process(ImageUInt8 orig, ImageSInt16 deriv) {
 		InputSanityCheck.checkSameShape(orig, deriv);
 
 		final byte[] data = orig.data;
@@ -90,7 +98,7 @@ public class LaplacianEdge {
 	 * @param orig  Input image.  Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
-	public static void process_F32(ImageFloat32 orig, ImageFloat32 deriv) {
+	public static void process(ImageFloat32 orig, ImageFloat32 deriv) {
 		InputSanityCheck.checkSameShape(orig, deriv);
 
 		final float[] data = orig.data;
@@ -111,7 +119,7 @@ public class LaplacianEdge {
 				v += data[index + 1];
 				v += data[index + stride];
 
-				out[indexOut++] = 0.25f * v - data[index];
+				out[indexOut++] = v - 4.0f * data[index];
 			}
 		}
 	}

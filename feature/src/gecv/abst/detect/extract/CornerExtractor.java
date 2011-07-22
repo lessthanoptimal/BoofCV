@@ -28,9 +28,15 @@ import gecv.struct.image.ImageFloat32;
  * </p>
  *
  * <p>
- * There are many different ways in which features can be extracted.  Depending on the application having features
+ * There are many different ways in which features can be extracted.  For example, depending on the application, having features
  * spread across the whole image can be more advantageous than simply selecting the features with the highest
- * intensity.
+ * intensity can be preferred.  This interface is designed to allow a diverse set of algorithms to be used.
+ * </p>
+ *
+ * <p>
+ * Almost all feature extraction algorithms use a threshold to determine what can be a feature or not.  Pixels
+ * whose intensity is less than the threshold cannot be a feature.  This interface allows the threshold to be changed,
+ * which is useful in scale-space analysis where the threshold will vary for each level.
  * </p>
  *
  * <p>
@@ -77,4 +83,19 @@ public interface CornerExtractor {
 	 * @return If requests are accepted for number of features.
 	 */
 	public boolean getAcceptRequest();
+
+	/**
+	 * Features must have the specified threshold.
+	 *
+	 * @return threshold for feature selection
+	 */
+	public float getThreshold();
+
+	/**
+	 * Change the feature selection threshold.
+	 *
+	 * @param threshold The new selection threshold.
+	 */
+	public void setThreshold( float threshold );
+
 }

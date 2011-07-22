@@ -156,4 +156,21 @@ public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 	public ImageFloat32 getIntensity() {
 		return intensity.getIntensity();
 	}
+
+	/**
+	 * Changes feature extraction threshold.
+	 *
+	 * @param threshold The new feature extraction threshold.
+	 */
+	public void setThreshold( float threshold ) {
+		extractor.setThreshold(threshold);
+	}
+
+	/**
+	 * Returns the current feature extraction threshold.
+	 * @return feature extraction threshold.
+	 */
+	public float getThreshold() {
+		return extractor.getThreshold();
+	}
 }

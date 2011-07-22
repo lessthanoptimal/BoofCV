@@ -52,7 +52,7 @@ public class TestLaplacianEdge {
 	}
 
 	public void process_I8(ImageUInt8 img, ImageSInt16 deriv) {
-		LaplacianEdge.process_I8(img, deriv);
+		LaplacianEdge.process(img, deriv);
 
 		int expected = -4 * img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
 				+ img.get(2, 1) + img.get(1, 2);
@@ -70,10 +70,10 @@ public class TestLaplacianEdge {
 	}
 
 	public void process_F32(ImageFloat32 img, ImageFloat32 deriv) {
-		LaplacianEdge.process_F32(img, deriv);
+		LaplacianEdge.process(img, deriv);
 
-		float expected = -img.get(1, 1) + (img.get(0, 1) + img.get(1, 0)
-				+ img.get(2, 1) + img.get(1, 2)) * 0.25f;
+		float expected = -4*img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
+				+ img.get(2, 1) + img.get(1, 2);
 
 		assertEquals(expected, deriv.get(1, 1), 1e-5);
 	}

@@ -155,7 +155,7 @@ public class DenoiseAccuracyStudyApp {
 
 	private double computeEdgeMSE(ImageFloat32 imageInv) {
 		ImageFloat32 edge = new ImageFloat32(imageInv.width,imageInv.height);
-		LaplacianEdge.process_F32(image,edge);
+		LaplacianEdge.process(image,edge);
 		PixelMath.abs(edge,edge);
 		float max = PixelMath.maxAbs(edge);
 		PixelMath.divide(edge,edge,max);

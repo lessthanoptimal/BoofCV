@@ -306,7 +306,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/feature/Feature.iml" filepath="$PROJECT_DIR$/feature/Feature.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sfm/Geometric Vision.iml" filepath="$PROJECT_DIR$/sfm/Geometric Vision.iml" />
+      <module fileurl="file://$PROJECT_DIR$/geo/Geometric Vision.iml" filepath="$PROJECT_DIR$/geo/Geometric Vision.iml" />
       <module fileurl="file://$PROJECT_DIR$/ip/Image Processing.iml" filepath="$PROJECT_DIR$/ip/Image Processing.iml" />
       <module fileurl="file://$PROJECT_DIR$/../jgrl/Java Geometric Regression Library.iml" filepath="$PROJECT_DIR$/../jgrl/Java Geometric Regression Library.iml" />
       <module fileurl="file://$PROJECT_DIR$/apps/apps.iml" filepath="$PROJECT_DIR$/apps/apps.iml" />

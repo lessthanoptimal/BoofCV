@@ -240,5 +240,14 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		public boolean getAcceptRequest() {
 			return false;
 		}
+
+		@Override
+		public float getThreshold() {
+			return 0;
+		}
+
+		@Override
+		public void setThreshold(float threshold) {
+		}
 	}
 }
