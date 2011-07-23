@@ -16,7 +16,13 @@
 
 package gecv.abst.detect.extract;
 
+import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
+import gecv.alg.detect.extract.NonMaxCornerCandidateExtractor;
+
 /**
+ * Given a list of requirements create a {@link gecv.abst.detect.extract.CornerExtractor} that meets
+ * those requirements.
+ *
  * @author Peter Abeles
  */
 public class FactoryFeatureFromIntensity
@@ -27,12 +33,36 @@ public class FactoryFeatureFromIntensity
 	 * be of the non-max suppression variety.  
 	 *
 	 * @param useCandidateList Will it use the provided list of candidate features?
-	 * @param ignoreExisting Will it skip over features that have already been detected?
+	 * @param excludeCorners Can it exclude all corners in a list?
 	 * @param acceptRequestNumber Will it detect features until the specified number have been found?
 	 * @return A feature extractor.
 	 */
-	public CornerExtractor create( boolean useCandidateList , boolean ignoreExisting , boolean acceptRequestNumber )
+	public static CornerExtractor create( int minSeparation , float threshold ,
+										  boolean useCandidateList , boolean excludeCorners , boolean acceptRequestNumber )
 	{
-		return null;
+		CornerExtractor ret = null;
+
+		if( useCandidateList ) {
+			if( !acceptRequestNumber )
+				ret = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(minSeparation,threshold));
+		} else {
+			if( !acceptRequestNumber ) {
+				ret = new WrapperNonMax(new FastNonMaxCornerExtractor(minSeparation,0,threshold));
+			} else {
+				throw new IllegalArgumentException("Need to create a wrapper for SelectNBestCorners");
+			}
+		}
+
+		if(ret == null )
+			throw new IllegalArgumentException("No filter exists which matches the specified requirements");
+
+		if( useCandidateList && !ret.getUsesCandidates() )
+			throw new RuntimeException("BUG: Returned algorithm does support candidate list");
+		if( excludeCorners && !ret.getCanExclude() )
+			throw new RuntimeException("BUG: Returned algorithm does support exclude corners");
+		if( acceptRequestNumber && !ret.getAcceptRequest() )
+			throw new RuntimeException("BUG: Returned algorithm does support request number");
+
+		return ret;
 	}
 }
