@@ -125,21 +125,21 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void fillRectangle(ImageBase img, double value , int x0 , int y0 , int x1 , int y1 ) {
+	public static void fillRectangle(ImageBase img, double value , int x0 , int y0 , int width , int height ) {
 		if (img.getClass() == ImageUInt8.class ) {
-			ImageTestingOps.fillRectangle((ImageUInt8) img, (int)value , x0 , y0 , x1 , y1 );
+			ImageTestingOps.fillRectangle((ImageUInt8) img, (int)value , x0 , y0 , width , height );
 		} else if (img.getClass() == ImageSInt8.class ) {
-			ImageTestingOps.fillRectangle((ImageSInt8) img, (int)value , x0 , y0 , x1 , y1 );
+			ImageTestingOps.fillRectangle((ImageSInt8) img, (int)value , x0 , y0 , width , height );
 		} else if (img.getClass() == ImageUInt16.class ) {
-			ImageTestingOps.fillRectangle((ImageUInt16) img, (int)value , x0 , y0 , x1 , y1 );
+			ImageTestingOps.fillRectangle((ImageUInt16) img, (int)value , x0 , y0 , width , height );
 		} else if (img.getClass() == ImageSInt16.class ) {
-			ImageTestingOps.fillRectangle((ImageSInt16) img, (int)value , x0 , y0 , x1 , y1 );
+			ImageTestingOps.fillRectangle((ImageSInt16) img, (int)value , x0 , y0 , width , height );
 		} else if (img.getClass() == ImageSInt32.class ) {
-			ImageTestingOps.fillRectangle((ImageSInt32) img, (int)value , x0 , y0 , x1 , y1 );
+			ImageTestingOps.fillRectangle((ImageSInt32) img, (int)value , x0 , y0 , width , height );
 		} else if (img.getClass() == ImageFloat32.class) {
-			ImageTestingOps.fillRectangle((ImageFloat32) img, (float)value , x0 , y0 , x1 , y1 );
+			ImageTestingOps.fillRectangle((ImageFloat32) img, (float)value , x0 , y0 , width , height );
 		} else if (img.getClass() == ImageFloat64.class) {
-			ImageTestingOps.fillRectangle((ImageFloat64) img, value , x0 , y0 , x1 , y1 );
+			ImageTestingOps.fillRectangle((ImageFloat64) img, value , x0 , y0 , width , height );
 		} else {
 			throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
 		}

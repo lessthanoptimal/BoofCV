@@ -16,18 +16,18 @@
 
 package gecv.alg.detect.interest;
 
-import jgrl.struct.point.Point2D_F64;
+import jgrl.struct.point.Point2D_I32;
 
 /**
  * Where a point of interest was detected and at what scale.
  *
  * @author Peter Abeles
  */
-public class ScalePoint extends Point2D_F64 {
+public class ScalePoint extends Point2D_I32 {
 	// the scale the feature was detected at
 	public double scale;
 
-	public ScalePoint(double x, double y, double scale) {
+	public ScalePoint(int x, int y, double scale) {
 		super(x, y);
 		this.scale = scale;
 	}
@@ -41,5 +41,15 @@ public class ScalePoint extends Point2D_F64 {
 
 	public void setScale(double scale) {
 		this.scale = scale;
+	}
+
+	public ScalePoint copy() {
+		return new ScalePoint(x,y,scale);
+	}
+
+	public void set(ScalePoint p) {
+		this.scale = p.scale;
+		this.x = p.x;
+		this.y = p.y;
 	}
 }

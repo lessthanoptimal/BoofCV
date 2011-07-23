@@ -2,3 +2,7 @@
 - Multi scale harris
 - LoG DoG DoH blob detectors
 - SURF
+
+- Weighted corner detection
+ * compute corner description using weights, such as Guassian distribution
+   Should provide more invariance for rotation

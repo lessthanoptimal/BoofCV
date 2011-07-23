@@ -30,6 +30,14 @@ import gecv.struct.image.ImageUInt8;
 @SuppressWarnings({"unchecked"})
 public class FactoryCornerIntensity {
 
+	/**
+	 * Common interface for creating a {@link KitRosCornerIntensity} from different image types.
+	 *
+	 * @param imageType Type of input image it is computed form.
+	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
+	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner.  11 or 12 are good numbers.
+	 * @return Fast corner
+	 */
 	public static <T extends ImageBase>
 	FastCornerIntensity<T> createFast12( Class<T> imageType , int pixelTol, int minCont)
 	{
@@ -41,36 +49,57 @@ public class FactoryCornerIntensity {
 			throw new IllegalArgumentException("Unknown image type "+imageType);
 	}
 
+	/**
+	 * Common interface for creating a {@link HarrisCornerIntensity} from different image types.
+	 *
+	 * @param derivType Image derivative type it is computed from.
+	 * @param windowRadius Size of the feature it is detects,
+	 * @param kappa Tuning parameter, typically a small number around 0.04
+	 * @return Harris corner
+	 */
 	public static <T extends ImageBase>
-	HarrisCornerIntensity<T> createHarris( Class<T> imageType , int windowRadius, float kappa)
+	HarrisCornerIntensity<T> createHarris( Class<T> derivType , int windowRadius, float kappa)
 	{
-		if( imageType == ImageFloat32.class )
+		if( derivType == ImageFloat32.class )
 			return (HarrisCornerIntensity<T>)new HarrisCorner_F32(windowRadius,kappa);
-		else if( imageType == ImageSInt16.class )
+		else if( derivType == ImageSInt16.class )
 			return (HarrisCornerIntensity<T>)new HarrisCorner_S16(windowRadius,kappa);
 		else
-			throw new IllegalArgumentException("Unknown image type "+imageType);
+			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}
 
+	/**
+	 * Common interface for creating a {@link KitRosCornerIntensity} from different image types.
+	 *
+	 * @param derivType Image derivative type it is computed from.
+	 * @return Kit Ros corner
+	 */
 	public static <T extends ImageBase>
-	KitRosCornerIntensity<T> createKitRos( Class<T> imageType )
+	KitRosCornerIntensity<T> createKitRos( Class<T> derivType )
 	{
-		if( imageType == ImageFloat32.class )
+		if( derivType == ImageFloat32.class )
 			return (KitRosCornerIntensity<T>)new KitRosCorner_F32();
-		else if( imageType == ImageSInt16.class )
+		else if( derivType == ImageSInt16.class )
 			return (KitRosCornerIntensity<T>)new KitRosCorner_S16();
 		else
-			throw new IllegalArgumentException("Unknown image type "+imageType);
+			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}
 
+	/**
+	 * Common interface for creating a {@link KltCornerIntensity} from different image types.
+	 *
+	 * @param derivType Image derivative type it is computed from.
+	 * @param windowRadius Size of the feature it detects,
+	 * @return KLT corner
+	 */
 	public static <T extends ImageBase>
-	KltCornerIntensity<T> createKlt( Class<T> imageType , int windowRadius)
+	KltCornerIntensity<T> createKlt( Class<T> derivType , int windowRadius)
 	{
-		if( imageType == ImageFloat32.class )
+		if( derivType == ImageFloat32.class )
 			return (KltCornerIntensity<T>)new KltCorner_F32(windowRadius);
-		else if( imageType == ImageSInt16.class )
+		else if( derivType == ImageSInt16.class )
 			return (KltCornerIntensity<T>)new KltCorner_S16(windowRadius);
 		else
-			throw new IllegalArgumentException("Unknown image type "+imageType);
+			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}
 }

@@ -40,7 +40,7 @@ public class FactoryDerivativeSparse {
 	 * Creates a sparse Laplacian filter.
 	 *
 	 * @param imageType The type of image which is to be processed.
-	 * @param border How the border should be handled.  If null EXTENDED will be used.
+	 * @param border How the border should be handled.  If null {@link BorderType#EXTENDED} will be used.
 	 * @return Filter for performing a sparse laplacian.
 	 */
 	public static <T extends ImageBase> ImageFunctionSparse<T> createLaplacian( Class<T> imageType , ImageBorder<T> border )

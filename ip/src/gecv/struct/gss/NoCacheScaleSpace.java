@@ -35,6 +35,7 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
+// todo remove the need to specify max derivative
 public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 		implements GaussianScaleSpace<I,D>
 {
