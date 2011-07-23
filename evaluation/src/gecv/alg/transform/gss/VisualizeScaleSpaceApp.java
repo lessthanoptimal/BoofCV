@@ -18,14 +18,12 @@ package gecv.alg.transform.gss;
 
 import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.core.image.ImageGenerator;
-import gecv.core.image.inst.SingleBandGenerator;
 import gecv.gui.image.ImageListPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;
+import gecv.struct.gss.FactoryGaussianScaleSpace;
 import gecv.struct.gss.GaussianScaleSpace;
-import gecv.struct.gss.NoCacheScaleSpace;
 import gecv.struct.image.ImageFloat32;
 
 import java.awt.image.BufferedImage;
@@ -40,8 +38,7 @@ public class VisualizeScaleSpaceApp {
 
 
 	public static void main( String args[] ) {
-		ImageGenerator<ImageFloat32> imageGen = new SingleBandGenerator<ImageFloat32>(ImageFloat32.class);
-		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(imageGen,imageGen,3);
+		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32(3);
 
 		ss.setScales(1.2,2.4,3.6,4.8,6.0);
 
