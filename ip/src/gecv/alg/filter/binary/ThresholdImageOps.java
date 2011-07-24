@@ -83,6 +83,58 @@ public class ThresholdImageOps {
 	}
 
 	/**
+	 * <p>
+	 * Marks which labeled blobs are contained within the inlier set.  If a blob
+	 * is inside the inlier set then its element in the 'results' array is set to its own ID number.  Otherwise
+	 * that element is set to zero.
+	 * </p>
+	 * 
+	 * @param input Original input image with intensity values.  Not modified.
+	 * @param labeled Labeled binary image.
+	 * @param results Where the inlier blobs are indicated.
+	 * @param numBlobs The number of blobs.
+	 * @param threshold Threshold used to define inlier set.
+	 * @param down If the threshold is up or down.
+	 */
+	public static void thresholdBlobs( ImageFloat32 input , ImageSInt32 labeled ,
+									   int results[] , int numBlobs , 
+									   float threshold , boolean down ) {
+		for( int i = 0; i < numBlobs; i++ ) {
+			results[i] = 0;
+		}
+		
+		if( down ) {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]) <= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		} else {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]) >= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Applies a global threshold across the whole image.  Pixels which are
 	 * considered in the set defined by the threshold are set to 1, all others
 	 * are set to zero.  If the down flag is set to true then the inlier set
@@ -130,6 +182,58 @@ public class ThresholdImageOps {
 		}
 
 		return output;
+	}
+
+	/**
+	 * <p>
+	 * Marks which labeled blobs are contained within the inlier set.  If a blob
+	 * is inside the inlier set then its element in the 'results' array is set to its own ID number.  Otherwise
+	 * that element is set to zero.
+	 * </p>
+	 * 
+	 * @param input Original input image with intensity values.  Not modified.
+	 * @param labeled Labeled binary image.
+	 * @param results Where the inlier blobs are indicated.
+	 * @param numBlobs The number of blobs.
+	 * @param threshold Threshold used to define inlier set.
+	 * @param down If the threshold is up or down.
+	 */
+	public static void thresholdBlobs( ImageFloat64 input , ImageSInt32 labeled ,
+									   int results[] , int numBlobs , 
+									   double threshold , boolean down ) {
+		for( int i = 0; i < numBlobs; i++ ) {
+			results[i] = 0;
+		}
+		
+		if( down ) {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]) <= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		} else {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]) >= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -183,6 +287,58 @@ public class ThresholdImageOps {
 	}
 
 	/**
+	 * <p>
+	 * Marks which labeled blobs are contained within the inlier set.  If a blob
+	 * is inside the inlier set then its element in the 'results' array is set to its own ID number.  Otherwise
+	 * that element is set to zero.
+	 * </p>
+	 * 
+	 * @param input Original input image with intensity values.  Not modified.
+	 * @param labeled Labeled binary image.
+	 * @param results Where the inlier blobs are indicated.
+	 * @param numBlobs The number of blobs.
+	 * @param threshold Threshold used to define inlier set.
+	 * @param down If the threshold is up or down.
+	 */
+	public static void thresholdBlobs( ImageUInt8 input , ImageSInt32 labeled ,
+									   int results[] , int numBlobs , 
+									   int threshold , boolean down ) {
+		for( int i = 0; i < numBlobs; i++ ) {
+			results[i] = 0;
+		}
+		
+		if( down ) {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]& 0xFF) <= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		} else {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]& 0xFF) >= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Applies a global threshold across the whole image.  Pixels which are
 	 * considered in the set defined by the threshold are set to 1, all others
 	 * are set to zero.  If the down flag is set to true then the inlier set
@@ -230,6 +386,58 @@ public class ThresholdImageOps {
 		}
 
 		return output;
+	}
+
+	/**
+	 * <p>
+	 * Marks which labeled blobs are contained within the inlier set.  If a blob
+	 * is inside the inlier set then its element in the 'results' array is set to its own ID number.  Otherwise
+	 * that element is set to zero.
+	 * </p>
+	 * 
+	 * @param input Original input image with intensity values.  Not modified.
+	 * @param labeled Labeled binary image.
+	 * @param results Where the inlier blobs are indicated.
+	 * @param numBlobs The number of blobs.
+	 * @param threshold Threshold used to define inlier set.
+	 * @param down If the threshold is up or down.
+	 */
+	public static void thresholdBlobs( ImageSInt16 input , ImageSInt32 labeled ,
+									   int results[] , int numBlobs , 
+									   int threshold , boolean down ) {
+		for( int i = 0; i < numBlobs; i++ ) {
+			results[i] = 0;
+		}
+		
+		if( down ) {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]) <= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		} else {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]) >= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -283,6 +491,58 @@ public class ThresholdImageOps {
 	}
 
 	/**
+	 * <p>
+	 * Marks which labeled blobs are contained within the inlier set.  If a blob
+	 * is inside the inlier set then its element in the 'results' array is set to its own ID number.  Otherwise
+	 * that element is set to zero.
+	 * </p>
+	 * 
+	 * @param input Original input image with intensity values.  Not modified.
+	 * @param labeled Labeled binary image.
+	 * @param results Where the inlier blobs are indicated.
+	 * @param numBlobs The number of blobs.
+	 * @param threshold Threshold used to define inlier set.
+	 * @param down If the threshold is up or down.
+	 */
+	public static void thresholdBlobs( ImageUInt16 input , ImageSInt32 labeled ,
+									   int results[] , int numBlobs , 
+									   int threshold , boolean down ) {
+		for( int i = 0; i < numBlobs; i++ ) {
+			results[i] = 0;
+		}
+		
+		if( down ) {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]& 0xFFFF) <= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		} else {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]& 0xFFFF) >= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Applies a global threshold across the whole image.  Pixels which are
 	 * considered in the set defined by the threshold are set to 1, all others
 	 * are set to zero.  If the down flag is set to true then the inlier set
@@ -330,6 +590,58 @@ public class ThresholdImageOps {
 		}
 
 		return output;
+	}
+
+	/**
+	 * <p>
+	 * Marks which labeled blobs are contained within the inlier set.  If a blob
+	 * is inside the inlier set then its element in the 'results' array is set to its own ID number.  Otherwise
+	 * that element is set to zero.
+	 * </p>
+	 * 
+	 * @param input Original input image with intensity values.  Not modified.
+	 * @param labeled Labeled binary image.
+	 * @param results Where the inlier blobs are indicated.
+	 * @param numBlobs The number of blobs.
+	 * @param threshold Threshold used to define inlier set.
+	 * @param down If the threshold is up or down.
+	 */
+	public static void thresholdBlobs( ImageSInt32 input , ImageSInt32 labeled ,
+									   int results[] , int numBlobs , 
+									   int threshold , boolean down ) {
+		for( int i = 0; i < numBlobs; i++ ) {
+			results[i] = 0;
+		}
+		
+		if( down ) {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]) <= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		} else {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexWork = labeled.startIndex + y*labeled.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexWork++ ) {
+					if( (input.data[indexIn]) >= threshold ) {
+						int val = labeled.data[indexWork];
+						results[val] = val;
+					}
+				}
+			}
+		}
 	}
 
 

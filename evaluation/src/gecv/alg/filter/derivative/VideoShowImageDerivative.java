@@ -16,8 +16,8 @@
 
 package gecv.alg.filter.derivative;
 
-import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.FactoryDerivative;
+import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.misc.PixelMath;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
@@ -28,6 +28,7 @@ import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 /**
@@ -43,6 +44,9 @@ public class VideoShowImageDerivative extends ProcessImageSequence<ImageUInt8> {
 
 	ImagePanel panelX;
 	ImagePanel panelY;
+	ImagePanel original;
+
+	boolean drawGray = false;
 
 	public VideoShowImageDerivative(SimpleImageSequence<ImageUInt8> sequence,
 									ImageGradient<ImageUInt8, ImageSInt16> gradient) {
@@ -69,16 +73,33 @@ public class VideoShowImageDerivative extends ProcessImageSequence<ImageUInt8> {
 		if (panelX == null) {
 			panelX = ShowImages.showWindow(derivX, "Derivative X-Axis");
 			panelY = ShowImages.showWindow(derivY, "Derivative Y-Axis");
+			original = ShowImages.showWindow( guiImage , "Original" );
 			addComponent(panelX);
 			addComponent(panelY);
 		} else {
+			original.setBufferedImage(guiImage);
 			int maxX = PixelMath.maxAbs(derivX);
 			int maxY = PixelMath.maxAbs(derivY);
-			VisualizeImageData.colorizeSign(derivX,panelX.getImage(),maxX);
-			VisualizeImageData.colorizeSign(derivY,panelY.getImage(),maxY);
+
+			if( drawGray ) {
+				VisualizeImageData.grayMagnitude(derivX,panelX.getImage(),maxX);
+				VisualizeImageData.grayMagnitude(derivY,panelY.getImage(),maxY);
+			} else {
+				VisualizeImageData.colorizeSign(derivX,panelX.getImage(),maxX);
+				VisualizeImageData.colorizeSign(derivY,panelY.getImage(),maxY);
+			}
 			panelX.repaint();
 			panelY.repaint();
+			original.repaint();
 		}
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if( e.getButton() == 1 )
+			super.mouseClicked(e);
+		else
+			drawGray = !drawGray;
 	}
 
 	public static void main(String args[]) {

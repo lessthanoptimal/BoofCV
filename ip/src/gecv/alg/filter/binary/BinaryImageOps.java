@@ -21,6 +21,7 @@ import gecv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import gecv.alg.filter.binary.impl.ImplBinaryBorderOps;
 import gecv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import gecv.alg.filter.binary.impl.ImplBinaryNaiveOps;
+import gecv.struct.GrowingArrayInt;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
 
@@ -204,14 +205,15 @@ public class BinaryImageOps {
 	 * expected max number of blobs.  Worst case it will be (width*height)/4
 	 * @return How many blobs were found.
 	 */
-	public static int labelBlobs8( ImageUInt8 input , ImageSInt32 output , int work[] )
+	public static int labelBlobs8( ImageUInt8 input , ImageSInt32 output , GrowingArrayInt work )
 	{
 		InputSanityCheck.checkSameShape(input,output);
+		work = checkDeclareMaxConnect(work);
 
 		int numBlobs = ImplBinaryBlobLabeling.quickLabelBlobs8(input,output,work);
-		ImplBinaryBlobLabeling.optimizeMaxConnect(work,numBlobs);
-		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(work,numBlobs);
-		ImplBinaryBlobLabeling.relabelBlobs(output,work);
+		ImplBinaryBlobLabeling.optimizeMaxConnect(work.data,numBlobs);
+		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(work.data,numBlobs);
+		ImplBinaryBlobLabeling.relabelBlobs(output,work.data);
 
 		return newNumBlobs;
 	}
@@ -234,14 +236,15 @@ public class BinaryImageOps {
 	 * expected max number of blobs.  Worst case it will be (width*height)/2
 	 * @return How many blobs were found.
 	 */
-	public static int labelBlobs4( ImageUInt8 input , ImageSInt32 output , int work[] )
+	public static int labelBlobs4( ImageUInt8 input , ImageSInt32 output , GrowingArrayInt work )
 	{
 		InputSanityCheck.checkSameShape(input,output);
+		work = checkDeclareMaxConnect(work);
 
 		int numBlobs = ImplBinaryBlobLabeling.quickLabelBlobs4(input,output,work);
-		ImplBinaryBlobLabeling.optimizeMaxConnect(work,numBlobs);
-		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(work,numBlobs);
-		ImplBinaryBlobLabeling.relabelBlobs(output,work);
+		ImplBinaryBlobLabeling.optimizeMaxConnect(work.data,numBlobs);
+		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(work.data,numBlobs);
+		ImplBinaryBlobLabeling.relabelBlobs(output,work.data);
 
 		return newNumBlobs;
 	}
@@ -321,5 +324,12 @@ public class BinaryImageOps {
 		}
 
 		return binaryImage;
+	}
+
+	private static GrowingArrayInt checkDeclareMaxConnect(GrowingArrayInt maxConnect) {
+		if( maxConnect == null )
+			maxConnect = new GrowingArrayInt(20);
+
+		return maxConnect;
 	}
 }

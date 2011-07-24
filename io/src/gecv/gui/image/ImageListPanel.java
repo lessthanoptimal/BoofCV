@@ -16,8 +16,6 @@
 
 package gecv.gui.image;
 
-import gecv.io.image.UtilImageIO;
-
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -124,16 +122,5 @@ public class ImageListPanel extends JPanel implements ListSelectionListener , Co
 	@Override
 	public void componentHidden(ComponentEvent e) {
 		//To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	public static void main( String args[] ) {
-		BufferedImage a = UtilImageIO.loadImage("evaluation/data/indoors01.jpg");
-		BufferedImage b = UtilImageIO.loadImage("evaluation/data/outdoors01.jpg");
-
-		ImageListPanel p = new ImageListPanel();
-		ShowImages.showWindow(p,"Test");
-
-		p.addImage(a,"First");
-		p.addImage(b,"Second");
 	}
 }

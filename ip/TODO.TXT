@@ -31,7 +31,6 @@
  * Use high order wavelets when available
 
 - Thresholding
- * Global Threshold
  * Adaptively select global threshold
  * Local Threshold
 
@@ -51,10 +50,6 @@
 
 - Improve Sort Median Filter
 *   Use bubble sort to avoid resorting each time
-
-- Convolve Sparse
- * Optimize a bit more by only running the re-normalize code on the outer most regions.
- * Delete if nothing is using it
 
 - Have a morphological filter section?
  * Add gray scale morphological operators

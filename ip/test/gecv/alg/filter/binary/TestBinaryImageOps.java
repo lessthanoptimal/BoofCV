@@ -86,9 +86,7 @@ public class TestBinaryImageOps {
 		ImageSInt32 expected = new ImageSInt32(13,8);
 		expected.data = expectedData;
 
-		int maxConnect[] = new int[20];
-
-		int numFount = rule8 ? BinaryImageOps.labelBlobs8(input,found,maxConnect) : BinaryImageOps.labelBlobs4(input,found,maxConnect);
+		int numFount = rule8 ? BinaryImageOps.labelBlobs8(input,found,null) : BinaryImageOps.labelBlobs4(input,found,null);
 		assertEquals(numExpected,numFount);
 
 		GecvTesting.assertEquals(expected,found,0);

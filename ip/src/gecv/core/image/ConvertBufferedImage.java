@@ -16,10 +16,7 @@
 
 package gecv.core.image;
 
-import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInterleavedInt8;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.*;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
@@ -255,6 +252,8 @@ public class ConvertBufferedImage {
 	public static BufferedImage convertTo( ImageBase src, BufferedImage dst) {
 		if( ImageUInt8.class == src.getClass() ) {
 			return convertTo((ImageUInt8)src,dst);
+		} else if( ImageSInt16.class == src.getClass() ) {
+			return convertTo((ImageSInt16)src,dst);
 		} else if( ImageFloat32.class == src.getClass() ) {
 			return convertTo((ImageFloat32)src,dst);
 		} else {

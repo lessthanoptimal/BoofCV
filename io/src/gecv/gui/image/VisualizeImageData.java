@@ -22,6 +22,7 @@ import gecv.core.image.ConvertBufferedImage;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInteger;
+import gecv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 
@@ -34,17 +35,26 @@ public class VisualizeImageData {
 
 	public static BufferedImage standard( ImageBase<?> src , BufferedImage dst )
 	{
-		if( ImageInteger.class.isAssignableFrom(src.getClass()) ) {
+		if( src.getTypeInfo().isInteger() ) {
 			ImageInteger srcInt = (ImageInteger)src;
 
-			double max = GenericPixelMath.maxAbs(srcInt);
-			return colorizeSign(srcInt,dst,(int)max);
+			if( src.getTypeInfo().isSigned() ) {
+				double max = GenericPixelMath.maxAbs(srcInt);
+				return colorizeSign(srcInt,dst,(int)max);
+			} else {
+				if( src.getTypeInfo().getNumBits() == 8 ) {
+					dst = ConvertBufferedImage.convertTo((ImageUInt8)src,dst);
+				} else {
+					double max = GenericPixelMath.maxAbs(srcInt);
+					dst = grayUnsigned(srcInt,dst,(int)max);
+				}
+			}
 		} else if( ImageFloat32.class.isAssignableFrom(src.getClass()) ) {
 			float max = PixelMath.maxAbs((ImageFloat32)src);
 			return grayMagnitude((ImageFloat32)src,dst,max);
 		}
 
-		return null;
+		return dst;
 	}
 
 	/**
