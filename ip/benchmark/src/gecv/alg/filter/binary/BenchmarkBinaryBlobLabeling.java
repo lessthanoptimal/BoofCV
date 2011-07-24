@@ -20,6 +20,7 @@ import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import gecv.alg.misc.ImageTestingOps;
+import gecv.struct.GrowingArrayInt;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
 
@@ -37,7 +38,7 @@ public class BenchmarkBinaryBlobLabeling {
 
 	static ImageUInt8 input;
 	static ImageSInt32 output;
-	static int work[] = new int[2000];
+	static GrowingArrayInt work = new GrowingArrayInt(2000);
 
 
 	public static class Normal8 extends PerformerBase {

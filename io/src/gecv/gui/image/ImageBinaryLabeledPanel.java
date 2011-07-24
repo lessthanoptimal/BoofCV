@@ -16,8 +16,8 @@
 
 package gecv.gui.image;
 
+import gecv.gui.binary.VisualizeBinaryData;
 import gecv.struct.image.ImageSInt32;
-import sun.awt.image.IntegerInterleavedRaster;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,7 +55,7 @@ public class ImageBinaryLabeledPanel extends JPanel implements MouseListener {
 		for( int i = 1; i < maxValues; i++ ) {
 			colors[i] = rand.nextInt(0xFFFFFF);
 		}
-		renderImage();
+		VisualizeBinaryData.renderLabeled(labelImage,img,colors);
 	}
 
 	protected ImageBinaryLabeledPanel() {
@@ -67,24 +67,6 @@ public class ImageBinaryLabeledPanel extends JPanel implements MouseListener {
 		//draw the image
 		if (img != null)
 			g.drawImage(img, 0, 0, this);
-	}
-
-	public void renderImage() {
-		IntegerInterleavedRaster raster = (IntegerInterleavedRaster)img.getRaster();
-
-		int rasterIndex = 0;
-		int data[] = raster.getDataStorage();
-
-		int w = labelImage.getWidth();
-		int h = labelImage.getHeight();
-
-
-		for( int y = 0; y < h; y++ ) {
-			int indexSrc = labelImage.startIndex + y* labelImage.stride;
-			for( int x = 0; x < w; x++ ) {
-				data[rasterIndex++] = colors[labelImage.data[indexSrc++]];
-			}
-		}
 	}
 
 	public void setImage(ImageSInt32 binaryImage) {

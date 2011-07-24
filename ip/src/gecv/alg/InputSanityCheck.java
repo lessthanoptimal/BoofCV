@@ -37,7 +37,7 @@ public class InputSanityCheck {
 		return output;
 	}
 
-	public static <T extends ImageBase> T checkDeclare(ImageBase<?> input, T output , Class outputType ) {
+	public static <T extends ImageBase> T checkDeclare(ImageBase<?> input, T output , Class<T> outputType ) {
 		if (output == null) {
 			output = (T) GeneralizedImageOps.createImage(outputType,input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)

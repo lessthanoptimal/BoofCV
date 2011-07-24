@@ -16,17 +16,20 @@
 
 package gecv.alg.binary;
 
+import gecv.alg.filter.binary.BinaryImageHighOps;
 import gecv.alg.filter.binary.BinaryImageOps;
 import gecv.alg.filter.binary.ThresholdImageOps;
 import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.gui.image.ImageBinaryLabeledPanel;
+import gecv.gui.binary.VisualizeBinaryData;
+import gecv.gui.image.ImageListPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 
 /**
@@ -34,29 +37,78 @@ import java.awt.image.BufferedImage;
  */
 public class DetectParticlesApp {
 
+	Random rand = new Random(234);
+	ImageListPanel binaryPanel = new ImageListPanel();
+	ImageListPanel labeledPanel = new ImageListPanel();
+	int colors[];
+
+	public void process( ImageUInt8 original ) {
+
+		colors = new int[ original.width*original.height/4 ];
+		for( int i = 1; i < colors.length; i++ ) {
+			colors[i] = rand.nextInt(0xFFFFFF);
+		}
+
+		double average = PixelMath.sum(original)/(double)(original.width*original.height);
+
+		average *= 0.8;
+
+		useThreshold(original,average);
+		useHysteresis4(original,average);
+		useHysteresis8(original,average);
+		useThresholdMorph(original,average);
+
+		ShowImages.showWindow(binaryPanel,"Binary Images");
+		ShowImages.showWindow(labeledPanel,"Labeled Images");
+	}
+
+	private void useThreshold( ImageUInt8 input , double threshold ) {
+		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		ImageUInt8 thresholded = ThresholdImageOps.threshold(input,null,(int)threshold,true);
+
+		BinaryImageOps.labelBlobs4(thresholded,labeled,null);
+		binaryPanel.addImage(VisualizeBinaryData.renderBinary(thresholded,null),"Threshold");
+		labeledPanel.addImage(VisualizeBinaryData.renderLabeled(labeled,null,colors), "Threshold");
+	}
+
+	private void useHysteresis4( ImageUInt8 input , double threshold ) {
+		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		BinaryImageHighOps.hysteresisLabel4(input,labeled,(int)(threshold*0.6),(int)threshold,true,null);
+		ImageUInt8 binary = BinaryImageOps.labelToBinary(labeled,null);
+
+		binaryPanel.addImage(VisualizeBinaryData.renderBinary(binary,null),"Hysteresis4");
+		labeledPanel.addImage(VisualizeBinaryData.renderLabeled(labeled,null,colors), "Hysteresis4");
+	}
+
+	private void useHysteresis8( ImageUInt8 input , double threshold ) {
+		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		BinaryImageHighOps.hysteresisLabel8(input,labeled,(int)(threshold*0.6),(int)threshold,true,null);
+		ImageUInt8 binary = BinaryImageOps.labelToBinary(labeled,null);
+
+		binaryPanel.addImage(VisualizeBinaryData.renderBinary(binary,null),"Hysteresis8");
+		labeledPanel.addImage(VisualizeBinaryData.renderLabeled(labeled,null,colors), "Hysteresis8");
+	}
+
+	private void useThresholdMorph( ImageUInt8 input , double threshold ) {
+		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+
+		ImageUInt8 thresholded = ThresholdImageOps.threshold(input,null,(int)threshold,true);
+		ImageUInt8 mod = BinaryImageOps.erode8(thresholded,null);
+		mod = BinaryImageOps.dilate8(mod,null);
+
+		BinaryImageOps.labelBlobs4(mod,labeled,null);
+		binaryPanel.addImage(VisualizeBinaryData.renderBinary(mod,null),"Threshold + Morph");
+		labeledPanel.addImage(VisualizeBinaryData.renderLabeled(labeled,null,colors), "Threshold + Morph");
+	}
+
 	public static void main( String args[] ) {
 		BufferedImage originalBuff = UtilImageIO.loadImage("evaluation/data/particles01.jpg");
 		ImageUInt8 original = ConvertBufferedImage.convertFrom(originalBuff,(ImageUInt8)null);
 
 		ShowImages.showWindow(original,"Original");
 
-		// todo add auto select threshold
-		double average = PixelMath.sum(original)/(double)(original.width*original.height);
+		DetectParticlesApp app = new DetectParticlesApp();
 
-		ImageUInt8 thresholded = ThresholdImageOps.threshold(original,null,(int)average,true);
-		ImageUInt8 mod = BinaryImageOps.erode8(thresholded,null);
-		mod = BinaryImageOps.dilate8(mod,null);
-
-//		ImageBinaryPanel panel = new ImageBinaryPanel(mod);
-//		ShowImages.showWindow(panel,"Threshold");
-
-		int max = 5000;
-		ImageSInt32 labeled = new ImageSInt32(original.width,original.height);
-		int numFound = BinaryImageOps.labelBlobs8(mod,labeled,new int[max]);
-
-		ImageBinaryLabeledPanel panel2 = new ImageBinaryLabeledPanel(labeled,max,234234);
-		ShowImages.showWindow(panel2,"Labeled");
-
-		System.out.println("Num found: "+numFound);
+		app.process(original);
 	}
 }

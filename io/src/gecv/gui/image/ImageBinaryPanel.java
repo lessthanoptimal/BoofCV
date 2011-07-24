@@ -16,8 +16,8 @@
 
 package gecv.gui.image;
 
+import gecv.gui.binary.VisualizeBinaryData;
 import gecv.struct.image.ImageUInt8;
-import sun.awt.image.ByteInterleavedRaster;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,7 +38,7 @@ public class ImageBinaryPanel extends JPanel {
 	public ImageBinaryPanel( ImageUInt8 binaryImage ) {
 		this.binaryImage = binaryImage;
 		img = new BufferedImage(binaryImage.getWidth(),binaryImage.getHeight(),BufferedImage.TYPE_BYTE_GRAY);
-		renderImage();
+		VisualizeBinaryData.renderBinary(binaryImage,img);
 
 		setPreferredSize(new Dimension(binaryImage.getWidth(), binaryImage.getHeight()));
 		setMinimumSize(getPreferredSize());
@@ -55,26 +55,9 @@ public class ImageBinaryPanel extends JPanel {
 			g.drawImage(img, 0, 0, this);
 	}
 
-	public void renderImage() {
-		ByteInterleavedRaster raster = (ByteInterleavedRaster)img.getRaster();
-
-		int rasterIndex = 0;
-		byte data[] = raster.getDataStorage();
-
-		int w = binaryImage.getWidth();
-		int h = binaryImage.getHeight();
-
-
-		for( int y = 0; y < h; y++ ) {
-			int indexSrc = binaryImage.startIndex + y*binaryImage.stride;
-			for( int x = 0; x < w; x++ ) {
-				 data[rasterIndex++] = binaryImage.data[indexSrc++] > 0 ? (byte)255 : (byte)0;
-			}
-		}
-	}
-
 	public void setBinaryImage(ImageUInt8 binaryImage) {
 		this.binaryImage = binaryImage;
+		VisualizeBinaryData.renderBinary(binaryImage,img);
 	}
 
 	public BufferedImage getImage() {

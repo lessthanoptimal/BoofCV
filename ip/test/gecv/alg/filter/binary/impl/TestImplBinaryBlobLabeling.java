@@ -16,6 +16,7 @@
 
 package gecv.alg.filter.binary.impl;
 
+import gecv.struct.GrowingArrayInt;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
@@ -99,9 +100,7 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs8_Naive(ImageUInt8 input, ImageSInt32 found,
 											ImageSInt32 expected)
 	{
-		int maxConnect[] = new int[10];
-
-		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,maxConnect);
+		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,new GrowingArrayInt());
 		assertEquals(5,numFount);
 
 		GecvTesting.assertEquals(expected,found,0);
@@ -110,9 +109,7 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs8(ImageUInt8 input, ImageSInt32 found,
 									  ImageSInt32 expected)
 	{
-		int maxConnect[] = new int[10];
-
-		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,maxConnect);
+		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,new GrowingArrayInt());
 		assertEquals(5,numFount);
 
 		GecvTesting.assertEquals(expected,found,0);
@@ -133,9 +130,7 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs4_Naive(ImageUInt8 input, ImageSInt32 found,
 											ImageSInt32 expected)
 	{
-		int coexist[] = new int[10];
-
-		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input,found,coexist);
+		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input,found,new GrowingArrayInt());
 		assertEquals(7,numFount);
 
 		GecvTesting.assertEquals(expected,found,0);
@@ -144,9 +139,7 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs4(ImageUInt8 input, ImageSInt32 found,
 									  ImageSInt32 expected)
 	{
-		int coexist[] = new int[10];
-
-		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input,found,coexist);
+		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input,found,new GrowingArrayInt());
 		assertEquals(7,numFount);
 
 		GecvTesting.assertEquals(expected,found,0);
