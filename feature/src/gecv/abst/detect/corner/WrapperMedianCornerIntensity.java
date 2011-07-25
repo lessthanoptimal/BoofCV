@@ -16,15 +16,11 @@
 
 package gecv.abst.detect.corner;
 
-import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.MedianImageFilter;
 import gecv.alg.detect.corner.MedianCornerIntensity;
-import gecv.alg.detect.corner.impl.MedianCorner_F32;
-import gecv.alg.detect.corner.impl.MedianCorner_U8;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageUInt8;
 
 /**
  * Wrapper around children of {@link gecv.alg.detect.corner.MedianCornerIntensity}.  This is a bit of a hack since
@@ -38,34 +34,17 @@ public class WrapperMedianCornerIntensity<I extends ImageBase, D extends ImageBa
 	MedianImageFilter<I> medianFilter;
 	I medianImage;
 
-	@SuppressWarnings({"unchecked"})
-	public static <I extends ImageBase, D extends ImageBase>
-	WrapperMedianCornerIntensity<I,D> create( Class<I> imageType , int imgWidth , int imgHeight , int medianRadius ) {
-		if( imageType == ImageUInt8.class ) {
-			ImageUInt8 medianImage = new ImageUInt8(imgWidth,imgHeight);
-			MedianImageFilter<ImageUInt8> medianFilter = FactoryBlurFilter.median(ImageUInt8.class,medianRadius);
-			MedianCornerIntensity<ImageUInt8> alg = new MedianCorner_U8(imgWidth,imgHeight);
-			return new WrapperMedianCornerIntensity(alg,medianFilter,medianImage);
-		} else if( imageType == ImageFloat32.class ) {
-			ImageFloat32 medianImage = new ImageFloat32(imgWidth,imgHeight);
-			MedianImageFilter<ImageFloat32> medianFilter = FactoryBlurFilter.median(ImageFloat32.class,medianRadius);
-			MedianCornerIntensity<ImageFloat32> alg = new MedianCorner_F32(imgWidth,imgHeight);
-			return new WrapperMedianCornerIntensity(alg,medianFilter,medianImage);
-		} else {
-			throw new IllegalArgumentException("Unknown image type");
-		}
-	}
-
-	protected WrapperMedianCornerIntensity(MedianCornerIntensity<I> alg ,
-										   MedianImageFilter<I> medianFilter ,
-										   I medianImage ) {
+	public WrapperMedianCornerIntensity(MedianCornerIntensity<I> alg ,
+										MedianImageFilter<I> medianFilter ) {
 		this.alg = alg;
 		this.medianFilter = medianFilter;
-		this.medianImage = medianImage;
 	}
 
 	@Override
 	public void process(I input, D derivX , D derivY , D derivXX , D derivYY , D derivXY ) {
+		if( medianImage == null ) {
+			medianImage = (I)input._createNew(input.width,input.height);
+		}
 		medianFilter.process(input,medianImage);
 		alg.process(input,medianImage);
 	}

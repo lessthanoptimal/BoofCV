@@ -26,7 +26,7 @@ import org.junit.Test;
  */
 public class TestMedianCorner_F32 extends GenericCornerIntensityTests
 {
-	MedianCorner_F32 detector = new MedianCorner_F32(width,height);
+	MedianCorner_F32 detector = new MedianCorner_F32();
 	ImageFloat32 median = new ImageFloat32(width,height);
 
 	@Test

@@ -27,7 +27,7 @@ import org.junit.Test;
  */
 public class TestMedianCorner_I8 extends GenericCornerIntensityTests {
 
-	MedianCorner_U8 detector = new MedianCorner_U8(width,height);
+	MedianCorner_U8 detector = new MedianCorner_U8();
 	ImageUInt8 median = new ImageUInt8(width,height);
 
 	@Test

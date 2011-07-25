@@ -30,14 +30,11 @@ public class MedianCorner_F32 implements MedianCornerIntensity<ImageFloat32> {
 	// the intensity of the found features in the image
 	private ImageFloat32 featureIntensity;
 
-	public MedianCorner_F32( int imgWidth , int imgHeight ) {
-		featureIntensity = new ImageFloat32(imgWidth,imgHeight);
-	}
-
 	@Override
 	public void process(ImageFloat32 originalImage, ImageFloat32 medianImage) {
 
-		InputSanityCheck.checkSameShape(featureIntensity,originalImage, medianImage);
+		InputSanityCheck.checkSameShape(originalImage,medianImage);
+		featureIntensity = InputSanityCheck.checkDeclare(originalImage,featureIntensity);
 
 		final int width = originalImage.width;
 		final int height = originalImage.height;

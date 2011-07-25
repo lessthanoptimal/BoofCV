@@ -30,7 +30,7 @@ import gecv.struct.image.ImageBase;
 /**
  * @author Peter Abeles
  */
-public class FactoryInterestPoints {
+public class FactoryInterestPointAlgs {
 
 	/**
 	 * Creates a {@link gecv.alg.detect.interest.CornerLaplaceScaleSpace} which is uses the Harris corner detector.
