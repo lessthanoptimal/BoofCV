@@ -49,7 +49,7 @@ public class DetectCornerLaplaceFeaturesApp {
 		ss.setImage(inputF32);
 
 		int r = 2;
-		CornerLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPoints.harrisLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+		CornerLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 
 		det.detect(ss);
 

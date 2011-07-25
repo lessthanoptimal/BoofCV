@@ -19,6 +19,8 @@ package gecv.alg.detect.corner;
 import gecv.abst.detect.corner.*;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
+import gecv.abst.filter.blur.FactoryBlurFilter;
+import gecv.abst.filter.blur.impl.MedianImageFilter;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.filter.derivative.GradientThree;
@@ -67,8 +69,9 @@ public class BenchmarkCornerAccuracy {
 
 	ImageFloat32 imageIntensity;
 
-	public QueueCorner detectMedianCorners( int imgWidth , int imgHeight , int medianRadius  ) {
-		return detectCorners(WrapperMedianCornerIntensity.<ImageUInt8, ImageSInt16>create(ImageUInt8.class,imgWidth,imgHeight,medianRadius));
+	public QueueCorner detectMedianCorners( int medianRadius  ) {
+		MedianImageFilter<ImageUInt8> medianFilter = FactoryBlurFilter.median(ImageUInt8.class,medianRadius);
+		return detectCorners(new WrapperMedianCornerIntensity<ImageUInt8,ImageSInt16>(FactoryCornerIntensity.createMedian(ImageUInt8.class),medianFilter));
 	}
 
 	public QueueCorner detectCorners( FastCornerIntensity<ImageUInt8> intensity  ) {
@@ -116,7 +119,7 @@ public class BenchmarkCornerAccuracy {
 		evaluate(detectCorners(FactoryCornerIntensity.createHarris( ImageSInt16.class , radius, 0.04f)),"Harris");
 		evaluate(detectCorners(FactoryCornerIntensity.createKitRos( ImageSInt16.class )),"KitRos");
 		evaluate(detectCorners(FactoryCornerIntensity.createKlt( ImageSInt16.class , radius )),"KLT");
-		evaluate(detectMedianCorners(width, height, radius ),"Median");
+		evaluate(detectMedianCorners(radius ),"Median");
 	}
 
 	private void createTestImage() {

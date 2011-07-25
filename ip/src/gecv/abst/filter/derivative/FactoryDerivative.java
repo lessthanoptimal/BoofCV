@@ -137,6 +137,15 @@ public class FactoryDerivative {
 		return hessianDirectSobel(ImageUInt8.class,ImageSInt16.class);
 	}
 
+	public static <D extends ImageBase> ImageHessian<D> hessianSobel( Class<D> derivType ) {
+		if( derivType == ImageFloat32.class )
+			return (ImageHessian<D>)hessianSobel_F32();
+		else if( derivType == ImageSInt16.class )
+			return (ImageHessian<D>)hessianSobel_I16();
+		else
+			throw new IllegalArgumentException("Not supported yet");
+	}
+
 	public static ImageHessian<ImageSInt16> hessianThree_I16() {
 		return hessian(GradientThree.class,ImageSInt16.class);
 	}

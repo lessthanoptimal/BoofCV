@@ -86,6 +86,10 @@ public class ImplBinaryBlobLabeling {
 			val = Math.max(val,maxConnect.data[p5]);
 			output.set(x,y,val);
 
+			maxConnect.data[maxConnect.data[p2]] = val;
+			maxConnect.data[maxConnect.data[p3]] = val;
+			maxConnect.data[maxConnect.data[p4]] = val;
+			maxConnect.data[maxConnect.data[p5]] = val;
 			maxConnect.data[p2] = val;
 			maxConnect.data[p3] = val;
 			maxConnect.data[p4] = val;
@@ -106,14 +110,14 @@ public class ImplBinaryBlobLabeling {
 				if( input.get(x,y) == 0 )
 					continue;
 
-				spotQuickLabel4(output, maxConnect, y, x);
+				spotQuickLabel4(output, maxConnect, x, y);
 			}
 		}
 
 		return maxConnect.size-1;
 	}
 
-	private static void spotQuickLabel4(ImageBorder_I32 output, GrowingArrayInt maxConnect, int y, int x) {
+	private static void spotQuickLabel4(ImageBorder_I32 output, GrowingArrayInt maxConnect, int x, int y) {
 		final int p5 = output.get(x-1,y);
 		final int p3 = output.get(x  ,y-1);
 
@@ -123,7 +127,7 @@ public class ImplBinaryBlobLabeling {
 			maxConnect.add( value );
 			output.set(x,y,value);
 		} else {
-			int val = Math.max(p3,p5);
+			int val = Math.max(maxConnect.data[p3],maxConnect.data[p5]);
 			output.set(x,y,val);
 
 			maxConnect.data[p3] = val;
@@ -208,14 +212,14 @@ public class ImplBinaryBlobLabeling {
 			if( input.get(x,0) == 0 )
 				continue;
 
-			 spotQuickLabel4(outputSafe, maxConnect, 0, x);
+			 spotQuickLabel4(outputSafe, maxConnect, x, 0);
 		}
 
 		for( int y = 1; y < input.height; y++ ) {
 
 			// label the left border
 			if( input.get(0,y) != 0 )
-				spotQuickLabel4(outputSafe, maxConnect, y, 0);
+				spotQuickLabel4(outputSafe, maxConnect, 0, y);
 
 			int indexIn = input.startIndex + y*input.stride;
 			int indexOut = output.startIndex + y*output.stride + 1;
@@ -235,7 +239,7 @@ public class ImplBinaryBlobLabeling {
 					maxConnect.add(value);
 					output.data[indexOut] = value;
 				} else {
-					int val = Math.max(maxConnect.data[p3],maxConnect.data[p5]);
+					int val = Math.max( maxConnect.data[p3], maxConnect.data[p5]);
 					output.data[indexOut] = val;
 
 					maxConnect.data[p3] = val;

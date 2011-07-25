@@ -102,4 +102,21 @@ public class FactoryCornerIntensity {
 		else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}
+
+	/**
+	 * Common interface for creating a {@link KltCornerIntensity} from different image types.
+	 *
+	 * @param derivType Image derivative type it is computed from.
+	 * @return KLT corner
+	 */
+	public static <T extends ImageBase>
+	MedianCornerIntensity<T> createMedian( Class<T> derivType )
+	{
+		if( derivType == ImageFloat32.class )
+			return (MedianCornerIntensity<T>)new MedianCorner_F32();
+		else if( derivType == ImageUInt8.class )
+			return (MedianCornerIntensity<T>)new MedianCorner_U8();
+		else
+			throw new IllegalArgumentException("Unknown image type "+derivType);
+	}
 }

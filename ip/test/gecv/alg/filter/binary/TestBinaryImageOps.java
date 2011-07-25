@@ -55,6 +55,18 @@ public class TestBinaryImageOps {
 			 0,0,0,0,0,0,0,0,0,0,0,0,0,
 			 0,0,0,0,0,0,0,0,0,0,0,0,0};
 
+	// this is designed to require multiple references in label ancestry to be saved, since otherwise
+	// islands will be formed
+	public static byte[] TEST2 = new byte[]
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,
+			 0,0,0,0,0,1,1,1,1,1,1,1,0,
+			 0,0,0,1,1,1,1,1,0,0,0,1,0,
+			 0,1,1,1,1,1,0,0,0,1,1,1,0,
+			 0,0,0,0,0,0,0,1,1,1,1,0,0,
+			 0,0,0,0,0,0,0,0,0,0,0,0,0,
+			 0,0,0,0,0,0,0,0,0,0,0,0,0,
+			 0,0,0,0,0,0,0,0,0,0,0,0,0};
+
 	@Test
 	public void compareToNaive() {
 		CompareToBinaryNaive tests = new CompareToBinaryNaive(BinaryImageOps.class);
@@ -65,6 +77,7 @@ public class TestBinaryImageOps {
 	public void labelBlobs8() {
 		checkLabelBlobs(TEST,EXPECTED8,2,true);
 		checkLabelBlobs(TestImplBinaryBlobLabeling.TEST1,TestImplBinaryBlobLabeling.BLOBS8,1,true);
+		checkLabelBlobs(TEST2,null,1,true);
 	}
 
 	@Test
@@ -74,12 +87,13 @@ public class TestBinaryImageOps {
 		EXPECTED4[4*13+5] = 3;
 		EXPECTED4[5*13+5] = 3;
 
-//		checkLabelBlobs(TEST,EXPECTED4,3,false);
+		checkLabelBlobs(TEST,EXPECTED4,3,false);
 		checkLabelBlobs(TestImplBinaryBlobLabeling.TEST1,TestImplBinaryBlobLabeling.BLOBS4,2,false);
+		checkLabelBlobs(TEST2,null,1,false);
 	}
 
 	private void checkLabelBlobs( byte[] inputData , int[] expectedData, int numExpected ,
-								   boolean rule8) {
+								  boolean rule8) {
 		ImageUInt8 input = new ImageUInt8(13,8);
 		input.data = inputData;
 		ImageSInt32 found = new ImageSInt32(13,8);
@@ -89,7 +103,8 @@ public class TestBinaryImageOps {
 		int numFount = rule8 ? BinaryImageOps.labelBlobs8(input,found,null) : BinaryImageOps.labelBlobs4(input,found,null);
 		assertEquals(numExpected,numFount);
 
-		GecvTesting.assertEquals(expected,found,0);
+		if( expectedData != null )
+			GecvTesting.assertEquals(expected,found,0);
 	}
 
 	@Test
