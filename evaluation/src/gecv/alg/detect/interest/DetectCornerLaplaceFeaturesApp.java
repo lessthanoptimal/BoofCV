@@ -34,22 +34,20 @@ import java.awt.image.BufferedImage;
 public class DetectCornerLaplaceFeaturesApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-	static String fileName = "evaluation/data/scale/beach01.jpg";
-	static int NUM_FEATURES = 500;
+	static String fileName = "evaluation/data/sunflowers.png";
+	static int NUM_FEATURES = 100;
 
 	public static void main( String args[] ) {
-
-
-
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 
 		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32(3);
-		ss.setScales(1.2,2.4,3.6,4.8,6.0);
+		ss.setScales(1,2,4,8,12);
 		ss.setImage(inputF32);
 
 		int r = 2;
-		CornerLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+		CornerLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+//		CornerLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 
 		det.detect(ss);
 

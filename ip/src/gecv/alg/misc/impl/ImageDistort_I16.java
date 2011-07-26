@@ -33,20 +33,20 @@ import gecv.struct.image.ImageInt16;
  * @author Peter Abeles
  */
 @SuppressWarnings({"UnnecessaryLocalVariable"})
-public class ImageDistort_I16 implements ImageDistort<ImageInt16> {
+public class ImageDistort_I16 <T extends ImageInt16> implements ImageDistort<T> {
 
 	// transform from dst to src image
 	private PixelDistort dstToSrc;
 	// sub pixel interpolation
-	private InterpolatePixel<ImageInt16> interp;
+	private InterpolatePixel<T> interp;
 
-	public ImageDistort_I16(PixelDistort dstToSrc, InterpolatePixel<ImageInt16> interp) {
+	public ImageDistort_I16(PixelDistort dstToSrc, InterpolatePixel<T> interp) {
 		this.dstToSrc = dstToSrc;
 		this.interp = interp;
 	}
 
 	@Override
-	public void apply( ImageInt16 srcImg , ImageInt16 dstImg ) {
+	public void apply( T srcImg , T dstImg ) {
 		InputSanityCheck.checkSameShape(srcImg,dstImg);
 
 		interp.setImage(srcImg);
@@ -75,7 +75,7 @@ public class ImageDistort_I16 implements ImageDistort<ImageInt16> {
 	}
 
 	@Override
-	public void apply( ImageInt16 srcImg , ImageInt16 dstImg , Number value ) {
+	public void apply( T srcImg , T dstImg , Number value ) {
 		InputSanityCheck.checkSameShape(srcImg,dstImg);
 
 		interp.setImage(srcImg);

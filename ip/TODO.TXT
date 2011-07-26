@@ -39,7 +39,7 @@
  * See in code comment on speeding up fast-non-max
  
 - Convolve
- * Add support for convolutions using kernels with:
+ * Add support for convolutions using kernels width:
    - Even length (offset + length)
    - Different width/height
  * Add a new implementation for horizontal and vertical which are "in-place"
@@ -50,6 +50,11 @@
 
 - Improve Sort Median Filter
 *   Use bubble sort to avoid resorting each time
+
+- Interpolate
+ * Remove unsafe in pixel.
+   * That operation would only be used in specialized cases, which likely could have further optimizations.
+   * Pro of keeping it is that it could make this easier to program in the long run
 
 - Have a morphological filter section?
  * Add gray scale morphological operators

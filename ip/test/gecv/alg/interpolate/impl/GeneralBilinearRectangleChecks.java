@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 public abstract class GeneralBilinearRectangleChecks<T extends ImageBase> {
-	Class<?> imageType;
+	Class<T> imageType;
 
 	Random rand = new Random(0xff34);
 
@@ -46,7 +46,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageBase> {
 	float tl_x;
 	float tl_y;
 
-	protected GeneralBilinearRectangleChecks(Class<?> imageType) {
+	protected GeneralBilinearRectangleChecks(Class<T> imageType) {
 		this.imageType = imageType;
 	}
 

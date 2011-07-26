@@ -14,25 +14,25 @@
  *    limitations under the License.
  */
 
-package gecv.alg.misc.impl;
-
-import gecv.alg.interpolate.InterpolatePixel;
-import gecv.alg.misc.ImageDistort;
-import gecv.struct.distort.PixelDistort;
-import gecv.struct.image.ImageUInt8;
-
+package gecv.struct.convolve;
 
 /**
+ * <p>
+ * Computes the instantaneous value of a continuous valued function.
+ * </p>
+ *
+ * <p>
+ * The kernel is assumed to be zero outside of its radius.
+ * </p>
+ *
  * @author Peter Abeles
  */
-public class TestImageDistort_I8 extends GeneralImageDistortTests<ImageUInt8>{
-
-	public TestImageDistort_I8() {
-		super(ImageUInt8.class);
-	}
-
-	@Override
-	public ImageDistort<ImageUInt8> createDistort(PixelDistort dstToSrc, InterpolatePixel<ImageUInt8> interp) {
-		return new ImageDistort_I8<ImageUInt8>(dstToSrc,interp);
-	}
+public abstract class KernelContinuous1D_F32 extends Kernel1D {
+	/**
+	 * Computes the value of the kernel at hte specified point.
+	 *
+	 * @param x Function's input.
+	 * @return  Function's value at point 'x'
+	 */
+	abstract public float compute( float x );
 }

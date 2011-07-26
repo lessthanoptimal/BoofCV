@@ -16,40 +16,22 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.InputSanityCheck;
-import gecv.alg.detect.corner.KitRosCornerIntensity;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * <p>
- * Implementation of {@link gecv.alg.detect.corner.KitRosCornerIntensity}.
- * </p>
- *
  * @author Peter Abeles
  */
-public class KitRosCorner_F32 implements KitRosCornerIntensity<ImageFloat32> {
+public class ImplLaplaceInterestPoints {
 
-	// the intensity of the found features in the image
-	private ImageFloat32 featureIntensity;
-
-	public KitRosCorner_F32() {
-	}
-
-	@Override
-	public void process(ImageFloat32 derivX, ImageFloat32 derivY,
-					 ImageFloat32 hessianXX, ImageFloat32 hessianYY , ImageFloat32 hessianXY ) {
-		InputSanityCheck.checkSameShape(derivX,derivY,hessianXX,hessianYY);
-
-		final int width = derivX.width;
-		final int height = derivY.height;
+	public static void determinant( ImageFloat32 featureIntensity , ImageFloat32 hessianXX, ImageFloat32 hessianYY , ImageFloat32 hessianXY ) {
+		final int width = hessianXX.width;
+		final int height = hessianXX.height;
 
 		if( featureIntensity == null ) {
 			featureIntensity = new ImageFloat32(width,height);
 		}
 
 		for( int y = 0; y < height; y++ ) {
-			int indexX = derivX.startIndex + y*derivX.stride;
-			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexXX = hessianXX.startIndex + y*hessianXX.stride;
 			int indexYY = hessianYY.startIndex + y*hessianYY.stride;
 			int indexXY = hessianXY.startIndex + y*hessianXY.stride;
@@ -57,34 +39,36 @@ public class KitRosCorner_F32 implements KitRosCornerIntensity<ImageFloat32> {
 			int indexInten = featureIntensity.startIndex + y*featureIntensity.stride;
 
 			for( int x = 0; x < width; x++ ) {
-				float dx = derivX.data[indexX++];
-				float dy = derivY.data[indexY++];
 				float dxx = hessianXX.data[indexXX++];
 				float dyy = hessianYY.data[indexYY++];
 				float dxy = hessianXY.data[indexXY++];
 
-				float dx2 = dx*dx;
-				float dy2 = dy*dy;
-
-
-				float top = Math.abs(dxx*dy2 - 2*dxy*dx*dy + dyy*dx2);
-				float bottom = dx2 + dy2;
-
-				if( bottom == 0.0 )
-					featureIntensity.data[indexInten++] = 0;
-				else
-					featureIntensity.data[indexInten++] = top/bottom;
+				featureIntensity.data[indexInten++] = dxx*dyy - dxy*dxy;
 			}
 		}
 	}
 
-	@Override
-	public int getRadius() {
-		return 0;
+	public static void trace( ImageFloat32 featureIntensity , ImageFloat32 hessianXX, ImageFloat32 hessianYY ) {
+		final int width = hessianXX.width;
+		final int height = hessianXX.height;
+
+		if( featureIntensity == null ) {
+			featureIntensity = new ImageFloat32(width,height);
+		}
+
+		for( int y = 0; y < height; y++ ) {
+			int indexXX = hessianXX.startIndex + y*hessianXX.stride;
+			int indexYY = hessianYY.startIndex + y*hessianYY.stride;
+
+			int indexInten = featureIntensity.startIndex + y*featureIntensity.stride;
+
+			for( int x = 0; x < width; x++ ) {
+				float dxx = hessianXX.data[indexXX++];
+				float dyy = hessianYY.data[indexYY++];
+
+				featureIntensity.data[indexInten++] = Math.abs(dxx + dyy);
+			}
+		}
 	}
 
-	@Override
-	public ImageFloat32 getIntensity() {
-		return featureIntensity;
-	}
 }

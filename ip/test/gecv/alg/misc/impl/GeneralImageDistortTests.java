@@ -49,7 +49,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 	Class<?> imageType;
 	ImageGenerator<T> generator;
 
-	public GeneralImageDistortTests( Class<?> imageType ) {
+	public GeneralImageDistortTests( Class<T> imageType ) {
 		this.imageType = imageType;
 		interp = FactoryInterpolation.nearestNeighborPixel(imageType);
 		generator = FactoryImageGenerator.create((Class<T>)imageType);

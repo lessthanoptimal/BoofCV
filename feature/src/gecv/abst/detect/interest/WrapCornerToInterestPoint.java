@@ -41,6 +41,7 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 	ImageGradient<T,D> gradient;
 	ImageHessian<D> hessian;
 
+	// true if the data 
 	boolean declaredDerivatives = false;
 	D derivX;
 	D derivY;
