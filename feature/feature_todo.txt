@@ -6,3 +6,6 @@
 - Weighted corner detection
  * compute corner description using weights, such as Guassian distribution
    Should provide more invariance for rotation
+
+
+- How to handle interest point and corner detector?

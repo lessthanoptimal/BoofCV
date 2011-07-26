@@ -58,7 +58,7 @@ public class ImageSInt32 extends ImageInteger<ImageSInt32> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		data[getIndex(x, y)] = (short) value;
+		data[getIndex(x, y)] = value;
 	}
 
 	@Override

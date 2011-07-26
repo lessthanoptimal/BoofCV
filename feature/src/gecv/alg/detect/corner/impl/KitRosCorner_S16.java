@@ -51,7 +51,7 @@ public class KitRosCorner_S16 implements KitRosCornerIntensity<ImageSInt16> {
 		for( int y = 0; y < height; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
-			int indexXX = hessianXX.startIndex + y*hessianYY.stride;
+			int indexXX = hessianXX.startIndex + y*hessianXX.stride;
 			int indexYY = hessianYY.startIndex + y*hessianYY.stride;
 			int indexXY = hessianXY.startIndex + y*hessianXY.stride;
 

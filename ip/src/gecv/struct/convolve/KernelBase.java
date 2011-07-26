@@ -23,6 +23,7 @@ package gecv.struct.convolve;
  * @author Peter Abeles
  */
 public abstract class KernelBase {
+	// number of elements in the kernel
 	public int width;
 
 	/**

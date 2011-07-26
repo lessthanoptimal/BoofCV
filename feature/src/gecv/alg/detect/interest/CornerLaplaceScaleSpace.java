@@ -35,7 +35,7 @@ import java.util.List;
  * </p>
  *
  * <p>
- * [1] Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"  TODO ??????
+ * [1] Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"  ICCV 2001. Proceedings.
  * </p>
  *
  * @author Peter Abeles

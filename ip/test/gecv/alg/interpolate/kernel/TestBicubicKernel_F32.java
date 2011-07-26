@@ -14,25 +14,18 @@
  *    limitations under the License.
  */
 
-package gecv.alg.misc.impl;
+package gecv.alg.interpolate.kernel;
 
-import gecv.alg.interpolate.InterpolatePixel;
-import gecv.alg.misc.ImageDistort;
-import gecv.struct.distort.PixelDistort;
-import gecv.struct.image.ImageUInt8;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageDistort_I8 extends GeneralImageDistortTests<ImageUInt8>{
-
-	public TestImageDistort_I8() {
-		super(ImageUInt8.class);
-	}
-
-	@Override
-	public ImageDistort<ImageUInt8> createDistort(PixelDistort dstToSrc, InterpolatePixel<ImageUInt8> interp) {
-		return new ImageDistort_I8<ImageUInt8>(dstToSrc,interp);
+public class TestBicubicKernel_F32 {
+	@Test
+	public void test() {
+		fail("implement tests");
 	}
 }

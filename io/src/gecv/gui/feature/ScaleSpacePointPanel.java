@@ -65,9 +65,8 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 				ScalePoint c = unused.remove( unused.size()-1 );
 				c.set(p);
 			}
+			this.points.add(p);
 		}
-
-		this.points.addAll(points);
 	}
 
 	private synchronized  void setLevel( int level ) {
@@ -97,6 +96,7 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 			g.drawImage(levelImage, 0, 0, this);
 			Graphics2D g2 = (Graphics2D)g;
 			g2.setColor(Color.RED);
+			g2.setStroke(new BasicStroke(2));
 
 			for( ScalePoint p : levelPoints ) {
 				int r = (int)(radius*p.scale);
@@ -113,6 +113,7 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 			g.drawImage(background, 0, 0, this);
 
 		Graphics2D g2 = (Graphics2D)g;
+		g2.setStroke(new BasicStroke(2));
 
 		g2.setColor(Color.RED);
 

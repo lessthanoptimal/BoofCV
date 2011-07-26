@@ -19,12 +19,14 @@ package gecv.alg.detect.interest;
 import gecv.abst.detect.corner.GeneralCornerDetector;
 import gecv.abst.detect.corner.GeneralCornerIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
+import gecv.abst.detect.corner.WrapperLaplacianBlobIntensity;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.FactoryDerivativeSparse;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.corner.GradientCornerIntensity;
+import gecv.alg.detect.corner.LaplaceInterestPoints;
 import gecv.struct.image.ImageBase;
 
 /**
@@ -52,6 +54,33 @@ public class FactoryInterestPointAlgs {
 		CornerExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,false,false,false);
 		GradientCornerIntensity<D> harris = FactoryCornerIntensity.createHarris(derivType,featureRadius,0.04f);
 		GeneralCornerIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
+		GeneralCornerDetector<T,D> detector = new GeneralCornerDetector<T,D>(intensity,extractor,maxFeatures);
+
+		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
+
+		return new CornerLaplaceScaleSpace<T,D>(detector,sparseLaplace);
+	}
+	
+	/**
+	 * Creates a {@link gecv.alg.detect.interest.CornerLaplaceScaleSpace} which is uses the Harris corner detector.
+	 * TODO UPDATE
+	 *
+	 * @param featureRadius Size of the feature used to detect the corners.
+	 * @param cornerThreshold Minimum corner intensity required
+	 * @param maxFeatures Max number of features that can be found.
+	 * @param imageType Type of input image.
+	 * @param derivType Image derivative type.
+	 * @return CornerLaplaceScaleSpace
+	 */
+	public static <T extends ImageBase, D extends ImageBase>
+	CornerLaplaceScaleSpace<T,D> hessianLaplace( int featureRadius ,
+												float cornerThreshold ,
+												int maxFeatures ,
+												Class<T> imageType ,
+												Class<D> derivType)
+	{
+		CornerExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,false,false,false);
+		GeneralCornerIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(LaplaceInterestPoints.Type.DETERMINANT,derivType);
 		GeneralCornerDetector<T,D> detector = new GeneralCornerDetector<T,D>(intensity,extractor,maxFeatures);
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);

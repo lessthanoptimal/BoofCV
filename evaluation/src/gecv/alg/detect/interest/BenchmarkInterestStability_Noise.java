@@ -34,25 +34,45 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Compares different image interest point detection algorithms stability under noise and image transformations.
+ * Compares different image interest point detection algorithms stability under different amounts of
+ * i.i.d. gaussian pixel noise.
  *
  * @author Peter Abeles
  */
-// todo multiple images
-// todo print as a function of noise level
-// todo add other interest point types
 public class BenchmarkInterestStability_Noise <T extends ImageBase, D extends ImageBase>  {
 
 	Random rand = new Random(23234);
+	// number of Monte-Carlo trials
 	int numTrials = 50;
-	double sigma = 10;
+	// noise increment
+	double sigmaLevel = 5;
+	// two points are considered to be the same if they are within this tolerance
 	double matchTolerance = 3;
 
+	// radius of the feature it is detecting
 	int radius = 2;
+	// the number of features it will search for
 	static int maxFeatures = 40;
-	Class<T> imageType = (Class<T>)ImageFloat32.class;
-	Class<D> derivType = (Class<D>)ImageFloat32.class;
+	// types of images being processed
+	Class<T> imageType;
+	Class<D> derivType;
 
+	/**
+	 * Evaluating input images of the specified type.
+	 *
+	 * @param imageType Original input image type.
+	 * @param derivType Type of the image derivative.
+	 */
+	public BenchmarkInterestStability_Noise(Class<T> imageType, Class<D> derivType) {
+		this.imageType = imageType;
+		this.derivType = derivType;
+	}
+
+	/**
+	 * Check stability across different amounts of Gaussian noise for the specified image.
+	 *
+	 * @param input Image gthat
+	 */
 	public void process( BufferedImage input  ) {
 		if( input == null )
 			throw new IllegalArgumentException("Image didn't load.");
@@ -61,25 +81,49 @@ public class BenchmarkInterestStability_Noise <T extends ImageBase, D extends Im
 
 		T original = ConvertBufferedImage.convertFrom(input,null,imageType);
 
-		System.out.println("Finding initial feature locations");
 		// get the list of where the features where initially found
+		// Each algorithm is scored based on how similar features found after this are
 		for( Helper<T> h : algs ) {
 			List<Point2D_I32> l = h.detector.detect(original);
 			h.setOriginal(l);
 		}
 
-		for( int i = 0; i < numTrials; i++ ) {
-			T noisy = (T)original.clone();
-			GeneralizedImageOps.addGaussian(noisy,rand,sigma);
+		// Add various amounts of noise to
+		double sigmas[] = new double[5];
+		for( int noiseLevel = 1; noiseLevel <= sigmas.length; noiseLevel++ ) {
+			double sigma = sigmas[noiseLevel-1] = noiseLevel*sigmaLevel;
+//			System.out.println("compute noise "+sigma);
+			
+			for( int i = 0; i < numTrials; i++ ) {
+				T noisy = (T)original.clone();
+				GeneralizedImageOps.addGaussian(noisy,rand,sigma);
+
+				for( Helper<T> h : algs ) {
+					List<Point2D_I32> l = h.detector.detect(noisy);
+					computeScore( l , h );
+				}
+			}
 
 			for( Helper<T> h : algs ) {
-				List<Point2D_I32> l = h.detector.detect(noisy);
-				computeScore( l , h );
+				Score s = h.computeScore();
+				h.scores.add(s);
+				h.reset();
 			}
 		}
 
+		// print the percent missed for each noise level
+		System.out.println("Percent Missed:");
+		System.out.print("Sigma    ");
+		for( int i = 0; i < sigmas.length; i++ ) {
+			System.out.printf("     %2d",(int)sigmas[i]);
+		}
+		System.out.println();
 		for( Helper<T> h : algs ) {
-			h.printResults();
+			System.out.printf("%10s ",h.name);
+			for( Score s : h.scores ) {
+				System.out.printf(" %5.2f%%",100.0*s.missed);
+			}
+			System.out.println();
 		}
 	}
 
@@ -106,7 +150,7 @@ public class BenchmarkInterestStability_Noise <T extends ImageBase, D extends Im
 		}
 
 		h.numMissed.add(numMissed);
-		h.scores.add(total/(h.original.size()-numMissed));
+		h.error.add(total/(h.original.size()-numMissed));
 	}
 
 	public List<Helper<T>> createAlgs() {
@@ -136,9 +180,11 @@ public class BenchmarkInterestStability_Noise <T extends ImageBase, D extends Im
 		String name;
 		InterestPointDetector<T> detector;
 		List<Point2D_I32> original;
-		List<Double> scores = new ArrayList<Double>();
+		List<Double> error = new ArrayList<Double>();
 		List<Integer> numMissed = new ArrayList<Integer>();
 
+		List<Score> scores = new ArrayList<Score>();
+		
 		public Helper( String name , InterestPointDetector<T> detector) {
 			this.name = name;
 			this.detector = detector;
@@ -151,33 +197,52 @@ public class BenchmarkInterestStability_Noise <T extends ImageBase, D extends Im
 			}
 		}
 
-		public void printResults() {
+		public void reset() {
+			error.clear();
+			numMissed.clear();
+		}
+
+		public Score computeScore() {
 			double totalMissed = 0;
 			double totalScore = 0;
 			int scoreDivisor = 0;
 
-			for( int i = 0; i < scores.size(); i++ ) {
+			for( int i = 0; i < error.size(); i++ ) {
 				totalMissed += numMissed.get(i);
-				double s = scores.get(i);
+				double s = error.get(i);
 				if( Double.isNaN(s) || Double.isInfinite(s))
 					continue;
 				totalScore += s;
 				scoreDivisor++;
 			}
 
-			totalMissed /= scores.size();
+			totalMissed /= error.size();
 			totalScore /= scoreDivisor;
-			System.out.printf("%10s missed = %5.2f%% score %5.2f\n",name,100.0*(totalMissed/maxFeatures),totalScore);
+			Score ret = new Score();
+			ret.error = totalScore;
+			ret.missed = (totalMissed/maxFeatures);
+
+			return ret;
 		}
 	}
 
+	public static class Score
+	{
+		double missed;
+		double error;
+	}
+
 	public static void main( String args[] ) {
-		BufferedImage image = UtilImageIO.loadImage("evaluation/data/outdoors01.jpg");
+		// specify test images
+		String imageNames[] = new String[]{"outdoors01.jpg","indoors01.jpg","scale/beach01.jpg"};
 
-		BenchmarkInterestStability_Noise alg = new BenchmarkInterestStability_Noise();
-		alg.process(image);
+		// evaluate each image individually
+		for( String s : imageNames ) {
+			BufferedImage image = UtilImageIO.loadImage("evaluation/data/"+s);
+			BenchmarkInterestStability_Noise<ImageFloat32,ImageFloat32> alg = new BenchmarkInterestStability_Noise<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-		image = UtilImageIO.loadImage("evaluation/data/indoors01.jpg");
-		alg.process(image);
+			System.out.println("\nEvaluating Image: "+s);
+			alg.process(image);
+		}
 	}
 }
