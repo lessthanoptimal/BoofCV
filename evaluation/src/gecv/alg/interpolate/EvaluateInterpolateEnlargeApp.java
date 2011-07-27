@@ -18,8 +18,9 @@ package gecv.alg.interpolate;
 
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.FactorySingleBandImage;
+import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
-import gecv.gui.image.ImageListPanel;
+import gecv.gui.image.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageBase;
@@ -38,7 +39,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase> {
 	int scaledWidth;
 	int scaledHeight;
 
-	ImageListPanel scalePanel = new ImageListPanel();
+	ListDisplayPanel scalePanel = new ListDisplayPanel();
 
 	public EvaluateInterpolateEnlargeApp( BufferedImage input ,
 										  int scaledWidth , int scaledHeight ,
@@ -46,8 +47,10 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase> {
 		grayOriginal = ConvertBufferedImage.convertFrom(input,null,imageType);
 		this.scaledWidth = scaledWidth;
 		this.scaledHeight = scaledHeight;
-		ShowImages.showWindow(scalePanel,"Scaled Images");
 		scalePanel.addImage(input,"Original");
+		scalePanel.setDataDisplaySize(scaledWidth,scaledHeight);
+		ShowImages.showWindow(scalePanel,"Scaled Images");
+
 	}
 
 	public void addInterpolation( String name , InterpolatePixel<T> alg ) {
@@ -66,6 +69,10 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase> {
 				v.set(x,y,value);
 			}
 		}
+		
+		// numerical round off error can cause the interpolation to go outside
+		// of pixel value bounds
+		GeneralizedImageOps.boundImage(scaledImg,0,255);
 
 		BufferedImage out = ConvertBufferedImage.convertTo(scaledImg,null);
 		scalePanel.addImage(out,name);

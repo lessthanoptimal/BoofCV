@@ -25,7 +25,11 @@ import gecv.struct.convolve.KernelContinuous1D_F32;
  * </p>
  *
  * <p>
- * See http://en.wikipedia.org/wiki/Bicubic_interpolation for more information.  July 25, 2011
+ * <ul>
+ * <li>R. Keys, (1981). "Cubic convolution interpolation for digital image processing".
+ * IEEE Transactions on Signal Processing, Acoustics, Speech, and Signal Processing 29: 1153 </li>
+ * <li>http://en.wikipedia.org/wiki/Bicubic_interpolation for more information.  July 25, 2011</li>
+ * </ul>
  * </p>
  *
  * @author Peter Abeles
@@ -40,7 +44,7 @@ public class BicubicKernel_F32 extends KernelContinuous1D_F32 {
      * @param a A parameter
      */
     public BicubicKernel_F32( float a ) {
-        this.width = 2;
+		super(5);
         this.a = a;
     }
 

@@ -26,7 +26,7 @@ import gecv.alg.misc.PixelMath;
 import gecv.alg.transform.wavelet.FactoryWaveletDaub;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.border.BorderType;
-import gecv.gui.image.ImageListPanel;
+import gecv.gui.image.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageFloat32;
@@ -83,7 +83,7 @@ public class DenoiseVisualizeApp {
 
 		System.out.printf("Denoised MSE %8.1ff\n",computeMSE(imageDenoised));
 
-		ImageListPanel gui = new ImageListPanel();
+		ListDisplayPanel gui = new ListDisplayPanel();
 		gui.addImage(ConvertBufferedImage.convertTo(image,null),"Original");
 		gui.addImage(ConvertBufferedImage.convertTo(imageNoisy,null),"Noisy");
 		gui.addImage(ConvertBufferedImage.convertTo(imageDenoised,null),"De-noised");

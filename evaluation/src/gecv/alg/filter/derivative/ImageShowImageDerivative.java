@@ -19,7 +19,7 @@ package gecv.alg.filter.derivative;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.gui.image.ImageListPanel;
+import gecv.gui.image.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;
@@ -38,8 +38,8 @@ public class ImageShowImageDerivative {
 	ImageSInt16 derivX;
 	ImageSInt16 derivY;
 
-	ImageListPanel panelX = new ImageListPanel();
-	ImageListPanel panelY = new ImageListPanel();
+	ListDisplayPanel panelX = new ListDisplayPanel();
+	ListDisplayPanel panelY = new ListDisplayPanel();
 
 	public void process(ImageUInt8 image) {
 

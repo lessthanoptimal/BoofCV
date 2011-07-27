@@ -105,6 +105,28 @@ public class GeneralizedImageOps {
 		}
 	}
 
+	public static void boundImage(ImageBase imgA , double lower , double upper ) {
+		if (imgA.getClass() == ImageUInt8.class ) {
+			PixelMath.boundImage( (ImageUInt8) imgA , (int)lower , (int)upper );
+		} else if (imgA.getClass() == ImageSInt8.class ) {
+			PixelMath.boundImage( (ImageSInt8) imgA , (int)lower , (int)upper );
+		} else if (imgA.getClass() == ImageUInt16.class ) {
+			PixelMath.boundImage( (ImageUInt16) imgA , (int)lower , (int)upper );
+		} else if (imgA.getClass() == ImageSInt16.class ) {
+			PixelMath.boundImage( (ImageSInt16) imgA , (int)lower , (int)upper );
+		} else if (imgA.getClass() == ImageSInt32.class ) {
+			PixelMath.boundImage( (ImageSInt32) imgA , (int)lower , (int)upper );
+//		} else if (imgA.getClass() == ImageSInt64.class ) {
+//			return PixelMath.sum( (ImageSInt64) imgA );
+		} else if (imgA.getClass() == ImageFloat32.class) {
+			PixelMath.boundImage( (ImageFloat32) imgA , (float)lower , (float)upper );
+		} else if (imgA.getClass() == ImageFloat64.class) {
+			PixelMath.boundImage( (ImageFloat64) imgA , lower , upper );
+		} else {
+			throw new RuntimeException("Unknown type: "+imgA.getClass().getSimpleName());
+		}
+	}
+
 	public static double computeMeanSquaredError(ImageBase imgA, ImageBase imgB ) {
 		if (imgA.getClass() == ImageUInt8.class ) {
 			return ImageTestingOps.computeMeanSquaredError((ImageUInt8) imgA, (ImageUInt8) imgB);

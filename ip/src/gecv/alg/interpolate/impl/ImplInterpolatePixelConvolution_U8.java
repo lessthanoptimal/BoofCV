@@ -18,7 +18,7 @@ package gecv.alg.interpolate.impl;
 
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.convolve.KernelContinuous1D_F32;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -33,24 +33,24 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixel<ImageFloat32>  {
+public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixel<ImageUInt8>  {
 
 	// kernel used to perform interpolation
 	private KernelContinuous1D_F32 kernel;
 	// input image
-	private ImageFloat32 image;
+	private ImageUInt8 image;
 
-	public ImplInterpolatePixelConvolution_F32(KernelContinuous1D_F32 kernel) {
+	public ImplInterpolatePixelConvolution_U8(KernelContinuous1D_F32 kernel) {
 		this.kernel = kernel;
 	}
 
 	@Override
-	public void setImage(ImageFloat32 image) {
+	public void setImage(ImageUInt8 image) {
 		this.image = image;
 	}
 
 	@Override
-	public ImageFloat32 getImage() {
+	public ImageUInt8 getImage() {
 		return image;
 	}
 
@@ -84,7 +84,7 @@ public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixel<Ima
 			for( int j = x0; j < x1; j++ ) {
 				float w = kernel.compute(j-x);
 				totalWeightX += w;
-				valueX += w * (image.data[ indexSrc++ ]);
+				valueX += w * (image.data[ indexSrc++ ]& 0xFF);
 			}
 			float w = kernel.compute(i-y);
 			totalWeightY +=  w;
@@ -114,7 +114,7 @@ public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixel<Ima
 			float valueX = 0;
 			for( int j = x0; j < x1; j++ ) {
 				float w = kernel.compute(j-x);
-				valueX += w * (image.data[ indexSrc++ ]);
+				valueX += w * (image.data[ indexSrc++ ]& 0xFF);
 			}
 			float w = kernel.compute(i-y);
 			value += w*valueX;

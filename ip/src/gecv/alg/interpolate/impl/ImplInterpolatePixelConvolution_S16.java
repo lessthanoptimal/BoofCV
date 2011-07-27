@@ -18,7 +18,7 @@ package gecv.alg.interpolate.impl;
 
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.convolve.KernelContinuous1D_F32;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
 
 /**
  * <p>
@@ -33,24 +33,24 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixel<ImageFloat32>  {
+public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixel<ImageSInt16>  {
 
 	// kernel used to perform interpolation
 	private KernelContinuous1D_F32 kernel;
 	// input image
-	private ImageFloat32 image;
+	private ImageSInt16 image;
 
-	public ImplInterpolatePixelConvolution_F32(KernelContinuous1D_F32 kernel) {
+	public ImplInterpolatePixelConvolution_S16(KernelContinuous1D_F32 kernel) {
 		this.kernel = kernel;
 	}
 
 	@Override
-	public void setImage(ImageFloat32 image) {
+	public void setImage(ImageSInt16 image) {
 		this.image = image;
 	}
 
 	@Override
-	public ImageFloat32 getImage() {
+	public ImageSInt16 getImage() {
 		return image;
 	}
 
