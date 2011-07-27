@@ -18,32 +18,33 @@ package gecv.alg.interpolate.impl;
 
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.convolve.KernelContinuous1D_F32;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplInterpolatePixelConvolution_F32 extends GeneralInterpolationPixelChecks<ImageFloat32>{
-
-	public TestImplInterpolatePixelConvolution_F32() {
+public class TestImplInterpolatePixelConvolution_U8 
+		extends GeneralInterpolationPixelChecks<ImageUInt8>
+{
+	public TestImplInterpolatePixelConvolution_U8() {
 		exceptionOutside = false;
 	}
 
 	@Override
-	protected ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width, height);
+	protected ImageUInt8 createImage(int width, int height) {
+		return new ImageUInt8(width, height);
 	}
 
 	@Override
-	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image) {
-		InterpolatePixel<ImageFloat32> ret = new ImplInterpolatePixelConvolution_F32(new Dummy());
+	protected InterpolatePixel<ImageUInt8> wrap(ImageUInt8 image) {
+		InterpolatePixel<ImageUInt8> ret = new ImplInterpolatePixelConvolution_U8(new Dummy());
 		ret.setImage(image);
 
 		return ret;
 	}
 
 	@Override
-	protected float compute(ImageFloat32 img, float x, float y) {
+	protected float compute(ImageUInt8 img, float x, float y) {
 		int xx = (int)x;
 		int yy = (int)y;
 

@@ -18,14 +18,27 @@ package gecv.alg.interpolate.kernel;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestBicubicKernel_F32 {
 	@Test
-	public void test() {
-		fail("implement tests");
+	public void checkSumToOne() {
+		BicubicKernel_F32 kernel = new BicubicKernel_F32(-0.5f);
+
+		// should sum to one for different offsets
+		for( int offset = 0; offset < 10; offset++ ) {
+			float delta = offset*0.01f;
+
+			float total = 0;
+			for( int i = 0; i < kernel.getWidth(); i++ ) {
+				float x = i - kernel.getRadius();
+				total += kernel.compute(x+delta);
+			}
+
+			assertEquals(1,total,1e-4);
+		}
 	}
 }

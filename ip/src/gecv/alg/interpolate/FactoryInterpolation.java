@@ -95,10 +95,10 @@ public class FactoryInterpolation {
 		BicubicKernel_F32 kernel = new BicubicKernel_F32(param);
 		if( type == ImageFloat32.class )
 			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_F32(kernel);
-//		else if( type == ImageUInt8.class )
-//			return (InterpolatePixel<T>)new BilinearPixel_U8();
-//		else if( type == ImageSInt16.class )
-//			return (InterpolatePixel<T>)new BilinearPixel_S16();
+		else if( type == ImageUInt8.class )
+			return (InterpolatePixel<T>)new BilinearPixel_U8();
+		else if( type == ImageSInt16.class )
+			return (InterpolatePixel<T>)new BilinearPixel_S16();
 		else
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}

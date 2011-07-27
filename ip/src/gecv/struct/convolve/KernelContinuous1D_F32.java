@@ -28,6 +28,11 @@ package gecv.struct.convolve;
  * @author Peter Abeles
  */
 public abstract class KernelContinuous1D_F32 extends Kernel1D {
+
+	protected KernelContinuous1D_F32(int width) {
+		super(width);
+	}
+
 	/**
 	 * Computes the value of the kernel at hte specified point.
 	 *

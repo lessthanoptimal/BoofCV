@@ -27,70 +27,68 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Provides a single display which can switch between different images.  A list of images is provided on the right.
+ * Displays a list of items and their respective data.
  *
  * @author Peter Abeles
  */
-public class ImageListPanel extends JPanel implements ListSelectionListener , ComponentListener {
-	// todo put image in a JScrollPane?
-	List<BufferedImage> images = new ArrayList<BufferedImage>();
+public class ListDisplayPanel extends JPanel implements ListSelectionListener , ComponentListener {
 
+	List<JPanel> panels = new ArrayList<JPanel>();
 	private JSplitPane splitPane;
 	private JList listPanel;
-	private ImagePanel imagePanel;
 
 	DefaultListModel listModel = new DefaultListModel();
 
-	public ImageListPanel() {
-
-		int width = 600;
-		int height = 600;
-
+	public ListDisplayPanel() {
 		listPanel = new JList(listModel);
-		imagePanel = new ImagePanel();
 
-		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-				imagePanel, listPanel);
+		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listPanel, new JPanel());
 		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(width-200);
+		splitPane.setDividerLocation(100);
 
 		listPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listPanel.setSelectedIndex(0);
 		listPanel.addListSelectionListener(this);
 
-		splitPane.setPreferredSize(new Dimension(width, height));
-//		listPanel.setMinimumSize(new Dimension(200,height));
-//		listPanel.setPreferredSize(new Dimension(200,height));
-//		imagePanel.setPreferredSize(new Dimension(width-200,height));
-//		splitPane.resetToPreferredSizes();
 
 		add(splitPane);
-//		add(BorderLayout.CENTER,imagePanel);
-//		add(BorderLayout.EAST,listPanel);
 		addComponentListener(this);
 	}
 
+	/**
+	 * Displays a new image in the list.
+	 *
+	 * @param image
+	 * @param name
+	 */
 	public void addImage( BufferedImage image , String name ) {
-		images.add(image);
+		addItem(new ImagePanel(image), name );
+	}
+
+	/**
+	 * Displays a new JPanel in the list.
+	 *
+	 * @param panel
+	 * @param name
+	 */
+	public void addItem( JPanel panel , String name ) {
+		panels.add(panel);
 		listModel.addElement(name);
 
-		if( images.size() == 1 ) {
+		if( listModel.size() == 1 ) {
 			listPanel.setSelectedIndex(0);
 		}
-		splitPane.repaint();
 	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
+		System.out.println("Enter value change");
 		if( e.getValueIsAdjusting() )
 			return;
+		System.out.println("changed "+listPanel.getWidth()+" "+listPanel.getPreferredSize().getWidth());
 
 		int index = listPanel.getSelectedIndex();
-		BufferedImage img = images.get(index);
-		imagePanel.setBufferedImage( img );
-//		imagePanel.setMinimumSize(new Dimension(img.getWidth(),img.getHeight()));
-		imagePanel.setPreferredSize(new Dimension(img.getWidth(),img.getHeight()));
-//		splitPane.resetToPreferredSizes();
+		splitPane.setRightComponent(panels.get(index));
 		splitPane.repaint();
 	}
 
@@ -99,28 +97,36 @@ public class ImageListPanel extends JPanel implements ListSelectionListener , Co
 		int w = e.getComponent().getWidth();
 		int h = e.getComponent().getHeight();
 
-//		System.out.println("w "+w+" h "+h);
-//		splitPane.setMinimumSize(new Dimension(w, h));
 		splitPane.setPreferredSize(new Dimension(w, h));
-//		splitPane.resetToPreferredSizes();
-//		if( splitPane.getWidth() >= 200 ) {
-//			splitPane.setDividerLocation(splitPane.getWidth()-200);
-//		}
 		splitPane.repaint();
 	}
 
 	@Override
 	public void componentMoved(ComponentEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override
 	public void componentShown(ComponentEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
+
 	}
 
 	@Override
 	public void componentHidden(ComponentEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	/**
+	 * Adjust the display size for a panel with the specified dimensions.  Useful for when
+	 * the data being displayed is different sizes.
+	 * 
+	 * @param width
+	 * @param height
+	 */
+	public void setDataDisplaySize(int width, int height) {
+
+		int w = width + splitPane.getDividerLocation();
+		int h = (int)Math.max(height,listPanel.getPreferredSize().getHeight());
+
+
+		splitPane.setPreferredSize(new Dimension(w,h));
 	}
 }

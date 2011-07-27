@@ -23,8 +23,7 @@ import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.binary.VisualizeBinaryData;
 import gecv.gui.image.ImageBinaryLabeledPanel;
-import gecv.gui.image.ImageListPanel;
-import gecv.gui.image.PanelListPanel;
+import gecv.gui.image.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageSInt32;
@@ -40,8 +39,8 @@ import java.util.Random;
 public class DetectParticlesApp {
 
 	Random rand = new Random(234);
-	ImageListPanel binaryPanel = new ImageListPanel();
-	PanelListPanel labeledPanel = new PanelListPanel();
+	ListDisplayPanel binaryPanel = new ListDisplayPanel();
+	ListDisplayPanel labeledPanel = new ListDisplayPanel();
 	int colors[];
 
 	public void process( ImageUInt8 original ) {
@@ -70,7 +69,7 @@ public class DetectParticlesApp {
 
 		int numBlobs = BinaryImageOps.labelBlobs4(thresholded,labeled,null);
 		binaryPanel.addImage(VisualizeBinaryData.renderBinary(thresholded,null),"Threshold");
-		labeledPanel.addImage(new ImageBinaryLabeledPanel(labeled,numBlobs+1,2342), "Threshold");
+		labeledPanel.addItem(new ImageBinaryLabeledPanel(labeled,numBlobs+1,2342), "Threshold");
 	}
 
 	private void useHysteresis4( ImageUInt8 input , double threshold ) {
@@ -79,7 +78,7 @@ public class DetectParticlesApp {
 		ImageUInt8 binary = BinaryImageOps.labelToBinary(labeled,null);
 
 		binaryPanel.addImage(VisualizeBinaryData.renderBinary(binary,null),"Hysteresis4");
-		labeledPanel.addImage(new ImageBinaryLabeledPanel(labeled,numBlobs+1,2342), "Hysteresis4");
+		labeledPanel.addItem(new ImageBinaryLabeledPanel(labeled,numBlobs+1,2342), "Hysteresis4");
 	}
 
 	private void useHysteresis8( ImageUInt8 input , double threshold ) {
@@ -88,7 +87,7 @@ public class DetectParticlesApp {
 		ImageUInt8 binary = BinaryImageOps.labelToBinary(labeled,null);
 
 		binaryPanel.addImage(VisualizeBinaryData.renderBinary(binary,null),"Hysteresis8");
-		labeledPanel.addImage(new ImageBinaryLabeledPanel(labeled,numBlobs+1,2342), "Hysteresis8");
+		labeledPanel.addItem(new ImageBinaryLabeledPanel(labeled,numBlobs+1,2342), "Hysteresis8");
 	}
 
 	private void useThresholdMorph( ImageUInt8 input , double threshold ) {
@@ -100,7 +99,7 @@ public class DetectParticlesApp {
 
 		int numBlobs = BinaryImageOps.labelBlobs4(mod,labeled,null);
 		binaryPanel.addImage(VisualizeBinaryData.renderBinary(mod,null),"Threshold + Morph");
-		labeledPanel.addImage(new ImageBinaryLabeledPanel(labeled,numBlobs+1,2342), "Threshold + Morph");
+		labeledPanel.addItem(new ImageBinaryLabeledPanel(labeled,numBlobs+1,2342), "Threshold + Morph");
 	}
 
 	public static void main( String args[] ) {

@@ -24,6 +24,13 @@ package gecv.struct.convolve;
  */
 public class Kernel1D extends KernelBase {
 
+	public Kernel1D(int width) {
+		super(width);
+	}
+
+	public Kernel1D() {
+	}
+
 	@Override
 	public int getDimension() {
 		return 1;

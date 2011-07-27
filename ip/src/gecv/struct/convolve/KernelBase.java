@@ -26,6 +26,13 @@ public abstract class KernelBase {
 	// number of elements in the kernel
 	public int width;
 
+	protected KernelBase(int width) {
+		this.width = width;
+	}
+
+	protected KernelBase() {
+	}
+
 	/**
 	 * The kernel's width.  This is an odd number.
 	 *

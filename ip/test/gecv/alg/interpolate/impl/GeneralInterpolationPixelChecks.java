@@ -24,8 +24,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Several standardized tests that ensure correct implementations of {@link gecv.alg.interpolate.InterpolatePixel}.
@@ -37,6 +36,8 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 
 	protected int width = 320;
 	protected int height = 240;
+
+	protected boolean exceptionOutside = true;
 
 	protected abstract T createImage( int width , int height );
 
@@ -98,14 +99,20 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 	/**
 	 * Sees if get throws an exception if it is out of bounds
 	 */
-	@Test(expected = IllegalArgumentException.class)
 	public void get_outside() {
 		T img = createImage(width, height);
 
 		InterpolatePixel<T> interp = wrap(img);
 
-		interp.get(500, 10);
+		try {
+			interp.get(500, 10);
+			if( exceptionOutside )
+				fail("Didn't throw an exception when accessing an outside pixel");
+		} catch( IllegalArgumentException e ) {
+
+		}
 	}
+
 
 	/**
 	 * Compare get_unsafe against the value returned by get()

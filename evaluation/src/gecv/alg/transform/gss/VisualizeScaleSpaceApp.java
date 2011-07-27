@@ -18,7 +18,7 @@ package gecv.alg.transform.gss;
 
 import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.gui.image.ImageListPanel;
+import gecv.gui.image.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;
@@ -47,8 +47,8 @@ public class VisualizeScaleSpaceApp {
 
 		ss.setImage(inputF32);
 
-		ImageListPanel gui = new ImageListPanel();
-		ImageListPanel guiDX = new ImageListPanel();
+		ListDisplayPanel gui = new ListDisplayPanel();
+		ListDisplayPanel guiDX = new ListDisplayPanel();
 
 		gui.addImage(input,"Original Image");
 

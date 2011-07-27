@@ -18,9 +18,11 @@ package gecv.alg.interpolate;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.interpolate.impl.BilinearPixel_F32;
+import gecv.alg.interpolate.impl.ImplInterpolatePixelConvolution_F32;
 import gecv.alg.interpolate.impl.NearestNeighborPixel_F32;
+import gecv.alg.interpolate.kernel.BicubicKernel_F32;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
 
@@ -77,6 +79,18 @@ public class BenchmarkInterpolatePixel {
 		}
 	}
 
+	public static class BilinearConvolution_Safe_F32 extends PerformerBase {
+		ImplInterpolatePixelConvolution_F32 alg = new ImplInterpolatePixelConvolution_F32(new BicubicKernel_F32(-0.5f));
+
+		@Override
+		public void process() {
+			alg.setImage(imgFloat32);
+			for (float x = start; x <= end; x += step)
+				for (float y = start; y <= end; y += step)
+					alg.get(x, y);
+		}
+	}
+
 	public static void main(String args[]) {
 		imgInt8 = new ImageUInt8(imgWidth, imgHeight);
 		imgFloat32 = new ImageFloat32(imgWidth, imgHeight);
@@ -91,5 +105,6 @@ public class BenchmarkInterpolatePixel {
 		ProfileOperation.printOpsPerSec(new Bilinear_Safe_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Bilinear_UnSafe_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new NearestNeighbor_Safe_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new BilinearConvolution_Safe_F32(), TEST_TIME);
 	}
 }
