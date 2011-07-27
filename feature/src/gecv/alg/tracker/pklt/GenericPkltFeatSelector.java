@@ -16,7 +16,7 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.abst.detect.corner.GeneralCornerDetector;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
@@ -25,7 +25,7 @@ import jgrl.struct.point.Point2D_I16;
 import java.util.List;
 
 /**
- * Automatically selects features for the {@link PyramidKltTracker} using a {@link gecv.abst.detect.corner.GeneralCornerDetector}.
+ * Automatically selects features for the {@link PyramidKltTracker} using a {@link gecv.abst.detect.corner.GeneralFeatureDetector}.
  *
  * @author Peter Abeles
  */
@@ -33,7 +33,7 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 		implements PyramidKltFeatureSelector<InputImage,DerivativeImage>
 {
 	// selects corners
-	GeneralCornerDetector<InputImage,DerivativeImage> detector;
+	GeneralFeatureDetector<InputImage,DerivativeImage> detector;
 	// used to set feature decription
 	PyramidKltTracker<InputImage,DerivativeImage> tracker;
 
@@ -45,7 +45,7 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 	ImagePyramid<DerivativeImage> derivX;
 	ImagePyramid<DerivativeImage> derivY;
 
-	public GenericPkltFeatSelector( GeneralCornerDetector<InputImage,DerivativeImage> detector,
+	public GenericPkltFeatSelector( GeneralFeatureDetector<InputImage,DerivativeImage> detector,
 									PyramidKltTracker<InputImage, DerivativeImage> tracker) {
 		this.detector = detector;
 		this.tracker = tracker;

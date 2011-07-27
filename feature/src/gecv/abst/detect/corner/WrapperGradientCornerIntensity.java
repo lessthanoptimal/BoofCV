@@ -26,7 +26,7 @@ import gecv.struct.image.ImageFloat32;
  * 
  * @author Peter Abeles
  */
-public class WrapperGradientCornerIntensity <I extends ImageBase,D extends ImageBase> implements GeneralCornerIntensity<I,D> {
+public class WrapperGradientCornerIntensity<I extends ImageBase,D extends ImageBase> implements GeneralFeatureIntensity<I,D> {
 
 	GradientCornerIntensity<D> alg;
 

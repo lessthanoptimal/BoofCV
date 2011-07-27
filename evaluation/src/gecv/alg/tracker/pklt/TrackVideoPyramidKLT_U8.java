@@ -16,8 +16,8 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.abst.detect.corner.GeneralCornerDetector;
-import gecv.abst.detect.corner.GeneralCornerIntensity;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
+import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
@@ -86,14 +86,14 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 		InterpolateRectangle<ImageUInt8> interp = FactoryInterpolation.bilinearRectangle(config.typeInput);
 		InterpolateRectangle<ImageSInt16> interpD = FactoryInterpolation.bilinearRectangle(config.typeDeriv);
 
-		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity =
+		GeneralFeatureIntensity<ImageUInt8,ImageSInt16> intensity =
 				new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(
 						FactoryCornerIntensity.createKlt(config.typeDeriv,config.featureRadius));
 		CornerExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(config.featureRadius+2,
 						config.featureRadius*scalingTop, configKLt.minDeterminant));
-		GeneralCornerDetector<ImageUInt8,ImageSInt16> detector =
-				new GeneralCornerDetector<ImageUInt8,ImageSInt16>(intensity,extractor,config.maxFeatures);
+		GeneralFeatureDetector<ImageUInt8,ImageSInt16> detector =
+				new GeneralFeatureDetector<ImageUInt8,ImageSInt16>(intensity,extractor,config.maxFeatures);
 
 		GenericPkltFeatSelector<ImageUInt8, ImageSInt16> featureSelector =
 				new GenericPkltFeatSelector<ImageUInt8,ImageSInt16>(detector,null);

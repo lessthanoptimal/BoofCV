@@ -129,7 +129,7 @@ public class TestKernelFactory {
 	@Test
 	public void gaussian1D_I32_radius() {
 		Kernel1D_I32 g1 = KernelFactory.gaussian1D_I32(2);
-		Kernel1D_I32 g2 = KernelFactory.gaussian1D_I32(1.0, 2);
+		Kernel1D_I32 g2 = KernelFactory.gaussian1D_I32(KernelFactory.sigmaForRadius(2), 2);
 
 		for (int i = 0; i < g1.data.length; i++) {
 			assertEquals(g1.data[i], g2.data[i], 1e-8);
@@ -198,7 +198,7 @@ public class TestKernelFactory {
 	public void gaussian1D_F32_radius() {
 		for (int toggle = 0; toggle < 2; toggle++) {
 			boolean normalize = toggle == 1;
-			Kernel1D_F32 g1 = KernelFactory.gaussian1D_F32(1.0, 2, normalize);
+			Kernel1D_F32 g1 = KernelFactory.gaussian1D_F32(KernelFactory.sigmaForRadius(2), 2, normalize);
 			Kernel1D_F32 g2 = KernelFactory.gaussian1D_F32(2, normalize);
 
 			for (int i = 0; i < g1.data.length; i++) {

@@ -16,7 +16,10 @@
 
 package gecv.alg.detect.corner;
 
-import gecv.struct.image.ImageBase;
+import gecv.alg.InputSanityCheck;
+import gecv.alg.detect.corner.impl.ImplKitRosCornerIntensity;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
 
 /**
  * <p>
@@ -31,7 +34,25 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface KitRosCornerIntensity<T extends ImageBase> extends CornerIntensity<T> {
+public class KitRosCornerIntensity {
 
-	public void process(T derivX, T derivY, T hessianXX , T hessianYY , T hessianXY);
+	public static void process( ImageFloat32 featureIntensity,
+								ImageFloat32 derivX, ImageFloat32 derivY,
+								ImageFloat32 hessianXX, ImageFloat32 hessianYY , ImageFloat32 hessianXY )
+	{
+		InputSanityCheck.checkSameShape(derivX,derivY,hessianXX,hessianYY,hessianXY);
+		InputSanityCheck.checkSameShape(derivX,featureIntensity);
+
+		ImplKitRosCornerIntensity.process(featureIntensity,derivX,derivY,hessianXX,hessianYY,hessianXY);
+	}
+
+	public static void process( ImageFloat32 featureIntensity,
+								ImageSInt16 derivX, ImageSInt16 derivY,
+								ImageSInt16 hessianXX, ImageSInt16 hessianYY , ImageSInt16 hessianXY )
+	{
+		InputSanityCheck.checkSameShape(derivX,derivY,hessianXX,hessianYY,hessianXY);
+		InputSanityCheck.checkSameShape(derivX,featureIntensity);
+
+		ImplKitRosCornerIntensity.process(featureIntensity,derivX,derivY,hessianXX,hessianYY,hessianXY);
+	}
 }

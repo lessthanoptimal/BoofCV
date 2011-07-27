@@ -16,8 +16,8 @@
 
 package gecv.alg.detect;
 
-import gecv.abst.detect.corner.GeneralCornerDetector;
-import gecv.abst.detect.corner.GeneralCornerIntensity;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
+import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
@@ -47,7 +47,7 @@ import java.awt.image.BufferedImage;
  */
 public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUInt8> {
 
-	GeneralCornerDetector<ImageUInt8, ImageSInt16> detector;
+	GeneralFeatureDetector<ImageUInt8, ImageSInt16> detector;
 	ImageSInt16 derivX;
 	ImageSInt16 derivY;
 	ImageSInt16 derivXX;
@@ -59,7 +59,7 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 	ImagePanel panel;
 
 	public VideoDetectCornersIntensity_I8(SimpleImageSequence<ImageUInt8> sequence,
-									   GeneralCornerDetector<ImageUInt8, ImageSInt16> detector) {
+									   GeneralFeatureDetector<ImageUInt8, ImageSInt16> detector) {
 		super(sequence);
 
 		this.detector = detector;
@@ -133,15 +133,15 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 		int width = image.width;
 		int height = image.height;
 
-		GeneralCornerIntensity<ImageUInt8,ImageSInt16> intensity = new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(FactoryCornerIntensity.createKlt(ImageSInt16.class , radius));
-//		GeneralCornerIntensity<ImageUInt8, ImageSInt16> intensity =
+		GeneralFeatureIntensity<ImageUInt8,ImageSInt16> intensity = new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(FactoryCornerIntensity.createKlt(ImageSInt16.class , radius));
+//		GeneralFeatureIntensity<ImageUInt8, ImageSInt16> intensity =
 //				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryCornerIntensity.createFast12_I8(width, height, 8 , 12));
 
 		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(radius + 10, radius + 10, 10f));
 //		CornerExtractor extractor = new WrapperNonMax( new NonMaxCornerExtractorNaive(radius+10,10f));
 //		CornerExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(radius+10, 10f));
 
-		GeneralCornerDetector<ImageUInt8, ImageSInt16> detector = new GeneralCornerDetector<ImageUInt8, ImageSInt16>(intensity, extractor, maxCorners);
+		GeneralFeatureDetector<ImageUInt8, ImageSInt16> detector = new GeneralFeatureDetector<ImageUInt8, ImageSInt16>(intensity, extractor, maxCorners);
 
 
 		VideoDetectCornersIntensity_I8 display = new VideoDetectCornersIntensity_I8(sequence, detector);

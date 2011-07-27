@@ -16,7 +16,10 @@
 
 package gecv.alg.detect.corner;
 
-import gecv.struct.image.ImageBase;
+import gecv.alg.InputSanityCheck;
+import gecv.alg.detect.corner.impl.ImplMedianCornerIntensity;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -27,7 +30,19 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface MedianCornerIntensity<T extends ImageBase> extends CornerIntensity<T> {
+public class MedianCornerIntensity {
 
-	public void process( T originalImage , T medianImage );
+	public static void process(ImageFloat32 intensity , ImageFloat32 originalImage, ImageFloat32 medianImage)
+	{
+		InputSanityCheck.checkSameShape(intensity,originalImage,medianImage);
+
+		ImplMedianCornerIntensity.process(intensity,originalImage,medianImage);
+	}
+
+	public static void process(ImageFloat32 intensity , ImageUInt8 originalImage, ImageUInt8 medianImage)
+	{
+		InputSanityCheck.checkSameShape(intensity,originalImage,medianImage);
+
+		ImplMedianCornerIntensity.process(intensity,originalImage,medianImage);
+	}
 }

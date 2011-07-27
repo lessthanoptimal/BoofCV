@@ -16,7 +16,7 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.abst.detect.corner.GeneralCornerDetector;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
@@ -90,7 +90,7 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 				FactoryInterpolation.<I>bilinearRectangle(config.typeInput),
 				FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv),
 				new GenericPkltFeatSelector<I,D>(
-				new GeneralCornerDetector<I,D>(
+				new GeneralFeatureDetector<I,D>(
 						new WrapperGradientCornerIntensity<I,D>(FactoryCornerIntensity.createKlt(config.typeDeriv,config.featureRadius)),
 						new WrapperNonMax(
 				new FastNonMaxCornerExtractor(config.featureRadius+2,

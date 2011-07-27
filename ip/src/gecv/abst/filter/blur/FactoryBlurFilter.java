@@ -34,7 +34,7 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return Median image filter.
 	 */
-	public static <T extends ImageBase> MedianImageFilter<T> median( Class<?> type , int radius ) {
+	public static <T extends ImageBase> MedianImageFilter<T> median( Class<T> type , int radius ) {
 		return new MedianImageFilter<T>(type,radius);
 	}
 
@@ -45,7 +45,7 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return mean image filter.
 	 */
-	public static <T extends ImageBase> BlurStorageFilter<T> mean( Class<?> type , int radius ) {
+	public static <T extends ImageBase> BlurStorageFilter<T> mean( Class<T> type , int radius ) {
 		return new BlurStorageFilter<T>("mean",type,radius);
 	}
 
@@ -56,7 +56,7 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return mean image filter.
 	 */
-	public static <T extends ImageBase> BlurStorageFilter<T> gaussian( Class<?> type , int radius ) {
+	public static <T extends ImageBase> BlurStorageFilter<T> gaussian( Class<T> type , int radius ) {
 		return new BlurStorageFilter<T>("gaussian",type,radius);
 	}
 }

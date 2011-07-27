@@ -16,8 +16,8 @@
 
 package gecv.alg.detect.interest;
 
-import gecv.abst.detect.corner.GeneralCornerDetector;
-import gecv.abst.detect.corner.GeneralCornerIntensity;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
+import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
@@ -47,6 +47,9 @@ public class TestCornerLaplaceScaleSpace {
 
 	int r = 2;
 
+	/**
+	 * Very basic test that just checks to see if it can find an obvious feature
+	 */
 	@Test
 	public void test() {
 		ImageFloat32 input = new ImageFloat32(width,height);
@@ -57,15 +60,15 @@ public class TestCornerLaplaceScaleSpace {
 
 		CornerExtractor extractor = FactoryFeatureFromIntensity.create(r,5,false,false,false);
 		GradientCornerIntensity<ImageFloat32> harris = FactoryCornerIntensity.createHarris(ImageFloat32.class,r,0.04f);
-		GeneralCornerIntensity<ImageFloat32, ImageFloat32> intensity =
+		GeneralFeatureIntensity<ImageFloat32, ImageFloat32> intensity =
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(harris);
-		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,200);
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,200);
 
 		ImageFunctionSparse<ImageFloat32> sparseLaplace = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class,null);
 
-		CornerLaplaceScaleSpace<ImageFloat32,ImageFloat32> alg =
-				new CornerLaplaceScaleSpace<ImageFloat32,ImageFloat32>(detector,sparseLaplace);
+		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> alg =
+				new FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32>(detector,sparseLaplace);
 
 		// give it one corner to find
 		GeneralizedImageOps.fillRectangle(input,20,10,10,width-10,height-10);

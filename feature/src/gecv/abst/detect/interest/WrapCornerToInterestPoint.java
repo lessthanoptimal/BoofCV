@@ -16,7 +16,7 @@
 
 package gecv.abst.detect.interest;
 
-import gecv.abst.detect.corner.GeneralCornerDetector;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;
 import gecv.core.image.ImageGenerator;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link gecv.abst.detect.corner.GeneralCornerDetector} to make it compatible with {@link InterestPointDetector}.
+ * Wrapper around {@link gecv.abst.detect.corner.GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
  *
  * @author Peter Abeles
  */
@@ -37,7 +37,7 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 {
 
 	ImageGenerator<D> derivativeGenerator;
-	GeneralCornerDetector<T,D> detector;
+	GeneralFeatureDetector<T,D> detector;
 	ImageGradient<T,D> gradient;
 	ImageHessian<D> hessian;
 
@@ -49,7 +49,7 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 	D derivYY;
 	D derivXY;
 
-	public WrapCornerToInterestPoint(GeneralCornerDetector<T, D> detector,
+	public WrapCornerToInterestPoint(GeneralFeatureDetector<T, D> detector,
 									 ImageGradient<T,D> gradient ,
 									 ImageHessian<D> hessian ,
 									 ImageGenerator<D> derivativeGenerator ) {

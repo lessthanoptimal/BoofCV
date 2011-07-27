@@ -22,36 +22,51 @@ import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Wrapper around children of {@link gecv.alg.detect.corner.MedianCornerIntensity}.  This is a bit of a hack since
  * the median image is not provided as a standard input so it has to compute it internally
  * 
  * @author Peter Abeles
  */
-public class WrapperMedianCornerIntensity<I extends ImageBase, D extends ImageBase> implements GeneralCornerIntensity<I,D> {
+public class WrapperMedianCornerIntensity<I extends ImageBase, D extends ImageBase> implements GeneralFeatureIntensity<I,D> {
 
-	MedianCornerIntensity<I> alg;
+	ImageFloat32 intensity = new ImageFloat32(1,1);
+	Method m;
 	MedianImageFilter<I> medianFilter;
 	I medianImage;
 
-	public WrapperMedianCornerIntensity(MedianCornerIntensity<I> alg ,
-										MedianImageFilter<I> medianFilter ) {
-		this.alg = alg;
+	public WrapperMedianCornerIntensity(MedianImageFilter<I> medianFilter ,
+										Class<I> imageType ) {
 		this.medianFilter = medianFilter;
+		try {
+			m = MedianCornerIntensity.class.getMethod("process",ImageFloat32.class,imageType,imageType);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void process(I input, D derivX , D derivY , D derivXX , D derivYY , D derivXY ) {
+		intensity.reshape(input.width,input.height);
 		if( medianImage == null ) {
 			medianImage = (I)input._createNew(input.width,input.height);
 		}
 		medianFilter.process(input,medianImage);
-		alg.process(input,medianImage);
+		try {
+			m.invoke(null,input,medianImage);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public ImageFloat32 getIntensity() {
-		return alg.getIntensity();
+		return intensity;
 	}
 
 	@Override

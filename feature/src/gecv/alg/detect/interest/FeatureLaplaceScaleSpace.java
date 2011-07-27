@@ -16,7 +16,7 @@
 
 package gecv.alg.detect.interest;
 
-import gecv.abst.detect.corner.GeneralCornerDetector;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.struct.QueueCorner;
 import gecv.struct.gss.GaussianScaleSpace;
@@ -41,10 +41,10 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class CornerLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> {
+public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> {
 
-	// corner detector
-	private GeneralCornerDetector<T,D> detector;
+	// generalized feature detector.  Used to find candidate features in each scale's image
+	private GeneralFeatureDetector<T,D> detector;
 	private float baseThreshold;
 
 	//---- Variables related to the local scale-space
@@ -67,7 +67,7 @@ public class CornerLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> {
 	 * @param detector Point feature detector which is used to find candidates in each scale level
 	 * @param sparseLaplace Used to validate found features
 	 */
-	public CornerLaplaceScaleSpace(GeneralCornerDetector<T, D> detector, ImageFunctionSparse<T> sparseLaplace ) {
+	public FeatureLaplaceScaleSpace(GeneralFeatureDetector<T, D> detector, ImageFunctionSparse<T> sparseLaplace ) {
 		this.detector = detector;
 		this.sparseLaplace = sparseLaplace;
 
@@ -167,7 +167,7 @@ public class CornerLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> {
 			derivYY = ss.getDerivative(false,false);
 			derivXY = ss.getDerivative(true,false);
 		}
-
+		
 		detector.process(ss.getScaledImage(),derivX,derivY,derivXX,derivYY,derivXY);
 	}
 
@@ -205,7 +205,6 @@ public class CornerLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> {
 			}
 		}
 	}
-
 
 	public List<ScalePoint> getInterestPoints() {
 		return foundPoints;

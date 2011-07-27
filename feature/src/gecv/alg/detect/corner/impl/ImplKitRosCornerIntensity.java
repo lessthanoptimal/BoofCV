@@ -16,37 +16,62 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.InputSanityCheck;
-import gecv.alg.detect.corner.KitRosCornerIntensity;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 
+
 /**
- * <p>
- * Implementation of {@link gecv.alg.detect.corner.KitRosCornerIntensity} based off of {@link SsdCorner_S16}.
- * </p>
+ * Implementations of {@link gecv.alg.detect.corner.KitRosCornerIntensity}.
  *
  * @author Peter Abeles
  */
-public class KitRosCorner_S16 implements KitRosCornerIntensity<ImageSInt16> {
+public class ImplKitRosCornerIntensity {
 
-	// the intensity of the found features in the image
-	private ImageFloat32 featureIntensity;
+	public static void process( ImageFloat32 featureIntensity,
+								ImageFloat32 derivX, ImageFloat32 derivY,
+								ImageFloat32 hessianXX, ImageFloat32 hessianYY , ImageFloat32 hessianXY )
+	{
 
-	public KitRosCorner_S16() {
-	}
-
-	@Override
-	public void process(ImageSInt16 derivX, ImageSInt16 derivY,
-					 ImageSInt16 hessianXX, ImageSInt16 hessianYY , ImageSInt16 hessianXY ) {
-		InputSanityCheck.checkSameShape(derivX,derivY,hessianXX,hessianYY);
-		
 		final int width = derivX.width;
 		final int height = derivY.height;
 
-		if( featureIntensity == null ) {
-			featureIntensity = new ImageFloat32(width,height);
+		for( int y = 0; y < height; y++ ) {
+			int indexX = derivX.startIndex + y*derivX.stride;
+			int indexY = derivY.startIndex + y*derivY.stride;
+			int indexXX = hessianXX.startIndex + y*hessianXX.stride;
+			int indexYY = hessianYY.startIndex + y*hessianYY.stride;
+			int indexXY = hessianXY.startIndex + y*hessianXY.stride;
+
+			int indexInten = featureIntensity.startIndex + y*featureIntensity.stride;
+
+			for( int x = 0; x < width; x++ ) {
+				float dx = derivX.data[indexX++];
+				float dy = derivY.data[indexY++];
+				float dxx = hessianXX.data[indexXX++];
+				float dyy = hessianYY.data[indexYY++];
+				float dxy = hessianXY.data[indexXY++];
+
+				float dx2 = dx*dx;
+				float dy2 = dy*dy;
+
+
+				float top = Math.abs(dxx*dy2 - 2*dxy*dx*dy + dyy*dx2);
+				float bottom = dx2 + dy2;
+
+				if( bottom == 0.0 )
+					featureIntensity.data[indexInten++] = 0;
+				else
+					featureIntensity.data[indexInten++] = top/bottom;
+			}
 		}
+	}
+
+	public static void process( ImageFloat32 featureIntensity,
+								ImageSInt16 derivX, ImageSInt16 derivY,
+								ImageSInt16 hessianXX, ImageSInt16 hessianYY , ImageSInt16 hessianXY )
+	{
+		final int width = derivX.width;
+		final int height = derivY.height;
 
 		for( int y = 0; y < height; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
@@ -77,15 +102,5 @@ public class KitRosCorner_S16 implements KitRosCornerIntensity<ImageSInt16> {
 					featureIntensity.data[indexInten++] = top/bottom;
 			}
 		}
-	}
-
-	@Override
-	public int getRadius() {
-		return 0;
-	}
-
-	@Override
-	public ImageFloat32 getIntensity() {
-		return featureIntensity;
 	}
 }

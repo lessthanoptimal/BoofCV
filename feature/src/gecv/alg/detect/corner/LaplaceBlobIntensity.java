@@ -17,7 +17,7 @@
 package gecv.alg.detect.corner;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.detect.corner.impl.ImplLaplaceInterestPoints;
+import gecv.alg.detect.corner.impl.ImplLaplaceBlobIntensity;
 import gecv.struct.image.ImageFloat32;
 
 /**
@@ -35,7 +35,7 @@ import gecv.struct.image.ImageFloat32;
  * @author Peter Abeles
  */
 // todo change KitRos to this same format
-public class LaplaceInterestPoints {
+public class LaplaceBlobIntensity {
 
 	public static enum Type
 	{
@@ -48,13 +48,13 @@ public class LaplaceInterestPoints {
 	{
 		InputSanityCheck.checkSameShape(featureIntensity,hessianXX,hessianYY,hessianXY);
 
-		ImplLaplaceInterestPoints.determinant(featureIntensity,hessianXX,hessianYY,hessianXY);
+		ImplLaplaceBlobIntensity.determinant(featureIntensity,hessianXX,hessianYY,hessianXY);
 	}
 
 	public static void trace( ImageFloat32 featureIntensity , ImageFloat32 hessianXX, ImageFloat32 hessianYY )
 	{
 		InputSanityCheck.checkSameShape(featureIntensity,hessianXX,hessianYY);
 
-		ImplLaplaceInterestPoints.trace(featureIntensity,hessianXX,hessianYY);
+		ImplLaplaceBlobIntensity.trace(featureIntensity,hessianXX,hessianYY);
 	}
 }

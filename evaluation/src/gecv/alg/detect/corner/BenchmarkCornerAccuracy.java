@@ -16,12 +16,8 @@
 
 package gecv.alg.detect.corner;
 
-import gecv.abst.detect.corner.*;
-import gecv.abst.detect.extract.CornerExtractor;
-import gecv.abst.detect.extract.WrapperNonMax;
-import gecv.abst.filter.blur.FactoryBlurFilter;
-import gecv.abst.filter.blur.impl.MedianImageFilter;
-import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
+import gecv.abst.detect.corner.FactoryCornerDetector;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.filter.derivative.GradientThree;
 import gecv.alg.filter.derivative.HessianFromGradient;
@@ -67,42 +63,20 @@ public class BenchmarkCornerAccuracy {
 
 	List<Point2D_F64> corners = new ArrayList<Point2D_F64>();
 
-	ImageFloat32 imageIntensity;
-
-	public QueueCorner detectMedianCorners( int medianRadius  ) {
-		MedianImageFilter<ImageUInt8> medianFilter = FactoryBlurFilter.median(ImageUInt8.class,medianRadius);
-		return detectCorners(new WrapperMedianCornerIntensity<ImageUInt8,ImageSInt16>(FactoryCornerIntensity.createMedian(ImageUInt8.class),medianFilter));
-	}
-
-	public QueueCorner detectCorners( FastCornerIntensity<ImageUInt8> intensity  ) {
-		return detectCorners(new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(intensity));
-	}
-
-	public QueueCorner detectCorners( GradientCornerIntensity<ImageSInt16> intensity  ) {
-		return detectCorners(new WrapperGradientCornerIntensity<ImageUInt8, ImageSInt16>(intensity));
-	}
-
-	public QueueCorner detectCorners( KitRosCornerIntensity<ImageSInt16> intensity  ) {
-		return detectCorners(new WrapperKitRosCornerIntensity<ImageUInt8, ImageSInt16>(intensity));
-	}
-
-	public QueueCorner detectCorners( GeneralCornerIntensity<ImageUInt8, ImageSInt16> intensity  ) {
-		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(radius + 10, radius + 10, 1f));
-		GeneralCornerDetector<ImageUInt8, ImageSInt16> det =
-				new GeneralCornerDetector<ImageUInt8, ImageSInt16>(intensity, extractor, corners.size()*2);
-
-		if( det.getRequiresGradient() ) {
+	public void detectCorners( String name , GeneralFeatureDetector<ImageUInt8,ImageSInt16> detector )
+	{
+		if( detector.getRequiresGradient() ) {
 			GradientThree.process(image,derivX,derivY, GecvDefaults.DERIV_BORDER_I32);
 		}
-		if( det.getRequiresHessian() ) {
+		if( detector.getRequiresHessian() ) {
 			HessianFromGradient.hessianThree(derivX,derivY,derivXX,derivYY,derivXY, GecvDefaults.DERIV_BORDER_I32);
-//			HessianThree.process(image,derivXX,derivYY,derivXY,true);
 		}
 
-		det.process(image,derivX,derivY,derivXX,derivYY,derivXY);
-		imageIntensity = det.getIntensity();
+		detector.process(image,derivX,derivY,derivXX,derivYY,derivXY);
 
-		return det.getCorners();
+		QueueCorner corners = detector.getCorners();
+
+		evaluate(corners,detector.getIntensity(), name );
 	}
 
 	public void evaluateAll() {
@@ -114,12 +88,13 @@ public class BenchmarkCornerAccuracy {
 		ShowImages.showWindow(derivY,"DerivY");
 
 		// todo try different noise levels
+		int maxFeatures = corners.size()*2;
 
-		evaluate(detectCorners(FactoryCornerIntensity.createFast12( ImageUInt8.class , 10 , 11)),"FAST");
-		evaluate(detectCorners(FactoryCornerIntensity.createHarris( ImageSInt16.class , radius, 0.04f)),"Harris");
-		evaluate(detectCorners(FactoryCornerIntensity.createKitRos( ImageSInt16.class )),"KitRos");
-		evaluate(detectCorners(FactoryCornerIntensity.createKlt( ImageSInt16.class , radius )),"KLT");
-		evaluate(detectMedianCorners(radius ),"Median");
+		detectCorners("FAST",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createFast( 10 , 11, maxFeatures, ImageUInt8.class));
+		detectCorners("Harris",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createHarris(radius, 0.04f,maxFeatures,ImageSInt16.class));
+		detectCorners("KitRos",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createKitRos( radius,1f,maxFeatures,ImageSInt16.class ));
+		detectCorners("KLT",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createKlt(radius,1f,maxFeatures, ImageSInt16.class ));
+		detectCorners("Median",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createMedian(radius,1,maxFeatures, ImageUInt8.class ));
 	}
 
 	private void createTestImage() {
@@ -162,10 +137,10 @@ public class BenchmarkCornerAccuracy {
 		}
 	}
 
-	public void evaluate( QueueCorner foundCorners , String name ) {
+	protected void evaluate( QueueCorner foundCorners , ImageFloat32 intensity , String name ) {
 
 		
-		ShowImages.showWindow(imageIntensity,"Intensity of "+name,true);
+		ShowImages.showWindow(intensity,"Intensity of "+name,true);
 
 		int numMatched = 0;
 		double error = 0;

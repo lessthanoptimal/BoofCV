@@ -16,26 +16,19 @@
 
 package gecv.alg.detect.corner.impl;
 
-import gecv.alg.InputSanityCheck;
-import gecv.alg.detect.corner.MedianCornerIntensity;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageUInt8;
+
 
 /**
- * Implementation of {@link MedianCornerIntensity} for {@link gecv.struct.image.ImageFloat32} images.
+ * Implementations of {@link gecv.alg.detect.corner.MedianCornerIntensity}.
  *
  * @author Peter Abeles
  */
-public class MedianCorner_F32 implements MedianCornerIntensity<ImageFloat32> {
+public class ImplMedianCornerIntensity {
 
-	// the intensity of the found features in the image
-	private ImageFloat32 featureIntensity;
-
-	@Override
-	public void process(ImageFloat32 originalImage, ImageFloat32 medianImage) {
-
-		InputSanityCheck.checkSameShape(originalImage,medianImage);
-		featureIntensity = InputSanityCheck.checkDeclare(originalImage,featureIntensity);
-
+	public static void process(ImageFloat32 intensity , ImageFloat32 originalImage, ImageFloat32 medianImage)
+	{
 		final int width = originalImage.width;
 		final int height = originalImage.height;
 
@@ -43,23 +36,32 @@ public class MedianCorner_F32 implements MedianCornerIntensity<ImageFloat32> {
 
 			int indexOrig = originalImage.startIndex + originalImage.stride*y;
 			int indexMed = medianImage.startIndex + medianImage.stride*y;
-			int indexInten = featureIntensity.startIndex + featureIntensity.stride*y;
+			int indexInten = intensity.startIndex + intensity.stride*y;
 
 			for( int x = 0; x < width; x++ ) {
 				float val = originalImage.data[indexOrig++] - medianImage.data[indexMed++];
 
-				featureIntensity.data[indexInten++] = val < 0 ? -val : val;
+				intensity.data[indexInten++] = val < 0 ? -val : val;
 			}
 		}
 	}
 
-	@Override
-	public int getRadius() {
-		return 0;
-	}
+	public static void process( ImageFloat32 intensity , ImageUInt8 originalImage, ImageUInt8 medianImage)
+	{
+		final int width = originalImage.width;
+		final int height = originalImage.height;
 
-	@Override
-	public ImageFloat32 getIntensity() {
-		return featureIntensity;
+		for( int y = 0; y < height; y++ ) {
+
+			int indexOrig = originalImage.startIndex + originalImage.stride*y;
+			int indexMed = medianImage.startIndex + medianImage.stride*y;
+			int indexInten = intensity.startIndex + intensity.stride*y;
+
+			for( int x = 0; x < width; x++ ) {
+				int val = (originalImage.data[indexOrig++] & 0xFF) - (medianImage.data[indexMed++] & 0xFF);
+
+				intensity.data[indexInten++] = val < 0 ? -val : val;
+			}
+		}
 	}
 }

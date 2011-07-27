@@ -335,7 +335,7 @@ public class KernelFactory {
 	 * @param normalize If the sum of the kernel should be equal to one or not.
 	 */
 	public static Kernel1D_F32 gaussian1D_F32(int radius, boolean normalize) {
-		return gaussian1D_F32((radius * 2 + 1) / 5.0, radius, normalize);
+		return gaussian1D_F32(sigmaForRadius(radius), radius, normalize);
 	}
 
 	/**
@@ -409,7 +409,7 @@ public class KernelFactory {
 	 *
 	 * @param sigma Distributions standard deviation.
 	 * @param radius Kernel's radius.
-	 * @param normalize The magnitude of the largest element will be set to one.
+	 * @param normalize Scale it by the same factor as the normalized gaussian
 	 * @return The derivative of the gaussian
 	 */
 	public static Kernel1D_F32 gaussianDerivative1D_F32(double sigma, int radius, boolean normalize) {
@@ -422,14 +422,11 @@ public class KernelFactory {
 		}
 
 		if (normalize) {
-			float max = 0;
-			for (int i = 0; i < radius; i++) {
-				if (max < Math.abs(gaussian[i])) {
-					max = Math.abs(gaussian[i]);
-				}
-			}
+			// scale it by the same scale factor as its corresponding Gaussian
+			float norm = gaussian1D_F32(sigma,radius,false).computeSum();
+
 			for (int i = 0; i < ret.width; i++) {
-				gaussian[i] /= max;
+				gaussian[i] /= norm;
 			}
 		}
 

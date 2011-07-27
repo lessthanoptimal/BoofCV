@@ -16,11 +16,11 @@
 
 package gecv.abst.detect.interest;
 
-import gecv.abst.detect.corner.GeneralCornerDetector;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;
-import gecv.alg.detect.interest.CornerLaplaceScaleSpace;
+import gecv.alg.detect.interest.FeatureLaplaceScaleSpace;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.image.ImageBase;
@@ -34,17 +34,17 @@ import gecv.struct.image.ImageBase;
 public class FactoryInterestPoint {
 
 	public static <T extends ImageBase, D extends ImageBase >
-	InterestPointDetector<T> fromCorner( GeneralCornerDetector<T,D> corner , Class<T> inputType , Class<D> derivType) {
+	InterestPointDetector<T> fromCorner( GeneralFeatureDetector<T,D> feature, Class<T> inputType , Class<D> derivType) {
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(inputType,derivType);
 		ImageHessian<D> hessian  = FactoryDerivative.hessianSobel(derivType);
 		ImageGenerator<D> derivativeGenerator = FactoryImageGenerator.create(derivType);
 
-		return new WrapCornerToInterestPoint<T,D>(corner,gradient,hessian,derivativeGenerator);
+		return new WrapCornerToInterestPoint<T,D>(feature,gradient,hessian,derivativeGenerator);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase >
-	InterestPointDetector<T> fromCornerLaplace( CornerLaplaceScaleSpace<T,D> corner , Class<T> inputType , Class<D> derivType) {
+	InterestPointDetector<T> fromFeatureLaplace( FeatureLaplaceScaleSpace<T,D> feature, Class<T> inputType , Class<D> derivType) {
 		return null;
 	}
 }

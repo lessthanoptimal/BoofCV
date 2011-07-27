@@ -29,7 +29,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public interface GeneralCornerIntensity<I extends ImageBase,D extends ImageBase > {
+public interface GeneralFeatureIntensity<I extends ImageBase,D extends ImageBase > {
 
 	/**
 	 * Computes the corner's intensity.  Before computing the various image derivatives call

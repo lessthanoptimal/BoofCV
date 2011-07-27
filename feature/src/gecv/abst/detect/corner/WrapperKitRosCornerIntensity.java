@@ -21,27 +21,43 @@ import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Wrapper around children of {@link gecv.alg.detect.corner.GradientCornerIntensity}.
  * 
  * @author Peter Abeles
  */
-public class WrapperKitRosCornerIntensity<I extends ImageBase,D extends ImageBase> implements GeneralCornerIntensity<I,D> {
+public class WrapperKitRosCornerIntensity<I extends ImageBase,D extends ImageBase> implements GeneralFeatureIntensity<I,D> {
 
-	KitRosCornerIntensity<D> alg;
+	ImageFloat32 intensity = new ImageFloat32(1,1);
+	Method m;
 
-	public WrapperKitRosCornerIntensity(KitRosCornerIntensity<D> alg) {
-		this.alg = alg;
+	public WrapperKitRosCornerIntensity(Class<D> derivType ) {
+		try {
+			m = KitRosCornerIntensity.class.getMethod("process",ImageFloat32.class,derivType,derivType,derivType,derivType,derivType);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void process(I image , D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
-		alg.process(derivX,derivY,derivXX,derivYY,derivXY);
+		intensity.reshape(image.width,image.height);
+
+		try {
+			m.invoke(null,intensity,derivX,derivY,derivXX,derivYY,derivXY);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public ImageFloat32 getIntensity() {
-		return alg.getIntensity();
+		return intensity;
 	}
 
 	@Override

@@ -231,7 +231,8 @@ public class ConvertBufferedImage {
 			dst = new ImageFloat32(src.getWidth(), src.getHeight());
 		}
 
-		if (src.getRaster() instanceof ByteInterleavedRaster) {
+		if (src.getRaster() instanceof ByteInterleavedRaster &&
+				src.getType() == BufferedImage.TYPE_BYTE_GRAY ) {
 			ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
 		} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 			ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);

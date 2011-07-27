@@ -16,7 +16,7 @@
 
 package gecv.abst.detect.corner;
 
-import gecv.alg.detect.corner.LaplaceInterestPoints;
+import gecv.alg.detect.corner.LaplaceBlobIntensity;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -25,26 +25,26 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Wrapper around {@link LaplaceInterestPoints} for {@link GeneralCornerIntensity}.
+ * Wrapper around {@link gecv.alg.detect.corner.LaplaceBlobIntensity} for {@link GeneralFeatureIntensity}.
  *
  * @author Peter Abeles
  */
-public class WrapperLaplacianBlobIntensity <I extends ImageBase, D extends ImageBase> implements GeneralCornerIntensity<I,D> {
+public class WrapperLaplacianBlobIntensity <I extends ImageBase, D extends ImageBase> implements GeneralFeatureIntensity<I,D> {
 
-	LaplaceInterestPoints.Type type;
+	LaplaceBlobIntensity.Type type;
 	ImageFloat32 intensity = new ImageFloat32(1,1);
 	Method m;
 
-	public WrapperLaplacianBlobIntensity(LaplaceInterestPoints.Type type, Class<D> derivType ) {
+	public WrapperLaplacianBlobIntensity(LaplaceBlobIntensity.Type type, Class<D> derivType ) {
 		this.type = type;
 		try {
 			switch( type ) {
 				case DETERMINANT:
-					m = LaplaceInterestPoints.class.getMethod("determinant",ImageFloat32.class,derivType,derivType,derivType);
+					m = LaplaceBlobIntensity.class.getMethod("determinant",ImageFloat32.class,derivType,derivType,derivType);
 					break;
 
 				case TRACE:
-					m = LaplaceInterestPoints.class.getMethod("trace",ImageFloat32.class,derivType,derivType);
+					m = LaplaceBlobIntensity.class.getMethod("trace",ImageFloat32.class,derivType,derivType);
 					break;
 
 				default:
@@ -99,7 +99,7 @@ public class WrapperLaplacianBlobIntensity <I extends ImageBase, D extends Image
 
 	@Override
 	public boolean getRequiresHessian() {
-		return( type != LaplaceInterestPoints.Type.QUICK);
+		return( type != LaplaceBlobIntensity.Type.QUICK);
 	}
 
 	@Override

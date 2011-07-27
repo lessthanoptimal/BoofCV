@@ -35,6 +35,8 @@ public class DetectCornerLaplaceFeaturesApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
 	static String fileName = "evaluation/data/sunflowers.png";
+//	static String fileName = "evaluation/data/scale/beach02.jpg";
+	
 	static int NUM_FEATURES = 100;
 
 	public static void main( String args[] ) {
@@ -46,8 +48,8 @@ public class DetectCornerLaplaceFeaturesApp {
 		ss.setImage(inputF32);
 
 		int r = 2;
-		CornerLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
-//		CornerLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+//		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 
 		det.detect(ss);
 

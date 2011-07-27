@@ -161,7 +161,7 @@ public class TestBlurImageOps {
 			ImageTestingOps.fill(expected,0);
 			ImageTestingOps.fill(found,0);
 
-			Kernel1D_F32 kernel =KernelFactory.gaussian1D_F32(radius,true);
+			Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(radius,true);
 			ConvolveNormalized.horizontal(kernel,input,storage);
 			ConvolveNormalized.vertical(kernel,storage,expected);
 
