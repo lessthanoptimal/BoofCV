@@ -19,9 +19,11 @@ package gecv.alg.detect.corner.impl;
 import gecv.struct.image.ImageFloat32;
 
 /**
+ * Implementations of {@link gecv.alg.detect.corner.LaplaceBlobIntensity}.
+ *
  * @author Peter Abeles
  */
-public class ImplLaplaceInterestPoints {
+public class ImplLaplaceBlobIntensity {
 
 	public static void determinant( ImageFloat32 featureIntensity , ImageFloat32 hessianXX, ImageFloat32 hessianYY , ImageFloat32 hessianXY ) {
 		final int width = hessianXX.width;

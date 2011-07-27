@@ -36,6 +36,8 @@ public class BenchmarkSsdCornerIntensity {
 	static int windowRadius = 2;
 	static long TEST_TIME = 1000;
 
+	static ImageFloat32 intensity = new ImageFloat32(imgWidth,imgHeight);
+
 	static ImageFloat32 derivX_F32;
 	static ImageFloat32 derivY_F32;
 	static ImageFloat32 derivXX_F32;
@@ -95,20 +97,17 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KitRos_F32 extends PerformerBase {
-		KitRosCorner_F32 corner = new KitRosCorner_F32();
 
 		@Override
 		public void process() {
-			corner.process(derivX_F32, derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32);
+			KitRosCornerIntensity.process(intensity,derivX_F32, derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32);
 		}
 	}
 
 	public static class KitRos_I16 extends PerformerBase {
-		KitRosCorner_S16 corner = new KitRosCorner_S16();
-
 		@Override
 		public void process() {
-			corner.process(derivX_I16, derivY_I16, derivXX_I16,derivYY_I16, derivXY_I16);
+			KitRosCornerIntensity.process(intensity,derivX_I16, derivY_I16, derivXX_I16,derivYY_I16, derivXY_I16);
 		}
 	}
 

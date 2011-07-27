@@ -82,10 +82,8 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		System.out.println("Enter value change");
 		if( e.getValueIsAdjusting() )
 			return;
-		System.out.println("changed "+listPanel.getWidth()+" "+listPanel.getPreferredSize().getWidth());
 
 		int index = listPanel.getSelectedIndex();
 		splitPane.setRightComponent(panels.get(index));
@@ -125,7 +123,6 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 
 		int w = width + splitPane.getDividerLocation();
 		int h = (int)Math.max(height,listPanel.getPreferredSize().getHeight());
-
 
 		splitPane.setPreferredSize(new Dimension(w,h));
 	}

@@ -28,7 +28,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
+public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 
 	// selects the features with the largest intensity
 	protected SelectNBestCorners selectBest;
@@ -46,14 +46,14 @@ public class GeneralCornerDetector<I extends ImageBase, D extends ImageBase > {
 	protected int requestedFeatureNumber;
 
 	// computes the corner intensity image
-	protected GeneralCornerIntensity<I,D> intensity;
+	protected GeneralFeatureIntensity<I,D> intensity;
 
 	/**
 	 * @param intensity Computes how much like the feature the region around each pixel is.
 	 * @param extractor   Extracts the corners from intensity image
 	 * @param maxFeatures If not zero then only the best features are returned up to this number
 	 */
-	public GeneralCornerDetector(GeneralCornerIntensity<I,D> intensity ,
+	public GeneralFeatureDetector(GeneralFeatureIntensity<I,D> intensity ,
 								 CornerExtractor extractor,
 								 int maxFeatures)
 	{

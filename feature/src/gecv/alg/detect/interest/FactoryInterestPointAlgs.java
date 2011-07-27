@@ -16,8 +16,8 @@
 
 package gecv.alg.detect.interest;
 
-import gecv.abst.detect.corner.GeneralCornerDetector;
-import gecv.abst.detect.corner.GeneralCornerIntensity;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
+import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.corner.WrapperLaplacianBlobIntensity;
 import gecv.abst.detect.extract.CornerExtractor;
@@ -26,7 +26,7 @@ import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.FactoryDerivativeSparse;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.corner.GradientCornerIntensity;
-import gecv.alg.detect.corner.LaplaceInterestPoints;
+import gecv.alg.detect.corner.LaplaceBlobIntensity;
 import gecv.struct.image.ImageBase;
 
 /**
@@ -35,7 +35,7 @@ import gecv.struct.image.ImageBase;
 public class FactoryInterestPointAlgs {
 
 	/**
-	 * Creates a {@link gecv.alg.detect.interest.CornerLaplaceScaleSpace} which is uses the Harris corner detector.
+	 * Creates a {@link FeatureLaplaceScaleSpace} which is uses the Harris corner detector.
 	 *
 	 * @param featureRadius Size of the feature used to detect the corners.
 	 * @param cornerThreshold Minimum corner intensity required
@@ -45,7 +45,7 @@ public class FactoryInterestPointAlgs {
 	 * @return CornerLaplaceScaleSpace
 	 */
 	public static <T extends ImageBase, D extends ImageBase>
-	CornerLaplaceScaleSpace<T,D> harrisLaplace( int featureRadius ,
+	FeatureLaplaceScaleSpace<T,D> harrisLaplace( int featureRadius ,
 												float cornerThreshold ,
 												int maxFeatures ,
 												Class<T> imageType ,
@@ -53,16 +53,16 @@ public class FactoryInterestPointAlgs {
 	{
 		CornerExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,false,false,false);
 		GradientCornerIntensity<D> harris = FactoryCornerIntensity.createHarris(derivType,featureRadius,0.04f);
-		GeneralCornerIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
-		GeneralCornerDetector<T,D> detector = new GeneralCornerDetector<T,D>(intensity,extractor,maxFeatures);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
+		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
 
-		return new CornerLaplaceScaleSpace<T,D>(detector,sparseLaplace);
+		return new FeatureLaplaceScaleSpace<T,D>(detector,sparseLaplace);
 	}
 	
 	/**
-	 * Creates a {@link gecv.alg.detect.interest.CornerLaplaceScaleSpace} which is uses the Harris corner detector.
+	 * Creates a {@link FeatureLaplaceScaleSpace} which is uses the Harris corner detector.
 	 * TODO UPDATE
 	 *
 	 * @param featureRadius Size of the feature used to detect the corners.
@@ -73,18 +73,18 @@ public class FactoryInterestPointAlgs {
 	 * @return CornerLaplaceScaleSpace
 	 */
 	public static <T extends ImageBase, D extends ImageBase>
-	CornerLaplaceScaleSpace<T,D> hessianLaplace( int featureRadius ,
+	FeatureLaplaceScaleSpace<T,D> hessianLaplace( int featureRadius ,
 												float cornerThreshold ,
 												int maxFeatures ,
 												Class<T> imageType ,
 												Class<D> derivType)
 	{
 		CornerExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,false,false,false);
-		GeneralCornerIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(LaplaceInterestPoints.Type.DETERMINANT,derivType);
-		GeneralCornerDetector<T,D> detector = new GeneralCornerDetector<T,D>(intensity,extractor,maxFeatures);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(LaplaceBlobIntensity.Type.DETERMINANT,derivType);
+		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
 
-		return new CornerLaplaceScaleSpace<T,D>(detector,sparseLaplace);
+		return new FeatureLaplaceScaleSpace<T,D>(detector,sparseLaplace);
 	}
 }

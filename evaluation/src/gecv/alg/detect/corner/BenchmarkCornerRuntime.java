@@ -19,7 +19,7 @@ package gecv.alg.detect.corner;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.abst.detect.corner.FactoryCornerDetector;
-import gecv.abst.detect.corner.GeneralCornerDetector;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;
@@ -54,7 +54,7 @@ public class BenchmarkCornerRuntime {
 	static boolean includeGradient = true;
 
 	public static class Detector<T extends ImageBase, D extends ImageBase> extends PerformerBase {
-		GeneralCornerDetector<T,D> alg;
+		GeneralFeatureDetector<T,D> alg;
 		ImageGradient<T,D> gradient;
 		ImageHessian<D> hessian;
 
@@ -63,7 +63,7 @@ public class BenchmarkCornerRuntime {
 
 		T input;
 
-		public Detector(GeneralCornerDetector<T,D> alg, T input , Class<T> imageType , Class<D> derivType) {
+		public Detector(GeneralFeatureDetector<T,D> alg, T input , Class<T> imageType , Class<D> derivType) {
 			this.alg = alg;
 			this.input = input;
 			gradient = FactoryDerivative.sobel(imageType,derivType);
@@ -93,30 +93,30 @@ public class BenchmarkCornerRuntime {
 		}
 	}
 
-	public static void benchmark(GeneralCornerDetector alg, String name) {
+	public static void benchmark(GeneralFeatureDetector alg, String name) {
 		ImageBase input = imageType == ImageFloat32.class ? image_F32 : image_I8;
 		double opsPerSec = ProfileOperation.profileOpsPerSec(new Detector(alg,input,imageType,derivType), TEST_TIME);
 
 		System.out.printf("%30s ops/sec = %6.2f\n", name, opsPerSec);
 	}
 
-	public static GeneralCornerDetector<?,?> createMedian() {
+	public static GeneralFeatureDetector<?,?> createMedian() {
 		return FactoryCornerDetector.createMedian(windowRadius,1,maxFeatures,imageType);
 	}
 
-	public static GeneralCornerDetector<?,?> createFast12() {
+	public static GeneralFeatureDetector<?,?> createFast12() {
 		return FactoryCornerDetector.createFast(windowRadius,30,maxFeatures,imageType);
 	}
 
-	public static GeneralCornerDetector<?,?> createHarris() {
+	public static GeneralFeatureDetector<?,?> createHarris() {
 		return FactoryCornerDetector.createHarris(windowRadius,1,maxFeatures,derivType);
 	}
 
-	public static GeneralCornerDetector<?,?> createKitRos() {
+	public static GeneralFeatureDetector<?,?> createKitRos() {
 		return FactoryCornerDetector.createKitRos(windowRadius,1,maxFeatures,derivType);
 	}
 
-	public static GeneralCornerDetector<?,?> createKlt() {
+	public static GeneralFeatureDetector<?,?> createKlt() {
 		return FactoryCornerDetector.createKlt(windowRadius,1,maxFeatures,derivType);
 	}
 

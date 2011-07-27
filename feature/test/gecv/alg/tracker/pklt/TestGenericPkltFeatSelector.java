@@ -16,8 +16,8 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.abst.detect.corner.GeneralCornerDetector;
-import gecv.abst.detect.corner.GeneralCornerIntensity;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
+import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
@@ -58,8 +58,8 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		derivY.setScaling(2,2);
 
 		// set the first layer to not be one
-		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(new DummyIntensity(), new DummyExtractor(),100);
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(new DummyIntensity(), new DummyExtractor(),100);
 		GenericPkltFeatSelector<ImageFloat32, ImageFloat32> selector =
 				new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,tracker);
 
@@ -164,20 +164,20 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 	}
 
 	private GenericPkltFeatSelector<ImageFloat32, ImageFloat32> createSelector() {
-		GeneralCornerIntensity<ImageFloat32,ImageFloat32> intensity =
+		GeneralFeatureIntensity<ImageFloat32,ImageFloat32> intensity =
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
 						FactoryCornerIntensity.createKlt( ImageFloat32.class,3));
 
 		CornerExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(3, 3, 0.001f));
 
-		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,maxFeatures);
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,maxFeatures);
 
 		return new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,tracker);
 	}
 
-	private static class DummyIntensity implements GeneralCornerIntensity<ImageFloat32,ImageFloat32> {
+	private static class DummyIntensity implements GeneralFeatureIntensity<ImageFloat32,ImageFloat32> {
 		ImageFloat32 intensity;
 
 		@Override

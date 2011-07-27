@@ -69,23 +69,6 @@ public class FactoryCornerIntensity {
 	}
 
 	/**
-	 * Common interface for creating a {@link KitRosCornerIntensity} from different image types.
-	 *
-	 * @param derivType Image derivative type it is computed from.
-	 * @return Kit Ros corner
-	 */
-	public static <T extends ImageBase>
-	KitRosCornerIntensity<T> createKitRos( Class<T> derivType )
-	{
-		if( derivType == ImageFloat32.class )
-			return (KitRosCornerIntensity<T>)new KitRosCorner_F32();
-		else if( derivType == ImageSInt16.class )
-			return (KitRosCornerIntensity<T>)new KitRosCorner_S16();
-		else
-			throw new IllegalArgumentException("Unknown image type "+derivType);
-	}
-
-	/**
 	 * Common interface for creating a {@link KltCornerIntensity} from different image types.
 	 *
 	 * @param derivType Image derivative type it is computed from.
@@ -99,23 +82,6 @@ public class FactoryCornerIntensity {
 			return (KltCornerIntensity<T>)new KltCorner_F32(windowRadius);
 		else if( derivType == ImageSInt16.class )
 			return (KltCornerIntensity<T>)new KltCorner_S16(windowRadius);
-		else
-			throw new IllegalArgumentException("Unknown image type "+derivType);
-	}
-
-	/**
-	 * Common interface for creating a {@link KltCornerIntensity} from different image types.
-	 *
-	 * @param derivType Image derivative type it is computed from.
-	 * @return KLT corner
-	 */
-	public static <T extends ImageBase>
-	MedianCornerIntensity<T> createMedian( Class<T> derivType )
-	{
-		if( derivType == ImageFloat32.class )
-			return (MedianCornerIntensity<T>)new MedianCorner_F32();
-		else if( derivType == ImageUInt8.class )
-			return (MedianCornerIntensity<T>)new MedianCorner_U8();
 		else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}

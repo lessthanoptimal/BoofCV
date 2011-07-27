@@ -37,8 +37,8 @@ public class TestGeneralCornerDetector {
 		HelperExtractor extractor = new HelperExtractor(false,true,true);
 		HelperIntensity intensity = new HelperIntensity(false,false,false);
 
-		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -52,8 +52,8 @@ public class TestGeneralCornerDetector {
 		HelperIntensity intensity = new HelperIntensity(false,false,true);
 		HelperExtractor extractor = new HelperExtractor(true,true,true);
 
-		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -70,8 +70,8 @@ public class TestGeneralCornerDetector {
 		HelperIntensity intensity = new HelperIntensity(false,false,false);
 		HelperExtractor extractor = new HelperExtractor(true,true,true);
 
-		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -86,8 +86,8 @@ public class TestGeneralCornerDetector {
 		HelperIntensity intensity = new HelperIntensity(false,false,true);
 		HelperExtractor extractor = new HelperExtractor(true,true,true);
 
-		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -103,8 +103,8 @@ public class TestGeneralCornerDetector {
 		HelperIntensity intensity = new HelperIntensity(false,false,true);
 		HelperExtractor extractor = new HelperExtractor(true,true,true);
 
-		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,1);
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,1);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -120,8 +120,8 @@ public class TestGeneralCornerDetector {
 		HelperIntensity intensity = new HelperIntensity(false,false,true);
 		HelperExtractor extractor = new HelperExtractor(true,true,true);
 
-		GeneralCornerDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralCornerDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -185,7 +185,7 @@ public class TestGeneralCornerDetector {
 		}
 	}
 
-	public class HelperIntensity implements GeneralCornerIntensity<ImageFloat32,ImageFloat32>
+	public class HelperIntensity implements GeneralFeatureIntensity<ImageFloat32,ImageFloat32>
 	{
 		boolean requiresGradient;
 		boolean requiresHessian;

@@ -17,7 +17,7 @@
 package gecv.alg.detect.interest;
 
 import gecv.abst.detect.corner.FactoryCornerDetector;
-import gecv.abst.detect.corner.GeneralCornerDetector;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.detect.interest.FactoryInterestPoint;
 import gecv.abst.detect.interest.InterestPointDetector;
 import gecv.core.image.ConvertBufferedImage;
@@ -156,7 +156,7 @@ public class BenchmarkInterestStability_Noise <T extends ImageBase, D extends Im
 	public List<Helper<T>> createAlgs() {
 		List<Helper<T>> ret = new ArrayList<Helper<T>>();
 
-		GeneralCornerDetector<T,D> alg;
+		GeneralFeatureDetector<T,D> alg;
 
 		alg = FactoryCornerDetector.createFast(radius,20,maxFeatures,imageType);
 		ret.add( new Helper<T>("Fast",FactoryInterestPoint.fromCorner(alg,imageType,derivType)) );

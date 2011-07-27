@@ -14,28 +14,24 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.corner.impl;
+package gecv.abst.detect.corner;
 
-import gecv.alg.detect.corner.GenericCornerIntensityGradientTests;
-import gecv.alg.detect.corner.KitRosCornerIntensity;
-import gecv.struct.image.ImageFloat32;
-import org.junit.Test;
+import gecv.alg.detect.corner.LaplaceBlobIntensity;
+import gecv.struct.image.ImageBase;
+
 
 /**
+ * Creates feature detectors which detect "blob" like objects.
+ *
  * @author Peter Abeles
  */
-public class TestKitRosCorner_I16 extends GenericCornerIntensityGradientTests {
+public class FactoryBlobDetector {
 
-	@Test
-	public void genericTests() {
-		performAllTests();
+	public static <T extends ImageBase, D extends ImageBase>
+	GeneralFeatureDetector<T,D> createLaplace( int featureRadius , int pixelTol , int maxFeatures ,
+											   Class<D> derivType , LaplaceBlobIntensity.Type type )
+	{
+		GeneralFeatureIntensity<T,D> intensity = new WrapperLaplacianBlobIntensity<T,D>(type,derivType);
+		return FactoryCornerDetector.createGeneral(intensity,featureRadius,pixelTol,maxFeatures);
 	}
-
-	@Override
-	public ImageFloat32 computeIntensity() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		KitRosCornerIntensity.process(intensity,derivX_I16,derivY_I16,derivXX_I16,derivYY_I16,derivXY_I16);
-		return intensity;
-	}
-
 }
