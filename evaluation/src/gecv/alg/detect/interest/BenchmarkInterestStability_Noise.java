@@ -234,7 +234,7 @@ public class BenchmarkInterestStability_Noise <T extends ImageBase, D extends Im
 
 	public static void main( String args[] ) {
 		// specify test images
-		String imageNames[] = new String[]{"outdoors01.jpg","indoors01.jpg","scale/beach01.jpg"};
+		String imageNames[] = new String[]{"outdoors01.jpg","indoors01.jpg","scale/beach01.jpg","sunflowers.png"};
 
 		// evaluate each image individually
 		for( String s : imageNames ) {

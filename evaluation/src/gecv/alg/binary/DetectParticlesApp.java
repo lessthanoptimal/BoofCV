@@ -55,9 +55,9 @@ public class DetectParticlesApp {
 		average *= 0.8;
 
 		useThreshold(original,average);
-//		useHysteresis4(original,average);
-//		useHysteresis8(original,average);
-//		useThresholdMorph(original,average);
+		useHysteresis4(original,average);
+		useHysteresis8(original,average);
+		useThresholdMorph(original,average);
 
 		ShowImages.showWindow(binaryPanel,"Binary Images");
 		ShowImages.showWindow(labeledPanel,"Labeled Images");
@@ -67,7 +67,7 @@ public class DetectParticlesApp {
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
 		ImageUInt8 thresholded = ThresholdImageOps.threshold(input,null,(int)threshold,true);
 
-		int numBlobs = BinaryImageOps.labelBlobs4(thresholded,labeled,null);
+		int numBlobs = BinaryImageOps.labelBlobs4(thresholded,labeled);
 		binaryPanel.addImage(VisualizeBinaryData.renderBinary(thresholded,null),"Threshold");
 		labeledPanel.addItem(new ImageBinaryLabeledPanel(labeled,numBlobs+1,2342), "Threshold");
 	}
@@ -97,7 +97,7 @@ public class DetectParticlesApp {
 		ImageUInt8 mod = BinaryImageOps.erode8(thresholded,null);
 		mod = BinaryImageOps.dilate8(mod,null);
 
-		int numBlobs = BinaryImageOps.labelBlobs4(mod,labeled,null);
+		int numBlobs = BinaryImageOps.labelBlobs4(mod,labeled);
 		binaryPanel.addImage(VisualizeBinaryData.renderBinary(mod,null),"Threshold + Morph");
 		labeledPanel.addItem(new ImageBinaryLabeledPanel(labeled,numBlobs+1,2342), "Threshold + Morph");
 	}

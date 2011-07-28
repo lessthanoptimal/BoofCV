@@ -17,13 +17,12 @@
 package gecv.alg.filter.binary;
 
 import gecv.alg.InputSanityCheck;
-import gecv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
-import gecv.alg.filter.binary.impl.ImplBinaryBorderOps;
-import gecv.alg.filter.binary.impl.ImplBinaryInnerOps;
-import gecv.alg.filter.binary.impl.ImplBinaryNaiveOps;
+import gecv.alg.filter.binary.impl.*;
 import gecv.struct.GrowingArrayInt;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
+
+import java.util.List;
 
 /**
  * <p>
@@ -201,19 +200,20 @@ public class BinaryImageOps {
 	 *
 	 * @param input Binary input image.
 	 * @param output The labeled blob image. Modified.
-	 * @param work Used to store intermediate labeling results.  In general it is at most 3 or 4 times larger than the
-	 * expected max number of blobs.  Worst case it will be (width*height)/4
 	 * @return How many blobs were found.
 	 */
-	public static int labelBlobs8( ImageUInt8 input , ImageSInt32 output , GrowingArrayInt work )
+	public static int labelBlobs8( ImageUInt8 input , ImageSInt32 output )
 	{
 		InputSanityCheck.checkSameShape(input,output);
-		work = checkDeclareMaxConnect(work);
 
-		int numBlobs = ImplBinaryBlobLabeling.quickLabelBlobs8(input,output,work);
-		ImplBinaryBlobLabeling.optimizeMaxConnect(work.data,numBlobs);
-		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(work.data,numBlobs);
-		ImplBinaryBlobLabeling.relabelBlobs(output,work.data);
+		List<LabelNode> labels = ImplBinaryBlobLabeling.quickLabelBlobs8(input,output);
+		ImplBinaryBlobLabeling.optimizeMaxConnect(labels);
+		int blobs[] = new int[ labels.size() ]; // todo clean this up
+		for( int i = 0; i < blobs.length; i++ ) {
+			blobs[i] = labels.get(i).maxIndex;
+		}
+		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(blobs,blobs.length-1);
+		ImplBinaryBlobLabeling.relabelBlobs(output,blobs);
 
 		return newNumBlobs;
 	}
@@ -232,19 +232,20 @@ public class BinaryImageOps {
 	 *
 	 * @param input Binary input image.
 	 * @param output The labeled blob image. Modified.
-	 * @param work Used to store intermediate labeling results.  In general it is at most 3 or 4 times larger than the
-	 * expected max number of blobs.  Worst case it will be (width*height)/2
 	 * @return How many blobs were found.
 	 */
-	public static int labelBlobs4( ImageUInt8 input , ImageSInt32 output , GrowingArrayInt work )
+	public static int labelBlobs4( ImageUInt8 input , ImageSInt32 output )
 	{
 		InputSanityCheck.checkSameShape(input,output);
-		work = checkDeclareMaxConnect(work);
 
-		int numBlobs = ImplBinaryBlobLabeling.quickLabelBlobs4(input,output,work);
-		ImplBinaryBlobLabeling.optimizeMaxConnect(work.data,numBlobs);
-		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(work.data,numBlobs);
-		ImplBinaryBlobLabeling.relabelBlobs(output,work.data);
+		List<LabelNode> labels = ImplBinaryBlobLabeling.quickLabelBlobs4(input,output);
+		ImplBinaryBlobLabeling.optimizeMaxConnect(labels);
+		int blobs[] = new int[ labels.size() ]; // todo clean this up
+		for( int i = 0; i < blobs.length; i++ ) {
+			blobs[i] = labels.get(i).maxIndex;
+		}
+		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(blobs,blobs.length-1);
+		ImplBinaryBlobLabeling.relabelBlobs(output,blobs);
 
 		return newNumBlobs;
 	}

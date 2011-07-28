@@ -18,10 +18,11 @@ package gecv.alg.filter.binary.impl;
 
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder_I32;
-import gecv.struct.GrowingArrayInt;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -48,28 +49,26 @@ public class ImplBinaryBlobLabeling {
 	/**
 	 * Simple but slower algorithm for quickLabel using an 8-connect rule.
 	 */
-	public static int quickLabelBlobs8_Naive( ImageUInt8 input , ImageSInt32 _output , GrowingArrayInt maxConnect ) {
+	public static List<LabelNode> quickLabelBlobs8_Naive( ImageUInt8 input , ImageSInt32 _output ) {
 		ImageBorder_I32 output = FactoryImageBorder.value(_output,0);
-		setupMaxConnect(maxConnect);
+		List<LabelNode> labels = new ArrayList<LabelNode>();
+
+		// add the background node
+		labels.add( new LabelNode(0));
 
 		for( int y = 0; y < input.height; y++ ) {
 			for( int x = 0; x < input.width; x++ ) {
 				if( input.get(x,y) == 0 )
 					continue;
 
-				 spotQuickLabel8(output, maxConnect, y, x);
+				 spotQuickLabel8(output, labels, y, x);
 			}
 		}
 
-		return maxConnect.size-1;
+		return labels;
 	}
 
-	private static void setupMaxConnect(GrowingArrayInt maxConnect) {
-		maxConnect.reset();
-		maxConnect.add(0);
-	}
-
-	private static void spotQuickLabel8(ImageBorder_I32 output, GrowingArrayInt maxConnect, int y, int x) {
+	private static void spotQuickLabel8(ImageBorder_I32 output, List<LabelNode> labels, int y, int x) {
 		final int p5 = output.get(x-1,y);
 		final int p4 = output.get(x-1,y-1);
 		final int p3 = output.get(x  ,y-1);
@@ -77,85 +76,99 @@ public class ImplBinaryBlobLabeling {
 
 		// see if anything around it has been labeled already
 		if( 0 == p2+p3+p4+p5 ) {
-			int value = maxConnect.size;
-			maxConnect.add(value);
+			int value = labels.size();
+			labels.add( new LabelNode(value));
 			output.set(x,y,value);
 		} else {
-			int val = Math.max(maxConnect.data[p2],maxConnect.data[p3]);
-			val = Math.max(val,maxConnect.data[p4]);
-			val = Math.max(val,maxConnect.data[p5]);
-			output.set(x,y,val);
+			LabelNode l2 = labels.get(p2);
+			LabelNode l3 = labels.get(p3);
+			LabelNode l4 = labels.get(p4);
+			LabelNode l5 = labels.get(p5);
+			int value = Math.max(l2.maxIndex,l3.maxIndex);
+			value = Math.max(value,l4.maxIndex);
+			value = Math.max(value,l5.maxIndex);
+			output.set(x,y,value);
 
-			maxConnect.data[maxConnect.data[p2]] = val;
-			maxConnect.data[maxConnect.data[p3]] = val;
-			maxConnect.data[maxConnect.data[p4]] = val;
-			maxConnect.data[maxConnect.data[p5]] = val;
-			maxConnect.data[p2] = val;
-			maxConnect.data[p3] = val;
-			maxConnect.data[p4] = val;
-			maxConnect.data[p5] = val;
-			maxConnect.data[0] = 0;
+			checkConnection(labels, l2, value);
+			checkConnection(labels, l3, value);
+			checkConnection(labels, l4, value);
+			checkConnection(labels, l5, value);
 		}
 	}
 
 	/**
 	 * Simple but slower algorithm for quickLabel using an 8-connect rule.
 	 */
-	public static int quickLabelBlobs4_Naive( ImageUInt8 input , ImageSInt32 _output , GrowingArrayInt maxConnect ) {
+	public static List<LabelNode> quickLabelBlobs4_Naive( ImageUInt8 input , ImageSInt32 _output ) {
 		ImageBorder_I32 output = FactoryImageBorder.value(_output,0);
-		setupMaxConnect(maxConnect);
+		List<LabelNode> labels = new ArrayList<LabelNode>();
+
+		// add the background node
+		labels.add( new LabelNode(0));
 
 		for( int y = 0; y < input.height; y++ ) {
 			for( int x = 0; x < input.width; x++ ) {
 				if( input.get(x,y) == 0 )
 					continue;
 
-				spotQuickLabel4(output, maxConnect, x, y);
+				spotQuickLabel4(output, labels, x, y);
 			}
 		}
 
-		return maxConnect.size-1;
+		return labels;
 	}
 
-	private static void spotQuickLabel4(ImageBorder_I32 output, GrowingArrayInt maxConnect, int x, int y) {
+	private static void spotQuickLabel4(ImageBorder_I32 output, List<LabelNode> labels, int x, int y) {
 		final int p5 = output.get(x-1,y);
 		final int p3 = output.get(x  ,y-1);
 
 		// see if anything around it has been labeled already
 		if( 0 == p3+p5) {
-			int value = maxConnect.size;
-			maxConnect.add( value );
+			int value = labels.size();
+			labels.add( new LabelNode(value) );
 			output.set(x,y,value);
 		} else {
-			int val = Math.max(maxConnect.data[p3],maxConnect.data[p5]);
-			output.set(x,y,val);
+			LabelNode l3 = labels.get(p3);
+			LabelNode l5 = labels.get(p5);
+			int value = Math.max(l3.maxIndex,l5.maxIndex);
+			output.set(x,y,value);
 
-			maxConnect.data[p3] = val;
-			maxConnect.data[p5] = val;
-			maxConnect.data[0] = 0;
+			checkConnection(labels, l3, value);
+			checkConnection(labels, l5, value);
+		}
+	}
+
+	private static void checkConnection(List<LabelNode> labels, LabelNode l, int val) {
+		if( l.index != 0 && l.maxIndex != val ) {
+			l.maxIndex = val;
+			l.connections.add(val);
+			labels.get(val).connections.add(l.index);
 		}
 	}
 
 	/**
 	 * Faster algorithm for quickLabel using an 8-connect rule.
 	 */
-	public static int quickLabelBlobs8( ImageUInt8 input , ImageSInt32 output , GrowingArrayInt maxConnect ) {
+	public static List<LabelNode> quickLabelBlobs8( ImageUInt8 input , ImageSInt32 output ) {
 		ImageBorder_I32 outputSafe = FactoryImageBorder.value(output,0);
-		setupMaxConnect(maxConnect);
+		List<LabelNode> labels = new ArrayList<LabelNode>();
+
+		// add the background node
+		labels.add( new LabelNode(0));
 
 		// table the top image
 		for( int x = 0; x < input.width; x++ ) {
 			if( input.get(x,0) == 0 )
 				continue;
 
-			spotQuickLabel8(outputSafe, maxConnect, 0, x);
+			spotQuickLabel8(outputSafe, labels, 0, x);
 		}
 
 		for( int y = 1; y < input.height; y++ ) {
 
 			// label the left border
 			if( input.get(0,y) != 0 )
-				spotQuickLabel8(outputSafe, maxConnect, y, 0);
+				spotQuickLabel8(outputSafe, labels, y, 0);
 
 			// label the inner portion of the row
 			int indexIn = input.startIndex + y*input.stride;
@@ -174,52 +187,57 @@ public class ImplBinaryBlobLabeling {
 
 				// see if anything around it has been labeled
 				if( 0 == p2+p3+p4+p5) {
-					int value = maxConnect.size;
-					maxConnect.add(value);
+					int value = labels.size();
+					labels.add( new LabelNode(value));
 					output.data[indexOut] = value;
 				} else {
-					int val = Math.max(maxConnect.data[p2],maxConnect.data[p3]);
-					val = Math.max(val,maxConnect.data[p4]);
-					val = Math.max(val,maxConnect.data[p5]);
-					output.data[indexOut] = val;
+					LabelNode l2 = labels.get(p2);
+					LabelNode l3 = labels.get(p3);
+					LabelNode l4 = labels.get(p4);
+					LabelNode l5 = labels.get(p5);
+					int value = Math.max(l2.maxIndex,l3.maxIndex);
+					value = Math.max(value,l4.maxIndex);
+					value = Math.max(value,l5.maxIndex);
+					output.data[indexOut] = value;
 
-					maxConnect.data[p2] = val;
-					maxConnect.data[p3] = val;
-					maxConnect.data[p4] = val;
-					maxConnect.data[p5] = val;
-					maxConnect.data[0] = 0;
+					checkConnection(labels, l2, value);
+					checkConnection(labels, l3, value);
+					checkConnection(labels, l4, value);
+					checkConnection(labels, l5, value);
 				}
 			}
 
 			// label the right border
 			if( input.get(input.width - 1,y) != 0 )
-				spotQuickLabel8(outputSafe, maxConnect, y, input.width - 1);
+				spotQuickLabel8(outputSafe, labels, y, input.width - 1);
 		}
 
-		return maxConnect.size-1;
+		return labels;
 	}
 
 	/**
 	 * Faster algorithm for quickLabel using an 4-connect rule.
 	 */
-	public static int quickLabelBlobs4( ImageUInt8 input , ImageSInt32 output , GrowingArrayInt maxConnect )
+	public static List<LabelNode> quickLabelBlobs4( ImageUInt8 input , ImageSInt32 output )
 	{
 		ImageBorder_I32 outputSafe = FactoryImageBorder.value(output,0);
-		setupMaxConnect(maxConnect);
-
+		List<LabelNode> labels = new ArrayList<LabelNode>();
+		// add the background node
+		labels.add( new LabelNode(0));
+		
 		// table the top image
 		for( int x = 0; x < input.width; x++ ) {
 			if( input.get(x,0) == 0 )
 				continue;
 
-			 spotQuickLabel4(outputSafe, maxConnect, x, 0);
+			 spotQuickLabel4(outputSafe, labels, x, 0);
 		}
 
 		for( int y = 1; y < input.height; y++ ) {
 
 			// label the left border
 			if( input.get(0,y) != 0 )
-				spotQuickLabel4(outputSafe, maxConnect, 0, y);
+				spotQuickLabel4(outputSafe, labels, 0, y);
 
 			int indexIn = input.startIndex + y*input.stride;
 			int indexOut = output.startIndex + y*output.stride + 1;
@@ -235,21 +253,22 @@ public class ImplBinaryBlobLabeling {
 
 				// see if anything around it has been labeled
 				if( 0 == p3+p5) {
-					int value = maxConnect.size;
-					maxConnect.add(value);
+					int value = labels.size();
+					labels.add( new LabelNode(value) );
 					output.data[indexOut] = value;
 				} else {
-					int val = Math.max( maxConnect.data[p3], maxConnect.data[p5]);
-					output.data[indexOut] = val;
+					LabelNode l3 = labels.get(p3);
+					LabelNode l5 = labels.get(p5);
+					int value = Math.max(l3.maxIndex,l5.maxIndex);
+					output.data[indexOut] = value;
 
-					maxConnect.data[p3] = val;
-					maxConnect.data[p5] = val;
-					maxConnect.data[0] = 0;
+					checkConnection(labels, l3, value);
+					checkConnection(labels, l5, value);
 				}
 			}
 		}
 
-		return maxConnect.size-1;
+		return labels;
 	}
 
 	/**
@@ -270,36 +289,22 @@ public class ImplBinaryBlobLabeling {
 		}
 	}
 
-	public static void optimizeMaxConnect( final int maxConnect[] , int numBlobs )
+	public static void optimizeMaxConnect( List<LabelNode> labels )
 	{
 		boolean change = true;
 		while( change ) {
 			change = false;
-			for( int i = 1; i < numBlobs; i++ ) {
-				int index = maxConnect[i];
-				int max = maxConnect[index];
-//				boolean localChange = false;
-				while( max != index ) {
-					index = max;
-					max = maxConnect[index];
-					change = true;
+			for( int i = 1; i < labels.size(); i++ ) {
+				LabelNode a = labels.get(i);
+				for( int j = 0; j < a.connections.size; j++ ) {
+					LabelNode b = labels.get( a.connections.data[j] );
+					if( a.maxIndex < b.maxIndex ) {
+						change = true;
+						a.maxIndex = b.maxIndex;
+					}
 				}
-				maxConnect[i] = max;
-//				if( localChange ) {
-//					// save time by setting all in path to max value, avoiding multiple searches
-//					change = true;
-//					maxConnect[i] = max;
-//					index = maxConnect[i];
-//					while( index != max ) {
-//						int indexNext = maxConnect[index];
-//						maxConnect[index] = max;
-//						index = indexNext;
-//					}
-//
-//				}
 			}
 		}
-		maxConnect[0] = 0;
 	}
 
 	/**

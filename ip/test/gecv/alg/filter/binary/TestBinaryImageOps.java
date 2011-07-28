@@ -100,7 +100,7 @@ public class TestBinaryImageOps {
 		ImageSInt32 expected = new ImageSInt32(13,8);
 		expected.data = expectedData;
 
-		int numFount = rule8 ? BinaryImageOps.labelBlobs8(input,found,null) : BinaryImageOps.labelBlobs4(input,found,null);
+		int numFount = rule8 ? BinaryImageOps.labelBlobs8(input,found) : BinaryImageOps.labelBlobs4(input,found);
 		assertEquals(numExpected,numFount);
 
 		if( expectedData != null )
