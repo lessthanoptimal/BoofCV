@@ -19,7 +19,6 @@ package gecv.alg.filter.binary;
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import gecv.misc.GecvMiscOps;
-import gecv.struct.GrowingArrayInt;
 import gecv.struct.image.*;
 
 /**
@@ -63,12 +62,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -76,7 +74,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -114,12 +112,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -127,7 +124,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -165,12 +162,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -178,7 +174,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -216,12 +212,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -229,7 +224,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -267,19 +262,19 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
+
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
 			ImplBinaryBlobLabeling.minimizeBlobID(relabel,numBlobs);
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -317,12 +312,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -330,7 +324,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -368,12 +362,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -381,7 +374,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -419,12 +412,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -432,7 +424,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -470,12 +462,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -483,7 +474,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -521,12 +512,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -534,7 +524,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -572,12 +562,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -585,7 +574,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
@@ -623,12 +612,11 @@ public class BinaryImageHighOps {
 		output = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
-		GrowingArrayInt temp = new GrowingArrayInt(20);
 		int relabel[];
 
 		if( down ) {
 			ThresholdImageOps.threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
@@ -636,7 +624,7 @@ public class BinaryImageHighOps {
 			BinaryImageOps.relabel(output,relabel);
 		} else {
 			ThresholdImageOps.threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output,temp);
+			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);

@@ -16,12 +16,12 @@
 
 package gecv.alg.filter.binary.impl;
 
-import gecv.struct.GrowingArrayInt;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
@@ -100,8 +100,8 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs8_Naive(ImageUInt8 input, ImageSInt32 found,
 											ImageSInt32 expected)
 	{
-		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,new GrowingArrayInt());
-		assertEquals(5,numFount);
+		List<LabelNode> labels = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found);
+		assertEquals(5,labels.size()-1);
 
 		GecvTesting.assertEquals(expected,found,0);
 	}
@@ -109,8 +109,8 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs8(ImageUInt8 input, ImageSInt32 found,
 									  ImageSInt32 expected)
 	{
-		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found,new GrowingArrayInt());
-		assertEquals(5,numFount);
+		List<LabelNode> labels= ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input,found);
+		assertEquals(5,labels.size()-1);
 
 		GecvTesting.assertEquals(expected,found,0);
 	}
@@ -130,8 +130,8 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs4_Naive(ImageUInt8 input, ImageSInt32 found,
 											ImageSInt32 expected)
 	{
-		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input,found,new GrowingArrayInt());
-		assertEquals(7,numFount);
+		List<LabelNode> nodes = ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input,found);
+		assertEquals(7,nodes.size()-1);
 
 		GecvTesting.assertEquals(expected,found,0);
 	}
@@ -139,8 +139,8 @@ public class TestImplBinaryBlobLabeling {
 	public void checkQuickLabelBlobs4(ImageUInt8 input, ImageSInt32 found,
 									  ImageSInt32 expected)
 	{
-		int numFount = ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input,found,new GrowingArrayInt());
-		assertEquals(7,numFount);
+		List<LabelNode> nodes = ImplBinaryBlobLabeling.quickLabelBlobs4(input,found);
+		assertEquals(7,nodes.size()-1);
 
 		GecvTesting.assertEquals(expected,found,0);
 	}
@@ -160,21 +160,6 @@ public class TestImplBinaryBlobLabeling {
 		assertEquals(2,input.get(0,0));
 		assertEquals(3,input.get(1,1));
 		assertEquals(4,input.get(2,1));
-	}
-
-	@Test
-	public void optimizeMaxConnect() {
-		int maxConnect[] = new int[]{0,2,3,5,4,5,6};
-
-		ImplBinaryBlobLabeling.optimizeMaxConnect(maxConnect,6);
-
-		assertEquals(0,maxConnect[0]);
-		assertEquals(5,maxConnect[1]);
-		assertEquals(5,maxConnect[2]);
-		assertEquals(5,maxConnect[3]);
-		assertEquals(4,maxConnect[4]);
-		assertEquals(5,maxConnect[5]);
-		assertEquals(6,maxConnect[6]);
 	}
 
 	@Test

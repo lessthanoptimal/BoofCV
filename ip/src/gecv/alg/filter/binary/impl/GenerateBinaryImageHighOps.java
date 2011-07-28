@@ -111,12 +111,11 @@ public class GenerateBinaryImageHighOps extends CodeGeneratorBase {
 				"\t\toutput = InputSanityCheck.checkDeclare(input,output,ImageSInt32.class);\n" +
 				"\t\twork = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);\n" +
 				"\n" +
-				"\t\tGrowingArrayInt temp = new GrowingArrayInt(20);\n" +
 				"\t\tint relabel[];\n" +
 				"\n" +
 				"\t\tif( down ) {\n" +
 				"\t\t\tThresholdImageOps.threshold(input,work,upperThreshold,true);\n" +
-				"\t\t\tint numBlobs = BinaryImageOps.labelBlobs"+rule+"(work,output,temp);\n" +
+				"\t\t\tint numBlobs = BinaryImageOps.labelBlobs"+rule+"(work,output);\n" +
 				"\n" +
 				"\t\t\trelabel = new int[numBlobs+1];\n" +
 				"\t\t\tThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);\n" +
@@ -124,7 +123,7 @@ public class GenerateBinaryImageHighOps extends CodeGeneratorBase {
 				"\t\t\tBinaryImageOps.relabel(output,relabel);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tThresholdImageOps.threshold(input,work,lowerThreshold,false);\n" +
-				"\t\t\tint numBlobs = BinaryImageOps.labelBlobs"+rule+"(work,output,temp);\n" +
+				"\t\t\tint numBlobs = BinaryImageOps.labelBlobs"+rule+"(work,output);\n" +
 				"\n" +
 				"\t\t\trelabel = new int[numBlobs+1];\n" +
 				"\t\t\tThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);\n" +
