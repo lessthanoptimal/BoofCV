@@ -16,7 +16,7 @@
 
 package gecv.abst.detect.corner;
 
-import gecv.alg.detect.corner.LaplaceBlobIntensity;
+import gecv.alg.detect.corner.HessianBlobIntensity;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -25,26 +25,26 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Wrapper around {@link gecv.alg.detect.corner.LaplaceBlobIntensity} for {@link GeneralFeatureIntensity}.
+ * Wrapper around {@link gecv.alg.detect.corner.HessianBlobIntensity} for {@link GeneralFeatureIntensity}.
  *
  * @author Peter Abeles
  */
 public class WrapperLaplacianBlobIntensity <I extends ImageBase, D extends ImageBase> implements GeneralFeatureIntensity<I,D> {
 
-	LaplaceBlobIntensity.Type type;
+	HessianBlobIntensity.Type type;
 	ImageFloat32 intensity = new ImageFloat32(1,1);
 	Method m;
 
-	public WrapperLaplacianBlobIntensity(LaplaceBlobIntensity.Type type, Class<D> derivType ) {
+	public WrapperLaplacianBlobIntensity(HessianBlobIntensity.Type type, Class<D> derivType ) {
 		this.type = type;
 		try {
 			switch( type ) {
 				case DETERMINANT:
-					m = LaplaceBlobIntensity.class.getMethod("determinant",ImageFloat32.class,derivType,derivType,derivType);
+					m = HessianBlobIntensity.class.getMethod("determinant",ImageFloat32.class,derivType,derivType,derivType);
 					break;
 
 				case TRACE:
-					m = LaplaceBlobIntensity.class.getMethod("trace",ImageFloat32.class,derivType,derivType);
+					m = HessianBlobIntensity.class.getMethod("trace",ImageFloat32.class,derivType,derivType);
 					break;
 
 				default:
@@ -68,11 +68,6 @@ public class WrapperLaplacianBlobIntensity <I extends ImageBase, D extends Image
 
 				case TRACE:
 					m.invoke(null,intensity,derivXX,derivYY);
-					break;
-
-				case QUICK:
-
-					// todo invoke that convolution here?
 					break;
 			}
 		} catch (IllegalAccessException e) {
@@ -99,7 +94,7 @@ public class WrapperLaplacianBlobIntensity <I extends ImageBase, D extends Image
 
 	@Override
 	public boolean getRequiresHessian() {
-		return( type != LaplaceBlobIntensity.Type.QUICK);
+		return( true );
 	}
 
 	@Override

@@ -16,7 +16,7 @@
 
 package gecv.alg.filter.convolve.noborder;
 
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernel;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
@@ -122,9 +122,9 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 	public static Object createTableKernel(Class<?> kernelType, int kernelRadius, Random rand) {
 		Object kernel;
 		if (Kernel1D_F32.class == kernelType) {
-			kernel = KernelFactory.table1D_F32(kernelRadius,true);
+			kernel = FactoryKernel.table1D_F32(kernelRadius,true);
 		} else if (Kernel1D_I32.class == kernelType) {
-			kernel = KernelFactory.table1D_I32(kernelRadius);
+			kernel = FactoryKernel.table1D_I32(kernelRadius);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}

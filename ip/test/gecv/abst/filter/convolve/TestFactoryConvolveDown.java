@@ -19,7 +19,7 @@ package gecv.abst.filter.convolve;
 import gecv.abst.filter.FilterImageInterface;
 import gecv.alg.filter.convolve.ConvolveDownNoBorder;
 import gecv.alg.filter.convolve.ConvolveDownNormalized;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernel;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D_F32;
@@ -48,7 +48,7 @@ public class TestFactoryConvolveDown {
 
 	@Test
 	public void convolve1D_F32() {
-		Kernel1D_F32 kernel = KernelFactory.random1D_F32(radius,1,6,rand);
+		Kernel1D_F32 kernel = FactoryKernel.random1D_F32(radius,1,6,rand);
 
 		FilterImageInterface<ImageFloat32,ImageFloat32> conv;
 
@@ -80,7 +80,7 @@ public class TestFactoryConvolveDown {
 	@Test
 	public void convolve1D_I32() {
 
-		Kernel1D_I32 kernel = KernelFactory.random1D_I32(radius,1,6,rand);
+		Kernel1D_I32 kernel = FactoryKernel.random1D_I32(radius,1,6,rand);
 
 		FilterImageInterface conv;
 
@@ -113,7 +113,7 @@ public class TestFactoryConvolveDown {
 
 	@Test
 	public void convolve2D_F32() {
-		Kernel2D_F32 kernel = KernelFactory.random2D_F32(radius,1,6,rand);
+		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(radius,1,6,rand);
 
 		FilterImageInterface<ImageFloat32,ImageFloat32> conv;
 
@@ -145,7 +145,7 @@ public class TestFactoryConvolveDown {
 	@Test
 	public void convolve2D_I32() {
 
-		Kernel2D_I32 kernel = KernelFactory.random2D_I32(radius,1,6,rand);
+		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(radius,1,6,rand);
 
 		FilterImageInterface conv;
 

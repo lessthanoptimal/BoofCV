@@ -1,0 +1,125 @@
+/*
+ * Copyright 2011 Peter Abeles
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package gecv.alg.detect.corner.impl;
+
+import gecv.core.image.FactorySingleBandImage;
+import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.SingleBandImage;
+import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageFloat32;
+import gecv.testing.GecvTesting;
+import org.junit.Test;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * @author Peter Abeles
+ */
+public class TestImplHessianBlobIntensity {
+	Random rand = new Random(123);
+	int width = 20;
+	int height = 30;
+
+	int numExpected = 2;
+
+	@Test
+	public void testDeterminant() {
+
+		int total = 0;
+		Method[] list = ImplHessianBlobIntensity.class.getMethods();
+
+		for( Method m : list ) {
+			if( !m.getName().equals("determinant"))
+				continue;
+
+			Class<?> param[] = m.getParameterTypes();
+
+			ImageBase derivXX = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageBase derivYY = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageBase derivXY = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageFloat32 intensity = new ImageFloat32(width,height);
+
+			GeneralizedImageOps.randomize(derivXX,rand,-10,10);
+			GeneralizedImageOps.randomize(derivYY,rand,-10,10);
+			GeneralizedImageOps.randomize(derivXY,rand,-10,10);
+
+			GecvTesting.checkSubImage(this,"performDeterminant",true,m,intensity,derivXX,derivYY,derivXY);
+			total++;
+		}
+
+		assertEquals(numExpected,total);
+	}
+
+	public void performDeterminant( Method m , ImageFloat32 intensity,
+									ImageBase derivXX, ImageBase derivYY, ImageBase derivXY )
+			throws InvocationTargetException, IllegalAccessException
+	{
+		m.invoke(null,intensity,derivXX,derivYY,derivXY);
+
+		SingleBandImage xx = FactorySingleBandImage.wrap(derivXX);
+		SingleBandImage yy = FactorySingleBandImage.wrap(derivYY);
+		SingleBandImage xy = FactorySingleBandImage.wrap(derivXY);
+
+
+		float expected = xx.get(5,6).floatValue()*yy.get(5,6).floatValue() - xy.get(5,6).floatValue()*xy.get(5,6).floatValue();
+		assertEquals(expected,intensity.get(5,6),1e-4);
+	}
+
+	@Test
+	public void testTrace() {
+
+		int total = 0;
+		Method[] list = ImplHessianBlobIntensity.class.getMethods();
+
+		for( Method m : list ) {
+			if( !m.getName().equals("trace"))
+				continue;
+
+			Class<?> param[] = m.getParameterTypes();
+
+			ImageBase derivXX = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageBase derivYY = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageFloat32 intensity = new ImageFloat32(width,height);
+
+			GeneralizedImageOps.randomize(derivXX,rand,-10,10);
+			GeneralizedImageOps.randomize(derivYY,rand,-10,10);
+
+			GecvTesting.checkSubImage(this,"performTrace",true,m,intensity,derivXX,derivYY);
+			total++;
+		}
+
+		assertEquals(numExpected,total);
+	}
+
+	public void performTrace( Method m , ImageFloat32 intensity,
+									ImageBase derivXX, ImageBase derivYY )
+			throws InvocationTargetException, IllegalAccessException
+	{
+		m.invoke(null,intensity,derivXX,derivYY);
+
+		SingleBandImage xx = FactorySingleBandImage.wrap(derivXX);
+		SingleBandImage yy = FactorySingleBandImage.wrap(derivYY);
+
+
+		float expected = Math.abs(xx.get(5,6).floatValue() + yy.get(5,6).floatValue());
+		assertEquals(expected,intensity.get(5,6),1e-4);
+	}
+}

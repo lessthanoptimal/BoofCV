@@ -20,7 +20,7 @@ import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.abst.filter.FilterImageInterface;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernel;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
@@ -96,8 +96,8 @@ public class BenchmarkConvolveAbstracted {
 			System.out.println("Radius: "+radius);
 			System.out.println();
 			BenchmarkConvolveAbstracted.radius = radius;
-			kernelF32 = KernelFactory.table1D_F32(radius,true);
-			kernelI32 = KernelFactory.table1D_I32(radius);
+			kernelF32 = FactoryKernel.table1D_F32(radius,true);
+			kernelI32 = FactoryKernel.table1D_I32(radius);
 			
 
 			ProfileOperation.printOpsPerSec(new Convolve_Vertical_I8_I16(),TEST_TIME);

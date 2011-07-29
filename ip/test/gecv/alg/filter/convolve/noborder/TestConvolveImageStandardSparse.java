@@ -17,7 +17,7 @@
 package gecv.alg.filter.convolve.noborder;
 
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.ConvertImage;
 import gecv.core.image.GeneralizedImageOps;
@@ -82,7 +82,7 @@ public class TestConvolveImageStandardSparse {
 		ImageFloat32 floatImage = new ImageFloat32(width,height);
 		ConvertImage.convert(seedImage,floatImage);
 
-		kernelI32 = KernelFactory.gaussian1D_I32(kernelRadius);
+		kernelI32 = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
 		kernelF32 = new Kernel1D_F32(kernelI32.width);
 		for( int i = 0; i < kernelI32.width; i++ )
 			kernelF32.data[i] = kernelI32.data[i];

@@ -18,7 +18,7 @@ package gecv.alg.geo.trackers;
 
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.alg.geo.AssociatedPair;
 import gecv.alg.geo.PointSequentialTracker;
 import gecv.alg.geo.SingleImageInput;
@@ -110,7 +110,7 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 		GradientPyramid<I,D> gradientUpdater = new GradientPyramid<I,D>(gradient);
 
 		setup(trackManager,
-				new ConvolutionPyramid<I>(KernelFactory.gaussian1D(typeInput,2),typeInput),
+				new ConvolutionPyramid<I>(FactoryKernelGaussian.gaussian1D(typeInput,2),typeInput),
 				gradientUpdater);
 	}
 

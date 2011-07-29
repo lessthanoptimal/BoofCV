@@ -14,21 +14,22 @@
  *    limitations under the License.
  */
 
-package gecv.struct.gss;
+package gecv.alg.transform.gss;
 
 import gecv.abst.filter.convolve.ConvolveInterface;
 import gecv.abst.filter.convolve.FactoryConvolve;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.border.BorderType;
 import gecv.struct.GecvDefaults;
 import gecv.struct.convolve.Kernel1D;
+import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.image.ImageBase;
 
 
 /**
  * <p>
- * Implementation of {@link GaussianScaleSpace} that focuses on one scale space at a time.
+ * Implementation of {@link gecv.struct.gss.GaussianScaleSpace} that focuses on one scale space at a time.
  * When the scale space is changed the scaled image is recomputed and previously computed derivatives
  * are marked as stale.  Then the derivatives are recomputed as needed.
  * </p>
@@ -123,13 +124,13 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 	public void setActiveScale(int index) {
 		this.currentScale = index;
 		double sigma = scales[index];
-		int radius = KernelFactory.radiusForSigma(sigma);
+		int radius = FactoryKernelGaussian.radiusForSigma(sigma);
 
 		Class<I> inputType = inputGen.getType();
 		Class<D> derivType = derivGen.getType();
 
-		Kernel1D kernel = KernelFactory.gaussian1D(inputType,sigma,radius);
-		Kernel1D kernelDeriv = KernelFactory.gaussianDerivative1D(inputType,sigma,radius);
+		Kernel1D kernel = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
+		Kernel1D kernelDeriv = FactoryKernelGaussian.gaussianDerivative1D(inputType,sigma,radius+1);
 
 		derivX_H = FactoryConvolve.convolve(kernelDeriv,inputType,derivType, borderDeriv,true);
 		derivY_V = FactoryConvolve.convolve(kernelDeriv,inputType,derivType, borderDeriv,false);

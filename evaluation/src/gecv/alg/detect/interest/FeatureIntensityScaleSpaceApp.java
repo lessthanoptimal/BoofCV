@@ -18,14 +18,14 @@ package gecv.alg.detect.interest;
 
 import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperLaplacianBlobIntensity;
-import gecv.alg.detect.corner.LaplaceBlobIntensity;
+import gecv.alg.detect.corner.HessianBlobIntensity;
 import gecv.alg.misc.PixelMath;
+import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.gss.FactoryGaussianScaleSpace;
 import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.image.ImageFloat32;
 
@@ -52,8 +52,8 @@ public class FeatureIntensityScaleSpaceApp {
 
 
 		GeneralFeatureIntensity<ImageFloat32, ImageFloat32> intensity;
-		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(LaplaceBlobIntensity.Type.DETERMINANT,ImageFloat32.class);
-//		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(LaplaceBlobIntensity.Type.TRACE,ImageFloat32.class);
+		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.DETERMINANT,ImageFloat32.class);
+//		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.TRACE,ImageFloat32.class);
 //		intensity = new WrapperFastCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createFast12(ImageFloat32.class,5,11));
 //		intensity = new WrapperKitRosCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKitRos(ImageFloat32.class));
 //		intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createHarris(ImageFloat32.class,2,0.04f));

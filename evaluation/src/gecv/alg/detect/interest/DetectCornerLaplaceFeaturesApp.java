@@ -16,11 +16,11 @@
 
 package gecv.alg.detect.interest;
 
+import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.feature.ScaleSpacePointPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.gss.FactoryGaussianScaleSpace;
 import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.image.ImageFloat32;
 

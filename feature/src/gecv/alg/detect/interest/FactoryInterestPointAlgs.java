@@ -26,7 +26,7 @@ import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.FactoryDerivativeSparse;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.corner.GradientCornerIntensity;
-import gecv.alg.detect.corner.LaplaceBlobIntensity;
+import gecv.alg.detect.corner.HessianBlobIntensity;
 import gecv.struct.image.ImageBase;
 
 /**
@@ -80,7 +80,7 @@ public class FactoryInterestPointAlgs {
 												Class<D> derivType)
 	{
 		CornerExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,false,false,false);
-		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(LaplaceBlobIntensity.Type.DETERMINANT,derivType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);

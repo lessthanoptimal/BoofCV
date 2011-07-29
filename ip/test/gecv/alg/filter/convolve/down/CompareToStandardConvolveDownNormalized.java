@@ -17,7 +17,7 @@
 package gecv.alg.filter.convolve.down;
 
 import gecv.alg.filter.convolve.ConvolutionTestHelper;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.image.ImageBase;
 import gecv.testing.CompareIdenticalFunctions;
@@ -52,7 +52,7 @@ public class CompareToStandardConvolveDownNormalized extends CompareIdenticalFun
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		Object kernel = KernelFactory.gaussian(paramTypes[0],kernelRadius,true);
+		Object kernel = FactoryKernelGaussian.gaussian(paramTypes[0],kernelRadius,true);
 
 		int divW,divH;
 		if( candidate.getName().compareTo("horizontal") == 0) {

@@ -120,13 +120,13 @@ public class TestConvolveWithBorderSparse {
 	protected static Object createKernel(Class<?> kernelType , int kernelRadius ) {
 		Object kernel;
 		if (Kernel1D_F32.class == kernelType) {
-			kernel = KernelFactory.gaussian1D_F32(kernelRadius,true);
+			kernel = FactoryKernelGaussian.gaussian1D_F32(kernelRadius,true);
 		} else if (Kernel1D_I32.class == kernelType) {
-			kernel = KernelFactory.gaussian1D_I32(kernelRadius);
+			kernel = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
 		} else if (Kernel2D_F32.class == kernelType) {
-			kernel = KernelFactory.gaussian2D_F32(1,kernelRadius,true);
+			kernel = FactoryKernelGaussian.gaussian2D_F32(1,kernelRadius,true);
 		} else if (Kernel2D_I32.class == kernelType) {
-			kernel = KernelFactory.gaussian2D_I32(1,kernelRadius);
+			kernel = FactoryKernelGaussian.gaussian2D_I32(1,kernelRadius);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}

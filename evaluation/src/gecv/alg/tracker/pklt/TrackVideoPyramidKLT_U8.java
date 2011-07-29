@@ -25,7 +25,7 @@ import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.tracker.klt.KltConfig;
@@ -99,7 +99,7 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 				new GenericPkltFeatSelector<ImageUInt8,ImageSInt16>(detector,null);
 
 		ConvolutionPyramid<ImageUInt8> pyrUpdater =
-				new ConvolutionPyramid<ImageUInt8>(KernelFactory.gaussian1D_I32(2),config.typeInput);
+				new ConvolutionPyramid<ImageUInt8>(FactoryKernelGaussian.gaussian1D_I32(2),config.typeInput);
 
 		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel_I8();
 

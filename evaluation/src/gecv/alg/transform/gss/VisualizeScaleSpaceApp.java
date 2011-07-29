@@ -22,7 +22,6 @@ import gecv.gui.image.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.gss.FactoryGaussianScaleSpace;
 import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.image.ImageFloat32;
 

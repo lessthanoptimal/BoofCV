@@ -280,10 +280,10 @@ public class BenchmarkConvolve {
 			System.out.println("Radius: "+radius);
 			System.out.println();
 			BenchmarkConvolve.radius = radius;
-			kernelF32 = KernelFactory.gaussian1D_F32(radius,true);
-			kernelI32 = KernelFactory.gaussian1D_I32(radius);
-			kernel2D_F32 = KernelFactory.gaussian2D_F32(1.0,radius,true);
-			kernel2D_I32 = KernelFactory.gaussian2D_I32(1.0,radius);
+			kernelF32 = FactoryKernelGaussian.gaussian1D_F32(radius,true);
+			kernelI32 = FactoryKernelGaussian.gaussian1D_I32(radius);
+			kernel2D_F32 = FactoryKernelGaussian.gaussian2D_F32(1.0,radius,true);
+			kernel2D_I32 = FactoryKernelGaussian.gaussian2D_I32(1.0,radius);
 			
 			ProfileOperation.printOpsPerSec(new Horizontal_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Horizontal_I8_I16(),TEST_TIME);

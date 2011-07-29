@@ -18,8 +18,8 @@ package gecv.alg.filter.convolve;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -133,10 +133,10 @@ public class BenchmarkConvolveNormalizeEdge {
 			System.out.println("Radius: "+radius);
 			System.out.println();
 			BenchmarkConvolveNormalizeEdge.radius = radius;
-			kernelF32 = KernelFactory.gaussian1D_F32(radius,true);
-			kernelI32 = KernelFactory.gaussian1D_I32(radius);
-			kernel2D_F32 = KernelFactory.gaussian2D_F32(1.0,radius,true);
-			kernel2D_I32 = KernelFactory.gaussian2D_I32(1.0,radius);
+			kernelF32 = FactoryKernelGaussian.gaussian1D_F32(radius,true);
+			kernelI32 = FactoryKernelGaussian.gaussian1D_I32(radius);
+			kernel2D_F32 = FactoryKernelGaussian.gaussian2D_F32(1.0,radius,true);
+			kernel2D_I32 = FactoryKernelGaussian.gaussian2D_I32(1.0,radius);
 			
 			ProfileOperation.printOpsPerSec(new Horizontal_Naive_F32(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Horizontal_F32(),TEST_TIME);

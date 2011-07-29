@@ -14,24 +14,36 @@
  *    limitations under the License.
  */
 
-package gecv.abst.detect.corner;
+package gecv.alg.filter.steer;
 
-import gecv.alg.detect.corner.HessianBlobIntensity;
+import gecv.struct.convolve.Kernel1D;
+import gecv.struct.convolve.Kernel2D;
 import gecv.struct.image.ImageBase;
 
 
 /**
- * Creates feature detectors which detect "blob" like objects.
+ * <p>
+ * Computes the output of steerable filters.  TODO describe what steerable filters are
+ * </p>
+ *
+ * <p>
+ * W. Freeman and E. Adelson. "The design and use of steerable filters," PAMI, 13(9):891-906, 1991
+ * </p>
  *
  * @author Peter Abeles
  */
-public class FactoryBlobDetector {
+public class SteerableFilter< I extends ImageBase, D extends ImageBase ,
+		K1 extends Kernel1D, K2 extends Kernel2D> {
 
-	public static <T extends ImageBase, D extends ImageBase>
-	GeneralFeatureDetector<T,D> createLaplace( int featureRadius , int pixelTol , int maxFeatures ,
-											   Class<D> derivType , HessianBlobIntensity.Type type )
-	{
-		GeneralFeatureIntensity<T,D> intensity = new WrapperLaplacianBlobIntensity<T,D>(type,derivType);
-		return FactoryCornerDetector.createGeneral(intensity,featureRadius,pixelTol,maxFeatures);
+	public D process( I input , double angle ) {
+		return null;
+	}
+
+	public void addBasis( double angle , K1 horizontal , K1 vertical ) {
+
+	}
+
+	public void addBasis( double angle , K2 kernel ) {
+
 	}
 }

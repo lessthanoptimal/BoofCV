@@ -17,7 +17,7 @@
 package gecv.alg.filter.convolve.down;
 
 import gecv.alg.filter.convolve.ConvolutionTestHelper;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernel;
 import gecv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
@@ -73,7 +73,7 @@ public class TestConvolveDownNormalized_JustBorder {
 		protected Object[][] createInputParam(Method candidate, Method validation) {
 			Class<?> paramTypes[] = candidate.getParameterTypes();
 
-			KernelBase kernel = KernelFactory.random(paramTypes[0],kernelRadius,0,5,rand);
+			KernelBase kernel = FactoryKernel.random(paramTypes[0],kernelRadius,0,5,rand);
 
 			int divW,divH;
 

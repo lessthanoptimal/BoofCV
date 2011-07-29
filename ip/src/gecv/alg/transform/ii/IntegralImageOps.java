@@ -28,7 +28,7 @@ import gecv.struct.image.ImageUInt8;
  */
 public class IntegralImageOps {
 
-	public ImageFloat32 transform( ImageFloat32 input , ImageFloat32 transformed ) {
+	public static ImageFloat32 transform( ImageFloat32 input , ImageFloat32 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input,transformed);
 
 		ImplIntegralImageOps.process(input,transformed);
@@ -36,7 +36,7 @@ public class IntegralImageOps {
 		return transformed;
 	}
 
-	public ImageSInt32 transform( ImageUInt8 input , ImageSInt32 transformed ) {
+	public static ImageSInt32 transform( ImageUInt8 input , ImageSInt32 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input,transformed,ImageSInt32.class);
 
 		ImplIntegralImageOps.process(input,transformed);
