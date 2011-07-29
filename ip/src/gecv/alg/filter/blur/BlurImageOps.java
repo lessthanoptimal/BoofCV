@@ -22,7 +22,7 @@ import gecv.alg.filter.blur.impl.ImplMedianSortEdgeNaive;
 import gecv.alg.filter.blur.impl.ImplMedianSortNaive;
 import gecv.alg.filter.convolve.ConvolveImageMean;
 import gecv.alg.filter.convolve.ConvolveNormalized;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -66,7 +66,7 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(sigma,radius);
+		Kernel1D_I32 kernel = FactoryKernelGaussian.gaussian1D_I32(sigma,radius);
 
 		ConvolveNormalized.horizontal(kernel,input,storage);
 		ConvolveNormalized.vertical(kernel,storage,output);
@@ -76,7 +76,7 @@ public class BlurImageOps {
 
 	public static ImageUInt8 gaussian(ImageUInt8 input, ImageUInt8 output, int radius,
 									  ImageUInt8 storage ) {
-		return gaussian(input,output,KernelFactory.sigmaForRadius(radius),radius,storage);
+		return gaussian(input,output, FactoryKernelGaussian.sigmaForRadius(radius),radius,storage);
 	}
 
 	public static ImageFloat32 mean(ImageFloat32 input, ImageFloat32 output, int radius, ImageFloat32 storage) {
@@ -104,7 +104,7 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(sigma, radius,true);
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(sigma, radius,true);
 
 		ConvolveNormalized.horizontal(kernel,input,storage);
 		ConvolveNormalized.vertical(kernel,storage,output);
@@ -114,6 +114,6 @@ public class BlurImageOps {
 
 	public static ImageFloat32 gaussian(ImageFloat32 input, ImageFloat32 output, int radius,
 										ImageFloat32 storage ) {
-		return gaussian(input,output,KernelFactory.sigmaForRadius(radius),radius,storage);
+		return gaussian(input,output, FactoryKernelGaussian.sigmaForRadius(radius),radius,storage);
 	}
 }

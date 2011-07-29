@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package gecv.struct.gss;
+package gecv.alg.transform.gss;
 
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.filter.blur.BlurImageOps;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.SingleBandGenerator;
@@ -54,7 +54,7 @@ public class TestNoCacheScaleSpace {
 		NoCacheScaleSpace<ImageFloat32,ImageFloat32> alg =
 				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(generator,generator,3);
 
-		int radius = KernelFactory.radiusForSigma(1.2);
+		int radius = FactoryKernelGaussian.radiusForSigma(1.2);
 		ImageFloat32 expected = BlurImageOps.gaussian(original,null,1.2,radius,null);
 
 		alg.setScales(1.2,2.3,3.5);
@@ -72,7 +72,7 @@ public class TestNoCacheScaleSpace {
 
 		double target = 2.3;
 
-		int radius = KernelFactory.radiusForSigma(target);
+		int radius = FactoryKernelGaussian.radiusForSigma(target);
 		ImageGradient<ImageFloat32,ImageFloat32> g =  FactoryDerivative.gaussian_F32(target,radius);
 
 		ImageFloat32 derivX = new ImageFloat32(width,height);

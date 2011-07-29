@@ -85,6 +85,10 @@ public class Kernel2D_F32 extends Kernel2D {
 		return data[y * width + x];
 	}
 
+	public void set( int x , int y , float value ) {
+		data[y * width + x] = value;
+	}
+
 	public float[] getData() {
 		return data;
 	}
@@ -96,5 +100,15 @@ public class Kernel2D_F32 extends Kernel2D {
 			total += data[i];
 		}
 		return total;
+	}
+
+	public void print() {
+		for( int i = 0; i < width; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				System.out.printf("%5.2f ",data[i*width+j]);
+			}
+			System.out.println();
+		}
+		System.out.println();
 	}
 }

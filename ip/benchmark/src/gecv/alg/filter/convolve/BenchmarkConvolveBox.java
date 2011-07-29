@@ -152,8 +152,8 @@ public class BenchmarkConvolveBox {
 			System.out.println("Radius: "+radius);
 			System.out.println();
 			BenchmarkConvolveBox.radius = radius;
-			kernelF32 = KernelFactory.table1D_F32(radius,false);
-			kernelI32 = KernelFactory.table1D_I32(radius);
+			kernelF32 = FactoryKernel.table1D_F32(radius,false);
+			kernelI32 = FactoryKernel.table1D_I32(radius);
 
 			ProfileOperation.printOpsPerSec(new Box_U8_I16_Vertical(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Box_U8_I32_Vertical(),TEST_TIME);

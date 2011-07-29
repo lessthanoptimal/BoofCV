@@ -44,7 +44,7 @@ public class ConvolveImageMean {
 	public static void horizontal(ImageFloat32 input, ImageFloat32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_F32 kernel = KernelFactory.table1D_F32(radius,true);
+		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
 		ConvolveNormalized_JustBorder.horizontal(kernel, input ,output );
 		ImplConvolveMean.horizontal(input, output, radius, true);
 	}
@@ -60,7 +60,7 @@ public class ConvolveImageMean {
 	public static void vertical(ImageFloat32 input, ImageFloat32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_F32 kernel = KernelFactory.table1D_F32(radius,true);
+		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
 		ConvolveNormalized_JustBorder.vertical(kernel, input ,output );
 		ImplConvolveMean.vertical(input, output, radius, true);
 	}
@@ -76,7 +76,7 @@ public class ConvolveImageMean {
 	public static void horizontal(ImageUInt8 input, ImageInt8 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_I32 kernel = KernelFactory.table1D_I32(radius);
+		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveNormalized_JustBorder.horizontal(kernel, input, output);
 		ImplConvolveMean.horizontal(input, output, radius, true);
 	}
@@ -92,7 +92,7 @@ public class ConvolveImageMean {
 	public static void vertical(ImageUInt8 input, ImageInt8 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_I32 kernel = KernelFactory.table1D_I32(radius);
+		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveNormalized_JustBorder.vertical(kernel, input, output);
 		ImplConvolveMean.vertical(input, output, radius, true);
 	}
@@ -108,7 +108,7 @@ public class ConvolveImageMean {
 	public static void horizontal(ImageSInt16 input, ImageInt16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_I32 kernel = KernelFactory.table1D_I32(radius);
+		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveNormalized_JustBorder.horizontal(kernel, input, output);
 		ImplConvolveMean.horizontal(input, output, radius, true);
 	}
@@ -124,7 +124,7 @@ public class ConvolveImageMean {
 	public static void vertical(ImageSInt16 input, ImageInt16 output, int radius ) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_I32 kernel = KernelFactory.table1D_I32(radius);
+		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveNormalized_JustBorder.vertical(kernel, input, output);
 		ImplConvolveMean.vertical(input, output, radius, true);
 	}

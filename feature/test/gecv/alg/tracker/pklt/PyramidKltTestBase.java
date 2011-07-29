@@ -16,7 +16,7 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.tracker.klt.KltTracker;
@@ -82,7 +82,7 @@ public class PyramidKltTestBase {
 
 	private PyramidUpdater<ImageFloat32> createPyramidUpdater() {
 
-		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(2,true);
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(2,true);
 		return new ConvolutionPyramid<ImageFloat32>(kernel,ImageFloat32.class);
 	}
 

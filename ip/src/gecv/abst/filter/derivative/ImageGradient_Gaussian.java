@@ -18,12 +18,12 @@ package gecv.abst.filter.derivative;
 
 import gecv.abst.filter.FilterImageInterface;
 import gecv.abst.filter.convolve.FactoryConvolve;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.image.ImageBase;
 
-import static gecv.alg.filter.convolve.KernelFactory.sigmaForRadius;
+import static gecv.alg.filter.convolve.FactoryKernelGaussian.sigmaForRadius;
 
 
 /**
@@ -58,8 +58,8 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 	public ImageGradient_Gaussian(double sigma, int radius,
 								  Class<I> inputType , Class<D> derivType ) {
 		this.borderSize = radius;
-		Kernel1D kernel = KernelFactory.gaussian1D(inputType,sigma,radius);
-		Kernel1D kernelDeriv = KernelFactory.gaussianDerivative1D(inputType,sigma,radius);
+		Kernel1D kernel = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
+		Kernel1D kernelDeriv = FactoryKernelGaussian.gaussianDerivative1D(inputType,sigma,radius+1);
 
 		derivX_H = FactoryConvolve.convolve(kernelDeriv,inputType,derivType, borderDeriv,true);
 		blurX = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur,true);

@@ -16,7 +16,7 @@
 
 package gecv.abst.filter.derivative;
 
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.alg.filter.derivative.*;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.ImageBorder_F32;
@@ -90,9 +90,9 @@ public class FactoryDerivative {
 	public static <I extends ImageBase, D extends ImageBase>
 	ImageGradient<I,D> gaussian( double sigma , int radius , Class<I> inputType , Class<D> derivType) {
 		if( radius <= 0 )
-			radius = KernelFactory.radiusForSigma(sigma);
+			radius = FactoryKernelGaussian.radiusForSigma(sigma);
 		else if( sigma <= 0 )
-			sigma = KernelFactory.sigmaForRadius(radius);
+			sigma = FactoryKernelGaussian.sigmaForRadius(radius);
 
 		return new ImageGradient_Gaussian<I,D>(sigma,radius,inputType,derivType);
 	}

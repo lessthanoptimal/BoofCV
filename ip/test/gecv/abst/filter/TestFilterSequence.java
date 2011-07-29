@@ -18,7 +18,7 @@ package gecv.abst.filter;
 
 import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernel;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D_F32;
@@ -47,9 +47,9 @@ public class TestFilterSequence {
 	 */
 	@Test
 	public void compareToManualSequence() {
-		Kernel1D_F32 ker1 = KernelFactory.random1D_F32(radius,0,5,rand);
-		Kernel1D_F32 ker2 = KernelFactory.random1D_F32(radius+1,0,5,rand);
-		Kernel1D_F32 ker3 = KernelFactory.random1D_F32(radius+2,0,5,rand);
+		Kernel1D_F32 ker1 = FactoryKernel.random1D_F32(radius,0,5,rand);
+		Kernel1D_F32 ker2 = FactoryKernel.random1D_F32(radius+1,0,5,rand);
+		Kernel1D_F32 ker3 = FactoryKernel.random1D_F32(radius+2,0,5,rand);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageTestingOps.randomize(input,rand,0,10);

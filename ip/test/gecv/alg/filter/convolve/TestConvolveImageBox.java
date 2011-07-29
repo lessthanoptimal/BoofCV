@@ -115,9 +115,9 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 	public static Object createTableKernel(Class<?> kernelType, int kernelRadius, Random rand) {
 		Object kernel;
 		if (Kernel1D_F32.class == kernelType) {
-			kernel = KernelFactory.table1D_F32(kernelRadius,false);
+			kernel = FactoryKernel.table1D_F32(kernelRadius,false);
 		} else if (Kernel1D_I32.class == kernelType) {
-			kernel = KernelFactory.table1D_I32(kernelRadius);
+			kernel = FactoryKernel.table1D_I32(kernelRadius);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}

@@ -69,10 +69,10 @@ public class TestConvolveImageNoBorderSparse {
 			Object storage;
 			Object kernel;
 			if (Kernel1D_F32.class == paramTypes[0]) {
-				kernel = KernelFactory.random1D_F32(kernelRadius, -1, 1, rand);
+				kernel = FactoryKernel.random1D_F32(kernelRadius, -1, 1, rand);
 				storage = new float[ kernelRadius*2+1];
 			} else if (Kernel1D_I32.class == paramTypes[0]) {
-				kernel = KernelFactory.random1D_I32(kernelRadius, 0, 5, rand);
+				kernel = FactoryKernel.random1D_I32(kernelRadius, 0, 5, rand);
 				storage = new int[ kernelRadius*2+1];
 			} else {
 				throw new RuntimeException("Unknown kernel type");

@@ -133,8 +133,8 @@ public class BenchmarkConvolveMean {
 			System.out.println("Radius: "+radius);
 			System.out.println();
 			BenchmarkConvolveMean.radius = radius;
-			kernelF32 = KernelFactory.table1D_F32(radius,true);
-			kernelI32 = KernelFactory.table1D_I32(radius);
+			kernelF32 = FactoryKernel.table1D_F32(radius,true);
+			kernelI32 = FactoryKernel.table1D_I32(radius);
 
 			ProfileOperation.printOpsPerSec(new Mean_U8_I8_Horizontal(),TEST_TIME);
 			ProfileOperation.printOpsPerSec(new Mean_F32_F32_Horizontal(),TEST_TIME);

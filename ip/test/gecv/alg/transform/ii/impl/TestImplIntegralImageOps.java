@@ -14,9 +14,8 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.ii;
+package gecv.alg.transform.ii.impl;
 
-import gecv.alg.transform.ii.impl.ImplIntegralImageOps;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;

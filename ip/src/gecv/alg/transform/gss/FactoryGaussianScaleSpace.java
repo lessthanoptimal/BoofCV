@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.struct.gss;
+package gecv.alg.transform.gss;
 
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.SingleBandGenerator;
@@ -23,7 +23,7 @@ import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 
 /**
- * Factory which removes some of the drudgery from creating {@link GaussianScaleSpace}
+ * Factory which removes some of the drudgery from creating {@link gecv.struct.gss.GaussianScaleSpace}
  *
  * @author Peter Abeles
  */

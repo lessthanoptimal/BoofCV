@@ -16,9 +16,9 @@
 
 package gecv.alg.filter.convolve.normalized;
 
-import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.filter.convolve.ConvolveNormalized;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.ConvertImage;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
@@ -102,8 +102,8 @@ public class TestConvolveNormalizedStandardSparse {
 		ImageSInt16 shortImage = new ImageSInt16(width,height);
 		ConvertImage.convert(seedImage,shortImage);
 
-		kernelI32 = KernelFactory.gaussian1D_I32(kernelRadius);
-		kernelF32 = KernelFactory.gaussian1D_F32(kernelRadius,true);
+		kernelI32 = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
+		kernelF32 = FactoryKernelGaussian.gaussian1D_F32(kernelRadius,true);
 
 		boolean isFloatingKernel = method.getParameterTypes()[0] == Kernel1D_F32.class;
 

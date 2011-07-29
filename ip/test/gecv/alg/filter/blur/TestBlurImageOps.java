@@ -18,7 +18,8 @@ package gecv.alg.filter.blur;
 
 import gecv.alg.filter.blur.impl.ImplMedianSortNaive;
 import gecv.alg.filter.convolve.ConvolveNormalized;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernel;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.convolve.Kernel1D_F32;
@@ -54,7 +55,7 @@ public class TestBlurImageOps {
 			ImageTestingOps.fill(expected,0);
 			ImageTestingOps.fill(found,0);
 
-			Kernel1D_I32 kernel = KernelFactory.table1D_I32(radius);
+			Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 			ConvolveNormalized.horizontal(kernel,input,storage);
 			ConvolveNormalized.vertical(kernel,storage,expected);
 
@@ -78,7 +79,7 @@ public class TestBlurImageOps {
 			ImageTestingOps.fill(expected,0);
 			ImageTestingOps.fill(found,0);
 
-			Kernel1D_F32 kernel = KernelFactory.table1D_F32(radius,true);
+			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
 			ConvolveNormalized.horizontal(kernel,input,storage);
 			ConvolveNormalized.vertical(kernel,storage,expected);
 
@@ -135,11 +136,11 @@ public class TestBlurImageOps {
 			ImageTestingOps.fill(expected,0);
 			ImageTestingOps.fill(found,0);
 
-			Kernel1D_I32 kernel = KernelFactory.gaussian1D_I32(radius);
+			Kernel1D_I32 kernel = FactoryKernelGaussian.gaussian1D_I32(radius);
 			ConvolveNormalized.horizontal(kernel,input,storage);
 			ConvolveNormalized.vertical(kernel,storage,expected);
 
-			double sigma = KernelFactory.sigmaForRadius(radius);
+			double sigma = FactoryKernelGaussian.sigmaForRadius(radius);
 
 			BlurImageOps.gaussian(input,found,sigma,radius,null);
 
@@ -161,11 +162,11 @@ public class TestBlurImageOps {
 			ImageTestingOps.fill(expected,0);
 			ImageTestingOps.fill(found,0);
 
-			Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(radius,true);
+			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(radius,true);
 			ConvolveNormalized.horizontal(kernel,input,storage);
 			ConvolveNormalized.vertical(kernel,storage,expected);
 
-			double sigma = KernelFactory.sigmaForRadius(radius);
+			double sigma = FactoryKernelGaussian.sigmaForRadius(radius);
 
 			BlurImageOps.gaussian(input,found,sigma,radius,null);
 

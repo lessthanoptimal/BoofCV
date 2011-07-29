@@ -17,7 +17,7 @@
 package gecv.alg.transform.pyramid;
 
 import gecv.alg.filter.convolve.ConvolveNormalized;
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
@@ -47,7 +47,7 @@ public class TestConvolutionPyramid {
 		ImageFloat32 img = new ImageFloat32(width, height);
 		ImageTestingOps.randomize(img, rand, 0, 100);
 
-		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(3, true);
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(3, true);
 		ImagePyramid<ImageFloat32> pyramid = ImagePyramidFactory.create_F32(width, height, true);
 		pyramid.setScaling(1, 2, 2);
 
@@ -84,7 +84,7 @@ public class TestConvolutionPyramid {
 	}
 
 	public void _update(ImageFloat32 img) {
-		Kernel1D_F32 kernel = KernelFactory.gaussian1D_F32(3, true);
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(3, true);
 		ImageFloat32 convImg = new ImageFloat32(width, height);
 
 		ImageFloat32 storage = new ImageFloat32(width, height);

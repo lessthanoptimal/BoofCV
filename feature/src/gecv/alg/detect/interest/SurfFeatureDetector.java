@@ -14,18 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.corner.impl;
+package gecv.alg.detect.interest;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplLaplaceInterestPoints {
-	@Test
-	public void test() {
-		fail("implement tests");
-	}
+public class SurfFeatureDetector {
 }

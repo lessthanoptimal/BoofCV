@@ -16,7 +16,8 @@
 
 package gecv.alg.filter.convolve.noborder;
 
-import gecv.alg.filter.convolve.KernelFactory;
+import gecv.alg.filter.convolve.FactoryKernel;
+import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.convolve.KernelBase;
 import gecv.struct.image.ImageBase;
@@ -122,9 +123,9 @@ public class TestConvolveImageStandard {
 	public void horizontal(ImageBase img, ImageBase dest) {
 		Object ker;
 		if (!img.getTypeInfo().isInteger())
-			ker = KernelFactory.gaussian1D_F32(kernelRadius, true);
+			ker = FactoryKernelGaussian.gaussian1D_F32(kernelRadius, true);
 		else
-			ker = KernelFactory.gaussian1D_I32(kernelRadius);
+			ker = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
 
 		invokeMethod("horizontal", ker, img, dest, false);
 		// the top border should not be convolved yet
@@ -148,9 +149,9 @@ public class TestConvolveImageStandard {
 		int divisor = 11;
 		Object ker;
 		if (!img.getTypeInfo().isInteger())
-			ker = KernelFactory.gaussian1D_F32(kernelRadius, true);
+			ker = FactoryKernelGaussian.gaussian1D_F32(kernelRadius, true);
 		else
-			ker = KernelFactory.gaussian1D_I32(kernelRadius);
+			ker = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
 
 		invokeMethod("horizontal", ker, img, dest, divisor, false);
 		// the top border should not be convolved yet
@@ -175,9 +176,9 @@ public class TestConvolveImageStandard {
 	public void vertical(ImageBase img, ImageBase dest) {
 		Object ker;
 		if (!img.getTypeInfo().isInteger())
-			ker = KernelFactory.gaussian1D_F32(kernelRadius, true);
+			ker = FactoryKernelGaussian.gaussian1D_F32(kernelRadius, true);
 		else
-			ker = KernelFactory.gaussian1D_I32(kernelRadius);
+			ker = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
 
 		invokeMethod("vertical", ker, img, dest, false);
 
@@ -200,9 +201,9 @@ public class TestConvolveImageStandard {
 	public void verticalDiv(ImageBase img, ImageBase dest) {
 		Object ker;
 		if (!img.getTypeInfo().isInteger())
-			ker = KernelFactory.gaussian1D_F32(kernelRadius, true);
+			ker = FactoryKernelGaussian.gaussian1D_F32(kernelRadius, true);
 		else
-			ker = KernelFactory.gaussian1D_I32(kernelRadius);
+			ker = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
 
 		int divisor = 11;
 		invokeMethod("vertical", ker, img, dest, divisor, false);
@@ -228,9 +229,9 @@ public class TestConvolveImageStandard {
 	public void convolve(ImageBase img, ImageBase dest) {
 		Object ker;
 		if (!img.getTypeInfo().isInteger())
-			ker = KernelFactory.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
+			ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
 		else
-			ker = KernelFactory.random2D_I32(kernelRadius, 0, 10, new Random(234));
+			ker = FactoryKernel.random2D_I32(kernelRadius, 0, 10, new Random(234));
 
 		int testX = 1;
 		int testY = 2;
@@ -263,9 +264,9 @@ public class TestConvolveImageStandard {
 	public void convolveDiv(ImageBase img, ImageBase dest) {
 		Object ker;
 		if (!img.getTypeInfo().isInteger())
-			ker = KernelFactory.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
+			ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
 		else
-			ker = KernelFactory.random2D_I32(kernelRadius, 0, 4, new Random(234));
+			ker = FactoryKernel.random2D_I32(kernelRadius, 0, 4, new Random(234));
 
 		int divisor = 11;
 		int testX = 1;

@@ -39,7 +39,8 @@ SFM
    * FFT
 #  * Wavelet
 #  * pyramid
-   * Integral Image
+#  * Integral Image
+#  * Scale Space
  - Misc
 #  * Non-Max Suppression
  - Binary Image
