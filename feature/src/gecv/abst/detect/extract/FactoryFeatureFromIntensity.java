@@ -20,7 +20,7 @@ import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
 import gecv.alg.detect.extract.NonMaxCornerCandidateExtractor;
 
 /**
- * Given a list of requirements create a {@link gecv.abst.detect.extract.CornerExtractor} that meets
+ * Given a list of requirements create a {@link FeatureExtractor} that meets
  * those requirements.
  *
  * @author Peter Abeles
@@ -34,20 +34,21 @@ public class FactoryFeatureFromIntensity
 	 *
 	 * @param useCandidateList Will it use the provided list of candidate features?
 	 * @param excludeCorners Can it exclude all corners in a list?
+	 * @param ignoreBorder How much of the image border is ignored.
 	 * @param acceptRequestNumber Will it detect features until the specified number have been found?
 	 * @return A feature extractor.
 	 */
-	public static CornerExtractor create( int minSeparation , float threshold ,
+	public static FeatureExtractor create( int minSeparation , float threshold , int ignoreBorder ,
 										  boolean useCandidateList , boolean excludeCorners , boolean acceptRequestNumber )
 	{
-		CornerExtractor ret = null;
+		FeatureExtractor ret = null;
 
 		if( useCandidateList ) {
-			if( !acceptRequestNumber )
+			if( !acceptRequestNumber && ignoreBorder <= minSeparation)
 				ret = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(minSeparation,threshold));
 		} else {
 			if( !acceptRequestNumber ) {
-				ret = new WrapperNonMax(new FastNonMaxCornerExtractor(minSeparation,0,threshold));
+				ret = new WrapperNonMax(new FastNonMaxCornerExtractor(minSeparation,ignoreBorder,threshold));
 			} else {
 				throw new IllegalArgumentException("Need to create a wrapper for SelectNBestCorners");
 			}

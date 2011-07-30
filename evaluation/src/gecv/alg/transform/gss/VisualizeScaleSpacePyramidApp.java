@@ -14,18 +14,17 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.pyramid;
+package gecv.alg.transform.gss;
 
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.interpolate.FactoryInterpolation;
+import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.ImagePyramidPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.convolve.Kernel1D_F32;
+import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidI;
-import gecv.struct.pyramid.PyramidUpdater;
 
 import java.awt.image.BufferedImage;
 
@@ -34,24 +33,24 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizeImagePyramidApp {
+public class VisualizeScaleSpacePyramidApp {
 
 	public static void main( String args[] ) {
-		int scales[] = new int[]{1,2,2,2,2};
+		double scales[] = new double[]{1,1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25};
 
 		BufferedImage input = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
 
-		Kernel1D_F32 gaussian = FactoryKernelGaussian.gaussian1D(ImageFloat32.class,2);
-		PyramidUpdater<ImageFloat32> updater = new PyramidUpdateIntegerDown<ImageFloat32>(gaussian,ImageFloat32.class);
-		ImagePyramid<ImageFloat32> pyramid = new ImagePyramidI<ImageFloat32>(true,updater,scales);
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+//		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bicubic(ImageFloat32.class,-0.5f);
+		PyramidUpdateGaussianScale<ImageFloat32> updater = new PyramidUpdateGaussianScale<ImageFloat32>(interp);
+		ImagePyramid<ImageFloat32> pyramid = new ScaleSpacePyramid<ImageFloat32>(updater,scales);
 
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 
 		pyramid.update(inputF32);
 
-		ImagePyramidPanel gui = new ImagePyramidPanel(pyramid);
+		ImagePyramidPanel<ImageFloat32> gui = new ImagePyramidPanel<ImageFloat32>(pyramid,true);
 		gui.render();
-		gui.repaint();
 
 		ShowImages.showWindow(gui,"Image Pyramid");
 	}

@@ -17,14 +17,14 @@
 package gecv.alg.tracker.pklt;
 
 import gecv.alg.transform.pyramid.GradientPyramid;
+import gecv.gui.image.DiscretePyramidPanel;
 import gecv.gui.image.ImagePanel;
-import gecv.gui.image.ImagePyramidPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.ProcessImageSequence;
 import gecv.io.image.SimpleImageSequence;
 import gecv.struct.image.ImageBase;
+import gecv.struct.pyramid.DiscreteImagePyramid;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidI;
 import gecv.struct.pyramid.PyramidUpdater;
 
 import java.awt.*;
@@ -40,7 +40,7 @@ public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageB
 	private PkltManager<I, D> tracker;
 
 	ImagePanel panel;
-	ImagePyramidPanel pyramidPanel;
+	DiscretePyramidPanel pyramidPanel;
 	int totalRespawns;
 
 	GradientPyramid<I,D> updateGradient;
@@ -61,9 +61,9 @@ public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageB
 		PkltManagerConfig<I, D> config = tracker.getConfig();
 
 		// declare the image pyramid
-		basePyramid = new ImagePyramidI<I>(true,pyramidUpdater,config.pyramidScaling);
-		derivX = new ImagePyramidI<D>(false,null,config.pyramidScaling);
-		derivY = new ImagePyramidI<D>(false,null,config.pyramidScaling);
+		basePyramid = new DiscreteImagePyramid<I>(true,pyramidUpdater,config.pyramidScaling);
+		derivX = new DiscreteImagePyramid<D>(false,null,config.pyramidScaling);
+		derivY = new DiscreteImagePyramid<D>(false,null,config.pyramidScaling);
 	}
 
 
@@ -92,7 +92,7 @@ public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageB
 		}
 
 //		if( pyramidPanel == null ) {
-//			pyramidPanel = new ImagePyramidPanel(tracker.getPyramid());
+//			pyramidPanel = new DiscretePyramidPanel(tracker.getPyramid());
 //			ShowImages.showWindow(pyramidPanel,"Pyramid");
 //			addComponent(pyramidPanel);
 //		} else {

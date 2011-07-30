@@ -21,7 +21,11 @@ import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.image.ImageBase;
 
 /**
- * <p>Image pyramids represent the same image at multiple resolutions allowing scale space searches to performed.</p>
+ * <p>
+ * Image pyramids represent the same image at multiple resolutions allowing searches to performed across multiple
+ * resolutions.  There are many different ways to defined an image pyramid and different ways to compute it.  This
+ * is a base class which hides many of those issues.
+ * </p>
  *
  * <p>
  * The scaling is relative to the previous layer.  For example, scale = [1,2,2] would be three layers which have scaling of 1,2, and 4 relative to the original image.
@@ -75,7 +79,7 @@ public abstract class ImagePyramid<T extends ImageBase> {
 			throw new IllegalArgumentException("Updater is null, this is an error or the class should be updated manually.");
 		}
 
-		if( layers == null ) {
+		if( !isLayersDeclared() ) {
 			ImageGenerator<T> gen = (ImageGenerator<T>)FactoryImageGenerator.create(image.getClass());
 			declareLayers(gen, image.width,image.height);
 		}
@@ -133,5 +137,9 @@ public abstract class ImagePyramid<T extends ImageBase> {
 
 	public int getHeight(int layer) {
 		return layers[layer].height;
+	}
+
+	public boolean isLayersDeclared() {
+		return layers != null;
 	}
 }

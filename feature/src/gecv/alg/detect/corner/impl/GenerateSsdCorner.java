@@ -93,7 +93,8 @@ public class GenerateSsdCorner {
 				" * </p>\n" +
 				" * \n" +
 				" * <p>\n" +
-				" * NOTE: Image borders are not processed.\n" +
+				" * NOTE: Image borders are not processed.  The zeros in the image border need to be taken in account when\n" +
+				" * extract features using algorithms such as non-max suppression.\n" +
 				" * </p>\n" +
 				" * \n" +
 				" * <p>\n" +

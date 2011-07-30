@@ -25,7 +25,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class WrapperFastNonMax implements CornerExtractor {
+public class WrapperFastNonMax implements FeatureExtractor {
 
 	FastNonMaxCornerExtractor extractor;
 

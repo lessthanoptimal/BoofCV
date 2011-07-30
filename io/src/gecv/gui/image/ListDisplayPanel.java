@@ -55,6 +55,10 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 		addComponentListener(this);
 	}
 
+	public void reset() {
+		panels.clear();
+	}
+
 	/**
 	 * Displays a new image in the list.
 	 *

@@ -25,7 +25,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class WrapperThreshold implements CornerExtractor {
+public class WrapperThreshold implements FeatureExtractor {
 
 	ThresholdCornerExtractor extractor;
 

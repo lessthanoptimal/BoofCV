@@ -16,69 +16,75 @@
 
 package gecv.gui.image;
 
+import gecv.abst.filter.distort.GeneralizedDistortImageOps;
+import gecv.alg.interpolate.FactoryInterpolation;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.core.image.ConvertBufferedImage;
+import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 
 /**
- * Displays the entire image pyramid in a single panel.
+ * Displays an {@link ImagePyramid} by listing each of its layers and showing them one at a time.
+ * Each layer can be scaled up to the size of the original layer if desired.
  *
  * @author Peter Abeles
  */
-public class ImagePyramidPanel extends JPanel {
+@SuppressWarnings({"unchecked"})
+public class ImagePyramidPanel<T extends ImageBase> extends ListDisplayPanel {
 
-	BufferedImage img;
-	ImagePyramid<?> pyramid;
+	// the image pyramid.
+	ImagePyramid<T> pyramid;
+	// interpolation used for upscaling
+	InterpolatePixel<T> interp;
+	// temporary storage for upscaled image
+	T upscale;
+	// if each layer should be scaled up to the original resolution or not
+	boolean scaleUp;
 
-	BufferedImage layers[];
-
-	public ImagePyramidPanel( ImagePyramid<?> pyramid ) {
+	public ImagePyramidPanel(ImagePyramid<T> pyramid, boolean scaleUp) {
 		this.pyramid = pyramid;
-
-		// create temporary buffers for each layer in the pyramid
-		layers = new BufferedImage[ pyramid.getNumLayers() ];
-		for( int i = 0; i < layers.length; i++ ) {
-			int width = pyramid.getWidth(i);
-			int height = pyramid.getHeight(i);
-			layers[i] = new BufferedImage(width,height,BufferedImage.TYPE_3BYTE_BGR);
-		}
-
-		// compute the size of the panel
-		int width = pyramid.getWidth(0);
-		int height = pyramid.getHeight(0);
-
-		if( pyramid.getNumLayers() > 1 ) {
-			width += pyramid.getWidth(1);
-		}
-
-		img = new BufferedImage(width,height,BufferedImage.TYPE_3BYTE_BGR);
-
-		setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
-		setMinimumSize(getPreferredSize());
-		setMaximumSize(getPreferredSize());
+		this.scaleUp = scaleUp;
 	}
 
+	/**
+	 * Redraws each layer
+	 */
 	public void render() {
-		for( int i = 0; i < layers.length; i++ ) {
-			VisualizeImageData.standard(pyramid.getLayer(i),layers[i]);
-		}
-
-		Graphics2D g2 = (Graphics2D)img.getGraphics();
-
-		g2.drawImage(layers[0],0,0,this);
-		int height = 0;
-		int width = layers[0].getWidth();
-		for( int i = 1; i < layers.length; i++ ) {
-			g2.drawImage(layers[i],width,height,this);
-			height += layers[i].getHeight();
+		reset();
+		if( scaleUp ) {
+			scaleUpLayers();
+		} else {
+			doNotScaleLayers();
 		}
 	}
 
-	@Override
-	public void paintComponent(Graphics g) {
-		g.drawImage(img, 0, 0, this);
+	private void doNotScaleLayers() {
+		int N = pyramid.getNumLayers();
+
+		for( int i = 0; i < N; i++ ) {
+			BufferedImage b = ConvertBufferedImage.convertTo(pyramid.getLayer(i),null);
+			addImage(b,String.format("%5.2f",pyramid.getScalingAtLayer(i)));
+		}
+	}
+
+	private void scaleUpLayers() {
+		T l = pyramid.getLayer(0);
+		if( upscale == null ) {
+			interp = (InterpolatePixel<T>) FactoryInterpolation.nearestNeighborPixel(l.getClass());
+			upscale = (T)l._createNew(l.width,l.height);
+		} else {
+			upscale.reshape(l.width,l.height);
+		}
+
+		int N = pyramid.getNumLayers();
+
+		for( int i = 0; i < N; i++ ) {
+			GeneralizedDistortImageOps.scale(pyramid.getLayer(i),upscale,interp);
+			BufferedImage b = ConvertBufferedImage.convertTo(upscale,null);
+			addImage(b,String.format("%5.2f",pyramid.getScalingAtLayer(i)));
+		}
 	}
 }

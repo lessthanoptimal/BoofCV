@@ -14,20 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.interpolate;
+package gecv.alg.transform.gss;
 
-import gecv.alg.interpolate.InterpolatePixel;
-import gecv.struct.image.ImageBase;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
 /**
  * @author Peter Abeles
  */
-public class GeneralizedInterpolateOps {
-
-	public static <T extends ImageBase> void scale( T input , T output ,
-													InterpolatePixel<T> interpolation )
-	{
-
+public class TestPyramidUpdateGaussianScale {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

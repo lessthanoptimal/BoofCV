@@ -28,8 +28,8 @@ import gecv.core.image.border.ImageBorder1D_F32;
 import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.pyramid.DiscreteImagePyramid;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidI;
 import gecv.struct.pyramid.PyramidUpdater;
 
 import java.util.Random;
@@ -82,7 +82,7 @@ public class PyramidKltTestBase {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(2,true);
 		PyramidUpdater<ImageFloat32> updater = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
-		ImagePyramidI<ImageFloat32> ret = new ImagePyramidI<ImageFloat32>(false,updater,scales);
+		DiscreteImagePyramid<ImageFloat32> ret = new DiscreteImagePyramid<ImageFloat32>(false,updater,scales);
 		ret.declareLayers((ImageGenerator<ImageFloat32>)FactoryImageGenerator.create(image.getClass()),width,height);
 
 		return ret;

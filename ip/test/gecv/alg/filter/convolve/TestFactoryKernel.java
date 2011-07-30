@@ -26,7 +26,6 @@ import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -128,7 +127,14 @@ public class TestFactoryKernel {
 
 	@Test
 	public void transpose() {
-		fail("Umpeme");
+		Kernel2D_F32 a = FactoryKernel.random2D_F32(2, -2, 2, rand);
+		Kernel2D_F32 b = FactoryKernel.transpose(a);
+
+		for( int i = 0; i < a.width; i++ ) {
+			for( int j = 0; j < a.width; j++ ) {
+				assertEquals(a.get(i,j),b.get(j,i),1e-4);
+			}
+		}
 	}
 
 	@Test

@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.alg.misc.impl;
+package gecv.alg.distort.impl;
 
+import gecv.alg.distort.ImageDistort;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.alg.misc.ImageDistort;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.FactoryImageGenerator;

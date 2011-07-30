@@ -19,7 +19,7 @@ package gecv.alg.tracker.pklt;
 import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
-import gecv.abst.detect.extract.CornerExtractor;
+import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
@@ -89,7 +89,7 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 		GeneralFeatureIntensity<ImageUInt8,ImageSInt16> intensity =
 				new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(
 						FactoryCornerIntensity.createKlt(config.typeDeriv,config.featureRadius));
-		CornerExtractor extractor = new WrapperNonMax(
+		FeatureExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(config.featureRadius+2,
 						config.featureRadius*scalingTop, configKLt.minDeterminant));
 		GeneralFeatureDetector<ImageUInt8,ImageSInt16> detector =
@@ -104,7 +104,7 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel_I8();
 
 		GradientPyramid<ImageUInt8,ImageSInt16> gradientUpdater =
-				new GradientPyramid<ImageUInt8,ImageSInt16>(gradient);
+				new GradientPyramid<ImageUInt8,ImageSInt16>(gradient,config.typeDeriv);
 
 		PkltManager<ImageUInt8,ImageSInt16> manager =
 				new PkltManager<ImageUInt8,ImageSInt16>(config,interp,interpD,featureSelector);

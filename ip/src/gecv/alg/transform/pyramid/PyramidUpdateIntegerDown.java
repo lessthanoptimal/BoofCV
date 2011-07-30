@@ -21,8 +21,8 @@ import gecv.abst.filter.convolve.GenericConvolveDown;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.image.ImageBase;
+import gecv.struct.pyramid.DiscreteImagePyramid;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidI;
 import gecv.struct.pyramid.PyramidUpdater;
 
 /**
@@ -58,7 +58,7 @@ public class PyramidUpdateIntegerDown<T extends ImageBase> implements PyramidUpd
 	@Override
 	public void update(T original , ImagePyramid<T> _pyramid ) {
 
-		 ImagePyramidI<T> pyramid = (ImagePyramidI<T>)_pyramid;
+		 DiscreteImagePyramid<T> pyramid = (DiscreteImagePyramid<T>)_pyramid;
 
 		if( temp == null )
 			// declare it to be hte latest image that it might need to be, resize below

@@ -17,6 +17,7 @@
 package gecv.alg.transform.pyramid;
 
 import gecv.abst.filter.derivative.ImageGradient;
+import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
 
@@ -30,14 +31,23 @@ public class GradientPyramid<In extends ImageBase , Out extends ImageBase> {
 
 
 	protected ImageGradient<In,Out> filter;
+	protected Class<Out> derivType;
 
-	public GradientPyramid(ImageGradient<In, Out> filter ) {
+	public GradientPyramid(ImageGradient<In, Out> filter , Class<Out> derivType ) {
 		this.filter = filter;
+		this.derivType = derivType;
 	}
 
 	public void update( ImagePyramid<In> input ,
 						ImagePyramid<Out> derivX,
 						ImagePyramid<Out> derivY ) {
+
+		if( !derivX.isLayersDeclared() ) {
+			derivX.declareLayers(FactoryImageGenerator.create(derivType),input.bottomWidth,input.bottomHeight );
+		}
+		if( !derivY.isLayersDeclared() ) {
+			derivY.declareLayers(FactoryImageGenerator.create(derivType),input.bottomWidth,input.bottomHeight );
+		}
 
 		for( int i = 0; i < input.getNumLayers(); i++ ) {
 			In imageIn = input.getLayer(i);

@@ -16,7 +16,7 @@
 
 package gecv.abst.detect.corner;
 
-import gecv.abst.detect.extract.CornerExtractor;
+import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -137,7 +137,7 @@ public class TestGeneralCornerDetector {
 		assertEquals(2,detector.getCorners().size());
 	}
 
-	public class HelperExtractor implements CornerExtractor
+	public class HelperExtractor implements FeatureExtractor
 	{
 
 		boolean usesCandidates;

@@ -19,7 +19,7 @@ package gecv.alg.tracker.pklt;
 import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
-import gecv.abst.detect.extract.CornerExtractor;
+import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
@@ -53,8 +53,8 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 		String fileName;
 
 		if (args.length == 0) {
-//			fileName = "/mnt/data/datasets/2010/snow_videos/snow_norail_stabilization.avi";
-			fileName = "/home/pja/uav_video.avi";
+			fileName = "/mnt/data/datasets/2010/snow_videos/snow_long_drive.avi";
+//			fileName = "/home/pja/uav_video.avi";
 		} else {
 			fileName = args[0];
 		}
@@ -87,7 +87,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 		GeneralFeatureIntensity<ImageFloat32,ImageFloat32> intensity =
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
 						FactoryCornerIntensity.createKlt(ImageFloat32.class , config.featureRadius));
-		CornerExtractor extractor = new WrapperNonMax(
+		FeatureExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(config.featureRadius+2,
 						config.featureRadius*scalingTop, configKLt.minDeterminant));
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
@@ -102,7 +102,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 		ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.sobel_F32();
 
 		GradientPyramid<ImageFloat32,ImageFloat32> gradientUpdater =
-				new GradientPyramid<ImageFloat32,ImageFloat32>(gradient);
+				new GradientPyramid<ImageFloat32,ImageFloat32>(gradient,config.typeDeriv);
 
 		PkltManager<ImageFloat32,ImageFloat32> manager =
 				new PkltManager<ImageFloat32,ImageFloat32>(config,interp,interp,featureSelector);

@@ -19,7 +19,7 @@ package gecv.alg.tracker.pklt;
 import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
-import gecv.abst.detect.extract.CornerExtractor;
+import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
@@ -166,7 +166,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
 						FactoryCornerIntensity.createKlt( ImageFloat32.class,3));
 
-		CornerExtractor extractor = new WrapperNonMax(
+		FeatureExtractor extractor = new WrapperNonMax(
 				new FastNonMaxCornerExtractor(3, 3, 0.001f));
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
@@ -209,7 +209,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		}
 	}
 
-	private class DummyExtractor implements CornerExtractor
+	private class DummyExtractor implements FeatureExtractor
 	{
 
 		@Override

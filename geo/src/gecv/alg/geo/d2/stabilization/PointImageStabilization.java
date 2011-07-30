@@ -16,14 +16,14 @@
 
 package gecv.alg.geo.d2.stabilization;
 
+import gecv.abst.filter.distort.FactoryImageDistort;
+import gecv.alg.distort.ImageDistort;
 import gecv.alg.geo.AssociatedPair;
 import gecv.alg.geo.PointSequentialTracker;
 import gecv.alg.geo.SingleImageInput;
 import gecv.alg.geo.d2.PixelDistortAffine;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.alg.misc.FactoryImageDistort;
-import gecv.alg.misc.ImageDistort;
 import gecv.numerics.fitting.modelset.ModelMatcher;
 import gecv.struct.distort.PixelDistort;
 import gecv.struct.image.ImageBase;

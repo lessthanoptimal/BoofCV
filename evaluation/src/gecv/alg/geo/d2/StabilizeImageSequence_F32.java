@@ -98,9 +98,7 @@ public class StabilizeImageSequence_F32 extends StabilizeImageSequenceBase<Image
 		String fileName;
 
 		if (args.length == 0) {
-//			fileName = "/home/pja/00004.MTS";
-//			fileName = "/home/pja/kayak_shake.mpg";
-			fileName = "/home/pja/Videos/00029.MTS";
+			fileName = "/mnt/data/datasets/2010/snow_videos/snow_norail_stabilization.avi";
 		} else {
 			fileName = args[0];
 		}
