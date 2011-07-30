@@ -24,10 +24,10 @@ import gecv.struct.image.ImageFloat32;
  */
 public class DerivativeIntegralImage {
 
-	public static void derivXX( ImageFloat32 input , ImageFloat32 output , int level )
+	public static void derivXX( ImageFloat32 input , ImageFloat32 output , int size )
 	{
-		int blockW = 3+2*level;
-		int blockH = 5+4*level;
+		int blockW = size/3;
+		int blockH = size-blockW-1;
 		int radiusW = 3*blockW/2;
 		int radiusH = blockH/2;
 
@@ -51,10 +51,10 @@ public class DerivativeIntegralImage {
 		}
 	}
 
-	public static void derivYY( ImageFloat32 input , ImageFloat32 output , int level )
+	public static void derivYY( ImageFloat32 input , ImageFloat32 output , int size )
 	{
-		int blockH = 3+2*level;
-		int blockW = 5+4*level;
+		int blockH = size/3;
+		int blockW = size-blockH-1;
 		int radiusH = 3*blockH/2;
 		int radiusW = blockW/2;
 
@@ -79,9 +79,9 @@ public class DerivativeIntegralImage {
 		}
 	}
 
-	public static void derivXY( ImageFloat32 input , ImageFloat32 output , int level )
+	public static void derivXY( ImageFloat32 input , ImageFloat32 output , int size )
 	{
-		int block = 3+2*level;
+		int block = size/3;
 
 		int endY = input.height - block;
 		int endX = input.width - block;

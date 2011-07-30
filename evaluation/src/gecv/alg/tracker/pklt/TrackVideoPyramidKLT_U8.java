@@ -29,14 +29,14 @@ import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.tracker.klt.KltConfig;
-import gecv.alg.transform.pyramid.ConvolutionPyramid;
 import gecv.alg.transform.pyramid.GradientPyramid;
-import gecv.alg.transform.pyramid.PyramidUpdater;
+import gecv.alg.transform.pyramid.PyramidUpdateIntegerDown;
 import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
+import gecv.struct.pyramid.PyramidUpdater;
 
 /**
  * @author Peter Abeles
@@ -98,8 +98,8 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 		GenericPkltFeatSelector<ImageUInt8, ImageSInt16> featureSelector =
 				new GenericPkltFeatSelector<ImageUInt8,ImageSInt16>(detector,null);
 
-		ConvolutionPyramid<ImageUInt8> pyrUpdater =
-				new ConvolutionPyramid<ImageUInt8>(FactoryKernelGaussian.gaussian1D_I32(2),config.typeInput);
+		PyramidUpdateIntegerDown<ImageUInt8> pyrUpdater =
+				new PyramidUpdateIntegerDown<ImageUInt8>(FactoryKernelGaussian.gaussian1D_I32(2),config.typeInput);
 
 		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel_I8();
 

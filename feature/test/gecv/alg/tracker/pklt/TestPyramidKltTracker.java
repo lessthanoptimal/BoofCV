@@ -40,7 +40,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	private void setTargetLocation( int x , int y ) {
 		ImageTestingOps.randomize(image,rand,0,1);
 		ImageTestingOps.fillRectangle(image,100,cornerX,cornerY,20,20);
-		updater.update(image);
+		pyramid.update(image);
 
 		for( int i = 0; i < derivX.getNumLayers(); i++ ) {
 			GradientSobel.process(pyramid.getLayer(i),derivX.getLayer(i),derivY.getLayer(i),new ImageBorder1D_F32(BorderIndex1D_Extend.class));

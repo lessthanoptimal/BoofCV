@@ -17,116 +17,100 @@
 package gecv.struct.pyramid;
 
 import gecv.core.image.ImageGenerator;
+import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.image.ImageBase;
-
-import java.lang.reflect.Array;
 
 /**
  * <p>Image pyramids represent the same image at multiple resolutions allowing scale space searches to performed.</p>
- * 
+ *
+ * <p>
+ * The scaling is relative to the previous layer.  For example, scale = [1,2,2] would be three layers which have scaling of 1,2, and 4 relative to the original image.
+ * The dimension of each image is the dimension of the previous layer dividing by its scaling.  So if the upper
+ * layer has a width/height of (640,480) and the next layer has a scale factor of 2, its dimension will be (320,240).
+ * </p>
+ *
  * <p>
  * When updating the pyramid, if the top most layer is at the same resolution as the original image then a reference
- * can optionally be saved, avoiding an unnecissary image copy.  This is done by setting the saveOriginalReference
+ * can optionally be saved, avoiding an unnecessary image copy.  This is done by setting the saveOriginalReference
  * to true.
  * </p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class ImagePyramid<T extends ImageBase> {
+public abstract class ImagePyramid<T extends ImageBase> {
+
+	// class which updates the pyramid
+	public PyramidUpdater<T> updater;
+
 	// shape of full resolution input image
 	public int bottomWidth;
 	public int bottomHeight;
 
 	// The image at different resolutions.  Larger indexes for lower resolutions
 	public T layers[];
-	// scale of each layer relative to the previous layer
-	public int scale[];
+
 	// if the top layer is full resolution, should a copy be made or a reference to the original be saved?i
 	public boolean saveOriginalReference;
-
-	// used to create the image layers
-	protected ImageGenerator<T> generator;
 
 	/**
 	 * Specifies input image size and behavior of top most layer.
 	 *
-	 * @param bottomWidth		   Width of original full resolution image.
-	 * @param bottomHeight		  Height of original full resolution image.
 	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of  copied.
-	 * @param generator Creates new images for each layer
+	 * @param updater Specifies how the image pyramid is updated.
 	 */
-	public ImagePyramid(int bottomWidth, int bottomHeight, boolean saveOriginalReference,
-						ImageGenerator<T> generator ) {
+	public ImagePyramid(boolean saveOriginalReference,
+						PyramidUpdater<T> updater ) {
 		this.saveOriginalReference = saveOriginalReference;
-		this.bottomWidth = bottomWidth;
-		this.bottomHeight = bottomHeight;
-		this.generator = generator;
+		this.updater = updater;
 	}
 
 	/**
-	 * <p>Sets the scale factor for each layer in the pyramid.</p>
-     *
-	 * <p>
-	 * The scaling is relative to the previous layer.  For
-	 * example, scale = [1,2,2] would be three layers which have scaling of 1,2, and 4 relative to the original image.
-	 * The dimension of each image is the dimension of the previous layer dividing by its scaling.  So if the upper
-	 * layer has a width/height of (640,480) and the next layer has a scale factor of 2, its dimension will be (320,240).
-	 * </p>
-	 *
-	 * @param scale
+	 * Updates each level in the pyramid using the specified input image.
+	 * 
+	 * @param image Original input image.
 	 */
-	public void setScaling(int... scale) {
-		if (scale.length <= 0)
-			throw new IllegalArgumentException("A scale must be specified");
-		for (int s : scale)
-			if (s < 1)
-				throw new IllegalArgumentException("The scale of each layer must be >= 1");
-
-		Class<T> type = getImageType();
-
-		layers = (T[]) Array.newInstance(type, scale.length);
-		this.scale = new int[scale.length];
-		System.arraycopy(scale, 0, this.scale, 0, scale.length);
-		int scaleFactor = scale[0];
-
-		if (scale[0] == 1) {
-			if (!saveOriginalReference) {
-				layers[0] = generator.createInstance(bottomWidth, bottomHeight);
-			}
-		} else {
-			layers[0] = generator.createInstance(bottomWidth / scaleFactor, bottomHeight / scaleFactor);
+	public void update( T image ) {
+		if( updater == null ) {
+			throw new IllegalArgumentException("Updater is null, this is an error or the class should be updated manually.");
 		}
 
-		for (int i = 1; i < scale.length; i++) {
-			scaleFactor *= scale[i];
-			layers[i] = generator.createInstance(bottomWidth / scaleFactor, bottomHeight / scaleFactor);
+		if( layers == null ) {
+			ImageGenerator<T> gen = (ImageGenerator<T>)FactoryImageGenerator.create(image.getClass());
+			declareLayers(gen, image.width,image.height);
 		}
+
+		updater.update(image,this);
 	}
 
+	/**
+	 * Declares the layers in the pyramid.
+	 *
+	 * @param generator
+	 */
+	public abstract void declareLayers( ImageGenerator<T> generator , int width , int height );
+
+	/**
+	 *
+	 * @param layer
+	 * @return
+	 */
+	public abstract double getScale( int layer );
+	
 	/**
 	 * Returns the scale factor relative to the original image.
 	 *
 	 * @param layer Layer at which the scale factor is to be computed.
 	 * @return Scale factor relative to original image.
 	 */
-	public int getScalingAtLayer(int layer) {
-		int scale = 1;
+	public double getScalingAtLayer(int layer) {
+		double scale = 1;
 
 		for (int i = 0; i <= layer; i++) {
-			scale *= this.scale[i];
+			scale *= getScale(i);
 		}
 
 		return scale;
-	}
-
-	/**
-	 * Type of image in each layer of the pyramid.
-	 *
-	 * @return Image type.
-	 */
-	public Class<T> getImageType() {
-		return generator.getType();
 	}
 
 	/**
@@ -144,10 +128,10 @@ public class ImagePyramid<T extends ImageBase> {
 	}
 
 	public int getWidth(int layer) {
-		return bottomWidth / getScalingAtLayer(layer);
+		return layers[layer].width;
 	}
 
 	public int getHeight(int layer) {
-		return bottomHeight / getScalingAtLayer(layer);
+		return layers[layer].height;
 	}
 }

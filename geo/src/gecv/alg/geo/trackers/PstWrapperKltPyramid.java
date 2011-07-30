@@ -25,11 +25,11 @@ import gecv.alg.geo.SingleImageInput;
 import gecv.alg.tracker.pklt.PkltManager;
 import gecv.alg.tracker.pklt.PkltManagerConfig;
 import gecv.alg.tracker.pklt.PyramidKltFeature;
-import gecv.alg.transform.pyramid.ConvolutionPyramid;
 import gecv.alg.transform.pyramid.GradientPyramid;
+import gecv.alg.transform.pyramid.PyramidUpdateIntegerDown;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidFactory;
+import gecv.struct.pyramid.ImagePyramidI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,6 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 {
 
 	PkltManager<I,D> trackManager;
-	ConvolutionPyramid<I> inputPyramidUpdater;
 	GradientPyramid<I,D> gradientPyramidUpdater;
 
 	ImagePyramid<I> basePyramid;
@@ -66,14 +65,13 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 	 * @param gradientPyramidUpdater Computes gradient image pyramid.
 	 */
 	public PstWrapperKltPyramid(PkltManager<I, D> trackManager,
-								ConvolutionPyramid<I> inputPyramidUpdater,
+								PyramidUpdateIntegerDown<I> inputPyramidUpdater,
 								GradientPyramid<I,D> gradientPyramidUpdater) {
 		setup(trackManager, inputPyramidUpdater, gradientPyramidUpdater);
 	}
 
-	private void setup(PkltManager<I, D> trackManager, ConvolutionPyramid<I> inputPyramidUpdater, GradientPyramid<I, D> gradientPyramidUpdater) {
+	private void setup(PkltManager<I, D> trackManager, PyramidUpdateIntegerDown<I> inputPyramidUpdater, GradientPyramid<I, D> gradientPyramidUpdater) {
 		this.trackManager = trackManager;
-		this.inputPyramidUpdater = inputPyramidUpdater;
 		this.gradientPyramidUpdater = gradientPyramidUpdater;
 
 		PkltManagerConfig<I, D> config = trackManager.getConfig();
@@ -82,18 +80,9 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 		config.minFeatures = 0;
 
 		// declare the image pyramid
-		basePyramid = ImagePyramidFactory.create(
-				config.imgWidth,config.imgHeight,true,config.typeInput);
-		derivX = ImagePyramidFactory.create(
-				config.imgWidth,config.imgHeight,false,config.typeDeriv);
-		derivY = ImagePyramidFactory.create(
-				config.imgWidth,config.imgHeight,false,config.typeDeriv);
-
-		basePyramid.setScaling(config.pyramidScaling);
-		derivX.setScaling(config.pyramidScaling);
-		derivY.setScaling(config.pyramidScaling);
-
-		inputPyramidUpdater.setPyramid(basePyramid);
+		basePyramid = new ImagePyramidI<I>(true,inputPyramidUpdater,config.pyramidScaling);
+		derivX = new ImagePyramidI<D>(false,null,config.pyramidScaling);
+		derivY = new ImagePyramidI<D>(false,null,config.pyramidScaling);
 	}
 
 	/**
@@ -110,7 +99,7 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 		GradientPyramid<I,D> gradientUpdater = new GradientPyramid<I,D>(gradient);
 
 		setup(trackManager,
-				new ConvolutionPyramid<I>(FactoryKernelGaussian.gaussian1D(typeInput,2),typeInput),
+				new PyramidUpdateIntegerDown<I>(FactoryKernelGaussian.gaussian1D(typeInput,2),typeInput),
 				gradientUpdater);
 	}
 
@@ -160,7 +149,7 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 		dropped.clear();
 		
 		// update image pyramids
-		inputPyramidUpdater.update(image);
+		basePyramid.update(image);
 		gradientPyramidUpdater.update(basePyramid,derivX,derivY);
 
 		// track features

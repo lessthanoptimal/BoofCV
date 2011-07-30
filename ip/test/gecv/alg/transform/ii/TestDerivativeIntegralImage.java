@@ -48,13 +48,14 @@ public class TestDerivativeIntegralImage {
 
 		IntegralImageOps.transform(orig,integral);
 
-		for( int level = 0; level <= 2; level++ ) {
-			Kernel2D_F32 kernel = createDerivXX(level);
+		for( int i = 1; i <= 5; i += 2 ) {
+			int size = i*3;
+			Kernel2D_F32 kernel = createDerivXX(size);
 			ConvolveImageNoBorder.convolve(kernel,orig,expected);
-			DerivativeIntegralImage.derivXX(integral,found,level);
+			DerivativeIntegralImage.derivXX(integral,found,size);
 
 
-			int r = 4+3*level;
+			int r = size/2;
 			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r);
 			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
 
@@ -74,14 +75,15 @@ public class TestDerivativeIntegralImage {
 
 		IntegralImageOps.transform(orig,integral);
 
-		for( int level = 0; level <= 2; level++ ) {
-			Kernel2D_F32 kernel = createDerivXX(level);
+		for( int i = 1; i <= 5; i += 2 ) {
+			int size = i*3;
+			Kernel2D_F32 kernel = createDerivXX(size);
 			kernel = FactoryKernel.transpose(kernel);
 
 			ConvolveImageNoBorder.convolve(kernel,orig,expected);
-			DerivativeIntegralImage.derivYY(integral,found,level);
+			DerivativeIntegralImage.derivYY(integral,found,size);
 
-			int r = 4+3*level;
+			int r = size/2;
 			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r);
 			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
 
@@ -101,13 +103,14 @@ public class TestDerivativeIntegralImage {
 
 		IntegralImageOps.transform(orig,integral);
 
-		for( int level = 0; level <= 2; level++ ) {
-			Kernel2D_F32 kernel = createDerivXY(level);
+		for( int i = 1; i <= 5; i += 2 ) {
+			int size = i*3;
+			Kernel2D_F32 kernel = createDerivXY(size);
 
 			ConvolveImageNoBorder.convolve(kernel,orig,expected);
-			DerivativeIntegralImage.derivXY(integral,found,level);
+			DerivativeIntegralImage.derivXY(integral,found,size);
 
-			int r = 4+3*level;
+			int r = size/2;
 			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r);
 			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
 
@@ -115,14 +118,14 @@ public class TestDerivativeIntegralImage {
 		}
 	}
 
-	private Kernel2D_F32 createDerivXX( int level ) {
-		int blockW = 3+2*level;
+	private Kernel2D_F32 createDerivXX( int size ) {
+		int blockW = size/3;
+		int blockH = size-blockW-1;
+		int borderY = (size-blockH)/2;
 
-		int w = blockW*3;
+		Kernel2D_F32 ret = new Kernel2D_F32(size);
 
-		Kernel2D_F32 ret = new Kernel2D_F32(w);
-
-		for( int y = 2+level; y < w-2-level; y++ ) {
+		for( int y = borderY; y < size-borderY; y++ ) {
 			for( int x = 0; x < blockW; x++ ) {
 				ret.set(x,y,1);
 				ret.set(x+blockW*2,y,1);
@@ -134,21 +137,22 @@ public class TestDerivativeIntegralImage {
 		return ret;
 	}
 
-	private Kernel2D_F32 createDerivXY( int level ) {
-		int block = 3+2*level;
+	private Kernel2D_F32 createDerivXY( int size ) {
+		int block = size/3;
+		int border = (size-2*block-1)/2;
 
 		int w = block*3;
 
 		Kernel2D_F32 ret = new Kernel2D_F32(w);
 
-		for( int y = 1+level; y < 1+level+block; y++ ) {
-			for( int x = 1+level; x < block+1+level; x++ ) {
+		for( int y = border; y < border+block; y++ ) {
+			for( int x = border; x < block+border; x++ ) {
 				ret.set(x,y,1);
 				ret.set(x+block+1,y,-1);
 			}
 		}
-		for( int y = 2+level+block; y < w-1-level; y++ ) {
-			for( int x = 1+level; x < block+1+level; x++ ) {
+		for( int y = border+block+1; y < size-border; y++ ) {
+			for( int x = border; x < block+border; x++ ) {
 				ret.set(x,y,-1);
 				ret.set(x+block+1,y,1);
 			}

@@ -72,7 +72,7 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 	@Override
 	public void compute(List<PyramidKltFeature> active, List<PyramidKltFeature> availableData ) {
 
-		float scaleBottom = image.getScalingAtLayer(0);
+		float scaleBottom = (float)image.getScalingAtLayer(0);
 
 		// exclude active tracks
 		excludeList.reset();

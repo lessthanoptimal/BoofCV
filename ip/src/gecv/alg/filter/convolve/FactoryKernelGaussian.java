@@ -95,6 +95,11 @@ public class FactoryKernelGaussian {
 	 * @param radius The kernel's radius.
 	 */
 	public static Kernel1D_I32 gaussian1D_I32(double sigma, int radius) {
+		if( radius <= 0 )
+			radius = FactoryKernelGaussian.radiusForSigma(sigma)+1;
+		else if( sigma <= 0 )
+			sigma = FactoryKernelGaussian.sigmaForRadius(radius);
+
 		double mult = 1.0 / UtilGaussian.computePDF(0, sigma, radius);
 
 		Kernel1D_I32 ret = new Kernel1D_I32(radius * 2 + 1);
@@ -146,6 +151,11 @@ public class FactoryKernelGaussian {
 	 * @param normalize If the kernel should be normalized to one or not.
 	 */
 	public static Kernel1D_F32 gaussian1D_F32(double sigma, int radius, boolean normalize) {
+		if( radius <= 0 )
+			radius = FactoryKernelGaussian.radiusForSigma(sigma)+1;
+		else if( sigma <= 0 )
+			sigma = FactoryKernelGaussian.sigmaForRadius(radius);
+
 		Kernel1D_F32 ret = new Kernel1D_F32(radius * 2 + 1);
 		float[] gaussian = ret.data;
 		int index = 0;
@@ -249,6 +259,11 @@ public class FactoryKernelGaussian {
 	 */
 	public static Kernel1D_F32 gaussianDerivative1D_F32(double sigma, int radius, boolean normalize) {
 
+		if( radius <= 0 )
+			radius = FactoryKernelGaussian.radiusForSigma(sigma)+1;
+		else if( sigma <= 0 )
+			sigma = FactoryKernelGaussian.sigmaForRadius(radius);
+
 		Kernel1D_F32 ret = new Kernel1D_F32(radius * 2 + 1);
 		float[] gaussian = ret.data;
 		int index = 0;
@@ -277,6 +292,11 @@ public class FactoryKernelGaussian {
 	 */
 	public static Kernel1D_I32 gaussianDerivative1D_I32(double sigma, int radius )
 	{
+		if( radius <= 0 )
+			radius = FactoryKernelGaussian.radiusForSigma(sigma)+1;
+		else if( sigma <= 0 )
+			sigma = FactoryKernelGaussian.sigmaForRadius(radius);
+
 		Kernel1D_I32 ret = new Kernel1D_I32(radius * 2 + 1);
 		int[] gaussian = ret.data;
 

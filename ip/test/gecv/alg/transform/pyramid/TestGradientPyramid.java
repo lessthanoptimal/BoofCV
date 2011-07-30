@@ -18,9 +18,9 @@ package gecv.alg.transform.pyramid;
 
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.core.image.border.BorderType;
+import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -29,10 +29,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestGradientPyramid {
-
-	int width = 50;
-	int height = 40;
+public class TestGradientPyramid extends BasePyramidTests {
 
 	/**
 	 * Sees if the gradient computation is called the expected number of times
@@ -45,13 +42,13 @@ public class TestGradientPyramid {
 		GradientPyramid<ImageFloat32,ImageFloat32> updater = new
 				GradientPyramid<ImageFloat32,ImageFloat32>(gradient);
 
-		ImagePyramid<ImageFloat32> in = ImagePyramidFactory.create_F32(width,height,false);
-		ImagePyramid<ImageFloat32> outX = ImagePyramidFactory.create_F32(width,height,false);
-		ImagePyramid<ImageFloat32> outY = ImagePyramidFactory.create_F32(width,height,false);
+		ImagePyramid<ImageFloat32> in = createPyramid(false,1,2,2);
+		ImagePyramid<ImageFloat32> outX = createPyramid(false,1,2,2);
+		ImagePyramid<ImageFloat32> outY = createPyramid(false,1,2,2);
 
-		in.setScaling(1,2,2);
-		outX.setScaling(1,2,2);
-		outY.setScaling(1,2,2);
+		in.update(inputF32);
+		outX.declareLayers(FactoryImageGenerator.create(inputF32),width,height);
+		outY.declareLayers(FactoryImageGenerator.create(inputF32),width,height);
 
 		updater.update(in,outX,outY);
 

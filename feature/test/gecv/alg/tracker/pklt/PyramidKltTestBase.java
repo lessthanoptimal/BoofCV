@@ -21,14 +21,16 @@ import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.tracker.klt.KltTracker;
 import gecv.alg.tracker.klt.TestKltTracker;
-import gecv.alg.transform.pyramid.ConvolutionPyramid;
-import gecv.alg.transform.pyramid.PyramidUpdater;
+import gecv.alg.transform.pyramid.PyramidUpdateIntegerDown;
+import gecv.core.image.ImageGenerator;
 import gecv.core.image.border.BorderIndex1D_Extend;
 import gecv.core.image.border.ImageBorder1D_F32;
+import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidFactory;
+import gecv.struct.pyramid.ImagePyramidI;
+import gecv.struct.pyramid.PyramidUpdater;
 
 import java.util.Random;
 
@@ -38,6 +40,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked"})
 public class PyramidKltTestBase {
 	Random rand = new Random(234);
 
@@ -47,7 +50,6 @@ public class PyramidKltTestBase {
 	int featureReadius = 2;
 
 	ImageFloat32 image = new ImageFloat32(width,height);
-	PyramidUpdater<ImageFloat32> updater = createPyramidUpdater();
 	ImagePyramid<ImageFloat32> pyramid;
 	ImagePyramid<ImageFloat32> derivX;
 	ImagePyramid<ImageFloat32> derivY;
@@ -57,13 +59,16 @@ public class PyramidKltTestBase {
 	int cornerY = 22;
 
 	public void setup() {
-		pyramid = createPyramid();
-		derivX = createPyramid();
-		derivY = createPyramid();
+		setup(1,2,2);
+	}
+
+	public void setup( int ...scales ) {
+		pyramid = createPyramid(scales);
+		derivX = createPyramid(scales);
+		derivY = createPyramid(scales);
 		ImageTestingOps.randomize(image,rand,0,1);
 		ImageTestingOps.fillRectangle(image,100,cornerX,cornerY,20,20);
-		updater.setPyramid(pyramid);
-		updater.update(image);
+		pyramid.update(image);
 
 		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
 
@@ -72,18 +77,15 @@ public class PyramidKltTestBase {
 		}
 	}
 
-	private ImagePyramid<ImageFloat32> createPyramid() {
-
-		ImagePyramid<ImageFloat32> pyramid = ImagePyramidFactory.create_F32(width,height,false);
-		pyramid.setScaling(1,2,2);
-
-		return pyramid;
-	}
-
-	private PyramidUpdater<ImageFloat32> createPyramidUpdater() {
+	private ImagePyramid<ImageFloat32> createPyramid( int ...scales ) {
 
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(2,true);
-		return new ConvolutionPyramid<ImageFloat32>(kernel,ImageFloat32.class);
+		PyramidUpdater<ImageFloat32> updater = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
+
+		ImagePyramidI<ImageFloat32> ret = new ImagePyramidI<ImageFloat32>(false,updater,scales);
+		ret.declareLayers((ImageGenerator<ImageFloat32>)FactoryImageGenerator.create(image.getClass()),width,height);
+
+		return ret;
 	}
 
 	private PyramidKltTracker<ImageFloat32,ImageFloat32> createDefaultTracker() {

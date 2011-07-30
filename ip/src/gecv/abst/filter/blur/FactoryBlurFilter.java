@@ -56,7 +56,7 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return mean image filter.
 	 */
-	public static <T extends ImageBase> BlurStorageFilter<T> gaussian( Class<T> type , int radius ) {
-		return new BlurStorageFilter<T>("gaussian",type,radius);
+	public static <T extends ImageBase> BlurStorageFilter<T> gaussian( Class<T> type , double sigma , int radius ) {
+		return new BlurStorageFilter<T>("gaussian",type,sigma,radius);
 	}
 }

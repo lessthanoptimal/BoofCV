@@ -14,25 +14,20 @@
  *    limitations under the License.
  */
 
-package gecv.struct.pyramid;
+package gecv.abst.filter.interpolate;
 
-import gecv.struct.image.ImageUInt8;
-import org.junit.Test;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.struct.image.ImageBase;
 
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestImagePyramid {
+public class GeneralizedInterpolateOps {
 
-	@Test
-	public void getScalingAtLayer() {
-		ImagePyramid<ImageUInt8> pyramid = new ImagePyramidI<ImageUInt8>(true,null,1,2,3);
+	public static <T extends ImageBase> void scale( T input , T output ,
+													InterpolatePixel<T> interpolation )
+	{
 
-
-		assertEquals(1,pyramid.getScalingAtLayer(0),1e-4);
-		assertEquals(2,pyramid.getScalingAtLayer(1),1e-4);
-		assertEquals(6,pyramid.getScalingAtLayer(2),1e-4);
 	}
 }

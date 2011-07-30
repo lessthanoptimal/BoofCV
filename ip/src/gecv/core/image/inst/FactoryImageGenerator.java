@@ -33,5 +33,27 @@ public class FactoryImageGenerator {
 		return new SingleBandGenerator(type);
 	}
 
-	
+	public static <T extends ImageBase> ImageGenerator<T> create( T original )
+	{
+		return new WrapImage(original);
+	}
+
+	public static class WrapImage<T extends ImageBase> implements ImageGenerator<T>
+	{
+		T original;
+
+		public WrapImage(T original) {
+			this.original = original;
+		}
+
+		@Override
+		public T createInstance(int width, int height) {
+			return (T)original._createNew(width,height);
+		}
+
+		@Override
+		public Class<T> getType() {
+			return (Class<T>)original.getClass();
+		}
+	}
 }

@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestCornerLaplaceScaleSpace {
+public class TestFeatureLaplaceScaleSpace {
 
 	Random rand = new Random(234);
 	int width = 20;
