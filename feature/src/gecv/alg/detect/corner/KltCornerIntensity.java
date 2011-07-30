@@ -24,7 +24,7 @@ import gecv.struct.image.ImageFloat32;
  * This corner detector is designed to select the best features for tracking inside of a Kanade-Lucas-Tomasi (KLT)
  * feature tracker [1].  It selects features which have a low self similarity in all directions.  The output
  * is an intensity image which indicates how corner like each pixel is.  Point features are extracted from the
- * feature intensity image using {@link gecv.abst.detect.extract.CornerExtractor}.
+ * feature intensity image using {@link gecv.abst.detect.extract.FeatureExtractor}.
  * </p>
  * <p>
  * An important consideration when using this detector in other applications than a KLT tracker is that the

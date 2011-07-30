@@ -16,7 +16,7 @@
 
 package gecv.struct.pyramid;
 
-import gecv.struct.image.ImageBase;
+import gecv.struct.gss.TestScaleSpacePyramid;
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestImagePyramidF {
+public class TestDiscreteImagePyramid {
 
 	int width = 80;
 	int height = 160;
@@ -34,7 +34,7 @@ public class TestImagePyramidF {
 	@Test
 	public void setScaling() {
 		// see if all the layers are set correctly
-		ImagePyramid<ImageUInt8> pyramid = new ImagePyramidF<ImageUInt8>(true,new DoNothingUpdater<ImageUInt8>(),1,2,2.5);
+		ImagePyramid<ImageUInt8> pyramid = new DiscreteImagePyramid<ImageUInt8>(true,new TestScaleSpacePyramid.DoNothingUpdater<ImageUInt8>(),1,2,2);
 
 		ImageUInt8 input = new ImageUInt8(width,height);
 		pyramid.update(input);
@@ -44,12 +44,12 @@ public class TestImagePyramidF {
 		assertEquals(width / 2, pyramid.getLayer(1).width);
 		assertEquals(height / 2, pyramid.getLayer(1).height);
 
-		assertEquals(width / 5, pyramid.getLayer(2).width);
-		assertEquals(height / 5, pyramid.getLayer(2).height);
+		assertEquals(width / 4, pyramid.getLayer(2).width);
+		assertEquals(height / 4, pyramid.getLayer(2).height);
 
 
 		// tell it to creates a new image in the first layer
-		pyramid = new ImagePyramidF<ImageUInt8>(false,new DoNothingUpdater<ImageUInt8>(),1,2,2);
+		pyramid = new DiscreteImagePyramid<ImageUInt8>(false,new TestScaleSpacePyramid.DoNothingUpdater<ImageUInt8>(),1,2,2);
 		pyramid.update(input);
 
 		assertTrue(null != pyramid.getLayer(0));
@@ -58,7 +58,7 @@ public class TestImagePyramidF {
 		assertEquals(height, pyramid.getLayer(0).height);
 
 		// try it with a scaling not equal to 1
-		pyramid = new ImagePyramidF<ImageUInt8>(false,new DoNothingUpdater<ImageUInt8>(),2,2);
+		pyramid = new DiscreteImagePyramid<ImageUInt8>(false,new TestScaleSpacePyramid.DoNothingUpdater<ImageUInt8>(),2,2);
 		pyramid.update(input);
 
 		assertEquals(width / 2, pyramid.getLayer(0).width);
@@ -67,11 +67,5 @@ public class TestImagePyramidF {
 		assertEquals(height / 4, pyramid.getLayer(1).height);
 	}
 
-	public static class DoNothingUpdater<T extends ImageBase> implements PyramidUpdater<T>
-	{
 
-		@Override
-		public void update(T input, ImagePyramid<T> imagePyramid) {
-		}
-	}
 }

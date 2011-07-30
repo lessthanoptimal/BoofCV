@@ -28,7 +28,7 @@ public class TestImagePyramid {
 
 	@Test
 	public void getScalingAtLayer() {
-		ImagePyramid<ImageUInt8> pyramid = new ImagePyramidI<ImageUInt8>(true,null,1,2,3);
+		ImagePyramid<ImageUInt8> pyramid = new DiscreteImagePyramid<ImageUInt8>(true,null,1,2,3);
 
 
 		assertEquals(1,pyramid.getScalingAtLayer(0),1e-4);

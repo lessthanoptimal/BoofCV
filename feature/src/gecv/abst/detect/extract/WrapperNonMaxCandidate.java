@@ -25,7 +25,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class WrapperNonMaxCandidate implements CornerExtractor {
+public class WrapperNonMaxCandidate implements FeatureExtractor {
 	NonMaxCornerCandidateExtractor extractor;
 
 	public WrapperNonMaxCandidate( NonMaxCornerCandidateExtractor extractor ) {

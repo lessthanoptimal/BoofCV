@@ -20,8 +20,8 @@ import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.pyramid.DiscreteImagePyramid;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidI;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -49,17 +49,17 @@ public class TestPyramidUpdateIntegerDown extends BasePyramidTests {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(3, true);
 		PyramidUpdateIntegerDown<ImageFloat32> alg = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
-		ImagePyramid<ImageFloat32> pyramid = new ImagePyramidI<ImageFloat32>(true,alg,1,2,2);
+		ImagePyramid<ImageFloat32> pyramid = new DiscreteImagePyramid<ImageFloat32>(true,alg,1,2,2);
 		pyramid.update(inputF32);
 
 		assertTrue(inputF32 == pyramid.getLayer(0));
 
-		pyramid = new ImagePyramidI<ImageFloat32>(false,alg,1,2,2);
+		pyramid = new DiscreteImagePyramid<ImageFloat32>(false,alg,1,2,2);
 		pyramid.update(inputF32);
 
 		assertTrue(inputF32 != pyramid.getLayer(0));
 
-		pyramid = new ImagePyramidI<ImageFloat32>(true,alg,2,2);
+		pyramid = new DiscreteImagePyramid<ImageFloat32>(true,alg,2,2);
 		pyramid.update(inputF32);
 
 		assertTrue(inputF32 != pyramid.getLayer(0));
@@ -85,7 +85,7 @@ public class TestPyramidUpdateIntegerDown extends BasePyramidTests {
 
 		PyramidUpdateIntegerDown<ImageFloat32> alg = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
-		ImagePyramid<ImageFloat32> pyramid = new ImagePyramidI<ImageFloat32>(true,alg,1,2,2);
+		ImagePyramid<ImageFloat32> pyramid = new DiscreteImagePyramid<ImageFloat32>(true,alg,1,2,2);
 		pyramid.update(img);
 
 		// top layer should be the same as the input layer

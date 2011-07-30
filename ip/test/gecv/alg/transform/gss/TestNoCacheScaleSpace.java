@@ -30,6 +30,8 @@ import org.junit.Test;
 
 import java.util.Random;
 
+import static org.junit.Assert.fail;
+
 
 /**
  * @author Peter Abeles
@@ -47,6 +49,11 @@ public class TestNoCacheScaleSpace {
 	@Before
 	public void setup() {
 		GeneralizedImageOps.randomize(original,rand,0,40);
+	}
+
+	@Test
+	public void note() {
+		fail("Don't use gaussian derivatives.  Or at least experiment with a class that does not");
 	}
 
 	@Test

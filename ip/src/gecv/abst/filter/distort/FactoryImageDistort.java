@@ -14,12 +14,13 @@
  *    limitations under the License.
  */
 
-package gecv.alg.misc;
+package gecv.abst.filter.distort;
 
+import gecv.alg.distort.ImageDistort;
+import gecv.alg.distort.impl.ImageDistort_F32;
+import gecv.alg.distort.impl.ImageDistort_I16;
+import gecv.alg.distort.impl.ImageDistort_I8;
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.alg.misc.impl.ImageDistort_F32;
-import gecv.alg.misc.impl.ImageDistort_I16;
-import gecv.alg.misc.impl.ImageDistort_I8;
 import gecv.struct.distort.PixelDistort;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;

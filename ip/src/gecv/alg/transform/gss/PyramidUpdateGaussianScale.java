@@ -14,15 +14,15 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.pyramid;
+package gecv.alg.transform.gss;
 
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.BlurStorageFilter;
-import gecv.abst.filter.interpolate.GeneralizedInterpolateOps;
+import gecv.abst.filter.distort.GeneralizedDistortImageOps;
 import gecv.alg.interpolate.InterpolatePixel;
+import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidF;
 import gecv.struct.pyramid.PyramidUpdater;
 
 
@@ -49,10 +49,16 @@ public class PyramidUpdateGaussianScale< T extends ImageBase> implements Pyramid
 	// used to store the blurred image
 	protected T tempImage;
 
+	public PyramidUpdateGaussianScale(InterpolatePixel<T> interpolate) {
+		this.interpolate = interpolate;
+	}
+
 	@Override
 	public void update(T input, ImagePyramid<T> _imagePyramid) {
-
-		ImagePyramidF<T> imagePyramid = (ImagePyramidF<T>)_imagePyramid;
+		if( _imagePyramid.saveOriginalReference )
+			throw new IllegalArgumentException("The original reference cannot be saved");
+		
+		ScaleSpacePyramid<T> imagePyramid = (ScaleSpacePyramid<T>)_imagePyramid;
 
 		if( tempImage == null ) {
 			tempImage = (T)input._createNew(input.width,input.height);
@@ -70,7 +76,7 @@ public class PyramidUpdateGaussianScale< T extends ImageBase> implements Pyramid
 			blur.process(prev,tempImage);
 			interpolate.setImage(tempImage);
 
-			GeneralizedInterpolateOps.scale(prev,layer,interpolate);
+			GeneralizedDistortImageOps.scale(prev,layer,interpolate);
 		}
 	}
 }

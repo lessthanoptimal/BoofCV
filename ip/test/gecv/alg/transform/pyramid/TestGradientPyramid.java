@@ -18,7 +18,6 @@ package gecv.alg.transform.pyramid;
 
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.core.image.border.BorderType;
-import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
 import org.junit.Test;
@@ -40,15 +39,13 @@ public class TestGradientPyramid extends BasePyramidTests {
 		ImageGradient<ImageFloat32,ImageFloat32> gradient = new DummyGradient();
 
 		GradientPyramid<ImageFloat32,ImageFloat32> updater = new
-				GradientPyramid<ImageFloat32,ImageFloat32>(gradient);
+				GradientPyramid<ImageFloat32,ImageFloat32>(gradient,ImageFloat32.class);
 
 		ImagePyramid<ImageFloat32> in = createPyramid(false,1,2,2);
 		ImagePyramid<ImageFloat32> outX = createPyramid(false,1,2,2);
 		ImagePyramid<ImageFloat32> outY = createPyramid(false,1,2,2);
 
 		in.update(inputF32);
-		outX.declareLayers(FactoryImageGenerator.create(inputF32),width,height);
-		outY.declareLayers(FactoryImageGenerator.create(inputF32),width,height);
 
 		updater.update(in,outX,outY);
 

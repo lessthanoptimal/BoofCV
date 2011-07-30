@@ -20,8 +20,8 @@ import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.corner.WrapperLaplacianBlobIntensity;
-import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
+import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.FactoryDerivativeSparse;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
@@ -46,12 +46,12 @@ public class FactoryInterestPointAlgs {
 	 */
 	public static <T extends ImageBase, D extends ImageBase>
 	FeatureLaplaceScaleSpace<T,D> harrisLaplace( int featureRadius ,
-												float cornerThreshold ,
-												int maxFeatures ,
-												Class<T> imageType ,
-												Class<D> derivType)
+												 float cornerThreshold ,
+												 int maxFeatures ,
+												 Class<T> imageType ,
+												 Class<D> derivType)
 	{
-		CornerExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,false,false,false);
+		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,featureRadius*2,false,false,false);
 		GradientCornerIntensity<D> harris = FactoryCornerIntensity.createHarris(derivType,featureRadius,0.04f);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
@@ -79,7 +79,7 @@ public class FactoryInterestPointAlgs {
 												Class<T> imageType ,
 												Class<D> derivType)
 	{
-		CornerExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,false,false,false);
+		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,0,false,false,false);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 

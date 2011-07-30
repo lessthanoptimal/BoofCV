@@ -25,7 +25,7 @@ import gecv.struct.image.ImageFloat32;
 
 
 /**
- *
+ * Empirically validates some theoretical predictions.
  *
  * @author Peter Abeles
  */
@@ -95,6 +95,7 @@ public class EdgeIntensitiesApp {
 	}
 
 	public void derivByGaussDeriv() {
+		System.out.println("DxG*I");
 		ImageFloat32 blurDeriv = new ImageFloat32(width,height);
 
 		for( int level = 1; level <= 3; level++ ) {
@@ -106,6 +107,7 @@ public class EdgeIntensitiesApp {
 	}
 
 	public void derivByBlurThenDeriv() {
+		System.out.println("Dx*G*I");
 		ImageGradient<ImageFloat32,ImageFloat32> funcDeriv = FactoryDerivative.three_F32();
 		ImageFloat32 blur = new ImageFloat32(width,height);
 		ImageFloat32 blurDeriv = new ImageFloat32(width,height);
@@ -120,6 +122,7 @@ public class EdgeIntensitiesApp {
 	}
 
 	public void derivByGaussThenGausDeriv() {
+		System.out.println("DxG*G*I");
 		ImageFloat32 blur = new ImageFloat32(width,height);
 		ImageFloat32 blurDeriv = new ImageFloat32(width,height);
 
@@ -134,6 +137,7 @@ public class EdgeIntensitiesApp {
 	}
 
 	public void derivByGaussGausThenDeriv() {
+		System.out.println("Dx*G*G*I");
 		ImageGradient<ImageFloat32,ImageFloat32> funcDeriv = FactoryDerivative.three_F32();
 		ImageFloat32 blur = new ImageFloat32(width,height);
 		ImageFloat32 blur2 = new ImageFloat32(width,height);
@@ -145,7 +149,7 @@ public class EdgeIntensitiesApp {
 			funcBlur.process(input,blur);
 			funcBlur.process(blur,blur2);
 
-			funcDeriv.process(blur,blurDeriv,derivY);
+			funcDeriv.process(blur2,blurDeriv,derivY);
 
 			printIntensity("Sigma "+level,blurDeriv);
 		}

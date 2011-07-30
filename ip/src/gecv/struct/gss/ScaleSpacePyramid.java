@@ -14,21 +14,27 @@
  *    limitations under the License.
  */
 
-package gecv.struct.pyramid;
+package gecv.struct.gss;
 
 import gecv.core.image.ImageGenerator;
 import gecv.struct.image.ImageBase;
+import gecv.struct.pyramid.ImagePyramid;
+import gecv.struct.pyramid.PyramidUpdater;
 
 import java.lang.reflect.Array;
 
 
 /**
- * An {@link ImagePyramid} where the scale factor between each level is specified using a floating point number.
+ * <p>
+ * A pyramidal representation of {@link gecv.struct.gss.GaussianScaleSpace scale-space}.
+ * </p>
+ *
+ * An {@link gecv.struct.pyramid.ImagePyramid} where the scale factor between each level is specified using a floating point number.
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class ImagePyramidF<T extends ImageBase> extends ImagePyramid<T> {
+public class ScaleSpacePyramid<T extends ImageBase> extends ImagePyramid<T> {
 
 	// scale of each layer relative to the previous layer
 	public double scale[];
@@ -36,10 +42,11 @@ public class ImagePyramidF<T extends ImageBase> extends ImagePyramid<T> {
 	/**
 	 * Specifies input image size and behavior of top most layer.
 	 *
-	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of  copied.
+	 * @param updater How each layer in the pyramid is computed.
+	 * @param scale The scales in the pyramid.
 	 */
-	public ImagePyramidF( boolean saveOriginalReference, PyramidUpdater<T> updater , double ...scale ) {
-		super(saveOriginalReference,updater);
+	public ScaleSpacePyramid( PyramidUpdater<T> updater , double ...scale ) {
+		super(false,updater);
 		this.scale = scale.clone();
 	}
 

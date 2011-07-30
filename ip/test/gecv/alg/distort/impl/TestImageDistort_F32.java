@@ -14,19 +14,25 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.interpolate;
+package gecv.alg.distort.impl;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import gecv.alg.distort.ImageDistort;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.struct.distort.PixelDistort;
+import gecv.struct.image.ImageFloat32;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestGeneralizedInterpolateOps {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestImageDistort_F32 extends GeneralImageDistortTests<ImageFloat32>{
+
+	public TestImageDistort_F32() {
+		super(ImageFloat32.class);
+	}
+
+	@Override
+	public ImageDistort<ImageFloat32> createDistort(PixelDistort dstToSrc, InterpolatePixel<ImageFloat32> interp) {
+		return new ImageDistort_F32(dstToSrc,interp);
 	}
 }

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.interpolate;
+package gecv.alg.detect.interest;
 
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestInterpolateOps {
+public class TestFeatureLaplacePyramid {
 	@Test
 	public void stuff() {
 		fail("implement");

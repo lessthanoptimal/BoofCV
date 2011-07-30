@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.misc;
+package gecv.alg.distort;
 
 import gecv.struct.image.ImageBase;
 

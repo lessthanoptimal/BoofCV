@@ -19,7 +19,7 @@ package gecv.alg.detect;
 import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.detect.corner.GeneralFeatureIntensity;
 import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
-import gecv.abst.detect.extract.CornerExtractor;
+import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
@@ -137,9 +137,9 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 //		GeneralFeatureIntensity<ImageUInt8, ImageSInt16> intensity =
 //				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryCornerIntensity.createFast12_I8(width, height, 8 , 12));
 
-		CornerExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(radius + 10, radius + 10, 10f));
-//		CornerExtractor extractor = new WrapperNonMax( new NonMaxCornerExtractorNaive(radius+10,10f));
-//		CornerExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(radius+10, 10f));
+		FeatureExtractor extractor = new WrapperNonMax(new FastNonMaxCornerExtractor(radius + 10, radius + 10, 10f));
+//		FeatureExtractor extractor = new WrapperNonMax( new NonMaxCornerExtractorNaive(radius+10,10f));
+//		FeatureExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(radius+10, 10f));
 
 		GeneralFeatureDetector<ImageUInt8, ImageSInt16> detector = new GeneralFeatureDetector<ImageUInt8, ImageSInt16>(intensity, extractor, maxCorners);
 

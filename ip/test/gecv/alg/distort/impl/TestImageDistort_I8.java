@@ -14,29 +14,25 @@
  *    limitations under the License.
  */
 
-package gecv.alg.interpolate;
+package gecv.alg.distort.impl;
 
-import gecv.struct.image.ImageFloat32;
+import gecv.alg.distort.ImageDistort;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.struct.distort.PixelDistort;
+import gecv.struct.image.ImageUInt8;
 
 
 /**
  * @author Peter Abeles
  */
-public class InterpolateOps {
+public class TestImageDistort_I8 extends GeneralImageDistortTests<ImageUInt8>{
 
-	public static void scale( ImageFloat32 input , ImageFloat32 output ,
-							  InterpolatePixel<ImageFloat32> interpolation )
-	{
-		float ratioW = (float)input.width/(float)output.width;
-		float ratioH = (float)input.height/(float)output.height;
+	public TestImageDistort_I8() {
+		super(ImageUInt8.class);
+	}
 
-		interpolation.setImage(input);
-		
-		for( int y = 0; y < output.height; y++ ) {
-			for( int x = 0; x < output.width; x++ ) {
-				float v = interpolation.get(x*ratioW,y*ratioH);
-				output.set(x,y,v);
-			}
-		}
+	@Override
+	public ImageDistort<ImageUInt8> createDistort(PixelDistort dstToSrc, InterpolatePixel<ImageUInt8> interp) {
+		return new ImageDistort_I8<ImageUInt8>(dstToSrc,interp);
 	}
 }

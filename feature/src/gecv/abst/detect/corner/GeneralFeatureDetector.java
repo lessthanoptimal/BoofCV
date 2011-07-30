@@ -16,7 +16,7 @@
 
 package gecv.abst.detect.corner;
 
-import gecv.abst.detect.extract.CornerExtractor;
+import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.alg.detect.extract.SelectNBestCorners;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
@@ -34,7 +34,7 @@ public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 	protected SelectNBestCorners selectBest;
 
 	// extracts corners from the intensity image
-	protected CornerExtractor extractor;
+	protected FeatureExtractor extractor;
 
 	// list of corners found by the extractor
 	protected QueueCorner foundCorners;
@@ -54,7 +54,7 @@ public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 	 * @param maxFeatures If not zero then only the best features are returned up to this number
 	 */
 	public GeneralFeatureDetector(GeneralFeatureIntensity<I,D> intensity ,
-								 CornerExtractor extractor,
+								 FeatureExtractor extractor,
 								 int maxFeatures)
 	{
 		if( extractor.getUsesCandidates() && !intensity.hasCandidates() )

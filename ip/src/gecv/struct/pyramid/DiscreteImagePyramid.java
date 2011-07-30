@@ -23,12 +23,14 @@ import java.lang.reflect.Array;
 
 
 /**
- * An {@link ImagePyramid} where the scale factor between each level is specified using an integer number.
- *
+ * <p>
+ * In this implementation the scale factor between each layer is limited to being a positive integer.
+ * This added assumption allows further optimization to be performed.
+ * </p>
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class ImagePyramidI<T extends ImageBase> extends ImagePyramid<T> {
+public class DiscreteImagePyramid<T extends ImageBase> extends ImagePyramid<T> {
 
 	// scale of each layer relative to the previous layer
 	public int scale[];
@@ -38,7 +40,7 @@ public class ImagePyramidI<T extends ImageBase> extends ImagePyramid<T> {
 	 *
 	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of  copied.
 	 */
-	public ImagePyramidI( boolean saveOriginalReference, PyramidUpdater<T> updater ,  int ...scale ) {
+	public DiscreteImagePyramid( boolean saveOriginalReference, PyramidUpdater<T> updater ,  int ...scale ) {
 		super(saveOriginalReference, updater);
 		this.scale = scale.clone();
 	}

@@ -17,12 +17,12 @@
 package gecv.alg.transform.pyramid;
 
 import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.gss.TestScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
+import gecv.struct.pyramid.DiscreteImagePyramid;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidI;
-import gecv.struct.pyramid.TestImagePyramidF;
 import org.junit.Before;
 
 import java.util.Random;
@@ -50,6 +50,6 @@ public class BasePyramidTests {
 	}
 
 	public <T extends ImageBase> ImagePyramid<T> createPyramid( boolean saveOriginal , int ...scales ) {
-		return new ImagePyramidI<T>(saveOriginal,new TestImagePyramidF.DoNothingUpdater<T>(),scales);
+		return new DiscreteImagePyramid<T>(saveOriginal,new TestScaleSpacePyramid.DoNothingUpdater<T>(),scales);
 	}
 }

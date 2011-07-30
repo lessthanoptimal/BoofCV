@@ -16,10 +16,9 @@
 
 package gecv.alg.interpolate;
 
+import gecv.abst.filter.distort.GeneralizedDistortImageOps;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
-import gecv.core.image.SingleBandImage;
 import gecv.gui.image.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
@@ -56,20 +55,8 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase> {
 	public void addInterpolation( String name , InterpolatePixel<T> alg ) {
 		T scaledImg = (T)grayOriginal._createNew(scaledWidth,scaledHeight);
 
-		float scaleY = (float)grayOriginal.getHeight()/(float)scaledHeight;
-		float scaleX = (float)grayOriginal.getWidth()/(float)scaledWidth;
+		GeneralizedDistortImageOps.scale(grayOriginal,scaledImg,alg);
 
-		alg.setImage(grayOriginal);
-
-		SingleBandImage v = FactorySingleBandImage.wrap(scaledImg);
-
-		for( int y = 0; y < scaledHeight; y++ ) {
-			for( int x = 0; x < scaledWidth; x++ ) {
-				float value = alg.get(x*scaleX,y*scaleY);
-				v.set(x,y,value);
-			}
-		}
-		
 		// numerical round off error can cause the interpolation to go outside
 		// of pixel value bounds
 		GeneralizedImageOps.boundImage(scaledImg,0,255);

@@ -22,7 +22,7 @@ import gecv.struct.image.ImageFloat32;
 
 /**
  * <p>
- * Extracts corner features from an intensity image.  The intensity image indicates the location of features
+ * Extracts features from an intensity image.  The intensity image indicates the location of features
  * across the image based the intensity value.  Typically local maximums are considered to be the location of
  * features.
  * </p>
@@ -48,7 +48,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public interface CornerExtractor {
+public interface FeatureExtractor {
 
 	/**
 	 * Process a feature intensity image to extract the point features.

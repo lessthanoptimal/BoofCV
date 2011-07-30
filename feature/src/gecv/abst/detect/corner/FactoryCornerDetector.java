@@ -16,8 +16,8 @@
 
 package gecv.abst.detect.corner;
 
-import gecv.abst.detect.extract.CornerExtractor;
 import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
+import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.MedianImageFilter;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
@@ -28,6 +28,12 @@ import gecv.struct.image.ImageBase;
 /**
  * Creates a family of interest point detectors which are designed to detect the corners of objects..
  *
+ * <p>
+ * NOTE: Sometimes the image border is ignored and some times it is not.  If feature intensities are not
+ * computed along the image border then it will be full of zeros.  In that case the ignore border region
+ * needs to be increased for non-max suppression or else it might generate a false positive.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class FactoryCornerDetector {
@@ -35,22 +41,26 @@ public class FactoryCornerDetector {
 	public static <T extends ImageBase, D extends ImageBase>
 	GeneralFeatureDetector<T,D> createHarris( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
 	{
+		// see NOTE in comments
+		int r = featureRadius*2;
 		GradientCornerIntensity<D> cornerIntensity = FactoryCornerIntensity.createHarris(derivType,featureRadius,0.04f);
-		return createGeneral(cornerIntensity,featureRadius,cornerThreshold,maxFeatures);
+		return createGeneral(cornerIntensity,featureRadius,r,cornerThreshold,maxFeatures);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>
 	GeneralFeatureDetector<T,D> createKlt( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
 	{
+		// see NOTE in comments
+		int r = featureRadius*2;
 		GradientCornerIntensity<D> cornerIntensity = FactoryCornerIntensity.createKlt(derivType,featureRadius);
-		return createGeneral(cornerIntensity,featureRadius,cornerThreshold,maxFeatures);
+		return createGeneral(cornerIntensity,featureRadius,r,cornerThreshold,maxFeatures);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>
 	GeneralFeatureDetector<T,D> createKitRos( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
 	{
 		GeneralFeatureIntensity<T,D> intensity = new WrapperKitRosCornerIntensity<T,D>(derivType);
-		return createGeneral(intensity,featureRadius,cornerThreshold,maxFeatures);
+		return createGeneral(intensity,featureRadius,0,cornerThreshold,maxFeatures);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>
@@ -58,7 +68,7 @@ public class FactoryCornerDetector {
 	{
 		FastCornerIntensity<T> alg = FactoryCornerIntensity.createFast12(imageType,pixelTol,11);
 		GeneralFeatureIntensity<T,D> intensity = new WrapperFastCornerIntensity<T,D>(alg);
-		return createGeneral(intensity,featureRadius,pixelTol,maxFeatures);
+		return createGeneral(intensity,featureRadius,0,pixelTol,maxFeatures);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>
@@ -66,20 +76,20 @@ public class FactoryCornerDetector {
 	{
 		MedianImageFilter<T> medianFilter = FactoryBlurFilter.median(imageType,featureRadius);
 		GeneralFeatureIntensity<T,D> intensity = new WrapperMedianCornerIntensity<T,D>(medianFilter,imageType);
-		return createGeneral(intensity,featureRadius,pixelTol,maxFeatures);
+		return createGeneral(intensity,featureRadius,0,pixelTol,maxFeatures);
 	}
 
 	protected static <T extends ImageBase, D extends ImageBase>
 	GeneralFeatureDetector<T,D> createGeneral( GradientCornerIntensity<D> cornerIntensity ,
-											  int featureRadius , float cornerThreshold , int maxFeatures ) {
+											  int minSeparation , int ignoreBorder , float cornerThreshold , int maxFeatures ) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(cornerIntensity);
-		return createGeneral(intensity,featureRadius,cornerThreshold,maxFeatures);
+		return createGeneral(intensity,minSeparation,ignoreBorder,cornerThreshold,maxFeatures);
 	}
 
 	protected static <T extends ImageBase, D extends ImageBase>
 	GeneralFeatureDetector<T,D> createGeneral( GeneralFeatureIntensity<T,D> intensity ,
-											  int featureRadius , float cornerThreshold , int maxFeatures ) {
-		CornerExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,false,false,false);
+											  int minSeparation , int ignoreBorder , float cornerThreshold , int maxFeatures ) {
+		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(minSeparation,cornerThreshold,ignoreBorder,false,false,false);
 		return new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 	}
 }
