@@ -24,7 +24,8 @@ import gecv.io.image.UtilImageIO;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidFactory;
+import gecv.struct.pyramid.ImagePyramidI;
+import gecv.struct.pyramid.PyramidUpdater;
 
 import java.awt.image.BufferedImage;
 
@@ -36,17 +37,17 @@ import java.awt.image.BufferedImage;
 public class VisualizeImagePyramidApp {
 
 	public static void main( String args[] ) {
+		int scales[] = new int[]{1,2,2,2,2};
+
 		BufferedImage input = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
 
 		Kernel1D_F32 gaussian = FactoryKernelGaussian.gaussian1D(ImageFloat32.class,2);
-		ImagePyramid<ImageFloat32> pyramid = ImagePyramidFactory.create_F32(input.getWidth(),input.getHeight(),true);
-		PyramidUpdater<ImageFloat32> updater = new ConvolutionPyramid<ImageFloat32>(gaussian,ImageFloat32.class);
-		pyramid.setScaling(1,2,2,2,2);
+		PyramidUpdater<ImageFloat32> updater = new PyramidUpdateIntegerDown<ImageFloat32>(gaussian,ImageFloat32.class);
+		ImagePyramid<ImageFloat32> pyramid = new ImagePyramidI<ImageFloat32>(true,updater,scales);
 
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 
-		updater.setPyramid(pyramid);
-		updater.update(inputF32);
+		pyramid.update(inputF32);
 
 		ImagePyramidPanel gui = new ImagePyramidPanel(pyramid);
 		gui.render();

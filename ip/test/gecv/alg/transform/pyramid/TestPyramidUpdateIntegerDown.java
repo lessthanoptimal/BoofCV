@@ -18,15 +18,12 @@ package gecv.alg.transform.pyramid;
 
 import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.alg.filter.convolve.FactoryKernelGaussian;
-import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidFactory;
+import gecv.struct.pyramid.ImagePyramidI;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
-
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,42 +31,38 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestConvolutionPyramid {
-	Random rand = new Random(234);
-	int width = 80;
-	int height = 160;
+public class TestPyramidUpdateIntegerDown extends BasePyramidTests {
+
+	public TestPyramidUpdateIntegerDown() {
+		super();
+		this.width = 80;
+		this.height = 80;
+	}
 
 	/**
 	 * Make sure this flag is handled correctly on update
 	 */
 	@Test
 	public void saveOriginalReference() {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageTestingOps.randomize(img, rand, 0, 100);
+
 
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(3, true);
-		ImagePyramid<ImageFloat32> pyramid = ImagePyramidFactory.create_F32(width, height, true);
-		pyramid.setScaling(1, 2, 2);
+		PyramidUpdateIntegerDown<ImageFloat32> alg = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
-		ConvolutionPyramid<ImageFloat32> alg = new ConvolutionPyramid<ImageFloat32>(kernel,ImageFloat32.class);
-		alg.setPyramid(pyramid);
-		alg.update(img);
+		ImagePyramid<ImageFloat32> pyramid = new ImagePyramidI<ImageFloat32>(true,alg,1,2,2);
+		pyramid.update(inputF32);
 
-		assertTrue(img == pyramid.getLayer(0));
+		assertTrue(inputF32 == pyramid.getLayer(0));
 
-		pyramid = ImagePyramidFactory.create_F32(width, height, false);
-		pyramid.setScaling(1, 2, 2);
-		alg.setPyramid(pyramid);
-		alg.update(img);
+		pyramid = new ImagePyramidI<ImageFloat32>(false,alg,1,2,2);
+		pyramid.update(inputF32);
 
-		assertTrue(img != pyramid.getLayer(0));
+		assertTrue(inputF32 != pyramid.getLayer(0));
 
-		pyramid = ImagePyramidFactory.create_F32(width, height, true);
-		pyramid.setScaling(2, 2);
-		alg.setPyramid(pyramid);
-		alg.update(img);
+		pyramid = new ImagePyramidI<ImageFloat32>(true,alg,2,2);
+		pyramid.update(inputF32);
 
-		assertTrue(img != pyramid.getLayer(0));
+		assertTrue(inputF32 != pyramid.getLayer(0));
 	}
 
 	/**
@@ -77,10 +70,8 @@ public class TestConvolutionPyramid {
 	 */
 	@Test
 	public void _update() {
-		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageTestingOps.randomize(img, rand, 0, 100);
 
-		GecvTesting.checkSubImage(this, "_update", true, img);
+		GecvTesting.checkSubImage(this, "_update", true, inputF32);
 	}
 
 	public void _update(ImageFloat32 img) {
@@ -92,11 +83,10 @@ public class TestConvolutionPyramid {
 		ConvolveNormalized.horizontal(kernel,img,storage);
 		ConvolveNormalized.vertical(kernel,storage,convImg);
 
-		ImagePyramid<ImageFloat32> pyramid = ImagePyramidFactory.create_F32(width, height, false);
-		pyramid.setScaling(1, 2, 2);
-		ConvolutionPyramid<ImageFloat32> alg = new ConvolutionPyramid<ImageFloat32>(kernel,ImageFloat32.class);
-		alg.setPyramid(pyramid);
-		alg.update(img);
+		PyramidUpdateIntegerDown<ImageFloat32> alg = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
+
+		ImagePyramid<ImageFloat32> pyramid = new ImagePyramidI<ImageFloat32>(true,alg,1,2,2);
+		pyramid.update(img);
 
 		// top layer should be the same as the input layer
 		GecvTesting.assertEquals(img, pyramid.getLayer(0), 1, 1e-4f);

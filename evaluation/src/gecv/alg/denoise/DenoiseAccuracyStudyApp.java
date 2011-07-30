@@ -133,9 +133,9 @@ public class DenoiseAccuracyStudyApp {
 		List<TestItem> ret = new ArrayList<TestItem>();
 
 		FilterImageInterface<ImageFloat32,ImageFloat32> filter;
-		filter = FactoryBlurFilter.gaussian(ImageFloat32.class,2);
+		filter = FactoryBlurFilter.gaussian(ImageFloat32.class,-1,2);
 		ret.add( new TestItem(filter,"Gaussian "+2));
-		filter = FactoryBlurFilter.gaussian(ImageFloat32.class,3);
+		filter = FactoryBlurFilter.gaussian(ImageFloat32.class,-1,3);
 		ret.add( new TestItem(filter,"Gaussian "+3));
 		filter = FactoryBlurFilter.mean(ImageFloat32.class,2);
 		ret.add( new TestItem(filter,"Mean "+2));

@@ -21,22 +21,32 @@ import gecv.abst.filter.convolve.GenericConvolveDown;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.image.ImageBase;
+import gecv.struct.pyramid.ImagePyramid;
+import gecv.struct.pyramid.ImagePyramidI;
+import gecv.struct.pyramid.PyramidUpdater;
 
 /**
+ * <p>
  * Convolves a re-normalizable blur kernel across the image before down sampling.  This is useful for creating
  * a Gaussian pyramid as well as other standard pyramids.
+ * </p>
+ *
+ * <p>
+ * NOTE: This blur magnitude is constant for each level in the pyramid. In general it is desirable to
+ * have it dependent on each level's scale factor.
+ * </p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class ConvolutionPyramid<T extends ImageBase> extends PyramidUpdater<T> {
+public class PyramidUpdateIntegerDown<T extends ImageBase> implements PyramidUpdater<T> {
 
 	// stores the results from the first convolution
 	private T temp;
 	GenericConvolveDown<T,T> horizontal;
 	GenericConvolveDown<T,T> vertical;
 
-	public ConvolutionPyramid(Kernel1D kernel, Class<T> imageType ) {
+	public PyramidUpdateIntegerDown(Kernel1D kernel, Class<T> imageType ) {
 
 		horizontal = FactoryConvolveDown.convolve(kernel,imageType,imageType,
 				BorderType.NORMALIZED,true,1);
@@ -46,7 +56,9 @@ public class ConvolutionPyramid<T extends ImageBase> extends PyramidUpdater<T> {
 	}
 
 	@Override
-	public void _update(T original) {
+	public void update(T original , ImagePyramid<T> _pyramid ) {
+
+		 ImagePyramidI<T> pyramid = (ImagePyramidI<T>)_pyramid;
 
 		if( temp == null )
 			// declare it to be hte latest image that it might need to be, resize below

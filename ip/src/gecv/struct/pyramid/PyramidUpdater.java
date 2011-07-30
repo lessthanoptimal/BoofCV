@@ -14,38 +14,22 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.pyramid;
+package gecv.struct.pyramid;
 
 import gecv.struct.image.ImageBase;
-import gecv.struct.pyramid.ImagePyramid;
 
 /**
  * Updates each layer in the pyramid given the original full resolution image.
  *
  * @author Peter Abeles
  */
-public abstract class PyramidUpdater<T extends ImageBase> {
-
-	protected ImagePyramid<T> pyramid;
-
-	public void setPyramid(ImagePyramid<T> pyramid) {
-		this.pyramid = pyramid;
-	}
-
-	public ImagePyramid<T> getPyramid() {
-		return pyramid;
-	}
+public interface PyramidUpdater<T extends ImageBase> {
 
 	/**
-	 * Given this original image create a pyramidal scale space representation.
+	 * Given the original input image update the specified image pyramid
 	 *
-	 * @param original Original full resolution image
+	 * @param input Original full resolution image.
+	 * @param pyramid The pyramid which is to be updated.
 	 */
-	public void update(T original) {
-		if (original.width != pyramid.bottomWidth || original.height != pyramid.bottomHeight)
-			throw new IllegalArgumentException("Unexpected dimension");
-		_update(original);
-	}
-
-	abstract protected void _update(T input);
+	public void update(T input , ImagePyramid<T> pyramid );
 }

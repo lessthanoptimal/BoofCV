@@ -19,7 +19,6 @@ package gecv.alg.transform.pyramid;
 import gecv.abst.filter.FilterImageInterface;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,10 +27,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestFilterPyramid {
-	int width = 50;
-	int height = 40;
-
+public class TestFilterPyramid extends BasePyramidTests{
 	/**
 	 * Sees if the filter computation is called the expected number of times
 	 */
@@ -43,11 +39,10 @@ public class TestFilterPyramid {
 		FilterPyramid<ImageFloat32,ImageFloat32> updater = new
 				FilterPyramid<ImageFloat32,ImageFloat32>(filter);
 
-		ImagePyramid<ImageFloat32> in = ImagePyramidFactory.create_F32(width,height,false);
-		ImagePyramid<ImageFloat32> out = ImagePyramidFactory.create_F32(width,height,false);
-
-		in.setScaling(1,2,2);
-		out.setScaling(1,2,2);
+		ImagePyramid<ImageFloat32> in = createPyramid(false,1,2,2);
+		ImagePyramid<ImageFloat32> out = createPyramid(false,1,2,2);
+		in.update(inputF32);
+		out.update(inputF32);
 
 		updater.update(in,out);
 

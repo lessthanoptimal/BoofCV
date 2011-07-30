@@ -14,25 +14,29 @@
  *    limitations under the License.
  */
 
-package gecv.struct.pyramid;
+package gecv.alg.interpolate;
 
-import gecv.struct.image.ImageUInt8;
-import org.junit.Test;
+import gecv.struct.image.ImageFloat32;
 
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestImagePyramid {
+public class InterpolateOps {
 
-	@Test
-	public void getScalingAtLayer() {
-		ImagePyramid<ImageUInt8> pyramid = new ImagePyramidI<ImageUInt8>(true,null,1,2,3);
+	public static void scale( ImageFloat32 input , ImageFloat32 output ,
+							  InterpolatePixel<ImageFloat32> interpolation )
+	{
+		float ratioW = (float)input.width/(float)output.width;
+		float ratioH = (float)input.height/(float)output.height;
 
-
-		assertEquals(1,pyramid.getScalingAtLayer(0),1e-4);
-		assertEquals(2,pyramid.getScalingAtLayer(1),1e-4);
-		assertEquals(6,pyramid.getScalingAtLayer(2),1e-4);
+		interpolation.setImage(input);
+		
+		for( int y = 0; y < output.height; y++ ) {
+			for( int x = 0; x < output.width; x++ ) {
+				float v = interpolation.get(x*ratioW,y*ratioH);
+				output.set(x,y,v);
+			}
+		}
 	}
 }

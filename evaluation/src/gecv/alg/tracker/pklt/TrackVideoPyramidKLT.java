@@ -17,7 +17,6 @@
 package gecv.alg.tracker.pklt;
 
 import gecv.alg.transform.pyramid.GradientPyramid;
-import gecv.alg.transform.pyramid.PyramidUpdater;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ImagePyramidPanel;
 import gecv.gui.image.ShowImages;
@@ -25,7 +24,8 @@ import gecv.io.image.ProcessImageSequence;
 import gecv.io.image.SimpleImageSequence;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.ImagePyramidFactory;
+import gecv.struct.pyramid.ImagePyramidI;
+import gecv.struct.pyramid.PyramidUpdater;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -43,7 +43,6 @@ public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageB
 	ImagePyramidPanel pyramidPanel;
 	int totalRespawns;
 
-	PyramidUpdater<I> pyramidUpdater;
 	GradientPyramid<I,D> updateGradient;
 
 	ImagePyramid<I> basePyramid;
@@ -58,30 +57,20 @@ public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageB
 								GradientPyramid<I,D> updateGradient) {
 		super(sequence);
 		this.tracker = tracker;
-		this.pyramidUpdater = pyramidUpdater;
 		this.updateGradient = updateGradient;
 		PkltManagerConfig<I, D> config = tracker.getConfig();
 
 		// declare the image pyramid
-		basePyramid = ImagePyramidFactory.create(
-				config.imgWidth,config.imgHeight,true,config.typeInput);
-		derivX = ImagePyramidFactory.create(
-				config.imgWidth,config.imgHeight,false,config.typeDeriv);
-		derivY = ImagePyramidFactory.create(
-				config.imgWidth,config.imgHeight,false,config.typeDeriv);
-
-		basePyramid.setScaling(config.pyramidScaling);
-		derivX.setScaling(config.pyramidScaling);
-		derivY.setScaling(config.pyramidScaling);
-
-		pyramidUpdater.setPyramid(basePyramid);
+		basePyramid = new ImagePyramidI<I>(true,pyramidUpdater,config.pyramidScaling);
+		derivX = new ImagePyramidI<D>(false,null,config.pyramidScaling);
+		derivY = new ImagePyramidI<D>(false,null,config.pyramidScaling);
 	}
 
 
 	@Override
 	public void processFrame(I image) {
 
-		pyramidUpdater.update(image);
+		basePyramid.update(image);
 		updateGradient.update(basePyramid,derivX,derivY);
 
 		tracker.processFrame(basePyramid,derivX,derivY);

@@ -34,15 +34,31 @@ public class BlurStorageFilter<T extends ImageBase> implements FilterImageInterf
 
 	// the blur function inside of BlurImageOps being invoked
 	private Method m;
+	// the Gaussians standard deviation
+	private double sigma;
 	// size of the blur region
 	private int radius;
 	// stores intermediate results
 	private ImageBase storage;
+	// if sigma is an input or not
+	private boolean hasSigma;
 
 	public BlurStorageFilter( String functionName , Class<?> imageType , int radius) {
 		this.radius = radius;
 
+		hasSigma = false;
 		m = GecvTesting.findMethod(BlurImageOps.class,functionName,imageType,imageType,int.class,imageType);
+
+		if( m == null )
+			throw new IllegalArgumentException("Can't find matching function for image type "+imageType.getSimpleName());
+	}
+
+	public BlurStorageFilter( String functionName , Class<?> imageType , double sigma , int radius) {
+		this.radius = radius;
+		this.sigma = sigma;
+
+		hasSigma = true;
+		m = GecvTesting.findMethod(BlurImageOps.class,functionName,imageType,imageType,double.class,int.class,imageType);
 
 		if( m == null )
 			throw new IllegalArgumentException("Can't find matching function for image type "+imageType.getSimpleName());
@@ -65,7 +81,10 @@ public class BlurStorageFilter<T extends ImageBase> implements FilterImageInterf
 			} else {
 				storage.reshape(output.width,output.height);
 			}
-			m.invoke(null,input,output,radius,storage);
+			if( hasSigma )
+				m.invoke(null,input,output,sigma,radius,storage);
+			else
+				m.invoke(null,input,output,radius,storage);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {

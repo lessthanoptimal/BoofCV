@@ -53,9 +53,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 	 */
 	@Test
 	public void handlesBottomLayerNotOne() {
-		pyramid.setScaling(2,2);
-		derivX.setScaling(2,2);
-		derivY.setScaling(2,2);
+		setup(2,2);// override initial scaling
 
 		// set the first layer to not be one
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
