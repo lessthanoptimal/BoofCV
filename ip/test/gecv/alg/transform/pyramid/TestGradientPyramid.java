@@ -41,9 +41,9 @@ public class TestGradientPyramid extends BasePyramidTests {
 		GradientPyramid<ImageFloat32,ImageFloat32> updater = new
 				GradientPyramid<ImageFloat32,ImageFloat32>(gradient,ImageFloat32.class);
 
-		ImagePyramid<ImageFloat32> in = createPyramid(false,1,2,2);
-		ImagePyramid<ImageFloat32> outX = createPyramid(false,1,2,2);
-		ImagePyramid<ImageFloat32> outY = createPyramid(false,1,2,2);
+		ImagePyramid<ImageFloat32> in = createPyramid(false,1,2,4);
+		ImagePyramid<ImageFloat32> outX = createPyramid(false,1,2,4);
+		ImagePyramid<ImageFloat32> outY = createPyramid(false,1,2,4);
 
 		in.update(inputF32);
 

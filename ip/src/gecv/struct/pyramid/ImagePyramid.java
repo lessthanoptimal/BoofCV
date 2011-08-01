@@ -28,12 +28,6 @@ import gecv.struct.image.ImageBase;
  * </p>
  *
  * <p>
- * The scaling is relative to the previous layer.  For example, scale = [1,2,2] would be three layers which have scaling of 1,2, and 4 relative to the original image.
- * The dimension of each image is the dimension of the previous layer dividing by its scaling.  So if the upper
- * layer has a width/height of (640,480) and the next layer has a scale factor of 2, its dimension will be (320,240).
- * </p>
- *
- * <p>
  * When updating the pyramid, if the top most layer is at the same resolution as the original image then a reference
  * can optionally be saved, avoiding an unnecessary image copy.  This is done by setting the saveOriginalReference
  * to true.
@@ -68,6 +62,22 @@ public abstract class ImagePyramid<T extends ImageBase> {
 		this.saveOriginalReference = saveOriginalReference;
 		this.updater = updater;
 	}
+	/**
+	 * Used to internally check that the provided scales are valid.
+	 */
+	protected void checkScales() {
+		if( getScale(0) < 0 ) {
+			throw new IllegalArgumentException("The first layer must be more than zero.");
+		}
+
+		double prevScale = 0;
+		for( int i = 0; i < getNumLayers(); i++ ) {
+			double s = getScale(i);
+			if( s <= prevScale )
+				throw new IllegalArgumentException("Higher layers must have larger scale factors than previous layers.");
+			prevScale = s;
+		}
+	}
 
 	/**
 	 * Updates each level in the pyramid using the specified input image.
@@ -100,22 +110,6 @@ public abstract class ImagePyramid<T extends ImageBase> {
 	 * @return
 	 */
 	public abstract double getScale( int layer );
-	
-	/**
-	 * Returns the scale factor relative to the original image.
-	 *
-	 * @param layer Layer at which the scale factor is to be computed.
-	 * @return Scale factor relative to original image.
-	 */
-	public double getScalingAtLayer(int layer) {
-		double scale = 1;
-
-		for (int i = 0; i <= layer; i++) {
-			scale *= getScale(i);
-		}
-
-		return scale;
-	}
 
 	/**
 	 * Returns a layer in the pyramid.
@@ -127,9 +121,7 @@ public abstract class ImagePyramid<T extends ImageBase> {
 		return layers[layerNum];
 	}
 
-	public int getNumLayers() {
-		return layers.length;
-	}
+	public abstract int getNumLayers();
 
 	public int getWidth(int layer) {
 		return layers[layer].width;

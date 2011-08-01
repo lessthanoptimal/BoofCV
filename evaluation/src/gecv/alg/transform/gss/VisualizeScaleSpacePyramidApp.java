@@ -36,7 +36,7 @@ import java.awt.image.BufferedImage;
 public class VisualizeScaleSpacePyramidApp {
 
 	public static void main( String args[] ) {
-		double scales[] = new double[]{1,1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25};
+		double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0};
 
 		BufferedImage input = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
 

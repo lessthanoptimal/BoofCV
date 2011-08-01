@@ -43,16 +43,32 @@ public class ScaleSpacePyramid<T extends ImageBase> extends ImagePyramid<T> {
 	 * Specifies input image size and behavior of top most layer.
 	 *
 	 * @param updater How each layer in the pyramid is computed.
-	 * @param scale The scales in the pyramid.
+	 * @param scaleFactors The scales in the pyramid.
 	 */
-	public ScaleSpacePyramid( PyramidUpdater<T> updater , double ...scale ) {
+	public ScaleSpacePyramid( PyramidUpdater<T> updater , double ...scaleFactors ) {
 		super(false,updater);
-		this.scale = scale.clone();
+		setScaleFactors(scaleFactors);
+	}
+
+	/**
+	 * Specifies the pyramid's structure.
+	 *
+	 * @param scaleFactors Change in scale factor for each layer in the pyramid.
+	 */
+	public void setScaleFactors( double ...scaleFactors ) {
+		this.scale = scaleFactors.clone();
+		checkScales();
+		layers = null;
 	}
 
 	@Override
 	public double getScale(int layer) {
 		return scale[layer];
+	}
+
+	@Override
+	public int getNumLayers() {
+		return scale.length;
 	}
 
 	@Override
@@ -65,7 +81,7 @@ public class ScaleSpacePyramid<T extends ImageBase> extends ImagePyramid<T> {
 		layers = (T[]) Array.newInstance(type, scale.length);
 		double scaleFactor = scale[0];
 
-		if (scale[0] == 1) {
+		if (scaleFactor == 1) {
 			if (!saveOriginalReference) {
 				layers[0] = generator.createInstance(bottomWidth, bottomHeight);
 			}
@@ -76,9 +92,8 @@ public class ScaleSpacePyramid<T extends ImageBase> extends ImagePyramid<T> {
 		}
 
 		for (int i = 1; i < scale.length; i++) {
-			scaleFactor *= scale[i];
-			int w = scaleLength(bottomWidth, scaleFactor);
-			int h = scaleLength(bottomHeight, scaleFactor);
+			int w = scaleLength(bottomWidth, scale[i]);
+			int h = scaleLength(bottomHeight, scale[i]);
 			layers[i] = generator.createInstance(w,h);
 		}
 	}

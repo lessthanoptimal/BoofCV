@@ -24,8 +24,8 @@ import java.lang.reflect.Array;
 
 /**
  * <p>
- * In this implementation the scale factor between each layer is limited to being a positive integer.
- * This added assumption allows further optimization to be performed.
+ * In this implementation the scale factor between each layer is limited to being a positive integer that is evenly
+ * divisible by the previous layer.  This added assumption allows further optimization to be performed.
  * </p>
  * @author Peter Abeles
  */
@@ -40,9 +40,31 @@ public class DiscreteImagePyramid<T extends ImageBase> extends ImagePyramid<T> {
 	 *
 	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of  copied.
 	 */
-	public DiscreteImagePyramid( boolean saveOriginalReference, PyramidUpdater<T> updater ,  int ...scale ) {
+	public DiscreteImagePyramid( boolean saveOriginalReference, PyramidUpdater<T> updater ,  int ...scaleFactors ) {
 		super(saveOriginalReference, updater);
-		this.scale = scale.clone();
+		setScaleFactors(scaleFactors);
+	}
+
+	/**
+	 * Specifies the pyramid's structure.
+	 *
+	 * @param scaleFactors Change in scale factor for each layer in the pyramid.
+	 */
+	public void setScaleFactors( int ...scaleFactors ) {
+		for( int i = 1; i < scaleFactors.length; i++ ){
+			if( scaleFactors[i] % scaleFactors[i-1] != 0 ) {
+				throw new IllegalArgumentException("Layer "+i+" is not evenly divisible by its lower layer.");
+			}
+		}
+
+		this.scale = scaleFactors.clone();
+		checkScales();
+		layers = null;
+	}
+
+	@Override
+	public int getNumLayers() {
+		return scale.length;
 	}
 
 	@Override
@@ -69,7 +91,7 @@ public class DiscreteImagePyramid<T extends ImageBase> extends ImagePyramid<T> {
 		}
 
 		for (int i = 1; i < scale.length; i++) {
-			scaleFactor *= scale[i];
+			scaleFactor = scale[i];
 			layers[i] = generator.createInstance(bottomWidth / scaleFactor, bottomHeight / scaleFactor);
 		}
 	}

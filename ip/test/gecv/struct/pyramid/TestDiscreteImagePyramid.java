@@ -34,7 +34,7 @@ public class TestDiscreteImagePyramid {
 	@Test
 	public void setScaling() {
 		// see if all the layers are set correctly
-		ImagePyramid<ImageUInt8> pyramid = new DiscreteImagePyramid<ImageUInt8>(true,new TestScaleSpacePyramid.DoNothingUpdater<ImageUInt8>(),1,2,2);
+		ImagePyramid<ImageUInt8> pyramid = new DiscreteImagePyramid<ImageUInt8>(true,new TestScaleSpacePyramid.DoNothingUpdater<ImageUInt8>(),1,2,4);
 
 		ImageUInt8 input = new ImageUInt8(width,height);
 		pyramid.update(input);
@@ -49,7 +49,7 @@ public class TestDiscreteImagePyramid {
 
 
 		// tell it to creates a new image in the first layer
-		pyramid = new DiscreteImagePyramid<ImageUInt8>(false,new TestScaleSpacePyramid.DoNothingUpdater<ImageUInt8>(),1,2,2);
+		pyramid = new DiscreteImagePyramid<ImageUInt8>(false,new TestScaleSpacePyramid.DoNothingUpdater<ImageUInt8>(),1,2,4);
 		pyramid.update(input);
 
 		assertTrue(null != pyramid.getLayer(0));
@@ -58,7 +58,7 @@ public class TestDiscreteImagePyramid {
 		assertEquals(height, pyramid.getLayer(0).height);
 
 		// try it with a scaling not equal to 1
-		pyramid = new DiscreteImagePyramid<ImageUInt8>(false,new TestScaleSpacePyramid.DoNothingUpdater<ImageUInt8>(),2,2);
+		pyramid = new DiscreteImagePyramid<ImageUInt8>(false,new TestScaleSpacePyramid.DoNothingUpdater<ImageUInt8>(),2,4);
 		pyramid.update(input);
 
 		assertEquals(width / 2, pyramid.getLayer(0).width);

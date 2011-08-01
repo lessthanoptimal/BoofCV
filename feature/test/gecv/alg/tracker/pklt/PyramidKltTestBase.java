@@ -59,7 +59,7 @@ public class PyramidKltTestBase {
 	int cornerY = 22;
 
 	public void setup() {
-		setup(1,2,2);
+		setup(1,2,4);
 	}
 
 	public void setup( int ...scales ) {

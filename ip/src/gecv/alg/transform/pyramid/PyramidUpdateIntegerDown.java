@@ -82,7 +82,7 @@ public class PyramidUpdateIntegerDown<T extends ImageBase> implements PyramidUpd
 		}
 
 		for (int index = 1; index < pyramid.layers.length; index++) {
-			int skip = pyramid.scale[index];
+			int skip = pyramid.scale[index]/pyramid.scale[index-1];
 			T prev = pyramid.layers[index-1];
 			temp.reshape(prev.width/skip,prev.height);
 

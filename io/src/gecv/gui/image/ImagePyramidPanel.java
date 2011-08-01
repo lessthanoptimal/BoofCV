@@ -66,7 +66,7 @@ public class ImagePyramidPanel<T extends ImageBase> extends ListDisplayPanel {
 
 		for( int i = 0; i < N; i++ ) {
 			BufferedImage b = ConvertBufferedImage.convertTo(pyramid.getLayer(i),null);
-			addImage(b,String.format("%5.2f",pyramid.getScalingAtLayer(i)));
+			addImage(b,String.format("%5.2f",pyramid.getScale(i)));
 		}
 	}
 
@@ -84,7 +84,7 @@ public class ImagePyramidPanel<T extends ImageBase> extends ListDisplayPanel {
 		for( int i = 0; i < N; i++ ) {
 			GeneralizedDistortImageOps.scale(pyramid.getLayer(i),upscale,interp);
 			BufferedImage b = ConvertBufferedImage.convertTo(upscale,null);
-			addImage(b,String.format("%5.2f",pyramid.getScalingAtLayer(i)));
+			addImage(b,String.format("%5.2f",pyramid.getScale(i)));
 		}
 	}
 }

@@ -74,7 +74,7 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 		config.config = configKLt;
 		config.typeInput = ImageUInt8.class;
 		config.typeDeriv = ImageSInt16.class;
-		config.pyramidScaling = new int[]{1,2,2,2};
+		config.pyramidScaling = new int[]{1,2,4,8};
 		config.imgWidth = image.width;
 		config.imgHeight = image.height;
 		config.minFeatures = 80;
