@@ -57,13 +57,10 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 	 * @param feature Feature's whose description is being setup.
 	 */
 	public void setDescription(PyramidKltFeature feature) {
-		float x = feature.x;
-		float y = feature.y;
-
 		for (int layer = 0; layer < image.getNumLayers(); layer++) {
 			float scale = (float)image.getScale(layer);
-			x /= scale;
-			y /= scale;
+			float x = feature.x / scale;
+			float y = feature.y /  scale;
 
 			setupKltTracker(layer);
 
@@ -107,20 +104,18 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 	public KltTrackFault track(PyramidKltFeature feature) {
 		boolean worked = false;
 
-		float x = feature.x;
-		float y = feature.y;
-
-
-		// estimate the position in the top most layer
-		float scaleAtTop = (float)image.getScalingAtLayer(feature.maxLayer);
-		x /= scaleAtTop;
-		y /= scaleAtTop;
-
 		// this is the first level it was able to track the feature at
 		int firstLevelTracked = -1;
 
+		float x = feature.x;
+		float y = feature.y;
+
 		// track from the top of the pyramid to the bottom
 		for (int layer = feature.maxLayer; layer >= 0; layer--) {
+			float scale = (float)image.getScale(layer);
+			x /= scale;
+			y /= scale;
+
 			setupKltTracker(layer);
 
 			feature.desc[layer].setPosition(x, y);
@@ -144,8 +139,6 @@ public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage ext
 				return ret;
 			}
 
-			// put the position estimate into the next layer
-			float scale = (float)image.getScale(layer);
 			x *= scale;
 			y *= scale;
 		}

@@ -16,10 +16,9 @@
 
 package gecv.struct.pyramid;
 
-import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -27,12 +26,30 @@ import static org.junit.Assert.assertEquals;
 public class TestImagePyramid {
 
 	@Test
-	public void getScalingAtLayer() {
-		ImagePyramid<ImageUInt8> pyramid = new DiscreteImagePyramid<ImageUInt8>(true,null,1,2,3);
+	public void checkScales() {
+		// rest a positive case
+		DiscreteImagePyramid pyramid = new DiscreteImagePyramid(false,null,1,2,4,8);
+		pyramid.checkScales();
 
+		// duplicate scale
+		try {
+			pyramid.setScaleFactors(1,2,2,4);
+			pyramid.checkScales();
+			fail("Exception should have been thrown");
+		} catch( IllegalArgumentException e ) {}
 
-		assertEquals(1,pyramid.getScalingAtLayer(0),1e-4);
-		assertEquals(2,pyramid.getScalingAtLayer(1),1e-4);
-		assertEquals(6,pyramid.getScalingAtLayer(2),1e-4);
+		// out of order scale
+		try {
+			pyramid.setScaleFactors(1,2,4,2);
+			pyramid.checkScales();
+			fail("Exception should have been thrown");
+		} catch( IllegalArgumentException e ) {}
+
+		// negative first out of order scale
+		try {
+			pyramid.setScaleFactors(-1,2,4,2);
+			pyramid.checkScales();
+			fail("Exception should have been thrown");
+		} catch( IllegalArgumentException e ) {}
 	}
 }

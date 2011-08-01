@@ -68,7 +68,7 @@ public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
 		ret.maxFeatures = 200;
 		ret.minFeatures = 100;
 		ret.featureRadius = 2;
-		ret.pyramidScaling = new int[]{1,2,2};
+		ret.pyramidScaling = new int[]{1,2,4};
 
 		return ret;
 	}
@@ -78,10 +78,6 @@ public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
 	 * @return Scale factor.
 	 */
 	public int computeScalingTop() {
-		int ret = 1;
-		for( int i = 0; i < pyramidScaling.length; i++ ) {
-			ret *= pyramidScaling[i];
-		}
-		return ret;
+		return pyramidScaling[ pyramidScaling.length-1];
 	}
 }

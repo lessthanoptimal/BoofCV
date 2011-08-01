@@ -39,8 +39,8 @@ public class TestFilterPyramid extends BasePyramidTests{
 		FilterPyramid<ImageFloat32,ImageFloat32> updater = new
 				FilterPyramid<ImageFloat32,ImageFloat32>(filter);
 
-		ImagePyramid<ImageFloat32> in = createPyramid(false,1,2,2);
-		ImagePyramid<ImageFloat32> out = createPyramid(false,1,2,2);
+		ImagePyramid<ImageFloat32> in = createPyramid(false,1,2,4);
+		ImagePyramid<ImageFloat32> out = createPyramid(false,1,2,4);
 		in.update(inputF32);
 		out.update(inputF32);
 

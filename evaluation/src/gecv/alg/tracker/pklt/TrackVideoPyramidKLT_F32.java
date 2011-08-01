@@ -73,7 +73,7 @@ public class TrackVideoPyramidKLT_F32 extends TrackVideoPyramidKLT<ImageFloat32,
 		config.config = configKLt;
 		config.typeInput = ImageFloat32.class;
 		config.typeDeriv = ImageFloat32.class;
-		config.pyramidScaling = new int[]{1,2,2,2};
+		config.pyramidScaling = new int[]{1,2,4,8};
 		config.imgWidth = image.width;
 		config.imgHeight = image.height;
 		config.minFeatures = 80;

@@ -39,9 +39,9 @@ public class VisualizeScaleSpaceApp {
 	public static void main( String args[] ) {
 		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32(3);
 
-		ss.setScales(1.2,2.4,3.6,4.8,6.0);
+		ss.setScales(1,1.2,2.4,3.6,4.8,6.0);
 
-		BufferedImage input = UtilImageIO.loadImage("evaluation/data/outdoors01.jpg");
+		BufferedImage input = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 
 		ss.setImage(inputF32);
