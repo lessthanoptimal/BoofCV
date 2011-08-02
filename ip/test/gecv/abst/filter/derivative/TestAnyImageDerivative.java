@@ -14,27 +14,23 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.gss;
+package gecv.abst.filter.derivative;
 
-import gecv.abst.filter.derivative.FactoryDerivative;
-import gecv.abst.filter.derivative.ImageGradient;
-import gecv.alg.filter.blur.BlurImageOps;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.derivative.GradientThree;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.SingleBandGenerator;
+import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Random;
 
-
 /**
  * @author Peter Abeles
  */
-public class TestNoCacheScaleSpace {
+public class TestAnyImageDerivative {
 
 	Random rand = new Random(234);
 	int width = 20;
@@ -44,34 +40,8 @@ public class TestNoCacheScaleSpace {
 
 	ImageFloat32 original = new ImageFloat32(width,height);
 
-	@Before
-	public void setup() {
-		GeneralizedImageOps.randomize(original,rand,0,40);
-	}
-
 	@Test
-	public void getScaledImage() {
-		NoCacheScaleSpace<ImageFloat32,ImageFloat32> alg =
-				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(generator,generator,3);
-
-		int radius = FactoryKernelGaussian.radiusForSigma(1.2);
-		ImageFloat32 expected = BlurImageOps.gaussian(original,null,1.2,radius,null);
-
-		alg.setScales(1.2,2.3,3.5);
-		alg.setImage(original);
-		alg.setActiveScale(0);
-		ImageFloat32 found = alg.getScaledImage();
-
-		GecvTesting.assertEquals(expected,found,0,1e-4);
-	}
-
-	@Test
-	public void getDerivative() {
-		NoCacheScaleSpace<ImageFloat32,ImageFloat32> alg =
-				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(generator,generator,3);
-
-		double target = 2.3;
-
+	public void test() {
 		ImageGradient<ImageFloat32,ImageFloat32> g =  FactoryDerivative.three_F32();
 
 		ImageFloat32 derivX = new ImageFloat32(width,height);
@@ -83,15 +53,16 @@ public class TestNoCacheScaleSpace {
 		ImageFloat32 derivYYX = new ImageFloat32(width,height);
 		ImageFloat32 derivYYY = new ImageFloat32(width,height);
 
-		alg.setScales(1.2,target,3.5);
-		alg.setImage(original);
-		alg.setActiveScale(1);
-
-		g.process(alg.getScaledImage(),derivX,derivY);
+		GeneralizedImageOps.randomize(original,rand,0,40);
+		g.process(original,derivX,derivY);
 		g.process(derivX,derivXX,derivXY);
 		g.process(derivY,derivYX,derivYY);
 		g.process(derivYY,derivYYX,derivYYY);
 
+		Kernel1D_F32 kernelX = (Kernel1D_F32)GradientThree.getKernelX(false);
+
+		AnyImageDerivative<ImageFloat32,ImageFloat32> alg = new AnyImageDerivative<ImageFloat32,ImageFloat32>(kernelX,ImageFloat32.class,generator);
+		alg.setInput(original);
 
 		// do one out of order which will force it to meet all the dependencies
 		GecvTesting.assertEquals(derivYYY,alg.getDerivative(false,false,false),0,1e-4);

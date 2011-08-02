@@ -191,16 +191,11 @@ public class FactoryKernelGaussian {
 	 * @param normalize If the kernel should be normalized to one or not.
 	 */
 	public static Kernel2D_F32 gaussian2D_F32(double sigma, int radius, boolean normalize) {
-		float[] a = gaussian1D_F32(sigma, radius, normalize).data;
+		Kernel1D_F32 kernel1D = gaussian1D_F32(sigma,radius,false);
+		Kernel2D_F32 ret = FactoryKernel.convolve(kernel1D,kernel1D);
 
-		Kernel2D_F32 ret = new Kernel2D_F32(radius * 2 + 1);
-		float[] data = ret.data;
-
-		int index = 0;
-		for (int i = 0; i < a.length; i++) {
-			for (int j = 0; j < a.length; j++) {
-				data[index++] = a[i] * a[j];
-			}
+		if (normalize) {
+			FactoryKernel.normalizeSumToOne(ret);
 		}
 
 		return ret;

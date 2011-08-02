@@ -22,6 +22,7 @@ import gecv.alg.filter.derivative.impl.GradientSobel_Outer;
 import gecv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.core.image.border.ImageBorder_I32;
+import gecv.struct.convolve.Kernel2D;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -66,6 +67,16 @@ public class GradientSobel {
 			new float[]{-0.25f,0,0.25f,-0.5f,0,0.5f,-0.25f,0,0.25f},3);
 	public static Kernel2D_F32 kernelDerivY_F32 = new Kernel2D_F32(
 			new float[]{-0.25f,-0.5f,-0.25f,0,0,0,0.25f,0.5f,0.25f},3);
+
+	/**
+	 * Returns the kernel for computing the derivative along the x-axis.
+	 */
+	public static Kernel2D getKernelX( boolean isInteger ) {
+		if( isInteger )
+			return kernelDerivX_I32;
+		else
+			return kernelDerivX_F32;
+	}
 
 	/**
 	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.

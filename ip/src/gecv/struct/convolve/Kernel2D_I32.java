@@ -106,4 +106,8 @@ public class Kernel2D_I32 extends Kernel2D {
 		}
 		return total;
 	}
+
+	public void set(int x, int y, int value) {
+		data[y * width + x] = value;
+	}
 }

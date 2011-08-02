@@ -68,15 +68,18 @@ public class PyramidUpdateGaussianScale< T extends ImageBase> implements Pyramid
 			T prev = i == 0 ? input : imagePyramid.getLayer(i-1);
 			T layer = imagePyramid.getLayer(i);
 
-			float s = (float)imagePyramid.scale[i];
+			float s;
+			if( i > 0 )
+				s = (float)(imagePyramid.scale[i]/imagePyramid.scale[i-1]);
+			else
+				s = (float)imagePyramid.scale[0];
 
 			BlurStorageFilter<T> blur = (BlurStorageFilter<T>)FactoryBlurFilter.gaussian(layer.getClass(),s,-1);
 
 			tempImage.reshape(prev.width,prev.height);
 			blur.process(prev,tempImage);
-			interpolate.setImage(tempImage);
 
-			GeneralizedDistortImageOps.scale(prev,layer,interpolate);
+			GeneralizedDistortImageOps.scale(tempImage,layer,interpolate);
 		}
 	}
 }
