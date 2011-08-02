@@ -20,6 +20,7 @@ import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.derivative.impl.GradientThree_Standard;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.core.image.border.ImageBorder_I32;
+import gecv.struct.convolve.Kernel1D;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
@@ -46,6 +47,17 @@ public class GradientThree {
 
 	public static Kernel1D_I32 kernelDeriv_I32 = new Kernel1D_I32(3,-1,0,1);
 	public static Kernel1D_F32 kernelDeriv_F32 = new Kernel1D_F32(new float[]{-0.5f,0,0.5f},3);
+
+	/**
+	 * Returns the kernel for computing the derivative along the x-axis.
+	 */
+	public static Kernel1D getKernelX( boolean isInteger ) {
+		if( isInteger )
+			return kernelDeriv_I32;
+		else
+			return kernelDeriv_F32;
+	}
+
 	/**
 	 * Computes the derivative of an {@link gecv.struct.image.ImageUInt8} along the x and y axes.
 	 *

@@ -18,7 +18,10 @@ package gecv.alg.transform.gss;
 
 import gecv.abst.filter.convolve.ConvolveInterface;
 import gecv.abst.filter.convolve.FactoryConvolve;
+import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.derivative.GradientThree;
+import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.border.BorderType;
 import gecv.struct.GecvDefaults;
@@ -47,33 +50,14 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 	private ImageGenerator<I> inputGen;
 	private ImageGenerator<D> derivGen;
 
-	// gaussian blur the input image
-	private ConvolveInterface<I, I> blurX;
-	private ConvolveInterface<I, I> blurY;
-
-	// gaussian blur the derivative image
-	private ConvolveInterface<D, D> blurDerivX;
-	private ConvolveInterface<D, D> blurDerivY;
-
-	// filters for computing image derivatives
-	private ConvolveInterface<I, D> derivX_H;
-	private ConvolveInterface<I, D> derivY_V;
-
-	// gaussian blur the derivative image
-	private ConvolveInterface<D, D> derivDerivX_H;
-	private ConvolveInterface<D, D> derivDerivY_V;
+	AnyImageDerivative<I,D> anyDeriv;
 
 	private double scales[];
 	private int currentScale;
 
 	private I workImage;
-	private D workImageD;
 	private I scaledImage;
 
-	// stores computed derivative images
-	private D[][] derivatives;
-	// if true then 
-	private boolean[][] stale;
 
 	// how the borders are handled
 	BorderType borderDeriv = GecvDefaults.DERIV_BORDER_TYPE;
@@ -91,17 +75,13 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 		this.inputGen = inputGen;
 		this.derivGen = derivGen;
 
-		derivatives = (D[][])new ImageBase[maxDerivativeOrder][];
-		stale = new boolean[maxDerivativeOrder][];
+		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(inputGen.getType());
 
-		for( int i = 0; i < maxDerivativeOrder; i++) {
-			int N = (int)Math.pow(2,i+1);
-			derivatives[i] = (D[])new ImageBase[N];
-			stale[i] = new boolean[N];
-			for( int j = 0; j < N; j++ ) {
-				stale[i][j] = true;
-			}
-		}
+		// compute image using a kernel which does not involve any additional blurring
+		// Using a Gaussian kernel is equivalent to blurring the image an additional time then computing the derivative
+		// Other derivatives such as Sobel and Prewitt also blur the image.   Image bluing has already been done
+		// once before the derivative is computed.
+		anyDeriv = new AnyImageDerivative<I,D>(GradientThree.getKernelX(isInteger),inputGen.getType(),derivGen);
 	}
 
 	@Override
@@ -116,7 +96,6 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 		if( scaledImage == null ) {
 			scaledImage = inputGen.createInstance(input.getWidth(),input.getHeight());
 			workImage = inputGen.createInstance(input.getWidth(),input.getHeight());
-			workImageD = derivGen.createInstance(input.getWidth(),input.getHeight());
 		}
 	}
 
@@ -127,33 +106,17 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 		int radius = FactoryKernelGaussian.radiusForSigma(sigma);
 
 		Class<I> inputType = inputGen.getType();
-		Class<D> derivType = derivGen.getType();
 
 		Kernel1D kernel = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
-		Kernel1D kernelDeriv = FactoryKernelGaussian.gaussianDerivative1D(inputType,sigma,radius+1);
 
-		derivX_H = FactoryConvolve.convolve(kernelDeriv,inputType,derivType, borderDeriv,true);
-		derivY_V = FactoryConvolve.convolve(kernelDeriv,inputType,derivType, borderDeriv,false);
-
-		derivDerivX_H = FactoryConvolve.convolve(kernelDeriv,derivType,derivType, borderDeriv,true);
-		derivDerivY_V = FactoryConvolve.convolve(kernelDeriv,derivType,derivType, borderDeriv,false);
-
-		blurX = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur ,true);
-		blurY = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur ,false);
-
-		blurDerivX = FactoryConvolve.convolve(kernel,derivType,derivType, borderBlur ,true);
-		blurDerivY = FactoryConvolve.convolve(kernel,derivType,derivType, borderBlur ,false);
+		ConvolveInterface<I, I> blurX = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur ,true);
+		ConvolveInterface<I, I> blurY = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur ,false);
 
 		// compute the scale image
 		blurX.process(originalImage,workImage);
 		blurY.process(workImage,scaledImage);
 
-		// set the derivatives to be stale
-		for( int i = 0; i < stale.length; i++) {
-			for( int j = 0; j < stale[i].length; j++ ) {
-				stale[i][j] = true;
-			}
-		}
+		anyDeriv.setInput(scaledImage);
 	}
 
 	@Override
@@ -189,42 +152,6 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 	 */
 	@Override
 	public D getDerivative(boolean... isX) {
-		if( isX.length > stale.length )
-			throw new IllegalArgumentException("The derivatives degree is too great");
-
-		int index = 0;
-		int prevIndex = 0;
-		for( int level = 0; level < isX.length; level++ ) {
-			index |= isX[level] ? 0 : 1 << level;
-
-			if( stale[level][index] ) {
-				stale[level][index] = false;
-				if( derivatives[level][index] == null ) {
-					derivatives[level][index] = derivGen.createInstance(originalImage.getWidth(),originalImage.getHeight());
-				}
-
-				if( level == 0 ) {
-					if( isX[level]) {
-						blurY.process(originalImage,workImage);
-						derivX_H.process(workImage,derivatives[level][index]);
-					} else {
-						blurX.process(originalImage,workImage);
-						derivY_V.process(workImage,derivatives[level][index]);
-					}
-				} else {
-					D prev = derivatives[level-1][prevIndex];
-					if( isX[level]) {
-						blurDerivY.process(prev,workImageD);
-						derivDerivX_H.process(workImageD,derivatives[level][index]);
-					} else {
-						blurDerivX.process(prev,workImageD);
-						derivDerivY_V.process(workImageD,derivatives[level][index]);
-					}
-				}
-			}
-			prevIndex = index;
-		}
-
-		return derivatives[isX.length-1][index];
+		return anyDeriv.getDerivative(isX);
 	}
 }

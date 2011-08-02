@@ -44,8 +44,6 @@ public class TestPyramidUpdateIntegerDown extends BasePyramidTests {
 	 */
 	@Test
 	public void saveOriginalReference() {
-
-
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(3, true);
 		PyramidUpdateIntegerDown<ImageFloat32> alg = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 

@@ -31,11 +31,11 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DetectCornerLaplaceFeaturesApp {
+public class DetectFeatureLaplaceScaleSpaceApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-	static String fileName = "evaluation/data/sunflowers.png";
-//	static String fileName = "evaluation/data/scale/beach02.jpg";
+//	static String fileName = "evaluation/data/sunflowers.png";
+	static String fileName = "evaluation/data/scale/beach02.jpg";
 	
 	static int NUM_FEATURES = 100;
 

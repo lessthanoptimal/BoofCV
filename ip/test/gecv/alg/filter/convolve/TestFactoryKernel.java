@@ -126,9 +126,21 @@ public class TestFactoryKernel {
 	}
 
 	@Test
-	public void transpose() {
+	public void transpose_F32() {
 		Kernel2D_F32 a = FactoryKernel.random2D_F32(2, -2, 2, rand);
 		Kernel2D_F32 b = FactoryKernel.transpose(a);
+
+		for( int i = 0; i < a.width; i++ ) {
+			for( int j = 0; j < a.width; j++ ) {
+				assertEquals(a.get(i,j),b.get(j,i),1e-4);
+			}
+		}
+	}
+
+	@Test
+	public void transpose_I32() {
+		Kernel2D_I32 a = FactoryKernel.random2D_I32(2, -2, 2, rand);
+		Kernel2D_I32 b = FactoryKernel.transpose(a);
 
 		for( int i = 0; i < a.width; i++ ) {
 			for( int j = 0; j < a.width; j++ ) {
@@ -147,5 +159,19 @@ public class TestFactoryKernel {
 
 		for (int i = 0; i < 3; i++)
 			assertEquals(kernel.data[i], 2.0F / 6.0f, 1e-4);
+	}
+
+	@Test
+	public void convolve_1D() {
+		Kernel1D_F32 k1 = FactoryKernel.random1D_F32(2,-1,1,rand);
+		Kernel1D_F32 k2 = FactoryKernel.random1D_F32(2,-1,1,rand);
+
+		Kernel2D_F32 c = FactoryKernel.convolve(k1,k2);
+
+		for( int i = 0; i < 5; i++ ) {
+			for( int j = 0; j < 5; j++ ) {
+				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-4);
+			}
+		}
 	}
 }

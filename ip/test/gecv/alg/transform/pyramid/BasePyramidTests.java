@@ -33,12 +33,12 @@ import java.util.Random;
  */
 public class BasePyramidTests {
 
-	Random rand = new Random(234);
-	int width = 50;
-	int height = 40;
+	protected Random rand = new Random(234);
+	protected int width = 50;
+	protected int height = 40;
 
-	ImageFloat32 inputF32;
-	ImageUInt8 inputU8;
+	protected ImageFloat32 inputF32;
+	protected ImageUInt8 inputU8;
 
 	@Before
 	public void setup() {
