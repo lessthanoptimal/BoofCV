@@ -31,14 +31,14 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DetectFeatureLaplaceScaleSpaceApp {
+public class DetectFeatureScaleSpaceApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
 //	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
-	static String fileName = "evaluation/data/indoors01.jpg";
-//	static String fileName = "evaluation/data/shapes01.png";
+//	static String fileName = "evaluation/data/indoors01.jpg";
+	static String fileName = "evaluation/data/shapes01.png";
 
 	static int NUM_FEATURES = 50;
 
@@ -47,12 +47,12 @@ public class DetectFeatureLaplaceScaleSpaceApp {
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 
 		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
-		ss.setScales(1,2,4,8,12);
+		ss.setScales(0.5,1,2,4,8,10,12,16,30,40);
 		ss.setImage(inputF32);
 
 		int r = 2;
-//		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
-		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+		FeatureScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianScaleSpace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+//		FeatureScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisScaleSpace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 
 		det.detect(ss);
 
@@ -60,7 +60,7 @@ public class DetectFeatureLaplaceScaleSpaceApp {
 		panel.setBackground(input);
 		panel.setPoints(det.getInterestPoints());
 
-		ShowImages.showWindow(panel,"Feature Laplace Scale Space");
+		ShowImages.showWindow(panel,"Feature Scale Space");
 		System.out.println("Done");
 	}
 }

@@ -20,8 +20,6 @@ import gecv.abst.filter.convolve.ConvolveInterface;
 import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.alg.filter.convolve.FactoryKernelGaussian;
-import gecv.alg.filter.derivative.GradientThree;
-import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.border.BorderType;
 import gecv.struct.GecvDefaults;
@@ -39,7 +37,6 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-// todo remove the need to specify max derivative
 public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 		implements GaussianScaleSpace<I,D>
 {
@@ -48,7 +45,6 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 
 	// types of input images
 	private ImageGenerator<I> inputGen;
-	private ImageGenerator<D> derivGen;
 
 	AnyImageDerivative<I,D> anyDeriv;
 
@@ -68,25 +64,20 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 	 *
 	 * @param inputGen Used to create image of the same type as the input.
 	 * @param derivGen Used to create derivative images.
-	 * @param maxDerivativeOrder The maximum derivative order which can be computed.
 	 */
-	public NoCacheScaleSpace(ImageGenerator<I> inputGen, ImageGenerator<D> derivGen,
-							 int maxDerivativeOrder ) {
+	public NoCacheScaleSpace(ImageGenerator<I> inputGen, ImageGenerator<D> derivGen ) {
 		this.inputGen = inputGen;
-		this.derivGen = derivGen;
-
-		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(inputGen.getType());
-
-		// compute image using a kernel which does not involve any additional blurring
-		// Using a Gaussian kernel is equivalent to blurring the image an additional time then computing the derivative
-		// Other derivatives such as Sobel and Prewitt also blur the image.   Image bluing has already been done
-		// once before the derivative is computed.
-		anyDeriv = new AnyImageDerivative<I,D>(GradientThree.getKernelX(isInteger),inputGen.getType(),derivGen);
+		anyDeriv = UtilScaleSpace.createDerivatives(inputGen.getType(),derivGen);
 	}
 
 	@Override
 	public void setScales(double... scales) {
 		this.scales = scales;
+	}
+
+	@Override
+	public double getScale(int level) {
+		return scales[level];
 	}
 
 	@Override

@@ -158,6 +158,8 @@ public class AnyImageDerivative<I extends ImageBase , D extends ImageBase> {
 				stale[level][index] = false;
 				if( derivatives[level][index] == null ) {
 					derivatives[level][index] = derivGen.createInstance(inputImage.getWidth(),inputImage.getHeight());
+				} else {
+					derivatives[level][index].reshape(inputImage.getWidth(),inputImage.getHeight());
 				}
 
 				if( level == 0 ) {

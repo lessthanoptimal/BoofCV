@@ -87,7 +87,7 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 		detector.process(image.getLayer(0),derivX.getLayer(0),derivY.getLayer(0),null,null,null);
 
 		// extract the features
-		QueueCorner found = detector.getCorners();
+		QueueCorner found = detector.getFeatures();
 
 		for( int i = 0; i < found.size() && !availableData.isEmpty(); i++ ) {
 			Point2D_I16 pt = found.get(i);

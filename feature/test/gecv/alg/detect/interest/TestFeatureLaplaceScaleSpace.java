@@ -57,7 +57,7 @@ public class TestFeatureLaplaceScaleSpace {
 		ImageFloat32 input = new ImageFloat32(width,height);
 		GeneralizedImageOps.fillRectangle(input,20,10,10,width,height);
 
-		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32(3);
+		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
 		ss.setScales(1,2,3,4);
 
 		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(r,5,r*2,false,false,false);

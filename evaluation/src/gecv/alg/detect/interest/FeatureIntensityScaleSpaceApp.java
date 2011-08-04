@@ -39,25 +39,29 @@ import java.awt.image.BufferedImage;
 public class FeatureIntensityScaleSpaceApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-	static String fileName = "evaluation/data/sunflowers.png";
+//	static String fileName = "evaluation/data/sunflowers.png";
+//	static String fileName = "evaluation/data/particles01.jpg";
+//	static String fileName = "evaluation/data/scale/beach02.jpg";
+//	static String fileName = "evaluation/data/indoors01.jpg";
+	static String fileName = "evaluation/data/shapes01.png";
 
 	public static void main( String args[] ) {
-		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32(3);
+		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
 
-		double scales[] = new double[21];
+		double scales[] = new double[31];
 		for( int i = 0; i < scales.length ; i++ ) {
-			scales[i] =  Math.exp(1.0+i*0.1);
+			scales[i] =  Math.exp(i*0.15);
 		}
 		ss.setScales(scales);
 
 
 		GeneralFeatureIntensity<ImageFloat32, ImageFloat32> intensity;
-		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.DETERMINANT,ImageFloat32.class);
+//		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.DETERMINANT,ImageFloat32.class);
+		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.TRACE,ImageFloat32.class);
 //		intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
 //				FactoryCornerIntensity.createHarris(ImageFloat32.class,2,0.4f));
 //		intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
 //				FactoryCornerIntensity.createKlt(ImageFloat32.class,2));
-//		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.TRACE,ImageFloat32.class);
 //		intensity = new WrapperFastCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createFast12(ImageFloat32.class,5,11));
 //		intensity = new WrapperKitRosCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKitRos(ImageFloat32.class));
 //		intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createHarris(ImageFloat32.class,2,0.04f));

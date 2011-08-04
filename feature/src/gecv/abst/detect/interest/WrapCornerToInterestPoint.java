@@ -82,7 +82,7 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 
 		detector.process(input,derivX,derivY,derivXX,derivYY,derivXY);
 
-		QueueCorner corners = detector.getCorners();
+		QueueCorner corners = detector.getFeatures();
 
 		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
 		for( int i = 0; i < corners.num; i++ ) {

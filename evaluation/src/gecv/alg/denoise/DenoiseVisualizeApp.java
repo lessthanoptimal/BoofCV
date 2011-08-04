@@ -23,7 +23,7 @@ import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.denoise.wavelet.DenoiseSureShrink_F32;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.misc.PixelMath;
-import gecv.alg.transform.wavelet.FactoryWaveletDaub;
+import gecv.alg.transform.wavelet.FactoryWaveletCoiflet;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.border.BorderType;
 import gecv.gui.image.ListDisplayPanel;
@@ -45,7 +45,7 @@ import java.util.Random;
 public class DenoiseVisualizeApp {
 
 	// amount of noise added to the test images
-	float noiseSigma = 20;
+	float noiseSigma = 0;
 
 	Random rand = new Random(2234);
 	ImageFloat32 image;
@@ -57,9 +57,9 @@ public class DenoiseVisualizeApp {
 	BorderType borderType = BorderType.REFLECT;
 
 //	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletHaar.generate_F32();
-	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.daubJ_F32(4);
+//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.daubJ_F32(4);
 //	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.biorthogonal_F32(5,borderType);
-//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletCoiflet.generate_F32(6);
+	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletCoiflet.generate_F32(6);
 
 	WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32> waveletTran = FactoryWaveletTransform.create_F32(waveletDesc,numLevels);
 
@@ -67,7 +67,9 @@ public class DenoiseVisualizeApp {
 //	DenoiseWavelet denoiser = new DenoiseBayesShrink_F32();
 	DenoiseWavelet denoiser = new DenoiseSureShrink_F32();
 
-	String imagePath = "evaluation/data/standard/barbara.png";
+//	String imagePath = "evaluation/data/standard/barbara.png";
+	String imagePath = "evaluation/data/particles01.jpg";
+
 	FilterImageInterface<ImageFloat32,ImageFloat32> filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,denoiser);
 
 	public void process() {

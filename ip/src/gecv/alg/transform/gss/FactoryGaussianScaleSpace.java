@@ -29,24 +29,24 @@ import gecv.struct.image.ImageUInt8;
  */
 public class FactoryGaussianScaleSpace {
 
-	public static NoCacheScaleSpace<?,?> nocache( Class<?> imageType , int maxDeriv ) {
+	public static NoCacheScaleSpace<?,?> nocache( Class<?> imageType  ) {
 		if( imageType == ImageFloat32.class ) {
-			return nocache_F32(maxDeriv);
+			return nocache_F32();
 		} else if( imageType == ImageUInt8.class ) {
-			return nocache_U8(maxDeriv);
+			return nocache_U8();
 		} else {
 			throw new IllegalArgumentException("Doesn't handle "+imageType.getSimpleName()+" yet.");
 		}
 	}
 
-	public static NoCacheScaleSpace<ImageFloat32,ImageFloat32> nocache_F32( int maxDeriv ) {
+	public static NoCacheScaleSpace<ImageFloat32,ImageFloat32> nocache_F32() {
 		ImageGenerator<ImageFloat32> imageGen = new SingleBandGenerator<ImageFloat32>(ImageFloat32.class);
-		return new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(imageGen,imageGen,maxDeriv);
+		return new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(imageGen,imageGen);
 	}
 
-	public static NoCacheScaleSpace<ImageUInt8, ImageSInt16> nocache_U8( int maxDeriv ) {
+	public static NoCacheScaleSpace<ImageUInt8, ImageSInt16> nocache_U8() {
 		ImageGenerator<ImageUInt8> imageGen = new SingleBandGenerator<ImageUInt8>(ImageUInt8.class);
 		ImageGenerator<ImageSInt16> derivGen = new SingleBandGenerator<ImageSInt16>(ImageSInt16.class);
-		return new NoCacheScaleSpace<ImageUInt8,ImageSInt16>(imageGen,derivGen,maxDeriv);
+		return new NoCacheScaleSpace<ImageUInt8,ImageSInt16>(imageGen,derivGen);
 	}
 }

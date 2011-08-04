@@ -74,7 +74,7 @@ public class BenchmarkCornerAccuracy {
 
 		detector.process(image,derivX,derivY,derivXX,derivYY,derivXY);
 
-		QueueCorner corners = detector.getCorners();
+		QueueCorner corners = detector.getFeatures();
 
 		evaluate(corners,detector.getIntensity(), name );
 	}

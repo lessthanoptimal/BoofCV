@@ -37,7 +37,7 @@ public class VisualizeScaleSpaceApp {
 
 
 	public static void main( String args[] ) {
-		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32(3);
+		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
 
 		ss.setScales(1,1.2,2.4,3.6,4.8,6.0);
 

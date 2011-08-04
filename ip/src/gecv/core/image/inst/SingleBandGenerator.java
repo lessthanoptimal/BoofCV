@@ -19,6 +19,7 @@ package gecv.core.image.inst;
 import gecv.core.image.ImageGenerator;
 import gecv.struct.image.ImageBase;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -42,6 +43,11 @@ public class SingleBandGenerator<T extends ImageBase> implements ImageGenerator<
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public T[] createArray(int number) {
+		return (T[])Array.newInstance(type,number);
 	}
 
 	@Override

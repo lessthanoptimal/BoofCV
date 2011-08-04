@@ -52,7 +52,7 @@ public class TestNoCacheScaleSpace {
 	@Test
 	public void getScaledImage() {
 		NoCacheScaleSpace<ImageFloat32,ImageFloat32> alg =
-				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(generator,generator,3);
+				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(generator,generator);
 
 		int radius = FactoryKernelGaussian.radiusForSigma(1.2);
 		ImageFloat32 expected = BlurImageOps.gaussian(original,null,1.2,radius,null);
@@ -68,7 +68,7 @@ public class TestNoCacheScaleSpace {
 	@Test
 	public void getDerivative() {
 		NoCacheScaleSpace<ImageFloat32,ImageFloat32> alg =
-				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(generator,generator,3);
+				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(generator,generator);
 
 		double target = 2.3;
 

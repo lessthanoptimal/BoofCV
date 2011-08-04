@@ -44,6 +44,11 @@ public interface GaussianScaleSpace<T extends ImageBase, D extends ImageBase> {
 	public void setScales( double ... scales);
 
 	/**
+	 * Returns the scale for the specified layer in the pyramid.
+	 */
+	public double getScale( int level );
+
+	/**
 	 * The original un-scaled image.
 	 *
 	 * @param input Original image.

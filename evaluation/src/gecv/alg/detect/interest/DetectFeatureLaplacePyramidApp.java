@@ -16,12 +16,14 @@
 
 package gecv.alg.detect.interest;
 
-import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
+import gecv.alg.interpolate.FactoryInterpolation;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.gui.feature.ScaleSpacePointPanel;
+import gecv.gui.feature.ScaleSpacePyramidPointPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.gss.GaussianScaleSpace;
+import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageFloat32;
 
 import java.awt.image.BufferedImage;
@@ -31,14 +33,13 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DetectFeatureLaplaceScaleSpaceApp {
+public class DetectFeatureLaplacePyramidApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
 //	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
-	static String fileName = "evaluation/data/indoors01.jpg";
-//	static String fileName = "evaluation/data/shapes01.png";
+	static String fileName = "evaluation/data/shapes01.png";
 
 	static int NUM_FEATURES = 50;
 
@@ -46,21 +47,22 @@ public class DetectFeatureLaplaceScaleSpaceApp {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 
-		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
-		ss.setScales(1,2,4,8,12);
-		ss.setImage(inputF32);
+		InterpolatePixel<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		PyramidUpdateGaussianScale<ImageFloat32> update = new PyramidUpdateGaussianScale<ImageFloat32>(interpolate);
+		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(update,1,2,4,8,10,12,16,30,40);
 
 		int r = 2;
-//		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
-		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisLaplace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+		FeatureLaplacePyramid<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianLaplacePyramid(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+//		FeatureLaplacePyramid<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisLaplacePyramid(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 
+		ss.update(inputF32);
 		det.detect(ss);
 
-		ScaleSpacePointPanel panel = new ScaleSpacePointPanel(ss,r);
+		ScaleSpacePyramidPointPanel panel = new ScaleSpacePyramidPointPanel(ss,r);
 		panel.setBackground(input);
 		panel.setPoints(det.getInterestPoints());
 
-		ShowImages.showWindow(panel,"Feature Laplace Scale Space");
+		ShowImages.showWindow(panel,"Feature Laplace Pyramid");
 		System.out.println("Done");
 	}
 }
