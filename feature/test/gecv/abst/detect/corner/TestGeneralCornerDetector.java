@@ -92,7 +92,7 @@ public class TestGeneralCornerDetector {
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
 		// two features are added by the extractor
-		assertEquals(2,detector.getCorners().size());
+		assertEquals(2,detector.getFeatures().size());
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class TestGeneralCornerDetector {
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
 		// it should select only one of the two features to return
-		assertEquals(1,detector.getCorners().size());
+		assertEquals(1,detector.getFeatures().size());
 	}
 
 	/**
@@ -126,15 +126,15 @@ public class TestGeneralCornerDetector {
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
 		// two features are added by the extractor
-		assertEquals(2,detector.getCorners().size());
+		assertEquals(2,detector.getFeatures().size());
 		// it should now create an n-best select
 		detector.setBestNumber(1);
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
-		assertEquals(1,detector.getCorners().size());
+		assertEquals(1,detector.getFeatures().size());
 		// it should now return all two features
 		detector.setBestNumber(2);
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
-		assertEquals(2,detector.getCorners().size());
+		assertEquals(2,detector.getFeatures().size());
 	}
 
 	public class HelperExtractor implements FeatureExtractor

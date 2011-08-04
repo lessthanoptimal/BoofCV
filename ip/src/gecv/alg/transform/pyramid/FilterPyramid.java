@@ -29,7 +29,6 @@ import gecv.struct.pyramid.ImagePyramid;
  */
 public class FilterPyramid<In extends ImageBase , Out extends ImageBase> {
 
-
 	protected FilterImageInterface<In,Out> filter;
 
 	public FilterPyramid(FilterImageInterface<In, Out> filter ) {

@@ -27,6 +27,8 @@ import org.junit.Test;
 
 import java.util.Random;
 
+import static org.junit.Assert.fail;
+
 /**
  * @author Peter Abeles
  */
@@ -39,6 +41,11 @@ public class TestAnyImageDerivative {
 	ImageGenerator<ImageFloat32> generator = new SingleBandGenerator<ImageFloat32>(ImageFloat32.class);
 
 	ImageFloat32 original = new ImageFloat32(width,height);
+
+	@Test
+	public void changeInputImageSize() {
+		fail("failed");
+	}
 
 	@Test
 	public void test() {

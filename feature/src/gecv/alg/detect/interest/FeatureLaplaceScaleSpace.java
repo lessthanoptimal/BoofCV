@@ -35,11 +35,18 @@ import java.util.List;
  * </p>
  *
  * <p>
+ * NOTE: While a bit vague [1] most likely was referring to a pyramid approach not the scale-space approach.
+ * </p>
+ *
+ * <p>
  * [1] Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"  ICCV 2001. Proceedings.
  * </p>
  *
  * @author Peter Abeles
  */
+// todo use similar local mechanism as FeaturePyramid
+// todo check 3x3x3 neighborhood
+// todo create a FeatureScaleSpace algorithm
 @SuppressWarnings({"unchecked"})
 public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> {
 
@@ -175,7 +182,7 @@ public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> 
 	 * Checks to see the candidate feature points are a local maximum in the Laplacian's scale-space.
 	 */
 	private void checkMaxInScaleSpace() {
-		QueueCorner corners = detector.getCorners();
+		QueueCorner corners = detector.getFeatures();
 
 		double l0,l1,l2;
 		// set values to -1 so if its at the extreme edge of scale-space the value is ignored

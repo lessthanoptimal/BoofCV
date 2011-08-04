@@ -14,21 +14,18 @@
  *    limitations under the License.
  */
 
-package gecv.core.image;
+package gecv.alg.transform.pyramid;
 
-import gecv.struct.image.ImageBase;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 /**
- * Creates a new instance of an image of a specific configuration.
- *
  * @author Peter Abeles
  */
-public interface ImageGenerator<T extends ImageBase> {
-
-	public T[] createArray( int number );
-
-	public T createInstance( int width , int height );
-
-	public Class<T> getType();
+public class TestCompanionPyramid {
+	@Test
+	public void test() {
+		fail("implement tests");
+	}
 }

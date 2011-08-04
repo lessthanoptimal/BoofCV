@@ -51,17 +51,17 @@ public abstract class SsdCorner_S16 implements GradientCornerIntensity<ImageSInt
 	protected int radius;
 
 	// temporary storage for intensity derivatives summations
-	private ImageSInt32 horizXX;
-	private ImageSInt32 horizXY;
-	private ImageSInt32 horizYY;
+	private ImageSInt32 horizXX = new ImageSInt32(1,1);
+	private ImageSInt32 horizXY = new ImageSInt32(1,1);
+	private ImageSInt32 horizYY = new ImageSInt32(1,1);
 
 	// temporary storage for convolution along in the vertical axis.
-	private int tempXX[];
-	private int tempXY[];
-	private int tempYY[];
+	private int tempXX[] = new int[1];
+	private int tempXY[] = new int[1];
+	private int tempYY[] = new int[1];
 
 	// the intensity of the found features in the image
-	private ImageFloat32 featureIntensity;
+	private ImageFloat32 featureIntensity = new ImageFloat32(1,1);
 
 	// defines the A matrix, from which the eignevalues are computed
 	protected int totalXX, totalYY, totalXY;
@@ -74,15 +74,17 @@ public abstract class SsdCorner_S16 implements GradientCornerIntensity<ImageSInt
 	}
 
 	public void setImageShape( int imageWidth, int imageHeight ) {
-		horizXX = new ImageSInt32(imageWidth, imageHeight);
-		horizYY = new ImageSInt32(imageWidth, imageHeight);
-		horizXY = new ImageSInt32(imageWidth, imageHeight);
+		horizXX.reshape(imageWidth,imageHeight);
+		horizYY.reshape(imageWidth,imageHeight);
+		horizXY.reshape(imageWidth,imageHeight);
 
-		featureIntensity = new ImageFloat32(imageWidth, imageHeight);
+		featureIntensity.reshape(imageWidth,imageHeight);
 
-		tempXX = new int[imageWidth];
-		tempXY = new int[imageWidth];
-		tempYY = new int[imageWidth];
+		if( tempXX.length < imageWidth ) {
+			tempXX = new int[imageWidth];
+			tempXY = new int[imageWidth];
+			tempYY = new int[imageWidth];
+		}
 	}
 
 	@Override
@@ -109,8 +111,7 @@ public abstract class SsdCorner_S16 implements GradientCornerIntensity<ImageSInt
 			}
 			setImageShape(derivX.getWidth(),derivX.getHeight());
 		} else if (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {
-			// adjust for the size of the input if possible
-			throw new IllegalArgumentException("Unexpected input size");
+			setImageShape(derivX.getWidth(),derivX.getHeight());
 		}
 		this.derivX = derivX;
 		this.derivY = derivY;

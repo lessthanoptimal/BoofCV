@@ -135,7 +135,7 @@ public class FactoryImageBorder {
 		return ret;
 	}
 
-	public static ImageBorder_F64 value( ImageFloat64 image , float value ) {
+	public static ImageBorder_F64 value( ImageFloat64 image , double value ) {
 		return ImageBorderValue.wrap(image,value);
 	}
 

@@ -128,7 +128,7 @@ public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 		this.requestedFeatureNumber = requestedFeatureNumber;
 	}
 
-	public QueueCorner getCorners() {
+	public QueueCorner getFeatures() {
 		if (selectBest != null) {
 			return selectBest.getBestCorners();
 		} else

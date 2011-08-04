@@ -90,7 +90,7 @@ public class VideoDetectCornersIntensity_F32 extends ProcessImageSequence<ImageF
 		}
 
 		detector.process(image,derivX, derivY,derivXX,derivYY,derivXY);
-		corners = detector.getCorners();
+		corners = detector.getFeatures();
 	}
 
 	@Override

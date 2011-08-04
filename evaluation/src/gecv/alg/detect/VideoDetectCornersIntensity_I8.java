@@ -91,7 +91,7 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 		}
 
 		detector.process(image,derivX, derivY, derivXX , derivYY, derivXY);
-		corners = detector.getCorners();
+		corners = detector.getFeatures();
 	}
 
 	@Override

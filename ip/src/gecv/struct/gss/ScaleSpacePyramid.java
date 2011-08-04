@@ -51,11 +51,33 @@ public class ScaleSpacePyramid<T extends ImageBase> extends ImagePyramid<T> {
 	}
 
 	/**
+	 * Creates a pyramid which cannot be updated using {@link #update(gecv.struct.image.ImageBase)} and needs
+	 * to have the pyramid scales set manually.
+	 */
+	public ScaleSpacePyramid() {
+		super(false,null);
+	}
+
+	/**
 	 * Specifies the pyramid's structure.
 	 *
 	 * @param scaleFactors Change in scale factor for each layer in the pyramid.
 	 */
 	public void setScaleFactors( double ...scaleFactors ) {
+		// see if the scale factors have not changed
+		if( scale != null && scale.length == scaleFactors.length ) {
+			boolean theSame = true;
+			for( int i = 0; i < scale.length; i++ ) {
+				if( scale[i] != scaleFactors[i] ) {
+					theSame = false;
+					break;
+				}
+			}
+			// no changes needed
+			if( theSame )
+				return;
+
+		}
 		this.scale = scaleFactors.clone();
 		checkScales();
 		layers = null;
@@ -100,5 +122,9 @@ public class ScaleSpacePyramid<T extends ImageBase> extends ImagePyramid<T> {
 
 	private int scaleLength( int length , double scaleFactor ) {
 		return (int)Math.ceil(length/scaleFactor);
+	}
+
+	public double[] getScaleFactors() {
+		return scale;
 	}
 }

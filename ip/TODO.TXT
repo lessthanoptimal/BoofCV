@@ -29,6 +29,7 @@
  * After an integer wavelet has been added that is energy conserving:
    - Create performance test and visualization apps
  * Use high order wavelets when available
+ * In particle image there seem to be out of bound pixel value issues
 
 - Thresholding
  * Adaptively select global threshold

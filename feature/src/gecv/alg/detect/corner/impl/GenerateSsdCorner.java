@@ -113,17 +113,17 @@ public class GenerateSsdCorner {
 				"\tprotected int radius;\n" +
 				"\n" +
 				"\t// temporary storage for intensity derivatives summations\n" +
-				"\tprivate " + typeOutput + " horizXX;\n" +
-				"\tprivate " + typeOutput + " horizXY;\n" +
-				"\tprivate " + typeOutput + " horizYY;\n" +
+				"\tprivate " + typeOutput + " horizXX = new "+typeOutput+"(1,1);\n" +
+				"\tprivate " + typeOutput + " horizXY = new "+typeOutput+"(1,1);\n" +
+				"\tprivate " + typeOutput + " horizYY = new "+typeOutput+"(1,1);\n" +
 				"\n" +
 				"\t// temporary storage for convolution along in the vertical axis.\n" +
-				"\tprivate " + sumType + " tempXX[];\n" +
-				"\tprivate " + sumType + " tempXY[];\n" +
-				"\tprivate " + sumType + " tempYY[];\n" +
+				"\tprivate " + sumType + " tempXX[] = new "+sumType+"[1];\n" +
+				"\tprivate " + sumType + " tempXY[] = new "+sumType+"[1];\n" +
+				"\tprivate " + sumType + " tempYY[] = new "+sumType+"[1];\n" +
 				"\n" +
 				"\t// the intensity of the found features in the image\n" +
-				"\tprivate ImageFloat32 featureIntensity;\n" +
+				"\tprivate ImageFloat32 featureIntensity = new ImageFloat32(1,1);\n" +
 				"\n" +
 				"\t// defines the A matrix, from which the eignevalues are computed\n" +
 				"\tprotected " + sumType + " totalXX, totalYY, totalXY;\n" +
@@ -136,15 +136,17 @@ public class GenerateSsdCorner {
 				"\t}\n" +
 				"\n" +
 				"\tpublic void setImageShape( int imageWidth, int imageHeight ) {\n" +
-				"\t\thorizXX = new " + typeOutput + "(imageWidth, imageHeight);\n" +
-				"\t\thorizYY = new " + typeOutput + "(imageWidth, imageHeight);\n" +
-				"\t\thorizXY = new " + typeOutput + "(imageWidth, imageHeight);\n" +
+				"\t\thorizXX.reshape(imageWidth,imageHeight);\n" +
+				"\t\thorizYY.reshape(imageWidth,imageHeight);\n" +
+				"\t\thorizXY.reshape(imageWidth,imageHeight);\n" +
 				"\n" +
-				"\t\tfeatureIntensity = new ImageFloat32(imageWidth, imageHeight);\n" +
+				"\t\tfeatureIntensity.reshape(imageWidth,imageHeight);\n" +
 				"\n" +
-				"\t\ttempXX = new " + sumType + "[imageWidth];\n" +
-				"\t\ttempXY = new " + sumType + "[imageWidth];\n" +
-				"\t\ttempYY = new " + sumType + "[imageWidth];\n" +
+				"\t\tif( tempXX.length < imageWidth ) {\n" +
+				"\t\t\ttempXX = new "+sumType+"[imageWidth];\n" +
+				"\t\t\ttempXY = new "+sumType+"[imageWidth];\n" +
+				"\t\t\ttempYY = new "+sumType+"[imageWidth];\n" +
+				"\t\t}\n" +
 				"\t}\n"+
 				"\n" +
 				"\t@Override\n" +
@@ -173,8 +175,7 @@ public class GenerateSsdCorner {
 				"\t\t\t}\n" +
 				"\t\t\tsetImageShape(derivX.getWidth(),derivX.getHeight());\n" +
 				"\t\t} else if (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {\n" +
-				"\t\t\t// adjust for the size of the input if possible\n" +
-				"\t\t\tthrow new IllegalArgumentException(\"Unexpected input size\");\n" +
+				"\t\t\tsetImageShape(derivX.getWidth(),derivX.getHeight());\n" +
 				"\t\t}\n" +
 				"\t\tthis.derivX = derivX;\n" +
 				"\t\tthis.derivY = derivY;\n" +

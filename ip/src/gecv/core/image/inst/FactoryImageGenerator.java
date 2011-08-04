@@ -19,6 +19,8 @@ package gecv.core.image.inst;
 import gecv.core.image.ImageGenerator;
 import gecv.struct.image.ImageBase;
 
+import java.lang.reflect.Array;
+
 
 /**
  * Factory for creating common image types
@@ -44,6 +46,11 @@ public class FactoryImageGenerator {
 
 		public WrapImage(T original) {
 			this.original = original;
+		}
+
+		@Override
+		public T[] createArray(int number) {
+			return (T[])Array.newInstance(original.getClass(),number);
 		}
 
 		@Override
