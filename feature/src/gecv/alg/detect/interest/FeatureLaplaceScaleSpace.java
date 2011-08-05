@@ -28,57 +28,82 @@ import java.util.List;
 
 /**
  * <p>
- * Detects scale invariant interest/corner features.  This is a generalization of the algorithm presented in [1], which was
- * designed specifically for the {@link gecv.alg.detect.corner.HarrisCornerIntensity Harris} corner detector.  The
- * algorithm works by detecting corners in each scale in a {@link gecv.struct.gss.GaussianScaleSpace scale-space}.  Then
- * it selects features whose Laplacian are a local maximum in the scale space.
+ * Detects scale invariant interest/corner features.  The general ideal of this approach to {@link GaussianScaleSpace scale space} feature
+ * detection is to use feature detector which is robust in 2D to find candidate feature points then use a metric
+ * which is robust in scale space to identify local maximums in scale space.  See [1] for more details.
  * </p>
  *
  * <p>
- * NOTE: While a bit vague [1] most likely was referring to a pyramid approach not the scale-space approach.
+ * This implementation is a generalized and tweaked version of the algorithm presented in [1], which was
+ * designed specifically for the {@link gecv.alg.detect.corner.HarrisCornerIntensity Harris} corner detector.
  * </p>
  *
  * <p>
- * [1] Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"  ICCV 2001. Proceedings.
+ * Algorithm Summary:
+ * <ol>
+ * <li>Detect feature intensities and local maximums (candidates) in each image scale.</li>
+ * <li>For each candidate search the local 3x3 region in the scale images above and below it to see if it i
+ * a local maximum in scale-space. </li>
+ * </ol>
+ * Candidates are not considered in the lower and upper most scale-spaces.
+ * </p>
+ *
+ *
+ * <p>
+ * To normalize feature intensity across scales each feature intensity is multiplied by the scale to the power of 'scalePower'.
+ * See [1,2] for how to compute 'scalePower'.
+ * </p>
+ *
+ * <p>
+ * [1] Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"  ICCV 2001. Proceedings.<br>
+ * [2] Lindeberg, T., "Feature detection with automatic scale selection." IJCV 30(2) (1998) 79 – 116
  * </p>
  *
  * @author Peter Abeles
  */
-// todo use similar local mechanism as FeaturePyramid
-// todo check 3x3x3 neighborhood
-// todo create a FeatureScaleSpace algorithm
 @SuppressWarnings({"unchecked"})
 public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> {
 
 	// generalized feature detector.  Used to find candidate features in each scale's image
-	private GeneralFeatureDetector<T,D> detector;
+	private GeneralFeatureDetector<
+			T,D> detector;
 	private float baseThreshold;
+	// feature intensity in the pyramid
+	protected T localSpace[];
+	protected int spaceIndex = 0;
 
-	//---- Variables related to the local scale-space
-	// Which local scales are valid.
-	private boolean activeLocal[] = new boolean[3];
-	// input images different local scales
-	private T localSpace[] = (T[])new ImageBase[3];
-	// the values of the local scales
-	private double scales[] = new double[3];
+	protected List<Point2D_I16> maximums[];
+
+	// List of found feature points
+	protected List<ScalePoint> foundPoints = new ArrayList<ScalePoint>();
+
+	// how much the feature intensity is scaled in each level
+	// varies depending on feature type
+	protected double scalePower;
 
 	// Function used to compute the Laplacian at each scale point
 	private ImageFunctionSparse<T> sparseLaplace;
-
-	// List of found feature points
-	List<ScalePoint> foundPoints = new ArrayList<ScalePoint>();
 
 	/**
 	 * Create a feature detector.
 	 *
 	 * @param detector Point feature detector which is used to find candidates in each scale level
-	 * @param sparseLaplace Used to validate found features
+	 * @param scalePower Used to adjust feature intensity in each level to make them comparable.  Feature dependent, but
+	 * most common features should use a value of 2.
 	 */
-	public FeatureLaplaceScaleSpace(GeneralFeatureDetector<T, D> detector, ImageFunctionSparse<T> sparseLaplace ) {
+	public FeatureLaplaceScaleSpace( GeneralFeatureDetector<T, D> detector ,
+									 ImageFunctionSparse<T> sparseLaplace , double scalePower ) {
 		this.detector = detector;
 		this.sparseLaplace = sparseLaplace;
+		this.baseThreshold = detector.getThreshold();
+		this.scalePower = scalePower;
 
-		baseThreshold = detector.getThreshold();
+		localSpace = (T[])new ImageBase[3];
+
+		maximums = new List[ 3 ];
+		maximums[0] = new ArrayList<Point2D_I16>();
+		maximums[1] = new ArrayList<Point2D_I16>();
+		maximums[2] = new ArrayList<Point2D_I16>();
 	}
 
 	/**
@@ -87,79 +112,44 @@ public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> 
 	 * @param ss Scale space of an image
 	 */
 	public void detect( GaussianScaleSpace<T,D> ss ) {
-		if( ss.getTotalScales() <= 2 ) {
-			throw new IllegalArgumentException("There must be at least two scale levels");
-		}
-		// reset internal variables
-		setupInternal(ss);
+		spaceIndex = 0;
 
-		// Go through each scale and search for features
+		// compute feature intensity in each level
 		for( int i = 0; i < ss.getTotalScales(); i++ ) {
 			ss.setActiveScale(i);
-			// detect features in this scale space
-			detectCandidateFeatures(ss);
 
-			// Validate the found features using the Laplacian across the local scale space
-			checkMaxInScaleSpace();
+			// save local scale space
+			T image = ss.getScaledImage();
 
-			// prepare the scale-space for the next iteration
-			shiftLocalScaleSpace(ss, i);
+			if( localSpace[spaceIndex] == null ) {
+				localSpace[spaceIndex] = (T)image.clone();
+			} else {
+				localSpace[spaceIndex].setTo(image);
+			}
+
+			// detect features in 2D space
+			// don't need to detect features for scale spaces at the tail end
+			if( i > 0 && i < ss.getTotalScales()-1)
+				detectCandidateFeatures(ss,ss.getCurrentScale());
+
+			spaceIndex++;
+			if( spaceIndex >= 3 )
+				spaceIndex = 0;
+
+			// check to see if they are local features in scale-space
+			if( i >= 2 ) {
+				findLocalScaleSpaceMax(ss,i-1);
+			}
 		}
 	}
 
-	/**
-	 * Changes the local scale-space by shifting it over by one
-	 */
-	private void shiftLocalScaleSpace(GaussianScaleSpace<T, D> ss, int scaleIndex) {
-		T tmp = localSpace[0];
-		localSpace[0] = localSpace[1];
-		localSpace[1] = localSpace[2];
-		localSpace[2] = tmp;
-		scales[0] = scales[1];
-		scales[1] = scales[2];
-		activeLocal[0] = true;
-		if( scaleIndex < ss.getTotalScales() - 2 ) {
-			ss.setActiveScale(scaleIndex+2);
-			localSpace[2].setTo(ss.getScaledImage());
-			scales[2] = ss.getCurrentScale();
-		} else {
-			activeLocal[2] = false;
-		}
-	}
-
-	/**
-	 * Sets up internal data structures
-	 */
-	private void setupInternal(GaussianScaleSpace<T, D> ss) {
-		foundPoints.clear();
-
-		activeLocal[0] = false;
-		activeLocal[1] = activeLocal[2] = true;
-
-		// if needed declare the local scale-space
-		if( localSpace[0] == null ) {
-			T a = ss.getScaledImage();
-			localSpace[0] = (T)a._createNew(a.width,a.height);
-			localSpace[1] = (T)a._createNew(a.width,a.height);
-			localSpace[2] = (T)a._createNew(a.width,a.height);
-		}
-
-		// initialize the local scale space
-		ss.setActiveScale(0);
-		localSpace[1].setTo(ss.getScaledImage());
-		scales[1] = ss.getCurrentScale();
-		ss.setActiveScale(1);
-		localSpace[2].setTo(ss.getScaledImage());
-		scales[2] = ss.getCurrentScale();
-	}
 
 	/**
 	 * Use the feature detector to find candidate features in each level.  Only compute the needed image derivatives.
 	 */
-	private void detectCandidateFeatures(GaussianScaleSpace<T, D> ss) {
-		double scale = ss.getCurrentScale();
+	private void detectCandidateFeatures( GaussianScaleSpace<T,D> ss , double scale ) {
 		// adjust corner intensity threshold based upon the current scale factor
-		float scaleThreshold = (float)(baseThreshold/(scale*scale));
+		float scaleThreshold = (float)(baseThreshold/Math.pow(scale,scalePower));
 		detector.setThreshold(scaleThreshold);
 
 		D derivX = null, derivY = null;
@@ -174,44 +164,65 @@ public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> 
 			derivYY = ss.getDerivative(false,false);
 			derivXY = ss.getDerivative(true,false);
 		}
-		
-		detector.process(ss.getScaledImage(),derivX,derivY,derivXX,derivYY,derivXY);
+
+		T image = ss.getScaledImage();
+		detector.process(image,derivX,derivY,derivXX,derivYY,derivXY);
+		List<Point2D_I16> m = maximums[spaceIndex];
+		m.clear();
+		QueueCorner q = detector.getFeatures();
+		for( int i = 0; i < q.num; i++ ) {
+			m.add( q.get(i).copy() );
+		}
 	}
 
 	/**
-	 * Checks to see the candidate feature points are a local maximum in the Laplacian's scale-space.
+	 * Searches the pyramid layers up and down to see if the found 2D features are also scale space maximums.
 	 */
-	private void checkMaxInScaleSpace() {
-		QueueCorner corners = detector.getFeatures();
+	protected void findLocalScaleSpaceMax( GaussianScaleSpace<T,D> ss , int layerID ) {
+		int index0 = spaceIndex;
+		int index1 = (spaceIndex + 1) % 3;
+		int index2 = (spaceIndex + 2) % 3;
 
-		double l0,l1,l2;
-		// set values to -1 so if its at the extreme edge of scale-space the value is ignored
-		l0=l1=l2=-1;
-		// pre-compute scale normalization
-		double ss0 = scales[0]*scales[0];
-		double ss1 = scales[1]*scales[1];
-		double ss2 = scales[2]*scales[2];
+		List<Point2D_I16> candidates = maximums[index1];
+		T image0 = localSpace[index0];
+		T image1 = localSpace[index1];
+		T image2 = localSpace[index2];
 
-		for( int i = 0; i < corners.num; i++ ) {
-			Point2D_I16 c = corners.get(i);
+		float scale0 = (float)ss.getScale(layerID-1);
+		float scale1 = (float)ss.getScale(layerID);
+		float scale2 = (float)ss.getScale(layerID+1);
 
-			if( activeLocal[0] ) {
-				sparseLaplace.setImage(localSpace[0]);
-				l0 = ss0*Math.abs(sparseLaplace.compute(c.x,c.y));
-			}
-			if( activeLocal[1] ) {
-				sparseLaplace.setImage(localSpace[1]);
-				l1 = ss1*Math.abs(sparseLaplace.compute(c.x,c.y));
-			}
-			if( activeLocal[2] ) {
-				sparseLaplace.setImage(localSpace[2]);
-				l2 = ss2*Math.abs(sparseLaplace.compute(c.x,c.y));
-			}
-			if( l1 > l0 && l1 > l2 ) {
-				foundPoints.add( new ScalePoint(c.x,c.y,scales[1]));
+		float ss0 = (float)Math.pow(scale0,scalePower);
+		float ss1 = (float)Math.pow(scale1,scalePower);
+		float ss2 = (float)Math.pow(scale2,scalePower);
+
+		for( Point2D_I16 c : candidates ) {
+			sparseLaplace.setImage(image1);
+			float val = ss1*(float)Math.abs(sparseLaplace.compute(c.x,c.y));
+
+			if( checkMax(image0, ss0, val, c.x, c.y) && checkMax(image2, ss2, val, c.x, c.y) ) {
+				// put features into the scale of the upper image
+				foundPoints.add( new ScalePoint(c.x,c.y,scale1));
 			}
 		}
 	}
+
+	private boolean checkMax(T image, float scoreAdjust, float bestScore, int c_x, int c_y) {
+		sparseLaplace.setImage(image);
+		boolean isMax = true;
+		beginLoop:
+		for( int i = c_y -1; i <= c_y+1; i++ ) {
+			for( int j = c_x-1; j <= c_x+1; j++ ) {
+
+				if( scoreAdjust*Math.abs(sparseLaplace.compute(j,i)) >= bestScore ) {
+					isMax = false;
+					break beginLoop;
+				}
+			}
+		}
+		return isMax;
+	}
+
 
 	public List<ScalePoint> getInterestPoints() {
 		return foundPoints;

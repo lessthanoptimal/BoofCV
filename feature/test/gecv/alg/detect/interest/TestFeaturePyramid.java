@@ -16,17 +16,38 @@
 
 package gecv.alg.detect.interest;
 
-import org.junit.Test;
+import gecv.abst.detect.corner.GeneralFeatureDetector;
+import gecv.abst.filter.derivative.AnyImageDerivative;
+import gecv.alg.interpolate.FactoryInterpolation;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
+import gecv.alg.transform.gss.UtilScaleSpace;
+import gecv.core.image.inst.FactoryImageGenerator;
+import gecv.struct.gss.ScaleSpacePyramid;
+import gecv.struct.image.ImageFloat32;
 
-import static org.junit.Assert.fail;
+import java.util.List;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestFeaturePyramid {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestFeaturePyramid extends GenericFeatureScaleDetector {
+	@Override
+	protected List<ScalePoint> detectFeature(ImageFloat32 input, GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector, double[] scales) {
+
+		InterpolatePixel<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		PyramidUpdateGaussianScale<ImageFloat32> update = new PyramidUpdateGaussianScale<ImageFloat32>(interpolate);
+		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(update,scales);
+		ss.update(input);
+
+		AnyImageDerivative<ImageFloat32,ImageFloat32> deriv = UtilScaleSpace.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
+
+		FeaturePyramid<ImageFloat32,ImageFloat32> alg =
+				new FeaturePyramid<ImageFloat32,ImageFloat32>(detector,deriv,1);
+		alg.detect(ss);
+
+		return alg.getInterestPoints();
 	}
 }
+

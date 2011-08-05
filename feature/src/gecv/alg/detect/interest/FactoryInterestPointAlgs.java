@@ -61,7 +61,7 @@ public class FactoryInterestPointAlgs {
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
 
-		return new FeatureLaplaceScaleSpace<T,D>(detector,sparseLaplace);
+		return new FeatureLaplaceScaleSpace<T,D>(detector,sparseLaplace,2);
 	}
 	
 	/**
@@ -87,7 +87,7 @@ public class FactoryInterestPointAlgs {
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
 
-		return new FeatureLaplaceScaleSpace<T,D>(detector,sparseLaplace);
+		return new FeatureLaplaceScaleSpace<T,D>(detector,sparseLaplace,2);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class FactoryInterestPointAlgs {
 
 		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
-		return new FeaturePyramid<T,D>(detector,deriv,2);
+		return new FeaturePyramid<T,D>(detector,deriv,1);
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class FactoryInterestPointAlgs {
 
 		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
-		return new FeaturePyramid<T,D>(detector,deriv,2);
+		return new FeaturePyramid<T,D>(detector,deriv,1);
 	}
 
 	/**
@@ -155,10 +155,10 @@ public class FactoryInterestPointAlgs {
 	 */
 	public static <T extends ImageBase, D extends ImageBase>
 	FeatureLaplacePyramid<T,D> hessianLaplacePyramid( int featureRadius ,
-											   float cornerThreshold ,
-											   int maxFeatures ,
-											   Class<T> imageType ,
-											   Class<D> derivType)
+													  float cornerThreshold ,
+													  int maxFeatures ,
+													  Class<T> imageType ,
+													  Class<D> derivType)
 	{
 		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,0,false,false,false);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
@@ -168,7 +168,7 @@ public class FactoryInterestPointAlgs {
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
 
-		return new FeatureLaplacePyramid<T,D>(detector,sparseLaplace,deriv);
+		return new FeatureLaplacePyramid<T,D>(detector,sparseLaplace,deriv,1);
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class FactoryInterestPointAlgs {
 		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
 
-		return new FeatureLaplacePyramid<T,D>(detector,sparseLaplace,deriv);
+		return new FeatureLaplacePyramid<T,D>(detector,sparseLaplace,deriv,1);
 	}
 
 		/**

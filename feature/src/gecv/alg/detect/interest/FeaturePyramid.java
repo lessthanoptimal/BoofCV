@@ -29,15 +29,23 @@ import jgrl.struct.point.Point2D_I16;
 import java.util.ArrayList;
 import java.util.List;
 
+import static gecv.alg.detect.interest.FeatureScaleSpace.checkMax;
+
 /**
  * <p>
  * Detects scale invariant interest/corner points by computing the feature intensities across a pyramid of different scales.
  * Features which are maximums with in a local 2D neighborhood and within the local scale neighbourhood are declared to
- * be features.
+ * be features.  Maximums are checked for in scale space by comparing the feature intensity against features in the
+ * upper and lower layers.
  * </p>
  *
  * <p>
  * NOTE: Features are not computed for the bottom and top most layers in the pyramid.
+ * </p>
+ *
+ * <p>
+ * [1] Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"  ICCV 2001. Proceedings.<br>
+ * [2] Lindeberg, T., "Feature detection with automatic scale selection." IJCV 30(2) (1998) 79 – 116
  * </p>
  *
  * @author Peter Abeles
@@ -67,6 +75,7 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 	 * Create a feature detector.
 	 *
 	 * @param detector Point feature detector which is used to find candidates in each scale level
+	 * @param scalePower Used to normalize feature intensity at different scales.  For many features this should be one.
 	 */
 	public FeaturePyramid( GeneralFeatureDetector<T, D> detector, AnyImageDerivative<T,D> computeDerivative ,
 						   double scalePower ) {
@@ -113,7 +122,7 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 	 */
 	private void detectCandidateFeatures( T image , double scale ) {
 		// adjust corner intensity threshold based upon the current scale factor
-		float scaleThreshold = (float)(baseThreshold/(scale*scale));
+		float scaleThreshold = (float)(baseThreshold/Math.pow(scale,scalePower));
 		detector.setThreshold(scaleThreshold);
 		computeDerivative.setInput(image);
 
@@ -184,21 +193,6 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 				foundPoints.add( new ScalePoint((int)(c.x*scale1),(int)(c.y*scale1),scale1));
 			}
 		}
-	}
-
-	private boolean checkMax(ImageBorder_F32 inten, float scoreAdjust, float bestScore, int c_x, int c_y) {
-		boolean isMax = true;
-		beginLoop:
-		for( int i = c_y -1; i <= c_y+1; i++ ) {
-			for( int j = c_x-1; j <= c_x+1; j++ ) {
-
-				if( scoreAdjust*inten.get(j,i) >= bestScore ) {
-					isMax = false;
-					break beginLoop;
-				}
-			}
-		}
-		return isMax;
 	}
 
 

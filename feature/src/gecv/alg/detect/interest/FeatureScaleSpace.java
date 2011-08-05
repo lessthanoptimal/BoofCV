@@ -39,6 +39,11 @@ import java.util.List;
  * NOTE: Features are not computed for the bottom and top most layers in the pyramid.
  * </p>
  *
+ * <p>
+ * [1] Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"  ICCV 2001. Proceedings.<br>
+ * [2] Lindeberg, T., "Feature detection with automatic scale selection." IJCV 30(2) (1998) 79 – 116
+ * </p>
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
@@ -110,7 +115,7 @@ public class FeatureScaleSpace<T extends ImageBase, D extends ImageBase> {
 	 */
 	private void detectCandidateFeatures( GaussianScaleSpace<T,D> ss , double scale ) {
 		// adjust corner intensity threshold based upon the current scale factor
-		float scaleThreshold = (float)(baseThreshold/(scale*scale));
+		float scaleThreshold = (float)(baseThreshold/Math.pow(scale,scalePower));
 		detector.setThreshold(scaleThreshold);
 
 		D derivX = null, derivY = null;
@@ -175,7 +180,7 @@ public class FeatureScaleSpace<T extends ImageBase, D extends ImageBase> {
 		}
 	}
 
-	private boolean checkMax(ImageBorder_F32 inten, float scoreAdjust, float bestScore, int c_x, int c_y) {
+	protected static boolean checkMax(ImageBorder_F32 inten, float scoreAdjust, float bestScore, int c_x, int c_y) {
 		boolean isMax = true;
 		beginLoop:
 		for( int i = c_y -1; i <= c_y+1; i++ ) {

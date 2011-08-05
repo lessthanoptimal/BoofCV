@@ -36,10 +36,10 @@ import java.awt.image.BufferedImage;
 public class DetectFeatureLaplacePyramidApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-//	static String fileName = "evaluation/data/sunflowers.png";
+	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
-	static String fileName = "evaluation/data/shapes01.png";
+//	static String fileName = "evaluation/data/shapes01.png";
 
 	static int NUM_FEATURES = 50;
 
@@ -49,7 +49,7 @@ public class DetectFeatureLaplacePyramidApp {
 
 		InterpolatePixel<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 		PyramidUpdateGaussianScale<ImageFloat32> update = new PyramidUpdateGaussianScale<ImageFloat32>(interpolate);
-		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(update,1,2,4,8,10,12,16,30,40);
+		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(update,1,1.5,2,4,8,12,24);
 
 		int r = 2;
 		FeatureLaplacePyramid<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianLaplacePyramid(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);

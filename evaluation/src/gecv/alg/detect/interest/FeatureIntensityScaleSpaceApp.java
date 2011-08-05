@@ -56,15 +56,14 @@ public class FeatureIntensityScaleSpaceApp {
 
 
 		GeneralFeatureIntensity<ImageFloat32, ImageFloat32> intensity;
-//		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.DETERMINANT,ImageFloat32.class);
-		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.TRACE,ImageFloat32.class);
+		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.DETERMINANT,ImageFloat32.class);
+//		intensity = new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.TRACE,ImageFloat32.class);
 //		intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
 //				FactoryCornerIntensity.createHarris(ImageFloat32.class,2,0.4f));
 //		intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
 //				FactoryCornerIntensity.createKlt(ImageFloat32.class,2));
 //		intensity = new WrapperFastCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createFast12(ImageFloat32.class,5,11));
 //		intensity = new WrapperKitRosCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKitRos(ImageFloat32.class));
-//		intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createHarris(ImageFloat32.class,2,0.04f));
 //		intensity = new WrapperMedianCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createMedian(ImageFloat32.class),
 //				FactoryBlurFilter.median(ImageFloat32.class,2));
 

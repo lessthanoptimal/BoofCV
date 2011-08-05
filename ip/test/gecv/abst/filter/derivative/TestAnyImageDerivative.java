@@ -27,8 +27,6 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author Peter Abeles
  */
@@ -42,9 +40,22 @@ public class TestAnyImageDerivative {
 
 	ImageFloat32 original = new ImageFloat32(width,height);
 
+	/**
+	 * See if changing the input image size causes an exception to be thrown.
+	 */
 	@Test
 	public void changeInputImageSize() {
-		fail("failed");
+		Kernel1D_F32 kernelX = (Kernel1D_F32)GradientThree.getKernelX(false);
+		AnyImageDerivative<ImageFloat32,ImageFloat32> alg = new AnyImageDerivative<ImageFloat32,ImageFloat32>(kernelX,ImageFloat32.class,generator);
+		alg.setInput(original);
+		alg.getDerivative(true);
+
+		ImageFloat32 smaller = new ImageFloat32(width-5,height-5);
+		GeneralizedImageOps.randomize(smaller,rand,0,40);
+
+		// assume that if it can't handle variable sized inputs then an exception is thrown
+		alg.setInput(smaller);
+		alg.getDerivative(true);
 	}
 
 	@Test
