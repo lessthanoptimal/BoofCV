@@ -480,10 +480,7 @@ public class GecvTesting {
 
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				double normalizer = Math.abs(a.get(x, y).doubleValue()) + Math.abs(b.get(x, y).doubleValue());
-				if( normalizer < 1.0 ) normalizer = 1.0;
-				if (Math.abs(a.get(x, y).doubleValue() - b.get(x, y).doubleValue())/normalizer > tol)
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
+				compareValues(tol, a, b, x, y);
 			}
 		}
 	}
@@ -505,6 +502,45 @@ public class GecvTesting {
 						throw new RuntimeException("value not equal");
 			}
 		}
+	}
+
+	/**
+	 * Checks to see if only the image borders are equal to each other within tolerance
+	 */
+	public static void assertEqualsBorder( ImageBase imgA, ImageBase imgB, double tol, int border ) {
+		if (imgA.getWidth() != imgB.getWidth())
+			throw new RuntimeException("Widths are not equals");
+
+		if (imgA.getHeight() != imgB.getHeight())
+			throw new RuntimeException("Heights are not equals");
+
+		SingleBandImage a = FactorySingleBandImage.wrap(imgA);
+		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
+
+		for (int y = 0; y < imgA.getHeight(); y++) {
+			for (int x = 0; x < border; x++) {
+				compareValues(tol, a, b, x, y);
+			}
+			for (int x = imgA.getWidth()-border; x < imgA.getWidth(); x++) {
+				compareValues(tol, a, b, x, y);
+			}
+		}
+
+		for (int x = border; x < imgA.getWidth()-border; x++) {
+			for (int y = 0; y < border; y++) {
+				compareValues(tol, a, b, x, y);
+			}
+			for (int y = imgA.getHeight()-border; y < imgA.getHeight(); y++) {
+				compareValues(tol, a, b, x, y);
+			}
+		}
+	}
+
+	private static void compareValues(double tol, SingleBandImage a, SingleBandImage b, int x, int y) {
+		double normalizer = Math.abs(a.get(x, y).doubleValue()) + Math.abs(b.get(x, y).doubleValue());
+		if( normalizer < 1.0 ) normalizer = 1.0;
+		if (Math.abs(a.get(x, y).doubleValue() - b.get(x, y).doubleValue())/normalizer > tol)
+			throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
 	}
 
 	public static void checkEquals(BufferedImage imgA, ImageBase imgB , double tol ) {

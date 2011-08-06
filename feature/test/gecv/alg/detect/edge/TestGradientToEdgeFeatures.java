@@ -16,11 +16,14 @@
 
 package gecv.alg.detect.edge;
 
+import gecv.alg.detect.edge.impl.ImplEdgeNonMaxSuppression;
+import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageUInt8;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -143,5 +146,49 @@ public class TestGradientToEdgeFeatures {
 		float expected = (float)Math.atan(b.get(1,2).floatValue()/a.get(1,2).floatValue());
 
 		assertEquals(expected,direction.get(1,2),1e-4);
+	}
+
+	@Test
+	public void discretizeDirection() {
+		ImageFloat32 angle = new ImageFloat32(5,5);
+		angle.set(0,0,(float)(3*Math.PI/8+0.01));
+		angle.set(1,0,(float)(3*Math.PI/8-0.01));
+		angle.set(2,0,(float)(Math.PI/4));
+		angle.set(3,0,(float)(Math.PI/8+0.01));
+		angle.set(4,0,(float)(Math.PI/8-0.01));
+		angle.set(0,1,(float)(-3*Math.PI/8+0.01));
+		angle.set(1,1,(float)(-3*Math.PI/8-0.01));
+
+		ImageUInt8 d = new ImageUInt8(5,5);
+
+		GradientToEdgeFeatures.discretizeDirection(angle,d);
+
+		assertEquals(0,d.get(0,0));
+		assertEquals(3,d.get(1,0));
+		assertEquals(3,d.get(2,0));
+		assertEquals(3,d.get(3,0));
+		assertEquals(2,d.get(4,0));
+		assertEquals(1,d.get(0,1));
+		assertEquals(0,d.get(1,1));
+	}
+
+	@Test
+	public void nonMaxSuppression() {
+		ImageFloat32 intensity = new ImageFloat32(width,height);
+		ImageUInt8 direction = new ImageUInt8(width,height);
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		ImageTestingOps.randomize(intensity,rand,0,100);
+		ImageTestingOps.randomize(direction,rand,0,4);
+
+		GecvTesting.checkSubImage(this,"nonMaxSuppression",true,intensity, direction, expected, found);
+	}
+
+	public void nonMaxSuppression(ImageFloat32 intensity, ImageUInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+		ImplEdgeNonMaxSuppression.naive(intensity,direction,expected);
+		GradientToEdgeFeatures.nonMaxSuppression(intensity,direction,found);
+
+		GecvTesting.assertEquals(expected,found,0,1e-4);
 	}
 }

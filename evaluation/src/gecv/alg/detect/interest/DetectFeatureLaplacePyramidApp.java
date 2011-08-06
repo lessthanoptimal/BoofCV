@@ -36,10 +36,10 @@ import java.awt.image.BufferedImage;
 public class DetectFeatureLaplacePyramidApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-	static String fileName = "evaluation/data/sunflowers.png";
+//	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
-//	static String fileName = "evaluation/data/shapes01.png";
+	static String fileName = "evaluation/data/shapes01.png";
 
 	static int NUM_FEATURES = 50;
 

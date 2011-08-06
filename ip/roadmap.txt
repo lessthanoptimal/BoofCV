@@ -23,7 +23,7 @@ SFM
  - Detect Features
 #  * corners
    * line
-   * blobs
+#  * blobs
    * Template Matching
    * SURF
  - Color
@@ -45,6 +45,6 @@ SFM
 #  * Non-Max Suppression
  - Binary Image
 #  * morphological operations
-   * flood fill
-   * blob detector
+#  * Threshold/Hysteresis Threshold
+#  * blob detector
    * contour?
