@@ -47,7 +47,7 @@ public class DetectFeatureScaleSpaceApp {
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 
 		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
-		ss.setScales(0.5,1,2,4,8,10,12,16,30,40);
+		ss.setScales(1,1.5,2,4,8,12,24);
 		ss.setImage(inputF32);
 
 		int r = 2;

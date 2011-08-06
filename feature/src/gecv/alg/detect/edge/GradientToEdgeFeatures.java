@@ -17,10 +17,12 @@
 package gecv.alg.detect.edge;
 
 import gecv.alg.InputSanityCheck;
+import gecv.alg.detect.edge.impl.ImplEdgeNonMaxSuppression;
 import gecv.alg.detect.edge.impl.ImplGradientToEdgeFeatures;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageSInt32;
+import gecv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -167,5 +169,65 @@ public class GradientToEdgeFeatures {
 		InputSanityCheck.checkSameShape(derivX,derivY,angle);
 
 		ImplGradientToEdgeFeatures.direction(derivX,derivY,angle);
+	}
+
+	/**
+	 * <p>
+	 * Converts an image containing edge angles into a discrete set of line angles which
+	 * represent orientations of 0, 45, 90, and 135 degrees.  The conversion is done by rounding
+	 * the angle to the nearest orientation in the set.
+	 * </p>
+	 * <p>
+	 * Discrete value to angle (degrees): 0=90,1=45,2=0,3=-45
+	 * </p>
+	 *
+	 * @param angle Input image containing edge orientations.  Orientations are assumed to be
+	 * from -pi/2 to pi/2. Not modified.
+	 * @param discrete  Output set of discretized angles.  Values will be from 0 to 3, inclusive. If null a new
+	 * image will be declared and returned. Modified.
+	 * @return Discretized direction.
+	 */
+	static public ImageUInt8 discretizeDirection( ImageFloat32 angle , ImageUInt8 discrete )
+	{
+		discrete = InputSanityCheck.checkDeclare(angle,discrete,ImageUInt8.class);
+
+		final float A = (float)(Math.PI/2.0);
+		final float B = (float)(Math.PI/4.0);
+		final int w = angle.width;
+		final int h = angle.height;
+
+		for( int y = 0; y < h; y++ ) {
+			int indexSrc = angle.startIndex + y*angle.stride;
+			int indexDst = discrete.startIndex + y*discrete.stride;
+
+			int end = indexSrc + w;
+			for( ; indexSrc < end; indexSrc++ , indexDst++ ) {
+				discrete.data[indexDst] = (byte)((int)Math.round((angle.data[indexSrc]+A)/B) % 4);
+			}
+		}
+
+		return discrete;
+	}
+
+	/**
+	 * <p>
+	 * Sets edge intensities to zero if the pixel has an intensity which is not greater than any of
+	 * the two adjacent pixels.  Pixel adjacency is determined by the gradients discretized direction.
+	 * </p>
+	 *
+	 * @param intensity Edge intensities. Not modified.
+	 * @param direction Discretized direction.  See {@link #discretizeDirection(gecv.struct.image.ImageFloat32, gecv.struct.image.ImageUInt8)}. Not modified.
+	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
+	 * @return Filtered edge intensity.
+	 */
+	static public ImageFloat32 nonMaxSuppression( ImageFloat32 intensity , ImageUInt8 direction , ImageFloat32 output )
+	{
+		InputSanityCheck.checkSameShape(intensity,direction);
+		output = InputSanityCheck.checkDeclare(intensity,output);
+
+		ImplEdgeNonMaxSuppression.inner(intensity,direction,output);
+		ImplEdgeNonMaxSuppression.border(intensity,direction,output);
+
+		return output;
 	}
 }

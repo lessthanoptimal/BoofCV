@@ -80,7 +80,7 @@ public class BenchmarkExtractors {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-		for (int radius = 1; radius < 10; radius += 1) {
+		for (int radius = 1; radius < 20; radius += 1) {
 			System.out.println("Radius: " + radius);
 			System.out.println();
 			windowRadius = radius;
