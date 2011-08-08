@@ -153,11 +153,11 @@ public class TestGeneralCornerDetector {
 		}
 
 		@Override
-		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner excludeCorners, QueueCorner foundCorners) {
+		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner excludeCorners, QueueCorner foundFeature) {
 			numTimesProcessed++;
 
-			foundCorners.add(1,1);
-			foundCorners.add(2,2);
+			foundFeature.add(1,1);
+			foundFeature.add(2,2);
 		}
 
 		@Override

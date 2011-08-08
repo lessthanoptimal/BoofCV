@@ -17,8 +17,11 @@
 package gecv.alg.transform.ii;
 
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
+import gecv.alg.filter.convolve.ConvolveWithBorder;
 import gecv.alg.filter.convolve.FactoryKernel;
 import gecv.alg.misc.ImageTestingOps;
+import gecv.core.image.border.FactoryImageBorder;
+import gecv.core.image.border.ImageBorder_F32;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
@@ -35,6 +38,32 @@ public class TestDerivativeIntegralImage {
 	Random rand = new Random(234);
 	int width = 30;
 	int height = 40;
+
+	@Test
+	public void kernelDerivXX() {
+		ImageFloat32 orig = new ImageFloat32(width,height);
+		ImageFloat32 integral = new ImageFloat32(width,height);
+
+		ImageTestingOps.randomize(orig,rand,0,20);
+
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		IntegralImageOps.transform(orig,integral);
+
+		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+
+		for( int i = 1; i <= 5; i += 2 ) {
+			int size = i*3;
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivXX(size);
+			Kernel2D_F32 kernel = createDerivXX(size);
+
+			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			IntegralImageOps.convolve(integral,kernelI.blocks,kernelI.scales,found);
+
+			GecvTesting.assertEquals(expected,found,0,1e-2);
+		}
+	}
 
 	@Test
 	public void derivXX() {
@@ -54,12 +83,38 @@ public class TestDerivativeIntegralImage {
 			ConvolveImageNoBorder.convolve(kernel,orig,expected);
 			DerivativeIntegralImage.derivXX(integral,found,size);
 
-
 			int r = size/2;
 			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r);
 			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
 
 			GecvTesting.assertEquals(a,b,0,1e-2);
+		}
+	}
+
+	@Test
+	public void kernelDerivYY() {
+		ImageFloat32 orig = new ImageFloat32(width,height);
+		ImageFloat32 integral = new ImageFloat32(width,height);
+
+		ImageTestingOps.randomize(orig,rand,0,20);
+
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		IntegralImageOps.transform(orig,integral);
+
+		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+
+		for( int i = 1; i <= 5; i += 2 ) {
+			int size = i*3;
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivYY(size);
+			Kernel2D_F32 kernel = createDerivXX(size);
+			kernel = FactoryKernel.transpose(kernel);
+
+			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			IntegralImageOps.convolve(integral,kernelI.blocks,kernelI.scales,found);
+
+			GecvTesting.assertEquals(expected,found,0,1e-2);
 		}
 	}
 
@@ -88,6 +143,32 @@ public class TestDerivativeIntegralImage {
 			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
 
 			GecvTesting.assertEquals(a,b,0,1e-2);
+		}
+	}
+
+	@Test
+	public void kernelDerivXY() {
+		ImageFloat32 orig = new ImageFloat32(width,height);
+		ImageFloat32 integral = new ImageFloat32(width,height);
+
+		ImageTestingOps.randomize(orig,rand,0,20);
+
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		IntegralImageOps.transform(orig,integral);
+
+		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+
+		for( int i = 1; i <= 5; i += 2 ) {
+			int size = i*3;
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivXY(size);
+			Kernel2D_F32 kernel = createDerivXY(size);
+
+			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			IntegralImageOps.convolve(integral,kernelI.blocks,kernelI.scales,found);
+
+			GecvTesting.assertEquals(expected,found,0,1e-2);
 		}
 	}
 

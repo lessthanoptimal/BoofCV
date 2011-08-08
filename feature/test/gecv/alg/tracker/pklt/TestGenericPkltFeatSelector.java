@@ -213,7 +213,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 	{
 
 		@Override
-		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner excludeCorners, QueueCorner foundCorners) {
+		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner excludeCorners, QueueCorner foundFeature) {
 			// if the feature's position isn't scaled then this test will fail
 			for( int i = 0; i < excludeCorners.num; i++ ) {
 				Point2D_I16 p = excludeCorners.get(i);
@@ -221,7 +221,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 			}
 
 			// add a corner on the image boundary for scaled down
-			foundCorners.add(width/2-2,height/2-2);
+			foundFeature.add(width/2-2,height/2-2);
 		}
 
 		@Override

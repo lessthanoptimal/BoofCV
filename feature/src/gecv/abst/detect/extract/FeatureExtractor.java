@@ -54,15 +54,14 @@ public interface FeatureExtractor {
 	 * Process a feature intensity image to extract the point features.
 	 *
 	 * @param intensity	Feature intensity image.  Can be modified.
-	 * @param foundCorners	List of existing features (not always supported) and where new features are stored.
 	 * @param requestedNumber Number of features it should find.  Not always supported.
 	 * @param excludeCorners Features which should not be selected again.  Can be null. Not always supported.
-	 * @param foundCorners Features which were found.
+	 * @param foundFeature Features which were found.
 	 */
 	public void process(ImageFloat32 intensity, QueueCorner candidate,
 						int requestedNumber ,
 						QueueCorner excludeCorners ,
-						QueueCorner foundCorners);
+						QueueCorner foundFeature);
 
 	/**
 	 * If it requires a list of candidate corners.

@@ -170,7 +170,7 @@ public class BenchmarkConvolveWithBorder {
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
 		System.out.println();
 
-		for( int radius = 2; radius < 10; radius += 1 ) {
+		for( int radius = 4; radius < 10; radius += 1 ) {
 			System.out.println("Radius: "+radius);
 			System.out.println();
 			BenchmarkConvolveWithBorder.radius = radius;

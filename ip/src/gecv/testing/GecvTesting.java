@@ -507,7 +507,7 @@ public class GecvTesting {
 	/**
 	 * Checks to see if only the image borders are equal to each other within tolerance
 	 */
-	public static void assertEqualsBorder( ImageBase imgA, ImageBase imgB, double tol, int border ) {
+	public static void assertEqualsBorder( ImageBase imgA, ImageBase imgB, double tol, int borderX , int borderY ) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -518,19 +518,19 @@ public class GecvTesting {
 		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
 
 		for (int y = 0; y < imgA.getHeight(); y++) {
-			for (int x = 0; x < border; x++) {
+			for (int x = 0; x < borderX; x++) {
 				compareValues(tol, a, b, x, y);
 			}
-			for (int x = imgA.getWidth()-border; x < imgA.getWidth(); x++) {
+			for (int x = imgA.getWidth()-borderX; x < imgA.getWidth(); x++) {
 				compareValues(tol, a, b, x, y);
 			}
 		}
 
-		for (int x = border; x < imgA.getWidth()-border; x++) {
-			for (int y = 0; y < border; y++) {
+		for (int x = borderX; x < imgA.getWidth()-borderX; x++) {
+			for (int y = 0; y < borderY; y++) {
 				compareValues(tol, a, b, x, y);
 			}
-			for (int y = imgA.getHeight()-border; y < imgA.getHeight(); y++) {
+			for (int y = imgA.getHeight()-borderY; y < imgA.getHeight(); y++) {
 				compareValues(tol, a, b, x, y);
 			}
 		}

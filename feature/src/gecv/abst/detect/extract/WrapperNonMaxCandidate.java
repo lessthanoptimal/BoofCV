@@ -34,8 +34,8 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
-					 QueueCorner excludeCorners, QueueCorner foundCorners) {
-		extractor.process(intensity,candidate,excludeCorners,foundCorners);
+					 QueueCorner excludeCorners, QueueCorner foundFeature) {
+		extractor.process(intensity,candidate,excludeCorners, foundFeature);
 	}
 
 	@Override

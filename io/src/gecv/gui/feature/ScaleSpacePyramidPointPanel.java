@@ -104,15 +104,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 			showAll(g);
 		else {
 			g.drawImage(levelImage, 0, 0, this);
-			Graphics2D g2 = (Graphics2D)g;
-			g2.setColor(Color.RED);
-			g2.setStroke(new BasicStroke(2));
-
-			for( ScalePoint p : levelPoints ) {
-				int r = (int)(radius*p.scale);
-				int w = r*2+1;
-				g2.drawOval(p.x-r,p.y-r,w,w);
-			}
+			VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,radius);
 		}
 
 	}
@@ -123,15 +115,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 			g.drawImage(background, 0, 0, this);
 
 		Graphics2D g2 = (Graphics2D)g;
-		g2.setStroke(new BasicStroke(2));
-
-		g2.setColor(Color.RED);
-
-		for( ScalePoint p : points ) {
-			int r = (int)(radius*p.scale);
-			int w = r*2+1;
-			g2.drawOval(p.x-r,p.y-r,w,w);
-		}
+		VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,radius);
 	}
 
 	@Override
