@@ -120,6 +120,6 @@ public class TestImplEdgeNonMaxSuppression {
 		ImplEdgeNonMaxSuppression.border(intensity,direction,found);
 
 		// just test the image border
-		GecvTesting.assertEqualsBorder(expected,found,1e-3f,1);
+		GecvTesting.assertEqualsBorder(expected,found,1e-3f,1,1);
 	}
 }

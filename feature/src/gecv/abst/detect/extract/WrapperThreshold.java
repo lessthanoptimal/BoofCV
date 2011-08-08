@@ -35,8 +35,8 @@ public class WrapperThreshold implements FeatureExtractor {
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
-					 QueueCorner excludeCorners, QueueCorner foundCorners) {
-		extractor.process(intensity, foundCorners);
+					 QueueCorner excludeCorners, QueueCorner foundFeature) {
+		extractor.process(intensity, foundFeature);
 	}
 
 	@Override

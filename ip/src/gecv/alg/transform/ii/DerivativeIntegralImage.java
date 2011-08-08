@@ -16,6 +16,7 @@
 
 package gecv.alg.transform.ii;
 
+import gecv.struct.ImageRectangle;
 import gecv.struct.image.ImageFloat32;
 
 
@@ -23,6 +24,58 @@ import gecv.struct.image.ImageFloat32;
  * @author Peter Abeles
  */
 public class DerivativeIntegralImage {
+
+	public static IntegralKernel kernelDerivXX( int size ) {
+		// lobe size
+		int blockW = size/3;
+		// horizontal band size
+		int blockH = size-blockW-1;
+
+		int r1 = blockW/2;
+		int r2 = blockW+r1;
+		int r3 = blockH/2;
+
+		IntegralKernel ret = new IntegralKernel(2);
+		ret.blocks[0] = new ImageRectangle(-r2-1,-r3-1,r2,r3);
+		ret.blocks[1] = new ImageRectangle(-r1-1,-r3-1,r1,r3);
+		ret.scales[0] = 1;
+		ret.scales[1] = -3;
+
+		return ret;
+	}
+
+	public static IntegralKernel kernelDerivYY( int size ) {
+		int blockW = size/3;
+		int blockH = size-blockW-1;
+
+		int r1 = blockW/2;
+		int r2 = blockW+r1;
+		int r3 = blockH/2;
+
+		IntegralKernel ret = new IntegralKernel(2);
+		ret.blocks[0] = new ImageRectangle(-r3-1,-r2-1,r3,r2);
+		ret.blocks[1] = new ImageRectangle(-r3-1,-r1-1,r3,r1);
+		ret.scales[0] = 1;
+		ret.scales[1] = -3;
+
+		return ret;
+	}
+
+	public static IntegralKernel kernelDerivXY( int size ) {
+		int block = size/3;
+
+		IntegralKernel ret = new IntegralKernel(4);
+		ret.blocks[0] = new ImageRectangle(-block-1,-block-1,-1,-1);
+		ret.blocks[1] = new ImageRectangle(0,-block-1,block,-1);
+		ret.blocks[2] = new ImageRectangle(0,0,block,block);
+		ret.blocks[3] = new ImageRectangle(-block-1,0,-1,block);
+		ret.scales[0] = 1;
+		ret.scales[1] = -1;
+		ret.scales[2] = 1;
+		ret.scales[3] = -1;
+
+		return ret;
+	}
 
 	public static void derivXX( ImageFloat32 input , ImageFloat32 output , int size )
 	{
