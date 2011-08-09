@@ -14,10 +14,25 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.interest;
+package gecv.alg.detect.interest.benchmark;
+
+import gecv.struct.image.ImageBase;
+
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkInterestStability_Rotation {
+public class BenchmarkInterestParameters<T extends ImageBase, D extends ImageBase> 
+{
+	// radius of the feature it is detecting
+	public int radius = 2;
+	// the number of features it will search for
+	public int maxFeatures = 40;
+	// max features per scale in scale-space features
+	public int maxScaleFeatures = maxFeatures/2;
+	// which scales are examined in scale-space features
+	public double[] scales = new double[]{1,1.5,2,3,4,6,8,12,16};
+	// types of images being processed
+	public Class<T> imageType;
+	public Class<D> derivType;
 }

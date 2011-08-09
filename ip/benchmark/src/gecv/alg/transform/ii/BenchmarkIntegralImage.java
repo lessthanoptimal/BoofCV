@@ -53,7 +53,7 @@ public class BenchmarkIntegralImage {
 		@Override
 		public void process() {
 			DerivativeIntegralImage.derivXX(integral,output,9);
-			IntegralImageOps.convolveBorder(integral,kernel.blocks,kernel.scales,output,4,4);
+			IntegralImageOps.convolveBorder(integral,kernel,output,4,4);
 		}
 	}
 
@@ -63,7 +63,7 @@ public class BenchmarkIntegralImage {
 
 		@Override
 		public void process() {
-			IntegralImageOps.convolve(integral,kernel.blocks,kernel.scales,output);
+			IntegralImageOps.convolve(integral,kernel,output);
 		}
 	}
 

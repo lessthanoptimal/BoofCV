@@ -17,10 +17,12 @@
 package gecv.alg.detect.interest;
 
 import gecv.abst.detect.extract.FeatureExtractor;
+import gecv.abst.detect.interest.GeneralizedIntegralImageFeatureIntensity;
 import gecv.alg.detect.extract.SelectNBestFeatures;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.struct.QueueCorner;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I16;
 
@@ -75,7 +77,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FastHessianFeatureDetector {
+// todo Do not compute intensity along the border, instead set it to zero?
+// TODO or handle the border in a more intelligent way
+public class FastHessianFeatureDetector<T extends ImageBase> {
 
 	// finds features from 2D intensity image
 	private FeatureExtractor extractor;
@@ -94,8 +98,6 @@ public class FastHessianFeatureDetector {
 	private int initialSize;
 	// the number of octaves it examines
 	private int numberOfOctaves;
-	// number of different scales in each octave
-	private int numberScalesPerOctave;
 
 	// local variables that are predeclared
 	int sizes[];
@@ -107,6 +109,7 @@ public class FastHessianFeatureDetector {
 	 * <p>
 	 * Configuration for FH-9: initialSize=9, numberScalesPerOctave=4, numberOfOctaves=4<br>
 	 * Configuration for FH-15: initialSize=15, numberScalesPerOctave=5, numberOfOctaves=4<br>
+	 * * Note that FH-15 requires the image to be up sampled first. See [1] for details.
 	 * </p>
 	 *
 	 * @param extractor Feature extractor used to find local maximums in 2D image.
@@ -119,14 +122,13 @@ public class FastHessianFeatureDetector {
 	public FastHessianFeatureDetector(FeatureExtractor extractor , int maxFeaturesPerScale  ,
 									  int initialSize ,
 									  int numberScalesPerOctave ,
-									  int numberOfOctaves) {
+									  int numberOfOctaves ) {
 		this.extractor = extractor;
 		if( maxFeaturesPerScale > 0 ) {
 			selectBest = new SelectNBestFeatures(200);
 			selectBest.setN(maxFeaturesPerScale);
 		}
 		this.initialSize = initialSize;
-		this.numberScalesPerOctave = numberScalesPerOctave;
 		this.numberOfOctaves = numberOfOctaves;
 
 		sizes = new int[ numberScalesPerOctave ];
@@ -137,13 +139,14 @@ public class FastHessianFeatureDetector {
 	 *
 	 * @param integral Image transformed into an integral image.
 	 */
-	public void detect( ImageFloat32 integral ) {
+	public void detect( T integral ) {
 		if( intensity == null ) {
 			intensity = new ImageFloat32[3];
 			for( int i = 0; i < intensity.length; i++ ) {
 				intensity[i] = new ImageFloat32(integral.width,integral.height);
 			}
 		}
+		foundPoints.clear();
 
 		int skip = 1;
 		int sizeStep = 6;
@@ -175,7 +178,7 @@ public class FastHessianFeatureDetector {
 	 * @param skip Pixel skip factor
 	 * @param featureSize which feature sizes should be detected.
 	 */
-	protected void detectOctave( ImageFloat32 integral , int skip , int ...featureSize ) {
+	protected void detectOctave( T integral , int skip , int ...featureSize ) {
 
 		int w = integral.width/skip;
 		int h = integral.height/skip;
@@ -186,7 +189,7 @@ public class FastHessianFeatureDetector {
 
 		// compute feature intensity in each level
 		for( int i = 0; i < featureSize.length; i++ ) {
-			FastHessianFeatureIntensity.intensity(integral,skip,featureSize[i],intensity[spaceIndex]);
+			GeneralizedIntegralImageFeatureIntensity.hessian(integral,skip,featureSize[i],intensity[spaceIndex]);
 
 			spaceIndex++;
 			if( spaceIndex >= 3 )

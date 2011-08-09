@@ -62,7 +62,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_F32 kernel, ImageFloat32 image, ImageFloat32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		if( kernel.width >= image.width ) {
+		if( kernel.width >= image.height ) {
 			ConvolveNormalizedNaive.vertical(kernel,image,dest);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel,image,dest,true);
@@ -81,7 +81,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_F32 kernel, ImageFloat32 image, ImageFloat32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		if( kernel.width >= image.width ) {
+		if( kernel.width >= image.width || kernel.width >= image.height ) {
 			ConvolveNormalizedNaive.convolve(kernel,image,dest);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel,image,dest);
@@ -119,7 +119,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt8 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		if( kernel.width >= image.width ) {
+		if( kernel.width >= image.height ) {
 			ConvolveNormalizedNaive.vertical(kernel,image,dest);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel,image,dest,kernel.computeSum(),true);
@@ -138,7 +138,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 image, ImageInt8 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		if( kernel.width >= image.width ) {
+		if( kernel.width >= image.width || kernel.width >= image.height ) {
 			ConvolveNormalizedNaive.convolve(kernel,image,dest);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel,image,dest,kernel.computeSum());
@@ -176,7 +176,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		if( kernel.width >= image.width ) {
+		if( kernel.width >= image.height ) {
 			ConvolveNormalizedNaive.vertical(kernel,image,dest);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel,image,dest,kernel.computeSum(),true);
@@ -195,7 +195,7 @@ public class ConvolveNormalized {
 	public static void convolve(Kernel2D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		if( kernel.width >= image.width ) {
+		if( kernel.width >= image.width || kernel.width >= image.height ) {
 			ConvolveNormalizedNaive.convolve(kernel,image,dest);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel,image,dest,kernel.computeSum());

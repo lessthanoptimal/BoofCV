@@ -37,8 +37,14 @@ public class TestConvolveNormalized {
 			test.setKernelRadius(3);
 			test.performTests(9);
 
-			// now try a pathological case where the kernel is larger than the image
-			test.setKernelRadius(10);
+//			// now try a pathological case where the kernel is larger than the image
+			// --- too big for width
+			test.setKernelRadius(8);
+			test.performTests(9);
+
+			// -- too big for height
+			test.setImageDimension(20+i,15+i);
+			test.setKernelRadius(8);
 			test.performTests(9);
 		}
 	}

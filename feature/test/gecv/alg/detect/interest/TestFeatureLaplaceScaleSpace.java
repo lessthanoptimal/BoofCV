@@ -31,18 +31,20 @@ import java.util.List;
 public class TestFeatureLaplaceScaleSpace extends GenericFeatureScaleDetector {
 
 	@Override
-	protected List<ScalePoint> detectFeature(ImageFloat32 input, GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector, double[] scales) {
+	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {
+		ImageFunctionSparse<ImageFloat32> sparseLaplace = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class,null);
 
+		return new FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32>(detector,sparseLaplace,2);
+	}
+
+	@Override
+	protected List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
 		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
 		ss.setScales(scales);
 		ss.setImage(input);
 
-		ImageFunctionSparse<ImageFloat32> sparseLaplace = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class,null);
-
-		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> alg =
-				new FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32>(detector,sparseLaplace,2);
+		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> alg = (FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32>)detector;
 		alg.detect(ss);
-
 		return alg.getInterestPoints();
 	}
 }

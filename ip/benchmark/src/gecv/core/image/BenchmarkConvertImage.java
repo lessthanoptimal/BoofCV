@@ -98,19 +98,19 @@ public class BenchmarkConvertImage {
 		System.out.println();
 
 		System.out.printf("Float32 to Int8              %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new Float32toInt8(),1000));
+				ProfileOperation.profileOpsPerSec(new Float32toInt8(),1000, false));
 		System.out.printf("Int8 to Float32 signed       %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new Int8ToFloat32(imgSInt8),1000));
+				ProfileOperation.profileOpsPerSec(new Int8ToFloat32(imgSInt8),1000, false));
 		System.out.printf("Int8 to Float32 unsigned     %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new Int8ToFloat32(imgUInt8),1000));
+				ProfileOperation.profileOpsPerSec(new Int8ToFloat32(imgUInt8),1000, false));
 		System.out.printf("Int16 to Float32 signed       %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new Int16ToFloat32(imgSInt16),1000));
+				ProfileOperation.profileOpsPerSec(new Int16ToFloat32(imgSInt16),1000, false));
 		System.out.printf("Int16 to Float32 unsigned     %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new Int16ToFloat32(imgUInt16),1000));
+				ProfileOperation.profileOpsPerSec(new Int16ToFloat32(imgUInt16),1000, false));
 		System.out.printf("Int16 to Int8 signed          %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new Int16ToInt8(imgSInt16),1000));
+				ProfileOperation.profileOpsPerSec(new Int16ToInt8(imgSInt16),1000, false));
 		System.out.printf("Int16 to Int8 unsigned        %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new Int16ToInt8(imgUInt16),1000));
+				ProfileOperation.profileOpsPerSec(new Int16ToInt8(imgUInt16),1000, false));
 
 	}
 }

@@ -95,7 +95,7 @@ public class BenchmarkCornerRuntime {
 
 	public static void benchmark(GeneralFeatureDetector alg, String name) {
 		ImageBase input = imageType == ImageFloat32.class ? image_F32 : image_I8;
-		double opsPerSec = ProfileOperation.profileOpsPerSec(new Detector(alg,input,imageType,derivType), TEST_TIME);
+		double opsPerSec = ProfileOperation.profileOpsPerSec(new Detector(alg,input,imageType,derivType), TEST_TIME, false);
 
 		System.out.printf("%30s ops/sec = %6.2f\n", name, opsPerSec);
 	}

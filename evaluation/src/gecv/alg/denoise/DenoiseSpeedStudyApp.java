@@ -74,7 +74,7 @@ public class DenoiseSpeedStudyApp {
 
 		for( TestItem i : filters ) {
 			System.out.print("*");
-			i.opsPerSecond = ProfileOperation.profileOpsPerSec(new RunFilter(i),TEST_TIME);
+			i.opsPerSecond = ProfileOperation.profileOpsPerSec(new RunFilter(i),TEST_TIME, false);
 		}
 		System.out.println();
 

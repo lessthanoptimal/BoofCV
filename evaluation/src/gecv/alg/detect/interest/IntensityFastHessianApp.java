@@ -32,7 +32,7 @@ import java.awt.image.BufferedImage;
  * Displays intensity of features in the SURF feature detector
  * @author Peter Abeles
  */
-public class SurfFeatureIntensityApp {
+public class IntensityFastHessianApp {
 //	static String fileName = "evaluation/data/outdoors01.jpg";
 	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
@@ -61,7 +61,7 @@ public class SurfFeatureIntensityApp {
 				int block = 1+skip*2*(sizeIndex+1);
 				int size = 3*block;
 
-				FastHessianFeatureIntensity.intensity(integral,1,size,intensity);
+				IntegralImageFeatureIntensity.hessian(integral,1,size,intensity);
 				float maxAbs = PixelMath.maxAbs(intensity);
 				BufferedImage b = VisualizeImageData.colorizeSign(intensity,null,maxAbs);
 				guiIntensity.addImage(b,String.format("Oct = %2d size %3d",octave+1,size));

@@ -39,7 +39,7 @@ public class ProfileOperation {
 	public static void printOpsPerSec( Performer performer , long minTestTime )
 	{
 		try {
-			double opsPerSecond = profileOpsPerSec(performer,minTestTime);
+			double opsPerSecond = profileOpsPerSec(performer,minTestTime, false);
 
 			System.out.printf("%30s  ops/sec = %7.3f\n",performer.getClass().getSimpleName(),opsPerSecond);
 		} catch( RuntimeException e ) {
@@ -47,8 +47,11 @@ public class ProfileOperation {
 		}
 	}
 
-	public static double profileOpsPerSec( Performer performer , long minTestTime )
+	public static double profileOpsPerSec(Performer performer, long minTestTime, boolean warmUp)
 	{
+		if( warmUp )
+			performer.process();
+
 		int N = 1;
 		long elapsedTime;
 		while( true ) {

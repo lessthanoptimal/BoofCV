@@ -16,9 +16,11 @@
 
 package gecv.alg.detect.interest;
 
+import gecv.alg.detect.interest.impl.ImplIntegralImageFeatureIntensity;
 import gecv.alg.transform.ii.IntegralImageOps;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -28,17 +30,17 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestFastHessianFeatureIntensity {
+public class TestIntegralImageFeatureIntensity {
 
 	Random rand = new Random(234);
 	int width = 60;
 	int height = 70;
 
 	/**
-	 * Compares the inner() function against the output from the naive function.
+	 * Compares hessian intensity against a naive implementation
 	 */
 	@Test
-	public void inner() {
+	public void hessian_F32() {
 		ImageFloat32 original = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
@@ -48,30 +50,24 @@ public class TestFastHessianFeatureIntensity {
 		IntegralImageOps.transform(original,integral);
 
 		int size = 9;
-		int r = size/2+1;
-		r++;
+
 		for( int skip = 1; skip <= 4; skip++ ) {
 			found.reshape(width/skip,height/skip);
 			expected.reshape(width/skip,height/skip);
-			FastHessianFeatureIntensity.naive(integral,skip,size,expected);
-			FastHessianFeatureIntensity.inner(integral,skip,size,found);
+			ImplIntegralImageFeatureIntensity.hessianNaive(integral,skip,size,expected);
+			IntegralImageFeatureIntensity.hessian(integral,skip,size,found);
 
-			int w = found.width;
-			int h = found.height;
-			ImageFloat32 f = found.subimage(r+1,r+1,w-r,h-r);
-			ImageFloat32 e = expected.subimage(r+1,r+1,w-r,h-r);
-
-			GecvTesting.assertEquals(e,f,0,1e-4f);
+			GecvTesting.assertEquals(expected,found,0,1e-4f);
 		}
 	}
 
 	/**
-	 * Compares the inner() function against the output from the naive function.
+	 * Compares hessian intensity against a naive implementation
 	 */
 	@Test
-	public void intensity() {
-		ImageFloat32 original = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+	public void hessian_S32() {
+		ImageSInt32 original = new ImageSInt32(width,height);
+		ImageSInt32 integral = new ImageSInt32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
@@ -83,8 +79,8 @@ public class TestFastHessianFeatureIntensity {
 		for( int skip = 1; skip <= 4; skip++ ) {
 			found.reshape(width/skip,height/skip);
 			expected.reshape(width/skip,height/skip);
-			FastHessianFeatureIntensity.naive(integral,skip,size,expected);
-			FastHessianFeatureIntensity.intensity(integral,skip,size,found);
+			ImplIntegralImageFeatureIntensity.hessianNaive(integral,skip,size,expected);
+			IntegralImageFeatureIntensity.hessian(integral,skip,size,found);
 
 			GecvTesting.assertEquals(expected,found,0,1e-4f);
 		}

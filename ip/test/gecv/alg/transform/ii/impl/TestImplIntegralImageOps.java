@@ -41,23 +41,23 @@ public class TestImplIntegralImageOps {
 	int height = 30;
 
 	@Test
-	public void testFloat32() {
+	public void transform_F32() {
 		ImageFloat32 a = new ImageFloat32(width,height);
 		GeneralizedImageOps.randomize(a,rand,0,100);
 
 		ImageFloat32 b = new ImageFloat32(width,height);
-		ImplIntegralImageOps.process(a,b);
+		ImplIntegralImageOps.transform(a,b);
 
 		GecvTesting.checkSubImage(this,"checkResults",true,a,b);
 	}
 
 	@Test
-	public void testUInt8() {
+	public void transform_U8() {
 		ImageUInt8 a = new ImageUInt8(width,height);
 		GeneralizedImageOps.randomize(a,rand,0,100);
 
 		ImageSInt32 b = new ImageSInt32(width,height);
-		ImplIntegralImageOps.process(a,b);
+		ImplIntegralImageOps.transform(a,b);
 
 		GecvTesting.checkSubImage(this,"checkResults",true,a,b);
 	}

@@ -30,13 +30,18 @@ import java.util.List;
 public class TestFeatureScaleSpace extends GenericFeatureScaleDetector {
 
 	@Override
-	protected List<ScalePoint> detectFeature(ImageFloat32 input, GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector, double[] scales) {
+	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {
+		return new FeatureScaleSpace<ImageFloat32,ImageFloat32>(detector,2);
+	}
 
+	@Override
+	protected List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
 		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
 		ss.setScales(scales);
 		ss.setImage(input);
 
-		FeatureScaleSpace<ImageFloat32,ImageFloat32> alg = new FeatureScaleSpace<ImageFloat32,ImageFloat32>(detector,2);
+		FeatureScaleSpace<ImageFloat32,ImageFloat32> alg =
+				(FeatureScaleSpace<ImageFloat32,ImageFloat32>)detector;
 		alg.detect(ss);
 
 		return alg.getInterestPoints();

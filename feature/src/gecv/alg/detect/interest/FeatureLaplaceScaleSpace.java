@@ -113,6 +113,7 @@ public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> 
 	 */
 	public void detect( GaussianScaleSpace<T,D> ss ) {
 		spaceIndex = 0;
+		foundPoints.clear();
 
 		// compute feature intensity in each level
 		for( int i = 0; i < ss.getTotalScales(); i++ ) {

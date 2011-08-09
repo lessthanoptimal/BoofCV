@@ -14,10 +14,31 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.interest;
+package gecv.alg.detect.interest.benchmark;
+
+import gecv.abst.detect.interest.InterestPointDetector;
+import gecv.struct.image.ImageBase;
+
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkInterestStability_Intensity {
+public class InterestMetrics<T extends ImageBase>
+{
+	public String name;
+	public InterestPointDetector<T> detector;
+	public Object metric;
+
+	public InterestMetrics(String name, InterestPointDetector<T> detector) {
+		this.name = name;
+		this.detector = detector;
+	}
+
+	public <T>T getMetric() {
+		return (T)metric;
+	}
+
+	public void setMetric(Object metric) {
+		this.metric = metric;
+	}
 }
