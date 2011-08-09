@@ -81,7 +81,7 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 //		ShowImages.showWindow((ImageFloat32)larger,"large",true);
 	}
 
-		@Override
+	@Override
 	protected boolean isEquivalent(Method candidate, Method evaluation) {
 		if( evaluation.getName().compareTo(candidate.getName()) != 0 )
 			return false;

@@ -19,10 +19,9 @@ package gecv.abst.detect.interest;
 import gecv.struct.image.ImageBase;
 import jgrl.struct.point.Point2D_I32;
 
-import java.util.List;
-
 /**
- * Interface for automatic interest point detection in an image.
+ * Interface for automatic interest point detection in an image.  Provides optional
+ * support for additional point features.
  *
  * @author Peter Abeles
  */
@@ -34,5 +33,17 @@ public interface InterestPointDetector< T extends ImageBase> {
 	 * @param input Input image.
 	 * @return List of interest points.
 	 */
-	List<Point2D_I32> detect( T input );
+	void detect( T input );
+
+	int getNumberOfFeatures();
+
+	Point2D_I32 getLocation( int featureIndex );
+
+	double getScale( int featureIndex );
+
+	double getOrientation( int featureIndex );
+
+	public boolean hasScale();
+
+	public boolean hasOrientation();
 }

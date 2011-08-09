@@ -18,6 +18,7 @@ package gecv.alg.transform.gss;
 
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.SingleBandGenerator;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -29,11 +30,12 @@ import gecv.struct.image.ImageUInt8;
  */
 public class FactoryGaussianScaleSpace {
 
-	public static NoCacheScaleSpace<?,?> nocache( Class<?> imageType  ) {
+	public static <T extends ImageBase, D extends ImageBase>
+	NoCacheScaleSpace<T,D> nocache( Class<T> imageType  ) {
 		if( imageType == ImageFloat32.class ) {
-			return nocache_F32();
+			return (NoCacheScaleSpace<T,D>)nocache_F32();
 		} else if( imageType == ImageUInt8.class ) {
-			return nocache_U8();
+			return (NoCacheScaleSpace<T,D>)nocache_U8();
 		} else {
 			throw new IllegalArgumentException("Doesn't handle "+imageType.getSimpleName()+" yet.");
 		}

@@ -16,16 +16,24 @@
 
 package gecv.alg.transform.ii;
 
+import gecv.abst.transform.GeneralizedIntegralImageOps;
 import gecv.alg.filter.convolve.ConvolveWithBorder;
+import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.SingleBandImage;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
+import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.ImageRectangle;
 import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.image.*;
 import gecv.testing.GecvTesting;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
@@ -42,104 +50,215 @@ public class TestIntegralImageOps {
 
 
 	@Test
-	public void convolve() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+	public void transform() {
+		int numFound = GecvTesting.findMethodThenCall(this,"transform",IntegralImageOps.class,"transform");
+		assertEquals(3,numFound);
+	}
 
-		GeneralizedImageOps.randomize(input,rand,0,10);
-		IntegralImageOps.transform(input,integral);
+	public void transform( Method m ) {
+		Class<?> paramType[] = m.getParameterTypes();
+		Class<?> inputType = paramType[0];
+		Class<?> outputType = paramType[1];
 
-		Kernel2D_F32 kernel = new Kernel2D_F32(new float[]{1,1,1,2,2,2,1,1,1},3);
+		ImageBase input = GeneralizedImageOps.createImage(inputType,width,height);
+		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GeneralizedImageOps.randomize(input,rand,0,100);
 
-		ImageBorder_F32 border = FactoryImageBorder.value(input,0);
-		ConvolveWithBorder.convolve(kernel,input,expected,border);
+		GecvTesting.checkSubImage(this,"checkTransformResults",true,m,input,integral);
+	}
 
-		ImageRectangle blocks[] = new ImageRectangle[2];
-		blocks[0] = new ImageRectangle(-2,-2,1,1);
-		blocks[1] = new ImageRectangle(-2,-1,1,0);
+	public void checkTransformResults(Method m , ImageBase a, ImageBase b) throws InvocationTargetException, IllegalAccessException {
 
-		IntegralImageOps.convolve(integral,blocks,new int[]{1,1},found);
+		m.invoke(null,a,b);
 
-		GecvTesting.assertEquals(expected,found,0,1e-4f);
+		SingleBandImage aa = FactorySingleBandImage.wrap(a);
+		SingleBandImage bb = FactorySingleBandImage.wrap(b);
+
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				double total = 0;
+
+				for( int i = 0; i <= y; i++ ) {
+					for( int j = 0; j <= x; j++ ) {
+						total += aa.get(j,i).doubleValue();
+					}
+				}
+
+				Assert.assertEquals(x+" "+y,total,bb.get(x,y).doubleValue(),1e-1);
+			}
+		}
 	}
 
 	@Test
-	public void convolveBorder() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+	public void convolve() {
+		int numFound = GecvTesting.findMethodThenCall(this,"convolve",IntegralImageOps.class,"convolve");
+		assertEquals(2,numFound);
+	}
+
+	public void convolve( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramType[] = m.getParameterTypes();
+		Class<?> inputType = paramType[0];
+		Class<?> outputType = paramType[2];
+		Class<?> origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
+
+		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
+		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
 
 		GeneralizedImageOps.randomize(input,rand,0,10);
-		IntegralImageOps.transform(input,integral);
+		GeneralizedIntegralImageOps.transform(input,integral);
 
-		Kernel2D_F32 kernel = new Kernel2D_F32(new float[]{1,1,1,2,2,2,1,1,1},3);
+		ImageBase expected = GeneralizedImageOps.createImage(outputType,width,height);
+		ImageBase found = GeneralizedImageOps.createImage(outputType,width,height);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		if( paramType[0] == ImageFloat32.class ) {
+			Kernel2D_F32 kernel = new Kernel2D_F32(new float[]{1,1,1,2,2,2,1,1,1},3);
+			ImageBorder_F32 border = FactoryImageBorder.value((ImageFloat32)input,0);
+			ConvolveWithBorder.convolve(kernel,(ImageFloat32)input,(ImageFloat32)expected,border);
+		} else {
+			Kernel2D_I32 kernel = new Kernel2D_I32(new int[]{1,1,1,2,2,2,1,1,1},3);
+			ImageBorder_I32 border = FactoryImageBorder.value((ImageInteger)input,0);
+			ConvolveWithBorder.convolve(kernel,(ImageUInt8)input,(ImageSInt32)expected,border);
+		}
 
-		ImageBorder_F32 border = FactoryImageBorder.value(input,0);
-		ConvolveWithBorder.convolve(kernel,input,expected,border);
+		IntegralKernel kernel = new IntegralKernel(2);
+		kernel.blocks[0] = new ImageRectangle(-2,-2,1,1);
+		kernel.blocks[1] = new ImageRectangle(-2,-1,1,0);
+		kernel.scales = new int[]{1,1};
 
-		ImageRectangle blocks[] = new ImageRectangle[2];
-		blocks[0] = new ImageRectangle(-2,-2,1,1);
-		blocks[1] = new ImageRectangle(-2,-1,1,0);
+		m.invoke(null,integral,kernel,found);
 
-		IntegralImageOps.convolveBorder(integral,blocks,new int[]{1,1},found,4,5);
+		GecvTesting.assertEqualsGeneric(expected,found,0,1e-4f);
+	}
+
+
+	@Test
+	public void convolveBorder() {
+		int numFound = GecvTesting.findMethodThenCall(this,"convolveBorder",IntegralImageOps.class,"convolveBorder");
+		assertEquals(2,numFound);
+	}
+
+	public void convolveBorder( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramType[] = m.getParameterTypes();
+		Class<?> inputType = paramType[0];
+		Class<?> outputType = paramType[2];
+		Class<?> origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
+
+		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
+		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
+
+		GeneralizedImageOps.randomize(input,rand,0,10);
+		GeneralizedIntegralImageOps.transform(input,integral);
+
+		ImageBase expected = GeneralizedImageOps.createImage(outputType,width,height);
+		ImageBase found = GeneralizedImageOps.createImage(outputType,width,height);
+
+		if( paramType[0] == ImageFloat32.class ) {
+			Kernel2D_F32 kernel = new Kernel2D_F32(new float[]{1,1,1,2,2,2,1,1,1},3);
+			ImageBorder_F32 border = FactoryImageBorder.value((ImageFloat32)input,0);
+			ConvolveWithBorder.convolve(kernel,(ImageFloat32)input,(ImageFloat32)expected,border);
+		} else {
+			Kernel2D_I32 kernel = new Kernel2D_I32(new int[]{1,1,1,2,2,2,1,1,1},3);
+			ImageBorder_I32 border = FactoryImageBorder.value((ImageInteger)input,0);
+			ConvolveWithBorder.convolve(kernel,(ImageUInt8)input,(ImageSInt32)expected,border);
+		}
+
+		IntegralKernel kernel = new IntegralKernel(2);
+		kernel.blocks[0] = new ImageRectangle(-2,-2,1,1);
+		kernel.blocks[1] = new ImageRectangle(-2,-1,1,0);
+		kernel.scales = new int[]{1,1};
+
+		m.invoke(null,integral,kernel,found,4,5);
 
 		GecvTesting.assertEqualsBorder(expected,found,1e-4f,4,5);
 	}
 
 	@Test
 	public void convolveSparse() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		int numFound = GecvTesting.findMethodThenCall(this,"convolveSparse",IntegralImageOps.class,"convolveSparse");
+		assertEquals(2,numFound);
+	}
 
-		GeneralizedImageOps.randomize(input,rand,0,10);
-		IntegralImageOps.transform(input,integral);
+	public void convolveSparse( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramType[] = m.getParameterTypes();
+		Class<?> inputType = paramType[0];
 
+		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
+		GeneralizedImageOps.randomize(integral,rand,0,1000);
+
+		ImageBase expected = GeneralizedImageOps.createImage(inputType,width,height);
 
 		IntegralKernel kernel = new IntegralKernel(2);
 		kernel.blocks[0] = new ImageRectangle(-2,-2,1,1);
 		kernel.blocks[1] = new ImageRectangle(-2,-1,1,0);
 		kernel.scales =  new int[]{1,2};
 
-		IntegralImageOps.convolve(integral,kernel.blocks,kernel.scales,expected);
+		GeneralizedIntegralImageOps.convolve(integral,kernel,expected);
 
-		assertEquals(expected.get(0,0),IntegralImageOps.convolveSparse(integral,kernel,0,0),1e-4f);
-		assertEquals(expected.get(10,12),IntegralImageOps.convolveSparse(integral,kernel,10,12),1e-4f);
-		assertEquals(expected.get(19,29),IntegralImageOps.convolveSparse(integral,kernel,19,29),1e-4f);
+		SingleBandImage e = FactorySingleBandImage.wrap(expected);
+
+		double found0 = ((Number)m.invoke(null,integral,kernel,0,0)).doubleValue();
+		double found1 = ((Number)m.invoke(null,integral,kernel,10,12)).doubleValue();
+		double found2 = ((Number)m.invoke(null,integral,kernel,19,29)).doubleValue();
+
+		assertEquals(e.get(0,0).doubleValue(),found0,1e-4f);
+		assertEquals(e.get(10,12).doubleValue(),found1,1e-4f);
+		assertEquals(e.get(19,29).doubleValue(),found2,1e-4f);
 	}
 
 	@Test
 	public void block_unsafe() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		int numFound = GecvTesting.findMethodThenCall(this,"block_unsafe",IntegralImageOps.class,"block_unsafe");
+		assertEquals(2,numFound);
+	}
+	
+	public void block_unsafe( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramType[] = m.getParameterTypes();
+		Class<?> inputType = paramType[0];
+		Class<?> origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
+
+		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
+		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);
 
 		GeneralizedImageOps.fill(input,1);
-		IntegralImageOps.transform(input,integral);
+		GeneralizedIntegralImageOps.transform(input,integral);
 
-		assertEquals(12,IntegralImageOps.block_unsafe(integral,4,5,8,8),1e-4f);
+		double found0 = ((Number)m.invoke(null,integral,4,5,8,8)).doubleValue();
+
+		assertEquals(12,found0,1e-4f);
 	}
 
 	@Test
 	public void block_zero() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		int numFound = GecvTesting.findMethodThenCall(this,"block_zero",IntegralImageOps.class,"block_zero");
+		assertEquals(2,numFound);
+	}
+
+	public void block_zero( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramType[] = m.getParameterTypes();
+		Class<?> inputType = paramType[0];
+		Class<?> origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
+
+		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
+		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);
 
 		GeneralizedImageOps.fill(input,1);
-		IntegralImageOps.transform(input,integral);
+		GeneralizedIntegralImageOps.transform(input,integral);
 
-		assertEquals(12,IntegralImageOps.block_zero(integral,4,5,8,8),1e-4f);
+		double found = ((Number)m.invoke(null,integral,4,5,8,8)).doubleValue();
+		assertEquals(12,found,1e-4f);
 
-		assertEquals(12,IntegralImageOps.block_zero(integral,-1,-2,2,3),1e-4f);
+		found = ((Number)m.invoke(null,integral,-1,-2,2,3)).doubleValue();
+		assertEquals(12,found,1e-4f);
 
-		assertEquals(2,IntegralImageOps.block_zero(integral,width-2,height-3,width+1,height+3),1e-4f);
+		found = ((Number)m.invoke(null,integral,width-2,height-3,width+1,height+3)).doubleValue();
+		assertEquals(2,found,1e-4f);
 
-		assertEquals(0,IntegralImageOps.block_zero(integral,-3,-4,-1,-1),1e-4f);
-		assertEquals(0,IntegralImageOps.block_zero(integral,width+1,height+2,width+6,height+8),1e-4f);
+		found = ((Number)m.invoke(null,integral,3,-4,-1,-1)).doubleValue();
+		assertEquals(0,found,1e-4f);
+
+		found = ((Number)m.invoke(null,integral,width+1,height+2,width+6,height+8)).doubleValue();
+		assertEquals(0,found,1e-4f);
 	}
 }

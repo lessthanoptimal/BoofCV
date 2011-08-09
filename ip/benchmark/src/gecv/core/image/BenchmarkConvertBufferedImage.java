@@ -96,28 +96,28 @@ public class BenchmarkConvertBufferedImage {
 
 		createBufferedImage(BufferedImage.TYPE_3BYTE_BGR);
 		System.out.printf("BufferedImage to ImageUInt8   %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromInt8ToGenericBuff(),1000));
+				ProfileOperation.profileOpsPerSec(new FromInt8ToGenericBuff(),1000, false));
 		System.out.printf("TYPE_3BYTE_BGR to ImageUInt8  %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000));
+				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000, false));
 		System.out.printf("ImageUInt8 to TYPE_3BYTE_BGR  %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000));
+				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000, false));
 
 		createBufferedImage(BufferedImage.TYPE_INT_RGB);
 		System.out.printf("TYPE_INT_RGB to ImageUInt8    %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000));
+				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000, false));
 		System.out.printf("ImageUInt8 to TYPE_INT_RGB    %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000));
+				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000, false));
 
 		createBufferedImage(BufferedImage.TYPE_BYTE_GRAY);
 		System.out.printf("TYPE_BYTE_GRAY to ImageUInt8  %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000));
+				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000, false));
 		System.out.printf("ImageUInt8 to TYPE_BYTE_GRAY  %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000));
+				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000, false));
 
 		System.out.printf("extractImageInt8             %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new ExtractImageInt8(),1000));
+				ProfileOperation.profileOpsPerSec(new ExtractImageInt8(),1000, false));
 		System.out.printf("wxtractBuffered              %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new ExtractBuffered(),1000));
+				ProfileOperation.profileOpsPerSec(new ExtractBuffered(),1000, false));
 
 		System.out.println();
 		System.out.println("=========  Profiling for ImageInterleavedInt8 ==========");

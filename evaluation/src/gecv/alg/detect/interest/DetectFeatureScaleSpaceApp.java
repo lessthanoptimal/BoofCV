@@ -54,15 +54,13 @@ public class DetectFeatureScaleSpaceApp {
 		FeatureScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianScaleSpace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 //		FeatureScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisScaleSpace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 
-		long before = System.currentTimeMillis();
 		det.detect(ss);
-		long after = System.currentTimeMillis();
 
 		ScaleSpacePointPanel panel = new ScaleSpacePointPanel(ss,r);
 		panel.setBackground(input);
 		panel.setPoints(det.getInterestPoints());
 
 		ShowImages.showWindow(panel,"Feature Scale Space");
-		System.out.println("Done: time "+(after-before));
+		System.out.println("Done");
 	}
 }

@@ -49,6 +49,8 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 	D derivYY;
 	D derivXY;
 
+	List<Point2D_I32> foundPoints;
+
 	public WrapCornerToInterestPoint(GeneralFeatureDetector<T, D> detector,
 									 ImageGradient<T,D> gradient ,
 									 ImageHessian<D> hessian ,
@@ -60,11 +62,11 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 	}
 
 	@Override
-	public List<Point2D_I32> detect(T input) {
+	public void detect(T input) {
 
 		if( !declaredDerivatives ) {
 			declaredDerivatives = true;
-			if( detector.getRequiresGradient() ) {
+			if( detector.getRequiresGradient() || detector.getRequiresHessian() ) {
 				derivX = derivativeGenerator.createInstance(input.width,input.height);
 				derivY = derivativeGenerator.createInstance(input.width,input.height);
 			}
@@ -84,12 +86,40 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 
 		QueueCorner corners = detector.getFeatures();
 
-		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
+		foundPoints = new ArrayList<Point2D_I32>();
 		for( int i = 0; i < corners.num; i++ ) {
 			Point2D_I16 p = corners.get(i);
-			ret.add( new Point2D_I32(p.x,p.y));
+			foundPoints.add( new Point2D_I32(p.x,p.y));
 		}
+	}
 
-		return ret;
+	@Override
+	public int getNumberOfFeatures() {
+		return foundPoints.size();
+	}
+
+	@Override
+	public Point2D_I32 getLocation(int featureIndex) {
+		return foundPoints.get(featureIndex);
+	}
+
+	@Override
+	public double getScale(int featureIndex) {
+		throw new IllegalArgumentException("Not supported");
+	}
+
+	@Override
+	public double getOrientation(int featureIndex) {
+		throw new IllegalArgumentException("Not supported");
+	}
+
+	@Override
+	public boolean hasScale() {
+		return false;
+	}
+
+	@Override
+	public boolean hasOrientation() {
+		return false;
 	}
 }

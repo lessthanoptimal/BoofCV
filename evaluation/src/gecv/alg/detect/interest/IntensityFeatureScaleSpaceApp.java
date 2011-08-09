@@ -36,14 +36,14 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class FeatureIntensityScaleSpaceApp {
+public class IntensityFeatureScaleSpaceApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-//	static String fileName = "evaluation/data/sunflowers.png";
+	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
 //	static String fileName = "evaluation/data/indoors01.jpg";
-	static String fileName = "evaluation/data/shapes01.png";
+//	static String fileName = "evaluation/data/shapes01.png";
 
 	public static void main( String args[] ) {
 		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
@@ -94,7 +94,7 @@ public class FeatureIntensityScaleSpaceApp {
 
 			ImageFloat32 featureImg = intensity.getIntensity();
 
-			b = VisualizeImageData.grayMagnitude(featureImg,null, PixelMath.maxAbs(featureImg));
+			b = VisualizeImageData.colorizeSign(featureImg,null, PixelMath.maxAbs(featureImg));
 			guiIntensity.addImage(b,String.format("Scale %6.2f",scale));
 		}
 

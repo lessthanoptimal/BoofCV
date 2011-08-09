@@ -35,21 +35,27 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetector {
-	@Override
-	protected List<ScalePoint> detectFeature(ImageFloat32 input, GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector, double[] scales) {
 
-		InterpolatePixel<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
-		PyramidUpdateGaussianScale<ImageFloat32> update = new PyramidUpdateGaussianScale<ImageFloat32>(interpolate);
-		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(update,scales);
-		ss.update(input);
+	@Override
+	protected Object createDetector( GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector ) {
 
 		ImageFunctionSparse<ImageFloat32> sparseLaplace = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class,null);
 		AnyImageDerivative<ImageFloat32,ImageFloat32> deriv = UtilScaleSpace.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
 
-		FeatureLaplacePyramid<ImageFloat32,ImageFloat32> alg =
-				new FeatureLaplacePyramid<ImageFloat32,ImageFloat32>(detector,sparseLaplace,deriv,1);
+		return new FeatureLaplacePyramid<ImageFloat32,ImageFloat32>(detector,sparseLaplace,deriv,1);	}
+
+	@Override
+	protected List<ScalePoint> detectFeature(ImageFloat32 input,  double[] scales , Object detector) {
+		InterpolatePixel<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+
+		PyramidUpdateGaussianScale<ImageFloat32> update = new PyramidUpdateGaussianScale<ImageFloat32>(interpolate);
+		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(update,scales);
+		ss.update(input);
+
+		FeatureLaplacePyramid<ImageFloat32,ImageFloat32> alg = (FeatureLaplacePyramid<ImageFloat32,ImageFloat32>)detector;
 		alg.detect(ss);
 
 		return alg.getInterestPoints();
 	}
+
 }

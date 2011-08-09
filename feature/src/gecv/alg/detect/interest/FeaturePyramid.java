@@ -104,6 +104,7 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 			maximums[1] = new ArrayList<Point2D_I16>();
 			maximums[2] = new ArrayList<Point2D_I16>();
 		}
+		foundPoints.clear();
 
 		// compute feature intensity in each level
 		for( int i = 0; i < ss.getNumLayers(); i++ ) {

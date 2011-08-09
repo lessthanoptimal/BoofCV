@@ -33,21 +33,27 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class TestFeaturePyramid extends GenericFeatureScaleDetector {
-	@Override
-	protected List<ScalePoint> detectFeature(ImageFloat32 input, GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector, double[] scales) {
 
+	@Override
+	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {
+		AnyImageDerivative<ImageFloat32,ImageFloat32> deriv = UtilScaleSpace.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
+
+		return new FeaturePyramid<ImageFloat32,ImageFloat32>(detector,deriv,1);
+	}
+
+	@Override
+	protected List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
 		InterpolatePixel<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 		PyramidUpdateGaussianScale<ImageFloat32> update = new PyramidUpdateGaussianScale<ImageFloat32>(interpolate);
 		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(update,scales);
 		ss.update(input);
 
-		AnyImageDerivative<ImageFloat32,ImageFloat32> deriv = UtilScaleSpace.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
-
 		FeaturePyramid<ImageFloat32,ImageFloat32> alg =
-				new FeaturePyramid<ImageFloat32,ImageFloat32>(detector,deriv,1);
+				(FeaturePyramid<ImageFloat32,ImageFloat32>)detector;
 		alg.detect(ss);
 
 		return alg.getInterestPoints();
 	}
+
 }
 

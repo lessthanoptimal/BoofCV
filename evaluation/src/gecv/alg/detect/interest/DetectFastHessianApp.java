@@ -52,12 +52,8 @@ public class DetectFastHessianApp {
 
 		ImageFloat32 integral = IntegralImageOps.transform(inputF32,null);
 		det.detect(integral);
-		long before = System.currentTimeMillis();
-		det.detect(integral);
-		long after = System.currentTimeMillis();
 
 		System.out.println("total features found: "+det.getFoundPoints().size());
-		System.out.println("Time: "+(after-before));
 
 		VisualizeFeatures.drawScalePoints(input.createGraphics(),det.getFoundPoints(),2.5);
 

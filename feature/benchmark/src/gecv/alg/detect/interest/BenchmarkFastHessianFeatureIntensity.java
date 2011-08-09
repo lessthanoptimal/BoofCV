@@ -18,6 +18,7 @@ package gecv.alg.detect.interest;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
+import gecv.alg.detect.interest.impl.ImplIntegralImageFeatureIntensity;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.transform.ii.IntegralImageOps;
 import gecv.struct.image.ImageFloat32;
@@ -46,7 +47,7 @@ public class BenchmarkFastHessianFeatureIntensity {
 
 		@Override
 		public void process() {
-			FastHessianFeatureIntensity.naive(integral,skip,size,intensity);
+			ImplIntegralImageFeatureIntensity.hessianNaive(integral,skip,size,intensity);
 		}
 	}
 
@@ -54,7 +55,7 @@ public class BenchmarkFastHessianFeatureIntensity {
 
 		@Override
 		public void process() {
-			FastHessianFeatureIntensity.intensity(integral,skip,size,intensity);
+			IntegralImageFeatureIntensity.hessian(integral,skip,size,intensity);
 		}
 	}
 

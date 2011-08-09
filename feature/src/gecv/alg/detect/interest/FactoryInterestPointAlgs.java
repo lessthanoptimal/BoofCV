@@ -76,10 +76,10 @@ public class FactoryInterestPointAlgs {
 	 */
 	public static <T extends ImageBase, D extends ImageBase>
 	FeatureLaplaceScaleSpace<T,D> hessianLaplace( int featureRadius ,
-												float cornerThreshold ,
-												int maxFeatures ,
-												Class<T> imageType ,
-												Class<D> derivType)
+												  float cornerThreshold ,
+												  int maxFeatures ,
+												  Class<T> imageType ,
+												  Class<D> derivType)
 	{
 		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,0,false,false,false);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);

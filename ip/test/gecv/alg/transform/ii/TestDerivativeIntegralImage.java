@@ -59,7 +59,7 @@ public class TestDerivativeIntegralImage {
 			Kernel2D_F32 kernel = createDerivXX(size);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
-			IntegralImageOps.convolve(integral,kernelI.blocks,kernelI.scales,found);
+			IntegralImageOps.convolve(integral,kernelI,found);
 
 			GecvTesting.assertEquals(expected,found,0,1e-2);
 		}
@@ -112,7 +112,7 @@ public class TestDerivativeIntegralImage {
 			kernel = FactoryKernel.transpose(kernel);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
-			IntegralImageOps.convolve(integral,kernelI.blocks,kernelI.scales,found);
+			IntegralImageOps.convolve(integral,kernelI,found);
 
 			GecvTesting.assertEquals(expected,found,0,1e-2);
 		}
@@ -166,7 +166,7 @@ public class TestDerivativeIntegralImage {
 			Kernel2D_F32 kernel = createDerivXY(size);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
-			IntegralImageOps.convolve(integral,kernelI.blocks,kernelI.scales,found);
+			IntegralImageOps.convolve(integral,kernelI,found);
 
 			GecvTesting.assertEquals(expected,found,0,1e-2);
 		}

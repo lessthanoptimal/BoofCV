@@ -14,21 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.interest;
-
-import gecv.struct.image.ImageFloat32;
-
+package gecv.alg.detect.interest.benchmark;
 
 /**
- * Feature detector for integral images.
- *
  * @author Peter Abeles
  */
-public class InterestIntegralImage {
-	public static void hessianDeterminant( ImageFloat32 integral ,
-										   int size , float w ,
-										   ImageFloat32 intensity )
-	{
-
-	}
+public class BenchmarkInterestStability_Rotation {
 }
