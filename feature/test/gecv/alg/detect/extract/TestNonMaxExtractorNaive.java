@@ -31,7 +31,7 @@ import static org.junit.Assert.assertFalse;
 /**
  * @author Peter Abeles
  */
-public class TestNonMaxCornerExtractorNaive {
+public class TestNonMaxExtractorNaive {
 
 	/**
 	 * Pass in a null list and see if it blows up
@@ -43,7 +43,7 @@ public class TestNonMaxCornerExtractorNaive {
 
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 
-		NonMaxCornerExtractorNaive alg = new NonMaxCornerExtractorNaive(2, 0.6F);
+		NonMaxExtractorNaive alg = new NonMaxExtractorNaive(2, 0.6F);
 		alg.process(inten,null,foundList);
 		// if it doesn't blow up it passed!
 	}
@@ -60,7 +60,7 @@ public class TestNonMaxCornerExtractorNaive {
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 
 
-		NonMaxCornerExtractorNaive alg = new NonMaxCornerExtractorNaive(2, 0.6F);
+		NonMaxExtractorNaive alg = new NonMaxExtractorNaive(2, 0.6F);
 		// find corners the first time
 		alg.process(inten,excludeList,foundList);
 
@@ -109,8 +109,8 @@ public class TestNonMaxCornerExtractorNaive {
 	public void testRegionWidth(ImageFloat32 img) {
 		QueueCorner corners = new QueueCorner(100);
 
-		NonMaxCornerExtractorNaive extractor;
-		extractor = new NonMaxCornerExtractorNaive(1, 0);
+		NonMaxExtractorNaive extractor;
+		extractor = new NonMaxExtractorNaive(1, 0);
 		extractor.process(img, null , corners);
 		assertEquals(5, corners.size());
 
@@ -150,8 +150,8 @@ public class TestNonMaxCornerExtractorNaive {
 	public void testThreshold(ImageFloat32 img) {
 		QueueCorner corners = new QueueCorner(100);
 
-		NonMaxCornerExtractorNaive extractor;
-		extractor = new NonMaxCornerExtractorNaive(0, 0);
+		NonMaxExtractorNaive extractor;
+		extractor = new NonMaxExtractorNaive(0, 0);
 		extractor.process(img, null , corners);
 		assertEquals(9 * 8, corners.size());
 

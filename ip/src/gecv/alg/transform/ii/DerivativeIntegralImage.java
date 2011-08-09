@@ -81,7 +81,7 @@ public class DerivativeIntegralImage {
 	{
 		int blockW = size/3;
 		int blockH = size-blockW-1;
-		int radiusW = 3*blockW/2;
+		int radiusW = size/2;
 		int radiusH = blockH/2;
 
 		int blockW2 = 2*blockW;
@@ -108,7 +108,7 @@ public class DerivativeIntegralImage {
 	{
 		int blockH = size/3;
 		int blockW = size-blockH-1;
-		int radiusH = 3*blockH/2;
+		int radiusH = size/2;
 		int radiusW = blockW/2;
 
 		int rowOff1 = blockH*input.stride;

@@ -34,11 +34,11 @@ import java.awt.image.BufferedImage;
 public class DetectFeatureScaleSpaceApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-//	static String fileName = "evaluation/data/sunflowers.png";
+	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
 //	static String fileName = "evaluation/data/indoors01.jpg";
-	static String fileName = "evaluation/data/shapes01.png";
+//	static String fileName = "evaluation/data/shapes01.png";
 
 	static int NUM_FEATURES = 50;
 
@@ -54,13 +54,15 @@ public class DetectFeatureScaleSpaceApp {
 		FeatureScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianScaleSpace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 //		FeatureScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisScaleSpace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 
+		long before = System.currentTimeMillis();
 		det.detect(ss);
+		long after = System.currentTimeMillis();
 
 		ScaleSpacePointPanel panel = new ScaleSpacePointPanel(ss,r);
 		panel.setBackground(input);
 		panel.setPoints(det.getInterestPoints());
 
 		ShowImages.showWindow(panel,"Feature Scale Space");
-		System.out.println("Done");
+		System.out.println("Done: time "+(after-before));
 	}
 }

@@ -17,7 +17,7 @@
 package gecv.abst.detect.corner;
 
 import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.alg.detect.extract.SelectNBestCorners;
+import gecv.alg.detect.extract.SelectNBestFeatures;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -31,7 +31,7 @@ import gecv.struct.image.ImageFloat32;
 public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 
 	// selects the features with the largest intensity
-	protected SelectNBestCorners selectBest;
+	protected SelectNBestFeatures selectBest;
 
 	// extracts corners from the intensity image
 	protected FeatureExtractor extractor;
@@ -64,7 +64,7 @@ public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 		this.extractor = extractor;
 		this.foundCorners = new QueueCorner(maxFeatures);
 		if (maxFeatures > 0) {
-			selectBest = new SelectNBestCorners(maxFeatures);
+			selectBest = new SelectNBestFeatures(maxFeatures);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 	 */
 	public void setBestNumber(int numFeatures) {
 		if( selectBest == null ) {
-			selectBest = new SelectNBestCorners(numFeatures);
+			selectBest = new SelectNBestFeatures(numFeatures);
 		} else {
 			selectBest.setN(numFeatures);
 		}

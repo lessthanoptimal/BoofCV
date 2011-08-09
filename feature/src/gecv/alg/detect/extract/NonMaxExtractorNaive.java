@@ -28,14 +28,16 @@ import jgrl.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class NonMaxCornerExtractorNaive implements NonMaxCornerExtractor {
+public class NonMaxExtractorNaive implements NonMaxExtractor {
 
 	// size of the search area
 	protected int radius;
 	// the threshold which points must be above to be a feature
 	protected float thresh;
 
-	public NonMaxCornerExtractorNaive(int minSeparation, float thresh) {
+	protected int border;
+
+	public NonMaxExtractorNaive(int minSeparation, float thresh) {
 		this.radius = minSeparation;
 		this.thresh = thresh;
 	}
@@ -56,6 +58,11 @@ public class NonMaxCornerExtractorNaive implements NonMaxCornerExtractor {
 	}
 
 	@Override
+	public void setIgnoreBorder(int border) {
+		this.border = border;
+	}
+
+	@Override
 	public void process(ImageFloat32 intensityImage, QueueCorner excludeCorners, QueueCorner corners) {
 		// mark corners which have already been found
 		if( excludeCorners != null ){
@@ -71,8 +78,10 @@ public class NonMaxCornerExtractorNaive implements NonMaxCornerExtractor {
 
 		final float inten[] = intensityImage.data;
 
-		for (int y = radius; y < imgHeight - radius; y++) {
-			for (int x = radius; x < imgWidth - radius; x++) {
+		int imageBorder = Math.max(radius,border);
+
+		for (int y = imageBorder; y < imgHeight - imageBorder; y++) {
+			for (int x = imageBorder; x < imgWidth - imageBorder; x++) {
 				int center = intensityImage.startIndex + y * stride + x;
 
 				float val = inten[center];
@@ -81,9 +90,9 @@ public class NonMaxCornerExtractorNaive implements NonMaxCornerExtractor {
 				boolean max = true;
 
 				escape:
-				for (int i = -radius; i <= radius; i++) {
-					int index = center + i * stride - radius;
-					for (int j = -radius; j <= radius; j++, index++) {
+				for (int i = -imageBorder; i <= imageBorder; i++) {
+					int index = center + i * stride - imageBorder;
+					for (int j = -imageBorder; j <= imageBorder; j++, index++) {
 						// don't compare the center point against itself
 						if (i == 0 && j == 0)
 							continue;

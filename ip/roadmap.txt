@@ -26,6 +26,7 @@ SFM
 #  * blobs
    * Template Matching
    * SURF
+   * Affine invariant
  - Color
    * images
    * color space conversion

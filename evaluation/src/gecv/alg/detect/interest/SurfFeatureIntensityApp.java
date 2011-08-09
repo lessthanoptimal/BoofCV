@@ -52,7 +52,7 @@ public class SurfFeatureIntensityApp {
 		guiIntensity.addImage(input,"Original");
 
 		int skip = 0;
-		for( int octave = 0; octave < 3; octave++ ) {
+		for( int octave = 0; octave < 4; octave++ ) {
 			if( skip == 0 )
 				skip = 1;
 			else
@@ -61,7 +61,7 @@ public class SurfFeatureIntensityApp {
 				int block = 1+skip*2*(sizeIndex+1);
 				int size = 3*block;
 
-				SurfHessianDetector.intensity(integral,1,size,intensity);
+				FastHessianFeatureIntensity.intensity(integral,1,size,intensity);
 				float maxAbs = PixelMath.maxAbs(intensity);
 				BufferedImage b = VisualizeImageData.colorizeSign(intensity,null,maxAbs);
 				guiIntensity.addImage(b,String.format("Oct = %2d size %3d",octave+1,size));

@@ -28,14 +28,14 @@ import jgrl.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class NonMaxCornerCandidateExtractor {
+public class NonMaxCandidateExtractor {
 
 	// size of the search area
 	int radius;
 	// the threshold which points must be above to be a feature
 	float thresh;
 
-	public NonMaxCornerCandidateExtractor(int minSeparation, float thresh) {
+	public NonMaxCandidateExtractor(int minSeparation, float thresh) {
 		this.radius = minSeparation;
 		this.thresh = thresh;
 	}

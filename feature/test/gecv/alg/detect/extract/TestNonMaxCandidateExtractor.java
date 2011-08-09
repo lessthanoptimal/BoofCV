@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestNonMaxCornerCandidateExtractor {
+public class TestNonMaxCandidateExtractor {
 
 	/**
 	 * Pass in a null list and see if it blows up
@@ -42,7 +42,7 @@ public class TestNonMaxCornerCandidateExtractor {
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 		QueueCorner candidates = new QueueCorner(100);
 
-		NonMaxCornerCandidateExtractor alg = new NonMaxCornerCandidateExtractor(2, 0.6F);
+		NonMaxCandidateExtractor alg = new NonMaxCandidateExtractor(2, 0.6F);
 		alg.process(inten,candidates,null,foundList);
 		// if it doesn't blow up it passed!
 	}
@@ -62,8 +62,8 @@ public class TestNonMaxCornerCandidateExtractor {
 		candidates.add(3,5);
 
 		// see if it detects everything
-		NonMaxCornerCandidateExtractor extractor;
-		extractor = new NonMaxCornerCandidateExtractor(1, 0);
+		NonMaxCandidateExtractor extractor;
+		extractor = new NonMaxCandidateExtractor(1, 0);
 		extractor.process(img, candidates, exclude, corners);
 		assertEquals(2, corners.size());
 
@@ -92,8 +92,8 @@ public class TestNonMaxCornerCandidateExtractor {
 		candidates.add(4,3);
 		candidates.add(3,5);
 
-		NonMaxCornerCandidateExtractor extractor;
-		extractor = new NonMaxCornerCandidateExtractor(1, 0);
+		NonMaxCandidateExtractor extractor;
+		extractor = new NonMaxCandidateExtractor(1, 0);
 		extractor.process(img, candidates, null,corners);
 		assertEquals(2, corners.size());
 
@@ -129,8 +129,8 @@ public class TestNonMaxCornerCandidateExtractor {
 		candidates.add(4,3);
 		candidates.add(3,5);
 
-		NonMaxCornerCandidateExtractor extractor;
-		extractor = new NonMaxCornerCandidateExtractor(0, 0);
+		NonMaxCandidateExtractor extractor;
+		extractor = new NonMaxCandidateExtractor(0, 0);
 		extractor.process(img, candidates, null,corners);
 		assertEquals(2, corners.size());
 

@@ -16,8 +16,8 @@
 
 package gecv.abst.detect.extract;
 
-import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
-import gecv.alg.detect.extract.NonMaxCornerCandidateExtractor;
+import gecv.alg.detect.extract.FastNonMaxExtractor;
+import gecv.alg.detect.extract.NonMaxCandidateExtractor;
 
 /**
  * Given a list of requirements create a {@link FeatureExtractor} that meets
@@ -45,12 +45,12 @@ public class FactoryFeatureFromIntensity
 
 		if( useCandidateList ) {
 			if( !acceptRequestNumber && ignoreBorder <= minSeparation)
-				ret = new WrapperNonMaxCandidate(new NonMaxCornerCandidateExtractor(minSeparation,threshold));
+				ret = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(minSeparation,threshold));
 		} else {
 			if( !acceptRequestNumber ) {
-				ret = new WrapperNonMax(new FastNonMaxCornerExtractor(minSeparation,ignoreBorder,threshold));
+				ret = new WrapperNonMax(new FastNonMaxExtractor(minSeparation,ignoreBorder,threshold));
 			} else {
-				throw new IllegalArgumentException("Need to create a wrapper for SelectNBestCorners");
+				throw new IllegalArgumentException("Need to create a wrapper for SelectNBestFeatures");
 			}
 		}
 

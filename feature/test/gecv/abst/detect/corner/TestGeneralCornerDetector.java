@@ -183,6 +183,10 @@ public class TestGeneralCornerDetector {
 		@Override
 		public void setThreshold(float threshold) {
 		}
+
+		@Override
+		public void setIgnoreBorder(int border) {
+		}
 	}
 
 	public class HelperIntensity implements GeneralFeatureIntensity<ImageFloat32,ImageFloat32>

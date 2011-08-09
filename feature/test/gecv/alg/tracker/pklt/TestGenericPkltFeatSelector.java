@@ -22,7 +22,7 @@ import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.alg.detect.corner.FactoryCornerIntensity;
-import gecv.alg.detect.extract.FastNonMaxCornerExtractor;
+import gecv.alg.detect.extract.FastNonMaxExtractor;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I16;
@@ -167,7 +167,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 						FactoryCornerIntensity.createKlt( ImageFloat32.class,3));
 
 		FeatureExtractor extractor = new WrapperNonMax(
-				new FastNonMaxCornerExtractor(3, 3, 0.001f));
+				new FastNonMaxExtractor(3, 3, 0.001f));
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
 				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,maxFeatures);
@@ -246,6 +246,10 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 
 		@Override
 		public void setThreshold(float threshold) {
+		}
+
+		@Override
+		public void setIgnoreBorder(int border) {
 		}
 	}
 }

@@ -27,7 +27,7 @@ import pja.sorting.QuickSelectArray;
  *
  * @author Peter Abeles
  */
-public class SelectNBestCorners {
+public class SelectNBestFeatures {
 
 	// list of the found best corners
 	QueueCorner bestCorners;
@@ -36,7 +36,7 @@ public class SelectNBestCorners {
 
 	int N;
 
-	public SelectNBestCorners(int maxCorners) {
+	public SelectNBestFeatures(int maxCorners) {
 		bestCorners = new QueueCorner(maxCorners);
 		setN(maxCorners);
 	}
