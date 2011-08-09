@@ -30,7 +30,7 @@ import jgrl.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class FastNonMaxCornerExtractor implements NonMaxCornerExtractor {
+public class FastNonMaxExtractor implements NonMaxExtractor {
 
 	// search region
 	private int radius;
@@ -43,7 +43,7 @@ public class FastNonMaxCornerExtractor implements NonMaxCornerExtractor {
 	 * @param minSeparation How close features can be to each other.
 	 * @param thresh		What the minimum intensity a feature must have to be considered a feature.
 	 */
-	public FastNonMaxCornerExtractor(int minSeparation, int border, float thresh) {
+	public FastNonMaxExtractor(int minSeparation, int border, float thresh) {
 		radius = minSeparation;
 		this.border = border;
 		this.thresh = thresh;
@@ -65,6 +65,11 @@ public class FastNonMaxCornerExtractor implements NonMaxCornerExtractor {
 	@Override
 	public void setMinSeparation(int minSeparation) {
 		this.radius = minSeparation;
+	}
+
+	@Override
+	public void setIgnoreBorder(int border) {
+		this.border = border;
 	}
 
 	/**

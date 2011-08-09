@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestFastNonMaxCornerExtractor {
+public class TestFastNonMaxExtractor {
 	Random rand = new Random(0x334);
 
 	/**
@@ -43,7 +43,7 @@ public class TestFastNonMaxCornerExtractor {
 
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 
-		FastNonMaxCornerExtractor alg = new FastNonMaxCornerExtractor(2, 2,0.6F);
+		FastNonMaxExtractor alg = new FastNonMaxExtractor(2, 2,0.6F);
 		alg.process(inten,null,foundList);
 		// if it doesn't blow up it passed!
 	}
@@ -61,7 +61,7 @@ public class TestFastNonMaxCornerExtractor {
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 
 
-		FastNonMaxCornerExtractor alg = new FastNonMaxCornerExtractor(2, 2,0.6F);
+		FastNonMaxExtractor alg = new FastNonMaxExtractor(2, 2,0.6F);
 		// find corners the first time
 		alg.process(inten,excludeList,foundList);
 
@@ -88,8 +88,8 @@ public class TestFastNonMaxCornerExtractor {
 	}
 
 	/**
-	 * Checks to see if {@link FastNonMaxCornerExtractor} produces exactly the same results as
-	 * {@link NonMaxCornerExtractorNaive}
+	 * Checks to see if {@link FastNonMaxExtractor} produces exactly the same results as
+	 * {@link NonMaxExtractorNaive}
 	 */
 	@Test
 	public void compareToNaive() {
@@ -107,8 +107,8 @@ public class TestFastNonMaxCornerExtractor {
 			}
 
 			for (int nonMaxWidth = 3; nonMaxWidth <= 9; nonMaxWidth += 2) {
-				FastNonMaxCornerExtractor fast = new FastNonMaxCornerExtractor(nonMaxWidth / 2, 0, 0.6F);
-				NonMaxCornerExtractorNaive reg = new NonMaxCornerExtractorNaive(nonMaxWidth / 2, 0.6F);
+				FastNonMaxExtractor fast = new FastNonMaxExtractor(nonMaxWidth / 2, 0, 0.6F);
+				NonMaxExtractorNaive reg = new NonMaxExtractorNaive(nonMaxWidth / 2, 0.6F);
 
 				for (int i = 0; i < 10; i++) {
 					ImageTestingOps.randomize(inten, rand, 0, 10);

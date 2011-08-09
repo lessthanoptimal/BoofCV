@@ -97,4 +97,9 @@ public interface FeatureExtractor {
 	 */
 	public void setThreshold( float threshold );
 
+	/**
+	 * If supported, change the border around the image which is ignored.
+	 */
+	public void setIgnoreBorder( int border );
+
 }

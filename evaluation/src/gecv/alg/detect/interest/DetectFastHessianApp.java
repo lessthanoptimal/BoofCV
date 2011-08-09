@@ -18,7 +18,6 @@ package gecv.alg.detect.interest;
 
 import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.alg.misc.PixelMath;
 import gecv.alg.transform.ii.IntegralImageOps;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.feature.VisualizeFeatures;
@@ -33,7 +32,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DetectSurfApp {
+public class DetectFastHessianApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
 	static String fileName = "evaluation/data/sunflowers.png";
@@ -48,12 +47,11 @@ public class DetectSurfApp {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 
-		PixelMath.divide(inputF32,inputF32,255.0f);
+		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(2,1,5,false,false,false);
+		FastHessianFeatureDetector det = new FastHessianFeatureDetector(extractor,NUM_FEATURES,9,4,4);
+
 		ImageFloat32 integral = IntegralImageOps.transform(inputF32,null);
-
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(1,0.0004f,5,false,false,false);
-		SurfFeatureDetector det = new SurfFeatureDetector(extractor);
-
+		det.detect(integral);
 		long before = System.currentTimeMillis();
 		det.detect(integral);
 		long after = System.currentTimeMillis();

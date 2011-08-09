@@ -19,7 +19,6 @@ package gecv.alg.transform.ii;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.misc.ImageTestingOps;
-import gecv.struct.ImageRectangle;
 import gecv.struct.image.ImageFloat32;
 
 import java.util.Random;
@@ -48,31 +47,25 @@ public class BenchmarkIntegralImage {
 	}
 
 	public static class DerivXX extends PerformerBase {
+
+		IntegralKernel kernel = DerivativeIntegralImage.kernelDerivXX(9);
+
 		@Override
 		public void process() {
 			DerivativeIntegralImage.derivXX(integral,output,9);
+			IntegralImageOps.convolveBorder(integral,kernel.blocks,kernel.scales,output,4,4);
 		}
 	}
 
 	public static class GenericDerivXX extends PerformerBase {
 
-		ImageRectangle blocks[];
-		int scales[];
-
-		public GenericDerivXX() {
-			blocks = new ImageRectangle[2];
-			scales = new int[]{1,-3};
-			blocks[0] = new ImageRectangle(-5,-3,4,2);
-			blocks[1] = new ImageRectangle(-2,-3,1,2);
-
-		}
+		IntegralKernel kernel = DerivativeIntegralImage.kernelDerivXX(9);
 
 		@Override
 		public void process() {
-			IntegralImageOps.convolve(integral,blocks,scales,output);
+			IntegralImageOps.convolve(integral,kernel.blocks,kernel.scales,output);
 		}
 	}
-
 
 	public static void main(String args[]) {
 

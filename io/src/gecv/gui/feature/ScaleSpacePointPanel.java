@@ -69,7 +69,7 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 		}
 	}
 
-	private synchronized  void setLevel( int level ) {
+	private synchronized void setLevel( int level ) {
 		System.out.println("level "+level);
 		if( level > 0 ) {
 			ss.setActiveScale(level-1);
@@ -104,8 +104,7 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 		if (background != null)
 			g.drawImage(background, 0, 0, this);
 
-		Graphics2D g2 = (Graphics2D)g;
-		VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,radius);
+		VisualizeFeatures.drawScalePoints((Graphics2D)g,points,radius);
 	}
 
 	@Override

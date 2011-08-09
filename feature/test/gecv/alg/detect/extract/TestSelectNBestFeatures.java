@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSelectNBestCorners {
+public class TestSelectNBestFeatures {
 
 	int width = 20;
 	int height = 20;
@@ -37,7 +37,7 @@ public class TestSelectNBestCorners {
 	@Test
 	public void setN() {
 		ImageFloat32 intensity = new ImageFloat32(width,height);
-		SelectNBestCorners alg = new SelectNBestCorners(1);
+		SelectNBestFeatures alg = new SelectNBestFeatures(1);
 
 		// make sure N can grow with no problems
 		alg.setN(N);
@@ -71,7 +71,7 @@ public class TestSelectNBestCorners {
 		}
 
 		// make sure the input features were returned
-		SelectNBestCorners alg = new SelectNBestCorners(N);
+		SelectNBestFeatures alg = new SelectNBestFeatures(N);
 		alg.process(intensity,origCorners);
 
 		assertEquals(alg.bestCorners.size(),origCorners.size());
@@ -94,7 +94,7 @@ public class TestSelectNBestCorners {
 		}
 
 		// make sure only N features were found
-		SelectNBestCorners alg = new SelectNBestCorners(N);
+		SelectNBestFeatures alg = new SelectNBestFeatures(N);
 		alg.process(intensity,origCorners);
 
 		assertEquals(alg.bestCorners.size(),N);

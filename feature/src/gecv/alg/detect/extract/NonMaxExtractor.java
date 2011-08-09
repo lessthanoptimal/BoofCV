@@ -28,7 +28,7 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public interface NonMaxCornerExtractor {
+public interface NonMaxExtractor {
 
 	/**
 	 * Sets the minimum distance two features can be.  This is the local region which is searched in non-max
@@ -44,6 +44,13 @@ public interface NonMaxCornerExtractor {
 	 * @param thresh Minimum intensity a feature can have to be valid.
 	 */
 	public void setThresh(float thresh);
+
+	/**
+	 * Specifies the size of the image border which should be ignored.
+	 *
+	 * @param border Size of image border.
+	 */
+	public void setIgnoreBorder( int border );
 
 	/**
 	 * Returns the current feature selection threshold.

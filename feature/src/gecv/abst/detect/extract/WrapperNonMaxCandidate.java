@@ -16,19 +16,19 @@
 
 package gecv.abst.detect.extract;
 
-import gecv.alg.detect.extract.NonMaxCornerCandidateExtractor;
+import gecv.alg.detect.extract.NonMaxCandidateExtractor;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * Wrapper around the {@link gecv.alg.detect.extract.NonMaxCornerCandidateExtractor} class.
+ * Wrapper around the {@link gecv.alg.detect.extract.NonMaxCandidateExtractor} class.
  *
  * @author Peter Abeles
  */
 public class WrapperNonMaxCandidate implements FeatureExtractor {
-	NonMaxCornerCandidateExtractor extractor;
+	NonMaxCandidateExtractor extractor;
 
-	public WrapperNonMaxCandidate( NonMaxCornerCandidateExtractor extractor ) {
+	public WrapperNonMaxCandidate( NonMaxCandidateExtractor extractor ) {
 		this.extractor = extractor;
 	}
 
@@ -46,6 +46,10 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 	@Override
 	public void setThreshold(float threshold) {
 		extractor.setThresh(threshold);
+	}
+
+	@Override
+	public void setIgnoreBorder(int border) {
 	}
 
 	@Override
