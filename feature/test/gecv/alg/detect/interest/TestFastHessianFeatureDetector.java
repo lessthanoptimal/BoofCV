@@ -16,17 +16,36 @@
 
 package gecv.alg.detect.interest;
 
-import org.junit.Test;
+import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
+import gecv.abst.detect.extract.FeatureExtractor;
+import gecv.alg.transform.ii.IntegralImageOps;
+import gecv.struct.image.ImageFloat32;
 
-import static org.junit.Assert.fail;
+import java.util.List;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestFastHessianFeatureDetector {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestFastHessianFeatureDetector extends GenericFeatureDetector{
+
+	public TestFastHessianFeatureDetector() {
+		this.scaleTolerance = 0.3;
+	}
+
+	@Override
+	protected Object createDetector() {
+		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(2,1,5,false,false,false);
+		return new FastHessianFeatureDetector(extractor,50,9,4,4);
+	}
+
+	@SuppressWarnings({"unchecked"})
+	@Override
+	protected List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
+		FastHessianFeatureDetector<ImageFloat32> alg = (FastHessianFeatureDetector<ImageFloat32>)detector;
+		ImageFloat32 integral = IntegralImageOps.transform(input,null);
+		alg.detect(integral);
+
+		return alg.getFoundPoints();
 	}
 }
