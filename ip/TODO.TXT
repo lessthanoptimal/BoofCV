@@ -1,5 +1,6 @@
 - Name Ideas
- * Able Vision
+ * Able Vision <--- taken
+ * Bubo Vision
 
 - Rename all low level implementation classes to have Impl* in their name
 
@@ -14,14 +15,10 @@
  * After adding new wavelets update denoising code
 
 - Derivative
- * Gaussian derivative kernel 1D
  * Improve performance of derivative edge calculation
  * Include the image border for the Laplacian
 
 - Edges
- * Whole image:
-    - Intensity and orientation
- * Wavelet based detector
  * Connected Segments
     - Canny?
 
@@ -48,6 +45,10 @@
  * Sparse Kernel Convolve for when there is a lot of zeros in the kernel
    - Unroll
    - Compare speed to hand derived kernels in gradient
+
+- Kernels
+ * Support kernels with an even size
+ * Support different width and height
 
 - Improve Sort Median Filter
 *   Use bubble sort to avoid resorting each time

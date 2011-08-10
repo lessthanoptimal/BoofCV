@@ -17,7 +17,7 @@
 package gecv.alg.filter.convolve.normalized;
 
 import gecv.alg.filter.convolve.ConvolveNormalized;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.ConvertImage;
 import gecv.struct.convolve.Kernel1D_F32;

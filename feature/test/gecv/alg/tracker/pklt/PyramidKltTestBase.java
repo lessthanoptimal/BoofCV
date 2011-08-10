@@ -16,8 +16,8 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
 import gecv.alg.filter.derivative.GradientSobel;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.tracker.klt.KltTracker;
 import gecv.alg.tracker.klt.TestKltTracker;

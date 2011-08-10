@@ -18,7 +18,7 @@ package gecv.alg.geo.trackers;
 
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.geo.AssociatedPair;
 import gecv.alg.geo.PointSequentialTracker;
 import gecv.alg.geo.SingleImageInput;

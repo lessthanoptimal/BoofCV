@@ -42,7 +42,7 @@ import gecv.struct.image.ImageUInt8;
  * </pre>
  * </p>
  * <p>
- * This formulation is derived by using the [1 -1] difference kernel for the image derivative.  Alternative
+ * This formulation is derived by using the [-1 1 0] and [0 -1 1] difference kernels for the image derivative.  Alternative
  * formulations can be found using other kernels.
  * </p>
  * <p>

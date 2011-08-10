@@ -17,7 +17,7 @@
 package gecv.alg.filter.convolve.border;
 
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;

@@ -22,6 +22,7 @@ import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.BlurStorageFilter;
 import gecv.alg.filter.blur.BlurImageOps;
 import gecv.alg.filter.convolve.noborder.ImplConvolveMean;
+import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;

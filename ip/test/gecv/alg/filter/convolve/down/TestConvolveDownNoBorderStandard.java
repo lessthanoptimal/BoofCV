@@ -18,7 +18,7 @@ package gecv.alg.filter.convolve.down;
 
 import gecv.alg.filter.convolve.ConvolutionTestHelper;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
-import gecv.alg.filter.convolve.FactoryKernel;
+import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;

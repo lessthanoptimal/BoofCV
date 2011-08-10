@@ -16,13 +16,13 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.abst.detect.corner.GeneralFeatureDetector;
-import gecv.abst.detect.corner.GeneralFeatureIntensity;
-import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
-import gecv.alg.detect.corner.FactoryCornerIntensity;
+import gecv.abst.detect.intensity.GeneralFeatureIntensity;
+import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
+import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.alg.detect.extract.FastNonMaxExtractor;
+import gecv.alg.detect.intensity.FactoryCornerIntensity;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I16;

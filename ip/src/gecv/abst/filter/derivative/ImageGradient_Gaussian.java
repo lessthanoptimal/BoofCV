@@ -18,12 +18,12 @@ package gecv.abst.filter.derivative;
 
 import gecv.abst.filter.FilterImageInterface;
 import gecv.abst.filter.convolve.FactoryConvolve;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.image.ImageBase;
 
-import static gecv.alg.filter.convolve.FactoryKernelGaussian.sigmaForRadius;
+import static gecv.alg.filter.kernel.FactoryKernelGaussian.sigmaForRadius;
 
 
 /**

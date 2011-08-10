@@ -16,6 +16,7 @@
 
 package gecv.alg.filter.convolve;
 
+import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.ImageBorder;
 import gecv.core.image.border.ImageBorderValue;

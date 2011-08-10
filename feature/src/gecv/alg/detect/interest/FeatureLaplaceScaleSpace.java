@@ -16,7 +16,7 @@
 
 package gecv.alg.detect.interest;
 
-import gecv.abst.detect.corner.GeneralFeatureDetector;
+import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.struct.QueueCorner;
 import gecv.struct.gss.GaussianScaleSpace;
@@ -35,7 +35,7 @@ import java.util.List;
  *
  * <p>
  * This implementation is a generalized and tweaked version of the algorithm presented in [1], which was
- * designed specifically for the {@link gecv.alg.detect.corner.HarrisCornerIntensity Harris} corner detector.
+ * designed specifically for the {@link gecv.alg.detect.intensity.HarrisCornerIntensity Harris} corner detector.
  * </p>
  *
  * <p>

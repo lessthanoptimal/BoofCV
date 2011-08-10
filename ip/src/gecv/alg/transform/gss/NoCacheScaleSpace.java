@@ -19,7 +19,7 @@ package gecv.alg.transform.gss;
 import gecv.abst.filter.convolve.ConvolveInterface;
 import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.abst.filter.derivative.AnyImageDerivative;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.border.BorderType;
 import gecv.struct.GecvDefaults;

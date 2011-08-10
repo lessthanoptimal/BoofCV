@@ -16,7 +16,7 @@
 
 package gecv.alg.detect.interest;
 
-import gecv.alg.detect.interest.impl.ImplIntegralImageFeatureIntensity;
+import gecv.alg.detect.intensity.impl.ImplIntegralImageFeatureIntensity;
 import gecv.alg.transform.ii.IntegralImageOps;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.image.ImageFloat32;

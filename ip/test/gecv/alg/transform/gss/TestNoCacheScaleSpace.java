@@ -19,7 +19,7 @@ package gecv.alg.transform.gss;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.filter.blur.BlurImageOps;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.SingleBandGenerator;

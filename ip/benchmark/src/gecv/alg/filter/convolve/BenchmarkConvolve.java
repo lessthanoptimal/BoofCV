@@ -19,6 +19,7 @@ package gecv.alg.filter.convolve;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.filter.convolve.noborder.*;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.border.BorderIndex1D_Extend;
 import gecv.core.image.border.ImageBorder1D_I32;

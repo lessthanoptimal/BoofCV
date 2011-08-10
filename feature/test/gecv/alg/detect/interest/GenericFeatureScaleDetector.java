@@ -16,12 +16,12 @@
 
 package gecv.alg.detect.interest;
 
-import gecv.abst.detect.corner.GeneralFeatureDetector;
-import gecv.abst.detect.corner.GeneralFeatureIntensity;
-import gecv.abst.detect.corner.WrapperLaplacianBlobIntensity;
 import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.alg.detect.corner.HessianBlobIntensity;
+import gecv.abst.detect.intensity.GeneralFeatureIntensity;
+import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;
+import gecv.abst.detect.point.GeneralFeatureDetector;
+import gecv.alg.detect.intensity.HessianBlobIntensity;
 import gecv.struct.image.ImageFloat32;
 
 /**

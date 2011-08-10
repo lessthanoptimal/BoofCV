@@ -16,6 +16,7 @@
 
 package gecv.alg.filter.convolve;
 
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.*;
 import gecv.struct.convolve.Kernel1D_F32;

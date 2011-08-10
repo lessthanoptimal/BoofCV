@@ -18,7 +18,7 @@ package gecv.alg.transform.pyramid;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.misc.ImageTestingOps;

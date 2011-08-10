@@ -19,6 +19,7 @@ package gecv.alg.filter.convolve;
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import gecv.alg.filter.convolve.noborder.ImplConvolveBox;
+import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.core.image.border.ImageBorderValue;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
