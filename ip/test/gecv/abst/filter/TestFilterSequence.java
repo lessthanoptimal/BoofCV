@@ -18,7 +18,7 @@ package gecv.abst.filter;
 
 import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
-import gecv.alg.filter.convolve.FactoryKernel;
+import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D_F32;

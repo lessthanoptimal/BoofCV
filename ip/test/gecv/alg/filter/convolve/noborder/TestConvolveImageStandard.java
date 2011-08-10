@@ -16,8 +16,8 @@
 
 package gecv.alg.filter.convolve.noborder;
 
-import gecv.alg.filter.convolve.FactoryKernel;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.kernel.FactoryKernel;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.convolve.KernelBase;
 import gecv.struct.image.ImageBase;

@@ -18,7 +18,7 @@ package gecv.abst.filter.derivative;
 
 import gecv.abst.filter.convolve.ConvolveInterface;
 import gecv.abst.filter.convolve.FactoryConvolve;
-import gecv.alg.filter.convolve.FactoryKernel;
+import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.border.BorderType;
 import gecv.struct.GecvDefaults;

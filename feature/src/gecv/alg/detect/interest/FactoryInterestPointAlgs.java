@@ -16,18 +16,18 @@
 
 package gecv.alg.detect.interest;
 
-import gecv.abst.detect.corner.GeneralFeatureDetector;
-import gecv.abst.detect.corner.GeneralFeatureIntensity;
-import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
-import gecv.abst.detect.corner.WrapperLaplacianBlobIntensity;
 import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
+import gecv.abst.detect.intensity.GeneralFeatureIntensity;
+import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
+import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;
+import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.abst.filter.derivative.FactoryDerivativeSparse;
-import gecv.alg.detect.corner.FactoryCornerIntensity;
-import gecv.alg.detect.corner.GradientCornerIntensity;
-import gecv.alg.detect.corner.HessianBlobIntensity;
+import gecv.alg.detect.intensity.FactoryCornerIntensity;
+import gecv.alg.detect.intensity.GradientCornerIntensity;
+import gecv.alg.detect.intensity.HessianBlobIntensity;
 import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.image.ImageBase;

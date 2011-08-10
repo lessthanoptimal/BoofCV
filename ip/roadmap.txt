@@ -2,7 +2,9 @@ SURF
 SFM
 ---------------------------------
 
- - Face detection
+ - Face
+   * Detection
+   * Recognition
  - Tracking
    * people
 #  * point features

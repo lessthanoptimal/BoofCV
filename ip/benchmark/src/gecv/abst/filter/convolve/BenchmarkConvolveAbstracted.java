@@ -20,7 +20,7 @@ import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.abst.filter.FilterImageInterface;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
-import gecv.alg.filter.convolve.FactoryKernel;
+import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.core.image.border.BorderType;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;

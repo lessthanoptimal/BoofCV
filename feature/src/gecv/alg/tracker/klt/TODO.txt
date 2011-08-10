@@ -6,6 +6,5 @@
 - Light invariant
 - Asymmetric with edges
 
-- Gray scale pyramid
 - Color images?
 - benchmark pyramid

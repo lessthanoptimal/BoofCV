@@ -22,7 +22,7 @@ import gecv.alg.filter.blur.impl.ImplMedianSortEdgeNaive;
 import gecv.alg.filter.blur.impl.ImplMedianSortNaive;
 import gecv.alg.filter.convolve.ConvolveImageMean;
 import gecv.alg.filter.convolve.ConvolveNormalized;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;

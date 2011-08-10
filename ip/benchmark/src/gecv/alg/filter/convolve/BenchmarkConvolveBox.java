@@ -19,6 +19,7 @@ package gecv.alg.filter.convolve;
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.filter.convolve.noborder.ImplConvolveBox;
+import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;

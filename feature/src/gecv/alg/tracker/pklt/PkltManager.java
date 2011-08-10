@@ -16,8 +16,8 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.abst.detect.corner.FactoryCornerDetector;
-import gecv.abst.detect.corner.GeneralFeatureDetector;
+import gecv.abst.detect.point.FactoryCornerDetector;
+import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.tracker.klt.KltTrackFault;
