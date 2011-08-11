@@ -78,11 +78,10 @@ public class TestConvolveNormalizedSparse {
 
 			Object storage;
 			Object kernel;
+			kernel = FactoryKernelGaussian.gaussian((Class)paramTypes[0],-1,kernelRadius);
 			if (Kernel1D_F32.class == paramTypes[0]) {
-				kernel = FactoryKernelGaussian.gaussian1D_F32(kernelRadius,true);
 				storage = new float[ kernelRadius*2+1];
 			} else if (Kernel1D_I32.class == paramTypes[0]) {
-				kernel = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
 				storage = new int[ kernelRadius*2+1];
 			} else {
 				throw new RuntimeException("Unknown kernel type");

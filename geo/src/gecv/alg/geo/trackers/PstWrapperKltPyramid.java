@@ -99,7 +99,7 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 		GradientPyramid<I,D> gradientUpdater = new GradientPyramid<I,D>(gradient,typeDeriv);
 
 		setup(trackManager,
-				new PyramidUpdateIntegerDown<I>(FactoryKernelGaussian.gaussian1D(typeInput,2),typeInput),
+				new PyramidUpdateIntegerDown<I>(FactoryKernelGaussian.gaussian1D(typeInput,-1,2),typeInput),
 				gradientUpdater);
 	}
 

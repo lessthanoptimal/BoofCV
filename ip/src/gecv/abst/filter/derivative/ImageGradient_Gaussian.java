@@ -52,14 +52,14 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 	private int borderSize;
 
 	public ImageGradient_Gaussian(int radius , Class<I> inputType , Class<D> derivType) {
-		this(sigmaForRadius(radius),radius,inputType,derivType);
+		this(sigmaForRadius(radius,0),radius,inputType,derivType);
 	}
 
 	public ImageGradient_Gaussian(double sigma, int radius,
 								  Class<I> inputType , Class<D> derivType ) {
 		this.borderSize = radius;
 		Kernel1D kernel = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
-		Kernel1D kernelDeriv = FactoryKernelGaussian.gaussianDerivative1D(inputType,sigma,radius+1);
+		Kernel1D kernelDeriv = FactoryKernelGaussian.derivativeI(inputType,1,sigma,radius+1);
 
 		derivX_H = FactoryConvolve.convolve(kernelDeriv,inputType,derivType, borderDeriv,true);
 		blurX = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur,true);

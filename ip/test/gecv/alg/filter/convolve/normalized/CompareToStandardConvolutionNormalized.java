@@ -60,7 +60,7 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		Object kernel = FactoryKernelGaussian.gaussian(paramTypes[0],kernelRadius,true);
+		Object kernel = FactoryKernelGaussian.gaussian((Class)paramTypes[0],-1,kernelRadius);
 
 		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 		GeneralizedImageOps.randomize(src, rand, 0, 5);

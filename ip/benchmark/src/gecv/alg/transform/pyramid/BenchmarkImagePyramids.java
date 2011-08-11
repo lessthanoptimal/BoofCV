@@ -75,7 +75,7 @@ public class BenchmarkImagePyramids {
 	}
 
 	private static void createUpdate() {
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(2,true);
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1.0,2);
 		updaterI = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);

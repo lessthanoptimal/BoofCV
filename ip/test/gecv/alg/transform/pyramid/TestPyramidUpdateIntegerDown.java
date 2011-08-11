@@ -44,7 +44,7 @@ public class TestPyramidUpdateIntegerDown extends BasePyramidTests {
 	 */
 	@Test
 	public void saveOriginalReference() {
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(3, true);
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
 		PyramidUpdateIntegerDown<ImageFloat32> alg = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
 		ImagePyramid<ImageFloat32> pyramid = new DiscreteImagePyramid<ImageFloat32>(true,alg,1,2,4);
@@ -73,7 +73,7 @@ public class TestPyramidUpdateIntegerDown extends BasePyramidTests {
 	}
 
 	public void _update(ImageFloat32 img) {
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(3, true);
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
 		ImageFloat32 convImg = new ImageFloat32(width, height);
 		ImageFloat32 convImg2 = new ImageFloat32(width/2, height/2);
 

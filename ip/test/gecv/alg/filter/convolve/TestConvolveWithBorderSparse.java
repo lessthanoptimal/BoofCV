@@ -19,10 +19,6 @@ package gecv.alg.filter.convolve;
 import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.*;
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.*;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -118,20 +114,8 @@ public class TestConvolveWithBorderSparse {
 		assertEquals(expectedValue,v.doubleValue(),1e-3);
 	}
 
-	protected static Object createKernel(Class<?> kernelType , int kernelRadius ) {
-		Object kernel;
-		if (Kernel1D_F32.class == kernelType) {
-			kernel = FactoryKernelGaussian.gaussian1D_F32(kernelRadius,true);
-		} else if (Kernel1D_I32.class == kernelType) {
-			kernel = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
-		} else if (Kernel2D_F32.class == kernelType) {
-			kernel = FactoryKernelGaussian.gaussian2D_F32(1,kernelRadius,true);
-		} else if (Kernel2D_I32.class == kernelType) {
-			kernel = FactoryKernelGaussian.gaussian2D_I32(1,kernelRadius);
-		} else {
-			throw new RuntimeException("Unknown kernel type");
-		}
-		return kernel;
+	protected static Object createKernel(Class kernelType , int kernelRadius ) {
+		return FactoryKernelGaussian.gaussian(kernelType,-1,kernelRadius);
 	}
 
 	protected static ImageBorder createBorder(Class<?> borderType ) {

@@ -79,7 +79,7 @@ public class PyramidKltTestBase {
 
 	private ImagePyramid<ImageFloat32> createPyramid( int ...scales ) {
 
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(2,true);
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,2);
 		PyramidUpdater<ImageFloat32> updater = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
 		DiscreteImagePyramid<ImageFloat32> ret = new DiscreteImagePyramid<ImageFloat32>(false,updater,scales);

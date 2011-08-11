@@ -102,8 +102,8 @@ public class TestConvolveNormalizedStandardSparse {
 		ImageSInt16 shortImage = new ImageSInt16(width,height);
 		ConvertImage.convert(seedImage,shortImage);
 
-		kernelI32 = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
-		kernelF32 = FactoryKernelGaussian.gaussian1D_F32(kernelRadius,true);
+		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,kernelRadius);
+		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,kernelRadius);
 
 		boolean isFloatingKernel = method.getParameterTypes()[0] == Kernel1D_F32.class;
 

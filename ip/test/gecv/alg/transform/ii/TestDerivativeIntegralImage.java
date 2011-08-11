@@ -18,7 +18,7 @@ package gecv.alg.transform.ii;
 
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.ConvolveWithBorder;
-import gecv.alg.filter.kernel.FactoryKernel;
+import gecv.alg.filter.kernel.KernelMath;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
@@ -109,7 +109,7 @@ public class TestDerivativeIntegralImage {
 			int size = i*3;
 			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivYY(size);
 			Kernel2D_F32 kernel = createDerivXX(size);
-			kernel = FactoryKernel.transpose(kernel);
+			kernel = KernelMath.transpose(kernel);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
@@ -133,7 +133,7 @@ public class TestDerivativeIntegralImage {
 		for( int i = 1; i <= 5; i += 2 ) {
 			int size = i*3;
 			Kernel2D_F32 kernel = createDerivXX(size);
-			kernel = FactoryKernel.transpose(kernel);
+			kernel = KernelMath.transpose(kernel);
 
 			ConvolveImageNoBorder.convolve(kernel,orig,expected);
 			DerivativeIntegralImage.derivYY(integral,found,size);

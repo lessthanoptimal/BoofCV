@@ -94,7 +94,7 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 	public void setActiveScale(int index) {
 		this.currentScale = index;
 		double sigma = scales[index];
-		int radius = FactoryKernelGaussian.radiusForSigma(sigma);
+		int radius = FactoryKernelGaussian.radiusForSigma(sigma,0);
 
 		Class<I> inputType = inputGen.getType();
 
