@@ -82,7 +82,7 @@ public class TestConvolveImageStandardSparse {
 		ImageFloat32 floatImage = new ImageFloat32(width,height);
 		ConvertImage.convert(seedImage,floatImage);
 
-		kernelI32 = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
+		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,kernelRadius);
 		kernelF32 = new Kernel1D_F32(kernelI32.width);
 		for( int i = 0; i < kernelI32.width; i++ )
 			kernelF32.data[i] = kernelI32.data[i];

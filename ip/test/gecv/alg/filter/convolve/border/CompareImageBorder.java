@@ -18,10 +18,6 @@ package gecv.alg.filter.convolve.border;
 
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.kernel.FactoryKernelGaussian;
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageBase;
 import gecv.testing.CompareEquivalentFunctions;
 
@@ -61,19 +57,7 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 		return a.subimage(kernelRadius,kernelRadius,width+kernelRadius,height+kernelRadius);
 	}
 
-	protected Object createKernel(Class<?> kernelType) {
-		Object kernel;
-		if (Kernel1D_F32.class == kernelType) {
-			kernel = FactoryKernelGaussian.gaussian1D_F32(kernelRadius,true);
-		} else if (Kernel1D_I32.class == kernelType) {
-			kernel = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
-		} else if (Kernel2D_F32.class == kernelType) {
-			kernel = FactoryKernelGaussian.gaussian2D_F32(1,kernelRadius,true);
-		} else if (Kernel2D_I32.class == kernelType) {
-			kernel = FactoryKernelGaussian.gaussian2D_I32(1,kernelRadius);
-		} else {
-			throw new RuntimeException("Unknown kernel type");
-		}
-		return kernel;
+	protected Object createKernel(Class kernelType) {
+		return FactoryKernelGaussian.gaussian(kernelType,-1,kernelRadius);
 	}
 }

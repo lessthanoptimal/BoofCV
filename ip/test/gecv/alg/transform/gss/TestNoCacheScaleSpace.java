@@ -54,7 +54,7 @@ public class TestNoCacheScaleSpace {
 		NoCacheScaleSpace<ImageFloat32,ImageFloat32> alg =
 				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(generator,generator);
 
-		int radius = FactoryKernelGaussian.radiusForSigma(1.2);
+		int radius = FactoryKernelGaussian.radiusForSigma(1.2,0);
 		ImageFloat32 expected = BlurImageOps.gaussian(original,null,1.2,radius,null);
 
 		alg.setScales(1.2,2.3,3.5);

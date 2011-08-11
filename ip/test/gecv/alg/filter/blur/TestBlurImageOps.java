@@ -136,11 +136,11 @@ public class TestBlurImageOps {
 			ImageTestingOps.fill(expected,0);
 			ImageTestingOps.fill(found,0);
 
-			Kernel1D_I32 kernel = FactoryKernelGaussian.gaussian1D_I32(radius);
+			Kernel1D_I32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,radius);
 			ConvolveNormalized.horizontal(kernel,input,storage);
 			ConvolveNormalized.vertical(kernel,storage,expected);
 
-			double sigma = FactoryKernelGaussian.sigmaForRadius(radius);
+			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
 
 			BlurImageOps.gaussian(input,found,sigma,radius,null);
 
@@ -162,11 +162,11 @@ public class TestBlurImageOps {
 			ImageTestingOps.fill(expected,0);
 			ImageTestingOps.fill(found,0);
 
-			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(radius,true);
+			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,radius);
 			ConvolveNormalized.horizontal(kernel,input,storage);
 			ConvolveNormalized.vertical(kernel,storage,expected);
 
-			double sigma = FactoryKernelGaussian.sigmaForRadius(radius);
+			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
 
 			BlurImageOps.gaussian(input,found,sigma,radius,null);
 

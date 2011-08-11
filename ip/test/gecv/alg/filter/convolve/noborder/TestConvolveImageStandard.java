@@ -121,11 +121,7 @@ public class TestConvolveImageStandard {
 	 * Unit test for horizontal convolution.
 	 */
 	public void horizontal(ImageBase img, ImageBase dest) {
-		Object ker;
-		if (!img.getTypeInfo().isInteger())
-			ker = FactoryKernelGaussian.gaussian1D_F32(kernelRadius, true);
-		else
-			ker = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
+		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		invokeMethod("horizontal", ker, img, dest, false);
 		// the top border should not be convolved yet
@@ -147,11 +143,7 @@ public class TestConvolveImageStandard {
 	 */
 	public void horizontalDiv(ImageBase img, ImageBase dest) {
 		int divisor = 11;
-		Object ker;
-		if (!img.getTypeInfo().isInteger())
-			ker = FactoryKernelGaussian.gaussian1D_F32(kernelRadius, true);
-		else
-			ker = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
+		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		invokeMethod("horizontal", ker, img, dest, divisor, false);
 		// the top border should not be convolved yet
@@ -174,11 +166,7 @@ public class TestConvolveImageStandard {
 	 * Unit test for vertical convolution.
 	 */
 	public void vertical(ImageBase img, ImageBase dest) {
-		Object ker;
-		if (!img.getTypeInfo().isInteger())
-			ker = FactoryKernelGaussian.gaussian1D_F32(kernelRadius, true);
-		else
-			ker = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
+		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		invokeMethod("vertical", ker, img, dest, false);
 
@@ -199,11 +187,7 @@ public class TestConvolveImageStandard {
 	 * Unit test for vertical convolution with division.
 	 */
 	public void verticalDiv(ImageBase img, ImageBase dest) {
-		Object ker;
-		if (!img.getTypeInfo().isInteger())
-			ker = FactoryKernelGaussian.gaussian1D_F32(kernelRadius, true);
-		else
-			ker = FactoryKernelGaussian.gaussian1D_I32(kernelRadius);
+		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		int divisor = 11;
 		invokeMethod("vertical", ker, img, dest, divisor, false);
