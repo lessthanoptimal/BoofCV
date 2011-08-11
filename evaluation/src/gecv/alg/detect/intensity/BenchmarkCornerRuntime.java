@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.corner;
+package gecv.alg.detect.intensity;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.abst.detect.corner.FactoryCornerDetector;
-import gecv.abst.detect.corner.GeneralFeatureDetector;
+import gecv.abst.detect.point.FactoryCornerDetector;
+import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;

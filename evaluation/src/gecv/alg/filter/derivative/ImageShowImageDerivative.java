@@ -19,7 +19,7 @@ package gecv.alg.filter.derivative;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.gui.image.ListDisplayPanel;
+import gecv.gui.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;

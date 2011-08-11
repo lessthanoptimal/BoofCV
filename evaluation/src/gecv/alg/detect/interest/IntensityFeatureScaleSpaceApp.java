@@ -16,13 +16,13 @@
 
 package gecv.alg.detect.interest;
 
-import gecv.abst.detect.corner.GeneralFeatureIntensity;
-import gecv.abst.detect.corner.WrapperLaplacianBlobIntensity;
-import gecv.alg.detect.corner.HessianBlobIntensity;
+import gecv.abst.detect.intensity.GeneralFeatureIntensity;
+import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;
+import gecv.alg.detect.intensity.HessianBlobIntensity;
 import gecv.alg.misc.PixelMath;
 import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.gui.image.ListDisplayPanel;
+import gecv.gui.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;

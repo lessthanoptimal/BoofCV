@@ -20,6 +20,7 @@ import gecv.abst.filter.distort.GeneralizedDistortImageOps;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.gui.ListDisplayPanel;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
 

@@ -26,7 +26,7 @@ import gecv.alg.misc.PixelMath;
 import gecv.alg.transform.wavelet.FactoryWaveletCoiflet;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.border.BorderType;
-import gecv.gui.image.ListDisplayPanel;
+import gecv.gui.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageFloat32;
@@ -45,7 +45,7 @@ import java.util.Random;
 public class DenoiseVisualizeApp {
 
 	// amount of noise added to the test images
-	float noiseSigma = 0;
+	float noiseSigma = 15;
 
 	Random rand = new Random(2234);
 	ImageFloat32 image;
@@ -67,8 +67,8 @@ public class DenoiseVisualizeApp {
 //	DenoiseWavelet denoiser = new DenoiseBayesShrink_F32();
 	DenoiseWavelet denoiser = new DenoiseSureShrink_F32();
 
-//	String imagePath = "evaluation/data/standard/barbara.png";
-	String imagePath = "evaluation/data/particles01.jpg";
+	String imagePath = "evaluation/data/standard/barbara.png";
+//	String imagePath = "evaluation/data/particles01.jpg";
 
 	FilterImageInterface<ImageFloat32,ImageFloat32> filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,denoiser);
 

@@ -16,7 +16,7 @@
 
 package gecv.alg.transform.pyramid;
 
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.DiscretePyramidPanel;
 import gecv.gui.image.ShowImages;
@@ -36,11 +36,11 @@ import java.awt.image.BufferedImage;
 public class VisualizeDiscretePyramidApp {
 
 	public static void main( String args[] ) {
-		int scales[] = new int[]{1,2,2,2,2};
+		int scales[] = new int[]{1,2,4,8,16};
 
 		BufferedImage input = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
 
-		Kernel1D_F32 gaussian = FactoryKernelGaussian.gaussian1D(ImageFloat32.class,2);
+		Kernel1D_F32 gaussian = FactoryKernelGaussian.gaussian1D(ImageFloat32.class,-1,2);
 		PyramidUpdater<ImageFloat32> updater = new PyramidUpdateIntegerDown<ImageFloat32>(gaussian,ImageFloat32.class);
 		DiscreteImagePyramid<ImageFloat32> pyramid = new DiscreteImagePyramid<ImageFloat32>(true,updater,scales);
 

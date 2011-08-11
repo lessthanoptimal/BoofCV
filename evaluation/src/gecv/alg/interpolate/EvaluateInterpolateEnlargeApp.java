@@ -19,7 +19,7 @@ package gecv.alg.interpolate;
 import gecv.abst.filter.distort.GeneralizedDistortImageOps;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.GeneralizedImageOps;
-import gecv.gui.image.ListDisplayPanel;
+import gecv.gui.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageBase;

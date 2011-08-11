@@ -14,7 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.gui.image;
+package gecv.gui;
+
+import gecv.gui.image.ImagePanel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -50,13 +52,13 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 		listPanel.setSelectedIndex(0);
 		listPanel.addListSelectionListener(this);
 
-
 		add(splitPane);
 		addComponentListener(this);
 	}
 
 	public void reset() {
 		panels.clear();
+		listModel.removeAllElements();
 	}
 
 	/**
@@ -78,7 +80,8 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 	public void addItem( JPanel panel , String name ) {
 		panels.add(panel);
 		listModel.addElement(name);
-
+		int dividerSize = splitPane.getDividerSize();
+		splitPane.setDividerLocation((int)listPanel.getPreferredSize().getWidth()+1);
 		if( listModel.size() == 1 ) {
 			listPanel.setSelectedIndex(0);
 		}
@@ -90,8 +93,10 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 			return;
 
 		int index = listPanel.getSelectedIndex();
-		splitPane.setRightComponent(panels.get(index));
-		splitPane.repaint();
+		if( index >= 0 ) {
+			splitPane.setRightComponent(panels.get(index));
+			splitPane.repaint();
+		}
 	}
 
 	@Override
