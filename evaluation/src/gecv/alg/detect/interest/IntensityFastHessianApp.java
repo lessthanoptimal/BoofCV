@@ -19,7 +19,7 @@ package gecv.alg.detect.interest;
 import gecv.alg.misc.PixelMath;
 import gecv.alg.transform.ii.IntegralImageOps;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.gui.image.ListDisplayPanel;
+import gecv.gui.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;

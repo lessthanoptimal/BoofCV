@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.corner;
+package gecv.alg.detect.intensity;
 
-import gecv.abst.detect.corner.FactoryCornerDetector;
-import gecv.abst.detect.corner.GeneralFeatureDetector;
+import gecv.abst.detect.point.FactoryCornerDetector;
+import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.filter.derivative.GradientThree;
 import gecv.alg.filter.derivative.HessianFromGradient;

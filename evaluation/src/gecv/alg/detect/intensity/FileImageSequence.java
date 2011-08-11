@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.corner;
+package gecv.alg.detect.intensity;
 
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.ConvertImage;

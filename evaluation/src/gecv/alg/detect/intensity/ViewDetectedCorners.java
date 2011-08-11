@@ -14,21 +14,12 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.corner;
-
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageUInt8;
+package gecv.alg.detect.intensity;
 
 /**
+ * Visually shows the location of detected corners in different test images.
+ *
  * @author Peter Abeles
  */
-public interface EvaluationImageSequence {
-
-	public boolean next();
-
-	public ImageUInt8 getImage_I8();
-
-	public ImageFloat32 getImage_F32();
-
-	public String getName();
+public class ViewDetectedCorners {
 }

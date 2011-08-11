@@ -16,16 +16,16 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.abst.detect.corner.GeneralFeatureDetector;
-import gecv.abst.detect.corner.GeneralFeatureIntensity;
-import gecv.abst.detect.corner.WrapperGradientCornerIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
+import gecv.abst.detect.intensity.GeneralFeatureIntensity;
+import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
+import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
-import gecv.alg.detect.corner.FactoryCornerIntensity;
 import gecv.alg.detect.extract.FastNonMaxExtractor;
-import gecv.alg.filter.convolve.FactoryKernelGaussian;
+import gecv.alg.detect.intensity.FactoryCornerIntensity;
+import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.tracker.klt.KltConfig;
@@ -33,6 +33,7 @@ import gecv.alg.transform.pyramid.GradientPyramid;
 import gecv.alg.transform.pyramid.PyramidUpdateIntegerDown;
 import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
+import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
@@ -99,7 +100,7 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 				new GenericPkltFeatSelector<ImageUInt8,ImageSInt16>(detector,null);
 
 		PyramidUpdateIntegerDown<ImageUInt8> pyrUpdater =
-				new PyramidUpdateIntegerDown<ImageUInt8>(FactoryKernelGaussian.gaussian1D_I32(2),config.typeInput);
+				new PyramidUpdateIntegerDown<ImageUInt8>(FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,2),config.typeInput);
 
 		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel_I8();
 

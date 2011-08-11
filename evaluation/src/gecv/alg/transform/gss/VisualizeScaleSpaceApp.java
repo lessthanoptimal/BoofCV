@@ -18,7 +18,7 @@ package gecv.alg.transform.gss;
 
 import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.gui.image.ListDisplayPanel;
+import gecv.gui.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;

@@ -16,12 +16,12 @@
 
 package gecv.alg.detect.interest.benchmark;
 
-import gecv.abst.detect.corner.FactoryBlobDetector;
-import gecv.abst.detect.corner.FactoryCornerDetector;
-import gecv.abst.detect.corner.GeneralFeatureDetector;
 import gecv.abst.detect.interest.FactoryInterestPoint;
 import gecv.abst.detect.interest.InterestPointDetector;
-import gecv.alg.detect.corner.HessianBlobIntensity;
+import gecv.abst.detect.point.FactoryBlobDetector;
+import gecv.abst.detect.point.FactoryCornerDetector;
+import gecv.abst.detect.point.GeneralFeatureDetector;
+import gecv.alg.detect.intensity.HessianBlobIntensity;
 import gecv.alg.detect.interest.*;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.GeneralizedImageOps;
