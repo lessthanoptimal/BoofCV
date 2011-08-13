@@ -24,13 +24,13 @@ import jgrl.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public class PixelDistortMap extends PixelDistort {
+public class PixelTransformMap extends PixelTransform {
 
 	int width;
 	int height;
 	Point2D_F32 map[];
 
-	public PixelDistortMap( int width , int height ) {
+	public PixelTransformMap( int width , int height ) {
 		this.width = width;
 		this.height = height;
 
@@ -41,15 +41,15 @@ public class PixelDistortMap extends PixelDistort {
 	}
 
 	/**
-	 * Sets the map using another {@link PixelDistort} to compute the distortion.
+	 * Sets the map using another {@link PixelTransform} to compute the distortion.
 	 *
 	 * @param distortion Distortion which is being precomputed.
 	 */
-	public void set( PixelDistort distortion ) {
+	public void set( PixelTransform distortion ) {
 		int index = 0;
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
-				distortion.distort(x,y);
+				distortion.compute(x,y);
 				map[index++].set(distortion.distX,distortion.distY);
 			}
 		}
@@ -73,7 +73,7 @@ public class PixelDistortMap extends PixelDistort {
 	}
 
 	@Override
-	public void distort(int x, int y) {
+	public void compute(int x, int y) {
 		Point2D_F32 p = map[y*width+x];
 		distX = p.x;
 		distY = p.y;

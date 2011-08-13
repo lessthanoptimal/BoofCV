@@ -14,27 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.struct.distort;
+package gecv.alg.filter.kernel;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
 /**
- * Computes the location of a pixel after an arbitrary distortion has been applied to the image.
- *
  * @author Peter Abeles
  */
-public abstract class PixelDistort {
-
-	// distorted pixel coordinates
-	public float distX;
-	public float distY;
-
-	public abstract void distort( int x , int y );
-
-	public float getDistX() {
-		return distX;
-	}
-
-	public float getDistY() {
-		return distY;
+public class TestFactorySteerable {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

@@ -16,10 +16,11 @@
 
 package gecv.alg.distort;
 
+import gecv.alg.distort.impl.DistortSupport;
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.alg.interpolate.TypeInterpolate;
+import gecv.struct.distort.PixelTransform;
+import gecv.struct.image.ImageBase;
 
 
 /**
@@ -33,73 +34,74 @@ public class DistortImageOps {
 
 	/**
 	 * Rescales the input image and writes the results into the output image.  The scale
-	 * factor is determined independently using the input and output image's width and height.
+	 * factor is determined independently of the width and height.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Rescaled input image. Modified.
-	 * @param interpolation Function used to interpolate pixel values.
+	 * @param type Which interpolation algorithm should be used.
 	 */
-	public static void scale( ImageFloat32 input , ImageFloat32 output ,
-							  InterpolatePixel<ImageFloat32> interpolation )
-	{
-		float ratioW = (float)input.width/(float)output.width;
-		float ratioH = (float)input.height/(float)output.height;
+	public static <T extends ImageBase>
+	void scale( T input , T output , TypeInterpolate type ) {
+		Class<T> inputType = (Class<T>)input.getClass();
 
-		interpolation.setImage(input);
+		PixelTransform model = DistortSupport.transformScale(output, input);
+		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,type);
 
-		for( int y = 0; y < output.height; y++ ) {
-			int indexDst = output.startIndex + y*output.stride;
-			for( int x = 0; x < output.width; x++ ) {
-				output.data[indexDst++] = interpolation.get(x*ratioW,y*ratioH);
-			}
-		}
+		distorter.apply(input,output);
+	}
+
+	public static <T extends ImageBase>
+	void scale( T input , T output , InterpolatePixel<T> interp ) {
+		Class<T> inputType = (Class<T>)input.getClass();
+
+		PixelTransform model = DistortSupport.transformScale(output, input);
+		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp);
+
+		distorter.apply(input,output);
 	}
 
 	/**
-	 * Rescales the input image and writes the results into the output image.  The scale
-	 * factor is determined independently using the input and output image's width and height.
+	 * Rotates the image using the specified interpolation type.  The rotation is performed
+	 * around the specified center of rotation in the input image.
 	 *
-	 * @param input Input image. Not modified.
-	 * @param output Rescaled input image. Modified.
-	 * @param interpolation Function used to interpolate pixel values.
+	 * @param input Which which is being rotated.
+	 * @param output The image in which the output is written to.
+	 * @param type Which type of interpolation will be used.
+	 * @param centerX Center of rotation in input image coordinates.
+	 * @param centerY Center of rotation in input image coordinates.
+	 * @param angle Angle of rotation in radians.
 	 */
-	public static void scale( ImageUInt8 input , ImageUInt8 output ,
-							  InterpolatePixel<ImageUInt8> interpolation )
-	{
-		float ratioW = (float)input.width/(float)output.width;
-		float ratioH = (float)input.height/(float)output.height;
+	public static <T extends ImageBase>
+	void rotate( T input , T output , TypeInterpolate type ,
+				 float centerX , float centerY , float angle ) {
+		Class<T> inputType = (Class<T>)input.getClass();
 
-		interpolation.setImage(input);
+		PixelTransform model = DistortSupport.transformRotate(centerX,centerY,angle);
+		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,type);
 
-		for( int y = 0; y < output.height; y++ ) {
-			int indexDst = output.startIndex + y*output.stride;
-			for( int x = 0; x < output.width; x++ ) {
-				output.data[indexDst++] = (byte)interpolation.get(x*ratioW,y*ratioH);
-			}
-		}
+		distorter.apply(input,output);
 	}
 
-	/**
-	 * Rescales the input image and writes the results into the output image.  The scale
-	 * factor is determined independently using the input and output image's width and height.
+		/**
+	 * Rotates the image using the specified interpolation.  The rotation is performed
+	 * around the specified center of rotation in the input image.
 	 *
-	 * @param input Input image. Not modified.
-	 * @param output Rescaled input image. Modified.
-	 * @param interpolation Function used to interpolate pixel values.
+	 * @param input Which which is being rotated.
+	 * @param output The image in which the output is written to.
+	 * @param interp The interpolation algorithm which is to be used.
+	 * @param centerX Center of rotation in input image coordinates.
+	 * @param centerY Center of rotation in input image coordinates.
+	 * @param angle Angle of rotation in radians.
 	 */
-	public static void scale( ImageSInt16 input , ImageSInt16 output ,
-							  InterpolatePixel<ImageSInt16> interpolation )
-	{
-		float ratioW = (float)input.width/(float)output.width;
-		float ratioH = (float)input.height/(float)output.height;
+	public static <T extends ImageBase>
+	void rotate( T input , T output , InterpolatePixel<T> interp ,
+				 float centerX , float centerY , float angle ) {
+		Class<T> inputType = (Class<T>)input.getClass();
 
-		interpolation.setImage(input);
+		PixelTransform model = DistortSupport.transformRotate(centerX,centerY,angle);
+		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp);
 
-		for( int y = 0; y < output.height; y++ ) {
-			int indexDst = output.startIndex + y*output.stride;
-			for( int x = 0; x < output.width; x++ ) {
-				output.data[indexDst++] = (short)interpolation.get(x*ratioW,y*ratioH);
-			}
-		}
+		distorter.apply(input,output);
 	}
+
 }

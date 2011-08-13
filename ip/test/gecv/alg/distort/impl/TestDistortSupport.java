@@ -16,23 +16,42 @@
 
 package gecv.alg.distort.impl;
 
-import gecv.alg.distort.ImageDistort;
-import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.distort.PixelTransform;
 import gecv.struct.image.ImageFloat32;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImageDistort_F32 extends GeneralImageDistortTests<ImageFloat32>{
+public class TestDistortSupport {
+	@Test
+	public void distortScale() {
+		ImageFloat32 a = new ImageFloat32(25,30);
+		ImageFloat32 b = new ImageFloat32(15,25);
 
-	public TestImageDistort_F32() {
-		super(ImageFloat32.class);
+		PixelTransform tran = DistortSupport.transformScale(a, b);
+
+		tran.compute(5,6);
+
+		assertEquals(5.0*15.0/25.0,tran.distX,1e-4);
+		assertEquals(6.0*25.0/30.0,tran.distY,1e-4);
 	}
 
-	@Override
-	public ImageDistort<ImageFloat32> createDistort(PixelTransform dstToSrc, InterpolatePixel<ImageFloat32> interp) {
-		return new ImplImageDistort_F32(dstToSrc,interp);
+	@Test
+	public void distortRotate() {
+
+		PixelTransform tran = DistortSupport.transformRotate(13f,15.0f,(float)(Math.PI/2.0));
+
+		// trivial case
+		tran.compute(13,15);
+		assertEquals(13,tran.distX,1e-4);
+		assertEquals(15,tran.distY,1e-4);
+		// see how it handles the rotation
+		tran.compute(15,20);
+		assertEquals(8,tran.distX,1e-4);
+		assertEquals(17,tran.distY,1e-4);
 	}
 }

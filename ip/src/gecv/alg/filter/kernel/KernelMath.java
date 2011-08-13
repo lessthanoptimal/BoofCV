@@ -25,6 +25,14 @@ import gecv.struct.image.ImageSInt32;
  * @author Peter Abeles
  */
 public class KernelMath {
+
+	public static void setTo( Kernel2D_F32 kernel , float value ) {
+		int N = kernel.width*kernel.width;
+		for( int i = 0; i < N; i++ ) {
+			kernel.data[i] = value;
+		}
+	}
+
 	public static Kernel2D transpose( Kernel2D a ) {
 		if( a instanceof Kernel2D_F32)
 			return transpose((Kernel2D_F32)a);
@@ -96,6 +104,66 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}
 
+	public static void normalizeByLargestMagnitude(Kernel2D_F32 kernel) {
+
+		float norm = 0;
+
+		int N = kernel.width*kernel.width;
+		for( int i = 0; i < N; i++ ) {
+			float v = Math.abs(kernel.data[i]);
+			if( v > norm )
+				norm = v;
+		}
+
+		for( int i = 0; i < N; i++ ) {
+			kernel.data[i] /= norm;
+		}
+	}
+
+	public static void normalizeByLargestMagnitude(Kernel1D_F32 kernel) {
+
+		float norm = 0;
+
+		int N = kernel.width;
+		for( int i = 0; i < N; i++ ) {
+			float v = Math.abs(kernel.data[i]);
+			if( v > norm )
+				norm = v;
+		}
+
+		for( int i = 0; i < N; i++ ) {
+			kernel.data[i] /= norm;
+		}
+	}
+
+	public static void normalizeEnergy( Kernel2D_F32 kernel ) {
+		double total = 0;
+
+		int N = kernel.width*kernel.width;
+		for( int i = 0; i < N; i++ ) {
+			float v = kernel.data[i];
+			total += v*v;
+		}
+		float norm = (float)Math.sqrt(total);
+		for( int i = 0; i < N; i++ ) {
+			kernel.data[i] /= norm;
+		}
+	}
+
+	public static void normalizeEnergy( Kernel1D_F32 kernel ) {
+		double total = 0;
+
+		int N = kernel.width;
+		for( int i = 0; i < N; i++ ) {
+			float v = kernel.data[i];
+			total += v*v;
+		}
+		float norm = (float)Math.sqrt(total);
+		for( int i = 0; i < N; i++ ) {
+			kernel.data[i] /= norm;
+		}
+	}
+
 	public static ImageFloat32 convertToImage( Kernel2D_F32 kernel ) {
 		int w = kernel.getWidth();
 		ImageFloat32 ret = new ImageFloat32(w,w);
@@ -116,6 +184,32 @@ public class KernelMath {
 		for( int i = 0; i < w; i++ ) {
 			for( int j = 0; j < w; j++ ) {
 				ret.set(j,i,kernel.get(j,i));
+			}
+		}
+
+		return ret;
+	}
+
+	public static Kernel2D_F32 convertToKernel( ImageFloat32 image ) {
+		int w = image.getWidth();
+		Kernel2D_F32 ret = new Kernel2D_F32(w);
+
+		for( int i = 0; i < w; i++ ) {
+			for( int j = 0; j < w; j++ ) {
+				ret.set(j,i,image.get(j,i));
+			}
+		}
+
+		return ret;
+	}
+
+	public static Kernel2D_I32 convertToKernel( ImageSInt32 image ) {
+		int w = image.getWidth();
+		Kernel2D_I32 ret = new Kernel2D_I32(w);
+
+		for( int i = 0; i < w; i++ ) {
+			for( int j = 0; j < w; j++ ) {
+				ret.set(j,i,image.get(j,i));
 			}
 		}
 
@@ -145,13 +239,13 @@ public class KernelMath {
 		int N = original.width;
 		for( int i = 0; i < N; i++ ) {
 			float v = Math.abs(original.data[i]);
-			if( v < minAbs )
+			if( v < minAbs && v > 0 )
 				minAbs = v;
 		}
 
 		Kernel1D_I32 ret = new Kernel1D_I32(original.width);
 		for( int i = 0; i < N; i++ ) {
-			ret.data[i] = (int)Math.round(original.data[i]/minAbs);
+			ret.data[i] = Math.round(original.data[i]/minAbs);
 		}
 		return ret;
 	}

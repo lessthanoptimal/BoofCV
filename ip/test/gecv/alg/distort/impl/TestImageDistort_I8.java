@@ -18,7 +18,7 @@ package gecv.alg.distort.impl;
 
 import gecv.alg.distort.ImageDistort;
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.struct.distort.PixelDistort;
+import gecv.struct.distort.PixelTransform;
 import gecv.struct.image.ImageUInt8;
 
 
@@ -32,7 +32,7 @@ public class TestImageDistort_I8 extends GeneralImageDistortTests<ImageUInt8>{
 	}
 
 	@Override
-	public ImageDistort<ImageUInt8> createDistort(PixelDistort dstToSrc, InterpolatePixel<ImageUInt8> interp) {
-		return new ImageDistort_I8<ImageUInt8>(dstToSrc,interp);
+	public ImageDistort<ImageUInt8> createDistort(PixelTransform dstToSrc, InterpolatePixel<ImageUInt8> interp) {
+		return new ImplImageDistort_I8<ImageUInt8>(dstToSrc,interp);
 	}
 }

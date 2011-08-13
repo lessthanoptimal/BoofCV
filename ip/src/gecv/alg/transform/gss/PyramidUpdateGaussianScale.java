@@ -18,7 +18,7 @@ package gecv.alg.transform.gss;
 
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.BlurStorageFilter;
-import gecv.abst.filter.distort.GeneralizedDistortImageOps;
+import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
@@ -79,7 +79,7 @@ public class PyramidUpdateGaussianScale< T extends ImageBase> implements Pyramid
 			tempImage.reshape(prev.width,prev.height);
 			blur.process(prev,tempImage);
 
-			GeneralizedDistortImageOps.scale(tempImage,layer,interpolate);
+			DistortImageOps.scale(tempImage,layer,interpolate);
 		}
 	}
 }

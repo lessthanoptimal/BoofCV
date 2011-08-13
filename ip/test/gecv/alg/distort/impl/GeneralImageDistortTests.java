@@ -22,7 +22,7 @@ import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.FactoryImageGenerator;
-import gecv.struct.distort.PixelDistort;
+import gecv.struct.distort.PixelTransform;
 import gecv.struct.image.ImageBase;
 import org.junit.Test;
 
@@ -55,7 +55,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 		generator = FactoryImageGenerator.create((Class<T>)imageType);
 	}
 
-	public abstract ImageDistort<T> createDistort(PixelDistort dstToSrc, InterpolatePixel<T> interp);
+	public abstract ImageDistort<T> createDistort(PixelTransform dstToSrc, InterpolatePixel<T> interp);
 
 	@Test
 	public void testSkip() {
@@ -113,11 +113,11 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 		}
 	}
 
-	public class BasicTransform extends PixelDistort {
+	public class BasicTransform extends PixelTransform {
 
 
 		@Override
-		public void distort(int x, int y) {
+		public void compute(int x, int y) {
 			this.distX = x+offX;
 			this.distY = y+offY;
 		}

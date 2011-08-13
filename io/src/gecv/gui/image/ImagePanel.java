@@ -33,8 +33,6 @@ public class ImagePanel extends JPanel {
 	public ImagePanel(BufferedImage img) {
 		this.img = img;
 		setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
-		setMinimumSize(getPreferredSize());
-		setMaximumSize(getPreferredSize());
 	}
 
 	protected ImagePanel() {

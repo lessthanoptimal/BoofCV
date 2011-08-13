@@ -16,6 +16,7 @@
 
 package gecv.alg.distort;
 
+import gecv.struct.distort.PixelTransform;
 import gecv.struct.image.ImageBase;
 
 
@@ -26,6 +27,14 @@ import gecv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 public interface ImageDistort<T extends ImageBase> {
+
+	/**
+	 * Specifies how pixel coordinates are transformed from the destination
+	 * to source images.
+	 *
+	 * @param dstToSrc Pixel coordinate transformation.
+	 */
+	public void setModel( PixelTransform dstToSrc );
 
 	/**
 	 * Applies the transform while skipping over pixels without a match.

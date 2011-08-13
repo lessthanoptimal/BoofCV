@@ -14,12 +14,16 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.intensity;
+package gecv.alg.interpolate;
+
 
 /**
- * Visually shows the location of detected corners in different test images.
+ * List of built in interpolation algorithms.
  *
  * @author Peter Abeles
  */
-public class ViewDetectedCorners {
+public enum TypeInterpolate {
+	NEAREST_NEIGHBOR,
+	BILINEAR,
+	BICUBIC
 }

@@ -31,6 +31,22 @@ import gecv.struct.image.ImageUInt8;
 @SuppressWarnings({"unchecked"})
 public class FactoryInterpolation {
 
+	public static <T extends ImageBase> InterpolatePixel<T> 
+	createPixel( Class<T> imageType , TypeInterpolate type )
+	{
+		switch( type ) {
+			case NEAREST_NEIGHBOR:
+				return nearestNeighborPixel(imageType);
+
+			case BILINEAR:
+				return bilinearPixel(imageType);
+
+			case BICUBIC:
+				return bicubic(imageType,0.5f);
+		}
+		throw new IllegalArgumentException("Add type: "+type);
+	}
+
 	public static <T extends ImageBase> InterpolatePixel<T> bilinearPixel( T image ) {
 
 		InterpolatePixel<T> ret = bilinearPixel((Class)image.getClass());

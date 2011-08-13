@@ -16,13 +16,22 @@
 
 package gecv.alg.filter.kernel;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 
 /**
- * Computes the magnitude of each basis function
- *
  * @author Peter Abeles
  */
-public interface SteerableCoefficients {
+public class TestKernelMath {
+	@Test
+	public void stuff() {
+		fail("implement");
+	}
 
-	public double compute( double angle , int basis );
+	@Test
+	public void normalizeEnergy() {
+		fail("implement");
+	}
 }

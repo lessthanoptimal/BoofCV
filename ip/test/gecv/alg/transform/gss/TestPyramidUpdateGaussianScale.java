@@ -18,9 +18,10 @@ package gecv.alg.transform.gss;
 
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.BlurStorageFilter;
-import gecv.abst.filter.distort.GeneralizedDistortImageOps;
+import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.interpolate.TypeInterpolate;
 import gecv.alg.transform.pyramid.BasePyramidTests;
 import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageFloat32;
@@ -62,7 +63,7 @@ public class TestPyramidUpdateGaussianScale extends BasePyramidTests {
 		ImageFloat32 blurrImg = new ImageFloat32(width, height);
 		blur.process(img,blurrImg);
 		ImageFloat32 expected = new ImageFloat32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
-		GeneralizedDistortImageOps.scale(blurrImg, expected,interp);
+		DistortImageOps.scale(blurrImg, expected, TypeInterpolate.BILINEAR);
 		ImageFloat32 found = pyramid.getLayer(0);
 
 		GecvTesting.assertEquals(expected,found);
@@ -72,7 +73,7 @@ public class TestPyramidUpdateGaussianScale extends BasePyramidTests {
 		blurrImg = new ImageFloat32(expected.width,expected.height);
 		blur.process(expected,blurrImg);
 		expected = new ImageFloat32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
-		GeneralizedDistortImageOps.scale(blurrImg, expected,interp);
+		DistortImageOps.scale(blurrImg, expected, TypeInterpolate.BILINEAR);
 		found = pyramid.getLayer(1);
 
 		GecvTesting.assertEquals(expected,found,0,1e-4);
