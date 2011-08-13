@@ -33,6 +33,7 @@ import gecv.struct.image.ImageFloat32;
 import gecv.struct.wavelet.WaveletDescription;
 import gecv.struct.wavelet.WlCoef_F32;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
@@ -86,6 +87,7 @@ public class DenoiseVisualizeApp {
 		System.out.printf("Denoised MSE %8.1ff\n",computeMSE(imageDenoised));
 
 		ListDisplayPanel gui = new ListDisplayPanel();
+		gui.setPreferredSize( new Dimension(image.width+100,image.height));
 		gui.addImage(ConvertBufferedImage.convertTo(image,null),"Original");
 		gui.addImage(ConvertBufferedImage.convertTo(imageNoisy,null),"Noisy");
 		gui.addImage(ConvertBufferedImage.convertTo(imageDenoised,null),"De-noised");

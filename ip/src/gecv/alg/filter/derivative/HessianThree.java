@@ -60,7 +60,7 @@ public class HessianThree {
 	public static Kernel2D_I32 kernelCross_I32 = new Kernel2D_I32(new int[]{1,0,-1,0,0,0,-1,0,1},3);
 
 	public static Kernel1D_F32 kernelXXYY_F32 = new Kernel1D_F32(5,0.5f,0,-1,0,0.5f);
-	public static Kernel2D_F32 kernelCross_F32 = new Kernel2D_F32(new float[]{0.5f,0,-0.5f,0,0,0,-0.5f,0,0.5f},3);
+	public static Kernel2D_F32 kernelCross_F32 = new Kernel2D_F32(3, new float[]{0.5f,0,-0.5f,0,0,0,-0.5f,0,0.5f});
 
 	/**
 	 * <p>

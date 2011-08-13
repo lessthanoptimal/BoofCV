@@ -16,7 +16,6 @@
 
 package gecv.alg.transform.ii;
 
-import gecv.abst.transform.GeneralizedIntegralImageOps;
 import gecv.alg.filter.convolve.ConvolveWithBorder;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
@@ -106,13 +105,13 @@ public class TestIntegralImageOps {
 		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
 
 		GeneralizedImageOps.randomize(input,rand,0,10);
-		GeneralizedIntegralImageOps.transform(input,integral);
+		GIntegralImageOps.transform(input,integral);
 
 		ImageBase expected = GeneralizedImageOps.createImage(outputType,width,height);
 		ImageBase found = GeneralizedImageOps.createImage(outputType,width,height);
 
 		if( paramType[0] == ImageFloat32.class ) {
-			Kernel2D_F32 kernel = new Kernel2D_F32(new float[]{1,1,1,2,2,2,1,1,1},3);
+			Kernel2D_F32 kernel = new Kernel2D_F32(3, new float[]{1,1,1,2,2,2,1,1,1});
 			ImageBorder_F32 border = FactoryImageBorder.value((ImageFloat32)input,0);
 			ConvolveWithBorder.convolve(kernel,(ImageFloat32)input,(ImageFloat32)expected,border);
 		} else {
@@ -148,13 +147,13 @@ public class TestIntegralImageOps {
 		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
 
 		GeneralizedImageOps.randomize(input,rand,0,10);
-		GeneralizedIntegralImageOps.transform(input,integral);
+		GIntegralImageOps.transform(input,integral);
 
 		ImageBase expected = GeneralizedImageOps.createImage(outputType,width,height);
 		ImageBase found = GeneralizedImageOps.createImage(outputType,width,height);
 
 		if( paramType[0] == ImageFloat32.class ) {
-			Kernel2D_F32 kernel = new Kernel2D_F32(new float[]{1,1,1,2,2,2,1,1,1},3);
+			Kernel2D_F32 kernel = new Kernel2D_F32(3, new float[]{1,1,1,2,2,2,1,1,1});
 			ImageBorder_F32 border = FactoryImageBorder.value((ImageFloat32)input,0);
 			ConvolveWithBorder.convolve(kernel,(ImageFloat32)input,(ImageFloat32)expected,border);
 		} else {
@@ -194,7 +193,7 @@ public class TestIntegralImageOps {
 		kernel.blocks[1] = new ImageRectangle(-2,-1,1,0);
 		kernel.scales =  new int[]{1,2};
 
-		GeneralizedIntegralImageOps.convolve(integral,kernel,expected);
+		GIntegralImageOps.convolve(integral,kernel,expected);
 
 		SingleBandImage e = FactorySingleBandImage.wrap(expected);
 
@@ -222,7 +221,7 @@ public class TestIntegralImageOps {
 		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);
 
 		GeneralizedImageOps.fill(input,1);
-		GeneralizedIntegralImageOps.transform(input,integral);
+		GIntegralImageOps.transform(input,integral);
 
 		double found0 = ((Number)m.invoke(null,integral,4,5,8,8)).doubleValue();
 
@@ -244,7 +243,7 @@ public class TestIntegralImageOps {
 		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);
 
 		GeneralizedImageOps.fill(input,1);
-		GeneralizedIntegralImageOps.transform(input,integral);
+		GIntegralImageOps.transform(input,integral);
 
 		double found = ((Number)m.invoke(null,integral,4,5,8,8)).doubleValue();
 		assertEquals(12,found,1e-4f);

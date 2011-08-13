@@ -27,7 +27,10 @@ import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.gss.GaussianScaleSpace;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,7 +41,8 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class IntensityFeatureScaleSpaceApp extends SelectAlgorithmPanel {
+public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase>
+		extends SelectAlgorithmPanel {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
 	static String fileName = "evaluation/data/sunflowers.png";
@@ -49,23 +53,26 @@ public class IntensityFeatureScaleSpaceApp extends SelectAlgorithmPanel {
 
 	ListDisplayPanel gui = new ListDisplayPanel();
 
-	GaussianScaleSpace<ImageFloat32,ImageFloat32> ss;
+	GaussianScaleSpace<T,D> ss;
 
 	BufferedImage input;
-	ImageFloat32 inputF32;
+	T workImage;
+	Class<T> imageType;
 
-	public IntensityFeatureScaleSpaceApp() {
-		addAlgorithm("Hessian Det", new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.DETERMINANT,ImageFloat32.class));
-		addAlgorithm("Laplacian", new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.TRACE,ImageFloat32.class));
-		addAlgorithm("Harris",new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createHarris(ImageFloat32.class,2,0.4f)));
-		addAlgorithm("KLT",new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>( FactoryCornerIntensity.createKlt(ImageFloat32.class,2)));
-		addAlgorithm("FAST 12",new WrapperFastCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createFast12(ImageFloat32.class,5,11)));
-		addAlgorithm("KitRos",new WrapperKitRosCornerIntensity<ImageFloat32,ImageFloat32>(ImageFloat32.class));
-		addAlgorithm("Median",new WrapperMedianCornerIntensity<ImageFloat32,ImageFloat32>(FactoryBlurFilter.median(ImageFloat32.class,2),ImageFloat32.class));
+	public IntensityFeatureScaleSpaceApp( Class<T> imageType , Class<D> derivType ) {
+		this.imageType = imageType;
+
+		addAlgorithm("Hessian Det", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
+		addAlgorithm("Laplacian", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
+		addAlgorithm("Harris",new WrapperGradientCornerIntensity<T,D>(FactoryCornerIntensity.createHarris(derivType,2,0.4f)));
+		addAlgorithm("KLT",new WrapperGradientCornerIntensity<T,D>( FactoryCornerIntensity.createKlt(derivType,2)));
+		addAlgorithm("FAST 12",new WrapperFastCornerIntensity<T,D>(FactoryCornerIntensity.createFast12(imageType,5,11)));
+		addAlgorithm("KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
+		addAlgorithm("Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
 
 		add(gui, BorderLayout.CENTER);
 
-		ss = FactoryGaussianScaleSpace.nocache_F32();
+		ss = FactoryGaussianScaleSpace.nocache(imageType);
 
 		double scales[] = new double[31];
 		for( int i = 0; i < scales.length ; i++ ) {
@@ -79,8 +86,8 @@ public class IntensityFeatureScaleSpaceApp extends SelectAlgorithmPanel {
 		if( input == null ) {
 			return;
 		}
-		GeneralFeatureIntensity<ImageFloat32,ImageFloat32> intensity =
-				(GeneralFeatureIntensity<ImageFloat32,ImageFloat32>)cookie;
+		GeneralFeatureIntensity<T,D> intensity =
+				(GeneralFeatureIntensity<T,D>)cookie;
 
 		gui.reset();
 		gui.addImage(input,"Original Image");
@@ -93,13 +100,13 @@ public class IntensityFeatureScaleSpaceApp extends SelectAlgorithmPanel {
 		for( int i = 0; i < ss.getTotalScales() && !progressMonitor.isCanceled(); i++ ) {
 			ss.setActiveScale(i);
 			double scale = ss.getCurrentScale();
-			ImageFloat32 scaledImage = ss.getScaledImage();
+			T scaledImage = ss.getScaledImage();
 
-			ImageFloat32 derivX = ss.getDerivative(true);
-			ImageFloat32 derivY = ss.getDerivative(false);
-			ImageFloat32 derivXX = ss.getDerivative(true,true);
-			ImageFloat32 derivYY = ss.getDerivative(false,false);
-			ImageFloat32 derivXY = ss.getDerivative(true,false);
+			D derivX = ss.getDerivative(true);
+			D derivY = ss.getDerivative(false);
+			D derivXX = ss.getDerivative(true,true);
+			D derivYY = ss.getDerivative(false,false);
+			D derivXY = ss.getDerivative(true,false);
 
 			intensity.process(scaledImage,derivX,derivY,derivXX,derivYY,derivXY);
 
@@ -120,26 +127,23 @@ public class IntensityFeatureScaleSpaceApp extends SelectAlgorithmPanel {
 	public synchronized void setImage( BufferedImage input ) {
 		setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
 		this.input = input;
-		inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
-		ss.setImage(inputF32);
+		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		ss.setImage(workImage);
+		setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
 		refreshAlgorithm();
+
+		ShowImages.showWindow(this,"Feature Scale Space Intensity: "+imageType.getSimpleName());
 	}
 
 	public static void main( String args[] ) {
-		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
-
-		double scales[] = new double[31];
-		for( int i = 0; i < scales.length ; i++ ) {
-			scales[i] =  Math.exp(i*0.15);
-		}
-		ss.setScales(scales);
-
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
-		IntensityFeatureScaleSpaceApp app = new IntensityFeatureScaleSpaceApp();
-		app.setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
-
-		ShowImages.showWindow(app,"Feature Scale Space Intensity");
+		IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32> app =
+				new IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 		app.setImage(input);
+
+		IntensityFeatureScaleSpaceApp<ImageUInt8, ImageSInt16> app2 =
+				new IntensityFeatureScaleSpaceApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
+		app2.setImage(input);
 	}
 }

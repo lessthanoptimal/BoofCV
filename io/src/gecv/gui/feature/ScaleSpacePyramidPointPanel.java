@@ -71,10 +71,11 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 			}
 			this.points.add(p);
 		}
+		setLevel(0);
 	}
 
-	private synchronized  void setLevel( int level ) {
-		System.out.println("level "+level);
+	private synchronized void setLevel( int level ) {
+//		System.out.println("level "+level);
 		if( level > 0 ) {
 
 			ImageBase small = ss.getLayer(level-1);
@@ -90,6 +91,9 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 					levelPoints.add(p);
 				}
 			}
+		} else {
+			levelPoints.clear();
+			levelPoints.addAll(points);
 		}
 
 		this.activeLevel = level;

@@ -16,7 +16,10 @@
 
 package gecv.alg.filter.kernel;
 
-import gecv.struct.convolve.*;
+import gecv.struct.convolve.Kernel1D_F32;
+import gecv.struct.convolve.Kernel1D_I32;
+import gecv.struct.convolve.Kernel2D_F32;
+import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt32;
 
@@ -26,19 +29,18 @@ import gecv.struct.image.ImageSInt32;
  */
 public class KernelMath {
 
-	public static void setTo( Kernel2D_F32 kernel , float value ) {
+	public static void fill( Kernel2D_F32 kernel , float value ) {
 		int N = kernel.width*kernel.width;
 		for( int i = 0; i < N; i++ ) {
 			kernel.data[i] = value;
 		}
 	}
 
-	public static Kernel2D transpose( Kernel2D a ) {
-		if( a instanceof Kernel2D_F32)
-			return transpose((Kernel2D_F32)a);
-		else
-			return transpose((Kernel2D_I32)a);
-
+	public static void fill( Kernel2D_I32 kernel , int value ) {
+		int N = kernel.width*kernel.width;
+		for( int i = 0; i < N; i++ ) {
+			kernel.data[i] = value;
+		}
 	}
 
 	public static Kernel2D_F32 transpose( Kernel2D_F32 a ) {
@@ -104,66 +106,6 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}
 
-	public static void normalizeByLargestMagnitude(Kernel2D_F32 kernel) {
-
-		float norm = 0;
-
-		int N = kernel.width*kernel.width;
-		for( int i = 0; i < N; i++ ) {
-			float v = Math.abs(kernel.data[i]);
-			if( v > norm )
-				norm = v;
-		}
-
-		for( int i = 0; i < N; i++ ) {
-			kernel.data[i] /= norm;
-		}
-	}
-
-	public static void normalizeByLargestMagnitude(Kernel1D_F32 kernel) {
-
-		float norm = 0;
-
-		int N = kernel.width;
-		for( int i = 0; i < N; i++ ) {
-			float v = Math.abs(kernel.data[i]);
-			if( v > norm )
-				norm = v;
-		}
-
-		for( int i = 0; i < N; i++ ) {
-			kernel.data[i] /= norm;
-		}
-	}
-
-	public static void normalizeEnergy( Kernel2D_F32 kernel ) {
-		double total = 0;
-
-		int N = kernel.width*kernel.width;
-		for( int i = 0; i < N; i++ ) {
-			float v = kernel.data[i];
-			total += v*v;
-		}
-		float norm = (float)Math.sqrt(total);
-		for( int i = 0; i < N; i++ ) {
-			kernel.data[i] /= norm;
-		}
-	}
-
-	public static void normalizeEnergy( Kernel1D_F32 kernel ) {
-		double total = 0;
-
-		int N = kernel.width;
-		for( int i = 0; i < N; i++ ) {
-			float v = kernel.data[i];
-			total += v*v;
-		}
-		float norm = (float)Math.sqrt(total);
-		for( int i = 0; i < N; i++ ) {
-			kernel.data[i] /= norm;
-		}
-	}
-
 	public static ImageFloat32 convertToImage( Kernel2D_F32 kernel ) {
 		int w = kernel.getWidth();
 		ImageFloat32 ret = new ImageFloat32(w,w);
@@ -222,7 +164,7 @@ public class KernelMath {
 		int N = original.width*original.width;
 		for( int i = 0; i < N; i++ ) {
 			float v = Math.abs(original.data[i]);
-			if( v < minAbs )
+			if( v < minAbs && v > 0)
 				minAbs = v;
 		}
 

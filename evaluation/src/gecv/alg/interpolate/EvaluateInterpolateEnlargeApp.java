@@ -24,6 +24,7 @@ import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 
@@ -72,11 +73,16 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase> {
 		int w = image.getWidth()*8;
 		int h = image.getHeight()*8;
 
-
 		EvaluateInterpolateEnlargeApp<ImageFloat32> app = new EvaluateInterpolateEnlargeApp<ImageFloat32>(image,w,h, ImageFloat32.class);
 
-		app.addInterpolation("NN",FactoryInterpolation.nearestNeighborPixel(ImageFloat32.class));
-		app.addInterpolation("Bilinear",FactoryInterpolation.bilinearPixel(ImageFloat32.class));
-		app.addInterpolation("Bicubic",FactoryInterpolation.bicubic(ImageFloat32.class,-0.5f));
+		app.addInterpolation("NN F32",FactoryInterpolation.nearestNeighborPixel(ImageFloat32.class));
+		app.addInterpolation("Bilinear F32",FactoryInterpolation.bilinearPixel(ImageFloat32.class));
+		app.addInterpolation("Bicubic F32",FactoryInterpolation.bicubic(ImageFloat32.class,-0.5f));
+
+		EvaluateInterpolateEnlargeApp<ImageUInt8> appU8 = new EvaluateInterpolateEnlargeApp<ImageUInt8>(image,w,h, ImageUInt8.class);
+
+		appU8.addInterpolation("NN U8",FactoryInterpolation.nearestNeighborPixel(ImageUInt8.class));
+		appU8.addInterpolation("Bilinear U8",FactoryInterpolation.bilinearPixel(ImageUInt8.class));
+		appU8.addInterpolation("Bicubic U8",FactoryInterpolation.bicubic(ImageUInt8.class,-0.5f));
 	}
 }

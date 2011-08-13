@@ -59,7 +59,7 @@ public class StabilizeImageSequence_F32 extends StabilizeImageSequenceBase<Image
 		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
 		DistanceAffine2DSq distance = new DistanceAffine2DSq();
 //		DistanceAffine2D distance = new DistanceAffine2D();
-		Affine2DCodec codec = new Affine2DCodec();
+//		Affine2DCodec codec = new Affine2DCodec();
 
 		int numSample =  modelFitter.getMinimumPoints();
 

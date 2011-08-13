@@ -67,7 +67,7 @@ public class SteerableKernel {
 	 */
 	public Kernel2D_F32 compute( double angle ) {
 		// set the output to zero
-		KernelMath.setTo(output,0);
+		KernelMath.fill(output,0);
 
 		int N = output.width*output.width;
 

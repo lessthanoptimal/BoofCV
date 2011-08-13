@@ -24,7 +24,10 @@ import gecv.gui.feature.ScaleSpacePyramidPointPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.gss.ScaleSpacePyramid;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 
@@ -36,33 +39,39 @@ import java.awt.image.BufferedImage;
 public class DetectFeatureLaplacePyramidApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-//	static String fileName = "evaluation/data/sunflowers.png";
+	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
-	static String fileName = "evaluation/data/shapes01.png";
+//	static String fileName = "evaluation/data/shapes01.png";
 
 	static int NUM_FEATURES = 50;
 
-	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage(fileName);
-		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
+	public static <T extends ImageBase, D extends ImageBase>
+	void doStuff( BufferedImage input , Class<T> imageType, Class<D> derivType ) {
+		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 
-		InterpolatePixel<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
-		PyramidUpdateGaussianScale<ImageFloat32> update = new PyramidUpdateGaussianScale<ImageFloat32>(interpolate);
-		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(update,1,1.5,2,4,8,12,24);
+		InterpolatePixel<T> interpolate = FactoryInterpolation.bilinearPixel(imageType);
+		PyramidUpdateGaussianScale<T> update = new PyramidUpdateGaussianScale<T>(interpolate);
+		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(update,1,1.5,2,4,8,12,24);
 
 		int r = 2;
-		FeatureLaplacePyramid<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianLaplacePyramid(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
-//		FeatureLaplacePyramid<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisLaplacePyramid(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+		FeatureLaplacePyramid<T,D> det = FactoryInterestPointAlgs.hessianLaplacePyramid(r,1,NUM_FEATURES,imageType,derivType);
+//		FeatureLaplacePyramid<T,D> det = FactoryInterestPointAlgs.harrisLaplacePyramid(r,1,NUM_FEATURES,imageType,derivType);
 
-		ss.update(inputF32);
+		ss.update(workImage);
 		det.detect(ss);
 
 		ScaleSpacePyramidPointPanel panel = new ScaleSpacePyramidPointPanel(ss,r);
 		panel.setBackground(input);
 		panel.setPoints(det.getInterestPoints());
 
-		ShowImages.showWindow(panel,"Feature Laplace Pyramid");
+		ShowImages.showWindow(panel,"Feature Laplace Pyramid: "+imageType.getSimpleName());
+	}
+
+	public static void main( String args[] ) {
+		BufferedImage input = UtilImageIO.loadImage(fileName);
+		doStuff(input,ImageFloat32.class,ImageFloat32.class);
+		doStuff(input, ImageUInt8.class, ImageSInt16.class);
 		System.out.println("Done");
 	}
 }

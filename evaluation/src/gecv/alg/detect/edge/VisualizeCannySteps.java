@@ -33,6 +33,7 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
+// todo abstract image type.  Put in integer images
 public class VisualizeCannySteps {
 
 	//	static String fileName = "evaluation/data/outdoors01.jpg";

@@ -18,7 +18,7 @@ package gecv.abst.filter.derivative;
 
 import gecv.abst.filter.convolve.ConvolveInterface;
 import gecv.abst.filter.convolve.FactoryConvolve;
-import gecv.alg.filter.kernel.KernelMath;
+import gecv.alg.filter.kernel.GKernelMath;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.border.BorderType;
 import gecv.struct.GecvDefaults;
@@ -86,7 +86,7 @@ public class AnyImageDerivative<I extends ImageBase , D extends ImageBase> {
 	public AnyImageDerivative( Kernel2D derivX , Class<I> inputType , ImageGenerator<D> derivGen )
 	{
 		this.derivGen = derivGen;
-		Kernel2D derivY = KernelMath.transpose(derivX);
+		Kernel2D derivY = GKernelMath.transpose(derivX);
 		Class<D> derivType = derivGen.getType();
 
 		this.derivX = FactoryConvolve.convolve(derivX,inputType,derivType, borderDeriv);

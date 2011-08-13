@@ -14,9 +14,8 @@
  *    limitations under the License.
  */
 
-package gecv.abst.misc;
+package gecv.alg.misc;
 
-import gecv.alg.misc.PixelMath;
 import gecv.struct.image.*;
 
 /**
@@ -24,7 +23,7 @@ import gecv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class GenericPixelMath {
+public class GPixelMath {
 
 	/**
 	 * Sets each pixel in the output image to be the absolute value of the input image.

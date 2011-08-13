@@ -14,10 +14,8 @@
  *    limitations under the License.
  */
 
-package gecv.abst.transform;
+package gecv.alg.transform.ii;
 
-import gecv.alg.transform.ii.IntegralImageOps;
-import gecv.alg.transform.ii.IntegralKernel;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt32;
@@ -30,7 +28,7 @@ import gecv.struct.image.ImageUInt8;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class GeneralizedIntegralImageOps {
+public class GIntegralImageOps {
 
 	public static <I extends ImageBase, T extends ImageBase>
 	T transform( I input , T transformed ) {
