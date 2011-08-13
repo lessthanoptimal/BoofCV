@@ -106,12 +106,12 @@ public class DistortSupport {
 	{
 		if( imageType == ImageFloat32.class ) {
 			return (ImageDistort<T>)new ImplImageDistort_F32(dstToSrc,(InterpolatePixel<ImageFloat32>)interp);
-		} else if( imageType.isAssignableFrom(ImageInt16.class) ) {
+		} else if( ImageInt16.class.isAssignableFrom(imageType) ) {
 			return (ImageDistort<T>)new ImplImageDistort_I16(dstToSrc,(InterpolatePixel<ImageInt16>)interp);
-		} else if( imageType.isAssignableFrom(ImageInt8.class) ) {
+		} else if( ImageInt8.class.isAssignableFrom(imageType) ) {
 			return (ImageDistort<T>)new ImplImageDistort_I8(dstToSrc,(InterpolatePixel<ImageInt8>)interp);
 		} else {
-			throw new IllegalArgumentException("Image type not supported");
+			throw new IllegalArgumentException("Image type not supported: "+imageType.getSimpleName());
 		}
 	}
 }

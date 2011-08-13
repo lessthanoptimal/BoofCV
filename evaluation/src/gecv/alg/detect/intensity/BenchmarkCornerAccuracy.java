@@ -44,6 +44,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
+// todo add floating point images to test.  do it by abstracting the code
 public class BenchmarkCornerAccuracy {
 
 	int width = 250;

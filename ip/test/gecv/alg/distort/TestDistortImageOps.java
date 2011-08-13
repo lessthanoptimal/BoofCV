@@ -18,15 +18,11 @@ package gecv.alg.distort;
 
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.core.image.FactorySingleBandImage;
-import gecv.core.image.GeneralizedImageOps;
-import gecv.core.image.SingleBandImage;
-import gecv.struct.image.ImageBase;
+import gecv.alg.interpolate.TypeInterpolate;
+import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -42,38 +38,20 @@ public class TestDistortImageOps {
 	int width = 20;
 	int height = 30;
 
-	int numExpected = 3;
-
 	@Test
 	public void scale() {
-		int total = 0;
-		Method[] list = DistortImageOps.class.getMethods();
+		ImageFloat32 input = new ImageFloat32(width,height);
+		ImageFloat32 output = new ImageFloat32(width,height);
+		ImageFloat32 output2 = new ImageFloat32(width,height);
 
-		for( Method m : list ) {
-			if( !m.getName().equals("scale"))
-				continue;
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
 
-			Class<?> param[] = m.getParameterTypes();
+		// check the two scale function
+		DistortImageOps.scale(input,output,interp);
+		DistortImageOps.scale(input,output2, TypeInterpolate.BILINEAR);
 
-			ImageBase input = GeneralizedImageOps.createImage(param[0],width,height);
-			ImageBase output = GeneralizedImageOps.createImage(param[1],width/3,height/3);
-
-			GeneralizedImageOps.randomize(input,rand,0,50);
-
-			InterpolatePixel interp = FactoryInterpolation.bilinearPixel((Class<ImageBase>)param[0]);
-
-			GecvTesting.checkSubImage(this,"performScale",true,m,input,output,interp);
-			total++;
-		}
-
-		assertEquals(numExpected,total);
-	}
-
-	public void performScale( Method m , ImageBase input , ImageBase output, InterpolatePixel interp )
-			throws InvocationTargetException, IllegalAccessException {
-		m.invoke(null,input,output,interp);
-
-		SingleBandImage a = FactorySingleBandImage.wrap(output);
+		// they should be identical
+		GecvTesting.assertEquals(output,output2);
 
 		interp.setImage(input);
 
@@ -84,16 +62,38 @@ public class TestDistortImageOps {
 			for( int i = 0; i < output.height; i++ ) {
 				for( int j = 0; j < output.width; j++ ) {
 					float val = interp.get(j*scaleX,i*scaleY);
-					assertEquals((int)val,a.get(j,i).intValue());
+					assertEquals((int)val,output.get(j,i),1e-4);
 				}
 			}
 		} else {
 			for( int i = 0; i < output.height; i++ ) {
 				for( int j = 0; j < output.width; j++ ) {
 					float val = interp.get(j*scaleX,i*scaleY);
-					assertEquals(val,a.get(j,i).floatValue(),1e-4);
+					assertEquals(val,output.get(j,i),1e-4);
 				}
 			}
 		}
+	}
+
+	@Test
+	public void rotate() {
+		ImageFloat32 input = new ImageFloat32(width,height);
+		ImageFloat32 output = new ImageFloat32(width,height);
+		ImageFloat32 output2 = new ImageFloat32(width,height);
+
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
+
+		int middleX = input.width/2;
+		int middleY = input.height/2;
+
+		DistortImageOps.rotate(input,output,interp,middleX,middleY,(float)Math.PI/2f);
+		DistortImageOps.rotate(input,output2,TypeInterpolate.BILINEAR,middleX,middleY,(float)Math.PI/2f);
+
+		// they should be identical
+		GecvTesting.assertEquals(output,output2);
+
+		// check for a 90 degrees rotation
+		assertEquals(input.get(middleX+5,middleY+3),output.get(middleX+3,middleY+5),1e-4);
+		assertEquals(input.get(middleX+4,middleY+6),output.get(middleX+6,middleY+4),1e-4);
 	}
 }

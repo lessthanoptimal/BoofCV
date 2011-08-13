@@ -16,7 +16,7 @@
 
 package gecv.gui.image;
 
-import gecv.abst.misc.GenericPixelMath;
+import gecv.alg.misc.GPixelMath;
 import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.struct.image.ImageBase;
@@ -39,13 +39,13 @@ public class VisualizeImageData {
 			ImageInteger srcInt = (ImageInteger)src;
 
 			if( src.getTypeInfo().isSigned() ) {
-				double max = GenericPixelMath.maxAbs(srcInt);
+				double max = GPixelMath.maxAbs(srcInt);
 				return colorizeSign(srcInt,dst,(int)max);
 			} else {
 				if( src.getTypeInfo().getNumBits() == 8 ) {
 					dst = ConvertBufferedImage.convertTo((ImageUInt8)src,dst);
 				} else {
-					double max = GenericPixelMath.maxAbs(srcInt);
+					double max = GPixelMath.maxAbs(srcInt);
 					dst = grayUnsigned(srcInt,dst,(int)max);
 				}
 			}

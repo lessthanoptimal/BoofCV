@@ -82,24 +82,24 @@ public class HessianSobel {
 		     0, 0,0, 0, 0,
 		    -2,-4,0, 4, 2,
 			-1,-2,0, 2, 1},5);
-	public static Kernel2D_F32 kernelYY_F32 = new Kernel2D_F32(new float[]
+	public static Kernel2D_F32 kernelYY_F32 = new Kernel2D_F32(5, new float[]
 			{1, 4, 6 , 4, 1,
 			 0, 0, 0 , 0, 0,
 			-2,-8,-12,-8,-2,
 		     0, 0, 0 , 0, 0,
-		     1, 4, 6 , 4, 1},5);
-	public static Kernel2D_F32 kernelXX_F32 = new Kernel2D_F32(new float[]
+		     1, 4, 6 , 4, 1});
+	public static Kernel2D_F32 kernelXX_F32 = new Kernel2D_F32(5, new float[]
 			{1, 0,-2 , 0, 1,
 			 4, 0,-8 , 0, 4,
 		     6, 0,-12, 0, 6,
 		     4, 0,-8 , 0, 4,
-			 1, 0,-2 , 0, 1},5);
-	public static Kernel2D_F32 kernelXY_F32 = new Kernel2D_F32(new float[]
+			 1, 0,-2 , 0, 1});
+	public static Kernel2D_F32 kernelXY_F32 = new Kernel2D_F32(5, new float[]
 			{1, 2,0,-2,-1,
 			 2, 4,0,-4,-2,
 		     0, 0,0, 0, 0,
 		    -2,-4,0, 4, 2,
-			-1,-2,0, 2, 1},5);
+			-1,-2,0, 2, 1});
 
 	/**
 	 * Computes the image's second derivatives.

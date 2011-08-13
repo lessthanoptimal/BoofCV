@@ -18,12 +18,14 @@ package gecv.alg.detect.interest;
 
 import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.alg.transform.ii.IntegralImageOps;
+import gecv.alg.transform.ii.GIntegralImageOps;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.feature.VisualizeFeatures;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 
@@ -43,22 +45,28 @@ public class DetectFastHessianApp {
 
 	static int NUM_FEATURES = 50;
 
-	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage(fileName);
-		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
+	private static <T extends ImageBase> void doStuff( Class<T> imageType , BufferedImage input ) {
+		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 
 		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(2,1,5,false,false,false);
-		FastHessianFeatureDetector det = new FastHessianFeatureDetector(extractor,NUM_FEATURES,9,4,4);
+		FastHessianFeatureDetector<T> det = new FastHessianFeatureDetector<T>(extractor,NUM_FEATURES,9,4,4);
 
-		ImageFloat32 integral = IntegralImageOps.transform(inputF32,null);
+		T integral = GIntegralImageOps.transform(workImage,null);
 		det.detect(integral);
 
 		System.out.println("total features found: "+det.getFoundPoints().size());
 
 		VisualizeFeatures.drawScalePoints(input.createGraphics(),det.getFoundPoints(),2.5);
 
+		ShowImages.showWindow(input,"Found Features: "+imageType.getSimpleName());
+	}
 
-		ShowImages.showWindow(input,"Found Features");
+	public static void main( String args[] ) {
+		BufferedImage input = UtilImageIO.loadImage(fileName);
+
+		doStuff(ImageFloat32.class,input);
+		doStuff(ImageUInt8.class,input);
+
 		System.out.println("Done");
 	}
 }

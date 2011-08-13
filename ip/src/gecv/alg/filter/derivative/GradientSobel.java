@@ -64,9 +64,9 @@ public class GradientSobel {
 	public static Kernel2D_I32 kernelDerivX_I32 = new Kernel2D_I32(new int[]{-1,0,1,-2,0,2,-1,0,1},3);
 	public static Kernel2D_I32 kernelDerivY_I32 = new Kernel2D_I32(new int[]{-1,-2,-1,0,0,0,1,2,1},3);
 	public static Kernel2D_F32 kernelDerivX_F32 = new Kernel2D_F32(
-			new float[]{-0.25f,0,0.25f,-0.5f,0,0.5f,-0.25f,0,0.25f},3);
+			3, new float[]{-0.25f,0,0.25f,-0.5f,0,0.5f,-0.25f,0,0.25f});
 	public static Kernel2D_F32 kernelDerivY_F32 = new Kernel2D_F32(
-			new float[]{-0.25f,-0.5f,-0.25f,0,0,0,0.25f,0.5f,0.25f},3);
+			3, new float[]{-0.25f,-0.5f,-0.25f,0,0,0,0.25f,0.5f,0.25f});
 
 	/**
 	 * Returns the kernel for computing the derivative along the x-axis.

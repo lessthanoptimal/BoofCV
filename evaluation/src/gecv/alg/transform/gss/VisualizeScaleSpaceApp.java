@@ -32,6 +32,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+// TODO abstract and add integer
 public class VisualizeScaleSpaceApp {
 
 
