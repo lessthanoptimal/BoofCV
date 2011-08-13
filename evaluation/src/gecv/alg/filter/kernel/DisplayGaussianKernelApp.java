@@ -17,8 +17,7 @@
 package gecv.alg.filter.kernel;
 
 import gecv.alg.distort.DistortImageOps;
-import gecv.alg.interpolate.FactoryInterpolation;
-import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.interpolate.TypeInterpolate;
 import gecv.alg.misc.PixelMath;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.SelectAlgorithmPanel;
@@ -33,7 +32,7 @@ import java.awt.image.BufferedImage;
 
 
 /**
- * Displays a Gaussian kernel and its derivatives.
+ * Displays the Gaussian kernel and its derivatives.
  *
  * @author Peter Abeles
  */
@@ -41,7 +40,6 @@ public class DisplayGaussianKernelApp extends SelectAlgorithmPanel {
 	int imageSize = 400;
 
 	ImageFloat32 largeImg = new ImageFloat32(imageSize,imageSize);
-	InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.nearestNeighborPixel(ImageFloat32.class);
 
 	ListDisplayPanel panel = new ListDisplayPanel();
 
@@ -59,6 +57,7 @@ public class DisplayGaussianKernelApp extends SelectAlgorithmPanel {
 		addAlgorithm("Deriv XYYY",new DerivType(1,3));
 
 		add(panel, BorderLayout.CENTER);
+		setPreferredSize(new Dimension(imageSize+50,imageSize+20));
 	}
 
 	@Override
@@ -68,12 +67,14 @@ public class DisplayGaussianKernelApp extends SelectAlgorithmPanel {
 
 		for( int radius = 1; radius <= 40; radius += 2 ) {
 
-			Kernel1D_F32 kerX =  FactoryKernelGaussian.derivativeK(Kernel1D_F32.class,type.orderX,-1,radius);
-			Kernel1D_F32 kerY = FactoryKernelGaussian.derivativeK(Kernel1D_F32.class,type.orderY,-1,radius);
+			int maxOrder = Math.max(type.orderX,type.orderY);
+			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,maxOrder);
+			Kernel1D_F32 kerX =  FactoryKernelGaussian.derivativeK(Kernel1D_F32.class,type.orderX,sigma,radius);
+			Kernel1D_F32 kerY = FactoryKernelGaussian.derivativeK(Kernel1D_F32.class,type.orderY,sigma,radius);
 			Kernel2D_F32 kernel = KernelMath.convolve(kerY,kerX);
 
 			ImageFloat32 smallImg = KernelMath.convertToImage(kernel);
-			DistortImageOps.scale(smallImg,largeImg,interp);
+			DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
 
 			float maxValue = PixelMath.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
@@ -82,11 +83,11 @@ public class DisplayGaussianKernelApp extends SelectAlgorithmPanel {
 		}
 	}
 
-	private static class DerivType {
+	public static class DerivType {
 		int orderX;
 		int orderY;
 
-		private DerivType(int orderX, int orderY) {
+		public DerivType(int orderX, int orderY) {
 			this.orderX = orderX;
 			this.orderY = orderY;
 		}

@@ -16,7 +16,7 @@
 
 package gecv.alg.interpolate;
 
-import gecv.abst.filter.distort.GeneralizedDistortImageOps;
+import gecv.alg.distort.DistortImageOps;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.gui.ListDisplayPanel;
@@ -55,7 +55,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase> {
 	public void addInterpolation( String name , InterpolatePixel<T> alg ) {
 		T scaledImg = (T)grayOriginal._createNew(scaledWidth,scaledHeight);
 
-		GeneralizedDistortImageOps.scale(grayOriginal,scaledImg,alg);
+		DistortImageOps.scale(grayOriginal,scaledImg,alg);
 
 		// numerical round off error can cause the interpolation to go outside
 		// of pixel value bounds

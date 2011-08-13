@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.geo.d2;
+package gecv.alg.distort;
 
 import jgrl.struct.affine.Affine2D_F32;
 import jgrl.struct.affine.Affine2D_F64;
@@ -34,10 +34,10 @@ public class TestPixelDistortAffine {
 	public void constructor_32() {
 		Affine2D_F32 a = new Affine2D_F32(1,2,3,4,5,6);
 
-		PixelDistortAffine alg = new PixelDistortAffine();
+		PixelTransformAffine alg = new PixelTransformAffine();
 		alg.set(a);
 
-		alg.distort(2,3);
+		alg.compute(2,3);
 		Point2D_F32 p = new Point2D_F32(2,3);
 		Point2D_F32 expected = new Point2D_F32();
 		AffinePointOps.transform(a,p,expected);
@@ -50,10 +50,10 @@ public class TestPixelDistortAffine {
 	public void constructor_64() {
 		Affine2D_F64 a = new Affine2D_F64(1,2,3,4,5,6);
 
-		PixelDistortAffine alg = new PixelDistortAffine();
+		PixelTransformAffine alg = new PixelTransformAffine();
 		alg.set(a);
 
-		alg.distort(2,3);
+		alg.compute(2,3);
 		Point2D_F64 p = new Point2D_F64(2,3);
 		Point2D_F64 expected = new Point2D_F64();
 		AffinePointOps.transform(a,p,expected);

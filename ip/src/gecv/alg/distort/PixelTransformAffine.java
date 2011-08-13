@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.alg.geo.d2;
+package gecv.alg.distort;
 
-import gecv.struct.distort.PixelDistort;
+import gecv.struct.distort.PixelTransform;
 import jgrl.struct.affine.Affine2D_F32;
 import jgrl.struct.affine.Affine2D_F64;
 import jgrl.struct.point.Point2D_F32;
@@ -28,7 +28,7 @@ import jgrl.transform.affine.AffinePointOps;
  *
  * @author Peter Abeles
  */
-public class PixelDistortAffine extends PixelDistort {
+public class PixelTransformAffine extends PixelTransform {
 
 	Affine2D_F32 affine = new Affine2D_F32();
 	Point2D_F32 tran = new Point2D_F32();
@@ -47,9 +47,8 @@ public class PixelDistortAffine extends PixelDistort {
 		this.affine.ty = (float)affine.ty;
 	}
 
-
 	@Override
-	public void distort(int x, int y) {
+	public void compute(int x, int y) {
 		AffinePointOps.transform(affine,x,y,tran);
 		distX = tran.x;
 		distY = tran.y;

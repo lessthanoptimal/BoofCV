@@ -49,12 +49,43 @@ public abstract class SelectAlgorithmPanel extends JPanel implements ActionListe
 		algBox.addItem(name);
 	}
 
+	/**
+	 * Tells it to switch again to the current algorithm.  Useful if the input has changed and information
+	 * needs to be rendered again.
+	 */
+	public void refreshAlgorithm() {
+		Object cookie = cookies.get(algBox.getSelectedIndex());
+		String name = (String)algBox.getSelectedItem();
+		algBox.setEditable(false);
+		new PerformSetAlgorithm(cookie,name).start();
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JComboBox cb = (JComboBox)e.getSource();
 		Object cookie = cookies.get(cb.getSelectedIndex());
-		setActiveAlgorithm( (String)cb.getSelectedItem() , cookie );
+		String name = (String)cb.getSelectedItem();
+		algBox.setEnabled(false);
+		new PerformSetAlgorithm(cookie,name).start();
 	}
 
 	public abstract void setActiveAlgorithm( String name , Object cookie );
+
+	private class PerformSetAlgorithm extends Thread
+	{
+		Object cookie;
+		String name;
+
+		private PerformSetAlgorithm(Object cookie, String name) {
+			this.cookie = cookie;
+			this.name = name;
+		}
+
+		@Override
+		public void run() {
+			setActiveAlgorithm( name , cookie );
+			algBox.setEnabled(true);
+		}
+
+	}
 }

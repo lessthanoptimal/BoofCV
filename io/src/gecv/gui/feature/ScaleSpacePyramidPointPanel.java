@@ -16,10 +16,9 @@
 
 package gecv.gui.feature;
 
-import gecv.abst.filter.distort.GeneralizedDistortImageOps;
 import gecv.alg.detect.interest.ScalePoint;
-import gecv.alg.interpolate.FactoryInterpolation;
-import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.distort.DistortImageOps;
+import gecv.alg.interpolate.TypeInterpolate;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.gss.ScaleSpacePyramid;
@@ -80,8 +79,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 
 			ImageBase small = ss.getLayer(level-1);
 			ImageBase enlarge = GeneralizedImageOps.createImage(small.getClass(),ss.bottomWidth,ss.bottomHeight);
-			InterpolatePixel interp = FactoryInterpolation.nearestNeighborPixel(small.getClass());
-			GeneralizedDistortImageOps.scale(small,enlarge, interp );
+			DistortImageOps.scale(small,enlarge, TypeInterpolate.NEAREST_NEIGHBOR);
 
 			levelImage = ConvertBufferedImage.convertTo(enlarge,levelImage);
 

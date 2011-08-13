@@ -14,10 +14,8 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.convolve;
+package gecv.alg.filter.kernel;
 
-import gecv.alg.filter.kernel.FactoryKernel;
-import gecv.alg.filter.kernel.KernelMath;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;

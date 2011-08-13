@@ -156,6 +156,23 @@ public class VisualizeImageData {
 		return dst;
 	}
 
+	public static BufferedImage graySign( ImageFloat32 src, BufferedImage dst, float maxAbsValue )
+	{
+		dst = ConvertBufferedImage.checkInputs(src, dst);
+
+		for( int y = 0; y < src.height; y++ ) {
+			for( int x = 0; x < src.width; x++ ) {
+				float v = src.get(x,y);
+
+				int rgb = 127+(int)(127 *v / maxAbsValue);
+
+				dst.setRGB(x,y,rgb << 16 | rgb << 8 | rgb  );
+			}
+		}
+
+		return dst;
+	}
+
 	public static BufferedImage grayMagnitude( ImageFloat32 src, BufferedImage dst, float maxValue )
 	{
 		dst = ConvertBufferedImage.checkInputs(src, dst);

@@ -18,11 +18,7 @@ package gecv.alg.filter.kernel;
 
 
 /**
- * Computes the magnitude of each basis function
- *
  * @author Peter Abeles
  */
-public interface SteerableCoefficients {
-
-	public double compute( double angle , int basis );
+public class SteerableSeparableKernel {
 }

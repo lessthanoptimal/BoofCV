@@ -25,6 +25,7 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,21 +45,32 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 	public ListDisplayPanel() {
 		listPanel = new JList(listModel);
 
-		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listPanel, new JPanel());
-		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(100);
-
 		listPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listPanel.setSelectedIndex(0);
 		listPanel.addListSelectionListener(this);
+
+		JScrollPane scroll = new JScrollPane(listPanel);
+		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scroll, new JPanel());
+		splitPane.setOneTouchExpandable(true);
+		splitPane.setDividerLocation(100);
 
 		add(splitPane);
 		addComponentListener(this);
 	}
 
 	public void reset() {
-		panels.clear();
-		listModel.removeAllElements();
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+					panels.clear();
+					listModel.removeAllElements();
+				}
+			});
+		} catch (InterruptedException e) {
+		} catch (InvocationTargetException e) {
+		}
 	}
 
 	/**
@@ -77,14 +89,17 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 	 * @param panel
 	 * @param name
 	 */
-	public void addItem( JPanel panel , String name ) {
-		panels.add(panel);
-		listModel.addElement(name);
-		int dividerSize = splitPane.getDividerSize();
-		splitPane.setDividerLocation((int)listPanel.getPreferredSize().getWidth()+1);
-		if( listModel.size() == 1 ) {
-			listPanel.setSelectedIndex(0);
-		}
+	public void addItem( final JPanel panel , final String name ) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				panels.add(panel);
+				listModel.addElement(name);
+				splitPane.setDividerLocation((int)listPanel.getPreferredSize().getWidth()+1);
+				if( listModel.size() == 1 ) {
+					listPanel.setSelectedIndex(0);
+				}
+			}
+		});
 	}
 
 	@Override
@@ -92,21 +107,34 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 		if( e.getValueIsAdjusting() )
 			return;
 
-		int index = listPanel.getSelectedIndex();
+		final int index = listPanel.getSelectedIndex();
 		if( index >= 0 ) {
-			splitPane.setRightComponent(panels.get(index));
-			splitPane.repaint();
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					// the split pane likes to screw up the divider location when the
+					// right component is changed and a scroll pane is being used on the left
+					int loc = splitPane.getDividerLocation();
+					splitPane.setRightComponent(panels.get(index));
+					splitPane.setDividerLocation(loc);
+					splitPane.repaint();
+				}
+			});
 		}
 	}
 
 	@Override
 	public void componentResized(ComponentEvent e) {
-		int w = e.getComponent().getWidth();
-		int h = e.getComponent().getHeight();
+		final int w = e.getComponent().getWidth();
+		final int h = e.getComponent().getHeight();
 
-		splitPane.setPreferredSize(new Dimension(w, h));
-		splitPane.repaint();
-	}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				splitPane.setPreferredSize(new Dimension(w, h));
+				splitPane.setDividerLocation((int)listPanel.getPreferredSize().getWidth()+1);
+//				splitPane.repaint();
+			}
+		});
+		}
 
 	@Override
 	public void componentMoved(ComponentEvent e) {

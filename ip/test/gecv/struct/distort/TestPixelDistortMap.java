@@ -31,12 +31,12 @@ public class TestPixelDistortMap {
 
 	@Test
 	public void set_FromDistort() {
-		PixelDistortMap map = new PixelDistortMap(width,height);
-		map.set(new TestDistort());
+		PixelTransformMap map = new PixelTransformMap(width,height);
+		map.set(new TestTransform());
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
-				map.distort(x,y);
+				map.compute(x,y);
 				assertEquals(x+2f,map.distX);
 				assertEquals(y+2f,map.distY);
 			}
@@ -45,21 +45,21 @@ public class TestPixelDistortMap {
 
 	@Test
 	public void set_Pixel() {
-		PixelDistortMap map = new PixelDistortMap(width,height);
+		PixelTransformMap map = new PixelTransformMap(width,height);
 
 		map.set(1,2,3.1f,4.1f);
 
-		map.distort(1,2);
+		map.compute(1,2);
 
 		assertEquals(3.1f,map.distX,1e-4f);
 		assertEquals(4.1f,map.distY,1e-4f);
 	}
 
-	private static class TestDistort extends PixelDistort
+	private static class TestTransform extends PixelTransform
 	{
 
 		@Override
-		public void distort(int x, int y) {
+		public void compute(int x, int y) {
 			distX = x + 2;
 			distY = y + 2;
 		}

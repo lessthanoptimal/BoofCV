@@ -58,6 +58,13 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 	public ImageGradient_Gaussian(double sigma, int radius,
 								  Class<I> inputType , Class<D> derivType ) {
 		this.borderSize = radius;
+
+		// need to do this here to make sure the blur and derivative functions have the same paramters.
+		if( radius <= 0 )
+			radius = FactoryKernelGaussian.radiusForSigma(sigma,1);
+		else if( sigma <= 0 )
+			sigma = FactoryKernelGaussian.sigmaForRadius(radius,1);
+
 		Kernel1D kernel = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
 		Kernel1D kernelDeriv = FactoryKernelGaussian.derivativeI(inputType,1,sigma,radius+1);
 

@@ -19,7 +19,7 @@ package gecv.alg.geo.d2;
 import gecv.alg.InputSanityCheck;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.SingleBandImage;
-import gecv.struct.distort.PixelDistort;
+import gecv.struct.distort.PixelTransform;
 import gecv.struct.image.ImageBase;
 
 import java.io.PrintStream;
@@ -77,7 +77,7 @@ public class EvaluateImageStabilization<I extends ImageBase> {
 		out.println("Total Frames:            " + frameNum);
 	}
 
-	public void update( I currentFrame , PixelDistort motion , boolean isKeyFrame )
+	public void update( I currentFrame , PixelTransform motion , boolean isKeyFrame )
 	{
 		final int width = currentFrame.getWidth();
 		final int height = currentFrame.getHeight();
@@ -108,7 +108,7 @@ public class EvaluateImageStabilization<I extends ImageBase> {
 
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {
-					motion.distort(x,y);
+					motion.compute(x,y);
 					int xx = (int)motion.distX;
 					int yy = (int)motion.distY;
 					if( keyFrame.isInBounds(xx,yy) ) {

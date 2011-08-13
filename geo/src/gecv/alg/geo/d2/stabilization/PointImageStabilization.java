@@ -16,16 +16,16 @@
 
 package gecv.alg.geo.d2.stabilization;
 
-import gecv.abst.filter.distort.FactoryImageDistort;
 import gecv.alg.distort.ImageDistort;
+import gecv.alg.distort.PixelTransformAffine;
+import gecv.alg.distort.impl.DistortSupport;
 import gecv.alg.geo.AssociatedPair;
 import gecv.alg.geo.PointSequentialTracker;
 import gecv.alg.geo.SingleImageInput;
-import gecv.alg.geo.d2.PixelDistortAffine;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.numerics.fitting.modelset.ModelMatcher;
-import gecv.struct.distort.PixelDistort;
+import gecv.struct.distort.PixelTransform;
 import gecv.struct.image.ImageBase;
 import jgrl.struct.affine.Affine2D_F64;
 import jgrl.struct.point.Point2D_F64;
@@ -65,7 +65,7 @@ public class PointImageStabilization<I extends ImageBase > {
 	// computes the image motion robustly
 	private ModelMatcher<Affine2D_F64,AssociatedPair> fitter;
 	// Computes the location of each pixel in the stabilized image from the current frame
-	private PixelDistortAffine transform = new PixelDistortAffine();
+	private PixelTransformAffine transform = new PixelTransformAffine();
 
 	// Computes the stabilized image given the unstabilized image and the motion model
 	private ImageDistort<I> distort;
@@ -99,7 +99,7 @@ public class PointImageStabilization<I extends ImageBase > {
 		}
 
 		InterpolatePixel<I> bilinear = FactoryInterpolation.bilinearPixel(imageType);
-		distort = FactoryImageDistort.create(imageType,transform,bilinear);
+		distort = DistortSupport.createDistort(imageType,transform,bilinear);
 		this.tracker = tracker;
 		this.fitter = fitter;
 
@@ -181,7 +181,7 @@ public class PointImageStabilization<I extends ImageBase > {
 		return fitter.getMatchSet();
 	}
 
-	public PixelDistort getDistortion() {
+	public PixelTransform getDistortion() {
 		return transform;
 	}
 

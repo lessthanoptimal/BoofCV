@@ -14,15 +14,27 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.struct.distort;
 
 
 /**
- * Computes the magnitude of each basis function
+ * Computes the location of a pixel after an arbitrary distortion has been applied to the image.
  *
  * @author Peter Abeles
  */
-public interface SteerableCoefficients {
+public abstract class PixelTransform {
 
-	public double compute( double angle , int basis );
+	// distorted pixel coordinates
+	public float distX;
+	public float distY;
+
+	public abstract void compute( int x , int y );
+
+	public float getDistX() {
+		return distX;
+	}
+
+	public float getDistY() {
+		return distY;
+	}
 }

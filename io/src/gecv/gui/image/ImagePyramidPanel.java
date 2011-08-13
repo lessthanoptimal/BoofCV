@@ -16,9 +16,10 @@
 
 package gecv.gui.image;
 
-import gecv.abst.filter.distort.GeneralizedDistortImageOps;
+import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.interpolate.TypeInterpolate;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.ListDisplayPanel;
 import gecv.struct.image.ImageBase;
@@ -83,7 +84,7 @@ public class ImagePyramidPanel<T extends ImageBase> extends ListDisplayPanel {
 		int N = pyramid.getNumLayers();
 
 		for( int i = 0; i < N; i++ ) {
-			GeneralizedDistortImageOps.scale(pyramid.getLayer(i),upscale,interp);
+			DistortImageOps.scale(pyramid.getLayer(i),upscale, TypeInterpolate.NEAREST_NEIGHBOR);
 			BufferedImage b = ConvertBufferedImage.convertTo(upscale,null);
 			addImage(b,String.format("%5.2f",pyramid.getScale(i)));
 		}

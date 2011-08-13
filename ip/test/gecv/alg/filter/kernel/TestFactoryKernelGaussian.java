@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.convolve;
+package gecv.alg.filter.kernel;
 
 import org.junit.Test;
 
