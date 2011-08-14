@@ -27,6 +27,9 @@ import pja.stats.UtilGaussian;
  */
 // todo add size heuristic for derivative that is different from regular kernel
 public class FactoryKernelGaussian {
+	// when converting to integer kernels what is the minimum size of the an element relative to the maximum
+	public static float MIN_FRAC = 1.0f/60f;
+
 	/**
 	 * Creates a Gaussian kernel of the specified type.
 	 *
@@ -59,8 +62,7 @@ public class FactoryKernelGaussian {
 	 * @return The computed Gaussian kernel.
 	 */
 	public static <T extends ImageBase , K extends Kernel1D>
-	K gaussian1D(Class<T> imageType, double sigma, int radius
-	)
+	K gaussian1D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
 		return gaussian(1,isFloat,sigma,radius);
@@ -75,8 +77,7 @@ public class FactoryKernelGaussian {
 	 * @return The computed Gaussian kernel.
 	 */
 	public static <T extends ImageBase , K extends Kernel2D>
-	K gaussian2D(Class<T> imageType, double sigma, int radius
-	)
+	K gaussian2D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
 		return gaussian(2,isFloat,sigma,radius);
@@ -91,9 +92,7 @@ public class FactoryKernelGaussian {
 	 * @param radius Number of pixels in the kernel's radius.  If <= 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
-	public static <T extends KernelBase> T gaussian(int DOF, boolean isFloat,
-													double sigma, int radius
-	)
+	public static <T extends KernelBase> T gaussian( int DOF, boolean isFloat, double sigma, int radius )
 	{
 		if( radius <= 0 )
 			radius = FactoryKernelGaussian.radiusForSigma(sigma,0);
@@ -104,12 +103,12 @@ public class FactoryKernelGaussian {
 			Kernel2D_F32 k = gaussian2D_F32(sigma,radius, isFloat);
 			if( isFloat )
 				return (T)k;
-			return (T)KernelMath.convert(k);
+			return (T)KernelMath.convert(k,MIN_FRAC);
 		} else if( DOF == 1 ) {
 			Kernel1D_F32 k = gaussian1D_F32(sigma,radius, isFloat);
 			if( isFloat )
 				return (T)k;
-			return (T)KernelMath.convert(k);
+			return (T)KernelMath.convert(k,MIN_FRAC);
 		} else {
 			throw new IllegalArgumentException("DOF not supported");
 		}
@@ -159,7 +158,7 @@ public class FactoryKernelGaussian {
 
 		if( isFloat )
 			return (T)k;
-		return (T)KernelMath.convert(k);
+		return (T)KernelMath.convert(k,MIN_FRAC);
 	}
 
 	/**
@@ -172,7 +171,7 @@ public class FactoryKernelGaussian {
 	 * @param radius	Kernel's radius.
 	 * @param normalize If the kernel should be normalized to one or not.
 	 */
-	private static Kernel1D_F32 gaussian1D_F32(double sigma, int radius, boolean normalize) {
+	protected static Kernel1D_F32 gaussian1D_F32(double sigma, int radius, boolean normalize) {
 		Kernel1D_F32 ret = new Kernel1D_F32(radius * 2 + 1);
 		float[] gaussian = ret.data;
 		int index = 0;
@@ -194,53 +193,9 @@ public class FactoryKernelGaussian {
 	 * @param radius	Kernel's radius.
 	 * @param normalize If the kernel should be normalized to one or not.
 	 */
-	private static Kernel2D_F32 gaussian2D_F32(double sigma, int radius, boolean normalize) {
+	protected static Kernel2D_F32 gaussian2D_F32(double sigma, int radius, boolean normalize) {
 		Kernel1D_F32 kernel1D = gaussian1D_F32(sigma,radius,false);
 		Kernel2D_F32 ret = KernelMath.convolve(kernel1D,kernel1D);
-
-		if (normalize) {
-			KernelMath.normalizeSumToOne(ret);
-		}
-
-		return ret;
-	}
-
-	/**
-	 * <p> Creates a new kernel and autonmatically selects the width of the kernel to have the specified
-	 * accuracy. </p>
-	 * <p>
-	 * radius = sqrt( -2&sigma;<sup>2</sup> *Log( &sigma; * sqrt(2&pi;) *minVal )<br>
-	 * <br>
-	 * This was found by solving for minVal in the Gaussian equation.
-	 * </p>
-	 *
-	 * @param sigma	 The sigma for the Gaussian
-	 * @param maxRadius The largest radius the kernel can have
-	 * @param minVal	The approximate minimum value that an element should have.
-	 */
-	// todo compute just the radius
-	public static Kernel1D_F32 gaussian1D_F32(double sigma, int maxRadius, double minVal, boolean normalize) {
-		double tempRadius = Math.sqrt(-2.0 * sigma * sigma * Math.log(sigma * Math.sqrt(2.0 * Math.PI) * minVal));
-
-		if (Double.isNaN(tempRadius) || Double.isInfinite(tempRadius))
-			throw new IllegalArgumentException("Bad minVal and/or sigma");
-
-		int radius = (int) Math.ceil(tempRadius);
-
-		int width = radius * 2 + 1;
-
-		if (width > maxRadius * 2 + 1) {
-			// use the max width instead
-			radius = maxRadius;
-			width = maxRadius * 2 + 1;
-		}
-
-		Kernel1D_F32 ret = new Kernel1D_F32(width);
-		float[] gaussian = ret.data;
-		int index = 0;
-		for (int i = -radius; i <= radius; i++) {
-			gaussian[index++] = (float) UtilGaussian.computePDF(0, sigma, i);
-		}
 
 		if (normalize) {
 			KernelMath.normalizeSumToOne(ret);
@@ -256,7 +211,7 @@ public class FactoryKernelGaussian {
 	 * @param radius Kernel's radius.
 	 * @return The derivative of the gaussian
 	 */
-	private static Kernel1D_F32 derivative1D_F32( int order , double sigma, int radius ) {
+	protected static Kernel1D_F32 derivative1D_F32( int order , double sigma, int radius ) {
 
 		Kernel1D_F32 ret = new Kernel1D_F32(radius * 2 + 1);
 		float[] gaussian = ret.data;

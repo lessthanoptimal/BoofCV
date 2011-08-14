@@ -57,6 +57,14 @@ public class VisualizeImageData {
 		return dst;
 	}
 
+	public static BufferedImage colorizeSign( ImageBase src, BufferedImage dst, double maxValue ) {
+		if( src.getClass().isAssignableFrom(ImageFloat32.class)) {
+			return colorizeSign((ImageFloat32)src,dst,(float)maxValue);
+		} else {
+			return colorizeSign((ImageInteger)src,dst,(int)maxValue);
+		}
+	}
+
 	/**
 	 * 
 	 * @param src

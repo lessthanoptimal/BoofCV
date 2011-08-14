@@ -16,9 +16,15 @@
 
 package gecv.alg.filter.kernel;
 
+import gecv.struct.convolve.Kernel1D_F32;
+import gecv.struct.convolve.Kernel1D_I32;
+import gecv.struct.convolve.Kernel2D_F32;
+import gecv.struct.convolve.Kernel2D_I32;
 import org.junit.Test;
+import pja.stats.UtilGaussian;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -27,160 +33,83 @@ import static org.junit.Assert.fail;
 public class TestFactoryKernelGaussian {
 
 	@Test
-	public void update() {
-		fail("Update these tests");
+	public void gaussian() {
+		// basic test to see if its creating kernels of the correct type
+		assertTrue( FactoryKernelGaussian.gaussian(1,true,1,2) instanceof Kernel1D_F32 );
+		assertTrue( FactoryKernelGaussian.gaussian(1,false,1,2) instanceof Kernel1D_I32 );
+		assertTrue( FactoryKernelGaussian.gaussian(2,true,1,2) instanceof Kernel2D_F32 );
+		assertTrue( FactoryKernelGaussian.gaussian(2,false,1,2) instanceof Kernel2D_I32);
 	}
 
-//	@Test
-//	public void gaussian1D_I32_radius() {
-//		Kernel1D_I32 g1 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,2,true);
-//		Kernel1D_I32 g2 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1, 2, true);
-//
-//		for (int i = 0; i < g1.data.length; i++) {
-//			assertEquals(g1.data[i], g2.data[i], 1e-8);
-//		}
-//	}
-//
-//	@Test
-//	public void gaussian1D_I32_radius_sigma() {
-//		Kernel1D_I32 g = FactoryKernelGaussian.gaussian1D_I32(1.0, 2);
-//
-//		assertEquals(1, g.data[0]);
-//		assertEquals(4, g.data[1]);
-//		assertEquals(7, g.data[2]);
-//		assertEquals(4, g.data[3]);
-//		assertEquals(1, g.data[4]);
-//	}
-//
-//	@Test
-//	public void gaussian2D_I32_sigma_radius() {
-//		Kernel2D_I32 g2 = FactoryKernelGaussian.gaussian2D_I32(1.0, 2);
-//		Kernel1D_I32 g1 = FactoryKernelGaussian.gaussian1D_I32(1.0, 2);
-//
-//		for (int i = 0; i < 5; i++) {
-//			for (int j = 0; j < 5; j++) {
-//				int expected = g1.data[i] * g1.data[j];
-//
-//				assertEquals(g2.data[i * 5 + j], expected);
-//			}
-//		}
-//	}
-//
-//	@Test
-//	public void gaussian1D_F32_sigma_radius() {
-//		// un-normalized it should be the same as the PDF
-//		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, false);
-//
-//		float g[] = kernel.data;
-//
-//		assertEquals(UtilGaussian.computePDF(0, 1, -2), g[0], 1e-4);
-//		assertEquals(UtilGaussian.computePDF(0, 1, -1), g[1], 1e-4);
-//		assertEquals(UtilGaussian.computePDF(0, 1, 0), g[2], 1e-4);
-//		assertEquals(UtilGaussian.computePDF(0, 1, 1), g[3], 1e-4);
-//		assertEquals(UtilGaussian.computePDF(0, 1, 2), g[4], 1e-4);
-//
-//		// if normalized it should add up to one
-//		kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, true);
-//
-//		g = kernel.data;
-//		double normalizer = 0;
-//		double total = 0;
-//		for (int i = 0; i < g.length; i++) {
-//			total += g[i];
-//			normalizer += UtilGaussian.computePDF(0, 1, i - 2);
-//		}
-//		assertEquals(1.0, total, 1e-8);
-//
-//		assertEquals(UtilGaussian.computePDF(0, 1, -2) / normalizer, g[0], 1e-4);
-//		assertEquals(UtilGaussian.computePDF(0, 1, -1) / normalizer, g[1], 1e-4);
-//		assertEquals(UtilGaussian.computePDF(0, 1, 0) / normalizer, g[2], 1e-4);
-//		assertEquals(UtilGaussian.computePDF(0, 1, 1) / normalizer, g[3], 1e-4);
-//		assertEquals(UtilGaussian.computePDF(0, 1, 2) / normalizer, g[4], 1e-4);
-//
-//	}
-//
-//	@Test
-//	public void gaussian1D_F32_radius() {
-//		for (int toggle = 0; toggle < 2; toggle++) {
-//			boolean normalize = toggle == 1;
-//			Kernel1D_F32 g1 = FactoryKernelGaussian.gaussian1D_F32(FactoryKernelGaussian.sigmaForRadius(2), 2, normalize);
-//			Kernel1D_F32 g2 = FactoryKernelGaussian.gaussian1D_F32(2, normalize);
-//
-//			for (int i = 0; i < g1.data.length; i++) {
-//				assertEquals(g1.data[i], g2.data[i], 1e-8);
-//			}
-//		}
-//	}
-//
-//	@Test
-//	public void gaussian2D_F32_radius() {
-//		for (int toggle = 0; toggle < 2; toggle++) {
-//			boolean normalize = toggle == 1;
-//			Kernel2D_F32 kernel = FactoryKernelGaussian.gaussian2D_F32(1.0, 2, normalize);
-//
-//			float g[] = kernel.data;
-//
-//			assertEquals(25, g.length);
-//
-//			float max = g[5 * 2 + 2];
-//
-//			float total = 0;
-//			for (float a : g) {
-//				total += a;
-//				assertTrue(max >= a);
-//			}
-//
-//			// see if it is normalized
-//			if (normalize)
-//				assertEquals(1.0, total, 1e-4);
-//			else
-//				assertTrue(Math.abs(1.0 - total) > 1e-4);
-//		}
-//	}
-//
-//	@Test
-//	public void gaussian1D_F32_sigma_radius_min() {
-//		// check to see if it has the expected length for a specific example
-//		double thresh = 0.08;
-//
-//		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 10, thresh, false);
-//		float g[] = kernel.data;
-//
-//		assertEquals(5, kernel.width);
-//		assertTrue(g[0] <= thresh && g[0] > 0);
-//
-//		// see if it is within tolerance for a few values
-//		for (thresh = 0.01; thresh < 0.4; thresh *= 2) {
-//			kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 21, thresh, false);
-//			g = kernel.data;
-//
-//			assertTrue(g[0] <= thresh && g[0] > 0);
-//		}
-//	}
-//
-//	@Test
-//	public void gaussianDerivative1D_F32() {
-//
-//		for (int toggle = 0; toggle < 2; toggle++) {
-//			boolean normalize = toggle == 1;
-//
-//			Kernel1D_F32 deriv = FactoryKernelGaussian.gaussianDerivative1D_F32(1.0, 2, normalize);
-//
-//			// the derivative should be symmetric
-//			assertEquals(deriv.data[4], -deriv.data[0], 1e-5);
-//			assertEquals(deriv.data[3], -deriv.data[1], 1e-5);
-//			assertEquals(0f, deriv.data[2], 1e-5);
-//		}
-//	}
-//
-//	@Test
-//	public void gaussianDerivative1D_I32()
-//	{
-//		Kernel1D_I32 deriv = FactoryKernelGaussian.gaussianDerivative1D_I32(1.0, 2);
-//
-//		// the derivative should be symmetric
-//		assertEquals(deriv.data[4], -deriv.data[0], 1e-5);
-//		assertEquals(deriv.data[3], -deriv.data[1], 1e-5);
-//		assertEquals(0f, deriv.data[2], 1e-5);
-//	}
+	@Test
+	public void gaussian1D_F32() {
+		// un-normalized it should be the same as the PDF
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, false);
+
+		float g[] = kernel.data;
+
+		assertEquals(UtilGaussian.computePDF(0, 1, -2), g[0], 1e-4);
+		assertEquals(UtilGaussian.computePDF(0, 1, -1), g[1], 1e-4);
+		assertEquals(UtilGaussian.computePDF(0, 1, 0), g[2], 1e-4);
+		assertEquals(UtilGaussian.computePDF(0, 1, 1), g[3], 1e-4);
+		assertEquals(UtilGaussian.computePDF(0, 1, 2), g[4], 1e-4);
+
+		// if normalized it should add up to one
+		kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, true);
+
+		g = kernel.data;
+		double normalizer = 0;
+		double total = 0;
+		for (int i = 0; i < g.length; i++) {
+			total += g[i];
+			normalizer += UtilGaussian.computePDF(0, 1, i - 2);
+		}
+		assertEquals(1.0, total, 1e-8);
+
+		assertEquals(UtilGaussian.computePDF(0, 1, -2) / normalizer, g[0], 1e-4);
+		assertEquals(UtilGaussian.computePDF(0, 1, -1) / normalizer, g[1], 1e-4);
+		assertEquals(UtilGaussian.computePDF(0, 1, 0) / normalizer, g[2], 1e-4);
+		assertEquals(UtilGaussian.computePDF(0, 1, 1) / normalizer, g[3], 1e-4);
+		assertEquals(UtilGaussian.computePDF(0, 1, 2) / normalizer, g[4], 1e-4);
+
+	}
+
+	@Test
+	public void gaussian2D_F32() {
+		// testing using the separable property
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, false);
+		Kernel2D_F32 kernel2 = FactoryKernelGaussian.gaussian2D_F32(1.0, 2, false);
+
+		for( int i = 0; i < kernel2.width; i++ ) {
+			for( int j = 0; j < kernel2.width; j++ ) {
+				float expected = kernel.data[i]*kernel.data[j];
+				assertEquals(expected,kernel2.get(j,i),1e-4f);
+			}
+		}
+
+		// normalized it should add up to one
+		kernel2 = FactoryKernelGaussian.gaussian2D_F32(1.0, 2, true);
+
+		float total = 0;
+
+		for( int i = 0; i < kernel2.width; i++ ) {
+			for( int j = 0; j < kernel2.width; j++ ) {
+				total += kernel2.get(j,i);
+			}
+		}
+
+		assertEquals(1,total,1e-4);
+	}
+
+	@Test
+	public void derivative1D_F32() {
+		float sigma = 1.5f;
+		int radius = 2;
+		Kernel1D_F32 found = FactoryKernelGaussian.derivative1D_F32(1,sigma,radius);
+
+		for( int i = -radius; i <= radius; i++ ) {
+			int index = i+radius;
+			assertTrue((float)-UtilGaussian.derivative1(0,sigma,i)==found.data[index]);
+		}
+	}
 }

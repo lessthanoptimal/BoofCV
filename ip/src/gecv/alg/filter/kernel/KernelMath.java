@@ -21,6 +21,7 @@ import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageInteger;
 import gecv.struct.image.ImageSInt32;
 
 
@@ -69,6 +70,21 @@ public class KernelMath {
 		int w = a.width;
 
 		Kernel2D_F32 ret = new Kernel2D_F32(w);
+
+		int index = 0;
+		for( int i = 0; i < w; i++ ) {
+			for( int j = 0; j < w; j++ ) {
+				ret.data[ index++ ] = a.data[i] * b.data[j];
+			}
+		}
+
+		return ret;
+	}
+
+	public static Kernel2D_I32 convolve( Kernel1D_I32 a , Kernel1D_I32 b ) {
+		int w = a.width;
+
+		Kernel2D_I32 ret = new Kernel2D_I32(w);
 
 		int index = 0;
 		for( int i = 0; i < w; i++ ) {
@@ -145,7 +161,7 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static Kernel2D_I32 convertToKernel( ImageSInt32 image ) {
+	public static Kernel2D_I32 convertToKernel( ImageInteger image ) {
 		int w = image.getWidth();
 		Kernel2D_I32 ret = new Kernel2D_I32(w);
 
@@ -158,37 +174,66 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static Kernel2D_I32 convert( Kernel2D_F32 original ) {
-		float minAbs = Float.POSITIVE_INFINITY;
-
-		int N = original.width*original.width;
-		for( int i = 0; i < N; i++ ) {
-			float v = Math.abs(original.data[i]);
-			if( v < minAbs && v > 0)
-				minAbs = v;
-		}
-
+	public static Kernel2D_I32 convert( Kernel2D_F32 original , float minFrac ) {
 		Kernel2D_I32 ret = new Kernel2D_I32(original.width);
-		for( int i = 0; i < N; i++ ) {
-			ret.data[i] = (int)Math.round(original.data[i]/minAbs);
-		}
+		convert( original.data,ret.data,original.width*original.width,minFrac);
 		return ret;
 	}
 
-	public static Kernel1D_I32 convert( Kernel1D_F32 original ) {
-		float minAbs = Float.POSITIVE_INFINITY;
-
-		int N = original.width;
-		for( int i = 0; i < N; i++ ) {
-			float v = Math.abs(original.data[i]);
-			if( v < minAbs && v > 0 )
-				minAbs = v;
-		}
+	public static Kernel1D_I32 convert( Kernel1D_F32 original , float minFrac ) {
 
 		Kernel1D_I32 ret = new Kernel1D_I32(original.width);
-		for( int i = 0; i < N; i++ ) {
-			ret.data[i] = Math.round(original.data[i]/minAbs);
-		}
+		convert( original.data,ret.data,original.width,minFrac);
+
 		return ret;
+	}
+
+	public static void convert( float input[] , int output[] , int size , float minFrac) {
+		float max = maxAbs(input,size);
+		float min = minAbs(input,size,max*minFrac);
+
+		for( int i = 0; i < size; i++ ) {
+			output[i] = (int)(input[i]/min);
+		}
+	}
+
+	public static float maxAbs( float data[] , int size ) {
+		float max = 0;
+		for( int i = 0; i < size; i++ ) {
+			float v = Math.abs(data[i]);
+
+			if( v > max )
+				max = v;
+		}
+		return max;
+	}
+
+	public static float minAbs( float data[] , int size , float minValue ) {
+		float min = Float.MAX_VALUE;
+		for( int i = 0; i < size; i++ ) {
+			float v = Math.abs(data[i]);
+
+			if( v < min && v >= minValue )
+				min = v;
+		}
+		return min;
+	}
+
+	public static boolean isEquals( float expected[] , float found[] , int size , float tol ) {
+		for( int i = 0; i < size; i++ ) {
+			float diff = Math.abs(expected[i] - found[i]);
+			if( diff > tol )
+				return false;
+		}
+		return true;
+	}
+
+	public static boolean isEquals( int expected[] , int found[] , int size ) {
+		for( int i = 0; i < size; i++ ) {
+			float diff = Math.abs(expected[i] - found[i]);
+			if( diff > 0 )
+				return false;
+		}
+		return true;
 	}
 }

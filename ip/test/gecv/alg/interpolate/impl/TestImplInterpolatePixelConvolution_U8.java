@@ -78,6 +78,11 @@ public class TestImplInterpolatePixelConvolution_U8
 		}
 
 		@Override
+		public boolean isInteger() {
+			return false;
+		}
+
+		@Override
 		public float compute(float x) {
 			return 1.0f/5.0f;
 		}

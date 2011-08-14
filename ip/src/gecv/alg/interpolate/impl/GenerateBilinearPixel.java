@@ -39,6 +39,7 @@ public class GenerateBilinearPixel extends CodeGeneratorBase {
 		createType(AutoTypeImage.F32);
 		createType(AutoTypeImage.U8);
 		createType(AutoTypeImage.S16);
+		createType(AutoTypeImage.S32);
 	}
 
 	private void createType( AutoTypeImage type ) throws FileNotFoundException {

@@ -89,6 +89,11 @@ public class Kernel2D_F32 extends Kernel2D {
 		data[y * width + x] = value;
 	}
 
+	@Override
+	public boolean isInteger() {
+		return false;
+	}
+
 	public float[] getData() {
 		return data;
 	}

@@ -18,12 +18,15 @@ package gecv.alg.filter.kernel;
 
 import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.TypeInterpolate;
-import gecv.alg.misc.PixelMath;
+import gecv.alg.misc.GPixelMath;
+import gecv.core.image.GeneralizedImageOps;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.SelectAlgorithmPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
+import gecv.struct.convolve.Kernel2D;
 import gecv.struct.convolve.Kernel2D_F32;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 
 import java.awt.*;
@@ -33,13 +36,29 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class DisplaySteerableGaussianApp {
+public class DisplaySteerableGaussianApp <T extends ImageBase, K extends Kernel2D> {
 	private static int imageSize = 400;
 	private static int radius = 100;
 
-	public static class ShowBasis extends SelectAlgorithmPanel
+	Class<T> imageType;
+	Class<K> kernelType;
+
+	public DisplaySteerableGaussianApp(Class<T> imageType, Class<K> kernelType) {
+		this.imageType = imageType;
+		this.kernelType = kernelType;
+	}
+
+	public void process() {
+		ShowBasis panelBasis = new ShowBasis();
+		ShowSteering panelSteering = new ShowSteering();
+
+		ShowImages.showWindow(panelBasis,"Steering Basis");
+		ShowImages.showWindow(panelSteering,"Steering");
+	}
+
+	public class ShowBasis extends SelectAlgorithmPanel
 	{
-		ImageFloat32 largeImg = new ImageFloat32(imageSize,imageSize);
+		T largeImg = GeneralizedImageOps.createImage(imageType,imageSize,imageSize);
 		ListDisplayPanel panel = new ListDisplayPanel();
 
 		public ShowBasis() {
@@ -62,23 +81,23 @@ public class DisplaySteerableGaussianApp {
 		public void setActiveAlgorithm(String name, Object cookie) {
 			DisplayGaussianKernelApp.DerivType dt = (DisplayGaussianKernelApp.DerivType)cookie;
 
-			SteerableKernel steerable = FactorySteerable.gaussianKernel(dt.orderX,dt.orderY,radius);
+			SteerableKernel<K> steerable = FactorySteerable.gaussian(kernelType,dt.orderX,dt.orderY,radius);
 			panel.reset();
 
 			for( int i = 0; i < steerable.getBasisSize(); i++ ) {
-				ImageFloat32 smallImg = KernelMath.convertToImage(steerable.getBasis(i));
+				T smallImg = GKernelMath.convertToImage(steerable.getBasis(i));
 				DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
 
-				float maxValue = PixelMath.maxAbs(largeImg);
+				double maxValue = GPixelMath.maxAbs(largeImg);
 				BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
 				panel.addImage(out,"Basis "+i);
 			}
 		}
 	}
 
-	public static class ShowSteering extends SelectAlgorithmPanel
+	public class ShowSteering extends SelectAlgorithmPanel
 	{
-		ImageFloat32 largeImg = new ImageFloat32(imageSize,imageSize);
+		T largeImg = GeneralizedImageOps.createImage(imageType,imageSize,imageSize);
 		ListDisplayPanel panel = new ListDisplayPanel();
 
 		public ShowSteering() {
@@ -100,18 +119,18 @@ public class DisplaySteerableGaussianApp {
 		@Override
 		public void setActiveAlgorithm(String name, Object cookie) {
 			DisplayGaussianKernelApp.DerivType dt = (DisplayGaussianKernelApp.DerivType)cookie;
-			SteerableKernel steerable = FactorySteerable.gaussianKernel(dt.orderX,dt.orderY,radius);
+			SteerableKernel<K> steerable = FactorySteerable.gaussian(kernelType,dt.orderX,dt.orderY,radius);
 			panel.reset();
 
 			for( int i = 0; i <= 20; i++  ) {
 				double angle = Math.PI*i/20.0;
 
-				Kernel2D_F32 kernel = steerable.compute(angle);
+				K kernel = steerable.compute(angle);
 
-				ImageFloat32 smallImg = KernelMath.convertToImage(kernel);
+				T smallImg = GKernelMath.convertToImage(kernel);
 				DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
 
-				float maxValue = PixelMath.maxAbs(largeImg);
+				double maxValue = GPixelMath.maxAbs(largeImg);
 				BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
 
 				panel.addImage(out,String.format("%5d",(int)(180.0*angle/Math.PI)));
@@ -121,10 +140,12 @@ public class DisplaySteerableGaussianApp {
 
 
 	public static void main( String args[] ) {
-		ShowBasis panelBasis = new ShowBasis();
-		ShowSteering panelSteering = new ShowSteering();
+		DisplaySteerableGaussianApp<ImageFloat32,Kernel2D_F32> app =
+				new DisplaySteerableGaussianApp<ImageFloat32,Kernel2D_F32>(ImageFloat32.class,Kernel2D_F32.class);
+		app.process();
 
-		ShowImages.showWindow(panelBasis,"Steering Basis");
-		ShowImages.showWindow(panelSteering,"Steering");
+//		DisplaySteerableGaussianApp<ImageSInt32, Kernel2D_I32> app =
+//				new DisplaySteerableGaussianApp<ImageSInt32,Kernel2D_I32>(ImageSInt32.class,Kernel2D_I32.class);
+//		app.process();
 	}
 }

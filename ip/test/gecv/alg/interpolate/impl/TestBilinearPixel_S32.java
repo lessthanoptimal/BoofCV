@@ -14,36 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.alg.interpolate.impl;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import gecv.struct.image.ImageSInt32;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestFactorySteerCoefficients {
+public class TestBilinearPixel_S32 extends GeneralBilinearPixelChecks<ImageSInt32>
+{
 
-	/**
-	 * For certain angles all but one coefficient should be zero
-	 */
-	@Test
-	public void polynomialZeros() {
-		for( int order = 1; order <= 4; order++ ) {
-			SteerableCoefficients coefs = FactorySteerCoefficients.polynomial(order);
-
-			for( int i = 0; i <= order; i++ ) {
-				double angle = i*Math.PI/(order+1);
-
-				for( int j = 0; j <= order; j++ ) {
-					if( i == j )
-						assertEquals(1,coefs.compute(angle,j),1e-4);
-					else
-						assertEquals(0,coefs.compute(angle,j),1e-4);
-				}
-			}
-		}
+	@Override
+	protected ImageSInt32 createImage(int width, int height) {
+		return new ImageSInt32(width, height);
 	}
 }

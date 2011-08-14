@@ -189,4 +189,11 @@ public class FactoryKernel {
 		return ret;
 	}
 
+	public static <K1 extends Kernel1D , K2 extends Kernel2D>
+	Class<K1> get1DType( Class<K2> kernelType ) {
+		if( kernelType == Kernel2D_F32.class )
+			return (Class<K1>)Kernel1D_F32.class;
+		else
+			return (Class<K1>)Kernel1D_I32.class;
+	}
 }

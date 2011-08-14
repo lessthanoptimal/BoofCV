@@ -57,4 +57,6 @@ public abstract class KernelBase {
 	 * @return Kernel's dimension
 	 */
 	public abstract int getDimension();
+
+	public abstract boolean isInteger();
 }

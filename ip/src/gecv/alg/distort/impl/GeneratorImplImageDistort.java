@@ -39,6 +39,7 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 		createType(AutoTypeImage.F32);
 		createType(AutoTypeImage.I8);
 		createType(AutoTypeImage.I16);
+		createType(AutoTypeImage.S32);
 	}
 
 	private void createType( AutoTypeImage type ) throws FileNotFoundException {
@@ -133,7 +134,7 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\t\tfor( int y = 0; y < dstImg.height; y++ ) {\n" +
 				"\t\t\tint indexDst = dstImg.startIndex + dstImg.stride*y;\n" +
 				"\t\t\tfor( int x = 0; x < dstImg.width; x++ , indexDst++ ) {\n" +
-				"\t\t\t\tdstToSrc.distort(x,y);\n" +
+				"\t\t\t\tdstToSrc.compute(x,y);\n" +
 				"\n" +
 				"\t\t\t\tfinal float sx = dstToSrc.distX;\n" +
 				"\t\t\t\tfinal float sy = dstToSrc.distY;\n" +

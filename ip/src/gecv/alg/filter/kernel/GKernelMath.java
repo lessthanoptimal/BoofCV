@@ -16,9 +16,10 @@
 
 package gecv.alg.filter.kernel;
 
-import gecv.struct.convolve.Kernel2D;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.convolve.*;
+import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageInteger;
 
 
 /**
@@ -33,6 +34,32 @@ public class GKernelMath {
 			return KernelMath.transpose((Kernel2D_F32)a);
 		else
 			return KernelMath.transpose((Kernel2D_I32)a);
+	}
 
+	public static Kernel2D convolve( Kernel1D a , Kernel1D b ) {
+		if( a.isInteger() != b.isInteger() )
+			throw new IllegalArgumentException("But input kernels must be of the same type.");
+
+		if( a.isInteger() ) {
+			return KernelMath.convolve((Kernel1D_I32)a,(Kernel1D_I32)b);
+		} else {
+			return KernelMath.convolve((Kernel1D_F32)a,(Kernel1D_F32)b);
+		}
+	}
+
+	public static <T extends ImageBase> T convertToImage( Kernel2D kernel ) {
+		if( kernel.isInteger() ) {
+			return (T)KernelMath.convertToImage((Kernel2D_I32)kernel);
+		} else {
+			return (T)KernelMath.convertToImage((Kernel2D_F32)kernel);
+		}
+	}
+
+	public static Kernel2D convertToKernel( ImageBase image ) {
+		if( image.getTypeInfo().isInteger() ) {
+			return KernelMath.convertToKernel((ImageInteger)image);
+		} else {
+			return KernelMath.convertToKernel((ImageFloat32)image);
+		}
 	}
 }

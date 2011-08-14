@@ -14,36 +14,25 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.alg.distort.impl;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import gecv.alg.distort.ImageDistort;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.struct.distort.PixelTransform;
+import gecv.struct.image.ImageFloat32;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestFactorySteerCoefficients {
+public class TestImplImageDistort_F32 extends GeneralImageDistortTests<ImageFloat32>{
 
-	/**
-	 * For certain angles all but one coefficient should be zero
-	 */
-	@Test
-	public void polynomialZeros() {
-		for( int order = 1; order <= 4; order++ ) {
-			SteerableCoefficients coefs = FactorySteerCoefficients.polynomial(order);
+	public TestImplImageDistort_F32() {
+		super(ImageFloat32.class);
+	}
 
-			for( int i = 0; i <= order; i++ ) {
-				double angle = i*Math.PI/(order+1);
-
-				for( int j = 0; j <= order; j++ ) {
-					if( i == j )
-						assertEquals(1,coefs.compute(angle,j),1e-4);
-					else
-						assertEquals(0,coefs.compute(angle,j),1e-4);
-				}
-			}
-		}
+	@Override
+	public ImageDistort<ImageFloat32> createDistort(PixelTransform dstToSrc, InterpolatePixel<ImageFloat32> interp) {
+		return new ImplImageDistort_F32(dstToSrc,interp);
 	}
 }

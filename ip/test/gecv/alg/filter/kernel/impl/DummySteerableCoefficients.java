@@ -14,36 +14,23 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.alg.filter.kernel.impl;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
+import gecv.alg.filter.kernel.SteerableCoefficients;
 
 /**
  * @author Peter Abeles
  */
-public class TestFactorySteerCoefficients {
+public class DummySteerableCoefficients implements SteerableCoefficients {
 
-	/**
-	 * For certain angles all but one coefficient should be zero
-	 */
-	@Test
-	public void polynomialZeros() {
-		for( int order = 1; order <= 4; order++ ) {
-			SteerableCoefficients coefs = FactorySteerCoefficients.polynomial(order);
+	double value[];
 
-			for( int i = 0; i <= order; i++ ) {
-				double angle = i*Math.PI/(order+1);
+	public DummySteerableCoefficients(double... value) {
+		this.value = value;
+	}
 
-				for( int j = 0; j <= order; j++ ) {
-					if( i == j )
-						assertEquals(1,coefs.compute(angle,j),1e-4);
-					else
-						assertEquals(0,coefs.compute(angle,j),1e-4);
-				}
-			}
-		}
+	@Override
+	public double compute(double angle, int basis) {
+		return value[basis];
 	}
 }

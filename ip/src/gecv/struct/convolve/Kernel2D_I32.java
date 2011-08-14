@@ -94,6 +94,11 @@ public class Kernel2D_I32 extends Kernel2D {
 		}
 	}
 
+	@Override
+	public boolean isInteger() {
+		return true;
+	}
+
 	public int get(int x, int y) {
 		return data[y * width + x];
 	}

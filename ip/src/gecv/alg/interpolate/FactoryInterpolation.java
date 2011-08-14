@@ -18,10 +18,7 @@ package gecv.alg.interpolate;
 
 import gecv.alg.interpolate.impl.*;
 import gecv.alg.interpolate.kernel.BicubicKernel_F32;
-import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.*;
 
 /**
  * Simplified interface for creating interpolation classes.
@@ -62,6 +59,8 @@ public class FactoryInterpolation {
 			return (InterpolatePixel<T>)new BilinearPixel_U8();
 		else if( type == ImageSInt16.class )
 			return (InterpolatePixel<T>)new BilinearPixel_S16();
+		else if( type == ImageSInt32.class )
+			return (InterpolatePixel<T>)new BilinearPixel_S32();
 		else
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
@@ -92,6 +91,8 @@ public class FactoryInterpolation {
 			return (InterpolatePixel<T>)new NearestNeighborPixel_U8();
 		else if( type == ImageSInt16.class )
 			return (InterpolatePixel<T>)new NearestNeighborPixel_S16();
+		else if( type == ImageSInt32.class )
+			return (InterpolatePixel<T>)new NearestNeighborPixel_S32();
 		else
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
