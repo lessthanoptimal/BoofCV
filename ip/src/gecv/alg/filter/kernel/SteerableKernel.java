@@ -17,7 +17,7 @@
 package gecv.alg.filter.kernel;
 
 
-import gecv.struct.convolve.Kernel2D_F32;
+import gecv.struct.convolve.Kernel2D;
 
 
 /**
@@ -33,15 +33,8 @@ import gecv.struct.convolve.Kernel2D_F32;
  *
  * @author Peter Abeles
  */
-// todo generalize by kernel type
-public class SteerableKernel {
+public interface SteerableKernel< K extends Kernel2D> {
 
-	// stores the output kernel
-	private Kernel2D_F32 output;
-
-	// definition of steerable function
-	private SteerableCoefficients coef;
-	private Kernel2D_F32 basis[];
 
 	/**
 	 * Compute the steerable filter.
@@ -49,15 +42,7 @@ public class SteerableKernel {
 	 * @param coef Coefficients for each basis.
 	 * @param basis Kernels which form the basis for the steerable filter.
 	 */
-	public void setBasis( SteerableCoefficients coef ,
-						  Kernel2D_F32...basis )
-	{
-		this.coef = coef;
-		this.basis = basis;
-
-		int width = basis[0].width;
-		output = new Kernel2D_F32(width);
-	}
+	public void setBasis( SteerableCoefficients coef ,  Kernel2D...basis );
 
 	/**
 	 * Computes the kernel at the specified angle.
@@ -65,30 +50,9 @@ public class SteerableKernel {
 	 * @param angle Angle the kernel should be pointed at.
 	 * @return The computed kernel.  Data is recycled each time compute is called.
 	 */
-	public Kernel2D_F32 compute( double angle ) {
-		// set the output to zero
-		KernelMath.fill(output,0);
+	public K compute( double angle );
 
-		int N = output.width*output.width;
+	public int getBasisSize() ;
 
-		for( int i = 0; i < basis.length; i++ ) {
-			double c = coef.compute(angle,i);
-
-			Kernel2D_F32 k = basis[i];
-
-			for( int j = 0; j < N; j++ ) {
-				output.data[j] += k.data[j]*c;
-			}
-		}
-
-		return output;
-	}
-
-	public int getBasisSize() {
-		return basis.length;
-	}
-
-	public Kernel2D_F32 getBasis( int index ) {
-		return basis[index];
-	}
+	public K getBasis( int index ) ;
 }

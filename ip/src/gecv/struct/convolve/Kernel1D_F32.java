@@ -91,6 +91,11 @@ public class Kernel1D_F32 extends Kernel1D {
 		return ret;
 	}
 
+	@Override
+	public boolean isInteger() {
+		return false;
+	}
+
 	public float get(int i) {
 		return data[i];
 	}

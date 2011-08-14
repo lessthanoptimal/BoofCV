@@ -19,20 +19,20 @@ package gecv.alg.distort.impl;
 import gecv.alg.distort.ImageDistort;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.distort.PixelTransform;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImageDistort_F32 extends GeneralImageDistortTests<ImageFloat32>{
+public class TestImplImageDistort_I16 extends GeneralImageDistortTests<ImageSInt16>{
 
-	public TestImageDistort_F32() {
-		super(ImageFloat32.class);
+	public TestImplImageDistort_I16() {
+		super(ImageSInt16.class);
 	}
 
 	@Override
-	public ImageDistort<ImageFloat32> createDistort(PixelTransform dstToSrc, InterpolatePixel<ImageFloat32> interp) {
-		return new ImplImageDistort_F32(dstToSrc,interp);
+	public ImageDistort<ImageSInt16> createDistort(PixelTransform dstToSrc, InterpolatePixel<ImageSInt16> interp) {
+		return new ImplImageDistort_I16<ImageSInt16>(dstToSrc,interp);
 	}
 }

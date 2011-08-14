@@ -22,10 +22,7 @@ import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.interpolate.TypeInterpolate;
 import gecv.struct.distort.PixelTransform;
-import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageInt16;
-import gecv.struct.image.ImageInt8;
+import gecv.struct.image.*;
 import jgrl.struct.affine.Affine2D_F32;
 import jgrl.struct.se.InvertibleTransformSequence;
 import jgrl.struct.se.Se2_F32;
@@ -106,6 +103,8 @@ public class DistortSupport {
 	{
 		if( imageType == ImageFloat32.class ) {
 			return (ImageDistort<T>)new ImplImageDistort_F32(dstToSrc,(InterpolatePixel<ImageFloat32>)interp);
+		} else if( ImageSInt32.class.isAssignableFrom(imageType) ) {
+			return (ImageDistort<T>)new ImplImageDistort_S32(dstToSrc,(InterpolatePixel<ImageSInt32>)interp);
 		} else if( ImageInt16.class.isAssignableFrom(imageType) ) {
 			return (ImageDistort<T>)new ImplImageDistort_I16(dstToSrc,(InterpolatePixel<ImageInt16>)interp);
 		} else if( ImageInt8.class.isAssignableFrom(imageType) ) {

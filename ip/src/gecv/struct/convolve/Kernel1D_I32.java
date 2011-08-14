@@ -91,6 +91,11 @@ public class Kernel1D_I32 extends Kernel1D {
 		return ret;
 	}
 
+	@Override
+	public boolean isInteger() {
+		return true;
+	}
+
 	public int[] getData() {
 		return data;
 	}

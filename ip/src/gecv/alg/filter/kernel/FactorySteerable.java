@@ -17,21 +17,37 @@
 package gecv.alg.filter.kernel;
 
 import gecv.alg.distort.DistortImageOps;
+import gecv.alg.filter.kernel.impl.SteerableKernel_F32;
+import gecv.alg.filter.kernel.impl.SteerableKernel_I32;
 import gecv.alg.interpolate.TypeInterpolate;
-import gecv.alg.misc.ImageTestingOps;
-import gecv.alg.misc.PixelMath;
-import gecv.struct.convolve.Kernel1D_F32;
+import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.convolve.Kernel1D;
+import gecv.struct.convolve.Kernel2D;
 import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageBase;
 
 
 /**
+ * <p>
+ * Creates different steerable kernels.  Steerable kernels are kernels which can be computed at an arbitrary angle easily
+ * and efficiently using a set of bases.
+ * </p>
+ *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked"})
 public class FactorySteerable {
 
-	// todo generalize to make image type agnostic
-	public static SteerableKernel gaussianKernel( int orderX , int orderY , int radius ) {
+	/**
+	 * Steerable filter using derivatives of a 2D Gaussian.
+	 *
+	 * @param kernelType Specifies which type of 2D kernel should be generated.
+	 * @param orderX Order of the derivative in the x-axis.
+	 * @param orderY Order of the derivative in the y-axis.
+	 * @param radius Radius of the kernel.
+	 * @return Steerable kernel generator for the specified gaussian derivative.
+	 */
+	public static <K extends Kernel2D> SteerableKernel<K> gaussian( Class<K> kernelType , int orderX , int orderY , int radius ) {
 		if( orderX < 0 || orderX > 4 )
 			throw new IllegalArgumentException("derivX must be from 0 to 4 inclusive.");
 		if( orderY < 0 || orderY > 4 )
@@ -46,22 +62,21 @@ public class FactorySteerable {
 
 		float sigma = (float)FactoryKernelGaussian.sigmaForRadius(radius,maxOrder);
 
-		Kernel1D_F32 kerX =  FactoryKernelGaussian.derivativeK(Kernel1D_F32.class,orderX,sigma,radius);
-		Kernel1D_F32 kerY = FactoryKernelGaussian.derivativeK(Kernel1D_F32.class,orderY,sigma,radius);
-		Kernel2D_F32 kernel = KernelMath.convolve(kerY,kerX);
+		Class kernel1DType = FactoryKernel.get1DType(kernelType);
+		Kernel1D kerX =  FactoryKernelGaussian.derivativeK(kernel1DType,orderX,sigma,radius);
+		Kernel1D kerY = FactoryKernelGaussian.derivativeK(kernel1DType,orderY,sigma,radius);
+		Kernel2D kernel = GKernelMath.convolve(kerY,kerX);
 
-		Kernel2D_F32 []basis = new Kernel2D_F32[order+1];
+		Kernel2D []basis = new Kernel2D[order+1];
 
 		// convert it into an image which can be rotated
-		ImageFloat32 image = KernelMath.convertToImage(kernel);
-		ImageFloat32 imageRotated = new ImageFloat32(image.width,image.height);
+		ImageBase image = GKernelMath.convertToImage(kernel);
+		ImageBase imageRotated = image._createNew(image.width,image.height);
 
 		float centerX = image.width/2;
 		float centerY = image.height/2;
 
-		float e = energy(image);
-		PixelMath.multiply(image,image,1.0f/(float)Math.sqrt(e));
-		basis[0] = KernelMath.convertToKernel(image);
+		basis[0] = kernel;
 
 		// form the basis by created rotated versions of the kernel
 		double angleStep = Math.PI/basis.length;
@@ -69,31 +84,21 @@ public class FactorySteerable {
 		for( int index = 1; index <= order; index++ ) {
 			float angle = (float)(angleStep*index);
 
-			ImageTestingOps.fill(imageRotated,0);
+			GeneralizedImageOps.fill(imageRotated,0);
 			DistortImageOps.rotate(image,imageRotated, TypeInterpolate.BILINEAR,centerX,centerY,angle);
 
-			e = energy(imageRotated);
-			PixelMath.multiply(imageRotated,imageRotated,1.0f/(float)Math.sqrt(e));
-
-			basis[index] = KernelMath.convertToKernel(imageRotated);
+			basis[index] = GKernelMath.convertToKernel(imageRotated);
 		}
 
-		SteerableKernel ret = new SteerableKernel();
+		SteerableKernel<K> ret;
+
+		if( kernelType == Kernel2D_F32.class )
+			ret = (SteerableKernel<K>)new SteerableKernel_F32();
+		else
+			ret = (SteerableKernel<K>)new SteerableKernel_I32();
+
 		ret.setBasis(FactorySteerCoefficients.polynomial(order),basis);
 
 		return ret;
-	}
-
-	private static float energy( ImageFloat32 img ) {
-		float total = 0;
-
-		for( int y = 0; y < img.height; y++ ) {
-			for( int x = 0; x < img.width; x++ ) {
-				float val = img.get(x,y);
-				total += val*val;
-			}
-		}
-
-		return total;
 	}
 }

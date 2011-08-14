@@ -49,6 +49,11 @@ public class BicubicKernel_F32 extends KernelContinuous1D_F32 {
     }
 
 	@Override
+	public boolean isInteger() {
+		return false;
+	}
+
+	@Override
 	public float compute(float x) {
 		float absX = x < 0 ? -x : x;
 

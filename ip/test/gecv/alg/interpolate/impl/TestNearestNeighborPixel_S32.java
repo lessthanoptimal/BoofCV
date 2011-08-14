@@ -14,19 +14,31 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.alg.interpolate.impl;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
-
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.struct.image.ImageSInt32;
 
 /**
  * @author Peter Abeles
  */
-public class TestSteerableKernel {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestNearestNeighborPixel_S32 extends GeneralInterpolationPixelChecks<ImageSInt32>
+{
+	@Override
+	protected ImageSInt32 createImage(int width, int height) {
+		return new ImageSInt32(width, height);
+	}
+
+	@Override
+	protected InterpolatePixel<ImageSInt32> wrap(ImageSInt32 image) {
+		return new NearestNeighborPixel_S32(image);
+	}
+
+	/**
+	 * Compute a bilinear interpolation manually
+	 */
+	@Override
+	protected float compute(ImageSInt32 img, float x, float y) {
+		return img.get((int)x,(int)y);
 	}
 }

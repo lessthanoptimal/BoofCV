@@ -22,7 +22,7 @@ package gecv.struct.convolve;
  *
  * @author Peter Abeles
  */
-public class Kernel1D extends KernelBase {
+public abstract class Kernel1D extends KernelBase {
 
 	public Kernel1D(int width) {
 		super(width);
