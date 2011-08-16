@@ -46,4 +46,21 @@ public class TestFactorySteerCoefficients {
 			}
 		}
 	}
+
+	/**
+	 * See if it is zero
+	 */
+	@Test
+	public void separableZeros() {
+		for( int order = 1; order <= 4; order++ ) {
+			SteerableCoefficients coefs = FactorySteerCoefficients.separable(order);
+
+			for( int i = 0; i <= order; i++ ) {
+				if( i == 0 )
+					assertEquals(1,coefs.compute(0,i),1e-4);
+				else
+					assertEquals(0,coefs.compute(0,i),1e-4);
+			}
+		}
+	}
 }

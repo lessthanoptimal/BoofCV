@@ -47,7 +47,7 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface GradientCornerIntensity<T extends ImageBase> extends CornerIntensity<T> {
+public interface GradientCornerIntensity<T extends ImageBase> extends FeatureIntensity<T> {
 
 	/**
 	 * Computes feature intensity image.

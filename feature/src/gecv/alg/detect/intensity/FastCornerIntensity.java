@@ -29,7 +29,7 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface FastCornerIntensity<T extends ImageBase> extends CornerIntensity<T> {
+public interface FastCornerIntensity<T extends ImageBase> extends FeatureIntensity<T> {
 
 	/**
 	 * Extracts corner features from the provided image.

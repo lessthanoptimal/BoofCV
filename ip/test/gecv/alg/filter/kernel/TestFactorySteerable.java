@@ -20,6 +20,7 @@ import gecv.struct.convolve.Kernel2D_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -52,5 +53,14 @@ public class TestFactorySteerable {
 				assertTrue(notZero);
 			}
 		}
+	}
+
+	/**
+	 * Compare the values found in the separable kernel against what was computed
+	 * using the full 2D gaussian kernel.
+	 */
+	@Test
+	public void separable() {
+		fail("implement");
 	}
 }

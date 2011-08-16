@@ -26,14 +26,14 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class ImageConvolveSparse< T extends ImageBase, K extends Kernel2D, IB extends ImageBorder<T>> implements ImageFunctionSparse<T> {
+public abstract class ImageConvolveSparse< T extends ImageBase, K extends Kernel2D > implements ImageFunctionSparse<T> {
 
 	// kernel being convolved
 	protected K kernel;
 	// image wrapper to handle the image borders
-	protected IB image;
+	protected ImageBorder<T> image;
 
-	public void setImageBorder(IB image) {
+	public void setImageBorder(ImageBorder<T> image) {
 		this.image = image;
 	}
 

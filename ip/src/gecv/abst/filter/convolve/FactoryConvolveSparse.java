@@ -17,10 +17,14 @@
 package gecv.abst.filter.convolve;
 
 import gecv.alg.filter.convolve.ConvolveWithBorderSparse;
+import gecv.core.image.GeneralizedImageOps;
+import gecv.core.image.border.ImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.core.image.border.ImageBorder_I32;
+import gecv.struct.convolve.Kernel2D;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInteger;
 
@@ -29,27 +33,29 @@ import gecv.struct.image.ImageInteger;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked"})
 public class FactoryConvolveSparse {
 
-	public static Convolve_F32 create_F32() {
-		return new Convolve_F32();
-	}
-
-	public static Convolve_I create_I() {
-		return new Convolve_I();
-	}
-
-	public static class Convolve_F32 extends ImageConvolveSparse<ImageFloat32, Kernel2D_F32, ImageBorder_F32> {
-		@Override
-		public double compute(int x, int y) {
-			return ConvolveWithBorderSparse.convolve(kernel,image,x,y);
+	public static <T extends ImageBase, K extends Kernel2D, B extends ImageBorder<T>>
+		ImageConvolveSparse<T,K> create( Class<T> imageType ) {
+		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
+			return (ImageConvolveSparse<T,K>)new Convolve_F32();
+		} else {
+			return (ImageConvolveSparse<T,K>)new Convolve_I();
 		}
 	}
 
-	public static class Convolve_I extends ImageConvolveSparse<ImageInteger, Kernel2D_I32, ImageBorder_I32> {
+	public static class Convolve_F32 extends ImageConvolveSparse<ImageFloat32, Kernel2D_F32> {
 		@Override
 		public double compute(int x, int y) {
-			return ConvolveWithBorderSparse.convolve(kernel,image,x,y);
+			return ConvolveWithBorderSparse.convolve(kernel,(ImageBorder_F32)image,x,y);
+		}
+	}
+
+	public static class Convolve_I extends ImageConvolveSparse<ImageInteger, Kernel2D_I32> {
+		@Override
+		public double compute(int x, int y) {
+			return ConvolveWithBorderSparse.convolve(kernel,(ImageBorder_I32)image,x,y);
 		}
 	}
 }

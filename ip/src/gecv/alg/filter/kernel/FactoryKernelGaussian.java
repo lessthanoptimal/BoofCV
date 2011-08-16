@@ -244,12 +244,6 @@ public class FactoryKernelGaussian {
 			default:
 				throw new IllegalArgumentException("Only derivatives of order 1 to 4 are supported");
 		}
-
-		// there must be some basic calculus 101 reason for this, but it seems that
-		// the negative must be taken
-		for( int i = 0; i < gaussian.length; i++ ) {
-			gaussian[i] = -gaussian[i];
-		}
 		
 		return ret;
 	}
