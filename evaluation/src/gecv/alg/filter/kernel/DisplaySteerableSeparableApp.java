@@ -25,25 +25,35 @@ import gecv.struct.image.ImageFloat32;
 /**
  * @author Peter Abeles
  */
-public class DisplaySteerableGaussianApp <T extends ImageBase, K extends Kernel2D>
+public class DisplaySteerableSeparableApp<T extends ImageBase, K extends Kernel2D>
 	extends DisplaySteerableBase<T,K>
 {
-	public DisplaySteerableGaussianApp(Class<T> imageType, Class<K> kernelType) {
+	public DisplaySteerableSeparableApp(Class<T> imageType, Class<K> kernelType) {
 		super(imageType, kernelType);
+
+//		double v;
+//		v = FactorySteerCoefficients.separable(1).compute(0,1);
+//		v = FactorySteerCoefficients.separable(2).compute(0,1);
+//		v = FactorySteerCoefficients.separable(3).compute(0,1);
+//		v = FactorySteerCoefficients.separable(3).compute(0,2);
+//		v = FactorySteerCoefficients.separable(4).compute(0,1);
+//		v = FactorySteerCoefficients.separable(4).compute(0,2);
+//		v = FactorySteerCoefficients.separable(4).compute(0,3);
+
 	}
 
 	@Override
 	protected SteerableKernel<K> createKernel(int orderX, int orderY) {
-		return FactorySteerable.gaussian(kernelType,orderX,orderY,radius);
+		return FactorySteerable.separable(kernelType,orderX,orderY,radius);
 	}
 
 	public static void main( String args[] ) {
-		DisplaySteerableGaussianApp<ImageFloat32,Kernel2D_F32> app =
-				new DisplaySteerableGaussianApp<ImageFloat32,Kernel2D_F32>(ImageFloat32.class,Kernel2D_F32.class);
+		DisplaySteerableSeparableApp<ImageFloat32,Kernel2D_F32> app =
+				new DisplaySteerableSeparableApp<ImageFloat32,Kernel2D_F32>(ImageFloat32.class,Kernel2D_F32.class);
 		app.process();
 
-//		DisplaySteerableGaussianApp<ImageSInt32, Kernel2D_I32> app =
-//				new DisplaySteerableGaussianApp<ImageSInt32,Kernel2D_I32>(ImageSInt32.class,Kernel2D_I32.class);
+//		DisplaySteerableSeparableApp<ImageSInt32, Kernel2D_I32> app =
+//				new DisplaySteerableSeparableApp<ImageSInt32,Kernel2D_I32>(ImageSInt32.class,Kernel2D_I32.class);
 //		app.process();
 	}
 }

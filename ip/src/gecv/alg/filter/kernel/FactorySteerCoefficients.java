@@ -16,6 +16,8 @@
 
 package gecv.alg.filter.kernel;
 
+import static java.lang.Math.*;
+
 
 /**
  * <p>
@@ -48,6 +50,16 @@ public class FactorySteerCoefficients {
 			return new PolyOrder4();
 		else
 			throw new IllegalArgumentException("Only supports orders 1 to 4");
+	}
+
+	/**
+	 * Coefficients for even or odd parity separable polynomials.
+	 *
+	 * @param order order of the polynomial.
+	 * @return Steering coeficient.
+	 */
+	public static SteerableCoefficients separable( int order ) {
+		return new Separable(order);
 	}
 
 	// forumulas for steering even or odd parity polynomials
@@ -90,6 +102,45 @@ public class FactorySteerCoefficients {
 			angle -= basis*Math.PI/5.0;
 
 			return (1.0/5.0)*(1+2.0*Math.cos(2.0*angle)+2.0*Math.cos(4.0*angle));
+		}
+	}
+
+	public static class Separable implements SteerableCoefficients
+	{
+		final int order;
+
+		public Separable(int order) {
+			this.order = order;
+		}
+
+		@Override
+		public double compute(double angle, int basis) {
+			int powerC = order-basis;
+
+			int middleIndex = Math.min(basis,order-basis);
+
+			float middle = 1;
+			if( middleIndex > 0 ) {
+				middle = order;
+				int inc = order;
+				for( int i = 1; i < middleIndex; i++ ) {
+					inc -= 2;
+					middle += inc;
+				}
+			}
+			middle *= Math.pow(-1,basis);
+
+//			if( order == 2 ) {
+//				if( basis == 0 )
+//					return cos(angle);
+//				else if( basis == 1 )
+//					return sin(angle);
+//				else
+//					return sin(angle);
+//			}
+
+//			System.out.println("order "+order+" basis "+basis+" middle "+middle);
+			return middle*pow(cos(angle),powerC)*pow(sin(angle),basis);
 		}
 	}
 }

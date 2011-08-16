@@ -14,43 +14,27 @@
  *    limitations under the License.
  */
 
-package gecv.misc;
+package gecv.alg.describe;
 
-import gecv.struct.ImageRectangle;
 import gecv.struct.image.ImageBase;
 
+
 /**
+ * Estimates the orientation of a region.  Often used to create rotation invariant features.
+ *
  * @author Peter Abeles
  */
-public class GecvMiscOps {
+public interface RegionOrientation<D extends ImageBase> {
 
-	public static int countNotZero( int a[] , int size ) {
-		int ret = 0;
-		for( int i = 0; i < size; i++ ) {
-			if( a[i] != 0 )
-				ret++;
-		}
-		return ret;
-	}
+	public void setImage( D derivX , D derivY );
 
 	/**
-	 * Bounds the provided rectangle to be inside the image.  It is assumed that
-	 * at least part of the rectangle is inside of the image so all possibilities
-	 * do not need to be checked.
+	 * Computes the orientation of a region about its center.
 	 *
-	 * @param b An image.
-	 * @param r Rectangle
+	 * @param c_x Center of the region in image pixels.
+	 * @param c_y Center of the region in image pixels.
+	 *
+	 * @return Orientation in radians.
 	 */
-	public static void boundRectangleInside( ImageBase b , ImageRectangle r )
-	{
-		if( r.x0 < 0 )
-			r.x0 = 0;
-		else if( r.x1 > b.width )
-			r.x1 = b.width;
-
-		if( r.y0 < 0 )
-			r.y0 = 0;
-		else if( r.y1 > b.height )
-			r.y1 = b.height;
-	}
+	public double compute( int c_x , int c_y );
 }

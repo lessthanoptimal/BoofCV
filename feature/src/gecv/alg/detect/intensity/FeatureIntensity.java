@@ -21,12 +21,12 @@ import gecv.struct.image.ImageFloat32;
 
 /**
  * <p>
- * Base interface for classes which extract intensity images for corners detection.
+ * Base interface for classes which extract intensity images for image feature detection.
  * </p>
  *
  * @author Peter Abeles
  */
-public interface CornerIntensity<T extends ImageBase> {
+public interface FeatureIntensity<T extends ImageBase> {
 
 	/**
 	 * Returns the radius of the feature being computed.  Features are square in shape with a width = 2*radius+1.

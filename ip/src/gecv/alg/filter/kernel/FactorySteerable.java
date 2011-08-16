@@ -39,7 +39,7 @@ import gecv.struct.image.ImageBase;
 public class FactorySteerable {
 
 	/**
-	 * Steerable filter using derivatives of a 2D Gaussian.
+	 * Steerable filter for 2D Gaussian derivatives.  The basis is composed of a set of rotated kernels.
 	 *
 	 * @param kernelType Specifies which type of 2D kernel should be generated.
 	 * @param orderX Order of the derivative in the x-axis.
@@ -98,6 +98,64 @@ public class FactorySteerable {
 			ret = (SteerableKernel<K>)new SteerableKernel_I32();
 
 		ret.setBasis(FactorySteerCoefficients.polynomial(order),basis);
+
+		return ret;
+	}
+
+	/**
+	 * Steerable filter using derivatives of a 2D Gaussian.     TODO update
+	 *
+	 * @param kernelType Specifies which type of 2D kernel should be generated.
+	 * @param orderX Order of the derivative in the x-axis.
+	 * @param orderY Order of the derivative in the y-axis.
+	 * @param radius Radius of the kernel.
+	 * @return Steerable kernel generator for the specified gaussian derivative.
+	 */
+	public static <K extends Kernel2D> SteerableKernel<K> separable( Class<K> kernelType , int orderX , int orderY , int radius ) {
+		if( orderX < 0 || orderX > 4 )
+			throw new IllegalArgumentException("derivX must be from 0 to 4 inclusive.");
+		if( orderY < 0 || orderY > 4 )
+			throw new IllegalArgumentException("derivT must be from 0 to 4 inclusive.");
+
+		int order = orderX + orderY;
+
+		if( order > 4 ) {
+			throw new IllegalArgumentException("The total order of x and y can't be greater than 4");
+		}
+
+		Kernel2D []basis = new Kernel2D[order+1];
+
+		Class kernel1DType = FactoryKernel.get1DType(kernelType);
+		float sigma = (float)FactoryKernelGaussian.sigmaForRadius(radius,order);
+
+		int N = order+1;
+		for( int i = 0; i < N; i++ ) {
+			int derivX = orderX-i;
+			int derivY = orderY+i;
+
+			if( derivX < 0 )
+				derivX += N;
+			if( derivY >= N )
+				derivY -= N;
+
+			Kernel1D kerX =  FactoryKernelGaussian.derivativeK(kernel1DType,derivX,sigma,radius);
+			Kernel1D kerY = FactoryKernelGaussian.derivativeK(kernel1DType,derivY,sigma,radius);
+
+			basis[i] = GKernelMath.convolve(kerY,kerX);
+		}
+
+//		if( order == 2 && orderX == 1 ) {
+//			basis[1] = basis[2] = basis[0];
+//		}
+
+		SteerableKernel<K> ret;
+
+		if( kernelType == Kernel2D_F32.class )
+			ret = (SteerableKernel<K>)new SteerableKernel_F32();
+		else
+			ret = (SteerableKernel<K>)new SteerableKernel_I32();
+
+		ret.setBasis(FactorySteerCoefficients.separable(order),basis);
 
 		return ret;
 	}
