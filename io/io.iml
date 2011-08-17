@@ -24,7 +24,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../thirdparty/xuggle_home/share/java/jars/xuggle-xuggler.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../thirdparty/xuggler-home/share/java/jars/xuggle-xuggler.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

@@ -16,8 +16,8 @@
 
 package gecv.gui.feature;
 
-import gecv.alg.detect.interest.ScalePoint;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.struct.feature.ScalePoint;
 import gecv.struct.gss.GaussianScaleSpace;
 
 import javax.swing.*;

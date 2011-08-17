@@ -28,25 +28,25 @@ import pja.stats.UtilGaussian;
 // todo add size heuristic for derivative that is different from regular kernel
 public class FactoryKernelGaussian {
 	// when converting to integer kernels what is the minimum size of the an element relative to the maximum
-	public static float MIN_FRAC = 1.0f/60f;
+	public static float MIN_FRAC = 1.0f/100f;
 
 	/**
 	 * Creates a Gaussian kernel of the specified type.
 	 *
+	 * @param kernelType The type of kernel which is to be created.
 	 * @param sigma The distributions stdev.  If <= 0 then the sigma will be computed from the radius.
 	 * @param radius Number of pixels in the kernel's radius.  If <= 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
-	public static <T extends KernelBase> T gaussian(Class<T> type, double sigma, int radius
-	)
+	public static <T extends KernelBase> T gaussian(Class<T> kernelType, double sigma, int radius )
 	{
-		if (Kernel1D_F32.class == type) {
+		if (Kernel1D_F32.class == kernelType) {
 			return gaussian(1,true,sigma,radius);
-		} else if (Kernel1D_I32.class == type) {
+		} else if (Kernel1D_I32.class == kernelType) {
 			return gaussian(1,false,sigma,radius);
-		} else if (Kernel2D_I32.class == type) {
+		} else if (Kernel2D_I32.class == kernelType) {
 			return gaussian(2,false,sigma,radius);
-		} else if (Kernel2D_F32.class == type) {
+		} else if (Kernel2D_F32.class == kernelType) {
 			return gaussian(2,true,sigma,radius);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
@@ -244,6 +244,10 @@ public class FactoryKernelGaussian {
 			default:
 				throw new IllegalArgumentException("Only derivatives of order 1 to 4 are supported");
 		}
+
+		// todo multiply by the same factor that the Gaussian kernel is normalized by?
+		// this ensures that it is equavlent to convolving by a gaussian then taking
+		// the derivative
 		
 		return ret;
 	}

@@ -20,6 +20,7 @@ import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.FactoryDerivativeSparse;
 import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
+import gecv.struct.feature.ScalePoint;
 import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.image.ImageFloat32;
 

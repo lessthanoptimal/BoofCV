@@ -20,6 +20,7 @@ import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.struct.QueueCorner;
+import gecv.struct.feature.ScalePoint;
 import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;

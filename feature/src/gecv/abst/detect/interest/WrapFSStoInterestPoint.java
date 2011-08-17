@@ -17,7 +17,7 @@
 package gecv.abst.detect.interest;
 
 import gecv.alg.detect.interest.FeatureScaleSpace;
-import gecv.alg.detect.interest.ScalePoint;
+import gecv.struct.feature.ScalePoint;
 import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.image.ImageBase;
 import jgrl.struct.point.Point2D_I32;

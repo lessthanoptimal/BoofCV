@@ -14,23 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.intensity;
+package gecv.alg.describe.impl;
 
-import gecv.struct.image.ImageUInt8;
 
 /**
- * Creates an image with corners at known locations
- *
  * @author Peter Abeles
  */
-public class CreateSyntheticCornerImage {
-
-	public ImageUInt8 createImage() {
-		return null;
-	}
-
-	int imgWidth;
-	int imgHeight;
-
-
+public class GenerateImplOrientationHistogram {
 }

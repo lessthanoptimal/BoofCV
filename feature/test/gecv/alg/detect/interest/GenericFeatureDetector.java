@@ -17,6 +17,7 @@
 package gecv.alg.detect.interest;
 
 import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.feature.ScalePoint;
 import gecv.struct.image.ImageFloat32;
 import jgrl.geometry.UtilPoint2D_I32;
 import org.junit.Test;

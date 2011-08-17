@@ -14,16 +14,42 @@
  *    limitations under the License.
  */
 
-package gecv.alg.describe;
+package gecv.struct.feature;
 
+import jgrl.struct.point.Point2D_I32;
 
 /**
+ * Where a point of interest was detected and at what scale.
+ *
  * @author Peter Abeles
  */
-public class TupleFeature {
-	double value[];
+public class ScalePoint extends Point2D_I32 {
+	// the scale the feature was detected at
+	public double scale;
 
-	public TupleFeature( int numFeatures ) {
-		this.value = new double[ numFeatures ];
+	public ScalePoint(int x, int y, double scale) {
+		super(x, y);
+		this.scale = scale;
+	}
+
+	public ScalePoint() {
+	}
+
+	public double getScale() {
+		return scale;
+	}
+
+	public void setScale(double scale) {
+		this.scale = scale;
+	}
+
+	public ScalePoint copy() {
+		return new ScalePoint(x,y,scale);
+	}
+
+	public void set(ScalePoint p) {
+		this.scale = p.scale;
+		this.x = p.x;
+		this.y = p.y;
 	}
 }

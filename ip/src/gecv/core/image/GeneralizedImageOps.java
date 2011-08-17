@@ -274,4 +274,16 @@ public class GeneralizedImageOps {
 		}
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}
+
+	public static void set(ImageBase img, int x, int y, double value) {
+		if (img.getClass().isAssignableFrom(ImageInteger.class)) {
+			((ImageInteger)img).set(x,y,(int)value);
+		} else if (img instanceof ImageFloat32) {
+			((ImageFloat32) img).set(x, y,(float)value);
+		} else if (img instanceof ImageFloat64) {
+			((ImageFloat64) img).set(x, y, value);
+		} else {
+			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+		}
+	}
 }

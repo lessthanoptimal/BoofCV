@@ -26,6 +26,14 @@ import gecv.struct.image.ImageBase;
  */
 public interface RegionOrientation<D extends ImageBase> {
 
+	
+
+	/**
+	 * Specifies input image data for estimating orientation.
+	 *
+	 * @param derivX Image derivative along x-axis.
+	 * @param derivY Image derivative along y-axis.
+	 */
 	public void setImage( D derivX , D derivY );
 
 	/**
@@ -37,4 +45,11 @@ public interface RegionOrientation<D extends ImageBase> {
 	 * @return Orientation in radians.
 	 */
 	public double compute( int c_x , int c_y );
+
+	/**
+	 * Returns the type of image it can process.
+	 *
+	 * @return Type of image which can be processed
+	 */
+	public Class<D> getImageType();
 }

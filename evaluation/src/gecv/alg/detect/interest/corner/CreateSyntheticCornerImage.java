@@ -14,26 +14,23 @@
  *    limitations under the License.
  */
 
-package gecv.gui.feature;
+package gecv.alg.detect.interest.corner;
 
-import gecv.struct.feature.ScalePoint;
-
-import java.awt.*;
-
+import gecv.struct.image.ImageUInt8;
 
 /**
+ * Creates an image with corners at known locations
+ *
  * @author Peter Abeles
  */
-public class VisualizeFeatures {
+public class CreateSyntheticCornerImage {
 
-	public static void drawScalePoints( Graphics2D g2 , java.util.List<ScalePoint> points , double radius ) {
-		g2.setColor(Color.RED);
-		g2.setStroke(new BasicStroke(2));
-
-		for( ScalePoint p : points ) {
-			int r = (int)(radius*p.scale);
-			int w = r*2+1;
-			g2.drawOval(p.x-r,p.y-r,w,w);
-		}
+	public ImageUInt8 createImage() {
+		return null;
 	}
+
+	int imgWidth;
+	int imgHeight;
+
+
 }

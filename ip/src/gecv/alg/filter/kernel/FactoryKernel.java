@@ -17,7 +17,11 @@
 package gecv.alg.filter.kernel;
 
 import gecv.struct.convolve.*;
+import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageInteger;
 
+import java.awt.image.Kernel;
 import java.util.Random;
 
 /**
@@ -195,5 +199,21 @@ public class FactoryKernel {
 			return (Class<K1>)Kernel1D_F32.class;
 		else
 			return (Class<K1>)Kernel1D_I32.class;
+	}
+
+	public static <K extends Kernel, T extends ImageBase>
+	Class<K> getKernelType( Class<T> imageType , int DOF ) {
+		if( imageType == ImageFloat32.class ) {
+			if( DOF == 1 )
+				return (Class)Kernel1D_F32.class;
+			else
+				return (Class)Kernel2D_F32.class;
+		} else if( ImageInteger.class.isAssignableFrom(imageType) ) {
+			if( DOF == 1 )
+				return (Class)Kernel1D_I32.class;
+			else
+				return (Class)Kernel2D_I32.class;
+		}
+		throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 	}
 }

@@ -25,6 +25,7 @@ import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
 import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.inst.FactoryImageGenerator;
+import gecv.struct.feature.ScalePoint;
 import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageFloat32;
 

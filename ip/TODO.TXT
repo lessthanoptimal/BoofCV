@@ -17,6 +17,7 @@
 - Derivative
  * Improve performance of derivative edge calculation
  * Include the image border for the Laplacian
+ * Why are values of gaussian swapped?
 
 - Edges
  * Connected Segments
@@ -47,6 +48,8 @@
    - Compare speed to hand derived kernels in gradient
 
 - Kernels
+ * Should Gaussian kernels be provided with only the exp() part?
+   - For numerical stability.  These are not app
  * Support kernels with an even size
  * Support different width and height
 

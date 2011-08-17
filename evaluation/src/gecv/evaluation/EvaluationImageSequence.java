@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.intensity;
+package gecv.evaluation;
 
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
