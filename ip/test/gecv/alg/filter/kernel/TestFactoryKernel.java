@@ -26,6 +26,7 @@ import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -123,5 +124,15 @@ public class TestFactoryKernel {
 			}
 		}
 		assertTrue(nonZero != 0);
+	}
+
+	@Test
+	public void get1DType() {
+		fail("implement");
+	}
+
+	@Test
+	public void getKernelType() {
+		fail("implement");
 	}
 }

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.intensity;
+package gecv.evaluation;
 
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.ConvertImage;

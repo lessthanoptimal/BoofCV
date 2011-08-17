@@ -16,11 +16,11 @@
 
 package gecv.gui.feature;
 
-import gecv.alg.detect.interest.ScalePoint;
 import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.TypeInterpolate;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.feature.ScalePoint;
 import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 

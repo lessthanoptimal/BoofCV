@@ -14,26 +14,14 @@
  *    limitations under the License.
  */
 
-package gecv.gui.feature;
-
-import gecv.struct.feature.ScalePoint;
-
-import java.awt.*;
+package gecv.alg.associate;
 
 
 /**
+ * A brute force algorithm where every feature is compared against every other feature.
+ * TODO BLAH BLAH
+ *
  * @author Peter Abeles
  */
-public class VisualizeFeatures {
-
-	public static void drawScalePoints( Graphics2D g2 , java.util.List<ScalePoint> points , double radius ) {
-		g2.setColor(Color.RED);
-		g2.setStroke(new BasicStroke(2));
-
-		for( ScalePoint p : points ) {
-			int r = (int)(radius*p.scale);
-			int w = r*2+1;
-			g2.drawOval(p.x-r,p.y-r,w,w);
-		}
-	}
+public class SimpleExhaustiveTupleAssociate {
 }

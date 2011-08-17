@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.intensity;
+package gecv.alg.detect.interest.corner;
 
 import gecv.abst.detect.point.FactoryCornerDetector;
 import gecv.abst.detect.point.GeneralFeatureDetector;

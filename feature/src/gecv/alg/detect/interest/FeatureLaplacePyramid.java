@@ -20,6 +20,7 @@ import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.struct.QueueCorner;
+import gecv.struct.feature.ScalePoint;
 import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 import jgrl.struct.point.Point2D_I16;

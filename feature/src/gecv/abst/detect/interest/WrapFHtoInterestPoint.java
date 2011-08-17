@@ -17,8 +17,8 @@
 package gecv.abst.detect.interest;
 
 import gecv.alg.detect.interest.FastHessianFeatureDetector;
-import gecv.alg.detect.interest.ScalePoint;
 import gecv.alg.transform.ii.IntegralImageOps;
+import gecv.struct.feature.ScalePoint;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I32;

@@ -19,6 +19,7 @@ package gecv.alg.detect.interest;
 import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.alg.transform.ii.IntegralImageOps;
+import gecv.struct.feature.ScalePoint;
 import gecv.struct.image.ImageFloat32;
 
 import java.util.List;

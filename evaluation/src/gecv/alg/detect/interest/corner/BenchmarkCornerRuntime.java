@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.intensity;
+package gecv.alg.detect.interest.corner;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
@@ -24,6 +24,7 @@ import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.evaluation.FileImageSequence;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
