@@ -17,7 +17,7 @@
 package gecv.alg.describe.impl;
 
 import gecv.alg.describe.OrientationHistogram;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt32;
 
 
 /**
@@ -31,15 +31,15 @@ import gecv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationHistogram_F32 extends OrientationHistogram<ImageFloat32> {
+public class ImplOrientationHistogram_S32 extends OrientationHistogram<ImageSInt32> {
 
-	public ImplOrientationHistogram_F32(int numAngles) {
+	public ImplOrientationHistogram_S32(int numAngles) {
 		super(numAngles);
 	}
 
 	@Override
-	public Class<ImageFloat32> getImageType() {
-		return ImageFloat32.class;
+	public Class<ImageSInt32> getImageType() {
+		return ImageSInt32.class;
 	}
 
 	@Override
@@ -50,8 +50,8 @@ public class ImplOrientationHistogram_F32 extends OrientationHistogram<ImageFloa
 			int indexY = derivY.startIndex + derivY.stride*y + rect.x0;
 
 			for( int x = rect.x0; x < rect.x1; x++ , indexX++ , indexY++ ) {
-				float dx = derivX.data[indexX];
-				float dy = derivY.data[indexY];
+				int dx = derivX.data[indexX];
+				int dy = derivY.data[indexY];
 
 				double angle = Math.atan2(dy,dx);
 				// compute which discretized angle it is
@@ -74,8 +74,8 @@ public class ImplOrientationHistogram_F32 extends OrientationHistogram<ImageFloa
 			for( int x = rect.x0; x < rect.x1; x++ , indexX++ , indexY++ , indexW++ ) {
 				float w = weights.data[indexW];
 
-				float dx = derivX.data[indexX];
-				float dy = derivY.data[indexY];
+				int dx = derivX.data[indexX];
+				int dy = derivY.data[indexY];
 
 				double angle = Math.atan2(dy,dx);
 				// compute which discretized angle it is

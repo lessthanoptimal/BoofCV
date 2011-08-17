@@ -48,7 +48,7 @@ public class FactoryDescribeRegionAlgs {
 				kernels[index++] = FactorySteerable.gaussian(kernelType,orderX,i,radius);
 			}
 		}
-		RegionOrientation<D> orientation = FactoryRegionOrientation.histogram(numAngles,radius,weighted,derivType);
+		RegionOrientation<D> orientation = FactoryRegionOrientationAlgs.histogram(numAngles,radius,weighted,derivType);
 
 		return new DescribePointSteerable2D<T,D,K>(orientation,kernels,imageType);
 	}

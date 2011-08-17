@@ -91,7 +91,7 @@ public class GenericOrientationTests<D extends ImageBase> {
 			alg.setImage(derivX,derivY);
 
 			double found = UtilAngle.bound(alg.compute(x,y));
-			assertTrue( UtilAngle.minus(angle,found) < angleTolerance );
+			assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 		}
 	}
 
@@ -112,6 +112,6 @@ public class GenericOrientationTests<D extends ImageBase> {
 
 		// if weight is no all on the center pixel a different solution will be generated
 		double found = alg.compute(c_x,c_y);
-		assertTrue( UtilAngle.minus(Math.PI/2.0,found) < angleTolerance );
+		assertTrue( UtilAngle.dist(Math.PI/2.0,found) < angleTolerance );
 	}
 }

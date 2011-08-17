@@ -64,7 +64,7 @@ public class SteerableKernel_F32 implements SteerableKernel<Kernel2D_F32> {
 			Kernel2D_F32 k = (Kernel2D_F32)basis[i];
 
 			for( int j = 0; j < N; j++ ) {
-				output.data[j] += (-k.data[j])*c;
+				output.data[j] += (k.data[j])*c;
 			}
 		}
 

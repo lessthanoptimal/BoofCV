@@ -221,7 +221,9 @@ public class KernelMath {
 
 	public static boolean isEquals( float expected[] , float found[] , int size , float tol ) {
 		for( int i = 0; i < size; i++ ) {
-			float diff = Math.abs(expected[i] - found[i]);
+			float norm = Math.max(Math.abs(expected[i]),Math.abs(found[i]));
+			if( norm < 1.0 ) norm = 1.0f;
+			float diff = Math.abs(expected[i] - found[i])/norm;
 			if( diff > tol )
 				return false;
 		}

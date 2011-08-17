@@ -276,7 +276,7 @@ public class GeneralizedImageOps {
 	}
 
 	public static void set(ImageBase img, int x, int y, double value) {
-		if (img.getClass().isAssignableFrom(ImageInteger.class)) {
+		if (ImageInteger.class.isAssignableFrom(img.getClass())) {
 			((ImageInteger)img).set(x,y,(int)value);
 		} else if (img instanceof ImageFloat32) {
 			((ImageFloat32) img).set(x, y,(float)value);
