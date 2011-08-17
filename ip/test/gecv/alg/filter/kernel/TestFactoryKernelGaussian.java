@@ -109,7 +109,7 @@ public class TestFactoryKernelGaussian {
 
 		for( int i = -radius; i <= radius; i++ ) {
 			int index = i+radius;
-			assertTrue((float)-UtilGaussian.derivative1(0,sigma,i)==found.data[index]);
+			assertTrue((float)UtilGaussian.derivative1(0,sigma,i)==found.data[index]);
 		}
 	}
 }

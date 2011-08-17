@@ -71,6 +71,7 @@ public class DetectFeatureLaplacePyramidApp {
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 		doStuff(input,ImageFloat32.class,ImageFloat32.class);
+		input = UtilImageIO.loadImage(fileName);
 		doStuff(input, ImageUInt8.class, ImageSInt16.class);
 		System.out.println("Done");
 	}

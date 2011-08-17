@@ -16,6 +16,7 @@
 
 package gecv.alg.describe;
 
+import gecv.alg.InputSanityCheck;
 import gecv.misc.GecvMiscOps;
 import gecv.struct.ImageRectangle;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -91,6 +92,14 @@ public abstract class OrientationHistogram <T extends ImageBase>
 		return weights;
 	}
 
+	@Override
+	public void setImage( T derivX, T derivY) {
+		InputSanityCheck.checkSameShape(derivX,derivY);
+
+		this.derivX = derivX;
+		this.derivY = derivY;
+	}
+
 	/**
 	 * Specifies the weights which are centered around the targeted pixel
 	 *
@@ -138,7 +147,7 @@ public abstract class OrientationHistogram <T extends ImageBase>
 			}
 		}
 
-		return angleDiv*bestIndex;
+		return angleDiv*bestIndex-Math.PI;
 	}
 
 	/**

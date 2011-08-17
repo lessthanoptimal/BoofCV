@@ -20,13 +20,16 @@ import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageSInt32;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -128,11 +131,20 @@ public class TestFactoryKernel {
 
 	@Test
 	public void get1DType() {
-		fail("implement");
+		assertTrue((Class)Kernel1D_F32.class == FactoryKernel.get1DType(Kernel2D_F32.class));
+		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.get1DType(Kernel2D_I32.class));
 	}
 
 	@Test
 	public void getKernelType() {
-		fail("implement");
+		assertTrue((Class)Kernel1D_F32.class == FactoryKernel.getKernelType(ImageFloat32.class,1));
+		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(ImageSInt32.class,1));
+		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(ImageSInt16.class,1));
+		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(ImageUInt8.class,1));
+
+		assertTrue((Class)Kernel2D_F32.class == FactoryKernel.getKernelType(ImageFloat32.class,2));
+		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(ImageSInt32.class,2));
+		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(ImageSInt16.class,2));
+		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(ImageUInt8.class,2));
 	}
 }
