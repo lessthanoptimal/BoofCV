@@ -25,7 +25,6 @@ import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 
@@ -37,13 +36,16 @@ import java.awt.image.BufferedImage;
 public class DetectFastHessianApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-	static String fileName = "evaluation/data/sunflowers.png";
+//	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
 //	static String fileName = "evaluation/data/indoors01.jpg";
 //	static String fileName = "evaluation/data/shapes01.png";
+//	static String fileName = "evaluation/data/scale/mountain_4p2mm.jpg";
+	static String fileName = "evaluation/data/scale/mountain_7p1mm.jpg";
+//	static String fileName = "evaluation/data/scale/mountain_19p9mm.jpg";
 
-	static int NUM_FEATURES = 50;
+	static int NUM_FEATURES = -1;
 
 	private static <T extends ImageBase> void doStuff( Class<T> imageType , BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
@@ -65,7 +67,7 @@ public class DetectFastHessianApp {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
 		doStuff(ImageFloat32.class,input);
-		doStuff(ImageUInt8.class,input);
+//		doStuff(ImageUInt8.class,input);
 
 		System.out.println("Done");
 	}

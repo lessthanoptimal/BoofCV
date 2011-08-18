@@ -126,6 +126,7 @@ public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase> 
 			if( localSpace[spaceIndex] == null ) {
 				localSpace[spaceIndex] = (T)image.clone();
 			} else {
+				localSpace[spaceIndex].reshape(image.width,image.height);
 				localSpace[spaceIndex].setTo(image);
 			}
 

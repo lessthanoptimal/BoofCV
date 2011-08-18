@@ -18,6 +18,7 @@ package gecv.alg.detect.interest;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
+import gecv.alg.detect.intensity.IntegralImageFeatureIntensity;
 import gecv.alg.detect.intensity.impl.ImplIntegralImageFeatureIntensity;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.transform.ii.IntegralImageOps;

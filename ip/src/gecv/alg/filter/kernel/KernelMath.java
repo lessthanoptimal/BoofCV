@@ -219,11 +219,20 @@ public class KernelMath {
 		return min;
 	}
 
-	public static boolean isEquals( float expected[] , float found[] , int size , float tol ) {
+	public static boolean isEqualsFrac( float expected[] , float found[] , int size , float fracTol , float zero ) {
 		for( int i = 0; i < size; i++ ) {
 			float norm = Math.max(Math.abs(expected[i]),Math.abs(found[i]));
-			if( norm < 1.0 ) norm = 1.0f;
+			if( norm < zero ) continue;
 			float diff = Math.abs(expected[i] - found[i])/norm;
+			if( diff > fracTol )
+				return false;
+		}
+		return true;
+	}
+
+	public static boolean isEquals( float expected[] , float found[] , int size , float tol ) {
+		for( int i = 0; i < size; i++ ) {
+			float diff = Math.abs(expected[i] - found[i]);
 			if( diff > tol )
 				return false;
 		}

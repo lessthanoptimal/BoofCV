@@ -14,10 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.interest.benchmark;
+package gecv.alg.filter.basic.impl;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkInterestStability_Intensity {
+public class TestImplGrayImageOps {
+	@Test
+	public void stuff() {
+		fail("implement");
+	}
 }

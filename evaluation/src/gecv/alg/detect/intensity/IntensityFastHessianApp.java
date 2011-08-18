@@ -16,7 +16,6 @@
 
 package gecv.alg.detect.intensity;
 
-import gecv.alg.detect.interest.IntegralImageFeatureIntensity;
 import gecv.alg.misc.PixelMath;
 import gecv.alg.transform.ii.IntegralImageOps;
 import gecv.core.image.ConvertBufferedImage;
