@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.interest;
+package gecv.alg.detect.intensity;
 
 import gecv.alg.detect.intensity.impl.ImplIntegralImageFeatureIntensity;
 import gecv.struct.image.ImageFloat32;

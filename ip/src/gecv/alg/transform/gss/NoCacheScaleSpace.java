@@ -87,6 +87,9 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 		if( scaledImage == null ) {
 			scaledImage = inputGen.createInstance(input.getWidth(),input.getHeight());
 			workImage = inputGen.createInstance(input.getWidth(),input.getHeight());
+		} else if( scaledImage.width != input.width || scaledImage.height != input.height ) {
+			scaledImage.reshape(input.width,input.height);
+			workImage.reshape(input.width,input.height);
 		}
 	}
 

@@ -19,5 +19,5 @@ package gecv.alg.detect.interest.benchmark;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkInterestStability_Rotation {
+public class BenchmarkDetectStability_Rotation {
 }

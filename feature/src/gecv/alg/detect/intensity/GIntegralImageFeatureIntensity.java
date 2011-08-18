@@ -14,9 +14,8 @@
  *    limitations under the License.
  */
 
-package gecv.abst.detect.interest;
+package gecv.alg.detect.intensity;
 
-import gecv.alg.detect.interest.IntegralImageFeatureIntensity;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt32;
@@ -25,7 +24,7 @@ import gecv.struct.image.ImageSInt32;
 /**
  * @author Peter Abeles
  */
-public class GeneralizedIntegralImageFeatureIntensity {
+public class GIntegralImageFeatureIntensity {
 
 	/**
 	 * Computes an approximation to the Hessian's determinant.

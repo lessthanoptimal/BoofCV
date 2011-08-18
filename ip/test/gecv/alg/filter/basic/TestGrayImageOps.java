@@ -38,7 +38,7 @@ public class TestGrayImageOps {
 		ImageUInt8 input = new ImageUInt8(width, height);
 		ImageTestingOps.randomize(input, rand, 0, 100);
 
-		ImageUInt8 output = GrayImageOps.invert(input, null);
+		ImageUInt8 output = GrayImageOps.invert(input, 255, null);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -52,7 +52,7 @@ public class TestGrayImageOps {
 		ImageUInt8 input = new ImageUInt8(width, height);
 		ImageTestingOps.fill(input, 23);
 
-		ImageUInt8 output = GrayImageOps.brighten(input, 10, null);
+		ImageUInt8 output = GrayImageOps.brighten(input, 10, 255,null);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -61,12 +61,12 @@ public class TestGrayImageOps {
 		}
 
 		// check to see how well it sets the ceiling
-		output = GrayImageOps.brighten(output, 230, null);
+		output = GrayImageOps.brighten(output, 230, 255,null);
 		assertEquals(255, output.get(5, 6));
 
 		// check it flooring to zero
 		ImageTestingOps.fill(input, 23);
-		output = GrayImageOps.brighten(input, -50, null);
+		output = GrayImageOps.brighten(input, -50, 255,null);
 		assertEquals(0, output.get(5, 6));
 	}
 
@@ -75,7 +75,7 @@ public class TestGrayImageOps {
 		ImageUInt8 input = new ImageUInt8(width, height);
 		ImageTestingOps.fill(input, 23);
 
-		ImageUInt8 output = GrayImageOps.stretch(input, 2.5, 10, null);
+		ImageUInt8 output = GrayImageOps.stretch(input, 2.5, 10, 255,null);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -84,12 +84,12 @@ public class TestGrayImageOps {
 		}
 
 		// check to see how well it sets the ceiling
-		output = GrayImageOps.stretch(output, 4, 10, null);
+		output = GrayImageOps.stretch(output, 4, 10, 255,null);
 		assertEquals(255, output.get(5, 6));
 
 		// check it flooring to zero
 		ImageTestingOps.fill(input, 23);
-		output = GrayImageOps.stretch(input, -1, 2, null);
+		output = GrayImageOps.stretch(input, -1, 2, 255,null);
 		assertEquals(0, output.get(5, 6));
 	}
 }

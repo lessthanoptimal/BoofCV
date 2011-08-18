@@ -17,6 +17,8 @@
 package gecv.alg.filter.basic;
 
 import gecv.alg.InputSanityCheck;
+import gecv.alg.filter.basic.impl.ImplGrayImageOps;
+import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageUInt8;
 
 /**
@@ -29,21 +31,17 @@ public class GrayImageOps {
 	/**
 	 * <p>
 	 * Inverts the image's intensity:<br>
-	 * O<sub>x,y</sub> = 255 - I<sub>x,y</sub><br>
+	 * O<sub>x,y</sub> = max - I<sub>x,y</sub><br>
 	 * </p>
 	 *
 	 * @param input  Input image. Not modified.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 invert(ImageUInt8 input, ImageUInt8 output) {
+	public static ImageUInt8 invert(ImageUInt8 input, int max , ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		for (int y = 0; y < input.height; y++) {
-			for (int x = 0; x < input.width; x++) {
-				output.set(x, y, (byte) (255 - input.get(x, y)));
-			}
-		}
+		ImplGrayImageOps.invert(input,max,output);
 
 		return output;
 	}
@@ -54,7 +52,7 @@ public class GrayImageOps {
 	 * O<sub>x,y</sub> = I<sub>x,y</sub> + beta<br>
 	 * </p>
 	 * <p>
-	 * The image's intensity is clamped at 0 and 255;
+	 * The image's intensity is clamped at 0 and max;
 	 * </p>
 	 *
 	 * @param input  Input image. Not modified.
@@ -62,17 +60,10 @@ public class GrayImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 brighten(ImageUInt8 input, int beta, ImageUInt8 output) {
+	public static ImageUInt8 brighten(ImageUInt8 input, int beta, int max , ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		for (int y = 0; y < input.height; y++) {
-			for (int x = 0; x < input.width; x++) {
-				int val = input.get(x, y) + beta;
-				if (val > 255) val = 255;
-				if (val < 0) val = 0;
-				output.set(x, y, (byte) val);
-			}
-		}
+		ImplGrayImageOps.brighten(input,beta,max,output);
 
 		return output;
 	}
@@ -83,24 +74,78 @@ public class GrayImageOps {
 	 * O<sub>x,y</sub> = I<sub>x,y</sub>&gamma + beta<br>
 	 * </p>
 	 * <p>
-	 * The image's intensity is clamped at 0 and 255;
+	 * The image's intensity is clamped at 0 and max;
 	 * </p>
 	 *
 	 * @param input  Input image. Not modified.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 stretch(ImageUInt8 input, double gamma, int beta, ImageUInt8 output) {
+	public static ImageUInt8 stretch(ImageUInt8 input, double gamma, int beta, int max , ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		for (int y = 0; y < input.height; y++) {
-			for (int x = 0; x < input.width; x++) {
-				int val = (int) (input.get(x, y) * gamma + beta);
-				if (val > 255) val = 255;
-				if (val < 0) val = 0;
-				output.set(x, y, (byte) val);
-			}
-		}
+		ImplGrayImageOps.stretch(input,gamma,beta,max,output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Inverts the image's intensity:<br>
+	 * O<sub>x,y</sub> = max - I<sub>x,y</sub><br>
+	 * </p>
+	 *
+	 * @param input  Input image. Not modified.
+	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @return Output image.
+	 */
+	public static ImageFloat32 invert(ImageFloat32 input, float max , ImageFloat32 output) {
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		ImplGrayImageOps.invert(input,max,output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Brightens the image's intensity:<br>
+	 * O<sub>x,y</sub> = I<sub>x,y</sub> + beta<br>
+	 * </p>
+	 * <p>
+	 * The image's intensity is clamped at 0 and max;
+	 * </p>
+	 *
+	 * @param input  Input image. Not modified.
+	 * @param beta   How much the image is brightened by.
+	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @return Output image.
+	 */
+	public static ImageFloat32 brighten(ImageFloat32 input, float beta, float max , ImageFloat32 output) {
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		ImplGrayImageOps.brighten(input,beta,max,output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Stretches the image's intensity:<br>
+	 * O<sub>x,y</sub> = I<sub>x,y</sub>&gamma + beta<br>
+	 * </p>
+	 * <p>
+	 * The image's intensity is clamped at 0 and max;
+	 * </p>
+	 *
+	 * @param input  Input image. Not modified.
+	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @return Output image.
+	 */
+	public static ImageFloat32 stretch(ImageFloat32 input, double gamma, float beta, float max , ImageFloat32 output) {
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		ImplGrayImageOps.stretch(input,gamma,beta,max,output);
 
 		return output;
 	}

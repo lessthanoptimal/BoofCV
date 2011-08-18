@@ -53,7 +53,10 @@ public class WrapperMedianCornerIntensity<I extends ImageBase, D extends ImageBa
 		intensity.reshape(input.width,input.height);
 		if( medianImage == null ) {
 			medianImage = (I)input._createNew(input.width,input.height);
+		} else {
+			medianImage.reshape(input.width,input.height);
 		}
+		
 		medianFilter.process(input,medianImage);
 		try {
 			m.invoke(null,intensity,input,medianImage);

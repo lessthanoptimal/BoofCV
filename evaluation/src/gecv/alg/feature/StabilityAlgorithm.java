@@ -14,31 +14,28 @@
  *    limitations under the License.
  */
 
-package gecv.alg.detect.interest.benchmark;
-
-import gecv.abst.detect.interest.InterestPointDetector;
-import gecv.struct.image.ImageBase;
-
+package gecv.alg.feature;
 
 /**
+ * Contains the name and an instance of the algorithm being evaluated.
+ *
  * @author Peter Abeles
  */
-public class InterestMetrics<T extends ImageBase>
-{
-	public String name;
-	public InterestPointDetector<T> detector;
-	public Object metric;
+public class StabilityAlgorithm {
 
-	public InterestMetrics(String name, InterestPointDetector<T> detector) {
+	String name;
+	Object algorithm;
+
+	public StabilityAlgorithm(String name, Object algorithm) {
 		this.name = name;
-		this.detector = detector;
+		this.algorithm = algorithm;
 	}
 
-	public <T>T getMetric() {
-		return (T)metric;
+	public String getName() {
+		return name;
 	}
 
-	public void setMetric(Object metric) {
-		this.metric = metric;
+	public <T> T getAlgorithm() {
+		return (T)algorithm;
 	}
 }

@@ -64,18 +64,7 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 	@Override
 	public void detect(T input) {
 
-		if( !declaredDerivatives ) {
-			declaredDerivatives = true;
-			if( detector.getRequiresGradient() || detector.getRequiresHessian() ) {
-				derivX = derivativeGenerator.createInstance(input.width,input.height);
-				derivY = derivativeGenerator.createInstance(input.width,input.height);
-			}
-			if( detector.getRequiresHessian() ) {
-				derivXX = derivativeGenerator.createInstance(input.width,input.height);
-				derivYY = derivativeGenerator.createInstance(input.width,input.height);
-				derivXY = derivativeGenerator.createInstance(input.width,input.height);
-			}
-		}
+		initializeDerivatives(input);
 
 		if( detector.getRequiresGradient() || detector.getRequiresHessian() )
 			gradient.process(input,derivX,derivY);
@@ -90,6 +79,30 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 		for( int i = 0; i < corners.num; i++ ) {
 			Point2D_I16 p = corners.get(i);
 			foundPoints.add( new Point2D_I32(p.x,p.y));
+		}
+	}
+
+	private void initializeDerivatives(T input) {
+		if( !declaredDerivatives ) {
+			declaredDerivatives = true;
+			if( detector.getRequiresGradient() || detector.getRequiresHessian() ) {
+				derivX = derivativeGenerator.createInstance(input.width,input.height);
+				derivY = derivativeGenerator.createInstance(input.width,input.height);
+			}
+			if( detector.getRequiresHessian() ) {
+				derivXX = derivativeGenerator.createInstance(input.width,input.height);
+				derivYY = derivativeGenerator.createInstance(input.width,input.height);
+				derivXY = derivativeGenerator.createInstance(input.width,input.height);
+			}
+		} else if( derivX != null && (input.width != derivX.width || input.height != input.height ) ) {
+			// reshape derivatives if the input image has changed size
+			derivX.reshape(input.width,input.height);
+			derivY.reshape(input.width,input.height);
+			if( detector.getRequiresHessian() ) {
+				derivXX.reshape(input.width,input.height);
+				derivYY.reshape(input.width,input.height);
+				derivXY.reshape(input.width,input.height);
+			}
 		}
 	}
 

@@ -76,7 +76,10 @@ public class FastCorner12_F32 implements FastCornerIntensity<ImageFloat32> {
 		if( featureIntensity == null ) {
 			featureIntensity = new ImageFloat32(img.getWidth(), img.getHeight());
 			candidates = new QueueCorner(img.getWidth());
+		} else if( featureIntensity.width != img.width || featureIntensity.height != img.height ) {
+			featureIntensity.reshape(img.width,img.height);
 		}
+
 		candidates.reset();
 		final float[] data = img.data;
 

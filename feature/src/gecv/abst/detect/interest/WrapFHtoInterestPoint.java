@@ -17,10 +17,9 @@
 package gecv.abst.detect.interest;
 
 import gecv.alg.detect.interest.FastHessianFeatureDetector;
-import gecv.alg.transform.ii.IntegralImageOps;
+import gecv.alg.transform.ii.GIntegralImageOps;
 import gecv.struct.feature.ScalePoint;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I32;
 
 import java.util.List;
@@ -31,19 +30,23 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapFHtoInterestPoint<T extends ImageBase> implements InterestPointDetector<T>{
+public class WrapFHtoInterestPoint<T extends ImageBase> implements InterestPointDetector<T> {
 
-	FastHessianFeatureDetector detector;
+	FastHessianFeatureDetector<T> detector;
 	List<ScalePoint> location;
-	ImageFloat32 integral;
+	T integral;
 
-	public WrapFHtoInterestPoint(FastHessianFeatureDetector detector) {
+	public WrapFHtoInterestPoint(FastHessianFeatureDetector<T> detector) {
 		this.detector = detector;
 	}
 
 	@Override
 	public void detect(T input) {
-		integral = IntegralImageOps.transform((ImageFloat32)input,integral);
+		if( integral != null ) {
+			integral.reshape(input.width,input.height);
+		}
+
+		integral = GIntegralImageOps.transform(input,integral);
 
 		detector.detect(integral);
 

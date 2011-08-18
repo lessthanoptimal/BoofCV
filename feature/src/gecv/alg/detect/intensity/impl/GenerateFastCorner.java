@@ -72,9 +72,9 @@ public class GenerateFastCorner {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.detect.corner.impl;\n" +
+		out.print("package gecv.alg.detect.intensity.impl;\n" +
 				"\n" +
-				"import gecv.alg.detect.corner.FastCornerIntensity;\n" +
+				"import gecv.alg.detect.intensity.FastCornerIntensity;\n" +
 				"import gecv.misc.DiscretizedCircle;\n" +
 				"import gecv.struct.QueueCorner;\n" +
 				"import gecv.struct.image.ImageFloat32;\n");
@@ -138,7 +138,10 @@ public class GenerateFastCorner {
 				"\t\tif( featureIntensity == null ) {\n" +
 				"\t\t\tfeatureIntensity = new ImageFloat32(img.getWidth(), img.getHeight());\n" +
 				"\t\t\tcandidates = new QueueCorner(img.getWidth());\n" +
-				"\t\t}\n"+
+				"\t\t} else if( featureIntensity.width != img.width || featureIntensity.height != img.height ) {\n" +
+				"\t\t\tfeatureIntensity.reshape(img.width,img.height);\n" +
+				"\t\t}\n" +
+				"\n" +
 				"\t\tcandidates.reset();\n" +
 				"\t\tfinal "+dataInput+"[] data = img.data;\n" +
 				"\n" +

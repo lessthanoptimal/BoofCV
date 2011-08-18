@@ -32,7 +32,6 @@ import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
 
 /**
  * Factory for creating/wrapping interest points detectors.
@@ -107,13 +106,10 @@ public class FactoryInterestPoint {
 	InterestPointDetector<T> fromFastHessian( int maxFeaturesPerScale  ,
 											  int initialSize ,
 											  int numberScalesPerOctave ,
-											  int numberOfOctaves,
-											  Class<T> inputType ) {
-		if( inputType != ImageFloat32.class )
-			throw new IllegalArgumentException("Image type not supported yet");
-
+											  int numberOfOctaves )
+	{
 		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(2,1,5,false,false,false);
-		FastHessianFeatureDetector feature = new FastHessianFeatureDetector(extractor,maxFeaturesPerScale,
+		FastHessianFeatureDetector<T> feature = new FastHessianFeatureDetector<T>(extractor,maxFeaturesPerScale,
 				initialSize,numberScalesPerOctave,numberOfOctaves);
 
 		return new WrapFHtoInterestPoint<T>(feature);

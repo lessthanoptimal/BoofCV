@@ -17,8 +17,8 @@
 package gecv.alg.detect.interest;
 
 import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.abst.detect.interest.GeneralizedIntegralImageFeatureIntensity;
 import gecv.alg.detect.extract.SelectNBestFeatures;
+import gecv.alg.detect.intensity.GIntegralImageFeatureIntensity;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.struct.QueueCorner;
@@ -190,7 +190,7 @@ public class FastHessianFeatureDetector<T extends ImageBase> {
 
 		// compute feature intensity in each level
 		for( int i = 0; i < featureSize.length; i++ ) {
-			GeneralizedIntegralImageFeatureIntensity.hessian(integral,skip,featureSize[i],intensity[spaceIndex]);
+			GIntegralImageFeatureIntensity.hessian(integral,skip,featureSize[i],intensity[spaceIndex]);
 
 			spaceIndex++;
 			if( spaceIndex >= 3 )
