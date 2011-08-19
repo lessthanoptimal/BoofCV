@@ -20,9 +20,9 @@ import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
 import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.alg.feature.detect.extract.FastNonMaxExtractor;
-import gecv.alg.feature.detect.intensity.FactoryCornerIntensity;
+import gecv.alg.feature.detect.intensity.FactoryPointIntensityAlg;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.filter.derivative.HessianThree;
 import gecv.gui.image.ImagePanel;
@@ -132,10 +132,10 @@ public class VideoDetectCornersIntensity_F32 extends ProcessImageSequence<ImageF
 		int width = image.width;
 		int height = image.height;
 
-		GeneralFeatureIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKlt( ImageFloat32.class , radius));
-//		GeneralFeatureIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperKitRosCornerIntensity<ImageFloat32,ImageFloat32>(FactoryCornerIntensity.createKitRos_F32(width, height));
+		GeneralFeatureIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(FactoryPointIntensityAlg.createKlt( ImageFloat32.class , radius));
+//		GeneralFeatureIntensity<ImageFloat32,ImageFloat32> intensity = new WrapperKitRosCornerIntensity<ImageFloat32,ImageFloat32>(FactoryPointIntensityAlg.createKitRos_F32(width, height));
 //		GeneralFeatureIntensity<ImageUInt8, ImageSInt16> intensity =
-//				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryCornerIntensity.createFast12_I8(width, height, 8 , 12));
+//				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryPointIntensityAlg.createFast12_I8(width, height, 8 , 12));
 
 		FeatureExtractor extractor = new WrapperNonMax(new FastNonMaxExtractor(radius + 10, radius + 10, 1f));
 //		FeatureExtractor extractor = new WrapperNonMax( new NonMaxExtractorNaive(radius+10,10f));

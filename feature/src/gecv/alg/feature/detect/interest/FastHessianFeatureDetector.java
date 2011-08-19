@@ -168,7 +168,7 @@ public class FastHessianFeatureDetector<T extends ImageBase> {
 			sizeStep += sizeStep;
 		}
 
-		// todo save previously computed sizes for reuse in higher octaves
+		// todo save previously computed sizes for reuse in higher octaves and reuse it
 	}
 
 	/**

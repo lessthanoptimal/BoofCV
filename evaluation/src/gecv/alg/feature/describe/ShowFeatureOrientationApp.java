@@ -16,9 +16,9 @@
 
 package gecv.alg.feature.describe;
 
-import gecv.abst.detect.point.FactoryCornerDetector;
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.derivative.AnyImageDerivative;
+import gecv.alg.feature.detect.interest.FactoryCornerDetector;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.inst.FactoryImageGenerator;

@@ -21,11 +21,10 @@ import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
 import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
 import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.abst.filter.derivative.FactoryDerivativeSparse;
-import gecv.alg.feature.detect.intensity.FactoryCornerIntensity;
+import gecv.alg.feature.detect.intensity.FactoryPointIntensityAlg;
 import gecv.alg.feature.detect.intensity.GradientCornerIntensity;
 import gecv.alg.feature.detect.intensity.HessianBlobIntensity;
 import gecv.alg.transform.gss.UtilScaleSpace;
@@ -55,7 +54,7 @@ public class FactoryInterestPointAlgs {
 												 Class<D> derivType)
 	{
 		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,featureRadius*2,false,false,false);
-		GradientCornerIntensity<D> harris = FactoryCornerIntensity.createHarris(derivType,featureRadius,0.04f);
+		GradientCornerIntensity<D> harris = FactoryPointIntensityAlg.createHarris(derivType,featureRadius,0.04f);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
@@ -134,7 +133,7 @@ public class FactoryInterestPointAlgs {
 									   Class<D> derivType)
 	{
 		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,featureRadius*2,false,false,false);
-		GradientCornerIntensity<D> harris = FactoryCornerIntensity.createHarris(derivType,featureRadius,0.04f);
+		GradientCornerIntensity<D> harris = FactoryPointIntensityAlg.createHarris(derivType,featureRadius,0.04f);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
@@ -189,7 +188,7 @@ public class FactoryInterestPointAlgs {
 													 Class<D> derivType)
 	{
 		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,featureRadius*2,false,false,false);
-		GradientCornerIntensity<D> harris = FactoryCornerIntensity.createHarris(derivType,featureRadius,0.04f);
+		GradientCornerIntensity<D> harris = FactoryPointIntensityAlg.createHarris(derivType,featureRadius,0.04f);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
@@ -217,7 +216,7 @@ public class FactoryInterestPointAlgs {
 											 Class<D> derivType)
 		{
 		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,featureRadius*2,false,false,false);
-		GradientCornerIntensity<D> harris = FactoryCornerIntensity.createHarris(derivType,featureRadius,0.04f);
+		GradientCornerIntensity<D> harris = FactoryPointIntensityAlg.createHarris(derivType,featureRadius,0.04f);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 

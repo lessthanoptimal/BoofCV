@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-package gecv.abst.detect.point;
+package gecv.alg.feature.detect.interest;
 
 import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.intensity.*;
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.MedianImageFilter;
-import gecv.alg.feature.detect.intensity.FactoryCornerIntensity;
+import gecv.alg.feature.detect.intensity.FactoryPointIntensityAlg;
 import gecv.alg.feature.detect.intensity.FastCornerIntensity;
 import gecv.alg.feature.detect.intensity.GradientCornerIntensity;
 import gecv.struct.image.ImageBase;
@@ -44,7 +44,7 @@ public class FactoryCornerDetector {
 	{
 		// see NOTE in comments
 		int r = featureRadius*2;
-		GradientCornerIntensity<D> cornerIntensity = FactoryCornerIntensity.createHarris(derivType,featureRadius,0.04f);
+		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createHarris(derivType,featureRadius,0.04f);
 		return createGeneral(cornerIntensity,featureRadius,r,cornerThreshold,maxFeatures);
 	}
 
@@ -53,7 +53,7 @@ public class FactoryCornerDetector {
 	{
 		// see NOTE in comments
 		int r = featureRadius*2;
-		GradientCornerIntensity<D> cornerIntensity = FactoryCornerIntensity.createKlt(derivType,featureRadius);
+		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createKlt(derivType,featureRadius);
 		return createGeneral(cornerIntensity,featureRadius,r,cornerThreshold,maxFeatures);
 	}
 
@@ -67,7 +67,7 @@ public class FactoryCornerDetector {
 	public static <T extends ImageBase, D extends ImageBase>
 	GeneralFeatureDetector<T,D> createFast( int featureRadius , int pixelTol , int maxFeatures , Class<T> imageType)
 	{
-		FastCornerIntensity<T> alg = FactoryCornerIntensity.createFast12(imageType,pixelTol,11);
+		FastCornerIntensity<T> alg = FactoryPointIntensityAlg.createFast12(imageType,pixelTol,11);
 		GeneralFeatureIntensity<T,D> intensity = new WrapperFastCornerIntensity<T,D>(alg);
 		return createGeneral(intensity,featureRadius,0,pixelTol,maxFeatures);
 	}

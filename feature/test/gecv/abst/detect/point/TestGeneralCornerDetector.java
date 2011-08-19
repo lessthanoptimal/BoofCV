@@ -18,6 +18,7 @@ package gecv.abst.detect.point;
 
 import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import org.junit.Test;

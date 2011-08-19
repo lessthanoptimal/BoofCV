@@ -16,7 +16,6 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
 import gecv.struct.feature.ScalePoint;
 import gecv.struct.gss.GaussianScaleSpace;

@@ -16,7 +16,6 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.struct.QueueCorner;

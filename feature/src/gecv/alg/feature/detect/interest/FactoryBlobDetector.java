@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.abst.detect.point;
+package gecv.alg.feature.detect.interest;
 
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
 import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;

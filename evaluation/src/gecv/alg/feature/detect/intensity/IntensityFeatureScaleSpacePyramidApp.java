@@ -18,28 +18,36 @@ package gecv.alg.feature.detect.intensity;
 
 import gecv.abst.detect.intensity.*;
 import gecv.abst.filter.blur.FactoryBlurFilter;
+import gecv.abst.filter.derivative.AnyImageDerivative;
+import gecv.alg.distort.DistortImageOps;
+import gecv.alg.interpolate.FactoryInterpolation;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.interpolate.TypeInterpolate;
 import gecv.alg.misc.PixelMath;
-import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
+import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
+import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.SelectAlgorithmPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.gss.GaussianScaleSpace;
+import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.pyramid.ImagePyramid;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Displays the intensity of detected features across scalespace
+ * Displays the intensity in each layer of a {@link ScaleSpacePyramid}.
  *
  * @author Peter Abeles
  */
-public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase>
+public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends ImageBase>
 		extends SelectAlgorithmPanel {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
@@ -52,13 +60,15 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 
 	ListDisplayPanel gui = new ListDisplayPanel();
 
-	GaussianScaleSpace<T,D> ss;
+	ImagePyramid<T> pyramid;
 
 	BufferedImage input;
 	T workImage;
+	ImageFloat32 scaledIntensity;
 	Class<T> imageType;
+	AnyImageDerivative<T,D> anyDerivative;
 
-	public IntensityFeatureScaleSpaceApp( Class<T> imageType , Class<D> derivType ) {
+	public IntensityFeatureScaleSpacePyramidApp( Class<T> imageType , Class<D> derivType ) {
 		this.imageType = imageType;
 
 		addAlgorithm("Hessian Det", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
@@ -71,13 +81,16 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 
 		add(gui, BorderLayout.CENTER);
 
-		ss = FactoryGaussianScaleSpace.nocache(imageType);
-
 		double scales[] = new double[31];
 		for( int i = 0; i < scales.length ; i++ ) {
 			scales[i] =  Math.exp(i*0.15);
 		}
-		ss.setScales(scales);
+
+		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		PyramidUpdateGaussianScale<T> updater = new PyramidUpdateGaussianScale<T>(interp);
+		pyramid = new ScaleSpacePyramid<T>(updater,scales);
+
+		anyDerivative = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 	}
 
 	@Override
@@ -93,25 +106,30 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 		gui.addImage(b,"Gray Image");
 
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
-				"Computing Scale Space Response",
-				"", 0, ss.getTotalScales());
+				"Computing Scale Space Pyramid Response",
+				"", 0, pyramid.getNumLayers());
 
 
-		for( int i = 0; i < ss.getTotalScales() && !progressMonitor.isCanceled(); i++ ) {
-			ss.setActiveScale(i);
-			double scale = ss.getCurrentScale();
-			T scaledImage = ss.getScaledImage();
 
-			D derivX = ss.getDerivative(true);
-			D derivY = ss.getDerivative(false);
-			D derivXX = ss.getDerivative(true,true);
-			D derivYY = ss.getDerivative(false,false);
-			D derivXY = ss.getDerivative(true,false);
+		for( int i = 0; i < pyramid.getNumLayers() && !progressMonitor.isCanceled(); i++ ) {
+			double scale = pyramid.getScale(i);
+			T scaledImage = pyramid.getLayer(i);
+
+			anyDerivative.setInput(scaledImage);
+			D derivX = anyDerivative.getDerivative(true);
+			D derivY = anyDerivative.getDerivative(false);
+			D derivXX = anyDerivative.getDerivative(true,true);
+			D derivYY = anyDerivative.getDerivative(false,false);
+			D derivXY = anyDerivative.getDerivative(true,false);
 
 			intensity.process(scaledImage,derivX,derivY,derivXX,derivYY,derivXY);
 
 			ImageFloat32 featureImg = intensity.getIntensity();
-			b = VisualizeImageData.colorizeSign(featureImg,null, PixelMath.maxAbs(featureImg));
+
+			// scale it up to full resolution
+			DistortImageOps.scale(featureImg,scaledIntensity, TypeInterpolate.NEAREST_NEIGHBOR);
+			// visualize the rescaled intensity
+			b = VisualizeImageData.colorizeSign(scaledIntensity,null, PixelMath.maxAbs(scaledIntensity));
 			gui.addImage(b,String.format("Scale %6.2f",scale));
 
 			final int progressStatus = i+1;
@@ -128,22 +146,23 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 		setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
-		ss.setImage(workImage);
+		scaledIntensity = new ImageFloat32(workImage.width,workImage.height);
+		pyramid.update(workImage);
 		setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
 		refreshAlgorithm();
 
-		ShowImages.showWindow(this,"Feature Scale Space Intensity: "+imageType.getSimpleName());
+		ShowImages.showWindow(this,"Feature Scale Space Pyramid Intensity: "+imageType.getSimpleName());
 	}
 
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
-		IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32> app =
-				new IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+		IntensityFeatureScaleSpacePyramidApp<ImageFloat32,ImageFloat32> app =
+				new IntensityFeatureScaleSpacePyramidApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 		app.setImage(input);
 
-//		IntensityFeatureScaleSpaceApp<ImageUInt8, ImageSInt16> app2 =
-//				new IntensityFeatureScaleSpaceApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
+//		IntensityFeatureScaleSpacePyramidApp<ImageUInt8, ImageSInt16> app2 =
+//				new IntensityFeatureScaleSpacePyramidApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 //		app2.setImage(input);
 	}
 }

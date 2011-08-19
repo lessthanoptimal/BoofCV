@@ -25,7 +25,6 @@ import gecv.struct.image.ImageSInt32;
  * @author Peter Abeles
  */
 public class GIntegralImageFeatureIntensity {
-
 	/**
 	 * Computes an approximation to the Hessian's determinant.
 	 *
