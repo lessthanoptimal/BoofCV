@@ -36,13 +36,13 @@ public class TestFactoryWaveletHaar extends CommonFactoryWavelet {
 	 */
 	@Test
 	public void transform_F32() {
-		WaveletDescription<WlCoef_F32> desc = FactoryWaveletHaar.generate_F32();
+		WaveletDescription<WlCoef_F32> desc = FactoryWaveletHaar.generate(false,32);
 		checkEncodeDecode_F32(desc);
 	}
 
 	@Test
 	public void checkProperties_F32() {
-		WaveletDescription<WlCoef_F32> desc = FactoryWaveletHaar.generate_F32();
+		WaveletDescription<WlCoef_F32> desc = FactoryWaveletHaar.generate(false,32);
 		WlCoef_F32 coef = desc.getForward();
 
 		double energyScaling = UtilWavelet.computeEnergy(coef.scaling);
@@ -58,7 +58,7 @@ public class TestFactoryWaveletHaar extends CommonFactoryWavelet {
 
 	@Test
 	public void checkProperties_I32() {
-		WaveletDescription<WlCoef_I32> desc = FactoryWaveletHaar.generate_I32();
+		WaveletDescription<WlCoef_I32> desc = FactoryWaveletHaar.generate(true,32);
 		WlCoef_I32 coef = desc.getForward();
 
 		double energyScaling = UtilWavelet.computeEnergy(coef.scaling,coef.denominatorScaling);

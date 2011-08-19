@@ -27,28 +27,35 @@ import gecv.struct.wavelet.*;
  */
 public class FactoryWaveletHaar {
 
-	public static WaveletDescription<WlCoef_F32> generate_F32() {
-		WlCoef_F32 forward = new WlCoef_F32();
+	public static <C extends WlCoef> 
+	WaveletDescription<C> generate( boolean isInteger , int imageBits )
+	{
+		if( isInteger ) {
+			if( imageBits <= 32) {
+				WlCoef_I32 forward = new WlCoef_I32();
 
-		forward.scaling = new float[]{(float)(1.0/Math.sqrt(2)),(float)(1.0/Math.sqrt(2))};
-		forward.wavelet = new float[]{forward.scaling[0],-forward.scaling[0]};
+				forward.scaling = new int[]{1,1};
+				forward.wavelet = new int[]{forward.scaling[0],-forward.scaling[0]};
+				forward.denominatorScaling = 1;
+				forward.denominatorWavelet = 1;
 
-		WlBorderCoef<WlCoef_F32> inverse = new WlBorderCoefStandard<WlCoef_F32>(forward);
+				WlBorderCoef<WlCoef_I32> inverse = new WlBorderCoefStandard<WlCoef_I32>(generateInv_I32());
 
-		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Extend(),forward,inverse);
-	}
+				return new WaveletDescription(new BorderIndex1D_Extend(),forward,inverse);
+			}
+		} else {
+			if( imageBits == 32 ) {
+				WlCoef_F32 forward = new WlCoef_F32();
 
-	public static WaveletDescription<WlCoef_I32> generate_I32() {
-		WlCoef_I32 forward = new WlCoef_I32();
+				forward.scaling = new float[]{(float)(1.0/Math.sqrt(2)),(float)(1.0/Math.sqrt(2))};
+				forward.wavelet = new float[]{forward.scaling[0],-forward.scaling[0]};
 
-		forward.scaling = new int[]{1,1};
-		forward.wavelet = new int[]{forward.scaling[0],-forward.scaling[0]};
-		forward.denominatorScaling = 1;
-		forward.denominatorWavelet = 1;
+				WlBorderCoef<WlCoef_F32> inverse = new WlBorderCoefStandard<WlCoef_F32>(forward);
 
-		WlBorderCoef<WlCoef_I32> inverse = new WlBorderCoefStandard<WlCoef_I32>(generateInv_I32());
-
-		return new WaveletDescription<WlCoef_I32>(new BorderIndex1D_Extend(),forward,inverse);
+				return new WaveletDescription(new BorderIndex1D_Extend(),forward,inverse);
+			}
+		}
+		return null;
 	}
 
 	/**

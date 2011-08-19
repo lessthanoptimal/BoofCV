@@ -26,7 +26,6 @@ SFM
 #  * corners
    * line
 #  * blobs
-   * Template Matching
    * SURF
    * Affine invariant
  - Color

@@ -103,7 +103,7 @@ public class DenoiseAccuracyStudyApp {
 
 		ret.addAll( addSpacial() );
 		for( int numLevels = minLevel; numLevels <= maxLevel; numLevels++ ) {
-			ret.addAll( createWaveletFilters(FactoryWaveletHaar.generate_F32(),numLevels,"Haar"));
+			ret.addAll( createWaveletFilters(FactoryWaveletHaar.<WlCoef_F32>generate(false,32),numLevels,"Haar"));
 			ret.addAll( createWaveletFilters(FactoryWaveletDaub.daubJ_F32(4),numLevels,"Daub-4"));
 			ret.addAll( createWaveletFilters(FactoryWaveletCoiflet.generate_F32(6),numLevels,"Coiflet-6"));
 		}
