@@ -1,0 +1,67 @@
+/*
+ * Copyright 2011 Peter Abeles
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package gecv.alg.feature.detect.intensity.impl;
+
+import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageUInt8;
+
+
+/**
+ * Implementations of {@link gecv.alg.feature.detect.intensity.MedianCornerIntensity}.
+ *
+ * @author Peter Abeles
+ */
+public class ImplMedianCornerIntensity {
+
+	public static void process(ImageFloat32 intensity , ImageFloat32 originalImage, ImageFloat32 medianImage)
+	{
+		final int width = originalImage.width;
+		final int height = originalImage.height;
+
+		for( int y = 0; y < height; y++ ) {
+
+			int indexOrig = originalImage.startIndex + originalImage.stride*y;
+			int indexMed = medianImage.startIndex + medianImage.stride*y;
+			int indexInten = intensity.startIndex + intensity.stride*y;
+
+			for( int x = 0; x < width; x++ ) {
+				float val = originalImage.data[indexOrig++] - medianImage.data[indexMed++];
+
+				intensity.data[indexInten++] = val < 0 ? -val : val;
+			}
+		}
+	}
+
+	public static void process( ImageFloat32 intensity , ImageUInt8 originalImage, ImageUInt8 medianImage)
+	{
+		final int width = originalImage.width;
+		final int height = originalImage.height;
+
+		for( int y = 0; y < height; y++ ) {
+
+			int indexOrig = originalImage.startIndex + originalImage.stride*y;
+			int indexMed = medianImage.startIndex + medianImage.stride*y;
+			int indexInten = intensity.startIndex + intensity.stride*y;
+
+			for( int x = 0; x < width; x++ ) {
+				int val = (originalImage.data[indexOrig++] & 0xFF) - (medianImage.data[indexMed++] & 0xFF);
+
+				intensity.data[indexInten++] = val < 0 ? -val : val;
+			}
+		}
+	}
+}

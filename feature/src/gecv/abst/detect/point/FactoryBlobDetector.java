@@ -18,7 +18,7 @@ package gecv.abst.detect.point;
 
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
 import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;
-import gecv.alg.detect.intensity.HessianBlobIntensity;
+import gecv.alg.feature.detect.intensity.HessianBlobIntensity;
 import gecv.struct.image.ImageBase;
 
 
@@ -30,7 +30,7 @@ import gecv.struct.image.ImageBase;
 public class FactoryBlobDetector {
 
 	public static <T extends ImageBase, D extends ImageBase>
-	GeneralFeatureDetector<T,D> createLaplace( int featureRadius , int pixelTol , int maxFeatures ,
+	GeneralFeatureDetector<T,D> createLaplace( int featureRadius , float pixelTol , int maxFeatures ,
 											   Class<D> derivType , HessianBlobIntensity.Type type )
 	{
 		GeneralFeatureIntensity<T,D> intensity = new WrapperLaplacianBlobIntensity<T,D>(type,derivType);

@@ -26,7 +26,7 @@ import java.util.Random;
 
 
 /**
- * Checks for stability against adding independent noise to each pixel.  Gausian noise is added.
+ * Checks for stability against adding independent noise to each pixel.  Gaussian noise is added.
  *
  * @author Peter Abeles
  */
@@ -61,7 +61,7 @@ public abstract class FeatureStabilityNoise<T extends ImageBase>
 			noisy.setTo(image);
 			GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma[i]);
 
-			double[]metrics = evaluator.evaluateImage(alg,noisy);
+			double[]metrics = evaluator.evaluateImage(alg,noisy, null);
 
 			for( int j = 0; j < results.size(); j++ ) {
 				results.get(j).observed[i] = metrics[j];

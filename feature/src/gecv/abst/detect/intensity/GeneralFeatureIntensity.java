@@ -24,7 +24,7 @@ import gecv.struct.image.ImageFloat32;
  * Extracts corners from a the image and or its gradient.  This is a generalized interface and lacks some of the functionality
  * of more specialized classes.
  *
- * @see gecv.alg.detect.intensity
+ * @see gecv.alg.feature.detect.intensity
  * @see gecv.abst.detect.extract
  *
  * @author Peter Abeles

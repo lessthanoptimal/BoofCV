@@ -16,12 +16,12 @@
 
 package gecv.abst.detect.extract;
 
-import gecv.alg.detect.extract.NonMaxCandidateExtractor;
+import gecv.alg.feature.detect.extract.NonMaxCandidateExtractor;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * Wrapper around the {@link gecv.alg.detect.extract.NonMaxCandidateExtractor} class.
+ * Wrapper around the {@link gecv.alg.feature.detect.extract.NonMaxCandidateExtractor} class.
  *
  * @author Peter Abeles
  */

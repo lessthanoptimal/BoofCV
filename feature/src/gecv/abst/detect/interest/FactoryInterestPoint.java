@@ -22,7 +22,7 @@ import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;
-import gecv.alg.detect.interest.*;
+import gecv.alg.feature.detect.interest.*;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.transform.gss.FactoryGaussianScaleSpace;

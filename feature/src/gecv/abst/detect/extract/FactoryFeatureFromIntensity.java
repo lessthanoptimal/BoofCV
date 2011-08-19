@@ -16,8 +16,8 @@
 
 package gecv.abst.detect.extract;
 
-import gecv.alg.detect.extract.FastNonMaxExtractor;
-import gecv.alg.detect.extract.NonMaxCandidateExtractor;
+import gecv.alg.feature.detect.extract.FastNonMaxExtractor;
+import gecv.alg.feature.detect.extract.NonMaxCandidateExtractor;
 
 /**
  * Given a list of requirements create a {@link FeatureExtractor} that meets

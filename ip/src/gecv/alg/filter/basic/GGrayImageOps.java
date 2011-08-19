@@ -18,6 +18,7 @@ package gecv.alg.filter.basic;
 
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;
 
 
@@ -29,11 +30,26 @@ import gecv.struct.image.ImageUInt8;
 @SuppressWarnings({"unchecked"})
 public class GGrayImageOps {
 
+	/**
+	 * <p>
+	 * Stretches the image's intensity:<br>
+	 * O<sub>x,y</sub> = I<sub>x,y</sub>&gamma + beta<br>
+	 * </p>
+	 * <p>
+	 * The image's intensity is clamped at 0 and max;
+	 * </p>
+	 *
+	 * @param input  Input image. Not modified.
+	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @return Output image.
+	 */
 	public static <T extends ImageBase> T stretch(T input, double gamma, double beta, double max , T output) {
 		if( input instanceof ImageFloat32 ) {
 			return (T)GrayImageOps.stretch((ImageFloat32)input,gamma,(float)beta,(float)max,(ImageFloat32)output);
 		} else if( input instanceof ImageUInt8) {
 			return (T)GrayImageOps.stretch((ImageUInt8)input,gamma,(int)beta,(int)max,(ImageUInt8)output);
+		} else if( input instanceof ImageSInt16) {
+			return (T)GrayImageOps.stretch((ImageSInt16)input,gamma,(int)beta,(int)max,(ImageSInt16)output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}

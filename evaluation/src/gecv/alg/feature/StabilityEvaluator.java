@@ -17,6 +17,7 @@
 package gecv.alg.feature;
 
 import gecv.struct.image.ImageBase;
+import jgrl.struct.affine.Affine2D_F32;
 
 
 /**
@@ -39,9 +40,10 @@ public interface StabilityEvaluator<T extends ImageBase> {
 	 *
 	 * @param alg Algorithm being evaluated.
 	 * @param image Modified image.
+	 * @param transform
 	 * @return Error metrics.
 	 */
-	double[] evaluateImage( StabilityAlgorithm alg , T image );
+	double[] evaluateImage(StabilityAlgorithm alg, T image, Affine2D_F32 transform);
 
 	/**
 	 * Names of extracted metrics.

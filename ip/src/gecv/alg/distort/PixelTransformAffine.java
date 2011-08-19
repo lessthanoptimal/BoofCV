@@ -33,6 +33,14 @@ public class PixelTransformAffine extends PixelTransform {
 	Affine2D_F32 affine = new Affine2D_F32();
 	Point2D_F32 tran = new Point2D_F32();
 
+	public PixelTransformAffine() {
+	}
+
+	public PixelTransformAffine(Affine2D_F32 affine) {
+		
+		this.affine = affine;
+	}
+
 	public void set( Affine2D_F32 affine ) {
 		this.affine.set(affine);
 	}
@@ -52,5 +60,9 @@ public class PixelTransformAffine extends PixelTransform {
 		AffinePointOps.transform(affine,x,y,tran);
 		distX = tran.x;
 		distY = tran.y;
+	}
+
+	public Affine2D_F32 getModel() {
+		return affine;
 	}
 }

@@ -16,7 +16,7 @@
 
 package gecv.abst.detect.interest;
 
-import gecv.alg.detect.interest.FeaturePyramid;
+import gecv.alg.feature.detect.interest.FeaturePyramid;
 import gecv.struct.feature.ScalePoint;
 import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
@@ -26,7 +26,7 @@ import java.util.List;
 
 
 /**
- * Wrapper around {@link gecv.alg.detect.interest.FeaturePyramid} for {@link gecv.abst.detect.interest.InterestPointDetector}.
+ * Wrapper around {@link gecv.alg.feature.detect.interest.FeaturePyramid} for {@link gecv.abst.detect.interest.InterestPointDetector}.
  *
  * @author Peter Abeles
  */

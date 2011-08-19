@@ -16,7 +16,7 @@
 
 package gecv.abst.detect.interest;
 
-import gecv.alg.detect.interest.FeatureLaplacePyramid;
+import gecv.alg.feature.detect.interest.FeatureLaplacePyramid;
 import gecv.struct.feature.ScalePoint;
 import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
@@ -26,7 +26,7 @@ import java.util.List;
 
 
 /**
- * Wrapper around {@link gecv.alg.detect.interest.FeatureLaplacePyramid} for {@link InterestPointDetector}.
+ * Wrapper around {@link gecv.alg.feature.detect.interest.FeatureLaplacePyramid} for {@link InterestPointDetector}.
  *
  * @author Peter Abeles
  */

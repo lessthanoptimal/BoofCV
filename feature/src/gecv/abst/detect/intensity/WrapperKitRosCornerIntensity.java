@@ -16,7 +16,7 @@
 
 package gecv.abst.detect.intensity;
 
-import gecv.alg.detect.intensity.KitRosCornerIntensity;
+import gecv.alg.feature.detect.intensity.KitRosCornerIntensity;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Wrapper around children of {@link gecv.alg.detect.intensity.GradientCornerIntensity}.
+ * Wrapper around children of {@link gecv.alg.feature.detect.intensity.GradientCornerIntensity}.
  * 
  * @author Peter Abeles
  */
