@@ -18,103 +18,90 @@ package gecv.alg.transform.wavelet;
 
 import gecv.abst.wavelet.FactoryWaveletTransform;
 import gecv.abst.wavelet.WaveletTransform;
-import gecv.alg.misc.ImageTestingOps;
-import gecv.alg.misc.PixelMath;
+import gecv.alg.misc.GPixelMath;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.border.BorderType;
+import gecv.gui.ListDisplayPanel;
+import gecv.gui.SelectAlgorithmPanel;
 import gecv.gui.image.ShowImages;
+import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.wavelet.WaveletDescription;
-import gecv.struct.wavelet.WlCoef_F32;
+import gecv.struct.wavelet.WlCoef;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.util.Random;
 
 
 /**
  * @author Peter Abeles
  */
-public class WaveletVisualizeApp {
-
-	int width;
-	int height;
+public class WaveletVisualizeApp
+		<T extends ImageBase, W extends ImageBase, C extends WlCoef>
+		extends SelectAlgorithmPanel
+{
 	int numLevels = 4;
 
-	Random rand = new Random(2234);
+	T image;
+	T imageInv;
 
-	ImageFloat32 image;
-	ImageFloat32 imageWavelet;
+	Class<T> imageType;
+	Class<W> waveletType;
 
-//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletHaar.generate_F32();
-//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.daubJ_F32(4);
-	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.biorthogonal_F32(5, BorderType.REFLECT);
+	ListDisplayPanel panel = new ListDisplayPanel();
 
-	WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32> waveletTran = FactoryWaveletTransform.create_F32(waveletDesc,numLevels);
+	public WaveletVisualizeApp(Class<T> imageType, Class<W> waveletType,
+							   BufferedImage original ) {
+		this.imageType = imageType;
+		this.waveletType = waveletType;
+
+		image = ConvertBufferedImage.convertFrom(original,null,imageType);
+		imageInv = (T)image._createNew(image.width,image.height);
+
+		addWaveletDesc("Haar",GFactoryWavelet.haar(imageType));
+		addWaveletDesc("Daub 4",GFactoryWavelet.daubJ(imageType,4));
+		addWaveletDesc("Bi-orthogonal 5",GFactoryWavelet.biorthogoal(imageType,5, BorderType.REFLECT));
+		addWaveletDesc("Coiflet 6",GFactoryWavelet.coiflet(imageType,6));
+
+		add(panel, BorderLayout.CENTER);
+		setPreferredSize(new Dimension(image.width+50,image.height+20));
+	}
+
+	private void addWaveletDesc( String name , WaveletDescription desc )
+	{
+		if( desc != null )
+			addAlgorithm(name,desc);
+	}
 
 
-	public void process() {
-//		createTestImage();
-		loadImage();
+	@Override
+	public void setActiveAlgorithm(String name, Object cookie) {
+		WaveletDescription<C> desc = (WaveletDescription<C>)cookie;
+		WaveletTransform<T,W,C> waveletTran = FactoryWaveletTransform.create(desc,numLevels);
 
-		width = image.getWidth();
-		height = image.getHeight();
+		panel.reset();
 
-		System.out.println("width "+width+"  height "+height);
-
-		ImageFloat32 imageInv = new ImageFloat32(width,height);
-
-		imageWavelet = waveletTran.transform(image,imageWavelet);
+		W imageWavelet = waveletTran.transform(image,null);
 
 		waveletTran.invert(imageWavelet,imageInv);
 
-		PixelMath.boundImage(imageInv,0,255);
+		float maxValue = (float)GPixelMath.maxAbs(imageWavelet);
+		BufferedImage buffWavelet = VisualizeImageData.grayMagnitude(imageWavelet,null,maxValue);
+		BufferedImage buffImage = ConvertBufferedImage.convertTo(image,null);
+		BufferedImage buffInv = ConvertBufferedImage.convertTo(imageInv,null);
 
-		ShowImages.showWindow(image,"Input Image",true);
-		ShowImages.showWindow(imageWavelet,"Transformed",true);
-		ShowImages.showWindow(imageInv,"Inverted",true);
-
-		double error = ImageTestingOps.computeMeanSquaredError(image,imageInv);
-
-		System.out.println("Mean Squared Error "+error);
-	}
-
-	private void loadImage() {
-		BufferedImage in = UtilImageIO.loadImage("evaluation/data/standard/lena512.bmp");
-		image = ConvertBufferedImage.convertFrom(in,image);
-	}
-
-	private void createTestImage() {
-		width = 250;
-		height = 300;
-		BufferedImage workImg = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);
-		Graphics2D g2 = workImg.createGraphics();
-		g2.setColor(new Color(200,200,200));
-		g2.fillRect(0,0,width,height);
-		g2.setColor(Color.BLACK);
-		addRectangle(g2,new AffineTransform(),40,50,60,50);
-
-		AffineTransform tran = new AffineTransform();
-		tran.setToRotation(0.5);
-		addRectangle(g2,tran,120,140,60,50);
-
-		tran.setToRotation(-1.2);
-		addRectangle(g2,tran,-120,200,60,40);
-
-		image = ConvertBufferedImage.convertFrom(workImg,image);
-	}
-
-	private void addRectangle( Graphics2D g2 , AffineTransform tran , int x0 , int y0 , int w , int h )
-	{
-		g2.setTransform(tran);
-		g2.fillRect(x0,y0,w,h);
+		panel.addImage(buffWavelet,"Transform");
+		panel.addImage(buffImage,"Original");
+		panel.addImage(buffInv,"Inverse");
 	}
 
 	public static void main( String args[] ) {
-		WaveletVisualizeApp app = new WaveletVisualizeApp();
+		BufferedImage in = UtilImageIO.loadImage("evaluation/data/standard/lena512.bmp");
+		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageFloat32.class,ImageFloat32.class,in);
+//		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageUInt8.class, ImageSInt32.class,in);
 
-		app.process();
+		ShowImages.showWindow(app,"Wavelet Transforms");
 	}
 }

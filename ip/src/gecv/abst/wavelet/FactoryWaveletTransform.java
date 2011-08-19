@@ -18,10 +18,12 @@ package gecv.abst.wavelet;
 
 import gecv.abst.wavelet.impl.WaveletTransformFloat32;
 import gecv.abst.wavelet.impl.WaveletTransformInt;
+import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInteger;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.wavelet.WaveletDescription;
+import gecv.struct.wavelet.WlCoef;
 import gecv.struct.wavelet.WlCoef_F32;
 import gecv.struct.wavelet.WlCoef_I32;
 
@@ -36,12 +38,13 @@ public class FactoryWaveletTransform {
 
 
 	@SuppressWarnings({"unchecked"})
-	public static WaveletTransform create( WaveletDescription waveletDesc , int numLevels )
+	public static <T extends ImageBase, W extends ImageBase, C extends WlCoef>
+	WaveletTransform<T,W,C> create( WaveletDescription<C> waveletDesc , int numLevels )
 	{
 		if( waveletDesc.getForward().getType() == float.class ) {
-			return create_F32(waveletDesc,numLevels);
-		} else if( waveletDesc.getForward().getType() == byte.class ) {
-			return create_I(waveletDesc,numLevels);
+			return (WaveletTransform<T,W,C>)create_F32((WaveletDescription)waveletDesc,numLevels);
+		} else if( waveletDesc.getForward().getType() == int.class ) {
+			return (WaveletTransform<T,W,C>)create_I((WaveletDescription)waveletDesc,numLevels);
 		} else {
 			throw new RuntimeException("Add support for this image type");
 		}
