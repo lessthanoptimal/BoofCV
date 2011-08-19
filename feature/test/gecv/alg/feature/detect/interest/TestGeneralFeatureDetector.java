@@ -16,35 +16,24 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.abst.filter.ImageFunctionSparse;
-import gecv.abst.filter.derivative.FactoryDerivativeSparse;
-import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
 import gecv.struct.feature.ScalePoint;
-import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.image.ImageFloat32;
 
 import java.util.List;
 
+
 /**
  * @author Peter Abeles
  */
-public class TestFeatureLaplaceScaleSpace extends GenericFeatureScaleDetector {
+public class TestGeneralFeatureDetector extends GenericFeatureDetector {
 
 	@Override
-	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {
-		ImageFunctionSparse<ImageFloat32> sparseLaplace = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class,null);
-
-		return new FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32>(detector,sparseLaplace,2);
+	protected Object createDetector() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override
 	protected List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
-		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
-		ss.setScales(scales);
-		ss.setImage(input);
-
-		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> alg = (FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32>)detector;
-		alg.detect(ss);
-		return alg.getInterestPoints();
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 }

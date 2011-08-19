@@ -28,7 +28,7 @@ import gecv.struct.image.ImageUInt8;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FactoryCornerIntensity {
+public class FactoryPointIntensityAlg {
 
 	/**
 	 * Common interface for creating a {@link KitRosCornerIntensity} from different image types.
@@ -85,4 +85,5 @@ public class FactoryCornerIntensity {
 		else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}
+
 }

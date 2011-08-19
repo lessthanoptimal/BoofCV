@@ -16,7 +16,7 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.abst.detect.point.GeneralFeatureDetector;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
@@ -25,7 +25,7 @@ import jgrl.struct.point.Point2D_I16;
 import java.util.List;
 
 /**
- * Automatically selects features for the {@link PyramidKltTracker} using a {@link gecv.abst.detect.point.GeneralFeatureDetector}.
+ * Automatically selects features for the {@link PyramidKltTracker} using a {@link gecv.alg.feature.detect.interest.GeneralFeatureDetector}.
  *
  * @author Peter Abeles
  */

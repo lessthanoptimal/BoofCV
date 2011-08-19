@@ -20,9 +20,9 @@ import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
 import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.alg.feature.detect.extract.FastNonMaxExtractor;
-import gecv.alg.feature.detect.intensity.FactoryCornerIntensity;
+import gecv.alg.feature.detect.intensity.FactoryPointIntensityAlg;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I16;
@@ -164,7 +164,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 	private GenericPkltFeatSelector<ImageFloat32, ImageFloat32> createSelector() {
 		GeneralFeatureIntensity<ImageFloat32,ImageFloat32> intensity =
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
-						FactoryCornerIntensity.createKlt( ImageFloat32.class,3));
+						FactoryPointIntensityAlg.createKlt( ImageFloat32.class,3));
 
 		FeatureExtractor extractor = new WrapperNonMax(
 				new FastNonMaxExtractor(3, 3, 0.001f));

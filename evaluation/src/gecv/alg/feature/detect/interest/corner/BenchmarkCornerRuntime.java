@@ -18,11 +18,11 @@ package gecv.alg.feature.detect.interest.corner;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.abst.detect.point.FactoryCornerDetector;
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;
+import gecv.alg.feature.detect.interest.FactoryCornerDetector;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.evaluation.FileImageSequence;
 import gecv.struct.image.ImageBase;

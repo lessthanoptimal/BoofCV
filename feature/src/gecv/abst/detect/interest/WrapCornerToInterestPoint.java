@@ -16,9 +16,9 @@
 
 package gecv.abst.detect.interest;
 
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.core.image.ImageGenerator;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link gecv.abst.detect.point.GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
+ * Wrapper around {@link gecv.alg.feature.detect.interest.GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
  *
  * @author Peter Abeles
  */

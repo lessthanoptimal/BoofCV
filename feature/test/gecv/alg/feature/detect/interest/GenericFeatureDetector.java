@@ -24,8 +24,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -38,6 +37,15 @@ public abstract class GenericFeatureDetector {
 	int r = 2;
 
 	double scaleTolerance = 1e-4;
+
+	/**
+	 * If the maximum number of features is set to a negative number then
+	 * it should return the maximum number of features possible
+	 */
+	@Test
+	public void checkNegativeMaxFeatures() {
+		fail("implement");
+	}
 
 	/**
 	 * Checks to see if features are flushed after multiple calls

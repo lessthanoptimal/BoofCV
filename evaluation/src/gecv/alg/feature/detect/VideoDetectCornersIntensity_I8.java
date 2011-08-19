@@ -20,9 +20,9 @@ import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
 import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.alg.feature.detect.extract.FastNonMaxExtractor;
-import gecv.alg.feature.detect.intensity.FactoryCornerIntensity;
+import gecv.alg.feature.detect.intensity.FactoryPointIntensityAlg;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.alg.filter.derivative.GradientSobel;
 import gecv.alg.filter.derivative.HessianThree;
 import gecv.gui.image.ImagePanel;
@@ -133,9 +133,9 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 		int width = image.width;
 		int height = image.height;
 
-		GeneralFeatureIntensity<ImageUInt8,ImageSInt16> intensity = new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(FactoryCornerIntensity.createKlt(ImageSInt16.class , radius));
+		GeneralFeatureIntensity<ImageUInt8,ImageSInt16> intensity = new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(FactoryPointIntensityAlg.createKlt(ImageSInt16.class , radius));
 //		GeneralFeatureIntensity<ImageUInt8, ImageSInt16> intensity =
-//				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryCornerIntensity.createFast12_I8(width, height, 8 , 12));
+//				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryPointIntensityAlg.createFast12_I8(width, height, 8 , 12));
 
 		FeatureExtractor extractor = new WrapperNonMax(new FastNonMaxExtractor(radius + 10, radius + 10, 10f));
 //		FeatureExtractor extractor = new WrapperNonMax( new NonMaxExtractorNaive(radius+10,10f));

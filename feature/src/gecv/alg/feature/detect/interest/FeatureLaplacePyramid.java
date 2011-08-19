@@ -16,7 +16,6 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.struct.QueueCorner;

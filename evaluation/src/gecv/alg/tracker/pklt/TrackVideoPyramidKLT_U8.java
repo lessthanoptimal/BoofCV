@@ -20,11 +20,11 @@ import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.extract.WrapperNonMax;
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
 import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
-import gecv.abst.detect.point.GeneralFeatureDetector;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.feature.detect.extract.FastNonMaxExtractor;
-import gecv.alg.feature.detect.intensity.FactoryCornerIntensity;
+import gecv.alg.feature.detect.intensity.FactoryPointIntensityAlg;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
@@ -89,7 +89,7 @@ public class TrackVideoPyramidKLT_U8 extends TrackVideoPyramidKLT<ImageUInt8, Im
 
 		GeneralFeatureIntensity<ImageUInt8,ImageSInt16> intensity =
 				new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(
-						FactoryCornerIntensity.createKlt(config.typeDeriv,config.featureRadius));
+						FactoryPointIntensityAlg.createKlt(config.typeDeriv,config.featureRadius));
 		FeatureExtractor extractor = new WrapperNonMax(
 				new FastNonMaxExtractor(config.featureRadius+2,
 						config.featureRadius*scalingTop, configKLt.minDeterminant));

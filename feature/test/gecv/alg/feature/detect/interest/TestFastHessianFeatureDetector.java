@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class TestFastHessianFeatureDetector extends GenericFeatureDetector{
+public class TestFastHessianFeatureDetector extends GenericFeatureDetector {
 
 	public TestFastHessianFeatureDetector() {
 		this.scaleTolerance = 0.3;

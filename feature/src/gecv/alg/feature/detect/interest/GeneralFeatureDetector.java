@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.abst.detect.point;
+package gecv.alg.feature.detect.interest;
 
 import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
@@ -24,7 +24,7 @@ import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * Generic class for extracting corners of different types. Can return all the found corners or just the corners with the highest
+ * Generic class for extracting features of different types. Can return all the found features or just the features with the highest
  * intensity.
  *
  * @author Peter Abeles
@@ -52,7 +52,7 @@ public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 	/**
 	 * @param intensity Computes how much like the feature the region around each pixel is.
 	 * @param extractor   Extracts the corners from intensity image
-	 * @param maxFeatures If not zero then only the best features are returned up to this number
+	 * @param maxFeatures If >= zero then only the best features are returned up to this number
 	 */
 	public GeneralFeatureDetector(GeneralFeatureIntensity<I,D> intensity ,
 								 FeatureExtractor extractor,
