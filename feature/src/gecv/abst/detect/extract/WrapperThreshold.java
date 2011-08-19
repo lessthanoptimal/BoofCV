@@ -16,12 +16,12 @@
 
 package gecv.abst.detect.extract;
 
-import gecv.alg.detect.extract.ThresholdCornerExtractor;
+import gecv.alg.feature.detect.extract.ThresholdCornerExtractor;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * Wrapper around the {@link gecv.alg.detect.extract.ThresholdCornerExtractor} class.
+ * Wrapper around the {@link gecv.alg.feature.detect.extract.ThresholdCornerExtractor} class.
  *
  * @author Peter Abeles
  */

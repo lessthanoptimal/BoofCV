@@ -40,7 +40,7 @@ public class DistortSupport {
 	 * directly from the size of the two input images and independently scales
 	 * the x and y axises.
 	 */
-	public static PixelTransform transformScale(ImageBase from, ImageBase to)
+	public static PixelTransformAffine transformScale(ImageBase from, ImageBase to)
 	{
 		float scaleX = (float)to.width/(float)from.width;
 		float scaleY = (float)to.height/(float)from.height;
@@ -59,7 +59,7 @@ public class DistortSupport {
 	 * @param centerY Center of rotation in input image coordinates.
 	 * @param angle Angle of rotation.
 	 */
-	public static PixelTransform transformRotate( float centerX , float centerY , float angle )
+	public static PixelTransformAffine transformRotate( float centerX , float centerY , float angle )
 	{
 		// make the coordinate system's origin the image center
 		Se2_F32 imageToCenter = new Se2_F32(-centerX,-centerY,0);
@@ -84,17 +84,21 @@ public class DistortSupport {
 	/**
 	 * Creates a {@link gecv.alg.distort.ImageDistort} for the specified image type, transformation
 	 * and interpolation type.
+	 *
+	 * @param dstToSrc Transform from dst to src image.
 	 */
 	public static <T extends ImageBase>
-	ImageDistort<T> createDistort( Class<T> imageType , PixelTransform model , TypeInterpolate interpType)
+	ImageDistort<T> createDistort( Class<T> imageType , PixelTransform dstToSrc , TypeInterpolate interpType)
 	{
 		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(imageType, interpType);
-		return createDistort(imageType,model,interp);
+		return createDistort(imageType,dstToSrc,interp);
 	}
 
 	/**
 	 * Creates a {@link gecv.alg.distort.ImageDistort} for the specified image type, transformation
 	 * and interpolation instance.
+	 * 
+	 * @param dstToSrc Transform from dst to src image.
 	 */
 	public static <T extends ImageBase>
 	ImageDistort<T> createDistort( Class<T> imageType ,

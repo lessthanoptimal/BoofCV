@@ -16,13 +16,13 @@
 
 package gecv.abst.detect.intensity;
 
-import gecv.alg.detect.intensity.GradientCornerIntensity;
+import gecv.alg.feature.detect.intensity.GradientCornerIntensity;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 
 /**
- * Wrapper around children of {@link gecv.alg.detect.intensity.GradientCornerIntensity}.
+ * Wrapper around children of {@link gecv.alg.feature.detect.intensity.GradientCornerIntensity}.
  * 
  * @author Peter Abeles
  */

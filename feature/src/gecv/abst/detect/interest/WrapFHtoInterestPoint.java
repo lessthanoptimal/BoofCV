@@ -16,7 +16,7 @@
 
 package gecv.abst.detect.interest;
 
-import gecv.alg.detect.interest.FastHessianFeatureDetector;
+import gecv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import gecv.alg.transform.ii.GIntegralImageOps;
 import gecv.struct.feature.ScalePoint;
 import gecv.struct.image.ImageBase;
@@ -26,7 +26,7 @@ import java.util.List;
 
 
 /**
- * Wrapper around {@link gecv.alg.detect.interest.FastHessianFeatureDetector} for {@link InterestPointDetector}.
+ * Wrapper around {@link gecv.alg.feature.detect.interest.FastHessianFeatureDetector} for {@link InterestPointDetector}.
  *
  * @author Peter Abeles
  */

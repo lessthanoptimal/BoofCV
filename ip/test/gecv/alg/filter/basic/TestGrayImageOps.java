@@ -16,80 +16,19 @@
 
 package gecv.alg.filter.basic;
 
-import gecv.alg.misc.ImageTestingOps;
-import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
-
-import java.util.Random;
-
-import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestGrayImageOps {
 
-	int width = 10;
-	int height = 15;
-	Random rand = new Random(234);
-
 	@Test
-	public void invert() {
-		ImageUInt8 input = new ImageUInt8(width, height);
-		ImageTestingOps.randomize(input, rand, 0, 100);
-
-		ImageUInt8 output = GrayImageOps.invert(input, 255, null);
-
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				assertEquals(255 - input.get(x, y), output.get(x, y));
-			}
-		}
-	}
-
-	@Test
-	public void brighten() {
-		ImageUInt8 input = new ImageUInt8(width, height);
-		ImageTestingOps.fill(input, 23);
-
-		ImageUInt8 output = GrayImageOps.brighten(input, 10, 255,null);
-
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				assertEquals(33, output.get(x, y));
-			}
-		}
-
-		// check to see how well it sets the ceiling
-		output = GrayImageOps.brighten(output, 230, 255,null);
-		assertEquals(255, output.get(5, 6));
-
-		// check it flooring to zero
-		ImageTestingOps.fill(input, 23);
-		output = GrayImageOps.brighten(input, -50, 255,null);
-		assertEquals(0, output.get(5, 6));
-	}
-
-	@Test
-	public void stretch() {
-		ImageUInt8 input = new ImageUInt8(width, height);
-		ImageTestingOps.fill(input, 23);
-
-		ImageUInt8 output = GrayImageOps.stretch(input, 2.5, 10, 255,null);
-
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				assertEquals(67, output.get(x, y));
-			}
-		}
-
-		// check to see how well it sets the ceiling
-		output = GrayImageOps.stretch(output, 4, 10, 255,null);
-		assertEquals(255, output.get(5, 6));
-
-		// check it flooring to zero
-		ImageTestingOps.fill(input, 23);
-		output = GrayImageOps.stretch(input, -1, 2, 255,null);
-		assertEquals(0, output.get(5, 6));
+	public void comment() {
+		// this is intentionally left blank.  The operations are already tested at the
+		// implementation
+		// If better tests are needed do the following:
+		// 1) Test to see if the output is declared correctly
+		// 2) Check the solution against a naive implementation
 	}
 }

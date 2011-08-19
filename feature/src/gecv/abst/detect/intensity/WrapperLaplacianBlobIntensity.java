@@ -16,7 +16,7 @@
 
 package gecv.abst.detect.intensity;
 
-import gecv.alg.detect.intensity.HessianBlobIntensity;
+import gecv.alg.feature.detect.intensity.HessianBlobIntensity;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Wrapper around {@link gecv.alg.detect.intensity.HessianBlobIntensity} for {@link GeneralFeatureIntensity}.
+ * Wrapper around {@link gecv.alg.feature.detect.intensity.HessianBlobIntensity} for {@link GeneralFeatureIntensity}.
  *
  * @author Peter Abeles
  */

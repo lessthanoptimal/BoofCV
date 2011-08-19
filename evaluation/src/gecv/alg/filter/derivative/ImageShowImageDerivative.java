@@ -67,6 +67,7 @@ public class ImageShowImageDerivative {
 		String fileName;
 
 		if (args.length == 0) {
+//			fileName = "evaluation/data/scale/mountain_7p1mm.jpg";
 			fileName = "evaluation/data/indoors01.jpg";
 		} else {
 			fileName = args[0];

@@ -17,7 +17,7 @@
 package gecv.abst.detect.intensity;
 
 import gecv.abst.filter.blur.impl.MedianImageFilter;
-import gecv.alg.detect.intensity.MedianCornerIntensity;
+import gecv.alg.feature.detect.intensity.MedianCornerIntensity;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -26,7 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Wrapper around children of {@link gecv.alg.detect.intensity.MedianCornerIntensity}.  This is a bit of a hack since
+ * Wrapper around children of {@link gecv.alg.feature.detect.intensity.MedianCornerIntensity}.  This is a bit of a hack since
  * the median image is not provided as a standard input so it has to compute it internally
  * 
  * @author Peter Abeles

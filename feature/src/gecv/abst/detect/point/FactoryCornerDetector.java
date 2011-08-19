@@ -21,9 +21,9 @@ import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.intensity.*;
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.MedianImageFilter;
-import gecv.alg.detect.intensity.FactoryCornerIntensity;
-import gecv.alg.detect.intensity.FastCornerIntensity;
-import gecv.alg.detect.intensity.GradientCornerIntensity;
+import gecv.alg.feature.detect.intensity.FactoryCornerIntensity;
+import gecv.alg.feature.detect.intensity.FastCornerIntensity;
+import gecv.alg.feature.detect.intensity.GradientCornerIntensity;
 import gecv.struct.image.ImageBase;
 
 /**
@@ -73,7 +73,7 @@ public class FactoryCornerDetector {
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>
-	GeneralFeatureDetector<T,D> createMedian( int featureRadius , int pixelTol , int maxFeatures , Class<T> imageType)
+	GeneralFeatureDetector<T,D> createMedian( int featureRadius , float pixelTol , int maxFeatures , Class<T> imageType)
 	{
 		MedianImageFilter<T> medianFilter = FactoryBlurFilter.median(imageType,featureRadius);
 		GeneralFeatureIntensity<T,D> intensity = new WrapperMedianCornerIntensity<T,D>(medianFilter,imageType);
