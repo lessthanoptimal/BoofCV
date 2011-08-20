@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.detect.interest;
+package gecv.factory.feature.detect.interest;
 
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
 import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;
 import gecv.alg.feature.detect.intensity.HessianBlobIntensity;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.struct.image.ImageBase;
 
 

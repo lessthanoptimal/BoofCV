@@ -29,11 +29,11 @@ import java.util.List;
 
 /**
  * <p>
- * A Pyramidal implementation of {@link FeatureScaleSpace}
+ * A Pyramidal implementation of {@link FeatureLaplaceScaleSpace}
  * </p>
  *
  * <p>
- * To normalize feature intensity across scales each feature intensity is multiplied by the scale to the power of 'scalePower'.
+ * COMMENT ON SCALEPOWER: To normalize feature intensity across scales each feature intensity is multiplied by the scale to the power of 'scalePower'.
  * See [1,2] for how to compute 'scalePower'.  Inside of the image pyramid sub-sampling of the image causes the image
  * gradient to be a factor of 'scale' larger than it would be without sub-sampling.  In some situations this can negate
  * the need to adjust feature intensity further.
@@ -105,7 +105,7 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
 		for( int i = 0; i < ss.getNumLayers(); i++ ) {
 			// detect features in 2D space.  Don't need to compute features at the tail ends of scale-space
 			if( i > 0 && i < ss.getNumLayers()-1 )
-				detectCandidateFeatures(ss.getLayer(i),ss.getScale(i));
+				detectCandidateFeatures(ss.getLayer(i),ss.scale[i]);
 
 			spaceIndex++;
 			if( spaceIndex >= 3 )
@@ -159,9 +159,12 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
 
 		List<Point2D_I16> candidates = maximums[index1];
 
-		float scale0 = (float)ss.getScale(layerID-1);
-		float scale1 = (float)ss.getScale(layerID);
-		float scale2 = (float)ss.getScale(layerID+1);
+		// In a ScaleSpacePyramid the resolution has been internally divided by two
+		float featureScale = (float)ss.getScale(layerID);
+
+		float scale0 = (float)ss.scale[layerID-1];
+		float scale1 = (float)ss.scale[layerID];
+		float scale2 = (float)ss.scale[layerID+1];
 
 		float ss0 = (float)Math.pow(scale0,scalePower);
 		float ss1 = (float)Math.pow(scale1,scalePower);
@@ -180,7 +183,7 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
 
 			if( checkMax(ss.getLayer(layerID-1), ss0, val, x0, y0) && checkMax(ss.getLayer(layerID+1), ss2, val, x2, y2) ) {
 				// put features into the scale of the upper image
-				foundPoints.add( new ScalePoint((int)(c.x*scale1),(int)(c.y*scale1),scale1));
+				foundPoints.add( new ScalePoint((int)(c.x*scale1),(int)(c.y*scale1),featureScale));
 			}
 		}
 	}
