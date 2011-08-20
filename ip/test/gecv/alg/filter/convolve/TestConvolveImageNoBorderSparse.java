@@ -17,8 +17,8 @@
 package gecv.alg.filter.convolve;
 
 import gecv.alg.filter.convolve.noborder.ConvolveImageStandardSparse;
-import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageBase;

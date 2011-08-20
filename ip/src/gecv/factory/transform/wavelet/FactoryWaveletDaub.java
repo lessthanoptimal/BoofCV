@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.wavelet;
+package gecv.factory.transform.wavelet;
 
+import gecv.alg.transform.wavelet.UtilWavelet;
 import gecv.core.image.border.BorderIndex1D;
 import gecv.core.image.border.BorderIndex1D_Reflect;
 import gecv.core.image.border.BorderIndex1D_Wrap;

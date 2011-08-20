@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.misc.impl;
+package gecv.alg.misc;
 
 import gecv.misc.AutoTypeImage;
 import gecv.misc.CodeGeneratorUtil;

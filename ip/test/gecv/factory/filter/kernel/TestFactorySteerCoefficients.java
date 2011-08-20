@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.factory.filter.kernel;
 
+import gecv.alg.filter.kernel.SteerableCoefficients;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

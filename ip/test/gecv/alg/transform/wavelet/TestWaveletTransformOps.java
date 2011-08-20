@@ -18,6 +18,7 @@ package gecv.alg.transform.wavelet;
 
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.BorderType;
+import gecv.factory.transform.wavelet.FactoryWaveletDaub;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;

@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.factory.filter.kernel;
 
+import gecv.alg.filter.kernel.KernelMath;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.convolve.*;
 import gecv.struct.image.ImageBase;
@@ -103,7 +104,7 @@ public class FactoryKernelGaussian {
 			Kernel2D_F32 k = gaussian2D_F32(sigma,radius, isFloat);
 			if( isFloat )
 				return (T)k;
-			return (T)KernelMath.convert(k,MIN_FRAC);
+			return (T) KernelMath.convert(k,MIN_FRAC);
 		} else if( DOF == 1 ) {
 			Kernel1D_F32 k = gaussian1D_F32(sigma,radius, isFloat);
 			if( isFloat )

@@ -18,11 +18,11 @@ package gecv.alg.transform.pyramid;
 
 import gecv.PerformerBase;
 import gecv.ProfileOperation;
-import gecv.alg.filter.kernel.FactoryKernelGaussian;
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageFloat32;

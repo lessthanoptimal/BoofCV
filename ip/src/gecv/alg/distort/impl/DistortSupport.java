@@ -18,9 +18,9 @@ package gecv.alg.distort.impl;
 
 import gecv.alg.distort.ImageDistort;
 import gecv.alg.distort.PixelTransformAffine;
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.interpolate.TypeInterpolate;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.distort.PixelTransform;
 import gecv.struct.image.*;
 import jgrl.struct.affine.Affine2D_F32;

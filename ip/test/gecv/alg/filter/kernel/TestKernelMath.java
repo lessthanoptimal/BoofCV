@@ -17,6 +17,7 @@
 package gecv.alg.filter.kernel;
 
 import gecv.alg.misc.ImageTestingOps;
+import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.convolve.Kernel2D_F32;

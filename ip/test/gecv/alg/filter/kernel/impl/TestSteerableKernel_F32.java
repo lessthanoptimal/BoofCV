@@ -16,8 +16,8 @@
 
 package gecv.alg.filter.kernel.impl;
 
-import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.alg.filter.kernel.KernelMath;
+import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.struct.convolve.Kernel2D;
 import gecv.struct.convolve.Kernel2D_F32;
 import org.junit.Test;

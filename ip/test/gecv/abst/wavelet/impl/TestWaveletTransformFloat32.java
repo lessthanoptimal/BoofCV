@@ -16,11 +16,11 @@
 
 package gecv.abst.wavelet.impl;
 
-import gecv.alg.transform.wavelet.FactoryWaveletDaub;
 import gecv.alg.transform.wavelet.UtilWavelet;
 import gecv.alg.transform.wavelet.WaveletTransformOps;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.BorderType;
+import gecv.factory.transform.wavelet.FactoryWaveletDaub;
 import gecv.struct.image.ImageDimension;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.wavelet.WaveletDescription;

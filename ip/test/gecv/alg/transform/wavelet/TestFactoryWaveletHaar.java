@@ -16,6 +16,7 @@
 
 package gecv.alg.transform.wavelet;
 
+import gecv.factory.transform.wavelet.FactoryWaveletHaar;
 import gecv.struct.wavelet.WaveletDescription;
 import gecv.struct.wavelet.WlCoef_F32;
 import gecv.struct.wavelet.WlCoef_I32;

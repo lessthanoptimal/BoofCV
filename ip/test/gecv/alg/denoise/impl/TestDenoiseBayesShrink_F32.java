@@ -17,7 +17,7 @@
 package gecv.alg.denoise.impl;
 
 import gecv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
-import gecv.alg.transform.wavelet.FactoryWaveletDaub;
+import gecv.factory.transform.wavelet.FactoryWaveletDaub;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import org.junit.Test;

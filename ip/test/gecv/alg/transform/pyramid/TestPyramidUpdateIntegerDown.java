@@ -17,7 +17,7 @@
 package gecv.alg.transform.pyramid;
 
 import gecv.alg.filter.convolve.ConvolveNormalized;
-import gecv.alg.filter.kernel.FactoryKernelGaussian;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.DiscreteImagePyramid;

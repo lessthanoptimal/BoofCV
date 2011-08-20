@@ -14,8 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.alg.interpolate;
+package gecv.factory.interpolate;
 
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.interpolate.InterpolateRectangle;
+import gecv.alg.interpolate.TypeInterpolate;
 import gecv.alg.interpolate.impl.*;
 import gecv.alg.interpolate.kernel.BicubicKernel_F32;
 import gecv.struct.image.*;
@@ -28,7 +31,7 @@ import gecv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryInterpolation {
 
-	public static <T extends ImageBase> InterpolatePixel<T> 
+	public static <T extends ImageBase> InterpolatePixel<T>
 	createPixel( Class<T> imageType , TypeInterpolate type )
 	{
 		switch( type ) {

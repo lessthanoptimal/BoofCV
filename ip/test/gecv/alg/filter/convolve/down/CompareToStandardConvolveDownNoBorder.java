@@ -18,8 +18,8 @@ package gecv.alg.filter.convolve.down;
 
 import gecv.alg.filter.convolve.ConvolutionTestHelper;
 import gecv.alg.filter.convolve.ConvolveDownNoBorder;
-import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.struct.image.ImageBase;
 import gecv.testing.CompareIdenticalFunctions;
 

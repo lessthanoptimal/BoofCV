@@ -17,7 +17,7 @@
 package gecv.alg.filter.convolve.border;
 
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
-import gecv.alg.filter.kernel.FactoryKernelGaussian;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.image.ImageBase;
 import gecv.testing.CompareEquivalentFunctions;
 

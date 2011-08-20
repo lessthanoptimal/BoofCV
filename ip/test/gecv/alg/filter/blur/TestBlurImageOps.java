@@ -18,10 +18,10 @@ package gecv.alg.filter.blur;
 
 import gecv.alg.filter.blur.impl.ImplMedianSortNaive;
 import gecv.alg.filter.convolve.ConvolveNormalized;
-import gecv.alg.filter.kernel.FactoryKernel;
-import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.factory.filter.kernel.FactoryKernel;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageFloat32;
