@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.gss;
+package gecv.alg.transform.pyramid;
 
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
@@ -22,9 +22,9 @@ import gecv.core.image.ConvertBufferedImage;
 import gecv.gui.image.ImagePyramidPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
+import gecv.struct.pyramid.SubsamplePyramid;
 
 import java.awt.image.BufferedImage;
 
@@ -33,8 +33,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-// TODO abstract and add integer
-public class VisualizeScaleSpacePyramidApp {
+public class VisualizeSubsamplePyramidApp {
 
 	public static void main( String args[] ) {
 		double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0};
@@ -43,7 +42,8 @@ public class VisualizeScaleSpacePyramidApp {
 
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 //		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bicubic(ImageFloat32.class,-0.5f);
-		ImagePyramid<ImageFloat32> pyramid = new ScaleSpacePyramid<ImageFloat32>(interp,scales);
+		PyramidUpdateSubsampleScale<ImageFloat32> updater = new PyramidUpdateSubsampleScale<ImageFloat32>(interp);
+		ImagePyramid<ImageFloat32> pyramid = new SubsamplePyramid<ImageFloat32>(updater,scales);
 
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 

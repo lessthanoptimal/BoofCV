@@ -24,10 +24,10 @@ import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.interpolate.TypeInterpolate;
 import gecv.alg.misc.PixelMath;
-import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
 import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.inst.FactoryImageGenerator;
+import gecv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.SelectAlgorithmPanel;
 import gecv.gui.image.ShowImages;
@@ -87,8 +87,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 		}
 
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
-		PyramidUpdateGaussianScale<T> updater = new PyramidUpdateGaussianScale<T>(interp);
-		pyramid = new ScaleSpacePyramid<T>(updater,scales);
+		pyramid = new ScaleSpacePyramid<T>(interp,scales);
 
 		anyDerivative = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 	}

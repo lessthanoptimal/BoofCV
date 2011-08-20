@@ -18,6 +18,7 @@ package gecv.alg.feature.detect.interest;
 
 import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import gecv.gui.feature.ScaleSpacePointPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
