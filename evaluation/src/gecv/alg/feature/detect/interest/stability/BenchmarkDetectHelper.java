@@ -16,10 +16,13 @@
 
 package gecv.alg.feature.detect.interest.stability;
 
-import gecv.abst.detect.interest.FactoryInterestPoint;
 import gecv.alg.feature.StabilityAlgorithm;
 import gecv.alg.feature.detect.intensity.HessianBlobIntensity;
 import gecv.alg.feature.detect.interest.*;
+import gecv.factory.feature.detect.interest.FactoryBlobDetector;
+import gecv.factory.feature.detect.interest.FactoryCornerDetector;
+import gecv.factory.feature.detect.interest.FactoryInterestPoint;
+import gecv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import gecv.struct.image.ImageBase;
 
 import java.util.ArrayList;
@@ -52,7 +55,7 @@ public class BenchmarkDetectHelper {
 		alg = FactoryCornerDetector.createHarris(radius,thresh,maxFeatures,derivType);
 		ret.add( new StabilityAlgorithm("Harris",FactoryInterestPoint.fromCorner(alg,imageType,derivType)) );
 		alg = FactoryCornerDetector.createKlt(radius,thresh,maxFeatures,derivType);
-		ret.add( new StabilityAlgorithm("KLT",FactoryInterestPoint.fromCorner(alg,imageType,derivType)) );
+		ret.add( new StabilityAlgorithm("KLT", FactoryInterestPoint.fromCorner(alg,imageType,derivType)) );
 		alg = FactoryCornerDetector.createKitRos(radius,thresh,maxFeatures,derivType);
 		ret.add( new StabilityAlgorithm("KitRos",FactoryInterestPoint.fromCorner(alg,imageType,derivType)) );
 		alg = FactoryCornerDetector.createMedian(radius,thresh,maxFeatures,imageType);

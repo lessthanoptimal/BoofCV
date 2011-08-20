@@ -18,8 +18,8 @@ package gecv.alg.feature.detect.interest;
 
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import gecv.gui.feature.ScaleSpacePyramidPointPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
@@ -51,8 +51,7 @@ public class DetectFeatureLaplacePyramidApp {
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 
 		InterpolatePixel<T> interpolate = FactoryInterpolation.bilinearPixel(imageType);
-		PyramidUpdateGaussianScale<T> update = new PyramidUpdateGaussianScale<T>(interpolate);
-		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(update,1,1.5,2,4,8,12,24);
+		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(interpolate,1,1.5,2,4,8,12,24);
 
 		int r = 2;
 		FeatureLaplacePyramid<T,D> det = FactoryInterestPointAlgs.hessianLaplacePyramid(r,1,NUM_FEATURES,imageType,derivType);

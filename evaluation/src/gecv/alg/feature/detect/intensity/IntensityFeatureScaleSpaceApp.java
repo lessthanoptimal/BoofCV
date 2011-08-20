@@ -21,6 +21,7 @@ import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.alg.misc.PixelMath;
 import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.SelectAlgorithmPanel;
 import gecv.gui.image.ShowImages;
