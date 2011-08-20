@@ -16,13 +16,12 @@
 
 package gecv.alg.transform.gss;
 
-import gecv.abst.filter.blur.FactoryBlurFilter;
-import gecv.abst.filter.blur.impl.BlurStorageFilter;
 import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.interpolate.TypeInterpolate;
 import gecv.alg.transform.pyramid.BasePyramidTests;
+import gecv.alg.transform.pyramid.PyramidUpdateSubsampleScale;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
 import gecv.struct.pyramid.SubsamplePyramid;
@@ -33,9 +32,9 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidUpdateGaussianScale extends BasePyramidTests {
+public class TestPyramidUpdateSubsampleScale extends BasePyramidTests {
 
-	public TestPyramidUpdateGaussianScale() {
+	public TestPyramidUpdateSubsampleScale() {
 		super();
 		this.width = 80;
 		this.height = 80;
@@ -53,29 +52,23 @@ public class TestPyramidUpdateGaussianScale extends BasePyramidTests {
 	public void _update(ImageFloat32 img) {
 
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(inputF32);
-		PyramidUpdateGaussianScale <ImageFloat32> alg = new PyramidUpdateGaussianScale <ImageFloat32>(interp);
+		PyramidUpdateSubsampleScale<ImageFloat32> alg = new PyramidUpdateSubsampleScale <ImageFloat32>(interp);
 
 		ImagePyramid<ImageFloat32> pyramid = new SubsamplePyramid<ImageFloat32>(alg,3,5);
 		pyramid.update(img);
 
 		// test the first layer
-		BlurStorageFilter<ImageFloat32> blur = FactoryBlurFilter.gaussian(ImageFloat32.class,3,-1);
-		ImageFloat32 blurrImg = new ImageFloat32(width, height);
-		blur.process(img,blurrImg);
 		ImageFloat32 expected = new ImageFloat32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
-		DistortImageOps.scale(blurrImg, expected, TypeInterpolate.BILINEAR);
+		DistortImageOps.scale(img, expected, TypeInterpolate.BILINEAR);
 		ImageFloat32 found = pyramid.getLayer(0);
 
 		GecvTesting.assertEquals(expected,found);
 
 		// test the second layer
-		blur = FactoryBlurFilter.gaussian(ImageFloat32.class,5.0/3.0,-1);
-		blurrImg = new ImageFloat32(expected.width,expected.height);
-		blur.process(expected,blurrImg);
-		expected = new ImageFloat32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
-		DistortImageOps.scale(blurrImg, expected, TypeInterpolate.BILINEAR);
+		ImageFloat32 next = new ImageFloat32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
+		DistortImageOps.scale(expected, next, TypeInterpolate.BILINEAR);
 		found = pyramid.getLayer(1);
 
-		GecvTesting.assertEquals(expected,found,0,1e-4);
+		GecvTesting.assertEquals(next,found,0,1e-4);
 	}
 }

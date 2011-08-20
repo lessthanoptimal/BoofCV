@@ -16,6 +16,8 @@
 
 package gecv.struct.gss;
 
+import gecv.alg.interpolate.FactoryInterpolation;
+import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageUInt8;
 import gecv.struct.pyramid.ImagePyramid;
@@ -29,34 +31,17 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestScaleSpacePyramid {
 
-	int width = 80;
-	int height = 160;
-
+	/**
+	 * Make sure the scale has been internally reduced by 1/2
+	 */
 	@Test
-	public void setScaling() {
+	public void checkScalingHalved() {
 		// see if all the layers are set correctly
-		ImagePyramid<ImageUInt8> pyramid = new ScaleSpacePyramid<ImageUInt8>(new DoNothingUpdater<ImageUInt8>(),1,2,5.5);
+		InterpolatePixel<ImageUInt8> interp = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
+		ScaleSpacePyramid<ImageUInt8> pyramid = new ScaleSpacePyramid<ImageUInt8>(interp,1,2,5.5);
 
-		ImageUInt8 input = new ImageUInt8(width,height);
-		pyramid.update(input);
-
-		assertEquals(width , pyramid.getLayer(0).width);
-		assertEquals(height , pyramid.getLayer(0).height);
-
-		assertEquals(width / 2, pyramid.getLayer(1).width);
-		assertEquals(height / 2, pyramid.getLayer(1).height);
-
-		assertEquals((int)Math.ceil(width / 5.5), pyramid.getLayer(2).width);
-		assertEquals((int)Math.ceil(height / 5.5), pyramid.getLayer(2).height);
-
-		// try it with a scaling not equal to 1
-		pyramid = new ScaleSpacePyramid<ImageUInt8>(new DoNothingUpdater<ImageUInt8>(),2,4);
-		pyramid.update(input);
-
-		assertEquals(width / 2, pyramid.getLayer(0).width);
-		assertEquals(height / 2, pyramid.getLayer(0).height);
-		assertEquals(width / 4, pyramid.getLayer(1).width);
-		assertEquals(height / 4, pyramid.getLayer(1).height);
+		for( int i = 0; i < pyramid.getNumLayers(); i++ )
+			assertEquals(pyramid.scale[i]*2,pyramid.getScale(i),1e-5);
 	}
 
 	public static class DoNothingUpdater<T extends ImageBase> implements PyramidUpdater<T>

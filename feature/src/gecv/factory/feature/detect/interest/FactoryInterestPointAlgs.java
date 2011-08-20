@@ -14,9 +14,8 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.detect.interest;
+package gecv.factory.feature.detect.interest;
 
-import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.intensity.GeneralFeatureIntensity;
 import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
@@ -24,11 +23,13 @@ import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.abst.filter.derivative.FactoryDerivativeSparse;
-import gecv.alg.feature.detect.intensity.FactoryPointIntensityAlg;
 import gecv.alg.feature.detect.intensity.GradientCornerIntensity;
 import gecv.alg.feature.detect.intensity.HessianBlobIntensity;
+import gecv.alg.feature.detect.interest.*;
 import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.inst.FactoryImageGenerator;
+import gecv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
+import gecv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import gecv.struct.image.ImageBase;
 
 /**
@@ -37,7 +38,7 @@ import gecv.struct.image.ImageBase;
 public class FactoryInterestPointAlgs {
 
 	/**
-	 * Creates a {@link FeatureLaplaceScaleSpace} which is uses the Harris corner detector.
+	 * Creates a {@link gecv.alg.feature.detect.interest.FeatureLaplaceScaleSpace} which is uses the Harris corner detector.
 	 *
 	 * @param featureRadius Size of the feature used to detect the corners.
 	 * @param cornerThreshold Minimum corner intensity required
@@ -62,7 +63,7 @@ public class FactoryInterestPointAlgs {
 
 		return new FeatureLaplaceScaleSpace<T,D>(detector,sparseLaplace,2);
 	}
-	
+
 	/**
 	 * Creates a {@link FeatureLaplaceScaleSpace} which is uses a hessian blob detector.
 	 *
@@ -90,7 +91,7 @@ public class FactoryInterestPointAlgs {
 	}
 
 	/**
-	 * Creates a {@link FeaturePyramid} which is uses a hessian blob detector.
+	 * Creates a {@link gecv.alg.feature.detect.interest.FeaturePyramid} which is uses a hessian blob detector.
 	 *
 	 * @param featureRadius Size of the feature used to detect the corners.
 	 * @param cornerThreshold Minimum corner intensity required
@@ -143,7 +144,7 @@ public class FactoryInterestPointAlgs {
 	}
 
 	/**
-	 * Creates a {@link FeatureLaplacePyramid} which is uses a hessian blob detector.
+	 * Creates a {@link gecv.alg.feature.detect.interest.FeatureLaplacePyramid} which is uses a hessian blob detector.
 	 *
 	 * @param featureRadius Size of the feature used to detect the corners.
 	 * @param cornerThreshold Minimum corner intensity required

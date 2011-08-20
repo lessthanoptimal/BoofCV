@@ -33,6 +33,10 @@ import static gecv.alg.feature.detect.interest.FeatureScaleSpace.checkMax;
 
 /**
  * <p>
+ * Pyramidal implementation of {@link FeatureScaleSpace}.
+ * </p>
+ *
+ * <p>
  * Detects scale invariant interest/corner points by computing the feature intensities across a pyramid of different scales.
  * Features which are maximums with in a local 2D neighborhood and within the local scale neighbourhood are declared to
  * be features.  Maximums are checked for in scale space by comparing the feature intensity against features in the
@@ -40,7 +44,8 @@ import static gecv.alg.feature.detect.interest.FeatureScaleSpace.checkMax;
  * </p>
  *
  * <p>
- * NOTE: Features are not computed for the bottom and top most layers in the pyramid.
+ * NOTE: Features are not computed for the bottom and top most layers in the pyramid.<br>
+ * NOTE: See discussion of scalePower inside of {@link FeatureLaplacePyramid}.
  * </p>
  *
  * <p>
@@ -108,7 +113,7 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 
 		// compute feature intensity in each level
 		for( int i = 0; i < ss.getNumLayers(); i++ ) {
-			detectCandidateFeatures(ss.getLayer(i),ss.getScale(i));
+			detectCandidateFeatures(ss.getLayer(i),ss.scale[i]);
 
 			// find maximum in NxNx3 (local image and scale space) region
 			if( i >= 2 ) {
@@ -170,9 +175,12 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 		ImageFloat32 inten1 = intensities[index1];
 		ImageBorder_F32 inten2 = FactoryImageBorder.value(intensities[index2],0);
 
-		float scale0 = (float)ss.getScale(layerID-1);
-		float scale1 = (float)ss.getScale(layerID);
-		float scale2 = (float)ss.getScale(layerID+1);
+		// In a ScaleSpacePyramid the resolution has been internally divided by two
+		float featureScale = (float)ss.getScale(layerID);
+
+		float scale0 = (float)ss.scale[layerID-1];
+		float scale1 = (float)ss.scale[layerID];
+		float scale2 = (float)ss.scale[layerID+1];
 
 		float ss0 = (float)Math.pow(scale0,scalePower);
 		float ss1 = (float)Math.pow(scale1,scalePower);
@@ -188,10 +196,9 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 			int x2 = (int)(c.x*scale1/scale2);
 			int y2 = (int)(c.y*scale1/scale2);
 
-
 			if( checkMax(inten0, ss0, val, x0, y0) && checkMax(inten2, ss2, val, x2, y2) ) {
 				// put features into the scale of the upper image
-				foundPoints.add( new ScalePoint((int)(c.x*scale1),(int)(c.y*scale1),scale1));
+				foundPoints.add( new ScalePoint((int)(c.x*scale1),(int)(c.y*scale1),featureScale));
 			}
 		}
 	}

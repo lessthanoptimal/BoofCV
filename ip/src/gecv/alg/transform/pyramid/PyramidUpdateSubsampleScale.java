@@ -14,10 +14,8 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.gss;
+package gecv.alg.transform.pyramid;
 
-import gecv.abst.filter.blur.FactoryBlurFilter;
-import gecv.abst.filter.blur.impl.BlurStorageFilter;
 import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.image.ImageBase;
@@ -28,28 +26,20 @@ import gecv.struct.pyramid.SubsamplePyramid;
 
 /**
  * <p>
- * {@link PyramidUpdater> for {@link ImagePyramid}s where each layer is first blurred using
- * a Gaussian filter and then downsampled using interpolation.  The scaling factor between
- * each level is a floating point number and the Gaussian blur's sigma is set to this value.
- * </p>
- *
- * <p>
- * NOTE: This can be considered the theoretically correct way to construct an image pyramid
- * with no sacrifices to improve speed.
+ * Updates each layer in a {@link SubsamplePyramid} by rescaling the layer with interpolation.
+ * Unlike {@link gecv.alg.transform.gss.PyramidUpdateGaussianScale}, no additional blurring is done between layers.
  * </p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidUpdateGaussianScale< T extends ImageBase> implements PyramidUpdater<T> {
+public class PyramidUpdateSubsampleScale< T extends ImageBase> implements PyramidUpdater<T> {
 
 	// interpolation algorithm
 	protected InterpolatePixel<T> interpolate;
 
-	// used to store the blurred image
-	protected T tempImage;
 
-	public PyramidUpdateGaussianScale(InterpolatePixel<T> interpolate) {
+	public PyramidUpdateSubsampleScale(InterpolatePixel<T> interpolate) {
 		this.interpolate = interpolate;
 	}
 
@@ -59,10 +49,6 @@ public class PyramidUpdateGaussianScale< T extends ImageBase> implements Pyramid
 			throw new IllegalArgumentException("The original reference cannot be saved");
 		
 		SubsamplePyramid<T> imagePyramid = (SubsamplePyramid<T>)_imagePyramid;
-
-		if( tempImage == null ) {
-			tempImage = (T)input._createNew(input.width,input.height);
-		}
 
 		for( int i = 0; i < imagePyramid.scale.length; i++ ) {
 			T prev = i == 0 ? input : imagePyramid.getLayer(i-1);
@@ -74,12 +60,7 @@ public class PyramidUpdateGaussianScale< T extends ImageBase> implements Pyramid
 			else
 				s = (float)imagePyramid.scale[0];
 
-			BlurStorageFilter<T> blur = (BlurStorageFilter<T>)FactoryBlurFilter.gaussian(layer.getClass(),s,-1);
-
-			tempImage.reshape(prev.width,prev.height);
-			blur.process(prev,tempImage);
-
-			DistortImageOps.scale(tempImage,layer,interpolate);
+			DistortImageOps.scale(prev,layer,interpolate);
 		}
 	}
 }

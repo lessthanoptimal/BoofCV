@@ -14,16 +14,17 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.detect.interest;
+package gecv.factory.feature.detect.interest;
 
-import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.intensity.*;
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.MedianImageFilter;
-import gecv.alg.feature.detect.intensity.FactoryPointIntensityAlg;
 import gecv.alg.feature.detect.intensity.FastCornerIntensity;
 import gecv.alg.feature.detect.intensity.GradientCornerIntensity;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
+import gecv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
+import gecv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import gecv.struct.image.ImageBase;
 
 /**

@@ -21,7 +21,6 @@ import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.abst.filter.derivative.FactoryDerivativeSparse;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
-import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
 import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.feature.ScalePoint;
@@ -48,8 +47,7 @@ public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetector {
 	protected List<ScalePoint> detectFeature(ImageFloat32 input,  double[] scales , Object detector) {
 		InterpolatePixel<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 
-		PyramidUpdateGaussianScale<ImageFloat32> update = new PyramidUpdateGaussianScale<ImageFloat32>(interpolate);
-		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(update,scales);
+		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(interpolate,scales);
 		ss.update(input);
 
 		FeatureLaplacePyramid<ImageFloat32,ImageFloat32> alg = (FeatureLaplacePyramid<ImageFloat32,ImageFloat32>)detector;

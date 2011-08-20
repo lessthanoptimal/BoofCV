@@ -14,8 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.detect.intensity;
+package gecv.factory.feature.detect.intensity;
 
+import gecv.alg.feature.detect.intensity.FastCornerIntensity;
+import gecv.alg.feature.detect.intensity.HarrisCornerIntensity;
+import gecv.alg.feature.detect.intensity.KltCornerIntensity;
 import gecv.alg.feature.detect.intensity.impl.*;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -31,7 +34,7 @@ import gecv.struct.image.ImageUInt8;
 public class FactoryPointIntensityAlg {
 
 	/**
-	 * Common interface for creating a {@link KitRosCornerIntensity} from different image types.
+	 * Common interface for creating a {@link gecv.alg.feature.detect.intensity.KitRosCornerIntensity} from different image types.
 	 *
 	 * @param imageType Type of input image it is computed form.
 	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
@@ -50,7 +53,7 @@ public class FactoryPointIntensityAlg {
 	}
 
 	/**
-	 * Common interface for creating a {@link HarrisCornerIntensity} from different image types.
+	 * Common interface for creating a {@link gecv.alg.feature.detect.intensity.HarrisCornerIntensity} from different image types.
 	 *
 	 * @param derivType Image derivative type it is computed from.
 	 * @param windowRadius Size of the feature it is detects,
@@ -69,7 +72,7 @@ public class FactoryPointIntensityAlg {
 	}
 
 	/**
-	 * Common interface for creating a {@link KltCornerIntensity} from different image types.
+	 * Common interface for creating a {@link gecv.alg.feature.detect.intensity.KltCornerIntensity} from different image types.
 	 *
 	 * @param derivType Image derivative type it is computed from.
 	 * @param windowRadius Size of the feature it detects,

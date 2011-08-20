@@ -16,115 +16,52 @@
 
 package gecv.struct.gss;
 
-import gecv.core.image.ImageGenerator;
+import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
 import gecv.struct.image.ImageBase;
-import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.PyramidUpdater;
-
-import java.lang.reflect.Array;
+import gecv.struct.pyramid.SubsamplePyramid;
 
 
 /**
  * <p>
  * A pyramidal representation of {@link gecv.struct.gss.GaussianScaleSpace scale-space}.
  * </p>
- *
- * An {@link gecv.struct.pyramid.ImagePyramid} where the scale factor between each level is specified using a floating point number.
+ * 
+ * <p>
+ * NOTE:  Internally the scale factors have been divided by two so that each layer in this
+ * pyramid will be comparable to a layer in {@link gecv.struct.gss.GaussianScaleSpace} at the same
+ * scale.  This has the side affect of enlarging layers when the scale is < 2.
+ * </p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class ScaleSpacePyramid<T extends ImageBase> extends ImagePyramid<T> {
+public class ScaleSpacePyramid<T extends ImageBase> extends SubsamplePyramid<T> {
 
-	// scale of each layer relative to the previous layer
-	public double scale[];
 
-	/**
-	 * Specifies input image size and behavior of top most layer.
-	 *
-	 * @param updater How each layer in the pyramid is computed.
-	 * @param scaleFactors The scales in the pyramid.
-	 */
-	public ScaleSpacePyramid( PyramidUpdater<T> updater , double ...scaleFactors ) {
-		super(false,updater);
-		setScaleFactors(scaleFactors);
+	public ScaleSpacePyramid(InterpolatePixel<T> interpolate, double... scaleFactors) {
+		super(new PyramidUpdateGaussianScale(interpolate), scaleFactors);
 	}
 
-	/**
-	 * Creates a pyramid which cannot be updated using {@link #update(gecv.struct.image.ImageBase)} and needs
-	 * to have the pyramid scales set manually.
-	 */
 	public ScaleSpacePyramid() {
-		super(false,null);
 	}
 
 	/**
-	 * Specifies the pyramid's structure.
+	 * Sets the scale space for the pyramid.  Internally the scales are divided by two.
 	 *
 	 * @param scaleFactors Change in scale factor for each layer in the pyramid.
 	 */
-	public void setScaleFactors( double ...scaleFactors ) {
-		// see if the scale factors have not changed
-		if( scale != null && scale.length == scaleFactors.length ) {
-			boolean theSame = true;
-			for( int i = 0; i < scale.length; i++ ) {
-				if( scale[i] != scaleFactors[i] ) {
-					theSame = false;
-					break;
-				}
-			}
-			// no changes needed
-			if( theSame )
-				return;
-
+	@Override
+	public void setScaleFactors(double... scaleFactors) {
+		scaleFactors = scaleFactors.clone();
+		for( int i = 0; i < scaleFactors.length; i++ ) {
+			scaleFactors[i] *= 0.5;
 		}
-		this.scale = scaleFactors.clone();
-		checkScales();
-		layers = null;
+		super.setScaleFactors(scaleFactors);
 	}
 
 	@Override
 	public double getScale(int layer) {
-		return scale[layer];
-	}
-
-	@Override
-	public int getNumLayers() {
-		return scale.length;
-	}
-
-	@Override
-	public void declareLayers(ImageGenerator<T> generator, int width , int height ) {
-		this.bottomWidth = width;
-		this.bottomHeight = height;
-
-		Class<T> type = generator.getType();
-
-		layers = (T[]) Array.newInstance(type, scale.length);
-		double scaleFactor = scale[0];
-
-		if (scaleFactor == 1) {
-			if (!saveOriginalReference) {
-				layers[0] = generator.createInstance(bottomWidth, bottomHeight);
-			}
-		} else {
-			int w = scaleLength(bottomWidth, scaleFactor);
-			int h = scaleLength(bottomHeight, scaleFactor);
-			layers[0] = generator.createInstance( w , h );
-		}
-
-		for (int i = 1; i < scale.length; i++) {
-			int w = scaleLength(bottomWidth, scale[i]);
-			int h = scaleLength(bottomHeight, scale[i]);
-			layers[i] = generator.createInstance(w,h);
-		}
-	}
-
-	private int scaleLength( int length , double scaleFactor ) {
-		return (int)Math.ceil(length/scaleFactor);
-	}
-
-	public double[] getScaleFactors() {
-		return scale;
+		return scale[layer]*2;
 	}
 }

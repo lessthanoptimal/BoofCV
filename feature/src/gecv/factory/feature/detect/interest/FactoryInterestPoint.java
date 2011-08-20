@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.abst.detect.interest;
+package gecv.factory.feature.detect.interest;
 
-import gecv.abst.detect.extract.FactoryFeatureFromIntensity;
 import gecv.abst.detect.extract.FeatureExtractor;
+import gecv.abst.detect.interest.*;
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;
@@ -25,9 +25,9 @@ import gecv.alg.feature.detect.interest.*;
 import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
-import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.FactoryImageGenerator;
+import gecv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
 import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
@@ -69,8 +69,7 @@ public class FactoryInterestPoint {
 
 		InterpolatePixel<T> interpolate = FactoryInterpolation.bilinearPixel(inputType);
 
-		PyramidUpdateGaussianScale<T> updater = new PyramidUpdateGaussianScale<T>(interpolate);
-		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(updater,scales);
+		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(interpolate,scales);
 
 		return new WrapFLPtoInterestPoint<T,D>(feature,ss);
 	}
@@ -92,11 +91,12 @@ public class FactoryInterestPoint {
 										  double []scales ,
 										  Class<T> inputType ) {
 
-
+		// todo divide scales by two!??!
+		// shouldn't change image size in pyramid because that will cause confusion
+		// but this screws up scale space stuff
 		InterpolatePixel<T> interpolate = FactoryInterpolation.bilinearPixel(inputType);
 
-		PyramidUpdateGaussianScale<T> updater = new PyramidUpdateGaussianScale<T>(interpolate);
-		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(updater,scales);
+		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(interpolate,scales);
 
 		return new WrapFPtoInterestPoint<T,D>(feature,ss);
 	}

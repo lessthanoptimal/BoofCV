@@ -48,6 +48,8 @@ public class BenchmarkImagePyramids {
 	static int scalesI[] = new int[]{1,2,2,2};
 	static double scalesF[] = new double[]{1,2,2,2};
 
+	static InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+
 	static PyramidUpdater<ImageFloat32> updaterI;
 	static PyramidUpdater<ImageFloat32> updaterF;
 
@@ -55,7 +57,7 @@ public class BenchmarkImagePyramids {
 	public static class ScaleSpace_F32 extends PerformerBase {
 
 		ScaleSpacePyramid<ImageFloat32> pyramid =
-				new ScaleSpacePyramid<ImageFloat32>(updaterF,scalesF);
+				new ScaleSpacePyramid<ImageFloat32>(interp,scalesF);
 
 		@Override
 		public void process() {
@@ -78,7 +80,6 @@ public class BenchmarkImagePyramids {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1.0,2);
 		updaterI = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 		updaterF = new PyramidUpdateGaussianScale<ImageFloat32>(interp);
 
 	}
