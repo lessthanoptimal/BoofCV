@@ -16,10 +16,10 @@
 
 package gecv.alg.interpolate.impl;
 
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;

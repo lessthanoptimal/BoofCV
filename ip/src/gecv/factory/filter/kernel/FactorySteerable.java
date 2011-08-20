@@ -14,9 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.factory.filter.kernel;
 
 import gecv.alg.distort.DistortImageOps;
+import gecv.alg.filter.kernel.GKernelMath;
+import gecv.alg.filter.kernel.SteerableKernel;
 import gecv.alg.filter.kernel.impl.SteerableKernel_F32;
 import gecv.alg.filter.kernel.impl.SteerableKernel_I32;
 import gecv.alg.interpolate.TypeInterpolate;

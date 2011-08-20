@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.factory.filter.kernel;
 
+import gecv.alg.filter.kernel.SteerableKernel;
 import gecv.struct.convolve.Kernel2D_F32;
 import org.junit.Test;
 

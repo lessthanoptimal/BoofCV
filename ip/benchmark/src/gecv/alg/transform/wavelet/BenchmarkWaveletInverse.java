@@ -21,6 +21,7 @@ import gecv.ProfileOperation;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.transform.wavelet.impl.ImplWaveletTransformNaive;
 import gecv.core.image.border.BorderType;
+import gecv.factory.transform.wavelet.FactoryWaveletDaub;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.wavelet.WaveletDescription;

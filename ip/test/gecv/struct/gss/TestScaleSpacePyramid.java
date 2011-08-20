@@ -16,8 +16,8 @@
 
 package gecv.struct.gss;
 
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageUInt8;
 import gecv.struct.pyramid.ImagePyramid;

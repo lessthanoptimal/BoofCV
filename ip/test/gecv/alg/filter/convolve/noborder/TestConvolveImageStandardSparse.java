@@ -17,10 +17,10 @@
 package gecv.alg.filter.convolve.noborder;
 
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
-import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.ConvertImage;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.ImageBase;

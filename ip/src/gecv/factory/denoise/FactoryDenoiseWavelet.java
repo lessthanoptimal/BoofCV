@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.alg.denoise;
+package gecv.factory.denoise;
 
+import gecv.alg.denoise.DenoiseWavelet;
+import gecv.alg.denoise.ShrinkThresholdRule;
 import gecv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
 import gecv.alg.denoise.wavelet.DenoiseSureShrink_F32;
 import gecv.alg.denoise.wavelet.DenoiseVisuShrink_F32;

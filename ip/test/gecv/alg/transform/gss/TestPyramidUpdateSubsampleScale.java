@@ -17,11 +17,11 @@
 package gecv.alg.transform.gss;
 
 import gecv.alg.distort.DistortImageOps;
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.interpolate.TypeInterpolate;
 import gecv.alg.transform.pyramid.BasePyramidTests;
 import gecv.alg.transform.pyramid.PyramidUpdateSubsampleScale;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
 import gecv.struct.pyramid.SubsamplePyramid;

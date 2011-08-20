@@ -16,13 +16,13 @@
 
 package gecv.alg.interpolate.impl;
 
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.SingleBandImage;
 import gecv.core.image.border.BorderType;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.image.ImageBase;
 
 

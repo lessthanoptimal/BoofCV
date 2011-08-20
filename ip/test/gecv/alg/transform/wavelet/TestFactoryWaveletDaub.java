@@ -17,6 +17,7 @@
 package gecv.alg.transform.wavelet;
 
 import gecv.core.image.border.BorderType;
+import gecv.factory.transform.wavelet.FactoryWaveletDaub;
 import gecv.struct.wavelet.WaveletDescription;
 import gecv.struct.wavelet.WlCoef_F32;
 import gecv.struct.wavelet.WlCoef_I32;

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.factory.filter.kernel;
 
 import gecv.struct.convolve.*;
 import gecv.struct.image.ImageBase;

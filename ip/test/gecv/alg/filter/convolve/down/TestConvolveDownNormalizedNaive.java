@@ -18,10 +18,10 @@ package gecv.alg.filter.convolve.down;
 
 import gecv.alg.filter.convolve.ConvolutionTestHelper;
 import gecv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
-import gecv.alg.filter.kernel.FactoryKernel;
 import gecv.core.image.FactorySingleBandImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.SingleBandImage;
+import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.struct.convolve.KernelBase;
 import gecv.struct.image.ImageBase;
 import gecv.testing.CompareEquivalentFunctions;

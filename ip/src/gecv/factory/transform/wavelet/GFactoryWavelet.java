@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.wavelet;
+package gecv.factory.transform.wavelet;
 
 import gecv.core.image.border.BorderType;
 import gecv.struct.image.ImageBase;

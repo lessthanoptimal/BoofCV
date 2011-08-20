@@ -19,7 +19,7 @@ package gecv.alg.filter.convolve;
 import gecv.alg.InputSanityCheck;
 import gecv.alg.filter.convolve.noborder.ImplConvolveMean;
 import gecv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder;
-import gecv.alg.filter.kernel.FactoryKernel;
+import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;
 import gecv.struct.image.*;

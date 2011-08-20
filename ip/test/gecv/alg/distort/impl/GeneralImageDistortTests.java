@@ -17,11 +17,11 @@
 package gecv.alg.distort.impl;
 
 import gecv.alg.distort.ImageDistort;
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.FactoryImageGenerator;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.distort.PixelTransform;
 import gecv.struct.image.ImageBase;
 import org.junit.Test;
