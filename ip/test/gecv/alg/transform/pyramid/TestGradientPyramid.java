@@ -75,5 +75,10 @@ public class TestGradientPyramid extends BasePyramidTests {
 		public int getBorder() {
 			return 0;
 		}
+
+		@Override
+		public Class<ImageFloat32> getDerivType() {
+			return null;
+		}
 	}
 }

@@ -31,7 +31,13 @@ import gecv.struct.image.ImageSInt32;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationAverage_S32 extends OrientationAverage<ImageSInt32> {	@Override
+public class ImplOrientationAverage_S32 extends OrientationAverage<ImageSInt32> {
+	
+	public ImplOrientationAverage_S32(boolean weighted) {
+		super(weighted);
+	}
+
+	@Override
 	public Class<ImageSInt32> getImageType() {
 		return ImageSInt32.class;
 	}
@@ -62,7 +68,7 @@ public class ImplOrientationAverage_S32 extends OrientationAverage<ImageSInt32> 
 		for( int y = rect.y0; y < rect.y1; y++ ) {
 			int indexX = derivX.startIndex + derivX.stride*y + rect.x0;
 			int indexY = derivY.startIndex + derivY.stride*y + rect.x0;
-			int indexW = (y-c_y+radius)*weights.width + rect.x0-c_x+radius;
+			int indexW = (y-c_y+radiusScale)*weights.width + rect.x0-c_x+radiusScale;
 
 			for( int x = rect.x0; x < rect.x1; x++ , indexX++ , indexY++ , indexW++ ) {
 				float w = weights.data[indexW];

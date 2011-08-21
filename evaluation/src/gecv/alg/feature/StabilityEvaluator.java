@@ -40,10 +40,10 @@ public interface StabilityEvaluator<T extends ImageBase> {
 	 *
 	 * @param alg Algorithm being evaluated.
 	 * @param image Modified image.
-	 * @param transform
+	 * @param initToImage Transform from the initial image into the current image.
 	 * @return Error metrics.
 	 */
-	double[] evaluateImage(StabilityAlgorithm alg, T image, Affine2D_F32 transform);
+	double[] evaluateImage(StabilityAlgorithm alg, T image, Affine2D_F32 initToImage);
 
 	/**
 	 * Names of extracted metrics.

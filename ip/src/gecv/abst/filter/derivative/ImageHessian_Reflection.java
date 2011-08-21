@@ -75,4 +75,9 @@ public class ImageHessian_Reflection<Output extends ImageBase>
 		else
 			return 1;
 	}
+
+	@Override
+	public Class<Output> getDerivType() {
+		return (Class)m.getParameterTypes()[2];
+	}
 }

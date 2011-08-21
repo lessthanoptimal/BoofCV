@@ -17,7 +17,6 @@
 package gecv.alg.tracker.pklt;
 
 import gecv.alg.filter.derivative.GradientSobel;
-import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.tracker.klt.KltTracker;
 import gecv.alg.tracker.klt.TestKltTracker;
@@ -26,6 +25,7 @@ import gecv.core.image.ImageGenerator;
 import gecv.core.image.border.BorderIndex1D_Extend;
 import gecv.core.image.border.ImageBorder1D_F32;
 import gecv.core.image.inst.FactoryImageGenerator;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.DiscreteImagePyramid;

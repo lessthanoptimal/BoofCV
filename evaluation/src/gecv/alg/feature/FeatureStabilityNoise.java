@@ -30,7 +30,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public abstract class FeatureStabilityNoise<T extends ImageBase>
+public class FeatureStabilityNoise<T extends ImageBase>
 	extends FeatureStabilityBase<T> 
 {
 	// rand number generator used to add noise

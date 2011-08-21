@@ -16,8 +16,8 @@
 
 package gecv.alg.transform.pyramid;
 
-import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.gui.image.DiscretePyramidPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;

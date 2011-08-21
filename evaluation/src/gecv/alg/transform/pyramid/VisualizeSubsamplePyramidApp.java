@@ -16,9 +16,9 @@
 
 package gecv.alg.transform.pyramid;
 
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.gui.image.ImagePyramidPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;

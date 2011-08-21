@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class FeatureStabilityScale<T extends ImageBase>
+public class FeatureStabilityScale<T extends ImageBase>
 		extends FeatureStabilityBase<T>
 {
 	// scale of the input image
@@ -59,13 +59,14 @@ public abstract class FeatureStabilityScale<T extends ImageBase>
 		List<MetricResult> results = createResultsStorage(evaluator, scale);
 
 		for( int i = 0; i < scale.length; i++ ) {
-			Affine2D_F32 tranScale = createScale((float)scale[i],image.width,image.height);
-			PixelTransformAffine affine = new PixelTransformAffine(tranScale);
-			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,affine,TypeInterpolate.NEAREST_NEIGHBOR);
+			Affine2D_F32 initToImage = createScale((float)scale[i],image.width,image.height);
+			Affine2D_F32 imageToInit = initToImage.invert(null);
+			PixelTransformAffine affine = new PixelTransformAffine(imageToInit);
+			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,affine,TypeInterpolate.BILINEAR);
 
 			distorter.apply(image,adjusted,125);
 
-			double[]metrics = evaluator.evaluateImage(alg,adjusted, tranScale);
+			double[]metrics = evaluator.evaluateImage(alg,adjusted, initToImage);
 
 			for( int j = 0; j < results.size(); j++ ) {
 				results.get(j).observed[i] = metrics[j];
@@ -86,7 +87,7 @@ public abstract class FeatureStabilityScale<T extends ImageBase>
 		int offX = (w-sw)/2;
 		int offY = (h-sh)/2;
 
-		return new Affine2D_F32(scale,0,0,scale,offX,offY).invert(null);
+		return new Affine2D_F32(scale,0,0,scale,offX,offY);
 	}
 
 	@Override

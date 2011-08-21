@@ -17,12 +17,13 @@
 package gecv.abst.filter.derivative;
 
 import gecv.core.image.border.BorderType;
+import gecv.struct.image.ImageBase;
 
 
 /**
  * @author Peter Abeles
  */
-public interface ImageDerivative {
+public interface ImageDerivative<T extends ImageBase, D extends ImageBase> {
 
 	/**
 	 * Overrides the default border behavior.  See {@link FactoryDerivative} for a discussion
@@ -46,4 +47,6 @@ public interface ImageDerivative {
 	 * @return number of pixels.
 	 */
 	public int getBorder();
+
+	public Class<D> getDerivType();
 }

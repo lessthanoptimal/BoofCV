@@ -16,6 +16,7 @@
 
 package gecv.alg.filter.kernel;
 
+import gecv.factory.filter.kernel.FactorySteerable;
 import gecv.struct.convolve.Kernel2D;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.image.ImageBase;

@@ -16,10 +16,10 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.factory.feature.detect.interest.FactoryInterestPointAlgs;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.gui.feature.ScaleSpacePyramidPointPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;

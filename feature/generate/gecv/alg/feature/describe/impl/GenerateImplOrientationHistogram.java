@@ -53,10 +53,10 @@ public class GenerateImplOrientationHistogram extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.describe.impl;\n" +
+		out.print("package gecv.alg.feature.describe.impl;\n" +
 				"\n" +
 				"import gecv.alg.InputSanityCheck;\n" +
-				"import gecv.alg.describe.OrientationHistogram;\n" +
+				"import gecv.alg.feature.describe.OrientationHistogram;\n" +
 				"import gecv.struct.image."+imageType.getImageName()+";\n" +
 				"\n" +
 				"\n" +
@@ -73,8 +73,8 @@ public class GenerateImplOrientationHistogram extends CodeGeneratorBase {
 				" */\n" +
 				"public class "+className+" extends OrientationHistogram<"+imageType.getImageName()+"> {\n" +
 				"\n" +
-				"\tpublic "+className+"(int numAngles) {\n" +
-				"\t\tsuper(numAngles);\n" +
+				"\tpublic "+className+"(int numAngles , boolean isWeighted ) {\n" +
+				"\t\tsuper(numAngles,isWeighted);\n" +
 				"\t}\n\n");
 	}
 
@@ -125,7 +125,7 @@ public class GenerateImplOrientationHistogram extends CodeGeneratorBase {
 				"\t\tfor( int y = rect.y0; y < rect.y1; y++ ) {\n" +
 				"\t\t\tint indexX = derivX.startIndex + derivX.stride*y + rect.x0;\n" +
 				"\t\t\tint indexY = derivY.startIndex + derivY.stride*y + rect.x0;\n" +
-				"\t\t\tint indexW = (y-c_y+radius)*weights.width + rect.x0-c_x+radius;\n" +
+				"\t\t\tint indexW = (y-c_y+radiusScale)*weights.width + rect.x0-c_x+radiusScale;\n" +
 				"\n" +
 				"\t\t\tfor( int x = rect.x0; x < rect.x1; x++ , indexX++ , indexY++ , indexW++ ) {\n" +
 				"\t\t\t\tfloat w = weights.data[indexW];\n" +

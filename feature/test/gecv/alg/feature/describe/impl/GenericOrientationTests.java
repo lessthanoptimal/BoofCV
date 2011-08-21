@@ -23,6 +23,7 @@ import jgrl.metric.UtilAngle;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -99,6 +100,7 @@ public class GenericOrientationTests<D extends ImageBase> {
 	 * This test sees if a weight is used for the region.  The weight should
 	 * be set up such that all the weight is on the center pixel.
 	 */
+	//TODO the weight is the same as a convolution.  use this in the test?
 	public void performWeightTests() {
 		GeneralizedImageOps.fill(derivX,10);
 		GeneralizedImageOps.fill(derivY,0);
@@ -113,5 +115,6 @@ public class GenericOrientationTests<D extends ImageBase> {
 		// if weight is no all on the center pixel a different solution will be generated
 		double found = alg.compute(c_x,c_y);
 		assertTrue( UtilAngle.dist(Math.PI/2.0,found) < angleTolerance );
+		fail("Update for a gaussian weight");
 	}
 }

@@ -51,6 +51,9 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 	// kernel's radius and the image border
 	private int borderSize;
 
+	// type of input/output images
+	private Class<D> derivType;
+
 	public ImageGradient_Gaussian(int radius , Class<I> inputType , Class<D> derivType) {
 		this(sigmaForRadius(radius,0),radius,inputType,derivType);
 	}
@@ -58,6 +61,7 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 	public ImageGradient_Gaussian(double sigma, int radius,
 								  Class<I> inputType , Class<D> derivType ) {
 		this.borderSize = radius;
+		this.derivType = derivType;
 
 		// need to do this here to make sure the blur and derivative functions have the same paramters.
 		if( radius <= 0 )
@@ -123,5 +127,10 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 			return 0;
 		else
 			return borderSize;
+	}
+
+	@Override
+	public Class getDerivType() {
+		return derivType;
 	}
 }

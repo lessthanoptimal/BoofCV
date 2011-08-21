@@ -75,7 +75,7 @@ public class CompileImageResults<T extends ImageBase> {
 			System.out.println("Metric: "+metrics[metricNum]);
 
 			for( AlgorithmResult<T> a : results ) {
-				System.out.printf("%12s ",a.algName);
+				System.out.printf("%20s ",a.algName);
 				for( int i = 0; i < N; i++ ) {
 					MetricResult r = a.performance.get(metricNum);
 					System.out.printf(" %4.1f",r.observed[i]);

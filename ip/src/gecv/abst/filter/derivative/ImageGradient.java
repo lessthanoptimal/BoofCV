@@ -24,7 +24,7 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ImageGradient<Input extends ImageBase, Output extends ImageBase> extends ImageDerivative {
+public interface ImageGradient<Input extends ImageBase, Output extends ImageBase> extends ImageDerivative<Input,Output> {
 
 	/**
 	 * Compues the image gradient from the input image and stores the results into
