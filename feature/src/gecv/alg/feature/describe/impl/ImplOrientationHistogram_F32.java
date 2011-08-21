@@ -33,8 +33,8 @@ import gecv.struct.image.ImageFloat32;
  */
 public class ImplOrientationHistogram_F32 extends OrientationHistogram<ImageFloat32> {
 
-	public ImplOrientationHistogram_F32(int numAngles) {
-		super(numAngles);
+	public ImplOrientationHistogram_F32(int numAngles , boolean isWeighted ) {
+		super(numAngles,isWeighted);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class ImplOrientationHistogram_F32 extends OrientationHistogram<ImageFloa
 		for( int y = rect.y0; y < rect.y1; y++ ) {
 			int indexX = derivX.startIndex + derivX.stride*y + rect.x0;
 			int indexY = derivY.startIndex + derivY.stride*y + rect.x0;
-			int indexW = (y-c_y+radius)*weights.width + rect.x0-c_x+radius;
+			int indexW = (y-c_y+radiusScale)*weights.width + rect.x0-c_x+radiusScale;
 
 			for( int x = rect.x0; x < rect.x1; x++ , indexX++ , indexY++ , indexW++ ) {
 				float w = weights.data[indexW];

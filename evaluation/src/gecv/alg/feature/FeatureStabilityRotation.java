@@ -22,6 +22,7 @@ import gecv.alg.distort.impl.DistortSupport;
 import gecv.alg.interpolate.TypeInterpolate;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.struct.image.ImageBase;
+import jgrl.struct.affine.Affine2D_F32;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class FeatureStabilityRotation<T extends ImageBase>
+public class FeatureStabilityRotation<T extends ImageBase>
 		extends FeatureStabilityBase<T>
 {
 	// rotation of the input image
@@ -60,15 +61,15 @@ public abstract class FeatureStabilityRotation<T extends ImageBase>
 		float centerX = image.width/2;
 		float centerY = image.height/2;
 
-
 		for( int i = 0; i < angle.length; i++ ) {
 			float theta = (float)angle[i];
-			PixelTransformAffine affine = DistortSupport.transformRotate(centerX,centerY,theta);
-			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,affine,TypeInterpolate.NEAREST_NEIGHBOR);
+			PixelTransformAffine imageToInit = DistortSupport.transformRotate(centerX,centerY,theta);
+			Affine2D_F32 initToImage = imageToInit.getModel().invert(null);
+			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,imageToInit,TypeInterpolate.BILINEAR);
 
 			distorter.apply(image,adjusted,125);
 
-			double[]metrics = evaluator.evaluateImage(alg,adjusted, affine.getModel());
+			double[]metrics = evaluator.evaluateImage(alg,adjusted, initToImage);
 
 			for( int j = 0; j < results.size(); j++ ) {
 				results.get(j).observed[i] = metrics[j];

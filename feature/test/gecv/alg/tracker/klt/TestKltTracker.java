@@ -17,11 +17,11 @@
 package gecv.alg.tracker.klt;
 
 import gecv.alg.filter.derivative.GradientSobel;
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.border.BorderIndex1D_Extend;
 import gecv.core.image.border.ImageBorder1D_F32;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;

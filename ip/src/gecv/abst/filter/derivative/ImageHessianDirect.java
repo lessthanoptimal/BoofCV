@@ -27,7 +27,7 @@ import gecv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 public interface ImageHessianDirect<Input extends ImageBase, Output extends ImageBase>
-		extends ImageDerivative 
+		extends ImageDerivative<Input,Output> 
 {
 
 	/**

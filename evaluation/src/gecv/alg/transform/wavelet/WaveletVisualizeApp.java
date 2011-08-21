@@ -21,6 +21,7 @@ import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.misc.GPixelMath;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.border.BorderType;
+import gecv.factory.transform.wavelet.GFactoryWavelet;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.SelectAlgorithmPanel;
 import gecv.gui.image.ShowImages;
@@ -61,7 +62,7 @@ public class WaveletVisualizeApp
 		imageInv = (T)image._createNew(image.width,image.height);
 
 		addWaveletDesc("Haar",GFactoryWavelet.haar(imageType));
-		addWaveletDesc("Daub 4",GFactoryWavelet.daubJ(imageType,4));
+		addWaveletDesc("Daub 4", GFactoryWavelet.daubJ(imageType,4));
 		addWaveletDesc("Bi-orthogonal 5",GFactoryWavelet.biorthogoal(imageType,5, BorderType.REFLECT));
 		addWaveletDesc("Coiflet 6",GFactoryWavelet.coiflet(imageType,6));
 

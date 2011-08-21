@@ -17,11 +17,11 @@
 package gecv.alg.tracker.pklt;
 
 import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.tracker.klt.KltTrackFault;
 import gecv.alg.tracker.klt.KltTracker;
 import gecv.factory.feature.detect.interest.FactoryCornerDetector;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
 

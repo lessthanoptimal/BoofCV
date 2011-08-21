@@ -14,11 +14,13 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.describe;
+package gecv.factory.feature.describe;
 
-import gecv.alg.filter.kernel.FactoryKernel;
-import gecv.alg.filter.kernel.FactorySteerable;
+import gecv.alg.feature.describe.DescribePointSteerable2D;
+import gecv.alg.feature.describe.RegionOrientation;
 import gecv.alg.filter.kernel.SteerableKernel;
+import gecv.factory.filter.kernel.FactoryKernel;
+import gecv.factory.filter.kernel.FactorySteerable;
 import gecv.struct.convolve.Kernel2D;
 import gecv.struct.image.ImageBase;
 
@@ -38,7 +40,7 @@ public class FactoryDescribeRegionAlgs {
 	{
 		SteerableKernel<K>[] kernels = (SteerableKernel<K>[])new SteerableKernel[14];
 
-		Class<K> kernelType = (Class)FactoryKernel.getKernelType(imageType,2);
+		Class<K> kernelType = (Class) FactoryKernel.getKernelType(imageType,2);
 
 		int index = 0;
 		for( int N = 1; N <= 4; N++ ) {

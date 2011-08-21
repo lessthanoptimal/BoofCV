@@ -16,38 +16,55 @@
 
 package gecv.alg.feature.detect.interest.stability;
 
-import gecv.alg.feature.CompileImageResults;
-import gecv.alg.feature.FeatureStabilityNoise;
+import gecv.alg.feature.*;
+import gecv.alg.feature.describe.stability.UtilOrientationBenchmark;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 
+
 /**
- * Compares different image interest point detection algorithms stability under different amounts of
- * i.i.d. gaussian pixel noise.
- *
  * @author Peter Abeles
  */
-public class BenchmarkDetectStability_Noise<T extends ImageBase>
-	extends FeatureStabilityNoise<T>
-{
+public class DetectStability<T extends ImageBase, D extends ImageBase> {
 
-	/**
-	 * Evaluating input images of the specified type.
-	 *
-	 * @param imageType Original input image type.
-	 */
-	public BenchmarkDetectStability_Noise(Class<T> imageType) {
-		super(imageType, 234234, 1,2,4,8,12,16,20);
+	int randSeed = 234234;
+	Class<T> imageType;
+	Class<D> derivType;
+
+	public DetectStability(Class<T> imageType, Class<D> derivType) {
+		this.imageType = imageType;
+		this.derivType = derivType;
 	}
 
-	public static <T extends ImageBase, D extends ImageBase>
-			void evaluate( Class<T> imageType , Class<D> derivType ) {
+	public void testNoise() {
+		FeatureStabilityNoise<T> stability =
+				new FeatureStabilityNoise<T>(imageType,randSeed, 1,2,4,8,12,16,20,40);
+		perform(stability);
+	}
 
+	public void testIntensity() {
+		FeatureStabilityIntensity<T> stability =
+				new FeatureStabilityIntensity<T>(imageType,0.2,0.5,0.8,1.1,1.5);
+		perform(stability);
+	}
+
+	public void testRotation() {
+		FeatureStabilityRotation<T> stability =
+				new FeatureStabilityRotation<T>(imageType,UtilOrientationBenchmark.makeSample(0,Math.PI,20));
+
+		perform(stability);
+	}
+
+	public void testScale() {
+		FeatureStabilityScale<T> stability =
+				new FeatureStabilityScale<T>(imageType,0.5,0.75,1,1.5,2,3,4);
+		perform(stability);
+	}
+
+	private void perform( FeatureStabilityBase<T> eval ) {
 		BenchmarkInterestParameters<T,D> param = new BenchmarkInterestParameters<T,D>();
 		param.imageType = imageType;
 		param.derivType = derivType;
-
-		BenchmarkDetectStability_Noise<T> eval = new BenchmarkDetectStability_Noise<T>(imageType);
 
 		CompileImageResults<T> compile = new CompileImageResults<T>(eval);
 		compile.addImage("evaluation/data/outdoors01.jpg");
@@ -61,10 +78,17 @@ public class BenchmarkDetectStability_Noise<T extends ImageBase>
 		compile.setAlgorithms(BenchmarkDetectHelper.createAlgs(param),evaluator);
 
 		compile.process();
+
 	}
 
-	public static void main( String args[] )
-	{
-		evaluate(ImageFloat32.class,ImageFloat32.class);
+	public static void main( String args[] ) {
+		DetectStability<ImageFloat32,ImageFloat32> benchmark
+				= new DetectStability<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+
+//		benchmark.testNoise();
+//		benchmark.testIntensity();
+		benchmark.testRotation();
+//		benchmark.testScale();
+
 	}
 }

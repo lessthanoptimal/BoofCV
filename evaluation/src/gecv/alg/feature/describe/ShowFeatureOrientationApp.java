@@ -21,6 +21,7 @@ import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.inst.FactoryImageGenerator;
+import gecv.factory.feature.describe.FactoryRegionOrientationAlgs;
 import gecv.factory.feature.detect.interest.FactoryCornerDetector;
 import gecv.gui.feature.FancyInterestPointRender;
 import gecv.gui.image.ShowImages;

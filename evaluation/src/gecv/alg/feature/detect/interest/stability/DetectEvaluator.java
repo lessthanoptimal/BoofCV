@@ -55,13 +55,10 @@ public class DetectEvaluator<T extends ImageBase> implements StabilityEvaluator<
 	}
 
 	@Override
-	public double[] evaluateImage(StabilityAlgorithm alg, T image, Affine2D_F32 transform)
+	public double[] evaluateImage(StabilityAlgorithm alg, T image, Affine2D_F32 initToImage)
 	{
-		if( transform != null )
-			transform = transform.invert(null);
-
 		// move the found points to the new coordinate system or just use the
-		List<Point2D_I32> original = transform == null ? this.original : transformOriginal(image,transform);
+		List<Point2D_I32> original = initToImage == null ? this.original : transformOriginal(image,initToImage);
 
 		InterestPointDetector<T> detector = alg.getAlgorithm();
 		detector.detect(image);
@@ -94,7 +91,7 @@ public class DetectEvaluator<T extends ImageBase> implements StabilityEvaluator<
 		return results;
 	}
 
-	private List<Point2D_I32> transformOriginal( T image , Affine2D_F32 transform )
+	private List<Point2D_I32> transformOriginal( T image , Affine2D_F32 initToImage )
 	{
 		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
 
@@ -104,7 +101,7 @@ public class DetectEvaluator<T extends ImageBase> implements StabilityEvaluator<
 		for( Point2D_I32 p : original ) {
 			f.x = p.x;
 			f.y = p.y;
-			AffinePointOps.transform(transform,f,t);
+			AffinePointOps.transform(initToImage,f,t);
 			if( image.isInBounds((int)t.x,(int)t.y) ) {
 				ret.add( new Point2D_I32((int)t.x,(int)t.y));
 			}

@@ -19,6 +19,7 @@ package gecv.alg.filter.kernel;
 import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.TypeInterpolate;
 import gecv.alg.misc.PixelMath;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.SelectAlgorithmPanel;
 import gecv.gui.image.ShowImages;

@@ -14,12 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.describe;
+package gecv.factory.feature.describe;
 
+import gecv.alg.feature.describe.OrientationAverage;
+import gecv.alg.feature.describe.OrientationHistogram;
 import gecv.alg.feature.describe.impl.*;
-import gecv.alg.filter.kernel.FactoryKernelGaussian;
-import gecv.alg.filter.kernel.KernelMath;
-import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
@@ -34,51 +33,41 @@ public class FactoryRegionOrientationAlgs {
 
 	public static <T extends ImageBase>
 	OrientationHistogram<T> histogram( int numAngles , int radius , boolean weighted ,
-									   Class<T> imageType )
+									   Class<T> derivType )
 	{
 		OrientationHistogram<T> ret;
 
-		if( imageType == ImageFloat32.class ) {
-			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_F32(numAngles);
-		} else if( imageType == ImageSInt16.class ) {
-			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S16(numAngles);
-		} else if( imageType == ImageSInt32.class ) {
-			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S32(numAngles);
+		if( derivType == ImageFloat32.class ) {
+			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_F32(numAngles,weighted);
+		} else if( derivType == ImageSInt16.class ) {
+			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S16(numAngles,weighted);
+		} else if( derivType == ImageSInt32.class ) {
+			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S32(numAngles,weighted);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
 		}
 
 		ret.setRadius(radius);
-		if( weighted ) {
-			Kernel2D_F32 weight = FactoryKernelGaussian.gaussian(2,true,-1,radius);
-			KernelMath.normalizeSumToOne(weight);
-			ret.setWeights(weight);
-		}
 
 		return ret;
 	}
 
 	public static <T extends ImageBase>
-	OrientationAverage<T> average( int radius , boolean weighted , Class<T> imageType )
+	OrientationAverage<T> average( int radius , boolean weighted , Class<T> derivType )
 	{
 		OrientationAverage<T> ret;
 
-		if( imageType == ImageFloat32.class ) {
-			ret = (OrientationAverage<T>)new ImplOrientationAverage_F32();
-		} else if( imageType == ImageSInt16.class ) {
-			ret = (OrientationAverage<T>)new ImplOrientationAverage_S16();
-		} else if( imageType == ImageSInt32.class ) {
-			ret = (OrientationAverage<T>)new ImplOrientationAverage_S32();
+		if( derivType == ImageFloat32.class ) {
+			ret = (OrientationAverage<T>)new ImplOrientationAverage_F32(weighted);
+		} else if( derivType == ImageSInt16.class ) {
+			ret = (OrientationAverage<T>)new ImplOrientationAverage_S16(weighted);
+		} else if( derivType == ImageSInt32.class ) {
+			ret = (OrientationAverage<T>)new ImplOrientationAverage_S32(weighted);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
 		}
 
 		ret.setRadius(radius);
-		if( weighted ) {
-			Kernel2D_F32 weight = FactoryKernelGaussian.gaussian(2,true,-1,radius);
-			KernelMath.normalizeSumToOne(weight);
-			ret.setWeights(weight);
-		}
 
 		return ret;
 	}

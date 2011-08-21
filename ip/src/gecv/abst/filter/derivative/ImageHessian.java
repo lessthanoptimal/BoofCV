@@ -25,7 +25,7 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ImageHessian<Output extends ImageBase> extends ImageDerivative {
+public interface ImageHessian<Output extends ImageBase> extends ImageDerivative<Output,Output> {
 
 	/**
 	 * Computes all the second derivative terms in the image.

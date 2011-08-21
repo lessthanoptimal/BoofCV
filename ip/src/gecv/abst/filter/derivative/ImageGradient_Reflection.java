@@ -76,4 +76,9 @@ public class ImageGradient_Reflection<Input extends ImageBase, Output extends Im
 		else
 			return 1;
 	}
+
+	@Override
+	public Class<Output> getDerivType() {
+		return (Class)m.getParameterTypes()[1];
+	}
 }

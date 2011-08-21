@@ -26,7 +26,12 @@ import gecv.struct.image.ImageBase;
  */
 public interface RegionOrientation<D extends ImageBase> {
 
-	
+	/**
+	 * Specifies scale at which the orientation is estimated.
+	 * 
+	 * @param scale Scale of the orientation region.
+	 */
+	public void setScale( double scale );
 
 	/**
 	 * Specifies input image data for estimating orientation.

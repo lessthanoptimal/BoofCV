@@ -17,6 +17,7 @@
 package gecv.alg.feature.describe;
 
 import gecv.alg.InputSanityCheck;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.misc.GecvMiscOps;
 import gecv.struct.ImageRectangle;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -27,20 +28,23 @@ import gecv.struct.image.ImageBase;
  * <p>
  * Estimates the orientation by creating a histogram of discrete angles around
  * the entire circle.  The angle with the largest sum of edge intensities is considered
- * to be the direction of the region.  Optional weighting can be provided using a {@link Kernel2D_F32}
+ * to be the direction of the region.    If weighted a Gaussian kernel centered around the targeted
+ * pixel is used.
  * </p>
  *
  * @author Peter Abeles
  */
-public abstract class OrientationHistogram <T extends ImageBase>
-		implements RegionOrientation<T>
+public abstract class OrientationHistogram <D extends ImageBase>
+		implements RegionOrientation<D>
 {
 	// the region's radius
 	protected int radius;
+	// the radius at the set scale
+	protected int radiusScale;
 
 	// image x and y derivatives
-	protected T derivX;
-	protected T derivY;
+	protected D derivX;
+	protected D derivY;
 
 	// local variable used to define the region being examined.
 	// this makes it easy to avoid going outside the image
@@ -57,22 +61,24 @@ public abstract class OrientationHistogram <T extends ImageBase>
 	// used to round towards the nearest angle
 	protected double angleRound;
 
+	// if it uses weights or not
+	protected boolean isWeighted;
 	// optional weights
 	protected Kernel2D_F32 weights;
 
 	/**
-	 * Constructor. Specify region size and weights using {@link #setRadius(int)} and
-	 * {@link #setWeights(gecv.struct.convolve.Kernel2D_F32)}.
+	 * Constructor. Specify region size and if it is weighted or not.
 	 *
 	 * @param numAngles Number of discrete angles that the orientation is estimated inside of
 	 */
-	public OrientationHistogram( int numAngles ) {
+	public OrientationHistogram( int numAngles , boolean isWeighted ) {
 		this.numAngles = numAngles;
 		sumDerivX = new double[ numAngles ];
 		sumDerivY = new double[ numAngles ];
 
 		angleDiv = 2.0*Math.PI/numAngles;
 		angleRound = Math.PI+angleDiv/2.0;
+		this.isWeighted = isWeighted;
 	}
 
 	public int getRadius() {
@@ -86,6 +92,7 @@ public abstract class OrientationHistogram <T extends ImageBase>
 	 */
 	public void setRadius(int radius) {
 		this.radius = radius;
+		setScale(1);
 	}
 
 	public Kernel2D_F32 getWeights() {
@@ -93,23 +100,19 @@ public abstract class OrientationHistogram <T extends ImageBase>
 	}
 
 	@Override
-	public void setImage( T derivX, T derivY) {
+	public void setScale(double scale) {
+		radiusScale = (int)Math.ceil(scale*radius);
+		if( isWeighted ) {
+			weights = FactoryKernelGaussian.gaussian(2,true,-1,radiusScale);
+		}
+	}
+
+	@Override
+	public void setImage( D derivX, D derivY) {
 		InputSanityCheck.checkSameShape(derivX,derivY);
 
 		this.derivX = derivX;
 		this.derivY = derivY;
-	}
-
-	/**
-	 * Specifies the weights which are centered around the targeted pixel
-	 *
-	 * @param weights
-	 */
-	public void setWeights(Kernel2D_F32 weights) {
-		if( weights.getRadius() != radius ) {
-			throw new IllegalArgumentException("The weight radius is not the same as the region's radius.");
-		}
-		this.weights = weights;
 	}
 
 	@Override
@@ -117,10 +120,10 @@ public abstract class OrientationHistogram <T extends ImageBase>
 
 		// compute the visible region while taking in account
 		// the image borders
-		rect.x0 = c_x-radius;
-		rect.y0 = c_y-radius;
-		rect.x1 = c_x+radius+1;
-		rect.y1 = c_y+radius+1;
+		rect.x0 = c_x-radiusScale;
+		rect.y0 = c_y-radiusScale;
+		rect.x1 = c_x+radiusScale+1;
+		rect.y1 = c_y+radiusScale+1;
 
 		GecvMiscOps.boundRectangleInside(derivX,rect);
 

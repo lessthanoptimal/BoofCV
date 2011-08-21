@@ -16,9 +16,6 @@
 
 package gecv.alg.feature.describe.impl;
 
-import gecv.alg.filter.kernel.FactoryKernelGaussian;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import org.junit.Test;
 
@@ -35,7 +32,7 @@ public class TestImplOrientationAverage_S16 {
 	public void standardUnweighted() {
 		GenericOrientationTests<ImageSInt16> tests = new GenericOrientationTests<ImageSInt16>();
 
-		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16();
+		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16(false);
 		alg.setRadius(r);
 
 		tests.setup(angleTol, r*2+1 , alg);
@@ -45,39 +42,12 @@ public class TestImplOrientationAverage_S16 {
 	@Test
 	public void standardWeighted() {
 		GenericOrientationTests<ImageSInt16> tests = new GenericOrientationTests<ImageSInt16>();
-		Kernel2D_F32 w = FactoryKernelGaussian.gaussian2D(ImageFloat32.class,-1,r);
 
-		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16();
+		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16(true);
 		alg.setRadius(r);
-		alg.setWeights(w);
 
 		tests.setup(angleTol, r*2+1 ,alg);
 		tests.performAll();
-
-		w = new Kernel2D_F32(r*2+1);
-		w.set(r,r,1);
-
-		alg.setWeights(w);
-		tests.performWeightTests();
-
-	}
-
-	/**
-	 * See if the weight is being used by provided a case where different answers will be
-	 * created for weighted and unweighted
-	 */
-	@Test
-	public void checkWeightsUsed() {
-		GenericOrientationTests<ImageSInt16> tests = new GenericOrientationTests<ImageSInt16>();
-		Kernel2D_F32 w = new Kernel2D_F32(r*2+1);
-		w.set(r,r,1);
-
-		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16();
-		alg.setRadius(r);
-		alg.setWeights(w);
-
-		tests.setup(angleTol, r*2+1 ,alg);
 		tests.performWeightTests();
 	}
-
 }

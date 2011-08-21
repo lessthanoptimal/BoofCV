@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class FeatureStabilityIntensity<T extends ImageBase>
+public class FeatureStabilityIntensity<T extends ImageBase>
 		extends FeatureStabilityBase<T>
 {
 	// how much of the original intensity is returned

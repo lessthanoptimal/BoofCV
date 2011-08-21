@@ -16,6 +16,7 @@
 
 package gecv.alg.feature.describe;
 
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.misc.GecvMiscOps;
 import gecv.struct.ImageRectangle;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -23,8 +24,11 @@ import gecv.struct.image.ImageBase;
 
 
 /**
- * <p>Computes the orientation of a region by summing up the derivative along each axis independently
- * then computing the direction fom the sum.</p>
+ * <p>
+ * Computes the orientation of a region by summing up the derivative along each axis independently
+ * then computing the direction fom the sum.  If weighted a Gaussian kernel centered around the targeted
+ * pixel is used.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -38,9 +42,17 @@ public abstract class OrientationAverage<T extends ImageBase> implements RegionO
 	protected ImageRectangle rect = new ImageRectangle();
 
 	protected int radius;
+	// the radius at this scale
+	protected int radiusScale;
 
+	// if it uses weights or not
+	protected boolean isWeighted;
 	// optional weights
 	protected Kernel2D_F32 weights;
+
+	protected OrientationAverage(boolean weighted) {
+		isWeighted = weighted;
+	}
 
 	public int getRadius() {
 		return radius;
@@ -48,14 +60,19 @@ public abstract class OrientationAverage<T extends ImageBase> implements RegionO
 
 	public void setRadius(int radius) {
 		this.radius = radius;
+		setScale(1);
 	}
 
 	public Kernel2D_F32 getWeights() {
 		return weights;
 	}
 
-	public void setWeights(Kernel2D_F32 weights) {
-		this.weights = weights;
+	@Override
+	public void setScale(double scale) {
+		radiusScale = (int)Math.ceil(scale*radius);
+		if( isWeighted ) {
+			weights = FactoryKernelGaussian.gaussian(2,true,-1,radiusScale);
+		}
 	}
 
 	@Override
@@ -69,10 +86,10 @@ public abstract class OrientationAverage<T extends ImageBase> implements RegionO
 
 		// compute the visible region while taking in account
 		// the image borders
-		rect.x0 = c_x-radius;
-		rect.y0 = c_y-radius;
-		rect.x1 = c_x+radius+1;
-		rect.y1 = c_y+radius+1;
+		rect.x0 = c_x-radiusScale;
+		rect.y0 = c_y-radiusScale;
+		rect.x1 = c_x+radiusScale+1;
+		rect.y1 = c_y+radiusScale+1;
 
 		GecvMiscOps.boundRectangleInside(derivX,rect);
 

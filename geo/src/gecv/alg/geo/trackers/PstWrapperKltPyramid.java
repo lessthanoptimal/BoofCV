@@ -18,7 +18,6 @@ package gecv.alg.geo.trackers;
 
 import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
-import gecv.alg.filter.kernel.FactoryKernelGaussian;
 import gecv.alg.geo.AssociatedPair;
 import gecv.alg.geo.PointSequentialTracker;
 import gecv.alg.geo.SingleImageInput;
@@ -27,6 +26,7 @@ import gecv.alg.tracker.pklt.PkltManagerConfig;
 import gecv.alg.tracker.pklt.PyramidKltFeature;
 import gecv.alg.transform.pyramid.GradientPyramid;
 import gecv.alg.transform.pyramid.PyramidUpdateIntegerDown;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.DiscreteImagePyramid;
 import gecv.struct.pyramid.ImagePyramid;

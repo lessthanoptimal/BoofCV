@@ -19,6 +19,7 @@ package gecv.alg.interpolate;
 import gecv.alg.distort.DistortImageOps;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
@@ -77,7 +78,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase> {
 
 		app.addInterpolation("NN F32",FactoryInterpolation.nearestNeighborPixel(ImageFloat32.class));
 		app.addInterpolation("Bilinear F32",FactoryInterpolation.bilinearPixel(ImageFloat32.class));
-		app.addInterpolation("Bicubic F32",FactoryInterpolation.bicubic(ImageFloat32.class,-0.5f));
+		app.addInterpolation("Bicubic F32", FactoryInterpolation.bicubic(ImageFloat32.class,-0.5f));
 
 		EvaluateInterpolateEnlargeApp<ImageUInt8> appU8 = new EvaluateInterpolateEnlargeApp<ImageUInt8>(image,w,h, ImageUInt8.class);
 

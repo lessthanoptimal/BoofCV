@@ -31,7 +31,13 @@ import gecv.struct.image.ImageSInt16;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationAverage_S16 extends OrientationAverage<ImageSInt16> {	@Override
+public class ImplOrientationAverage_S16 extends OrientationAverage<ImageSInt16> {
+	
+	public ImplOrientationAverage_S16(boolean weighted) {
+		super(weighted);
+	}
+
+	@Override
 	public Class<ImageSInt16> getImageType() {
 		return ImageSInt16.class;
 	}
@@ -62,7 +68,7 @@ public class ImplOrientationAverage_S16 extends OrientationAverage<ImageSInt16> 
 		for( int y = rect.y0; y < rect.y1; y++ ) {
 			int indexX = derivX.startIndex + derivX.stride*y + rect.x0;
 			int indexY = derivY.startIndex + derivY.stride*y + rect.x0;
-			int indexW = (y-c_y+radius)*weights.width + rect.x0-c_x+radius;
+			int indexW = (y-c_y+radiusScale)*weights.width + rect.x0-c_x+radiusScale;
 
 			for( int x = rect.x0; x < rect.x1; x++ , indexX++ , indexY++ , indexW++ ) {
 				float w = weights.data[indexW];
