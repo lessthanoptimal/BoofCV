@@ -20,10 +20,8 @@ import gecv.alg.feature.describe.RegionOrientation;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.image.ImageBase;
 import jgrl.metric.UtilAngle;
-import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -63,14 +61,16 @@ public class GenericOrientationTests<D extends ImageBase> {
 	 */
 	public void performAll() {
 		performEasyTests();
+		setScale();
 	}
 
 	/**
 	 * Points all pixels in the surrounding region in same direction.  Then sees if the found
 	 * direction for the region is in the expected direction.
 	 */
-	@Test
 	public void performEasyTests() {
+
+		alg.setScale(1);
 
 		int N = 2*(int)(Math.PI/angleTolerance);
 
@@ -86,8 +86,8 @@ public class GenericOrientationTests<D extends ImageBase> {
 			GeneralizedImageOps.fill(derivY,0);
 			// only fill in the around around the region so that it also checks to see if the estimate
 			// is localized
-			GeneralizedImageOps.fillRectangle(derivX,c,x-regionSize/2,y-regionSize/2,regionSize,regionSize);
-			GeneralizedImageOps.fillRectangle(derivY,s,x-regionSize/2,y-regionSize/2,regionSize,regionSize);
+			GeneralizedImageOps.fillRectangle(derivX,c*100,x-regionSize/2,y-regionSize/2,regionSize,regionSize);
+			GeneralizedImageOps.fillRectangle(derivY,s*100,x-regionSize/2,y-regionSize/2,regionSize,regionSize);
 
 			alg.setImage(derivX,derivY);
 
@@ -97,24 +97,32 @@ public class GenericOrientationTests<D extends ImageBase> {
 	}
 
 	/**
-	 * This test sees if a weight is used for the region.  The weight should
-	 * be set up such that all the weight is on the center pixel.
+	 * Estimate the direction at a couple of different scales and see if it produces the expected results.
 	 */
-	//TODO the weight is the same as a convolution.  use this in the test?
-	public void performWeightTests() {
-		GeneralizedImageOps.fill(derivX,10);
-		GeneralizedImageOps.fill(derivY,0);
+	public void setScale() {
+		int x = width/2;
+		int y = height/2;
 
-		int c_x = width/2;
-		int c_y = height/2;
+		int N = 2*(int)(Math.PI/angleTolerance);
+		double angle = UtilAngle.bound((N/2)*angleTolerance);
+		double c = Math.cos(angle);
+		double s = Math.sin(angle);
 
-		GeneralizedImageOps.set(derivX,c_x,c_y,0);
-		GeneralizedImageOps.set(derivY,c_x,c_y,1);
+		GeneralizedImageOps.fill(derivX,c*100);
+		GeneralizedImageOps.fill(derivY,s*100);
+
 		alg.setImage(derivX,derivY);
+		alg.setScale(1);
 
-		// if weight is no all on the center pixel a different solution will be generated
-		double found = alg.compute(c_x,c_y);
-		assertTrue( UtilAngle.dist(Math.PI/2.0,found) < angleTolerance );
-		fail("Update for a gaussian weight");
+		double found = UtilAngle.bound(alg.compute(x,y));
+		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
+
+		alg.setScale(1.5);
+		found = UtilAngle.bound(alg.compute(x,y));
+		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
+
+		alg.setScale(0.5);
+		found = UtilAngle.bound(alg.compute(x,y));
+		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 	}
 }

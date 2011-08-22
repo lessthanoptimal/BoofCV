@@ -16,21 +16,19 @@
 
 package gecv.struct.pyramid;
 
-import gecv.core.image.ImageGenerator;
 import gecv.struct.image.ImageBase;
-
-import java.lang.reflect.Array;
 
 
 /**
  * <p>
  * In this implementation the scale factor between each layer is limited to being a positive integer that is evenly
- * divisible by the previous layer.  This added assumption allows further optimization to be performed.
+ * divisible by the previous layer.  This added constraint allows further optimization to be performed.
  * </p>
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class DiscreteImagePyramid<T extends ImageBase> extends ImagePyramid<T> {
+public class PyramidDiscrete<T extends ImageBase> extends ImagePyramidBase<T> {
 
 	// scale of each layer relative to the previous layer
 	public int scale[];
@@ -38,15 +36,21 @@ public class DiscreteImagePyramid<T extends ImageBase> extends ImagePyramid<T> {
 	/**
 	 * Specifies input image size and behavior of top most layer.
 	 *
-	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of  copied.
+	 * @param imageType Type of image.
+	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of copied.
+	 * @param scaleFactors (optional) Specifies the scale of each layer in the pyramid.  See restrictions
+	 * on scaleFactor in {@link #setScaleFactors(int...)}.
 	 */
-	public DiscreteImagePyramid( boolean saveOriginalReference, PyramidUpdater<T> updater ,  int ...scaleFactors ) {
-		super(saveOriginalReference, updater);
-		setScaleFactors(scaleFactors);
+	public PyramidDiscrete( Class<T> imageType ,
+							boolean saveOriginalReference, int ...scaleFactors)
+	{
+		super(imageType,saveOriginalReference);
+		if( scaleFactors.length > 0 )
+			setScaleFactors(scaleFactors);
 	}
 
 	/**
-	 * Specifies the pyramid's structure.
+	 * Specifies the pyramid's structure.  Scale factors are in relative to the input image.
 	 *
 	 * @param scaleFactors Change in scale factor for each layer in the pyramid.
 	 */
@@ -59,12 +63,6 @@ public class DiscreteImagePyramid<T extends ImageBase> extends ImagePyramid<T> {
 
 		this.scale = scaleFactors.clone();
 		checkScales();
-		layers = null;
-	}
-
-	@Override
-	public int getNumLayers() {
-		return scale.length;
 	}
 
 	@Override
@@ -73,26 +71,7 @@ public class DiscreteImagePyramid<T extends ImageBase> extends ImagePyramid<T> {
 	}
 
 	@Override
-	public void declareLayers(ImageGenerator<T> generator, int width , int height ) {
-		this.bottomWidth = width;
-		this.bottomHeight = height;
-
-		Class<T> type = generator.getType();
-
-		layers = (T[]) Array.newInstance(type, scale.length);
-		int scaleFactor = scale[0];
-
-		if (scale[0] == 1) {
-			if (!saveOriginalReference) {
-				layers[0] = generator.createInstance(bottomWidth, bottomHeight);
-			}
-		} else {
-			layers[0] = generator.createInstance(bottomWidth / scaleFactor, bottomHeight / scaleFactor);
-		}
-
-		for (int i = 1; i < scale.length; i++) {
-			scaleFactor = scale[i];
-			layers[i] = generator.createInstance(bottomWidth / scaleFactor, bottomHeight / scaleFactor);
-		}
+	public int getNumLayers() {
+		return scale.length;
 	}
 }

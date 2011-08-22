@@ -17,8 +17,8 @@
 package gecv.abst.filter.derivative;
 
 import gecv.abst.filter.FilterImageInterface;
-import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.core.image.border.BorderType;
+import gecv.factory.filter.convolve.FactoryConvolve;
 import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.image.ImageBase;

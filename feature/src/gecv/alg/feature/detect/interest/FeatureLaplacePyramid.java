@@ -18,9 +18,9 @@ package gecv.alg.feature.detect.interest;
 
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.AnyImageDerivative;
+import gecv.alg.transform.gss.ScaleSpacePyramid;
 import gecv.struct.QueueCorner;
 import gecv.struct.feature.ScalePoint;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 import jgrl.struct.point.Point2D_I16;
 
@@ -160,7 +160,7 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
 		List<Point2D_I16> candidates = maximums[index1];
 
 		// In a ScaleSpacePyramid the resolution has been internally divided by two
-		float featureScale = (float)ss.getScale(layerID);
+		float featureScale = (float)ss.getScaleSpace(layerID);
 
 		float scale0 = (float)ss.scale[layerID-1];
 		float scale1 = (float)ss.scale[layerID];

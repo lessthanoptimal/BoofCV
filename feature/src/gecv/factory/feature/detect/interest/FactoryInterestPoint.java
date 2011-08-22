@@ -18,18 +18,16 @@ package gecv.factory.feature.detect.interest;
 
 import gecv.abst.detect.extract.FeatureExtractor;
 import gecv.abst.detect.interest.*;
-import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;
 import gecv.alg.feature.detect.interest.*;
-import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
+import gecv.alg.transform.gss.ScaleSpacePyramid;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
-import gecv.factory.interpolate.FactoryInterpolation;
+import gecv.factory.filter.derivative.FactoryDerivative;
 import gecv.struct.gss.GaussianScaleSpace;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 
 /**
@@ -66,10 +64,7 @@ public class FactoryInterestPoint {
 												 double []scales ,
 												 Class<T> inputType ) {
 
-
-		InterpolatePixel<T> interpolate = FactoryInterpolation.bilinearPixel(inputType);
-
-		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(interpolate,scales);
+		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(inputType,scales);
 
 		return new WrapFLPtoInterestPoint<T,D>(feature,ss);
 	}
@@ -91,12 +86,7 @@ public class FactoryInterestPoint {
 										  double []scales ,
 										  Class<T> inputType ) {
 
-		// todo divide scales by two!??!
-		// shouldn't change image size in pyramid because that will cause confusion
-		// but this screws up scale space stuff
-		InterpolatePixel<T> interpolate = FactoryInterpolation.bilinearPixel(inputType);
-
-		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(interpolate,scales);
+		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(inputType,scales);
 
 		return new WrapFPtoInterestPoint<T,D>(feature,ss);
 	}

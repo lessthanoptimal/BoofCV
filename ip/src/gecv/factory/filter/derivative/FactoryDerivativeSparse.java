@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.derivative;
+package gecv.factory.filter.derivative;
 
 import gecv.abst.filter.ImageFunctionSparse;
-import gecv.abst.filter.convolve.FactoryConvolveSparse;
 import gecv.abst.filter.convolve.ImageConvolveSparse;
 import gecv.alg.filter.derivative.LaplacianEdge;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.*;
+import gecv.factory.filter.convolve.FactoryConvolveSparse;
 import gecv.struct.convolve.Kernel2D_F32;
 import gecv.struct.convolve.Kernel2D_I32;
 import gecv.struct.image.ImageBase;

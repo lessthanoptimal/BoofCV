@@ -16,25 +16,43 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.alg.transform.pyramid.GradientPyramid;
+import gecv.abst.detect.extract.FeatureExtractor;
+import gecv.abst.detect.extract.WrapperNonMax;
+import gecv.abst.detect.intensity.GeneralFeatureIntensity;
+import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
+import gecv.abst.filter.derivative.ImageGradient;
+import gecv.alg.feature.detect.extract.FastNonMaxExtractor;
+import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
+import gecv.alg.interpolate.InterpolateRectangle;
+import gecv.alg.tracker.klt.KltConfig;
+import gecv.alg.transform.pyramid.PyramidOps;
+import gecv.alg.transform.pyramid.PyramidUpdateIntegerDown;
+import gecv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
+import gecv.factory.filter.derivative.FactoryDerivative;
+import gecv.factory.filter.kernel.FactoryKernelGaussian;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.gui.image.DiscretePyramidPanel;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.ProcessImageSequence;
 import gecv.io.image.SimpleImageSequence;
+import gecv.io.wrapper.xuggler.XugglerSimplified;
+import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageBase;
-import gecv.struct.pyramid.DiscreteImagePyramid;
+import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.PyramidUpdater;
+import gecv.struct.pyramid.PyramidDiscrete;
+import gecv.struct.pyramid.PyramidUpdaterDiscrete;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
+ * Runs a KLT tracker through a video sequence
+ *
  * @author Peter Abeles
  */
-
-public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
+public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 		extends ProcessImageSequence<I> {
 
 	private PkltManager<I, D> tracker;
@@ -43,9 +61,10 @@ public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageB
 	DiscretePyramidPanel pyramidPanel;
 	int totalRespawns;
 
-	GradientPyramid<I,D> updateGradient;
+	ImageGradient<I,D> gradient;
 
-	ImagePyramid<I> basePyramid;
+	PyramidUpdaterDiscrete<I> pyramidUpdater;
+	PyramidDiscrete<I> basePyramid;
 	ImagePyramid<D> derivX;
 	ImagePyramid<D> derivY;
 
@@ -53,25 +72,26 @@ public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageB
 	@SuppressWarnings({"unchecked"})
 	public TrackVideoPyramidKLT(SimpleImageSequence<I> sequence,
 								PkltManager<I, D> tracker ,
-								PyramidUpdater<I> pyramidUpdater ,
-								GradientPyramid<I,D> updateGradient) {
+								PyramidUpdaterDiscrete<I> pyramidUpdater ,
+								ImageGradient<I,D> gradient ) {
 		super(sequence);
+		this.pyramidUpdater = pyramidUpdater;
 		this.tracker = tracker;
-		this.updateGradient = updateGradient;
+		this.gradient = gradient;
 		PkltManagerConfig<I, D> config = tracker.getConfig();
 
 		// declare the image pyramid
-		basePyramid = new DiscreteImagePyramid<I>(true,pyramidUpdater,config.pyramidScaling);
-		derivX = new DiscreteImagePyramid<D>(false,null,config.pyramidScaling);
-		derivY = new DiscreteImagePyramid<D>(false,null,config.pyramidScaling);
+		basePyramid = new PyramidDiscrete<I>(config.typeInput,true,config.pyramidScaling);
+		derivX = new PyramidDiscrete<D>(config.typeDeriv,false,config.pyramidScaling);
+		derivY = new PyramidDiscrete<D>(config.typeDeriv,false,config.pyramidScaling);
 	}
 
 
 	@Override
 	public void processFrame(I image) {
 
-		basePyramid.update(image);
-		updateGradient.update(basePyramid,derivX,derivY);
+		pyramidUpdater.update(image,basePyramid);
+		PyramidOps.gradient(basePyramid, gradient, derivX,derivY);
 
 		tracker.processFrame(basePyramid,derivX,derivY);
 	}
@@ -124,5 +144,68 @@ public abstract class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageB
 			g2.setColor(color);
 			g2.fillOval(x - r, y - r, w, w);
 		}
+	}
+
+	public static <I extends ImageBase, D extends ImageBase>
+	void run( String fileName , Class<I> imageType , Class<D> derivType ) {
+
+		SimpleImageSequence<I> sequence = new XugglerSimplified<I>(fileName, imageType);
+
+		ImageBase<?> image = sequence.next();
+
+		KltConfig configKLt = new KltConfig();
+		configKLt.forbiddenBorder = 0;
+		configKLt.maxPerPixelError = 25.0f;
+		configKLt.maxIterations = 15;
+		configKLt.minDeterminant = 0.001f;
+		configKLt.minPositionDelta = 0.01f;
+
+		PkltManagerConfig<I,D> config = new PkltManagerConfig<I,D>();
+		config.config = configKLt;
+		config.typeInput = imageType;
+		config.typeDeriv = derivType;
+		config.pyramidScaling = new int[]{1,2,4,8};
+		config.imgWidth = image.width;
+		config.imgHeight = image.height;
+		config.minFeatures = 80;
+		config.maxFeatures = 100;
+		config.featureRadius = 3;
+
+		int scalingTop = config.computeScalingTop();
+
+		InterpolateRectangle<I> interp = FactoryInterpolation.bilinearRectangle(imageType);
+		InterpolateRectangle<D> interpD = FactoryInterpolation.bilinearRectangle(derivType);
+
+		GeneralFeatureIntensity<I,D> intensity =
+				new WrapperGradientCornerIntensity<I,D>(
+						FactoryPointIntensityAlg.createKlt(derivType, config.featureRadius));
+		FeatureExtractor extractor = new WrapperNonMax(
+				new FastNonMaxExtractor(config.featureRadius+2,
+						config.featureRadius*scalingTop, configKLt.minDeterminant));
+		GeneralFeatureDetector<I,D> detector =
+				new GeneralFeatureDetector<I,D>(intensity,extractor,config.maxFeatures);
+
+		GenericPkltFeatSelector<I, D> featureSelector =
+				new GenericPkltFeatSelector<I,D>(detector,null);
+
+		PyramidUpdateIntegerDown<I> pyrUpdater =
+				new PyramidUpdateIntegerDown<I>(FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,2),imageType);
+
+		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
+
+		PkltManager<I,D> manager =
+				new PkltManager<I,D>(config,interp,interpD,featureSelector);
+
+		TrackVideoPyramidKLT<I,D> alg = new TrackVideoPyramidKLT<I,D>(sequence,manager,
+				pyrUpdater,gradient);
+
+		alg.process();
+	}
+
+	public static void main( String args[] ) {
+		String fileName = "/home/pja/kayaking.ogv";
+
+		run(fileName,ImageFloat32.class,ImageFloat32.class);
+//		run(fileName, ImageUInt8.class, ImageSInt16.class);
 	}
 }

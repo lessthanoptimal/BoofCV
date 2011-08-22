@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.derivative;
+package gecv.factory.filter.derivative;
 
+import gecv.abst.filter.derivative.*;
 import gecv.alg.filter.derivative.*;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.border.ImageBorder_F32;
@@ -29,7 +30,7 @@ import java.lang.reflect.Method;
 
 /**
  * <p>
- * Factory for creating different types of {@link ImageGradient}, which are used to compute
+ * Factory for creating different types of {@link gecv.abst.filter.derivative.ImageGradient}, which are used to compute
  * the image's derivative.
  * </p>
  *

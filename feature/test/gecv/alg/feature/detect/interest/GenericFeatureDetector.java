@@ -23,14 +23,18 @@ import jgrl.geometry.UtilPoint2D_I32;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
  * @author Peter Abeles
  */
 public abstract class GenericFeatureDetector {
+	Random rand = new Random(234);
+
 	int width = 50;
 	int height = 60;
 
@@ -44,7 +48,19 @@ public abstract class GenericFeatureDetector {
 	 */
 	@Test
 	public void checkNegativeMaxFeatures() {
-		fail("implement");
+		double scales[]=new double[]{1,2,4,8};
+		ImageFloat32 input = new ImageFloat32(width,height);
+		GeneralizedImageOps.randomize(input,rand,0,100);
+
+		// limit it to "one" feature
+		Object alg = createDetector(1);
+		int firstFound = detectFeature(input, scales,alg).size();
+
+		// tell it to return everything it can find
+		 alg = createDetector(0);
+		int secondFound = detectFeature(input, scales,alg).size();
+
+		assertTrue(secondFound>firstFound);
 	}
 
 	/**
@@ -56,12 +72,11 @@ public abstract class GenericFeatureDetector {
 		ImageFloat32 input = new ImageFloat32(width,height);
 		GeneralizedImageOps.fillRectangle(input,20,10,10,width,height);
 
-
 		// give it one corner to find
 		GeneralizedImageOps.fill(input,50);
 		drawCircle(input,10,10,r*2);
 
-		Object alg = createDetector();
+		Object alg = createDetector(50);
 		int firstFound = detectFeature(input, scales,alg).size();
 		int secondFound = detectFeature(input, scales,alg).size();
 
@@ -85,7 +100,7 @@ public abstract class GenericFeatureDetector {
 		GeneralizedImageOps.fill(input,50);
 		drawCircle(input,10,10,r*2);
 
-		Object alg = createDetector();
+		Object alg = createDetector(50);
 		List<ScalePoint> found = detectFeature(input,scales,alg);
 
 		assertTrue(found.size()>=1);
@@ -106,7 +121,7 @@ public abstract class GenericFeatureDetector {
 		assertTrue(foundMatch);
 	}
 
-	protected abstract Object createDetector();
+	protected abstract Object createDetector( int maxFeatures );
 
 	protected abstract List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector);
 

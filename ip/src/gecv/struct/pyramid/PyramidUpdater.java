@@ -19,11 +19,13 @@ package gecv.struct.pyramid;
 import gecv.struct.image.ImageBase;
 
 /**
- * Updates each layer in the pyramid given the original full resolution image.
+ * <p>
+ * Interface for updating each layer in an {@link ImagePyramid} given the original full resolution image.
+ * </p>
  *
  * @author Peter Abeles
  */
-public interface PyramidUpdater<T extends ImageBase> {
+public interface PyramidUpdater<T extends ImageBase, P extends ImagePyramid> {
 
 	/**
 	 * Given the original input image update the specified image pyramid
@@ -31,5 +33,5 @@ public interface PyramidUpdater<T extends ImageBase> {
 	 * @param input Original full resolution image.
 	 * @param pyramid The pyramid which is to be updated.
 	 */
-	public void update(T input , ImagePyramid<T> pyramid );
+	public void update(T input , P pyramid );
 }

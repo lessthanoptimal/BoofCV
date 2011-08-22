@@ -17,9 +17,9 @@
 package gecv.alg.feature.describe.stability;
 
 import gecv.abst.detect.interest.InterestPointDetector;
-import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.feature.*;
+import gecv.factory.filter.derivative.FactoryDerivative;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 

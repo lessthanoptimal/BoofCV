@@ -37,19 +37,20 @@ import gecv.struct.image.ImageBase;
 public interface GaussianScaleSpace<T extends ImageBase, D extends ImageBase> {
 
 	/**
-	 * Sets the scales for which the scale-space should be computed over.
+	 * Sets the scales/blur magnitudes for which the scale-space should be computed over.
 	 *
-	 * @param scales All the scales.
+	 * @param scales All the scales.  These are absolute and not relative to the previous level.
 	 */
 	public void setScales( double ... scales);
 
 	/**
-	 * Returns the scale for the specified layer in the pyramid.
+	 * Returns the scale for the specified layer in the pyramid.  This is equivalent to
+	 * the standard deviation of the Gaussian convolved across the original input image.
 	 */
 	public double getScale( int level );
 
 	/**
-	 * The original un-scaled image.
+	 * Specifies the original un-scaled image.
 	 *
 	 * @param input Original image.
 	 */

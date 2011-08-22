@@ -18,13 +18,11 @@ package gecv.alg.feature.detect.interest;
 
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.AnyImageDerivative;
-import gecv.abst.filter.derivative.FactoryDerivativeSparse;
-import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.transform.gss.ScaleSpacePyramid;
 import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.inst.FactoryImageGenerator;
-import gecv.factory.interpolate.FactoryInterpolation;
+import gecv.factory.filter.derivative.FactoryDerivativeSparse;
 import gecv.struct.feature.ScalePoint;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageFloat32;
 
 import java.util.List;
@@ -41,13 +39,13 @@ public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetector {
 		ImageFunctionSparse<ImageFloat32> sparseLaplace = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class,null);
 		AnyImageDerivative<ImageFloat32,ImageFloat32> deriv = UtilScaleSpace.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
 
-		return new FeatureLaplacePyramid<ImageFloat32,ImageFloat32>(detector,sparseLaplace,deriv,1);	}
+		return new FeatureLaplacePyramid<ImageFloat32,ImageFloat32>(detector,sparseLaplace,deriv,1);
+	}
 
 	@Override
 	protected List<ScalePoint> detectFeature(ImageFloat32 input,  double[] scales , Object detector) {
-		InterpolatePixel<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 
-		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(interpolate,scales);
+		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class,scales);
 		ss.update(input);
 
 		FeatureLaplacePyramid<ImageFloat32,ImageFloat32> alg = (FeatureLaplacePyramid<ImageFloat32,ImageFloat32>)detector;

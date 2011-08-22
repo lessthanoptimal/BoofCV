@@ -16,9 +16,9 @@
 
 package gecv.alg.denoise.impl;
 
-import gecv.abst.wavelet.FactoryWaveletTransform;
 import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.denoise.GenericDenoiseTests;
+import gecv.factory.transform.wavelet.FactoryWaveletTransform;
 import gecv.struct.image.ImageBase;
 import gecv.struct.wavelet.WaveletDescription;
 import gecv.testing.GecvTesting;

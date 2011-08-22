@@ -20,6 +20,7 @@ import gecv.alg.filter.derivative.GradientThree;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.SingleBandGenerator;
+import gecv.factory.filter.derivative.FactoryDerivative;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;

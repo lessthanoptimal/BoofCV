@@ -16,9 +16,9 @@
 
 package gecv.alg.filter.derivative;
 
-import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.factory.filter.derivative.FactoryDerivative;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
@@ -50,7 +50,7 @@ public class ImageShowImageDerivative {
 
 		addDerivative(image,"Sobel",FactoryDerivative.sobel_I8());
 		addDerivative(image,"Three",FactoryDerivative.three_I8());
-		addDerivative(image,"Gaussian",FactoryDerivative.gaussian_I8(-1,3));
+		addDerivative(image,"Gaussian", FactoryDerivative.gaussian_I8(-1,3));
 
 		ShowImages.showWindow(image, "Input");
 		ShowImages.showWindow(panelX, "Derivative X-Axis");

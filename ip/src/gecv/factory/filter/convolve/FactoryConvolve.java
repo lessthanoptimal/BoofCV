@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.convolve;
+package gecv.factory.filter.convolve;
 
+import gecv.abst.filter.convolve.ConvolveInterface;
+import gecv.abst.filter.convolve.GenericConvolve;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.alg.filter.convolve.ConvolveWithBorder;

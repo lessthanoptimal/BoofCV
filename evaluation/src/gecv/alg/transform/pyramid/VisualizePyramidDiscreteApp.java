@@ -23,8 +23,8 @@ import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.pyramid.DiscreteImagePyramid;
-import gecv.struct.pyramid.PyramidUpdater;
+import gecv.struct.pyramid.PyramidDiscrete;
+import gecv.struct.pyramid.PyramidUpdaterDiscrete;
 
 import java.awt.image.BufferedImage;
 
@@ -33,7 +33,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizeDiscretePyramidApp {
+public class VisualizePyramidDiscreteApp {
 
 	public static void main( String args[] ) {
 		int scales[] = new int[]{1,2,4,8,16};
@@ -41,12 +41,12 @@ public class VisualizeDiscretePyramidApp {
 		BufferedImage input = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
 
 		Kernel1D_F32 gaussian = FactoryKernelGaussian.gaussian1D(ImageFloat32.class,-1,2);
-		PyramidUpdater<ImageFloat32> updater = new PyramidUpdateIntegerDown<ImageFloat32>(gaussian,ImageFloat32.class);
-		DiscreteImagePyramid<ImageFloat32> pyramid = new DiscreteImagePyramid<ImageFloat32>(true,updater,scales);
+		PyramidUpdaterDiscrete<ImageFloat32> updater = new PyramidUpdateIntegerDown<ImageFloat32>(gaussian,ImageFloat32.class);
+		PyramidDiscrete<ImageFloat32> pyramid = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,true,scales);
 
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 
-		pyramid.update(inputF32);
+		updater.update(inputF32,pyramid);
 
 		DiscretePyramidPanel gui = new DiscretePyramidPanel(pyramid);
 		gui.render();

@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.abst.wavelet;
+package gecv.factory.transform.wavelet;
 
+import gecv.abst.wavelet.WaveletTransform;
 import gecv.abst.wavelet.impl.WaveletTransformFloat32;
 import gecv.abst.wavelet.impl.WaveletTransformInt;
 import gecv.struct.image.ImageBase;
@@ -29,7 +30,7 @@ import gecv.struct.wavelet.WlCoef_I32;
 
 
 /**
- * Simplified factory for creating {@link WaveletTransform}.  Factories are provided
+ * Simplified factory for creating {@link gecv.abst.wavelet.WaveletTransform}.  Factories are provided
  * for creating the different wavelet descriptions.
  *
  * @author Peter Abeles

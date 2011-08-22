@@ -19,6 +19,7 @@ package gecv.abst.filter.derivative;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.alg.filter.derivative.LaplacianEdge;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.factory.filter.derivative.FactoryDerivativeSparse;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageUInt8;

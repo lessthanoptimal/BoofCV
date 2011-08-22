@@ -17,10 +17,10 @@
 package gecv.gui.image;
 
 import gecv.alg.distort.DistortImageOps;
-import gecv.alg.interpolate.FactoryInterpolation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.interpolate.TypeInterpolate;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.gui.ListDisplayPanel;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;

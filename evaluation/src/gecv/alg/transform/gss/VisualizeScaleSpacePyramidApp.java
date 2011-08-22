@@ -16,15 +16,11 @@
 
 package gecv.alg.transform.gss;
 
-import gecv.alg.interpolate.InterpolatePixel;
 import gecv.core.image.ConvertBufferedImage;
-import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.gui.image.ImagePyramidPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.pyramid.ImagePyramid;
 
 import java.awt.image.BufferedImage;
 
@@ -41,9 +37,7 @@ public class VisualizeScaleSpacePyramidApp {
 
 		BufferedImage input = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
 
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
-//		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bicubic(ImageFloat32.class,-0.5f);
-		ImagePyramid<ImageFloat32> pyramid = new ScaleSpacePyramid<ImageFloat32>(interp,scales);
+		ScaleSpacePyramid<ImageFloat32> pyramid = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class,scales);
 
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 

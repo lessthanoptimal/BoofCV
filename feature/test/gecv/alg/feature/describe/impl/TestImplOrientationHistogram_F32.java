@@ -48,7 +48,6 @@ public class TestImplOrientationHistogram_F32 {
 
 		tests.setup(2.0*Math.PI/N, r*2+1 ,alg);
 		tests.performAll();
-		tests.performWeightTests();
 
 	}
 

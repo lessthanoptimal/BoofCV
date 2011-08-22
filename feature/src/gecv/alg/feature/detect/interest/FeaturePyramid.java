@@ -17,11 +17,11 @@
 package gecv.alg.feature.detect.interest;
 
 import gecv.abst.filter.derivative.AnyImageDerivative;
+import gecv.alg.transform.gss.ScaleSpacePyramid;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.struct.QueueCorner;
 import gecv.struct.feature.ScalePoint;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I16;
@@ -176,7 +176,7 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 		ImageBorder_F32 inten2 = FactoryImageBorder.value(intensities[index2],0);
 
 		// In a ScaleSpacePyramid the resolution has been internally divided by two
-		float featureScale = (float)ss.getScale(layerID);
+		float featureScale = (float)ss.getScaleSpace(layerID);
 
 		float scale0 = (float)ss.scale[layerID-1];
 		float scale1 = (float)ss.scale[layerID];

@@ -16,7 +16,6 @@
 
 package gecv.struct.pyramid;
 
-import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -25,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestSubsamplePyramid {
+public class TestPyramidFloat {
 
 	int width = 80;
 	int height = 160;
@@ -33,11 +32,10 @@ public class TestSubsamplePyramid {
 	@Test
 	public void setScaling() {
 		// see if all the layers are set correctly
-		ImagePyramid<ImageUInt8> pyramid = new SubsamplePyramid<ImageUInt8>(new DoNothingUpdater<ImageUInt8>(),1,2,5.5);
+		PyramidFloat<ImageUInt8> pyramid = new PyramidFloat<ImageUInt8>(ImageUInt8.class);
 
-		ImageUInt8 input = new ImageUInt8(width,height);
-		pyramid.update(input);
-
+		pyramid.setScaleFactors(1,2,5.5);
+		pyramid.initialize(width,height);
 		assertEquals(width , pyramid.getLayer(0).width);
 		assertEquals(height , pyramid.getLayer(0).height);
 
@@ -48,19 +46,12 @@ public class TestSubsamplePyramid {
 		assertEquals((int)Math.ceil(height / 5.5), pyramid.getLayer(2).height);
 
 		// try it with a scaling not equal to 1
-		pyramid = new SubsamplePyramid<ImageUInt8>(new DoNothingUpdater<ImageUInt8>(),2,4);
-		pyramid.update(input);
+		pyramid.setScaleFactors(2,4);
+		pyramid.initialize(width,height);
 
 		assertEquals(width / 2, pyramid.getLayer(0).width);
 		assertEquals(height / 2, pyramid.getLayer(0).height);
 		assertEquals(width / 4, pyramid.getLayer(1).width);
 		assertEquals(height / 4, pyramid.getLayer(1).height);
-	}
-
-	public static class DoNothingUpdater<T extends ImageBase> implements PyramidUpdater<T>
-	{
-		@Override
-		public void update(T input, ImagePyramid<T> imagePyramid) {
-		}
 	}
 }

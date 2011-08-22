@@ -18,7 +18,6 @@ package gecv.alg.denoise;
 
 import gecv.abst.denoise.WaveletDenoiseFilter;
 import gecv.abst.filter.FilterImageInterface;
-import gecv.abst.wavelet.FactoryWaveletTransform;
 import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.denoise.wavelet.DenoiseSureShrink_F32;
 import gecv.alg.misc.ImageTestingOps;
@@ -26,6 +25,7 @@ import gecv.alg.misc.PixelMath;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.border.BorderType;
 import gecv.factory.transform.wavelet.FactoryWaveletCoiflet;
+import gecv.factory.transform.wavelet.FactoryWaveletTransform;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;

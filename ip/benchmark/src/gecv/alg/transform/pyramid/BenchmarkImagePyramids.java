@@ -20,21 +20,20 @@ import gecv.PerformerBase;
 import gecv.ProfileOperation;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.misc.ImageTestingOps;
-import gecv.alg.transform.gss.PyramidUpdateGaussianScale;
 import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.pyramid.DiscreteImagePyramid;
-import gecv.struct.pyramid.PyramidUpdater;
+import gecv.struct.pyramid.PyramidDiscrete;
+import gecv.struct.pyramid.PyramidFloat;
+import gecv.struct.pyramid.PyramidUpdaterDiscrete;
+import gecv.struct.pyramid.PyramidUpdaterFloat;
 
 import java.util.Random;
 
 
 /**
- * Shows runtime performance difference of different types of image pyramids.  Each pyramid has
- * been configured to produce similar outputs.
+ * Shows runtime performance difference of each type of image pyramid given similar configurations.
  *
  * @author Peter Abeles
  */
@@ -45,42 +44,42 @@ public class BenchmarkImagePyramids {
 
 	static ImageFloat32 input = new ImageFloat32(width,height);
 
-	static int scalesI[] = new int[]{1,2,2,2};
-	static double scalesF[] = new double[]{1,2,2,2};
+	static int scalesD[] = new int[]{1,2,4,8};
+	static double scalesF[] = new double[]{1,2,4,8};
 
-	static InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+	static PyramidUpdaterDiscrete<ImageFloat32> updaterD;
+	static PyramidUpdaterFloat<ImageFloat32> updaterF;
 
-	static PyramidUpdater<ImageFloat32> updaterI;
-	static PyramidUpdater<ImageFloat32> updaterF;
-
+	static Class<ImageFloat32> imageType = ImageFloat32.class;
 
 	public static class ScaleSpace_F32 extends PerformerBase {
 
-		ScaleSpacePyramid<ImageFloat32> pyramid =
-				new ScaleSpacePyramid<ImageFloat32>(interp,scalesF);
+		PyramidFloat<ImageFloat32> pyramid =
+				new PyramidFloat<ImageFloat32>(imageType,scalesF);
 
 		@Override
 		public void process() {
-			pyramid.update(input);
+			updaterF.update(input,pyramid);
 		}
 	}
 
 	public static class Discrete_F32 extends PerformerBase {
 
-		DiscreteImagePyramid<ImageFloat32> pyramid =
-				new DiscreteImagePyramid<ImageFloat32>(false,updaterI,scalesI);
+		PyramidDiscrete<ImageFloat32> pyramid =
+				new PyramidDiscrete<ImageFloat32>(imageType,false,scalesD);
 
 		@Override
 		public void process() {
-			pyramid.update(input);
+			updaterD.update(input,pyramid);
 		}
 	}
 
 	private static void createUpdate() {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1.0,2);
-		updaterI = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
+		updaterD = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
-		updaterF = new PyramidUpdateGaussianScale<ImageFloat32>(interp);
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		updaterF = new PyramidUpdateGaussianScale<ImageFloat32>(interp,scalesF);
 
 	}
 

@@ -21,6 +21,7 @@ import gecv.ProfileOperation;
 import gecv.abst.filter.FilterImageInterface;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.core.image.border.BorderType;
+import gecv.factory.filter.convolve.FactoryConvolve;
 import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;

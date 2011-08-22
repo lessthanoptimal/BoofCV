@@ -26,7 +26,7 @@ import gecv.struct.image.ImageBase;
 public interface ImageDerivative<T extends ImageBase, D extends ImageBase> {
 
 	/**
-	 * Overrides the default border behavior.  See {@link FactoryDerivative} for a discussion
+	 * Overrides the default border behavior.  See {@link gecv.factory.filter.derivative.FactoryDerivative} for a discussion
 	 * of the pros and cons of each border type.
 	 *
 	 * @param type How image borders are handled.
