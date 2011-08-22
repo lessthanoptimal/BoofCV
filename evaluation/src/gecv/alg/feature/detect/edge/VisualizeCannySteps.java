@@ -18,9 +18,9 @@ package gecv.alg.feature.detect.edge;
 
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.BlurStorageFilter;
-import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.core.image.ConvertBufferedImage;
+import gecv.factory.filter.derivative.FactoryDerivative;
 import gecv.gui.edge.VisualizeEdgeFeatures;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;

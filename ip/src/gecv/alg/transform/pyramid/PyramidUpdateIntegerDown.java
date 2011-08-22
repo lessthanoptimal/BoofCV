@@ -16,14 +16,13 @@
 
 package gecv.alg.transform.pyramid;
 
-import gecv.abst.filter.convolve.FactoryConvolveDown;
 import gecv.abst.filter.convolve.GenericConvolveDown;
 import gecv.core.image.border.BorderType;
+import gecv.factory.filter.convolve.FactoryConvolveDown;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.image.ImageBase;
-import gecv.struct.pyramid.DiscreteImagePyramid;
-import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.PyramidUpdater;
+import gecv.struct.pyramid.PyramidDiscrete;
+import gecv.struct.pyramid.PyramidUpdaterDiscrete;
 
 /**
  * <p>
@@ -39,7 +38,7 @@ import gecv.struct.pyramid.PyramidUpdater;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidUpdateIntegerDown<T extends ImageBase> implements PyramidUpdater<T> {
+public class PyramidUpdateIntegerDown<T extends ImageBase> implements PyramidUpdaterDiscrete<T> {
 
 	// stores the results from the first convolution
 	private T temp;
@@ -56,19 +55,20 @@ public class PyramidUpdateIntegerDown<T extends ImageBase> implements PyramidUpd
 	}
 
 	@Override
-	public void update(T original , ImagePyramid<T> _pyramid ) {
+	public void update(T input , PyramidDiscrete<T> pyramid ) {
 
-		 DiscreteImagePyramid<T> pyramid = (DiscreteImagePyramid<T>)_pyramid;
-
+		if( !pyramid.isInitialized() )
+			pyramid.initialize(input.width,input.height);
+		
 		if( temp == null )
 			// declare it to be hte latest image that it might need to be, resize below
-			temp = (T)original._createNew(original.width/2,original.height);
+			temp = (T)input._createNew(input.width/2,input.height);
 
 		if (pyramid.scale[0] == 1) {
-			if (pyramid.saveOriginalReference) {
-				pyramid.layers[0] = original;
+			if (pyramid.isSaveOriginalReference()) {
+				pyramid.setFirstLayer(input);
 			} else {
-				pyramid.layers[0].setTo(original);
+				pyramid.getLayer(0).setTo(input);
 			}
 		} else {
 			int skip = pyramid.scale[0];
@@ -76,21 +76,21 @@ public class PyramidUpdateIntegerDown<T extends ImageBase> implements PyramidUpd
 			horizontal.setSkip(skip);
 			vertical.setSkip(skip);
 
-			temp.reshape(original.width/skip,original.height);
-			horizontal.process(original,temp);
-			vertical.process(temp,pyramid.layers[0]);
+			temp.reshape(input.width/skip,input.height);
+			horizontal.process(input,temp);
+			vertical.process(temp,pyramid.getLayer(0));
 		}
 
-		for (int index = 1; index < pyramid.layers.length; index++) {
+		for (int index = 1; index < pyramid.getNumLayers(); index++) {
 			int skip = pyramid.scale[index]/pyramid.scale[index-1];
-			T prev = pyramid.layers[index-1];
+			T prev = pyramid.getLayer(index-1);
 			temp.reshape(prev.width/skip,prev.height);
 
 			horizontal.setSkip(skip);
 			vertical.setSkip(skip);
 
 			horizontal.process(prev,temp);
-			vertical.process(temp,pyramid.layers[index]);
+			vertical.process(temp,pyramid.getLayer(index));
 		}
 	}
 

@@ -26,7 +26,7 @@ import gecv.struct.wavelet.WlCoef;
  * <p>
  * Easy to use interface for performing a multilevel wavelet transformations.  Internally it handles
  * all buffer maintenance and type conversion.  To create a new instance of this interface use
- * {@link gecv.abst.wavelet.FactoryWaveletTransform}.
+ * {@link gecv.factory.transform.wavelet.FactoryWaveletTransform}.
  * </p>
  * 
  * @see gecv.alg.transform.wavelet.WaveletTransformOps

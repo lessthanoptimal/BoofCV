@@ -16,12 +16,12 @@
 
 package gecv.abst.denoise;
 
-import gecv.abst.wavelet.FactoryWaveletTransform;
 import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.denoise.DenoiseWavelet;
 import gecv.core.image.border.BorderType;
 import gecv.factory.denoise.FactoryDenoiseWavelet;
 import gecv.factory.transform.wavelet.FactoryWaveletDaub;
+import gecv.factory.transform.wavelet.FactoryWaveletTransform;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageTypeInfo;
 import gecv.struct.wavelet.WaveletDescription;

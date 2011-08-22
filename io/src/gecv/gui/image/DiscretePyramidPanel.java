@@ -16,8 +16,8 @@
 
 package gecv.gui.image;
 
-import gecv.struct.pyramid.DiscreteImagePyramid;
 import gecv.struct.pyramid.ImagePyramid;
+import gecv.struct.pyramid.PyramidDiscrete;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +37,7 @@ public class DiscretePyramidPanel extends JPanel {
 
 	BufferedImage layers[];
 
-	public DiscretePyramidPanel( DiscreteImagePyramid<?> pyramid ) {
+	public DiscretePyramidPanel( PyramidDiscrete<?> pyramid ) {
 		this.pyramid = pyramid;
 
 		// create temporary buffers for each layer in the pyramid

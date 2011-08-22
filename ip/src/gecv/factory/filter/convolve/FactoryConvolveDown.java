@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.convolve;
+package gecv.factory.filter.convolve;
 
+import gecv.abst.filter.convolve.GenericConvolveDown;
 import gecv.alg.filter.convolve.ConvolveDownNoBorder;
 import gecv.alg.filter.convolve.ConvolveDownNormalized;
 import gecv.core.image.border.BorderType;

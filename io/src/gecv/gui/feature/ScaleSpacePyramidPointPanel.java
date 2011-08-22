@@ -18,10 +18,10 @@ package gecv.gui.feature;
 
 import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.TypeInterpolate;
+import gecv.alg.transform.gss.ScaleSpacePyramid;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.feature.ScalePoint;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 
 import javax.swing.*;
@@ -79,7 +79,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 		if( level > 0 ) {
 
 			ImageBase small = ss.getLayer(level-1);
-			ImageBase enlarge = GeneralizedImageOps.createImage(small.getClass(),ss.bottomWidth,ss.bottomHeight);
+			ImageBase enlarge = GeneralizedImageOps.createImage(small.getClass(),ss.getInputWidth(),ss.getInputHeight());
 			DistortImageOps.scale(small,enlarge, TypeInterpolate.NEAREST_NEIGHBOR);
 
 			levelImage = ConvertBufferedImage.convertTo(enlarge,levelImage);

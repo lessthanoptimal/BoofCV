@@ -16,12 +16,12 @@
 
 package gecv.alg.feature.describe;
 
-import gecv.abst.filter.convolve.FactoryConvolveSparse;
 import gecv.abst.filter.convolve.ImageConvolveSparse;
 import gecv.alg.filter.kernel.SteerableKernel;
 import gecv.core.image.border.BorderType;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder;
+import gecv.factory.filter.convolve.FactoryConvolveSparse;
 import gecv.struct.convolve.Kernel2D;
 import gecv.struct.feature.TupleFeature;
 import gecv.struct.image.ImageBase;

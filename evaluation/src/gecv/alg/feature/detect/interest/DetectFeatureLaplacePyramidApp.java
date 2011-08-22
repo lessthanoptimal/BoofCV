@@ -16,14 +16,12 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.transform.gss.ScaleSpacePyramid;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.factory.feature.detect.interest.FactoryInterestPointAlgs;
-import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.gui.feature.ScaleSpacePyramidPointPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
@@ -50,8 +48,7 @@ public class DetectFeatureLaplacePyramidApp {
 	void doStuff( BufferedImage input , Class<T> imageType, Class<D> derivType ) {
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 
-		InterpolatePixel<T> interpolate = FactoryInterpolation.bilinearPixel(imageType);
-		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(interpolate,1,1.5,2,4,8,12,24);
+		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(imageType,1,1.5,2,4,8,12,24);
 
 		int r = 2;
 		FeatureLaplacePyramid<T,D> det = FactoryInterestPointAlgs.hessianLaplacePyramid(r,1,NUM_FEATURES,imageType,derivType);

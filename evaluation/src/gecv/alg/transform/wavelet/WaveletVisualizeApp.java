@@ -16,11 +16,11 @@
 
 package gecv.alg.transform.wavelet;
 
-import gecv.abst.wavelet.FactoryWaveletTransform;
 import gecv.abst.wavelet.WaveletTransform;
 import gecv.alg.misc.GPixelMath;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.border.BorderType;
+import gecv.factory.transform.wavelet.FactoryWaveletTransform;
 import gecv.factory.transform.wavelet.GFactoryWavelet;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.SelectAlgorithmPanel;

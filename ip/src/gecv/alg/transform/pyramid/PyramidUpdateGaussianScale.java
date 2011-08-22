@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.gss;
+package gecv.alg.transform.pyramid;
 
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.BlurStorageFilter;
@@ -22,15 +22,22 @@ import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
+import gecv.struct.pyramid.PyramidFloat;
 import gecv.struct.pyramid.PyramidUpdater;
-import gecv.struct.pyramid.SubsamplePyramid;
+import gecv.struct.pyramid.PyramidUpdaterFloat;
 
 
 /**
  * <p>
  * {@link PyramidUpdater> for {@link ImagePyramid}s where each layer is first blurred using
  * a Gaussian filter and then downsampled using interpolation.  The scaling factor between
- * each level is a floating point number and the Gaussian blur's sigma is set to this value.
+ * each level are floating point number.  Unlike {@link gecv.alg.transform.pyramid.PyramidUpdateIntegerDown}
+ * the scale factors can be arbitrary and are not limited to certain integer values.  The specified
+ * sigmas are the sigmas which are applied to each layer.
+ * </p>
+ *
+ * <p>
+ *
  * </p>
  *
  * <p>
@@ -41,7 +48,7 @@ import gecv.struct.pyramid.SubsamplePyramid;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidUpdateGaussianScale< T extends ImageBase> implements PyramidUpdater<T> {
+public class PyramidUpdateGaussianScale< T extends ImageBase> implements PyramidUpdaterFloat<T> {
 
 	// interpolation algorithm
 	protected InterpolatePixel<T> interpolate;
@@ -49,37 +56,53 @@ public class PyramidUpdateGaussianScale< T extends ImageBase> implements Pyramid
 	// used to store the blurred image
 	protected T tempImage;
 
-	public PyramidUpdateGaussianScale(InterpolatePixel<T> interpolate) {
+	// how much each layer is blurred before sub-sampling
+	protected float[] sigmas;
+
+	/**
+	 * Creates the updater.
+	 *
+	 * @param interpolate Interpolation function used to sub-sample.
+	 * @param sigmas Amount of blur applied to each layer in the pyramid.
+	 */
+	public PyramidUpdateGaussianScale(InterpolatePixel<T> interpolate, double ...sigmas ) {
 		this.interpolate = interpolate;
+		this.sigmas = new float[ sigmas.length ];
+		for( int i = 0; i < sigmas.length; i++ )
+			this.sigmas[i] = (float)sigmas[i];
 	}
 
 	@Override
-	public void update(T input, ImagePyramid<T> _imagePyramid) {
-		if( _imagePyramid.saveOriginalReference )
+	public void update(T input, PyramidFloat<T> pyramid) {
+		if( !pyramid.isInitialized() )
+			pyramid.initialize(input.width,input.height);
+
+		if( pyramid.isSaveOriginalReference() )
 			throw new IllegalArgumentException("The original reference cannot be saved");
-		
-		SubsamplePyramid<T> imagePyramid = (SubsamplePyramid<T>)_imagePyramid;
 
 		if( tempImage == null ) {
 			tempImage = (T)input._createNew(input.width,input.height);
 		}
 
-		for( int i = 0; i < imagePyramid.scale.length; i++ ) {
-			T prev = i == 0 ? input : imagePyramid.getLayer(i-1);
-			T layer = imagePyramid.getLayer(i);
+		for( int i = 0; i < pyramid.scale.length; i++ ) {
+			T prev = i == 0 ? input : pyramid.getLayer(i-1);
+			T layer = pyramid.getLayer(i);
 
-			float s;
-			if( i > 0 )
-				s = (float)(imagePyramid.scale[i]/imagePyramid.scale[i-1]);
-			else
-				s = (float)imagePyramid.scale[0];
 
-			BlurStorageFilter<T> blur = (BlurStorageFilter<T>)FactoryBlurFilter.gaussian(layer.getClass(),s,-1);
+			BlurStorageFilter<T> blur = (BlurStorageFilter<T>)FactoryBlurFilter.gaussian(layer.getClass(),sigmas[i],-1);
 
 			tempImage.reshape(prev.width,prev.height);
 			blur.process(prev,tempImage);
 
 			DistortImageOps.scale(tempImage,layer,interpolate);
 		}
+	}
+
+	public InterpolatePixel<T> getInterpolate() {
+		return interpolate;
+	}
+
+	public void setInterpolate(InterpolatePixel<T> interpolate) {
+		this.interpolate = interpolate;
 	}
 }

@@ -18,9 +18,9 @@ package gecv.alg.transform.gss;
 
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.BlurStorageFilter;
-import gecv.abst.filter.derivative.FactoryDerivative;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.misc.ImageTestingOps;
+import gecv.factory.filter.derivative.FactoryDerivative;
 import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.image.ImageFloat32;
 

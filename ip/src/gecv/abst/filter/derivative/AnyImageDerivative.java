@@ -17,10 +17,10 @@
 package gecv.abst.filter.derivative;
 
 import gecv.abst.filter.convolve.ConvolveInterface;
-import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.alg.filter.kernel.GKernelMath;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.border.BorderType;
+import gecv.factory.filter.convolve.FactoryConvolve;
 import gecv.struct.GecvDefaults;
 import gecv.struct.convolve.Kernel1D;
 import gecv.struct.convolve.Kernel2D;
@@ -30,7 +30,7 @@ import gecv.struct.image.ImageBase;
  * <p>
  * A helpful class which allows a derivative of any order to be computed from an input image using a simple to use
  * interface.  Higher order derivatives are computed from lower order derivatives.  Derivatives are computed
- * using convolution kernels and thus might not be as efficient as when using functions from {@link FactoryDerivative}.
+ * using convolution kernels and thus might not be as efficient as when using functions from {@link gecv.factory.filter.derivative.FactoryDerivative}.
  * </p>
  *
  * @author Peter Abeles

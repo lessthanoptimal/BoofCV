@@ -17,8 +17,8 @@
 package gecv.abst.detect.interest;
 
 import gecv.alg.feature.detect.interest.FeatureLaplacePyramid;
+import gecv.alg.transform.gss.ScaleSpacePyramid;
 import gecv.struct.feature.ScalePoint;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 import jgrl.struct.point.Point2D_I32;
 

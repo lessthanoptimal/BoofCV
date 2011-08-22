@@ -14,17 +14,17 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.gss;
+package gecv.alg.transform.pyramid;
 
 import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.interpolate.TypeInterpolate;
-import gecv.alg.transform.pyramid.BasePyramidTests;
-import gecv.alg.transform.pyramid.PyramidUpdateSubsampleScale;
 import gecv.factory.interpolate.FactoryInterpolation;
+import gecv.misc.GecvMiscOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.SubsamplePyramid;
+import gecv.struct.pyramid.PyramidFloat;
+import gecv.struct.pyramid.PyramidUpdater;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -32,12 +32,10 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidUpdateSubsampleScale extends BasePyramidTests {
+public class TestPyramidUpdateSubsampleScale extends GenericPyramidUpdateTests<ImageFloat32> {
 
 	public TestPyramidUpdateSubsampleScale() {
-		super();
-		this.width = 80;
-		this.height = 80;
+		super(ImageFloat32.class);
 	}
 
 	/**
@@ -46,20 +44,21 @@ public class TestPyramidUpdateSubsampleScale extends BasePyramidTests {
 	@Test
 	public void update() {
 
-		GecvTesting.checkSubImage(this, "_update", true, inputF32);
+		ImageFloat32 input = new ImageFloat32(width,height);
+		GecvTesting.checkSubImage(this, "_update", true, input);
 	}
 
-	public void _update(ImageFloat32 img) {
+	public void _update(ImageFloat32 input) {
 
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(inputF32);
-		PyramidUpdateSubsampleScale<ImageFloat32> alg = new PyramidUpdateSubsampleScale <ImageFloat32>(interp);
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
+		PyramidUpdateSubsampleScale<ImageFloat32> alg = new PyramidUpdateSubsampleScale<ImageFloat32>(interp);
 
-		ImagePyramid<ImageFloat32> pyramid = new SubsamplePyramid<ImageFloat32>(alg,3,5);
-		pyramid.update(img);
+		PyramidFloat<ImageFloat32> pyramid = new PyramidFloat<ImageFloat32>(imageType,3,5);
+		alg.update(input,pyramid);
 
 		// test the first layer
 		ImageFloat32 expected = new ImageFloat32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
-		DistortImageOps.scale(img, expected, TypeInterpolate.BILINEAR);
+		DistortImageOps.scale(input, expected, TypeInterpolate.BILINEAR);
 		ImageFloat32 found = pyramid.getLayer(0);
 
 		GecvTesting.assertEquals(expected,found);
@@ -70,5 +69,17 @@ public class TestPyramidUpdateSubsampleScale extends BasePyramidTests {
 		found = pyramid.getLayer(1);
 
 		GecvTesting.assertEquals(next,found,0,1e-4);
+	}
+
+	@Override
+	protected PyramidUpdater createUpdater() {
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(imageType);
+		return new PyramidUpdateSubsampleScale(interp);
+	}
+
+	@Override
+	protected ImagePyramid<ImageFloat32> createPyramid(int... scales) {
+		double a[] = GecvMiscOps.convertTo_F64(scales);
+		return new PyramidFloat<ImageFloat32>(imageType,a);
 	}
 }

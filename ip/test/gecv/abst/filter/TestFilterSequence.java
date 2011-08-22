@@ -16,10 +16,10 @@
 
 package gecv.abst.filter;
 
-import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.alg.filter.convolve.ConvolveImageNoBorder;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.core.image.border.BorderType;
+import gecv.factory.filter.convolve.FactoryConvolve;
 import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;

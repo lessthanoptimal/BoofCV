@@ -23,8 +23,7 @@ import gecv.gui.image.ImagePyramidPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.SubsamplePyramid;
+import gecv.struct.pyramid.PyramidFloat;
 
 import java.awt.image.BufferedImage;
 
@@ -33,21 +32,21 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizeSubsamplePyramidApp {
+public class VisualizePyramidFloatApp {
 
 	public static void main( String args[] ) {
 		double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0};
 
-		BufferedImage input = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
+		BufferedImage original = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
 
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 //		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bicubic(ImageFloat32.class,-0.5f);
 		PyramidUpdateSubsampleScale<ImageFloat32> updater = new PyramidUpdateSubsampleScale<ImageFloat32>(interp);
-		ImagePyramid<ImageFloat32> pyramid = new SubsamplePyramid<ImageFloat32>(updater,scales);
+		PyramidFloat<ImageFloat32> pyramid = new PyramidFloat<ImageFloat32>(ImageFloat32.class,scales);
 
-		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
+		ImageFloat32 input = ConvertBufferedImage.convertFrom(original,(ImageFloat32)null);
 
-		pyramid.update(inputF32);
+		updater.update(input,pyramid);
 
 		ImagePyramidPanel<ImageFloat32> gui = new ImagePyramidPanel<ImageFloat32>(pyramid,true);
 		gui.render();

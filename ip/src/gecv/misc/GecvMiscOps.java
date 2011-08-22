@@ -33,6 +33,14 @@ public class GecvMiscOps {
 		return ret;
 	}
 
+	public static double[] convertTo_F64( int a[] ) {
+		double[] ret = new double[ a.length ];
+		for( int i = 0; i < a.length; i++ ) {
+			ret[i] = (int)a[i];
+		}
+		return ret;
+	}
+
 	/**
 	 * Bounds the provided rectangle to be inside the image.  It is assumed that
 	 * at least part of the rectangle is inside of the image so all possibilities

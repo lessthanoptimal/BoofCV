@@ -24,6 +24,7 @@ import gecv.core.image.border.BorderIndex1D_Extend;
 import gecv.core.image.border.BorderType;
 import gecv.core.image.border.ImageBorder1D_F32;
 import gecv.core.image.border.ImageBorder1D_I32;
+import gecv.factory.filter.convolve.FactoryConvolve;
 import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.convolve.Kernel1D_I32;

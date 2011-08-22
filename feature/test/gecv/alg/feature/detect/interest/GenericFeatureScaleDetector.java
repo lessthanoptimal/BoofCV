@@ -30,17 +30,17 @@ public abstract class GenericFeatureScaleDetector extends GenericFeatureDetector
 
 	int r = 2;
 
-	private GeneralFeatureDetector<ImageFloat32,ImageFloat32> createBlobDetector() {
+	private GeneralFeatureDetector<ImageFloat32,ImageFloat32> createBlobDetector( int maxFeatures) {
 		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(r,1,0,false,false,false);
 		GeneralFeatureIntensity<ImageFloat32, ImageFloat32> intensity =
 				new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.DETERMINANT,ImageFloat32.class);
-		return new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,200);
+		return new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,maxFeatures);
 	}
 
 	@Override
-	protected Object createDetector()
+	protected Object createDetector( int maxFeatures )
 	{
-		return createDetector(createBlobDetector());
+		return createDetector(createBlobDetector(maxFeatures));
 	}
 
 	protected abstract Object createDetector( GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector);

@@ -239,9 +239,9 @@ public class GeneralizedImageOps {
 		} else if ( ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
 			ImageTestingOps.fill((ImageSInt64)img,(int)value);
 		} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
-			ImageTestingOps.fill((ImageFloat32)img,(int)value);
+			ImageTestingOps.fill((ImageFloat32)img,(float)value);
 		} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
-			ImageTestingOps.fill((ImageFloat64)img,(int)value);
+			ImageTestingOps.fill((ImageFloat64)img,value);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}

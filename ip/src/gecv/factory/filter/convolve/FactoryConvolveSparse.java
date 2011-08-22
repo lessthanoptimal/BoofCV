@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.abst.filter.convolve;
+package gecv.factory.filter.convolve;
 
+import gecv.abst.filter.convolve.ImageConvolveSparse;
 import gecv.alg.filter.convolve.ConvolveWithBorderSparse;
 import gecv.core.image.GeneralizedImageOps;
-import gecv.core.image.border.ImageBorder;
 import gecv.core.image.border.ImageBorder_F32;
 import gecv.core.image.border.ImageBorder_I32;
 import gecv.struct.convolve.Kernel2D;
@@ -36,8 +36,8 @@ import gecv.struct.image.ImageInteger;
 @SuppressWarnings({"unchecked"})
 public class FactoryConvolveSparse {
 
-	public static <T extends ImageBase, K extends Kernel2D, B extends ImageBorder<T>>
-		ImageConvolveSparse<T,K> create( Class<T> imageType ) {
+	public static <T extends ImageBase, K extends Kernel2D>
+	ImageConvolveSparse<T,K> create( Class<T> imageType ) {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
 			return (ImageConvolveSparse<T,K>)new Convolve_F32();
 		} else {

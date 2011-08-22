@@ -22,7 +22,6 @@ import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
 import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.AnyImageDerivative;
-import gecv.abst.filter.derivative.FactoryDerivativeSparse;
 import gecv.alg.feature.detect.intensity.GradientCornerIntensity;
 import gecv.alg.feature.detect.intensity.HessianBlobIntensity;
 import gecv.alg.feature.detect.interest.*;
@@ -30,6 +29,7 @@ import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
 import gecv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
+import gecv.factory.filter.derivative.FactoryDerivativeSparse;
 import gecv.struct.image.ImageBase;
 
 /**

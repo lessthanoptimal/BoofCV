@@ -17,10 +17,10 @@
 package gecv.alg.transform.gss;
 
 import gecv.abst.filter.convolve.ConvolveInterface;
-import gecv.abst.filter.convolve.FactoryConvolve;
 import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.border.BorderType;
+import gecv.factory.filter.convolve.FactoryConvolve;
 import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.GecvDefaults;
 import gecv.struct.convolve.Kernel1D;

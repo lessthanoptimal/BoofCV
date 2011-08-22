@@ -14,18 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.gss;
+package gecv.alg.transform.pyramid;
 
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.BlurStorageFilter;
 import gecv.alg.distort.DistortImageOps;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.interpolate.TypeInterpolate;
-import gecv.alg.transform.pyramid.BasePyramidTests;
 import gecv.factory.interpolate.FactoryInterpolation;
+import gecv.misc.GecvMiscOps;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
-import gecv.struct.pyramid.SubsamplePyramid;
+import gecv.struct.pyramid.PyramidFloat;
+import gecv.struct.pyramid.PyramidUpdater;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -33,12 +34,12 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidUpdateGaussianScale extends BasePyramidTests {
+public class TestPyramidUpdateGaussianScale extends GenericPyramidUpdateTests<ImageFloat32> {
+
+	double sigmas[] = new double[]{1,2};
 
 	public TestPyramidUpdateGaussianScale() {
-		super();
-		this.width = 80;
-		this.height = 80;
+		super(ImageFloat32.class);
 	}
 
 	/**
@@ -47,16 +48,18 @@ public class TestPyramidUpdateGaussianScale extends BasePyramidTests {
 	@Test
 	public void update() {
 
-		GecvTesting.checkSubImage(this, "_update", true, inputF32);
+		ImageFloat32 img = new ImageFloat32(width,height);
+
+		GecvTesting.checkSubImage(this, "_update", true, img);
 	}
 
 	public void _update(ImageFloat32 img) {
 
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(inputF32);
-		PyramidUpdateGaussianScale <ImageFloat32> alg = new PyramidUpdateGaussianScale <ImageFloat32>(interp);
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(img);
+		PyramidUpdateGaussianScale<ImageFloat32> alg = new PyramidUpdateGaussianScale <ImageFloat32>(interp,sigmas);
 
-		ImagePyramid<ImageFloat32> pyramid = new SubsamplePyramid<ImageFloat32>(alg,3,5);
-		pyramid.update(img);
+		PyramidFloat<ImageFloat32> pyramid = new PyramidFloat<ImageFloat32>(imageType,3,5);
+		alg.update(img,pyramid);
 
 		// test the first layer
 		BlurStorageFilter<ImageFloat32> blur = FactoryBlurFilter.gaussian(ImageFloat32.class,3,-1);
@@ -69,7 +72,7 @@ public class TestPyramidUpdateGaussianScale extends BasePyramidTests {
 		GecvTesting.assertEquals(expected,found);
 
 		// test the second layer
-		blur = FactoryBlurFilter.gaussian(ImageFloat32.class,5.0/3.0,-1);
+		blur = FactoryBlurFilter.gaussian(ImageFloat32.class,sigmas[0],-1);
 		blurrImg = new ImageFloat32(expected.width,expected.height);
 		blur.process(expected,blurrImg);
 		expected = new ImageFloat32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
@@ -77,5 +80,17 @@ public class TestPyramidUpdateGaussianScale extends BasePyramidTests {
 		found = pyramid.getLayer(1);
 
 		GecvTesting.assertEquals(expected,found,0,1e-4);
+	}
+
+	@Override
+	protected PyramidUpdater createUpdater() {
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(imageType);
+		return new PyramidUpdateGaussianScale(interp,sigmas);
+	}
+
+	@Override
+	protected ImagePyramid<ImageFloat32> createPyramid(int... scales) {
+		double a[] = GecvMiscOps.convertTo_F64(scales);
+		return new PyramidFloat<ImageFloat32>(imageType,a);
 	}
 }

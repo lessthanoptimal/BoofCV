@@ -48,7 +48,6 @@ public class TestImplOrientationAverage_S32 {
 
 		tests.setup(angleTol, r*2+1 ,alg);
 		tests.performAll();
-		tests.performWeightTests();
 
 	}
 }

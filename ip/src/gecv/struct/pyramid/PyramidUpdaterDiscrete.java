@@ -14,26 +14,17 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.detect.interest;
+package gecv.struct.pyramid;
 
-import gecv.struct.feature.ScalePoint;
-import gecv.struct.image.ImageFloat32;
-
-import java.util.List;
+import gecv.struct.image.ImageBase;
 
 
 /**
+ * <p>
+ * Updater for pyramids of type {@link PyramidDiscrete}.
+ * </p>
+ *
  * @author Peter Abeles
  */
-public class TestGeneralFeatureDetector extends GenericFeatureDetector {
-
-	@Override
-	protected Object createDetector( int maxFeatures ) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	@Override
-	protected List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
+public interface PyramidUpdaterDiscrete<T extends ImageBase> extends PyramidUpdater<T, PyramidDiscrete<T>> {
 }

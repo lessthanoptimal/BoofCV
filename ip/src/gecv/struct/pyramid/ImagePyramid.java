@@ -16,100 +16,42 @@
 
 package gecv.struct.pyramid;
 
-import gecv.core.image.ImageGenerator;
-import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.struct.image.ImageBase;
 
 /**
  * <p>
- * Image pyramids represent the same image at multiple resolutions allowing searches to performed across multiple
- * resolutions.  There are many different ways to defined an image pyramid and different ways to compute it.  This
- * is a base class which hides many of those issues.
+ * Image pyramids represent an image at different resolution in a fine to coarse fashion. Lower layers
+ * in the pyramid are at a higher resolution than the upper layers.  The resolution of a layer is
+ * specified by its scale.  The scale number indicates how many pixels in the original input image
+ * correspond to a single pixel at the current layer.  So a layer with a scale of 5 is 5 times lower
+ * resolution than the input layer.
  * </p>
  *
  * <p>
- * When updating the pyramid, if the top most layer is at the same resolution as the original image then a reference
- * can optionally be saved, avoiding an unnecessary image copy.  This is done by setting the saveOriginalReference
- * to true.
+ * Usage: Before being used the scales in the pyramid must first be specified then the {@link @initialize}
+ * function called.  How the scale is set is implementation dependent.  Once initialized images
+ * at different layers can be accessed with {@link #getLayer}.
  * </p>
- *
+ * 
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class ImagePyramid<T extends ImageBase> {
-
-	// class which updates the pyramid
-	public PyramidUpdater<T> updater;
-
-	// shape of full resolution input image
-	public int bottomWidth;
-	public int bottomHeight;
-
-	// The image at different resolutions.  Larger indexes for lower resolutions
-	public T layers[];
-
-	// if the top layer is full resolution, should a copy be made or a reference to the original be saved?i
-	public boolean saveOriginalReference;
+public interface ImagePyramid<T extends ImageBase> {
 
 	/**
-	 * Specifies input image size and behavior of top most layer.
+	 * Creates the pyramids internal data structures.  The provided image must be of the same type
+	 * and dimension as all the input images.
+	 */
+	public void initialize( int width , int height );
+
+	/**
+	 * Returns the scale of the specified layer in the pyramid.  Larger the scale
+	 * smaller the image is relative to the input image.
 	 *
-	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of  copied.
-	 * @param updater Specifies how the image pyramid is updated.
+	 * @param layer Which layer is being inspected.
+	 * @return The layer's scale.
 	 */
-	public ImagePyramid(boolean saveOriginalReference,
-						PyramidUpdater<T> updater ) {
-		this.saveOriginalReference = saveOriginalReference;
-		this.updater = updater;
-	}
-	/**
-	 * Used to internally check that the provided scales are valid.
-	 */
-	protected void checkScales() {
-		if( getScale(0) < 0 ) {
-			throw new IllegalArgumentException("The first layer must be more than zero.");
-		}
-
-		double prevScale = 0;
-		for( int i = 0; i < getNumLayers(); i++ ) {
-			double s = getScale(i);
-			if( s <= prevScale )
-				throw new IllegalArgumentException("Higher layers must have larger scale factors than previous layers.");
-			prevScale = s;
-		}
-	}
-
-	/**
-	 * Updates each level in the pyramid using the specified input image.
-	 * 
-	 * @param image Original input image.
-	 */
-	public void update( T image ) {
-		if( updater == null ) {
-			throw new IllegalArgumentException("Updater is null, this is an error or the class should be updated manually.");
-		}
-
-		if( !isLayersDeclared() ) {
-			ImageGenerator<T> gen = (ImageGenerator<T>)FactoryImageGenerator.create(image.getClass());
-			declareLayers(gen, image.width,image.height);
-		}
-
-		updater.update(image,this);
-	}
-
-	/**
-	 * Declares the layers in the pyramid.
-	 *
-	 * @param generator
-	 */
-	public abstract void declareLayers( ImageGenerator<T> generator , int width , int height );
-
-	/**
-	 *
-	 * @param layer
-	 * @return
-	 */
-	public abstract double getScale( int layer );
+	public double getScale( int layer );
 
 	/**
 	 * Returns a layer in the pyramid.
@@ -117,21 +59,50 @@ public abstract class ImagePyramid<T extends ImageBase> {
 	 * @param layerNum which image is to be returned.
 	 * @return The image in the pyramid.
 	 */
-	public T getLayer(int layerNum) {
-		return layers[layerNum];
-	}
+	public T getLayer(int layerNum);
 
-	public abstract int getNumLayers();
+	/**
+	 * Returns the number of layers in the pyramid.
+	 */
+	public int getNumLayers();
 
-	public int getWidth(int layer) {
-		return layers[layer].width;
-	}
+	/**
+	 * Returns the width of an image at ths specified layer.
+	 *
+	 * @param layer The layer being requested.
+	 * @return The layer's width.
+	 */
+	public int getWidth(int layer);
 
-	public int getHeight(int layer) {
-		return layers[layer].height;
-	}
+	/**
+	 * Returns the height of an image at ths specified layer.
+	 *
+	 * @param layer The layer being requested.
+	 * @return The layer's height.
+	 */
+	public int getHeight(int layer);
 
-	public boolean isLayersDeclared() {
-		return layers != null;
-	}
+	/**
+	 * Width of input image.
+	 */
+	public int getInputWidth();
+
+	/**
+	 * Height of input image.
+	 */
+	public int getInputHeight();
+
+
+	/**
+	 * Checks to see if the image pyramid has been initialized or not yet.
+	 * @return True if initialized and false if not.
+	 */
+	public boolean isInitialized();
+
+	/**
+	 * The type of image.
+	 *
+	 * @return Image type.
+	 */
+	public Class<T> getImageType();
 }

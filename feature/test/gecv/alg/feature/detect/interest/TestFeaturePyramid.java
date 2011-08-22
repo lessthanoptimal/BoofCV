@@ -17,12 +17,10 @@
 package gecv.alg.feature.detect.interest;
 
 import gecv.abst.filter.derivative.AnyImageDerivative;
-import gecv.alg.interpolate.InterpolatePixel;
+import gecv.alg.transform.gss.ScaleSpacePyramid;
 import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.inst.FactoryImageGenerator;
-import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.struct.feature.ScalePoint;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageFloat32;
 
 import java.util.List;
@@ -42,8 +40,7 @@ public class TestFeaturePyramid extends GenericFeatureScaleDetector {
 
 	@Override
 	protected List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
-		InterpolatePixel<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
-		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(interpolate,scales);
+		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class,scales);
 		ss.update(input);
 
 		FeaturePyramid<ImageFloat32,ImageFloat32> alg =

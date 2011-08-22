@@ -20,23 +20,20 @@ import gecv.abst.detect.intensity.*;
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.alg.distort.DistortImageOps;
-import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.interpolate.TypeInterpolate;
 import gecv.alg.misc.PixelMath;
+import gecv.alg.transform.gss.ScaleSpacePyramid;
 import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.inst.FactoryImageGenerator;
 import gecv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
-import gecv.factory.interpolate.FactoryInterpolation;
 import gecv.gui.ListDisplayPanel;
 import gecv.gui.SelectAlgorithmPanel;
 import gecv.gui.image.ShowImages;
 import gecv.gui.image.VisualizeImageData;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.gss.ScaleSpacePyramid;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.pyramid.ImagePyramid;
 
 import javax.swing.*;
 import java.awt.*;
@@ -60,7 +57,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 
 	ListDisplayPanel gui = new ListDisplayPanel();
 
-	ImagePyramid<T> pyramid;
+	ScaleSpacePyramid<T> pyramid;
 
 	BufferedImage input;
 	T workImage;
@@ -85,9 +82,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 		for( int i = 0; i < scales.length ; i++ ) {
 			scales[i] =  Math.exp(i*0.15);
 		}
-
-		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
-		pyramid = new ScaleSpacePyramid<T>(interp,scales);
+		pyramid = new ScaleSpacePyramid<T>(imageType,scales);
 
 		anyDerivative = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 	}

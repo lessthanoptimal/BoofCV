@@ -20,8 +20,9 @@ import gecv.alg.filter.convolve.ConvolveNormalized;
 import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.pyramid.DiscreteImagePyramid;
 import gecv.struct.pyramid.ImagePyramid;
+import gecv.struct.pyramid.PyramidDiscrete;
+import gecv.struct.pyramid.PyramidUpdater;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -31,12 +32,10 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidUpdateIntegerDown extends BasePyramidTests {
+public class TestPyramidUpdateIntegerDown extends GenericPyramidUpdateTests<ImageFloat32> {
 
 	public TestPyramidUpdateIntegerDown() {
-		super();
-		this.width = 80;
-		this.height = 80;
+		super(ImageFloat32.class);
 	}
 
 	/**
@@ -44,23 +43,25 @@ public class TestPyramidUpdateIntegerDown extends BasePyramidTests {
 	 */
 	@Test
 	public void saveOriginalReference() {
+		ImageFloat32 input= new ImageFloat32(width,height);
+
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
 		PyramidUpdateIntegerDown<ImageFloat32> alg = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
-		ImagePyramid<ImageFloat32> pyramid = new DiscreteImagePyramid<ImageFloat32>(true,alg,1,2,4);
-		pyramid.update(inputF32);
+		PyramidDiscrete<ImageFloat32> pyramid = new PyramidDiscrete<ImageFloat32>(imageType,true,1,2,4);
+		alg.update(input,pyramid);
 
-		assertTrue(inputF32 == pyramid.getLayer(0));
+		assertTrue(input == pyramid.getLayer(0));
 
-		pyramid = new DiscreteImagePyramid<ImageFloat32>(false,alg,1,2,4);
-		pyramid.update(inputF32);
+		pyramid = new PyramidDiscrete<ImageFloat32>(imageType,false,1,2,4);
+		alg.update(input,pyramid);
 
-		assertTrue(inputF32 != pyramid.getLayer(0));
+		assertTrue(input != pyramid.getLayer(0));
 
-		pyramid = new DiscreteImagePyramid<ImageFloat32>(true,alg,2,4);
-		pyramid.update(inputF32);
+		pyramid = new PyramidDiscrete<ImageFloat32>(imageType,true,2,4);
+		alg.update(input,pyramid);
 
-		assertTrue(inputF32 != pyramid.getLayer(0));
+		assertTrue(input != pyramid.getLayer(0));
 	}
 
 	/**
@@ -68,27 +69,28 @@ public class TestPyramidUpdateIntegerDown extends BasePyramidTests {
 	 */
 	@Test
 	public void _update() {
+		ImageFloat32 input = new ImageFloat32(width,height);
 
-		GecvTesting.checkSubImage(this, "_update", true, inputF32);
+		GecvTesting.checkSubImage(this, "_update", true, input);
 	}
 
-	public void _update(ImageFloat32 img) {
+	public void _update(ImageFloat32 input) {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
 		ImageFloat32 convImg = new ImageFloat32(width, height);
 		ImageFloat32 convImg2 = new ImageFloat32(width/2, height/2);
 
 		ImageFloat32 storage = new ImageFloat32(width, height);
 
-		ConvolveNormalized.horizontal(kernel,img,storage);
+		ConvolveNormalized.horizontal(kernel,input,storage);
 		ConvolveNormalized.vertical(kernel,storage,convImg);
 
 		PyramidUpdateIntegerDown<ImageFloat32> alg = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
 
-		ImagePyramid<ImageFloat32> pyramid = new DiscreteImagePyramid<ImageFloat32>(true,alg,1,2,4);
-		pyramid.update(img);
+		PyramidDiscrete<ImageFloat32> pyramid = new PyramidDiscrete<ImageFloat32>(imageType,true,1,2,4);
+		alg.update(input,pyramid);
 
 		// top layer should be the same as the input layer
-		GecvTesting.assertEquals(img, pyramid.getLayer(0), 1, 1e-4f);
+		GecvTesting.assertEquals(input, pyramid.getLayer(0), 1, 1e-4f);
 
 		// second layer should have the same values as the convolved image
 		for (int i = 0; i < height; i += 2) {
@@ -112,5 +114,16 @@ public class TestPyramidUpdateIntegerDown extends BasePyramidTests {
 				assertEquals(j+" "+j,a, b, 1e-4);
 			}
 		}
+	}
+
+	@Override
+	protected PyramidUpdater createUpdater() {
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
+		return new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
+	}
+
+	@Override
+	protected ImagePyramid<ImageFloat32> createPyramid(int... scales) {
+		return new PyramidDiscrete<ImageFloat32>(imageType,true,scales);
 	}
 }
