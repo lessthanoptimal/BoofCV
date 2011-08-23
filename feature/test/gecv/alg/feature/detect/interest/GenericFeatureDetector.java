@@ -17,9 +17,9 @@
 package gecv.alg.feature.detect.interest;
 
 import gecv.core.image.GeneralizedImageOps;
-import gecv.struct.feature.ScalePoint;
 import gecv.struct.image.ImageFloat32;
 import jgrl.geometry.UtilPoint2D_I32;
+import jgrl.struct.point.Point2D_I32;
 import org.junit.Test;
 
 import java.util.List;
@@ -30,6 +30,8 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
+ * Provides basic tests for feature detectors
+ *
  * @author Peter Abeles
  */
 public abstract class GenericFeatureDetector {
@@ -43,14 +45,19 @@ public abstract class GenericFeatureDetector {
 	double scaleTolerance = 1e-4;
 
 	/**
-	 * If the maximum number of features is set to a negative number then
+	 * If the maximum number of features is set to a negative number or zero then
 	 * it should return the maximum number of features possible
 	 */
 	@Test
 	public void checkNegativeMaxFeatures() {
 		double scales[]=new double[]{1,2,4,8};
 		ImageFloat32 input = new ImageFloat32(width,height);
-		GeneralizedImageOps.randomize(input,rand,0,100);
+
+		// give it a bunch of features that any of the detectors should be able to see
+		GeneralizedImageOps.fillRectangle(input,100,10,10,15,15);
+		GeneralizedImageOps.fillRectangle(input,100,30,10,35,15);
+		GeneralizedImageOps.fillRectangle(input,100,10,30,15,35);
+		GeneralizedImageOps.fillRectangle(input,100,30,30,35,35);
 
 		// limit it to "one" feature
 		Object alg = createDetector(1);
@@ -70,10 +77,9 @@ public abstract class GenericFeatureDetector {
 	public void checkFlushFeatures() {
 		double scales[]=new double[]{1,2,4,8};
 		ImageFloat32 input = new ImageFloat32(width,height);
-		GeneralizedImageOps.fillRectangle(input,20,10,10,width,height);
 
-		// give it one corner to find
-		GeneralizedImageOps.fill(input,50);
+		// provide a rectangle and circular feature
+		GeneralizedImageOps.fillRectangle(input,20,5,5,25,25);
 		drawCircle(input,10,10,r*2);
 
 		Object alg = createDetector(50);
@@ -86,44 +92,9 @@ public abstract class GenericFeatureDetector {
 		assertEquals(firstFound,secondFound);
 	}
 
-	/**
-	 * Very basic test that just checks to see if it can find an obvious circular feature
-	 */
-	@Test
-	public void basicDetect() {
-		double scales[]=new double[]{1,2,4,8};
-		ImageFloat32 input = new ImageFloat32(width,height);
-		GeneralizedImageOps.fillRectangle(input,20,10,10,width,height);
-
-
-		// give it one corner to find
-		GeneralizedImageOps.fill(input,50);
-		drawCircle(input,10,10,r*2);
-
-		Object alg = createDetector(50);
-		List<ScalePoint> found = detectFeature(input,scales,alg);
-
-		assertTrue(found.size()>=1);
-		
-		// look for at least one good match
-		boolean foundMatch = false;
-		for( ScalePoint p : found ) {
-			if( Math.abs(2-p.scale) > scaleTolerance )
-				continue;
-			if( Math.abs(10-p.x) > r )
-				continue;
-			if( Math.abs(10-p.y) > r )
-				continue;
-
-			foundMatch = true;
-			break;
-		}
-		assertTrue(foundMatch);
-	}
-
 	protected abstract Object createDetector( int maxFeatures );
 
-	protected abstract List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector);
+	protected abstract List<Point2D_I32> detectFeature(ImageFloat32 input, double[] scales, Object detector);
 
 	private void drawCircle( ImageFloat32 img , int c_x , int c_y , double r ) {
 

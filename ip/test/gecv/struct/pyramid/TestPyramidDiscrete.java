@@ -16,7 +16,6 @@
 
 package gecv.struct.pyramid;
 
-import gecv.alg.transform.pyramid.GenericPyramidTests;
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 

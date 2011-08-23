@@ -16,10 +16,10 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.alg.transform.gss.FactoryGaussianScaleSpace;
-import gecv.struct.feature.ScalePoint;
+import gecv.factory.transform.gss.FactoryGaussianScaleSpace;
 import gecv.struct.gss.GaussianScaleSpace;
 import gecv.struct.image.ImageFloat32;
+import jgrl.struct.point.Point2D_I32;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class TestFeatureScaleSpace extends GenericFeatureScaleDetector {
 	}
 
 	@Override
-	protected List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
+	protected List<Point2D_I32> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
 		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
 		ss.setScales(scales);
 		ss.setImage(input);
@@ -44,6 +44,6 @@ public class TestFeatureScaleSpace extends GenericFeatureScaleDetector {
 				(FeatureScaleSpace<ImageFloat32,ImageFloat32>)detector;
 		alg.detect(ss);
 
-		return alg.getInterestPoints();
+		return (List)alg.getInterestPoints();
 	}
 }

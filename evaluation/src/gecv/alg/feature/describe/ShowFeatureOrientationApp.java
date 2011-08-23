@@ -28,8 +28,7 @@ import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I16;
 
 import java.awt.*;
@@ -72,7 +71,8 @@ public class ShowFeatureOrientationApp {
 		detector.process(workImage,derivX,derivY,derivXX,derivYY,derivXY);
 
 //		OrientationHistogram<D> orientation =  FactoryRegionOrientationAlgs.histogram(10,1,false,derivType);
-		OrientationAverage<D> orientation =  FactoryRegionOrientationAlgs.average(1,false,derivType);
+//		OrientationAverage<D> orientation =  FactoryRegionOrientationAlgs.average(1,false,derivType);
+		OrientationSlidingWindow<D> orientation =  FactoryRegionOrientationAlgs.sliding(20,Math.PI/3.0,1,false,derivType);
 
 		QueueCorner points = detector.getFeatures();
 		System.out.println("Found points: "+points.size());
@@ -94,9 +94,9 @@ public class ShowFeatureOrientationApp {
 
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
-//		doStuff(input,ImageFloat32.class,ImageFloat32.class);
+		doStuff(input,ImageFloat32.class, ImageFloat32.class);
 //		input = UtilImageIO.loadImage(fileName);
-		doStuff(input, ImageUInt8.class, ImageSInt16.class);
+//		doStuff(input, ImageUInt8.class, ImageSInt16.class);
 		System.out.println("Done");
 	}
 }

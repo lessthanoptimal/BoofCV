@@ -85,9 +85,9 @@ public class DetectStability<T extends ImageBase, D extends ImageBase> {
 		DetectStability<ImageFloat32,ImageFloat32> benchmark
 				= new DetectStability<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-//		benchmark.testNoise();
+		benchmark.testNoise();
 //		benchmark.testIntensity();
-		benchmark.testRotation();
+//		benchmark.testRotation();
 //		benchmark.testScale();
 
 	}

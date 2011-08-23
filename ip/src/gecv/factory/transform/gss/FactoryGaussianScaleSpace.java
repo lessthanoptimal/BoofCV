@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package gecv.alg.transform.gss;
+package gecv.factory.transform.gss;
 
+import gecv.alg.transform.gss.NoCacheScaleSpace;
 import gecv.core.image.ImageGenerator;
 import gecv.core.image.inst.SingleBandGenerator;
 import gecv.struct.image.ImageBase;

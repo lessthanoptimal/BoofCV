@@ -17,21 +17,44 @@
 package gecv.struct.gss;
 
 import gecv.alg.transform.gss.ScaleSpacePyramid;
+import gecv.core.image.GeneralizedImageOps;
+import gecv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestScaleSpacePyramid {
 
+	Random rand = new Random(234);
+	int width = 50;
+	int height = 60;
+
 	/**
-	 * Checks to see if {@link GaussianScaleSpace} and {@link ScaleSpacePyramid} blur an image
-	 * about the same amount.
+	 * This is a hard class to test.  It can't be compared directly against {@link GaussianScaleSpace}
+	 * because they won't produce exactly the same results and visually it looks a bit different.  The
+	 * math has been inspected a couple of times.
+	 *
+	 * So all this test does is see if it will process an image without blowing up.
 	 */
 	@Test
-	public void checkSimilarBlur() {
-		fail("implement");
+	public void reallyStupidTest() {
+		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class,1,2,3,4);
+
+		ImageFloat32 input = new ImageFloat32(width,height);
+		GeneralizedImageOps.randomize(input,rand,0,100);
+
+		ss.update(input);
+
+		assertEquals(4,ss.getNumLayers());
+
+		for( int i = 0; i < 4; i++ ) {
+			assertTrue(GeneralizedImageOps.sum(ss.getLayer(i))>0);
+		}
 	}
 }

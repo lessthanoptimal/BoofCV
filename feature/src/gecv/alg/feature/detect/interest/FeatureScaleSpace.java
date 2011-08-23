@@ -174,20 +174,20 @@ public class FeatureScaleSpace<T extends ImageBase, D extends ImageBase> {
 		for( Point2D_I16 c : candidates ) {
 			float val = ss1*inten1.get(c.x,c.y);
 
-			if( checkMax(inten0, ss0, val, c.x, c.y) && checkMax(inten2, ss2, val, c.x, c.y) ) {
+			if( checkMax(inten0, val/ss0, c.x, c.y) && checkMax(inten2, val/ss2, c.x, c.y) ) {
 				// put features into the scale of the upper image
 				foundPoints.add( new ScalePoint(c.x,c.y,scale1));
 			}
 		}
 	}
 
-	protected static boolean checkMax(ImageBorder_F32 inten, float scoreAdjust, float bestScore, int c_x, int c_y) {
+	protected static boolean checkMax(ImageBorder_F32 inten, float bestScore, int c_x, int c_y) {
 		boolean isMax = true;
 		beginLoop:
 		for( int i = c_y -1; i <= c_y+1; i++ ) {
 			for( int j = c_x-1; j <= c_x+1; j++ ) {
 
-				if( scoreAdjust*inten.get(j,i) >= bestScore ) {
+				if( inten.get(j,i) >= bestScore ) {
 					isMax = false;
 					break beginLoop;
 				}

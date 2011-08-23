@@ -16,9 +16,16 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.struct.feature.ScalePoint;
+import gecv.abst.filter.derivative.AnyImageDerivative;
+import gecv.alg.transform.gss.UtilScaleSpace;
+import gecv.core.image.inst.FactoryImageGenerator;
+import gecv.factory.feature.detect.interest.FactoryCornerDetector;
+import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageFloat32;
+import jgrl.struct.point.Point2D_I16;
+import jgrl.struct.point.Point2D_I32;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,13 +34,36 @@ import java.util.List;
  */
 public class TestGeneralFeatureDetector extends GenericFeatureDetector {
 
+	AnyImageDerivative<ImageFloat32,ImageFloat32> computeDerivative =
+			UtilScaleSpace.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
+
 	@Override
 	protected Object createDetector( int maxFeatures ) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+//		return FactoryBlobDetector.createLaplace(2,0,maxFeatures,ImageFloat32.class,HessianBlobIntensity.Type.DETERMINANT);
+		return FactoryCornerDetector.createHarris(2,0,maxFeatures,ImageFloat32.class);
 	}
 
 	@Override
-	protected List<ScalePoint> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	protected List<Point2D_I32> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> d =
+				(GeneralFeatureDetector<ImageFloat32,ImageFloat32>)detector;
+
+		computeDerivative.setInput(input);
+
+		ImageFloat32 derivX = computeDerivative.getDerivative(true);
+		ImageFloat32 derivY = computeDerivative.getDerivative(false);
+		ImageFloat32 derivXX = computeDerivative.getDerivative(true,true);
+		ImageFloat32 derivYY = computeDerivative.getDerivative(false,false);
+		ImageFloat32 derivXY = computeDerivative.getDerivative(true,false);
+
+		d.process(input,derivX,derivY,derivXX,derivYY,derivXY);
+
+		QueueCorner found = d.getFeatures();
+		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
+		for( int i = 0; i < found.num; i++ ) {
+			Point2D_I16 p = found.get(i);
+			ret.add( new Point2D_I32(p.x,p.y));
+		}
+		return ret;
 	}
 }
