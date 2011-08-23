@@ -26,18 +26,16 @@ import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
 import gecv.alg.interpolate.InterpolateRectangle;
 import gecv.alg.tracker.klt.KltConfig;
 import gecv.alg.transform.pyramid.PyramidOps;
-import gecv.alg.transform.pyramid.PyramidUpdateIntegerDown;
 import gecv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import gecv.factory.filter.derivative.FactoryDerivative;
-import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.factory.interpolate.FactoryInterpolation;
+import gecv.factory.transform.pyramid.FactoryPyramid;
 import gecv.gui.image.DiscretePyramidPanel;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.ProcessImageSequence;
 import gecv.io.image.SimpleImageSequence;
 import gecv.io.wrapper.xuggler.XugglerSimplified;
-import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
@@ -188,8 +186,7 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 		GenericPkltFeatSelector<I, D> featureSelector =
 				new GenericPkltFeatSelector<I,D>(detector,null);
 
-		PyramidUpdateIntegerDown<I> pyrUpdater =
-				new PyramidUpdateIntegerDown<I>(FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,2),imageType);
+		PyramidUpdaterDiscrete<I> pyrUpdater = FactoryPyramid.discreteGaussian(imageType,-1,2);
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 

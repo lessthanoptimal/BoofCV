@@ -49,6 +49,7 @@ import java.util.List;
 @SuppressWarnings({"unchecked"})
 public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
 
+	// used to compute feature intensity across scale space
 	private ImageFunctionSparse<T> sparseLaplace;
 
 	// generalized feature detector.  Used to find candidate features in each scale's image
@@ -159,9 +160,6 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
 
 		List<Point2D_I16> candidates = maximums[index1];
 
-		// In a ScaleSpacePyramid the resolution has been internally divided by two
-		float featureScale = (float)ss.getScaleSpace(layerID);
-
 		float scale0 = (float)ss.scale[layerID-1];
 		float scale1 = (float)ss.scale[layerID];
 		float scale2 = (float)ss.scale[layerID+1];
@@ -181,9 +179,9 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
 			int x2 = (int)(c.x*scale1/scale2);
 			int y2 = (int)(c.y*scale1/scale2);
 
-			if( checkMax(ss.getLayer(layerID-1), ss0, val, x0, y0) && checkMax(ss.getLayer(layerID+1), ss2, val, x2, y2) ) {
+			if( checkMax(ss.getLayer(layerID-1), val/ss0, x0, y0) && checkMax(ss.getLayer(layerID+1), val/ss2, x2, y2) ) {
 				// put features into the scale of the upper image
-				foundPoints.add( new ScalePoint((int)(c.x*scale1),(int)(c.y*scale1),featureScale));
+				foundPoints.add( new ScalePoint((int)(c.x*scale1),(int)(c.y*scale1),scale1));
 			}
 		}
 	}
@@ -191,14 +189,14 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
 	/**
 	 * See if the best score is better than the local adjusted scores at this scale
 	 */
-	private boolean checkMax(T image, float scoreAdjust, float bestScore, int c_x, int c_y) {
+	private boolean checkMax(T image, float bestScore, int c_x, int c_y) {
 		sparseLaplace.setImage(image);
 		boolean isMax = true;
 		beginLoop:
 		for( int i = c_y -1; i <= c_y+1; i++ ) {
 			for( int j = c_x-1; j <= c_x+1; j++ ) {
 
-				if( scoreAdjust*Math.abs(sparseLaplace.compute(j,i)) >= bestScore ) {
+				if( Math.abs(sparseLaplace.compute(j,i)) >= bestScore ) {
 					isMax = false;
 					break beginLoop;
 				}

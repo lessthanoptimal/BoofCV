@@ -16,11 +16,8 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.abst.detect.intensity.GeneralFeatureIntensity;
-import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;
 import gecv.alg.feature.detect.intensity.HessianBlobIntensity;
-import gecv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
+import gecv.factory.feature.detect.interest.FactoryBlobDetector;
 import gecv.struct.image.ImageFloat32;
 
 /**
@@ -31,10 +28,7 @@ public abstract class GenericFeatureScaleDetector extends GenericFeatureDetector
 	int r = 2;
 
 	private GeneralFeatureDetector<ImageFloat32,ImageFloat32> createBlobDetector( int maxFeatures) {
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(r,1,0,false,false,false);
-		GeneralFeatureIntensity<ImageFloat32, ImageFloat32> intensity =
-				new WrapperLaplacianBlobIntensity<ImageFloat32,ImageFloat32>(HessianBlobIntensity.Type.DETERMINANT,ImageFloat32.class);
-		return new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,maxFeatures);
+		return FactoryBlobDetector.createLaplace(r,1,maxFeatures,ImageFloat32.class,HessianBlobIntensity.Type.DETERMINANT);
 	}
 
 	@Override
@@ -44,6 +38,4 @@ public abstract class GenericFeatureScaleDetector extends GenericFeatureDetector
 	}
 
 	protected abstract Object createDetector( GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector);
-
-
 }

@@ -18,6 +18,7 @@ package gecv.factory.feature.describe;
 
 import gecv.alg.feature.describe.OrientationAverage;
 import gecv.alg.feature.describe.OrientationHistogram;
+import gecv.alg.feature.describe.OrientationSlidingWindow;
 import gecv.alg.feature.describe.impl.*;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -63,6 +64,27 @@ public class FactoryRegionOrientationAlgs {
 			ret = (OrientationAverage<T>)new ImplOrientationAverage_S16(weighted);
 		} else if( derivType == ImageSInt32.class ) {
 			ret = (OrientationAverage<T>)new ImplOrientationAverage_S32(weighted);
+		} else {
+			throw new IllegalArgumentException("Unknown image type.");
+		}
+
+		ret.setRadius(radius);
+
+		return ret;
+	}
+
+	public static <T extends ImageBase>
+	OrientationSlidingWindow<T> sliding( int numAngles, double windowSize , 
+										 int radius , boolean weighted , Class<T> derivType )
+	{
+		OrientationSlidingWindow<T> ret;
+
+		if( derivType == ImageFloat32.class ) {
+			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_F32(numAngles,windowSize,weighted);
+		} else if( derivType == ImageSInt16.class ) {
+			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_S16(numAngles,windowSize,weighted);
+		} else if( derivType == ImageSInt32.class ) {
+			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_S32(numAngles,windowSize,weighted);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
 		}

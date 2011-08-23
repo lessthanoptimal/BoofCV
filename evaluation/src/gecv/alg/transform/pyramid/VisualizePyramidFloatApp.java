@@ -51,6 +51,6 @@ public class VisualizePyramidFloatApp {
 		ImagePyramidPanel<ImageFloat32> gui = new ImagePyramidPanel<ImageFloat32>(pyramid,true);
 		gui.render();
 
-		ShowImages.showWindow(gui,"Image Pyramid");
+		ShowImages.showWindow(gui,"Image Float Pyramid");
 	}
 }

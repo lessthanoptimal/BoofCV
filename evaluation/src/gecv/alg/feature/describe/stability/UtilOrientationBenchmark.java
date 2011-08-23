@@ -48,6 +48,10 @@ public class UtilOrientationBenchmark {
 		ret.add(new StabilityAlgorithm("Hist10 Unweighted", FactoryRegionOrientationAlgs.histogram(10,radius,false,derivType)));
 		ret.add(new StabilityAlgorithm("Hist10 Weighted", FactoryRegionOrientationAlgs.histogram(10,radius,true,derivType)));
 		ret.add(new StabilityAlgorithm("Hist20 Unweighted", FactoryRegionOrientationAlgs.histogram(20,radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Slide PI/6 Un-W", FactoryRegionOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Slide PI/6 W", FactoryRegionOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Slide PI/3 Un-W", FactoryRegionOrientationAlgs.sliding(20,Math.PI/3,radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Slide PI/3 W", FactoryRegionOrientationAlgs.sliding(20,Math.PI/3,radius,true,derivType)));
 
 		return ret;
 	}

@@ -21,10 +21,8 @@ import gecv.alg.misc.ImageTestingOps;
 import gecv.alg.tracker.klt.KltTracker;
 import gecv.alg.tracker.klt.TestKltTracker;
 import gecv.alg.transform.pyramid.PyramidOps;
-import gecv.alg.transform.pyramid.PyramidUpdateIntegerDown;
 import gecv.factory.filter.derivative.FactoryDerivative;
-import gecv.factory.filter.kernel.FactoryKernelGaussian;
-import gecv.struct.convolve.Kernel1D_F32;
+import gecv.factory.transform.pyramid.FactoryPyramid;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.ImagePyramid;
 import gecv.struct.pyramid.PyramidDiscrete;
@@ -62,8 +60,7 @@ public class PyramidKltTestBase {
 	}
 
 	public void setup( int ...scales ) {
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,2);
-		updater = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
+		updater = FactoryPyramid.discreteGaussian(ImageFloat32.class,-1,2);
 
 		pyramid = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
 		derivX = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);

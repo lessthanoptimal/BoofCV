@@ -26,15 +26,19 @@ import gecv.struct.image.ImageBase;
 
 /**
  * <p>
- * Estimates the orientation by creating a histogram of discrete angles around
- * the entire circle.  The angle with the largest sum of edge intensities is considered
- * to be the direction of the region.    If weighted a Gaussian kernel centered around the targeted
- * pixel is used.
+ * Estimates the orientation by sliding window across all angles.  All pixels which are pointing
+ * at an angle inside of this window have their gradient summed.  The window with the largest normal
+ * is selected as the best window.  The angle is then computed from the best window using atan2()
+ * and the summed gradient.
+ * </p>
+ *
+ * <p>
+ * NOTE: There are probably additional performance enhancements that could be done.
  * </p>
  *
  * @author Peter Abeles
  */
-public abstract class OrientationHistogram <D extends ImageBase>
+public abstract class OrientationSlidingWindow<D extends ImageBase>
 		implements RegionOrientation<D>
 {
 	// the region's radius
@@ -52,14 +56,10 @@ public abstract class OrientationHistogram <D extends ImageBase>
 
 	// number of different angles it will consider
 	protected int numAngles;
-	// used to compute the score for each angle
-	protected double sumDerivX[];
-	protected double sumDerivY[];
-
-	// resolution of each angle
-	protected double angleDiv;
-	// used to round towards the nearest angle
-	protected double angleRound;
+	// the size of the window it will consider
+	protected double windowSize;
+	// the angle each pixel is pointing
+	protected double angles[];
 
 	// if it uses weights or not
 	protected boolean isWeighted;
@@ -67,17 +67,15 @@ public abstract class OrientationHistogram <D extends ImageBase>
 	protected Kernel2D_F32 weights;
 
 	/**
-	 * Constructor. Specify region size and if it is weighted or not.
+	 * Configures orientation estimating algorithm.
 	 *
-	 * @param numAngles Number of discrete angles that the orientation is estimated inside of
+	 * @param numAngles Number of discrete points in which the sliding window will be centered around.
+	 * @param windowSize Number of radians in the window being considered.
+	 * @param isWeighted Should points be weighted using a Gaussian kernel.
 	 */
-	public OrientationHistogram( int numAngles , boolean isWeighted ) {
+	public OrientationSlidingWindow( int numAngles , double windowSize , boolean isWeighted ) {
 		this.numAngles = numAngles;
-		sumDerivX = new double[ numAngles ];
-		sumDerivY = new double[ numAngles ];
-
-		angleDiv = 2.0*Math.PI/numAngles;
-		angleRound = Math.PI+angleDiv/2.0;
+		this.windowSize = windowSize;
 		this.isWeighted = isWeighted;
 	}
 
@@ -105,6 +103,8 @@ public abstract class OrientationHistogram <D extends ImageBase>
 		if( isWeighted ) {
 			weights = FactoryKernelGaussian.gaussian(2,true,-1,radiusScale);
 		}
+		int w = radiusScale*2+1;
+		angles = new double[ w*w ];
 	}
 
 	@Override
@@ -127,43 +127,19 @@ public abstract class OrientationHistogram <D extends ImageBase>
 
 		GecvMiscOps.boundRectangleInside(derivX,rect);
 
-		for( int i = 0; i < numAngles; i++ ) {
-			sumDerivX[i] = 0;
-			sumDerivY[i] = 0;
-		}
-
-		if( weights == null )
-			computeUnweightedScore();
+		if( isWeighted )
+			return computeWeightedOrientation(c_x,c_y);
 		else
-			computeWeightedScore(c_x,c_y);
-
-		// find the angle with the best score
-		double bestScore = -1;
-		int bestIndex = -1;
-		double bestX=-1;
-		double bestY=-1;
-		for( int i = 0; i < numAngles; i++ ) {
-			double x = sumDerivX[i];
-			double y = sumDerivY[i];
-			double score = x*x + y*y;
-			if( score > bestScore ) {
-				bestScore = score;
-				bestIndex = i;
-				bestX = x;
-				bestY = y;
-			}
-		}
-
-		return Math.atan2(bestY,bestX);
+			return computeOrientation();
 	}
 
 	/**
-	 * Compute the score without using the optional weights
+	 * Compute the angle without using the optional weights
 	 */
-	protected abstract void computeUnweightedScore();
+	protected abstract double computeOrientation();
 
 	/**
-	 * Compute the score using the weighting kernel.
+	 * Compute the angle using the weighting kernel.
 	 */
-	protected abstract void computeWeightedScore(int c_x , int c_y );
+	protected abstract double computeWeightedOrientation(int c_x , int c_y );
 }

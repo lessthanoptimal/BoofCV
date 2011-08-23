@@ -27,9 +27,8 @@ import gecv.struct.pyramid.PyramidFloat;
  * <p>
  * A pyramidal representation of {@link gecv.struct.gss.GaussianScaleSpace scale-space}.  Each
  * layer in the pyramid is created by applying a Gaussian blur to the previous layer and then sub-sampling.
- * For example, if each layer's scale is set to 1, then it will produce very similar result a
- * {@link gecv.struct.gss.GaussianScaleSpace}.  The amount of blur applied to each level is selected such that
- * it is applying the same effective amount of blurring as {@link gecv.struct.gss.GaussianScaleSpace} at the same level.
+ * The amount of blur applied to each level is selected such that it has the same effective amount of
+ * blurring as {@link gecv.struct.gss.GaussianScaleSpace} at the same level.
  * </p>
  *
  * <p>
@@ -100,12 +99,7 @@ public class ScaleSpacePyramid<T extends ImageBase> extends PyramidFloat<T> {
 		return scale[layer];
 	}
 
-	/**
-	 * Returns the total blur standard deviation in this layer.
-	 * @param layer
-	 * @return The blur magnitude/scale space of this layer in the pyramid.
-	 */
-	public double getScaleSpace( int layer ) {
-		return scale[layer];
+	public PyramidUpdateGaussianScale<T> getUpdater() {
+		return updater;
 	}
 }

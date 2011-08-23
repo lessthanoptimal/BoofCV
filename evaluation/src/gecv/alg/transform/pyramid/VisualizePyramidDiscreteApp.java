@@ -17,11 +17,10 @@
 package gecv.alg.transform.pyramid;
 
 import gecv.core.image.ConvertBufferedImage;
-import gecv.factory.filter.kernel.FactoryKernelGaussian;
+import gecv.factory.transform.pyramid.FactoryPyramid;
 import gecv.gui.image.DiscretePyramidPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.convolve.Kernel1D_F32;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.pyramid.PyramidDiscrete;
 import gecv.struct.pyramid.PyramidUpdaterDiscrete;
@@ -40,8 +39,7 @@ public class VisualizePyramidDiscreteApp {
 
 		BufferedImage input = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
 
-		Kernel1D_F32 gaussian = FactoryKernelGaussian.gaussian1D(ImageFloat32.class,-1,2);
-		PyramidUpdaterDiscrete<ImageFloat32> updater = new PyramidUpdateIntegerDown<ImageFloat32>(gaussian,ImageFloat32.class);
+		PyramidUpdaterDiscrete<ImageFloat32> updater = FactoryPyramid.discreteGaussian(ImageFloat32.class,-1,2);
 		PyramidDiscrete<ImageFloat32> pyramid = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,true,scales);
 
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
@@ -52,6 +50,6 @@ public class VisualizePyramidDiscreteApp {
 		gui.render();
 		gui.repaint();
 
-		ShowImages.showWindow(gui,"Image Pyramid");
+		ShowImages.showWindow(gui,"Image Discrete Pyramid");
 	}
 }

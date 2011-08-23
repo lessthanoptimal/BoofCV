@@ -26,10 +26,11 @@ import gecv.alg.tracker.pklt.PyramidKltFeature;
 import gecv.alg.transform.pyramid.PyramidOps;
 import gecv.alg.transform.pyramid.PyramidUpdateIntegerDown;
 import gecv.factory.filter.derivative.FactoryDerivative;
-import gecv.factory.filter.kernel.FactoryKernelGaussian;
+import gecv.factory.transform.pyramid.FactoryPyramid;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.ImagePyramid;
 import gecv.struct.pyramid.PyramidDiscrete;
+import gecv.struct.pyramid.PyramidUpdaterDiscrete;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 {
 
 	PkltManager<I,D> trackManager;
-	PyramidUpdateIntegerDown<I> inputPyramidUpdater;
+	PyramidUpdaterDiscrete<I>  inputPyramidUpdater;
 	ImageGradient<I,D> gradient;
 
 	PyramidDiscrete<I> basePyramid;
@@ -72,7 +73,7 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 	}
 
 	private void setup(PkltManager<I, D> trackManager,
-					   PyramidUpdateIntegerDown<I> inputPyramidUpdater,
+					   PyramidUpdaterDiscrete<I> inputPyramidUpdater,
 					   ImageGradient<I,D> gradient ) {
 		this.trackManager = trackManager;
 		this.gradient = gradient;
@@ -100,9 +101,9 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(typeInput,typeDeriv);
 
-		setup(trackManager,
-				new PyramidUpdateIntegerDown<I>(FactoryKernelGaussian.gaussian1D(typeInput,-1,2),typeInput),
-				gradient);
+		PyramidUpdaterDiscrete<I> pyrUpdater = FactoryPyramid.discreteGaussian(typeInput,-1,2);
+
+		setup(trackManager,pyrUpdater, gradient);
 	}
 
 	@Override

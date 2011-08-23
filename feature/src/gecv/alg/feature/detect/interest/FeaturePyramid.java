@@ -175,9 +175,6 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 		ImageFloat32 inten1 = intensities[index1];
 		ImageBorder_F32 inten2 = FactoryImageBorder.value(intensities[index2],0);
 
-		// In a ScaleSpacePyramid the resolution has been internally divided by two
-		float featureScale = (float)ss.getScaleSpace(layerID);
-
 		float scale0 = (float)ss.scale[layerID-1];
 		float scale1 = (float)ss.scale[layerID];
 		float scale2 = (float)ss.scale[layerID+1];
@@ -196,9 +193,9 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 			int x2 = (int)(c.x*scale1/scale2);
 			int y2 = (int)(c.y*scale1/scale2);
 
-			if( checkMax(inten0, ss0, val, x0, y0) && checkMax(inten2, ss2, val, x2, y2) ) {
+			if( checkMax(inten0, val/ss0, x0, y0) && checkMax(inten2, val/ss2, x2, y2) ) {
 				// put features into the scale of the upper image
-				foundPoints.add( new ScalePoint((int)(c.x*scale1),(int)(c.y*scale1),featureScale));
+				foundPoints.add( new ScalePoint((int)(c.x*scale1),(int)(c.y*scale1),scale1));
 			}
 		}
 	}
