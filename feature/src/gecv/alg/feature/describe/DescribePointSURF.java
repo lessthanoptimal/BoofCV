@@ -28,6 +28,7 @@ import gecv.struct.image.ImageBase;
 /**
  * @author Peter Abeles
  */
+// todo option for unoriented
 public class DescribePointSURF<T extends ImageBase> {
 
 	T ii;
@@ -36,8 +37,13 @@ public class DescribePointSURF<T extends ImageBase> {
 
 	Kernel2D_F64 weight = FactoryKernelGaussian.gaussian(2,true,64,-1,10);
 
+	public DescribePointSURF(OrientationIntegral<T> orientation) {
+		this.orientation = orientation;
+	}
+
 	public void setImage( T integralImage ) {
 		ii = integralImage;
+		orientation.setImage(ii);
 	}
 
 	public SurfFeature describe( int x , int y , double scale ) {

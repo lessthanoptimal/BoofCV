@@ -35,7 +35,7 @@ public class DisplaySteerableGaussianApp <T extends ImageBase, K extends Kernel2
 
 	@Override
 	protected SteerableKernel<K> createKernel(int orderX, int orderY) {
-		return FactorySteerable.gaussian(kernelType,orderX,orderY,radius);
+		return FactorySteerable.gaussian(kernelType,orderX,orderY, -1, radius);
 	}
 
 	public static void main( String args[] ) {

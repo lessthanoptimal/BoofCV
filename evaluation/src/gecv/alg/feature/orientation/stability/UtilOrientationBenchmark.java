@@ -18,8 +18,8 @@ package gecv.alg.feature.orientation.stability;
 
 import gecv.abst.detect.interest.InterestPointDetector;
 import gecv.alg.feature.StabilityAlgorithm;
-import gecv.factory.feature.describe.FactoryRegionOrientationAlgs;
 import gecv.factory.feature.detect.interest.FactoryInterestPoint;
+import gecv.factory.feature.orientation.FactoryOrientationAlgs;
 import gecv.struct.image.ImageBase;
 
 import java.util.ArrayList;
@@ -41,17 +41,17 @@ public class UtilOrientationBenchmark {
 	{
 		List<StabilityAlgorithm> ret = new ArrayList<StabilityAlgorithm>();
 
-		ret.add(new StabilityAlgorithm("Ave Unweighted", FactoryRegionOrientationAlgs.average(radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Ave Weighted", FactoryRegionOrientationAlgs.average(radius,true,derivType)));
-		ret.add(new StabilityAlgorithm("Hist5 Unweighted", FactoryRegionOrientationAlgs.histogram(5,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Hist5 Weighted", FactoryRegionOrientationAlgs.histogram(5,radius,true,derivType)));
-		ret.add(new StabilityAlgorithm("Hist10 Unweighted", FactoryRegionOrientationAlgs.histogram(10,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Hist10 Weighted", FactoryRegionOrientationAlgs.histogram(10,radius,true,derivType)));
-		ret.add(new StabilityAlgorithm("Hist20 Unweighted", FactoryRegionOrientationAlgs.histogram(20,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Slide PI/6 Un-W", FactoryRegionOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Slide PI/6 W", FactoryRegionOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Slide PI/3 Un-W", FactoryRegionOrientationAlgs.sliding(20,Math.PI/3,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Slide PI/3 W", FactoryRegionOrientationAlgs.sliding(20,Math.PI/3,radius,true,derivType)));
+		ret.add(new StabilityAlgorithm("Ave Unweighted", FactoryOrientationAlgs.average(radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Ave Weighted", FactoryOrientationAlgs.average(radius,true,derivType)));
+		ret.add(new StabilityAlgorithm("Hist5 Unweighted", FactoryOrientationAlgs.histogram(5,radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Hist5 Weighted", FactoryOrientationAlgs.histogram(5,radius,true,derivType)));
+		ret.add(new StabilityAlgorithm("Hist10 Unweighted", FactoryOrientationAlgs.histogram(10,radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Hist10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType)));
+		ret.add(new StabilityAlgorithm("Hist20 Unweighted", FactoryOrientationAlgs.histogram(20,radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Slide PI/6 Un-W", FactoryOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Slide PI/6 W", FactoryOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Slide PI/3 Un-W", FactoryOrientationAlgs.sliding(20,Math.PI/3,radius,false,derivType)));
+		ret.add(new StabilityAlgorithm("Slide PI/3 W", FactoryOrientationAlgs.sliding(20,Math.PI/3,radius,true,derivType)));
 
 		return ret;
 	}

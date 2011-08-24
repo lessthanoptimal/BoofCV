@@ -22,8 +22,8 @@ import gecv.alg.transform.gss.UtilScaleSpace;
 import gecv.alg.transform.ii.GIntegralImageOps;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.inst.FactoryImageGenerator;
-import gecv.factory.feature.describe.FactoryRegionOrientationAlgs;
 import gecv.factory.feature.detect.interest.FactoryCornerDetector;
+import gecv.factory.feature.orientation.FactoryOrientationAlgs;
 import gecv.gui.SelectAlgorithmPanel;
 import gecv.gui.feature.FancyInterestPointRender;
 import gecv.gui.image.ImagePanel;
@@ -67,14 +67,14 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		addAlgorithm("Average",FactoryRegionOrientationAlgs.average(radius,false,derivType));
-		addAlgorithm("Average Weighted",FactoryRegionOrientationAlgs.average(radius,true,derivType));
-		addAlgorithm("Histogram 10",FactoryRegionOrientationAlgs.histogram(10,radius,false,derivType));
-		addAlgorithm("Histogram 10 Weighted",FactoryRegionOrientationAlgs.histogram(10,radius,true,derivType));
-		addAlgorithm("Sliding Window",FactoryRegionOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
-		addAlgorithm("Sliding Window Weighted",FactoryRegionOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
-		addAlgorithm("Average Haar II",FactoryRegionOrientationAlgs.average_ii(radius,false));
-		addAlgorithm("Average Haar II Weighted",FactoryRegionOrientationAlgs.average_ii(radius,true));
+		addAlgorithm("Average", FactoryOrientationAlgs.average(radius,false,derivType));
+		addAlgorithm("Average Weighted", FactoryOrientationAlgs.average(radius,true,derivType));
+		addAlgorithm("Histogram 10", FactoryOrientationAlgs.histogram(10,radius,false,derivType));
+		addAlgorithm("Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType));
+		addAlgorithm("Sliding Window", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
+		addAlgorithm("Sliding Window Weighted", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
+		addAlgorithm("Average Haar II", FactoryOrientationAlgs.average_ii(radius,false));
+		addAlgorithm("Average Haar II Weighted", FactoryOrientationAlgs.average_ii(radius,true));
 
 		panel = new ImagePanel(input);
 		add(panel, BorderLayout.CENTER);

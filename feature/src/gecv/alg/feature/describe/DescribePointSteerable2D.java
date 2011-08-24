@@ -24,7 +24,7 @@ import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder;
 import gecv.factory.filter.convolve.FactoryConvolveSparse;
 import gecv.struct.convolve.Kernel2D;
-import gecv.struct.feature.TupleFeature;
+import gecv.struct.feature.TupleFeature_F64;
 import gecv.struct.image.ImageBase;
 
 
@@ -40,12 +40,17 @@ public class DescribePointSteerable2D <T extends ImageBase, D extends ImageBase,
 
 	ImageConvolveSparse<T,K> convolver;
 	OrientationGradient<D> orientation;
+	// should the feature vector be normalized to one?
+	// this provides some intensity invariance
+	boolean normalize;
 
 	public DescribePointSteerable2D( OrientationGradient<D> orientation ,
 									 SteerableKernel<K> kernels[] ,
+									 boolean normalize ,
 									 Class<T> imageType ) {
 		this.orientation = orientation;
 		this.kernels = kernels;
+		this.normalize = normalize;
 
 		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 		convolver = FactoryConvolveSparse.create(imageType);
@@ -57,8 +62,8 @@ public class DescribePointSteerable2D <T extends ImageBase, D extends ImageBase,
 		orientation.setImage(derivX,derivY);
 	}
 
-	public TupleFeature describe( int x , int y ) {
-		TupleFeature ret = new TupleFeature(kernels.length);
+	public TupleFeature_F64 describe( int x , int y ) {
+		TupleFeature_F64 ret = new TupleFeature_F64(kernels.length);
 
 		// determine feature's orientation
 		double angle = orientation.compute(x,y);
@@ -72,6 +77,9 @@ public class DescribePointSteerable2D <T extends ImageBase, D extends ImageBase,
 			ret.value[i] = convolver.compute(x,y);
 		}
 
+		if( normalize )
+			SurfDescribeOps.normalizeFeatures(ret.value);
+		
 		return ret;
 	}
 
