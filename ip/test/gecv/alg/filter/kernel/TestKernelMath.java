@@ -18,10 +18,7 @@ package gecv.alg.filter.kernel;
 
 import gecv.alg.misc.ImageTestingOps;
 import gecv.factory.filter.kernel.FactoryKernel;
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.convolve.*;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt32;
 import org.junit.Test;
@@ -101,6 +98,20 @@ public class TestKernelMath {
 	}
 
 	@Test
+	public void convolve_1D_F64() {
+		Kernel1D_F64 k1 = FactoryKernel.random1D_F64(2,-1,1,rand);
+		Kernel1D_F64 k2 = FactoryKernel.random1D_F64(2,-1,1,rand);
+
+		Kernel2D_F64 c = KernelMath.convolve(k1,k2);
+
+		for( int i = 0; i < 5; i++ ) {
+			for( int j = 0; j < 5; j++ ) {
+				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-4);
+			}
+		}
+	}
+
+	@Test
 	public void convolve_1D_I32() {
 		Kernel1D_I32 k1 = FactoryKernel.random1D_I32(2,-1,1,rand);
 		Kernel1D_I32 k2 = FactoryKernel.random1D_I32(2,-1,1,rand);
@@ -115,7 +126,7 @@ public class TestKernelMath {
 	}
 
 	@Test
-	public void normalizeSumToOne_1D() {
+	public void normalizeSumToOne_F32_1D() {
 		Kernel1D_F32 kernel = new Kernel1D_F32(3);
 		for (int i = 0; i < 3; i++)
 			kernel.data[i] = 2.0F;
@@ -127,7 +138,19 @@ public class TestKernelMath {
 	}
 
 	@Test
-	public void normalizeSumToOne_2D() {
+	public void normalizeSumToOne_F64_1D() {
+		Kernel1D_F64 kernel = new Kernel1D_F64(3);
+		for (int i = 0; i < 3; i++)
+			kernel.data[i] = 2.0;
+
+		KernelMath.normalizeSumToOne(kernel);
+
+		for (int i = 0; i < 3; i++)
+			assertEquals(kernel.data[i], 2.0 / 6.0, 1e-8);
+	}
+
+	@Test
+	public void normalizeSumToOne_F32_2D() {
 		Kernel2D_F32 kernel = new Kernel2D_F32(3);
 		for (int i = 0; i < 9; i++)
 			kernel.data[i] = 2.0F;
@@ -138,6 +161,20 @@ public class TestKernelMath {
 
 		for (int i = 0; i < 3; i++)
 			assertEquals(2.0F / total,kernel.data[i], 1e-4);
+	}
+
+	@Test
+	public void normalizeSumToOne_F64_2D() {
+		Kernel2D_F64 kernel = new Kernel2D_F64(3);
+		for (int i = 0; i < 9; i++)
+			kernel.data[i] = 2.0F;
+
+		KernelMath.normalizeSumToOne(kernel);
+
+		double total = 2*9;
+
+		for (int i = 0; i < 3; i++)
+			assertEquals(2.0 / total,kernel.data[i], 1e-8);
 	}
 
 	@Test

@@ -17,7 +17,7 @@
 package gecv.factory.feature.describe;
 
 import gecv.alg.feature.describe.DescribePointSteerable2D;
-import gecv.alg.feature.describe.RegionOrientation;
+import gecv.alg.feature.orientation.OrientationGradient;
 import gecv.alg.filter.kernel.SteerableKernel;
 import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.factory.filter.kernel.FactorySteerable;
@@ -50,7 +50,7 @@ public class FactoryDescribeRegionAlgs {
 				kernels[index++] = FactorySteerable.gaussian(kernelType,orderX,i,radius);
 			}
 		}
-		RegionOrientation<D> orientation = FactoryRegionOrientationAlgs.histogram(numAngles,radius,weighted,derivType);
+		OrientationGradient<D> orientation = FactoryRegionOrientationAlgs.histogram(numAngles,radius,weighted,derivType);
 
 		return new DescribePointSteerable2D<T,D,K>(orientation,kernels,imageType);
 	}

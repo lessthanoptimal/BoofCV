@@ -122,18 +122,23 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static void main(String args[]) {
+		String pre = "evaluation/data/";
 
-		FileImageSequence sequence = new FileImageSequence("data/indoors01.jpg", "data/outdoors01.jpg", "data/particles01.jpg");
+		FileImageSequence<ImageUInt8> sequence_U8 = new FileImageSequence<ImageUInt8>(ImageUInt8.class,"indoors01.jpg", "outdoors01.jpg", "particles01.jpg");
+		FileImageSequence<ImageFloat32> sequence_F32 = new FileImageSequence<ImageFloat32>(ImageFloat32.class,"indoors01.jpg", "outdoors01.jpg", "particles01.jpg");
 
-		while (sequence.next()) {
-			image_I8 = sequence.getImage_I8();
-			image_F32 = sequence.getImage_F32();
+		sequence_U8.setPrefix(pre);
+		sequence_F32.setPrefix(pre);
+
+		while (sequence_U8.next() && sequence_F32.next()) {
+			image_I8 = sequence_U8.getImage();
+			image_F32 = sequence_F32.getImage();
 
 			imgWidth = image_I8.getWidth();
 			imgHeight = image_I8.getHeight();
 
 			System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-			System.out.println("           " + sequence.getName());
+			System.out.println("           " + sequence_U8.getName());
 			System.out.println();
 
 

@@ -16,10 +16,7 @@
 
 package gecv.factory.filter.kernel;
 
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.convolve.*;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
 import gecv.struct.image.ImageSInt32;
@@ -89,6 +86,19 @@ public class TestFactoryKernel {
 	@Test
 	public void random1D_F32() {
 		Kernel1D_F32 kernel = FactoryKernel.random1D_F32(2, -2, 2, rand);
+		int nonZero = 0;
+		for (int i = 0; i < kernel.width; i++) {
+			assertTrue(kernel.get(i) <= 2);
+			assertTrue(kernel.get(i) >= -2);
+			if (kernel.get(i) != 0)
+				nonZero++;
+		}
+		assertTrue(nonZero != 0);
+	}
+
+	@Test
+	public void random1D_F64() {
+		Kernel1D_F64 kernel = FactoryKernel.random1D_F64(2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
 			assertTrue(kernel.get(i) <= 2);

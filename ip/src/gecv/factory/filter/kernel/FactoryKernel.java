@@ -153,6 +153,17 @@ public class FactoryKernel {
 		return ret;
 	}
 
+	public static Kernel1D_F64 random1D_F64(int radius, double min, double max, Random rand) {
+		Kernel1D_F64 ret = new Kernel1D_F64(radius * 2 + 1);
+
+		double range = max - min;
+		for (int i = 0; i < ret.data.length; i++) {
+			ret.data[i] = rand.nextDouble() * range + min;
+		}
+
+		return ret;
+	}
+
 	/**
 	 * Creates a random 2D kernel drawn from a uniform distribution.
 	 *

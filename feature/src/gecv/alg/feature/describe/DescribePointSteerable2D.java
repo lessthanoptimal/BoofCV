@@ -17,6 +17,7 @@
 package gecv.alg.feature.describe;
 
 import gecv.abst.filter.convolve.ImageConvolveSparse;
+import gecv.alg.feature.orientation.OrientationGradient;
 import gecv.alg.filter.kernel.SteerableKernel;
 import gecv.core.image.border.BorderType;
 import gecv.core.image.border.FactoryImageBorder;
@@ -38,9 +39,9 @@ public class DescribePointSteerable2D <T extends ImageBase, D extends ImageBase,
 	SteerableKernel<K> kernels[];
 
 	ImageConvolveSparse<T,K> convolver;
-	RegionOrientation<D> orientation;
+	OrientationGradient<D> orientation;
 
-	public DescribePointSteerable2D( RegionOrientation<D> orientation ,
+	public DescribePointSteerable2D( OrientationGradient<D> orientation ,
 									 SteerableKernel<K> kernels[] ,
 									 Class<T> imageType ) {
 		this.orientation = orientation;

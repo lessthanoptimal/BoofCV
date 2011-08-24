@@ -14,18 +14,28 @@
  *    limitations under the License.
  */
 
-package gecv.evaluation;
+package gecv.alg.feature.orientation;
 
 import gecv.struct.image.ImageBase;
 
+
 /**
+ * Estimate the orientation of an image from an {@link gecv.alg.transform.ii.IntegralImageOps integral image}.
+ *
  * @author Peter Abeles
  */
-public interface EvaluationImageSequence<T extends ImageBase>  {
+public interface OrientationIntegral<T extends ImageBase> extends RegionOrientation {
+	/**
+	 * Specifies input image data for estimating orientation.
+	 *
+	 * @param integralImage Input image transformed into an integral image.
+	 */
+	public void setImage( T integralImage );
 
-	public boolean next();
-
-	public T getImage();
-
-	public String getName();
+	/**
+	 * Returns the type of image it can process.
+	 *
+	 * @return Type of image which can be processed
+	 */
+	public Class<T> getImageType();
 }

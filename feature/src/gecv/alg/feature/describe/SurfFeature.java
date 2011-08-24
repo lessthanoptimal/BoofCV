@@ -14,18 +14,21 @@
  *    limitations under the License.
  */
 
-package gecv.evaluation;
+package gecv.alg.feature.describe;
 
-import gecv.struct.image.ImageBase;
+import gecv.struct.feature.TupleFeature;
+
 
 /**
  * @author Peter Abeles
  */
-public interface EvaluationImageSequence<T extends ImageBase>  {
+public class SurfFeature {
+	public boolean laplacianPositive;
+	public TupleFeature features;
 
-	public boolean next();
+	public SurfFeature( int numFeatures ) {
+		features = new TupleFeature(numFeatures);
+	}
 
-	public T getImage();
 
-	public String getName();
 }

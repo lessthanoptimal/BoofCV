@@ -25,6 +25,42 @@ import gecv.struct.image.ImageFloat32;
  */
 public class DerivativeIntegralImage {
 
+	/**
+	 * Creates a kernel for the Haar wavelet.
+	 *
+	 * @param size Length of a side on the wavelet
+	 * @return Kernel for a Haar x-axis wavelet.
+	 */
+	public static IntegralKernel kernelHaarX( int size ) {
+		int r = size/2;
+
+		IntegralKernel ret = new IntegralKernel(2);
+		ret.blocks[0] = new ImageRectangle(-r,-r,0,r);
+		ret.blocks[1] = new ImageRectangle(0,-r,r,r);
+		ret.scales[0] = -1;
+		ret.scales[1] = 1;
+
+		return ret;
+	}
+
+	/**
+	 * Creates a kernel for the Haar wavelet.
+	 *
+	 * @param size Length of a side on the wavelet
+	 * @return Kernel for a Haar y-axis wavelet.
+	 */
+	public static IntegralKernel kernelHaarY( int size ) {
+		int r = size/2;
+
+		IntegralKernel ret = new IntegralKernel(2);
+		ret.blocks[0] = new ImageRectangle(-r,-r,r,0);
+		ret.blocks[1] = new ImageRectangle(-r,0,r,r);
+		ret.scales[0] = -1;
+		ret.scales[1] = 1;
+
+		return ret;
+	}
+
 	public static IntegralKernel kernelDerivXX( int size ) {
 		// lobe size
 		int blockW = size/3;
