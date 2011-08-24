@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package gecv.factory.feature.describe;
+package gecv.factory.feature.orientation;
 
 import gecv.alg.feature.orientation.*;
 import gecv.alg.feature.orientation.impl.*;
@@ -28,7 +28,7 @@ import gecv.struct.image.ImageSInt32;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FactoryRegionOrientationAlgs {
+public class FactoryOrientationAlgs {
 
 	public static <T extends ImageBase>
 	OrientationHistogram<T> histogram( int numAngles , int radius , boolean weighted ,

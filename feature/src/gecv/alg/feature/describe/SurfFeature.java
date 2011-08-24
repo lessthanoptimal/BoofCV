@@ -16,18 +16,20 @@
 
 package gecv.alg.feature.describe;
 
-import gecv.struct.feature.TupleFeature;
+import gecv.struct.feature.TupleFeature_F64;
 
 
 /**
  * @author Peter Abeles
  */
 public class SurfFeature {
+	// is the feature light or dark. Can be used to improve lookup performance.
 	public boolean laplacianPositive;
-	public TupleFeature features;
+	// feature description
+	public TupleFeature_F64 features;
 
 	public SurfFeature( int numFeatures ) {
-		features = new TupleFeature(numFeatures);
+		features = new TupleFeature_F64(numFeatures);
 	}
 
 

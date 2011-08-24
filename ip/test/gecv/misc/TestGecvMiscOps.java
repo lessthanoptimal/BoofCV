@@ -35,6 +35,7 @@ public class TestGecvMiscOps {
 		checkBound(-2,-3,5,6,0,0,5,6,image);
 		checkBound(16,15,22,26,16,15,20,25,image);
 		checkBound(0,0,20,25,0,0,20,25,image);
+		checkBound(-2,-3,22,26,0,0,20,25,image);
 	}
 
 	private void checkBound( int x0, int y0, int x1 , int y1,

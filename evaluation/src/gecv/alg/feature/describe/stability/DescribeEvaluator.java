@@ -16,9 +16,95 @@
 
 package gecv.alg.feature.describe.stability;
 
+import gecv.abst.detect.describe.ExtractFeatureDescription;
+import gecv.abst.detect.interest.InterestPointDetector;
+import gecv.alg.feature.StabilityAlgorithm;
+import gecv.alg.feature.StabilityEvaluatorPoint;
+import gecv.struct.feature.TupleFeature_F64;
+import gecv.struct.image.ImageBase;
+import jgrl.struct.affine.Affine2D_F32;
+import jgrl.struct.point.Point2D_I32;
+import jgrl.struct.point.Vector2D_F32;
+import jgrl.transform.affine.AffinePointOps;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
+ * Computes error metrics for feature descriptions.  These errors can not be used to compare the
+ * quality of one description against another but should be viewed as a way to see if a
+ * descriptor is invariant against different types of distortion and its noise sensitivity.
+ *
  * @author Peter Abeles
  */
-public class DescribeEvaluator {
+public class DescribeEvaluator <T extends ImageBase>
+	extends StabilityEvaluatorPoint<T>
+{
+	List<TupleFeature_F64> initial = new ArrayList<TupleFeature_F64>();
+
+	public DescribeEvaluator(int borderSize, InterestPointDetector<T> detector) {
+		super(borderSize, detector);
+	}
+
+	@Override
+	public void extractInitial(StabilityAlgorithm alg, T image, List<Point2D_I32> points)
+	{
+		initial.clear();
+
+		ExtractFeatureDescription<T> extract = alg.getAlgorithm();
+		extract.setImage(image);
+
+		for( Point2D_I32 p : points ) {
+			TupleFeature_F64 f = extract.process(p.x,p.y,1.0);
+			if( f == null )
+				initial.add(f);
+			else
+				initial.add(f.copy());
+		}
+	}
+
+	@Override
+	public double[] evaluateImage(StabilityAlgorithm alg, T image,
+							   Affine2D_F32 initToImage,
+							   List<Point2D_I32> points, List<Integer> indexes)
+	{
+		ExtractFeatureDescription<T> extract = alg.getAlgorithm();
+		extract.setImage(image);
+
+		double scale = 1;
+		if( initToImage != null ) {
+			Vector2D_F32 v1 = new Vector2D_F32(1,1);
+			Vector2D_F32 v2 = new Vector2D_F32();
+
+			AffinePointOps.transform(initToImage,v1,v2);
+			scale = v2.norm()/v1.norm();
+		}
+
+		double totalError = 0;
+
+		for( int i = 0; i < points.size(); i++ ) {
+			Point2D_I32 p = points.get(i);
+			int index = indexes != null ? indexes.get(i) : i;
+
+			TupleFeature_F64 f = extract.process(p.x,p.y,scale);
+			TupleFeature_F64 e = initial.get(index);
+			if( f != null && e != null ) {
+				double error = 0;
+				for( int j = 0; j < f.value.length; j++ ) {
+					error += Math.abs(f.value[j] - e.value[j]);
+				}
+				totalError += error/f.value.length;
+			}
+		}
+		totalError /= points.size();
+
+
+		return new double[]{totalError*30};
+	}
+
+	@Override
+	public String[] getMetricNames() {
+		return new String[]{"Error * 30"};
+	}
 }

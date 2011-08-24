@@ -54,9 +54,7 @@ public class GecvMiscOps {
 	}
 
 	/**
-	 * Bounds the provided rectangle to be inside the image.  It is assumed that
-	 * at least part of the rectangle is inside of the image so all possibilities
-	 * do not need to be checked.
+	 * Bounds the provided rectangle to be inside the image.  
 	 *
 	 * @param b An image.
 	 * @param r Rectangle
@@ -65,12 +63,12 @@ public class GecvMiscOps {
 	{
 		if( r.x0 < 0 )
 			r.x0 = 0;
-		else if( r.x1 > b.width )
+		if( r.x1 > b.width )
 			r.x1 = b.width;
 
 		if( r.y0 < 0 )
 			r.y0 = 0;
-		else if( r.y1 > b.height )
+		if( r.y1 > b.height )
 			r.y1 = b.height;
 	}
 }

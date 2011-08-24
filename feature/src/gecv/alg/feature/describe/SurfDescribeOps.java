@@ -81,6 +81,7 @@ public class SurfDescribeOps {
 		NaiveSurfDescribeOps.features(ii,c_x,c_y,theta,weight,regionSize,numSubRegions,scale,features);
 	}
 
+	// todo move to a generalized class?
 	public static void normalizeFeatures( double []features ) {
 		double norm = 0;
 		for( int i = 0; i < features.length; i++ ) {

@@ -4,6 +4,9 @@
 
 - Rename all low level implementation classes to have Impl* in their name
 
+- Features
+ * Abstract out KLT feature descriptions
+
 - Wavelet
  * Generate coefficients for arbitrary daub and coiflet wavelets
  * Add Symmlet wavelet

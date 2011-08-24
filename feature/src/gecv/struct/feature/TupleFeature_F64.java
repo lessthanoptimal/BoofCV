@@ -20,10 +20,16 @@ package gecv.struct.feature;
 /**
  * @author Peter Abeles
  */
-public class TupleFeature {
+public class TupleFeature_F64 {
 	public double value[];
 
-	public TupleFeature( int numFeatures ) {
+	public TupleFeature_F64( int numFeatures ) {
 		this.value = new double[ numFeatures ];
+	}
+
+	public TupleFeature_F64 copy() {
+		TupleFeature_F64 ret = new TupleFeature_F64( value.length );
+		System.arraycopy(value,0,ret.value,0,value.length);
+		return ret;
 	}
 }

@@ -53,7 +53,7 @@ public class OrientationAverageHaarIntegral<T extends ImageBase>
 
 	/**
 	 *
-	 * @param radius Radius of the region being considered in terms of Wavelet samples.
+	 * @param radius Radius of the region being considered in terms of Wavelet samples. Typically 6.
 	 * @param weighted If edge intensities are weighted using a Gaussian kernel.
 	 */
 	public OrientationAverageHaarIntegral(int radius , boolean weighted ) {

@@ -19,6 +19,8 @@ package gecv.alg.tracker.klt;
 import gecv.struct.image.ImageFloat32;
 
 /**
+ * Contains feature information for {@link KltTracker}.
+ *
  * @author Peter Abeles
  */
 public class KltFeature {
