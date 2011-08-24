@@ -42,13 +42,13 @@ public class FactoryKernelGaussian {
 	public static <T extends KernelBase> T gaussian(Class<T> kernelType, double sigma, int radius )
 	{
 		if (Kernel1D_F32.class == kernelType) {
-			return gaussian(1,true,sigma,radius);
+			return gaussian(1,true, 32, sigma,radius);
 		} else if (Kernel1D_I32.class == kernelType) {
-			return gaussian(1,false,sigma,radius);
+			return gaussian(1,false, 32, sigma,radius);
 		} else if (Kernel2D_I32.class == kernelType) {
-			return gaussian(2,false,sigma,radius);
+			return gaussian(2,false, 32, sigma,radius);
 		} else if (Kernel2D_F32.class == kernelType) {
-			return gaussian(2,true,sigma,radius);
+			return gaussian(2,true, 32, sigma,radius);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}
@@ -66,7 +66,7 @@ public class FactoryKernelGaussian {
 	K gaussian1D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
-		return gaussian(1,isFloat,sigma,radius);
+		return gaussian(1,isFloat, 32, sigma,radius);
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class FactoryKernelGaussian {
 	K gaussian2D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
-		return gaussian(2,isFloat,sigma,radius);
+		return gaussian(2,isFloat, 32, sigma,radius);
 	}
 
 	/**
@@ -89,11 +89,11 @@ public class FactoryKernelGaussian {
 	 *
 	 * @param DOF 1 for 1D kernel and 2 for 2D kernel.
 	 * @param isFloat True for F32 kernel and false for I32.
+	 * @param numBits Number of bits in each data element. 32 or 64
 	 * @param sigma The distributions stdev.  If <= 0 then the sigma will be computed from the radius.
-	 * @param radius Number of pixels in the kernel's radius.  If <= 0 then the sigma will be computed from the sigma.
-	 * @return The computed Gaussian kernel.
+	 * @param radius Number of pixels in the kernel's radius.  If <= 0 then the sigma will be computed from the sigma.   @return The computed Gaussian kernel.
 	 */
-	public static <T extends KernelBase> T gaussian( int DOF, boolean isFloat, double sigma, int radius )
+	public static <T extends KernelBase> T gaussian(int DOF, boolean isFloat, int numBits, double sigma, int radius)
 	{
 		if( radius <= 0 )
 			radius = FactoryKernelGaussian.radiusForSigma(sigma,0);
@@ -101,15 +101,29 @@ public class FactoryKernelGaussian {
 			sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
 
 		if( DOF == 2 ) {
-			Kernel2D_F32 k = gaussian2D_F32(sigma,radius, isFloat);
-			if( isFloat )
-				return (T)k;
-			return (T) KernelMath.convert(k,MIN_FRAC);
+			if( numBits == 32 ) {
+				Kernel2D_F32 k = gaussian2D_F32(sigma,radius, isFloat);
+				if( isFloat )
+					return (T)k;
+				return (T) KernelMath.convert(k,MIN_FRAC);
+			} else if( numBits == 64 ) {
+				Kernel2D_F64 k = gaussian2D_F64(sigma,radius, isFloat);
+				if( isFloat )
+					return (T)k;
+				else
+					throw new IllegalArgumentException("64bit int kernels supported");
+			} else {
+				throw new IllegalArgumentException("Bits must be 32 or 64");
+			}
 		} else if( DOF == 1 ) {
-			Kernel1D_F32 k = gaussian1D_F32(sigma,radius, isFloat);
-			if( isFloat )
-				return (T)k;
-			return (T)KernelMath.convert(k,MIN_FRAC);
+			if( numBits == 32 ) {
+				Kernel1D_F32 k = gaussian1D_F32(sigma,radius, isFloat);
+				if( isFloat )
+					return (T)k;
+				return (T)KernelMath.convert(k,MIN_FRAC);
+			} else {
+				throw new IllegalArgumentException("Bits must be 32 ");
+			}
 		} else {
 			throw new IllegalArgumentException("DOF not supported");
 		}
@@ -146,7 +160,7 @@ public class FactoryKernelGaussian {
 	{
 		// zero order is a regular gaussian
 		if( order == 0 ) {
-			return gaussian(1,isFloat,sigma,radius);
+			return gaussian(1,isFloat, 32, sigma,radius);
 		}
 
 		if( radius <= 0 )
@@ -187,6 +201,21 @@ public class FactoryKernelGaussian {
 		return ret;
 	}
 
+	protected static Kernel1D_F64 gaussian1D_F64(double sigma, int radius, boolean normalize) {
+		Kernel1D_F64 ret = new Kernel1D_F64(radius * 2 + 1);
+		double[] gaussian = ret.data;
+		int index = 0;
+		for (int i = -radius; i <= radius; i++) {
+			gaussian[index++] = UtilGaussian.computePDF(0, sigma, i);
+		}
+
+		if (normalize) {
+			KernelMath.normalizeSumToOne(ret);
+		}
+
+		return ret;
+	}
+
 	/**
 	 * Creates a kernel for a 2D convolution.  This should only be used for validation purposes.
 	 *
@@ -197,6 +226,17 @@ public class FactoryKernelGaussian {
 	protected static Kernel2D_F32 gaussian2D_F32(double sigma, int radius, boolean normalize) {
 		Kernel1D_F32 kernel1D = gaussian1D_F32(sigma,radius,false);
 		Kernel2D_F32 ret = KernelMath.convolve(kernel1D,kernel1D);
+
+		if (normalize) {
+			KernelMath.normalizeSumToOne(ret);
+		}
+
+		return ret;
+	}
+
+	protected static Kernel2D_F64 gaussian2D_F64(double sigma, int radius, boolean normalize) {
+		Kernel1D_F64 kernel1D = gaussian1D_F64(sigma,radius,false);
+		Kernel2D_F64 ret = KernelMath.convolve(kernel1D,kernel1D);
 
 		if (normalize) {
 			KernelMath.normalizeSumToOne(ret);

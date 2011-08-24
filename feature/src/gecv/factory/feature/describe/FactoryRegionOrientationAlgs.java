@@ -16,10 +16,8 @@
 
 package gecv.factory.feature.describe;
 
-import gecv.alg.feature.describe.OrientationAverage;
-import gecv.alg.feature.describe.OrientationHistogram;
-import gecv.alg.feature.describe.OrientationSlidingWindow;
-import gecv.alg.feature.describe.impl.*;
+import gecv.alg.feature.orientation.*;
+import gecv.alg.feature.orientation.impl.*;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt16;
@@ -92,5 +90,11 @@ public class FactoryRegionOrientationAlgs {
 		ret.setRadius(radius);
 
 		return ret;
+	}
+
+	public static <T extends ImageBase>
+	OrientationIntegral<T> average_ii( int radius , boolean weighted )
+	{
+		return new OrientationAverageHaarIntegral<T>(radius,weighted);
 	}
 }

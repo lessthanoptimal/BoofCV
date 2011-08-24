@@ -14,18 +14,30 @@
  *    limitations under the License.
  */
 
-package gecv.evaluation;
+package gecv.alg.feature.orientation;
 
 import gecv.struct.image.ImageBase;
 
+
 /**
+ * Estimates the orientation of a region from the image gradient.
+ *
  * @author Peter Abeles
  */
-public interface EvaluationImageSequence<T extends ImageBase>  {
+public interface OrientationGradient<D extends ImageBase> extends RegionOrientation {
 
-	public boolean next();
+	/**
+	 * Specifies input image data for estimating orientation.
+	 *
+	 * @param derivX Image derivative along x-axis.
+	 * @param derivY Image derivative along y-axis.
+	 */
+	public void setImage( D derivX , D derivY );
 
-	public T getImage();
-
-	public String getName();
+	/**
+	 * Returns the type of image it can process.
+	 *
+	 * @return Type of image which can be processed
+	 */
+	public Class<D> getImageType();
 }

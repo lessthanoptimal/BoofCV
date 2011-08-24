@@ -14,18 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.evaluation;
+package gecv.alg.feature.describe;
 
-import gecv.struct.image.ImageBase;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 
 /**
  * @author Peter Abeles
  */
-public interface EvaluationImageSequence<T extends ImageBase>  {
-
-	public boolean next();
-
-	public T getImage();
-
-	public String getName();
+public class TestDescribeSURF {
+	@Test
+	public void stuff() {
+		fail("implement");
+	}
 }

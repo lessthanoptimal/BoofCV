@@ -17,10 +17,9 @@
 package gecv.evaluation;
 
 import gecv.core.image.ConvertBufferedImage;
-import gecv.core.image.ConvertImage;
+import gecv.core.image.GeneralizedImageOps;
 import gecv.io.image.UtilImageIO;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageBase;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -31,49 +30,48 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FileImageSequence implements EvaluationImageSequence {
+public class FileImageSequence<T extends ImageBase> implements EvaluationImageSequence<T> {
 
 	List<String> fileNames = new ArrayList<String>();
 	int index = 0;
 
 	BufferedImage image;
 	String name;
+	String prefix="";
+	T output;
+	Class<T> imageType;
 
-	public FileImageSequence(String... names) {
+	public FileImageSequence( Class<T> imageType , String... names) {
 		for (String s : names) {
 			fileNames.add(s);
 		}
+		output = GeneralizedImageOps.createImage(imageType,1,1);
+		this.imageType = imageType;
 	}
 
 	public FileImageSequence() {
+	}
+
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
 	}
 
 	@Override
 	public boolean next() {
 		if (index < fileNames.size()) {
 			name = fileNames.get(index++);
-			image = UtilImageIO.loadImage(name);
+			image = UtilImageIO.loadImage(prefix+name);
 			if (image == null)
-				throw new RuntimeException("Couldn't open " + name);
+				throw new RuntimeException("Couldn't open " + (prefix+name));
 			return true;
 		} else
 			return false;
 	}
 
 	@Override
-	public ImageUInt8 getImage_I8() {
-		ImageUInt8 img8 = new ImageUInt8(image.getWidth(), image.getHeight());
-		ConvertBufferedImage.convertFrom(image, img8);
-		return img8;
-	}
-
-	@Override
-	public ImageFloat32 getImage_F32() {
-		ImageUInt8 img8 = new ImageUInt8(image.getWidth(), image.getHeight());
-		ImageFloat32 imgF32 = new ImageFloat32(image.getWidth(), image.getHeight());
-		ConvertBufferedImage.convertFrom(image, img8);
-		ConvertImage.convert(img8, imgF32);
-		return imgF32;
+	public T getImage() {
+		output.reshape(image.getWidth(), image.getHeight());
+		return ConvertBufferedImage.convertFrom(image,output,imageType);
 	}
 
 	@Override

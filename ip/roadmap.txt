@@ -27,7 +27,7 @@ SFM
    * line
 #  * blobs
    * SURF
-   * Affine invariant
+   * CenSurE (Detector/Modified SURF descriptor)
  - Color
    * images
    * color space conversion

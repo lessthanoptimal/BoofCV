@@ -16,10 +16,7 @@
 
 package gecv.alg.filter.kernel;
 
-import gecv.struct.convolve.Kernel1D_F32;
-import gecv.struct.convolve.Kernel1D_I32;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.convolve.Kernel2D_I32;
+import gecv.struct.convolve.*;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInteger;
 import gecv.struct.image.ImageSInt32;
@@ -81,6 +78,21 @@ public class KernelMath {
 		return ret;
 	}
 
+	public static Kernel2D_F64 convolve( Kernel1D_F64 a , Kernel1D_F64 b ) {
+		int w = a.width;
+
+		Kernel2D_F64 ret = new Kernel2D_F64(w);
+
+		int index = 0;
+		for( int i = 0; i < w; i++ ) {
+			for( int j = 0; j < w; j++ ) {
+				ret.data[ index++ ] = a.data[i] * b.data[j];
+			}
+		}
+
+		return ret;
+	}
+
 	public static Kernel2D_I32 convolve( Kernel1D_I32 a , Kernel1D_I32 b ) {
 		int w = a.width;
 
@@ -109,6 +121,14 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}
 
+	public static void normalizeSumToOne(Kernel1D_F64 kernel) {
+
+		double[] data = kernel.data;
+		double total = 0;
+		for (int i = 0; i < data.length; i++) total += data[i];
+		for (int i = 0; i < data.length; i++) data[i] /= total;
+	}
+
 	/**
 	 * Normalizes the array such that it sums up to one.
 	 *
@@ -118,6 +138,14 @@ public class KernelMath {
 
 		float[] data = kernel.data;
 		float total = 0;
+		for (int i = 0; i < data.length; i++) total += data[i];
+		for (int i = 0; i < data.length; i++) data[i] /= total;
+	}
+
+	public static void normalizeSumToOne(Kernel2D_F64 kernel) {
+
+		double[] data = kernel.data;
+		double total = 0;
 		for (int i = 0; i < data.length; i++) total += data[i];
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}

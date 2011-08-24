@@ -14,18 +14,29 @@
  *    limitations under the License.
  */
 
-package gecv.evaluation;
+package gecv.alg.feature.orientation;
 
-import gecv.struct.image.ImageBase;
 
 /**
+ * Estimates the orientation of a region.  Often used to create rotation invariant features.
+ *
  * @author Peter Abeles
  */
-public interface EvaluationImageSequence<T extends ImageBase>  {
+public interface RegionOrientation {
+	/**
+	 * Specifies scale at which the orientation is estimated.
+	 *
+	 * @param scale Scale of the orientation region.
+	 */
+	public void setScale( double scale );
 
-	public boolean next();
-
-	public T getImage();
-
-	public String getName();
+	/**
+	 * Computes the orientation of a region about its center.
+	 *
+	 * @param c_x Center of the region in image pixels.
+	 * @param c_y Center of the region in image pixels.
+	 *
+	 * @return Orientation in radians.  Angle zero points along x-axis and pi/2 along y-axis.
+	 */
+	public double compute( int c_x , int c_y );
 }

@@ -14,18 +14,11 @@
  *    limitations under the License.
  */
 
-package gecv.evaluation;
+package gecv.alg.feature.describe.stability;
 
-import gecv.struct.image.ImageBase;
 
 /**
  * @author Peter Abeles
  */
-public interface EvaluationImageSequence<T extends ImageBase>  {
-
-	public boolean next();
-
-	public T getImage();
-
-	public String getName();
+public class DescribeEvaluator {
 }

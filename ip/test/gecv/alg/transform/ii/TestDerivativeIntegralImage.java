@@ -29,6 +29,8 @@ import org.junit.Test;
 
 import java.util.Random;
 
+import static org.junit.Assert.fail;
+
 
 /**
  * @author Peter Abeles
@@ -38,6 +40,16 @@ public class TestDerivativeIntegralImage {
 	Random rand = new Random(234);
 	int width = 30;
 	int height = 40;
+
+	@Test
+	public void kernelHaarX() {
+		fail("implement");
+	}
+
+	@Test
+	public void kernelHaarY() {
+		fail("implement");
+	}
 
 	@Test
 	public void kernelDerivXX() {

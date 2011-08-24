@@ -33,6 +33,18 @@ public class GecvMiscOps {
 		return ret;
 	}
 
+	public static void zero( int a[] , int size ) {
+		for( int i = 0; i < size; i++ ) {
+			a[i] = 0;
+		}
+	}
+
+	public static void zero( double a[] , int size ) {
+		for( int i = 0; i < size; i++ ) {
+			a[i] = 0;
+		}
+	}
+
 	public static double[] convertTo_F64( int a[] ) {
 		double[] ret = new double[ a.length ];
 		for( int i = 0; i < a.length; i++ ) {
