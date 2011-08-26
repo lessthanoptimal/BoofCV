@@ -70,7 +70,7 @@ public class ImageHessian_Reflection<Output extends ImageBase>
 
 	@Override
 	public int getBorder() {
-		if( borderType != BorderType.SKIP )
+		if( borderType != BorderType.SKIP)
 			return 0;
 		else
 			return 1;

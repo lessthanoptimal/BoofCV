@@ -17,7 +17,6 @@
 package gecv.alg.feature.describe;
 
 import gecv.abst.filter.convolve.ImageConvolveSparse;
-import gecv.alg.feature.orientation.OrientationGradient;
 import gecv.alg.filter.kernel.SteerableKernel;
 import gecv.core.image.border.BorderType;
 import gecv.core.image.border.FactoryImageBorder;
@@ -29,44 +28,47 @@ import gecv.struct.image.ImageBase;
 
 
 /**
+ * <p>
+ * Extracts a set of image features using a steerable kernel.  THe kernels are steered in the provided
+ * direction, making the set of features rotation invariant. 
+ * </p>
+ *
  * @author Peter Abeles
  */
-// todo add a 12 DOF variant which divides by the first deriviative as specified in paper
 @SuppressWarnings({"unchecked"})
-public class DescribePointSteerable2D <T extends ImageBase, D extends ImageBase, K extends Kernel2D> {
+public class DescribePointSteerable2D <T extends ImageBase, K extends Kernel2D> {
 
-
+	// the set of steerable kernels used to compute image feature points.
 	SteerableKernel<K> kernels[];
 
+	// Applies the kernel to the interest point
 	ImageConvolveSparse<T,K> convolver;
-	OrientationGradient<D> orientation;
 	// should the feature vector be normalized to one?
 	// this provides some intensity invariance
 	boolean normalize;
 
-	public DescribePointSteerable2D( OrientationGradient<D> orientation ,
-									 SteerableKernel<K> kernels[] ,
+	public DescribePointSteerable2D( SteerableKernel<K> kernels[] ,
 									 boolean normalize ,
 									 Class<T> imageType ) {
-		this.orientation = orientation;
+
 		this.kernels = kernels;
 		this.normalize = normalize;
 
-		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
+		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.SKIP);
 		convolver = FactoryConvolveSparse.create(imageType);
 		convolver.setImageBorder(border);
 	}
 
-	public void setImage( T image , D derivX , D derivY ) {
-		convolver.setImage(image);
-		orientation.setImage(derivX,derivY);
+	public int getRadius() {
+		return kernels[0].getBasis(0).getRadius();
 	}
 
-	public TupleFeature_F64 describe( int x , int y ) {
-		TupleFeature_F64 ret = new TupleFeature_F64(kernels.length);
+	public void setImage( T image ) {
+		convolver.setImage(image);
+	}
 
-		// determine feature's orientation
-		double angle = orientation.compute(x,y);
+	public TupleFeature_F64 describe( int x , int y , double angle ) {
+		TupleFeature_F64 ret = new TupleFeature_F64(kernels.length);
 
 		// compute the image feature's characteristics
 		for( int i = 0; i < kernels.length; i++ ) {

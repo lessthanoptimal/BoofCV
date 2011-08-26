@@ -29,8 +29,6 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.fail;
-
 
 /**
  * @author Peter Abeles
@@ -42,13 +40,109 @@ public class TestDerivativeIntegralImage {
 	int height = 40;
 
 	@Test
+		public void kernelDerivX() {
+		ImageFloat32 orig = new ImageFloat32(width,height);
+		ImageFloat32 integral = new ImageFloat32(width,height);
+
+		ImageTestingOps.randomize(orig,rand,0,20);
+
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		IntegralImageOps.transform(orig,integral);
+
+		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+
+		for( int i = 1; i < 5; i++ ) {
+			int size = i*2+1;
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivX(size);
+			Kernel2D_F32 kernel = createDerivX(size);
+
+			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			IntegralImageOps.convolve(integral,kernelI,found);
+
+			GecvTesting.assertEquals(expected,found,0,1e-2);
+		}
+	}
+
+	@Test
+	public void kernelDerivY() {
+		ImageFloat32 orig = new ImageFloat32(width,height);
+		ImageFloat32 integral = new ImageFloat32(width,height);
+
+		ImageTestingOps.randomize(orig,rand,0,20);
+
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		IntegralImageOps.transform(orig,integral);
+
+		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+
+		for( int i = 1; i < 5; i++ ) {
+			int size = i*2+1;
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivY(size);
+			Kernel2D_F32 kernel = createDerivX(size);
+			kernel = KernelMath.transpose(kernel);
+
+			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			IntegralImageOps.convolve(integral,kernelI,found);
+
+			GecvTesting.assertEquals(expected,found,0,1e-2);
+		}
+	}
+
+	@Test
 	public void kernelHaarX() {
-		fail("implement");
+		ImageFloat32 orig = new ImageFloat32(width,height);
+		ImageFloat32 integral = new ImageFloat32(width,height);
+
+		ImageTestingOps.randomize(orig,rand,0,20);
+
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		IntegralImageOps.transform(orig,integral);
+
+		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+
+		for( int i = 1; i < 5; i++ ) {
+			int size = i*2;
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelHaarX(size);
+			Kernel2D_F32 kernel = createHaarX(size);
+
+			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			IntegralImageOps.convolve(integral,kernelI,found);
+
+			GecvTesting.assertEquals(expected,found,0,1e-2);
+		}
 	}
 
 	@Test
 	public void kernelHaarY() {
-		fail("implement");
+		ImageFloat32 orig = new ImageFloat32(width,height);
+		ImageFloat32 integral = new ImageFloat32(width,height);
+
+		ImageTestingOps.randomize(orig,rand,0,20);
+
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		IntegralImageOps.transform(orig,integral);
+
+		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+
+		for( int i = 1; i < 5; i++ ) {
+			int size = i*2;
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelHaarY(size);
+			Kernel2D_F32 kernel = createHaarX(size);
+			kernel = KernelMath.transpose(kernel);
+
+			ConvolveWithBorder.convolve(kernel,orig,expected,border);
+			IntegralImageOps.convolve(integral,kernelI,found);
+
+			GecvTesting.assertEquals(expected,found,0,1e-2);
+		}
 	}
 
 	@Test
@@ -209,6 +303,37 @@ public class TestDerivativeIntegralImage {
 
 			GecvTesting.assertEquals(a,b,0,1e-2);
 		}
+	}
+
+	private Kernel2D_F32 createDerivX( int size ) {
+		int r = size/2;
+
+		Kernel2D_F32 ret = new Kernel2D_F32(size);
+
+		for( int y = 0; y < size; y++ ) {
+			for( int x = 0; x < r; x++ ) {
+				ret.set(x,y,-1);
+				ret.set(x+r+1,y,1);
+			}
+		}
+
+		return ret;
+	}
+
+	private Kernel2D_F32 createHaarX( int size ) {
+		int r = size/2;
+
+		// TODO kernels only support odd sizes right now...  change if that changes (remove +1)
+		Kernel2D_F32 ret = new Kernel2D_F32(size+1);
+
+		for( int y = 1; y <= size; y++ ) {
+			for( int x = 1; x <= r; x++ ) {
+				ret.set(x,y,-1);
+				ret.set(x+r,y,1);
+			}
+		}
+
+		return ret;
 	}
 
 	private Kernel2D_F32 createDerivXX( int size ) {

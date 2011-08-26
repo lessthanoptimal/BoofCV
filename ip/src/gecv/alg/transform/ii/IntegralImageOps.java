@@ -18,6 +18,7 @@ package gecv.alg.transform.ii;
 
 import gecv.alg.InputSanityCheck;
 import gecv.alg.transform.ii.impl.ImplIntegralImageOps;
+import gecv.struct.ImageRectangle;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageSInt32;
 import gecv.struct.image.ImageUInt8;
@@ -253,5 +254,51 @@ public class IntegralImageOps {
 	public static int block_zero( ImageSInt32 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
+	}
+
+	/**
+	 * Prints out the kernel.
+	 * 
+	 * @param kernel THe kernel which is to be printed.
+	 */
+	public static void print( IntegralKernel kernel )
+	{
+		int x0 = 0,x1=0,y0=0,y1=0;
+		for( ImageRectangle k : kernel.blocks) {
+			if( k.x0 < x0 )
+				x0 = k.x0;
+			if( k.y0 < y0 )
+				y0 = k.y0;
+			if( k.x1 > x1 )
+				x1 = k.x1;
+			if( k.y1 > y1 )
+				y1 = k.y1;
+		}
+
+		int w = x1-x0;
+		int h = y1-y0;
+
+		int sum[] = new int[ w*h ];
+
+		for( int i = 0; i < kernel.blocks.length; i++ ) {
+			ImageRectangle r = kernel.blocks[i];
+			int value = kernel.scales[i];
+
+			for( int y = r.y0; y < r.y1; y++ ) {
+				int yy = y-y0;
+				for( int x = r.x0; x < r.x1; x++ ) {
+					int xx = x - x0;
+					sum[ yy*w + xx ] += value;
+				}
+			}
+		}
+
+		System.out.println("IntegralKernel: TL = ("+(x0+1)+","+(y0+1)+") BR=("+x1+","+y1+")");
+		for( int y = 0; y < h; y++ ) {
+			for( int x = 0; x < w; x++ ) {
+				System.out.printf("%4d ",sum[y*w+x]);
+			}
+			System.out.println();
+		}
 	}
 }

@@ -34,10 +34,17 @@ public class NaiveSurfDescribeOps {
 	public static <T extends ImageBase>
 	void gradient( T ii , int c_x , int c_y ,
 				   int radius , double s ,
+				   boolean useHaar ,
 				   double []derivX , double derivY[] )
 	{
-		IntegralKernel haarX = DerivativeIntegralImage.kernelHaarX((int)Math.ceil(4*s));
-		IntegralKernel haarY = DerivativeIntegralImage.kernelHaarY((int)Math.ceil(4*s));
+		IntegralKernel kernelX,kernelY;
+		if( useHaar ) {
+			kernelX = DerivativeIntegralImage.kernelHaarX((int)Math.ceil(4*s));
+			kernelY = DerivativeIntegralImage.kernelHaarY((int)Math.ceil(4*s));
+		} else {
+			kernelX = DerivativeIntegralImage.kernelDerivX((int)Math.ceil(4*s));
+			kernelY = DerivativeIntegralImage.kernelDerivY((int)Math.ceil(4*s));
+		}
 
 		int i = 0;
 		for( int y = -radius; y <= radius; y++ ) {
@@ -45,8 +52,8 @@ public class NaiveSurfDescribeOps {
 				int xx = (int)Math.floor(x*s);
 				int yy = (int)Math.floor(y*s);
 
-				derivX[i] = GIntegralImageOps.convolveSparse(ii,haarX,c_x+xx,c_y+yy);
-				derivY[i] = GIntegralImageOps.convolveSparse(ii,haarY,c_x+xx,c_y+yy);
+				derivX[i] = GIntegralImageOps.convolveSparse(ii,kernelX,c_x+xx,c_y+yy);
+				derivY[i] = GIntegralImageOps.convolveSparse(ii,kernelY,c_x+xx,c_y+yy);
 			}
 		}
 	}
@@ -55,6 +62,7 @@ public class NaiveSurfDescribeOps {
 	void features( T ii , int c_x , int c_y ,
 				   double theta , Kernel2D_F64 weight ,
 				   int regionSize , int numSubRegions , double scale ,
+				   boolean useHaar ,
 				   double []features )
 	{
 		if( weight.width != regionSize+1 )
@@ -65,8 +73,14 @@ public class NaiveSurfDescribeOps {
 		int subSize = regionSize/numSubRegions;
 		int regionR = regionSize/2;
 
-		IntegralKernel haarX = DerivativeIntegralImage.kernelHaarX((int)(2*scale));
-		IntegralKernel haarY = DerivativeIntegralImage.kernelHaarY((int)(2*scale));
+		IntegralKernel kernelX,kernelY;
+		if( useHaar ) {
+			kernelX = DerivativeIntegralImage.kernelHaarX((int)Math.ceil(2*scale));
+			kernelY = DerivativeIntegralImage.kernelHaarY((int)Math.ceil(2*scale));
+		} else {
+			kernelX = DerivativeIntegralImage.kernelDerivX((int)Math.ceil(2*scale));
+			kernelY = DerivativeIntegralImage.kernelDerivY((int)Math.ceil(2*scale));
+		}
 
 		int regionIndex = 0;
 		int weightIndex = 0;
@@ -90,8 +104,8 @@ public class NaiveSurfDescribeOps {
 						int pixelY = c_y + (int)(s*regionX + c*regionY);
 
 						// compute the wavelet and multiply by the weighting factor
-						double dx =  w*GIntegralImageOps.convolveSparse(ii,haarX,pixelX,pixelY);
-						double dy =  w*GIntegralImageOps.convolveSparse(ii,haarY,pixelX,pixelY);
+						double dx =  w*GIntegralImageOps.convolveSparse(ii,kernelX,pixelX,pixelY);
+						double dy =  w*GIntegralImageOps.convolveSparse(ii,kernelY,pixelX,pixelY);
 
 						// align the gradient along image patch
 						// note the transform is transposed

@@ -17,73 +17,87 @@
 package gecv.abst.detect.describe;
 
 import gecv.abst.filter.derivative.ImageGradient;
+import gecv.alg.distort.DistortImageOps;
 import gecv.alg.feature.describe.DescribePointSteerable2D;
-import gecv.alg.filter.blur.GBlurImageOps;
+import gecv.alg.feature.orientation.OrientationGradient;
+import gecv.alg.interpolate.TypeInterpolate;
 import gecv.core.image.GeneralizedImageOps;
-import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.misc.GecvMiscOps;
 import gecv.struct.ImageRectangle;
 import gecv.struct.feature.TupleFeature_F64;
 import gecv.struct.image.ImageBase;
 
-import java.util.Random;
-
 
 /**
+ * Computes image features using a steerable filter.  An image patch is rescaled
+ * to the size of the steerable filter.  The size of the image patch is dependent
+ * upon estimated scale of the feature.
+ *
  * @author Peter Abeles
  */
 public class WrapDescribeSteerable <T extends ImageBase, D extends ImageBase>
 		implements ExtractFeatureDescription<T>
 {
-	DescribePointSteerable2D<T,D,?> steer;
+	DescribePointSteerable2D<T,?> steer;
+	OrientationGradient<D> orientation;
 	ImageGradient<T,D> gradient;
 
 	T image;
-	D derivX;
-	D derivY;
-	T blurredRegion;
+	T scaledImage;
+	D scaledDerivX;
+	D scaledDerivY;
 
-	Random rand = new Random();
+	int steerR;
 
-	public WrapDescribeSteerable(DescribePointSteerable2D<T, D, ?> steer,
+	public WrapDescribeSteerable(DescribePointSteerable2D<T,?> steer,
+								 OrientationGradient<D> orientation,
 								 ImageGradient<T, D> gradient,
+								 Class<T> inputType ,
 								 Class<D> derivType ) {
 		this.steer = steer;
+		this.orientation = orientation;
 		this.gradient = gradient;
-		derivX = GeneralizedImageOps.createImage(derivType,1,1);
-		derivY = GeneralizedImageOps.createImage(derivType,1,1);
+
+		steerR = steer.getRadius();
+		int w = steerR*2+1+2;
+		// +2 is for image border when computing the image derivative
+
+		scaledImage = GeneralizedImageOps.createImage(inputType,w,w);
+		scaledDerivX = GeneralizedImageOps.createImage(derivType,w,w);
+		scaledDerivY = GeneralizedImageOps.createImage(derivType,w,w);
 	}
 
 	@Override
 	public void setImage(T image) {
 		this.image = image;
-		if( blurredRegion == null ) {
-			blurredRegion = (T)image._createNew(1,1);
-		}
-		derivX.reshape(image.width,image.height);
-		derivY.reshape(image.width,image.height);
-		gradient.process(image,derivX,derivY);
+
 	}
 
 	@Override
 	public TupleFeature_F64 process(int x, int y, double scale) {
-		// determine the bounds of a region surrounding the pixel
-		int r = FactoryKernelGaussian.radiusForSigma(scale,0);
 
-		ImageRectangle area = new ImageRectangle(x-r*2,y-r*2,x+r*2+1,y+r*2+1);
-		GecvMiscOps.boundRectangleInside(image,area);
+		// compute the size of the region at this scale
+		int r = (int)Math.ceil(scale*3)+1;
+
+		ImageRectangle area = new ImageRectangle(x-r,y-r,x+r+1,y+r+1);
+		if( !GecvMiscOps.checkInside(image,area) )
+			return null;
 
 		// create a subimage of this region
 		T subImage = (T)image.subimage(area.x0,area.y0,area.x1,area.y1);
-		D subDX = (D)derivX.subimage(area.x0,area.y0,area.x1,area.y1);
-		D subDY = (D)derivY.subimage(area.x0,area.y0,area.x1,area.y1);
 
-		// blur this subimage to the appropriate scale
-		blurredRegion.reshape(subImage.width,subImage.height);
-		GBlurImageOps.gaussian(subImage,blurredRegion,scale,r,null);
+		DistortImageOps.scale(subImage,scaledImage, TypeInterpolate.BILINEAR);
+
+		// compute the gradient
+		gradient.process(scaledImage, scaledDerivX, scaledDerivY);
+
+		// estimate the angle
+		orientation.setImage(scaledDerivX,scaledDerivY);
+		double angle = orientation.compute(steerR+1,steerR+1);
 
 		// extract descriptor
-		steer.setImage(blurredRegion,subDX,subDY);
-		return steer.describe(x-area.x0,y-area.y0);
+		steer.setImage(scaledImage);
+		return steer.describe(steerR+1,steerR+1,angle);
+		// +1 to avoid edge conditions
 	}
 }

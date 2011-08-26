@@ -14,11 +14,17 @@
  *    limitations under the License.
  */
 
-package gecv.alg.filter.kernel;
+package gecv.core.image.border;
 
 
 /**
+ * Throws an exception of the border is accessed.
+ *
  * @author Peter Abeles
  */
-public class SteerableSeparableKernel {
+public class BorderIndex1D_Exception extends BorderIndex1D {
+	@Override
+	public int getIndex(int index) {
+		throw new IllegalArgumentException("Tried to access a pixel outside of the image");
+	}
 }

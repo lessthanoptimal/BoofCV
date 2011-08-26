@@ -46,7 +46,10 @@ public class GenericConvolve<Input extends ImageBase, Output extends ImageBase>
 		this.type = type;
 
 		Class<?> params[] = m.getParameterTypes();
-		this.borderRule = FactoryImageBorder.general(params[1],type);
+		if( type == BorderType.SKIP || type == BorderType.NORMALIZED )
+			this.borderRule = null;
+		else
+			borderRule = FactoryImageBorder.general(params[1],type);
 	}
 
 	@Override
@@ -58,18 +61,24 @@ public class GenericConvolve<Input extends ImageBase, Output extends ImageBase>
 						m.invoke(null,kernel,input,output,false);
 						break;
 
+					case NORMALIZED:
+						m.invoke(null,kernel,input,output);
+						break;
+
 					default:
-						if( borderRule == null )
-							m.invoke(null,kernel,input,output);
-						else
-							m.invoke(null,kernel,input,output, borderRule);
+						m.invoke(null,kernel,input,output, borderRule);
 						break;
 				}
 			} else {
-				if( borderRule == null )
-					m.invoke(null,kernel,input,output);
-				else
-					m.invoke(null,kernel,input,output, borderRule);
+				switch( type ) {
+					case SKIP:
+					case NORMALIZED:
+						m.invoke(null,kernel,input,output);
+						break;
+
+					default:
+						m.invoke(null,kernel,input,output, borderRule);
+				}
 			}
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);

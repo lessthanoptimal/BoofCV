@@ -16,9 +16,11 @@
 
 package gecv.alg.feature.describe;
 
+import gecv.alg.feature.describe.impl.ImplSurfDescribeOps;
 import gecv.alg.feature.describe.impl.NaiveSurfDescribeOps;
 import gecv.struct.convolve.Kernel2D_F64;
 import gecv.struct.image.ImageBase;
+import gecv.struct.image.ImageFloat32;
 
 
 /**
@@ -29,25 +31,35 @@ import gecv.struct.image.ImageBase;
 public class SurfDescribeOps {
 
 	/**
-	 * Computes the "gradient" using Haar wavelets.  The region considered has a radius
-	 * of ceil(radius*s) pixels.  It is samples every 's' pixels by a Haar wavelet.  The
-	 * output of the Haar wavelet is stored om the derivX and derivY variables.
+	 * <p>
+	 * Computes the of a square region.  The region considered has a radius
+	 * of ceil(radius*s) pixels.  The derivative is computed every 's' pixels.
+	 * </p>
 	 *
+	 * <p>
+	 * Deviation from paper:<br>
+	 * <ul>
+	 * <li>An symmetric box derivative is used instead of the Haar wavelet.</li>
+	 * </ul>
+	 * </p>
 	 *
 	 * @param ii Integral image.
 	 * @param c_x Center pixel.
 	 * @param c_y Center pixel.
 	 * @param radius Radius of region being considered in samples.
 	 * @param s Scale of feature.
-	 * @param derivX Haar x wavelet output.
-	 * @param derivY Haar Y wavelet output.
+	 * @param derivX Derivative x wavelet output.
+	 * @param derivY Derivative Y wavelet output.
 	 */
 	public static <T extends ImageBase>
 	void gradient( T ii , int c_x , int c_y ,
 				   int radius , double s ,
 				   double []derivX , double derivY[] )
 	{
-		NaiveSurfDescribeOps.gradient(ii,c_x,c_y,radius,s,derivX,derivY);
+//		NaiveSurfDescribeOps.gradient(ii,c_x,c_y,radius,s,false,derivX,derivY);
+		int r = (int)Math.ceil(radius);
+		int step = (int)Math.ceil(1);
+		ImplSurfDescribeOps.gradientInner((ImageFloat32)ii,r,step,c_x-r,c_y-r,c_x+r,c_y+r,0,0,derivX,derivY);
 	}
 
 
@@ -58,8 +70,12 @@ public class SurfDescribeOps {
 	 *
 	 * <p>
 	 * Deviation from paper:<br>
-	 * Weighting function is applied to each sub region as a whole and not to each wavelet inside the sub
-	 * region.  This allows the weight to be precomputed once.  Unlikely to degrade quality significantly.
+	 * <ul>
+	 * <li>Weighting function is applied to each sub region as a whole and not to each wavelet inside the sub
+	 * region.  This allows the weight to be precomputed once.  Unlikely to degrade quality significantly.</li>
+	 * <li>An symmetric box derivative is used instead of the Haar wavelet.  Haar is not symmetric and the performance
+	 * noticeable improved when the derivative was used instead.</li>
+	 * </ul>
 	 * </p>
 	 *
 	 * @param ii Integral image.
@@ -78,7 +94,7 @@ public class SurfDescribeOps {
 				   int regionSize , int numSubRegions , double scale ,
 				   double []features )
 	{
-		NaiveSurfDescribeOps.features(ii,c_x,c_y,theta,weight,regionSize,numSubRegions,scale,features);
+		NaiveSurfDescribeOps.features(ii,c_x,c_y,theta,weight,regionSize,numSubRegions,scale,false,features);
 	}
 
 	// todo move to a generalized class?

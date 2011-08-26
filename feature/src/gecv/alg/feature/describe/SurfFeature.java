@@ -20,6 +20,9 @@ import gecv.struct.feature.TupleFeature_F64;
 
 
 /**
+ * Description of a SURF interest point.  It is composed of a set of image features computed from sub-regions
+ * around the interest point as well as the sign of the Laplacian at the interest point.
+ *
  * @author Peter Abeles
  */
 public class SurfFeature {
