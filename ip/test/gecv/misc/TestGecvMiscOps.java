@@ -21,7 +21,7 @@ import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 
 /**
@@ -48,6 +48,17 @@ public class TestGecvMiscOps {
 		assertEquals(ey0,a.y0);
 		assertEquals(ex1,a.x1);
 		assertEquals(ey1,a.y1);
+	}
 
+	@Test
+	public void checkInside() {
+		ImageUInt8 image = new ImageUInt8(20,25);
+
+		assertTrue(GecvMiscOps.checkInside(image,new ImageRectangle(0,0,20,25)));
+		assertTrue(GecvMiscOps.checkInside(image,new ImageRectangle(2,4,15,23)));
+		assertFalse(GecvMiscOps.checkInside(image,new ImageRectangle(-1,0,20,25)));
+		assertFalse(GecvMiscOps.checkInside(image,new ImageRectangle(0,-1,20,25)));
+		assertFalse(GecvMiscOps.checkInside(image,new ImageRectangle(0,0,21,25)));
+		assertFalse(GecvMiscOps.checkInside(image,new ImageRectangle(0,0,20,26)));
 	}
 }

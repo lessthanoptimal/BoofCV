@@ -71,7 +71,7 @@ public class TestNaiveSurfDescribeOps {
 			ImageFloat32 img = createGradient(width,height,theta);
 			ImageFloat32 ii = IntegralImageOps.transform(img,null);
 
-			NaiveSurfDescribeOps.gradient(ii,r*3,r*3,r,scale,derivX,derivY);
+			NaiveSurfDescribeOps.gradient(ii,r*3,r*3,r,scale,true,derivX,derivY);
 
 			double c = Math.cos(theta);
 			double s = Math.sin(theta);
@@ -99,7 +99,7 @@ public class TestNaiveSurfDescribeOps {
 		ImageFloat32 ii = IntegralImageOps.transform(img,null);
 
 		GecvMiscOps.zero(features,64);
-		NaiveSurfDescribeOps.features(ii,20,20,0.75,weight,20,4,1,features);
+		NaiveSurfDescribeOps.features(ii,20,20,0.75,weight,20,4,1,true,features);
 
 		for( double f : features )
 			assertEquals(0,f,1e-4);
@@ -117,7 +117,7 @@ public class TestNaiveSurfDescribeOps {
 		ImageFloat32 ii = IntegralImageOps.transform(img,null);
 
 		// orient the feature along the x-acis
-		NaiveSurfDescribeOps.features(ii,15,15,0,weight,20,4,1,features);
+		NaiveSurfDescribeOps.features(ii,15,15,0,weight,20,4,1,true,features);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(features[i],features[i+1],1e-4);
@@ -127,7 +127,7 @@ public class TestNaiveSurfDescribeOps {
 		}
 
 		// now orient the feature along the y-axis
-		NaiveSurfDescribeOps.features(ii,15,15,Math.PI/2.0,weight,20,4,1,features);
+		NaiveSurfDescribeOps.features(ii,15,15,Math.PI/2.0,weight,20,4,1,true,features);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(-features[i+2],features[i+3],1e-4);
@@ -147,7 +147,7 @@ public class TestNaiveSurfDescribeOps {
 		ImageFloat32 ii = IntegralImageOps.transform(img,null);
 
 		// orient the feature along the x-acis
-		NaiveSurfDescribeOps.features(ii,25,25,0,weight,20,4,1.5,features);
+		NaiveSurfDescribeOps.features(ii,25,25,0,weight,20,4,1.5,true,features);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(features[i],features[i+1],1e-4);

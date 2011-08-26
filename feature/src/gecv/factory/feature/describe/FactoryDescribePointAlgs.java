@@ -19,10 +19,8 @@ package gecv.factory.feature.describe;
 import gecv.alg.feature.describe.DescribePointSURF;
 import gecv.alg.feature.describe.DescribePointSteerable2D;
 import gecv.alg.feature.orientation.OrientationAverageHaarIntegral;
-import gecv.alg.feature.orientation.OrientationGradient;
 import gecv.alg.feature.orientation.OrientationIntegral;
 import gecv.alg.filter.kernel.SteerableKernel;
-import gecv.factory.feature.orientation.FactoryOrientationAlgs;
 import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.factory.filter.kernel.FactorySteerable;
@@ -44,12 +42,11 @@ public class FactoryDescribePointAlgs {
 	}
 
 	// todo comment
-	public static <T extends ImageBase, D extends ImageBase, K extends Kernel2D>
-	DescribePointSteerable2D<T,D,K> steerableGaussian( boolean normalized ,
+	public static <T extends ImageBase, K extends Kernel2D>
+	DescribePointSteerable2D<T,K> steerableGaussian( boolean normalized ,
 													   double sigma ,
 													   int radius ,
-													   Class<T> imageType ,
-													   Class<D> derivType )
+													   Class<T> imageType )
 	{
 		if( sigma <= 0 )
 			sigma = FactoryKernelGaussian.sigmaForRadius(radius,4);
@@ -67,9 +64,7 @@ public class FactoryDescribePointAlgs {
 				kernels[index++] = FactorySteerable.gaussian(kernelType,orderX,i, sigma, radius);
 			}
 		}
-		OrientationGradient<D> orientation = FactoryOrientationAlgs.average(radius,false,derivType);
-//		OrientationGradient<D> orientation = FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType);
 
-		return new DescribePointSteerable2D<T,D,K>(orientation,kernels,normalized,imageType);
+		return new DescribePointSteerable2D<T,K>(kernels,normalized,imageType);
 	}
 }

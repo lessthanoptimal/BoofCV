@@ -71,4 +71,18 @@ public class GecvMiscOps {
 		if( r.y1 > b.height )
 			r.y1 = b.height;
 	}
+
+	public static boolean checkInside(ImageBase b, ImageRectangle r) {
+		if( r.x0 < 0 )
+			return false;
+		if( r.x1 > b.width )
+			return false;
+
+		if( r.y0 < 0 )
+			return false;
+		if( r.y1 > b.height )
+			return false;
+		return true;
+
+	}
 }

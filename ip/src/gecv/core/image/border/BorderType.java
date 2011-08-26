@@ -25,7 +25,7 @@ package gecv.core.image.border;
  */
 public enum BorderType {
 	/**
-	 * Image borders are not processed
+	 * Image borders are not processed and are simply skipped over.
 	 */
 	SKIP,
 

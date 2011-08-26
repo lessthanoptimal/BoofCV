@@ -123,7 +123,7 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 
 	@Override
 	public int getBorder() {
-		if( borderDeriv == BorderType.SKIP )
+		if( borderDeriv == BorderType.SKIP)
 			return 0;
 		else
 			return borderSize;

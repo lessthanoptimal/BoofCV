@@ -41,7 +41,8 @@ public class ProfileOperation {
 		try {
 			double opsPerSecond = profileOpsPerSec(performer,minTestTime, false);
 
-			System.out.printf("%30s  ops/sec = %7.3f\n",performer.getClass().getSimpleName(),opsPerSecond);
+			String name = performer.getName() == null ? performer.getClass().getSimpleName() : performer.getName();
+			System.out.printf("%30s  ops/sec = %7.3f\n",name,opsPerSecond);
 		} catch( RuntimeException e ) {
 			System.out.printf("%30s  FAILED\n",performer.getClass().getSimpleName());
 		}

@@ -26,7 +26,44 @@ import gecv.struct.image.ImageFloat32;
 public class DerivativeIntegralImage {
 
 	/**
-	 * Creates a kernel for the Haar wavelet.
+	 * Creates a kernel for a symmetric box derivative.
+	 *
+	 * @param size Length of a side on the box
+	 * @return Kernel Kernel for derivative.
+	 */
+	public static IntegralKernel kernelDerivX( int size ) {
+		int r = size/2;
+
+		IntegralKernel ret = new IntegralKernel(2);
+		ret.blocks[0] = new ImageRectangle(-r-1,-r-1,-1,r);
+		ret.blocks[1] = new ImageRectangle(0,-r-1,r,r);
+		ret.scales[0] = -1;
+		ret.scales[1] = 1;
+
+		return ret;
+	}
+
+	/**
+	 * Creates a kernel for a symmetric box derivative.
+	 *
+	 * @param size Length of a side on the box
+	 * @return Kernel Kernel for derivative.
+	 */
+	public static IntegralKernel kernelDerivY( int size ) {
+		int r = size/2;
+
+		IntegralKernel ret = new IntegralKernel(2);
+		ret.blocks[0] = new ImageRectangle(-r-1,-r-1,r,-1);
+		ret.blocks[1] = new ImageRectangle(-r-1,0,r,r);
+		ret.scales[0] = -1;
+		ret.scales[1] = 1;
+
+		return ret;
+	}
+
+
+	/**
+	 * Creates a kernel for the Haar wavelet "centered" around the center pixel.
 	 *
 	 * @param size Length of a side on the wavelet
 	 * @return Kernel for a Haar x-axis wavelet.
@@ -44,7 +81,7 @@ public class DerivativeIntegralImage {
 	}
 
 	/**
-	 * Creates a kernel for the Haar wavelet.
+	 * Creates a kernel for the Haar wavelet "centered" around the center pixel.
 	 *
 	 * @param size Length of a side on the wavelet
 	 * @return Kernel for a Haar y-axis wavelet.

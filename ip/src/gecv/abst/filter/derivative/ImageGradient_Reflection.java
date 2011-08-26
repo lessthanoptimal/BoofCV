@@ -71,7 +71,7 @@ public class ImageGradient_Reflection<Input extends ImageBase, Output extends Im
 
 	@Override
 	public int getBorder() {
-		if( borderType != BorderType.SKIP )
+		if( borderType != BorderType.SKIP)
 			return 0;
 		else
 			return 1;

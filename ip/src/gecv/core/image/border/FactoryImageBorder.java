@@ -80,8 +80,11 @@ public class FactoryImageBorder {
 		Class<?> borderClass;
 		switch(borderType) {
 			case SKIP:
+				borderClass = BorderIndex1D_Exception.class;
+				break;
+
 			case NORMALIZED:
-				return null;
+				throw new IllegalArgumentException("Normalized can't be supported by this border interface");
 			
 			case REFLECT:
 				borderClass = BorderIndex1D_Reflect.class;
