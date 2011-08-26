@@ -30,7 +30,7 @@ public interface ExtractFeatureDescription<T extends ImageBase> {
 	/**
 	 * Specified the image which is to be processed.
 	 * 
-	 * @param image THe image which contains the features.
+	 * @param image The image which contains the features.
 	 */
 	public void setImage( T image );
 

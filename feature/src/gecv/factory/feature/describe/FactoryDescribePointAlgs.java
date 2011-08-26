@@ -18,9 +18,9 @@ package gecv.factory.feature.describe;
 
 import gecv.alg.feature.describe.DescribePointSURF;
 import gecv.alg.feature.describe.DescribePointSteerable2D;
-import gecv.alg.feature.orientation.OrientationAverageHaarIntegral;
 import gecv.alg.feature.orientation.OrientationIntegral;
 import gecv.alg.filter.kernel.SteerableKernel;
+import gecv.factory.feature.orientation.FactoryOrientationAlgs;
 import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.factory.filter.kernel.FactorySteerable;
@@ -35,8 +35,10 @@ import gecv.struct.image.ImageBase;
 public class FactoryDescribePointAlgs {
 
 	public static <T extends ImageBase>
-	DescribePointSURF<T> surf() {
-		OrientationIntegral<T> orientation = new OrientationAverageHaarIntegral<T>(6,false);
+	DescribePointSURF<T> surf( boolean isOriented , Class<T> imageType) {
+		OrientationIntegral<T> orientation = null;
+		if( isOriented )
+			orientation = FactoryOrientationAlgs.average_ii(6,false,imageType);
 
 		return new DescribePointSURF<T>(orientation);
 	}

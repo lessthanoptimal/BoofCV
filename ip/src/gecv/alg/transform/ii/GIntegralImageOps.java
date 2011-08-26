@@ -36,6 +36,8 @@ public class GIntegralImageOps {
 			return (T)IntegralImageOps.transform((ImageFloat32)input,(ImageFloat32)transformed);
 		} else if( input instanceof ImageUInt8) {
 			return (T)IntegralImageOps.transform((ImageUInt8)input,(ImageSInt32)transformed);
+		} else if( input instanceof ImageSInt32) {
+			return (T)IntegralImageOps.transform((ImageSInt32)input,(ImageSInt32)transformed);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}

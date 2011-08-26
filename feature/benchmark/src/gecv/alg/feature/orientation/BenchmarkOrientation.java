@@ -21,7 +21,6 @@ import gecv.ProfileOperation;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.transform.ii.GIntegralImageOps;
 import gecv.core.image.GeneralizedImageOps;
-import gecv.factory.feature.orientation.FactoryOrientationAlgs;
 import gecv.factory.filter.derivative.FactoryDerivative;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -29,6 +28,8 @@ import gecv.struct.image.ImageSInt32;
 import jgrl.struct.point.Point2D_I32;
 
 import java.util.Random;
+
+import static gecv.factory.feature.orientation.FactoryOrientationAlgs.*;
 
 
 /**
@@ -73,10 +74,10 @@ public class BenchmarkOrientation<I extends ImageBase, D extends ImageBase> {
 		gradient.process(image,derivX,derivY);
 
 		pts = new Point2D_I32[NUM_POINTS];
-		int border = 50;
+		int border = 6;
 		for( int i = 0; i < NUM_POINTS; i++ ) {
-			int x = rand.nextInt(width-border)+border;
-			int y = rand.nextInt(height-border)+border;
+			int x = rand.nextInt(width-border*2)+border;
+			int y = rand.nextInt(height-border*2)+border;
 			pts[i] = new Point2D_I32(x,y);
 		}
 
@@ -134,14 +135,14 @@ public class BenchmarkOrientation<I extends ImageBase, D extends ImageBase> {
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
 		System.out.println();
 
-//		ProfileOperation.printOpsPerSec(new Gradient("Average", average(RADIUS,false,derivType)), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Gradient("Average W", average(RADIUS,true,derivType)), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Gradient("Histogram", histogram(15,RADIUS,false,derivType)), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Gradient("Histogram W", histogram(15,RADIUS,true,derivType)), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Gradient("Sliding", sliding(15,Math.PI/3.0,RADIUS,false,derivType)), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Gradient("Sliding W", sliding(15,Math.PI/3.0,RADIUS,true,derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Average II", FactoryOrientationAlgs.<I>average_ii(RADIUS,false)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Average II W", FactoryOrientationAlgs.<I>average_ii(RADIUS,true)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Average", average(RADIUS,false,derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Average W", average(RADIUS,true,derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Histogram", histogram(15,RADIUS,false,derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Histogram W", histogram(15,RADIUS,true,derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Sliding", sliding(15,Math.PI/3.0,RADIUS,false,derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Sliding W", sliding(15,Math.PI/3.0,RADIUS,true,derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Average II", average_ii(RADIUS,false,imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Average II W", average_ii(RADIUS,true,imageType)), TEST_TIME);
 	}
 
 	public static void main( String argsp[ ] ) {

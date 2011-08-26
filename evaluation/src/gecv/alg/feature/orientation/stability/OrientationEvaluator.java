@@ -81,7 +81,7 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 							   List<Point2D_I32> points, List<Integer> indexes ) {
 
 //		initToImage = initToImage.invert(null);
-//		ShowImages.showWindow((ImageFloat32)image,"Mdoified",true);
+//		ShowImages.showWindow((ImageFloat32)image,"Modified",true);
 		OrientationGradient<D> angleAlg = alg.getAlgorithm();
 
 		gradient.process(image,derivX,derivY);

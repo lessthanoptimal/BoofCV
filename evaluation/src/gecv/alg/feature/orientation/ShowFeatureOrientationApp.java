@@ -73,8 +73,8 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		addAlgorithm("Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType));
 		addAlgorithm("Sliding Window", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
 		addAlgorithm("Sliding Window Weighted", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
-		addAlgorithm("Average Haar II", FactoryOrientationAlgs.average_ii(radius,false));
-		addAlgorithm("Average Haar II Weighted", FactoryOrientationAlgs.average_ii(radius,true));
+		addAlgorithm("Average II", FactoryOrientationAlgs.average_ii(radius,false,imageType));
+		addAlgorithm("Average II Weighted", FactoryOrientationAlgs.average_ii(radius,true,imageType));
 
 		panel = new ImagePanel(input);
 		add(panel, BorderLayout.CENTER);
@@ -133,7 +133,7 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
 //		ShowFeatureOrientationApp<ImageFloat32,ImageFloat32> app =
-//				new ShowFeatureOrientationApp<ImageFloat32,ImageFloat32>(input,ImageFloat32.class, ImageFloat32.class);
+//				new ShowFeatureOrientationApp<ImageFloat32, ImageFloat32>(input,ImageFloat32.class, ImageFloat32.class);
 		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 

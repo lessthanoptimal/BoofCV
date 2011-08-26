@@ -16,7 +16,10 @@
 
 package gecv.factory.feature.orientation;
 
-import gecv.alg.feature.orientation.*;
+import gecv.alg.feature.orientation.OrientationAverage;
+import gecv.alg.feature.orientation.OrientationHistogram;
+import gecv.alg.feature.orientation.OrientationIntegral;
+import gecv.alg.feature.orientation.OrientationSlidingWindow;
 import gecv.alg.feature.orientation.impl.*;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -93,8 +96,13 @@ public class FactoryOrientationAlgs {
 	}
 
 	public static <T extends ImageBase>
-	OrientationIntegral<T> average_ii( int radius , boolean weighted )
+	OrientationIntegral<T> average_ii( int radius , boolean weighted , Class<T> imageType)
 	{
-		return new OrientationAverageHaarIntegral<T>(radius,weighted);
+		if( imageType == ImageFloat32.class )
+			return (OrientationIntegral<T>)new ImplOrientationAverageIntegral_F32(radius,weighted);
+		else if( imageType == ImageSInt32.class )
+			return (OrientationIntegral<T>)new ImplOrientationAverageIntegral_I32(radius,weighted);
+		else
+			throw new IllegalArgumentException("Image type not supported. "+imageType.getSimpleName());
 	}
 }

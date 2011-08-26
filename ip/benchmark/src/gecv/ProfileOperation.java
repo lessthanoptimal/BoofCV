@@ -44,6 +44,7 @@ public class ProfileOperation {
 			String name = performer.getName() == null ? performer.getClass().getSimpleName() : performer.getName();
 			System.out.printf("%30s  ops/sec = %7.3f\n",name,opsPerSecond);
 		} catch( RuntimeException e ) {
+			e.printStackTrace();
 			System.out.printf("%30s  FAILED\n",performer.getClass().getSimpleName());
 		}
 	}

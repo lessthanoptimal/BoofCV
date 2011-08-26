@@ -16,7 +16,6 @@
 
 package gecv.alg.feature.orientation;
 
-import gecv.alg.feature.describe.SurfDescribeOps;
 import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel2D_F64;
 import gecv.struct.image.ImageBase;
@@ -24,29 +23,24 @@ import gecv.struct.image.ImageBase;
 
 /**
  * <p>
- * Estimates the orientation of a region by computing the image derivative from an integral image
- * using the Haar wavelet.  The derivative along each axis is summed up and the angle computed from
- * that.
+ * Estimates the orientation of a region by computing the image derivative from an integral image.
+ * The derivative along each axis is summed up and the angle computed from that.
  * </p>
  *
  * @author Peter Abeles
  */
-public class OrientationAverageHaarIntegral<T extends ImageBase>
+public abstract class OrientationAverageIntegral<T extends ImageBase>
 		implements OrientationIntegral<T>
 {
 	// integral image transform of input image
-	T ii;
+	protected T ii;
 
 	// the scale at which the feature was detected
-	double scale=1;
+	protected double scale=1;
 
 	// size of the area being considered in wavelets samples
-	int radius;
-	int width;
-
-	// where the output from the Haar wavelets are stored
-	double derivX[];
-	double derivY[];
+	protected int radius;
+	protected int width;
 
 	// optional weights
 	protected Kernel2D_F64 weights;
@@ -56,14 +50,11 @@ public class OrientationAverageHaarIntegral<T extends ImageBase>
 	 * @param radius Radius of the region being considered in terms of Wavelet samples. Typically 6.
 	 * @param weighted If edge intensities are weighted using a Gaussian kernel.
 	 */
-	public OrientationAverageHaarIntegral(int radius , boolean weighted ) {
+	public OrientationAverageIntegral( int radius , boolean weighted ) {
 		this.radius = radius;
 		this.width = radius*2+1;
 		if( weighted )
 			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, -1,radius);
-
-		derivX = new double[width*width];
-		derivY = new double[width*width];
 	}
 
 	@Override
@@ -74,31 +65,5 @@ public class OrientationAverageHaarIntegral<T extends ImageBase>
 	@Override
 	public void setImage(T integralImage) {
 		this.ii = integralImage;
-	}
-
-	@Override
-	public double compute(int c_x, int c_y ) {
-		SurfDescribeOps.gradient(ii,c_x,c_y,radius,scale,derivX,derivY);
-
-		double Dx=0,Dy=0;
-		if( weights == null ) {
-			for( int i = 0; i < derivX.length; i++ ) {
-				Dx += derivX[i];
-				Dy += derivY[i];
-			}
-		} else {
-			for( int i = 0; i < derivX.length; i++ ) {
-				double w = weights.data[i];
-				Dx += w*derivX[i];
-				Dy += w*derivY[i];
-			}
-		}
-
-		return Math.atan2(Dy,Dx);
-	}
-
-	@Override
-	public Class<T> getImageType() {
-		return (Class<T>)ii.getClass();
 	}
 }
