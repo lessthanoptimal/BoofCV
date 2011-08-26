@@ -37,6 +37,26 @@ public class TestSurfDescribeOps {
 		fail("compare to naive");
 	}
 
+	@Test
+	public void gradient_noborder_F32() {
+		fail("compare to naive");
+	}
+
+	@Test
+	public void gradient_noborder_I32() {
+		fail("compare to naive");
+	}
+
+	@Test
+	public void isInside_aligned() {
+		fail("implement");
+	}
+
+	@Test
+	public void isInside_rotated() {
+		fail("implement");
+	}
+
 
 	/**
 	 * Compare against some hand computed examples

@@ -17,10 +17,15 @@
 package gecv.alg.feature.describe;
 
 import gecv.alg.feature.describe.impl.ImplSurfDescribeOps;
-import gecv.alg.feature.describe.impl.NaiveSurfDescribeOps;
+import gecv.alg.transform.ii.DerivativeIntegralImage;
+import gecv.alg.transform.ii.IntegralKernel;
+import gecv.alg.transform.ii.SparseIntegralGradientKernel;
+import gecv.factory.transform.ii.FactorySparseIntegralFilters;
 import gecv.struct.convolve.Kernel2D_F64;
+import gecv.struct.deriv.SparseImageGradient;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt32;
 
 
 /**
@@ -43,23 +48,157 @@ public class SurfDescribeOps {
 	 * </ul>
 	 * </p>
 	 *
-	 * @param ii Integral image.
 	 * @param c_x Center pixel.
 	 * @param c_y Center pixel.
-	 * @param radius Radius of region being considered in samples.
-	 * @param s Scale of feature.
+	 * @param radiusRegions Radius of region being considered in samples points (not pixels).
+	 * @param kernelSize Size of the kernel's width (in pixels) at scale of 1.
+	 * @param scale Scale of feature.  Changes sample points.
 	 * @param derivX Derivative x wavelet output.
 	 * @param derivY Derivative Y wavelet output.
 	 */
 	public static <T extends ImageBase>
-	void gradient( T ii , int c_x , int c_y ,
-				   int radius , double s ,
+	void gradient( T ii ,int c_x , int c_y ,
+				   int radiusRegions, int kernelSize , double scale,
 				   double []derivX , double derivY[] )
 	{
-//		NaiveSurfDescribeOps.gradient(ii,c_x,c_y,radius,s,false,derivX,derivY);
-		int r = (int)Math.ceil(radius);
-		int step = (int)Math.ceil(1);
-		ImplSurfDescribeOps.gradientInner((ImageFloat32)ii,r,step,c_x-r,c_y-r,c_x+r,c_y+r,0,0,derivX,derivY);
+		ImplSurfDescribeOps.naiveGradient(ii,c_x,c_y, radiusRegions, scale,kernelSize,derivX,derivY);
+	}
+
+	public static
+	void gradient_noborder( ImageFloat32 ii , int c_x , int c_y ,
+							int radius , int kernelSize , double scale,
+							float[] derivX , float[] derivY )
+	{
+		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, scale,kernelSize,derivX,derivY);
+	}
+
+	public static
+	void gradient_noborder( ImageSInt32 ii , int c_x , int c_y ,
+							int radius , int kernelSize , double scale,
+							int[] derivX , int[] derivY )
+	{
+		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, scale,kernelSize,derivX,derivY);
+	}
+
+	/**
+	 * Create class for computing the image gradient from an integral image in a sparse fashion.
+	 *
+	 * @param assumeInsideImage Can it assume that the feature is contained entirely inside the image.
+	 * @param useHaar Should it use a haar wavelet or an derivative kernel.
+	 * @param kernelSize Size of the kernel's width in pixels (before scale adjustment).
+	 * @param scale Scale of the kernel.
+	 * @param imageType Type of image being processed.
+	 * @return Sparse gradient algorithm
+	 */
+	public static <T extends ImageBase>
+	SparseImageGradient<T,?> createGradient( boolean assumeInsideImage ,
+											 boolean useHaar , int kernelSize , double scale,
+											 Class<T> imageType )
+	{
+		// adjust the size for the scale factor
+		kernelSize = (int)Math.ceil(kernelSize*scale);
+
+		if( assumeInsideImage && !useHaar ) {
+			int regionRadius = kernelSize/2;
+			return FactorySparseIntegralFilters.gradient(regionRadius,imageType);
+		} else {
+			IntegralKernel kernelX,kernelY;
+			if( useHaar ) {
+				kernelX = DerivativeIntegralImage.kernelHaarX(kernelSize);
+				kernelY = DerivativeIntegralImage.kernelHaarY(kernelSize);
+			} else {
+				kernelX = DerivativeIntegralImage.kernelDerivX(kernelSize);
+				kernelY = DerivativeIntegralImage.kernelDerivY(kernelSize);
+			}
+			return new SparseIntegralGradientKernel<T>(kernelX,kernelY);
+		}
+	}
+
+	/**
+	 * Checks to see if the region is contained inside the image.  This includes convolution
+	 * kernel.
+	 *
+	 * @param c_x Center of the interest point.
+	 * @param c_y Center of the interest point.
+	 * @param radiusRegions Radius in pixels of the whole region at a scale of 1
+	 * @param kernelSize Size of the kernel's width in pixels at a scale of 1
+	 * @param scale Scale factor for the region.
+	 */
+	public static <T extends ImageBase>
+	boolean isInside( T ii , int c_x , int c_y , int radiusRegions , int kernelSize , double scale) {
+
+		// size of the convolution kernel
+		kernelSize = (int)Math.ceil(kernelSize*scale);
+		int kernelRadius = kernelSize/2;
+
+		// find the radius of the whole area being sampled
+		int radius = (int)Math.floor(radiusRegions*scale);
+
+		// integral image convolutions sample the pixel before the region starts
+		// which is why the extra minus one is there
+		int kernelPaddingMinus = -radius-kernelRadius-2;
+		int kernelPaddingPlus = radius+kernelRadius;
+
+		// compute the new bounds and see if its inside
+		int x0 = c_x+kernelPaddingMinus;
+		if( x0 < 0 ) return false;
+		int x1 = c_x+kernelPaddingPlus;
+		if( x1 >= ii.width ) return false;
+		int y0 = c_y+kernelPaddingMinus;
+		if( y0 < 0 ) return false;
+		int y1 = c_y+kernelPaddingPlus;
+		if( y1 >= ii.height) return false;
+
+		return true;
+	}
+
+	/**
+	 * Checks to see if the region is contained inside the image.  This includes convolution
+	 * kernel.  Take in account the orientation of the region.
+	 *
+	 * @param c_x Center of the interest point.
+	 * @param c_y Center of the interest point.
+	 * @param radiusRegions Radius in pixels of the whole region at a scale of 1
+	 * @param kernelSize Size of the kernel in pixels at a scale of 1
+	 * @param scale Scale factor for the region.
+	 * @param theta Orientation of the region
+	 */
+	public static <T extends ImageBase>
+	boolean isInside( T ii , int c_x , int c_y , int radiusRegions , int kernelSize ,
+					  double scale, double theta ) {
+		kernelSize = (int)Math.ceil(kernelSize*scale);
+		int kernelRadius = kernelSize/2;
+
+		// find the radius of the whole area being sampled
+		int radius = (int)Math.floor(radiusRegions*scale);
+
+		// integral image convolutions sample the pixel before the region starts
+		// which is why the extra minus one is there
+		int kernelPaddingMinus = radius+kernelRadius+2;
+		int kernelPaddingPlus = radius+kernelRadius;
+
+		// take in account the rotation
+		double c = Math.cos(theta);
+		double s = Math.sin(theta);
+		double xx = Math.abs(c*kernelPaddingMinus - s*kernelPaddingMinus);
+		double yy = Math.abs(s*kernelPaddingMinus + c*kernelPaddingMinus);
+
+		double delta = xx>yy? xx - kernelPaddingMinus : yy - kernelPaddingMinus;
+
+		kernelPaddingMinus += (int)Math.ceil(delta);
+		kernelPaddingPlus += (int)Math.ceil(delta);
+
+		// compute the new bounds and see if its inside
+		int x0 = c_x-kernelPaddingMinus;
+		if( x0 < 0 ) return false;
+		int x1 = c_x+kernelPaddingPlus;
+		if( x1 >= ii.width ) return false;
+		int y0 = c_y-kernelPaddingMinus;
+		if( y0 < 0 ) return false;
+		int y1 = c_y+kernelPaddingPlus;
+		if( y1 >= ii.height) return false;
+
+		return true;
 	}
 
 
@@ -86,15 +225,20 @@ public class SurfDescribeOps {
 	 * @param regionSize Number of wavelets wide.
 	 * @param numSubRegions How many sub-regions is the large region divided along its width.
 	 * @param scale The scale of the wavelets.
+	 * @param inBounds Can it assume that the entire feature + kernel is inside the image bounds?
 	 * @param features Where the features are written to.  Must be 4*numSubRegions^2 large.
 	 */
 	public static <T extends ImageBase>
 	void features( T ii , int c_x , int c_y ,
 				   double theta , Kernel2D_F64 weight ,
 				   int regionSize , int numSubRegions , double scale ,
+				   boolean inBounds ,
 				   double []features )
 	{
-		NaiveSurfDescribeOps.features(ii,c_x,c_y,theta,weight,regionSize,numSubRegions,scale,false,features);
+		SparseImageGradient<T,?> gradient = createGradient(inBounds,false,2,scale,(Class<T>)ii.getClass());
+		gradient.setImage(ii);
+
+		ImplSurfDescribeOps.features(c_x,c_y,theta,weight,regionSize,numSubRegions,scale,gradient,features);
 	}
 
 	// todo move to a generalized class?

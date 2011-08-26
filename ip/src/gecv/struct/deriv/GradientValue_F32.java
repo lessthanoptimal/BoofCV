@@ -14,11 +14,24 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.describe;
+package gecv.struct.deriv;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestSTuff {
+public class GradientValue_F32 implements GradientValue{
+
+	public float x;
+	public float y;
+
+	@Override
+	public double getX() {
+		return x;
+	}
+
+	@Override
+	public double getY() {
+		return y;
+	}
 }

@@ -78,21 +78,12 @@ public class DescribePointSURF<T extends ImageBase> {
 	 * goes outside of the image border (including convolution kernels) then null is returned.
 	 * </p>
 	 *
-	 * <p>
-	 * A feature point partially outside the image will have a different orientation
-	 * (completely changing the description) and some of its characteristics will be garbage.
-	 * Computations can also be greatly speed up if it is known that all the pixels are inside
-	 * the image.
-	 * </p>
-	 *
 	 * @param x Location of interest point.
 	 * @param y Location of interest point.
 	 * @param scale Scale of the interest point. Null is returned if the feature goes outside the image border.
-	 * @return The SURF interest point.
+	 * @return The SURF interest point or null if the feature region goes outside the image.
 	 */
 	public SurfFeature describe( int x , int y , double scale ) {
-		// todo check to see if it touches the border (including convolution kernel) at all
-		// If so
 		SurfFeature ret = new SurfFeature(64);
 
 		double angle = 0;
@@ -101,11 +92,20 @@ public class DescribePointSURF<T extends ImageBase> {
 			// compute the feature's orientation
 			orientation.setScale(scale);
 			angle = orientation.compute(x,y);
-		}
 
-		// todo see if rotated kernel touches the image border
+		    // see if it touches the image border
+			if( !SurfDescribeOps.isInside(ii,x,y,20,2,scale,angle))
+				return null;
+		} else {
+		    // see if it touches the image border
+			if( !SurfDescribeOps.isInside(ii,x,y,20,2,scale))
+				return null;
+		}
+		// By assuming that the entire feature is inside the image faster algorithms can be used
+		// the results are also of dubious value when interacting with the image border.
+
 		// extract descriptor
-		SurfDescribeOps.features(ii,x,y,angle,weight,20,4,scale,ret.features.value);
+		SurfDescribeOps.features(ii,x,y,angle,weight,20,4,scale,true,ret.features.value);
 		SurfDescribeOps.normalizeFeatures(ret.features.value);
 
 		// Laplacian's sign

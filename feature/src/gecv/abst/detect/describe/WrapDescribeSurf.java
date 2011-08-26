@@ -47,6 +47,8 @@ public class WrapDescribeSurf<T extends ImageBase> implements ExtractFeatureDesc
 	public TupleFeature_F64 process(int x, int y, double scale) {
 		surf.setImage(ii);
 		SurfFeature f = surf.describe(x,y,scale);
+		if( f == null)
+			return null;
 		return f.features;
 	}
 }

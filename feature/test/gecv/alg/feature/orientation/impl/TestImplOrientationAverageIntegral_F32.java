@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.orientation;
+package gecv.alg.feature.orientation.impl;
 
+import gecv.alg.feature.orientation.GenericOrientationIntegralTests;
+import gecv.alg.feature.orientation.OrientationAverageIntegral;
 import gecv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -23,7 +25,7 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestOrientationAverageHaarIntegral {
+public class TestImplOrientationAverageIntegral_F32 {
 	double angleTol = 0.01;
 	int r = 3;
 
@@ -31,7 +33,7 @@ public class TestOrientationAverageHaarIntegral {
 	public void standardUnweighted() {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationAverageHaarIntegral<ImageFloat32> alg = new OrientationAverageHaarIntegral<ImageFloat32>(r,false);
+		OrientationAverageIntegral<ImageFloat32> alg = new ImplOrientationAverageIntegral_F32(r,false);
 
 		tests.setup(angleTol, r*2+1 , alg,ImageFloat32.class);
 		tests.performAll();
@@ -41,7 +43,7 @@ public class TestOrientationAverageHaarIntegral {
 	public void standardWeighted() {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationAverageHaarIntegral<ImageFloat32> alg = new OrientationAverageHaarIntegral<ImageFloat32>(r,true);
+		OrientationAverageIntegral<ImageFloat32> alg = new ImplOrientationAverageIntegral_F32(r,true);
 
 		tests.setup(angleTol, r*2+1 ,alg,ImageFloat32.class);
 		tests.performAll();

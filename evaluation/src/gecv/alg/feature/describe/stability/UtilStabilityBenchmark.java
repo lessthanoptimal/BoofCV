@@ -16,15 +16,8 @@
 
 package gecv.alg.feature.describe.stability;
 
-import gecv.abst.detect.describe.WrapDescribeSteerable;
-import gecv.abst.detect.describe.WrapDescribeSurf;
-import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.feature.StabilityAlgorithm;
-import gecv.alg.feature.describe.DescribePointSteerable2D;
-import gecv.alg.feature.orientation.OrientationGradient;
-import gecv.factory.feature.describe.FactoryDescribePointAlgs;
-import gecv.factory.feature.orientation.FactoryOrientationAlgs;
-import gecv.factory.filter.derivative.FactoryDerivative;
+import gecv.factory.feature.describe.FactoryExtractFeatureDescription;
 import gecv.struct.image.ImageBase;
 
 import java.util.ArrayList;
@@ -39,14 +32,9 @@ public class UtilStabilityBenchmark {
 	List<StabilityAlgorithm> createAlgorithms(int radius, Class<T> imageType , Class<D> derivType ) {
 		List<StabilityAlgorithm> ret = new ArrayList<StabilityAlgorithm>();
 
-		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-		OrientationGradient<D> orientation = FactoryOrientationAlgs.average(radius,false,derivType);
-		DescribePointSteerable2D<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian(false,-1,12,imageType);
-		DescribePointSteerable2D<T, ?> steerN = FactoryDescribePointAlgs.steerableGaussian(true,-1,12, imageType);
-
-		ret.add( new StabilityAlgorithm("SURF",new WrapDescribeSurf<T>( FactoryDescribePointAlgs.<T>surf())));
-		ret.add( new StabilityAlgorithm("Steer", new WrapDescribeSteerable<T,D>(steer,orientation,gradient,imageType,derivType)));
-		ret.add( new StabilityAlgorithm("Steer Norm", new WrapDescribeSteerable<T,D>(steerN,orientation,gradient,imageType,derivType)));
+		ret.add( new StabilityAlgorithm("SURF", FactoryExtractFeatureDescription.surf(true,imageType)));
+		ret.add( new StabilityAlgorithm("Steer", FactoryExtractFeatureDescription.steerableGaussian(12,false,imageType,derivType)));
+		ret.add( new StabilityAlgorithm("Steer Norm", FactoryExtractFeatureDescription.steerableGaussian(12,true,imageType,derivType)));
 
 		return ret;
 	}

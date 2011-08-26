@@ -53,6 +53,25 @@ public class GecvMiscOps {
 		return ret;
 	}
 
+	public static float[] convertTo_F32( double a[] , float[] ret) {
+		if( ret == null )
+			ret = new float[ a.length ];
+		for( int i = 0; i < a.length; i++ ) {
+			ret[i] = (float)a[i];
+		}
+		return ret;
+	}
+
+	public static int[] convertTo_I32( double a[] , int[] ret) {
+		if( ret == null )
+			ret = new int[ a.length ];
+		for( int i = 0; i < a.length; i++ ) {
+			ret[i] = (int)a[i];
+		}
+		return ret;
+	}
+
+
 	/**
 	 * Bounds the provided rectangle to be inside the image.  
 	 *
