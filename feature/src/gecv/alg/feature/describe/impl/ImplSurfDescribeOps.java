@@ -35,9 +35,9 @@ public class ImplSurfDescribeOps {
 	 * Computes the gradient for a using the derivX kernel found in {@link gecv.alg.transform.ii.DerivativeIntegralImage)}.
 	 * Assumes that the entire region, including the surrounding pixels, are inside the image.
 	 */
-	public static void gradientInner( ImageFloat32 ii , int c_x , int c_y ,
-									  int radius , double scale , int kernelSize ,
-									  float []derivX , float derivY[] )
+	public static void gradientInner(ImageFloat32 ii, int c_x, int c_y,
+									 int radius, int kernelSize, double scale,
+									 float[] derivX, float derivY[])
 	{
 		int r = (int)Math.ceil(kernelSize*scale)/2;
 		int w = r*2+1;
@@ -85,9 +85,9 @@ public class ImplSurfDescribeOps {
 	 * Computes the gradient for a using the derivX kernel found in {@link gecv.alg.transform.ii.DerivativeIntegralImage)}.
 	 * Assumes that the entire region, including the surrounding pixels, are inside the image.
 	 */
-	public static void gradientInner( ImageSInt32 ii , int c_x , int c_y ,
-									  int radius , double scale , int kernelSize ,
-									  int []derivX , int derivY[] )
+	public static void gradientInner(ImageSInt32 ii, int c_x, int c_y,
+									 int radius, int kernelSize, double scale,
+									 int[] derivX, int derivY[])
 	{
 		int r = (int)Math.ceil(kernelSize*scale)/2;
 		int w = r*2+1;
@@ -135,10 +135,9 @@ public class ImplSurfDescribeOps {
 	 * Simple algorithm for computing the gradient of a region.  Can handle image borders
 	 */
 	public static <T extends ImageBase>
-	void naiveGradient( T ii , int c_x , int c_y ,
-						int radiusRegions, double scale,
-						int kernelSize ,
-						double []derivX , double derivY[] )
+	void naiveGradient(T ii, int c_x, int c_y,
+					   int radiusRegions, int kernelSize, double scale,
+					   double[] derivX, double derivY[])
 	{
 		SparseImageGradient<T,?> g =  SurfDescribeOps.createGradient(false,false,kernelSize,scale,(Class<T>)ii.getClass());
 		g.setImage(ii);
@@ -162,7 +161,7 @@ public class ImplSurfDescribeOps {
 	public static <T extends ImageBase>
 	void features( int c_x , int c_y ,
 				   double theta , Kernel2D_F64 weight ,
-				   int regionSize , int numSubRegions , double scale ,
+				   int regionSize , int subSize , double scale ,
 				   SparseImageGradient<T,?> gradient,
 				   double []features )
 	{
@@ -171,8 +170,8 @@ public class ImplSurfDescribeOps {
 
 		GecvMiscOps.zero(features,64);
 
-		int subSize = regionSize/numSubRegions;
 		int regionR = regionSize/2;
+		int regionEnd = regionSize-regionR;
 
 		int regionIndex = 0;
 		int weightIndex = 0;
@@ -181,8 +180,8 @@ public class ImplSurfDescribeOps {
 		double s = Math.sin(theta);
 
 		// step through the sub-regions
-		for( int rY = -regionR; rY < regionR; rY += subSize ) {
-			for( int rX = -regionR; rX <regionR; rX += subSize ) {
+		for( int rY = -regionR; rY < regionEnd; rY += subSize ) {
+			for( int rX = -regionR; rX < regionEnd; rX += subSize ) {
 				// compute and sum up the response  inside the sub-region
 				for( int i = 0; i < subSize; i++ ) {
 					int regionY = (int)((rY + i)*scale);

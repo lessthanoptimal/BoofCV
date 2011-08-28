@@ -61,6 +61,7 @@ public class GenericOrientationGradientTests<D extends ImageBase> {
 	public void performAll() {
 		performEasyTests();
 		setScale();
+		checkSubImages();
 	}
 
 	/**
@@ -96,6 +97,28 @@ public class GenericOrientationGradientTests<D extends ImageBase> {
 	}
 
 	/**
+	 * See if it can handle sub-images correctly
+	 */
+	public void checkSubImages() {
+		double angle = 0.5;
+		double c = Math.cos(angle);
+		double s = Math.sin(angle);
+
+		GeneralizedImageOps.fill(derivX,0);
+		GeneralizedImageOps.fill(derivY,0);
+		GeneralizedImageOps.fillRectangle(derivX,c*100,5,0,regionSize+5,regionSize);
+		GeneralizedImageOps.fillRectangle(derivY,s*100,5,0,regionSize+5,regionSize);
+
+		D subX = (D)derivX.subimage(5,0,regionSize+5,regionSize);
+		D subY = (D)derivY.subimage(5,0,regionSize+5,regionSize);
+
+		alg.setImage(subX,subY);
+
+		double found = UtilAngle.bound(alg.compute(subX.width/2,subY.height/2));
+		assertTrue( angle+" "+found,UtilAngle.dist(angle,found) < angleTolerance );
+	}
+
+	/**
 	 * Estimate the direction at a couple of different scales and see if it produces the expected results.
 	 */
 	public void setScale() {
@@ -124,4 +147,5 @@ public class GenericOrientationGradientTests<D extends ImageBase> {
 		found = UtilAngle.bound(alg.compute(x,y));
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 	}
+
 }

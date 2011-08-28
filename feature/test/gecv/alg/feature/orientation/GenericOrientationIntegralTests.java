@@ -60,6 +60,7 @@ public class GenericOrientationIntegralTests<T extends ImageBase> {
 	public void performAll() {
 		performEasyTests();
 		setScale();
+		checkSubImages();
 	}
 
 	/**
@@ -111,6 +112,29 @@ public class GenericOrientationIntegralTests<T extends ImageBase> {
 		alg.setScale(0.5);
 		found = UtilAngle.bound(alg.compute(x,y));
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
+	}
+
+	/**
+	 * See if it can handle sub-images correctly
+	 */
+	public void checkSubImages() {
+		double angle = 0.5;
+		createOrientedImage(angle);
+		// set the border of the image to zeros to screw up orientation estimation
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				if( j >= regionSize || i >= regionSize )
+					GeneralizedImageOps.set(ii,j,i,0);
+			}
+		}
+
+
+		T sub = (T)ii.subimage(0,0,regionSize,regionSize);
+
+		alg.setImage(sub);
+
+		double found = UtilAngle.bound(alg.compute(sub.width/2,sub.height/2));
+		assertTrue( angle+" "+found,UtilAngle.dist(angle,found) < angleTolerance );
 	}
 
 	/**

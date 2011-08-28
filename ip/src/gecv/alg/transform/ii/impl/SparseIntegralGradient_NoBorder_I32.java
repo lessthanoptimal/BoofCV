@@ -26,13 +26,13 @@ import gecv.struct.image.ImageSInt32;
  *
  * @author Peter Abeles
  */
-public class SparseIntegralGradient_NoBorder_S32 
+public class SparseIntegralGradient_NoBorder_I32
 		extends SparseIntegralGradient_NoBorder<ImageSInt32, GradientValue_I32>
 {
 
 	private GradientValue_I32 ret = new GradientValue_I32();
 
-	public SparseIntegralGradient_NoBorder_S32(int radius) {
+	public SparseIntegralGradient_NoBorder_I32(int radius) {
 		super(radius);
 	}
 

@@ -17,8 +17,9 @@
 package gecv.abst.detect.describe;
 
 import gecv.alg.feature.describe.DescribePointSURF;
-import gecv.alg.feature.describe.SurfFeature;
+import gecv.alg.feature.orientation.OrientationIntegral;
 import gecv.alg.transform.ii.GIntegralImageOps;
+import gecv.struct.feature.SurfFeature;
 import gecv.struct.feature.TupleFeature_F64;
 import gecv.struct.image.ImageBase;
 
@@ -29,10 +30,14 @@ import gecv.struct.image.ImageBase;
 public class WrapDescribeSurf<T extends ImageBase> implements ExtractFeatureDescription<T> {
 
 	DescribePointSURF<T> surf;
+	OrientationIntegral<T> orientation;
 	T ii;
 
-	public WrapDescribeSurf(DescribePointSURF<T> surf) {
+	public WrapDescribeSurf(DescribePointSURF<T> surf ,
+							OrientationIntegral<T> orientation )
+	{
 		this.surf = surf;
+		this.orientation = orientation;
 	}
 
 	@Override
@@ -41,12 +46,19 @@ public class WrapDescribeSurf<T extends ImageBase> implements ExtractFeatureDesc
 			ii.reshape(image.width,image.height);
 		}
 		ii = GIntegralImageOps.transform(image,ii);
+		orientation.setImage(ii);
+		surf.setImage(ii);
 	}
 
 	@Override
 	public TupleFeature_F64 process(int x, int y, double scale) {
-		surf.setImage(ii);
-		SurfFeature f = surf.describe(x,y,scale);
+
+		double angle = 0;
+
+		if( orientation != null )
+			angle = orientation.compute(x,y);
+
+		SurfFeature f = surf.describe(x,y,scale,angle,null);
 		if( f == null)
 			return null;
 		return f.features;

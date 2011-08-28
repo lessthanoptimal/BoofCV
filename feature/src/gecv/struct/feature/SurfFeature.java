@@ -14,19 +14,23 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.describe;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
-
+package gecv.struct.feature;
 
 /**
+ * Description of a SURF interest point.  It is composed of a set of image features computed from sub-regions
+ * around the interest point as well as the sign of the Laplacian at the interest point.
+ *
  * @author Peter Abeles
  */
-public class TestDescribeSURF {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class SurfFeature {
+	// is the feature light or dark. Can be used to improve lookup performance.
+	public boolean laplacianPositive;
+	// feature description
+	public TupleFeature_F64 features;
+
+	public SurfFeature( int numFeatures ) {
+		features = new TupleFeature_F64(numFeatures);
 	}
+
+
 }

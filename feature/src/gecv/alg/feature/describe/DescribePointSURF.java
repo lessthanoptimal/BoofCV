@@ -16,12 +16,12 @@
 
 package gecv.alg.feature.describe;
 
-import gecv.alg.feature.orientation.OrientationIntegral;
 import gecv.alg.transform.ii.DerivativeIntegralImage;
 import gecv.alg.transform.ii.GIntegralImageOps;
 import gecv.alg.transform.ii.IntegralKernel;
 import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.struct.convolve.Kernel2D_F64;
+import gecv.struct.feature.SurfFeature;
 import gecv.struct.image.ImageBase;
 
 
@@ -53,23 +53,11 @@ public class DescribePointSURF<T extends ImageBase> {
 	// integral image transform of input image
 	private T ii;
 
-	// estimates feature orientation
-	private OrientationIntegral<T> orientation;
-
 	// used to weigh feature computation
 	private Kernel2D_F64 weight = FactoryKernelGaussian.gaussian(2,true,64,-1,10);
 
-	/**
-	 *
-	 * @param orientation Algorithm for estimating orientation.  If null then orientation will not be estimated.
-	 */
-	public DescribePointSURF(OrientationIntegral<T> orientation) {
-		this.orientation = orientation;
-	}
-
 	public void setImage( T integralImage ) {
 		ii = integralImage;
-		orientation.setImage(ii);
 	}
 
 	/**
@@ -81,42 +69,54 @@ public class DescribePointSURF<T extends ImageBase> {
 	 * @param x Location of interest point.
 	 * @param y Location of interest point.
 	 * @param scale Scale of the interest point. Null is returned if the feature goes outside the image border.
+	 * @param angle The angle the feature is pointing at in radians.
+	 * @param ret storage for the feature. Must have 64 values. If null a new feature will be declared internally.
 	 * @return The SURF interest point or null if the feature region goes outside the image.
 	 */
-	public SurfFeature describe( int x , int y , double scale ) {
-		SurfFeature ret = new SurfFeature(64);
+	public SurfFeature describe( int x , int y ,
+								 double scale , double angle ,
+								 SurfFeature ret ) {
 
-		double angle = 0;
-
-		if( orientation != null ) {
-			// compute the feature's orientation
-			orientation.setScale(scale);
-			angle = orientation.compute(x,y);
-
-		    // see if it touches the image border
-			if( !SurfDescribeOps.isInside(ii,x,y,20,2,scale,angle))
-				return null;
-		} else {
-		    // see if it touches the image border
-			if( !SurfDescribeOps.isInside(ii,x,y,20,2,scale))
-				return null;
-		}
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
+		if( !SurfDescribeOps.isInside(ii,x,y,10,4,scale,angle)) {
+			return null;
+		}
+
+		// declare the feature if needed
+		if( ret == null )
+			ret = new SurfFeature(64);
+		else if( ret.features.value.length != 64 )
+			throw new IllegalArgumentException("Provided feature must have 64 values");
+
 
 		// extract descriptor
-		SurfDescribeOps.features(ii,x,y,angle,weight,20,4,scale,true,ret.features.value);
+		SurfDescribeOps.features(ii,x,y,angle,weight,20,5,scale,true,ret.features.value);
+		// normalize feature vector to have an Euclidean length of 1
+		// adds light invariance
 		SurfDescribeOps.normalizeFeatures(ret.features.value);
 
 		// Laplacian's sign
+		ret.laplacianPositive = computeLaplaceSign(x, y, scale);
+
+		return ret;
+	}
+
+	/**
+	 * Compute the sign of the Laplacian using a sparse convolution.
+	 *
+	 * @param x center
+	 * @param y center
+	 * @param scale scale of the feature
+	 * @return true if positive
+	 */
+	private boolean computeLaplaceSign(int x, int y, double scale) {
 		int s = (int)Math.ceil(scale);
 		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(9*s);
 		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(9*s);
 		double lap = GIntegralImageOps.convolveSparse(ii,kerXX,x,y);
 		lap += GIntegralImageOps.convolveSparse(ii,kerYY,x,y);
 
-		ret.laplacianPositive = lap > 0;
-
-		return ret;
+		return lap > 0;
 	}
 }

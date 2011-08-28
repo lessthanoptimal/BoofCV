@@ -17,7 +17,7 @@
 package gecv.factory.transform.ii;
 
 import gecv.alg.transform.ii.impl.SparseIntegralGradient_NoBorder_F32;
-import gecv.alg.transform.ii.impl.SparseIntegralGradient_NoBorder_S32;
+import gecv.alg.transform.ii.impl.SparseIntegralGradient_NoBorder_I32;
 import gecv.struct.deriv.SparseImageGradient;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -35,7 +35,7 @@ public class FactorySparseIntegralFilters {
 		if( imageType == ImageFloat32.class )
 			return (SparseImageGradient<T,?>)new SparseIntegralGradient_NoBorder_F32(radius);
 		else if( imageType == ImageFloat32.class )
-			return (SparseImageGradient<T,?>)new SparseIntegralGradient_NoBorder_S32(radius);
+			return (SparseImageGradient<T,?>)new SparseIntegralGradient_NoBorder_I32(radius);
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}

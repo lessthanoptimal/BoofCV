@@ -53,31 +53,39 @@ public class SurfDescribeOps {
 	 * @param radiusRegions Radius of region being considered in samples points (not pixels).
 	 * @param kernelSize Size of the kernel's width (in pixels) at scale of 1.
 	 * @param scale Scale of feature.  Changes sample points.
-	 * @param derivX Derivative x wavelet output.
-	 * @param derivY Derivative Y wavelet output.
+	 * @param derivX Derivative x wavelet output. length = radiusRegions*radiusRegions
+	 * @param derivY Derivative y wavelet output. length = radiusRegions*radiusRegions
 	 */
 	public static <T extends ImageBase>
 	void gradient( T ii ,int c_x , int c_y ,
 				   int radiusRegions, int kernelSize , double scale,
 				   double []derivX , double derivY[] )
 	{
-		ImplSurfDescribeOps.naiveGradient(ii,c_x,c_y, radiusRegions, scale,kernelSize,derivX,derivY);
+		ImplSurfDescribeOps.naiveGradient(ii,c_x,c_y, radiusRegions, kernelSize, scale, derivX,derivY);
 	}
 
+	/**
+	 * Faster version of {@lin #gradient} which assumes the region is entirely contained inside the
+	 * of the image.  This includes the convolution kernel's radius.
+	 */
 	public static
 	void gradient_noborder( ImageFloat32 ii , int c_x , int c_y ,
 							int radius , int kernelSize , double scale,
 							float[] derivX , float[] derivY )
 	{
-		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, scale,kernelSize,derivX,derivY);
+		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, kernelSize, scale, derivX,derivY);
 	}
 
+	/**
+	 * Faster version of {@lin #gradient} which assumes the region is entirely contained inside the
+	 * of the image.  This includes the convolution kernel's radius.
+	 */
 	public static
 	void gradient_noborder( ImageSInt32 ii , int c_x , int c_y ,
 							int radius , int kernelSize , double scale,
 							int[] derivX , int[] derivY )
 	{
-		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, scale,kernelSize,derivX,derivY);
+		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, kernelSize, scale, derivX,derivY);
 	}
 
 	/**
@@ -132,11 +140,11 @@ public class SurfDescribeOps {
 		int kernelRadius = kernelSize/2;
 
 		// find the radius of the whole area being sampled
-		int radius = (int)Math.floor(radiusRegions*scale);
+		int radius = (int)Math.ceil(radiusRegions*scale);
 
 		// integral image convolutions sample the pixel before the region starts
 		// which is why the extra minus one is there
-		int kernelPaddingMinus = -radius-kernelRadius-2;
+		int kernelPaddingMinus = -radius-kernelRadius-1;
 		int kernelPaddingPlus = radius+kernelRadius;
 
 		// compute the new bounds and see if its inside
@@ -165,16 +173,17 @@ public class SurfDescribeOps {
 	 */
 	public static <T extends ImageBase>
 	boolean isInside( T ii , int c_x , int c_y , int radiusRegions , int kernelSize ,
-					  double scale, double theta ) {
+					  double scale, double theta )
+	{
 		kernelSize = (int)Math.ceil(kernelSize*scale);
 		int kernelRadius = kernelSize/2;
 
 		// find the radius of the whole area being sampled
-		int radius = (int)Math.floor(radiusRegions*scale);
+		int radius = (int)Math.ceil(radiusRegions*scale);
 
 		// integral image convolutions sample the pixel before the region starts
 		// which is why the extra minus one is there
-		int kernelPaddingMinus = radius+kernelRadius+2;
+		int kernelPaddingMinus = radius+kernelRadius+1;
 		int kernelPaddingPlus = radius+kernelRadius;
 
 		// take in account the rotation
@@ -222,8 +231,8 @@ public class SurfDescribeOps {
 	 * @param c_y Center of the feature y-coordinate.
 	 * @param theta Orientation of the features.
 	 * @param weight Gaussian normalization.
-	 * @param regionSize Number of wavelets wide.
-	 * @param numSubRegions How many sub-regions is the large region divided along its width.
+	 * @param regionSize Size of the region in pixels at a scale of 1..
+	 * @param subSize Size of a sub-region that features are computed inside of in pixels at scale of 1.
 	 * @param scale The scale of the wavelets.
 	 * @param inBounds Can it assume that the entire feature + kernel is inside the image bounds?
 	 * @param features Where the features are written to.  Must be 4*numSubRegions^2 large.
@@ -231,14 +240,14 @@ public class SurfDescribeOps {
 	public static <T extends ImageBase>
 	void features( T ii , int c_x , int c_y ,
 				   double theta , Kernel2D_F64 weight ,
-				   int regionSize , int numSubRegions , double scale ,
+				   int regionSize , int subSize , double scale ,
 				   boolean inBounds ,
 				   double []features )
 	{
 		SparseImageGradient<T,?> gradient = createGradient(inBounds,false,2,scale,(Class<T>)ii.getClass());
 		gradient.setImage(ii);
 
-		ImplSurfDescribeOps.features(c_x,c_y,theta,weight,regionSize,numSubRegions,scale,gradient,features);
+		ImplSurfDescribeOps.features(c_x,c_y,theta,weight,regionSize,subSize,scale,gradient,features);
 	}
 
 	// todo move to a generalized class?
