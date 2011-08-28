@@ -69,13 +69,19 @@ public class GecvTesting {
 	}
 
 	/**
+	 * <p>
 	 * Returns an image which is a sub-image but contains the same values of the input image.  Use for
-	 * testing compliance with sub-images.
+	 * testing compliance with sub-images.  The subimage is created by creating a larger image,
+	 * copying over the input image into the inner portion, then creating a subimage of the copied part.
+	 * </p>
 	 */
 	@SuppressWarnings({"unchecked"})
 	public static <T extends ImageBase> T createSubImageOf(T input) {
+		// create the larger image
 		T ret = (T) input._createNew(input.width + 10, input.height + 12);
+		// create a sub-image of the inner portion
 		ret = (T) ret.subimage(5, 7, input.width + 5, input.height + 7);
+		// copy input image into the subimage
 		ret.setTo(input);
 
 		return ret;
@@ -321,6 +327,38 @@ public class GecvTesting {
 		}
 
 		return total;
+	}
+
+	public static void assertEquals( double a[] , double b[], double tol ) {
+		for( int i = 0; i < a.length; i++ ) {
+			double diff = Math.abs(a[i] - b[i]);
+			if( diff > tol )
+				throw new RuntimeException("Element "+i+" not equals. "+a[i]+" "+b[i]);
+		}
+	}
+
+	public static void assertEquals( double a[] , float b[], double tol ) {
+		for( int i = 0; i < a.length; i++ ) {
+			double diff = Math.abs(a[i] - b[i]);
+			if( diff > tol )
+				throw new RuntimeException("Element "+i+" not equals. "+a[i]+" "+b[i]);
+		}
+	}
+
+	public static void assertEquals( double a[] , int b[] ) {
+		for( int i = 0; i < a.length; i++ ) {
+			double diff = Math.abs((int)a[i] - b[i]);
+			if( diff != 0 )
+				throw new RuntimeException("Element "+i+" not equals. "+a[i]+" "+b[i]);
+		}
+	}
+
+	public static void assertEquals( float a[] , float b[], float tol ) {
+		for( int i = 0; i < a.length; i++ ) {
+			double diff = Math.abs(a[i] - b[i]);
+			if( diff > tol )
+				throw new RuntimeException("Element "+i+" not equals. "+a[i]+" "+b[i]);
+		}
 	}
 
 	/**

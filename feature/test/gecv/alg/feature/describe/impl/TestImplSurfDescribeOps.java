@@ -58,16 +58,16 @@ public class TestImplSurfDescribeOps {
 		float foundX[] = new float[w*w];
 		float foundY[] = new float[w*w];
 
-		ImplSurfDescribeOps.naiveGradient(ii,10,10,r,1,4,expectedX,expectedY);
-		ImplSurfDescribeOps.gradientInner(ii,10,10,r,1,4,foundX,foundY);
+		ImplSurfDescribeOps.naiveGradient(ii,10,10,r, 4, 1, expectedX,expectedY);
+		ImplSurfDescribeOps.gradientInner(ii,10,10,r, 4, 1, foundX,foundY);
 
 		for( int i = 0; i < foundX.length; i++ ) {
 			assertEquals("at "+i,expectedX[i],foundX[i],1e-4);
 			assertEquals("at "+i,expectedY[i],foundY[i],1e-4);
 		}
 
-		ImplSurfDescribeOps.naiveGradient(ii,10,10,r,1.5,4,expectedX,expectedY);
-		ImplSurfDescribeOps.gradientInner(ii,10,10,r,1.5,4,foundX,foundY);
+		ImplSurfDescribeOps.naiveGradient(ii,10,10,r, 4, 1.5, expectedX,expectedY);
+		ImplSurfDescribeOps.gradientInner(ii,10,10,r, 4, 1.5, foundX,foundY);
 
 		for( int i = 0; i < foundX.length; i++ ) {
 			assertEquals("at "+i,expectedX[i],foundX[i],1e-4);
@@ -87,16 +87,16 @@ public class TestImplSurfDescribeOps {
 		int foundX[] = new int[w*w];
 		int foundY[] = new int[w*w];
 
-		ImplSurfDescribeOps.naiveGradient(ii,10,10,r,1,4,expectedX,expectedY);
-		ImplSurfDescribeOps.gradientInner(ii,10,10,r,1,4,foundX,foundY);
+		ImplSurfDescribeOps.naiveGradient(ii,10,10,r, 4, 1, expectedX,expectedY);
+		ImplSurfDescribeOps.gradientInner(ii,10,10,r, 4, 1, foundX,foundY);
 
 		for( int i = 0; i < foundX.length; i++ ) {
 			assertEquals("at "+i,expectedX[i],foundX[i],1e-4);
 			assertEquals("at "+i,expectedY[i],foundY[i],1e-4);
 		}
 
-		ImplSurfDescribeOps.naiveGradient(ii,10,10,r,1.5,4,expectedX,expectedY);
-		ImplSurfDescribeOps.gradientInner(ii,10,10,r,1.5,4,foundX,foundY);
+		ImplSurfDescribeOps.naiveGradient(ii,10,10,r, 4, 1.5, expectedX,expectedY);
+		ImplSurfDescribeOps.gradientInner(ii,10,10,r, 4, 1.5, foundX,foundY);
 
 		for( int i = 0; i < foundX.length; i++ ) {
 			assertEquals("at "+i,expectedX[i],foundX[i],1e-4);
@@ -136,7 +136,7 @@ public class TestImplSurfDescribeOps {
 			ImageFloat32 img = createGradient(width,height,theta);
 			ImageFloat32 ii = IntegralImageOps.transform(img,null);
 
-			ImplSurfDescribeOps.naiveGradient(ii,r*3,r*3,r,scale,4,derivX,derivY);
+			ImplSurfDescribeOps.naiveGradient(ii,r*3,r*3,r, 4, scale, derivX,derivY);
 
 			double c = Math.cos(theta);
 			double s = Math.sin(theta);
@@ -165,7 +165,7 @@ public class TestImplSurfDescribeOps {
 		SparseImageGradient<ImageFloat32,?> sparse = createGradient(ii,1);
 
 		GecvMiscOps.zero(features,64);
-		ImplSurfDescribeOps.features(20,20,0.75,weight,20,4,1,sparse,features);
+		ImplSurfDescribeOps.features(20,20,0.75,weight,20,5,1,sparse,features);
 
 		for( double f : features )
 			assertEquals(0,f,1e-4);
@@ -184,7 +184,7 @@ public class TestImplSurfDescribeOps {
 		SparseImageGradient<ImageFloat32,?> sparse = createGradient(ii,1);
 
 		// orient the feature along the x-axis
-		ImplSurfDescribeOps.features(15,15,0,weight,20,4,1,sparse,features);
+		ImplSurfDescribeOps.features(15,15,0,weight,20,5,1,sparse,features);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(features[i],features[i+1],1e-4);
@@ -194,7 +194,7 @@ public class TestImplSurfDescribeOps {
 		}
 
 		// now orient the feature along the y-axis
-		ImplSurfDescribeOps.features(15,15,Math.PI/2.0,weight,20,4,1,sparse,features);
+		ImplSurfDescribeOps.features(15,15,Math.PI/2.0,weight,20,5,1,sparse,features);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(-features[i+2],features[i+3],1e-4);
@@ -215,7 +215,7 @@ public class TestImplSurfDescribeOps {
 		SparseImageGradient<ImageFloat32,?> sparse = createGradient(ii,1.5);
 
 		// orient the feature along the x-acis
-		ImplSurfDescribeOps.features(25,25,0,weight,20,4,1.5,sparse,features);
+		ImplSurfDescribeOps.features(25,25,0,weight,20,5,1.5,sparse,features);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(features[i],features[i+1],1e-4);

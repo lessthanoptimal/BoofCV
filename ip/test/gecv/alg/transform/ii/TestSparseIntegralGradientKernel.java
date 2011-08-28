@@ -16,17 +16,49 @@
 
 package gecv.alg.transform.ii;
 
+import gecv.alg.filter.derivative.GeneralSparseGradientTests;
+import gecv.struct.deriv.GradientValue;
+import gecv.struct.image.ImageFloat32;
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestSparseIntegralGradientKernel {
+public class TestSparseIntegralGradientKernel
+		extends GeneralSparseGradientTests<ImageFloat32,ImageFloat32,GradientValue>
+{
+
+	final static int size = 5;
+	SparseIntegralGradientKernel<ImageFloat32> alg;
+
+	public TestSparseIntegralGradientKernel() {
+		super(ImageFloat32.class, ImageFloat32.class,size/2);
+
+		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(size);
+		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(size);
+
+		alg = new SparseIntegralGradientKernel<ImageFloat32>(kernelX,kernelY);
+	}
+
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void allStandard() {
+		allTests(true);
+	}
+
+
+	@Override
+	protected void imageGradient(ImageFloat32 input, ImageFloat32 derivX, ImageFloat32 derivY) {
+		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(size);
+		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(size);
+
+		GIntegralImageOps.convolve(input,kernelX,derivX);
+		GIntegralImageOps.convolve(input,kernelY,derivY);
+	}
+
+	@Override
+	protected GradientValue sparseGradient(ImageFloat32 input, int x, int y) {
+		alg.setImage(input);
+		return alg.compute(x,y);
 	}
 }
