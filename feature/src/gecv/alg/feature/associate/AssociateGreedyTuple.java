@@ -52,7 +52,7 @@ public class AssociateGreedyTuple {
 			int bestIndex = -1;
 
 			for( int j = 0; j < dst.size; j++ ) {
-				TupleDesc_F64 b = src.data[j];
+				TupleDesc_F64 b = dst.data[j];
 
 				double fit = score.score(a,b);
 
@@ -87,7 +87,7 @@ public class AssociateGreedyTuple {
 			int bestIndex = -1;
 
 			for( int j = 0; j < dst.size; j++ ) {
-				TupleDesc_F64 b = src.data[j];
+				TupleDesc_F64 b = dst.data[j];
 
 				double fit = score.score(a,b);
 				
@@ -128,7 +128,7 @@ public class AssociateGreedyTuple {
 			int bestIndex = -1;
 
 			for( int j = 0; j < dst.size; j++ ) {
-				TupleDesc_F64 b = src.data[j];
+				TupleDesc_F64 b = dst.data[j];
 
 				double fit = workBuffer[j] = score.score(a,b);
 
@@ -175,7 +175,7 @@ public class AssociateGreedyTuple {
 			double bestScore = Double.MAX_VALUE;
 			int bestIndex = -1;
 			for( int j = 0; j < dst.size; j++ ) {
-				double s = workBuffer[index++] = score.score(a,src.data[j]);
+				double s = workBuffer[index++] = score.score(a,dst.data[j]);
 				if( s < bestScore ) {
 					bestScore = s;
 					bestIndex = j;

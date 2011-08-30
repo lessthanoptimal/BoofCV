@@ -2,6 +2,9 @@ Trackers
 - SURF
 - Detect region/normalized cross correlation
 
+- Faster association
+  - FLANN?
+
 - See KLT list
 
 - Weighted corner detection

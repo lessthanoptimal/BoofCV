@@ -36,8 +36,8 @@ public class UtilOrientationBenchmark {
 		return FactoryInterestPoint.<T>fromFastHessian(200,9,4,1);
 	}
 
-	public static <D extends ImageBase>
-	List<StabilityAlgorithm> createAlgorithms( int radius , Class<D> derivType )
+	public static <T extends ImageBase, D extends ImageBase>
+	List<StabilityAlgorithm> createAlgorithms( int radius , Class<T> imageType , Class<D> derivType )
 	{
 		List<StabilityAlgorithm> ret = new ArrayList<StabilityAlgorithm>();
 
@@ -52,6 +52,7 @@ public class UtilOrientationBenchmark {
 		ret.add(new StabilityAlgorithm("Slide PI/6 W", FactoryOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
 		ret.add(new StabilityAlgorithm("Slide PI/3 Un-W", FactoryOrientationAlgs.sliding(20,Math.PI/3,radius,false,derivType)));
 		ret.add(new StabilityAlgorithm("Slide PI/3 W", FactoryOrientationAlgs.sliding(20,Math.PI/3,radius,true,derivType)));
+		ret.add(new StabilityAlgorithm("No Gradient", FactoryOrientationAlgs.nogradient(radius,imageType)));
 
 		return ret;
 	}

@@ -107,6 +107,30 @@ public class BenchmarkOrientation<I extends ImageBase, D extends ImageBase> {
 		}
 	}
 
+	public class NoGradient implements Performer {
+
+		OrientationNoGradient alg;
+		String name;
+
+		public NoGradient(String name, OrientationNoGradient alg) {
+			this.alg = alg;
+			this.name = name;
+		}
+
+		@Override
+		public void process() {
+			alg.setImage((ImageFloat32)image);
+			for( Point2D_I32 p : pts ) {
+				alg.compute(p.x,p.y);
+			}
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+	}
+
 	public class Integral implements Performer {
 
 		OrientationIntegral alg;
@@ -135,6 +159,7 @@ public class BenchmarkOrientation<I extends ImageBase, D extends ImageBase> {
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
 		System.out.println();
 
+		ProfileOperation.printOpsPerSec(new NoGradient("No Gradient", nogradient(RADIUS,imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Average", average(RADIUS,false,derivType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Average W", average(RADIUS,true,derivType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Histogram", histogram(15,RADIUS,false,derivType)), TEST_TIME);

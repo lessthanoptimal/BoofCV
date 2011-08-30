@@ -16,15 +16,9 @@
 
 package gecv.factory.feature.orientation;
 
-import gecv.alg.feature.orientation.OrientationAverage;
-import gecv.alg.feature.orientation.OrientationHistogram;
-import gecv.alg.feature.orientation.OrientationIntegral;
-import gecv.alg.feature.orientation.OrientationSlidingWindow;
+import gecv.alg.feature.orientation.*;
 import gecv.alg.feature.orientation.impl.*;
-import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageSInt32;
+import gecv.struct.image.*;
 
 
 /**
@@ -45,6 +39,24 @@ public class FactoryOrientationAlgs {
 			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S16(numAngles,weighted);
 		} else if( derivType == ImageSInt32.class ) {
 			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S32(numAngles,weighted);
+		} else {
+			throw new IllegalArgumentException("Unknown image type.");
+		}
+
+		ret.setRadius(radius);
+
+		return ret;
+	}
+
+	public static <T extends ImageBase>
+	OrientationNoGradient<T> nogradient( int radius , Class<T> imageType )
+	{
+		OrientationNoGradient<T> ret;
+
+		if( imageType == ImageFloat32.class ) {
+			ret = (OrientationNoGradient<T>)new ImplOrientationNoGradient_F32(radius);
+		} else if( imageType == ImageUInt8.class ) {
+			ret = (OrientationNoGradient<T>)new ImplOrientationNoGradient_U8(radius);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
 		}

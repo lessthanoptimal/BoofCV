@@ -14,28 +14,28 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.associate;
+package gecv.alg.feature.orientation.impl;
 
-import gecv.struct.feature.TupleDesc_F64;
+import gecv.alg.feature.orientation.GenericOrientationImageTests;
+import gecv.alg.feature.orientation.OrientationNoGradient;
+import gecv.struct.image.ImageUInt8;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestScoreAssociateEuclidean {
+public class TestImplOrientationNoGradient_U8 {
+	double angleTol = 0.1;// had to up tolerance for limited resolution of UInt8 images
+	int r = 3;
+
 	@Test
-	public void compareToExpected() {
-		ScoreAssociateEuclidean score = new ScoreAssociateEuclidean();
+	public void standardUnweighted() {
+		GenericOrientationImageTests<ImageUInt8> tests = new GenericOrientationImageTests<ImageUInt8>();
 
-		TupleDesc_F64 a = new TupleDesc_F64(5);
-		TupleDesc_F64 b = new TupleDesc_F64(5);
+		OrientationNoGradient<ImageUInt8> alg = new ImplOrientationNoGradient_U8(r);
 
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
-
-		assertEquals(13.964,score.score(a,b),1e-2);
+		tests.setup(angleTol, r*2+1 , alg,ImageUInt8.class);
+		tests.performAll();
 	}
 }

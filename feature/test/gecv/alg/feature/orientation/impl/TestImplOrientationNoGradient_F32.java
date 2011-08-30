@@ -14,28 +14,28 @@
  *    limitations under the License.
  */
 
-package gecv.struct.feature;
+package gecv.alg.feature.orientation.impl;
+
+import gecv.alg.feature.orientation.GenericOrientationImageTests;
+import gecv.alg.feature.orientation.OrientationNoGradient;
+import gecv.struct.image.ImageFloat32;
+import org.junit.Test;
 
 
 /**
- * Basic description of an image feature's attributes using an array.
- *
  * @author Peter Abeles
  */
-public class TupleDesc_F64 {
-	public double value[];
+public class TestImplOrientationNoGradient_F32 {
+	double angleTol = 0.01;
+	int r = 3;
 
-	public TupleDesc_F64( int numFeatures ) {
-		this.value = new double[ numFeatures ];
-	}
+	@Test
+	public void standardUnweighted() {
+		GenericOrientationImageTests<ImageFloat32> tests = new GenericOrientationImageTests<ImageFloat32>();
 
-	public void set( double ...value ) {
-		System.arraycopy(value,0,this.value,0,this.value.length);
-	}
+		OrientationNoGradient<ImageFloat32> alg = new ImplOrientationNoGradient_F32(r);
 
-	public TupleDesc_F64 copy() {
-		TupleDesc_F64 ret = new TupleDesc_F64( value.length );
-		System.arraycopy(value,0,ret.value,0,value.length);
-		return ret;
+		tests.setup(angleTol, r*2+1 , alg,ImageFloat32.class);
+		tests.performAll();
 	}
 }
