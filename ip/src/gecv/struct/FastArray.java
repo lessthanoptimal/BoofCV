@@ -30,27 +30,25 @@ public class FastArray<T> {
 	public Class<T> type;
 
 	public FastArray(int size, Class<T> type) {
-		this.size = size;
+		this.size = 0;
 		this.type = type;
 
 		data = (T[])Array.newInstance(type,size);
-		for( int i = this.size; i < size; i++ ) {
-			try {
-				data[i] = type.newInstance();
-			} catch (InstantiationException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
+		for( int i = 0; i < size; i++ ) {
+			data[i] = createInstance();
 		}
 	}
 
-	public FastArray(Class<T> type) {
-		this(10,type);
+	protected FastArray(Class<T> type) {
+		this(0,type);
 	}
 
 	public void reset() {
 		size = 0;
+	}
+
+	public int getInternalArraySize() {
+		return data.length;
 	}
 
 	/**
@@ -74,7 +72,7 @@ public class FastArray<T> {
 		if( size < data.length ) {
 			return data[size++];
 		} else {
-			growArray(data.length*2);
+			growArray((data.length+1)*2);
 			return data[size++];
 		}
 	}
@@ -87,14 +85,18 @@ public class FastArray<T> {
 		System.arraycopy(this.data,0,data,0,this.data.length);
 
 		for( int i = this.data.length; i < length; i++ ) {
-			try {
-				data[i] = type.newInstance();
-			} catch (InstantiationException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
+			data[i] = createInstance();
 		}
 		this.data = data;
+	}
+
+	protected T createInstance() {
+		try {
+			return type.newInstance();
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

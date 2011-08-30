@@ -21,7 +21,8 @@ import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.feature.benchmark.*;
 import gecv.factory.filter.derivative.FactoryDerivative;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt16;
+import gecv.struct.image.ImageUInt8;
 
 
 /**
@@ -79,14 +80,16 @@ public class BenchmarkStabilityOrientation<T extends ImageBase, D extends ImageB
 		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector();
 		OrientationEvaluator<T,D> evaluator = new OrientationEvaluator<T,D>(border,detector,gradient);
 
-		compile.setAlgorithms(UtilOrientationBenchmark.createAlgorithms(radius,derivType),evaluator);
+		compile.setAlgorithms(UtilOrientationBenchmark.createAlgorithms(radius,imageType,derivType),evaluator);
 
 		compile.process();
 	}
 
 	public static void main( String args[] ) {
-		BenchmarkStabilityOrientation<ImageFloat32,ImageFloat32> benchmark
-				= new BenchmarkStabilityOrientation<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+//		BenchmarkStabilityOrientation<ImageFloat32,ImageFloat32> benchmark
+//				= new BenchmarkStabilityOrientation<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+		BenchmarkStabilityOrientation<ImageUInt8, ImageSInt16> benchmark
+				= new BenchmarkStabilityOrientation<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 
 //		benchmark.testNoise();
 //		benchmark.testIntensity();

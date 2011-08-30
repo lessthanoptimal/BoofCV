@@ -17,6 +17,8 @@
 package gecv.misc;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 
 
 /**
@@ -26,10 +28,25 @@ import java.io.FileNotFoundException;
  */
 public abstract class CodeGeneratorBase {
 
+	protected PrintStream out;
+	protected String className;
+
 	/**
 	 * Creates 
 	 *
 	 * @throws FileNotFoundException
 	 */
 	public abstract void generate() throws FileNotFoundException;
+
+	public void setOutputFile( String className ) throws FileNotFoundException {
+		this.className = className;
+		out = new PrintStream(new FileOutputStream(className + ".java"));
+		out.print(CodeGeneratorUtil.copyright);
+		out.println("package "+getPackage()+";");
+		out.println();
+	}
+
+	public String getPackage() {
+		return getClass().getPackage().getName();
+	}
 }

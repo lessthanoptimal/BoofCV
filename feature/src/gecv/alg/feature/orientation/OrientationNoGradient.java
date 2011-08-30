@@ -16,7 +16,6 @@
 
 package gecv.alg.feature.orientation;
 
-import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.misc.GecvMiscOps;
 import gecv.struct.ImageRectangle;
 import gecv.struct.convolve.Kernel2D_F32;
@@ -24,38 +23,37 @@ import gecv.struct.image.ImageBase;
 
 
 /**
- * <p>
- * Computes the orientation of a region by summing up the derivative along each axis independently
- * then computing the direction fom the sum.  If weighted a Gaussian kernel centered around the targeted
- * pixel is used.
- * </p>
+ * Computes the orientation of a region by computing a weighted sum of each pixel's intensity
+ * using their respective sine and cosine values.
  *
  * @author Peter Abeles
  */
-public abstract class OrientationAverage<D extends ImageBase> implements OrientationGradient<D> {
-	// image gradient
-	protected D derivX;
-	protected D derivY;
+public abstract class OrientationNoGradient<T extends ImageBase> implements OrientationImage<T> {
+
+	// input image
+	protected T image;
 
 	// local variable used to define the region being examined.
 	// this makes it easy to avoid going outside the image
 	protected ImageRectangle rect = new ImageRectangle();
 
+	// radius at a scale of 1
 	protected int radius;
 	// the radius at this scale
 	protected int radiusScale;
 
-	// if it uses weights or not
-	protected boolean isWeighted;
-	// optional weights
-	protected Kernel2D_F32 weights;
+	// cosine values for each pixel
+	protected Kernel2D_F32 kerCosine;
+	// sine values for each pixel
+	protected Kernel2D_F32 kerSine;
 
-	protected OrientationAverage(boolean weighted) {
-		isWeighted = weighted;
+	public OrientationNoGradient(int radius) {
+		setRadius(radius);
 	}
 
-	public int getRadius() {
-		return radius;
+	@Override
+	public void setImage( T image ) {
+		this.image = image;
 	}
 
 	public void setRadius(int radius) {
@@ -63,22 +61,25 @@ public abstract class OrientationAverage<D extends ImageBase> implements Orienta
 		setScale(1);
 	}
 
-	public Kernel2D_F32 getWeights() {
-		return weights;
-	}
-
 	@Override
 	public void setScale(double scale) {
 		radiusScale = (int)Math.ceil(scale*radius);
-		if( isWeighted ) {
-			weights = FactoryKernelGaussian.gaussian(2,true, 32, -1,radiusScale);
-		}
-	}
 
-	@Override
-	public void setImage(D derivX, D derivY) {
-		this.derivX = derivX;
-		this.derivY = derivY;
+		int w = radiusScale*2+1;
+		kerCosine = new Kernel2D_F32(w);
+		kerSine = new Kernel2D_F32(w);
+
+		for( int y=-radiusScale; y <= radiusScale; y++ ) {
+			int pixelY = y+radiusScale;
+			for( int x=-radiusScale; x <= radiusScale; x++ ) {
+				int pixelX = x+radiusScale;
+				float r = (float)Math.sqrt(x*x+y*y);
+				kerCosine.set(pixelX,pixelY,(float)x/r);
+				kerSine.set(pixelX,pixelY,(float)y/r);
+			}
+		}
+		kerCosine.set(radiusScale,radiusScale,0);
+		kerSine.set(radiusScale,radiusScale,0);
 	}
 
 	@Override
@@ -91,23 +92,10 @@ public abstract class OrientationAverage<D extends ImageBase> implements Orienta
 		rect.x1 = c_x+radiusScale+1;
 		rect.y1 = c_y+radiusScale+1;
 
-		GecvMiscOps.boundRectangleInside(derivX,rect);
+		GecvMiscOps.boundRectangleInside(image,rect);
 
-		if( weights == null )
-			return computeUnweightedScore();
-		else
-			return computeWeightedScore(c_x,c_y);
-
+		return computeAngle(c_x,c_y);
 	}
 
-	/**
-	 * Compute the score without using the optional weights
-	 */
-	protected abstract double computeUnweightedScore();
-
-	/**
-	 * Compute the score using the weighting kernel.
-	 */
-	protected abstract double computeWeightedScore(int c_x , int c_y );
-
+	protected abstract double computeAngle( int c_x , int c_y );
 }

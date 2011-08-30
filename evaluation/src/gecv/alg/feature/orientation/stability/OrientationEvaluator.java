@@ -21,6 +21,8 @@ import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.feature.benchmark.StabilityAlgorithm;
 import gecv.alg.feature.benchmark.StabilityEvaluatorPoint;
 import gecv.alg.feature.orientation.OrientationGradient;
+import gecv.alg.feature.orientation.OrientationImage;
+import gecv.alg.feature.orientation.RegionOrientation;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.image.ImageBase;
 import jgrl.metric.UtilAngle;
@@ -61,10 +63,8 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 			derivY.reshape(image.width,image.height);
 		}
 
-		OrientationGradient<D> angleAlg = alg.getAlgorithm();
-
 		gradient.process(image,derivX,derivY);
-		angleAlg.setImage(derivX,derivY);
+		RegionOrientation angleAlg = setupAlgorithm(alg, image);
 		angleAlg.setScale(1);
 
 		angles = new double[points.size()];
@@ -76,16 +76,27 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 //		ShowImages.showWindow((ImageFloat32)image,"Original",true);
 	}
 
+	private RegionOrientation setupAlgorithm(StabilityAlgorithm alg, T image) {
+		RegionOrientation angleAlg = alg.getAlgorithm();
+
+		if( angleAlg instanceof OrientationGradient) {
+			((OrientationGradient)angleAlg).setImage(derivX,derivY);
+		} else if( angleAlg instanceof OrientationImage) {
+			((OrientationImage)angleAlg).setImage(image);
+		} else {
+			throw new IllegalArgumentException("Unknown type");
+		}
+		return angleAlg;
+	}
+
 	@Override
 	public double[] evaluateImage(StabilityAlgorithm alg, T image, Affine2D_F32 initToImage,
 							   List<Point2D_I32> points, List<Integer> indexes ) {
 
 //		initToImage = initToImage.invert(null);
 //		ShowImages.showWindow((ImageFloat32)image,"Modified",true);
-		OrientationGradient<D> angleAlg = alg.getAlgorithm();
-
 		gradient.process(image,derivX,derivY);
-		angleAlg.setImage(derivX,derivY);
+		RegionOrientation angleAlg = setupAlgorithm(alg, image);
 
 		Vector2D_F32 v1 = new Vector2D_F32();
 		Vector2D_F32 v2 = new Vector2D_F32();

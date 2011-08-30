@@ -14,28 +14,28 @@
  *    limitations under the License.
  */
 
-package gecv.struct.feature;
+package gecv.alg.feature.orientation;
+
+import gecv.struct.image.ImageBase;
 
 
 /**
- * Basic description of an image feature's attributes using an array.
+ * Estimates the orientation of a region directly from the image's pixels.
  *
  * @author Peter Abeles
  */
-public class TupleDesc_F64 {
-	public double value[];
+public interface OrientationImage <T extends ImageBase> extends RegionOrientation {
+	/**
+	 * Specifies input image data for estimating orientation.
+	 *
+	 * @param image Input image..
+	 */
+	public void setImage( T image );
 
-	public TupleDesc_F64( int numFeatures ) {
-		this.value = new double[ numFeatures ];
-	}
-
-	public void set( double ...value ) {
-		System.arraycopy(value,0,this.value,0,this.value.length);
-	}
-
-	public TupleDesc_F64 copy() {
-		TupleDesc_F64 ret = new TupleDesc_F64( value.length );
-		System.arraycopy(value,0,ret.value,0,value.length);
-		return ret;
-	}
+	/**
+	 * Returns the type of image it can process.
+	 *
+	 * @return Type of image which can be processed
+	 */
+	public Class<T> getImageType();
 }

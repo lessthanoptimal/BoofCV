@@ -31,8 +31,7 @@ import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I16;
 
 import java.awt.*;
@@ -67,6 +66,7 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		this.imageType = imageType;
 		this.derivType = derivType;
 
+		addAlgorithm("No Gradient", FactoryOrientationAlgs.nogradient(radius,imageType));
 		addAlgorithm("Average", FactoryOrientationAlgs.average(radius,false,derivType));
 		addAlgorithm("Average Weighted", FactoryOrientationAlgs.average(radius,true,derivType));
 		addAlgorithm("Histogram 10", FactoryOrientationAlgs.histogram(10,radius,false,derivType));
@@ -112,6 +112,10 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		} else if( orientation instanceof OrientationIntegral ) {
 			T ii = GIntegralImageOps.transform(workImage,null);
 			((OrientationIntegral<T>)orientation).setImage(ii);
+		} else if( orientation instanceof OrientationNoGradient ) {
+			((OrientationNoGradient)orientation).setImage((ImageFloat32)workImage);
+		} else {
+			throw new IllegalArgumentException("Unknown algorithm type.");
 		}
 
 		for( int i = 0; i < points.num; i++ ) {
@@ -132,10 +136,10 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
-//		ShowFeatureOrientationApp<ImageFloat32,ImageFloat32> app =
-//				new ShowFeatureOrientationApp<ImageFloat32, ImageFloat32>(input,ImageFloat32.class, ImageFloat32.class);
-		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
-				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
+		ShowFeatureOrientationApp<ImageFloat32,ImageFloat32> app =
+				new ShowFeatureOrientationApp<ImageFloat32, ImageFloat32>(input,ImageFloat32.class, ImageFloat32.class);
+//		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
+//				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
 		ShowImages.showWindow(app,"Feature Orientation");
 //		input = UtilImageIO.loadImage(fileName);

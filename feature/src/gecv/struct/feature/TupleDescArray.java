@@ -16,26 +16,26 @@
 
 package gecv.struct.feature;
 
+import gecv.struct.FastArray;
+
 
 /**
- * Basic description of an image feature's attributes using an array.
+ * {@link FastArray} for TupleDesc_F64.
  *
  * @author Peter Abeles
  */
-public class TupleDesc_F64 {
-	public double value[];
+public class TupleDescArray extends FastArray<TupleDesc_F64> {
 
-	public TupleDesc_F64( int numFeatures ) {
-		this.value = new double[ numFeatures ];
+	int numFeatures;
+
+	public TupleDescArray( int numFeatures ) {
+		super(TupleDesc_F64.class);
+		this.numFeatures = numFeatures;
+		growArray(10);
 	}
 
-	public void set( double ...value ) {
-		System.arraycopy(value,0,this.value,0,this.value.length);
-	}
-
-	public TupleDesc_F64 copy() {
-		TupleDesc_F64 ret = new TupleDesc_F64( value.length );
-		System.arraycopy(value,0,ret.value,0,value.length);
-		return ret;
+	@Override
+	protected TupleDesc_F64 createInstance() {
+		return new TupleDesc_F64(numFeatures);
 	}
 }
