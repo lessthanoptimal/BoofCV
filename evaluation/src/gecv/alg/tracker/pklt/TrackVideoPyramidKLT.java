@@ -16,10 +16,10 @@
 
 package gecv.alg.tracker.pklt;
 
-import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.abst.detect.extract.WrapperNonMax;
-import gecv.abst.detect.intensity.GeneralFeatureIntensity;
-import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
+import gecv.abst.feature.detect.extract.FeatureExtractor;
+import gecv.abst.feature.detect.extract.WrapperNonMax;
+import gecv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import gecv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.feature.detect.extract.FastNonMaxExtractor;
 import gecv.alg.feature.detect.interest.GeneralFeatureDetector;

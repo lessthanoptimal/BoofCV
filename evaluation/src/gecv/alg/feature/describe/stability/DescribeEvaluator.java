@@ -16,11 +16,11 @@
 
 package gecv.alg.feature.describe.stability;
 
-import gecv.abst.detect.describe.ExtractFeatureDescription;
-import gecv.abst.detect.interest.InterestPointDetector;
-import gecv.alg.feature.StabilityAlgorithm;
-import gecv.alg.feature.StabilityEvaluatorPoint;
-import gecv.struct.feature.TupleFeature_F64;
+import gecv.abst.feature.describe.ExtractFeatureDescription;
+import gecv.abst.feature.detect.interest.InterestPointDetector;
+import gecv.alg.feature.benchmark.StabilityAlgorithm;
+import gecv.alg.feature.benchmark.StabilityEvaluatorPoint;
+import gecv.struct.feature.TupleDesc_F64;
 import gecv.struct.image.ImageBase;
 import jgrl.struct.affine.Affine2D_F32;
 import jgrl.struct.point.Point2D_I32;
@@ -41,7 +41,7 @@ import java.util.List;
 public class DescribeEvaluator <T extends ImageBase>
 	extends StabilityEvaluatorPoint<T>
 {
-	List<TupleFeature_F64> initial = new ArrayList<TupleFeature_F64>();
+	List<TupleDesc_F64> initial = new ArrayList<TupleDesc_F64>();
 
 	public DescribeEvaluator(int borderSize, InterestPointDetector<T> detector) {
 		super(borderSize, detector);
@@ -56,7 +56,7 @@ public class DescribeEvaluator <T extends ImageBase>
 		extract.setImage(image);
 
 		for( Point2D_I32 p : points ) {
-			TupleFeature_F64 f = extract.process(p.x,p.y,1.0);
+			TupleDesc_F64 f = extract.process(p.x,p.y,1.0);
 			if( f == null )
 				initial.add(f);
 			else
@@ -87,8 +87,8 @@ public class DescribeEvaluator <T extends ImageBase>
 			Point2D_I32 p = points.get(i);
 			int index = indexes != null ? indexes.get(i) : i;
 
-			TupleFeature_F64 f = extract.process(p.x,p.y,scale);
-			TupleFeature_F64 e = initial.get(index);
+			TupleDesc_F64 f = extract.process(p.x,p.y,scale);
+			TupleDesc_F64 e = initial.get(index);
 			if( f != null && e != null ) {
 				double error = 0;
 				for( int j = 0; j < f.value.length; j++ ) {

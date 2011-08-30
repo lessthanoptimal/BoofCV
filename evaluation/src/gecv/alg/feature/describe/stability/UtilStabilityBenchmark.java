@@ -16,7 +16,7 @@
 
 package gecv.alg.feature.describe.stability;
 
-import gecv.alg.feature.StabilityAlgorithm;
+import gecv.alg.feature.benchmark.StabilityAlgorithm;
 import gecv.factory.feature.describe.FactoryExtractFeatureDescription;
 import gecv.struct.image.ImageBase;
 

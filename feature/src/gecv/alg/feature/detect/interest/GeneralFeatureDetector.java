@@ -16,8 +16,8 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.abst.detect.intensity.GeneralFeatureIntensity;
+import gecv.abst.feature.detect.extract.FeatureExtractor;
+import gecv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import gecv.alg.feature.detect.extract.SelectNBestFeatures;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;

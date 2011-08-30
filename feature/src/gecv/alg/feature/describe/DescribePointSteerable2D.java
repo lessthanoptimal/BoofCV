@@ -23,7 +23,7 @@ import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder;
 import gecv.factory.filter.convolve.FactoryConvolveSparse;
 import gecv.struct.convolve.Kernel2D;
-import gecv.struct.feature.TupleFeature_F64;
+import gecv.struct.feature.TupleDesc_F64;
 import gecv.struct.image.ImageBase;
 
 
@@ -67,8 +67,8 @@ public class DescribePointSteerable2D <T extends ImageBase, K extends Kernel2D> 
 		convolver.setImage(image);
 	}
 
-	public TupleFeature_F64 describe( int x , int y , double angle ) {
-		TupleFeature_F64 ret = new TupleFeature_F64(kernels.length);
+	public TupleDesc_F64 describe( int x , int y , double angle ) {
+		TupleDesc_F64 ret = new TupleDesc_F64(kernels.length);
 
 		// compute the image feature's characteristics
 		for( int i = 0; i < kernels.length; i++ ) {

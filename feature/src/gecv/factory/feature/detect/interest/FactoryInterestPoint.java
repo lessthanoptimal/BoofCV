@@ -16,8 +16,8 @@
 
 package gecv.factory.feature.detect.interest;
 
-import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.abst.detect.interest.*;
+import gecv.abst.feature.detect.extract.FeatureExtractor;
+import gecv.abst.feature.detect.interest.*;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.abst.filter.derivative.ImageHessian;
 import gecv.alg.feature.detect.interest.*;
@@ -91,6 +91,14 @@ public class FactoryInterestPoint {
 		return new WrapFPtoInterestPoint<T,D>(feature,ss);
 	}
 
+	/**
+	 *
+	 * @param maxFeaturesPerScale Number of features it will find or if <= 0 it will return all features it finds.
+	 * @param initialSize Typically 9.
+	 * @param numberScalesPerOctave Typically 4.
+	 * @param numberOfOctaves Typically 4.
+	 * @return Fast hessian detector.
+	 */
 	public static <T extends ImageBase>
 	InterestPointDetector<T> fromFastHessian( int maxFeaturesPerScale  ,
 											  int initialSize ,

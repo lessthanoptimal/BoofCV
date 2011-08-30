@@ -16,7 +16,7 @@
 
 package gecv.alg.feature.detect.interest;
 
-import gecv.abst.detect.extract.FeatureExtractor;
+import gecv.abst.feature.detect.extract.FeatureExtractor;
 import gecv.alg.transform.ii.IntegralImageOps;
 import gecv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
 import gecv.struct.image.ImageFloat32;

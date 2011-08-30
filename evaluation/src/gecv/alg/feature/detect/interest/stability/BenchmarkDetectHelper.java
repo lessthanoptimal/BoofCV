@@ -16,7 +16,7 @@
 
 package gecv.alg.feature.detect.interest.stability;
 
-import gecv.alg.feature.StabilityAlgorithm;
+import gecv.alg.feature.benchmark.StabilityAlgorithm;
 import gecv.alg.feature.detect.intensity.HessianBlobIntensity;
 import gecv.alg.feature.detect.interest.*;
 import gecv.factory.feature.detect.interest.FactoryBlobDetector;

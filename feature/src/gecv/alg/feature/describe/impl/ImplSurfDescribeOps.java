@@ -45,35 +45,35 @@ public class ImplSurfDescribeOps {
 		for( int y = -radius; y <= radius; y++ ) {
 			int pixelsY = c_y + (int)Math.floor(y*scale);
 			int indexRow1 = ii.startIndex + (pixelsY-r-1)*ii.stride - r - 1;
-			int indexRow2 = ii.startIndex + (pixelsY-1)*ii.stride - r - 1;
-			int indexRow3 = ii.startIndex + pixelsY*ii.stride - r - 1;
-			int indexRow4 = ii.startIndex + (pixelsY+r)*ii.stride - r - 1;
+			int indexRow2 = indexRow1 + r*ii.stride;
+			int indexRow3 = indexRow2 + ii.stride;
+			int indexRow4 = indexRow3 + r*ii.stride;
 
 			for( int x = -radius; x <= radius; x++ , i++) {
 				int pixelsX = c_x + (int)Math.floor(x*scale);
 
-				int indexSrc1 = indexRow1 + pixelsX;
-				int indexSrc2 = indexRow2 + pixelsX;
-				int indexSrc3 = indexRow3 + pixelsX;
-				int indexSrc4 = indexRow4 + pixelsX;
+				final int indexSrc1 = indexRow1 + pixelsX;
+				final int indexSrc2 = indexRow2 + pixelsX;
+				final int indexSrc3 = indexRow3 + pixelsX;
+				final int indexSrc4 = indexRow4 + pixelsX;
 
-				float p0 = ii.data[indexSrc1];
-				float p1 = ii.data[indexSrc1+r];
-				float p2 = ii.data[indexSrc1+r+1];
-				float p3 = ii.data[indexSrc1+w];
-				float p11 = ii.data[indexSrc2];
-				float p4 = ii.data[indexSrc2+w];
-				float p10 = ii.data[indexSrc3];
-				float p5 = ii.data[indexSrc3+w];
-				float p9 = ii.data[indexSrc4];
-				float p8 = ii.data[indexSrc4+r];
-				float p7 = ii.data[indexSrc4+r+1];
-				float p6 = ii.data[indexSrc4+w];
+				final float p0 = ii.data[indexSrc1];
+				final float p1 = ii.data[indexSrc1+r];
+				final float p2 = ii.data[indexSrc1+r+1];
+				final float p3 = ii.data[indexSrc1+w];
+				final float p11 = ii.data[indexSrc2];
+				final float p4 = ii.data[indexSrc2+w];
+				final float p10 = ii.data[indexSrc3];
+				final float p5 = ii.data[indexSrc3+w];
+				final float p9 = ii.data[indexSrc4];
+				final float p8 = ii.data[indexSrc4+r];
+				final float p7 = ii.data[indexSrc4+r+1];
+				final float p6 = ii.data[indexSrc4+w];
 
-				float left = p8-p9-p1+p0;
-				float right = p6-p7-p3+p2;
-				float top = p4-p11-p3+p0;
-				float bottom = p6-p9-p5+p10;
+				final float left = p8-p9-p1+p0;
+				final float right = p6-p7-p3+p2;
+				final float top = p4-p11-p3+p0;
+				final float bottom = p6-p9-p5+p10;
 
 				derivX[i] = right-left;
 				derivY[i] = bottom-top;
@@ -95,35 +95,35 @@ public class ImplSurfDescribeOps {
 		for( int y = -radius; y <= radius; y++ ) {
 			int pixelsY = c_y + (int)Math.floor(y*scale);
 			int indexRow1 = ii.startIndex + (pixelsY-r-1)*ii.stride - r - 1;
-			int indexRow2 = ii.startIndex + (pixelsY-1)*ii.stride - r - 1;
-			int indexRow3 = ii.startIndex + pixelsY*ii.stride - r - 1;
-			int indexRow4 = ii.startIndex + (pixelsY+r)*ii.stride - r - 1;
+			int indexRow2 = indexRow1 + r*ii.stride;
+			int indexRow3 = indexRow2 + ii.stride;
+			int indexRow4 = indexRow3 + r*ii.stride;
 
 			for( int x = -radius; x <= radius; x++ , i++) {
 				int pixelsX = c_x + (int)Math.floor(x*scale);
 
-				int indexSrc1 = indexRow1 + pixelsX;
-				int indexSrc2 = indexRow2 + pixelsX;
-				int indexSrc3 = indexRow3 + pixelsX;
-				int indexSrc4 = indexRow4 + pixelsX;
+				final int indexSrc1 = indexRow1 + pixelsX;
+				final int indexSrc2 = indexRow2 + pixelsX;
+				final int indexSrc3 = indexRow3 + pixelsX;
+				final int indexSrc4 = indexRow4 + pixelsX;
 
-				int p0 = ii.data[indexSrc1];
-				int p1 = ii.data[indexSrc1+r];
-				int p2 = ii.data[indexSrc1+r+1];
-				int p3 = ii.data[indexSrc1+w];
-				int p11 = ii.data[indexSrc2];
-				int p4 = ii.data[indexSrc2+w];
-				int p10 = ii.data[indexSrc3];
-				int p5 = ii.data[indexSrc3+w];
-				int p9 = ii.data[indexSrc4];
-				int p8 = ii.data[indexSrc4+r];
-				int p7 = ii.data[indexSrc4+r+1];
-				int p6 = ii.data[indexSrc4+w];
+				final int p0 = ii.data[indexSrc1];
+				final int p1 = ii.data[indexSrc1+r];
+				final int p2 = ii.data[indexSrc1+r+1];
+				final int p3 = ii.data[indexSrc1+w];
+				final int p11 = ii.data[indexSrc2];
+				final int p4 = ii.data[indexSrc2+w];
+				final int p10 = ii.data[indexSrc3];
+				final int p5 = ii.data[indexSrc3+w];
+				final int p9 = ii.data[indexSrc4];
+				final int p8 = ii.data[indexSrc4+r];
+				final int p7 = ii.data[indexSrc4+r+1];
+				final int p6 = ii.data[indexSrc4+w];
 
-				int left = p8-p9-p1+p0;
-				int right = p6-p7-p3+p2;
-				int top = p4-p11-p3+p0;
-				int bottom = p6-p9-p5+p10;
+				final int left = p8-p9-p1+p0;
+				final int right = p6-p7-p3+p2;
+				final int top = p4-p11-p3+p0;
+				final int bottom = p6-p9-p5+p10;
 
 				derivX[i] = right-left;
 				derivY[i] = bottom-top;

@@ -43,6 +43,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 	DefaultListModel listModel = new DefaultListModel();
 
 	public ListDisplayPanel() {
+		setLayout(new BorderLayout());
 		listPanel = new JList(listModel);
 
 		listPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

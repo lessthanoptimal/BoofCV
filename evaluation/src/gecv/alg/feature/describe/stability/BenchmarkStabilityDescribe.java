@@ -16,8 +16,8 @@
 
 package gecv.alg.feature.describe.stability;
 
-import gecv.abst.detect.interest.InterestPointDetector;
-import gecv.alg.feature.*;
+import gecv.abst.feature.detect.interest.InterestPointDetector;
+import gecv.alg.feature.benchmark.*;
 import gecv.alg.feature.orientation.stability.UtilOrientationBenchmark;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;

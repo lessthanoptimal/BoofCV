@@ -16,9 +16,9 @@
 
 package gecv.factory.feature.describe;
 
-import gecv.abst.detect.describe.ExtractFeatureDescription;
-import gecv.abst.detect.describe.WrapDescribeSteerable;
-import gecv.abst.detect.describe.WrapDescribeSurf;
+import gecv.abst.feature.describe.ExtractFeatureDescription;
+import gecv.abst.feature.describe.WrapDescribeSteerable;
+import gecv.abst.feature.describe.WrapDescribeSurf;
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.feature.describe.DescribePointSteerable2D;
 import gecv.alg.feature.orientation.OrientationGradient;

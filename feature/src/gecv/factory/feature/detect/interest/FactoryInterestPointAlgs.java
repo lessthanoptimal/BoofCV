@@ -16,10 +16,10 @@
 
 package gecv.factory.feature.detect.interest;
 
-import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.abst.detect.intensity.GeneralFeatureIntensity;
-import gecv.abst.detect.intensity.WrapperGradientCornerIntensity;
-import gecv.abst.detect.intensity.WrapperLaplacianBlobIntensity;
+import gecv.abst.feature.detect.extract.FeatureExtractor;
+import gecv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import gecv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
+import gecv.abst.feature.detect.intensity.WrapperLaplacianBlobIntensity;
 import gecv.abst.filter.ImageFunctionSparse;
 import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.alg.feature.detect.intensity.GradientCornerIntensity;
