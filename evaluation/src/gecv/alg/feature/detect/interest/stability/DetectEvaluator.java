@@ -16,9 +16,9 @@
 
 package gecv.alg.feature.detect.interest.stability;
 
-import gecv.abst.detect.interest.InterestPointDetector;
-import gecv.alg.feature.StabilityAlgorithm;
-import gecv.alg.feature.StabilityEvaluator;
+import gecv.abst.feature.detect.interest.InterestPointDetector;
+import gecv.alg.feature.benchmark.StabilityAlgorithm;
+import gecv.alg.feature.benchmark.StabilityEvaluator;
 import gecv.struct.image.ImageBase;
 import jgrl.geometry.UtilPoint2D_I32;
 import jgrl.struct.affine.Affine2D_F32;

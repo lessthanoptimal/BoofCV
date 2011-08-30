@@ -16,7 +16,7 @@
 
 package gecv.alg.feature.detect.intensity;
 
-import gecv.abst.detect.intensity.*;
+import gecv.abst.feature.detect.intensity.*;
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.derivative.AnyImageDerivative;
 import gecv.alg.distort.DistortImageOps;

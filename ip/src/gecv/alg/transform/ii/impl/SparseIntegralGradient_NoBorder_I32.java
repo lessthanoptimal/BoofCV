@@ -41,9 +41,9 @@ public class SparseIntegralGradient_NoBorder_I32
 
 		int horizontalOffset = x-r-1;
 		int indexSrc1 = ii.startIndex + (y-r-1)*ii.stride + horizontalOffset;
-		int indexSrc2 = ii.startIndex + (y-1)*ii.stride + horizontalOffset;
-		int indexSrc3 = ii.startIndex + y*ii.stride + horizontalOffset;
-		int indexSrc4 = ii.startIndex + (y+r)*ii.stride + horizontalOffset;
+		int indexSrc2 = indexSrc1 + r*ii.stride;
+		int indexSrc3 = indexSrc2 + ii.stride;
+		int indexSrc4 = indexSrc3 + r*ii.stride;
 
 		int p0 = ii.data[indexSrc1];
 		int p1 = ii.data[indexSrc1+r];

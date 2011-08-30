@@ -26,10 +26,10 @@ public class SurfFeature {
 	// is the feature light or dark. Can be used to improve lookup performance.
 	public boolean laplacianPositive;
 	// feature description
-	public TupleFeature_F64 features;
+	public TupleDesc_F64 features;
 
 	public SurfFeature( int numFeatures ) {
-		features = new TupleFeature_F64(numFeatures);
+		features = new TupleDesc_F64(numFeatures);
 	}
 
 

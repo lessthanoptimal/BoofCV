@@ -21,7 +21,7 @@ import gecv.core.image.GeneralizedImageOps;
 import gecv.factory.feature.describe.FactoryDescribePointAlgs;
 import gecv.factory.filter.derivative.FactoryDerivative;
 import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.feature.TupleFeature_F64;
+import gecv.struct.feature.TupleDesc_F64;
 import gecv.struct.image.ImageFloat32;
 import gecv.testing.GecvTesting;
 import org.junit.Test;
@@ -63,11 +63,11 @@ public class TestDescribePointSteerable2D {
 	public void checkSubImage()
 	{
 		alg.setImage(image);
-		TupleFeature_F64 expected = alg.describe(c_x,c_y,0);
+		TupleDesc_F64 expected = alg.describe(c_x,c_y,0);
 
 		ImageFloat32 sub = GecvTesting.createSubImageOf(image);
 		alg.setImage(sub);
-		TupleFeature_F64 found = alg.describe(c_x,c_y,0);
+		TupleDesc_F64 found = alg.describe(c_x,c_y,0);
 
 		GecvTesting.assertEquals(expected.value,found.value,1e-8);
 	}
@@ -78,8 +78,8 @@ public class TestDescribePointSteerable2D {
 	@Test
 	public void changeRotation() {
 		alg.setImage(image);
-		TupleFeature_F64 a = alg.describe(c_x,c_y,0);
-		TupleFeature_F64 b = alg.describe(c_x,c_y,1);
+		TupleDesc_F64 a = alg.describe(c_x,c_y,0);
+		TupleDesc_F64 b = alg.describe(c_x,c_y,1);
 
 		boolean equals = true;
 		for( int i = 0; i < a.value.length; i++ ) {

@@ -16,10 +16,10 @@
 
 package gecv.alg.feature.orientation.stability;
 
-import gecv.abst.detect.interest.InterestPointDetector;
+import gecv.abst.feature.detect.interest.InterestPointDetector;
 import gecv.abst.filter.derivative.ImageGradient;
-import gecv.alg.feature.StabilityAlgorithm;
-import gecv.alg.feature.StabilityEvaluatorPoint;
+import gecv.alg.feature.benchmark.StabilityAlgorithm;
+import gecv.alg.feature.benchmark.StabilityEvaluatorPoint;
 import gecv.alg.feature.orientation.OrientationGradient;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.struct.image.ImageBase;

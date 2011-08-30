@@ -18,7 +18,7 @@ package gecv.alg.feature.describe;
 
 import gecv.Performer;
 import gecv.ProfileOperation;
-import gecv.abst.detect.describe.ExtractFeatureDescription;
+import gecv.abst.feature.describe.ExtractFeatureDescription;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.factory.feature.describe.FactoryExtractFeatureDescription;
 import gecv.struct.image.ImageBase;

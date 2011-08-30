@@ -17,6 +17,7 @@
 package gecv.gui.feature;
 
 import gecv.struct.feature.ScalePoint;
+import jgrl.struct.point.Point2D_I32;
 
 import java.awt.*;
 
@@ -25,6 +26,24 @@ import java.awt.*;
  * @author Peter Abeles
  */
 public class VisualizeFeatures {
+
+	public static void drawPoints( Graphics2D g2 ,
+								   Color color ,
+								   java.util.List<Point2D_I32> points ,
+								   int radius) {
+
+		g2.setStroke(new BasicStroke(2));
+
+		int ro = radius+1;
+		int wo = ro*2+1;
+		int w = radius*2+1;
+		for( Point2D_I32 p : points ) {
+			g2.setColor(color);
+			g2.fillOval(p.x-radius,p.y-radius,w,w);
+			g2.setColor(Color.BLACK);
+			g2.drawOval(p.x-ro,p.y-ro,wo,wo);
+		}
+	}
 
 	public static void drawScalePoints( Graphics2D g2 , java.util.List<ScalePoint> points , double radius ) {
 		g2.setColor(Color.RED);

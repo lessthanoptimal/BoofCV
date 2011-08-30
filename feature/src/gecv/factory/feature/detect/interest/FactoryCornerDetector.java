@@ -16,8 +16,8 @@
 
 package gecv.factory.feature.detect.interest;
 
-import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.abst.detect.intensity.*;
+import gecv.abst.feature.detect.extract.FeatureExtractor;
+import gecv.abst.feature.detect.intensity.*;
 import gecv.abst.filter.blur.FactoryBlurFilter;
 import gecv.abst.filter.blur.impl.MedianImageFilter;
 import gecv.alg.feature.detect.intensity.FastCornerIntensity;

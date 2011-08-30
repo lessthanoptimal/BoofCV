@@ -16,14 +16,14 @@
 
 package gecv.factory.feature.detect.extract;
 
-import gecv.abst.detect.extract.FeatureExtractor;
-import gecv.abst.detect.extract.WrapperNonMax;
-import gecv.abst.detect.extract.WrapperNonMaxCandidate;
+import gecv.abst.feature.detect.extract.FeatureExtractor;
+import gecv.abst.feature.detect.extract.WrapperNonMax;
+import gecv.abst.feature.detect.extract.WrapperNonMaxCandidate;
 import gecv.alg.feature.detect.extract.FastNonMaxExtractor;
 import gecv.alg.feature.detect.extract.NonMaxCandidateExtractor;
 
 /**
- * Given a list of requirements create a {@link gecv.abst.detect.extract.FeatureExtractor} that meets
+ * Given a list of requirements create a {@link gecv.abst.feature.detect.extract.FeatureExtractor} that meets
  * those requirements.
  *
  * @author Peter Abeles
