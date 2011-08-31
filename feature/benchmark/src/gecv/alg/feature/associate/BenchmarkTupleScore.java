@@ -18,8 +18,8 @@ package gecv.alg.feature.associate;
 
 import gecv.Performer;
 import gecv.ProfileOperation;
-import gecv.struct.FastArray;
-import gecv.struct.feature.TupleDescArray;
+import gecv.struct.FastQueue;
+import gecv.struct.feature.TupleDescQueue;
 import gecv.struct.feature.TupleDesc_F64;
 
 import java.util.Random;
@@ -35,8 +35,8 @@ public class BenchmarkTupleScore {
 	static final int DOF = 10;
 	static final int NUM_FEATURES = 2000;
 
-	static final FastArray<TupleDesc_F64> listA = createSet();
-	static final FastArray<TupleDesc_F64> listB = createSet();
+	static final FastQueue<TupleDesc_F64> listA = createSet();
+	static final FastQueue<TupleDesc_F64> listB = createSet();
 
 	public static class General implements Performer {
 
@@ -61,8 +61,8 @@ public class BenchmarkTupleScore {
 		}
 	}
 
-	private static FastArray<TupleDesc_F64> createSet() {
-		FastArray<TupleDesc_F64> ret = new TupleDescArray(DOF);
+	private static FastQueue<TupleDesc_F64> createSet() {
+		FastQueue<TupleDesc_F64> ret = new TupleDescQueue(DOF);
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			TupleDesc_F64 t = ret.pop();

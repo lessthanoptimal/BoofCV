@@ -20,27 +20,35 @@ import java.lang.reflect.Array;
 
 
 /**
- * Growable array designed for fast access.
+ * Growable array designed for fast access.  It can be configured to declare new instances
+ * or just grow the array.
  *
  * @author Peter Abeles
  */
-public class FastArray<T> {
+public class FastQueue<T> {
 	public T []data;
 	public int size;
 	public Class<T> type;
 
-	public FastArray(int initialMaxSize, Class<T> type) {
+	// if true then it will declare new instances automatically
+	// if false then
+	private boolean declareInstances;
+
+	public FastQueue(int initialMaxSize, Class<T> type, boolean declareInstances) {
 		this.size = 0;
 		this.type = type;
+		this.declareInstances = declareInstances;
 
 		data = (T[])Array.newInstance(type,initialMaxSize);
-		for( int i = 0; i < initialMaxSize; i++ ) {
-			data[i] = createInstance();
+		if( declareInstances ) {
+			for( int i = 0; i < initialMaxSize; i++ ) {
+				data[i] = createInstance();
+			}
 		}
 	}
 
-	protected FastArray(Class<T> type) {
-		this(0,type);
+	protected FastQueue(Class<T> type, boolean declareInstances ) {
+		this(0,type,declareInstances);
 	}
 
 	public void reset() {
@@ -49,6 +57,10 @@ public class FastArray<T> {
 
 	public int getInternalArraySize() {
 		return data.length;
+	}
+
+	public int size() {
+		return size;
 	}
 
 	/**
@@ -77,6 +89,19 @@ public class FastArray<T> {
 		}
 	}
 
+	public void add( T object ) {
+		if( size >= data.length ) {
+			growArray((data.length+1)*2);
+		}
+		data[size++] = object;
+	}
+
+	public void addAll( FastQueue<T> list ) {
+		for( int i = 0; i < list.size; i++ ) {
+			add( list.data[i]);
+		}
+	}
+
 	public void growArray( int length) {
 		if( this.data.length >= length)
 			throw new IllegalArgumentException("The new size must be larger than the old size.");
@@ -84,8 +109,10 @@ public class FastArray<T> {
 		T []data = (T[])Array.newInstance(type, length);
 		System.arraycopy(this.data,0,data,0,this.data.length);
 
-		for( int i = this.data.length; i < length; i++ ) {
-			data[i] = createInstance();
+		if( declareInstances ) {
+			for( int i = this.data.length; i < length; i++ ) {
+				data[i] = createInstance();
+			}
 		}
 		this.data = data;
 	}

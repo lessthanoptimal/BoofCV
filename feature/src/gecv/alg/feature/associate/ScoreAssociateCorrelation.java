@@ -33,4 +33,9 @@ public class ScoreAssociateCorrelation implements ScoreAssociateTuple {
 
 		return -Math.abs(total);
 	}
+
+	@Override
+	public boolean isZeroMinimum() {
+		return false;
+	}
 }

@@ -16,8 +16,8 @@
 
 package gecv.alg.feature.associate;
 
-import gecv.struct.FastArray;
-import gecv.struct.feature.TupleDescArray;
+import gecv.struct.FastQueue;
+import gecv.struct.feature.TupleDescQueue;
 import gecv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
@@ -33,8 +33,8 @@ public class TestAssociateGreedyTuple {
 
 	@Test
 	public void basic() {
-		FastArray<TupleDesc_F64> a = createData(1,2,3,4);
-		FastArray<TupleDesc_F64> b = createData(3,4,1,40);
+		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
+		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
 
 		int pairs[] = new int[4];
 
@@ -48,8 +48,8 @@ public class TestAssociateGreedyTuple {
 
 	@Test
 	public void fitIsError() {
-		FastArray<TupleDesc_F64> a = createData(1,2,3,4);
-		FastArray<TupleDesc_F64> b = createData(3,4,1,40);
+		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
+		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
 
 		int pairs[] = new int[4];
 		double fitScore[] = new double[4];
@@ -69,8 +69,8 @@ public class TestAssociateGreedyTuple {
 
 	@Test
 	public void totalCloseMatches() {
-		FastArray<TupleDesc_F64> a = createData(1,2,3,4);
-		FastArray<TupleDesc_F64> b = createData(3,4,1,40);
+		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
+		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
 
 		int pairs[] = new int[4];
 		double fitScore[] = new double[4];
@@ -91,8 +91,8 @@ public class TestAssociateGreedyTuple {
 
 	@Test
 	public void forwardBackwards() {
-		FastArray<TupleDesc_F64> a = createData(1,2,3,4);
-		FastArray<TupleDesc_F64> b = createData(3,4,1,40);
+		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
+		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
 
 		int pairs[] = new int[4];
 		double workBuffer[] = new double[4*4];
@@ -110,9 +110,9 @@ public class TestAssociateGreedyTuple {
 		assertEquals(0,fitScore[3],1e-5);
 	}
 
-	private FastArray<TupleDesc_F64> createData( double ...values )
+	private FastQueue<TupleDesc_F64> createData( double ...values )
 	{
-		FastArray<TupleDesc_F64> ret = new TupleDescArray(1);
+		FastQueue<TupleDesc_F64> ret = new TupleDescQueue(1);
 
 		for( int i = 0; i < values.length; i++ ) {
 			ret.pop().set(values[i]);

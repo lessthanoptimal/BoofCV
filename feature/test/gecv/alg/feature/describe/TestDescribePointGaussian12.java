@@ -14,28 +14,19 @@
  *    limitations under the License.
  */
 
-package gecv.struct.feature;
+package gecv.alg.feature.describe;
 
-import gecv.struct.FastArray;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
 /**
- * {@link FastArray} for TupleDesc_F64.
- *
  * @author Peter Abeles
  */
-public class TupleDescArray extends FastArray<TupleDesc_F64> {
-
-	int numFeatures;
-
-	public TupleDescArray( int numFeatures ) {
-		super(TupleDesc_F64.class);
-		this.numFeatures = numFeatures;
-		growArray(10);
-	}
-
-	@Override
-	protected TupleDesc_F64 createInstance() {
-		return new TupleDesc_F64(numFeatures);
+public class TestDescribePointGaussian12 {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

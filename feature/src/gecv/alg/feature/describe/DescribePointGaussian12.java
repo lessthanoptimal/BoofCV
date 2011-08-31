@@ -22,6 +22,8 @@ import gecv.core.image.border.BorderType;
 import gecv.core.image.border.FactoryImageBorder;
 import gecv.core.image.border.ImageBorder;
 import gecv.factory.filter.convolve.FactoryConvolveSparse;
+import gecv.factory.filter.kernel.FactoryKernel;
+import gecv.factory.filter.kernel.FactorySteerable;
 import gecv.struct.convolve.Kernel2D;
 import gecv.struct.feature.TupleDesc_F64;
 import gecv.struct.image.ImageBase;
@@ -29,30 +31,47 @@ import gecv.struct.image.ImageBase;
 
 /**
  * <p>
- * Extracts a set of image features using a steerable kernel.  THe kernels are steered in the provided
- * direction, making the set of features rotation invariant. 
+ * Uses steerable Gaussian derivatives to describe an image feature.  Invariance to
+ * lighting changes is brought about by dividing the output of each kernel by the
+ * image's first derivative.  Thus 12 features are returned, but up to 4th order derivatives
+ * are computed.
  * </p>
  *
+ * <p>
+ * Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"
+ * In Proceedings of the 8th International Conference on Computer Vision, 2001
+ * </p>
+ * 
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class DescribePointSteerable2D <T extends ImageBase, K extends Kernel2D> {
+public class DescribePointGaussian12 <T extends ImageBase, K extends Kernel2D> {
 
 	// the set of steerable kernels used to compute image feature points.
 	SteerableKernel<K> kernels[];
 
+	// first order derivative used to compute light invariance
+	SteerableKernel<K> derivX;
+	SteerableKernel<K> derivY;
+
 	// Applies the kernel to the interest point
 	ImageConvolveSparse<T,K> convolver;
-	// should the feature vector be normalized to one?
-	// this provides some intensity invariance
-	boolean normalize;
 
-	public DescribePointSteerable2D( SteerableKernel<K> kernels[] ,
-									 boolean normalize ,
-									 Class<T> imageType ) {
+	public DescribePointGaussian12( int radius , Class<T> imageType ) {
 
-		this.kernels = kernels;
-		this.normalize = normalize;
+		Class<K> kernelType = (Class) FactoryKernel.getKernelType(imageType,2);
+
+		derivX = FactorySteerable.gaussian(kernelType,1,0, -1, radius);
+		derivY = FactorySteerable.gaussian(kernelType,0,1, -1, radius);
+
+		kernels = (SteerableKernel<K>[])new SteerableKernel[12];
+		int index = 0;
+		for( int N = 2; N <= 4; N++ ) {
+			for( int i = 0; i <= N; i++ ) {
+				int orderX = N-i;
+				kernels[index++] = FactorySteerable.gaussian(kernelType,orderX,i, -1, radius);
+			}
+		}
 
 		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.SKIP);
 		convolver = FactoryConvolveSparse.create(imageType);
@@ -77,19 +96,27 @@ public class DescribePointSteerable2D <T extends ImageBase, K extends Kernel2D> 
 		else if( ret.value.length != kernels.length )
 			throw new IllegalArgumentException("Unexpected feature description length");
 
+		// compute the derivative and use it to normalize
+		// the other features, providing invariance to changes in image intensity
+		convolver.setKernel(derivX.compute(angle));
+		double Dx = convolver.compute(x,y);
+		convolver.setKernel(derivY.compute(angle));
+		double Dy = convolver.compute(x,y);
+
+		double norm = Math.sqrt(Dx*Dx + Dy*Dy);
+		// the feature is probably useless, but need to avoid divide by zero error
+		if( norm <= 1e-15 )
+			norm = 1;
+
 		// compute the image feature's characteristics
 		for( int i = 0; i < kernels.length; i++ ) {
 			SteerableKernel<K> filter = kernels[i];
 			K kernel = filter.compute(angle);
 
 			convolver.setKernel(kernel);
-			ret.value[i] = convolver.compute(x,y);
+			ret.value[i] = convolver.compute(x,y)/norm;
 		}
 
-		if( normalize )
-			SurfDescribeOps.normalizeFeatures(ret.value);
-		
 		return ret;
 	}
-
 }

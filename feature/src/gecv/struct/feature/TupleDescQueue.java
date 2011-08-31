@@ -14,29 +14,28 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.associate;
+package gecv.struct.feature;
 
-import gecv.struct.feature.TupleDesc_F64;
+import gecv.struct.FastQueue;
 
 
 /**
+ * {@link gecv.struct.FastQueue} for TupleDesc_F64.
+ *
  * @author Peter Abeles
  */
-public class ScoreAssociateEuclideanSq implements ScoreAssociateTuple {
-	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
-		final int N = a.value.length;
-		double total = 0;
-		for( int i = 0; i < N; i++ ) {
-			double d = a.value[i]-b.value[i];
-			total += d*d;
-		}
+public class TupleDescQueue extends FastQueue<TupleDesc_F64> {
 
-		return total;
+	int numFeatures;
+
+	public TupleDescQueue( int numFeatures ) {
+		super(TupleDesc_F64.class,true);
+		this.numFeatures = numFeatures;
+		growArray(10);
 	}
 
 	@Override
-	public boolean isZeroMinimum() {
-		return true;
+	protected TupleDesc_F64 createInstance() {
+		return new TupleDesc_F64(numFeatures);
 	}
 }

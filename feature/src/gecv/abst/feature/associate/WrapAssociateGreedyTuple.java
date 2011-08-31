@@ -18,7 +18,7 @@ package gecv.abst.feature.associate;
 
 import gecv.alg.feature.associate.AssociateGreedyTuple;
 import gecv.alg.feature.associate.ScoreAssociateTuple;
-import gecv.struct.FastArray;
+import gecv.struct.FastQueue;
 import gecv.struct.feature.AssociatedIndex;
 import gecv.struct.feature.TupleDesc_F64;
 import pja.sorting.QuickSelectArray;
@@ -32,14 +32,14 @@ import pja.sorting.QuickSelectArray;
 public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<TupleDesc_F64> {
 
 	ScoreAssociateTuple score;
-	FastArray<AssociatedIndex> matches = new FastArray<AssociatedIndex>(10,AssociatedIndex.class);
+	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
 
 	public void setScore(ScoreAssociateTuple score) {
 		this.score = score;
 	}
 
 	@Override
-	public FastArray<AssociatedIndex> getMatches() {
+	public FastQueue<AssociatedIndex> getMatches() {
 		return matches;
 	}
 
@@ -60,10 +60,11 @@ public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<Tup
 								   double matchScore[],
 								   int maxMatches )
 	{
-		double threshold = QuickSelectArray.select(matchScore,maxMatches,sizeSrc);
+		double copy[] = matchScore.clone();
+		double threshold = QuickSelectArray.select(copy,maxMatches,sizeSrc);
 
 		matches.reset();
-		for( int i = 0; i < sizeSrc; i++ ) {
+		for( int i = 0; i < sizeSrc && matches.size() < maxMatches; i++ ) {
 			int index = pairs[i];
 			double s = matchScore[i];
 			if( index >= 0 && s <= threshold ) {
@@ -82,7 +83,7 @@ public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<Tup
 		}
 
 		@Override
-		public void associate(FastArray<TupleDesc_F64> listSrc, FastArray<TupleDesc_F64> listDst) {
+		public void associate(FastQueue<TupleDesc_F64> listSrc, FastQueue<TupleDesc_F64> listDst) {
 			if( pairs == null || pairs.length < listSrc.size ) {
 				pairs = new int[ listSrc.size ];
 			}
@@ -102,7 +103,7 @@ public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<Tup
 		}
 
 		@Override
-		public void associate(FastArray<TupleDesc_F64> listSrc, FastArray<TupleDesc_F64> listDst) {
+		public void associate(FastQueue<TupleDesc_F64> listSrc, FastQueue<TupleDesc_F64> listDst) {
 			if( pairs == null || pairs.length < listSrc.size ) {
 				pairs = new int[ listSrc.size ];
 				fitScore = new double[ listSrc.size ];
@@ -126,11 +127,14 @@ public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<Tup
 		}
 
 		@Override
-		public void associate(FastArray<TupleDesc_F64> listSrc, FastArray<TupleDesc_F64> listDst) {
+		public void associate(FastQueue<TupleDesc_F64> listSrc, FastQueue<TupleDesc_F64> listDst) {
 			if( pairs == null || pairs.length < listSrc.size ) {
 				pairs = new int[ listSrc.size ];
 				fitScore = new double[ listSrc.size ];
-				workBuffer = new double[ listSrc.size ];
+				workBuffer = new double[ listDst.size ];
+			}
+			if( workBuffer.length < listDst.size ) {
+				workBuffer = new double[ listDst.size ];
 			}
 			AssociateGreedyTuple.totalCloseMatches(listSrc,listDst, score,containmentScale,workBuffer,pairs, fitScore);
 			extractMatches(listSrc.size,pairs,fitScore,maxMatches);
@@ -149,7 +153,7 @@ public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<Tup
 		}
 
 		@Override
-		public void associate(FastArray<TupleDesc_F64> listSrc, FastArray<TupleDesc_F64> listDst) {
+		public void associate(FastQueue<TupleDesc_F64> listSrc, FastQueue<TupleDesc_F64> listDst) {
 			if( pairs == null || pairs.length < listSrc.size ) {
 				pairs = new int[ listSrc.size ];
 				fitScore = new double[ listSrc.size ];
@@ -158,7 +162,6 @@ public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<Tup
 				workBuffer = new double[ listSrc.size*listDst.size ];
 			}
 			AssociateGreedyTuple.forwardBackwards(listSrc,listDst, score,workBuffer,pairs, fitScore);
-			// todo make sure unmatched pairs have a high score
 			extractMatches(listSrc.size,pairs,fitScore,maxMatches);
 		}
 	}

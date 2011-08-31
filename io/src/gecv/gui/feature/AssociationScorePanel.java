@@ -36,7 +36,7 @@ import java.util.List;
  */
 public abstract class AssociationScorePanel extends JPanel implements MouseListener {
 	// adjusts how close to the optimal answer a point needs to be before it is plotted
-	double plotFraction ;
+	double containmentFraction;
 
 	// how big circles are drawn in association window
 	int maxCircleRadius = 30;
@@ -58,12 +58,17 @@ public abstract class AssociationScorePanel extends JPanel implements MouseListe
 	int maxWidth;
 	int maxHeight;
 
-	public AssociationScorePanel( int maxWidth , int maxHeight , double plotFraction ) {
-		if( plotFraction <= 0 || plotFraction > 1 )
-			throw new IllegalArgumentException("plotFraction must be between 0 and 1, inclusive.");
-		this.plotFraction = plotFraction;
+	// is zero the minimum score or can it go negative
+	boolean zeroMinimumScore;
+
+	public AssociationScorePanel( int maxWidth , int maxHeight ,
+								  double containmentFraction, boolean zeroMinimumScore ) {
+		if( containmentFraction <= 0  )
+			throw new IllegalArgumentException("containmentFraction must be more than zero");
+		this.containmentFraction = containmentFraction;
 		this.maxWidth = maxWidth;
 		this.maxHeight = maxHeight;
+		this.zeroMinimumScore = zeroMinimumScore;
 		setLayout(new BorderLayout());
 
 		leftPanel = new ScorePanel(true);
@@ -167,7 +172,11 @@ public abstract class AssociationScorePanel extends JPanel implements MouseListe
 				g2.setColor(Color.RED);
 				g2.setStroke(new BasicStroke(3));
 
-				double worstLimit = (worst-best)*plotFraction;
+				double normalizer;
+				if( zeroMinimumScore )
+					normalizer = best*containmentFraction;
+				else
+					normalizer = Math.abs(best)*(Math.exp(-1.0/containmentFraction));
 
 				for( int i = 0; i < N; i++ ) {
 					Point2D_I32 p = getPoint(i);
@@ -175,8 +184,8 @@ public abstract class AssociationScorePanel extends JPanel implements MouseListe
 					double s = associationScore[i];
 
 					// scale the circle based on how bad it is
-					double ratio = (s-best)/worstLimit;
-					if( ratio > 1 )
+					double ratio = 1-Math.abs(s-best)/normalizer;
+					if( ratio < 0 )
 						continue;
 					
 					int r = maxCircleRadius - (int)(maxCircleRadius*ratio);

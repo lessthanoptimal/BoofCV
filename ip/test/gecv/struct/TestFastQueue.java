@@ -25,10 +25,16 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestFastArray {
+public class TestFastQueue {
+
+	@Test
+	public void checkDeclareInstance() {
+		fail("impleemnt");
+	}
+
 	@Test
 	public void get_pop() {
-		FastArray<Point2D_I32> alg = new FastArray<Point2D_I32>(Point2D_I32.class);
+		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 
 		// test a failure case
 		try {
@@ -42,10 +48,20 @@ public class TestFastArray {
 
 	@Test
 	public void size() {
-		FastArray<Point2D_I32> alg = new FastArray<Point2D_I32>(Point2D_I32.class);
+		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 		assertEquals(0,alg.size);
 		alg.pop();
 		assertEquals(1,alg.size);
+	}
+
+	@Test
+	public void add() {
+		fail("impleemnt");
+	}
+
+	@Test
+	public void addAll() {
+		fail("impleemnt");
 	}
 
 	/**
@@ -53,7 +69,7 @@ public class TestFastArray {
 	 */
 	@Test
 	public void pop_grow() {
-		FastArray<Point2D_I32> alg = new FastArray<Point2D_I32>(1,Point2D_I32.class);
+		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(1,Point2D_I32.class,true);
 
 		int before = alg.getInternalArraySize();
 		for( int i = 0; i < 20; i++ ) {
@@ -66,7 +82,7 @@ public class TestFastArray {
 
 	@Test
 	public void growArray() {
-		FastArray<Point2D_I32> alg = new FastArray<Point2D_I32>(1,Point2D_I32.class);
+		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(1,Point2D_I32.class,true);
 
 		alg.pop().set(10,12);
 		int before = alg.getInternalArraySize();

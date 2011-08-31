@@ -34,4 +34,9 @@ public class ScoreAssociateEuclidean implements ScoreAssociateTuple {
 
 		return Math.sqrt(total);
 	}
+
+	@Override
+	public boolean isZeroMinimum() {
+		return true;
+	}
 }

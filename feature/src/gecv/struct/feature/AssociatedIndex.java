@@ -38,4 +38,10 @@ public class AssociatedIndex {
 		this.dst = dst;
 		this.fitScore = fitScore;
 	}
+
+	public void set( AssociatedIndex a ) {
+		src = a.src;
+		dst = a.dst;
+		fitScore = a.fitScore;
+	}
 }
