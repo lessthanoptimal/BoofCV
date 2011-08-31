@@ -17,23 +17,23 @@
 package gecv.abst.feature.describe;
 
 import gecv.abst.filter.derivative.ImageGradient;
-import gecv.alg.feature.describe.DescribePointSteerable2D;
+import gecv.alg.feature.describe.DescribePointGaussian12;
 import gecv.alg.feature.orientation.OrientationGradient;
 import gecv.struct.feature.TupleDesc_F64;
 import gecv.struct.image.ImageBase;
 
 
 /**
- * Wrapper around {@link DescribePointSteerable2D} for {@link ExtractFeatureDescription}.
+ * Wrapper around {@link DescribePointGaussian12} for {@link ExtractFeatureDescription}.
  *
  * @author Peter Abeles
  */
-public class WrapDescribeSteerable <T extends ImageBase, D extends ImageBase>
+public class WrapDescribeGaussian12<T extends ImageBase, D extends ImageBase>
 		extends WrapScaleToCharacteristic<T,D>
 {
-	DescribePointSteerable2D<T,?> steer;
+	DescribePointGaussian12<T,?> steer;
 
-	public WrapDescribeSteerable(DescribePointSteerable2D<T,?> steer,
+	public WrapDescribeGaussian12(DescribePointGaussian12<T,?> steer,
 								 OrientationGradient<D> orientation,
 								 ImageGradient<T, D> gradient,
 								 Class<T> inputType ,
@@ -52,5 +52,4 @@ public class WrapDescribeSteerable <T extends ImageBase, D extends ImageBase>
 		steer.setImage(scaledImage);
 		return steer.describe(x,y,angle,ret);
 	}
-
 }

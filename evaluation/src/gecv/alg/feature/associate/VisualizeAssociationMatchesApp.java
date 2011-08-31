@@ -16,15 +16,20 @@
 
 package gecv.alg.feature.associate;
 
+import gecv.abst.feature.associate.GeneralAssociation;
 import gecv.abst.feature.describe.ExtractFeatureDescription;
 import gecv.abst.feature.detect.interest.InterestPointDetector;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.factory.feature.associate.FactoryAssociationTuple;
 import gecv.factory.feature.describe.FactoryExtractFeatureDescription;
 import gecv.factory.feature.detect.interest.FactoryInterestPoint;
-import gecv.gui.feature.AssociationScorePanel;
+import gecv.gui.feature.AssociationPanel;
 import gecv.gui.image.ShowImages;
 import gecv.io.image.UtilImageIO;
+import gecv.struct.FastQueue;
+import gecv.struct.feature.AssociatedIndex;
+import gecv.struct.feature.TupleDescQueue;
 import gecv.struct.feature.TupleDesc_F64;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
@@ -36,41 +41,44 @@ import java.util.List;
 
 
 /**
- * Shows how tightly focused the score is around the best figure by showing the relative
- * size and number of features which have a similar score visually in the image.  For example,
- * lots of other featurse with similar sized circles means the distribution is spread widely
- * while only one or two small figures means it is very narrow.
+ * Visually shows the location of matching pairs of associated features in two images.
  *
  * @author Peter Abeles
  */
-// TODO make feature selection, feature type, score all changeable in a GUI
-public class VisualizeAssociationScoreApp<T extends ImageBase> {
+// todo add waiting tool bar
+// todo show partial results
+public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 
 	InterestPointDetector<T> detector;
 	ExtractFeatureDescription<T> describe;
-	ScoreAssociateTuple scorer;
+	GeneralAssociation<TupleDesc_F64> matcher;
 
 	T imageLeft;
 	T imageRight;
 	Class<T> imageType;
 
+	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
+
 	List<Point2D_I32> leftPts = new ArrayList<Point2D_I32>();
 	List<Point2D_I32> rightPts = new ArrayList<Point2D_I32>();
-	List<TupleDesc_F64> leftDesc = new ArrayList<TupleDesc_F64>();
-	List<TupleDesc_F64> rightDesc = new ArrayList<TupleDesc_F64>();
+	TupleDescQueue leftDesc;
+	TupleDescQueue rightDesc;
 
-	public VisualizeAssociationScoreApp( InterestPointDetector<T> detector,
-										 ExtractFeatureDescription<T> describe,
-										 ScoreAssociateTuple scorer,
-										 Class<T> imageType )
+	public VisualizeAssociationMatchesApp( InterestPointDetector<T> detector,
+										ExtractFeatureDescription<T> describe,
+										GeneralAssociation<TupleDesc_F64> matcher,
+										Class<T> imageType )
 	{
 		this.detector = detector;
 		this.describe = describe;
-		this.scorer = scorer;
+		this.matcher = matcher;
 		this.imageType = imageType;
 
 		imageLeft = GeneralizedImageOps.createImage(imageType,1,1);
 		imageRight = GeneralizedImageOps.createImage(imageType,1,1);
+
+		leftDesc = new TupleDescQueue(describe.getDescriptionLength());
+		rightDesc = new TupleDescQueue(describe.getDescriptionLength());
 	}
 
 	public void process( BufferedImage buffLeft , BufferedImage buffRight ) {
@@ -84,15 +92,17 @@ public class VisualizeAssociationScoreApp<T extends ImageBase> {
 		extractImageFeatures(imageLeft,leftDesc,leftPts);
 		extractImageFeatures(imageRight,rightDesc,rightPts);
 
-		MyPanel panel = new MyPanel(500,500);
-		panel.setImages(buffLeft,buffRight);
-		panel.setLocation(leftPts,rightPts);
+		matcher.associate(leftDesc,rightDesc);
 
-		ShowImages.showWindow(panel,"Association Score");
+		AssociationPanel panel = new AssociationPanel(20,500,500);
+		panel.setImages(buffLeft,buffRight);
+		panel.setAssociation(leftPts,rightPts,matcher.getMatches());
+
+		ShowImages.showWindow(panel,"Associated Features");
 	}
 
-	private void extractImageFeatures( T image , List<TupleDesc_F64> descs , List<Point2D_I32> locs ) {
-		descs.clear();
+	private void extractImageFeatures( T image , FastQueue<TupleDesc_F64> descs , List<Point2D_I32> locs ) {
+		descs.reset();
 		locs.clear();
 		detector.detect(image);
 		describe.setImage(image);
@@ -102,39 +112,9 @@ public class VisualizeAssociationScoreApp<T extends ImageBase> {
 
 			TupleDesc_F64 d = describe.process(pt.x,pt.y,scale,null);
 			if( d != null ) {
-				descs.add( d.copy() );
+				descs.pop().set(d.value);
 				locs.add( pt.copy());
 			}
-		}
-	}
-
-	private class MyPanel extends AssociationScorePanel
-	{
-		double[] score;
-
-		public MyPanel(int maxWidth, int maxHeight) {
-			super(maxWidth, maxHeight,3,scorer.isZeroMinimum());
-		}
-
-		@Override
-		protected double[] computeScore(boolean isTargetLeft, int targetIndex) {
-			if( score == null ) {
-				score = new double[ Math.max(leftPts.size(),rightPts.size())];
-			}
-			if( isTargetLeft ) {
-				TupleDesc_F64 t = leftDesc.get(targetIndex);
-				for( int i = 0; i < rightDesc.size(); i++ ) {
-					TupleDesc_F64 d = rightDesc.get(i);
-					score[i] = scorer.score(t,d);
-				}
-			} else {
-				TupleDesc_F64 t = rightDesc.get(targetIndex);
-				for( int i = 0; i < leftDesc.size(); i++ ) {
-					TupleDesc_F64 d = leftDesc.get(i);
-					score[i] = scorer.score(t,d);
-				}
-			}
-			return score;
 		}
 	}
 
@@ -152,16 +132,20 @@ public class VisualizeAssociationScoreApp<T extends ImageBase> {
 
 		Class imageType = ImageFloat32.class;
 		Class derivType = ImageFloat32.class;
-		InterestPointDetector detector = FactoryInterestPoint.fromFastHessian(100,9,4,4);
+		InterestPointDetector detector = FactoryInterestPoint.fromFastHessian(200,9,4,4);
 		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.surf(true,imageType);
 //		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType);
 //		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType);
 
-		ScoreAssociateTuple scorer = new ScoreAssociateEuclidean();
-//		ScoreAssociateTuple scorer = new ScoreAssociateEuclideanSq();
+		ScoreAssociateTuple scorer = new ScoreAssociateEuclideanSq();
 //		ScoreAssociateTuple scorer = new ScoreAssociateCorrelation();
 
-		VisualizeAssociationScoreApp app = new VisualizeAssociationScoreApp(detector,describe,scorer,imageType);
+		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.inlierError(scorer,100,10);
+//		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.forwardBackwards(scorer,100);
+//		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.maxMatches(scorer,100);
+//		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.maxError(scorer,10);
+
+		VisualizeAssociationMatchesApp app = new VisualizeAssociationMatchesApp(detector,describe,matcher,imageType);
 
 		app.process(left,right);
 

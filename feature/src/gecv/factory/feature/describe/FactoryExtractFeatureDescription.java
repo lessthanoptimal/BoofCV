@@ -17,9 +17,11 @@
 package gecv.factory.feature.describe;
 
 import gecv.abst.feature.describe.ExtractFeatureDescription;
+import gecv.abst.feature.describe.WrapDescribeGaussian12;
 import gecv.abst.feature.describe.WrapDescribeSteerable;
 import gecv.abst.feature.describe.WrapDescribeSurf;
 import gecv.abst.filter.derivative.ImageGradient;
+import gecv.alg.feature.describe.DescribePointGaussian12;
 import gecv.alg.feature.describe.DescribePointSteerable2D;
 import gecv.alg.feature.orientation.OrientationGradient;
 import gecv.alg.feature.orientation.OrientationIntegral;
@@ -40,6 +42,16 @@ public class FactoryExtractFeatureDescription {
 			orientation = FactoryOrientationAlgs.average_ii(6,false,imageType);
 
 		return new WrapDescribeSurf<T>( FactoryDescribePointAlgs.<T>surf(imageType),orientation);
+	}
+
+	public static <T extends ImageBase, D extends ImageBase>
+	ExtractFeatureDescription<T> gaussian12( int radius ,Class<T> imageType , Class<D> derivType ) {
+
+		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
+		OrientationGradient<D> orientation = FactoryOrientationAlgs.average(radius,false,derivType);
+		DescribePointGaussian12<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian12(radius,imageType);
+
+		return new WrapDescribeGaussian12<T,D>(steer,orientation,gradient,imageType,derivType);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>

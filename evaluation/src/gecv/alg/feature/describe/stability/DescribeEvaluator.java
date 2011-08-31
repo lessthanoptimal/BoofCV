@@ -56,7 +56,7 @@ public class DescribeEvaluator <T extends ImageBase>
 		extract.setImage(image);
 
 		for( Point2D_I32 p : points ) {
-			TupleDesc_F64 f = extract.process(p.x,p.y,1.0);
+			TupleDesc_F64 f = extract.process(p.x,p.y,1.0,null);
 			if( f == null )
 				initial.add(f);
 			else
@@ -87,7 +87,7 @@ public class DescribeEvaluator <T extends ImageBase>
 			Point2D_I32 p = points.get(i);
 			int index = indexes != null ? indexes.get(i) : i;
 
-			TupleDesc_F64 f = extract.process(p.x,p.y,scale);
+			TupleDesc_F64 f = extract.process(p.x,p.y,scale,null);
 			TupleDesc_F64 e = initial.get(index);
 			if( f != null && e != null ) {
 				double error = 0;

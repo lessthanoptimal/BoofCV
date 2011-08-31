@@ -35,12 +35,18 @@ public interface ExtractFeatureDescription<T extends ImageBase> {
 	public void setImage( T image );
 
 	/**
+	 * Returns the descriptor length
+	 */
+	public int getDescriptionLength();
+
+	/**
 	 * Extract feature information from point at the specified scale.
 	 *
 	 * @param x Coordinate of the point.
 	 * @param y Coordinate of the point.
 	 * @param scale Scale at which the feature was found.
+	 * @param ret Used to store the extracted feature.  If null a new instance will be created.
 	 * @return  Description of the point.  If one could not be computed then null is returned.
 	 */
-	TupleDesc_F64 process( int x , int y , double scale );
+	TupleDesc_F64 process( int x , int y , double scale , TupleDesc_F64 ret );
 }

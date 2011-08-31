@@ -119,4 +119,8 @@ public class DescribePointSURF<T extends ImageBase> {
 
 		return lap > 0;
 	}
+
+	public int getDescriptionLength() {
+		return 64;
+	}
 }

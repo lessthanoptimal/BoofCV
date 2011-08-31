@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.abst.feature.associate;
+package gecv.factory.feature.associate;
 
+import gecv.abst.feature.associate.GeneralAssociation;
+import gecv.abst.feature.associate.WrapAssociateGreedyTuple;
 import gecv.alg.feature.associate.ScoreAssociateTuple;
 import gecv.struct.feature.TupleDesc_F64;
 

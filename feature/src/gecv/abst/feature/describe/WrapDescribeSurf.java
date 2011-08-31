@@ -51,7 +51,12 @@ public class WrapDescribeSurf<T extends ImageBase> implements ExtractFeatureDesc
 	}
 
 	@Override
-	public TupleDesc_F64 process(int x, int y, double scale) {
+	public int getDescriptionLength() {
+		return surf.getDescriptionLength();
+	}
+
+	@Override
+	public TupleDesc_F64 process(int x, int y, double scale, TupleDesc_F64 ret) {
 
 		double angle = 0;
 

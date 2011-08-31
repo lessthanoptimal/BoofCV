@@ -16,6 +16,7 @@
 
 package gecv.factory.feature.describe;
 
+import gecv.alg.feature.describe.DescribePointGaussian12;
 import gecv.alg.feature.describe.DescribePointSURF;
 import gecv.alg.feature.describe.DescribePointSteerable2D;
 import gecv.alg.filter.kernel.SteerableKernel;
@@ -36,6 +37,13 @@ public class FactoryDescribePointAlgs {
 	DescribePointSURF<T> surf(Class<T> imageType) {
 		return new DescribePointSURF<T>();
 	}
+
+	public static <T extends ImageBase, K extends Kernel2D>
+	DescribePointGaussian12<T,K> steerableGaussian12( int radius , Class<T> imageType )
+	{
+		return new DescribePointGaussian12<T,K>(radius,imageType);
+	}
+
 
 	// todo comment
 	public static <T extends ImageBase, K extends Kernel2D>

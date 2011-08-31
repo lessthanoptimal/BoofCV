@@ -16,27 +16,17 @@
 
 package gecv.alg.feature.associate;
 
-import gecv.struct.feature.TupleDesc_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
 /**
  * @author Peter Abeles
  */
-public class ScoreAssociateEuclideanSq implements ScoreAssociateTuple {
-	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
-		final int N = a.value.length;
-		double total = 0;
-		for( int i = 0; i < N; i++ ) {
-			double d = a.value[i]-b.value[i];
-			total += d*d;
-		}
-
-		return total;
-	}
-
-	@Override
-	public boolean isZeroMinimum() {
-		return true;
+public class TestAssociateSurfBasic {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

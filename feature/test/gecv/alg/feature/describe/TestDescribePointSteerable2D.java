@@ -63,11 +63,11 @@ public class TestDescribePointSteerable2D {
 	public void checkSubImage()
 	{
 		alg.setImage(image);
-		TupleDesc_F64 expected = alg.describe(c_x,c_y,0);
+		TupleDesc_F64 expected = alg.describe(c_x,c_y,0,null);
 
 		ImageFloat32 sub = GecvTesting.createSubImageOf(image);
 		alg.setImage(sub);
-		TupleDesc_F64 found = alg.describe(c_x,c_y,0);
+		TupleDesc_F64 found = alg.describe(c_x,c_y,0,null);
 
 		GecvTesting.assertEquals(expected.value,found.value,1e-8);
 	}
@@ -78,8 +78,8 @@ public class TestDescribePointSteerable2D {
 	@Test
 	public void changeRotation() {
 		alg.setImage(image);
-		TupleDesc_F64 a = alg.describe(c_x,c_y,0);
-		TupleDesc_F64 b = alg.describe(c_x,c_y,1);
+		TupleDesc_F64 a = alg.describe(c_x,c_y,0,null);
+		TupleDesc_F64 b = alg.describe(c_x,c_y,1,null);
 
 		boolean equals = true;
 		for( int i = 0; i < a.value.length; i++ ) {

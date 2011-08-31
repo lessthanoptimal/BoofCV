@@ -16,7 +16,7 @@
 
 package gecv.alg.feature.associate;
 
-import gecv.struct.FastArray;
+import gecv.struct.FastQueue;
 import gecv.struct.feature.TupleDesc_F64;
 
 
@@ -40,8 +40,8 @@ public class AssociateGreedyTuple {
 	 * @param pairs Index of the 'dst' feature a 'src' feature is associated with.  If an element
 	 * has a value of -1 then no association was performed.  Must be src.size() long.
 	 */
-	public static void basic( FastArray<TupleDesc_F64> src ,
-							  FastArray<TupleDesc_F64> dst ,
+	public static void basic( FastQueue<TupleDesc_F64> src ,
+							  FastQueue<TupleDesc_F64> dst ,
 							  ScoreAssociateTuple score ,
 							  double maxFitError ,
 							  int pairs[] )
@@ -75,8 +75,8 @@ public class AssociateGreedyTuple {
 	 * @param pairs Index of the 'dst' feature a 'src' feature is associated with.  Must be src.size() long.
 	 * @param fitScore Quality of the associations fit.  Must be src.size() long.
 	 */
-	public static void fitIsError( FastArray<TupleDesc_F64> src ,
-								   FastArray<TupleDesc_F64> dst ,
+	public static void fitIsError( FastQueue<TupleDesc_F64> src ,
+								   FastQueue<TupleDesc_F64> dst ,
 								   ScoreAssociateTuple score ,
 								   int pairs[] ,
 								   double fitScore[] )
@@ -114,8 +114,8 @@ public class AssociateGreedyTuple {
 	 * @param pairs Index of the 'dst' feature a 'src' feature is associated with.  Must be src.size() long.
 	 * @param fitScore Quality of the associations fit.  Must be src.size() long.
 	 */
-	public static void totalCloseMatches( FastArray<TupleDesc_F64> src ,
-										  FastArray<TupleDesc_F64> dst ,
+	public static void totalCloseMatches( FastQueue<TupleDesc_F64> src ,
+										  FastQueue<TupleDesc_F64> dst ,
 										  ScoreAssociateTuple score ,
 										  double containmentScale ,
 										  double workBuffer[] ,
@@ -157,12 +157,13 @@ public class AssociateGreedyTuple {
 	 *
 	 * @param src The set of features which are being associated with 'dst'.
 	 * @param dst A set of features.
-	 * @param score Function used to score the quality of a possible association.
+	 * @param score Function used to score the quality of a possible association.  If no association was made
+	 * then its value will be Double.MAX_VALUE
 	 * @param workBuffer Internal work buffer. Must be dst.size()*src.size() long.
 	 * @param pairs Index of the 'dst' feature a 'src' feature is associated with.  Must be src.size() long.
 	 */
-	public static void forwardBackwards( FastArray<TupleDesc_F64> src ,
-										 FastArray<TupleDesc_F64> dst ,
+	public static void forwardBackwards( FastQueue<TupleDesc_F64> src ,
+										 FastQueue<TupleDesc_F64> dst ,
 										 ScoreAssociateTuple score ,
 										 double workBuffer[] ,
 										 int pairs[] ,
@@ -194,6 +195,7 @@ public class AssociateGreedyTuple {
 			for( int j = 0; j < src.size; j++ , match += dst.size ) {
 				if( workBuffer[match] < scoreToBeat ) {
 					pairs[i] = -1;
+					fitScore[i] = Double.MAX_VALUE;
 					break;
 				}
 			}
