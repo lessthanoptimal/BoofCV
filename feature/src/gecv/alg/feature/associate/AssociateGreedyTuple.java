@@ -165,7 +165,8 @@ public class AssociateGreedyTuple {
 										 FastArray<TupleDesc_F64> dst ,
 										 ScoreAssociateTuple score ,
 										 double workBuffer[] ,
-										 int pairs[] )
+										 int pairs[] ,
+										 double fitScore[] )
 	{
 		// forward association
 		int index = 0;
@@ -182,6 +183,7 @@ public class AssociateGreedyTuple {
 				}
 			}
 			pairs[i] = bestIndex;
+			fitScore[i] = bestScore;
 		}
 
 		// validate by seeing if the reverse association has a better fit score or not
