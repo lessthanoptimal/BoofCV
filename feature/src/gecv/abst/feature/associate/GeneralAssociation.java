@@ -16,9 +16,29 @@
 
 package gecv.abst.feature.associate;
 
+import gecv.struct.FastArray;
+import gecv.struct.feature.AssociatedIndex;
+
 
 /**
+ * Generalized interface for associating features.
+ *
  * @author Peter Abeles
  */
-public class GeneralPointAssociation {
+public interface GeneralAssociation<T> {
+
+	/**
+	 * Finds the best match for each item in the src list with an item in the 'dst' list.
+	 *
+	 * @param listSrc Source list that is being matched to dst list.
+	 * @param listDst Destination list of items that are matched to source.
+	 */
+	public void associate( FastArray<T> listSrc , FastArray<T> listDst );
+
+	/**
+	 * List of associated features.  Indexes refer to the index inside the input lists.
+	 *
+	 * @return List of associated features.
+	 */
+	public FastArray<AssociatedIndex> getMatches();
 }

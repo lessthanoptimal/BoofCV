@@ -96,13 +96,18 @@ public class TestAssociateGreedyTuple {
 
 		int pairs[] = new int[4];
 		double workBuffer[] = new double[4*4];
+		double fitScore[] = new double[4];
 
-		AssociateGreedyTuple.forwardBackwards(a,b,score,workBuffer,pairs);
+		AssociateGreedyTuple.forwardBackwards(a,b,score,workBuffer,pairs,fitScore);
 
 		assertEquals(2,pairs[0]);
 		assertEquals(-1,pairs[1]);
 		assertEquals(0,pairs[2]);
 		assertEquals(1,pairs[3]);
+
+		assertEquals(0,fitScore[0],1e-5);
+		assertEquals(0,fitScore[2],1e-5);
+		assertEquals(0,fitScore[3],1e-5);
 	}
 
 	private FastArray<TupleDesc_F64> createData( double ...values )

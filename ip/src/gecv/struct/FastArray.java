@@ -29,12 +29,12 @@ public class FastArray<T> {
 	public int size;
 	public Class<T> type;
 
-	public FastArray(int size, Class<T> type) {
+	public FastArray(int initialMaxSize, Class<T> type) {
 		this.size = 0;
 		this.type = type;
 
-		data = (T[])Array.newInstance(type,size);
-		for( int i = 0; i < size; i++ ) {
+		data = (T[])Array.newInstance(type,initialMaxSize);
+		for( int i = 0; i < initialMaxSize; i++ ) {
 			data[i] = createInstance();
 		}
 	}

@@ -167,7 +167,7 @@ public abstract class AssociationScorePanel extends JPanel implements MouseListe
 				g2.setColor(Color.RED);
 				g2.setStroke(new BasicStroke(3));
 
-				double worstLimit = (worst-best)*plotFraction+best;
+				double worstLimit = (worst-best)*plotFraction;
 
 				for( int i = 0; i < N; i++ ) {
 					Point2D_I32 p = getPoint(i);
@@ -215,7 +215,7 @@ public abstract class AssociationScorePanel extends JPanel implements MouseListe
 			final int N = isLeft ? leftPts.size() : rightPts.size();
 
 			indexBest = -1;
-			worst = 0;
+			worst = -Double.MAX_VALUE;
 			best = Double.MAX_VALUE;
 			for( int i = 0; i < N; i++ ) {
 				double s = associationScore[i];
