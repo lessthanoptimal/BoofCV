@@ -20,6 +20,7 @@ import gecv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -37,5 +38,11 @@ public class TestScoreAssociateEuclideanSq {
 		b.value=new double[]{2,-1,7,-8,10};
 
 		assertEquals(195,score.score(a,b),1e-4);
+	}
+
+	@Test
+	public void check() {
+		ScoreAssociateEuclideanSq score = new ScoreAssociateEuclideanSq();
+		assertTrue(score.isZeroMinimum());
 	}
 }

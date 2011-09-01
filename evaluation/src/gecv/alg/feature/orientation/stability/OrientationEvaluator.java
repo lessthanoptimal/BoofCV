@@ -24,6 +24,7 @@ import gecv.alg.feature.orientation.OrientationGradient;
 import gecv.alg.feature.orientation.OrientationImage;
 import gecv.alg.feature.orientation.RegionOrientation;
 import gecv.core.image.GeneralizedImageOps;
+import gecv.evaluation.ErrorStatistics;
 import gecv.struct.image.ImageBase;
 import jgrl.metric.UtilAngle;
 import jgrl.struct.affine.Affine2D_F32;
@@ -44,6 +45,8 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 	double angles[];
 	D derivX;
 	D derivY;
+
+	ErrorStatistics errors = new ErrorStatistics(500);
 
 	public OrientationEvaluator(int borderSize,
 								InterestPointDetector<T> detector ,
@@ -113,7 +116,7 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 			angleAlg.setScale(1.0);
 		}
 
-		double totalError = 0;
+		errors.reset();
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_I32 p = points.get(i);
 
@@ -132,20 +135,17 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 
 			double foundAngle = angleAlg.compute(p.x,p.y);
 			double error = UtilAngle.dist(expectedAngle,foundAngle);
-			totalError += error;
-//			if( error > 1 )
-//				System.out.println();
-//			if( i == 0 )
-//				System.out.println("Error "+error+" "+p.x+" "+p.y+" angle "+angles[indexes.get(i)]);
+			errors.add(error);
 		}
 
-		totalError /= points.size();
+		double p50 = errors.getFraction(0.5);
+		double p90 = errors.getFraction(0.9);
 
-		return new double[]{totalError};
+		return new double[]{p50,p90};
 	}
 
 	@Override
 	public String[] getMetricNames() {
-		return new String[]{"AveAngleError"};
+		return new String[]{"50% error","90% error"};
 	}
 }

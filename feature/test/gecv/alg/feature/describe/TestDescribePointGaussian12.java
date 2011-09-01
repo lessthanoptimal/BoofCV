@@ -16,17 +16,25 @@
 
 package gecv.alg.feature.describe;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import gecv.struct.convolve.Kernel2D_F32;
+import gecv.struct.feature.TupleDesc_F64;
+import gecv.struct.image.ImageFloat32;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointGaussian12 {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestDescribePointGaussian12 extends StandardTupleDescribeTests {
+
+	DescribePointGaussian12<ImageFloat32, Kernel2D_F32> alg;
+
+	public TestDescribePointGaussian12() {
+		alg = new DescribePointGaussian12<ImageFloat32, Kernel2D_F32>(radius,ImageFloat32.class);
+	}
+
+	@Override
+	public TupleDesc_F64 describe(int x, int y, double theta, ImageFloat32 image) {
+		alg.setImage(image);
+		return alg.describe(x,y,theta,null);
 	}
 }

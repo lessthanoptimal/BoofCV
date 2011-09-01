@@ -33,6 +33,7 @@ public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<Tup
 
 	ScoreAssociateTuple score;
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
+	double copy[];
 
 	public void setScore(ScoreAssociateTuple score) {
 		this.score = score;
@@ -60,14 +61,35 @@ public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<Tup
 								   double matchScore[],
 								   int maxMatches )
 	{
-		double copy[] = matchScore.clone();
+		matches.reset();
+		if( sizeSrc < maxMatches ) {
+			// put all the matches in
+			addAllMatches(sizeSrc, pairs);
+			return;
+		}
+
+		// copy the score so that the original is not modified
+		if( copy == null || copy.length < sizeSrc ) {
+			copy = matchScore.clone();
+		} else {
+			System.arraycopy(matchScore,0,copy,0,sizeSrc);
+		}
 		double threshold = QuickSelectArray.select(copy,maxMatches,sizeSrc);
 
-		matches.reset();
 		for( int i = 0; i < sizeSrc && matches.size() < maxMatches; i++ ) {
 			int index = pairs[i];
 			double s = matchScore[i];
 			if( index >= 0 && s <= threshold ) {
+				matches.pop().setAssociation(i,index);
+			}
+		}
+	}
+
+	private void addAllMatches(int sizeSrc, int pairs[]) {
+		matches.reset();
+		for( int i = 0; i < sizeSrc ; i++ ) {
+			int index = pairs[i];
+			if( index >= 0 ) {
 				matches.pop().setAssociation(i,index);
 			}
 		}

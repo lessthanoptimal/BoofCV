@@ -33,8 +33,9 @@ public class UtilStabilityBenchmark {
 		List<StabilityAlgorithm> ret = new ArrayList<StabilityAlgorithm>();
 
 		ret.add( new StabilityAlgorithm("SURF", FactoryExtractFeatureDescription.surf(true,imageType)));
-		ret.add( new StabilityAlgorithm("Steer", FactoryExtractFeatureDescription.steerableGaussian(12,false,imageType,derivType)));
-		ret.add( new StabilityAlgorithm("Steer Norm", FactoryExtractFeatureDescription.steerableGaussian(12,true,imageType,derivType)));
+		ret.add( new StabilityAlgorithm("Gaussian 12", FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType)));
+		ret.add( new StabilityAlgorithm("Steer", FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType)));
+		ret.add( new StabilityAlgorithm("Steer Norm", FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType)));
 
 		return ret;
 	}

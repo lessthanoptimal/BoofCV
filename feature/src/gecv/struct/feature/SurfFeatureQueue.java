@@ -14,29 +14,28 @@
  *    limitations under the License.
  */
 
-package gecv.alg.feature.describe;
+package gecv.struct.feature;
 
-import gecv.factory.feature.describe.FactoryDescribePointAlgs;
-import gecv.struct.convolve.Kernel2D_F32;
-import gecv.struct.feature.TupleDesc_F64;
-import gecv.struct.image.ImageFloat32;
+import gecv.struct.FastQueue;
 
 
 /**
+ * {@link gecv.struct.FastQueue} for {@link SurfFeature}.
+ *
  * @author Peter Abeles
  */
-public class TestDescribePointSteerable2D extends StandardTupleDescribeTests {
+public class SurfFeatureQueue extends FastQueue<SurfFeature> {
 
-	DescribePointSteerable2D<ImageFloat32, Kernel2D_F32> alg;
+	int numFeatures;
 
-	public TestDescribePointSteerable2D() {
-		alg = FactoryDescribePointAlgs.steerableGaussian(false,-1,radius,ImageFloat32.class);
-
+	public SurfFeatureQueue( int numFeatures ) {
+		super(SurfFeature.class,true);
+		this.numFeatures = numFeatures;
+		growArray(10);
 	}
 
 	@Override
-	public TupleDesc_F64 describe(int x, int y, double theta, ImageFloat32 image) {
-		alg.setImage(image);
-		return alg.describe(x,y,theta,null);
+	protected SurfFeature createInstance() {
+		return new SurfFeature(numFeatures);
 	}
 }
