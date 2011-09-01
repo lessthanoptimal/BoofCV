@@ -41,6 +41,11 @@ import gecv.struct.image.ImageBase;
  * </ul>
  * </p>
  *
+ * <P>
+ * NOTE: Code is available for creating any the SURF variables described in [1].  To keep it simple, easy to use
+ * interfaces for other variants are at this time not provided.
+ * </p>
+ *
  * <p>
  * [1] Bay, Herbert and Ess, Andreas and Tuytelaars, Tinne and Van Gool, Luc, "Speeded-Up Robust Features (SURF)"
  * Comput. Vis. Image Underst., vol 110, issue 3, 2008
@@ -48,7 +53,7 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class DescribePointSURF<T extends ImageBase> {
+public class DescribePointSurf<T extends ImageBase> {
 
 	// integral image transform of input image
 	private T ii;
@@ -88,7 +93,6 @@ public class DescribePointSURF<T extends ImageBase> {
 			ret = new SurfFeature(64);
 		else if( ret.features.value.length != 64 )
 			throw new IllegalArgumentException("Provided feature must have 64 values");
-
 
 		// extract descriptor
 		SurfDescribeOps.features(ii,x,y,angle,weight,20,5,scale,true,ret.features.value);

@@ -14,11 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.alg.geo.trackers;
+package gecv.abst.feature.tracker;
 
 import gecv.abst.filter.derivative.ImageGradient;
 import gecv.alg.geo.AssociatedPair;
-import gecv.alg.geo.PointSequentialTracker;
 import gecv.alg.geo.SingleImageInput;
 import gecv.alg.tracker.pklt.PkltManager;
 import gecv.alg.tracker.pklt.PkltManagerConfig;
@@ -37,7 +36,7 @@ import java.util.List;
 
 
 /**
- * Wrapper around {@link gecv.alg.tracker.pklt.PyramidKltTracker} for {@link gecv.alg.geo.PointSequentialTracker}
+ * Wrapper around {@link gecv.alg.tracker.pklt.PyramidKltTracker} for {@link PointSequentialTracker}
  *
  * @author Peter Abeles
  */
@@ -162,7 +161,7 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 		for( PyramidKltFeature t : trackManager.getDropped() ) {
 			dropped.add( (AssociatedPair)t.cookie);
 			if( !active.remove(t.cookie) )
-				throw new IllegalArgumentException("Feature droped not in active list");
+				throw new IllegalArgumentException("Feature dropped not in active list");
 			t.cookie = null;
 		}
 

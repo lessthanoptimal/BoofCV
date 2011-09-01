@@ -30,6 +30,22 @@ import gecv.struct.image.ImageUInt8;
 @SuppressWarnings({"unchecked"})
 public class GIntegralImageOps {
 
+	/**
+	 * Given the input image, return the type of image the integral image should be.
+	 */
+	public static <I extends ImageBase, II extends ImageBase>
+	Class<II> getIntegralType( Class<I> inputType ) {
+		if( inputType == ImageFloat32.class ) {
+			return (Class<II>)ImageFloat32.class;
+		} else if( inputType == ImageUInt8.class ){
+			return (Class<II>)ImageSInt32.class;
+		} else if( inputType == ImageSInt32.class ){
+			return (Class<II>)ImageSInt32.class;
+		} else {
+			throw new IllegalArgumentException("Unknown input image type: "+inputType.getSimpleName());
+		}
+	}
+
 	public static <I extends ImageBase, T extends ImageBase>
 	T transform( I input , T transformed ) {
 		if( input instanceof ImageFloat32 ) {

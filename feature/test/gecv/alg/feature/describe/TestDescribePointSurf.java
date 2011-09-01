@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointSURF {
+public class TestDescribePointSurf {
 
 	Random rand = new Random(234);
 	int width = 50;
@@ -40,10 +40,10 @@ public class TestDescribePointSURF {
 	int c_x = width/2;
 	int c_y = height/2;
 
-	DescribePointSURF<ImageFloat32> alg = new DescribePointSURF<ImageFloat32>();
+	DescribePointSurf<ImageFloat32> alg = new DescribePointSurf<ImageFloat32>();
 	ImageFloat32 ii = new ImageFloat32(width,height);
 
-	public TestDescribePointSURF() {
+	public TestDescribePointSurf() {
 		GeneralizedImageOps.randomize(ii,rand,0,100);
 	}
 

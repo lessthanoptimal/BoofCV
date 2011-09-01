@@ -49,11 +49,11 @@ public class AssociateSurfBasic {
 		this.assoc = assoc;
 	}
 
-	public void addSource( FastQueue<SurfFeature> src ) {
+	public void setSrc( FastQueue<SurfFeature> src ) {
 		sort(src,srcPositive,srcNegative);
 	}
 
-	public void addDest( FastQueue<SurfFeature> dst ) {
+	public void setDst( FastQueue<SurfFeature> dst ) {
 		sort(dst,dstPositive,dstNegative);
 	}
 

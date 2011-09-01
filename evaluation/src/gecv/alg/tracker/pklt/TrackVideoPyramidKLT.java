@@ -66,7 +66,6 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 	ImagePyramid<D> derivX;
 	ImagePyramid<D> derivY;
 
-
 	@SuppressWarnings({"unchecked"})
 	public TrackVideoPyramidKLT(SimpleImageSequence<I> sequence,
 								PkltManager<I, D> tracker ,
@@ -200,7 +199,7 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 	}
 
 	public static void main( String args[] ) {
-		String fileName = "/home/pja/kayaking.ogv";
+		String fileName = "/media/backup/datasets/2010/snow_videos/snow_norail_stabilization.avi";
 
 		run(fileName,ImageFloat32.class,ImageFloat32.class);
 //		run(fileName, ImageUInt8.class, ImageSInt16.class);

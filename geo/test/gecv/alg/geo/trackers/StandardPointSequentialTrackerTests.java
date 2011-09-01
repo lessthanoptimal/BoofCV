@@ -16,8 +16,8 @@
 
 package gecv.alg.geo.trackers;
 
+import gecv.abst.feature.tracker.PointSequentialTracker;
 import gecv.alg.geo.AssociatedPair;
-import gecv.alg.geo.PointSequentialTracker;
 import gecv.alg.misc.ImageTestingOps;
 import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_F64;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * Standard tests for implementations of {@link gecv.alg.geo.PointSequentialTracker}.
+ * Standard tests for implementations of {@link gecv.abst.feature.tracker.PointSequentialTracker}.
  *
  * @author Peter Abeles
  */

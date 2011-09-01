@@ -46,8 +46,8 @@ public class TestAssociateSurfBasic {
 		dst.add( createDesc(true,0));
 		dst.add( createDesc(false,10));
 
-		alg.addSource(src);
-		alg.addDest(dst);
+		alg.setSrc(src);
+		alg.setDst(dst);
 		alg.associate();
 		FastQueue<AssociatedIndex> matches = alg.getMatches();
 
@@ -70,8 +70,8 @@ public class TestAssociateSurfBasic {
 		dst.add( createDesc(false,0));
 		dst.add( createDesc(false,7));
 
-		alg.addSource(src);
-		alg.addDest(dst);
+		alg.setSrc(src);
+		alg.setDst(dst);
 		alg.associate();
 		FastQueue<AssociatedIndex> matches = alg.getMatches();
 
