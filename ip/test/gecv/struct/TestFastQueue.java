@@ -41,6 +41,16 @@ public class TestFastQueue {
 	}
 
 	@Test
+	public void removeTail() {
+		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(10,Point2D_I32.class,true);
+
+		alg.pop();
+		assertEquals(1,alg.size);
+		alg.removeTail();
+		assertEquals(0,alg.size);
+	}
+
+	@Test
 	public void get_pop() {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 

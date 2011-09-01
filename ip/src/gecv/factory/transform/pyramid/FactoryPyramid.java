@@ -19,9 +19,10 @@ package gecv.factory.transform.pyramid;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.alg.transform.pyramid.PyramidUpdateGaussianScale;
 import gecv.alg.transform.pyramid.PyramidUpdateIntegerDown;
+import gecv.factory.filter.kernel.FactoryKernel;
 import gecv.factory.filter.kernel.FactoryKernelGaussian;
 import gecv.factory.interpolate.FactoryInterpolation;
-import gecv.struct.convolve.Kernel1D_F32;
+import gecv.struct.convolve.Kernel1D;
 import gecv.struct.image.ImageBase;
 import gecv.struct.pyramid.PyramidUpdaterDiscrete;
 import gecv.struct.pyramid.PyramidUpdaterFloat;
@@ -45,7 +46,10 @@ public class FactoryPyramid {
 	 */
 	public static <T extends ImageBase>
 	PyramidUpdaterDiscrete<T> discreteGaussian( Class<T> imageType , double sigma , int radius ) {
-		return new PyramidUpdateIntegerDown<T>(FactoryKernelGaussian.gaussian(Kernel1D_F32.class,sigma,radius),imageType);
+
+		Class<Kernel1D> kernelType = FactoryKernel.getKernelType(imageType,1);
+
+		return new PyramidUpdateIntegerDown<T>(FactoryKernelGaussian.gaussian(kernelType,sigma,radius),imageType);
 	}
 
 	/**

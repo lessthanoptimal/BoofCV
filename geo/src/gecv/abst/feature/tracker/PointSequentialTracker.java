@@ -14,9 +14,10 @@
  *    limitations under the License.
  */
 
-package gecv.alg.geo;
+package gecv.abst.feature.tracker;
 
 
+import gecv.alg.geo.AssociatedPair;
 import gecv.struct.image.ImageBase;
 
 import java.util.List;

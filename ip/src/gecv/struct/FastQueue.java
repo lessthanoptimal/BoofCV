@@ -51,6 +51,13 @@ public class FastQueue<T> {
 		this(0,type,declareInstances);
 	}
 
+	public void removeTail() {
+		if( size > 0 )
+			size--;
+		else
+			throw new IllegalArgumentException("Size is already zero");
+	}
+
 	public void reset() {
 		size = 0;
 	}

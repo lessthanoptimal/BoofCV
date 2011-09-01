@@ -16,7 +16,7 @@
 
 package gecv.abst.feature.describe;
 
-import gecv.alg.feature.describe.DescribePointSURF;
+import gecv.alg.feature.describe.DescribePointSurf;
 import gecv.alg.feature.orientation.OrientationIntegral;
 import gecv.alg.transform.ii.GIntegralImageOps;
 import gecv.struct.feature.SurfFeature;
@@ -29,11 +29,11 @@ import gecv.struct.image.ImageBase;
  */
 public class WrapDescribeSurf<T extends ImageBase> implements ExtractFeatureDescription<T> {
 
-	DescribePointSURF<T> surf;
+	DescribePointSurf<T> surf;
 	OrientationIntegral<T> orientation;
 	T ii;
 
-	public WrapDescribeSurf(DescribePointSURF<T> surf ,
+	public WrapDescribeSurf(DescribePointSurf<T> surf ,
 							OrientationIntegral<T> orientation )
 	{
 		this.surf = surf;

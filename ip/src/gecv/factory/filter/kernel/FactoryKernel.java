@@ -21,7 +21,6 @@ import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
 import gecv.struct.image.ImageInteger;
 
-import java.awt.image.Kernel;
 import java.util.Random;
 
 /**
@@ -212,7 +211,7 @@ public class FactoryKernel {
 			return (Class<K1>)Kernel1D_I32.class;
 	}
 
-	public static <K extends Kernel, T extends ImageBase>
+	public static <K extends KernelBase, T extends ImageBase>
 	Class<K> getKernelType( Class<T> imageType , int DOF ) {
 		if( imageType == ImageFloat32.class ) {
 			if( DOF == 1 )

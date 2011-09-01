@@ -16,11 +16,11 @@
 
 package gecv.alg.geo.d2.stabilization;
 
+import gecv.abst.feature.tracker.PointSequentialTracker;
 import gecv.alg.distort.ImageDistort;
 import gecv.alg.distort.PixelTransformAffine;
 import gecv.alg.distort.impl.DistortSupport;
 import gecv.alg.geo.AssociatedPair;
-import gecv.alg.geo.PointSequentialTracker;
 import gecv.alg.geo.SingleImageInput;
 import gecv.alg.interpolate.InterpolatePixel;
 import gecv.factory.interpolate.FactoryInterpolation;

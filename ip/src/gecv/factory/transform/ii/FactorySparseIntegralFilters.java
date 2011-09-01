@@ -21,6 +21,7 @@ import gecv.alg.transform.ii.impl.SparseIntegralGradient_NoBorder_I32;
 import gecv.struct.deriv.SparseImageGradient;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
+import gecv.struct.image.ImageSInt32;
 
 
 /**
@@ -34,7 +35,7 @@ public class FactorySparseIntegralFilters {
 	SparseImageGradient<T,?> gradient( int radius , Class<T> imageType ) {
 		if( imageType == ImageFloat32.class )
 			return (SparseImageGradient<T,?>)new SparseIntegralGradient_NoBorder_F32(radius);
-		else if( imageType == ImageFloat32.class )
+		else if( imageType == ImageSInt32.class )
 			return (SparseImageGradient<T,?>)new SparseIntegralGradient_NoBorder_I32(radius);
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
