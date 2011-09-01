@@ -36,11 +36,11 @@ public class AssociateSurfBasic {
 	GeneralAssociation<TupleDesc_F64> assoc;
 
 	// features segmented by laplace sign
-	FastQueue<TupleDesc_F64> srcPositive = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class,false);
-	FastQueue<TupleDesc_F64> srcNegative = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class,false);
+	FastQueue<Helper> srcPositive = new FastQueue<Helper>(10,Helper.class,true);
+	FastQueue<Helper> srcNegative = new FastQueue<Helper>(10,Helper.class,true);
 
-	FastQueue<TupleDesc_F64> dstPositive = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class,false);
-	FastQueue<TupleDesc_F64> dstNegative = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class,false);
+	FastQueue<Helper> dstPositive = new FastQueue<Helper>(10,Helper.class,true);
+	FastQueue<Helper> dstNegative = new FastQueue<Helper>(10,Helper.class,true);
 
 	// stores output matches
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
@@ -62,7 +62,7 @@ public class AssociateSurfBasic {
 	 * of images and don't want to resort everything.
 	 */
 	public void swapLists() {
-		FastQueue<TupleDesc_F64> tmp = srcPositive;
+		FastQueue<Helper> tmp = srcPositive;
 		srcPositive = dstPositive;
 		dstPositive = tmp;
 
@@ -78,15 +78,21 @@ public class AssociateSurfBasic {
 	{
 		// find and add the matches
 		matches.reset();
-		assoc.associate(srcPositive,dstPositive);
+		assoc.associate((FastQueue)srcPositive,(FastQueue)dstPositive);
 		FastQueue<AssociatedIndex> m = assoc.getMatches();
 		for( int i = 0; i < m.size; i++ ) {
-			matches.pop().set(m.data[i]);
+			AssociatedIndex a = m.data[i];
+			int globalSrcIndex = srcPositive.data[a.src].index;
+			int globalDstIndex = dstPositive.data[a.dst].index;
+			matches.pop().setAssociation(globalSrcIndex,globalDstIndex);
 		}
-		assoc.associate(srcNegative,dstNegative);
+		assoc.associate((FastQueue)srcNegative,(FastQueue)dstNegative);
 		m = assoc.getMatches();
 		for( int i = 0; i < m.size; i++ ) {
-			matches.pop().set(m.data[i]);
+			AssociatedIndex a = m.data[i];
+			int globalSrcIndex = srcNegative.data[a.src].index;
+			int globalDstIndex = dstNegative.data[a.dst].index;
+			matches.pop().setAssociation(globalSrcIndex,globalDstIndex);
 		}
 	}
 
@@ -99,19 +105,31 @@ public class AssociateSurfBasic {
 
 	/**
 	 * Splits the set of input features into positive and negative laplacian lists.
+	 * Keep track of the feature's index in the original input list.  This is
+	 * the index that needs to be returned.
 	 */
 	private void sort(FastQueue<SurfFeature> input ,
-					  FastQueue<TupleDesc_F64> pos , FastQueue<TupleDesc_F64> neg ) {
+					  FastQueue<Helper> pos , FastQueue<Helper> neg ) {
 		pos.reset();
 		neg.reset();
 
 		for( int i = 0; i < input.size; i++ ) {
 			SurfFeature f = input.get(i);
 			if( f.laplacianPositive ) {
-				pos.add(f.features);
+				pos.pop().wrap(f.features,i);
 			} else {
-				neg.add(f.features);
+				neg.pop().wrap(f.features,i);
 			}
 		}
+	}
+
+	public static class Helper extends TupleDesc_F64
+	{
+		public int index;
+		public void wrap( TupleDesc_F64 a , int index ) {
+			this.index = index;
+			value = a.value;
+		}
+
 	}
 }

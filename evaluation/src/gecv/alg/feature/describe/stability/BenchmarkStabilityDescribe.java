@@ -90,6 +90,5 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 //		benchmark.testIntensity();
 		benchmark.testRotation();
 //		benchmark.testScale();
-
 	}
 }

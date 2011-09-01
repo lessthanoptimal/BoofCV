@@ -29,7 +29,15 @@ public class TestFastQueue {
 
 	@Test
 	public void checkDeclareInstance() {
-		fail("impleemnt");
+		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(10,Point2D_I32.class,true);
+
+		assertTrue(alg.getInternalArraySize()>0);
+		assertTrue(alg.data[0] != null);
+
+		alg = new FastQueue<Point2D_I32>(10,Point2D_I32.class,false);
+
+		assertTrue(alg.getInternalArraySize()>0);
+		assertTrue(alg.data[0] == null);
 	}
 
 	@Test
@@ -56,12 +64,25 @@ public class TestFastQueue {
 
 	@Test
 	public void add() {
-		fail("impleemnt");
+		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(Point2D_I32.class,false);
+
+		Point2D_I32 a = new Point2D_I32();
+		alg.add(a);
+		assertTrue(a==alg.data[0]);
 	}
 
 	@Test
 	public void addAll() {
-		fail("impleemnt");
+		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+		alg.pop();
+		alg.pop();
+
+		FastQueue<Point2D_I32> alg2 = new FastQueue<Point2D_I32>(Point2D_I32.class,false);
+
+		alg2.addAll(alg);
+
+		assertTrue(alg.get(0) == alg2.get(0));
+		assertTrue(alg.get(1) == alg2.get(1));
 	}
 
 	/**

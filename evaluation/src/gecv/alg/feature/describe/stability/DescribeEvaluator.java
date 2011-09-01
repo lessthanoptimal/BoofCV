@@ -20,6 +20,7 @@ import gecv.abst.feature.describe.ExtractFeatureDescription;
 import gecv.abst.feature.detect.interest.InterestPointDetector;
 import gecv.alg.feature.benchmark.StabilityAlgorithm;
 import gecv.alg.feature.benchmark.StabilityEvaluatorPoint;
+import gecv.evaluation.ErrorStatistics;
 import gecv.struct.feature.TupleDesc_F64;
 import gecv.struct.image.ImageBase;
 import jgrl.struct.affine.Affine2D_F32;
@@ -42,6 +43,7 @@ public class DescribeEvaluator <T extends ImageBase>
 	extends StabilityEvaluatorPoint<T>
 {
 	List<TupleDesc_F64> initial = new ArrayList<TupleDesc_F64>();
+	ErrorStatistics errors = new ErrorStatistics(500);
 
 	public DescribeEvaluator(int borderSize, InterestPointDetector<T> detector) {
 		super(borderSize, detector);
@@ -81,8 +83,9 @@ public class DescribeEvaluator <T extends ImageBase>
 			scale = v2.norm()/v1.norm();
 		}
 
-		double totalError = 0;
 
+		// compute the median error
+		errors.reset();
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_I32 p = points.get(i);
 			int index = indexes != null ? indexes.get(i) : i;
@@ -94,17 +97,18 @@ public class DescribeEvaluator <T extends ImageBase>
 				for( int j = 0; j < f.value.length; j++ ) {
 					error += Math.abs(f.value[j] - e.value[j]);
 				}
-				totalError += error/f.value.length;
+				errors.add(error/f.value.length);
 			}
 		}
-		totalError /= points.size();
 
+		double p50 = errors.getFraction(0.5);
+		double p90 = errors.getFraction(0.9);
 
-		return new double[]{totalError*30};
+		return new double[]{p50*30,p90*30};
 	}
 
 	@Override
 	public String[] getMetricNames() {
-		return new String[]{"Error * 30"};
+		return new String[]{"50% * 30","90% *30"};
 	}
 }

@@ -29,6 +29,9 @@ public class TupleDesc_F64 {
 		this.value = new double[ numFeatures ];
 	}
 
+	protected TupleDesc_F64() {
+	}
+
 	public void set( double ...value ) {
 		System.arraycopy(value,0,this.value,0,this.value.length);
 	}
