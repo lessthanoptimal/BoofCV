@@ -35,11 +35,6 @@ public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
 	/** The radius of each feature. 3 is a reasonable number. */
 	public int featureRadius;
 
-	/** Width of input image */
-	public int imgWidth;
-	/** Height of input image */
-	public int imgHeight;
-
 	/** Scale factor for each layer in the pyramid */
 	public int pyramidScaling[];
 
@@ -55,12 +50,9 @@ public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
 	 */
 	public static <I extends ImageBase, D extends ImageBase>
 	PkltManagerConfig<I,D> createDefault(Class<I> typeInput,
-										 Class<D> typeDeriv,
-										 int width , int height ) {
+										 Class<D> typeDeriv) {
 		PkltManagerConfig<I,D> ret = new PkltManagerConfig<I,D>();
 
-		ret.imgWidth = width;
-		ret.imgHeight = height;
 		ret.typeInput = typeInput;
 		ret.typeDeriv = typeDeriv;
 

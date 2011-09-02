@@ -162,8 +162,6 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 		config.typeInput = imageType;
 		config.typeDeriv = derivType;
 		config.pyramidScaling = new int[]{1,2,4,8};
-		config.imgWidth = image.width;
-		config.imgHeight = image.height;
 		config.minFeatures = 80;
 		config.maxFeatures = 100;
 		config.featureRadius = 3;

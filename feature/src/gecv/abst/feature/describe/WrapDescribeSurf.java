@@ -27,14 +27,15 @@ import gecv.struct.image.ImageBase;
 /**
  * @author Peter Abeles
  */
-public class WrapDescribeSurf<T extends ImageBase> implements ExtractFeatureDescription<T> {
+public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
+		implements ExtractFeatureDescription<T> {
 
-	DescribePointSurf<T> surf;
-	OrientationIntegral<T> orientation;
-	T ii;
+	DescribePointSurf<II> surf;
+	OrientationIntegral<II> orientation;
+	II ii;
 
-	public WrapDescribeSurf(DescribePointSurf<T> surf ,
-							OrientationIntegral<T> orientation )
+	public WrapDescribeSurf(DescribePointSurf<II> surf ,
+							OrientationIntegral<II> orientation )
 	{
 		this.surf = surf;
 		this.orientation = orientation;

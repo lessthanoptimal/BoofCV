@@ -17,7 +17,7 @@
 package gecv.alg.geo.d2;
 
 import gecv.abst.feature.tracker.PointSequentialTracker;
-import gecv.alg.filter.derivative.ImageDerivativeOps;
+import gecv.alg.filter.derivative.GImageDerivativeOps;
 import gecv.alg.geo.AssociatedPair;
 import gecv.alg.geo.d2.stabilization.PointImageStabilization;
 import gecv.core.image.ConvertBufferedImage;
@@ -131,7 +131,7 @@ public class StabilizeImageSequence<I extends ImageBase> extends ProcessImageSeq
 	private static <I extends ImageBase,D extends ImageBase>
 	void doStuff( String fileName , Class<I> imageType )
 	{
-		Class<D> derivType = ImageDerivativeOps.getDerivativeType(imageType);
+		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		SimpleImageSequence<I> sequence = new XugglerSimplified<I>(fileName, imageType);
 
@@ -139,9 +139,8 @@ public class StabilizeImageSequence<I extends ImageBase> extends ProcessImageSeq
 
 		I image = sequence.next();
 
-		tracker = FactoryPointSequentialTracker.klt(maxFeatures,image.width,image.height,
-				new int[]{1,2,4},imageType,derivType);
-//		tracker = FactoryPointSequentialTracker.surf(maxFeatures,100,1,imageType);
+		tracker = FactoryPointSequentialTracker.klt(maxFeatures,new int[]{1,2,4},imageType,derivType);
+//		tracker = FactoryPointSequentialTracker.surf(maxFeatures,400,1,imageType);
 
 		ModelMatcher<Affine2D_F64,AssociatedPair> fitter = createModelMatcher();
 

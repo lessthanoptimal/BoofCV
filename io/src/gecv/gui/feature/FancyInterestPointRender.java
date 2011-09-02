@@ -29,6 +29,7 @@ import java.util.List;
 public class FancyInterestPointRender {
 
 	List<Point> points = new ArrayList<Point>();
+	List<Line> lines = new ArrayList<Line>();
 	List<Circle> circles = new ArrayList<Circle>();
 	List<VString> strings = new ArrayList<VString>();
 
@@ -56,10 +57,16 @@ public class FancyInterestPointRender {
 				g2.drawLine(c.x,c.y,c.x+dx,c.y+dy);
 			}
 		}
+
+		for( Line l : lines ) {
+			g2.setColor(l.color);
+			g2.drawLine(l.x0,l.y0,l.x1,l.y1);
+		}
 	}
 
 	public synchronized void reset() {
 		points.clear();
+		lines.clear();
 		circles.clear();
 		strings.clear();
 	}
@@ -96,6 +103,15 @@ public class FancyInterestPointRender {
 		circles.add(p);
 	}
 
+	public synchronized void addLine( int x0 , int y0 , int x1 , int y1 ) {
+		Line p = new Line();
+		p.x0 = x0;
+		p.y0 = y0;
+		p.x1 = x1;
+		p.y1 = y1;
+		lines.add(p);
+	}
+
 	public synchronized void addCircle( int x , int y , int radius , Color color ) {
 		Circle p = new Circle();
 		p.x = x;
@@ -119,6 +135,13 @@ public class FancyInterestPointRender {
 	{
 		int x,y;
 		String value;
+	}
+
+	public static class Line
+	{
+		int x0,y0;
+		int x1,y1;
+		Color color = Color.BLUE;
 	}
 
 	public static class Point

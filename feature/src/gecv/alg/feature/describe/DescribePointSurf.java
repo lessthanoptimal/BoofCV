@@ -53,15 +53,15 @@ import gecv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class DescribePointSurf<T extends ImageBase> {
+public class DescribePointSurf<II extends ImageBase> {
 
 	// integral image transform of input image
-	private T ii;
+	private II ii;
 
 	// used to weigh feature computation
 	private Kernel2D_F64 weight = FactoryKernelGaussian.gaussian(2,true,64,-1,10);
 
-	public void setImage( T integralImage ) {
+	public void setImage( II integralImage ) {
 		ii = integralImage;
 	}
 
