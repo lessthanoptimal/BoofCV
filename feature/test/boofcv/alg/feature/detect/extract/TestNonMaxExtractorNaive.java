@@ -19,7 +19,7 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import jgrl.struct.point.Point2D_I16;
 import org.junit.Test;
 
@@ -103,7 +103,7 @@ public class TestNonMaxExtractorNaive {
 		ImageFloat32 img = new ImageFloat32(9, 8);
 		img.data = inten;
 
-		GecvTesting.checkSubImage(this, "testRegionWidth", true, img);
+		BoofTesting.checkSubImage(this, "testRegionWidth", true, img);
 	}
 
 	public void testRegionWidth(ImageFloat32 img) {
@@ -144,7 +144,7 @@ public class TestNonMaxExtractorNaive {
 		ImageFloat32 img = new ImageFloat32(9, 8);
 		img.data = inten;
 
-		GecvTesting.checkSubImage(this, "testThreshold", true, img);
+		BoofTesting.checkSubImage(this, "testThreshold", true, img);
 	}
 
 	public void testThreshold(ImageFloat32 img) {

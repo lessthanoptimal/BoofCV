@@ -25,7 +25,7 @@ import boofcv.core.image.border.ImageBorder1D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
@@ -66,7 +66,7 @@ public class TestKltCorner_I16 {
 
 		GradientSobel.process(img, derivX, derivY, new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 
-		GecvTesting.checkSubImage(this, "compareToNaive", true, derivX, derivY);
+		BoofTesting.checkSubImage(this, "compareToNaive", true, derivX, derivY);
 	}
 
 	public void compareToNaive(ImageSInt16 derivX, ImageSInt16 derivY) {
@@ -76,6 +76,6 @@ public class TestKltCorner_I16 {
 		KltCorner_S16 fast = new KltCorner_S16(3);
 		fast.process(derivX, derivY);
 
-		GecvTesting.assertEquals(naive.getIntensity(), fast.getIntensity());
+		BoofTesting.assertEquals(naive.getIntensity(), fast.getIntensity());
 	}
 }

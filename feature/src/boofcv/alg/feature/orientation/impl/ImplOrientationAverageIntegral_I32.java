@@ -18,7 +18,7 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.alg.feature.orientation.OrientationAverageIntegral;
-import boofcv.misc.GecvMiscOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.image.ImageSInt32;
 
@@ -66,8 +66,8 @@ public class ImplOrientationAverageIntegral_I32
 			SurfDescribeOps.gradient_noborder(ii,c_x,c_y,radius,4,scale,derivX,derivY);
 		} else {
 			SurfDescribeOps.gradient(ii,c_x,c_y,radius,4,scale,borderDerivX,borderDerivY);
-			GecvMiscOps.convertTo_I32(borderDerivX,derivX);
-			GecvMiscOps.convertTo_I32(borderDerivY,derivY);
+			BoofMiscOps.convertTo_I32(borderDerivX,derivX);
+			BoofMiscOps.convertTo_I32(borderDerivY,derivY);
 		}
 
 		double Dx=0,Dy=0;

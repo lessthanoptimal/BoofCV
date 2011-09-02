@@ -16,7 +16,7 @@
 
 package boofcv.alg.feature.orientation;
 
-import boofcv.misc.GecvMiscOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.ImageBase;
@@ -92,7 +92,7 @@ public abstract class OrientationNoGradient<T extends ImageBase> implements Orie
 		rect.x1 = c_x+radiusScale+1;
 		rect.y1 = c_y+radiusScale+1;
 
-		GecvMiscOps.boundRectangleInside(image,rect);
+		BoofMiscOps.boundRectangleInside(image,rect);
 
 		return computeAngle(c_x,c_y);
 	}

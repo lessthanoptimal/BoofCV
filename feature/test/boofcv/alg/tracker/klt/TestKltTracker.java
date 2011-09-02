@@ -23,6 +23,7 @@ import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_F32;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.testing.BoofTesting;
 import boofcv.testing.GecvTesting;
 import org.junit.Test;
 
@@ -73,9 +74,9 @@ public class TestKltTracker {
 
 		checkMovement(radius, deltaX, deltaY);
 
-		image = GecvTesting.createSubImageOf(image);
-		derivX = GecvTesting.createSubImageOf(derivX);
-		derivY = GecvTesting.createSubImageOf(derivY);
+		image = BoofTesting.createSubImageOf(image);
+		derivX = BoofTesting.createSubImageOf(derivX);
+		derivY = BoofTesting.createSubImageOf(derivY);
 
 		checkMovement(radius, deltaX, deltaY);
 	}

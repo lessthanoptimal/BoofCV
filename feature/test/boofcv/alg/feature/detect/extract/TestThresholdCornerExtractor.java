@@ -18,7 +18,7 @@ package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,7 +44,7 @@ public class TestThresholdCornerExtractor {
 		ImageFloat32 img = new ImageFloat32(9, 8);
 		img.data = inten;
 
-		GecvTesting.checkSubImage(this, "testThreshold", true, img);
+		BoofTesting.checkSubImage(this, "testThreshold", true, img);
 	}
 
 	public void testThreshold(ImageFloat32 img) {

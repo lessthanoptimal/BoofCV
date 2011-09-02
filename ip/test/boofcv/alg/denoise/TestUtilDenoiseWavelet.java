@@ -1,0 +1,64 @@
+/*
+ * Copyright 2011 Peter Abeles
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package boofcv.alg.denoise;
+
+import boofcv.alg.denoise.wavelet.UtilDenoiseWavelet;
+import boofcv.alg.misc.ImageTestingOps;
+import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
+
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+
+
+/**
+ * @author Peter Abeles
+ */
+public class TestUtilDenoiseWavelet {
+
+	Random rand = new Random(234235);
+
+	int width = 20;
+	int height = 30;
+
+	@Test
+	public void estimateNoiseStdDev() {
+		ImageFloat32 image = new ImageFloat32(width,height);
+
+		double sigma = 12;
+		ImageTestingOps.addGaussian(image,rand,sigma);
+
+		double found = UtilDenoiseWavelet.estimateNoiseStdDev(image,null);
+
+		assertEquals(sigma,found,1);
+	}
+
+	@Test
+	public void universalThreshold() {
+
+		ImageFloat32 image = new ImageFloat32(width,height);
+
+		double sigma = 12;
+
+		double found = UtilDenoiseWavelet.universalThreshold(image,sigma);
+
+		double expected = sigma*Math.sqrt(2.0*Math.log(height));
+
+		assertEquals(expected,found,1e-4);
+	}
+}

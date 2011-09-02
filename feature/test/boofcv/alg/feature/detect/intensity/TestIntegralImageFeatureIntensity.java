@@ -21,7 +21,7 @@ import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
@@ -57,7 +57,7 @@ public class TestIntegralImageFeatureIntensity {
 			ImplIntegralImageFeatureIntensity.hessianNaive(integral,skip,size,expected);
 			IntegralImageFeatureIntensity.hessian(integral,skip,size,found);
 
-			GecvTesting.assertEquals(expected,found,0,1e-4f);
+			BoofTesting.assertEquals(expected,found,0,1e-4f);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class TestIntegralImageFeatureIntensity {
 			ImplIntegralImageFeatureIntensity.hessianNaive(integral,skip,size,expected);
 			IntegralImageFeatureIntensity.hessian(integral,skip,size,found);
 
-			GecvTesting.assertEquals(expected,found,0,1e-4f);
+			BoofTesting.assertEquals(expected,found,0,1e-4f);
 		}
 	}
 }

@@ -21,7 +21,7 @@ import boofcv.alg.misc.ImageTestingOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.misc.GecvMiscOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.image.ImageFloat32;
@@ -164,7 +164,7 @@ public class TestImplSurfDescribeOps {
 		ImageFloat32 ii = IntegralImageOps.transform(img,null);
 		SparseImageGradient<ImageFloat32,?> sparse = createGradient(ii,1);
 
-		GecvMiscOps.zero(features,64);
+		BoofMiscOps.zero(features,64);
 		ImplSurfDescribeOps.features(20,20,0.75,weight,20,5,1,sparse,features);
 
 		for( double f : features )

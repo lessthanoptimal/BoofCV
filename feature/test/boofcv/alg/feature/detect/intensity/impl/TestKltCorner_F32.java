@@ -26,7 +26,7 @@ import boofcv.core.image.border.ImageBorder1D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
@@ -75,7 +75,7 @@ public class TestKltCorner_F32 {
 		ImageFloat32 derivX_F = ConvertImage.convert(derivX_I, (ImageFloat32)null);
 		ImageFloat32 derivY_F = ConvertImage.convert(derivY_I, (ImageFloat32)null);
 
-		GecvTesting.checkSubImage(this, "compareToNaive", true, derivX_I, derivY_I, derivX_F, derivY_F);
+		BoofTesting.checkSubImage(this, "compareToNaive", true, derivX_I, derivY_I, derivX_F, derivY_F);
 	}
 
 	public void compareToNaive(ImageSInt16 derivX_I, ImageSInt16 derivY_I, ImageFloat32 derivX_F, ImageFloat32 derivY_F) {
@@ -85,6 +85,6 @@ public class TestKltCorner_F32 {
 		KltCorner_F32 ssd_F = new KltCorner_F32( 3);
 		ssd_F.process(derivX_F, derivY_F);
 
-		GecvTesting.assertEquals(ssd_I.getIntensity(), ssd_F.getIntensity(), 0, 1f);
+		BoofTesting.assertEquals(ssd_I.getIntensity(), ssd_F.getIntensity(), 0, 1f);
 	}
 }

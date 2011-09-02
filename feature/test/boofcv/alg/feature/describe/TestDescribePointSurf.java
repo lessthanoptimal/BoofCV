@@ -19,7 +19,7 @@ package boofcv.alg.feature.describe;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
@@ -55,7 +55,7 @@ public class TestDescribePointSurf {
 		alg.setImage(ii);
 		SurfFeature expected = alg.describe(c_x,c_y,1,0,null);
 
-		ImageFloat32 sub = GecvTesting.createSubImageOf(ii);
+		ImageFloat32 sub = BoofTesting.createSubImageOf(ii);
 
 		alg.setImage(sub);
 		SurfFeature found = alg.describe(c_x,c_y,1,0,null);

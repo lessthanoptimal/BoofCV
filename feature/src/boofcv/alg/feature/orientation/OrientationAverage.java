@@ -17,7 +17,7 @@
 package boofcv.alg.feature.orientation;
 
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.misc.GecvMiscOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.ImageBase;
@@ -91,7 +91,7 @@ public abstract class OrientationAverage<D extends ImageBase> implements Orienta
 		rect.x1 = c_x+radiusScale+1;
 		rect.y1 = c_y+radiusScale+1;
 
-		GecvMiscOps.boundRectangleInside(derivX,rect);
+		BoofMiscOps.boundRectangleInside(derivX,rect);
 
 		if( weights == null )
 			return computeUnweightedScore();

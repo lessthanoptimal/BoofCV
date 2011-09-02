@@ -19,7 +19,7 @@ package boofcv.alg.feature.describe;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
@@ -57,10 +57,10 @@ public abstract class StandardTupleDescribeTests {
 	public void checkSubImage()
 	{
 		TupleDesc_F64 expected = describe(c_x,c_y,0,image);
-		ImageFloat32 sub = GecvTesting.createSubImageOf(image);
+		ImageFloat32 sub = BoofTesting.createSubImageOf(image);
 		TupleDesc_F64 found = describe(c_x,c_y,0,sub);
 
-		GecvTesting.assertEquals(expected.value,found.value,1e-8);
+		BoofTesting.assertEquals(expected.value,found.value,1e-8);
 	}
 
 	/**
