@@ -24,7 +24,7 @@ import boofcv.core.image.SingleBandImage;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -49,7 +49,7 @@ public class TestGradientToEdgeFeatures {
 	@Test
 	public void intensityE()  {
 
-		int total = GecvTesting.findMethodThenCall(this,"intensityE",GradientToEdgeFeatures.class,"intensityE");
+		int total = BoofTesting.findMethodThenCall(this,"intensityE",GradientToEdgeFeatures.class,"intensityE");
 
 		assertEquals(numExpected,total);
 	}
@@ -64,7 +64,7 @@ public class TestGradientToEdgeFeatures {
 		GeneralizedImageOps.randomize(derivX,rand,0,10);
 		GeneralizedImageOps.randomize(derivY,rand,0,10);
 
-		GecvTesting.checkSubImage(this,"intensityE",true,m,derivX,derivY,intensity);
+		BoofTesting.checkSubImage(this,"intensityE",true,m,derivX,derivY,intensity);
 	}
 
 	public void intensityE( Method m , ImageBase derivX , ImageBase derivY , ImageFloat32 intensity )
@@ -83,7 +83,7 @@ public class TestGradientToEdgeFeatures {
 	@Test
 	public void intensityAbs()  {
 
-		int total = GecvTesting.findMethodThenCall(this,"intensityAbs",GradientToEdgeFeatures.class,"intensityAbs");
+		int total = BoofTesting.findMethodThenCall(this,"intensityAbs",GradientToEdgeFeatures.class,"intensityAbs");
 
 		assertEquals(numExpected,total);
 	}
@@ -98,7 +98,7 @@ public class TestGradientToEdgeFeatures {
 		GeneralizedImageOps.randomize(derivX,rand,0,10);
 		GeneralizedImageOps.randomize(derivY,rand,0,10);
 
-		GecvTesting.checkSubImage(this,"intensityAbs",true,m,derivX,derivY,intensity);
+		BoofTesting.checkSubImage(this,"intensityAbs",true,m,derivX,derivY,intensity);
 	}
 
 	public void intensityAbs( Method m , ImageBase derivX , ImageBase derivY , ImageFloat32 intensity )
@@ -117,7 +117,7 @@ public class TestGradientToEdgeFeatures {
 	@Test
 	public void direction()  {
 
-		int total = GecvTesting.findMethodThenCall(this,"direction",GradientToEdgeFeatures.class,"direction");
+		int total = BoofTesting.findMethodThenCall(this,"direction",GradientToEdgeFeatures.class,"direction");
 
 		assertEquals(numExpected,total);
 	}
@@ -132,7 +132,7 @@ public class TestGradientToEdgeFeatures {
 		GeneralizedImageOps.randomize(derivX,rand,0,10);
 		GeneralizedImageOps.randomize(derivY,rand,0,10);
 
-		GecvTesting.checkSubImage(this,"direction",true,m,derivX,derivY,intensity);
+		BoofTesting.checkSubImage(this,"direction",true,m,derivX,derivY,intensity);
 	}
 
 	public void direction( Method m , ImageBase derivX , ImageBase derivY , ImageFloat32 direction )
@@ -182,13 +182,13 @@ public class TestGradientToEdgeFeatures {
 		ImageTestingOps.randomize(intensity,rand,0,100);
 		ImageTestingOps.randomize(direction,rand,0,4);
 
-		GecvTesting.checkSubImage(this,"nonMaxSuppression",true,intensity, direction, expected, found);
+		BoofTesting.checkSubImage(this,"nonMaxSuppression",true,intensity, direction, expected, found);
 	}
 
 	public void nonMaxSuppression(ImageFloat32 intensity, ImageUInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
 		ImplEdgeNonMaxSuppression.naive(intensity,direction,expected);
 		GradientToEdgeFeatures.nonMaxSuppression(intensity,direction,found);
 
-		GecvTesting.assertEquals(expected,found,0,1e-4);
+		BoofTesting.assertEquals(expected,found,0,1e-4);
 	}
 }

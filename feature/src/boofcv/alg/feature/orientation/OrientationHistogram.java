@@ -18,7 +18,7 @@ package boofcv.alg.feature.orientation;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.misc.GecvMiscOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.ImageBase;
@@ -125,7 +125,7 @@ public abstract class OrientationHistogram <D extends ImageBase>
 		rect.x1 = c_x+radiusScale+1;
 		rect.y1 = c_y+radiusScale+1;
 
-		GecvMiscOps.boundRectangleInside(derivX,rect);
+		BoofMiscOps.boundRectangleInside(derivX,rect);
 
 		for( int i = 0; i < numAngles; i++ ) {
 			sumDerivX[i] = 0;

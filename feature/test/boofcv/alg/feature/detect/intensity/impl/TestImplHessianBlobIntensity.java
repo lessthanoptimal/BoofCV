@@ -21,7 +21,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -61,7 +61,7 @@ public class TestImplHessianBlobIntensity {
 			GeneralizedImageOps.randomize(derivYY,rand,-10,10);
 			GeneralizedImageOps.randomize(derivXY,rand,-10,10);
 
-			GecvTesting.checkSubImage(this,"performDeterminant",true,m,intensity,derivXX,derivYY,derivXY);
+			BoofTesting.checkSubImage(this,"performDeterminant",true,m,intensity,derivXX,derivYY,derivXY);
 			total++;
 		}
 
@@ -102,7 +102,7 @@ public class TestImplHessianBlobIntensity {
 			GeneralizedImageOps.randomize(derivXX,rand,-10,10);
 			GeneralizedImageOps.randomize(derivYY,rand,-10,10);
 
-			GecvTesting.checkSubImage(this,"performTrace",true,m,intensity,derivXX,derivYY);
+			BoofTesting.checkSubImage(this,"performTrace",true,m,intensity,derivXX,derivYY);
 			total++;
 		}
 

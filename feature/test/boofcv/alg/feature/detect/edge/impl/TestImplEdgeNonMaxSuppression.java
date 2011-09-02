@@ -20,7 +20,7 @@ import boofcv.alg.misc.ImageTestingOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
@@ -90,7 +90,7 @@ public class TestImplEdgeNonMaxSuppression {
 		ImageTestingOps.randomize(intensity,rand,0,100);
 		ImageTestingOps.randomize(direction,rand,0,4);
 
-		GecvTesting.checkSubImage(this,"inner",true,intensity, direction, expected, found);
+		BoofTesting.checkSubImage(this,"inner",true,intensity, direction, expected, found);
 	}
 
 	public void inner(ImageFloat32 intensity, ImageUInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
@@ -98,7 +98,7 @@ public class TestImplEdgeNonMaxSuppression {
 		ImplEdgeNonMaxSuppression.inner(intensity,direction,found);
 
 		// just test the inside border
-		GecvTesting.assertEquals(expected.subimage(1,1,width-1,height-1),
+		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1),
 				found.subimage(1,1,width-1,height-1),0,1e-4);
 	}
 
@@ -112,7 +112,7 @@ public class TestImplEdgeNonMaxSuppression {
 		ImageTestingOps.randomize(intensity,rand,0,100);
 		ImageTestingOps.randomize(direction,rand,0,4);
 
-		GecvTesting.checkSubImage(this,"border",true,intensity, direction, expected, found);
+		BoofTesting.checkSubImage(this,"border",true,intensity, direction, expected, found);
 	}
 
 	public void border(ImageFloat32 intensity, ImageUInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
@@ -120,6 +120,6 @@ public class TestImplEdgeNonMaxSuppression {
 		ImplEdgeNonMaxSuppression.border(intensity,direction,found);
 
 		// just test the image border
-		GecvTesting.assertEqualsBorder(expected,found,1e-3f,1,1);
+		BoofTesting.assertEqualsBorder(expected,found,1e-3f,1,1);
 	}
 }

@@ -20,7 +20,7 @@ import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
@@ -62,7 +62,7 @@ public class TestImplIntegralImageFeatureIntensity {
 			ImageFloat32 f = found.subimage(r+1,r+1,w-r,h-r);
 			ImageFloat32 e = expected.subimage(r+1,r+1,w-r,h-r);
 
-			GecvTesting.assertEquals(e,f,0,1e-4f);
+			BoofTesting.assertEquals(e,f,0,1e-4f);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class TestImplIntegralImageFeatureIntensity {
 			ImageFloat32 f = found.subimage(r+1,r+1,w-r,h-r);
 			ImageFloat32 e = expected.subimage(r+1,r+1,w-r,h-r);
 
-			GecvTesting.assertEquals(e,f,0,1e-4f);
+			BoofTesting.assertEquals(e,f,0,1e-4f);
 		}
 	}
 

@@ -23,7 +23,7 @@ import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
-import boofcv.testing.GecvTesting;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
@@ -67,15 +67,15 @@ public class TestSurfDescribeOps {
 		SurfDescribeOps.gradient(inputF32,c_x,c_y,radiusRegions,4,1.5,foundX,foundY);
 		ImplSurfDescribeOps.naiveGradient(inputF32,c_x,c_y,radiusRegions, 4, 1.5, expectedX,expectedY);
 
-		GecvTesting.assertEquals(foundX,expectedX,1e-4);
-		GecvTesting.assertEquals(foundY,expectedY,1e-4);
+		BoofTesting.assertEquals(foundX,expectedX,1e-4);
+		BoofTesting.assertEquals(foundY,expectedY,1e-4);
 
 		// check the border
 		SurfDescribeOps.gradient(inputF32,0,0,radiusRegions,4,1.5,foundX,foundY);
 		ImplSurfDescribeOps.naiveGradient(inputF32,0,0,radiusRegions, 4, 1.5, expectedX,expectedY);
 
-		GecvTesting.assertEquals(foundX,expectedX,1e-4);
-		GecvTesting.assertEquals(foundY,expectedY,1e-4);
+		BoofTesting.assertEquals(foundX,expectedX,1e-4);
+		BoofTesting.assertEquals(foundY,expectedY,1e-4);
 	}
 
 	@Test
@@ -91,8 +91,8 @@ public class TestSurfDescribeOps {
 		SurfDescribeOps.gradient_noborder(inputF32,c_x,c_y,radiusRegions,4,1.5,foundX,foundY);
 		ImplSurfDescribeOps.naiveGradient(inputF32,c_x,c_y,radiusRegions, 4, 1.5, expectedX,expectedY);
 
-		GecvTesting.assertEquals(expectedX,foundX,1e-4);
-		GecvTesting.assertEquals(expectedY,foundY,1e-4);
+		BoofTesting.assertEquals(expectedX,foundX,1e-4);
+		BoofTesting.assertEquals(expectedY,foundY,1e-4);
 	}
 
 	@Test
@@ -108,8 +108,8 @@ public class TestSurfDescribeOps {
 		SurfDescribeOps.gradient_noborder(inputI32,c_x,c_y,radiusRegions,4,1.5,foundX,foundY);
 		ImplSurfDescribeOps.naiveGradient(inputI32,c_x,c_y,radiusRegions, 4, 1.5, expectedX,expectedY);
 
-		GecvTesting.assertEquals(expectedX,foundX);
-		GecvTesting.assertEquals(expectedY,foundY);
+		BoofTesting.assertEquals(expectedX,foundX);
+		BoofTesting.assertEquals(expectedY,foundY);
 	}
 
 	@Test
@@ -125,7 +125,7 @@ public class TestSurfDescribeOps {
 		gradient.setImage(inputF32);
 		ImplSurfDescribeOps.features(c_x,c_y,1.2,weight,20,5,scale,gradient,expected);
 
-		GecvTesting.assertEquals(expected,found,1e-4);
+		BoofTesting.assertEquals(expected,found,1e-4);
 	}
 
 	@Test

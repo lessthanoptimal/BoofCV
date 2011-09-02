@@ -1,0 +1,317 @@
+/*
+ * Copyright 2011 Peter Abeles
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package boofcv.alg.misc;
+
+import boofcv.core.image.FactorySingleBandImage;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.SingleBandImage;
+import boofcv.struct.image.ImageBase;
+import org.junit.Test;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * @author Peter Abeles
+ */
+public class TestPixelMath {
+	int width = 10;
+	int height = 15;
+	Random rand = new Random(234);
+
+	@Test
+	public void checkAll() {
+		int numExpected = 54;
+		Method methods[] = PixelMath.class.getMethods();
+
+		// sanity check to make sure the functions are being found
+		int numFound = 0;
+		for (Method m : methods) {
+			if( !isTestMethod(m))
+				continue;
+			try {
+				System.out.println(m.getName());
+				if( m.getName().compareTo("abs") == 0 ) {
+					testAbs(m);
+				} else if( m.getName().compareTo("maxAbs") == 0 ) {
+					testMaxAbs(m);
+				} else if( m.getName().compareTo("divide") == 0 ) {
+					testDivide(m);
+				} else if( m.getName().compareTo("multiply") == 0 ) {
+				    testMultiply(m);
+				} else if( m.getName().compareTo("plus") == 0 ) {
+				    testPlus(m);
+				} else if( m.getName().compareTo("boundImage") == 0 ) {
+				    testBound(m);
+				} else if( m.getName().compareTo("diffAbs") == 0 ) {
+				    testDiffAbs(m);
+				} else if( m.getName().compareTo("sum") == 0 ) {
+					testSum(m);
+				} else {
+					throw new RuntimeException("Unknown function: "+m.getName());
+				}
+			} catch (InvocationTargetException e) {
+				throw new RuntimeException(e);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+
+			numFound++;
+		}
+
+		// update this as needed when new functions are added
+		if(numExpected != numFound)
+			throw new RuntimeException("Unexpected number of methods: Found "+numFound+"  expected "+numExpected);
+	}
+
+	private boolean isTestMethod(Method m ) {
+
+		Class<?> param[] = m.getParameterTypes();
+
+		if( param.length < 1 )
+			return false;
+
+		return ImageBase.class.isAssignableFrom(param[0]);
+	}
+
+	private void testAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		GeneralizedImageOps.randomize(input, rand, -20,20);
+
+		m.invoke(null,input,output);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(input);
+		SingleBandImage b = FactorySingleBandImage.wrap(output);
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				assertEquals(Math.abs(a.get(j,i).doubleValue()),b.get(j,i).doubleValue(),1e-4);
+			}
+		}
+	}
+
+	private void testMaxAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(input);
+
+		if( input.getTypeInfo().isSigned() ) {
+			GeneralizedImageOps.randomize(input, rand, -20,20);
+			a.set(0,3,-100);
+		} else {
+			GeneralizedImageOps.randomize(input, rand, 0,20);
+			a.set(0,3,100);
+		}
+
+		Number o = (Number)m.invoke(null,input);
+
+		assertEquals(100,o.doubleValue(),1e-8);
+
+	}
+
+	private void testDivide( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		GeneralizedImageOps.randomize(input, rand, 0,20);
+
+		if( input.getTypeInfo().isSigned() ) {
+			GeneralizedImageOps.randomize(input, rand, -20,20);
+		} else {
+			GeneralizedImageOps.randomize(input, rand, 0,20);
+		}
+
+		if( input.getTypeInfo().isInteger() )
+			m.invoke(null,input,output,10);
+		else
+			m.invoke(null,input,output,10.0f);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(input);
+		SingleBandImage b = FactorySingleBandImage.wrap(output);
+		if( input.getTypeInfo().isInteger() ) {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					assertEquals(a.get(j,i).intValue()/10,b.get(j,i).intValue());
+				}
+			}
+		} else {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					assertEquals(a.get(j,i).doubleValue()/10f,b.get(j,i).doubleValue(),1e-4);
+				}
+			}
+		}
+	}
+
+	private void testMultiply( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		GeneralizedImageOps.randomize(input, rand, 0,20);
+
+		if( input.getTypeInfo().isSigned() ) {
+			GeneralizedImageOps.randomize(input, rand, -20,20);
+		} else {
+			GeneralizedImageOps.randomize(input, rand, 0,20);
+		}
+
+		if( input.getTypeInfo().isInteger() )
+			m.invoke(null,input,output,2);
+		else
+			m.invoke(null,input,output,2.0f);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(input);
+		SingleBandImage b = FactorySingleBandImage.wrap(output);
+		if( input.getTypeInfo().isInteger() ) {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					assertEquals(a.get(j,i).intValue()*2,b.get(j,i).intValue());
+				}
+			}
+		} else {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					assertEquals(a.get(j,i).doubleValue()*2f,b.get(j,i).doubleValue(),1e-4);
+				}
+			}
+		}
+	}
+
+	private void testPlus( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+
+		if( input.getTypeInfo().isSigned() ) {
+			GeneralizedImageOps.randomize(input, rand, -20,20);
+		} else {
+			GeneralizedImageOps.randomize(input, rand, 0,20);
+		}
+
+		if( input.getTypeInfo().isInteger() )
+			m.invoke(null,input,output,2);
+		else
+			m.invoke(null,input,output,2.0f);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(input);
+		SingleBandImage b = FactorySingleBandImage.wrap(output);
+		if( input.getTypeInfo().isInteger() ) {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					assertEquals(a.get(j,i).intValue()+2,b.get(j,i).intValue());
+				}
+			}
+		} else {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					assertEquals(a.get(j,i).doubleValue()+2f,b.get(j,i).doubleValue(),1e-4);
+				}
+			}
+		}
+	}
+
+	private void testBound( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+
+		if( input.getTypeInfo().isSigned() ) {
+			GeneralizedImageOps.randomize(input, rand, -20,20);
+		} else {
+			GeneralizedImageOps.randomize(input, rand, 0,20);
+		}
+
+		if( input.getTypeInfo().isInteger() )
+			m.invoke(null,input,2,10);
+		else
+			m.invoke(null,input,2.0f,10.0f);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(input);
+		if( input.getTypeInfo().isInteger() ) {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					int v = a.get(j,i).intValue();
+					assertTrue(v >= 2 && v <= 10);
+				}
+			}
+		} else {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					float v = a.get(j,i).floatValue();
+					assertTrue(v >= 2f && v <= 10f);
+				}
+			}
+		}
+	}
+
+	private void testDiffAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase inputB = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageBase inputC = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+
+		if( inputA.getTypeInfo().isSigned() ) {
+			GeneralizedImageOps.randomize(inputA, rand, -20,20);
+			GeneralizedImageOps.randomize(inputB, rand, -20,20);
+		} else {
+			GeneralizedImageOps.randomize(inputA, rand, 0,20);
+			GeneralizedImageOps.randomize(inputB, rand, -20,20);
+		}
+
+		m.invoke(null,inputA,inputB,inputC);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(inputA);
+		SingleBandImage b = FactorySingleBandImage.wrap(inputB);
+		SingleBandImage c = FactorySingleBandImage.wrap(inputC);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				float v = a.get(j,i).floatValue()-b.get(j,i).floatValue();
+				assertEquals(Math.abs(v),c.get(j,i).floatValue(),1e-4);
+			}
+		}
+	}
+
+	private void testSum( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class<?> paramTypes[] = m.getParameterTypes();
+		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+
+		if( inputA.getTypeInfo().isSigned() ) {
+			GeneralizedImageOps.randomize(inputA, rand, -20,20);
+		} else {
+			GeneralizedImageOps.randomize(inputA, rand, 0,20);
+		}
+
+		Object result = m.invoke(null,inputA);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(inputA);
+
+		double total = 0;
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				total += a.get(j,i).doubleValue();
+			}
+		}
+
+		assertEquals(total,((Number)result).doubleValue(),1e-4);
+	}
+}

@@ -17,7 +17,7 @@
 package boofcv.alg.feature.describe.impl;
 
 import boofcv.alg.feature.describe.SurfDescribeOps;
-import boofcv.misc.GecvMiscOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.deriv.GradientValue;
 import boofcv.struct.deriv.SparseImageGradient;
@@ -168,7 +168,7 @@ public class ImplSurfDescribeOps {
 		if( weight.width != regionSize+1 )
 			throw new IllegalArgumentException("Weighting kernel has an unexpected size");
 
-		GecvMiscOps.zero(features,64);
+		BoofMiscOps.zero(features,64);
 
 		int regionR = regionSize/2;
 		int regionEnd = regionSize-regionR;

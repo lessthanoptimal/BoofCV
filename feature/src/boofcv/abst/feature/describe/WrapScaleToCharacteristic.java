@@ -21,7 +21,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.feature.orientation.OrientationGradient;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.misc.GecvMiscOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
@@ -76,7 +76,7 @@ public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends 
 		int r = (int)Math.ceil(scale*3)+1;
 
 		ImageRectangle area = new ImageRectangle(x-r,y-r,x+r+1,y+r+1);
-		if( !GecvMiscOps.checkInside(image,area) )
+		if( !BoofMiscOps.checkInside(image,area) )
 			return null;
 
 		// create a subimage of this region
