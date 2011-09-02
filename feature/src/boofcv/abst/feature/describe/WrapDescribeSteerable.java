@@ -1,0 +1,56 @@
+/*
+ * Copyright 2011 Peter Abeles
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package boofcv.abst.feature.describe;
+
+import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.feature.describe.DescribePointSteerable2D;
+import boofcv.alg.feature.orientation.OrientationGradient;
+import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageBase;
+
+
+/**
+ * Wrapper around {@link DescribePointSteerable2D} for {@link ExtractFeatureDescription}.
+ *
+ * @author Peter Abeles
+ */
+public class WrapDescribeSteerable <T extends ImageBase, D extends ImageBase>
+		extends WrapScaleToCharacteristic<T,D>
+{
+	DescribePointSteerable2D<T,?> steer;
+
+	public WrapDescribeSteerable(DescribePointSteerable2D<T,?> steer,
+								 OrientationGradient<D> orientation,
+								 ImageGradient<T, D> gradient,
+								 Class<T> inputType ,
+								 Class<D> derivType ) {
+		super(steer.getRadius(),orientation,gradient,inputType,derivType);
+		this.steer = steer;
+	}
+
+	@Override
+	public int getDescriptionLength() {
+		return steer.getDescriptionLength();
+	}
+
+	@Override
+	protected TupleDesc_F64 describe(int x, int y, double angle, TupleDesc_F64 ret) {
+		steer.setImage(scaledImage);
+		return steer.describe(x,y,angle,ret);
+	}
+
+}
