@@ -46,19 +46,16 @@ public class FactoryPointSequentialTracker {
 	 * Creates a tracker using KLT features/tracker.
 	 *
 	 * @param maxFeatures Maximum number of features it can detect/track. Try 200 initially.
-	 * @param imgWidth Input image width.
-	 * @param imgHeight Input image height.
 	 * @param scaling Scales in the image pyramid. Recommend [1,2,4] or [2,4]
 	 * @param imageType Input image type.
 	 * @param derivType Image derivative  type.
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageBase, D extends ImageBase>
-	PointSequentialTracker<I> klt( int maxFeatures , int imgWidth , int imgHeight ,
-								   int scaling[] , Class<I> imageType , Class<D> derivType )
+	PointSequentialTracker<I> klt( int maxFeatures , int scaling[] , Class<I> imageType , Class<D> derivType )
 	{
 		PkltManagerConfig<I, D> config =
-				PkltManagerConfig.createDefault(imageType,derivType,imgWidth,imgHeight);
+				PkltManagerConfig.createDefault(imageType,derivType);
 		config.pyramidScaling = scaling;
 		config.maxFeatures = maxFeatures;
 		PkltManager<I, D> trackManager =

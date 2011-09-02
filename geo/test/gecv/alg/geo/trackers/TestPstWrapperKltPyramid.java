@@ -36,7 +36,7 @@ public class TestPstWrapperKltPyramid extends StandardPointSequentialTrackerTest
 
 	@Before
 	public void init() {
-		config = PkltManagerConfig.createDefault(ImageFloat32.class,ImageFloat32.class,width,height);
+		config = PkltManagerConfig.createDefault(ImageFloat32.class,ImageFloat32.class);
 		config.minFeatures = 0;
 		manager = new PkltManager<ImageFloat32,ImageFloat32>(config);
 		pointTracker = new PstWrapperKltPyramid<ImageFloat32,ImageFloat32>(manager);

@@ -25,6 +25,7 @@ import gecv.alg.feature.describe.DescribePointGaussian12;
 import gecv.alg.feature.describe.DescribePointSteerable2D;
 import gecv.alg.feature.orientation.OrientationGradient;
 import gecv.alg.feature.orientation.OrientationIntegral;
+import gecv.alg.transform.ii.GIntegralImageOps;
 import gecv.factory.feature.orientation.FactoryOrientationAlgs;
 import gecv.factory.filter.derivative.FactoryDerivative;
 import gecv.struct.image.ImageBase;
@@ -35,13 +36,16 @@ import gecv.struct.image.ImageBase;
  */
 public class FactoryExtractFeatureDescription {
 
-	public static <T extends ImageBase>
+	public static <T extends ImageBase, II extends ImageBase>
 	ExtractFeatureDescription<T> surf( boolean isOriented , Class<T> imageType) {
-		OrientationIntegral<T> orientation = null;
-		if( isOriented )
-			orientation = FactoryOrientationAlgs.average_ii(6,false,imageType);
+		OrientationIntegral<II> orientation = null;
 
-		return new WrapDescribeSurf<T>( FactoryDescribePointAlgs.<T>surf(imageType),orientation);
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+
+		if( isOriented )
+			orientation = FactoryOrientationAlgs.average_ii(6,false,integralType);
+
+		return new WrapDescribeSurf<T,II>( FactoryDescribePointAlgs.<II>surf(integralType),orientation);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>

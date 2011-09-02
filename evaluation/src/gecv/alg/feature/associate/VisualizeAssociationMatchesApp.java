@@ -19,6 +19,7 @@ package gecv.alg.feature.associate;
 import gecv.abst.feature.associate.GeneralAssociation;
 import gecv.abst.feature.describe.ExtractFeatureDescription;
 import gecv.abst.feature.detect.interest.InterestPointDetector;
+import gecv.alg.filter.derivative.GImageDerivativeOps;
 import gecv.core.image.ConvertBufferedImage;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.factory.feature.associate.FactoryAssociationTuple;
@@ -131,7 +132,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 		BufferedImage right = UtilImageIO.loadImage(rightName);
 
 		Class imageType = ImageFloat32.class;
-		Class derivType = ImageFloat32.class;
+		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		InterestPointDetector detector = FactoryInterestPoint.fromFastHessian(200,9,4,4);
 		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.surf(true,imageType);
 //		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType);
@@ -140,8 +141,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 		ScoreAssociateTuple scorer = new ScoreAssociateEuclideanSq();
 //		ScoreAssociateTuple scorer = new ScoreAssociateCorrelation();
 
-		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.inlierError(scorer,100,10);
-//		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.forwardBackwards(scorer,100);
+//		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.inlierError(scorer,200,10);
+		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.forwardBackwards(scorer,150);
 //		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.maxMatches(scorer,100);
 //		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.maxError(scorer,10);
 

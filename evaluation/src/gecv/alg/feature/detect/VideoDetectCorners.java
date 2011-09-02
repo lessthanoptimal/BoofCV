@@ -22,8 +22,8 @@ import gecv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import gecv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import gecv.alg.feature.detect.extract.FastNonMaxExtractor;
 import gecv.alg.feature.detect.interest.GeneralFeatureDetector;
-import gecv.alg.filter.derivative.GradientSobel;
-import gecv.alg.filter.derivative.HessianThree;
+import gecv.alg.filter.derivative.GImageDerivativeOps;
+import gecv.core.image.GeneralizedImageOps;
 import gecv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import gecv.gui.image.ImagePanel;
 import gecv.gui.image.ShowImages;
@@ -33,8 +33,7 @@ import gecv.io.wrapper.xuggler.XugglerSimplified;
 import gecv.struct.GecvDefaults;
 import gecv.struct.QueueCorner;
 import gecv.struct.image.ImageBase;
-import gecv.struct.image.ImageSInt16;
-import gecv.struct.image.ImageUInt8;
+import gecv.struct.image.ImageFloat32;
 import jgrl.struct.point.Point2D_I16;
 
 import java.awt.*;
@@ -45,49 +44,54 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUInt8> {
+public class VideoDetectCorners<T extends ImageBase, D extends ImageBase>
+		extends ProcessImageSequence<T> {
 
-	GeneralFeatureDetector<ImageUInt8, ImageSInt16> detector;
-	ImageSInt16 derivX;
-	ImageSInt16 derivY;
-	ImageSInt16 derivXX;
-	ImageSInt16 derivYY;
-	ImageSInt16 derivXY;
+	GeneralFeatureDetector<T, D> detector;
+	D derivX;
+	D derivY;
+	D derivXX;
+	D derivYY;
+	D derivXY;
+
+	Class<D> derivType;
 
 	QueueCorner corners;
 
 	ImagePanel panel;
 
-	public VideoDetectCornersIntensity_I8(SimpleImageSequence<ImageUInt8> sequence,
-									   GeneralFeatureDetector<ImageUInt8, ImageSInt16> detector) {
+	public VideoDetectCorners(SimpleImageSequence<T> sequence,
+									   GeneralFeatureDetector<T, D> detector,
+									   Class<D> derivType ) {
 		super(sequence);
 
+		this.derivType = derivType;
 		this.detector = detector;
 	}
 
 
 	@Override
-	public void processFrame(ImageUInt8 image) {
+	public void processFrame(T image) {
 
 		if( detector.getRequiresGradient() ) {
 			if (derivX == null) {
-				derivX = new ImageSInt16(image.width, image.height);
-				derivY = new ImageSInt16(image.width, image.height);
+				derivX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+				derivY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
 			}
 
 			// compute the image gradient
-			GradientSobel.process(image, derivX, derivY, GecvDefaults.DERIV_BORDER_I32);
+			GImageDerivativeOps.sobel(image, derivX, derivY, GecvDefaults.DERIV_BORDER_TYPE);
 		}
 
 		if( detector.getRequiresHessian() ) {
 			if (derivXX == null) {
-				derivXX = new ImageSInt16(image.width, image.height);
-				derivYY = new ImageSInt16(image.width, image.height);
-				derivXY = new ImageSInt16(image.width, image.height);
+				derivXX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+				derivYY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+				derivXY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
 			}
 
 			// compute the image gradient
-			HessianThree.process(image, derivXX, derivYY,derivXY,GecvDefaults.DERIV_BORDER_I32);
+			GImageDerivativeOps.hessianThree(image, derivXX, derivYY,derivXY, GecvDefaults.DERIV_BORDER_TYPE);
 		}
 
 		detector.process(image,derivX, derivY, derivXX , derivYY, derivXY);
@@ -95,7 +99,7 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 	}
 
 	@Override
-	public void updateGUI(BufferedImage guiImage, ImageUInt8 origImage) {
+	public void updateGUI(BufferedImage guiImage, T origImage) {
 		Graphics2D g2 = guiImage.createGraphics();
 
 		for (int i = 0; i < corners.size(); i++) {
@@ -116,36 +120,40 @@ public class VideoDetectCornersIntensity_I8 extends ProcessImageSequence<ImageUI
 		}
 	}
 
-	public static void main(String args[]) {
-		String fileName;
-
-		if (args.length == 0) {
-			fileName = "/home/pja/uav_video.avi";
-		} else {
-			fileName = args[0];
-		}
-		SimpleImageSequence<ImageUInt8> sequence = new XugglerSimplified<ImageUInt8>(fileName, ImageUInt8.class);
-
-		ImageBase<?> image = sequence.next();
+	public static <T extends ImageBase, D extends ImageBase>
+	void perform( String fileName , Class<T> imageType , Class<D> derivType )
+	{
+		SimpleImageSequence<T> sequence = new XugglerSimplified<T>(fileName, imageType);
 
 		int maxCorners = 200;
 		int radius = 2;
-		int width = image.width;
-		int height = image.height;
 
-		GeneralFeatureIntensity<ImageUInt8,ImageSInt16> intensity = new WrapperGradientCornerIntensity<ImageUInt8,ImageSInt16>(FactoryPointIntensityAlg.createKlt(ImageSInt16.class , radius));
-//		GeneralFeatureIntensity<ImageUInt8, ImageSInt16> intensity =
-//				new WrapperFastCornerIntensity<ImageUInt8, ImageSInt16>(FactoryPointIntensityAlg.createFast12_I8(width, height, 8 , 12));
+		GeneralFeatureIntensity<T,D> intensity = new WrapperGradientCornerIntensity<T,D>(FactoryPointIntensityAlg.createKlt(derivType , radius));
+//		GeneralFeatureIntensity<T, D> intensity =
+//				new WrapperFastCornerIntensity<T, D>(FactoryPointIntensityAlg.createFast12(imageType, 8 , 12));
 
 		FeatureExtractor extractor = new WrapperNonMax(new FastNonMaxExtractor(radius + 10, radius + 10, 10f));
 //		FeatureExtractor extractor = new WrapperNonMax( new NonMaxExtractorNaive(radius+10,10f));
 //		FeatureExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(radius+10, 10f));
 
-		GeneralFeatureDetector<ImageUInt8, ImageSInt16> detector = new GeneralFeatureDetector<ImageUInt8, ImageSInt16>(intensity, extractor, maxCorners);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, maxCorners);
 
 
-		VideoDetectCornersIntensity_I8 display = new VideoDetectCornersIntensity_I8(sequence, detector);
+		VideoDetectCorners<T,D> display = new VideoDetectCorners<T,D>(sequence, detector, derivType);
 
 		display.process();
+	}
+
+	public static void main(String args[]) {
+		String fileName;
+
+		if (args.length == 0) {
+			fileName = "/media/backup/datasets/2010/snow_videos/snow_norail_stabilization.avi";
+		} else {
+			fileName = args[0];
+		}
+
+//		perform(fileName,ImageUInt8.class,ImageSInt16.class);
+		perform(fileName, ImageFloat32.class,ImageFloat32.class);
 	}
 }

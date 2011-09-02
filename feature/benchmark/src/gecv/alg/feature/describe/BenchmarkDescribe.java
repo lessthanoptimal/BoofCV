@@ -19,11 +19,12 @@ package gecv.alg.feature.describe;
 import gecv.Performer;
 import gecv.ProfileOperation;
 import gecv.abst.feature.describe.ExtractFeatureDescription;
+import gecv.alg.filter.derivative.GImageDerivativeOps;
+import gecv.alg.transform.ii.GIntegralImageOps;
 import gecv.core.image.GeneralizedImageOps;
 import gecv.factory.feature.describe.FactoryExtractFeatureDescription;
 import gecv.struct.image.ImageBase;
 import gecv.struct.image.ImageFloat32;
-import gecv.struct.image.ImageSInt32;
 import jgrl.struct.point.Point2D_I32;
 
 import java.util.Random;
@@ -32,12 +33,11 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase> {
+public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II extends ImageBase> {
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);
 	static int NUM_POINTS = 1000;
-	static int RADIUS = 6;
 
 	final static int width = 640;
 	final static int height = 480;
@@ -49,13 +49,14 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase> {
 
 	Class<I> imageType;
 	Class<D> derivType;
+	Class<II> integralType;
 
-	public BenchmarkDescribe( Class<I> imageType , Class<D> derivType ) {
+	public BenchmarkDescribe( Class<I> imageType ) {
 
 		this.imageType = imageType;
-		this.derivType = derivType;
 
-		Class integralType = ImageFloat32.class == imageType ? ImageFloat32.class : ImageSInt32.class;
+		derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		image = GeneralizedImageOps.createImage(imageType,width,height);
 
@@ -102,14 +103,17 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase> {
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryExtractFeatureDescription.<I>surf(true,imageType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("Steer", FactoryExtractFeatureDescription.steerableGaussian(12,false,imageType,derivType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("Steer Norm", FactoryExtractFeatureDescription.steerableGaussian(12,true,imageType,derivType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryExtractFeatureDescription.<I,II>surf(true,imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("Steer r=12", FactoryExtractFeatureDescription.steerableGaussian(12,false,imageType,derivType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("Steer Norm r=12", FactoryExtractFeatureDescription.steerableGaussian(12,true,imageType,derivType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=12", FactoryExtractFeatureDescription.gaussian12(12,imageType,derivType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=20", FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType)),TEST_TIME);
+
 	}
 
 	public static void main( String argsp[ ] ) {
-		BenchmarkDescribe<ImageFloat32,ImageFloat32> alg = new BenchmarkDescribe<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
-//		BenchmarkOrientation<ImageUInt8,ImageSInt16> alg = new BenchmarkOrientation<ImageUInt8,ImageSInt16>(ImageUInt8.class, ImageSInt16.class);
+		BenchmarkDescribe<ImageFloat32,?,?> alg = new BenchmarkDescribe(ImageFloat32.class);
+//		BenchmarkDescribe<ImageUInt8,?,?> alg = new BenchmarkDescribe(ImageUInt8.class);
 
 		alg.perform();
 	}
