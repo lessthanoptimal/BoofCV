@@ -18,7 +18,7 @@
 
 package boofcv.struct.image;
 
-import jgrl.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I32;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;

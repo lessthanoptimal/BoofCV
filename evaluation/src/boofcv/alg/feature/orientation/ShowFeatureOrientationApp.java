@@ -34,7 +34,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.struct.point.Point2D_I16;
+import georegression.struct.point.Point2D_I16;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

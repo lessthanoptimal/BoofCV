@@ -20,8 +20,8 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.geometry.UtilPoint2D_I32;
-import jgrl.struct.point.Point2D_I32;
+import georegression.geometry.UtilPoint2D_I32;
+import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
 import java.util.List;

@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.OrientationSlidingWindow;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.metric.UtilAngle;
+import georegression.metric.UtilAngle;
 
 
 /**

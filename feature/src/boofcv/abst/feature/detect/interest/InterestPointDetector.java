@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.struct.image.ImageBase;
-import jgrl.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I32;
 
 /**
  * Interface for automatic interest point detection in an image.  Provides optional

@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I32;
 
 import java.util.List;
 

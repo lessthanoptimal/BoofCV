@@ -22,7 +22,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.pyramid.ImagePyramid;
-import jgrl.struct.point.Point2D_I16;
+import georegression.struct.point.Point2D_I16;
 
 import java.util.List;
 

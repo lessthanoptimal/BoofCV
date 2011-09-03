@@ -22,7 +22,7 @@ import boofcv.abst.feature.tracker.PointSequentialTracker;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Before;
 import org.junit.Test;
 

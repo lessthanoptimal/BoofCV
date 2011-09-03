@@ -20,9 +20,9 @@ package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelFitter;
-import jgrl.fitting.affine.MotionAffinePoint2D_F64;
-import jgrl.struct.affine.Affine2D_F64;
-import jgrl.struct.point.Point2D_F64;
+import georegression.fitting.affine.MotionAffinePoint2D_F64;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;

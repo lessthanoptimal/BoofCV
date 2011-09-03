@@ -19,9 +19,9 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="Image Processing" />
-    <orderEntry type="module" module-name="Java Geometric Regression Library" />
     <orderEntry type="module" module-name="ejml" />
     <orderEntry type="module" module-name="Feature" />
+    <orderEntry type="module" module-name="GeoRegression" />
   </component>
 </module>
 

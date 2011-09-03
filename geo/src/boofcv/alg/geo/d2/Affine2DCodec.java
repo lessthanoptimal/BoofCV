@@ -19,11 +19,11 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.numerics.fitting.modelset.ModelCodec;
-import jgrl.struct.affine.Affine2D_F32;
+import georegression.struct.affine.Affine2D_F32;
 
 
 /**
- * Converts an {@link jgrl.struct.affine.Affine2D_F64} to and from an array
+ * Converts an {@link georegression.struct.affine.Affine2D_F64} to and from an array
  * parameterized format.
  *
  * @author Peter Abeles

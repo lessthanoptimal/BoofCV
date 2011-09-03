@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
-import jgrl.struct.point.Point2D_I16;
+import georegression.struct.point.Point2D_I16;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

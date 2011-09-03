@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import jgrl.metric.UtilAngle;
+import georegression.metric.UtilAngle;
 
 import static org.junit.Assert.assertTrue;
 

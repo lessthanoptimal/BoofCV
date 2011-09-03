@@ -30,7 +30,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.xuggler.XugglerSimplified;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I32;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

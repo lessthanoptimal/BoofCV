@@ -18,7 +18,7 @@
 
 package boofcv.struct.distort;
 
-import jgrl.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F32;
 
 
 /**

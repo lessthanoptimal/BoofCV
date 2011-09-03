@@ -25,7 +25,7 @@ import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.struct.point.Point2D_I16;
+import georegression.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
 import java.util.List;

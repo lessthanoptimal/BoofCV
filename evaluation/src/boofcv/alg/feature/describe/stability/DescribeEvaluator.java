@@ -25,10 +25,10 @@ import boofcv.alg.feature.benchmark.StabilityEvaluatorPoint;
 import boofcv.evaluation.ErrorStatistics;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
-import jgrl.struct.affine.Affine2D_F32;
-import jgrl.struct.point.Point2D_I32;
-import jgrl.struct.point.Vector2D_F32;
-import jgrl.transform.affine.AffinePointOps;
+import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Vector2D_F32;
+import georegression.transform.affine.AffinePointOps;
 
 import java.util.ArrayList;
 import java.util.List;

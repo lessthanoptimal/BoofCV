@@ -29,9 +29,9 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageBase;
-import jgrl.struct.affine.Affine2D_F64;
-import jgrl.struct.point.Point2D_F64;
-import jgrl.transform.affine.AffinePointOps;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.transform.affine.AffinePointOps;
 
 import java.util.List;
 

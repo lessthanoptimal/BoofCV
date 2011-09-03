@@ -20,9 +20,9 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="Java Geometric Regression Library" />
     <orderEntry type="module" module-name="libpja" />
     <orderEntry type="module" module-name="ejml" />
+    <orderEntry type="module" module-name="GeoRegression" />
   </component>
 </module>
 

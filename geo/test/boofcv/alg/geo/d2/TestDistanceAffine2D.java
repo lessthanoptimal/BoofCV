@@ -21,9 +21,9 @@ package boofcv.alg.geo.d2;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.numerics.fitting.modelset.distance.StandardDistanceTest;
-import jgrl.struct.affine.Affine2D_F64;
-import jgrl.struct.point.Point2D_F64;
-import jgrl.transform.affine.AffinePointOps;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.transform.affine.AffinePointOps;
 
 import java.util.Random;
 

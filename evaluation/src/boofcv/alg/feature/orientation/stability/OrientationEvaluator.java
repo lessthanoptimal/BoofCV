@@ -28,11 +28,11 @@ import boofcv.alg.feature.orientation.RegionOrientation;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.evaluation.ErrorStatistics;
 import boofcv.struct.image.ImageBase;
-import jgrl.metric.UtilAngle;
-import jgrl.struct.affine.Affine2D_F32;
-import jgrl.struct.point.Point2D_I32;
-import jgrl.struct.point.Vector2D_F32;
-import jgrl.transform.affine.AffinePointOps;
+import georegression.metric.UtilAngle;
+import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Vector2D_F32;
+import georegression.transform.affine.AffinePointOps;
 
 import java.util.List;
 

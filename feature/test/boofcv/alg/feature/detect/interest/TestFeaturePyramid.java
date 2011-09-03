@@ -23,7 +23,7 @@ import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.alg.transform.gss.UtilScaleSpace;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I32;
 
 import java.util.List;
 

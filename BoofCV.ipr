@@ -52,15 +52,15 @@
       <option name="myLocal" value="true" />
     </copyright>
     <copyright>
-      <option name="notice" value="Copyright (c) 2011, Peter Abeles. All Rights Reserved.&#10;&#10;This file is part of Java Geometric Regression Library (JGRL).&#10;&#10;JGRL is free software: you can redistribute it and/or modify&#10;it under the terms of the GNU Lesser General Public License as&#10;published by the Free Software Foundation, either version 3&#10;of the License, or (at your option) any later version.&#10;&#10;JGRL is distributed in the hope that it will be useful,&#10;but WITHOUT ANY WARRANTY; without even the implied warranty of&#10;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the&#10;GNU Lesser General Public License for more details.&#10;&#10;You should have received a copy of the GNU Lesser General Public&#10;License along with JGRL.  If not, see &lt;http://www.gnu.org/licenses/&gt;." />
+      <option name="notice" value="Copyright (c) 2011, Peter Abeles. All Rights Reserved.&#10; &#10;This file is part of Geometric Regression Library (GeoRegression).&#10;&#10;GeoRegression is free software: you can redistribute it and/or modify&#10;it under the terms of the GNU Lesser General Public License as&#10;published by the Free Software Foundation, either version 3&#10;of the License, or (at your option) any later version.&#10;&#10;JGRL is distributed in the hope that it will be useful,&#10;but WITHOUT ANY WARRANTY; without even the implied warranty of&#10;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the&#10;GNU Lesser General Public License for more details.&#10;&#10;You should have received a copy of the GNU Lesser General Public&#10;License along with GeoRegression.  If not, see &lt;http://www.gnu.org/licenses/&gt;." />
       <option name="keyword" value="Copyright" />
       <option name="allowReplaceKeyword" value="" />
-      <option name="myName" value="JGRL" />
+      <option name="myName" value="GeoRegression" />
       <option name="myLocal" value="true" />
     </copyright>
     <module2copyright>
       <element module="BOOFCV" copyright="BOOFCV" />
-      <element module="JGRL" copyright="JGRL" />
+      <element module="GeoRegression" copyright="GeoRegression" />
     </module2copyright>
   </component>
   <component name="DependenciesAnalyzeManager">
@@ -68,7 +68,7 @@
   </component>
   <component name="DependencyValidationManager">
     <scope name="BOOFCV" pattern="file[Feature]:*//*||file[Geometric Vision]:*//*||file[Image Processing]:*//*||file[apps]:*//*||file[evaluation]:*//*||file[io]:*//*" />
-    <scope name="JGRL" pattern="" />
+    <scope name="GeoRegression" pattern="file[GeoRegression]:*//*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="EclipseCompilerSettings">
@@ -294,9 +294,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/feature/Feature.iml" filepath="$PROJECT_DIR$/feature/Feature.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
       <module fileurl="file://$PROJECT_DIR$/geo/Geometric Vision.iml" filepath="$PROJECT_DIR$/geo/Geometric Vision.iml" />
       <module fileurl="file://$PROJECT_DIR$/ip/Image Processing.iml" filepath="$PROJECT_DIR$/ip/Image Processing.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../jgrl/Java Geometric Regression Library.iml" filepath="$PROJECT_DIR$/../jgrl/Java Geometric Regression Library.iml" />
       <module fileurl="file://$PROJECT_DIR$/apps/apps.iml" filepath="$PROJECT_DIR$/apps/apps.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
       <module fileurl="file://$PROJECT_DIR$/evaluation/evaluation.iml" filepath="$PROJECT_DIR$/evaluation/evaluation.iml" />
@@ -357,7 +357,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../ejml" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../jgrl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../georegression" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../libpjajava" vcs="svn" />
   </component>
   <component name="VssConfiguration">
