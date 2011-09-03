@@ -24,7 +24,7 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageBase;
-import jgrl.struct.affine.Affine2D_F32;
+import georegression.struct.affine.Affine2D_F32;
 
 import java.awt.image.BufferedImage;
 import java.util.List;

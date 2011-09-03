@@ -19,7 +19,7 @@
 package boofcv.gui.feature;
 
 import boofcv.struct.feature.ScalePoint;
-import jgrl.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I32;
 
 import java.awt.*;
 

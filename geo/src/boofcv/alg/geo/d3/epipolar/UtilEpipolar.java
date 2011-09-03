@@ -19,8 +19,8 @@
 package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
-import jgrl.geometry.GeometryMath_F64;
-import jgrl.struct.point.Point2D_F64;
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 

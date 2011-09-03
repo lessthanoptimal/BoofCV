@@ -19,7 +19,7 @@
 package boofcv.alg.feature.benchmark;
 
 import boofcv.struct.image.ImageBase;
-import jgrl.struct.affine.Affine2D_F32;
+import georegression.struct.affine.Affine2D_F32;
 
 
 /**

@@ -18,7 +18,7 @@
 
 package boofcv.struct;
 
-import jgrl.struct.point.Point2D_I16;
+import georegression.struct.point.Point2D_I16;
 
 
 /**

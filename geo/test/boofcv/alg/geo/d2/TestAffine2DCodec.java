@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.d2;
 
-import jgrl.struct.affine.Affine2D_F32;
+import georegression.struct.affine.Affine2D_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

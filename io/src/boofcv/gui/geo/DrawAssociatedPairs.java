@@ -19,7 +19,7 @@
 package boofcv.gui.geo;
 
 import boofcv.alg.geo.AssociatedPair;
-import jgrl.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 

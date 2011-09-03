@@ -18,11 +18,11 @@
 
 package boofcv.alg.distort;
 
-import jgrl.struct.affine.Affine2D_F32;
-import jgrl.struct.affine.Affine2D_F64;
-import jgrl.struct.point.Point2D_F32;
-import jgrl.struct.point.Point2D_F64;
-import jgrl.transform.affine.AffinePointOps;
+import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
+import georegression.transform.affine.AffinePointOps;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

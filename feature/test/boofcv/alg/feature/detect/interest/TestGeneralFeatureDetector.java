@@ -24,8 +24,8 @@ import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.struct.point.Point2D_I16;
-import jgrl.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I16;
+import georegression.struct.point.Point2D_I32;
 
 import java.util.ArrayList;
 import java.util.List;

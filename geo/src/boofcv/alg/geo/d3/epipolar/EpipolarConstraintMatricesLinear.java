@@ -19,7 +19,7 @@
 package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
-import jgrl.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_F64;
 import org.ejml.alg.dense.decomposition.DecompositionFactory;
 import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.alg.dense.mult.VectorVectorMult;

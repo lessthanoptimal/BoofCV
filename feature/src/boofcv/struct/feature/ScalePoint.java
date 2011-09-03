@@ -18,7 +18,7 @@
 
 package boofcv.struct.feature;
 
-import jgrl.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I32;
 
 /**
  * Where a point of interest was detected and at what scale.

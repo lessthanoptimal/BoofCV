@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I32;
 
 import java.util.List;
 

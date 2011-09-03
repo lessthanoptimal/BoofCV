@@ -22,11 +22,11 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.benchmark.StabilityAlgorithm;
 import boofcv.alg.feature.benchmark.StabilityEvaluator;
 import boofcv.struct.image.ImageBase;
-import jgrl.geometry.UtilPoint2D_I32;
-import jgrl.struct.affine.Affine2D_F32;
-import jgrl.struct.point.Point2D_F32;
-import jgrl.struct.point.Point2D_I32;
-import jgrl.transform.affine.AffinePointOps;
+import georegression.geometry.UtilPoint2D_I32;
+import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_I32;
+import georegression.transform.affine.AffinePointOps;
 
 import java.util.ArrayList;
 import java.util.List;

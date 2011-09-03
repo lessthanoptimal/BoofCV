@@ -34,7 +34,7 @@ import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.struct.affine.Affine2D_F64;
+import georegression.struct.affine.Affine2D_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

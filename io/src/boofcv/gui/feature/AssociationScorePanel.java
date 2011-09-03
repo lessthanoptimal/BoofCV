@@ -18,8 +18,8 @@
 
 package boofcv.gui.feature;
 
-import jgrl.geometry.UtilPoint2D_I32;
-import jgrl.struct.point.Point2D_I32;
+import georegression.geometry.UtilPoint2D_I32;
+import georegression.struct.point.Point2D_I32;
 
 import javax.swing.*;
 import java.awt.*;

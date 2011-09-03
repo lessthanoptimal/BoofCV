@@ -18,7 +18,7 @@
 
 package boofcv.struct;
 
-import jgrl.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

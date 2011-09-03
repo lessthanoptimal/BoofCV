@@ -12,8 +12,8 @@
     <orderEntry type="module" module-name="io" />
     <orderEntry type="module" module-name="libpja" />
     <orderEntry type="module" module-name="Feature" />
-    <orderEntry type="module" module-name="Java Geometric Regression Library" />
     <orderEntry type="module" module-name="Geometric Vision" />
+    <orderEntry type="module" module-name="GeoRegression" />
   </component>
 </module>
 

@@ -25,10 +25,10 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.*;
-import jgrl.struct.affine.Affine2D_F32;
-import jgrl.struct.se.InvertibleTransformSequence;
-import jgrl.struct.se.Se2_F32;
-import jgrl.struct.se.SpecialEuclideanOps_F32;
+import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.se.InvertibleTransformSequence;
+import georegression.struct.se.Se2_F32;
+import georegression.struct.se.SpecialEuclideanOps_F32;
 
 
 /**

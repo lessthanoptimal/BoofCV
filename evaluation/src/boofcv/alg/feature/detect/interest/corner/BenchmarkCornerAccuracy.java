@@ -31,9 +31,9 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
-import jgrl.geometry.UtilPoint2D_F64;
-import jgrl.struct.point.Point2D_F64;
-import jgrl.struct.point.Point2D_I16;
+import georegression.geometry.UtilPoint2D_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I16;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

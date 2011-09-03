@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import jgrl.struct.point.Point2D_I16;
+import georegression.struct.point.Point2D_I16;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
