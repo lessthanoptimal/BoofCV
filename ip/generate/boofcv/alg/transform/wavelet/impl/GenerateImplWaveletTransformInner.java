@@ -59,12 +59,12 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.wavelet.impl;\n" +
+		out.print("package boofcv.alg.wavelet.impl;\n" +
 				"\n" +
-				"import gecv.alg.wavelet.UtilWavelet;\n" +
-				"import gecv.struct.image.*;\n" +
-				"import gecv.struct.wavelet.WlCoef_F32;\n" +
-				"import gecv.struct.wavelet.WlCoef_I32;\n" +
+				"import boofcv.alg.wavelet.UtilWavelet;\n" +
+				"import boofcv.struct.image.*;\n" +
+				"import boofcv.struct.wavelet.WlCoef_F32;\n" +
+				"import boofcv.struct.wavelet.WlCoef_I32;\n" +
 				"\n" +
 				"\n" +
 				"/**\n" +

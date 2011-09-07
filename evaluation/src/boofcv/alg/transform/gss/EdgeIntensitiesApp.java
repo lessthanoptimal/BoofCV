@@ -18,10 +18,10 @@
 
 package boofcv.alg.transform.gss;
 
-import boofcv.abst.filter.blur.FactoryBlurFilter;
-import boofcv.abst.filter.blur.impl.BlurStorageFilter;
+import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageTestingOps;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.image.ImageFloat32;

@@ -133,18 +133,18 @@ public class GenerateConvolveDownNoBorderStandard {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.filter.convolve.down;\n" +
+		out.print("package boofcv.alg.filter.convolve.down;\n" +
 				"\n" +
-				"import gecv.struct.convolve.Kernel1D_F32;\n" +
-				"import gecv.struct.convolve.Kernel1D_I32;\n" +
-				"import gecv.struct.convolve.Kernel2D_F32;\n" +
-				"import gecv.struct.convolve.Kernel2D_I32;\n" +
-				"import gecv.struct.image.*;\n" +
+				"import boofcv.struct.convolve.Kernel1D_F32;\n" +
+				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
+				"import boofcv.struct.convolve.Kernel2D_F32;\n" +
+				"import boofcv.struct.convolve.Kernel2D_I32;\n" +
+				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Standard implementation of {@link gecv.alg.filter.convolve.ConvolveDownNoBorder} where no special\n" +
+				" * Standard implementation of {@link boofcv.alg.filter.convolve.ConvolveDownNoBorder} where no special\n" +
 				" * optimization has been done.\n" +
 				" * </p>\n" +
 				" *\n" +

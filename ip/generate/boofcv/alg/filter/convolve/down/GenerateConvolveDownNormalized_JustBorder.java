@@ -48,13 +48,13 @@ public class GenerateConvolveDownNormalized_JustBorder {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.filter.convolve.down;\n" +
+		out.print("package boofcv.alg.filter.convolve.down;\n" +
 				"\n" +
-				"import gecv.struct.convolve.Kernel2D_F32;\n" +
-				"import gecv.struct.convolve.Kernel2D_I32;\n" +
-				"import gecv.struct.convolve.Kernel1D_F32;\n" +
-				"import gecv.struct.convolve.Kernel1D_I32;\n" +
-				"import gecv.struct.image.*;\n"+
+				"import boofcv.struct.convolve.Kernel2D_F32;\n" +
+				"import boofcv.struct.convolve.Kernel2D_I32;\n" +
+				"import boofcv.struct.convolve.Kernel1D_F32;\n" +
+				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
+				"import boofcv.struct.image.*;\n"+
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +

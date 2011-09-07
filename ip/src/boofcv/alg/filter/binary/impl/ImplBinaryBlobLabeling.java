@@ -121,15 +121,17 @@ public class ImplBinaryBlobLabeling {
 	}
 
 	private static void spotQuickLabel4(ImageBorder_I32 output, List<LabelNode> labels, int x, int y) {
-		final int p5 = output.get(x-1,y);
+		final int p5 = output.get(x-1,y  );
 		final int p3 = output.get(x  ,y-1);
 
-		// see if anything around it has been labeled already
 		if( 0 == p3+p5) {
+			// nothing around it has been labeled already
 			int value = labels.size();
 			labels.add( new LabelNode(value) );
 			output.set(x,y,value);
 		} else {
+			// one of the surrounding pixels has been labeled.
+			// pick the pixel with the highest ID
 			LabelNode l3 = labels.get(p3);
 			LabelNode l5 = labels.get(p5);
 			int value = Math.max(l3.maxIndex,l5.maxIndex);
@@ -161,9 +163,9 @@ public class ImplBinaryBlobLabeling {
 		// table the top image
 		for( int x = 0; x < input.width; x++ ) {
 			if( input.get(x,0) == 0 )
-				continue;
-
-			spotQuickLabel8(outputSafe, labels, 0, x);
+				output.set(x,0,0);
+			else
+				spotQuickLabel8(outputSafe, labels, 0, x);
 		}
 
 		for( int y = 1; y < input.height; y++ ) {
@@ -171,6 +173,8 @@ public class ImplBinaryBlobLabeling {
 			// label the left border
 			if( input.get(0,y) != 0 )
 				spotQuickLabel8(outputSafe, labels, y, 0);
+			else
+				output.set(0,y,0);
 
 			// label the inner portion of the row
 			int indexIn = input.startIndex + y*input.stride;
@@ -179,8 +183,10 @@ public class ImplBinaryBlobLabeling {
 
 //			for( int x = 1; x < input.width - 1; x++ ) {
 			for( indexIn++; indexIn < indexEnd; indexIn++ , indexOut++ ) {
-				if( input.data[indexIn] == 0 )
+				if( input.data[indexIn] == 0 ) {
+					output.data[indexOut] = 0;
 					continue;
+				}
 
 				final int p5 = output.data[indexOut-1];
 				final int p4 = output.data[indexOut-1-output.stride];
@@ -212,6 +218,8 @@ public class ImplBinaryBlobLabeling {
 			// label the right border
 			if( input.get(input.width - 1,y) != 0 )
 				spotQuickLabel8(outputSafe, labels, y, input.width - 1);
+			else
+				output.set(input.width - 1,y,0);
 		}
 
 		return labels;
@@ -229,10 +237,11 @@ public class ImplBinaryBlobLabeling {
 		
 		// table the top image
 		for( int x = 0; x < input.width; x++ ) {
-			if( input.get(x,0) == 0 )
-				continue;
-
-			 spotQuickLabel4(outputSafe, labels, x, 0);
+			if( input.get(x,0) == 0 ) {
+				output.set(x,0,0);
+			} else {
+				spotQuickLabel4(outputSafe, labels, x, 0);
+			}
 		}
 
 		for( int y = 1; y < input.height; y++ ) {
@@ -240,6 +249,8 @@ public class ImplBinaryBlobLabeling {
 			// label the left border
 			if( input.get(0,y) != 0 )
 				spotQuickLabel4(outputSafe, labels, 0, y);
+			else
+				output.set(0,y,0);
 
 			int indexIn = input.startIndex + y*input.stride;
 			int indexOut = output.startIndex + y*output.stride + 1;
@@ -247,18 +258,22 @@ public class ImplBinaryBlobLabeling {
 
 //			for( int x = 1; x < input.width - 1; x++ ) {
 			for( indexIn++; indexIn < indexEnd; indexIn++ , indexOut++ ) {
-				if( input.data[indexIn] == 0 )
+				if( input.data[indexIn] == 0 ) {
+					output.data[indexOut] = 0;
 					continue;
+				}
 
 				final int p5 = output.data[indexOut-1];
 				final int p3 = output.data[indexOut-output.stride];
 
-				// see if anything around it has been labeled
 				if( 0 == p3+p5) {
+					// nothing around it has been labeled already
 					int value = labels.size();
 					labels.add( new LabelNode(value) );
 					output.data[indexOut] = value;
 				} else {
+					// one of the surrounding pixels has been labeled.
+					// pick the pixel with the highest ID
 					LabelNode l3 = labels.get(p3);
 					LabelNode l5 = labels.get(p5);
 					int value = Math.max(l3.maxIndex,l5.maxIndex);

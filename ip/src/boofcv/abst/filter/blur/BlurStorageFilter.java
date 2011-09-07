@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.filter.blur.impl;
+package boofcv.abst.filter.blur;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.filter.blur.BlurImageOps;
@@ -45,25 +45,30 @@ public class BlurStorageFilter<T extends ImageBase> implements FilterImageInterf
 	// if sigma is an input or not
 	private boolean hasSigma;
 
-	public BlurStorageFilter( String functionName , Class<?> imageType , int radius) {
+	// type of image it processes
+	Class<T> inputType;
+
+	public BlurStorageFilter( String functionName , Class<T> inputType, int radius) {
 		this.radius = radius;
+		this.inputType = inputType;
 
 		hasSigma = false;
-		m = BoofTesting.findMethod(BlurImageOps.class,functionName,imageType,imageType,int.class,imageType);
+		m = BoofTesting.findMethod(BlurImageOps.class,functionName, inputType, inputType,int.class, inputType);
 
 		if( m == null )
-			throw new IllegalArgumentException("Can't find matching function for image type "+imageType.getSimpleName());
+			throw new IllegalArgumentException("Can't find matching function for image type "+ inputType.getSimpleName());
 	}
 
-	public BlurStorageFilter( String functionName , Class<?> imageType , double sigma , int radius) {
+	public BlurStorageFilter( String functionName , Class<T> inputType, double sigma , int radius) {
 		this.radius = radius;
 		this.sigma = sigma;
+		this.inputType = inputType;
 
 		hasSigma = true;
-		m = BoofTesting.findMethod(BlurImageOps.class,functionName,imageType,imageType,double.class,int.class,imageType);
+		m = BoofTesting.findMethod(BlurImageOps.class,functionName, inputType, inputType,double.class,int.class, inputType);
 
 		if( m == null )
-			throw new IllegalArgumentException("Can't find matching function for image type "+imageType.getSimpleName());
+			throw new IllegalArgumentException("Can't find matching function for image type "+ inputType.getSimpleName());
 	}
 
 	/**
@@ -102,5 +107,9 @@ public class BlurStorageFilter<T extends ImageBase> implements FilterImageInterf
 	@Override
 	public int getVerticalBorder() {
 		return 0;
+	}
+
+	public Class<T> getInputType() {
+		return inputType;
 	}
 }

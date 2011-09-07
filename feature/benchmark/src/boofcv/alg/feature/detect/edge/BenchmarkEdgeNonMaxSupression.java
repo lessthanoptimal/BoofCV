@@ -23,7 +23,7 @@ import boofcv.ProfileOperation;
 import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppression;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageSInt8;
 
 import java.util.Random;
 
@@ -41,35 +41,54 @@ public class BenchmarkEdgeNonMaxSupression {
 
 	static ImageFloat32 intensity = new ImageFloat32(width,height);
 	static ImageFloat32 output = new ImageFloat32(width,height);
-	static ImageUInt8 direction = new ImageUInt8(width,height);
+	static ImageSInt8 direction4 = new ImageSInt8(width,height);
+	static ImageSInt8 direction8 = new ImageSInt8(width,height);
 
 
-	public static class Naive_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			ImplEdgeNonMaxSuppression.naive(intensity,direction,output);
-		}
-	}
-
-	public static class Main_F32 extends PerformerBase {
+	public static class Naive4_F32 extends PerformerBase {
 
 		@Override
 		public void process() {
-			GradientToEdgeFeatures.nonMaxSuppression(intensity,direction,output);
+			ImplEdgeNonMaxSuppression.naive4(intensity, direction4,output);
 		}
 	}
 
+	public static class Main4_F32 extends PerformerBase {
+
+		@Override
+		public void process() {
+			GradientToEdgeFeatures.nonMaxSuppression4(intensity, direction4,output);
+		}
+	}
+
+	public static class Naive8_F32 extends PerformerBase {
+
+		@Override
+		public void process() {
+			ImplEdgeNonMaxSuppression.naive8(intensity,direction8,output);
+		}
+	}
+
+	public static class Main8_F32 extends PerformerBase {
+
+		@Override
+		public void process() {
+			GradientToEdgeFeatures.nonMaxSuppression8(intensity,direction8,output);
+		}
+	}
 
 	public static void main(String args[]) {
 		ImageTestingOps.randomize(intensity, rand, 0, 100);
-		ImageTestingOps.randomize(direction, rand, 0, 4);
+		ImageTestingOps.randomize(direction4, rand, -1, 3);
+		ImageTestingOps.randomize(direction8, rand, -3, 5);
 
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new Naive_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Main_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Naive4_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Main4_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Naive8_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Main8_F32(), TEST_TIME);
 
 	}
 }

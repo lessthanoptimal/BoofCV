@@ -19,9 +19,9 @@
 package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.abst.filter.blur.FactoryBlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.PixelMath;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.PyramidDiscrete;

@@ -20,11 +20,8 @@ package boofcv.alg.feature.detect.edge.impl;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 
 /**
@@ -33,10 +30,8 @@ import java.io.PrintStream;
 public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 	String className = "ImplGradientToEdgeFeatures";
 
-	PrintStream out;
-
 	public GenerateImplGradientToEdgeFeatures() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
+		setOutputFile(className);
 	}
 
 	@Override
@@ -52,14 +47,11 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.detect.edge.impl;\n" +
-				"\n" +
-				"import gecv.struct.image.*;\n" +
+		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Implementations of the core algorithms of {@link gecv.alg.detect.edge.GradientToEdgeFeatures}.\n" +
+				" * Implementations of the core algorithms of {@link boofcv.alg.feature.detect.edge.GradientToEdgeFeatures}.\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +
@@ -76,6 +68,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 		printItensityE(derivType);
 		printIntensityAbs(derivType);
 		printDirection(derivType);
+		printDirection2(derivType);
 	}
 
 	private void printItensityE(AutoTypeImage derivType) {
@@ -155,6 +148,33 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 		}
 
 		out.print("\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	private void printDirection2(AutoTypeImage derivType) {
+
+		String bitWise = derivType.getBitWise();
+		String sumType = derivType.getSumType();
+
+		out.print("\tstatic public void direction2( "+derivType.getImageName()+" derivX , "+derivType.getImageName()+" derivY , ImageFloat32 angle )\n" +
+				"\t{\n" +
+				"\t\tfinal int w = derivX.width;\n" +
+				"\t\tfinal int h = derivY.height;\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < h; y++ ) {\n" +
+				"\t\t\tint indexX = derivX.startIndex + y*derivX.stride;\n" +
+				"\t\t\tint indexY = derivY.startIndex + y*derivY.stride;\n" +
+				"\t\t\tint indexA = angle.startIndex + y*angle.stride;\n" +
+				"\n" +
+				"\t\t\tint end = indexX + w;\n" +
+				"\t\t\tfor( ; indexX < end; indexX++ , indexY++ , indexA++ ) {\n" +
+				"\t\t\t\t"+sumType+" dx = derivX.data[indexX]"+bitWise+";\n" +
+				"\t\t\t\t"+sumType+" dy = derivY.data[indexY]"+bitWise+";\n" +
+				"\n" +
+				"\t\t\t\t// compute the angle while avoiding divided by zero errors\n" +
+				"\t\t\t\tangle.data[indexA] = (float)Math.atan2(dy,dx);\n" +
+				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}

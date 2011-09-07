@@ -20,7 +20,6 @@ package boofcv.alg.denoise;
 
 import boofcv.abst.denoise.WaveletDenoiseFilter;
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.abst.filter.blur.FactoryBlurFilter;
 import boofcv.abst.wavelet.WaveletTransform;
 import boofcv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
 import boofcv.alg.denoise.wavelet.DenoiseSureShrink_F32;
@@ -29,6 +28,7 @@ import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.wavelet.FactoryWaveletCoiflet;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletHaar;

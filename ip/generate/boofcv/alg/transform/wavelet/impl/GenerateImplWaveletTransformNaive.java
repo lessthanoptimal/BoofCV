@@ -57,15 +57,15 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.wavelet.impl;\n" +
+		out.print("package boofcv.alg.wavelet.impl;\n" +
 				"\n" +
-				"import gecv.alg.wavelet.UtilWavelet;\n" +
-				"import gecv.struct.wavelet.WlBorderCoef;\n"+
-				"import gecv.struct.wavelet.WlCoef_F32;\n" +
-				"import gecv.struct.wavelet.WlCoef_I32;\n" +
-				"import gecv.core.image.border.BorderIndex1D;\n" +
-				"import gecv.struct.image.ImageFloat32;\n" +
-				"import gecv.struct.image.ImageInteger;\n" +
+				"import boofcv.alg.wavelet.UtilWavelet;\n" +
+				"import boofcv.struct.wavelet.WlBorderCoef;\n"+
+				"import boofcv.struct.wavelet.WlCoef_F32;\n" +
+				"import boofcv.struct.wavelet.WlCoef_I32;\n" +
+				"import boofcv.core.image.border.BorderIndex1D;\n" +
+				"import boofcv.struct.image.ImageFloat32;\n" +
+				"import boofcv.struct.image.ImageInteger;\n" +
 				"\n" +
 				"\n" +
 				"/**\n" +

@@ -59,13 +59,13 @@ public class GenerateImplGrayImageOps extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.filter.basic.impl;\n" +
+		out.print("package boofcv.alg.filter.basic.impl;\n" +
 				"\n" +
-				"import gecv.struct.image.*;\n" +
+				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Contains implementations of algorithms in {@link gecv.alg.filter.basic.GrayImageOps}.\n" +
+				" * Contains implementations of algorithms in {@link boofcv.alg.filter.basic.GrayImageOps}.\n" +
 				" * </p>\n" +
 				" * \n" +
 				" * <p>\n" +

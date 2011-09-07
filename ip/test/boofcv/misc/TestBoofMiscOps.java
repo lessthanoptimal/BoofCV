@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestGecvMiscOps {
+public class TestBoofMiscOps {
 	@Test
 	public void boundRectangleInside() {
 		ImageUInt8 image = new ImageUInt8(20,25);

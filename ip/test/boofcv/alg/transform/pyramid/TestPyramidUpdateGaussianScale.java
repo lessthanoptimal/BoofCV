@@ -18,11 +18,11 @@
 
 package boofcv.alg.transform.pyramid;
 
-import boofcv.abst.filter.blur.FactoryBlurFilter;
-import boofcv.abst.filter.blur.impl.BlurStorageFilter;
+import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;

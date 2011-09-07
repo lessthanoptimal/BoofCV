@@ -18,10 +18,10 @@
 
 package boofcv.alg.transform.pyramid;
 
-import boofcv.abst.filter.blur.FactoryBlurFilter;
-import boofcv.abst.filter.blur.impl.BlurStorageFilter;
+import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidFloat;
@@ -91,7 +91,7 @@ public class PyramidUpdateGaussianScale< T extends ImageBase> implements Pyramid
 			T layer = pyramid.getLayer(i);
 
 
-			BlurStorageFilter<T> blur = (BlurStorageFilter<T>)FactoryBlurFilter.gaussian(layer.getClass(),sigmas[i],-1);
+			BlurStorageFilter<T> blur = (BlurStorageFilter<T>) FactoryBlurFilter.gaussian(layer.getClass(),sigmas[i],-1);
 
 			tempImage.reshape(prev.width,prev.height);
 			blur.process(prev,tempImage);

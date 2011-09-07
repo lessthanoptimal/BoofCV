@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.intensity;
 
-import boofcv.abst.filter.blur.impl.MedianImageFilter;
+import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageBase;

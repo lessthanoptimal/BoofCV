@@ -57,10 +57,10 @@ public class GenerateImplOrientationSlidingWindow extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.feature.describe.impl;\n" +
+		out.print("package boofcv.alg.feature.describe.impl;\n" +
 				"\n" +
-				"import gecv.alg.feature.describe.OrientationSlidingWindow;\n" +
-				"import gecv.struct.image."+imageType.getImageName()+";\n" +
+				"import boofcv.alg.feature.describe.OrientationSlidingWindow;\n" +
+				"import boofcv.struct.image."+imageType.getImageName()+";\n" +
 				"import jgrl.metric.UtilAngle;\n" +
 				"\n" +
 				"\n" +

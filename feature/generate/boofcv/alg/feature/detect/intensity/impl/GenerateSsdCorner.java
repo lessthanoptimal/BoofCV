@@ -74,14 +74,14 @@ public class GenerateSsdCorner {
 	}
 
 	private void printPreamble() {
-		out.print("package gecv.alg.detect.corner.impl;\n" +
+		out.print("package boofcv.alg.detect.corner.impl;\n" +
 				"\n" +
-				"import gecv.alg.detect.corner.GradientCornerIntensity;\n" +
-				"import gecv.struct.image." + typeInput + ";\n");
+				"import boofcv.alg.detect.corner.GradientCornerIntensity;\n" +
+				"import boofcv.struct.image." + typeInput + ";\n");
 		if (typeInput.compareTo(typeOutput) != 0)
-			out.print("import gecv.struct.image." + typeOutput + ";\n");
+			out.print("import boofcv.struct.image." + typeOutput + ";\n");
 		if( typeInput.compareTo("ImageFloat32") != 0 && typeOutput.compareTo("ImageFloat32") != 0 ) {
-			out.print("import gecv.struct.image.ImageFloat32;\n");
+			out.print("import boofcv.struct.image.ImageFloat32;\n");
 		}
 
 		out.print("\n" +

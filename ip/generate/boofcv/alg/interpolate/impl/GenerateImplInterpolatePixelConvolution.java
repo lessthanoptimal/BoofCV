@@ -57,11 +57,11 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 
 	private void printPreamble( String fileName ) {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.interpolate.impl;\n" +
+		out.print("package boofcv.alg.interpolate.impl;\n" +
 				"\n" +
-				"import gecv.alg.interpolate.InterpolatePixel;\n" +
-				"import gecv.struct.convolve.KernelContinuous1D_F32;\n" +
-				"import gecv.struct.image.*;\n" +
+				"import boofcv.alg.interpolate.InterpolatePixel;\n" +
+				"import boofcv.struct.convolve.KernelContinuous1D_F32;\n" +
+				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +

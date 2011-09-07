@@ -21,11 +21,15 @@ package boofcv.alg.filter.binary;
 import boofcv.alg.filter.binary.impl.CompareToBinaryNaive;
 import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import boofcv.alg.filter.binary.impl.TestImplBinaryBlobLabeling;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
+import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
@@ -102,6 +106,9 @@ public class TestBinaryImageOps {
 		ImageSInt32 expected = new ImageSInt32(13,8);
 		expected.data = expectedData;
 
+		// randomize output data to simulate using the same output multiple times
+		GeneralizedImageOps.randomize(found,rand,0,20);
+
 		int numFount = rule8 ? BinaryImageOps.labelBlobs8(input,found) : BinaryImageOps.labelBlobs4(input,found);
 		assertEquals(numExpected,numFount);
 
@@ -159,5 +166,26 @@ public class TestBinaryImageOps {
 				}
 			}
 		}
+	}
+
+	@Test
+	public void labelToClusters() {
+		FastQueue<Point2D_I32> queue = new FastQueue<Point2D_I32>(16,Point2D_I32.class,true);
+		ImageSInt32 labels = new ImageSInt32(4,4);
+		labels.data = new int[]{
+				1,2,3,4,
+				5,0,2,2,
+				3,4,4,4,
+				0,0,0,0};
+
+		List<List<Point2D_I32>> ret = BinaryImageOps.labelToClusters(labels,5,queue);
+
+		assertEquals(5,ret.size());
+
+		assertEquals(1,ret.get(0).size());
+		assertEquals(3,ret.get(1).size());
+		assertEquals(2,ret.get(2).size());
+		assertEquals(4,ret.get(3).size());
+		assertEquals(1,ret.get(4).size());
 	}
 }

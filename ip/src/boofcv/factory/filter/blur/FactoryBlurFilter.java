@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.abst.filter.blur;
+package boofcv.factory.filter.blur;
 
-import boofcv.abst.filter.blur.impl.BlurStorageFilter;
-import boofcv.abst.filter.blur.impl.MedianImageFilter;
+import boofcv.abst.filter.blur.BlurStorageFilter;
+import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.struct.image.ImageBase;
 
 /**

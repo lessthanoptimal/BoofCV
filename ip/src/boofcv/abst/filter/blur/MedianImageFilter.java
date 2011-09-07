@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.filter.blur.impl;
+package boofcv.abst.filter.blur;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.filter.blur.BlurImageOps;

@@ -55,11 +55,11 @@ public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.transform.ii.impl;\n" +
+		out.print("package boofcv.alg.transform.ii.impl;\n" +
 				"\n" +
-				"import gecv.alg.transform.ii.IntegralKernel;\n" +
-				"import gecv.struct.ImageRectangle;\n" +
-				"import gecv.struct.image.*;\n" +
+				"import boofcv.alg.transform.ii.IntegralKernel;\n" +
+				"import boofcv.struct.ImageRectangle;\n" +
+				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"\n" +
 				"/**\n" +

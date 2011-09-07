@@ -49,14 +49,14 @@ public class GenerateImplOrientationNoGradient extends CodeGeneratorBase {
 	private void printPreamble() {
 		String type = imageType.getImageName();
 
-		out.print("import gecv.alg.feature.orientation.OrientationNoGradient;\n" +
-				"import gecv.struct.image."+type+";\n" +
+		out.print("import boofcv.alg.feature.orientation.OrientationNoGradient;\n" +
+				"import boofcv.struct.image."+type+";\n" +
 				"\n" +
 				"\n" +
 				"/**\n" +
 				" *\n" +
 				" * <p>\n" +
-				" * Implementation of {@link gecv.alg.feature.orientation.OrientationNoGradient} for a specific image type.\n" +
+				" * Implementation of {@link boofcv.alg.feature.orientation.OrientationNoGradient} for a specific image type.\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +

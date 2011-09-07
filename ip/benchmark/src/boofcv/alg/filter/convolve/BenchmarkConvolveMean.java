@@ -20,11 +20,11 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.PerformerBase;
 import boofcv.ProfileOperation;
-import boofcv.abst.filter.blur.FactoryBlurFilter;
-import boofcv.abst.filter.blur.impl.BlurStorageFilter;
+import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.misc.ImageTestingOps;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;

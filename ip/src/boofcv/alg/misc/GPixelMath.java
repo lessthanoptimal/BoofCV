@@ -176,4 +176,33 @@ public class GPixelMath {
 			}
 		}
 	}
+
+	/**
+	 * <p>
+	 * Returns the sum of all the pixels in the image.
+	 * </p>
+	 *
+	 * @param input Input image. Not modified.
+	 */
+	public static <T extends ImageBase> double sum( T input ) {
+
+		if( ImageUInt8.class == input.getClass() ) {
+			return PixelMath.sum((ImageUInt8)input);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			return PixelMath.sum((ImageSInt8)input);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			return PixelMath.sum((ImageUInt16)input);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			return PixelMath.sum((ImageSInt16)input);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			return PixelMath.sum((ImageSInt32)input);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			return PixelMath.sum((ImageFloat32)input);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			return PixelMath.sum((ImageFloat64)input);
+		} else {
+			throw new IllegalArgumentException("Unknown integer image Type");
+		}
+
+	}
 }

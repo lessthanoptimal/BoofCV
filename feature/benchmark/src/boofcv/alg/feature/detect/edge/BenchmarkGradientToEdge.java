@@ -22,6 +22,7 @@ import boofcv.PerformerBase;
 import boofcv.ProfileOperation;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt8;
 
 import java.util.Random;
 
@@ -43,6 +44,7 @@ public class BenchmarkGradientToEdge {
 	static ImageFloat32 intensity_F32 = new ImageFloat32(width,height);
 	static ImageFloat32 orientation_F32 = new ImageFloat32(width,height);
 
+	static ImageSInt8 direction = new ImageSInt8(width,height);
 
 	public static class Euclidian_F32 extends PerformerBase {
 
@@ -68,9 +70,33 @@ public class BenchmarkGradientToEdge {
 		}
 	}
 
+	public static class Orientation2_F32 extends PerformerBase {
+
+		@Override
+		public void process() {
+			GradientToEdgeFeatures.direction2(derivX_F32,derivY_F32,orientation_F32);
+		}
+	}
+
+	public static class Discretize4 extends PerformerBase {
+		@Override
+		public void process() {
+			GradientToEdgeFeatures.discretizeDirection4(intensity_F32,direction);
+		}
+	}
+
+	public static class Discretize8 extends PerformerBase {
+
+		@Override
+		public void process() {
+			GradientToEdgeFeatures.discretizeDirection8(intensity_F32,direction);
+		}
+	}
+
 	public static void main(String args[]) {
 		ImageTestingOps.randomize(derivX_F32, rand, 0, 255);
 		ImageTestingOps.randomize(derivY_F32, rand, 0, 255);
+		ImageTestingOps.randomize(orientation_F32, rand, (float)(-Math.PI/2.0), (float)(Math.PI/2.0));
 
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
 		System.out.println();
@@ -78,6 +104,8 @@ public class BenchmarkGradientToEdge {
 		ProfileOperation.printOpsPerSec(new Euclidian_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Abs_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Orientation_F32(), TEST_TIME);
-
+		ProfileOperation.printOpsPerSec(new Orientation2_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Discretize4(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Discretize8(), TEST_TIME);
 	}
 }
