@@ -46,17 +46,17 @@ public class GenerateConvolveNormalizedStandardSparse {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.filter.convolve.normalized;\n" +
+		out.print("package boofcv.alg.filter.convolve.normalized;\n" +
 				"\n" +
-				"import gecv.struct.convolve.Kernel1D_F32;\n" +
-				"import gecv.struct.convolve.Kernel1D_I32;\n" +
-				"import gecv.struct.image.ImageFloat32;\n" +
-				"import gecv.struct.image.ImageSInt16;\n" +
-				"import gecv.struct.image.ImageUInt8;\n" +
+				"import boofcv.struct.convolve.Kernel1D_F32;\n" +
+				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
+				"import boofcv.struct.image.ImageFloat32;\n" +
+				"import boofcv.struct.image.ImageSInt16;\n" +
+				"import boofcv.struct.image.ImageUInt8;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Straight forward implementation of {@link gecv.alg.filter.convolve.edge.ConvolveNormalizedSparse} with minimal\n" +
+				" * Straight forward implementation of {@link boofcv.alg.filter.convolve.edge.ConvolveNormalizedSparse} with minimal\n" +
 				" * optimizations.\n" +
 				" * </p>\n" +
 				" *\n" +

@@ -52,12 +52,12 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.detect.intensity.impl;\n" +
+		out.print("package boofcv.alg.detect.intensity.impl;\n" +
 				"\n" +
-				"import gecv.alg.transform.ii.DerivativeIntegralImage;\n" +
-				"import gecv.alg.transform.ii.IntegralImageOps;\n" +
-				"import gecv.alg.transform.ii.IntegralKernel;\n" +
-				"import gecv.struct.image.*;\n" +
+				"import boofcv.alg.transform.ii.DerivativeIntegralImage;\n" +
+				"import boofcv.alg.transform.ii.IntegralImageOps;\n" +
+				"import boofcv.alg.transform.ii.IntegralKernel;\n" +
+				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"\n" +
 				"/**\n" +

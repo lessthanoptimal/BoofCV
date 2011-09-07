@@ -90,21 +90,21 @@ public class GenerateConvolveJustBorder_General {
 
 	public void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.filter.convolve.border;\n" +
+		out.print("package boofcv.alg.filter.convolve.border;\n" +
 				"\n" +
-				"import gecv.core.image.border.ImageBorder_F32;\n" +
-				"import gecv.core.image.border.ImageBorder_I;\n" +
-				"import gecv.struct.convolve.Kernel1D_F32;\n" +
-				"import gecv.struct.convolve.Kernel1D_I32;\n" +
-				"import gecv.struct.convolve.Kernel2D_F32;\n" +
-				"import gecv.struct.convolve.Kernel2D_I32;\n" +
-				"import gecv.struct.image.ImageFloat32;\n" +
-				"import gecv.struct.image.ImageInt16;\n" +
-				"import gecv.struct.image.ImageSInt32;\n" +
+				"import boofcv.core.image.border.ImageBorder_F32;\n" +
+				"import boofcv.core.image.border.ImageBorder_I;\n" +
+				"import boofcv.struct.convolve.Kernel1D_F32;\n" +
+				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
+				"import boofcv.struct.convolve.Kernel2D_F32;\n" +
+				"import boofcv.struct.convolve.Kernel2D_I32;\n" +
+				"import boofcv.struct.image.ImageFloat32;\n" +
+				"import boofcv.struct.image.ImageInt16;\n" +
+				"import boofcv.struct.image.ImageSInt32;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Convolves just the image's border.  How the border condition is handled is specified by the {@link gecv.core.image.border.ImageBorder}\n" +
+				" * Convolves just the image's border.  How the border condition is handled is specified by the {@link boofcv.core.image.border.ImageBorder}\n" +
 				" * passed in.  For 1D kernels only the horizontal or vertical borders are processed.\n" +
 				" * </p>\n" +
 				" * \n" +

@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.abst.filter.blur.FactoryBlurFilter;
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityTests;
 import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;

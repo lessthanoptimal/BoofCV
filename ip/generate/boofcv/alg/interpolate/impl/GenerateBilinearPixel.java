@@ -60,10 +60,10 @@ public class GenerateBilinearPixel extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.interpolate.impl;\n");
+		out.print("package boofcv.alg.interpolate.impl;\n");
 		out.println();
-		out.print("import gecv.alg.interpolate.InterpolatePixel;\n" +
-				"import gecv.struct.image."+image.getImageName()+";\n");
+		out.print("import boofcv.alg.interpolate.InterpolatePixel;\n" +
+				"import boofcv.struct.image."+image.getImageName()+";\n");
 		out.println();
 		out.println();
 		out.print("/**\n" +

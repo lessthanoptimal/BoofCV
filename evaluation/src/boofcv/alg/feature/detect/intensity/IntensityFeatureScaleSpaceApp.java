@@ -19,10 +19,10 @@
 package boofcv.alg.feature.detect.intensity;
 
 import boofcv.abst.feature.detect.intensity.*;
-import boofcv.abst.filter.blur.FactoryBlurFilter;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmPanel;

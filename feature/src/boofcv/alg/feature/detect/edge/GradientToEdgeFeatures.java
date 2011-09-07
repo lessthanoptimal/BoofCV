@@ -24,7 +24,7 @@ import boofcv.alg.feature.detect.edge.impl.ImplGradientToEdgeFeatures;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageSInt8;
 
 /**
  * <p>
@@ -76,17 +76,31 @@ public class GradientToEdgeFeatures {
 	}
 
 	/**
-	 * Computes the edge intensity using a Euclidean norm.
+	 * Computes the edge orientation using the {@link Math#atan} function.
 	 *
 	 * @param derivX Derivative along x-axis. Not modified.
 	 * @param derivY Derivative along y-axis. Not modified.
-	 * @param angle Edge orientation in radians.
+	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
 	static public void direction( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 angle )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,angle);
 
 		ImplGradientToEdgeFeatures.direction(derivX,derivY,angle);
+	}
+
+	/**
+	 * Computes the edge orientation using the {@link Math#atan2} function.
+	 *
+	 * @param derivX Derivative along x-axis. Not modified.
+	 * @param derivY Derivative along y-axis. Not modified.
+	 * @param angle Edge orientation in radians (-pi to pi).
+	 */
+	static public void direction2( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 angle )
+	{
+		InputSanityCheck.checkSameShape(derivX,derivY,angle);
+
+		ImplGradientToEdgeFeatures.direction2(derivX,derivY,angle);
 	}
 
 	/**
@@ -118,17 +132,31 @@ public class GradientToEdgeFeatures {
 	}
 
 	/**
-	 * Computes the edge intensity using a Euclidean norm.
+	 * Computes the edge orientation using the {@link Math#atan} function.
 	 *
 	 * @param derivX Derivative along x-axis. Not modified.
 	 * @param derivY Derivative along y-axis. Not modified.
-	 * @param angle Edge orientation in radians.
+	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
 	static public void direction( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 angle )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,angle);
 
 		ImplGradientToEdgeFeatures.direction(derivX,derivY,angle);
+	}
+
+	/**
+	 * Computes the edge orientation using the {@link Math#atan2} function.
+	 *
+	 * @param derivX Derivative along x-axis. Not modified.
+	 * @param derivY Derivative along y-axis. Not modified.
+	 * @param angle Edge orientation in radians (-pi to pi).
+	 */
+	static public void direction2( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 angle )
+	{
+		InputSanityCheck.checkSameShape(derivX,derivY,angle);
+
+		ImplGradientToEdgeFeatures.direction2(derivX,derivY,angle);
 	}
 
 	/**
@@ -160,11 +188,11 @@ public class GradientToEdgeFeatures {
 	}
 
 	/**
-	 * Computes the edge intensity using a Euclidean norm.
+	 * Computes the edge orientation using the {@link Math#atan} function.
 	 *
 	 * @param derivX Derivative along x-axis. Not modified.
 	 * @param derivY Derivative along y-axis. Not modified.
-	 * @param angle Edge orientation in radians.
+	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
 	static public void direction( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 angle )
 	{
@@ -174,26 +202,39 @@ public class GradientToEdgeFeatures {
 	}
 
 	/**
+	 * Computes the edge orientation using the {@link Math#atan2} function.
+	 *
+	 * @param derivX Derivative along x-axis. Not modified.
+	 * @param derivY Derivative along y-axis. Not modified.
+	 * @param angle Edge orientation in radians (-pi to pi).
+	 */
+	static public void direction2( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 angle )
+	{
+		InputSanityCheck.checkSameShape(derivX,derivY,angle);
+
+		ImplGradientToEdgeFeatures.direction2(derivX,derivY,angle);
+	}
+
+	/**
 	 * <p>
-	 * Converts an image containing edge angles into a discrete set of line angles which
-	 * represent orientations of 0, 45, 90, and 135 degrees.  The conversion is done by rounding
-	 * the angle to the nearest orientation in the set.
+	 * Converts an image containing edge angles (-pi/2 to pi/2) into a discrete set of angles.
+	 * The conversion is done by rounding the angle to the nearest orientation in the set.
 	 * </p>
 	 * <p>
-	 * Discrete value to angle (degrees): 0=90,1=45,2=0,3=-45
+	 * Discrete value to angle (degrees): 0=0,1=45,2=90,-1=-45
 	 * </p>
 	 *
 	 * @param angle Input image containing edge orientations.  Orientations are assumed to be
 	 * from -pi/2 to pi/2. Not modified.
-	 * @param discrete  Output set of discretized angles.  Values will be from 0 to 3, inclusive. If null a new
+	 * @param discrete  Output set of discretized angles.  Values will be from -1 to 2, inclusive. If null a new
 	 * image will be declared and returned. Modified.
 	 * @return Discretized direction.
 	 */
-	static public ImageUInt8 discretizeDirection( ImageFloat32 angle , ImageUInt8 discrete )
+	static public ImageSInt8 discretizeDirection4( ImageFloat32 angle , ImageSInt8 discrete )
 	{
-		discrete = InputSanityCheck.checkDeclare(angle,discrete,ImageUInt8.class);
+		discrete = InputSanityCheck.checkDeclare(angle,discrete,ImageSInt8.class);
 
-		final float A = (float)(Math.PI/2.0);
+		final float A = (float)(Math.PI/8.0);
 		final float B = (float)(Math.PI/4.0);
 		final int w = angle.width;
 		final int h = angle.height;
@@ -204,7 +245,58 @@ public class GradientToEdgeFeatures {
 
 			int end = indexSrc + w;
 			for( ; indexSrc < end; indexSrc++ , indexDst++ ) {
-				discrete.data[indexDst] = (byte)((int)Math.round((angle.data[indexSrc]+A)/B) % 4);
+				float a = angle.data[indexSrc];
+				int val;
+				if( a >= 0 ) {
+					val = (int)((a+A)/B);
+				} else {
+					val = (int)((a-A)/B);
+				}
+				discrete.data[indexDst] = (byte)(val == -2 ? 2 : val);
+			}
+		}
+
+		return discrete;
+	}
+
+	/**
+	 * <p>
+	 * Converts an image containing edge angles (-pi to pi) into a discrete set of 8 angles.
+	 * The conversion is done by rounding the angle to the nearest orientation in the set.
+	 * </p>
+	 * <p>
+	 * Discrete value to angle (degrees): 0=0,1=45,2=90,3=135,4=180,-1=-45,-2=--90,-3=-135
+	 * </p>
+	 *
+	 * @param angle Input image containing edge orientations.  Orientations are assumed to be
+	 * from -pi to pi. Not modified.
+	 * @param discrete  Output set of discretized angles.  Values will be from -3 to 4, inclusive. If null a new
+	 * image will be declared and returned. Modified.
+	 * @return Discretized direction.
+	 */
+	static public ImageSInt8 discretizeDirection8( ImageFloat32 angle , ImageSInt8 discrete )
+	{
+		discrete = InputSanityCheck.checkDeclare(angle,discrete,ImageSInt8.class);
+
+		final float A = (float)(Math.PI/8.0);
+		final float B = (float)(Math.PI/4.0);
+		final int w = angle.width;
+		final int h = angle.height;
+
+		for( int y = 0; y < h; y++ ) {
+			int indexSrc = angle.startIndex + y*angle.stride;
+			int indexDst = discrete.startIndex + y*discrete.stride;
+
+			int end = indexSrc + w;
+			for( ; indexSrc < end; indexSrc++ , indexDst++ ) {
+				float a = angle.data[indexSrc];
+				int val;
+				if( a >= 0 ) {
+					val = (int)((a+A)/B);
+				} else {
+					val = (int)((a-A)/B);
+				}
+				discrete.data[indexDst] = (byte)(val == -4 ? 4 : val);
 			}
 		}
 
@@ -218,17 +310,39 @@ public class GradientToEdgeFeatures {
 	 * </p>
 	 *
 	 * @param intensity Edge intensities. Not modified.
-	 * @param direction Discretized direction.  See {@link #discretizeDirection(boofcv.struct.image.ImageFloat32, boofcv.struct.image.ImageUInt8)}. Not modified.
+	 * @param direction 4-Discretized direction.  See {@link #discretizeDirection4(boofcv.struct.image.ImageFloat32, boofcv.struct.image.ImageSInt8)}. Not modified.
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public ImageFloat32 nonMaxSuppression( ImageFloat32 intensity , ImageUInt8 direction , ImageFloat32 output )
+	static public ImageFloat32 nonMaxSuppression4( ImageFloat32 intensity , ImageSInt8 direction , ImageFloat32 output )
 	{
 		InputSanityCheck.checkSameShape(intensity,direction);
 		output = InputSanityCheck.checkDeclare(intensity,output);
 
-		ImplEdgeNonMaxSuppression.inner(intensity,direction,output);
-		ImplEdgeNonMaxSuppression.border(intensity,direction,output);
+		ImplEdgeNonMaxSuppression.inner4(intensity,direction,output);
+		ImplEdgeNonMaxSuppression.border4(intensity,direction,output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Sets edge intensities to zero if the pixel has an intensity which is not greater than any of
+	 * the two adjacent pixels.  Pixel adjacency is determined by the gradients discretized direction.
+	 * </p>
+	 *
+	 * @param intensity Edge intensities. Not modified.
+	 * @param direction 8-Discretized direction.  See {@link #discretizeDirection8(boofcv.struct.image.ImageFloat32, boofcv.struct.image.ImageSInt8)}. Not modified.
+	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
+	 * @return Filtered edge intensity.
+	 */
+	static public ImageFloat32 nonMaxSuppression8( ImageFloat32 intensity , ImageSInt8 direction , ImageFloat32 output )
+	{
+		InputSanityCheck.checkSameShape(intensity,direction);
+		output = InputSanityCheck.checkDeclare(intensity,output);
+
+		ImplEdgeNonMaxSuppression.inner8(intensity,direction,output);
+		ImplEdgeNonMaxSuppression.border8(intensity,direction,output);
 
 		return output;
 	}

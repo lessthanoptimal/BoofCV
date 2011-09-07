@@ -54,13 +54,13 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.detect.corner.impl;\n" +
+		out.print("package boofcv.alg.detect.corner.impl;\n" +
 				"\n" +
-				"import gecv.struct.image.*;\n" +
+				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Implementations of {@link gecv.alg.detect.corner.HessianBlobIntensity}.\n" +
+				" * Implementations of {@link boofcv.alg.detect.corner.HessianBlobIntensity}.\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +

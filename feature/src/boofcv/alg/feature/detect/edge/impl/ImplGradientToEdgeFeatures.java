@@ -94,6 +94,27 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
+	static public void direction2( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 angle )
+	{
+		final int w = derivX.width;
+		final int h = derivY.height;
+
+		for( int y = 0; y < h; y++ ) {
+			int indexX = derivX.startIndex + y*derivX.stride;
+			int indexY = derivY.startIndex + y*derivY.stride;
+			int indexA = angle.startIndex + y*angle.stride;
+
+			int end = indexX + w;
+			for( ; indexX < end; indexX++ , indexY++ , indexA++ ) {
+				float dx = derivX.data[indexX];
+				float dy = derivY.data[indexY];
+
+				// compute the angle while avoiding divided by zero errors
+				angle.data[indexA] = (float)Math.atan2(dy,dx);
+			}
+		}
+	}
+
 	static public void intensityE( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 intensity )
 	{
 		final int w = derivX.width;
@@ -153,6 +174,27 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
+	static public void direction2( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 angle )
+	{
+		final int w = derivX.width;
+		final int h = derivY.height;
+
+		for( int y = 0; y < h; y++ ) {
+			int indexX = derivX.startIndex + y*derivX.stride;
+			int indexY = derivY.startIndex + y*derivY.stride;
+			int indexA = angle.startIndex + y*angle.stride;
+
+			int end = indexX + w;
+			for( ; indexX < end; indexX++ , indexY++ , indexA++ ) {
+				int dx = derivX.data[indexX];
+				int dy = derivY.data[indexY];
+
+				// compute the angle while avoiding divided by zero errors
+				angle.data[indexA] = (float)Math.atan2(dy,dx);
+			}
+		}
+	}
+
 	static public void intensityE( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 intensity )
 	{
 		final int w = derivX.width;
@@ -208,6 +250,27 @@ public class ImplGradientToEdgeFeatures {
 
 				// compute the angle while avoiding divided by zero errors
 				angle.data[indexA] = dx == 0 ? (float)(Math.PI/2.0) : (float)Math.atan((double)dy/(double)dx);
+			}
+		}
+	}
+
+	static public void direction2( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 angle )
+	{
+		final int w = derivX.width;
+		final int h = derivY.height;
+
+		for( int y = 0; y < h; y++ ) {
+			int indexX = derivX.startIndex + y*derivX.stride;
+			int indexY = derivY.startIndex + y*derivY.stride;
+			int indexA = angle.startIndex + y*angle.stride;
+
+			int end = indexX + w;
+			for( ; indexX < end; indexX++ , indexY++ , indexA++ ) {
+				int dx = derivX.data[indexX];
+				int dy = derivY.data[indexY];
+
+				// compute the angle while avoiding divided by zero errors
+				angle.data[indexA] = (float)Math.atan2(dy,dx);
 			}
 		}
 	}

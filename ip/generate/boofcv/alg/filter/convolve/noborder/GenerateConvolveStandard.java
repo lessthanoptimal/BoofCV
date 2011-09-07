@@ -65,18 +65,18 @@ public class GenerateConvolveStandard extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.filter.convolve.noborder;\n");
+		out.print("package boofcv.alg.filter.convolve.noborder;\n");
 		out.println();
-		out.print("import gecv.struct.convolve.Kernel1D_F32;\n" +
-				"import gecv.struct.convolve.Kernel1D_I32;\n" +
-				"import gecv.struct.convolve.Kernel2D_F32;\n" +
-				"import gecv.struct.convolve.Kernel2D_I32;\n" +
-				"import gecv.struct.image.ImageFloat32;\n" +
-				"import gecv.struct.image.ImageSInt32;\n" +
-				"import gecv.struct.image.ImageSInt16;\n" +
-				"import gecv.struct.image.ImageInt16;\n" +
-				"import gecv.struct.image.ImageInt8;\n" +
-				"import gecv.struct.image.ImageUInt8;\n");
+		out.print("import boofcv.struct.convolve.Kernel1D_F32;\n" +
+				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
+				"import boofcv.struct.convolve.Kernel2D_F32;\n" +
+				"import boofcv.struct.convolve.Kernel2D_I32;\n" +
+				"import boofcv.struct.image.ImageFloat32;\n" +
+				"import boofcv.struct.image.ImageSInt32;\n" +
+				"import boofcv.struct.image.ImageSInt16;\n" +
+				"import boofcv.struct.image.ImageInt16;\n" +
+				"import boofcv.struct.image.ImageInt8;\n" +
+				"import boofcv.struct.image.ImageUInt8;\n");
 		out.println();
 		out.println();
 		out.print("/**\n" +

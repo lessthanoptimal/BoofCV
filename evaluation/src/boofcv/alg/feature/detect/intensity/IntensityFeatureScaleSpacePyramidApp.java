@@ -19,7 +19,6 @@
 package boofcv.alg.feature.detect.intensity;
 
 import boofcv.abst.feature.detect.intensity.*;
-import boofcv.abst.filter.blur.FactoryBlurFilter;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -29,6 +28,7 @@ import boofcv.alg.transform.gss.UtilScaleSpace;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmPanel;
 import boofcv.gui.image.ShowImages;

@@ -59,9 +59,9 @@ public class GenerateImplConvolveBox {
 
 	public void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.filter.convolve.noborder;\n" +
+		out.print("package boofcv.alg.filter.convolve.noborder;\n" +
 				"\n" +
-				"import gecv.struct.image.*;\n" +
+				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +

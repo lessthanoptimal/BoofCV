@@ -61,12 +61,12 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.interpolate.impl;\n");
+		out.print("package boofcv.alg.interpolate.impl;\n");
 		out.println();
-		out.print("import gecv.alg.interpolate.InterpolateRectangle;\n" +
-				"import gecv.struct.image."+image.getImageName()+";\n");
+		out.print("import boofcv.alg.interpolate.InterpolateRectangle;\n" +
+				"import boofcv.struct.image."+image.getImageName()+";\n");
 		if( image.getImageName().compareTo("ImageFloat32") != 0 )
-			out.println("import gecv.struct.image.ImageFloat32;");
+			out.println("import boofcv.struct.image.ImageFloat32;");
 		out.println();
 		out.println();
 		out.print("/**\n" +

@@ -53,10 +53,10 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.filter.blur.impl;\n" +
+		out.print("package boofcv.alg.filter.blur.impl;\n" +
 				"\n" +
-				"import gecv.struct.image.ImageFloat32;\n" +
-				"import gecv.struct.image.ImageInteger;\n" +
+				"import boofcv.struct.image.ImageFloat32;\n" +
+				"import boofcv.struct.image.ImageInteger;\n" +
 				"import pja.sorting.QuickSelectArray;\n" +
 				"\n" +
 				"/**\n" +

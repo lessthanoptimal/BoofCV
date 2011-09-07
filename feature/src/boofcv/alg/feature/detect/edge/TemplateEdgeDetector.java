@@ -19,6 +19,8 @@
 package boofcv.alg.feature.detect.edge;
 
 /**
+ * Detect edges and their directions using templates.
+ *
  * @author Peter Abeles
  */
 public class TemplateEdgeDetector {

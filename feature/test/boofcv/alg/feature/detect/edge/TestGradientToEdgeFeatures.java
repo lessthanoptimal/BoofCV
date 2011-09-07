@@ -25,8 +25,9 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageSInt8;
 import boofcv.testing.BoofTesting;
+import georegression.metric.UtilAngle;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -75,7 +76,6 @@ public class TestGradientToEdgeFeatures {
 
 		SingleBandImage a = FactorySingleBandImage.wrap(derivX);
 		SingleBandImage b = FactorySingleBandImage.wrap(derivY);
-
 
 		float expected = (float)Math.sqrt( Math.pow(a.get(1,2).doubleValue(),2) + Math.pow(b.get(1,2).doubleValue(),2));
 
@@ -151,7 +151,7 @@ public class TestGradientToEdgeFeatures {
 	}
 
 	@Test
-	public void discretizeDirection() {
+	public void discretizeDirection4() {
 		ImageFloat32 angle = new ImageFloat32(5,5);
 		angle.set(0,0,(float)(3*Math.PI/8+0.01));
 		angle.set(1,0,(float)(3*Math.PI/8-0.01));
@@ -161,35 +161,52 @@ public class TestGradientToEdgeFeatures {
 		angle.set(0,1,(float)(-3*Math.PI/8+0.01));
 		angle.set(1,1,(float)(-3*Math.PI/8-0.01));
 
-		ImageUInt8 d = new ImageUInt8(5,5);
+		ImageSInt8 d = new ImageSInt8(5,5);
 
-		GradientToEdgeFeatures.discretizeDirection(angle,d);
+		GradientToEdgeFeatures.discretizeDirection4(angle,d);
 
-		assertEquals(0,d.get(0,0));
-		assertEquals(3,d.get(1,0));
-		assertEquals(3,d.get(2,0));
-		assertEquals(3,d.get(3,0));
-		assertEquals(2,d.get(4,0));
-		assertEquals(1,d.get(0,1));
-		assertEquals(0,d.get(1,1));
+		assertEquals(2,d.get(0,0));
+		assertEquals(1,d.get(1,0));
+		assertEquals(1,d.get(2,0));
+		assertEquals(1,d.get(3,0));
+		assertEquals(0,d.get(4,0));
+		assertEquals(-1,d.get(0,1));
+		assertEquals(2,d.get(1,1));
 	}
 
 	@Test
-	public void nonMaxSuppression() {
+	public void discretizeDirection8() {
+		ImageFloat32 angle = new ImageFloat32(5,5);
+		for( int i = 0; i < 8; i++ ) {
+			angle.data[i] = (float) UtilAngle.bound(i*Math.PI/4.0);
+		}
+
+		ImageSInt8 d = new ImageSInt8(5,5);
+
+		GradientToEdgeFeatures.discretizeDirection8(angle,d);
+
+		for( int i = 0; i < 8; i++ ) {
+			int expected = i > 4 ? i-8 : i;
+			assertEquals(expected,d.data[i]);
+		}
+	}
+
+	@Test
+	public void nonMaxSuppression4() {
 		ImageFloat32 intensity = new ImageFloat32(width,height);
-		ImageUInt8 direction = new ImageUInt8(width,height);
+		ImageSInt8 direction = new ImageSInt8(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
 		ImageTestingOps.randomize(intensity,rand,0,100);
 		ImageTestingOps.randomize(direction,rand,0,4);
 
-		BoofTesting.checkSubImage(this,"nonMaxSuppression",true,intensity, direction, expected, found);
+		BoofTesting.checkSubImage(this,"nonMaxSuppression4",true,intensity, direction, expected, found);
 	}
 
-	public void nonMaxSuppression(ImageFloat32 intensity, ImageUInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
-		ImplEdgeNonMaxSuppression.naive(intensity,direction,expected);
-		GradientToEdgeFeatures.nonMaxSuppression(intensity,direction,found);
+	public void nonMaxSuppression4(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
+		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction,found);
 
 		BoofTesting.assertEquals(expected,found,0,1e-4);
 	}

@@ -20,13 +20,13 @@ package boofcv.factory.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.intensity.*;
-import boofcv.abst.filter.blur.FactoryBlurFilter;
-import boofcv.abst.filter.blur.impl.MedianImageFilter;
+import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageBase;
 
 /**

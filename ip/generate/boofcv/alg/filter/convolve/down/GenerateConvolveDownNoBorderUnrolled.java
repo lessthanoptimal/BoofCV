@@ -155,13 +155,13 @@ public class GenerateConvolveDownNoBorderUnrolled {
 
 	public void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.filter.convolve.down;\n");
+		out.print("package boofcv.alg.filter.convolve.down;\n");
 		out.println();
-		out.print("import gecv.struct.convolve.Kernel1D_" + typeKernel + ";\n");
-		out.print("import gecv.struct.convolve.Kernel2D_" + typeKernel + ";\n");
-		out.print("import gecv.struct.image." + typeInput + ";\n");
+		out.print("import boofcv.struct.convolve.Kernel1D_" + typeKernel + ";\n");
+		out.print("import boofcv.struct.convolve.Kernel2D_" + typeKernel + ";\n");
+		out.print("import boofcv.struct.image." + typeInput + ";\n");
 		if (typeInput.compareTo(typeOutput) != 0)
-			out.print("import gecv.struct.image." + typeOutput + ";\n");
+			out.print("import boofcv.struct.image." + typeOutput + ";\n");
 		out.print("\n" +
 				"/**\n" +
 				" * <p>\n" +

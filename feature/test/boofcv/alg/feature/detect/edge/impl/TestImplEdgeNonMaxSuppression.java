@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.edge.impl;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageSInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -40,42 +40,42 @@ public class TestImplEdgeNonMaxSuppression {
 	int height = 30;
 
 	@Test
-	public void naive() {
+	public void naive4() {
 		ImageFloat32 intensity = new ImageFloat32(3,3);
 		ImageFloat32 output = new ImageFloat32(3,3);
-		ImageUInt8 direction = new ImageUInt8(3,3);
+		ImageSInt8 direction = new ImageSInt8(3,3);
 
-		// test it against simple positive and  negative cases
-		for( int dir = 0; dir < 4; dir++ ) {
+		// test it against simple positive and negative cases
+		for( int dir = -1; dir < 3; dir++ ) {
 			direction.set(1,1,dir);
 
 			GeneralizedImageOps.fill(intensity,0);
 			intensity.set(1,1,10);
 
 			// test suppress
-			setByDirection(intensity,dir,15);
-			ImplEdgeNonMaxSuppression.naive(intensity,direction,output);
+			setByDirection4(intensity,dir,15);
+			ImplEdgeNonMaxSuppression.naive4(intensity,direction,output);
 
 			assertEquals(0,output.get(1,1),1e-4f);
 
 			// test no suppression
-			setByDirection(intensity,dir,5);
-			ImplEdgeNonMaxSuppression.naive(intensity,direction,output);
+			setByDirection4(intensity,dir,5);
+			ImplEdgeNonMaxSuppression.naive4(intensity,direction,output);
 
 			assertEquals(intensity.get(1,1),output.get(1,1),1e-4f);
 		}
 	}
 
-	private void setByDirection( ImageFloat32 img , int dir , float value ) {
+	private void setByDirection4( ImageFloat32 img , int dir , float value ) {
 		if( dir == 0 ) {
-			img.set(1,0,value);
-			img.set(1,2,value);
+			img.set(0,1,value);
+			img.set(2,1,value);
 		} else if( dir == 1 ) {
 			img.set(0,2,value);
 			img.set(2,0,value);
 		} else if( dir == 2 ) {
-			img.set(0,1,value);
-			img.set(2,1,value);
+			img.set(1,0,value);
+			img.set(1,2,value);
 		} else {
 			img.set(0,0,value);
 			img.set(2,2,value);
@@ -83,21 +83,64 @@ public class TestImplEdgeNonMaxSuppression {
 	}
 
 	@Test
-	public void inner() {
+	public void naive8() {
+		ImageFloat32 intensity = new ImageFloat32(3,3);
+		ImageFloat32 output = new ImageFloat32(3,3);
+		ImageSInt8 direction = new ImageSInt8(3,3);
+
+		// test it against simple positive and negative cases
+		for( int dir = -3; dir < 5; dir++ ) {
+			direction.set(1,1,dir);
+
+			GeneralizedImageOps.fill(intensity,0);
+			intensity.set(1,1,10);
+
+			// test suppress
+			setByDirection8(intensity,dir,15);
+			ImplEdgeNonMaxSuppression.naive8(intensity,direction,output);
+
+			assertEquals(0,output.get(1,1),1e-4f);
+
+			// test no suppression
+			setByDirection8(intensity,dir,5);
+			ImplEdgeNonMaxSuppression.naive8(intensity,direction,output);
+
+			assertEquals(intensity.get(1,1),output.get(1,1),1e-4f);
+		}
+	}
+
+	private void setByDirection8( ImageFloat32 img , int dir , float value ) {
+		if( dir == 0 || dir == 4) {
+			img.set(0,1,value);
+			img.set(2,1,value);
+		} else if( dir == 1 || dir == -3) {
+			img.set(0,2,value);
+			img.set(2,0,value);
+		} else if( dir == 2 || dir == -2) {
+			img.set(1,0,value);
+			img.set(1,2,value);
+		} else {
+			img.set(0,0,value);
+			img.set(2,2,value);
+		}
+	}
+
+	@Test
+	public void inner4() {
 		ImageFloat32 intensity = new ImageFloat32(width,height);
-		ImageUInt8 direction = new ImageUInt8(width,height);
+		ImageSInt8 direction = new ImageSInt8(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
 		ImageTestingOps.randomize(intensity,rand,0,100);
-		ImageTestingOps.randomize(direction,rand,0,4);
+		ImageTestingOps.randomize(direction,rand,-1,3);
 
-		BoofTesting.checkSubImage(this,"inner",true,intensity, direction, expected, found);
+		BoofTesting.checkSubImage(this,"inner4",true,intensity, direction, expected, found);
 	}
 
-	public void inner(ImageFloat32 intensity, ImageUInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
-		ImplEdgeNonMaxSuppression.naive(intensity,direction,expected);
-		ImplEdgeNonMaxSuppression.inner(intensity,direction,found);
+	public void inner4(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
+		ImplEdgeNonMaxSuppression.inner4(intensity,direction,found);
 
 		// just test the inside border
 		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1),
@@ -105,21 +148,64 @@ public class TestImplEdgeNonMaxSuppression {
 	}
 
 	@Test
-	public void border() {
+	public void inner8() {
 		ImageFloat32 intensity = new ImageFloat32(width,height);
-		ImageUInt8 direction = new ImageUInt8(width,height);
+		ImageSInt8 direction = new ImageSInt8(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
 		ImageTestingOps.randomize(intensity,rand,0,100);
-		ImageTestingOps.randomize(direction,rand,0,4);
+		ImageTestingOps.randomize(direction,rand,-3,5);
 
-		BoofTesting.checkSubImage(this,"border",true,intensity, direction, expected, found);
+		BoofTesting.checkSubImage(this,"inner8",true,intensity, direction, expected, found);
 	}
 
-	public void border(ImageFloat32 intensity, ImageUInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
-		ImplEdgeNonMaxSuppression.naive(intensity,direction,expected);
-		ImplEdgeNonMaxSuppression.border(intensity,direction,found);
+	public void inner8(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+		ImplEdgeNonMaxSuppression.naive8(intensity,direction,expected);
+		ImplEdgeNonMaxSuppression.inner8(intensity,direction,found);
+
+		// just test the inside border
+		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1),
+				found.subimage(1,1,width-1,height-1),0,1e-4);
+	}
+
+	@Test
+	public void border4() {
+		ImageFloat32 intensity = new ImageFloat32(width,height);
+		ImageSInt8 direction = new ImageSInt8(width,height);
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		ImageTestingOps.randomize(intensity,rand,0,100);
+		ImageTestingOps.randomize(direction,rand,-1,3);
+
+		BoofTesting.checkSubImage(this,"border4",true,intensity, direction, expected, found);
+	}
+
+	public void border4(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
+		ImplEdgeNonMaxSuppression.border4(intensity,direction,found);
+
+		// just test the image border
+		BoofTesting.assertEqualsBorder(expected,found,1e-3f,1,1);
+	}
+
+@Test
+	public void border8() {
+		ImageFloat32 intensity = new ImageFloat32(width,height);
+		ImageSInt8 direction = new ImageSInt8(width,height);
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		ImageTestingOps.randomize(intensity,rand,0,100);
+		ImageTestingOps.randomize(direction,rand,-3,5);
+
+		BoofTesting.checkSubImage(this,"border8",true,intensity, direction, expected, found);
+	}
+
+	public void border8(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+		ImplEdgeNonMaxSuppression.naive8(intensity,direction,expected);
+		ImplEdgeNonMaxSuppression.border8(intensity,direction,found);
 
 		// just test the image border
 		BoofTesting.assertEqualsBorder(expected,found,1e-3f,1,1);

@@ -19,6 +19,7 @@
 package boofcv.gui.edge;
 
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageUInt8;
 import sun.awt.image.IntegerInterleavedRaster;
 
@@ -63,7 +64,7 @@ public class VisualizeEdgeFeatures {
 		return out;
 	}
 
-	public static BufferedImage renderOrientation( ImageUInt8 direction , ImageFloat32 intensity , float threshold , BufferedImage out ) {
+	public static BufferedImage renderOrientation4( ImageSInt8 direction , ImageFloat32 intensity , float threshold , BufferedImage out ) {
 
 		if( out == null ) {
 			out = new BufferedImage(direction.getWidth(),direction.getHeight(),BufferedImage.TYPE_INT_RGB);
@@ -90,8 +91,7 @@ public class VisualizeEdgeFeatures {
 				int indexInten = intensity.startIndex + y*intensity.stride;
 				for( int x = 0; x < w; x++ , indexInten++ , indexSrc++, rasterIndex++) {
 					if( intensity.data[indexInten] >= threshold ) {
-						data[rasterIndex] = colors[direction.data[indexSrc]];
-
+						data[rasterIndex] = colors[direction.data[indexSrc]+1];
 					} else {
 						data[rasterIndex] = white;
 					}

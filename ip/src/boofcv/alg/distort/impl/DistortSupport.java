@@ -28,7 +28,7 @@ import boofcv.struct.image.*;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.se.InvertibleTransformSequence;
 import georegression.struct.se.Se2_F32;
-import georegression.struct.se.SpecialEuclideanOps_F32;
+import georegression.transform.ConvertTransform_F32;
 
 
 /**
@@ -76,7 +76,7 @@ public class DistortSupport {
 		Se2_F32 total = new Se2_F32();
 		sequence.computeTransform(total);
 
-		Affine2D_F32 affine = SpecialEuclideanOps_F32.toAffine(total,null);
+		Affine2D_F32 affine = ConvertTransform_F32.convert(total,null);
 		PixelTransformAffine distort = new PixelTransformAffine();
 		distort.set(affine);
 

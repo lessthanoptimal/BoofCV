@@ -80,6 +80,7 @@ public class BinaryImageHighOps {
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
+			ImplBinaryBlobLabeling.minimizeBlobID(relabel,numBlobs);
 			BinaryImageOps.relabel(output,relabel);
 		}
 
@@ -130,6 +131,7 @@ public class BinaryImageHighOps {
 
 			relabel = new int[numBlobs+1];
 			ThresholdImageOps.thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
+			ImplBinaryBlobLabeling.minimizeBlobID(relabel,numBlobs);
 			BinaryImageOps.relabel(output,relabel);
 		}
 

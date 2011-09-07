@@ -74,14 +74,14 @@ public class GenerateFastCorner {
 
 	private void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
-		out.print("package gecv.alg.detect.intensity.impl;\n" +
+		out.print("package boofcv.alg.detect.intensity.impl;\n" +
 				"\n" +
-				"import gecv.alg.detect.intensity.FastCornerIntensity;\n" +
-				"import gecv.misc.DiscretizedCircle;\n" +
-				"import gecv.struct.QueueCorner;\n" +
-				"import gecv.struct.image.ImageFloat32;\n");
+				"import boofcv.alg.detect.intensity.FastCornerIntensity;\n" +
+				"import boofcv.misc.DiscretizedCircle;\n" +
+				"import boofcv.struct.QueueCorner;\n" +
+				"import boofcv.struct.image.ImageFloat32;\n");
 		if( typeInput.compareTo("ImageFloat32") != 0 )
-			out.print("import gecv.struct.image."+typeInput+";\n");
+			out.print("import boofcv.struct.image."+typeInput+";\n");
 		out.print("\n" +
 				"/**\n" +
 				" * <p>\n" +

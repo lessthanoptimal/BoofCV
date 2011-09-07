@@ -20,10 +20,13 @@ package boofcv.alg.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.impl.*;
+import boofcv.struct.FastQueue;
 import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import georegression.struct.point.Point2D_I32;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -327,6 +330,45 @@ public class BinaryImageOps {
 		}
 
 		return binaryImage;
+	}
+
+	/**
+	 * Scans through the labeled image and adds the coordinate of each pixel that has been
+	 * labeled to a list specific to its label.
+	 *
+	 * @param labelImage The labeled image.
+	 * @param numLabels Number of labeled objects inside the image.
+	 * @param queue Predeclare returned points.  Improves runtime performance.
+	 * @return List of pixels in each cluster.
+	 */
+	public static List<List<Point2D_I32>> labelToClusters( ImageSInt32 labelImage ,
+														   int numLabels ,
+														   FastQueue<Point2D_I32> queue )
+	{
+		List<List<Point2D_I32>> ret = new ArrayList<List<Point2D_I32>>();
+		for( int i = 0; i < numLabels+1; i++ ) {
+			ret.add( new ArrayList<Point2D_I32>() );
+		}
+		queue.reset();
+
+		for( int y = 0; y < labelImage.height; y++ ) {
+			int start = labelImage.startIndex + y*labelImage.stride;
+			int end = start + labelImage.width;
+
+			for( int index = start; index < end; index++ ) {
+				int v = labelImage.data[index];
+				if( v > 0 ) {
+					Point2D_I32 p = queue.pop();
+					p.set(index-start,y);
+					ret.get(v).add(p);
+				}
+			}
+		}
+		// first list is a place holder and should be empty
+		if( ret.get(0).size() != 0 )
+			throw new RuntimeException("BUG!");
+		ret.remove(0);
+		return ret;
 	}
 
 	private static GrowingArrayInt checkDeclareMaxConnect(GrowingArrayInt maxConnect) {
