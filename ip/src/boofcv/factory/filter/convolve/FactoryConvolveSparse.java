@@ -39,15 +39,20 @@ import boofcv.struct.image.ImageInteger;
 public class FactoryConvolveSparse {
 
 	public static <T extends ImageBase, K extends Kernel2D>
-	ImageConvolveSparse<T,K> create( Class<T> imageType ) {
+	ImageConvolveSparse<T,K> create( Class<T> imageType , K kernel ) {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
-			return (ImageConvolveSparse<T,K>)new Convolve_F32();
+			return (ImageConvolveSparse<T,K>)new Convolve_F32((Kernel2D_F32)kernel);
 		} else {
-			return (ImageConvolveSparse<T,K>)new Convolve_I();
+			return (ImageConvolveSparse<T,K>)new Convolve_I((Kernel2D_I32)kernel);
 		}
 	}
 
 	public static class Convolve_F32 extends ImageConvolveSparse<ImageFloat32, Kernel2D_F32> {
+
+		public Convolve_F32(Kernel2D_F32 kernel) {
+			super(kernel);
+		}
+
 		@Override
 		public double compute(int x, int y) {
 			return ConvolveWithBorderSparse.convolve(kernel,(ImageBorder_F32)image,x,y);
@@ -55,6 +60,11 @@ public class FactoryConvolveSparse {
 	}
 
 	public static class Convolve_I extends ImageConvolveSparse<ImageInteger, Kernel2D_I32> {
+
+		public Convolve_I(Kernel2D_I32 kernel) {
+			super(kernel);
+		}
+
 		@Override
 		public double compute(int x, int y) {
 			return ConvolveWithBorderSparse.convolve(kernel,(ImageBorder_I32)image,x,y);

@@ -76,7 +76,7 @@ public class DescribePointGaussian12 <T extends ImageBase, K extends Kernel2D> {
 		}
 
 		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.SKIP);
-		convolver = FactoryConvolveSparse.create(imageType);
+		convolver = FactoryConvolveSparse.create(imageType,null);
 		convolver.setImageBorder(border);
 	}
 

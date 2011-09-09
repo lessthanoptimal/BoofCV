@@ -32,6 +32,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import pja.dev.cv.NewWrapper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,12 +47,12 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 		extends SelectAlgorithmPanel {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-	static String fileName = "evaluation/data/sunflowers.png";
+//	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
 //	static String fileName = "evaluation/data/scale/mountain_7p1mm.jpg";
 //	static String fileName = "evaluation/data/indoors01.jpg";
-//	static String fileName = "evaluation/data/shapes01.png";
+	static String fileName = "evaluation/data/shapes01.png";
 
 	ListDisplayPanel gui = new ListDisplayPanel();
 
@@ -64,6 +65,7 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 	public IntensityFeatureScaleSpaceApp( Class<T> imageType , Class<D> derivType ) {
 		this.imageType = imageType;
 
+		addAlgorithm("New", new NewWrapper());
 		addAlgorithm("Hessian Det", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
 		addAlgorithm("Laplacian", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
 		addAlgorithm("Harris",new WrapperGradientCornerIntensity<T,D>(FactoryPointIntensityAlg.createHarris(derivType,2,0.4f)));

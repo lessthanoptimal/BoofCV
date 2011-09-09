@@ -35,6 +35,13 @@ public abstract class ImageConvolveSparse< T extends ImageBase, K extends Kernel
 	// image wrapper to handle the image borders
 	protected ImageBorder<T> image;
 
+	protected ImageConvolveSparse(K kernel) {
+		this.kernel = kernel;
+	}
+
+	protected ImageConvolveSparse() {
+	}
+
 	public void setImageBorder(ImageBorder<T> image) {
 		this.image = image;
 	}

@@ -38,13 +38,13 @@ import boofcv.struct.image.ImageBase;
 public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends ImageBase>
 		implements ExtractFeatureDescription<T>
 {
-	OrientationGradient<D> orientation;
-	ImageGradient<T,D> gradient;
+	protected OrientationGradient<D> orientation;
+	protected ImageGradient<T,D> gradient;
 
-	T image;
-	T scaledImage;
-	D scaledDerivX;
-	D scaledDerivY;
+	protected T image;
+	protected T scaledImage;
+	protected D scaledDerivX;
+	protected D scaledDerivY;
 
 	int steerR;
 

@@ -293,6 +293,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../developmental/cv/Developmental-CV.iml" filepath="$PROJECT_DIR$/../developmental/cv/Developmental-CV.iml" />
       <module fileurl="file://$PROJECT_DIR$/feature/Feature.iml" filepath="$PROJECT_DIR$/feature/Feature.iml" />
       <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
       <module fileurl="file://$PROJECT_DIR$/geo/Geometric Vision.iml" filepath="$PROJECT_DIR$/geo/Geometric Vision.iml" />
@@ -351,6 +352,7 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../developmental/cv" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../ejml" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../georegression" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../libpjajava" vcs="svn" />

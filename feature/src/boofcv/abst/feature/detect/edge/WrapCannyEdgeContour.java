@@ -105,6 +105,21 @@ public class WrapCannyEdgeContour<T extends ImageBase, D extends ImageBase> impl
 		GGradientToEdgeFeatures.direction(derivX,derivY,angle);
 		GradientToEdgeFeatures.discretizeDirection4(angle,direction);
 		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction, suppressed);
+
+//		float v[] = suppressed.data.clone();
+//		Arrays.sort(v);
+//
+//		int indexZero = 0;
+//		for( ; indexZero < v.length; indexZero++ ) {
+//			if( v[indexZero] > 0 )
+//				break;
+//		}
+//
+//		int size = v.length-indexZero;
+//		threshLow = v[indexZero +(int)(size*0.5)];
+//		threshHigh = v[indexZero +(int)(size*0.8)];
+
+
 		// TODO investigate improving performance by tracking contour
 		int numFound = BinaryImageHighOps.hysteresisLabel8(suppressed,label,threshLow,threshHigh,false,work);
 

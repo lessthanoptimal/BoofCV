@@ -57,7 +57,7 @@ public class DescribePointSteerable2D <T extends ImageBase, K extends Kernel2D> 
 		this.normalize = normalize;
 
 		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.SKIP);
-		convolver = FactoryConvolveSparse.create(imageType);
+		convolver = FactoryConvolveSparse.create(imageType,null);
 		convolver.setImageBorder(border);
 	}
 
