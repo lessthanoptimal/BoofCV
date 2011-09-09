@@ -52,16 +52,14 @@ public class FactoryDerivativeSparse {
 		}
 
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
-			ImageConvolveSparse<ImageFloat32, Kernel2D_F32> r = FactoryConvolveSparse.create(ImageFloat32.class);
+			ImageConvolveSparse<ImageFloat32, Kernel2D_F32> r = FactoryConvolveSparse.create(ImageFloat32.class,LaplacianEdge.kernel_F32);
 
-			r.setKernel(LaplacianEdge.kernel_F32);
 			r.setImageBorder((ImageBorder_F32)border);
 
 			return (ImageFunctionSparse<T>)r;
 		} else {
-			ImageConvolveSparse<ImageInteger, Kernel2D_I32> r = FactoryConvolveSparse.create(ImageInteger.class);
+			ImageConvolveSparse<ImageInteger, Kernel2D_I32> r = FactoryConvolveSparse.create(ImageInteger.class,LaplacianEdge.kernel_I32);
 
-			r.setKernel(LaplacianEdge.kernel_I32);
 			r.setImageBorder((ImageBorder_I32)border);
 
 			return (ImageFunctionSparse<T>)r;

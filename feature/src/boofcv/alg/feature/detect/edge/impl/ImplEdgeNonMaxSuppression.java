@@ -54,11 +54,11 @@ public class ImplEdgeNonMaxSuppression {
 				if( dir == 0 ) {
 					dx = 1; dy = 0;
 				} else if( dir == 1 ) {
-					dx = 1; dy = -1;
-				} else if( dir == 2 ) {
-					dx = 0; dy = -1;
-				} else {
 					dx = 1; dy = 1;
+				} else if( dir == 2 ) {
+					dx = 0; dy = 1;
+				} else {
+					dx = 1; dy = -1;
 				}
 
 				float left = intensity.data[indexI-dx-dy*intensity.stride];
@@ -93,11 +93,11 @@ public class ImplEdgeNonMaxSuppression {
 				if( dir == 0 ) {
 					dx = 1; dy = 0;
 				} else if( dir == 1 ) {
-					dx = 1; dy = -1;
-				} else if( dir == 2 ) {
-					dx = 0; dy = -1;
-				} else {
 					dx = 1; dy = 1;
+				} else if( dir == 2 ) {
+					dx = 0; dy = 1;
+				} else {
+					dx = 1; dy = -1;
 				}
 
 				float left = intensity.get(x-dx,y-dy);
@@ -133,11 +133,11 @@ public class ImplEdgeNonMaxSuppression {
 			if( dir == 0 ) {
 				dx = 1; dy = 0;
 			} else if( dir == 1 ) {
-				dx = 1; dy = -1;
-			} else if( dir == 2 ) {
-				dx = 0; dy = -1;
-			} else {
 				dx = 1; dy = 1;
+			} else if( dir == 2 ) {
+				dx = 0; dy = 1;
+			} else {
+				dx = 1; dy = -1;
 			}
 
 			float left = intensity.get(x-dx,-dy);
@@ -159,11 +159,11 @@ public class ImplEdgeNonMaxSuppression {
 			if( dir == 0 ) {
 				dx = 1; dy = 0;
 			} else if( dir == 1 ) {
-				dx = 1; dy = -1;
-			} else if( dir == 2 ) {
-				dx = 0; dy = -1;
-			} else {
 				dx = 1; dy = 1;
+			} else if( dir == 2 ) {
+				dx = 0; dy = 1;
+			} else {
+				dx = 1; dy = -1;
 			}
 
 			float left = intensity.get(x-dx,h-dy);
@@ -185,11 +185,11 @@ public class ImplEdgeNonMaxSuppression {
 			if( dir == 0 ) {
 				dx = 1; dy = 0;
 			} else if( dir == 1 ) {
-				dx = 1; dy = -1;
-			} else if( dir == 2 ) {
-				dx = 0; dy = -1;
-			} else {
 				dx = 1; dy = 1;
+			} else if( dir == 2 ) {
+				dx = 0; dy = 1;
+			} else {
+				dx = 1; dy = -1;
 			}
 
 			float left = intensity.get(-dx,y-dy);
@@ -212,11 +212,11 @@ public class ImplEdgeNonMaxSuppression {
 			if( dir == 0 ) {
 				dx = 1; dy = 0;
 			} else if( dir == 1 ) {
-				dx = 1; dy = -1;
-			} else if( dir == 2 ) {
-				dx = 0; dy = -1;
-			} else {
 				dx = 1; dy = 1;
+			} else if( dir == 2 ) {
+				dx = 0; dy = 1;
+			} else {
+				dx = 1; dy = -1;
 			}
 
 			float left = intensity.get(w-dx,y-dy);
@@ -252,11 +252,11 @@ public class ImplEdgeNonMaxSuppression {
 				if( dir == 0 || dir == 4) {
 					dx = 1; dy = 0;
 				} else if( dir == 1 || dir == -3) {
-					dx = 1; dy = -1;
-				} else if( dir == 2 || dir == -2) {
-					dx = 0; dy = -1;
-				} else {
 					dx = 1; dy = 1;
+				} else if( dir == 2 || dir == -2) {
+					dx = 0; dy = 1;
+				} else {
+					dx = 1; dy = -1;
 				}
 
 				float left = intensity.data[indexI-dx-dy*intensity.stride];
@@ -291,11 +291,11 @@ public class ImplEdgeNonMaxSuppression {
 				if( dir == 0 || dir == 4) {
 					dx = 1; dy = 0;
 				} else if( dir == 1 || dir == -3) {
-					dx = 1; dy = -1;
-				} else if( dir == 2 || dir == -2) {
-					dx = 0; dy = -1;
-				} else {
 					dx = 1; dy = 1;
+				} else if( dir == 2 || dir == -2) {
+					dx = 0; dy = 1;
+				} else {
+					dx = 1; dy = -1;
 				}
 
 				float left = intensity.get(x-dx,y-dy);
@@ -331,11 +331,11 @@ public class ImplEdgeNonMaxSuppression {
 			if( dir == 0 || dir == 4) {
 				dx = 1; dy = 0;
 			} else if( dir == 1 || dir == -3) {
-				dx = 1; dy = -1;
-			} else if( dir == 2 || dir == -2) {
-				dx = 0; dy = -1;
-			} else {
 				dx = 1; dy = 1;
+			} else if( dir == 2 || dir == -2) {
+				dx = 0; dy = 1;
+			} else {
+				dx = 1; dy = -1;
 			}
 
 			float left = intensity.get(x-dx,-dy);
@@ -357,11 +357,11 @@ public class ImplEdgeNonMaxSuppression {
 			if( dir == 0 || dir == 4) {
 				dx = 1; dy = 0;
 			} else if( dir == 1 || dir == -3) {
-				dx = 1; dy = -1;
-			} else if( dir == 2 || dir == -2) {
-				dx = 0; dy = -1;
-			} else {
 				dx = 1; dy = 1;
+			} else if( dir == 2 || dir == -2) {
+				dx = 0; dy = 1;
+			} else {
+				dx = 1; dy = -1;
 			}
 
 			float left = intensity.get(x-dx,h-dy);
@@ -383,11 +383,11 @@ public class ImplEdgeNonMaxSuppression {
 			if( dir == 0 || dir == 4) {
 				dx = 1; dy = 0;
 			} else if( dir == 1 || dir == -3) {
-				dx = 1; dy = -1;
-			} else if( dir == 2 || dir == -2) {
-				dx = 0; dy = -1;
-			} else {
 				dx = 1; dy = 1;
+			} else if( dir == 2 || dir == -2) {
+				dx = 0; dy = 1;
+			} else {
+				dx = 1; dy = -1;
 			}
 
 			float left = intensity.get(-dx,y-dy);
@@ -410,11 +410,11 @@ public class ImplEdgeNonMaxSuppression {
 			if( dir == 0 || dir == 4) {
 				dx = 1; dy = 0;
 			} else if( dir == 1 || dir == -3) {
-				dx = 1; dy = -1;
-			} else if( dir == 2 || dir == -2) {
-				dx = 0; dy = -1;
-			} else {
 				dx = 1; dy = 1;
+			} else if( dir == 2 || dir == -2) {
+				dx = 0; dy = 1;
+			} else {
+				dx = 1; dy = -1;
 			}
 
 			float left = intensity.get(w-dx,y-dy);

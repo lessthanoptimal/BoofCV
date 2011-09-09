@@ -42,9 +42,9 @@ import java.util.Random;
 public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		extends SelectAlgorithmPanel {
 
-//	static String fileName = "evaluation/data/outdoors01.jpg";
+	static String fileName = "evaluation/data/outdoors01.jpg";
 //	static String fileName = "evaluation/data/sunflowers.png";
-	static String fileName = "evaluation/data/particles01.jpg";
+//	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
 //	static String fileName = "evaluation/data/shapes01.png";
 
@@ -61,7 +61,7 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		panel = new ImagePanel(input);
 
 		addAlgorithm("Original Image", null);
-		addAlgorithm("Canny", FactoryDetectEdgeContour.canny(5,40,imageType,derivType));
+		addAlgorithm("Canny", FactoryDetectEdgeContour.canny(1,40,imageType,derivType));
 		addAlgorithm("Binary Simple", FactoryDetectEdgeContour.<T>binarySimple());
 
 		add(panel, BorderLayout.CENTER);

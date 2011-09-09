@@ -125,10 +125,10 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 
 //		String leftName = "evaluation/data/stitch/cave_01.jpg";
 //		String rightName = "evaluation/data/stitch/cave_02.jpg";
-		String leftName = "evaluation/data/stitch/kayak_02.jpg";
-		String rightName = "evaluation/data/stitch/kayak_03.jpg";
-//		String leftName = "evaluation/data/scale/rainforest_01.jpg";
-//		String rightName = "evaluation/data/scale/rainforest_02.jpg";
+//		String leftName = "evaluation/data/stitch/kayak_02.jpg";
+//		String rightName = "evaluation/data/stitch/kayak_03.jpg";
+		String leftName = "evaluation/data/scale/rainforest_01.jpg";
+		String rightName = "evaluation/data/scale/rainforest_02.jpg";
 
 		BufferedImage left = UtilImageIO.loadImage(leftName);
 		BufferedImage right = UtilImageIO.loadImage(rightName);
@@ -139,6 +139,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.surf(true,imageType);
 //		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType);
 //		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType);
+//		ExtractFeatureDescription describe =  FactoryNewFeature.describe(12,imageType);
 
 		ScoreAssociateTuple scorer = new ScoreAssociateEuclideanSq();
 //		ScoreAssociateTuple scorer = new ScoreAssociateCorrelation();
