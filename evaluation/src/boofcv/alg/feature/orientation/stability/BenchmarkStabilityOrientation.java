@@ -79,7 +79,7 @@ public class BenchmarkStabilityOrientation<T extends ImageBase, D extends ImageB
 		compile.addImage("evaluation/data/sunflowers.png");
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector();
+		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
 		OrientationEvaluator<T,D> evaluator = new OrientationEvaluator<T,D>(border,detector,gradient);
 
 		compile.setAlgorithms(UtilOrientationBenchmark.createAlgorithms(radius,imageType,derivType),evaluator);

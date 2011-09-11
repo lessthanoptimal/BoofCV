@@ -21,12 +21,12 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.feature.orientation.stability.UtilOrientationBenchmark;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.associate.FactoryAssociationTuple;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
-import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
@@ -41,6 +41,7 @@ import georegression.struct.point.Point2D_I32;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
 
 
 /**
@@ -68,9 +69,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 	TupleDescQueue rightDesc;
 
 	public VisualizeAssociationMatchesApp( InterestPointDetector<T> detector,
-										ExtractFeatureDescription<T> describe,
-										GeneralAssociation<TupleDesc_F64> matcher,
-										Class<T> imageType )
+										   ExtractFeatureDescription<T> describe,
+										   GeneralAssociation<TupleDesc_F64> matcher,
+										   Class<T> imageType )
 	{
 		this.detector = detector;
 		this.describe = describe;
@@ -101,6 +102,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 		panel.setImages(buffLeft,buffRight);
 		panel.setAssociation(leftPts,rightPts,matcher.getMatches());
 
+		System.out.println("Total Associated "+matcher.getMatches().size());
+
 		ShowImages.showWindow(panel,"Associated Features");
 	}
 
@@ -129,20 +132,24 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 //		String rightName = "evaluation/data/stitch/kayak_03.jpg";
 		String leftName = "evaluation/data/scale/rainforest_01.jpg";
 		String rightName = "evaluation/data/scale/rainforest_02.jpg";
+//		String leftName = "evaluation/data/stitch/grass_rotate_03.jpg";
+//		String rightName = "evaluation/data/stitch/grass_rotate_04.jpg";
 
 		BufferedImage left = UtilImageIO.loadImage(leftName);
 		BufferedImage right = UtilImageIO.loadImage(rightName);
 
 		Class imageType = ImageFloat32.class;
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-		InterestPointDetector detector = FactoryInterestPoint.fromFastHessian(200,9,4,4);
+//		InterestPointDetector detector = FactoryInterestPoint.fromFastHessian(200,9,4,4);
+		InterestPointDetector detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
 		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.surf(true,imageType);
 //		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType);
 //		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType);
-//		ExtractFeatureDescription describe =  FactoryNewFeature.describe(12,imageType);
 
+//		ScoreAssociateTuple scorer = new ScoreAssociateEuclidean();
 		ScoreAssociateTuple scorer = new ScoreAssociateEuclideanSq();
 //		ScoreAssociateTuple scorer = new ScoreAssociateCorrelation();
+//		ScorePointNew scorer = new ScorePointNew(createCircle(12,8,2));
 
 //		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.inlierError(scorer,200,10);
 		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.forwardBackwards(scorer,150);

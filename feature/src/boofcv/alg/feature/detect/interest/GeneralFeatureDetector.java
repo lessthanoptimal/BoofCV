@@ -65,9 +65,11 @@ public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 
 		this.intensity = intensity;
 		this.extractor = extractor;
-		this.foundCorners = new QueueCorner(maxFeatures);
 		if (maxFeatures > 0) {
+			foundCorners = new QueueCorner(maxFeatures);
 			selectBest = new SelectNBestFeatures(maxFeatures);
+		} else {
+			foundCorners = new QueueCorner(100);
 		}
 	}
 

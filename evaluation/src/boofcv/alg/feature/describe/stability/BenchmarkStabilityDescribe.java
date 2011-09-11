@@ -24,6 +24,8 @@ import boofcv.alg.feature.orientation.stability.UtilOrientationBenchmark;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
+import java.util.List;
+
 
 /**
  * @author Peter Abeles
@@ -37,9 +39,17 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 	int border = 10;
 	int radius = 8;
 
+	// algorithms which are to be evaluated
+	List<StabilityAlgorithm> algs;
+
 	public BenchmarkStabilityDescribe(Class<T> imageType, Class<D> derivType) {
 		this.imageType = imageType;
 		this.derivType = derivType;
+		algs = UtilStabilityBenchmark.createAlgorithms(radius,imageType,derivType);
+	}
+
+	public List<StabilityAlgorithm> getEvaluationAlgs() {
+		return algs;
 	}
 
 	public void testNoise() {
@@ -76,10 +86,10 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 		compile.addImage("evaluation/data/scale/mountain_7p1mm.jpg");
 		compile.addImage("evaluation/data/sunflowers.png");
 
-		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector();
+		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
 		DescribeEvaluator<T> evaluator = new DescribeEvaluator<T>(border,detector);
 
-		compile.setAlgorithms(UtilStabilityBenchmark.createAlgorithms(radius,imageType,derivType),evaluator);
+		compile.setAlgorithms(algs,evaluator);
 
 		compile.process();
 	}

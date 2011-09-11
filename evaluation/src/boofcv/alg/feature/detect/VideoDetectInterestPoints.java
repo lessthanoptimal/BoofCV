@@ -124,7 +124,7 @@ public class VideoDetectInterestPoints<T extends ImageBase>
 		String fileName;
 
 		if (args.length == 0) {
-			fileName = "/media/backup/datasets/2010/snow_videos/snow_norail_stabilization.avi";
+			fileName = "/home/pja/projects/boofcv/snow_norail_stabilization.avi";
 		} else {
 			fileName = args[0];
 		}

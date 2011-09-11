@@ -33,9 +33,13 @@ import java.util.List;
  */
 public class UtilOrientationBenchmark {
 
-	public static <T extends ImageBase>
-	InterestPointDetector<T> defaultDetector() {
-		return FactoryInterestPoint.<T>fromFastHessian(200,9,4,1);
+	public static <T extends ImageBase, D extends ImageBase>
+	InterestPointDetector<T> defaultDetector( Class<T> imageType , Class<D> derivType ) {
+		return FactoryInterestPoint.<T>fromFastHessian(200,9,4,4);
+//		GeneralFeatureDetector<T, D> detector = FactoryCornerDetector.createKlt(2,0.1f,150,derivType);
+//		FeatureScaleSpace<T,D> ff = new FeatureScaleSpace<T,D>(detector,2);
+//		double scales[] = new double[]{1,1.2,1.5,3,4,5,6,7};
+//		return FactoryInterestPoint.fromFeature(ff,scales,imageType);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>

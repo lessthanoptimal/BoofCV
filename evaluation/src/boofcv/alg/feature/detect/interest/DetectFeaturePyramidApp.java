@@ -49,8 +49,8 @@ public class DetectFeaturePyramidApp {
 		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class,1,1.5,2,4,8,12,24);
 
 		int r = 2;
-		FeaturePyramid<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianPyramid(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
-//		FeaturePyramid<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisPyramid(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+//		FeaturePyramid<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianPyramid(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+		FeaturePyramid<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisPyramid(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 
 		ss.update(inputF32);
 		det.detect(ss);
