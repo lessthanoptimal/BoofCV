@@ -35,6 +35,11 @@ import boofcv.struct.image.ImageBase;
  * direction, making the set of features rotation invariant. 
  * </p>
  *
+ * <p>
+ * NOTE: When comparing features of this type, typically a covariance matrix is used to weight
+ * the features.
+ * </p>
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})

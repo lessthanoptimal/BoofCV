@@ -91,7 +91,7 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 			alg.setImage(image);
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				alg.process(p.x,p.y,scales[i],null);
+				alg.process(p.x,p.y,0,scales[i],null);
 			}
 		}
 

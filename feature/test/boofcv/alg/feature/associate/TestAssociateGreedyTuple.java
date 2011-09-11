@@ -114,7 +114,7 @@ public class TestAssociateGreedyTuple {
 
 	private FastQueue<TupleDesc_F64> createData( double ...values )
 	{
-		FastQueue<TupleDesc_F64> ret = new TupleDescQueue(1);
+		FastQueue<TupleDesc_F64> ret = new TupleDescQueue(1, true);
 
 		for( int i = 0; i < values.length; i++ ) {
 			ret.pop().set(values[i]);

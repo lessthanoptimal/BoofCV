@@ -61,14 +61,14 @@ public class FeatureStabilityScale<T extends ImageBase>
 		List<MetricResult> results = createResultsStorage(evaluator, scale);
 
 		for( int i = 0; i < scale.length; i++ ) {
-			Affine2D_F32 initToImage = createScale((float)scale[i],image.width,image.height);
+			Affine2D_F32 initToImage = StabilityEvaluatorPoint.createScale((float)scale[i],image.width,image.height);
 			Affine2D_F32 imageToInit = initToImage.invert(null);
 			PixelTransformAffine affine = new PixelTransformAffine(imageToInit);
 			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,affine,TypeInterpolate.BILINEAR);
 
 			distorter.apply(image,adjusted,125);
 
-			double[]metrics = evaluator.evaluateImage(alg,adjusted, initToImage);
+			double[]metrics = evaluator.evaluateImage(alg,adjusted, scale[i], 0);
 
 			for( int j = 0; j < results.size(); j++ ) {
 				results.get(j).observed[i] = metrics[j];
@@ -78,19 +78,6 @@ public class FeatureStabilityScale<T extends ImageBase>
 		return results;
 	}
 
-	/**
-	 * Scale the image about the center pixel.  
-	 */
-	public Affine2D_F32 createScale( float scale , int w , int h )
-	{
-		int sw = (int)(w*scale);
-		int sh = (int)(h*scale);
-
-		int offX = (w-sw)/2;
-		int offY = (h-sh)/2;
-
-		return new Affine2D_F32(scale,0,0,scale,offX,offY);
-	}
 
 	@Override
 	public int getNumberOfObservations() {

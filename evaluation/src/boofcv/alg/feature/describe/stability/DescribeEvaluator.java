@@ -25,10 +25,7 @@ import boofcv.alg.feature.benchmark.StabilityEvaluatorPoint;
 import boofcv.evaluation.ErrorStatistics;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
-import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.point.Vector2D_F32;
-import georegression.transform.affine.AffinePointOps;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +57,7 @@ public class DescribeEvaluator <T extends ImageBase>
 		extract.setImage(image);
 
 		for( Point2D_I32 p : points ) {
-			TupleDesc_F64 f = extract.process(p.x,p.y,1.0,null);
+			TupleDesc_F64 f = extract.process(p.x,p.y,0,1.0,null);
 			if( f == null )
 				initial.add(f);
 			else
@@ -70,29 +67,19 @@ public class DescribeEvaluator <T extends ImageBase>
 
 	@Override
 	public double[] evaluateImage(StabilityAlgorithm alg, T image,
-							   Affine2D_F32 initToImage,
+							   double scale , double theta ,
 							   List<Point2D_I32> points, List<Integer> indexes)
 	{
 		ExtractFeatureDescription<T> extract = alg.getAlgorithm();
 		extract.setImage(image);
 
-		double scale = 1;
-		if( initToImage != null ) {
-			Vector2D_F32 v1 = new Vector2D_F32(1,1);
-			Vector2D_F32 v2 = new Vector2D_F32();
-
-			AffinePointOps.transform(initToImage,v1,v2);
-			scale = v2.norm()/v1.norm();
-		}
-
-
 		// compute the median error
 		errors.reset();
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_I32 p = points.get(i);
-			int index = indexes != null ? indexes.get(i) : i;
+			int index =  indexes.get(i);
 
-			TupleDesc_F64 f = extract.process(p.x,p.y,scale,null);
+			TupleDesc_F64 f = extract.process(p.x,p.y,0,scale,null);
 			TupleDesc_F64 e = initial.get(index);
 
 			if( f != null && e != null ) {

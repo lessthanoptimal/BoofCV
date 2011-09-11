@@ -24,7 +24,6 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageBase;
-import georegression.struct.affine.Affine2D_F32;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -66,12 +65,11 @@ public class FeatureStabilityRotation<T extends ImageBase>
 		for( int i = 0; i < angle.length; i++ ) {
 			float theta = (float)angle[i];
 			PixelTransformAffine imageToInit = DistortSupport.transformRotate(centerX,centerY,theta);
-			Affine2D_F32 initToImage = imageToInit.getModel().invert(null);
 			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,imageToInit,TypeInterpolate.BILINEAR);
 
 			distorter.apply(image,adjusted,125);
 
-			double[]metrics = evaluator.evaluateImage(alg,adjusted, initToImage);
+			double[]metrics = evaluator.evaluateImage(alg,adjusted, 1.0,theta);
 
 			for( int j = 0; j < results.size(); j++ ) {
 				results.get(j).observed[i] = metrics[j];

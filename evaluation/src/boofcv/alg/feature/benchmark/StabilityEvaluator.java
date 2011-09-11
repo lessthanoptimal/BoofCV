@@ -19,7 +19,6 @@
 package boofcv.alg.feature.benchmark;
 
 import boofcv.struct.image.ImageBase;
-import georegression.struct.affine.Affine2D_F32;
 
 
 /**
@@ -42,10 +41,11 @@ public interface StabilityEvaluator<T extends ImageBase> {
 	 *
 	 * @param alg Algorithm being evaluated.
 	 * @param image Modified image.
-	 * @param initToImage Transform from the initial image into the current image.
+	 * @param scale The true change in scale from the initial image.
+	 * @param theta The true change in orientation from the initial image.
 	 * @return Error metrics.
 	 */
-	double[] evaluateImage(StabilityAlgorithm alg, T image, Affine2D_F32 initToImage);
+	double[] evaluateImage(StabilityAlgorithm alg, T image, double scale , double theta );
 
 	/**
 	 * Names of extracted metrics.

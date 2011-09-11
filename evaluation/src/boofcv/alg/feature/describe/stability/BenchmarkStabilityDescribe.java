@@ -87,7 +87,10 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 		compile.addImage("evaluation/data/sunflowers.png");
 
 		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
-		DescribeEvaluator<T> evaluator = new DescribeEvaluator<T>(border,detector);
+
+		// comment/uncomment to change the evaluator
+//		StabilityEvaluator<T> evaluator = new DescribeEvaluator<T>(border,detector);
+		StabilityEvaluator<T> evaluator = new DescribeAssociateEvaluator<T>(border,detector);
 
 		compile.setAlgorithms(algs,evaluator);
 
@@ -100,7 +103,7 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 
 //		benchmark.testNoise();
 //		benchmark.testIntensity();
-		benchmark.testRotation();
-//		benchmark.testScale();
+//		benchmark.testRotation();
+		benchmark.testScale();
 	}
 }

@@ -46,9 +46,14 @@ public interface ExtractFeatureDescription<T extends ImageBase> {
 	 *
 	 * @param x Coordinate of the point.
 	 * @param y Coordinate of the point.
+	 * @param orientation Direction the feature is pointing at in radians. 0 = x-axis PI/2 = y-axis
 	 * @param scale Scale at which the feature was found.
 	 * @param ret Used to store the extracted feature.  If null a new instance will be created.
 	 * @return  Description of the point.  If one could not be computed then null is returned.
 	 */
-	TupleDesc_F64 process( int x , int y , double scale , TupleDesc_F64 ret );
+	public TupleDesc_F64 process( int x , int y , double orientation , double scale , TupleDesc_F64 ret );
+
+	public boolean requiresScale();
+
+	public boolean requiresOrientation();
 }

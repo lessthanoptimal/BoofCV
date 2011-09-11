@@ -30,8 +30,8 @@ public class TupleDescQueue extends FastQueue<TupleDesc_F64> {
 
 	int numFeatures;
 
-	public TupleDescQueue( int numFeatures ) {
-		super(TupleDesc_F64.class,true);
+	public TupleDescQueue(int numFeatures, boolean declareInstances) {
+		super(TupleDesc_F64.class,declareInstances);
 		this.numFeatures = numFeatures;
 		growArray(10);
 	}

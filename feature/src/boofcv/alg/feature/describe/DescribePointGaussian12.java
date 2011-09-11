@@ -40,6 +40,11 @@ import boofcv.struct.image.ImageBase;
  * </p>
  *
  * <p>
+ * NOTE: When comparing features of this type, typically a covariance matrix is used to weight
+ * the features.
+ * </p>
+ *
+ * <p>
  * Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"
  * In Proceedings of the 8th International Conference on Computer Vision, 2001
  * </p>
