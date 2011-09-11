@@ -33,14 +33,14 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 		implements ExtractFeatureDescription<T> {
 
 	DescribePointSurf<II> surf;
-	OrientationIntegral<II> orientation;
+	OrientationIntegral<II> orientationAlg;
 	II ii;
 
 	public WrapDescribeSurf(DescribePointSurf<II> surf ,
 							OrientationIntegral<II> orientation )
 	{
 		this.surf = surf;
-		this.orientation = orientation;
+		this.orientationAlg = orientation;
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 			ii.reshape(image.width,image.height);
 		}
 		ii = GIntegralImageOps.transform(image,ii);
-		orientation.setImage(ii);
+		orientationAlg.setImage(ii);
 		surf.setImage(ii);
 	}
 
@@ -59,16 +59,30 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 	}
 
 	@Override
-	public TupleDesc_F64 process(int x, int y, double scale, TupleDesc_F64 ret) {
+	public TupleDesc_F64 process(int x, int y, double orientation , double scale, TupleDesc_F64 ret) {
 
-		double angle = 0;
+		double angle = orientation;
 
-		if( orientation != null )
-			angle = orientation.compute(x,y);
+		if( orientationAlg != null )
+			angle = orientationAlg.compute(x,y);
 
 		SurfFeature f = surf.describe(x,y,scale,angle,null);
 		if( f == null)
 			return null;
+		if( ret != null ) {
+			System.arraycopy(f.features.value,0,ret.value,0,f.features.value.length);
+			return ret;
+		}
 		return f.features;
+	}
+
+	@Override
+	public boolean requiresScale() {
+		return true;
+	}
+
+	@Override
+	public boolean requiresOrientation() {
+		return orientationAlg == null;
 	}
 }

@@ -59,7 +59,7 @@ public class FeatureStabilityIntensity<T extends ImageBase>
 		for( int i = 0; i < scale.length; i++ ) {
 			GGrayImageOps.stretch(image,scale[i],0,255,adjusted);
 
-			double[]metrics = evaluator.evaluateImage(alg,adjusted, null);
+			double[]metrics = evaluator.evaluateImage(alg,adjusted, 1 , 0);
 
 			for( int j = 0; j < results.size(); j++ ) {
 				results.get(j).observed[i] = metrics[j];

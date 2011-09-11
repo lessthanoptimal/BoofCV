@@ -81,8 +81,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 		imageLeft = GeneralizedImageOps.createImage(imageType,1,1);
 		imageRight = GeneralizedImageOps.createImage(imageType,1,1);
 
-		leftDesc = new TupleDescQueue(describe.getDescriptionLength());
-		rightDesc = new TupleDescQueue(describe.getDescriptionLength());
+		leftDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
+		rightDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
 	}
 
 	public void process( BufferedImage buffLeft , BufferedImage buffRight ) {
@@ -116,7 +116,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 			Point2D_I32 pt = detector.getLocation(i);
 			double scale = detector.getScale(i);
 
-			TupleDesc_F64 d = describe.process(pt.x,pt.y,scale,null);
+			TupleDesc_F64 d = describe.process(pt.x,pt.y,0,scale,null);
 			if( d != null ) {
 				descs.pop().set(d.value);
 				locs.add( pt.copy());

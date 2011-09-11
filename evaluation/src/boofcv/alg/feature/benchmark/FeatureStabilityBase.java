@@ -34,8 +34,8 @@ public abstract class FeatureStabilityBase<T extends ImageBase> {
 
 	
 	public abstract List<MetricResult> evaluate( BufferedImage original ,
-										StabilityAlgorithm alg ,
-										StabilityEvaluator<T> evaluator );
+												 StabilityAlgorithm alg ,
+												 StabilityEvaluator<T> evaluator );
 
 	/**
 	 * Returns how many different types of distortion are going to be tested.

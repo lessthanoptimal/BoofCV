@@ -19,6 +19,7 @@
 package boofcv.alg.feature.benchmark;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_F32;
@@ -70,22 +71,21 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 	}
 
 	@Override
-	public double[] evaluateImage(StabilityAlgorithm alg, T image, Affine2D_F32 initToImage ) {
-		if( initToImage == null ) {
-			return evaluateImage(alg,image,initToImage,initialPoints,null);
-		} else {
-			transform(initToImage,image);
+	public double[] evaluateImage(StabilityAlgorithm alg, T image, double scale , double theta ) {
 
-			return evaluateImage(alg,image,initToImage,transformPoints,transformIndexes);
-		}
+		transform(scale,theta,image);
+
+		return evaluateImage(alg,image,scale,theta,transformPoints,transformIndexes);
 	}
 
 	/**
 	 * rotate points in first image into current image
 	 * filter points outside of image or too close to the border
 	 */
-	private void transform( Affine2D_F32 initToImage , T image )
+	private void transform( double scale , double theta , T image )
 	{
+		Affine2D_F32 initToImage = createTransform(scale,theta,image);
+
 		transformPoints.clear();
 		transformIndexes.clear();
 
@@ -108,11 +108,38 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 
 	}
 
-	public abstract void extractInitial(StabilityAlgorithm alg,
-										T image, List<Point2D_I32> points );
+	public static Affine2D_F32 createTransform( double scale , double theta , ImageBase image ) {
+		Affine2D_F32 a = createScale((float)scale,image.width,image.height);
+		Affine2D_F32 b = DistortSupport.transformRotate(image.width/2f,image.height/2f,(float)theta).getModel();
 
+		return a.concat(b,null);
+	}
+
+	/**
+	 * Scale the image about the center pixel.
+	 */
+	public static Affine2D_F32 createScale( float scale , int w , int h )
+	{
+		int sw = (int)(w*scale);
+		int sh = (int)(h*scale);
+
+		int offX = (w-sw)/2;
+		int offY = (h-sh)/2;
+
+		return new Affine2D_F32(scale,0,0,scale,offX,offY);
+	}
+
+	public abstract void extractInitial(StabilityAlgorithm alg, T image, List<Point2D_I32> points );
+
+	/**
+	 *
+	 * @param scale change in scale from initial image to current image
+	 * @param theta rotation from initial image to current image.
+	 * @param points Location of interest points in current frame.
+	 * @param indexes Original index of each interest point in current frame.
+	 */
 	public abstract double[] evaluateImage(StabilityAlgorithm alg,
-										   T image, Affine2D_F32 initToImage,
+										   T image, double scale , double theta,
 										   List<Point2D_I32> points ,
 										   List<Integer> indexes );
 

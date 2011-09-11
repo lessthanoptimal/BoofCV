@@ -63,7 +63,7 @@ public class FeatureStabilityNoise<T extends ImageBase>
 			noisy.setTo(image);
 			GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma[i]);
 
-			double[]metrics = evaluator.evaluateImage(alg,noisy, null);
+			double[]metrics = evaluator.evaluateImage(alg,noisy, 1,0);
 
 			for( int j = 0; j < results.size(); j++ ) {
 				results.get(j).observed[i] = metrics[j];

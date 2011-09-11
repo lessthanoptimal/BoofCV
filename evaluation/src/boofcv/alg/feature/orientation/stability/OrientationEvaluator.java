@@ -29,10 +29,8 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.evaluation.ErrorStatistics;
 import boofcv.struct.image.ImageBase;
 import georegression.metric.UtilAngle;
-import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.point.Vector2D_F32;
-import georegression.transform.affine.AffinePointOps;
 
 import java.util.List;
 
@@ -95,7 +93,7 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 	}
 
 	@Override
-	public double[] evaluateImage(StabilityAlgorithm alg, T image, Affine2D_F32 initToImage,
+	public double[] evaluateImage(StabilityAlgorithm alg, T image,  double scale , double theta,
 							   List<Point2D_I32> points, List<Integer> indexes ) {
 
 //		initToImage = initToImage.invert(null);
@@ -106,34 +104,14 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 		Vector2D_F32 v1 = new Vector2D_F32();
 		Vector2D_F32 v2 = new Vector2D_F32();
 
-		// assume that the feature's scale was correctly estimated by the detection algorithm
-		if( initToImage != null ) {
-			v1.x = 1;
-			v1.y = 1;
-			AffinePointOps.transform(initToImage,v1,v2);
-			double scale = v2.norm()/v1.norm();
-//			System.out.println("Scale "+scale+"  "+points.size());
-			angleAlg.setScale(scale);
-		} else {
-			angleAlg.setScale(1.0);
-		}
+
+		angleAlg.setScale(scale);
 
 		errors.reset();
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_I32 p = points.get(i);
 
-			double expectedAngle;
-
-			if( initToImage != null ) {
-				int index = indexes.get(i);
-				// find the direction in this frame by applying the transform
-				v1.x = (float)Math.cos(angles[index]);
-				v1.y = (float)Math.sin(angles[index]);
-				AffinePointOps.transform(initToImage,v1,v2);
-				expectedAngle = Math.atan2(v2.y,v2.x);
-			} else {
-				expectedAngle = angles[i];
-			}
+			double expectedAngle = UtilAngle.bound(angles[i]+theta);
 
 			double foundAngle = angleAlg.compute(p.x,p.y);
 			double error = UtilAngle.dist(expectedAngle,foundAngle);

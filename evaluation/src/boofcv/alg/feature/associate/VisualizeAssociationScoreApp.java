@@ -102,7 +102,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase> {
 			Point2D_I32 pt = detector.getLocation(i);
 			double scale = detector.getScale(i);
 
-			TupleDesc_F64 d = describe.process(pt.x,pt.y,scale,null);
+			TupleDesc_F64 d = describe.process(pt.x,pt.y,0,scale,null);
 			if( d != null ) {
 				descs.add( d.copy() );
 				locs.add( pt.copy());

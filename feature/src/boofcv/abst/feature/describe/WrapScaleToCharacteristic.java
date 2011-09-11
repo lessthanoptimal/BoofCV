@@ -73,7 +73,7 @@ public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends 
 
 
 	@Override
-	public TupleDesc_F64 process(int x, int y, double scale, TupleDesc_F64 ret ) {
+	public TupleDesc_F64 process(int x, int y, double theta , double scale, TupleDesc_F64 ret ) {
 		// compute the size of the region at this scale
 		int r = (int)Math.ceil(scale*3)+1;
 
@@ -90,12 +90,25 @@ public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends 
 		gradient.process(scaledImage, scaledDerivX, scaledDerivY);
 
 		// estimate the angle
-		orientation.setImage(scaledDerivX,scaledDerivY);
-		double angle = orientation.compute(steerR+1,steerR+1);
+		double angle = theta;
+		if( orientation != null ) {
+			orientation.setImage(scaledDerivX,scaledDerivY);
+			angle = orientation.compute(steerR+1,steerR+1);
+		}
 
 		return describe(steerR+1,steerR+1,angle,ret);
 		// +1 to avoid edge conditions
 	}
 
 	protected abstract TupleDesc_F64 describe( int x , int y , double angle , TupleDesc_F64 ret );
+
+	@Override
+	public boolean requiresScale() {
+		return true;
+	}
+
+	@Override
+	public boolean requiresOrientation() {
+		return orientation == null;
+	}
 }
