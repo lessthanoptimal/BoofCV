@@ -94,23 +94,39 @@ public class DescribeEvaluator <T extends ImageBase>
 
 			TupleDesc_F64 f = extract.process(p.x,p.y,scale,null);
 			TupleDesc_F64 e = initial.get(index);
+
 			if( f != null && e != null ) {
-				double error = 0;
-				for( int j = 0; j < f.value.length; j++ ) {
-					error += Math.abs(f.value[j] - e.value[j]);
-				}
-				errors.add(error/f.value.length);
+				double errorNorm = errorNorm(f,e);
+				double initNorm = norm(e);
+				errors.add( errorNorm/initNorm );
 			}
 		}
 
 		double p50 = errors.getFraction(0.5);
 		double p90 = errors.getFraction(0.9);
 
-		return new double[]{p50*30,p90*30};
+		return new double[]{p50*10,p90*10};
+	}
+
+	private double norm( TupleDesc_F64 desc ) {
+		double total = 0;
+		for( int i = 0; i < desc.value.length; i++ ) {
+			total += desc.value[i]*desc.value[i];
+		}
+		return Math.sqrt(total);
+	}
+
+	private double errorNorm( TupleDesc_F64 a , TupleDesc_F64 b  ) {
+		double total = 0;
+		for( int i = 0; i < a.value.length; i++ ) {
+			double error = a.value[i] - b.value[i];
+			total += error*error;
+		}
+		return Math.sqrt(total);
 	}
 
 	@Override
 	public String[] getMetricNames() {
-		return new String[]{"50% * 30","90% *30"};
+		return new String[]{"50% * 10","90% * 10"};
 	}
 }

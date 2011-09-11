@@ -37,11 +37,12 @@ import java.awt.image.BufferedImage;
 public class DetectFeatureScaleSpaceApp {
 
 //	static String fileName = "evaluation/data/outdoors01.jpg";
-	static String fileName = "evaluation/data/sunflowers.png";
+//	static String fileName = "evaluation/data/sunflowers.png";
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
 //	static String fileName = "evaluation/data/indoors01.jpg";
 //	static String fileName = "evaluation/data/shapes01.png";
+	static String fileName = "evaluation/data/stitch/cave_01.jpg";
 
 	static int NUM_FEATURES = 50;
 
@@ -54,8 +55,8 @@ public class DetectFeatureScaleSpaceApp {
 		ss.setImage(inputF32);
 
 		int r = 2;
-		FeatureScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianScaleSpace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
-//		FeatureScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisScaleSpace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+//		FeatureScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.hessianScaleSpace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
+		FeatureScaleSpace<ImageFloat32,ImageFloat32> det = FactoryInterestPointAlgs.harrisScaleSpace(r,1,NUM_FEATURES,ImageFloat32.class,ImageFloat32.class);
 
 		det.detect(ss);
 
