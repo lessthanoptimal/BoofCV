@@ -20,7 +20,6 @@ package boofcv.abst.feature.describe;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribePointGaussian12;
-import boofcv.alg.feature.orientation.OrientationGradient;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 
@@ -36,11 +35,10 @@ public class WrapDescribeGaussian12<T extends ImageBase, D extends ImageBase>
 	DescribePointGaussian12<T,?> steer;
 
 	public WrapDescribeGaussian12(DescribePointGaussian12<T,?> steer,
-								 OrientationGradient<D> orientation,
 								 ImageGradient<T, D> gradient,
 								 Class<T> inputType ,
 								 Class<D> derivType ) {
-		super(steer.getRadius(),orientation,gradient,inputType,derivType);
+		super(steer.getRadius(),gradient,inputType,derivType);
 		this.steer = steer;
 	}
 

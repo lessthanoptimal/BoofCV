@@ -20,7 +20,6 @@ package boofcv.abst.feature.describe;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribePointSteerable2D;
-import boofcv.alg.feature.orientation.OrientationGradient;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 
@@ -36,11 +35,10 @@ public class WrapDescribeSteerable <T extends ImageBase, D extends ImageBase>
 	DescribePointSteerable2D<T,?> steer;
 
 	public WrapDescribeSteerable(DescribePointSteerable2D<T,?> steer,
-								 OrientationGradient<D> orientation,
 								 ImageGradient<T, D> gradient,
 								 Class<T> inputType ,
 								 Class<D> derivType ) {
-		super(steer.getRadius(),orientation,gradient,inputType,derivType);
+		super(steer.getRadius(),gradient,inputType,derivType);
 		this.steer = steer;
 	}
 

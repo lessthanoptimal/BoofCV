@@ -18,17 +18,26 @@
 
 package boofcv.alg.feature.benchmark;
 
-import boofcv.struct.image.ImageBase;
-
-import java.util.List;
-
-
 /**
- * Contains performance for a particular algorithm against an image.
+ * Contains the name and an instance of the algorithm being evaluated.
  *
  * @author Peter Abeles
  */
-public class AlgorithmResult<T extends ImageBase> {
-	public String algName;
-	public List<MetricResult> performance;
+public class BenchmarkAlgorithm {
+
+	public String name;
+	public Object algorithm;
+
+	public BenchmarkAlgorithm(String name, Object algorithm) {
+		this.name = name;
+		this.algorithm = algorithm;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public <T> T getAlgorithm() {
+		return (T)algorithm;
+	}
 }

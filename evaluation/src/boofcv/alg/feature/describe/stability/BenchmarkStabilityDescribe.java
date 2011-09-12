@@ -19,8 +19,14 @@
 package boofcv.alg.feature.describe.stability;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.benchmark.*;
+import boofcv.alg.feature.benchmark.BenchmarkAlgorithm;
+import boofcv.alg.feature.benchmark.distort.BenchmarkFeatureDistort;
+import boofcv.alg.feature.benchmark.distort.CompileImageResults;
+import boofcv.alg.feature.benchmark.distort.FactoryBenchmarkFeatureDistort;
+import boofcv.alg.feature.benchmark.distort.StabilityEvaluator;
+import boofcv.alg.feature.orientation.OrientationNoGradient;
 import boofcv.alg.feature.orientation.stability.UtilOrientationBenchmark;
+import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
@@ -28,19 +34,20 @@ import java.util.List;
 
 
 /**
+ * Evalutes
+ *
  * @author Peter Abeles
  */
 public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBase>
 {
-	int randSeed = 234234;
 	Class<T> imageType;
 	Class<D> derivType;
 
-	int border = 10;
-	int radius = 8;
+	int border = 13;
+	int radius = 12;
 
 	// algorithms which are to be evaluated
-	List<StabilityAlgorithm> algs;
+	List<BenchmarkAlgorithm> algs;
 
 	public BenchmarkStabilityDescribe(Class<T> imageType, Class<D> derivType) {
 		this.imageType = imageType;
@@ -48,38 +55,36 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 		algs = UtilStabilityBenchmark.createAlgorithms(radius,imageType,derivType);
 	}
 
-	public List<StabilityAlgorithm> getEvaluationAlgs() {
+	public List<BenchmarkAlgorithm> getEvaluationAlgs() {
 		return algs;
 	}
 
 	public void testNoise() {
-		FeatureStabilityNoise<T> stability =
-				new FeatureStabilityNoise<T>(imageType,randSeed, 1,2,4,8,12,16,20,40);
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.noise(imageType);
+		perform(benchmark);
 	}
 
 	public void testIntensity() {
-		FeatureStabilityIntensity<T> stability =
-				new FeatureStabilityIntensity<T>(imageType,0.2,0.5,0.8,1,1.1,1.5);
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.intensity(imageType);
+		perform(benchmark);
 	}
 
-	// NOTE: Much of the error inside of rotation seems to be caused by interpolation.
 	public void testRotation() {
-		FeatureStabilityRotation<T> stability =
-				new FeatureStabilityRotation<T>(imageType, UtilOrientationBenchmark.makeSample(0,Math.PI,20));
-
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.rotate(imageType);
+		perform(benchmark);
 	}
 
 	public void testScale() {
-		FeatureStabilityScale<T> stability =
-				new FeatureStabilityScale<T>(imageType,0.5,0.75,1,1.5,2,3,4);
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.scale(imageType);
+		perform(benchmark);
 	}
 
-	private void perform( FeatureStabilityBase<T> eval ) {
-		CompileImageResults<T> compile = new CompileImageResults<T>(eval);
+	private void perform( BenchmarkFeatureDistort<T> benchmark ) {
+		CompileImageResults<T> compile = new CompileImageResults<T>(benchmark);
 		compile.addImage("evaluation/data/outdoors01.jpg");
 		compile.addImage("evaluation/data/indoors01.jpg");
 		compile.addImage("evaluation/data/scale/beach01.jpg");
@@ -87,10 +92,10 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 		compile.addImage("evaluation/data/sunflowers.png");
 
 		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
-
+		OrientationNoGradient<T> orientation = FactoryOrientationAlgs.nogradient(radius,imageType);
 		// comment/uncomment to change the evaluator
-//		StabilityEvaluator<T> evaluator = new DescribeEvaluator<T>(border,detector);
-		StabilityEvaluator<T> evaluator = new DescribeAssociateEvaluator<T>(border,detector);
+//		StabilityEvaluator<T> evaluator = new DescribeEvaluator<T>(border,detector,orientation);
+		StabilityEvaluator<T> evaluator = new DescribeAssociateEvaluator<T>(border,detector,orientation);
 
 		compile.setAlgorithms(algs,evaluator);
 
@@ -103,7 +108,7 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 
 //		benchmark.testNoise();
 //		benchmark.testIntensity();
-//		benchmark.testRotation();
-		benchmark.testScale();
+		benchmark.testRotation();
+//		benchmark.testScale();
 	}
 }

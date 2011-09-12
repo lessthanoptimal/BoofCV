@@ -20,7 +20,6 @@ package boofcv.abst.feature.describe;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.feature.orientation.OrientationGradient;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
@@ -38,7 +37,6 @@ import boofcv.struct.image.ImageBase;
 public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends ImageBase>
 		implements ExtractFeatureDescription<T>
 {
-	protected OrientationGradient<D> orientation;
 	protected ImageGradient<T,D> gradient;
 
 	protected T image;
@@ -49,11 +47,9 @@ public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends 
 	int steerR;
 
 	public WrapScaleToCharacteristic( int radiusR ,
-								   OrientationGradient<D> orientation,
 								   ImageGradient<T, D> gradient,
 								   Class<T> inputType ,
 								   Class<D> derivType ) {
-		this.orientation = orientation;
 		this.gradient = gradient;
 
 		steerR = radiusR;
@@ -89,14 +85,8 @@ public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends 
 		// compute the gradient
 		gradient.process(scaledImage, scaledDerivX, scaledDerivY);
 
-		// estimate the angle
-		double angle = theta;
-		if( orientation != null ) {
-			orientation.setImage(scaledDerivX,scaledDerivY);
-			angle = orientation.compute(steerR+1,steerR+1);
-		}
 
-		return describe(steerR+1,steerR+1,angle,ret);
+		return describe(steerR+1,steerR+1,theta,ret);
 		// +1 to avoid edge conditions
 	}
 
@@ -109,6 +99,6 @@ public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends 
 
 	@Override
 	public boolean requiresOrientation() {
-		return orientation == null;
+		return true;
 	}
 }

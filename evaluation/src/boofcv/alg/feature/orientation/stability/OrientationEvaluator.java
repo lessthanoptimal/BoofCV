@@ -20,8 +20,8 @@ package boofcv.alg.feature.orientation.stability;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.feature.benchmark.StabilityAlgorithm;
-import boofcv.alg.feature.benchmark.StabilityEvaluatorPoint;
+import boofcv.alg.feature.benchmark.BenchmarkAlgorithm;
+import boofcv.alg.feature.benchmark.distort.StabilityEvaluatorPoint;
 import boofcv.alg.feature.orientation.OrientationGradient;
 import boofcv.alg.feature.orientation.OrientationImage;
 import boofcv.alg.feature.orientation.RegionOrientation;
@@ -30,7 +30,6 @@ import boofcv.evaluation.ErrorStatistics;
 import boofcv.struct.image.ImageBase;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.point.Vector2D_F32;
 
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 	}
 
 	@Override
-	public void extractInitial(StabilityAlgorithm alg, T image, List<Point2D_I32> points) {
+	public void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_I32> points) {
 		if( derivX == null ) {
 			derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),image.width,image.height);
 			derivY = GeneralizedImageOps.createImage(gradient.getDerivType(),image.width,image.height);
@@ -79,7 +78,7 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 //		ShowImages.showWindow((ImageFloat32)image,"Original",true);
 	}
 
-	private RegionOrientation setupAlgorithm(StabilityAlgorithm alg, T image) {
+	private RegionOrientation setupAlgorithm(BenchmarkAlgorithm alg, T image) {
 		RegionOrientation angleAlg = alg.getAlgorithm();
 
 		if( angleAlg instanceof OrientationGradient) {
@@ -93,7 +92,7 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 	}
 
 	@Override
-	public double[] evaluateImage(StabilityAlgorithm alg, T image,  double scale , double theta,
+	public double[] evaluateImage(BenchmarkAlgorithm alg, T image,  double scale , double theta,
 							   List<Point2D_I32> points, List<Integer> indexes ) {
 
 //		initToImage = initToImage.invert(null);
@@ -101,17 +100,13 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 		gradient.process(image,derivX,derivY);
 		RegionOrientation angleAlg = setupAlgorithm(alg, image);
 
-		Vector2D_F32 v1 = new Vector2D_F32();
-		Vector2D_F32 v2 = new Vector2D_F32();
-
-
 		angleAlg.setScale(scale);
 
 		errors.reset();
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_I32 p = points.get(i);
 
-			double expectedAngle = UtilAngle.bound(angles[i]+theta);
+			double expectedAngle = UtilAngle.bound(angles[indexes.get(i)]+theta);
 
 			double foundAngle = angleAlg.compute(p.x,p.y);
 			double error = UtilAngle.dist(expectedAngle,foundAngle);

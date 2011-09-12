@@ -18,8 +18,9 @@
 
 package boofcv.alg.feature.detect.interest.stability;
 
-import boofcv.alg.feature.benchmark.*;
-import boofcv.alg.feature.orientation.stability.UtilOrientationBenchmark;
+import boofcv.alg.feature.benchmark.distort.BenchmarkFeatureDistort;
+import boofcv.alg.feature.benchmark.distort.CompileImageResults;
+import boofcv.alg.feature.benchmark.distort.FactoryBenchmarkFeatureDistort;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
@@ -29,7 +30,6 @@ import boofcv.struct.image.ImageFloat32;
  */
 public class BenchmarkStabilityDetect<T extends ImageBase, D extends ImageBase> {
 
-	int randSeed = 234234;
 	Class<T> imageType;
 	Class<D> derivType;
 
@@ -39,36 +39,35 @@ public class BenchmarkStabilityDetect<T extends ImageBase, D extends ImageBase> 
 	}
 
 	public void testNoise() {
-		FeatureStabilityNoise<T> stability =
-				new FeatureStabilityNoise<T>(imageType,randSeed, 1,2,4,8,12,16,20,40);
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.noise(imageType);
+		perform(benchmark);
 	}
 
 	public void testIntensity() {
-		FeatureStabilityIntensity<T> stability =
-				new FeatureStabilityIntensity<T>(imageType,0.2,0.5,0.8,1.1,1.5);
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.intensity(imageType);
+		perform(benchmark);
 	}
 
 	public void testRotation() {
-		FeatureStabilityRotation<T> stability =
-				new FeatureStabilityRotation<T>(imageType,UtilOrientationBenchmark.makeSample(0,Math.PI,20));
-
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.rotate(imageType);
+		perform(benchmark);
 	}
 
 	public void testScale() {
-		FeatureStabilityScale<T> stability =
-				new FeatureStabilityScale<T>(imageType,0.5,0.75,1,1.5,2,3,4);
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.scale(imageType);
+		perform(benchmark);
 	}
 
-	private void perform( FeatureStabilityBase<T> eval ) {
+	private void perform( BenchmarkFeatureDistort<T> benchmark ) {
 		BenchmarkInterestParameters<T,D> param = new BenchmarkInterestParameters<T,D>();
 		param.imageType = imageType;
 		param.derivType = derivType;
 
-		CompileImageResults<T> compile = new CompileImageResults<T>(eval);
+		CompileImageResults<T> compile = new CompileImageResults<T>(benchmark);
 		compile.addImage("evaluation/data/outdoors01.jpg");
 		compile.addImage("evaluation/data/indoors01.jpg");
 		compile.addImage("evaluation/data/scale/beach01.jpg");

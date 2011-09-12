@@ -25,7 +25,6 @@ import boofcv.abst.feature.describe.WrapDescribeSurf;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribePointGaussian12;
 import boofcv.alg.feature.describe.DescribePointSteerable2D;
-import boofcv.alg.feature.orientation.OrientationGradient;
 import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
@@ -54,10 +53,9 @@ public class FactoryExtractFeatureDescription {
 	ExtractFeatureDescription<T> gaussian12( int radius ,Class<T> imageType , Class<D> derivType ) {
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-		OrientationGradient<D> orientation = FactoryOrientationAlgs.average(radius,false,derivType);
 		DescribePointGaussian12<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian12(radius,imageType);
 
-		return new WrapDescribeGaussian12<T,D>(steer,orientation,gradient,imageType,derivType);
+		return new WrapDescribeGaussian12<T,D>(steer,gradient,imageType,derivType);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>
@@ -65,9 +63,8 @@ public class FactoryExtractFeatureDescription {
 													Class<T> imageType , Class<D> derivType ) {
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-		OrientationGradient<D> orientation = FactoryOrientationAlgs.average(radius,false,derivType);
 		DescribePointSteerable2D<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian(normalized,-1,radius,imageType);
 
-		return new WrapDescribeSteerable<T,D>(steer,orientation,gradient,imageType,derivType);
+		return new WrapDescribeSteerable<T,D>(steer,gradient,imageType,derivType);
 	}
 }

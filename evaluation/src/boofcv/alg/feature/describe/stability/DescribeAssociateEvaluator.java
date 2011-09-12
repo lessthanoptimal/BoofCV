@@ -23,21 +23,26 @@ import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.alg.feature.associate.ScoreAssociateTuple;
-import boofcv.alg.feature.benchmark.StabilityAlgorithm;
-import boofcv.alg.feature.benchmark.StabilityEvaluatorPoint;
+import boofcv.alg.feature.benchmark.BenchmarkAlgorithm;
+import boofcv.alg.feature.benchmark.distort.StabilityEvaluatorPoint;
+import boofcv.alg.feature.orientation.OrientationNoGradient;
+import boofcv.evaluation.ErrorStatistics;
 import boofcv.factory.feature.associate.FactoryAssociationTuple;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 /**
- * Evaluates a descriptors ability to select the correct corresponding point.
+ * Evaluates a descriptors using association and error based metrics.  Both "true" scale and
+ * orientation are provided to the description extractors.
  *
  * @author Peter Abeles
  */
@@ -48,67 +53,132 @@ public class DescribeAssociateEvaluator<T extends ImageBase>
 	TupleDescQueue initial;
 	// list of descriptions from the current image being considered
 	TupleDescQueue current;
-	// 
+	// list of features which maintain the original indexes
+	List<TupleDesc_F64> initList = new ArrayList<TupleDesc_F64>();
+	List<TupleDesc_F64> currentList = new ArrayList<TupleDesc_F64>();
+
+	// transform from original index to the index in the queues
 	int initIndexes[];
 	int currentIndexes[];
 
+	// estimates feature orientation
+	OrientationNoGradient<T> orientationAlg;
+
+	// saved feature orientation in first frame
+	double theta[];
+	
+	// associates features together
 	GeneralAssociation<TupleDesc_F64> matcher;
 
-	public DescribeAssociateEvaluator(int borderSize, InterestPointDetector<T> detector) {
+	// computes error statistics
+	ErrorStatistics errors = new ErrorStatistics(500);
+
+	public DescribeAssociateEvaluator(int borderSize, InterestPointDetector<T> detector,
+									  OrientationNoGradient<T> orientationAlg ) {
 		super(borderSize, detector);
 
+		this.orientationAlg = orientationAlg;
 		ScoreAssociateTuple scorer = new ScoreAssociateEuclideanSq();
 
 		matcher = FactoryAssociationTuple.maxError(scorer,100000);
 	}
 
 	@Override
-	public void extractInitial(StabilityAlgorithm alg, T image, List<Point2D_I32> points)
+	public void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_I32> points)
 	{
 		if( initIndexes == null || initIndexes.length < points.size() ) {
 			initIndexes = new int[ points.size() ];
 			currentIndexes = new int[ points.size() ];
 		}
 
-		ExtractFeatureDescription<T> extract = alg.getAlgorithm()
-				;
+		if( theta == null || theta.length < points.size() )
+			theta = new double[ points.size() ];
+
+		ExtractFeatureDescription<T> extract = alg.getAlgorithm();
+
 		int descLength = extract.getDescriptionLength();
 
 		initial = new TupleDescQueue(descLength, true);
 		current = new TupleDescQueue(descLength, true);
 
-		extract.setImage(image);
-		createDescriptionList(points, 1.0 , extract, initial , initIndexes );
-	}
-
-	private void createDescriptionList(List<Point2D_I32> points,
-									   double scale ,
-									   ExtractFeatureDescription<T> extract ,
-									   TupleDescQueue queue ,
-									   int indexes[] ) {
-		queue.reset();
-		TupleDesc_F64 f = queue.pop();
-		for( int i = 0; i < points.size(); i++  ) {
-			Point2D_I32 p = points.get(i);
-			TupleDesc_F64 result = extract.process(p.x,p.y,0,scale,f);
-			if( result != null ) {
-				indexes[queue.size()-1] = i;
-				f = queue.pop();
-			}
-		}
-		queue.removeTail();
+		initialDescriptions(image, points, extract);
 	}
 
 	@Override
-	public double[] evaluateImage(StabilityAlgorithm alg, T image,
+	public double[] evaluateImage(BenchmarkAlgorithm alg, T image,
 							   double scale , double theta ,
 							   List<Point2D_I32> points, List<Integer> indexes)
 	{
 		ExtractFeatureDescription<T> extract = alg.getAlgorithm();
 
-		extract.setImage(image);
-		createDescriptionList(points, scale , extract, current , currentIndexes );
+		// extract descriptions from the current image
+		currentDescriptions(image,extract,scale,theta,points,indexes);
 
+		// compute association error
+		double associationScore = computeAssociationScore(indexes);
+		// compute description change error
+		computeErrorScore(indexes);
+		double p50 = errors.getFraction(0.5);
+		double p90 = errors.getFraction(0.9);
+
+		return new double[]{associationScore,p50*10,p90*10};
+	}
+
+	/**
+	 * Extract feature descriptions from the initial image.  Calculates the
+	 * feature's orientation.
+	 */
+	private void initialDescriptions(T image, List<Point2D_I32> points, ExtractFeatureDescription<T> extract) {
+		extract.setImage(image);
+		orientationAlg.setImage(image);
+
+		initial.reset();
+		initList.clear();
+		TupleDesc_F64 f = initial.pop();
+		for( int i = 0; i < points.size(); i++  ) {
+			Point2D_I32 p = points.get(i);
+			theta[i] = orientationAlg.compute(p.x,p.y);
+			TupleDesc_F64 result = extract.process(p.x,p.y,theta[i],1,f);
+			if( result != null ) {
+				initIndexes[initial.size()-1] = i;
+				initList.add(f);
+				f = initial.pop();
+			} else {
+				initList.add(null);
+			}
+		}
+		initial.removeTail();
+	}
+
+	/**
+	 * extracts feature description from the current image.  Provide the
+	 * description extractor the "true" orientation of the feature.
+	 */
+	private void currentDescriptions( T image ,ExtractFeatureDescription<T> extract ,
+									  double scale , double theta ,
+									  List<Point2D_I32> points, List<Integer> indexes ) {
+		extract.setImage(image);
+		current.reset();
+		currentList.clear();
+		TupleDesc_F64 f = current.pop();
+		for( int i = 0; i < points.size(); i++  ) {
+			Point2D_I32 p = points.get(i);
+			// calculate the true orientation of the feature
+			double ang = UtilAngle.bound(this.theta[indexes.get(i)] + theta);
+			// extract the description
+			TupleDesc_F64 result = extract.process(p.x,p.y,ang,scale,f);
+			if( result != null ) {
+				currentIndexes[current.size()-1] = i;
+				currentList.add(f);
+				f = current.pop();
+			} else {
+				currentList.add(null);
+			}
+		}
+		current.removeTail();
+	}
+
+	private double computeAssociationScore(List<Integer> indexes) {
 		matcher.associate(initial,current);
 
 		FastQueue<AssociatedIndex> matches =  matcher.getMatches();
@@ -120,18 +190,53 @@ public class DescribeAssociateEvaluator<T extends ImageBase>
 			int expected = initIndexes[a.src];
 			int found = indexes.get(currentIndexes[a.dst]);
 
-
 			if( expected == found ) {
 				numCorrect++;
 			}
 		}
 
-		return new double[]{matches.size(),100.0*((double)numCorrect/(double)matches.size())};
+		if( matches.size() > 0 )
+			return 100.0*((double)numCorrect/(double)matches.size());
+		else
+			return 0;
 	}
 
+	private void computeErrorScore( List<Integer> indexes ) {
+		errors.reset();
+		for( int i = 0; i < indexes.size(); i++ ) {
+
+			TupleDesc_F64 f = currentList.get(i);
+			TupleDesc_F64 e = initList.get(indexes.get(i));
+
+			if( f != null && e != null ) {
+				// normalize the error based on the magnitude of the descriptor in the first frame
+				// this adjusts the error for descriptor length and magnitude
+				double errorNorm = errorNorm(f,e);
+				double initNorm = norm(e);
+				errors.add( errorNorm/initNorm );
+			}
+		}
+	}
+
+	private double norm( TupleDesc_F64 desc ) {
+		double total = 0;
+		for( int i = 0; i < desc.value.length; i++ ) {
+			total += desc.value[i]*desc.value[i];
+		}
+		return Math.sqrt(total);
+	}
+
+	private double errorNorm( TupleDesc_F64 a , TupleDesc_F64 b  ) {
+		double total = 0;
+		for( int i = 0; i < a.value.length; i++ ) {
+			double error = a.value[i] - b.value[i];
+			total += error*error;
+		}
+		return Math.sqrt(total);
+	}
 
 	@Override
 	public String[] getMetricNames() {
-		return new String[]{"# Matches","Correct %"};
+		return new String[]{"Correct %","50% * 10","90% * 10"};
 	}
 }

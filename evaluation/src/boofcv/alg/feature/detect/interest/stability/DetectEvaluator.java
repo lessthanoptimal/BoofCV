@@ -19,9 +19,10 @@
 package boofcv.alg.feature.detect.interest.stability;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.benchmark.StabilityAlgorithm;
-import boofcv.alg.feature.benchmark.StabilityEvaluator;
-import boofcv.alg.feature.benchmark.StabilityEvaluatorPoint;
+import boofcv.alg.feature.benchmark.BenchmarkAlgorithm;
+import boofcv.alg.feature.benchmark.distort.DistortParam;
+import boofcv.alg.feature.benchmark.distort.StabilityEvaluator;
+import boofcv.alg.feature.benchmark.distort.StabilityEvaluatorPoint;
 import boofcv.struct.image.ImageBase;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.affine.Affine2D_F32;
@@ -50,7 +51,7 @@ public class DetectEvaluator<T extends ImageBase> implements StabilityEvaluator<
 	}
 
 	@Override
-	public void extractInitial(StabilityAlgorithm alg, T image)
+	public void extractInitial(BenchmarkAlgorithm alg, T image)
 	{
 		InterestPointDetector<T> detector = alg.getAlgorithm();
 		detector.detect(image);
@@ -58,9 +59,9 @@ public class DetectEvaluator<T extends ImageBase> implements StabilityEvaluator<
 	}
 
 	@Override
-	public double[] evaluateImage(StabilityAlgorithm alg, T image, double scale , double theta )
+	public double[] evaluateImage(BenchmarkAlgorithm alg, T image, DistortParam param )
 	{
-		Affine2D_F32 initToImage = StabilityEvaluatorPoint.createTransform(scale,theta,image);
+		Affine2D_F32 initToImage = StabilityEvaluatorPoint.createTransform(param.scale,param.rotation,image);
 
 		// move the found points to the new coordinate system or just use the
 		List<Point2D_I32> original = transformOriginal(image,initToImage);
