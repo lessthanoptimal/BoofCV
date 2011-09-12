@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.benchmark;
+package boofcv.alg.feature.benchmark.distort;
 
+import boofcv.alg.feature.benchmark.AlgorithmResult;
+import boofcv.alg.feature.benchmark.BenchmarkAlgorithm;
+import boofcv.alg.feature.benchmark.MetricResult;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
 
@@ -34,24 +37,25 @@ import java.util.List;
 public class CompileImageResults<T extends ImageBase> {
 
 	private List<String> fileNames = new ArrayList<String>();
-	private List<StabilityAlgorithm> algs;
-	private FeatureStabilityBase<T> stability;
+	private List<BenchmarkAlgorithm> algs;
+	private BenchmarkFeatureDistort<T> benchmark;
 	private StabilityEvaluator<T> evaluator;
 
 
 	private boolean verbose = false;
 
-	public CompileImageResults(FeatureStabilityBase<T> evaluator) {
-		this.stability = evaluator;
+	public CompileImageResults(BenchmarkFeatureDistort<T> benchmark) {
+		this.benchmark = benchmark;
 	}
 
 	public void addImage( String fileName ) {
 		fileNames.add(fileName);
 	}
 
-	public void setAlgorithms( List<StabilityAlgorithm> algs , StabilityEvaluator<T> evaluator ) {
+	public void setAlgorithms( List<BenchmarkAlgorithm> algs , StabilityEvaluator<T> evaluator ) {
 		this.algs = algs;
 		this.evaluator = evaluator;
+		benchmark.setEvaluator(evaluator);
 	}
 
 	public void process() {
@@ -70,7 +74,7 @@ public class CompileImageResults<T extends ImageBase> {
 	}
 
 	private void print( List<AlgorithmResult<T>> results ) {
-		int N = stability.getNumberOfObservations();
+		int N = benchmark.getNumberOfObservations();
 		String metrics[] = evaluator.getMetricNames();
 
 		for( int metricNum = 0; metricNum < metrics.length; metricNum++ ) {
@@ -90,12 +94,13 @@ public class CompileImageResults<T extends ImageBase> {
 	protected List<AlgorithmResult<T>> processImage( BufferedImage original ) {
 		List<AlgorithmResult<T>> ret = new ArrayList<AlgorithmResult<T>>();
 
-		for( StabilityAlgorithm alg : algs ) {
+		for( BenchmarkAlgorithm alg : algs ) {
 			if( verbose )
 				System.out.println("Processing alg "+alg.getName());
+			benchmark.setAlg(alg);
 			AlgorithmResult<T> a = new AlgorithmResult<T>();
 			a.algName = alg.getName();
-			a.performance = stability.evaluate(original,alg,evaluator);
+			a.performance = benchmark.evaluate(original);
 
 			ret.add(a);
 		}

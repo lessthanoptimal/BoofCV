@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.benchmark;
+package boofcv.alg.feature.benchmark.distort;
 
+import boofcv.alg.feature.benchmark.BenchmarkAlgorithm;
 import boofcv.struct.image.ImageBase;
 
 
@@ -33,7 +34,7 @@ public interface StabilityEvaluator<T extends ImageBase> {
 	 * @param alg Algorithm being evaluated.
 	 * @param image Original image.
 	 */
-	void extractInitial( StabilityAlgorithm alg , T image );
+	void extractInitial( BenchmarkAlgorithm alg , T image );
 
 	/**
 	 * Extracts information from a modified image and compares
@@ -41,11 +42,10 @@ public interface StabilityEvaluator<T extends ImageBase> {
 	 *
 	 * @param alg Algorithm being evaluated.
 	 * @param image Modified image.
-	 * @param scale The true change in scale from the initial image.
-	 * @param theta The true change in orientation from the initial image.
+	 * @param param Describes how the image was distorted.
 	 * @return Error metrics.
 	 */
-	double[] evaluateImage(StabilityAlgorithm alg, T image, double scale , double theta );
+	double[] evaluateImage(BenchmarkAlgorithm alg, T image, DistortParam param );
 
 	/**
 	 * Names of extracted metrics.

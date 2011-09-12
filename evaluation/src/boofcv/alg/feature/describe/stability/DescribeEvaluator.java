@@ -20,8 +20,9 @@ package boofcv.alg.feature.describe.stability;
 
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.benchmark.StabilityAlgorithm;
-import boofcv.alg.feature.benchmark.StabilityEvaluatorPoint;
+import boofcv.alg.feature.benchmark.BenchmarkAlgorithm;
+import boofcv.alg.feature.benchmark.distort.StabilityEvaluatorPoint;
+import boofcv.alg.feature.orientation.OrientationNoGradient;
 import boofcv.evaluation.ErrorStatistics;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
@@ -44,19 +45,35 @@ public class DescribeEvaluator <T extends ImageBase>
 	List<TupleDesc_F64> initial = new ArrayList<TupleDesc_F64>();
 	ErrorStatistics errors = new ErrorStatistics(500);
 
-	public DescribeEvaluator(int borderSize, InterestPointDetector<T> detector) {
+	// estimates feature orientation
+	OrientationNoGradient<T> orientationAlg;
+	// saved feature orientation in first frame
+	double theta[];
+
+	public DescribeEvaluator(int borderSize,
+							 InterestPointDetector<T> detector,
+							 OrientationNoGradient<T> orientationAlg ) {
 		super(borderSize, detector);
+		this.orientationAlg = orientationAlg;
 	}
 
 	@Override
-	public void extractInitial(StabilityAlgorithm alg, T image, List<Point2D_I32> points)
+	public void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_I32> points)
 	{
 		initial.clear();
 
 		ExtractFeatureDescription<T> extract = alg.getAlgorithm();
 		extract.setImage(image);
 
-		for( Point2D_I32 p : points ) {
+		if( theta == null || theta.length < points.size() )
+			theta = new double[ points.size() ];
+
+		// extract initial feature description and angle
+		orientationAlg.setImage(image);
+		orientationAlg.setScale(1);
+		for( int i = 0; i < points.size(); i++ ) {
+			Point2D_I32 p = points.get(i);
+			theta[i] = orientationAlg.compute(p.x,p.y);
 			TupleDesc_F64 f = extract.process(p.x,p.y,0,1.0,null);
 			if( f == null )
 				initial.add(f);
@@ -66,7 +83,7 @@ public class DescribeEvaluator <T extends ImageBase>
 	}
 
 	@Override
-	public double[] evaluateImage(StabilityAlgorithm alg, T image,
+	public double[] evaluateImage(BenchmarkAlgorithm alg, T image,
 							   double scale , double theta ,
 							   List<Point2D_I32> points, List<Integer> indexes)
 	{
@@ -79,10 +96,13 @@ public class DescribeEvaluator <T extends ImageBase>
 			Point2D_I32 p = points.get(i);
 			int index =  indexes.get(i);
 
-			TupleDesc_F64 f = extract.process(p.x,p.y,0,scale,null);
+			// the feature's orientation is the orientation in the initial frame + the rotation
+			TupleDesc_F64 f = extract.process(p.x,p.y,this.theta[index]+theta,scale,null);
 			TupleDesc_F64 e = initial.get(index);
 
 			if( f != null && e != null ) {
+				// normalize the error based on the magnitude of the descriptor in the first frame
+				// this adjusts the error for descriptor length and magnitude
 				double errorNorm = errorNorm(f,e);
 				double initNorm = norm(e);
 				errors.add( errorNorm/initNorm );

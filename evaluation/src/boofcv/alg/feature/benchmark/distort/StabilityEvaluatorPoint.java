@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.benchmark;
+package boofcv.alg.feature.benchmark.distort;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.distort.impl.DistortSupport;
+import boofcv.alg.feature.benchmark.BenchmarkAlgorithm;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_F32;
@@ -53,7 +54,7 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 	}
 
 	@Override
-	public void extractInitial(StabilityAlgorithm alg, T image) {
+	public void extractInitial(BenchmarkAlgorithm alg, T image) {
 		initialPoints.clear();
 		detector.detect(image);
 
@@ -71,11 +72,11 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 	}
 
 	@Override
-	public double[] evaluateImage(StabilityAlgorithm alg, T image, double scale , double theta ) {
+	public double[] evaluateImage(BenchmarkAlgorithm alg, T image, DistortParam param ) {
 
-		transform(scale,theta,image);
+		transform(param.scale,param.rotation,image);
 
-		return evaluateImage(alg,image,scale,theta,transformPoints,transformIndexes);
+		return evaluateImage(alg,image,param.scale,param.rotation,transformPoints,transformIndexes);
 	}
 
 	/**
@@ -129,7 +130,7 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 		return new Affine2D_F32(scale,0,0,scale,offX,offY);
 	}
 
-	public abstract void extractInitial(StabilityAlgorithm alg, T image, List<Point2D_I32> points );
+	public abstract void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_I32> points );
 
 	/**
 	 *
@@ -138,7 +139,7 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 	 * @param points Location of interest points in current frame.
 	 * @param indexes Original index of each interest point in current frame.
 	 */
-	public abstract double[] evaluateImage(StabilityAlgorithm alg,
+	public abstract double[] evaluateImage(BenchmarkAlgorithm alg,
 										   T image, double scale , double theta,
 										   List<Point2D_I32> points ,
 										   List<Integer> indexes );

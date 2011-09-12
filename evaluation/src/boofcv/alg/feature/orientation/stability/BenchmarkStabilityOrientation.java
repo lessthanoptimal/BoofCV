@@ -20,7 +20,9 @@ package boofcv.alg.feature.orientation.stability;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.feature.benchmark.*;
+import boofcv.alg.feature.benchmark.distort.BenchmarkFeatureDistort;
+import boofcv.alg.feature.benchmark.distort.CompileImageResults;
+import boofcv.alg.feature.benchmark.distort.FactoryBenchmarkFeatureDistort;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt16;
@@ -45,32 +47,30 @@ public class BenchmarkStabilityOrientation<T extends ImageBase, D extends ImageB
 	}
 
 	public void testNoise() {
-		FeatureStabilityNoise<T> stability =
-				new FeatureStabilityNoise<T>(imageType,randSeed, 1,2,4,8,12,16,20,40);
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.noise(imageType);
+		perform(benchmark);
 	}
 
 	public void testIntensity() {
-		FeatureStabilityIntensity<T> stability =
-				new FeatureStabilityIntensity<T>(imageType,0.2,0.5,0.8,1.1,1.5);
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.intensity(imageType);
+		perform(benchmark);
 	}
 
-	// NOTE: Much of the error inside of rotation seems to be caused by interpolation.
 	public void testRotation() {
-		FeatureStabilityRotation<T> stability =
-				new FeatureStabilityRotation<T>(imageType,UtilOrientationBenchmark.makeSample(0,Math.PI,20));
-
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.rotate(imageType);
+		perform(benchmark);
 	}
 
 	public void testScale() {
-		FeatureStabilityScale<T> stability =
-				new FeatureStabilityScale<T>(imageType,0.5,0.75,1,1.5,2,3,4);
-		perform(stability);
+		BenchmarkFeatureDistort<T> benchmark =
+				FactoryBenchmarkFeatureDistort.scale(imageType);
+		perform(benchmark);
 	}
 
-	private void perform( FeatureStabilityBase<T> eval ) {
+	private void perform( BenchmarkFeatureDistort<T> eval ) {
 		CompileImageResults<T> compile = new CompileImageResults<T>(eval);
 		compile.addImage("evaluation/data/outdoors01.jpg");
 		compile.addImage("evaluation/data/indoors01.jpg");

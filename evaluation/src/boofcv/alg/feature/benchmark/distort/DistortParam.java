@@ -16,28 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.benchmark;
+package boofcv.alg.feature.benchmark.distort;
+
 
 /**
- * Contains the name and an instance of the algorithm being evaluated.
- *
  * @author Peter Abeles
  */
-public class StabilityAlgorithm {
+public class DistortParam {
+	public double rotation;
+	public double scale;
 
-	String name;
-	Object algorithm;
-
-	public StabilityAlgorithm(String name, Object algorithm) {
-		this.name = name;
-		this.algorithm = algorithm;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public <T> T getAlgorithm() {
-		return (T)algorithm;
+	public DistortParam(double rotation, double scale) {
+		this.rotation = rotation;
+		this.scale = scale;
 	}
 }

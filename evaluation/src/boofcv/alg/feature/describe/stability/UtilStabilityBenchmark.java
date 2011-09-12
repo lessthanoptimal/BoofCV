@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe.stability;
 
-import boofcv.alg.feature.benchmark.StabilityAlgorithm;
+import boofcv.alg.feature.benchmark.BenchmarkAlgorithm;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
 import boofcv.struct.image.ImageBase;
 
@@ -31,13 +31,13 @@ import java.util.List;
  */
 public class UtilStabilityBenchmark {
 	public static <T extends ImageBase, D extends ImageBase>
-	List<StabilityAlgorithm> createAlgorithms(int radius, Class<T> imageType , Class<D> derivType ) {
-		List<StabilityAlgorithm> ret = new ArrayList<StabilityAlgorithm>();
+	List<BenchmarkAlgorithm> createAlgorithms(int radius, Class<T> imageType , Class<D> derivType ) {
+		List<BenchmarkAlgorithm> ret = new ArrayList<BenchmarkAlgorithm>();
 
-		ret.add( new StabilityAlgorithm("SURF", FactoryExtractFeatureDescription.surf(true,imageType)));
-		ret.add( new StabilityAlgorithm("Gaussian 12", FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType)));
-		ret.add( new StabilityAlgorithm("Steer", FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType)));
-		ret.add( new StabilityAlgorithm("Steer Norm", FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType)));
+		ret.add( new BenchmarkAlgorithm("SURF", FactoryExtractFeatureDescription.surf(false,imageType)));
+		ret.add( new BenchmarkAlgorithm("Gaussian 12", FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType)));
+		ret.add( new BenchmarkAlgorithm("Steer", FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType)));
+		ret.add( new BenchmarkAlgorithm("Steer Norm", FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType)));
 
 		return ret;
 	}

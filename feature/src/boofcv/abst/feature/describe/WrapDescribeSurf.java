@@ -32,8 +32,12 @@ import boofcv.struct.image.ImageBase;
 public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 		implements ExtractFeatureDescription<T> {
 
+	// computes SURF feature descriptor
 	DescribePointSurf<II> surf;
+	// estimates feature's orientation
+	// would not be included normally, but this way the integral image will only need to be computed once
 	OrientationIntegral<II> orientationAlg;
+	// integral image
 	II ii;
 
 	public WrapDescribeSurf(DescribePointSurf<II> surf ,
@@ -49,7 +53,8 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 			ii.reshape(image.width,image.height);
 		}
 		ii = GIntegralImageOps.transform(image,ii);
-		orientationAlg.setImage(ii);
+		if( orientationAlg != null )
+			orientationAlg.setImage(ii);
 		surf.setImage(ii);
 	}
 

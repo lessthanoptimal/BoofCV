@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation.stability;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.benchmark.StabilityAlgorithm;
+import boofcv.alg.feature.benchmark.BenchmarkAlgorithm;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.image.ImageBase;
@@ -43,22 +43,22 @@ public class UtilOrientationBenchmark {
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>
-	List<StabilityAlgorithm> createAlgorithms( int radius , Class<T> imageType , Class<D> derivType )
+	List<BenchmarkAlgorithm> createAlgorithms( int radius , Class<T> imageType , Class<D> derivType )
 	{
-		List<StabilityAlgorithm> ret = new ArrayList<StabilityAlgorithm>();
+		List<BenchmarkAlgorithm> ret = new ArrayList<BenchmarkAlgorithm>();
 
-		ret.add(new StabilityAlgorithm("Ave Unweighted", FactoryOrientationAlgs.average(radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Ave Weighted", FactoryOrientationAlgs.average(radius,true,derivType)));
-		ret.add(new StabilityAlgorithm("Hist5 Unweighted", FactoryOrientationAlgs.histogram(5,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Hist5 Weighted", FactoryOrientationAlgs.histogram(5,radius,true,derivType)));
-		ret.add(new StabilityAlgorithm("Hist10 Unweighted", FactoryOrientationAlgs.histogram(10,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Hist10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType)));
-		ret.add(new StabilityAlgorithm("Hist20 Unweighted", FactoryOrientationAlgs.histogram(20,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Slide PI/6 Un-W", FactoryOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Slide PI/6 W", FactoryOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Slide PI/3 Un-W", FactoryOrientationAlgs.sliding(20,Math.PI/3,radius,false,derivType)));
-		ret.add(new StabilityAlgorithm("Slide PI/3 W", FactoryOrientationAlgs.sliding(20,Math.PI/3,radius,true,derivType)));
-		ret.add(new StabilityAlgorithm("No Gradient", FactoryOrientationAlgs.nogradient(radius,imageType)));
+		ret.add(new BenchmarkAlgorithm("Ave Unweighted", FactoryOrientationAlgs.average(radius,false,derivType)));
+		ret.add(new BenchmarkAlgorithm("Ave Weighted", FactoryOrientationAlgs.average(radius,true,derivType)));
+		ret.add(new BenchmarkAlgorithm("Hist5 Unweighted", FactoryOrientationAlgs.histogram(5,radius,false,derivType)));
+		ret.add(new BenchmarkAlgorithm("Hist5 Weighted", FactoryOrientationAlgs.histogram(5,radius,true,derivType)));
+		ret.add(new BenchmarkAlgorithm("Hist10 Unweighted", FactoryOrientationAlgs.histogram(10,radius,false,derivType)));
+		ret.add(new BenchmarkAlgorithm("Hist10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType)));
+		ret.add(new BenchmarkAlgorithm("Hist20 Unweighted", FactoryOrientationAlgs.histogram(20,radius,false,derivType)));
+		ret.add(new BenchmarkAlgorithm("Slide PI/6 Un-W", FactoryOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
+		ret.add(new BenchmarkAlgorithm("Slide PI/6 W", FactoryOrientationAlgs.sliding(10,Math.PI/6,radius,false,derivType)));
+		ret.add(new BenchmarkAlgorithm("Slide PI/3 Un-W", FactoryOrientationAlgs.sliding(20,Math.PI/3,radius,false,derivType)));
+		ret.add(new BenchmarkAlgorithm("Slide PI/3 W", FactoryOrientationAlgs.sliding(20,Math.PI/3,radius,true,derivType)));
+		ret.add(new BenchmarkAlgorithm("No Gradient", FactoryOrientationAlgs.nogradient(radius,imageType)));
 
 		return ret;
 	}
