@@ -51,14 +51,14 @@ public class FactoryOrientationAlgs {
 	}
 
 	public static <T extends ImageBase>
-	OrientationNoGradient<T> nogradient( int radius , Class<T> imageType )
+	OrientationImageAverage<T> nogradient( int radius , Class<T> imageType )
 	{
-		OrientationNoGradient<T> ret;
+		OrientationImageAverage<T> ret;
 
 		if( imageType == ImageFloat32.class ) {
-			ret = (OrientationNoGradient<T>)new ImplOrientationNoGradient_F32(radius);
+			ret = (OrientationImageAverage<T>)new ImplOrientationImageAverage_F32(radius);
 		} else if( imageType == ImageUInt8.class ) {
-			ret = (OrientationNoGradient<T>)new ImplOrientationNoGradient_U8(radius);
+			ret = (OrientationImageAverage<T>)new ImplOrientationImageAverage_U8(radius);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
 		}

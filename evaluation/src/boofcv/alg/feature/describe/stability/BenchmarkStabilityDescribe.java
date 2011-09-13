@@ -24,7 +24,7 @@ import boofcv.alg.feature.benchmark.distort.BenchmarkFeatureDistort;
 import boofcv.alg.feature.benchmark.distort.CompileImageResults;
 import boofcv.alg.feature.benchmark.distort.FactoryBenchmarkFeatureDistort;
 import boofcv.alg.feature.benchmark.distort.StabilityEvaluator;
-import boofcv.alg.feature.orientation.OrientationNoGradient;
+import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.alg.feature.orientation.stability.UtilOrientationBenchmark;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.image.ImageBase;
@@ -92,10 +92,9 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 		compile.addImage("evaluation/data/sunflowers.png");
 
 		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
-		OrientationNoGradient<T> orientation = FactoryOrientationAlgs.nogradient(radius,imageType);
+		OrientationImageAverage<T> orientation = FactoryOrientationAlgs.nogradient(radius,imageType);
 		// comment/uncomment to change the evaluator
-//		StabilityEvaluator<T> evaluator = new DescribeEvaluator<T>(border,detector,orientation);
-		StabilityEvaluator<T> evaluator = new DescribeAssociateEvaluator<T>(border,detector,orientation);
+		StabilityEvaluator<T> evaluator = new DescribeEvaluator<T>(border,detector,orientation);
 
 		compile.setAlgorithms(algs,evaluator);
 

@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class OrientationNoGradient<T extends ImageBase> implements OrientationImage<T> {
+public abstract class OrientationImageAverage<T extends ImageBase> implements OrientationImage<T> {
 
 	// input image
 	protected T image;
@@ -49,7 +49,7 @@ public abstract class OrientationNoGradient<T extends ImageBase> implements Orie
 	// sine values for each pixel
 	protected Kernel2D_F32 kerSine;
 
-	public OrientationNoGradient(int radius) {
+	public OrientationImageAverage(int radius) {
 		setRadius(radius);
 	}
 

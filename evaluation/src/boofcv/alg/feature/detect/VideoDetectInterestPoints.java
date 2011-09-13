@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.orientation.OrientationNoGradient;
+import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.gui.feature.FancyInterestPointRender;
@@ -44,14 +44,14 @@ public class VideoDetectInterestPoints<T extends ImageBase>
 		extends ProcessImageSequence<T> {
 
 	InterestPointDetector<T> detector;
-	OrientationNoGradient<T> orientation;
+	OrientationImageAverage<T> orientation;
 	FancyInterestPointRender render = new FancyInterestPointRender();
 
 	ImagePanel panel;
 
 	public VideoDetectInterestPoints(SimpleImageSequence<T> sequence,
 									 InterestPointDetector<T> detector ,
-									 OrientationNoGradient<T> orientation ) {
+									 OrientationImageAverage<T> orientation ) {
 		super(sequence);
 
 		this.detector = detector;
@@ -106,7 +106,7 @@ public class VideoDetectInterestPoints<T extends ImageBase>
 		int radius = 2;
 
 		// if null then no orientation will be computed
-		OrientationNoGradient<T> orientation = null;
+		OrientationImageAverage<T> orientation = null;
 		orientation = FactoryOrientationAlgs.nogradient(radius,imageType);
 
 		InterestPointDetector<T> detector;
