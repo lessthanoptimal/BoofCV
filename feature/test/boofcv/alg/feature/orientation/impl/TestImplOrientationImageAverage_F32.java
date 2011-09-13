@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationImageTests;
-import boofcv.alg.feature.orientation.OrientationNoGradient;
+import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestImplOrientationNoGradient_F32 {
+public class TestImplOrientationImageAverage_F32 {
 	double angleTol = 0.01;
 	int r = 3;
 
@@ -35,7 +35,7 @@ public class TestImplOrientationNoGradient_F32 {
 	public void standardUnweighted() {
 		GenericOrientationImageTests<ImageFloat32> tests = new GenericOrientationImageTests<ImageFloat32>();
 
-		OrientationNoGradient<ImageFloat32> alg = new ImplOrientationNoGradient_F32(r);
+		OrientationImageAverage<ImageFloat32> alg = new ImplOrientationImageAverage_F32(r);
 
 		tests.setup(angleTol, r*2+1 , alg,ImageFloat32.class);
 		tests.performAll();

@@ -111,10 +111,10 @@ public class BenchmarkOrientation<I extends ImageBase, D extends ImageBase> {
 
 	public class NoGradient implements Performer {
 
-		OrientationNoGradient alg;
+		OrientationImageAverage alg;
 		String name;
 
-		public NoGradient(String name, OrientationNoGradient alg) {
+		public NoGradient(String name, OrientationImageAverage alg) {
 			this.alg = alg;
 			this.name = name;
 		}

@@ -114,8 +114,8 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		} else if( orientation instanceof OrientationIntegral ) {
 			T ii = GIntegralImageOps.transform(workImage,null);
 			((OrientationIntegral<T>)orientation).setImage(ii);
-		} else if( orientation instanceof OrientationNoGradient ) {
-			((OrientationNoGradient)orientation).setImage((ImageFloat32)workImage);
+		} else if( orientation instanceof OrientationImageAverage) {
+			((OrientationImageAverage)orientation).setImage((ImageFloat32)workImage);
 		} else {
 			throw new IllegalArgumentException("Unknown algorithm type.");
 		}

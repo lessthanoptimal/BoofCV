@@ -16,39 +16,37 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.alg.feature.benchmark.homography;
+
+import boofcv.struct.feature.TupleDesc_F64;
+import georegression.struct.point.Point2D_I32;
 
 
 /**
- * Basic description of an image feature's attributes using an array.
- *
  * @author Peter Abeles
  */
-public class TupleDesc_F64 {
-	public double value[];
+public class FeatureInfo {
+	Point2D_I32 location;
+	TupleDesc_F64 description;
 
-	public TupleDesc_F64( int numFeatures ) {
-		this.value = new double[ numFeatures ];
+	public FeatureInfo( int descLength ) {
+		location = new Point2D_I32();
+		description = new TupleDesc_F64(descLength);
 	}
 
-	protected TupleDesc_F64() {
+	public Point2D_I32 getLocation() {
+		return location;
 	}
 
-	public void set( double ...value ) {
-		System.arraycopy(value,0,this.value,0,this.value.length);
+	public void setLocation(Point2D_I32 location) {
+		this.location = location;
 	}
 
-	public TupleDesc_F64 copy() {
-		TupleDesc_F64 ret = new TupleDesc_F64( value.length );
-		System.arraycopy(value,0,ret.value,0,value.length);
-		return ret;
+	public TupleDesc_F64 getDescription() {
+		return description;
 	}
 
-	public double[] getValue() {
-		return value;
-	}
-
-	public void setValue(double[] value) {
-		this.value = value;
+	public void setDescription(TupleDesc_F64 description) {
+		this.description = description;
 	}
 }

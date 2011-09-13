@@ -293,15 +293,16 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/apps/BoofCV Apps.iml" filepath="$PROJECT_DIR$/apps/BoofCV Apps.iml" />
+      <module fileurl="file://$PROJECT_DIR$/evaluation/BoofCV Evaluation.iml" filepath="$PROJECT_DIR$/evaluation/BoofCV Evaluation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/feature/BoofCV Feature.iml" filepath="$PROJECT_DIR$/feature/BoofCV Feature.iml" />
+      <module fileurl="file://$PROJECT_DIR$/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/geo/BoofCV Geometric Vision.iml" />
+      <module fileurl="file://$PROJECT_DIR$/io/BoofCV IO.iml" filepath="$PROJECT_DIR$/io/BoofCV IO.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/ip/BoofCV Image Processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../bubo/io/trunk/Bubo IO.iml" filepath="$PROJECT_DIR$/../bubo/io/trunk/Bubo IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/../developmental/cv/Developmental-CV.iml" filepath="$PROJECT_DIR$/../developmental/cv/Developmental-CV.iml" />
-      <module fileurl="file://$PROJECT_DIR$/feature/Feature.iml" filepath="$PROJECT_DIR$/feature/Feature.iml" />
       <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
-      <module fileurl="file://$PROJECT_DIR$/geo/Geometric Vision.iml" filepath="$PROJECT_DIR$/geo/Geometric Vision.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ip/Image Processing.iml" filepath="$PROJECT_DIR$/ip/Image Processing.iml" />
-      <module fileurl="file://$PROJECT_DIR$/apps/apps.iml" filepath="$PROJECT_DIR$/apps/apps.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
-      <module fileurl="file://$PROJECT_DIR$/evaluation/evaluation.iml" filepath="$PROJECT_DIR$/evaluation/evaluation.iml" />
-      <module fileurl="file://$PROJECT_DIR$/io/io.iml" filepath="$PROJECT_DIR$/io/io.iml" />
       <module fileurl="file://$PROJECT_DIR$/../libpjajava/libpja.iml" filepath="$PROJECT_DIR$/../libpjajava/libpja.iml" />
     </modules>
   </component>
@@ -352,6 +353,7 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../bubo" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../developmental/cv" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../ejml" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../georegression" vcs="Git" />

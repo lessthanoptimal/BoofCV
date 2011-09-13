@@ -64,7 +64,7 @@ public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<Tup
 								   int maxMatches )
 	{
 		matches.reset();
-		if( sizeSrc < maxMatches ) {
+		if( sizeSrc < maxMatches || maxMatches <= 0 ) {
 			// put all the matches in
 			addAllMatches(sizeSrc, pairs);
 			return;
