@@ -31,7 +31,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ProcessImageSequence;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.wrapper.xuggler.XugglerSimplified;
+import boofcv.io.video.BuboVideoManager;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageBase;
@@ -125,7 +125,7 @@ public class VideoDetectCorners<T extends ImageBase, D extends ImageBase>
 	public static <T extends ImageBase, D extends ImageBase>
 	void perform( String fileName , Class<T> imageType , Class<D> derivType )
 	{
-		SimpleImageSequence<T> sequence = new XugglerSimplified<T>(fileName, imageType);
+		SimpleImageSequence<T> sequence = BuboVideoManager.loadManagerDefault().load(fileName, imageType);
 
 		int maxCorners = 200;
 		int radius = 2;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv;
+package boofcv.misc;
 
 
 /**

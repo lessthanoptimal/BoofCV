@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;

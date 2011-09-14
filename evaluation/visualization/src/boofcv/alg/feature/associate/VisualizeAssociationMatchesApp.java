@@ -21,12 +21,12 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.associate.FactoryAssociationTuple;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
@@ -140,8 +140,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 
 		Class imageType = ImageFloat32.class;
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-//		InterestPointDetector detector = FactoryInterestPoint.fromFastHessian(200,9,4,4);
-		InterestPointDetector detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
+		InterestPointDetector detector = FactoryInterestPoint.fromFastHessian(200,9,4,4);
+//		InterestPointDetector detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
 		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.surf(true,imageType);
 //		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType);
 //		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType);

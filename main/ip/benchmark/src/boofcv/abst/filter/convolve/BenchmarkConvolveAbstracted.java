@@ -18,8 +18,8 @@
 
 package boofcv.abst.filter.convolve;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.core.image.border.BorderType;

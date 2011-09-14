@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.Performer;
-import boofcv.ProfileOperation;
+import boofcv.misc.Performer;
+import boofcv.misc.ProfileOperation;
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;

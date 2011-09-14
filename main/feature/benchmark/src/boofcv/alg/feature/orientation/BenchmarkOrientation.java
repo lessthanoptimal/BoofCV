@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.orientation;
 
-import boofcv.Performer;
-import boofcv.ProfileOperation;
+import boofcv.misc.Performer;
+import boofcv.misc.ProfileOperation;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;

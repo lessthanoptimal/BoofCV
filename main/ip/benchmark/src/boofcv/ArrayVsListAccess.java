@@ -18,6 +18,9 @@
 
 package boofcv;
 
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

@@ -18,8 +18,8 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.alg.interpolate.impl.BilinearPixel_F32;
 import boofcv.alg.interpolate.impl.ImplInterpolatePixelConvolution_F32;
 import boofcv.alg.interpolate.impl.NearestNeighborPixel_F32;

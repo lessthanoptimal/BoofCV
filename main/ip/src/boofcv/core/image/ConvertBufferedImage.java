@@ -179,6 +179,7 @@ public class ConvertBufferedImage {
 	 * it will be used for output, otherwise a new image will be created.
 	 */
 	public static <T extends ImageBase> T convertFrom(BufferedImage src, T dst, Class<T> type) {
+		System.out.println("Inside convert from");
 		if (type == ImageUInt8.class) {
 			return (T) convertFrom(src, (ImageUInt8) dst);
 		} else if (type == ImageFloat32.class) {
@@ -205,11 +206,16 @@ public class ConvertBufferedImage {
 			dst = new ImageUInt8(src.getWidth(), src.getHeight());
 		}
 
-		if (src.getRaster() instanceof ByteInterleavedRaster) {
-			ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
-		} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-			ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
-		} else {
+		try {
+			if (src.getRaster() instanceof ByteInterleavedRaster) {
+				ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
+			} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
+				ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
+			} else {
+				ConvertRaster.bufferedToGray(src, dst);
+			}
+		} catch( java.security.AccessControlException e) {
+			// Applets don't allow access to the raster()
 			ConvertRaster.bufferedToGray(src, dst);
 		}
 
@@ -233,12 +239,17 @@ public class ConvertBufferedImage {
 			dst = new ImageFloat32(src.getWidth(), src.getHeight());
 		}
 
-		if (src.getRaster() instanceof ByteInterleavedRaster &&
-				src.getType() == BufferedImage.TYPE_BYTE_GRAY ) {
-			ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
-		} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-			ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
-		} else {
+		try {
+			if (src.getRaster() instanceof ByteInterleavedRaster &&
+					src.getType() == BufferedImage.TYPE_BYTE_GRAY ) {
+				ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
+			} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
+				ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
+			} else {
+				ConvertRaster.bufferedToGray(src, dst);
+			}
+		} catch( java.security.AccessControlException e) {
+			// Applets don't allow access to the raster()
 			ConvertRaster.bufferedToGray(src, dst);
 		}
 

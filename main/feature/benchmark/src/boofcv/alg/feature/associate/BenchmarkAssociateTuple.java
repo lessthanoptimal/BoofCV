@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.Performer;
-import boofcv.ProfileOperation;
+import boofcv.misc.Performer;
+import boofcv.misc.ProfileOperation;
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.factory.feature.associate.FactoryAssociationTuple;
 import boofcv.struct.FastQueue;

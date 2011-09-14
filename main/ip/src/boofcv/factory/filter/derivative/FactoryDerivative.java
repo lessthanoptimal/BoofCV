@@ -56,6 +56,13 @@ import java.lang.reflect.Method;
 public class FactoryDerivative {
 
 	public static <I extends ImageBase, D extends ImageBase>
+	ImageGradient<I,D> prewitt( Class<I> inputType , Class<D> derivType)
+	{
+		Method m = findDerivative(GradientPrewitt.class,inputType,derivType);
+		return new ImageGradient_Reflection<I,D>(m);
+	}
+
+	public static <I extends ImageBase, D extends ImageBase>
 	ImageGradient<I,D> sobel( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findDerivative(GradientSobel.class,inputType,derivType);

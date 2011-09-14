@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.edge;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;

@@ -27,6 +27,9 @@ import java.util.List;
 
 
 /**
+ * Provides a pull down list form which the user can select which algorithm to run.  After
+ * it has been selected the input should be processed and displayed.
+ *
  * @author Peter Abeles
  */
 public abstract class SelectAlgorithmPanel extends JPanel implements ActionListener {

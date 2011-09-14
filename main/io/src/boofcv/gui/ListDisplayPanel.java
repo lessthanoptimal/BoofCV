@@ -76,6 +76,10 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 		}
 	}
 
+	public int getListWidth(){
+		return (int)listPanel.getPreferredSize().getWidth();
+	}
+
 	/**
 	 * Displays a new image in the list.
 	 *
@@ -83,7 +87,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 	 * @param name
 	 */
 	public void addImage( BufferedImage image , String name ) {
-		addItem(new ImagePanel(image), name );
+		addItem(new ImagePanel(image,true), name );
 	}
 
 	/**

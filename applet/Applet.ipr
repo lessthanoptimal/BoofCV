@@ -51,13 +51,15 @@
       <option name="myName" value="BoofCV" />
       <option name="myLocal" value="true" />
     </copyright>
-    <module2copyright />
+    <module2copyright>
+      <element module="BoofCV" copyright="BoofCV" />
+    </module2copyright>
   </component>
   <component name="DependenciesAnalyzeManager">
     <option name="myForwardDirection" value="false" />
   </component>
   <component name="DependencyValidationManager">
-    <scope name="BoofCV" pattern="" />
+    <scope name="BoofCV" pattern="file[BoofCV Applet]:*//*||file[Visualization]:*//*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="EclipseCompilerSettings">
@@ -282,17 +284,8 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BoofCV Evaluation.iml" filepath="$PROJECT_DIR$/BoofCV Evaluation.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../main/feature/BoofCV Feature.iml" filepath="$PROJECT_DIR$/../main/feature/BoofCV Feature.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../main/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/../main/geo/BoofCV Geometric Vision.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../main/io/BoofCV IO.iml" filepath="$PROJECT_DIR$/../main/io/BoofCV IO.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../main/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/../main/ip/BoofCV Image Processing.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../integration/xuggler/BoofCV Xuggler.iml" filepath="$PROJECT_DIR$/../integration/xuggler/BoofCV Xuggler.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" filepath="$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../developmental/cv/Developmental-CV.iml" filepath="$PROJECT_DIR$/../../developmental/cv/Developmental-CV.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../georegression/GeoRegression.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../../ejml/trunk/ejml.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../libpjajava/libpja.iml" filepath="$PROJECT_DIR$/../../libpjajava/libpja.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BoofCV Applet.iml" filepath="$PROJECT_DIR$/BoofCV Applet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Visualization.iml" filepath="$PROJECT_DIR$/Visualization.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0_26" project-jdk-type="JavaSDK">
@@ -315,6 +308,11 @@
     <option name="ALTERNATIVE_WORKING_PATH" value="" />
     <option name="LOCK_ON_CHECKOUT" value="false" />
     <option name="UNLOCK_ON_CHECKIN" value="false" />
+  </component>
+  <component name="StructureViewFactory">
+    <option name="AUTOSCROLL_MODE" value="true" />
+    <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
+    <option name="ACTIVE_ACTIONS" value="" />
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myVersion" value="123" />
@@ -342,9 +340,6 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../../ejml" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../../georegression" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../../libpjajava" vcs="svn" />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />

@@ -18,8 +18,8 @@
 
 package boofcv.alg.denoise;
 
-import boofcv.Performer;
-import boofcv.ProfileOperation;
+import boofcv.misc.Performer;
+import boofcv.misc.ProfileOperation;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
 

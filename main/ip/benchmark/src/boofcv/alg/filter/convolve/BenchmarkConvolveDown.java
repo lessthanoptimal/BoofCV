@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.alg.filter.convolve.down.ConvolveDownNoBorderStandard;
 import boofcv.alg.filter.convolve.down.ConvolveDownNoBorderUnrolled_F32_F32;
 import boofcv.alg.filter.convolve.down.ConvolveDownNoBorderUnrolled_U8_I16;

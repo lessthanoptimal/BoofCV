@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryNaiveOps;
 import boofcv.alg.misc.ImageTestingOps;
