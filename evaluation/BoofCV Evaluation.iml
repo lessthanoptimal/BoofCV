@@ -7,15 +7,15 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="BoofCV Image Processing" />
-    <orderEntry type="module" module-name="ejml" />
-    <orderEntry type="module" module-name="BoofCV IO" />
-    <orderEntry type="module" module-name="libpja" />
     <orderEntry type="module" module-name="BoofCV Feature" />
     <orderEntry type="module" module-name="BoofCV Geometric Vision" />
-    <orderEntry type="module" module-name="GeoRegression" />
-    <orderEntry type="module" module-name="Developmental-CV" />
+    <orderEntry type="module" module-name="BoofCV Image Processing" />
+    <orderEntry type="module" module-name="BoofCV IO" />
     <orderEntry type="module" module-name="Bubo IO" />
+    <orderEntry type="module" module-name="Developmental-CV" />
+    <orderEntry type="module" module-name="ejml" />
+    <orderEntry type="module" module-name="GeoRegression" />
+    <orderEntry type="module" module-name="libpja" />
   </component>
 </module>
 
