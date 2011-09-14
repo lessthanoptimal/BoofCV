@@ -3,7 +3,8 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/benchmark/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/visualization/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -16,6 +17,7 @@
     <orderEntry type="module" module-name="ejml" />
     <orderEntry type="module" module-name="GeoRegression" />
     <orderEntry type="module" module-name="libpja" />
+    <orderEntry type="module" module-name="BoofCV Xuggler" />
   </component>
 </module>
 
