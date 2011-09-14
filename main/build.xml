@@ -1,0 +1,59 @@
+<project name="BoofCV" basedir="." default="main">
+
+    <property name="lib.dir"     value="../lib"/>
+    <property name="jar.dir"     value="jar"/>
+    <property name="doc.dir"     value="api"/>
+
+    <path id="project.classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+        <fileset dir="${jar.dir}" includes="**/*.jar"/>
+    </path>
+
+
+    <target name="javadoc">
+        <javadoc
+                destdir="docs/api"
+                author="true"
+                version="true"
+                use="true"
+                windowtitle="BoofCV">
+
+            <packageset dir="ip/src" defaultexcludes="yes">
+                <include name="boofcv/**"/>
+            </packageset>
+	    <packageset dir="io/src" defaultexcludes="yes">
+                <include name="boofcv/**"/>
+            </packageset>
+	    <packageset dir="feature/src" defaultexcludes="yes">
+                <include name="boofcv/**"/>
+            </packageset>
+	    <packageset dir="geo/src" defaultexcludes="yes">
+                <include name="boofcv/**"/>
+            </packageset>
+
+            <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright &#169; 2011 Peter Abeles All Rights Reserved.</i>]]></bottom>
+ 
+        </javadoc>
+    </target>
+
+    <target name="clean">
+        <delete dir="${jar.dir}"/>
+	<ant dir="ip/" target="clean"/>
+	<ant dir="io/" target="clean"/>
+	<ant dir="geo/" target="clean"/>
+	<ant dir="feature/" target="clean"/>
+    </target>
+
+    <target name="jar">
+	<ant dir="ip" inheritAll="false"/>
+	<ant dir="feature/" inheritAll="false"/>
+	<ant dir="geo/" inheritAll="false"/>
+	<ant dir="io/" inheritAll="false"/>
+	<jar destfile="${lib.dir}/${ant.project.name}.jar">
+	  <zipgroupfileset dir="jar" includes="*.jar" /> 
+	</jar>
+    </target>
+
+    <target name="main" depends="clean,jar"/>
+</project>
