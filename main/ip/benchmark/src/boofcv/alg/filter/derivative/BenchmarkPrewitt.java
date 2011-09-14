@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.derivative;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.alg.filter.derivative.impl.GradientPrewitt_Shared;
 
 /**

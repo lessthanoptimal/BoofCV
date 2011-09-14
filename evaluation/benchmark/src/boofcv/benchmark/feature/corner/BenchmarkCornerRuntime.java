@@ -18,8 +18,8 @@
 
 package boofcv.benchmark.feature.corner;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;

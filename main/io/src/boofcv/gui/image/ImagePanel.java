@@ -20,6 +20,7 @@ package boofcv.gui.image;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 
@@ -31,9 +32,16 @@ import java.awt.image.BufferedImage;
 public class ImagePanel extends JPanel {
 	// the image being displayed
 	protected BufferedImage img;
+	// should it re-size the image based on the panel's size
+	protected boolean resize = true;
 
 	public ImagePanel(BufferedImage img) {
+		this(img,false);
+	}
+
+	public ImagePanel(BufferedImage img , boolean resize ) {
 		this.img = img;
+		this.resize = resize;
 		setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
 	}
 
@@ -43,9 +51,27 @@ public class ImagePanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D)g;
+
 		//draw the image
-		if (img != null)
-			g.drawImage(img, 0, 0, this);
+		if (img != null) {
+			if( resize ) {
+				double ratioW = (double)getWidth()/(double)img.getWidth();
+				double ratioH = (double)getHeight()/(double)img.getHeight();
+
+				double ratio = Math.min(ratioW,ratioH);
+				if( ratio >= 1 ) {
+					g.drawImage(img, 0, 0, this);
+				} else {
+					AffineTransform tran = new AffineTransform();
+					tran.setToScale(ratio,ratio);
+					g2.drawImage(img,tran,null);
+				}
+
+			} else {
+				g2.drawImage(img, 0, 0, this);
+			}
+		}
 	}
 
 	/**
@@ -59,5 +85,9 @@ public class ImagePanel extends JPanel {
 
 	public BufferedImage getImage() {
 		return img;
+	}
+
+	public void setResize(boolean resize) {
+		this.resize = resize;
 	}
 }

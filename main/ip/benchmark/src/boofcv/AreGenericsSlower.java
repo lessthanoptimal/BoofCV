@@ -19,6 +19,8 @@
 package boofcv;
 
 import boofcv.alg.misc.ImageTestingOps;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 

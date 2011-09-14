@@ -47,11 +47,11 @@
 
     <target name="jar">
 	<ant dir="ip" inheritAll="false"/>
-	<ant dir="feature/" inheritAll="false"/>
-	<ant dir="geo/" inheritAll="false"/>
-	<ant dir="io/" inheritAll="false"/>
+	<ant dir="feature" inheritAll="false"/>
+	<ant dir="geo" inheritAll="false"/>
+	<ant dir="io" inheritAll="false"/>
 	<jar destfile="${lib.dir}/${ant.project.name}.jar">
-	  <zipgroupfileset dir="jar" includes="*.jar" /> 
+	  <zipgroupfileset dir="${jar.dir}" includes="*.jar" /> 
 	</jar>
     </target>
 

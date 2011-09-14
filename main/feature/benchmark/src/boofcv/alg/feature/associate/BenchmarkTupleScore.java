@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.Performer;
-import boofcv.ProfileOperation;
+import boofcv.misc.Performer;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;

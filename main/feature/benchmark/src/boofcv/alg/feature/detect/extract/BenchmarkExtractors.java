@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.extract;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;

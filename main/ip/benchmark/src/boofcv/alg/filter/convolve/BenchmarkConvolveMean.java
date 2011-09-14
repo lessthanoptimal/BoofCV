@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;

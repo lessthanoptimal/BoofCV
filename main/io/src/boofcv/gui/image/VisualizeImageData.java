@@ -52,8 +52,23 @@ public class VisualizeImageData {
 				}
 			}
 		} else if( ImageFloat32.class.isAssignableFrom(src.getClass()) ) {
-			float max = PixelMath.maxAbs((ImageFloat32)src);
-			return grayMagnitude((ImageFloat32)src,dst,max);
+			ImageFloat32 img = (ImageFloat32)src;
+			float max = PixelMath.maxAbs(img);
+
+			boolean hasNegative = false;
+			for( int i = 0; i < img.getHeight(); i++ ) {
+				for( int j = 0; j < img.getWidth(); j++ ) {
+					if( img.get(j,i) < 0 ) {
+						hasNegative = true;
+						break;
+					}
+				}
+			}
+
+			if( hasNegative )
+				return colorizeSign(img,dst,(int)max);
+			else
+				return grayMagnitude((ImageFloat32)src,dst,max);
 		}
 
 		return dst;

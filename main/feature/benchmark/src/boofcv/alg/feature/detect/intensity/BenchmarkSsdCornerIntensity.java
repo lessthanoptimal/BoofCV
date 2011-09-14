@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.alg.feature.detect.intensity.impl.*;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;

@@ -18,8 +18,8 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.PerformerBase;
-import boofcv.ProfileOperation;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.alg.interpolate.impl.BilinearRectangle_F32;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;

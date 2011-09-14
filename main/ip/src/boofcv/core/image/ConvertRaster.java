@@ -146,7 +146,9 @@ public class ConvertRaster {
 	 * A faster convert that works directly with a specific raster
 	 */
 	public static void bufferedToGray(IntegerInterleavedRaster src, ImageFloat32 dst) {
+		System.err.println("Before get storage");
 		int[] srcData = src.getDataStorage();
+		System.err.println("After get storage");
 
 		float[] data = dst.data;
 

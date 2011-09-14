@@ -29,7 +29,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ProcessImageSequence;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.wrapper.xuggler.XugglerSimplified;
+import boofcv.io.video.BuboVideoManager;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import boofcv.struct.image.ImageBase;
@@ -135,7 +135,7 @@ public class StabilizeImageSequence<I extends ImageBase> extends ProcessImageSeq
 	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		SimpleImageSequence<I> sequence = new XugglerSimplified<I>(fileName, imageType);
+		SimpleImageSequence<I> sequence = BuboVideoManager.loadManagerDefault().load(fileName, imageType);
 
 		PointSequentialTracker<I> tracker;
 
