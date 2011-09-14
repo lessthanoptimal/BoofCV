@@ -48,27 +48,16 @@
       <option name="notice" value="Copyright (c) 2011, Peter Abeles. All Rights Reserved.&#10;&#10;This file is part of BoofCV (http://www.boofcv.org).&#10;&#10;Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);&#10;you may not use this file except in compliance with the License.&#10;You may obtain a copy of the License at&#10;&#10;  http://www.apache.org/licenses/LICENSE-2.0&#10;&#10;Unless required by applicable law or agreed to in writing, software&#10;distributed under the License is distributed on an &quot;AS IS&quot; BASIS,&#10;WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.&#10;See the License for the specific language governing permissions and&#10;limitations under the License." />
       <option name="keyword" value="Copyright" />
       <option name="allowReplaceKeyword" value="" />
-      <option name="myName" value="BOOFCV" />
+      <option name="myName" value="BoofCV" />
       <option name="myLocal" value="true" />
     </copyright>
-    <copyright>
-      <option name="notice" value="Copyright (c) 2011, Peter Abeles. All Rights Reserved.&#10; &#10;This file is part of Geometric Regression Library (GeoRegression).&#10;&#10;GeoRegression is free software: you can redistribute it and/or modify&#10;it under the terms of the GNU Lesser General Public License as&#10;published by the Free Software Foundation, either version 3&#10;of the License, or (at your option) any later version.&#10;&#10;JGRL is distributed in the hope that it will be useful,&#10;but WITHOUT ANY WARRANTY; without even the implied warranty of&#10;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the&#10;GNU Lesser General Public License for more details.&#10;&#10;You should have received a copy of the GNU Lesser General Public&#10;License along with GeoRegression.  If not, see &lt;http://www.gnu.org/licenses/&gt;." />
-      <option name="keyword" value="Copyright" />
-      <option name="allowReplaceKeyword" value="" />
-      <option name="myName" value="GeoRegression" />
-      <option name="myLocal" value="true" />
-    </copyright>
-    <module2copyright>
-      <element module="BOOFCV" copyright="BOOFCV" />
-      <element module="GeoRegression" copyright="GeoRegression" />
-    </module2copyright>
+    <module2copyright />
   </component>
   <component name="DependenciesAnalyzeManager">
     <option name="myForwardDirection" value="false" />
   </component>
   <component name="DependencyValidationManager">
-    <scope name="BOOFCV" pattern="file[Feature]:*//*||file[Geometric Vision]:*//*||file[Image Processing]:*//*||file[apps]:*//*||file[evaluation]:*//*||file[io]:*//*" />
-    <scope name="GeoRegression" pattern="file[GeoRegression]:*//*" />
+    <scope name="BoofCV Main" pattern="file[BoofCV Feature]:*//*||file[BoofCV Geometric Vision]:*//*||file[BoofCV IO]:*//*||file[BoofCV Image Processing]:*//*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="EclipseCompilerSettings">
@@ -293,17 +282,13 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/apps/BoofCV Apps.iml" filepath="$PROJECT_DIR$/apps/BoofCV Apps.iml" />
-      <module fileurl="file://$PROJECT_DIR$/evaluation/BoofCV Evaluation.iml" filepath="$PROJECT_DIR$/evaluation/BoofCV Evaluation.iml" />
       <module fileurl="file://$PROJECT_DIR$/feature/BoofCV Feature.iml" filepath="$PROJECT_DIR$/feature/BoofCV Feature.iml" />
       <module fileurl="file://$PROJECT_DIR$/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/geo/BoofCV Geometric Vision.iml" />
       <module fileurl="file://$PROJECT_DIR$/io/BoofCV IO.iml" filepath="$PROJECT_DIR$/io/BoofCV IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/ip/BoofCV Image Processing.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../bubo/io/trunk/Bubo IO.iml" filepath="$PROJECT_DIR$/../bubo/io/trunk/Bubo IO.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../developmental/cv/Developmental-CV.iml" filepath="$PROJECT_DIR$/../developmental/cv/Developmental-CV.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../libpjajava/libpja.iml" filepath="$PROJECT_DIR$/../libpjajava/libpja.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../georegression/GeoRegression.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../../ejml/trunk/ejml.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../libpjajava/libpja.iml" filepath="$PROJECT_DIR$/../../libpjajava/libpja.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0_26" project-jdk-type="JavaSDK">
@@ -326,6 +311,11 @@
     <option name="ALTERNATIVE_WORKING_PATH" value="" />
     <option name="LOCK_ON_CHECKOUT" value="false" />
     <option name="UNLOCK_ON_CHECKIN" value="false" />
+  </component>
+  <component name="StructureViewFactory">
+    <option name="AUTOSCROLL_MODE" value="true" />
+    <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
+    <option name="ACTIVE_ACTIONS" value="" />
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myVersion" value="123" />
@@ -352,12 +342,10 @@
     </todo-panel>
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../bubo" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../developmental/cv" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../ejml" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../georegression" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../libpjajava" vcs="svn" />
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../ejml/trunk" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../georegression" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../libpjajava" vcs="svn" />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
