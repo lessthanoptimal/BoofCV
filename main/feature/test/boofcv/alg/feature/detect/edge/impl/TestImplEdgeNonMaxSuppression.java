@@ -71,14 +71,14 @@ public class TestImplEdgeNonMaxSuppression {
 			img.set(0,1,value);
 			img.set(2,1,value);
 		} else if( dir == 1 ) {
-			img.set(0,2,value);
-			img.set(2,0,value);
+			img.set(2,2,value);
+			img.set(0,0,value);
 		} else if( dir == 2 ) {
 			img.set(1,0,value);
 			img.set(1,2,value);
 		} else {
-			img.set(0,0,value);
-			img.set(2,2,value);
+			img.set(2,0,value);
+			img.set(0,2,value);
 		}
 	}
 
@@ -114,14 +114,14 @@ public class TestImplEdgeNonMaxSuppression {
 			img.set(0,1,value);
 			img.set(2,1,value);
 		} else if( dir == 1 || dir == -3) {
-			img.set(0,2,value);
-			img.set(2,0,value);
+			img.set(2,2,value);
+			img.set(0,0,value);
 		} else if( dir == 2 || dir == -2) {
 			img.set(1,0,value);
 			img.set(1,2,value);
 		} else {
-			img.set(0,0,value);
-			img.set(2,2,value);
+			img.set(2,0,value);
+			img.set(0,2,value);
 		}
 	}
 

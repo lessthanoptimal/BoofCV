@@ -51,7 +51,7 @@ public class TestScaleSpacePyramid {
 		ImageFloat32 input = new ImageFloat32(width,height);
 		GeneralizedImageOps.randomize(input,rand,0,100);
 
-		ss.update(input);
+		ss.setImage(input);
 
 		assertEquals(4,ss.getNumLayers());
 

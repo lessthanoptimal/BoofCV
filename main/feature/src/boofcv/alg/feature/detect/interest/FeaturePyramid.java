@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -58,7 +59,9 @@ import static boofcv.alg.feature.detect.interest.FeatureScaleSpace.checkMax;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
+public class FeaturePyramid<T extends ImageBase, D extends ImageBase>
+	implements InterestPointScaleSpacePyramid<T>
+{
 
 	// generalized feature detector.  Used to find candidate features in each scale's image
 	private GeneralFeatureDetector<T,D> detector;
@@ -98,6 +101,7 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 	 *
 	 * @param ss Scale space of an image
 	 */
+	@Override
 	public void detect( ScaleSpacePyramid<T> ss ) {
 		spaceIndex = 0;
 		if( intensities == null ) {
@@ -202,7 +206,7 @@ public class FeaturePyramid<T extends ImageBase, D extends ImageBase> {
 		}
 	}
 
-
+	@Override
 	public List<ScalePoint> getInterestPoints() {
 		return foundPoints;
 	}

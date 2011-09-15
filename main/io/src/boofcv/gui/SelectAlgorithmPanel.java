@@ -49,9 +49,12 @@ public abstract class SelectAlgorithmPanel extends JPanel implements ActionListe
 		add(toolbar, BorderLayout.PAGE_START);
 	}
 
-	public void addAlgorithm( String name , Object cookie ) {
+	public void addAlgorithm( final String name , Object cookie ) {
 		cookies.add(cookie);
-		algBox.addItem(name);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				algBox.addItem(name);
+			}});
 	}
 
 	/**
@@ -61,36 +64,34 @@ public abstract class SelectAlgorithmPanel extends JPanel implements ActionListe
 	public void refreshAlgorithm() {
 		Object cookie = cookies.get(algBox.getSelectedIndex());
 		String name = (String)algBox.getSelectedItem();
-		algBox.setEditable(false);
-		new PerformSetAlgorithm(cookie,name).start();
+		performSetAlgorithm(cookie, name);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JComboBox cb = (JComboBox)e.getSource();
-		Object cookie = cookies.get(cb.getSelectedIndex());
-		String name = (String)cb.getSelectedItem();
-		algBox.setEnabled(false);
-		new PerformSetAlgorithm(cookie,name).start();
+
+		final Object cookie = cookies.get(cb.getSelectedIndex());
+		final String name = (String)cb.getSelectedItem();
+		
+		new Thread() {
+			public void run() {
+				performSetAlgorithm(cookie, name);
+			}
+		}.start();
+	}
+
+	private void performSetAlgorithm(Object cookie, String name) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				algBox.setEnabled(false);
+				}});
+		setActiveAlgorithm( name , cookie );
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				algBox.setEnabled(true);
+			}});
 	}
 
 	public abstract void setActiveAlgorithm( String name , Object cookie );
-
-	private class PerformSetAlgorithm extends Thread
-	{
-		Object cookie;
-		String name;
-
-		private PerformSetAlgorithm(Object cookie, String name) {
-			this.cookie = cookie;
-			this.name = name;
-		}
-
-		@Override
-		public void run() {
-			setActiveAlgorithm( name , cookie );
-			algBox.setEnabled(true);
-		}
-
-	}
 }

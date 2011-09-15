@@ -18,7 +18,6 @@
 
 package boofcv.applet;
 
-import boofcv.alg.filter.derivative.ShowImageDerivative;
 import boofcv.struct.image.ImageFloat32;
 
 import javax.imageio.ImageIO;
@@ -32,23 +31,28 @@ import java.net.URL;
 /**
  * @author Peter Abeles
  */
-public class MasterApplet extends JApplet {
-
-	Class inputType = ImageFloat32.class;
-	Class derivType = ImageFloat32.class;
-
-	BufferedImage image;
+public class SingleInputApplet extends JApplet {
 
 	@Override
 	public void init() {
-		image = loadImage("data/indoors01.jpg");
+		showStatus("Loading Input Image");
+		String directory = getParameter("directory");
+		final BufferedImage image = loadImage(directory+"data/indoors01.jpg");
 
-//		ShowImages.showWindow(image,"Image");
-		ShowImageDerivative deriv = new ShowImageDerivative(inputType,derivType);
+		final String panelPath = getParameter("panelPath");
+		Class inputType = ImageFloat32.class;
 
-		deriv.process(image);
-//		ShowImages.showWindow(deriv,"Derivative");
-		getContentPane().add(deriv,BorderLayout.CENTER);
+		showStatus("Creating GUI component");
+		final JComponent comp = FactoryVisualPanel.create(panelPath,inputType);
+		if( comp == null ) {
+			showStatus("Failed to create GUI component");
+		} else {
+			getContentPane().add(comp, BorderLayout.CENTER);
+				if( !FactoryVisualPanel.invokeProcess(comp,image) )
+				showStatus("Failed to invoke process");
+			else
+				showStatus("Running");
+		}
 	}
 
 
@@ -64,6 +68,6 @@ public class MasterApplet extends JApplet {
 
 	@Override
 	public String getAppletInfo() {
-		return "Draws a sin graph.";
+		return "Shows gradient of an image";
 	}
 }

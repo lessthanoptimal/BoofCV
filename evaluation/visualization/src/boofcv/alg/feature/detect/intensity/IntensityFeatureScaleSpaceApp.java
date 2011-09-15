@@ -45,14 +45,14 @@ import java.awt.image.BufferedImage;
 public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase>
 		extends SelectAlgorithmPanel {
 
-//	static String fileName = "evaluation/data/outdoors01.jpg";
-//	static String fileName = "evaluation/data/sunflowers.png";
-//	static String fileName = "evaluation/data/particles01.jpg";
-//	static String fileName = "evaluation/data/scale/beach02.jpg";
-//	static String fileName = "evaluation/data/scale/mountain_7p1mm.jpg";
-//	static String fileName = "evaluation/data/indoors01.jpg";
-//	static String fileName = "evaluation/data/shapes01.png";
-	static String fileName = "evaluation/data/stitch/cave_01.jpg";
+//	static String fileName = "data/outdoors01.jpg";
+	static String fileName = "data/sunflowers.png";
+//	static String fileName = "data/particles01.jpg";
+//	static String fileName = "data/scale/beach02.jpg";
+//	static String fileName = "data/scale/mountain_7p1mm.jpg";
+//	static String fileName = "data/indoors01.jpg";
+//	static String fileName = "data/shapes01.png";
+//	static String fileName = "data/stitch/cave_01.jpg";
 
 	ListDisplayPanel gui = new ListDisplayPanel();
 
@@ -77,7 +77,7 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 
 		ss = FactoryGaussianScaleSpace.nocache(imageType);
 
-		double scales[] = new double[31];
+		double scales[] = new double[25];
 		for( int i = 0; i < scales.length ; i++ ) {
 			scales[i] =  Math.exp(i*0.15);
 		}
@@ -99,7 +99,6 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Computing Scale Space Response",
 				"", 0, ss.getTotalScales());
-
 
 		for( int i = 0; i < ss.getTotalScales() && !progressMonitor.isCanceled(); i++ ) {
 			ss.setActiveScale(i);
@@ -124,19 +123,20 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 					progressMonitor.setProgress(progressStatus);
 				}
 			});
-
 		}
+		gui.requestFocusInWindow();
 	}
 
-	public synchronized void setImage( BufferedImage input ) {
-		setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
+	public synchronized void process( final BufferedImage input ) {
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 		ss.setImage(workImage);
-		setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
+			}
+		});
 		refreshAlgorithm();
-
-		ShowImages.showWindow(this,"Feature Scale Space Intensity: "+imageType.getSimpleName());
 	}
 
 	public static void main( String args[] ) {
@@ -144,10 +144,12 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 
 		IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32> app =
 				new IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
-		app.setImage(input);
+		app.process(input);
 
 //		IntensityFeatureScaleSpaceApp<ImageUInt8, ImageSInt16> app2 =
 //				new IntensityFeatureScaleSpaceApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 //		app2.setImage(input);
+		ShowImages.showWindow(app,"Feature Scale Space Intensity");
+
 	}
 }

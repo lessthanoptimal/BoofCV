@@ -40,7 +40,7 @@ public class TestConvertRaster {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	int numMethods = 12;
+	int numMethods = 15;
 
 	/**
 	 * Use reflections to test all the functions.

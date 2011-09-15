@@ -18,6 +18,7 @@
 
 package boofcv.io.image;
 
+import boofcv.core.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageBase;
 
 import javax.swing.*;
@@ -183,7 +184,8 @@ public abstract class ProcessImageSequence<T extends ImageBase> implements Mouse
 			System.out.println("Saving image");
 			String name = String.format("image%05d.jpg", savedIndex++);
 
-			UtilImageIO.saveImage(image, name);
+			BufferedImage img = ConvertBufferedImage.convertTo(image,null);
+			UtilImageIO.saveImage(img, name);
 
 		} else {
 			paused = true;

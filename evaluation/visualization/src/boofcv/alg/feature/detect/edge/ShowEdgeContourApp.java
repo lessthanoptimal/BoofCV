@@ -29,6 +29,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -42,23 +43,23 @@ import java.util.Random;
 public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		extends SelectAlgorithmPanel {
 
-	static String fileName = "evaluation/data/outdoors01.jpg";
-//	static String fileName = "evaluation/data/sunflowers.png";
-//	static String fileName = "evaluation/data/particles01.jpg";
-//	static String fileName = "evaluation/data/scale/beach02.jpg";
-//	static String fileName = "evaluation/data/shapes01.png";
+	static String fileName = "data/outdoors01.jpg";
+//	static String fileName = "data/sunflowers.png";
+//	static String fileName = "data/particles01.jpg";
+//	static String fileName = "data/scale/beach02.jpg";
+//	static String fileName = "data/shapes01.png";
 
-	ImagePanel panel;
+	// shows panel for displaying input image
+	ImagePanel panel = new ImagePanel();
 
 	BufferedImage input;
 	Class<T> imageType;
 	Class<D> derivType;
 
-	public ShowEdgeContourApp(BufferedImage input, Class<T> imageType, Class<D> derivType) {
-		this.input = input;
+	public ShowEdgeContourApp(Class<T> imageType, Class<D> derivType) {
+
 		this.imageType = imageType;
 		this.derivType = derivType;
-		panel = new ImagePanel(input);
 
 		addAlgorithm("Original Image", null);
 		addAlgorithm("Canny", FactoryDetectEdgeContour.canny(1,40,imageType,derivType));
@@ -67,8 +68,22 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		add(panel, BorderLayout.CENTER);
 	}
 
+	public void process( BufferedImage input ) {
+		this.input = input;
+		panel.setBufferedImage(input);
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				setPreferredSize(new Dimension(width,height));
+				panel.repaint();
+			}});
+	}
+
 	@Override
 	public void setActiveAlgorithm(String name, Object cookie) {
+		if( input == null )
+			return;
 		if( cookie == null ) {
 			panel.setBufferedImage(input);
 			panel.repaint();
@@ -82,11 +97,7 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		contour.process(workImage);
 		List<List<Point2D_I32>> found = contour.getContours();
 
-
 		BufferedImage temp = new BufferedImage(input.getWidth(),input.getHeight(),input.getType());
-		Graphics2D g2 = (Graphics2D)temp.getGraphics();
-
-//		g2.drawImage(input,0,0,null);
 
 		Random rand = new Random(234);
 		for( List<Point2D_I32> l : found ) {
@@ -104,10 +115,11 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
 		ShowEdgeContourApp<ImageFloat32,ImageFloat32> app =
-				new ShowEdgeContourApp<ImageFloat32, ImageFloat32>(input,ImageFloat32.class, ImageFloat32.class);
+				new ShowEdgeContourApp<ImageFloat32, ImageFloat32>(ImageFloat32.class, ImageFloat32.class);
 //		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
+		app.process(input);
 		ShowImages.showWindow(app,"Contours");
 //		input = UtilImageIO.loadImage(fileName);
 //		doStuff(input, ImageUInt8.class, ImageSInt16.class);
