@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.interest.InterestPointScaleSpace;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.QueueCorner;
@@ -49,7 +50,9 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FeatureScaleSpace<T extends ImageBase, D extends ImageBase> {
+public class FeatureScaleSpace<T extends ImageBase, D extends ImageBase>
+		implements InterestPointScaleSpace<T,D>
+{
 
 	// generalized feature detector.  Used to find candidate features in each scale's image
 	private GeneralFeatureDetector<T,D> detector;
@@ -85,6 +88,7 @@ public class FeatureScaleSpace<T extends ImageBase, D extends ImageBase> {
 	 *
 	 * @param ss Scale space of an image
 	 */
+	@Override
 	public void detect( GaussianScaleSpace<T,D> ss ) {
 		spaceIndex = 0;
 		if( intensities == null ) {
@@ -198,7 +202,7 @@ public class FeatureScaleSpace<T extends ImageBase, D extends ImageBase> {
 		return isMax;
 	}
 
-
+	@Override
 	public List<ScalePoint> getInterestPoints() {
 		return foundPoints;
 	}

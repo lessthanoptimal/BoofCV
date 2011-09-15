@@ -46,7 +46,7 @@ public class WrapFLPtoInterestPoint<T extends ImageBase, D extends ImageBase> im
 
 	@Override
 	public void detect(T input) {
-		ss.update(input);
+		ss.setImage(input);
 
 		detector.detect(ss);
 

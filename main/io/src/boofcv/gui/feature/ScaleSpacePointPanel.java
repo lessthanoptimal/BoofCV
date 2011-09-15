@@ -53,12 +53,19 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 
 	public void setBackground( BufferedImage background ) {
 		this.background = background;
-		setPreferredSize(new Dimension(background.getWidth(),background.getHeight()));
+		final int width = background.getWidth();
+		final int height = background.getHeight();
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				setPreferredSize(new Dimension(width,height));
+			}});
 	}
 
 	public synchronized void setPoints( List<ScalePoint> points ) {
 		unused.addAll(this.points);
 		this.points.clear();
+		this.activeLevel = 0;
 
 		for( ScalePoint p : points ) {
 			if( unused.isEmpty() ) {
@@ -72,7 +79,7 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 	}
 
 	private synchronized void setLevel( int level ) {
-		System.out.println("level "+level);
+//		System.out.println("level "+level);
 		if( level > 0 ) {
 			ss.setActiveScale(level-1);
 			levelImage = ConvertBufferedImage.convertTo(ss.getScaledImage(),levelImage);
@@ -120,22 +127,14 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+	public void mousePressed(MouseEvent e) {}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+	public void mouseReleased(MouseEvent e) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+	public void mouseEntered(MouseEvent e) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+	public void mouseExited(MouseEvent e) {}
 }

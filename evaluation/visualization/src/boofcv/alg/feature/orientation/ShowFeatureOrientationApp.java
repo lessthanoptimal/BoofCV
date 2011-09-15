@@ -36,6 +36,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I16;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -47,11 +48,11 @@ import java.awt.image.BufferedImage;
 public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase>
 		extends SelectAlgorithmPanel {
 
-//	static String fileName = "evaluation/data/outdoors01.jpg";
-//	static String fileName = "evaluation/data/sunflowers.png";
-//	static String fileName = "evaluation/data/particles01.jpg";
-//	static String fileName = "evaluation/data/scale/beach02.jpg";
-	static String fileName = "evaluation/data/shapes01.png";
+//	static String fileName = "data/outdoors01.jpg";
+//	static String fileName = "data/sunflowers.png";
+//	static String fileName = "data/particles01.jpg";
+//	static String fileName = "data/scale/beach02.jpg";
+	static String fileName = "data/shapes01.png";
 
 	ImagePanel panel;
 
@@ -63,7 +64,7 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 	Class<T> imageType;
 	Class<D> derivType;
 
-	public ShowFeatureOrientationApp(BufferedImage input, Class<T> imageType, Class<D> derivType) {
+	public ShowFeatureOrientationApp(Class<T> imageType, Class<D> derivType) {
 		this.input = input;
 		this.imageType = imageType;
 		this.derivType = derivType;
@@ -78,12 +79,25 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		addAlgorithm("Average II", FactoryOrientationAlgs.average_ii(radius,false,imageType));
 		addAlgorithm("Average II Weighted", FactoryOrientationAlgs.average_ii(radius,true,imageType));
 
-		panel = new ImagePanel(input);
+		panel = new ImagePanel();
 		add(panel, BorderLayout.CENTER);
+	}
+
+	public void process( final BufferedImage input ) {
+		panel.setBufferedImage(input);
+		this.input = input;
+		refreshAlgorithm();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
+			}});
 	}
 
 	@Override
 	public void setActiveAlgorithm(String name, Object cookie) {
+		if( input == null )
+			return;
+		
 		RegionOrientation orientation = (RegionOrientation)cookie;
 
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
@@ -139,7 +153,9 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
 		ShowFeatureOrientationApp<ImageFloat32,ImageFloat32> app =
-				new ShowFeatureOrientationApp<ImageFloat32, ImageFloat32>(input,ImageFloat32.class, ImageFloat32.class);
+				new ShowFeatureOrientationApp<ImageFloat32, ImageFloat32>(ImageFloat32.class, ImageFloat32.class);
+		app.process(input);
+
 //		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 

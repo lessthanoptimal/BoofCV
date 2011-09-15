@@ -18,8 +18,6 @@
 
 package boofcv.io.image;
 
-import boofcv.struct.image.ImageBase;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -29,11 +27,6 @@ import java.io.IOException;
  * @author Peter Abeles
  */
 public class UtilImageIO {
-
-
-	public static void saveImage(ImageBase image, String fileName) {
-
-	}
 
 	/**
 	 * A function that load the specified image.  If anything goes wrong it returns a

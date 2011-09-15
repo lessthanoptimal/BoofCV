@@ -86,7 +86,7 @@ public class ScaleSpacePyramid<T extends ImageBase> extends PyramidFloat<T> {
 		updater.setInterpolate(interpolate);
 	}
 
-	public void update( T image ) {
+	public void setImage( T image ) {
 		updater.update(image,this);
 	}
 

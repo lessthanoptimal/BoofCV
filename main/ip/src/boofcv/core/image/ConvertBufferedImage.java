@@ -179,7 +179,6 @@ public class ConvertBufferedImage {
 	 * it will be used for output, otherwise a new image will be created.
 	 */
 	public static <T extends ImageBase> T convertFrom(BufferedImage src, T dst, Class<T> type) {
-		System.out.println("Inside convert from");
 		if (type == ImageUInt8.class) {
 			return (T) convertFrom(src, (ImageUInt8) dst);
 		} else if (type == ImageFloat32.class) {
@@ -286,11 +285,41 @@ public class ConvertBufferedImage {
 	public static BufferedImage convertTo(ImageUInt8 src, BufferedImage dst) {
 		dst = checkInputs(src, dst);
 
-		if (dst.getRaster() instanceof ByteInterleavedRaster) {
-			ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
-		} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
-			ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
-		} else {
+		try {
+			if (dst.getRaster() instanceof ByteInterleavedRaster) {
+				ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
+			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
+				ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
+			} else {
+				ConvertRaster.grayToBuffered(src, dst);
+			}
+		} catch( java.security.AccessControlException e) {
+			ConvertRaster.grayToBuffered(src, dst);
+		}
+
+		return dst;
+	}
+
+	/**
+	 * Converts a {@link boofcv.struct.image.ImageSInt16} into a BufferedImage.  If the buffered image
+	 * has multiple channels the intensities of each channel are averaged together.
+	 *
+	 * @param src Input image.
+	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @return Converted image.
+	 */
+	public static BufferedImage convertTo(ImageSInt16 src, BufferedImage dst) {
+		dst = checkInputs(src, dst);
+
+		try {
+			if (dst.getRaster() instanceof ByteInterleavedRaster) {
+				ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
+			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
+				ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
+			} else {
+				ConvertRaster.grayToBuffered(src, dst);
+			}
+		} catch( java.security.AccessControlException e) {
 			ConvertRaster.grayToBuffered(src, dst);
 		}
 
@@ -309,11 +338,15 @@ public class ConvertBufferedImage {
 	public static BufferedImage convertTo(ImageFloat32 src, BufferedImage dst) {
 		dst = checkInputs(src, dst);
 
-		if (dst.getRaster() instanceof ByteInterleavedRaster) {
-			ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
-		} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
-			ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
-		} else {
+		try {
+			if (dst.getRaster() instanceof ByteInterleavedRaster) {
+				ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
+			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
+				ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
+			} else {
+				ConvertRaster.grayToBuffered(src, dst);
+			}
+		} catch( java.security.AccessControlException e) {
 			ConvertRaster.grayToBuffered(src, dst);
 		}
 

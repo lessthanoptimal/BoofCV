@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.impl;
+package boofcv.core.image;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;

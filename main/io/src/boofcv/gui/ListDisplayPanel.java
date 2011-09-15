@@ -64,15 +64,20 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 	}
 
 	public void reset() {
-		try {
-			SwingUtilities.invokeAndWait(new Runnable() {
-				public void run() {
-					panels.clear();
-					listModel.removeAllElements();
-				}
-			});
-		} catch (InterruptedException e) {
-		} catch (InvocationTargetException e) {
+		if( SwingUtilities.isEventDispatchThread() ) {
+			panels.clear();
+			listModel.removeAllElements();
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						panels.clear();
+						listModel.removeAllElements();
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
 		}
 	}
 
@@ -114,10 +119,10 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 		if( e.getValueIsAdjusting() )
 			return;
 
-		final int index = listPanel.getSelectedIndex();
-		if( index >= 0 ) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				final int index = listPanel.getSelectedIndex();
+				if( index >= 0 ) {
 					// the split pane likes to screw up the divider location when the
 					// right component is changed and a scroll pane is being used on the left
 					int loc = splitPane.getDividerLocation();
@@ -125,17 +130,18 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 					splitPane.setDividerLocation(loc);
 					splitPane.repaint();
 				}
-			});
-		}
+			}
+		});
+
 	}
 
 	@Override
-	public void componentResized(ComponentEvent e) {
-		final int w = e.getComponent().getWidth();
-		final int h = e.getComponent().getHeight();
-
+	public void componentResized( final ComponentEvent e) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				final int w = e.getComponent().getWidth();
+				final int h = e.getComponent().getHeight();
+
 				splitPane.setPreferredSize(new Dimension(w, h));
 				splitPane.setDividerLocation((int)listPanel.getPreferredSize().getWidth()+1);
 //				splitPane.repaint();
@@ -163,11 +169,12 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 	 * @param width
 	 * @param height
 	 */
-	public void setDataDisplaySize(int width, int height) {
-
-		int w = width + splitPane.getDividerLocation();
-		int h = (int)Math.max(height,listPanel.getPreferredSize().getHeight());
-
-		splitPane.setPreferredSize(new Dimension(w,h));
+	public void setDataDisplaySize(final int width, final int height) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				final int w = width + splitPane.getDividerLocation();
+				final int h = (int)Math.max(height,listPanel.getPreferredSize().getHeight());
+				splitPane.setPreferredSize(new Dimension(w,h));
+			}});
 	}
 }

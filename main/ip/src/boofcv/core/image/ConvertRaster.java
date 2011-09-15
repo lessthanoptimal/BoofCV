@@ -19,6 +19,7 @@
 package boofcv.core.image;
 
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -146,9 +147,7 @@ public class ConvertRaster {
 	 * A faster convert that works directly with a specific raster
 	 */
 	public static void bufferedToGray(IntegerInterleavedRaster src, ImageFloat32 dst) {
-		System.err.println("Before get storage");
 		int[] srcData = src.getDataStorage();
-		System.err.println("After get storage");
 
 		float[] data = dst.data;
 
@@ -274,7 +273,45 @@ public class ConvertRaster {
 		} else {
 			throw new RuntimeException("Code more here");
 		}
+	}
 
+	public static void grayToBuffered(ImageSInt16 src, ByteInterleavedRaster dst) {
+//        dst.markDirty();
+
+		final short[] srcData = src.data;
+		final byte[] dstData = dst.getDataStorage();
+
+		final int numBands = dst.getNumBands();
+
+		final int size = src.getWidth() * src.getHeight();
+
+		if (numBands == 3) {
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + src.stride * y;
+				int indexSrcEnd = indexSrc + src.width;
+
+				for (; indexSrc < indexSrcEnd; indexSrc++) {
+					byte val = (byte)srcData[indexSrc];
+
+					dstData[indexDst++] = val;
+					dstData[indexDst++] = val;
+					dstData[indexDst++] = val;
+				}
+			}
+		} else if (numBands == 1) {
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + src.stride * y;
+				int indexSrcEnd = indexSrc + src.width;
+
+				for (; indexSrc < indexSrcEnd; indexSrc++) {
+					dstData[indexDst++] = (byte)srcData[indexSrc];
+				}
+			}
+		} else {
+			throw new RuntimeException("Code more here");
+		}
 	}
 
 	public static void grayToBuffered(ImageFloat32 src, ByteInterleavedRaster dst) {
@@ -284,9 +321,6 @@ public class ConvertRaster {
 		final byte[] dstData = dst.getDataStorage();
 
 		final int numBands = dst.getNumBands();
-
-		final int size = src.getWidth() * src.getHeight();
-
 
 		if (numBands == 3) {
 			int indexDst = 0;
@@ -342,18 +376,13 @@ public class ConvertRaster {
 		} else {
 			throw new RuntimeException("Code more here");
 		}
-
 	}
 
-	public static void grayToBuffered(ImageFloat32 src, IntegerInterleavedRaster dst) {
-//        dst.markDirty();
-
-		final float[] srcData = src.data;
+	public static void grayToBuffered(ImageSInt16 src, IntegerInterleavedRaster dst) {
+		final short[] srcData = src.data;
 		final int[] dstData = dst.getDataStorage();
 
 		final int numBands = dst.getNumBands();
-
-		final int size = src.getWidth() * src.getHeight();
 
 		if (numBands == 3) {
 			int indexDst = 0;
@@ -369,7 +398,28 @@ public class ConvertRaster {
 		} else {
 			throw new RuntimeException("Code more here");
 		}
+	}
 
+	public static void grayToBuffered(ImageFloat32 src, IntegerInterleavedRaster dst) {
+		final float[] srcData = src.data;
+		final int[] dstData = dst.getDataStorage();
+
+		final int numBands = dst.getNumBands();
+
+		if (numBands == 3) {
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + y * src.stride;
+
+				for (int x = 0; x < src.width; x++) {
+					int v = (int)srcData[indexSrc++];
+
+					dstData[indexDst++] = v << 16 | v << 8 | v;
+				}
+			}
+		} else {
+			throw new RuntimeException("Code more here");
+		}
 	}
 
 	public static void grayToBuffered(ImageUInt8 src, BufferedImage dst) {
@@ -393,6 +443,26 @@ public class ConvertRaster {
 
 	}
 
+	public static void grayToBuffered(ImageSInt16 src, BufferedImage dst) {
+//        dst.markDirty();
+
+		final int width = dst.getWidth();
+		final int height = dst.getHeight();
+
+		short[] data = src.data;
+		for (int y = 0; y < height; y++) {
+			int indexSrc = src.startIndex + src.stride * y;
+
+			for (int x = 0; x < width; x++) {
+				int v = (int)data[indexSrc++];
+
+				int argb = v << 16 | v << 8 | v;
+
+				dst.setRGB(x, y, argb);
+			}
+		}
+	}
+
 	public static void grayToBuffered(ImageFloat32 src, BufferedImage dst) {
 //        dst.markDirty();
 
@@ -411,6 +481,5 @@ public class ConvertRaster {
 				dst.setRGB(x, y, argb);
 			}
 		}
-
 	}
 }

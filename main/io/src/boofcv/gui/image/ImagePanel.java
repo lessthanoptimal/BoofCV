@@ -39,7 +39,7 @@ public class ImagePanel extends JPanel {
 		this(img,false);
 	}
 
-	public ImagePanel(BufferedImage img , boolean resize ) {
+	public ImagePanel(final BufferedImage img , boolean resize ) {
 		this.img = img;
 		this.resize = resize;
 		setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));

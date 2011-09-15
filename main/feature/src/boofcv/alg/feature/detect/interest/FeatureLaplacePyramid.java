@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
@@ -49,7 +50,9 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
+public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase>
+	implements InterestPointScaleSpacePyramid<T>
+{
 
 	// used to compute feature intensity across scale space
 	private ImageFunctionSparse<T> sparseLaplace;
@@ -94,6 +97,7 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
 	 *
 	 * @param ss Scale space of an image
 	 */
+	@Override
 	public void detect( ScaleSpacePyramid<T> ss ) {
 		spaceIndex = 0;
 		if( maximums == null ) {
@@ -207,6 +211,7 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase> {
 		return isMax;
 	}
 
+	@Override
 	public List<ScalePoint> getInterestPoints() {
 		return foundPoints;
 	}

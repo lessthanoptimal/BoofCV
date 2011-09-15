@@ -61,7 +61,7 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 		addAlgorithm("Original",panelInput);
 	}
 
-	public void process(BufferedImage original ) {
+	public void process( final BufferedImage original ) {
 
 		T image = ConvertBufferedImage.convertFrom(original,null,imageType);
 
@@ -73,13 +73,17 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 		addDerivative(image,"Three",FactoryDerivative.three(imageType,derivType),derivX,derivY);
 		addDerivative(image,"Gaussian", FactoryDerivative.gaussian(-1,3,imageType,derivType),derivX,derivY);
 
+
 		panelInput.setResize(true);
 		panelInput.setBufferedImage(original);
 
-		// adjust the prefered size for the list panel
-		int width = panelX.getListWidth();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				// adjust the preferred size for the list panel
+				int width = panelX.getListWidth();
 
-		setPreferredSize(new Dimension(original.getWidth()+width+10,original.getHeight()+30));
+				setPreferredSize(new Dimension(original.getWidth()+width+10,original.getHeight()+30));
+			}});
 	}
 
 	private void addDerivative( T image , String name , ImageGradient<T, D> gradient ,

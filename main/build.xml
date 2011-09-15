@@ -39,6 +39,7 @@
 
     <target name="clean">
         <delete dir="${jar.dir}"/>
+	<delete file="${lib.dir}/${ant.project.name}.jar"/>
 	<ant dir="ip/" target="clean"/>
 	<ant dir="io/" target="clean"/>
 	<ant dir="geo/" target="clean"/>

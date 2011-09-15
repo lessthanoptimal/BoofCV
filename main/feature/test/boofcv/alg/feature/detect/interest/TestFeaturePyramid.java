@@ -43,7 +43,7 @@ public class TestFeaturePyramid extends GenericFeatureScaleDetector {
 	@Override
 	protected List<Point2D_I32> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
 		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class,scales);
-		ss.update(input);
+		ss.setImage(input);
 
 		FeaturePyramid<ImageFloat32,ImageFloat32> alg =
 				(FeaturePyramid<ImageFloat32,ImageFloat32>)detector;

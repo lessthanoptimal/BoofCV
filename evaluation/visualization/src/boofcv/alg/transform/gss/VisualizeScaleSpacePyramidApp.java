@@ -43,7 +43,7 @@ public class VisualizeScaleSpacePyramidApp {
 
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
 
-		pyramid.update(inputF32);
+		pyramid.setImage(inputF32);
 
 		ImagePyramidPanel<ImageFloat32> gui = new ImagePyramidPanel<ImageFloat32>(pyramid,true);
 		gui.render();

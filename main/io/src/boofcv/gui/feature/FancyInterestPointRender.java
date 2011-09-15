@@ -36,6 +36,8 @@ public class FancyInterestPointRender {
 	List<VString> strings = new ArrayList<VString>();
 
 	public synchronized void draw( Graphics2D g2 ) {
+		g2.setStroke(new BasicStroke(2));
+		
 		for( Point p : points ) {
 			g2.setColor(p.color);
 			int w = p.radius*2+1;
@@ -43,10 +45,9 @@ public class FancyInterestPointRender {
 			w+=2;
 			int r = p.radius+1;
 			g2.setColor(Color.BLACK);
-			g2.fillOval(p.x-r,p.y-r,w,w);
+			g2.drawOval(p.x-r,p.y-r,w,w);
 		}
 
-		g2.setStroke(new BasicStroke(2));
 		for( Circle c : circles ) {
 			g2.setColor(c.color);
 			int w = c.radius*2+1;
@@ -155,7 +156,7 @@ public class FancyInterestPointRender {
 
 	public static class Circle
 	{
-		int x,y;
+		int x,y;                   
 		int radius;
 		double direction = Double.NaN;
 		Color color = Color.RED;
