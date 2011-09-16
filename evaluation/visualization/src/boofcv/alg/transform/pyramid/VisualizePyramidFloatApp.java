@@ -22,9 +22,10 @@ import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ProcessImage;
+import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.pyramid.PyramidFloat;
@@ -39,24 +40,25 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizePyramidFloatApp <T extends ImageBase>
-	extends JPanel implements ProcessImage
+	extends SelectImagePanel implements ProcessImage
 {
 	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};
 
 	Class<T> imageType;
 	InterpolatePixel<T> interp;
 	ImagePyramidPanel<T> gui = new ImagePyramidPanel<T>();
+	boolean processedImage = false;
 
 	public VisualizePyramidFloatApp( Class<T> imageType ) {
 		this.imageType = imageType;
 		interp = FactoryInterpolation.bilinearPixel(imageType);
 
-		setLayout(new BorderLayout());
-		add(gui,BorderLayout.CENTER);
+		setMainGUI(gui);
 	}
 
 	@Override
 	public void process( final BufferedImage input ) {
+		setInputImage(input);
 		final T gray = ConvertBufferedImage.convertFrom(input,null,imageType);
 
 		PyramidUpdateSubsampleScale<T> updater = new PyramidUpdateSubsampleScale<T>(interp);
@@ -71,17 +73,41 @@ public class VisualizePyramidFloatApp <T extends ImageBase>
 				gui.render();
 				gui.repaint();
 				setPreferredSize(new Dimension(gray.width+50,gray.height+20));
+				processedImage = true;
 			}});
+	}
+
+	@Override
+	public synchronized void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
+
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
 	}
 
 	public static void main( String args[] ) {
 
-		BufferedImage original = UtilImageIO.loadImage("data/standard/boat.png");
-
 //		VisualizePyramidFloatApp<ImageFloat32> app = new VisualizePyramidFloatApp<ImageFloat32>(ImageFloat32.class);
 		VisualizePyramidFloatApp<ImageUInt8> app = new VisualizePyramidFloatApp<ImageUInt8>(ImageUInt8.class);
 
-		app.process(original);
+		ImageListManager manager = new ImageListManager();
+		manager.add("boat","data/standard/boat.png");
+		manager.add("shapes","data/shapes01.png");
+		manager.add("sunflowers","data/sunflowers.png");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
 
 		ShowImages.showWindow(app,"Image Float Pyramid");
 	}

@@ -26,9 +26,10 @@ import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.factory.transform.wavelet.GFactoryWavelet;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.ProcessImage;
-import boofcv.gui.SelectAlgorithmPanel;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.image.ImageListManager;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -45,9 +46,9 @@ import java.awt.image.BufferedImage;
  */
 public class WaveletVisualizeApp
 		<T extends ImageBase, W extends ImageBase, C extends WlCoef>
-		extends SelectAlgorithmPanel implements ProcessImage
+		extends SelectAlgorithmImagePanel implements ProcessImage
 {
-	int numLevels = 4;
+	int numLevels = 3;
 
 	T image;
 	T imageInv;
@@ -55,6 +56,7 @@ public class WaveletVisualizeApp
 	Class<T> imageType;
 
 	ListDisplayPanel panel = new ListDisplayPanel();
+	boolean processedImage = false;
 
 	public WaveletVisualizeApp(Class<T> imageType ) {
 		this.imageType = imageType;
@@ -64,17 +66,20 @@ public class WaveletVisualizeApp
 		addWaveletDesc("Bi-orthogonal 5",GFactoryWavelet.biorthogoal(imageType,5, BorderType.REFLECT));
 		addWaveletDesc("Coiflet 6",GFactoryWavelet.coiflet(imageType,6));
 
-		add(panel, BorderLayout.CENTER);
+		addMainGUI(panel);
 	}
 
 	@Override
 	public void process( BufferedImage input ) {
+		setInputImage(input);
+		
 		image = ConvertBufferedImage.convertFrom(input,null,imageType);
 		imageInv = (T)image._createNew(image.width,image.height);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setPreferredSize(new Dimension(image.width+50,image.height+20));
+				processedImage = true;
 			}});
 
 		refreshAlgorithm();
@@ -103,12 +108,25 @@ public class WaveletVisualizeApp
 
 		float maxValue = (float)GPixelMath.maxAbs(imageWavelet);
 		BufferedImage buffWavelet = VisualizeImageData.grayMagnitude(imageWavelet,null,maxValue);
-		BufferedImage buffImage = ConvertBufferedImage.convertTo(image,null);
 		BufferedImage buffInv = ConvertBufferedImage.convertTo(imageInv,null);
 
 		panel.addImage(buffWavelet,"Transform");
-		panel.addImage(buffImage,"Original");
 		panel.addImage(buffInv,"Inverse");
+	}
+
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
+
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
 	}
 
 	public static void main( String args[] ) {
@@ -116,7 +134,17 @@ public class WaveletVisualizeApp
 		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageFloat32.class);
 //		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageUInt8.class);
 
-		app.process(in);
+		ImageListManager manager = new ImageListManager();
+		manager.add("lena","data/standard/lena512.bmp");
+		manager.add("boat","data/standard/boat.png");
+		manager.add("fingerprint","data/standard/fingerprint.png");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
 
 		ShowImages.showWindow(app,"Wavelet Transforms");
 	}

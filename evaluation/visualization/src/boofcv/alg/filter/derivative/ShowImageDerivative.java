@@ -25,10 +25,10 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.ProcessImage;
-import boofcv.gui.SelectAlgorithmPanel;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
-	extends SelectAlgorithmPanel implements ProcessImage
+	extends SelectAlgorithmImagePanel implements ProcessImage
 {
 	Class<T> imageType;
 	Class<D> derivType;
@@ -52,6 +52,7 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 	D derivX,derivY;
 	T image;
 	BufferedImage original;
+	boolean processedImage = false;
 
 	public ShowImageDerivative(Class<T> imageType, Class<D> derivType) {
 		this.imageType = imageType;
@@ -62,11 +63,12 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 		addAlgorithm("Three",FactoryDerivative.three(imageType,derivType));
 		addAlgorithm("Gaussian", FactoryDerivative.gaussian(-1,3,imageType,derivType));
 
-		add(panel,BorderLayout.CENTER);
+		addMainGUI(panel);
 	}
 
 	@Override
 	public void process( final BufferedImage original ) {
+		setInputImage(original);
 
 		this.original = original;
 		image = ConvertBufferedImage.convertFrom(original,null,imageType);
@@ -80,6 +82,7 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 				int width = panel.getListWidth();
 
 				setPreferredSize(new Dimension(original.getWidth()+width+10,original.getHeight()+30));
+				processedImage = true;
 				refreshAlgorithm();
 			}});
 	}
@@ -99,27 +102,42 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 		double maxY = GPixelMath.maxAbs(derivY);
 		panel.addImage(VisualizeImageData.colorizeSign(derivX,null,maxX),"X-derivative");
 		panel.addImage(VisualizeImageData.colorizeSign(derivY,null,maxY),"Y-derivative");
-		panel.addImage(original,"Original");
 
 		repaint();
 	}
 
-	public static void main(String args[]) {
-		String fileName;
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
 
-		if (args.length == 0) {
-//			fileName = "evaluation/data/scale/mountain_7p1mm.jpg";
-			fileName = "data/indoors01.jpg";
-		} else {
-			fileName = args[0];
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
 		}
-		BufferedImage input = UtilImageIO.loadImage(fileName);
+	}
 
-		ShowImageDerivative<ImageFloat32,ImageFloat32> display
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
+	}
+
+	public static void main(String args[]) {
+
+		ShowImageDerivative<ImageFloat32,ImageFloat32> app
 				= new ShowImageDerivative<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-		display.process(input);
+		ImageListManager manager = new ImageListManager();
+		manager.add("shapes","data/shapes01.png");
+		manager.add("sunflowers","data/sunflowers.png");
+		manager.add("beach","data/scale/beach02.jpg");
 
-		ShowImages.showWindow(display, "Derivatives");
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
+
+		ShowImages.showWindow(app, "Image Derivative");
 	}
 }

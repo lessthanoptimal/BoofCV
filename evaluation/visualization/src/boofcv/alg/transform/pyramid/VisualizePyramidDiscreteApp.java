@@ -21,16 +21,16 @@ package boofcv.alg.transform.pyramid;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.gui.ProcessImage;
+import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.DiscretePyramidPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -39,7 +39,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizePyramidDiscreteApp <T extends ImageBase>
-	extends JPanel implements ProcessImage
+	extends SelectImagePanel implements ProcessImage
 {
 	int scales[] = new int[]{1,2,4,8,16};
 
@@ -48,6 +48,7 @@ public class VisualizePyramidDiscreteApp <T extends ImageBase>
 	PyramidUpdaterDiscrete<T> updater;
 	PyramidDiscrete<T> pyramid;
 
+	boolean processedImage = false;
 
 	public VisualizePyramidDiscreteApp(Class<T> imageType) {
 		this.imageType = imageType;
@@ -56,12 +57,12 @@ public class VisualizePyramidDiscreteApp <T extends ImageBase>
 		updater = FactoryPyramid.discreteGaussian(imageType,-1,2);
 		gui = new DiscretePyramidPanel();
 
-		setLayout(new BorderLayout());
-		add(gui,BorderLayout.CENTER);
+		setMainGUI(gui);
 	}
 
 	@Override
 	public void process( BufferedImage input ) {
+		setInputImage(input);
 		final T gray = ConvertBufferedImage.convertFrom(input,null,imageType);
 
 		// update the pyramid
@@ -74,14 +75,39 @@ public class VisualizePyramidDiscreteApp <T extends ImageBase>
 				gui.render();
 				gui.repaint();
 //				setPreferredSize(new Dimension(gray.width,gray.height));
+				processedImage = true;
 			}});
 	}
 
-	public static void main( String args[] ) {
-		BufferedImage original = UtilImageIO.loadImage("data/standard/boat.png");
+	@Override
+	public synchronized void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
 
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
+	}
+
+	public static void main( String args[] ) {
 		VisualizePyramidDiscreteApp<ImageFloat32> app = new VisualizePyramidDiscreteApp<ImageFloat32>(ImageFloat32.class);
-		app.process(original);
+
+		ImageListManager manager = new ImageListManager();
+		manager.add("lena","data/standard/lena512.bmp");
+		manager.add("boat","data/standard/boat.png");
+		manager.add("fingerprint","data/standard/fingerprint.png");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
 
 		ShowImages.showWindow(app,"Image Discrete Pyramid");
 	}

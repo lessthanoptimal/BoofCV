@@ -31,10 +31,10 @@ import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.ProcessImage;
-import boofcv.gui.SelectAlgorithmPanel;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
@@ -48,17 +48,8 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel implements ProcessImage
+		extends SelectAlgorithmImagePanel implements ProcessImage
 {
-
-//	static String fileName = "data/outdoors01.jpg";
-	static String fileName = "data/sunflowers.png";
-//	static String fileName = "data/particles01.jpg";
-//	static String fileName = "data/scale/beach02.jpg";
-//	static String fileName = "data/scale/mountain_7p1mm.jpg";
-//	static String fileName = "data/indoors01.jpg";
-//	static String fileName = "data/shapes01.png";
-
 	ListDisplayPanel gui = new ListDisplayPanel();
 
 	ScaleSpacePyramid<T> pyramid;
@@ -68,6 +59,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 	ImageFloat32 scaledIntensity;
 	Class<T> imageType;
 	AnyImageDerivative<T,D> anyDerivative;
+	boolean processedImage = false;
 
 	public IntensityFeatureScaleSpacePyramidApp( Class<T> imageType , Class<D> derivType ) {
 		this.imageType = imageType;
@@ -80,7 +72,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 		addAlgorithm("KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
 		addAlgorithm("Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
 
-		add(gui, BorderLayout.CENTER);
+		addMainGUI(gui);
 
 		double scales[] = new double[25];
 		for( int i = 0; i < scales.length ; i++ ) {
@@ -92,14 +84,13 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(String name, Object cookie ) {
+	public void setActiveAlgorithm(String name, Object cookie ) {
 		if( input == null ) {
 			return;
 		}
 		GeneralFeatureIntensity<T,D> intensity = (GeneralFeatureIntensity<T,D>)cookie;
 
 		gui.reset();
-		gui.addImage(input,"Original Image");
 		BufferedImage b = VisualizeImageData.grayMagnitude(workImage,null, 255);
 		gui.addImage(b,"Gray Image");
 
@@ -140,7 +131,8 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 	}
 
 	@Override
-	public synchronized void process( final BufferedImage input ) {
+	public void process( final BufferedImage input ) {
+		setInputImage(input);
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 		scaledIntensity = new ImageFloat32(workImage.width,workImage.height);
@@ -148,20 +140,46 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
+				processedImage = true;
 			}});
 		refreshAlgorithm();
 	}
 
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
+
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
+	}
+
 	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage(fileName);
 
 		IntensityFeatureScaleSpacePyramidApp<ImageFloat32,ImageFloat32> app =
 				new IntensityFeatureScaleSpacePyramidApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
-		app.process(input);
 
 //		IntensityFeatureScaleSpacePyramidApp<ImageUInt8, ImageSInt16> app2 =
 //				new IntensityFeatureScaleSpacePyramidApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
-//		app2.setImage(input);
+
+		ImageListManager manager = new ImageListManager();
+		manager.add("shapes","data/shapes01.png");
+		manager.add("sunflowers","data/sunflowers.png");
+		manager.add("beach","data/scale/beach02.jpg");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
+
 		ShowImages.showWindow(app,"Feature Scale Space Pyramid Intensity");
 
 	}
