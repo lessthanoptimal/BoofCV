@@ -18,6 +18,9 @@
 
 package boofcv.applet;
 
+import boofcv.gui.ProcessImage;
+import boofcv.gui.UtilVisualize;
+import boofcv.io.image.SelectInputImageToolBar;
 import boofcv.struct.image.ImageFloat32;
 
 import javax.imageio.ImageIO;
@@ -39,20 +42,28 @@ public class SingleInputApplet extends JApplet {
 		String directory = getParameter("directory");
 		final BufferedImage image = loadImage(directory+"data/indoors01.jpg");
 
+
 		final String panelPath = getParameter("panelPath");
 		Class inputType = ImageFloat32.class;
 
 		showStatus("Creating GUI component");
 		final JComponent comp = FactoryVisualPanel.create(panelPath,inputType);
+
 		if( comp == null ) {
 			showStatus("Failed to create GUI component");
-		} else {
-			getContentPane().add(comp, BorderLayout.CENTER);
-				if( !FactoryVisualPanel.invokeProcess(comp,image) )
-				showStatus("Failed to invoke process");
-			else
-				showStatus("Running");
+		} else if( !(comp instanceof ProcessImage) ) {
+			showStatus("Loaded component is not of ProcessImage type");
+			return;
 		}
+
+		SelectInputImageToolBar toolbar = new SelectInputImageToolBar(comp);
+		toolbar.addImage("Room",directory+"data/indoors01.jpg");
+		toolbar.addImage("Shapes",directory+"data/shapes01.png");
+		toolbar.addImage("Sunflowers",directory+"data/sunflowers.jpg");
+
+		UtilVisualize.manageSelectInput(toolbar,(ProcessImage)comp,getCodeBase(),true);
+
+		getContentPane().add(toolbar, BorderLayout.CENTER);
 	}
 
 

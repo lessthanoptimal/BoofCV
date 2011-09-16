@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.edge;
 import boofcv.abst.feature.detect.edge.DetectEdgeContour;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
+import boofcv.gui.ProcessImage;
 import boofcv.gui.SelectAlgorithmPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -41,7 +42,8 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel {
+		extends SelectAlgorithmPanel implements ProcessImage
+{
 
 	static String fileName = "data/outdoors01.jpg";
 //	static String fileName = "data/sunflowers.png";
@@ -68,15 +70,15 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		add(panel, BorderLayout.CENTER);
 	}
 
+	@Override
 	public void process( BufferedImage input ) {
 		this.input = input;
-		panel.setBufferedImage(input);
 		final int width = input.getWidth();
 		final int height = input.getHeight();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setPreferredSize(new Dimension(width,height));
-				panel.repaint();
+				refreshAlgorithm();
 			}});
 	}
 

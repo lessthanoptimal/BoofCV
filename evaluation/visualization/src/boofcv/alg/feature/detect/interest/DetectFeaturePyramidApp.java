@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
+import boofcv.gui.ProcessImage;
 import boofcv.gui.SelectAlgorithmPanel;
 import boofcv.gui.feature.ScaleSpacePyramidPointPanel;
 import boofcv.gui.image.ShowImages;
@@ -38,7 +39,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class DetectFeaturePyramidApp <T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel
+		extends SelectAlgorithmPanel implements ProcessImage
 {
 //	static String fileName = "data/outdoors01.jpg";
 	static String fileName = "data/sunflowers.png";
@@ -67,6 +68,7 @@ public class DetectFeaturePyramidApp <T extends ImageBase, D extends ImageBase>
 		add(panel, BorderLayout.CENTER);
 	}
 
+	@Override
 	public synchronized void process( BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 		ss.setImage(workImage);

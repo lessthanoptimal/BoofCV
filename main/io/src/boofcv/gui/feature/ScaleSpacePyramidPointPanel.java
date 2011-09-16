@@ -30,6 +30,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +85,11 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 			ImageBase enlarge = GeneralizedImageOps.createImage(small.getClass(),ss.getInputWidth(),ss.getInputHeight());
 			DistortImageOps.scale(small,enlarge, TypeInterpolate.NEAREST_NEIGHBOR);
 
+			// if the size isn't the same null it so a new image will be declared
+			if( levelImage != null &&
+					(levelImage.getWidth() != enlarge.width || levelImage.getHeight() != enlarge.height )) {
+				levelImage = null;
+			}
 			levelImage = ConvertBufferedImage.convertTo(enlarge,levelImage);
 
 			double scale = ss.getScale(level-1);
@@ -104,10 +110,24 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 	@Override
 	public synchronized void paintComponent(Graphics g) {
 		super.paintComponent(g);
+
+		Graphics2D g2 = (Graphics2D)g;
+
+		double scaleX = ss.getInputWidth() / (double)getWidth();
+		double scaleY = ss.getInputHeight() / (double)getHeight();
+		double scale = Math.max(scaleX,scaleY);
+
+		// scale it down so that the whole image is visible
+		if( scale > 1 ) {
+			AffineTransform tran = g2.getTransform();
+			tran.concatenate(AffineTransform.getScaleInstance(1/scale,1/scale));
+			g2.setTransform(tran);
+		}
+
 		if( activeLevel == 0 )
 			showAll(g);
 		else {
-			g.drawImage(levelImage, 0, 0, this);
+			g.drawImage(levelImage, 0, 0, levelImage.getWidth(), levelImage.getHeight(),null);
 			VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,radius);
 		}
 
@@ -116,7 +136,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 	private void showAll(Graphics g) {
 		//draw the image
 		if (background != null)
-			g.drawImage(background, 0, 0, this);
+			g.drawImage(background, 0, 0, background.getWidth(), background.getHeight(),null);
 
 		VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,radius);
 	}

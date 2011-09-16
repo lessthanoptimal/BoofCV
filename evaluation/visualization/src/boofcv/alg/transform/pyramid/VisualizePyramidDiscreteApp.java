@@ -20,13 +20,17 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
+import boofcv.gui.ProcessImage;
 import boofcv.gui.image.DiscretePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -34,24 +38,51 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizePyramidDiscreteApp {
+public class VisualizePyramidDiscreteApp <T extends ImageBase>
+	extends JPanel implements ProcessImage
+{
+	int scales[] = new int[]{1,2,4,8,16};
+
+	Class<T> imageType;
+	DiscretePyramidPanel gui = new DiscretePyramidPanel();
+	PyramidUpdaterDiscrete<T> updater;
+	PyramidDiscrete<T> pyramid;
+
+
+	public VisualizePyramidDiscreteApp(Class<T> imageType) {
+		this.imageType = imageType;
+
+		pyramid = new PyramidDiscrete<T>(imageType,true,scales);
+		updater = FactoryPyramid.discreteGaussian(imageType,-1,2);
+		gui = new DiscretePyramidPanel();
+
+		setLayout(new BorderLayout());
+		add(gui,BorderLayout.CENTER);
+	}
+
+	@Override
+	public void process( BufferedImage input ) {
+		final T gray = ConvertBufferedImage.convertFrom(input,null,imageType);
+
+		// update the pyramid
+		updater.update(gray,pyramid);
+
+		// render the pyramid
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui.setPyramid(pyramid);
+				gui.render();
+				gui.repaint();
+//				setPreferredSize(new Dimension(gray.width,gray.height));
+			}});
+	}
 
 	public static void main( String args[] ) {
-		int scales[] = new int[]{1,2,4,8,16};
+		BufferedImage original = UtilImageIO.loadImage("data/standard/boat.png");
 
-		BufferedImage input = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
+		VisualizePyramidDiscreteApp<ImageFloat32> app = new VisualizePyramidDiscreteApp<ImageFloat32>(ImageFloat32.class);
+		app.process(original);
 
-		PyramidUpdaterDiscrete<ImageFloat32> updater = FactoryPyramid.discreteGaussian(ImageFloat32.class,-1,2);
-		PyramidDiscrete<ImageFloat32> pyramid = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,true,scales);
-
-		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
-
-		updater.update(inputF32,pyramid);
-
-		DiscretePyramidPanel gui = new DiscretePyramidPanel(pyramid);
-		gui.render();
-		gui.repaint();
-
-		ShowImages.showWindow(gui,"Image Discrete Pyramid");
+		ShowImages.showWindow(app,"Image Discrete Pyramid");
 	}
 }

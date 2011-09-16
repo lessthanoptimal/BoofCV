@@ -23,6 +23,7 @@ import boofcv.struct.pyramid.PyramidDiscrete;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 
@@ -39,7 +40,14 @@ public class DiscretePyramidPanel extends JPanel {
 
 	BufferedImage layers[];
 
-	public DiscretePyramidPanel( PyramidDiscrete<?> pyramid ) {
+	public DiscretePyramidPanel() {
+	}
+
+	public DiscretePyramidPanel(PyramidDiscrete<?> pyramid) {
+		setPyramid(pyramid);
+	}
+
+	public void setPyramid( PyramidDiscrete<?> pyramid ) {
 		this.pyramid = pyramid;
 
 		// create temporary buffers for each layer in the pyramid
@@ -60,9 +68,7 @@ public class DiscretePyramidPanel extends JPanel {
 
 		img = new BufferedImage(width,height,BufferedImage.TYPE_3BYTE_BGR);
 
-		setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
-		setMinimumSize(getPreferredSize());
-		setMaximumSize(getPreferredSize());
+		setPreferredSize(new Dimension(width,height));
 	}
 
 	public void render() {
@@ -83,6 +89,19 @@ public class DiscretePyramidPanel extends JPanel {
 
 	@Override
 	public void paintComponent(Graphics g) {
-		g.drawImage(img, 0, 0, this);
+		if( img != null) {
+			Graphics2D g2 = (Graphics2D)g;
+			g2.setColor(Color.WHITE);
+			g2.fillRect(0,0,getWidth(),getHeight());
+			
+			double scale = img.getWidth()/(double)getWidth();
+			if( scale > 1 ) {
+				AffineTransform tran = new AffineTransform();
+				tran.setToScale(1.0/scale,1.0/scale);
+				g2.drawImage(img,tran,null);
+			} else {
+				g.drawImage(img, 0, 0, this);
+			}
+		}
 	}
 }
