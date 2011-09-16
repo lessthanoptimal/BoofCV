@@ -49,6 +49,13 @@ public class ImagePyramidPanel<T extends ImageBase> extends ListDisplayPanel {
 	boolean scaleUp;
 
 	public ImagePyramidPanel(ImagePyramid<T> pyramid, boolean scaleUp) {
+		set(pyramid,scaleUp);
+	}
+
+	public ImagePyramidPanel() {
+	}
+
+	public void set(ImagePyramid<T> pyramid, boolean scaleUp) {
 		this.pyramid = pyramid;
 		this.scaleUp = scaleUp;
 	}
@@ -58,6 +65,10 @@ public class ImagePyramidPanel<T extends ImageBase> extends ListDisplayPanel {
 	 */
 	public void render() {
 		reset();
+
+		if( pyramid == null )
+			return;
+
 		if( scaleUp ) {
 			scaleUpLayers();
 		} else {

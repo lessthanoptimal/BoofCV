@@ -63,8 +63,9 @@ public class ImagePanel extends JPanel {
 				if( ratio >= 1 ) {
 					g.drawImage(img, 0, 0, this);
 				} else {
-					AffineTransform tran = new AffineTransform();
-					tran.setToScale(ratio,ratio);
+					AffineTransform tran = AffineTransform.getScaleInstance(ratio, ratio);
+//					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//							RenderingHints.VALUE_ANTIALIAS_ON);
 					g2.drawImage(img,tran,null);
 				}
 

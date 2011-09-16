@@ -32,15 +32,17 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class SelectAlgorithmPanel extends JPanel implements ActionListener {
+public abstract class SelectAlgorithmPanel extends JPanel
+		implements ActionListener
+{
 	JToolBar toolbar;
 	JComboBox algBox;
-
 	List<Object> cookies = new ArrayList<Object>();
 
 	public SelectAlgorithmPanel() {
 		toolbar = new JToolBar();
 		algBox = new JComboBox();
+		toolbar.add( new JLabel("Algorithm"));
 		toolbar.add(algBox);
 
 		algBox.addActionListener(this);

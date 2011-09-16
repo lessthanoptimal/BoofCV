@@ -25,6 +25,7 @@ import boofcv.factory.feature.detect.interest.FactoryBlobDetector;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
+import boofcv.gui.ProcessImage;
 import boofcv.gui.SelectAlgorithmPanel;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
@@ -44,7 +45,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel
+		extends SelectAlgorithmPanel implements ProcessImage
 {
 //	static String fileName = "data/outdoors01.jpg";
 	static String fileName = "data/sunflowers.png";
@@ -100,6 +101,7 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		add(panel, BorderLayout.CENTER);
 	}
 
+	@Override
 	public synchronized void process( BufferedImage input ) {
 		this.input = input;
 		grayImage = ConvertBufferedImage.convertFrom(input,null,imageType);

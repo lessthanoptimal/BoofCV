@@ -92,7 +92,7 @@ public class FactoryVisualPanel {
 
 			if( params.length == 1 || params.length == 2  ) {
 				boolean allGood = true;
-				for( int i = 0; i < 2; i++ ) {
+				for( int i = 0; i < params.length; i++ ) {
 					if( params[i] != Class.class ) {
 						allGood = false;
 						break;

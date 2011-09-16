@@ -26,11 +26,13 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.gui.ProcessImage;
 import boofcv.gui.SelectAlgorithmPanel;
+import boofcv.gui.UtilVisualize;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.SelectInputImageToolBar;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -46,13 +48,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel {
-
-//	static String fileName = "data/outdoors01.jpg";
-//	static String fileName = "data/sunflowers.png";
-//	static String fileName = "data/particles01.jpg";
-//	static String fileName = "data/scale/beach02.jpg";
-	static String fileName = "data/shapes01.png";
+		extends SelectAlgorithmPanel implements ProcessImage {
 
 	ImagePanel panel;
 
@@ -83,18 +79,21 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		add(panel, BorderLayout.CENTER);
 	}
 
-	public void process( final BufferedImage input ) {
+	@Override
+	public synchronized void process( final BufferedImage input ) {
 		panel.setBufferedImage(input);
 		this.input = input;
 		refreshAlgorithm();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
+				setSize(input.getWidth(),input.getHeight());
+				System.out.println("set size called!");
 			}});
 	}
 
 	@Override
-	public void setActiveAlgorithm(String name, Object cookie) {
+	public synchronized void setActiveAlgorithm(String name, Object cookie) {
 		if( input == null )
 			return;
 		
@@ -149,19 +148,23 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		panel.repaint();
 	}
 
-	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage(fileName);
 
+
+	public static void main( String args[] ) {
 		ShowFeatureOrientationApp<ImageFloat32,ImageFloat32> app =
 				new ShowFeatureOrientationApp<ImageFloat32, ImageFloat32>(ImageFloat32.class, ImageFloat32.class);
-		app.process(input);
 
 //		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
-		ShowImages.showWindow(app,"Feature Orientation");
-//		input = UtilImageIO.loadImage(fileName);
-//		doStuff(input, ImageUInt8.class, ImageSInt16.class);
+		SelectInputImageToolBar select = new SelectInputImageToolBar(app);
+		select.addImage("shapes","data/shapes01.png");
+		select.addImage("sunflowers","data/sunflowers.png");
+		select.addImage("beach","data/scale/beach02.jpg");
+		UtilVisualize.manageSelectInput(select,app,null,true);
+
+		System.out.println("Calling show window");
+		ShowImages.showWindow(select,"Feature Orientation");
 		System.out.println("Done");
 	}
 }

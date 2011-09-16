@@ -76,7 +76,9 @@ public class PyramidUpdateGaussianScale< T extends ImageBase> implements Pyramid
 
 	@Override
 	public void update(T input, PyramidFloat<T> pyramid) {
-		if( !pyramid.isInitialized() )
+		if( !pyramid.isInitialized() ||
+				pyramid.getInputWidth() != input.width ||
+				pyramid.getInputHeight() != input.height )
 			pyramid.initialize(input.width,input.height);
 
 		if( pyramid.isSaveOriginalReference() )

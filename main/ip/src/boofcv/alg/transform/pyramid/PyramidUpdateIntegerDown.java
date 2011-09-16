@@ -59,11 +59,13 @@ public class PyramidUpdateIntegerDown<T extends ImageBase> implements PyramidUpd
 	@Override
 	public void update(T input , PyramidDiscrete<T> pyramid ) {
 
-		if( !pyramid.isInitialized() )
+		if( !pyramid.isInitialized() ||
+				pyramid.getInputWidth() != input.width ||
+				pyramid.getInputHeight() != input.height )
 			pyramid.initialize(input.width,input.height);
 		
 		if( temp == null )
-			// declare it to be hte latest image that it might need to be, resize below
+			// declare it to be the latest image that it might need to be, resize below
 			temp = (T)input._createNew(input.width/2,input.height);
 
 		if (pyramid.scale[0] == 1) {

@@ -25,6 +25,7 @@ import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.gui.ListDisplayPanel;
+import boofcv.gui.ProcessImage;
 import boofcv.gui.SelectAlgorithmPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -43,7 +44,8 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel {
+		extends SelectAlgorithmPanel implements ProcessImage
+{
 
 //	static String fileName = "data/outdoors01.jpg";
 	static String fileName = "data/sunflowers.png";
@@ -127,6 +129,7 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 		gui.requestFocusInWindow();
 	}
 
+	@Override
 	public synchronized void process( final BufferedImage input ) {
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);

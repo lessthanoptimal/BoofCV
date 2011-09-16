@@ -24,8 +24,8 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.ListDisplayPanel;
+import boofcv.gui.ProcessImage;
 import boofcv.gui.SelectAlgorithmPanel;
-import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.UtilImageIO;
@@ -35,7 +35,6 @@ import boofcv.struct.image.ImageFloat32;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Displays detected corners in a video sequence
@@ -43,77 +42,65 @@ import java.lang.reflect.InvocationTargetException;
  * @author Peter Abeles
  */
 public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
-	extends SelectAlgorithmPanel
+	extends SelectAlgorithmPanel implements ProcessImage
 {
 	Class<T> imageType;
 	Class<D> derivType;
 
-	ImagePanel panelInput = new ImagePanel();
-	ListDisplayPanel panelX = new ListDisplayPanel();
-	ListDisplayPanel panelY = new ListDisplayPanel();
+	ListDisplayPanel panel = new ListDisplayPanel();
+
+	D derivX,derivY;
+	T image;
+	BufferedImage original;
 
 	public ShowImageDerivative(Class<T> imageType, Class<D> derivType) {
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		addAlgorithm("Derivative X",panelX);
-		addAlgorithm("Derivative Y",panelY);
-		addAlgorithm("Original",panelInput);
+		addAlgorithm("Prewitt",FactoryDerivative.prewitt(imageType,derivType));
+		addAlgorithm("Sobel",FactoryDerivative.sobel(imageType,derivType));
+		addAlgorithm("Three",FactoryDerivative.three(imageType,derivType));
+		addAlgorithm("Gaussian", FactoryDerivative.gaussian(-1,3,imageType,derivType));
+
+		add(panel,BorderLayout.CENTER);
 	}
 
+	@Override
 	public void process( final BufferedImage original ) {
 
-		T image = ConvertBufferedImage.convertFrom(original,null,imageType);
+		this.original = original;
+		image = ConvertBufferedImage.convertFrom(original,null,imageType);
 
-		D derivX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
-		D derivY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
-
-		addDerivative(image,"Prewitt",FactoryDerivative.prewitt(imageType,derivType),derivX,derivY);
-		addDerivative(image,"Sobel",FactoryDerivative.sobel(imageType,derivType),derivX,derivY);
-		addDerivative(image,"Three",FactoryDerivative.three(imageType,derivType),derivX,derivY);
-		addDerivative(image,"Gaussian", FactoryDerivative.gaussian(-1,3,imageType,derivType),derivX,derivY);
-
-
-		panelInput.setResize(true);
-		panelInput.setBufferedImage(original);
+		derivX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+		derivY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				// adjust the preferred size for the list panel
-				int width = panelX.getListWidth();
+				int width = panel.getListWidth();
 
 				setPreferredSize(new Dimension(original.getWidth()+width+10,original.getHeight()+30));
+				refreshAlgorithm();
 			}});
-	}
-
-	private void addDerivative( T image , String name , ImageGradient<T, D> gradient ,
-								D derivX , D derivY ) {
-		gradient.process(image,derivX,derivY);
-
-		double maxX = GPixelMath.maxAbs(derivX);
-		double maxY = GPixelMath.maxAbs(derivY);
-
-		panelX.addImage(VisualizeImageData.colorizeSign(derivX,null,maxX),name);
-		panelY.addImage(VisualizeImageData.colorizeSign(derivY,null,maxY),name);
 	}
 
 	@Override
 	public void setActiveAlgorithm(String name, final Object cookie) {
-		try {
-			SwingUtilities.invokeAndWait(new Runnable() {
-				public void run() {
-					// remove the previous component
-					Component c = ((BorderLayout)getLayout()).getLayoutComponent(BorderLayout.CENTER);
-					if( c != null )
-						remove(c);
-					// add the new one
-					add((JPanel)cookie, BorderLayout.CENTER);
-					revalidate();
-				}
-			});
-		} catch (InterruptedException e) {
-		} catch (InvocationTargetException e) {
-		}
+		if( image == null )
+			return;
+
+		ImageGradient<T,D> gradient = (ImageGradient<T,D>)cookie;
+
+		panel.reset();
+
+		gradient.process(image,derivX,derivY);
+
+		double maxX = GPixelMath.maxAbs(derivX);
+		double maxY = GPixelMath.maxAbs(derivY);
+		panel.addImage(VisualizeImageData.colorizeSign(derivX,null,maxX),"X-derivative");
+		panel.addImage(VisualizeImageData.colorizeSign(derivY,null,maxY),"Y-derivative");
+		panel.addImage(original,"Original");
+
 		repaint();
 	}
 

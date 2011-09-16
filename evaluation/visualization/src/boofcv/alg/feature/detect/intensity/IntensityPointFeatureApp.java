@@ -28,6 +28,7 @@ import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.gui.ProcessImage;
 import boofcv.gui.SelectAlgorithmPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -46,7 +47,8 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel {
+		extends SelectAlgorithmPanel implements ProcessImage
+{
 
 //	static String fileName = "data/outdoors01.jpg";
 //	static String fileName = "data/sunflowers.png";
@@ -120,6 +122,7 @@ public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
 		gui.repaint();
 	}
 
+	@Override
 	public synchronized void process( final BufferedImage input ) {
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);

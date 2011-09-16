@@ -25,6 +25,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.factory.transform.wavelet.GFactoryWavelet;
 import boofcv.gui.ListDisplayPanel;
+import boofcv.gui.ProcessImage;
 import boofcv.gui.SelectAlgorithmPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -34,6 +35,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -43,7 +45,7 @@ import java.awt.image.BufferedImage;
  */
 public class WaveletVisualizeApp
 		<T extends ImageBase, W extends ImageBase, C extends WlCoef>
-		extends SelectAlgorithmPanel
+		extends SelectAlgorithmPanel implements ProcessImage
 {
 	int numLevels = 4;
 
@@ -51,17 +53,11 @@ public class WaveletVisualizeApp
 	T imageInv;
 
 	Class<T> imageType;
-	Class<W> waveletType;
 
 	ListDisplayPanel panel = new ListDisplayPanel();
 
-	public WaveletVisualizeApp(Class<T> imageType, Class<W> waveletType,
-							   BufferedImage original ) {
+	public WaveletVisualizeApp(Class<T> imageType ) {
 		this.imageType = imageType;
-		this.waveletType = waveletType;
-
-		image = ConvertBufferedImage.convertFrom(original,null,imageType);
-		imageInv = (T)image._createNew(image.width,image.height);
 
 		addWaveletDesc("Haar",GFactoryWavelet.haar(imageType));
 		addWaveletDesc("Daub 4", GFactoryWavelet.daubJ(imageType,4));
@@ -69,7 +65,19 @@ public class WaveletVisualizeApp
 		addWaveletDesc("Coiflet 6",GFactoryWavelet.coiflet(imageType,6));
 
 		add(panel, BorderLayout.CENTER);
-		setPreferredSize(new Dimension(image.width+50,image.height+20));
+	}
+
+	@Override
+	public void process( BufferedImage input ) {
+		image = ConvertBufferedImage.convertFrom(input,null,imageType);
+		imageInv = (T)image._createNew(image.width,image.height);
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				setPreferredSize(new Dimension(image.width+50,image.height+20));
+			}});
+
+		refreshAlgorithm();
 	}
 
 	private void addWaveletDesc( String name , WaveletDescription desc )
@@ -81,6 +89,9 @@ public class WaveletVisualizeApp
 
 	@Override
 	public void setActiveAlgorithm(String name, Object cookie) {
+		if( image == null )
+			return;
+
 		WaveletDescription<C> desc = (WaveletDescription<C>)cookie;
 		WaveletTransform<T,W,C> waveletTran = FactoryWaveletTransform.create(desc,numLevels);
 
@@ -101,9 +112,11 @@ public class WaveletVisualizeApp
 	}
 
 	public static void main( String args[] ) {
-		BufferedImage in = UtilImageIO.loadImage("evaluation/data/standard/lena512.bmp");
-		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageFloat32.class,ImageFloat32.class,in);
-//		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageUInt8.class, ImageSInt32.class,in);
+		BufferedImage in = UtilImageIO.loadImage("data/standard/lena512.bmp");
+		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageFloat32.class);
+//		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageUInt8.class);
+
+		app.process(in);
 
 		ShowImages.showWindow(app,"Wavelet Transforms");
 	}

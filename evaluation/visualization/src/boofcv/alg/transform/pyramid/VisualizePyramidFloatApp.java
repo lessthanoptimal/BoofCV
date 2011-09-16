@@ -21,12 +21,16 @@ package boofcv.alg.transform.pyramid;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.gui.ProcessImage;
 import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.pyramid.PyramidFloat;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -34,25 +38,51 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizePyramidFloatApp {
+public class VisualizePyramidFloatApp <T extends ImageBase>
+	extends JPanel implements ProcessImage
+{
+	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};
+
+	Class<T> imageType;
+	InterpolatePixel<T> interp;
+	ImagePyramidPanel<T> gui = new ImagePyramidPanel<T>();
+
+	public VisualizePyramidFloatApp( Class<T> imageType ) {
+		this.imageType = imageType;
+		interp = FactoryInterpolation.bilinearPixel(imageType);
+
+		setLayout(new BorderLayout());
+		add(gui,BorderLayout.CENTER);
+	}
+
+	@Override
+	public void process( final BufferedImage input ) {
+		final T gray = ConvertBufferedImage.convertFrom(input,null,imageType);
+
+		PyramidUpdateSubsampleScale<T> updater = new PyramidUpdateSubsampleScale<T>(interp);
+		PyramidFloat<T> pyramid = new PyramidFloat<T>(imageType,scales);
+
+		updater.update(gray,pyramid);
+
+		gui.set(pyramid,true);
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui.render();
+				gui.repaint();
+				setPreferredSize(new Dimension(gray.width+50,gray.height+20));
+			}});
+	}
 
 	public static void main( String args[] ) {
-		double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0};
 
-		BufferedImage original = UtilImageIO.loadImage("evaluation/data/standard/boat.png");
+		BufferedImage original = UtilImageIO.loadImage("data/standard/boat.png");
 
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
-//		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bicubic(ImageFloat32.class,-0.5f);
-		PyramidUpdateSubsampleScale<ImageFloat32> updater = new PyramidUpdateSubsampleScale<ImageFloat32>(interp);
-		PyramidFloat<ImageFloat32> pyramid = new PyramidFloat<ImageFloat32>(ImageFloat32.class,scales);
+//		VisualizePyramidFloatApp<ImageFloat32> app = new VisualizePyramidFloatApp<ImageFloat32>(ImageFloat32.class);
+		VisualizePyramidFloatApp<ImageUInt8> app = new VisualizePyramidFloatApp<ImageUInt8>(ImageUInt8.class);
 
-		ImageFloat32 input = ConvertBufferedImage.convertFrom(original,(ImageFloat32)null);
+		app.process(original);
 
-		updater.update(input,pyramid);
-
-		ImagePyramidPanel<ImageFloat32> gui = new ImagePyramidPanel<ImageFloat32>(pyramid,true);
-		gui.render();
-
-		ShowImages.showWindow(gui,"Image Float Pyramid");
+		ShowImages.showWindow(app,"Image Float Pyramid");
 	}
 }
