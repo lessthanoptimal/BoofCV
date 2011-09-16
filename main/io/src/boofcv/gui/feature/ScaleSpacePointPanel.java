@@ -83,6 +83,11 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 //		System.out.println("level "+level);
 		if( level > 0 ) {
 			ss.setActiveScale(level-1);
+			// if the input image size has changed reallocate the levelImage
+			if( levelImage != null &&
+					(levelImage.getWidth() != background.getWidth() ||
+					levelImage.getHeight() != background.getHeight()))
+				levelImage = null;
 			levelImage = ConvertBufferedImage.convertTo(ss.getScaledImage(),levelImage);
 
 			double scale = ss.getCurrentScale();

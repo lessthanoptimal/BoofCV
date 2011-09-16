@@ -22,10 +22,10 @@ import boofcv.abst.feature.detect.edge.DetectEdgeContour;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
 import boofcv.gui.ProcessImage;
-import boofcv.gui.SelectAlgorithmPanel;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
@@ -42,24 +42,17 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel implements ProcessImage
+		extends SelectAlgorithmImagePanel implements ProcessImage
 {
-
-	static String fileName = "data/outdoors01.jpg";
-//	static String fileName = "data/sunflowers.png";
-//	static String fileName = "data/particles01.jpg";
-//	static String fileName = "data/scale/beach02.jpg";
-//	static String fileName = "data/shapes01.png";
-
 	// shows panel for displaying input image
 	ImagePanel panel = new ImagePanel();
 
 	BufferedImage input;
 	Class<T> imageType;
 	Class<D> derivType;
+	boolean processedImage = false;
 
 	public ShowEdgeContourApp(Class<T> imageType, Class<D> derivType) {
-
 		this.imageType = imageType;
 		this.derivType = derivType;
 
@@ -67,7 +60,7 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		addAlgorithm("Canny", FactoryDetectEdgeContour.canny(1,40,imageType,derivType));
 		addAlgorithm("Binary Simple", FactoryDetectEdgeContour.<T>binarySimple());
 
-		add(panel, BorderLayout.CENTER);
+		addMainGUI(panel);
 	}
 
 	@Override
@@ -78,6 +71,7 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setPreferredSize(new Dimension(width,height));
+				processedImage = true;
 				refreshAlgorithm();
 			}});
 	}
@@ -113,18 +107,41 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		panel.repaint();
 	}
 
-	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage(fileName);
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
 
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
+	}
+
+	public static void main( String args[] ) {
 		ShowEdgeContourApp<ImageFloat32,ImageFloat32> app =
 				new ShowEdgeContourApp<ImageFloat32, ImageFloat32>(ImageFloat32.class, ImageFloat32.class);
 //		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
-		app.process(input);
+		ImageListManager manager = new ImageListManager();
+		manager.add("shapes","data/shapes01.png");
+		manager.add("sunflowers","data/sunflowers.png");
+		manager.add("beach","data/scale/beach02.jpg");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
+
 		ShowImages.showWindow(app,"Contours");
-//		input = UtilImageIO.loadImage(fileName);
-//		doStuff(input, ImageUInt8.class, ImageSInt16.class);
+		
 		System.out.println("Done");
 	}
 }

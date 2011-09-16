@@ -26,11 +26,11 @@ import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.gui.ProcessImage;
-import boofcv.gui.SelectAlgorithmPanel;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
@@ -45,12 +45,8 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel implements ProcessImage
+		extends SelectAlgorithmImagePanel implements ProcessImage
 {
-//	static String fileName = "data/outdoors01.jpg";
-	static String fileName = "data/sunflowers.png";
-//	static String fileName = "data/particles01.jpg";
-//	static String fileName = "data/scale/beach02.jpg";
 
 	static int maxFeatures = 400;
 	static int maxScaleFeatures = maxFeatures/3;
@@ -60,7 +56,7 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 	float thresh = 1;
 	T grayImage;
 	Class<T> imageType;
-	boolean hasImage = false;
+	boolean processImage = false;
 	BufferedImage input;
 	BufferedImage workImage;
 	FancyInterestPointRender render = new FancyInterestPointRender();
@@ -98,27 +94,28 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		addAlgorithm("FastHessian",FactoryInterestPoint.<T>fromFastHessian(maxScaleFeatures,9,4,4));
 
 		panel = new ImagePanel();
-		add(panel, BorderLayout.CENTER);
+		addMainGUI(panel);
 	}
 
 	@Override
-	public synchronized void process( BufferedImage input ) {
+	public void process( BufferedImage input ) {
+		setInputImage(input);
 		this.input = input;
 		grayImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_BGR);
 		panel.setBufferedImage(workImage);
-		hasImage = true;
 		refreshAlgorithm();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setPreferredSize(new Dimension(workImage.getWidth(), workImage.getHeight()));
+				processImage = true;
 			}});
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(String name, Object cookie) {
-		if( !hasImage )
+	public void setActiveAlgorithm(String name, Object cookie) {
+		if( input == null )
 			return;
 
 		final InterestPointDetector<T> det = (InterestPointDetector<T>)cookie;
@@ -141,14 +138,39 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		Graphics2D g2 = workImage.createGraphics();
 		g2.drawImage(input,0,0,grayImage.width,grayImage.height,null);
 		render.draw(g2);
-
 		panel.repaint();
 	}
 
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
+
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processImage;
+	}
+
 	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage(fileName);
 		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageFloat32.class,ImageFloat32.class);
-		app.process(input);
+
+		ImageListManager manager = new ImageListManager();
+		manager.add("shapes","data/shapes01.png");
+		manager.add("sunflowers","data/sunflowers.png");
+		manager.add("beach","data/scale/beach02.jpg");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
+
 		ShowImages.showWindow(app,"Point Feature");
 
 		System.out.println("Done");

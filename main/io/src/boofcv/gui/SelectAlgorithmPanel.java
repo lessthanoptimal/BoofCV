@@ -18,6 +18,8 @@
 
 package boofcv.gui;
 
+import boofcv.io.image.ImageListManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -37,12 +39,12 @@ public abstract class SelectAlgorithmPanel extends JPanel
 {
 	JToolBar toolbar;
 	JComboBox algBox;
-	List<Object> cookies = new ArrayList<Object>();
+	List<Object> algCookies = new ArrayList<Object>();
+	ImageListManager imageManager;
 
 	public SelectAlgorithmPanel() {
 		toolbar = new JToolBar();
 		algBox = new JComboBox();
-		toolbar.add( new JLabel("Algorithm"));
 		toolbar.add(algBox);
 
 		algBox.addActionListener(this);
@@ -52,7 +54,7 @@ public abstract class SelectAlgorithmPanel extends JPanel
 	}
 
 	public void addAlgorithm( final String name , Object cookie ) {
-		cookies.add(cookie);
+		algCookies.add(cookie);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				algBox.addItem(name);
@@ -64,36 +66,41 @@ public abstract class SelectAlgorithmPanel extends JPanel
 	 * needs to be rendered again.
 	 */
 	public void refreshAlgorithm() {
-		Object cookie = cookies.get(algBox.getSelectedIndex());
+		Object cookie = algCookies.get(algBox.getSelectedIndex());
 		String name = (String)algBox.getSelectedItem();
-		performSetAlgorithm(cookie, name);
+		performSetAlgorithm(name, cookie);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		JComboBox cb = (JComboBox)e.getSource();
+		if( e.getSource() == algBox ) {
+			final Object cookie = algCookies.get(algBox.getSelectedIndex());
+			final String name = (String)algBox.getSelectedItem();
 
-		final Object cookie = cookies.get(cb.getSelectedIndex());
-		final String name = (String)cb.getSelectedItem();
-		
-		new Thread() {
-			public void run() {
-				performSetAlgorithm(cookie, name);
-			}
-		}.start();
+			new Thread() {
+				public void run() {
+					performSetAlgorithm(name, cookie);
+				}
+			}.start();
+		}
 	}
 
-	private void performSetAlgorithm(Object cookie, String name) {
+	private void performSetAlgorithm(String name, Object cookie) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				algBox.setEnabled(false);
+				toolbar.setEnabled(false);
 				}});
 		setActiveAlgorithm( name , cookie );
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				algBox.setEnabled(true);
+				toolbar.setEnabled(true);
 			}});
 	}
 
+	public ImageListManager getImageManager() {
+		return imageManager;
+	}
+
 	public abstract void setActiveAlgorithm( String name , Object cookie );
+
 }

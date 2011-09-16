@@ -79,6 +79,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 			} catch (InvocationTargetException e) {
 			}
 		}
+		splitPane.requestFocus();
 	}
 
 	public int getListWidth(){

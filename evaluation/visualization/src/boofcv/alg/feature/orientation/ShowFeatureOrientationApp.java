@@ -27,12 +27,11 @@ import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.gui.ProcessImage;
-import boofcv.gui.SelectAlgorithmPanel;
-import boofcv.gui.UtilVisualize;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.SelectInputImageToolBar;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -48,7 +47,8 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel implements ProcessImage {
+		extends SelectAlgorithmImagePanel implements ProcessImage
+{
 
 	ImagePanel panel;
 
@@ -59,28 +59,31 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 	BufferedImage input;
 	Class<T> imageType;
 	Class<D> derivType;
+	// true after it processes one image
+	boolean hasProcessed = false;
 
 	public ShowFeatureOrientationApp(Class<T> imageType, Class<D> derivType) {
-		this.input = input;
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		addAlgorithm("No Gradient", FactoryOrientationAlgs.nogradient(radius,imageType));
-		addAlgorithm("Average", FactoryOrientationAlgs.average(radius,false,derivType));
-		addAlgorithm("Average Weighted", FactoryOrientationAlgs.average(radius,true,derivType));
-		addAlgorithm("Histogram 10", FactoryOrientationAlgs.histogram(10,radius,false,derivType));
-		addAlgorithm("Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType));
-		addAlgorithm("Sliding Window", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
-		addAlgorithm("Sliding Window Weighted", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
-		addAlgorithm("Average II", FactoryOrientationAlgs.average_ii(radius,false,imageType));
-		addAlgorithm("Average II Weighted", FactoryOrientationAlgs.average_ii(radius,true,imageType));
+		addAlgorithm("Pixel", FactoryOrientationAlgs.nogradient(radius,imageType));
+		addAlgorithm("Gradient Average", FactoryOrientationAlgs.average(radius,false,derivType));
+		addAlgorithm("Gradient Average Weighted", FactoryOrientationAlgs.average(radius,true,derivType));
+		addAlgorithm("Gradient Histogram 10", FactoryOrientationAlgs.histogram(10,radius,false,derivType));
+		addAlgorithm("Gradient Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType));
+		addAlgorithm("Gradient Sliding Window", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
+		addAlgorithm("Gradient Sliding Window Weighted", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
+		addAlgorithm("Integral Average", FactoryOrientationAlgs.average_ii(radius,false,imageType));
+		addAlgorithm("Integral Average Weighted", FactoryOrientationAlgs.average_ii(radius,true,imageType));
 
 		panel = new ImagePanel();
-		add(panel, BorderLayout.CENTER);
+		addMainGUI(panel);
 	}
 
 	@Override
 	public synchronized void process( final BufferedImage input ) {
+		setInputImage(input);
+
 		panel.setBufferedImage(input);
 		this.input = input;
 		refreshAlgorithm();
@@ -88,7 +91,7 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 			public void run() {
 				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
 				setSize(input.getWidth(),input.getHeight());
-				System.out.println("set size called!");
+				hasProcessed = true;
 			}});
 	}
 
@@ -148,7 +151,20 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		panel.repaint();
 	}
 
+	@Override
+	public synchronized void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
 
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return hasProcessed;
+	}
 
 	public static void main( String args[] ) {
 		ShowFeatureOrientationApp<ImageFloat32,ImageFloat32> app =
@@ -157,14 +173,20 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 //		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
-		SelectInputImageToolBar select = new SelectInputImageToolBar(app);
-		select.addImage("shapes","data/shapes01.png");
-		select.addImage("sunflowers","data/sunflowers.png");
-		select.addImage("beach","data/scale/beach02.jpg");
-		UtilVisualize.manageSelectInput(select,app,null,true);
+		ImageListManager manager = new ImageListManager();
+		manager.add("shapes","data/shapes01.png");
+		manager.add("sunflowers","data/sunflowers.png");
+		manager.add("beach","data/scale/beach02.jpg");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
 
 		System.out.println("Calling show window");
-		ShowImages.showWindow(select,"Feature Orientation");
+		ShowImages.showWindow(app,"Feature Orientation");
 		System.out.println("Done");
 	}
 }

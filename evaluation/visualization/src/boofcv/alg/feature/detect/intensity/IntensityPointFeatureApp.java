@@ -29,11 +29,11 @@ import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.gui.ProcessImage;
-import boofcv.gui.SelectAlgorithmPanel;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
@@ -47,18 +47,8 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel implements ProcessImage
+		extends SelectAlgorithmImagePanel implements ProcessImage
 {
-
-//	static String fileName = "data/outdoors01.jpg";
-//	static String fileName = "data/sunflowers.png";
-//	static String fileName = "data/particles01.jpg";
-//	static String fileName = "data/scale/beach02.jpg";
-//	static String fileName = "data/scale/mountain_7p1mm.jpg";
-//	static String fileName = "data/indoors01.jpg";
-	static String fileName = "data/shapes01.png";
-//	static String fileName = "data/stitch/cave_01.jpg";
-
 	// displays intensity image
 	ImagePanel gui;
 
@@ -72,6 +62,8 @@ public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
 	Class<T> imageType;
 	// computes image derivative
 	AnyImageDerivative<T,D> deriv;
+	// if it has processed an image or not
+	boolean processImage = false;
 
 	public IntensityPointFeatureApp( Class<T> imageType , Class<D> derivType ) {
 		this.imageType = imageType;
@@ -80,7 +72,6 @@ public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
 		ImageGenerator<D> derivGen = FactoryImageGenerator.create(derivType);
 		deriv = new AnyImageDerivative<T,D>(GradientThree.getKernelX(isInteger),imageType,derivGen);
 
-		addAlgorithm("Original",null);
 		addAlgorithm("Hessian Det", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
 		addAlgorithm("Laplacian", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
 		addAlgorithm("Harris",new WrapperGradientCornerIntensity<T,D>(FactoryPointIntensityAlg.createHarris(derivType,2,0.4f)));
@@ -90,20 +81,14 @@ public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
 		addAlgorithm("Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
 
 		gui = new ImagePanel();
-		add(gui, BorderLayout.CENTER);
+		addMainGUI(gui);
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(String name, Object cookie ) {
+	public void setActiveAlgorithm(String name, Object cookie ) {
 		if( workImage == null )
 			return;
 
-		if( cookie == null ) {
-			gui.setBufferedImage(input);
-			gui.repaint();
-			return;
-		}
-		
 		GeneralFeatureIntensity<T,D> intensity = (GeneralFeatureIntensity<T,D>)cookie;
 
 		deriv.setInput(workImage);
@@ -123,27 +108,52 @@ public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
 	}
 
 	@Override
-	public synchronized void process( final BufferedImage input ) {
+	public void process( final BufferedImage input ) {
+		setInputImage(input);
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 		temp = new BufferedImage(workImage.width,workImage.height,BufferedImage.TYPE_INT_BGR);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
+				processImage = true;
 			}});
 		refreshAlgorithm();
 	}
 
-	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage(fileName);
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
 
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processImage;
+	}
+
+	public static void main( String args[] ) {
 		IntensityPointFeatureApp<ImageFloat32,ImageFloat32> app =
 				new IntensityPointFeatureApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
-		app.process(input);
 
 //		IntensityFeatureScaleSpaceApp<ImageUInt8, ImageSInt16> app2 =
 //				new IntensityFeatureScaleSpaceApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
-//		app2.setImage(input);
+
+		ImageListManager manager = new ImageListManager();
+		manager.add("shapes","data/shapes01.png");
+		manager.add("sunflowers","data/sunflowers.png");
+		manager.add("beach","data/scale/beach02.jpg");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
 
 		ShowImages.showWindow(app,"Feature Intensity");
 	}

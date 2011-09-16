@@ -26,10 +26,10 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.ProcessImage;
-import boofcv.gui.SelectAlgorithmPanel;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -44,17 +44,8 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmPanel implements ProcessImage
+		extends SelectAlgorithmImagePanel implements ProcessImage
 {
-
-//	static String fileName = "data/outdoors01.jpg";
-	static String fileName = "data/sunflowers.png";
-//	static String fileName = "data/particles01.jpg";
-//	static String fileName = "data/scale/beach02.jpg";
-//	static String fileName = "data/scale/mountain_7p1mm.jpg";
-//	static String fileName = "data/indoors01.jpg";
-//	static String fileName = "data/shapes01.png";
-//	static String fileName = "data/stitch/cave_01.jpg";
 
 	ListDisplayPanel gui = new ListDisplayPanel();
 
@@ -63,6 +54,7 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 	BufferedImage input;
 	T workImage;
 	Class<T> imageType;
+	boolean processedImage = false;
 
 	public IntensityFeatureScaleSpaceApp( Class<T> imageType , Class<D> derivType ) {
 		this.imageType = imageType;
@@ -75,7 +67,7 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 		addAlgorithm("KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
 		addAlgorithm("Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
 
-		add(gui, BorderLayout.CENTER);
+		addMainGUI(gui);
 
 		ss = FactoryGaussianScaleSpace.nocache(imageType);
 
@@ -87,14 +79,13 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(String name, Object cookie ) {
+	public void setActiveAlgorithm(String name, Object cookie ) {
 		if( input == null ) {
 			return;
 		}
 		GeneralFeatureIntensity<T,D> intensity = (GeneralFeatureIntensity<T,D>)cookie;
 
 		gui.reset();
-		gui.addImage(input,"Original Image");
 		BufferedImage b = VisualizeImageData.grayMagnitude(workImage,null, 255);
 		gui.addImage(b,"Gray Image");
 
@@ -130,28 +121,52 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 	}
 
 	@Override
-	public synchronized void process( final BufferedImage input ) {
+	public void process( final BufferedImage input ) {
+		setInputImage(input);
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 		ss.setImage(workImage);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
+				setPreferredSize(new Dimension(input.getWidth()+50,input.getHeight()));
+				processedImage = true;
 			}
 		});
 		refreshAlgorithm();
 	}
 
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
+
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
+	}
+
 	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage(fileName);
 
 		IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32> app =
 				new IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
-		app.process(input);
 
-//		IntensityFeatureScaleSpaceApp<ImageUInt8, ImageSInt16> app2 =
-//				new IntensityFeatureScaleSpaceApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
-//		app2.setImage(input);
+		ImageListManager manager = new ImageListManager();
+		manager.add("shapes","data/shapes01.png");
+		manager.add("sunflowers","data/sunflowers.png");
+		manager.add("beach","data/scale/beach02.jpg");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
+
 		ShowImages.showWindow(app,"Feature Scale Space Intensity");
 
 	}

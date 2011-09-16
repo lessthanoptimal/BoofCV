@@ -19,16 +19,10 @@
 package boofcv.applet;
 
 import boofcv.gui.ProcessImage;
-import boofcv.gui.UtilVisualize;
-import boofcv.io.image.SelectInputImageToolBar;
 import boofcv.struct.image.ImageFloat32;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
 
 
 /**
@@ -38,10 +32,8 @@ public class SingleInputApplet extends JApplet {
 
 	@Override
 	public void init() {
-		showStatus("Loading Input Image");
+		showStatus("Loading Parameters");
 		String directory = getParameter("directory");
-		final BufferedImage image = loadImage(directory+"data/indoors01.jpg");
-
 
 		final String panelPath = getParameter("panelPath");
 		Class inputType = ImageFloat32.class;
@@ -56,25 +48,23 @@ public class SingleInputApplet extends JApplet {
 			return;
 		}
 
-		SelectInputImageToolBar toolbar = new SelectInputImageToolBar(comp);
-		toolbar.addImage("Room",directory+"data/indoors01.jpg");
-		toolbar.addImage("Shapes",directory+"data/shapes01.png");
-		toolbar.addImage("Sunflowers",directory+"data/sunflowers.jpg");
+		showStatus("Loading Image");
+		ProcessImage p = (ProcessImage)comp;
 
-		UtilVisualize.manageSelectInput(toolbar,(ProcessImage)comp,getCodeBase(),true);
+		AppletImageListManager manager = new AppletImageListManager(getCodeBase());
+		manager.add("shapes",directory+"data/shapes01.png");
+		manager.add("sunflowers",directory+"data/sunflowers.jpg");
+		manager.add("room",directory+"data/indoors01.jpg");
 
-		getContentPane().add(toolbar, BorderLayout.CENTER);
-	}
+		p.setImageManager(manager);
 
-
-	public BufferedImage loadImage( String path ) {
-		try {
-		   URL url = new URL(getCodeBase(), path);
-		   return ImageIO.read(url);
-		} catch (IOException e) {
-			System.err.println("Failed to load image: "+path);
-			return null;
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !p.getHasProcessedImage() ) {
+			Thread.yield();
 		}
+
+		showStatus("Running");
+		getContentPane().add(comp, BorderLayout.CENTER);
 	}
 
 	@Override
