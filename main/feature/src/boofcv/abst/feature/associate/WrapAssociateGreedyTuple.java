@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateGreedyTuple;
-import boofcv.alg.feature.associate.ScoreAssociateTuple;
+import boofcv.alg.feature.associate.ScoreAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -33,11 +33,11 @@ import pja.sorting.QuickSelectArray;
  */
 public abstract class WrapAssociateGreedyTuple implements GeneralAssociation<TupleDesc_F64> {
 
-	ScoreAssociateTuple score;
+	ScoreAssociation<TupleDesc_F64> score;
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
 	double copy[];
 
-	public void setScore(ScoreAssociateTuple score) {
+	public void setScore(ScoreAssociation<TupleDesc_F64> score) {
 		this.score = score;
 	}
 

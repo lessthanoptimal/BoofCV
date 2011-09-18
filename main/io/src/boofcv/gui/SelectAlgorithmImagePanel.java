@@ -39,13 +39,13 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 		implements ActionListener
 {
 	JToolBar toolbar;
-	// used to select the algorithm
-	JComboBox algBox;
+	// each combo box is used to select different algorithms
+	JComboBox algBoxes[];
 	// used to select the input image
 	JComboBox imageBox;
 	// when selected it shows the original image
 	JCheckBox originalCheck;
-	List<Object> algCookies = new ArrayList<Object>();
+	List<Object> algCookies[];
 	ImageListManager imageManager;
 
 	// what the original image was before any processing
@@ -54,19 +54,30 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 	ImagePanel origPanel = new ImagePanel();
 	// the main GUI being displayed
 	Component gui;
+	// should it post algorithm change events yet?
+	boolean postAlgorithmEvents = false;
 
-	public SelectAlgorithmImagePanel() {
+	public SelectAlgorithmImagePanel(int numAlgFamilies) {
 		super(new BorderLayout());
 		toolbar = new JToolBar();
 
 		imageBox = new JComboBox();
 		toolbar.add(imageBox);
 		imageBox.addActionListener(this);
+		imageBox.setMaximumSize(imageBox.getPreferredSize());
 
-		algBox = new JComboBox();
-		toolbar.add(algBox);
-		algBox.addActionListener(this);
+		algBoxes = new JComboBox[numAlgFamilies];
+		algCookies = new List[numAlgFamilies];
+		for( int i = 0; i < numAlgFamilies; i++ ) {
+			JComboBox b = algBoxes[i] = new JComboBox();
+			toolbar.add( b);
+			b.addActionListener(this);
+			b.setMaximumSize(b.getPreferredSize());
+			algCookies[i] = new ArrayList<Object>();
+		}
 
+		toolbar.add(Box.createHorizontalGlue());
+		
 		originalCheck = new JCheckBox("Show Input");
 		toolbar.add(originalCheck);
 		originalCheck.addActionListener(this);
@@ -78,10 +89,12 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 
 	/**
 	 * Used to add the main GUI to this panel.   Must use this function.
+	 * Algorithm change events will not be posted until this function has been set.
 	 *
 	 * @param gui The main GUI being displayed.
 	 */
-	public void addMainGUI( final Component gui ) {
+	public void setMainGUI( final Component gui ) {
+		postAlgorithmEvents = true;
 		this.gui = gui;
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -121,37 +134,84 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 			}});
 	}
 
-	public void addAlgorithm( final String name , Object cookie ) {
-		algCookies.add(cookie);
+
+	public void addAlgorithm(final int indexFamily, final String name, Object cookie) {
+		algCookies[indexFamily].add(cookie);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				algBox.addItem(name);
+				algBoxes[indexFamily].addItem(name);
 			}});
 	}
 
 	/**
-	 * Tells it to switch again to the current algorithm.  Useful if the input has changed and information
-	 * needs to be rendered again.
+	 * Grabs the currently selected algorithm, passes information to GUI for updating, toggles GUI
+	 * being active/not.  refreshAll() is called in a new thread.
+	 *
 	 */
-	public void refreshAlgorithm() {
-		Object cookie = algCookies.get(algBox.getSelectedIndex());
-		String name = (String)algBox.getSelectedItem();
-		performSetAlgorithm(name, cookie);
+	public void doRefreshAll() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				// collect the current state inside the GUI thread
+				final Object state[] = new Object[ algCookies.length ];
+				for( int i = 0; i < state.length; i++ ) {
+					state[i] = algCookies[i].get(algBoxes[i].getSelectedIndex());
+				}
+				// create a new thread to process this change
+				new Thread() {
+					public void run() {
+						setActiveGUI(false);
+						refreshAll(state);
+						setActiveGUI(true);
+					}
+				}.start();
+			}});
+	}
+
+	/**
+	 * Enables/disables the ability to interact with the algorithms GUI.
+	 */
+	private void setActiveGUI( final boolean isEnabled ) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				toolbar.setEnabled(isEnabled);
+				for( JComboBox b : algBoxes ) {
+					b.setEnabled(isEnabled);
+				}
+				imageBox.setEnabled(isEnabled);
+			}
+		});
+	}
+
+	/**
+	 * Returns the cookie associated with the specified algorithm family.
+	 */
+	protected <T> T getAlgorithmCookie( int indexFamily ) {
+		return (T)algCookies[indexFamily].get( algBoxes[indexFamily].getSelectedIndex() );
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == algBox ) {
-			// notify the main GUI to change the input algorithm
-			final Object cookie = algCookies.get(algBox.getSelectedIndex());
-			final String name = (String)algBox.getSelectedItem();
+		for( int i = 0; i < algBoxes.length; i++ ) {
+			if( algBoxes[i] == e.getSource() ) {
+				// see if its ready to start posting these events
+				if( !postAlgorithmEvents )
+					return;
 
-			new Thread() {
-				public void run() {
-					performSetAlgorithm(name, cookie);
-				}
-			}.start();
-		} else if( e.getSource() == imageBox ) {
+				// notify the main GUI to change the input algorithm
+				final Object cookie = algCookies[i].get(algBoxes[i].getSelectedIndex());
+				final String name = (String)algBoxes[i].getSelectedItem();
+				final int indexFamily = i;
+
+				new Thread() {
+					public void run() {
+						performSetAlgorithm(indexFamily,name, cookie);
+					}
+				}.start();
+				return;
+			}
+		}
+
+		if( e.getSource() == imageBox ) {
 			// notify the main GUI to change the input image
 			final String name = (String)imageBox.getSelectedItem();
 			new Thread() {
@@ -174,28 +234,16 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 		}
 	}
 
-	private void performSetAlgorithm(String name, Object cookie) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				toolbar.setEnabled(false);
-				}});
-		setActiveAlgorithm( name , cookie );
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				toolbar.setEnabled(true);
-			}});
+	private void performSetAlgorithm( int indexFamily , String name, Object cookie) {
+		setActiveGUI(false);
+		setActiveAlgorithm(indexFamily, name , cookie );
+		setActiveGUI(true);
 	}
 
 	private void performChangeImage(String name , int index ) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				toolbar.setEnabled(false);
-				}});
+		setActiveGUI(false);
 		changeImage( name , index );
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				toolbar.setEnabled(true);
-			}});
+		setActiveGUI(true);
 	}
 
 	public ImageListManager getImageManager() {
@@ -203,12 +251,20 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 	}
 
 	/**
+	 * Provides the current state of all selected algorithms.
+	 *
+	 * @param cookies state of each selected algorithm.
+	 */
+	public abstract void refreshAll( Object[] cookies );
+
+	/**
 	 * A request has been made to change the processing algorithm.
 	 *
+	 * @param indexFamily
 	 * @param name Display name of the algorithm.
 	 * @param cookie Reference to user defined data.
 	 */
-	public abstract void setActiveAlgorithm( String name , Object cookie );
+	public abstract void setActiveAlgorithm(int indexFamily, String name, Object cookie);
 
 	/**
 	 * A request to change the input image has been made.  The input image's label and its index in the

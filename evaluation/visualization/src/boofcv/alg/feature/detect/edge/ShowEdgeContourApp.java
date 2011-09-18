@@ -53,18 +53,18 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 	boolean processedImage = false;
 
 	public ShowEdgeContourApp(Class<T> imageType, Class<D> derivType) {
+		super(1);
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		addAlgorithm("Original Image", null);
-		addAlgorithm("Canny", FactoryDetectEdgeContour.canny(1,40,imageType,derivType));
-		addAlgorithm("Binary Simple", FactoryDetectEdgeContour.<T>binarySimple());
+		addAlgorithm(0, "Canny", FactoryDetectEdgeContour.canny(1,40,imageType,derivType));
+		addAlgorithm(0, "Binary Simple", FactoryDetectEdgeContour.<T>binarySimple());
 
-		addMainGUI(panel);
+		setMainGUI(panel);
 	}
 
-	@Override
 	public void process( BufferedImage input ) {
+		setInputImage(input);
 		this.input = input;
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -72,19 +72,19 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 			public void run() {
 				setPreferredSize(new Dimension(width,height));
 				processedImage = true;
-				refreshAlgorithm();
+				doRefreshAll();
 			}});
 	}
 
 	@Override
-	public void setActiveAlgorithm(String name, Object cookie) {
+	public void refreshAll(Object[] cookies) {
+		setActiveAlgorithm(0,null,cookies[0]);
+	}
+
+	@Override
+	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if( input == null )
 			return;
-		if( cookie == null ) {
-			panel.setBufferedImage(input);
-			panel.repaint();
-			return;
-		}
 
 		DetectEdgeContour<T> contour = (DetectEdgeContour<T>)cookie;
 

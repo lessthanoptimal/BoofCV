@@ -18,11 +18,13 @@
 
 package boofcv.alg.filter.kernel;
 
+import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactorySteerable;
+import boofcv.gui.image.ShowImages;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt32;
 
 
 /**
@@ -31,8 +33,8 @@ import boofcv.struct.image.ImageFloat32;
 public class DisplaySteerableGaussianApp <T extends ImageBase, K extends Kernel2D>
 	extends DisplaySteerableBase<T,K>
 {
-	public DisplaySteerableGaussianApp(Class<T> imageType, Class<K> kernelType) {
-		super(imageType, kernelType);
+	public DisplaySteerableGaussianApp(Class<T> imageType) {
+		super(imageType, (Class)FactoryKernel.getKernelType(imageType,2));
 	}
 
 	@Override
@@ -41,12 +43,12 @@ public class DisplaySteerableGaussianApp <T extends ImageBase, K extends Kernel2
 	}
 
 	public static void main( String args[] ) {
-		DisplaySteerableGaussianApp<ImageFloat32,Kernel2D_F32> app =
-				new DisplaySteerableGaussianApp<ImageFloat32,Kernel2D_F32>(ImageFloat32.class,Kernel2D_F32.class);
-		app.process();
+//		DisplaySteerableGaussianApp<ImageFloat32,Kernel2D_F32> app =
+//				new DisplaySteerableGaussianApp<ImageFloat32,Kernel2D_F32>(ImageFloat32.class);
 
-//		DisplaySteerableGaussianApp<ImageSInt32, Kernel2D_I32> app =
-//				new DisplaySteerableGaussianApp<ImageSInt32,Kernel2D_I32>(ImageSInt32.class,Kernel2D_I32.class);
-//		app.process();
+		DisplaySteerableGaussianApp<ImageSInt32, Kernel2D_I32> app =
+				new DisplaySteerableGaussianApp<ImageSInt32,Kernel2D_I32>(ImageSInt32.class);
+
+		ShowImages.showWindow(app,"Steerable Gaussian Kernels");
 	}
 }

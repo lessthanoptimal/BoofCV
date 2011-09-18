@@ -20,14 +20,17 @@ package boofcv.alg.filter.kernel;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.GPixelMath;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.struct.convolve.Kernel1D;
+import boofcv.struct.convolve.Kernel2D;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
 import java.awt.*;
@@ -39,14 +42,19 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DisplayGaussianKernelApp extends SelectAlgorithmPanel {
+public class DisplayGaussianKernelApp<T extends ImageBase> extends SelectAlgorithmPanel {
 	int imageSize = 400;
 
-	ImageFloat32 largeImg = new ImageFloat32(imageSize,imageSize);
+	T largeImg;
 
 	ListDisplayPanel panel = new ListDisplayPanel();
 
-	public DisplayGaussianKernelApp() {
+	Class<T> imageType;
+
+	public DisplayGaussianKernelApp( Class<T> imageType ) {
+		this.imageType = imageType;
+
+		largeImg = GeneralizedImageOps.createImage(imageType,imageSize,imageSize);
 		addAlgorithm("Gaussian",new DerivType(0,0));
 		addAlgorithm("Deriv X",new DerivType(1,0));
 		addAlgorithm("Deriv XX",new DerivType(2,0));
@@ -72,14 +80,17 @@ public class DisplayGaussianKernelApp extends SelectAlgorithmPanel {
 
 			int maxOrder = Math.max(type.orderX,type.orderY);
 			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,maxOrder);
-			Kernel1D_F32 kerX =  FactoryKernelGaussian.derivativeK(Kernel1D_F32.class,type.orderX,sigma,radius);
-			Kernel1D_F32 kerY = FactoryKernelGaussian.derivativeK(Kernel1D_F32.class,type.orderY,sigma,radius);
-			Kernel2D_F32 kernel = KernelMath.convolve(kerY,kerX);
 
-			ImageFloat32 smallImg = KernelMath.convertToImage(kernel);
+			Class typeKer1 = FactoryKernel.getKernelType(imageType,1);
+
+			Kernel1D kerX =  FactoryKernelGaussian.derivativeK(typeKer1,type.orderX,sigma,radius);
+			Kernel1D kerY = FactoryKernelGaussian.derivativeK(typeKer1,type.orderY,sigma,radius);
+			Kernel2D kernel = GKernelMath.convolve(kerY,kerX);
+
+			T smallImg = GKernelMath.convertToImage(kernel);
 			DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
 
-			float maxValue = PixelMath.maxAbs(largeImg);
+			double maxValue = GPixelMath.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
 
 			panel.addImage(out,String.format("%5d",radius));
@@ -97,7 +108,8 @@ public class DisplayGaussianKernelApp extends SelectAlgorithmPanel {
 	}
 
 	public static void main( String args[] ) {
-		DisplayGaussianKernelApp panel = new DisplayGaussianKernelApp();
+		DisplayGaussianKernelApp<ImageFloat32> panel = new DisplayGaussianKernelApp<ImageFloat32>(ImageFloat32.class);
+//		DisplayGaussianKernelApp<ImageSInt32> panel = new DisplayGaussianKernelApp<ImageSInt32>(ImageSInt32.class);
 
 		ShowImages.showWindow(panel,"Gaussian Kernels");
 	}

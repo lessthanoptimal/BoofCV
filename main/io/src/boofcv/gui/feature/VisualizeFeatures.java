@@ -47,6 +47,20 @@ public class VisualizeFeatures {
 		}
 	}
 
+	public static void drawPoint( Graphics2D g2 , int x , int y , Color color ) {
+		int r = 5;
+		int w = r*2+1;
+
+		int r2 = r+2;
+		int w2 = r2*2+1;
+
+		g2.setColor(Color.BLACK);
+		g2.fillOval(x-r2,y-r2,w2,w2);
+
+		g2.setColor(color);
+		g2.fillOval(x-r,y-r,w,w);
+	}
+
 	public static void drawScalePoints( Graphics2D g2 , java.util.List<ScalePoint> points , double radius ) {
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));

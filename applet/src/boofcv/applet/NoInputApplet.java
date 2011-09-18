@@ -16,29 +16,42 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
+package boofcv.applet;
 
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageFloat32;
+
+import javax.swing.*;
+import java.awt.*;
 
 
 /**
+ * Applet which does not require any images for input.
+ *
  * @author Peter Abeles
  */
-public class ScoreAssociateEuclidean implements ScoreAssociation<TupleDesc_F64> {
+public class NoInputApplet extends JApplet {
+
 	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
-		final int N = a.value.length;
-		double total = 0;
-		for( int i = 0; i < N; i++ ) {
-			double d = a.value[i]-b.value[i];
-			total += d*d;
+	public void init() {
+		showStatus("Loading Parameters");
+		final String panelPath = getParameter("panelPath");
+
+		showStatus("Creating GUI component");
+		Class inputType = ImageFloat32.class;
+
+		final JComponent comp = FactoryVisualPanel.create(panelPath,inputType);
+
+		if( comp == null ) {
+			showStatus("Failed to create GUI component");
+			return;
 		}
 
-		return Math.sqrt(total);
+		showStatus("Running");
+		getContentPane().add(comp, BorderLayout.CENTER);
 	}
 
 	@Override
-	public boolean isZeroMinimum() {
-		return true;
+	public String getAppletInfo() {
+		return "Shows gradient of an image";
 	}
 }

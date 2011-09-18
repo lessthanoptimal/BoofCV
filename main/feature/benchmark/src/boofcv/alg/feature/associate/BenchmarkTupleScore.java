@@ -42,10 +42,10 @@ public class BenchmarkTupleScore {
 
 	public static class General implements Performer {
 
-		ScoreAssociateTuple alg;
+		ScoreAssociation alg;
 		String name;
 
-		public General(String name, ScoreAssociateTuple alg) {
+		public General(String name, ScoreAssociation alg) {
 			this.alg = alg;
 			this.name = name;
 		}

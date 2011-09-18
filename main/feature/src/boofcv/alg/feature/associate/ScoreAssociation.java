@@ -18,17 +18,14 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.struct.feature.TupleDesc_F64;
-
-
 /**
- * Scores the quality of fit between two {@link TupleDesc_F64} feature descriptions.
+ * Scores the quality of fit between two feature descriptions.
  * Designed to handle fit metrics with different statics.  In general it is assumed that
  * scores with lower values are better.  They can be limited to zero or go negative.
  *
  * @author Peter Abeles
  */
-public interface ScoreAssociateTuple {
+public interface ScoreAssociation<T> {
 
 	/**
 	 * Compte the fit score between the two features.
@@ -36,7 +33,7 @@ public interface ScoreAssociateTuple {
 	 * @param b second feature
 	 * @return Quality of fit score.
 	 */
-	public double score( TupleDesc_F64 a , TupleDesc_F64 b );
+	public double score( T a , T b );
 
 	/**
 	 * Is the best/minimum score zero?

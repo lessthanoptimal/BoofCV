@@ -20,7 +20,7 @@ package boofcv.benchmark.feature.homography;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
-import boofcv.alg.feature.associate.ScoreAssociateTuple;
+import boofcv.alg.feature.associate.ScoreAssociation;
 import boofcv.factory.feature.associate.FactoryAssociationTuple;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
@@ -154,7 +154,7 @@ public class BenchmarkFeatureHomography {
 	public static void main( String args[] ) {
 		double tolerance = 3;
 
-		ScoreAssociateTuple score = new ScoreAssociateEuclideanSq();
+		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociationTuple.forwardBackwards(score,-1);
 
 		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"evaluation/data/mikolajczk/ubc/",".png",tolerance);

@@ -43,13 +43,14 @@ public abstract class SelectAlgorithmPanel extends JPanel
 	ImageListManager imageManager;
 
 	public SelectAlgorithmPanel() {
+		super(new BorderLayout());
+
 		toolbar = new JToolBar();
 		algBox = new JComboBox();
 		toolbar.add(algBox);
 
 		algBox.addActionListener(this);
 
-		setLayout(new BorderLayout());
 		add(toolbar, BorderLayout.PAGE_START);
 	}
 

@@ -64,47 +64,47 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 	ImagePanel panel;
 
 	public DetectFeaturePointApp( Class<T> imageType , Class<D> derivType ) {
+		super(1);
 		this.imageType = imageType;
 
 		GeneralFeatureDetector<T,D> alg;
 
 		alg = FactoryCornerDetector.createFast(radius,20,maxFeatures,imageType);
-		addAlgorithm("Fast", FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "Fast", FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 		alg = FactoryCornerDetector.createHarris(radius,thresh,maxFeatures,derivType);
-		addAlgorithm("Harris",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "Harris",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 		alg = FactoryCornerDetector.createKlt(radius,thresh,maxFeatures,derivType);
-		addAlgorithm("KLT", FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "KLT", FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 		alg = FactoryCornerDetector.createKitRos(radius,thresh,maxFeatures,derivType);
-		addAlgorithm("KitRos",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "KitRos",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 		alg = FactoryCornerDetector.createMedian(radius,thresh,maxFeatures,imageType);
-		addAlgorithm("Median",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "Median",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 		alg = FactoryBlobDetector.createLaplace(radius,thresh,maxFeatures,derivType, HessianBlobIntensity.Type.DETERMINANT);
-		addAlgorithm("Hessian",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "Hessian",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 		alg = FactoryBlobDetector.createLaplace(radius,thresh,maxFeatures,derivType, HessianBlobIntensity.Type.TRACE);
-		addAlgorithm("Laplace",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "Laplace",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 
 		FeatureLaplaceScaleSpace<T,D> flss = FactoryInterestPointAlgs.hessianLaplace(radius,thresh,maxScaleFeatures,imageType,derivType);
-		addAlgorithm("Hess Lap SS",FactoryInterestPoint.fromFeatureLaplace(flss,scales,imageType));
+		addAlgorithm(0, "Hess Lap SS",FactoryInterestPoint.fromFeatureLaplace(flss,scales,imageType));
 		FeatureLaplacePyramid<T,D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius,thresh,maxScaleFeatures,imageType,derivType);
-		addAlgorithm("Hess Lap P",FactoryInterestPoint.fromFeatureLaplace(flp,scales,imageType));
+		addAlgorithm(0, "Hess Lap P",FactoryInterestPoint.fromFeatureLaplace(flp,scales,imageType));
 		FeatureScaleSpace<T,D> fss = FactoryInterestPointAlgs.hessianScaleSpace(radius,thresh,maxScaleFeatures,imageType,derivType);
-		addAlgorithm("Hessian SS",FactoryInterestPoint.fromFeature(fss,scales,imageType));
+		addAlgorithm(0, "Hessian SS",FactoryInterestPoint.fromFeature(fss,scales,imageType));
 		FeaturePyramid<T,D> fp = FactoryInterestPointAlgs.hessianPyramid(radius,thresh,maxScaleFeatures,imageType,derivType);
-		addAlgorithm("Hessian P",FactoryInterestPoint.fromFeature(fp,scales,imageType));
-		addAlgorithm("FastHessian",FactoryInterestPoint.<T>fromFastHessian(maxScaleFeatures,9,4,4));
+		addAlgorithm(0, "Hessian P",FactoryInterestPoint.fromFeature(fp,scales,imageType));
+		addAlgorithm(0, "FastHessian",FactoryInterestPoint.<T>fromFastHessian(maxScaleFeatures,9,4,4));
 
 		panel = new ImagePanel();
-		addMainGUI(panel);
+		setMainGUI(panel);
 	}
 
-	@Override
 	public void process( BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
 		grayImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_BGR);
 		panel.setBufferedImage(workImage);
-		refreshAlgorithm();
+		doRefreshAll();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -114,7 +114,12 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 	}
 
 	@Override
-	public void setActiveAlgorithm(String name, Object cookie) {
+	public void refreshAll(Object[] cookies) {
+		setActiveAlgorithm(0,null,cookies[0]);
+	}
+
+	@Override
+	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if( input == null )
 			return;
 

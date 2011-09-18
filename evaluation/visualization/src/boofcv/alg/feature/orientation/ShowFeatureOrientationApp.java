@@ -49,7 +49,6 @@ import java.awt.image.BufferedImage;
 public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase>
 		extends SelectAlgorithmImagePanel implements ProcessImage
 {
-
 	ImagePanel panel;
 
 	static int NUM_FEATURES = 500;
@@ -63,30 +62,30 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 	boolean hasProcessed = false;
 
 	public ShowFeatureOrientationApp(Class<T> imageType, Class<D> derivType) {
+		super(1);
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		addAlgorithm("Pixel", FactoryOrientationAlgs.nogradient(radius,imageType));
-		addAlgorithm("Gradient Average", FactoryOrientationAlgs.average(radius,false,derivType));
-		addAlgorithm("Gradient Average Weighted", FactoryOrientationAlgs.average(radius,true,derivType));
-		addAlgorithm("Gradient Histogram 10", FactoryOrientationAlgs.histogram(10,radius,false,derivType));
-		addAlgorithm("Gradient Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType));
-		addAlgorithm("Gradient Sliding Window", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
-		addAlgorithm("Gradient Sliding Window Weighted", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
-		addAlgorithm("Integral Average", FactoryOrientationAlgs.average_ii(radius,false,imageType));
-		addAlgorithm("Integral Average Weighted", FactoryOrientationAlgs.average_ii(radius,true,imageType));
+		addAlgorithm(0, "Pixel", FactoryOrientationAlgs.nogradient(radius,imageType));
+		addAlgorithm(0, "Gradient Average", FactoryOrientationAlgs.average(radius,false,derivType));
+		addAlgorithm(0, "Gradient Average Weighted", FactoryOrientationAlgs.average(radius,true,derivType));
+		addAlgorithm(0, "Gradient Histogram 10", FactoryOrientationAlgs.histogram(10,radius,false,derivType));
+		addAlgorithm(0, "Gradient Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType));
+		addAlgorithm(0, "Gradient Sliding Window", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
+		addAlgorithm(0, "Gradient Sliding Window Weighted", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
+		addAlgorithm(0, "Integral Average", FactoryOrientationAlgs.average_ii(radius,false,imageType));
+		addAlgorithm(0, "Integral Average Weighted", FactoryOrientationAlgs.average_ii(radius,true,imageType));
 
 		panel = new ImagePanel();
-		addMainGUI(panel);
+		setMainGUI(panel);
 	}
 
-	@Override
 	public synchronized void process( final BufferedImage input ) {
 		setInputImage(input);
 
 		panel.setBufferedImage(input);
 		this.input = input;
-		refreshAlgorithm();
+		doRefreshAll();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
@@ -96,7 +95,12 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(String name, Object cookie) {
+	public void refreshAll(Object[] cookies) {
+		setActiveAlgorithm(0,null,cookies[0]);
+	}
+
+	@Override
+	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if( input == null )
 			return;
 		

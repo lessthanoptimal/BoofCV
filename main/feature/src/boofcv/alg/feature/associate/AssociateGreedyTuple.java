@@ -44,7 +44,7 @@ public class AssociateGreedyTuple {
 	 */
 	public static void basic( FastQueue<TupleDesc_F64> src ,
 							  FastQueue<TupleDesc_F64> dst ,
-							  ScoreAssociateTuple score ,
+							  ScoreAssociation score ,
 							  double maxFitError ,
 							  int pairs[] )
 	{
@@ -79,7 +79,7 @@ public class AssociateGreedyTuple {
 	 */
 	public static void fitIsError( FastQueue<TupleDesc_F64> src ,
 								   FastQueue<TupleDesc_F64> dst ,
-								   ScoreAssociateTuple score ,
+								   ScoreAssociation score ,
 								   int pairs[] ,
 								   double fitScore[] )
 	{
@@ -118,7 +118,7 @@ public class AssociateGreedyTuple {
 	 */
 	public static void totalCloseMatches( FastQueue<TupleDesc_F64> src ,
 										  FastQueue<TupleDesc_F64> dst ,
-										  ScoreAssociateTuple score ,
+										  ScoreAssociation score ,
 										  double containmentScale ,
 										  double workBuffer[] ,
 										  int pairs[] ,
@@ -166,7 +166,7 @@ public class AssociateGreedyTuple {
 	 */
 	public static void forwardBackwards( FastQueue<TupleDesc_F64> src ,
 										 FastQueue<TupleDesc_F64> dst ,
-										 ScoreAssociateTuple score ,
+										 ScoreAssociation score ,
 										 double workBuffer[] ,
 										 int pairs[] ,
 										 double fitScore[] )

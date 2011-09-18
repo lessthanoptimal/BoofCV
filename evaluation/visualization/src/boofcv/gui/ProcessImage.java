@@ -2,8 +2,6 @@ package boofcv.gui;
 
 import boofcv.io.image.ImageListManager;
 
-import java.awt.image.BufferedImage;
-
 
 /**
  * Common interface for visualization applications that process a single input image.
@@ -13,8 +11,6 @@ import java.awt.image.BufferedImage;
 public interface ProcessImage {
 
 	public void setImageManager( ImageListManager manager );
-
-	public void process( BufferedImage image );
 
 	public boolean getHasProcessedImage();
 }

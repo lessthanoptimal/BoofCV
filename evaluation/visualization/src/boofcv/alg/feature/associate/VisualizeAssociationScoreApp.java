@@ -20,18 +20,24 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.gui.ProcessImage;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.AssociationScorePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,127 +51,209 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO make feature selection, feature type, score all changeable in a GUI
-public class VisualizeAssociationScoreApp<T extends ImageBase> {
+public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBase>
+	extends SelectAlgorithmImagePanel implements ProcessImage
+{
 
+	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;
 	ExtractFeatureDescription<T> describe;
-	ScoreAssociateTuple scorer;
+	ScoreAssociation<TupleDesc_F64> scorer;
 
+	// gray scale versions of input image
 	T imageLeft;
 	T imageRight;
 	Class<T> imageType;
 
-	List<Point2D_I32> leftPts = new ArrayList<Point2D_I32>();
-	List<Point2D_I32> rightPts = new ArrayList<Point2D_I32>();
-	List<TupleDesc_F64> leftDesc = new ArrayList<TupleDesc_F64>();
-	List<TupleDesc_F64> rightDesc = new ArrayList<TupleDesc_F64>();
+	// visualizes association score
+	AssociationScorePanel<TupleDesc_F64> scorePanel;
 
-	public VisualizeAssociationScoreApp( InterestPointDetector<T> detector,
-										 ExtractFeatureDescription<T> describe,
-										 ScoreAssociateTuple scorer,
-										 Class<T> imageType )
+	// has the image been processed yet
+	boolean processedImage = false;
+
+	public VisualizeAssociationScoreApp( Class<T> imageType,
+										 Class<D> derivType )
 	{
-		this.detector = detector;
-		this.describe = describe;
-		this.scorer = scorer;
+		super(3);
 		this.imageType = imageType;
 
 		imageLeft = GeneralizedImageOps.createImage(imageType,1,1);
 		imageRight = GeneralizedImageOps.createImage(imageType,1,1);
+
+		GeneralFeatureDetector<T,D> alg;
+
+		addAlgorithm(0,"Fast Hessian",FactoryInterestPoint.fromFastHessian(200,9,4,4));
+		alg = FactoryCornerDetector.createKlt(2,1,500,derivType);
+		addAlgorithm(0,"KLT",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+
+		addAlgorithm(1,"SURF",FactoryExtractFeatureDescription.surf(true,imageType));
+		addAlgorithm(1,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));
+		addAlgorithm(1,"Gaussian 14",FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType));
+
+		addAlgorithm(2,"norm",new ScoreAssociateEuclidean());
+		addAlgorithm(2,"norm^2",new ScoreAssociateEuclideanSq());
+		addAlgorithm(2,"correlation",new ScoreAssociateCorrelation());
+
+		scorePanel = new AssociationScorePanel<TupleDesc_F64>(3);
+		setMainGUI(scorePanel);
 	}
 
 	public void process( BufferedImage buffLeft , BufferedImage buffRight ) {
+		// copy the input images
 		imageLeft.reshape(buffLeft.getWidth(),buffLeft.getHeight());
 		imageRight.reshape(buffRight.getWidth(),buffRight.getHeight());
 
 		ConvertBufferedImage.convertFrom(buffLeft,imageLeft,imageType);
 		ConvertBufferedImage.convertFrom(buffRight,imageRight,imageType);
 
-		// find feature points  and descriptions
-		extractImageFeatures(imageLeft,leftDesc,leftPts);
-		extractImageFeatures(imageRight,rightDesc,rightPts);
+		// update the GUI's background images
+		scorePanel.setImages(buffLeft,buffRight);
 
-		MyPanel panel = new MyPanel(500,500);
-		panel.setImages(buffLeft,buffRight);
-		panel.setLocation(leftPts,rightPts);
+		processedImage = true;
 
-		ShowImages.showWindow(panel,"Association Score");
+		// tell it to update everything
+		doRefreshAll();
 	}
 
-	private void extractImageFeatures( T image , List<TupleDesc_F64> descs , List<Point2D_I32> locs ) {
-		descs.clear();
-		locs.clear();
+	@Override
+	public void refreshAll(Object[] cookies) {
+		detector = (InterestPointDetector<T>)cookies[0];
+		describe = (ExtractFeatureDescription<T>)cookies[1];
+		scorer = (ScoreAssociation<TupleDesc_F64>)cookies[2];
+
+		processImage();
+	}
+
+	@Override
+	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+		switch( indexFamily ) {
+			case 0:
+				detector = (InterestPointDetector<T>)cookie;
+				break;
+
+			case 1:
+				describe = (ExtractFeatureDescription<T>)cookie;
+				break;
+
+			case 2:
+				scorer = (ScoreAssociation<TupleDesc_F64>)cookie;
+				break;
+		}
+
+		processImage();
+	}
+
+	/**
+	 * Extracts image information and then passes that info onto scorePanel for display.  Data is not
+	 * recycled to avoid threading issues.
+	 */
+	private void processImage() {
+		final List<Point2D_I32> leftPts = new ArrayList<Point2D_I32>();
+		final List<Point2D_I32> rightPts = new ArrayList<Point2D_I32>();
+		final List<TupleDesc_F64> leftDesc = new ArrayList<TupleDesc_F64>();
+		final List<TupleDesc_F64> rightDesc = new ArrayList<TupleDesc_F64>();
+
+		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
+				"Compute Feature Information",
+				"", 0, 4);
+		extractImageFeatures(progressMonitor,0,imageLeft,leftDesc,leftPts);
+		extractImageFeatures(progressMonitor,2,imageRight,rightDesc,rightPts);
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				progressMonitor.close();
+				scorePanel.setScorer(scorer);
+				scorePanel.setLocation(leftPts,rightPts,leftDesc,rightDesc);
+				repaint();
+			}});
+	}
+
+	/**
+	 * Detects the locations of the features in the image and extracts descriptions of each of
+	 * the features.
+	 */
+	private void extractImageFeatures( final ProgressMonitor progressMonitor , final int progress ,
+									   T image ,
+									   List<TupleDesc_F64> descs , List<Point2D_I32> locs ) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				progressMonitor.setNote("Detecting");
+			}});
 		detector.detect(image);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				progressMonitor.setProgress(progress+1);
+				progressMonitor.setNote("Describing");
+			}});
 		describe.setImage(image);
-		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
-			Point2D_I32 pt = detector.getLocation(i);
-			double scale = detector.getScale(i);
 
-			TupleDesc_F64 d = describe.process(pt.x,pt.y,0,scale,null);
-			if( d != null ) {
-				descs.add( d.copy() );
-				locs.add( pt.copy());
+		// See if the detector can detect the feature's scale
+		if( detector.hasScale() ) {
+			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
+				Point2D_I32 pt = detector.getLocation(i);
+				double scale = detector.getScale(i);
+
+				TupleDesc_F64 d = describe.process(pt.x,pt.y,0,scale,null);
+				if( d != null ) {
+					descs.add( d.copy() );
+					locs.add( pt.copy());
+				}
+			}
+		} else {
+			// just set the scale to one in this case
+			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
+				Point2D_I32 pt = detector.getLocation(i);
+
+				TupleDesc_F64 d = describe.process(pt.x,pt.y,0,1,null);
+				if( d != null ) {
+					descs.add( d.copy() );
+					locs.add( pt.copy());
+				}
 			}
 		}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				progressMonitor.setProgress(progress+2);
+			}});
 	}
 
-	private class MyPanel extends AssociationScorePanel
-	{
-		double[] score;
 
-		public MyPanel(int maxWidth, int maxHeight) {
-			super(maxWidth, maxHeight,3,scorer.isZeroMinimum());
-		}
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager m = getImageManager();
+		BufferedImage left = m.loadImage(index,0);
+		BufferedImage right = m.loadImage(index,1);
 
-		@Override
-		protected double[] computeScore(boolean isTargetLeft, int targetIndex) {
-			if( score == null ) {
-				score = new double[ Math.max(leftPts.size(),rightPts.size())];
-			}
-			if( isTargetLeft ) {
-				TupleDesc_F64 t = leftDesc.get(targetIndex);
-				for( int i = 0; i < rightDesc.size(); i++ ) {
-					TupleDesc_F64 d = rightDesc.get(i);
-					score[i] = scorer.score(t,d);
-				}
-			} else {
-				TupleDesc_F64 t = rightDesc.get(targetIndex);
-				for( int i = 0; i < leftDesc.size(); i++ ) {
-					TupleDesc_F64 d = leftDesc.get(i);
-					score[i] = scorer.score(t,d);
-				}
-			}
-			return score;
-		}
+		process(left,right);
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
 	}
 
 	public static void main( String args[] ) {
 
-//		String leftName = "evaluation/data/stitch/cave_01.jpg";
-//		String rightName = "evaluation/data/stitch/cave_02.jpg";
-		String leftName = "evaluation/data/stitch/kayak_02.jpg";
-		String rightName = "evaluation/data/stitch/kayak_03.jpg";
-//		String leftName = "evaluation/data/scale/rainforest_01.jpg";
-//		String rightName = "evaluation/data/scale/rainforest_02.jpg";
-
-		BufferedImage left = UtilImageIO.loadImage(leftName);
-		BufferedImage right = UtilImageIO.loadImage(rightName);
-
 		Class imageType = ImageFloat32.class;
 		Class derivType = ImageFloat32.class;
-		InterestPointDetector detector = FactoryInterestPoint.fromFastHessian(100,9,4,4);
-		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.surf(true,imageType);
-//		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType);
-//		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType);
 
-		ScoreAssociateTuple scorer = new ScoreAssociateEuclidean();
-//		ScoreAssociateTuple scorer = new ScoreAssociateEuclideanSq();
-//		ScoreAssociateTuple scorer = new ScoreAssociateCorrelation();
+		VisualizeAssociationScoreApp app = new VisualizeAssociationScoreApp(imageType,derivType);
 
-		VisualizeAssociationScoreApp app = new VisualizeAssociationScoreApp(detector,describe,scorer,imageType);
+		ImageListManager manager = new ImageListManager();
+		manager.add("Cave","data/stitch/cave_01.jpg","data/stitch/cave_02.jpg");
+		manager.add("Kayak","data/stitch/kayak_02.jpg","data/stitch/kayak_03.jpg");
+		manager.add("Forest","data/scale/rainforest_01.jpg","data/scale/rainforest_02.jpg");
 
-		app.process(left,right);
+		app.setPreferredSize(new Dimension(1000,500));
+		app.setSize(1000,500);
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
+
+		ShowImages.showWindow(app,"Association Relative Score");
 
 	}
 }
