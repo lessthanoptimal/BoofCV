@@ -39,7 +39,6 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 
 	SelectRegionDescriptionPanel panel = new SelectRegionDescriptionPanel();
 
-
 	TupleDescPanel tuplePanel = new TupleDescPanel();
 
 	public VisualizeRegionDescriptionApp( Class<T> imageType , Class<D> derivType  ) {

@@ -34,7 +34,8 @@ import java.io.PrintStream;
 
 
 /**
- * Creates a file containing all the detected feature location and scales.
+ * Detects the locations of features inside each image and saves to a file.  All the files
+ * in a directory are processed that have the appropriate extension.
  *
  * @author Peter Abeles
  */
@@ -47,31 +48,57 @@ public class CreateDetectionFile<T extends ImageBase> {
 	// name of the detector
 	String detectorName;
 
+	/**
+	 * Configures detector
+	 *
+	 * @param alg Algorithm used to detect interest points.
+	 * @param imageType Primitive of input image that is processed.
+	 * @param detectorName Name of the detector.  Put into output file name.
+	 */
 	public CreateDetectionFile(InterestPointDetector<T> alg, Class<T> imageType, String detectorName) {
 		this.alg = alg;
 		this.imageType = imageType;
 		this.detectorName = detectorName;
 	}
 
-	public void directory( String path , String suffix ) throws FileNotFoundException {
-		File dir = new File(path);
+	/**
+	 * Processes all images found inside a directory.
+	 *
+	 * @param directoryPath Path to directory containing input images.
+	 * @param imageSuffix Type of input image.
+	 * @throws FileNotFoundException
+	 */
+	public void directory( String directoryPath , String imageSuffix ) throws FileNotFoundException {
+		File dir = new File(directoryPath);
 		if( !dir.isDirectory() )
 			throw new IllegalArgumentException("Path does not point to a directory!");
 
+		int totalProcessed = 0;
 		File[] files = dir.listFiles();
 		for( File f : files ) {
-			if( !f.isFile() || !f.getName().endsWith(suffix))
+			if( !f.isFile() || !f.getName().endsWith(imageSuffix))
 				continue;
 
 			System.out.println("Detecting features inside of: "+f.getName());
 
-			String fullPath = f.getPath();
-			String baseName = fullPath.substring(0,fullPath.length()-suffix.length());
-			BufferedImage image = UtilImageIO.loadImage(fullPath);
-			process(image,baseName+"_"+detectorName+".txt");
+			BufferedImage image = UtilImageIO.loadImage(f.getPath());
+
+			String imageName = f.getName();
+			directoryPath = f.getParent();
+			imageName = imageName.substring(0,imageName.length()-imageSuffix.length());
+
+			process(image,directoryPath+"/DETECTED_"+imageName+"_"+detectorName+".txt");
+			totalProcessed++;
 		}
+		System.out.println("Total Processed: "+totalProcessed);
 	}
 
+	/**
+	 * Detects features in the specified image and saves the output to the specified file.
+	 * @param input Input image that features are detected inside of.
+	 * @param outputName Name of output file.
+	 * @throws FileNotFoundException
+	 */
 	public void process( BufferedImage input , String outputName ) throws FileNotFoundException {
 		T image = ConvertBufferedImage.convertFrom(input,null,imageType);
 
@@ -96,7 +123,12 @@ public class CreateDetectionFile<T extends ImageBase> {
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		doStuff("evaluation/data/mikolajczk/ubc/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/bikes/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/boat/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/graf/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/leuven/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/ubc/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/trees/",".png",ImageFloat32.class);
 	}
 
 }

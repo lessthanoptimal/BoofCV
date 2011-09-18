@@ -70,8 +70,8 @@ public class DenoiseVisualizeApp {
 //	DenoiseWavelet denoiser = new DenoiseBayesShrink_F32();
 	DenoiseWavelet denoiser = new DenoiseSureShrink_F32();
 
-	String imagePath = "evaluation/data/standard/barbara.png";
-//	String imagePath = "evaluation/data/particles01.jpg";
+	String imagePath = "data/standard/barbara.png";
+//	String imagePath = "data/particles01.jpg";
 
 	FilterImageInterface<ImageFloat32,ImageFloat32> filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,denoiser);
 

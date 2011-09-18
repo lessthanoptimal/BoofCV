@@ -70,6 +70,13 @@ public class TupleDescPanel extends JPanel {
 			g2.setColor(Color.BLACK);
 			String s = String.format("%4.1e",max);
 			g2.drawString(s,0,20);
+
+			g2.setColor(Color.BLUE);
+			for( int i = 0; i < desc.value.length; i++ ) {
+				int r = 1;
+				w = r*2+1;
+				g2.fillOval(x[i]-r,y[i]-r,w,w);
+			}
 		}
 	}
 }
