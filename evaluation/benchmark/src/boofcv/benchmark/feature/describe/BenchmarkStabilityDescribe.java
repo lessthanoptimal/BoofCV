@@ -19,12 +19,12 @@
 package boofcv.benchmark.feature.describe;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.benchmark.feature.distort.BenchmarkFeatureDistort;
 import boofcv.benchmark.feature.distort.CompileImageResults;
 import boofcv.benchmark.feature.distort.FactoryBenchmarkFeatureDistort;
 import boofcv.benchmark.feature.distort.StabilityEvaluator;
-import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.image.ImageBase;
@@ -85,11 +85,11 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 
 	private void perform( BenchmarkFeatureDistort<T> benchmark ) {
 		CompileImageResults<T> compile = new CompileImageResults<T>(benchmark);
-		compile.addImage("evaluation/data/outdoors01.jpg");
-		compile.addImage("evaluation/data/indoors01.jpg");
-		compile.addImage("evaluation/data/scale/beach01.jpg");
-		compile.addImage("evaluation/data/scale/mountain_7p1mm.jpg");
-		compile.addImage("evaluation/data/sunflowers.png");
+		compile.addImage("data/outdoors01.jpg");
+		compile.addImage("data/indoors01.jpg");
+		compile.addImage("data/scale/beach01.jpg");
+		compile.addImage("data/scale/mountain_7p1mm.jpg");
+		compile.addImage("data/sunflowers.png");
 
 		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
 		OrientationImageAverage<T> orientation = FactoryOrientationAlgs.nogradient(radius,imageType);

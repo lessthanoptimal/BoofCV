@@ -21,9 +21,9 @@ package boofcv.benchmark.feature.distort;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine;
 import boofcv.alg.distort.impl.DistortSupport;
-import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.alg.filter.basic.GGrayImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F32;
@@ -92,7 +92,7 @@ public class FactoryBenchmarkFeatureDistort {
 		@Override
 		protected void distortImage(T image, T distortedImage ,double gamma) {
 			distortedImage.reshape(image.width,image.height);
-			GGrayImageOps.stretch(image,gamma,0,255,distortedImage);
+			GGrayImageOps.stretch(image,gamma,gamma,255,distortedImage);
 		}
 
 		@Override

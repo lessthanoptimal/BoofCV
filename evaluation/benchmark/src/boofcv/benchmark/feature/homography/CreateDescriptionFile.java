@@ -21,13 +21,13 @@ package boofcv.benchmark.feature.homography;
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.alg.feature.orientation.OrientationImage;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
-import pja.dev.cv.IntensityGraphDesc;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -36,11 +36,10 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 
-import static pja.dev.cv.FactoryDescribeNewStructure.*;
-
 
 /**
- * Creates a file containing all the detected feature location and scales.
+ * Creates a file describing each detected image feature.  The input directory is scanned for images
+ * and when is found the specified detection file is loaded.
  *
  * @author Peter Abeles
  */
@@ -55,6 +54,14 @@ public class CreateDescriptionFile<T extends ImageBase> {
 	// name of the description
 	String descriptionName;
 
+	/**
+	 * Defines the set of images and detection files that are to be processed.
+	 *
+	 * @param alg Algorithm which creates a description for the feature.
+	 * @param orientation Algorithm which estimates the orientation.
+	 * @param imageType Type of input file.
+	 * @param descriptionName The name of the description algorithm.  This name is appended to output files.
+	 */
 	public CreateDescriptionFile(ExtractFeatureDescription<T> alg,
 								 OrientationImage<T> orientation ,
 								 Class<T> imageType,
@@ -65,11 +72,22 @@ public class CreateDescriptionFile<T extends ImageBase> {
 		this.descriptionName = descriptionName;
 	}
 
-	public void directory( String path , String imageSuffix , String detectionSuffix ) throws FileNotFoundException {
-		File dir = new File(path);
+	/**
+	 * Scans a all the files in a directory looking for matching image files.  Once a match is found it then
+	 * looks up the corresponding detection file.  For each input image a description of all the detected
+	 * features is saved to a file.
+	 *
+	 * @param pathToDirectory Location of the directory being searched.
+	 * @param imageSuffix Input image type.  All images have this suffix.
+	 * @param detectionSuffix Name of the detection log.
+	 * @throws FileNotFoundException
+	 */
+	public void directory( String pathToDirectory , String imageSuffix , String detectionSuffix ) throws FileNotFoundException {
+		File dir = new File(pathToDirectory);
 		if( !dir.isDirectory() )
 			throw new IllegalArgumentException("Path does not point to a directory!");
 
+		int filesFound = 0;
 		File[] files = dir.listFiles();
 		for( File f : files ) {
 			if( !f.isFile() || !f.getName().endsWith(imageSuffix))
@@ -77,18 +95,29 @@ public class CreateDescriptionFile<T extends ImageBase> {
 
 			System.out.println("Describing features inside of: "+f.getName());
 
-			String fullPath = f.getPath();
-			String baseName = fullPath.substring(0,fullPath.length()-imageSuffix.length());
+			String imageName = f.getName();
+			String directoryPath = f.getParent();
+			imageName = imageName.substring(0,imageName.length()-imageSuffix.length());
 
-			File detectionFile = new File(baseName+detectionSuffix);
+			File detectionFile = new File(directoryPath+"/DETECTED_"+imageName+"_"+detectionSuffix);
 			if( !detectionFile.exists() )
 				throw new RuntimeException("Detection file does not exist");
 
-			BufferedImage image = UtilImageIO.loadImage(fullPath);
-			process(image,detectionFile.getPath(),baseName+"_"+descriptionName+".txt");
+			BufferedImage image = UtilImageIO.loadImage(f.getPath());
+			process(image,detectionFile.getPath(),directoryPath+"/DESCRIBE_"+imageName+"_"+descriptionName+".txt");
+			filesFound++;
 		}
+		System.out.println("Total files processed: "+filesFound);
 	}
 
+	/**
+	 * Given the input image, load the specified detection file and save the description of each feature.
+	 *
+	 * @param input Image being processed.
+	 * @param detectionName Path to detection file.
+	 * @param outputName Path to output file.
+	 * @throws FileNotFoundException
+	 */
 	public void process( BufferedImage input , String detectionName , String outputName ) throws FileNotFoundException {
 		T image = ConvertBufferedImage.convertFrom(input,null,imageType);
 
@@ -110,6 +139,7 @@ public class CreateDescriptionFile<T extends ImageBase> {
 			}
 			TupleDesc_F64 desc = alg.process(p.x,p.y,theta,d.scale,null);
 			if( desc != null ) {
+				// save the location and tuple description
 				out.printf("%d %d",p.getX(),p.getY());
 				for( int i = 0; i < desc.value.length; i++ ) {
 					out.printf(" %.10f",desc.value[i]);
@@ -122,23 +152,27 @@ public class CreateDescriptionFile<T extends ImageBase> {
 
 	public static <T extends ImageBase>
 	void doStuff( String directory , String imageSuffix , Class<T> imageType ) throws FileNotFoundException {
-//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
+		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
 		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(12,imageType);
-//		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");
-//		cdf.directory(directory,imageSuffix,"_FH.txt");
+		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");
 
-		int radius = 12;
-		int numAngles = 8;
-		int numJoints = 2;
-		IntensityGraphDesc graph = createCircle(radius,numAngles,numJoints);
-		connectSpiderWeb(numAngles,numJoints,graph);
-		ExtractFeatureDescription<T> alg = wrap(graph,imageType);
-		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"NEW");
-		cdf.directory(directory,imageSuffix,"_FH.txt");
+//		int radius = 12;
+//		int numAngles = 8;
+//		int numJoints = 2;
+//		IntensityGraphDesc graph = createCircle(radius,numAngles,numJoints);
+//		connectSpiderWeb(numAngles,numJoints,graph);
+//		ExtractFeatureDescription<T> alg = wrap(graph,imageType);
+//		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"NEW");
+
+		cdf.directory(directory,imageSuffix,"FH.txt");
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		doStuff("evaluation/data/mikolajczk/ubc/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/bikes/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/boat/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/graf/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/leuven/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/ubc/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/trees/",".png",ImageFloat32.class);
 	}
-
 }

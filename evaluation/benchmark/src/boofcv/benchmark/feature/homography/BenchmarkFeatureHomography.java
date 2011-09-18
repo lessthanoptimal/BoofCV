@@ -71,6 +71,14 @@ public class BenchmarkFeatureHomography {
 		}
 	}
 
+	/**
+	 * Scans the directory for images with the specified suffix.  These names are
+	 * used to find all the description files.
+	 *
+	 * @param directory Directory containing images and description files.
+	 * @param imageSuffix Type of input images.
+	 * @return Names of input images.
+	 */
 	private List<String> loadNameBase(String directory, String imageSuffix) {
 		List<String> ret = new ArrayList<String>();
 		File dir = new File(directory);
@@ -80,7 +88,7 @@ public class BenchmarkFeatureHomography {
 				continue;
 			}
 
-			String name = f.getPath();
+			String name = f.getName();
 			ret.add( name.substring(0,name.length()-imageSuffix.length()));
 		}
 
@@ -90,23 +98,38 @@ public class BenchmarkFeatureHomography {
 		return ret;
 	}
 
+	/**
+	 * For each input image it loads the specified descriptions.  These are then associated
+	 * against each other and the results compared.
+	 *
+	 * @param algSuffix String used to identify feature description files.
+	 */
 	public void evaluate( String algSuffix ) {
 		System.out.println("\n"+algSuffix);
 
+		String descriptionName = directory+"DESCRIBE_"+nameBase.get(0)+"_"+algSuffix;
 		// load descriptions in the keyframe
-		List<FeatureInfo> keyFrame = LoadBenchmarkFiles.loadDescription(nameBase.get(0)+algSuffix);
+		List<FeatureInfo> keyFrame = LoadBenchmarkFiles.loadDescription(descriptionName);
 
 		for( int i = 1; i < nameBase.size(); i++ ) {
-			System.out.println("Examining image "+i);
-			List<FeatureInfo> targetFrame = LoadBenchmarkFiles.loadDescription(nameBase.get(i)+algSuffix);
+			System.out.print("Examining "+nameBase.get(i));
+
+			descriptionName = directory+"DESCRIBE_"+nameBase.get(i)+"_"+algSuffix;
+			List<FeatureInfo> targetFrame = LoadBenchmarkFiles.loadDescription(descriptionName);
 
 			Homography2D_F32 keyToTarget = transforms.get(i-1);
 
 			associationScore(keyFrame,targetFrame,keyToTarget);
-			System.out.println(i+" "+numMatches+" "+fractionCorrect);
+			System.out.printf(" %5d %4.2f\n",numMatches,fractionCorrect);
 		}
 	}
 
+	/**
+	 * Associates two sets of features against each other.
+	 * @param keyFrame
+	 * @param targetFrame
+	 * @param keyToTarget
+	 */
 	private void associationScore(List<FeatureInfo> keyFrame,
 								  List<FeatureInfo> targetFrame,
 								  Homography2D_F32 keyToTarget) {
@@ -157,9 +180,12 @@ public class BenchmarkFeatureHomography {
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociationTuple.forwardBackwards(score,-1);
 
-		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"evaluation/data/mikolajczk/ubc/",".png",tolerance);
+		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/boat/",".png",tolerance);
 
-		app.evaluate("_BoofCV_SURF.txt");
-		app.evaluate("_NEW.txt");
+		app.evaluate("SURF.txt");
+		app.evaluate("BoofCV_SURF.txt");
+		app.evaluate("OpenSURF.txt");
+//		app.evaluate("_NEW.txt");
+//		app.evaluate("_NEW2.txt");
 	}
 }

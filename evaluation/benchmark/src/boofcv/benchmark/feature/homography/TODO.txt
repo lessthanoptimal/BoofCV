@@ -1,0 +1,5 @@
+- Create a perfect set of detected features
+ * Run detector in first image
+ * Apply homography to find location in other images
+ * Change in angle and scale by applying homography to three points at feature
+   - front and back.  take average for change in scale
