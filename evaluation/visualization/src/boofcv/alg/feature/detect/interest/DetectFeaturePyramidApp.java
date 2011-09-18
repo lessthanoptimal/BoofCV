@@ -48,32 +48,37 @@ public class DetectFeaturePyramidApp <T extends ImageBase, D extends ImageBase>
 	boolean hasImage = false;
 
 	public DetectFeaturePyramidApp( Class<T> imageType , Class<D> derivType ) {
+		super(1);
 		this.imageType = imageType;
 
-		addAlgorithm("Hessian",FactoryInterestPointAlgs.hessianPyramid(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm("Hessian Laplace",FactoryInterestPointAlgs.hessianLaplacePyramid(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm("Harris",FactoryInterestPointAlgs.harrisPyramid(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm("Harris Laplace",FactoryInterestPointAlgs.harrisLaplacePyramid(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Hessian",FactoryInterestPointAlgs.hessianPyramid(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Hessian Laplace",FactoryInterestPointAlgs.hessianLaplacePyramid(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Harris",FactoryInterestPointAlgs.harrisPyramid(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Harris Laplace",FactoryInterestPointAlgs.harrisLaplacePyramid(r,1,NUM_FEATURES,imageType,derivType));
 
 		ss = new ScaleSpacePyramid<T>(imageType,1,1.5,2,4,8,12,24);
 
 		panel = new ScaleSpacePyramidPointPanel(ss,r);
 
-		addMainGUI(panel);
+		setMainGUI(panel);
 	}
 
-	@Override
 	public synchronized void process( BufferedImage input ) {
 		setInputImage(input);
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 		ss.setImage(workImage);
 		panel.setBackground(input);
 		hasImage = true;
-		refreshAlgorithm();
+		doRefreshAll();
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(String name, Object cookie) {
+	public void refreshAll(Object[] cookies) {
+		setActiveAlgorithm(0,null,cookies[0]);
+	}
+
+	@Override
+	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if( !hasImage )
 			return;
 

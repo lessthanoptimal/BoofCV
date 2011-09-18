@@ -26,6 +26,9 @@
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
+    <excludeFromCompile>
+      <file url="file://$PROJECT_DIR$/../../developmental/cv/src/pja/dev/cv/VisualizeAssociationNewApp.java" />
+    </excludeFromCompile>
     <resourceExtensions>
       <entry name=".+\.(properties|xml|html|dtd|tld)" />
       <entry name=".+\.(gif|png|jpeg|jpg)" />
@@ -51,7 +54,9 @@
       <option name="myName" value="BoofCV" />
       <option name="myLocal" value="true" />
     </copyright>
-    <module2copyright />
+    <module2copyright>
+      <element module="BoofCV" copyright="BoofCV" />
+    </module2copyright>
   </component>
   <component name="DependenciesAnalyzeManager">
     <option name="myForwardDirection" value="false" />

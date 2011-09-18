@@ -18,10 +18,10 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.misc.Performer;
-import boofcv.misc.ProfileOperation;
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.factory.feature.associate.FactoryAssociationTuple;
+import boofcv.misc.Performer;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -79,7 +79,7 @@ public class BenchmarkAssociateTuple {
 		System.out.println("=========  Profile Description Length "+DOF+" ========== Num Features "+NUM_FEATURES);
 		System.out.println();
 
-		ScoreAssociateTuple score = new ScoreAssociateEuclideanSq();
+		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		int maxMatches = 200;
 
 		ProfileOperation.printOpsPerSec(new General("Max Error", FactoryAssociationTuple.maxError(score,0.1)),TEST_TIME);

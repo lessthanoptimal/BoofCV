@@ -50,33 +50,38 @@ public class DetectFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase
 	boolean hasImage = false;
 
 	public DetectFeatureScaleSpaceApp( Class<T> imageType , Class<D> derivType ) {
+		super(1);
 		this.imageType = imageType;
 
-		addAlgorithm("Hessian",FactoryInterestPointAlgs.hessianScaleSpace(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm("Hessian Laplace",FactoryInterestPointAlgs.hessianLaplace(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm("Harris",FactoryInterestPointAlgs.harrisScaleSpace(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm("Harris Laplace",FactoryInterestPointAlgs.harrisLaplace(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Hessian",FactoryInterestPointAlgs.hessianScaleSpace(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Hessian Laplace",FactoryInterestPointAlgs.hessianLaplace(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Harris",FactoryInterestPointAlgs.harrisScaleSpace(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Harris Laplace",FactoryInterestPointAlgs.harrisLaplace(r,1,NUM_FEATURES,imageType,derivType));
 
 		ss = FactoryGaussianScaleSpace.nocache(imageType);
 		ss.setScales(1,1.5,2,4,8,12,24);
 
 		panel = new ScaleSpacePointPanel(ss,r);
 
-		addMainGUI(panel);
+		setMainGUI(panel);
 	}
 
-	@Override
 	public void process( BufferedImage input ) {
 		setInputImage(input);
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 		ss.setImage(workImage);
 		panel.setBackground(input);
 		hasImage = true;
-		refreshAlgorithm();
+		doRefreshAll();
 	}
 
 	@Override
-	public void setActiveAlgorithm(String name, Object cookie) {
+	public void refreshAll(Object[] cookies) {
+		setActiveAlgorithm(0,null,cookies[0]);
+	}
+
+	@Override
+	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if( !hasImage )
 			return;
 

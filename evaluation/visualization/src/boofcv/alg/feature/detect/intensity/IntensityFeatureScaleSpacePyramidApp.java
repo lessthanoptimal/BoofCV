@@ -62,17 +62,18 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 	boolean processedImage = false;
 
 	public IntensityFeatureScaleSpacePyramidApp( Class<T> imageType , Class<D> derivType ) {
+		super(1);
 		this.imageType = imageType;
 
-		addAlgorithm("Hessian Det", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
-		addAlgorithm("Laplacian", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
-		addAlgorithm("Harris",new WrapperGradientCornerIntensity<T,D>(FactoryPointIntensityAlg.createHarris(derivType,2,0.4f)));
-		addAlgorithm("KLT",new WrapperGradientCornerIntensity<T,D>( FactoryPointIntensityAlg.createKlt(derivType,2)));
-		addAlgorithm("FAST 12",new WrapperFastCornerIntensity<T,D>(FactoryPointIntensityAlg.createFast12(imageType,5,11)));
-		addAlgorithm("KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
-		addAlgorithm("Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
+		addAlgorithm(0, "Hessian Det", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
+		addAlgorithm(0, "Laplacian", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
+		addAlgorithm(0, "Harris",new WrapperGradientCornerIntensity<T,D>(FactoryPointIntensityAlg.createHarris(derivType,2,0.4f)));
+		addAlgorithm(0, "KLT",new WrapperGradientCornerIntensity<T,D>( FactoryPointIntensityAlg.createKlt(derivType,2)));
+		addAlgorithm(0, "FAST 12",new WrapperFastCornerIntensity<T,D>(FactoryPointIntensityAlg.createFast12(imageType,5,11)));
+		addAlgorithm(0, "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
+		addAlgorithm(0, "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
 
-		addMainGUI(gui);
+		setMainGUI(gui);
 
 		double scales[] = new double[25];
 		for( int i = 0; i < scales.length ; i++ ) {
@@ -84,7 +85,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 	}
 
 	@Override
-	public void setActiveAlgorithm(String name, Object cookie ) {
+	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if( input == null ) {
 			return;
 		}
@@ -125,12 +126,10 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 					progressMonitor.setProgress(progressStatus);
 				}
 			});
-
 		}
 		gui.requestFocusInWindow();
 	}
 
-	@Override
 	public void process( final BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
@@ -142,7 +141,12 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
 				processedImage = true;
 			}});
-		refreshAlgorithm();
+		doRefreshAll();
+	}
+
+	@Override
+	public void refreshAll(Object[] cookies) {
+		setActiveAlgorithm(0,null,cookies[0]);
 	}
 
 	@Override

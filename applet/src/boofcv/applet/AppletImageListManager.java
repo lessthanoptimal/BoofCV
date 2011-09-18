@@ -37,16 +37,31 @@ public class AppletImageListManager extends ImageListManager {
 	}
 
 	@Override
-	public BufferedImage loadImage( int index ) {
+	public BufferedImage loadImage( int labelIndex ) {
 
 		URL url = null;
 		try {
-			url = new URL(codebase, fileNames.get(index));
+			url = new URL(codebase, fileNames.get(labelIndex)[0]);
 			return ImageIO.read(url);
 		} catch (MalformedURLException e) {
-			System.err.println("MalformedURL"+fileNames.get(index));
+			System.err.println("MalformedURL"+fileNames.get(labelIndex));
 		} catch (IOException e) {
-			System.err.println("IOException reading "+fileNames.get(index));
+			System.err.println("IOException reading "+fileNames.get(labelIndex));
+		}
+		return null;
+	}
+
+	@Override
+	public BufferedImage loadImage( int labelIndex , int imageIndex ) {
+
+		URL url = null;
+		try {
+			url = new URL(codebase, fileNames.get(labelIndex)[imageIndex]);
+			return ImageIO.read(url);
+		} catch (MalformedURLException e) {
+			System.err.println("MalformedURL"+fileNames.get(labelIndex));
+		} catch (IOException e) {
+			System.err.println("IOException reading "+fileNames.get(labelIndex));
 		}
 		return null;
 	}

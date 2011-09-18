@@ -53,7 +53,6 @@ public class DisplaySteerableSeparableApp<T extends ImageBase, K extends Kernel2
 	public static void main( String args[] ) {
 		DisplaySteerableSeparableApp<ImageFloat32,Kernel2D_F32> app =
 				new DisplaySteerableSeparableApp<ImageFloat32,Kernel2D_F32>(ImageFloat32.class,Kernel2D_F32.class);
-		app.process();
 
 //		DisplaySteerableSeparableApp<ImageSInt32, Kernel2D_I32> app =
 //				new DisplaySteerableSeparableApp<ImageSInt32,Kernel2D_I32>(ImageSInt32.class,Kernel2D_I32.class);

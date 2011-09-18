@@ -24,7 +24,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 /**
  * @author Peter Abeles
  */
-public class ScoreAssociateCorrelation implements ScoreAssociateTuple {
+public class ScoreAssociateCorrelation implements ScoreAssociation<TupleDesc_F64> {
 	@Override
 	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
 		final int N = a.value.length;

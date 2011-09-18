@@ -59,6 +59,7 @@ public class WaveletVisualizeApp
 	boolean processedImage = false;
 
 	public WaveletVisualizeApp(Class<T> imageType ) {
+		super(1);
 		this.imageType = imageType;
 
 		addWaveletDesc("Haar",GFactoryWavelet.haar(imageType));
@@ -66,10 +67,9 @@ public class WaveletVisualizeApp
 		addWaveletDesc("Bi-orthogonal 5",GFactoryWavelet.biorthogoal(imageType,5, BorderType.REFLECT));
 		addWaveletDesc("Coiflet 6",GFactoryWavelet.coiflet(imageType,6));
 
-		addMainGUI(panel);
+		setMainGUI(panel);
 	}
 
-	@Override
 	public void process( BufferedImage input ) {
 		setInputImage(input);
 		
@@ -82,18 +82,22 @@ public class WaveletVisualizeApp
 				processedImage = true;
 			}});
 
-		refreshAlgorithm();
+		doRefreshAll();
+	}
+
+	@Override
+	public void refreshAll(Object[] cookies) {
+		setActiveAlgorithm(0,null,cookies[0]);
 	}
 
 	private void addWaveletDesc( String name , WaveletDescription desc )
 	{
 		if( desc != null )
-			addAlgorithm(name,desc);
+			addAlgorithm(0, name,desc);
 	}
 
-
 	@Override
-	public void setActiveAlgorithm(String name, Object cookie) {
+	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if( image == null )
 			return;
 

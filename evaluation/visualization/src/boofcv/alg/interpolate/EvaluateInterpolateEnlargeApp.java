@@ -22,13 +22,17 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.gui.ListDisplayPanel;
+import boofcv.gui.ProcessImage;
+import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 
+import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 
 /**
@@ -36,56 +40,113 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class EvaluateInterpolateEnlargeApp<T extends ImageBase> {
+public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
+	extends SelectAlgorithmImagePanel implements ProcessImage , ComponentListener
+{
+	Class<T> imageType;
+	T gray;
+	T scaledImage;
 
-	T grayOriginal;
-	int scaledWidth;
-	int scaledHeight;
+	ImagePanel panel = new ImagePanel();
+	boolean hasProcessed = false;
 
-	ListDisplayPanel scalePanel = new ListDisplayPanel();
+	public EvaluateInterpolateEnlargeApp( Class<T> imageType ) {
+		super(1);
+		this.imageType = imageType;
 
-	public EvaluateInterpolateEnlargeApp( BufferedImage input ,
-										  int scaledWidth , int scaledHeight ,
-										  Class<T> imageType ) {
-		grayOriginal = ConvertBufferedImage.convertFrom(input,null,imageType);
-		this.scaledWidth = scaledWidth;
-		this.scaledHeight = scaledHeight;
-		scalePanel.addImage(input,"Original");
-		scalePanel.setDataDisplaySize(scaledWidth,scaledHeight);
-		ShowImages.showWindow(scalePanel,"Scaled Images");
+		panel.setResize(false);
+		setMainGUI(panel);
 
+		scaledImage = GeneralizedImageOps.createImage(imageType,1,1);
+
+		addAlgorithm(0, "Nearest Neighbor",FactoryInterpolation.nearestNeighborPixel(imageType));
+		addAlgorithm(0, "Bilinear",FactoryInterpolation.bilinearPixel(imageType));
+		addAlgorithm(0, "Bicubic Kernel",FactoryInterpolation.bicubic(imageType,-0.5f));
+
+		setPreferredSize(new Dimension(300,300));
+		addComponentListener(this);
 	}
 
-	public void addInterpolation( String name , InterpolatePixel<T> alg ) {
-		T scaledImg = (T)grayOriginal._createNew(scaledWidth,scaledHeight);
+	public void process(BufferedImage image) {
+		setInputImage(image);
 
-		DistortImageOps.scale(grayOriginal,scaledImg,alg);
+		gray = ConvertBufferedImage.convertFrom(image,null,imageType);
+
+		hasProcessed = true;
+		doRefreshAll();
+	}
+
+	@Override
+	public void refreshAll(Object[] cookies) {
+		setActiveAlgorithm(0,null,cookies[0]);
+	}
+	
+	@Override
+	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+		if( gray == null || 0 == panel.getWidth() || 0 == panel.getHeight() ) {
+			return;
+		}
+
+		InterpolatePixel<T> interp = (InterpolatePixel<T>)cookie;
+
+
+		scaledImage.reshape(panel.getWidth(),panel.getHeight());
+		DistortImageOps.scale(gray,scaledImage,interp);
 
 		// numerical round off error can cause the interpolation to go outside
 		// of pixel value bounds
-		GeneralizedImageOps.boundImage(scaledImg,0,255);
+//		GeneralizedImageOps.boundImage(scaledImage,0,255);
 
-		BufferedImage out = ConvertBufferedImage.convertTo(scaledImg,null);
-		scalePanel.addImage(out,name);
+		BufferedImage out = ConvertBufferedImage.convertTo(scaledImage,null);
+		panel.setBufferedImage(out);
+		panel.repaint();
 	}
 
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
+
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return hasProcessed;
+	}
+
+	@Override
+	public void componentResized(ComponentEvent e) {
+		setActiveAlgorithm(0,null, getAlgorithmCookie(0));
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent e) {}
+
+	@Override
+	public void componentShown(ComponentEvent e) {}
+
+	@Override
+	public void componentHidden(ComponentEvent e) {}
+
 	public static void main( String args[] ) {
+//		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(ImageFloat32.class);
+		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(ImageUInt8.class);
 
-		BufferedImage image = UtilImageIO.loadImage("data/eye01.jpg");
+		app.setPreferredSize(new Dimension(500,500));
+		ImageListManager manager = new ImageListManager();
+		manager.add("eye 1","data/eye01.jpg");
+		manager.add("eye 2","data/eye02.jpg");
 
-		int w = image.getWidth()*8;
-		int h = image.getHeight()*8;
+		app.setImageManager(manager);
 
-		EvaluateInterpolateEnlargeApp<ImageFloat32> app = new EvaluateInterpolateEnlargeApp<ImageFloat32>(image,w,h, ImageFloat32.class);
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
 
-		app.addInterpolation("NN F32",FactoryInterpolation.nearestNeighborPixel(ImageFloat32.class));
-		app.addInterpolation("Bilinear F32",FactoryInterpolation.bilinearPixel(ImageFloat32.class));
-		app.addInterpolation("Bicubic F32", FactoryInterpolation.bicubic(ImageFloat32.class,-0.5f));
-
-		EvaluateInterpolateEnlargeApp<ImageUInt8> appU8 = new EvaluateInterpolateEnlargeApp<ImageUInt8>(image,w,h, ImageUInt8.class);
-
-		appU8.addInterpolation("NN U8",FactoryInterpolation.nearestNeighborPixel(ImageUInt8.class));
-		appU8.addInterpolation("Bilinear U8",FactoryInterpolation.bilinearPixel(ImageUInt8.class));
-		appU8.addInterpolation("Bicubic U8",FactoryInterpolation.bicubic(ImageUInt8.class,-0.5f));
+		ShowImages.showWindow(app,"Interpolation Enlarge");
 	}
 }

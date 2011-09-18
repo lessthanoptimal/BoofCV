@@ -56,7 +56,6 @@ public class VisualizePyramidFloatApp <T extends ImageBase>
 		setMainGUI(gui);
 	}
 
-	@Override
 	public void process( final BufferedImage input ) {
 		setInputImage(input);
 		final T gray = ConvertBufferedImage.convertFrom(input,null,imageType);

@@ -53,7 +53,15 @@ public interface ExtractFeatureDescription<T extends ImageBase> {
 	 */
 	public TupleDesc_F64 process( int x , int y , double orientation , double scale , TupleDesc_F64 ret );
 
+	/**
+	 *
+	 * @return if scale needs to be provided or not
+	 */
 	public boolean requiresScale();
 
+	/**
+	 *
+	 * @return if orientation needs to be provided or not
+	 */
 	public boolean requiresOrientation();
 }

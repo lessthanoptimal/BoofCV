@@ -60,7 +60,6 @@ public class VisualizePyramidDiscreteApp <T extends ImageBase>
 		setMainGUI(gui);
 	}
 
-	@Override
 	public void process( BufferedImage input ) {
 		setInputImage(input);
 		final T gray = ConvertBufferedImage.convertFrom(input,null,imageType);

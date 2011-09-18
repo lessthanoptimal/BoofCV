@@ -18,14 +18,15 @@
 
 package boofcv.alg.transform.gss;
 
-import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.gui.ListDisplayPanel;
+import boofcv.gui.ProcessImage;
+import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.gss.GaussianScaleSpace;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
 import java.awt.image.BufferedImage;
@@ -35,39 +36,71 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-// TODO abstract and add integer
-public class VisualizeScaleSpaceApp {
+public class VisualizeScaleSpaceApp <T extends ImageBase, D extends ImageBase>
+	extends SelectImagePanel implements ProcessImage
+{
+	GaussianScaleSpace<T,D> ss;
 
+	Class<T> imageType;
+	ListDisplayPanel gui = new ListDisplayPanel();
+	boolean processedImage = false;
 
+	public VisualizeScaleSpaceApp( Class<T> imageType ) {
+		this.imageType = imageType;
 
-	public static void main( String args[] ) {
-		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
+		ss = FactoryGaussianScaleSpace.nocache(imageType);
+		ss.setScales(1,1.2,2.4,3.6,4.8,6.0,10,15,20);
 
-		ss.setScales(1,1.2,2.4,3.6,4.8,6.0);
+		setMainGUI(gui);
+	}
 
-		BufferedImage input = UtilImageIO.loadImage("data/standard/boat.png");
-		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
+	public void process(BufferedImage image) {
+		setInputImage(image);
+		T gray = ConvertBufferedImage.convertFrom(image,null,imageType);
 
-		ss.setImage(inputF32);
-
-		ListDisplayPanel gui = new ListDisplayPanel();
-		ListDisplayPanel guiDX = new ListDisplayPanel();
-
-		gui.addImage(input,"Original Image");
+		ss.setImage(gray);
+		gui.reset();
 
 		for( int i = 0; i < ss.getTotalScales(); i++ ) {
 			ss.setActiveScale(i);
 			double scale = ss.getCurrentScale();
-			ImageFloat32 scaledImage = ss.getScaledImage();
+			T scaledImage = ss.getScaledImage();
 			BufferedImage b = ConvertBufferedImage.convertTo(scaledImage,null);
 			gui.addImage(b,String.format("Scale %6.2f",scale));
+		}
+		processedImage = true;
+	}
 
-			ImageFloat32 derivX = ss.getDerivative(true);
-			b = VisualizeImageData.colorizeSign(derivX,null, PixelMath.maxAbs(derivX));
-			guiDX.addImage(b,String.format("Scale %6.2f",scale));
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
+	}
+
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
+
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	public static void main( String args[] ) {
+		VisualizeScaleSpaceApp app = new VisualizeScaleSpaceApp(ImageFloat32.class);
+
+		ImageListManager manager = new ImageListManager();
+		manager.add("boat","data/standard/boat.png");
+		manager.add("shapes","data/shapes01.png");
+		manager.add("sunflowers","data/sunflowers.png");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
 		}
 
-		ShowImages.showWindow(gui,"Scale Space");
-		ShowImages.showWindow(guiDX,"Derivative X: Scale Space");
+		ShowImages.showWindow(app,"Scale Space");
 	}
 }

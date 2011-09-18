@@ -22,10 +22,10 @@ import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
-import boofcv.alg.feature.associate.ScoreAssociateTuple;
+import boofcv.alg.feature.associate.ScoreAssociation;
+import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.benchmark.feature.distort.StabilityEvaluatorPoint;
-import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.evaluation.ErrorStatistics;
 import boofcv.factory.feature.associate.FactoryAssociationTuple;
 import boofcv.struct.FastQueue;
@@ -78,7 +78,7 @@ public class DescribeEvaluator<T extends ImageBase>
 		super(borderSize, detector);
 
 		this.orientationAlg = orientationAlg;
-		ScoreAssociateTuple scorer = new ScoreAssociateEuclideanSq();
+		ScoreAssociation scorer = new ScoreAssociateEuclideanSq();
 
 		matcher = FactoryAssociationTuple.maxError(scorer,100000);
 	}

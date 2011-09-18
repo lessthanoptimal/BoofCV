@@ -23,121 +23,126 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.gui.SelectAlgorithmPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageBase;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * @author Peter Abeles
  */
-public abstract class DisplaySteerableBase<T extends ImageBase, K extends Kernel2D> {
+public abstract class DisplaySteerableBase<T extends ImageBase, K extends Kernel2D>
+		extends JPanel implements ActionListener
+{
 	protected static int imageSize = 400;
 	protected static int radius = 100;
 
 	protected Class<T> imageType;
 	protected Class<K> kernelType;
 
+	ListDisplayPanel basisPanel = new ListDisplayPanel();
+	ListDisplayPanel steerPanel = new ListDisplayPanel();
+
+	JToolBar toolbar;
+	JComboBox derivBox;
+
+	T largeImg;
+
+	List<DisplayGaussianKernelApp.DerivType> order = new ArrayList<DisplayGaussianKernelApp.DerivType>();
+
 	public DisplaySteerableBase(Class<T> imageType, Class<K> kernelType) {
+		super(new BorderLayout());
+
 		this.imageType = imageType;
 		this.kernelType = kernelType;
-	}
 
-	public void process() {
-		ShowBasis panelBasis = new ShowBasis();
-		ShowSteering panelSteering = new ShowSteering();
+		largeImg = GeneralizedImageOps.createImage(imageType,imageSize,imageSize);
 
-		ShowImages.showWindow(panelBasis,"Steering Basis");
-		ShowImages.showWindow(panelSteering,"Steering");
+		toolbar = new JToolBar();
+		derivBox = new JComboBox();
+		toolbar.add(derivBox);
+
+		congigureComboBox();
+
+		add(toolbar, BorderLayout.PAGE_START);
+
+		basisPanel.setPreferredSize(new Dimension(imageSize+100,imageSize));
+		steerPanel.setPreferredSize(new Dimension(imageSize+60,imageSize));
+		JPanel content = new JPanel(new GridLayout(0,2));
+		content.add(basisPanel);
+		content.add(steerPanel);
+		add(content, BorderLayout.CENTER);
+
+		derivBox.addActionListener(this);
+		setActive(order.get(0));
 	}
 
 	protected abstract SteerableKernel<K> createKernel( int orderX , int orderY );
 
-	public class ShowBasis extends SelectAlgorithmPanel
+	protected void setActive( DisplayGaussianKernelApp.DerivType dt )
 	{
-		T largeImg = GeneralizedImageOps.createImage(imageType,imageSize,imageSize);
-		ListDisplayPanel panel = new ListDisplayPanel();
+		// add basis
+		SteerableKernel<K> steerable = createKernel(dt.orderX,dt.orderY);
+		basisPanel.reset();
 
-		public ShowBasis() {
-			addAlgorithm("Deriv X",new DisplayGaussianKernelApp.DerivType(1,0));
-			addAlgorithm("Deriv XX",new DisplayGaussianKernelApp.DerivType(2,0));
-			addAlgorithm("Deriv XXX",new DisplayGaussianKernelApp.DerivType(3,0));
-			addAlgorithm("Deriv XXXX",new DisplayGaussianKernelApp.DerivType(4,0));
-			addAlgorithm("Deriv XY",new DisplayGaussianKernelApp.DerivType(1,1));
-			addAlgorithm("Deriv XXY",new DisplayGaussianKernelApp.DerivType(2,1));
-			addAlgorithm("Deriv XYY",new DisplayGaussianKernelApp.DerivType(1,2));
-			addAlgorithm("Deriv XXXY",new DisplayGaussianKernelApp.DerivType(3,1));
-			addAlgorithm("Deriv XXYY",new DisplayGaussianKernelApp.DerivType(2,2));
-			addAlgorithm("Deriv XYYY",new DisplayGaussianKernelApp.DerivType(1,3));
+		for( int i = 0; i < steerable.getBasisSize(); i++ ) {
+			T smallImg = GKernelMath.convertToImage(steerable.getBasis(i));
+			DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
 
-			add(panel, BorderLayout.CENTER);
-			setPreferredSize(new Dimension(imageSize+50,imageSize+20));
+			double maxValue = GPixelMath.maxAbs(largeImg);
+			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
+			basisPanel.addImage(out,"Basis "+i);
 		}
 
-		@Override
-		public void setActiveAlgorithm(String name, Object cookie) {
-			DisplayGaussianKernelApp.DerivType dt = (DisplayGaussianKernelApp.DerivType)cookie;
+		// add steered kernels
+		steerPanel.reset();
 
-			SteerableKernel<K> steerable = createKernel(dt.orderX,dt.orderY);
-			panel.reset();
+		for( int i = 0; i <= 20; i++  ) {
+			double angle = Math.PI*i/20.0;
 
-			for( int i = 0; i < steerable.getBasisSize(); i++ ) {
-				T smallImg = GKernelMath.convertToImage(steerable.getBasis(i));
-				DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
+			K kernel = steerable.compute(angle);
 
-				double maxValue = GPixelMath.maxAbs(largeImg);
-				BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
-				panel.addImage(out,"Basis "+i);
-			}
+			T smallImg = GKernelMath.convertToImage(kernel);
+			DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
+
+			double maxValue = GPixelMath.maxAbs(largeImg);
+			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
+
+			steerPanel.addImage(out,String.format("%5d",(int)(180.0*angle/Math.PI)));
 		}
+		repaint();
 	}
 
-	public class ShowSteering extends SelectAlgorithmPanel
-	{
-		T largeImg = GeneralizedImageOps.createImage(imageType,imageSize,imageSize);
-		ListDisplayPanel panel = new ListDisplayPanel();
-
-		public ShowSteering() {
-			addAlgorithm("Deriv X",new DisplayGaussianKernelApp.DerivType(1,0));
-			addAlgorithm("Deriv XX",new DisplayGaussianKernelApp.DerivType(2,0));
-			addAlgorithm("Deriv XXX",new DisplayGaussianKernelApp.DerivType(3,0));
-			addAlgorithm("Deriv XXXX",new DisplayGaussianKernelApp.DerivType(4,0));
-			addAlgorithm("Deriv XY",new DisplayGaussianKernelApp.DerivType(1,1));
-			addAlgorithm("Deriv XXY",new DisplayGaussianKernelApp.DerivType(2,1));
-			addAlgorithm("Deriv XYY",new DisplayGaussianKernelApp.DerivType(1,2));
-			addAlgorithm("Deriv XXXY",new DisplayGaussianKernelApp.DerivType(3,1));
-			addAlgorithm("Deriv XXYY",new DisplayGaussianKernelApp.DerivType(2,2));
-			addAlgorithm("Deriv XYYY",new DisplayGaussianKernelApp.DerivType(1,3));
-
-			add(panel, BorderLayout.CENTER);
-			setPreferredSize(new Dimension(imageSize+50,imageSize+20));
-		}
-
-		@Override
-		public void setActiveAlgorithm(String name, Object cookie) {
-			DisplayGaussianKernelApp.DerivType dt = (DisplayGaussianKernelApp.DerivType)cookie;
-			SteerableKernel<K> steerable = createKernel(dt.orderX,dt.orderY);
-			panel.reset();
-
-			for( int i = 0; i <= 20; i++  ) {
-				double angle = Math.PI*i/20.0;
-
-				K kernel = steerable.compute(angle);
-
-				T smallImg = GKernelMath.convertToImage(kernel);
-				DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
-
-				double maxValue = GPixelMath.maxAbs(largeImg);
-				BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
-
-				panel.addImage(out,String.format("%5d",(int)(180.0*angle/Math.PI)));
-			}
-		}
+	private void congigureComboBox() {
+		addDerivative("Deriv X",1,0);
+		addDerivative("Deriv XX",2,0);
+		addDerivative("Deriv XXX",3,0);
+		addDerivative("Deriv XXXX",4,0);
+		addDerivative("Deriv XY",1,1);
+		addDerivative("Deriv XXY",2,1);
+		addDerivative("Deriv XYY",1,2);
+		addDerivative("Deriv XXXY",3,1);
+		addDerivative("Deriv XXYY",2,2);
+		addDerivative("Deriv XYYY",1,3);
 	}
 
+	private void addDerivative( String name , int x , int y ) {
+		derivBox.addItem(name);
+		order.add(new DisplayGaussianKernelApp.DerivType(x,y));
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		int index = derivBox.getSelectedIndex();
+
+		setActive(order.get(index));
+	}
 }

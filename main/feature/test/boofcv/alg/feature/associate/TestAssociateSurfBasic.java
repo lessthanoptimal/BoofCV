@@ -88,7 +88,7 @@ public class TestAssociateSurfBasic {
 
 	private AssociateSurfBasic createAlg() {
 
-		ScoreAssociateTuple score = new ScoreAssociateEuclidean();
+		ScoreAssociation score = new ScoreAssociateEuclidean();
 		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociationTuple.maxMatches(score,20);
 
 		return new AssociateSurfBasic(assoc);

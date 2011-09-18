@@ -21,23 +21,28 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.associate.FactoryAssociationTuple;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.gui.ProcessImage;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
 import boofcv.struct.FastQueue;
-import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +56,9 @@ import java.util.List;
  */
 // todo add waiting tool bar
 // todo show partial results
-public class VisualizeAssociationMatchesApp<T extends ImageBase> {
+public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends ImageBase>
+	extends SelectAlgorithmImagePanel implements ProcessImage
+{
 
 	InterestPointDetector<T> detector;
 	ExtractFeatureDescription<T> describe;
@@ -61,36 +68,88 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 	T imageRight;
 	Class<T> imageType;
 
-	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
+	AssociationPanel panel = new AssociationPanel(20);
 
-	List<Point2D_I32> leftPts = new ArrayList<Point2D_I32>();
-	List<Point2D_I32> rightPts = new ArrayList<Point2D_I32>();
-	TupleDescQueue leftDesc;
-	TupleDescQueue rightDesc;
+	boolean processedImage = false;
 
-	public VisualizeAssociationMatchesApp( InterestPointDetector<T> detector,
-										   ExtractFeatureDescription<T> describe,
-										   GeneralAssociation<TupleDesc_F64> matcher,
-										   Class<T> imageType )
+	public VisualizeAssociationMatchesApp( Class<T> imageType , Class<D> derivType )
 	{
-		this.detector = detector;
-		this.describe = describe;
-		this.matcher = matcher;
+		super(3);
 		this.imageType = imageType;
+
+		GeneralFeatureDetector<T,D> alg;
+		addAlgorithm(0,"Fast Hessian",FactoryInterestPoint.fromFastHessian(200,9,4,4));
+		alg = FactoryCornerDetector.createKlt(2,1,500,derivType);
+		addAlgorithm(0,"KLT",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+
+		addAlgorithm(1,"SURF",FactoryExtractFeatureDescription.surf(true,imageType));
+		addAlgorithm(1,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));
+		addAlgorithm(1,"Gaussian 14",FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType));
+
+		ScoreAssociation<TupleDesc_F64> scorer = new ScoreAssociateEuclideanSq();
+
+		addAlgorithm(2,"Forward/Backwards", FactoryAssociationTuple.forwardBackwards(scorer,150));
+		addAlgorithm(2,"Inlier Size",FactoryAssociationTuple.inlierError(scorer,200,10));
+		addAlgorithm(2,"Max Matches",FactoryAssociationTuple.maxMatches(scorer,100));
+		addAlgorithm(2,"Error",FactoryAssociationTuple.maxError(scorer,10));
 
 		imageLeft = GeneralizedImageOps.createImage(imageType,1,1);
 		imageRight = GeneralizedImageOps.createImage(imageType,1,1);
 
-		leftDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
-		rightDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
+		setMainGUI(panel);
 	}
 
-	public void process( BufferedImage buffLeft , BufferedImage buffRight ) {
+	public void process( final BufferedImage buffLeft , final BufferedImage buffRight ) {
 		imageLeft.reshape(buffLeft.getWidth(),buffLeft.getHeight());
 		imageRight.reshape(buffRight.getWidth(),buffRight.getHeight());
 
 		ConvertBufferedImage.convertFrom(buffLeft,imageLeft,imageType);
 		ConvertBufferedImage.convertFrom(buffRight,imageRight,imageType);
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				panel.setImages(buffLeft,buffRight);
+				doRefreshAll();
+				processedImage = true;
+			}});
+	}
+
+	@Override
+	public synchronized void refreshAll(Object[] cookies) {
+		detector = (InterestPointDetector<T>)cookies[0];
+		describe = (ExtractFeatureDescription<T>)cookies[1];
+		matcher = (GeneralAssociation<TupleDesc_F64>)cookies[2];
+
+		processImage();
+	}
+
+	@Override
+	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+		if( detector == null || describe == null || matcher == null )
+			return;
+
+		switch( indexFamily ) {
+			case 0:
+				detector = (InterestPointDetector<T>)cookie;
+				break;
+
+			case 1:
+				describe = (ExtractFeatureDescription<T>)cookie;
+				break;
+
+			case 2:
+				matcher = (GeneralAssociation<TupleDesc_F64>)cookie;
+				break;
+		}
+
+		processImage();
+	}
+
+	private void processImage() {
+		final List<Point2D_I32> leftPts = new ArrayList<Point2D_I32>();
+		final List<Point2D_I32> rightPts = new ArrayList<Point2D_I32>();
+		TupleDescQueue leftDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
+		TupleDescQueue rightDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
 
 		// find feature points  and descriptions
 		extractImageFeatures(imageLeft,leftDesc,leftPts);
@@ -98,67 +157,76 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase> {
 
 		matcher.associate(leftDesc,rightDesc);
 
-		AssociationPanel panel = new AssociationPanel(20,500,500);
-		panel.setImages(buffLeft,buffRight);
-		panel.setAssociation(leftPts,rightPts,matcher.getMatches());
-
-		System.out.println("Total Associated "+matcher.getMatches().size());
-
-		ShowImages.showWindow(panel,"Associated Features");
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				panel.setAssociation(leftPts,rightPts,matcher.getMatches());
+				repaint();
+			}});
 	}
 
 	private void extractImageFeatures( T image , FastQueue<TupleDesc_F64> descs , List<Point2D_I32> locs ) {
-		descs.reset();
-		locs.clear();
 		detector.detect(image);
 		describe.setImage(image);
-		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
-			Point2D_I32 pt = detector.getLocation(i);
-			double scale = detector.getScale(i);
 
-			TupleDesc_F64 d = describe.process(pt.x,pt.y,0,scale,null);
-			if( d != null ) {
-				descs.pop().set(d.value);
-				locs.add( pt.copy());
+		if( detector.hasScale() ) {
+			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
+				Point2D_I32 pt = detector.getLocation(i);
+				double scale = detector.getScale(i);
+
+				TupleDesc_F64 d = describe.process(pt.x,pt.y,0,scale,null);
+				if( d != null ) {
+					descs.pop().set(d.value);
+					locs.add( pt.copy());
+				}
+			}
+		} else {
+			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
+				Point2D_I32 pt = detector.getLocation(i);
+
+				TupleDesc_F64 d = describe.process(pt.x,pt.y,0,1,null);
+				if( d != null ) {
+					descs.pop().set(d.value);
+					locs.add( pt.copy());
+				}
 			}
 		}
 	}
 
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager m = getImageManager();
+		BufferedImage left = m.loadImage(index,0);
+		BufferedImage right = m.loadImage(index,1);
+
+		process(left,right);
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
+	}
+
 	public static void main( String args[] ) {
-
-//		String leftName = "evaluation/data/stitch/cave_01.jpg";
-//		String rightName = "evaluation/data/stitch/cave_02.jpg";
-//		String leftName = "evaluation/data/stitch/kayak_02.jpg";
-//		String rightName = "evaluation/data/stitch/kayak_03.jpg";
-		String leftName = "evaluation/data/scale/rainforest_01.jpg";
-		String rightName = "evaluation/data/scale/rainforest_02.jpg";
-//		String leftName = "evaluation/data/stitch/grass_rotate_03.jpg";
-//		String rightName = "evaluation/data/stitch/grass_rotate_04.jpg";
-
-		BufferedImage left = UtilImageIO.loadImage(leftName);
-		BufferedImage right = UtilImageIO.loadImage(rightName);
-
 		Class imageType = ImageFloat32.class;
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-		InterestPointDetector detector = FactoryInterestPoint.fromFastHessian(200,9,4,4);
-//		InterestPointDetector detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
-		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.surf(true,imageType);
-//		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType);
-//		ExtractFeatureDescription describe =  FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType);
 
-//		ScoreAssociateTuple scorer = new ScoreAssociateEuclidean();
-		ScoreAssociateTuple scorer = new ScoreAssociateEuclideanSq();
-//		ScoreAssociateTuple scorer = new ScoreAssociateCorrelation();
-//		ScorePointNew scorer = new ScorePointNew(createCircle(12,8,2));
+		VisualizeAssociationMatchesApp app = new VisualizeAssociationMatchesApp(imageType,derivType);
 
-//		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.inlierError(scorer,200,10);
-		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.forwardBackwards(scorer,150);
-//		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.maxMatches(scorer,100);
-//		GeneralAssociation<TupleDesc_F64> matcher = FactoryAssociationTuple.maxError(scorer,10);
+		ImageListManager manager = new ImageListManager();
+		manager.add("Cave","data/stitch/cave_01.jpg","data/stitch/cave_02.jpg");
+		manager.add("Kayak","data/stitch/kayak_02.jpg","data/stitch/kayak_03.jpg");
+		manager.add("Forest","data/scale/rainforest_01.jpg","data/scale/rainforest_02.jpg");
 
-		VisualizeAssociationMatchesApp app = new VisualizeAssociationMatchesApp(detector,describe,matcher,imageType);
+		app.setPreferredSize(new Dimension(1000,500));
+		app.setSize(1000,500);
+		app.setImageManager(manager);
 
-		app.process(left,right);
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
+
+		ShowImages.showWindow(app,"Association Relative Score");
 
 	}
 }

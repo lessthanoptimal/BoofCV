@@ -16,29 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
-
-import boofcv.struct.feature.TupleDesc_F64;
+package boofcv.applet;
 
 
 /**
  * @author Peter Abeles
  */
-public class ScoreAssociateEuclidean implements ScoreAssociation<TupleDesc_F64> {
-	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
-		final int N = a.value.length;
-		double total = 0;
-		for( int i = 0; i < N; i++ ) {
-			double d = a.value[i]-b.value[i];
-			total += d*d;
-		}
-
-		return Math.sqrt(total);
-	}
-
-	@Override
-	public boolean isZeroMinimum() {
-		return true;
-	}
+public class ParseImageInputFile {
 }

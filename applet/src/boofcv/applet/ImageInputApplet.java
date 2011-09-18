@@ -23,17 +23,26 @@ import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
+import java.net.URL;
 
 
 /**
+ * Applet for visualizations which take in as input a single image.
+ *
  * @author Peter Abeles
  */
-public class SingleInputApplet extends JApplet {
+public class ImageInputApplet extends JApplet {
 
 	@Override
 	public void init() {
 		showStatus("Loading Parameters");
-		String directory = getParameter("directory");
+		String dataset = getParameter("dataset");
+
+		if( dataset == null ) {
+			showStatus("dataset parameter not set!");
+			return;
+		}
 
 		final String panelPath = getParameter("panelPath");
 		Class inputType = ImageFloat32.class;
@@ -43,18 +52,16 @@ public class SingleInputApplet extends JApplet {
 
 		if( comp == null ) {
 			showStatus("Failed to create GUI component");
+			return;
 		} else if( !(comp instanceof ProcessImage) ) {
-			showStatus("Loaded component is not of ProcessImage type");
+			showStatus("The loaded component is not of ProcessImage type");
 			return;
 		}
 
 		showStatus("Loading Image");
 		ProcessImage p = (ProcessImage)comp;
 
-		AppletImageListManager manager = new AppletImageListManager(getCodeBase());
-		manager.add("shapes",directory+"data/shapes01.png");
-		manager.add("sunflowers",directory+"data/sunflowers.jpg");
-		manager.add("room",directory+"data/indoors01.jpg");
+		AppletImageListManager manager = parseImageInput(dataset);
 
 		p.setImageManager(manager);
 
@@ -65,6 +72,37 @@ public class SingleInputApplet extends JApplet {
 
 		showStatus("Running");
 		getContentPane().add(comp, BorderLayout.CENTER);
+	}
+
+	public AppletImageListManager parseImageInput( String fileName )
+	{
+		File a = new File(fileName);
+		String directory = a.getParent()+"/";
+
+		AppletImageListManager ret = new AppletImageListManager(getCodeBase());
+		try {
+			InputStreamReader isr = new InputStreamReader(new URL(getCodeBase(),fileName).openStream());
+			BufferedReader reader = new BufferedReader(isr);
+
+			String line;
+			while( (line = reader.readLine()) != null ) {
+
+				String[]z = line.split("\\^");
+				String[] names = new String[z.length-1];
+				for( int i = 1; i < z.length; i++ ) {
+					names[i-1] = directory+z[i];
+				}
+
+				ret.add(z[0],names);
+			}
+
+			return ret;
+
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

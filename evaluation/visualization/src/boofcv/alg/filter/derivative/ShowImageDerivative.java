@@ -55,18 +55,18 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 	boolean processedImage = false;
 
 	public ShowImageDerivative(Class<T> imageType, Class<D> derivType) {
+		super(1);
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		addAlgorithm("Prewitt",FactoryDerivative.prewitt(imageType,derivType));
-		addAlgorithm("Sobel",FactoryDerivative.sobel(imageType,derivType));
-		addAlgorithm("Three",FactoryDerivative.three(imageType,derivType));
-		addAlgorithm("Gaussian", FactoryDerivative.gaussian(-1,3,imageType,derivType));
+		addAlgorithm(0, "Prewitt",FactoryDerivative.prewitt(imageType,derivType));
+		addAlgorithm(0, "Sobel",FactoryDerivative.sobel(imageType,derivType));
+		addAlgorithm(0, "Three",FactoryDerivative.three(imageType,derivType));
+		addAlgorithm(0, "Gaussian", FactoryDerivative.gaussian(-1,3,imageType,derivType));
 
-		addMainGUI(panel);
+		setMainGUI(panel);
 	}
 
-	@Override
 	public void process( final BufferedImage original ) {
 		setInputImage(original);
 
@@ -83,12 +83,17 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 
 				setPreferredSize(new Dimension(original.getWidth()+width+10,original.getHeight()+30));
 				processedImage = true;
-				refreshAlgorithm();
+				doRefreshAll();
 			}});
 	}
 
 	@Override
-	public void setActiveAlgorithm(String name, final Object cookie) {
+	public void refreshAll(Object[] cookies) {
+		setActiveAlgorithm(0,null,cookies[0]);
+	}
+
+	@Override
+	public void setActiveAlgorithm(int indexFamily, String name, final Object cookie) {
 		if( image == null )
 			return;
 

@@ -24,7 +24,7 @@ import boofcv.abst.feature.tracker.PstWrapperKltPyramid;
 import boofcv.abst.feature.tracker.PstWrapperSurf;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
-import boofcv.alg.feature.associate.ScoreAssociateTuple;
+import boofcv.alg.feature.associate.ScoreAssociation;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.orientation.OrientationIntegral;
@@ -89,7 +89,7 @@ public class FactoryPointSequentialTracker {
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(3,false,integralType);
 		DescribePointSurf<II> describe = new DescribePointSurf<II>();
 
-		ScoreAssociateTuple score = new ScoreAssociateEuclideanSq();
+		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociationTuple.inlierError(score,maxMatches,3));
 
 		return new PstWrapperSurf<I,II>(detector,orientation,describe,assoc,integralType);
