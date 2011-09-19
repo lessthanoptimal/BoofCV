@@ -21,21 +21,27 @@ package boofcv.alg.denoise;
 import boofcv.abst.denoise.WaveletDenoiseFilter;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.wavelet.WaveletTransform;
+import boofcv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
 import boofcv.alg.denoise.wavelet.DenoiseSureShrink_F32;
-import boofcv.alg.misc.ImageTestingOps;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.denoise.wavelet.DenoiseVisuShrink_F32;
+import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.border.BorderType;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.wavelet.FactoryWaveletCoiflet;
+import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
+import boofcv.factory.transform.wavelet.FactoryWaveletHaar;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.gui.ListDisplayPanel;
+import boofcv.gui.ProcessImage;
+import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.ImageListManager;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.wavelet.WaveletDescription;
-import boofcv.struct.wavelet.WlCoef_F32;
+import boofcv.struct.wavelet.WlCoef;
 
-import java.awt.*;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
@@ -45,80 +51,161 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class DenoiseVisualizeApp {
+// TODO make custom panel
+	// select display image
+	// noise level
+	// number of levels
+	// statistics for denoised and noisy image
+// todo add non-wavelet filters
+public class DenoiseVisualizeApp<T extends ImageBase,W extends WlCoef>
+	extends SelectAlgorithmImagePanel implements ProcessImage
+{
 
 	// amount of noise added to the test images
 	float noiseSigma = 15;
-
-	Random rand = new Random(2234);
-	ImageFloat32 image;
-	ImageFloat32 imageNoisy;
-	ImageFloat32 imageDenoised;
-
 	int numLevels = 3;
 
-	BorderType borderType = BorderType.REFLECT;
+	Random rand = new Random(2234);
 
-//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletHaar.generate_F32();
-//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.daubJ_F32(4);
-//	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletDaub.biorthogonal_F32(5,borderType);
-	WaveletDescription<WlCoef_F32> waveletDesc = FactoryWaveletCoiflet.generate_F32(6);
+	DenoiseWavelet<T> denoiser;
+	WaveletDescription<W> waveletDesc;
 
-	WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32> waveletTran = FactoryWaveletTransform.create_F32(waveletDesc,numLevels);
+	ListDisplayPanel gui = new ListDisplayPanel();
 
-//	DenoiseWavelet denoiser = new DenoiseVisuShrink_F32();
-//	DenoiseWavelet denoiser = new DenoiseBayesShrink_F32();
-	DenoiseWavelet denoiser = new DenoiseSureShrink_F32();
+	Class<T> imageType;
+	T input;
+	T noisy;
+	T output;
 
-	String imagePath = "data/standard/barbara.png";
-//	String imagePath = "data/particles01.jpg";
+	boolean processedImage = false;
 
-	FilterImageInterface<ImageFloat32,ImageFloat32> filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,denoiser);
+	public DenoiseVisualizeApp( Class<T> imageType ) {
+		super(2);
 
-	public void process() {
+		this.imageType = imageType;
 
-		System.out.println(imagePath);
-		loadImage(imagePath);
-		addNoiseToImage();
-		imageDenoised = new ImageFloat32(image.width,image.height);
+		addAlgorithm(0,"BayesShrink",new DenoiseBayesShrink_F32());
+		addAlgorithm(0,"VisuShrink",new DenoiseVisuShrink_F32());
+		addAlgorithm(0,"SureShrink",new DenoiseSureShrink_F32());
 
-		System.out.printf("Noise MSE    %8.1ff\n",computeMSE(imageNoisy));
+		addAlgorithm(1,"Daub 4",FactoryWaveletDaub.daubJ_F32(4));
+		addAlgorithm(1,"Haar", FactoryWaveletHaar.generate(false,32));
+		addAlgorithm(1,"Coiflet 6",FactoryWaveletCoiflet.generate_F32(6));
+// todo something is clearly wrong with biorthogonal.  comment out so it doesn't appear in the applet
+//		addAlgorithm(1,"Biorthogonal 5", FactoryWaveletDaub.biorthogonal_F32(5,borderType));
 
-		filter.process(imageNoisy,imageDenoised);
+		input = GeneralizedImageOps.createImage(imageType,1,1);
+		noisy = GeneralizedImageOps.createImage(imageType,1,1);
+		output = GeneralizedImageOps.createImage(imageType,1,1);
 
-		System.out.printf("Denoised MSE %8.1ff\n",computeMSE(imageDenoised));
-
-		ListDisplayPanel gui = new ListDisplayPanel();
-		gui.setPreferredSize( new Dimension(image.width+100,image.height));
-		gui.addImage(ConvertBufferedImage.convertTo(image,null),"Original");
-		gui.addImage(ConvertBufferedImage.convertTo(imageNoisy,null),"Noisy");
-		gui.addImage(ConvertBufferedImage.convertTo(imageDenoised,null),"De-noised");
-
-		ShowImages.showWindow(gui,"Image Denoising");
+		setMainGUI(gui);
 	}
 
-	private double computeMSE(ImageFloat32 imageInv) {
-		return ImageTestingOps.computeMeanSquaredError(imageInv,image);
+	public void process( BufferedImage image ) {
+		input.reshape(image.getWidth(),image.getHeight());
+		noisy.reshape(input.width,input.height);
+		output.reshape(input.width,input.height);
+		ConvertBufferedImage.convertFrom(image,input,imageType);
+
+		// add noise to the image
+		noisy.setTo(input);
+		GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma);
+		GPixelMath.boundImage(noisy,0,255);
+
+		doRefreshAll();
 	}
 
-	private void loadImage( String imagePath ) {
-		BufferedImage in = UtilImageIO.loadImage(imagePath);
-		image = ConvertBufferedImage.convertFrom(in,(ImageFloat32)null);
-		if( image == null ) {
-			throw new RuntimeException("Couldn't load image: "+imagePath);
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
+	}
+
+	@Override
+	public void refreshAll(Object[] cookies) {
+		denoiser = (DenoiseWavelet<T>)cookies[0];
+		waveletDesc = (WaveletDescription<W>)cookies[1];
+
+		performDenoising();
+	}
+
+	@Override
+	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+		switch( indexFamily ) {
+			case 0:
+				denoiser = (DenoiseWavelet<T>)cookie;
+				break;
+
+			case 1:
+				waveletDesc = (WaveletDescription<W>)cookie;
+				break;
+		}
+
+		performDenoising();
+	}
+
+	private void performDenoising() {
+		WaveletTransform<T, T,W> waveletTran = FactoryWaveletTransform.create(waveletDesc,numLevels);
+		FilterImageInterface<T,T> filter = new WaveletDenoiseFilter<T>(waveletTran,denoiser);
+
+		filter.process(noisy,output);
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui.reset();
+				gui.addImage(ConvertBufferedImage.convertTo(output,null),"De-noised");
+				gui.addImage(ConvertBufferedImage.convertTo(noisy,null),"Noisy");
+				gui.addImage(ConvertBufferedImage.convertTo(input,null),"Original");
+				processedImage = true;
+			}});
+	}
+
+	@Override
+	public void changeImage(String name, int index) {
+		ImageListManager manager = getImageManager();
+
+		BufferedImage image = manager.loadImage(index);
+		if( image != null ) {
+			process(image);
 		}
 	}
 
-	private void addNoiseToImage() {
-		imageNoisy = image.clone();
-		ImageTestingOps.addGaussian(imageNoisy,rand,noiseSigma);
-		PixelMath.boundImage(imageNoisy,0,255);
-	}
+//	private double computeMSE(ImageFloat32 imageInv) {
+//		return ImageTestingOps.computeMeanSquaredError(imageInv,image);
+//	}
+//
+//	private void loadImage( String imagePath ) {
+//		BufferedImage in = UtilImageIO.loadImage(imagePath);
+//		image = ConvertBufferedImage.convertFrom(in,(ImageFloat32)null);
+//		if( image == null ) {
+//			throw new RuntimeException("Couldn't load image: "+imagePath);
+//		}
+//	}
+//
+//	private void addNoiseToImage() {
+//		imageNoisy = image.clone();
+//		ImageTestingOps.addGaussian(imageNoisy,rand,noiseSigma);
+//		PixelMath.boundImage(imageNoisy,0,255);
+//	}
 
 
 	public static void main( String args[] ) {
-		DenoiseVisualizeApp app = new DenoiseVisualizeApp();
+		DenoiseVisualizeApp app = new DenoiseVisualizeApp(ImageFloat32.class);
 
-		app.process();
+		ImageListManager manager = new ImageListManager();
+		manager.add("lena","data/standard/lena512.bmp");
+		manager.add("barbara","data/standard/barbara.png");
+		manager.add("boat","data/standard/boat.png");
+		manager.add("fingerprint","data/standard/fingerprint.png");
+
+		app.setImageManager(manager);
+
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
+
+		ShowImages.showWindow(app,"Image Noise Removal");
+
+		System.out.println("Done");
 	}
 }

@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface DenoiseWavelet <T extends ImageBase<T>>  {
+public interface DenoiseWavelet <T extends ImageBase>  {
 
 	/**
 	 * Removes noise from the multi-level wavelet transform.

@@ -20,6 +20,8 @@ import java.awt.image.BufferedImage;
  */
 public class SelectRegionDescriptionPanel extends JPanel implements MouseListener , MouseMotionListener {
 
+	double clickTolerance = 10;
+
 	BufferedImage background;
 	Point2D_I32 target;
 	Point2D_I32 current;
@@ -27,6 +29,10 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 	// scale of background to view
 	double imageScale;
 	Listener listener;
+	// is the region being dragged around?
+	// In normal mode the current mouse position sets the size and orientation.
+	// In drag mode it sets the region's center.
+	boolean dragMode = false;
 
 	public SelectRegionDescriptionPanel() {
 		super(new BorderLayout());
@@ -142,6 +148,22 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 			target = null;
 			current = null;
 		} else {
+			if( target != null ) {
+				// if the user clicked on the center point enter drag mode
+				int targetX = (int)(target.x*imageScale);
+				int targetY = (int)(target.y*imageScale);
+				double distance = UtilPoint2D_I32.distance(e.getX(),e.getY(),targetX,targetY);
+				if( distance < clickTolerance ) {
+					// adjust the target to be at the cursor
+					dragMode = true;
+					current.x += x-target.x;
+					current.y += y-target.y;
+					target.set(x,y);
+					repaint();
+					return;
+				}
+			}
+			dragMode = false;
 			target = new Point2D_I32(x,y);
 			current = target.copy();
 			repaint();
@@ -165,8 +187,13 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 		int x = (int)(e.getX()/imageScale);
 		int y = (int)(e.getY()/imageScale);
 
-
-		current.set(x,y);
+		if( dragMode ) {
+			current.x += x-target.x;
+			current.y += y-target.y;
+			target.set(x,y);
+		} else {
+			current.set(x,y);
+		}
 		repaint();
 
 		if( listener != null ) {

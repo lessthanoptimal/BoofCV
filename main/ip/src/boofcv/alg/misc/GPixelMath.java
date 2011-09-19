@@ -203,6 +203,33 @@ public class GPixelMath {
 		} else {
 			throw new IllegalArgumentException("Unknown integer image Type");
 		}
+	}
 
+	/**
+	 * Bounds image pixels to be between these two values.
+	 *
+	 * @param input Input image.
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 */
+	public static <T extends ImageBase> void boundImage( T input , double min , double max ) {
+
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.boundImage((ImageUInt8)input,(int)min,(int)max);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.boundImage((ImageSInt8)input,(int)min,(int)max);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.boundImage((ImageUInt16)input,(int)min,(int)max);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.boundImage((ImageSInt16)input,(int)min,(int)max);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.boundImage((ImageSInt32)input,(int)min,(int)max);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.boundImage((ImageFloat32)input,(float)min,(float)max);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.boundImage((ImageFloat64)input,(int)min,(int)max);
+		} else {
+			throw new IllegalArgumentException("Unknown integer image Type");
+		}
 	}
 }

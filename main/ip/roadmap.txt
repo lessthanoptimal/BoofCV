@@ -42,10 +42,10 @@ SFM
 #  * pyramid
 #  * Integral Image
 #  * Scale Space
- - Misc
+#- Misc
 #  * Non-Max Suppression
- - Binary Image
+#- Binary Image
 #  * morphological operations
 #  * Threshold/Hysteresis Threshold
 #  * blob detector
-   * contour?
+#  * contour

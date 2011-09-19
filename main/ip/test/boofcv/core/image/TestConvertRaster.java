@@ -19,6 +19,8 @@
 package boofcv.core.image;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 import sun.awt.image.ByteInterleavedRaster;
@@ -29,6 +31,9 @@ import java.awt.image.Raster;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -69,6 +74,35 @@ public class TestConvertRaster {
 		// update this as needed when new functions are added
 		if(numMethods != numFound)
 			throw new RuntimeException("Unexpected number of methods: Found "+numFound+"  expected "+numMethods);
+	}
+
+	/**
+	 * There is a bug where gray scale images are mangled by getRGB().  There is a work around in
+	 * the code.
+	 *
+	 * Java Bug ID: 5051418
+	 */
+	@Test
+	public void checkGrayBug() {
+		BufferedImage img = new BufferedImage(5,5,BufferedImage.TYPE_BYTE_GRAY);
+
+		img.getRaster().getDataBuffer().setElem(0,101);
+
+		int RGB = img.getRGB(0,0);
+		int r = RGB & 0xFF;
+
+		// this is the bug in Java, if this ever is false then a miracle has happened
+		// and this line should be commented out
+		assertTrue( r != 101);
+
+		// test several image types
+		ImageUInt8 out = new ImageUInt8(5,5);
+		ConvertRaster.bufferedToGray(img,out);
+		assertEquals(101,out.get(0,0));
+
+		ImageFloat32 outF = new ImageFloat32(5,5);
+		ConvertRaster.bufferedToGray(img,outF);
+		assertEquals(101,outF.get(0,0),1e-4);
 	}
 
 	private boolean isTestMethod( Method m ) {

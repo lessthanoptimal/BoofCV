@@ -25,6 +25,7 @@ import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 
 /**
  * Routines for converting to and from {@link BufferedImage} that use its internal
@@ -188,12 +189,29 @@ public class ConvertRaster {
 		final int height = src.getHeight();
 
 		byte[] data = dst.data;
-		for (int y = 0; y < height; y++) {
-			int index = dst.startIndex + y*dst.stride;
-			for (int x = 0; x < width; x++) {
-				int argb = src.getRGB(x, y);
 
-				data[index++] = (byte) ((((argb >>> 16) & 0xFF) + ((argb >>> 8) & 0xFF) + (argb & 0xFF)) / 3);
+		if( src.getType() == BufferedImage.TYPE_BYTE_GRAY ) {
+			// If the buffered image is a gray scale image there is a bug where getRGB distorts
+			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
+			WritableRaster raster = src.getRaster();
+			int hack[] = new int[1];
+
+			for (int y = 0; y < height; y++) {
+				int index = dst.startIndex + y*dst.stride;
+				for (int x = 0; x < width; x++) {
+					raster.getPixel(x,y,hack);
+
+					data[index++] = (byte)hack[0];
+				}
+			}
+		} else {
+			for (int y = 0; y < height; y++) {
+				int index = dst.startIndex + y*dst.stride;
+				for (int x = 0; x < width; x++) {
+					int argb = src.getRGB(x, y);
+
+					data[index++] = (byte) ((((argb >>> 16) & 0xFF) + ((argb >>> 8) & 0xFF) + (argb & 0xFF)) / 3);
+				}
 			}
 		}
 	}
@@ -218,18 +236,35 @@ public class ConvertRaster {
 		final int height = src.getHeight();
 
 		float[] data = dst.data;
-		for (int y = 0; y < height; y++) {
-			int index = dst.startIndex + y*dst.stride;
-			for (int x = 0; x < width; x++) {
-				int argb = src.getRGB(x, y);
 
-				int r = (argb >>> 16) & 0xFF;
-				int g = (argb >>> 8) & 0xFF;
-				int b = argb & 0xFF;
+		if( src.getType() == BufferedImage.TYPE_BYTE_GRAY ) {
+			// If the buffered image is a gray scale image there is a bug where getRGB distorts
+			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
+			WritableRaster raster = src.getRaster();
+			float hack[] = new float[1];
 
-				float ave = (r + g + b) / 3.0f;
+			for (int y = 0; y < height; y++) {
+				int index = dst.startIndex + y*dst.stride;
+				for (int x = 0; x < width; x++) {
+					raster.getPixel(x,y,hack);
 
-				data[index++] = ave;
+					data[index++] = hack[0];
+				}
+			}
+		} else {
+			for (int y = 0; y < height; y++) {
+				int index = dst.startIndex + y*dst.stride;
+				for (int x = 0; x < width; x++) {
+					int argb = src.getRGB(x, y);
+
+					int r = (argb >>> 16) & 0xFF;
+					int g = (argb >>> 8) & 0xFF;
+					int b = argb & 0xFF;
+
+					float ave = (r + g + b) / 3.0f;
+
+					data[index++] = ave;
+				}
 			}
 		}
 	}
