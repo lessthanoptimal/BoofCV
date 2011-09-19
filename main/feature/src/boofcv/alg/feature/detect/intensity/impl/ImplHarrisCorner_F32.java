@@ -23,16 +23,16 @@ import boofcv.struct.image.ImageFloat32;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity} based off of {@link SsdCorner_F32}.
+ * Implementation of {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity} based off of {@link ImplSsdCorner_F32}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class HarrisCorner_F32 extends SsdCorner_F32 implements HarrisCornerIntensity<ImageFloat32> {
+public class ImplHarrisCorner_F32 extends ImplSsdCorner_F32 implements HarrisCornerIntensity<ImageFloat32> {
 
 	float kappa;
 
-	public HarrisCorner_F32(int windowRadius, float kappa) {
+	public ImplHarrisCorner_F32(int windowRadius, float kappa) {
 		super(windowRadius);
 		this.kappa = kappa;
 	}

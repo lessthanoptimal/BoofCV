@@ -18,40 +18,33 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.alg.feature.detect.intensity.GenericCornerIntensityTests;
+import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
 
 /**
- * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity} based off of {@link SsdCorner_S16}.
- * </p>
- *
  * @author Peter Abeles
  */
-public class HarrisCorner_S16 extends SsdCorner_S16 implements HarrisCornerIntensity<ImageSInt16> {
+public class TestImplMedianCorner_F32 extends GenericCornerIntensityTests
+{
+	ImageFloat32 intensity = new ImageFloat32(width,height);
+	ImageFloat32 median = new ImageFloat32(width,height);
 
-	// tuning parameter
-	float kappa;
-
-	public HarrisCorner_S16(int windowRadius, float kappa) {
-		super(windowRadius);
-		this.kappa = kappa;
+	@Test
+	public void genericTests() {
+		performAllTests();
 	}
 
 	@Override
-	public void setKappa(float kappa) {
-		this.kappa = kappa;
+	public ImageFloat32 computeIntensity() {
+		MedianCornerIntensity.process(intensity,imageF,median);
+		return intensity;
 	}
 
 	@Override
-	protected float computeIntensity() {
-		// det(A) + kappa*trace(A)^2
-		float trace = totalXX + totalYY;
-		return (totalXX * totalYY - totalXY * totalXY) + kappa * trace*trace;
-	}
-
-	@Override
-	public float getKappa() {
-		return kappa;
+	protected void computeDerivatives() {
+		FactoryBlurFilter.median(ImageFloat32.class,2).process(imageF,median);
 	}
 }

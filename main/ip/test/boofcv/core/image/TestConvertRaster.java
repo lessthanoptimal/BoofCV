@@ -83,7 +83,7 @@ public class TestConvertRaster {
 	 * Java Bug ID: 5051418
 	 */
 	@Test
-	public void checkGrayBug() {
+	public void checkGrayBug_To() {
 		BufferedImage img = new BufferedImage(5,5,BufferedImage.TYPE_BYTE_GRAY);
 
 		img.getRaster().getDataBuffer().setElem(0,101);

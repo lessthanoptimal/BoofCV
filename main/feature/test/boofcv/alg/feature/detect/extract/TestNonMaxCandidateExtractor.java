@@ -44,7 +44,7 @@ public class TestNonMaxCandidateExtractor {
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 		QueueCorner candidates = new QueueCorner(100);
 
-		NonMaxCandidateExtractor alg = new NonMaxCandidateExtractor(2, 0.6F);
+		NonMaxCandidateExtractor alg = new NonMaxCandidateExtractor(2, 2, 0.6F);
 		alg.process(inten,candidates,null,foundList);
 		// if it doesn't blow up it passed!
 	}
@@ -65,7 +65,7 @@ public class TestNonMaxCandidateExtractor {
 
 		// see if it detects everything
 		NonMaxCandidateExtractor extractor;
-		extractor = new NonMaxCandidateExtractor(1, 0);
+		extractor = new NonMaxCandidateExtractor(1, 1 , 0);
 		extractor.process(img, candidates, exclude, corners);
 		assertEquals(2, corners.size());
 
@@ -95,7 +95,7 @@ public class TestNonMaxCandidateExtractor {
 		candidates.add(3,5);
 
 		NonMaxCandidateExtractor extractor;
-		extractor = new NonMaxCandidateExtractor(1, 0);
+		extractor = new NonMaxCandidateExtractor(1, 1 , 0);
 		extractor.process(img, candidates, null,corners);
 		assertEquals(2, corners.size());
 
@@ -132,7 +132,7 @@ public class TestNonMaxCandidateExtractor {
 		candidates.add(3,5);
 
 		NonMaxCandidateExtractor extractor;
-		extractor = new NonMaxCandidateExtractor(0, 0);
+		extractor = new NonMaxCandidateExtractor(0, 0 , 0);
 		extractor.process(img, candidates, null,corners);
 		assertEquals(2, corners.size());
 

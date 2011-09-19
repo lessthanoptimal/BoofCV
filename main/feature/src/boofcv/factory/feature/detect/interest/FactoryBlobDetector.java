@@ -37,6 +37,6 @@ public class FactoryBlobDetector {
 											   Class<D> derivType , HessianBlobIntensity.Type type )
 	{
 		GeneralFeatureIntensity<T,D> intensity = new WrapperLaplacianBlobIntensity<T,D>(type,derivType);
-		return FactoryCornerDetector.createGeneral(intensity,featureRadius,featureRadius,pixelTol,maxFeatures);
+		return FactoryCornerDetector.createGeneral(intensity,featureRadius,pixelTol,maxFeatures);
 	}
 }

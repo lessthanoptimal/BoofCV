@@ -36,10 +36,15 @@ public class NonMaxCandidateExtractor {
 	int radius;
 	// the threshold which points must be above to be a feature
 	float thresh;
+	// does not process pixels this close to the image border
+	int ignoreBorder;
 
-	public NonMaxCandidateExtractor(int minSeparation, float thresh) {
+	public NonMaxCandidateExtractor(int minSeparation, int ignoreBorder , float thresh) {
+		if( ignoreBorder < minSeparation )
+			throw new IllegalArgumentException("Requires: ignoreBorder >= minSeparation");
 		this.radius = minSeparation;
 		this.thresh = thresh;
+		this.ignoreBorder = ignoreBorder;
 	}
 
 	public void setMinSeparation(int minSeparation) {
@@ -71,8 +76,8 @@ public class NonMaxCandidateExtractor {
 			}
 		}
 
-		final int w = intensityImage.width-radius;
-		final int h = intensityImage.height-radius;
+		final int w = intensityImage.width-ignoreBorder;
+		final int h = intensityImage.height-ignoreBorder;
 
 		final int stride = intensityImage.stride;
 
@@ -82,7 +87,7 @@ public class NonMaxCandidateExtractor {
 			Point2D_I16 pt = candidates.points[iter];
 
 			// see if its too close to the image edge
-			if( pt.x < radius || pt.y < radius || pt.x >= w || pt.y >= h )
+			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= w || pt.y >= h )
 				continue;
 
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;

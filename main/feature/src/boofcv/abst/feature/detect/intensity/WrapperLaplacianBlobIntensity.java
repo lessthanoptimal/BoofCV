@@ -103,4 +103,12 @@ public class WrapperLaplacianBlobIntensity <I extends ImageBase, D extends Image
 	public boolean hasCandidates() {
 		return false;
 	}
+
+	/**
+	 * No ignore border unless the derivative has an ignore border
+	 */
+	@Override
+	public int getIgnoreBorder() {
+		return 0;
+	}
 }

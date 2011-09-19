@@ -146,8 +146,8 @@ public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
 		IntensityPointFeatureApp<ImageFloat32,ImageFloat32> app =
 				new IntensityPointFeatureApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-//		IntensityFeatureScaleSpaceApp<ImageUInt8, ImageSInt16> app2 =
-//				new IntensityFeatureScaleSpaceApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
+//		IntensityPointFeatureApp<ImageUInt8, ImageSInt16> app =
+//				new IntensityPointFeatureApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("shapes","data/shapes01.png");

@@ -69,12 +69,12 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 
 		GeneralFeatureDetector<T,D> alg;
 
-		alg = FactoryCornerDetector.createFast(radius,20,maxFeatures,imageType);
-		addAlgorithm(0, "Fast", FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 		alg = FactoryCornerDetector.createHarris(radius,thresh,maxFeatures,derivType);
 		addAlgorithm(0, "Harris",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 		alg = FactoryCornerDetector.createKlt(radius,thresh,maxFeatures,derivType);
 		addAlgorithm(0, "KLT", FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		alg = FactoryCornerDetector.createFast(radius,10,maxFeatures,imageType);
+		addAlgorithm(0, "Fast", FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 		alg = FactoryCornerDetector.createKitRos(radius,thresh,maxFeatures,derivType);
 		addAlgorithm(0, "KitRos",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 		alg = FactoryCornerDetector.createMedian(radius,thresh,maxFeatures,imageType);

@@ -81,4 +81,12 @@ public class WrapperKitRosCornerIntensity<I extends ImageBase,D extends ImageBas
 	public boolean hasCandidates() {
 		return false;
 	}
+
+	/**
+	 * There is no ignore border, unless the derivative that it is computed from has an ignore border.
+	 */
+	@Override
+	public int getIgnoreBorder() {
+		return 0;
+	}
 }

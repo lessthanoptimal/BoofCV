@@ -28,7 +28,9 @@ import boofcv.struct.image.ImageFloat32;
  * 
  * @author Peter Abeles
  */
-public class WrapperGradientCornerIntensity<I extends ImageBase,D extends ImageBase> implements GeneralFeatureIntensity<I,D> {
+public class WrapperGradientCornerIntensity<I extends ImageBase,D extends ImageBase>
+		implements GeneralFeatureIntensity<I,D>
+{
 
 	GradientCornerIntensity<D> alg;
 
@@ -64,5 +66,10 @@ public class WrapperGradientCornerIntensity<I extends ImageBase,D extends ImageB
 	@Override
 	public boolean hasCandidates() {
 		return false;
+	}
+
+	@Override
+	public int getIgnoreBorder() {
+		return alg.getIgnoreBorder();
 	}
 }

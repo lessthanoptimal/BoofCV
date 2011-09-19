@@ -18,10 +18,10 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.alg.feature.detect.intensity.impl.*;
 import boofcv.alg.misc.ImageTestingOps;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 
@@ -54,7 +54,7 @@ public class BenchmarkSsdCornerIntensity {
 	static Random rand = new Random(234);
 
 	public static class KLT_F32 extends PerformerBase {
-		KltCorner_F32 corner = new KltCorner_F32(windowRadius);
+		ImplKltCorner_F32 corner = new ImplKltCorner_F32(windowRadius);
 
 		@Override
 		public void process() {
@@ -63,7 +63,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KLT_I16 extends PerformerBase {
-		KltCorner_S16 corner = new KltCorner_S16(windowRadius);
+		ImplKltCorner_S16 corner = new ImplKltCorner_S16(windowRadius);
 
 		@Override
 		public void process() {
@@ -72,7 +72,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KLT_Naive_I16 extends PerformerBase {
-		SsdCornerNaive_S16 corner = new SsdCornerNaive_S16(imgWidth, imgHeight, windowRadius);
+		ImplSsdCornerNaive_S16 corner = new ImplSsdCornerNaive_S16(imgWidth, imgHeight, windowRadius);
 
 		@Override
 		public void process() {
@@ -81,7 +81,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class Harris_F32 extends PerformerBase {
-		HarrisCorner_F32 corner = new HarrisCorner_F32(windowRadius, 0.04f);
+		ImplHarrisCorner_F32 corner = new ImplHarrisCorner_F32(windowRadius, 0.04f);
 
 		@Override
 		public void process() {
@@ -90,7 +90,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class Harris_I16 extends PerformerBase {
-		HarrisCorner_S16 corner = new HarrisCorner_S16( windowRadius, 0.04f);
+		ImplHarrisCorner_S16 corner = new ImplHarrisCorner_S16( windowRadius, 0.04f);
 
 		@Override
 		public void process() {

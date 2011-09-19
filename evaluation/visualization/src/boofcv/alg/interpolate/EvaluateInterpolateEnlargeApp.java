@@ -57,6 +57,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 		panel.setResize(false);
 		setMainGUI(panel);
 
+		gray = GeneralizedImageOps.createImage(imageType,1,1);
 		scaledImage = GeneralizedImageOps.createImage(imageType,1,1);
 
 		addAlgorithm(0, "Nearest Neighbor",FactoryInterpolation.nearestNeighborPixel(imageType));
@@ -70,6 +71,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 	public void process(BufferedImage image) {
 		setInputImage(image);
 
+		gray.reshape(image.getWidth(),image.getHeight());
 		gray = ConvertBufferedImage.convertFrom(image,null,imageType);
 
 		hasProcessed = true;
@@ -88,7 +90,6 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 		}
 
 		InterpolatePixel<T> interp = (InterpolatePixel<T>)cookie;
-
 
 		scaledImage.reshape(panel.getWidth(),panel.getHeight());
 		DistortImageOps.scale(gray,scaledImage,interp);

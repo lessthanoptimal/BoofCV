@@ -18,19 +18,15 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.feature.detect.intensity.GenericCornerIntensityTests;
-import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
-import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestMedianCorner_F32 extends GenericCornerIntensityTests
-{
-	ImageFloat32 intensity = new ImageFloat32(width,height);
-	ImageFloat32 median = new ImageFloat32(width,height);
+public class TestImplHarrisCorner_I16 extends GenericCornerIntensityGradientTests {
+	ImplHarrisCorner_S16 detector = new ImplHarrisCorner_S16(1,0.04f);
 
 	@Test
 	public void genericTests() {
@@ -39,12 +35,7 @@ public class TestMedianCorner_F32 extends GenericCornerIntensityTests
 
 	@Override
 	public ImageFloat32 computeIntensity() {
-		MedianCornerIntensity.process(intensity,imageF,median);
-		return intensity;
-	}
-
-	@Override
-	protected void computeDerivatives() {
-		FactoryBlurFilter.median(ImageFloat32.class,2).process(imageF,median);
+		detector.process(derivX_I16,derivY_I16);
+		return detector.getIntensity();
 	}
 }
