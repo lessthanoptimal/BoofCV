@@ -1,8 +1,3 @@
-- Name Ideas
- * Able Vision <--- taken
- * Bubo Vision
- * BoofCV
-
 - Rename all low level implementation classes to have Impl* in their name
 
 - Features

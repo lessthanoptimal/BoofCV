@@ -24,8 +24,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -36,13 +34,15 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ListDisplayPanel extends JPanel implements ListSelectionListener , ComponentListener {
+public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 
 	List<JPanel> panels = new ArrayList<JPanel>();
-	private JSplitPane splitPane;
+	private JPanel bodyPanel;
 	private JList listPanel;
 
 	DefaultListModel listModel = new DefaultListModel();
+
+	JScrollPane scroll;
 
 	public ListDisplayPanel() {
 		setLayout(new BorderLayout());
@@ -52,15 +52,15 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 		listPanel.setSelectedIndex(0);
 		listPanel.addListSelectionListener(this);
 
-		JScrollPane scroll = new JScrollPane(listPanel);
-		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scroll = new JScrollPane(listPanel);
+		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scroll, new JPanel());
-		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(100);
 
-		add(splitPane);
-		addComponentListener(this);
+		bodyPanel = new JPanel();
+		bodyPanel.setLayout(new BorderLayout());
+		bodyPanel.add(scroll,BorderLayout.WEST);
+
+		add(bodyPanel);
 	}
 
 	public void reset() {
@@ -79,7 +79,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 			} catch (InvocationTargetException e) {
 			}
 		}
-		splitPane.requestFocus();
+//		bodyPanel.requestFocus();
 	}
 
 	public int getListWidth(){
@@ -107,7 +107,6 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 			public void run() {
 				panels.add(panel);
 				listModel.addElement(name);
-				splitPane.setDividerLocation((int)listPanel.getPreferredSize().getWidth()+1);
 				if( listModel.size() == 1 ) {
 					listPanel.setSelectedIndex(0);
 				}
@@ -124,58 +123,20 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener , 
 			public void run() {
 				final int index = listPanel.getSelectedIndex();
 				if( index >= 0 ) {
-					// the split pane likes to screw up the divider location when the
-					// right component is changed and a scroll pane is being used on the left
-					int loc = splitPane.getDividerLocation();
-					splitPane.setRightComponent(panels.get(index));
-					splitPane.setDividerLocation(loc);
-					splitPane.repaint();
+					removeCenterBody();
+					bodyPanel.add(panels.get(index),BorderLayout.CENTER);
+					bodyPanel.validate();
+					bodyPanel.repaint();
 				}
 			}
 		});
 
 	}
 
-	@Override
-	public void componentResized( final ComponentEvent e) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				final int w = e.getComponent().getWidth();
-				final int h = e.getComponent().getHeight();
-
-				splitPane.setPreferredSize(new Dimension(w, h));
-				splitPane.setDividerLocation((int)listPanel.getPreferredSize().getWidth()+1);
-//				splitPane.repaint();
-			}
-		});
+	private void removeCenterBody() {
+		Component old = ((BorderLayout)bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+		if( old != null ) {
+			bodyPanel.remove(old);
 		}
-
-	@Override
-	public void componentMoved(ComponentEvent e) {
-	}
-
-	@Override
-	public void componentShown(ComponentEvent e) {
-
-	}
-
-	@Override
-	public void componentHidden(ComponentEvent e) {
-	}
-
-	/**
-	 * Adjust the display size for a panel with the specified dimensions.  Useful for when
-	 * the data being displayed is different sizes.
-	 * 
-	 * @param width
-	 * @param height
-	 */
-	public void setDataDisplaySize(final int width, final int height) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				final int w = width + splitPane.getDividerLocation();
-				final int h = (int)Math.max(height,listPanel.getPreferredSize().getHeight());
-				splitPane.setPreferredSize(new Dimension(w,h));
-			}});
 	}
 }
