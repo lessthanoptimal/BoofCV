@@ -93,4 +93,9 @@ public class WrapperMedianCornerIntensity<I extends ImageBase, D extends ImageBa
 	public boolean hasCandidates() {
 		return false;
 	}
+
+	@Override
+	public int getIgnoreBorder() {
+		return 0;
+	}
 }

@@ -79,4 +79,11 @@ public interface GeneralFeatureIntensity<I extends ImageBase,D extends ImageBase
 	 * If true a list of candidate corners is returned.
 	 */
 	public boolean hasCandidates();
+
+	/**
+	 * Pixels within this distance from the image border are not processed.
+	 *
+	 * @return Size of unprocessed border around the image.
+	 */
+	public int getIgnoreBorder();
 }

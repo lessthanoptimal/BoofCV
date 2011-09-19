@@ -19,14 +19,15 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
-import boofcv.alg.feature.detect.intensity.KitRosCornerIntensity;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestKitRosCorner_F32 extends GenericCornerIntensityGradientTests {
+public class TestImplHarrisCorner_F32 extends GenericCornerIntensityGradientTests {
+
+	ImplHarrisCorner_F32 detector = new ImplHarrisCorner_F32(1,0.04f);
 
 	@Test
 	public void genericTests() {
@@ -35,8 +36,7 @@ public class TestKitRosCorner_F32 extends GenericCornerIntensityGradientTests {
 
 	@Override
 	public ImageFloat32 computeIntensity() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		KitRosCornerIntensity.process(intensity,derivX_I16,derivY_I16,derivXX_I16,derivYY_I16,derivXY_I16);
-		return intensity;
+		detector.process(derivX_F32,derivY_F32);
+		return detector.getIntensity();
 	}
 }

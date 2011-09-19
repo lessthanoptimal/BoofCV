@@ -49,4 +49,11 @@ public interface FeatureIntensity<T extends ImageBase> {
 	 * </p>
 	 */
 	public ImageFloat32 getIntensity();
+
+	/**
+	 * Size of the region surrounding the image's border in which pixels are not processed.
+	 *
+	 * @return The ignore border around the image.
+	 */
+	public int getIgnoreBorder();
 }

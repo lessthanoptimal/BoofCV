@@ -65,4 +65,9 @@ public class WrapperFastCornerIntensity<I extends ImageBase, D extends ImageBase
 	public boolean hasCandidates() {
 		return true;
 	}
+
+	@Override
+	public int getIgnoreBorder() {
+		return alg.getIgnoreBorder();
+	}
 }

@@ -239,5 +239,10 @@ public class TestGeneralCornerDetector {
 		public boolean hasCandidates() {
 			return hasCandidates;
 		}
+
+		@Override
+		public int getIgnoreBorder() {
+			return 0;
+		}
 	}
 }

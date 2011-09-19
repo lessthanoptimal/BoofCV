@@ -47,9 +47,9 @@ public class FactoryPointIntensityAlg {
 	FastCornerIntensity<T> createFast12( Class<T> imageType , int pixelTol, int minCont)
 	{
 		if( imageType == ImageFloat32.class )
-			return (FastCornerIntensity<T>)new FastCorner12_F32(pixelTol,minCont);
+			return (FastCornerIntensity<T>)new ImplFastCorner12_F32(pixelTol,minCont);
 		else if( imageType == ImageUInt8.class )
-			return (FastCornerIntensity<T>)new FastCorner12_U8(pixelTol,minCont);
+			return (FastCornerIntensity<T>)new ImplFastCorner12_U8(pixelTol,minCont);
 		else
 			throw new IllegalArgumentException("Unknown image type "+imageType);
 	}
@@ -66,9 +66,9 @@ public class FactoryPointIntensityAlg {
 	HarrisCornerIntensity<T> createHarris( Class<T> derivType , int windowRadius, float kappa)
 	{
 		if( derivType == ImageFloat32.class )
-			return (HarrisCornerIntensity<T>)new HarrisCorner_F32(windowRadius,kappa);
+			return (HarrisCornerIntensity<T>)new ImplHarrisCorner_F32(windowRadius,kappa);
 		else if( derivType == ImageSInt16.class )
-			return (HarrisCornerIntensity<T>)new HarrisCorner_S16(windowRadius,kappa);
+			return (HarrisCornerIntensity<T>)new ImplHarrisCorner_S16(windowRadius,kappa);
 		else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}
@@ -84,9 +84,9 @@ public class FactoryPointIntensityAlg {
 	KltCornerIntensity<T> createKlt( Class<T> derivType , int windowRadius)
 	{
 		if( derivType == ImageFloat32.class )
-			return (KltCornerIntensity<T>)new KltCorner_F32(windowRadius);
+			return (KltCornerIntensity<T>)new ImplKltCorner_F32(windowRadius);
 		else if( derivType == ImageSInt16.class )
-			return (KltCornerIntensity<T>)new KltCorner_S16(windowRadius);
+			return (KltCornerIntensity<T>)new ImplKltCorner_S16(windowRadius);
 		else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}

@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFastCorner12_I8 {
+public class TestImplFastCorner12_U8 {
 	private int[] offsets;
 
 	int width = 7;
@@ -66,7 +66,7 @@ public class TestFastCorner12_I8 {
 	 */
 	@Test
 	public void testPositive() {
-		FastCorner12_U8 corner = new FastCorner12_U8(20, 12);
+		ImplFastCorner12_U8 corner = new ImplFastCorner12_U8(20, 12);
 		ImageUInt8 img = new ImageUInt8(width, height);
 
 		for( int subImage = 0; subImage < 2; subImage++ ) {
@@ -134,7 +134,7 @@ public class TestFastCorner12_I8 {
 	 */
 	@Test
 	public void testNegativeShort() {
-		FastCorner12_U8 corner = new FastCorner12_U8( 20, 12);
+		ImplFastCorner12_U8 corner = new ImplFastCorner12_U8( 20, 12);
 		ImageUInt8 img = new ImageUInt8(width, height);
 		setOffsets(img);
 
@@ -153,7 +153,7 @@ public class TestFastCorner12_I8 {
 	 */
 	@Test
 	public void testNegativeMixed() {
-		FastCorner12_U8 corner = new FastCorner12_U8(20, 12);
+		ImplFastCorner12_U8 corner = new ImplFastCorner12_U8(20, 12);
 		ImageUInt8 img = new ImageUInt8(width, height);
 		setOffsets(img);
 

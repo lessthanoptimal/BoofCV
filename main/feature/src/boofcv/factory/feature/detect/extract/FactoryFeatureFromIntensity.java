@@ -50,7 +50,7 @@ public class FactoryFeatureFromIntensity
 
 		if( useCandidateList ) {
 			if( !acceptRequestNumber && ignoreBorder <= minSeparation)
-				ret = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(minSeparation,threshold));
+				ret = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(minSeparation,ignoreBorder,threshold));
 		} else {
 			if( !acceptRequestNumber ) {
 				ret = new WrapperNonMax(new FastNonMaxExtractor(minSeparation,ignoreBorder,threshold));

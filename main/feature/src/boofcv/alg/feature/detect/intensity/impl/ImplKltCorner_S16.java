@@ -19,30 +19,28 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} based off of {@link SsdCorner_F32}.
+ * Implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} based off of {@link ImplSsdCornerNaive_S16}.
  * </p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class KltCorner_F32 extends SsdCorner_F32 implements KltCornerIntensity<ImageFloat32> {
-
-
-	public KltCorner_F32(int windowRadius) {
+public class ImplKltCorner_S16 extends ImplSsdCorner_S16 implements KltCornerIntensity<ImageSInt16> {
+	public ImplKltCorner_S16(int windowRadius) {
 		super(windowRadius);
 	}
 
 	@Override
 	protected float computeIntensity() {
 		// compute the smallest eigenvalue
-		float left = (totalXX + totalYY) * 0.5f;
-		float b = (totalXX - totalYY) * 0.5f;
-		double right = Math.sqrt(b * b + totalXY * totalXY);
+		double left = (totalXX + totalYY) * 0.5f;
+		double b = (totalXX - totalYY) * 0.5f;
+		double right = Math.sqrt(b * b + (double)totalXY * totalXY);
 
 		// the smallest eigenvalue will be minus the right side
 		return (float)(left - right);

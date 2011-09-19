@@ -27,7 +27,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 
@@ -87,7 +87,8 @@ public class VisualizeScaleSpaceApp <T extends ImageBase, D extends ImageBase>
 	}
 
 	public static void main( String args[] ) {
-		VisualizeScaleSpaceApp app = new VisualizeScaleSpaceApp(ImageFloat32.class);
+//		VisualizeScaleSpaceApp app = new VisualizeScaleSpaceApp(ImageFloat32.class);
+		VisualizeScaleSpaceApp app = new VisualizeScaleSpaceApp(ImageUInt8.class);
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("boat","data/standard/boat.png");

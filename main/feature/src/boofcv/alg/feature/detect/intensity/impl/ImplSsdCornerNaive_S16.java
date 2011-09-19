@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageSInt16;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class SsdCornerNaive_S16 implements KltCornerIntensity<ImageSInt16> {
+public class ImplSsdCornerNaive_S16 implements KltCornerIntensity<ImageSInt16> {
 
 	// feature's radius
 	private int radius;
@@ -38,7 +38,7 @@ public class SsdCornerNaive_S16 implements KltCornerIntensity<ImageSInt16> {
 	// the intensity of the found features in the image
 	private ImageFloat32 featureIntensity;
 
-	public SsdCornerNaive_S16(int imageWidth, int imageHeight,
+	public ImplSsdCornerNaive_S16(int imageWidth, int imageHeight,
 							  int windowRadius) {
 		this.radius = windowRadius;
 
@@ -55,6 +55,10 @@ public class SsdCornerNaive_S16 implements KltCornerIntensity<ImageSInt16> {
 		return featureIntensity;
 	}
 
+	@Override
+	public int getIgnoreBorder() {
+		return radius;
+	}
 
 	@Override
 	public void process(ImageSInt16 derivX, ImageSInt16 derivY) {

@@ -209,6 +209,11 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		public boolean hasCandidates() {
 			return false;
 		}
+
+		@Override
+		public int getIgnoreBorder() {
+			return 0;
+		}
 	}
 
 	private class DummyExtractor implements FeatureExtractor
