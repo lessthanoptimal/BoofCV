@@ -28,7 +28,7 @@ import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -47,7 +47,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmImagePanel implements ProcessImage
+		extends SelectAlgorithmImagePanel implements ProcessInput
 {
 	// displays intensity image
 	ImagePanel gui;
@@ -129,7 +129,7 @@ public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
 
 	@Override
 	public void changeImage(String name, int index) {
-		ImageListManager manager = getImageManager();
+		ImageListManager manager = getInputManager();
 
 		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
@@ -154,7 +154,7 @@ public class IntensityPointFeatureApp<T extends ImageBase, D extends ImageBase>
 		manager.add("sunflowers","data/sunflowers.png");
 		manager.add("beach","data/scale/beach02.jpg");
 
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

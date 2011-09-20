@@ -37,6 +37,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ProcessImageSequence;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.wrapper.images.LoadFileImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -97,7 +98,7 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 	@Override
 	public void updateGUI(BufferedImage guiImage, I origImage) {
 		Graphics2D g2 = guiImage.createGraphics();
-		
+
 		drawFeatures(g2, tracker.getTracks(), Color.RED);
 		drawFeatures(g2, tracker.getSpawned(), Color.BLUE);
 
@@ -149,7 +150,7 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 
 		SimpleImageSequence<I> sequence = null;//new XugglerSimplified<I>(fileName, imageType);
 
-		ImageBase<?> image = sequence.next();
+		sequence = new LoadFileImageSequence<I>(imageType,"../applet/data/snow_rail","jpg");
 
 		KltConfig configKLt = new KltConfig();
 		configKLt.forbiddenBorder = 0;

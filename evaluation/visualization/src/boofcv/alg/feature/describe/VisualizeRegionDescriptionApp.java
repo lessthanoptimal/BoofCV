@@ -4,7 +4,7 @@ import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.SelectRegionDescriptionPanel;
 import boofcv.gui.feature.TupleDescPanel;
@@ -28,7 +28,7 @@ import java.awt.image.BufferedImage;
 // TODO Each descriptor interprets the scale value different.  The actual region sample size will vary.
 // maybe add a region size to ExtractFeatureDescription?
 public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends ImageBase>
-	extends SelectAlgorithmImagePanel implements ProcessImage , SelectRegionDescriptionPanel.Listener
+	extends SelectAlgorithmImagePanel implements ProcessInput, SelectRegionDescriptionPanel.Listener
 {
 	boolean processedImage = false;
 
@@ -100,7 +100,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 
 	@Override
 	public void changeImage(String name, int index) {
-		ImageListManager m = getImageManager();
+		ImageListManager m = getInputManager();
 		BufferedImage image = m.loadImage(index);
 
 		process(image);
@@ -131,7 +131,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 
 		app.setPreferredSize(new Dimension(500,500));
 		app.setSize(500,500);
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

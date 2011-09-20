@@ -21,7 +21,7 @@ package boofcv.alg.transform.pyramid;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
@@ -40,7 +40,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizePyramidFloatApp <T extends ImageBase>
-	extends SelectImagePanel implements ProcessImage
+	extends SelectImagePanel implements ProcessInput
 {
 	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};
 
@@ -101,7 +101,7 @@ public class VisualizePyramidFloatApp <T extends ImageBase>
 		manager.add("shapes","data/shapes01.png");
 		manager.add("sunflowers","data/sunflowers.png");
 
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

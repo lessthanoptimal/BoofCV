@@ -80,7 +80,7 @@ public class DescribeEvaluator<T extends ImageBase>
 		this.orientationAlg = orientationAlg;
 		ScoreAssociation scorer = new ScoreAssociateEuclideanSq();
 
-		matcher = FactoryAssociationTuple.maxError(scorer,100000);
+		matcher = FactoryAssociationTuple.greedy(scorer,Double.MAX_VALUE,-1,true);
 	}
 
 	@Override

@@ -21,7 +21,7 @@ package boofcv.alg.transform.gss;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizeScaleSpaceApp <T extends ImageBase, D extends ImageBase>
-	extends SelectImagePanel implements ProcessImage
+	extends SelectImagePanel implements ProcessInput
 {
 	GaussianScaleSpace<T,D> ss;
 
@@ -95,7 +95,7 @@ public class VisualizeScaleSpaceApp <T extends ImageBase, D extends ImageBase>
 		manager.add("shapes","data/shapes01.png");
 		manager.add("sunflowers","data/sunflowers.png");
 
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

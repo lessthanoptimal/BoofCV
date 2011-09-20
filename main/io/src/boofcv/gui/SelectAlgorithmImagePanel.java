@@ -19,7 +19,7 @@
 package boofcv.gui;
 
 import boofcv.gui.image.ImagePanel;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.InputListManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +46,7 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 	// when selected it shows the original image
 	JCheckBox originalCheck;
 	List<Object> algCookies[];
-	ImageListManager imageManager;
+	InputListManager imageManager;
 
 	// what the original image was before any processing
 	BufferedImage inputImage;
@@ -124,7 +124,7 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 			}});
 	}
 
-	public void setImageManager( final ImageListManager manager ) {
+	public void setInputManager( final InputListManager manager ) {
 		this.imageManager = manager;
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -246,8 +246,8 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 		setActiveGUI(true);
 	}
 
-	public ImageListManager getImageManager() {
-		return imageManager;
+	public <T extends InputListManager> T getInputManager() {
+		return (T)imageManager;
 	}
 
 	/**

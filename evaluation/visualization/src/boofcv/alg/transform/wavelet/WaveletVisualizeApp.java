@@ -25,7 +25,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.factory.transform.wavelet.GFactoryWavelet;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -46,7 +46,7 @@ import java.awt.image.BufferedImage;
  */
 public class WaveletVisualizeApp
 		<T extends ImageBase, W extends ImageBase, C extends WlCoef>
-		extends SelectAlgorithmImagePanel implements ProcessImage
+		extends SelectAlgorithmImagePanel implements ProcessInput
 {
 	int numLevels = 3;
 
@@ -120,7 +120,7 @@ public class WaveletVisualizeApp
 
 	@Override
 	public void changeImage(String name, int index) {
-		ImageListManager manager = getImageManager();
+		ImageListManager manager = getInputManager();
 
 		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
@@ -143,7 +143,7 @@ public class WaveletVisualizeApp
 		manager.add("boat","data/standard/boat.png");
 		manager.add("fingerprint","data/standard/fingerprint.png");
 
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

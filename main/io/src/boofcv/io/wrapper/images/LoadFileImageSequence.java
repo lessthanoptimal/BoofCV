@@ -57,6 +57,9 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 	// reference to output GUI image
 	BufferedImage imageGUI;
 
+	boolean loop = true;
+	boolean forwards = true;
+
 	/**
 	 * Will load an image sequence with no modification.
 	 *
@@ -83,6 +86,10 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 		findImages();
 	}
 
+	public void setLoop(boolean loop) {
+		this.loop = loop;
+	}
+
 	private void findImages() {
 		File dir = new File(directoryName);
 
@@ -101,7 +108,10 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 	 * True if there is another image to read and false if there are no more.
 	 */
 	public boolean hasNext() {
-		return index < fileNames.size();
+		if( loop )
+			return true;
+		else
+			return index < fileNames.size();
 	}
 
 	/**
@@ -113,7 +123,23 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 	 */
 	public T next() {
 		try {
-			imageGUI = ImageIO.read(new File(fileNames.get(index++)));
+			if( loop ) {
+				if( forwards ) {
+					if( index >= fileNames.size() ) {
+						index = fileNames.size()-1;
+						forwards = false;
+					}
+				} else {
+					if( index < 0 ) {
+						index = 0;
+						forwards = true;
+					}
+				}
+			}
+			if( forwards )
+				imageGUI = ImageIO.read(new File(fileNames.get(index++)));
+			else
+				imageGUI = ImageIO.read(new File(fileNames.get(index--)));
 
 			image = ConvertBufferedImage.convertFrom(imageGUI, image, type);
 

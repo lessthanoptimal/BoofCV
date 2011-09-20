@@ -82,9 +82,8 @@ public class BenchmarkAssociateTuple {
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		int maxMatches = 200;
 
-		ProfileOperation.printOpsPerSec(new General("Max Error", FactoryAssociationTuple.maxError(score,0.1)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Max Matches", FactoryAssociationTuple.maxMatches(score,maxMatches)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Inlier Error", FactoryAssociationTuple.inlierError(score,maxMatches,10)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Forward Backwards", FactoryAssociationTuple.forwardBackwards(score,maxMatches)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Greedy", FactoryAssociationTuple.greedy(score,Double.MAX_VALUE,maxMatches,false)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Greedy Backwards", FactoryAssociationTuple.greedy(score,Double.MAX_VALUE,maxMatches,true)),TEST_TIME);
+		
 	}
 }

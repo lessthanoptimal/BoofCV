@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAssociateGreedyTuple {
+public class TestAssociateGreedy {
 
 	ScoreAssociation score = new ScoreAssociateEuclidean();
 
@@ -38,78 +38,62 @@ public class TestAssociateGreedyTuple {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
 		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
 
-		int pairs[] = new int[4];
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,0.5,false);
 
-		AssociateGreedyTuple.basic(a,b,score,0.5,pairs);
+		alg.associate(a,b);
 
-		assertEquals(2,pairs[0]);
-		assertEquals(-1,pairs[1]);
-		assertEquals(0,pairs[2]);
-		assertEquals(1,pairs[3]);
-	}
-
-	@Test
-	public void fitIsError() {
-		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
-		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
-
-		int pairs[] = new int[4];
-		double fitScore[] = new double[4];
-
-		AssociateGreedyTuple.fitIsError(a,b,score,pairs,fitScore);
-
-		assertEquals(2,pairs[0]);
-		assertEquals(0,pairs[1]);
-		assertEquals(0,pairs[2]);
-		assertEquals(1,pairs[3]);
-
-		assertEquals(0,fitScore[0],1e-5);
-		assertEquals(1,fitScore[1],1e-5);
-		assertEquals(0,fitScore[2],1e-5);
-		assertEquals(0,fitScore[3],1e-5);
-	}
-
-	@Test
-	public void totalCloseMatches() {
-		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
-		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
-
-		int pairs[] = new int[4];
-		double fitScore[] = new double[4];
-		double workBuffer[] = new double[4];
-
-		AssociateGreedyTuple.totalCloseMatches(a,b,score,2,workBuffer,pairs,fitScore);
-
-		assertEquals(2,pairs[0]);
-		assertEquals(0,pairs[1]);
-		assertEquals(0,pairs[2]);
-		assertEquals(1,pairs[3]);
-
-		assertEquals(1,fitScore[0],1e-5);
-		assertEquals(3,fitScore[1],1e-5);
-		assertEquals(1,fitScore[2],1e-5);
-		assertEquals(1,fitScore[3],1e-5);
-	}
-
-	@Test
-	public void forwardBackwards() {
-		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
-		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
-
-		int pairs[] = new int[4];
-		double workBuffer[] = new double[4*4];
-		double fitScore[] = new double[4];
-
-		AssociateGreedyTuple.forwardBackwards(a,b,score,workBuffer,pairs,fitScore);
+		int pairs[] = alg.getPairs();
 
 		assertEquals(2,pairs[0]);
 		assertEquals(-1,pairs[1]);
 		assertEquals(0,pairs[2]);
 		assertEquals(1,pairs[3]);
 
+		double fitScore[] = alg.getFitQuality();
+
 		assertEquals(0,fitScore[0],1e-5);
 		assertEquals(0,fitScore[2],1e-5);
 		assertEquals(0,fitScore[3],1e-5);
+	}
+
+	@Test
+	public void maxError() {
+		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
+		FastQueue<TupleDesc_F64> b = createData(3,4,1.1,40);
+
+		// large margin for error
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,10,false);
+
+		alg.associate(a,b);
+		assertEquals(2,alg.getPairs()[1]);
+
+		// small margin for error, no association
+		alg = new AssociateGreedy<TupleDesc_F64>(score,0.1,false);
+		alg.associate(a,b);
+		assertEquals(-1,alg.getPairs()[1]);
+	}
+
+	@Test
+	public void backwards() {
+		FastQueue<TupleDesc_F64> a = createData(1,2,3,8);
+		FastQueue<TupleDesc_F64> b = createData(3,4,1,10);
+
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,10,true);
+
+		alg.associate(a,b);
+
+		int pairs[] = alg.getPairs();
+
+		assertEquals(2,pairs[0]);
+		assertEquals(-1,pairs[1]);
+		assertEquals(0,pairs[2]);
+		assertEquals(3,pairs[3]);
+
+		double fitScore[] = alg.getFitQuality();
+
+		assertEquals(0,fitScore[0],1e-5);
+		assertEquals(0,fitScore[2],1e-5);
+		assertEquals(2,fitScore[3],1e-5);
 	}
 
 	private FastQueue<TupleDesc_F64> createData( double ...values )

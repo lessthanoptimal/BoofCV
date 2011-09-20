@@ -22,7 +22,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -41,7 +41,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
-	extends SelectAlgorithmImagePanel implements ProcessImage , ComponentListener
+	extends SelectAlgorithmImagePanel implements ProcessInput, ComponentListener
 {
 	Class<T> imageType;
 	T gray;
@@ -105,7 +105,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 
 	@Override
 	public void changeImage(String name, int index) {
-		ImageListManager manager = getImageManager();
+		ImageListManager manager = getInputManager();
 
 		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
@@ -141,7 +141,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 		manager.add("eye 1","data/eye01.jpg");
 		manager.add("eye 2","data/eye02.jpg");
 
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

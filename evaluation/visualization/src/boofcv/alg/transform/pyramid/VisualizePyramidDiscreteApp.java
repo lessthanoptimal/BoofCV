@@ -20,7 +20,7 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.DiscretePyramidPanel;
 import boofcv.gui.image.ShowImages;
@@ -39,7 +39,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizePyramidDiscreteApp <T extends ImageBase>
-	extends SelectImagePanel implements ProcessImage
+	extends SelectImagePanel implements ProcessInput
 {
 	int scales[] = new int[]{1,2,4,8,16};
 
@@ -101,7 +101,7 @@ public class VisualizePyramidDiscreteApp <T extends ImageBase>
 		manager.add("boat","data/standard/boat.png");
 		manager.add("fingerprint","data/standard/fingerprint.png");
 
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

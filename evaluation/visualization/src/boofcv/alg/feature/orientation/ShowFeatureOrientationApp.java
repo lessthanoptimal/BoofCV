@@ -26,7 +26,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
@@ -47,7 +47,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmImagePanel implements ProcessImage
+		extends SelectAlgorithmImagePanel implements ProcessInput
 {
 	ImagePanel panel;
 
@@ -157,7 +157,7 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 
 	@Override
 	public synchronized void changeImage(String name, int index) {
-		ImageListManager manager = getImageManager();
+		ImageListManager manager = getInputManager();
 
 		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
@@ -182,7 +182,7 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		manager.add("sunflowers","data/sunflowers.png");
 		manager.add("beach","data/scale/beach02.jpg");
 
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

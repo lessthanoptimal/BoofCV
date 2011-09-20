@@ -1,5 +1,7 @@
 package boofcv.io.image;
 
+import boofcv.io.InputListManager;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +11,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ImageListManager {
+public class ImageListManager implements InputListManager {
 	protected List<String> imageLabels = new ArrayList<String>();
 	protected List<String[]> fileNames = new ArrayList<String[]>();
 
