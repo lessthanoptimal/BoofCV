@@ -29,6 +29,18 @@ import boofcv.struct.image.*;
  */
 public class GImageDerivativeOps {
 
+	public static <I extends ImageBase, D extends ImageBase>
+	void laplace( I input , D output ) {
+		if( input instanceof ImageFloat32 ) {
+			LaplacianEdge.process((ImageFloat32)input,(ImageFloat32)output);
+		} else if( input instanceof ImageUInt8 ) {
+			LaplacianEdge.process((ImageUInt8)input,(ImageSInt16)output);
+		} else {
+			throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
+
+		}
+	}
+
 	/**
 	 * Returns the type of image the derivative should be for the specified input type.
 	 * @param imageType Input image type.

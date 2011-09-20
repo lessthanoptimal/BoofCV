@@ -86,6 +86,25 @@ public class TestKernelMath {
 	}
 
 	@Test
+	public void convolve1D_F32() {
+		Kernel1D_F32 k1 = new Kernel1D_F32(5,1,2,3,4,5);
+		Kernel1D_F32 k2 = new Kernel1D_F32(3,6,7,8);
+
+		// computed using conv() in octave
+		Kernel1D_F32 expected = new Kernel1D_F32(7,6,19,40,61,82,67,40);
+		Kernel1D_F32 c = KernelMath.convolve1D(k1,k2);
+
+		for( int i = 0; i < 7; i++ ) {
+			assertEquals(expected.data[i],c.data[i],1e-4);
+		}
+
+		c = KernelMath.convolve1D(k2,k1);
+		for( int i = 0; i < 7; i++ ) {
+			assertEquals(expected.data[i],c.data[i],1e-4);
+		}
+	}
+
+	@Test
 	public void convolve_1D_F32() {
 		Kernel1D_F32 k1 = FactoryKernel.random1D_F32(2,-1,1,rand);
 		Kernel1D_F32 k2 = FactoryKernel.random1D_F32(2,-1,1,rand);

@@ -38,6 +38,17 @@ public class GKernelMath {
 			return KernelMath.transpose((Kernel2D_I32)a);
 	}
 
+	public static Kernel1D convolve1D( Kernel1D a , Kernel1D b ) {
+		if( a.isInteger() != b.isInteger() )
+			throw new IllegalArgumentException("But input kernels must be of the same type.");
+
+		if( a.isInteger() ) {
+			throw new IllegalArgumentException("Add support");
+		} else {
+			return KernelMath.convolve1D((Kernel1D_F32)a,(Kernel1D_F32)b);
+		}
+	}
+
 	public static Kernel2D convolve( Kernel1D a , Kernel1D b ) {
 		if( a.isInteger() != b.isInteger() )
 			throw new IllegalArgumentException("But input kernels must be of the same type.");

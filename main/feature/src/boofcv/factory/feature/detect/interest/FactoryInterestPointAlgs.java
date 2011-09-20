@@ -56,9 +56,9 @@ public class FactoryInterestPointAlgs {
 												 Class<T> imageType ,
 												 Class<D> derivType)
 	{
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,featureRadius*2,false,false,false);
 		GradientCornerIntensity<D> harris = FactoryPointIntensityAlg.createHarris(derivType,featureRadius,0.04f);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
+		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
@@ -83,8 +83,8 @@ public class FactoryInterestPointAlgs {
 												  Class<T> imageType ,
 												  Class<D> derivType)
 	{
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,0,false,false,false);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
+		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
@@ -109,8 +109,8 @@ public class FactoryInterestPointAlgs {
 										Class<T> imageType ,
 										Class<D> derivType)
 	{
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,0,false,false,false);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
+		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
@@ -135,9 +135,9 @@ public class FactoryInterestPointAlgs {
 									   Class<T> imageType ,
 									   Class<D> derivType)
 	{
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,featureRadius*2,false,false,false);
 		GradientCornerIntensity<D> harris = FactoryPointIntensityAlg.createHarris(derivType,featureRadius,0.04f);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
+		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
@@ -162,8 +162,8 @@ public class FactoryInterestPointAlgs {
 													  Class<T> imageType ,
 													  Class<D> derivType)
 	{
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,0,false,false,false);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
+		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
@@ -190,9 +190,9 @@ public class FactoryInterestPointAlgs {
 													 Class<T> imageType ,
 													 Class<D> derivType)
 	{
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,featureRadius*2,false,false,false);
 		GradientCornerIntensity<D> harris = FactoryPointIntensityAlg.createHarris(derivType,featureRadius,0.04f);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
+		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
@@ -201,7 +201,7 @@ public class FactoryInterestPointAlgs {
 		return new FeatureLaplacePyramid<T,D>(detector,sparseLaplace,deriv,1);
 	}
 
-		/**
+	/**
 	 * Creates a {@link FeatureLaplaceScaleSpace} which is uses the Harris corner detector.
 	 *
 	 * @param featureRadius Size of the feature used to detect the corners.
@@ -217,10 +217,10 @@ public class FactoryInterestPointAlgs {
 											 int maxFeatures ,
 											 Class<T> imageType ,
 											 Class<D> derivType)
-		{
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,featureRadius*2,false,false,false);
+	{
 		GradientCornerIntensity<D> harris = FactoryPointIntensityAlg.createHarris(derivType,featureRadius,0.04f);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T,D>(harris);
+		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		return new FeatureScaleSpace<T,D>(detector,2);
@@ -243,10 +243,16 @@ public class FactoryInterestPointAlgs {
 												Class<T> imageType ,
 												Class<D> derivType)
 	{
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,0,false,false,false);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
+		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 
 		return new FeatureScaleSpace<T,D>(detector,2);
+	}
+
+	private static <T extends ImageBase, D extends ImageBase>
+	FeatureExtractor createExtractor(int featureRadius, float cornerThreshold, GeneralFeatureIntensity<T, D> intensity) {
+		int intensityBorder = intensity.getIgnoreBorder();
+		return FactoryFeatureFromIntensity.create(featureRadius,cornerThreshold,intensityBorder,false,false,false);
 	}
 }

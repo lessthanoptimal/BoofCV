@@ -72,7 +72,7 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 			sigma = FactoryKernelGaussian.sigmaForRadius(radius,1);
 
 		Kernel1D kernel = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
-		Kernel1D kernelDeriv = FactoryKernelGaussian.derivativeI(inputType,1,sigma,radius+1);
+		Kernel1D kernelDeriv = FactoryKernelGaussian.derivativeI(inputType,1,sigma,radius);
 
 		derivX_H = FactoryConvolve.convolve(kernelDeriv,inputType,derivType, borderDeriv,true);
 		blurX = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur,true);

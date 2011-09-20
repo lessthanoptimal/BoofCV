@@ -39,12 +39,13 @@ public class NonMaxCandidateExtractor {
 	// does not process pixels this close to the image border
 	int ignoreBorder;
 
-	public NonMaxCandidateExtractor(int minSeparation, int ignoreBorder , float thresh) {
-		if( ignoreBorder < minSeparation )
-			throw new IllegalArgumentException("Requires: ignoreBorder >= minSeparation");
+	public NonMaxCandidateExtractor(int minSeparation, int ignoreBorderIntensity, float thresh) {
 		this.radius = minSeparation;
 		this.thresh = thresh;
-		this.ignoreBorder = ignoreBorder;
+		// double the ignore border to avoid touching unprocessed pixels in the intensity image
+		this.ignoreBorder = 2*ignoreBorderIntensity;
+		if( ignoreBorder < minSeparation )
+			ignoreBorder = minSeparation;
 	}
 
 	public void setMinSeparation(int minSeparation) {

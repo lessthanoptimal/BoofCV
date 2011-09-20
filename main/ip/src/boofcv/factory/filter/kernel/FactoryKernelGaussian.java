@@ -171,7 +171,7 @@ public class FactoryKernelGaussian {
 			sigma = FactoryKernelGaussian.sigmaForRadius(radius,order);
 		}
 
-		Kernel1D_F32 k = derivative1D_F32(order,sigma,radius);
+		Kernel1D_F32 k = derivative1D_F32(order,sigma,radius, true);
 
 		if( isFloat )
 			return (T)k;
@@ -192,7 +192,8 @@ public class FactoryKernelGaussian {
 		Kernel1D_F32 ret = new Kernel1D_F32(radius * 2 + 1);
 		float[] gaussian = ret.data;
 		int index = 0;
-		for (int i = -radius; i <= radius; i++) {
+
+		for (int i = radius; i >= -radius; i--) {
 			gaussian[index++] = (float) UtilGaussian.computePDF(0, sigma, i);
 		}
 
@@ -207,7 +208,8 @@ public class FactoryKernelGaussian {
 		Kernel1D_F64 ret = new Kernel1D_F64(radius * 2 + 1);
 		double[] gaussian = ret.data;
 		int index = 0;
-		for (int i = -radius; i <= radius; i++) {
+
+		for (int i = radius; i >= -radius; i--) {
 			gaussian[index++] = UtilGaussian.computePDF(0, sigma, i);
 		}
 
@@ -252,34 +254,35 @@ public class FactoryKernelGaussian {
 	 *
 	 * @param sigma Distributions standard deviation.
 	 * @param radius Kernel's radius.
+	 * @param normalize
 	 * @return The derivative of the gaussian
 	 */
-	protected static Kernel1D_F32 derivative1D_F32( int order , double sigma, int radius ) {
+	protected static Kernel1D_F32 derivative1D_F32(int order, double sigma, int radius, boolean normalize) {
 
 		Kernel1D_F32 ret = new Kernel1D_F32(radius * 2 + 1);
 		float[] gaussian = ret.data;
 		int index = 0;
 		switch( order ) {
 			case 1:
-				for (int i = -radius; i <= radius; i++) {
+				for (int i = radius; i >= -radius; i--) {
 					gaussian[index++] = (float) UtilGaussian.derivative1(0, sigma, i);
 				}
 				break;
 
 			case 2:
-				for (int i = -radius; i <= radius; i++) {
+				for (int i = radius; i >= -radius; i--) {
 					gaussian[index++] = (float) UtilGaussian.derivative2(0, sigma, i);
 				}
 				break;
 
 			case 3:
-				for (int i = -radius; i <= radius; i++) {
+				for (int i = radius; i >= -radius; i--) {
 					gaussian[index++] = (float) UtilGaussian.derivative3(0, sigma, i);
 				}
 				break;
 
 			case 4:
-				for (int i = -radius; i <= radius; i++) {
+				for (int i = radius; i >= -radius; i--) {
 					gaussian[index++] = (float) UtilGaussian.derivative4(0, sigma, i);
 				}
 				break;
@@ -288,9 +291,17 @@ public class FactoryKernelGaussian {
 				throw new IllegalArgumentException("Only derivatives of order 1 to 4 are supported");
 		}
 
-		// todo multiply by the same factor that the Gaussian kernel is normalized by?
-		// this ensures that it is equavlent to convolving by a gaussian then taking
-		// the derivative
+		// multiply by the same factor as the gaussian would be normalized by
+		// otherwise it will effective change the intensity of the input image
+		if( normalize ) {
+			double sum = 0;
+			for (int i = radius; i >= -radius; i--) {
+				sum += UtilGaussian.computePDF(0, sigma, i);
+			}
+			for (int i = 0; i < gaussian.length; i++) {
+				gaussian[i] /= sum;
+			}
+		}
 		
 		return ret;
 	}
