@@ -19,10 +19,10 @@
 package boofcv.alg.filter.derivative;
 
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.ProcessImage;
 import boofcv.gui.SelectAlgorithmImagePanel;
@@ -33,8 +33,9 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
+
+import static boofcv.factory.filter.derivative.FactoryDerivative.*;
 
 /**
  * Displays detected corners in a video sequence
@@ -49,7 +50,6 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 
 	ListDisplayPanel panel = new ListDisplayPanel();
 
-	D derivX,derivY;
 	T image;
 	BufferedImage original;
 	boolean processedImage = false;
@@ -59,10 +59,16 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		addAlgorithm(0, "Prewitt",FactoryDerivative.prewitt(imageType,derivType));
-		addAlgorithm(0, "Sobel",FactoryDerivative.sobel(imageType,derivType));
-		addAlgorithm(0, "Three",FactoryDerivative.three(imageType,derivType));
-		addAlgorithm(0, "Gaussian", FactoryDerivative.gaussian(-1,3,imageType,derivType));
+		Helper h;
+
+		h = new Helper(prewitt(imageType,derivType),hessianPrewitt(derivType));
+		addAlgorithm(0, "Prewitt", h);
+		h = new Helper(sobel(imageType,derivType),hessianSobel(derivType));
+		addAlgorithm(0, "Sobel",h);
+		h = new Helper(three(imageType,derivType),hessianThree(derivType));
+		addAlgorithm(0, "Three",h);
+		h = new Helper(gaussian(-1,3,imageType,derivType),hessianGaussian(-1,3,derivType));
+		addAlgorithm(0, "Gaussian", h);
 
 		setMainGUI(panel);
 	}
@@ -73,16 +79,12 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 		this.original = original;
 		image = ConvertBufferedImage.convertFrom(original,null,imageType);
 
-		derivX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
-		derivY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
-
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				// adjust the preferred size for the list panel
 				int width = panel.getListWidth();
 
-				setPreferredSize(new Dimension(original.getWidth()+width+10,original.getHeight()+30));
-				processedImage = true;
+//				setPreferredSize(new Dimension(original.getWidth()+width+10,original.getHeight()+30));
 				doRefreshAll();
 			}});
 	}
@@ -97,17 +99,34 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 		if( image == null )
 			return;
 
-		ImageGradient<T,D> gradient = (ImageGradient<T,D>)cookie;
+		D derivX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+		D derivY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
 
 		panel.reset();
 
-		gradient.process(image,derivX,derivY);
+		Helper h = (Helper)cookie;
 
-		double maxX = GPixelMath.maxAbs(derivX);
-		double maxY = GPixelMath.maxAbs(derivY);
-		panel.addImage(VisualizeImageData.colorizeSign(derivX,null,maxX),"X-derivative");
-		panel.addImage(VisualizeImageData.colorizeSign(derivY,null,maxY),"Y-derivative");
+		D derivXX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+		D derivYY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+		D derivXY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
 
+		h.gradient.process(image,derivX,derivY);
+		h.hessian.process(derivX,derivY,derivXX,derivYY,derivXY);
+
+		double max;
+
+		max = GPixelMath.maxAbs(derivX);
+		panel.addImage(VisualizeImageData.colorizeSign(derivX,null,max),"X-derivative");
+		max = GPixelMath.maxAbs(derivY);
+		panel.addImage(VisualizeImageData.colorizeSign(derivY,null,max),"Y-derivative");
+		max = GPixelMath.maxAbs(derivXX);
+		panel.addImage(VisualizeImageData.colorizeSign(derivXX,null,max),"XX-derivative");
+		max = GPixelMath.maxAbs(derivYY);
+		panel.addImage(VisualizeImageData.colorizeSign(derivYY,null,max),"YY-derivative");
+		max = GPixelMath.maxAbs(derivXY);
+		panel.addImage(VisualizeImageData.colorizeSign(derivXY,null,max),"XY-derivative");
+
+		processedImage = true;
 		repaint();
 	}
 
@@ -126,10 +145,23 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 		return processedImage;
 	}
 
+	private class Helper
+	{
+		public ImageGradient<T,D> gradient;
+		public ImageHessian<D> hessian;
+
+		private Helper(ImageGradient<T, D> gradient, ImageHessian<D> hessian) {
+			this.gradient = gradient;
+			this.hessian = hessian;
+		}
+	}
+
 	public static void main(String args[]) {
 
 		ShowImageDerivative<ImageFloat32,ImageFloat32> app
 				= new ShowImageDerivative<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+//		ShowImageDerivative<ImageUInt8, ImageSInt16> app
+//				= new ShowImageDerivative<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("shapes","data/shapes01.png");

@@ -43,11 +43,14 @@ public class FastNonMaxExtractor implements NonMaxExtractor {
 
 	/**
 	 * @param minSeparation How close features can be to each other.
-	 * @param thresh		What the minimum intensity a feature must have to be considered a feature.
+	 * @param intensityBorder Image border in intensity image which was not processed
+	 * @param thresh What the minimum intensity a feature must have to be considered a feature.
 	 */
-	public FastNonMaxExtractor(int minSeparation, int border, float thresh) {
+	public FastNonMaxExtractor(int minSeparation, int intensityBorder, float thresh) {
 		radius = minSeparation;
-		this.border = border;
+		// multiply this by 2 to ensure that none of the unprocessed features
+		// are examined since they could have random values
+		this.border = intensityBorder*2;
 		this.thresh = thresh;
 
 		if (this.border < radius)

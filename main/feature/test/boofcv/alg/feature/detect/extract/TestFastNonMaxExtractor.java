@@ -63,7 +63,7 @@ public class TestFastNonMaxExtractor {
 		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
 
 
-		FastNonMaxExtractor alg = new FastNonMaxExtractor(2, 2,0.6F);
+		FastNonMaxExtractor alg = new FastNonMaxExtractor(2, 0,0.6F);
 		// find corners the first time
 		alg.process(inten,excludeList,foundList);
 

@@ -61,8 +61,8 @@ public class TestUtilImageIO {
 		}
 
 		// clean up
-		File f = new File("temp.gif");
-		f.delete();
+		File f = new File("temp.png");
+		assertTrue(f.delete());
 	}
 
 	/**

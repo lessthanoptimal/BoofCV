@@ -1,0 +1,25 @@
+Contains a discussion of design issues that there is no clear solution for and require some thought.
+
+
+--------------- Image Derivatives ----------------------------------------
+
+ * For image derivatives with a built in blur (sobel, prewitt, gaussian) the blur portion should
+   be normalized to 1.  If it is not then the image intensity is being scaled up, exaggerating the magnitude.
+ * Disadvantage for normalizing in integer images is that you are effective reducing the precision of the
+   output due to discretization.  Also the division will slow the filter down.
+ * For integer this is not done, and might not be done for all floating point kernels.
+ * It is standard practice not to do this for integer images.
+ * Will also exaggerate the affects of numerical overflow for integer and could affect feature detectors.
+
+ Examples:
+
+    Sobel                   Prewitt
+ [ -1 -2 -1 ]            [ -1 -1 -1 ]
+ [  0  0  0 ] / 4        [  0  0  0 ] / 3
+ [  1  2  1 ]            [  1  1  1 ]
+
+
+Possible Solution:
+  Offer two ways to compute image derivatives for integer?
+
+---------------------------------------------------------------------------

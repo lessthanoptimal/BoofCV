@@ -8,19 +8,17 @@
  * Add Symmlet wavelet
  * Support for Image64F
  * Unrolled inner image
- * GUI Panel to display wavelets
-   * change the level being viewed
-   * display detail on a log scale
  * After adding new wavelets update denoising code
 
 - Derivative
- * Improve performance of derivative edge calculation
+ * Overflow in integer derivatives.
+   - Provide support for ImageSInt32?
+   - Do a better job bormalizing?
+   - See ShowImageDerivative
+ * The hessian XY is likely to be computed incorrectly in several locations
+   - See ImageHessian_Filter for an example of what's going on
  * Include the image border for the Laplacian
  * Why are values of gaussian swapped?
-
-- Edges
- * Connected Segments
-    - Canny?
 
 - Denoise
  * After an integer wavelet has been added that is energy conserving:
@@ -40,6 +38,9 @@
  * Add support for convolutions using kernels width:
    - Even length (offset + length)
    - Different width/height
+ * Make sure convolve kernel flips the directions of one of the kernels
+ * Wait are all the convolution algorithms convolve in the WRONG direction?!?!?
+   - Most kernels are symmetric so this would not appear to be an issue in general
  * Add a new implementation for horizontal and vertical which are "in-place"
    Uses an array one row/column long in which the image is locally copied.
  * Sparse Kernel Convolve for when there is a lot of zeros in the kernel
@@ -53,12 +54,13 @@
  * Support different width and height
 
 - Improve Sort Median Filter
-*   Use bubble sort to avoid resorting each time
+ * Use bubble sort to avoid resorting each time
 
 - Interpolate
  * Remove unsafe in pixel.
    * That operation would only be used in specialized cases, which likely could have further optimizations.
    * Pro of keeping it is that it could make this easier to program in the long run
+ * Bicubic seems to have overflow issues
 
 - Have a morphological filter section?
  * Add gray scale morphological operators

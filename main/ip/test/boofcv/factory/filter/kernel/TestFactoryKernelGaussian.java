@@ -107,11 +107,13 @@ public class TestFactoryKernelGaussian {
 	public void derivative1D_F32() {
 		float sigma = 1.5f;
 		int radius = 2;
-		Kernel1D_F32 found = FactoryKernelGaussian.derivative1D_F32(1,sigma,radius);
+		Kernel1D_F32 found = FactoryKernelGaussian.derivative1D_F32(1,sigma,radius, false);
 
-		for( int i = -radius; i <= radius; i++ ) {
-			int index = i+radius;
-			assertTrue((float)UtilGaussian.derivative1(0,sigma,i)==found.data[index]);
+		int index = 0;
+		for( int i = radius; i >= -radius; i-- ) {
+			assertTrue((float)UtilGaussian.derivative1(0,sigma,i)==found.data[index++]);
 		}
+
+		// todo check normalized version
 	}
 }

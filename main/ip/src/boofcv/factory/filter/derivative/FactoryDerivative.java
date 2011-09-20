@@ -18,11 +18,16 @@
 
 package boofcv.factory.filter.derivative;
 
+import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.derivative.*;
 import boofcv.alg.filter.derivative.*;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.factory.filter.convolve.FactoryConvolve;
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
@@ -143,27 +148,47 @@ public class FactoryDerivative {
 
 	public static <D extends ImageBase> ImageHessian<D> hessianSobel( Class<D> derivType ) {
 		if( derivType == ImageFloat32.class )
-			return (ImageHessian<D>)hessianSobel_F32();
+			return (ImageHessian<D>)hessian(GradientSobel.class,ImageFloat32.class);
 		else if( derivType == ImageSInt16.class )
-			return (ImageHessian<D>)hessianSobel_I16();
+			return (ImageHessian<D>)hessian(GradientSobel.class,ImageSInt16.class);
 		else
 			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static ImageHessian<ImageSInt16> hessianThree_I16() {
-		return hessian(GradientThree.class,ImageSInt16.class);
+	public static <D extends ImageBase> ImageHessian<D> hessianPrewitt( Class<D> derivType ) {
+		if( derivType == ImageFloat32.class )
+			return (ImageHessian<D>)hessian(GradientPrewitt.class,ImageFloat32.class);
+		else if( derivType == ImageSInt16.class )
+			return (ImageHessian<D>)hessian(GradientPrewitt.class,ImageSInt16.class);
+		else
+			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static ImageHessian< ImageSInt16> hessianSobel_I16() {
-		return hessian(GradientSobel.class,ImageSInt16.class);
+	public static <D extends ImageBase> ImageHessian<D> hessianThree( Class<D> derivType ) {
+		if( derivType == ImageFloat32.class )
+			return (ImageHessian<D>)hessian(GradientThree.class,ImageFloat32.class);
+		else if( derivType == ImageSInt16.class )
+			return (ImageHessian<D>)hessian(GradientThree.class,ImageSInt16.class);
+		else
+			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static ImageHessian<ImageFloat32> hessianThree_F32() {
-		return hessian(GradientThree.class,ImageFloat32.class);
-	}
+	public static <D extends ImageBase> ImageHessian<D> hessianGaussian( int radius , double sigma ,
+																		 Class<D> derivType )
+	{
+		// need to do this here to make sure the blur and derivative functions have the same paramters.
+		if( radius <= 0 )
+			radius = FactoryKernelGaussian.radiusForSigma(sigma,1);
+		else if( sigma <= 0 )
+			sigma = FactoryKernelGaussian.sigmaForRadius(radius,1);
 
-	public static ImageHessian< ImageFloat32> hessianSobel_F32() {
-		return hessian(GradientSobel.class,ImageFloat32.class);
+		Kernel1D kernelDeriv = FactoryKernelGaussian.derivativeI(derivType,1,sigma,radius);
+
+		BorderType borderDeriv = BorderType.EXTENDED;
+		FilterImageInterface<D, D> derivX = FactoryConvolve.convolve(kernelDeriv,derivType,derivType, borderDeriv,true);
+		FilterImageInterface<D, D> derivY = FactoryConvolve.convolve(kernelDeriv,derivType,derivType, borderDeriv,false);
+
+		return new ImageHessian_Filter<D>(derivX,derivY,derivType);
 	}
 
 	private static Method findDerivative(Class<?> derivativeClass,

@@ -24,16 +24,18 @@ import boofcv.abst.wavelet.WaveletTransform;
 import boofcv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
 import boofcv.alg.denoise.wavelet.DenoiseSureShrink_F32;
 import boofcv.alg.denoise.wavelet.DenoiseVisuShrink_F32;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.wavelet.FactoryWaveletCoiflet;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletHaar;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
-import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.ProcessImage;
 import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
@@ -42,8 +44,12 @@ import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
 
 /**
@@ -57,46 +63,82 @@ import java.util.Random;
 	// number of levels
 	// statistics for denoised and noisy image
 // todo add non-wavelet filters
-public class DenoiseVisualizeApp<T extends ImageBase,W extends WlCoef>
-	extends SelectAlgorithmImagePanel implements ProcessImage
+public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W extends WlCoef>
+	extends SelectAlgorithmImagePanel implements ProcessImage , DenoiseInfoPanel.Listener
 {
 
 	// amount of noise added to the test images
-	float noiseSigma = 15;
+	float noiseSigma = 20;
 	int numLevels = 3;
 
 	Random rand = new Random(2234);
 
+	// selected spacial filter
+	FilterImageInterface<T,T> filter;
+	// selected wavelet filter
 	DenoiseWavelet<T> denoiser;
 	WaveletDescription<W> waveletDesc;
+	List<WaveletDescription> waveletList = new ArrayList<WaveletDescription>();
 
-	ListDisplayPanel gui = new ListDisplayPanel();
+	JPanel gui = new JPanel();
+	DenoiseInfoPanel info = new DenoiseInfoPanel();
+	ImagePanel imagePanel = new ImagePanel();
 
 	Class<T> imageType;
 	T input;
 	T noisy;
 	T output;
 
+	D deriv;
+
+	Vector<BufferedImage> images = new Vector<BufferedImage>();
+
 	boolean processedImage = false;
 
 	public DenoiseVisualizeApp( Class<T> imageType ) {
-		super(2);
+		super(1);
 
 		this.imageType = imageType;
 
 		addAlgorithm(0,"BayesShrink",new DenoiseBayesShrink_F32());
-		addAlgorithm(0,"VisuShrink",new DenoiseVisuShrink_F32());
 		addAlgorithm(0,"SureShrink",new DenoiseSureShrink_F32());
+		addAlgorithm(0,"VisuShrink",new DenoiseVisuShrink_F32());
+		FilterImageInterface<T,T> filter;
+		filter = FactoryBlurFilter.gaussian(imageType,-1,2);
+		addAlgorithm(0,"Gaussian "+2,filter);
+		filter = FactoryBlurFilter.gaussian(imageType,-1,3);
+		addAlgorithm(0,"Gaussian "+3,filter);
+		filter = FactoryBlurFilter.mean(imageType,2);
+		addAlgorithm(0,"Mean "+2,filter);
+		filter = FactoryBlurFilter.mean(imageType,3);
+		addAlgorithm(0,"Mean "+3,filter);
+		filter = FactoryBlurFilter.median(imageType,2);
+		addAlgorithm(0,"Median "+2,filter);
+		filter = FactoryBlurFilter.median(imageType,3);
+		addAlgorithm(0,"Median "+3,filter);
 
-		addAlgorithm(1,"Daub 4",FactoryWaveletDaub.daubJ_F32(4));
-		addAlgorithm(1,"Haar", FactoryWaveletHaar.generate(false,32));
-		addAlgorithm(1,"Coiflet 6",FactoryWaveletCoiflet.generate_F32(6));
+		info.addWaveletName("Daub 4");
+		waveletList.add(FactoryWaveletDaub.daubJ_F32(4));
+		info.addWaveletName("Coiflet 6");
+		waveletList.add(FactoryWaveletCoiflet.generate_F32(6));
+		info.addWaveletName("Haar");
+		waveletList.add(FactoryWaveletHaar.generate(false,32));
+		waveletDesc = waveletList.get(0);
+
 // todo something is clearly wrong with biorthogonal.  comment out so it doesn't appear in the applet
 //		addAlgorithm(1,"Biorthogonal 5", FactoryWaveletDaub.biorthogonal_F32(5,borderType));
 
 		input = GeneralizedImageOps.createImage(imageType,1,1);
 		noisy = GeneralizedImageOps.createImage(imageType,1,1);
 		output = GeneralizedImageOps.createImage(imageType,1,1);
+
+		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		deriv = GeneralizedImageOps.createImage(derivType,1,1);
+
+		gui.setLayout(new BorderLayout());
+		gui.add(info,BorderLayout.WEST);
+		gui.add(imagePanel,BorderLayout.CENTER);
+		info.setListener(this);
 
 		setMainGUI(gui);
 	}
@@ -105,14 +147,27 @@ public class DenoiseVisualizeApp<T extends ImageBase,W extends WlCoef>
 		input.reshape(image.getWidth(),image.getHeight());
 		noisy.reshape(input.width,input.height);
 		output.reshape(input.width,input.height);
+		deriv.reshape(input.width,input.height);
+
 		ConvertBufferedImage.convertFrom(image,input,imageType);
 
 		// add noise to the image
 		noisy.setTo(input);
 		GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma);
 		GPixelMath.boundImage(noisy,0,255);
+		// compute edge image for weighted error
+		GImageDerivativeOps.laplace(input,deriv);
+		GPixelMath.abs(deriv,deriv);
 
-		doRefreshAll();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				images.clear();
+				images.add(ConvertBufferedImage.convertTo(output,null));
+				images.add(ConvertBufferedImage.convertTo(noisy,null));
+				images.add(ConvertBufferedImage.convertTo(input,null));
+				info.reset();
+				doRefreshAll();
+			}});
 	}
 
 	@Override
@@ -122,8 +177,14 @@ public class DenoiseVisualizeApp<T extends ImageBase,W extends WlCoef>
 
 	@Override
 	public void refreshAll(Object[] cookies) {
-		denoiser = (DenoiseWavelet<T>)cookies[0];
-		waveletDesc = (WaveletDescription<W>)cookies[1];
+		// tod adjust menus?
+		if( cookies[0] instanceof DenoiseWavelet ) {
+			denoiser = (DenoiseWavelet<T>)cookies[0];
+			filter = null;
+		} else {
+			denoiser = null;
+			filter = (FilterImageInterface<T,T>)cookies[0];
+		}
 
 		performDenoising();
 	}
@@ -132,29 +193,42 @@ public class DenoiseVisualizeApp<T extends ImageBase,W extends WlCoef>
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		switch( indexFamily ) {
 			case 0:
-				denoiser = (DenoiseWavelet<T>)cookie;
-				break;
-
-			case 1:
-				waveletDesc = (WaveletDescription<W>)cookie;
+				if( cookie instanceof DenoiseWavelet ) {
+					denoiser = (DenoiseWavelet<T>)cookie;
+					filter = null;
+				} else {
+					filter = (FilterImageInterface<T,T>)cookie;
+					denoiser = null;
+				}
 				break;
 		}
 
 		performDenoising();
 	}
 
-	private void performDenoising() {
-		WaveletTransform<T, T,W> waveletTran = FactoryWaveletTransform.create(waveletDesc,numLevels);
-		FilterImageInterface<T,T> filter = new WaveletDenoiseFilter<T>(waveletTran,denoiser);
+	private synchronized void performDenoising() {
+		if( denoiser != null ) {
+			WaveletTransform<T, T,W> waveletTran = FactoryWaveletTransform.create(waveletDesc,numLevels);
+			FilterImageInterface<T,T> filter = new WaveletDenoiseFilter<T>(waveletTran,denoiser);
 
-		filter.process(noisy,output);
+			filter.process(noisy,output);
+		} else {
+			filter.process(noisy,output);
+		}
+
+		final double algError = computeError((ImageFloat32)output,(ImageFloat32)input);
+		final double algErrorEdge = computeWeightedError((ImageFloat32)output,(ImageFloat32)input,(ImageFloat32)deriv);
+		final double noiseError = computeError((ImageFloat32)noisy,(ImageFloat32)input);
+		final double noiseErrorEdge = computeWeightedError((ImageFloat32)noisy,(ImageFloat32)input,(ImageFloat32)deriv);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				gui.reset();
-				gui.addImage(ConvertBufferedImage.convertTo(output,null),"De-noised");
-				gui.addImage(ConvertBufferedImage.convertTo(noisy,null),"Noisy");
-				gui.addImage(ConvertBufferedImage.convertTo(input,null),"Original");
+				info.setWaveletActive(denoiser!=null);
+				ConvertBufferedImage.convertTo(output,images.get(0));
+				ConvertBufferedImage.convertTo(noisy,images.get(1));
+				info.setError(algError,algErrorEdge,noiseError,noiseErrorEdge);
+				imagePanel.repaint();
+				info.repaint();
 				processedImage = true;
 			}});
 	}
@@ -169,10 +243,74 @@ public class DenoiseVisualizeApp<T extends ImageBase,W extends WlCoef>
 		}
 	}
 
-//	private double computeMSE(ImageFloat32 imageInv) {
-//		return ImageTestingOps.computeMeanSquaredError(imageInv,image);
-//	}
-//
+	@Override
+	public void noiseChange(float sigma) {
+		this.noiseSigma = sigma;
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				noisy.setTo(input);
+				GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma);
+				GPixelMath.boundImage(noisy,0,255);
+				performDenoising();
+			}});
+	}
+
+	@Override
+	public void imageChange(final int which) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				BufferedImage b = images.get(which);
+				imagePanel.setBufferedImage(images.get(which));
+				imagePanel.setPreferredSize(new Dimension(b.getWidth(),b.getHeight()));
+				gui.validate();
+				imagePanel.repaint();
+			}});
+	}
+
+	@Override
+	public void waveletChange(int which) {
+		waveletDesc = waveletList.get(which);
+		performDenoising();
+	}
+
+	// todo push to what ops? Also what is this error called again?
+	public static double computeError(ImageFloat32 imgA, ImageFloat32 imgB ) {
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		double total = 0;
+
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				double difference =  Math.abs(imgA.get(x,y)-imgB.get(x,y));
+				total += difference;
+			}
+		}
+
+		return total / (w*h);
+	}
+
+	// todo push to what ops?
+	public static double computeWeightedError(ImageFloat32 imgA, ImageFloat32 imgB ,
+											  ImageFloat32 imgWeight ) {
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		double total = 0;
+		double totalWeight = 0;
+
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				float weight = imgWeight.get(x,y);
+				double difference =  Math.abs(imgA.get(x,y)-imgB.get(x,y));
+				total += difference*weight;
+				totalWeight += weight;
+			}
+		}
+
+		return total / totalWeight;
+	}
+
 //	private void loadImage( String imagePath ) {
 //		BufferedImage in = UtilImageIO.loadImage(imagePath);
 //		image = ConvertBufferedImage.convertFrom(in,(ImageFloat32)null);
@@ -208,4 +346,6 @@ public class DenoiseVisualizeApp<T extends ImageBase,W extends WlCoef>
 
 		System.out.println("Done");
 	}
+
+
 }

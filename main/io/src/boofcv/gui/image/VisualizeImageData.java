@@ -106,7 +106,7 @@ public class VisualizeImageData {
 				if( v > 0 ) {
 					rgb = (255*v/maxValue) << 16;
 				} else {
-					rgb = -255*v/maxValue;
+					rgb = (-255*v/maxValue) << 8;
 				}
 				dst.setRGB(x,y,rgb);
 			}

@@ -65,6 +65,34 @@ public class KernelMath {
 		return b;
 	}
 
+	public static Kernel1D_F32 convolve1D( Kernel1D_F32 a , Kernel1D_F32 b ) {
+		int w = a.width+b.width-1;
+
+		Kernel1D_F32 ret = new Kernel1D_F32(w);
+
+		int end = w-(b.getWidth()-1);
+		int N = b.width-1;
+
+		int index = 0;
+		for( int j = -(b.getWidth()-1); j < end; j++ ) {
+
+			float sum = 0;
+			for( int k = 0; k < b.getWidth(); k++ ) {
+				if( j+k >= 0 && j+k < a.getWidth() ) {
+					float valB = b.data[N-k];
+					float valA = a.data[j+k];
+					sum += valB*valA;
+				}
+			}
+
+			ret.data[index++] = sum;
+		}
+
+		return ret;
+	}
+
+	// TODO rename convolve2D
+	// todo these might not be swapping the direction of one of the kernels during the convolution
 	public static Kernel2D_F32 convolve( Kernel1D_F32 a , Kernel1D_F32 b ) {
 		int w = a.width;
 

@@ -39,21 +39,21 @@ public class FactoryFeatureFromIntensity
 	 *
 	 * @param useCandidateList Will it use the provided list of candidate features?
 	 * @param excludeCorners Can it exclude all corners in a list?
-	 * @param ignoreBorder How much of the image border is ignored.
+	 * @param ignoreBorderIntensity How many pixels in the intensity image were not processed.
 	 * @param acceptRequestNumber Will it detect features until the specified number have been found?
 	 * @return A feature extractor.
 	 */
-	public static FeatureExtractor create( int minSeparation , float threshold , int ignoreBorder ,
+	public static FeatureExtractor create( int minSeparation , float threshold , int ignoreBorderIntensity ,
 										  boolean useCandidateList , boolean excludeCorners , boolean acceptRequestNumber )
 	{
 		FeatureExtractor ret = null;
 
 		if( useCandidateList ) {
-			if( !acceptRequestNumber && ignoreBorder <= minSeparation)
-				ret = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(minSeparation,ignoreBorder,threshold));
+			if( !acceptRequestNumber && ignoreBorderIntensity <= minSeparation)
+				ret = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(minSeparation,ignoreBorderIntensity,threshold));
 		} else {
 			if( !acceptRequestNumber ) {
-				ret = new WrapperNonMax(new FastNonMaxExtractor(minSeparation,ignoreBorder,threshold));
+				ret = new WrapperNonMax(new FastNonMaxExtractor(minSeparation,ignoreBorderIntensity,threshold));
 			} else {
 				throw new IllegalArgumentException("Need to create a wrapper for SelectNBestFeatures");
 			}

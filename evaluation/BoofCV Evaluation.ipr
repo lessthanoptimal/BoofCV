@@ -282,6 +282,13 @@
       </item>
     </group>
   </component>
+  <component name="ProjectDictionaryState">
+    <dictionary name="pja">
+      <words>
+        <w>discretization</w>
+      </words>
+    </dictionary>
+  </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BoofCV Evaluation.iml" filepath="$PROJECT_DIR$/BoofCV Evaluation.iml" />
