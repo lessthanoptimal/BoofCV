@@ -84,4 +84,9 @@ public class FilterSequence<Input extends ImageBase, Output extends ImageBase>
 	public int getVerticalBorder() {
 		return borderVertical;
 	}
+
+	@Override
+	public Class<Input> getInputType() {
+		return firstFilter.getInputType();
+	}
 }

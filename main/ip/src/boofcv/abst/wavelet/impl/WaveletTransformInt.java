@@ -53,10 +53,14 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 	WaveletDescription<WlCoef_I32> desc;
 	// number of levels in the transform
 	int numLevels;
+	//  the class can really take any integer image as input, but this adds strong typeing
+	Class<T> inputType;
 
-	public WaveletTransformInt(WaveletDescription<WlCoef_I32> desc, int numLevels) {
+	public WaveletTransformInt(WaveletDescription<WlCoef_I32> desc, int numLevels,
+							   Class<T> inputType ) {
 		this.desc = desc;
 		this.numLevels = numLevels;
+		this.inputType = inputType;
 	}
 
 	@Override
@@ -107,5 +111,10 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 	@Override
 	public WaveletDescription<WlCoef_I32> getDescription() {
 		return desc;
+	}
+
+	@Override
+	public Class<T> getOriginalType() {
+		return inputType;
 	}
 }

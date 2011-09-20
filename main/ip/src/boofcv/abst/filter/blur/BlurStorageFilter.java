@@ -18,7 +18,6 @@
 
 package boofcv.abst.filter.blur;
 
-import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.BoofTesting;
@@ -32,7 +31,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class BlurStorageFilter<T extends ImageBase> implements FilterImageInterface<T,T> {
+public class BlurStorageFilter<T extends ImageBase> implements BlurFilter<T> {
 
 	// the blur function inside of BlurImageOps being invoked
 	private Method m;
@@ -76,8 +75,14 @@ public class BlurStorageFilter<T extends ImageBase> implements FilterImageInterf
 	 *
 	 * @return Blur region's radius.
 	 */
+	@Override
 	public int getRadius() {
 		return radius;
+	}
+
+	@Override
+	public void setRadius(int radius) {
+		this.radius = radius;
 	}
 
 	@Override
@@ -109,6 +114,7 @@ public class BlurStorageFilter<T extends ImageBase> implements FilterImageInterf
 		return 0;
 	}
 
+	@Override
 	public Class<T> getInputType() {
 		return inputType;
 	}

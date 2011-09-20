@@ -20,6 +20,7 @@ package boofcv.alg.denoise;
 
 import boofcv.abst.denoise.WaveletDenoiseFilter;
 import boofcv.abst.filter.FilterImageInterface;
+import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.wavelet.WaveletTransform;
 import boofcv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
 import boofcv.alg.denoise.wavelet.DenoiseSureShrink_F32;
@@ -68,13 +69,15 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 {
 
 	// amount of noise added to the test images
-	float noiseSigma = 20;
-	int numLevels = 3;
+	float noiseSigma;
+	int numLevels;
+	// config for blurring
+	int blurRadius;
 
 	Random rand = new Random(2234);
 
 	// selected spacial filter
-	FilterImageInterface<T,T> filter;
+	BlurFilter<T> filter;
 	// selected wavelet filter
 	DenoiseWavelet<T> denoiser;
 	WaveletDescription<W> waveletDesc;
@@ -104,18 +107,12 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 		addAlgorithm(0,"SureShrink",new DenoiseSureShrink_F32());
 		addAlgorithm(0,"VisuShrink",new DenoiseVisuShrink_F32());
 		FilterImageInterface<T,T> filter;
-		filter = FactoryBlurFilter.gaussian(imageType,-1,2);
-		addAlgorithm(0,"Gaussian "+2,filter);
-		filter = FactoryBlurFilter.gaussian(imageType,-1,3);
-		addAlgorithm(0,"Gaussian "+3,filter);
-		filter = FactoryBlurFilter.mean(imageType,2);
-		addAlgorithm(0,"Mean "+2,filter);
-		filter = FactoryBlurFilter.mean(imageType,3);
-		addAlgorithm(0,"Mean "+3,filter);
-		filter = FactoryBlurFilter.median(imageType,2);
-		addAlgorithm(0,"Median "+2,filter);
-		filter = FactoryBlurFilter.median(imageType,3);
-		addAlgorithm(0,"Median "+3,filter);
+		filter = FactoryBlurFilter.gaussian(imageType,-1,1);
+		addAlgorithm(0,"Gaussian",filter);
+		filter = FactoryBlurFilter.mean(imageType,1);
+		addAlgorithm(0,"Mean",filter);
+		filter = FactoryBlurFilter.median(imageType,1);
+		addAlgorithm(0,"Median",filter);
 
 		info.addWaveletName("Daub 4");
 		waveletList.add(FactoryWaveletDaub.daubJ_F32(4));
@@ -139,6 +136,11 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 		gui.add(info,BorderLayout.WEST);
 		gui.add(imagePanel,BorderLayout.CENTER);
 		info.setListener(this);
+
+		// get initial values
+		noiseSigma = info.getNoiseSigma();
+		blurRadius = info.getBlurRadius();
+		numLevels = info.getWaveletLevel();
 
 		setMainGUI(gui);
 	}
@@ -183,7 +185,7 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 			filter = null;
 		} else {
 			denoiser = null;
-			filter = (FilterImageInterface<T,T>)cookies[0];
+			filter = (BlurFilter<T>)cookies[0];
 		}
 
 		performDenoising();
@@ -197,7 +199,7 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 					denoiser = (DenoiseWavelet<T>)cookie;
 					filter = null;
 				} else {
-					filter = (FilterImageInterface<T,T>)cookie;
+					filter = (BlurFilter<T>)cookie;
 					denoiser = null;
 				}
 				break;
@@ -208,11 +210,12 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 
 	private synchronized void performDenoising() {
 		if( denoiser != null ) {
-			WaveletTransform<T, T,W> waveletTran = FactoryWaveletTransform.create(waveletDesc,numLevels);
+			WaveletTransform<T, T,W> waveletTran = FactoryWaveletTransform.create(imageType,waveletDesc,numLevels);
 			FilterImageInterface<T,T> filter = new WaveletDenoiseFilter<T>(waveletTran,denoiser);
 
 			filter.process(noisy,output);
 		} else {
+			filter.setRadius(blurRadius);
 			filter.process(noisy,output);
 		}
 
@@ -268,8 +271,15 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 	}
 
 	@Override
-	public void waveletChange(int which) {
+	public void waveletChange(int which , int level ) {
 		waveletDesc = waveletList.get(which);
+		this.numLevels = level;
+		performDenoising();
+	}
+
+	@Override
+	public void noiseChange(int radius) {
+		this.blurRadius = radius;
 		performDenoising();
 	}
 
@@ -310,21 +320,6 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 
 		return total / totalWeight;
 	}
-
-//	private void loadImage( String imagePath ) {
-//		BufferedImage in = UtilImageIO.loadImage(imagePath);
-//		image = ConvertBufferedImage.convertFrom(in,(ImageFloat32)null);
-//		if( image == null ) {
-//			throw new RuntimeException("Couldn't load image: "+imagePath);
-//		}
-//	}
-//
-//	private void addNoiseToImage() {
-//		imageNoisy = image.clone();
-//		ImageTestingOps.addGaussian(imageNoisy,rand,noiseSigma);
-//		PixelMath.boundImage(imageNoisy,0,255);
-//	}
-
 
 	public static void main( String args[] ) {
 		DenoiseVisualizeApp app = new DenoiseVisualizeApp(ImageFloat32.class);

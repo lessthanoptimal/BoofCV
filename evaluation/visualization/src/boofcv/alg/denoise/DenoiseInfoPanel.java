@@ -1,6 +1,7 @@
 package boofcv.alg.denoise;
 
 import javax.swing.*;
+import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -9,23 +10,41 @@ import java.awt.event.ActionListener;
 
 
 /**
+ * Configures denoising algorithm and controls the GUI.
+ *
  * @author Peter Abeles
  */
 public class DenoiseInfoPanel extends JPanel implements ChangeListener , ActionListener {
 
+	// selects which image to view
 	JComboBox images;
-	JComboBox waveletBox;
+	// specifies amount of noise to add to the image
 	JSpinner noiseLevel;
 
+	// A panel that just holds the config's position
+	JPanel configHolder = new JPanel();
+
+	// wavelet config
+	JPanel waveletConfig;
+	JComboBox waveletBox;
+	JSpinner waveletLevel;
+
+	// blur config
+	JPanel blurConfig;
+	JSpinner blurRadius;
+
+	// Shows statistic info in error level
 	JTextArea algError;
 	JTextArea algErrorEdge;
 	JTextArea noiseError;
 	JTextArea noiseErrorEdge;
 
+	// passes change events
 	Listener listener;
 
 	public DenoiseInfoPanel() {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
 		images = new JComboBox();
 		images.addItem("Denoised");
@@ -43,33 +62,59 @@ public class DenoiseInfoPanel extends JPanel implements ChangeListener , ActionL
 		noiseLevel.addChangeListener(this);
 		noiseLevel.setMaximumSize(noiseLevel.getPreferredSize());
 
+		waveletLevel = new JSpinner(new SpinnerNumberModel(4,1,5,1));
+		waveletLevel.addChangeListener(this);
+		waveletLevel.setMaximumSize(new Dimension(75,(int)h));
+
+		blurRadius = new JSpinner(new SpinnerNumberModel(1,1,12,1));
+		blurRadius.addChangeListener(this);
+		blurRadius.setMaximumSize(new Dimension(75,(int)h));
 
 		algError = createErrorComponent();
 		algErrorEdge = createErrorComponent();
 		noiseError = createErrorComponent();
 		noiseErrorEdge = createErrorComponent();
 
-		addLabeled(images,"View");
-		addLabeled(noiseLevel,"Noise");
+		configHolder.add(createWaveletConfig());
+		createBlurConfig();
+
+		addLabeled(images,"View",this);
+		addLabeled(noiseLevel,"Noise",this);
 		addSeparator();
-		addCenterLabel("Denoised");
-		addLabeled(algError,"Error");
-		addLabeled(algErrorEdge,"Edge Error");
+		addCenterLabel("Denoised",this);
+		addLabeled(algError,"Error",this);
+		addLabeled(algErrorEdge,"Edge Error",this);
 		addSeparator();
-		addCenterLabel("Noise Image");
-		addLabeled(noiseError,"Error");
-		addLabeled(noiseErrorEdge,"Edge Error");
+		addCenterLabel("Noise Image",this);
+		addLabeled(noiseError,"Error",this);
+		addLabeled(noiseErrorEdge,"Edge Error",this);
 		addSeparator();
-		addCenterLabel("Wavelet Config");
-		addLabeled(waveletBox,"Wavelet");
+		add(configHolder);
 		add(Box.createVerticalGlue());
 	}
 
-	public void addCenterLabel( String text ) {
+	private JPanel createWaveletConfig() {
+		waveletConfig = new JPanel();
+		waveletConfig.setLayout(new BoxLayout(waveletConfig,BoxLayout.Y_AXIS));
+		addCenterLabel("Wavelet Config",waveletConfig);
+		addLabeled(waveletBox,"Wavelet",waveletConfig);
+		addLabeled(waveletLevel,"Level",waveletConfig);
+		return waveletConfig;
+	}
+
+	private JPanel createBlurConfig() {
+		blurConfig = new JPanel();
+		blurConfig.setLayout(new BoxLayout(blurConfig,BoxLayout.Y_AXIS));
+		addCenterLabel("Blur Config",blurConfig);
+		addLabeled(blurRadius,"Radius",blurConfig);
+		return blurConfig;
+	}
+
+	public void addCenterLabel( String text , JPanel owner ) {
 		JLabel l = new JLabel(text);
 		l.setAlignmentX(Component.CENTER_ALIGNMENT);
-		add(l);
-		add(Box.createRigidArea(new Dimension(1,8)));
+		owner.add(l);
+		owner.add(Box.createRigidArea(new Dimension(1,8)));
 	}
 
 	public void addSeparator() {
@@ -81,8 +126,14 @@ public class DenoiseInfoPanel extends JPanel implements ChangeListener , ActionL
 	}
 
 	public void setWaveletActive( boolean active ) {
-		waveletBox.setEnabled(active);
-		waveletBox.repaint();
+		if( active ){
+			configHolder.remove(blurConfig);
+			configHolder.add(waveletConfig);
+		} else {
+			configHolder.remove(waveletConfig);
+			configHolder.add(blurConfig);
+		}
+		validate();
 	}
 
 	public void addWaveletName( String name ) {
@@ -97,7 +148,7 @@ public class DenoiseInfoPanel extends JPanel implements ChangeListener , ActionL
 		return comp;
 	}
 
-	private void addLabeled( JComponent target , String text ) {
+	private void addLabeled( JComponent target , String text , JPanel owner ) {
 		JLabel label = new JLabel(text);
 		label.setLabelFor(target);
 		JPanel p = new JPanel();
@@ -105,7 +156,7 @@ public class DenoiseInfoPanel extends JPanel implements ChangeListener , ActionL
 		p.add(label);
 		p.add(Box.createHorizontalGlue());
 		p.add(target);
-		add(p);
+		owner.add(p);
 	}
 
 	public void reset() {
@@ -122,32 +173,60 @@ public class DenoiseInfoPanel extends JPanel implements ChangeListener , ActionL
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		float sigma = ((Number)((JSpinner)e.getSource()).getValue()).floatValue();
-		if( listener != null )
-			listener.noiseChange(sigma);
+		if( listener == null )
+			return;
+
+		if( e.getSource() == noiseLevel ) {
+			listener.noiseChange(getNoiseSigma());
+		} else if( e.getSource() == blurRadius ) {
+			listener.noiseChange(getBlurRadius());
+		} else if( e.getSource() == waveletLevel ) {
+			listener.waveletChange(waveletBox.getSelectedIndex(),getWaveletLevel());
+		}
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if( listener == null )
+			return;
+
 		if( e.getSource() == images ) {
-			if( listener != null )
-				listener.imageChange(images.getSelectedIndex());
+			listener.imageChange(images.getSelectedIndex());
 		} else {
-			if( listener != null )
-				listener.waveletChange(waveletBox.getSelectedIndex());
+			listener.waveletChange(waveletBox.getSelectedIndex(),getWaveletLevel());
 		}
 	}
 
 	public void setError(double algError, double algErrorEdge, double noiseError , double noiseErrorEdge) {
-		this.algError.setText(String.format("%5.2f",algError));
-		this.algErrorEdge.setText(String.format("%5.2f",algErrorEdge));
-		this.noiseError.setText(String.format("%5.2f",noiseError));
-		this.noiseErrorEdge.setText(String.format("%5.2f",noiseErrorEdge));
+		this.algError.setText(String.format("%5.1f",algError));
+		this.algErrorEdge.setText(String.format("%5.1f",algErrorEdge));
+		this.noiseError.setText(String.format("%5.1f",noiseError));
+		this.noiseErrorEdge.setText(String.format("%5.1f",noiseErrorEdge));
+	}
+
+	/**
+	 * Returns the number of levels in the wavelet transform.
+	 */
+	public int getWaveletLevel() {
+		return((Number)waveletLevel.getValue()).intValue();
+	}
+
+	/**
+	 * Radius of the blur kernel
+	 */
+	public int getBlurRadius() {
+		return ((Number)blurRadius.getValue()).intValue();
+	}
+
+	public float getNoiseSigma() {
+		return ((Number)noiseLevel.getValue()).floatValue();
 	}
 
 	public static interface Listener
 	{
-		public void waveletChange( int which );
+		public void noiseChange( int radius );
+
+		public void waveletChange( int which , int level );
 
 		public void noiseChange( float sigma );
 

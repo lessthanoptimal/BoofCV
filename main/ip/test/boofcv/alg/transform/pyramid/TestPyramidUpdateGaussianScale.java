@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.pyramid;
 
-import boofcv.abst.filter.blur.BlurStorageFilter;
+import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -64,7 +64,7 @@ public class TestPyramidUpdateGaussianScale extends GenericPyramidUpdateTests<Im
 		alg.update(img,pyramid);
 
 		// test the first layer
-		BlurStorageFilter<ImageFloat32> blur = FactoryBlurFilter.gaussian(ImageFloat32.class,3,-1);
+		BlurFilter<ImageFloat32> blur = FactoryBlurFilter.gaussian(ImageFloat32.class,3,-1);
 		ImageFloat32 blurrImg = new ImageFloat32(width, height);
 		blur.process(img,blurrImg);
 		ImageFloat32 expected = new ImageFloat32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));

@@ -120,7 +120,7 @@ public class FactoryImageDenoise {
 			descTran = FactoryWaveletTransform.create_F32(waveletDesc_F32,numLevels);
 		} else {
 			WaveletDescription<WlCoef_I32> waveletDesc_I32 = FactoryWaveletDaub.biorthogonal_I32(5, BorderType.REFLECT);
-			descTran = FactoryWaveletTransform.create_I(waveletDesc_I32,numLevels);
+			descTran = FactoryWaveletTransform.create_I(waveletDesc_I32,numLevels,imageType.getImageClass());
 		}
 		return descTran;
 	}

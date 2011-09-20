@@ -39,12 +39,16 @@ public class GenericConvolveDown<Input extends ImageBase, Output extends ImageBa
 	KernelBase kernel;
 	BorderType type;
 	int skip;
+	Class<Input> imageType;
 
-	public GenericConvolveDown(Method m, KernelBase kernel, BorderType type, int skip ) {
+	public GenericConvolveDown(Method m, KernelBase kernel,
+							   BorderType type, int skip ,
+							   Class<Input> imageType ) {
 		this.m = m;
 		this.kernel = kernel;
 		this.type = type;
 		this.skip = skip;
+		this.imageType = imageType;
 	}
 
 	public int getSkip() {
@@ -82,5 +86,10 @@ public class GenericConvolveDown<Input extends ImageBase, Output extends ImageBa
 	@Override
 	public BorderType getBorderType() {
 		return type;
+	}
+
+	@Override
+	public Class<Input> getInputType() {
+		return imageType;
 	}
 }

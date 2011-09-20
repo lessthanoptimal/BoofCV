@@ -84,4 +84,9 @@ public class WaveletTransformFloat32 implements WaveletTransform<ImageFloat32,Im
 	public WaveletDescription<WlCoef_F32> getDescription() {
 		return desc;
 	}
+
+	@Override
+	public Class<ImageFloat32> getOriginalType() {
+		return ImageFloat32.class;
+	}
 }

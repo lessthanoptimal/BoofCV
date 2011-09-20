@@ -76,4 +76,6 @@ public interface WaveletTransform
 	 * @return wavelet description.
 	 */
 	public WaveletDescription<C> getDescription();
+
+	public Class<O> getOriginalType();
 }

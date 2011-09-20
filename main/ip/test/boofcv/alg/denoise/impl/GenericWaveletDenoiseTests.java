@@ -41,7 +41,7 @@ public abstract class GenericWaveletDenoiseTests<T extends ImageBase> extends Ge
 									  WaveletDescription waveletDesc, int numLevels ) {
 		super(imageType, noiseSigma);
 
-		transform = FactoryWaveletTransform.create(waveletDesc,numLevels);
+		transform = FactoryWaveletTransform.create(imageType,waveletDesc,numLevels);
 	}
 
 	public abstract void denoiseWavelet( ImageBase transformedImg , int numLevels );
