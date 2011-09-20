@@ -90,7 +90,7 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 				FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv),
 				new GenericPkltFeatSelector<I,D>(
 				(GeneralFeatureDetector<I,D>)
-						FactoryCornerDetector.createKlt(config.featureRadius*config.computeScalingTop(),config.config.minDeterminant,config.maxFeatures,config.typeDeriv),null));
+						FactoryCornerDetector.createKlt(config.featureRadius,config.config.minDeterminant,config.maxFeatures,config.typeDeriv),null));
 	}
 
 	/**

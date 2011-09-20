@@ -1,6 +1,6 @@
 package boofcv.gui;
 
-import boofcv.io.image.ImageListManager;
+import boofcv.io.InputListManager;
 
 
 /**
@@ -8,9 +8,9 @@ import boofcv.io.image.ImageListManager;
  *
  * @author Peter Abeles
  */
-public interface ProcessImage {
+public interface ProcessInput {
 
-	public void setImageManager( ImageListManager manager );
+	public void setInputManager( InputListManager manager );
 
 	public boolean getHasProcessedImage();
 }

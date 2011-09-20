@@ -26,7 +26,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.AssociationScorePanel;
 import boofcv.gui.image.ShowImages;
@@ -52,7 +52,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBase>
-	extends SelectAlgorithmImagePanel implements ProcessImage
+	extends SelectAlgorithmImagePanel implements ProcessInput
 {
 
 	// These classes process the input images and compute association score
@@ -220,7 +220,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 
 	@Override
 	public void changeImage(String name, int index) {
-		ImageListManager m = getImageManager();
+		ImageListManager m = getInputManager();
 		BufferedImage left = m.loadImage(index,0);
 		BufferedImage right = m.loadImage(index,1);
 
@@ -246,7 +246,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 
 		app.setPreferredSize(new Dimension(1000,500));
 		app.setSize(1000,500);
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

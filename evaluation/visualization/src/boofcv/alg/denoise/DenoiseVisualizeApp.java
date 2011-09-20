@@ -34,7 +34,7 @@ import boofcv.factory.transform.wavelet.FactoryWaveletCoiflet;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletHaar;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -65,7 +65,7 @@ import java.util.Vector;
 	// statistics for denoised and noisy image
 // todo add non-wavelet filters
 public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W extends WlCoef>
-	extends SelectAlgorithmImagePanel implements ProcessImage , DenoiseInfoPanel.Listener
+	extends SelectAlgorithmImagePanel implements ProcessInput, DenoiseInfoPanel.Listener
 {
 
 	// amount of noise added to the test images
@@ -238,7 +238,7 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 
 	@Override
 	public void changeImage(String name, int index) {
-		ImageListManager manager = getImageManager();
+		ImageListManager manager = getInputManager();
 
 		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
@@ -330,7 +330,7 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 		manager.add("boat","data/standard/boat.png");
 		manager.add("fingerprint","data/standard/fingerprint.png");
 
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

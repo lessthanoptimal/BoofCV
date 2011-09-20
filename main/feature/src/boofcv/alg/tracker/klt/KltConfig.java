@@ -41,7 +41,7 @@ public class KltConfig {
 	 */
 	public static KltConfig createDefault() {
 		KltConfig ret = new KltConfig();
-		ret.maxPerPixelError = 20;
+		ret.maxPerPixelError = 25;
 		ret.maxIterations = 15;
 		ret.minDeterminant = 0.001f;
 		ret.minPositionDelta = 0.01f;

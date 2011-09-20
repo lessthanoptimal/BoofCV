@@ -29,7 +29,7 @@ import boofcv.factory.feature.associate.FactoryAssociationTuple;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
-import boofcv.gui.ProcessImage;
+import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
@@ -57,8 +57,10 @@ import java.util.List;
 // todo add waiting tool bar
 // todo show partial results
 public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends ImageBase>
-	extends SelectAlgorithmImagePanel implements ProcessImage
+	extends SelectAlgorithmImagePanel implements ProcessInput
 {
+	int maxMatches = 200;
+
 
 	InterestPointDetector<T> detector;
 	ExtractFeatureDescription<T> describe;
@@ -88,10 +90,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 
 		ScoreAssociation<TupleDesc_F64> scorer = new ScoreAssociateEuclideanSq();
 
-		addAlgorithm(2,"Forward/Backwards", FactoryAssociationTuple.forwardBackwards(scorer,150));
-		addAlgorithm(2,"Inlier Size",FactoryAssociationTuple.inlierError(scorer,200,10));
-		addAlgorithm(2,"Max Matches",FactoryAssociationTuple.maxMatches(scorer,100));
-		addAlgorithm(2,"Error",FactoryAssociationTuple.maxError(scorer,10));
+		addAlgorithm(2,"Greedy", FactoryAssociationTuple.greedy(scorer,Double.MAX_VALUE,maxMatches,false));
+		addAlgorithm(2,"Backwards", FactoryAssociationTuple.greedy(scorer,Double.MAX_VALUE,maxMatches,true));
 
 		imageLeft = GeneralizedImageOps.createImage(imageType,1,1);
 		imageRight = GeneralizedImageOps.createImage(imageType,1,1);
@@ -194,7 +194,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 
 	@Override
 	public void changeImage(String name, int index) {
-		ImageListManager m = getImageManager();
+		ImageListManager m = getInputManager();
 		BufferedImage left = m.loadImage(index,0);
 		BufferedImage right = m.loadImage(index,1);
 
@@ -216,10 +216,11 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 		manager.add("Cave","data/stitch/cave_01.jpg","data/stitch/cave_02.jpg");
 		manager.add("Kayak","data/stitch/kayak_02.jpg","data/stitch/kayak_03.jpg");
 		manager.add("Forest","data/scale/rainforest_01.jpg","data/scale/rainforest_02.jpg");
+		manager.add("Building","data/stitch/apartment_building_01.jpg","data/stitch/apartment_building_02.jpg");
 
 		app.setPreferredSize(new Dimension(1000,500));
 		app.setSize(1000,500);
-		app.setImageManager(manager);
+		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

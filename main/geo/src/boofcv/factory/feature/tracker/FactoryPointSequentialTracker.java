@@ -34,6 +34,7 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.FactoryAssociationTuple;
 import boofcv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 
 
@@ -60,8 +61,21 @@ public class FactoryPointSequentialTracker {
 				PkltManagerConfig.createDefault(imageType,derivType);
 		config.pyramidScaling = scaling;
 		config.maxFeatures = maxFeatures;
-		PkltManager<I, D> trackManager =
-				new PkltManager<I, D>(config);
+		PkltManager<I, D> trackManager = new PkltManager<I, D>(config);
+
+		return new PstWrapperKltPyramid<I,D>(trackManager);
+	}
+
+	/**
+	 * Creates a tracker using KLT features/tracker.
+	 *
+	 * @param config Config for the tracker. Try PkltManagerConfig.createDefault().
+	 * @return KLT based tracker.
+	 */
+	public static <I extends ImageBase, D extends ImageBase>
+	PointSequentialTracker<I> klt( PkltManagerConfig<I, D> config )
+	{
+		PkltManager<I, D> trackManager = new PkltManager<I, D>(config);
 
 		return new PstWrapperKltPyramid<I,D>(trackManager);
 	}
@@ -89,8 +103,8 @@ public class FactoryPointSequentialTracker {
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(3,false,integralType);
 		DescribePointSurf<II> describe = new DescribePointSurf<II>();
 
-		ScoreAssociation score = new ScoreAssociateEuclideanSq();
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociationTuple.inlierError(score,maxMatches,3));
+		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclideanSq();
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociationTuple.greedy(score,100000,maxMatches,true));
 
 		return new PstWrapperSurf<I,II>(detector,orientation,describe,assoc,integralType);
 	}

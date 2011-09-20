@@ -19,7 +19,8 @@
 package boofcv.factory.feature.associate;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.associate.WrapAssociateGreedyTuple;
+import boofcv.abst.feature.associate.WrapAssociateGreedy;
+import boofcv.alg.feature.associate.AssociateGreedy;
 import boofcv.alg.feature.associate.ScoreAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
 
@@ -32,36 +33,13 @@ import boofcv.struct.feature.TupleDesc_F64;
 public class FactoryAssociationTuple {
 
 	public static GeneralAssociation<TupleDesc_F64>
-	maxError( ScoreAssociation<TupleDesc_F64> score , double maxError )
+	greedy( ScoreAssociation<TupleDesc_F64> score ,
+			double maxError ,
+			int maxMatches ,
+			boolean backwardsValidation )
 	{
-		WrapAssociateGreedyTuple ret = new WrapAssociateGreedyTuple.Basic(maxError);
-		ret.setScore(score);
-		return ret;
-	}
-
-	public static GeneralAssociation<TupleDesc_F64>
-	maxMatches( ScoreAssociation<TupleDesc_F64> score , int maxMatches )
-	{
-		WrapAssociateGreedyTuple ret =  new WrapAssociateGreedyTuple.FitIsError(maxMatches);
-		ret.setScore(score);
-		return ret;
-	}
-
-	public static GeneralAssociation<TupleDesc_F64>
-	inlierError( ScoreAssociation<TupleDesc_F64> score ,
-				 int maxMatches , double containmentScale )
-	{
-		WrapAssociateGreedyTuple ret =  new WrapAssociateGreedyTuple.TotalCloseMatches(maxMatches,containmentScale);
-		ret.setScore(score);
-		return ret;
-	}
-
-	public static GeneralAssociation<TupleDesc_F64>
-	forwardBackwards( ScoreAssociation<TupleDesc_F64> score ,
-					  int maxMatches )
-	{
-		WrapAssociateGreedyTuple ret =  new WrapAssociateGreedyTuple.ForwardBackwards(maxMatches);
-		ret.setScore(score);
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,maxError,backwardsValidation);
+		WrapAssociateGreedy<TupleDesc_F64> ret = new WrapAssociateGreedy<TupleDesc_F64>(alg,maxMatches);
 		return ret;
 	}
 }

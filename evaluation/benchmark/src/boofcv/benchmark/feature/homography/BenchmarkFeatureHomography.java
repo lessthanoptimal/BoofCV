@@ -178,7 +178,7 @@ public class BenchmarkFeatureHomography {
 		double tolerance = 3;
 
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
-		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociationTuple.forwardBackwards(score,-1);
+		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociationTuple.greedy(score,Double.MAX_VALUE,-1,true);
 
 		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/boat/",".png",tolerance);
 

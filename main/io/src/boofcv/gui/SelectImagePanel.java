@@ -1,7 +1,7 @@
 package boofcv.gui;
 
 import boofcv.gui.image.ImagePanel;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.InputListManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +18,7 @@ public abstract class SelectImagePanel extends JPanel implements ActionListener 
 	JToolBar toolbar;
 	JComboBox imageBox;
 	JCheckBox originalCheck;
-	ImageListManager imageManager;
+	InputListManager imageManager;
 
 	protected BufferedImage inputImage;
 
@@ -66,7 +66,7 @@ public abstract class SelectImagePanel extends JPanel implements ActionListener 
 	}
 
 
-	public void setImageManager( final ImageListManager manager ) {
+	public void setInputManager( final InputListManager manager ) {
 		this.imageManager = manager;
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -112,8 +112,8 @@ public abstract class SelectImagePanel extends JPanel implements ActionListener 
 			}});
 	}
 
-	public ImageListManager getImageManager() {
-		return imageManager;
+	public <T extends InputListManager> T getImageManager() {
+		return (T)imageManager;
 	}
 
 	public abstract void changeImage( String name , int index );

@@ -32,7 +32,7 @@ import java.net.URL;
  *
  * @author Peter Abeles
  */
-public class ImageInputApplet extends JApplet {
+public class VideoInputApplet extends JApplet {
 
 	@Override
 	public void init() {
@@ -54,14 +54,14 @@ public class ImageInputApplet extends JApplet {
 			showStatus("Failed to create GUI component");
 			return;
 		} else if( !(comp instanceof ProcessInput) ) {
-			showStatus("The loaded component is not of ProcessInput type");
+			showStatus("The loaded component is not of ProcessImage type");
 			return;
 		}
 
 		showStatus("Loading Image");
 		ProcessInput p = (ProcessInput)comp;
 
-		AppletImageListManager manager = parseImageInput(dataset);
+		AppletVideoListManager manager = parseImageInput(inputType,dataset);
 
 		p.setInputManager(manager);
 
@@ -74,12 +74,12 @@ public class ImageInputApplet extends JApplet {
 		getContentPane().add(comp, BorderLayout.CENTER);
 	}
 
-	public AppletImageListManager parseImageInput( String fileName )
+	public AppletVideoListManager parseImageInput( Class imageType , String fileName )
 	{
 		File a = new File(fileName);
 		String directory = a.getParent()+"/";
 
-		AppletImageListManager ret = new AppletImageListManager(getCodeBase());
+		AppletVideoListManager ret = new AppletVideoListManager(imageType,getCodeBase());
 		try {
 			InputStreamReader isr = new InputStreamReader(new URL(getCodeBase(),fileName).openStream());
 			BufferedReader reader = new BufferedReader(isr);
