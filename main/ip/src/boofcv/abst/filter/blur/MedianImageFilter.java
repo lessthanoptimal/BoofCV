@@ -18,7 +18,6 @@
 
 package boofcv.abst.filter.blur;
 
-import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.BoofTesting;
@@ -32,15 +31,18 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class MedianImageFilter<T extends ImageBase> implements FilterImageInterface<T,T> {
+public class MedianImageFilter<T extends ImageBase> implements BlurFilter<T> {
 
 	// the blur function inside of BlurImageOps being invoked
 	private Method m;
 	// size of the blur region
 	private int radius;
 
-	public MedianImageFilter( Class<?> imageType , int radius) {
+	Class<T> imageType;
+
+	public MedianImageFilter( Class<T> imageType , int radius) {
 		this.radius = radius;
+		this.imageType = imageType;
 
 		m = BoofTesting.findMethod(BlurImageOps.class,"median",imageType,imageType,int.class);
 
@@ -53,8 +55,14 @@ public class MedianImageFilter<T extends ImageBase> implements FilterImageInterf
 	 *
 	 * @return Blur region's radius.
 	 */
+	@Override
 	public int getRadius() {
 		return radius;
+	}
+
+	@Override
+	public void setRadius(int radius) {
+		this.radius = radius;
 	}
 
 	@Override
@@ -76,5 +84,10 @@ public class MedianImageFilter<T extends ImageBase> implements FilterImageInterf
 	@Override
 	public int getVerticalBorder() {
 		return 0;
+	}
+
+	@Override
+	public Class<T> getInputType() {
+		return imageType;
 	}
 }

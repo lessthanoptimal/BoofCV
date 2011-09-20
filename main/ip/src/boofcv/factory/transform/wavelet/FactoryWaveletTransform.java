@@ -42,12 +42,12 @@ public class FactoryWaveletTransform {
 
 	@SuppressWarnings({"unchecked"})
 	public static <T extends ImageBase, W extends ImageBase, C extends WlCoef>
-	WaveletTransform<T,W,C> create( WaveletDescription<C> waveletDesc , int numLevels )
+	WaveletTransform<T,W,C> create( Class<T> imageType , WaveletDescription<C> waveletDesc , int numLevels )
 	{
 		if( waveletDesc.getForward().getType() == float.class ) {
 			return (WaveletTransform<T,W,C>)create_F32((WaveletDescription)waveletDesc,numLevels);
 		} else if( waveletDesc.getForward().getType() == int.class ) {
-			return (WaveletTransform<T,W,C>)create_I((WaveletDescription)waveletDesc,numLevels);
+			return (WaveletTransform<T,W,C>)create_I((WaveletDescription)waveletDesc,numLevels,(Class)imageType);
 		} else {
 			throw new RuntimeException("Add support for this image type");
 		}
@@ -63,9 +63,10 @@ public class FactoryWaveletTransform {
 	public static <T extends ImageInteger>
 	WaveletTransform<T, ImageSInt32,WlCoef_I32>
 	create_I( WaveletDescription<WlCoef_I32> waveletDesc ,
-			  int numLevels )
+			  int numLevels ,
+			  Class<T> imageType )
 	{
-		return new WaveletTransformInt<T>(waveletDesc,numLevels);
+		return new WaveletTransformInt<T>(waveletDesc,numLevels,imageType);
 	}
 
 	/**

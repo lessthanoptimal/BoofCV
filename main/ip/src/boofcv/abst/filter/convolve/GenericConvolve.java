@@ -42,10 +42,13 @@ public class GenericConvolve<Input extends ImageBase, Output extends ImageBase>
 	BorderType type;
 	ImageBorder borderRule;
 
-	public GenericConvolve(Method m, KernelBase kernel, BorderType type ) {
+	Class<Input> imageType;
+
+	public GenericConvolve(Method m, KernelBase kernel, BorderType type , Class<Input> imageType) {
 		this.m = m;
 		this.kernel = kernel;
 		this.type = type;
+		this.imageType = imageType;
 
 		Class<?> params[] = m.getParameterTypes();
 		if( type == BorderType.SKIP || type == BorderType.NORMALIZED )
@@ -105,5 +108,10 @@ public class GenericConvolve<Input extends ImageBase, Output extends ImageBase>
 	@Override
 	public int getVerticalBorder() {
 		return getHorizontalBorder();
+	}
+
+	@Override
+	public Class<Input> getInputType() {
+		return imageType;
 	}
 }

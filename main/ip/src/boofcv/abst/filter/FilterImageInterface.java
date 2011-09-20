@@ -49,4 +49,11 @@ public interface FilterImageInterface<Input extends ImageBase, Output extends Im
 	 * @return Border size in pixels.
 	 */
 	public int getVerticalBorder();
+
+	/**
+	 * Specifies the type of image it takes as input.
+	 *
+	 * @return Input image type.
+	 */
+	public Class<Input> getInputType();
 }

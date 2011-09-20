@@ -70,7 +70,7 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		final int height = input.getHeight();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				setPreferredSize(new Dimension(width,height));
+				panel.setPreferredSize(new Dimension(width,height));
 				processedImage = true;
 				doRefreshAll();
 			}});

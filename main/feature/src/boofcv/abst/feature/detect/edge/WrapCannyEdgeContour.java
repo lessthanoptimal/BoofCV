@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.edge;
 
-import boofcv.abst.filter.blur.BlurStorageFilter;
+import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.edge.GradientToEdgeFeatures;
@@ -40,7 +40,7 @@ import java.util.List;
 public class WrapCannyEdgeContour<T extends ImageBase, D extends ImageBase> implements DetectEdgeContour<T> {
 
 	// blurs the input image
-	BlurStorageFilter<T> blur;
+	BlurFilter<T> blur;
 
 	// computes the image gradient
 	private ImageGradient<T,D> gradient;
@@ -70,7 +70,7 @@ public class WrapCannyEdgeContour<T extends ImageBase, D extends ImageBase> impl
 
 	List<List<Point2D_I32>> contours;
 
-	public WrapCannyEdgeContour(BlurStorageFilter<T> blur , ImageGradient<T, D> gradient, float threshLow, float threshHigh ) {
+	public WrapCannyEdgeContour(BlurFilter<T> blur , ImageGradient<T, D> gradient, float threshLow, float threshHigh ) {
 		this.blur = blur;
 		this.gradient = gradient;
 		this.threshLow = threshLow;

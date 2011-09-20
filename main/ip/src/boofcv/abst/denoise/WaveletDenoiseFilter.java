@@ -83,4 +83,9 @@ public class WaveletDenoiseFilter<T extends ImageBase > implements FilterImageIn
 	public int getVerticalBorder() {
 		return 0;
 	}
+
+	@Override
+	public Class<T> getInputType() {
+		return wavelet.getOriginalType();
+	}
 }

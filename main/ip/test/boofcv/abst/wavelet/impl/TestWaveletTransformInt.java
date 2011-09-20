@@ -61,7 +61,7 @@ public class TestWaveletTransformInt {
 		ImageSInt32 storage = new ImageSInt32(dimen.width,dimen.height);
 		WaveletTransformOps.transformN(desc,orig.clone(),expected,storage,N);
 
-		WaveletTransformInt<ImageSInt32> alg = new WaveletTransformInt<ImageSInt32>(desc,N);
+		WaveletTransformInt<ImageSInt32> alg = new WaveletTransformInt<ImageSInt32>(desc,N,ImageSInt32.class);
 		alg.transform(orig,found);
 
 		// make sure the original input was not modified like it is in WaveletTransformOps
@@ -97,7 +97,7 @@ public class TestWaveletTransformInt {
 		ImageSInt32 storage = new ImageSInt32(dimen.width,dimen.height);
 		WaveletTransformOps.transformN(desc,orig.clone(),expected,storage,N);
 
-		WaveletTransformInt<ImageUInt8> alg = new WaveletTransformInt<ImageUInt8>(desc,N);
+		WaveletTransformInt<ImageUInt8> alg = new WaveletTransformInt<ImageUInt8>(desc,N,ImageUInt8.class);
 		alg.transform(orig8,found);
 
 		// see if the two techniques produced the same results
