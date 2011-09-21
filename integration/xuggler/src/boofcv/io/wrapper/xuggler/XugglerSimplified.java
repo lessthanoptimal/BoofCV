@@ -57,12 +57,14 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 
 	int frameID=-1;
 
-	{
-//		UtilIO.loadLibrarySmart("libxuggle-xuggler.so");
-	}
+	String fileName;
 
 	public XugglerSimplified(String filename, Class<T> typeOutput) {
+		open(filename,typeOutput);
+	}
 
+	public void open(String filename, Class<T> typeOutput) {
+		this.fileName = filename;
 
 		if (!IVideoResampler.isSupported(
 				IVideoResampler.Feature.FEATURE_COLORSPACECONVERSION))
@@ -76,16 +78,13 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 		container = IContainer.make();
 
 		// open up the container
-
 		if (container.open(filename, IContainer.Type.READ, null) < 0)
 			throw new IllegalArgumentException("could not open file: " + filename);
 
 		// query how many streams the call to open found
-
 		int numStreams = container.getNumStreams();
 
 		// and iterate through the streams to find the first video stream
-
 		videoStreamId = -1;
 		videoCoder = null;
 		for (int i = 0; i < numStreams; i++) {
@@ -130,7 +129,6 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 		// Now, we start walking through the container looking at each packet.
 
 		packet = IPacket.make();
-
 		bufferedImage = new BufferedImage(videoCoder.getWidth(), videoCoder.getHeight(),
 				BufferedImage.TYPE_3BYTE_BGR);
 
@@ -232,13 +230,20 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 	}
 
 	@Override
-	public Class<T> getType() {
+	public Class<T> getImageType() {
 		return typeOutput;
 	}
 
 	@Override
 	public int getFrameNumber() {
 		return frameID;
+	}
+
+	@Override
+	public void reset() {
+		// todo this really is a brute force reset... has to be a faster way
+		close();
+		open(fileName,typeOutput);
 	}
 
 	@Override

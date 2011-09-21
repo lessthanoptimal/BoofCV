@@ -105,8 +105,17 @@ public class PyramidOps {
 	{
 		if( !derivX.isInitialized() )
 			derivX.initialize(input.getInputWidth(),input.getInputHeight());
+		else if( derivX.getInputWidth() != input.getInputWidth() ||
+				derivX.getInputWidth() != input.getInputWidth() ) {
+			derivX.initialize(input.getInputWidth(),input.getInputHeight());
+		}
+
 		if( !derivY.isInitialized() )
 			derivY.initialize(input.getInputWidth(),input.getInputHeight());
+		else if( derivY.getInputWidth() != input.getInputWidth() ||
+				derivY.getInputWidth() != input.getInputWidth() ) {
+			derivY.initialize(input.getInputWidth(),input.getInputHeight());
+		}
 
 		for( int i = 0; i < input.getNumLayers(); i++ ) {
 			I imageIn = input.getLayer(i);

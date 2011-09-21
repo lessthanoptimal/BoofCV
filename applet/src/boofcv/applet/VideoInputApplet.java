@@ -86,6 +86,8 @@ public class VideoInputApplet extends JApplet {
 
 			String line;
 			while( (line = reader.readLine()) != null ) {
+				if( line.length() == 0 )
+					continue;
 
 				String[]z = line.split("\\^");
 				String[] names = new String[z.length-1];

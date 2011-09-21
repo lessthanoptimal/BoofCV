@@ -2,10 +2,8 @@ package boofcv.io.video;
 
 import boofcv.io.InputListManager;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.wrapper.images.BufferedFileImageSequence;
 import boofcv.struct.image.ImageBase;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +44,8 @@ public class VideoListManager<T extends ImageBase> implements InputListManager {
 	}
 
 	public SimpleImageSequence<T> loadSequence( int labelIndex , int imageIndex ) {
-		File directory = new File(fileNames.get(labelIndex)[imageIndex]);
-		return new BufferedFileImageSequence<T>(imageType,directory,"jpg");
+		return BuboVideoManager.loadManagerDefault().load(fileNames.get(labelIndex)[imageIndex], imageType);
+//		File directory = new File(fileNames.get(labelIndex)[imageIndex]);
+//		return new BufferedFileImageSequence<T>(imageType,directory,"jpg");
 	}
 }

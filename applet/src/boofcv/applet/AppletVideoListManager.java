@@ -20,13 +20,11 @@ package boofcv.applet;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoListManager;
-import boofcv.io.wrapper.images.BufferedFileImageSequence;
+import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -61,6 +59,8 @@ public class AppletVideoListManager<T extends ImageBase> extends VideoListManage
 			List<BufferedImage> frames = new ArrayList<BufferedImage>();
 			ZipEntry entry;
 
+			List<byte[]> jpegData = new ArrayList<byte[]>();
+
 			while( (zin.getNextEntry()) != null ) {
 //				System.out.println("Extracting: " +entry);
 				int count;
@@ -71,15 +71,10 @@ public class AppletVideoListManager<T extends ImageBase> extends VideoListManage
 				while ((count = zin.read(data, 0, 1024)) != -1) {
 					bout.write(data,0,count);
 				}
-				BufferedImage img = ImageIO.read(new ByteArrayInputStream(bout.toByteArray()));
-				if( img != null ) {
-					frames.add(img);
-				}
+				jpegData.add(bout.toByteArray());
 			}
 
-			BufferedImage []arrayImgs = frames.toArray(new BufferedImage[0]);
-
-			return new BufferedFileImageSequence<T>(imageType,arrayImgs);
+			return new JpegByteImageSequence<T>(imageType,jpegData, true);
 		} catch (MalformedURLException e) {
 			System.err.println("MalformedURL"+fileNames.get(labelIndex));
 		} catch (IOException e) {

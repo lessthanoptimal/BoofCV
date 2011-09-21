@@ -141,7 +141,7 @@ public class StabilizeImageSequence<I extends ImageBase> extends ProcessImageSeq
 
 		I image = sequence.next();
 
-		tracker = FactoryPointSequentialTracker.klt(maxFeatures,new int[]{1,2,4},imageType,derivType);
+		tracker = FactoryPointSequentialTracker.klt(maxFeatures,new int[]{2,4,8},imageType,derivType);
 //		tracker = FactoryPointSequentialTracker.surf(maxFeatures,400,1,imageType);
 
 		ModelMatcher<Affine2D_F64,AssociatedPair> fitter = createModelMatcher();
@@ -159,7 +159,7 @@ public class StabilizeImageSequence<I extends ImageBase> extends ProcessImageSeq
 		String fileName;
 
 		if (args.length == 0) {
-			fileName = "snow_norail_stabilization.avi";
+			fileName = "/home/pja/2011_09_20/MAQ00687.MP4";
 		} else {
 			fileName = args[0];
 		}

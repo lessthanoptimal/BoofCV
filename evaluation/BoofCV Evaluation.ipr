@@ -291,6 +291,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Applet.iml" filepath="$PROJECT_DIR$/Applet.iml" />
       <module fileurl="file://$PROJECT_DIR$/BoofCV Evaluation.iml" filepath="$PROJECT_DIR$/BoofCV Evaluation.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/feature/BoofCV Feature.iml" filepath="$PROJECT_DIR$/../main/feature/BoofCV Feature.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/../main/geo/BoofCV Geometric Vision.iml" />
@@ -326,6 +327,44 @@
     <option name="UNLOCK_ON_CHECKIN" value="false" />
   </component>
   <component name="SvnBranchConfigurationManager">
+    <option name="myConfigurationMap">
+      <map>
+        <entry key="$PROJECT_DIR$/../../ejml">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="https://efficient-java-matrix-library.googlecode.com/svn" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../libpjajava">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="svn+ssh://127.0.0.1/opt/repos/libpjajava/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="svn+ssh://127.0.0.1/opt/repos/libpjajava/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="branchUrls">
+                <list>
+                  <option value="svn+ssh://127.0.0.1/opt/repos/libpjajava/branches" />
+                  <option value="svn+ssh://127.0.0.1/opt/repos/libpjajava/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="svn+ssh://127.0.0.1/opt/repos/libpjajava/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="myVersion" value="123" />
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
