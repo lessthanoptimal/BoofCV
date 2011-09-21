@@ -175,7 +175,7 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 	}
 
 	@Override
-	public Class<T> getType() {
+	public Class<T> getImageType() {
 		return type;
 	}
 
@@ -186,6 +186,12 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 
 	@Override
 	public void close() {
+	}
+
+	@Override
+	public void reset() {
+		index = 0;
+		forwards = true;
 	}
 
 	private class Filter implements FilenameFilter {

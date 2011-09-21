@@ -19,7 +19,7 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.numerics.fitting.modelset.ModelCodec;
-import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.affine.Affine2D_F64;
 
 
 /**
@@ -28,7 +28,7 @@ import georegression.struct.affine.Affine2D_F32;
  *
  * @author Peter Abeles
  */
-public class Affine2DCodec implements ModelCodec<Affine2D_F32> {
+public class Affine2DCodec implements ModelCodec<Affine2D_F64> {
 
 	@Override
 	public int getParamLength() {
@@ -36,16 +36,16 @@ public class Affine2DCodec implements ModelCodec<Affine2D_F32> {
 	}
 
 	@Override
-	public Affine2D_F32 decode(double[] param, Affine2D_F32 model) {
+	public Affine2D_F64 decode(double[] param, Affine2D_F64 model) {
 		if( model == null )
-			model = new Affine2D_F32();
+			model = new Affine2D_F64();
 
 		decodeStatic(param, model);
 
 		return model;
 	}
 
-	public static void decodeStatic(double[] param, Affine2D_F32 model) {
+	public static void decodeStatic(double[] param, Affine2D_F64 model) {
 		model.a11 = (float)param[0];
 		model.a12 = (float)param[1];
 		model.a21 = (float)param[2];
@@ -55,7 +55,7 @@ public class Affine2DCodec implements ModelCodec<Affine2D_F32> {
 	}
 
 	@Override
-	public double[] encode(Affine2D_F32 model, double[] param) {
+	public double[] encode(Affine2D_F64 model, double[] param) {
 		if( param == null )
 			param = new double[6];
 
@@ -64,7 +64,7 @@ public class Affine2DCodec implements ModelCodec<Affine2D_F32> {
 		return param;
 	}
 
-	public static void encodeStatic(Affine2D_F32 model, double[] param) {
+	public static void encodeStatic(Affine2D_F64 model, double[] param) {
 		param[0] = model.a11;
 		param[1] = model.a12;
 		param[2] = model.a21;

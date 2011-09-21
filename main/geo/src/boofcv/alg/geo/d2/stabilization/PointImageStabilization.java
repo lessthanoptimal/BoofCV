@@ -117,7 +117,8 @@ public class PointImageStabilization<I extends ImageBase > {
 	 */
 	public void process( I input ) {
 		// if needed, declare the stabilized output image
-		if( imageOut == null ) {
+		if( imageOut == null ||
+				imageOut.width != input.width || imageOut.height != input.height ) {
 			imageOut = (I)input._createNew(input.getWidth(),input.getHeight());
 		}
 

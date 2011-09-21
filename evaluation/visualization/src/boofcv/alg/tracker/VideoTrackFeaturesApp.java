@@ -46,7 +46,7 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 		extends SelectAlgorithmImagePanel implements ProcessInput
 {
 
-	long framePeriod = 100;
+	long framePeriod = 150;
 	int maxFeatures = 130;
 	int minFeatures = 90;
 
@@ -96,9 +96,9 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 		if( sequence == null )
 			return;
 		
-		tracker = (PointSequentialTracker<I>)cookie;
-
 		stopWorker();
+
+		tracker = (PointSequentialTracker<I>)cookie;
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -187,7 +187,13 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 
 				}
 				while( System.currentTimeMillis()-startTime < framePeriod ) {
-					Thread.yield();
+					synchronized (this) {
+						try {
+							wait(System.currentTimeMillis()-startTime-10);
+						} catch (InterruptedException e) {
+							throw new RuntimeException(e);
+						}
+					}
 				}
 			}
 

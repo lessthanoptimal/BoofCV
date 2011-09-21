@@ -37,7 +37,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ProcessImageSequence;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.wrapper.images.LoadFileImageSequence;
+import boofcv.io.video.BuboVideoManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -148,9 +148,9 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 	public static <I extends ImageBase, D extends ImageBase>
 	void run( String fileName , Class<I> imageType , Class<D> derivType ) {
 
-		SimpleImageSequence<I> sequence = null;//new XugglerSimplified<I>(fileName, imageType);
+		SimpleImageSequence<I> sequence = BuboVideoManager.loadManagerDefault().load(fileName,imageType);
 
-		sequence = new LoadFileImageSequence<I>(imageType,"../applet/data/snow_rail","jpg");
+//		sequence = new LoadFileImageSequence<I>(imageType,"../applet/data/snow_rail","jpg");
 
 		KltConfig configKLt = new KltConfig();
 		configKLt.forbiddenBorder = 0;
@@ -199,7 +199,7 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 	}
 
 	public static void main( String args[] ) {
-		String fileName = "/media/backup/datasets/2010/snow_videos/snow_norail_stabilization.avi";
+		String fileName = "/home/pja/2011_09_20/MAQ00688.MP4";
 
 		run(fileName,ImageFloat32.class,ImageFloat32.class);
 //		run(fileName, ImageUInt8.class, ImageSInt16.class);

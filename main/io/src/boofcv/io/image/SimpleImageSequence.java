@@ -66,5 +66,10 @@ public interface SimpleImageSequence<T extends ImageBase> {
 	/**
 	 * Returns the type of class used to store the output image
 	 */
-	public Class<T> getType();
+	public Class<T> getImageType();
+
+	/**
+	 * Start reading the sequence from the start
+	 */
+	public void reset();
 }

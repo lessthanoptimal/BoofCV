@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.d2;
 
-import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.affine.Affine2D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,7 +33,7 @@ public class TestAffine2DCodec {
 	public void encode() {
 		Affine2DCodec codec = new Affine2DCodec();
 
-		Affine2D_F32 model = new Affine2D_F32(1,2,3,4,5,6);
+		Affine2D_F64 model = new Affine2D_F64(1,2,3,4,5,6);
 		double param[] = new double[6];
 
 		codec.encode(model,param);
@@ -43,7 +43,7 @@ public class TestAffine2DCodec {
 		}
 
 		// decode
-		model = new Affine2D_F32();
+		model = new Affine2D_F64();
 		codec.decode(param,model);
 
 		assertEquals(1,model.a11,1e-4);
@@ -58,7 +58,7 @@ public class TestAffine2DCodec {
 	public void decode() {
 		Affine2DCodec codec = new Affine2DCodec();
 
-		Affine2D_F32 model = new Affine2D_F32();
+		Affine2D_F64 model = new Affine2D_F64();
 		double param[] = new double[6];
 
 

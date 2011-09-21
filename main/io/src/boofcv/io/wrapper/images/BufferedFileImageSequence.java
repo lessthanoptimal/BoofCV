@@ -143,7 +143,7 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 	}
 
 	@Override
-	public Class<T> getType() {
+	public Class<T> getImageType() {
 		return type;
 	}
 
@@ -168,5 +168,11 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 		public boolean accept(File dir, String name) {
 			return name.contains(suffix);
 		}
+	}
+
+	@Override
+	public void reset() {
+		index = 0;
+		forwards = true;
 	}
 }
