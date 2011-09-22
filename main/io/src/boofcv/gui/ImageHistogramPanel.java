@@ -28,9 +28,9 @@ import java.awt.*;
  * Draws a histogram of the image's pixel intensity level
  */
 public class ImageHistogramPanel extends JPanel {
-	int totalBins;
-	double maxValue;
-	int bins[];
+	protected int totalBins;
+	protected double maxValue;
+	protected int bins[];
 
 	public ImageHistogramPanel(int totalBins, double maxValue) {
 		this.totalBins = totalBins;

@@ -20,17 +20,16 @@ package boofcv.factory.filter.binary;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.FilterImageReflection;
+import boofcv.abst.filter.binary.FilterLabelBlobs;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
 /**
- * {@link FilterImageInterface} wrappers around functions inside of {@link BinaryImageOps} and {@link boofcv.alg.filter.binary.BinaryImageHighOps}.
+ * {@link FilterImageInterface} wrappers around functions inside of {@link BinaryImageOps}.
  *
  * NOTE:: Not all functions inside of {@link BinaryImageOps} are contained here.
  */
-// TODO add hysteresisLabel4() from HighOps
-// TODO create GBinaryImageHighOps
 public class FactoryBinaryImageOps {
 
 	public static FilterImageInterface<ImageUInt8, ImageUInt8> erode4() {
@@ -61,12 +60,12 @@ public class FactoryBinaryImageOps {
 		return new FilterImageReflection<ImageUInt8, ImageUInt8>(BinaryImageOps.class, "removePointNoise", 0, 0, ImageUInt8.class, ImageUInt8.class);
 	}
 
-	public static FilterImageInterface<ImageUInt8, ImageSInt32> labelBlobs4() {
-		return new FilterImageReflection<ImageUInt8, ImageSInt32>(BinaryImageOps.class, "labelBlobs4", 0, 0, ImageUInt8.class, ImageSInt32.class);
+	public static FilterLabelBlobs labelBlobs4() {
+		return new FilterLabelBlobs(true);
 	}
 
-	public static FilterImageInterface<ImageUInt8, ImageSInt32> labelBlobs8() {
-		return new FilterImageReflection<ImageUInt8, ImageSInt32>(BinaryImageOps.class, "labelBlobs4", 0, 0, ImageUInt8.class, ImageSInt32.class);
+	public static FilterLabelBlobs labelBlobs8() {
+		return new FilterLabelBlobs(false);
 	}
 
 	public static FilterImageInterface<ImageSInt32, ImageUInt8> labelToBinary() {

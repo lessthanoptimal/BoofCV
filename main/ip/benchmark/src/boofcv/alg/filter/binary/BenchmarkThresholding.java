@@ -18,9 +18,9 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.alg.misc.ImageTestingOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
@@ -55,7 +55,7 @@ public class BenchmarkThresholding {
 	public static class HysteresisLabel4 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryImageHighOps.hysteresisLabel4(input, output_S32,threshLower,threshUpper,true,work);
+			ThresholdImageOps.hysteresisLabel4(input, output_S32,threshLower,threshUpper,true,work);
 			BinaryImageOps.labelToBinary(output_S32,output_U8);
 		}
 	}
@@ -63,7 +63,7 @@ public class BenchmarkThresholding {
 	public static class HysteresisLabel8 extends PerformerBase {
 		@Override
 		public void process() {
-			BinaryImageHighOps.hysteresisLabel8(input, output_S32,threshLower,threshUpper,true,work);
+			ThresholdImageOps.hysteresisLabel8(input, output_S32,threshLower,threshUpper,true,work);
 			BinaryImageOps.labelToBinary(output_S32,output_U8);
 		}
 	}

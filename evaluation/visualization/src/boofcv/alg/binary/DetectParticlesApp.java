@@ -18,7 +18,6 @@
 
 package boofcv.alg.binary;
 
-import boofcv.alg.filter.binary.BinaryImageHighOps;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.PixelMath;
@@ -76,7 +75,7 @@ public class DetectParticlesApp {
 
 	private void useHysteresis4( ImageUInt8 input , double threshold ) {
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		int numBlobs = BinaryImageHighOps.hysteresisLabel4(input,labeled,(int)(threshold*0.6),(int)threshold,true,null);
+		int numBlobs = ThresholdImageOps.hysteresisLabel4(input,labeled,(int)(threshold*0.6),(int)threshold,true,null);
 		ImageUInt8 binary = BinaryImageOps.labelToBinary(labeled,null);
 
 		binaryPanel.addImage(VisualizeBinaryData.renderBinary(binary,null),"Hysteresis4");
@@ -85,7 +84,7 @@ public class DetectParticlesApp {
 
 	private void useHysteresis8( ImageUInt8 input , double threshold ) {
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		int numBlobs = BinaryImageHighOps.hysteresisLabel8(input,labeled,(int)(threshold*0.6),(int)threshold,true,null);
+		int numBlobs = ThresholdImageOps.hysteresisLabel8(input,labeled,(int)(threshold*0.6),(int)threshold,true,null);
 		ImageUInt8 binary = BinaryImageOps.labelToBinary(labeled,null);
 
 		binaryPanel.addImage(VisualizeBinaryData.renderBinary(binary,null),"Hysteresis8");

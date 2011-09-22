@@ -19,6 +19,8 @@
 package boofcv.alg.binary;
 
 import boofcv.abst.filter.FilterImageInterface;
+import boofcv.abst.filter.binary.FilterLabelBlobs;
+import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
@@ -33,6 +35,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
 import javax.swing.*;
@@ -41,13 +44,15 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 /**
  * Demonstrates the affects of different binary operations on an image.
  */
-// todo clean up appearance
-public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmImagePanel
+public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgorithmImagePanel
 		implements ProcessInput , ChangeListener {
+
+	Random rand = new Random(234234);
 
 	double threshold = 0;
 	boolean down = true;
@@ -55,11 +60,16 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 	Class<T> imageType;
 	T imageInput;
 	ImageUInt8 imageBinary;
-	ImageUInt8 imageOutput;
-	ImageUInt8 selectedVisualize;
+	ImageUInt8 imageOutput1;
+	ImageUInt8 imageOutput2;
+	ImageSInt32 imageLabeled;
+	ImageBase selectedVisualize;
 
-	FilterImageInterface<ImageUInt8, ImageUInt8> filter;
+	FilterImageInterface<ImageUInt8, ImageUInt8> filter1;
+	FilterImageInterface<ImageUInt8, ImageUInt8> filter2;
+	FilterLabelBlobs filterLabel;
 	BufferedImage work;
+	int colors[];
 
 	boolean processedImage = false;
 
@@ -69,8 +79,8 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 	JButton toggleButton;
 	ImagePanel gui = new ImagePanel();
 
-	public DemoBinaryImageOpsApp( Class<T> imageType ) {
-		super(1);
+	public DemoBinaryImageLabelOpsApp(Class<T> imageType) {
+		super(3);
 
 		this.imageType = imageType;
 
@@ -78,9 +88,16 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 		addAlgorithm(0,"Erode-8", FactoryBinaryImageOps.erode8());
 		addAlgorithm(0,"Dilate-4", FactoryBinaryImageOps.dilate4());
 		addAlgorithm(0,"Dilate-8", FactoryBinaryImageOps.dilate8());
-		addAlgorithm(0,"Edge-4", FactoryBinaryImageOps.edge4());
-		addAlgorithm(0,"Edge-8", FactoryBinaryImageOps.edge8());
 		addAlgorithm(0,"Remove Noise", FactoryBinaryImageOps.removePointNoise());
+
+		addAlgorithm(1,"Erode-4", FactoryBinaryImageOps.erode4());
+		addAlgorithm(1,"Erode-8", FactoryBinaryImageOps.erode8());
+		addAlgorithm(1,"Dilate-4", FactoryBinaryImageOps.dilate4());
+		addAlgorithm(1,"Dilate-8", FactoryBinaryImageOps.dilate8());
+		addAlgorithm(1,"Remove Noise", FactoryBinaryImageOps.removePointNoise());
+
+		addAlgorithm(2, "Label-4", FactoryBinaryImageOps.labelBlobs4());
+		addAlgorithm(2, "Label-8", FactoryBinaryImageOps.labelBlobs8());
 
 		JPanel body = new JPanel();
 		body.setLayout(new BorderLayout());
@@ -90,9 +107,11 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 
 		imageInput = GeneralizedImageOps.createImage(imageType,1,1);
 		imageBinary = new ImageUInt8(1,1);
-		imageOutput = new ImageUInt8(1,1);
+		imageOutput1 = new ImageUInt8(1,1);
+		imageOutput2 = new ImageUInt8(1,1);
+		imageLabeled = new ImageSInt32(1,1);
 
-		selectedVisualize = imageOutput;
+		selectedVisualize = imageLabeled;
 
 		setMainGUI(body);
 	}
@@ -144,7 +163,9 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 	public void process( final BufferedImage image ) {
 		imageInput.reshape(image.getWidth(),image.getHeight());
 		imageBinary.reshape(image.getWidth(),image.getHeight());
-		imageOutput.reshape(image.getWidth(),image.getHeight());
+		imageOutput1.reshape(image.getWidth(),image.getHeight());
+		imageOutput2.reshape(image.getWidth(),image.getHeight());
+		imageLabeled.reshape(image.getWidth(),image.getHeight());
 
 		ConvertBufferedImage.convertFrom(image,imageInput,imageType);
 
@@ -167,21 +188,38 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 
 	@Override
 	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
+		filter1 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookies[0];
+		filter2 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookies[1];
+		filterLabel = (FilterLabelBlobs)cookies[2];
+		performWork();
 	}
 
 	@Override
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		filter = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookie;
+		switch( indexFamily ) {
+			case 0:
+				filter1 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookie;
+				break;
+			case 1:
+				filter2 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookie;
+				break;
+			case 2:
+				filterLabel = (FilterLabelBlobs)cookie;
+				break;
+		}
 
 		performWork();
 	}
 
 	private synchronized void performWork() {
-		if( filter == null )
+		if( filter1 == null || filter2 == null || filterLabel == null )
 			return;
 		GThresholdImageOps.threshold(imageInput, imageBinary, threshold, down);
-		filter.process(imageBinary,imageOutput);
+		filter1.process(imageBinary,imageOutput1);
+		filter2.process(imageOutput1,imageOutput2);
+		filterLabel.process(imageOutput2,imageLabeled);
+		if( colors == null || colors.length < filterLabel.getNumBlobs() )
+			colors = BinaryImageOps.selectRandomColors(filterLabel.getNumBlobs(),rand);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -190,13 +228,20 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 				}
 				histogramPanel.setThreshold(threshold,down);
 				histogramPanel.repaint();
-				VisualizeBinaryData.renderBinary(selectedVisualize, work);
+				renderVisualizeImage();
 				gui.setBufferedImage(work);
 				gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
 				processedImage = true;
 				gui.repaint();
 			}
 		});
+	}
+
+	private void renderVisualizeImage() {
+		if( selectedVisualize instanceof ImageUInt8)
+			VisualizeBinaryData.renderBinary((ImageUInt8) selectedVisualize, work);
+		else
+			VisualizeBinaryData.renderLabeled((ImageSInt32) selectedVisualize, work, colors);
 	}
 
 	@Override
@@ -227,11 +272,15 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 			int index = imagesCombo.getSelectedIndex();
 			if( index == 0 ) {
 				selectedVisualize = imageBinary;
-			} else {
-				selectedVisualize = imageOutput;
+			} else if( index == 1 ) {
+				selectedVisualize = imageOutput1;
+			} else if( index == 2 ) {
+				selectedVisualize = imageOutput2;
+			} else if( index == 3 ) {
+				selectedVisualize = imageLabeled;
 			}
 			if( work != null ) {
-				VisualizeBinaryData.renderBinary(selectedVisualize, work);
+				renderVisualizeImage();
 				gui.repaint();
 			}
 		} else {
@@ -240,7 +289,7 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 	}
 
 	public static void main( String args[] ) {
-		DemoBinaryImageOpsApp app = new DemoBinaryImageOpsApp(ImageFloat32.class);
+		DemoBinaryImageLabelOpsApp app = new DemoBinaryImageLabelOpsApp(ImageFloat32.class);
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("lena","data/particles01.jpg");
@@ -253,7 +302,7 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Image Noise Removal");
+		ShowImages.showWindow(app, "Label Binary Blobs");
 
 		System.out.println("Done");
 	}

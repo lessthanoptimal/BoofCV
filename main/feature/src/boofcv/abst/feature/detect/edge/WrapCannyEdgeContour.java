@@ -22,8 +22,8 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.edge.GradientToEdgeFeatures;
-import boofcv.alg.filter.binary.BinaryImageHighOps;
 import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.*;
@@ -121,7 +121,7 @@ public class WrapCannyEdgeContour<T extends ImageBase, D extends ImageBase> impl
 
 
 		// TODO investigate improving performance by tracking contour
-		int numFound = BinaryImageHighOps.hysteresisLabel8(suppressed,label,threshLow,threshHigh,false,work);
+		int numFound = ThresholdImageOps.hysteresisLabel8(suppressed, label, threshLow, threshHigh, false, work);
 
 		contours = BinaryImageOps.labelToClusters(label,numFound,queuePts);
 	}
