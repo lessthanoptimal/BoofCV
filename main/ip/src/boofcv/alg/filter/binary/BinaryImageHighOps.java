@@ -34,6 +34,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
+// todo change to Impl and put into BinaryImageOps?
 public class BinaryImageHighOps {
 
 	/**

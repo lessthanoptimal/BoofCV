@@ -24,7 +24,7 @@ import boofcv.alg.geo.SingleImageInput;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -35,6 +35,7 @@ import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 /**
@@ -42,21 +43,17 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+// todo extract out base class for handling videos
 public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmImagePanel implements ProcessInput
+		extends VideoProcessAppBase<I,D> implements ProcessInput , MouseListener
 {
 
-	long framePeriod = 150;
 	int maxFeatures = 130;
 	int minFeatures = 90;
 
 	PointSequentialTracker<I> tracker;
-	SimpleImageSequence<I> sequence;
 
 	ImagePanel gui = new ImagePanel();
-
-	volatile boolean requestStop = false;
-	volatile boolean isRunning = false;
 
 	BufferedImage workImage;
 
@@ -72,9 +69,12 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 
 		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config));
 
+		gui.addMouseListener(this);
+		gui.requestFocus();
 		setMainGUI(gui);
 	}
 
+	@Override
 	public void process( SimpleImageSequence<I> sequence ) {
 		stopWorker();
 		this.sequence = sequence;
@@ -83,7 +83,7 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 
 	@Override
 	public boolean getHasProcessedImage() {
-		return isRunning;
+		return workImage != null;
 	}
 
 	@Override
@@ -103,29 +103,15 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				I image = sequence.next();
+				gui.setPreferredSize(new Dimension(image.width,image.height));
 				workImage = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_BGR);
 				gui.setBufferedImage(workImage);
-				gui.setPreferredSize(new Dimension(image.width,image.height));
 				revalidate();
-				new WorkThread().start();
+				startWorkerThread();
 			}});
 	}
 
-	private void stopWorker() {
-		requestStop = true;
-		while( isRunning ) {
-			Thread.yield();
-		}
-		requestStop = false;
-	}
-
-	@Override
-	public void changeImage(String name, int index) {
-		VideoListManager manager = getInputManager();
-		process(manager.loadSequence(index));
-	}
-
-	void renderFeatures( BufferedImage orig , long trackingPeriodMilli ) {
+	void renderFeatures( BufferedImage orig , double trackerFPS ) {
 		Graphics2D g2 = workImage.createGraphics();
 
 		g2.drawImage(orig,0,0,orig.getWidth(),orig.getHeight(),null);
@@ -133,79 +119,41 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 			int x = (int)p.currLoc.x;
 			int y = (int)p.currLoc.y;
 
-			VisualizeFeatures.drawPoint(g2,x,y,Color.red);
+			VisualizeFeatures.drawPoint(g2,x,y,Color.blue);
 		}
 
 		for( AssociatedPair p : tracker.getNewTracks() ) {
 			int x = (int)p.currLoc.x;
 			int y = (int)p.currLoc.y;
 
-			VisualizeFeatures.drawPoint(g2,x,y,Color.blue);
+			VisualizeFeatures.drawPoint(g2,x,y,Color.green);
 		}
 
-		double trackerFPS = 1e9/trackingPeriodMilli;
 		g2.setColor(Color.WHITE);
 		g2.fillRect(5,15,140,20);
 		g2.setColor(Color.BLACK);
 		g2.drawString(String.format("Tracker FPS: %3.1f",trackerFPS),10,30);
 	}
 
+	@Override
+	protected void updateAlg(I frame) {
+		((SingleImageInput<I>)tracker).process(frame);
 
-	private class WorkThread extends Thread
-	{
-		@Override
-		public void run() {
-			isRunning = true;
-
-			long totalTrackerTime = 0;
-			long totalFrames = 0;
-
-			while( requestStop == false ) {
-				long startTime = System.currentTimeMillis();
-				// periodically reset the FPS
-				if( totalFrames > 20 ) {
-					totalFrames = 0;
-					totalTrackerTime = 0;
-				}
-
-				if( sequence.hasNext() ) {
-					I frame = sequence.next();
-
-					long startTracker = System.nanoTime();
-					((SingleImageInput<I>)tracker).process(frame);
-
-					if( tracker.getActiveTracks().size() < minFeatures ) {
-						tracker.spawnTracks();
-					}
-					totalTrackerTime += System.nanoTime()-startTracker;
-					totalFrames++;
-
-
-					// render the features
-					renderFeatures(sequence.getGuiImage(),totalTrackerTime/totalFrames);
-					gui.repaint();
-
-				}
-				while( System.currentTimeMillis()-startTime < framePeriod ) {
-					synchronized (this) {
-						try {
-							wait(System.currentTimeMillis()-startTime-10);
-						} catch (InterruptedException e) {
-							throw new RuntimeException(e);
-						}
-					}
-				}
-			}
-
-			isRunning = false;
+		if( tracker.getActiveTracks().size() < minFeatures ) {
+			tracker.spawnTracks();
 		}
+	}
+
+	@Override
+	protected void updateAlgGUI(ImageBase frame, BufferedImage imageGUI, double fps) {
+		renderFeatures(sequence.getGuiImage(),fps);
 	}
 
 	public static void main( String args[] ) {
 		VideoTrackFeaturesApp app = new VideoTrackFeaturesApp(ImageFloat32.class, ImageFloat32.class);
 
 		VideoListManager manager = new VideoListManager(ImageFloat32.class);
-		manager.add("Snow","../applet/data/snow_rail");
+		manager.add("Snow", "JPEG_ZIP", "../applet/data/driving_snow.zip");
 
 		app.setInputManager(manager);
 

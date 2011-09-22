@@ -58,12 +58,6 @@ import java.util.Vector;
  *
  * @author Peter Abeles
  */
-// TODO make custom panel
-	// select display image
-	// noise level
-	// number of levels
-	// statistics for denoised and noisy image
-// todo add non-wavelet filters
 public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W extends WlCoef>
 	extends SelectAlgorithmImagePanel implements ProcessInput, DenoiseInfoPanel.Listener
 {
