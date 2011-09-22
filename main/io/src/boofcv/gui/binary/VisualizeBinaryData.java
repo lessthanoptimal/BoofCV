@@ -53,7 +53,16 @@ public class VisualizeBinaryData {
 				}
 			}
 		} else {
-			throw new RuntimeException("Raster not supported yet");
+			int w = labelImage.getWidth();
+			int h = labelImage.getHeight();
+
+			for( int y = 0; y < h; y++ ) {
+				int indexSrc = labelImage.startIndex + y*labelImage.stride;
+				for( int x = 0; x < w; x++ ) {
+					int rgb = colors[labelImage.data[indexSrc++]];
+					out.setRGB(x,y,rgb);
+				}
+			}
 		}
 		return out;
 	}
@@ -64,25 +73,43 @@ public class VisualizeBinaryData {
 			out = new BufferedImage(binaryImage.getWidth(),binaryImage.getHeight(),BufferedImage.TYPE_BYTE_GRAY);
 		}
 
-		if( out.getRaster() instanceof ByteInterleavedRaster ) {
-			ByteInterleavedRaster raster = (ByteInterleavedRaster)out.getRaster();
-
-			int rasterIndex = 0;
-			byte data[] = raster.getDataStorage();
-
-			int w = binaryImage.getWidth();
-			int h = binaryImage.getHeight();
-
-
-			for( int y = 0; y < h; y++ ) {
-				int indexSrc = binaryImage.startIndex + y*binaryImage.stride;
-				for( int x = 0; x < w; x++ ) {
-					data[rasterIndex++] = binaryImage.data[indexSrc++] > 0 ? (byte)255 : (byte)0;
-				}
+		try {
+			if( out.getRaster() instanceof ByteInterleavedRaster ) {
+				renderBinary(binaryImage, (ByteInterleavedRaster)out.getRaster());
+			} else {
+				_renderBinary(binaryImage, out);
 			}
-		} else {
-			throw new RuntimeException("Raster not supported yet");
+		} catch( SecurityException e ) {
+			_renderBinary(binaryImage, out);
 		}
 		return out;
+	}
+
+	private static void _renderBinary(ImageUInt8 binaryImage, BufferedImage out) {
+		int w = binaryImage.getWidth();
+		int h = binaryImage.getHeight();
+
+		for( int y = 0; y < h; y++ ) {
+			int indexSrc = binaryImage.startIndex + y*binaryImage.stride;
+			for( int x = 0; x < w; x++ ) {
+				int rgb = binaryImage.data[indexSrc++] > 0 ? 0x00FFFFFF : 0;
+				out.setRGB(x,y,rgb);
+			}
+		}
+	}
+
+	private static void renderBinary(ImageUInt8 binaryImage, ByteInterleavedRaster raster) {
+		int rasterIndex = 0;
+		byte data[] = raster.getDataStorage();
+
+		int w = binaryImage.getWidth();
+		int h = binaryImage.getHeight();
+
+		for( int y = 0; y < h; y++ ) {
+			int indexSrc = binaryImage.startIndex + y*binaryImage.stride;
+			for( int x = 0; x < w; x++ ) {
+				data[rasterIndex++] = binaryImage.data[indexSrc++] > 0 ? (byte)255 : (byte)0;
+			}
+		}
 	}
 }

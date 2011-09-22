@@ -1,5 +1,5 @@
-Driving^driving_snow.zip
-Cars^shake_cars.zip
-Parking Lot^shake_parking_scan.zip
+Driving:driving_snow.zip
+Cars:shake_cars.zip
+Parking Lot:shake_parking_scan.zip
 
 

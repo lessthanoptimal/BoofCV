@@ -16,11 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.applet;
+package boofcv.abst.filter;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * @author Peter Abeles
+ * Created by IntelliJ IDEA.
+ * User: pja
+ * Date: 9/21/11
+ * Time: 11:17 PM
+ * To change this template use File | Settings | File Templates.
  */
-public class ParseImageInputFile {
+public class TestFilterImageReflection {
+
+    @Test
+    public void doStuff() {
+        fail("implement");
+    }
 }

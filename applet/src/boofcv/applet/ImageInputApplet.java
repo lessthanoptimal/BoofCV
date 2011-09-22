@@ -23,8 +23,13 @@ import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
+
+import static boofcv.applet.VideoInputApplet.getDirectory;
 
 
 /**
@@ -76,8 +81,7 @@ public class ImageInputApplet extends JApplet {
 
 	public AppletImageListManager parseImageInput( String fileName )
 	{
-		File a = new File(fileName);
-		String directory = a.getParent()+"/";
+		String directory = getDirectory(fileName);
 
 		AppletImageListManager ret = new AppletImageListManager(getCodeBase());
 		try {
@@ -87,7 +91,7 @@ public class ImageInputApplet extends JApplet {
 			String line;
 			while( (line = reader.readLine()) != null ) {
 
-				String[]z = line.split("\\^");
+				String[]z = line.split(":");
 				String[] names = new String[z.length-1];
 				for( int i = 1; i < z.length; i++ ) {
 					names[i-1] = directory+z[i];

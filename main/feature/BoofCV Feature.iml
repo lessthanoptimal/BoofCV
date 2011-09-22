@@ -23,6 +23,15 @@
     <orderEntry type="module" module-name="libpja" />
     <orderEntry type="module" module-name="ejml" />
     <orderEntry type="module" module-name="GeoRegression" />
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://$APPLICATION_HOME_DIR$/lib/junit-4.8.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

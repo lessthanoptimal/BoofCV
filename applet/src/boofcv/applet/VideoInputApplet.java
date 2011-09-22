@@ -23,7 +23,10 @@ import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 
 
@@ -76,8 +79,8 @@ public class VideoInputApplet extends JApplet {
 
 	public AppletVideoListManager parseImageInput( Class imageType , String fileName )
 	{
-		File a = new File(fileName);
-		String directory = a.getParent()+"/";
+
+		String directory = getDirectory(fileName);
 
 		AppletVideoListManager ret = new AppletVideoListManager(imageType,getCodeBase());
 		try {
@@ -89,13 +92,13 @@ public class VideoInputApplet extends JApplet {
 				if( line.length() == 0 )
 					continue;
 
-				String[]z = line.split("\\^");
+				String[]z = line.split(":");
 				String[] names = new String[z.length-1];
 				for( int i = 1; i < z.length; i++ ) {
 					names[i-1] = directory+z[i];
 				}
 
-				ret.add(z[0],names);
+				ret.add(z[0],null,names);
 			}
 
 			return ret;
@@ -105,6 +108,21 @@ public class VideoInputApplet extends JApplet {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Given the path to the file it extracts the directory containing the file
+	 */
+	public static String getDirectory( String fileName ) {
+		int tailLength = 0;
+		while( tailLength < fileName.length() ) {
+			if( fileName.charAt(fileName.length()-tailLength-1) == '/') {
+				break;
+			} else {
+				tailLength++;
+			}
+		}
+		return fileName.substring(0,fileName.length()-tailLength);
 	}
 
 	@Override

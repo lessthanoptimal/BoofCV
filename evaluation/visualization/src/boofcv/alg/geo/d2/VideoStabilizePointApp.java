@@ -25,7 +25,7 @@ import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoListManager;
@@ -54,31 +54,22 @@ import java.awt.image.BufferedImage;
 
 	
 public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmImagePanel implements ProcessInput
+		extends VideoProcessAppBase<I,D> implements ProcessInput
 {
-
-	long framePeriod = 150;
 	int maxFeatures = 250;
 	int minFeatures = 150;
 	static int thresholdChange = 80;
 	static int thresholdReset = 30;
-	static double thresholdDistance = 50;
+	static double thresholdDistance = 100;
 
-	int videoIndex;
 	Class<I> imageType;
-
-	EvaluateImageStabilization<I> evaluator = new EvaluateImageStabilization<I>();
 
 	PointSequentialTracker<I> tracker;
 	ModelMatcher<Affine2D_F64,AssociatedPair> modelMatcher;
-	SimpleImageSequence<I> sequence;
 
 	PointImageStabilization<I> stabilizer;
 
 	DisplayPanel gui = new DisplayPanel();
-
-	volatile boolean requestStop = false;
-	volatile boolean isRunning = false;
 
 	BufferedImage workImage;
 
@@ -115,6 +106,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 				new StatisticalDistanceModelMatcher<Affine2D_F64,AssociatedPair>(25,0.001,0.001,1.2,
 				numSample, StatisticalDistance.PERCENTILE,0.9,modelFitter,distance,codec));
 
+		gui.addMouseListener(this);
 		setMainGUI(gui);
 	}
 
@@ -126,7 +118,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 
 	@Override
 	public boolean getHasProcessedImage() {
-		return isRunning;
+		return workImage != null;
 	}
 
 	@Override
@@ -169,23 +161,8 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 				workImage = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_BGR);
 				gui.setPreferredSize(new Dimension(image.width*2+10,image.height));
 				revalidate();
-				new WorkThread().start();
+				startWorkerThread();
 			}});
-	}
-
-	private void stopWorker() {
-		requestStop = true;
-		while( isRunning ) {
-			Thread.yield();
-		}
-		requestStop = false;
-	}
-
-	@Override
-	public void changeImage(String name, int index) {
-		this.videoIndex = index;
-		VideoListManager manager = getInputManager();
-		process(manager.loadSequence(index));
 	}
 
 	private class DisplayPanel extends JPanel
@@ -239,65 +216,29 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		}
 	}
 
+	@Override
+	protected void updateAlg(I frame) {
+		stabilizer.process(frame);
+	}
 
-	private class WorkThread extends Thread
-	{
-		@Override
-		public void run() {
-			isRunning = true;
-
-			long totalTrackerTime = 0;
-			long totalFrames = 0;
-
-
-			while( requestStop == false ) {
-				long startTime = System.currentTimeMillis();
-				// periodically reset the FPS
-				if( totalFrames > 20 ) {
-					totalFrames = 0;
-					totalTrackerTime = 0;
-				}
-
-				if( sequence.hasNext() ) {
-					I frame = sequence.next();
-
-					long startTracker = System.nanoTime();
-					stabilizer.process(frame);
-					I stabilizedImage = stabilizer.getStabilizedImage();
-					totalTrackerTime += System.nanoTime()-startTracker;
-					totalFrames++;
-
-					ConvertBufferedImage.convertTo(stabilizedImage,workImage);
-					gui.setTrackerFPS(1e9/(totalTrackerTime/(double)totalFrames));
-
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							gui.setImages(sequence.getGuiImage(),workImage);
-							gui.repaint();
-						}});
-
-				}
-				while( System.currentTimeMillis()-startTime < framePeriod ) {
-					synchronized (this) {
-						try {
-							wait(System.currentTimeMillis()-startTime-10);
-						} catch (InterruptedException e) {
-							throw new RuntimeException(e);
-						}
-					}
-				}
-			}
-
-			isRunning = false;
-		}
+	@Override
+	protected void updateAlgGUI(I frame, BufferedImage imageGUI, double fps) {
+		I stabilizedImage = stabilizer.getStabilizedImage();
+		ConvertBufferedImage.convertTo(stabilizedImage,workImage);
+		gui.setTrackerFPS(fps);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui.setImages(sequence.getGuiImage(),workImage);
+				gui.repaint();
+			}});
 	}
 
 	public static void main( String args[] ) {
 		VideoStabilizePointApp app = new VideoStabilizePointApp(ImageFloat32.class, ImageFloat32.class);
 
 		VideoListManager manager = new VideoListManager(ImageFloat32.class);
-		manager.add("Smaller","/home/pja/2011_09_20/parking_wobble.wmv");
-		manager.add("Snow","/home/pja/2011_09_20/MAQ00687.MP4");
+		manager.add("Smaller", null, "/home/pja/cv/MAQ00684.MP4");
+		manager.add("Snow", null, "/home/pja/cv/small.mp4");
 
 		app.setInputManager(manager);
 

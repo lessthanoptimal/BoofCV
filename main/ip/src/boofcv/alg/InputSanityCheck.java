@@ -28,6 +28,27 @@ import boofcv.struct.image.ImageBase;
 public class InputSanityCheck {
 
 	/**
+	 * Checks to see if the target image is null or if it is a different size than
+	 * the test image.  If it is null then a new image is returned, otherwise
+	 * target is reshaped and returned.
+	 *
+	 * @param target
+	 * @param testImage
+	 * @param targetType
+	 * @param <T>
+	 * @return
+	 */
+	public static <T extends ImageBase> T checkReshape( T target , ImageBase testImage , Class<T> targetType )
+	{
+		if( target == null ) {
+			return GeneralizedImageOps.createImage(targetType,testImage.width,testImage.height);
+		} else if( target.width != testImage.width || target.height != testImage.height ) {
+			target.reshape(testImage.width,testImage.height);
+		}
+		return  target;
+	}
+
+	/**
 	 * If the output has not been declared a new instance is declared.  If an instance of the output
 	 * is provided its bounds are checked.
 	 */
