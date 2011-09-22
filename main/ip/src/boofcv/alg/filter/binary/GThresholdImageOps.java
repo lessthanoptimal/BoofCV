@@ -70,4 +70,86 @@ public class GThresholdImageOps {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
 	}
+
+	/**
+	 * <p>
+	 * Hysteresis thresholding and blob labeling with a connect-4 rule. The input image is thresholded and the resulting
+	 * blobs are labeled.
+	 * </p>
+	 *
+	 * <p>
+	 * Hysteresis thresholding works by first detecting if a pixel is within a more stringent threshold.  If it is
+	 * then a less stringent threshold is used for all the connected pixels. The threshold direction determines
+	 * if the lower or upper threshold is more or less stringent.  When thresholding down the the lower threshold
+	 * is more stringent and the upper less. The opposite is true for when being thresholded up.
+	 * </p>
+	 *
+	 * @param input Input intensity image. Not modified.
+	 * @param output Output labeled binary image. Modified.
+	 * @param lowerThreshold Lower threshold.
+	 * @param upperThreshold Upper threshold.
+	 * @param down If it is being thresholded down or up.
+	 * @param work Work image which stores intermediate results and is the same size as the input image.  If null one will be declared internally.
+	 * @return Number of blobs found.
+	 */
+	public static <T extends ImageBase>
+			void hysteresisLabel4( T input , ImageSInt32 output ,
+								   double lowerThreshold , double upperThreshold , boolean down ,
+								   ImageUInt8 work )
+	{
+		if( input instanceof ImageFloat32 ) {
+			ThresholdImageOps.hysteresisLabel4((ImageFloat32)input,output,(float)lowerThreshold,(float)upperThreshold,down,work);
+		} else if( input instanceof ImageFloat64 ) {
+			ThresholdImageOps.hysteresisLabel4((ImageFloat64)input,output,lowerThreshold,upperThreshold,down,work);
+		} else if( input instanceof ImageUInt8 ) {
+			ThresholdImageOps.hysteresisLabel4((ImageUInt8)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+		} else if( input instanceof ImageSInt16) {
+			ThresholdImageOps.hysteresisLabel4((ImageSInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+		} else if( input instanceof ImageUInt16) {
+			ThresholdImageOps.hysteresisLabel4((ImageUInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+		} else if( input instanceof ImageSInt32) {
+			ThresholdImageOps.hysteresisLabel4((ImageSInt32)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+		}
+	}
+
+	/**
+	 * <p>
+	 * Hysteresis thresholding and blob labeling with a connect-8 rule. The input image is thresholded and the resulting
+	 * blobs are labeled.
+	 * </p>
+	 *
+	 * <p>
+	 * Hysteresis thresholding works by first detecting if a pixel is within a more stringent threshold.  If it is
+	 * then a less stringent threshold is used for all the connected pixels. The threshold direction determines
+	 * if the lower or upper threshold is more or less stringent.  When thresholding down the the lower threshold
+	 * is more stringent and the upper less. The opposite is true for when being thresholded up.
+	 * </p>
+	 *
+	 * @param input Input intensity image. Not modified.
+	 * @param output Output labeled binary image. Modified.
+	 * @param lowerThreshold Lower threshold.
+	 * @param upperThreshold Upper threshold.
+	 * @param down If it is being thresholded down or up.
+	 * @param work Work image which stores intermediate results and is the same size as the input image.  If null one will be declared internally.
+	 * @return Number of blobs found.
+	 */
+	public static <T extends ImageBase>
+			void hysteresisLabel8( T input , ImageSInt32 output ,
+								   double lowerThreshold , double upperThreshold , boolean down ,
+								   ImageUInt8 work )
+	{
+		if( input instanceof ImageFloat32 ) {
+			ThresholdImageOps.hysteresisLabel8((ImageFloat32)input,output,(float)lowerThreshold,(float)upperThreshold,down,work);
+		} else if( input instanceof ImageFloat64 ) {
+			ThresholdImageOps.hysteresisLabel8((ImageFloat64)input,output,lowerThreshold,upperThreshold,down,work);
+		} else if( input instanceof ImageUInt8 ) {
+			ThresholdImageOps.hysteresisLabel8((ImageUInt8)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+		} else if( input instanceof ImageSInt16) {
+			ThresholdImageOps.hysteresisLabel8((ImageSInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+		} else if( input instanceof ImageUInt16) {
+			ThresholdImageOps.hysteresisLabel8((ImageUInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+		} else if( input instanceof ImageSInt32) {
+			ThresholdImageOps.hysteresisLabel8((ImageSInt32)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+		}
+	}
 }

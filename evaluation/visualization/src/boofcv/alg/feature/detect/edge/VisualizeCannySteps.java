@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.edge;
 
 import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.filter.binary.BinaryImageHighOps;
+import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -78,7 +78,7 @@ public class VisualizeCannySteps {
 		GradientToEdgeFeatures.direction(derivX,derivY,orientation);
 		GradientToEdgeFeatures.discretizeDirection4(orientation,direction);
 		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction,suppressed);
-		int numFound = BinaryImageHighOps.hysteresisLabel8(suppressed,labeled,threshLow,threshHigh,false,work);
+		int numFound = ThresholdImageOps.hysteresisLabel8(suppressed, labeled, threshLow, threshHigh, false, work);
 
 		Random rand = new Random(234);
 		int colors[] = new int[ numFound+1 ];

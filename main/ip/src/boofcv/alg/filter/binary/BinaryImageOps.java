@@ -28,6 +28,7 @@ import georegression.struct.point.Point2D_I32;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * <p>
@@ -376,5 +377,14 @@ public class BinaryImageOps {
 			maxConnect = new GrowingArrayInt(20);
 
 		return maxConnect;
+	}
+
+	public static int[] selectRandomColors( int numBlobs , Random rand ) {
+		int colors[] = new int[ numBlobs+1 ];
+		for( int i = 0; i < colors.length; i++ ) {
+			colors[i] = rand.nextInt();
+		}
+		colors[0] = 0xFFFFFF;
+		return colors;
 	}
 }

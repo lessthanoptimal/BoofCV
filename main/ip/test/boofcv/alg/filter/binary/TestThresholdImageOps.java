@@ -37,6 +37,21 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestThresholdImageOps {
 
+	int[] patternDo = new int[]{0,0,0,0,0,0,0,0,0,0,
+								0,0,0,1,1,0,1,0,0,0,
+								0,0,1,1,1,1,0,0,0,0,
+								0,0,1,1,5,0,0,0,1,0,
+								0,0,0,1,1,0,0,1,1,0,
+								0,0,0,0,0,0,0,0,1,0};
+
+	int[] patternUp = new int[]{6,6,6,6,6,6,6,6,6,6,
+								6,6,6,5,5,6,5,6,6,6,
+							 	6,6,5,5,5,5,6,6,6,6,
+							 	6,6,5,5,2,6,6,6,5,6,
+								6,6,6,5,5,6,6,5,5,6,
+								6,6,6,6,6,6,6,6,5,6};
+
+
 	int width = 20;
 	int height = 30;
 
@@ -127,5 +142,110 @@ public class TestThresholdImageOps {
 		for( int i = 7; i < width; i++ ) {
 			assertEquals(i,results[i]);
 		}
+	}
+
+		@Test
+	public void hysteresisLabel4() {
+		int total = 0;
+		Method[] list = ThresholdImageOps.class.getMethods();
+
+			int width = 10;
+			int height = 6;
+
+		for( Method m : list ) {
+			if( !m.getName().equals("hysteresisLabel4"))
+				continue;
+
+			Class<?> param[] = m.getParameterTypes();
+
+			ImageBase inputDown = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageBase inputUp = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSInt32 labeled = new ImageSInt32(width,height);
+
+			SingleBandImage a = FactorySingleBandImage.wrap(inputDown);
+			for( int y = 0; y < height; y++ ) {
+				for( int x = 0; x < width; x++ ) {
+					a.set(x,y,patternDo[y*width+x]);
+				}
+			}
+
+			a = FactorySingleBandImage.wrap(inputUp);
+			for( int y = 0; y < height; y++ ) {
+				for( int x = 0; x < width; x++ ) {
+					a.set(x,y,patternUp[y*width+x]);
+				}
+			}
+
+			BoofTesting.checkSubImage(this,"performHysteresisLabel",true,m,11,inputDown,inputUp,labeled);
+			total++;
+		}
+
+		assertEquals(6,total);
+	}
+
+	@Test
+	public void hysteresisLabel8() {
+		int total = 0;
+		Method[] list = ThresholdImageOps.class.getMethods();
+
+		int width = 10;
+		int height = 6;
+
+		for( Method m : list ) {
+			if( !m.getName().equals("hysteresisLabel8"))
+				continue;
+
+			Class<?> param[] = m.getParameterTypes();
+
+			ImageBase inputDown = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageBase inputUp = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSInt32 labeled = new ImageSInt32(width,height);
+
+			SingleBandImage a = FactorySingleBandImage.wrap(inputDown);
+			for( int y = 0; y < height; y++ ) {
+				for( int x = 0; x < width; x++ ) {
+					a.set(x,y,patternDo[y*width+x]);
+				}
+			}
+
+			a = FactorySingleBandImage.wrap(inputUp);
+			for( int y = 0; y < height; y++ ) {
+				for( int x = 0; x < width; x++ ) {
+					a.set(x,y,patternUp[y*width+x]);
+				}
+			}
+
+			BoofTesting.checkSubImage(this,"performHysteresisLabel",true,m,12,inputDown,inputUp,labeled);
+			total++;
+		}
+
+		assertEquals(6,total);
+	}
+
+	public void performHysteresisLabel( Method m , Integer expected , ImageBase inputDown , ImageBase inputUp , ImageSInt32 labeled )
+			throws InvocationTargetException, IllegalAccessException
+	{
+		int numFound = (Integer)m.invoke(null,inputUp,labeled,3,5,true,null);
+		assertEquals(1,numFound);
+		assertEquals(expected, countNotZero(labeled),1e-4);
+
+		numFound = (Integer)m.invoke(null,inputDown,labeled,1,4,false,null);
+		assertEquals(1,numFound);
+		assertEquals(expected, countNotZero(labeled),1e-4);
+	}
+
+	private int countNotZero( ImageBase image ) {
+		SingleBandImage a = FactorySingleBandImage.wrap(image);
+
+		int ret = 0;
+
+		for( int i = 0; i < a.getHeight(); i++ ) {
+			for( int j = 0; j < a.getWidth(); j++ ) {
+				if( a.get(j,i).intValue() != 0 )
+					ret++;
+			}
+		}
+
+		return ret;
 	}
 }
