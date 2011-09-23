@@ -41,13 +41,17 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixel<Ima
 	private KernelContinuous1D_F32 kernel;
 	// input image
 	private ImageSInt16 image;
+	// minimum and maximum allowed pixel values
+	private float min,max;
 
-	public ImplInterpolatePixelConvolution_S16(KernelContinuous1D_F32 kernel) {
+	public ImplInterpolatePixelConvolution_S16(KernelContinuous1D_F32 kernel , float min , float max ) {
 		this.kernel = kernel;
+		this.min = min;
+		this.max = max;
 	}
 
 	@Override
-	public void setImage(ImageSInt16 image) {
+	public void setImage(ImageSInt16 image ) {
 		this.image = image;
 	}
 
@@ -93,7 +97,14 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixel<Ima
 			value += w*valueX/totalWeightX;
 		}
 
-		return value/totalWeightY;
+		value /= totalWeightY;
+		
+		if( value > max )
+			return max;
+		else if( value < min )
+			return min;
+		else
+			return value;
 	}
 
 	@Override
@@ -122,8 +133,13 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixel<Ima
 			value += w*valueX;
 		}
 
-		return value;
-	}
+		if( value > max )
+			return max;
+		else if( value < min )
+			return min;
+		else
+			return value
+;	}
 
 
 }

@@ -38,7 +38,7 @@ public class TestImplInterpolatePixelConvolution_F32 extends GeneralInterpolatio
 
 	@Override
 	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image) {
-		InterpolatePixel<ImageFloat32> ret = new ImplInterpolatePixelConvolution_F32(new Dummy());
+		InterpolatePixel<ImageFloat32> ret = new ImplInterpolatePixelConvolution_F32(new Dummy(),0,255);
 		ret.setImage(image);
 
 		return ret;

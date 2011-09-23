@@ -54,20 +54,20 @@ public class ImplPolynomialPixel_F32 implements InterpolatePixel<ImageFloat32>  
 
     private PolynomialNevilleFixed_F32 interp1D;
 
-    public ImplPolynomialPixel_F32(int M, float min, float max) {
-        this.M = M;
+    public ImplPolynomialPixel_F32(int maxDegree, float min, float max) {
+        this.M = maxDegree;
         this.min = min;
         this.max = max;
-        horiz = new float[M];
-        vert = new float[M];
+        horiz = new float[maxDegree];
+        vert = new float[maxDegree];
 
-        if( M % 2 == 0 ) {
+        if( maxDegree % 2 == 0 ) {
             offM = 1;
         } else {
             offM = 0;
         }
 
-        interp1D = new PolynomialNevilleFixed_F32(M);
+        interp1D = new PolynomialNevilleFixed_F32(maxDegree);
     }
 
     @Override

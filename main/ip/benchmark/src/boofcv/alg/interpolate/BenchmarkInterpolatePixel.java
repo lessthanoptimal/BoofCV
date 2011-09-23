@@ -18,13 +18,13 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.alg.interpolate.impl.BilinearPixel_F32;
 import boofcv.alg.interpolate.impl.ImplInterpolatePixelConvolution_F32;
 import boofcv.alg.interpolate.impl.NearestNeighborPixel_F32;
 import boofcv.alg.interpolate.kernel.BicubicKernel_F32;
 import boofcv.alg.misc.ImageTestingOps;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 
@@ -82,7 +82,7 @@ public class BenchmarkInterpolatePixel {
 	}
 
 	public static class BilinearConvolution_Safe_F32 extends PerformerBase {
-		ImplInterpolatePixelConvolution_F32 alg = new ImplInterpolatePixelConvolution_F32(new BicubicKernel_F32(-0.5f));
+		ImplInterpolatePixelConvolution_F32 alg = new ImplInterpolatePixelConvolution_F32(new BicubicKernel_F32(-0.5f),0,255);
 
 		@Override
 		public void process() {
