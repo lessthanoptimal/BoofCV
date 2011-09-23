@@ -92,7 +92,7 @@ public class DistortSupport {
 	public static <T extends ImageBase>
 	ImageDistort<T> createDistort( Class<T> imageType , PixelTransform dstToSrc , TypeInterpolate interpType)
 	{
-		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(imageType, interpType);
+		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, imageType);
 		return createDistort(imageType,dstToSrc,interp);
 	}
 

@@ -18,6 +18,7 @@
 
 package boofcv.gui.image;
 
+import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.struct.image.ImageSInt32;
 
@@ -51,12 +52,9 @@ public class ImageBinaryLabeledPanel extends JPanel implements MouseListener {
 		setMinimumSize(getPreferredSize());
 		setMaximumSize(getPreferredSize());
 
-		Random rand = new Random(2342);
+		Random rand = new Random(randSeed);
 
-		colors = new int[ maxValues ];
-		for( int i = 1; i < maxValues; i++ ) {
-			colors[i] = rand.nextInt(0xFFFFFF);
-		}
+		colors = BinaryImageOps.selectRandomColors(maxValues,rand);
 		VisualizeBinaryData.renderLabeled(labelImage,img,colors);
 	}
 

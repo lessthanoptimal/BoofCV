@@ -18,16 +18,11 @@
 
 package boofcv.factory.filter.derivative;
 
-import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.derivative.*;
 import boofcv.alg.filter.derivative.*;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
-import boofcv.factory.filter.convolve.FactoryConvolve;
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
@@ -171,24 +166,6 @@ public class FactoryDerivative {
 			return (ImageHessian<D>)hessian(GradientThree.class,ImageSInt16.class);
 		else
 			throw new IllegalArgumentException("Not supported yet");
-	}
-
-	public static <D extends ImageBase> ImageHessian<D> hessianGaussian( int radius , double sigma ,
-																		 Class<D> derivType )
-	{
-		// need to do this here to make sure the blur and derivative functions have the same paramters.
-		if( radius <= 0 )
-			radius = FactoryKernelGaussian.radiusForSigma(sigma,1);
-		else if( sigma <= 0 )
-			sigma = FactoryKernelGaussian.sigmaForRadius(radius,1);
-
-		Kernel1D kernelDeriv = FactoryKernelGaussian.derivativeI(derivType,1,sigma,radius);
-
-		BorderType borderDeriv = BorderType.EXTENDED;
-		FilterImageInterface<D, D> derivX = FactoryConvolve.convolve(kernelDeriv,derivType,derivType, borderDeriv,true);
-		FilterImageInterface<D, D> derivY = FactoryConvolve.convolve(kernelDeriv,derivType,derivType, borderDeriv,false);
-
-		return new ImageHessian_Filter<D>(derivX,derivY,derivType);
 	}
 
 	private static Method findDerivative(Class<?> derivativeClass,

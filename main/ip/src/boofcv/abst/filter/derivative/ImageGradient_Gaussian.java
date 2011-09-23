@@ -18,9 +18,10 @@
 
 package boofcv.abst.filter.derivative;
 
-import boofcv.abst.filter.FilterImageInterface;
+import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.factory.filter.convolve.FactoryConvolve;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.ImageBase;
@@ -37,24 +38,18 @@ import static boofcv.factory.filter.kernel.FactoryKernelGaussian.sigmaForRadius;
 public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 		implements ImageGradient<I, D> {
 
-	// default border types.
-	// These have been selected to maximize visual appearance while sacrificing some theoretical properties
-	private BorderType borderBlur = BorderType.NORMALIZED;
-	private BorderType borderDeriv = BorderType.EXTENDED;
+	// default border.
+	private BorderType borderType = BorderType.EXTENDED;
+	ImageBorder border;
 
-	// filters for computing image derivatives
-	private FilterImageInterface<I, D> derivX_H;
-	private FilterImageInterface<I, I> blurX;
-	private FilterImageInterface<I, I> blurY;
-	private FilterImageInterface<I, D> derivY_V;
 	// storage the results after the first gaussian blur
 	private I storage;
 
-	// kernel's radius and the image border
-	private int borderSize;
-
 	// type of input/output images
 	private Class<D> derivType;
+
+	Kernel1D kernelBlur;
+	Kernel1D kernelDeriv;
 
 	public ImageGradient_Gaussian(int radius , Class<I> inputType , Class<D> derivType) {
 		this(sigmaForRadius(radius,0),radius,inputType,derivType);
@@ -62,7 +57,6 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 
 	public ImageGradient_Gaussian(double sigma, int radius,
 								  Class<I> inputType , Class<D> derivType ) {
-		this.borderSize = radius;
 		this.derivType = derivType;
 
 		// need to do this here to make sure the blur and derivative functions have the same paramters.
@@ -71,13 +65,9 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 		else if( sigma <= 0 )
 			sigma = FactoryKernelGaussian.sigmaForRadius(radius,1);
 
-		Kernel1D kernel = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
-		Kernel1D kernelDeriv = FactoryKernelGaussian.derivativeI(inputType,1,sigma,radius);
-
-		derivX_H = FactoryConvolve.convolve(kernelDeriv,inputType,derivType, borderDeriv,true);
-		blurX = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur,true);
-		blurY = FactoryConvolve.convolve(kernel,inputType,inputType, borderBlur,false);
-		derivY_V = FactoryConvolve.convolve(kernelDeriv,inputType,derivType, borderDeriv,false);
+		kernelBlur = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
+		kernelDeriv = FactoryKernelGaussian.derivativeI(inputType,1,sigma,radius);
+		border = FactoryImageBorder.general(derivType,borderType);
 	}
 
 	@SuppressWarnings({"unchecked"})
@@ -90,45 +80,26 @@ public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
 			storage.reshape(inputImage.width,inputImage.height);
 		}
 
-		blurY.process(inputImage,storage);
-		derivX_H.process(storage,derivX);
-		blurX.process(inputImage,storage);
-		derivY_V.process(storage,derivY);
-	}
-
-	public BorderType getBorderBlur() {
-		return borderBlur;
-	}
-
-	public void setBorderBlur(BorderType borderBlur) {
-		this.borderBlur = borderBlur;
-	}
-
-	public BorderType getBorderDeriv() {
-		return borderDeriv;
-	}
-
-	public void setBorderDeriv(BorderType borderDeriv) {
-		this.borderDeriv = borderDeriv;
+		GConvolveImageOps.verticalNormalized(kernelBlur,inputImage,storage);
+		GConvolveImageOps.horizontal(kernelDeriv,storage,derivX,border );
+		GConvolveImageOps.horizontalNormalized(kernelBlur,inputImage,storage);
+		GConvolveImageOps.vertical(kernelDeriv,storage,derivY,border );
 	}
 
 	@Override
 	public void setBorderType(BorderType type) {
-		this.borderBlur = type;
-		this.borderDeriv = type;
+		this.borderType = type;
+		border = FactoryImageBorder.general(derivType,borderType);
 	}
 
 	@Override
 	public BorderType getBorderType() {
-		return borderDeriv;
+		return borderType;
 	}
 
 	@Override
 	public int getBorder() {
-		if( borderDeriv == BorderType.SKIP)
-			return 0;
-		else
-			return borderSize;
+		return 0;
 	}
 
 	@Override

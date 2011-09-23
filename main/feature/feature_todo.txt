@@ -20,8 +20,6 @@ Trackers
 
 - Do all non-max feature suppression process borders?
 
-- How to handle interest point and corner detector?
-
 - Ignore Borders
   * WrapperKitRosCornerIntensity: add ignore border parameter for when the derivative has an ignore border?
   * WrapperLaplacianBlobIntensity: same

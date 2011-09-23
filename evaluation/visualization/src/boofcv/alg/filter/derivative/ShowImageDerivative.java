@@ -67,7 +67,7 @@ public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
 		addAlgorithm(0, "Sobel",h);
 		h = new Helper(three(imageType,derivType),hessianThree(derivType));
 		addAlgorithm(0, "Three",h);
-		h = new Helper(gaussian(-1,3,imageType,derivType),hessianGaussian(-1,3,derivType));
+		h = new Helper(gaussian(-1,3,imageType,derivType),hessianThree(derivType));
 		addAlgorithm(0, "Gaussian", h);
 
 		setMainGUI(panel);

@@ -15,10 +15,8 @@
    - Provide support for ImageSInt32?
    - Do a better job bormalizing?
    - See ShowImageDerivative
- * The hessian XY is likely to be computed incorrectly in several locations
-   - See ImageHessian_Filter for an example of what's going on
+ * Check comments for Sobel and Prewitt.  Can you really compute it from those kernels?
  * Include the image border for the Laplacian
- * Why are values of gaussian swapped?
 
 - Denoise
  * After an integer wavelet has been added that is energy conserving:
@@ -61,6 +59,8 @@
    * That operation would only be used in specialized cases, which likely could have further optimizations.
    * Pro of keeping it is that it could make this easier to program in the long run
  * Bicubic seems to have overflow issues
+ * Move 1D interpolation into libpja?
+ * Add more types to polynomial, improve tests, and refine
 
 - Have a morphological filter section?
  * Add gray scale morphological operators

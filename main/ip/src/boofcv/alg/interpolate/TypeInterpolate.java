@@ -27,5 +27,6 @@ package boofcv.alg.interpolate;
 public enum TypeInterpolate {
 	NEAREST_NEIGHBOR,
 	BILINEAR,
-	BICUBIC
+	BICUBIC,
+	POLYNOMIAL4
 }
