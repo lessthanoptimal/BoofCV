@@ -44,7 +44,7 @@ public class FactoryInterpolation {
 				return bilinearPixel(imageType);
 
 			case BICUBIC:
-				return bicubic(0.5f, imageType);
+				return bicubic(0.5f, (float)min, (float)max, imageType);
 
 			case POLYNOMIAL4:
 				return polynomial(4,min,max,imageType);
@@ -116,21 +116,21 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageBase> InterpolatePixel<T> bicubic(float param, Class<T> type) {
+	public static <T extends ImageBase> InterpolatePixel<T> bicubic(float param, float min , float max ,Class<T> type) {
 		BicubicKernel_F32 kernel = new BicubicKernel_F32(param);
 		if( type == ImageFloat32.class )
-			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_F32(kernel);
+			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_F32(kernel,min,max);
 		else if( type == ImageUInt8.class )
-			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_U8(kernel);
+			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_U8(kernel,min,max);
 		else if( type == ImageSInt16.class )
-			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_S16(kernel);
+			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_S16(kernel,min,max);
 		else
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageBase> InterpolatePixel<T> polynomial( int M , double min , double max , Class<T> type ) {
+	public static <T extends ImageBase> InterpolatePixel<T> polynomial( int maxDegree , double min , double max , Class<T> type ) {
 		if( type == ImageFloat32.class )
-			return (InterpolatePixel<T>)new ImplPolynomialPixel_F32(M,(float)min,(float)max);
+			return (InterpolatePixel<T>)new ImplPolynomialPixel_F32(maxDegree,(float)min,(float)max);
 		else
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}

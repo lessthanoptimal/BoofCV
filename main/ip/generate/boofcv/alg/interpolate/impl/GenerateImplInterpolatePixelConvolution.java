@@ -82,9 +82,13 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\tprivate KernelContinuous1D_F32 kernel;\n" +
 				"\t// input image\n" +
 				"\tprivate "+inputType.getImageName()+" image;\n" +
+				"\t// minimum and maximum allowed pixel values\n" +
+				"\tprivate float min,max;\n" +
 				"\n" +
-				"\tpublic "+fileName+"(KernelContinuous1D_F32 kernel) {\n" +
+				"\tpublic "+fileName+"(KernelContinuous1D_F32 kernel , float min , float max ) {\n" +
 				"\t\tthis.kernel = kernel;\n" +
+				"\t\tthis.min = min;\n" +
+				"\t\tthis.max = max;\n" +
 				"\t}\n\n");
 	}
 
@@ -93,7 +97,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 		String bitWise = inputType.getBitWise();
 
 		out.print("\t@Override\n" +
-				"\tpublic void setImage("+inputType.getImageName()+" image) {\n" +
+				"\tpublic void setImage("+inputType.getImageName()+" image ) {\n" +
 				"\t\tthis.image = image;\n" +
 				"\t}\n" +
 				"\n" +
@@ -139,7 +143,14 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\t\t\tvalue += w*valueX/totalWeightX;\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\treturn value/totalWeightY;\n" +
+				"\t\tvalue /= totalWeightY;\n" +
+				"\t\t\n" +
+				"\t\tif( value > max )\n" +
+				"\t\t\treturn max;\n" +
+				"\t\telse if( value < min )\n" +
+				"\t\t\treturn min;\n" +
+				"\t\telse\n" +
+				"\t\t\treturn value;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
@@ -168,7 +179,12 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\t\t\tvalue += w*valueX;\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\treturn value;\n" +
+				"\t\tif( value > max )\n" +
+				"\t\t\treturn max;\n" +
+				"\t\telse if( value < min )\n" +
+				"\t\t\treturn min;\n" +
+				"\t\telse\n" +
+				"\t\t\treturn value\n;"+
 				"\t}\n\n");
 	}
 
