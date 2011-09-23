@@ -60,7 +60,7 @@ public class PolynomialNevilleFixed_F32 {
 
 		int M = i1 - i0 + 1;
 
-		// compute hte closest index
+		// compute the closest index
 		int closestIndex = sample % 1f <= 0.5f ? (int) sample : ((int) sample) + 1;
 		if (closestIndex > i1) closestIndex = i1;
 		else if (closestIndex < i0) closestIndex = i0;

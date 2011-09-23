@@ -26,6 +26,8 @@ import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 
+import java.awt.*;
+
 
 /**
  * @author Peter Abeles
@@ -48,6 +50,8 @@ public class DisplaySteerableGaussianApp <T extends ImageBase, K extends Kernel2
 
 		DisplaySteerableGaussianApp<ImageSInt32, Kernel2D_I32> app =
 				new DisplaySteerableGaussianApp<ImageSInt32,Kernel2D_I32>(ImageSInt32.class);
+
+		app.setPreferredSize(new Dimension(1000,480));
 
 		ShowImages.showWindow(app,"Steerable Gaussian Kernels");
 	}

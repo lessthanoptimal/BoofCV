@@ -41,17 +41,34 @@ public abstract class SelectAlgorithmPanel extends JPanel
 	JComboBox algBox;
 	List<Object> algCookies = new ArrayList<Object>();
 	ImageListManager imageManager;
+	Component gui;
 
 	public SelectAlgorithmPanel() {
 		super(new BorderLayout());
 
 		toolbar = new JToolBar();
 		algBox = new JComboBox();
+		algBox.setMaximumSize(algBox.getPreferredSize());
 		toolbar.add(algBox);
 
 		algBox.addActionListener(this);
 
+		toolbar.add(Box.createHorizontalGlue());
 		add(toolbar, BorderLayout.PAGE_START);
+	}
+
+	/**
+	 * Used to add the main GUI to this panel.   Must use this function.
+	 * Algorithm change events will not be posted until this function has been set.
+	 *
+	 * @param gui The main GUI being displayed.
+	 */
+	public void setMainGUI( final Component gui ) {
+		this.gui = gui;
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				add(gui,BorderLayout.CENTER);
+			}});
 	}
 
 	public void addAlgorithm( final String name , Object cookie ) {

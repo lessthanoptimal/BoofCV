@@ -64,6 +64,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 		addAlgorithm(0, "Bilinear",FactoryInterpolation.bilinearPixel(imageType));
 		addAlgorithm(0, "Bicubic Kernel",FactoryInterpolation.bicubic(-0.5f, imageType));
 		addAlgorithm(0, "Polynomial 4",FactoryInterpolation.polynomial(4, 0, 255, imageType));
+		addAlgorithm(0, "Polynomial 10",FactoryInterpolation.polynomial(10, 0, 255, imageType));
 
 		setPreferredSize(new Dimension(300,300));
 		addComponentListener(this);

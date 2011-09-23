@@ -47,6 +47,8 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 	JCheckBox originalCheck;
 	List<Object> algCookies[];
 	InputListManager imageManager;
+	// components which had been externally added
+	List<JComponent> addedComponents = new ArrayList<JComponent>();
 
 	// what the original image was before any processing
 	BufferedImage inputImage;
@@ -85,6 +87,17 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 		originalCheck.setEnabled(false);
 
 		add(toolbar, BorderLayout.PAGE_START);
+	}
+
+	/**
+	 * Adds a new component into the toolbar.
+	 *
+	 * @param comp The component being added
+	 */
+	public void addToToolbar( JComponent comp ) {
+		toolbar.add(comp,1+algBoxes.length);
+		toolbar.revalidate();
+		addedComponents.add(comp);
 	}
 
 	/**
@@ -175,6 +188,9 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 			public void run() {
 				toolbar.setEnabled(isEnabled);
 				for( JComboBox b : algBoxes ) {
+					b.setEnabled(isEnabled);
+				}
+				for( JComponent b : addedComponents ) {
 					b.setEnabled(isEnabled);
 				}
 				imageBox.setEnabled(isEnabled);
