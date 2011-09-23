@@ -54,8 +54,6 @@ public class ImplPolynomialPixel_F32 implements InterpolatePixel<ImageFloat32>  
 
     private PolynomialNevilleFixed_F32 interp1D;
 
-    private int borderOffsets[];
-
     public ImplPolynomialPixel_F32(int M, float min, float max) {
         this.M = M;
         this.min = min;
@@ -70,7 +68,6 @@ public class ImplPolynomialPixel_F32 implements InterpolatePixel<ImageFloat32>  
         }
 
         interp1D = new PolynomialNevilleFixed_F32(M);
-        borderOffsets = new int[]{M/2,M/2,M/2,M/2};
     }
 
     @Override

@@ -67,8 +67,7 @@ public class DisplayGaussianKernelApp<T extends ImageBase> extends SelectAlgorit
 		addAlgorithm("Deriv XXYY",new DerivType(2,2));
 		addAlgorithm("Deriv XYYY",new DerivType(1,3));
 
-		add(panel, BorderLayout.CENTER);
-		setPreferredSize(new Dimension(imageSize+50,imageSize+20));
+		setMainGUI(panel);
 	}
 
 	@Override
@@ -110,6 +109,8 @@ public class DisplayGaussianKernelApp<T extends ImageBase> extends SelectAlgorit
 	public static void main( String args[] ) {
 		DisplayGaussianKernelApp<ImageFloat32> panel = new DisplayGaussianKernelApp<ImageFloat32>(ImageFloat32.class);
 //		DisplayGaussianKernelApp<ImageSInt32> panel = new DisplayGaussianKernelApp<ImageSInt32>(ImageSInt32.class);
+
+		panel.setPreferredSize(new Dimension(640,480));
 
 		ShowImages.showWindow(panel,"Gaussian Kernels");
 	}

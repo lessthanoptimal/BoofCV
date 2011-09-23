@@ -36,35 +36,45 @@ public class VisualizeBinaryData {
 			out = new BufferedImage(labelImage.getWidth(),labelImage.getHeight(),BufferedImage.TYPE_INT_RGB);
 		}
 
-		if( out.getRaster() instanceof IntegerInterleavedRaster) {
-			IntegerInterleavedRaster raster = (IntegerInterleavedRaster)out.getRaster();
-
-			int rasterIndex = 0;
-			int data[] = raster.getDataStorage();
-
-			int w = labelImage.getWidth();
-			int h = labelImage.getHeight();
-
-
-			for( int y = 0; y < h; y++ ) {
-				int indexSrc = labelImage.startIndex + y*labelImage.stride;
-				for( int x = 0; x < w; x++ ) {
-					data[rasterIndex++] = colors[labelImage.data[indexSrc++]];
-				}
+		try {
+			if( out.getRaster() instanceof IntegerInterleavedRaster) {
+				renderLabeled(labelImage, colors, (IntegerInterleavedRaster)out.getRaster());
+			} else {
+				_renderLabeled(labelImage, out, colors);
 			}
-		} else {
-			int w = labelImage.getWidth();
-			int h = labelImage.getHeight();
-
-			for( int y = 0; y < h; y++ ) {
-				int indexSrc = labelImage.startIndex + y*labelImage.stride;
-				for( int x = 0; x < w; x++ ) {
-					int rgb = colors[labelImage.data[indexSrc++]];
-					out.setRGB(x,y,rgb);
-				}
-			}
+		} catch( SecurityException e ) {
+			_renderLabeled(labelImage, out, colors);
 		}
 		return out;
+	}
+
+	private static void _renderLabeled(ImageSInt32 labelImage, BufferedImage out, int[] colors) {
+		int w = labelImage.getWidth();
+		int h = labelImage.getHeight();
+
+		for( int y = 0; y < h; y++ ) {
+			int indexSrc = labelImage.startIndex + y*labelImage.stride;
+			for( int x = 0; x < w; x++ ) {
+				int rgb = colors[labelImage.data[indexSrc++]];
+				out.setRGB(x,y,rgb);
+			}
+		}
+	}
+
+	private static void renderLabeled(ImageSInt32 labelImage, int[] colors, IntegerInterleavedRaster raster) {
+		int rasterIndex = 0;
+		int data[] = raster.getDataStorage();
+
+		int w = labelImage.getWidth();
+		int h = labelImage.getHeight();
+
+
+		for( int y = 0; y < h; y++ ) {
+			int indexSrc = labelImage.startIndex + y*labelImage.stride;
+			for( int x = 0; x < w; x++ ) {
+				data[rasterIndex++] = colors[labelImage.data[indexSrc++]];
+			}
+		}
 	}
 
 	public static BufferedImage renderBinary( ImageUInt8 binaryImage , BufferedImage out ) {

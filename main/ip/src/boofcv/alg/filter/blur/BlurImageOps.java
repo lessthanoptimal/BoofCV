@@ -76,10 +76,6 @@ public class BlurImageOps {
 		return output;
 	}
 
-	public static ImageUInt8 gaussian(ImageUInt8 input, ImageUInt8 output, int radius,
-									  ImageUInt8 storage ) {
-		return gaussian(input,output, -1,radius,storage);
-	}
 
 	public static ImageFloat32 mean(ImageFloat32 input, ImageFloat32 output, int radius, ImageFloat32 storage) {
 
@@ -112,10 +108,5 @@ public class BlurImageOps {
 		ConvolveNormalized.vertical(kernel,storage,output);
 
 		return output;
-	}
-
-	public static ImageFloat32 gaussian(ImageFloat32 input, ImageFloat32 output, int radius,
-										ImageFloat32 storage ) {
-		return gaussian(input,output, -1,radius,storage);
 	}
 }
