@@ -99,6 +99,6 @@ public class FilterImageReflection<Input extends ImageBase, Output extends Image
 
 	@Override
 	public Class<Input> getInputType() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return inputType;
 	}
 }

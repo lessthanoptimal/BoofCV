@@ -379,12 +379,31 @@ public class BinaryImageOps {
 		return maxConnect;
 	}
 
+	/**
+	 * Several blob rending functions take in an array of colors so that the random blobs can be drawn
+	 * with the same color each time.  This function selects a random color for each blob and returns it
+	 * in an array.
+	 * @param numBlobs  Number of blobs found.
+	 * @param rand Random number generator
+	 * @return array of RGB colors for each blob + the background blob
+	 */
 	public static int[] selectRandomColors( int numBlobs , Random rand ) {
 		int colors[] = new int[ numBlobs+1 ];
-		for( int i = 0; i < colors.length; i++ ) {
-			colors[i] = rand.nextInt();
+		colors[0] = 0; // black
+
+		int B = 100;
+
+		for( int i = 1; i < colors.length; i++ ) {
+			int c;
+			while( true ) {
+				c = rand.nextInt(0xFFFFFF);
+				// make sure its not too dark and can't be distriquished from the background
+				if( (c & 0xFF) > B || ((c >> 8) & 0xFF) > B || ((c >> 8 ) & 0xFF) > B ) {
+					break;
+				}
+			}
+			colors[i] = c;
 		}
-		colors[0] = 0xFFFFFF;
 		return colors;
 	}
 }

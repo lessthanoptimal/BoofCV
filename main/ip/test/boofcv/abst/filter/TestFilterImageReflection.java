@@ -18,21 +18,33 @@
 
 package boofcv.abst.filter;
 
+import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-/**
- * Created by IntelliJ IDEA.
- * User: pja
- * Date: 9/21/11
- * Time: 11:17 PM
- * To change this template use File | Settings | File Templates.
- */
 public class TestFilterImageReflection {
 
+	/**
+	 * Checks to see if the provided function is invoked and that it returned the correct border
+	 */
     @Test
-    public void doStuff() {
-        fail("implement");
+    public void basicTest() {
+		FilterImageReflection filter = new FilterImageReflection(getClass(),"methodDummy",2,3,ImageUInt8.class,ImageUInt16.class);
+
+		ImageUInt8 in = new ImageUInt8(5,5);
+		ImageUInt16 out = new ImageUInt16(5,5);
+		filter.process(in,out);
+
+		assertEquals(2,filter.getHorizontalBorder());
+		assertEquals(3,filter.getVerticalBorder());
+		assertTrue(ImageUInt8.class==filter.getInputType());
+		assertEquals(1,out.get(0,0));
     }
+
+	public static void methodDummy( ImageUInt8 imgA , ImageUInt16 imgB ) {
+		imgB.set(0,0,1);
+	}
 }

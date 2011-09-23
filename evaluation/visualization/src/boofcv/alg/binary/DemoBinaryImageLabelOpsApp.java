@@ -122,9 +122,11 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 
 		imagesCombo = new JComboBox();
 		imagesCombo.addItem("Thresholded");
-		imagesCombo.addItem("Filtered");
+		imagesCombo.addItem("Filtered 1");
+		imagesCombo.addItem("Filtered 2");
+		imagesCombo.addItem("Labeled");
 		imagesCombo.addActionListener(this);
-		imagesCombo.setSelectedIndex(1);
+		imagesCombo.setSelectedIndex(3);
 		imagesCombo.setMaximumSize(imagesCombo.getPreferredSize());
 
 		histogramPanel = new HistogramThresholdPanel(200,256);
@@ -218,7 +220,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 		filter1.process(imageBinary,imageOutput1);
 		filter2.process(imageOutput1,imageOutput2);
 		filterLabel.process(imageOutput2,imageLabeled);
-		if( colors == null || colors.length < filterLabel.getNumBlobs() )
+		if( colors == null || colors.length <= filterLabel.getNumBlobs() )
 			colors = BinaryImageOps.selectRandomColors(filterLabel.getNumBlobs(),rand);
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -237,7 +239,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 		});
 	}
 
-	private void renderVisualizeImage() {
+	private synchronized void renderVisualizeImage() {
 		if( selectedVisualize instanceof ImageUInt8)
 			VisualizeBinaryData.renderBinary((ImageUInt8) selectedVisualize, work);
 		else

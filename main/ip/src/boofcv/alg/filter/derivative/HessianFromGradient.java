@@ -31,6 +31,14 @@ import boofcv.struct.image.ImageSInt16;
  * as computing the Hessian directly from a larger kernel, it requires additional storage space.
  * </p>
  *
+ * <p>
+ * NOTE: A subtle design flaw in many of these operations is that they add more image blur each time the derivative
+ * is computed.  For example, with the sobel operator is is derived by convolving a blur kernel with a derivative kernel.
+ * So applying it twice to computer the second order x-derivative is the same as blurring it twice then applying
+ * the derivative operator twice.  Thus it is not th true second order derivative.  Having said that, this
+ * issue is of little practical importance and is hard to detect..
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class HessianFromGradient {

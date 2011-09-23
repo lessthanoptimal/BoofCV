@@ -56,7 +56,7 @@ import boofcv.struct.image.ImageUInt8;
  * </table}
  * Floating point images use a kernel which is similar to the ones above, but divided by 4.0.
  * As a side note, the sobel operator is equivalent to convolving the image with the following 1D
- * kernels: [0.25 0.5 0.25] [1 0 1]
+ * kernels: conv2( [0.25 0.5 0.25], [-1 0 1] )
  * </p>
  *
  * @author Peter Abeles

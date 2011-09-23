@@ -34,7 +34,7 @@ import boofcv.struct.image.*;
 public class FactoryInterpolation {
 
 	public static <T extends ImageBase> InterpolatePixel<T>
-	createPixel( Class<T> imageType , TypeInterpolate type )
+	createPixel(double min, double max, TypeInterpolate type, Class<T> imageType)
 	{
 		switch( type ) {
 			case NEAREST_NEIGHBOR:
@@ -44,7 +44,10 @@ public class FactoryInterpolation {
 				return bilinearPixel(imageType);
 
 			case BICUBIC:
-				return bicubic(imageType,0.5f);
+				return bicubic(0.5f, imageType);
+
+			case POLYNOMIAL4:
+				return polynomial(4,min,max,imageType);
 		}
 		throw new IllegalArgumentException("Add type: "+type);
 	}
@@ -113,7 +116,7 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageBase> InterpolatePixel<T> bicubic(Class<T> type , float param ) {
+	public static <T extends ImageBase> InterpolatePixel<T> bicubic(float param, Class<T> type) {
 		BicubicKernel_F32 kernel = new BicubicKernel_F32(param);
 		if( type == ImageFloat32.class )
 			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_F32(kernel);
@@ -121,6 +124,13 @@ public class FactoryInterpolation {
 			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_U8(kernel);
 		else if( type == ImageSInt16.class )
 			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_S16(kernel);
+		else
+			throw new RuntimeException("Unknown image type: "+type.getName());
+	}
+
+	public static <T extends ImageBase> InterpolatePixel<T> polynomial( int M , double min , double max , Class<T> type ) {
+		if( type == ImageFloat32.class )
+			return (InterpolatePixel<T>)new ImplPolynomialPixel_F32(M,(float)min,(float)max);
 		else
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}

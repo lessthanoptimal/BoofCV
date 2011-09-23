@@ -28,7 +28,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageFloat32;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;
@@ -62,7 +62,8 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 
 		addAlgorithm(0, "Nearest Neighbor",FactoryInterpolation.nearestNeighborPixel(imageType));
 		addAlgorithm(0, "Bilinear",FactoryInterpolation.bilinearPixel(imageType));
-		addAlgorithm(0, "Bicubic Kernel",FactoryInterpolation.bicubic(imageType,-0.5f));
+		addAlgorithm(0, "Bicubic Kernel",FactoryInterpolation.bicubic(-0.5f, imageType));
+		addAlgorithm(0, "Polynomial 4",FactoryInterpolation.polynomial(4, 0, 255, imageType));
 
 		setPreferredSize(new Dimension(300,300));
 		addComponentListener(this);
@@ -133,8 +134,8 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 	public void componentHidden(ComponentEvent e) {}
 
 	public static void main( String args[] ) {
-//		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(ImageFloat32.class);
-		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(ImageUInt8.class);
+		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(ImageFloat32.class);
+//		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(ImageUInt8.class);
 
 		app.setPreferredSize(new Dimension(500,500));
 		ImageListManager manager = new ImageListManager();
