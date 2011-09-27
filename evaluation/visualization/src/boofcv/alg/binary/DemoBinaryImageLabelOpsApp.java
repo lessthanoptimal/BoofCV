@@ -28,7 +28,6 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryBinaryImageOps;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
-import boofcv.gui.binary.HistogramThresholdPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -39,8 +38,6 @@ import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
@@ -50,12 +47,9 @@ import java.util.Random;
  * Demonstrates the affects of different binary operations on an image.
  */
 public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgorithmImagePanel
-		implements ProcessInput , ChangeListener {
+		implements ProcessInput , SelectHistogramThresholdPanel.Listener {
 
 	Random rand = new Random(234234);
-
-	double threshold = 0;
-	boolean down = true;
 
 	Class<T> imageType;
 	T imageInput;
@@ -74,9 +68,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 	boolean processedImage = false;
 
 	JComboBox imagesCombo;
-	JSlider thresholdLevel;
-	HistogramThresholdPanel histogramPanel;
-	JButton toggleButton;
+	SelectHistogramThresholdPanel selectThresh;
 	ImagePanel gui = new ImagePanel();
 
 	public DemoBinaryImageLabelOpsApp(Class<T> imageType) {
@@ -102,7 +94,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 		JPanel body = new JPanel();
 		body.setLayout(new BorderLayout());
 
-		body.add(createLeftPanel(),BorderLayout.NORTH);
+		body.add(createControlPanel(),BorderLayout.NORTH);
 		body.add(gui,BorderLayout.CENTER);
 
 		imageInput = GeneralizedImageOps.createImage(imageType,1,1);
@@ -116,7 +108,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 		setMainGUI(body);
 	}
 
-	private JPanel createLeftPanel() {
+	private JPanel createControlPanel() {
 		JPanel left = new JPanel();
 		left.setLayout(new BoxLayout(left, BoxLayout.X_AXIS));
 
@@ -129,37 +121,14 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 		imagesCombo.setSelectedIndex(3);
 		imagesCombo.setMaximumSize(imagesCombo.getPreferredSize());
 
-		histogramPanel = new HistogramThresholdPanel(200,256);
-		histogramPanel.setPreferredSize(new Dimension(120,60));
-		histogramPanel.setMaximumSize(histogramPanel.getPreferredSize());
-
-		thresholdLevel = new JSlider(JSlider.HORIZONTAL,0,255,20);
-		thresholdLevel.setMajorTickSpacing(20);
-		thresholdLevel.setPaintTicks(true);
-		thresholdLevel.addChangeListener(this);
-
-		toggleButton = new JButton();
-		toggleButton.setPreferredSize(new Dimension(100,30));
-		toggleButton.setMaximumSize(toggleButton.getPreferredSize());
-		toggleButton.setMinimumSize(toggleButton.getPreferredSize());
-		setToggleText();
-		toggleButton.addActionListener(this);
+		selectThresh = new SelectHistogramThresholdPanel(20,true);
+		selectThresh.setListener(this);
 
 		left.add(imagesCombo);
-		left.add(histogramPanel);
-		left.add(Box.createRigidArea(new Dimension(8,8)));
-		left.add(thresholdLevel);
-		left.add(toggleButton);
+		left.add(selectThresh);
 		left.add(Box.createHorizontalGlue());
 
 		return left;
-	}
-
-	private void setToggleText() {
-		if( down )
-			toggleButton.setText("down");
-		else
-			toggleButton.setText("Up");
 	}
 
 	public void process( final BufferedImage image ) {
@@ -172,13 +141,13 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 		ConvertBufferedImage.convertFrom(image,imageInput,imageType);
 
 		// average pixel intensity should be a reasonable threshold
-		threshold = GPixelMath.sum(imageInput)/(imageInput.width*imageInput.height);
+		final double threshold = GPixelMath.sum(imageInput)/(imageInput.width*imageInput.height);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				thresholdLevel.setValue((int)threshold);
+				selectThresh.setThreshold((int) threshold);
 				setInputImage(image);
-				histogramPanel.update(imageInput);
-				histogramPanel.repaint();
+				selectThresh.getHistogramPanel().update(imageInput);
+				selectThresh.repaint();
 			}});
 		doRefreshAll();
 	}
@@ -216,7 +185,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 	private synchronized void performWork() {
 		if( filter1 == null || filter2 == null || filterLabel == null )
 			return;
-		GThresholdImageOps.threshold(imageInput, imageBinary, threshold, down);
+		GThresholdImageOps.threshold(imageInput, imageBinary, selectThresh.getThreshold(), selectThresh.isDown());
 		filter1.process(imageBinary,imageOutput1);
 		filter2.process(imageOutput1,imageOutput2);
 		filterLabel.process(imageOutput2,imageLabeled);
@@ -228,8 +197,6 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 				if (work == null || work.getWidth() != imageInput.width || work.getHeight() != imageInput.height) {
 					work = new BufferedImage(imageInput.width, imageInput.height, BufferedImage.TYPE_INT_BGR);
 				}
-				histogramPanel.setThreshold(threshold,down);
-				histogramPanel.repaint();
 				renderVisualizeImage();
 				gui.setBufferedImage(work);
 				gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
@@ -256,21 +223,10 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 		}
 	}
 
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == thresholdLevel )
-			threshold = ((Number)thresholdLevel.getValue()).doubleValue();
-
-		performWork();
-	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == toggleButton ) {
-			down = !down;
-			setToggleText();
-			performWork();
-		}else if( e.getSource() == imagesCombo ) {
+		if( e.getSource() == imagesCombo ) {
 			int index = imagesCombo.getSelectedIndex();
 			if( index == 0 ) {
 				selectedVisualize = imageBinary;
@@ -288,6 +244,11 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 		} else {
 			super.actionPerformed(e);
 		}
+	}
+
+	@Override
+	public void histogramThresholdChange() {
+		performWork();
 	}
 
 	public static void main( String args[] ) {

@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapCannyEdgeContour<T extends ImageBase, D extends ImageBase> implements DetectEdgeContour<T> {
+public class CannyEdgeContour<T extends ImageBase, D extends ImageBase> implements DetectEdgeContour<T> {
 
 	// blurs the input image
 	BlurFilter<T> blur;
@@ -45,8 +45,8 @@ public class WrapCannyEdgeContour<T extends ImageBase, D extends ImageBase> impl
 	// computes the image gradient
 	private ImageGradient<T,D> gradient;
 	// thresholds for hysteresis thresholding
-	private float threshLow;
-	private float threshHigh;
+	protected float threshLow;
+	protected float threshHigh;
 
 	// blurred input image
 	private T blurred;
@@ -56,21 +56,21 @@ public class WrapCannyEdgeContour<T extends ImageBase, D extends ImageBase> impl
 	private D derivY;
 
 	// edge intensity
-	private ImageFloat32 intensity = new ImageFloat32(1,1);
-	private ImageFloat32 suppressed = new ImageFloat32(1,1);
+	protected ImageFloat32 intensity = new ImageFloat32(1,1);
+	protected ImageFloat32 suppressed = new ImageFloat32(1,1);
 	// edge direction in radians
-	private ImageFloat32 angle = new ImageFloat32(1,1);
+	protected ImageFloat32 angle = new ImageFloat32(1,1);
 	// quantized direction
-	private ImageSInt8 direction = new ImageSInt8(1,1);
+	protected ImageSInt8 direction = new ImageSInt8(1,1);
 	// work space
-	private ImageSInt32 label = new ImageSInt32(1,1);
-	private ImageUInt8 work = new ImageUInt8(1,1);
+	protected ImageSInt32 label = new ImageSInt32(1,1);
+	protected ImageUInt8 work = new ImageUInt8(1,1);
 	// reuse found points
-	private FastQueue<Point2D_I32> queuePts = new FastQueue<Point2D_I32>(100,Point2D_I32.class,true);
+	protected FastQueue<Point2D_I32> queuePts = new FastQueue<Point2D_I32>(100,Point2D_I32.class,true);
 
 	List<List<Point2D_I32>> contours;
 
-	public WrapCannyEdgeContour(BlurFilter<T> blur , ImageGradient<T, D> gradient, float threshLow, float threshHigh ) {
+	public CannyEdgeContour(BlurFilter<T> blur, ImageGradient<T, D> gradient, float threshLow, float threshHigh) {
 		this.blur = blur;
 		this.gradient = gradient;
 		this.threshLow = threshLow;
@@ -119,11 +119,19 @@ public class WrapCannyEdgeContour<T extends ImageBase, D extends ImageBase> impl
 //		threshLow = v[indexZero +(int)(size*0.5)];
 //		threshHigh = v[indexZero +(int)(size*0.8)];
 
+		updateThresholds();
 
 		// TODO investigate improving performance by tracking contour
 		int numFound = ThresholdImageOps.hysteresisLabel8(suppressed, label, threshLow, threshHigh, false, work);
 
 		contours = BinaryImageOps.labelToClusters(label,numFound,queuePts);
+	}
+
+	/**
+	 * This function exists so that the wrapper can be overridden to add an adaptive threshold
+	 */
+	protected void updateThresholds() {
+
 	}
 
 	@Override

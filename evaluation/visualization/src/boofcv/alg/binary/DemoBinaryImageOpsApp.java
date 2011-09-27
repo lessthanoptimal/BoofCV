@@ -26,7 +26,6 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryBinaryImageOps;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
-import boofcv.gui.binary.HistogramThresholdPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -36,8 +35,6 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
@@ -47,11 +44,8 @@ import java.awt.image.BufferedImage;
  */
 // todo clean up appearance
 public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmImagePanel
-		implements ProcessInput , ChangeListener {
-
-	double threshold = 0;
-	boolean down = true;
-
+		implements ProcessInput , SelectHistogramThresholdPanel.Listener
+{
 	Class<T> imageType;
 	T imageInput;
 	ImageUInt8 imageBinary;
@@ -64,9 +58,7 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 	boolean processedImage = false;
 
 	JComboBox imagesCombo;
-	JSlider thresholdLevel;
-	HistogramThresholdPanel histogramPanel;
-	JButton toggleButton;
+	SelectHistogramThresholdPanel selectThresh;
 	ImagePanel gui = new ImagePanel();
 
 	public DemoBinaryImageOpsApp( Class<T> imageType ) {
@@ -108,37 +100,14 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 		imagesCombo.setSelectedIndex(1);
 		imagesCombo.setMaximumSize(imagesCombo.getPreferredSize());
 
-		histogramPanel = new HistogramThresholdPanel(200,256);
-		histogramPanel.setPreferredSize(new Dimension(120,60));
-		histogramPanel.setMaximumSize(histogramPanel.getPreferredSize());
-
-		thresholdLevel = new JSlider(JSlider.HORIZONTAL,0,255,20);
-		thresholdLevel.setMajorTickSpacing(20);
-		thresholdLevel.setPaintTicks(true);
-		thresholdLevel.addChangeListener(this);
-
-		toggleButton = new JButton();
-		toggleButton.setPreferredSize(new Dimension(100,30));
-		toggleButton.setMaximumSize(toggleButton.getPreferredSize());
-		toggleButton.setMinimumSize(toggleButton.getPreferredSize());
-		setToggleText();
-		toggleButton.addActionListener(this);
+		selectThresh = new SelectHistogramThresholdPanel(20,true);
+		selectThresh.setListener(this);
 
 		left.add(imagesCombo);
-		left.add(histogramPanel);
-		left.add(Box.createRigidArea(new Dimension(8,8)));
-		left.add(thresholdLevel);
-		left.add(toggleButton);
+		left.add(selectThresh);
 		left.add(Box.createHorizontalGlue());
 
 		return left;
-	}
-
-	private void setToggleText() {
-		if( down )
-			toggleButton.setText("down");
-		else
-			toggleButton.setText("Up");
 	}
 
 	public void process( final BufferedImage image ) {
@@ -149,13 +118,13 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 		ConvertBufferedImage.convertFrom(image,imageInput,imageType);
 
 		// average pixel intensity should be a reasonable threshold
-		threshold = GPixelMath.sum(imageInput)/(imageInput.width*imageInput.height);
+		final double threshold = GPixelMath.sum(imageInput)/(imageInput.width*imageInput.height);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				thresholdLevel.setValue((int)threshold);
+				selectThresh.setThreshold((int) threshold);
 				setInputImage(image);
-				histogramPanel.update(imageInput);
-				histogramPanel.repaint();
+				selectThresh.getHistogramPanel().update(imageInput);
+				selectThresh.repaint();
 			}});
 		doRefreshAll();
 	}
@@ -180,7 +149,7 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 	private synchronized void performWork() {
 		if( filter == null )
 			return;
-		GThresholdImageOps.threshold(imageInput, imageBinary, threshold, down);
+		GThresholdImageOps.threshold(imageInput, imageBinary, selectThresh.getThreshold(), selectThresh.isDown());
 		filter.process(imageBinary,imageOutput);
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -188,8 +157,6 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 				if (work == null || work.getWidth() != imageInput.width || work.getHeight() != imageInput.height) {
 					work = new BufferedImage(imageInput.width, imageInput.height, BufferedImage.TYPE_INT_BGR);
 				}
-				histogramPanel.setThreshold(threshold,down);
-				histogramPanel.repaint();
 				VisualizeBinaryData.renderBinary(selectedVisualize, work);
 				gui.setBufferedImage(work);
 				gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
@@ -210,20 +177,8 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == thresholdLevel )
-			threshold = ((Number)thresholdLevel.getValue()).doubleValue();
-
-		performWork();
-	}
-
-	@Override
 	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == toggleButton ) {
-			down = !down;
-			setToggleText();
-			performWork();
-		}else if( e.getSource() == imagesCombo ) {
+		if( e.getSource() == imagesCombo ) {
 			int index = imagesCombo.getSelectedIndex();
 			if( index == 0 ) {
 				selectedVisualize = imageBinary;
@@ -237,6 +192,11 @@ public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmI
 		} else {
 			super.actionPerformed(e);
 		}
+	}
+
+	@Override
+	public void histogramThresholdChange() {
+		performWork();
 	}
 
 	public static void main( String args[] ) {

@@ -20,7 +20,6 @@ package boofcv.abst.feature.detect.edge;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.alg.misc.GPixelMath;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
@@ -39,6 +38,10 @@ import java.util.List;
  */
 public class WrapBinaryContour<T extends ImageBase> implements DetectEdgeContour<T>{
 
+	// threshold description
+	double threshold;
+	boolean down;
+
 	// thresholded image
 	ImageUInt8 thresh = new ImageUInt8(1,1);
 	// found edges
@@ -46,10 +49,15 @@ public class WrapBinaryContour<T extends ImageBase> implements DetectEdgeContour
 	// labeled edges
 	ImageSInt32 label = new ImageSInt32(1,1);
 
-		// reuse found points
+	// reuse found points
 	private FastQueue<Point2D_I32> queuePts = new FastQueue<Point2D_I32>(100,Point2D_I32.class,true);
 
 	List<List<Point2D_I32>> contours;
+
+	public WrapBinaryContour(double threshold, boolean down) {
+		this.threshold = threshold;
+		this.down = down;
+	}
 
 	@Override
 	public void process(T input) {
@@ -58,11 +66,8 @@ public class WrapBinaryContour<T extends ImageBase> implements DetectEdgeContour
 		edge.reshape(input.width,input.height);
 		label.reshape(input.width,input.height);
 
-		// select the threshold to be the average pixel value
-		double threshold = GPixelMath.sum(input)/(input.width*input.height);
-
 		// threshold image
-		GThresholdImageOps.threshold(input,thresh,threshold,true);
+		GThresholdImageOps.threshold(input,thresh,threshold,down);
 		// extract the edges
 		BinaryImageOps.edge4(thresh,edge);
 

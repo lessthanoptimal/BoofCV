@@ -18,9 +18,16 @@
 
 package boofcv.alg.feature.detect.edge;
 
+import boofcv.abst.feature.detect.edge.CannyEdgeContourDynamic;
 import boofcv.abst.feature.detect.edge.DetectEdgeContour;
+import boofcv.abst.filter.blur.BlurFilter;
+import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.binary.SelectHistogramThresholdPanel;
+import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
@@ -41,35 +48,61 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+// todo canny controls
+// todo threshold controls
 public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmImagePanel implements ProcessInput
+		extends SelectAlgorithmImagePanel implements ProcessInput , CannyControlBar.Listener , SelectHistogramThresholdPanel.Listener
 {
 	// shows panel for displaying input image
 	ImagePanel panel = new ImagePanel();
 
 	BufferedImage input;
+	T workImage;
 	Class<T> imageType;
 	Class<D> derivType;
 	boolean processedImage = false;
+
+	CannyControlBar barCanny;
+	SelectHistogramThresholdPanel barBinary;
+	JPanel bodyPanel = new JPanel();
+	int activeAlg;
 
 	public ShowEdgeContourApp(Class<T> imageType, Class<D> derivType) {
 		super(1);
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		addAlgorithm(0, "Canny", FactoryDetectEdgeContour.canny(1,40,imageType,derivType));
-		addAlgorithm(0, "Binary Simple", FactoryDetectEdgeContour.<T>binarySimple());
+		addAlgorithm(0, "Canny", 0);
+		addAlgorithm(0, "Binary Simple", 1);
 
-		setMainGUI(panel);
+		barCanny = new CannyControlBar(1,5);
+		barCanny.setListener(this);
+
+		barBinary = new SelectHistogramThresholdPanel(50,true);
+		barBinary.setListener(this);
+
+		bodyPanel.setLayout(new BorderLayout());
+		bodyPanel.add(panel,BorderLayout.CENTER);
+		bodyPanel.add(barCanny,BorderLayout.NORTH);
+
+		setMainGUI(bodyPanel);
 	}
 
 	public void process( BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
+		workImage = ConvertBufferedImage.convertFrom(input, null, imageType);
+
+		// update the binary histogram threshold for this image
+		final double threshold = GPixelMath.sum(workImage)/(workImage.width*workImage.height);
+
+
 		final int width = input.getWidth();
 		final int height = input.getHeight();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				barBinary.setThreshold((int)threshold);
+				barBinary.getHistogramPanel().update(workImage);
 				panel.setPreferredSize(new Dimension(width,height));
 				processedImage = true;
 				doRefreshAll();
@@ -83,17 +116,35 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 
 	@Override
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+
+		activeAlg = ((Integer)cookie).intValue();
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				// swap control bar on top
+				if( activeAlg == 0 ){
+					bodyPanel.remove(barBinary);
+					bodyPanel.add(barCanny,BorderLayout.NORTH);
+				} else {
+					bodyPanel.remove(barCanny);
+					bodyPanel.add(barBinary,BorderLayout.NORTH);
+				}
+				validate();
+			}});
+
+		doProcess();
+	}
+
+	private void doProcess() {
 		if( input == null )
 			return;
 
-		DetectEdgeContour<T> contour = (DetectEdgeContour<T>)cookie;
-
-		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		DetectEdgeContour<T> contour = declareAlgorithm();
 
 		contour.process(workImage);
 		List<List<Point2D_I32>> found = contour.getContours();
 
-		BufferedImage temp = new BufferedImage(input.getWidth(),input.getHeight(),input.getType());
+		final BufferedImage temp = new BufferedImage(input.getWidth(),input.getHeight(),input.getType());
 
 		Random rand = new Random(234);
 		for( List<Point2D_I32> l : found ) {
@@ -103,8 +154,23 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 			}
 		}
 
-		panel.setBufferedImage(temp);
-		panel.repaint();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				panel.setBufferedImage(temp);
+				panel.repaint();
+			}});
+	}
+
+	private DetectEdgeContour<T> declareAlgorithm(){
+		switch( activeAlg ) {
+			case 0:
+				return createCanny();
+
+			case 1:
+				return FactoryDetectEdgeContour.binarySimple(barBinary.getThreshold(),barBinary.isDown());
+		}
+
+		throw new RuntimeException("Unknown algorithm");
 	}
 
 	@Override
@@ -122,6 +188,24 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		return processedImage;
 	}
 
+	private DetectEdgeContour<T> createCanny() {
+		double thresh = barCanny.getThreshold()/100.0;
+		BlurFilter<T> blur = FactoryBlurFilter.gaussian(imageType, -1, barCanny.getBlurRadius());
+		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType, derivType);
+
+		return new CannyEdgeContourDynamic<T,D>(blur,gradient,(float)thresh*0.1f,(float)thresh);
+	}
+
+	@Override
+	public void changeCanny() {
+		doProcess();
+	}
+
+	@Override
+	public void histogramThresholdChange() {
+		doProcess();
+	}
+
 	public static void main( String args[] ) {
 		ShowEdgeContourApp<ImageFloat32,ImageFloat32> app =
 				new ShowEdgeContourApp<ImageFloat32, ImageFloat32>(ImageFloat32.class, ImageFloat32.class);
@@ -130,6 +214,8 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("shapes","data/shapes01.png");
+		manager.add("Room","data/indoors01.jpg");
+		manager.add("Particles","data/particles01.jpg");
 		manager.add("sunflowers","data/sunflowers.png");
 		manager.add("beach","data/scale/beach02.jpg");
 
@@ -141,7 +227,7 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		}
 
 		ShowImages.showWindow(app,"Contours");
-		
+
 		System.out.println("Done");
 	}
 }

@@ -18,9 +18,9 @@
 
 package boofcv.factory.feature.detect.edge;
 
+import boofcv.abst.feature.detect.edge.CannyEdgeContour;
 import boofcv.abst.feature.detect.edge.DetectEdgeContour;
 import boofcv.abst.feature.detect.edge.WrapBinaryContour;
-import boofcv.abst.feature.detect.edge.WrapCannyEdgeContour;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
@@ -42,12 +42,12 @@ public class FactoryDetectEdgeContour {
 		BlurFilter<T> blur = FactoryBlurFilter.gaussian(imageType,-1,2);
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new WrapCannyEdgeContour<T,D>(blur,gradient,threshLow,threshHigh);
+		return new CannyEdgeContour<T,D>(blur,gradient,threshLow,threshHigh);
 	}
 
 	public static <T extends ImageBase>
-	DetectEdgeContour<T> binarySimple()
+	DetectEdgeContour<T> binarySimple( double threshold , boolean down )
 	{
-		return new WrapBinaryContour<T>();
+		return new WrapBinaryContour<T>(threshold,down);
 	}
 }
