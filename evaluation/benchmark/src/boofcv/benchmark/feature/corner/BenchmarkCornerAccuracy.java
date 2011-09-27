@@ -18,7 +18,7 @@
 
 package boofcv.benchmark.feature.corner;
 
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.filter.derivative.HessianFromGradient;

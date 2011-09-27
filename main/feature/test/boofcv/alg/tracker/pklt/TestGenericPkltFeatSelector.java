@@ -19,11 +19,11 @@
 package boofcv.alg.tracker.pklt;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.extract.WrapperNonMax;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import boofcv.alg.feature.detect.extract.FastNonMaxExtractor;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
@@ -166,7 +166,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 	private GenericPkltFeatSelector<ImageFloat32, ImageFloat32> createSelector() {
 		GeneralFeatureIntensity<ImageFloat32,ImageFloat32> intensity =
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
-						FactoryPointIntensityAlg.createKlt( ImageFloat32.class,3));
+						FactoryPointIntensityAlg.createKlt(3, ImageFloat32.class));
 
 		FeatureExtractor extractor = new WrapperNonMax(
 				new FastNonMaxExtractor(3, 3, 0.001f));

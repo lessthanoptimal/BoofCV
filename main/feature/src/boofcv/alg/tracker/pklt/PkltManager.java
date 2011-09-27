@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.pklt;
 
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.KltTracker;

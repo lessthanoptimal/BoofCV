@@ -78,7 +78,7 @@ public class VisualizeScaleSpaceApp <T extends ImageBase, D extends ImageBase>
 
 	@Override
 	public void changeImage(String name, int index) {
-		ImageListManager manager = getImageManager();
+		ImageListManager manager = getInputManager();
 
 		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {

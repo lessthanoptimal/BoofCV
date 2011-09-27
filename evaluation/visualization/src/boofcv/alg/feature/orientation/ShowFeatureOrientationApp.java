@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.transform.gss.UtilScaleSpace;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;

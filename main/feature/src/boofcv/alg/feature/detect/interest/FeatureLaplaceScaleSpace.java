@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpace;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.struct.QueueCorner;

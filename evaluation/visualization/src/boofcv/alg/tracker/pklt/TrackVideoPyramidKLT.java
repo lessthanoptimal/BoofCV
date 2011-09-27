@@ -19,12 +19,12 @@
 package boofcv.alg.tracker.pklt;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.extract.WrapperNonMax;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.extract.FastNonMaxExtractor;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.transform.pyramid.PyramidOps;
@@ -175,7 +175,7 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 
 		GeneralFeatureIntensity<I,D> intensity =
 				new WrapperGradientCornerIntensity<I,D>(
-						FactoryPointIntensityAlg.createKlt(derivType, config.featureRadius));
+						FactoryPointIntensityAlg.createKlt(config.featureRadius, derivType));
 		FeatureExtractor extractor = new WrapperNonMax(
 				new FastNonMaxExtractor(config.featureRadius+2,
 						config.featureRadius*scalingTop, configKLt.minDeterminant));

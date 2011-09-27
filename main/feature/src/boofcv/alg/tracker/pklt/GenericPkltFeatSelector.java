@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.pklt;
 
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_I16;
 import java.util.List;
 
 /**
- * Automatically selects features for the {@link PyramidKltTracker} using a {@link boofcv.alg.feature.detect.interest.GeneralFeatureDetector}.
+ * Automatically selects features for the {@link PyramidKltTracker} using a {@link boofcv.abst.feature.detect.extract.GeneralFeatureDetector}.
  *
  * @author Peter Abeles
  */

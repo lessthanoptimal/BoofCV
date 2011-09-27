@@ -19,6 +19,7 @@
 package boofcv.factory.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
@@ -26,7 +27,7 @@ import boofcv.alg.feature.detect.interest.*;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.inst.FactoryImageGenerator;
-import boofcv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.struct.gss.GaussianScaleSpace;
@@ -107,7 +108,7 @@ public class FactoryInterestPoint {
 											  int numberScalesPerOctave ,
 											  int numberOfOctaves )
 	{
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(2,1,5,false,false,false);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 1, 5);
 		FastHessianFeatureDetector<T> feature = new FastHessianFeatureDetector<T>(extractor,maxFeaturesPerScale,
 				initialSize,numberScalesPerOctave,numberOfOctaves);
 

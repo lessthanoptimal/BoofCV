@@ -62,8 +62,8 @@ public class ShowImageBlurApp<T extends ImageBase>
 		super(1);
 
 		addAlgorithm(0,"Gaussian",0);
-		addAlgorithm(0,"Median",1);
-		addAlgorithm(0,"Mean",2);
+		addAlgorithm(0,"Mean",1);
+		addAlgorithm(0,"Median",2);
 
 		this.imageType = imageType;
 		input = GeneralizedImageOps.createImage(imageType,1,1);
@@ -150,12 +150,12 @@ public class ShowImageBlurApp<T extends ImageBase>
 				break;
 
 			case 1:
-				GBlurImageOps.median(input, output, radius);
+				GBlurImageOps.mean(input, output, radius, storage);
 				break;
 
 			case 2:
-				GBlurImageOps.mean(input, output, radius, storage);
-				break;
+				GBlurImageOps.median(input, output, radius);
+			break;
 		}
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
