@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
+import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.gss.UtilScaleSpace;
 import boofcv.core.image.ConvertBufferedImage;
@@ -86,6 +87,8 @@ public class CompareFeatureExtractorApp<T extends ImageBase, D extends ImageBase
 		addAlgorithm(0, "KLT", FactoryGeneralIntensity.klt(radius, derivType));
 		addAlgorithm(0, "FAST", FactoryGeneralIntensity.fast(5, 11, derivType));
 		addAlgorithm(0, "KitRos", FactoryGeneralIntensity.kitros(derivType));
+		addAlgorithm(0, "Laplace Det", FactoryGeneralIntensity.laplacian(HessianBlobIntensity.Type.DETERMINANT,derivType));
+		addAlgorithm(0, "Laplace Trace", FactoryGeneralIntensity.laplacian(HessianBlobIntensity.Type.TRACE,derivType));
 
 		deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
@@ -133,7 +136,7 @@ public class CompareFeatureExtractorApp<T extends ImageBase, D extends ImageBase
 	}
 
 	private synchronized void doProcess() {
-		System.out.println("radius "+radius+" min separation "+minSeparation+" thresholdFraction "+thresholdFraction+" numFeatures "+numFeatures);
+//		System.out.println("radius "+radius+" min separation "+minSeparation+" thresholdFraction "+thresholdFraction+" numFeatures "+numFeatures);
 
 		deriv.setInput(grayImage);
 		D derivX = deriv.getDerivative(true);
@@ -142,7 +145,7 @@ public class CompareFeatureExtractorApp<T extends ImageBase, D extends ImageBase
 		D derivYY = deriv.getDerivative(false,false);
 		D derivXY = deriv.getDerivative(true,false);
 
-		// todo modifying buffered images which might be actively being displayed
+		// todo modifying buffered images which might be actively being displayed, could mess up swing
 
 		intensityAlg.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);
 		ImageFloat32 intensity = intensityAlg.getIntensity();
@@ -151,7 +154,7 @@ public class CompareFeatureExtractorApp<T extends ImageBase, D extends ImageBase
 		float max = PixelMath.maxAbs(intensity);
 		float threshold = max*thresholdFraction;
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, threshold, 0);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, threshold, radius);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensityAlg,extractor,numFeatures);
 		detector.process(grayImage,derivX,derivY,derivXX,derivYY,derivXY);
 		QueueCorner foundCorners = detector.getFeatures();
