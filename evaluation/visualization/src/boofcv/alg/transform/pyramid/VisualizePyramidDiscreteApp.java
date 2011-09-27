@@ -80,7 +80,7 @@ public class VisualizePyramidDiscreteApp <T extends ImageBase>
 
 	@Override
 	public synchronized void changeImage(String name, int index) {
-		ImageListManager manager = getImageManager();
+		ImageListManager manager = getInputManager();
 
 		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {

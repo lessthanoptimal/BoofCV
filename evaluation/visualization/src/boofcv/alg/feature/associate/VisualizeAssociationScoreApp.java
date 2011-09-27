@@ -19,8 +19,8 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;

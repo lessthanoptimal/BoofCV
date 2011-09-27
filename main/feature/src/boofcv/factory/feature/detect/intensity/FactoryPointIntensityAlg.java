@@ -38,13 +38,13 @@ public class FactoryPointIntensityAlg {
 	/**
 	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.KitRosCornerIntensity} from different image types.
 	 *
-	 * @param imageType Type of input image it is computed form.
 	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
 	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner.  11 or 12 are good numbers.
+	 * @param imageType Type of input image it is computed form.
 	 * @return Fast corner
 	 */
 	public static <T extends ImageBase>
-	FastCornerIntensity<T> createFast12( Class<T> imageType , int pixelTol, int minCont)
+	FastCornerIntensity<T> createFast12(int pixelTol, int minCont, Class<T> imageType)
 	{
 		if( imageType == ImageFloat32.class )
 			return (FastCornerIntensity<T>)new ImplFastCorner12_F32(pixelTol,minCont);
@@ -57,13 +57,13 @@ public class FactoryPointIntensityAlg {
 	/**
 	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity} from different image types.
 	 *
-	 * @param derivType Image derivative type it is computed from.
 	 * @param windowRadius Size of the feature it is detects,
 	 * @param kappa Tuning parameter, typically a small number around 0.04
+	 * @param derivType Image derivative type it is computed from.
 	 * @return Harris corner
 	 */
 	public static <T extends ImageBase>
-	HarrisCornerIntensity<T> createHarris( Class<T> derivType , int windowRadius, float kappa)
+	HarrisCornerIntensity<T> createHarris(int windowRadius, float kappa, Class<T> derivType)
 	{
 		if( derivType == ImageFloat32.class )
 			return (HarrisCornerIntensity<T>)new ImplHarrisCorner_F32(windowRadius,kappa);
@@ -76,12 +76,12 @@ public class FactoryPointIntensityAlg {
 	/**
 	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} from different image types.
 	 *
-	 * @param derivType Image derivative type it is computed from.
 	 * @param windowRadius Size of the feature it detects,
+	 * @param derivType Image derivative type it is computed from.
 	 * @return KLT corner
 	 */
 	public static <T extends ImageBase>
-	KltCornerIntensity<T> createKlt( Class<T> derivType , int windowRadius)
+	KltCornerIntensity<T> createKlt(int windowRadius, Class<T> derivType)
 	{
 		if( derivType == ImageFloat32.class )
 			return (KltCornerIntensity<T>)new ImplKltCorner_F32(windowRadius);
@@ -90,5 +90,4 @@ public class FactoryPointIntensityAlg {
 		else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}
-
 }

@@ -18,15 +18,15 @@
 
 package boofcv.benchmark.feature.corner;
 
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.evaluation.FileImageSequence;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;

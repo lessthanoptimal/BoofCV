@@ -18,10 +18,10 @@
 
 package boofcv.factory.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperLaplacianBlobIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.image.ImageBase;
 
 

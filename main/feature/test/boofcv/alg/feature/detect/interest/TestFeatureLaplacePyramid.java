@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;

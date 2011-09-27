@@ -19,12 +19,12 @@
 package boofcv.factory.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.intensity.*;
 import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageBase;
@@ -45,14 +45,14 @@ public class FactoryCornerDetector {
 	public static <T extends ImageBase, D extends ImageBase>
 	GeneralFeatureDetector<T,D> createHarris( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
 	{
-		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createHarris(derivType,featureRadius,0.04f);
+		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createHarris(featureRadius, 0.04f, derivType);
 		return createGeneral(cornerIntensity,featureRadius,cornerThreshold,maxFeatures);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>
 	GeneralFeatureDetector<T,D> createKlt( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
 	{
-		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createKlt(derivType,featureRadius);
+		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createKlt(featureRadius, derivType);
 		return createGeneral(cornerIntensity,featureRadius,cornerThreshold,maxFeatures);
 	}
 
@@ -66,7 +66,7 @@ public class FactoryCornerDetector {
 	public static <T extends ImageBase, D extends ImageBase>
 	GeneralFeatureDetector<T,D> createFast( int featureRadius , int pixelTol , int maxFeatures , Class<T> imageType)
 	{
-		FastCornerIntensity<T> alg = FactoryPointIntensityAlg.createFast12(imageType,pixelTol,11);
+		FastCornerIntensity<T> alg = FactoryPointIntensityAlg.createFast12(pixelTol, 11, imageType);
 		GeneralFeatureIntensity<T,D> intensity = new WrapperFastCornerIntensity<T,D>(alg);
 		return createGeneral(intensity,featureRadius,pixelTol,maxFeatures);
 	}
@@ -90,7 +90,7 @@ public class FactoryCornerDetector {
 	GeneralFeatureDetector<T,D> createGeneral( GeneralFeatureIntensity<T,D> intensity ,
 											  int minSeparation , float cornerThreshold , int maxFeatures ) {
 		int intensityBorder = intensity.getIgnoreBorder();
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(minSeparation,cornerThreshold,intensityBorder,false,false,false);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, cornerThreshold, intensityBorder);
 		return new GeneralFeatureDetector<T,D>(intensity,extractor,maxFeatures);
 	}
 }

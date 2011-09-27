@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.transform.ii.IntegralImageOps;
-import boofcv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
 
@@ -38,7 +38,7 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetector {
 
 	@Override
 	protected Object createDetector( int maxFeatures ) {
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(2,1,5,false,false,false);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 1, 5);
 		return new FastHessianFeatureDetector(extractor,maxFeatures,9,4,4);
 	}
 

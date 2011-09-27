@@ -18,9 +18,13 @@
 
 package boofcv.benchmark.feature.detect;
 
-import boofcv.benchmark.feature.BenchmarkAlgorithm;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.alg.feature.detect.interest.*;
+import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
+import boofcv.alg.feature.detect.interest.FeatureLaplaceScaleSpace;
+import boofcv.alg.feature.detect.interest.FeaturePyramid;
+import boofcv.alg.feature.detect.interest.FeatureScaleSpace;
+import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.factory.feature.detect.interest.FactoryBlobDetector;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;

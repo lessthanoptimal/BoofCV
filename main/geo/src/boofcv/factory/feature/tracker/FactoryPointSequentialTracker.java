@@ -32,7 +32,7 @@ import boofcv.alg.tracker.pklt.PkltManager;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.FactoryAssociationTuple;
-import boofcv.factory.feature.detect.extract.FactoryFeatureFromIntensity;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
@@ -97,7 +97,7 @@ public class FactoryPointSequentialTracker {
 	{
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
-		FeatureExtractor extractor = FactoryFeatureFromIntensity.create(minSeparation,1,10,false,false,false);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, 1, 10);
 
 		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor,detectPerScale,9,4,4);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(3,false,integralType);

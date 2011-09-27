@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.factory.feature.detect.interest.FactoryBlobDetector;
 import boofcv.struct.image.ImageFloat32;

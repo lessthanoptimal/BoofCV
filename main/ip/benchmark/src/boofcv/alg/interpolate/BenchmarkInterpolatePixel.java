@@ -20,6 +20,7 @@ package boofcv.alg.interpolate;
 
 import boofcv.alg.interpolate.impl.BilinearPixel_F32;
 import boofcv.alg.interpolate.impl.ImplInterpolatePixelConvolution_F32;
+import boofcv.alg.interpolate.impl.ImplPolynomialPixel_F32;
 import boofcv.alg.interpolate.impl.NearestNeighborPixel_F32;
 import boofcv.alg.interpolate.kernel.BicubicKernel_F32;
 import boofcv.alg.misc.ImageTestingOps;
@@ -93,6 +94,18 @@ public class BenchmarkInterpolatePixel {
 		}
 	}
 
+	public static class Polynomial_Safe_F32 extends PerformerBase {
+		ImplPolynomialPixel_F32 alg = new ImplPolynomialPixel_F32(5,0,255);
+
+		@Override
+		public void process() {
+			alg.setImage(imgFloat32);
+			for (float x = start; x <= end; x += step)
+				for (float y = start; y <= end; y += step)
+					alg.get(x, y);
+		}
+	}
+
 	public static void main(String args[]) {
 		imgInt8 = new ImageUInt8(imgWidth, imgHeight);
 		imgFloat32 = new ImageFloat32(imgWidth, imgHeight);
@@ -108,5 +121,6 @@ public class BenchmarkInterpolatePixel {
 		ProfileOperation.printOpsPerSec(new Bilinear_UnSafe_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new NearestNeighbor_Safe_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new BilinearConvolution_Safe_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Polynomial_Safe_F32(), TEST_TIME);
 	}
 }

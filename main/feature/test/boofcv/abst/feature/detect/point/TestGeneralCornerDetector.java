@@ -19,8 +19,8 @@
 package boofcv.abst.feature.detect.point;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;

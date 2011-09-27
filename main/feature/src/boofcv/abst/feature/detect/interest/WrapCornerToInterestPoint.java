@@ -18,9 +18,9 @@
 
 package boofcv.abst.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.core.image.ImageGenerator;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageBase;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link boofcv.alg.feature.detect.interest.GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
+ * Wrapper around {@link boofcv.abst.feature.detect.extract.GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
  *
  * @author Peter Abeles
  */
