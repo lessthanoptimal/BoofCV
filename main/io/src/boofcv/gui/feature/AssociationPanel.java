@@ -143,4 +143,12 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 			g2.drawLine(x1,y1,x2,y2);
 		}
 	}
+
+	@Override
+	protected boolean isValidPoint(int index) {
+		if( selectedIsLeft )
+			return assocLeft[index] >= 0;
+		else
+			return assocRight[index] >= 0;
+	}
 }

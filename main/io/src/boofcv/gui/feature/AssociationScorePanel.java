@@ -199,6 +199,11 @@ public class AssociationScorePanel<D>
 		g2.drawLine(x,y-r,x,y+r);
 	}
 
+	@Override
+	protected boolean isValidPoint(int index) {
+		return true;
+	}
+
 	private void findStatistics( ) {
 		final int N = selectedIsLeft ? rightPts.size() : leftPts.size();
 

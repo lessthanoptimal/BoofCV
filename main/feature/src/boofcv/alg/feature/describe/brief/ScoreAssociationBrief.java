@@ -26,7 +26,6 @@ import boofcv.alg.feature.associate.ScoreAssociation;
  *
  * @author Peter Abeles
  */
-// todo create unit test
 public class ScoreAssociationBrief implements ScoreAssociation<BriefFeature>{
 	@Override
 	public double score(BriefFeature a, BriefFeature b) {
@@ -38,8 +37,9 @@ public class ScoreAssociationBrief implements ScoreAssociation<BriefFeature>{
 		return score;
 	}
 
-	private int hamming( int a , int b ) {
+	public static int hamming( int a , int b ) {
 		int distance = 0;
+		// see which bits are different
 		int val = a ^ b;
 
 		while( val != 0 ) {

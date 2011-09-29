@@ -16,29 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe.brief;
+package boofcv.alg.feature.describe;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Stores the descriptor as an array of integers.  Each bit is the output of a comparison.
- *
  * @author Peter Abeles
  */
-public class BriefFeature {
-	public int[] data;
-	public int numBits;
+// todo go through each type
+public class TestDescribePointBrief {
 
-	public BriefFeature( int numBits ) {
-		int numInts = numBits/32;
-		if( numBits % 32 != 0 ) {
-			numInts++;
-		}
+	public void testSubImage() {
 
-		this.numBits = numBits;
-		data = new int[numInts];
 	}
 
-	public BriefFeature( int numBits , int numInts ) {
-		this.numBits = numBits;
-		data = new int[numInts];
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }
