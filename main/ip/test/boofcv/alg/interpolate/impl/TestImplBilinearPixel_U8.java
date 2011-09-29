@@ -18,17 +18,17 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageUInt8;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestBilinearPixel_S16 extends GeneralBilinearPixelChecks<ImageSInt16>
+public class TestImplBilinearPixel_U8 extends GeneralBilinearPixelChecks<ImageUInt8>
 {
 
 	@Override
-	protected ImageSInt16 createImage(int width, int height) {
-		return new ImageSInt16(width, height);
+	protected ImageUInt8 createImage(int width, int height) {
+		return new ImageUInt8(width, height);
 	}
 }

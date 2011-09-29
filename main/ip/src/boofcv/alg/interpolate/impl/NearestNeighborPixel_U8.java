@@ -71,4 +71,9 @@ public class NearestNeighborPixel_U8 implements InterpolatePixel<ImageUInt8> {
 
 		return data[ orig.startIndex + yy*stride + xx] & 0xFF;
 	}
+
+	@Override
+	public boolean isInSafeBounds(float x, float y) {
+		return( x >= 0 && y >= 0 && x < width && y < height );
+	}
 }

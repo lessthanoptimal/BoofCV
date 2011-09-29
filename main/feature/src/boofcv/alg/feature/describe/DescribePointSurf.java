@@ -129,4 +129,8 @@ public class DescribePointSurf<II extends ImageBase> {
 	public int getDescriptionLength() {
 		return 64;
 	}
+
+	public int getRadius() {
+		return 4+10;//todo redo and make the descriptor more configurable
+	}
 }

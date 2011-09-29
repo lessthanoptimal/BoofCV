@@ -43,6 +43,11 @@ public class WrapDescribeSteerable <T extends ImageBase, D extends ImageBase>
 	}
 
 	@Override
+	public int getRadius() {
+		return steer.getRadius();
+	}
+
+	@Override
 	public int getDescriptionLength() {
 		return steer.getDescriptionLength();
 	}

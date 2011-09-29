@@ -22,6 +22,7 @@ import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -29,6 +30,7 @@ import boofcv.factory.feature.associate.FactoryAssociationTuple;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.AssociationPanel;
@@ -65,6 +67,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 	InterestPointDetector<T> detector;
 	ExtractFeatureDescription<T> describe;
 	GeneralAssociation<TupleDesc_F64> matcher;
+	OrientationImageAverage<T> orientation;
 
 	T imageLeft;
 	T imageRight;
@@ -86,6 +89,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 
 		addAlgorithm(1,"SURF",FactoryExtractFeatureDescription.surf(true,imageType));
 		addAlgorithm(1,"BRIEF", FactoryExtractFeatureDescription.brief(16,512,-1,4,false,false,imageType));
+		addAlgorithm(1,"BRIEFO", FactoryExtractFeatureDescription.brief(16,512,-1,4,false,true,imageType));
 		addAlgorithm(1,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));
 		addAlgorithm(1,"Gaussian 14",FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType));
 
@@ -93,6 +97,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 
 		addAlgorithm(2,"Greedy", FactoryAssociationTuple.greedy(scorer,Double.MAX_VALUE,maxMatches,false));
 		addAlgorithm(2,"Backwards", FactoryAssociationTuple.greedy(scorer,Double.MAX_VALUE,maxMatches,true));
+
+		orientation = FactoryOrientationAlgs.nogradient(5,imageType);
 
 		imageLeft = GeneralizedImageOps.createImage(imageType,1,1);
 		imageRight = GeneralizedImageOps.createImage(imageType,1,1);
@@ -168,23 +174,36 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 	private void extractImageFeatures( T image , FastQueue<TupleDesc_F64> descs , List<Point2D_I32> locs ) {
 		detector.detect(image);
 		describe.setImage(image);
+		orientation.setImage(image);
 
 		if( detector.hasScale() ) {
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
+				double yaw = 0;
+
 				Point2D_I32 pt = detector.getLocation(i);
 				double scale = detector.getScale(i);
+				if( describe.requiresOrientation() ) {
+					orientation.setRadius((int)(describe.getRadius()*scale));
+					yaw = orientation.compute(pt.x,pt.y);
+				}
 
-				TupleDesc_F64 d = describe.process(pt.x,pt.y,0,scale,null);
+				TupleDesc_F64 d = describe.process(pt.x,pt.y,yaw,scale,null);
 				if( d != null ) {
 					descs.pop().set(d.value);
 					locs.add( pt.copy());
 				}
 			}
 		} else {
+			orientation.setRadius(describe.getRadius());
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
-				Point2D_I32 pt = detector.getLocation(i);
+				double yaw = 0;
 
-				TupleDesc_F64 d = describe.process(pt.x,pt.y,0,1,null);
+				Point2D_I32 pt = detector.getLocation(i);
+				if( describe.requiresOrientation() ) {
+					yaw = orientation.compute(pt.x,pt.y);
+				}
+
+				TupleDesc_F64 d = describe.process(pt.x,pt.y,yaw,1,null);
 				if( d != null ) {
 					descs.pop().set(d.value);
 					locs.add( pt.copy());

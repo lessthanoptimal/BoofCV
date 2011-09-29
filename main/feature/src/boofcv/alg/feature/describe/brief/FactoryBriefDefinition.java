@@ -32,7 +32,8 @@ public class FactoryBriefDefinition {
 
 	/**
 	 * Creates a descriptor by randomly selecting points inside a square region using a Gaussian distribution
-	 * with a sigma of (5/2)*radius.
+	 * with a sigma of (5/2)*radius.  This is done exactly as is described in the paper where twice
+	 * as many points are sampled as are compared..
 	 *
 	 * @param rand Random number generator.
 	 * @param radius Radius of the square region.  width = 2*radius+1.
@@ -40,12 +41,26 @@ public class FactoryBriefDefinition {
 	 * @return Definition of a BRIEF feature.
 	 */
 	public static BriefDefinition gaussian( Random rand, int radius , int numPairs ) {
-		BriefDefinition ret = new BriefDefinition(radius,numPairs);
+		BriefDefinition ret = new BriefDefinition(radius,numPairs*2,numPairs);
 
 		double sigma = (2.0*radius+1.0)/5.0;
 		for( int i = 0; i < numPairs; i++ ) {
-			randomGaussian(rand,sigma,radius,ret.setA[i]);
-			randomGaussian(rand,sigma,radius,ret.setB[i]);
+			randomGaussian(rand,sigma,radius,ret.samplePoints[i]);
+			randomGaussian(rand,sigma,radius,ret.samplePoints[i+numPairs]);
+
+			ret.compare[i].set(i,i+numPairs);
+		}
+
+		return ret;
+	}
+
+	public static BriefDefinition gaussian2( Random rand, int radius , int numPairs ) {
+		BriefDefinition ret = new BriefDefinition(radius,numPairs,numPairs);
+
+		double sigma = (2.0*radius+1.0)/5.0;
+		for( int i = 0; i < numPairs; i++ ) {
+			randomGaussian(rand,sigma,radius,ret.samplePoints[i]);
+			ret.compare[i].set(i,rand.nextInt(numPairs));
 		}
 
 		return ret;

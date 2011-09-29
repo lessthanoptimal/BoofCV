@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.alg.interpolate.impl.BilinearPixel_F32;
+import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
 import boofcv.alg.interpolate.impl.ImplInterpolatePixelConvolution_F32;
 import boofcv.alg.interpolate.impl.ImplPolynomialPixel_F32;
 import boofcv.alg.interpolate.impl.NearestNeighborPixel_F32;
@@ -50,7 +50,7 @@ public class BenchmarkInterpolatePixel {
 	static float step = 1f;
 
 	public static class Bilinear_Safe_F32 extends PerformerBase {
-		BilinearPixel_F32 alg = new BilinearPixel_F32(imgFloat32);
+		ImplBilinearPixel_F32 alg = new ImplBilinearPixel_F32(imgFloat32);
 
 		@Override
 		public void process() {
@@ -61,7 +61,7 @@ public class BenchmarkInterpolatePixel {
 	}
 
 	public static class Bilinear_UnSafe_F32 extends PerformerBase {
-		BilinearPixel_F32 alg = new BilinearPixel_F32(imgFloat32);
+		ImplBilinearPixel_F32 alg = new ImplBilinearPixel_F32(imgFloat32);
 
 		@Override
 		public void process() {

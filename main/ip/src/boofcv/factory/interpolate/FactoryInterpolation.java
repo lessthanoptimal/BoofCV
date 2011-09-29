@@ -62,13 +62,13 @@ public class FactoryInterpolation {
 
 	public static <T extends ImageBase> InterpolatePixel<T> bilinearPixel(Class<T> type ) {
 		if( type == ImageFloat32.class )
-			return (InterpolatePixel<T>)new BilinearPixel_F32();
+			return (InterpolatePixel<T>)new ImplBilinearPixel_F32();
 		else if( type == ImageUInt8.class )
-			return (InterpolatePixel<T>)new BilinearPixel_U8();
+			return (InterpolatePixel<T>)new ImplBilinearPixel_U8();
 		else if( type == ImageSInt16.class )
-			return (InterpolatePixel<T>)new BilinearPixel_S16();
+			return (InterpolatePixel<T>)new ImplBilinearPixel_S16();
 		else if( type == ImageSInt32.class )
-			return (InterpolatePixel<T>)new BilinearPixel_S32();
+			return (InterpolatePixel<T>)new ImplBilinearPixel_S32();
 		else
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}

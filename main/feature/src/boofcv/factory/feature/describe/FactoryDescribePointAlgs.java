@@ -19,18 +19,17 @@
 package boofcv.factory.feature.describe;
 
 import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.alg.feature.describe.DescribePointBrief;
-import boofcv.alg.feature.describe.DescribePointGaussian12;
-import boofcv.alg.feature.describe.DescribePointSteerable2D;
-import boofcv.alg.feature.describe.DescribePointSurf;
+import boofcv.alg.feature.describe.*;
 import boofcv.alg.feature.describe.brief.BriefDefinition;
 import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_F32;
 import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_U16;
 import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_U8;
 import boofcv.alg.filter.kernel.SteerableKernel;
+import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.filter.kernel.FactorySteerable;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -39,6 +38,8 @@ import boofcv.struct.image.ImageUInt8;
 
 
 /**
+ * Creates algorithms for describing point features.
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
@@ -62,6 +63,15 @@ public class FactoryDescribePointAlgs {
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 		}
+	}
+
+	public static <T extends ImageBase>
+	DescribePointBriefO briefo(BriefDefinition definition, BlurFilter<T> filterBlur ) {
+		Class<T> imageType = filterBlur.getInputType();
+
+		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+
+		return new DescribePointBriefO(definition,filterBlur,interp);
 	}
 
 	public static <T extends ImageBase, K extends Kernel2D>

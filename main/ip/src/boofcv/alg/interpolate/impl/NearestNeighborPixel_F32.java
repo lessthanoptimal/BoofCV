@@ -71,4 +71,9 @@ public class NearestNeighborPixel_F32 implements InterpolatePixel<ImageFloat32> 
 
 		return data[ orig.startIndex + yy*stride + xx];
 	}
+
+	@Override
+	public boolean isInSafeBounds(float x, float y) {
+		return( x >= 0 && y >= 0 && x < width && y < height );
+	}
 }

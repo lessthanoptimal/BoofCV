@@ -57,6 +57,7 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 				"import boofcv.alg.feature.describe.brief.BriefFeature;\n" +
 				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.image.*;\n" +
+				"import georegression.struct.point.Point2D_I32;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -90,9 +91,9 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 				"\n" +
 				"\t\tint index = blur.startIndex + blur.stride*c_y + c_x;\n" +
 				"\n" +
-				"\t\tfor( int i = 0; i < definition.setA.length; i++ ) {\n" +
-				"\t\t\t"+sumType+" valA = blur.data[index+offsetsA[i]]"+bitwise+";\n" +
-				"\t\t\t"+sumType+" valB = blur.data[index+offsetsB[i]]"+bitwise+";\n" +
+				"\t\tfor( int i = 0; i < definition.compare.length; i++ ) {\n" +
+				"\t\t\t"+sumType+" valA = blur.data[index + offsetsA[i]]"+bitwise+";\n" +
+				"\t\t\t"+sumType+" valB = blur.data[index + offsetsB[i]]"+bitwise+";\n" +
 				"\n" +
 				"\t\t\tif( valA < valB ) {\n" +
 				"\t\t\t\tfeature.data[ i/32 ] |= 1 << (i % 32);\n" +

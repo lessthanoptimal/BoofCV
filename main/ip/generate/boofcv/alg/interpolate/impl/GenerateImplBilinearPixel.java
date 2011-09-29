@@ -20,20 +20,14 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 
 /**
  * @author Peter Abeles
  */
-public class GenerateBilinearPixel extends CodeGeneratorBase {
-	String className;
-
-	PrintStream out;
+public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 	AutoTypeImage image;
 
 	@Override
@@ -45,47 +39,36 @@ public class GenerateBilinearPixel extends CodeGeneratorBase {
 	}
 
 	private void createType( AutoTypeImage type ) throws FileNotFoundException {
-		className = "BilinearPixel_"+type.name();
+		className = "ImplBilinearPixel_"+type.name();
 		image = type;
 
 		createFile();
 	}
 
 	private void createFile() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
 		printPreamble();
 		printTheRest();
 		out.println("}");
 	}
 
-	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.interpolate.impl;\n");
-		out.println();
-		out.print("import boofcv.alg.interpolate.InterpolatePixel;\n" +
+	private void printPreamble() throws FileNotFoundException {
+		setOutputFile(className);
+		out.print("import boofcv.alg.interpolate.BilinearPixel;\n" +
 				"import boofcv.struct.image."+image.getImageName()+";\n");
 		out.println();
 		out.println();
 		out.print("/**\n" +
 				" * <p>\n" +
-				" * Performs bilinear interpolation to extract values between pixels in an image.  When a boundary is encountered\n" +
-				" * the number of pixels used to interpolate is automatically reduced.\n" +
+				" * Implementation of {@link BilinearPixel} for a specific image type.\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +
-				" * NOTE: This code was automatically generated using {@link GenerateBilinearPixel}.\n" +
+				" * NOTE: This code was automatically generated using {@link GenerateImplBilinearPixel}.\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+" implements InterpolatePixel<"+image.getImageName()+"> {\n" +
-				"\n" +
-				"\tprivate "+image.getImageName()+" orig;\n" +
-				"\n" +
-				"\tprivate "+image.getDataType()+" data[];\n" +
-				"\tprivate int stride;\n" +
-				"\tprivate int width;\n" +
-				"\tprivate int height;\n" +
+				"public class "+className+" extends BilinearPixel<"+image.getImageName()+"> {\n" +
 				"\n" +
 				"\tpublic "+className+"() {\n" +
 				"\t}\n" +
@@ -93,20 +76,7 @@ public class GenerateBilinearPixel extends CodeGeneratorBase {
 				"\tpublic "+className+"("+image.getImageName()+" orig) {\n" +
 				"\t\tsetImage(orig);\n" +
 				"\t}\n" +
-				"\n" +
-				"\t@Override\n" +
-				"\tpublic void setImage("+image.getImageName()+" image) {\n" +
-				"\t\tthis.orig = image;\n" +
-				"\t\tthis.data = orig.data;\n" +
-				"\t\tthis.stride = orig.getStride();\n" +
-				"\t\tthis.width = orig.getWidth();\n" +
-				"\t\tthis.height = orig.getHeight();\n" +
-				"\t}\n" +
-				"\n" +
-				"\t@Override\n" +
-				"\tpublic "+image.getImageName()+" getImage() {\n" +
-				"\t\treturn orig;\n" +
-				"\t}\n\n");
+				"\n\n");
 
 	}
 
@@ -124,6 +94,8 @@ public class GenerateBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\t\tint dx = xt == width - 1 ? 0 : 1;\n" +
 				"\t\tint dy = yt == height - 1 ? 0 : stride;\n" +
+				"\n" +
+				"\t\t"+image.getDataType()+"[] data = orig.data;\n" +
 				"\n" +
 				"\t\tfloat val = (1.0f - ax) * (1.0f - ay) * (data[index] "+bitWise+"); // (x,y)\n" +
 				"\t\tval += ax * (1.0f - ay) * (data[index + dx] "+bitWise+"); // (x+1,y)\n" +
@@ -150,6 +122,8 @@ public class GenerateBilinearPixel extends CodeGeneratorBase {
 				"\t\tint dx = xt == width - 1 ? 0 : 1;\n" +
 				"\t\tint dy = yt == height - 1 ? 0 : stride;\n" +
 				"\n" +
+				"\t\t"+image.getDataType()+"[] data = orig.data;\n" +
+				"\n" +
 				"\t\tfloat val = (1.0f - ax) * (1.0f - ay) * (data[index] "+bitWise+"); // (x,y)\n" +
 				"\t\tval += ax * (1.0f - ay) * (data[index + dx] "+bitWise+"); // (x+1,y)\n" +
 				"\t\tval += ax * ay * (data[index + dx + dy] "+bitWise+"); // (x+1,y+1)\n" +
@@ -160,7 +134,7 @@ public class GenerateBilinearPixel extends CodeGeneratorBase {
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		GenerateBilinearPixel gen = new GenerateBilinearPixel();
+		GenerateImplBilinearPixel gen = new GenerateImplBilinearPixel();
 		gen.generate();
 	}
 }

@@ -43,8 +43,6 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-// TODO Each descriptor interprets the scale value different.  The actual region sample size will vary.
-// maybe add a region size to ExtractFeatureDescription?
 public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends ImageBase>
 	extends SelectAlgorithmImagePanel implements ProcessInput, SelectRegionDescriptionPanel.Listener
 {
@@ -66,6 +64,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 
 		addAlgorithm(0,"SURF", FactoryExtractFeatureDescription.surf(false,imageType));
 		addAlgorithm(0,"BRIEF", FactoryExtractFeatureDescription.brief(16, 512, -1, 4, false, false, imageType));
+		addAlgorithm(0,"BRIEFO", FactoryExtractFeatureDescription.brief(16, 512, -1, 4, false, true, imageType));
 		addAlgorithm(0,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));
 		addAlgorithm(0,"Gaussian 14",FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType));
 
@@ -130,7 +129,9 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 		if( pt == null || radius < 1) {
 			tuplePanel.setDescription(null);
 		} else {
-			TupleDesc_F64 feature = describe.process(pt.x,pt.y,orientation,radius/10.0,null);
+			double scale = radius/describe.getRadius();
+
+			TupleDesc_F64 feature = describe.process(pt.x,pt.y,orientation,scale,null);
 			tuplePanel.setDescription(feature);
 		}
 		tuplePanel.repaint();

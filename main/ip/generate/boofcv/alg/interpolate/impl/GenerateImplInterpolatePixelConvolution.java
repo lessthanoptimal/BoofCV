@@ -184,7 +184,13 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\t\telse if( value < min )\n" +
 				"\t\t\treturn min;\n" +
 				"\t\telse\n" +
-				"\t\t\treturn value\n;"+
+				"\t\t\treturn value;\n"+
+				"\t}\n"+
+				"\t@Override\n" +
+				"\tpublic boolean isInSafeBounds(float x, float y) {\n" +
+				"\t\tfloat r = kernel.getRadius();\n" +
+				"\t\t\n" +
+				"\t\treturn (x-r >= 0 && y-r >= 0 && x+r < image.width && y+r <image.height);\n" +
 				"\t}\n\n");
 	}
 

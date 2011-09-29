@@ -21,27 +21,37 @@ package boofcv.alg.feature.describe.brief;
 import georegression.struct.point.Point2D_I32;
 
 /**
+ * <p>
  * Describes the layout of a BRIEF descriptor.  This descriptor is composed of a set of locations
- * where image intensity is sampled and compared against each other.
+ * where image intensity is sampled and a list of which locations are compared against each other.
+ * </p>
+ *
+ * <p>
+ * NOTE: The data structure here is different than the one implied in the paper.  A single list of sample points
+ * is provided instead of two lists.  This way a single set of points can sample within the same set, reducing
+ * the number of samples taken.
+ * </p>
  *
  * @author Peter Abeles
  */
 public class BriefDefinition {
 	// radius of the region
 	public int radius;
-	// first set of locations
-	public Point2D_I32 setA[];
-	// second set of locations
-	public Point2D_I32 setB[];
+	// points whose intensity values are sampled
+	public Point2D_I32 samplePoints[];
+	// indexes of points which are compared
+	public Point2D_I32 compare[];
 
-	public BriefDefinition( int radius , int numPairs ) {
+	public BriefDefinition( int radius , int numSamples , int numPairs  ) {
 		this.radius = radius;
-		setA = new Point2D_I32[ numPairs ];
-		setB = new Point2D_I32[ numPairs ];
+		samplePoints = new Point2D_I32[ numSamples ];
+		compare = new Point2D_I32[ numPairs ];
 
-		for( int i = 0; i < setA.length; i++ ) {
-			setA[i] = new Point2D_I32();
-			setB[i] = new Point2D_I32();
+		for( int i = 0; i < samplePoints.length; i++ ) {
+			samplePoints[i] = new Point2D_I32();
+		}
+		for( int i = 0; i < compare.length; i++ ) {
+			compare[i] = new Point2D_I32();
 		}
 	}
 
@@ -51,6 +61,6 @@ public class BriefDefinition {
 	 * @return Descriptor length.
 	 */
 	public int getLength() {
-		return setA.length;
+		return samplePoints.length;
 	}
 }

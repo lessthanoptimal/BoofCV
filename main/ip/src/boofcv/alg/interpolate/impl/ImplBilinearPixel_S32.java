@@ -18,51 +18,30 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.alg.interpolate.BilinearPixel;
+import boofcv.struct.image.ImageSInt32;
 
 
 /**
  * <p>
- * Performs bilinear interpolation to extract values between pixels in an image.  When a boundary is encountered
- * the number of pixels used to interpolate is automatically reduced.
+ * Implementation of {@link BilinearPixel} for a specific image type.
  * </p>
  *
  * <p>
- * NOTE: This code was automatically generated using {@link GenerateBilinearPixel}.
+ * NOTE: This code was automatically generated using {@link GenerateImplBilinearPixel}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class BilinearPixel_U8 implements InterpolatePixel<ImageUInt8> {
+public class ImplBilinearPixel_S32 extends BilinearPixel<ImageSInt32> {
 
-	private ImageUInt8 orig;
-
-	private byte data[];
-	private int stride;
-	private int width;
-	private int height;
-
-	public BilinearPixel_U8() {
+	public ImplBilinearPixel_S32() {
 	}
 
-	public BilinearPixel_U8(ImageUInt8 orig) {
+	public ImplBilinearPixel_S32(ImageSInt32 orig) {
 		setImage(orig);
 	}
 
-	@Override
-	public void setImage(ImageUInt8 image) {
-		this.orig = image;
-		this.data = orig.data;
-		this.stride = orig.getStride();
-		this.width = orig.getWidth();
-		this.height = orig.getHeight();
-	}
-
-	@Override
-	public ImageUInt8 getImage() {
-		return orig;
-	}
 
 	@Override
 	public float get_unsafe(float x, float y) {
@@ -76,10 +55,12 @@ public class BilinearPixel_U8 implements InterpolatePixel<ImageUInt8> {
 		int dx = xt == width - 1 ? 0 : 1;
 		int dy = yt == height - 1 ? 0 : stride;
 
-		float val = (1.0f - ax) * (1.0f - ay) * (data[index] & 0xFF); // (x,y)
-		val += ax * (1.0f - ay) * (data[index + dx] & 0xFF); // (x+1,y)
-		val += ax * ay * (data[index + dx + dy] & 0xFF); // (x+1,y+1)
-		val += (1.0f - ax) * ay * (data[index + dy] & 0xFF); // (x,y+1)
+		int[] data = orig.data;
+
+		float val = (1.0f - ax) * (1.0f - ay) * (data[index] ); // (x,y)
+		val += ax * (1.0f - ay) * (data[index + dx] ); // (x+1,y)
+		val += ax * ay * (data[index + dx + dy] ); // (x+1,y+1)
+		val += (1.0f - ax) * ay * (data[index + dy] ); // (x,y+1)
 
 		return val;
 	}
@@ -101,10 +82,12 @@ public class BilinearPixel_U8 implements InterpolatePixel<ImageUInt8> {
 		int dx = xt == width - 1 ? 0 : 1;
 		int dy = yt == height - 1 ? 0 : stride;
 
-		float val = (1.0f - ax) * (1.0f - ay) * (data[index] & 0xFF); // (x,y)
-		val += ax * (1.0f - ay) * (data[index + dx] & 0xFF); // (x+1,y)
-		val += ax * ay * (data[index + dx + dy] & 0xFF); // (x+1,y+1)
-		val += (1.0f - ax) * ay * (data[index + dy] & 0xFF); // (x,y+1)
+		int[] data = orig.data;
+
+		float val = (1.0f - ax) * (1.0f - ay) * (data[index] ); // (x,y)
+		val += ax * (1.0f - ay) * (data[index + dx] ); // (x+1,y)
+		val += ax * ay * (data[index + dx + dy] ); // (x+1,y+1)
+		val += (1.0f - ax) * ay * (data[index + dy] ); // (x,y+1)
 
 		return val;
 	}

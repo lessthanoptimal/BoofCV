@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_I32;
 
 /**
  * <p>
- * BRIEF: Binary Robust Independent Elementary Features. [1] Invariance: light and small rotations.  Fast to compute
+ * BRIEF: Binary Robust Independent Elementary Features. [1] Invariance: light.  Fast to compute
  * and to compare feature descriptions.  Shown to be more robust than SURF in situations it was designed for.
  * </p>
  *
@@ -53,6 +53,8 @@ public abstract class DescribePointBrief<T extends ImageBase> {
 	protected T blur;
 
 	// precomputed offsets of sample points inside the image.
+	// splitting it into two arrays avoids an extract array lookup, boosting performance by about 30%
+	private  int offsets[]; // just a temporary place holder
 	protected int offsetsA[];
 	protected int offsetsB[];
 
@@ -62,8 +64,9 @@ public abstract class DescribePointBrief<T extends ImageBase> {
 
 		blur = GeneralizedImageOps.createImage(filterBlur.getInputType(),1,1);
 
-		offsetsA = new int[ definition.getLength() ];
-		offsetsB = new int[ definition.getLength() ];
+		offsets = new int[ definition.samplePoints.length ];
+		offsetsA = new int[ definition.compare.length ];
+		offsetsB = new int[ definition.compare.length ];
 	}
 
 	public BriefFeature createFeature() {
@@ -74,12 +77,16 @@ public abstract class DescribePointBrief<T extends ImageBase> {
 		blur.reshape(image.width,image.height);
 		filterBlur.process(image,blur);
 
-		for( int i = 0; i < definition.setA.length ; i++ ) {
-			Point2D_I32 a = definition.setA[i];
-			Point2D_I32 b = definition.setB[i];
+		for( int i = 0; i < definition.samplePoints.length ; i++ ) {
+			Point2D_I32 a = definition.samplePoints[i];
 
-			offsetsA[i] = blur.startIndex + blur.stride*a.y + a.x;
-			offsetsB[i] = blur.startIndex + blur.stride*b.y + b.x;
+			offsets[i] = blur.startIndex + blur.stride*a.y + a.x;
+		}
+
+		for( int i = 0; i < definition.compare.length ; i++ ) {
+			Point2D_I32 p = definition.compare[i];
+			offsetsA[i] = offsets[p.x];
+			offsetsB[i] = offsets[p.y];
 		}
 	}
 
