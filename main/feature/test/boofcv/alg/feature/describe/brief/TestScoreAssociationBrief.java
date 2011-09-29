@@ -18,27 +18,16 @@
 
 package boofcv.alg.feature.describe.brief;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 /**
- * Stores the descriptor as an array of integers.  Each bit is the output of a comparison.
- *
  * @author Peter Abeles
  */
-public class BriefFeature {
-	public int[] data;
-	public int numBits;
-
-	public BriefFeature( int numBits ) {
-		int numInts = numBits/32;
-		if( numBits % 32 != 0 ) {
-			numInts++;
-		}
-
-		this.numBits = numBits;
-		data = new int[numInts];
-	}
-
-	public BriefFeature( int numBits , int numInts ) {
-		this.numBits = numBits;
-		data = new int[numInts];
+public class TestScoreAssociationBrief {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

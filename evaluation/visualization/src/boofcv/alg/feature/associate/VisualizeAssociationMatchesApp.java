@@ -217,7 +217,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 		manager.add("Cave","data/stitch/cave_01.jpg","data/stitch/cave_02.jpg");
 		manager.add("Kayak","data/stitch/kayak_02.jpg","data/stitch/kayak_03.jpg");
 		manager.add("Forest","data/scale/rainforest_01.jpg","data/scale/rainforest_02.jpg");
-		manager.add("Building","data/stitch/apartment_building_01.jpg","data/stitch/apartment_building_02.jpg");
+//		manager.add("Building","data/stitch/apartment_building_01.jpg","data/stitch/apartment_building_02.jpg");
+		manager.add("Trees Rotate","data/stitch/trees_rotate_01.jpg","data/stitch/trees_rotate_03.jpg");
 
 		app.setPreferredSize(new Dimension(1000,500));
 		app.setSize(1000,500);

@@ -185,6 +185,9 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 		double bestDist = clickDistance;
 		int bestIndex = -1;
 		for( int i = 0; i < pts.size(); i++ ) {
+			if( !isValidPoint(i) )
+				continue;
+
 			Point2D_I32 p = pts.get(i);
 			double d = UtilPoint2D_I32.distance(p.x,p.y,x,y);
 			if( d < bestDist ) {
@@ -194,6 +197,8 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 		}
 		return bestIndex;
 	}
+
+	protected abstract boolean isValidPoint( int index );
 
 	@Override
 	public void mousePressed(MouseEvent e) {}

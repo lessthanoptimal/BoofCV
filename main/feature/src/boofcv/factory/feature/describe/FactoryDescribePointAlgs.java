@@ -18,15 +18,24 @@
 
 package boofcv.factory.feature.describe;
 
+import boofcv.abst.filter.blur.BlurFilter;
+import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointGaussian12;
 import boofcv.alg.feature.describe.DescribePointSteerable2D;
 import boofcv.alg.feature.describe.DescribePointSurf;
+import boofcv.alg.feature.describe.brief.BriefDefinition;
+import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_F32;
+import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_U16;
+import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_U8;
 import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.filter.kernel.FactorySteerable;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.ImageUInt8;
 
 
 /**
@@ -38,6 +47,21 @@ public class FactoryDescribePointAlgs {
 	public static <T extends ImageBase>
 	DescribePointSurf<T> surf(Class<T> imageType) {
 		return new DescribePointSurf<T>();
+	}
+
+	public static <T extends ImageBase>
+	DescribePointBrief<T> brief(BriefDefinition definition, BlurFilter<T> filterBlur ) {
+		Class<T> imageType = filterBlur.getInputType();
+
+		if( imageType == ImageFloat32.class ) {
+			return (DescribePointBrief<T> )new ImplDescribePointBrief_F32(definition,(BlurFilter<ImageFloat32>)filterBlur);
+		} else if( imageType == ImageUInt8.class ) {
+			return (DescribePointBrief<T> )new ImplDescribePointBrief_U8(definition,(BlurFilter<ImageUInt8>)filterBlur);
+		} else if( imageType == ImageUInt16.class ) {
+			return (DescribePointBrief<T> )new ImplDescribePointBrief_U16(definition,(BlurFilter<ImageUInt16>)filterBlur);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
+		}
 	}
 
 	public static <T extends ImageBase, K extends Kernel2D>

@@ -95,6 +95,6 @@ public class FactoryExtractFeatureDescription {
 		BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
 		BriefDefinition definition = FactoryBriefDefinition.gaussian(new Random(123), radius,numPoints);
 
-		return new WrapDescribeBrief<T>(definition,filter);
+		return new WrapDescribeBrief<T>(FactoryDescribePointAlgs.brief(definition,filter));
 	}
 }

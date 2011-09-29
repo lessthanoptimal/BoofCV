@@ -23,7 +23,8 @@ import georegression.struct.point.Point2D_I32;
 import java.util.Random;
 
 /**
- * Creates different brief descriptors.
+ * Creates different brief descriptors.  The original paper proposed several different configurations.  The
+ * best one were randomly generated with a gaussian distribution.
  *
  * @author Peter Abeles
  */

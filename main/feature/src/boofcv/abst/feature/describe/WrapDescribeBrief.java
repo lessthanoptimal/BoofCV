@@ -18,9 +18,7 @@
 
 package boofcv.abst.feature.describe;
 
-import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.DescribePointBrief;
-import boofcv.alg.feature.describe.brief.BriefDefinition;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
@@ -35,9 +33,9 @@ public class WrapDescribeBrief<T extends ImageBase> implements ExtractFeatureDes
 	DescribePointBrief alg;
 	BriefFeature feature;
 
-	public WrapDescribeBrief( BriefDefinition definition, BlurFilter<T> filterBlur) {
-		this.alg = new DescribePointBrief(definition,filterBlur);
-		this.length = definition.getLength();
+	public WrapDescribeBrief( DescribePointBrief<T> alg ) {
+		this.alg = alg;
+		this.length = alg.getDefinition().getLength();
 		feature = new BriefFeature(length);
 	}
 

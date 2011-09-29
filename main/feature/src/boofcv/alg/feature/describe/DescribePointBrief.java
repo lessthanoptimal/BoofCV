@@ -21,30 +21,46 @@ package boofcv.alg.feature.describe;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BriefDefinition;
 import boofcv.alg.feature.describe.brief.BriefFeature;
-import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_I32;
 
 /**
+ * <p>
+ * BRIEF: Binary Robust Independent Elementary Features. [1] Invariance: light and small rotations.  Fast to compute
+ * and to compare feature descriptions.  Shown to be more robust than SURF in situations it was designed for.
+ * </p>
+ *
+ * <p>
+ * Describes an image region by comparing a large number of mage point pairs.  The location of each point in the
+ * pair is determined by the feature's {@link BriefDefinition definition} and the comparison itself is done using
+ * a simple less than operator: pixel(1) < pixel(2).  Distance between two descriptors is computed using the Hamming distance.
+ * </p>
+ *
+ * <p>
+ * [1] Michael Calonder, Vincent Lepetit, Christoph Strecha, and Pascal Fua. "BRIEF: Binary Robust Independent Elementary
+ * Features" in European Conference on Computer Vision, September 2010.
+ * </p>
+ *
  * @author Peter Abeles
  */
-// todo add for other image types.
-// todo create a new brief with scale + orientation? new class?  generic transform?
-public class DescribePointBrief {
+public abstract class DescribePointBrief<T extends ImageBase> {
 	// scribes the BRIEF feature
-	BriefDefinition definition;
+	protected BriefDefinition definition;
 	// blurs the image prior to sampling
-	BlurFilter filterBlur;
+	protected BlurFilter<T> filterBlur;
 	// blurred image
-	ImageFloat32 blur = new ImageFloat32(1,1);
+	protected T blur;
 
 	// precomputed offsets of sample points inside the image.
-	int offsetsA[];
-	int offsetsB[];
+	protected int offsetsA[];
+	protected int offsetsB[];
 
-	public DescribePointBrief(BriefDefinition definition, BlurFilter filterBlur) {
+	public DescribePointBrief(BriefDefinition definition, BlurFilter<T> filterBlur) {
 		this.definition = definition;
 		this.filterBlur = filterBlur;
+
+		blur = GeneralizedImageOps.createImage(filterBlur.getInputType(),1,1);
 
 		offsetsA = new int[ definition.getLength() ];
 		offsetsB = new int[ definition.getLength() ];
@@ -54,7 +70,7 @@ public class DescribePointBrief {
 		return new BriefFeature(definition.getLength());
 	}
 
-	public void setImage(ImageFloat32 image) {
+	public void setImage(T image) {
 		blur.reshape(image.width,image.height);
 		filterBlur.process(image,blur);
 
@@ -67,24 +83,9 @@ public class DescribePointBrief {
 		}
 	}
 
-	public boolean process( int c_x , int c_y , BriefFeature feature )
-	{
-		if( !BoofMiscOps.checkInside(blur,c_x,c_y,definition.radius) )
-			return false;
+	public abstract boolean process( int c_x , int c_y , BriefFeature feature );
 
-		BoofMiscOps.zero(feature.data,feature.data.length);
-
-		int index = blur.startIndex + blur.stride*c_y + c_x;
-
-		for( int i = 0; i < definition.setA.length; i++ ) {
-			float valA = blur.data[index+offsetsA[i]];
-			float valB = blur.data[index+offsetsB[i]];
-
-			if( valA < valB ) {
-				feature.data[ i/32 ] |= 1 << (i % 32);
-			}
-		}
-
-		return true;
+	public BriefDefinition getDefinition() {
+		return definition;
 	}
 }

@@ -23,6 +23,7 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.misc.Performer;
@@ -81,12 +82,12 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 
 	public class Brief512 extends PerformerBase {
 
-		DescribePointBrief alg = new DescribePointBrief(FactoryBriefDefinition.gaussian(new Random(123),16,512),
-				FactoryBlurFilter.gaussian(imageType,0,4));
+		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian(new Random(123), 16, 512),
+				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		@Override
 		public void process() {
-			alg.setImage((ImageFloat32)image);
+			alg.setImage(image);
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
 				alg.process(p.x,p.y,alg.createFeature());

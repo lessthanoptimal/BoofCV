@@ -20,7 +20,6 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -33,7 +32,6 @@ import java.io.PrintStream;
 public class GenerateImplOrientationAverage extends CodeGeneratorBase {
 	String className;
 
-	PrintStream out;
 	AutoTypeImage imageType;
 
 	@Override
@@ -53,11 +51,9 @@ public class GenerateImplOrientationAverage extends CodeGeneratorBase {
 		out.print("}\n");
 	}
 
-	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.feature.describe.impl;\n" +
-				"\n" +
-				"import boofcv.alg.feature.describe.OrientationAverage;\n" +
+	private void printPreamble() throws FileNotFoundException {
+		setOutputFile(className);
+		out.print("import boofcv.alg.feature.describe.OrientationAverage;\n" +
 				"import boofcv.struct.image."+imageType.getImageName()+";\n" +
 				"\n" +
 				"\n" +
