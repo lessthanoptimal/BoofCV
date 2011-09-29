@@ -138,8 +138,14 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixel<Ima
 		else if( value < min )
 			return min;
 		else
-			return value
-;	}
+			return value;
+	}
+	@Override
+	public boolean isInSafeBounds(float x, float y) {
+		float r = kernel.getRadius();
+		
+		return (x-r >= 0 && y-r >= 0 && x+r < image.width && y+r <image.height);
+	}
 
 
 }

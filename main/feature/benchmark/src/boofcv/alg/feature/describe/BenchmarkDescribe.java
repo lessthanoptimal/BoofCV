@@ -52,6 +52,7 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 
 	Point2D_I32 pts[];
 	double scales[];
+	double yaws[];
 
 	Class<I> imageType;
 	Class<D> derivType;
@@ -70,19 +71,21 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 
 		pts = new Point2D_I32[ NUM_POINTS ];
 		scales = new double[ NUM_POINTS ];
+		yaws = new double[ NUM_POINTS ];
 		int border = 20;
 		for( int i = 0; i < NUM_POINTS; i++ ) {
 			int x = rand.nextInt(width-border*2)+border;
 			int y = rand.nextInt(height-border*2)+border;
 			pts[i] = new Point2D_I32(x,y);
 			scales[i] = rand.nextDouble()*3+1;
+			yaws[i] = 2.0*(rand.nextDouble()-0.5)*Math.PI;
 		}
 
 	}
 
 	public class Brief512 extends PerformerBase {
 
-		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian(new Random(123), 16, 512),
+		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		@Override
@@ -91,6 +94,21 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
 				alg.process(p.x,p.y,alg.createFeature());
+			}
+		}
+	}
+
+	public class BriefO512 extends PerformerBase {
+
+		DescribePointBriefO alg = FactoryDescribePointAlgs.briefo(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+				FactoryBlurFilter.gaussian(imageType, 0, 4));
+
+		@Override
+		public void process() {
+			alg.setImage((ImageFloat32)image);
+			for( int i = 0; i < pts.length; i++ ) {
+				Point2D_I32 p = pts[i];
+				alg.process(p.x,p.y,(float)yaws[i],alg.createFeature());
 			}
 		}
 	}
@@ -110,7 +128,7 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 			alg.setImage(image);
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				alg.process(p.x,p.y,0,scales[i],null);
+				alg.process(p.x,p.y,yaws[i],scales[i],null);
 			}
 		}
 
@@ -126,6 +144,7 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 
 		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryExtractFeatureDescription.<I,II>surf(true,imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new BriefO512(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Steer r=12", FactoryExtractFeatureDescription.steerableGaussian(12,false,imageType,derivType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Steer Norm r=12", FactoryExtractFeatureDescription.steerableGaussian(12,true,imageType,derivType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=12", FactoryExtractFeatureDescription.gaussian12(12,imageType,derivType)),TEST_TIME);

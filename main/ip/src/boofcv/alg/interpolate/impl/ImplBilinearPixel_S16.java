@@ -18,51 +18,30 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.BilinearPixel;
 import boofcv.struct.image.ImageSInt16;
 
 
 /**
  * <p>
- * Performs bilinear interpolation to extract values between pixels in an image.  When a boundary is encountered
- * the number of pixels used to interpolate is automatically reduced.
+ * Implementation of {@link BilinearPixel} for a specific image type.
  * </p>
  *
  * <p>
- * NOTE: This code was automatically generated using {@link GenerateBilinearPixel}.
+ * NOTE: This code was automatically generated using {@link GenerateImplBilinearPixel}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class BilinearPixel_S16 implements InterpolatePixel<ImageSInt16> {
+public class ImplBilinearPixel_S16 extends BilinearPixel<ImageSInt16> {
 
-	private ImageSInt16 orig;
-
-	private short data[];
-	private int stride;
-	private int width;
-	private int height;
-
-	public BilinearPixel_S16() {
+	public ImplBilinearPixel_S16() {
 	}
 
-	public BilinearPixel_S16(ImageSInt16 orig) {
+	public ImplBilinearPixel_S16(ImageSInt16 orig) {
 		setImage(orig);
 	}
 
-	@Override
-	public void setImage(ImageSInt16 image) {
-		this.orig = image;
-		this.data = orig.data;
-		this.stride = orig.getStride();
-		this.width = orig.getWidth();
-		this.height = orig.getHeight();
-	}
-
-	@Override
-	public ImageSInt16 getImage() {
-		return orig;
-	}
 
 	@Override
 	public float get_unsafe(float x, float y) {
@@ -75,6 +54,8 @@ public class BilinearPixel_S16 implements InterpolatePixel<ImageSInt16> {
 
 		int dx = xt == width - 1 ? 0 : 1;
 		int dy = yt == height - 1 ? 0 : stride;
+
+		short[] data = orig.data;
 
 		float val = (1.0f - ax) * (1.0f - ay) * (data[index] ); // (x,y)
 		val += ax * (1.0f - ay) * (data[index + dx] ); // (x+1,y)
@@ -100,6 +81,8 @@ public class BilinearPixel_S16 implements InterpolatePixel<ImageSInt16> {
 		// throw allows borders to be interpolated gracefully by double counting appropriate pixels
 		int dx = xt == width - 1 ? 0 : 1;
 		int dy = yt == height - 1 ? 0 : stride;
+
+		short[] data = orig.data;
 
 		float val = (1.0f - ax) * (1.0f - ay) * (data[index] ); // (x,y)
 		val += ax * (1.0f - ay) * (data[index + dx] ); // (x+1,y)

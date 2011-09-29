@@ -52,9 +52,9 @@ public class ImplDescribePointBrief_U16 extends DescribePointBrief<ImageUInt16> 
 
 		int index = blur.startIndex + blur.stride*c_y + c_x;
 
-		for( int i = 0; i < definition.setA.length; i++ ) {
-			int valA = blur.data[index+offsetsA[i]]& 0xFFFF;
-			int valB = blur.data[index+offsetsB[i]]& 0xFFFF;
+		for( int i = 0; i < definition.compare.length; i++ ) {
+			int valA = blur.data[index + offsetsA[i]]& 0xFFFF;
+			int valB = blur.data[index + offsetsB[i]]& 0xFFFF;
 
 			if( valA < valB ) {
 				feature.data[ i/32 ] |= 1 << (i % 32);

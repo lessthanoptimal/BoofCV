@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageSInt32;
 /**
  * @author Peter Abeles
  */
-public class TestBilinearPixel_S32 extends GeneralBilinearPixelChecks<ImageSInt32>
+public class TestImplBilinearPixel_S32 extends GeneralBilinearPixelChecks<ImageSInt32>
 {
 
 	@Override

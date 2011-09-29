@@ -21,11 +21,13 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.AssociationScorePanel;
@@ -59,6 +61,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 	InterestPointDetector<T> detector;
 	ExtractFeatureDescription<T> describe;
 	ScoreAssociation<TupleDesc_F64> scorer;
+	OrientationImageAverage<T> orientation;
 
 	// gray scale versions of input image
 	T imageLeft;
@@ -94,6 +97,8 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 		addAlgorithm(2,"norm",new ScoreAssociateEuclidean());
 		addAlgorithm(2,"norm^2",new ScoreAssociateEuclideanSq());
 		addAlgorithm(2,"correlation",new ScoreAssociateCorrelation());
+
+		orientation = FactoryOrientationAlgs.nogradient(5, imageType);
 
 		scorePanel = new AssociationScorePanel<TupleDesc_F64>(3);
 		setMainGUI(scorePanel);
@@ -187,14 +192,21 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 				progressMonitor.setNote("Describing");
 			}});
 		describe.setImage(image);
+		orientation.setImage(image);
 
 		// See if the detector can detect the feature's scale
 		if( detector.hasScale() ) {
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
+				double yaw = 0;
+
 				Point2D_I32 pt = detector.getLocation(i);
 				double scale = detector.getScale(i);
+				if( describe.requiresOrientation() ) {
+					orientation.setRadius((int)(describe.getRadius()*scale));
+					yaw = orientation.compute(pt.x,pt.y);
+				}
 
-				TupleDesc_F64 d = describe.process(pt.x,pt.y,0,scale,null);
+				TupleDesc_F64 d = describe.process(pt.x,pt.y,yaw,scale,null);
 				if( d != null ) {
 					descs.add( d.copy() );
 					locs.add( pt.copy());
@@ -202,10 +214,16 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 			}
 		} else {
 			// just set the scale to one in this case
+			orientation.setRadius(describe.getRadius());
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
-				Point2D_I32 pt = detector.getLocation(i);
+				double yaw = 0;
 
-				TupleDesc_F64 d = describe.process(pt.x,pt.y,0,1,null);
+				Point2D_I32 pt = detector.getLocation(i);
+				if( describe.requiresOrientation() ) {
+					yaw = orientation.compute(pt.x,pt.y);
+				}
+
+				TupleDesc_F64 d = describe.process(pt.x,pt.y,yaw,1,null);
 				if( d != null ) {
 					descs.add( d.copy() );
 					locs.add( pt.copy());

@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageFloat32;
 /**
  * @author Peter Abeles
  */
-public class TestBilinearPixel_F32 extends GeneralBilinearPixelChecks<ImageFloat32>
+public class TestImplBilinearPixel_F32 extends GeneralBilinearPixelChecks<ImageFloat32>
 {
 
 	@Override

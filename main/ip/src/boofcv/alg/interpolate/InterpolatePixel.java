@@ -65,4 +65,13 @@ public interface InterpolatePixel<T extends ImageBase> {
 	 */
 	public float get_unsafe(float x, float y);
 
+	/**
+	 * Is the requested pixel inside the image bounds in which get_unsafe() can be called without throwing
+	 * an exception?
+	 * @param x Point's x-coordinate.
+	 * @param y Point's y-coordinate.
+	 * @return  true if get_unsafe() can be called.
+	 */
+	public boolean isInSafeBounds( float x , float y );
+
 }

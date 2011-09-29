@@ -92,9 +92,17 @@ public class FactoryExtractFeatureDescription {
 										double blurSigma , int blurRadius ,
 										 boolean isScale , boolean isOriented ,
 										 Class<T> imageType) {
-		BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
-		BriefDefinition definition = FactoryBriefDefinition.gaussian(new Random(123), radius,numPoints);
 
-		return new WrapDescribeBrief<T>(FactoryDescribePointAlgs.brief(definition,filter));
+		if( !isOriented ) {
+			BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
+			BriefDefinition definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
+
+			return new WrapDescribeBrief<T>(FactoryDescribePointAlgs.brief(definition,filter));
+		} else {
+			BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
+			BriefDefinition definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
+
+			return new WrapDescribeBriefO<T>(FactoryDescribePointAlgs.briefo(definition,filter));
+		}
 	}
 }

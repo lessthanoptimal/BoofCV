@@ -142,4 +142,11 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 		InterpolatePixel<T> interp = wrap(img);
 		assertTrue(img == interp.getImage());
 	}
+
+	@Test
+	public void isInSafeBounds() {
+		// scan through whole image that is "safe"
+		// compare get() to get_unsafe()
+		fail("implement");
+	}
 }

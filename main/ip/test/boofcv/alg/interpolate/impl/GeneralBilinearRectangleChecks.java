@@ -91,7 +91,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageBase> {
 	}
 
 	/**
-	 * Compare region against the value returned by get BilinearPixel_F32
+	 * Compare region against the value returned by get ImplBilinearPixel_F32
 	 */
 	public void checkRegion(int regionWidth, int regionHeight, float x, float y) {
 		T img = createImage(width, height);

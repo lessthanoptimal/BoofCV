@@ -1,3 +1,6 @@
+BRIEF
+- modify so that there is a single list of points which are sampled and then compared against each other?
+
 Trackers
 - Detect region/normalized cross correlation
 

@@ -48,6 +48,11 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 	}
 
 	@Override
+	public int getRadius() {
+		return surf.getRadius();
+	}
+
+	@Override
 	public void setImage(T image) {
 		if( ii != null ) {
 			ii.reshape(image.width,image.height);

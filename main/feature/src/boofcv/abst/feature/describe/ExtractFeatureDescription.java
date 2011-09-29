@@ -42,6 +42,11 @@ public interface ExtractFeatureDescription<T extends ImageBase> {
 	public int getDescriptionLength();
 
 	/**
+	 * Returns the description's radius at a scale of 1
+	 */
+	public int getRadius();
+
+	/**
 	 * Extract feature information from point at the specified scale.
 	 *
 	 * @param x Coordinate of the point.
