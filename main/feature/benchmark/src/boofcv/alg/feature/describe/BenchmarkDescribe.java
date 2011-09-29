@@ -18,13 +18,16 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.misc.Performer;
-import boofcv.misc.ProfileOperation;
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
+import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.misc.Performer;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
@@ -39,7 +42,7 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);
-	static int NUM_POINTS = 1000;
+	static int NUM_POINTS = 512;
 
 	final static int width = 640;
 	final static int height = 480;
@@ -76,6 +79,21 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 
 	}
 
+	public class Brief512 extends PerformerBase {
+
+		DescribePointBrief alg = new DescribePointBrief(FactoryBriefDefinition.gaussian(new Random(123),16,512),
+				FactoryBlurFilter.gaussian(imageType,0,4));
+
+		@Override
+		public void process() {
+			alg.setImage((ImageFloat32)image);
+			for( int i = 0; i < pts.length; i++ ) {
+				Point2D_I32 p = pts[i];
+				alg.process(p.x,p.y,alg.createFeature());
+			}
+		}
+	}
+
 	public class Describe implements Performer {
 
 		ExtractFeatureDescription<I> alg;
@@ -106,6 +124,7 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 		System.out.println();
 
 		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryExtractFeatureDescription.<I,II>surf(true,imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Steer r=12", FactoryExtractFeatureDescription.steerableGaussian(12,false,imageType,derivType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Steer Norm r=12", FactoryExtractFeatureDescription.steerableGaussian(12,true,imageType,derivType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=12", FactoryExtractFeatureDescription.gaussian12(12,imageType,derivType)),TEST_TIME);

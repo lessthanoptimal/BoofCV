@@ -132,7 +132,6 @@ public class AssociationScorePanel<D>
 	 */
 	private void drawDistribution( Graphics2D g2 , List<Point2D_I32> candidates ,
 					  int offX, int offY , double scale) {
-		System.out.println("Drawing foo!");
 		findStatistics();
 
 		// draw all the features, adjusting their size based on the first score

@@ -73,6 +73,7 @@ public class CreateDetectionFile<T extends ImageBase> {
 		if( !dir.isDirectory() )
 			throw new IllegalArgumentException("Path does not point to a directory!");
 
+		System.out.println(directoryPath);
 		int totalProcessed = 0;
 		File[] files = dir.listFiles();
 		for( File f : files ) {
@@ -128,7 +129,9 @@ public class CreateDetectionFile<T extends ImageBase> {
 //		doStuff("data/mikolajczk/graf/",".png",ImageFloat32.class);
 //		doStuff("data/mikolajczk/leuven/",".png",ImageFloat32.class);
 //		doStuff("data/mikolajczk/ubc/",".png",ImageFloat32.class);
-		doStuff("data/mikolajczk/trees/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/trees/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/wall/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/bark/",".png",ImageFloat32.class);
 	}
 
 }

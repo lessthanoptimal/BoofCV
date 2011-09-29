@@ -177,7 +177,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 			}
 
 		}
-		System.out.println("selected index "+selectedIndex);
+//		System.out.println("selected index "+selectedIndex);
 		repaint();
 	}
 

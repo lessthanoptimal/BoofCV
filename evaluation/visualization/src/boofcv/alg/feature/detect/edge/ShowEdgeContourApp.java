@@ -48,8 +48,6 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-// todo canny controls
-// todo threshold controls
 public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 		extends SelectAlgorithmImagePanel implements ProcessInput , CannyControlBar.Listener , SelectHistogramThresholdPanel.Listener
 {
@@ -125,9 +123,11 @@ public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
 				if( activeAlg == 0 ){
 					bodyPanel.remove(barBinary);
 					bodyPanel.add(barCanny,BorderLayout.NORTH);
+					barCanny.repaint();
 				} else {
 					bodyPanel.remove(barCanny);
 					bodyPanel.add(barBinary,BorderLayout.NORTH);
+					barBinary.repaint();
 				}
 				validate();
 			}});
