@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.edge;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 
 /**
  * Provides methods for adjusting the settings in a canny edge detector
@@ -44,6 +45,8 @@ public class CannyControlBar extends JPanel implements ChangeListener {
 
 		controlBlur = new JSpinner(new SpinnerNumberModel(blurRadius,1,20,1));
 		controlBlur.addChangeListener(this);
+		controlBlur.setPreferredSize(new Dimension((int)controlBlur.getPreferredSize().getWidth(),(int)controlBlur.getPreferredSize().getHeight()+8));
+		controlBlur.setMaximumSize(controlBlur.getPreferredSize());
 
 		controlThreshold = new JSlider(JSlider.HORIZONTAL,threshold,100,20);
 		controlThreshold.setMajorTickSpacing(20);
@@ -54,6 +57,7 @@ public class CannyControlBar extends JPanel implements ChangeListener {
 		add(controlBlur);
 		add(new JLabel("Threshold"));
 		add(controlThreshold);
+		add(Box.createHorizontalGlue());
 	}
 
 	@Override

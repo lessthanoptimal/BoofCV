@@ -16,22 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.gui;
+package boofcv.alg.feature.describe.brief;
 
 /**
- * Panel where a toolbar is provided for selecting an input image only.
+ * Stores the descriptor as an array of integers.  Each bit is the output of a comparison.
  *
  * @author Peter Abeles
  */
-public abstract class SelectImagePanel extends SelectAlgorithmImagePanel {
+public class BriefFeature {
+	public int[] data;
+	public int numBits;
 
-	public SelectImagePanel() {
-		super(0);
+	public BriefFeature( int numBits ) {
+		this.numBits = numBits;
+		int numInts = numBits/32;
+		if( numBits % 32 != 0 )
+			numInts++;
+
+		data = new int[numInts];
 	}
 
-	@Override
-	public void refreshAll(Object[] cookies) {}
-
-	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {}
+	public BriefFeature( int numBits , int numInts ) {
+		this.numBits = numBits;
+		data = new int[numInts];
+	}
 }

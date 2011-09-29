@@ -87,6 +87,7 @@ public class CreateDescriptionFile<T extends ImageBase> {
 		if( !dir.isDirectory() )
 			throw new IllegalArgumentException("Path does not point to a directory!");
 
+		System.out.println("Directory: "+pathToDirectory);
 		int filesFound = 0;
 		File[] files = dir.listFiles();
 		for( File f : files ) {
@@ -152,9 +153,9 @@ public class CreateDescriptionFile<T extends ImageBase> {
 
 	public static <T extends ImageBase>
 	void doStuff( String directory , String imageSuffix , Class<T> imageType ) throws FileNotFoundException {
-		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
+//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
 		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(12,imageType);
-		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");
+//		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");
 
 //		int radius = 12;
 //		int numAngles = 8;
@@ -163,6 +164,9 @@ public class CreateDescriptionFile<T extends ImageBase> {
 //		connectSpiderWeb(numAngles,numJoints,graph);
 //		ExtractFeatureDescription<T> alg = wrap(graph,imageType);
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"NEW");
+
+		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16,512,-1,4,false,false,imageType);
+		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BRIEF");
 
 		cdf.directory(directory,imageSuffix,"FH.txt");
 	}
@@ -173,6 +177,8 @@ public class CreateDescriptionFile<T extends ImageBase> {
 //		doStuff("data/mikolajczk/graf/",".png",ImageFloat32.class);
 //		doStuff("data/mikolajczk/leuven/",".png",ImageFloat32.class);
 //		doStuff("data/mikolajczk/ubc/",".png",ImageFloat32.class);
-		doStuff("data/mikolajczk/trees/",".png",ImageFloat32.class);
+//		doStuff("data/mikolajczk/trees/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/wall/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/bark/",".png",ImageFloat32.class);
 	}
 }

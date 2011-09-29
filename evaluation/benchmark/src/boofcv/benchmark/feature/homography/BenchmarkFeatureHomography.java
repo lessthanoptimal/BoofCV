@@ -152,6 +152,9 @@ public class BenchmarkFeatureHomography {
 		Point2D_F32 src = new Point2D_F32();
 		Point2D_F32 expected = new Point2D_F32();
 
+		// the number of key frame features which have a correspondence
+		int maxCorrect = 0;
+		// number of correct associations
 		int numCorrect = 0;
 
 		for( int i = 0; i < matches.size; i++ ) {
@@ -167,11 +170,27 @@ public class BenchmarkFeatureHomography {
 
 			if( dist <= tolerance ) {
 				numCorrect++;
+				maxCorrect++;
+			} else {
+				if( hasCorrespondence(expected,targetFrame)) {
+					maxCorrect++;
+				}
 			}
 		}
 
-		numMatches = matches.size();
-		fractionCorrect = ((double)numCorrect)/((double)numMatches);
+		numMatches = maxCorrect;
+		fractionCorrect = ((double)numCorrect)/((double)maxCorrect);
+	}
+
+	private boolean hasCorrespondence( Point2D_F32 expected, List<FeatureInfo> targetFrame) {
+
+		for( FeatureInfo t : targetFrame ) {
+			Point2D_I32 d = t.getLocation();
+			double dist = UtilPoint2D_F32.distance(expected.x,expected.y,d.x,d.y);
+			if( dist <= tolerance)
+				return true;
+		}
+		return false;
 	}
 
 	public static void main( String args[] ) {
@@ -180,12 +199,13 @@ public class BenchmarkFeatureHomography {
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociationTuple.greedy(score,Double.MAX_VALUE,-1,true);
 
-		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/boat/",".png",tolerance);
+		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/wall/",".png",tolerance);
 
-		app.evaluate("SURF.txt");
-		app.evaluate("BoofCV_SURF.txt");
-		app.evaluate("OpenSURF.txt");
-//		app.evaluate("_NEW.txt");
-//		app.evaluate("_NEW2.txt");
+//		app.evaluate("BRIEF.txt");
+//		app.evaluate("SURF.txt");
+//		app.evaluate("BoofCV_SURF.txt");
+//		app.evaluate("OpenSURF.txt");
+		app.evaluate("NEW.txt");
+//		app.evaluate("NEW2.txt");
 	}
 }

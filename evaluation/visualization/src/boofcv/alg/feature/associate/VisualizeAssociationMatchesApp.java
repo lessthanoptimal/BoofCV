@@ -85,6 +85,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 		addAlgorithm(0,"KLT",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 
 		addAlgorithm(1,"SURF",FactoryExtractFeatureDescription.surf(true,imageType));
+		addAlgorithm(1,"BRIEF", FactoryExtractFeatureDescription.brief(16,512,-1,4,false,false,imageType));
 		addAlgorithm(1,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));
 		addAlgorithm(1,"Gaussian 14",FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType));
 
