@@ -19,7 +19,11 @@
 package boofcv.benchmark.feature.orientation;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.feature.orientation.OrientationImage;
+import boofcv.alg.feature.orientation.OrientationIntegral;
+import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.image.ImageBase;
@@ -60,7 +64,46 @@ public class UtilOrientationBenchmark {
 		ret.add(new BenchmarkAlgorithm("Slide PI/3 W", FactoryOrientationAlgs.sliding(20,Math.PI/3,radius,true,derivType)));
 		ret.add(new BenchmarkAlgorithm("No Gradient", FactoryOrientationAlgs.nogradient(radius,imageType)));
 
+		Class typeII = GIntegralImageOps.getIntegralType(imageType);
+		ret.add(new BenchmarkAlgorithm("II Ave", new WrapII(FactoryOrientationAlgs.average_ii(radius, false, typeII),imageType)));
+		ret.add(new BenchmarkAlgorithm("II Ave Weighted", new WrapII(FactoryOrientationAlgs.average_ii(radius, true, typeII),imageType)));
+
 		return ret;
+	}
+
+	private static class WrapII<T extends ImageBase, II extends ImageBase> implements  OrientationImage<T> {
+
+		OrientationIntegral<II> alg;
+		II ii;
+		Class<T> imageType;
+
+		private WrapII(OrientationIntegral<II> alg , Class<T> imageType ) {
+			this.alg = alg;
+			this.imageType = imageType;
+			ii = GeneralizedImageOps.createImage(alg.getImageType(),1,1);
+		}
+
+		@Override
+		public void setImage(T image) {
+			ii.reshape(image.width,image.height);
+			GIntegralImageOps.transform(image,ii);
+			alg.setImage(ii);
+		}
+
+		@Override
+		public Class<T> getImageType() {
+			return imageType;
+		}
+
+		@Override
+		public void setScale(double scale) {
+			alg.setScale(scale);
+		}
+
+		@Override
+		public double compute(int c_x, int c_y) {
+			return alg.compute(c_x,c_y);
+		}
 	}
 
 	public static double[] makeSample( double min , double max , int num ) {

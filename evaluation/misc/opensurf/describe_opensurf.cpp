@@ -43,7 +43,7 @@ void process( IplImage *image , FILE *fid , FILE *output)
     fprintf(output,"64\n");
     for( size_t i = 0; i < ipts.size(); i++ ) {
         Ipoint &p = ipts.at(i);
-        fprintf(output,"%d %d",(int)p.x,(int)p.y);
+        fprintf(output,"%d %d %f",(int)p.x,(int)p.y,p.orientation);
         for( int i = 0; i < 64; i++ ) {
             fprintf(output," %0.10f",p.descriptor[i]);
         }

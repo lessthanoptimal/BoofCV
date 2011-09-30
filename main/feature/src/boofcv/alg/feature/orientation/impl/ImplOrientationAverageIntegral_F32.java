@@ -21,7 +21,6 @@ package boofcv.alg.feature.orientation.impl;
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.alg.feature.orientation.OrientationAverageIntegral;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.image.ImageFloat32;
 
 
@@ -42,9 +41,6 @@ public class ImplOrientationAverageIntegral_F32
 	// derivative needed for border algorithm
 	double[] borderDerivX;
 	double[] borderDerivY;
-
-	// optional weights
-	protected Kernel2D_F64 weights;
 
 	/**
 	 *
