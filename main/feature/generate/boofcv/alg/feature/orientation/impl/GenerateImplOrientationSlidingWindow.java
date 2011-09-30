@@ -20,7 +20,6 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,9 +30,6 @@ import java.io.PrintStream;
  * @author Peter Abeles
  */
 public class GenerateImplOrientationSlidingWindow extends CodeGeneratorBase {
-	String className;
-
-	PrintStream out;
 	AutoTypeImage imageType;
 
 	@Override
@@ -55,14 +51,11 @@ public class GenerateImplOrientationSlidingWindow extends CodeGeneratorBase {
 		out.print("}\n");
 	}
 
-	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.feature.describe.impl;\n" +
-				"\n" +
-				"import boofcv.alg.feature.describe.OrientationSlidingWindow;\n" +
+	private void printPreamble() throws FileNotFoundException {
+		setOutputFile(className);
+		out.print("import boofcv.alg.feature.orientation.OrientationSlidingWindow;\n" +
 				"import boofcv.struct.image."+imageType.getImageName()+";\n" +
-				"import jgrl.metric.UtilAngle;\n" +
-				"\n" +
+				"import georegression.metric.UtilAngle;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -143,6 +136,8 @@ public class GenerateImplOrientationSlidingWindow extends CodeGeneratorBase {
 	private void printWeighted() {
 		out.print("\t@Override\n" +
 				"\tprotected double computeWeightedOrientation(int c_x, int c_y) {\n" +
+				"\t\tcomputeAngles();\n" +
+				"\n" +
 				"\t\tdouble windowRadius = windowSize/2.0;\n" +
 				"\t\tint w = rect.x1-rect.x0;\n" +
 				"\t\tdouble bestScore = -1;\n" +
