@@ -47,7 +47,7 @@ public class FactoryExtractFeatureDescription {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		if( isOriented )
-			orientation = FactoryOrientationAlgs.average_ii(6,false,integralType);
+			orientation = FactoryOrientationAlgs.average_ii(6,true,integralType);
 
 		return new WrapDescribeSurf<T,II>( FactoryDescribePointAlgs.<II>surf(integralType),orientation);
 	}

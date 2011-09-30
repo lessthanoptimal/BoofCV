@@ -25,8 +25,7 @@ import boofcv.benchmark.feature.distort.CompileImageResults;
 import boofcv.benchmark.feature.distort.FactoryBenchmarkFeatureDistort;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageFloat32;
 
 
 /**
@@ -72,11 +71,11 @@ public class BenchmarkStabilityOrientation<T extends ImageBase, D extends ImageB
 
 	private void perform( BenchmarkFeatureDistort<T> eval ) {
 		CompileImageResults<T> compile = new CompileImageResults<T>(eval);
-		compile.addImage("evaluation/data/outdoors01.jpg");
-		compile.addImage("evaluation/data/indoors01.jpg");
-		compile.addImage("evaluation/data/scale/beach01.jpg");
-		compile.addImage("evaluation/data/scale/mountain_7p1mm.jpg");
-		compile.addImage("evaluation/data/sunflowers.png");
+		compile.addImage("data/outdoors01.jpg");
+		compile.addImage("data/indoors01.jpg");
+		compile.addImage("data/scale/beach01.jpg");
+		compile.addImage("data/scale/mountain_7p1mm.jpg");
+		compile.addImage("data/sunflowers.png");
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
@@ -88,10 +87,10 @@ public class BenchmarkStabilityOrientation<T extends ImageBase, D extends ImageB
 	}
 
 	public static void main( String args[] ) {
-//		BenchmarkStabilityOrientation<ImageFloat32,ImageFloat32> benchmark
-//				= new BenchmarkStabilityOrientation<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
-		BenchmarkStabilityOrientation<ImageUInt8, ImageSInt16> benchmark
-				= new BenchmarkStabilityOrientation<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
+		BenchmarkStabilityOrientation<ImageFloat32,ImageFloat32> benchmark
+				= new BenchmarkStabilityOrientation<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+//		BenchmarkStabilityOrientation<ImageUInt8, ImageSInt16> benchmark
+//				= new BenchmarkStabilityOrientation<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 
 //		benchmark.testNoise();
 //		benchmark.testIntensity();
