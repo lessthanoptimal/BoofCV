@@ -22,7 +22,6 @@ import boofcv.alg.feature.orientation.OrientationSlidingWindow;
 import boofcv.struct.image.ImageSInt16;
 import georegression.metric.UtilAngle;
 
-
 /**
  * <p>
  * Implementation of {@link OrientationSlidingWindow} for a specific image type.
@@ -94,6 +93,8 @@ public class ImplOrientationSlidingWindow_S16 extends OrientationSlidingWindow<I
 
 	@Override
 	protected double computeWeightedOrientation(int c_x, int c_y) {
+		computeAngles();
+
 		double windowRadius = windowSize/2.0;
 		int w = rect.x1-rect.x0;
 		double bestScore = -1;
