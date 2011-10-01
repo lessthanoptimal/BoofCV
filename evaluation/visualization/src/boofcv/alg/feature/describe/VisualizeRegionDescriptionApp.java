@@ -63,6 +63,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 		this.imageType = imageType;
 
 		addAlgorithm(0,"SURF", FactoryExtractFeatureDescription.surf(false,imageType));
+//		addAlgorithm(0,"Sample", DescribePointSamples.create(imageType));
+//		addAlgorithm(0,"SampleDiff", DescribeSampleDifference.create(imageType));
 		addAlgorithm(0,"BRIEF", FactoryExtractFeatureDescription.brief(16, 512, -1, 4, false, false, imageType));
 		addAlgorithm(0,"BRIEFO", FactoryExtractFeatureDescription.brief(16, 512, -1, 4, false, true, imageType));
 		addAlgorithm(0,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));

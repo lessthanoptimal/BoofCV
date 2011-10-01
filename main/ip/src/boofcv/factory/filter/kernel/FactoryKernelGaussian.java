@@ -313,8 +313,8 @@ public class FactoryKernelGaussian {
 	 * @param radius
 	 * @return
 	 */
-	public static double sigmaForRadius(int radius , int order ) {
-		return (radius* 2 + 1 ) / (5.0+0.8*order);
+	public static double sigmaForRadius(double radius , int order ) {
+		return (radius* 2.0 + 1.0 ) / (5.0+0.8*order);
 	}
 
 	/**

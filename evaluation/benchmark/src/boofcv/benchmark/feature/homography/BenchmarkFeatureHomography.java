@@ -199,13 +199,15 @@ public class BenchmarkFeatureHomography {
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociationTuple.greedy(score,Double.MAX_VALUE,-1,true);
 
-		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/bark/",".png",tolerance);
+		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/boat/",".png",tolerance);
 
 //		app.evaluate("SURF.txt");
-		app.evaluate("NEW.txt");
-//		app.evaluate("BRIEFO.txt");
+		app.evaluate("SAMPLEDIFF.txt");
+//		app.evaluate("SAMPLE.txt");
+//		app.evaluate("NEW.txt");
+		app.evaluate("BRIEFO.txt");
 //		app.evaluate("BRIEF.txt");
-		app.evaluate("BoofCV_SURF.txt");
+//		app.evaluate("BoofCV_SURF.txt");
 		app.evaluate("OpenSURF.txt");
 //		app.evaluate("NEW2.txt");
 	}

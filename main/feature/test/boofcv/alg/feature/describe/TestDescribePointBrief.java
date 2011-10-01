@@ -18,22 +18,37 @@
 
 package boofcv.alg.feature.describe;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
-
 /**
  * @author Peter Abeles
  */
 // todo go through each type
 public class TestDescribePointBrief {
 
+	/**
+	 * Have brief process a sub-image and see if it produces the same results.
+	 */
 	public void testSubImage() {
 
 	}
 
-	@Test
-	public void stuff() {
-		fail("implement");
+	/**
+	 * Change the input image size and see if it handles that case properly.
+	 */
+	public void changeInInputSize() {
+
+	}
+
+	/**
+	 * Vary the intensity of the input image and see if the description changes.
+	 */
+	public void testIntensityInvariance() {
+
+	}
+
+	/**
+	 * Give it an image with a known description and see if BRIEF generates that same description.
+	 */
+	public void testKnownCase() {
+
 	}
 }
