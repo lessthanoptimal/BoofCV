@@ -69,14 +69,25 @@ public abstract class DescribePointBrief<T extends ImageBase> {
 		offsetsB = new int[ definition.compare.length ];
 	}
 
+	/**
+	 * Function which creates a description of the appropriate size.
+	 *
+	 * @return Creates a bew description.
+	 */
 	public BriefFeature createFeature() {
 		return new BriefFeature(definition.getLength());
 	}
 
+	/**
+	 * Specifies the image from which feature descriptions are to be created.
+	 *
+	 * @param image Image being examined.
+	 */
 	public void setImage(T image) {
 		blur.reshape(image.width,image.height);
 		filterBlur.process(image,blur);
 
+		// precompute offsets for faster computing later on
 		for( int i = 0; i < definition.samplePoints.length ; i++ ) {
 			Point2D_I32 a = definition.samplePoints[i];
 
@@ -90,6 +101,15 @@ public abstract class DescribePointBrief<T extends ImageBase> {
 		}
 	}
 
+	/**
+	 * Computes the descriptor at the specified point.  If the region go outside of the image then a description
+	 * will not be made.
+	 *
+	 * @param c_x Center of region being described.
+	 * @param c_y Center of region being described.
+	 * @param feature Where the descriptor is written to.
+	 * @return true indicates a descriptor could be created and false one was not.
+	 */
 	public abstract boolean process( int c_x , int c_y , BriefFeature feature );
 
 	public BriefDefinition getDefinition() {

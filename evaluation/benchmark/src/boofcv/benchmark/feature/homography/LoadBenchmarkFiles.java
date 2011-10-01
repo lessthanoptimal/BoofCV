@@ -46,7 +46,7 @@ public class LoadBenchmarkFiles {
 		manager.addPath("boofcv.alg.feature.benchmark.homography");
 		manager.addPath("georegression.struct.point");
 		manager.loadDefinition(DetectionInfo.class, "location","scale");
-		manager.loadDefinition(FeatureInfo.class, "location","description");
+		manager.loadDefinition(FeatureInfo.class, "location","orientation","description");
 		manager.loadDefinition(Point2D_I32.class, "x","y");
 		manager.loadDefinition(TupleDesc_F64.class,"value" );
 	}

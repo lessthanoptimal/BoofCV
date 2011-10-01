@@ -28,7 +28,7 @@ import org.junit.Test;
  * @author Peter Abeles
  */
 public class TestImplOrientationAverageIntegral_I32 {
-	double angleTol = 0.015;
+	double angleTol = 0.02;
 	int r = 3;
 
 	@Test

@@ -91,6 +91,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 
 		addAlgorithm(1,"SURF",FactoryExtractFeatureDescription.surf(true,imageType));
 		addAlgorithm(1,"BRIEF", FactoryExtractFeatureDescription.brief(16,512,-1,4,false,false,imageType));
+		addAlgorithm(1,"BRIEFO", FactoryExtractFeatureDescription.brief(16,512,-1,4,false,true,imageType));
 		addAlgorithm(1,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));
 		addAlgorithm(1,"Gaussian 14",FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType));
 

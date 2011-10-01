@@ -118,4 +118,30 @@ public class BoofMiscOps {
 			return false;
 		return true;
 	}
+
+	public static boolean checkInside(ImageBase b, int c_x , int c_y , int radius , double theta ) {
+		int r = radius;
+		float c = (float)Math.cos(theta);
+		float s = (float)Math.sin(theta);
+
+		// make sure the region is inside the image
+		if( !checkInBounds(b,c_x,c_y,-r,-r,c,s))
+			return false;
+		else if( !checkInBounds(b,c_x,c_y,-r,r,c,s))
+			return false;
+		else if( !checkInBounds(b,c_x,c_y,r,r,c,s))
+			return false;
+		else if( !checkInBounds(b,c_x,c_y,r,-r,c,s))
+			return false;
+
+		return true;
+	}
+
+	private static boolean checkInBounds( ImageBase b , int c_x , int c_y , int dx , int dy , float c , float s )
+	{
+		float x = c_x + c*dx - s*dy;
+		float y = c_y + s*dx + c*dy;
+
+		return b.isInBounds((int) x, (int) y);
+	}
 }

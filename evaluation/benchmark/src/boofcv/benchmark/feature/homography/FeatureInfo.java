@@ -27,6 +27,7 @@ import georegression.struct.point.Point2D_I32;
  */
 public class FeatureInfo {
 	Point2D_I32 location;
+	double orientation;
 	TupleDesc_F64 description;
 
 	public FeatureInfo( int descLength ) {
@@ -36,6 +37,14 @@ public class FeatureInfo {
 
 	public Point2D_I32 getLocation() {
 		return location;
+	}
+
+	public double getOrientation() {
+		return orientation;
+	}
+
+	public void setOrientation(double orientation) {
+		this.orientation = orientation;
 	}
 
 	public void setLocation(Point2D_I32 location) {

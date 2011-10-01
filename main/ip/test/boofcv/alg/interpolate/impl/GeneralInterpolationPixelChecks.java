@@ -143,10 +143,24 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 		assertTrue(img == interp.getImage());
 	}
 
+	/**
+	 * Scans through the whole image and for each pixel which is "safe" it compares the safe
+	 * value to the unsafe value.
+	 */
 	@Test
 	public void isInSafeBounds() {
-		// scan through whole image that is "safe"
-		// compare get() to get_unsafe()
-		fail("implement");
+		T img = createImage(width, height);
+		GeneralizedImageOps.randomize(img, rand, 0,100);
+		InterpolatePixel<T> interp = wrap(img);
+
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				if( interp.isInSafeBounds(x,y)) {
+					float a = interp.get(x,y);
+					float b = interp.get_unsafe(x,y);
+					assertEquals(a,b,1e-4);
+				}
+			}
+		}
 	}
 }
