@@ -5,7 +5,7 @@
     <property name="doc.dir"     value="api"/>
 
     <path id="project.classpath">
-        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+        <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/junit*"/>
         <fileset dir="${jar.dir}" includes="**/*.jar"/>
     </path>
 
@@ -18,21 +18,33 @@
                 use="true"
                 windowtitle="BoofCV">
 
-            <packageset dir="ip/src" defaultexcludes="yes">
-                <include name="boofcv/**"/>
-            </packageset>
-	    <packageset dir="io/src" defaultexcludes="yes">
-                <include name="boofcv/**"/>
-            </packageset>
-	    <packageset dir="feature/src" defaultexcludes="yes">
-                <include name="boofcv/**"/>
-            </packageset>
-	    <packageset dir="geo/src" defaultexcludes="yes">
-                <include name="boofcv/**"/>
-            </packageset>
+          <packageset dir="ip/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
+          </packageset>
+	  <packageset dir="io/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
+          </packageset>
+	  <packageset dir="feature/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
+          </packageset>
+	  <packageset dir="geo/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
+          </packageset>
 
             <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
-            <bottom><![CDATA[<i>Copyright &#169; 2011 Peter Abeles All Rights Reserved.</i>]]></bottom>
+            <bottom><![CDATA[<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-10413214-5']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>]]></bottom>
  
         </javadoc>
     </target>
@@ -45,14 +57,13 @@
 	<ant dir="geo/" target="clean"/>
 	<ant dir="feature/" target="clean"/>
     </target>
-
     <target name="jar">
 	<ant dir="ip" inheritAll="false"/>
 	<ant dir="feature" inheritAll="false"/>
 	<ant dir="geo" inheritAll="false"/>
 	<ant dir="io" inheritAll="false"/>
 	<jar destfile="${lib.dir}/${ant.project.name}.jar">
-	  <zipgroupfileset dir="${jar.dir}" includes="*.jar" /> 
+	  <zipgroupfileset dir="${jar.dir}" includes="*.jar"/> 
 	</jar>
     </target>
 
