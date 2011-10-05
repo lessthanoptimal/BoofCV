@@ -134,7 +134,7 @@ public class FactoryBenchmarkFeatureDistort {
 		@Override
 		protected void distortImage(T image, T distortedImage ,double scale) {
 			distortedImage.reshape(image.width,image.height);
-			
+
 			Affine2D_F32 initToImage = StabilityEvaluatorPoint.createScale((float)scale,image.width,image.height);
 			Affine2D_F32 imageToInit = initToImage.invert(null);
 			PixelTransformAffine affine = new PixelTransformAffine(imageToInit);

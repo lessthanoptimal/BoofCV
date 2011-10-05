@@ -44,9 +44,16 @@ public class FactoryInterestPoint {
 	public static <T extends ImageBase, D extends ImageBase >
 	InterestPointDetector<T> fromCorner( GeneralFeatureDetector<T,D> feature, Class<T> inputType , Class<D> derivType) {
 
-		ImageGradient<T,D> gradient = FactoryDerivative.sobel(inputType,derivType);
-		ImageHessian<D> hessian  = FactoryDerivative.hessianSobel(derivType);
-		ImageGenerator<D> derivativeGenerator = FactoryImageGenerator.create(derivType);
+		ImageGradient<T,D> gradient = null;
+		ImageHessian<D> hessian = null;
+		ImageGenerator<D> derivativeGenerator = null;
+
+		if( feature.getRequiresGradient() )
+			gradient = FactoryDerivative.sobel(inputType,derivType);
+		if( feature.getRequiresHessian() )
+			hessian  = FactoryDerivative.hessianSobel(derivType);
+		if( gradient != null || hessian != null )
+			derivativeGenerator = FactoryImageGenerator.create(derivType);
 
 		return new WrapCornerToInterestPoint<T,D>(feature,gradient,hessian,derivativeGenerator);
 	}

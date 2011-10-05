@@ -111,7 +111,7 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 
 	public static Affine2D_F32 createTransform( double scale , double theta , int imageWidth , int imageHeight ) {
 		// these create a transform from the dst to source image
-		Affine2D_F32 a = createScale((float)scale,imageWidth,imageHeight);
+		Affine2D_F32 a = createScale((float)scale,imageWidth,imageHeight).invert(null);
 		Affine2D_F32 b = DistortSupport.transformRotate(imageWidth/2,imageHeight/2,imageWidth/2,imageHeight/2,(float)theta).getModel();
 
 		// need to invert to the transform to be from src to dst image

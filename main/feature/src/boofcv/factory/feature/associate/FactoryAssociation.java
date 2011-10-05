@@ -22,7 +22,6 @@ import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.associate.WrapAssociateGreedy;
 import boofcv.alg.feature.associate.AssociateGreedy;
 import boofcv.alg.feature.associate.ScoreAssociation;
-import boofcv.struct.feature.TupleDesc_F64;
 
 
 /**
@@ -30,16 +29,16 @@ import boofcv.struct.feature.TupleDesc_F64;
  *
  * @author Peter Abeles
  */
-public class FactoryAssociationTuple {
+public class FactoryAssociation {
 
-	public static GeneralAssociation<TupleDesc_F64>
-	greedy( ScoreAssociation<TupleDesc_F64> score ,
+	public static <D> GeneralAssociation<D>
+	greedy( ScoreAssociation<D> score ,
 			double maxError ,
 			int maxMatches ,
 			boolean backwardsValidation )
 	{
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,maxError,backwardsValidation);
-		WrapAssociateGreedy<TupleDesc_F64> ret = new WrapAssociateGreedy<TupleDesc_F64>(alg,maxMatches);
+		AssociateGreedy<D> alg = new AssociateGreedy<D>(score,maxError,backwardsValidation);
+		WrapAssociateGreedy<D> ret = new WrapAssociateGreedy<D>(alg,maxMatches);
 		return ret;
 	}
 }

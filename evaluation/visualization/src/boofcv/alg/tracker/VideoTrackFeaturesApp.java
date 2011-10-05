@@ -68,6 +68,8 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config));
+		addAlgorithm(0,"BRIEF", FactoryPointSequentialTracker.brief(300, 200, 86, imageType));
+		addAlgorithm(0,"SURF", FactoryPointSequentialTracker.surf(300, 200, 2, imageType));
 
 		gui.addMouseListener(this);
 		gui.requestFocus();
@@ -153,6 +155,7 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 		VideoTrackFeaturesApp app = new VideoTrackFeaturesApp(ImageFloat32.class, ImageFloat32.class);
 
 		VideoListManager manager = new VideoListManager(ImageFloat32.class);
+		manager.add("Parking Lot", "JPEG_ZIP", "../applet/data/shake_parking_scan.zip");
 		manager.add("Snow", "JPEG_ZIP", "../applet/data/driving_snow.zip");
 
 		app.setInputManager(manager);

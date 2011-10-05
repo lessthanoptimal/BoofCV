@@ -72,28 +72,25 @@ public class FactoryExtractFeatureDescription {
 	}
 
 	/**
-	 * The brief descriptor is HORRIBLY inefficient when used through this interface.  This functionality is only
+	 * <p>
+	 * The BRIEF descriptor is HORRIBLY inefficient when used through this interface.  This functionality is only
 	 * provided for testing and validation purposes.
-	 *
-	 * TODO Describe what to do for efficiency
+	 * </p>
 	 *
 	 * @param radius Region's radius.  Typical value is 16.
 	 * @param numPoints Number of feature/points.  Typical value is 512.
 	 * @param blurSigma Typical value is -1.
 	 * @param blurRadius Typical value is 4.
-	 * @param isScale
-	 * @param isOriented
-	 * @param imageType
-	 * @param <T>
-	 * @return
+	 * @param isFixed Is the orientation and scale fixed? true for original algorithm described in BRIEF paper.
+	 *@param imageType  @return
 	 */
 	public static <T extends ImageBase>
-	ExtractFeatureDescription<T> brief( int radius , int numPoints ,
-										double blurSigma , int blurRadius ,
-										 boolean isScale , boolean isOriented ,
-										 Class<T> imageType) {
+	ExtractFeatureDescription<T> brief(int radius, int numPoints,
+									   double blurSigma, int blurRadius,
+									   boolean isFixed,
+									   Class<T> imageType) {
 
-		if( !isOriented ) {
+		if( isFixed) {
 			BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
 			BriefDefinition definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
 
@@ -102,7 +99,7 @@ public class FactoryExtractFeatureDescription {
 			BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
 			BriefDefinition definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
 
-			return new WrapDescribeBriefO<T>(FactoryDescribePointAlgs.briefo(definition,filter));
+			return new WrapDescribeBriefSo<T>(FactoryDescribePointAlgs.briefso(definition, filter));
 		}
 	}
 }

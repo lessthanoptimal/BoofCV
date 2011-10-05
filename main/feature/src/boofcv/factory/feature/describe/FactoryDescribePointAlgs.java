@@ -66,12 +66,12 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageBase>
-	DescribePointBriefO briefo(BriefDefinition definition, BlurFilter<T> filterBlur ) {
+	DescribePointBriefSO briefso(BriefDefinition definition, BlurFilter<T> filterBlur) {
 		Class<T> imageType = filterBlur.getInputType();
 
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
 
-		return new DescribePointBriefO(definition,filterBlur,interp);
+		return new DescribePointBriefSO(definition,filterBlur,interp);
 	}
 
 	public static <T extends ImageBase, K extends Kernel2D>

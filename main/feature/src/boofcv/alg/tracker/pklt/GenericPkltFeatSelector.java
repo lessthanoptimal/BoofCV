@@ -36,7 +36,7 @@ public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeIma
 {
 	// selects corners
 	GeneralFeatureDetector<InputImage,DerivativeImage> detector;
-	// used to set feature decription
+	// used to set feature description
 	PyramidKltTracker<InputImage,DerivativeImage> tracker;
 
 	// list of corners which should be ignored by the corner detector

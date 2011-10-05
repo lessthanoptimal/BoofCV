@@ -16,28 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.alg.feature.describe;
 
-import boofcv.struct.FastQueue;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
 /**
- * {@link boofcv.struct.FastQueue} for {@link SurfFeature}.
- *
  * @author Peter Abeles
  */
-public class SurfFeatureQueue extends FastQueue<SurfFeature> {
-
-	int numFeatures;
-
-	public SurfFeatureQueue( int descriptionLength ) {
-		super(SurfFeature.class,true);
-		this.numFeatures = descriptionLength;
-		growArray(10);
-	}
-
-	@Override
-	protected SurfFeature createInstance() {
-		return new SurfFeature(numFeatures);
+public class TestDescribePointBriefO {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

@@ -26,7 +26,7 @@ import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.associate.FactoryAssociationTuple;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -90,15 +90,15 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 		addAlgorithm(1,"SURF",FactoryExtractFeatureDescription.surf(true,imageType));
 //		addAlgorithm(1,"Sample", DescribePointSamples.create(imageType));
 //		addAlgorithm(1,"SampleDiff", DescribeSampleDifference.create(imageType));
-		addAlgorithm(1,"BRIEF", FactoryExtractFeatureDescription.brief(16,512,-1,4,false,false,imageType));
-		addAlgorithm(1,"BRIEFO", FactoryExtractFeatureDescription.brief(16,512,-1,4,false,true,imageType));
+		addAlgorithm(1,"BRIEF", FactoryExtractFeatureDescription.brief(16,512,-1,4, true,imageType));
+		addAlgorithm(1,"BRIEFO", FactoryExtractFeatureDescription.brief(16,512,-1,4, false,imageType));
 		addAlgorithm(1,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));
 		addAlgorithm(1,"Gaussian 14",FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType));
 
 		ScoreAssociation<TupleDesc_F64> scorer = new ScoreAssociateEuclideanSq();
 
-		addAlgorithm(2,"Greedy", FactoryAssociationTuple.greedy(scorer,Double.MAX_VALUE,maxMatches,false));
-		addAlgorithm(2,"Backwards", FactoryAssociationTuple.greedy(scorer,Double.MAX_VALUE,maxMatches,true));
+		addAlgorithm(2,"Greedy", FactoryAssociation.greedy(scorer, Double.MAX_VALUE, maxMatches, false));
+		addAlgorithm(2,"Backwards", FactoryAssociation.greedy(scorer, Double.MAX_VALUE, maxMatches, true));
 
 		orientation = FactoryOrientationAlgs.nogradient(5,imageType);
 

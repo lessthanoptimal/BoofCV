@@ -19,7 +19,7 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.factory.feature.associate.FactoryAssociationTuple;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.FastQueue;
@@ -82,8 +82,8 @@ public class BenchmarkAssociateTuple {
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		int maxMatches = 200;
 
-		ProfileOperation.printOpsPerSec(new General("Greedy", FactoryAssociationTuple.greedy(score,Double.MAX_VALUE,maxMatches,false)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Greedy Backwards", FactoryAssociationTuple.greedy(score,Double.MAX_VALUE,maxMatches,true)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, false)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, true)),TEST_TIME);
 		
 	}
 }

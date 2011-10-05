@@ -85,6 +85,9 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 	}
 
 	private void initializeDerivatives(T input) {
+		if( derivativeGenerator == null )
+			return;
+
 		if( !declaredDerivatives ) {
 			declaredDerivatives = true;
 			if( detector.getRequiresGradient() || detector.getRequiresHessian() ) {
