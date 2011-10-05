@@ -101,7 +101,7 @@ public class PointImageStabilization<I extends ImageBase > {
 		}
 
 		InterpolatePixel<I> bilinear = FactoryInterpolation.bilinearPixel(imageType);
-		distort = DistortSupport.createDistort(imageType,transform,bilinear);
+		distort = DistortSupport.createDistort(imageType,transform,bilinear, null);
 		this.tracker = tracker;
 		this.fitter = fitter;
 

@@ -74,7 +74,7 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 	@Override
 	public double[] evaluateImage(BenchmarkAlgorithm alg, T image, DistortParam param ) {
 
-		transform(param.scale,param.rotation,image);
+		transformPoints(param.scale, param.rotation, image.width, image.height);
 
 		return evaluateImage(alg,image,param.scale,param.rotation,transformPoints,transformIndexes);
 	}
@@ -83,9 +83,9 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 	 * rotate points in first image into current image
 	 * filter points outside of image or too close to the border
 	 */
-	private void transform( double scale , double theta , T image )
+	private void transformPoints(double scale, double theta, int imageWidth, int imageHeight)
 	{
-		Affine2D_F32 initToImage = createTransform(scale,theta,image);
+		Affine2D_F32 initToImage = createTransform(scale,theta,imageWidth,imageHeight);
 
 		transformPoints.clear();
 		transformIndexes.clear();
@@ -93,8 +93,8 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 		Point2D_F32 a = new Point2D_F32();
 		Point2D_F32 b = new Point2D_F32();
 
-		float w = image.width-borderSize;
-		float h = image.height-borderSize;
+		float w = imageWidth-borderSize;
+		float h = imageHeight-borderSize;
 
 		for( int index = 0; index < initialPoints.size(); index++ ) {
 			Point2D_I32 i = initialPoints.get(index);
@@ -109,11 +109,13 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 
 	}
 
-	public static Affine2D_F32 createTransform( double scale , double theta , ImageBase image ) {
-		Affine2D_F32 a = createScale((float)scale,image.width,image.height);
-		Affine2D_F32 b = DistortSupport.transformRotate(image.width/2f,image.height/2f,(float)theta).getModel();
+	public static Affine2D_F32 createTransform( double scale , double theta , int imageWidth , int imageHeight ) {
+		// these create a transform from the dst to source image
+		Affine2D_F32 a = createScale((float)scale,imageWidth,imageHeight);
+		Affine2D_F32 b = DistortSupport.transformRotate(imageWidth/2,imageHeight/2,imageWidth/2,imageHeight/2,(float)theta).getModel();
 
-		return a.concat(b,null);
+		// need to invert to the transform to be from src to dst image
+		return a.concat(b,null).invert(null);
 	}
 
 	/**

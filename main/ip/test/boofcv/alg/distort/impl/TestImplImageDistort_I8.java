@@ -20,6 +20,7 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageUInt8;
 
@@ -34,7 +35,7 @@ public class TestImplImageDistort_I8 extends GeneralImageDistortTests<ImageUInt8
 	}
 
 	@Override
-	public ImageDistort<ImageUInt8> createDistort(PixelTransform dstToSrc, InterpolatePixel<ImageUInt8> interp) {
-		return new ImplImageDistort_I8<ImageUInt8>(dstToSrc,interp);
+	public ImageDistort<ImageUInt8> createDistort(PixelTransform dstToSrc, InterpolatePixel<ImageUInt8> interp , ImageBorder border) {
+		return new ImplImageDistort_I8<ImageUInt8>(dstToSrc,interp,border);
 	}
 }

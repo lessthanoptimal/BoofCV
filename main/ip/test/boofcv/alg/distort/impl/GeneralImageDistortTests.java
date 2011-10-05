@@ -22,6 +22,8 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.ImageGenerator;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform;
@@ -50,23 +52,26 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 	InterpolatePixel<T> interp;
 	Class<?> imageType;
 	ImageGenerator<T> generator;
+	ImageBorder border;
 
 	public GeneralImageDistortTests( Class<T> imageType ) {
 		this.imageType = imageType;
 		interp = FactoryInterpolation.nearestNeighborPixel(imageType);
 		generator = FactoryImageGenerator.create((Class<T>)imageType);
+		border = FactoryImageBorder.value(imageType,5);
 	}
 
-	public abstract ImageDistort<T> createDistort(PixelTransform dstToSrc, InterpolatePixel<T> interp);
+	public abstract ImageDistort<T> createDistort(PixelTransform dstToSrc, InterpolatePixel<T> interp, ImageBorder border );
+
 
 	@Test
-	public void testSkip() {
+	public void testDefaultValue() {
 		T src = generator.createInstance(width,height);
 		T dst = generator.createInstance(width,height);
 
 		GeneralizedImageOps.randomize(src, rand, 0,10);
 
-		ImageDistort<T> tran = createDistort(new BasicTransform(),interp);
+		ImageDistort<T> tran = createDistort(new BasicTransform(),interp,border);
 		tran.apply(src,dst);
 
 		for( int dstY = 0; dstY < height; dstY++ ) {
@@ -80,36 +85,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 					double srcVal = GeneralizedImageOps.get(src,srcX,srcY);
 					assertEquals(srcVal,dstVal,1e-4);
 				} else {
-					assertEquals(0f,dstVal,1e-4);
-				}
-			}
-		}
-	}
-
-	@Test
-	public void testDefaultValue() {
-		T src = generator.createInstance(width,height);
-		T dst = generator.createInstance(width,height);
-
-		GeneralizedImageOps.randomize(src, rand, 0,10);
-
-		int fillValue = 5;
-
-		ImageDistort<T> tran = createDistort(new BasicTransform(),interp);
-		tran.apply(src,dst,fillValue);
-
-		for( int dstY = 0; dstY < height; dstY++ ) {
-			for( int dstX = 0; dstX < width; dstX++ ) {
-				int srcX = dstX + offX;
-				int srcY = dstY + offY;
-
-				double dstVal = GeneralizedImageOps.get(dst,dstX,dstY);
-
-				if( src.isInBounds(srcX,srcY) ) {
-					double srcVal = GeneralizedImageOps.get(src,srcX,srcY);
-					assertEquals(srcVal,dstVal,1e-4);
-				} else {
-					assertEquals(fillValue,dstVal,1e-4);
+					assertEquals(5,dstVal,1e-4);
 				}
 			}
 		}

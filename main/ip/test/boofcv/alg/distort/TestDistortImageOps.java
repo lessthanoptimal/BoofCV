@@ -20,6 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
@@ -27,7 +28,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 
 /**
@@ -40,11 +41,16 @@ public class TestDistortImageOps {
 	int width = 20;
 	int height = 30;
 
+	/**
+	 * Checks to see if the two ways of specifying interpolation work
+	 */
 	@Test
-	public void scale() {
+	public void scale_InterpTypeStyle() {
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 output = new ImageFloat32(width,height);
 		ImageFloat32 output2 = new ImageFloat32(width,height);
+
+		GeneralizedImageOps.randomize(input,rand,0,100);
 
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
 
@@ -78,24 +84,51 @@ public class TestDistortImageOps {
 	}
 
 	@Test
-	public void rotate() {
+	public void scaleSanityCheck() {
+		fail("write");
+	}
+
+	@Test
+	public void rotate_InterpTypeStyle() {
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 output = new ImageFloat32(width,height);
 		ImageFloat32 output2 = new ImageFloat32(width,height);
 
+		GeneralizedImageOps.randomize(input,rand,0,100);
+
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
 
-		int middleX = input.width/2;
-		int middleY = input.height/2;
 
-		DistortImageOps.rotate(input,output,interp,middleX,middleY,(float)Math.PI/2f);
-		DistortImageOps.rotate(input,output2,TypeInterpolate.BILINEAR,middleX,middleY,(float)Math.PI/2f);
+		DistortImageOps.rotate(input,output,interp,(float)Math.PI/2f);
+		DistortImageOps.rotate(input,output2,TypeInterpolate.BILINEAR,(float)Math.PI/2f);
 
 		// they should be identical
 		BoofTesting.assertEquals(output,output2);
+	}
 
-		// check for a 90 degrees rotation
-		assertEquals(input.get(middleX+5,middleY+3),output.get(middleX+3,middleY+5),1e-4);
-		assertEquals(input.get(middleX+4,middleY+6),output.get(middleX+6,middleY+4),1e-4);
+	/**
+	 * Very simple test for rotation accuracy.
+	 */
+	@Test
+	public void rotate_SanityCheck() {
+		ImageFloat32 input = new ImageFloat32(width,height);
+		ImageFloat32 output = new ImageFloat32(height,width);
+
+		GeneralizedImageOps.randomize(input,rand,0,100);
+
+		DistortImageOps.rotate(input, output, TypeInterpolate.BILINEAR, (float) Math.PI / 2f);
+
+		double error = 0;
+		// the outside pixels are ignored because numerical round off can cause those to be skipped
+		for( int y = 1; y < input.height-1; y++ ) {
+			for( int x = 1; x < input.width-1; x++ ) {
+				int xx = output.width-y;
+				int yy = x;
+
+				double e = input.get(x,y)-output.get(xx,yy);
+				error += Math.abs(e);
+			}
+		}
+		assertTrue(error / (width * height) < 0.1);
 	}
 }

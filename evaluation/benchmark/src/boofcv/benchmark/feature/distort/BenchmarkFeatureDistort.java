@@ -76,7 +76,6 @@ public abstract class BenchmarkFeatureDistort<T extends ImageBase> {
 
 	public List<MetricResult> evaluate( BufferedImage original ) {
 		T image = ConvertBufferedImage.convertFrom(original,null,imageType);
-		T noisy = (T)image._createNew(image.width,image.height);
 
 		evaluator.extractInitial(alg,image);
 
@@ -85,7 +84,6 @@ public abstract class BenchmarkFeatureDistort<T extends ImageBase> {
 		for( int i = 0; i < variable.length; i++ ) {
 			distortImage(image,distortedImage,variable[i]);
 			DistortParam param = createDistortParam(variable[i]);
-
 			double[]metrics = evaluator.evaluateImage(alg,distortedImage, param);
 
 			for( int j = 0; j < results.size(); j++ ) {

@@ -20,6 +20,8 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.core.image.border.ImageBorder;
+import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageFloat32;
 
@@ -40,10 +42,13 @@ public class ImplImageDistort_F32 implements ImageDistort<ImageFloat32> {
 	private PixelTransform dstToSrc;
 	// sub pixel interpolation
 	private InterpolatePixel<ImageFloat32> interp;
+	// handle the image border
+	private ImageBorder_F32 border;
 
-	public ImplImageDistort_F32(PixelTransform dstToSrc, InterpolatePixel<ImageFloat32> interp) {
+	public ImplImageDistort_F32(PixelTransform dstToSrc, InterpolatePixel<ImageFloat32> interp , ImageBorder<ImageFloat32> border ) {
 		this.dstToSrc = dstToSrc;
 		this.interp = interp;
+		this.border = (ImageBorder_F32)border;
 	}
 
 	@Override
@@ -67,37 +72,10 @@ public class ImplImageDistort_F32 implements ImageDistort<ImageFloat32> {
 				final float sy = dstToSrc.distY;
 
 				if( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {
-					continue;
+					dstImg.data[indexDst] = border.getOutside((int)sx,(int)sy);
+				} else {
+					dstImg.data[indexDst] = interp.get(sx,sy);
 				}
-
-				dstImg.data[indexDst] = interp.get(sx,sy);
-			}
-		}
-	}
-
-	@Override
-	public void apply( ImageFloat32 srcImg , ImageFloat32 dstImg , Number value ) {
-		interp.setImage(srcImg);
-
-		float valueF = value.floatValue();
-
-		final float widthF = srcImg.getWidth();
-		final float heightF = srcImg.getHeight();
-
-		for( int y = 0; y < dstImg.height; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y;
-			for( int x = 0; x < dstImg.width; x++ , indexDst++ ) {
-				dstToSrc.compute(x,y);
-
-				final float sx = dstToSrc.distX;
-				final float sy = dstToSrc.distY;
-
-				if( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {
-					dstImg.data[indexDst] = valueF;
-					continue;
-				}
-
-				dstImg.data[indexDst] = interp.get(sx,sy);
 			}
 		}
 	}

@@ -18,13 +18,16 @@
 
 package boofcv.benchmark.feature.distort;
 
+import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.filter.basic.GGrayImageOps;
+import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F32;
 
@@ -52,7 +55,7 @@ public class FactoryBenchmarkFeatureDistort {
 
 	public static <T extends ImageBase>
 	BenchmarkFeatureDistort<T> rotate(  Class<T> imageType ) {
-		double thetas[]=UtilOrientationBenchmark.makeSample(0,Math.PI,20);
+		double thetas[]=UtilOrientationBenchmark.makeSample(0,2.0*Math.PI,20);
 		return new Rotation<T>(SEED,thetas,imageType);
 	}
 
@@ -111,13 +114,8 @@ public class FactoryBenchmarkFeatureDistort {
 		@Override
 		protected void distortImage(T image, T distortedImage ,double theta) {
 			distortedImage.reshape(image.width,image.height);
-			float centerX = image.width/2;
-			float centerY = image.height/2;
 
-			PixelTransformAffine imageToInit = DistortSupport.transformRotate(centerX,centerY,(float)-theta);
-			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,imageToInit, TypeInterpolate.BILINEAR);
-
-			distorter.apply(image,distortedImage,125);
+			DistortImageOps.rotate(image,distortedImage,TypeInterpolate.BILINEAR,(float)theta);
 		}
 
 		@Override
@@ -140,9 +138,10 @@ public class FactoryBenchmarkFeatureDistort {
 			Affine2D_F32 initToImage = StabilityEvaluatorPoint.createScale((float)scale,image.width,image.height);
 			Affine2D_F32 imageToInit = initToImage.invert(null);
 			PixelTransformAffine affine = new PixelTransformAffine(imageToInit);
-			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,affine,TypeInterpolate.BILINEAR);
+			InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
+			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,affine,interp, null);
 
-			distorter.apply(image,distortedImage,125);
+			distorter.apply(image,distortedImage);
 		}
 
 		@Override

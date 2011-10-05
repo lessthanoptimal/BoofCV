@@ -57,12 +57,12 @@ public class TestImplPolynomialPixel_F32 extends GeneralInterpolationPixelChecks
 		// set it up so that it will be equivalent to bilinear interpolation
 		ImplPolynomialPixel_F32 alg = new ImplPolynomialPixel_F32(2,0,255);
 
-		ImageDistort<ImageFloat32> distorter = DistortSupport.createDistort(ImageFloat32.class, new PixelTransformAffine(tran), alg);
+		ImageDistort<ImageFloat32> distorter = DistortSupport.createDistort(ImageFloat32.class, new PixelTransformAffine(tran), alg, null);
 		distorter.apply(img,found);
 
 		InterpolatePixel<ImageFloat32> bilinear = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 
-		distorter = DistortSupport.createDistort(ImageFloat32.class, new PixelTransformAffine(tran), bilinear);
+		distorter = DistortSupport.createDistort(ImageFloat32.class, new PixelTransformAffine(tran), bilinear, null);
         distorter.apply(img, expected);
 
 		BoofTesting.assertEquals(expected, found, 0, 1e-4f);

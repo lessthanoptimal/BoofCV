@@ -45,13 +45,4 @@ public interface ImageDistort<T extends ImageBase> {
 	 * @param dstImg Output image. Modified.
 	 */
 	public void apply( T srcImg , T dstImg );
-
-	/**
-	 * Applies the transform while setting pixels to the specified default value if there is
-	 * no match.
-	 *
-	 * @param srcImg Input image. Not modified.
-	 * @param dstImg Output image. Modified.
-	 */
-	public void apply( T srcImg , T dstImg , Number value );
 }

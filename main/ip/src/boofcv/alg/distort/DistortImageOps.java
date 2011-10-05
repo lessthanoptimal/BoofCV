@@ -21,6 +21,7 @@ package boofcv.alg.distort;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageBase;
 
@@ -40,16 +41,14 @@ public class DistortImageOps {
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Rescaled input image. Modified.
-	 * @param type Which interpolation algorithm should be used.
+	 * @param interpType Which interpolation algorithm should be used.
 	 */
 	public static <T extends ImageBase>
-	void scale( T input , T output , TypeInterpolate type ) {
+	void scale( T input , T output , TypeInterpolate interpType ) {
 		Class<T> inputType = (Class<T>)input.getClass();
+		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
 
-		PixelTransform model = DistortSupport.transformScale(output, input);
-		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,type);
-
-		distorter.apply(input,output);
+		scale(input,output,interp);
 	}
 
 	public static <T extends ImageBase>
@@ -57,51 +56,64 @@ public class DistortImageOps {
 		Class<T> inputType = (Class<T>)input.getClass();
 
 		PixelTransform model = DistortSupport.transformScale(output, input);
-		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp);
+		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp, null);
 
 		distorter.apply(input,output);
 	}
 
 	/**
+	 * <p>
 	 * Rotates the image using the specified interpolation type.  The rotation is performed
 	 * around the specified center of rotation in the input image.
+	 * </p>
+	 *
+	 * <p>
+	 * Input coordinates (x,y) to output coordinate (x',y')<br>
+	 * x' = x_c + c*(x-x_c) - s(y - y_c)<br>
+	 * y' = y_c + s*(x-x_c) + c(y - y_c)
+	 * </p>
 	 *
 	 * @param input Which which is being rotated.
 	 * @param output The image in which the output is written to.
-	 * @param type Which type of interpolation will be used.
-	 * @param centerX Center of rotation in input image coordinates.
-	 * @param centerY Center of rotation in input image coordinates.
-	 * @param angle Angle of rotation in radians.
+	 * @param interpType Which type of interpolation will be used.
+	 * @param angleInputToOutput Angle of rotation in radians. From input to output, CCW rotation.
 	 */
 	public static <T extends ImageBase>
-	void rotate( T input , T output , TypeInterpolate type ,
-				 float centerX , float centerY , float angle ) {
+	void rotate( T input , T output , TypeInterpolate interpType , float angleInputToOutput ) {
+
 		Class<T> inputType = (Class<T>)input.getClass();
+		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
 
-		PixelTransform model = DistortSupport.transformRotate(centerX,centerY,angle);
-		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,type);
-
-		distorter.apply(input,output);
+		rotate(input, output, interp, angleInputToOutput);
 	}
 
-		/**
+	/**
+	 * <p>
 	 * Rotates the image using the specified interpolation.  The rotation is performed
 	 * around the specified center of rotation in the input image.
+	 * </p>
+	 *
+	 * <p>
+	 * Input coordinates (x,y) to output coordinate (x',y')<br>
+	 * x' = x_c + c*(x-x_c) - s(y - y_c)<br>
+	 * y' = y_c + s*(x-x_c) + c(y - y_c)
+	 * </p>
 	 *
 	 * @param input Which which is being rotated.
 	 * @param output The image in which the output is written to.
 	 * @param interp The interpolation algorithm which is to be used.
-	 * @param centerX Center of rotation in input image coordinates.
-	 * @param centerY Center of rotation in input image coordinates.
-	 * @param angle Angle of rotation in radians.
+	 * @param angleInputToOutput Angle of rotation in radians.  From input to output, CCW rotation.
 	 */
 	public static <T extends ImageBase>
 	void rotate( T input , T output , InterpolatePixel<T> interp ,
-				 float centerX , float centerY , float angle ) {
+				 float angleInputToOutput ) {
 		Class<T> inputType = (Class<T>)input.getClass();
 
-		PixelTransform model = DistortSupport.transformRotate(centerX,centerY,angle);
-		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp);
+		float offX = 0;//(output.width+1)%2;
+		float offY = 0;//(output.height+1)%2;
+
+		PixelTransform model = DistortSupport.transformRotate(input.width/2,input.height/2,output.width/2-offX,output.height/2-offY,angleInputToOutput);
+		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp, null);
 
 		distorter.apply(input,output);
 	}
