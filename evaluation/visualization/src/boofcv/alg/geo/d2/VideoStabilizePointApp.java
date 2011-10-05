@@ -86,6 +86,8 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config));
+		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 70, imageType));
+		addAlgorithm(0,"SURF", FactoryPointSequentialTracker.surf(300,200,2,imageType));
 
 		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
 		DistanceAffine2DSq distance = new DistanceAffine2DSq();
@@ -237,8 +239,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		VideoStabilizePointApp app = new VideoStabilizePointApp(ImageFloat32.class, ImageFloat32.class);
 
 		VideoListManager manager = new VideoListManager(ImageFloat32.class);
-		manager.add("Smaller", null, "/home/pja/cv/MAQ00684.MP4");
-		manager.add("Snow", null, "/home/pja/cv/small.mp4");
+		manager.add("Parking Lot", "JPEG_ZIP", "../applet/data/shake_parking_scan.zip");
 
 		app.setInputManager(manager);
 

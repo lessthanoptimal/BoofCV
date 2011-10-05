@@ -18,6 +18,8 @@
 
 package boofcv.alg.feature.describe;
 
+import org.junit.Test;
+
 /**
  * @author Peter Abeles
  */
@@ -27,6 +29,7 @@ public class TestDescribePointBrief {
 	/**
 	 * Have brief process a sub-image and see if it produces the same results.
 	 */
+	@Test
 	public void testSubImage() {
 
 	}
@@ -34,6 +37,7 @@ public class TestDescribePointBrief {
 	/**
 	 * Change the input image size and see if it handles that case properly.
 	 */
+	@Test
 	public void changeInInputSize() {
 
 	}
@@ -41,6 +45,7 @@ public class TestDescribePointBrief {
 	/**
 	 * Vary the intensity of the input image and see if the description changes.
 	 */
+	@Test
 	public void testIntensityInvariance() {
 
 	}
@@ -48,6 +53,7 @@ public class TestDescribePointBrief {
 	/**
 	 * Give it an image with a known description and see if BRIEF generates that same description.
 	 */
+	@Test
 	public void testKnownCase() {
 
 	}

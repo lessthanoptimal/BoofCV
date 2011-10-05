@@ -483,5 +483,14 @@
       <setting name="state" value="2" />
     </Base>
   </component>
+  <component name="libraryTable">
+    <library name="testing">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/junit-4.9.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+  </component>
 </project>
 

@@ -47,8 +47,8 @@ public class AssociateGreedy<T> {
 	private boolean backwardsValidation;
 
 	public AssociateGreedy(ScoreAssociation<T> score,
-								double maxFitError,
-								boolean backwardsValidation) {
+						   double maxFitError,
+						   boolean backwardsValidation) {
 		this.score = score;
 		this.maxFitError = maxFitError;
 		this.backwardsValidation = backwardsValidation;

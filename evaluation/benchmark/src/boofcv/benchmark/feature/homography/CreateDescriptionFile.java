@@ -157,7 +157,7 @@ public class CreateDescriptionFile<T extends ImageBase> {
 
 	public static <T extends ImageBase>
 	void doStuff( String directory , String imageSuffix , Class<T> imageType ) throws FileNotFoundException {
-		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
+//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
 
 		int radius = 12;
 		int numAngles = 8;
@@ -166,17 +166,17 @@ public class CreateDescriptionFile<T extends ImageBase> {
 		connectSpiderWeb(numAngles,numJoints,graph);
 //		ExtractFeatureDescription<T> alg = wrap(graph,imageType);
 
-//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16, 512, -1, 4, false, false, imageType);
+//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16, 512, -1, 4, true, imageType);
 
-//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16,512,-1,4,false,true,imageType);
+		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16,512,-1,4,false,imageType);
 //		ExtractFeatureDescription<T> alg = DescribePointSamples.create(imageType);
 //		ExtractFeatureDescription<T> alg = DescribeSampleDifference.create(imageType);
 
 		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(alg.getRadius(),imageType);
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLEDIFF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLE");
-		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");
-//		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BRIEFO");
+//		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");
+		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BRIEFO");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BRIEF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"NEW");
 		cdf.directory(directory,imageSuffix,"FH.txt");

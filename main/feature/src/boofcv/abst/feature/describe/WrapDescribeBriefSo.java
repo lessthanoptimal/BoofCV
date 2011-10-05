@@ -18,22 +18,21 @@
 
 package boofcv.abst.feature.describe;
 
-import boofcv.alg.feature.describe.DescribePointBriefO;
+import boofcv.alg.feature.describe.DescribePointBriefSO;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 
 /**
  * @author Peter Abeles
  */
-public class WrapDescribeBriefO<T extends ImageBase> implements ExtractFeatureDescription<T> {
+public class WrapDescribeBriefSo<T extends ImageBase> implements ExtractFeatureDescription<T> {
 
 	int length;
-	DescribePointBriefO alg;
+	DescribePointBriefSO<T> alg;
 	BriefFeature feature;
 
-	public WrapDescribeBriefO(DescribePointBriefO alg) {
+	public WrapDescribeBriefSo(DescribePointBriefSO<T> alg) {
 		this.alg = alg;
 		this.length = alg.getDefinition().getLength();
 		feature = new BriefFeature(length);
@@ -46,7 +45,7 @@ public class WrapDescribeBriefO<T extends ImageBase> implements ExtractFeatureDe
 
 	@Override
 	public void setImage(T image) {
-		alg.setImage((ImageFloat32)image);
+		alg.setImage(image);
 	}
 
 	@Override
@@ -57,7 +56,7 @@ public class WrapDescribeBriefO<T extends ImageBase> implements ExtractFeatureDe
 	@Override
 	public TupleDesc_F64 process(int x, int y, double orientation, double scale, TupleDesc_F64 ret) {
 
-		if( !alg.process(x,y,(float)orientation,feature) )
+		if( !alg.process(x,y,(float)orientation,(float)scale,feature) )
 			return null;
 
 		if( ret == null )

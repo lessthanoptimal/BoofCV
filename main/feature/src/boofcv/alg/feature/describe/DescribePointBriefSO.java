@@ -29,14 +29,14 @@ import georegression.struct.point.Point2D_I32;
 
 /**
  * <p>
- * Extension of {@link DescribePointBrief} which adds invariance to orientation.  Invariance is added by simply
- * applying an orientation transform to the sample points and then applying interpolation to the point at which
+ * Extension of {@link DescribePointBrief} which adds invariance to orientation and scale.  Invariance is added by simply
+ * applying an orientation/scale transform to the sample points and then applying interpolation to the point at which
  * it has been sampled.
  * </p>
  *
  * @author Peter Abeles
  */
-public class DescribePointBriefO<T extends ImageBase> {
+public class DescribePointBriefSO<T extends ImageBase> {
 	// describes the BRIEF feature
 	protected BriefDefinition definition;
 	// blurs the image prior to sampling
@@ -50,9 +50,9 @@ public class DescribePointBriefO<T extends ImageBase> {
 	// values at each sample point
 	float values[];
 
-	public DescribePointBriefO(BriefDefinition definition,
-							   BlurFilter<T> filterBlur ,
-							   InterpolatePixel<T> interp ) {
+	public DescribePointBriefSO(BriefDefinition definition,
+								BlurFilter<T> filterBlur,
+								InterpolatePixel<T> interp) {
 		this.definition = definition;
 		this.filterBlur = filterBlur;
 		this.interp = interp;
@@ -71,20 +71,20 @@ public class DescribePointBriefO<T extends ImageBase> {
 		interp.setImage(blur);
 	}
 
-	public boolean process( int c_x , int c_y , float orientation , BriefFeature feature )
+	public boolean process( int c_x , int c_y , float orientation , float scale , BriefFeature feature )
 	{
 		int r = definition.radius;
 		float c = (float)Math.cos(orientation);
 		float s = (float)Math.sin(orientation);
 
 		// make sure the region is inside the image
-		if( !checkInBounds(c_x,c_y,-r,-r,c,s))
+		if( !checkInBounds(c_x,c_y,-r,-r,c,s,scale))
 			return false;
-		else if( !checkInBounds(c_x,c_y,-r,r,c,s))
+		else if( !checkInBounds(c_x,c_y,-r,r,c,s,scale))
 			return false;
-		else if( !checkInBounds(c_x,c_y,r,r,c,s))
+		else if( !checkInBounds(c_x,c_y,r,r,c,s,scale))
 			return false;
-		else if( !checkInBounds(c_x,c_y,r,-r,c,s))
+		else if( !checkInBounds(c_x,c_y,r,-r,c,s,scale))
 			return false;
 
 		BoofMiscOps.zero(feature.data, feature.data.length);
@@ -92,8 +92,8 @@ public class DescribePointBriefO<T extends ImageBase> {
 		for( int i = 0; i < definition.samplePoints.length; i++ ) {
 			Point2D_I32 a = definition.samplePoints[i];
 			// rotate the points
-			float x0 = c_x + c*a.x - s*a.y;
-			float y0 = c_y + s*a.x + c*a.y;
+			float x0 = c_x + (c*a.x - s*a.y)*scale;
+			float y0 = c_y + (s*a.x + c*a.y)*scale;
 
 			values[i] = interp.get_unsafe(x0,y0);
 		}
@@ -109,10 +109,10 @@ public class DescribePointBriefO<T extends ImageBase> {
 		return true;
 	}
 
-	private boolean checkInBounds( int c_x , int c_y , int dx , int dy , float c , float s )
+	private boolean checkInBounds( int c_x , int c_y , int dx , int dy , float c , float s , float scale )
 	{
-		float x = c_x + c*dx - s*dy;
-		float y = c_y + s*dx + c*dy;
+		float x = c_x + (c*dx - s*dy)*scale;
+		float y = c_y + (s*dx + c*dy)*scale;
 
 		return interp.isInSafeBounds((int) x, (int) y);
 	}

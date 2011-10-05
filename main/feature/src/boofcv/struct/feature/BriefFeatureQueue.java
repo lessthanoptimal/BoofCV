@@ -18,26 +18,27 @@
 
 package boofcv.struct.feature;
 
+import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.struct.FastQueue;
 
 
 /**
- * {@link boofcv.struct.FastQueue} for {@link SurfFeature}.
+ * {@link boofcv.struct.FastQueue} for {@link BriefFeature}.
  *
  * @author Peter Abeles
  */
-public class SurfFeatureQueue extends FastQueue<SurfFeature> {
+public class BriefFeatureQueue extends FastQueue<BriefFeature> {
 
-	int numFeatures;
+	int numBits;
 
-	public SurfFeatureQueue( int descriptionLength ) {
-		super(SurfFeature.class,true);
-		this.numFeatures = descriptionLength;
+	public BriefFeatureQueue(int numBits) {
+		super(BriefFeature.class,true);
+		this.numBits = numBits;
 		growArray(10);
 	}
 
 	@Override
-	protected SurfFeature createInstance() {
-		return new SurfFeature(numFeatures);
+	protected BriefFeature createInstance() {
+		return new BriefFeature(numBits);
 	}
 }

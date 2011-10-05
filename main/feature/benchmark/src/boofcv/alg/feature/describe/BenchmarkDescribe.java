@@ -100,7 +100,7 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 
 	public class BriefO512 extends PerformerBase {
 
-		DescribePointBriefO alg = FactoryDescribePointAlgs.briefo(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+		DescribePointBriefSO alg = FactoryDescribePointAlgs.briefso(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		@Override
@@ -108,7 +108,7 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 			alg.setImage((ImageFloat32)image);
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				alg.process(p.x,p.y,(float)yaws[i],alg.createFeature());
+				alg.process(p.x,p.y,(float)yaws[i],(float)scales[i],alg.createFeature());
 			}
 		}
 	}

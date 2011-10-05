@@ -18,24 +18,38 @@
 
 package boofcv.factory.feature.tracker;
 
+import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.tracker.PointSequentialTracker;
+import boofcv.abst.feature.tracker.PstWrapperBrief;
 import boofcv.abst.feature.tracker.PstWrapperKltPyramid;
 import boofcv.abst.feature.tracker.PstWrapperSurf;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.alg.feature.associate.ScoreAssociation;
+import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointSurf;
+import boofcv.alg.feature.describe.brief.BriefFeature;
+import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
+import boofcv.alg.feature.describe.brief.ScoreAssociationBrief;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.tracker.pklt.PkltManager;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.factory.feature.associate.FactoryAssociationTuple;
+import boofcv.factory.feature.associate.FactoryAssociation;
+import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
+import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
+
+import java.util.Random;
 
 
 /**
@@ -104,8 +118,30 @@ public class FactoryPointSequentialTracker {
 		DescribePointSurf<II> describe = new DescribePointSurf<II>();
 
 		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclideanSq();
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociationTuple.greedy(score,100000,maxMatches,true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
 
 		return new PstWrapperSurf<I,II>(detector,orientation,describe,assoc,integralType);
+	}
+
+	/**
+	 * Creates a tracker for BRIEF features.
+	 *
+	 * @param maxFeatures Maximum number of features it will track.
+	 * @param maxAssociationError Maximum allowed association error.  Try 200.
+	 * @param pixelDetectTol Tolerance for detecting FAST features.  Try 20.
+	 * @param imageType Type of image being processed.
+	 */
+	public static <I extends ImageBase>
+	PointSequentialTracker<I> brief( int maxFeatures , int maxAssociationError , int pixelDetectTol , Class<I> imageType ) {
+		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+				FactoryBlurFilter.gaussian(imageType, 0, 4));
+		GeneralFeatureDetector<I,?> fast = FactoryCornerDetector.createFast(3, pixelDetectTol, maxFeatures, imageType);
+		InterestPointDetector<I> detector = FactoryInterestPoint.fromCorner(fast, imageType, null);
+		ScoreAssociationBrief score = new ScoreAssociationBrief();
+
+		GeneralAssociation<BriefFeature> association =
+				FactoryAssociation.greedy(score,maxAssociationError,maxFeatures,true);
+
+		return new PstWrapperBrief<I>(alg,detector,association);
 	}
 }

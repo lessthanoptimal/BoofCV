@@ -21,7 +21,7 @@ package boofcv.benchmark.feature.homography;
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.alg.feature.associate.ScoreAssociation;
-import boofcv.factory.feature.associate.FactoryAssociationTuple;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -197,7 +197,7 @@ public class BenchmarkFeatureHomography {
 		double tolerance = 3;
 
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
-		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociationTuple.greedy(score,Double.MAX_VALUE,-1,true);
+		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, Double.MAX_VALUE, -1, true);
 
 		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/graf/",".png",tolerance);
 

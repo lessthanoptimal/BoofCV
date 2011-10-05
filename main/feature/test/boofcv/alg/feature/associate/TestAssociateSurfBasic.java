@@ -19,7 +19,7 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.factory.feature.associate.FactoryAssociationTuple;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
@@ -89,7 +89,7 @@ public class TestAssociateSurfBasic {
 	private AssociateSurfBasic createAlg() {
 
 		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean();
-		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociationTuple.greedy(score,20,-1,true);
+		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, 20, -1, true);
 
 		return new AssociateSurfBasic(assoc);
 	}
