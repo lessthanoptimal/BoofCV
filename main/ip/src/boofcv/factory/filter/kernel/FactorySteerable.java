@@ -81,9 +81,6 @@ public class FactorySteerable {
 		ImageBase image = GKernelMath.convertToImage(kernel);
 		ImageBase imageRotated = image._createNew(image.width,image.height);
 
-		float centerX = image.width/2;
-		float centerY = image.height/2;
-
 		basis[0] = kernel;
 
 		// form the basis by created rotated versions of the kernel
@@ -93,7 +90,7 @@ public class FactorySteerable {
 			float angle = (float)(angleStep*index);
 
 			GeneralizedImageOps.fill(imageRotated,0);
-			DistortImageOps.rotate(image,imageRotated, TypeInterpolate.BILINEAR,centerX,centerY,angle);
+			DistortImageOps.rotate(image,imageRotated, TypeInterpolate.BILINEAR,angle);
 
 			basis[index] = GKernelMath.convertToKernel(imageRotated);
 		}

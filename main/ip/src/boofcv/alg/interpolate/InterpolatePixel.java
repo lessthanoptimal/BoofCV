@@ -47,10 +47,11 @@ public interface InterpolatePixel<T extends ImageBase> {
 	 * Returns the intensity value of the image at the specified coordinate.
 	 * This value is computed using interpolation.  Bounds checking is performed
 	 * to make sure a point that can be interpolated inside the image is requested.
+	 * If a point can't be interpolated then Float.NaN is returned.
 	 *
 	 * @param x Point's x-coordinate.
 	 * @param y Point's y-coordinate.
-	 * @return Interpolated intensity value.
+	 * @return Interpolated intensity value or NaN if it can't be interpolated.
 	 */
 	public float get(float x, float y);
 
@@ -68,6 +69,7 @@ public interface InterpolatePixel<T extends ImageBase> {
 	/**
 	 * Is the requested pixel inside the image bounds in which get_unsafe() can be called without throwing
 	 * an exception?
+	 *
 	 * @param x Point's x-coordinate.
 	 * @param y Point's y-coordinate.
 	 * @return  true if get_unsafe() can be called.

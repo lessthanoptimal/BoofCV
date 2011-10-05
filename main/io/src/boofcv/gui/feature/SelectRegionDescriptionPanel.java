@@ -169,6 +169,7 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 			target = null;
 			current = null;
 		} else {
+			boolean adjusted = false;
 			if( target != null ) {
 				// if the user clicked on the center point enter drag mode
 				int targetX = (int)(target.x*imageScale);
@@ -180,14 +181,29 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 					current.x += x-target.x;
 					current.y += y-target.y;
 					target.set(x,y);
-					repaint();
-					return;
+					adjusted = true;
+				} else {
+					// see if the user clicked on the circle, if so go into adjustment mode
+					double radiusCircle = imageScale*UtilPoint2D_I32.distance(target,current);
+					distance = Math.abs( distance - radiusCircle);
+					if( distance < clickTolerance ) {
+						current.set(x,y);
+						adjusted = true;
+					}
 				}
 			}
-			dragMode = false;
-			target = new Point2D_I32(x,y);
-			current = target.copy();
-			repaint();
+			if( adjusted ) {
+				repaint();
+
+				if( listener != null ) {
+					listener.descriptionChanged(target,getFeatureRadius(),getFeatureOrientation());
+				}
+			} else {
+				dragMode = false;
+				target = new Point2D_I32(x,y);
+				current = target.copy();
+				repaint();
+			}
 		}
 	}
 

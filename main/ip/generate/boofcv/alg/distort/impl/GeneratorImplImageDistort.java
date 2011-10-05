@@ -20,11 +20,8 @@ package boofcv.alg.distort.impl;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 
 /**
@@ -33,7 +30,6 @@ import java.io.PrintStream;
 public class GeneratorImplImageDistort extends CodeGeneratorBase {
 	String className;
 
-	PrintStream out;
 	AutoTypeImage image;
 
 	@Override
@@ -52,26 +48,29 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 	}
 
 	private void createFile() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
 		printPreamble();
-		printInterpolation(false);
-		printInterpolation(true);
+		printFunction();
 		out.println("}");
 	}
 
-	private void printPreamble() {
+	private void printPreamble() throws FileNotFoundException {
 
 		String imageName = image.getImageName();
+		String borderType = image.isInteger() ? "ImageBorder_I32" : "ImageBorder_F32";
+		String borderImageType = image.isInteger() ? "ImageInteger" : imageName;
 
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.distort.impl;\n" +
-				"\n" +
-				"import boofcv.alg.InputSanityCheck;\n" +
+		setOutputFile(className);
+		out.print("import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.alg.interpolate.InterpolatePixel;\n" +
 				"import boofcv.alg.distort.ImageDistort;\n" +
 				"import boofcv.struct.image."+imageName+";\n" +
 				"import boofcv.struct.distort.PixelTransform;\n" +
-				"\n" +
+				"import boofcv.core.image.border.ImageBorder;\n" +
+				"import boofcv.core.image.border."+borderType+";\n");
+		if( image.isInteger() ) {
+			out.print("import boofcv.struct.image.ImageInteger;\n");
+		}
+		out.print("\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>Implementation of {@link boofcv.alg.distort.ImageDistort}.</p>\n" +
@@ -95,10 +94,13 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\tprivate PixelTransform dstToSrc;\n" +
 				"\t// sub pixel interpolation\n" +
 				"\tprivate InterpolatePixel<"+imageName+"> interp;\n" +
+				"\t// handle the image border\n" +
+				"\tprivate "+borderType+" border;\n" +
 				"\n" +
-				"\tpublic "+className+"(PixelTransform dstToSrc, InterpolatePixel<"+imageName+"> interp) {\n" +
+				"\tpublic "+className+"(PixelTransform dstToSrc, InterpolatePixel<"+imageName+"> interp , ImageBorder<"+borderImageType+"> border ) {\n" +
 				"\t\tthis.dstToSrc = dstToSrc;\n" +
 				"\t\tthis.interp = interp;\n" +
+				"\t\tthis.border = ("+borderType+")border;\n" +
 				"\t}\n"+
 				"\n" +
 				"\t@Override\n" +
@@ -107,30 +109,17 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printInterpolation( boolean defaultValue )
-	{
-		String imageName = image.getImageName();
+	private void printFunction() {
+
 		String typeCast = image.isInteger() ? "("+image.getDataType()+")" : "";
+		String imageName = image.isInteger() ? "T" : image.getImageName();
 
-		if( image.isInteger() ) {
-			imageName = "T";
-		}
 
-		out.print("\t@Override\n");
-		if( defaultValue ) {
-			out.print("\tpublic void apply( "+imageName+" srcImg , "+imageName+" dstImg , Number value ) {\n");
-		} else {
-			out.print("\tpublic void apply( "+imageName+" srcImg , "+imageName+" dstImg ) {\n");
-		}
-		out.print("\t\tinterp.setImage(srcImg);\n" +
-				"\n");
-		if( defaultValue ) {
-			if( image.isInteger() )
-				out.print("\t\tint valueF = value.intValue();\n\n");
-			else
-				out.print("\t\tfloat valueF = value.floatValue();\n\n");
-		}
-		out.print("\t\tfinal float widthF = srcImg.getWidth();\n" +
+		out.print("\t@Override\n" +
+				"\tpublic void apply( "+imageName+" srcImg , "+imageName+" dstImg ) {\n" +
+				"\t\tinterp.setImage(srcImg);\n" +
+				"\n" +
+				"\t\tfinal float widthF = srcImg.getWidth();\n" +
 				"\t\tfinal float heightF = srcImg.getHeight();\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < dstImg.height; y++ ) {\n" +
@@ -141,15 +130,11 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\t\t\t\tfinal float sx = dstToSrc.distX;\n" +
 				"\t\t\t\tfinal float sy = dstToSrc.distY;\n" +
 				"\n" +
-				"\t\t\t\tif( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {\n");
-		if( defaultValue ) {
-			out.print("\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"valueF;\n");
-		}
-
-		out.print("\t\t\t\t\tcontinue;\n" +
+				"\t\t\t\tif( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {\n" +
+				"\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"border.getOutside((int)sx,(int)sy);\n" +
+				"\t\t\t\t} else {\n" +
+				"\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"interp.get(sx,sy);\n" +
 				"\t\t\t\t}\n" +
-				"\n" +
-				"\t\t\t\tdstImg.data[indexDst] = "+typeCast+"interp.get(sx,sy);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

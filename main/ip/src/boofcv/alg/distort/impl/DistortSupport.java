@@ -21,8 +21,8 @@ package boofcv.alg.distort.impl;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.*;
 import georegression.struct.affine.Affine2D_F32;
@@ -55,18 +55,20 @@ public class DistortSupport {
 	}
 
 	/**
-	 * Rotates the input image using the specified coordinate as the center of rotation.
+	 * Creates a {@link PixelTransformAffine} from the dst image into the src image.
 	 *
-	 * @param centerX Center of rotation in input image coordinates.
-	 * @param centerY Center of rotation in input image coordinates.
+	 * @param x0 Center of rotation in input image coordinates.
+	 * @param y0 Center of rotation in input image coordinates.
+	 * @param x1 Center of rotation in output image coordinates.
+	 * @param y1 Center of rotation in output image coordinates.
 	 * @param angle Angle of rotation.
 	 */
-	public static PixelTransformAffine transformRotate( float centerX , float centerY , float angle )
+	public static PixelTransformAffine transformRotate( float x0 , float y0 , float x1 , float y1 , float angle )
 	{
 		// make the coordinate system's origin the image center
-		Se2_F32 imageToCenter = new Se2_F32(-centerX,-centerY,0);
+		Se2_F32 imageToCenter = new Se2_F32(-x0,-y0,0);
 		Se2_F32 rotate = new Se2_F32(0,0,angle);
-		Se2_F32 centerToImage = new Se2_F32(centerX,centerY,0);
+		Se2_F32 centerToImage = new Se2_F32(x1,y1,0);
 
 		InvertibleTransformSequence sequence = new InvertibleTransformSequence();
 		sequence.addTransform(true,imageToCenter);
@@ -75,8 +77,9 @@ public class DistortSupport {
 
 		Se2_F32 total = new Se2_F32();
 		sequence.computeTransform(total);
+		Se2_F32 inv = total.invert(null);
 
-		Affine2D_F32 affine = ConvertTransform_F32.convert(total,null);
+		Affine2D_F32 affine = ConvertTransform_F32.convert(inv,null);
 		PixelTransformAffine distort = new PixelTransformAffine();
 		distort.set(affine);
 
@@ -85,36 +88,26 @@ public class DistortSupport {
 
 	/**
 	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
-	 * and interpolation type.
+	 * and interpolation instance.
 	 *
 	 * @param dstToSrc Transform from dst to src image.
+	 * @param border
 	 */
 	public static <T extends ImageBase>
-	ImageDistort<T> createDistort( Class<T> imageType , PixelTransform dstToSrc , TypeInterpolate interpType)
+	ImageDistort<T> createDistort(Class<T> imageType,
+								  PixelTransform dstToSrc,
+								  InterpolatePixel<T> interp, ImageBorder border)
 	{
-		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, imageType);
-		return createDistort(imageType,dstToSrc,interp);
-	}
-
-	/**
-	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
-	 * and interpolation instance.
-	 * 
-	 * @param dstToSrc Transform from dst to src image.
-	 */
-	public static <T extends ImageBase>
-	ImageDistort<T> createDistort( Class<T> imageType ,
-								   PixelTransform dstToSrc ,
-								   InterpolatePixel<T> interp )
-	{
+		if( border == null )
+			border = FactoryImageBorder.value(imageType,0);
 		if( imageType == ImageFloat32.class ) {
-			return (ImageDistort<T>)new ImplImageDistort_F32(dstToSrc,(InterpolatePixel<ImageFloat32>)interp);
+			return (ImageDistort<T>)new ImplImageDistort_F32(dstToSrc,(InterpolatePixel<ImageFloat32>)interp,border);
 		} else if( ImageSInt32.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_S32(dstToSrc,(InterpolatePixel<ImageSInt32>)interp);
+			return (ImageDistort<T>)new ImplImageDistort_S32(dstToSrc,(InterpolatePixel<ImageSInt32>)interp,border);
 		} else if( ImageInt16.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_I16(dstToSrc,(InterpolatePixel<ImageInt16>)interp);
+			return (ImageDistort<T>)new ImplImageDistort_I16(dstToSrc,(InterpolatePixel<ImageInt16>)interp,border);
 		} else if( ImageInt8.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_I8(dstToSrc,(InterpolatePixel<ImageInt8>)interp);
+			return (ImageDistort<T>)new ImplImageDistort_I8(dstToSrc,(InterpolatePixel<ImageInt8>)interp,border);
 		} else {
 			throw new IllegalArgumentException("Image type not supported: "+imageType.getSimpleName());
 		}

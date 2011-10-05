@@ -61,7 +61,8 @@ public class DescribeEvaluator<T extends ImageBase>
 	int initIndexes[];
 	int currentIndexes[];
 
-	// estimates feature orientation
+	// estimates feature orientation, only in the initial image.
+	// the true transform is used in the current image
 	OrientationImageAverage<T> orientationAlg;
 
 	// saved feature orientation in first frame
@@ -106,8 +107,8 @@ public class DescribeEvaluator<T extends ImageBase>
 
 	@Override
 	public double[] evaluateImage(BenchmarkAlgorithm alg, T image,
-							   double scale , double theta ,
-							   List<Point2D_I32> points, List<Integer> indexes)
+								  double scale , double theta ,
+								  List<Point2D_I32> points, List<Integer> indexes)
 	{
 		ExtractFeatureDescription<T> extract = alg.getAlgorithm();
 
@@ -121,7 +122,7 @@ public class DescribeEvaluator<T extends ImageBase>
 		double p50 = errors.getFraction(0.5);
 		double p90 = errors.getFraction(0.9);
 
-		return new double[]{associationScore,p50*10,p90*10};
+		return new double[]{current.size(),matcher.getMatches().size(),associationScore,p50*10,p90*10};
 	}
 
 	/**
@@ -201,12 +202,12 @@ public class DescribeEvaluator<T extends ImageBase>
 			return 0;
 	}
 
-	private void computeErrorScore( List<Integer> indexes ) {
+	private void computeErrorScore( List<Integer> currentToInitialIndex ) {
 		errors.reset();
-		for( int i = 0; i < indexes.size(); i++ ) {
+		for( int i = 0; i < currentToInitialIndex.size(); i++ ) {
 
 			TupleDesc_F64 f = currentList.get(i);
-			TupleDesc_F64 e = initList.get(indexes.get(i));
+			TupleDesc_F64 e = initList.get(currentToInitialIndex.get(i));
 
 			if( f != null && e != null ) {
 				// normalize the error based on the magnitude of the descriptor in the first frame
@@ -214,6 +215,8 @@ public class DescribeEvaluator<T extends ImageBase>
 				double errorNorm = errorNorm(f,e);
 				double initNorm = norm(e);
 				errors.add( errorNorm/initNorm );
+
+//				System.out.println("Error["+i+"] "+(errorNorm/initNorm));
 			}
 		}
 	}
@@ -237,6 +240,6 @@ public class DescribeEvaluator<T extends ImageBase>
 
 	@Override
 	public String[] getMetricNames() {
-		return new String[]{"Correct %","50% * 10","90% * 10"};
+		return new String[]{"num curr","matches","Correct %","50% * 10","90% * 10"};
 	}
 }

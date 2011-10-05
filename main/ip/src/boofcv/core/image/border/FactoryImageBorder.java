@@ -77,6 +77,17 @@ public class FactoryImageBorder {
 			throw new IllegalArgumentException("Unknown image type");
 	}
 
+	public static <T extends ImageBase> ImageBorder<T> value( Class<?> imageType , double value ) {
+		if( imageType == ImageFloat32.class ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_F32((float)value);
+		} else if( imageType == ImageFloat64.class ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_F64(value);
+		} else if( ImageInteger.class.isAssignableFrom(imageType) ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_I((int)value);
+		} else {
+			throw new IllegalArgumentException("Unknown image type");
+		}
+	}
 	public static <T extends ImageBase> ImageBorder<T> general( Class<?> imageType , BorderType borderType ) {
 
 		Class<?> borderClass;

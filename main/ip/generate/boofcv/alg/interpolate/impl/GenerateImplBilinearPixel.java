@@ -75,8 +75,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\tpublic "+className+"("+image.getImageName()+" orig) {\n" +
 				"\t\tsetImage(orig);\n" +
-				"\t}\n" +
-				"\n\n");
+				"\t}\n\n");
 
 	}
 
@@ -118,7 +117,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\t\tint index = orig.startIndex + yt * stride + xt;\n" +
 				"\n" +
-				"\t\t// throw allows borders to be interpolated gracefully by double counting appropriate pixels\n" +
+				"\t\t// allows borders to be interpolated gracefully by double counting appropriate pixels\n" +
 				"\t\tint dx = xt == width - 1 ? 0 : 1;\n" +
 				"\t\tint dy = yt == height - 1 ? 0 : stride;\n" +
 				"\n" +

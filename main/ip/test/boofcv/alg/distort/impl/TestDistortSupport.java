@@ -45,7 +45,7 @@ public class TestDistortSupport {
 	@Test
 	public void distortRotate() {
 
-		PixelTransform tran = DistortSupport.transformRotate(13f,15.0f,(float)(Math.PI/2.0));
+		PixelTransform tran = DistortSupport.transformRotate(13f,15.0f,13f,15f,(float)(-Math.PI/2.0));
 
 		// trivial case
 		tran.compute(13,15);

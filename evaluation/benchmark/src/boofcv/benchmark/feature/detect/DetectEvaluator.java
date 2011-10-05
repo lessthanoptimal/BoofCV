@@ -61,7 +61,7 @@ public class DetectEvaluator<T extends ImageBase> implements StabilityEvaluator<
 	@Override
 	public double[] evaluateImage(BenchmarkAlgorithm alg, T image, DistortParam param )
 	{
-		Affine2D_F32 initToImage = StabilityEvaluatorPoint.createTransform(param.scale,param.rotation,image);
+		Affine2D_F32 initToImage = StabilityEvaluatorPoint.createTransform(param.scale,param.rotation,image.width,image.height);
 
 		// move the found points to the new coordinate system or just use the
 		List<Point2D_I32> original = transformOriginal(image,initToImage);

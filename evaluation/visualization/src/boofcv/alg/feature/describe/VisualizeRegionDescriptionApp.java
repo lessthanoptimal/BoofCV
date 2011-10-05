@@ -32,6 +32,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
+import pja.dev.cv.intensity.DescribePointSamples;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,7 +64,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 		this.imageType = imageType;
 
 		addAlgorithm(0,"SURF", FactoryExtractFeatureDescription.surf(false,imageType));
-//		addAlgorithm(0,"Sample", DescribePointSamples.create(imageType));
+		addAlgorithm(0,"Sample", DescribePointSamples.create(imageType));
 //		addAlgorithm(0,"SampleDiff", DescribeSampleDifference.create(imageType));
 		addAlgorithm(0,"BRIEF", FactoryExtractFeatureDescription.brief(16, 512, -1, 4, false, false, imageType));
 		addAlgorithm(0,"BRIEFO", FactoryExtractFeatureDescription.brief(16, 512, -1, 4, false, true, imageType));

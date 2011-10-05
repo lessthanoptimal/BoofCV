@@ -34,7 +34,7 @@ import java.util.List;
 
 
 /**
- * Evalutes
+ * Evaluates the stability of feature descriptions after applying different image transforms to the image.
  *
  * @author Peter Abeles
  */
@@ -106,8 +106,8 @@ public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBas
 				= new BenchmarkStabilityDescribe<ImageFloat32,ImageFloat32>(ImageFloat32.class, ImageFloat32.class);
 
 //		benchmark.testNoise();
-//		benchmark.testIntensity();
-		benchmark.testRotation();
+		benchmark.testIntensity();
+//		benchmark.testRotation();
 //		benchmark.testScale();
 	}
 }

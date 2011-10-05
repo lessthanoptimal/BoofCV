@@ -20,8 +20,11 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.core.image.border.ImageBorder;
+import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageInt8;
+import boofcv.struct.image.ImageInteger;
 
 
 /**
@@ -40,10 +43,13 @@ public class ImplImageDistort_I8<T extends ImageInt8> implements ImageDistort<T>
 	private PixelTransform dstToSrc;
 	// sub pixel interpolation
 	private InterpolatePixel<T> interp;
+	// handle the image border
+	private ImageBorder_I32 border;
 
-	public ImplImageDistort_I8(PixelTransform dstToSrc, InterpolatePixel<T> interp) {
+	public ImplImageDistort_I8(PixelTransform dstToSrc, InterpolatePixel<T> interp , ImageBorder<ImageInteger> border ) {
 		this.dstToSrc = dstToSrc;
 		this.interp = interp;
+		this.border = (ImageBorder_I32)border;
 	}
 
 	@Override
@@ -67,37 +73,10 @@ public class ImplImageDistort_I8<T extends ImageInt8> implements ImageDistort<T>
 				final float sy = dstToSrc.distY;
 
 				if( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {
-					continue;
+					dstImg.data[indexDst] = (byte)border.getOutside((int)sx,(int)sy);
+				} else {
+					dstImg.data[indexDst] = (byte)interp.get(sx,sy);
 				}
-
-				dstImg.data[indexDst] = (byte)interp.get(sx,sy);
-			}
-		}
-	}
-
-	@Override
-	public void apply( T srcImg , T dstImg , Number value ) {
-		interp.setImage(srcImg);
-
-		int valueF = value.intValue();
-
-		final float widthF = srcImg.getWidth();
-		final float heightF = srcImg.getHeight();
-
-		for( int y = 0; y < dstImg.height; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y;
-			for( int x = 0; x < dstImg.width; x++ , indexDst++ ) {
-				dstToSrc.compute(x,y);
-
-				final float sx = dstToSrc.distX;
-				final float sy = dstToSrc.distY;
-
-				if( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {
-					dstImg.data[indexDst] = (byte)valueF;
-					continue;
-				}
-
-				dstImg.data[indexDst] = (byte)interp.get(sx,sy);
 			}
 		}
 	}

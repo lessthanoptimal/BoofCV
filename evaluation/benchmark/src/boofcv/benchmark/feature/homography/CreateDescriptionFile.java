@@ -21,13 +21,14 @@ package boofcv.benchmark.feature.homography;
 import boofcv.abst.feature.describe.ExtractFeatureDescription;
 import boofcv.alg.feature.orientation.OrientationImage;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
-import pja.dev.cv.intensity.DescribeSampleDifference;
+import pja.dev.cv.IntensityGraphDesc;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -35,6 +36,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.List;
+
+import static pja.dev.cv.FactoryDescribeNewStructure.connectSpiderWeb;
+import static pja.dev.cv.FactoryDescribeNewStructure.createCircle;
 
 
 /**
@@ -153,25 +157,25 @@ public class CreateDescriptionFile<T extends ImageBase> {
 
 	public static <T extends ImageBase>
 	void doStuff( String directory , String imageSuffix , Class<T> imageType ) throws FileNotFoundException {
-//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
+		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
 
-//		int radius = 12;
-//		int numAngles = 8;
-//		int numJoints = 2;
-//		IntensityGraphDesc graph = createCircle(radius,numAngles,numJoints);
-//		connectSpiderWeb(numAngles,numJoints,graph);
+		int radius = 12;
+		int numAngles = 8;
+		int numJoints = 2;
+		IntensityGraphDesc graph = createCircle(radius,numAngles,numJoints);
+		connectSpiderWeb(numAngles,numJoints,graph);
 //		ExtractFeatureDescription<T> alg = wrap(graph,imageType);
 
-//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16,512,-1,4,false,false,imageType);
+//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16, 512, -1, 4, false, false, imageType);
 
 //		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16,512,-1,4,false,true,imageType);
 //		ExtractFeatureDescription<T> alg = DescribePointSamples.create(imageType);
-		ExtractFeatureDescription<T> alg = DescribeSampleDifference.create(imageType);
+//		ExtractFeatureDescription<T> alg = DescribeSampleDifference.create(imageType);
 
 		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(alg.getRadius(),imageType);
-		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLEDIFF");
+//		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLEDIFF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLE");
-//		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");
+		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BRIEFO");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BRIEF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"NEW");
@@ -179,13 +183,13 @@ public class CreateDescriptionFile<T extends ImageBase> {
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-//		doStuff("data/mikolajczk/bikes/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/bikes/",".png",ImageFloat32.class);
 		doStuff("data/mikolajczk/boat/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/graf/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/leuven/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/ubc/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/trees/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/wall/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/bark/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/graf/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/leuven/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/ubc/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/trees/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/wall/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/bark/",".png",ImageFloat32.class);
 	}
 }
