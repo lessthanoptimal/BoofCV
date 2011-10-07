@@ -78,10 +78,10 @@ public class TestFastNonMaxExtractor {
 		alg.process(inten,excludeList,cornersSecond);
 
 		// make sure none of the features in the exclude list are in the second list
-		for( int i = 0; i < excludeList.num; i++ ) {
+		for( int i = 0; i < excludeList.size; i++ ) {
 			Point2D_I16 p = excludeList.get(i);
 
-			for( int j = 0; j < cornersSecond.num; j++ ) {
+			for( int j = 0; j < cornersSecond.size; j++ ) {
 				Point2D_I16 c = cornersSecond.get(i);
 
 				assertFalse(c.x == p.x && p.y == c.y);

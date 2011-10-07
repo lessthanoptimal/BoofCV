@@ -325,6 +325,8 @@
     <dictionary name="pja">
       <words>
         <w>discretization</w>
+        <w>hough</w>
+        <w>maxima</w>
         <w>thresholded</w>
         <w>thresholding</w>
         <w>tuple</w>

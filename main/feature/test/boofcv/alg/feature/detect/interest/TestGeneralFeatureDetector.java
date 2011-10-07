@@ -63,7 +63,7 @@ public class TestGeneralFeatureDetector extends GenericFeatureDetector {
 
 		QueueCorner found = d.getFeatures();
 		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
-		for( int i = 0; i < found.num; i++ ) {
+		for( int i = 0; i < found.size; i++ ) {
 			Point2D_I16 p = found.get(i);
 			ret.add( new Point2D_I32(p.x,p.y));
 		}

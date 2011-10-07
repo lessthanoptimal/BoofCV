@@ -74,11 +74,15 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage colorizeSign( ImageBase src, BufferedImage dst, double maxValue ) {
+	public static BufferedImage colorizeSign( ImageBase src, BufferedImage dst, double maxAbsValue ) {
+		if( maxAbsValue < 0 ) {
+			maxAbsValue = GPixelMath.maxAbs(src);
+		}
+
 		if( src.getClass().isAssignableFrom(ImageFloat32.class)) {
-			return colorizeSign((ImageFloat32)src,dst,(float)maxValue);
+			return colorizeSign((ImageFloat32)src,dst,(float)maxAbsValue);
 		} else {
-			return colorizeSign((ImageInteger)src,dst,(int)maxValue);
+			return colorizeSign((ImageInteger)src,dst,(int)maxAbsValue);
 		}
 	}
 
@@ -161,8 +165,11 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage colorizeSign( ImageFloat32 src, BufferedImage dst, float maxValue ) {
+	public static BufferedImage colorizeSign( ImageFloat32 src, BufferedImage dst, float maxAbsValue ) {
 		dst = ConvertBufferedImage.checkInputs(src, dst);
+
+		if( maxAbsValue < 0 )
+			maxAbsValue = PixelMath.maxAbs(src);
 
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
@@ -170,9 +177,9 @@ public class VisualizeImageData {
 
 				int rgb;
 				if( v > 0 ) {
-					rgb = (int)(255*v/maxValue) << 16;
+					rgb = (int)(255*v/maxAbsValue) << 16;
 				} else {
-					rgb = (int)(-255*v/maxValue) << 8;
+					rgb = (int)(-255*v/maxAbsValue) << 8;
 				}
 				dst.setRGB(x,y,rgb);
 			}
@@ -184,6 +191,9 @@ public class VisualizeImageData {
 	public static BufferedImage graySign( ImageFloat32 src, BufferedImage dst, float maxAbsValue )
 	{
 		dst = ConvertBufferedImage.checkInputs(src, dst);
+
+		if( maxAbsValue < 0 )
+			maxAbsValue = PixelMath.maxAbs(src);
 
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
@@ -198,15 +208,18 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage grayMagnitude( ImageFloat32 src, BufferedImage dst, float maxValue )
+	public static BufferedImage grayMagnitude( ImageFloat32 src, BufferedImage dst, float maxAbsValue )
 	{
 		dst = ConvertBufferedImage.checkInputs(src, dst);
+
+		if( maxAbsValue < 0 )
+			maxAbsValue = PixelMath.maxAbs(src);
 
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
 				float v = Math.abs(src.get(x,y));
 
-				int rgb = (int)(255 *v / maxValue);
+				int rgb = (int)(255 *v / maxAbsValue);
 
 				dst.setRGB(x,y,rgb << 16 | rgb << 8 | rgb  );
 			}

@@ -71,7 +71,7 @@ public class NonMaxCandidateExtractor {
 	public void process(ImageFloat32 intensityImage, QueueCorner candidates, QueueCorner excludeCorners, QueueCorner corners) {
 		// mark corners which have already been found
 		if( excludeCorners != null ) {
-			for (int i = 0; i < excludeCorners.num; i++) {
+			for (int i = 0; i < excludeCorners.size; i++) {
 				Point2D_I16 pt = excludeCorners.get(i);
 				intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
 			}
@@ -84,8 +84,8 @@ public class NonMaxCandidateExtractor {
 
 		final float inten[] = intensityImage.data;
 
-		for (int iter = 0; iter < candidates.num; iter++) {
-			Point2D_I16 pt = candidates.points[iter];
+		for (int iter = 0; iter < candidates.size; iter++) {
+			Point2D_I16 pt = candidates.data[iter];
 
 			// see if its too close to the image edge
 			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= w || pt.y >= h )

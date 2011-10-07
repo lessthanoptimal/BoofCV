@@ -140,7 +140,7 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 			throw new IllegalArgumentException("Unknown algorithm type.");
 		}
 
-		for( int i = 0; i < points.num; i++ ) {
+		for( int i = 0; i < points.size; i++ ) {
 			Point2D_I16 p = points.get(i);
 			double angle = orientation.compute(p.x,p.y);
 			render.addCircle(p.x,p.y,radius, Color.RED,angle);

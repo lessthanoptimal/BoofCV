@@ -16,29 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.struct;
+package boofcv.abst.feature.detect.line;
 
-import georegression.struct.point.Point2D_I16;
 
+import boofcv.struct.image.ImageBase;
+import georegression.struct.line.LineParametric2D_F32;
+
+import java.util.List;
 
 /**
- * A list that allows fast access to a queue of points that represents corners in an image.
- * All the points are predeclared and recycled.
+ * <p>
+ * Interface for detecting lines inside images.  Lines are returned using
+ * {@link LineParametric2D_F32 parametric} line equations and do not indicate the
+ * beginning and end points.
+ * </p>
  *
  * @author Peter Abeles
  */
-public class QueueCorner extends FastQueue<Point2D_I16>{
+public interface DetectLine<T extends ImageBase> {
 
-	public QueueCorner(int max) {
-		super(max,Point2D_I16.class,true);
-	}
-
-
-	public final void add(int x, int y) {
-		pop().set((short)x,(short)y);
-	}
-
-	public final void add( Point2D_I16 pt ) {
-		pop().set(pt.x, pt.y);
-	}
+	/**
+	 * Detect lines inside the image.
+	 *
+	 * @param input Input image.
+	 * @return List of found lines.
+	 */
+	public List<LineParametric2D_F32> detect( T input );
 }

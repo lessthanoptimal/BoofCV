@@ -53,14 +53,14 @@ public class SelectNBestFeatures {
 	}
 
 	public void process(ImageFloat32 intensityImage, QueueCorner origCorners) {
-		final int numFoundFeatures = origCorners.num;
+		final int numFoundFeatures = origCorners.size;
 		bestCorners.reset();
 
 		if (numFoundFeatures <= N) {
 			// make a copy of the results with no pruning since it already
 			// has the desired number, or less
 			for (int i = 0; i < numFoundFeatures; i++) {
-				Point2D_I16 pt = origCorners.points[i];
+				Point2D_I16 pt = origCorners.data[i];
 				bestCorners.add(pt.x, pt.y);
 			}
 		} else {
@@ -73,7 +73,7 @@ public class SelectNBestFeatures {
 			}
 
 			// extract the intensities for each corner
-			Point2D_I16[] points = origCorners.points;
+			Point2D_I16[] points = origCorners.data;
 			int size = origCorners.size();
 
 			for (int i = 0; i < size; i++) {
@@ -87,7 +87,7 @@ public class SelectNBestFeatures {
 			QuickSelectArray.selectIndex(inten, N, size, indexes);
 
 			for (int i = 0; i < N; i++) {
-				Point2D_I16 pt = origCorners.points[indexes[i]];
+				Point2D_I16 pt = origCorners.data[indexes[i]];
 				bestCorners.add(pt.x, pt.y);
 			}
 		}

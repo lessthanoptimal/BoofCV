@@ -33,12 +33,12 @@ public class TestFastQueue {
 	public void checkDeclareInstance() {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(10,Point2D_I32.class,true);
 
-		assertTrue(alg.getInternalArraySize()>0);
+		assertTrue(alg.getMaxSize()>0);
 		assertTrue(alg.data[0] != null);
 
 		alg = new FastQueue<Point2D_I32>(10,Point2D_I32.class,false);
 
-		assertTrue(alg.getInternalArraySize()>0);
+		assertTrue(alg.getMaxSize()>0);
 		assertTrue(alg.data[0] == null);
 	}
 
@@ -104,12 +104,12 @@ public class TestFastQueue {
 	public void pop_grow() {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(1,Point2D_I32.class,true);
 
-		int before = alg.getInternalArraySize();
+		int before = alg.getMaxSize();
 		for( int i = 0; i < 20; i++ ) {
 			alg.pop();
 		}
 		alg.get(19);
-		int after = alg.getInternalArraySize();
+		int after = alg.getMaxSize();
 		assertTrue(after>before);
 	}
 
@@ -118,7 +118,7 @@ public class TestFastQueue {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(1,Point2D_I32.class,true);
 
 		alg.pop().set(10,12);
-		int before = alg.getInternalArraySize();
+		int before = alg.getMaxSize();
 		alg.growArray(before+5);
 		assertEquals(10,alg.get(0).getX());
 	}

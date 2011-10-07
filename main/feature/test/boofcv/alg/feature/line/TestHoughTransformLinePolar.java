@@ -16,29 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.struct;
+package boofcv.alg.feature.line;
 
-import georegression.struct.point.Point2D_I16;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
 /**
- * A list that allows fast access to a queue of points that represents corners in an image.
- * All the points are predeclared and recycled.
- *
  * @author Peter Abeles
  */
-public class QueueCorner extends FastQueue<Point2D_I16>{
-
-	public QueueCorner(int max) {
-		super(max,Point2D_I16.class,true);
-	}
-
-
-	public final void add(int x, int y) {
-		pop().set((short)x,(short)y);
-	}
-
-	public final void add( Point2D_I16 pt ) {
-		pop().set(pt.x, pt.y);
+public class TestHoughTransformLinePolar {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

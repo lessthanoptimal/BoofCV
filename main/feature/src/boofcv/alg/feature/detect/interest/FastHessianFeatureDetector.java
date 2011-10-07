@@ -245,7 +245,7 @@ public class FastHessianFeatureDetector<T extends ImageBase> {
 		int sizeStep = levelSize-size[level-1];
 
 		// see if these local maximums are also a maximum in scale-space
-		for( int i = 0; i < features.num; i++ ) {
+		for( int i = 0; i < features.size; i++ ) {
 			Point2D_I16 f = features.get(i);
 
 			float val = inten1.get(f.x,f.y);
