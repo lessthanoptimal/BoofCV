@@ -90,7 +90,7 @@ public class FastNonMaxExtractor implements NonMaxExtractor {
 
 		// mark corners which have already been found
 		if( excludeCorners != null ) {
-			for (int i = 0; i < excludeCorners.num; i++) {
+			for (int i = 0; i < excludeCorners.size; i++) {
 				Point2D_I16 pt = excludeCorners.get(i);
 				intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
 			}

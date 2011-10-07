@@ -1,4 +1,4 @@
-Cars:shake_cars.zip
-Parking Lot:shake_parking_scan.zip
+Parking Lot:shake_cars.zip
+Panning:shake_parking_scan.zip
 
 

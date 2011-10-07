@@ -64,7 +64,7 @@ public class FastQueue<T> {
 		size = 0;
 	}
 
-	public int getInternalArraySize() {
+	public int getMaxSize() {
 		return data.length;
 	}
 

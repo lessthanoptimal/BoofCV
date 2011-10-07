@@ -48,7 +48,7 @@ public class FactoryInterestPoint {
 		ImageHessian<D> hessian = null;
 		ImageGenerator<D> derivativeGenerator = null;
 
-		if( feature.getRequiresGradient() )
+		if( feature.getRequiresGradient() || feature.getRequiresHessian() )
 			gradient = FactoryDerivative.sobel(inputType,derivType);
 		if( feature.getRequiresHessian() )
 			hessian  = FactoryDerivative.hessianSobel(derivType);

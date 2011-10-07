@@ -27,6 +27,9 @@ SFM
 #  * blobs
 #  * SURF
    * CenSurE (Detector/Modified SURF descriptor)
+ - Region
+   * Watershed?
+   * Super Pixel
  - Color
    * images
    * color space conversion
