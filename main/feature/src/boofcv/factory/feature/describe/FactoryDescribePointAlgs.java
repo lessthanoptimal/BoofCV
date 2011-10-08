@@ -22,7 +22,6 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.*;
 import boofcv.alg.feature.describe.brief.BriefDefinition;
 import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_F32;
-import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_U16;
 import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_U8;
 import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.alg.interpolate.InterpolatePixel;
@@ -33,7 +32,6 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -58,20 +56,19 @@ public class FactoryDescribePointAlgs {
 			return (DescribePointBrief<T> )new ImplDescribePointBrief_F32(definition,(BlurFilter<ImageFloat32>)filterBlur);
 		} else if( imageType == ImageUInt8.class ) {
 			return (DescribePointBrief<T> )new ImplDescribePointBrief_U8(definition,(BlurFilter<ImageUInt8>)filterBlur);
-		} else if( imageType == ImageUInt16.class ) {
-			return (DescribePointBrief<T> )new ImplDescribePointBrief_U16(definition,(BlurFilter<ImageUInt16>)filterBlur);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 		}
 	}
 
+	// todo remove filterBlur for all BRIEF change to radius,sigma,type
 	public static <T extends ImageBase>
-	DescribePointBriefSO briefso(BriefDefinition definition, BlurFilter<T> filterBlur) {
+	DescribePointBriefSO<T> briefso(BriefDefinition definition, BlurFilter<T> filterBlur) {
 		Class<T> imageType = filterBlur.getInputType();
 
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
 
-		return new DescribePointBriefSO(definition,filterBlur,interp);
+		return new DescribePointBriefSO<T>(definition,filterBlur,interp);
 	}
 
 	public static <T extends ImageBase, K extends Kernel2D>

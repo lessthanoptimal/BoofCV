@@ -16,19 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe;
+package boofcv.alg.feature.describe.impl;
 
-import org.junit.Test;
 
-import static org.junit.Assert.fail;
-
+import boofcv.alg.feature.describe.BaseTestDescribeBrief;
+import boofcv.struct.image.ImageFloat32;
 
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointBriefO {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestImplDescribePointBrief_F32 extends BaseTestDescribeBrief<ImageFloat32>{
+	public TestImplDescribePointBrief_F32() {
+		super(ImageFloat32.class);
 	}
 }

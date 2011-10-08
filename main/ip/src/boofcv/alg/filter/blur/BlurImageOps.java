@@ -44,8 +44,8 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		ConvolveImageMean.horizontal(input,storage,radius);
-		ConvolveImageMean.vertical(storage,output,radius);
+		ConvolveImageMean.horizontal(input, storage, radius);
+		ConvolveImageMean.vertical(storage, output, radius);
 
 		return output;
 	}
@@ -57,8 +57,8 @@ public class BlurImageOps {
 		int offset[] = new int[ w*w ];
 		int histogram[] = new int[ 256 ];
 
-		ImplMedianHistogramInner.process(input,output,radius,offset,histogram);
-		ImplMedianSortEdgeNaive.process(input,output,radius,offset);
+		ImplMedianHistogramInner.process(input, output, radius, offset, histogram);
+		ImplMedianSortEdgeNaive.process(input, output, radius, offset);
 
 		return output;
 	}
@@ -75,7 +75,6 @@ public class BlurImageOps {
 
 		return output;
 	}
-
 
 	public static ImageFloat32 mean(ImageFloat32 input, ImageFloat32 output, int radius, ImageFloat32 storage) {
 

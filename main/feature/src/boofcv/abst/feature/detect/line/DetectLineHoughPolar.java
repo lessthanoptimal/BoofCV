@@ -22,6 +22,7 @@ package boofcv.abst.feature.detect.line;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
+import boofcv.alg.feature.detect.edge.GradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
@@ -29,6 +30,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
 
@@ -71,6 +73,10 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 	// detected edge image
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
+	ImageFloat32 suppressed = new ImageFloat32(1,1);
+	ImageFloat32 angle = new ImageFloat32(1,1);
+	ImageSInt8 direction = new ImageSInt8(1,1);
+
 
 	public DetectLineHoughPolar(int localMaxRadius,
 								int minCounts,
@@ -84,7 +90,7 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(localMaxRadius, minCounts, 0);
 		alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
 		derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);
-		derivY = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);
+		derivY = GeneralizedImageOps.createImage(gradient.getDerivType(), 1, 1);
 	}
 
 	@Override
@@ -93,11 +99,18 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 		derivY.reshape(input.width,input.height);
 		intensity.reshape(input.width,input.height);
 		binary.reshape(input.width,input.height);
+		angle.reshape(input.width,input.height);
+		direction.reshape(input.width,input.height);
+		suppressed.reshape(input.width,input.height);
 
 		gradient.process(input,derivX,derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
+		GGradientToEdgeFeatures.direction(derivX, derivY, angle);
+		GradientToEdgeFeatures.discretizeDirection4(angle, direction);
 
-		ThresholdImageOps.threshold(intensity, binary, thresholdEdge, false);
+		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction, suppressed);
+
+		ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
 
 		alg.transform(binary);
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();

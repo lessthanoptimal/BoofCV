@@ -36,7 +36,6 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 	public void generate() throws FileNotFoundException {
 		printClass(AutoTypeImage.F32);
 		printClass(AutoTypeImage.U8);
-		printClass(AutoTypeImage.U16);
 	}
 
 	private void printClass( AutoTypeImage imageType ) throws FileNotFoundException {

@@ -16,45 +16,37 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe;
+package boofcv.alg.feature.describe.brief;
+
 
 import org.junit.Test;
+
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-// todo go through each type
-public class TestDescribePointBrief {
+public class TestBriefFeature {
 
-	/**
-	 * Have brief process a sub-image and see if it produces the same results.
-	 */
+	Random rand = new Random(234);
+
 	@Test
-	public void testSubImage() {
+	public void isBitTrue() {
+		int N = 40;
+		BriefFeature desc = new BriefFeature(N);
 
-	}
+		boolean expected[] = new boolean[N];
+		for( int i = 0; i < N; i++ ) {
+			expected[i] = rand.nextBoolean();
 
-	/**
-	 * Change the input image size and see if it handles that case properly.
-	 */
-	@Test
-	public void changeInInputSize() {
+			int index = i/32;
+			desc.data[index] |= expected[i] ? 1 << (i%32) : 0;
+		}
 
-	}
-
-	/**
-	 * Vary the intensity of the input image and see if the description changes.
-	 */
-	@Test
-	public void testIntensityInvariance() {
-
-	}
-
-	/**
-	 * Give it an image with a known description and see if BRIEF generates that same description.
-	 */
-	@Test
-	public void testKnownCase() {
-
+		for( int i = 0; i < N; i++ ) {
+			assertEquals(desc.isBitTrue(i),expected[i]);
+		}
 	}
 }

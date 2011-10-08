@@ -1,0 +1,2 @@
+Objects:simple_objects.jpg
+Indoors:lines_indoors.jpg
