@@ -67,8 +67,8 @@ public class DetectLineApp<T extends ImageBase, D extends ImageBase>
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		addAlgorithm(0,"Hough Polar",new DetectLineHoughPolar<T,D>(5,500,300,360,edgeThreshold,gradient));
-		addAlgorithm(0,"Hough Foot",new DetectLineHoughFoot<T,D>(6,8,5,edgeThreshold,gradient));
+		addAlgorithm(0,"Hough Polar",new DetectLineHoughPolar<T,D>(5,175,300,360,edgeThreshold,gradient));
+		addAlgorithm(0,"Hough Foot",new DetectLineHoughFoot<T,D>(6,10,5,edgeThreshold,gradient));
 		addAlgorithm(0,"Hough Foot Sub Image",new DetectLineHoughFootSubimage<T,D>(6,8,5,edgeThreshold,2,2,gradient));
 
 		input = GeneralizedImageOps.createImage(imageType,1,1);

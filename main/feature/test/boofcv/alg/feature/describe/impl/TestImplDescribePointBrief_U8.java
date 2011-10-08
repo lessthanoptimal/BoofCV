@@ -16,34 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe.brief;
+package boofcv.alg.feature.describe.impl;
+
+
+import boofcv.alg.feature.describe.BaseTestDescribeBrief;
+import boofcv.struct.image.ImageUInt8;
 
 /**
- * Stores the descriptor as an array of integers.  Each bit is the output of a comparison.
- *
  * @author Peter Abeles
  */
-public class BriefFeature {
-	public int[] data;
-	public int numBits;
-
-	public BriefFeature( int numBits ) {
-		int numInts = numBits/32;
-		if( numBits % 32 != 0 ) {
-			numInts++;
-		}
-
-		this.numBits = numBits;
-		data = new int[numInts];
-	}
-
-	public BriefFeature( int numBits , int numInts ) {
-		this.numBits = numBits;
-		data = new int[numInts];
-	}
-
-	public boolean isBitTrue( int bit ) {
-		int index = bit/32;
-		return ((data[index] >> (bit%32)) & 0x01) == 1;
+public class TestImplDescribePointBrief_U8 extends BaseTestDescribeBrief<ImageUInt8>{
+	public TestImplDescribePointBrief_U8() {
+		super(ImageUInt8.class);
 	}
 }

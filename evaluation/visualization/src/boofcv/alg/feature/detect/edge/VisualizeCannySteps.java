@@ -48,7 +48,7 @@ public class VisualizeCannySteps {
 //	static String fileName = "evaluation/data/particles01.jpg";
 //	static String fileName = "evaluation/data/scale/beach02.jpg";
 //	static String fileName = "evaluation/data/indoors01.jpg";
-	static String fileName = "evaluation/data/shapes01.png";
+	static String fileName = "data/shapes01.png";
 
 	public static void main( String args[] ){
 
@@ -88,6 +88,7 @@ public class VisualizeCannySteps {
 
 		BufferedImage renderedOrientation = VisualizeEdgeFeatures.renderOrientation4(direction,suppressed,threshLow,null);
 		BufferedImage renderedLabel = VisualizeBinaryData.renderLabeled(labeled,null,colors);
+
 		ShowImages.showWindow(intensity,"Raw Intensity",true);
 		ShowImages.showWindow(suppressed,"Suppressed Intensity",true);
 		ShowImages.showWindow(renderedOrientation,"Orientation");
