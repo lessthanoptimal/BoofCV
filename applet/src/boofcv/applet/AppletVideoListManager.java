@@ -19,20 +19,17 @@
 package boofcv.applet;
 
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.video.VideoJpegZipCodec;
 import boofcv.io.video.VideoListManager;
+import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * @author Peter Abeles
@@ -48,38 +45,31 @@ public class AppletVideoListManager<T extends ImageBase> extends VideoListManage
 	@Override
 	public SimpleImageSequence<T> loadSequence( int labelIndex , int imageIndex ) {
 
+		String type = (String)videoType.get(labelIndex);
+		String n = ((String[])fileNames.get(labelIndex))[imageIndex];
+		URL url = null;
+		BufferedInputStream stream = null;
 		try {
-			String n = ((String[])fileNames.get(labelIndex))[imageIndex];
-			URL url = new URL(codebase, n);
-
-			ZipInputStream zin = new
-					ZipInputStream(new BufferedInputStream(url.openStream()));
-
-
-			List<BufferedImage> frames = new ArrayList<BufferedImage>();
-			ZipEntry entry;
-
-			List<byte[]> jpegData = new ArrayList<byte[]>();
-
-			while( (zin.getNextEntry()) != null ) {
-//				System.out.println("Extracting: " +entry);
-				int count;
-				byte data[] = new byte[1024];
-				// write the files to the disk
-				ByteArrayOutputStream bout = new ByteArrayOutputStream(1024);
-
-				while ((count = zin.read(data, 0, 1024)) != -1) {
-					bout.write(data,0,count);
-				}
-				jpegData.add(bout.toByteArray());
-			}
-
-			return new JpegByteImageSequence<T>(imageType,jpegData, true);
+			url = new URL(codebase, n);
+			stream = new BufferedInputStream(url.openStream());
 		} catch (MalformedURLException e) {
-			System.err.println("MalformedURL"+fileNames.get(labelIndex));
+			throw new RuntimeException(e);
 		} catch (IOException e) {
-			System.err.println("IOException reading "+fileNames.get(labelIndex));
+			throw new RuntimeException(e);
 		}
+
+		if( type.compareToIgnoreCase("JPEG_ZIP") == 0 ) {
+			VideoJpegZipCodec codec = new VideoJpegZipCodec();
+			List<byte[]> data = codec.read(stream);
+			return new JpegByteImageSequence<T>(imageType,data,true);
+		} else if( type.compareToIgnoreCase("MJPEG") == 0 ) {
+			VideoMjpegCodec codec = new VideoMjpegCodec();
+			List<byte[]> data = codec.read(stream);
+			return new JpegByteImageSequence<T>(imageType,data,true);
+		} else {
+			System.err.println("Unknown video type: "+type);
+		}
+
 		return null;
 	}
 }

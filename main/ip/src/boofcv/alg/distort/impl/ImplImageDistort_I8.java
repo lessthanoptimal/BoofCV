@@ -61,6 +61,14 @@ public class ImplImageDistort_I8<T extends ImageInt8> implements ImageDistort<T>
 	public void apply( T srcImg , T dstImg ) {
 		interp.setImage(srcImg);
 
+		if( border != null )
+			applyBorder(srcImg, dstImg);
+		else
+			applyNoBorder(srcImg, dstImg);
+	}
+
+	public void applyBorder( T srcImg , T dstImg ) {
+
 		final float widthF = srcImg.getWidth();
 		final float heightF = srcImg.getHeight();
 
@@ -75,6 +83,26 @@ public class ImplImageDistort_I8<T extends ImageInt8> implements ImageDistort<T>
 				if( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {
 					dstImg.data[indexDst] = (byte)border.getOutside((int)sx,(int)sy);
 				} else {
+					dstImg.data[indexDst] = (byte)interp.get(sx,sy);
+				}
+			}
+		}
+	}
+
+	public void applyNoBorder( T srcImg , T dstImg ) {
+
+		final float widthF = srcImg.getWidth();
+		final float heightF = srcImg.getHeight();
+
+		for( int y = 0; y < dstImg.height; y++ ) {
+			int indexDst = dstImg.startIndex + dstImg.stride*y;
+			for( int x = 0; x < dstImg.width; x++ , indexDst++ ) {
+				dstToSrc.compute(x,y);
+
+				final float sx = dstToSrc.distX;
+				final float sy = dstToSrc.distY;
+
+				if( sx >= 0f && sx < widthF && sy >= 0f && sy < heightF ) {
 					dstImg.data[indexDst] = (byte)interp.get(sx,sy);
 				}
 			}

@@ -23,6 +23,8 @@ import boofcv.alg.distort.PixelTransformAffine;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
@@ -57,12 +59,13 @@ public class TestImplPolynomialPixel_F32 extends GeneralInterpolationPixelChecks
 		// set it up so that it will be equivalent to bilinear interpolation
 		ImplPolynomialPixel_F32 alg = new ImplPolynomialPixel_F32(2,0,255);
 
-		ImageDistort<ImageFloat32> distorter = DistortSupport.createDistort(ImageFloat32.class, new PixelTransformAffine(tran), alg, null);
+		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class, 0);
+		ImageDistort<ImageFloat32> distorter = DistortSupport.createDistort(ImageFloat32.class, new PixelTransformAffine(tran), alg, border);
 		distorter.apply(img,found);
 
 		InterpolatePixel<ImageFloat32> bilinear = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 
-		distorter = DistortSupport.createDistort(ImageFloat32.class, new PixelTransformAffine(tran), bilinear, null);
+		distorter = DistortSupport.createDistort(ImageFloat32.class, new PixelTransformAffine(tran), bilinear, border);
         distorter.apply(img, expected);
 
 		BoofTesting.assertEquals(expected, found, 0, 1e-4f);

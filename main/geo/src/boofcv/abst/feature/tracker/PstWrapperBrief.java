@@ -47,6 +47,8 @@ public class PstWrapperBrief <I extends ImageBase>
 		this.alg = alg;
 		this.detector = detector;
 		this.association = association;
+
+		setUpdateState(true);
 	}
 
 	@Override
@@ -56,8 +58,16 @@ public class PstWrapperBrief <I extends ImageBase>
 	}
 
 	@Override
-	public FastQueue<BriefFeature> createFeatureDescQueue() {
-		return new BriefFeatureQueue(alg.getDefinition().getLength());
+	public FastQueue<BriefFeature> createFeatureDescQueue(  boolean declareData  ) {
+		if( declareData )
+			return new BriefFeatureQueue(alg.getDefinition().getLength());
+		else
+			return new FastQueue<BriefFeature>(100,BriefFeature.class,false);
+	}
+
+	@Override
+	public BriefFeature createDescription() {
+		return new BriefFeature(alg.getDefinition().getLength());
 	}
 
 	@Override
@@ -86,5 +96,10 @@ public class PstWrapperBrief <I extends ImageBase>
 	public FastQueue<AssociatedIndex> associate(FastQueue<BriefFeature> featSrc, FastQueue<BriefFeature> featDst) {
 		association.associate(featSrc,featDst);
 		return association.getMatches();
+	}
+
+	@Override
+	protected void setDescription(BriefFeature src, BriefFeature dst) {
+		System.arraycopy(dst.data,0,src.data,0,src.data.length);
 	}
 }

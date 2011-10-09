@@ -1,4 +1,5 @@
-Parking Lot:shake_cars.zip
-Panning:shake_parking_scan.zip
+shake:MJPEG:shake.mjpeg
+zoom:MJPEG:zoom.mjpeg
+rotate:MJPEG:rotate.mjpeg
 
 

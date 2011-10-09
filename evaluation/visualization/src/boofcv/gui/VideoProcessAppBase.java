@@ -22,6 +22,9 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoListManager;
 import boofcv.struct.image.ImageBase;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -32,7 +35,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public abstract class VideoProcessAppBase<I extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmImagePanel implements ProcessInput , MouseListener
+		extends SelectAlgorithmImagePanel implements ProcessInput , MouseListener , ChangeListener
 {
 	protected SimpleImageSequence<I> sequence;
 
@@ -40,10 +43,28 @@ public abstract class VideoProcessAppBase<I extends ImageBase, D extends ImageBa
 	volatile boolean isRunning = false;
 	volatile boolean isPaused = false;
 
-	long framePeriod = 150;
+	long framePeriod = 100;
+
+	JSpinner periodSpinner;
 
 	public VideoProcessAppBase(int numAlgFamilies) {
 		super(numAlgFamilies);
+
+		addToToolbar(createSelectDelay());
+	}
+
+	private JPanel createSelectDelay() {
+		JPanel ret = new JPanel();
+		ret.setLayout(new BoxLayout(ret, BoxLayout.X_AXIS));
+
+		periodSpinner = new JSpinner(new SpinnerNumberModel(framePeriod,0,1000,10));
+		periodSpinner.setMaximumSize(periodSpinner.getPreferredSize());
+		periodSpinner.addChangeListener(this);
+
+		ret.add(new JLabel("Delay"));
+		ret.add(periodSpinner);
+
+		return ret;
 	}
 
 	public void startWorkerThread() {
@@ -136,5 +157,12 @@ public abstract class VideoProcessAppBase<I extends ImageBase, D extends ImageBa
 
 	@Override
 	public void mouseExited(MouseEvent e) {}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if( e.getSource() == periodSpinner ) {
+			framePeriod = ((Number)periodSpinner.getValue()).intValue();
+		}
+	}
 
 }
