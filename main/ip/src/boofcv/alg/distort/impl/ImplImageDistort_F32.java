@@ -60,6 +60,14 @@ public class ImplImageDistort_F32 implements ImageDistort<ImageFloat32> {
 	public void apply( ImageFloat32 srcImg , ImageFloat32 dstImg ) {
 		interp.setImage(srcImg);
 
+		if( border != null )
+			applyBorder(srcImg, dstImg);
+		else
+			applyNoBorder(srcImg, dstImg);
+	}
+
+	public void applyBorder( ImageFloat32 srcImg , ImageFloat32 dstImg ) {
+
 		final float widthF = srcImg.getWidth();
 		final float heightF = srcImg.getHeight();
 
@@ -74,6 +82,26 @@ public class ImplImageDistort_F32 implements ImageDistort<ImageFloat32> {
 				if( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {
 					dstImg.data[indexDst] = border.getOutside((int)sx,(int)sy);
 				} else {
+					dstImg.data[indexDst] = interp.get(sx,sy);
+				}
+			}
+		}
+	}
+
+	public void applyNoBorder( ImageFloat32 srcImg , ImageFloat32 dstImg ) {
+
+		final float widthF = srcImg.getWidth();
+		final float heightF = srcImg.getHeight();
+
+		for( int y = 0; y < dstImg.height; y++ ) {
+			int indexDst = dstImg.startIndex + dstImg.stride*y;
+			for( int x = 0; x < dstImg.width; x++ , indexDst++ ) {
+				dstToSrc.compute(x,y);
+
+				final float sx = dstToSrc.distX;
+				final float sy = dstToSrc.distY;
+
+				if( sx >= 0f && sx < widthF && sy >= 0f && sy < heightF ) {
 					dstImg.data[indexDst] = interp.get(sx,sy);
 				}
 			}

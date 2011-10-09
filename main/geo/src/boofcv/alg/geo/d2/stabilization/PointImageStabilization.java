@@ -25,6 +25,7 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.SingleImageInput;
 import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.distort.PixelTransform;
@@ -90,6 +91,8 @@ public class PointImageStabilization<I extends ImageBase > {
 	// true if the keyframe has been changed to this frame
 	private boolean referenceFrameChanged;
 
+	private ImageBorder<I> border;
+
 	public PointImageStabilization( Class<I> imageType ,
 								  PointSequentialTracker tracker ,
 								  ModelMatcher<Affine2D_F64,AssociatedPair> fitter ,
@@ -101,13 +104,15 @@ public class PointImageStabilization<I extends ImageBase > {
 		}
 
 		InterpolatePixel<I> bilinear = FactoryInterpolation.bilinearPixel(imageType);
-		distort = DistortSupport.createDistort(imageType,transform,bilinear, null);
+//		border = FactoryImageBorder.value(imageType, 0);
+		distort = DistortSupport.createDistort(imageType, transform, bilinear, border);
 		this.tracker = tracker;
 		this.fitter = fitter;
 
 		this.thresholdChange = thresholdChange;
 		this.thresholdReset = thresholdReset;
 		this.thresholdDistance2 = thresholdDistance*thresholdDistance;
+
 	}
 
 	/**
@@ -120,12 +125,15 @@ public class PointImageStabilization<I extends ImageBase > {
 		if( imageOut == null ||
 				imageOut.width != input.width || imageOut.height != input.height ) {
 			imageOut = (I)input._createNew(input.getWidth(),input.getHeight());
+			// drop previous tracks just in case a 'hot' tracker was passed in
+			tracker.dropTracks();
 		}
 
 		// track
 		((SingleImageInput<I>)tracker).process(input);
 
 		List<AssociatedPair> tracks = tracker.getActiveTracks();
+//		System.out.println("active tracks = "+tracks.size());
 
 		referenceFrameChanged = false;
 
@@ -135,6 +143,7 @@ public class PointImageStabilization<I extends ImageBase > {
 		} else {
 			// compute the image motion from the tracks
 			if( fitter.process(tracks,null) ) {
+//				System.out.println("match set tracks = "+fitter.getMatchSet().size());
 
 				// find the transform from the current frame to the keyframe
 				Affine2D_F64 m = totalMotion.concat(fitter.getModel(),null);
@@ -147,15 +156,21 @@ public class PointImageStabilization<I extends ImageBase > {
 					// not enough overlap with the reference frame
 					referenceFrameChanged = true;
 				} else {
-					// render stabilized image
-					transform.set(m);
-					distort.apply(input,imageOut);
+					int matchSet = fitter.getMatchSet().size();
+
+					if( matchSet >= thresholdReset ) {
+						// render stabilized image
+						transform.set(m);
+						distort.apply(input,imageOut);
 					
-					if( fitter.getMatchSet().size() < thresholdChange ) {
-						// too few features in the inlier set, so change the keyframe
-						totalMotion.set(m);
-						tracker.setCurrentToKeyFrame();
-						tracker.spawnTracks();
+						if( matchSet < thresholdChange ) {
+							// too few features in the inlier set, so change the keyframe
+							totalMotion.set(m);
+							tracker.setCurrentToKeyFrame();
+							tracker.spawnTracks();
+						}
+					} else {
+						referenceFrameChanged = true;
 					}
 				}
 			} else {

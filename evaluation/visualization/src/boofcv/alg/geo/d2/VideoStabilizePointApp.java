@@ -59,8 +59,8 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 	int maxFeatures = 250;
 	int minFeatures = 150;
 	static int thresholdChange = 80;
-	static int thresholdReset = 30;
-	static double thresholdDistance = 100;
+	static int thresholdReset = 20;
+	static double thresholdDistance = Double.MAX_VALUE;
 
 	Class<I> imageType;
 
@@ -86,7 +86,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config));
-		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 70, imageType));
+		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 50, imageType));
 		addAlgorithm(0,"SURF", FactoryPointSequentialTracker.surf(300,200,2,imageType));
 
 		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
@@ -239,7 +239,9 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		VideoStabilizePointApp app = new VideoStabilizePointApp(ImageFloat32.class, ImageFloat32.class);
 
 		VideoListManager manager = new VideoListManager(ImageFloat32.class);
-		manager.add("Parking Lot", "JPEG_ZIP", "../applet/data/shake_parking_scan.zip");
+		manager.add("Shake", "MJPEG", "../applet/data/shake.mjpeg");
+		manager.add("Zoom", "MJPEG", "../applet/data/zoom.mjpeg");
+		manager.add("Rotate", "MJPEG", "../applet/data/rotate.mjpeg");
 
 		app.setInputManager(manager);
 
@@ -248,6 +250,6 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Feature Tracker");
+		ShowImages.showWindow(app, "Video Stabilization");
 	}
 }

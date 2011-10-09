@@ -21,7 +21,6 @@ package boofcv.alg.distort.impl;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.*;
@@ -98,8 +97,6 @@ public class DistortSupport {
 								  PixelTransform dstToSrc,
 								  InterpolatePixel<T> interp, ImageBorder border)
 	{
-		if( border == null )
-			border = FactoryImageBorder.value(imageType,0);
 		if( imageType == ImageFloat32.class ) {
 			return (ImageDistort<T>)new ImplImageDistort_F32(dstToSrc,(InterpolatePixel<ImageFloat32>)interp,border);
 		} else if( ImageSInt32.class.isAssignableFrom(imageType) ) {

@@ -60,6 +60,7 @@ public class PstWrapperSurf<I extends ImageBase,II extends ImageBase>
 		this.describe = describe;
 		this.assoc = assoc;
 		this.integralImage = GeneralizedImageOps.createImage(integralType,1,1);
+		setPruneThreshold(20);
 	}
 
 	@Override
@@ -69,8 +70,16 @@ public class PstWrapperSurf<I extends ImageBase,II extends ImageBase>
 	}
 
 	@Override
-	public FastQueue<SurfFeature> createFeatureDescQueue() {
-		return new SurfFeatureQueue(64);
+	public FastQueue<SurfFeature> createFeatureDescQueue(  boolean declareData ) {
+		if( declareData )
+			return new SurfFeatureQueue(64);
+		else
+			return new FastQueue<SurfFeature>(100,SurfFeature.class,false);
+	}
+
+	@Override
+	public SurfFeature createDescription() {
+		return new SurfFeature(64);
 	}
 
 	@Override
@@ -94,6 +103,12 @@ public class PstWrapperSurf<I extends ImageBase,II extends ImageBase>
 			}
 		}
 		description.removeTail();
+	}
+
+	@Override
+	protected void setDescription(SurfFeature src, SurfFeature dst) {
+		src.laplacianPositive = dst.laplacianPositive;
+		src.features.set(dst.features.getValue());
 	}
 
 	@Override

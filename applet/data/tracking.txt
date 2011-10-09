@@ -1,5 +1,4 @@
-Driving:driving_snow.zip
-Cars:shake_cars.zip
-Parking Lot:shake_parking_scan.zip
-
+shake:MJPEG:shake.mjpeg
+zoom:MJPEG:zoom.mjpeg
+rotate:MJPEG:rotate.mjpeg
 

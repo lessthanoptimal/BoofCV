@@ -26,6 +26,7 @@ import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -34,10 +35,7 @@ import java.util.List;
  * feature description..
  *
  * TODO improve algorithm
- * - Put descriptions into associated pair
- * - Drop tracks if not associated for a while
  * - Drop tracks if consistent poor score
- * - configure option: change feature description after association
  *
  * @author Peter Abeles
  */
@@ -63,24 +61,55 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 
 	long featureID = 0;
 
+	// if a track goes unassociated for this long it is pruned
+	int pruneThreshold = 2;
+
+	// should it update the feature description after each association?
+	boolean updateState = true;
+
+	// how many frames have been processed
+	long tick;
+
 	public abstract void setInputImage( I input );
 
-	public abstract FastQueue<D> createFeatureDescQueue();
+	public abstract FastQueue<D> createFeatureDescQueue( boolean declareData );
+
+	public abstract D createDescription();
 
 	public abstract void detectFeatures( FastQueue<Point2D_I32> location ,
 										 FastQueue<D> description );
 
 	public abstract FastQueue<AssociatedIndex> associate( FastQueue<D> featSrc , FastQueue<D> featDst );
 
+	public boolean isUpdateState() {
+		return updateState;
+	}
+
+	/**
+	 * If a feature is associated should the description be updated with the latest observation?
+	 */
+	public void setUpdateState(boolean updateState) {
+		this.updateState = updateState;
+	}
+
+	public int getPruneThreshold() {
+		return pruneThreshold;
+	}
+
+	public void setPruneThreshold(int pruneThreshold) {
+		this.pruneThreshold = pruneThreshold;
+	}
+
 	@Override
 	public void process( I input ) {
 		if( featSrc == null ) {
-			featSrc = createFeatureDescQueue();
-			featDst = createFeatureDescQueue();
+			featSrc = createFeatureDescQueue(false);
+			featDst = createFeatureDescQueue(true);
 		}
 
 //		System.out.println("process");
 		setInputImage(input);
+		tick++;
 
 		tracksActive.clear();
 		tracksDropped.clear();
@@ -90,6 +119,8 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 		locDst.reset();
 
 		detectFeatures(locDst,featDst);
+
+		pruneTracks();
 
 		// if the keyframe has been set associate
 		if( keyFrameSet ) {
@@ -101,9 +132,40 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 				Point2D_I32 loc = locDst.data[indexes.dst];
 				pair.currLoc.set(loc.x,loc.y);
 				tracksActive.add(pair);
+				TrackInfo info = (TrackInfo)pair.getDescription();
+				info.lastAssociated = tick;
+
+				// update the description
+				if( updateState ) {
+					setDescription(info.desc, featDst.get(indexes.dst));
+				}
+//				System.out.println("i = "+i+"  x = "+loc.x+" y = "+loc.y);
+			}
+//			System.out.println("----------------- matched "+matches.size()+"  tracked "+locDst.size());
+		}
+	}
+
+	private void pruneTracks() {
+		featSrc.reset();
+		Iterator<AssociatedPair> iter = tracksAll.iterator();
+		while( iter.hasNext() ) {
+			AssociatedPair p = iter.next();
+			TrackInfo info = (TrackInfo)p.description;
+			if( tick - info.lastAssociated > pruneThreshold ) {
+//				System.out.println("Dropping track");
+				tracksDropped.add(p);
+				unused.add(p);
+				iter.remove();
+			} else {
+				featSrc.add(info.desc);
 			}
 		}
 	}
+
+	/**
+	 * Sets the 'src' description equal to 'dst'
+	 */
+	protected abstract void setDescription(D src, D dst);
 
 	@Override
 	public boolean addTrack(float x, float y) {
@@ -141,6 +203,7 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 					p.currLoc.set(loc.x,loc.y);
 					p.keyLoc.set(p.currLoc);
 					p.featureId = featureID++;
+					setDescription(((TrackInfo)p.getDescription()).desc, featDst.get(i));
 					tracksActive.add(p);
 					tracksNew.add(p);
 				}
@@ -152,6 +215,7 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 				Point2D_I32 loc = locDst.get(i);
 				p.currLoc.set(loc.x,loc.y);
 				p.keyLoc.set(p.currLoc);
+				setDescription(((TrackInfo)p.getDescription()).desc, featDst.get(i));
 				p.featureId = featureID++;
 
 				tracksNew.add(p);
@@ -159,7 +223,7 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 			}
 		}
 
-		// add unused to unused
+		// add unused to the lists
 		for(AssociatedPair p : tracksAll ) {
 			if( !tracksActive.contains(p) ) {
 				tracksDropped.add(p);
@@ -169,30 +233,42 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 		tracksAll.clear();
 		tracksAll.addAll(tracksActive);
 
-		keyFrameSet = true;
+		featSrc.reset();
+		for( AssociatedPair p : tracksAll ) {
+			featSrc.add(p.<TrackInfo>getDescription().desc);
+		}
 
-		// swap to avoid unnecessary memory copy
-		FastQueue<D> temp = featDst;
-		featDst = featSrc;
-		featSrc = temp;
+		keyFrameSet = true;
 	}
 
 	private AssociatedPair getUnused() {
 		AssociatedPair p;
 		if( unused.size() > 0 ) {
 			p = unused.remove( unused.size()-1 );
+			((TrackInfo)p.getDescription()).reset();
 		} else {
 			p = new AssociatedPair();
+			TrackInfo info = new TrackInfo();
+			info.desc = createDescription();
+			p.setDescription(info);
 		}
 		return p;
 	}
 
 	@Override
 	public void dropTracks() {
-		tracksDropped.addAll(tracksAll);
+		unused.addAll(tracksAll);
+		tracksDropped.clear();
+		tracksDropped.addAll(tracksActive);
+		tracksActive.clear();
+		tracksAll.clear();
+		tracksNew.clear();
+
 		keyFrameSet = false;
-		featSrc.reset();
-		featDst.reset();
+		if( featSrc != null ) {
+			featSrc.reset();
+			featDst.reset();
+		}
 	}
 
 	@Override
@@ -220,5 +296,17 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 	@Override
 	public List<AssociatedPair> getNewTracks() {
 		return tracksNew;
+	}
+
+	private class TrackInfo
+	{
+		// which tick was it last associated at.  Used for dropping tracks
+		long lastAssociated;
+		// description of the feature
+		D desc;
+
+		public void reset() {
+			lastAssociated = tick;
+		}
 	}
 }

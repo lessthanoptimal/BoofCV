@@ -50,6 +50,8 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 	private void createFile() throws FileNotFoundException {
 		printPreamble();
 		printFunction();
+		printDistort();
+		printNoDistort();
 		out.println("}");
 	}
 
@@ -111,13 +113,25 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 
 	private void printFunction() {
 
-		String typeCast = image.isInteger() ? "("+image.getDataType()+")" : "";
 		String imageName = image.isInteger() ? "T" : image.getImageName();
-
 
 		out.print("\t@Override\n" +
 				"\tpublic void apply( "+imageName+" srcImg , "+imageName+" dstImg ) {\n" +
 				"\t\tinterp.setImage(srcImg);\n" +
+				"\n" +
+				"\t\tif( border != null )\n" +
+				"\t\t\tapplyBorder(srcImg, dstImg);\n" +
+				"\t\telse\n" +
+				"\t\t\tapplyNoBorder(srcImg, dstImg);\n" +
+				"\t}\n\n");
+	}
+
+	private void printDistort() {
+
+		String typeCast = image.isInteger() ? "("+image.getDataType()+")" : "";
+		String imageName = image.isInteger() ? "T" : image.getImageName();
+
+		out.print("\tpublic void applyBorder( "+imageName+" srcImg , "+imageName+" dstImg ) {\n" +
 				"\n" +
 				"\t\tfinal float widthF = srcImg.getWidth();\n" +
 				"\t\tfinal float heightF = srcImg.getHeight();\n" +
@@ -133,6 +147,32 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\t\t\t\tif( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {\n" +
 				"\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"border.getOutside((int)sx,(int)sy);\n" +
 				"\t\t\t\t} else {\n" +
+				"\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"interp.get(sx,sy);\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	private void printNoDistort() {
+
+		String typeCast = image.isInteger() ? "("+image.getDataType()+")" : "";
+		String imageName = image.isInteger() ? "T" : image.getImageName();
+
+		out.print("\tpublic void applyNoBorder( "+imageName+" srcImg , "+imageName+" dstImg ) {\n" +
+				"\n" +
+				"\t\tfinal float widthF = srcImg.getWidth();\n" +
+				"\t\tfinal float heightF = srcImg.getHeight();\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < dstImg.height; y++ ) {\n" +
+				"\t\t\tint indexDst = dstImg.startIndex + dstImg.stride*y;\n" +
+				"\t\t\tfor( int x = 0; x < dstImg.width; x++ , indexDst++ ) {\n" +
+				"\t\t\t\tdstToSrc.compute(x,y);\n" +
+				"\n" +
+				"\t\t\t\tfinal float sx = dstToSrc.distX;\n" +
+				"\t\t\t\tfinal float sy = dstToSrc.distY;\n" +
+				"\n" +
+				"\t\t\t\tif( sx >= 0f && sx < widthF && sy >= 0f && sy < heightF ) {\n" +
 				"\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"interp.get(sx,sy);\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +

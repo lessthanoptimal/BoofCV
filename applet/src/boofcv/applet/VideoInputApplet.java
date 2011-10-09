@@ -19,6 +19,7 @@
 package boofcv.applet;
 
 import boofcv.gui.ProcessInput;
+import boofcv.io.video.VideoListManager;
 import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
@@ -64,7 +65,7 @@ public class VideoInputApplet extends JApplet {
 		showStatus("Loading Image");
 		ProcessInput p = (ProcessInput)comp;
 
-		AppletVideoListManager manager = parseImageInput(inputType,dataset);
+		VideoListManager manager = parseImageInput(inputType,dataset);
 
 		p.setInputManager(manager);
 
@@ -77,7 +78,7 @@ public class VideoInputApplet extends JApplet {
 		getContentPane().add(comp, BorderLayout.CENTER);
 	}
 
-	public AppletVideoListManager parseImageInput( Class imageType , String fileName )
+	public VideoListManager parseImageInput( Class imageType , String fileName )
 	{
 
 		String directory = getDirectory(fileName);
@@ -93,12 +94,12 @@ public class VideoInputApplet extends JApplet {
 					continue;
 
 				String[]z = line.split(":");
-				String[] names = new String[z.length-1];
-				for( int i = 1; i < z.length; i++ ) {
-					names[i-1] = directory+z[i];
+				String[] names = new String[z.length-2];
+				for( int i = 2; i < z.length; i++ ) {
+					names[i-2] = directory+z[i];
 				}
 
-				ret.add(z[0],null,names);
+				ret.add(z[0],z[1],names);
 			}
 
 			return ret;
@@ -127,6 +128,6 @@ public class VideoInputApplet extends JApplet {
 
 	@Override
 	public String getAppletInfo() {
-		return "Shows gradient of an image";
+		return "Video Processing Applet";
 	}
 }

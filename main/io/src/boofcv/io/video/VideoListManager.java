@@ -78,6 +78,14 @@ public class VideoListManager<T extends ImageBase> implements InputListManager {
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
+		} else if( type.compareToIgnoreCase("MJPEG") == 0 ) {
+			try {
+				VideoMjpegCodec codec = new VideoMjpegCodec();
+				List<byte[]> data = codec.read(new FileInputStream(fileNames.get(labelIndex)[imageIndex]));
+				return new JpegByteImageSequence<T>(imageType,data,true);
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			throw new IllegalArgumentException("Unknown video type: "+type);
 		}

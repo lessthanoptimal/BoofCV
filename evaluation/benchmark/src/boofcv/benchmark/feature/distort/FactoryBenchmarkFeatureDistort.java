@@ -27,6 +27,7 @@ import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F32;
@@ -139,7 +140,7 @@ public class FactoryBenchmarkFeatureDistort {
 			Affine2D_F32 imageToInit = initToImage.invert(null);
 			PixelTransformAffine affine = new PixelTransformAffine(imageToInit);
 			InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
-			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,affine,interp, null);
+			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,affine,interp, FactoryImageBorder.value(imageType, 0));
 
 			distorter.apply(image,distortedImage);
 		}
