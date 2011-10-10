@@ -38,11 +38,11 @@ public class TestGeneralCornerDetector {
 
 	@Test
 	public void testPositiveNoCandidates() {
-		HelperExtractor extractor = new HelperExtractor(false,true,true);
+		HelperExtractor extractor = new HelperExtractor(false, true);
 		HelperIntensity intensity = new HelperIntensity(false,false,false);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 0);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -54,10 +54,10 @@ public class TestGeneralCornerDetector {
 	@Test
 	public void testPositiveCandidates() {
 		HelperIntensity intensity = new HelperIntensity(false,false,true);
-		HelperExtractor extractor = new HelperExtractor(true,true,true);
+		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 0);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -72,10 +72,10 @@ public class TestGeneralCornerDetector {
 	@Test(expected=IllegalArgumentException.class)
 	public void candidatesMissMatch() {
 		HelperIntensity intensity = new HelperIntensity(false,false,false);
-		HelperExtractor extractor = new HelperExtractor(true,true,true);
+		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 0);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -88,10 +88,10 @@ public class TestGeneralCornerDetector {
 	@Test
 	public void testNoNBestSelect() {
 		HelperIntensity intensity = new HelperIntensity(false,false,true);
-		HelperExtractor extractor = new HelperExtractor(true,true,true);
+		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 0);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -105,10 +105,10 @@ public class TestGeneralCornerDetector {
 	@Test
 	public void testWithNBestSelect() {
 		HelperIntensity intensity = new HelperIntensity(false,false,true);
-		HelperExtractor extractor = new HelperExtractor(true,true,true);
+		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,1);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 1);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -122,10 +122,10 @@ public class TestGeneralCornerDetector {
 	@Test
 	public void setBestNumber() {
 		HelperIntensity intensity = new HelperIntensity(false,false,true);
-		HelperExtractor extractor = new HelperExtractor(true,true,true);
+		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,0);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 0);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -145,19 +145,17 @@ public class TestGeneralCornerDetector {
 	{
 
 		boolean usesCandidates;
-		boolean canExclude;
 		boolean acceptsRequests;
 
 		public int numTimesProcessed;
 
-		public HelperExtractor(boolean usesCandidates, boolean canExclude, boolean acceptsRequests) {
+		public HelperExtractor(boolean usesCandidates, boolean acceptsRequests) {
 			this.usesCandidates = usesCandidates;
-			this.canExclude = canExclude;
 			this.acceptsRequests = acceptsRequests;
 		}
 
 		@Override
-		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner excludeCorners, QueueCorner foundFeature) {
+		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner foundFeature) {
 			numTimesProcessed++;
 
 			foundFeature.add(1,1);
@@ -169,10 +167,6 @@ public class TestGeneralCornerDetector {
 			return usesCandidates;
 		}
 
-		@Override
-		public boolean getCanExclude() {
-			return canExclude;
-		}
 
 		@Override
 		public boolean getAcceptRequest() {
@@ -189,7 +183,17 @@ public class TestGeneralCornerDetector {
 		}
 
 		@Override
-		public void setIgnoreBorder(int border) {
+		public void setInputBorder(int border) {
+		}
+
+		@Override
+		public int getInputBorder() {
+			return 0;
+		}
+
+		@Override
+		public boolean canDetectBorder() {
+			return true;
 		}
 	}
 

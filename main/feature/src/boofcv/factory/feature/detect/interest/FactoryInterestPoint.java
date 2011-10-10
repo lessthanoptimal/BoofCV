@@ -115,7 +115,7 @@ public class FactoryInterestPoint {
 											  int numberScalesPerOctave ,
 											  int numberOfOctaves )
 	{
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 1, 5);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 1, 5, false);
 		FastHessianFeatureDetector<T> feature = new FastHessianFeatureDetector<T>(extractor,maxFeaturesPerScale,
 				initialSize,numberScalesPerOctave,numberOfOctaves);
 

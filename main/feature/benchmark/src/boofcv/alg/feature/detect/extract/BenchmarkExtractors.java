@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.extract;
 
+import boofcv.alg.misc.ImageTestingOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 
@@ -43,12 +43,12 @@ public class BenchmarkExtractors {
 	static Random rand = new Random(33456);
 
 	public static class FastNonMax extends PerformerBase {
-		FastNonMaxExtractor corner = new FastNonMaxExtractor(windowRadius, windowRadius, threshold);
+		FastNonMaxExtractor corner = new FastNonMaxExtractor(windowRadius, threshold);
 
 		@Override
 		public void process() {
 			corners.reset();
-			corner.process(intensity, null , corners);
+			corner.process(intensity, corners);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class BenchmarkExtractors {
 		@Override
 		public void process() {
 			corners.reset();
-			corner.process(intensity, null , corners);
+			corner.process(intensity, corners);
 		}
 	}
 

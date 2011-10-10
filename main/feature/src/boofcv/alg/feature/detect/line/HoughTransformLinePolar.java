@@ -67,6 +67,9 @@ public class HoughTransformLinePolar {
 	 * @param numBinsRange
 	 */
 	public HoughTransformLinePolar(FeatureExtractor extractor , int numBinsRange , int numBinsAngle) {
+		if( !extractor.canDetectBorder() ) {
+			throw new IllegalArgumentException("The extractor must also process the image border");
+		}
 		this.extractor = extractor;
 		transform.reshape(numBinsRange,numBinsAngle);
 
@@ -114,7 +117,7 @@ public class HoughTransformLinePolar {
 		lines.reset();
 		foundLines.reset();
 
-		extractor.process(transform, null, -1, null, foundLines);
+		extractor.process(transform, null, -1, foundLines);
 
 		int w2 = transform.width/2;
 

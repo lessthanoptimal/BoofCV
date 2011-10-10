@@ -229,8 +229,8 @@ public class FastHessianFeatureDetector<T extends ImageBase> {
 		// false positives are found around them as an artifact of pixels outside being
 		// treated as being zero.
 		foundFeatures.reset();
-		extractor.setIgnoreBorder(size[level]/(2*skip));
-		extractor.process(intensity[index1],null,-1,null,foundFeatures);
+		extractor.setInputBorder(size[level] / (2 * skip));
+		extractor.process(intensity[index1],null,-1,foundFeatures);
 
 		// if configured to do so, only select the features with the highest intensity
 		QueueCorner features;

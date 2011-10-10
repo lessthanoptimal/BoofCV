@@ -48,11 +48,13 @@ public interface NonMaxExtractor {
 	public void setThresh(float thresh);
 
 	/**
-	 * Specifies the size of the image border which should be ignored.
+	 * Specifies the size of the input image border which is ignored.
 	 *
 	 * @param border Size of image border.
 	 */
-	public void setIgnoreBorder( int border );
+	public void setInputBorder(int border);
+
+	public int getInputBorder();
 
 	/**
 	 * Returns the current feature selection threshold.
@@ -60,11 +62,12 @@ public interface NonMaxExtractor {
 	public float getThresh();
 
 	/**
-	 * Detects corners in the image.  Features that are in the exclude list will be avoided
+	 * Detects corners in the image.  If a pixel has an intensity less than the minimum threshold or
+	 * has a value equal to Float.MAX_VALUE it cannot be an image feature.  Typically Float.MAX_VALUE
+	 * is given to features which have already been detected and should not be returned again.
 	 *
 	 * @param intensityImage Feature intensity image. Can be modified.
-	 * @param excludeCorners List of features which should be excluded and not added to the list
 	 * @param corners	Where found corners are stored.
 	 */
-	public void process(ImageFloat32 intensityImage, QueueCorner excludeCorners , QueueCorner corners);
+	public void process(ImageFloat32 intensityImage, QueueCorner corners);
 }

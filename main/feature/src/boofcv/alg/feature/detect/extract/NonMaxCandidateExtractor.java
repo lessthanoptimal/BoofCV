@@ -38,14 +38,12 @@ public class NonMaxCandidateExtractor {
 	float thresh;
 	// does not process pixels this close to the image border
 	int ignoreBorder;
+	// size of the intensity image's border which can't be touched
+	private int borderIntensity;
 
-	public NonMaxCandidateExtractor(int minSeparation, int ignoreBorderIntensity, float thresh) {
+	public NonMaxCandidateExtractor(int minSeparation, float thresh) {
 		this.radius = minSeparation;
 		this.thresh = thresh;
-		// double the ignore border to avoid touching unprocessed pixels in the intensity image
-		this.ignoreBorder = 2*ignoreBorderIntensity;
-		if( ignoreBorder < minSeparation )
-			ignoreBorder = minSeparation;
 	}
 
 	public void setMinSeparation(int minSeparation) {
@@ -60,6 +58,16 @@ public class NonMaxCandidateExtractor {
 		this.thresh = thresh;
 	}
 
+	public void setBorder( int border ) {
+		this.borderIntensity = border;
+		this.ignoreBorder = border+radius;
+
+	}
+
+	public int getBorder() {
+		return borderIntensity;
+	}
+
 	/**
 	 * Selects a set of features from the provided intensity image and corner candidates.  If a non-empty list of
 	 * corners is passed in then those corners will not be added again and similar corners will be excluded.
@@ -68,14 +76,7 @@ public class NonMaxCandidateExtractor {
 	 * @param candidates	 List of candidate locations for features.
 	 * @param corners		List of selected features.  If not empty, previously found features will be skipped.
 	 */
-	public void process(ImageFloat32 intensityImage, QueueCorner candidates, QueueCorner excludeCorners, QueueCorner corners) {
-		// mark corners which have already been found
-		if( excludeCorners != null ) {
-			for (int i = 0; i < excludeCorners.size; i++) {
-				Point2D_I16 pt = excludeCorners.get(i);
-				intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
-			}
-		}
+	public void process(ImageFloat32 intensityImage, QueueCorner candidates, QueueCorner corners) {
 
 		final int w = intensityImage.width-ignoreBorder;
 		final int h = intensityImage.height-ignoreBorder;
@@ -94,7 +95,7 @@ public class NonMaxCandidateExtractor {
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;
 
 			float val = inten[center];
-			if (val < thresh) continue;
+			if (val < thresh || val == Float.MAX_VALUE ) continue;
 
 			boolean max = true;
 
@@ -113,7 +114,7 @@ public class NonMaxCandidateExtractor {
 				}
 			}
 
-			if (max && val != Float.MAX_VALUE) {
+			if (max ) {
 				corners.add(pt.x, pt.y);
 			}
 		}

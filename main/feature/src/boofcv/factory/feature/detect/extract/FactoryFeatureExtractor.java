@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.WrapperNonMax;
 import boofcv.abst.feature.detect.extract.WrapperNonMaxCandidate;
 import boofcv.alg.feature.detect.extract.FastNonMaxExtractor;
+import boofcv.alg.feature.detect.extract.NonMaxBorderExtractor;
 import boofcv.alg.feature.detect.extract.NonMaxCandidateExtractor;
 
 /**
@@ -35,13 +36,25 @@ public class FactoryFeatureExtractor
 	/**
 	 * Standard non-max feature extractor.
 	 *
+	 *
 	 * @param minSeparation Minimum separation between found features.
 	 * @param threshold Minimum feature intensity it will consider
 	 * @param ignoreBorderIntensity How many pixels in the intensity image were not processed.
+	 * @param detectBorderFeatures Should it detect feature's whose region intersect the image border?
 	 * @return A feature extractor.
 	 */
-	public static FeatureExtractor nonmax( int minSeparation , float threshold , int ignoreBorderIntensity ) {
-		return new WrapperNonMax(new FastNonMaxExtractor(minSeparation,ignoreBorderIntensity,threshold));
+	public static FeatureExtractor nonmax(int minSeparation,
+										  float threshold,
+										  int ignoreBorderIntensity, boolean detectBorderFeatures) {
+
+		NonMaxBorderExtractor extractorBorder = null;
+		if( detectBorderFeatures ) {
+			extractorBorder = new NonMaxBorderExtractor(minSeparation,threshold);
+		}
+
+		WrapperNonMax ret = new WrapperNonMax(new FastNonMaxExtractor(minSeparation,threshold), extractorBorder);
+		ret.setInputBorder(ignoreBorderIntensity);
+		return ret;
 	}
 
 	/**
@@ -53,7 +66,9 @@ public class FactoryFeatureExtractor
 	 * @return A feature extractor.
 	 */
 	public static FeatureExtractor nonmaxCandidate( int minSeparation , float threshold , int ignoreBorderIntensity ) {
-		return new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(minSeparation,ignoreBorderIntensity,threshold));
+		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(minSeparation,threshold));
+		ret.setInputBorder(ignoreBorderIntensity);
+		return ret;
 	}
 
 }

@@ -149,7 +149,6 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 		ProfileOperation.printOpsPerSec(new Describe("Steer Norm r=12", FactoryExtractFeatureDescription.steerableGaussian(12,true,imageType,derivType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=12", FactoryExtractFeatureDescription.gaussian12(12,imageType,derivType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=20", FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType)),TEST_TIME);
-
 	}
 
 	public static void main( String argsp[ ] ) {

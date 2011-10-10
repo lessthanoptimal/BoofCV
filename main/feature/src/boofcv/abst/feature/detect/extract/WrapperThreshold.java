@@ -37,7 +37,7 @@ public class WrapperThreshold implements FeatureExtractor {
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
-					 QueueCorner excludeCorners, QueueCorner foundFeature) {
+					QueueCorner foundFeature) {
 		extractor.process(intensity, foundFeature);
 	}
 
@@ -47,7 +47,7 @@ public class WrapperThreshold implements FeatureExtractor {
 	}
 
 	@Override
-	public void setIgnoreBorder(int border) {
+	public void setInputBorder(int border) {
 
 	}
 
@@ -62,12 +62,17 @@ public class WrapperThreshold implements FeatureExtractor {
 	}
 
 	@Override
-	public boolean getCanExclude() {
+	public boolean getAcceptRequest() {
 		return false;
 	}
 
 	@Override
-	public boolean getAcceptRequest() {
-		return false;
+	public int getInputBorder() {
+		return 0;
+	}
+
+	@Override
+	public boolean canDetectBorder() {
+		return true;
 	}
 }

@@ -23,6 +23,7 @@ import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import georegression.struct.point.Point2D_I16;
 
 /**
  * Generic class for extracting features of different types. Can return all the found features or just the features with the highest
@@ -55,21 +56,23 @@ public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 	 * @param extractor   Extracts the corners from intensity image
 	 * @param maxFeatures If >= zero then only the best features are returned up to this number
 	 */
-	public GeneralFeatureDetector(GeneralFeatureIntensity<I,D> intensity ,
-								 FeatureExtractor extractor,
-								 int maxFeatures)
+	public GeneralFeatureDetector(GeneralFeatureIntensity<I, D> intensity,
+								  FeatureExtractor extractor,
+								  int maxFeatures)
 	{
 		if( extractor.getUsesCandidates() && !intensity.hasCandidates() )
 			throw new IllegalArgumentException("The extractor requires candidate features, which the intensity does not provide.");
 
 		this.intensity = intensity;
 		this.extractor = extractor;
+
 		if (maxFeatures > 0) {
 			foundCorners = new QueueCorner(maxFeatures);
 			selectBest = new SelectNBestFeatures(maxFeatures);
 		} else {
 			foundCorners = new QueueCorner(100);
 		}
+
 	}
 
 	public void setExcludedCorners(QueueCorner excludedCorners) {
@@ -89,15 +92,27 @@ public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
 	public void process(I image , D derivX, D derivY, D derivXX, D derivYY , D derivXY ) {
 		intensity.process(image,derivX, derivY, derivXX, derivYY, derivXY );
 		foundCorners.reset();
-		if( intensity.hasCandidates() ) {
-			extractor.process(intensity.getIntensity(), intensity.getCandidates(), requestedFeatureNumber,
-					excludedCorners,foundCorners);
-		} else {
-			extractor.process(intensity.getIntensity(), null, requestedFeatureNumber, 
-					excludedCorners,foundCorners);
+		ImageFloat32 intensityImage = intensity.getIntensity();
+
+		// mark features which are in the excluded list so that they are not returned again
+		if( excludedCorners != null ) {
+			for (int i = 0; i < excludedCorners.size; i++) {
+				Point2D_I16 pt = excludedCorners.get(i);
+				intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
+			}
 		}
+
+		extractor.setInputBorder(intensity.getIgnoreBorder());
+
+		// extract features from inside the image
+		if( intensity.hasCandidates() ) {
+			extractor.process(intensityImage, intensity.getCandidates(), requestedFeatureNumber, foundCorners);
+		} else {
+			extractor.process(intensityImage, null, requestedFeatureNumber, foundCorners);
+		}
+
 		if (selectBest != null) {
-			selectBest.process(intensity.getIntensity(), foundCorners);
+			selectBest.process(intensityImage, foundCorners);
 		}
 	}
 

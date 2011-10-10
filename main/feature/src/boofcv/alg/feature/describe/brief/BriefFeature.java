@@ -46,4 +46,10 @@ public class BriefFeature {
 		int index = bit/32;
 		return ((data[index] >> (bit%32)) & 0x01) == 1;
 	}
+
+	public BriefFeature copy() {
+		BriefFeature ret = new BriefFeature(numBits);
+		System.arraycopy(data,0,ret.data,0,data.length);
+		return ret;
+	}
 }
