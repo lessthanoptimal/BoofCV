@@ -20,7 +20,6 @@ package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I16;
 
 /**
  * <p/>
@@ -39,22 +38,18 @@ public class FastNonMaxExtractor implements NonMaxExtractor {
 	// minimum intensity value
 	private float thresh;
 	// image border that should be skipped
-	private int border;
+	private int ignoreBorder;
+	// size of the intensity image's border which can't be touched
+	private int borderIntensity;
 
 	/**
 	 * @param minSeparation How close features can be to each other.
-	 * @param intensityBorder Image border in intensity image which was not processed
 	 * @param thresh What the minimum intensity a feature must have to be considered a feature.
 	 */
-	public FastNonMaxExtractor(int minSeparation, int intensityBorder, float thresh) {
+	public FastNonMaxExtractor(int minSeparation, float thresh) {
 		radius = minSeparation;
-		// multiply this by 2 to ensure that none of the unprocessed features
-		// are examined since they could have random values
-		this.border = intensityBorder*2;
 		this.thresh = thresh;
-
-		if (this.border < radius)
-			this.border = radius;
+		this.ignoreBorder = radius;
 	}
 
 	@Override
@@ -73,8 +68,13 @@ public class FastNonMaxExtractor implements NonMaxExtractor {
 	}
 
 	@Override
-	public void setIgnoreBorder(int border) {
-		this.border = border;
+	public void setInputBorder(int border) {
+		this.borderIntensity = border;
+		this.ignoreBorder = radius+border;
+	}
+
+	public int getInputBorder() {
+		return borderIntensity;
 	}
 
 	/**
@@ -84,25 +84,17 @@ public class FastNonMaxExtractor implements NonMaxExtractor {
 	 * @param corners		Where found corners are stored.  Corners which are already in the list will not be added twice.
 	 */
 	@Override
-	public void process(ImageFloat32 intensityImage, QueueCorner excludeCorners, QueueCorner corners) {
+	public void process(ImageFloat32 intensityImage, QueueCorner corners) {
 		int imgWidth = intensityImage.getWidth();
 		int imgHeight = intensityImage.getHeight();
 
-		// mark corners which have already been found
-		if( excludeCorners != null ) {
-			for (int i = 0; i < excludeCorners.size; i++) {
-				Point2D_I16 pt = excludeCorners.get(i);
-				intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
-			}
-		}
-
 		final float inten[] = intensityImage.data;
 
-		for (int y = border; y < imgHeight - border; y++) {
+		for (int y = ignoreBorder; y < imgHeight - ignoreBorder; y++) {
 			int maxX = Integer.MIN_VALUE;
 			float maxValue = -1;
 
-			for (int x = border; x < imgWidth - border; x++) {
+			for (int x = ignoreBorder; x < imgWidth - ignoreBorder; x++) {
 				int center = intensityImage.startIndex + y * intensityImage.stride + x;
 				float val = inten[center];
 

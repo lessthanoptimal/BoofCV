@@ -36,8 +36,8 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
-					 QueueCorner excludeCorners, QueueCorner foundFeature) {
-		extractor.process(intensity,candidate,excludeCorners, foundFeature);
+					QueueCorner foundFeature) {
+		extractor.process(intensity,candidate, foundFeature);
 	}
 
 	@Override
@@ -51,7 +51,13 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 	}
 
 	@Override
-	public void setIgnoreBorder(int border) {
+	public void setInputBorder(int border) {
+		throw new RuntimeException("This is being ignored");
+	}
+
+	@Override
+	public int getInputBorder() {
+		return extractor.getBorder();
 	}
 
 	@Override
@@ -60,12 +66,12 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 	}
 
 	@Override
-	public boolean getCanExclude() {
+	public boolean getAcceptRequest() {
 		return false;
 	}
 
 	@Override
-	public boolean getAcceptRequest() {
+	public boolean canDetectBorder() {
 		return false;
 	}
 }

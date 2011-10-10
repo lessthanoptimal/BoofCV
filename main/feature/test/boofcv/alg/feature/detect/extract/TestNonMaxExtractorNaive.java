@@ -18,17 +18,12 @@
 
 package boofcv.alg.feature.detect.extract;
 
-import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
-import georegression.struct.point.Point2D_I16;
 import org.junit.Test;
 
-import java.util.Random;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
  * @author Peter Abeles
@@ -36,57 +31,28 @@ import static org.junit.Assert.assertFalse;
 public class TestNonMaxExtractorNaive {
 
 	/**
-	 * Pass in a null list and see if it blows up
+	 * See if it correctly ignores features which  are equal to MAX_VALUE
 	 */
 	@Test
-	public void checkNullExcludeList() {
+	public void exclude_MAX_VALUE() {
 		ImageFloat32 inten = new ImageFloat32(30, 40);
-		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
 
-		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
-
-		NonMaxExtractorNaive alg = new NonMaxExtractorNaive(2, 0.6F);
-		alg.process(inten,null,foundList);
-		// if it doesn't blow up it passed!
-	}
-
-	/**
-	 *See if the exclude list is honored
-	 */
-	@Test
-	public void excludePreExisting() {
-		ImageFloat32 inten = new ImageFloat32(30, 40);
-		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
-
-		QueueCorner excludeList = new QueueCorner(inten.getWidth() * inten.getHeight());
-		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
+		inten.set(15, 20, Float.MAX_VALUE);
+		inten.set(20,21,Float.MAX_VALUE);
+		inten.set(10,25,Float.MAX_VALUE);
+		inten.set(11,24,10);
+		inten.set(25,35,10);
 
 
+		QueueCorner foundList = new QueueCorner(100);
 		NonMaxExtractorNaive alg = new NonMaxExtractorNaive(2, 0.6F);
 		// find corners the first time
-		alg.process(inten,excludeList,foundList);
+		alg.process(inten,foundList);
 
-		// add points which should be excluded
-		QueueCorner cornersSecond = new QueueCorner(inten.getWidth() * inten.getHeight());
-		for( int i = 0; i < 20; i++ ) {
-			excludeList.add(foundList.get(i));
-		}
-
-		// recreate the same image
-		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
-		alg.process(inten,excludeList,cornersSecond);
-
-		// make sure none of the features in the exclude list are in the second list
-		for( int i = 0; i < excludeList.size; i++ ) {
-			Point2D_I16 p = excludeList.get(i);
-
-			for( int j = 0; j < cornersSecond.size; j++ ) {
-				Point2D_I16 c = cornersSecond.get(i);
-
-				assertFalse(c.x == p.x && p.y == c.y);
-			}
-		}
-
+		// only one feature should be found.  The rest should be MAX_VALUE or too close to MAX_VALUE
+		assertEquals(1, foundList.size);
+		assertEquals(25, foundList.data[0].x);
+		assertEquals(35,foundList.data[0].y);
 	}
 
 	/**
@@ -113,17 +79,17 @@ public class TestNonMaxExtractorNaive {
 
 		NonMaxExtractorNaive extractor;
 		extractor = new NonMaxExtractorNaive(1, 0);
-		extractor.process(img, null , corners);
+		extractor.process(img, corners);
 		assertEquals(5, corners.size());
 
 		corners.reset();
 		extractor.setMinSeparation(2);
-		extractor.process(img, null , corners);
+		extractor.process(img, corners);
 		assertEquals(1, corners.size());
 
 		corners.reset();
 		extractor.setMinSeparation(3);
-		extractor.process(img, null , corners);
+		extractor.process(img, corners);
 		assertEquals(1, corners.size());
 
 		assertEquals(4, corners.get(0).x);
@@ -154,12 +120,12 @@ public class TestNonMaxExtractorNaive {
 
 		NonMaxExtractorNaive extractor;
 		extractor = new NonMaxExtractorNaive(0, 0);
-		extractor.process(img, null , corners);
+		extractor.process(img, corners);
 		assertEquals(9 * 8, corners.size());
 
 		corners.reset();
 		extractor.setThresh(3);
-		extractor.process(img, null , corners);
+		extractor.process(img, corners);
 		assertEquals(6, corners.size());
 	}
 }

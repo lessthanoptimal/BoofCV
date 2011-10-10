@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.detect.extract;
 
+import boofcv.alg.feature.detect.extract.NonMaxBorderExtractor;
 import boofcv.alg.feature.detect.extract.NonMaxExtractor;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
@@ -30,15 +31,20 @@ import boofcv.struct.image.ImageFloat32;
 public class WrapperNonMax implements FeatureExtractor {
 
 	NonMaxExtractor extractor;
+	NonMaxBorderExtractor extractorBorder;
 
-	public WrapperNonMax(NonMaxExtractor extractor) {
+	public WrapperNonMax(NonMaxExtractor extractor,
+						 NonMaxBorderExtractor extractorBorder) {
 		this.extractor = extractor;
+		this.extractorBorder = extractorBorder;
 	}
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
-					 QueueCorner excludeCorners, QueueCorner foundFeature) {
-		extractor.process(intensity, excludeCorners, foundFeature);
+					QueueCorner foundFeature) {
+		extractor.process(intensity, foundFeature);
+		if( extractorBorder != null )
+			extractorBorder.process(intensity,foundFeature);
 	}
 
 	@Override
@@ -47,8 +53,10 @@ public class WrapperNonMax implements FeatureExtractor {
 	}
 
 	@Override
-	public void setIgnoreBorder(int border) {
-		extractor.setIgnoreBorder(border);
+	public void setInputBorder(int border) {
+		extractor.setInputBorder(border);
+		if( extractorBorder != null )
+			extractorBorder.setInputBorder(border);
 	}
 
 	@Override
@@ -62,12 +70,17 @@ public class WrapperNonMax implements FeatureExtractor {
 	}
 
 	@Override
-	public boolean getCanExclude() {
-		return true;
+	public boolean getAcceptRequest() {
+		return false;
 	}
 
 	@Override
-	public boolean getAcceptRequest() {
-		return false;
+	public int getInputBorder() {
+		return extractor.getInputBorder();
+	}
+
+	@Override
+	public boolean canDetectBorder() {
+		return extractorBorder!=null;
 	}
 }

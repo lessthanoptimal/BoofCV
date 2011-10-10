@@ -19,10 +19,7 @@
 package boofcv.io.video;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,19 +35,32 @@ public class VideoMjpegCodec {
 	private static final byte EOI = (byte)0xD9;
 
 	public List<byte[]> read( InputStream streamIn ) {
-		DataInputStream in = new DataInputStream(streamIn);
+		// read the whole movie in at once to make it faster
 
-		 List<byte[]> ret = new ArrayList<byte[]>();
-
+		List<byte[]> ret = new ArrayList<byte[]>();
 		try {
+			byte[] b = convertToByteArray(streamIn);
+//			System.out.println("MJPEG file is "+b.length+" bytes");
+
+			DataInputStream in = new DataInputStream(new ByteArrayInputStream(b));
+
 			while( findMarker(in,SOI) && in.available() > 0 ) {
 				byte data[] = readJpegData(in, EOI);
 				ret.add(data);
 			}
 		} catch (IOException e) {
 		}
-
 		return ret;
+	}
+
+	private byte[] convertToByteArray(InputStream streamIn) throws IOException {
+		ByteArrayOutputStream temp = new ByteArrayOutputStream(1024);
+		byte[] data = new byte[ 1024 ];
+		int length;
+		while( ( length = streamIn.read(data)) != -1 ) {
+			temp.write(data,0,length);
+		}
+		return temp.toByteArray();
 	}
 
 	private boolean findMarker( DataInputStream in , byte marker ) throws IOException {

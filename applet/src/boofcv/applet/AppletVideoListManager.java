@@ -65,6 +65,7 @@ public class AppletVideoListManager<T extends ImageBase> extends VideoListManage
 		} else if( type.compareToIgnoreCase("MJPEG") == 0 ) {
 			VideoMjpegCodec codec = new VideoMjpegCodec();
 			List<byte[]> data = codec.read(stream);
+//			System.out.println("Loaded "+data.size()+" jpeg images!");
 			return new JpegByteImageSequence<T>(imageType,data,true);
 		} else {
 			System.err.println("Unknown video type: "+type);

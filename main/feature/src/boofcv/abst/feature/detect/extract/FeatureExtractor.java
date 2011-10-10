@@ -38,7 +38,9 @@ import boofcv.struct.image.ImageFloat32;
  * <p>
  * Almost all feature extraction algorithms use a threshold to determine what can be a feature or not.  Pixels
  * whose intensity is less than the threshold cannot be a feature.  This interface allows the threshold to be changed,
- * which is useful in scale-space analysis where the threshold will vary for each level.
+ * which is useful in scale-space analysis where the threshold will vary for each level.  In addition, if
+ * a pixel has an intensity of Float.MAX_VALUE then it is ignored and not returned.  This technique is often used to
+ * ignore features which have already been detected.
  * </p>
  *
  * <p>
@@ -48,21 +50,26 @@ import boofcv.struct.image.ImageFloat32;
  * <li> Return the specified number of features, always. </li>
  * </ul>
  *
+ * <p>
+ * DESIGN NOTES:<br>
+ * The input border is specified because its faster to ignore it internally than create a sub-image,
+ * adjust candidate and output feature positions.  VERIFY THIS WITH BENCHMARK?
+ * </p>
+ *
  * @author Peter Abeles
  */
 public interface FeatureExtractor {
 
 	/**
-	 * Process a feature intensity image to extract the point features.
+	 * Process a feature intensity image to extract the point features.  If a pixel has an intensity
+	 * value == Float.MAX_VALUE it is be ignored.
 	 *
 	 * @param intensity	Feature intensity image.  Can be modified.
 	 * @param requestedNumber Number of features it should find.  Not always supported.
-	 * @param excludeCorners Features which should not be selected again.  Can be null. Not always supported.
 	 * @param foundFeature Features which were found.
 	 */
 	public void process(ImageFloat32 intensity, QueueCorner candidate,
 						int requestedNumber ,
-						QueueCorner excludeCorners ,
 						QueueCorner foundFeature);
 
 	/**
@@ -71,13 +78,6 @@ public interface FeatureExtractor {
 	 * @return true if candidates are required.
 	 */
 	public boolean getUsesCandidates();
-
-	/**
-	 * Returns if the excluded list is used or not.
-	 *
-	 * @return true if features can be excluded.
-	 */
-	public boolean getCanExclude();
 
 	/**
 	 * If it accepts requests to find a specific number of features or not.
@@ -100,8 +100,27 @@ public interface FeatureExtractor {
 	public void setThreshold( float threshold );
 
 	/**
-	 * If supported, change the border around the image which is ignored.
+	 * Specify the size of the image border which it will not process.  If the extractor
+	 * is configured to only extract whole regions then this will increase the size
+	 * of its own ignore region to avoid these border pixels.
+	 *
+	 * @param border Border size in pixels.
 	 */
-	public void setIgnoreBorder( int border );
+	public void setInputBorder(int border);
 
+	/**
+	 * Returns the size of the image border which is not processed.
+	 *
+	 * @return border size
+	 */
+	public int getInputBorder();
+
+	/**
+	 * Can it detect features which are inside the image border.  For example if a feature
+	 * has a radius of 5, but there is a local max at 2, should that be returned?  Can
+	 * the output handle feature descriptors which are partially inside the image?
+	 *
+	 * @return If it can detect features inside the image border.
+	 */
+	public boolean canDetectBorder();
 }

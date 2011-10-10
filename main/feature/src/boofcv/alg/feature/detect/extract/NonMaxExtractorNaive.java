@@ -20,7 +20,6 @@ package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I16;
 
 
 /**
@@ -60,19 +59,16 @@ public class NonMaxExtractorNaive implements NonMaxExtractor {
 	}
 
 	@Override
-	public void setIgnoreBorder(int border) {
+	public void setInputBorder(int border) {
 		this.border = border;
 	}
 
+	public int getInputBorder() {
+		return border;
+	}
+
 	@Override
-	public void process(ImageFloat32 intensityImage, QueueCorner excludeCorners, QueueCorner corners) {
-		// mark corners which have already been found
-		if( excludeCorners != null ){
-			for (int i = 0; i < excludeCorners.size; i++) {
-				Point2D_I16 pt = excludeCorners.get(i);
-				intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
-			}
-		}
+	public void process(ImageFloat32 intensityImage, QueueCorner corners) {
 
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();

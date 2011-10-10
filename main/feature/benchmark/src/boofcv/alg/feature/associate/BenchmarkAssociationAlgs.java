@@ -18,6 +18,8 @@
 
 package boofcv.alg.feature.associate;
 
+import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.FastQueue;
@@ -30,7 +32,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkTupleScore {
+public class BenchmarkAssociationAlgs {
 
 	static final long TEST_TIME = 1000;
 	static final Random rand = new Random(234234);
@@ -42,19 +44,17 @@ public class BenchmarkTupleScore {
 
 	public static class General implements Performer {
 
-		ScoreAssociation alg;
+		GeneralAssociation<TupleDesc_F64> alg;
 		String name;
 
-		public General(String name, ScoreAssociation alg) {
+		public General(String name, GeneralAssociation<TupleDesc_F64> alg) {
 			this.alg = alg;
 			this.name = name;
 		}
 
 		@Override
 		public void process() {
-			for( int i = 0; i < listA.size; i++ )
-				for( int j = 0; j < listB.size; j++ )
-					alg.score(listA.data[i],listB.data[j]);
+			alg.associate(listA,listB);
 		}
 
 		@Override
@@ -79,9 +79,11 @@ public class BenchmarkTupleScore {
 		System.out.println("=========  Profile Description Length "+DOF+" ========== Num Features "+NUM_FEATURES);
 		System.out.println();
 
-		// the "fastest" seems to always be the first one tested
-		ProfileOperation.printOpsPerSec(new General("Correlation", new ScoreAssociateCorrelation()),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Euclidean", new ScoreAssociateEuclidean()),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Euclidean Sq", new ScoreAssociateEuclideanSq()),TEST_TIME);
+		ScoreAssociation score = new ScoreAssociateEuclideanSq();
+		int maxMatches = 200;
+
+		ProfileOperation.printOpsPerSec(new General("Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, false)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, true)),TEST_TIME);
+		
 	}
 }

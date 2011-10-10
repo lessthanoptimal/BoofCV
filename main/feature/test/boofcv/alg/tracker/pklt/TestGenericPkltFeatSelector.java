@@ -27,7 +27,6 @@ import boofcv.alg.feature.detect.extract.FastNonMaxExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I16;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -59,7 +58,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 
 		// set the first layer to not be one
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(new DummyIntensity(), new DummyExtractor(),100);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(new DummyIntensity(), new DummyExtractor(), 100);
 		GenericPkltFeatSelector<ImageFloat32, ImageFloat32> selector =
 				new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,tracker);
 
@@ -169,10 +168,11 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 						FactoryPointIntensityAlg.createKlt(3, ImageFloat32.class));
 
 		FeatureExtractor extractor = new WrapperNonMax(
-				new FastNonMaxExtractor(3, 3, 0.001f));
+				new FastNonMaxExtractor(3, 0.001f), null);
+		extractor.setInputBorder(3);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor,maxFeatures);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, maxFeatures);
 
 		return new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,tracker);
 	}
@@ -220,13 +220,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 	{
 
 		@Override
-		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner excludeCorners, QueueCorner foundFeature) {
-			// if the feature's position isn't scaled then this test will fail
-			for( int i = 0; i < excludeCorners.size; i++ ) {
-				Point2D_I16 p = excludeCorners.get(i);
-				assertTrue(intensity.isInBounds(p.x,p.y));
-			}
-
+		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner foundFeature) {
 			// add a corner on the image boundary for scaled down
 			foundFeature.add(width/2-2,height/2-2);
 		}
@@ -234,11 +228,6 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		@Override
 		public boolean getUsesCandidates() {
 			return false;
-		}
-
-		@Override
-		public boolean getCanExclude() {
-			return true;
 		}
 
 		@Override
@@ -256,7 +245,17 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		}
 
 		@Override
-		public void setIgnoreBorder(int border) {
+		public void setInputBorder(int border) {
+		}
+
+		@Override
+		public int getInputBorder() {
+			return 0;
+		}
+
+		@Override
+		public boolean canDetectBorder() {
+			return false;
 		}
 	}
 }

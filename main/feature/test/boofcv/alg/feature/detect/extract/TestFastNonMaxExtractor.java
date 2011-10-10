@@ -26,7 +26,8 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -35,58 +36,30 @@ import static org.junit.Assert.*;
 public class TestFastNonMaxExtractor {
 	Random rand = new Random(0x334);
 
-	/**
-	 * Pass in a null list and see if it blows up
-	 */
-	@Test
-	public void checkNullExcludeList() {
-		ImageFloat32 inten = new ImageFloat32(30, 40);
-		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
-
-		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
-
-		FastNonMaxExtractor alg = new FastNonMaxExtractor(2, 2,0.6F);
-		alg.process(inten,null,foundList);
-		// if it doesn't blow up it passed!
-	}
 
 	/**
-	 * If a non-empty list of features is passed in it should not add them again to the list nor return
-	 * any similar features.
+	 * See if it correctly ignores features which  are equal to MAX_VALUE
 	 */
 	@Test
-	public void excludePreExisting() {
+	public void exclude_MAX_VALUE() {
 		ImageFloat32 inten = new ImageFloat32(30, 40);
-		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
 
-		QueueCorner excludeList = new QueueCorner(inten.getWidth() * inten.getHeight());
-		QueueCorner foundList = new QueueCorner(inten.getWidth() * inten.getHeight());
+		inten.set(15,20,Float.MAX_VALUE);
+		inten.set(20,21,Float.MAX_VALUE);
+		inten.set(10,25,Float.MAX_VALUE);
+		inten.set(11,24,10);
+		inten.set(25,35,10);
 
 
-		FastNonMaxExtractor alg = new FastNonMaxExtractor(2, 0,0.6F);
+		QueueCorner foundList = new QueueCorner(100);
+		FastNonMaxExtractor alg = new FastNonMaxExtractor(2, 0.6F);
 		// find corners the first time
-		alg.process(inten,excludeList,foundList);
+		alg.process(inten,foundList);
 
-		// add points which should be excluded
-		QueueCorner cornersSecond = new QueueCorner(inten.getWidth() * inten.getHeight());
-		for( int i = 0; i < 20; i++ ) {
-			excludeList.add(foundList.get(i));
-		}
-
-		// recreate the same image
-		ImageTestingOps.randomize(inten, new Random(1231), 0, 10);
-		alg.process(inten,excludeList,cornersSecond);
-
-		// make sure none of the features in the exclude list are in the second list
-		for( int i = 0; i < excludeList.size; i++ ) {
-			Point2D_I16 p = excludeList.get(i);
-
-			for( int j = 0; j < cornersSecond.size; j++ ) {
-				Point2D_I16 c = cornersSecond.get(i);
-
-				assertFalse(c.x == p.x && p.y == c.y);
-			}
-		}
+		// only one feature should be found.  The rest should be MAX_VALUE or too close to MAX_VALUE
+		assertEquals(1,foundList.size);
+		assertEquals(25,foundList.data[0].x);
+		assertEquals(35,foundList.data[0].y);
 	}
 
 	/**
@@ -109,14 +82,14 @@ public class TestFastNonMaxExtractor {
 			}
 
 			for (int nonMaxWidth = 3; nonMaxWidth <= 9; nonMaxWidth += 2) {
-				FastNonMaxExtractor fast = new FastNonMaxExtractor(nonMaxWidth / 2, 0, 0.6F);
+				FastNonMaxExtractor fast = new FastNonMaxExtractor(nonMaxWidth / 2, 0.6F);
 				NonMaxExtractorNaive reg = new NonMaxExtractorNaive(nonMaxWidth / 2, 0.6F);
 
 				for (int i = 0; i < 10; i++) {
 					ImageTestingOps.randomize(inten, rand, 0, 10);
 
-					fast.process(inten, null,fastCorners);
-					reg.process(inten, null,regCorners);
+					fast.process(inten, fastCorners);
+					reg.process(inten, regCorners);
 
 					assertTrue(fastCorners.size() > 0);
 

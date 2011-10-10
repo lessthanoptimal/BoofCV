@@ -60,7 +60,7 @@ public class ImagePanel extends JPanel {
 				double ratioH = (double)getHeight()/(double)img.getHeight();
 
 				double ratio = Math.min(ratioW,ratioH);
-				if( ratio >= 1 ) {
+				if( ratio == 1 ) {
 					g.drawImage(img, 0, 0, this);
 				} else {
 					AffineTransform tran = AffineTransform.getScaleInstance(ratio, ratio);

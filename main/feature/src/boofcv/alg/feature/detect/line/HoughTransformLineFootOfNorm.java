@@ -75,6 +75,9 @@ public class HoughTransformLineFootOfNorm {
 	 */
 	public HoughTransformLineFootOfNorm(FeatureExtractor extractor,
 										int minDistanceFromOrigin) {
+		if( !extractor.canDetectBorder() ) {
+			throw new IllegalArgumentException("The extractor must also process the image border");
+		}
 		this.extractor = extractor;
 		this.minDistanceFromOrigin = minDistanceFromOrigin;
 	}
@@ -116,7 +119,7 @@ public class HoughTransformLineFootOfNorm {
 		lines.reset();
 		foundLines.reset();
 
-		extractor.process(transform, candidates, -1, null, foundLines);
+		extractor.process(transform, candidates, -1, foundLines);
 
 		for( int i = 0; i < foundLines.size(); i++ ) {
 			Point2D_I16 p = foundLines.get(i);

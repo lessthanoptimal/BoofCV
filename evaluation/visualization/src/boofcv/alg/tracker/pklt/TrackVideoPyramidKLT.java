@@ -177,10 +177,10 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 				new WrapperGradientCornerIntensity<I,D>(
 						FactoryPointIntensityAlg.createKlt(config.featureRadius, derivType));
 		FeatureExtractor extractor = new WrapperNonMax(
-				new FastNonMaxExtractor(config.featureRadius+2,
-						config.featureRadius*scalingTop, configKLt.minDeterminant));
+				new FastNonMaxExtractor(config.featureRadius+2,configKLt.minDeterminant), null);
+		extractor.setInputBorder(config.featureRadius * scalingTop);
 		GeneralFeatureDetector<I,D> detector =
-				new GeneralFeatureDetector<I,D>(intensity,extractor,config.maxFeatures);
+				new GeneralFeatureDetector<I,D>(intensity,extractor, config.maxFeatures);
 
 		GenericPkltFeatSelector<I, D> featureSelector =
 				new GenericPkltFeatSelector<I,D>(detector,null);

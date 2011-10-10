@@ -49,4 +49,18 @@ public class TestBriefFeature {
 			assertEquals(desc.isBitTrue(i),expected[i]);
 		}
 	}
+
+	@Test
+	public void copy() {
+		BriefFeature a = new BriefFeature(512);
+		for( int i = 0; i < a.data.length; i++ ) {
+			a.data[i] = 100+i;
+		}
+
+		BriefFeature b = a.copy();
+		assertEquals(a.numBits,b.numBits);
+		for( int i = 0; i < a.data.length; i++ ) {
+			assertEquals(100+i,a.data[i]);
+		}
+	}
 }
