@@ -1,4 +1,4 @@
-<project name="BoofCV_Feature" basedir="." default="main">
+<project name="BoofCV_Numerics" basedir="." default="main">
 
 
     <property name="src.dir"     value="src"/>
@@ -16,7 +16,8 @@
 
     <path id="project.classpath">
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
-        <fileset dir="${jar.dir}" includes="**/BoofCV_*.jar"/>
+        <fileset dir="${jar.dir}" includes="**/BoofCV_IP.jar"/>
+        <fileset dir="${jar.dir}" includes="**/BoofCV_Feature.jar"/>
     </path>
 
     <path id="test.classpath">

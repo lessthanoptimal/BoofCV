@@ -18,8 +18,17 @@
 
 package boofcv.alg.feature.line;
 
+import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
+import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.struct.FastQueue;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
+import georegression.struct.line.LineParametric2D_F32;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 
@@ -27,8 +36,39 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestHoughTransformLineFootOfNorm {
+	int width = 30;
+	int height = 40;
+
+	// todo support other image types
+	/**
+	 * See if it can detect an obvious line in the image
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void obviousLines() {
+		ImageUInt8 image = new ImageUInt8(width,height);
+		ImageFloat32 derivX = new ImageFloat32(width,height);
+		ImageFloat32 derivY = new ImageFloat32(width,height);
+
+		for( int i = 0; i < height; i++ ) {
+			image.set(5,i,1);
+			derivX.set(5,i,20);
+		}
+
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(4, 2, 0, true);
+		HoughTransformLineFootOfNorm alg = new HoughTransformLineFootOfNorm(extractor,2);
+
+		alg.transform(derivX,derivY,image);
+
+		FastQueue<LineParametric2D_F32> lines =  alg.extractLines();
+
+		assertEquals(1,lines.size());
+
+		LineParametric2D_F32 l = lines.get(0);
+		assertEquals(l.p.x,5,0.1);
+		// normalize the line for easier evaluation
+		l.slope.x /= l.slope.norm();
+		l.slope.y /= l.slope.norm();
+		assertEquals(0,Math.abs(l.slope.x),0);
+		assertEquals(1,Math.abs(l.slope.y), 0.1);
 	}
 }

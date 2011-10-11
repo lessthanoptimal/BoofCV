@@ -24,6 +24,9 @@
 	  <packageset dir="io/src" defaultexcludes="yes">
             <include name="boofcv/**"/>
           </packageset>
+	  <packageset dir="numerics/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
+          </packageset>
 	  <packageset dir="feature/src" defaultexcludes="yes">
             <include name="boofcv/**"/>
           </packageset>
@@ -54,11 +57,13 @@
 	<delete file="${lib.dir}/${ant.project.name}.jar"/>
 	<ant dir="ip/" target="clean"/>
 	<ant dir="io/" target="clean"/>
+	<ant dir="numerics/" target="clean"/>
 	<ant dir="geo/" target="clean"/>
 	<ant dir="feature/" target="clean"/>
     </target>
     <target name="jar">
 	<ant dir="ip" inheritAll="false"/>
+	<ant dir="numerics" inheritAll="false"/>
 	<ant dir="feature" inheritAll="false"/>
 	<ant dir="geo" inheritAll="false"/>
 	<ant dir="io" inheritAll="false"/>
