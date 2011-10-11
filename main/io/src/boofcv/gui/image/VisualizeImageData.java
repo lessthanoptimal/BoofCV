@@ -75,9 +75,14 @@ public class VisualizeImageData {
 	}
 
 	public static BufferedImage colorizeSign( ImageBase src, BufferedImage dst, double maxAbsValue ) {
-		if( maxAbsValue < 0 ) {
+		dst = ConvertBufferedImage.checkInputs(src, dst);
+
+		if( maxAbsValue <= 0 ) {
 			maxAbsValue = GPixelMath.maxAbs(src);
 		}
+
+		if( maxAbsValue == 0 )
+			return dst;
 
 		if( src.getClass().isAssignableFrom(ImageFloat32.class)) {
 			return colorizeSign((ImageFloat32)src,dst,(float)maxAbsValue);
@@ -93,14 +98,7 @@ public class VisualizeImageData {
 	 * @param maxValue
 	 * @return
 	 */
-	public static BufferedImage colorizeSign( ImageInteger src, BufferedImage dst, int maxValue ) {
-		dst = ConvertBufferedImage.checkInputs(src, dst);
-
-		if( !src.getTypeInfo().isSigned() )
-			throw new IllegalArgumentException("Can only convert signed images.");
-
-		if( maxValue == 0 )
-			return dst;
+	private static BufferedImage colorizeSign( ImageInteger src, BufferedImage dst, int maxValue ) {
 
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
@@ -139,19 +137,22 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage grayMagnitude( ImageBase src, BufferedImage dst, float maxValue )
+	public static BufferedImage grayMagnitude( ImageBase src, BufferedImage dst, double maxAbsValue )
 	{
+		if( maxAbsValue < 0 )
+			maxAbsValue = GPixelMath.maxAbs(src);
+
+		dst = ConvertBufferedImage.checkInputs(src, dst);
+
 		if( src.getTypeInfo().isInteger() ) {
-			return grayMagnitude((ImageInteger)src,dst,(int)maxValue);
+			return grayMagnitude((ImageInteger)src,dst,(int)maxAbsValue);
 		} else {
-			return grayMagnitude((ImageFloat32)src,dst,maxValue);
+			return grayMagnitude((ImageFloat32)src,dst,(float)maxAbsValue);
 		}
 	}
 
 	private static BufferedImage grayMagnitude( ImageInteger src, BufferedImage dst, int maxValue )
 	{
-		dst = ConvertBufferedImage.checkInputs(src, dst);
-
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
 				int v = Math.abs(src.get(x,y));
@@ -165,12 +166,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage colorizeSign( ImageFloat32 src, BufferedImage dst, float maxAbsValue ) {
-		dst = ConvertBufferedImage.checkInputs(src, dst);
-
-		if( maxAbsValue < 0 )
-			maxAbsValue = PixelMath.maxAbs(src);
-
+	private static BufferedImage colorizeSign( ImageFloat32 src, BufferedImage dst, float maxAbsValue ) {
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
 				float v = src.get(x,y);
@@ -208,13 +204,8 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage grayMagnitude( ImageFloat32 src, BufferedImage dst, float maxAbsValue )
+	private static BufferedImage grayMagnitude( ImageFloat32 src, BufferedImage dst, float maxAbsValue )
 	{
-		dst = ConvertBufferedImage.checkInputs(src, dst);
-
-		if( maxAbsValue < 0 )
-			maxAbsValue = PixelMath.maxAbs(src);
-
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
 				float v = Math.abs(src.get(x,y));
