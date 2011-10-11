@@ -52,7 +52,7 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 
 	@Override
 	public void setInputBorder(int border) {
-		throw new RuntimeException("This is being ignored");
+		extractor.setBorder(border);
 	}
 
 	@Override
@@ -72,6 +72,6 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 
 	@Override
 	public boolean canDetectBorder() {
-		return false;
+		return extractor.canProcessBorder();
 	}
 }

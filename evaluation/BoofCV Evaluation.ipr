@@ -340,6 +340,7 @@
       <module fileurl="file://$PROJECT_DIR$/../main/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/../main/geo/BoofCV Geometric Vision.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/io/BoofCV IO.iml" filepath="$PROJECT_DIR$/../main/io/BoofCV IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/../main/ip/BoofCV Image Processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" filepath="$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" />
       <module fileurl="file://$PROJECT_DIR$/../integration/xuggler/BoofCV Xuggler.iml" filepath="$PROJECT_DIR$/../integration/xuggler/BoofCV Xuggler.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" filepath="$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../developmental/cv/Developmental-CV.iml" filepath="$PROJECT_DIR$/../../developmental/cv/Developmental-CV.iml" />

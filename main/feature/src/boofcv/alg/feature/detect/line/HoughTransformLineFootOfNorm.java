@@ -127,7 +127,7 @@ public class HoughTransformLineFootOfNorm {
 			int x0 = p.x - originX;
 			int y0 = p.y - originY;
 
-			if( Math.abs(x0) >= minDistanceFromOrigin &&
+			if( Math.abs(x0) >= minDistanceFromOrigin ||
 					Math.abs(y0) >= minDistanceFromOrigin ) {
 				LineParametric2D_F32 l = lines.pop();
 				l.p.set(p.x,p.y);

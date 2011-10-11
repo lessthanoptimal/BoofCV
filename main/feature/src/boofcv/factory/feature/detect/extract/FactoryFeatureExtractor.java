@@ -60,13 +60,17 @@ public class FactoryFeatureExtractor
 	/**
 	 * Non-max feature extractor which saves a candidate list of all the found local maximums..
 	 *
+	 *
 	 * @param minSeparation Minimum separation between found features.
 	 * @param threshold Minimum feature intensity it will consider
 	 * @param ignoreBorderIntensity How many pixels in the intensity image were not processed.
+	 * @param detectBorderExtractor Should it detect feature's whose region intersect the image border?
 	 * @return A feature extractor.
 	 */
-	public static FeatureExtractor nonmaxCandidate( int minSeparation , float threshold , int ignoreBorderIntensity ) {
-		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(minSeparation,threshold));
+	public static FeatureExtractor nonmaxCandidate(int minSeparation, float threshold,
+												   int ignoreBorderIntensity,
+												   boolean detectBorderExtractor) {
+		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(minSeparation,threshold, detectBorderExtractor));
 		ret.setInputBorder(ignoreBorderIntensity);
 		return ret;
 	}

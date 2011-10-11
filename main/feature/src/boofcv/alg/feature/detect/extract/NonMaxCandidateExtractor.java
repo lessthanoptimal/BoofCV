@@ -41,13 +41,18 @@ public class NonMaxCandidateExtractor {
 	// size of the intensity image's border which can't be touched
 	private int borderIntensity;
 
-	public NonMaxCandidateExtractor(int minSeparation, float thresh) {
-		this.radius = minSeparation;
+	ImageFloat32 input;
+	private boolean processBorders;
+
+	public NonMaxCandidateExtractor(int minSeparation, float thresh, boolean processBorders) {
+		setMinSeparation(minSeparation);
 		this.thresh = thresh;
+		this.processBorders = processBorders;
 	}
 
 	public void setMinSeparation(int minSeparation) {
 		this.radius = minSeparation;
+		this.ignoreBorder = borderIntensity+radius;
 	}
 
 	public float getThresh() {
@@ -60,7 +65,7 @@ public class NonMaxCandidateExtractor {
 
 	public void setBorder( int border ) {
 		this.borderIntensity = border;
-		this.ignoreBorder = border+radius;
+		this.ignoreBorder = borderIntensity+radius;
 
 	}
 
@@ -78,6 +83,7 @@ public class NonMaxCandidateExtractor {
 	 */
 	public void process(ImageFloat32 intensityImage, QueueCorner candidates, QueueCorner corners) {
 
+		this.input = intensityImage;
 		final int w = intensityImage.width-ignoreBorder;
 		final int h = intensityImage.height-ignoreBorder;
 
@@ -88,35 +94,60 @@ public class NonMaxCandidateExtractor {
 		for (int iter = 0; iter < candidates.size; iter++) {
 			Point2D_I16 pt = candidates.data[iter];
 
-			// see if its too close to the image edge
-			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= w || pt.y >= h )
-				continue;
 
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;
 
 			float val = inten[center];
 			if (val < thresh || val == Float.MAX_VALUE ) continue;
 
-			boolean max = true;
+			// see if its too close to the image edge
+			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= w || pt.y >= h ) {
+				if( processBorders && checkBorder(center, val, pt.x, pt.y))
+					corners.add(pt.x,pt.y);
+			} else if( checkInner(center, val) )
+				corners.add(pt.x, pt.y);
+		}
+	}
 
-			escape:
-			for (int i = -radius; i <= radius; i++) {
-				int index = center + i * stride - radius;
-				for (int j = -radius; j <= radius; j++, index++) {
-					// don't compare the center point against itself
-					if (i == 0 && j == 0)
-						continue;
+	private boolean checkBorder(int center, float val, int c_x , int c_y )
+	{
+		int x0 = Math.max(borderIntensity,c_x-radius);
+		int y0 = Math.max(borderIntensity,c_y-radius);
+		int x1 = Math.min(input.width - borderIntensity, c_x + radius + 1);
+		int y1 = Math.min(input.height-borderIntensity,c_y+radius+1);
 
-					if (val <= inten[index]) {
-						max = false;
-						break escape;
-					}
+		for( int i = y0; i < y1; i++ ) {
+			int index = input.startIndex + i * input.stride + x0;
+			for( int j = x0; j < x1; j++ , index++ ) {
+				// don't compare the center point against itself
+				if ( center == index )
+					continue;
+
+				if (val <= input.data[index]) {
+					return false;
 				}
 			}
+		}
+		return true;
+	}
 
-			if (max ) {
-				corners.add(pt.x, pt.y);
+	private boolean checkInner( int center, float val ) {
+		for (int i = -radius; i <= radius; i++) {
+			int index = center + i * input.stride - radius;
+			for (int j = -radius; j <= radius; j++, index++) {
+				// don't compare the center point against itself
+				if ( index == center )
+					continue;
+
+				if (val <= input.data[index]) {
+					return false;
+				}
 			}
 		}
+		return true;
+	}
+
+	public boolean canProcessBorder() {
+		return processBorders;
 	}
 }

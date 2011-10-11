@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
+import georegression.struct.point.Point2D_I16;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,13 +31,72 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestNonMaxCandidateExtractor {
 
+	int width = 30;
+	int height = 40;
+
+	/**
+	 * See if it can extract points from the border when configured to do so
+	 */
+	@Test
+	public void testBorders() {
+		// check top,bottom,left,right regions
+		checkDetectPoint(10, 0);
+		checkDetectPoint(10, height - 1);
+		checkDetectPoint(1, 10);
+		checkDetectPoint(width - 2, 10);
+	}
+
+	private void checkDetectPoint( int x , int y ) {
+		ImageFloat32 inten = new ImageFloat32(width,height);
+		inten.set(x,y,20);
+
+		QueueCorner candidates = new QueueCorner(100);
+		candidates.add(x,y);
+
+		NonMaxCandidateExtractor alg = new NonMaxCandidateExtractor(5, 0.6F, true);
+
+		QueueCorner corners = new QueueCorner(100);
+		alg.process(inten, candidates , corners);
+
+		assertEquals(1,corners.size);
+		Point2D_I16 p = corners.get(0);
+
+		assertEquals(x,p.x);
+		assertEquals(y,p.y);
+	}
+
+	/**
+	 * Test sub-images along the image border
+	 */
+	@Test
+	public void testBorderSubImage() {
+		ImageFloat32 inten = new ImageFloat32(width,height);
+		inten.set(1,10,20);
+		QueueCorner candidates = new QueueCorner(100);
+		candidates.add(1,10);
+
+		// create a sub image and see if stuff breaks
+		inten = BoofTesting.createSubImageOf(inten);
+
+		NonMaxCandidateExtractor alg = new NonMaxCandidateExtractor(5, 0.6F, true);
+
+		QueueCorner corners = new QueueCorner(100);
+
+		// test positive case with no input border
+		alg.process(inten, candidates , corners);
+		assertEquals(1,corners.size);
+		Point2D_I16 p = corners.get(0);
+
+		assertEquals(1,p.x);
+		assertEquals(10,p.y);
+	}
 
 	/**
 	 * If a list of pre-existing corners is added they should not be added again to the found list
 	 */
 	@Test
 	public void exclude_MAX_VALUE() {
-		ImageFloat32 inten = new ImageFloat32(30, 40);
+		ImageFloat32 inten = new ImageFloat32(width, height);
 
 		inten.set(15,20,Float.MAX_VALUE);
 		inten.set(20,21,Float.MAX_VALUE);
@@ -52,7 +112,7 @@ public class TestNonMaxCandidateExtractor {
 		candidates.add(25,35);
 
 		QueueCorner foundList = new QueueCorner(100);
-		NonMaxCandidateExtractor alg = new NonMaxCandidateExtractor(2, 0.6F);
+		NonMaxCandidateExtractor alg = new NonMaxCandidateExtractor(2, 0.6F, false);
 		// find corners the first time
 		alg.process(inten,candidates,foundList);
 
@@ -80,7 +140,7 @@ public class TestNonMaxCandidateExtractor {
 		candidates.add(3,5);
 
 		NonMaxCandidateExtractor extractor;
-		extractor = new NonMaxCandidateExtractor(1, 0);
+		extractor = new NonMaxCandidateExtractor(1, 0, false);
 		extractor.process(img, candidates, corners);
 		assertEquals(2, corners.size());
 
@@ -117,7 +177,7 @@ public class TestNonMaxCandidateExtractor {
 		candidates.add(3,5);
 
 		NonMaxCandidateExtractor extractor;
-		extractor = new NonMaxCandidateExtractor(0, 0);
+		extractor = new NonMaxCandidateExtractor(0, 0, false);
 		extractor.process(img, candidates, corners);
 		assertEquals(2, corners.size());
 
