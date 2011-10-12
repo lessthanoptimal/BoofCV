@@ -109,7 +109,7 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 		this.thresholdEdge = thresholdEdge;
 		this.totalHorizontalDivisions = totalHorizontalDivisions;
 		this.totalVerticalDivisions = totalVerticalDivisions;
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmaxCandidate(localMaxRadius, minCounts, 0, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmaxCandidate(localMaxRadius, minCounts, 0, true, false);
 		alg = new HoughTransformLineFootOfNorm(extractor,minDistanceFromOrigin);
 		derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);
 		derivY = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);

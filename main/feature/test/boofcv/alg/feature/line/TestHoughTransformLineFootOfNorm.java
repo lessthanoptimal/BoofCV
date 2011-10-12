@@ -20,7 +20,6 @@ package boofcv.alg.feature.line;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
-import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
@@ -29,7 +28,6 @@ import georegression.struct.line.LineParametric2D_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -54,7 +52,7 @@ public class TestHoughTransformLineFootOfNorm {
 			derivX.set(5,i,20);
 		}
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(4, 2, 0, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(4, 2, 0, true, true);
 		HoughTransformLineFootOfNorm alg = new HoughTransformLineFootOfNorm(extractor,2);
 
 		alg.transform(derivX,derivY,image);

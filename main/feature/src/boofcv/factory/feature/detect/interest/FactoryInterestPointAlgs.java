@@ -257,6 +257,6 @@ public class FactoryInterestPointAlgs {
 	private static <T extends ImageBase, D extends ImageBase>
 	FeatureExtractor createExtractor(int featureRadius, float cornerThreshold, GeneralFeatureIntensity<T, D> intensity) {
 		int intensityBorder = intensity.getIgnoreBorder();
-		return FactoryFeatureExtractor.nonmax(featureRadius, cornerThreshold, intensityBorder, false);
+		return FactoryFeatureExtractor.nonmax(featureRadius, cornerThreshold, intensityBorder, false, true);
 	}
 }

@@ -96,7 +96,7 @@
     <option name="myForwardDirection" value="false" />
   </component>
   <component name="DependencyValidationManager">
-    <scope name="BoofCV" pattern="file[BoofCV IO]:*//*||file[BoofCV Evaluation]:*//*||file[BoofCV Geometric Vision]:*//*||file[BoofCV Feature]:*//*||file[BoofCV Xuggler]:*//*||file[BoofCV Image Processing]:*//*" />
+    <scope name="BoofCV" pattern="src[BoofCV Evaluation]:*..*||src[BoofCV Examples]:*..*||src[BoofCV Feature]:*..*||src[BoofCV Geometric Vision]:*..*||src[BoofCV IO]:*..*||src[BoofCV Image Processing]:*..*||src[BoofCV Numerics]:*..*||src[BoofCV Xuggler]:*..*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="EclipseCompilerSettings">

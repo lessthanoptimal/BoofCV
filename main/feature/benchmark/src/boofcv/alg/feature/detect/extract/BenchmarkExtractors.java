@@ -43,7 +43,7 @@ public class BenchmarkExtractors {
 	static Random rand = new Random(33456);
 
 	public static class FastNonMax extends PerformerBase {
-		FastNonMaxExtractor corner = new FastNonMaxExtractor(windowRadius, threshold);
+		FastNonMaxExtractor corner = new FastNonMaxExtractor(windowRadius, threshold,true);
 
 		@Override
 		public void process() {
@@ -53,7 +53,7 @@ public class BenchmarkExtractors {
 	}
 
 	public static class NonMax extends PerformerBase {
-		NonMaxExtractorNaive corner = new NonMaxExtractorNaive(windowRadius, threshold);
+		NonMaxExtractorNaive corner = new NonMaxExtractorNaive(windowRadius, threshold, true);
 
 		@Override
 		public void process() {

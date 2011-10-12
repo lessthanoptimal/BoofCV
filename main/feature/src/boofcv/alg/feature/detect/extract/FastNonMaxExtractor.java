@@ -42,14 +42,18 @@ public class FastNonMaxExtractor implements NonMaxExtractor {
 	// size of the intensity image's border which can't be touched
 	private int borderIntensity;
 
+	// should it use a strict rule for defining the local max?
+	protected boolean useStrictRule;
+
 	/**
 	 * @param minSeparation How close features can be to each other.
 	 * @param thresh What the minimum intensity a feature must have to be considered a feature.
 	 */
-	public FastNonMaxExtractor(int minSeparation, float thresh) {
+	public FastNonMaxExtractor(int minSeparation, float thresh, boolean useStrictRule) {
 		radius = minSeparation;
 		this.thresh = thresh;
 		this.ignoreBorder = radius;
+		this.useStrictRule = useStrictRule;
 	}
 
 	@Override
@@ -77,6 +81,11 @@ public class FastNonMaxExtractor implements NonMaxExtractor {
 		return borderIntensity;
 	}
 
+	@Override
+	public boolean isStrict() {
+		return useStrictRule;
+	}
+
 	/**
 	 * Detects corners in the image while excluding corners which are already contained in the corners list.
 	 *
@@ -85,6 +94,13 @@ public class FastNonMaxExtractor implements NonMaxExtractor {
 	 */
 	@Override
 	public void process(ImageFloat32 intensityImage, QueueCorner corners) {
+		if( useStrictRule )
+			processStrict(intensityImage, corners);
+		else
+			processNotStrict(intensityImage, corners);
+	}
+
+	private void processStrict(ImageFloat32 intensityImage, QueueCorner corners) {
 		int imgWidth = intensityImage.getWidth();
 		int imgHeight = intensityImage.getHeight();
 
@@ -112,6 +128,52 @@ public class FastNonMaxExtractor implements NonMaxExtractor {
 							float v = inten[center + i * intensityImage.stride + j];
 
 							if (val <= v) {
+								isMax = false;
+								maxValue = v;
+								maxX = x + j + radius;
+								break escape;
+							}
+						}
+					}
+
+					if (isMax && val != Float.MAX_VALUE) {
+						maxValue = val;
+						maxX = x;
+						corners.add(x, y);
+					}
+				}
+			}
+		}
+	}
+
+	private void processNotStrict(ImageFloat32 intensityImage, QueueCorner corners) {
+		int imgWidth = intensityImage.getWidth();
+		int imgHeight = intensityImage.getHeight();
+
+		final float inten[] = intensityImage.data;
+
+		for (int y = ignoreBorder; y < imgHeight - ignoreBorder; y++) {
+			int maxX = Integer.MIN_VALUE;
+			float maxValue = -1;
+
+			for (int x = ignoreBorder; x < imgWidth - ignoreBorder; x++) {
+				int center = intensityImage.startIndex + y * intensityImage.stride + x;
+				float val = inten[center];
+
+				if (val < thresh) continue;
+
+				if (maxX < x || maxValue <= val) {
+					boolean isMax = true;
+
+					// todo can this be speed up by cropping the search along the x-axis?
+					escape:
+					for (int i = -radius; i <= radius; i++) {
+						for (int j = -radius; j <= radius; j++) {
+							if (i == 0 && j == 0)
+								continue;
+							float v = inten[center + i * intensityImage.stride + j];
+
+							if (val < v) {
 								isMax = false;
 								maxValue = v;
 								maxX = x + j + radius;

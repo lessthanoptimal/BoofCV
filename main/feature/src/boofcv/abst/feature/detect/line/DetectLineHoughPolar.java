@@ -87,7 +87,7 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 	{
 		this.gradient = gradient;
 		this.thresholdEdge = thresholdEdge;
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(localMaxRadius, minCounts, 0, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(localMaxRadius, minCounts, 0, true, true);
 		alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
 		derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);
 		derivY = GeneralizedImageOps.createImage(gradient.getDerivType(), 1, 1);

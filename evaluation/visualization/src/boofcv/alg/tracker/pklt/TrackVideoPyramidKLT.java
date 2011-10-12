@@ -20,14 +20,13 @@ package boofcv.alg.tracker.pklt;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
-import boofcv.abst.feature.detect.extract.WrapperNonMax;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.feature.detect.extract.FastNonMaxExtractor;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.transform.pyramid.PyramidOps;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -176,8 +175,7 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 		GeneralFeatureIntensity<I,D> intensity =
 				new WrapperGradientCornerIntensity<I,D>(
 						FactoryPointIntensityAlg.createKlt(config.featureRadius, derivType));
-		FeatureExtractor extractor = new WrapperNonMax(
-				new FastNonMaxExtractor(config.featureRadius+2,configKLt.minDeterminant), null);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config.featureRadius+2,configKLt.minDeterminant,0,false, true);
 		extractor.setInputBorder(config.featureRadius * scalingTop);
 		GeneralFeatureDetector<I,D> detector =
 				new GeneralFeatureDetector<I,D>(intensity,extractor, config.maxFeatures);

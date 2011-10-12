@@ -48,7 +48,7 @@ public class TestHoughTransformLinePolar {
 			image.set(5,i,1);
 		}
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(4,5,0, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(4,5,0, true, true);
 		HoughTransformLinePolar alg = new HoughTransformLinePolar(extractor,40,180);
 
 		alg.transform(image);

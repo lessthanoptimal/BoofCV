@@ -134,9 +134,9 @@ public class VideoDetectCorners<T extends ImageBase, D extends ImageBase>
 //		GeneralFeatureIntensity<T, D> intensity =
 //				new WrapperFastCornerIntensity<T, D>(FactoryPointIntensityAlg.createFast12(imageType, 8 , 12));
 
-		FeatureExtractor extractor = new WrapperNonMax(new FastNonMaxExtractor(radius + 10, 10f), null);
+		FeatureExtractor extractor = new WrapperNonMax(new FastNonMaxExtractor(radius + 10, 10f,true), null);
 //		FeatureExtractor extractor = new WrapperNonMax( new NonMaxExtractorNaive(radius+10,10f));
-//		FeatureExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(radius+10, 10f));
+//		FeatureExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCandidateStrict(radius+10, 10f));
 
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, maxCorners);
 

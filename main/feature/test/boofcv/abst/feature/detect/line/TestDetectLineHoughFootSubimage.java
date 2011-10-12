@@ -18,17 +18,31 @@
 
 package boofcv.abst.feature.detect.line;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.factory.feature.detect.line.FactoryDetectLine;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestDetectLineHoughFootSubimage {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestDetectLineHoughFootSubimage extends GeneralDetectLineTests {
+
+
+	public TestDetectLineHoughFootSubimage() {
+		super(ImageUInt8.class,ImageFloat32.class);
+
+		lineLocation = 15;
+	}
+
+	@Override
+	public <T extends ImageBase>
+	DetectLine<T> createAlg(Class<T> imageType) {
+
+		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		return FactoryDetectLine.houghFootSub(2, 3, 2, 10,2,2, imageType, derivType);
 	}
 }

@@ -23,11 +23,11 @@ import boofcv.abst.feature.detect.extract.WrapperNonMax;
 import boofcv.abst.feature.detect.extract.WrapperNonMaxCandidate;
 import boofcv.alg.feature.detect.extract.FastNonMaxExtractor;
 import boofcv.alg.feature.detect.extract.NonMaxBorderExtractor;
-import boofcv.alg.feature.detect.extract.NonMaxCandidateExtractor;
+import boofcv.alg.feature.detect.extract.NonMaxCandidateRelaxed;
+import boofcv.alg.feature.detect.extract.NonMaxCandidateStrict;
 
 /**
- * Given a list of requirements create a {@link boofcv.abst.feature.detect.extract.FeatureExtractor} that meets
- * those requirements.
+ * Creates {@link FeatureExtractor} for finding local maximums in feature intensity images.
  *
  * @author Peter Abeles
  */
@@ -36,23 +36,24 @@ public class FactoryFeatureExtractor
 	/**
 	 * Standard non-max feature extractor.
 	 *
-	 *
 	 * @param minSeparation Minimum separation between found features.
 	 * @param threshold Minimum feature intensity it will consider
 	 * @param ignoreBorderIntensity How many pixels in the intensity image were not processed.
 	 * @param detectBorderFeatures Should it detect feature's whose region intersect the image border?
+	 * @param useStrictRule Is a strict test used to test for local maximums.
 	 * @return A feature extractor.
 	 */
 	public static FeatureExtractor nonmax(int minSeparation,
 										  float threshold,
-										  int ignoreBorderIntensity, boolean detectBorderFeatures) {
+										  int ignoreBorderIntensity, boolean detectBorderFeatures,
+										  boolean useStrictRule) {
 
 		NonMaxBorderExtractor extractorBorder = null;
 		if( detectBorderFeatures ) {
-			extractorBorder = new NonMaxBorderExtractor(minSeparation,threshold);
+			extractorBorder = new NonMaxBorderExtractor(minSeparation,threshold,useStrictRule);
 		}
 
-		WrapperNonMax ret = new WrapperNonMax(new FastNonMaxExtractor(minSeparation,threshold), extractorBorder);
+		WrapperNonMax ret = new WrapperNonMax(new FastNonMaxExtractor(minSeparation,threshold,useStrictRule), extractorBorder);
 		ret.setInputBorder(ignoreBorderIntensity);
 		return ret;
 	}
@@ -60,17 +61,23 @@ public class FactoryFeatureExtractor
 	/**
 	 * Non-max feature extractor which saves a candidate list of all the found local maximums..
 	 *
-	 *
 	 * @param minSeparation Minimum separation between found features.
 	 * @param threshold Minimum feature intensity it will consider
 	 * @param ignoreBorderIntensity How many pixels in the intensity image were not processed.
 	 * @param detectBorderExtractor Should it detect feature's whose region intersect the image border?
+	 * @param useStrictRule Is a strict test used to test for local maximums.
 	 * @return A feature extractor.
 	 */
 	public static FeatureExtractor nonmaxCandidate(int minSeparation, float threshold,
 												   int ignoreBorderIntensity,
-												   boolean detectBorderExtractor) {
-		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(new NonMaxCandidateExtractor(minSeparation,threshold, detectBorderExtractor));
+												   boolean detectBorderExtractor, boolean useStrictRule) {
+		WrapperNonMaxCandidate ret;
+
+		if( useStrictRule )
+			ret = new WrapperNonMaxCandidate(new NonMaxCandidateStrict(minSeparation,threshold, detectBorderExtractor));
+		else
+			ret = new WrapperNonMaxCandidate(new NonMaxCandidateRelaxed(minSeparation,threshold, detectBorderExtractor));
+
 		ret.setInputBorder(ignoreBorderIntensity);
 		return ret;
 	}

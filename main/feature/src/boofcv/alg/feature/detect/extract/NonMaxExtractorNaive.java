@@ -38,9 +38,13 @@ public class NonMaxExtractorNaive implements NonMaxExtractor {
 
 	protected int border;
 
-	public NonMaxExtractorNaive(int minSeparation, float thresh) {
+	// should it use a strict rule for defining the local max?
+	protected boolean useStrictRule;
+
+	public NonMaxExtractorNaive(int minSeparation, float thresh, boolean useStrictRule ) {
 		this.radius = minSeparation;
 		this.thresh = thresh;
+		this.useStrictRule = useStrictRule;
 	}
 
 	@Override
@@ -63,6 +67,11 @@ public class NonMaxExtractorNaive implements NonMaxExtractor {
 		this.border = border;
 	}
 
+	@Override
+	public boolean isStrict() {
+		return useStrictRule;
+	}
+
 	public int getInputBorder() {
 		return border;
 	}
@@ -70,6 +79,13 @@ public class NonMaxExtractorNaive implements NonMaxExtractor {
 	@Override
 	public void process(ImageFloat32 intensityImage, QueueCorner corners) {
 
+		if( useStrictRule )
+			strictRule(intensityImage, corners);
+		else
+			notStrictRule(intensityImage, corners);
+	}
+
+	private void strictRule(ImageFloat32 intensityImage, QueueCorner corners) {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
 		final int stride = intensityImage.stride;
@@ -96,6 +112,47 @@ public class NonMaxExtractorNaive implements NonMaxExtractor {
 							continue;
 
 						if (val <= inten[index]) {
+							max = false;
+							break escape;
+						}
+					}
+				}
+
+				// add points which are local maximums and are not already contained in the corners list
+				if (max && val != Float.MAX_VALUE) {
+					corners.add(x, y);
+				}
+			}
+		}
+	}
+
+	private void notStrictRule(ImageFloat32 intensityImage, QueueCorner corners) {
+		final int imgWidth = intensityImage.getWidth();
+		final int imgHeight = intensityImage.getHeight();
+		final int stride = intensityImage.stride;
+
+		final float inten[] = intensityImage.data;
+
+		int imageBorder = Math.max(radius,border);
+
+		for (int y = imageBorder; y < imgHeight - imageBorder; y++) {
+			for (int x = imageBorder; x < imgWidth - imageBorder; x++) {
+				int center = intensityImage.startIndex + y * stride + x;
+
+				float val = inten[center];
+				if (val < thresh) continue;
+
+				boolean max = true;
+
+				escape:
+				for (int i = -imageBorder; i <= imageBorder; i++) {
+					int index = center + i * stride - imageBorder;
+					for (int j = -imageBorder; j <= imageBorder; j++, index++) {
+						// don't compare the center point against itself
+						if (i == 0 && j == 0)
+							continue;
+
+						if (val < inten[index]) {
 							max = false;
 							break escape;
 						}
