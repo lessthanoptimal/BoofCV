@@ -20,8 +20,6 @@ package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.testing.BoofTesting;
-import georegression.struct.point.Point2D_I16;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,119 +28,47 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestNonMaxBorderExtractor {
+public class TestNonMaxBorderExtractor extends GenericNonMaxBorderTests{
 
-	int width = 30;
-	int height = 40;
 
-	int minSeparation = 5;
-
-	/**
-	 * Put features at strategic places inside the image and see if it can detect all of them
-	 */
-	@Test
-	public void checkDetect() {
-		// check top,bottom,left,right regions
-		checkDetectPoint(10, 0);
-		checkDetectPoint(10, height - 1);
-		checkDetectPoint(1, 10);
-		checkDetectPoint(width - 2, 10);
+	@Override
+	public void findLocalMaximums(ImageFloat32 intensity,
+								  float threshold, int radius,
+								  boolean useStrict, QueueCorner found) {
+		NonMaxBorderExtractor alg = new NonMaxBorderExtractor(radius,threshold,useStrict);
+		alg.process(intensity, found);
 	}
 
-	/**
-	 * See if it ignores features at MAX_VALUE
-	 */
 	@Test
-	public void checkMaxValue() {
-		// check top,bottom,left,right regions
-		checkIgnoreMax(10, 0);
-		checkIgnoreMax(10, height - 1);
-		checkIgnoreMax(1, 10);
-		checkIgnoreMax(width - 2, 10);
+	public void standardTests() {
+		super.allStandard(true);
+		super.allStandard(false);
 	}
 
+
+	@Test
+	public void checkInputBorder() {
+		checkInputBorder(true);
+		checkInputBorder(false);
+	}
 	/**
 	 * Adjust the input border and see if it has the expected behavior
 	 */
-	@Test
-	public void checkInputBorder() {
-		ImageFloat32 inten = new ImageFloat32(width,height);
-		inten.set(1,1,20);
+	public void checkInputBorder( boolean useStrictRule ) {
+		reset();
 
-		NonMaxBorderExtractor alg = new NonMaxBorderExtractor(minSeparation,5);
-
-		QueueCorner corners = new QueueCorner(100);
+		intensity.set(1,1,20);
 
 		// test positive case with no input border
-		alg.process(inten, corners);
-		assertEquals(1, corners.size);
+		NonMaxBorderExtractor alg = new NonMaxBorderExtractor(3,10,useStrictRule);
+		alg.process(intensity, found);
+		assertEquals(1, found.size);
 
 		// test negative case with the input border
-		alg.setInputBorder(2);
-		corners.reset();
-		alg.process(inten, corners);
-		assertEquals(0,corners.size);
-	}
-
-	/**
-	 * See if it can process sub-images correctly
-	 */
-	@Test
-	public void checkSubImage() {
-		checkSubImage(10, 0);
-		checkSubImage(10, height - 1);
-		checkSubImage(1, 10);
-		checkSubImage(width - 2, 10);
-	}
-
-	private void checkSubImage( int x , int y ) {
-		ImageFloat32 inten = new ImageFloat32(width,height);
-		inten.set(x,y,20);
-
-		// create a sub image and see if stuff breaks
-		inten = BoofTesting.createSubImageOf(inten);
-
-		NonMaxBorderExtractor alg = new NonMaxBorderExtractor(minSeparation,5);
-
-		QueueCorner corners = new QueueCorner(100);
-
-		// test positive case with no input border
-		alg.process(inten, corners);
-		assertEquals(1,corners.size);
-		Point2D_I16 p = corners.get(0);
-
-		assertEquals(x,p.x);
-		assertEquals(y,p.y);
-	}
-
-	private void checkDetectPoint( int x , int y ) {
-		ImageFloat32 inten = new ImageFloat32(width,height);
-		inten.set(x,y,20);
-
-		NonMaxBorderExtractor alg = new NonMaxBorderExtractor(minSeparation,5);
-
-		QueueCorner corners = new QueueCorner(100);
-
-		alg.process(inten, corners);
-
-		assertEquals(1,corners.size);
-		Point2D_I16 p = corners.get(0);
-
-		assertEquals(x,p.x);
-		assertEquals(y,p.y);
-	}
-
-	private void checkIgnoreMax( int x , int y ) {
-		ImageFloat32 inten = new ImageFloat32(width,height);
-		inten.set(x,y,Float.MAX_VALUE);
-
-		NonMaxBorderExtractor alg = new NonMaxBorderExtractor(minSeparation,5);
-
-		QueueCorner corners = new QueueCorner(100);
-
-		alg.process(inten, corners);
-
-		assertEquals(0,corners.size);
+		found.reset();
+		alg.setInputBorder(3);
+		alg.process(intensity, found);
+		assertEquals(0,found.size);
 	}
 
 }

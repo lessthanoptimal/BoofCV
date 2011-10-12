@@ -30,7 +30,7 @@ import georegression.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class NonMaxCandidateExtractor {
+public class NonMaxCandidateStrict {
 
 	// size of the search area
 	int radius;
@@ -39,12 +39,12 @@ public class NonMaxCandidateExtractor {
 	// does not process pixels this close to the image border
 	int ignoreBorder;
 	// size of the intensity image's border which can't be touched
-	private int borderIntensity;
+	protected int borderIntensity;
 
-	ImageFloat32 input;
-	private boolean processBorders;
+	protected ImageFloat32 input;
+	protected boolean processBorders;
 
-	public NonMaxCandidateExtractor(int minSeparation, float thresh, boolean processBorders) {
+	public NonMaxCandidateStrict(int minSeparation, float thresh, boolean processBorders) {
 		setMinSeparation(minSeparation);
 		this.thresh = thresh;
 		this.processBorders = processBorders;
@@ -109,7 +109,7 @@ public class NonMaxCandidateExtractor {
 		}
 	}
 
-	private boolean checkBorder(int center, float val, int c_x , int c_y )
+	protected boolean checkBorder(int center, float val, int c_x , int c_y )
 	{
 		int x0 = Math.max(borderIntensity,c_x-radius);
 		int y0 = Math.max(borderIntensity,c_y-radius);
@@ -131,7 +131,7 @@ public class NonMaxCandidateExtractor {
 		return true;
 	}
 
-	private boolean checkInner( int center, float val ) {
+	protected boolean checkInner( int center, float val ) {
 		for (int i = -radius; i <= radius; i++) {
 			int index = center + i * input.stride - radius;
 			for (int j = -radius; j <= radius; j++, index++) {

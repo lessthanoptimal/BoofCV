@@ -28,6 +28,16 @@ import boofcv.struct.image.ImageFloat32;
  * features can be closer than the minSeparation apart.
  * </p>
  *
+ * <p>
+ * Strict versus Not Strict.  Standard non-maximum suppression requires that the central point be a true maximum.
+ * There are situations where symmetry in the image causes a couple of local pixels to have the exact same value
+ * and what happens is that no points are found in those situations.  In these situations it might be appropriate
+ * use the not strict rule which just requires that no local pixel have a higher value.<br>
+ * <br>
+ * strict:     I(x_c,y_x) > I(x,y)  for all (x,y) around (x_c,y_c) <br>
+ * not struct: I(x_c,y_x) >= I(x,y) for all (x,y) around (x_c,y_c) <br>
+ * </p>
+ *
  * @author Peter Abeles
  */
 public interface NonMaxExtractor {
@@ -55,6 +65,13 @@ public interface NonMaxExtractor {
 	public void setInputBorder(int border);
 
 	public int getInputBorder();
+
+	/**
+	 * Does it use the strict non-max rule or not?
+	 *
+	 * @return true if strict.
+	 */
+	public boolean isStrict();
 
 	/**
 	 * Returns the current feature selection threshold.

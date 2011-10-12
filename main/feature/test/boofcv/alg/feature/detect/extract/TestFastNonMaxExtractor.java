@@ -33,33 +33,13 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFastNonMaxExtractor {
+public class TestFastNonMaxExtractor extends GenericNonMaxTests {
 	Random rand = new Random(0x334);
 
-
-	/**
-	 * See if it correctly ignores features which  are equal to MAX_VALUE
-	 */
 	@Test
-	public void exclude_MAX_VALUE() {
-		ImageFloat32 inten = new ImageFloat32(30, 40);
-
-		inten.set(15,20,Float.MAX_VALUE);
-		inten.set(20,21,Float.MAX_VALUE);
-		inten.set(10,25,Float.MAX_VALUE);
-		inten.set(11,24,10);
-		inten.set(25,35,10);
-
-
-		QueueCorner foundList = new QueueCorner(100);
-		FastNonMaxExtractor alg = new FastNonMaxExtractor(2, 0.6F);
-		// find corners the first time
-		alg.process(inten,foundList);
-
-		// only one feature should be found.  The rest should be MAX_VALUE or too close to MAX_VALUE
-		assertEquals(1,foundList.size);
-		assertEquals(25,foundList.data[0].x);
-		assertEquals(35,foundList.data[0].y);
+	public void standardTests() {
+		super.allStandard(true);
+		super.allStandard(false);
 	}
 
 	/**
@@ -68,7 +48,11 @@ public class TestFastNonMaxExtractor {
 	 */
 	@Test
 	public void compareToNaive() {
+		compareToNaive(true);
+		compareToNaive(false);
+	}
 
+	public void compareToNaive( boolean useStrict ) {
 		ImageFloat32 inten = new ImageFloat32(30, 40);
 
 		QueueCorner fastCorners = new QueueCorner(inten.getWidth() * inten.getHeight());
@@ -82,8 +66,8 @@ public class TestFastNonMaxExtractor {
 			}
 
 			for (int nonMaxWidth = 3; nonMaxWidth <= 9; nonMaxWidth += 2) {
-				FastNonMaxExtractor fast = new FastNonMaxExtractor(nonMaxWidth / 2, 0.6F);
-				NonMaxExtractorNaive reg = new NonMaxExtractorNaive(nonMaxWidth / 2, 0.6F);
+				FastNonMaxExtractor fast = new FastNonMaxExtractor(nonMaxWidth / 2, 0.6F, useStrict);
+				NonMaxExtractorNaive reg = new NonMaxExtractorNaive(nonMaxWidth / 2, 0.6F, useStrict);
 
 				for (int i = 0; i < 10; i++) {
 					ImageTestingOps.randomize(inten, rand, 0, 10);
@@ -105,5 +89,13 @@ public class TestFastNonMaxExtractor {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void findLocalMaximums(ImageFloat32 intensity, float threshold, int radius,
+								  boolean useStrict, QueueCorner found) {
+		FastNonMaxExtractor fast = new FastNonMaxExtractor(radius, threshold,useStrict);
+
+		fast.process(intensity,found);
 	}
 }

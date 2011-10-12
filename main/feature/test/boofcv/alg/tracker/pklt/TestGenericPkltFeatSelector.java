@@ -168,7 +168,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 						FactoryPointIntensityAlg.createKlt(3, ImageFloat32.class));
 
 		FeatureExtractor extractor = new WrapperNonMax(
-				new FastNonMaxExtractor(3, 0.001f), null);
+				new FastNonMaxExtractor(3, 0.001f,true), null);
 		extractor.setInputBorder(3);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =

@@ -52,7 +52,7 @@ public class DetectFastHessianApp {
 	private static <T extends ImageBase> void doStuff( Class<T> imageType , BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax( 2 , 0.001f , 5, false);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax( 2 , 0.001f , 5, false, true);
 		FastHessianFeatureDetector<T> det = new FastHessianFeatureDetector<T>(extractor,NUM_FEATURES,9,4,4);
 
 		T integral = GIntegralImageOps.transform(workImage,null);

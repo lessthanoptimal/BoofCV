@@ -18,19 +18,19 @@
 
 package boofcv.abst.feature.detect.extract;
 
-import boofcv.alg.feature.detect.extract.NonMaxCandidateExtractor;
+import boofcv.alg.feature.detect.extract.NonMaxCandidateStrict;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 
 /**
- * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxCandidateExtractor} class.
+ * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxCandidateStrict} class.
  *
  * @author Peter Abeles
  */
 public class WrapperNonMaxCandidate implements FeatureExtractor {
-	NonMaxCandidateExtractor extractor;
+	NonMaxCandidateStrict extractor;
 
-	public WrapperNonMaxCandidate( NonMaxCandidateExtractor extractor ) {
+	public WrapperNonMaxCandidate( NonMaxCandidateStrict extractor ) {
 		this.extractor = extractor;
 	}
 
