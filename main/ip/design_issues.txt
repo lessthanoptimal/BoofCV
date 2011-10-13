@@ -23,3 +23,7 @@ Possible Solution:
   Offer two ways to compute image derivatives for integer?
 
 ---------------------------------------------------------------------------
+
+Non-Maximum Suppression
+
+When

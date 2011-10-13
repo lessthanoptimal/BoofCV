@@ -16,18 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.line.gridline;
+package boofcv.abst.feature.detect.line;
 
 
-import georegression.struct.point.Point2D_F32;
+import boofcv.struct.image.ImageBase;
+import georegression.struct.line.LineSegment2D_F32;
+
+import java.util.List;
 
 /**
- * Describes an edge pixel found inside a region.
+ * <p>
+ * Interface for detecting {@link LineSegment2D_F32 line segments} inside images.
+ * </p>
  *
  * @author Peter Abeles
  */
-public class Edgel extends Point2D_F32 {
-	// orientation of the edge
-	// half circle from -pi to pi
-	public float theta;
+public interface DetectLineSegment<T extends ImageBase> {
+
+	/**
+	 * Detect lines inside the image.
+	 *
+	 * @param input Input image.
+	 * @return List of found line segments.
+	 */
+	public List<LineSegment2D_F32> detect(T input);
 }

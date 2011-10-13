@@ -16,18 +16,21 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.line.gridline;
+package boofcv.struct.feature;
 
-
-import georegression.struct.point.Point2D_F32;
 
 /**
- * Describes an edge pixel found inside a region.
+ * Precomputes the output of sine/cosine operations.  Given an angle it will
+ * return an approximation much faster than computing it from scratch.
  *
  * @author Peter Abeles
  */
-public class Edgel extends Point2D_F32 {
-	// orientation of the edge
-	// half circle from -pi to pi
-	public float theta;
+// todo place in ConnectLinesGrid
+// todo          HoughTransformLinePolar
+public class CachedSineCosine_F32 {
+
+	float c[];
+	float s[];
+
+
 }

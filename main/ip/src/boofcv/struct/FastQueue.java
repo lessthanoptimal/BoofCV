@@ -19,6 +19,8 @@
 package boofcv.struct;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -134,5 +136,14 @@ public class FastQueue<T> {
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public List<T> toList(List<T> ret) {
+		if( ret == null )
+			ret = new ArrayList<T>(size);
+		for( int i = 0; i < size; i++ ) {
+			ret.add(data[i]);
+		}
+		return ret;
 	}
 }

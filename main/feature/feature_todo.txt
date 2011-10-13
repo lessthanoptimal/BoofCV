@@ -1,5 +1,3 @@
-BRIEF
-- modify so that there is a single list of points which are sampled and then compared against each other?
 
 Trackers
 - Detect region/normalized cross correlation
@@ -20,8 +18,6 @@ Trackers
 - Add whole image detection capability to SSD detectors
  * Hunt through code where it expands the avoid border
  * Main reason for adding image borders is to avoid this headache.
-
-- Do all non-max feature suppression process borders?
 
 - Ignore Borders
   * WrapperKitRosCornerIntensity: add ignore border parameter for when the derivative has an ignore border?

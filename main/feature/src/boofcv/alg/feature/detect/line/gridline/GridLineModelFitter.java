@@ -50,12 +50,16 @@ public class GridLineModelFitter implements ModelFitter<LinePolar2D_F32,Edgel> {
 	@Override
 	public boolean fitModel(List<Edgel> dataSet, LinePolar2D_F32 initParam, LinePolar2D_F32 foundModel) {
 		if( dataSet.size() == 2 ) {
-			// todo find angle between the points
 			Edgel a = dataSet.get(0);
 			Edgel b = dataSet.get(1);
 
-			// see if their orientations are alisgned with the line's agle
-			if(UtilAngle.dist(a.theta,b.theta) > angleTol )
+			float dx = b.x - a.x;
+			float dy = b.y - a.y;
+
+			double lineAngle = UtilAngle.toHalfCircle(Math.atan2(dy,dx));
+
+			// see if their orientations are aligned with the line's angle
+			if(UtilAngle.distHalf(lineAngle, a.theta) > angleTol || UtilAngle.distHalf(lineAngle, b.theta) > angleTol)
 				return false;
 		}
 

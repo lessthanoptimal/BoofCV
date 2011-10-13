@@ -20,13 +20,12 @@ package boofcv.alg.feature.detect.line;
 
 
 import boofcv.abst.feature.detect.line.DetectLine;
-import boofcv.abst.feature.detect.line.DetectLineHoughFoot;
-import boofcv.abst.feature.detect.line.DetectLineHoughFootSubimage;
-import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
+import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.detect.line.FactoryDetectLine;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
@@ -67,9 +66,10 @@ public class DetectLineApp<T extends ImageBase, D extends ImageBase>
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		addAlgorithm(0,"Hough Polar",new DetectLineHoughPolar<T,D>(5,175,300,360,edgeThreshold,gradient));
-		addAlgorithm(0,"Hough Foot",new DetectLineHoughFoot<T,D>(6,10,5,edgeThreshold,gradient));
-		addAlgorithm(0,"Hough Foot Sub Image",new DetectLineHoughFootSubimage<T,D>(6,8,5,edgeThreshold,2,2,gradient));
+		addAlgorithm(0,"Hough Polar",FactoryDetectLine.houghPolar(5, 175, 300, 360, edgeThreshold, imageType, derivType));
+		addAlgorithm(0,"Grid Line", FactoryDetectLine.lineRansac(40, 30, 2.36, true , imageType, derivType));
+		addAlgorithm(0,"Hough Foot",FactoryDetectLine.houghFoot(6, 10, 5, edgeThreshold, imageType, derivType));
+		addAlgorithm(0,"Hough Foot Sub Image",FactoryDetectLine.houghFootSub(6,8,5,edgeThreshold,2,2,imageType,derivType));
 
 		input = GeneralizedImageOps.createImage(imageType,1,1);
 		blur = GeneralizedImageOps.createImage(imageType,1,1);
@@ -106,15 +106,27 @@ public class DetectLineApp<T extends ImageBase, D extends ImageBase>
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		GBlurImageOps.gaussian(input, blur, -1,blurRadius, null);
 
-		final DetectLine<T> detector = (DetectLine<T>) cookie;
+		if( cookie instanceof DetectLine ) {
+			final DetectLine<T> detector = (DetectLine<T>) cookie;
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setLines(detector.detect(blur));
-				gui.repaint();
-				processedImage = true;
-			}
-		});
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					gui.setLines(detector.detect(blur));
+					gui.repaint();
+					processedImage = true;
+				}
+			});
+		} else if( cookie instanceof DetectLineSegment) {
+			final DetectLineSegment<T> detector = (DetectLineSegment<T>) cookie;
+
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					gui.setLineSegments(detector.detect(blur));
+					gui.repaint();
+					processedImage = true;
+				}
+			});
+		}
 	}
 
 	@Override
