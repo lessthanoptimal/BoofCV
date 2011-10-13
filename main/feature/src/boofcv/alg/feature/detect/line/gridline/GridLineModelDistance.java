@@ -20,32 +20,49 @@ package boofcv.alg.feature.detect.line.gridline;
 
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
+import georegression.geometry.UtilLine2D_F32;
+import georegression.metric.Distance2D_F32;
+import georegression.metric.UtilAngle;
+import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 
 import java.util.List;
 
 /**
+ * Computes the distance of a point from the line.
+ *
  * @author Peter Abeles
  */
 public class GridLineModelDistance implements DistanceFromModel<LinePolar2D_F32,Edgel> {
 
-	LinePolar2D_F32 lineParam;
+	LineParametric2D_F32 line = new LineParametric2D_F32();
+	float theta;
+
+	// maximum distance between line slope and point gradient
+	float angleTolerance;
+
+	public GridLineModelDistance(float angleTolerance) {
+		this.angleTolerance = angleTolerance;
+	}
 
 	@Override
 	public void setModel(LinePolar2D_F32 lineParam) {
-		this.lineParam = lineParam;
+		UtilLine2D_F32.convert(lineParam,line);
+		theta = lineParam.angle;
 	}
 
 	@Override
 	public double computeDistance(Edgel pt) {
-		// todo see if edge orientation and point orientation are compatible
+		if(UtilAngle.dist(pt.theta,theta) > angleTolerance )
+			return Double.MAX_VALUE;
 
-
-		return 0;  //To change body of implemented methods use File | Settings | File Templates.
+		return Distance2D_F32.distance(line,pt);
 	}
 
 	@Override
 	public void computeDistance(List<Edgel> edgels, double[] distance) {
-		//To change body of implemented methods use File | Settings | File Templates.
+		for( int i = 0; i < edgels.size(); i++ ) {
+			distance[i] = computeDistance(edgels.get(i));
+		}
 	}
 }

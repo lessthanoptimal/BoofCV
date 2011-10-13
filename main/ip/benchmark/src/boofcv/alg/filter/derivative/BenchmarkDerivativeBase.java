@@ -18,10 +18,13 @@
 
 package boofcv.alg.filter.derivative;
 
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
+
+import java.util.Random;
 
 /**
  * Base class for benchmarking derivative classes
@@ -59,6 +62,10 @@ public abstract class BenchmarkDerivativeBase {
 		derivX_F32 = new ImageFloat32(imgWidth,imgHeight);
 		derivY_F32 = new ImageFloat32(imgWidth,imgHeight);
 		derivXY_F32 = new ImageFloat32(imgWidth,imgHeight);
+
+		Random rand = new Random(123);
+		GeneralizedImageOps.randomize(imgInt8,rand,0,100);
+		GeneralizedImageOps.randomize(imgFloat32,rand,0,100);
 		
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
 		System.out.println("               border = "+border);

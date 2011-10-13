@@ -50,6 +50,11 @@ public class ImageLinePanel extends JPanel {
 		}
 	}
 
+	public synchronized void setLineSegments(List<LineSegment2D_F32> lines) {
+		this.lines.clear();
+		this.lines.addAll(lines);
+	}
+
 	@Override
 	public synchronized void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -69,11 +74,14 @@ public class ImageLinePanel extends JPanel {
 		}
 
 		g2.drawImage(background,0,0,(int)(scale*w),(int)(scale*h),0,0,w,h,null);
-		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(3));
 
 		for( LineSegment2D_F32 s : lines ) {
+			g2.setColor(Color.RED);
 			g2.drawLine((int)(scale*s.a.x),(int)(scale*s.a.y),(int)(scale*s.b.x),(int)(scale*s.b.y));
+			g2.setColor(Color.BLUE);
+			g2.fillOval((int)(scale*s.a.x)-1,(int)(scale*s.a.y)-1,3,3);
+			g2.fillOval((int)(scale*s.b.x)-1,(int)(scale*s.b.y)-1,3,3);
 		}
 	}
 

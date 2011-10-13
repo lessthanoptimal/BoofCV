@@ -75,6 +75,7 @@ public class VisualizeHoughPolar<I extends ImageBase , D extends ImageBase> {
 		VisualizeHoughPolar<ImageFloat32,ImageFloat32> app =
 				new VisualizeHoughPolar<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
+//		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
+		app.process(UtilImageIO.loadImage("data/outdoors01.jpg"));
 	}
 }
