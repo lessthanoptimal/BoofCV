@@ -24,6 +24,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.edge.GradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
+import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -33,6 +34,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
+import pja.storage.GrowQueue_F32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +89,9 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 	ImageFloat32 angle = new ImageFloat32(1,1);
 	ImageSInt8 direction = new ImageSInt8(1,1);
 
+		// line intensities for later pruning
+	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
+
 	/**
 	 * Specifies detection parameters.  The suggested parameters should be used as a starting point and will
 	 * likely need to be tuned significantly for each different scene.
@@ -136,6 +141,7 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 		ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
 
 		List<LineParametric2D_F32> ret = new ArrayList<LineParametric2D_F32>();
+		foundIntensity.reset();
 
 		for( int i = 0; i < totalVerticalDivisions; i++ ) {
 			int y0 = input.height*i/totalVerticalDivisions;
@@ -149,7 +155,13 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 			}
 		}
 
-		// todo remove duplicate lines
+		// removing duplicate lines  caused by processing sub-images
+		// NOTE: angular accuracy is a function of range from sub image center.  This pruning
+		// function uses a constant value for range accuracy.  A custom algorithm should really
+		// be used here.
+		// NOTE: Thresholds should not be hardcoded...
+		ret = LineImageOps.pruneSimilarLines(ret, foundIntensity.queue, (float)(Math.PI*0.04), 5,
+				input.width, input.height);
 
 		return ret;
 	}
@@ -160,7 +172,7 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 		D derivY = (D)this.derivY.subimage(x0,y0,x1,y1);
 		ImageUInt8 binary = this.binary.subimage(x0,y0,x1,y1);
 
-		alg.transform(derivX,derivY,binary);
+		alg.transform(derivX, derivY, binary);
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
 
 		for( int i = 0; i < lines.size; i++ ) {
@@ -169,6 +181,7 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 			l.p.x += x0;
 			l.p.y += y0;
 			found.add(l);
+			foundIntensity.push(alg.getFoundIntensity()[i]);
 		}
 	}
 

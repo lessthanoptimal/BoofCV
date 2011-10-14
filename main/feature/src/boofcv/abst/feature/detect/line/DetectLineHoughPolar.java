@@ -24,6 +24,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.edge.GradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
+import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -77,6 +78,13 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 	ImageFloat32 angle = new ImageFloat32(1,1);
 	ImageSInt8 direction = new ImageSInt8(1,1);
 
+	// angle tolerance for post processing pruning
+	float pruneAngleTol;
+
+	// number of range bins
+	int numBinsRange;
+	// radius for local max
+	int localMaxRadius;
 
 	public DetectLineHoughPolar(int localMaxRadius,
 								int minCounts,
@@ -85,8 +93,11 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 								float thresholdEdge,
 								ImageGradient<I, D> gradient)
 	{
+		pruneAngleTol = (float)(Math.PI*(localMaxRadius+1)/numBinsAngle);
+		this.localMaxRadius = localMaxRadius;
 		this.gradient = gradient;
 		this.thresholdEdge = thresholdEdge;
+		this.numBinsRange = numBinsRange;
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(localMaxRadius, minCounts, 0, true, true);
 		alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
 		derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);
@@ -115,9 +126,14 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 		alg.transform(binary);
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
 
+
 		List<LineParametric2D_F32> ret = new ArrayList<LineParametric2D_F32>();
 		for( int i = 0; i < lines.size; i++ )
 			ret.add(lines.get(i));
+
+		double r = Math.sqrt(input.width*input.width + input.height*input.height);
+		float pruneDistTol =  (float)((localMaxRadius+1)*r/numBinsRange);
+		ret = LineImageOps.pruneSimilarLines(ret,alg.getFoundIntensity(),pruneAngleTol,pruneDistTol,input.width,input.height);
 
 		return ret;
 	}

@@ -57,7 +57,7 @@ public class GBlurImageOps {
 		} else if( input instanceof ImageFloat32) {
 			return (T)BlurImageOps.gaussian((ImageFloat32)input,(ImageFloat32)output,sigma,radius,(ImageFloat32)storage);
 		} else  {
-			throw new IllegalArgumentException("Unsupported image type");
+			throw new IllegalArgumentException("Unsupported image type: "+input.getClass().getSimpleName());
 		}
 	}
 }

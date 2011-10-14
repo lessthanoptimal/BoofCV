@@ -101,6 +101,7 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 		stopWorker();
 
 		tracker = (PointSequentialTracker<I>)cookie;
+		sequence.reset();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

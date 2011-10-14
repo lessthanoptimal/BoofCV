@@ -31,7 +31,11 @@
 - Corners
  * See corner section
  * See in code comment on speeding up fast-non-max
- 
+
+- Lines
+ * Improve grid based detector
+ * Improve sub image foot? Remove duplicates and such.
+
 - Convolve
  * Add support for convolutions using kernels width:
    - Even length (offset + length)

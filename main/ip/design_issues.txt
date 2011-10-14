@@ -26,4 +26,8 @@ Possible Solution:
 
 Non-Maximum Suppression
 
-When
+Regions can have pixels with identical values that are peaks.  Typically in synthetic regions
+cause by symmetry.  No detections will happen there.  Can use relaxed non-max to detect features in
+those regions, but the "same" feature is detected multiple times.  Could fix the problem by creating
+a list, sort by intensity and removing all but one duplicate.  Not going to implement since I don't
+think this is a significant issue.

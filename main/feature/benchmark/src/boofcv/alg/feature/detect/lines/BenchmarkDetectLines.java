@@ -57,7 +57,7 @@ public class BenchmarkDetectLines<T extends ImageBase, D extends ImageBase> {
 	public class HoughPolar extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLine.houghPolar(5, 175, 300, 360, edgeThreshold, imageType, derivType);
+				FactoryDetectLine.houghPolar(5, 175, 300, 180, edgeThreshold, imageType, derivType);
 
 		@Override
 		public void process() {
