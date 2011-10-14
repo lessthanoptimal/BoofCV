@@ -30,9 +30,11 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import georegression.struct.line.LineParametric2D_F32;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 /**
  * Computes the Hough Polar transform and displays some of its steps and the detected lines
@@ -56,11 +58,13 @@ public class VisualizeHoughPolar<I extends ImageBase , D extends ImageBase> {
 		ConvertBufferedImage.convertFrom(image, input, imageType);
 		GBlurImageOps.gaussian(input, blur, -1, 2, null);
 
-		DetectLineHoughPolar<I,D> alg =  FactoryDetectLine.houghPolar(5, 175, 300, 360, 25, imageType, derivType);
+		DetectLineHoughPolar<I,D> alg =  FactoryDetectLine.houghPolar(5, 120, 150, 180, 25, imageType, derivType);
+
+		List<LineParametric2D_F32> lines = alg.detect(blur);
 
 		ImageLinePanel gui = new ImageLinePanel();
 		gui.setBackground(image);
-		gui.setLines(alg.detect(blur));
+		gui.setLines(lines);
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 
 		BufferedImage renderedTran = VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(),null,-1);
@@ -76,6 +80,7 @@ public class VisualizeHoughPolar<I extends ImageBase , D extends ImageBase> {
 				new VisualizeHoughPolar<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
 //		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
-		app.process(UtilImageIO.loadImage("data/outdoors01.jpg"));
+		app.process(UtilImageIO.loadImage("data/lines_indoors.jpg"));
+//		app.process(UtilImageIO.loadImage("data/outdoors01.jpg"));
 	}
 }

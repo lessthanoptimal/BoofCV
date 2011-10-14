@@ -327,6 +327,7 @@
         <w>discretization</w>
         <w>hough</w>
         <w>maxima</w>
+        <w>precompute</w>
         <w>thresholded</w>
         <w>thresholding</w>
         <w>tuple</w>

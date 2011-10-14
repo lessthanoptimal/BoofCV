@@ -27,6 +27,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_I16;
+import pja.storage.GrowQueue_F32;
 
 /**
  * <p>
@@ -35,6 +36,13 @@ import georegression.struct.point.Point2D_I16;
  * true lines in the image.  Parameter space is discretized into a set of bins.  The range can vary from
  * +- the maximum range inside the image and the angle from 0 to PI radians.  How finely discretized an image
  * is effects line detection accuracy.  If too fine lines might not be detected or it will be too noisy.
+ * </p>
+ *
+ * <p>
+ * USAGE NOTE: Duplicate/very similar lines are possible due to angles being cyclical.  What happens is that if
+ * a line's orientation lies along a boundary point its angles will be split up between top and bottom
+ * of the transform.  When lines are extracted using non-maximum it will detects peaks at the top
+ * and bottom.
  * </p>
  *
  * @author Peter Abeles
@@ -54,6 +62,8 @@ public class HoughTransformLinePolar {
 	ImageFloat32 transform = new ImageFloat32(1,1);
 	// found lines in transform space
 	QueueCorner foundLines = new QueueCorner(10);
+	// line intensities for later pruning
+	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
 
 	// lookup tables for sine and cosine functions
 	double tableCosine[];
@@ -76,6 +86,7 @@ public class HoughTransformLinePolar {
 		tableCosine = new double[numBinsAngle];
 		tableSine = new double[numBinsAngle];
 
+		// precompute angles from 0 to pi
 		for( int i = 0; i < numBinsAngle; i++ ) {
 			double theta = Math.PI*i/numBinsAngle;
 			tableCosine[i] = Math.cos(theta);
@@ -116,6 +127,7 @@ public class HoughTransformLinePolar {
 	public FastQueue<LineParametric2D_F32> extractLines() {
 		lines.reset();
 		foundLines.reset();
+		foundIntensity.reset();
 
 		extractor.process(transform, null, -1, foundLines);
 
@@ -131,6 +143,7 @@ public class HoughTransformLinePolar {
 			float x0 = r*c+originX;
 			float y0 = r*s+originY;
 
+			foundIntensity.push( transform.get(p.x,p.y));
 			LineParametric2D_F32 l = lines.pop();
 			l.p.set(x0,y0);
 			l.slope.set(-s,c);
@@ -152,7 +165,8 @@ public class HoughTransformLinePolar {
 
 		for( int i = 0; i < transform.height; i++ ) {
 			double p = x*tableCosine[i] + y*tableSine[i];
-			int col = (int)(p*w2/r_max) + w2;
+
+			int col = (int)Math.floor(p * w2 / r_max) + w2;
 			int index = transform.startIndex + i*transform.stride + col;
 			transform.data[index]++;
 		}
@@ -167,4 +181,13 @@ public class HoughTransformLinePolar {
 		return transform;
 	}
 
+	/**
+	 * Returns the intensity/edge count for each returned line.  Useful when doing
+	 * post processing pruning.
+	 *
+	 * @return Array containing line intensities.
+	 */
+	public float[] getFoundIntensity() {
+		return foundIntensity.queue;
+	}
 }

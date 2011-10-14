@@ -27,6 +27,7 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.*;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_I16;
+import pja.storage.GrowQueue_F32;
 
 /**
  * <p>
@@ -66,6 +67,8 @@ public class HoughTransformLineFootOfNorm {
 	QueueCorner foundLines = new QueueCorner(10);
 	// list of points in the transform with non-zero values
 	QueueCorner candidates = new QueueCorner(10);
+		// line intensities for later pruning
+	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
 
 	/**
 	 * Specifies parameters of transform.
@@ -118,6 +121,7 @@ public class HoughTransformLineFootOfNorm {
 	public FastQueue<LineParametric2D_F32> extractLines() {
 		lines.reset();
 		foundLines.reset();
+		foundIntensity.reset();
 
 		extractor.process(transform, candidates, -1, foundLines);
 
@@ -132,6 +136,7 @@ public class HoughTransformLineFootOfNorm {
 				LineParametric2D_F32 l = lines.pop();
 				l.p.set(p.x,p.y);
 				l.slope.set(-y0,x0);
+				foundIntensity.push(transform.get(p.x,p.y));
 			}
 		}
 
@@ -162,9 +167,8 @@ public class HoughTransformLineFootOfNorm {
 			int index = transform.startIndex+y0*transform.stride+x0;
 			// keep track of candidate pixels so that a sparse search can be done
 			// to detect lines
-			if( transform.data[index] == 0 )
+			if( transform.data[index]++ == 1 )
 				candidates.add(x0,y0);
-			transform.data[index]++;
 		}
 	}
 
@@ -175,6 +179,16 @@ public class HoughTransformLineFootOfNorm {
 	 */
 	public ImageFloat32 getTransform() {
 		return transform;
+	}
+
+	/**
+	 * Returns the intensity/edge count for each returned line.  Useful when doing
+	 * post processing pruning.
+	 *
+	 * @return Array containing line intensities.
+	 */
+	public float[] getFoundIntensity() {
+		return foundIntensity.queue;
 	}
 
 	private void _transform( ImageFloat32 derivX , ImageFloat32 derivY , ImageUInt8 binary )
