@@ -7,6 +7,9 @@ Trackers
 
 - See KLT list
 
+- Non-Maximum Suppression for edges
+ * Add a crude version 4 which just checks to see if gradient is > or < 0 to pick direction of line
+
 - Canny Edge Detector
  * Uses generalized algorithm for non-max.  Use a specialized one for speed that traces
    the edge intensity and direction

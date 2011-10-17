@@ -42,6 +42,6 @@ public class TestDetectLineHoughFoot extends GeneralDetectLineTests {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		return FactoryDetectLine.houghFoot(2,3,2,10,imageType,derivType);
+		return FactoryDetectLine.houghFoot(2,3,2,10,10,imageType,derivType);
 	}
 }

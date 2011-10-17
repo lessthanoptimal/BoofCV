@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppression;
+import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppressionCrude;
 import boofcv.alg.feature.detect.edge.impl.ImplGradientToEdgeFeatures;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
@@ -343,6 +344,78 @@ public class GradientToEdgeFeatures {
 
 		ImplEdgeNonMaxSuppression.inner8(intensity,direction,output);
 		ImplEdgeNonMaxSuppression.border8(intensity,direction,output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Sets edge intensities to zero if the pixel has an intensity which is not greater than any of
+	 * the two adjacent pixels.  Pixel adjacency is determined based upon the sign of the image gradient.  Less precise
+	 * than other methods, but faster.
+	 * </p>
+	 *
+	 * @param intensity Edge intensities. Not modified.
+	 * @param derivX Image derivative along x-axis.
+	 * @param derivY Image derivative along y-axis.
+	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
+	 * @return Filtered edge intensity.
+	 */
+	static public ImageFloat32 nonMaxSuppressionCrude4( ImageFloat32 intensity , ImageFloat32 derivX , ImageFloat32 derivY, ImageFloat32 output )
+	{
+		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
+		output = InputSanityCheck.checkDeclare(intensity,output);
+
+		ImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX,derivY, output);
+		ImplEdgeNonMaxSuppressionCrude.border4(intensity,derivX,derivY, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Sets edge intensities to zero if the pixel has an intensity which is not greater than any of
+	 * the two adjacent pixels.  Pixel adjacency is determined based upon the sign of the image gradient.  Less precise
+	 * than other methods, but faster.
+	 * </p>
+	 *
+	 * @param intensity Edge intensities. Not modified.
+	 * @param derivX Image derivative along x-axis.
+	 * @param derivY Image derivative along y-axis.
+	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
+	 * @return Filtered edge intensity.
+	 */
+	static public ImageFloat32 nonMaxSuppressionCrude4( ImageFloat32 intensity , ImageSInt16 derivX , ImageSInt16 derivY, ImageFloat32 output )
+	{
+		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
+		output = InputSanityCheck.checkDeclare(intensity,output);
+
+		ImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX,derivY, output);
+		ImplEdgeNonMaxSuppressionCrude.border4(intensity,derivX,derivY, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Sets edge intensities to zero if the pixel has an intensity which is not greater than any of
+	 * the two adjacent pixels.  Pixel adjacency is determined based upon the sign of the image gradient.  Less precise
+	 * than other methods, but faster.
+	 * </p>
+	 *
+	 * @param intensity Edge intensities. Not modified.
+	 * @param derivX Image derivative along x-axis.
+	 * @param derivY Image derivative along y-axis.
+	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
+	 * @return Filtered edge intensity.
+	 */
+	static public ImageFloat32 nonMaxSuppressionCrude4( ImageFloat32 intensity , ImageSInt32 derivX , ImageSInt32 derivY, ImageFloat32 output )
+	{
+		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
+		output = InputSanityCheck.checkDeclare(intensity,output);
+
+		ImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX,derivY, output);
+		ImplEdgeNonMaxSuppressionCrude.border4(intensity,derivX,derivY, output);
 
 		return output;
 	}

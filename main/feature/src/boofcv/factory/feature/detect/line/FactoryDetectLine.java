@@ -84,12 +84,13 @@ public class FactoryDetectLine {
 									   int minCounts ,
 									   int minDistanceFromOrigin ,
 									   float thresholdEdge ,
+									   int maxLines ,
 									   Class<I> imageType ,
 									   Class<D> derivType ) {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new DetectLineHoughFoot<I,D>(localMaxRadius,minCounts,minDistanceFromOrigin,thresholdEdge,gradient);
+		return new DetectLineHoughFoot<I,D>(localMaxRadius,minCounts,minDistanceFromOrigin,thresholdEdge,maxLines,gradient);
 	}
 
 	public static <I extends ImageBase, D extends ImageBase>
@@ -97,6 +98,7 @@ public class FactoryDetectLine {
 									   int minCounts ,
 									   int minDistanceFromOrigin ,
 									   float thresholdEdge ,
+									   int maxLines ,
 									   int totalHorizontalDivisions ,
 									   int totalVerticalDivisions ,
 									   Class<I> imageType ,
@@ -106,7 +108,7 @@ public class FactoryDetectLine {
 
 		return new DetectLineHoughFootSubimage<I,D>(localMaxRadius,
 				minCounts,minDistanceFromOrigin,thresholdEdge,
-				totalHorizontalDivisions,totalVerticalDivisions,gradient);
+				totalHorizontalDivisions,totalVerticalDivisions,maxLines,gradient);
 	}
 
 	public static <I extends ImageBase, D extends ImageBase>
@@ -115,12 +117,13 @@ public class FactoryDetectLine {
 										 int numBinsRange ,
 										 int numBinsAngle ,
 										 float thresholdEdge,
+										 int maxLines ,
 										 Class<I> imageType ,
 										 Class<D> derivType ) {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new DetectLineHoughPolar<I,D>(localMaxRadius,minCounts,numBinsRange,numBinsAngle,thresholdEdge,gradient);
+		return new DetectLineHoughPolar<I,D>(localMaxRadius,minCounts,numBinsRange,numBinsAngle,thresholdEdge,maxLines,gradient);
 	}
 
 }

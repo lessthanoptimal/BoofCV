@@ -61,12 +61,10 @@ public class ImplEdgeNonMaxSuppression {
 					dx = 1; dy = -1;
 				}
 
-				float left = intensity.data[indexI-dx-dy*intensity.stride];
 				float middle = intensity.data[indexI];
-				float right = intensity.data[indexI+dx+dy*intensity.stride];
 
 				// suppress the value if either of its neighboring values are more than or equal to it
-				if( left > middle || right > middle ) {
+				if( intensity.data[indexI-dx-dy*intensity.stride] > middle || intensity.data[indexI+dx+dy*intensity.stride] > middle ) {
 					output.data[indexO] = 0;
 				} else {
 					output.data[indexO] = middle;
@@ -259,12 +257,10 @@ public class ImplEdgeNonMaxSuppression {
 					dx = 1; dy = -1;
 				}
 
-				float left = intensity.data[indexI-dx-dy*intensity.stride];
 				float middle = intensity.data[indexI];
-				float right = intensity.data[indexI+dx+dy*intensity.stride];
 
 				// suppress the value if either of its neighboring values are more than or equal to it
-				if( left > middle || right > middle ) {
+				if( intensity.data[indexI-dx-dy*intensity.stride] > middle || intensity.data[indexI+dx+dy*intensity.stride] > middle ) {
 					output.data[indexO] = 0;
 				} else {
 					output.data[indexO] = middle;

@@ -41,6 +41,27 @@ public class LineImageOps {
 
 	static double foo = 1e-4;
 
+	public static List<LineParametric2D_F32>
+	pruneRelativeIntensity( List<LineParametric2D_F32> lines ,
+							float intensity[] ,
+							float fraction )
+	{
+		int indexSort[] = new int[ intensity.length ];
+		QuickSort_F32 sort = new QuickSort_F32();
+		sort.sort(intensity, lines.size(), indexSort);
+
+		float threshold = intensity[ indexSort[ lines.size()-1] ]*fraction;
+
+		List<LineParametric2D_F32> ret = new ArrayList<LineParametric2D_F32>();
+
+		for( int i = 0; i < lines.size(); i++ ) {
+			if( intensity[i] >= threshold ) {
+				ret.add( lines.get(i));
+			}
+		}
+		return ret;
+	}
+
 	/**
 	 * Prunes similar looking lines, but keeps the lines with the most intensity.
 	 *
@@ -220,7 +241,8 @@ public class LineImageOps {
 		checkAddInside(width , height , d, inside);
 
 		if( inside.size() != 2 ) {
-			System.out.println("interesting");
+			return null;
+//			System.out.println("interesting");
 		}
 		return new LineSegment2D_F32(inside.get(0),inside.get(1));
 	}

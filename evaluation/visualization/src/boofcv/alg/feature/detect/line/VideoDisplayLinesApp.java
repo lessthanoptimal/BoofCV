@@ -47,6 +47,7 @@ public class VideoDisplayLinesApp<I extends ImageBase, D extends ImageBase>
 	I blur;
 
 	float edgeThreshold = 20;
+	int maxLines = 10;
 	int blurRadius = 2;
 
 	ImageLinePanel gui = new ImageLinePanel();
@@ -57,10 +58,10 @@ public class VideoDisplayLinesApp<I extends ImageBase, D extends ImageBase>
 	public VideoDisplayLinesApp(Class<I> imageType, Class<D> derivType) {
 		super(1);
 
-		addAlgorithm(0,"Hough Polar", FactoryDetectLine.houghPolar(5, 150, 300, 180, edgeThreshold, imageType, derivType));
+		addAlgorithm(0,"Hough Foot",FactoryDetectLine.houghFoot(5, 8, 5, edgeThreshold, maxLines, imageType, derivType));
+		addAlgorithm(0,"Hough Polar", FactoryDetectLine.houghPolar(5, 30, 300, 180, edgeThreshold, maxLines, imageType, derivType));
+		addAlgorithm(0,"Hough Foot Sub Image",FactoryDetectLine.houghFootSub(5, 8, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType));
 		addAlgorithm(0,"Grid Line", FactoryDetectLine.lineRansac(40, 30, 2.36, true, imageType, derivType));
-		addAlgorithm(0,"Hough Foot",FactoryDetectLine.houghFoot(6, 10, 5, edgeThreshold, imageType, derivType));
-		addAlgorithm(0,"Hough Foot Sub Image",FactoryDetectLine.houghFootSub(6,8,5,edgeThreshold,2,2,imageType,derivType));
 
 
 		blur = GeneralizedImageOps.createImage(imageType,1,1);

@@ -52,6 +52,7 @@ public class DetectLineApp<T extends ImageBase, D extends ImageBase>
 	T blur;
 
 	float edgeThreshold = 25;
+	int maxLines = 10;
 	int blurRadius = 2;
 
 	ImageLinePanel gui = new ImageLinePanel();
@@ -62,10 +63,10 @@ public class DetectLineApp<T extends ImageBase, D extends ImageBase>
 
 		this.imageType = imageType;
 
-		addAlgorithm(0,"Hough Polar",FactoryDetectLine.houghPolar(5, 175, 300, 180, edgeThreshold, imageType, derivType));
-		addAlgorithm(0,"Grid Line", FactoryDetectLine.lineRansac(40, 30, 2.36, true , imageType, derivType));
-		addAlgorithm(0,"Hough Foot",FactoryDetectLine.houghFoot(6, 10, 5, edgeThreshold, imageType, derivType));
-		addAlgorithm(0,"Hough Foot Sub Image",FactoryDetectLine.houghFootSub(6,8,5,edgeThreshold,2,2,imageType,derivType));
+		addAlgorithm(0,"Hough Foot",FactoryDetectLine.houghFoot(5, 8, 5, edgeThreshold, maxLines, imageType, derivType));
+		addAlgorithm(0,"Hough Polar",FactoryDetectLine.houghPolar(5, 30, 300, 180, edgeThreshold, maxLines, imageType, derivType));
+		addAlgorithm(0,"Hough Foot Sub Image",FactoryDetectLine.houghFootSub(5, 8, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType));
+		addAlgorithm(0,"Grid Line", FactoryDetectLine.lineRansac(40, 30, 2.36, true, imageType, derivType));
 
 		input = GeneralizedImageOps.createImage(imageType,1,1);
 		blur = GeneralizedImageOps.createImage(imageType,1,1);

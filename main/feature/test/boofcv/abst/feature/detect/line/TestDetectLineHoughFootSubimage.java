@@ -43,6 +43,6 @@ public class TestDetectLineHoughFootSubimage extends GeneralDetectLineTests {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		return FactoryDetectLine.houghFootSub(2, 3, 2, 10,2,2, imageType, derivType);
+		return FactoryDetectLine.houghFootSub(2, 3, 2, 10,10,2,2, imageType, derivType);
 	}
 }

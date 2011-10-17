@@ -58,7 +58,7 @@ public class VisualizeHoughPolar<I extends ImageBase , D extends ImageBase> {
 		ConvertBufferedImage.convertFrom(image, input, imageType);
 		GBlurImageOps.gaussian(input, blur, -1, 2, null);
 
-		DetectLineHoughPolar<I,D> alg =  FactoryDetectLine.houghPolar(5, 120, 150, 180, 25, imageType, derivType);
+		DetectLineHoughPolar<I,D> alg =  FactoryDetectLine.houghPolar(5, 10, 150, 180, 25, 10, imageType, derivType);
 
 		List<LineParametric2D_F32> lines = alg.detect(blur);
 
@@ -79,8 +79,8 @@ public class VisualizeHoughPolar<I extends ImageBase , D extends ImageBase> {
 		VisualizeHoughPolar<ImageFloat32,ImageFloat32> app =
 				new VisualizeHoughPolar<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-//		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
-		app.process(UtilImageIO.loadImage("data/lines_indoors.jpg"));
+		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
+//		app.process(UtilImageIO.loadImage("data/lines_indoors.jpg"));
 //		app.process(UtilImageIO.loadImage("data/outdoors01.jpg"));
 	}
 }

@@ -28,6 +28,7 @@ import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
@@ -110,11 +111,9 @@ public class VisualizeLineRansac<I extends ImageBase , D extends ImageBase> {
 		gui.setLineSegments(found);
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 
-//		BufferedImage renderedTran = VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(),null,-1);
-//		BufferedImage renderedBinary = VisualizeBinaryData.renderBinary(alg.getBinary(), null);
+		BufferedImage renderedBinary = VisualizeBinaryData.renderBinary(detected, null);
 
-//		ShowImages.showWindow(renderedBinary,"Detected Edges");
-//		ShowImages.showWindow(renderedTran,"Parameter Space");
+		ShowImages.showWindow(renderedBinary,"Detected Edges");
 		ShowImages.showWindow(gui,"Detected Lines");
 	}
 
@@ -124,7 +123,7 @@ public class VisualizeLineRansac<I extends ImageBase , D extends ImageBase> {
 
 //		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
 //		app.process(UtilImageIO.loadImage("data/shapes01.png"));
-		app.process(UtilImageIO.loadImage("data/lines_indoors.jpg"));
-//		app.process(UtilImageIO.loadImage("data/outdoors01.jpg"));
+//		app.process(UtilImageIO.loadImage("data/lines_indoors.jpg"));
+		app.process(UtilImageIO.loadImage("data/outdoors01.jpg"));
 	}
 }
