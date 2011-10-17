@@ -56,7 +56,7 @@ public class VisualizeHoughFoot<I extends ImageBase , D extends ImageBase> {
 		ConvertBufferedImage.convertFrom(image, input, imageType);
 		GBlurImageOps.gaussian(input, blur, -1, 2, null);
 
-		DetectLineHoughFoot<I,D> alg =  FactoryDetectLine.houghFoot(6, 10, 5, 25, imageType, derivType);
+		DetectLineHoughFoot<I,D> alg =  FactoryDetectLine.houghFoot(6, 12, 5, 25, 10, imageType, derivType);
 
 		ImageLinePanel gui = new ImageLinePanel();
 		gui.setBackground(image);
@@ -75,6 +75,7 @@ public class VisualizeHoughFoot<I extends ImageBase , D extends ImageBase> {
 		VisualizeHoughFoot<ImageFloat32,ImageFloat32> app =
 				new VisualizeHoughFoot<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
+//		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
+		app.process(UtilImageIO.loadImage("data/lines_indoors.jpg"));
 	}
 }

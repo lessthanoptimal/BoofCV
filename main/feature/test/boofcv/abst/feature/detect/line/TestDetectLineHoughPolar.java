@@ -41,6 +41,6 @@ public class TestDetectLineHoughPolar extends GeneralDetectLineTests {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		return FactoryDetectLine.houghPolar(2, 3, 40, 180, 10,imageType, derivType);
+		return FactoryDetectLine.houghPolar(2, 3, 40, 180, 10, 20 , imageType, derivType);
 	}
 }

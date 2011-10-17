@@ -22,15 +22,14 @@ package boofcv.abst.feature.detect.line;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
-import boofcv.alg.feature.detect.edge.GradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
+import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
 
@@ -74,10 +73,11 @@ public class DetectLineHoughFoot <I extends ImageBase, D extends ImageBase> impl
 	// detected edge image
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
-	// used for suppressing all but the most intense edge pixels
-	ImageFloat32 suppressed = new ImageFloat32(1,1);
-	ImageFloat32 angle = new ImageFloat32(1,1);
-	ImageSInt8 direction = new ImageSInt8(1,1);
+	// the maximum number of lines it will return
+	int maxLines;
+
+	// post processing pruning
+	ImageLinePruneMerge post = new ImageLinePruneMerge();
 
 	/**
 	 * Specifies detection parameters.  The suggested parameters should be used as a starting point and will
@@ -93,10 +93,12 @@ public class DetectLineHoughFoot <I extends ImageBase, D extends ImageBase> impl
 								int minCounts ,
 								int minDistanceFromOrigin ,
 								float thresholdEdge ,
+								int maxLines ,
 								ImageGradient<I,D> gradient )
 	{
 		this.gradient = gradient;
 		this.thresholdEdge = thresholdEdge;
+		this.maxLines = maxLines;
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmaxCandidate(localMaxRadius, minCounts, 0, true, false);
 		alg = new HoughTransformLineFootOfNorm(extractor,minDistanceFromOrigin);
 		derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);
@@ -109,19 +111,11 @@ public class DetectLineHoughFoot <I extends ImageBase, D extends ImageBase> impl
 		derivY.reshape(input.width,input.height);
 		intensity.reshape(input.width,input.height);
 		binary.reshape(input.width,input.height);
-		angle.reshape(input.width,input.height);
-		direction.reshape(input.width,input.height);
-		suppressed.reshape(input.width,input.height);
 
 		gradient.process(input,derivX,derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
 
-		GGradientToEdgeFeatures.direction(derivX, derivY, angle);
-		GradientToEdgeFeatures.discretizeDirection4(angle, direction);
-
-		GradientToEdgeFeatures.nonMaxSuppression4(intensity, direction, suppressed);
-
-		ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
+		ThresholdImageOps.threshold(intensity, binary, thresholdEdge, false);
 
 		alg.transform(derivX,derivY,binary);
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
@@ -130,7 +124,26 @@ public class DetectLineHoughFoot <I extends ImageBase, D extends ImageBase> impl
 		for( int i = 0; i < lines.size; i++ )
 			ret.add(lines.get(i));
 
+		ret = pruneLines(input,ret);
+
 		return ret;
+	}
+
+	private List<LineParametric2D_F32> pruneLines(I input, List<LineParametric2D_F32> ret) {
+		float intensity[] = alg.getFoundIntensity();
+		post.reset();
+		for( int i = 0; i < ret.size(); i++ ) {
+			post.add(ret.get(i),intensity[i]);
+		}
+
+		// NOTE: angular accuracy is a function of range from sub image center.  This pruning
+		// function uses a constant value for range accuracy.  A custom algorithm should really
+		// be used here.
+		// NOTE: Thresholds should not be hardcoded...
+		post.mergeSimilar((float)(Math.PI*0.04),10,input.width,input.height);
+		post.pruneNBest(maxLines);
+
+		return post.createList();
 	}
 
 	public HoughTransformLineFootOfNorm getTransform() {

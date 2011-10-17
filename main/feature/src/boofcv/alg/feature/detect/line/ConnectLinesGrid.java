@@ -81,8 +81,8 @@ public class ConnectLinesGrid {
 	 */
 	public ConnectLinesGrid(double lineSlopeAngleTol, double tangentTol, double parallelTol ) {
 		this.lineSlopeAngleTol = (float)lineSlopeAngleTol;
-		this.tangentTol = (float)(tangentTol*tangentTol);
-		this.parallelTol = (float)(parallelTol*parallelTol);
+		this.tangentTol = (float)(tangentTol);
+		this.parallelTol = (float)(parallelTol);
 	}
 
 	public void process( MatrixOfList<LineSegment2D_F32> grid ) {
@@ -103,6 +103,13 @@ public class ConnectLinesGrid {
 		}
 	}
 
+	/**
+	 * Connect lines in the target region to lines in neighboring regions.  Regions are selected such that
+	 * no two regions are compared against each other more than once.
+	 *
+	 * @param x target region grid x-coordinate
+	 * @param y target region grid y-coordinate
+	 */
 	private void connectToNeighbors(int x, int y ) {
 		List<LineSegment2D_F32> lines = grid.get(x,y);
 

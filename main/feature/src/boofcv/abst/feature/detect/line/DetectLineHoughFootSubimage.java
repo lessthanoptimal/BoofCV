@@ -22,19 +22,16 @@ package boofcv.abst.feature.detect.line;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
-import boofcv.alg.feature.detect.edge.GradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
-import boofcv.alg.feature.detect.line.LineImageOps;
+import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
-import pja.storage.GrowQueue_F32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,13 +81,12 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 	// detected edge image
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
-	// used for suppressing all but the most intense edge pixels
-	ImageFloat32 suppressed = new ImageFloat32(1,1);
-	ImageFloat32 angle = new ImageFloat32(1,1);
-	ImageSInt8 direction = new ImageSInt8(1,1);
+	// post processing pruning of duplicate lines
+	ImageLinePruneMerge post = new ImageLinePruneMerge();
 
-		// line intensities for later pruning
-	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
+	// the maximum number of lines it will return
+	int maxLines;
+
 
 	/**
 	 * Specifies detection parameters.  The suggested parameters should be used as a starting point and will
@@ -100,6 +96,7 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 	 * @param minCounts Minimum number of counts/votes inside the transformed image. Try 5.
 	 * @param minDistanceFromOrigin Lines which are this close to the origin of the transformed image are ignored.  Try 5.
 	 * @param thresholdEdge Threshold for classifying pixels as edge or not.  Try 30.
+	 * @param maxLines Maximum number of lines it will detect.  Try 10.
 	 * @param gradient Computes the image gradient.
 	 */
 	public DetectLineHoughFootSubimage(int localMaxRadius,
@@ -108,12 +105,14 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 									   float thresholdEdge,
 									   int totalHorizontalDivisions ,
 									   int totalVerticalDivisions ,
+									   int maxLines ,
 									   ImageGradient<I, D> gradient)
 	{
 		this.gradient = gradient;
 		this.thresholdEdge = thresholdEdge;
 		this.totalHorizontalDivisions = totalHorizontalDivisions;
 		this.totalVerticalDivisions = totalVerticalDivisions;
+		this.maxLines = maxLines;
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmaxCandidate(localMaxRadius, minCounts, 0, true, false);
 		alg = new HoughTransformLineFootOfNorm(extractor,minDistanceFromOrigin);
 		derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);
@@ -126,22 +125,14 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 		derivY.reshape(input.width,input.height);
 		intensity.reshape(input.width,input.height);
 		binary.reshape(input.width,input.height);
-		angle.reshape(input.width,input.height);
-		direction.reshape(input.width,input.height);
-		suppressed.reshape(input.width,input.height);
 
 		gradient.process(input,derivX,derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
 
-		GGradientToEdgeFeatures.direction(derivX, derivY, angle);
-		GradientToEdgeFeatures.discretizeDirection4(angle, direction);
-
-		GradientToEdgeFeatures.nonMaxSuppression4(intensity, direction, suppressed);
-
-		ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
+		ThresholdImageOps.threshold(intensity, binary, thresholdEdge, false);
 
 		List<LineParametric2D_F32> ret = new ArrayList<LineParametric2D_F32>();
-		foundIntensity.reset();
+		post.reset();
 
 		for( int i = 0; i < totalVerticalDivisions; i++ ) {
 			int y0 = input.height*i/totalVerticalDivisions;
@@ -156,14 +147,20 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 		}
 
 		// removing duplicate lines  caused by processing sub-images
+		ret = pruneLines(input);
+
+		return ret;
+	}
+
+	private List<LineParametric2D_F32> pruneLines(I input) {
 		// NOTE: angular accuracy is a function of range from sub image center.  This pruning
 		// function uses a constant value for range accuracy.  A custom algorithm should really
 		// be used here.
 		// NOTE: Thresholds should not be hardcoded...
-		ret = LineImageOps.pruneSimilarLines(ret, foundIntensity.queue, (float)(Math.PI*0.04), 5,
-				input.width, input.height);
+		post.mergeSimilar((float)(Math.PI*0.04),10,input.width,input.height);
+		post.pruneNBest(maxLines);
 
-		return ret;
+		return post.createList();
 	}
 
 	private void processSubimage( int x0 , int y0 , int x1 , int y1 ,
@@ -174,6 +171,7 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 
 		alg.transform(derivX, derivY, binary);
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
+		float intensity[] = alg.getFoundIntensity();
 
 		for( int i = 0; i < lines.size; i++ ) {
 		    // convert from the sub-image coordinate system to original image coordinate system
@@ -181,7 +179,7 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 			l.p.x += x0;
 			l.p.y += y0;
 			found.add(l);
-			foundIntensity.push(alg.getFoundIntensity()[i]);
+			post.add(l, intensity[i]);
 		}
 	}
 

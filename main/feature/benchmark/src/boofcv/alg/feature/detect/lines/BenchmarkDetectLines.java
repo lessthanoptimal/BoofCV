@@ -46,6 +46,7 @@ public class BenchmarkDetectLines<T extends ImageBase, D extends ImageBase> {
 	Class<D> derivType;
 
 	float edgeThreshold = 30;
+	int maxLines = 10;
 
 	public BenchmarkDetectLines( Class<T> imageType , Class<D> derivType ) {
 		this.imageType = imageType;
@@ -57,7 +58,7 @@ public class BenchmarkDetectLines<T extends ImageBase, D extends ImageBase> {
 	public class HoughPolar extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLine.houghPolar(5, 175, 300, 180, edgeThreshold, imageType, derivType);
+				FactoryDetectLine.houghPolar(5, 30, 300, 180, edgeThreshold, maxLines , imageType, derivType);
 
 		@Override
 		public void process() {
@@ -68,7 +69,7 @@ public class BenchmarkDetectLines<T extends ImageBase, D extends ImageBase> {
 	public class HoughFoot extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLine.houghFoot(6, 10, 5, edgeThreshold, imageType, derivType);
+				FactoryDetectLine.houghFoot(6, 10, 5, edgeThreshold, maxLines , imageType, derivType);
 
 		@Override
 		public void process() {
@@ -79,7 +80,7 @@ public class BenchmarkDetectLines<T extends ImageBase, D extends ImageBase> {
 	public class HoughFootSub extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLine.houghFootSub(6, 8, 5, edgeThreshold, 2, 2, imageType, derivType);
+				FactoryDetectLine.houghFootSub(5, 6, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType);
 
 		@Override
 		public void process() {

@@ -9,8 +9,27 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestGridRansacLineDetector {
+
+	/**
+	 * Try different sized regions and see if it blows up
+	 */
+	public void checkRegionSizes() {
+		fail("implement");
+	}
+
+	/**
+	 * Have the model matcher find multiple lines and see if they are correctly added
+	 */
 	@Test
-	public void stuff() {
+	public void checkMultipleLines() {
+		fail("implement");
+	}
+
+	/**
+	 * Makes sure the convert to line segment function is working correctly
+	 */
+	@Test
+	public void convertToLineSegment() {
 		fail("implement");
 	}
 }

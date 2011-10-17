@@ -22,16 +22,14 @@ package boofcv.abst.feature.detect.line;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
-import boofcv.alg.feature.detect.edge.GradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
-import boofcv.alg.feature.detect.line.LineImageOps;
+import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
 
@@ -75,8 +73,8 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
 	ImageFloat32 suppressed = new ImageFloat32(1,1);
-	ImageFloat32 angle = new ImageFloat32(1,1);
-	ImageSInt8 direction = new ImageSInt8(1,1);
+//	ImageFloat32 angle = new ImageFloat32(1,1);
+//	ImageSInt8 direction = new ImageSInt8(1,1);
 
 	// angle tolerance for post processing pruning
 	float pruneAngleTol;
@@ -85,12 +83,18 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 	int numBinsRange;
 	// radius for local max
 	int localMaxRadius;
+	// the maximum number of lines it will return
+	int maxLines;
+
+	// post processing pruning
+	ImageLinePruneMerge post = new ImageLinePruneMerge();
 
 	public DetectLineHoughPolar(int localMaxRadius,
 								int minCounts,
 								int numBinsRange ,
 								int numBinsAngle ,
 								float thresholdEdge,
+								int maxLines ,
 								ImageGradient<I, D> gradient)
 	{
 		pruneAngleTol = (float)(Math.PI*(localMaxRadius+1)/numBinsAngle);
@@ -98,6 +102,7 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 		this.gradient = gradient;
 		this.thresholdEdge = thresholdEdge;
 		this.numBinsRange = numBinsRange;
+		this.maxLines = maxLines;
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(localMaxRadius, minCounts, 0, true, true);
 		alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
 		derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);
@@ -109,17 +114,23 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 		derivX.reshape(input.width,input.height);
 		derivY.reshape(input.width,input.height);
 		intensity.reshape(input.width,input.height);
-		binary.reshape(input.width,input.height);
-		angle.reshape(input.width,input.height);
-		direction.reshape(input.width,input.height);
-		suppressed.reshape(input.width,input.height);
+		binary.reshape(input.width, input.height);
+//		angle.reshape(input.width, input.height);
+//		direction.reshape(input.width, input.height);
+		suppressed.reshape(input.width, input.height);
 
-		gradient.process(input,derivX,derivY);
+		gradient.process(input, derivX, derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
-		GGradientToEdgeFeatures.direction(derivX, derivY, angle);
-		GradientToEdgeFeatures.discretizeDirection4(angle, direction);
 
-		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction, suppressed);
+		// non-max suppression reduces the number of line pixels, reducing the number of false positives
+		// When too many pixels are flagged, then more curves randomly cross over in transform space causing
+		// false positives
+
+//		GGradientToEdgeFeatures.direction(derivX, derivY, angle);
+//		GradientToEdgeFeatures.discretizeDirection4(angle, direction);
+//		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction, suppressed);
+
+		GGradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity,derivX,derivY,suppressed);
 
 		ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
 
@@ -131,11 +142,24 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 		for( int i = 0; i < lines.size; i++ )
 			ret.add(lines.get(i));
 
-		double r = Math.sqrt(input.width*input.width + input.height*input.height);
-		float pruneDistTol =  (float)((localMaxRadius+1)*r/numBinsRange);
-		ret = LineImageOps.pruneSimilarLines(ret,alg.getFoundIntensity(),pruneAngleTol,pruneDistTol,input.width,input.height);
+		ret = pruneLines(input, ret);
 
 		return ret;
+	}
+
+	private List<LineParametric2D_F32> pruneLines(I input, List<LineParametric2D_F32> ret) {
+		float intensity[] = alg.getFoundIntensity();
+		post.reset();
+		for( int i = 0; i < ret.size(); i++ ) {
+			post.add(ret.get(i),intensity[i]);
+		}
+
+		double r = Math.sqrt(input.width*input.width + input.height*input.height);
+		float pruneDistTol =  (float)((localMaxRadius+1)*r/numBinsRange);
+		post.mergeSimilar(pruneAngleTol,pruneDistTol,input.width,input.height);
+		post.pruneNBest(maxLines);
+
+		return post.createList();
 	}
 
 	public HoughTransformLinePolar getTransform() {

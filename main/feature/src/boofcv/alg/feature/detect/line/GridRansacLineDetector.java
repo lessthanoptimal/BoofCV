@@ -219,4 +219,6 @@ public class GridRansacLineDetector {
 
 		return segment;
 	}
+
+
 }

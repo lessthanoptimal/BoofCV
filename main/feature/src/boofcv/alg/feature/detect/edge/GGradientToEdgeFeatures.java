@@ -86,4 +86,18 @@ public class GGradientToEdgeFeatures {
 			throw new IllegalArgumentException("Unknown input type");
 		}
 	}
+
+	static public <D extends ImageBase>
+	void nonMaxSuppressionCrude4( ImageFloat32 intensity , D derivX , D derivY , ImageFloat32 output )
+	{
+		if( derivX instanceof ImageFloat32 ) {
+			GradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity, (ImageFloat32) derivX, (ImageFloat32) derivY,output);
+		} else if( derivX instanceof ImageSInt16) {
+			GradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity, (ImageSInt16) derivX, (ImageSInt16) derivY,output);
+		} else if( derivX instanceof ImageSInt32) {
+			GradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity, (ImageSInt32) derivX, (ImageSInt32) derivY,output);
+		} else {
+			throw new IllegalArgumentException("Unknown input type");
+		}
+	}
 }
