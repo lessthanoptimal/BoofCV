@@ -56,7 +56,8 @@ public class GridLineModelFitter implements ModelFitter<LinePolar2D_F32,Edgel> {
 			float dx = b.x - a.x;
 			float dy = b.y - a.y;
 
-			double lineAngle = UtilAngle.toHalfCircle(Math.atan2(dy,dx));
+			// the gradient's orientation is perpendicular to the line's slope
+			double lineAngle = UtilAngle.atanSafe(-dx, dy);
 
 			// see if their orientations are aligned with the line's angle
 			if(UtilAngle.distHalf(lineAngle, a.theta) > angleTol || UtilAngle.distHalf(lineAngle, b.theta) > angleTol)

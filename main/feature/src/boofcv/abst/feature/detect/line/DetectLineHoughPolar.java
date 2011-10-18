@@ -156,7 +156,7 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 
 		double r = Math.sqrt(input.width*input.width + input.height*input.height);
 		float pruneDistTol =  (float)((localMaxRadius+1)*r/numBinsRange);
-		post.mergeSimilar(pruneAngleTol,pruneDistTol,input.width,input.height);
+		post.pruneSimilar(pruneAngleTol, pruneDistTol, input.width, input.height);
 		post.pruneNBest(maxLines);
 
 		return post.createList();

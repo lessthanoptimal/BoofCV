@@ -157,7 +157,7 @@ public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBas
 		// function uses a constant value for range accuracy.  A custom algorithm should really
 		// be used here.
 		// NOTE: Thresholds should not be hardcoded...
-		post.mergeSimilar((float)(Math.PI*0.04),10,input.width,input.height);
+		post.pruneSimilar((float) (Math.PI * 0.04), 10, input.width, input.height);
 		post.pruneNBest(maxLines);
 
 		return post.createList();

@@ -103,8 +103,10 @@ public class VisualizeLineRansac<I extends ImageBase , D extends ImageBase> {
 //		connect.process(gridLine);
 //		LineImageOps.pruneClutteredGrids(gridLine,3);
 		List<LineSegment2D_F32> found = gridLine.createSingleList();
-//		LineImageOps.mergeSimilar(found,(float)(Math.PI*0.05),2f);
+		System.out.println("size = "+found.size());
+		LineImageOps.mergeSimilar(found,(float)(Math.PI*0.03),5f);
 //		LineImageOps.pruneSmall(found,40);
+		System.out.println("after size = "+found.size());
 
 		ImageLinePanel gui = new ImageLinePanel();
 		gui.setBackground(image);
@@ -123,7 +125,7 @@ public class VisualizeLineRansac<I extends ImageBase , D extends ImageBase> {
 
 //		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
 //		app.process(UtilImageIO.loadImage("data/shapes01.png"));
-//		app.process(UtilImageIO.loadImage("data/lines_indoors.jpg"));
-		app.process(UtilImageIO.loadImage("data/outdoors01.jpg"));
+		app.process(UtilImageIO.loadImage("data/lines_indoors.jpg"));
+//		app.process(UtilImageIO.loadImage("data/outdoors01.jpg"));
 	}
 }

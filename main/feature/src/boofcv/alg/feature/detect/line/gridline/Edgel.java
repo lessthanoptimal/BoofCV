@@ -30,4 +30,12 @@ public class Edgel extends Point2D_F32 {
 	// orientation of the edge
 	// half circle from -pi to pi
 	public float theta;
+
+	public Edgel(float x, float y, float theta) {
+		super(x, y);
+		this.theta = theta;
+	}
+
+	public Edgel() {
+	}
 }

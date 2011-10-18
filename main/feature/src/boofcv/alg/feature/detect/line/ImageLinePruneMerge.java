@@ -90,7 +90,7 @@ public class ImageLinePruneMerge {
 		});
 	}
 
-	public void mergeSimilar( float toleranceAngle , float toleranceDist , int imgWidth , int imgHeight) {
+	public void pruneSimilar(float toleranceAngle, float toleranceDist, int imgWidth, int imgHeight) {
 		sortByIntensity();
 
 		float theta[] = new float[ lines.size() ];
@@ -103,11 +103,11 @@ public class ImageLinePruneMerge {
 			segments.add( LineImageOps.convert(l, imgWidth, imgHeight));
 		}
 
-		for( int i = segments.size()-1; i >= 0; i-- ) {
+		for( int i = 0; i < segments.size(); i++ ) {
 			LineSegment2D_F32 a = segments.get(i);
 			if( a == null ) continue;
 
-			for( int j = i-1; j >= 0; j-- ) {
+			for( int j = i+1; j < segments.size(); j++) {
 				LineSegment2D_F32 b = segments.get(j);
 
 				if( b == null )
