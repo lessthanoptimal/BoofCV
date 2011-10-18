@@ -51,9 +51,9 @@ void process( Mat image , FILE *fid , FILE *output)
     Mat descriptors;
     extractor.compute( image, ipts, descriptors );
 
-    printf("descriptors shape: rows = %d cols = %d\n",descriptors.rows,descriptors.cols);
-    printf("dims = %d  type = %d  channels = %d\n",descriptors.dims,descriptors.type(),descriptors.channels());
-    printf("CV_64FC1 %d  CV_32FC1 %d\n",CV_64FC1,CV_32FC1);
+//    printf("descriptors shape: rows = %d cols = %d\n",descriptors.rows,descriptors.cols);
+//    printf("dims = %d  type = %d  channels = %d\n",descriptors.dims,descriptors.type(),descriptors.channels());
+//    printf("CV_64FC1 %d  CV_32FC1 %d\n",CV_64FC1,CV_32FC1);
 
     // output the description
     fprintf(output,"64\n");

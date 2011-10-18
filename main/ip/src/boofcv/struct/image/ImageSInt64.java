@@ -40,9 +40,19 @@ public class ImageSInt64 extends ImageBase<ImageSInt64> {
 		super(width, height);
 	}
 
+	/**
+	 * Creates an image with no data declared and the width/height set to zero.
+	 */
 	public ImageSInt64() {
 	}
 
+	/**
+	 * Returns the value of the specified pixel.
+	 *
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
+	 * @return Pixel intensity value.
+	 */
 	public long get(int x, int y) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");

@@ -39,6 +39,9 @@ public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 		super(width, height);
 	}
 
+	/**
+	 * Creates an image with no data declared and the width/height set to zero.
+	 */
 	public ImageFloat64() {
 	}
 
@@ -47,7 +50,7 @@ public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 	 *
 	 * @param x pixel coordinate.
 	 * @param y pixel coordinate.
-	 * @return an intensity value.
+	 * @return Pixel intensity value.
 	 */
 	public double get(int x, int y) {
 		if (!isInBounds(x, y))

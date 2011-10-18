@@ -82,16 +82,4 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageBase<T>{
 	public ImageTypeInfo<T> getTypeInfo() {
 		return (ImageTypeInfo<T>)ImageTypeInfo.I;
 	}
-
-	public void printBinary() {
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				if (get(x, y) == 0)
-					System.out.print("0");
-				else
-					System.out.print("1");
-			}
-			System.out.println();
-		}
-	}
 }

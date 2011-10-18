@@ -210,7 +210,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 		if( selectedVisualize instanceof ImageUInt8)
 			VisualizeBinaryData.renderBinary((ImageUInt8) selectedVisualize, work);
 		else
-			VisualizeBinaryData.renderLabeled((ImageSInt32) selectedVisualize, work, colors);
+			VisualizeBinaryData.renderLabeled((ImageSInt32) selectedVisualize, colors, work);
 	}
 
 	@Override

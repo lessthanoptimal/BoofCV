@@ -40,6 +40,9 @@ public class ImageSInt32 extends ImageInteger<ImageSInt32> {
 		super(width, height);
 	}
 
+	/**
+	 * Creates an image with no data declared and the width/height set to zero.
+	 */
 	public ImageSInt32() {
 	}
 
