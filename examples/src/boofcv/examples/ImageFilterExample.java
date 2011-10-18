@@ -50,14 +50,16 @@ import java.awt.image.BufferedImage;
 @SuppressWarnings({"unchecked"})
 public class ImageFilterExample {
 
+	private static int blurRadius = 10;
+
 	public static void procedural( ImageUInt8 input )
 	{
 		ImageUInt8 blurred = new ImageUInt8(input.width,input.height);
 		ImageSInt16 derivX = new ImageSInt16(input.width,input.height);
 		ImageSInt16 derivY = new ImageSInt16(input.width,input.height);
 
-		// Gaussian blur: Convolve a Gaussian kernel with a width of 5 pixels
-		BlurImageOps.gaussian(input,blurred,-1,2,null);
+		// Gaussian blur: Convolve a Gaussian kernel
+		BlurImageOps.gaussian(input,blurred,-1,blurRadius,null);
 
 		// Calculate image's derivative
 		GradientSobel.process(blurred, derivX, derivY, FactoryImageBorder.extend(input));
@@ -77,8 +79,8 @@ public class ImageFilterExample {
 		D derivX = GeneralizedImageOps.createImage(derivType,input.width, input.height);
 		D derivY = GeneralizedImageOps.createImage(derivType,input.width, input.height);
 
-		// Gaussian blur: Convolve a Gaussian kernel with a width of 5 pixels
-		GBlurImageOps.gaussian(input, blurred, -1, 2, null);
+		// Gaussian blur: Convolve a Gaussian kernel
+		GBlurImageOps.gaussian(input, blurred, -1, blurRadius, null);
 
 		// Calculate image's derivative
 		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
@@ -99,7 +101,7 @@ public class ImageFilterExample {
 		D derivY = GeneralizedImageOps.createImage(derivType, input.width, input.height);
 
 		// declare image filters
-		BlurFilter<T> filterBlur = FactoryBlurFilter.gaussian(inputType, -1, 2);
+		BlurFilter<T> filterBlur = FactoryBlurFilter.gaussian(inputType, -1, blurRadius);
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(inputType, derivType);
 
 		// process the image
@@ -120,8 +122,8 @@ public class ImageFilterExample {
 		ImageBase derivX = GeneralizedImageOps.createImage(derivType,input.width, input.height);
 		ImageBase derivY = GeneralizedImageOps.createImage(derivType,input.width, input.height);
 
-		// Gaussian blur: Convolve a Gaussian kernel with a width of 5 pixels
-		GBlurImageOps.gaussian(input, blurred, -1, 2, null);
+		// Gaussian blur: Convolve a Gaussian kernel
+		GBlurImageOps.gaussian(input, blurred, -1, blurRadius, null);
 
 		// Calculate image's derivative
 		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
@@ -133,7 +135,7 @@ public class ImageFilterExample {
 
 	public static void main( String args[] ) {
 
-		BufferedImage image = UtilImageIO.loadImage("../evaluation/data/outdoors01.jpg");
+		BufferedImage image = UtilImageIO.loadImage("../evaluation/data/standard/lena512.bmp");
 
 		// produces the same results
 		procedural(ConvertBufferedImage.convertFrom(image,null,ImageUInt8.class));
