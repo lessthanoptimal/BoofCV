@@ -24,13 +24,14 @@ import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
 public class VisualizeBinaryData {
 
-	public static BufferedImage renderLabeled( ImageSInt32 labelImage , BufferedImage out , int colors[] ) {
+	public static BufferedImage renderLabeled(ImageSInt32 labelImage, int colors[], BufferedImage out) {
 
 		if( out == null ) {
 			out = new BufferedImage(labelImage.getWidth(),labelImage.getHeight(),BufferedImage.TYPE_INT_RGB);
@@ -46,6 +47,19 @@ public class VisualizeBinaryData {
 			_renderLabeled(labelImage, out, colors);
 		}
 		return out;
+	}
+
+	public static BufferedImage renderLabeled(ImageSInt32 labelImage, int numColors, BufferedImage out) {
+
+		int colors[] = new int[numColors+1];
+
+		Random rand = new Random(123);
+		for( int i = 0; i < colors.length; i++ ) {
+			colors[i] = rand.nextInt();
+		}
+		colors[0] = 0;
+
+		return renderLabeled(labelImage, colors, out);
 	}
 
 	private static void _renderLabeled(ImageSInt32 labelImage, BufferedImage out, int[] colors) {
