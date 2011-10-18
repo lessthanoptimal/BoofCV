@@ -55,7 +55,7 @@ public class ImageBinaryLabeledPanel extends JPanel implements MouseListener {
 		Random rand = new Random(randSeed);
 
 		colors = BinaryImageOps.selectRandomColors(maxValues,rand);
-		VisualizeBinaryData.renderLabeled(labelImage,img,colors);
+		VisualizeBinaryData.renderLabeled(labelImage, colors, img);
 	}
 
 	protected ImageBinaryLabeledPanel() {
