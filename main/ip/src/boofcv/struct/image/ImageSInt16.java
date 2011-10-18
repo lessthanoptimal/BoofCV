@@ -37,6 +37,9 @@ public class ImageSInt16 extends ImageInt16<ImageSInt16> {
 		super(width, height);
 	}
 
+	/**
+	 * Creates an image with no data declared and the width/height set to zero.
+	 */
 	public ImageSInt16() {
 	}
 

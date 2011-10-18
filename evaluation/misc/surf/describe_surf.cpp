@@ -25,9 +25,9 @@ void process( Image *image , FILE *fid , FILE *output)
     // read in location of points
     while( true ) {
         int x,y;
-        float scale;
-        int ret = fscanf(fid,"%d %d %f\n",&x,&y,&scale);
-        if( ret != 3 )
+        float scale,yaw;
+        int ret = fscanf(fid,"%d %d %f %f\n",&x,&y,&scale,&yaw);
+        if( ret != 4 )
             break;
         Ipoint p;
         p.x = x;
@@ -59,7 +59,7 @@ void process( Image *image , FILE *fid , FILE *output)
         // make the SURF descriptor
         des.makeDescriptor();
 
-        fprintf(output,"%d %d",(int)p.x,(int)p.y);
+        fprintf(output,"%d %d %f",(int)p.x,(int)p.y,(float)p.ori);
         for( int i = 0; i < length; i++ ) {
             fprintf(output," %0.10f",p.ivec[i]);
         }

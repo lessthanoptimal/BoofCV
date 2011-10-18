@@ -39,6 +39,9 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 		super(width, height);
 	}
 
+	/**
+	 * Creates an image with no data declared and the width/height set to zero.
+	 */
 	public ImageFloat32() {
 	}
 
@@ -47,7 +50,7 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 	 *
 	 * @param x pixel coordinate.
 	 * @param y pixel coordinate.
-	 * @return an intensity value.
+	 * @return Pixel intensity value.
 	 */
 	public float get(int x, int y) {
 		if (!isInBounds(x, y))

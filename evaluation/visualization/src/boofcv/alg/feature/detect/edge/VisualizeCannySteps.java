@@ -87,7 +87,7 @@ public class VisualizeCannySteps {
 		}
 
 		BufferedImage renderedOrientation = VisualizeEdgeFeatures.renderOrientation4(direction,suppressed,threshLow,null);
-		BufferedImage renderedLabel = VisualizeBinaryData.renderLabeled(labeled,null,colors);
+		BufferedImage renderedLabel = VisualizeBinaryData.renderLabeled(labeled, colors, null);
 
 		ShowImages.showWindow(intensity,"Raw Intensity",true);
 		ShowImages.showWindow(suppressed,"Suppressed Intensity",true);
