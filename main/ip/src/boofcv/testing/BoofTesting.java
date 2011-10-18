@@ -311,7 +311,6 @@ public class BoofTesting {
 		try {
 			Method om = owner.getClass().getMethod(ownerMethod,Method.class);
 
-
 			for( Method m : list ) {
 				if( !m.getName().equals(targetMethod))
 					continue;

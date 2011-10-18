@@ -19,8 +19,10 @@
 package boofcv.benchmark.feature.homography;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.feature.orientation.OrientationImage;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -43,6 +45,8 @@ public class CreateDetectionFile<T extends ImageBase> {
 
 	// algorithm that detects the features
 	InterestPointDetector<T> alg;
+	// estimates the orientation of the region
+	OrientationImage<T> orientation;
 	// type of input image
 	Class<T> imageType;
 	// name of the detector
@@ -55,8 +59,10 @@ public class CreateDetectionFile<T extends ImageBase> {
 	 * @param imageType Primitive of input image that is processed.
 	 * @param detectorName Name of the detector.  Put into output file name.
 	 */
-	public CreateDetectionFile(InterestPointDetector<T> alg, Class<T> imageType, String detectorName) {
+	public CreateDetectionFile(InterestPointDetector<T> alg, OrientationImage<T> orientation,
+							   Class<T> imageType, String detectorName) {
 		this.alg = alg;
+		this.orientation = orientation;
 		this.imageType = imageType;
 		this.detectorName = detectorName;
 	}
@@ -104,6 +110,7 @@ public class CreateDetectionFile<T extends ImageBase> {
 		T image = ConvertBufferedImage.convertFrom(input,null,imageType);
 
 		alg.detect(image);
+		orientation.setImage(image);
 
 		FileOutputStream fos = new FileOutputStream(outputName);
 		PrintStream out = new PrintStream(fos);
@@ -111,7 +118,9 @@ public class CreateDetectionFile<T extends ImageBase> {
 		for( int i = 0; i < alg.getNumberOfFeatures(); i++ ) {
 			Point2D_I32 pt = alg.getLocation(i);
 			double scale = alg.getScale(i);
-			out.printf("%d %d %.5f\n",pt.getX(),pt.getY(),scale);
+			orientation.setScale(scale);
+			double yaw = orientation.compute(pt.getX(),pt.getY());
+			out.printf("%d %d %.5f %.5f\n",pt.getX(),pt.getY(),scale,yaw);
 		}
 		out.close();
 	}
@@ -119,7 +128,9 @@ public class CreateDetectionFile<T extends ImageBase> {
 	public static <T extends ImageBase>
 	void doStuff( String directory , String suffix , Class<T> imageType ) throws FileNotFoundException {
 		InterestPointDetector<T> alg = FactoryInterestPoint.fromFastHessian(-1,9,4,4);
-		CreateDetectionFile<T> cdf = new CreateDetectionFile<T>(alg,imageType,"FH");
+		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(14,imageType);
+
+		CreateDetectionFile<T> cdf = new CreateDetectionFile<T>(alg,orientation,imageType,"FH");
 		cdf.directory(directory,suffix);
 	}
 
