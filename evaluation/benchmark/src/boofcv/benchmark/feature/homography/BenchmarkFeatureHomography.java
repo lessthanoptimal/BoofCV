@@ -58,6 +58,7 @@ public class BenchmarkFeatureHomography {
 									  String directory,
 									  String imageSuffix ,
 									  double tolerance) {
+		System.out.println("Directory: "+directory);
 		this.assoc = assoc;
 		this.directory = directory;
 		this.tolerance = tolerance;
@@ -199,17 +200,18 @@ public class BenchmarkFeatureHomography {
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, Double.MAX_VALUE, -1, true);
 
-		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/graf/",".png",tolerance);
+		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/boat/",".png",tolerance);
 
 //		app.evaluate("SURF.txt");
-		app.evaluate("SAMPLE.txt");
+//		app.evaluate("SAMPLE.txt");
 //		app.evaluate("SAMPLEZ.txt");
 //		app.evaluate("SAMPLEDIFF.txt");
 //		app.evaluate("NEW.txt");
 		app.evaluate("OpenSURF.txt");
+		app.evaluate("OpenCV_SURF.txt");
 //		app.evaluate("BRIEFO.txt");
 //		app.evaluate("BRIEF.txt");
-//		app.evaluate("BoofCV_SURF.txt");
+		app.evaluate("BoofCV_SURF.txt");
 //		app.evaluate("NEW2.txt");
 	}
 }
