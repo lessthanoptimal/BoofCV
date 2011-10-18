@@ -85,9 +85,9 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
-		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config));
-		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 50, imageType));
-		addAlgorithm(0,"SURF", FactoryPointSequentialTracker.surf(300,200,2,imageType));
+		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
+		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 300, imageType));
+		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.surf(300,200,2,imageType));
 
 		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
 		DistanceAffine2DSq distance = new DistanceAffine2DSq();

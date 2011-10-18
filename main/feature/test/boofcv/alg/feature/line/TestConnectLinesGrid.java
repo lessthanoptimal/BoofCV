@@ -40,6 +40,26 @@ public class TestConnectLinesGrid {
 	}
 
 	/**
+	 * Orientation of two lines should be compared using the half circle angle.
+	 *
+	 * The test is designed to test that both angles are computed using atan() and compared
+	 * between 0 and 180 degrees
+	 */
+	@Test
+	public void checkHalfCircleAngle() {
+		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<LineSegment2D_F32>(1,1);
+
+		grid.get(0,0).add(new LineSegment2D_F32(0,0,0,2));
+		grid.get(0,0).add(new LineSegment2D_F32(0,0,0.001f,-2));
+
+		ConnectLinesGrid app = new ConnectLinesGrid(0.1,1,1);
+		app.process(grid);
+
+		List<LineSegment2D_F32> list = grid.createSingleList();
+		assertEquals(1, list.size());
+	}
+
+	/**
 	 * Very basic check to see if lines are connected between regions.
 	 */
 	@Test
@@ -55,6 +75,9 @@ public class TestConnectLinesGrid {
 		checkConnectNeighbor(0,1);
 	}
 
+	/**
+	 * Makes sure the angle tolerance parameter is correctly set and processed
+	 */
 	@Test
 	public void checkAngleTolerance() {
 		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<LineSegment2D_F32>(1,1);
@@ -74,6 +97,9 @@ public class TestConnectLinesGrid {
 
 	}
 
+	/**
+	 * Makes sure the tangent distance tolerance parameter is correctly set and processed
+	 */
 	@Test
 	public void checkTangentTolerance() {
 		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<LineSegment2D_F32>(1,1);
@@ -92,6 +118,9 @@ public class TestConnectLinesGrid {
 		assertEquals(1,grid.createSingleList().size());
 	}
 
+	/**
+	 * Makes sure the parallel distance tolerance parameter is correctly set and processed
+	 */
 	@Test
 	public void checkParallelTolerance() {
 		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<LineSegment2D_F32>(1,1);

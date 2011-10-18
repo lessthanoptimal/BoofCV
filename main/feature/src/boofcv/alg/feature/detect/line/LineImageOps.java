@@ -155,29 +155,38 @@ public class LineImageOps {
 
 	public static void mergeSimilar( List<LineSegment2D_F32> lines , float thresholdAngle , float thresholdDist )
 	{
-		Point2D_F32 p = new Point2D_F32();
 		for( int i = 0; i < lines.size(); i++ ) {
 			LineSegment2D_F32 a = lines.get(i);
 			double thetaA = UtilAngle.atanSafe(a.slopeY(),a.slopeX());
 
-			for( int j = i+1; j < lines.size(); j++ ) {
-				LineSegment2D_F32 b = lines.get(j);
-				double thetaB = UtilAngle.atanSafe(b.slopeY(),b.slopeX());
+			// finds the best match and merges
+			// could speed up by just picking the first match, but results would depend on input order
+			while( true ) {
+				int indexBest = -1;
+				double distanceBest = thresholdDist;
+				for( int j = i+1; j < lines.size(); j++ ) {
+					LineSegment2D_F32 b = lines.get(j);
+					double thetaB = UtilAngle.atanSafe(b.slopeY(),b.slopeX());
 
-				// see if they are nearly parallel
-				if( UtilAngle.distHalf(thetaA,thetaB) > thresholdAngle )
-					continue;
+					// see if they are nearly parallel
+					if( UtilAngle.distHalf(thetaA,thetaB) > thresholdAngle )
+						continue;
 
-				if( !(Distance2D_F32.distance(a,b.a) < thresholdDist || Distance2D_F32.distance(a,b.b) < thresholdDist) )
-					continue;
+					float distA = Distance2D_F32.distance(a,b.a);
+					float distB = Distance2D_F32.distance(a,b.b);
+					float dist = Math.min(distA,distB);
 
-				// if they don't intersect let it be
-//				if( Intersection2D_F32.intersection(a, b, p) == null )
-//					continue;
-
-				mergeIntoA(a,b);
-				lines.remove(j);
-				j--;// counteract the ++
+					if( dist < distanceBest ) {
+						distanceBest = dist;
+						indexBest = j;
+					}
+				}
+				if( indexBest != -1 ) {
+					mergeIntoA(a,lines.remove(indexBest));
+					thetaA = UtilAngle.atanSafe(a.slopeY(),a.slopeX());
+				} else {
+					break;
+				}
 			}
 		}
 	}

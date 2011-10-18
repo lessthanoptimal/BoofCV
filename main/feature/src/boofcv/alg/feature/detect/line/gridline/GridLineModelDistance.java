@@ -53,7 +53,7 @@ public class GridLineModelDistance implements DistanceFromModel<LinePolar2D_F32,
 
 	@Override
 	public double computeDistance(Edgel pt) {
-		if(UtilAngle.dist(pt.theta,theta) > angleTolerance )
+		if(UtilAngle.distHalf(pt.theta, theta) > angleTolerance )
 			return Double.MAX_VALUE;
 
 		return Distance2D_F32.distance(line,pt);

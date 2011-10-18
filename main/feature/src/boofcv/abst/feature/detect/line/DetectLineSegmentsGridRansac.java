@@ -23,6 +23,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.ConnectLinesGrid;
 import boofcv.alg.feature.detect.line.GridRansacLineDetector;
+import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.MatrixOfList;
@@ -86,6 +87,9 @@ public class DetectLineSegmentsGridRansac<T extends ImageBase, D extends ImageBa
 			connect.process(grid);
 		}
 
-		return grid.createSingleList();
+		List<LineSegment2D_F32> found = grid.createSingleList();
+		LineImageOps.mergeSimilar(found, (float) (Math.PI * 0.03), 5f);
+
+		return found;
 	}
 }

@@ -32,4 +32,12 @@ public class TestGridRansacLineDetector {
 	public void convertToLineSegment() {
 		fail("implement");
 	}
+
+	/**
+	 * Makes sure angles of edgles are computed using half-angles
+	 */
+	@Test
+	public void checkHalfCircleEdgle() {
+		fail("implement");
+	}
 }
