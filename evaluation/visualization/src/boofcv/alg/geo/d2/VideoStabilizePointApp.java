@@ -26,6 +26,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.VideoProcessAppBase;
+import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoListManager;
@@ -34,9 +35,11 @@ import boofcv.numerics.fitting.modelset.distance.StatisticalDistance;
 import boofcv.numerics.fitting.modelset.distance.StatisticalDistanceModelMatcher;
 import boofcv.numerics.fitting.modelset.lmeds.LeastMedianOfSquares;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
+import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,12 +50,6 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-// todo add control panel
-// show feature locations
-// number of frame changes
-// frame period
-
-	
 public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		extends VideoProcessAppBase<I,D> implements ProcessInput
 {
@@ -69,9 +66,13 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 
 	PointImageStabilization<I> stabilizer;
 
+	StabilizationInfoPanel infoPanel;
 	DisplayPanel gui = new DisplayPanel();
 
 	BufferedImage workImage;
+
+	// number of times the keyframe has been set
+	int totalKeyFrames = 0;
 
 	public VideoStabilizePointApp( Class<I> imageType , Class<D> derivType ) {
 		super(2);
@@ -86,7 +87,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
-		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 300, imageType));
+		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 20, imageType));
 		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.surf(300,200,2,imageType));
 
 		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
@@ -108,7 +109,11 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 				new StatisticalDistanceModelMatcher<Affine2D_F64,AssociatedPair>(25,0.001,0.001,1.2,
 				numSample, StatisticalDistance.PERCENTILE,0.9,modelFitter,distance,codec));
 
+		infoPanel = new StabilizationInfoPanel();
+		infoPanel.setMaximumSize(infoPanel.getPreferredSize());
 		gui.addMouseListener(this);
+
+		add(infoPanel, BorderLayout.WEST);
 		setMainGUI(gui);
 	}
 
@@ -156,6 +161,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 	private void startEverything() {
 		stabilizer = new PointImageStabilization<I>(
 				imageType,tracker,modelMatcher,thresholdChange,thresholdReset,thresholdDistance);
+		totalKeyFrames = 0;
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -171,7 +177,8 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 	{
 		BufferedImage orig;
 		BufferedImage stabilized;
-		double trackerFPS;
+
+		FastQueue<Point2D_F64> features = new FastQueue<Point2D_F64>(300,Point2D_F64.class,true);
 
 		public void setImages( BufferedImage orig , BufferedImage stabilized )
 		{
@@ -179,12 +186,18 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 			this.stabilized = stabilized;
 		}
 
-		public void setTrackerFPS(double trackerFPS) {
-			this.trackerFPS = trackerFPS;
+		public synchronized void setInliers(java.util.List<AssociatedPair> list) {
+			features.reset();
+
+			if( list != null ) {
+				for( AssociatedPair p : list ) {
+					features.pop().set(p.currLoc.x,p.currLoc.y);
+				}
+			}
 		}
 
 		@Override
-		public void paintComponent(Graphics g) {
+		public synchronized void paintComponent(Graphics g) {
 			super.paintComponent(g);
 
 			if( orig == null || stabilized == null )
@@ -211,10 +224,10 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 			// draw stabilized on right
 			g2.drawImage(stabilized,scaledWidth+10,0,scaledWidth*2+10,scaledHeight,0,0,orig.getWidth(),orig.getHeight(),null);
 
-			g2.setColor(Color.WHITE);
-			g2.fillRect(5,15,140,20);
-			g2.setColor(Color.BLACK);
-			g2.drawString(String.format("Stabilize FPS: %3.1f",trackerFPS),10,30);
+			for( int i = 0; i < features.size(); i++ ) {
+				Point2D_F64 p = features.get(i);
+				VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,Color.BLUE);
+			}
 		}
 	}
 
@@ -224,12 +237,32 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 	}
 
 	@Override
-	protected void updateAlgGUI(I frame, BufferedImage imageGUI, double fps) {
+	protected void updateAlgGUI(I frame, BufferedImage imageGUI, final double fps) {
 		I stabilizedImage = stabilizer.getStabilizedImage();
 		ConvertBufferedImage.convertTo(stabilizedImage,workImage);
-		gui.setTrackerFPS(fps);
+
+		final int numAssociated = stabilizer.getInlierFeatures().size();
+		final int numFeatures = stabilizer.getTracker().getActiveTracks().size();
+		if( stabilizer.isKeyFrame() )
+			totalKeyFrames++;
+
+		if( infoPanel.getShowFeatures() )
+			gui.setInliers(stabilizer.getInlierFeatures());
+		else
+			gui.setInliers(null);
+
+		if( infoPanel.resetRequested() ) {
+			doRefreshAll();
+		}
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				infoPanel.setFPS(fps);
+				infoPanel.setNumInliers(numAssociated);
+				infoPanel.setNumTracks(numFeatures);
+				infoPanel.setKeyFrames(totalKeyFrames);
+				infoPanel.repaint();
+
 				gui.setImages(sequence.getGuiImage(),workImage);
 				gui.repaint();
 			}});

@@ -35,6 +35,14 @@ public class StandardAlgConfigPanel extends JPanel {
 
 	}
 
+	public void addAlignLeft( JComponent target, JPanel owner ) {
+		JPanel p = new JPanel();
+		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
+		p.add(target);
+		p.add(Box.createHorizontalGlue());
+		owner.add(p);
+	}
+
 	protected void addCenterLabel( String text , JPanel owner ) {
 		JLabel l = new JLabel(text);
 		l.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -42,10 +50,10 @@ public class StandardAlgConfigPanel extends JPanel {
 		owner.add(Box.createRigidArea(new Dimension(1,8)));
 	}
 
-	protected void addSeparator() {
+	protected void addSeparator(int width) {
 		add(Box.createRigidArea(new Dimension(1,8)));
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-		separator.setMaximumSize(new Dimension(200,5));
+		separator.setMaximumSize(new Dimension(width,5));
 		add(separator);
 		add(Box.createRigidArea(new Dimension(1,8)));
 	}

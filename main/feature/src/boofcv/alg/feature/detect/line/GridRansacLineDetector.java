@@ -91,7 +91,6 @@ public class GridRansacLineDetector {
 		this.robustMatcher = robustMatcher;
 	}
 
-
 	/**
 	 * Detects line segments through the image inside of grids.
 	 *
@@ -103,20 +102,20 @@ public class GridRansacLineDetector {
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,binaryEdges);
 
-		int regionRadius = regionSize/2;
-		int w = derivX.width-2*regionRadius;
-		int h = derivY.height-2*regionRadius;
+		int w = derivX.width-regionSize+1;
+		int h = derivY.height-regionSize+1;
 
 		foundLines.reshape(derivX.width / regionSize, derivX.height / regionSize);
 		foundLines.reset();
 
-		for( int y = regionRadius; y < h; y += regionSize) {
-			int gridY = (y-regionRadius)/regionSize;
+		// avoid partial regions/other image edge conditions by being at least the region's radius away
+		for( int y = 0; y < h; y += regionSize) {
+			int gridY = y/regionSize;
 			// index of the top left pixel in the region being considered
 			// possible over optimization
-			int index = binaryEdges.startIndex + y*binaryEdges.stride + regionRadius;
-			for( int x = regionRadius; x < w; x+= regionSize , index += regionSize) {
-				int gridX = (x-regionRadius)/regionSize;
+			int index = binaryEdges.startIndex + y*binaryEdges.stride;
+			for( int x = 0; x < w; x+= regionSize , index += regionSize) {
+				int gridX = x/regionSize;
 				// detects edgels inside the region
 				detectEdgels(index,x,y,derivX,derivY,binaryEdges);
 
