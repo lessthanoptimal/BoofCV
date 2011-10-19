@@ -29,8 +29,35 @@ package boofcv.struct.feature;
 // todo          HoughTransformLinePolar
 public class CachedSineCosine_F32 {
 
-	float c[];
-	float s[];
+	// minimum angle in the table
+	float minAngle;
+	// Maximum angle in the table
+	float maxAngle;
+	// radians between each step
+	float delta;
 
+	// cosine table
+	public float c[];
+	// sine table
+	public float s[];
+
+	public CachedSineCosine_F32( float minAngle, float maxAngle, int size )  {
+		this.minAngle = minAngle;
+		this.maxAngle = maxAngle;
+		this.delta = (maxAngle - minAngle)/(size-1);
+
+		c = new float[size];
+		s = new float[size];
+
+		for( int i = 0; i < size; i++ ) {
+			float angle = (maxAngle - minAngle)*i/(size-1) + minAngle;
+			c[i] = (float)Math.cos(angle);
+			s[i] = (float)Math.sin(angle);
+		}
+	}
+
+	public int computeIndex( float angle ) {
+		return (int)((angle- minAngle)/delta);
+	}
 
 }

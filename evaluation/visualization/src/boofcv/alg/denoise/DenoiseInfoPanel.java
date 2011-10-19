@@ -100,15 +100,15 @@ public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeLi
 
 		addLabeled(images,"View",this);
 		addLabeled(noiseLevel,"Noise",this);
-		addSeparator();
+		addSeparator(200);
 		addCenterLabel("Denoised",this);
 		addLabeled(algError,"Error",this);
 		addLabeled(algErrorEdge,"Edge Error",this);
-		addSeparator();
+		addSeparator(200);
 		addCenterLabel("Noise Image",this);
 		addLabeled(noiseError,"Error",this);
 		addLabeled(noiseErrorEdge,"Edge Error",this);
-		addSeparator();
+		addSeparator(200);
 		add(configHolder);
 		add(Box.createVerticalGlue());
 	}

@@ -20,10 +20,10 @@ package boofcv.alg.feature.line;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.FastQueue;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 import georegression.struct.line.LineParametric2D_F32;
 import org.junit.Test;
 
@@ -37,25 +37,30 @@ public class TestHoughTransformLineFootOfNorm {
 	int width = 30;
 	int height = 40;
 
-	// todo support other image types
 	/**
 	 * See if it can detect an obvious line in the image
 	 */
 	@Test
 	public void obviousLines() {
-		ImageUInt8 image = new ImageUInt8(width,height);
-		ImageFloat32 derivX = new ImageFloat32(width,height);
-		ImageFloat32 derivY = new ImageFloat32(width,height);
+		obviousLines(ImageFloat32.class);
+		obviousLines(ImageSInt16.class);
+		obviousLines(ImageSInt32.class);
+	}
+
+	private <D extends ImageBase> void obviousLines( Class<D> derivType ) {
+		ImageUInt8 binary = new ImageUInt8(width,height);
+		D derivX = GeneralizedImageOps.createImage(derivType,width, height);
+		D derivY = GeneralizedImageOps.createImage(derivType,width, height);
 
 		for( int i = 0; i < height; i++ ) {
-			image.set(5,i,1);
-			derivX.set(5,i,20);
+			binary.set(5, i, 1);
+			GeneralizedImageOps.set(derivX,5,i,20);
 		}
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(4, 2, 0, true, true);
 		HoughTransformLineFootOfNorm alg = new HoughTransformLineFootOfNorm(extractor,2);
 
-		alg.transform(derivX,derivY,image);
+		alg.transform(derivX,derivY,binary);
 
 		FastQueue<LineParametric2D_F32> lines =  alg.extractLines();
 

@@ -27,6 +27,7 @@ import georegression.struct.line.LineParametric2D_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -55,11 +56,13 @@ public class TestHoughTransformLinePolar {
 
 		FastQueue<LineParametric2D_F32> lines =  alg.extractLines();
 
-		assertEquals(1,lines.size());
+		assertTrue(lines.size() > 0);
 
-		LineParametric2D_F32 l = lines.get(0);
-		assertEquals(l.p.x,5,0.1);
-		assertEquals(Math.abs(l.slope.x),0,0);
-		assertEquals(Math.abs(l.slope.y),1,0.1);
+		for( int i = 0; i < lines.size(); i++ ) {
+			LineParametric2D_F32 l = lines.get(i);
+			assertEquals(l.p.x,5,0.1);
+			assertEquals(Math.abs(l.slope.x),0,1e-4);
+			assertEquals(Math.abs(l.slope.y),1,0.1);
+		}
 	}
 }

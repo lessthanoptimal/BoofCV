@@ -89,10 +89,6 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		addAlgorithm(0, "Hess Lap SS",FactoryInterestPoint.fromFeatureLaplace(flss,scales,imageType));
 		FeatureLaplacePyramid<T,D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius,thresh,maxScaleFeatures,imageType,derivType);
 		addAlgorithm(0, "Hess Lap P",FactoryInterestPoint.fromFeatureLaplace(flp,scales,imageType));
-		FeatureScaleSpace<T,D> fss = FactoryInterestPointAlgs.hessianScaleSpace(radius,thresh,maxScaleFeatures,imageType,derivType);
-		addAlgorithm(0, "Hessian SS",FactoryInterestPoint.fromFeature(fss,scales,imageType));
-		FeaturePyramid<T,D> fp = FactoryInterestPointAlgs.hessianPyramid(radius,thresh,maxScaleFeatures,imageType,derivType);
-		addAlgorithm(0, "Hessian P",FactoryInterestPoint.fromFeature(fp,scales,imageType));
 		addAlgorithm(0, "FastHessian",FactoryInterestPoint.<T>fromFastHessian(maxScaleFeatures,9,4,4));
 
 		panel = new ImagePanel();

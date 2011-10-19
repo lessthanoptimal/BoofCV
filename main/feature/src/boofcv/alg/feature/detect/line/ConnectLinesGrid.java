@@ -213,7 +213,6 @@ public class ConnectLinesGrid {
 		int bestFarthest = 0;
 
 		float targetAngle = UtilAngle.atanSafe(target.slopeY(),target.slopeX());
-		// todo change to lookup table? make a class?
 		float cos = (float)Math.cos(targetAngle);
 		float sin = (float)Math.sin(targetAngle);
 

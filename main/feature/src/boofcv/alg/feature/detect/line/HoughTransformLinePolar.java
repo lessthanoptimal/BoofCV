@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.QueueCorner;
+import boofcv.struct.feature.CachedSineCosine_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
@@ -66,8 +67,7 @@ public class HoughTransformLinePolar {
 	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
 
 	// lookup tables for sine and cosine functions
-	double tableCosine[];
-	double tableSine[];
+	CachedSineCosine_F32 tableTrig;
 
 	/**
 	 * Specifies parameters of transform.  The minimum number of points specified in the extractor
@@ -83,15 +83,7 @@ public class HoughTransformLinePolar {
 		this.extractor = extractor;
 		transform.reshape(numBinsRange,numBinsAngle);
 
-		tableCosine = new double[numBinsAngle];
-		tableSine = new double[numBinsAngle];
-
-		// precompute angles from 0 to pi
-		for( int i = 0; i < numBinsAngle; i++ ) {
-			double theta = Math.PI*i/numBinsAngle;
-			tableCosine[i] = Math.cos(theta);
-			tableSine[i] = Math.sin(theta);
-		}
+		tableTrig = new CachedSineCosine_F32(0,(float)Math.PI,numBinsAngle);
 	}
 
 	/**
@@ -137,8 +129,8 @@ public class HoughTransformLinePolar {
 			Point2D_I16 p = foundLines.get(i);
 
 			float r = (float)(r_max*(p.x-w2)/w2);
-			float c = (float)tableCosine[p.y];
-			float s = (float)tableSine[p.y];
+			float c = tableTrig.c[p.y];
+			float s = tableTrig.s[p.y];
 
 			float x0 = r*c+originX;
 			float y0 = r*s+originY;
@@ -164,7 +156,7 @@ public class HoughTransformLinePolar {
 		int w2 = transform.width/2;
 
 		for( int i = 0; i < transform.height; i++ ) {
-			double p = x*tableCosine[i] + y*tableSine[i];
+			double p = x*tableTrig.c[i] + y*tableTrig.s[i];
 
 			int col = (int)Math.floor(p * w2 / r_max) + w2;
 			int index = transform.startIndex + i*transform.stride + col;
