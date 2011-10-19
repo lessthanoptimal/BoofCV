@@ -119,7 +119,7 @@ public class FactoryInterestPointAlgs {
 
 		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
-		return new FeaturePyramid<T,D>(detector,deriv,1);
+		return new FeaturePyramid<T,D>(detector,deriv,0);
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class FactoryInterestPointAlgs {
 
 		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
-		return new FeaturePyramid<T,D>(detector,deriv,1);
+		return new FeaturePyramid<T,D>(detector,deriv,0);
 	}
 
 	/**

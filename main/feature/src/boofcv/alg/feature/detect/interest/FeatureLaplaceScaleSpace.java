@@ -71,8 +71,7 @@ public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase>
 {
 
 	// generalized feature detector.  Used to find candidate features in each scale's image
-	private GeneralFeatureDetector<
-			T,D> detector;
+	private GeneralFeatureDetector<T,D> detector;
 	private float baseThreshold;
 	// feature intensity in the pyramid
 	protected T localSpace[];
@@ -84,7 +83,7 @@ public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase>
 	protected List<ScalePoint> foundPoints = new ArrayList<ScalePoint>();
 
 	// how much the feature intensity is scaled in each level
-	// varies depending on feature type
+	// varies depending on feature type, used to adjust detection threshold
 	protected double scalePower;
 
 	// Function used to compute the Laplacian at each scale point
@@ -201,9 +200,10 @@ public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase>
 		float scale1 = (float)ss.getScale(layerID);
 		float scale2 = (float)ss.getScale(layerID+1);
 
-		float ss0 = (float)Math.pow(scale0,scalePower);
-		float ss1 = (float)Math.pow(scale1,scalePower);
-		float ss2 = (float)Math.pow(scale2,scalePower);
+		// For laplacian its t^(2*gamma) where gamma = 3/4
+		float ss0 = (float)Math.pow(scale0, 2.0*0.75);
+		float ss1 = (float)Math.pow(scale1, 2.0*0.75);
+		float ss2 = (float)Math.pow(scale2, 2.0*0.75);
 
 		for( Point2D_I16 c : candidates ) {
 			sparseLaplace.setImage(image1);

@@ -34,8 +34,8 @@ import boofcv.struct.image.ImageUInt8;
  * @author Peter Abeles
  */
 public class GradientPrewitt {
-	public static Kernel2D_I32 kernelDerivX_I32 = new Kernel2D_I32(new int[]{-1,0,1,-1,0,1,-1,0,1},3);
-	public static Kernel2D_I32 kernelDerivY_I32 = new Kernel2D_I32(new int[]{-1,-1,-1,0,0,0,1,1,1},3);
+	public static Kernel2D_I32 kernelDerivX_I32 = new Kernel2D_I32(3, new int[]{-1,0,1,-1,0,1,-1,0,1});
+	public static Kernel2D_I32 kernelDerivY_I32 = new Kernel2D_I32(3, new int[]{-1,-1,-1,0,0,0,1,1,1});
 	public static Kernel2D_F32 kernelDerivX_F32 = new Kernel2D_F32(
 			3, new float[]{-1f,0,1f,-1f,0,1f,-1f,0,1f});
 	public static Kernel2D_F32 kernelDerivY_F32 = new Kernel2D_F32(

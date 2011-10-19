@@ -24,8 +24,6 @@ import boofcv.struct.gss.GaussianScaleSpace;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -34,7 +32,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class ScaleSpacePointPanel extends JPanel implements MouseListener {
+public class ScaleSpacePointPanel extends JPanel {
 
 	GaussianScaleSpace ss;
 	double radius;
@@ -49,7 +47,6 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 	public ScaleSpacePointPanel( GaussianScaleSpace ss , double radius) {
 		this.ss = ss;
 		this.radius = radius;
-		addMouseListener(this);
 	}
 
 	public void setBackground( BufferedImage background ) {
@@ -79,7 +76,7 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 		}
 	}
 
-	private synchronized void setLevel( int level ) {
+	public synchronized void setLevel( int level ) {
 //		System.out.println("level "+level);
 		if( level > 0 ) {
 			ss.setActiveScale(level-1);
@@ -136,25 +133,4 @@ public class ScaleSpacePointPanel extends JPanel implements MouseListener {
 		VisualizeFeatures.drawScalePoints((Graphics2D)g,points,radius);
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		int level = activeLevel + 1;
-		if( level > ss.getTotalScales() ) {
-			level = 0;
-		}
-		setLevel(level);
-		repaint();
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {}
-
-	@Override
-	public void mouseExited(MouseEvent e) {}
 }

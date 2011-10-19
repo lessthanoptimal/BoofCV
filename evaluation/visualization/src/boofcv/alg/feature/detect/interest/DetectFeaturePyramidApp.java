@@ -40,7 +40,7 @@ import java.awt.image.BufferedImage;
 public class DetectFeaturePyramidApp <T extends ImageBase, D extends ImageBase>
 		extends SelectAlgorithmImagePanel implements ProcessInput
 {
-	static int NUM_FEATURES = 400;
+	static int NUM_FEATURES = 100;
 	int r = 2;
 	ScaleSpacePyramid<T> ss;
 	Class<T> imageType;
@@ -51,12 +51,12 @@ public class DetectFeaturePyramidApp <T extends ImageBase, D extends ImageBase>
 		super(1);
 		this.imageType = imageType;
 
-		addAlgorithm(0, "Hessian Laplace",FactoryInterestPointAlgs.hessianLaplacePyramid(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm(0, "Harris Laplace",FactoryInterestPointAlgs.harrisLaplacePyramid(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Hessian Laplace",FactoryInterestPointAlgs.hessianLaplacePyramid(r,1f,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Harris Laplace",FactoryInterestPointAlgs.harrisLaplacePyramid(r,1f,NUM_FEATURES,imageType,derivType));
 		addAlgorithm(0, "Hessian",FactoryInterestPointAlgs.hessianPyramid(r,1,NUM_FEATURES,imageType,derivType));
 		addAlgorithm(0, "Harris",FactoryInterestPointAlgs.harrisPyramid(r,1,NUM_FEATURES,imageType,derivType));
 
-		ss = new ScaleSpacePyramid<T>(imageType,1,1.5,2,4,8,12,24);
+		ss = new ScaleSpacePyramid<T>(imageType,1,1.5,2,3,4,8,12,16,24);
 
 		panel = new ScaleSpacePyramidPointPanel(ss,r);
 

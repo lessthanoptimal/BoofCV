@@ -66,24 +66,24 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class HessianSobel {
 
-	public static Kernel2D_I32 kernelYY_I32 = new Kernel2D_I32(new int[]
+	public static Kernel2D_I32 kernelYY_I32 = new Kernel2D_I32(5, new int[]
 			{1, 4, 6 , 4, 1,
 			 0, 0, 0 , 0, 0,
 			-2,-8,-12,-8,-2,
 		     0, 0, 0 , 0, 0,
-		     1, 4, 6 , 4, 1},5);
-	public static Kernel2D_I32 kernelXX_I32 = new Kernel2D_I32(new int[]
+		     1, 4, 6 , 4, 1});
+	public static Kernel2D_I32 kernelXX_I32 = new Kernel2D_I32(5, new int[]
 			{1, 0,-2 , 0, 1,
 			 4, 0,-8 , 0, 4,
 		     6, 0,-12, 0, 6,
 		     4, 0,-8 , 0, 4,
-			 1, 0,-2 , 0, 1},5);
-	public static Kernel2D_I32 kernelXY_I32 = new Kernel2D_I32(new int[]
+			 1, 0,-2 , 0, 1});
+	public static Kernel2D_I32 kernelXY_I32 = new Kernel2D_I32(5, new int[]
 			{1, 2,0,-2,-1,
 			 2, 4,0,-4,-2,
 		     0, 0,0, 0, 0,
 		    -2,-4,0, 4, 2,
-			-1,-2,0, 2, 1},5);
+			-1,-2,0, 2, 1});
 	public static Kernel2D_F32 kernelYY_F32 = new Kernel2D_F32(5, new float[]
 			{1, 4, 6 , 4, 1,
 			 0, 0, 0 , 0, 0,
