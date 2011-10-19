@@ -33,8 +33,6 @@ import boofcv.io.image.ImageListManager;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
 
 import javax.swing.*;
 import java.awt.*;
@@ -108,8 +106,8 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 			D derivXY = ss.getDerivative(true,false);
 
 			intensity.process(scaledImage,derivX,derivY,derivXX,derivYY,derivXY);
-
 			ImageFloat32 featureImg = intensity.getIntensity();
+
 			b = VisualizeImageData.colorizeSign(featureImg,null, PixelMath.maxAbs(featureImg));
 			gui.addImage(b,String.format("Scale %6.2f",scale));
 
@@ -159,10 +157,10 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageBase, D extends ImageB
 
 	public static void main( String args[] ) {
 
-//		IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32> app =
-//				new IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
-		IntensityFeatureScaleSpaceApp app =
-				new IntensityFeatureScaleSpaceApp(ImageUInt8.class, ImageSInt16.class);
+		IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32> app =
+				new IntensityFeatureScaleSpaceApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+//		IntensityFeatureScaleSpaceApp app =
+//				new IntensityFeatureScaleSpaceApp(ImageUInt8.class, ImageSInt16.class);
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("shapes","data/shapes01.png");

@@ -35,10 +35,10 @@ public class Kernel2D_I32 extends Kernel2D {
 	 * Creates a new kernel whose initial values are specified by data and width.  The length
 	 * of its internal data will be width*width.  Data must be at least as long as width*width.
 	 *
-	 * @param data  The value of the kernel. Not modified.  Reference is not saved.
 	 * @param width The kernels width.  Must be odd.
+	 * @param data  The value of the kernel. Not modified.  Reference is not saved.
 	 */
-	public Kernel2D_I32(int data[], int width) {
+	public Kernel2D_I32(int width, int data[]) {
 		if (width % 2 == 0 && width <= 0)
 			throw new IllegalArgumentException("invalid width");
 

@@ -20,11 +20,8 @@ package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 
 /**
@@ -33,13 +30,7 @@ import java.io.PrintStream;
 public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 	String className = "ImplHessianBlobIntensity";
 
-	PrintStream out;
-	AutoTypeImage inputType;
 	AutoTypeImage derivType;
-
-	public GenerateImplHessianBlobIntensity() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
-	}
 
 	@Override
 	public void generate() throws FileNotFoundException {
@@ -52,15 +43,13 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 				"}\n");
 	}
 
-	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.detect.corner.impl;\n" +
-				"\n" +
-				"import boofcv.struct.image.*;\n" +
+	private void printPreamble() throws FileNotFoundException {
+		setOutputFile(className);
+		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Implementations of {@link boofcv.alg.detect.corner.HessianBlobIntensity}.\n" +
+				" * Implementations of {@link boofcv.alg.feature.detect.intensity.HessianBlobIntensity}.\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +
@@ -105,7 +94,7 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 				"\t\t\t\t"+sumType+" dyy = hessianYY.data[indexYY++]"+bitWise+";\n" +
 				"\t\t\t\t"+sumType+" dxy = hessianXY.data[indexXY++]"+bitWise+";\n" +
 				"\n" +
-				"\t\t\t\tfeatureIntensity.data[indexInten++] = dxx*dyy - dxy*dxy;\n" +
+				"\t\t\t\tfeatureIntensity.data[indexInten++] = Math.abs(dxx*dyy - dxy*dxy);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

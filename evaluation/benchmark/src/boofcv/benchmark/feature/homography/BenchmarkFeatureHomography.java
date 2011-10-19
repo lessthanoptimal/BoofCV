@@ -202,7 +202,7 @@ public class BenchmarkFeatureHomography {
 
 		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/boat/",".png",tolerance);
 
-//		app.evaluate("SURF.txt");
+		app.evaluate("SURF.txt");
 //		app.evaluate("SAMPLE.txt");
 //		app.evaluate("SAMPLEZ.txt");
 //		app.evaluate("SAMPLEDIFF.txt");

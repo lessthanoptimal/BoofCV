@@ -117,7 +117,7 @@ public class TestIntegralImageOps {
 			ImageBorder_F32 border = FactoryImageBorder.value((ImageFloat32)input,0);
 			ConvolveWithBorder.convolve(kernel,(ImageFloat32)input,(ImageFloat32)expected,border);
 		} else {
-			Kernel2D_I32 kernel = new Kernel2D_I32(new int[]{1,1,1,2,2,2,1,1,1},3);
+			Kernel2D_I32 kernel = new Kernel2D_I32(3, new int[]{1,1,1,2,2,2,1,1,1});
 			ImageBorder_I32 border = FactoryImageBorder.value((ImageInteger)input,0);
 			ConvolveWithBorder.convolve(kernel,(ImageUInt8)input,(ImageSInt32)expected,border);
 		}
@@ -159,7 +159,7 @@ public class TestIntegralImageOps {
 			ImageBorder_F32 border = FactoryImageBorder.value((ImageFloat32)input,0);
 			ConvolveWithBorder.convolve(kernel,(ImageFloat32)input,(ImageFloat32)expected,border);
 		} else {
-			Kernel2D_I32 kernel = new Kernel2D_I32(new int[]{1,1,1,2,2,2,1,1,1},3);
+			Kernel2D_I32 kernel = new Kernel2D_I32(3, new int[]{1,1,1,2,2,2,1,1,1});
 			ImageBorder_I32 border = FactoryImageBorder.value((ImageInteger)input,0);
 			ConvolveWithBorder.convolve(kernel,(ImageUInt8)input,(ImageSInt32)expected,border);
 		}

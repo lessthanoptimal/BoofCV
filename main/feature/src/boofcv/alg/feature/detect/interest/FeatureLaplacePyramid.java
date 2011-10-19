@@ -71,7 +71,7 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase>
 	protected AnyImageDerivative<T,D> computeDerivative;
 
 	// how much the feature intensity is scaled in each level
-	// varies depending on feature type
+	// varies depending on feature type, used to adjust detection threshold
 	protected double scalePower;
 
 	/**
@@ -171,9 +171,10 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase>
 		float scale1 = (float)ss.scale[layerID];
 		float scale2 = (float)ss.scale[layerID+1];
 
-		float ss0 = (float)Math.pow(scale0,scalePower);
-		float ss1 = (float)Math.pow(scale1,scalePower);
-		float ss2 = (float)Math.pow(scale2,scalePower);
+		// Because the image is blurred and scaled these are all one, I think.
+		float ss0 = 1;//(float)Math.pow(scale0,0);
+		float ss1 = 1;//(float)Math.pow(scale1,0);
+		float ss2 = 1;//(float)Math.pow(scale2,0);
 
 		for( Point2D_I16 c : candidates ) {
 			sparseLaplace.setImage(ss.getLayer(layerID));

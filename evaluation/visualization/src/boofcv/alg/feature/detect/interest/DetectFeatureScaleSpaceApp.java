@@ -31,6 +31,7 @@ import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -42,27 +43,30 @@ public class DetectFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase
 		extends SelectAlgorithmImagePanel implements ProcessInput
 {
 
-	static int NUM_FEATURES = 400;
+	static int NUM_FEATURES = 80;
 	int r = 2;
 	GaussianScaleSpace<T,D> ss;
 	Class<T> imageType;
 	ScaleSpacePointPanel panel;
+	SelectScaleSpacePanel levelPanel;
 	boolean hasImage = false;
 
 	public DetectFeatureScaleSpaceApp( Class<T> imageType , Class<D> derivType ) {
 		super(1);
 		this.imageType = imageType;
 
-		addAlgorithm(0, "Hessian Laplace",FactoryInterestPointAlgs.hessianLaplace(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm(0, "Harris Laplace",FactoryInterestPointAlgs.harrisLaplace(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm(0, "Hessian",FactoryInterestPointAlgs.hessianScaleSpace(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm(0, "Harris",FactoryInterestPointAlgs.harrisScaleSpace(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Hessian Laplace",FactoryInterestPointAlgs.hessianLaplace(r,1f,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Harris Laplace",FactoryInterestPointAlgs.harrisLaplace(r,0.5f,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Hessian",FactoryInterestPointAlgs.hessianScaleSpace(r,1f,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Harris",FactoryInterestPointAlgs.harrisScaleSpace(r,0.5f,NUM_FEATURES,imageType,derivType));
 
 		ss = FactoryGaussianScaleSpace.nocache(imageType);
-		ss.setScales(1,1.5,2,4,8,12,24);
+		ss.setScales(1,1.5,2,3,4,8,12,16,24);
 
 		panel = new ScaleSpacePointPanel(ss,r);
+		levelPanel = new SelectScaleSpacePanel(ss,panel);
 
+		add(levelPanel, BorderLayout.WEST);
 		setMainGUI(panel);
 	}
 
@@ -88,8 +92,7 @@ public class DetectFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase
 		final InterestPointScaleSpace<T,D> det = (InterestPointScaleSpace<T,D>)cookie;
 		det.detect(ss);
 		panel.setPoints(det.getInterestPoints());
-		panel.repaint();
-		panel.requestFocusInWindow();
+		levelPanel.reset();
 	}
 
 	@Override

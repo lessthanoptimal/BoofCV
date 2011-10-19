@@ -63,7 +63,7 @@ public class VisualizeFeatures {
 
 	public static void drawScalePoints( Graphics2D g2 , java.util.List<ScalePoint> points , double radius ) {
 		g2.setColor(Color.RED);
-		g2.setStroke(new BasicStroke(2));
+		g2.setStroke(new BasicStroke(3));
 
 		for( ScalePoint p : points ) {
 			int r = (int)(radius*p.scale);

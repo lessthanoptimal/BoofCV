@@ -57,7 +57,7 @@ import boofcv.struct.image.ImageUInt8;
 // TODO process image borders
 // TODO create a generator for these functions
 public class LaplacianEdge {
-	public static Kernel2D_I32 kernel_I32 = new Kernel2D_I32(new int[]{0,1,0,1,-4,1,0,1,0},3);
+	public static Kernel2D_I32 kernel_I32 = new Kernel2D_I32(3, new int[]{0,1,0,1,-4,1,0,1,0});
 	public static Kernel2D_F32 kernel_F32 = new Kernel2D_F32(3, new float[]{0,1,0,1,-4,1,0,1,0});
 
 	/**
