@@ -19,7 +19,6 @@
 package boofcv.alg.transform.wavelet;
 
 import boofcv.abst.wavelet.WaveletTransform;
-import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
@@ -110,13 +109,17 @@ public class WaveletVisualizeApp
 
 		waveletTran.invert(imageWavelet,imageInv);
 
-		float maxValue = (float)GPixelMath.maxAbs(imageWavelet);
-		BufferedImage buffWavelet = VisualizeImageData.grayMagnitude(imageWavelet,null,maxValue);
+		// adjust the values inside the wavelet transform to make it easier to see
+		UtilWavelet.adjustForDisplay(imageWavelet, waveletTran.getLevels(), 255);
+		BufferedImage buffWavelet = VisualizeImageData.grayMagnitude(imageWavelet,null,255);
 		BufferedImage buffInv = ConvertBufferedImage.convertTo(imageInv,null);
 
 		panel.addImage(buffWavelet,"Transform");
 		panel.addImage(buffInv,"Inverse");
 	}
+
+
+
 
 	@Override
 	public void changeImage(String name, int index) {

@@ -24,6 +24,8 @@ import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageInteger;
 import boofcv.struct.wavelet.WlBorderCoef;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -321,6 +323,86 @@ public class UtilWavelet {
 			return BorderType.WRAP;
 		} else {
 			throw new RuntimeException("Unknown border type: "+b.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Adjusts the values inside a wavelet transform to make it easier to view.
+	 *
+	 * @param transform
+	 * @param numLevels Number of levels in the transform
+	 */
+	public static void adjustForDisplay( ImageBase transform , int numLevels , double valueRange ) {
+		if( transform instanceof ImageFloat32 )
+			adjustForDisplay((ImageFloat32)transform,numLevels,(float)valueRange);
+		else
+			adjustForDisplay((ImageInteger)transform,numLevels,(int)valueRange);
+	}
+
+	private static void adjustForDisplay( ImageFloat32 transform , int numLevels , float valueRange ) {
+		int div = (int)Math.pow(2,numLevels);
+
+		int minX = 0;
+		int minY = 0;
+		while( div >= 1 ) {
+			int maxX = transform.width/div;
+			int maxY = transform.height/div;
+
+			float max = 0;
+			for( int y = 0; y < maxX; y++ ) {
+				for( int x = 0; x < maxY; x++ ) {
+					if( x >= minX || y >= minY ) {
+						float val = Math.abs(transform.data[ transform.getIndex(x,y) ]);
+						max = Math.max(val,max);
+					}
+				}
+			}
+
+			for( int y = 0; y < maxX; y++ ) {
+				for( int x = 0; x < maxY; x++ ) {
+					if( x >= minX || y >= minY ) {
+						transform.data[ transform.getIndex(x,y) ] *= valueRange/max;
+					}
+				}
+			}
+
+			minX = maxX;
+			minY = maxY;
+			div /= 2;
+		}
+	}
+
+	private static void adjustForDisplay( ImageInteger transform , int numLevels , int valueRange ) {
+		int div = (int)Math.pow(2,numLevels);
+
+		int minX = 0;
+		int minY = 0;
+		while( div >= 1 ) {
+			int maxX = transform.width/div;
+			int maxY = transform.height/div;
+
+			int max = 0;
+			for( int y = 0; y < maxX; y++ ) {
+				for( int x = 0; x < maxY; x++ ) {
+					if( x >= minX || y >= minY ) {
+						int val = Math.abs(transform.get(x,y));
+						max = Math.max(val,max);
+					}
+				}
+			}
+
+			for( int y = 0; y < maxX; y++ ) {
+				for( int x = 0; x < maxY; x++ ) {
+					if( x >= minX || y >= minY ) {
+						int val = transform.get(x,y);
+						transform.set( x,y,val * valueRange/max);
+					}
+				}
+			}
+
+			minX = maxX;
+			minY = maxY;
+			div /= 2;
 		}
 	}
 }
