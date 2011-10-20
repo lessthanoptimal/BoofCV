@@ -226,7 +226,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 
 			for( int i = 0; i < features.size(); i++ ) {
 				Point2D_F64 p = features.get(i);
-				VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,Color.BLUE);
+				VisualizeFeatures.drawPoint(g2,(int)(scale*p.x),(int)(scale*p.y),Color.BLUE);
 			}
 		}
 	}
