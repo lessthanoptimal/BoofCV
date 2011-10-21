@@ -1,7 +1,7 @@
 # Indicates compilator to use
 CC      = g++
 
-DIR = OpenSURFcpp
+DIR = /home/pja/projects/thirdparty/opensurf/OpenSURFcpp
 
 # Specifies compilator options
 CFLAGS  = -O3 -Wall `pkg-config --cflags opencv` -I$(DIR)/src -D LINUX

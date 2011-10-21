@@ -118,9 +118,6 @@ public class WaveletVisualizeApp
 		panel.addImage(buffInv,"Inverse");
 	}
 
-
-
-
 	@Override
 	public void changeImage(String name, int index) {
 		ImageListManager manager = getInputManager();

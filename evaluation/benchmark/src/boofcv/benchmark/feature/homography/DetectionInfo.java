@@ -28,6 +28,7 @@ public class DetectionInfo {
 
 	Point2D_I32 location;
 	double scale;
+	double yaw;
 
 	public Point2D_I32 getLocation() {
 		return location;
@@ -45,4 +46,11 @@ public class DetectionInfo {
 		this.scale = scale;
 	}
 
+	public double getYaw() {
+		return yaw;
+	}
+
+	public void setYaw(double yaw) {
+		this.yaw = yaw;
+	}
 }
