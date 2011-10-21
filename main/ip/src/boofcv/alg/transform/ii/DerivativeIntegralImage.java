@@ -71,22 +71,13 @@ public class DerivativeIntegralImage {
 	 * @return Kernel for a Haar x-axis wavelet.
 	 */
 	public static IntegralKernel kernelHaarX( int size ) {
-		int r0 = size/2;
-		int r1 = size-r0;
+		int r = size/2;
 
 		IntegralKernel ret = new IntegralKernel(2);
-		ret.blocks[0] = new ImageRectangle(-r0,-r0,0,r1);
-		ret.blocks[1] = new ImageRectangle(0,-r0,r1,r1);
+		ret.blocks[0] = new ImageRectangle(-r,-r,0,r);
+		ret.blocks[1] = new ImageRectangle(0,-r,r,r);
 		ret.scales[0] = -1;
 		ret.scales[1] = 1;
-
-		// todo undo the shift here, done to make identical to OpenSURF
-		for( int i = 0; i < 2; i++ ) {
-			ret.blocks[i].x0 -= 1;
-			ret.blocks[i].y0 -= 1;
-			ret.blocks[i].x1 -= 1;
-			ret.blocks[i].y1 -= 1;
-		}
 
 		return ret;
 	}
@@ -98,22 +89,13 @@ public class DerivativeIntegralImage {
 	 * @return Kernel for a Haar y-axis wavelet.
 	 */
 	public static IntegralKernel kernelHaarY( int size ) {
-		int r0 = size/2;
-		int r1 = size-r0;
+		int r = size/2;
 
 		IntegralKernel ret = new IntegralKernel(2);
-		ret.blocks[0] = new ImageRectangle(-r0,-r0,r1,0);
-		ret.blocks[1] = new ImageRectangle(-r0,0,r1,r1);
+		ret.blocks[0] = new ImageRectangle(-r,-r,r,0);
+		ret.blocks[1] = new ImageRectangle(-r,0,r,r);
 		ret.scales[0] = -1;
 		ret.scales[1] = 1;
-
-		// todo undo the shift here
-		for( int i = 0; i < 2; i++ ) {
-			ret.blocks[i].x0 -= 1;
-			ret.blocks[i].y0 -= 1;
-			ret.blocks[i].x1 -= 1;
-			ret.blocks[i].y1 -= 1;
-		}
 
 		return ret;
 	}

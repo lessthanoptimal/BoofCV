@@ -73,13 +73,13 @@ public class ImplOrientationSlidingWindowIntegral_F32
 	@Override
 	public double compute(int c_x, int c_y ) {
 		// use a faster algorithm if it is entirely inside
-//		if( SurfDescribeOps.isInside(ii,c_x,c_y,radius,4,scale))  {
-//			SurfDescribeOps.gradient_noborder(ii,c_x,c_y,radius,4,scale,derivX,derivY);
-//		} else {
+		if( SurfDescribeOps.isInside(ii,c_x,c_y,radius,4,scale))  {
+			SurfDescribeOps.gradient_noborder(ii,c_x,c_y,radius,4,scale,derivX,derivY);
+		} else {
 			SurfDescribeOps.gradient(ii,c_x,c_y,radius,4,scale, true, borderDerivX,borderDerivY);
 			BoofMiscOps.convertTo_F32(borderDerivX,derivX);
 			BoofMiscOps.convertTo_F32(borderDerivY,derivY);
-//		}
+		}
 
 		for( int i = 0; i < derivX.length; i++ ) {
 			angles[i] = Math.atan2(derivY[i],derivX[i]);

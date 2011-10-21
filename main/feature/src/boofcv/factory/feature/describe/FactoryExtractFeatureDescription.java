@@ -26,8 +26,8 @@ import boofcv.alg.feature.describe.DescribePointSteerable2D;
 import boofcv.alg.feature.describe.brief.BriefDefinition;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.orientation.OrientationIntegral;
-import boofcv.alg.feature.orientation.impl.ImplOrientationOpenSURF_F32;
 import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageBase;
@@ -47,9 +47,9 @@ public class FactoryExtractFeatureDescription {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		if( isOriented )
-//			orientation = FactoryOrientationAlgs.average_ii(6,true,integralType);
+			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
 //			orientation = FactoryOrientationAlgs.sliding_ii(42,Math.PI/3.0,6,true,integralType);
-			orientation = (OrientationIntegral<II>)new ImplOrientationOpenSURF_F32();
+//			orientation = (OrientationIntegral<II>)new ImplOrientationOpenSURF_F32();
 
 		return new WrapDescribeSurf<T,II>( FactoryDescribePointAlgs.<II>surf(integralType),orientation, 255);
 	}
