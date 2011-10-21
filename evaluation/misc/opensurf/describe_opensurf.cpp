@@ -20,9 +20,9 @@ void process( IplImage *image , FILE *fid , FILE *output)
     // read in location of points
     while( true ) {
         int x,y;
-        float scale;
-        int ret = fscanf(fid,"%d %d %f\n",&x,&y,&scale);
-        if( ret != 3 )
+        float scale,yaw;
+        int ret = fscanf(fid,"%d %d %f %f\n",&x,&y,&scale,&yaw);
+        if( ret != 4 )
             break;
         Ipoint p;
         p.x = x;

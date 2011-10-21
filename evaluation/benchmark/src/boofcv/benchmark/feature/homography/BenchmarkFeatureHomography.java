@@ -202,16 +202,17 @@ public class BenchmarkFeatureHomography {
 
 		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/boat/",".png",tolerance);
 
-		app.evaluate("SURF.txt");
+//		app.evaluate("SURF.txt");
 //		app.evaluate("SAMPLE.txt");
 //		app.evaluate("SAMPLEZ.txt");
 //		app.evaluate("SAMPLEDIFF.txt");
 //		app.evaluate("NEW.txt");
 		app.evaluate("OpenSURF.txt");
-		app.evaluate("OpenCV_SURF.txt");
+//		app.evaluate("OpenCV_SURF.txt");
 //		app.evaluate("BRIEFO.txt");
 //		app.evaluate("BRIEF.txt");
-		app.evaluate("BoofCV_SURF.txt");
+//		app.evaluate("BoofCV_SURF.txt");
+		app.evaluate("BoofCV_SURF2.txt");
 //		app.evaluate("NEW2.txt");
 	}
 }

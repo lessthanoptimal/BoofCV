@@ -180,6 +180,15 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}
 
+	public static void normalizeF(Kernel2D_F64 kernel) {
+
+		double[] data = kernel.data;
+		double norm = 0;
+		for (int i = 0; i < data.length; i++) norm += data[i]*data[i];
+		norm = Math.sqrt(norm);
+		for (int i = 0; i < data.length; i++) data[i] /= norm;
+	}
+
 	public static ImageFloat32 convertToImage( Kernel2D_F32 kernel ) {
 		int w = kernel.getWidth();
 		ImageFloat32 ret = new ImageFloat32(w,w);

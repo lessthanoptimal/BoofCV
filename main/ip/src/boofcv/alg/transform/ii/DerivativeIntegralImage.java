@@ -65,37 +65,55 @@ public class DerivativeIntegralImage {
 
 
 	/**
-	 * Creates a kernel for the Haar wavelet "centered" around the center pixel.
+	 * Creates a kernel for the Haar wavelet "centered" around the target pixel.
 	 *
 	 * @param size Length of a side on the wavelet
 	 * @return Kernel for a Haar x-axis wavelet.
 	 */
 	public static IntegralKernel kernelHaarX( int size ) {
-		int r = size/2;
+		int r0 = size/2;
+		int r1 = size-r0;
 
 		IntegralKernel ret = new IntegralKernel(2);
-		ret.blocks[0] = new ImageRectangle(-r,-r,0,r);
-		ret.blocks[1] = new ImageRectangle(0,-r,r,r);
+		ret.blocks[0] = new ImageRectangle(-r0,-r0,0,r1);
+		ret.blocks[1] = new ImageRectangle(0,-r0,r1,r1);
 		ret.scales[0] = -1;
 		ret.scales[1] = 1;
+
+		// todo undo the shift here, done to make identical to OpenSURF
+		for( int i = 0; i < 2; i++ ) {
+			ret.blocks[i].x0 -= 1;
+			ret.blocks[i].y0 -= 1;
+			ret.blocks[i].x1 -= 1;
+			ret.blocks[i].y1 -= 1;
+		}
 
 		return ret;
 	}
 
 	/**
-	 * Creates a kernel for the Haar wavelet "centered" around the center pixel.
+	 * Creates a kernel for the Haar wavelet "centered" around the target pixel.
 	 *
 	 * @param size Length of a side on the wavelet
 	 * @return Kernel for a Haar y-axis wavelet.
 	 */
 	public static IntegralKernel kernelHaarY( int size ) {
-		int r = size/2;
+		int r0 = size/2;
+		int r1 = size-r0;
 
 		IntegralKernel ret = new IntegralKernel(2);
-		ret.blocks[0] = new ImageRectangle(-r,-r,r,0);
-		ret.blocks[1] = new ImageRectangle(-r,0,r,r);
+		ret.blocks[0] = new ImageRectangle(-r0,-r0,r1,0);
+		ret.blocks[1] = new ImageRectangle(-r0,0,r1,r1);
 		ret.scales[0] = -1;
 		ret.scales[1] = 1;
+
+		// todo undo the shift here
+		for( int i = 0; i < 2; i++ ) {
+			ret.blocks[i].x0 -= 1;
+			ret.blocks[i].y0 -= 1;
+			ret.blocks[i].x1 -= 1;
+			ret.blocks[i].y1 -= 1;
+		}
 
 		return ret;
 	}
