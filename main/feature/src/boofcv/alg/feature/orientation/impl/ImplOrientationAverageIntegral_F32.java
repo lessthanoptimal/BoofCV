@@ -63,7 +63,7 @@ public class ImplOrientationAverageIntegral_F32
 		if( SurfDescribeOps.isInside(ii,c_x,c_y,radius,4,scale))  {
 			SurfDescribeOps.gradient_noborder(ii,c_x,c_y,radius,4,scale,derivX,derivY);
 		} else {
-			SurfDescribeOps.gradient(ii,c_x,c_y,radius,4,scale,borderDerivX,borderDerivY);
+			SurfDescribeOps.gradient(ii,c_x,c_y,radius,4,scale, false, borderDerivX,borderDerivY);
 			BoofMiscOps.convertTo_F32(borderDerivX,derivX);
 			BoofMiscOps.convertTo_F32(borderDerivY,derivY);
 		}

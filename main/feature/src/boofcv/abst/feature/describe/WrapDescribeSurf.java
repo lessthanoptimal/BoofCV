@@ -20,6 +20,7 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.orientation.OrientationIntegral;
+import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -37,14 +38,19 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 	// estimates feature's orientation
 	// would not be included normally, but this way the integral image will only need to be computed once
 	OrientationIntegral<II> orientationAlg;
+	// normalized input image
+	T normalized;
 	// integral image
 	II ii;
+	// max pixel value, used to normalize input image
+	int maxPixelValue;
 
-	public WrapDescribeSurf(DescribePointSurf<II> surf ,
-							OrientationIntegral<II> orientation )
+	public WrapDescribeSurf(DescribePointSurf<II> surf,
+							OrientationIntegral<II> orientation, int maxPixelValue)
 	{
 		this.surf = surf;
 		this.orientationAlg = orientation;
+		this.maxPixelValue = maxPixelValue;
 	}
 
 	@Override
@@ -57,7 +63,18 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 		if( ii != null ) {
 			ii.reshape(image.width,image.height);
 		}
-		ii = GIntegralImageOps.transform(image,ii);
+		if( normalized == null ) {
+			normalized = (T)image._createNew(image.width,image.height);
+		} else {
+			normalized.reshape(image.width,image.height);
+		}
+
+		// normalize input to reduce numerical overflow
+		// This does make a slight difference..
+		GPixelMath.divide(image,normalized,maxPixelValue);
+
+		// compute integral image
+		ii = GIntegralImageOps.transform(normalized,ii);
 		if( orientationAlg != null )
 			orientationAlg.setImage(ii);
 		surf.setImage(ii);
@@ -73,8 +90,10 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 
 		double angle = orientation;
 
-		if( orientationAlg != null )
+		if( orientationAlg != null ) {
+			orientationAlg.setScale(scale);
 			angle = orientationAlg.compute(x,y);
+		}
 
 		SurfFeature f = surf.describe(x,y,scale,angle,null);
 		if( f == null)

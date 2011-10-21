@@ -19,7 +19,6 @@
 package boofcv.alg.feature.describe.impl;
 
 import boofcv.alg.feature.describe.SurfDescribeOps;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.deriv.GradientValue;
 import boofcv.struct.deriv.SparseImageGradient;
@@ -139,20 +138,21 @@ public class ImplSurfDescribeOps {
 	public static <T extends ImageBase>
 	void naiveGradient(T ii, int c_x, int c_y,
 					   int radiusRegions, int kernelSize, double scale,
-					   double[] derivX, double derivY[])
+					   boolean useHaar, double[] derivX, double derivY[])
 	{
-		SparseImageGradient<T,?> g =  SurfDescribeOps.createGradient(false,false,kernelSize,scale,(Class<T>)ii.getClass());
+		SparseImageGradient<T,?> g =  SurfDescribeOps.createGradient(false,useHaar,kernelSize,scale,(Class<T>)ii.getClass());
 		g.setImage(ii);
 
 		int i = 0;
 		for( int y = -radiusRegions; y <= radiusRegions; y++ ) {
 			for( int x = -radiusRegions; x <= radiusRegions; x++ , i++) {
-				int xx = (int)Math.floor(x*scale);
-				int yy = (int)Math.floor(y*scale);
+				int xx = (int)Math.round(x * scale); // todo changed
+				int yy = (int)Math.round(y * scale);
 
 				GradientValue deriv = g.compute(c_x+xx,c_y+yy);
 				derivX[i] = deriv.getX();
 				derivY[i] = deriv.getY();
+//				System.out.printf("%2d %2d dx = %6.2f  dy = %6.2f\n",x,y,derivX[i],derivY[i]);
 			}
 		}
 	}
@@ -160,6 +160,7 @@ public class ImplSurfDescribeOps {
 	/**
 	 * Computes SURF features for the specified region.
 	 */
+	// todo change param
 	public static <T extends ImageBase>
 	void features( int c_x , int c_y ,
 				   double theta , Kernel2D_F64 weight ,
@@ -170,13 +171,10 @@ public class ImplSurfDescribeOps {
 		if( weight.width != regionSize+1 )
 			throw new IllegalArgumentException("Weighting kernel has an unexpected size");
 
-		BoofMiscOps.zero(features,64);
-
 		int regionR = regionSize/2;
 		int regionEnd = regionSize-regionR;
 
 		int regionIndex = 0;
-		int weightIndex = 0;
 
 		double c = Math.cos(theta);
 		double s = Math.sin(theta);
@@ -184,17 +182,19 @@ public class ImplSurfDescribeOps {
 		// step through the sub-regions
 		for( int rY = -regionR; rY < regionEnd; rY += subSize ) {
 			for( int rX = -regionR; rX < regionEnd; rX += subSize ) {
+				double sum_dx = 0, sum_dy=0, sum_adx=0, sum_ady=0;
+
 				// compute and sum up the response  inside the sub-region
 				for( int i = 0; i < subSize; i++ ) {
-					int regionY = (int)((rY + i)*scale);
+					int regionY = (int)Math.round((rY + i)*scale);
 					for( int j = 0; j < subSize; j++ ) {
-						double w = weight.data[weightIndex++];
+						double w = weight.get(regionR+rX + j, regionR+rY + i);
 
-						int regionX = (int)((rX + j)*scale);
+						int regionX = (int)Math.round((rX + j)*scale);
 
 						// rotate the pixel along the feature's direction
-						int pixelX = c_x + (int)(c*regionX - s*regionY);
-						int pixelY = c_y + (int)(s*regionX + c*regionY);
+						int pixelX = c_x + (int)Math.round(c*regionX - s*regionY);
+						int pixelY = c_y + (int)Math.round(s*regionX + c*regionY);
 
 						// compute the wavelet and multiply by the weighting factor
 						GradientValue g = gradient.compute(pixelX,pixelY);
@@ -206,13 +206,16 @@ public class ImplSurfDescribeOps {
 						double pdx =  c*dx + s*dy;
 						double pdy = -s*dx + c*dy;
 
-						features[regionIndex] += pdx;
-						features[regionIndex+1] += Math.abs(pdx);
-						features[regionIndex+2] += pdy;
-						features[regionIndex+3] += Math.abs(pdy);
+						sum_dx += pdx;
+						sum_adx += Math.abs(pdx);
+						sum_dy += pdy;
+						sum_ady += Math.abs(pdy);
 					}
 				}
-				regionIndex += 4;
+				features[regionIndex++] = sum_dx;
+				features[regionIndex++] = sum_adx;
+				features[regionIndex++] = sum_dy;
+				features[regionIndex++] = sum_ady;
 			}
 		}
 	}
