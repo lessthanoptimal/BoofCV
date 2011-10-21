@@ -28,6 +28,10 @@ import boofcv.struct.image.ImageSInt32;
 
 
 /**
+ *
+ * Design Note:
+ * When estimating the
+ *
  * @author Peter Abeles
  */
 public class ImplSurfDescribeOps {
@@ -40,18 +44,18 @@ public class ImplSurfDescribeOps {
 									 int radius, int kernelSize, double scale,
 									 float[] derivX, float derivY[])
 	{
-		int r = (int)Math.ceil(kernelSize*scale)/2;
+		int r = (int)Math.ceil(kernelSize*scale)/2; // todo think about this ceil more
 		int w = r*2+1;
 		int i = 0;
 		for( int y = -radius; y <= radius; y++ ) {
-			int pixelsY = c_y + (int)Math.floor(y*scale);
+			int pixelsY = c_y + (int)Math.round(y * scale);
 			int indexRow1 = ii.startIndex + (pixelsY-r-1)*ii.stride - r - 1;
 			int indexRow2 = indexRow1 + r*ii.stride;
 			int indexRow3 = indexRow2 + ii.stride;
 			int indexRow4 = indexRow3 + r*ii.stride;
 
 			for( int x = -radius; x <= radius; x++ , i++) {
-				int pixelsX = c_x + (int)Math.floor(x*scale);
+				int pixelsX = c_x + (int)Math.round(x * scale);
 
 				final int indexSrc1 = indexRow1 + pixelsX;
 				final int indexSrc2 = indexRow2 + pixelsX;
@@ -94,14 +98,14 @@ public class ImplSurfDescribeOps {
 		int w = r*2+1;
 		int i = 0;
 		for( int y = -radius; y <= radius; y++ ) {
-			int pixelsY = c_y + (int)Math.floor(y*scale);
+			int pixelsY = c_y + (int)Math.round(y * scale);
 			int indexRow1 = ii.startIndex + (pixelsY-r-1)*ii.stride - r - 1;
 			int indexRow2 = indexRow1 + r*ii.stride;
 			int indexRow3 = indexRow2 + ii.stride;
 			int indexRow4 = indexRow3 + r*ii.stride;
 
 			for( int x = -radius; x <= radius; x++ , i++) {
-				int pixelsX = c_x + (int)Math.floor(x*scale);
+				int pixelsX = c_x + (int)Math.round(x * scale);
 
 				final int indexSrc1 = indexRow1 + pixelsX;
 				final int indexSrc2 = indexRow2 + pixelsX;
@@ -146,7 +150,7 @@ public class ImplSurfDescribeOps {
 		int i = 0;
 		for( int y = -radiusRegions; y <= radiusRegions; y++ ) {
 			for( int x = -radiusRegions; x <= radiusRegions; x++ , i++) {
-				int xx = (int)Math.round(x * scale); // todo changed
+				int xx = (int)Math.round(x * scale);
 				int yy = (int)Math.round(y * scale);
 
 				GradientValue deriv = g.compute(c_x+xx,c_y+yy);
@@ -186,11 +190,11 @@ public class ImplSurfDescribeOps {
 
 				// compute and sum up the response  inside the sub-region
 				for( int i = 0; i < subSize; i++ ) {
-					int regionY = (int)Math.round((rY + i)*scale);
+					double regionY = (rY + i)*scale;
 					for( int j = 0; j < subSize; j++ ) {
 						double w = weight.get(regionR+rX + j, regionR+rY + i);
 
-						int regionX = (int)Math.round((rX + j)*scale);
+						double regionX = (rX + j)*scale;
 
 						// rotate the pixel along the feature's direction
 						int pixelX = c_x + (int)Math.round(c*regionX - s*regionY);

@@ -106,8 +106,11 @@ public class SurfDescribeOps {
 											 boolean useHaar , int kernelSize , double scale,
 											 Class<T> imageType )
 	{
+		// scaling seems to work best when forced to an integer value
+		// Doesn't really make sense to me.  Thanks OpenSURF for the idea.
+
 		// adjust the size for the scale factor
-		kernelSize = (int)Math.round(scale)*kernelSize; // todo change here
+		kernelSize = (int)(Math.round(scale)*kernelSize);
 
 		if( assumeInsideImage && !useHaar ) {
 			int regionRadius = kernelSize/2;
@@ -238,17 +241,18 @@ public class SurfDescribeOps {
 	 * @param widthSubRegion Number of sample points wide a sub-region is.
 	 * @param widthSample The size of a sample point.
 	 * @param scale The scale of the wavelets.
+	 * @param useHaar Use the Haar wavelet or a symmetric image derivative.  False is recommended.
 	 * @param inBounds Can it assume that the entire feature + kernel is inside the image bounds?
 	 * @param features Where the features are written to.  Must be 4*numSubRegions^2 large.
 	 */
 	public static <T extends ImageBase>
-	void features( T ii , int c_x , int c_y ,
-				   double theta , Kernel2D_F64 weight ,
-				   int widthLargeGrid , int widthSubRegion , int widthSample , double scale ,
-				   boolean inBounds ,
-				   double []features )
+	void features(T ii, int c_x, int c_y,
+				  double theta, Kernel2D_F64 weight,
+				  int widthLargeGrid, int widthSubRegion, int widthSample, double scale,
+				  boolean useHaar, boolean inBounds,
+				  double[] features)
 	{
-		SparseImageGradient<T,?> gradient = createGradient(inBounds,true,widthSample,scale,(Class<T>)ii.getClass());
+		SparseImageGradient<T,?> gradient = createGradient(inBounds,useHaar,widthSample,scale,(Class<T>)ii.getClass());
 		gradient.setImage(ii);
 
 		int regionSize = widthLargeGrid*widthSubRegion;

@@ -207,7 +207,7 @@ public class BenchmarkFeatureHomography {
 //		app.evaluate("SAMPLEZ.txt");
 //		app.evaluate("SAMPLEDIFF.txt");
 //		app.evaluate("NEW.txt");
-		app.evaluate("OpenSURF.txt");
+//		app.evaluate("OpenSURF.txt");
 //		app.evaluate("OpenCV_SURF.txt");
 //		app.evaluate("BRIEFO.txt");
 //		app.evaluate("BRIEF.txt");
