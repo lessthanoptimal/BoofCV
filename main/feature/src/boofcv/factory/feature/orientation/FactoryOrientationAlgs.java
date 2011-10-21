@@ -119,4 +119,16 @@ public class FactoryOrientationAlgs {
 		else
 			throw new IllegalArgumentException("Image type not supported. "+imageType.getSimpleName());
 	}
+
+	public static <T extends ImageBase>
+	OrientationIntegral<T> sliding_ii( int numAngles, double windowSize ,
+									   int radius , boolean weighted , Class<T> imageType)
+	{
+		if( imageType == ImageFloat32.class )
+			return (OrientationIntegral<T>)new ImplOrientationSlidingWindowIntegral_F32(numAngles,windowSize,radius,weighted);
+//		else if( imageType == ImageSInt32.class )
+//			return (OrientationIntegral<T>)new ImplOrientationAverageIntegral_I32(radius,weighted);
+		else
+			throw new IllegalArgumentException("Image type not supported. "+imageType.getSimpleName());
+	}
 }

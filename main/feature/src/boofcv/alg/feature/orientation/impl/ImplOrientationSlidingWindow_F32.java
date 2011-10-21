@@ -68,6 +68,7 @@ public class ImplOrientationSlidingWindow_F32 extends OrientationSlidingWindow<I
 		double bestScore = -1;
 		double bestAngle = 0;
 		double stepAngle = Math.PI*2.0/numAngles;
+
 		int N = w*(rect.y1-rect.y0);
 		for( double angle = -Math.PI; angle < Math.PI; angle += stepAngle ) {
 			double dx = 0;

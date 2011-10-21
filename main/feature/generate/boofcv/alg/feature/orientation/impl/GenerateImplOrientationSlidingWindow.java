@@ -109,6 +109,7 @@ public class GenerateImplOrientationSlidingWindow extends CodeGeneratorBase {
 				"\t\tdouble bestScore = -1;\n" +
 				"\t\tdouble bestAngle = 0;\n" +
 				"\t\tdouble stepAngle = Math.PI*2.0/numAngles;\n" +
+				"\n" +
 				"\t\tint N = w*(rect.y1-rect.y0);\n" +
 				"\t\tfor( double angle = -Math.PI; angle < Math.PI; angle += stepAngle ) {\n" +
 				"\t\t\tdouble dx = 0;\n" +

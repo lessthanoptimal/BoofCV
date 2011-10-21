@@ -57,11 +57,54 @@ import boofcv.struct.image.ImageBase;
  */
 public class DescribePointSurf<II extends ImageBase> {
 
+	// Number of sub-regions wide the large grid is
+	private int widthLargeGrid;
+	// Number of sample points wide a sub-region is
+	private int widthSubRegion;
+	// Size of a sample point
+	private int widthSample;
+
+	// DOF of feature
+	private int featureDOF;
+
 	// integral image transform of input image
 	private II ii;
 
 	// used to weigh feature computation
-	private Kernel2D_F64 weight = FactoryKernelGaussian.gaussian(2,true,64,-1,10);
+	private Kernel2D_F64 weight;
+
+	/**
+	 * Creates a SURF descriptor of arbitrary dimension by changing how the local region is sampled.
+	 *
+	 * @param widthLargeGrid Number of sub-regions wide the large grid is.
+	 * @param widthSubRegion Number of sample points wide a sub-region is.
+	 * @param widthSample The size of a sample point.
+	 */
+	public DescribePointSurf(int widthLargeGrid, int widthSubRegion, int widthSample) {
+		this.widthLargeGrid = widthLargeGrid;
+		this.widthSubRegion = widthSubRegion;
+		this.widthSample = widthSample;
+
+		int radius = (widthLargeGrid*widthSubRegion)/2;
+		weight = FactoryKernelGaussian.gaussian(2,true,64,3.3,radius);
+
+//		System.out.println("max = "+weight.get(radius,radius));
+//		KernelMath.normalizeF(weight);
+//		System.out.println("max = "+weight.get(radius,radius));
+		double div = weight.get(radius,radius);
+		for( int i = 0; i < weight.data.length; i++ )
+			weight.data[i] /= div;
+
+		// each sub-region provides 4 features
+		featureDOF = widthLargeGrid*widthLargeGrid*4;
+	}
+
+	/**
+	 * Create a SURF-64 descriptor.  See [1] for details.
+	 */
+	public DescribePointSurf() {
+		this(4,5,2);
+	}
 
 	public void setImage( II integralImage ) {
 		ii = integralImage;
@@ -83,21 +126,23 @@ public class DescribePointSurf<II extends ImageBase> {
 	public SurfFeature describe( int x , int y ,
 								 double scale , double angle ,
 								 SurfFeature ret ) {
-
+		boolean isInBounds = false;
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
-		if( !SurfDescribeOps.isInside(ii,x,y,10,4,scale,angle)) {
-			return null;
-		}
+//		if( !SurfDescribeOps.isInside(ii,x,y,(widthLargeGrid*widthSubRegion)/2,widthSample,scale,angle)) {
+//			isInBounds = false; // todo clean up inbounds
+//		}
+
+//		System.out.printf("%3d %3d yaw = %5.2f  scale = %4.2f\n",x,y,angle,scale);
 
 		// declare the feature if needed
 		if( ret == null )
-			ret = new SurfFeature(64);
-		else if( ret.features.value.length != 64 )
-			throw new IllegalArgumentException("Provided feature must have 64 values");
+			ret = new SurfFeature(featureDOF);
+		else if( ret.features.value.length != featureDOF )
+			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
 
 		// extract descriptor
-		SurfDescribeOps.features(ii,x,y,angle,weight,20,5,scale,true,ret.features.value);
+		SurfDescribeOps.features(ii,x,y,angle,weight,widthLargeGrid,widthSubRegion,widthSample,scale,isInBounds,ret.features.value);
 		// normalize feature vector to have an Euclidean length of 1
 		// adds light invariance
 		SurfDescribeOps.normalizeFeatures(ret.features.value);
@@ -117,6 +162,7 @@ public class DescribePointSurf<II extends ImageBase> {
 	 * @return true if positive
 	 */
 	private boolean computeLaplaceSign(int x, int y, double scale) {
+		// todo precompute these kernels only once
 		int s = (int)Math.ceil(scale);
 		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(9*s);
 		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(9*s);
@@ -127,10 +173,10 @@ public class DescribePointSurf<II extends ImageBase> {
 	}
 
 	public int getDescriptionLength() {
-		return 64;
+		return featureDOF;
 	}
 
 	public int getRadius() {
-		return 4+10;//todo redo and make the descriptor more configurable
+		return (widthLargeGrid*widthSubRegion+widthSample)/2;
 	}
 }

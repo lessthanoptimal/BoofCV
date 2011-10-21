@@ -52,18 +52,19 @@ public class SurfDescribeOps {
 	 *
 	 * @param c_x Center pixel.
 	 * @param c_y Center pixel.
-	 * @param radiusRegions Radius of region being considered in samples points (not pixels).
+	 * @param radiusRegion Radius of region being considered in samples points (not pixels).
 	 * @param kernelSize Size of the kernel's width (in pixels) at scale of 1.
 	 * @param scale Scale of feature.  Changes sample points.
+	 * @param useHaar
 	 * @param derivX Derivative x wavelet output. length = radiusRegions*radiusRegions
 	 * @param derivY Derivative y wavelet output. length = radiusRegions*radiusRegions
 	 */
 	public static <T extends ImageBase>
-	void gradient( T ii ,int c_x , int c_y ,
-				   int radiusRegions, int kernelSize , double scale,
-				   double []derivX , double derivY[] )
+	void gradient(T ii, int c_x, int c_y,
+				  int radiusRegion, int kernelSize, double scale,
+				  boolean useHaar, double[] derivX, double derivY[])
 	{
-		ImplSurfDescribeOps.naiveGradient(ii,c_x,c_y, radiusRegions, kernelSize, scale, derivX,derivY);
+		ImplSurfDescribeOps.naiveGradient(ii,c_x,c_y, radiusRegion, kernelSize, scale, useHaar, derivX,derivY);
 	}
 
 	/**
@@ -91,7 +92,7 @@ public class SurfDescribeOps {
 	}
 
 	/**
-	 * Create class for computing the image gradient from an integral image in a sparse fashion.
+	 * Creates a class for computing the image gradient from an integral image in a sparse fashion.
 	 *
 	 * @param assumeInsideImage Can it assume that the feature is contained entirely inside the image.
 	 * @param useHaar Should it use a haar wavelet or an derivative kernel.
@@ -106,7 +107,7 @@ public class SurfDescribeOps {
 											 Class<T> imageType )
 	{
 		// adjust the size for the scale factor
-		kernelSize = (int)Math.ceil(kernelSize*scale);
+		kernelSize = (int)Math.round(scale)*kernelSize; // todo change here
 
 		if( assumeInsideImage && !useHaar ) {
 			int regionRadius = kernelSize/2;
@@ -233,8 +234,9 @@ public class SurfDescribeOps {
 	 * @param c_y Center of the feature y-coordinate.
 	 * @param theta Orientation of the features.
 	 * @param weight Gaussian normalization.
-	 * @param regionSize Size of the region in pixels at a scale of 1..
-	 * @param subSize Size of a sub-region that features are computed inside of in pixels at scale of 1.
+	 * @param widthLargeGrid Number of sub-regions wide the large grid is.
+	 * @param widthSubRegion Number of sample points wide a sub-region is.
+	 * @param widthSample The size of a sample point.
 	 * @param scale The scale of the wavelets.
 	 * @param inBounds Can it assume that the entire feature + kernel is inside the image bounds?
 	 * @param features Where the features are written to.  Must be 4*numSubRegions^2 large.
@@ -242,14 +244,15 @@ public class SurfDescribeOps {
 	public static <T extends ImageBase>
 	void features( T ii , int c_x , int c_y ,
 				   double theta , Kernel2D_F64 weight ,
-				   int regionSize , int subSize , double scale ,
+				   int widthLargeGrid , int widthSubRegion , int widthSample , double scale ,
 				   boolean inBounds ,
 				   double []features )
 	{
-		SparseImageGradient<T,?> gradient = createGradient(inBounds,false,2,scale,(Class<T>)ii.getClass());
+		SparseImageGradient<T,?> gradient = createGradient(inBounds,true,widthSample,scale,(Class<T>)ii.getClass());
 		gradient.setImage(ii);
 
-		ImplSurfDescribeOps.features(c_x,c_y,theta,weight,regionSize,subSize,scale,gradient,features);
+		int regionSize = widthLargeGrid*widthSubRegion;
+		ImplSurfDescribeOps.features(c_x, c_y, theta, weight, regionSize, widthSubRegion, scale, gradient, features);
 	}
 
 	// todo move to a generalized class?
