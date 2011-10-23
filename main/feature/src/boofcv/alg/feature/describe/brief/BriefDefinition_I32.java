@@ -34,7 +34,7 @@ import georegression.struct.point.Point2D_I32;
  *
  * @author Peter Abeles
  */
-public class BriefDefinition {
+public class BriefDefinition_I32 {
 	// radius of the region
 	public int radius;
 	// points whose intensity values are sampled
@@ -42,7 +42,7 @@ public class BriefDefinition {
 	// indexes of points which are compared
 	public Point2D_I32 compare[];
 
-	public BriefDefinition( int radius , int numSamples , int numPairs  ) {
+	public BriefDefinition_I32(int radius, int numSamples, int numPairs) {
 		this.radius = radius;
 		samplePoints = new Point2D_I32[ numSamples ];
 		compare = new Point2D_I32[ numPairs ];

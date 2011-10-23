@@ -20,7 +20,6 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.orientation.OrientationIntegral;
-import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -38,8 +37,6 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 	// estimates feature's orientation
 	// would not be included normally, but this way the integral image will only need to be computed once
 	OrientationIntegral<II> orientationAlg;
-	// normalized input image
-	T normalized;
 	// integral image
 	II ii;
 	// max pixel value, used to normalize input image
@@ -58,23 +55,20 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 		return surf.getRadius();
 	}
 
+	/**
+	 *
+	 *
+	 *
+	 * @param image The image which contains the features.
+	 */
 	@Override
 	public void setImage(T image) {
 		if( ii != null ) {
 			ii.reshape(image.width,image.height);
 		}
-		if( normalized == null ) {
-			normalized = (T)image._createNew(image.width,image.height);
-		} else {
-			normalized.reshape(image.width,image.height);
-		}
-
-		// normalize input to reduce numerical overflow
-		// This does make a slight difference..
-		GPixelMath.divide(image,normalized,maxPixelValue);
 
 		// compute integral image
-		ii = GIntegralImageOps.transform(normalized,ii);
+		ii = GIntegralImageOps.transform(image,ii);
 		if( orientationAlg != null )
 			orientationAlg.setImage(ii);
 		surf.setImage(ii);

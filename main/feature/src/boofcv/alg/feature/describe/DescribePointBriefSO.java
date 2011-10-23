@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.alg.feature.describe.brief.BriefDefinition;
+import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
@@ -38,7 +38,8 @@ import georegression.struct.point.Point2D_I32;
  */
 public class DescribePointBriefSO<T extends ImageBase> {
 	// describes the BRIEF feature
-	protected BriefDefinition definition;
+	protected BriefDefinition_I32 definition;
+
 	// blurs the image prior to sampling
 	protected BlurFilter<T> filterBlur;
 	// blurred image
@@ -50,7 +51,7 @@ public class DescribePointBriefSO<T extends ImageBase> {
 	// values at each sample point
 	float values[];
 
-	public DescribePointBriefSO(BriefDefinition definition,
+	public DescribePointBriefSO(BriefDefinition_I32 definition,
 								BlurFilter<T> filterBlur,
 								InterpolatePixel<T> interp) {
 		this.definition = definition;
@@ -71,20 +72,24 @@ public class DescribePointBriefSO<T extends ImageBase> {
 		interp.setImage(blur);
 	}
 
-	public boolean process( int c_x , int c_y , float orientation , float scale , BriefFeature feature )
+	public boolean process( float c_x , float c_y , float orientation , float scale , BriefFeature feature )
 	{
 		int r = definition.radius;
 		float c = (float)Math.cos(orientation);
 		float s = (float)Math.sin(orientation);
 
+		int pixelX = (int)c_x;
+		int pixelY = (int)c_y;
+
+		// todo modify to handle regions partially inside the image
 		// make sure the region is inside the image
-		if( !checkInBounds(c_x,c_y,-r,-r,c,s,scale))
+		if( !checkInBounds(pixelX,pixelY,-r,-r,c,s,scale))
 			return false;
-		else if( !checkInBounds(c_x,c_y,-r,r,c,s,scale))
+		else if( !checkInBounds(pixelX,pixelY,-r,r,c,s,scale))
 			return false;
-		else if( !checkInBounds(c_x,c_y,r,r,c,s,scale))
+		else if( !checkInBounds(pixelX,pixelY,r,r,c,s,scale))
 			return false;
-		else if( !checkInBounds(c_x,c_y,r,-r,c,s,scale))
+		else if( !checkInBounds(pixelX,pixelY,r,-r,c,s,scale))
 			return false;
 
 		BoofMiscOps.zero(feature.data, feature.data.length);
@@ -117,7 +122,7 @@ public class DescribePointBriefSO<T extends ImageBase> {
 		return interp.isInSafeBounds((int) x, (int) y);
 	}
 
-	public BriefDefinition getDefinition() {
+	public BriefDefinition_I32 getDefinition() {
 		return definition;
 	}
 }

@@ -34,6 +34,7 @@ public class TestSparseIntegralGradient_NoBorder_F32 extends GeneralSparseGradie
 {
 
 	final static int size = 5;
+	final static int radius = size/2;
 	SparseIntegralGradient_NoBorder_F32 alg;
 
 	public TestSparseIntegralGradient_NoBorder_F32() {
@@ -50,8 +51,8 @@ public class TestSparseIntegralGradient_NoBorder_F32 extends GeneralSparseGradie
 
 	@Override
 	protected void imageGradient(ImageFloat32 input, ImageFloat32 derivX, ImageFloat32 derivY) {
-		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(size);
-		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(size);
+		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius);
+		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius);
 
 		GIntegralImageOps.convolve(input,kernelX,derivX);
 		GIntegralImageOps.convolve(input,kernelY,derivY);

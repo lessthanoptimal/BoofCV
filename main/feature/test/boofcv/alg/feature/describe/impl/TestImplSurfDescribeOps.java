@@ -167,7 +167,7 @@ public class TestImplSurfDescribeOps {
 		SparseImageGradient<ImageFloat32,?> sparse = createGradient(ii,1);
 
 		BoofMiscOps.zero(features,64);
-		ImplSurfDescribeOps.features(20,20,0.75,weight,20,5,1,sparse,features);
+		ImplSurfDescribeOps.features(20,20,0.75,weight,4,5,1,sparse,features);
 
 		for( double f : features )
 			assertEquals(0,f,1e-4);
@@ -186,7 +186,7 @@ public class TestImplSurfDescribeOps {
 		SparseImageGradient<ImageFloat32,?> sparse = createGradient(ii,1);
 
 		// orient the feature along the x-axis
-		ImplSurfDescribeOps.features(15,15,0,weight,20,5,1,sparse,features);
+		ImplSurfDescribeOps.features(15,15,0,weight,4,5,1,sparse,features);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(features[i],features[i+1],1e-4);
@@ -196,7 +196,7 @@ public class TestImplSurfDescribeOps {
 		}
 
 		// now orient the feature along the y-axis
-		ImplSurfDescribeOps.features(15,15,Math.PI/2.0,weight,20,5,1,sparse,features);
+		ImplSurfDescribeOps.features(15,15,Math.PI/2.0,weight,4,5,1,sparse,features);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(-features[i+2],features[i+3],1e-4);
@@ -217,7 +217,7 @@ public class TestImplSurfDescribeOps {
 		SparseImageGradient<ImageFloat32,?> sparse = createGradient(ii,1.5);
 
 		// orient the feature along the x-acis
-		ImplSurfDescribeOps.features(25,25,0,weight,20,5,1.5,sparse,features);
+		ImplSurfDescribeOps.features(25,25,0,weight,4,5,1.5,sparse,features);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(features[i],features[i+1],1e-4);

@@ -106,23 +106,20 @@ public class SurfDescribeOps {
 											 boolean useHaar , int kernelSize , double scale,
 											 Class<T> imageType )
 	{
-		// scaling seems to work best when forced to an integer value
-		// Doesn't really make sense to me.  Thanks OpenSURF for the idea.
-
-		// adjust the size for the scale factor
-		kernelSize = (int)(Math.round(scale)*kernelSize);
+		// scale the kernel and round it up to the nearest even size
+		kernelSize = (int)Math.round(scale*kernelSize);
+		int regionRadius = kernelSize/2 + (kernelSize%2);
 
 		if( assumeInsideImage && !useHaar ) {
-			int regionRadius = kernelSize/2;
 			return FactorySparseIntegralFilters.gradient(regionRadius,imageType);
 		} else {
 			IntegralKernel kernelX,kernelY;
 			if( useHaar ) {
-				kernelX = DerivativeIntegralImage.kernelHaarX(kernelSize);
-				kernelY = DerivativeIntegralImage.kernelHaarY(kernelSize);
+				kernelX = DerivativeIntegralImage.kernelHaarX(regionRadius);
+				kernelY = DerivativeIntegralImage.kernelHaarY(regionRadius);
 			} else {
-				kernelX = DerivativeIntegralImage.kernelDerivX(kernelSize);
-				kernelY = DerivativeIntegralImage.kernelDerivY(kernelSize);
+				kernelX = DerivativeIntegralImage.kernelDerivX(regionRadius);
+				kernelY = DerivativeIntegralImage.kernelDerivY(regionRadius);
 			}
 			return new SparseIntegralGradientKernel<T>(kernelX,kernelY);
 		}
@@ -182,7 +179,7 @@ public class SurfDescribeOps {
 					  double scale, double theta )
 	{
 		kernelSize = (int)Math.ceil(kernelSize*scale);
-		int kernelRadius = kernelSize/2;
+		int kernelRadius = kernelSize/2+(kernelSize%2);
 
 		// find the radius of the whole area being sampled
 		int radius = (int)Math.ceil(radiusRegions*scale);
@@ -246,7 +243,7 @@ public class SurfDescribeOps {
 	 * @param features Where the features are written to.  Must be 4*numSubRegions^2 large.
 	 */
 	public static <T extends ImageBase>
-	void features(T ii, int c_x, int c_y,
+	void features(T ii, double c_x, double c_y,
 				  double theta, Kernel2D_F64 weight,
 				  int widthLargeGrid, int widthSubRegion, int widthSample, double scale,
 				  boolean useHaar, boolean inBounds,
@@ -255,8 +252,7 @@ public class SurfDescribeOps {
 		SparseImageGradient<T,?> gradient = createGradient(inBounds,useHaar,widthSample,scale,(Class<T>)ii.getClass());
 		gradient.setImage(ii);
 
-		int regionSize = widthLargeGrid*widthSubRegion;
-		ImplSurfDescribeOps.features(c_x, c_y, theta, weight, regionSize, widthSubRegion, scale, gradient, features);
+		ImplSurfDescribeOps.features(c_x, c_y, theta, weight, widthLargeGrid, widthSubRegion, scale, gradient, features);
 	}
 
 	// todo move to a generalized class?

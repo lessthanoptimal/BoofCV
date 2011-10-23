@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.alg.feature.describe.brief.BriefDefinition;
+import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.misc.GPixelMath;
@@ -47,7 +47,7 @@ public class TestDescribePointBriefSO {
 	int height = 40;
 	Class<ImageFloat32> imageType = ImageFloat32.class;
 
-	BriefDefinition def = FactoryBriefDefinition.gaussian2(rand, 5, 20);
+	BriefDefinition_I32 def = FactoryBriefDefinition.gaussian2(rand, 5, 20);
 	BlurFilter<ImageFloat32> filterBlur;
 
 	public TestDescribePointBriefSO() {

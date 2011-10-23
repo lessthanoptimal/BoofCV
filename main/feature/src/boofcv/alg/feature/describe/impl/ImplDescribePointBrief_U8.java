@@ -20,7 +20,7 @@ package boofcv.alg.feature.describe.impl;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.DescribePointBrief;
-import boofcv.alg.feature.describe.brief.BriefDefinition;
+import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageUInt8;
@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class ImplDescribePointBrief_U8 extends DescribePointBrief<ImageUInt8> {
 
-	public ImplDescribePointBrief_U8(BriefDefinition definition, BlurFilter<ImageUInt8> filterBlur) {
+	public ImplDescribePointBrief_U8(BriefDefinition_I32 definition, BlurFilter<ImageUInt8> filterBlur) {
 		super(definition, filterBlur);
 	}
 
