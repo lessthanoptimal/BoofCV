@@ -26,8 +26,6 @@ import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageBase;
 
-
-// todo make wavelet/gradient setting configurable
 /**
  * <p>
  * Implementation of the SURF feature descriptor, see [1].  SURF features are invariant to illumination, scale,
@@ -44,9 +42,11 @@ import boofcv.struct.image.ImageBase;
  * </ul>
  * </p>
  *
- * <P>
- * NOTE: Code is available for creating any the SURF variables described in [1].  To keep it simple, easy to use
- * interfaces for other variants are at this time not provided.
+ * <p>
+ * Usage Notes:<br>
+ * If the input image is floating point then normalizing it will very slightly improves stability.  Normalization in
+ * this situation means dividing the input image by the maximum pixel intensity value, typically 255.  In stability
+ * benchmarks it slightly change the results, but not enough to justify the runtime performance hit.
  * </p>
  *
  * <p>
@@ -129,13 +129,17 @@ public class DescribePointSurf<II extends ImageBase> {
 	 * @param ret storage for the feature. Must have 64 values. If null a new feature will be declared internally.
 	 * @return The SURF interest point or null if the feature region goes outside the image.
 	 */
-	public SurfFeature describe( int x , int y ,
+	public SurfFeature describe( double x , double y ,
 								 double scale , double angle ,
 								 SurfFeature ret ) {
+		// some functions require an integer pixel coordinate, rounding is more accurate
+		int xInt = (int)Math.round(x);
+		int yInt = (int)Math.round(y);
+
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
 		boolean isInBounds =
-				SurfDescribeOps.isInside(ii,x,y,(widthLargeGrid*widthSubRegion)/2,widthSample,scale,angle);
+				SurfDescribeOps.isInside(ii,xInt,yInt,(widthLargeGrid*widthSubRegion)/2,widthSample,scale,angle);
 
 		// declare the feature if needed
 		if( ret == null )
@@ -151,7 +155,7 @@ public class DescribePointSurf<II extends ImageBase> {
 		SurfDescribeOps.normalizeFeatures(ret.features.value);
 
 		// Laplacian's sign
-		ret.laplacianPositive = computeLaplaceSign(x, y, scale);
+		ret.laplacianPositive = computeLaplaceSign(xInt,yInt, scale);
 
 		return ret;
 	}

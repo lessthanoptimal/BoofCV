@@ -2,6 +2,8 @@
 Trackers
 - Detect region/normalized cross correlation
 
+- Modify BRIEF/BRIEFSO to compute descriptors with features partially outside image like in SURF
+
 - Faster association
   - FLANN?
 

@@ -55,10 +55,9 @@ public class TestDerivativeIntegralImage {
 
 		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
 
-		for( int i = 1; i < 5; i++ ) {
-			int size = i*2+1;
-			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivX(size);
-			Kernel2D_F32 kernel = createDerivX(size);
+		for( int r = 1; r < 5; r++ ) {
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivX(r);
+			Kernel2D_F32 kernel = createDerivX(r);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
@@ -81,10 +80,9 @@ public class TestDerivativeIntegralImage {
 
 		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
 
-		for( int i = 1; i < 5; i++ ) {
-			int size = i*2+1;
-			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivY(size);
-			Kernel2D_F32 kernel = createDerivX(size);
+		for( int r = 1; r < 5; r++ ) {
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivY(r);
+			Kernel2D_F32 kernel = createDerivX(r);
 			kernel = KernelMath.transpose(kernel);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
@@ -108,10 +106,9 @@ public class TestDerivativeIntegralImage {
 
 		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
 
-		for( int i = 1; i < 5; i++ ) {
-			int size = i*2;
-			IntegralKernel kernelI = DerivativeIntegralImage.kernelHaarX(size);
-			Kernel2D_F32 kernel = createHaarX(size);
+		for( int r = 1; r < 5; r++ ) {
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelHaarX(r);
+			Kernel2D_F32 kernel = createHaarX(r);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
@@ -307,8 +304,8 @@ public class TestDerivativeIntegralImage {
 		}
 	}
 
-	private Kernel2D_F32 createDerivX( int size ) {
-		int r = size/2;
+	private Kernel2D_F32 createDerivX( int r ) {
+		int size = r*2+1;
 
 		Kernel2D_F32 ret = new Kernel2D_F32(size);
 
@@ -322,8 +319,8 @@ public class TestDerivativeIntegralImage {
 		return ret;
 	}
 
-	private Kernel2D_F32 createHaarX( int size ) {
-		int r = size/2;
+	private Kernel2D_F32 createHaarX( int r ) {
+		int size = r*2;
 
 		// TODO kernels only support odd sizes right now...  change if that changes (remove +1)
 		Kernel2D_F32 ret = new Kernel2D_F32(size+1);

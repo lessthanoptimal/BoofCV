@@ -151,7 +151,7 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=20", FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType)),TEST_TIME);
 	}
 
-	public static void main( String argsp[ ] ) {
+	public static void main( String arg[ ] ) {
 		BenchmarkDescribe<ImageFloat32,?,?> alg = new BenchmarkDescribe(ImageFloat32.class);
 //		BenchmarkDescribe<ImageUInt8,?,?> alg = new BenchmarkDescribe(ImageUInt8.class);
 

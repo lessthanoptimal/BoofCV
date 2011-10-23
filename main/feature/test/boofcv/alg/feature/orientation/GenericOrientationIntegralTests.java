@@ -63,6 +63,27 @@ public class GenericOrientationIntegralTests<T extends ImageBase> {
 		performEasyTests();
 		setScale();
 		checkSubImages();
+		checkBorderExplode();
+	}
+
+	/**
+	 * Tests involving the image border
+	 */
+	public void checkBorderExplode() {
+		alg.setScale(1);
+
+		createOrientedImage(0);
+		alg.setImage(ii);
+
+		// just see if it blows up when tracing along the image broder
+		for( int y = 0; y < height; y++ ) {
+			alg.compute(0,y);
+			alg.compute(width-1,y);
+		}
+		for( int x = 0; x < width; x++ ) {
+			alg.compute(x,0);
+			alg.compute(x,height-1);
+		}
 	}
 
 	/**
@@ -134,6 +155,7 @@ public class GenericOrientationIntegralTests<T extends ImageBase> {
 		T sub = (T)ii.subimage(0,0,regionSize,regionSize);
 
 		alg.setImage(sub);
+		alg.setScale(1);
 
 		double found = UtilAngle.bound(alg.compute(sub.width/2,sub.height/2));
 		assertTrue( angle+" "+found,UtilAngle.dist(angle,found) < angleTolerance );

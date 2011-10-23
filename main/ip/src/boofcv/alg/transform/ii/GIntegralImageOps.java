@@ -48,6 +48,13 @@ public class GIntegralImageOps {
 		}
 	}
 
+	/**
+	 * Converts a regular image into an integral image.
+	 *
+	 * @param input Regular image. Not modified.
+	 * @param transformed Integral image. If null a new image will be created. Modified.
+	 * @return Integral image.
+	 */
 	public static <I extends ImageBase, T extends ImageBase>
 	T transform( I input , T transformed ) {
 		if( input instanceof ImageFloat32 ) {
@@ -61,6 +68,14 @@ public class GIntegralImageOps {
 		}
 	}
 
+	/**
+	 * General code for convolving a box filter across an image using the integral image.
+	 *
+	 * @param integral Integral image.
+	 * @param kernel Convolution kernel.
+	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
+	 * @return Convolved image.
+	 */
 	public static <T extends ImageBase>
 	T convolve( T integral ,
 				IntegralKernel kernel,
@@ -74,6 +89,15 @@ public class GIntegralImageOps {
 		}
 	}
 
+	/**
+	 * Convolves the kernel only across the image's border.
+	 *
+	 * @param integral Integral image. Not modified.
+	 * @param kernel Convolution kernel.
+	 * @param output The convolved image. If null a new image will be created. Modified.
+	 * @param borderX Size of the image border along the horizontal axis.
+	 * @param borderY size of the image border along the vertical axis.
+	 */
 	public static <T extends ImageBase>
 	T convolveBorder( T integral ,
 					  IntegralKernel kernel,
@@ -87,6 +111,15 @@ public class GIntegralImageOps {
 		}
 	}
 
+	/**
+	 * Convolves a kernel around a single point in the integral image.
+	 *
+	 * @param integral Input integral image. Not modified.
+	 * @param kernel Convolution kernel.
+	 * @param x Pixel the convolution is performed at.
+	 * @param y Pixel the convolution is performed at.
+	 * @return Value of the convolution
+	 */
 	public static <T extends ImageBase>
 	double convolveSparse( T integral ,
 						   IntegralKernel kernel ,

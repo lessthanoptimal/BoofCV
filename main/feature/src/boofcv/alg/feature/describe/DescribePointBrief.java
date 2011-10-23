@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.alg.feature.describe.brief.BriefDefinition;
+import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
@@ -33,7 +33,7 @@ import georegression.struct.point.Point2D_I32;
  *
  * <p>
  * Describes an image region by comparing a large number of mage point pairs.  The location of each point in the
- * pair is determined by the feature's {@link BriefDefinition definition} and the comparison itself is done using
+ * pair is determined by the feature's {@link boofcv.alg.feature.describe.brief.BriefDefinition_I32 definition} and the comparison itself is done using
  * a simple less than operator: pixel(1) < pixel(2).  Distance between two descriptors is computed using the Hamming distance.
  * </p>
  *
@@ -45,8 +45,8 @@ import georegression.struct.point.Point2D_I32;
  * @author Peter Abeles
  */
 public abstract class DescribePointBrief<T extends ImageBase> {
-	// scribes the BRIEF feature
-	protected BriefDefinition definition;
+	// describes the BRIEF feature
+	protected BriefDefinition_I32 definition;
 	// blurs the image prior to sampling
 	protected BlurFilter<T> filterBlur;
 	// blurred image
@@ -58,7 +58,7 @@ public abstract class DescribePointBrief<T extends ImageBase> {
 	protected int offsetsA[];
 	protected int offsetsB[];
 
-	public DescribePointBrief(BriefDefinition definition, BlurFilter<T> filterBlur) {
+	public DescribePointBrief(BriefDefinition_I32 definition, BlurFilter<T> filterBlur) {
 		this.definition = definition;
 		this.filterBlur = filterBlur;
 
@@ -112,7 +112,7 @@ public abstract class DescribePointBrief<T extends ImageBase> {
 	 */
 	public abstract boolean process( int c_x , int c_y , BriefFeature feature );
 
-	public BriefDefinition getDefinition() {
+	public BriefDefinition_I32 getDefinition() {
 		return definition;
 	}
 }

@@ -52,7 +52,7 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 		setOutputFile(className);
 		out.print("import boofcv.abst.filter.blur.BlurFilter;\n" +
 				"import boofcv.alg.feature.describe.DescribePointBrief;\n" +
-				"import boofcv.alg.feature.describe.brief.BriefDefinition;\n" +
+				"import boofcv.alg.feature.describe.brief.BriefDefinition_I32;\n" +
 				"import boofcv.alg.feature.describe.brief.BriefFeature;\n" +
 				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.image.*;\n" +
@@ -71,7 +71,7 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 				" */\n" +
 				"public class "+className+" extends DescribePointBrief<"+imageType.getImageName()+"> {\n" +
 				"\n" +
-				"\tpublic "+className+"(BriefDefinition definition, BlurFilter<"+imageType.getImageName()+"> filterBlur) {\n" +
+				"\tpublic "+className+"(BriefDefinition_I32 definition, BlurFilter<"+imageType.getImageName()+"> filterBlur) {\n" +
 				"\t\tsuper(definition, filterBlur);\n" +
 				"\t}\n\n");
 	}

@@ -80,8 +80,7 @@ public class TestImplHessianBlobIntensity {
 		SingleBandImage yy = FactorySingleBandImage.wrap(derivYY);
 		SingleBandImage xy = FactorySingleBandImage.wrap(derivXY);
 
-
-		float expected = xx.get(5,6).floatValue()*yy.get(5,6).floatValue() - xy.get(5,6).floatValue()*xy.get(5,6).floatValue();
+		float expected = Math.abs(xx.get(5,6).floatValue()*yy.get(5,6).floatValue() - xy.get(5,6).floatValue()*xy.get(5,6).floatValue());
 		assertEquals(expected,intensity.get(5,6),1e-4);
 	}
 

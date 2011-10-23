@@ -40,22 +40,27 @@ public class ImplSurfDescribeOps {
 	 * Computes the gradient for a using the derivX kernel found in {@link boofcv.alg.transform.ii.DerivativeIntegralImage)}.
 	 * Assumes that the entire region, including the surrounding pixels, are inside the image.
 	 */
-	public static void gradientInner(ImageFloat32 ii, int c_x, int c_y,
+	public static void gradientInner(ImageFloat32 ii, double c_x, double c_y,
 									 int radius, int kernelSize, double scale,
 									 float[] derivX, float derivY[])
 	{
+		// add 0.5 to c_x and c_y to have it round when converted to an integer pixel
+		// this is faster than the straight forward method
+		c_x += 0.5;
+		c_y += 0.5;
+
 		int r = (int)Math.ceil(kernelSize*scale)/2; // todo think about this ceil more
 		int w = r*2+1;
 		int i = 0;
 		for( int y = -radius; y <= radius; y++ ) {
-			int pixelsY = c_y + (int)Math.round(y * scale);
+			int pixelsY = (int)(c_y + y * scale);
 			int indexRow1 = ii.startIndex + (pixelsY-r-1)*ii.stride - r - 1;
 			int indexRow2 = indexRow1 + r*ii.stride;
 			int indexRow3 = indexRow2 + ii.stride;
 			int indexRow4 = indexRow3 + r*ii.stride;
 
 			for( int x = -radius; x <= radius; x++ , i++) {
-				int pixelsX = c_x + (int)Math.round(x * scale);
+				int pixelsX = (int)(c_x + x * scale);
 
 				final int indexSrc1 = indexRow1 + pixelsX;
 				final int indexSrc2 = indexRow2 + pixelsX;
@@ -90,22 +95,27 @@ public class ImplSurfDescribeOps {
 	 * Computes the gradient for a using the derivX kernel found in {@link boofcv.alg.transform.ii.DerivativeIntegralImage)}.
 	 * Assumes that the entire region, including the surrounding pixels, are inside the image.
 	 */
-	public static void gradientInner(ImageSInt32 ii, int c_x, int c_y,
+	public static void gradientInner(ImageSInt32 ii, double c_x, double c_y,
 									 int radius, int kernelSize, double scale,
 									 int[] derivX, int derivY[])
 	{
+		// add 0.5 to c_x and c_y to have it round when converted to an integer pixel
+		// this is faster than the straight forward method
+		c_x += 0.5;
+		c_y += 0.5;
+
 		int r = (int)Math.ceil(kernelSize*scale)/2;
 		int w = r*2+1;
 		int i = 0;
 		for( int y = -radius; y <= radius; y++ ) {
-			int pixelsY = c_y + (int)Math.round(y * scale);
+			int pixelsY = (int)(c_y + y * scale);
 			int indexRow1 = ii.startIndex + (pixelsY-r-1)*ii.stride - r - 1;
 			int indexRow2 = indexRow1 + r*ii.stride;
 			int indexRow3 = indexRow2 + ii.stride;
 			int indexRow4 = indexRow3 + r*ii.stride;
 
 			for( int x = -radius; x <= radius; x++ , i++) {
-				int pixelsX = c_x + (int)Math.round(x * scale);
+				int pixelsX = (int)(c_x + x * scale);
 
 				final int indexSrc1 = indexRow1 + pixelsX;
 				final int indexSrc2 = indexRow2 + pixelsX;
@@ -140,20 +150,25 @@ public class ImplSurfDescribeOps {
 	 * Simple algorithm for computing the gradient of a region.  Can handle image borders
 	 */
 	public static <T extends ImageBase>
-	void naiveGradient(T ii, int c_x, int c_y,
+	void naiveGradient(T ii, double c_x, double c_y,
 					   int radiusRegions, int kernelSize, double scale,
 					   boolean useHaar, double[] derivX, double derivY[])
 	{
 		SparseImageGradient<T,?> g =  SurfDescribeOps.createGradient(false,useHaar,kernelSize,scale,(Class<T>)ii.getClass());
 		g.setImage(ii);
 
+		// add 0.5 to c_x and c_y to have it round when converted to an integer pixel
+		// this is faster than the straight forward method
+		c_x += 0.5;
+		c_y += 0.5;
+
 		int i = 0;
 		for( int y = -radiusRegions; y <= radiusRegions; y++ ) {
 			for( int x = -radiusRegions; x <= radiusRegions; x++ , i++) {
-				int xx = (int)Math.round(x * scale);
-				int yy = (int)Math.round(y * scale);
+				int xx = (int)(c_x + x * scale);
+				int yy = (int)(c_y + y * scale);
 
-				GradientValue deriv = g.compute(c_x+xx,c_y+yy);
+				GradientValue deriv = g.compute(xx,yy);
 				derivX[i] = deriv.getX();
 				derivY[i] = deriv.getY();
 //				System.out.printf("%2d %2d dx = %6.2f  dy = %6.2f\n",x,y,derivX[i],derivY[i]);
@@ -166,14 +181,17 @@ public class ImplSurfDescribeOps {
 	 */
 	// todo change param
 	public static <T extends ImageBase>
-	void features( int c_x , int c_y ,
+	void features( double c_x , double c_y ,
 				   double theta , Kernel2D_F64 weight ,
-				   int regionSize , int subSize , double scale ,
+				   int widthLargeGrid , int widthSubRegion,
+				   double scale ,
 				   SparseImageGradient<T,?> gradient,
 				   double []features )
 	{
-		if( weight.width != regionSize+1 )
+		int regionSize = widthLargeGrid*widthSubRegion;
+		if( weight.width != regionSize+1 ) {
 			throw new IllegalArgumentException("Weighting kernel has an unexpected size");
+		}
 
 		int regionR = regionSize/2;
 		int regionEnd = regionSize-regionR;
@@ -183,22 +201,28 @@ public class ImplSurfDescribeOps {
 		double c = Math.cos(theta);
 		double s = Math.sin(theta);
 
+		// when computing the pixel coordinates it is more precise to round to the nearest integer
+		// since pixels are always positive round() is equivalent to adding 0.5 and then converting
+		// to an int, which floors the variable.
+		c_x += 0.5;
+		c_y += 0.5;
+
 		// step through the sub-regions
-		for( int rY = -regionR; rY < regionEnd; rY += subSize ) {
-			for( int rX = -regionR; rX < regionEnd; rX += subSize ) {
+		for( int rY = -regionR; rY < regionEnd; rY += widthSubRegion ) {
+			for( int rX = -regionR; rX < regionEnd; rX += widthSubRegion ) {
 				double sum_dx = 0, sum_dy=0, sum_adx=0, sum_ady=0;
 
 				// compute and sum up the response  inside the sub-region
-				for( int i = 0; i < subSize; i++ ) {
+				for( int i = 0; i < widthSubRegion; i++ ) {
 					double regionY = (rY + i)*scale;
-					for( int j = 0; j < subSize; j++ ) {
+					for( int j = 0; j < widthSubRegion; j++ ) {
 						double w = weight.get(regionR+rX + j, regionR+rY + i);
 
 						double regionX = (rX + j)*scale;
 
 						// rotate the pixel along the feature's direction
-						int pixelX = c_x + (int)Math.round(c*regionX - s*regionY);
-						int pixelY = c_y + (int)Math.round(s*regionX + c*regionY);
+						int pixelX = (int)(c_x + c*regionX - s*regionY);
+						int pixelY = (int)(c_y + s*regionX + c*regionY);
 
 						// compute the wavelet and multiply by the weighting factor
 						GradientValue g = gradient.compute(pixelX,pixelY);

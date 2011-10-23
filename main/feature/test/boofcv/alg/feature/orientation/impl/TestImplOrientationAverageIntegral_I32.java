@@ -37,7 +37,7 @@ public class TestImplOrientationAverageIntegral_I32 {
 
 		OrientationAverageIntegral<ImageSInt32> alg = new ImplOrientationAverageIntegral_I32(r,false);
 
-		tests.setup(angleTol, r*2+1 , alg,ImageSInt32.class);
+		tests.setup(angleTol, r * 2 + 1, alg, ImageSInt32.class);
 		tests.performAll();
 	}
 
@@ -47,7 +47,7 @@ public class TestImplOrientationAverageIntegral_I32 {
 
 		OrientationAverageIntegral<ImageSInt32> alg = new ImplOrientationAverageIntegral_I32(r,true);
 
-		tests.setup(angleTol, r*2+1 ,alg,ImageSInt32.class);
+		tests.setup(angleTol, r * 2 + 1, alg, ImageSInt32.class);
 		tests.performAll();
 	}
 }

@@ -20,7 +20,7 @@ package boofcv.factory.feature.describe;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.*;
-import boofcv.alg.feature.describe.brief.BriefDefinition;
+import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_F32;
 import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_U8;
 import boofcv.alg.filter.kernel.SteerableKernel;
@@ -49,7 +49,7 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageBase>
-	DescribePointBrief<T> brief(BriefDefinition definition, BlurFilter<T> filterBlur ) {
+	DescribePointBrief<T> brief(BriefDefinition_I32 definition, BlurFilter<T> filterBlur ) {
 		Class<T> imageType = filterBlur.getInputType();
 
 		if( imageType == ImageFloat32.class ) {
@@ -63,7 +63,7 @@ public class FactoryDescribePointAlgs {
 
 	// todo remove filterBlur for all BRIEF change to radius,sigma,type
 	public static <T extends ImageBase>
-	DescribePointBriefSO<T> briefso(BriefDefinition definition, BlurFilter<T> filterBlur) {
+	DescribePointBriefSO<T> briefso(BriefDefinition_I32 definition, BlurFilter<T> filterBlur) {
 		Class<T> imageType = filterBlur.getInputType();
 
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);

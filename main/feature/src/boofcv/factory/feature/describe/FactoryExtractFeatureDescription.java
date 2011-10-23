@@ -23,7 +23,7 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribePointGaussian12;
 import boofcv.alg.feature.describe.DescribePointSteerable2D;
-import boofcv.alg.feature.describe.brief.BriefDefinition;
+import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
@@ -94,12 +94,12 @@ public class FactoryExtractFeatureDescription {
 
 		if( isFixed) {
 			BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
-			BriefDefinition definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
+			BriefDefinition_I32 definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
 
 			return new WrapDescribeBrief<T>(FactoryDescribePointAlgs.brief(definition,filter));
 		} else {
 			BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
-			BriefDefinition definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
+			BriefDefinition_I32 definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
 
 			return new WrapDescribeBriefSo<T>(FactoryDescribePointAlgs.briefso(definition, filter));
 		}
