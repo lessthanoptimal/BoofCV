@@ -49,6 +49,11 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageBase>
+	DescribePointSurf<T> msurf(Class<T> imageType) {
+		return new DescribePointSurfMod<T>();
+	}
+
+	public static <T extends ImageBase>
 	DescribePointBrief<T> brief(BriefDefinition_I32 definition, BlurFilter<T> filterBlur ) {
 		Class<T> imageType = filterBlur.getInputType();
 

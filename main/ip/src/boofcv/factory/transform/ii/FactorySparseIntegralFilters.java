@@ -20,6 +20,8 @@ package boofcv.factory.transform.ii;
 
 import boofcv.alg.transform.ii.impl.SparseIntegralGradient_NoBorder_F32;
 import boofcv.alg.transform.ii.impl.SparseIntegralGradient_NoBorder_I32;
+import boofcv.alg.transform.ii.impl.SparseIntegralHaar_NoBorder_F32;
+import boofcv.alg.transform.ii.impl.SparseIntegralHaar_NoBorder_I32;
 import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -39,6 +41,16 @@ public class FactorySparseIntegralFilters {
 			return (SparseImageGradient<T,?>)new SparseIntegralGradient_NoBorder_F32(radius);
 		else if( imageType == ImageSInt32.class )
 			return (SparseImageGradient<T,?>)new SparseIntegralGradient_NoBorder_I32(radius);
+		else
+			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
+	}
+
+	public static <T extends ImageBase>
+	SparseImageGradient<T,?> haar( int radius , Class<T> imageType ) {
+		if( imageType == ImageFloat32.class )
+			return (SparseImageGradient<T,?>)new SparseIntegralHaar_NoBorder_F32(radius);
+		else if( imageType == ImageSInt32.class )
+			return (SparseImageGradient<T,?>)new SparseIntegralHaar_NoBorder_I32(radius);
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}

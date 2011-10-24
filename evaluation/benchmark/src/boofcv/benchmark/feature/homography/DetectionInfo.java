@@ -18,7 +18,7 @@
 
 package boofcv.benchmark.feature.homography;
 
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 
 /**
@@ -26,15 +26,15 @@ import georegression.struct.point.Point2D_I32;
  */
 public class DetectionInfo {
 
-	Point2D_I32 location;
+	Point2D_F64 location;
 	double scale;
 	double yaw;
 
-	public Point2D_I32 getLocation() {
+	public Point2D_F64 getLocation() {
 		return location;
 	}
 
-	public void setLocation(Point2D_I32 location) {
+	public void setLocation(Point2D_F64 location) {
 		this.location = location;
 	}
 

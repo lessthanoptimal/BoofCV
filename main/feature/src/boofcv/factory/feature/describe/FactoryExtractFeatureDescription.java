@@ -41,6 +41,16 @@ import java.util.Random;
  */
 public class FactoryExtractFeatureDescription {
 
+	/**
+	 * <p>
+	 * Standard SURF descriptor configured to balance speed and descriptor stability. Invariant
+	 * to illumination, orientation, and scale.
+	 * </p>
+	 *
+	 * @param isOriented True for orientation invariant.
+	 * @param imageType Type of input image.
+	 * @return SURF
+	 */
 	public static <T extends ImageBase, II extends ImageBase>
 	ExtractFeatureDescription<T> surf( boolean isOriented , Class<T> imageType) {
 		OrientationIntegral<II> orientation = null;
@@ -52,7 +62,31 @@ public class FactoryExtractFeatureDescription {
 //			orientation = FactoryOrientationAlgs.sliding_ii(42,Math.PI/3.0,6,true,integralType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>surf(integralType);
-		return new WrapDescribeSurf<T,II>( alg ,orientation, 255);
+		return new WrapDescribeSurf<T,II>( alg ,orientation);
+	}
+
+	/**
+	 * <p>
+	 * Modified SURF descriptor configured for optimal descriptor stability.  Runs slower
+	 * than {@link #surf(boolean, Class)}, but produces more stable results.
+	 * </p>
+	 *
+	 * @param isOriented True for orientation invariant.
+	 * @param imageType Type of input image.
+	 * @return SURF
+	 */
+	public static <T extends ImageBase, II extends ImageBase>
+	ExtractFeatureDescription<T> msurf( boolean isOriented , Class<T> imageType) {
+		OrientationIntegral<II> orientation = null;
+
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+
+		if( isOriented )
+//			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
+			orientation = FactoryOrientationAlgs.sliding_ii(42,Math.PI/3.0,6,true,integralType);
+
+		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>msurf(integralType);
+		return new WrapDescribeSurf<T,II>( alg ,orientation);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>

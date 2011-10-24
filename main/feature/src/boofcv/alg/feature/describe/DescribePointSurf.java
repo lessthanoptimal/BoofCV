@@ -23,6 +23,7 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
+import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageBase;
 
@@ -37,7 +38,7 @@ import boofcv.struct.image.ImageBase;
  * <p>
  * To improve performance (stability and/or computational) there are a few (intentional) deviations from the original paper.
  * <ul>
- * <li>Instead of the Haar wavelet a symmetric image derivative is used.</li>
+ * <li>Haar wavelet or image derivative can be used.</li>
  * <li>How the weighting is computed in some places has been tweaked.</li>
  * </ul>
  * </p>
@@ -59,23 +60,23 @@ import boofcv.struct.image.ImageBase;
 public class DescribePointSurf<II extends ImageBase> {
 
 	// Number of sub-regions wide the large grid is
-	private int widthLargeGrid;
+	protected int widthLargeGrid;
 	// Number of sample points wide a sub-region is
-	private int widthSubRegion;
+	protected int widthSubRegion;
 	// Size of a sample point
-	private int widthSample;
+	protected int widthSample;
 
 	// DOF of feature
-	private int featureDOF;
+	protected int featureDOF;
 
 	// integral image transform of input image
-	private II ii;
+	protected II ii;
 
 	// used to weigh feature computation
-	private Kernel2D_F64 weight;
+	protected Kernel2D_F64 weight;
 
 	// Use the Haar wavelet or image derivative approximation
-	private boolean useHaar;
+	protected boolean useHaar;
 
 	/**
 	 * Creates a SURF descriptor of arbitrary dimension by changing how the local region is sampled.
@@ -83,19 +84,19 @@ public class DescribePointSurf<II extends ImageBase> {
 	 * @param widthLargeGrid Number of sub-regions wide the large grid is.
 	 * @param widthSubRegion Number of sample points wide a sub-region is.
 	 * @param widthSample The size of a sample point.
+	 * @param weightSigma Weighting factor's sigma.  Try 3.8
 	 * @param useHaar If true the Haar wavelet will be used (what was used in [1]), false means an image gradient
 	 * approximation will be used.  False is recommended.
 	 */
-	public DescribePointSurf(int widthLargeGrid, int widthSubRegion, int widthSample, boolean useHaar) {
+	public DescribePointSurf(int widthLargeGrid, int widthSubRegion, int widthSample,
+							 double weightSigma , boolean useHaar) {
 		this.widthLargeGrid = widthLargeGrid;
 		this.widthSubRegion = widthSubRegion;
 		this.widthSample = widthSample;
 		this.useHaar = useHaar;
 
 		int radius = (widthLargeGrid*widthSubRegion)/2;
-		// performance seems to keep on improving as sigma is increased, but this becomes less
-		// like the original paper as that's done.
-		weight = FactoryKernelGaussian.gaussianWidth(3.8, radius * 2);
+		weight = FactoryKernelGaussian.gaussianWidth(weightSigma, radius * 2);
 
 		// normalize to reduce numerical issues.
 		// not sure if this makes any difference.
@@ -111,7 +112,7 @@ public class DescribePointSurf<II extends ImageBase> {
 	 * Create a SURF-64 descriptor.  See [1] for details.
 	 */
 	public DescribePointSurf() {
-		this(4,5,2, false);
+		this(4,5,2, 4.5 , false);
 	}
 
 	public void setImage( II integralImage ) {
@@ -150,8 +151,11 @@ public class DescribePointSurf<II extends ImageBase> {
 			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
 
 		// extract descriptor
-		SurfDescribeOps.features(ii,x,y,angle,weight,widthLargeGrid,widthSubRegion,widthSample,scale,
-				useHaar, isInBounds,ret.features.value);
+		SparseImageGradient<II,?> gradient = SurfDescribeOps.createGradient(isInBounds, useHaar, widthSample, scale, (Class<II>) ii.getClass());
+		gradient.setImage(ii);
+
+		SurfDescribeOps.features(x, y, angle, scale, weight, widthLargeGrid, widthSubRegion, gradient, ret.features.value);
+
 		// normalize feature vector to have an Euclidean length of 1
 		// adds light invariance
 		SurfDescribeOps.normalizeFeatures(ret.features.value);
@@ -170,7 +174,7 @@ public class DescribePointSurf<II extends ImageBase> {
 	 * @param scale scale of the feature
 	 * @return true if positive
 	 */
-	private boolean computeLaplaceSign(int x, int y, double scale) {
+	protected boolean computeLaplaceSign(int x, int y, double scale) {
 		int s = (int)Math.ceil(scale);
 		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(9*s);
 		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(9*s);

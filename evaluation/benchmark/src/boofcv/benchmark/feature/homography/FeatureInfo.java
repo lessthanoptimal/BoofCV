@@ -19,23 +19,23 @@
 package boofcv.benchmark.feature.homography;
 
 import boofcv.struct.feature.TupleDesc_F64;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 
 /**
  * @author Peter Abeles
  */
 public class FeatureInfo {
-	Point2D_I32 location;
+	Point2D_F64 location;
 	double orientation;
 	TupleDesc_F64 description;
 
 	public FeatureInfo( int descLength ) {
-		location = new Point2D_I32();
+		location = new Point2D_F64();
 		description = new TupleDesc_F64(descLength);
 	}
 
-	public Point2D_I32 getLocation() {
+	public Point2D_F64 getLocation() {
 		return location;
 	}
 
@@ -47,7 +47,7 @@ public class FeatureInfo {
 		this.orientation = orientation;
 	}
 
-	public void setLocation(Point2D_I32 location) {
+	public void setLocation(Point2D_F64 location) {
 		this.location = location;
 	}
 

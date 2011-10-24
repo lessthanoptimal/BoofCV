@@ -265,7 +265,7 @@ public class FastHessianFeatureDetector<T extends ImageBase> {
 				float interpS = levelSize+peakS*sizeStep;
 
 				double scale =  1.2*interpS/9.0;
-				foundPoints.add( new ScalePoint((int)interpX,(int)interpY,scale));
+				foundPoints.add( new ScalePoint(interpX,interpY,scale));
 			}
 		}
 	}

@@ -28,7 +28,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import georegression.geometry.UtilPoint2D_F32;
 import georegression.struct.homo.Homography2D_F32;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 import georegression.transform.homo.HomographyPointOps;
 
 import java.io.File;
@@ -46,7 +46,7 @@ import java.util.List;
 public class BenchmarkFeatureHomography {
 	GeneralAssociation<TupleDesc_F64> assoc;
 	List<Homography2D_F32> transforms;
-	String directory;
+	String imageSuffix;
 	double tolerance;
 
 	List<String> nameBase = new ArrayList<String>();
@@ -54,22 +54,22 @@ public class BenchmarkFeatureHomography {
 	int numMatches;
 	double fractionCorrect;
 
+	int totalMatches;
+	double totalCorrect;
+
+	List<String>  directories = new ArrayList<String>();
+
 	public BenchmarkFeatureHomography(GeneralAssociation<TupleDesc_F64> assoc,
-									  String directory,
 									  String imageSuffix ,
 									  double tolerance) {
-		System.out.println("Directory: "+directory);
+
 		this.assoc = assoc;
-		this.directory = directory;
+		this.imageSuffix = imageSuffix;
 		this.tolerance = tolerance;
+	}
 
-		nameBase = loadNameBase( directory , imageSuffix );
-
-		transforms = new ArrayList<Homography2D_F32>();
-		for( int i=1; i < nameBase.size(); i++ ) {
-			String fileName = "H1to"+(i+1)+"p";
-			transforms.add( LoadBenchmarkFiles.loadHomography(directory+"/"+fileName));
-		}
+	public void addDirectory( String dir ) {
+		directories.add(dir);
 	}
 
 	/**
@@ -108,12 +108,34 @@ public class BenchmarkFeatureHomography {
 	public void evaluate( String algSuffix ) {
 		System.out.println("\n"+algSuffix);
 
+		totalCorrect = 0;
+		totalMatches = 0;
+		for( String dir : directories ) {
+			processDirectory(dir,algSuffix);
+		}
+
+		System.out.println("Summary Score:");
+		System.out.println("   num matches   = "+totalMatches);
+		System.out.println("   total correct = "+totalCorrect);
+	}
+
+	private void processDirectory( String directory , String algSuffix ) {
+		System.out.println("Directory: "+directory);
+
+		nameBase = loadNameBase( directory , imageSuffix );
+
+		transforms = new ArrayList<Homography2D_F32>();
+		for( int i=1; i < nameBase.size(); i++ ) {
+			String fileName = "H1to"+(i+1)+"p";
+			transforms.add( LoadBenchmarkFiles.loadHomography(directory+"/"+fileName));
+		}
+
 		String descriptionName = directory+"DESCRIBE_"+nameBase.get(0)+"_"+algSuffix;
 		// load descriptions in the keyframe
 		List<FeatureInfo> keyFrame = LoadBenchmarkFiles.loadDescription(descriptionName);
 
 		for( int i = 1; i < nameBase.size(); i++ ) {
-			System.out.print("Examining "+nameBase.get(i));
+//			System.out.print("Examining "+nameBase.get(i));
 
 			descriptionName = directory+"DESCRIBE_"+nameBase.get(i)+"_"+algSuffix;
 			List<FeatureInfo> targetFrame = LoadBenchmarkFiles.loadDescription(descriptionName);
@@ -121,7 +143,9 @@ public class BenchmarkFeatureHomography {
 			Homography2D_F32 keyToTarget = transforms.get(i-1);
 
 			associationScore(keyFrame,targetFrame,keyToTarget);
-			System.out.printf(" %5d %4.2f\n",numMatches,fractionCorrect);
+			totalCorrect += fractionCorrect;
+			totalMatches += numMatches;
+//			System.out.printf(" %5d %4.2f\n",numMatches,fractionCorrect);
 		}
 	}
 
@@ -160,14 +184,14 @@ public class BenchmarkFeatureHomography {
 
 		for( int i = 0; i < matches.size; i++ ) {
 			AssociatedIndex a = matches.get(i);
-			Point2D_I32 s = keyFrame.get(a.src).getLocation();
-			Point2D_I32 d = targetFrame.get(a.dst).getLocation();
+			Point2D_F64 s = keyFrame.get(a.src).getLocation();
+			Point2D_F64 d = targetFrame.get(a.dst).getLocation();
 
-			src.set(s.x,s.y);
+			src.set((float)s.x,(float)s.y);
 
 			HomographyPointOps.transform(keyToTarget,src,expected);
 
-			double dist = UtilPoint2D_F32.distance(expected.x,expected.y,d.x,d.y);
+			double dist = UtilPoint2D_F32.distance(expected.x,expected.y,(float)d.x,(float)d.y);
 
 			if( dist <= tolerance ) {
 				numCorrect++;
@@ -186,8 +210,8 @@ public class BenchmarkFeatureHomography {
 	private boolean hasCorrespondence( Point2D_F32 expected, List<FeatureInfo> targetFrame) {
 
 		for( FeatureInfo t : targetFrame ) {
-			Point2D_I32 d = t.getLocation();
-			double dist = UtilPoint2D_F32.distance(expected.x,expected.y,d.x,d.y);
+			Point2D_F64 d = t.getLocation();
+			double dist = UtilPoint2D_F32.distance(expected.x,expected.y,(float)d.x,(float)d.y);
 			if( dist <= tolerance)
 				return true;
 		}
@@ -200,19 +224,29 @@ public class BenchmarkFeatureHomography {
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, Double.MAX_VALUE, -1, true);
 
-		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,"data/mikolajczk/boat/",".png",tolerance);
+		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,".png",tolerance);
+
+		app.addDirectory("data/mikolajczk/bikes/");
+		app.addDirectory("data/mikolajczk/boat/");
+		app.addDirectory("data/mikolajczk/graf/");
+		app.addDirectory("data/mikolajczk/leuven/");
+		app.addDirectory("data/mikolajczk/ubc/");
+		app.addDirectory("data/mikolajczk/trees/");
+		app.addDirectory("data/mikolajczk/wall/");
+		app.addDirectory("data/mikolajczk/bark/");
 
 //		app.evaluate("SURF.txt");
 //		app.evaluate("SAMPLE.txt");
 //		app.evaluate("SAMPLEZ.txt");
 //		app.evaluate("SAMPLEDIFF.txt");
 //		app.evaluate("NEW.txt");
-//		app.evaluate("OpenSURF.txt");
+		app.evaluate("OpenSURF.txt");
 //		app.evaluate("OpenCV_SURF.txt");
 //		app.evaluate("BRIEFO.txt");
 //		app.evaluate("BRIEF.txt");
 		app.evaluate("BoofCV_SURF.txt");
-		app.evaluate("BoofCV_SURF2.txt");
+		app.evaluate("BoofCV_MSURF.txt");
+		app.evaluate("BoofCV_MSURF2.txt");
 //		app.evaluate("NEW2.txt");
 	}
 }
