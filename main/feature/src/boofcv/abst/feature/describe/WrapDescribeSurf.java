@@ -39,15 +39,13 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 	OrientationIntegral<II> orientationAlg;
 	// integral image
 	II ii;
-	// max pixel value, used to normalize input image
-	int maxPixelValue;
+
 
 	public WrapDescribeSurf(DescribePointSurf<II> surf,
-							OrientationIntegral<II> orientation, int maxPixelValue)
+							OrientationIntegral<II> orientation)
 	{
 		this.surf = surf;
 		this.orientationAlg = orientation;
-		this.maxPixelValue = maxPixelValue;
 	}
 
 	@Override

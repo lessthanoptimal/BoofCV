@@ -120,7 +120,7 @@ public class CreateDetectionFile<T extends ImageBase> {
 			double scale = alg.getScale(i);
 			orientation.setScale(scale);
 			double yaw = orientation.compute(pt.getX(),pt.getY());
-			out.printf("%.2f %.2f %.5f %.5f\n",pt.getX(),pt.getY(),scale,yaw);
+			out.printf("%.3f %.3f %.5f %.5f\n",pt.getX(),pt.getY(),scale,yaw);
 		}
 		out.close();
 	}

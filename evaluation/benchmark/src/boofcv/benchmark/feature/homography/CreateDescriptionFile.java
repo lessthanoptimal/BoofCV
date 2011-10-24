@@ -27,7 +27,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -132,7 +132,7 @@ public class CreateDescriptionFile<T extends ImageBase> {
 
 		out.printf("%d\n",alg.getDescriptionLength());
 		for( DetectionInfo d : detections  ) {
-			Point2D_I32 p = d.location;
+			Point2D_F64 p = d.location;
 			double theta=0;
 			if( alg.requiresOrientation() ) {
 				orientation.setScale(d.scale);
@@ -141,7 +141,7 @@ public class CreateDescriptionFile<T extends ImageBase> {
 			TupleDesc_F64 desc = alg.process(p.x,p.y,theta,d.scale,null);
 			if( desc != null ) {
 				// save the location and tuple description
-				out.printf("%d %d %f",p.getX(),p.getY(),theta);
+				out.printf("%.3f %.3f %f",p.getX(),p.getY(),theta);
 				for( int i = 0; i < desc.value.length; i++ ) {
 					out.printf(" %.10f",desc.value[i]);
 				}
@@ -153,7 +153,8 @@ public class CreateDescriptionFile<T extends ImageBase> {
 
 	public static <T extends ImageBase>
 	void doStuff( String directory , String imageSuffix , Class<T> imageType ) throws FileNotFoundException {
-		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
+//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
+		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.msurf(true,imageType);
 
 //		int radius = 12;
 //		int numAngles = 8;
@@ -171,7 +172,8 @@ public class CreateDescriptionFile<T extends ImageBase> {
 		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(alg.getRadius(),imageType);
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLEDIFF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLE");
-		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF2");
+//		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");
+		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_MSURF2");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BRIEFO");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BRIEF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"NEW");
@@ -179,13 +181,13 @@ public class CreateDescriptionFile<T extends ImageBase> {
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-//		doStuff("data/mikolajczk/bikes/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/bikes/",".png",ImageFloat32.class);
 		doStuff("data/mikolajczk/boat/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/graf/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/leuven/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/ubc/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/trees/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/wall/",".png",ImageFloat32.class);
-//		doStuff("data/mikolajczk/bark/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/graf/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/leuven/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/ubc/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/trees/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/wall/",".png",ImageFloat32.class);
+		doStuff("data/mikolajczk/bark/",".png",ImageFloat32.class);
 	}
 }

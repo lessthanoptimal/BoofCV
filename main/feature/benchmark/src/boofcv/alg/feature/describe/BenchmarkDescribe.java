@@ -143,6 +143,9 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 		System.out.println();
 
 		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryExtractFeatureDescription.<I,II>surf(true,imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryExtractFeatureDescription.<I,II>msurf(true,imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("SURF UP", FactoryExtractFeatureDescription.<I,II>surf(false,imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("MSURF UP", FactoryExtractFeatureDescription.<I,II>msurf(false, imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new BriefO512(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Steer r=12", FactoryExtractFeatureDescription.steerableGaussian(12,false,imageType,derivType)),TEST_TIME);

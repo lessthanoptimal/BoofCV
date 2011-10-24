@@ -19,12 +19,8 @@
 package boofcv.alg.feature.describe.impl;
 
 import boofcv.alg.feature.describe.SurfDescribeOps;
-import boofcv.alg.misc.ImageTestingOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.misc.BoofMiscOps;
-import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
@@ -33,7 +29,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -44,9 +39,6 @@ public class TestImplSurfDescribeOps {
 	Random rand = new Random(234);
 	int width = 80;
 	int height = 100;
-
-	Kernel2D_F64 weight = FactoryKernelGaussian.gaussianWidth(-1,20);
-	double features[] = new double[64];
 
 	@Test
 	public void gradientInner_F32() {
@@ -155,82 +147,12 @@ public class TestImplSurfDescribeOps {
 		}
 	}
 
-	/**
-	 * If the image has a constant value then all the features should be zero.
-	 */
-	@Test
-	public void features_constant() {
-		ImageFloat32 img = new ImageFloat32(width,height);
-		ImageTestingOps.fill(img,50);
 
-		ImageFloat32 ii = IntegralImageOps.transform(img,null);
-		SparseImageGradient<ImageFloat32,?> sparse = createGradient(ii,1);
-
-		BoofMiscOps.zero(features,64);
-		ImplSurfDescribeOps.features(20,20,0.75,weight,4,5,1,sparse,features);
-
-		for( double f : features )
-			assertEquals(0,f,1e-4);
-	}
-
-	/**
-	 * Create an image which has a constant slope.  The features aligned along that
-	 * direction should be large.  This also checks that the orientation parameter
-	 * is being used correctly and that absolute value is being done.
-	 */
-	@Test
-	public void features_increasing() {
-		// test the gradient along the x-axis only
-		ImageFloat32 img = createGradient(width,height,0);
-		ImageFloat32 ii = IntegralImageOps.transform(img,null);
-		SparseImageGradient<ImageFloat32,?> sparse = createGradient(ii,1);
-
-		// orient the feature along the x-axis
-		ImplSurfDescribeOps.features(15,15,0,weight,4,5,1,sparse,features);
-
-		for( int i = 0; i < 64; i+= 4) {
-			assertEquals(features[i],features[i+1],1e-4);
-			assertTrue(features[i] > 0);
-			assertEquals(0,features[i+2],1e-4);
-			assertEquals(0,features[i+3],1e-4);
-		}
-
-		// now orient the feature along the y-axis
-		ImplSurfDescribeOps.features(15,15,Math.PI/2.0,weight,4,5,1,sparse,features);
-
-		for( int i = 0; i < 64; i+= 4) {
-			assertEquals(-features[i+2],features[i+3],1e-4);
-			assertTrue(features[i+2] < 0);
-			assertEquals(0,features[i],1e-4);
-			assertEquals(0,features[i+1],1e-4);
-		}
-	}
-
-	/**
-	 * Give it a scale factor which is a fraction and see if it blows up
-	 */
-	@Test
-	public void features_fraction() {
-				// test the gradient along the x-axis only
-		ImageFloat32 img = createGradient(width,height,0);
-		ImageFloat32 ii = IntegralImageOps.transform(img,null);
-		SparseImageGradient<ImageFloat32,?> sparse = createGradient(ii,1.5);
-
-		// orient the feature along the x-acis
-		ImplSurfDescribeOps.features(25,25,0,weight,4,5,1.5,sparse,features);
-
-		for( int i = 0; i < 64; i+= 4) {
-			assertEquals(features[i],features[i+1],1e-4);
-			assertTrue(features[i] > 0);
-			assertEquals(0,features[i+2],1e-4);
-			assertEquals(0,features[i+3],1e-4);
-		}
-	}
 
 	/**
 	 * Creates an image with a constant gradient in the specified direction
 	 */
-	private ImageFloat32 createGradient( int width , int height , double theta ) {
+	public static ImageFloat32 createGradient( int width , int height , double theta ) {
 		ImageFloat32 ret = new ImageFloat32(width,height);
 
 		double c = Math.cos(theta);
@@ -246,7 +168,7 @@ public class TestImplSurfDescribeOps {
 		return ret;
 	}
 
-	public SparseImageGradient<ImageFloat32,?> createGradient( ImageFloat32 ii , double scale) {
+	public static SparseImageGradient<ImageFloat32,?> createGradient( ImageFloat32 ii , double scale) {
 		SparseImageGradient<ImageFloat32,?> ret =
 				SurfDescribeOps.createGradient(false,false,4,scale,ImageFloat32.class);
 		ret.setImage(ii);

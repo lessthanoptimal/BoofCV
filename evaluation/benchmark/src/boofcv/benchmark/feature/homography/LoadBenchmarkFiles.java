@@ -22,7 +22,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import bubo.io.serialization.SerializationDefinitionManager;
 import bubo.io.text.ReadCsvObjectSmart;
 import georegression.struct.homo.Homography2D_F32;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.MatrixIO;
 
@@ -47,7 +47,7 @@ public class LoadBenchmarkFiles {
 		manager.addPath("georegression.struct.point");
 		manager.loadDefinition(DetectionInfo.class, "location","scale","yaw");
 		manager.loadDefinition(FeatureInfo.class, "location","orientation","description");
-		manager.loadDefinition(Point2D_I32.class, "x","y");
+		manager.loadDefinition(Point2D_F64.class, "x","y");
 		manager.loadDefinition(TupleDesc_F64.class,"value" );
 	}
 

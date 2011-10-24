@@ -19,9 +19,9 @@ void process( IplImage *image , FILE *fid , FILE *output)
 
     // read in location of points
     while( true ) {
-        int x,y;
+        float x,y;
         float scale,yaw;
-        int ret = fscanf(fid,"%d %d %f %f\n",&x,&y,&scale,&yaw);
+        int ret = fscanf(fid,"%f %f %f %f\n",&x,&y,&scale,&yaw);
         if( ret != 4 )
             break;
         Ipoint p;
@@ -43,7 +43,7 @@ void process( IplImage *image , FILE *fid , FILE *output)
     fprintf(output,"64\n");
     for( size_t i = 0; i < ipts.size(); i++ ) {
         Ipoint &p = ipts.at(i);
-        fprintf(output,"%d %d %f",(int)p.x,(int)p.y,p.orientation);
+        fprintf(output,"%7.3f %7.3f %7.5f",p.x,p.y,p.orientation);
         for( int i = 0; i < 64; i++ ) {
             fprintf(output," %0.10f",p.descriptor[i]);
         }

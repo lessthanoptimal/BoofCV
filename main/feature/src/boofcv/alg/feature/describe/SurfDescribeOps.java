@@ -24,6 +24,7 @@ import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.alg.transform.ii.SparseIntegralGradientKernel;
 import boofcv.factory.transform.ii.FactorySparseIntegralFilters;
 import boofcv.struct.convolve.Kernel2D_F64;
+import boofcv.struct.deriv.GradientValue;
 import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -110,8 +111,11 @@ public class SurfDescribeOps {
 		kernelWidth = (int)Math.round(scale*kernelWidth);
 		int regionRadius = kernelWidth/2 + (kernelWidth%2);
 
-		if( assumeInsideImage && !useHaar ) {
-			return FactorySparseIntegralFilters.gradient(regionRadius,imageType);
+		if( assumeInsideImage ) {
+			if( useHaar )
+				return FactorySparseIntegralFilters.haar(regionRadius, imageType);
+			else
+				return FactorySparseIntegralFilters.gradient(regionRadius,imageType);
 		} else {
 			IntegralKernel kernelX,kernelY;
 			if( useHaar ) {
@@ -223,35 +227,172 @@ public class SurfDescribeOps {
 	 * <ul>
 	 * <li>Weighting function is applied to each sub region as a whole and not to each wavelet inside the sub
 	 * region.  This allows the weight to be precomputed once.  Unlikely to degrade quality significantly.</li>
-	 * <li>An symmetric box derivative is used instead of the Haar wavelet.  Haar is not symmetric and the performance
-	 * noticeable improved when the derivative was used instead.</li>
 	 * </ul>
 	 * </p>
 	 *
-	 * @param ii Integral image.
 	 * @param c_x Center of the feature x-coordinate.
 	 * @param c_y Center of the feature y-coordinate.
-	 * @param theta Orientation of the features.
+	 * @param theta Orientation of the features. -pi/2 to pi/2
+	 * @param scale The scale of the wavelets.
 	 * @param weight Gaussian normalization.
 	 * @param widthLargeGrid Number of sub-regions wide the large grid is.
 	 * @param widthSubRegion Number of sample points wide a sub-region is.
-	 * @param widthSample The size of a sample point.
-	 * @param scale The scale of the wavelets.
-	 * @param useHaar Use the Haar wavelet or a symmetric image derivative.  False is recommended.
-	 * @param inBounds Can it assume that the entire feature + kernel is inside the image bounds?
-	 * @param features Where the features are written to.  Must be 4*numSubRegions^2 large.
+	 * @param gradient Computes the image gradient at the specified points.  Make sure the scale and image are set.
+	 * @param features Where the features are written to.  Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
 	 */
 	public static <T extends ImageBase>
-	void features(T ii, double c_x, double c_y,
-				  double theta, Kernel2D_F64 weight,
-				  int widthLargeGrid, int widthSubRegion, int widthSample, double scale,
-				  boolean useHaar, boolean inBounds,
+	void features(double c_x, double c_y,
+				  double theta, double scale, Kernel2D_F64 weight,
+				  int widthLargeGrid, int widthSubRegion,
+				  SparseImageGradient<T, ?> gradient,
 				  double[] features)
 	{
-		SparseImageGradient<T,?> gradient = createGradient(inBounds,useHaar,widthSample,scale,(Class<T>)ii.getClass());
-		gradient.setImage(ii);
+		int regionSize = widthLargeGrid*widthSubRegion;
+		if( weight.width != regionSize ) {
+			throw new IllegalArgumentException("Weighting kernel has an unexpected size");
+		}
 
-		ImplSurfDescribeOps.features(c_x, c_y, theta, weight, widthLargeGrid, widthSubRegion, scale, gradient, features);
+		int regionR = regionSize/2;
+		int regionEnd = regionSize-regionR;
+
+		int regionIndex = 0;
+
+		double c = Math.cos(theta);
+		double s = Math.sin(theta);
+
+		// when computing the pixel coordinates it is more precise to round to the nearest integer
+		// since pixels are always positive round() is equivalent to adding 0.5 and then converting
+		// to an int, which floors the variable.
+		c_x += 0.5;
+		c_y += 0.5;
+
+		// step through the sub-regions
+		for( int rY = -regionR; rY < regionEnd; rY += widthSubRegion ) {
+			for( int rX = -regionR; rX < regionEnd; rX += widthSubRegion ) {
+				double sum_dx = 0, sum_dy=0, sum_adx=0, sum_ady=0;
+
+				// compute and sum up the response  inside the sub-region
+				for( int i = 0; i < widthSubRegion; i++ ) {
+					double regionY = (rY + i)*scale;
+					for( int j = 0; j < widthSubRegion; j++ ) {
+						double w = weight.get(regionR+rX + j, regionR+rY + i);
+
+						double regionX = (rX + j)*scale;
+
+						// rotate the pixel along the feature's direction
+						int pixelX = (int)(c_x + c*regionX - s*regionY);
+						int pixelY = (int)(c_y + s*regionX + c*regionY);
+
+						// compute the wavelet and multiply by the weighting factor
+						GradientValue g = gradient.compute(pixelX,pixelY);
+						double dx = w*g.getX();
+						double dy = w*g.getY();
+
+						// align the gradient along image patch
+						// note the transform is transposed
+						double pdx =  c*dx + s*dy;
+						double pdy = -s*dx + c*dy;
+
+						sum_dx += pdx;
+						sum_adx += Math.abs(pdx);
+						sum_dy += pdy;
+						sum_ady += Math.abs(pdy);
+					}
+				}
+				features[regionIndex++] = sum_dx;
+				features[regionIndex++] = sum_adx;
+				features[regionIndex++] = sum_dy;
+				features[regionIndex++] = sum_ady;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * An improved SURF descriptor as presented in CenSurE paper.   The sub-regions now overlap and more
+	 * points are sampled in the sub-region to allow overlap.
+	 * </p>
+	 *
+	 * @param c_x Center of the feature x-coordinate.
+	 * @param c_y Center of the feature y-coordinate.
+	 * @param theta Orientation of the features. -pi/2 to pi/2
+	 * @param scale The scale of the wavelets.
+	 * @param weightGrid Gaussian normalization across the large grid.
+	 * @param weightSub Gaussian normalization across the sub-region.
+	 * @param widthLargeGrid Number of sub-regions wide the large grid is.
+	 * @param widthSubRegion Number of sample points wide a sub-region is.
+	 * @param overLap Number of samples that two adjacent sub-regions will overlap.
+	 * @param gradient Computes the image gradient at the specified points.  Make sure the scale and image are set.
+	 * @param features Where the features are written to.  Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
+	 */
+	public static <T extends ImageBase>
+	void featuresMod(double c_x, double c_y,
+					 double theta,
+					 double scale, Kernel2D_F64 weightGrid,
+					 Kernel2D_F64 weightSub,
+					 int widthLargeGrid, int widthSubRegion, int overLap,
+					 SparseImageGradient<T, ?> gradient,
+					 double[] features)
+	{
+		int regionSize = widthLargeGrid*widthSubRegion;
+
+		int totalSampleWidth = widthSubRegion+overLap*2;
+
+		int regionR = regionSize/2;
+		int regionEnd = regionSize-regionR;
+
+		int regionIndex = 0;
+
+		double c = Math.cos(theta);
+		double s = Math.sin(theta);
+
+		// when computing the pixel coordinates it is more precise to round to the nearest integer
+		// since pixels are always positive round() is equivalent to adding 0.5 and then converting
+		// to an int, which floors the variable.
+		c_x += 0.5;
+		c_y += 0.5;
+
+		int indexGridWeight = 0;
+		// step through the sub-regions
+		for( int rY = -regionR; rY < regionEnd; rY += widthSubRegion ) {
+			for( int rX = -regionR; rX < regionEnd; rX += widthSubRegion ) {
+				double sum_dx = 0, sum_dy=0, sum_adx=0, sum_ady=0;
+
+				// compute and sum up the response  inside the sub-region
+				for( int i = 0; i < totalSampleWidth; i++ ) {
+					double regionY = (rY + i - overLap)*scale;
+					for( int j = 0; j < totalSampleWidth; j++ ) {
+						double regionX = (rX + j - overLap)*scale;
+
+						double w = weightSub.get(j,i);
+						// rotate the pixel along the feature's direction
+						int pixelX = (int)(c_x + c*regionX - s*regionY);
+						int pixelY = (int)(c_y + s*regionX + c*regionY);
+
+						// compute the wavelet and multiply by the weighting factor
+						GradientValue g = gradient.compute(pixelX,pixelY);
+						double dx = w*g.getX();
+						double dy = w*g.getY();
+
+						// align the gradient along image patch
+						// note the transform is transposed
+						double pdx =  c*dx + s*dy;
+						double pdy = -s*dx + c*dy;
+
+						sum_dx += pdx;
+						sum_adx += Math.abs(pdx);
+						sum_dy += pdy;
+						sum_ady += Math.abs(pdy);
+					}
+				}
+
+				double w = weightGrid.data[indexGridWeight++];
+				features[regionIndex++] = w*sum_dx;
+				features[regionIndex++] = w*sum_adx;
+				features[regionIndex++] = w*sum_dy;
+				features[regionIndex++] = w*sum_ady;
+			}
+		}
 	}
 
 	public static void normalizeFeatures( double []features ) {
