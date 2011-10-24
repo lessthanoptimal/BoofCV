@@ -34,7 +34,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -126,14 +126,14 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		render.reset();
 		if( det.hasScale() ) {
 			for( int i = 0; i < det.getNumberOfFeatures(); i++ ) {
-				Point2D_I32 p = det.getLocation(i);
+				Point2D_F64 p = det.getLocation(i);
 				int radius = (int)Math.ceil(det.getScale(i)*3);
-				render.addCircle(p.x,p.y,radius);
+				render.addCircle((int)p.x,(int)p.y,radius);
 			}
 		} else {
 			for( int i = 0; i < det.getNumberOfFeatures(); i++ ) {
-				Point2D_I32 p = det.getLocation(i);
-				render.addPoint(p.x,p.y,3,Color.RED);
+				Point2D_F64 p = det.getLocation(i);
+				render.addPoint((int)p.x,(int)p.y,3,Color.RED);
 			}
 		}
 

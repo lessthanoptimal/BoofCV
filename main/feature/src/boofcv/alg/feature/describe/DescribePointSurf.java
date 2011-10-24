@@ -98,7 +98,7 @@ public class DescribePointSurf<II extends ImageBase> {
 		weight = FactoryKernelGaussian.gaussianWidth(3.8, radius * 2);
 
 		// normalize to reduce numerical issues.
-		// not sure if this makes any difference.  // TODO CHECK TOUT
+		// not sure if this makes any difference.
 		double div = weight.get(radius,radius);
 		for( int i = 0; i < weight.data.length; i++ )
 			weight.data[i] /= div;
@@ -171,7 +171,6 @@ public class DescribePointSurf<II extends ImageBase> {
 	 * @return true if positive
 	 */
 	private boolean computeLaplaceSign(int x, int y, double scale) {
-		// todo precompute these kernels only once
 		int s = (int)Math.ceil(scale);
 		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(9*s);
 		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(9*s);

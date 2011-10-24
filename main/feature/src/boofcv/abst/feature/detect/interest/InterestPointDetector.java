@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.struct.image.ImageBase;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * Interface for automatic interest point detection in an image.  Provides optional
@@ -39,7 +39,7 @@ public interface InterestPointDetector< T extends ImageBase> {
 
 	int getNumberOfFeatures();
 
-	Point2D_I32 getLocation( int featureIndex );
+	Point2D_F64 getLocation( int featureIndex );
 
 	double getScale( int featureIndex );
 

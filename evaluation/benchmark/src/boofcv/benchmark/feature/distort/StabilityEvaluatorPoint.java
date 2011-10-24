@@ -23,8 +23,8 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F32;
-import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps;
 
 import java.util.ArrayList;
@@ -44,8 +44,8 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 	protected int borderSize;
 	private InterestPointDetector<T> detector;
 
-	private List<Point2D_I32> initialPoints = new ArrayList<Point2D_I32>();
-	private List<Point2D_I32> transformPoints = new ArrayList<Point2D_I32>();
+	private List<Point2D_F64> initialPoints = new ArrayList<Point2D_F64>();
+	private List<Point2D_F64> transformPoints = new ArrayList<Point2D_F64>();
 	private List<Integer> transformIndexes = new ArrayList<Integer>();
 
 	protected StabilityEvaluatorPoint(int borderSize, InterestPointDetector<T> detector) {
@@ -62,7 +62,7 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 		float h = image.height-borderSize;
 
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
-			Point2D_I32 pt = detector.getLocation(i);
+			Point2D_F64 pt = detector.getLocation(i);
 			// make sure its not too close to the image border
 			if( pt.x >= borderSize && pt.y >= borderSize && pt.x < w && pt.y < h) {
 				initialPoints.add(pt.copy());
@@ -85,37 +85,43 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 	 */
 	private void transformPoints(double scale, double theta, int imageWidth, int imageHeight)
 	{
-		Affine2D_F32 initToImage = createTransform(scale,theta,imageWidth,imageHeight);
+		Affine2D_F64 initToImage = createTransform(scale,theta,imageWidth,imageHeight);
 
 		transformPoints.clear();
 		transformIndexes.clear();
 
-		Point2D_F32 a = new Point2D_F32();
-		Point2D_F32 b = new Point2D_F32();
+		Point2D_F64 b = new Point2D_F64();
 
 		float w = imageWidth-borderSize;
 		float h = imageHeight-borderSize;
 
 		for( int index = 0; index < initialPoints.size(); index++ ) {
-			Point2D_I32 i = initialPoints.get(index);
-			a.x = i.x;
-			a.y = i.y;
+			Point2D_F64 a = initialPoints.get(index);
 			AffinePointOps.transform(initToImage,a,b);
 			if( b.x >= borderSize && b.y >= borderSize && b.x < w && b.y < h) {
-				transformPoints.add( new Point2D_I32((int)b.x,(int)b.y));
+				transformPoints.add( b.copy() );
 				transformIndexes.add(index);
 			}
 		}
 
 	}
 
-	public static Affine2D_F32 createTransform( double scale , double theta , int imageWidth , int imageHeight ) {
+	public static Affine2D_F64 createTransform( double scale , double theta , int imageWidth , int imageHeight ) {
 		// these create a transform from the dst to source image
 		Affine2D_F32 a = createScale((float)scale,imageWidth,imageHeight).invert(null);
 		Affine2D_F32 b = DistortSupport.transformRotate(imageWidth/2,imageHeight/2,imageWidth/2,imageHeight/2,(float)theta).getModel();
 
 		// need to invert to the transform to be from src to dst image
-		return a.concat(b,null).invert(null);
+		Affine2D_F32 tran = a.concat(b,null).invert(null);
+
+		Affine2D_F64 ret = new Affine2D_F64();
+		ret.a11 = tran.a11;
+		ret.a12 = tran.a12;
+		ret.a21 = tran.a21;
+		ret.a22 = tran.a22;
+		ret.tx = tran.tx;
+		ret.ty = tran.ty;
+		return ret;
 	}
 
 	/**
@@ -132,7 +138,7 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 		return new Affine2D_F32(scale,0,0,scale,offX,offY);
 	}
 
-	public abstract void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_I32> points );
+	public abstract void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_F64> points );
 
 	/**
 	 *
@@ -143,7 +149,7 @@ public abstract class StabilityEvaluatorPoint<T extends ImageBase>
 	 */
 	public abstract double[] evaluateImage(BenchmarkAlgorithm alg,
 										   T image, double scale , double theta,
-										   List<Point2D_I32> points ,
+										   List<Point2D_F64> points ,
 										   List<Integer> indexes );
 
 }

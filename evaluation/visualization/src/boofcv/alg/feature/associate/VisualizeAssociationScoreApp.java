@@ -36,7 +36,7 @@ import boofcv.io.image.ImageListManager;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -155,8 +155,8 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 	 * recycled to avoid threading issues.
 	 */
 	private void processImage() {
-		final List<Point2D_I32> leftPts = new ArrayList<Point2D_I32>();
-		final List<Point2D_I32> rightPts = new ArrayList<Point2D_I32>();
+		final List<Point2D_F64> leftPts = new ArrayList<Point2D_F64>();
+		final List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
 		final List<TupleDesc_F64> leftDesc = new ArrayList<TupleDesc_F64>();
 		final List<TupleDesc_F64> rightDesc = new ArrayList<TupleDesc_F64>();
 
@@ -181,7 +181,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 	 */
 	private void extractImageFeatures( final ProgressMonitor progressMonitor , final int progress ,
 									   T image ,
-									   List<TupleDesc_F64> descs , List<Point2D_I32> locs ) {
+									   List<TupleDesc_F64> descs , List<Point2D_F64> locs ) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				progressMonitor.setNote("Detecting");
@@ -200,7 +200,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 				double yaw = 0;
 
-				Point2D_I32 pt = detector.getLocation(i);
+				Point2D_F64 pt = detector.getLocation(i);
 				double scale = detector.getScale(i);
 				if( describe.requiresOrientation() ) {
 					orientation.setRadius((int)(describe.getRadius()*scale));
@@ -219,7 +219,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 				double yaw = 0;
 
-				Point2D_I32 pt = detector.getLocation(i);
+				Point2D_F64 pt = detector.getLocation(i);
 				if( describe.requiresOrientation() ) {
 					yaw = orientation.compute(pt.x,pt.y);
 				}

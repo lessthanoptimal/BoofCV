@@ -128,8 +128,8 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 	}
 
 	@Override
-	public boolean addTrack(float x, float y) {
-		if( trackManager.addTrack(x,y) ) {
+	public boolean addTrack(double x, double y) {
+		if( trackManager.addTrack((float)x,(float)y) ) {
 			List<PyramidKltFeature> spawnList = trackManager.getSpawned();
 			PyramidKltFeature t = spawnList.get( spawnList.size()-1 );
 			addSpawnedFeature(t);

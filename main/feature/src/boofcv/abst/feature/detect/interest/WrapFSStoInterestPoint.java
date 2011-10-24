@@ -22,7 +22,7 @@ import boofcv.alg.feature.detect.interest.FeatureScaleSpace;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageBase;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
 
@@ -59,7 +59,7 @@ public class WrapFSStoInterestPoint<T extends ImageBase, D extends ImageBase> im
 	}
 
 	@Override
-	public Point2D_I32 getLocation(int featureIndex) {
+	public Point2D_F64 getLocation(int featureIndex) {
 		return location.get(featureIndex);
 	}
 

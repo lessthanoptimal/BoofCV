@@ -30,7 +30,7 @@ import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.image.ImageBase;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
 
@@ -83,7 +83,7 @@ public class PstWrapperSurf<I extends ImageBase,II extends ImageBase>
 	}
 
 	@Override
-	public void detectFeatures(FastQueue<Point2D_I32> location, FastQueue<SurfFeature> description) {
+	public void detectFeatures(FastQueue<Point2D_F64> location, FastQueue<SurfFeature> description) {
 		// detect interest points
 		detector.detect(integralImage);
 		List<ScalePoint> points = detector.getFoundPoints();

@@ -18,8 +18,8 @@
 
 package boofcv.gui.feature;
 
-import georegression.geometry.UtilPoint2D_I32;
-import georegression.struct.point.Point2D_I32;
+import georegression.geometry.UtilPoint2D_F64;
+import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,7 +40,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 	private double clickDistance = 20;
 
 	// list of features in both images
-	protected List<Point2D_I32> leftPts,rightPts;
+	protected List<Point2D_F64> leftPts,rightPts;
 
 	// draw a selected pair
 	protected int selectedIndex=-1;
@@ -58,7 +58,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 		addMouseListener(this);
 	}
 
-	public void setLocation( List<Point2D_I32> leftPts , List<Point2D_I32> rightPts) {
+	public void setLocation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts) {
 		this.leftPts = leftPts;
 		this.rightPts = rightPts;
 		selectedIndex = -1;
@@ -181,15 +181,15 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 		repaint();
 	}
 
-	private int findBestPoint(int x, int y,  List<Point2D_I32> pts ) {
+	private int findBestPoint(int x, int y,  List<Point2D_F64> pts ) {
 		double bestDist = clickDistance;
 		int bestIndex = -1;
 		for( int i = 0; i < pts.size(); i++ ) {
 			if( !isValidPoint(i) )
 				continue;
 
-			Point2D_I32 p = pts.get(i);
-			double d = UtilPoint2D_I32.distance(p.x,p.y,x,y);
+			Point2D_F64 p = pts.get(i);
+			double d = UtilPoint2D_F64.distance(p.x, p.y, x, y);
 			if( d < bestDist ) {
 				bestDist = d;
 				bestIndex = i;

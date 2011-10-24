@@ -101,7 +101,7 @@ public class UtilOrientationBenchmark {
 		}
 
 		@Override
-		public double compute(int c_x, int c_y) {
+		public double compute(double c_x, double c_y) {
 			return alg.compute(c_x,c_y);
 		}
 	}

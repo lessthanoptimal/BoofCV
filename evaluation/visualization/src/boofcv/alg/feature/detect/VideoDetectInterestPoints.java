@@ -30,7 +30,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BuboVideoManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -73,7 +73,7 @@ public class VideoDetectInterestPoints<T extends ImageBase>
 
 		render.reset();
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
-			Point2D_I32 pt = detector.getLocation(i);
+			Point2D_F64 pt = detector.getLocation(i);
 			double scale = detector.getScale(i);
 
 			int radius = (int)(3*scale);
@@ -81,9 +81,9 @@ public class VideoDetectInterestPoints<T extends ImageBase>
 			if( orientation != null ) {
 				orientation.setScale(scale);
 				double angle = orientation.compute(pt.x,pt.y);
-				render.addCircle(pt.x,pt.y,radius,Color.red,angle);
+				render.addCircle((int)pt.x,(int)pt.y,radius,Color.red,angle);
 			} else {
-				render.addCircle(pt.x,pt.y,radius);
+				render.addCircle((int)pt.x,(int)pt.y,radius);
 			}
 		}
 		render.draw(g2);

@@ -40,5 +40,5 @@ public interface RegionOrientation {
 	 *
 	 * @return Orientation in radians.  Angle zero points along x-axis and pi/2 along y-axis.
 	 */
-	public double compute( int c_x , int c_y );
+	public double compute( double c_x , double c_y );
 }

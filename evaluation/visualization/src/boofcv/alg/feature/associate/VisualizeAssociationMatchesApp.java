@@ -41,7 +41,7 @@ import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -155,8 +155,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 	}
 
 	private void processImage() {
-		final List<Point2D_I32> leftPts = new ArrayList<Point2D_I32>();
-		final List<Point2D_I32> rightPts = new ArrayList<Point2D_I32>();
+		final List<Point2D_F64> leftPts = new ArrayList<Point2D_F64>();
+		final List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
 		TupleDescQueue leftDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
 		TupleDescQueue rightDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
 
@@ -173,7 +173,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 			}});
 	}
 
-	private void extractImageFeatures( T image , FastQueue<TupleDesc_F64> descs , List<Point2D_I32> locs ) {
+	private void extractImageFeatures( T image , FastQueue<TupleDesc_F64> descs , List<Point2D_F64> locs ) {
 		detector.detect(image);
 		describe.setImage(image);
 		orientation.setImage(image);
@@ -182,7 +182,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 				double yaw = 0;
 
-				Point2D_I32 pt = detector.getLocation(i);
+				Point2D_F64 pt = detector.getLocation(i);
 				double scale = detector.getScale(i);
 				if( describe.requiresOrientation() ) {
 					orientation.setRadius((int)(describe.getRadius()*scale));
@@ -200,7 +200,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 				double yaw = 0;
 
-				Point2D_I32 pt = detector.getLocation(i);
+				Point2D_F64 pt = detector.getLocation(i);
 				if( describe.requiresOrientation() ) {
 					yaw = orientation.compute(pt.x,pt.y);
 				}
@@ -238,7 +238,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 		manager.add("Cave","data/stitch/cave_01.jpg","data/stitch/cave_02.jpg");
 		manager.add("Kayak","data/stitch/kayak_02.jpg","data/stitch/kayak_03.jpg");
 		manager.add("Forest","data/scale/rainforest_01.jpg","data/scale/rainforest_02.jpg");
-//		manager.add("Building","data/stitch/apartment_building_01.jpg","data/stitch/apartment_building_02.jpg");
+		manager.add("Building","data/stitch/apartment_building_01.jpg","data/stitch/apartment_building_02.jpg");
 		manager.add("Trees Rotate","data/stitch/trees_rotate_01.jpg","data/stitch/trees_rotate_03.jpg");
 
 		app.setPreferredSize(new Dimension(1000,500));
