@@ -84,7 +84,10 @@ public abstract class OrientationAverage<D extends ImageBase> implements Orienta
 	}
 
 	@Override
-	public double compute(int c_x, int c_y) {
+	public double compute(double X, double Y) {
+
+		int c_x = (int)X;
+		int c_y = (int)Y;
 
 		// compute the visible region while taking in account
 		// the image borders

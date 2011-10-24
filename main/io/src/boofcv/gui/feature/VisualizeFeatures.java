@@ -68,7 +68,7 @@ public class VisualizeFeatures {
 		for( ScalePoint p : points ) {
 			int r = (int)(radius*p.scale);
 			int w = r*2+1;
-			g2.drawOval(p.x-r,p.y-r,w,w);
+			g2.drawOval((int)p.x-r,(int)p.y-r,w,w);
 		}
 	}
 }

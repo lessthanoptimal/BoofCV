@@ -110,7 +110,7 @@ public abstract class DescribePointBrief<T extends ImageBase> {
 	 * @param feature Where the descriptor is written to.
 	 * @return true indicates a descriptor could be created and false one was not.
 	 */
-	public abstract boolean process( int c_x , int c_y , BriefFeature feature );
+	public abstract boolean process( double c_x , double c_y , BriefFeature feature );
 
 	public BriefDefinition_I32 getDefinition() {
 		return definition;

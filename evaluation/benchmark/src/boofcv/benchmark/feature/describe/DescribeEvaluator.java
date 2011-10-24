@@ -34,7 +34,7 @@ import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import georegression.metric.UtilAngle;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +85,7 @@ public class DescribeEvaluator<T extends ImageBase>
 	}
 
 	@Override
-	public void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_I32> points)
+	public void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_F64> points)
 	{
 		if( initIndexes == null || initIndexes.length < points.size() ) {
 			initIndexes = new int[ points.size() ];
@@ -108,7 +108,7 @@ public class DescribeEvaluator<T extends ImageBase>
 	@Override
 	public double[] evaluateImage(BenchmarkAlgorithm alg, T image,
 								  double scale , double theta ,
-								  List<Point2D_I32> points, List<Integer> indexes)
+								  List<Point2D_F64> points, List<Integer> indexes)
 	{
 		ExtractFeatureDescription<T> extract = alg.getAlgorithm();
 
@@ -129,7 +129,7 @@ public class DescribeEvaluator<T extends ImageBase>
 	 * Extract feature descriptions from the initial image.  Calculates the
 	 * feature's orientation.
 	 */
-	private void initialDescriptions(T image, List<Point2D_I32> points, ExtractFeatureDescription<T> extract) {
+	private void initialDescriptions(T image, List<Point2D_F64> points, ExtractFeatureDescription<T> extract) {
 		extract.setImage(image);
 		orientationAlg.setImage(image);
 
@@ -137,7 +137,7 @@ public class DescribeEvaluator<T extends ImageBase>
 		initList.clear();
 		TupleDesc_F64 f = initial.pop();
 		for( int i = 0; i < points.size(); i++  ) {
-			Point2D_I32 p = points.get(i);
+			Point2D_F64 p = points.get(i);
 			theta[i] = orientationAlg.compute(p.x,p.y);
 			TupleDesc_F64 result = extract.process(p.x,p.y,theta[i],1,f);
 			if( result != null ) {
@@ -157,13 +157,13 @@ public class DescribeEvaluator<T extends ImageBase>
 	 */
 	private void currentDescriptions( T image ,ExtractFeatureDescription<T> extract ,
 									  double scale , double theta ,
-									  List<Point2D_I32> points, List<Integer> indexes ) {
+									  List<Point2D_F64> points, List<Integer> indexes ) {
 		extract.setImage(image);
 		current.reset();
 		currentList.clear();
 		TupleDesc_F64 f = current.pop();
 		for( int i = 0; i < points.size(); i++  ) {
-			Point2D_I32 p = points.get(i);
+			Point2D_F64 p = points.get(i);
 			// calculate the true orientation of the feature
 			double ang = UtilAngle.bound(this.theta[indexes.get(i)] + theta);
 			// extract the description

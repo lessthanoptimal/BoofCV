@@ -60,7 +60,7 @@ public interface PointSequentialTracker<T extends ImageBase> {
 	 * @param y coordinate of the new feature being tracked.
 	 * @return If a new track was added or not.
 	 */
-	public boolean addTrack( float x , float y );
+	public boolean addTrack( double x , double y );
 
 	/**
 	 * Automatically selects new features in the image to track.

@@ -81,8 +81,11 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 		String sumType = imageType.getSumType();
 
 		out.print("\t@Override\n" +
-				"\tpublic boolean process( int c_x , int c_y , BriefFeature feature )\n" +
+				"\tpublic boolean process( double X , double Y , BriefFeature feature )\n" +
 				"\t{\n" +
+				"\t\tint c_x = (int)X;\n" +
+				"\t\tint c_y = (int)Y;\n"+
+				"\n" +
 				"\t\tif( !BoofMiscOps.checkInside(blur,c_x,c_y,definition.radius) )\n" +
 				"\t\t\treturn false;\n" +
 				"\n" +

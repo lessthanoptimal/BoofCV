@@ -189,7 +189,7 @@ public class FeatureLaplacePyramid<T extends ImageBase, D extends ImageBase>
 
 			if( checkMax(ss.getLayer(layerID-1), val/ss0, x0, y0) && checkMax(ss.getLayer(layerID+1), val/ss2, x2, y2) ) {
 				// put features into the scale of the upper image
-				foundPoints.add( new ScalePoint((int)(c.x*scale1),(int)(c.y*scale1),scale1));
+				foundPoints.add( new ScalePoint(c.x*scale1,c.y*scale1,scale1));
 			}
 		}
 	}

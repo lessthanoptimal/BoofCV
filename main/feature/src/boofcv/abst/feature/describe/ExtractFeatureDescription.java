@@ -56,7 +56,7 @@ public interface ExtractFeatureDescription<T extends ImageBase> {
 	 * @param ret Used to store the extracted feature.  If null a new instance will be created.
 	 * @return  Description of the point.  If one could not be computed then null is returned.
 	 */
-	public TupleDesc_F64 process( int x , int y , double orientation , double scale , TupleDesc_F64 ret );
+	public TupleDesc_F64 process( double x , double y , double orientation , double scale , TupleDesc_F64 ret );
 
 	/**
 	 *

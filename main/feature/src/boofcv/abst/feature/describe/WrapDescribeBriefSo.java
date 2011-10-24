@@ -54,9 +54,9 @@ public class WrapDescribeBriefSo<T extends ImageBase> implements ExtractFeatureD
 	}
 
 	@Override
-	public TupleDesc_F64 process(int x, int y, double orientation, double scale, TupleDesc_F64 ret) {
+	public TupleDesc_F64 process(double x, double y, double orientation, double scale, TupleDesc_F64 ret) {
 
-		if( !alg.process(x,y,(float)orientation,(float)scale,feature) )
+		if( !alg.process((float)x,(float)y,(float)orientation,(float)scale,feature) )
 			return null;
 
 		if( ret == null )

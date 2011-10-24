@@ -20,16 +20,16 @@ package boofcv.benchmark.feature.orientation;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.benchmark.feature.BenchmarkAlgorithm;
-import boofcv.benchmark.feature.distort.StabilityEvaluatorPoint;
 import boofcv.alg.feature.orientation.OrientationGradient;
 import boofcv.alg.feature.orientation.OrientationImage;
 import boofcv.alg.feature.orientation.RegionOrientation;
+import boofcv.benchmark.feature.BenchmarkAlgorithm;
+import boofcv.benchmark.feature.distort.StabilityEvaluatorPoint;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.evaluation.ErrorStatistics;
 import boofcv.struct.image.ImageBase;
 import georegression.metric.UtilAngle;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 	}
 
 	@Override
-	public void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_I32> points) {
+	public void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_F64> points) {
 		if( derivX == null ) {
 			derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),image.width,image.height);
 			derivY = GeneralizedImageOps.createImage(gradient.getDerivType(),image.width,image.height);
@@ -71,7 +71,7 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 
 		angles = new double[points.size()];
 		for( int i = 0; i < points.size(); i++ ) {
-			Point2D_I32 p = points.get(i);
+			Point2D_F64 p = points.get(i);
 			angles[i] = angleAlg.compute(p.x,p.y);
 		}
 
@@ -93,7 +93,7 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 
 	@Override
 	public double[] evaluateImage(BenchmarkAlgorithm alg, T image,  double scale , double theta,
-							   List<Point2D_I32> points, List<Integer> indexes ) {
+							   List<Point2D_F64> points, List<Integer> indexes ) {
 
 //		initToImage = initToImage.invert(null);
 //		ShowImages.showWindow((ImageFloat32)image,"Modified",true);
@@ -104,7 +104,7 @@ public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
 
 		errors.reset();
 		for( int i = 0; i < points.size(); i++ ) {
-			Point2D_I32 p = points.get(i);
+			Point2D_F64 p = points.get(i);
 
 			double expectedAngle = UtilAngle.bound(angles[indexes.get(i)]+theta);
 

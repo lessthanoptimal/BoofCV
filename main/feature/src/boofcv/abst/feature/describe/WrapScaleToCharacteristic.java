@@ -69,11 +69,14 @@ public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends 
 
 
 	@Override
-	public TupleDesc_F64 process(int x, int y, double theta , double scale, TupleDesc_F64 ret ) {
+	public TupleDesc_F64 process(double x, double y, double theta , double scale, TupleDesc_F64 ret ) {
 		// compute the size of the region at this scale
 		int r = (int)Math.ceil(scale*3)+1;
 
-		ImageRectangle area = new ImageRectangle(x-r,y-r,x+r+1,y+r+1);
+		int pixelX = (int)x;
+		int pixelY = (int)y;
+
+		ImageRectangle area = new ImageRectangle(pixelX-r,pixelY-r,pixelX+r+1,pixelY+r+1);
 		if( !BoofMiscOps.checkInside(image,area) )
 			return null;
 

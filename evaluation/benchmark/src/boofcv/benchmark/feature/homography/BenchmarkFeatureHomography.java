@@ -211,7 +211,7 @@ public class BenchmarkFeatureHomography {
 //		app.evaluate("OpenCV_SURF.txt");
 //		app.evaluate("BRIEFO.txt");
 //		app.evaluate("BRIEF.txt");
-//		app.evaluate("BoofCV_SURF.txt");
+		app.evaluate("BoofCV_SURF.txt");
 		app.evaluate("BoofCV_SURF2.txt");
 //		app.evaluate("NEW2.txt");
 	}

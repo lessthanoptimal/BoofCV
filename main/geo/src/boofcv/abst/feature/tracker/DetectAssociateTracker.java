@@ -23,7 +23,7 @@ import boofcv.alg.geo.SingleImageInput;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageBase;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,7 +43,7 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 		implements PointSequentialTracker<I> , SingleImageInput<I> {
 
 	// location of interest points
-	private FastQueue<Point2D_I32> locDst = new FastQueue<Point2D_I32>(10,Point2D_I32.class,true);
+	private FastQueue<Point2D_F64> locDst = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
 	// description of interest points
 	private FastQueue<D> featSrc;
 	private FastQueue<D> featDst;
@@ -76,7 +76,7 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 
 	public abstract D createDescription();
 
-	public abstract void detectFeatures( FastQueue<Point2D_I32> location ,
+	public abstract void detectFeatures( FastQueue<Point2D_F64> location ,
 										 FastQueue<D> description );
 
 	public abstract FastQueue<AssociatedIndex> associate( FastQueue<D> featSrc , FastQueue<D> featDst );
@@ -129,7 +129,7 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 			for( int i = 0; i < matches.size; i++ ) {
 				AssociatedIndex indexes = matches.data[i];
 				AssociatedPair pair = tracksAll.get(indexes.src);
-				Point2D_I32 loc = locDst.data[indexes.dst];
+				Point2D_F64 loc = locDst.data[indexes.dst];
 				pair.currLoc.set(loc.x,loc.y);
 				tracksActive.add(pair);
 				TrackInfo info = (TrackInfo)pair.getDescription();
@@ -168,7 +168,7 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 	protected abstract void setDescription(D src, D dst);
 
 	@Override
-	public boolean addTrack(float x, float y) {
+	public boolean addTrack(double x, double y) {
 		throw new IllegalArgumentException("Not supported.  SURF features need to know the scale.");
 	}
 
@@ -184,7 +184,7 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 
 		if( keyFrameSet ) {
 			for( int i = 0; i < featDst.size; i++ ) {
-				Point2D_I32 loc = locDst.get(i);
+				Point2D_F64 loc = locDst.get(i);
 				// see if the track had been associated with an older one
 				boolean matched = false;
 				for( int j = 0; j < matches.size; j++ ) {
@@ -212,7 +212,7 @@ public abstract class DetectAssociateTracker<I extends ImageBase, D >
 			// create new tracks from latest detected features
 			for( int i = 0; i < featDst.size; i++ ) {
 				AssociatedPair p = getUnused();
-				Point2D_I32 loc = locDst.get(i);
+				Point2D_F64 loc = locDst.get(i);
 				p.currLoc.set(loc.x,loc.y);
 				p.keyLoc.set(p.currLoc);
 				setDescription(((TrackInfo)p.getDescription()).desc, featDst.get(i));

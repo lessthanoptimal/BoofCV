@@ -80,7 +80,7 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 	}
 
 	@Override
-	public TupleDesc_F64 process(int x, int y, double orientation , double scale, TupleDesc_F64 ret) {
+	public TupleDesc_F64 process(double x, double y, double orientation , double scale, TupleDesc_F64 ret) {
 
 		double angle = orientation;
 

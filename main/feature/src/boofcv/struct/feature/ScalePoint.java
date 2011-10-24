@@ -18,18 +18,18 @@
 
 package boofcv.struct.feature;
 
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * Where a point of interest was detected and at what scale.
  *
  * @author Peter Abeles
  */
-public class ScalePoint extends Point2D_I32 {
+public class ScalePoint extends Point2D_F64 {
 	// the scale the feature was detected at
 	public double scale;
 
-	public ScalePoint(int x, int y, double scale) {
+	public ScalePoint(double x, double y, double scale) {
 		super(x, y);
 		this.scale = scale;
 	}

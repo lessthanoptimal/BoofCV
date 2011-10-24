@@ -20,7 +20,7 @@ package boofcv.gui.feature;
 
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
@@ -46,7 +46,7 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 		super(borderSize);
 	}
 
-	public synchronized void setAssociation( List<Point2D_I32> leftPts , List<Point2D_I32> rightPts,
+	public synchronized void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts,
 											 FastQueue<AssociatedIndex> matches ) {
 		setLocation(leftPts,rightPts);
 
@@ -79,7 +79,7 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 			drawAllFeatures(g2, scaleLeft,scaleRight,rightX);
 		else {
 			// draw just an individual feature pair
-			Point2D_I32 l,r;
+			Point2D_F64 l,r;
 			Color color;
 
 			if( selectedIsLeft ) {
@@ -112,8 +112,8 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 			if( assocLeft[i] == -1 )
 				continue;
 
-			Point2D_I32 l = leftPts.get(i);
-			Point2D_I32 r = rightPts.get(assocLeft[i]);
+			Point2D_F64 l = leftPts.get(i);
+			Point2D_F64 r = rightPts.get(assocLeft[i]);
 
 			Color color = colors[i];
 
@@ -121,7 +121,7 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 		}
 	}
 
-	private void drawAssociation(Graphics2D g2, double scaleLeft , double scaleRight , int rightX, Point2D_I32 l, Point2D_I32 r, Color color) {
+	private void drawAssociation(Graphics2D g2, double scaleLeft , double scaleRight , int rightX, Point2D_F64 l, Point2D_F64 r, Color color) {
 		if( r == null ) {
 			int x1 = (int)(scaleLeft*l.x);
 			int y1 = (int)(scaleLeft*l.y);

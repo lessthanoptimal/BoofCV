@@ -43,8 +43,11 @@ public class ImplDescribePointBrief_U8 extends DescribePointBrief<ImageUInt8> {
 	}
 
 	@Override
-	public boolean process( int c_x , int c_y , BriefFeature feature )
+	public boolean process( double X , double Y , BriefFeature feature )
 	{
+		int c_x = (int)X;
+		int c_y = (int)Y;
+
 		if( !BoofMiscOps.checkInside(blur,c_x,c_y,definition.radius) )
 			return false;
 

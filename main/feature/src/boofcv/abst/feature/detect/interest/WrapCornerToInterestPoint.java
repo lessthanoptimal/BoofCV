@@ -24,8 +24,8 @@ import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.core.image.ImageGenerator;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageBase;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
-import georegression.struct.point.Point2D_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 	D derivYY;
 	D derivXY;
 
-	List<Point2D_I32> foundPoints;
+	List<Point2D_F64> foundPoints;
 
 	public WrapCornerToInterestPoint(GeneralFeatureDetector<T, D> detector,
 									 ImageGradient<T,D> gradient ,
@@ -77,10 +77,10 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 
 		QueueCorner corners = detector.getFeatures();
 
-		foundPoints = new ArrayList<Point2D_I32>();
+		foundPoints = new ArrayList<Point2D_F64>();
 		for( int i = 0; i < corners.size; i++ ) {
 			Point2D_I16 p = corners.get(i);
-			foundPoints.add( new Point2D_I32(p.x,p.y));
+			foundPoints.add( new Point2D_F64(p.x,p.y));
 		}
 	}
 
@@ -117,7 +117,7 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 	}
 
 	@Override
-	public Point2D_I32 getLocation(int featureIndex) {
+	public Point2D_F64 getLocation(int featureIndex) {
 		return foundPoints.get(featureIndex);
 	}
 

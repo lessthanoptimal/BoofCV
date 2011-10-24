@@ -19,7 +19,7 @@
 package boofcv.gui.feature;
 
 import boofcv.alg.feature.associate.ScoreAssociation;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
@@ -64,7 +64,7 @@ public class AssociationScorePanel<D>
 		this.scorer = scorer;
 	}
 
-	public void setLocation(List<Point2D_I32> leftPts , List<Point2D_I32> rightPts ,
+	public void setLocation(List<Point2D_F64> leftPts , List<Point2D_F64> rightPts ,
 							List<D> leftDesc, List<D> rightDesc ) {
 		setLocation(leftPts,rightPts);
 		this.leftDesc = leftDesc;
@@ -130,7 +130,7 @@ public class AssociationScorePanel<D>
 	 * Visualizes score distribution.  Larger circles mean its closer to the best
 	 * fit score.
 	 */
-	private void drawDistribution( Graphics2D g2 , List<Point2D_I32> candidates ,
+	private void drawDistribution( Graphics2D g2 , List<Point2D_F64> candidates ,
 					  int offX, int offY , double scale) {
 		findStatistics();
 
@@ -145,7 +145,7 @@ public class AssociationScorePanel<D>
 			normalizer = Math.abs(best)*(Math.exp(-1.0/containmentFraction));
 
 		for( int i = 0; i < candidates.size(); i++ ) {
-			Point2D_I32 p = candidates.get(i);
+			Point2D_F64 p = candidates.get(i);
 
 			double s = associationScore[i];
 
@@ -166,15 +166,15 @@ public class AssociationScorePanel<D>
 		g2.setColor(Color.GREEN);
 		g2.setStroke(new BasicStroke(10));
 		int w = maxCircleRadius*2+1;
-		Point2D_I32 p = candidates.get(indexBest);
+		Point2D_F64 p = candidates.get(indexBest);
 		int x = (int)(p.x*scale+offX);
 		int y = (int)(p.y*scale+offY);
 		g2.drawOval(x-maxCircleRadius,y-maxCircleRadius,w,w);
 	}
 
-	private void drawPoints( Graphics2D g2 , List<Point2D_I32> points ,
+	private void drawPoints( Graphics2D g2 , List<Point2D_F64> points ,
 							 int startX , int startY , double scale ) {
-		for( Point2D_I32 p : points ) {
+		for( Point2D_F64 p : points ) {
 			int x1 = (int)(scale*p.x)+startX;
 			int y1 = (int)(scale*p.y)+startY;
 
@@ -182,7 +182,7 @@ public class AssociationScorePanel<D>
 		}
 	}
 
-	private void drawCrossHair( Graphics2D g2 , Point2D_I32 target ,
+	private void drawCrossHair( Graphics2D g2 , Point2D_F64 target ,
 								int startX , int startY , double scale) {
 
 		int x = startX + (int)(target.x*scale);

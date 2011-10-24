@@ -27,7 +27,7 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BriefFeatureQueue;
 import boofcv.struct.image.ImageBase;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * Wrapper around {{@link DescribePointBrief}.
@@ -71,14 +71,14 @@ public class PstWrapperBrief <I extends ImageBase>
 	}
 
 	@Override
-	public void detectFeatures(FastQueue<Point2D_I32> location,
+	public void detectFeatures(FastQueue<Point2D_F64> location,
 							   FastQueue<BriefFeature> description) {
 		int N = detector.getNumberOfFeatures();
 
-		Point2D_I32 lp = location.pop();
+		Point2D_F64 lp = location.pop();
 		BriefFeature f = description.pop();
 		for( int i = 0; i < N; i++ ) {
-			Point2D_I32 p = detector.getLocation(i);
+			Point2D_F64 p = detector.getLocation(i);
 
 			if( alg.process(p.x,p.y,f) ) {
 				lp.set(p.x,p.y);

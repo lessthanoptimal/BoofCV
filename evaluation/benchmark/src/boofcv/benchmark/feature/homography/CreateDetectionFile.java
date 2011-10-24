@@ -26,7 +26,7 @@ import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -116,11 +116,11 @@ public class CreateDetectionFile<T extends ImageBase> {
 		PrintStream out = new PrintStream(fos);
 
 		for( int i = 0; i < alg.getNumberOfFeatures(); i++ ) {
-			Point2D_I32 pt = alg.getLocation(i);
+			Point2D_F64 pt = alg.getLocation(i);
 			double scale = alg.getScale(i);
 			orientation.setScale(scale);
 			double yaw = orientation.compute(pt.getX(),pt.getY());
-			out.printf("%d %d %.5f %.5f\n",pt.getX(),pt.getY(),scale,yaw);
+			out.printf("%.2f %.2f %.5f %.5f\n",pt.getX(),pt.getY(),scale,yaw);
 		}
 		out.close();
 	}
