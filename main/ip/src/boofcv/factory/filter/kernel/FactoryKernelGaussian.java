@@ -327,4 +327,44 @@ public class FactoryKernelGaussian {
 	public static int radiusForSigma(double sigma, int order ) {
 		return (int)Math.ceil((((5+0.8*order)*sigma)-1)/2);
 	}
+
+	/**
+	 * Create a gaussian kernel based on its width.  Supports kernels of even or odd widths
+	 * .
+	 * @param sigma
+	 * @param width
+	 * @return
+	 */
+	public static Kernel2D_F64 gaussianWidth( double sigma , int width )
+	{
+		if( sigma <= 0 )
+			sigma = sigmaForRadius(width/2,0);
+		else if( width <= 0 )
+			throw new IllegalArgumentException("Must specify the width since it doesn't know if it should be even or odd");
+
+		if( width % 2 == 0 ) {
+			int r = width/2;
+			Kernel2D_F64 ret = new Kernel2D_F64(width);
+			double sum = 0;
+			for( int y = 0; y < width; y++ ) {
+				double dy = Math.abs(y-r)+0.5;
+				for( int x = 0; x < width; x++ ) {
+					double dx = Math.abs(x-r)+0.5;
+
+					double d = Math.sqrt(dx*dx + dy*dy);
+					double val = UtilGaussian.computePDF(0,sigma,d);
+					ret.set(x,y,val);
+					sum += val;
+				}
+			}
+
+			for( int i = 0; i < ret.data.length; i++ ) {
+				ret.data[i] /= sum;
+			}
+
+			return ret;
+		} else {
+			return gaussian2D_F64(sigma,width/2,true);
+		}
+	}
 }

@@ -132,7 +132,7 @@ public class GenericOrientationIntegralTests<T extends ImageBase> {
 		found = UtilAngle.bound(alg.compute(x,y));
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 
-		alg.setScale(0.5);
+		alg.setScale(0.75);
 		found = UtilAngle.bound(alg.compute(x,y));
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 	}

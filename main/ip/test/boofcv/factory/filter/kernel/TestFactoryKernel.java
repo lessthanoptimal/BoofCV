@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -139,6 +140,13 @@ public class TestFactoryKernel {
 			}
 		}
 		assertTrue(nonZero != 0);
+	}
+
+	@Test
+	public void gaussianWidth() {
+		// check that sum adds up to 1
+		// should be symmetric for even
+		fail("implement");
 	}
 
 	@Test

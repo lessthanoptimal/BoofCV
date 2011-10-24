@@ -53,7 +53,7 @@ public class SurfDescribeOps {
 	 * @param c_x Center pixel.
 	 * @param c_y Center pixel.
 	 * @param radiusRegion Radius of region being considered in samples points (not pixels).
-	 * @param kernelSize Size of the kernel's width (in pixels) at scale of 1.
+	 * @param kernelWidth Size of the kernel's width (in pixels) at scale of 1.
 	 * @param scale Scale of feature.  Changes sample points.
 	 * @param useHaar
 	 * @param derivX Derivative x wavelet output. length = radiusRegions*radiusRegions
@@ -61,10 +61,10 @@ public class SurfDescribeOps {
 	 */
 	public static <T extends ImageBase>
 	void gradient(T ii, int c_x, int c_y,
-				  int radiusRegion, int kernelSize, double scale,
+				  int radiusRegion, int kernelWidth, double scale,
 				  boolean useHaar, double[] derivX, double derivY[])
 	{
-		ImplSurfDescribeOps.naiveGradient(ii,c_x,c_y, radiusRegion, kernelSize, scale, useHaar, derivX,derivY);
+		ImplSurfDescribeOps.naiveGradient(ii,c_x,c_y, radiusRegion, kernelWidth, scale, useHaar, derivX,derivY);
 	}
 
 	/**
@@ -73,10 +73,10 @@ public class SurfDescribeOps {
 	 */
 	public static
 	void gradient_noborder( ImageFloat32 ii , int c_x , int c_y ,
-							int radius , int kernelSize , double scale,
+							int radius , int kernelWidth , double scale,
 							float[] derivX , float[] derivY )
 	{
-		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, kernelSize, scale, derivX,derivY);
+		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, kernelWidth, scale, derivX,derivY);
 	}
 
 	/**
@@ -85,10 +85,10 @@ public class SurfDescribeOps {
 	 */
 	public static
 	void gradient_noborder( ImageSInt32 ii , int c_x , int c_y ,
-							int radius , int kernelSize , double scale,
+							int radius , int kernelWidth , double scale,
 							int[] derivX , int[] derivY )
 	{
-		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, kernelSize, scale, derivX,derivY);
+		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, kernelWidth, scale, derivX,derivY);
 	}
 
 	/**
@@ -96,19 +96,19 @@ public class SurfDescribeOps {
 	 *
 	 * @param assumeInsideImage Can it assume that the feature is contained entirely inside the image.
 	 * @param useHaar Should it use a haar wavelet or an derivative kernel.
-	 * @param kernelSize Size of the kernel's width in pixels (before scale adjustment).
+	 * @param kernelWidth Size of the kernel's width in pixels (before scale adjustment).
 	 * @param scale Scale of the kernel.
 	 * @param imageType Type of image being processed.
 	 * @return Sparse gradient algorithm
 	 */
 	public static <T extends ImageBase>
 	SparseImageGradient<T,?> createGradient( boolean assumeInsideImage ,
-											 boolean useHaar , int kernelSize , double scale,
+											 boolean useHaar , int kernelWidth , double scale,
 											 Class<T> imageType )
 	{
 		// scale the kernel and round it up to the nearest even size
-		kernelSize = (int)Math.round(scale*kernelSize);
-		int regionRadius = kernelSize/2 + (kernelSize%2);
+		kernelWidth = (int)Math.round(scale*kernelWidth);
+		int regionRadius = kernelWidth/2 + (kernelWidth%2);
 
 		if( assumeInsideImage && !useHaar ) {
 			return FactorySparseIntegralFilters.gradient(regionRadius,imageType);
@@ -132,15 +132,15 @@ public class SurfDescribeOps {
 	 * @param c_x Center of the interest point.
 	 * @param c_y Center of the interest point.
 	 * @param radiusRegions Radius in pixels of the whole region at a scale of 1
-	 * @param kernelSize Size of the kernel's width in pixels at a scale of 1
+	 * @param kernelWidth Size of the kernel's width in pixels at a scale of 1
 	 * @param scale Scale factor for the region.
 	 */
 	public static <T extends ImageBase>
-	boolean isInside( T ii , int c_x , int c_y , int radiusRegions , int kernelSize , double scale) {
+	boolean isInside( T ii , int c_x , int c_y , int radiusRegions , int kernelWidth , double scale) {
 
 		// size of the convolution kernel
-		kernelSize = (int)Math.ceil(kernelSize*scale);
-		int kernelRadius = kernelSize/2;
+		kernelWidth = (int)Math.ceil(kernelWidth*scale);
+		int kernelRadius = kernelWidth/2;
 
 		// find the radius of the whole area being sampled
 		int radius = (int)Math.ceil(radiusRegions*scale);
@@ -213,7 +213,6 @@ public class SurfDescribeOps {
 		return true;
 	}
 
-
 	/**
 	 * <p>
 	 * Computes features in the SURF descriptor.
@@ -255,7 +254,6 @@ public class SurfDescribeOps {
 		ImplSurfDescribeOps.features(c_x, c_y, theta, weight, widthLargeGrid, widthSubRegion, scale, gradient, features);
 	}
 
-	// todo move to a generalized class?
 	public static void normalizeFeatures( double []features ) {
 		double norm = 0;
 		for( int i = 0; i < features.length; i++ ) {

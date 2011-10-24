@@ -49,7 +49,7 @@ public class ImplSurfDescribeOps {
 		c_x += 0.5;
 		c_y += 0.5;
 
-		int r = (int)Math.ceil(kernelSize*scale)/2; // todo think about this ceil more
+		int r = (int)Math.ceil(kernelSize * scale)/2;
 		int w = r*2+1;
 		int i = 0;
 		for( int y = -radius; y <= radius; y++ ) {
@@ -179,7 +179,6 @@ public class ImplSurfDescribeOps {
 	/**
 	 * Computes SURF features for the specified region.
 	 */
-	// todo change param
 	public static <T extends ImageBase>
 	void features( double c_x , double c_y ,
 				   double theta , Kernel2D_F64 weight ,
@@ -189,7 +188,7 @@ public class ImplSurfDescribeOps {
 				   double []features )
 	{
 		int regionSize = widthLargeGrid*widthSubRegion;
-		if( weight.width != regionSize+1 ) {
+		if( weight.width != regionSize ) {
 			throw new IllegalArgumentException("Weighting kernel has an unexpected size");
 		}
 

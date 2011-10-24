@@ -21,7 +21,7 @@ package boofcv.alg.feature.orientation.impl;
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt32;
 import georegression.metric.UtilAngle;
 
 
@@ -32,12 +32,12 @@ import georegression.metric.UtilAngle;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationSlidingWindowIntegral_F32
-		extends OrientationIntegralBase<ImageFloat32>
+public class ImplOrientationSlidingWindowIntegral_I32
+		extends OrientationIntegralBase<ImageSInt32>
 {
 	// where the output from the derivative is stored
-	float[] derivX;
-	float[] derivY;
+	int[] derivX;
+	int[] derivY;
 
 	// derivative needed for border algorithm
 	double[] borderDerivX;
@@ -60,15 +60,15 @@ public class ImplOrientationSlidingWindowIntegral_F32
 	 * @param weighted If edge intensities are weighted using a Gaussian kernel.
 	 * @param sampleKernelWidth Size of kernel doing the sampling.  Typically 4.
 	 */
-	public ImplOrientationSlidingWindowIntegral_F32(int numAngles, double windowSize,
-													int radius, boolean weighted, int sampleKernelWidth) {
+	public ImplOrientationSlidingWindowIntegral_I32(int numAngles, double windowSize,
+													int radius, boolean weighted , int sampleKernelWidth ) {
 		super(radius,weighted);
 		this.numAngles = numAngles;
 		this.windowSize = windowSize;
 		this.sampleKernelWidth = sampleKernelWidth;
 
-		derivX = new float[width*width];
-		derivY = new float[width*width];
+		derivX = new int[width*width];
+		derivY = new int[width*width];
 
 		borderDerivX = new double[width*width];
 		borderDerivY = new double[width*width];
@@ -83,8 +83,8 @@ public class ImplOrientationSlidingWindowIntegral_F32
 			SurfDescribeOps.gradient_noborder(ii,c_x,c_y,radius,sampleKernelWidth,scale,derivX,derivY);
 		} else {
 			SurfDescribeOps.gradient(ii,c_x,c_y,radius,sampleKernelWidth,scale, true, borderDerivX,borderDerivY);
-			BoofMiscOps.convertTo_F32(borderDerivX,derivX);
-			BoofMiscOps.convertTo_F32(borderDerivY,derivY);
+			BoofMiscOps.convertTo_I32(borderDerivX, derivX);
+			BoofMiscOps.convertTo_I32(borderDerivY, derivY);
 		}
 
 		for( int i = 0; i < derivX.length; i++ ) {
@@ -100,13 +100,13 @@ public class ImplOrientationSlidingWindowIntegral_F32
 
 	private double unweighted() {
 		double windowRadius = windowSize/2.0;
-		double bestScore = -1;
+		int bestScore = -1;
 		double bestAngle = 0;
 		double stepAngle = Math.PI*2.0/numAngles;
 
 		for( double angle = -Math.PI; angle < Math.PI; angle += stepAngle ) {
-			double dx = 0;
-			double dy = 0;
+			int dx = 0;
+			int dy = 0;
 			for( int i = 0; i < angles.length; i++ ) {
 				double diff = UtilAngle.dist(angle, angles[i]);
 				if( diff <= windowRadius) {
@@ -114,7 +114,7 @@ public class ImplOrientationSlidingWindowIntegral_F32
 					dy += derivY[i];
 				}
 			}
-			double n = dx*dx + dy*dy;
+			int n = dx*dx + dy*dy;
 			if( n > bestScore) {
 				bestAngle = Math.atan2(dy,dx);
 				bestScore = n;
@@ -151,7 +151,7 @@ public class ImplOrientationSlidingWindowIntegral_F32
 	}
 
 	@Override
-	public Class<ImageFloat32> getImageType() {
-		return ImageFloat32.class;
+	public Class<ImageSInt32> getImageType() {
+		return ImageSInt32.class;
 	}
 }

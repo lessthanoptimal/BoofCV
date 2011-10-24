@@ -19,20 +19,21 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.describe.SurfDescribeOps;
-import boofcv.alg.feature.orientation.OrientationAverageIntegral;
+import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;
 
 
 /**
  * <p>
- * Implementation of {@link OrientationAverageIntegral} for a specific type.
+ * Estimates the orientation of a region by computing the image derivative from an integral image.
+ * The derivative along each axis is summed up and the angle computed from that.
  * </p>
  *
  * @author Peter Abeles
  */
 public class ImplOrientationAverageIntegral_F32
-		extends OrientationAverageIntegral<ImageFloat32>
+		extends OrientationIntegralBase<ImageFloat32>
 {
 	// where the output from the derivative is stored
 	float[] derivX;
@@ -60,7 +61,7 @@ public class ImplOrientationAverageIntegral_F32
 	@Override
 	public double compute(int c_x, int c_y ) {
 		// use a faster algorithm if it is entirely inside
-		if( SurfDescribeOps.isInside(ii,c_x,c_y,radius,4,scale))  {
+		if( SurfDescribeOps.isInside(ii,c_x,c_y,radius,5,scale))  {
 			SurfDescribeOps.gradient_noborder(ii,c_x,c_y,radius,4,scale,derivX,derivY);
 		} else {
 			SurfDescribeOps.gradient(ii,c_x,c_y,radius,4,scale, false, borderDerivX,borderDerivY);

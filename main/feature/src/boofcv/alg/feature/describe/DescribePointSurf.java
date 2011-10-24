@@ -93,7 +93,9 @@ public class DescribePointSurf<II extends ImageBase> {
 		this.useHaar = useHaar;
 
 		int radius = (widthLargeGrid*widthSubRegion)/2;
-		weight = FactoryKernelGaussian.gaussian(2,true,64,3.3,radius);
+		// performance seems to keep on improving as sigma is increased, but this becomes less
+		// like the original paper as that's done.
+		weight = FactoryKernelGaussian.gaussianWidth(3.8, radius * 2);
 
 		// normalize to reduce numerical issues.
 		// not sure if this makes any difference.  // TODO CHECK TOUT

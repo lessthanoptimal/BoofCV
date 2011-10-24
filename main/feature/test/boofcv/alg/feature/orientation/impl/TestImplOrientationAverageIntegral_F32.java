@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationIntegralTests;
-import boofcv.alg.feature.orientation.OrientationAverageIntegral;
+import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ public class TestImplOrientationAverageIntegral_F32 {
 	public void standardUnweighted() {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationAverageIntegral<ImageFloat32> alg = new ImplOrientationAverageIntegral_F32(r,false);
+		OrientationIntegralBase<ImageFloat32> alg = new ImplOrientationAverageIntegral_F32(r,false);
 
 		tests.setup(angleTol, r*2+1 , alg,ImageFloat32.class);
 		tests.performAll();
@@ -45,7 +45,7 @@ public class TestImplOrientationAverageIntegral_F32 {
 	public void standardWeighted() {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationAverageIntegral<ImageFloat32> alg = new ImplOrientationAverageIntegral_F32(r,true);
+		OrientationIntegralBase<ImageFloat32> alg = new ImplOrientationAverageIntegral_F32(r,true);
 
 		tests.setup(angleTol, r*2+1 ,alg,ImageFloat32.class);
 		tests.performAll();

@@ -45,7 +45,7 @@ public class TestImplSurfDescribeOps {
 	int width = 80;
 	int height = 100;
 
-	Kernel2D_F64 weight = FactoryKernelGaussian.gaussian(2,true, 64, -1,10);
+	Kernel2D_F64 weight = FactoryKernelGaussian.gaussianWidth(-1,20);
 	double features[] = new double[64];
 
 	@Test
