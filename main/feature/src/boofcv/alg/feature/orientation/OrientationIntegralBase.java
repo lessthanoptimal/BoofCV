@@ -25,13 +25,12 @@ import boofcv.struct.image.ImageBase;
 
 /**
  * <p>
- * Estimates the orientation of a region by computing the image derivative from an integral image.
- * The derivative along each axis is summed up and the angle computed from that.
+ * Common base class for integral image region orientation algorithms.
  * </p>
  *
  * @author Peter Abeles
  */
-public abstract class OrientationAverageIntegral<T extends ImageBase>
+public abstract class OrientationIntegralBase<T extends ImageBase>
 		implements OrientationIntegral<T>
 {
 	// integral image transform of input image
@@ -49,10 +48,10 @@ public abstract class OrientationAverageIntegral<T extends ImageBase>
 
 	/**
 	 *
-	 * @param radius Radius of the region being considered in terms of Wavelet samples. Typically 6.
+	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
 	 * @param weighted If edge intensities are weighted using a Gaussian kernel.
 	 */
-	public OrientationAverageIntegral( int radius , boolean weighted ) {
+	public OrientationIntegralBase(int radius, boolean weighted) {
 		this.radius = radius;
 		this.width = radius*2+1;
 		if( weighted )

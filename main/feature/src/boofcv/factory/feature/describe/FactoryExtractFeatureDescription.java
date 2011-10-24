@@ -23,6 +23,7 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribePointGaussian12;
 import boofcv.alg.feature.describe.DescribePointSteerable2D;
+import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.orientation.OrientationIntegral;
@@ -49,9 +50,9 @@ public class FactoryExtractFeatureDescription {
 		if( isOriented )
 			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
 //			orientation = FactoryOrientationAlgs.sliding_ii(42,Math.PI/3.0,6,true,integralType);
-//			orientation = (OrientationIntegral<II>)new ImplOrientationOpenSURF_F32();
 
-		return new WrapDescribeSurf<T,II>( FactoryDescribePointAlgs.<II>surf(integralType),orientation, 255);
+		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>surf(integralType);
+		return new WrapDescribeSurf<T,II>( alg ,orientation, 255);
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>

@@ -105,7 +105,7 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 
 		@Override
 		public void process() {
-			alg.setImage((ImageFloat32)image);
+			alg.setImage(image);
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
 				alg.process(p.x,p.y,(float)yaws[i],(float)scales[i],alg.createFeature());
