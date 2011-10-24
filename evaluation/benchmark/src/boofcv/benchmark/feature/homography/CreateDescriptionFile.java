@@ -28,7 +28,6 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
-import pja.dev.cv.IntensityGraphDesc;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -36,9 +35,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.List;
-
-import static pja.dev.cv.FactoryDescribeNewStructure.connectSpiderWeb;
-import static pja.dev.cv.FactoryDescribeNewStructure.createCircle;
 
 
 /**
@@ -159,11 +155,11 @@ public class CreateDescriptionFile<T extends ImageBase> {
 	void doStuff( String directory , String imageSuffix , Class<T> imageType ) throws FileNotFoundException {
 		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
 
-		int radius = 12;
-		int numAngles = 8;
-		int numJoints = 2;
-		IntensityGraphDesc graph = createCircle(radius,numAngles,numJoints);
-		connectSpiderWeb(numAngles,numJoints,graph);
+//		int radius = 12;
+//		int numAngles = 8;
+//		int numJoints = 2;
+//		IntensityGraphDesc graph = createCircle(radius,numAngles,numJoints);
+//		connectSpiderWeb(numAngles,numJoints,graph);
 //		ExtractFeatureDescription<T> alg = wrap(graph,imageType);
 
 //		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16, 512, -1, 4, true, imageType);

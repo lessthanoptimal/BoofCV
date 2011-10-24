@@ -14,7 +14,6 @@
     <orderEntry type="module" module-name="BoofCV Image Processing" />
     <orderEntry type="module" module-name="BoofCV IO" />
     <orderEntry type="module" module-name="Bubo IO" />
-    <orderEntry type="module" module-name="Developmental-CV" />
     <orderEntry type="module" module-name="ejml" />
     <orderEntry type="module" module-name="GeoRegression" />
     <orderEntry type="module" module-name="libpja" />
