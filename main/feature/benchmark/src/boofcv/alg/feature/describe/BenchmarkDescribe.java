@@ -18,13 +18,13 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.abst.feature.describe.ExtractFeatureDescription;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
-import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
@@ -115,10 +115,10 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 
 	public class Describe implements Performer {
 
-		ExtractFeatureDescription<I> alg;
+		DescribeRegionPoint<I> alg;
 		String name;
 
-		public Describe(String name, ExtractFeatureDescription<I> alg) {
+		public Describe(String name, DescribeRegionPoint<I> alg) {
 			this.alg = alg;
 			this.name = name;
 		}
@@ -142,16 +142,16 @@ public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II exte
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryExtractFeatureDescription.<I,II>surf(true,imageType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryExtractFeatureDescription.<I,II>msurf(true,imageType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("SURF UP", FactoryExtractFeatureDescription.<I,II>surf(false,imageType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("MSURF UP", FactoryExtractFeatureDescription.<I,II>msurf(false, imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryDescribeRegionPoint.<I,II>surf(true, imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryDescribeRegionPoint.<I,II>msurf(true, imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("SURF UP", FactoryDescribeRegionPoint.<I,II>surf(false, imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("MSURF UP", FactoryDescribeRegionPoint.<I,II>msurf(false, imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new BriefO512(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("Steer r=12", FactoryExtractFeatureDescription.steerableGaussian(12,false,imageType,derivType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("Steer Norm r=12", FactoryExtractFeatureDescription.steerableGaussian(12,true,imageType,derivType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=12", FactoryExtractFeatureDescription.gaussian12(12,imageType,derivType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=20", FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("Steer r=12", FactoryDescribeRegionPoint.steerableGaussian(12, false, imageType, derivType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("Steer Norm r=12", FactoryDescribeRegionPoint.steerableGaussian(12, true, imageType, derivType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=12", FactoryDescribeRegionPoint.gaussian12(12, imageType, derivType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=20", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType)),TEST_TIME);
 	}
 
 	public static void main( String arg[ ] ) {

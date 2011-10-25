@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ExtractFeatureDescription<T extends ImageBase> {
+public interface DescribeRegionPoint<T extends ImageBase> {
 
 	/**
 	 * Specified the image which is to be processed.

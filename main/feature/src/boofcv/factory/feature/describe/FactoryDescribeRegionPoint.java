@@ -37,9 +37,11 @@ import java.util.Random;
 
 
 /**
+ * Factory for creating implementations of {@link DescribeRegionPoint}.
+ *
  * @author Peter Abeles
  */
-public class FactoryExtractFeatureDescription {
+public class FactoryDescribeRegionPoint {
 
 	/**
 	 * <p>
@@ -49,10 +51,10 @@ public class FactoryExtractFeatureDescription {
 	 *
 	 * @param isOriented True for orientation invariant.
 	 * @param imageType Type of input image.
-	 * @return SURF
+	 * @return SURF description extractor
 	 */
 	public static <T extends ImageBase, II extends ImageBase>
-	ExtractFeatureDescription<T> surf( boolean isOriented , Class<T> imageType) {
+	DescribeRegionPoint<T> surf( boolean isOriented , Class<T> imageType) {
 		OrientationIntegral<II> orientation = null;
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -73,10 +75,10 @@ public class FactoryExtractFeatureDescription {
 	 *
 	 * @param isOriented True for orientation invariant.
 	 * @param imageType Type of input image.
-	 * @return SURF
+	 * @return SURF description extractor
 	 */
 	public static <T extends ImageBase, II extends ImageBase>
-	ExtractFeatureDescription<T> msurf( boolean isOriented , Class<T> imageType) {
+	DescribeRegionPoint<T> msurf( boolean isOriented , Class<T> imageType) {
 		OrientationIntegral<II> orientation = null;
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -90,7 +92,7 @@ public class FactoryExtractFeatureDescription {
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>
-	ExtractFeatureDescription<T> gaussian12( int radius ,Class<T> imageType , Class<D> derivType ) {
+	DescribeRegionPoint<T> gaussian12( int radius ,Class<T> imageType , Class<D> derivType ) {
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 		DescribePointGaussian12<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian12(radius,imageType);
@@ -99,7 +101,7 @@ public class FactoryExtractFeatureDescription {
 	}
 
 	public static <T extends ImageBase, D extends ImageBase>
-	ExtractFeatureDescription<T> steerableGaussian( int radius , boolean normalized ,
+	DescribeRegionPoint<T> steerableGaussian( int radius , boolean normalized ,
 													Class<T> imageType , Class<D> derivType ) {
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
@@ -122,7 +124,7 @@ public class FactoryExtractFeatureDescription {
 	 *@param imageType  @return
 	 */
 	public static <T extends ImageBase>
-	ExtractFeatureDescription<T> brief(int radius, int numPoints,
+	DescribeRegionPoint<T> brief(int radius, int numPoints,
 									   double blurSigma, int blurRadius,
 									   boolean isFixed,
 									   Class<T> imageType) {

@@ -19,7 +19,7 @@
 package boofcv.benchmark.feature.describe;
 
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
-import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.struct.image.ImageBase;
 
 import java.util.ArrayList;
@@ -34,12 +34,12 @@ public class UtilStabilityBenchmark {
 	List<BenchmarkAlgorithm> createAlgorithms(int radius, Class<T> imageType , Class<D> derivType ) {
 		List<BenchmarkAlgorithm> ret = new ArrayList<BenchmarkAlgorithm>();
 
-		ret.add( new BenchmarkAlgorithm("SURF", FactoryExtractFeatureDescription.surf(false,imageType)));
-		ret.add( new BenchmarkAlgorithm("BRIEF", FactoryExtractFeatureDescription.brief(16, 512, -1, 4, true, imageType)));
-		ret.add( new BenchmarkAlgorithm("BRIEF-SO", FactoryExtractFeatureDescription.brief(16, 512, -1, 4, false, imageType)));
-		ret.add( new BenchmarkAlgorithm("Gaussian 12", FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType)));
-		ret.add( new BenchmarkAlgorithm("Steer", FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType)));
-		ret.add( new BenchmarkAlgorithm("Steer Norm", FactoryExtractFeatureDescription.steerableGaussian(20,true,imageType,derivType)));
+		ret.add( new BenchmarkAlgorithm("SURF", FactoryDescribeRegionPoint.surf(false, imageType)));
+		ret.add( new BenchmarkAlgorithm("BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType)));
+		ret.add( new BenchmarkAlgorithm("BRIEF-SO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType)));
+		ret.add( new BenchmarkAlgorithm("Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType)));
+		ret.add( new BenchmarkAlgorithm("Steer", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType)));
+		ret.add( new BenchmarkAlgorithm("Steer Norm", FactoryDescribeRegionPoint.steerableGaussian(20, true, imageType, derivType)));
 
 		return ret;
 	}

@@ -1,23 +1,36 @@
-#include "imload.h"
-#include "ipoint.h"
-#include "image.h"
-#include "surf.h"
-#include <ctime>
-#include <iostream>
-#include <stdio.h>
+import org.mite.jsurf.InterestPoint;
 
-#include <vector>
-#include <stdexcept>
+import java.util.List;
+
+/**
+ * @author Peter Abeles
+ */
+public class CreateDescription {
+
+	public static List<InterestPoint> loadInterestPoints( String fileName )
+	{
+
+	}
+
+	public static void main( String args ) {
+		String nameDirectory = "";
+		String nameDirectory = "";
+
+	}
+
+}
+
+/*
+        #include <vector>
 
 using namespace std;
-using namespace surf;
 
 std::vector<string> imageNames;
 
-void process( Image *image , FILE *fid , FILE *output)
+void process( IplImage *image , FILE *fid , FILE *output)
 {
     // convert the image into an integral image
-    Image iimage(image, false);
+    IplImage *int_img = Integral(image);
 
     // location of detected points
     std::vector<Ipoint> ipts;
@@ -39,34 +52,25 @@ void process( Image *image , FILE *fid , FILE *output)
     printf("Read in a total of %d points.\n",(int)ipts.size());
 
     // Create Surf Descriptor Object
-    Surf des(&iimage, /* pointer to integral image */
-             false, /* double image size flag */
-             false, /* rotation invariance or upright */
-             false, /* use the extended descriptor */
-             4 /* square size of the descriptor window (default 4x4)*/);
+    Surf des(int_img, ipts);
 
     // Extract the descriptors for the ipts
-    int length = des.getVectLength();
+    des.getDescriptors(false);
 
     // output the description
-    fprintf(output,"%d\n",length);
+    fprintf(output,"64\n");
     for( size_t i = 0; i < ipts.size(); i++ ) {
         Ipoint &p = ipts.at(i);
-
-        des.setIpoint(&p);
-        // assign reproducible orientation
-        des.assignOrientation();
-        // make the SURF descriptor
-        des.makeDescriptor();
-
-        fprintf(output,"%f %f %f",(float)p.x,(float)p.y,(float)p.ori);
-        for( int i = 0; i < length; i++ ) {
-            fprintf(output," %0.10f",p.ivec[i]);
+        fprintf(output,"%7.3f %7.3f %7.5f",p.x,p.y,p.orientation);
+        for( int i = 0; i < 64; i++ ) {
+            fprintf(output," %0.10f",p.descriptor[i]);
         }
         fprintf(output,"\n");
     }
 
     printf("Done\n");
+    // Deallocate the integral image
+    cvReleaseImage(&int_img);
 }
 
 int main( int argc , char **argv )
@@ -89,15 +93,14 @@ int main( int argc , char **argv )
             fprintf(stderr,"Couldn't open file: %s\n",filename);
             throw std::runtime_error("Failed to open");
         }
-        sprintf(filename,"%s/img%d.pgm",nameDirectory,i);
-        ImLoad ImageLoader;
-        Image *img=ImageLoader.readImage(filename);
+        sprintf(filename,"%s/img%d.png",nameDirectory,i);
+        IplImage *img=cvLoadImage(filename);
         if( img == NULL ) {
             fprintf(stderr,"Couldn't open image file: %s\n",filename);
             throw std::runtime_error("Failed to open");
         }
 
-        sprintf(filename,"%s/DESCRIBE_img%d_%s.txt",nameDirectory,i,"SURF");
+        sprintf(filename,"%s/DESCRIBE_img%d_%s.txt",nameDirectory,i,"OpenSURF");
         FILE *output = fopen(filename,"w");
         if( fid == NULL ) {
             fprintf(stderr,"Couldn't open file: %s\n",filename);
@@ -108,7 +111,7 @@ int main( int argc , char **argv )
         process(img,fid,output);
 
         fclose(fid);
-        fclose(output);
     }
 
 }
+*/

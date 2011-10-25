@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageBase;
 
 
 /**
- * Wrapper around {@link DescribePointGaussian12} for {@link ExtractFeatureDescription}.
+ * Wrapper around {@link DescribePointGaussian12} for {@link DescribeRegionPoint}.
  *
  * @author Peter Abeles
  */

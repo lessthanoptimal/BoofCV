@@ -19,7 +19,7 @@
 package boofcv.benchmark.feature.describe;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.describe.ExtractFeatureDescription;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.alg.feature.associate.ScoreAssociation;
@@ -95,7 +95,7 @@ public class DescribeEvaluator<T extends ImageBase>
 		if( theta == null || theta.length < points.size() )
 			theta = new double[ points.size() ];
 
-		ExtractFeatureDescription<T> extract = alg.getAlgorithm();
+		DescribeRegionPoint<T> extract = alg.getAlgorithm();
 
 		int descLength = extract.getDescriptionLength();
 
@@ -110,7 +110,7 @@ public class DescribeEvaluator<T extends ImageBase>
 								  double scale , double theta ,
 								  List<Point2D_F64> points, List<Integer> indexes)
 	{
-		ExtractFeatureDescription<T> extract = alg.getAlgorithm();
+		DescribeRegionPoint<T> extract = alg.getAlgorithm();
 
 		// extract descriptions from the current image
 		currentDescriptions(image,extract,scale,theta,points,indexes);
@@ -129,7 +129,7 @@ public class DescribeEvaluator<T extends ImageBase>
 	 * Extract feature descriptions from the initial image.  Calculates the
 	 * feature's orientation.
 	 */
-	private void initialDescriptions(T image, List<Point2D_F64> points, ExtractFeatureDescription<T> extract) {
+	private void initialDescriptions(T image, List<Point2D_F64> points, DescribeRegionPoint<T> extract) {
 		extract.setImage(image);
 		orientationAlg.setImage(image);
 
@@ -155,7 +155,7 @@ public class DescribeEvaluator<T extends ImageBase>
 	 * extracts feature description from the current image.  Provide the
 	 * description extractor the "true" orientation of the feature.
 	 */
-	private void currentDescriptions( T image ,ExtractFeatureDescription<T> extract ,
+	private void currentDescriptions( T image ,DescribeRegionPoint<T> extract ,
 									  double scale , double theta ,
 									  List<Point2D_F64> points, List<Integer> indexes ) {
 		extract.setImage(image);

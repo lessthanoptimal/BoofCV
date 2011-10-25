@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
-		implements ExtractFeatureDescription<T> {
+		implements DescribeRegionPoint<T> {
 
 	// computes SURF feature descriptor
 	DescribePointSurf<II> surf;
