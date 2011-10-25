@@ -18,10 +18,10 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.abst.feature.describe.ExtractFeatureDescription;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.SelectRegionDescriptionPanel;
@@ -51,7 +51,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 	Class<T> imageType;
 	T input;
 
-	ExtractFeatureDescription<T> describe;
+	DescribeRegionPoint<T> describe;
 
 	SelectRegionDescriptionPanel panel = new SelectRegionDescriptionPanel();
 
@@ -62,13 +62,13 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 
 		this.imageType = imageType;
 
-		addAlgorithm(0,"SURF", FactoryExtractFeatureDescription.surf(false,imageType));
+		addAlgorithm(0,"SURF", FactoryDescribeRegionPoint.surf(false, imageType));
 //		addAlgorithm(0,"Sample", DescribePointSamples.create(imageType));
 //		addAlgorithm(0,"SampleDiff", DescribeSampleDifference.create(imageType));
-		addAlgorithm(0,"BRIEF", FactoryExtractFeatureDescription.brief(16, 512, -1, 4, true, imageType));
-		addAlgorithm(0,"BRIEFO", FactoryExtractFeatureDescription.brief(16, 512, -1, 4, false, imageType));
-		addAlgorithm(0,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));
-		addAlgorithm(0,"Gaussian 14",FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType));
+		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
+		addAlgorithm(0,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
+		addAlgorithm(0,"Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
+		addAlgorithm(0,"Gaussian 14", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType));
 
 		panel.setListener(this);
 		tuplePanel.setPreferredSize(new Dimension(100,50));
@@ -105,7 +105,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 
 	@Override
 	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		this.describe = (ExtractFeatureDescription<T>)cookie;
+		this.describe = (DescribeRegionPoint<T>)cookie;
 		if( input != null ) {
 			describe.setImage(input);
 		}

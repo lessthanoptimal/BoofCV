@@ -18,10 +18,10 @@
 
 package boofcv.benchmark.feature.homography;
 
-import boofcv.abst.feature.describe.ExtractFeatureDescription;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.orientation.OrientationImage;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -46,7 +46,7 @@ import java.util.List;
 public class CreateDescriptionFile<T extends ImageBase> {
 
 	// algorithm that detects the features
-	ExtractFeatureDescription<T> alg;
+	DescribeRegionPoint<T> alg;
 	// estimates the feature's orientation
 	OrientationImage<T> orientation;
 	// type of input image
@@ -62,7 +62,7 @@ public class CreateDescriptionFile<T extends ImageBase> {
 	 * @param imageType Type of input file.
 	 * @param descriptionName The name of the description algorithm.  This name is appended to output files.
 	 */
-	public CreateDescriptionFile(ExtractFeatureDescription<T> alg,
+	public CreateDescriptionFile(DescribeRegionPoint<T> alg,
 								 OrientationImage<T> orientation ,
 								 Class<T> imageType,
 								 String descriptionName ) {
@@ -138,7 +138,7 @@ public class CreateDescriptionFile<T extends ImageBase> {
 				orientation.setScale(d.scale);
 				theta = orientation.compute(p.x,p.y);
 			}
-			TupleDesc_F64 desc = alg.process(p.x,p.y,theta,d.scale,null);
+			TupleDesc_F64 desc = process(p.x, p.y, theta, d.scale);
 			if( desc != null ) {
 				// save the location and tuple description
 				out.printf("%.3f %.3f %f",p.getX(),p.getY(),theta);
@@ -151,29 +151,34 @@ public class CreateDescriptionFile<T extends ImageBase> {
 		out.close();
 	}
 
+	protected TupleDesc_F64 process( double x , double y , double theta , double scale )
+	{
+		return alg.process(x,y,theta,scale,null);
+	}
+
 	public static <T extends ImageBase>
 	void doStuff( String directory , String imageSuffix , Class<T> imageType ) throws FileNotFoundException {
-//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.surf(true,imageType);
-		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.msurf(true,imageType);
+//		DescribeRegionPoint<T> alg = FactoryDescribeRegionPoint.surf(true,imageType);
+		DescribeRegionPoint<T> alg = FactoryDescribeRegionPoint.msurf(true, imageType);
 
 //		int radius = 12;
 //		int numAngles = 8;
 //		int numJoints = 2;
 //		IntensityGraphDesc graph = createCircle(radius,numAngles,numJoints);
 //		connectSpiderWeb(numAngles,numJoints,graph);
-//		ExtractFeatureDescription<T> alg = wrap(graph,imageType);
+//		DescribeRegionPoint<T> alg = wrap(graph,imageType);
 
-//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16, 512, -1, 4, true, imageType);
+//		DescribeRegionPoint<T> alg = FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType);
 
-//		ExtractFeatureDescription<T> alg = FactoryExtractFeatureDescription.brief(16,512,-1,4,false,imageType);
-//		ExtractFeatureDescription<T> alg = DescribePointSamples.create(imageType);
-//		ExtractFeatureDescription<T> alg = DescribeSampleDifference.create(imageType);
+//		DescribeRegionPoint<T> alg = FactoryDescribeRegionPoint.brief(16,512,-1,4,false,imageType);
+//		DescribeRegionPoint<T> alg = DescribePointSamples.create(imageType);
+//		DescribeRegionPoint<T> alg = DescribeSampleDifference.create(imageType);
 
 		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(alg.getRadius(),imageType);
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLEDIFF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLE");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");
-		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_MSURF2");
+		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_MSURF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BRIEFO");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BRIEF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"NEW");

@@ -32,6 +32,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.transform.homo.HomographyPointOps;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,11 +59,13 @@ public class BenchmarkFeatureHomography {
 	int totalMatches;
 	double totalCorrect;
 
-	List<String>  directories = new ArrayList<String>();
+	List<String> directories = new ArrayList<String>();
+
+	PrintStream output;
 
 	public BenchmarkFeatureHomography(GeneralAssociation<TupleDesc_F64> assoc,
 									  String imageSuffix ,
-									  double tolerance) {
+									  double tolerance ) {
 
 		this.assoc = assoc;
 		this.imageSuffix = imageSuffix;
@@ -105,8 +109,11 @@ public class BenchmarkFeatureHomography {
 	 *
 	 * @param algSuffix String used to identify feature description files.
 	 */
-	public void evaluate( String algSuffix ) {
+	public void evaluate( String algSuffix ) throws FileNotFoundException {
 		System.out.println("\n"+algSuffix);
+		output = new PrintStream("results_"+algSuffix);
+		output.println("tolerance = "+tolerance);
+		output.println();
 
 		totalCorrect = 0;
 		totalMatches = 0;
@@ -117,10 +124,16 @@ public class BenchmarkFeatureHomography {
 		System.out.println("Summary Score:");
 		System.out.println("   num matches   = "+totalMatches);
 		System.out.println("   total correct = "+totalCorrect);
+		output.println("Summary Score:");
+		output.println("   num matches   = "+totalMatches);
+		output.println("   total correct = " + totalCorrect);
+
+		output.close();
 	}
 
 	private void processDirectory( String directory , String algSuffix ) {
 		System.out.println("Directory: "+directory);
+		output.println("---------- Directory: "+directory);
 
 		nameBase = loadNameBase( directory , imageSuffix );
 
@@ -134,6 +147,9 @@ public class BenchmarkFeatureHomography {
 		// load descriptions in the keyframe
 		List<FeatureInfo> keyFrame = LoadBenchmarkFiles.loadDescription(descriptionName);
 
+		List<Integer> matches = new ArrayList<Integer>();
+		List<Double> fractions = new ArrayList<Double>();
+
 		for( int i = 1; i < nameBase.size(); i++ ) {
 //			System.out.print("Examining "+nameBase.get(i));
 
@@ -145,8 +161,21 @@ public class BenchmarkFeatureHomography {
 			associationScore(keyFrame,targetFrame,keyToTarget);
 			totalCorrect += fractionCorrect;
 			totalMatches += numMatches;
+			matches.add(numMatches);
+			fractions.add(fractionCorrect);
+			output.print(nameBase.get(i)+" ");
 //			System.out.printf(" %5d %4.2f\n",numMatches,fractionCorrect);
 		}
+		output.println();
+
+		for( int m : matches ) {
+			output.print(m+" ");
+		}
+		output.println();
+		for( double f : fractions ) {
+			output.printf("%6.4f ", f);
+		}
+		output.println();
 	}
 
 	/**
@@ -218,7 +247,7 @@ public class BenchmarkFeatureHomography {
 		return false;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String args[] ) throws FileNotFoundException {
 		double tolerance = 3;
 
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
@@ -235,18 +264,13 @@ public class BenchmarkFeatureHomography {
 		app.addDirectory("data/mikolajczk/wall/");
 		app.addDirectory("data/mikolajczk/bark/");
 
-//		app.evaluate("SURF.txt");
-//		app.evaluate("SAMPLE.txt");
-//		app.evaluate("SAMPLEZ.txt");
-//		app.evaluate("SAMPLEDIFF.txt");
-//		app.evaluate("NEW.txt");
+		app.evaluate("SURF.txt");
 		app.evaluate("OpenSURF.txt");
 //		app.evaluate("OpenCV_SURF.txt");
 //		app.evaluate("BRIEFO.txt");
 //		app.evaluate("BRIEF.txt");
 		app.evaluate("BoofCV_SURF.txt");
 		app.evaluate("BoofCV_MSURF.txt");
-		app.evaluate("BoofCV_MSURF2.txt");
-//		app.evaluate("NEW2.txt");
+
 	}
 }

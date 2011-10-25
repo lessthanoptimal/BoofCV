@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageBase;
 /**
  * @author Peter Abeles
  */
-public class WrapDescribeBrief<T extends ImageBase> implements ExtractFeatureDescription<T> {
+public class WrapDescribeBrief<T extends ImageBase> implements DescribeRegionPoint<T> {
 
 	int length;
 	DescribePointBrief<T> alg;

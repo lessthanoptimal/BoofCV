@@ -19,7 +19,7 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.describe.ExtractFeatureDescription;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.orientation.OrientationImageAverage;
@@ -27,7 +27,7 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
@@ -65,7 +65,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 
 
 	InterestPointDetector<T> detector;
-	ExtractFeatureDescription<T> describe;
+	DescribeRegionPoint<T> describe;
 	GeneralAssociation<TupleDesc_F64> matcher;
 	OrientationImageAverage<T> orientation;
 
@@ -87,13 +87,13 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 		alg = FactoryCornerDetector.createKlt(2,1,500,derivType);
 		addAlgorithm(0,"KLT",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 
-		addAlgorithm(1,"SURF",FactoryExtractFeatureDescription.surf(true,imageType));
+		addAlgorithm(1,"SURF", FactoryDescribeRegionPoint.surf(true, imageType));
 //		addAlgorithm(1,"Sample", DescribePointSamples.create(imageType));
 //		addAlgorithm(1,"SampleDiff", DescribeSampleDifference.create(imageType));
-		addAlgorithm(1,"BRIEF", FactoryExtractFeatureDescription.brief(16,512,-1,4, true,imageType));
-		addAlgorithm(1,"BRIEFO", FactoryExtractFeatureDescription.brief(16,512,-1,4, false,imageType));
-		addAlgorithm(1,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));
-		addAlgorithm(1,"Gaussian 14",FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType));
+		addAlgorithm(1,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
+		addAlgorithm(1,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
+		addAlgorithm(1,"Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
+		addAlgorithm(1,"Gaussian 14", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType));
 
 		ScoreAssociation<TupleDesc_F64> scorer = new ScoreAssociateEuclideanSq();
 
@@ -126,7 +126,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 	@Override
 	public synchronized void refreshAll(Object[] cookies) {
 		detector = (InterestPointDetector<T>)cookies[0];
-		describe = (ExtractFeatureDescription<T>)cookies[1];
+		describe = (DescribeRegionPoint<T>)cookies[1];
 		matcher = (GeneralAssociation<TupleDesc_F64>)cookies[2];
 
 		processImage();
@@ -143,7 +143,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 				break;
 
 			case 1:
-				describe = (ExtractFeatureDescription<T>)cookie;
+				describe = (DescribeRegionPoint<T>)cookie;
 				break;
 
 			case 2:

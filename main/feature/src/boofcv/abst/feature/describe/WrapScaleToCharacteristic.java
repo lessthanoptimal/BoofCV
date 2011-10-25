@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends ImageBase>
-		implements ExtractFeatureDescription<T>
+		implements DescribeRegionPoint<T>
 {
 	protected ImageGradient<T,D> gradient;
 

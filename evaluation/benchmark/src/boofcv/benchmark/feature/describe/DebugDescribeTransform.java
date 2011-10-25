@@ -18,11 +18,11 @@
 
 package boofcv.benchmark.feature.describe;
 
-import boofcv.abst.feature.describe.ExtractFeatureDescription;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -38,7 +38,7 @@ import java.util.Random;
 public class DebugDescribeTransform {
 
 	public static <T extends ImageBase> void doStuff( Class<T> imageType ) {
-		ExtractFeatureDescription<T> alg =  FactoryExtractFeatureDescription.surf(false, imageType);
+		DescribeRegionPoint<T> alg =  FactoryDescribeRegionPoint.surf(false, imageType);
 
 		int r = alg.getRadius()+8;
 		int w = r*2+1;

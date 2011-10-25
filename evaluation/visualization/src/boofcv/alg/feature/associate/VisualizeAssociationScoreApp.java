@@ -18,13 +18,13 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.describe.ExtractFeatureDescription;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.describe.FactoryExtractFeatureDescription;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
@@ -59,7 +59,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 
 	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;
-	ExtractFeatureDescription<T> describe;
+	DescribeRegionPoint<T> describe;
 	ScoreAssociation<TupleDesc_F64> scorer;
 	OrientationImageAverage<T> orientation;
 
@@ -89,11 +89,11 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 		alg = FactoryCornerDetector.createKlt(2,1,500,derivType);
 		addAlgorithm(0,"KLT",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 
-		addAlgorithm(1,"SURF",FactoryExtractFeatureDescription.surf(true,imageType));
-		addAlgorithm(1,"BRIEF", FactoryExtractFeatureDescription.brief(16,512,-1,4, true,imageType));
-		addAlgorithm(1,"BRIEFO", FactoryExtractFeatureDescription.brief(16,512,-1,4, false,imageType));
-		addAlgorithm(1,"Gaussian 12",FactoryExtractFeatureDescription.gaussian12(20,imageType,derivType));
-		addAlgorithm(1,"Gaussian 14",FactoryExtractFeatureDescription.steerableGaussian(20,false,imageType,derivType));
+		addAlgorithm(1,"SURF", FactoryDescribeRegionPoint.surf(true, imageType));
+		addAlgorithm(1,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
+		addAlgorithm(1,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
+		addAlgorithm(1,"Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
+		addAlgorithm(1,"Gaussian 14", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType));
 
 		addAlgorithm(2,"norm",new ScoreAssociateEuclidean());
 		addAlgorithm(2,"norm^2",new ScoreAssociateEuclideanSq());
@@ -125,7 +125,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 	@Override
 	public void refreshAll(Object[] cookies) {
 		detector = (InterestPointDetector<T>)cookies[0];
-		describe = (ExtractFeatureDescription<T>)cookies[1];
+		describe = (DescribeRegionPoint<T>)cookies[1];
 		scorer = (ScoreAssociation<TupleDesc_F64>)cookies[2];
 
 		processImage();
@@ -139,7 +139,7 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 				break;
 
 			case 1:
-				describe = (ExtractFeatureDescription<T>)cookie;
+				describe = (DescribeRegionPoint<T>)cookie;
 				break;
 
 			case 2:

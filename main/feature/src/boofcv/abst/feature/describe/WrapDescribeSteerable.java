@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageBase;
 
 
 /**
- * Wrapper around {@link DescribePointSteerable2D} for {@link ExtractFeatureDescription}.
+ * Wrapper around {@link DescribePointSteerable2D} for {@link DescribeRegionPoint}.
  *
  * @author Peter Abeles
  */
