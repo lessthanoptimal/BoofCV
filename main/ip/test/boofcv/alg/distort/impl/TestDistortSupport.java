@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.impl;
 
-import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public class TestDistortSupport {
 		ImageFloat32 a = new ImageFloat32(25,30);
 		ImageFloat32 b = new ImageFloat32(15,25);
 
-		PixelTransform tran = DistortSupport.transformScale(a, b);
+		PixelTransform_F32 tran = DistortSupport.transformScale(a, b);
 
 		tran.compute(5,6);
 
@@ -45,7 +45,7 @@ public class TestDistortSupport {
 	@Test
 	public void distortRotate() {
 
-		PixelTransform tran = DistortSupport.transformRotate(13f,15.0f,13f,15f,(float)(-Math.PI/2.0));
+		PixelTransform_F32 tran = DistortSupport.transformRotate(13f,15.0f,13f,15f,(float)(-Math.PI/2.0));
 
 		// trivial case
 		tran.compute(13,15);

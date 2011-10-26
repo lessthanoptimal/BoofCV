@@ -21,7 +21,7 @@ package boofcv.alg.geo.d2;
 import boofcv.alg.InputSanityCheck;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 
 import java.io.PrintStream;
@@ -79,7 +79,7 @@ public class EvaluateImageStabilization<I extends ImageBase> {
 		out.println("Total Frames:            " + frameNum);
 	}
 
-	public void update( I currentFrame , PixelTransform motion , boolean isKeyFrame )
+	public void update( I currentFrame , PixelTransform_F32 motion , boolean isKeyFrame )
 	{
 		final int width = currentFrame.getWidth();
 		final int height = currentFrame.getHeight();

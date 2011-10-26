@@ -24,7 +24,7 @@ package boofcv.struct.distort;
  *
  * @author Peter Abeles
  */
-public abstract class PixelTransform {
+public abstract class PixelTransform_F32 {
 
 	// distorted pixel coordinates
 	public float distX;

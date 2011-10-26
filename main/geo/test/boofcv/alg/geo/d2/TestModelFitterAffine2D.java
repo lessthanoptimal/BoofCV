@@ -19,66 +19,68 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.numerics.fitting.modelset.ModelFitter;
+import boofcv.numerics.fitting.modelset.StandardModelFitterTests;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps;
-import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestModelFitterAffine2D {
+public class TestModelFitterAffine2D extends StandardModelFitterTests<Affine2D_F64,AssociatedPair> {
 
 	Random rand = new Random(234);
 
-
-	@Test
-	public void checkMinPoints() {
-		ModelFitterAffine2D fitter = new ModelFitterAffine2D();
-		assertEquals(3,fitter.getMinimumPoints());
+	public TestModelFitterAffine2D() {
+		super(3);
 	}
 
-	/**
-	 * Give it points which have been transform by the true affine model.  See
-	 * if the transform is correctly estimated
-	 */
-	@Test
-	public void simpleTest() {
+	@Override
+	public ModelFitter<Affine2D_F64, AssociatedPair> createAlg() {
+		return new ModelFitterAffine2D();
+	}
 
-		Affine2D_F64 model = new Affine2D_F64(1,2,3,4,5,6);
+	@Override
+	public Affine2D_F64 createRandomModel() {
+		Affine2D_F64 model = new Affine2D_F64();
+		model.a11 = rand.nextDouble();
+		model.a12 = rand.nextDouble();
+		model.a21 = rand.nextDouble();
+		model.a22 = rand.nextDouble();
+		model.tx = rand.nextDouble();
+		model.ty = rand.nextDouble();
 
-		List<AssociatedPair> dataSet = new ArrayList<AssociatedPair>();
+		return model;
+	}
 
-		// give it perfect observations
-		for( int i = 0; i < 10; i++ ) {
-			AssociatedPair p = new AssociatedPair();
-			p.keyLoc.set(rand.nextDouble(),rand.nextDouble());
+	@Override
+	public AssociatedPair createRandomPointFromModel(Affine2D_F64 affine) {
+		AssociatedPair ret = new AssociatedPair();
+		ret.keyLoc.x = rand.nextDouble()*10;
+		ret.keyLoc.y = rand.nextDouble()*10;
 
-			AffinePointOps.transform(model,p.keyLoc,p.currLoc);
-			dataSet.add(p);
+		AffinePointOps.transform(affine,ret.keyLoc,ret.currLoc);
+
+		return ret;
+	}
+
+	@Override
+	public boolean doPointsFitModel(Affine2D_F64 affine, List<AssociatedPair> dataSet) {
+
+		Point2D_F64 expected = new Point2D_F64();
+
+		for( AssociatedPair p : dataSet ) {
+			AffinePointOps.transform(affine,p.keyLoc,expected);
+
+			if( expected.distance(p.currLoc) > 0.01 )
+				return false;
 		}
 
-		ModelFitterAffine2D fitter = new ModelFitterAffine2D();
-
-		Affine2D_F64 found = new Affine2D_F64();
-		fitter.fitModel(dataSet,null,found);
-
-		// test the found transform by seeing if it recomputes the current points
-		Point2D_F64 a = new Point2D_F64();
-		for( int i = 0; i < 10; i++ ) {
-			AssociatedPair p = dataSet.get(i);
-
-			AffinePointOps.transform(found,p.keyLoc,a);
-
-			assertTrue(a.isIdentical(p.currLoc,1e-4f));
-		}
+		return true;
 	}
 }

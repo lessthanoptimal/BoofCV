@@ -19,10 +19,10 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PixelTransformAffine;
+import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.*;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.se.InvertibleTransformSequence;
@@ -41,20 +41,20 @@ public class DistortSupport {
 	 * directly from the size of the two input images and independently scales
 	 * the x and y axises.
 	 */
-	public static PixelTransformAffine transformScale(ImageBase from, ImageBase to)
+	public static PixelTransformAffine_F32 transformScale(ImageBase from, ImageBase to)
 	{
 		float scaleX = (float)to.width/(float)from.width;
 		float scaleY = (float)to.height/(float)from.height;
 
 		Affine2D_F32 affine = new Affine2D_F32(scaleX,0,0,scaleY,0,0);
-		PixelTransformAffine distort = new PixelTransformAffine();
+		PixelTransformAffine_F32 distort = new PixelTransformAffine_F32();
 		distort.set(affine);
 
 		return distort;
 	}
 
 	/**
-	 * Creates a {@link PixelTransformAffine} from the dst image into the src image.
+	 * Creates a {@link boofcv.alg.distort.PixelTransformAffine_F32} from the dst image into the src image.
 	 *
 	 * @param x0 Center of rotation in input image coordinates.
 	 * @param y0 Center of rotation in input image coordinates.
@@ -62,7 +62,7 @@ public class DistortSupport {
 	 * @param y1 Center of rotation in output image coordinates.
 	 * @param angle Angle of rotation.
 	 */
-	public static PixelTransformAffine transformRotate( float x0 , float y0 , float x1 , float y1 , float angle )
+	public static PixelTransformAffine_F32 transformRotate( float x0 , float y0 , float x1 , float y1 , float angle )
 	{
 		// make the coordinate system's origin the image center
 		Se2_F32 imageToCenter = new Se2_F32(-x0,-y0,0);
@@ -79,7 +79,7 @@ public class DistortSupport {
 		Se2_F32 inv = total.invert(null);
 
 		Affine2D_F32 affine = ConvertTransform_F32.convert(inv,null);
-		PixelTransformAffine distort = new PixelTransformAffine();
+		PixelTransformAffine_F32 distort = new PixelTransformAffine_F32();
 		distort.set(affine);
 
 		return distort;
@@ -94,7 +94,7 @@ public class DistortSupport {
 	 */
 	public static <T extends ImageBase>
 	ImageDistort<T> createDistort(Class<T> imageType,
-								  PixelTransform dstToSrc,
+								  PixelTransform_F32 dstToSrc,
 								  InterpolatePixel<T> interp, ImageBorder border)
 	{
 		if( imageType == ImageFloat32.class ) {

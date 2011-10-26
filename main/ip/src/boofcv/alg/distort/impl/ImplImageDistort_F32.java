@@ -22,7 +22,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 
 
@@ -39,20 +39,20 @@ import boofcv.struct.image.ImageFloat32;
 public class ImplImageDistort_F32 implements ImageDistort<ImageFloat32> {
 
 	// transform from dst to src image
-	private PixelTransform dstToSrc;
+	private PixelTransform_F32 dstToSrc;
 	// sub pixel interpolation
 	private InterpolatePixel<ImageFloat32> interp;
 	// handle the image border
 	private ImageBorder_F32 border;
 
-	public ImplImageDistort_F32(PixelTransform dstToSrc, InterpolatePixel<ImageFloat32> interp , ImageBorder<ImageFloat32> border ) {
+	public ImplImageDistort_F32(PixelTransform_F32 dstToSrc, InterpolatePixel<ImageFloat32> interp , ImageBorder<ImageFloat32> border ) {
 		this.dstToSrc = dstToSrc;
 		this.interp = interp;
 		this.border = (ImageBorder_F32)border;
 	}
 
 	@Override
-	public void setModel(PixelTransform dstToSrc) {
+	public void setModel(PixelTransform_F32 dstToSrc) {
 		this.dstToSrc = dstToSrc;
 	}
 

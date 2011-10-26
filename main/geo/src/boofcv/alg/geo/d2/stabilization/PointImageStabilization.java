@@ -20,7 +20,7 @@ package boofcv.alg.geo.d2.stabilization;
 
 import boofcv.abst.feature.tracker.PointSequentialTracker;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PixelTransformAffine;
+import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.SingleImageInput;
@@ -28,7 +28,7 @@ import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -68,7 +68,7 @@ public class PointImageStabilization<I extends ImageBase > {
 	// computes the image motion robustly
 	private ModelMatcher<Affine2D_F64,AssociatedPair> fitter;
 	// Computes the location of each pixel in the stabilized image from the current frame
-	private PixelTransformAffine transform = new PixelTransformAffine();
+	private PixelTransformAffine_F32 transform = new PixelTransformAffine_F32();
 
 	// Computes the stabilized image given the unstabilized image and the motion model
 	private ImageDistort<I> distort;
@@ -199,7 +199,7 @@ public class PointImageStabilization<I extends ImageBase > {
 		return fitter.getMatchSet();
 	}
 
-	public PixelTransform getDistortion() {
+	public PixelTransform_F32 getDistortion() {
 		return transform;
 	}
 

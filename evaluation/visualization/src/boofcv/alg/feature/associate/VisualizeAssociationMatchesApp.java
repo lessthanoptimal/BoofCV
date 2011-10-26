@@ -223,7 +223,6 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 		process(left,right);
 	}
 
-	@Override
 	public boolean getHasProcessedImage() {
 		return processedImage;
 	}
