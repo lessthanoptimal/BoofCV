@@ -24,7 +24,7 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 
 
@@ -57,7 +57,7 @@ public class DistortImageOps {
 	void scale( T input , T output , InterpolatePixel<T> interp ) {
 		Class<T> inputType = (Class<T>)input.getClass();
 
-		PixelTransform model = DistortSupport.transformScale(output, input);
+		PixelTransform_F32 model = DistortSupport.transformScale(output, input);
 		ImageBorder<T> border = FactoryImageBorder.value(inputType, 0);
 		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp, border);
 
@@ -115,7 +115,7 @@ public class DistortImageOps {
 		float offX = 0;//(output.width+1)%2;
 		float offY = 0;//(output.height+1)%2;
 
-		PixelTransform model = DistortSupport.transformRotate(input.width/2,input.height/2,output.width/2-offX,output.height/2-offY,angleInputToOutput);
+		PixelTransform_F32 model = DistortSupport.transformRotate(input.width/2,input.height/2,output.width/2-offX,output.height/2-offY,angleInputToOutput);
 		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp, FactoryImageBorder.value(inputType, 0));
 
 		distorter.apply(input,output);

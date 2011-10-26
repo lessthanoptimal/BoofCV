@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 
 
@@ -36,7 +36,7 @@ public interface ImageDistort<T extends ImageBase> {
 	 *
 	 * @param dstToSrc Pixel coordinate transformation.
 	 */
-	public void setModel( PixelTransform dstToSrc );
+	public void setModel( PixelTransform_F32 dstToSrc );
 
 	/**
 	 * Applies the transform while skipping over pixels without a match.

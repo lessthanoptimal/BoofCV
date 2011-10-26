@@ -66,7 +66,7 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"import boofcv.alg.interpolate.InterpolatePixel;\n" +
 				"import boofcv.alg.distort.ImageDistort;\n" +
 				"import boofcv.struct.image."+imageName+";\n" +
-				"import boofcv.struct.distort.PixelTransform;\n" +
+				"import boofcv.struct.distort.PixelTransform_F32;\n" +
 				"import boofcv.core.image.border.ImageBorder;\n" +
 				"import boofcv.core.image.border."+borderType+";\n");
 		if( image.isInteger() ) {
@@ -93,20 +93,20 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 
 		out.print("\n" +
 				"\t// transform from dst to src image\n" +
-				"\tprivate PixelTransform dstToSrc;\n" +
+				"\tprivate PixelTransform_F32 dstToSrc;\n" +
 				"\t// sub pixel interpolation\n" +
 				"\tprivate InterpolatePixel<"+imageName+"> interp;\n" +
 				"\t// handle the image border\n" +
 				"\tprivate "+borderType+" border;\n" +
 				"\n" +
-				"\tpublic "+className+"(PixelTransform dstToSrc, InterpolatePixel<"+imageName+"> interp , ImageBorder<"+borderImageType+"> border ) {\n" +
+				"\tpublic "+className+"(PixelTransform_F32 dstToSrc, InterpolatePixel<"+imageName+"> interp , ImageBorder<"+borderImageType+"> border ) {\n" +
 				"\t\tthis.dstToSrc = dstToSrc;\n" +
 				"\t\tthis.interp = interp;\n" +
 				"\t\tthis.border = ("+borderType+")border;\n" +
 				"\t}\n"+
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic void setModel(PixelTransform dstToSrc) {\n" +
+				"\tpublic void setModel(PixelTransform_F32 dstToSrc) {\n" +
 				"\t\tthis.dstToSrc = dstToSrc;\n" +
 				"\t}\n\n");
 	}

@@ -72,7 +72,7 @@ public class WrapFHtoInterestPoint<T extends ImageBase> implements InterestPoint
 
 	@Override
 	public double getOrientation(int featureIndex) {
-		throw new IllegalArgumentException("Not supported");
+		return 0;
 	}
 
 	@Override

@@ -57,7 +57,7 @@ public class TestPixelDistortMap {
 		assertEquals(4.1f,map.distY,1e-4f);
 	}
 
-	private static class TestTransform extends PixelTransform
+	private static class TestTransform extends PixelTransform_F32
 	{
 
 		@Override

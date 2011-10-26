@@ -20,7 +20,7 @@ package boofcv.benchmark.feature.distort;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PixelTransformAffine;
+import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.filter.basic.GGrayImageOps;
 import boofcv.alg.interpolate.InterpolatePixel;
@@ -138,7 +138,7 @@ public class FactoryBenchmarkFeatureDistort {
 
 			Affine2D_F32 initToImage = StabilityEvaluatorPoint.createScale((float)scale,image.width,image.height);
 			Affine2D_F32 imageToInit = initToImage.invert(null);
-			PixelTransformAffine affine = new PixelTransformAffine(imageToInit);
+			PixelTransformAffine_F32 affine = new PixelTransformAffine_F32(imageToInit);
 			InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
 			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,affine,interp, FactoryImageBorder.value(imageType, 0));
 

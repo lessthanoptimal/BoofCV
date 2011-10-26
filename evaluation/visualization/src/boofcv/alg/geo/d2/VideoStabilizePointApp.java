@@ -123,7 +123,6 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		doRefreshAll();
 	}
 
-	@Override
 	public boolean getHasProcessedImage() {
 		return workImage != null;
 	}

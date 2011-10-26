@@ -21,7 +21,7 @@ package boofcv.alg.distort.impl;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 
 
@@ -35,7 +35,7 @@ public class TestImplImageDistort_F32 extends GeneralImageDistortTests<ImageFloa
 	}
 
 	@Override
-	public ImageDistort<ImageFloat32> createDistort(PixelTransform dstToSrc, InterpolatePixel<ImageFloat32> interp, ImageBorder border) {
+	public ImageDistort<ImageFloat32> createDistort(PixelTransform_F32 dstToSrc, InterpolatePixel<ImageFloat32> interp, ImageBorder border) {
 		return new ImplImageDistort_F32(dstToSrc,interp,border);
 	}
 }

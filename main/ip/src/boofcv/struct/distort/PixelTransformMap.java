@@ -26,7 +26,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public class PixelTransformMap extends PixelTransform {
+public class PixelTransformMap extends PixelTransform_F32 {
 
 	int width;
 	int height;
@@ -43,11 +43,11 @@ public class PixelTransformMap extends PixelTransform {
 	}
 
 	/**
-	 * Sets the map using another {@link PixelTransform} to compute the distortion.
+	 * Sets the map using another {@link PixelTransform_F32} to compute the distortion.
 	 *
 	 * @param distortion Distortion which is being precomputed.
 	 */
-	public void set( PixelTransform distortion ) {
+	public void set( PixelTransform_F32 distortion ) {
 		int index = 0;
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {

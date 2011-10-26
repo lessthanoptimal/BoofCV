@@ -18,49 +18,53 @@
 
 package boofcv.alg.distort;
 
+import boofcv.struct.distort.PixelTransform_F32;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 
 /**
+ * Distorts pixels using {@link Affine2D_F32}.
+ *
  * @author Peter Abeles
  */
-public class TestPixelDistortAffine {
-	@Test
-	public void constructor_32() {
-		Affine2D_F32 a = new Affine2D_F32(1,2,3,4,5,6);
+public class PixelTransformAffine_F32 extends PixelTransform_F32 {
 
-		PixelTransformAffine alg = new PixelTransformAffine();
-		alg.set(a);
+	Affine2D_F32 affine = new Affine2D_F32();
+	Point2D_F32 tran = new Point2D_F32();
 
-		alg.compute(2,3);
-		Point2D_F32 p = new Point2D_F32(2,3);
-		Point2D_F32 expected = new Point2D_F32();
-		AffinePointOps.transform(a,p,expected);
-
-		assertEquals(expected.x,alg.distX,1e-4);
-		assertEquals(expected.y,alg.distY,1e-4);
+	public PixelTransformAffine_F32() {
 	}
 
-	@Test
-	public void constructor_64() {
-		Affine2D_F64 a = new Affine2D_F64(1,2,3,4,5,6);
+	public PixelTransformAffine_F32(Affine2D_F32 affine) {
+		
+		this.affine = affine;
+	}
 
-		PixelTransformAffine alg = new PixelTransformAffine();
-		alg.set(a);
+	public void set( Affine2D_F32 affine ) {
+		this.affine.set(affine);
+	}
 
-		alg.compute(2,3);
-		Point2D_F64 p = new Point2D_F64(2,3);
-		Point2D_F64 expected = new Point2D_F64();
-		AffinePointOps.transform(a,p,expected);
+	public void set( Affine2D_F64 affine ) {
+		this.affine.a11 = (float)affine.a11;
+		this.affine.a12 = (float)affine.a12;
+		this.affine.a21 = (float)affine.a21;
+		this.affine.a22 = (float)affine.a22;
 
-		assertEquals(expected.x,alg.distX,1e-4);
-		assertEquals(expected.y,alg.distY,1e-4);
+		this.affine.tx = (float)affine.tx;
+		this.affine.ty = (float)affine.ty;
+	}
+
+	@Override
+	public void compute(int x, int y) {
+		AffinePointOps.transform(affine,x,y,tran);
+		distX = tran.x;
+		distY = tran.y;
+	}
+
+	public Affine2D_F32 getModel() {
+		return affine;
 	}
 }
