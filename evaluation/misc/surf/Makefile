@@ -12,19 +12,24 @@ SUFFIXES = .cpp .o
 
 # Name of the main program
 PROG  = describe_surf
+RUNTIME = runtime_surf
 
 # Object files .o necessary to build the main program
-OBJS  = describe_surf.o SURF-V1.0.9/imload.o
+OBJS  = describe_surf.o  SURF-V1.0.9/imload.o
+ROBJS = runtime_surf.o SURF-V1.0.9/imload.o
 
-all: $(PROG)
+all: $(PROG) $(RUNTIME)
 
 # Compilation and link
 $(PROG): $(OBJS)
 	$(CC) $(LDFLAGS) -o $(PROG) $(OBJS) $(LDLIBS) 
+$(RUNTIME): $(ROBJS)
+	$(CC) $(LDFLAGS) -o $(RUNTIME) $(ROBJS) $(LDLIBS) 
 
 %.o: %.cpp
 	$(CC)  $(CFLAGS) -c $< -o $@
 
 clean:
 	-rm -f $(PROG)
+	-rm -f $(RUNTIME)
 	-rm -f *.o

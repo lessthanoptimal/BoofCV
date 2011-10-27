@@ -164,7 +164,7 @@ public class BenchmarkFeatureHomography {
 			matches.add(numMatches);
 			fractions.add(fractionCorrect);
 			output.print(nameBase.get(i)+" ");
-//			System.out.printf(" %5d %4.2f\n",numMatches,fractionCorrect);
+			System.out.printf(" %5d %4.2f\n",numMatches,fractionCorrect);
 		}
 		output.println();
 
@@ -264,13 +264,15 @@ public class BenchmarkFeatureHomography {
 		app.addDirectory("data/mikolajczk/wall/");
 		app.addDirectory("data/mikolajczk/bark/");
 
-		app.evaluate("SURF.txt");
-		app.evaluate("OpenSURF.txt");
+//		app.evaluate("SURF.txt");
+//		app.evaluate("JavaSURF.txt");
+		app.evaluate("JOpenSURF.txt");
+//		app.evaluate("OpenSURF.txt");
 //		app.evaluate("OpenCV_SURF.txt");
 //		app.evaluate("BRIEFO.txt");
 //		app.evaluate("BRIEF.txt");
-		app.evaluate("BoofCV_SURF.txt");
-		app.evaluate("BoofCV_MSURF.txt");
+//		app.evaluate("BoofCV_SURF.txt");
+//		app.evaluate("BoofCV_MSURF.txt");
 
 	}
 }

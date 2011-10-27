@@ -92,7 +92,6 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 
 		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
 		DistanceAffine2DSq distance = new DistanceAffine2DSq();
-//		DistanceAffine2D distance = new DistanceAffine2D();
 		Affine2DCodec codec = new Affine2DCodec();
 
 		int numSample =  modelFitter.getMinimumPoints();
@@ -103,10 +102,10 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 
 		addAlgorithm(1,"LMedS",
 				new LeastMedianOfSquares<Affine2D_F64,AssociatedPair>(123123,
-				numSample,25,1.1,0.6,modelFitter,distance));
+				numSample,30,25,0.4,modelFitter,distance));
 
 		addAlgorithm(1,"StatDist",
-				new StatisticalDistanceModelMatcher<Affine2D_F64,AssociatedPair>(25,0.001,0.001,1.2,
+				new StatisticalDistanceModelMatcher<Affine2D_F64,AssociatedPair>(3,0.1,4,16,
 				numSample, StatisticalDistance.PERCENTILE,0.9,modelFitter,distance,codec));
 
 		infoPanel = new StabilizationInfoPanel();

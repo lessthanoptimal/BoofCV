@@ -68,7 +68,7 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 	private double []errors;
 
 	private List<Point> inlierSet;
-	private double inlierFrac = 0.8;
+	private double inlierFrac;
 
 	/**
 	 *

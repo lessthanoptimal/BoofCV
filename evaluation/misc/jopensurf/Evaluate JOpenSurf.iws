@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6839c83e-b3be-491b-b1a5-dec25066ab2e" name="Default" comment="" />
-    <ignored path="javasurf.iws" />
+    <list default="true" id="45ae2d8f-d3de-4476-b240-5d2639c873e2" name="Default" comment="" />
+    <ignored path="Evaluate JOpenSurf.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -55,14 +55,14 @@
     <ui_properties />
   </component>
   <component name="FavoritesManager">
-    <favorites_list name="javasurf" />
+    <favorites_list name="Evaluate JOpenSurf" />
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="CreateDescription.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/CreateDescription.java">
+      <file leaf-file-name="CreateDescriptor.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/CreateDescriptor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="43" column="47" selection-start="1132" selection-end="1228" vertical-scroll-proportion="0.0">
+            <state line="82" column="26" selection-start="2428" selection-end="2454" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -71,44 +71,10 @@
       <file leaf-file-name="BenchmarkRuntime.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/BenchmarkRuntime.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="51" column="25" selection-start="1374" selection-end="1374" vertical-scroll-proportion="0.76363635">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="InterestPoint.class" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/JavaSurf-1.0-SNAPSHOT.jar!/org/mite/jsurf/InterestPoint.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="11" selection-start="802" selection-end="802" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="System.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar:///opt/jdk/jdk1.6.0_26/src.zip!/java/lang/System.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="81" column="35" selection-start="2841" selection-end="2852" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ISURFfactory.class" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/JavaSurf-1.0-SNAPSHOT.jar!/org/mite/jsurf/ISURFfactory.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="29" selection-start="206" selection-end="206" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="IDescriptor.class" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/JavaSurf-1.0-SNAPSHOT.jar!/org/mite/jsurf/IDescriptor.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="16" selection-start="192" selection-end="192" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="51" column="89" selection-start="1336" selection-end="1336" vertical-scroll-proportion="0.8181818">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -120,10 +86,14 @@
       <setting name="OPEN_NEW_TAB" value="false" />
     </FindUsagesManager>
   </component>
+  <component name="Git.Settings">
+    <option name="CHECKOUT_INCLUDE_TAGS" value="false" />
+    <option name="UPDATE_CHANGES_POLICY" value="STASH" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/CreateDescription.java" />
+        <option value="$PROJECT_DIR$/src/CreateDescriptor.java" />
         <option value="$PROJECT_DIR$/src/BenchmarkRuntime.java" />
       </list>
     </option>
@@ -158,33 +128,32 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Favorites" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="javasurf" />
+              <option name="myItemId" value="Evaluate JOpenSurf" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="javasurf" />
+              <option name="myItemId" value="Evaluate JOpenSurf" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="javasurf" />
+              <option name="myItemId" value="jopensurf" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="javasurf" />
+              <option name="myItemId" value="Evaluate JOpenSurf" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="javasurf" />
+              <option name="myItemId" value="jopensurf" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -195,29 +164,29 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
+      <pane id="Favorites" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="project.structure.last.edited" value="Modules" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
-    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="options.splitter.main.proportions" value="0.3" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="recentsLimit" value="5" />
+    <property name="options.lastSelected" value="preferences.externalResources" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="project.structure.side.proportion" value="0.2" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="dynamic.classpath" value="false" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="" />
-    </key>
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RunManager" selected="Application.BenchmarkRuntime">
-    <configuration default="false" name="CreateDescription" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="CreateDescription" />
+    <configuration default="false" name="CreateDescriptor" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="CreateDescriptor" />
       <option name="VM_PARAMETERS" />
       <option name="PROGRAM_PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -226,10 +195,10 @@
       <option name="ENABLE_SWING_INSPECTOR" value="false" />
       <option name="ENV_VARIABLES" />
       <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="Javasurf" />
+      <module name="Jopensurf" />
       <envs />
       <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="59151" />
+        <option name="DEBUG_PORT" value="57592" />
         <option name="TRANSPORT" value="0" />
         <option name="LOCAL" value="true" />
       </RunnerSettings>
@@ -246,10 +215,10 @@
       <option name="ENABLE_SWING_INSPECTOR" value="false" />
       <option name="ENV_VARIABLES" />
       <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="Javasurf" />
+      <module name="Jopensurf" />
       <envs />
       <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="58940" />
+        <option name="DEBUG_PORT" value="40039" />
         <option name="TRANSPORT" value="0" />
         <option name="LOCAL" value="true" />
       </RunnerSettings>
@@ -331,7 +300,7 @@
       </method>
     </configuration>
     <list size="2">
-      <item index="0" class="java.lang.String" itemvalue="Application.CreateDescription" />
+      <item index="0" class="java.lang.String" itemvalue="Application.CreateDescriptor" />
       <item index="1" class="java.lang.String" itemvalue="Application.BenchmarkRuntime" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
@@ -355,19 +324,20 @@
     <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
     <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
     <option name="FORCE_UPDATE" value="false" />
+    <configuration useDefault="true">$USER_HOME$/.subversion_IDEA</configuration>
     <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="6839c83e-b3be-491b-b1a5-dec25066ab2e" name="Default" comment="" />
-      <created>1319558092294</created>
-      <updated>1319558092294</updated>
+      <changelist id="45ae2d8f-d3de-4476-b240-5d2639c873e2" name="Default" comment="" />
+      <created>1319676056809</created>
+      <updated>1319676056809</updated>
     </task>
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="25" width="1280" height="974" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -377,14 +347,14 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24856909" sideWeight="0.6014068" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3985932" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24938676" sideWeight="0.60023445" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39976552" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32942554" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -438,40 +408,26 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///opt/jdk/jdk1.6.0_26/src.zip!/java/io/BufferedInputStream.java">
+    <entry file="jar://$PROJECT_DIR$/../../../../thirdparty/jopensurf/build/jar/jopensurf.jar!/com/stromberglabs/jopensurf/Surf.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="6" selection-start="1073" selection-end="1073" vertical-scroll-proportion="0.86419755" />
+        <state line="37" column="16" selection-start="1965" selection-end="1965" vertical-scroll-proportion="0.4790343">
+          <folding />
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/CreateDescription.java">
+    <entry file="file://$PROJECT_DIR$/src/CreateDescriptor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="47" selection-start="1132" selection-end="1228" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/JavaSurf-1.0-SNAPSHOT.jar!/org/mite/jsurf/InterestPoint.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="11" selection-start="802" selection-end="802" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="jar:///opt/jdk/jdk1.6.0_26/src.zip!/java/lang/System.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="81" column="35" selection-start="2841" selection-end="2852" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/JavaSurf-1.0-SNAPSHOT.jar!/org/mite/jsurf/ISURFfactory.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="29" selection-start="206" selection-end="206" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/JavaSurf-1.0-SNAPSHOT.jar!/org/mite/jsurf/IDescriptor.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="16" selection-start="192" selection-end="192" vertical-scroll-proportion="0.0" />
+        <state line="82" column="26" selection-start="2428" selection-end="2454" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/BenchmarkRuntime.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="25" selection-start="1374" selection-end="1374" vertical-scroll-proportion="0.76363635">
-          <folding />
+        <state line="51" column="89" selection-start="1336" selection-end="1336" vertical-scroll-proportion="0.8181818">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -528,7 +484,7 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>Javasurf</last-edited>
+          <last-edited>Jopensurf</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
