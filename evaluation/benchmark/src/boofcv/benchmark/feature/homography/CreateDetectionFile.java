@@ -127,7 +127,7 @@ public class CreateDetectionFile<T extends ImageBase> {
 
 	public static <T extends ImageBase>
 	void doStuff( String directory , String suffix , Class<T> imageType ) throws FileNotFoundException {
-		InterestPointDetector<T> alg = FactoryInterestPoint.fromFastHessian(-1,9,4,4);
+		InterestPointDetector<T> alg = FactoryInterestPoint.fromFastHessian(1, -1,9,4,4);
 		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(14,imageType);
 
 		CreateDetectionFile<T> cdf = new CreateDetectionFile<T>(alg,orientation,imageType,"FH");

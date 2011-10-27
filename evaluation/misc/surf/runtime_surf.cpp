@@ -46,7 +46,6 @@ void process( Image *image , FILE *fid )
              false, /* use the extended descriptor */
              4 /* square size of the descriptor window (default 4x4)*/);
 
-    struct timeval start, end;
     long best = -1;
 
     for( int trial = 0; trial < 10; trial++ ) {
