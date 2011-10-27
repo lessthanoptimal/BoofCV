@@ -1,21 +1,21 @@
-import org.mite.jsurf.*;
+import com.stromberglabs.jopensurf.SURFInterestPoint;
+import com.stromberglabs.jopensurf.Surf;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
  * @author Peter Abeles
  */
-public class CreateDescription {
-
-	public static ArrayList<InterestPoint> loadInterestPoints( BufferedImage image , String fileName ) throws IOException {
+public class CreateDescriptor {
+	public static List<SURFInterestPoint> loadInterestPoints( String fileName ) throws IOException {
 		Scanner in = new Scanner(new BufferedReader(new FileReader(fileName)));
 
-
-		ArrayList<InterestPoint> ret = new ArrayList<InterestPoint>();
+		List<SURFInterestPoint> ret = new ArrayList<SURFInterestPoint>();
 
 		// read in location of points
 		while( in.hasNext() ) {
@@ -24,7 +24,7 @@ public class CreateDescription {
 			float scale = in.nextFloat();
 			float yaw = in.nextFloat();
 
-			ret.add(new InterestPoint(x,y,scale,image));
+			ret.add(new SURFInterestPoint(x,y,scale,0));
 		}
 
 		return ret;
@@ -33,26 +33,23 @@ public class CreateDescription {
 	public static void process( BufferedImage image , String detectName , String describeName )
 			throws IOException
 	{
-		ArrayList<InterestPoint> points = loadInterestPoints(image,detectName);
+		List<SURFInterestPoint> points = loadInterestPoints(detectName);
 
 		// Compute descriptors for each point
-		ISURFfactory mySURF = SURF.createInstance(image, 0.9f, 800, 4, image);
+		Surf surf = new Surf(image,0.81F, 0.0004F, 4);
 
-		IDescriptor descriptor = mySURF.createDescriptor(points);
-		descriptor.generateAllDescriptors();
-
+		for( SURFInterestPoint p : points ) {
+			surf.getOrientation(p);
+			surf.getMDescriptor(p,false);
+		}
 		// save the descriptors
 		PrintStream out = new PrintStream(new FileOutputStream(describeName));
 
 		out.println("64");
-		for( InterestPoint p : points ) {
+		for( SURFInterestPoint p : points ) {
 
-			int orientationX = p.getOrientation_x();
-			int orientationY = p.getOrientation_y();
-			float theta = (float)Math.atan2(orientationY,orientationX);
-
-			out.printf("%7.3f %7.3f %7.5f",p.getX(),p.getY(),theta);
-			float[] desc = p.getDescriptorOfTheInterestPoint();
+			out.printf("%7.3f %7.3f %7.5f",p.getX(),p.getY(),p.getOrientation());
+			float[] desc = p.getDescriptor();
 			if( desc.length != 64 )
 				throw new RuntimeException("Unexpected descriptor length");
 
@@ -72,7 +69,7 @@ public class CreateDescription {
 			String imageName = String.format("%s/img%d.png",nameDirectory,i);
 			BufferedImage img = ImageIO.read(new File(imageName));
 
-			String describeName = String.format("%s/DESCRIBE_img%d_%s.txt",nameDirectory,i,"JavaSURF");
+			String describeName = String.format("%s/DESCRIBE_img%d_%s.txt",nameDirectory,i,"JOpenSURF");
 
 			System.out.println("Processing "+describeName);
 			process(img, detectName, describeName);
@@ -90,5 +87,4 @@ public class CreateDescription {
 		processDirectory("../../data/mikolajczk/ubc");
 		processDirectory("../../data/mikolajczk/wall");
 	}
-
 }
