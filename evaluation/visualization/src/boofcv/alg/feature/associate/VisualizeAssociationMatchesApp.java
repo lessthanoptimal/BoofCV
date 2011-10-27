@@ -83,7 +83,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 		this.imageType = imageType;
 
 		GeneralFeatureDetector<T,D> alg;
-		addAlgorithm(0,"Fast Hessian",FactoryInterestPoint.fromFastHessian(200,9,4,4));
+		addAlgorithm(0,"Fast Hessian",FactoryInterestPoint.fromFastHessian(1, 200,9,4,4));
 		alg = FactoryCornerDetector.createKlt(2,1,500,derivType);
 		addAlgorithm(0,"KLT",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
 

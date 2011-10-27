@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.3.1, 2011-10-26T22:06:02. -->
+<!-- Written by Qt Creator 2.3.1, 2011-10-27T07:44:18. -->
 <qtcreator>
  <data>
   <variable>GenericProjectManager.GenericProject.Toolchain</variable>
-  <value type="QString"></value>
+  <value type="QString">ProjectExplorer.ToolChain.Gcc:/usr/bin/g++.x86-linux-generic-elf-64bit./usr/bin/gdb</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>

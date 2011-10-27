@@ -79,7 +79,7 @@ public class BenchmarkDetectHelper {
 		ret.add( new BenchmarkAlgorithm("Hessian SS",FactoryInterestPoint.fromFeature(fss,scales,imageType)) );
 		FeaturePyramid<T,D> fp = FactoryInterestPointAlgs.hessianPyramid(radius,thresh,maxScaleFeatures,imageType,derivType);
 		ret.add( new BenchmarkAlgorithm("Hessian P",FactoryInterestPoint.fromFeature(fp,scales,imageType)) );
-		ret.add( new BenchmarkAlgorithm("FastHessian",FactoryInterestPoint.<T>fromFastHessian(maxScaleFeatures,9,4,4)) );
+		ret.add( new BenchmarkAlgorithm("FastHessian",FactoryInterestPoint.<T>fromFastHessian(1, maxScaleFeatures,9,4,4)) );
 
 		return ret;
 	}
