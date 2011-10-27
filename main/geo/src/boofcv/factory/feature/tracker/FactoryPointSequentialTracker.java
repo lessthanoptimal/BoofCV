@@ -113,7 +113,7 @@ public class FactoryPointSequentialTracker {
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, 1, 10, false, true);
 
-		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor,detectPerScale,9,4,4);
+		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor,detectPerScale, 2, 9,4,4);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(3,false,integralType);
 		DescribePointSurf<II> describe = new DescribePointSurf<II>();
 

@@ -111,7 +111,7 @@ public class VideoDetectInterestPoints<T extends ImageBase>
 
 		InterestPointDetector<T> detector;
 
-		detector = FactoryInterestPoint.fromFastHessian(1, 100,9,4,4);
+		detector = FactoryInterestPoint.fromFastHessian(1, 100, 2, 9,4,4);
 //		FeatureScaleSpace<T,D> feature = FactoryInterestPointAlgs.hessianScaleSpace(radius,1,maxCorners,imageType,derivType);
 //		detector = FactoryInterestPoint.fromFeature(feature,new double[]{1,2,4,6,8,12},imageType);
 

@@ -105,32 +105,37 @@ public class FastHessianFeatureDetector<T extends ImageBase> {
 	// local variables that are predeclared
 	int sizes[];
 
+	// how often the image is sampled in the first octave
+	// a value of 1 would mean every pixel is sampled
+	int initialSampleRate;
+
 	/**
 	 * <p>
 	 * Defines the feature detector by specifying the size of features.
 	 * </p>
 	 * <p>
-	 * Configuration for FH-9: initialSize=9, numberScalesPerOctave=4, numberOfOctaves=4<br>
-	 * Configuration for FH-15: initialSize=15, numberScalesPerOctave=5, numberOfOctaves=4<br>
+	 * Configuration for FH-9: initialSampleSize=1, initialSize=9, numberScalesPerOctave=4, numberOfOctaves=4<br>
+	 * Configuration for FH-15: initialSampleSize=1, initialSize=15, numberScalesPerOctave=5, numberOfOctaves=4<br>
 	 * * Note that FH-15 requires the image to be up sampled first. See [1] for details.
 	 * </p>
 	 *
 	 * @param extractor Feature extractor used to find local maximums in 2D image.
 	 * @param maxFeaturesPerScale Maximum number of features it can find per image scale.  If set <= 0 then the all potential
 	 * features will be returned, which is how it is in the original paper.
+	 * @param initialSampleRate How often pixels are sampled in the first octave.
 	 * @param initialSize Size/width of the smallest feature/kernel in the lowest octave.
 	 * @param numberScalesPerOctave How many different feature sizes are considered in a single octave
 	 * @param numberOfOctaves How many different octaves are considered.
 	 */
-	public FastHessianFeatureDetector(FeatureExtractor extractor , int maxFeaturesPerScale  ,
-									  int initialSize ,
-									  int numberScalesPerOctave ,
-									  int numberOfOctaves ) {
+	public FastHessianFeatureDetector(FeatureExtractor extractor, int maxFeaturesPerScale,
+									  int initialSampleRate, int initialSize,
+									  int numberScalesPerOctave,
+									  int numberOfOctaves) {
 		this.extractor = extractor;
 		if( maxFeaturesPerScale > 0 ) {
-			selectBest = new SelectNBestFeatures(200);
-			selectBest.setN(maxFeaturesPerScale);
+			selectBest = new SelectNBestFeatures(maxFeaturesPerScale);
 		}
+		this.initialSampleRate = initialSampleRate;
 		this.initialSize = initialSize;
 		this.numberOfOctaves = numberOfOctaves;
 
@@ -152,7 +157,7 @@ public class FastHessianFeatureDetector<T extends ImageBase> {
 		foundPoints.clear();
 
 		// computes feature intensity every 'skip' pixels
-		int skip = 1;
+		int skip = initialSampleRate;
 		// increment between kernel sizes
 		int sizeStep = 6;
 		// initial size of the kernel in the first octave

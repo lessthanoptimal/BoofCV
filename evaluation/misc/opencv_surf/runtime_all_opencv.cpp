@@ -1,20 +1,19 @@
-
-
-
-#include "surflib.h"
-#include "kmeans.h"
+#include "cv.h"
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include <highgui.h>
 #include <ctime>
 #include <iostream>
 #include <stdio.h>
 
 #include <vector>
-#include <stdexcept>
 
 using namespace std;
+using namespace cv;
 
 std::vector<string> imageNames;
 
-void process( IplImage *image )
+void process( Mat image )
 {
 
     long best = -1;
@@ -22,14 +21,17 @@ void process( IplImage *image )
     for( int trial = 0; trial < 10; trial++ ) {
         clock_t start = clock();
 
-        std::vector<Ipoint> ipts;
-        FastHessian detector(ipts,4,4,1,0.0013f);
+        // location of detected points
+        std::vector<KeyPoint> ipts;
 
-        // convert the image into an integral image
-        IplImage *int_img = Integral(image);
+        SurfFeatureDetector detector(250,4,4,false);
+        detector.detect(image,ipts);
 
-        detector.setIntImage(int_img);
-        detector.getIpoints();
+        // Create Surf Descriptor Object
+        SurfDescriptorExtractor extractor;
+
+        Mat descriptors;
+        extractor.compute( image, ipts, descriptors );
 
         clock_t end = clock();
         long mtime = (long)(1000*(float(end - start) / CLOCKS_PER_SEC));
@@ -39,6 +41,7 @@ void process( IplImage *image )
         printf("time = %d  detected = %d\n",(int)mtime,(int)ipts.size());
     }
     printf("best time = %d\n",(int)best);
+
 }
 
 int main( int argc , char **argv )
@@ -56,13 +59,8 @@ int main( int argc , char **argv )
     printf("  image number: %d\n",imageNumber);
 
     sprintf(filename,"%s/img%d.png",nameDirectory,imageNumber);
-    IplImage *img=cvLoadImage(filename);
-    if( img == NULL ) {
-        fprintf(stderr,"Couldn't open image file: %s\n",filename);
-        throw std::runtime_error("Failed to open");
-    }
+    Mat img = imread( filename, CV_LOAD_IMAGE_GRAYSCALE );
 
     process(img);
-
-    return 0;
 }
+

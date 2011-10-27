@@ -27,7 +27,7 @@ void process( Image *image )
         clock_t start = clock();
 
         std::vector<Ipoint> ip;
-        FastHessian detector(&iimage,ip,6,false,9,2,4);
+        FastHessian detector(&iimage,ip,12.7,false,9,1,4);
         detector.getInterestPoints();
 
         clock_t end = clock();
