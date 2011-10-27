@@ -1,5 +1,6 @@
+import com.stromberglabs.jopensurf.FastHessian;
+import com.stromberglabs.jopensurf.IntegralImage;
 import com.stromberglabs.jopensurf.SURFInterestPoint;
-import com.stromberglabs.jopensurf.Surf;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -26,8 +27,9 @@ public class BenchmarkDetectRuntime {
 			long before = System.currentTimeMillis();
 
 			// caches result, need to declare Surf here
-			Surf surf = new Surf(image,0.81F, 0.00004F, 4);
-			List<SURFInterestPoint> found = surf.getFreeOrientedInterestPoints();
+			IntegralImage ii = new IntegralImage(image);
+			FastHessian detector = new FastHessian(ii,4,1,0.000119F, 0.81F);
+			List<SURFInterestPoint> found = detector.getIPoints();
 
 			long after = System.currentTimeMillis();
 			long elapsed = after-before;

@@ -104,23 +104,24 @@ public class FactoryInterestPoint {
 	/**
 	 * Detects features using a Fast Hessian detector as described in the SURF paper.
 	 *
+	 *
 	 * @param threshold Minimum feature intensity.
 	 * @param maxFeaturesPerScale Number of features it will find or if <= 0 it will return all features it finds.
-	 * @param initialSize Typically 9.
+	 * @param initialSampleSize How often pixels are sampled in the first octave.  Typically 1 or 2.
+	 *@param initialSize Typically 9.
 	 * @param numberScalesPerOctave Typically 4.
-	 * @param numberOfOctaves Typically 4.
-	 * @return Fast hessian detector.
+	 * @param numberOfOctaves Typically 4.	@return Fast hessian detector.
 	 */
 	public static <T extends ImageBase>
 	InterestPointDetector<T> fromFastHessian(float threshold,
 											 int maxFeaturesPerScale,
-											 int initialSize,
+											 int initialSampleSize, int initialSize,
 											 int numberScalesPerOctave,
 											 int numberOfOctaves)
 	{
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, threshold, 5, false, true);
 		FastHessianFeatureDetector<T> feature = new FastHessianFeatureDetector<T>(extractor,maxFeaturesPerScale,
-				initialSize,numberScalesPerOctave,numberOfOctaves);
+				initialSampleSize, initialSize,numberScalesPerOctave,numberOfOctaves);
 
 		return new WrapFHtoInterestPoint<T>(feature);
 	}

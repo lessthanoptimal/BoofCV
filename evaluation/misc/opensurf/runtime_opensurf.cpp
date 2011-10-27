@@ -37,16 +37,13 @@ void process( IplImage *image , FILE *fid )
 
     printf("Read in a total of %d points.\n",(int)ipts.size());
 
-    // Create Surf Descriptor Object
-    Surf des(int_img, ipts);
-
-    // Extract the descriptors for the ipts
-    des.getDescriptors(false);
-
     long best = -1;
 
     for( int trial = 0; trial < 10; trial++ ) {
         clock_t start = clock();
+
+        // benchmark rules state that integral image calculations should be included in time
+        int_img = Integral(image);
 
         // Create Surf Descriptor Object
         Surf des(int_img, ipts);
