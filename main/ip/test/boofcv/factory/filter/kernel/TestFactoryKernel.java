@@ -143,13 +143,6 @@ public class TestFactoryKernel {
 	}
 
 	@Test
-	public void gaussianWidth() {
-		// check that sum adds up to 1
-		// should be symmetric for even
-		fail("implement");
-	}
-
-	@Test
 	public void get1DType() {
 		assertTrue((Class)Kernel1D_F32.class == FactoryKernel.get1DType(Kernel2D_F32.class));
 		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.get1DType(Kernel2D_I32.class));

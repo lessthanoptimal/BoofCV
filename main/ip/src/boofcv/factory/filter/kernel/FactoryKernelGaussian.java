@@ -307,9 +307,12 @@ public class FactoryKernelGaussian {
 	}
 
 	/**
-	 *
+	 * <p>
+	 * Given the the radius of a Gaussian distribution, choose an appropriate sigma.
+	 * </p>
+	 * <p>
 	 * NOTE: If trying to determine sigma for gaussian derivative -1 from radius.
-	 *
+	 * </p>
 	 * @param radius
 	 * @return
 	 */
@@ -331,9 +334,9 @@ public class FactoryKernelGaussian {
 	/**
 	 * Create a gaussian kernel based on its width.  Supports kernels of even or odd widths
 	 * .
-	 * @param sigma
-	 * @param width
-	 * @return
+	 * @param sigma Sigma of the Gaussian distribution. If <= 0 then the width will be used.
+	 * @param width How wide the kernel is.  Can be even or odd.
+	 * @return Gaussian convolution kernel.
 	 */
 	public static Kernel2D_F64 gaussianWidth( double sigma , int width )
 	{
@@ -343,14 +346,13 @@ public class FactoryKernelGaussian {
 			throw new IllegalArgumentException("Must specify the width since it doesn't know if it should be even or odd");
 
 		if( width % 2 == 0 ) {
-			int r = width/2;
+			int r = width/2-1;
 			Kernel2D_F64 ret = new Kernel2D_F64(width);
 			double sum = 0;
 			for( int y = 0; y < width; y++ ) {
-				double dy = Math.abs(y-r)+0.5;
+				double dy = y <= r ? Math.abs(y-r)+0.5 : Math.abs(y-r-1)+0.5;
 				for( int x = 0; x < width; x++ ) {
-					double dx = Math.abs(x-r)+0.5;
-
+					double dx = x <= r ? Math.abs(x-r)+0.5 : Math.abs(x-r-1)+0.5;
 					double d = Math.sqrt(dx*dx + dy*dy);
 					double val = UtilGaussian.computePDF(0,sigma,d);
 					ret.set(x,y,val);
