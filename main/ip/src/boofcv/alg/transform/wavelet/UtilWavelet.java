@@ -349,8 +349,8 @@ public class UtilWavelet {
 			int maxY = transform.height/div;
 
 			float max = 0;
-			for( int y = 0; y < maxX; y++ ) {
-				for( int x = 0; x < maxY; x++ ) {
+			for( int y = 0; y < maxY; y++ ) {
+				for( int x = 0; x < maxX; x++ ) {
 					if( x >= minX || y >= minY ) {
 						float val = Math.abs(transform.data[ transform.getIndex(x,y) ]);
 						max = Math.max(val,max);
@@ -358,8 +358,8 @@ public class UtilWavelet {
 				}
 			}
 
-			for( int y = 0; y < maxX; y++ ) {
-				for( int x = 0; x < maxY; x++ ) {
+			for( int y = 0; y < maxY; y++ ) {
+				for( int x = 0; x < maxX; x++ ) {
 					if( x >= minX || y >= minY ) {
 						transform.data[ transform.getIndex(x,y) ] *= valueRange/max;
 					}

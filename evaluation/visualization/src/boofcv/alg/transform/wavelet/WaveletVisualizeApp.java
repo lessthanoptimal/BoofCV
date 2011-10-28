@@ -142,6 +142,8 @@ public class WaveletVisualizeApp
 		manager.add("lena","data/standard/lena512.bmp");
 		manager.add("boat","data/standard/boat.png");
 		manager.add("fingerprint","data/standard/fingerprint.png");
+		manager.add("shapes","data/shapes01.png");
+		manager.add("sunflowers","data/sunflowers.png");
 
 		app.setInputManager(manager);
 
