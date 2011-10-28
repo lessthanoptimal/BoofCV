@@ -180,6 +180,14 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}
 
+	public static double sum(Kernel2D_F64 kernel) {
+
+		double[] data = kernel.data;
+		double total = 0;
+		for (int i = 0; i < data.length; i++) total += data[i];
+		return total;
+	}
+
 	public static void normalizeF(Kernel2D_F64 kernel) {
 
 		double[] data = kernel.data;

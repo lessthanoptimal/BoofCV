@@ -18,14 +18,15 @@
 
 package boofcv.factory.filter.kernel;
 
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.alg.filter.kernel.KernelMath;
+import boofcv.struct.convolve.*;
+import junit.framework.Assert;
 import org.junit.Test;
 import pja.stats.UtilGaussian;
 
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -115,5 +116,62 @@ public class TestFactoryKernelGaussian {
 		}
 
 		// todo check normalized version
+	}
+
+	/**
+	 * Create a kernel with an even width
+	 */
+	@Test
+	public void gaussianWidth_even() {
+		Kernel2D_F64 a = FactoryKernelGaussian.gaussianWidth(2,4);
+
+		assertEquals(4, a.width);
+		checkForSymmetry(a);
+		assertEquals(1,KernelMath.sum(a),1e-8);
+
+		// don't specify sigma
+		a = FactoryKernelGaussian.gaussianWidth(-1,4);
+		assertEquals(4, a.width);
+		checkForSymmetry(a);
+		assertEquals(1,KernelMath.sum(a),1e-8);
+	}
+
+	/**
+	 * Create a kernel with an odd width
+	 */
+	@Test
+	public void gaussianWidth_odd() {
+		Kernel2D_F64 a = FactoryKernelGaussian.gaussianWidth(2,5);
+		assertEquals(5, a.width);
+		checkForSymmetry(a);
+		assertEquals(1,KernelMath.sum(a),1e-8);
+
+		// don't specify sigma
+		a = FactoryKernelGaussian.gaussianWidth(-1,5);
+		assertEquals(5, a.width);
+		checkForSymmetry(a);
+		assertEquals(1,KernelMath.sum(a),1e-8);
+	}
+
+	public static void checkForSymmetry( Kernel2D_F64 a ) {
+		boolean even = a.getWidth()%2==0;
+		int r = a.getRadius();
+		int w = a.getWidth()-1;
+
+		if( even )
+			r--;
+
+		for( int i = 0; i <= r; i++ ) {
+			for( int j = 0; j <= r; j++ ) {
+				assertEquals(a.get(i,j),a.get(w-i,j),1e-8);
+				assertEquals(a.get(i,j),a.get(i,w-j),1e-8);
+			}
+		}
+
+		if( !even ) {
+			assertTrue(Math.abs(a.get(r,r)-a.get(r+1,r))>1e-8);
+			assertTrue(Math.abs(a.get(r,r)-a.get(r,r+1))>1e-8);
+		}
+
 	}
 }
