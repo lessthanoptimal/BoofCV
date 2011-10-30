@@ -52,7 +52,7 @@ public class TestImplHessianBlobIntensity {
 			if( !m.getName().equals("determinant"))
 				continue;
 
-			Class<?> param[] = m.getParameterTypes();
+			Class param[] = m.getParameterTypes();
 
 			ImageBase derivXX = GeneralizedImageOps.createImage(param[1],width,height);
 			ImageBase derivYY = GeneralizedImageOps.createImage(param[1],width,height);
@@ -94,7 +94,7 @@ public class TestImplHessianBlobIntensity {
 			if( !m.getName().equals("trace"))
 				continue;
 
-			Class<?> param[] = m.getParameterTypes();
+			Class param[] = m.getParameterTypes();
 
 			ImageBase derivXX = GeneralizedImageOps.createImage(param[1],width,height);
 			ImageBase derivYY = GeneralizedImageOps.createImage(param[1],width,height);

@@ -53,7 +53,7 @@ public class TestImplMedianSortNaive {
 			if( !m.getName().equals("process"))
 				continue;
 
-			Class<?> params[] = m.getParameterTypes();
+			Class params[] = m.getParameterTypes();
 
 			ImageBase input = GeneralizedImageOps.createImage(params[0],4,4);
 			ImageBase found = GeneralizedImageOps.createImage(params[1],4,4);

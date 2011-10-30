@@ -258,7 +258,7 @@ public class ConvertBufferedImage {
 	/**
 	 * Converts an image which extends {@link ImageBase} into a BufferedImage.
 	 *
-	 * @param src Input image.
+	 * @param src Input image.  Pixels must have a value from 0 to 255.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
 	 * @return Converted image.
 	 */

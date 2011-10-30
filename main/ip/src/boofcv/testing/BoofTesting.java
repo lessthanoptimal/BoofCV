@@ -105,7 +105,7 @@ public class BoofTesting {
 				continue;
 
 			// test a positive case
-			Class<?> params[] = m.getParameterTypes();
+			Class params[] = m.getParameterTypes();
 			Object[] inputs = new Object[params.length];
 			for (int i = 0; i < params.length; i++) {
 				inputs[i] = GeneralizedImageOps.createImage(params[i], 10, 20);

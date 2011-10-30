@@ -40,14 +40,14 @@ public abstract class GenericDenoiseTests<T extends ImageBase> {
 	int width = 20;
 	int height = 30;
 
-	Class imageType;
+	Class<T> imageType;
 	int noiseSigma;
 
 	T image;
 	T imageNoisy;
 	T imageDenoised;
 
-	protected GenericDenoiseTests(Class imageType, int noiseSigma) {
+	protected GenericDenoiseTests(Class<T> imageType, int noiseSigma) {
 		this.imageType = imageType;
 		this.noiseSigma = noiseSigma;
 	}

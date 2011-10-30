@@ -74,7 +74,7 @@ public class StandardGradientChecks {
 	 * The XY and YX second derivatives should be indential
 	 */
 	private void testSecondDerivative(Method m1 , Method m2) {
-		Class<?> params[] = m1.getParameterTypes();
+		Class params[] = m1.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(params[0],width,height);
 		ImageBase derivX = GeneralizedImageOps.createImage(params[1],width,height);
 		ImageBase derivY = GeneralizedImageOps.createImage(params[2],width,height);

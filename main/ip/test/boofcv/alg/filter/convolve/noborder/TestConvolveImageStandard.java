@@ -88,7 +88,7 @@ public class TestConvolveImageStandard {
 	 * Using the method's name and the number of parameters invoke the appropriate test function
 	 */
 	private void testMethod( Method m ) {
-		Class<?> param[] = m.getParameterTypes();
+		Class param[] = m.getParameterTypes();
 
 		ImageBase input = GeneralizedImageOps.createImage(param[1],width,height);
 		ImageBase output = GeneralizedImageOps.createImage(param[2],width,height);

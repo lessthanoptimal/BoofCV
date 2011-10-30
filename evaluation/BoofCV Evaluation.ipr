@@ -2,6 +2,22 @@
 <project version="4">
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
+    <buildFile url="file://$PROJECT_DIR$/../main/build.xml">
+      <additionalClassPath />
+      <antReference projectDefault="true" />
+      <customJdkName value="" />
+      <maximumHeapSize value="128" />
+      <maximumStackSize value="2" />
+      <properties />
+    </buildFile>
+    <buildFile url="file://$PROJECT_DIR$/../applet/build.xml">
+      <additionalClassPath />
+      <antReference projectDefault="true" />
+      <customJdkName value="" />
+      <maximumHeapSize value="128" />
+      <maximumStackSize value="2" />
+      <properties />
+    </buildFile>
   </component>
   <component name="BuildJarProjectSettings">
     <option name="BUILD_JARS_ON_MAKE" value="false" />
@@ -344,10 +360,9 @@
       <module fileurl="file://$PROJECT_DIR$/../main/io/BoofCV IO.iml" filepath="$PROJECT_DIR$/../main/io/BoofCV IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/../main/ip/BoofCV Image Processing.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" filepath="$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../integration/xuggler/BoofCV Xuggler.iml" filepath="$PROJECT_DIR$/../integration/xuggler/BoofCV Xuggler.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" filepath="$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../developmental/cv/Developmental-CV.iml" filepath="$PROJECT_DIR$/../../developmental/cv/Developmental-CV.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../georegression/GeoRegression.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../GeoRegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../GeoRegression/GeoRegression.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../../ejml/trunk/ejml.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../libpjajava/libpja.iml" filepath="$PROJECT_DIR$/../../libpjajava/libpja.iml" />
     </modules>
@@ -355,7 +370,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0_27" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ResourceManagerContainer">
@@ -441,9 +456,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../developmental/cv" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../../ejml" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../georegression" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../../libpjajava" vcs="svn" />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />

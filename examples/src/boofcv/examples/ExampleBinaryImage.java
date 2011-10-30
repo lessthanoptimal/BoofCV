@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class BinaryImageExample {
+public class ExampleBinaryImage {
 
 	/**
 	 * Thresholds and displays the image.

@@ -52,12 +52,12 @@ public class TestWaveletTransformOps {
 	 */
 	@Test
 	public void smallImage(){
-		for( Class<?> t : types ) {
+		for( Class t : types ) {
 			testSmallImage(t);
 		}
 	}
 
-	public void testSmallImage( Class<?> typeInput ) {
+	public <T extends ImageBase> void testSmallImage( Class<T> typeInput ) {
 		this.typeInput = typeInput;
 		WaveletDescription<?> desc = createDesc(typeInput);
 
@@ -65,9 +65,9 @@ public class TestWaveletTransformOps {
 
 		for( int i = length; i < 20; i++ ) {
 
-			ImageBase input = GeneralizedImageOps.createImage(typeInput,i,i);
-			ImageBase output = GeneralizedImageOps.createImage(typeInput,input.width+(input.width%2),input.height+(input.height%2));
-			ImageBase found = GeneralizedImageOps.createImage(typeInput,input.width,input.height);
+			T input = GeneralizedImageOps.createImage(typeInput,i,i);
+			T output = GeneralizedImageOps.createImage(typeInput,input.width+(input.width%2),input.height+(input.height%2));
+			T found = GeneralizedImageOps.createImage(typeInput,input.width,input.height);
 
 			GeneralizedImageOps.randomize(input,rand,0,50);
 
@@ -97,7 +97,7 @@ public class TestWaveletTransformOps {
 		}
 	}
 
-	private void testMultipleLEvels( Class<?> typeInput ) {
+	private void testMultipleLEvels( Class typeInput ) {
 		this.typeInput = typeInput;
 
 		WaveletDescription<?> desc = createDesc(typeInput);
