@@ -64,7 +64,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ImageStitchingExample {
+public class ExampleImageStitching {
 
 	/**
 	 * Using abstracted code, find a transform which minimises the difference between corresponding features

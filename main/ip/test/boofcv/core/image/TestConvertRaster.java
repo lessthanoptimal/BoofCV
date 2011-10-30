@@ -119,7 +119,7 @@ public class TestConvertRaster {
 	}
 
 	private void testBufferedTo( Method m ) {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 
 		BufferedImage input[];
 
@@ -171,7 +171,7 @@ public class TestConvertRaster {
 
 	private void testGrayTo( Method m ) {
 
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],imgWidth,imgHeight);
 		GeneralizedImageOps.randomize(input, rand, 0,50);

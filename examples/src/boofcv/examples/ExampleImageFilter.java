@@ -48,7 +48,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class ImageFilterExample {
+public class ExampleImageFilter {
 
 	private static int blurRadius = 10;
 

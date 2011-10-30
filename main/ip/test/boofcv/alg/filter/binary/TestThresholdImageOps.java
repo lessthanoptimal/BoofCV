@@ -65,7 +65,7 @@ public class TestThresholdImageOps {
 			if( !m.getName().equals("threshold"))
 				continue;
 
-			Class<?> param[] = m.getParameterTypes();
+			Class param[] = m.getParameterTypes();
 
 			ImageBase input = GeneralizedImageOps.createImage(param[0],width,height);
 			ImageUInt8 output = new ImageUInt8(width,height);
@@ -103,7 +103,7 @@ public class TestThresholdImageOps {
 			if( !m.getName().equals("thresholdBlobs"))
 				continue;
 
-			Class<?> param[] = m.getParameterTypes();
+			Class param[] = m.getParameterTypes();
 
 			ImageBase input = GeneralizedImageOps.createImage(param[0],width,height);
 			ImageSInt32 labeled = new ImageSInt32(width,height);
@@ -156,7 +156,7 @@ public class TestThresholdImageOps {
 			if( !m.getName().equals("hysteresisLabel4"))
 				continue;
 
-			Class<?> param[] = m.getParameterTypes();
+			Class param[] = m.getParameterTypes();
 
 			ImageBase inputDown = GeneralizedImageOps.createImage(param[0],width,height);
 			ImageBase inputUp = GeneralizedImageOps.createImage(param[0],width,height);
@@ -195,7 +195,7 @@ public class TestThresholdImageOps {
 			if( !m.getName().equals("hysteresisLabel8"))
 				continue;
 
-			Class<?> param[] = m.getParameterTypes();
+			Class param[] = m.getParameterTypes();
 
 			ImageBase inputDown = GeneralizedImageOps.createImage(param[0],width,height);
 			ImageBase inputUp = GeneralizedImageOps.createImage(param[0],width,height);

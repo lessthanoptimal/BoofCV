@@ -40,11 +40,11 @@ import java.util.Random;
 public abstract class PermuteWaveletCompare {
 	Random rand = new Random(234);
 
-	Class<?> inputType;
-	Class<?> outputType;
+	Class inputType;
+	Class outputType;
 	
 
-	protected PermuteWaveletCompare(Class<?> inputType, Class<?> outputType) {
+	protected PermuteWaveletCompare(Class inputType, Class outputType) {
 		this.inputType = inputType;
 		this.outputType = outputType;
 	}

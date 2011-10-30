@@ -41,7 +41,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 54;
+		int numExpected = 78;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -55,6 +55,10 @@ public class TestPixelMath {
 					testAbs(m);
 				} else if( m.getName().compareTo("maxAbs") == 0 ) {
 					testMaxAbs(m);
+				} else if( m.getName().compareTo("min") == 0 ) {
+					testMin(m);
+				} else if( m.getName().compareTo("max") == 0 ) {
+					testMax(m);
 				} else if( m.getName().compareTo("divide") == 0 ) {
 					testDivide(m);
 				} else if( m.getName().compareTo("multiply") == 0 ) {
@@ -86,7 +90,7 @@ public class TestPixelMath {
 
 	private boolean isTestMethod(Method m ) {
 
-		Class<?> param[] = m.getParameterTypes();
+		Class param[] = m.getParameterTypes();
 
 		if( param.length < 1 )
 			return false;
@@ -95,7 +99,7 @@ public class TestPixelMath {
 	}
 
 	private void testAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.randomize(input, rand, -20,20);
@@ -112,7 +116,7 @@ public class TestPixelMath {
 	}
 
 	private void testMaxAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		SingleBandImage a = FactorySingleBandImage.wrap(input);
@@ -131,8 +135,48 @@ public class TestPixelMath {
 
 	}
 
+	private void testMax( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(input);
+
+		if( input.getTypeInfo().isSigned() ) {
+			GeneralizedImageOps.randomize(input, rand, -20,-5);
+			a.set(0,3,-2);
+			Number o = (Number)m.invoke(null,input);
+			assertEquals(-2,o.doubleValue(),1e-8);
+
+		} else {
+			GeneralizedImageOps.randomize(input, rand, 0,20);
+			a.set(0,3,100);
+			Number o = (Number)m.invoke(null,input);
+			assertEquals(100,o.doubleValue(),1e-8);
+		}
+	}
+
+	private void testMin( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(input);
+
+		if( input.getTypeInfo().isSigned() ) {
+			GeneralizedImageOps.randomize(input, rand, -20,-5);
+			a.set(0,3,-30);
+			Number o = (Number)m.invoke(null,input);
+			assertEquals(-30,o.doubleValue(),1e-8);
+
+		} else {
+			GeneralizedImageOps.randomize(input, rand, 5,20);
+			a.set(0,3,1);
+			Number o = (Number)m.invoke(null,input);
+			assertEquals(1,o.doubleValue(),1e-8);
+		}
+	}
+
 	private void testDivide( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.randomize(input, rand, 0,20);
@@ -166,7 +210,7 @@ public class TestPixelMath {
 	}
 
 	private void testMultiply( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.randomize(input, rand, 0,20);
@@ -200,7 +244,7 @@ public class TestPixelMath {
 	}
 
 	private void testPlus( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		ImageBase output = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
@@ -233,7 +277,7 @@ public class TestPixelMath {
 	}
 
 	private void testBound( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		if( input.getTypeInfo().isSigned() ) {
@@ -266,7 +310,7 @@ public class TestPixelMath {
 	}
 
 	private void testDiffAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		ImageBase inputB = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		ImageBase inputC = GeneralizedImageOps.createImage(paramTypes[0],width,height);
@@ -294,7 +338,7 @@ public class TestPixelMath {
 	}
 
 	private void testSum( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		if( inputA.getTypeInfo().isSigned() ) {

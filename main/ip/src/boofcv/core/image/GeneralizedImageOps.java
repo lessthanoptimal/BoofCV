@@ -48,7 +48,7 @@ public class GeneralizedImageOps {
 	 * @param typeDst The type of output image.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageBase> T convert( ImageBase<?> src , T dst , Class<?> typeDst  )
+	public static <T extends ImageBase> T convert( ImageBase<?> src , T dst , Class<T> typeDst  )
 	{
 		if (dst == null) {
 			dst =(T) createImage(typeDst,src.width, src.height);
@@ -249,7 +249,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static <T extends ImageBase> T createImage(Class<?> type, int width, int height) {
+	public static <T extends ImageBase> T createImage(Class<T> type, int width, int height) {
 		type = BoofTesting.convertGenericToSpecificType(type);
 
 		if (type == ImageUInt8.class) {

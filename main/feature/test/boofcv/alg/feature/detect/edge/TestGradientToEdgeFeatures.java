@@ -59,7 +59,7 @@ public class TestGradientToEdgeFeatures {
 
 	public void intensityE( Method m )
 	{
-		Class<?> params[] = m.getParameterTypes();
+		Class params[] = m.getParameterTypes();
 
 		ImageBase derivX = GeneralizedImageOps.createImage(params[0],width,height);
 		ImageBase derivY = GeneralizedImageOps.createImage(params[0],width,height);
@@ -92,7 +92,7 @@ public class TestGradientToEdgeFeatures {
 
 	public void intensityAbs( Method m )
 	{
-		Class<?> params[] = m.getParameterTypes();
+		Class params[] = m.getParameterTypes();
 
 		ImageBase derivX = GeneralizedImageOps.createImage(params[0],width,height);
 		ImageBase derivY = GeneralizedImageOps.createImage(params[0],width,height);
@@ -126,7 +126,7 @@ public class TestGradientToEdgeFeatures {
 
 	public void direction( Method m )
 	{
-		Class<?> params[] = m.getParameterTypes();
+		Class params[] = m.getParameterTypes();
 
 		ImageBase derivX = GeneralizedImageOps.createImage(params[0],width,height);
 		ImageBase derivY = GeneralizedImageOps.createImage(params[0],width,height);

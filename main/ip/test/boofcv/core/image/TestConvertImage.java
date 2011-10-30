@@ -63,9 +63,9 @@ public class TestConvertImage {
 		assertEquals(42,count);
 	}
 
-	private void checkConvert( Method m , Class<?> inputType , Class<?> outputType ) {
-		ImageBase<?> input = GeneralizedImageOps.createImage(inputType,imgWidth,imgHeight);
-		ImageBase<?> output = GeneralizedImageOps.createImage(outputType,imgWidth,imgHeight);
+	private void checkConvert( Method m , Class inputType , Class outputType ) {
+		ImageBase input = GeneralizedImageOps.createImage(inputType,imgWidth,imgHeight);
+		ImageBase output = GeneralizedImageOps.createImage(outputType,imgWidth,imgHeight);
 
 		boolean inputSigned = true;
 		boolean outputSigned = true;

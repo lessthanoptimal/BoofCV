@@ -57,9 +57,9 @@ public class TestIntegralImageOps {
 	}
 
 	public void transform( Method m ) {
-		Class<?> paramType[] = m.getParameterTypes();
-		Class<?> inputType = paramType[0];
-		Class<?> outputType = paramType[1];
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+		Class outputType = paramType[1];
 
 		ImageBase input = GeneralizedImageOps.createImage(inputType,width,height);
 		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
@@ -98,10 +98,10 @@ public class TestIntegralImageOps {
 	}
 
 	public void convolve( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramType[] = m.getParameterTypes();
-		Class<?> inputType = paramType[0];
-		Class<?> outputType = paramType[2];
-		Class<?> origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+		Class outputType = paramType[2];
+		Class origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
 
 		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
 		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
@@ -140,10 +140,10 @@ public class TestIntegralImageOps {
 	}
 
 	public void convolveBorder( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramType[] = m.getParameterTypes();
-		Class<?> inputType = paramType[0];
-		Class<?> outputType = paramType[2];
-		Class<?> origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+		Class outputType = paramType[2];
+		Class origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
 
 		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
 		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
@@ -181,8 +181,8 @@ public class TestIntegralImageOps {
 	}
 
 	public void convolveSparse( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramType[] = m.getParameterTypes();
-		Class<?> inputType = paramType[0];
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
 
 		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);
 
@@ -215,9 +215,9 @@ public class TestIntegralImageOps {
 	}
 	
 	public void block_unsafe( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramType[] = m.getParameterTypes();
-		Class<?> inputType = paramType[0];
-		Class<?> origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+		Class origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
 
 		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
 		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);
@@ -237,9 +237,9 @@ public class TestIntegralImageOps {
 	}
 
 	public void block_zero( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramType[] = m.getParameterTypes();
-		Class<?> inputType = paramType[0];
-		Class<?> origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+		Class origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
 
 		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
 		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);

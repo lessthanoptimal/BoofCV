@@ -86,7 +86,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 	@Override
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 
-		Class<?> c[] = candidate.getParameterTypes();
+		Class c[] = candidate.getParameterTypes();
 
 		ImageBase input = GeneralizedImageOps.createImage(c[0],width,height);
 		ImageBase output = GeneralizedImageOps.createImage(c[1],width,height);

@@ -92,7 +92,7 @@ public class TestConvolveImageStandardSparse {
 		expectedOutput = computeExpected(floatImage);
 		boolean isFloatingKernel = method.getParameterTypes()[0] == Kernel1D_F32.class;
 
-		ImageBase<?> inputImage = GeneralizedImageOps.convert(floatImage,null,method.getParameterTypes()[2]);
+		ImageBase inputImage = GeneralizedImageOps.convert(floatImage,null,(Class)method.getParameterTypes()[2]);
 		Object inputKernel = isFloatingKernel ? kernelF32 : kernelI32;
 		Object inputStorage = isFloatingKernel ? new float[kernelI32.width] : new int[ kernelI32.width];
 

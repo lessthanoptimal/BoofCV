@@ -96,8 +96,8 @@ public class TestConvolveWithBorderSparse {
 
 		Class<?> kernelType = m.getParameterTypes()[0];
 		Class<?> borderType = m.getParameterTypes()[1];
-		Class<?> inputType = borderToInputType(borderType);
-		Class<?> outputType = borderToOutputType(borderType);
+		Class inputType = borderToInputType(borderType);
+		Class outputType = borderToOutputType(borderType);
 
 		ImageBase input = GeneralizedImageOps.createImage(inputType,width,height);
 		GeneralizedImageOps.randomize(input,rand,0,20);
@@ -136,7 +136,7 @@ public class TestConvolveWithBorderSparse {
 		return ret;
 	}
 
-	protected static Class<?> borderToInputType(Class<?> borderType ) {
+	protected static Class borderToInputType(Class<?> borderType ) {
 		if (ImageBorder_F32.class == borderType) {
 			return ImageFloat32.class;
 		} else if (ImageBorder_F64.class == borderType) {

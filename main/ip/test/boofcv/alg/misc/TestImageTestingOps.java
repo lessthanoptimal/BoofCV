@@ -92,7 +92,7 @@ public class TestImageTestingOps {
 	}
 
 	private void testFill( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.randomize(orig, rand, 0,20);
 
@@ -111,7 +111,7 @@ public class TestImageTestingOps {
 	}
 
 	private void testFillRectangle( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		int x0 = 2;
@@ -137,7 +137,7 @@ public class TestImageTestingOps {
 	}
 
 	private void testRandomize( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		if( orig.getTypeInfo().isInteger() ) {
@@ -166,7 +166,7 @@ public class TestImageTestingOps {
 	}
 
 	private void testAddUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.fill(orig,1);
 
@@ -189,7 +189,7 @@ public class TestImageTestingOps {
 
 		double mean = 10;
 
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		GeneralizedImageOps.fill(orig,mean);
@@ -221,7 +221,7 @@ public class TestImageTestingOps {
 
 	private void testComputeMSE( Method m ) throws InvocationTargetException, IllegalAccessException {
 
-		Class<?> paramTypes[] = m.getParameterTypes();
+		Class paramTypes[] = m.getParameterTypes();
 		ImageBase imgA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		GeneralizedImageOps.fill(imgA,10);
