@@ -28,6 +28,39 @@ import java.io.File;
 public class UtilIO {
 
 	/**
+	 * Steps back until it finds the base BoofCV directory.
+	 *
+	 * @return Path to the base directory.
+	 */
+	public static String getPathToBase() {
+		String path = "./";
+
+
+		for( int i = 0; i < 3; i++ ) {
+			File f = new File(path);
+			if( !f.exists() )
+				throw new RuntimeException("Failed");
+			String[] files = f.list();
+
+			boolean foundMain = false;
+			boolean foundLib = false;
+
+			for( String s : files ) {
+				if( s.compareToIgnoreCase("main") == 0 )
+					foundMain = true;
+				else if( s.compareToIgnoreCase("lib") == 0 )
+					foundLib = true;
+			}
+
+			if( foundMain && foundLib )
+				return path;
+
+			path = "../"+path;
+		}
+		throw new RuntimeException("Base not found");
+	}
+
+	/**
 	 * Opens up a dialog box asking the user to select a file.  If the user cancels
 	 * it either returns null or quits the program.
 	 *

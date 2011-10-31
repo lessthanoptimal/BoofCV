@@ -57,7 +57,7 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 	// reference to output GUI image
 	BufferedImage imageGUI;
 
-	boolean loop = true;
+	boolean loop = false;
 	boolean forwards = true;
 
 	/**
@@ -88,6 +88,10 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 
 	public void setLoop(boolean loop) {
 		this.loop = loop;
+	}
+
+	public boolean isLoop() {
+		return loop;
 	}
 
 	private void findImages() {

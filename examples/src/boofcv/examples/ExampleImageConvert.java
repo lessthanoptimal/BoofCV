@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageUInt8;
 import java.awt.image.BufferedImage;
 
 /**
- * Demonstrates how to convert between different image types and visualize image data.
+ * Demonstrates how to convert between different image types.
  *
  * @author Peter Abeles
  */
@@ -42,6 +42,7 @@ public class ExampleImageConvert {
 	/**
 	 * Computes the image derivative to demonstrate how to convert to and from BufferedImages.  When a gray scale
 	 * image hsa intensity values from 0 to 255 then the faster operations inside of ConvertBufferedImage can be used.
+	 * Otherwise alternative techniques (shown below) are used which rescale the image.
 	 *
 	 * @param input Input BufferedImage.
 	 * @param imageType Image type for work image.
