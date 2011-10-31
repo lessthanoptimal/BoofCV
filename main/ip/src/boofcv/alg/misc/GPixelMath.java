@@ -74,6 +74,54 @@ public class GPixelMath {
 	}
 
 	/**
+	 * Returns the maximum pixel value.
+	 *
+	 * @param input Input image. Not modified.
+	 * @return Maximum pixel value.
+	 */
+	public static double max( ImageBase input ) {
+		if( ImageUInt8.class == input.getClass() ) {
+			return PixelMath.max((ImageUInt8) input);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			return PixelMath.max((ImageSInt8) input);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			return PixelMath.max((ImageUInt16) input);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			return PixelMath.max((ImageSInt16) input);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			return PixelMath.max((ImageSInt32) input);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			return PixelMath.max((ImageFloat32) input);
+		} else {
+			throw new IllegalArgumentException("Unknown Image Type");
+		}
+	}
+
+	/**
+	 * Returns the minimum pixel value.
+	 *
+	 * @param input Input image. Not modified.
+	 * @return Minimum pixel value.
+	 */
+	public static double min( ImageBase input ) {
+		if( ImageUInt8.class == input.getClass() ) {
+			return PixelMath.min((ImageUInt8) input);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			return PixelMath.min((ImageSInt8) input);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			return PixelMath.min((ImageUInt16) input);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			return PixelMath.min((ImageSInt16) input);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			return PixelMath.min((ImageSInt32) input);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			return PixelMath.min((ImageFloat32) input);
+		} else {
+			throw new IllegalArgumentException("Unknown Image Type");
+		}
+	}
+
+	/**
 	 * Divides each element by the denominator. Both input and output images can
 	 * be the same.
 	 *
@@ -84,18 +132,16 @@ public class GPixelMath {
 	public static <T extends ImageBase> void divide( T input , T output , double denominator ) {
 
 		if( ImageInteger.class.isAssignableFrom(input.getClass())) {
-			int denominatorI = (int)denominator;
-
 			if( ImageUInt8.class == input.getClass() ) {
-				PixelMath.divide((ImageUInt8)input,(ImageUInt8)output, denominatorI);
+				PixelMath.divide((ImageUInt8)input,(ImageUInt8)output, denominator);
 			} else if( ImageSInt8.class == input.getClass() ) {
-				PixelMath.divide((ImageSInt8)input,(ImageSInt8)output, denominatorI);
+				PixelMath.divide((ImageSInt8)input,(ImageSInt8)output, denominator);
 			} else if( ImageUInt16.class == input.getClass() ) {
-				PixelMath.divide((ImageUInt16)input,(ImageUInt16)output, denominatorI);
+				PixelMath.divide((ImageUInt16)input,(ImageUInt16)output, denominator);
 			} else if( ImageSInt16.class == input.getClass() ) {
-				PixelMath.divide((ImageSInt16)input,(ImageSInt16)output, denominatorI);
+				PixelMath.divide((ImageSInt16)input,(ImageSInt16)output, denominator);
 			} else if( ImageSInt32.class == input.getClass() ) {
-				PixelMath.divide((ImageSInt32)input,(ImageSInt32)output, denominatorI);
+				PixelMath.divide((ImageSInt32)input,(ImageSInt32)output, denominator);
 			} else {
 				throw new IllegalArgumentException("Unknown integer image Type");
 			}
@@ -119,18 +165,16 @@ public class GPixelMath {
 	public static <T extends ImageBase> void multiply( T input , T output , double scale ) {
 
 		if( ImageInteger.class.isAssignableFrom(input.getClass())) {
-			int scaleI = (int)scale;
-
 			if( ImageUInt8.class == input.getClass() ) {
-				PixelMath.multiply((ImageUInt8)input,(ImageUInt8)output, scaleI);
+				PixelMath.multiply((ImageUInt8)input,(ImageUInt8)output, scale);
 			} else if( ImageSInt8.class == input.getClass() ) {
-				PixelMath.multiply((ImageSInt8)input,(ImageSInt8)output, scaleI);
+				PixelMath.multiply((ImageSInt8)input,(ImageSInt8)output, scale);
 			} else if( ImageUInt16.class == input.getClass() ) {
-				PixelMath.multiply((ImageUInt16)input,(ImageUInt16)output, scaleI);
+				PixelMath.multiply((ImageUInt16)input,(ImageUInt16)output, scale);
 			} else if( ImageSInt16.class == input.getClass() ) {
-				PixelMath.multiply((ImageSInt16)input,(ImageSInt16)output, scaleI);
+				PixelMath.multiply((ImageSInt16)input,(ImageSInt16)output, scale);
 			} else if( ImageSInt32.class == input.getClass() ) {
-				PixelMath.multiply((ImageSInt32)input,(ImageSInt32)output, scaleI);
+				PixelMath.multiply((ImageSInt32)input,(ImageSInt32)output, scale);
 			} else {
 				throw new IllegalArgumentException("Unknown integer image Type");
 			}

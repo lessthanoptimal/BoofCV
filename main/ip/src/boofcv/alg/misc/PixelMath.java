@@ -240,7 +240,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param denominator What each element is divided by.
 	 */
-	public static void divide( ImageUInt8 input , ImageUInt8 output, int denominator ) {
+	public static void divide( ImageUInt8 input , ImageUInt8 output, double denominator ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -263,7 +263,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param scale What each element is divided by.
 	 */
-	public static void multiply( ImageUInt8 input , ImageUInt8 output, int scale ) {
+	public static void multiply( ImageUInt8 input , ImageUInt8 output, double scale ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -273,7 +273,7 @@ public class PixelMath {
 			int end = indexSrc + input.width;
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
-				int val = (input.data[indexSrc] & 0xFF)* scale;
+				int val = (int)((input.data[indexSrc] & 0xFF)* scale);
 				if( val < 0 ) val = 0;
 				else if( val > 255 ) val = 255;
 				output.data[indexDst] = (byte)val;
@@ -466,7 +466,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param denominator What each element is divided by.
 	 */
-	public static void divide( ImageSInt8 input , ImageSInt8 output, int denominator ) {
+	public static void divide( ImageSInt8 input , ImageSInt8 output, double denominator ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -489,7 +489,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param scale What each element is divided by.
 	 */
-	public static void multiply( ImageSInt8 input , ImageSInt8 output, int scale ) {
+	public static void multiply( ImageSInt8 input , ImageSInt8 output, double scale ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -499,7 +499,7 @@ public class PixelMath {
 			int end = indexSrc + input.width;
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
-				int val = input.data[indexSrc] * scale;
+				int val = (int)(input.data[indexSrc] * scale);
 				if( val < -128 ) val = -128;
 				else if( val > 127 ) val = 127;
 				output.data[indexDst] = (byte)val;
@@ -692,7 +692,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param denominator What each element is divided by.
 	 */
-	public static void divide( ImageUInt16 input , ImageUInt16 output, int denominator ) {
+	public static void divide( ImageUInt16 input , ImageUInt16 output, double denominator ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -715,7 +715,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param scale What each element is divided by.
 	 */
-	public static void multiply( ImageUInt16 input , ImageUInt16 output, int scale ) {
+	public static void multiply( ImageUInt16 input , ImageUInt16 output, double scale ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -725,7 +725,7 @@ public class PixelMath {
 			int end = indexSrc + input.width;
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
-				int val = (input.data[indexSrc] & 0xFFFF)* scale;
+				int val = (int)((input.data[indexSrc] & 0xFFFF)* scale);
 				if( val < 0 ) val = 0;
 				else if( val > 65535 ) val = 65535;
 				output.data[indexDst] = (short)val;
@@ -918,7 +918,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param denominator What each element is divided by.
 	 */
-	public static void divide( ImageSInt16 input , ImageSInt16 output, int denominator ) {
+	public static void divide( ImageSInt16 input , ImageSInt16 output, double denominator ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -941,7 +941,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param scale What each element is divided by.
 	 */
-	public static void multiply( ImageSInt16 input , ImageSInt16 output, int scale ) {
+	public static void multiply( ImageSInt16 input , ImageSInt16 output, double scale ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -951,7 +951,7 @@ public class PixelMath {
 			int end = indexSrc + input.width;
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
-				int val = input.data[indexSrc] * scale;
+				int val = (int)(input.data[indexSrc] * scale);
 				if( val < -32768 ) val = -32768;
 				else if( val > 32767 ) val = 32767;
 				output.data[indexDst] = (short)val;
@@ -1144,7 +1144,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param denominator What each element is divided by.
 	 */
-	public static void divide( ImageSInt32 input , ImageSInt32 output, int denominator ) {
+	public static void divide( ImageSInt32 input , ImageSInt32 output, double denominator ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1154,7 +1154,7 @@ public class PixelMath {
 			int end = indexSrc + input.width;
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
-				output.data[indexDst] = ((input.data[indexSrc] )/ denominator);
+				output.data[indexDst] = (int)((input.data[indexSrc] )/ denominator);
 			}
 		}
 	}
@@ -1167,7 +1167,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param scale What each element is divided by.
 	 */
-	public static void multiply( ImageSInt32 input , ImageSInt32 output, int scale ) {
+	public static void multiply( ImageSInt32 input , ImageSInt32 output, double scale ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1177,7 +1177,7 @@ public class PixelMath {
 			int end = indexSrc + input.width;
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
-				int val = input.data[indexSrc] * scale;
+				int val = (int)(input.data[indexSrc] * scale);
 				output.data[indexDst] = val;
 			}
 		}
@@ -1366,7 +1366,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param denominator What each element is divided by.
 	 */
-	public static void divide( ImageSInt64 input , ImageSInt64 output, long denominator ) {
+	public static void divide( ImageSInt64 input , ImageSInt64 output, double denominator ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1376,7 +1376,7 @@ public class PixelMath {
 			int end = indexSrc + input.width;
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
-				output.data[indexDst] = ((input.data[indexSrc] )/ denominator);
+				output.data[indexDst] = (long)((input.data[indexSrc] )/ denominator);
 			}
 		}
 	}
@@ -1389,7 +1389,7 @@ public class PixelMath {
 	 * @param output The output image. Modified.
 	 * @param scale What each element is divided by.
 	 */
-	public static void multiply( ImageSInt64 input , ImageSInt64 output, long scale ) {
+	public static void multiply( ImageSInt64 input , ImageSInt64 output, double scale ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1399,9 +1399,7 @@ public class PixelMath {
 			int end = indexSrc + input.width;
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
-				long val = input.data[indexSrc] * scale;
-				if( val < -2147483648 ) val = -2147483648;
-				else if( val > 2147483647 ) val = 2147483647;
+				long val = (long)(input.data[indexSrc] * scale);
 				output.data[indexDst] = val;
 			}
 		}
