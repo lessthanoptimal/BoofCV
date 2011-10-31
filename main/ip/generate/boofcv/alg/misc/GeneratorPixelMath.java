@@ -200,6 +200,9 @@ public class GeneratorPixelMath {
 	}
 
 	public void printDivide() {
+
+		String divisorType = input.isInteger() ? "double" : input.getSumType();
+
 		out.print("\t/**\n" +
 				"\t * Divides each element by the denominator. Both input and output images can\n" +
 				"\t * be the same.\n" +
@@ -208,7 +211,7 @@ public class GeneratorPixelMath {
 				"\t * @param output The output image. Modified.\n" +
 				"\t * @param denominator What each element is divided by.\n" +
 				"\t */\n" +
-				"\tpublic static void divide( "+input.getImageName()+" input , "+input.getImageName()+" output, "+input.getSumType()+" denominator ) {\n" +
+				"\tpublic static void divide( "+input.getImageName()+" input , "+input.getImageName()+" output, "+divisorType+" denominator ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\n" +
@@ -219,7 +222,7 @@ public class GeneratorPixelMath {
 				"\n" +
 				"\t\t\tfor( ; indexSrc < end; indexSrc++, indexDst++ ) {\n");
 		if( input.isInteger() ) {
-			String typeCast = input.getTypeCastFromSum();
+			String typeCast = "("+input.getDataType()+")";
 			if( input.isSigned() )
 				out.print("\t\t\t\toutput.data[indexDst] = "+typeCast+"((input.data[indexSrc] "+input.getBitWise()+")/ denominator);\n");
 			else
@@ -233,6 +236,9 @@ public class GeneratorPixelMath {
 	}
 
 	public void printMult() {
+
+		String scaleType = input.isInteger() ? "double" : input.getSumType();
+
 		out.print("\t/**\n" +
 				"\t * Multiplied each element by the scale factor. Both input and output images can\n" +
 				"\t * be the same.\n" +
@@ -241,7 +247,7 @@ public class GeneratorPixelMath {
 				"\t * @param output The output image. Modified.\n" +
 				"\t * @param scale What each element is divided by.\n" +
 				"\t */\n" +
-				"\tpublic static void multiply( "+input.getImageName()+" input , "+input.getImageName()+" output, "+input.getSumType()+" scale ) {\n" +
+				"\tpublic static void multiply( "+input.getImageName()+" input , "+input.getImageName()+" output, "+scaleType+" scale ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\n" +
@@ -253,10 +259,10 @@ public class GeneratorPixelMath {
 				"\t\t\tfor( ; indexSrc < end; indexSrc++, indexDst++ ) {\n");
 		if( input.isInteger() ) {
 			if( input.isSigned() )
-				out.print("\t\t\t\t"+input.getSumType()+" val = input.data[indexSrc] * scale;\n");
+				out.print("\t\t\t\t"+input.getSumType()+" val = ("+input.getSumType()+")(input.data[indexSrc] * scale);\n");
 			else
-				out.print("\t\t\t\t"+input.getSumType()+" val = (input.data[indexSrc] "+input.getBitWise()+")* scale;\n");
-			if( input.getPrimitiveType() != int.class) {
+				out.print("\t\t\t\t"+input.getSumType()+" val = ("+input.getSumType()+")((input.data[indexSrc] "+input.getBitWise()+")* scale);\n");
+			if( input.getPrimitiveType() != int.class && input.getPrimitiveType() != long.class ) {
 				out.print("\t\t\t\tif( val < "+input.getMin()+" ) val = "+input.getMin()+";\n" +
 						"\t\t\t\telse if( val > "+input.getMax()+" ) val = "+input.getMax()+";\n");
 			}
