@@ -100,8 +100,7 @@ public class PyramidOps {
 	public static <I extends ImageBase, O extends ImageBase>
 	void gradient(ImagePyramid<I> input,
 				  ImageGradient<I, O> gradient, ImagePyramid<O> derivX,
-				  ImagePyramid<O> derivY
-	)
+				  ImagePyramid<O> derivY )
 	{
 		if( !derivX.isInitialized() )
 			derivX.initialize(input.getInputWidth(),input.getInputHeight());

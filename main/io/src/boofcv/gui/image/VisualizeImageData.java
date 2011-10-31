@@ -74,31 +74,35 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage colorizeSign( ImageBase src, BufferedImage dst, double maxAbsValue ) {
+	/**
+	 * <p>
+	 * Renders a colored image where the color indicates the sign and intensity its magnitude.   The input is divided
+	 * by normalize to render it in the appropriate scale.
+	 * </p>
+	 *
+	 * @param src Input single band image.
+	 * @param dst Where the image is rendered into.  If null a new BufferedImage will be created and return.
+	 * @param normalize Used to normalize the input image.
+	 * @return Rendered image.
+	 */
+	public static BufferedImage colorizeSign( ImageBase src, BufferedImage dst, double normalize ) {
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
-		if( maxAbsValue <= 0 ) {
-			maxAbsValue = GPixelMath.maxAbs(src);
+		if( normalize <= 0 ) {
+			normalize = GPixelMath.maxAbs(src);
 		}
 
-		if( maxAbsValue == 0 )
+		if( normalize == 0 )
 			return dst;
 
 		if( src.getClass().isAssignableFrom(ImageFloat32.class)) {
-			return colorizeSign((ImageFloat32)src,dst,(float)maxAbsValue);
+			return colorizeSign((ImageFloat32)src,dst,(float)normalize);
 		} else {
-			return colorizeSign((ImageInteger)src,dst,(int)maxAbsValue);
+			return colorizeSign((ImageInteger)src,dst,(int)normalize);
 		}
 	}
 
-	/**
-	 * 
-	 * @param src
-	 * @param dst
-	 * @param maxValue
-	 * @return
-	 */
-	private static BufferedImage colorizeSign( ImageInteger src, BufferedImage dst, int maxValue ) {
+	private static BufferedImage colorizeSign( ImageInteger src, BufferedImage dst, int normalize ) {
 
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
@@ -106,9 +110,9 @@ public class VisualizeImageData {
 
 				int rgb;
 				if( v > 0 ) {
-					rgb = (255*v/maxValue) << 16;
+					rgb = (255*v/normalize) << 16;
 				} else {
-					rgb = (-255*v/maxValue) << 8;
+					rgb = (-255*v/normalize) << 8;
 				}
 				dst.setRGB(x,y,rgb);
 			}
@@ -117,7 +121,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage grayUnsigned( ImageInteger src, BufferedImage dst, int maxValue )
+	public static BufferedImage grayUnsigned( ImageInteger src, BufferedImage dst, int normalize )
 	{
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
@@ -128,7 +132,7 @@ public class VisualizeImageData {
 			for( int x = 0; x < src.width; x++ ) {
 				int v = src.get(x,y);
 
-				int rgb = 255 *v / maxValue;
+				int rgb = 255 *v / normalize;
 
 				dst.setRGB(x,y,rgb << 16 | rgb << 8 | rgb  );
 			}
@@ -137,17 +141,29 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage grayMagnitude( ImageBase src, BufferedImage dst, double maxAbsValue )
+	/**
+	 * <p>
+	 * Renders a gray scale image of the input image's intensity.<br>
+	 * <br>
+	 * dst(i,j) = 255*abs(src(i,j))/normalize
+	 * </p>
+	 *
+	 * @param src Input single band image.
+	 * @param dst Where the image is rendered into.  If null a new BufferedImage will be created and return.
+	 * @param normalize Used to normalize the input image.
+	 * @return Rendered image.
+	 */
+	public static BufferedImage grayMagnitude( ImageBase src, BufferedImage dst, double normalize )
 	{
-		if( maxAbsValue < 0 )
-			maxAbsValue = GPixelMath.maxAbs(src);
+		if( normalize < 0 )
+			normalize = GPixelMath.maxAbs(src);
 
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
 		if( src.getTypeInfo().isInteger() ) {
-			return grayMagnitude((ImageInteger)src,dst,(int)maxAbsValue);
+			return grayMagnitude((ImageInteger)src,dst,(int)normalize);
 		} else {
-			return grayMagnitude((ImageFloat32)src,dst,(float)maxAbsValue);
+			return grayMagnitude((ImageFloat32)src,dst,(float)normalize);
 		}
 	}
 
