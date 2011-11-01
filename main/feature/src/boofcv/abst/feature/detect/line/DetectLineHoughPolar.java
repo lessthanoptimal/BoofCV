@@ -56,6 +56,9 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 	// transform algorithm
 	HoughTransformLinePolar alg;
 
+	// extractor used by hough transform
+	FeatureExtractor extractor;
+
 	// computes image gradient
 	ImageGradient<I,D> gradient;
 
@@ -78,9 +81,14 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 
 	// angle tolerance for post processing pruning
 	float pruneAngleTol;
+	// range tolerance for post processing pruning
+	float pruneRangeTol;
 
-	// number of range bins
-	int numBinsRange;
+	// size of range bin in pixels
+	double resolutionRange;
+	// size of angle bin in radians
+	double resolutionAngle;
+
 	// radius for local max
 	int localMaxRadius;
 	// the maximum number of lines it will return
@@ -89,35 +97,55 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 	// post processing pruning
 	ImageLinePruneMerge post = new ImageLinePruneMerge();
 
+	/**
+	 * Configures hough line detector.
+	 *
+	 * @param localMaxRadius Radius for local maximum suppression.  Try 2.
+	 * @param minCounts Minimum number of counts for detected line.  Critical tuning parameter and image dependent.
+	 * @param resolutionRange Resolution of line range in pixels.  Try 2
+	 * @param resolutionAngle Resolution of line angle in radius.  Try PI/180
+	 * @param thresholdEdge Edge detection threshold. Try 50.
+	 * @param maxLines Maximum number of lines to return. If <= 0 it will return them all.
+	 * @param gradient Algorithm for computing image gradient.
+	 */
 	public DetectLineHoughPolar(int localMaxRadius,
 								int minCounts,
-								int numBinsRange ,
-								int numBinsAngle ,
+								double resolutionRange ,
+								double resolutionAngle ,
 								float thresholdEdge,
 								int maxLines ,
 								ImageGradient<I, D> gradient)
 	{
-		pruneAngleTol = (float)(Math.PI*(localMaxRadius+1)/numBinsAngle);
+		pruneAngleTol = (float)((localMaxRadius+1)*resolutionAngle);
+		pruneRangeTol = (float)((localMaxRadius+1)*resolutionRange);
 		this.localMaxRadius = localMaxRadius;
 		this.gradient = gradient;
 		this.thresholdEdge = thresholdEdge;
-		this.numBinsRange = numBinsRange;
-		this.maxLines = maxLines;
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(localMaxRadius, minCounts, 0, true, true);
-		alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
+		this.resolutionRange = resolutionRange;
+		this.resolutionAngle = resolutionAngle;
+		this.maxLines = maxLines <= 0 ? Integer.MAX_VALUE : maxLines;
+		extractor = FactoryFeatureExtractor.nonmax(localMaxRadius, minCounts, 0, true, true);
 		derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);
 		derivY = GeneralizedImageOps.createImage(gradient.getDerivType(), 1, 1);
 	}
 
 	@Override
 	public List<LineParametric2D_F32> detect(I input) {
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
-		intensity.reshape(input.width,input.height);
-		binary.reshape(input.width, input.height);
+		// see if the input image shape has changed.
+		if( derivX.width != input.width || derivY.height != input.height ) {
+			double r = Math.sqrt(input.width*input.width + input.height*input.height);
+			int numBinsRange = (int)Math.ceil(r/resolutionRange);
+			int numBinsAngle = (int)Math.ceil(Math.PI/resolutionAngle);
+
+			alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
+			derivX.reshape(input.width,input.height);
+			derivY.reshape(input.width,input.height);
+			intensity.reshape(input.width,input.height);
+			binary.reshape(input.width, input.height);
 //		angle.reshape(input.width, input.height);
 //		direction.reshape(input.width, input.height);
-		suppressed.reshape(input.width, input.height);
+			suppressed.reshape(input.width, input.height);
+		}
 
 		gradient.process(input, derivX, derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
@@ -154,9 +182,7 @@ public class DetectLineHoughPolar<I extends ImageBase, D extends ImageBase> impl
 			post.add(ret.get(i),intensity[i]);
 		}
 
-		double r = Math.sqrt(input.width*input.width + input.height*input.height);
-		float pruneDistTol =  (float)((localMaxRadius+1)*r/numBinsRange);
-		post.pruneSimilar(pruneAngleTol, pruneDistTol, input.width, input.height);
+		post.pruneSimilar(pruneAngleTol, pruneRangeTol, input.width, input.height);
 		post.pruneNBest(maxLines);
 
 		return post.createList();

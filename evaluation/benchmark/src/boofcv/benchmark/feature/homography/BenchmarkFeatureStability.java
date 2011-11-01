@@ -45,7 +45,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BenchmarkFeatureHomography {
+public class BenchmarkFeatureStability {
 	GeneralAssociation<TupleDesc_F64> assoc;
 	List<Homography2D_F32> transforms;
 	String imageSuffix;
@@ -63,9 +63,9 @@ public class BenchmarkFeatureHomography {
 
 	PrintStream output;
 
-	public BenchmarkFeatureHomography(GeneralAssociation<TupleDesc_F64> assoc,
-									  String imageSuffix ,
-									  double tolerance ) {
+	public BenchmarkFeatureStability(GeneralAssociation<TupleDesc_F64> assoc,
+									 String imageSuffix,
+									 double tolerance) {
 
 		this.assoc = assoc;
 		this.imageSuffix = imageSuffix;
@@ -253,7 +253,7 @@ public class BenchmarkFeatureHomography {
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, Double.MAX_VALUE, -1, true);
 
-		BenchmarkFeatureHomography app = new BenchmarkFeatureHomography(assoc,".png",tolerance);
+		BenchmarkFeatureStability app = new BenchmarkFeatureStability(assoc,".png",tolerance);
 
 		app.addDirectory("data/mikolajczk/bikes/");
 		app.addDirectory("data/mikolajczk/boat/");
@@ -266,9 +266,9 @@ public class BenchmarkFeatureHomography {
 
 //		app.evaluate("SURF.txt");
 //		app.evaluate("JavaSURF.txt");
-//		app.evaluate("JOpenSURF.txt");
+		app.evaluate("JOpenSURF.txt");
 //		app.evaluate("OpenSURF.txt");
-		app.evaluate("OpenCV_SURF.txt");
+//		app.evaluate("OpenCV_SURF.txt");
 //		app.evaluate("BRIEFO.txt");
 //		app.evaluate("BRIEF.txt");
 //		app.evaluate("BoofCV_SURF.txt");

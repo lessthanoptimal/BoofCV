@@ -111,11 +111,24 @@ public class FactoryDetectLine {
 				totalHorizontalDivisions,totalVerticalDivisions,maxLines,gradient);
 	}
 
+	/**
+	 * Creates a Hough line detector based on polar paramterization.
+	 *
+	 * @param localMaxRadius Radius for local maximum suppression.  Try 2.
+	 * @param minCounts Minimum number of counts for detected line.  Critical tuning parameter and image dependent.
+	 * @param resolutionRange Resolution of line range in pixels.  Try 2
+	 * @param resolutionAngle Resolution of line angle in radius.  Try PI/180
+	 * @param thresholdEdge Edge detection threshold. Try 50.
+	 * @param maxLines Maximum number of lines to return. If <= 0 it will return them all.
+	 * @param <I> Input image type.
+	 * @param <D> Image derivative type.
+	 * @return Line detector.
+	 */
 	public static <I extends ImageBase, D extends ImageBase>
 	DetectLineHoughPolar<I,D> houghPolar(int localMaxRadius,
 										 int minCounts,
-										 int numBinsRange ,
-										 int numBinsAngle ,
+										 double resolutionRange ,
+										 double resolutionAngle ,
 										 float thresholdEdge,
 										 int maxLines ,
 										 Class<I> imageType ,
@@ -123,7 +136,7 @@ public class FactoryDetectLine {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new DetectLineHoughPolar<I,D>(localMaxRadius,minCounts,numBinsRange,numBinsAngle,thresholdEdge,maxLines,gradient);
+		return new DetectLineHoughPolar<I,D>(localMaxRadius,minCounts,resolutionRange,resolutionAngle,thresholdEdge,maxLines,gradient);
 	}
 
 }

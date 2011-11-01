@@ -74,7 +74,8 @@ public class HoughTransformLinePolar {
 	 * is an important tuning parameter.
 	 *
 	 * @param extractor Extracts local maxima from transform space.
-	 * @param numBinsRange
+	 * @param numBinsRange How many bins are be used for line range.
+	 * @param numBinsAngle How many bins are used for angle.
 	 */
 	public HoughTransformLinePolar(FeatureExtractor extractor , int numBinsRange , int numBinsAngle) {
 		if( !extractor.canDetectBorder() ) {
@@ -84,6 +85,14 @@ public class HoughTransformLinePolar {
 		transform.reshape(numBinsRange,numBinsAngle);
 
 		tableTrig = new CachedSineCosine_F32(0,(float)Math.PI,numBinsAngle);
+	}
+
+	public int getNumBinsRange() {
+		return transform.getWidth();
+	}
+
+	public int getNumBinsAngle() {
+		return transform.getHeight();
 	}
 
 	/**

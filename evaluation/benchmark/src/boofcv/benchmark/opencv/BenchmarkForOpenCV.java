@@ -18,42 +18,55 @@
 
 package boofcv.benchmark.opencv;
 
+import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.detect.edge.DetectEdgeContour;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
+import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.factory.feature.detect.line.FactoryDetectLine;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import georegression.struct.line.LineParametric2D_F32;
+import georegression.struct.point.Point2D_F64;
 
-import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-// todo general convolution
 // todo canny edge
-public class BenchmarkGaussianBlur<T extends ImageBase, D extends ImageBase> {
+// todo hough line
+// todo
+public class BenchmarkForOpenCV<T extends ImageBase, D extends ImageBase> {
 
 	final Class<T> imageType;
 	final Class<D> derivType;
 	final T input;
+	final T inputLine;
 
 	final static String imageName = "data/standard/barbara.png";
+	final static String imageLineName = "data/simple_objects.jpg";
 	final int radius = 2;
 	final long TEST_TIME = 1000;
 	final Random rand = new Random(234234);
 
-	public BenchmarkGaussianBlur( BufferedImage image , Class<T> imageType , Class<D> derivType ) {
+	public BenchmarkForOpenCV(Class<T> imageType, Class<D> derivType) {
 		this.imageType = imageType;
 		this.derivType = derivType;
-		this.input = ConvertBufferedImage.convertFrom(image,null,imageType);
+		this.input = UtilImageIO.loadImage(imageName,imageType);
+		this.inputLine = UtilImageIO.loadImage(imageLineName,imageType);
 	}
 
 	public class Gaussian extends PerformerBase
@@ -92,9 +105,68 @@ public class BenchmarkGaussianBlur<T extends ImageBase, D extends ImageBase> {
 		@Override
 		public void process() {
 			detector.process(input,derivX,derivY,null,null,null);
+//			System.out.println("num found "+detector.getFeatures().size);
 		}
 	}
 
+	public class HoughLine extends PerformerBase
+	{
+		D derivX = GeneralizedImageOps.createImage(derivType,input.width,input.height);
+		D derivY = GeneralizedImageOps.createImage(derivType,input.width,input.height);
+		DetectLineHoughPolar<T,D> detector;
+
+		public HoughLine() {
+			GImageDerivativeOps.sobel(input, derivX,derivY, BorderType.EXTENDED);
+			detector = FactoryDetectLine.houghPolar(2,40,2,Math.PI/180,150,-1,imageType,derivType);
+		}
+
+		@Override
+		public void process() {
+			List<LineParametric2D_F32> lines =  detector.detect(inputLine);
+//			System.out.println("total found lines: "+lines.size());
+		}
+	}
+
+	// Canny has known algorithm issues with its runtime performance.
+	public class Canny extends PerformerBase
+	{
+		DetectEdgeContour<T> detector;
+
+		public Canny() {
+			detector = FactoryDetectEdgeContour.canny(5,50,imageType,derivType);
+		}
+
+		@Override
+		public void process() {
+			detector.process(input);
+		}
+	}
+
+	public class SURF extends PerformerBase
+	{
+		InterestPointDetector<T> detector;
+		DescribeRegionPoint<T> describer;
+
+		public SURF() {
+			detector = FactoryInterestPoint.fromFastHessian(20,-1,1,9,4,4);
+			describer = FactoryDescribeRegionPoint.surf(true,imageType);
+		}
+
+		@Override
+		public void process() {
+			detector.detect(input);
+			describer.setImage(input);
+
+			int N = detector.getNumberOfFeatures();
+			for( int i = 0; i < N; i++ ) {
+				Point2D_F64 pt = detector.getLocation(i);
+				double scale = detector.getScale(i);
+				describer.process(pt.x,pt.y,0,scale,null);
+			}
+
+//			System.out.println("Found features: "+N);
+		}
+	}
 
 	public void performTest() {
 		System.out.println("=========  Profile Description width = "+input.width+" height = "+input.height);
@@ -102,16 +174,17 @@ public class BenchmarkGaussianBlur<T extends ImageBase, D extends ImageBase> {
 
 //		ProfileOperation.printOpsPerSec(new Gaussian(), TEST_TIME);
 //		ProfileOperation.printOpsPerSec(new Sobel(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Harris(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Harris(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Canny(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new HoughLine(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new SURF(), TEST_TIME);
 
 		System.out.println();
 	}
 
 	public static void main( String args[] ) {
-		BufferedImage image = UtilImageIO.loadImage(imageName);
-
-		BenchmarkGaussianBlur<ImageFloat32,ImageFloat32> test =
-				new BenchmarkGaussianBlur<ImageFloat32,ImageFloat32>(image, ImageFloat32.class,ImageFloat32.class);
+		BenchmarkForOpenCV<ImageFloat32,ImageFloat32> test =
+				new BenchmarkForOpenCV<ImageFloat32,ImageFloat32>( ImageFloat32.class,ImageFloat32.class);
 
 		test.performTest();
 	}

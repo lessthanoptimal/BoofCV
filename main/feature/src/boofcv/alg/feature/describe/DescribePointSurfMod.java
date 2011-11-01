@@ -84,7 +84,7 @@ public class DescribePointSurfMod<II extends ImageBase> extends DescribePointSur
 	 * Create a SURF-64 descriptor.  See [1] for details.
 	 */
 	public DescribePointSurfMod() {
-		this(4,5,2,2, 2.5 , 2.5 , true);
+		this(4,5,2,2, 2.5 , 2.5 , false );
 	}
 
 	/**

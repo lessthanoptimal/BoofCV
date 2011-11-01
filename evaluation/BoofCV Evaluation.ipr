@@ -362,7 +362,7 @@
       <module fileurl="file://$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" filepath="$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" filepath="$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../developmental/cv/Developmental-CV.iml" filepath="$PROJECT_DIR$/../../developmental/cv/Developmental-CV.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../GeoRegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../GeoRegression/GeoRegression.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../georegression/GeoRegression.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../../ejml/trunk/ejml.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../libpjajava/libpja.iml" filepath="$PROJECT_DIR$/../../libpjajava/libpja.iml" />
     </modules>
@@ -370,7 +370,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0_27" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0_26" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ResourceManagerContainer">
