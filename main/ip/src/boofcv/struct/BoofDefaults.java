@@ -26,6 +26,11 @@ import boofcv.core.image.border.*;
  */
 public class BoofDefaults {
 
+	/**
+	 * String specifying BoofCV's version.
+	 */
+	public static String version = "0.1";
+
 	// Use extended borders when computing image derivatives 
 	public static BorderType DERIV_BORDER_TYPE = BorderType.EXTENDED;
 	public static ImageBorder_I32 DERIV_BORDER_I32 = new ImageBorder1D_I32(BorderIndex1D_Extend.class);

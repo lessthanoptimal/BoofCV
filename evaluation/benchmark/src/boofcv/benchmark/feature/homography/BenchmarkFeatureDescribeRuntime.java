@@ -89,7 +89,7 @@ public class BenchmarkFeatureDescribeRuntime<T extends ImageBase> {
 	public static void main( String args[] ) throws IOException {
 
 //		DescribeRegionPoint<ImageFloat32> alg = FactoryDescribeRegionPoint.surf(true,ImageFloat32.class);
-		DescribeRegionPoint<ImageFloat32> alg = FactoryDescribeRegionPoint.msurf(true,ImageFloat32.class);
+		DescribeRegionPoint<ImageFloat32> alg = FactoryDescribeRegionPoint.surfm(true, ImageFloat32.class);
 
 
 		BenchmarkFeatureDescribeRuntime<ImageFloat32> benchmark =
