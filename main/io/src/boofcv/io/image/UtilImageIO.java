@@ -18,12 +18,17 @@
 
 package boofcv.io.image;
 
+import boofcv.core.image.ConvertBufferedImage;
+import boofcv.struct.image.ImageBase;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 /**
+ * Class for loading and saving images.
+ *
  * @author Peter Abeles
  */
 public class UtilImageIO {
@@ -41,7 +46,22 @@ public class UtilImageIO {
 		}
 
 		return img;
+	}
 
+	/**
+	 * Loads the image and converts into the specified image type.
+	 *
+	 *
+	 * @param fileName Path to image file.
+	 * @param imageType Type of image that should be returned.
+	 * @return The image or null if the image could not be loaded.
+	 */
+	public static <T extends ImageBase> T loadImage(String fileName, Class<T> imageType ) {
+		BufferedImage img = loadImage(fileName);
+		if( img == null )
+			return null;
+
+		return ConvertBufferedImage.convertFrom(img,null,imageType);
 	}
 
 	public static void saveImage(BufferedImage img, String fileName) {

@@ -20,8 +20,8 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
-import boofcv.alg.transform.gss.UtilScaleSpace;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I32;
@@ -36,7 +36,7 @@ public class TestFeaturePyramid extends GenericFeatureScaleDetector {
 
 	@Override
 	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {
-		AnyImageDerivative<ImageFloat32,ImageFloat32> deriv = UtilScaleSpace.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
+		AnyImageDerivative<ImageFloat32,ImageFloat32> deriv = GImageDerivativeOps.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
 
 		return new FeaturePyramid<ImageFloat32,ImageFloat32>(detector,deriv,1);
 	}
