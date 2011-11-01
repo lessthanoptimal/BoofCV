@@ -23,8 +23,8 @@ import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.PixelMath;
-import boofcv.alg.transform.gss.UtilScaleSpace;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -90,7 +90,7 @@ public class CompareFeatureExtractorApp<T extends ImageBase, D extends ImageBase
 		addAlgorithm(0, "Laplace Det", FactoryGeneralIntensity.laplacian(HessianBlobIntensity.Type.DETERMINANT,derivType));
 		addAlgorithm(0, "Laplace Trace", FactoryGeneralIntensity.laplacian(HessianBlobIntensity.Type.TRACE,derivType));
 
-		deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
 		JPanel gui = new JPanel();
 		gui.setLayout(new BorderLayout());

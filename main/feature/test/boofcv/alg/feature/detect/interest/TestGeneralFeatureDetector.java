@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
-import boofcv.alg.transform.gss.UtilScaleSpace;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.struct.QueueCorner;
@@ -38,7 +38,7 @@ import java.util.List;
 public class TestGeneralFeatureDetector extends GenericFeatureDetector {
 
 	AnyImageDerivative<ImageFloat32,ImageFloat32> computeDerivative =
-			UtilScaleSpace.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
+			GImageDerivativeOps.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
 
 	@Override
 	protected Object createDetector( int maxFeatures ) {

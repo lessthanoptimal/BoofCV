@@ -20,6 +20,7 @@ package boofcv.alg.transform.gss;
 
 import boofcv.abst.filter.convolve.ConvolveInterface;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolve;
@@ -69,7 +70,7 @@ public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
 	 */
 	public NoCacheScaleSpace(ImageGenerator<I> inputGen, ImageGenerator<D> derivGen ) {
 		this.inputGen = inputGen;
-		anyDeriv = UtilScaleSpace.createDerivatives(inputGen.getType(),derivGen);
+		anyDeriv = GImageDerivativeOps.createDerivatives(inputGen.getType(), derivGen);
 	}
 
 	@Override

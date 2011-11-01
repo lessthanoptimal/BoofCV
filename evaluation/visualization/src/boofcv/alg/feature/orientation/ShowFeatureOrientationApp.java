@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation;
 
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
-import boofcv.alg.transform.gss.UtilScaleSpace;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
@@ -107,7 +107,7 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		RegionOrientation orientation = (RegionOrientation)cookie;
 
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
-		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		AnyImageDerivative<T,D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 		deriv.setInput(workImage);
 
 		int r = 2;

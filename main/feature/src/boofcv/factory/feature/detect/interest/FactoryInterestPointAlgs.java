@@ -31,7 +31,7 @@ import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
 import boofcv.alg.feature.detect.interest.FeatureLaplaceScaleSpace;
 import boofcv.alg.feature.detect.interest.FeaturePyramid;
 import boofcv.alg.feature.detect.interest.FeatureScaleSpace;
-import boofcv.alg.transform.gss.UtilScaleSpace;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
@@ -117,7 +117,7 @@ public class FactoryInterestPointAlgs {
 		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor, maxFeatures);
 
-		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		AnyImageDerivative<T,D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
 		return new FeaturePyramid<T,D>(detector,deriv,0);
 	}
@@ -144,7 +144,7 @@ public class FactoryInterestPointAlgs {
 		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor, maxFeatures);
 
-		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		AnyImageDerivative<T,D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
 		return new FeaturePyramid<T,D>(detector,deriv,0);
 	}
@@ -170,7 +170,7 @@ public class FactoryInterestPointAlgs {
 		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor, maxFeatures);
 
-		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		AnyImageDerivative<T,D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
 
@@ -199,7 +199,7 @@ public class FactoryInterestPointAlgs {
 		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor, maxFeatures);
 
-		AnyImageDerivative<T,D> deriv = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		AnyImageDerivative<T,D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType,null);
 
 		return new FeatureLaplacePyramid<T,D>(detector,sparseLaplace,deriv,1);

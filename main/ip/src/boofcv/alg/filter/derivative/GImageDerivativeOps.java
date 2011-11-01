@@ -18,7 +18,11 @@
 
 package boofcv.alg.filter.derivative;
 
+import boofcv.abst.filter.derivative.AnyImageDerivative;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.border.*;
+import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.struct.image.*;
 
 
@@ -175,5 +179,52 @@ public class GImageDerivativeOps {
 		} else {
 			throw new IllegalArgumentException("Unknown input image type: "+inputDerivX.getClass().getSimpleName());
 		}
+	}
+
+	/**
+	 * <p>
+	 * Creates an {@link boofcv.abst.filter.derivative.AnyImageDerivative} for use when processing scale space images.
+	 * </p>
+	 *
+	 * <p>
+	 * The derivative is calculating using a kernel which does not involve any additional blurring.
+	 * Using a Gaussian kernel is equivalent to blurring the image an additional time then computing the derivative
+	 * Other derivatives such as Sobel and Prewitt also blur the image.   Image bluing has already been done
+	 * once before the derivative is computed.
+	 * </p>
+	 *
+	 * @param inputType Type of input image.
+	 * @param derivGen Generator for derivative images.
+	 * @param <I> Image type.
+	 * @param <D> Image derivative type.
+	 * @return AnyImageDerivative
+	 */
+	public static <I extends ImageBase, D extends ImageBase>
+	AnyImageDerivative<I,D> createDerivatives( Class<I> inputType , ImageGenerator<D> derivGen ) {
+
+		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(inputType);
+
+		return new AnyImageDerivative<I,D>(GradientThree.getKernelX(isInteger),inputType,derivGen);
+	}
+
+	/**
+	 * <p>
+	 * See {@link #createDerivatives(Class, boofcv.core.image.ImageGenerator)}.
+	 * </p>
+	 *
+	 * @param inputType Type of input image.
+	 * @param derivType Type of output image.
+	 * @param <I> Image type.
+	 * @param <D> Image derivative type.
+	 * @return AnyImageDerivative
+	 */
+	public static <I extends ImageBase, D extends ImageBase>
+	AnyImageDerivative<I,D> createDerivatives( Class<I> inputType , Class<D> derivType ) {
+
+		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(inputType);
+
+		ImageGenerator<D> gen = FactoryImageGenerator.create(derivType);
+
+		return new AnyImageDerivative<I,D>(GradientThree.getKernelX(isInteger),inputType,gen);
 	}
 }

@@ -21,10 +21,10 @@ package boofcv.alg.feature.detect.intensity;
 import boofcv.abst.feature.detect.intensity.*;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
-import boofcv.alg.transform.gss.UtilScaleSpace;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
@@ -81,7 +81,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageBase, D extends
 		}
 		pyramid = new ScaleSpacePyramid<T>(imageType,scales);
 
-		anyDerivative = UtilScaleSpace.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		anyDerivative = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 	}
 
 	@Override

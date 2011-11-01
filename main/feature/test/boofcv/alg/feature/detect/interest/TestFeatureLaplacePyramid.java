@@ -21,8 +21,8 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
-import boofcv.alg.transform.gss.UtilScaleSpace;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
 import boofcv.struct.image.ImageFloat32;
@@ -45,7 +45,7 @@ public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetector {
 	protected Object createDetector( GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector ) {
 
 		ImageFunctionSparse<ImageFloat32> sparseLaplace = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class,null);
-		AnyImageDerivative<ImageFloat32,ImageFloat32> deriv = UtilScaleSpace.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
+		AnyImageDerivative<ImageFloat32,ImageFloat32> deriv = GImageDerivativeOps.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
 
 		return new FeatureLaplacePyramid<ImageFloat32,ImageFloat32>(detector,sparseLaplace,deriv,1);
 	}
