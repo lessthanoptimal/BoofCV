@@ -71,11 +71,11 @@ public class ProfileOperation {
 	public static long measureTime( Performer performer , int num )
 	{
 		long startTime = System.nanoTime();
-        for( int i = 0; i < num; i++ ) {
-            performer.process();
-        }
-        long stopTime = System.nanoTime();
+		for( int i = 0; i < num; i++ ) {
+			performer.process();
+		}
+		long stopTime = System.nanoTime();
 
-        return (stopTime-startTime)/1000000L;
+		return (stopTime-startTime)/1000000L;
 	}
 }
