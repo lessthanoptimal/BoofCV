@@ -167,23 +167,24 @@ public class ThresholdImageOps {
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
 		int relabel[];
+		int numBlobs;
 
 		if( down ) {
 			threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
+			numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
-			ImplBinaryBlobLabeling.minimizeBlobID(relabel,numBlobs);
-			BinaryImageOps.relabel(output,relabel);
 		} else {
 			threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs4(work,output);
+			numBlobs = BinaryImageOps.labelBlobs4(work,output);
 
 			relabel = new int[numBlobs+1];
 			thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
-			BinaryImageOps.relabel(output,relabel);
 		}
+
+		ImplBinaryBlobLabeling.minimizeBlobID(relabel,numBlobs);
+		BinaryImageOps.relabel(output,relabel);
 
 		return BoofMiscOps.countNotZero(relabel,relabel.length);
 	}
@@ -217,23 +218,24 @@ public class ThresholdImageOps {
 		work = InputSanityCheck.checkDeclare(input,work,ImageUInt8.class);
 
 		int relabel[];
+		int numBlobs;
 
 		if( down ) {
 			threshold(input,work,upperThreshold,true);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
+			numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			thresholdBlobs(input,output,relabel,numBlobs,lowerThreshold,true);
-			ImplBinaryBlobLabeling.minimizeBlobID(relabel,numBlobs);
-			BinaryImageOps.relabel(output,relabel);
 		} else {
 			threshold(input,work,lowerThreshold,false);
-			int numBlobs = BinaryImageOps.labelBlobs8(work,output);
+			numBlobs = BinaryImageOps.labelBlobs8(work,output);
 
 			relabel = new int[numBlobs+1];
 			thresholdBlobs(input,output,relabel,numBlobs,upperThreshold,false);
-			BinaryImageOps.relabel(output,relabel);
 		}
+
+		ImplBinaryBlobLabeling.minimizeBlobID(relabel,numBlobs);
+		BinaryImageOps.relabel(output,relabel);
 
 		return BoofMiscOps.countNotZero(relabel,relabel.length);
 	}

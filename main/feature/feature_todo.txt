@@ -27,3 +27,6 @@ Trackers
 - Ignore Borders
   * WrapperKitRosCornerIntensity: add ignore border parameter for when the derivative has an ignore border?
   * WrapperLaplacianBlobIntensity: same
+
+- Hough Detectors
+  * Used round to reduce round off error?  Right now it is equivalent of floor

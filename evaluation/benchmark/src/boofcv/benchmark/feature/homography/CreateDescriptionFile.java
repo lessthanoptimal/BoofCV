@@ -159,7 +159,7 @@ public class CreateDescriptionFile<T extends ImageBase> {
 	public static <T extends ImageBase>
 	void doStuff( String directory , String imageSuffix , Class<T> imageType ) throws FileNotFoundException {
 //		DescribeRegionPoint<T> alg = FactoryDescribeRegionPoint.surf(true,imageType);
-		DescribeRegionPoint<T> alg = FactoryDescribeRegionPoint.msurf(true, imageType);
+		DescribeRegionPoint<T> alg = FactoryDescribeRegionPoint.surfm(true, imageType);
 
 //		int radius = 12;
 //		int numAngles = 8;

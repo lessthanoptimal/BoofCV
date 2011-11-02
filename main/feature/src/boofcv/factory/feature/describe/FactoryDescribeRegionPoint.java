@@ -78,7 +78,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageBase, II extends ImageBase>
-	DescribeRegionPoint<T> msurf( boolean isOriented , Class<T> imageType) {
+	DescribeRegionPoint<T> surfm(boolean isOriented, Class<T> imageType) {
 		OrientationIntegral<II> orientation = null;
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
