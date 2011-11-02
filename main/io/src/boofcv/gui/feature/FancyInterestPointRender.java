@@ -36,8 +36,6 @@ public class FancyInterestPointRender {
 	List<VString> strings = new ArrayList<VString>();
 
 	public synchronized void draw( Graphics2D g2 ) {
-		g2.setStroke(new BasicStroke(2));
-		
 		for( Point p : points ) {
 			g2.setColor(p.color);
 			int w = p.radius*2+1;
