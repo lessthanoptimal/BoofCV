@@ -4,7 +4,7 @@ TARG = describe_opencv
 
 CC = g++
 
-CPPFLAGS = -g -Wall -Wno-unused-function `pkg-config --cflags opencv`
+CPPFLAGS = -O3 -Wall -Wno-unused-function `pkg-config --cflags opencv`
 
 LDFLAGS = `pkg-config --libs opencv`
 

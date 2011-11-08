@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../thirdparty/jopensurf/build/jar/jopensurf.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../../../thirdparty/jopensurf/lib/stromberglabs-commons.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -19,7 +19,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../thirdparty/jopensurf/lib/stromberglabs-commons.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../../../thirdparty/jopensurf/lib/math/commons-math-2.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -28,7 +28,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../thirdparty/jopensurf/lib/math/commons-math-2.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../../../thirdparty/jopensurf/build/jar/jopensurf.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

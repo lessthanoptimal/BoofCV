@@ -14,13 +14,15 @@ SUFFIXES = .cpp .o
 PROG  = describe_surf
 RUNTIME = runtime_desc_surf
 DETECT = runtime_detect_surf
+RALL = runtime_all_surf
 
 # Object files .o necessary to build the main program
 OBJS  = describe_surf.o  SURF-V1.0.9/imload.o
 ROBJS = runtime_surf.o SURF-V1.0.9/imload.o
 DOBJS = runtime_detect_surf.o SURF-V1.0.9/imload.o
+AOBJS = runtime_all_surf.o SURF-V1.0.9/imload.o
 
-all: $(PROG) $(RUNTIME) $(DETECT)
+all: $(PROG) $(RUNTIME) $(DETECT) $(RALL)
 
 # Compilation and link
 $(PROG): $(OBJS)
@@ -29,10 +31,12 @@ $(RUNTIME): $(ROBJS)
 	$(CC) $(LDFLAGS) -o $(RUNTIME) $(ROBJS) $(LDLIBS) 
 $(DETECT): $(DOBJS)
 	$(CC) $(LDFLAGS) -o $(DETECT) $(DOBJS) $(LDLIBS) 
+$(RALL): $(AOBJS)
+	$(CC) $(LDFLAGS) -o $(RALL) $(AOBJS) $(LDLIBS) 
 
 %.o: %.cpp
 	$(CC)  $(CFLAGS) -c $< -o $@
 
 clean:
-	-rm -f $(PROG) $(RUNTIME) $(DETECT)
+	-rm -f $(PROG) $(RUNTIME) $(DETECT) $(RALL)
 	-rm -f *.o
