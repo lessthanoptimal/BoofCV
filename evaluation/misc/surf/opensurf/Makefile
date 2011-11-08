@@ -16,11 +16,12 @@ SUFFIXES = .cpp .o
 PROG  = desc_surf
 RDESC = runtime_describe
 RDET  = runtime_detect
+RALL  = runtime_all
 
 # Object files .o necessary to build the main program
 FOO  = $(DIR)/fasthessian.o $(DIR)/integral.o $(DIR)/surf.o $(DIR)/utils.o $(DIR)/ipoint.o
 
-all: $(PROG) $(RDESC) $(RDET)
+all: $(PROG) $(RDESC) $(RDET) $(RALL)
 
 # Compilation and link
 $(PROG): describe_opensurf.o
@@ -30,6 +31,8 @@ $(RDESC): runtime_opensurf.o
 	$(CC) $(LDFLAGS) -o $(RDESC) $(FOO) runtime_opensurf.o $(LDLIBS)
 $(RDET): runtime_detect_opensurf.o
 	$(CC) $(LDFLAGS) -o $(RDET) $(FOO) runtime_detect_opensurf.o $(LDLIBS)
+$(RALL): runtime_all_opensurf.o
+	$(CC) $(LDFLAGS) -o $(RALL) $(FOO) runtime_all_opensurf.o $(LDLIBS)
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@

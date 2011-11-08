@@ -1,19 +1,18 @@
-#include "cv.h"
-#include "opencv2/core/core.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include <highgui.h>
+
+#include "surflib.h"
+#include "kmeans.h"
 #include <ctime>
 #include <iostream>
 #include <stdio.h>
 
 #include <vector>
+#include <stdexcept>
 
 using namespace std;
-using namespace cv;
 
 std::vector<string> imageNames;
 
-void process( Mat image )
+void process( IplImage *image )
 {
 
     long best = -1;
@@ -21,18 +20,21 @@ void process( Mat image )
     for( int trial = 0; trial < 10; trial++ ) {
         clock_t start = clock();
 
-        // location of detected points
-        std::vector<KeyPoint> ipts;
+        std::vector<Ipoint> ipts;
+        FastHessian detector(ipts,4,4,1,0.0013f);
 
-//        SurfFeatureDetector detector(250,4,4,false); // 6485 features
-        SurfFeatureDetector detector(3100,4,4,false); // 1999 features
-        detector.detect(image,ipts);
+        // convert the image into an integral image
+        IplImage *int_img = Integral(image);
+
+        // detect features in the image
+        detector.setIntImage(int_img);
+        detector.getIpoints();
 
         // Create Surf Descriptor Object
-        SurfDescriptorExtractor extractor;
+        Surf des(int_img, ipts);
 
-        Mat descriptors;
-        extractor.compute( image, ipts, descriptors );
+        // Extract the descriptors for the ipts
+        des.getDescriptors(false);
 
         clock_t end = clock();
         long mtime = (long)(1000*(float(end - start) / CLOCKS_PER_SEC));
@@ -42,7 +44,6 @@ void process( Mat image )
         printf("time = %d  detected = %d\n",(int)mtime,(int)ipts.size());
     }
     printf("best time = %d\n",(int)best);
-
 }
 
 int main( int argc , char **argv )
@@ -60,8 +61,13 @@ int main( int argc , char **argv )
     printf("  image number: %d\n",imageNumber);
 
     sprintf(filename,"%s/img%d.png",nameDirectory,imageNumber);
-    Mat img = imread( filename, CV_LOAD_IMAGE_GRAYSCALE );
+    IplImage *img=cvLoadImage(filename);
+    if( img == NULL ) {
+        fprintf(stderr,"Couldn't open image file: %s\n",filename);
+        throw std::runtime_error("Failed to open");
+    }
 
     process(img);
-}
 
+    return 0;
+}
