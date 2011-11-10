@@ -19,7 +19,7 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.PolynomialPixel;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageInteger;
 
 /**
  * <p>
@@ -28,9 +28,9 @@ import boofcv.struct.image.ImageFloat32;
  * 
  * @author Peter Abeles
  */
-public class ImplPolynomialPixel_F32 extends PolynomialPixel<ImageFloat32> {
+public class ImplPolynomialPixel_I extends PolynomialPixel<ImageInteger> {
 
-	public ImplPolynomialPixel_F32(int maxDegree, float min, float max) {
+	public ImplPolynomialPixel_I(int maxDegree, float min, float max) {
 		super(maxDegree, min, max);
 	}
 

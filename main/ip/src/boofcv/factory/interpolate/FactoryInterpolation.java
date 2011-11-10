@@ -131,7 +131,9 @@ public class FactoryInterpolation {
 	public static <T extends ImageBase> InterpolatePixel<T> polynomial( int maxDegree , double min , double max , Class<T> type ) {
 		if( type == ImageFloat32.class )
 			return (InterpolatePixel<T>)new ImplPolynomialPixel_F32(maxDegree,(float)min,(float)max);
-		else
+		else if( ImageInteger.class.isAssignableFrom(type) ) {
+			return (InterpolatePixel<T>)new ImplPolynomialPixel_I(maxDegree,(float)min,(float)max);
+		} else
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 }

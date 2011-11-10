@@ -163,4 +163,22 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
 			}
 		}
 	}
+
+	/**
+	 * Try the same get at a few border points and see if anything blows up
+	 */
+	@Test
+	public void checkSafeGetAlongBorder() {
+		T img = createImage(width, height);
+		GeneralizedImageOps.randomize(img, rand, 0,100);
+		InterpolatePixel<T> interp = wrap(img);
+
+		// will it blow up?
+		interp.get(0,0);
+		interp.get(width/2,0);
+		interp.get(0,height/2);
+		interp.get(width-1,height-1);
+		interp.get(width/2,height-1);
+		interp.get(width-1,height/2);
+	}
 }

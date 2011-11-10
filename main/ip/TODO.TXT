@@ -48,6 +48,7 @@
  * Sparse Kernel Convolve for when there is a lot of zeros in the kernel
    - Unroll
    - Compare speed to hand derived kernels in gradient
+ * Special unroll for symmetric kernels.  need to store fewer elements.
 
 - Kernels
  * Should Gaussian kernels be provided with only the exp() part?
