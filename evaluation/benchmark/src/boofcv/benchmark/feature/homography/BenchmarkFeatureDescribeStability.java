@@ -45,7 +45,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BenchmarkFeatureStability {
+public class BenchmarkFeatureDescribeStability {
 	GeneralAssociation<TupleDesc_F64> assoc;
 	List<Homography2D_F32> transforms;
 	String imageSuffix;
@@ -63,9 +63,9 @@ public class BenchmarkFeatureStability {
 
 	PrintStream output;
 
-	public BenchmarkFeatureStability(GeneralAssociation<TupleDesc_F64> assoc,
-									 String imageSuffix,
-									 double tolerance) {
+	public BenchmarkFeatureDescribeStability(GeneralAssociation<TupleDesc_F64> assoc,
+											 String imageSuffix,
+											 double tolerance) {
 
 		this.assoc = assoc;
 		this.imageSuffix = imageSuffix;
@@ -111,7 +111,7 @@ public class BenchmarkFeatureStability {
 	 */
 	public void evaluate( String algSuffix ) throws FileNotFoundException {
 		System.out.println("\n"+algSuffix);
-		output = new PrintStream("results_"+algSuffix);
+		output = new PrintStream("describe_stability_"+algSuffix);
 		output.println("tolerance = "+tolerance);
 		output.println();
 
@@ -253,7 +253,7 @@ public class BenchmarkFeatureStability {
 		ScoreAssociation score = new ScoreAssociateEuclideanSq();
 		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, Double.MAX_VALUE, -1, true);
 
-		BenchmarkFeatureStability app = new BenchmarkFeatureStability(assoc,".png",tolerance);
+		BenchmarkFeatureDescribeStability app = new BenchmarkFeatureDescribeStability(assoc,".png",tolerance);
 
 		app.addDirectory("data/mikolajczk/bikes/");
 		app.addDirectory("data/mikolajczk/boat/");
@@ -266,7 +266,8 @@ public class BenchmarkFeatureStability {
 
 //		app.evaluate("SURF.txt");
 //		app.evaluate("JavaSURF.txt");
-		app.evaluate("JOpenSURF.txt");
+		app.evaluate("PanOMatic.txt");
+//		app.evaluate("JOpenSURF.txt");
 //		app.evaluate("OpenSURF.txt");
 //		app.evaluate("OpenCV_SURF.txt");
 //		app.evaluate("BRIEFO.txt");

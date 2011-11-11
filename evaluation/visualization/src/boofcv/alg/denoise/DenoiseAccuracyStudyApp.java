@@ -28,6 +28,7 @@ import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.wavelet.FactoryWaveletCoiflet;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
@@ -108,6 +109,8 @@ public class DenoiseAccuracyStudyApp {
 			ret.addAll( createWaveletFilters(FactoryWaveletHaar.<WlCoef_F32>generate(false,32),numLevels,"Haar"));
 			ret.addAll( createWaveletFilters(FactoryWaveletDaub.daubJ_F32(4),numLevels,"Daub-4"));
 			ret.addAll( createWaveletFilters(FactoryWaveletCoiflet.generate_F32(6),numLevels,"Coiflet-6"));
+			ret.addAll( createWaveletFilters(FactoryWaveletDaub.biorthogonal_F32(5, BorderType.WRAP),numLevels,"Biorthogonal-5"));
+
 		}
 
 		return ret;
