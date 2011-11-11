@@ -113,11 +113,11 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 		info.addWaveletName("Coiflet 6");
 		waveletList.add(FactoryWaveletCoiflet.generate_F32(6));
 		info.addWaveletName("Haar");
-		waveletList.add(FactoryWaveletHaar.generate(false,32));
+		waveletList.add(FactoryWaveletHaar.generate(false, 32));
+		// todo something is clearly wrong with biorthogonal.  comment out so it doesn't appear in the applet
+//		info.addWaveletName("Biorthogonal 5");
+//		waveletList.add(FactoryWaveletDaub.biorthogonal_F32(5, BorderType.WRAP));
 		waveletDesc = waveletList.get(0);
-
-// todo something is clearly wrong with biorthogonal.  comment out so it doesn't appear in the applet
-//		addAlgorithm(1,"Biorthogonal 5", FactoryWaveletDaub.biorthogonal_F32(5,borderType));
 
 		input = GeneralizedImageOps.createImage(imageType,1,1);
 		noisy = GeneralizedImageOps.createImage(imageType,1,1);

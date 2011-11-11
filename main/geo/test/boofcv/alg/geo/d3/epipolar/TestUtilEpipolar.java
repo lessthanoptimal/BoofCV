@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
  */
 public class TestUtilEpipolar {
 	@Test
-	public void stuff() {
+	public void computeNormalization() {
 		fail("implement");
 	}
 }

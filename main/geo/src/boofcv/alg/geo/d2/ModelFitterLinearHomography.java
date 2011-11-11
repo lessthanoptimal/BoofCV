@@ -20,7 +20,7 @@ package boofcv.alg.geo.d2;
 
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.d3.epipolar.EpipolarConstraintMatricesLinear;
+import boofcv.alg.geo.d3.epipolar.HomographyLinear4;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.homo.UtilHomography;
@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class ModelFitterLinearHomography implements ModelFitter<Homography2D_F64,AssociatedPair> {
 
-	EpipolarConstraintMatricesLinear alg = new EpipolarConstraintMatricesLinear();
+	HomographyLinear4 alg = new HomographyLinear4();
 
 	@Override
 	public Homography2D_F64 declareModel() {
@@ -47,7 +47,7 @@ public class ModelFitterLinearHomography implements ModelFitter<Homography2D_F64
 							Homography2D_F64 initParam,
 							Homography2D_F64 foundModel)
 	{
-		if( !alg.computeHomography(dataSet) )
+		if( !alg.process(dataSet) )
 			return false;
 
 		DenseMatrix64F m = alg.getEpipolarMatrix();
