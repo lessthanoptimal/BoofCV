@@ -97,7 +97,7 @@ public class BenchmarkFeatureAllRuntime<T extends ImageBase> {
 	public static void main( String args[] ) throws IOException {
 
 		InterestPointDetector<ImageFloat32> detectAlg =
-				FactoryInterestPoint.fromFastHessian(100, -1, 1, 9, 4, 4);
+				FactoryInterestPoint.fromFastHessian(100, 2, -1, 1, 9, 4, 4);
 
 		DescribeRegionPoint<ImageFloat32> describeAlg =
 				FactoryDescribeRegionPoint.surf(true,ImageFloat32.class);

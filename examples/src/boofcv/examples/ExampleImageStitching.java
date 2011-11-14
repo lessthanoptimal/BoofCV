@@ -158,7 +158,7 @@ public class ExampleImageStitching {
 		T inputB = ConvertBufferedImage.convertFrom(imageB, null, imageType);
 
 		// Detect using the standard SURF feature descriptor and describer
-		InterestPointDetector<T> detector = FactoryInterestPoint.fromFastHessian(1, 400, 1, 9,4,4);
+		InterestPointDetector<T> detector = FactoryInterestPoint.fromFastHessian(1, 2, 400, 1, 9,4,4);
 		DescribeRegionPoint<T> describe = FactoryDescribeRegionPoint.surf(true,imageType);
 		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(new ScoreAssociateEuclideanSq(),2,-1,true);
 

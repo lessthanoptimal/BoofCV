@@ -15,3 +15,4 @@ SURF-V1.0.9/surflib.h
 runtime_surf.cpp
 runtime_detect_surf.cpp
 runtime_all_surf.cpp
+detect_surf.cpp

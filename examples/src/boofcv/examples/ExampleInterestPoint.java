@@ -48,7 +48,7 @@ public class ExampleInterestPoint {
 
 		// create a Fast Hessian detector from the SURF paper.
 		// Other detectors can be used in this example too.
-		InterestPointDetector<T> detector = FactoryInterestPoint.fromFastHessian(10,100,2,9,3,4);
+		InterestPointDetector<T> detector = FactoryInterestPoint.fromFastHessian(10, 2, 100,2,9,3,4);
 
 		// find interest points in the image
 		detector.detect(input);

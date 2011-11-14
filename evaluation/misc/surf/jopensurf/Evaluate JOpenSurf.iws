@@ -2,33 +2,56 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="45ae2d8f-d3de-4476-b240-5d2639c873e2" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureAllRuntime.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../javasurf/readme.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../javasurf/src/BenchmarkAllRuntime.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../javasurf/src/BenchmarkDescribeRuntime.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/BenchmarkAllRuntime.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../opensurf/runtime_all_opensurf.cpp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../surf_reference/runtime_all_surf.cpp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../../../main/change.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureDetectStability.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../javasurf/src/CreateDetect.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/CreateDetector.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../opencv_surf/detect_opencv.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../opensurf/detect_opensurf.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../panomatic/detect_panomatic.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../panomatic/runtime_all_panomatic.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../panomatic/runtime_describe_panomatic.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../panomatic/runtime_detect_panomatic.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../script.sh" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../surf_reference/detect_surf.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/GeoTestingOps.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/EpipolarConstraintMatricesLinear.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/d3/epipolar/TestEpipolarConstraintMatricesLinear.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opencv_surf/Makefile" afterPath="$PROJECT_DIR$/../opencv_surf/Makefile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opencv_surf/OpenCV_SURF.files" afterPath="$PROJECT_DIR$/../opencv_surf/OpenCV_SURF.files" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opensurf/BenchmarkOpenSURF.files" afterPath="$PROJECT_DIR$/../opensurf/BenchmarkOpenSURF.files" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opensurf/BenchmarkOpenSURF.includes" afterPath="$PROJECT_DIR$/../opensurf/BenchmarkOpenSURF.includes" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opensurf/Makefile" afterPath="$PROJECT_DIR$/../opensurf/Makefile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../panomatic/Makefile" afterPath="$PROJECT_DIR$/../panomatic/Makefile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../panomatic/pan-o-matic_eval.creator.user" afterPath="$PROJECT_DIR$/../panomatic/pan-o-matic_eval.creator.user" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../panomatic/pan-o-matic_eval.files" afterPath="$PROJECT_DIR$/../panomatic/pan-o-matic_eval.files" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../surf_reference/BenchmarkSURF.creator.user" afterPath="$PROJECT_DIR$/../surf_reference/BenchmarkSURF.creator.user" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../surf_reference/BenchmarkSURF.files" afterPath="$PROJECT_DIR$/../surf_reference/BenchmarkSURF.files" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../surf_reference/Makefile" afterPath="$PROJECT_DIR$/../surf_reference/Makefile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/detect/BenchmarkDetectHelper.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/detect/BenchmarkDetectHelper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureAllRuntime.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureAllRuntime.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureDetectRuntime.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureDetectRuntime.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../javasurf/javasurf.ipr" afterPath="$PROJECT_DIR$/../javasurf/javasurf.ipr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/CreateDetectionFile.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/CreateDetectionFile.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/orientation/UtilOrientationBenchmark.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/orientation/UtilOrientationBenchmark.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/opencv/BenchmarkForOpenCV.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/opencv/BenchmarkForOpenCV.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../javasurf/javasurf.iws" afterPath="$PROJECT_DIR$/../javasurf/javasurf.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Evaluate JOpenSurf.ipr" afterPath="$PROJECT_DIR$/Evaluate JOpenSurf.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Evaluate JOpenSurf.iws" afterPath="$PROJECT_DIR$/Evaluate JOpenSurf.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Jopensurf.iml" afterPath="$PROJECT_DIR$/Jopensurf.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opencv_surf/runtime_all_opencv.cpp" afterPath="$PROJECT_DIR$/../opencv_surf/runtime_all_opencv.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opensurf/runtime_detect_opensurf.cpp" afterPath="$PROJECT_DIR$/../opensurf/runtime_detect_opensurf.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/denoise/DenoiseAccuracyStudyApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/denoise/DenoiseAccuracyStudyApp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/denoise/DenoiseVisualizeApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/denoise/DenoiseVisualizeApp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/intensity/IntensityFeatureScaleSpaceApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/intensity/IntensityFeatureScaleSpaceApp.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../panomatic/common_panomatic.hpp" afterPath="$PROJECT_DIR$/../panomatic/common_panomatic.hpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../surf_reference/runtime_all_surf.cpp" afterPath="$PROJECT_DIR$/../surf_reference/runtime_all_surf.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/associate/VisualizeAssociationMatchesApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/associate/VisualizeAssociationMatchesApp.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/associate/VisualizeAssociationScoreApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/associate/VisualizeAssociationScoreApp.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/VideoDetectInterestPoints.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/VideoDetectInterestPoints.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/interest/DetectFeaturePointApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/interest/DetectFeaturePointApp.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/interest/DetectFeatureScaleSpaceApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/interest/DetectFeatureScaleSpaceApp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/ip/TODO.TXT" afterPath="$PROJECT_DIR$/../../../../main/ip/TODO.TXT" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../examples/src/boofcv/examples/ExampleImageStitching.java" afterPath="$PROJECT_DIR$/../../../../examples/src/boofcv/examples/ExampleImageStitching.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../examples/src/boofcv/examples/ExampleInterestPoint.java" afterPath="$PROJECT_DIR$/../../../../examples/src/boofcv/examples/ExampleInterestPoint.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/feature/feature_todo.txt" afterPath="$PROJECT_DIR$/../../../../main/feature/feature_todo.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/feature/src/boofcv/factory/feature/detect/interest/FactoryInterestPoint.java" afterPath="$PROJECT_DIR$/../../../../main/feature/src/boofcv/factory/feature/detect/interest/FactoryInterestPoint.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d2/ModelFitterLinearHomography.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d2/ModelFitterLinearHomography.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/FundamentalLinear8.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/FundamentalLinear8.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/HomographyLinear4.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/HomographyLinear4.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/UtilEpipolar.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/UtilEpipolar.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/d3/epipolar/TestFundamentalLinear8.java" afterPath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/d3/epipolar/TestFundamentalLinear8.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/d3/epipolar/TestUtilEpipolar.java" afterPath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/d3/epipolar/TestUtilEpipolar.java" />
     </list>
     <ignored path="Evaluate JOpenSurf.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -90,25 +113,34 @@
       <file leaf-file-name="BenchmarkDetectRuntime.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/BenchmarkDetectRuntime.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="55" selection-start="913" selection-end="913" vertical-scroll-proportion="0.0">
+            <state line="33" column="24" selection-start="941" selection-end="941" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BenchmarkAllRuntime.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="BenchmarkAllRuntime.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/BenchmarkAllRuntime.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="55" column="24" selection-start="1451" selection-end="1451" vertical-scroll-proportion="0.69008267">
+            <state line="55" column="24" selection-start="1451" selection-end="1451" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BenchmarkDescribeRuntime.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/BenchmarkDescribeRuntime.java">
+      <file leaf-file-name="CreateDescriptor.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/CreateDescriptor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="0" selection-start="736" selection-end="824" vertical-scroll-proportion="0.0">
+            <state line="45" column="83" selection-start="1199" selection-end="1295" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreateDetector.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/CreateDetector.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="54" column="82" selection-start="1580" selection-end="1580" vertical-scroll-proportion="1.2706611">
               <folding />
             </state>
           </provider>
@@ -133,6 +165,7 @@
         <option value="$PROJECT_DIR$/src/BenchmarkDescribeRuntime.java" />
         <option value="$PROJECT_DIR$/src/BenchmarkDetectRuntime.java" />
         <option value="$PROJECT_DIR$/src/BenchmarkAllRuntime.java" />
+        <option value="$PROJECT_DIR$/src/CreateDetector.java" />
       </list>
     </option>
   </component>
@@ -166,9 +199,7 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Favorites" />
       <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -203,12 +234,14 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Favorites" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="recentsLimit" value="5" />
@@ -227,7 +260,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.BenchmarkAllRuntime">
+  <component name="RunManager" selected="Application.CreateDetector">
     <configuration default="false" name="BenchmarkDescribeRuntime" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="BenchmarkDescribeRuntime" />
       <option name="VM_PARAMETERS" />
@@ -308,6 +341,26 @@
       <ConfigurationWrapper RunnerId="Debug" />
       <method />
     </configuration>
+    <configuration default="false" name="CreateDetector" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="CreateDetector" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="Jopensurf" />
+      <envs />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="35643" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <ConfigurationWrapper RunnerId="Debug" />
+      <method />
+    </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
@@ -382,11 +435,12 @@
         <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
-    <list size="4">
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Application.BenchmarkDescribeRuntime" />
       <item index="1" class="java.lang.String" itemvalue="Application.CreateDescriptor" />
       <item index="2" class="java.lang.String" itemvalue="Application.BenchmarkDetectRuntime" />
       <item index="3" class="java.lang.String" itemvalue="Application.BenchmarkAllRuntime" />
+      <item index="4" class="java.lang.String" itemvalue="Application.CreateDetector" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -493,28 +547,40 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/CreateDescriptor.java">
+    <entry file="file://$PROJECT_DIR$/src/BenchmarkDescribeRuntime.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="82" column="26" selection-start="2428" selection-end="2454" vertical-scroll-proportion="0.0" />
+        <state line="24" column="0" selection-start="736" selection-end="824" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/../../../../../thirdparty/jopensurf/lib/math/commons-math-2.1.jar!/org/apache/commons/math/linear/LUDecompositionImpl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="51" column="0" selection-start="3050" selection-end="3050" vertical-scroll-proportion="0.8116592" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/BenchmarkDetectRuntime.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="55" selection-start="913" selection-end="913" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/BenchmarkDescribeRuntime.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="0" selection-start="736" selection-end="824" vertical-scroll-proportion="0.0">
+        <state line="33" column="24" selection-start="941" selection-end="941" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/BenchmarkAllRuntime.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="55" column="24" selection-start="1451" selection-end="1451" vertical-scroll-proportion="0.69008267">
+        <state line="55" column="24" selection-start="1451" selection-end="1451" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CreateDescriptor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="83" selection-start="1199" selection-end="1295" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CreateDetector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="54" column="82" selection-start="1580" selection-end="1580" vertical-scroll-proportion="1.2706611">
           <folding />
         </state>
       </provider>
