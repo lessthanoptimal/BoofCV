@@ -1,6 +1,3 @@
-
-
-
 #include "imload.h"
 #include "ipoint.h"
 #include "image.h"

@@ -33,3 +33,4 @@ Trackers
 
 - Add interpolation to regular surf
   * Can add bilinear interpolation like done in that other library.  might not slow it down too much
+  * Try 2D quadratic polynomial fit for X,Y in detector

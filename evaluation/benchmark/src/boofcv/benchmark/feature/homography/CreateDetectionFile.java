@@ -22,7 +22,6 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.orientation.OrientationImage;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
-import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -86,7 +85,6 @@ public class CreateDetectionFile<T extends ImageBase> {
 			if( !f.isFile() || !f.getName().endsWith(imageSuffix))
 				continue;
 
-			System.out.println("Detecting features inside of: "+f.getName());
 
 			BufferedImage image = UtilImageIO.loadImage(f.getPath());
 
@@ -94,7 +92,8 @@ public class CreateDetectionFile<T extends ImageBase> {
 			directoryPath = f.getParent();
 			imageName = imageName.substring(0,imageName.length()-imageSuffix.length());
 
-			process(image,directoryPath+"/DETECTED_"+imageName+"_"+detectorName+".txt");
+			process(image, directoryPath + "/DETECTED_" + imageName + "_" + detectorName + ".txt");
+			System.out.println("Detected features inside of: " + f.getName() + "  total " + alg.getNumberOfFeatures());
 			totalProcessed++;
 		}
 		System.out.println("Total Processed: "+totalProcessed);
@@ -110,7 +109,8 @@ public class CreateDetectionFile<T extends ImageBase> {
 		T image = ConvertBufferedImage.convertFrom(input,null,imageType);
 
 		alg.detect(image);
-		orientation.setImage(image);
+		if( orientation != null)
+			orientation.setImage(image);
 
 		FileOutputStream fos = new FileOutputStream(outputName);
 		PrintStream out = new PrintStream(fos);
@@ -118,8 +118,11 @@ public class CreateDetectionFile<T extends ImageBase> {
 		for( int i = 0; i < alg.getNumberOfFeatures(); i++ ) {
 			Point2D_F64 pt = alg.getLocation(i);
 			double scale = alg.getScale(i);
-			orientation.setScale(scale);
-			double yaw = orientation.compute(pt.getX(),pt.getY());
+			double yaw = 0;
+			if( orientation != null ) {
+				orientation.setScale(scale);
+				yaw = orientation.compute(pt.getX(),pt.getY());
+			}
 			out.printf("%.3f %.3f %.5f %.5f\n",pt.getX(),pt.getY(),scale,yaw);
 		}
 		out.close();
@@ -127,10 +130,12 @@ public class CreateDetectionFile<T extends ImageBase> {
 
 	public static <T extends ImageBase>
 	void doStuff( String directory , String suffix , Class<T> imageType ) throws FileNotFoundException {
-		InterestPointDetector<T> alg = FactoryInterestPoint.fromFastHessian(1, -1, 1, 9,4,4);
-		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(14,imageType);
+		// below are the settings used for detect stability test
+//		InterestPointDetector<T> alg = FactoryInterestPoint.fromFastHessian(0, 2, -1, 1, 9,4,4);
+		// below is the settings used for describe stability test
+		InterestPointDetector<T> alg = FactoryInterestPoint.fromFastHessian(80, 1 , -1, 1, 9,4,4);
 
-		CreateDetectionFile<T> cdf = new CreateDetectionFile<T>(alg,orientation,imageType,"FH");
+		CreateDetectionFile<T> cdf = new CreateDetectionFile<T>(alg,null,imageType,"FH");
 		cdf.directory(directory,suffix);
 	}
 
