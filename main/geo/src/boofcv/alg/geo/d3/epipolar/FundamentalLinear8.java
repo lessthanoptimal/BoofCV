@@ -21,32 +21,66 @@ package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.alg.dense.decomposition.DecompositionFactory;
+import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
+import org.ejml.ops.SingularOps;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
 
 /**
  * <p>
- * Given a set of points this class computes the  essential or fundamental matrix (depending on if the input puts are
- * normalized or not) that define epipolar constraints of the form:<br>
- * <br>
- * x<sup>T</sup><sub>2</sub>*F*x<sub>1</sub> = 0<br>
- * where F is a matrix,  x is a pixel location in the right (2) or left (1) images or in the case
- * of a plane:<br>
- * hat{x}<sub>2</sub>H x<sub>1</sub>
- * where hat(x) is a skew symmetric cross product matrix. The solution to these problems are
- * computed using a linear least-squares approach.  The result is often used as an initial guess
- * for more accurate non-linear approaches.
+ * Given a set of points this class computes the essential or fundamental matrix.  The result is
+ * often used as an initial guess for more accurate non-linear approaches.
  * </p>
  *
  * <p>
- * When dealing with points in pixel coordinates then normalization is required to reduce numerical errors.
- * </p>
+ * References:
+ * <ul>
+ * <li> Y. Ma, S. Soatto, J. Kosecka, and S. S. Sastry, "An Invitation to 3-D Vision" Springer-Verlad, 2004 </li>
+ * <li> R. Hartley, and A. Zisserman, "Multi View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
+ * </ul>
  *
  * @author Peter Abeles
  */
-public class FundamentalLinear8 extends EpipolarConstraintMatricesLinear {
+public class FundamentalLinear8 {
+
+	// contains the set of equations that are solved
+	protected DenseMatrix64F A = new DenseMatrix64F(1,9);
+	protected SingularValueDecomposition<DenseMatrix64F> svd
+			= DecompositionFactory.svd(0, 0, true, true, false);
+
+	// either the fundamental or essential matrix
+	protected DenseMatrix64F F = new DenseMatrix64F(3,3);
+
+	protected DenseMatrix64F temp0 = new DenseMatrix64F(3,3);
+
+	// matrix used to normalize results
+	protected DenseMatrix64F N1 = new DenseMatrix64F(3,3);
+	protected DenseMatrix64F N2 = new DenseMatrix64F(3,3);
+
+	// should it compute a fundamental (true) or essential (false) matrix?
+	boolean computeFundamental;
+
+	/**
+	 * When computing the essential matrix normalization is optional because pixel coordinates
+	 *
+	 * @param computeFundamental true it computes a fundamental matrix and false for essential
+	 */
+	public FundamentalLinear8( boolean computeFundamental ) {
+		this.computeFundamental = computeFundamental;
+	}
+
+	/**
+	 * Returns the computed Fundamental or Essential matrix.
+	 *
+	 * @return Fundamental or Essential matrix.
+	 */
+	public DenseMatrix64F getF() {
+		return F;
+	}
 
 	/**
 	 * <p>
@@ -66,22 +100,89 @@ public class FundamentalLinear8 extends EpipolarConstraintMatricesLinear {
 		if( points.size() < 8 )
 			throw new IllegalArgumentException("Must be at least 8 points. Was only "+points.size());
 
-		if( normalize ) {
+		if( computeFundamental ) {
 			UtilEpipolar.computeNormalization(N1, N2, points);
-
 			createA(points,A);
-		} else {
-			createA_nonorm(points,A);
-		}
 
-		if (computeMatrix(svd,A))
+			if (process(A))
 			return false;
 
-		if( normalize )
-			undoNormalizationF(M,N1,N2);
+			undoNormalizationF(F,N1,N2);
+			return projectOntoFundamentalSpace();
+		} else {
+			createA_nonorm(points,A);
 
-		// just happens that since F is in a row major format there is no need to copy any memory
-		return enforceSmallZeroSingularValue();
+			if (process(A))
+			return false;
+
+			return projectOntoEssential();
+		}
+	}
+
+	/**
+	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
+	 */
+	protected boolean process(DenseMatrix64F A) {
+		if( !svd.decompose(A) )
+			return true;
+
+		SingularOps.nullSpace(svd,F);
+
+		return false;
+	}
+
+	/**
+	 * Projects the found estimate of E onto essential space.
+	 *
+	 * @return true if svd returned true.
+	 */
+	protected boolean projectOntoEssential() {
+		if( !svd.decompose(F) ) {
+			return false;
+		}
+		DenseMatrix64F V = svd.getV(false);
+		DenseMatrix64F U = svd.getU(false);
+		DenseMatrix64F W = svd.getW(null);
+
+		SingularOps.descendingOrder(U, false, W, V, false);
+
+		// project it into essential space
+		// the scale factor is arbitrary, but the first two singular values need
+		// to be the same.  so just set them to one
+		W.set(0,0,1);
+		W.set(1,1,1);
+		W.set(2,2,0);
+
+		// recompute F
+		CommonOps.mult(U, W, temp0);
+		CommonOps.multTransB(temp0,V, F);
+
+		return true;
+	}
+
+	/**
+	 * Projects the found estimate of F onto Fundamental space.
+	 *
+	 * @return true if svd returned true.
+	 */
+	protected boolean projectOntoFundamentalSpace() {
+		if( !svd.decompose(F) ) {
+			return false;
+		}
+		DenseMatrix64F V = svd.getV(false);
+		DenseMatrix64F U = svd.getU(false);
+		DenseMatrix64F W = svd.getW(null);
+
+		SingularOps.descendingOrder(U, false, W, V, false);
+
+		// the smallest singular value needs to be set to zero, unlike
+		W.set(2,2,0);
+
+		// recompute F
+		CommonOps.mult(U, W, temp0);
+		CommonOps.multTransB(temp0,V, F);
+
+		return true;
 	}
 
 	/**
@@ -126,8 +227,8 @@ public class FundamentalLinear8 extends EpipolarConstraintMatricesLinear {
 			Point2D_F64 s = p.currLoc;
 
 			// normalize the points
-			normalize(f,f_norm,N1);
-			normalize(s,s_norm,N2);
+			UtilEpipolar.pixelToNormalized(f, f_norm, N1);
+			UtilEpipolar.pixelToNormalized(s, s_norm, N2);
 
 			// perform the Kronecker product with the two points being in
 			// homogeneous coordinates (z=1)

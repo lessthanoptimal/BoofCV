@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class ModelFitterLinearHomography implements ModelFitter<Homography2D_F64,AssociatedPair> {
 
-	HomographyLinear4 alg = new HomographyLinear4();
+	HomographyLinear4 alg = new HomographyLinear4(true);
 
 	@Override
 	public Homography2D_F64 declareModel() {
@@ -50,7 +50,7 @@ public class ModelFitterLinearHomography implements ModelFitter<Homography2D_F64
 		if( !alg.process(dataSet) )
 			return false;
 
-		DenseMatrix64F m = alg.getEpipolarMatrix();
+		DenseMatrix64F m = alg.getHomography();
 		UtilHomography.convert(m,foundModel);
 
 		return true;
