@@ -20,24 +20,29 @@ package boofcv.alg.geo.d3.epipolar;
 
 
 import boofcv.alg.geo.AssociatedPair;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.alg.dense.mult.VectorVectorMult;
+import org.ejml.alg.dense.decomposition.DecompositionFactory;
+import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
+import org.ejml.ops.SingularOps;
 import org.ejml.simple.SimpleMatrix;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * <p>
- * Using linear algebra it computes a planar homography matrix up to a scale factor:<br>
- * H<sub>s</sub> = &alpha;H<br>
- * where H<sub>s</sub> is the returned homography matrix.
+ * Using linear algebra it computes a planar homography matrix using for or more points. Typically used
+ * as an initial estimate for a non-linear optimization.
  * </p>
+ *
  * <p>
- * This follows the procedure described in "An Invitation to 3-D Vision" 2004, but with out normalization TODO ???
- * since it was found to not be of much practical use.  If this matrix was to be decomposed further then
- * the normalization procedure would need to be followed.  A minimum number of four points are required.
+ * The algorithm works by solving the equation below:<br>
+ * hat(x<sub>2</sub>)*H*x<sub>1</sub> = 0<br>
+ * where hat(x) is the skew symmetric cross product matrix. To solve this equation is is reformatted into
+ * A*H<sup>s</sup>=0 using the Kronecker product and the null space solved for.
  * </p>
  *
  * <p>
@@ -47,7 +52,41 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class HomographyLinear4 extends EpipolarConstraintMatricesLinear {
+public class HomographyLinear4 {
+
+	// contains the set of equations that are solved
+	protected DenseMatrix64F A = new DenseMatrix64F(1,9);
+	protected SingularValueDecomposition<DenseMatrix64F> svd
+			= DecompositionFactory.svd(0, 0, true, true, false);
+
+	// either the fundamental or essential matrix
+	protected DenseMatrix64F H = new DenseMatrix64F(3,3);
+
+	// matrix used to normalize results
+	protected DenseMatrix64F N1 = new DenseMatrix64F(3,3);
+	protected DenseMatrix64F N2 = new DenseMatrix64F(3,3);
+
+	// normalize image coordinates to avoid numerical errors?
+	boolean normalize;
+
+	/**
+	 * Configure homography calculation
+	 *
+	 * @param normalize Should image coordinate be normalized?  Needed when coordinates are in units of pixels.
+	 */
+	public HomographyLinear4(boolean normalize) {
+		this.normalize = normalize;
+	}
+
+	/**
+	 * Returns the computed homography matrix.
+	 *
+	 * @return Homography matrix.
+	 */
+	public DenseMatrix64F getHomography() {
+		return H;
+	}
+
 	/**
 	 * <p>
 	 * Computes the homography matrix given a set of observed points in two images.
@@ -63,24 +102,40 @@ public class HomographyLinear4 extends EpipolarConstraintMatricesLinear {
 		if( normalize ) {
 			UtilEpipolar.computeNormalization(N1, N2, points);
 
-			createHomoA(points,A);
+			createANormalized(points, A);
 		} else {
-			// todo make this
-			throw new RuntimeException("Un-normalized homography hasn't been created yet");
+			createA(points,A);
 		}
 
 		// compute the homograph matrix up to a scale factor
-		if (computeMatrix(svd,A))
+		if (computeH(A))
 			return false;
 
 		if( normalize )
-			undoNormalizationH(M,N1,N2);
+			undoNormalizationH(H,N1,N2);
 
+		// correctly scale the matrix
+		if( !findScaleH() )
+			return false;
+
+		// ensure that positive results are returned for points in front of the camera
 		adjustHomographSign(points.get(0));
 
 		return true;
 	}
 
+
+	/**
+	 * Computes the SVD of A and extracts the homography matrix from its null space
+	 */
+	protected boolean computeH(DenseMatrix64F A) {
+		if( !svd.decompose(A) )
+			return true;
+
+		SingularOps.nullSpace(svd, H);
+
+		return false;
+	}
 
 	/**
 	 * Undoes normalization for a homography matrix.
@@ -96,28 +151,45 @@ public class HomographyLinear4 extends EpipolarConstraintMatricesLinear {
 	}
 
 	/**
+	 * The scale of H is found by computing the second smallest singular value.
+	 */
+	protected boolean findScaleH() {
+		if( !svd.decompose(H) )
+			return false;
+
+		Arrays.sort(svd.getSingularValues(),0,3);
+
+		double scale = svd.getSingularValues()[1];
+		CommonOps.scale(scale,H);
+
+		return true;
+	}
+
+	/**
 	 * Since the sign of the homography is ambiguous a point is required to make sure the correct
 	 * one was selected.
 	 *
 	 * @param p test point, used to determine the sign of the matrix.
 	 */
 	protected void adjustHomographSign( AssociatedPair p ) {
-		// now figure out the sign
-		DenseMatrix64F x1 = new DenseMatrix64F(3,1,true,p.currLoc.x,p.currLoc.y,1);
-		DenseMatrix64F x2 = new DenseMatrix64F(3,1,true,p.keyLoc.x,p.keyLoc.y,1);
+		double val = GeometryMath_F64.innerProd(p.currLoc,H,p.keyLoc);
 
-		double val = VectorVectorMult.innerProdA(x2, M, x1);
 		if( val < 0 )
-			CommonOps.scale(-1, M);
+			CommonOps.scale(-1, H);
+
+//		// now figure out the sign
+//		DenseMatrix64F x1 = new DenseMatrix64F(3,1,true,p.currLoc.x,p.currLoc.y,1);
+//		DenseMatrix64F x2 = new DenseMatrix64F(3,1,true,p.keyLoc.x,p.keyLoc.y,1);
+//
+//		double val = VectorVectorMult.innerProdA(x2, H, x1);
+//		if( val < 0 )
+//			CommonOps.scale(-1, H);
 	}
 
 	/**
-	 * Compute the 'A' matrix for a homography.
-	 *
-	 * @param points
-	 * @param A
+	 * Compute the 'A' matrix used to solve for H from normalized points.
 	 */
-	protected void createHomoA(List<AssociatedPair> points, DenseMatrix64F A ) {
+	protected void createANormalized(List<AssociatedPair> points, DenseMatrix64F A) {
 		A.reshape(points.size()*2,9, false);
 		A.zero();
 
@@ -134,8 +206,8 @@ public class HomographyLinear4 extends EpipolarConstraintMatricesLinear {
 			Point2D_F64 s = p.currLoc;
 
 			// normalize the points
-			normalize(f,f_norm,N1);
-			normalize(s,s_norm,N2);
+			UtilEpipolar.pixelToNormalized(f, f_norm, N1);
+			UtilEpipolar.pixelToNormalized(s, s_norm, N2);
 
 			A.set(i*2   , 3 , -f_norm.x);
 			A.set(i*2   , 4 , -f_norm.y);
@@ -149,6 +221,37 @@ public class HomographyLinear4 extends EpipolarConstraintMatricesLinear {
 			A.set(i*2+1 , 6 , -s_norm.x*f_norm.x);
 			A.set(i*2+1 , 7 , -s_norm.x*f_norm.y);
 			A.set(i*2+1 , 8 , -s_norm.x);
+		}
+	}
+
+/**
+	 * Compute the 'A' matrix used to solve for H from un-normalized points.
+	 */
+	protected void createA(List<AssociatedPair> points, DenseMatrix64F A) {
+		A.reshape(points.size()*2,9, false);
+		A.zero();
+
+		final int size = points.size();
+		for( int i = 0; i < size; i++ ) {
+			AssociatedPair p = points.get(i);
+
+			// the first image
+			Point2D_F64 f = p.keyLoc;
+			// the second image
+			Point2D_F64 s = p.currLoc;
+
+			A.set(i*2   , 3 , -f.x);
+			A.set(i*2   , 4 , -f.y);
+			A.set(i*2   , 5 , -1);
+			A.set(i*2   , 6 , s.y*f.x);
+			A.set(i*2   , 7 , s.y*f.y);
+			A.set(i*2   , 8 , s.y);
+			A.set(i*2+1 , 0 , f.x);
+			A.set(i*2+1 , 1 , f.y);
+			A.set(i*2+1 , 2 , 1);
+			A.set(i*2+1 , 6 , -s.x*f.x);
+			A.set(i*2+1 , 7 , -s.x*f.y);
+			A.set(i*2+1 , 8 , -s.x);
 		}
 	}
 }

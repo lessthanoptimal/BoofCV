@@ -19,10 +19,8 @@
 package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
 
 import java.util.List;
 
@@ -32,11 +30,21 @@ import java.util.List;
  */
 public class UtilEpipolar {
 	/**
-	 * Computes a normalization matrix.  After applying this transform to each point in an image
-	 * they will be conditioned such that their values are evenly spread.  Making the result much more
-	 * stable.
+	 * <p>
+	 * Computes a normalization matrix.  Pixels coordinates are poorly scaled for linear algebra operations resulting in
+	 * excessive numerical error.  This function computes a transform which will minimize numerical error
+	 * by properly scaling the pixels.
+	 * </p>
 	 *
-	 * TODO describe statistical properties of normalized points.
+	 * <p>
+	 * N = [ 1/&sigma;_x     0         -&mu;_x/&sigma;_x ]<br>
+	 *     [    0        1/&sigma;_y 0 -&mu;_y/&sigma;_y ]<br>
+	 *     [    0            0                  1        ]
+	 * </p>
+	 *
+	 * <p>
+	 * Y. Ma, S. Soatto, J. Kosecka, and S. S. Sastry, "An Invitation to 3-D Vision" Springer-Verlad, 2004
+	 * </p>
 	 *
 	 * @param N1 normalization matrix for first set of points. Modified.
 	 * @param N2 normalization matrix for second set of points. Modified.
@@ -97,54 +105,17 @@ public class UtilEpipolar {
 		N2.set(2,2,1.0);
 	}
 
-	// todo If nothing is useing this delete it?
-	public static void pixelToNormalized( DenseMatrix64F K_inv , Point2D_F64 pixel , Point2D_F64 norm ) {
-		GeometryMath_F64.mult(K_inv,pixel,norm);
-	}
-
 	/**
-	 * Converts the pairs from pixel to normalized image coordinates.
+	 * Given the normalization matrix computed from {@link #computeNormalization}
+	 * normalize the point.
 	 *
-	 * @param K calibration matrix. Not modified.
-	 * @param pixels location in pixels. Not modified.
-	 * @param norms Computed location in normalized image coordinates. Modified.
+	 * @param orig Unnormalized coordinate in pixels.
+	 * @param normed Normalized coordinate.
+	 * @param N Normalization matrix.
 	 */
-	// todo If nothing is useing this delete it?
-	public static void pixelToNormalized( DenseMatrix64F K , List<AssociatedPair> pixels , List<AssociatedPair> norms ) {
-		// if it did not come with predeclared data, declare the data now
-		while( norms.size() < pixels.size() ) {
-			norms.add( new AssociatedPair() );
-		}
-
-		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
-
-		CommonOps.invert(K,K_inv);
-
-		double k00 = K_inv.get(0,0);
-		double k01 = K_inv.get(0,1);
-		double k02 = K_inv.get(0,2);
-		double k11 = K_inv.get(1,1);
-		double k12 = K_inv.get(1,2);
-		double k22 = K_inv.get(2,2);
-
-		for( int i = 0; i < pixels.size(); i++ ) {
-			AssociatedPair pixelPair = pixels.get(i);
-			AssociatedPair normPair = norms.get(i);
-
-			Point2D_F64 p = pixelPair.keyLoc;
-			Point2D_F64 n = normPair.keyLoc;
-
-			n.x = (p.x*k00 + p.y*k01 + k02)/k22;
-			n.y = (p.y*k11 + k12)/k22;
-
-			p = pixelPair.currLoc;
-			n = normPair.currLoc;
-
-			n.x = (p.x*k00 + p.y*k01 + k02)/k22;
-			n.y = (p.y*k11 + k12)/k22;
-
-//            System.out.println("normed "+n.x+" "+n.y);
-		}
+	public static void pixelToNormalized(Point2D_F64 orig, Point2D_F64 normed, DenseMatrix64F N) {
+		normed.x = orig.x * N.data[0] + N.data[2];
+		normed.y = orig.y * N.data[4] + N.data[5];
 	}
 
 }
