@@ -27,6 +27,7 @@ import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
+import org.ejml.ops.SpecializedOps;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.Arrays;
@@ -132,7 +133,14 @@ public class HomographyLinear4 {
 		if( !svd.decompose(A) )
 			return true;
 
-		SingularOps.nullSpace(svd, H);
+		if( A.numRows > 8 )
+			SingularOps.nullSpace(svd,H);
+		else {
+			// handle a special case since the matrix only has 8 singular values and won't select
+			// the correct column
+			DenseMatrix64F V = svd.getV(false);
+			SpecializedOps.subvector(V, 0, 8, V.numCols, false, 0, H);
+		}
 
 		return false;
 	}
@@ -176,14 +184,6 @@ public class HomographyLinear4 {
 
 		if( val < 0 )
 			CommonOps.scale(-1, H);
-
-//		// now figure out the sign
-//		DenseMatrix64F x1 = new DenseMatrix64F(3,1,true,p.currLoc.x,p.currLoc.y,1);
-//		DenseMatrix64F x2 = new DenseMatrix64F(3,1,true,p.keyLoc.x,p.keyLoc.y,1);
-//
-//		double val = VectorVectorMult.innerProdA(x2, H, x1);
-//		if( val < 0 )
-//			CommonOps.scale(-1, H);
 	}
 
 	/**
