@@ -31,22 +31,33 @@ public class TestHomographyLinear4 {
 
 	@Test
 	public void perfectCalibrated() {
-		checkEpipolarMatrix(false,new HomographyLinear4(false));
+		// test the minimum number of points
+		checkEpipolarMatrix(4,false,new HomographyLinear4(false));
+		// test with extra points
+		checkEpipolarMatrix(10,false,new HomographyLinear4(false));
 	}
 
 	@Test
 	public void perfectPixels() {
-		checkEpipolarMatrix(true,new HomographyLinear4(true));
+		checkEpipolarMatrix(4,true,new HomographyLinear4(true));
+		checkEpipolarMatrix(10,true,new HomographyLinear4(true));
 	}
 
-	private void checkEpipolarMatrix( boolean isPixels , HomographyLinear4 alg ) {
+	/**
+	 * Create a set of points perfectly on a plane and provide perfect observations of them
+	 *
+	 * @param N Number of observed points.
+	 * @param isPixels Pixel or calibrated coordinates
+	 * @param alg Algorithm being evaluated
+	 */
+	private void checkEpipolarMatrix( int N , boolean isPixels , HomographyLinear4 alg ) {
 		// define the camera's motion
 		Se3_F64 motion = new Se3_F64();
 		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
 		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
-		List<Point3D_F64> pts = createRandomPlane(4);
+		List<Point3D_F64> pts = createRandomPlane(N);
 
 		// transform points into second camera's reference frame
 		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();

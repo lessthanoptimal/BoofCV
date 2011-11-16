@@ -26,6 +26,7 @@ import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
+import org.ejml.ops.SpecializedOps;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
@@ -126,7 +127,14 @@ public class FundamentalLinear8 {
 		if( !svd.decompose(A) )
 			return true;
 
-		SingularOps.nullSpace(svd,F);
+		if( A.numRows > 8 )
+			SingularOps.nullSpace(svd,F);
+		else {
+			// handle a special case since the matrix only has 8 singular values and won't select
+			// the correct column
+			DenseMatrix64F V = svd.getV(false);
+			SpecializedOps.subvector(V, 0, 8, V.numCols, false, 0, F);
+		}
 
 		return false;
 	}

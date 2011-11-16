@@ -18,39 +18,37 @@
 
 package boofcv.examples;
 
-import boofcv.alg.transform.pyramid.PyramidUpdateIntegerDown;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.gui.image.DiscretePyramidPanel;
+import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
+import boofcv.struct.pyramid.PyramidFloat;
+import boofcv.struct.pyramid.PyramidUpdaterFloat;
 
 import java.awt.image.BufferedImage;
 
 /**
- * Demonstrates how to construct and display a {@link PyramidDiscrete}.  Discrete pyramids require that
- * each level has a relative scale with an integer ratio and is updated by sparsely sub-sampling.  These
- * restrictions allows a very quick update across scale space.
+ * Demonstrates how to construct and display a {@link PyramidFloat}.  Float pyramids require only require
+ * that each layer's scale be larger than the scale of the previous layer. Interpolation is used to allow
+ * sub-sampling at arbitrary scales.  All of this additional flexibility comes at the cost of speed
+ * when compared to a {@link PyramidDiscrete}.
  *
  * @author Peter Abeles
  */
-public class ExamplePyramidDiscrete<T extends ImageBase> {
+public class ExamplePyramidFloat<T extends ImageBase> {
 
 	// specifies the image type
 	Class<T> imageType;
 	// The pyramid data structure
-	PyramidDiscrete<T> pyramid;
+	PyramidFloat<T> pyramid;
 	// update the pyramid given from
-	PyramidUpdaterDiscrete<T> updater;
+	PyramidUpdaterFloat<T> updater;
 
-	public ExamplePyramidDiscrete(Class<T> imageType) {
+	public ExamplePyramidFloat(Class<T> imageType) {
 		this.imageType = imageType;
 	}
 
@@ -58,29 +56,13 @@ public class ExamplePyramidDiscrete<T extends ImageBase> {
 	 * Creates a fairly standard pyramid and updater.
 	 */
 	public void standard() {
-		// Each level in the pyramid must have a ratio with the previously layer that is an integer value
-		pyramid = new PyramidDiscrete<T>(imageType,true,1,2,4,8);
+		// Scale factory for each layer can be any floating point value which is larger than
+		// the previous layer's scale.
+		pyramid = new PyramidFloat<T>(imageType,1,1.5,2,2.5,3,5,8,15);
 
-		// In most cases sub-sampling with a Gaussian is preferred
-		updater = FactoryPyramid.discreteGaussian(imageType,-1,2);
-	}
-
-	/**
-	 * Creates a more unusual pyramid and updater.
-	 */
-	public void unusual() {
-		// Note that the first level does not have to be one
-		pyramid = new PyramidDiscrete<T>(imageType,true,2,6);
-
-		// Other kernels can also be used besides Gaussian
-		Kernel1D kernel;
-		if(GeneralizedImageOps.isFloatingPoint(imageType) ) {
-			kernel = FactoryKernel.table1D_F32(2,true);
-		} else {
-			kernel = FactoryKernel.table1D_I32(2);
-		}
-
-		updater = new PyramidUpdateIntegerDown<T>(kernel,imageType);
+		// Specify the amount of blur to apply to each scale
+		// Using a custom updater other types of blur and interpolation can be applied
+		updater = FactoryPyramid.floatGaussian(imageType, 1,1,1,1,1,1,1,1);
 	}
 
 	/**
@@ -90,11 +72,11 @@ public class ExamplePyramidDiscrete<T extends ImageBase> {
 		T input = ConvertBufferedImage.convertFrom(image,null,imageType);
 		updater.update(input,pyramid);
 
-		DiscretePyramidPanel gui = new DiscretePyramidPanel();
-		gui.setPyramid(pyramid);
+		ImagePyramidPanel<T> gui = new ImagePyramidPanel<T>();
+		gui.set(pyramid, true);
 		gui.render();
 
-		ShowImages.showWindow(gui,"Image Pyramid");
+		ShowImages.showWindow(gui,"Image Pyramid Float");
 
 		// To get an image at any of the scales simply call this get function
 		T imageAtScale = pyramid.getLayer(1);
@@ -102,14 +84,14 @@ public class ExamplePyramidDiscrete<T extends ImageBase> {
 		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageAtScale,null),"Image at layer 1");
 	}
 
+
 	public static void main( String[] args ) {
 		BufferedImage image = UtilImageIO.loadImage("data/standard/barbara.png");
 
-		ExamplePyramidDiscrete<ImageFloat32> app = new ExamplePyramidDiscrete<ImageFloat32>(ImageFloat32.class);
-//		ExamplePyramidDiscrete<ImageUInt8> app = new ExamplePyramidDiscrete<ImageUInt8>(ImageUInt8.class);
+		ExamplePyramidFloat<ImageFloat32> app = new ExamplePyramidFloat<ImageFloat32>(ImageFloat32.class);
+//		ExamplePyramidFloat<ImageUInt8> app = new ExamplePyramidFloat<ImageUInt8>(ImageUInt8.class);
 
 		app.standard();
-//		app.unusual();
 		app.process(image);
 	}
 }

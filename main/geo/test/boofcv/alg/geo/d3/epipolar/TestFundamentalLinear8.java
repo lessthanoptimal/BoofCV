@@ -31,22 +31,24 @@ public class TestFundamentalLinear8 {
 
 	@Test
 	public void perfectFundamental() {
-		checkEpipolarMatrix(true,new FundamentalLinear8(true));
+		checkEpipolarMatrix(8,true,new FundamentalLinear8(true));
+		checkEpipolarMatrix(15,true,new FundamentalLinear8(true));
 	}
 
 	@Test
 	public void perfectEssential() {
-		checkEpipolarMatrix(false,new FundamentalLinear8(false));
+		checkEpipolarMatrix(8,false,new FundamentalLinear8(false));
+		checkEpipolarMatrix(15,false,new FundamentalLinear8(false));
 	}
 
-	private void checkEpipolarMatrix( boolean isFundamental , FundamentalLinear8 alg ) {
+	private void checkEpipolarMatrix( int N , boolean isFundamental , FundamentalLinear8 alg ) {
 		// define the camera's motion
 		Se3_F64 motion = new Se3_F64();
 		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
 		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
-		List<Point3D_F64> pts = GeoTestingOps.randomPoints_F32(-1, 1, -1, 1, 2, 3, 20, rand);
+		List<Point3D_F64> pts = GeoTestingOps.randomPoints_F32(-1, 1, -1, 1, 2, 3, N, rand);
 
 		// transform points into second camera's reference frame
 		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
