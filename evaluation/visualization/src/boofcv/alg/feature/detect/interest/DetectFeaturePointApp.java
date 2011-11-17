@@ -92,7 +92,7 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		addAlgorithm(0, "Hess Lap SS",FactoryInterestPoint.fromFeatureLaplace(flss,scales,imageType));
 		FeatureLaplacePyramid<T,D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius,thresh,maxScaleFeatures,imageType,derivType);
 		addAlgorithm(0, "Hess Lap P",FactoryInterestPoint.fromFeatureLaplace(flp,scales,imageType));
-		addAlgorithm(0, "FastHessian",FactoryInterestPoint.<T>fromFastHessian(thresh, maxScaleFeatures, 2, 9,4,4));
+		addAlgorithm(0, "FastHessian",FactoryInterestPoint.<T>fromFastHessian(thresh,2, maxScaleFeatures, 2, 9,4,4));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();
@@ -123,7 +123,7 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 
 	@Override
 	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
+		setActiveAlgorithm(0, null, cookies[0]);
 	}
 
 	@Override
@@ -178,6 +178,11 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		return processImage;
 	}
 
+	@Override
+	public synchronized void corruptImageChange() {
+		doRefreshAll();
+	}
+
 	public static void main( String args[] ) {
 		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageFloat32.class,ImageFloat32.class);
 
@@ -196,10 +201,5 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		ShowImages.showWindow(app,"Point Feature");
 
 		System.out.println("Done");
-	}
-
-	@Override
-	public synchronized void corruptImageChange() {
-		doRefreshAll();
 	}
 }

@@ -1,7 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6839c83e-b3be-491b-b1a5-dec25066ab2e" name="Default" comment="" />
+    <list default="true" id="6839c83e-b3be-491b-b1a5-dec25066ab2e" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureDetectStability.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/CreateDetect.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../jopensurf/src/CreateDetector.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../opencv_surf/detect_opencv.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../opensurf/detect_opensurf.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../panomatic/detect_panomatic.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../panomatic/runtime_all_panomatic.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../panomatic/runtime_describe_panomatic.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../panomatic/runtime_detect_panomatic.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../script.sh" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../surf_reference/detect_surf.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/GeoTestingOps.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/EpipolarConstraintMatricesLinear.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/d3/epipolar/TestEpipolarConstraintMatricesLinear.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opencv_surf/Makefile" afterPath="$PROJECT_DIR$/../opencv_surf/Makefile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opencv_surf/OpenCV_SURF.files" afterPath="$PROJECT_DIR$/../opencv_surf/OpenCV_SURF.files" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opensurf/BenchmarkOpenSURF.files" afterPath="$PROJECT_DIR$/../opensurf/BenchmarkOpenSURF.files" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opensurf/BenchmarkOpenSURF.includes" afterPath="$PROJECT_DIR$/../opensurf/BenchmarkOpenSURF.includes" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../opensurf/Makefile" afterPath="$PROJECT_DIR$/../opensurf/Makefile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../panomatic/Makefile" afterPath="$PROJECT_DIR$/../panomatic/Makefile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../panomatic/pan-o-matic_eval.creator.user" afterPath="$PROJECT_DIR$/../panomatic/pan-o-matic_eval.creator.user" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../panomatic/pan-o-matic_eval.files" afterPath="$PROJECT_DIR$/../panomatic/pan-o-matic_eval.files" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../surf_reference/BenchmarkSURF.creator.user" afterPath="$PROJECT_DIR$/../surf_reference/BenchmarkSURF.creator.user" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../surf_reference/BenchmarkSURF.files" afterPath="$PROJECT_DIR$/../surf_reference/BenchmarkSURF.files" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../surf_reference/Makefile" afterPath="$PROJECT_DIR$/../surf_reference/Makefile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/detect/BenchmarkDetectHelper.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/detect/BenchmarkDetectHelper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureAllRuntime.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureAllRuntime.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureDetectRuntime.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/BenchmarkFeatureDetectRuntime.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/CreateDetectionFile.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/homography/CreateDetectionFile.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/orientation/UtilOrientationBenchmark.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/feature/orientation/UtilOrientationBenchmark.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/opencv/BenchmarkForOpenCV.java" afterPath="$PROJECT_DIR$/../../../benchmark/src/boofcv/benchmark/opencv/BenchmarkForOpenCV.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/javasurf.iws" afterPath="$PROJECT_DIR$/javasurf.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../jopensurf/Evaluate JOpenSurf.iws" afterPath="$PROJECT_DIR$/../jopensurf/Evaluate JOpenSurf.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../panomatic/common_panomatic.hpp" afterPath="$PROJECT_DIR$/../panomatic/common_panomatic.hpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../surf_reference/runtime_all_surf.cpp" afterPath="$PROJECT_DIR$/../surf_reference/runtime_all_surf.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/associate/VisualizeAssociationMatchesApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/associate/VisualizeAssociationMatchesApp.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/associate/VisualizeAssociationScoreApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/associate/VisualizeAssociationScoreApp.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/VideoDetectInterestPoints.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/VideoDetectInterestPoints.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/interest/DetectFeaturePointApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/interest/DetectFeaturePointApp.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/interest/DetectFeatureScaleSpaceApp.java" afterPath="$PROJECT_DIR$/../../../visualization/src/boofcv/alg/feature/detect/interest/DetectFeatureScaleSpaceApp.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../examples/src/boofcv/examples/ExampleImageStitching.java" afterPath="$PROJECT_DIR$/../../../../examples/src/boofcv/examples/ExampleImageStitching.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../examples/src/boofcv/examples/ExampleInterestPoint.java" afterPath="$PROJECT_DIR$/../../../../examples/src/boofcv/examples/ExampleInterestPoint.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/feature/feature_todo.txt" afterPath="$PROJECT_DIR$/../../../../main/feature/feature_todo.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/feature/src/boofcv/factory/feature/detect/interest/FactoryInterestPoint.java" afterPath="$PROJECT_DIR$/../../../../main/feature/src/boofcv/factory/feature/detect/interest/FactoryInterestPoint.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d2/ModelFitterLinearHomography.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d2/ModelFitterLinearHomography.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/FundamentalLinear8.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/FundamentalLinear8.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/HomographyLinear4.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/HomographyLinear4.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/UtilEpipolar.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/d3/epipolar/UtilEpipolar.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/d3/epipolar/TestFundamentalLinear8.java" afterPath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/d3/epipolar/TestFundamentalLinear8.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/d3/epipolar/TestUtilEpipolar.java" afterPath="$PROJECT_DIR$/../../../../main/geo/test/boofcv/alg/geo/d3/epipolar/TestUtilEpipolar.java" />
+    </list>
     <ignored path="javasurf.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -59,10 +110,55 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="BenchmarkDetectRuntime.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="BenchmarkDetectRuntime.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/BenchmarkDetectRuntime.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="70" selection-start="577" selection-end="577" vertical-scroll-proportion="0.29090908">
+            <state line="21" column="44" selection-start="511" selection-end="511" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BenchmarkAllRuntime.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/BenchmarkAllRuntime.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="18" column="107" selection-start="467" selection-end="467" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreateDetect.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/CreateDetect.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="35" column="54" selection-start="1451" selection-end="1559" vertical-scroll-proportion="0.15236051">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BenchmarkDescribeRuntime.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/BenchmarkDescribeRuntime.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="26" column="0" selection-start="795" selection-end="907" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreateDescription.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/CreateDescription.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="43" column="47" selection-start="1132" selection-end="1228" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="readme.txt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/readme.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="1" column="20" selection-start="35" selection-end="35" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -75,13 +171,19 @@
       <setting name="OPEN_NEW_TAB" value="false" />
     </FindUsagesManager>
   </component>
+  <component name="Git.Settings">
+    <option name="CHECKOUT_INCLUDE_TAGS" value="false" />
+    <option name="UPDATE_CHANGES_POLICY" value="STASH" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/src/CreateDescription.java" />
         <option value="$PROJECT_DIR$/src/BenchmarkRuntime.java" />
-        <option value="$PROJECT_DIR$/src/BenchmarkDescribeRuntime.java" />
         <option value="$PROJECT_DIR$/src/BenchmarkDetectRuntime.java" />
+        <option value="$PROJECT_DIR$/src/BenchmarkAllRuntime.java" />
+        <option value="$PROJECT_DIR$/src/BenchmarkDescribeRuntime.java" />
+        <option value="$PROJECT_DIR$/src/CreateDetect.java" />
       </list>
     </option>
   </component>
@@ -89,7 +191,7 @@
     <option name="LAST_EDITED_MODULE_NAME" />
     <option name="LAST_EDITED_TAB_NAME" />
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
     <OptionsSetting value="true" id="Remove" />
     <OptionsSetting value="true" id="Checkout" />
@@ -115,7 +217,9 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Favorites" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -150,29 +254,31 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Favorites" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="project.structure.last.edited" value="Project" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="project.structure.proportion" value="0.15" />
+    <property name="options.splitter.main.proportions" value="0.3" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="recentsLimit" value="5" />
-    <property name="MemberChooser.showClasses" value="true" />
-    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="GoToClass.includeLibraries" value="false" />
     <property name="dynamic.classpath" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.BenchmarkDetectRuntime">
+  <component name="RunManager" selected="Application.CreateDetect">
     <configuration default="false" name="CreateDescription" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="CreateDescription" />
       <option name="VM_PARAMETERS" />
@@ -227,6 +333,46 @@
       <envs />
       <RunnerSettings RunnerId="Debug">
         <option name="DEBUG_PORT" value="37644" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <ConfigurationWrapper RunnerId="Debug" />
+      <method />
+    </configuration>
+    <configuration default="false" name="BenchmarkAllRuntime" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="BenchmarkAllRuntime" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="Javasurf" />
+      <envs />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="59679" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <ConfigurationWrapper RunnerId="Debug" />
+      <method />
+    </configuration>
+    <configuration default="false" name="CreateDetect" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="CreateDetect" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="Javasurf" />
+      <envs />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="52028" />
         <option name="TRANSPORT" value="0" />
         <option name="LOCAL" value="true" />
       </RunnerSettings>
@@ -307,10 +453,12 @@
         <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
-    <list size="3">
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Application.CreateDescription" />
       <item index="1" class="java.lang.String" itemvalue="Application.BenchmarkDescribeRuntime" />
       <item index="2" class="java.lang.String" itemvalue="Application.BenchmarkDetectRuntime" />
+      <item index="3" class="java.lang.String" itemvalue="Application.BenchmarkAllRuntime" />
+      <item index="4" class="java.lang.String" itemvalue="Application.CreateDetect" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -333,6 +481,7 @@
     <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
     <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
     <option name="FORCE_UPDATE" value="false" />
+    <configuration useDefault="true">$USER_HOME$/.subversion_IDEA</configuration>
     <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
   </component>
   <component name="TaskManager">
@@ -349,20 +498,20 @@
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24856909" sideWeight="0.6014068" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3985932" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32942554" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24856909" sideWeight="0.6014068" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32942554" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -421,11 +570,6 @@
         <state line="33" column="6" selection-start="1073" selection-end="1073" vertical-scroll-proportion="0.86419755" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/CreateDescription.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="47" selection-start="1132" selection-end="1228" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/JavaSurf-1.0-SNAPSHOT.jar!/org/mite/jsurf/InterestPoint.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="20" column="11" selection-start="802" selection-end="802" vertical-scroll-proportion="0.0" />
@@ -446,16 +590,40 @@
         <state line="7" column="16" selection-start="192" selection-end="192" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/BenchmarkDescribeRuntime.java">
+    <entry file="file://$PROJECT_DIR$/src/BenchmarkAllRuntime.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="36" selection-start="350" selection-end="350" vertical-scroll-proportion="0.0">
+        <state line="18" column="107" selection-start="467" selection-end="467" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/BenchmarkDescribeRuntime.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="0" selection-start="795" selection-end="907" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CreateDescription.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="47" selection-start="1132" selection-end="1228" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/readme.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1" column="20" selection-start="35" selection-end="35" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/BenchmarkDetectRuntime.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="70" selection-start="577" selection-end="577" vertical-scroll-proportion="0.29090908">
+        <state line="21" column="44" selection-start="511" selection-end="511" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CreateDetect.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="54" selection-start="1451" selection-end="1559" vertical-scroll-proportion="0.15236051">
           <folding />
         </state>
       </provider>

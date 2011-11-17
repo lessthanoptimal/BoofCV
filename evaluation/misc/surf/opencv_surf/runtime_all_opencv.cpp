@@ -24,7 +24,8 @@ void process( Mat image )
         // location of detected points
         std::vector<KeyPoint> ipts;
 
-        SurfFeatureDetector detector(250,4,4,false);
+//        SurfFeatureDetector detector(250,4,4,false); // 6485 features
+        SurfFeatureDetector detector(3100,4,4,false); // 1999 features
         detector.detect(image,ipts);
 
         // Create Surf Descriptor Object

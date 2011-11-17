@@ -1,0 +1,18 @@
+Change Log
+
+Date Format: year/month/day
+
+
+---------------------------------------------
+Date    :  
+Version : Alpha 0.2
+
+- Added integer polynomial interpolation
+  * Cleaned up polynomial interpolation code
+
+
+---------------------------------------------
+Date    : 2011/11/01 
+Version : Alpha 0.1 
+
+- Initial public release

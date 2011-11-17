@@ -20,10 +20,13 @@ package boofcv.alg.interpolate.array;
 
 
 /**
- * This is an alternative implementation of Lagrange's formula that is more computationally efficient.
- * <p/>
- * See Numerical Recipes Third Edition page 118 for a more detailed description
- *
+ * <p>
+ * Neville's algorithm for polynomial interpolation and extrapolation.  Neville's algorithm improves upon
+ * Lagrange's formula by avoiding repetitive calculations.
+ * </p>
+ * <p>
+ * See Numerical Recipes Third Edition page 118.
+ * </p>
  * @author Peter Abeles
  */
 public class PolynomialNeville_F32 extends Interpolate1D_F32 {
