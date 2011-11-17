@@ -56,4 +56,31 @@ public class GGrayImageOps {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
 	}
+
+		/**
+	 * <p>
+	 * Brightens the image's intensity:<br>
+	 * O<sub>x,y</sub> = I<sub>x,y</sub> + beta<br>
+	 * </p>
+	 * <p>
+	 * The image's intensity is clamped at 0 and max;
+	 * </p>
+	 *
+	 * @param input  Input image. Not modified.
+	 * @param beta   How much the image is brightened by.
+	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @return Output image.
+	 */
+	public static <T extends ImageBase> T brighten( T input , double beta, double max , T output )
+	{
+		if( input instanceof ImageFloat32 ) {
+			return (T)GrayImageOps.brighten((ImageFloat32) input, (float) beta, (float) max, (ImageFloat32) output);
+		} else if( input instanceof ImageUInt8 ) {
+			return (T)GrayImageOps.brighten((ImageUInt8)input,(int)beta,(int)max,(ImageUInt8)output);
+		} else if( input instanceof ImageSInt16) {
+			return (T)GrayImageOps.brighten((ImageSInt16) input, (int) beta, (int) max, (ImageSInt16) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
+		}
+	}
 }

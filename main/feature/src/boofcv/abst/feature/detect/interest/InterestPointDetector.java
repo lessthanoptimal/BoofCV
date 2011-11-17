@@ -22,25 +22,42 @@ import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Interface for automatic interest point detection in an image.  Provides optional
- * support for additional point features.
+ * Interface for automatic interest point detection in an image.  Optional support is
+ * provided for scale and orientation.
  *
  * @author Peter Abeles
  */
+// TODO Change scale into size in pixels. Or maybe radius in pixels.
+// todo make scale a manditory feature.  even corner detectors have "scale" its the detector region size
 public interface InterestPointDetector< T extends ImageBase> {
 
 	/**
-	 * Detects and returns a list of interest points in the input image.
+	 * Detects interest points inside the provided image.
 	 *
-	 * @param input Input image.
-	 * @return List of interest points.
+	 * @param input Input features are detected inside of.
 	 */
 	void detect( T input );
 
+	/**
+	 * Returns the number of interest points found.
+	 *
+	 * @return Number of interest points.
+	 */
 	int getNumberOfFeatures();
 
+	/**
+	 * The center location of the feature inside the image.
+	 *
+	 * @param featureIndex The feature's index.
+	 * @return Location of the feature in image pixels.
+	 */
 	Point2D_F64 getLocation( int featureIndex );
 
+	/**
+	 * The
+	 * @param featureIndex
+	 * @return
+	 */
 	double getScale( int featureIndex );
 
 	double getOrientation( int featureIndex );

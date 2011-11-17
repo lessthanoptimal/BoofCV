@@ -27,6 +27,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
+// todo change scale to size/radius in pixels?
 public interface DescribeRegionPoint<T extends ImageBase> {
 
 	/**

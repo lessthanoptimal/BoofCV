@@ -13,7 +13,7 @@ Trackers
  * Add a crude version 4 which just checks to see if gradient is > or < 0 to pick direction of line
 
 - Canny Edge Detector
- * Uses generalized algorithm for non-max.  Use a specialized one for speed that traces
+ * Uses generalized algorithm for non-max right now.  It should use a specialized one for speed that traces
    the edge intensity and direction
 
 - Weighted corner detection
@@ -27,6 +27,10 @@ Trackers
 - Ignore Borders
   * WrapperKitRosCornerIntensity: add ignore border parameter for when the derivative has an ignore border?
   * WrapperLaplacianBlobIntensity: same
+
+- InterestPointDetector
+  * change scale into size or radius in pixels so its not detector dependent
+  * Would need to update descriptor interface to accommodate this change, DescribeRegionPoint
 
 - Hough Detectors
   * Used round to reduce round off error?  Right now it is equivalent of floor
