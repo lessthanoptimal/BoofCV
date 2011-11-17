@@ -31,7 +31,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Evaluates how fast interest points are detected at runtime is at runtime.
+ * Evaluates how fast interest points are detected at runtime.
  *
  * @author Peter Abeles
  */
@@ -77,7 +77,7 @@ public class BenchmarkFeatureDetectRuntime<T extends ImageBase> {
 
 	public static void main( String args[] ) throws IOException {
 
-		InterestPointDetector<ImageFloat32> alg = FactoryInterestPoint.fromFastHessian(100, -1, 1, 9, 4, 4);
+		InterestPointDetector<ImageFloat32> alg = FactoryInterestPoint.fromFastHessian(100, 2, -1, 1, 9, 4, 4);
 
 		BenchmarkFeatureDetectRuntime<ImageFloat32> benchmark =
 				new BenchmarkFeatureDetectRuntime<ImageFloat32>(ImageFloat32.class,alg);

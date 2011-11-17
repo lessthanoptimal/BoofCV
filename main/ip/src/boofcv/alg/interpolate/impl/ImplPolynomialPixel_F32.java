@@ -18,69 +18,22 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.array.PolynomialNevilleFixed_F32;
+import boofcv.alg.interpolate.PolynomialPixel;
 import boofcv.struct.image.ImageFloat32;
-
 
 /**
  * <p>
- * A quick and dirty arbitrary degree polynomial interpolation algorithm for images.
- * A M by M region is the image is used in the interpolation.  Edges are handled
- * with no problems.  In the region first the interpolation is done horizontally,
- * then it is done vertically along the interpolated column that was just computed.
+ * Implementation of {@link PolynomialPixel}.
  * </p>
- * <p>
- * The code is unopitimized and the algorithm is relatively expensive.
- * </p>
+ * 
  * @author Peter Abeles
  */
-public class ImplPolynomialPixel_F32 implements InterpolatePixel<ImageFloat32>  {
-	// the image that is being interpolated
-	private ImageFloat32 image;
-
-	private int M;
-	// if even need to add one to initial coordinate to make sure
-	// the point interpolated is bounded inside the interpolation points
-	private int offM;
-
-	// temporary arrays used in the interpolation
-	private float horiz[];
-	private float vert[];
-
-	// the minimum and maximum pixel intensity values allowed
-	private float min;
-	private float max;
-
-	private PolynomialNevilleFixed_F32 interp1D;
+public class ImplPolynomialPixel_F32 extends PolynomialPixel<ImageFloat32> {
 
 	public ImplPolynomialPixel_F32(int maxDegree, float min, float max) {
-		this.M = maxDegree;
-		this.min = min;
-		this.max = max;
-		horiz = new float[maxDegree];
-		vert = new float[maxDegree];
-
-		if( maxDegree % 2 == 0 ) {
-			offM = 1;
-		} else {
-			offM = 0;
-		}
-
-		interp1D = new PolynomialNevilleFixed_F32(maxDegree);
+		super(maxDegree, min, max);
 	}
 
-	@Override
-	public void setImage(ImageFloat32 image) {
-		this.image = image;
-	}
-
-	@Override
-	public ImageFloat32 getImage() {
-		return image;
-	}
-
-	// todo reduce the order of the interpolation at edges to improve results
 	@Override
 	public float get(float x, float y) {
 		int width = image.getWidth();
@@ -96,22 +49,22 @@ public class ImplPolynomialPixel_F32 implements InterpolatePixel<ImageFloat32>  
 		int y1 = y0 + M;
 
 		if( x0 < 0 ) { x0 = 0;}
-		else if( x1 > width) {x1 = width;}
+		if( x1 > width) {x1 = width;}
 
 		if( y0 < 0 ) { y0 = 0;}
-		else if( y1 > height) {y1 = height;}
+		if( y1 > height) {y1 = height;}
 
 		final int horizM = x1-x0;
 		final int vertM = y1-y0;
 
-		interp1D.setInput(horiz,horiz.length);
+		interp1D.setInput(horiz,horizM);
 		for( int i = 0; i < vertM; i++ ) {
 			for( int j = 0; j < horizM; j++ ) {
 				horiz[j] = image.get(j+x0,i+y0);
 			}
 			vert[i]=interp1D.process(x-x0,0,horizM-1);
 		}
-		interp1D.setInput(vert,vert.length);
+		interp1D.setInput(vert,vertM);
 
 		float ret = interp1D.process(y-y0,0,vertM-1);
 
@@ -152,13 +105,4 @@ public class ImplPolynomialPixel_F32 implements InterpolatePixel<ImageFloat32>  
 		return ret;
 	}
 
-	@Override
-	public boolean isInSafeBounds(float x, float y) {
-		int x0 = (int)x - M/2 + offM;
-		int x1 = x0 + M;
-		int y0 = (int)y - M/2 + offM;
-		int y1 = y0 + M;
-
-		return (x0 >= 0 && y0 >= 0 && x1 < image.width && y1 <image.height);
-	}
 }

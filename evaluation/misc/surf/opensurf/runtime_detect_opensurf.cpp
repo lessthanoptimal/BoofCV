@@ -1,6 +1,3 @@
-
-
-
 #include "surflib.h"
 #include "kmeans.h"
 #include <ctime>

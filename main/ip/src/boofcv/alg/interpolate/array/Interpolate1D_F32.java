@@ -29,7 +29,7 @@ package boofcv.alg.interpolate.array;
 public abstract class Interpolate1D_F32 {
 
 	// the sample data
-	// both axeses must be monotonic increasing or decreasing
+	// both axises must be monotonic increasing or decreasing
 	protected int size;
 	protected float x[];
 	protected float y[];

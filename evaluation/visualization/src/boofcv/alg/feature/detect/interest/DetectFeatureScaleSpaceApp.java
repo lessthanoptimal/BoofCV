@@ -112,6 +112,8 @@ public class DetectFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase
 
 	public static void main( String args[] ) {
 		DetectFeatureScaleSpaceApp app = new DetectFeatureScaleSpaceApp(ImageFloat32.class,ImageFloat32.class);
+//		DetectFeatureScaleSpaceApp app = new DetectFeatureScaleSpaceApp(ImageUInt8.class,ImageSInt16.class);
+
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("shapes","data/shapes01.png");

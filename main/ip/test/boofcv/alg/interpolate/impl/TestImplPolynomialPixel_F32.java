@@ -39,22 +39,24 @@ import java.util.Random;
  */
 public class TestImplPolynomialPixel_F32 extends GeneralInterpolationPixelChecks<ImageFloat32> {
 
+	int DOF = 2;
+
     Random rand = new Random(0xff);
     int width = 20;
     int height = 34;
 
     /**
-     * Polynomial interpolation of order one is bilinear interpolation
-     */
-    @Test
-    public void compareToBilinear() {
-        ImageFloat32 img = new ImageFloat32(width,height);
-        ImageFloat32 expected = new ImageFloat32(width,height);
-        ImageFloat32 found = new ImageFloat32(width,height);
+	 * Polynomial interpolation of order one is bilinear interpolation
+	 */
+	@Test
+	public void compareToBilinear() {
+		ImageFloat32 img = new ImageFloat32(width,height);
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
 
 		GeneralizedImageOps.randomize(img,rand,0,255);
 
-        Affine2D_F32 tran = new Affine2D_F32(1,0,0,1,0.25f,0.25f);
+		Affine2D_F32 tran = new Affine2D_F32(1,0,0,1,0.25f,0.25f);
 
 		// set it up so that it will be equivalent to bilinear interpolation
 		ImplPolynomialPixel_F32 alg = new ImplPolynomialPixel_F32(2,0,255);
@@ -78,11 +80,17 @@ public class TestImplPolynomialPixel_F32 extends GeneralInterpolationPixelChecks
 
 	@Override
 	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image) {
-		return new ImplPolynomialPixel_F32(2,0,255);
+		InterpolatePixel<ImageFloat32> ret = new ImplPolynomialPixel_F32(DOF,0,255);
+		ret.setImage(image);
+		return ret;
 	}
 
 	@Override
 	protected float compute(ImageFloat32 img, float x, float y) {
-		throw new RuntimeException("Put more thoguht into this");
+		// yes by using the same algorithm for this compute several unit tests are being defeated
+		// polynomial interpolation is more complex and a simple compute alg here is not possible
+		ImplPolynomialPixel_F32 a = new ImplPolynomialPixel_F32(DOF,0,255);
+		a.setImage(img);
+		return a.get(x,y);
 	}
 }

@@ -150,10 +150,11 @@ public class DescribePointSurf<II extends ImageBase> {
 		else if( ret.features.value.length != featureDOF )
 			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
 
-		// extract descriptor
+		// Computes the gradient (possibly the Haar wavelet) used compute the descriptor
 		SparseImageGradient<II,?> gradient = SurfDescribeOps.createGradient(isInBounds, useHaar, widthSample, scale, (Class<II>) ii.getClass());
 		gradient.setImage(ii);
 
+		// extract descriptor
 		SurfDescribeOps.features(x, y, angle, scale, weight, widthLargeGrid, widthSubRegion, gradient, ret.features.value);
 
 		// normalize feature vector to have an Euclidean length of 1

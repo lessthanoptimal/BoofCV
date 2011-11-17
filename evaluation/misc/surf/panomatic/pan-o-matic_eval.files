@@ -1,0 +1,7 @@
+describe_panomatic.cpp
+common_panomatic.hpp
+common_panomatic.cpp
+runtime_detect_panomatic.cpp
+runtime_all_panomatic.cpp
+runtime_describe_panomatic.cpp
+detect_panomatic.cpp
