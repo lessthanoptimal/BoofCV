@@ -47,12 +47,12 @@ public class DetectFastHessianApp {
 //	static String fileName = "evaluation/data/scale/mountain_7p1mm.jpg";
 //	static String fileName = "evaluation/data/scale/mountain_19p9mm.jpg";
 
-	static int NUM_FEATURES = 50;
+	static int NUM_FEATURES = 120;
 
 	private static <T extends ImageBase> void doStuff( Class<T> imageType , BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax( 2 , 0.001f , 5, false, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax( 5 , 1 , 5, false, true);
 		FastHessianFeatureDetector<T> det = new FastHessianFeatureDetector<T>(extractor,NUM_FEATURES, 2, 9,4,4);
 
 		T integral = GIntegralImageOps.transform(workImage,null);

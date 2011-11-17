@@ -293,6 +293,8 @@ public class ConvertBufferedImage {
 			} else {
 				ConvertRaster.grayToBuffered(src, dst);
 			}
+			// hack so that it knows the buffer has been modified
+			dst.setRGB(0,0,dst.getRGB(0,0));
 		} catch( java.security.AccessControlException e) {
 			ConvertRaster.grayToBuffered(src, dst);
 		}
@@ -319,6 +321,8 @@ public class ConvertBufferedImage {
 			} else {
 				ConvertRaster.grayToBuffered(src, dst);
 			}
+			// hack so that it knows the buffer has been modified
+			dst.setRGB(0,0,dst.getRGB(0,0));
 		} catch( java.security.AccessControlException e) {
 			ConvertRaster.grayToBuffered(src, dst);
 		}
@@ -346,6 +350,8 @@ public class ConvertBufferedImage {
 			} else {
 				ConvertRaster.grayToBuffered(src, dst);
 			}
+			// hack so that it knows the buffer has been modified
+			dst.setRGB(0,0,dst.getRGB(0,0));
 		} catch( java.security.AccessControlException e) {
 			ConvertRaster.grayToBuffered(src, dst);
 		}

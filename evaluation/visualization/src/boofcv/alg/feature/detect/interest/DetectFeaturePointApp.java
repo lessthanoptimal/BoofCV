@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.feature.detect.ImageCorruptPanel;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryBlobDetector;
@@ -46,7 +47,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
-		extends SelectAlgorithmImagePanel implements ProcessInput
+		extends SelectAlgorithmImagePanel implements ProcessInput , ImageCorruptPanel.Listener
 {
 
 	static int maxFeatures = 400;
@@ -56,6 +57,7 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 	int radius = 2;
 	float thresh = 1;
 	T grayImage;
+	T corruptImage;
 	Class<T> imageType;
 	boolean processImage = false;
 	BufferedImage input;
@@ -63,6 +65,7 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 	FancyInterestPointRender render = new FancyInterestPointRender();
 
 	ImagePanel panel;
+	ImageCorruptPanel corruptPanel;
 
 	public DetectFeaturePointApp( Class<T> imageType , Class<D> derivType ) {
 		super(1);
@@ -89,23 +92,31 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		addAlgorithm(0, "Hess Lap SS",FactoryInterestPoint.fromFeatureLaplace(flss,scales,imageType));
 		FeatureLaplacePyramid<T,D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius,thresh,maxScaleFeatures,imageType,derivType);
 		addAlgorithm(0, "Hess Lap P",FactoryInterestPoint.fromFeatureLaplace(flp,scales,imageType));
-		addAlgorithm(0, "FastHessian",FactoryInterestPoint.<T>fromFastHessian(1, maxScaleFeatures, 2, 9,4,4));
+		addAlgorithm(0, "FastHessian",FactoryInterestPoint.<T>fromFastHessian(thresh, maxScaleFeatures, 2, 9,4,4));
 
+		JPanel viewArea = new JPanel(new BorderLayout());
+		corruptPanel = new ImageCorruptPanel();
+		corruptPanel.setListener(this);
 		panel = new ImagePanel();
-		setMainGUI(panel);
+
+		viewArea.add(corruptPanel,BorderLayout.WEST);
+		viewArea.add(panel,BorderLayout.CENTER);
+		setMainGUI(viewArea);
 	}
 
 	public void process( BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
 		grayImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		corruptImage = (T)grayImage._createNew(grayImage.width,grayImage.height);
 		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_BGR);
 		panel.setBufferedImage(workImage);
+		panel.setPreferredSize(new Dimension(workImage.getWidth(), workImage.getHeight()));
 		doRefreshAll();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				setPreferredSize(new Dimension(workImage.getWidth(), workImage.getHeight()));
+				revalidate();
 				processImage = true;
 			}});
 	}
@@ -116,18 +127,21 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 	}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if( input == null )
 			return;
 
+		// corrupt the input image
+		corruptPanel.corruptImage(grayImage,corruptImage);
+
 		final InterestPointDetector<T> det = (InterestPointDetector<T>)cookie;
-		det.detect(grayImage);
+		det.detect(corruptImage);
 
 		render.reset();
 		if( det.hasScale() ) {
 			for( int i = 0; i < det.getNumberOfFeatures(); i++ ) {
 				Point2D_F64 p = det.getLocation(i);
-				int radius = (int)Math.ceil(det.getScale(i)*3);
+				int radius = (int)Math.ceil(det.getScale(i)*2.5);
 				render.addCircle((int)p.x,(int)p.y,radius);
 			}
 		} else {
@@ -137,10 +151,16 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 			}
 		}
 
-		Graphics2D g2 = workImage.createGraphics();
-		g2.drawImage(input,0,0,grayImage.width,grayImage.height,null);
-		render.draw(g2);
-		panel.repaint();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				ConvertBufferedImage.convertTo(corruptImage, workImage);
+				Graphics2D g2 = workImage.createGraphics();
+//		g2.drawImage(input,0,0,grayImage.width,grayImage.height,null);
+				g2.setStroke(new BasicStroke(2));
+				render.draw(g2);
+				panel.repaint();
+			}
+		});
 	}
 
 	@Override
@@ -176,5 +196,10 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		ShowImages.showWindow(app,"Point Feature");
 
 		System.out.println("Done");
+	}
+
+	@Override
+	public synchronized void corruptImageChange() {
+		doRefreshAll();
 	}
 }
