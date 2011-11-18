@@ -92,7 +92,7 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		addAlgorithm(0, "Hess Lap SS",FactoryInterestPoint.fromFeatureLaplace(flss,scales,imageType));
 		FeatureLaplacePyramid<T,D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius,thresh,maxScaleFeatures,imageType,derivType);
 		addAlgorithm(0, "Hess Lap P",FactoryInterestPoint.fromFeatureLaplace(flp,scales,imageType));
-		addAlgorithm(0, "FastHessian",FactoryInterestPoint.<T>fromFastHessian(thresh,2, maxScaleFeatures, 2, 9,4,4));
+		addAlgorithm(0, "FastHessian",FactoryInterestPoint.<T>fromFastHessian(thresh,5, maxScaleFeatures, 2, 9,4,4));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();
@@ -155,7 +155,6 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 			public void run() {
 				ConvertBufferedImage.convertTo(corruptImage, workImage);
 				Graphics2D g2 = workImage.createGraphics();
-//		g2.drawImage(input,0,0,grayImage.width,grayImage.height,null);
 				g2.setStroke(new BasicStroke(2));
 				render.draw(g2);
 				panel.repaint();
@@ -185,6 +184,7 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 
 	public static void main( String args[] ) {
 		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageFloat32.class,ImageFloat32.class);
+//		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageUInt8.class,ImageSInt16.class);
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("shapes","data/shapes01.png");
