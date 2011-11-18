@@ -280,15 +280,14 @@ public class TestPixelMath {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
-		if( input.getTypeInfo().isSigned() ) {
-			GeneralizedImageOps.randomize(input, rand, -20,20);
-		} else {
-			GeneralizedImageOps.randomize(input, rand, 0,20);
-		}
+		double max = 100;
+		double min = -100;
 
-		if( input.getTypeInfo().isInteger() )
+		GeneralizedImageOps.randomize(input, rand, (int)min, (int)max);
+
+		if( input.getTypeInfo().isInteger() ) {
 			m.invoke(null,input,2,10);
-		else
+		} else
 			m.invoke(null,input,2.0f,10.0f);
 
 		SingleBandImage a = FactorySingleBandImage.wrap(input);

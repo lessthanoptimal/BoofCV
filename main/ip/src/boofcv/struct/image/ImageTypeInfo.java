@@ -55,6 +55,8 @@ public final class ImageTypeInfo <T extends ImageBase> {
 	private boolean isAbstract;
 	private boolean isSigned;
 	private boolean isInteger;
+	private double maxValue;
+	private double minValue;
 	private Class dataType;
 	private Class sumType;
 	private Class imageClass;
@@ -134,6 +136,51 @@ public final class ImageTypeInfo <T extends ImageBase> {
 			else
 				sumType = long.class;
 		}
+
+		configureMinMaxValues();
+	}
+
+	private void configureMinMaxValues() {
+		if( isInteger ) {
+			switch( numBits ) {
+				case 8:
+					minValue = Byte.MIN_VALUE;
+					maxValue = Byte.MAX_VALUE;
+					break;
+
+				case 16:
+					minValue = Short.MIN_VALUE;
+					maxValue = Short.MAX_VALUE;
+					break;
+
+				case 32:
+					minValue = Integer.MIN_VALUE;
+					maxValue = Integer.MAX_VALUE;
+					break;
+
+				case 64:
+					minValue = Long.MIN_VALUE;
+					maxValue = Long.MAX_VALUE;
+					break;
+			}
+		} else {
+			switch( numBits ) {
+				case 32:
+					minValue = Float.MIN_VALUE;
+					maxValue = Float.MAX_VALUE;
+					break;
+
+				case 64:
+					minValue = Double.MIN_VALUE;
+					maxValue = Double.MAX_VALUE;
+					break;
+			}
+		}
+
+		if( !isSigned ) {
+			maxValue += -minValue;
+			minValue = 0;
+		}
 	}
 
 	/**
@@ -183,5 +230,19 @@ public final class ImageTypeInfo <T extends ImageBase> {
 	 */
 	public Class getImageClass() {
 		return imageClass;
+	}
+
+	/**
+	 * Returns the maximum allowed value for data elements in this data type
+	 */
+	public double getMaxValue() {
+		return maxValue;
+	}
+
+	/**
+	 * Returns the minimum allowed value for data elements in this data type
+	 */
+	public double getMinValue() {
+		return maxValue;
 	}
 }

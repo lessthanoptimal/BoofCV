@@ -64,7 +64,7 @@ public class ImageCorruptPanel extends StandardAlgConfigPanel implements ChangeL
 		lightScale.addChangeListener(this);
 		lightScale.setMaximumSize(lightScale.getPreferredSize());
 
-		lightOffset = new JSpinner(new SpinnerNumberModel(valueOffset,-20,20,5));
+		lightOffset = new JSpinner(new SpinnerNumberModel(valueOffset,-30,30,5));
 		lightOffset.addChangeListener(this);
 		lightOffset.setMaximumSize(lightOffset.getPreferredSize());
 

@@ -33,7 +33,7 @@ import java.util.List;
 
 /**
  * <p>
- * Given a set of points this class computes the essential or fundamental matrix.  The result is
+ * Given a set of 8 or more points this class computes the essential or fundamental matrix.  The result is
  * often used as an initial guess for more accurate non-linear approaches.
  * </p>
  *
@@ -41,7 +41,7 @@ import java.util.List;
  * References:
  * <ul>
  * <li> Y. Ma, S. Soatto, J. Kosecka, and S. S. Sastry, "An Invitation to 3-D Vision" Springer-Verlad, 2004 </li>
- * <li> R. Hartley, and A. Zisserman, "Multi View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
+ * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
  * </ul>
  *
  * @author Peter Abeles
@@ -101,23 +101,21 @@ public class FundamentalLinear8 {
 		if( points.size() < 8 )
 			throw new IllegalArgumentException("Must be at least 8 points. Was only "+points.size());
 
-		if( computeFundamental ) {
-			UtilEpipolar.computeNormalization(N1, N2, points);
-			createA(points,A);
+		// use normalized coordinates for pixel and calibrated
+		// un-normalized passed unit tests in 8 point, but failed in 7 point, hinting
+		// that there could be situations where normalization might be needed in 8 point
+		UtilEpipolar.computeNormalization(N1, N2, points);
+		createA(points,A);
 
-			if (process(A))
+		if (process(A))
 			return false;
 
-			undoNormalizationF(F,N1,N2);
-			return projectOntoFundamentalSpace();
-		} else {
-			createA_nonorm(points,A);
+		undoNormalizationF(F,N1,N2);
 
-			if (process(A))
-			return false;
-
-			return projectOntoEssential();
-		}
+		if( computeFundamental )
+			return projectOntoFundamentalSpace(F);
+		else
+			return projectOntoEssential(F);
 	}
 
 	/**
@@ -144,7 +142,7 @@ public class FundamentalLinear8 {
 	 *
 	 * @return true if svd returned true.
 	 */
-	protected boolean projectOntoEssential() {
+	protected boolean projectOntoEssential( DenseMatrix64F F ) {
 		if( !svd.decompose(F) ) {
 			return false;
 		}
@@ -173,7 +171,7 @@ public class FundamentalLinear8 {
 	 *
 	 * @return true if svd returned true.
 	 */
-	protected boolean projectOntoFundamentalSpace() {
+	protected boolean projectOntoFundamentalSpace( DenseMatrix64F F ) {
 		if( !svd.decompose(F) ) {
 			return false;
 		}
@@ -251,33 +249,4 @@ public class FundamentalLinear8 {
 			A.set(i,8,1);
 		}
 	}
-
-	/**
-	 * Same as {@link #createA} but does not normalize and should be slightly faster.
-	 */
-	protected void createA_nonorm(List<AssociatedPair> points, DenseMatrix64F A ) {
-		A.reshape(points.size(),9, false);
-		A.zero();
-
-		final int size = points.size();
-		for( int i = 0; i < size; i++ ) {
-			AssociatedPair p = points.get(i);
-
-			Point2D_F64 f = p.keyLoc;
-			Point2D_F64 s = p.currLoc;
-
-			// perform the Kronecker product with the two points being in
-			// homogeneous coordinates (z=1)
-			A.set(i,0,s.x*f.x);
-			A.set(i,1,s.x*f.y);
-			A.set(i,2,s.x);
-			A.set(i,3,s.y*f.x);
-			A.set(i,4,s.y*f.y);
-			A.set(i,5,s.y);
-			A.set(i,6,f.x);
-			A.set(i,7,f.y);
-			A.set(i,8,1);
-		}
-	}
-
 }
