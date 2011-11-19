@@ -131,9 +131,9 @@ public class CreateDetectionFile<T extends ImageBase> {
 	public static <T extends ImageBase>
 	void doStuff( String directory , String suffix , Class<T> imageType ) throws FileNotFoundException {
 		// below are the settings used for detect stability test
-//		InterestPointDetector<T> alg = FactoryInterestPoint.fromFastHessian(0, 2, -1, 1, 9,4,4);
+//		InterestPointDetector<T> alg = FactoryInterestPoint.fastHessian(0, 2, -1, 1, 9,4,4);
 		// below is the settings used for describe stability test
-		InterestPointDetector<T> alg = FactoryInterestPoint.fromFastHessian(80, 1 , -1, 1, 9,4,4);
+		InterestPointDetector<T> alg = FactoryInterestPoint.fastHessian(80, 1, -1, 1, 9, 4, 4);
 
 		CreateDetectionFile<T> cdf = new CreateDetectionFile<T>(alg,null,imageType,"FH");
 		cdf.directory(directory,suffix);

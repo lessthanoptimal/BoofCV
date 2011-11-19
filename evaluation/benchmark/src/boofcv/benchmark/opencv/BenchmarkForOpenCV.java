@@ -148,7 +148,7 @@ public class BenchmarkForOpenCV<T extends ImageBase, D extends ImageBase> {
 		DescribeRegionPoint<T> describer;
 
 		public SURF() {
-			detector = FactoryInterestPoint.fromFastHessian(20, 2, -1,1,9,4,4);
+			detector = FactoryInterestPoint.fastHessian(20, 2, -1, 1, 9, 4, 4);
 			describer = FactoryDescribeRegionPoint.surf(true,imageType);
 		}
 

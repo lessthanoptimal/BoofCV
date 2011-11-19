@@ -74,25 +74,25 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		GeneralFeatureDetector<T,D> alg;
 
 		alg = FactoryCornerDetector.createHarris(radius,thresh,maxFeatures,derivType);
-		addAlgorithm(0, "Harris",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "Harris",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 		alg = FactoryCornerDetector.createKlt(radius,thresh,maxFeatures,derivType);
-		addAlgorithm(0, "KLT", FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "KLT", FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 		alg = FactoryCornerDetector.createFast(radius,10,maxFeatures,imageType);
-		addAlgorithm(0, "Fast", FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "Fast", FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 		alg = FactoryCornerDetector.createKitRos(radius,thresh,maxFeatures,derivType);
-		addAlgorithm(0, "KitRos",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "KitRos",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 		alg = FactoryCornerDetector.createMedian(radius,thresh,maxFeatures,imageType);
-		addAlgorithm(0, "Median",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "Median",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 		alg = FactoryBlobDetector.createLaplace(radius,thresh,maxFeatures,derivType, HessianBlobIntensity.Type.DETERMINANT);
-		addAlgorithm(0, "Hessian",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "Hessian",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 		alg = FactoryBlobDetector.createLaplace(radius,thresh,maxFeatures,derivType, HessianBlobIntensity.Type.TRACE);
-		addAlgorithm(0, "Laplace",FactoryInterestPoint.fromCorner(alg,imageType,derivType));
+		addAlgorithm(0, "Laplace",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 
 		FeatureLaplaceScaleSpace<T,D> flss = FactoryInterestPointAlgs.hessianLaplace(radius,thresh,maxScaleFeatures,imageType,derivType);
-		addAlgorithm(0, "Hess Lap SS",FactoryInterestPoint.fromFeatureLaplace(flss,scales,imageType));
+		addAlgorithm(0, "Hess Lap SS",FactoryInterestPoint.wrapDetector(flss, scales, imageType));
 		FeatureLaplacePyramid<T,D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius,thresh,maxScaleFeatures,imageType,derivType);
-		addAlgorithm(0, "Hess Lap P",FactoryInterestPoint.fromFeatureLaplace(flp,scales,imageType));
-		addAlgorithm(0, "FastHessian",FactoryInterestPoint.<T>fromFastHessian(thresh,5, maxScaleFeatures, 2, 9,4,4));
+		addAlgorithm(0, "Hess Lap P",FactoryInterestPoint.wrapDetector(flp, scales, imageType));
+		addAlgorithm(0, "FastHessian",FactoryInterestPoint.<T>fastHessian(thresh, 5, maxScaleFeatures, 2, 9, 4, 4));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();

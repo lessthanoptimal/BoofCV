@@ -136,7 +136,7 @@ public class FactoryPointSequentialTracker {
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 		GeneralFeatureDetector<I,?> fast = FactoryCornerDetector.createFast(3, pixelDetectTol, maxFeatures, imageType);
-		InterestPointDetector<I> detector = FactoryInterestPoint.fromCorner(fast, imageType, null);
+		InterestPointDetector<I> detector = FactoryInterestPoint.wrapCorner(fast, imageType, null);
 		ScoreAssociationBrief score = new ScoreAssociationBrief();
 
 		GeneralAssociation<BriefFeature> association =
