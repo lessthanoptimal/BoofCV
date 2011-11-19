@@ -18,6 +18,7 @@
 
 package boofcv.numerics.solver;
 
+import boofcv.numerics.complex.ComplexMath;
 import org.ejml.alg.dense.decomposition.DecompositionFactory;
 import org.ejml.alg.dense.decomposition.EigenDecomposition;
 import org.ejml.data.Complex64F;
@@ -37,7 +38,7 @@ public class PolynomialSolver {
 	 * @param coefficients Polynomial coefficients.
 	 * @return The found roots.
 	 */
-	public static Complex64F[] polynomialRoots( double ...coefficients ) {
+	public static Complex64F[] polynomialRootsEVD(double... coefficients) {
 
 		int N = coefficients.length-1;
 
@@ -74,7 +75,7 @@ public class PolynomialSolver {
 	 * </p>
 	 *
 	 * <p>
-	 * WARNING: Will not work for all polynomials.  Some requires taking the square root of a negative number.
+	 * WARNING: Not as numerically stable as {@link #polynomialRootsEVD(double...)}, but still fairly stable.
 	 * </p>
 	 *
 	 * @param a polynomial coefficient.
@@ -85,20 +86,39 @@ public class PolynomialSolver {
 	 */
 	public static double cubicRootReal(double a, double b, double c, double d)
 	{
-		double insideLeft = 2*c*c*c - 9*d*c*b + 27*d*d*a;
+		// normalize for numerical stability
+		double norm = Math.max(Math.abs(a), Math.abs(b));
+		norm = Math.max(norm,Math.abs(c));
+		norm = Math.max(norm, Math.abs(d));
+
+		a /= norm;
+		b /= norm;
+		c /= norm;
+		d /= norm;
+
+		// proceed with standard algorithm
+		double insideLeft = c*(2*c*c - 9*d*b) + 27*d*d*a;
 		double temp = c*c-3*d*b;
 		double insideOfSqrt = insideLeft*insideLeft - 4*temp*temp*temp;
 
 		if( insideOfSqrt >= 0 ) {
 			double insideRight = Math.sqrt(insideOfSqrt );
 
-			double ret = c +
+			double ret = c/d +
 					root3(0.5*(insideLeft+insideRight)) +
 					root3(0.5*(insideLeft-insideRight));
 
 			return -ret/(3.0*d);
 		} else {
-			throw new RuntimeException("This polynomial requires complex ");
+			Complex64F inside = new Complex64F(0.5*insideLeft,0.5*Math.sqrt(-insideOfSqrt ));
+			Complex64F root = new Complex64F();
+
+			ComplexMath.root(inside,3,2,root);
+
+			// imaginary components cancel out
+			double ret = c + 2*root.getReal();
+
+			return -ret/(3.0*d);
 		}
 	}
 
@@ -107,13 +127,6 @@ public class PolynomialSolver {
 			return -Math.pow(-val,1.0/3.0);
 		else
 			return Math.pow(val,1.0/3.0);
-	}
-
-	private static double root6( double val ) {
-		if( val < 0 )
-			return -Math.pow(-val,1.0/6.0);
-		else
-			return Math.pow(val,1.0/6.0);
 	}
 
 	/**

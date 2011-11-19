@@ -9,6 +9,11 @@ Version : Alpha 0.2
 
 - Added integer polynomial interpolation
   * Cleaned up polynomial interpolation code
+- Fixed bug in PixelMath.bound() dealing with unsigned images
+- Converting to a BufferedImage now marks it as modified
+- Added min and max pixel values to ImageTypeInfo
+- Added ComplexMath
+- Added PolynomialSolver
 
 
 ---------------------------------------------
