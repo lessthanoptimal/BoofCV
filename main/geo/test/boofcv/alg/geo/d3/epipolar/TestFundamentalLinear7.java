@@ -22,16 +22,18 @@ public class TestFundamentalLinear7 extends CommonFundamentalChecks{
 
 	@Test
 	public void enforceZeroDeterminant() {
-		SimpleMatrix F1 = SimpleMatrix.random(3, 3, 0.1, 2, rand);
-		SimpleMatrix F2 = SimpleMatrix.random(3, 3, 0.1, 2, rand);
+		for( int i = 0; i < 20; i++ ) {
+			SimpleMatrix F1 = SimpleMatrix.random(3, 3, 0.1, 2, rand);
+			SimpleMatrix F2 = SimpleMatrix.random(3, 3, 0.1, 2, rand);
 
-		double alpha = FundamentalLinear7.enforceZeroDeterminant(F1.getMatrix(),F2.getMatrix(),new double[4]);
+			double alpha = FundamentalLinear7.enforceZeroDeterminant(F1.getMatrix(),F2.getMatrix(),new double[4]);
 
-		SimpleMatrix F = F1.scale(alpha).plus(F2.scale(1 - alpha));
+			SimpleMatrix F = F1.scale(alpha).plus(F2.scale(1 - alpha));
 
-//		System.out.println("det = "+F.determinant()+"  F1 = "+F1.determinant());
+			System.out.println("det = "+F.determinant()+"  F1 = "+F1.determinant());
 
-		assertEquals(0, F.determinant(), 1e-8);
+			assertEquals(0, F.determinant(), 1e-8);
+		}
 	}
 
 	@Test

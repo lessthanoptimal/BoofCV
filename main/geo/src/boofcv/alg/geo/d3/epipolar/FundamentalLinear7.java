@@ -123,9 +123,12 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 	{
 		computeCoefficients(F1,F2,coefs);
 
-		// this part could be speed up by using a specialized solver for cubic polynomials
-		Complex64F[] zeros = PolynomialSolver.polynomialRoots(coefs);
+		// using a specialized algorithm is faster, but this implementation is less numerically stable
+//		double alpha =  PolynomialSolver.cubicRootReal(coefs[0],coefs[1],coefs[2],coefs[3]);
 
+		Complex64F[] zeros = PolynomialSolver.polynomialRootsEVD(coefs);
+
+//		// not because its the biggest
 		double alpha = zeros[0].real;
 		double minImaginary = Math.abs(zeros[0].imaginary);
 		for( int i = 1; i < zeros.length; i++ ) {
@@ -135,7 +138,6 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 				alpha = zeros[i].getReal();
 			}
 		}
-
 		return alpha;
 	}
 
