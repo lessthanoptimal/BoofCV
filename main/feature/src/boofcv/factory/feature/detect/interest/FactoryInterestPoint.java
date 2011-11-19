@@ -38,11 +38,18 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-// todo comment
 public class FactoryInterestPoint {
 
+	/**
+	 * Wraps {@link GeneralFeatureDetector} inside an {@link InterestPointDetector}.
+	 *
+	 * @param feature Feature detector.
+	 * @param inputType Image type of input image.
+	 * @param inputType Image type for gradient.
+	 * @return The interest point detector.
+	 */
 	public static <T extends ImageBase, D extends ImageBase >
-	InterestPointDetector<T> fromCorner( GeneralFeatureDetector<T,D> feature, Class<T> inputType , Class<D> derivType) {
+	InterestPointDetector<T> wrapCorner(GeneralFeatureDetector<T, D> feature, Class<T> inputType, Class<D> derivType) {
 
 		ImageGradient<T,D> gradient = null;
 		ImageHessian<D> hessian = null;
@@ -58,10 +65,18 @@ public class FactoryInterestPoint {
 		return new WrapCornerToInterestPoint<T,D>(feature,gradient,hessian,derivativeGenerator);
 	}
 
+	/**
+	 * Wraps {@link FeatureLaplaceScaleSpace} inside an {@link InterestPointDetector}.
+	 *
+	 * @param feature Feature detector.
+	 * @param scales Scales at which features are detected at.
+	 * @param inputType Image type of input image.
+	 * @return The interest point detector.
+	 */
 	public static <T extends ImageBase, D extends ImageBase >
-	InterestPointDetector<T> fromFeatureLaplace( FeatureLaplaceScaleSpace<T,D> feature,
-												 double []scales ,
-												 Class<T> inputType ) {
+	InterestPointDetector<T> wrapDetector(FeatureLaplaceScaleSpace<T, D> feature,
+										  double[] scales,
+										  Class<T> inputType) {
 
 		GaussianScaleSpace<T,D> ss = FactoryGaussianScaleSpace.nocache(inputType);
 		ss.setScales(scales);
@@ -69,20 +84,36 @@ public class FactoryInterestPoint {
 		return new WrapFLSStoInterestPoint<T,D>(feature,ss);
 	}
 
+	/**
+	 * Wraps {@link FeatureScaleSpace} inside an {@link InterestPointDetector}.
+	 *
+	 * @param feature Feature detector.
+	 * @param scales Scales at which features are detected at.
+	 * @param inputType Image type of input image.
+	 * @return The interest point detector.
+	 */
 	public static <T extends ImageBase, D extends ImageBase >
-	InterestPointDetector<T> fromFeatureLaplace( FeatureLaplacePyramid<T,D> feature,
-												 double []scales ,
-												 Class<T> inputType ) {
+	InterestPointDetector<T> wrapDetector(FeatureLaplacePyramid<T, D> feature,
+										  double[] scales,
+										  Class<T> inputType) {
 
 		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(inputType,scales);
 
 		return new WrapFLPtoInterestPoint<T,D>(feature,ss);
 	}
 
+	/**
+	 * Wraps {@link FeatureScaleSpace} inside an {@link InterestPointDetector}.
+	 *
+	 * @param feature Feature detector.
+	 * @param scales Scales at which features are detected at.
+	 * @param inputType Image type of input image.
+	 * @return The interest point detector.
+	 */
 	public static <T extends ImageBase, D extends ImageBase >
-	InterestPointDetector<T> fromFeature( FeatureScaleSpace<T,D> feature,
-											double []scales ,
-											Class<T> inputType ) {
+	InterestPointDetector<T> wrapDetector(FeatureScaleSpace<T, D> feature,
+										  double[] scales,
+										  Class<T> inputType) {
 
 		GaussianScaleSpace<T,D> ss = FactoryGaussianScaleSpace.nocache(inputType);
 		ss.setScales(scales);
@@ -90,11 +121,18 @@ public class FactoryInterestPoint {
 		return new WrapFSStoInterestPoint<T,D>(feature,ss);
 	}
 
-
+	/**
+	 * Wraps {@link FeaturePyramid} inside an {@link InterestPointDetector}.
+	 *
+	 * @param feature Feature detector.
+	 * @param scales Scales at which features are detected at.
+	 * @param inputType Image type of input image.
+	 * @return The interest point detector.
+	 */
 	public static <T extends ImageBase, D extends ImageBase >
-	InterestPointDetector<T> fromFeature( FeaturePyramid<T,D> feature,
-										  double []scales ,
-										  Class<T> inputType ) {
+	InterestPointDetector<T> wrapDetector(FeaturePyramid<T, D> feature,
+										  double[] scales,
+										  Class<T> inputType) {
 
 		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(inputType,scales);
 
@@ -102,7 +140,10 @@ public class FactoryInterestPoint {
 	}
 
 	/**
-	 * Detects features using a Fast Hessian detector as described in the SURF paper.
+	 * Creates a {@link FastHessianFeatureDetector} detector which is wrapped inside
+	 * an {@link InterestPointDetector}
+	 *
+	 * @see FastHessianFeatureDetector
 	 *
 	 * @param threshold Minimum feature intensity.
 	 * @param nonMaxRadius Radius used for non-max-suppression.  Typically 1 or 2.
@@ -110,14 +151,15 @@ public class FactoryInterestPoint {
 	 * @param initialSampleSize How often pixels are sampled in the first octave.  Typically 1 or 2.
 	 * @param initialSize Typically 9.
 	 * @param numberScalesPerOctave Typically 4.
-	 * @param numberOfOctaves Typically 4.	@return Fast hessian detector.
+	 * @param numberOfOctaves Typically 4.
+	 * @return The interest point detector.
 	 */
 	public static <T extends ImageBase>
-	InterestPointDetector<T> fromFastHessian(float threshold,
-											 int nonMaxRadius, int maxFeaturesPerScale,
-											 int initialSampleSize, int initialSize,
-											 int numberScalesPerOctave,
-											 int numberOfOctaves)
+	InterestPointDetector<T> fastHessian(float threshold,
+										 int nonMaxRadius, int maxFeaturesPerScale,
+										 int initialSampleSize, int initialSize,
+										 int numberScalesPerOctave,
+										 int numberOfOctaves)
 	{
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(nonMaxRadius, threshold, 5, false, true);
 		FastHessianFeatureDetector<T> feature = new FastHessianFeatureDetector<T>(extractor,maxFeaturesPerScale,

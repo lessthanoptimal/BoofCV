@@ -46,14 +46,20 @@ public class ExampleInterestPoint {
 	void detect( BufferedImage image , Class<T> imageType ) {
 		T input = ConvertBufferedImage.convertFrom(image,null,imageType);
 
-		// create a Fast Hessian detector from the SURF paper.
+		// Create a Fast Hessian detector from the SURF paper.
 		// Other detectors can be used in this example too.
-		InterestPointDetector<T> detector = FactoryInterestPoint.fromFastHessian(10, 2, 100,2,9,3,4);
+		InterestPointDetector<T> detector = FactoryInterestPoint.fastHessian(10, 2, 100, 2, 9, 3, 4);
 
 		// find interest points in the image
 		detector.detect(input);
 
-		// Draw the features
+		// Show the features
+		displayResults(image, detector);
+	}
+
+	private static <T extends ImageBase> void displayResults(BufferedImage image,
+															 InterestPointDetector<T> detector)
+	{
 		Graphics2D g2 = image.createGraphics();
 		FancyInterestPointRender render = new FancyInterestPointRender();
 
@@ -73,7 +79,7 @@ public class ExampleInterestPoint {
 
 		// just draw the features onto the input image
 		render.draw(g2);
-		ShowImages.showWindow(image,"Detected Features");
+		ShowImages.showWindow(image, "Detected Features");
 	}
 
 	public static void main( String args[] ) {
