@@ -49,7 +49,7 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 	}
 
 	@Override
-	public int getRadius() {
+	public int getCanonicalRadius() {
 		return surf.getRadius();
 	}
 

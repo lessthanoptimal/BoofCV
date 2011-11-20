@@ -20,6 +20,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
@@ -73,6 +74,11 @@ public class WrapFHtoInterestPoint<T extends ImageBase> implements InterestPoint
 	@Override
 	public double getOrientation(int featureIndex) {
 		return 0;
+	}
+
+	@Override
+	public double getCanonicalRadius() {
+		return BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
 	}
 
 	@Override

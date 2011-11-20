@@ -39,7 +39,7 @@ public class WrapDescribeBriefSo<T extends ImageBase> implements DescribeRegionP
 	}
 
 	@Override
-	public int getRadius() {
+	public int getCanonicalRadius() {
 		return alg.getDefinition().radius;
 	}
 

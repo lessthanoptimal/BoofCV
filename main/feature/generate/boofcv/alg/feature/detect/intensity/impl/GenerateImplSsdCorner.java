@@ -135,7 +135,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t}\n"+
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic int getRadius() {\n" +
+				"\tpublic int getCanonicalRadius() {\n" +
 				"\t\treturn radius;\n" +
 				"\t}\n" +
 				"\n" +

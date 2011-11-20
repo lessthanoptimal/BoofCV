@@ -27,8 +27,6 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-// TODO Change scale into size in pixels. Or maybe radius in pixels.
-// todo make scale a manditory feature.  even corner detectors have "scale" its the detector region size
 public interface InterestPointDetector< T extends ImageBase> {
 
 	/**
@@ -46,7 +44,12 @@ public interface InterestPointDetector< T extends ImageBase> {
 	int getNumberOfFeatures();
 
 	/**
+	 * <p>
 	 * The center location of the feature inside the image.
+	 * </p>
+	 * <p>
+	 * WARNING: Do not save the returned reference since it might get overwritten.
+	 * </p>
 	 *
 	 * @param featureIndex The feature's index.
 	 * @return Location of the feature in image pixels.
@@ -54,15 +57,44 @@ public interface InterestPointDetector< T extends ImageBase> {
 	Point2D_F64 getLocation( int featureIndex );
 
 	/**
-	 * The
-	 * @param featureIndex
-	 * @return
+	 * The scale of the feature relative to the canonical size. To get the size in pixels
+	 * multiply the scale by the canonical radius.  If scale is not supported by the detector
+	 * then 1 is always returned.
+	 *
+	 * @see #getCanonicalRadius()
+	 *
+	 * @param featureIndex Feature whose scale is being requested.
+	 * @return Size of the interest point relative to canonical size.
 	 */
 	double getScale( int featureIndex );
 
+	/**
+	 * Returns the features found orientation.   If orientation is not supported by the detector then
+	 * 0 is always returned.
+	 *
+	 * @param featureIndex Feature whose
+	 * @return Orientation in radians.
+	 */
 	double getOrientation( int featureIndex );
 
+	/**
+	 * The radius of a feature at a scale of one in pixels.
+	 *
+	 * @return Size of a feature at scale one in pixels.
+	 */
+	double getCanonicalRadius();
+
+	/**
+	 * Does the interest point detector have scale information
+	 *
+	 * @return true if it has scale information and false otherwise
+	 */
 	public boolean hasScale();
 
+	/**
+	 * If the interest point detector estimates the feature's orientation
+	 *
+	 * @return true if it estimates the orientation
+	 */
 	public boolean hasOrientation();
 }

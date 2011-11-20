@@ -123,12 +123,17 @@ public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase
 
 	@Override
 	public double getScale(int featureIndex) {
-		throw new IllegalArgumentException("Not supported");
+		return 1;
 	}
 
 	@Override
 	public double getOrientation(int featureIndex) {
-		throw new IllegalArgumentException("Not supported");
+		return 0;
+	}
+
+	@Override
+	public double getCanonicalRadius() {
+		return 2;// TODO should set something better here
 	}
 
 	@Override

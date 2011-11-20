@@ -185,7 +185,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 				Point2D_F64 pt = detector.getLocation(i);
 				double scale = detector.getScale(i);
 				if( describe.requiresOrientation() ) {
-					orientation.setRadius((int)(describe.getRadius()*scale));
+					orientation.setRadius((int)(describe.getCanonicalRadius()*scale));
 					yaw = orientation.compute(pt.x,pt.y);
 				}
 
@@ -196,7 +196,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 				}
 			}
 		} else {
-			orientation.setRadius(describe.getRadius());
+			orientation.setRadius(describe.getCanonicalRadius());
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 				double yaw = 0;
 

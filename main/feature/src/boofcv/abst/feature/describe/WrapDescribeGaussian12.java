@@ -43,7 +43,7 @@ public class WrapDescribeGaussian12<T extends ImageBase, D extends ImageBase>
 	}
 
 	@Override
-	public int getRadius() {
+	public int getCanonicalRadius() {
 		return steer.getRadius();
 	}
 

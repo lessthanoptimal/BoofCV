@@ -19,7 +19,7 @@ public class TestPolynomialSolver {
 	 * Provide a simple test case where one of the roots should be real
 	 */
 	@Test
-	public void polynomialRoots() {
+	public void polynomialRootsEVD() {
 		Complex64F[] roots = PolynomialSolver.polynomialRootsEVD(4, 3, 2, 1);
 
 		int numReal = 0;

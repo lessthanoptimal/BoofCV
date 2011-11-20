@@ -45,7 +45,7 @@ public interface DescribeRegionPoint<T extends ImageBase> {
 	/**
 	 * Returns the description's radius at a scale of 1
 	 */
-	public int getRadius();
+	public int getCanonicalRadius();
 
 	/**
 	 * Extract feature information from point at the specified scale.
