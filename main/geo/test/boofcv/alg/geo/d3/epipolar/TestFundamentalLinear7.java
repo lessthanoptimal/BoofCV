@@ -30,7 +30,7 @@ public class TestFundamentalLinear7 extends CommonFundamentalChecks{
 
 			SimpleMatrix F = F1.scale(alpha).plus(F2.scale(1 - alpha));
 
-			System.out.println("det = "+F.determinant()+"  F1 = "+F1.determinant());
+//			System.out.println("det = "+F.determinant()+"  F1 = "+F1.determinant());
 
 			assertEquals(0, F.determinant(), 1e-8);
 		}
