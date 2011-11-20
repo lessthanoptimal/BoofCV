@@ -97,14 +97,14 @@ public class PolynomialSolver {
 		d /= norm;
 
 		// proceed with standard algorithm
-		double insideLeft = c*(2*c*c - 9*d*b) + 27*d*d*a;
+		double insideLeft = 2*c*c*c - 9*d*c*b + 27*d*d*a;
 		double temp = c*c-3*d*b;
 		double insideOfSqrt = insideLeft*insideLeft - 4*temp*temp*temp;
 
 		if( insideOfSqrt >= 0 ) {
 			double insideRight = Math.sqrt(insideOfSqrt );
 
-			double ret = c/d +
+			double ret = c +
 					root3(0.5*(insideLeft+insideRight)) +
 					root3(0.5*(insideLeft-insideRight));
 
