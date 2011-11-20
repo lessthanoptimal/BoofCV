@@ -137,11 +137,13 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 		final InterestPointDetector<T> det = (InterestPointDetector<T>)cookie;
 		det.detect(corruptImage);
 
+		double detectorRadius = det.getCanonicalRadius();
+
 		render.reset();
 		if( det.hasScale() ) {
 			for( int i = 0; i < det.getNumberOfFeatures(); i++ ) {
 				Point2D_F64 p = det.getLocation(i);
-				int radius = (int)Math.ceil(det.getScale(i)*2.5);
+				int radius = (int)Math.ceil(det.getScale(i)*detectorRadius);
 				render.addCircle((int)p.x,(int)p.y,radius);
 			}
 		} else {

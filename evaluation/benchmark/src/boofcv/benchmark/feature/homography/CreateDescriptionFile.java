@@ -174,7 +174,7 @@ public class CreateDescriptionFile<T extends ImageBase> {
 //		DescribeRegionPoint<T> alg = DescribePointSamples.create(imageType);
 //		DescribeRegionPoint<T> alg = DescribeSampleDifference.create(imageType);
 
-		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(alg.getRadius(),imageType);
+		OrientationImage<T> orientation = FactoryOrientationAlgs.nogradient(alg.getCanonicalRadius(),imageType);
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLEDIFF");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"SAMPLE");
 //		CreateDescriptionFile<T> cdf = new CreateDescriptionFile<T>(alg,orientation,imageType,"BoofCV_SURF");

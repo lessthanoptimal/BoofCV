@@ -190,6 +190,7 @@ public class DescribePointSurf<II extends ImageBase> {
 	}
 
 	public int getRadius() {
-		return (widthLargeGrid*widthSubRegion+widthSample)/2;
+		int ret = widthLargeGrid*widthSubRegion+widthSample;
+		return ret/2 + ret%2;
 	}
 }

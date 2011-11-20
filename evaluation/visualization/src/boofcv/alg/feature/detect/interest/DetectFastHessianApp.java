@@ -25,6 +25,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
@@ -60,7 +61,7 @@ public class DetectFastHessianApp {
 
 		System.out.println("total features found: "+det.getFoundPoints().size());
 
-		VisualizeFeatures.drawScalePoints(input.createGraphics(),det.getFoundPoints(),2.5);
+		VisualizeFeatures.drawScalePoints(input.createGraphics(),det.getFoundPoints(), BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
 
 		ShowImages.showWindow(input,"Found Features: "+imageType.getSimpleName());
 	}

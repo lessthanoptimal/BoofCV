@@ -63,13 +63,15 @@ public class ExampleInterestPoint {
 		Graphics2D g2 = image.createGraphics();
 		FancyInterestPointRender render = new FancyInterestPointRender();
 
+		double detectorRadius = detector.getCanonicalRadius();
+
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			Point2D_F64 pt = detector.getLocation(i);
 
 			// note how it checks the capabilities of the detector
 			if( detector.hasScale() ) {
 				double scale = detector.getScale(i);
-				render.addCircle((int)pt.x,(int)pt.y,(int)(scale*2.5));
+				render.addCircle((int)pt.x,(int)pt.y,(int)(scale*detectorRadius));
 			} else {
 				render.addPoint((int) pt.x, (int) pt.y);
 			}

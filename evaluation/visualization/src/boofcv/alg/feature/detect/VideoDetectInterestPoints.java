@@ -71,12 +71,14 @@ public class VideoDetectInterestPoints<T extends ImageBase>
 		if( orientation != null )
 			orientation.setImage(origImage);
 
+		double detectorRadius = detector.getCanonicalRadius();
+
 		render.reset();
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			Point2D_F64 pt = detector.getLocation(i);
 			double scale = detector.getScale(i);
 
-			int radius = (int)(3*scale);
+			int radius = (int)Math.round(detectorRadius*scale);
 
 			if( orientation != null ) {
 				orientation.setScale(scale);

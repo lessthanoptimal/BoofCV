@@ -27,6 +27,7 @@ import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.ScaleSpacePyramidPointPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
@@ -41,7 +42,7 @@ public class DetectFeaturePyramidApp <T extends ImageBase, D extends ImageBase>
 		extends SelectAlgorithmImagePanel implements ProcessInput
 {
 	static int NUM_FEATURES = 100;
-	int r = 2;
+
 	ScaleSpacePyramid<T> ss;
 	Class<T> imageType;
 	ScaleSpacePyramidPointPanel panel;
@@ -51,6 +52,7 @@ public class DetectFeaturePyramidApp <T extends ImageBase, D extends ImageBase>
 		super(1);
 		this.imageType = imageType;
 
+		int r = 2;
 		addAlgorithm(0, "Hessian Laplace",FactoryInterestPointAlgs.hessianLaplacePyramid(r,1f,NUM_FEATURES,imageType,derivType));
 		addAlgorithm(0, "Harris Laplace",FactoryInterestPointAlgs.harrisLaplacePyramid(r,1f,NUM_FEATURES,imageType,derivType));
 		addAlgorithm(0, "Hessian",FactoryInterestPointAlgs.hessianPyramid(r,1,NUM_FEATURES,imageType,derivType));
@@ -58,7 +60,7 @@ public class DetectFeaturePyramidApp <T extends ImageBase, D extends ImageBase>
 
 		ss = new ScaleSpacePyramid<T>(imageType,1,1.5,2,3,4,8,12,16,24);
 
-		panel = new ScaleSpacePyramidPointPanel(ss,r);
+		panel = new ScaleSpacePyramidPointPanel(ss, BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
 
 		setMainGUI(panel);
 	}

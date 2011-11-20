@@ -27,6 +27,7 @@ import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.ScaleSpacePointPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -44,7 +45,7 @@ public class DetectFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase
 {
 
 	static int NUM_FEATURES = 80;
-	int r = 2;
+
 	GaussianScaleSpace<T,D> ss;
 	Class<T> imageType;
 	ScaleSpacePointPanel panel;
@@ -55,6 +56,7 @@ public class DetectFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase
 		super(1);
 		this.imageType = imageType;
 
+		int r = 2;
 		addAlgorithm(0, "Hessian Laplace",FactoryInterestPointAlgs.hessianLaplace(r,1f,NUM_FEATURES,imageType,derivType));
 		addAlgorithm(0, "Harris Laplace",FactoryInterestPointAlgs.harrisLaplace(r,0.5f,NUM_FEATURES,imageType,derivType));
 		addAlgorithm(0, "Hessian",FactoryInterestPointAlgs.hessianScaleSpace(r,1f,NUM_FEATURES,imageType,derivType));
@@ -63,7 +65,7 @@ public class DetectFeatureScaleSpaceApp<T extends ImageBase, D extends ImageBase
 		ss = FactoryGaussianScaleSpace.nocache(imageType);
 		ss.setScales(1,1.5,2,3,4,8,12,16,24);
 
-		panel = new ScaleSpacePointPanel(ss,r);
+		panel = new ScaleSpacePointPanel(ss, BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
 		levelPanel = new SelectScaleSpacePanel(ss,panel);
 
 		add(levelPanel, BorderLayout.WEST);

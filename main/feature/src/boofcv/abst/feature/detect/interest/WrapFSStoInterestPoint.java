@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.FeatureScaleSpace;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageBase;
@@ -71,6 +72,11 @@ public class WrapFSStoInterestPoint<T extends ImageBase, D extends ImageBase> im
 	@Override
 	public double getOrientation(int featureIndex) {
 		throw new IllegalArgumentException("Not supported");
+	}
+
+	@Override
+	public double getCanonicalRadius() {
+		return BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
 	}
 
 	@Override

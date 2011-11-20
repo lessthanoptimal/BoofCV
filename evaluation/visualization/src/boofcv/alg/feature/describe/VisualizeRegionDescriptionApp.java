@@ -131,7 +131,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 		if( pt == null || radius < 1) {
 			tuplePanel.setDescription(null);
 		} else {
-			double scale = radius/describe.getRadius();
+			double scale = radius/describe.getCanonicalRadius();
 
 			TupleDesc_F64 feature = describe.process(pt.x,pt.y,orientation,scale,null);
 			tuplePanel.setDescription(feature);

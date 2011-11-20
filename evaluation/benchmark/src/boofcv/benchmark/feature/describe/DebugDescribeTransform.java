@@ -40,7 +40,7 @@ public class DebugDescribeTransform {
 	public static <T extends ImageBase> void doStuff( Class<T> imageType ) {
 		DescribeRegionPoint<T> alg =  FactoryDescribeRegionPoint.surf(false, imageType);
 
-		int r = alg.getRadius()+8;
+		int r = alg.getCanonicalRadius()+8;
 		int w = r*2+1;
 
 		T orig = GeneralizedImageOps.createImage(imageType,w,w);

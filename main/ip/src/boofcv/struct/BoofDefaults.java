@@ -35,4 +35,7 @@ public class BoofDefaults {
 	public static BorderType DERIV_BORDER_TYPE = BorderType.EXTENDED;
 	public static ImageBorder_I32 DERIV_BORDER_I32 = new ImageBorder1D_I32(BorderIndex1D_Extend.class);
 	public static ImageBorder_F32 DERIV_BORDER_F32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
+
+	// multiplication factor to go from scale to pixel radius
+	public static final double SCALE_SPACE_CANONICAL_RADIUS = 2.5;
 }
