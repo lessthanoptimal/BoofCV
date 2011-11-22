@@ -56,6 +56,11 @@ public class FundamentalLinear8 {
 	// either the fundamental or essential matrix
 	protected DenseMatrix64F F = new DenseMatrix64F(3,3);
 
+	// SVD decomposition of F = U*S*V^T
+	protected DenseMatrix64F svdU;
+	protected DenseMatrix64F svdS;
+	protected DenseMatrix64F svdV;
+
 	protected DenseMatrix64F temp0 = new DenseMatrix64F(3,3);
 
 	// matrix used to normalize results
@@ -142,26 +147,26 @@ public class FundamentalLinear8 {
 	 *
 	 * @return true if svd returned true.
 	 */
-	protected boolean projectOntoEssential( DenseMatrix64F F ) {
-		if( !svd.decompose(F) ) {
+	protected boolean projectOntoEssential( DenseMatrix64F E ) {
+		if( !svd.decompose(E) ) {
 			return false;
 		}
-		DenseMatrix64F V = svd.getV(false);
-		DenseMatrix64F U = svd.getU(false);
-		DenseMatrix64F W = svd.getW(null);
+		svdV = svd.getV(false);
+		svdU = svd.getU(false);
+		svdS = svd.getW(null);
 
-		SingularOps.descendingOrder(U, false, W, V, false);
+		SingularOps.descendingOrder(svdU, false, svdS, svdV, false);
 
 		// project it into essential space
 		// the scale factor is arbitrary, but the first two singular values need
 		// to be the same.  so just set them to one
-		W.set(0,0,1);
-		W.set(1,1,1);
-		W.set(2,2,0);
+		svdS.set(0, 0, 1);
+		svdS.set(1, 1, 1);
+		svdS.set(2, 2, 0);
 
 		// recompute F
-		CommonOps.mult(U, W, temp0);
-		CommonOps.multTransB(temp0,V, F);
+		CommonOps.mult(svdU, svdS, temp0);
+		CommonOps.multTransB(temp0,svdV, E);
 
 		return true;
 	}
@@ -175,18 +180,18 @@ public class FundamentalLinear8 {
 		if( !svd.decompose(F) ) {
 			return false;
 		}
-		DenseMatrix64F V = svd.getV(false);
-		DenseMatrix64F U = svd.getU(false);
-		DenseMatrix64F W = svd.getW(null);
+		svdV = svd.getV(false);
+		svdU = svd.getU(false);
+		svdS = svd.getW(null);
 
-		SingularOps.descendingOrder(U, false, W, V, false);
+		SingularOps.descendingOrder(svdU, false, svdS, svdV, false);
 
 		// the smallest singular value needs to be set to zero, unlike
-		W.set(2,2,0);
+		svdS.set(2, 2, 0);
 
 		// recompute F
-		CommonOps.mult(U, W, temp0);
-		CommonOps.multTransB(temp0,V, F);
+		CommonOps.mult(svdU, svdS, temp0);
+		CommonOps.multTransB(temp0,svdV, F);
 
 		return true;
 	}
@@ -248,5 +253,32 @@ public class FundamentalLinear8 {
 			A.set(i,7,f_norm.y);
 			A.set(i,8,1);
 		}
+	}
+
+	/**
+	 * Returns the U from the SVD of F.
+	 *
+	 * @return U matrix.
+	 */
+	public DenseMatrix64F getSvdU() {
+		return svdU;
+	}
+
+	/**
+	 * Returns the S from the SVD of F.
+	 *
+	 * @return S matrix.
+	 */
+	public DenseMatrix64F getSvdS() {
+		return svdS;
+	}
+
+	/**
+	 * Returns the V from the SVD of F.
+	 *
+	 * @return V matrix.
+	 */
+	public DenseMatrix64F getSvdV() {
+		return svdV;
 	}
 }
