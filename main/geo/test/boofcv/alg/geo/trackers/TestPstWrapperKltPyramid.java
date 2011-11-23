@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.trackers;
 
-import boofcv.abst.feature.tracker.PointSequentialTracker;
+import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PstWrapperKltPyramid;
 import boofcv.alg.tracker.pklt.PkltManager;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
@@ -30,7 +30,7 @@ import org.junit.Before;
 /**
  * @author Peter Abeles
  */
-public class TestPstWrapperKltPyramid extends StandardPointSequentialTrackerTests{
+public class TestPstWrapperKltPyramid extends StandardImagePointTracker {
 
 	PkltManagerConfig<ImageFloat32,ImageFloat32> config;
 	PkltManager<ImageFloat32,ImageFloat32> manager;
@@ -44,7 +44,7 @@ public class TestPstWrapperKltPyramid extends StandardPointSequentialTrackerTest
 	}
 
 	@Override
-	public void trackUpdateDrop(PointSequentialTracker tracker) {
+	public void trackUpdateDrop(ImagePointTracker tracker) {
 		PkltManager<?,?> m = ((PstWrapperKltPyramid)tracker).getTrackManager();
 
 		// this will force it to drop the tracks
@@ -53,16 +53,16 @@ public class TestPstWrapperKltPyramid extends StandardPointSequentialTrackerTest
 			f.desc[0].Gyy = 0;
 			f.desc[0].Gxy = 0;
 		}
-		((PstWrapperKltPyramid)tracker).process(image);
+		tracker.process(image);
 	}
 
 	@Override
-	public void trackUpdateChangePosition(PointSequentialTracker tracker) {
-		((PstWrapperKltPyramid)tracker).process(image);
+	public void trackUpdateChangePosition(ImagePointTracker tracker) {
+		tracker.process(image);
 	}
 
 	@Override
-	public PointSequentialTracker createTracker() {
+	public ImagePointTracker createTracker() {
 		pointTracker.process(image);
 		return pointTracker;
 	}

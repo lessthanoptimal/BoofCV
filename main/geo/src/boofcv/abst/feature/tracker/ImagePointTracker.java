@@ -18,20 +18,92 @@
 
 package boofcv.abst.feature.tracker;
 
+import boofcv.alg.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 
+import java.util.List;
+
 /**
- * {@link PointSequentialTracker} which takes in a single image as input.
+ * <p>
+ * Interface for tracking point features in a sequence of images for SFM applications.
+ * </p>
+ * <p/>
+ * <p>
+ * Lower level/mundane track maintenance is handled by implementations of this interface. This
+ * includes selecting features, dropping features, and updating features. THe ability to manually
+ * add tracks has intentionally been omitted from this interface for simplicity.  If that level
+ * of control is needed then a more complex tracker should be used.
+ * </p>
+ * <p/>
+ * <p>
+ * Contract:
+ * <ul>
+ * <li> The current location of a feature in AssociatedPair will be used by the tracker if it
+ * can affect the tracking outcome. </li>
+ * <li> If a track is dropped its description will not be modified.</li>
+ * <li> Each time a new track is spawned it is given a new unique ID </li>
+ * <li> New tracks are only added when {@link #setCurrentToKeyFrame()} is called </li>
+ * <li> The location of the current frame is only modified when {@link #setCurrentToKeyFrame()} is called </li>
+ * </ul>
+ * </p>
  *
  * @author Peter Abeles
  */
-public interface ImagePointTracker <T extends ImageBase>
-		extends PointSequentialTracker
-{
+public interface ImagePointTracker <T extends ImageBase> {
+
 	/**
 	 * Process input image and perform tracking.
 	 *
-	 * @param image
+	 * @param image Next image in the sequence
 	 */
 	void process( T image );
+
+	/**
+	 * Adds a new feature to be tracked at the specified location.
+	 *
+	 * @param x coordinate of the new feature being tracked.
+	 * @param y coordinate of the new feature being tracked.
+	 * @return If a new track was added or not.
+	 */
+	public boolean addTrack( double x , double y );
+
+	/**
+	 * Automatically selects new features in the image to track.
+	 */
+	public void spawnTracks();
+
+	/**
+	 * Drops all feature currently being tracked
+	 */
+	public void dropTracks();
+
+	/**
+	 * Sets the current frame to be the key frame.  If configured to spawn new features, a new
+	 * feature will be spawned here.
+	 */
+	public void setCurrentToKeyFrame();
+
+	/**
+	 * Manually forces a track to be dropped.
+	 *
+	 * @param track The track which is to be dropped
+	 */
+	public void dropTrack(AssociatedPair track);
+
+	/**
+	 * Returns a list of active tracks.
+	 */
+	public List<AssociatedPair> getActiveTracks();
+
+	/**
+	 * Returns a list of tracks that were dropped the last time track features was
+	 * called.
+	 */
+	public List<AssociatedPair> getDroppedTracks();
+
+	/**
+	 * Returns a list of tracks that were added when {@link #setCurrentToKeyFrame()} was called.
+	 */
+	public List<AssociatedPair> getNewTracks();
 }
+

@@ -36,7 +36,7 @@ import java.util.List;
 
 
 /**
- * Wrapper around SURF features for {@link PointSequentialTracker}.
+ * Wrapper around SURF features for {@link ImagePointTracker}.
  *
  * @author Peter Abeles
  */
