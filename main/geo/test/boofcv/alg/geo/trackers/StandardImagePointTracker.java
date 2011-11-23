@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.trackers;
 
-import boofcv.abst.feature.tracker.PointSequentialTracker;
+import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
@@ -35,13 +35,13 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * Standard tests for implementations of {@link boofcv.abst.feature.tracker.PointSequentialTracker}.
+ * Standard tests for implementations of {@link boofcv.abst.feature.tracker.ImagePointTracker}.
  *
  * @author Peter Abeles
  */
-public abstract class StandardPointSequentialTrackerTests {
+public abstract class StandardImagePointTracker {
 
-	public PointSequentialTracker tracker;
+	public ImagePointTracker<?> tracker;
 	Random rand = new Random(234);
 	int width = 100;
 	int height = 80;
@@ -55,17 +55,17 @@ public abstract class StandardPointSequentialTrackerTests {
 	/**
 	 * The tracker should drop all the tracks on update
 	 */
-	public abstract void trackUpdateDrop( PointSequentialTracker tracker );
+	public abstract void trackUpdateDrop( ImagePointTracker tracker );
 
 	/**
 	 * Tracker should change the position of existing tracks
 	 */
-	public abstract void trackUpdateChangePosition( PointSequentialTracker tracker );
+	public abstract void trackUpdateChangePosition( ImagePointTracker tracker );
 
 	/**
 	 * Creates a new tracker with the specified number of tracks initially.
 	 */
-	public abstract PointSequentialTracker createTracker();
+	public abstract ImagePointTracker<?> createTracker();
 
 	@Test
 	public void spawnTracks() {

@@ -22,7 +22,10 @@ import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.abst.feature.tracker.*;
+import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.PstWrapperBrief;
+import boofcv.abst.feature.tracker.PstWrapperKltPyramid;
+import boofcv.abst.feature.tracker.PstWrapperSurf;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.alg.feature.associate.ScoreAssociation;
@@ -50,7 +53,7 @@ import java.util.Random;
 
 
 /**
- * Factory for creating trackers which implement {@link PointSequentialTracker}.
+ * Factory for creating trackers which implement {@link ImagePointTracker}.
  *
  * @author Peter Abeles
  */

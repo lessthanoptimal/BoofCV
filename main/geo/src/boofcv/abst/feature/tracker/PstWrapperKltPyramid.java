@@ -37,7 +37,7 @@ import java.util.List;
 
 
 /**
- * Wrapper around {@link boofcv.alg.tracker.pklt.PyramidKltTracker} for {@link PointSequentialTracker}
+ * Wrapper around {@link boofcv.alg.tracker.pklt.PyramidKltTracker} for {@link ImagePointTracker}
  *
  * @author Peter Abeles
  */
