@@ -69,7 +69,7 @@ public class VideoListManager<T extends ImageBase> implements InputListManager {
 	public SimpleImageSequence<T> loadSequence( int labelIndex , int imageIndex ) {
 		String type = videoType.get(labelIndex);
 		if( type == null || type.compareToIgnoreCase("video") == 0 ) {
-			return BuboVideoManager.loadManagerDefault().load(fileNames.get(labelIndex)[imageIndex], imageType);
+			return BoofVideoManager.loadManagerDefault().load(fileNames.get(labelIndex)[imageIndex], imageType);
 		} else if( type.compareToIgnoreCase("JPEG_ZIP") == 0 ) {
 			try {
 				VideoJpegZipCodec codec = new VideoJpegZipCodec();

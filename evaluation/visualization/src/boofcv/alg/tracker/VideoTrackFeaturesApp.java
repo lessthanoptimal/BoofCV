@@ -18,9 +18,8 @@
 
 package boofcv.alg.tracker;
 
-import boofcv.abst.feature.tracker.PointSequentialTracker;
+import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.SingleImageInput;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.ProcessInput;
@@ -51,7 +50,7 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 	int maxFeatures = 130;
 	int minFeatures = 90;
 
-	PointSequentialTracker<I> tracker;
+	ImagePointTracker<I> tracker;
 
 	ImagePanel gui = new ImagePanel();
 
@@ -63,7 +62,6 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 		PkltManagerConfig<I, D> config =
 				PkltManagerConfig.createDefault(imageType,derivType);
 		config.maxFeatures = maxFeatures;
-		config.minFeatures = minFeatures;
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
@@ -100,7 +98,7 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 		
 		stopWorker();
 
-		tracker = (PointSequentialTracker<I>)cookie;
+		tracker = (ImagePointTracker<I>)cookie;
 		sequence.reset();
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -140,7 +138,7 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 
 	@Override
 	protected void updateAlg(I frame) {
-		((SingleImageInput<I>)tracker).process(frame);
+		tracker.process(frame);
 
 		if( tracker.getActiveTracks().size() < minFeatures ) {
 			tracker.spawnTracks();

@@ -26,7 +26,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ProcessImageSequence;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.video.BuboVideoManager;
+import boofcv.io.video.BoofVideoManager;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
@@ -99,7 +99,7 @@ public class VideoShowImageHessian extends ProcessImageSequence<ImageUInt8> {
 		} else {
 			fileName = args[0];
 		}
-		SimpleImageSequence<ImageUInt8> sequence = BuboVideoManager.loadManagerDefault().load(fileName, ImageUInt8.class);
+		SimpleImageSequence<ImageUInt8> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageUInt8.class);
 
 		ImageHessianDirect<ImageUInt8, ImageSInt16> hessian = FactoryDerivative.hessianDirectSobel_I8();
 

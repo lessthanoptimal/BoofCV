@@ -144,4 +144,15 @@ public class BoofMiscOps {
 
 		return b.isInBounds((int) x, (int) y);
 	}
+
+	public static void pause(int milli) {
+		Thread t = Thread.currentThread();
+		synchronized( t )  {
+			try {
+				t.wait(milli);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
 }

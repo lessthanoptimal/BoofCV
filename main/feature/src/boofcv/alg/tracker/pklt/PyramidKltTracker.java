@@ -25,9 +25,9 @@ import boofcv.struct.pyramid.ImagePyramid;
 
 /**
  * <p>
- * A pyramid KLT tracker that allows features to be tracker over a larger region than the basic ({@link KltTracker})
- * implementation.  A feature is tracked at multiple resolutions, large motions can be detected at low resolution and
- * are refined at higher resolutions.
+ * A pyramid Kanade-Lucas-Tomasi (KLT) tracker that allows features to be tracker over a larger region than the basic
+ * ({@link KltTracker}) implementation.  A feature is tracked at multiple resolutions, large motions can
+ * be detected at low resolution and are refined at higher resolutions.
  * </p>
  * <p/>
  * <p>
