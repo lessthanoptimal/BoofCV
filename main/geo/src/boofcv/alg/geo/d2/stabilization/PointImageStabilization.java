@@ -18,12 +18,11 @@
 
 package boofcv.alg.geo.d2.stabilization;
 
-import boofcv.abst.feature.tracker.PointSequentialTracker;
+import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.SingleImageInput;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -63,7 +62,7 @@ import java.util.List;
 public class PointImageStabilization<I extends ImageBase > {
 
 	// tracks point features in the image
-	private PointSequentialTracker<I> tracker;
+	private ImagePointTracker<I> tracker;
 
 	// computes the image motion robustly
 	private ModelMatcher<Affine2D_F64,AssociatedPair> fitter;
@@ -94,14 +93,11 @@ public class PointImageStabilization<I extends ImageBase > {
 	private ImageBorder<I> border;
 
 	public PointImageStabilization( Class<I> imageType ,
-								  PointSequentialTracker tracker ,
+								  ImagePointTracker tracker ,
 								  ModelMatcher<Affine2D_F64,AssociatedPair> fitter ,
 								  int thresholdChange ,
 								  int thresholdReset ,
 								  double thresholdDistance ) {
-		if( !SingleImageInput.class.isAssignableFrom(tracker.getClass()) ) {
-			throw new IllegalArgumentException("Tracker must implement "+SingleImageInput.class);
-		}
 
 		InterpolatePixel<I> bilinear = FactoryInterpolation.bilinearPixel(imageType);
 //		border = FactoryImageBorder.value(imageType, 0);
@@ -130,7 +126,7 @@ public class PointImageStabilization<I extends ImageBase > {
 		}
 
 		// track
-		((SingleImageInput<I>)tracker).process(input);
+		tracker.process(input);
 
 		List<AssociatedPair> tracks = tracker.getActiveTracks();
 //		System.out.println("active tracks = "+tracks.size());
@@ -191,7 +187,7 @@ public class PointImageStabilization<I extends ImageBase > {
 		return imageOut;
 	}
 
-	public PointSequentialTracker<I> getTracker() {
+	public ImagePointTracker<I> getTracker() {
 		return tracker;
 	}
 

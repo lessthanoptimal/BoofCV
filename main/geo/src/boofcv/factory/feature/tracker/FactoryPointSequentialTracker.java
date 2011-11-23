@@ -22,10 +22,7 @@ import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.abst.feature.tracker.PointSequentialTracker;
-import boofcv.abst.feature.tracker.PstWrapperBrief;
-import boofcv.abst.feature.tracker.PstWrapperKltPyramid;
-import boofcv.abst.feature.tracker.PstWrapperSurf;
+import boofcv.abst.feature.tracker.*;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.alg.feature.associate.ScoreAssociation;
@@ -69,7 +66,7 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageBase, D extends ImageBase>
-	PointSequentialTracker<I> klt( int maxFeatures , int scaling[] , Class<I> imageType , Class<D> derivType )
+	ImagePointTracker<I> klt( int maxFeatures , int scaling[] , Class<I> imageType , Class<D> derivType )
 	{
 		PkltManagerConfig<I, D> config =
 				PkltManagerConfig.createDefault(imageType,derivType);
@@ -87,7 +84,7 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageBase, D extends ImageBase>
-	PointSequentialTracker<I> klt( PkltManagerConfig<I, D> config )
+	ImagePointTracker<I> klt( PkltManagerConfig<I, D> config )
 	{
 		PkltManager<I, D> trackManager = new PkltManager<I, D>(config);
 
@@ -106,7 +103,7 @@ public class FactoryPointSequentialTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageBase,II extends ImageBase>
-	PointSequentialTracker<I> surf( int maxMatches , int detectPerScale , int minSeparation ,
+	ImagePointTracker<I> surf( int maxMatches , int detectPerScale , int minSeparation ,
 									Class<I> imageType )
 	{
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -132,7 +129,7 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType Type of image being processed.
 	 */
 	public static <I extends ImageBase>
-	PointSequentialTracker<I> brief( int maxFeatures , int maxAssociationError , int pixelDetectTol , Class<I> imageType ) {
+	ImagePointTracker<I> brief( int maxFeatures , int maxAssociationError , int pixelDetectTol , Class<I> imageType ) {
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 		GeneralFeatureDetector<I,?> fast = FactoryCornerDetector.createFast(3, pixelDetectTol, maxFeatures, imageType);

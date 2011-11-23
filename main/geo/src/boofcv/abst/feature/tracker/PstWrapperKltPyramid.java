@@ -20,7 +20,6 @@ package boofcv.abst.feature.tracker;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.SingleImageInput;
 import boofcv.alg.tracker.pklt.PkltManager;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.alg.tracker.pklt.PyramidKltFeature;
@@ -43,7 +42,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
-		implements PointSequentialTracker<I>, SingleImageInput<I>
+		implements ImagePointTracker<I>
 {
 
 	PkltManager<I,D> trackManager;
@@ -81,9 +80,6 @@ public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
 		this.inputPyramidUpdater = inputPyramidUpdater;
 
 		PkltManagerConfig<I, D> config = trackManager.getConfig();
-
-		// force the min number of features to be zero to prevent automatic feature spawning
-		config.minFeatures = 0;
 
 		// declare the image pyramid
 		basePyramid = new PyramidDiscrete<I>(config.typeInput,true,config.pyramidScaling);

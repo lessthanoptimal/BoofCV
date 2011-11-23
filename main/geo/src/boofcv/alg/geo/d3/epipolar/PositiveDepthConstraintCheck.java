@@ -29,7 +29,7 @@ import georegression.transform.se.SePointOps_F64;
 /**
  * <p>
  * Given two views of the same point and a known 3D transform checks to see if the point is in front
- * of both cameras.  This is the stereo depth constraint.  A class is provided instead of a function
+ * of both cameras.  This is the positive depth constraint.  A class is provided instead of a function
  * to reduce computational overhead each time the function is called.  Memory only needs to be
  * declared once.
  * </p>
@@ -41,7 +41,7 @@ import georegression.transform.se.SePointOps_F64;
  *
  * @author Peter Abeles
  */
-public class StereoDepthConstraintCheck {
+public class PositiveDepthConstraintCheck {
 	// pre-declare all data structure for faster bulk computations
 
 	// the origin of the 3D coordinate system

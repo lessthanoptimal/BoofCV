@@ -34,7 +34,7 @@ import java.util.List;
  * <p>
  * Decomposed the essential matrix into a rigid body motion, rotation and translation.  A total
  * of four possible motions will be found and the ambiguity can be removed by calling
- * {@link StereoDepthConstraintCheck} on each hypothesis.
+ * {@link PositiveDepthConstraintCheck} on each hypothesis.
  * </p>
  *
  * <p>

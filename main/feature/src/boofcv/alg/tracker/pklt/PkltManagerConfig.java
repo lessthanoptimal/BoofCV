@@ -30,10 +30,8 @@ import boofcv.struct.image.ImageBase;
 public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
 	/** configuration for low level KLT tracker */
 	public KltConfig config;
-	/** Maximum number of features it can track */
+	/** Maximum number of features it can track.  Determines how many features are spawned */
 	public int maxFeatures;
-	/** Minimum number of features it tracks before more are spawned */
-	public int minFeatures;
 	/** The radius of each feature. 3 is a reasonable number. */
 	public int featureRadius;
 
@@ -60,7 +58,6 @@ public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
 
 		ret.config = KltConfig.createDefault();
 		ret.maxFeatures = 200;
-		ret.minFeatures = 100;
 		ret.featureRadius = 2;
 		ret.pyramidScaling = new int[]{1,2,4};
 

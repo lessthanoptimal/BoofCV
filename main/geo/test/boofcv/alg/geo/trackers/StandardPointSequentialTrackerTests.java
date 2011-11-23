@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class StandardPointSequentialTrackerTests {
 
-	public PointSequentialTracker<?> tracker;
+	public PointSequentialTracker tracker;
 	Random rand = new Random(234);
 	int width = 100;
 	int height = 80;

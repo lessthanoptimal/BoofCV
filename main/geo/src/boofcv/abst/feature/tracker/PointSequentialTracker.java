@@ -20,7 +20,6 @@ package boofcv.abst.feature.tracker;
 
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.struct.image.ImageBase;
 
 import java.util.List;
 
@@ -51,7 +50,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface PointSequentialTracker<T extends ImageBase> {
+public interface PointSequentialTracker {
 
 	/**
 	 * Adds a new feature to be tracked at the specified location.

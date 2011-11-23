@@ -16,22 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo;
+package boofcv.abst.feature.tracker;
 
 import boofcv.struct.image.ImageBase;
 
-
 /**
- * Generic interface for classes which take a single image as an input.
+ * {@link PointSequentialTracker} which takes in a single image as input.
  *
  * @author Peter Abeles
  */
-public interface SingleImageInput <T extends ImageBase> {
-
+public interface ImagePointTracker <T extends ImageBase>
+		extends PointSequentialTracker
+{
 	/**
-	 * Process the next image.
+	 * Process input image and perform tracking.
 	 *
-	 * @param image Input image.
+	 * @param image
 	 */
-	public void process( T image );
+	void process( T image );
 }

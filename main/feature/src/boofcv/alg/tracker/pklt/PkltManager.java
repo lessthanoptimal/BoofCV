@@ -143,11 +143,6 @@ public class PkltManager<I extends ImageBase, D extends ImageBase> {
 				tracker.setDescription(f);
 			}
 		}
-
-		// if there are too few features spawn new ones
-		if( active.size() < config.minFeatures ) {
-			spawnTracks( image , derivX , derivY );
-		}
 	}
 
 	/**

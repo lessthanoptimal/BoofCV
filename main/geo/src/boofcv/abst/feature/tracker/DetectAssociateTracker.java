@@ -19,7 +19,6 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.SingleImageInput;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageBase;
@@ -40,7 +39,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public abstract class DetectAssociateTracker<I extends ImageBase, D >
-		implements PointSequentialTracker<I> , SingleImageInput<I> {
+		implements ImagePointTracker<I> {
 
 	// location of interest points
 	private FastQueue<Point2D_F64> locDst = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);

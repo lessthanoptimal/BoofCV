@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestStereoDepthConstraintCheck {
+public class TestPositiveDepthConstraintCheck {
 
 	/**
 	 * Point a point in front of both cameras and see if it returns true
@@ -38,7 +38,7 @@ public class TestStereoDepthConstraintCheck {
 		Point3D_F64 pt_inB = SePointOps_F64.transform(fromAtoB,pt,null);
 		Point2D_F64 obsB = new Point2D_F64(pt_inB.x/pt_inB.z,pt_inB.y/pt_inB.z);
 
-		StereoDepthConstraintCheck alg = new StereoDepthConstraintCheck();
+		PositiveDepthConstraintCheck alg = new PositiveDepthConstraintCheck();
 
 		assertTrue(alg.checkConstraint(obsA,obsB,fromBtoA));
 	}
@@ -48,12 +48,12 @@ public class TestStereoDepthConstraintCheck {
 	 */
 	@Test
 	public void testNegative() {
-		// create transform from A to N
+		// create transform from B to A
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0, -0.05, 0, null);
 		Vector3D_F64 T = new Vector3D_F64(1,0,0);
 
 		Se3_F64 fromBtoA = new Se3_F64(R,T);
-		// transform from B to A
+		// transform from A to B
 		Se3_F64 fromAtoB = fromBtoA.invert(null);
 
 		// point in front of both cameras
@@ -64,7 +64,7 @@ public class TestStereoDepthConstraintCheck {
 		Point3D_F64 pt_inB = SePointOps_F64.transform(fromAtoB,pt,null);
 		Point2D_F64 obsB = new Point2D_F64(pt_inB.x/pt_inB.z,pt_inB.y/pt_inB.z);
 
-		StereoDepthConstraintCheck alg = new StereoDepthConstraintCheck();
+		PositiveDepthConstraintCheck alg = new PositiveDepthConstraintCheck();
 
 		assertFalse(alg.checkConstraint(obsA, obsB, fromBtoA));
 	}

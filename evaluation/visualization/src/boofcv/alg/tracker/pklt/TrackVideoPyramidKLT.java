@@ -31,12 +31,11 @@ import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.gui.image.DiscretePyramidPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ProcessImageSequence;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.video.BuboVideoManager;
+import boofcv.io.video.BoofVideoManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -56,8 +55,10 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 
 	private PkltManager<I, D> tracker;
 
+	final static int maxFeatures = 100;
+	final static int minFeatures = 80;
+
 	ImagePanel panel;
-	DiscretePyramidPanel pyramidPanel;
 	int totalRespawns;
 
 	ImageGradient<I,D> gradient;
@@ -92,6 +93,9 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 		PyramidOps.gradient(basePyramid, gradient, derivX,derivY);
 
 		tracker.processFrame(basePyramid,derivX,derivY);
+
+		if( tracker.getTracks().size() < minFeatures )
+			tracker.spawnTracks(basePyramid,derivX,derivY);
 	}
 
 	@Override
@@ -147,7 +151,7 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 	public static <I extends ImageBase, D extends ImageBase>
 	void run( String fileName , Class<I> imageType , Class<D> derivType ) {
 
-		SimpleImageSequence<I> sequence = BuboVideoManager.loadManagerDefault().load(fileName,imageType);
+		SimpleImageSequence<I> sequence = BoofVideoManager.loadManagerDefault().load(fileName,imageType);
 
 //		sequence = new LoadFileImageSequence<I>(imageType,"../applet/data/snow_rail","jpg");
 
@@ -163,8 +167,7 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 		config.typeInput = imageType;
 		config.typeDeriv = derivType;
 		config.pyramidScaling = new int[]{1,2,4,8};
-		config.minFeatures = 80;
-		config.maxFeatures = 100;
+		config.maxFeatures = maxFeatures;
 		config.featureRadius = 3;
 
 		int scalingTop = config.computeScalingTop();

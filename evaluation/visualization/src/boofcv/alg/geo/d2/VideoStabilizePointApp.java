@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.d2;
 
-import boofcv.abst.feature.tracker.PointSequentialTracker;
+import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.d2.stabilization.PointImageStabilization;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
@@ -61,7 +61,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 
 	Class<I> imageType;
 
-	PointSequentialTracker<I> tracker;
+	ImagePointTracker<I> tracker;
 	ModelMatcher<Affine2D_F64,AssociatedPair> modelMatcher;
 
 	PointImageStabilization<I> stabilizer;
@@ -82,7 +82,6 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		PkltManagerConfig<I, D> config =
 				PkltManagerConfig.createDefault(imageType,derivType);
 		config.maxFeatures = maxFeatures;
-		config.minFeatures = minFeatures;
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
@@ -129,7 +128,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 	@Override
 	public void refreshAll(Object[] cookies) {
 		stopWorker();
-		tracker = (PointSequentialTracker<I>)cookies[0];
+		tracker = (ImagePointTracker<I>)cookies[0];
 		modelMatcher = (ModelMatcher<Affine2D_F64,AssociatedPair>)cookies[1];
 		startEverything();
 	}
@@ -143,7 +142,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 
 		switch( indexFamily ) {
 			case 0:
-				tracker = (PointSequentialTracker<I>)cookie;
+				tracker = (ImagePointTracker<I>)cookie;
 				break;
 			case 1:
 				modelMatcher = (ModelMatcher<Affine2D_F64,AssociatedPair>)cookie;
