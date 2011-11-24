@@ -35,6 +35,10 @@ import georegression.transform.se.SePointOps_F64;
  * </p>
  *
  * <p>
+ * COORDINATE SYSTEM: Right handed coordinate system with +z is pointing along the camera's optical axis,
+ * </p>
+ *
+ * <p>
  * The triangulated point is found by computing the closest point on both rays to each other.  Observations
  * must be in calibrated coordinates.
  * </p>

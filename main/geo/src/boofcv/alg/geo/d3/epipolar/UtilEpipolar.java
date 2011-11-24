@@ -19,8 +19,11 @@
 package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 import java.util.List;
 
@@ -116,6 +119,50 @@ public class UtilEpipolar {
 	public static void pixelToNormalized(Point2D_F64 orig, Point2D_F64 normed, DenseMatrix64F N) {
 		normed.x = orig.x * N.data[0] + N.data[2];
 		normed.y = orig.y * N.data[4] + N.data[5];
+	}
+
+	/**
+	 * <p>
+	 * Computes an essential matrix from a rotation and translation:<br>
+	 * E = hat(T)*R
+	 * </p>
+	 *
+	 * @param R Rotation matrix.
+	 * @param T Translation vector.
+	 * @return Essential matrix
+	 */
+	public static DenseMatrix64F computeEssential( DenseMatrix64F R , Vector3D_F64 T )
+	{
+		DenseMatrix64F E = new DenseMatrix64F(3,3);
+
+		DenseMatrix64F T_hat = GeometryMath_F64.crossMatrix(T, null);
+		CommonOps.mult(T_hat, R, E);
+
+		return E;
+	}
+
+	/**
+	 * <p>
+	 * Computes a homography matrix from a rotation, translation, plane normal and plane distance:<br>
+	 * H = R+(1/d)*T*N<sup>T</sup>
+	 * </p>
+	 *
+	 * @param R Rotation matrix.
+	 * @param T Translation vector.
+	 * @param d Distance of closest point on plane to camera
+	 * @param N Normal of plane
+	 * @return Essential matrix
+	 */
+	public static DenseMatrix64F computeHomography( DenseMatrix64F R , Vector3D_F64 T ,
+													double d , Vector3D_F64 N )
+	{
+		DenseMatrix64F H = new DenseMatrix64F(3,3);
+
+		GeometryMath_F64.outerProd(T,N,H);
+		CommonOps.divide(d,H);
+		CommonOps.addEquals(H, R);
+
+		return H;
 	}
 
 }

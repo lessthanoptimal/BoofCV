@@ -30,7 +30,7 @@ import org.junit.Before;
 /**
  * @author Peter Abeles
  */
-public class TestPstWrapperKltPyramid extends StandardImagePointTracker {
+public class TestPstWrapperKltPyramid extends StandardImagePointTracker<ImageFloat32> {
 
 	PkltManagerConfig<ImageFloat32,ImageFloat32> config;
 	PkltManager<ImageFloat32,ImageFloat32> manager;
@@ -44,7 +44,7 @@ public class TestPstWrapperKltPyramid extends StandardImagePointTracker {
 	}
 
 	@Override
-	public void trackUpdateDrop(ImagePointTracker tracker) {
+	public void trackUpdateDrop(ImagePointTracker<ImageFloat32> tracker) {
 		PkltManager<?,?> m = ((PstWrapperKltPyramid)tracker).getTrackManager();
 
 		// this will force it to drop the tracks
@@ -57,12 +57,12 @@ public class TestPstWrapperKltPyramid extends StandardImagePointTracker {
 	}
 
 	@Override
-	public void trackUpdateChangePosition(ImagePointTracker tracker) {
+	public void trackUpdateChangePosition(ImagePointTracker<ImageFloat32> tracker) {
 		tracker.process(image);
 	}
 
 	@Override
-	public ImagePointTracker createTracker() {
+	public ImagePointTracker<ImageFloat32> createTracker() {
 		pointTracker.process(image);
 		return pointTracker;
 	}

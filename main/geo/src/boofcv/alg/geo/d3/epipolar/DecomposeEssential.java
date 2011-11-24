@@ -32,13 +32,15 @@ import java.util.List;
 
 /**
  * <p>
- * Decomposed the essential matrix into a rigid body motion, rotation and translation.  A total
+ * Decomposed the essential matrix into a rigid body motion; rotation and translation.  A total
  * of four possible motions will be found and the ambiguity can be removed by calling
  * {@link PositiveDepthConstraintCheck} on each hypothesis.
  * </p>
  *
  * <p>
- * See "An Invitation to 3-D Vision" 1st edition page 116.
+ * An essential matrix is defined as E=cross(T)*R, where cross(T) is a cross product matrix,
+ * T is translation vector, and R is a 3x3 rotation matrix.  The decomposition works by computing
+ * the SVD of E.  For more details see "An Invitation to 3-D Vision" 1st edition page 116.
  * </p>
  *
  * @author Peter Abeles
@@ -50,6 +52,9 @@ public class DecomposeEssential {
 
 	// storage for the four possible solutions
 	List<Se3_F64> solutions = new ArrayList<Se3_F64>();
+
+	// working copy of E
+	DenseMatrix64F E_copy = new DenseMatrix64F(3,3);
 
 	// local storage used when computing a hypothesis
 	DenseMatrix64F temp = new DenseMatrix64F(3,3);
@@ -73,6 +78,10 @@ public class DecomposeEssential {
 	 * @param E essential matrix
 	 */
 	public void decompose( DenseMatrix64F E ) {
+		if( svd.inputModified() ) {
+			E_copy.set(E);
+			E = E_copy;
+		}
 
 		if( !svd.decompose(E))
 			throw new RuntimeException("Svd some how failed");
