@@ -1,6 +1,5 @@
 package boofcv.alg.geo.d3.epipolar;
 
-import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.misc.test.GeometryUnitTest;
 import georegression.struct.point.Point3D_F64;
@@ -8,7 +7,6 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
 
@@ -29,12 +27,8 @@ public class TestDecomposeEssential {
 	public void checkAgainstKnown() {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.4,0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
-		T.normalize();
 
-		DenseMatrix64F T_hat = GeometryMath_F64.crossMatrix(T,null);
-
-		DenseMatrix64F E = new DenseMatrix64F(3,3);
-		CommonOps.mult(T_hat,R,E);
+		DenseMatrix64F E = UtilEpipolar.computeEssential(R,T);
 
 		DecomposeEssential alg = new DecomposeEssential();
 		alg.decompose(E);
@@ -49,9 +43,33 @@ public class TestDecomposeEssential {
 	}
 
 	/**
+	 * Checks to see if the same solution is returned when invoked multiple times
+	 */
+	@Test
+	public void multipleCalls() {
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.4,0.5,null);
+		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
+
+		DenseMatrix64F E = UtilEpipolar.computeEssential(R,T);
+
+		DecomposeEssential alg = new DecomposeEssential();
+		// call it twice and see if it breaks
+		alg.decompose(E);
+		alg.decompose(E);
+
+		List<Se3_F64> solutions = alg.getSolutions();
+
+		assertEquals(4,solutions.size());
+
+		checkUnique(solutions);
+
+		checkHasOriginal(solutions, E);
+	}
+
+	/**
 	 * Makes sure each solution returned is unique by transforming a point.
 	 */
-	private void checkUnique( List<Se3_F64> solutions ) {
+	public static void checkUnique( List<Se3_F64> solutions ) {
 
 		Point3D_F64 orig = new Point3D_F64(1,2,3);
 
@@ -73,10 +91,7 @@ public class TestDecomposeEssential {
 
 		int numMatches = 0;
 		for( Se3_F64 se : solutions ) {
-			DenseMatrix64F T_hat = GeometryMath_F64.crossMatrix(se.getT(),null);
-
-			DenseMatrix64F foundE = new DenseMatrix64F(3,3);
-			CommonOps.mult(T_hat,se.getR(),foundE);
+			DenseMatrix64F foundE = UtilEpipolar.computeEssential(se.getR(),se.getT());
 
 			if(MatrixFeatures.isIdentical(origE,foundE,1e-4))
 				numMatches++;

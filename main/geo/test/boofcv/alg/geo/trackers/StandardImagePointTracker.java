@@ -21,6 +21,7 @@ package boofcv.alg.geo.trackers;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.misc.ImageTestingOps;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Before;
@@ -39,9 +40,9 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class StandardImagePointTracker {
+public abstract class StandardImagePointTracker <T extends ImageBase> {
 
-	public ImagePointTracker<?> tracker;
+	public ImagePointTracker<T> tracker;
 	Random rand = new Random(234);
 	int width = 100;
 	int height = 80;
@@ -55,17 +56,17 @@ public abstract class StandardImagePointTracker {
 	/**
 	 * The tracker should drop all the tracks on update
 	 */
-	public abstract void trackUpdateDrop( ImagePointTracker tracker );
+	public abstract void trackUpdateDrop( ImagePointTracker<T> tracker );
 
 	/**
 	 * Tracker should change the position of existing tracks
 	 */
-	public abstract void trackUpdateChangePosition( ImagePointTracker tracker );
+	public abstract void trackUpdateChangePosition( ImagePointTracker<T> tracker );
 
 	/**
 	 * Creates a new tracker with the specified number of tracks initially.
 	 */
-	public abstract ImagePointTracker<?> createTracker();
+	public abstract ImagePointTracker<T> createTracker();
 
 	@Test
 	public void spawnTracks() {

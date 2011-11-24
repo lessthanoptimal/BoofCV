@@ -19,7 +19,13 @@
 package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
+import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
@@ -123,5 +129,47 @@ public class TestUtilEpipolar {
 
 		assertEquals(found.x,expected.x,1e-8);
 		assertEquals(found.y,expected.y,1e-8);
+	}
+
+	@Test
+	public void computeEssential() {
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.05, -0.04, 0.1, null);
+		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
+		T.normalize();
+
+		DenseMatrix64F E = UtilEpipolar.computeEssential(R,T);
+
+		// Test using the following theorem:  x2^T*E*x1 = 0
+		Point3D_F64 P = new Point3D_F64(0.1,0.1,2);
+
+		Point2D_F64 x0 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		SePointOps_F64.transform(new Se3_F64(R,T),P,P);
+		Point2D_F64 x1 = new Point2D_F64(P.x/P.z,P.y/P.z);
+
+		double val = GeometryMath_F64.innerProd(x1,E,x0);
+		assertEquals(0,val,1e-8);
+	}
+
+	@Test
+	public void computeHomography() {
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
+		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
+		T.normalize();
+		double d = 2;
+		Vector3D_F64 N = new Vector3D_F64(0,0,1);
+
+		DenseMatrix64F H = UtilEpipolar.computeHomography(R, T, d, N);
+
+		// Test using the following theorem:  x2 = H*x1
+		Point3D_F64 P = new Point3D_F64(0.1,0.1,d); // a point on the plane
+
+		Point2D_F64 x0 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		SePointOps_F64.transform(new Se3_F64(R,T),P,P);
+		Point2D_F64 x1 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		Point2D_F64 found = new Point2D_F64();
+
+		GeometryMath_F64.mult(H, x0, found);
+		assertEquals(x1.x,found.x,1e-8);
+		assertEquals(x1.y,found.y,1e-8);
 	}
 }
