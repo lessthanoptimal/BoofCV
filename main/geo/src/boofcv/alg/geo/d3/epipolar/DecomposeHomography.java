@@ -84,6 +84,13 @@ public class DecomposeHomography {
 		}
 	}
 
+	/**
+	 * Decomposed the provided homography matrix into its R,T/d,N components. Four
+	 * solutions will be produced and can be accessed with {@link #getSolutionsN()} and
+	 * {@link #getSolutionsSE()}.
+	 *
+	 * @param H Homography matrix.  Not modified.
+	 */
 	public void decompose( DenseMatrix64F H ) {
 		if( svd.inputModified() ) {
 			H_copy.set(H);
@@ -99,7 +106,11 @@ public class DecomposeHomography {
 
 		SingularOps.descendingOrder(null,false,S, V,false);
 
+		// COMMENT: The smallest singular value should be zero so I'm not sure why
+		// that is not assumed here.  Seen the same strategy done in a few papers
+		// Maybe that really isn't always the case?
 		double s0 = S.get(0,0)*S.get(0,0);
+		// the middle singular value is known to be one
 		double s2 = S.get(2,2)*S.get(2,2);
 
 		v2.set(V.get(0,1),V.get(1,1),V.get(2,1));
@@ -117,9 +128,9 @@ public class DecomposeHomography {
 		}
 
 		setU(U1, v2, u1);
-		setU(U2,v2,u2);
-		setW(W1,H,v2,u1);
-		setW(W2,H,v2,u2);
+		setU(U2, v2, u2);
+		setW(W1, H , v2, u1);
+		setW(W2, H , v2, u2);
 
 		// create the four solutions
 		createSolution(W1, U1, u1,H,solutionsSE.get(0), solutionsN.get(0));
