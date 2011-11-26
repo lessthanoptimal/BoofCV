@@ -14,7 +14,14 @@ Version : Alpha 0.2
 - Added min and max pixel values to ImageTypeInfo
 - Added ComplexMath
 - Added PolynomialSolver
-
+- Added process(image) to PointSequentialTracker and renamed it to ImagePointTracker
+- Added the following 3D vision code:
+  * Linear 8-point essential/fundamental matrix
+  * Linear 7-point essential/fundamental matrix
+  * Linear 4-point homography
+  * Extract camera motion from essential
+  * Extract camera and plane normal from homography
+  * Triangulate: Linear pixel depth
 
 ---------------------------------------------
 Date    : 2011/11/01 

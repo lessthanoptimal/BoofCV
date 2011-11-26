@@ -65,8 +65,10 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 		if( points.size() != 7 )
 			throw new IllegalArgumentException("Must be exactly 7 points. Not "+points.size()+" you gelatinous piece of pond scum.");
 
-		// must normalize for when points are in pixel or calibrated units
+		// must normalize for when points are in either pixel or calibrated units
 		UtilEpipolar.computeNormalization(N1, N2, points);
+
+		// extract F1 and F2 from two null spaces
 		createA(points,A);
 
 		if (process(A))
@@ -75,14 +77,14 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 		undoNormalizationF(F1,N1,N2);
 		undoNormalizationF(F2,N1,N2);
 
-		// enforce the zero determinant constraint
+		// enforce the zero determinant constraint and computing weighting
+		// factor between F1 and F2
 		double alpha = enforceZeroDeterminant(F1,F2,coefs);
 		CommonOps.scale(alpha,F1);
 		CommonOps.scale(1-alpha,F2);
 		CommonOps.add(F1,F2,F);
 
-		// not 100% sure this is needed. already in fundamental or
-		// essential space when given perfect observations in the unit test
+		// enforce final constraints and normalize to canonical scale
 		if( computeFundamental)
 			return projectOntoFundamentalSpace(F);
 		else
