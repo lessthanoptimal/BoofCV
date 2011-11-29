@@ -22,6 +22,8 @@ Version : Alpha 0.2
   * Extract camera motion from essential
   * Extract camera and plane normal from homography
   * Triangulate: Linear pixel depth
+  * Projective N Point (PNP): Linear N >= 6
+- Added non-linear optimizer based upon Levenberg-Marquardt
 
 ---------------------------------------------
 Date    : 2011/11/01 
