@@ -23,6 +23,8 @@ import boofcv.alg.feature.describe.*;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_F32;
 import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_U8;
+import boofcv.alg.feature.describe.impl.ImplDescribePointPixelRegionNCC_F32;
+import boofcv.alg.feature.describe.impl.ImplDescribePointPixelRegion_F32;
 import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -30,6 +32,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.filter.kernel.FactorySteerable;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.convolve.Kernel2D;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -108,5 +111,25 @@ public class FactoryDescribePointAlgs {
 		}
 
 		return new DescribePointSteerable2D<T,K>(kernels,normalized,imageType);
+	}
+
+	public static <T extends ImageBase, D extends TupleDesc>
+	DescribePointPixelRegion<T,D> pixelRegion( int regionWidth , int regionHeight , Class<T> imageType )
+	{
+		if( imageType == ImageFloat32.class ) {
+			return (DescribePointPixelRegion<T,D>)new ImplDescribePointPixelRegion_F32(regionWidth,regionHeight);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type");
+		}
+	}
+
+	public static <T extends ImageBase>
+	DescribePointPixelRegionNCC<T> pixelRegionNCC( int regionWidth , int regionHeight , Class<T> imageType )
+	{
+		if( imageType == ImageFloat32.class ) {
+			return (DescribePointPixelRegionNCC<T>)new ImplDescribePointPixelRegionNCC_F32(regionWidth,regionHeight);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type");
+		}
 	}
 }

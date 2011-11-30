@@ -41,6 +41,12 @@ public class BoofMiscOps {
 		}
 	}
 
+	public static void zero( float a[] , int size ) {
+		for( int i = 0; i < size; i++ ) {
+			a[i] = 0;
+		}
+	}
+
 	public static void zero( double a[] , int size ) {
 		for( int i = 0; i < size; i++ ) {
 			a[i] = 0;
@@ -115,6 +121,19 @@ public class BoofMiscOps {
 		if( y-radius < 0 )
 			return false;
 		if( y+radius >= b.height )
+			return false;
+		return true;
+	}
+
+	public static boolean checkInside(ImageBase b, int x , int y , int radiusWidth , int radiusHeight ) {
+		if( x-radiusWidth < 0 )
+			return false;
+		if( x+radiusWidth >= b.width )
+			return false;
+
+		if( y-radiusHeight < 0 )
+			return false;
+		if( y+radiusHeight >= b.height )
 			return false;
 		return true;
 	}

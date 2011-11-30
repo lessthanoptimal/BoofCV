@@ -56,7 +56,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 	int maxFeatures = 250;
 	int minFeatures = 150;
 	static int thresholdChange = 80;
-	static int thresholdReset = 20;
+	static int thresholdReset = 15;
 	static double thresholdDistance = Double.MAX_VALUE;
 
 	Class<I> imageType;
@@ -87,7 +87,8 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
 		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 20, imageType));
-		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.surf(300,200,2,imageType));
+		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.surf(300, 200, 2, imageType));
+		addAlgorithm(0, "NCC", FactoryPointSequentialTracker.pixelNCC(500,11,11,20,imageType,derivType));
 
 		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
 		DistanceAffine2DSq distance = new DistanceAffine2DSq();
@@ -97,7 +98,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 
 		addAlgorithm(1,"RANSAC",
 				new SimpleInlierRansac<Affine2D_F64,AssociatedPair>(123123,
-				modelFitter,distance,30,numSample,numSample,10000,2.0));
+				modelFitter,distance,40,numSample,numSample,10000,2.0));
 
 		addAlgorithm(1,"LMedS",
 				new LeastMedianOfSquares<Affine2D_F64,AssociatedPair>(123123,

@@ -88,12 +88,12 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 		addAlgorithm(0,"KLT",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 
 		addAlgorithm(1,"SURF", FactoryDescribeRegionPoint.surf(true, imageType));
-//		addAlgorithm(1,"Sample", DescribePointSamples.create(imageType));
-//		addAlgorithm(1,"SampleDiff", DescribeSampleDifference.create(imageType));
 		addAlgorithm(1,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(1,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(1,"Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
 		addAlgorithm(1,"Gaussian 14", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType));
+		addAlgorithm(1,"Pixel 5x5", FactoryDescribeRegionPoint.pixel(5,5, imageType));
+		addAlgorithm(1,"NCC 5x5", FactoryDescribeRegionPoint.pixelNCC(5,5, imageType));
 
 		ScoreAssociation<TupleDesc_F64> scorer = new ScoreAssociateEuclideanSq();
 

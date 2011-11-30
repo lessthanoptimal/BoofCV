@@ -18,19 +18,26 @@
 
 package boofcv.struct.feature;
 
+import boofcv.struct.FastQueue;
+
+
 /**
- * Description of a SURF interest point.  It is composed of a set of image features computed from sub-regions
- * around the interest point as well as the sign of the Laplacian at the interest point.
+ * {@link boofcv.struct.FastQueue} for {@link NccFeature}.
  *
  * @author Peter Abeles
  */
-public class SurfFeature extends TupleDesc_F64 {
-	// is the feature light or dark. Can be used to improve lookup performance.
-	public boolean laplacianPositive;
+public class NccFeatureQueue extends FastQueue<NccFeature> {
 
-	public SurfFeature( int numFeatures ) {
-		super(numFeatures);
+	int descriptorLength;
+
+	public NccFeatureQueue(int descriptorLength) {
+		super(NccFeature.class,true);
+		this.descriptorLength = descriptorLength;
+		growArray(10);
 	}
 
-
+	@Override
+	protected NccFeature createInstance() {
+		return new NccFeature(descriptorLength);
+	}
 }

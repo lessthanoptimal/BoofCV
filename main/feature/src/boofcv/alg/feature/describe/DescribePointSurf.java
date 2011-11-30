@@ -147,7 +147,7 @@ public class DescribePointSurf<II extends ImageBase> {
 		// declare the feature if needed
 		if( ret == null )
 			ret = new SurfFeature(featureDOF);
-		else if( ret.features.value.length != featureDOF )
+		else if( ret.value.length != featureDOF )
 			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
 
 		// Computes the gradient (possibly the Haar wavelet) used compute the descriptor
@@ -155,11 +155,11 @@ public class DescribePointSurf<II extends ImageBase> {
 		gradient.setImage(ii);
 
 		// extract descriptor
-		SurfDescribeOps.features(x, y, angle, scale, weight, widthLargeGrid, widthSubRegion, gradient, ret.features.value);
+		SurfDescribeOps.features(x, y, angle, scale, weight, widthLargeGrid, widthSubRegion, gradient, ret.value);
 
 		// normalize feature vector to have an Euclidean length of 1
 		// adds light invariance
-		SurfDescribeOps.normalizeFeatures(ret.features.value);
+		SurfDescribeOps.normalizeFeatures(ret.value);
 
 		// Laplacian's sign
 		ret.laplacianPositive = computeLaplaceSign(xInt,yInt, scale);

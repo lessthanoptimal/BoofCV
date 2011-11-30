@@ -19,18 +19,9 @@
 package boofcv.struct.feature;
 
 /**
- * Description of a SURF interest point.  It is composed of a set of image features computed from sub-regions
- * around the interest point as well as the sign of the Laplacian at the interest point.
+ * Base class for tuple based feature descriptors
  *
  * @author Peter Abeles
  */
-public class SurfFeature extends TupleDesc_F64 {
-	// is the feature light or dark. Can be used to improve lookup performance.
-	public boolean laplacianPositive;
-
-	public SurfFeature( int numFeatures ) {
-		super(numFeatures);
-	}
-
-
+public class TupleDesc {
 }

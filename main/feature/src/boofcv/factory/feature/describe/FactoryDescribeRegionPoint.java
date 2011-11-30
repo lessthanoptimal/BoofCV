@@ -121,7 +121,8 @@ public class FactoryDescribeRegionPoint {
 	 * @param blurSigma Typical value is -1.
 	 * @param blurRadius Typical value is 4.
 	 * @param isFixed Is the orientation and scale fixed? true for original algorithm described in BRIEF paper.
-	 *@param imageType  @return
+	 * @param imageType Type of gray scale image it processes.
+	 * @return BRIEF descriptor
 	 */
 	public static <T extends ImageBase>
 	DescribeRegionPoint<T> brief(int radius, int numPoints,
@@ -140,5 +141,35 @@ public class FactoryDescribeRegionPoint {
 
 			return new WrapDescribeBriefSo<T>(FactoryDescribePointAlgs.briefso(definition, filter));
 		}
+	}
+
+	/**
+	 * Creates a region descriptor based on pixel intensity values alone.  A classic and fast to compute
+	 * descriptor, but much less stable than more modern ones.
+	 *
+	 * @param regionWidth How wide the pixel region is.
+	 * @param regionHeight How tall the pixel region is.
+	 * @param imageType Type of image it will process.
+	 * @return Pixel region descriptor
+	 */
+	@SuppressWarnings({"unchecked"})
+	public static <T extends ImageBase>
+	DescribeRegionPoint<T> pixel( int regionWidth , int regionHeight , Class<T> imageType ) {
+		return new WrapDescribePixelRegion(FactoryDescribePointAlgs.pixelRegion(regionWidth,regionHeight,imageType));
+	}
+
+	/**
+	 * Creates a region descriptor based on normalized pixel intensity values alone.  This descriptor
+	 * is designed to be light invariance, but is still less stable than more modern ones.
+	 *
+	 * @param regionWidth How wide the pixel region is.
+	 * @param regionHeight How tall the pixel region is.
+	 * @param imageType Type of image it will process.
+	 * @return Pixel region descriptor
+	 */
+	@SuppressWarnings({"unchecked"})
+	public static <T extends ImageBase>
+	DescribeRegionPoint<T> pixelNCC( int regionWidth , int regionHeight , Class<T> imageType ) {
+		return new WrapDescribePixelRegionNCC(FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType));
 	}
 }

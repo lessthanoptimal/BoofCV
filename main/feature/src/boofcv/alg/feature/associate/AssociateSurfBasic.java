@@ -118,9 +118,9 @@ public class AssociateSurfBasic {
 		for( int i = 0; i < input.size; i++ ) {
 			SurfFeature f = input.get(i);
 			if( f.laplacianPositive ) {
-				pos.pop().wrap(f.features,i);
+				pos.pop().wrap(f,i);
 			} else {
-				neg.pop().wrap(f.features,i);
+				neg.pop().wrap(f,i);
 			}
 		}
 	}

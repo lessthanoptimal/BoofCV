@@ -19,18 +19,24 @@
 package boofcv.struct.feature;
 
 /**
- * Description of a SURF interest point.  It is composed of a set of image features computed from sub-regions
- * around the interest point as well as the sign of the Laplacian at the interest point.
+ * Description for normalized cross correlation (NCC)
  *
  * @author Peter Abeles
  */
-public class SurfFeature extends TupleDesc_F64 {
-	// is the feature light or dark. Can be used to improve lookup performance.
-	public boolean laplacianPositive;
+public class NccFeature extends TupleDesc_F64 {
 
-	public SurfFeature( int numFeatures ) {
+	// mean pixel intensity
+	public double mean;
+	// variance deviation
+	public double variance;
+
+	public NccFeature(int numFeatures) {
 		super(numFeatures);
 	}
 
-
+	public void setTo(NccFeature src) {
+		this.mean = src.mean;
+		this.variance = src.variance;
+		System.arraycopy(src.value,0,value,0,value.length);
+	}
 }

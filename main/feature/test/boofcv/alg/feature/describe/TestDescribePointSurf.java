@@ -94,7 +94,7 @@ public class TestDescribePointSurf {
 			return false;
 
 		for( int i = 0; i < 64; i++ ) {
-			double diff = Math.abs(a.features.value[i] - b.features.value[i]);
+			double diff = Math.abs(a.value[i] - b.value[i]);
 
 			if( diff > 1e-4 )
 				return false;
