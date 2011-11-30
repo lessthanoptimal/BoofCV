@@ -31,7 +31,7 @@ import pja.sorting.QuickSelectArray;
  */
 public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 
-	AssociateGreedy alg;
+	AssociateGreedy<T> alg;
 
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
 	int indexes[] = new int[1];
@@ -42,7 +42,7 @@ public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 	 * @param alg
 	 * @param maxAssociations Maximum number of allowed associations.  If -1 then all are returned.
 	 */
-	public WrapAssociateGreedy( AssociateGreedy alg , int maxAssociations ) {
+	public WrapAssociateGreedy( AssociateGreedy<T> alg , int maxAssociations ) {
 		this.alg = alg;
 		this.maxAssociations = maxAssociations;
 	}

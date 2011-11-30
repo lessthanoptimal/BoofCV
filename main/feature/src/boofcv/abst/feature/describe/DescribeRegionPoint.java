@@ -23,11 +23,13 @@ import boofcv.struct.image.ImageBase;
 
 
 /**
- * Given a point in an image compute a descriptor of the point
+ * Describes the region around a point in the image.  The number of features used to compute the descriptor
+ * is algorithm and scale dependent. To find out how many pixels the descriptor uses at a scale of one
+ * call {@link #getCanonicalRadius()}.  The size at other scales is simply that number multiplied by the scale,
+ * rounded up.
  *
  * @author Peter Abeles
  */
-// todo change scale to size/radius in pixels?
 public interface DescribeRegionPoint<T extends ImageBase> {
 
 	/**
@@ -57,6 +59,7 @@ public interface DescribeRegionPoint<T extends ImageBase> {
 	 * @param ret Used to store the extracted feature.  If null a new instance will be created.
 	 * @return  Description of the point.  If one could not be computed then null is returned.
 	 */
+	// todo would this be easier to use if it returned a boolean and required a descriptor be passed in
 	public TupleDesc_F64 process( double x , double y , double orientation , double scale , TupleDesc_F64 ret );
 
 	/**

@@ -53,7 +53,21 @@ public class TestBoofMiscOps {
 	}
 
 	@Test
-	public void checkInside() {
+	public void checkInside_w_h() {
+		ImageUInt8 image = new ImageUInt8(20,25);
+
+		assertTrue(BoofMiscOps.checkInside(image,2,3,2,3));
+		assertTrue(BoofMiscOps.checkInside(image,17,21,2,3));
+		assertTrue(BoofMiscOps.checkInside(image,6,7,2,3));
+
+		assertFalse(BoofMiscOps.checkInside(image,1,3,2,3));
+		assertFalse(BoofMiscOps.checkInside(image,2,2,2,3));
+		assertFalse(BoofMiscOps.checkInside(image,18,21,2,3));
+		assertFalse(BoofMiscOps.checkInside(image,17,22,2,3));
+	}
+
+	@Test
+	public void checkInside_ImageRectangle() {
 		ImageUInt8 image = new ImageUInt8(20,25);
 
 		assertTrue(BoofMiscOps.checkInside(image,new ImageRectangle(0,0,20,25)));

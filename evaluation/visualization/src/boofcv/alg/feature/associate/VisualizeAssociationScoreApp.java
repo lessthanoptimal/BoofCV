@@ -94,6 +94,8 @@ public class VisualizeAssociationScoreApp<T extends ImageBase, D extends ImageBa
 		addAlgorithm(1,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(1,"Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
 		addAlgorithm(1,"Gaussian 14", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType));
+		addAlgorithm(1,"Pixel 5x5", FactoryDescribeRegionPoint.pixel(5, 5, imageType));
+		addAlgorithm(1,"NCC 5x5", FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType));
 
 		addAlgorithm(2,"norm",new ScoreAssociateEuclidean());
 		addAlgorithm(2,"norm^2",new ScoreAssociateEuclideanSq());

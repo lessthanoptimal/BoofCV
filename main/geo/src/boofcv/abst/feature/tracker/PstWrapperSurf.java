@@ -108,7 +108,7 @@ public class PstWrapperSurf<I extends ImageBase,II extends ImageBase>
 	@Override
 	protected void setDescription(SurfFeature src, SurfFeature dst) {
 		src.laplacianPositive = dst.laplacianPositive;
-		src.features.set(dst.features.getValue());
+		src.set(dst.getValue());
 	}
 
 	@Override

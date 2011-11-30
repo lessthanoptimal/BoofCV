@@ -16,21 +16,31 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.alg.feature.associate;
+
+import boofcv.struct.feature.NccFeature;
 
 /**
- * Description of a SURF interest point.  It is composed of a set of image features computed from sub-regions
- * around the interest point as well as the sign of the Laplacian at the interest point.
+ * Association scorer for NccFeatures.  Computes the normalized cross correlation score.
  *
  * @author Peter Abeles
  */
-public class SurfFeature extends TupleDesc_F64 {
-	// is the feature light or dark. Can be used to improve lookup performance.
-	public boolean laplacianPositive;
+public class ScoreAssociateNccFeature implements ScoreAssociation<NccFeature>{
+	@Override
+	public double score(NccFeature a, NccFeature b) {
+		double top = 0;
 
-	public SurfFeature( int numFeatures ) {
-		super(numFeatures);
+		int N = a.value.length;
+		for( int i = 0; i < N; i++ ) {
+			top += a.value[i]*b.value[i];
+		}
+
+		// negative so that smaller values are better
+		return -top/(a.variance*b.variance);
 	}
 
-
+	@Override
+	public boolean isZeroMinimum() {
+		return false;
+	}
 }

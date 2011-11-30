@@ -57,18 +57,23 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 
 	TupleDescPanel tuplePanel = new TupleDescPanel();
 
+	// most recently requested pixel description.  Used when the algorithm is changed
+	Point2D_I32 targetPt;
+	double targetRadius;
+	double targetOrientation;
+
 	public VisualizeRegionDescriptionApp( Class<T> imageType , Class<D> derivType  ) {
 		super(1);
 
 		this.imageType = imageType;
 
 		addAlgorithm(0,"SURF", FactoryDescribeRegionPoint.surf(false, imageType));
-//		addAlgorithm(0,"Sample", DescribePointSamples.create(imageType));
-//		addAlgorithm(0,"SampleDiff", DescribeSampleDifference.create(imageType));
 		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(0,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(0,"Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
 		addAlgorithm(0,"Gaussian 14", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType));
+		addAlgorithm(0,"Pixel 5x5", FactoryDescribeRegionPoint.pixel(5, 5, imageType));
+		addAlgorithm(0,"NCC 5x5", FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType));
 
 		panel.setListener(this);
 		tuplePanel.setPreferredSize(new Dimension(100,50));
@@ -112,8 +117,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				tuplePanel.setDescription(null);
-				panel.reset();
+				updateTargetDescription();
 				repaint();
 			}});
 	}
@@ -129,12 +133,26 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 	@Override
 	public synchronized void descriptionChanged(Point2D_I32 pt, double radius, double orientation) {
 		if( pt == null || radius < 1) {
-			tuplePanel.setDescription(null);
+			targetPt = null;
 		} else {
-			double scale = radius/describe.getCanonicalRadius();
+			this.targetPt = pt;
+			this.targetRadius = radius;
+			this.targetOrientation = orientation;
+		}
+		updateTargetDescription();
+	}
 
-			TupleDesc_F64 feature = describe.process(pt.x,pt.y,orientation,scale,null);
+	/**
+	 * Extracts the target description and updates the panel.  Should only be called from a swing thread
+	 */
+	private void updateTargetDescription() {
+		if( targetPt != null ) {
+			double scale = targetRadius/describe.getCanonicalRadius();
+
+			TupleDesc_F64 feature = describe.process(targetPt.x,targetPt.y,targetOrientation,scale,null);
 			tuplePanel.setDescription(feature);
+		} else {
+			tuplePanel.setDescription(null);
 		}
 		tuplePanel.repaint();
 	}
@@ -160,6 +178,6 @@ public class VisualizeRegionDescriptionApp <T extends ImageBase, D extends Image
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Association Relative Score");
+		ShowImages.showWindow(app,"Region Descriptor Visualization");
 	}
 }

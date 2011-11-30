@@ -18,19 +18,37 @@
 
 package boofcv.struct.feature;
 
+
 /**
- * Description of a SURF interest point.  It is composed of a set of image features computed from sub-regions
- * around the interest point as well as the sign of the Laplacian at the interest point.
+ * Basic description of an image feature's attributes using an array.
  *
  * @author Peter Abeles
  */
-public class SurfFeature extends TupleDesc_F64 {
-	// is the feature light or dark. Can be used to improve lookup performance.
-	public boolean laplacianPositive;
+public class TupleDesc_F32 extends TupleDesc {
+	public float value[];
 
-	public SurfFeature( int numFeatures ) {
-		super(numFeatures);
+	public TupleDesc_F32(int numFeatures) {
+		this.value = new float[ numFeatures ];
 	}
 
+	protected TupleDesc_F32() {
+	}
 
+	public void set( float ...value ) {
+		System.arraycopy(value,0,this.value,0,this.value.length);
+	}
+
+	public TupleDesc_F32 copy() {
+		TupleDesc_F32 ret = new TupleDesc_F32( value.length );
+		System.arraycopy(value,0,ret.value,0,value.length);
+		return ret;
+	}
+
+	public float[] getValue() {
+		return value;
+	}
+
+	public void setValue(float[] value) {
+		this.value = value;
+	}
 }

@@ -116,7 +116,7 @@ public class DescribePointSurfMod<II extends ImageBase> extends DescribePointSur
 		// declare the feature if needed
 		if( ret == null )
 			ret = new SurfFeature(featureDOF);
-		else if( ret.features.value.length != featureDOF )
+		else if( ret.value.length != featureDOF )
 			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
 
 		// extract descriptor
@@ -124,11 +124,11 @@ public class DescribePointSurfMod<II extends ImageBase> extends DescribePointSur
 		gradient.setImage(ii);
 
 		SurfDescribeOps.featuresMod(x, y, angle, scale, weightGrid, weightSub,
-				widthLargeGrid, widthSubRegion, overLap , gradient, ret.features.value);
+				widthLargeGrid, widthSubRegion, overLap , gradient, ret.value);
 
 		// normalize feature vector to have an Euclidean length of 1
 		// adds light invariance
-		SurfDescribeOps.normalizeFeatures(ret.features.value);
+		SurfDescribeOps.normalizeFeatures(ret.value);
 
 		// Laplacian's sign
 		ret.laplacianPositive = computeLaplaceSign(xInt,yInt, scale);

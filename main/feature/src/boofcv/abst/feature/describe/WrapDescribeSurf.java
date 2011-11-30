@@ -91,10 +91,10 @@ public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
 		if( f == null)
 			return null;
 		if( ret != null ) {
-			System.arraycopy(f.features.value,0,ret.value,0,f.features.value.length);
+			System.arraycopy(f.value,0,ret.value,0,f.value.length);
 			return ret;
 		}
-		return f.features;
+		return f;
 	}
 
 	@Override

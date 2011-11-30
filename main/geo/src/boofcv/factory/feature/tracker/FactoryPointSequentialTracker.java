@@ -22,14 +22,13 @@ import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.abst.feature.tracker.PstWrapperBrief;
-import boofcv.abst.feature.tracker.PstWrapperKltPyramid;
-import boofcv.abst.feature.tracker.PstWrapperSurf;
+import boofcv.abst.feature.tracker.*;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
+import boofcv.alg.feature.associate.ScoreAssociateNccFeature;
 import boofcv.alg.feature.associate.ScoreAssociation;
 import boofcv.alg.feature.describe.DescribePointBrief;
+import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
@@ -46,6 +45,7 @@ import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.struct.feature.NccFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 
@@ -143,5 +143,30 @@ public class FactoryPointSequentialTracker {
 				FactoryAssociation.greedy(score,maxAssociationError,maxFeatures,true);
 
 		return new PstWrapperBrief<I>(alg,detector,association);
+	}
+
+	/**
+	 * Creates a tracker for rectangular pixel regions that are associated using normalized
+	 * cross correlation (NCC)..
+	 *
+	 * @param maxFeatures Maximum number of features it will track.
+	 * @param regionWidth How wide the region is.  Try 5
+	 * @param regionHeight How tall the region is.  Try 5
+	 * @param pixelDetectTol Tolerance for detecting features.  Try 20.
+	 * @param imageType Type of image being processed.
+	 */
+	public static <I extends ImageBase,D extends ImageBase>
+	ImagePointTracker<I> pixelNCC( int maxFeatures , int regionWidth , int regionHeight ,
+								   int pixelDetectTol , Class<I> imageType , Class<D> derivType ) {
+		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType);
+		GeneralFeatureDetector<I,D> corner = FactoryCornerDetector.createFast(2, pixelDetectTol, maxFeatures, imageType);
+
+		InterestPointDetector<I> detector = FactoryInterestPoint.wrapCorner(corner, imageType, derivType);
+		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
+
+		GeneralAssociation<NccFeature> association =
+				FactoryAssociation.greedy(score,0,maxFeatures,true);
+
+		return new PstWrapperPixelNcc<I>(alg,detector,association);
 	}
 }

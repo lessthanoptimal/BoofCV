@@ -98,7 +98,7 @@ public class TestAssociateSurfBasic {
 		SurfFeature ret = new SurfFeature(64);
 
 		ret.laplacianPositive = laplace;
-		ret.features.value[0] = value;
+		ret.value[0] = value;
 
 		return ret;
 	}

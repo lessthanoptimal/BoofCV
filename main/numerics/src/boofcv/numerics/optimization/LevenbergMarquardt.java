@@ -48,9 +48,11 @@ public class LevenbergMarquardt<Observed,State> {
 	private double ftol;
 
 	// number of parameters being optimized
-	private int numParameters;
+	private int numModelParam;
 	// number of functions
 	private int numFunctions;
+	// total number of observations
+	private int totalObservations;
 
 	// Computes observation residuals given a model
 	private OptimizationFunction<Observed,State> function;
@@ -86,42 +88,54 @@ public class LevenbergMarquardt<Observed,State> {
 	private DenseMatrix64F Jacobian = new DenseMatrix64F(1,1);
 	private DenseMatrix64F Residuals = new DenseMatrix64F(1,1);
 
-	public LevenbergMarquardt( int numParameters,
-							   OptimizationFunction<Observed,State> residual ,
-							   OptimizationDerivative<State> derivative)
+	/**
+	 * Creates a optimizer using default parameters and numerical Jacobian estimate.
+	 *
+	 * @param numModelParam Number of model parameters to be optimized.
+	 * @param function Function that is being optimized.
+	 */
+	public LevenbergMarquardt( int numModelParam,
+							   OptimizationFunction<Observed,State> function )
 	{
-		this(numParameters,residual,derivative,DEFAULT_XTOL,DEFAULT_XTOL,100);
+		this(numModelParam,function,new NumericalJacobian<Observed,State>(function),DEFAULT_XTOL,DEFAULT_XTOL,100);
 	}
 
-	public LevenbergMarquardt( int numParameters ,
-							   OptimizationFunction<Observed,State> residual ,
+	public LevenbergMarquardt( int numModelParam,
+							   OptimizationFunction<Observed,State> function ,
+							   OptimizationDerivative<State> derivative)
+	{
+		this(numModelParam,function,derivative,DEFAULT_XTOL,DEFAULT_XTOL,100);
+	}
+
+	public LevenbergMarquardt( int numModelParam,
+							   OptimizationFunction<Observed,State> function ,
 							   OptimizationDerivative<State> derivative,
 							   double xtol , double ftol , int maxIterations )
 	{
 
-		this.numParameters = numParameters;
-		this.function = residual;
+		this.numModelParam = numModelParam;
+		this.function = function;
 		this.derivative = derivative;
 		this.xtol = xtol;
 		this.ftol = ftol;
 		this.maxIterations = maxIterations;
-		this.numFunctions = residual.getNumberOfFunctions();
+		this.numFunctions = function.getNumberOfFunctions();
 
-		this.workModel = new double[numParameters];
-		this.candidateModel = new double[numParameters];
+		this.workModel = new double[numModelParam];
+		this.candidateModel = new double[numModelParam];
 
-		d = new DenseMatrix64F(numParameters,1);
-		H = new DenseMatrix64F(numParameters, numParameters);
-		diag = new DenseMatrix64F(numParameters, numParameters);
-		gradient = new double[numFunctions][numParameters];
-		correction = new DenseMatrix64F(numParameters,1);
-		A = new DenseMatrix64F(numParameters, numParameters);
-		J.numRows = numParameters;
+		d = new DenseMatrix64F(numModelParam,1);
+		H = new DenseMatrix64F(numModelParam, numModelParam);
+		diag = new DenseMatrix64F(numModelParam, numModelParam);
+		gradient = new double[numFunctions][numModelParam];
+		correction = new DenseMatrix64F(numModelParam,1);
+		A = new DenseMatrix64F(numModelParam, numModelParam);
+		J.numRows = numModelParam;
 		J.numCols = 1;
 
-		decomposition = DecompositionFactory.qrp(numParameters,numParameters);
+		decomposition = DecompositionFactory.qrp(numModelParam, numModelParam);
 
-		R = new DenseMatrix64F(residual.getNumberOfFunctions() ,1);
+		R = new DenseMatrix64F(function.getNumberOfFunctions() ,1);
 
 	}
 
@@ -137,18 +151,24 @@ public class LevenbergMarquardt<Observed,State> {
 		return workModel;
 	}
 
+	/**
+	 * Optimizes the system given an initial estimate of the model parameters.
+	 *
+	 * @param initialModel Initial estimate of model parameters.
+	 * @param dataObserved List of model observations.  Can be null.
+	 * @param dataState List of system states.  Can be null.
+	 * @return true it was able to optimize the system or not.
+	 */
 	public boolean process( double[] initialModel ,
 							List<Observed> dataObserved ,
 							List<State> dataState )
 	{
-		int totalObservations = dataObserved == null ? dataState.size() : dataObserved.size();
+		totalObservations = dataObserved == null ? dataState.size() : dataObserved.size();
 
-		System.arraycopy(initialModel, 0, workModel, 0, numParameters);
-		System.arraycopy(initialModel, 0, candidateModel, 0, numParameters);
+		System.arraycopy(initialModel, 0, workModel, 0, numModelParam);
+		System.arraycopy(initialModel, 0, candidateModel, 0, numModelParam);
 
-		int numFunctions = function.getNumberOfFunctions();
-
-		Jacobian.reshape(totalObservations*numFunctions,numParameters,false);
+		Jacobian.reshape(totalObservations*numFunctions, numModelParam,false);
 		Residuals.reshape(totalObservations*numFunctions,1,false);
 
 		double lambda = initialLambda;
@@ -166,7 +186,7 @@ public class LevenbergMarquardt<Observed,State> {
 		boolean recomputeDerivatives = true;
 
 		for( int iter = 0; iter < maxIterations && prevCost > 0; iter++ ) {
-//            System.out.println("Iteration: "+iter+"  recomp "+recomputeDerivatives);
+            System.out.println("Iteration: "+iter+"  recomp "+recomputeDerivatives);
 
 			if( recomputeDerivatives ) {
 				computeMatrices(dataObserved,dataState, numFunctions);
@@ -180,7 +200,7 @@ public class LevenbergMarquardt<Observed,State> {
 //			correction.print();
 //			System.out.println("--------------------");
 			// apply the found correction
-			for( int i = 0; i < numParameters; i++ ) {
+			for( int i = 0; i < numModelParam; i++ ) {
 				candidateModel[i] = workModel[i] + correction.data[i];
 			}
 
@@ -188,9 +208,11 @@ public class LevenbergMarquardt<Observed,State> {
 
 //			System.out.println("lambda = "+lambda+"  correction mag = "+NormOps.normF(correction)+"  "+recomputeDerivatives+" maxStep "+maxStep);
 
+			System.out.println("  prevCost = "+prevCost+"  candidate cost = "+cost);
+
 			// did this correction improve the results?
 			if( cost < prevCost ) {
-				System.arraycopy(candidateModel, 0, workModel, 0, numParameters);
+				System.arraycopy(candidateModel, 0, workModel, 0, numModelParam);
 				lambda /= 10;
 				recomputeDerivatives = true;
 			} else {
@@ -202,6 +224,8 @@ public class LevenbergMarquardt<Observed,State> {
 				break;
 			if( performXTest(workModel,lambda))
 				break;
+
+
 
 			if( recomputeDerivatives ) {
 				prevCost = cost;
@@ -224,9 +248,9 @@ public class LevenbergMarquardt<Observed,State> {
 		DenseMatrix64F R = decomposition.getR(null,true);
 
 		// get the pivots and transpose them
-		int pivotTran[] = new int[ numParameters ];
+		int pivotTran[] = new int[numModelParam];
 		int pivots[] = decomposition.getPivots();
-		for( int i = 0; i < numParameters; i++ ) {
+		for( int i = 0; i < numModelParam; i++ ) {
 			pivotTran[pivots[i]] = i;
 		}
 
@@ -259,9 +283,9 @@ public class LevenbergMarquardt<Observed,State> {
 		derivative.setModel(workModel);
 
 		int rowJacobian = 0;
-		for( int i = 0; i < dataState.size(); i++ ) {
-			Observed o = dataObserved.get(i);
-			State s = dataState.get(i);
+		for( int i = 0; i < totalObservations; i++ ) {
+			Observed o = dataObserved != null ? dataObserved.get(i) : null;
+			State s = dataState != null ? dataState.get(i) : null;
 
 			// compute the approximate hessian and derivative
 			function.computeResiduals(o,s,R.data);
@@ -299,9 +323,9 @@ public class LevenbergMarquardt<Observed,State> {
 	 * @param rowJacobian The row J is inserted into Jacobian
 	 */
 	private void insertRowIntoJacobian(int rowJacobian) {
-		J.numCols=numParameters; J.numRows=1;
+		J.numCols= numModelParam; J.numRows=1;
 		CommonOps.insert(J, Jacobian, rowJacobian, 0);
-		J.numCols=1; J.numRows=numParameters;
+		J.numCols=1; J.numRows= numModelParam;
 	}
 
 	/**
@@ -332,15 +356,15 @@ public class LevenbergMarquardt<Observed,State> {
 	}
 
 	private boolean performXTest( double param[] , double lambda ) {
-		double normParam = norm(param,numParameters);
+		double normParam = norm(param, numModelParam);
 //		System.out.println("lambda = "+lambda+"  right = "+(xtol*normParam*lambda));
 		return 1 <= xtol*normParam*lambda;
 	}
 
 	private void computeA( DenseMatrix64F A , DenseMatrix64F H , double lambda )
 	{
-		for( int i = 0; i < numParameters; i++ ) {
-			for( int j = 0; j < numParameters; j++ ) {
+		for( int i = 0; i < numModelParam; i++ ) {
+			for( int j = 0; j < numModelParam; j++ ) {
 				if( i==j) {
 					A.set(i,j, H.get(i,j)*(1+lambda));
 				} else {
@@ -357,8 +381,11 @@ public class LevenbergMarquardt<Observed,State> {
 		int N = function.getNumberOfFunctions();
 
 		double total = 0;
-		for( int i = 0; i < dataObserved.size(); i++ ) {
-			if( !function.computeResiduals(dataObserved.get(i),dataState.get(i),R.data) )
+		for( int i = 0; i < totalObservations; i++ ) {
+			Observed o = dataObserved != null ? dataObserved.get(i) : null;
+			State s = dataState != null ? dataState.get(i) : null;
+
+			if( !function.computeResiduals(o,s,R.data) )
 				return Double.MAX_VALUE;
 
 			for( int j = 0; j < N; j++ ) {

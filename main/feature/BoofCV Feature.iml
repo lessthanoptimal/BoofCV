@@ -12,7 +12,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="BoofCV Image Processing" />
     <orderEntry type="module" module-name="libpja" />
-    <orderEntry type="module" module-name="ejml" />
     <orderEntry type="module" module-name="GeoRegression" />
     <orderEntry type="library" name="testing" level="project" />
     <orderEntry type="module" module-name="BoofCV IO" />
