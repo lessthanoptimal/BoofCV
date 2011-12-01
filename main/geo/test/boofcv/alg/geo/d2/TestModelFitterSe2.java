@@ -21,8 +21,11 @@ public class TestModelFitterSe2 {
 
 	Random rand = new Random(234);
 
+	/**
+	 * Provide a simple scenario where its off a bit and see if it converges
+	 */
 	@Test
-	public void stuff() {
+	public void basicTest() {
 		int N = 10;
 		Se2_F64 model = new Se2_F64(1,2,-0.3);
 
@@ -46,6 +49,9 @@ public class TestModelFitterSe2 {
 		assertEquals(model.getYaw(),found.getYaw(),0.01);
 	}
 
+	/**
+	 * Make sure the jacobian its using internally is correct
+	 */
 	@Test
 	public void checkJacobian() {
 		ModelFitterSe2.Function func = new ModelFitterSe2.Function();

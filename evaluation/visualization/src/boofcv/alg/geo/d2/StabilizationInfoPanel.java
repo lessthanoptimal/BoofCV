@@ -34,13 +34,15 @@ import java.awt.event.ItemListener;
 public class StabilizationInfoPanel extends StandardAlgConfigPanel implements ItemListener, ActionListener {
 
 	JButton resetButton;
-	JCheckBox showFeatures;
+	JCheckBox showInliers;
+	JCheckBox showAll;
 	JTextArea displayFPS;
 	JTextArea displayNumKeyFrames;
 	JTextArea displayNumTracks;
 	JTextArea displayNumInliers;
 
-	boolean setShowFeatures = false;
+	boolean setShowInliers = false;
+	boolean setShowAll = false;
 	boolean shouldReset = false;
 
 	public StabilizationInfoPanel() {
@@ -50,9 +52,12 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 		resetButton = new JButton("Reset");
 		resetButton.addActionListener(this);
 
-		showFeatures = new JCheckBox("Show Inliers");
-		showFeatures.addItemListener(this);
-		showFeatures.setSelected(setShowFeatures);
+		showAll = new JCheckBox("Show All");
+		showAll.addItemListener(this);
+		showAll.setSelected(setShowAll);
+		showInliers = new JCheckBox("Show Inliers");
+		showInliers.addItemListener(this);
+		showInliers.setSelected(setShowInliers);
 
 		displayFPS = createTextInfo();
 		displayNumKeyFrames = createTextInfo();
@@ -60,7 +65,8 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 		displayNumInliers = createTextInfo();
 
 		addAlignLeft(resetButton, this);
-		addAlignLeft(showFeatures, this);
+		addAlignLeft(showAll, this);
+		addAlignLeft(showInliers, this);
 		addSeparator(200);
 		addLabeled(displayFPS,"Algorithm FPS:",this);
 		addLabeled(displayNumKeyFrames,"Key Frames:",this);
@@ -86,8 +92,10 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		if( e.getItem() == showFeatures ) {
-			setShowFeatures = e.getStateChange() != ItemEvent.DESELECTED;
+		if( e.getItem() == showInliers) {
+			setShowInliers = e.getStateChange() != ItemEvent.DESELECTED;
+		} else if( e.getItem() == showAll) {
+			setShowAll = e.getStateChange() != ItemEvent.DESELECTED;
 		}
 	}
 
@@ -107,8 +115,12 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 		displayNumInliers.setText(String.format("%5d",totalInliers));
 	}
 
-	public boolean getShowFeatures() {
-		return setShowFeatures;
+	public boolean getShowInliers() {
+		return setShowInliers;
+	}
+
+	public boolean getShowAll() {
+		return setShowAll;
 	}
 
 	public boolean resetRequested() {

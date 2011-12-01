@@ -18,33 +18,26 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.struct.feature.TupleDesc_F64;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import boofcv.struct.feature.TupleDesc_U8;
 
 /**
+ * Computes sum of absolute difference (SAD) score for {@link TupleDesc_U8}.
+ *
  * @author Peter Abeles
  */
-public class TestScoreAssociateEuclidean {
-	@Test
-	public void compareToExpected() {
-		ScoreAssociateEuclidean score = new ScoreAssociateEuclidean();
+public class ScoreAssociateSad_U8 implements ScoreAssociation<TupleDesc_U8>{
+	@Override
+	public double score(TupleDesc_U8 a, TupleDesc_U8 b) {
 
-		TupleDesc_F64 a = new TupleDesc_F64(5);
-		TupleDesc_F64 b = new TupleDesc_F64(5);
-
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
-
-		assertEquals(13.964,score.score(a,b),1e-2);
+		int total = 0;
+		for( int i = 0; i < a.value.length; i++ ) {
+			total += Math.abs( (a.value[i] & 0xFF) - (b.value[i] & 0xFF));
+		}
+		return total;
 	}
 
-	@Test
-	public void checkZeroMinimum() {
-		ScoreAssociateEuclidean score = new ScoreAssociateEuclidean();
-		assertTrue(score.isZeroMinimum());
+	@Override
+	public boolean isZeroMinimum() {
+		return true;
 	}
 }

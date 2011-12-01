@@ -22,61 +22,26 @@ import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageBase;
 
 /**
- * Describes a rectangular region using its raw pixel intensities. Score between two regions of this type is typically
- * computed using Sum of Absolute Differences (SAD).
+ * Describes a rectangular region using its raw pixel intensities which have been normalized for intensity.  This
+ * allows the descriptor to be light invariant.  The entire region must be inside the image for a descriptor to be computed
+ * because any outside values will change its intensity normalization.
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointPixelRegionNCC<T extends ImageBase> {
-
-	// image that descriptors are being extracted from
-	protected T image;
-
-	// size of the extracted region
-	protected int regionWidth;
-	protected int regionHeight;
-	// radius from focal pixel
-	protected int radiusWidth;
-	protected int radiusHeight;
-
-	// offset in terms of pixel index from the center pixel
-	protected int offset[];
-
-	public DescribePointPixelRegionNCC(int regionWidth, int regionHeight) {
-		this.regionWidth = regionWidth;
-		this.regionHeight = regionHeight;
-
-		this.radiusWidth = regionWidth/2;
-		this.radiusHeight = regionHeight/2;
-
-		offset = new int[ regionHeight*regionWidth ];
+public abstract class DescribePointPixelRegionNCC<T extends ImageBase>
+		extends DescribePointRectangleRegion<T>
+{
+	protected DescribePointPixelRegionNCC(int regionWidth, int regionHeight) {
+		super(regionWidth, regionHeight);
 	}
 
-	public void setImage( T image ) {
-		this.image = image;
-
-		for( int i = 0; i < regionHeight; i++ ) {
-			for( int j = 0; j < regionWidth; j++ ) {
-				offset[i*regionWidth+j] = (i-radiusHeight)*image.stride + j-radiusWidth;
-			}
-		}
-	}
-
+	/**
+	 * Extracts the descriptor at the specified location.
+	 *
+	 * @param c_x Center of the descriptor region.
+	 * @param c_y Center of the descriptor region.
+	 * @param desc Where the description is written to.
+	 * @return True if a descriptor was created or false if the region went outside image bounds.
+	 */
 	public abstract boolean process( int c_x , int c_y , NccFeature desc );
-
-	public int getDescriptorLength() {
-		return offset.length;
-	}
-
-	public int getDescriptorRadius() {
-		return Math.max(radiusHeight,radiusWidth);
-	}
-
-	public int getRegionWidth() {
-		return regionWidth;
-	}
-
-	public int getRegionHeight() {
-		return regionHeight;
-	}
 }

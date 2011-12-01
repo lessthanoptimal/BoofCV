@@ -88,6 +88,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
 		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 20, imageType));
 		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.surf(300, 200, 2, imageType));
+		// size of the description region has been increased to improve quality.
 		addAlgorithm(0, "NCC", FactoryPointSequentialTracker.pixelNCC(500,11,11,20,imageType,derivType));
 
 		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
@@ -98,7 +99,7 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 
 		addAlgorithm(1,"RANSAC",
 				new SimpleInlierRansac<Affine2D_F64,AssociatedPair>(123123,
-				modelFitter,distance,40,numSample,numSample,10000,2.0));
+				modelFitter,distance,40,numSample,numSample,10000,4.0));
 
 		addAlgorithm(1,"LMedS",
 				new LeastMedianOfSquares<Affine2D_F64,AssociatedPair>(123123,
@@ -176,7 +177,8 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		BufferedImage orig;
 		BufferedImage stabilized;
 
-		FastQueue<Point2D_F64> features = new FastQueue<Point2D_F64>(300,Point2D_F64.class,true);
+		FastQueue<Point2D_F64> inliers = new FastQueue<Point2D_F64>(300,Point2D_F64.class,true);
+		FastQueue<Point2D_F64> allTracks = new FastQueue<Point2D_F64>(300,Point2D_F64.class,true);
 
 		public void setImages( BufferedImage orig , BufferedImage stabilized )
 		{
@@ -185,11 +187,21 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		}
 
 		public synchronized void setInliers(java.util.List<AssociatedPair> list) {
-			features.reset();
+			inliers.reset();
 
 			if( list != null ) {
 				for( AssociatedPair p : list ) {
-					features.pop().set(p.currLoc.x,p.currLoc.y);
+					inliers.pop().set(p.currLoc.x,p.currLoc.y);
+				}
+			}
+		}
+
+		public synchronized void setAllTracks(java.util.List<AssociatedPair> list) {
+			allTracks.reset();
+
+			if( list != null ) {
+				for( AssociatedPair p : list ) {
+					allTracks.pop().set(p.currLoc.x,p.currLoc.y);
 				}
 			}
 		}
@@ -222,8 +234,13 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 			// draw stabilized on right
 			g2.drawImage(stabilized,scaledWidth+10,0,scaledWidth*2+10,scaledHeight,0,0,orig.getWidth(),orig.getHeight(),null);
 
-			for( int i = 0; i < features.size(); i++ ) {
-				Point2D_F64 p = features.get(i);
+			for( int i = 0; i < allTracks.size(); i++ ) {
+				Point2D_F64 p = allTracks.get(i);
+				VisualizeFeatures.drawPoint(g2,(int)(scale*p.x),(int)(scale*p.y),Color.RED);
+			}
+
+			for( int i = 0; i < inliers.size(); i++ ) {
+				Point2D_F64 p = inliers.get(i);
 				VisualizeFeatures.drawPoint(g2,(int)(scale*p.x),(int)(scale*p.y),Color.BLUE);
 			}
 		}
@@ -244,10 +261,15 @@ public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
 		if( stabilizer.isKeyFrame() )
 			totalKeyFrames++;
 
-		if( infoPanel.getShowFeatures() )
+		if( infoPanel.getShowInliers() )
 			gui.setInliers(stabilizer.getInlierFeatures());
 		else
 			gui.setInliers(null);
+
+		if( infoPanel.getShowAll() )
+			gui.setAllTracks(stabilizer.getTracker().getActiveTracks());
+		else
+			gui.setAllTracks(null);
 
 		if( infoPanel.resetRequested() ) {
 			doRefreshAll();
