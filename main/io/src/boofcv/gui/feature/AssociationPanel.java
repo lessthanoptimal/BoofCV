@@ -108,6 +108,9 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	}
 
 	private void drawAllFeatures(Graphics2D g2, double scaleLeft , double scaleRight , int rightX) {
+		if( assocLeft == null || rightPts == null || leftPts == null )
+			return;
+
 		for( int i = 0; i < assocLeft.length; i++ ) {
 			if( assocLeft[i] == -1 )
 				continue;

@@ -157,7 +157,7 @@ public class DetectFeaturePointApp<T extends ImageBase, D extends ImageBase>
 			public void run() {
 				ConvertBufferedImage.convertTo(corruptImage, workImage);
 				Graphics2D g2 = workImage.createGraphics();
-				g2.setStroke(new BasicStroke(2));
+				g2.setStroke(new BasicStroke(3));
 				render.draw(g2);
 				panel.repaint();
 			}

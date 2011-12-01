@@ -67,7 +67,7 @@ import java.util.List;
 public class ExampleImageStitching {
 
 	/**
-	 * Using abstracted code, find a transform which minimises the difference between corresponding features
+	 * Using abstracted code, find a transform which minimizes the difference between corresponding features
 	 * in both images.  This code is completely model independent and is the core algorithms.
 	 */
 	public static<T extends ImageBase> Homography2D_F64

@@ -68,6 +68,8 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config));
 		addAlgorithm(0,"BRIEF", FactoryPointSequentialTracker.brief(300, 200, 50, imageType));
 		addAlgorithm(0,"SURF", FactoryPointSequentialTracker.surf(300, 200, 2, imageType));
+		addAlgorithm(0,"NCC", FactoryPointSequentialTracker.pixelNCC(500,5,5,20,imageType,derivType));
+
 
 		gui.addMouseListener(this);
 		gui.requestFocus();
@@ -151,9 +153,15 @@ public class VideoTrackFeaturesApp<I extends ImageBase, D extends ImageBase>
 	}
 
 	public static void main( String args[] ) {
-		VideoTrackFeaturesApp app = new VideoTrackFeaturesApp(ImageFloat32.class, ImageFloat32.class);
+		Class imageType = ImageFloat32.class;
+		Class derivType = ImageFloat32.class;
 
-		VideoListManager manager = new VideoListManager(ImageFloat32.class);
+//		Class imageType = ImageUInt8.class;
+//		Class derivType = ImageSInt16.class;
+
+		VideoTrackFeaturesApp app = new VideoTrackFeaturesApp(imageType, derivType);
+
+		VideoListManager manager = new VideoListManager(imageType);
 		manager.add("Shake", "MJPEG", "../applet/data/shake.mjpeg");
 		manager.add("Zoom", "MJPEG", "../applet/data/zoom.mjpeg");
 		manager.add("Rotate", "MJPEG", "../applet/data/rotate.mjpeg");

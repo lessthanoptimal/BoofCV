@@ -35,6 +35,18 @@ public class BoofMiscOps {
 		return ret;
 	}
 
+	public static void zero( byte a[] , int size ) {
+		for( int i = 0; i < size; i++ ) {
+			a[i] = 0;
+		}
+	}
+
+	public static void zero( short a[] , int size ) {
+		for( int i = 0; i < size; i++ ) {
+			a[i] = 0;
+		}
+	}
+
 	public static void zero( int a[] , int size ) {
 		for( int i = 0; i < size; i++ ) {
 			a[i] = 0;
