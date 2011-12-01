@@ -150,6 +150,7 @@ public class ShowFeatureOrientationApp <T extends ImageBase, D extends ImageBase
 		Graphics2D g2 = (Graphics2D)temp.getGraphics();
 
 		g2.drawImage(input,0,0,null);
+		g2.setStroke(new BasicStroke(2.5f));
 		render.draw(g2);
 		panel.setBufferedImage(temp);
 		panel.repaint();

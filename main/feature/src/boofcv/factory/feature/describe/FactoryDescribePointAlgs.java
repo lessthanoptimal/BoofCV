@@ -21,10 +21,7 @@ package boofcv.factory.feature.describe;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.*;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
-import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_F32;
-import boofcv.alg.feature.describe.impl.ImplDescribePointBrief_U8;
-import boofcv.alg.feature.describe.impl.ImplDescribePointPixelRegionNCC_F32;
-import boofcv.alg.feature.describe.impl.ImplDescribePointPixelRegion_F32;
+import boofcv.alg.feature.describe.impl.*;
 import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -118,6 +115,8 @@ public class FactoryDescribePointAlgs {
 	{
 		if( imageType == ImageFloat32.class ) {
 			return (DescribePointPixelRegion<T,D>)new ImplDescribePointPixelRegion_F32(regionWidth,regionHeight);
+		} else if( imageType == ImageUInt8.class ) {
+			return (DescribePointPixelRegion<T,D>)new ImplDescribePointPixelRegion_U8(regionWidth,regionHeight);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
@@ -128,6 +127,8 @@ public class FactoryDescribePointAlgs {
 	{
 		if( imageType == ImageFloat32.class ) {
 			return (DescribePointPixelRegionNCC<T>)new ImplDescribePointPixelRegionNCC_F32(regionWidth,regionHeight);
+		} else if( imageType == ImageUInt8.class ) {
+			return (DescribePointPixelRegionNCC<T>)new ImplDescribePointPixelRegionNCC_U8(regionWidth,regionHeight);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
