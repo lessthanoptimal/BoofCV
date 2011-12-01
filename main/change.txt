@@ -4,7 +4,7 @@ Date Format: year/month/day
 
 
 ---------------------------------------------
-Date    :  
+Date    : 2011/12/01 
 Version : Alpha 0.2
 
 - Added integer polynomial interpolation
@@ -24,6 +24,11 @@ Version : Alpha 0.2
   * Triangulate: Linear pixel depth
   * Projective N Point (PNP): Linear N >= 6
 - Added non-linear optimizer based upon Levenberg-Marquardt
+- Added pixel region based descriptors
+  * Raw pixel values
+  * Normalized Cross Correlation (NCC)
+- Added pixel region based trackers
+- Added Sum of Absolute Difference (SAD) score for feature association with a few different descriptor types.
 
 ---------------------------------------------
 Date    : 2011/11/01 
