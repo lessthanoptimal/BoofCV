@@ -30,11 +30,11 @@ import java.util.List;
 
 
 /**
+ * <p>
  * Tracker for image features which are first detected and then associated using the extracted
- * feature description..
- *
- * TODO improve algorithm
- * - Drop tracks if consistent poor score
+ * feature description.  For this tracker to work well the feature descriptor must be very strong
+ * and result in the correct association without any model of the model being fit.
+ * </p>
  *
  * @author Peter Abeles
  */

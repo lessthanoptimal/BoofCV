@@ -274,6 +274,20 @@ public class BoofTesting {
 			for (int i = 0; i < a.length; i++) {
 				if( params[i] == a[i] )
 					continue;
+				if( a[i].isPrimitive() ) {
+					if( a[i] == Byte.TYPE &&  params[i] == Byte.class )
+						continue;
+					if( a[i] == Short.TYPE &&  params[i] == Short.class )
+						continue;
+					if( a[i] == Integer.TYPE &&  params[i] == Integer.class )
+						continue;
+					if( a[i] == Long.TYPE &&  params[i] == Long.class )
+						continue;
+					if( a[i] == Float.TYPE &&  params[i] == Float.class )
+						continue;
+					if( a[i] == Double.TYPE &&  params[i] == Double.class )
+						continue;
+				}
 				if ( !a[i].isAssignableFrom(params[i])) {
 					match = false;
 					break;
