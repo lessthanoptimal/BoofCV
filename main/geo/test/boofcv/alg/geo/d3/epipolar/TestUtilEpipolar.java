@@ -151,7 +151,7 @@ public class TestUtilEpipolar {
 	}
 
 	@Test
-	public void computeHomography() {
+	public void computeHomography_calibrated() {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
 		T.normalize();
@@ -166,6 +166,34 @@ public class TestUtilEpipolar {
 		Point2D_F64 x0 = new Point2D_F64(P.x/P.z,P.y/P.z);
 		SePointOps_F64.transform(new Se3_F64(R,T),P,P);
 		Point2D_F64 x1 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		Point2D_F64 found = new Point2D_F64();
+
+		GeometryMath_F64.mult(H, x0, found);
+		assertEquals(x1.x,found.x,1e-8);
+		assertEquals(x1.y,found.y,1e-8);
+	}
+
+	@Test
+	public void computeHomography_uncalibrated() {
+		DenseMatrix64F K = new DenseMatrix64F(3,3,true,0.1,0.001,200,0,0.2,250,0,0,1);
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
+		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
+		T.normalize();
+		double d = 2;
+		Vector3D_F64 N = new Vector3D_F64(0,0,1);
+
+		K.print();
+
+		DenseMatrix64F H = UtilEpipolar.computeHomography(R, T, d, N, K);
+
+		// Test using the following theorem:  x2 = H*x1
+		Point3D_F64 P = new Point3D_F64(0.1,0.1,d); // a point on the plane
+
+		Point2D_F64 x0 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		GeometryMath_F64.mult(K,x0,x0);
+		SePointOps_F64.transform(new Se3_F64(R,T),P,P);
+		Point2D_F64 x1 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		GeometryMath_F64.mult(K,x1,x1);
 		Point2D_F64 found = new Point2D_F64();
 
 		GeometryMath_F64.mult(H, x0, found);

@@ -90,10 +90,13 @@ public class HomographyLinear4 {
 
 	/**
 	 * <p>
-	 * Computes the homography matrix given a set of observed points in two images.
+	 * Computes the homography matrix given a set of observed points in two images.  A set of {@link AssociatedPair}
+	 * is passed in.  The computed homography 'H' is found such that the attributes 'keyLoc' and 'currLoc' in {@link AssociatedPair}
+	 * refers to x1 and x2, respectively, in the equation  below:<br>
+	 * x<sub>2</sub> = H*x<sub>1</sub>
 	 * </p>
 	 *
-	 * @param points A set of points that are generated from a planar object.  Minimum of 4 points required.
+	 * @param points A set of observed image points that are generated from a planar object.  Minimum of 4 pairs required.
 	 * @return true if the calculation was a success.
 	 */
 	public boolean process( List<AssociatedPair> points ) {
@@ -168,7 +171,7 @@ public class HomographyLinear4 {
 		Arrays.sort(svd.getSingularValues(),0,3);
 
 		double scale = svd.getSingularValues()[1];
-		CommonOps.scale(scale,H);
+		CommonOps.divide(scale, H);
 
 		return true;
 	}

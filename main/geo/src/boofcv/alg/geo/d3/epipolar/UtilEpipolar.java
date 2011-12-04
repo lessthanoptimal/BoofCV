@@ -39,11 +39,11 @@ public class UtilEpipolar {
 	 * by properly scaling the pixels.
 	 * </p>
 	 *
-	 * <p>
-	 * N = [ 1/&sigma;_x     0         -&mu;_x/&sigma;_x ]<br>
-	 *     [    0        1/&sigma;_y 0 -&mu;_y/&sigma;_y ]<br>
-	 *     [    0            0                  1        ]
-	 * </p>
+	 * <pre>
+	 * N = [ 1/&sigma;_x     0      -&mu;_x/&sigma;_x ]
+	 *     [    0   1/&sigma;_y 0   -&mu;_y/&sigma;_y ]
+	 *     [    0      0          1    ]
+	 * </pre>
 	 *
 	 * <p>
 	 * Y. Ma, S. Soatto, J. Kosecka, and S. S. Sastry, "An Invitation to 3-D Vision" Springer-Verlad, 2004
@@ -151,7 +151,7 @@ public class UtilEpipolar {
 	 * @param T Translation vector.
 	 * @param d Distance of closest point on plane to camera
 	 * @param N Normal of plane
-	 * @return Essential matrix
+	 * @return Calibrated homography matrix
 	 */
 	public static DenseMatrix64F computeHomography( DenseMatrix64F R , Vector3D_F64 T ,
 													double d , Vector3D_F64 N )
@@ -161,6 +161,38 @@ public class UtilEpipolar {
 		GeometryMath_F64.outerProd(T,N,H);
 		CommonOps.divide(d,H);
 		CommonOps.addEquals(H, R);
+
+		return H;
+	}
+
+	/**
+	 * <p>
+	 * Computes a homography matrix from a rotation, translation, plane normal, plane distance, and
+	 * calibration matrix:<br>
+	 * H = K*(R+(1/d)*T*N<sup>T</sup>)*K<sup>-1</sup>
+	 * </p>
+	 *
+	 * @param R Rotation matrix.
+	 * @param T Translation vector.
+	 * @param d Distance of closest point on plane to camera
+	 * @param N Normal of plane
+	 * @param K Intrinsic calibration matrix
+	 * @return Uncalibrated homography matrix
+	 */
+	public static DenseMatrix64F computeHomography( DenseMatrix64F R , Vector3D_F64 T ,
+													double d , Vector3D_F64 N ,
+													DenseMatrix64F K )
+	{
+		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+
+		DenseMatrix64F H = computeHomography(R,T,d,N);
+
+		// apply calibration matrix to R
+		CommonOps.mult(K,H,temp);
+
+		CommonOps.invert(K, K_inv);
+		CommonOps.mult(temp, K_inv, H);
 
 		return H;
 	}
