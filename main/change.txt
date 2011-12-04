@@ -2,6 +2,11 @@ Change Log
 
 Date Format: year/month/day
 
+---------------------------------------------
+Date    : 
+Version : Alpha 0.3
+
+
 
 ---------------------------------------------
 Date    : 2011/12/01 
@@ -28,7 +33,7 @@ Version : Alpha 0.2
   * Raw pixel values
   * Normalized Cross Correlation (NCC)
 - Added pixel region based trackers
-- Added Sum of Absolute Difference (SAD) score for feature association with a few different descriptor types.
+- Added Sum of Absolute Difference (SAD) feature association score for several different descriptor types.
 
 ---------------------------------------------
 Date    : 2011/11/01 

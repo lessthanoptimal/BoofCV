@@ -76,6 +76,16 @@ public class AssociatedPair {
 	 *
 	 * @param keyLoc keyframe location
 	 * @param currLoc current location
+	 */
+	public AssociatedPair(Point2D_F64 keyLoc, Point2D_F64 currLoc) {
+		this(keyLoc,currLoc,true);
+	}
+
+	/**
+	 * Creates a new associated point from the two provided points.
+	 *
+	 * @param keyLoc keyframe location
+	 * @param currLoc current location
 	 * @param newInstance Should it create new points or save a reference to these instances.
 	 */
 	public AssociatedPair(Point2D_F64 keyLoc, Point2D_F64 currLoc, boolean newInstance) {
