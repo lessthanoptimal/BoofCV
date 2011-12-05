@@ -63,7 +63,6 @@ public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends Image
 {
 	int maxMatches = 200;
 
-
 	InterestPointDetector<T> detector;
 	DescribeRegionPoint<T> describe;
 	GeneralAssociation<TupleDesc_F64> matcher;
