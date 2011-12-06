@@ -1,14 +1,9 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.alg.calibration.CalibrationMatrixFromHomographiesLinear;
-import boofcv.alg.geo.d3.epipolar.UtilEpipolar;
-import georegression.struct.point.Vector3D_F64;
-import georegression.struct.se.Se3_F64;
-import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -29,7 +24,7 @@ public class TestCalibrationMatrixFromHomographiesLinear {
 
 		// try different numbers of observations
 		for( int N = 3; N <= 6; N++ ) {
-			setup(K,N);
+			homographies = GenericCalibrationGrid.createHomographies(K, N, rand);
 
 			CalibrationMatrixFromHomographiesLinear alg = new CalibrationMatrixFromHomographiesLinear(false);
 
@@ -44,13 +39,13 @@ public class TestCalibrationMatrixFromHomographiesLinear {
 	@Test
 	public void withNoSkew() {
 
-		// test a bunch
-		for( int i = 0; i < 10; i++ ) {
+		// try different sizes
+		for( int N = 2; N <= 5; N++ ) {
 			DenseMatrix64F K = GenericCalibrationGrid.createStandardCalibration();
 			// force skew to zero
 			K.set(0,1,0);
 
-			setup(K,2);
+			homographies = GenericCalibrationGrid.createHomographies(K, N, rand);
 
 			CalibrationMatrixFromHomographiesLinear alg = new CalibrationMatrixFromHomographiesLinear(true);
 
@@ -73,35 +68,6 @@ public class TestCalibrationMatrixFromHomographiesLinear {
 		assertEquals(a.get(0,2),b.get(0,2),10);
 		assertEquals(a.get(1,2),b.get(1,2),10);
 		assertEquals(a.get(2,2),b.get(2,2),1e-8);
-	}
-
-	/**
-	 * Creates several random uncalibrated homographies
-	 * @param K Calibration matrix
-	 * @param N Number of homographies
-	 */
-	private void setup( DenseMatrix64F K , int N ) {
-		List<Se3_F64> motions = new ArrayList<Se3_F64>();
-
-		for( int i = 0; i < N; i++ ) {
-			double x = rand.nextGaussian()*200;
-			double y = rand.nextGaussian()*200;
-			double z = rand.nextGaussian()*50-1000;
-
-			double rotX = (rand.nextDouble()-0.5)*0.1;
-			double rotY = (rand.nextDouble()-0.5)*0.1;
-			double rotZ = (rand.nextDouble()-0.5)*0.1;
-
-			motions.add( SpecialEuclideanOps_F64.setEulerXYZ(x,y,z,rotX,rotY,rotZ,null));
-		}
-
-		homographies = new ArrayList<DenseMatrix64F>();
-		for( Se3_F64 se : motions ) {
-			DenseMatrix64F H = UtilEpipolar.computeHomography(se.getR(),se.getT(),1000,new Vector3D_F64(0,0,1),K);
-
-			homographies.add(H);
-		}
-
 	}
 
 

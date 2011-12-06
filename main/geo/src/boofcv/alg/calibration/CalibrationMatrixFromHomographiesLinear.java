@@ -28,10 +28,11 @@ import org.ejml.ops.SpecializedOps;
 import java.util.List;
 
 /**
- * todo update comments
  * <p>
- * Uses a linear equation to estimate the camera's calibration matrix using a set of homographies.  This is used to provide an initial set of parameters for a non-linear
- * optimization that will produce more accurate results.
+ * Estimates camera calibration matrix from a set of homographies using linear algebra as described in [1].  Two
+ * variants are implemented inside this class.  One variant assumes that the skew is zero and requires two or
+ * more homographies and the other variant does not assume the skew is zero and requires three or more
+ * homographies. The calibration matrix which it estimates is shown below.
  * </p>
  *
  * <p>
@@ -42,11 +43,16 @@ import java.util.List;
  * where 'c' is the camera's skew.
  * </p>
  *
+ * <p>
+ * The zero skew variant is a modification of what was described in [1].  Instead of simply adding another row
+ * to force the skew to be zero that entire part of the equation has been omitted. The algorithm described in
+ * [1] was numerically unstable and did not produce meaningful results.
+ * </p>
  *
+ * <p>
+ * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations," 1998
+ * </p>
  */
-// TODO add skewless constraint
-// IMPLEMENTATION NOTE:  Could this be improved by normalizing homography matrices like points are in
-// Fundamental matrix calculation?
 public class CalibrationMatrixFromHomographiesLinear {
 
 	// system of equations
@@ -55,7 +61,7 @@ public class CalibrationMatrixFromHomographiesLinear {
 	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(0,0);
 
 	// a vectorized description of the B = A^-T * A^-1 matrix.
-	private DenseMatrix64F b = new DenseMatrix64F(6,1);
+	private DenseMatrix64F b;
 	// the found calibration matrix
 	private DenseMatrix64F K = new DenseMatrix64F(3,3);
 
@@ -64,6 +70,11 @@ public class CalibrationMatrixFromHomographiesLinear {
 
 	public CalibrationMatrixFromHomographiesLinear(boolean assumeZeroSkew) {
 		this.assumeZeroSkew = assumeZeroSkew;
+
+		if( assumeZeroSkew )
+			b = new DenseMatrix64F(5,1);
+		else
+			b = new DenseMatrix64F(6,1);
 	}
 
 	/**
@@ -74,8 +85,8 @@ public class CalibrationMatrixFromHomographiesLinear {
 	 */
 	public void process( List<DenseMatrix64F> homographies ) {
 		if( assumeZeroSkew ) {
-			if( homographies.size() != 2 )
-				throw new IllegalArgumentException("When skew is assumed zero only two homographies are allowed");
+			if( homographies.size() < 2 )
+				throw new IllegalArgumentException("At least two homographies are required");
 		} else if( homographies.size() < 3 ) {
 			throw new IllegalArgumentException("At least three homographies are required");
 		}
@@ -84,8 +95,12 @@ public class CalibrationMatrixFromHomographiesLinear {
 			setupA_NoSkew(homographies);
 			if( !svd.decompose(A) )
 				throw new RuntimeException("SVD failed");
-			DenseMatrix64F V = svd.getV(false);
-			SpecializedOps.subvector(V, 0, 4, V.numRows, false, 0, b);
+			if( homographies.size() == 2 ) {
+				DenseMatrix64F V = svd.getV(false);
+				SpecializedOps.subvector(V, 0, 4, V.numRows, false, 0, b);
+			} else {
+				SingularOps.nullSpace(svd,b);
+			}
 			computeParam_ZeroSkew();
 		} else {
 			setupA(homographies);
@@ -131,8 +146,8 @@ public class CalibrationMatrixFromHomographiesLinear {
 
 			// compute elements of A
 			computeV(h1, h2, v12);
-			computeV(h1,h1,v11);
-			computeV(h2,h2,v22);
+			computeV(h1, h1, v11);
+			computeV(h2, h2, v22);
 
 			CommonOps.sub(v11,v22,v11m22);
 
@@ -232,6 +247,9 @@ public class CalibrationMatrixFromHomographiesLinear {
 	 * Compute the calibration parameters from the b matrix.
 	 */
 	private void computeParam() {
+		// reduce overflow/underflow
+		CommonOps.divide(CommonOps.elementMaxAbs(b),b);
+
 		double B11 = b.get(0,0);
 		double B12 = b.get(1,0);
 		double B22 = b.get(2,0);
@@ -264,6 +282,9 @@ public class CalibrationMatrixFromHomographiesLinear {
 	 * Compute the calibration parameters from the b matrix when the skew is assumed to be zero
 	 */
 	private void computeParam_ZeroSkew() {
+		// reduce overflow/underflow
+		CommonOps.divide(CommonOps.elementMaxAbs(b),b);
+
 		double B11 = b.get(0,0);
 		double B22 = b.get(1,0);
 		double B13 = b.get(2,0);

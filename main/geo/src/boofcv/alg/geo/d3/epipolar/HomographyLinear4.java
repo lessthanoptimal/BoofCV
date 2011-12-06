@@ -171,7 +171,7 @@ public class HomographyLinear4 {
 		Arrays.sort(svd.getSingularValues(),0,3);
 
 		double scale = svd.getSingularValues()[1];
-		CommonOps.divide(scale, H);
+		CommonOps.divide(scale,H);
 
 		return true;
 	}
