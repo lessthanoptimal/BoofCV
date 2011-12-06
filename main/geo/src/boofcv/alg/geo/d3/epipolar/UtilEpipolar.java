@@ -191,8 +191,8 @@ public class UtilEpipolar {
 		// apply calibration matrix to R
 		CommonOps.mult(K,H,temp);
 
-		CommonOps.invert(K, K_inv);
-		CommonOps.mult(temp, K_inv, H);
+		CommonOps.invert(K,K_inv);
+		CommonOps.mult(temp,K_inv,H);
 
 		return H;
 	}
