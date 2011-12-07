@@ -57,7 +57,7 @@ import java.util.List;
  * </p>
  * @author Peter Abeles
  */
-public class EstimateRadialDistortionLinear {
+public class RadialDistortionEstimateLinear {
 	// matrices in the linear equations
 	private DenseMatrix64F A = new DenseMatrix64F(1,1);
 	private DenseMatrix64F B = new DenseMatrix64F(1,1);
@@ -79,7 +79,7 @@ public class EstimateRadialDistortionLinear {
 	 * @param gridDesc Description of calibration grid
 	 * @param numParam Number of radial distortion parameters. Two is a good number.
 	 */
-	public EstimateRadialDistortionLinear(CalibrationGridConfig gridDesc , int numParam) {
+	public RadialDistortionEstimateLinear(CalibrationGridConfig gridDesc, int numParam) {
 		worldPoints = gridDesc.computeGridPoints();
 		X = new DenseMatrix64F(numParam,1);
 	}

@@ -1,7 +1,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.alg.calibration.CalibrationGridConfig;
-import boofcv.alg.calibration.EstimateRadialDistortionLinear;
+import boofcv.alg.calibration.RadialDistortionEstimateLinear;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestEstimateRadialDistortionLinear {
+public class TestRadialDistortionEstimateLinear {
 
 	Random rand = new Random(34);
 
@@ -49,7 +49,7 @@ public class TestEstimateRadialDistortionLinear {
 			observations.add( pixels );
 		}
 
-		EstimateRadialDistortionLinear alg = new EstimateRadialDistortionLinear(config,distort.length);
+		RadialDistortionEstimateLinear alg = new RadialDistortionEstimateLinear(config,distort.length);
 
 		alg.process(K,homographies,observations);
 

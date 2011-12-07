@@ -1,15 +1,15 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.alg.calibration.CalibrationGridConfig;
-import boofcv.alg.geo.d3.epipolar.UtilEpipolar;
 import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,34 +93,49 @@ public class GenericCalibrationGrid {
 	}
 
 	/**
+	 * Creates a homography as defined in Section 2.2 in Zhang98.
+	 *
+	 * H = K*[r1 r2 t]
+	 */
+	public static DenseMatrix64F computeHomography(DenseMatrix64F K, DenseMatrix64F R, Vector3D_F64 T)
+	{
+		DenseMatrix64F M = new DenseMatrix64F(3,3);
+		CommonOps.extract(R, 0, 3, 0, 1, M, 0, 0);
+		CommonOps.extract(R, 0, 3, 1, 2, M, 0, 1);
+		M.set(0, 2, T.x);
+		M.set(1, 2, T.y);
+		M.set(2, 2, T.z);
+
+		DenseMatrix64F H = new DenseMatrix64F(3,3);
+		CommonOps.mult(K,M,H);
+
+		return H;
+	}
+
+	/**
 	 * Creates several random uncalibrated homographies
 	 * @param K Calibration matrix
 	 * @param N Number of homographies
 	 */
 	public static List<DenseMatrix64F> createHomographies( DenseMatrix64F K , int N , Random rand ) {
-		List<Se3_F64> motions = new ArrayList<Se3_F64>();
+		List<DenseMatrix64F> homographies = new ArrayList<DenseMatrix64F>();
 
 		for( int i = 0; i < N; i++ ) {
-			double x = rand.nextGaussian()*200;
-			double y = rand.nextGaussian()*200;
-			double z = rand.nextGaussian()*50-1000;
+			Vector3D_F64 T = new Vector3D_F64();
+			T.x = rand.nextGaussian()*200;
+			T.y = rand.nextGaussian()*200;
+			T.z = rand.nextGaussian()*50-1000;
 
 			double rotX = (rand.nextDouble()-0.5)*0.1;
 			double rotY = (rand.nextDouble()-0.5)*0.1;
 			double rotZ = (rand.nextDouble()-0.5)*0.1;
 
-			motions.add( SpecialEuclideanOps_F64.setEulerXYZ(x, y, z, rotX, rotY, rotZ, null));
-		}
+			DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(rotX, rotY, rotZ, null);
 
-		List<DenseMatrix64F> homographies;
-		homographies = new ArrayList<DenseMatrix64F>();
-		for( Se3_F64 se : motions ) {
-			DenseMatrix64F H = UtilEpipolar.computeHomography(se.getR(), se.getT(), 1000, new Vector3D_F64(0, 0, 1), K);
-
+			DenseMatrix64F H = computeHomography(K, R, T);
 			homographies.add(H);
 		}
 
 		return homographies;
-
 	}
 }
