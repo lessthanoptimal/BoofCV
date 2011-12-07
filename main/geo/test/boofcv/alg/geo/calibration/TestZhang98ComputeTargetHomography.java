@@ -1,7 +1,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.alg.calibration.CalibrationGridConfig;
-import boofcv.alg.calibration.ComputeTargetHomography;
+import boofcv.alg.calibration.Zhang98ComputeTargetHomography;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestComputeTargetHomography {
+public class TestZhang98ComputeTargetHomography {
 
 	/**
 	 * Give it a grid and see if it computed a legitimate homography
@@ -35,7 +35,7 @@ public class TestComputeTargetHomography {
 		List<Point2D_F64> observations = GenericCalibrationGrid.observations(motion,config);
 
 		// compute the homography
-		ComputeTargetHomography alg = new ComputeTargetHomography(config);
+		Zhang98ComputeTargetHomography alg = new Zhang98ComputeTargetHomography(config);
 
 		assertTrue(alg.computeHomography(observations));
 

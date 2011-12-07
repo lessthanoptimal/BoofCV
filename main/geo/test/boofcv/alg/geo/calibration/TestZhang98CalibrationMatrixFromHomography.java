@@ -1,6 +1,6 @@
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.calibration.CalibrationMatrixFromHomographiesLinear;
+import boofcv.alg.calibration.Zhang98CalibrationMatrixFromHomographies;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationMatrixFromHomographiesLinear {
+public class TestZhang98CalibrationMatrixFromHomography {
 
 	Random rand = new Random(123);
 	List<DenseMatrix64F> homographies;
@@ -26,7 +26,8 @@ public class TestCalibrationMatrixFromHomographiesLinear {
 		for( int N = 3; N <= 6; N++ ) {
 			homographies = GenericCalibrationGrid.createHomographies(K, N, rand);
 
-			CalibrationMatrixFromHomographiesLinear alg = new CalibrationMatrixFromHomographiesLinear(false);
+			Zhang98CalibrationMatrixFromHomographies alg =
+					new Zhang98CalibrationMatrixFromHomographies(false);
 
 			alg.process(homographies);
 
@@ -47,7 +48,8 @@ public class TestCalibrationMatrixFromHomographiesLinear {
 
 			homographies = GenericCalibrationGrid.createHomographies(K, N, rand);
 
-			CalibrationMatrixFromHomographiesLinear alg = new CalibrationMatrixFromHomographiesLinear(true);
+			Zhang98CalibrationMatrixFromHomographies alg =
+					new Zhang98CalibrationMatrixFromHomographies(true);
 
 			alg.process(homographies);
 
@@ -62,11 +64,11 @@ public class TestCalibrationMatrixFromHomographiesLinear {
 	 * for different elements
 	 */
 	private void checkK( DenseMatrix64F a , DenseMatrix64F b ) {
-		assertEquals(a.get(0,0),b.get(0,0),0.3);
-		assertEquals(a.get(1,1),b.get(1,1),0.3);
-		assertEquals(a.get(0,1),b.get(0,1),0.08);
-		assertEquals(a.get(0,2),b.get(0,2),10);
-		assertEquals(a.get(1,2),b.get(1,2),10);
+		assertEquals(a.get(0,0),b.get(0,0),0.05);
+		assertEquals(a.get(1,1),b.get(1,1),0.05);
+		assertEquals(a.get(0,1),b.get(0,1),0.01);
+		assertEquals(a.get(0,2),b.get(0,2),2);
+		assertEquals(a.get(1,2),b.get(1,2),2);
 		assertEquals(a.get(2,2),b.get(2,2),1e-8);
 	}
 

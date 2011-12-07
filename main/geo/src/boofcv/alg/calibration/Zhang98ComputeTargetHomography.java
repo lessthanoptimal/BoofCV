@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ComputeTargetHomography {
+public class Zhang98ComputeTargetHomography {
 
 	HomographyLinear4 linear = new HomographyLinear4(true);
 
@@ -47,7 +47,7 @@ public class ComputeTargetHomography {
 	// the z-axis is assumed to be zero
 	List<Point2D_F64> worldPoints;
 
-	public ComputeTargetHomography(CalibrationGridConfig config) {
+	public Zhang98ComputeTargetHomography(CalibrationGridConfig config) {
 		this.worldPoints = config.computeGridPoints();
 	}
 
@@ -77,6 +77,10 @@ public class ComputeTargetHomography {
 		return true;
 	}
 
+	/**
+	 * Returns a copy of the found homography matrix.
+	 * @return Homography matrix.
+	 */
 	public DenseMatrix64F getHomography() {
 		return linear.getHomography().copy();
 	}

@@ -29,10 +29,11 @@ import java.util.List;
 
 /**
  * <p>
- * Estimates camera calibration matrix from a set of homographies using linear algebra as described in [1].  Two
+ * Estimates camera calibration matrix from a set of homographies using linear algebra.  Based upon the
+ * description found in [1], but has been modified to improve stability and flexibility.  Two
  * variants are implemented inside this class.  One variant assumes that the skew is zero and requires two or
  * more homographies and the other variant does not assume the skew is zero and requires three or more
- * homographies. The calibration matrix which it estimates is shown below.
+ * homographies. The calibration matrix structure is shown below.
  * </p>
  *
  * <p>
@@ -53,7 +54,7 @@ import java.util.List;
  * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations," 1998
  * </p>
  */
-public class CalibrationMatrixFromHomographiesLinear {
+public class Zhang98CalibrationMatrixFromHomographies {
 
 	// system of equations
 	private DenseMatrix64F A = new DenseMatrix64F(1,1);
@@ -68,13 +69,20 @@ public class CalibrationMatrixFromHomographiesLinear {
 	// if it should assume the skew is zero or not
 	private boolean assumeZeroSkew;
 
-	public CalibrationMatrixFromHomographiesLinear(boolean assumeZeroSkew) {
+
+	/**
+	 * Configures calibration estimation.
+	 *
+	 * @param assumeZeroSkew  Assume that skew matrix is zero or not
+	 */
+	public Zhang98CalibrationMatrixFromHomographies(boolean assumeZeroSkew) {
 		this.assumeZeroSkew = assumeZeroSkew;
 
 		if( assumeZeroSkew )
 			b = new DenseMatrix64F(5,1);
 		else
 			b = new DenseMatrix64F(6,1);
+
 	}
 
 	/**
