@@ -6,6 +6,10 @@ Date Format: year/month/day
 Date    : 
 Version : Alpha 0.3
 
+- Added min and max values to ImageTestingOps.addGaussian()
+- Tweaked factories related to wavelet denoising so that they take in
+  an image type.
+
 
 
 ---------------------------------------------
