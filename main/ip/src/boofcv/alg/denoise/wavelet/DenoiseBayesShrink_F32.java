@@ -46,10 +46,6 @@ public class DenoiseBayesShrink_F32 extends SubbandShrink<ImageFloat32> {
 
 	float noiseVariance;
 
-	public DenoiseBayesShrink_F32() {
-		super(new ShrinkThresholdSoft_F32());
-	}
-
 	public DenoiseBayesShrink_F32( ShrinkThresholdRule<ImageFloat32> rule ) {
 		super(rule);
 	}

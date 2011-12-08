@@ -169,21 +169,21 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void addGaussian(ImageBase img, Random rand, double sigma) {
+	public static void addGaussian(ImageBase img, Random rand, double sigma , double min , double max ) {
 		if (img.getClass() == ImageUInt8.class ) {
-			ImageTestingOps.addGaussian((ImageUInt8) img, rand, sigma );
+			ImageTestingOps.addGaussian((ImageUInt8) img, rand, sigma , (int)min , (int)max );
 		} else if (img.getClass() == ImageSInt8.class ) {
-			ImageTestingOps.addGaussian((ImageSInt8) img, rand, sigma );
+			ImageTestingOps.addGaussian((ImageSInt8) img, rand, sigma , (int)min , (int)max);
 		} else if (img.getClass() == ImageUInt16.class ) {
-			ImageTestingOps.addGaussian((ImageUInt16) img, rand, sigma );
+			ImageTestingOps.addGaussian((ImageUInt16) img, rand, sigma , (int)min , (int)max);
 		} else if (img.getClass() == ImageSInt16.class ) {
-			ImageTestingOps.addGaussian((ImageSInt16) img, rand, sigma );
+			ImageTestingOps.addGaussian((ImageSInt16) img, rand, sigma , (int)min , (int)max);
 		} else if (img.getClass() == ImageSInt32.class ) {
-			ImageTestingOps.addGaussian((ImageSInt32) img, rand, sigma );
+			ImageTestingOps.addGaussian((ImageSInt32) img, rand, sigma , (int)min , (int)max);
 		} else if (img.getClass() == ImageFloat32.class) {
-			ImageTestingOps.addGaussian((ImageFloat32) img, rand, sigma );
+			ImageTestingOps.addGaussian((ImageFloat32) img, rand, sigma , (float)min , (float)max);
 		} else if (img.getClass() == ImageFloat64.class) {
-			ImageTestingOps.addGaussian((ImageFloat64) img, rand, sigma );
+			ImageTestingOps.addGaussian((ImageFloat64) img, rand, sigma , (double)min , (double)max);
 		} else {
 			throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
 		}

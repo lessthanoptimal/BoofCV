@@ -19,6 +19,7 @@
 package boofcv.alg.misc;
 
 import boofcv.misc.AutoTypeImage;
+import boofcv.misc.CodeGeneratorBase;
 import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
@@ -31,33 +32,25 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public class GenerateImageTestingOps {
+public class GenerateImageTestingOps extends CodeGeneratorBase {
 
 	String className = "ImageTestingOps";
-
-	PrintStream out;
 
 	private AutoTypeImage imageType;
 	private String imageName;
 	private String dataType;
 	private String bitWise;
 
-	public GenerateImageTestingOps() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
-	}
-
-	public void generate() {
+	public void generate() throws FileNotFoundException {
 		printPreamble();
 		printAllGeneric();
 		printAllSpecific();
 		out.println("}");
 	}
 
-	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.misc;\n" +
-				"\n" +
-				"import boofcv.struct.image.*;\n" +
+	private void printPreamble() throws FileNotFoundException {
+		setOutputFile(className);
+		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
 				"import java.util.Random;\n" +
 				"\n" +
@@ -215,15 +208,13 @@ public class GenerateImageTestingOps {
 
 	public void printAddGaussian() {
 		String sumType = imageType.getSumType();
-		int min = imageType.getMin().intValue();
-		int max = imageType.getMax().intValue();
 		String typeCast = imageType.getTypeCastFromSum();
 		String sumCast = sumType.equals("double") ? "" : "("+sumType+")";
 
 		out.print("\t/**\n" +
 				"\t * Adds Gaussian/normal i.i.d noise to each pixel in the image.\n" +
 				"\t */\n" +
-				"\tpublic static void addGaussian("+imageName+" img, Random rand , double sigma ) {\n" +
+				"\tpublic static void addGaussian("+imageName+" img, Random rand , double sigma , "+sumType+" min , "+sumType+" max ) {\n" +
 				"\t\tfinal int h = img.getHeight();\n" +
 				"\t\tfinal int w = img.getWidth();\n" +
 				"\n" +
@@ -233,13 +224,9 @@ public class GenerateImageTestingOps {
 				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
 				"\t\t\tfor (int x = 0; x < w; x++) {\n");
 		out.print("\t\t\t\t"+sumType+" value = (data[index] "+bitWise+") + "+sumCast+"(rand.nextGaussian()*sigma);\n");
-		if( imageType.isInteger() && imageType.getNumBits() < 32 ) {
-			if( imageType.getPrimitiveType() != int.class ) {
-				out.print("\t\t\t\tif( value < "+min+" ) value = "+min+";\n" +
-						"\t\t\t\tif( value > "+max+" ) value = "+max+";\n" +
-						"\n");
-			}
-		}
+		out.print("\t\t\t\tif( value < min ) value = min;\n" +
+				"\t\t\t\tif( value > max ) value = max;\n" +
+				"\n");
 		out.print("\t\t\t\tdata[index++] = "+typeCast+" value;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +

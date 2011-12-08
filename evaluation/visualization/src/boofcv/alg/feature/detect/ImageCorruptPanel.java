@@ -95,7 +95,7 @@ public class ImageCorruptPanel extends StandardAlgConfigPanel implements ChangeL
 	public <T extends ImageBase> void corruptImage( T original , T corrupted )
 	{
 		GGrayImageOps.stretch(original, valueScale, valueOffset, 255.0, corrupted);
-		GeneralizedImageOps.addGaussian(corrupted,rand,valueNoise);
+		GeneralizedImageOps.addGaussian(corrupted,rand,valueNoise,0,255);
 		GPixelMath.boundImage(corrupted,0,255);
 	}
 

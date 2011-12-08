@@ -125,7 +125,7 @@ public class DenoiseAccuracyStudyApp {
 		FilterImageInterface<ImageFloat32,ImageFloat32> filter;
 		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,new DenoiseVisuShrink_F32());
 		ret.add( new TestItem(filter,"Visu "+waveletName+" L = "+numLevels));
-		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,new DenoiseBayesShrink_F32());
+		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,new DenoiseBayesShrink_F32(null));
 		ret.add( new TestItem(filter,"Bayes "+waveletName+" L = "+numLevels));
 		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,new DenoiseSureShrink_F32());
 		ret.add( new TestItem(filter,"Sure "+waveletName+" L = "+numLevels));
@@ -185,8 +185,7 @@ public class DenoiseAccuracyStudyApp {
 
 	private void addNoiseToImage() {
 		imageNoisy = image.clone();
-		ImageTestingOps.addGaussian(imageNoisy,rand,noiseSigma);
-		PixelMath.boundImage(imageNoisy,0,255);
+		ImageTestingOps.addGaussian(imageNoisy,rand,noiseSigma,0,255);
 	}
 
 

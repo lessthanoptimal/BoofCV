@@ -77,7 +77,7 @@ public class FactoryBenchmarkFeatureDistort {
 		protected void distortImage(T image, T distortedImage ,double sigma) {
 			distortedImage.reshape(image.width,image.height);
 			distortedImage.setTo(image);
-			GeneralizedImageOps.addGaussian(distortedImage,rand,sigma);
+			GeneralizedImageOps.addGaussian(distortedImage,rand,sigma,0,255);
 		}
 
 		@Override

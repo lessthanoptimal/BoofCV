@@ -21,7 +21,7 @@ package boofcv.abst.denoise;
 import boofcv.abst.wavelet.WaveletTransform;
 import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.core.image.border.BorderType;
-import boofcv.factory.denoise.FactoryDenoiseWavelet;
+import boofcv.factory.denoise.FactoryDenoiseWaveletAlg;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.struct.image.ImageBase;
@@ -50,16 +50,11 @@ public class FactoryImageDenoise {
 	 * @return filter for image noise removal.
 	 */
 	public static <T extends ImageBase> WaveletDenoiseFilter<T>
-	waveletVisu( Class<?> imageType , int numLevels )
+	waveletVisu( Class<T> imageType , int numLevels )
 	{
 		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
 		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels);
-		DenoiseWavelet denoiser;
-
-		if( info.getSumType() == float.class )
-			denoiser = FactoryDenoiseWavelet.visu_F32();
-		else
-			throw new IllegalArgumentException("Unsupported");
+		DenoiseWavelet denoiser  = FactoryDenoiseWaveletAlg.visu(imageType);
 
 		return new WaveletDenoiseFilter<T>(descTran,denoiser);
 	}
@@ -72,16 +67,11 @@ public class FactoryImageDenoise {
 	 * @return filter for image noise removal.
 	 */
 	public static <T extends ImageBase> WaveletDenoiseFilter<T>
-	waveletBayes( Class<?> imageType , int numLevels )
+	waveletBayes( Class<T> imageType , int numLevels )
 	{
 		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
 		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels);
-		DenoiseWavelet denoiser;
-
-		if( info.getSumType() == float.class )
-			denoiser = FactoryDenoiseWavelet.bayes_F32();
-		else
-			throw new IllegalArgumentException("Unsupported");
+		DenoiseWavelet denoiser = FactoryDenoiseWaveletAlg.bayes(null, imageType);
 
 		return new WaveletDenoiseFilter<T>(descTran,denoiser);
 	}
@@ -94,16 +84,11 @@ public class FactoryImageDenoise {
 	 * @return filter for image noise removal.
 	 */
 	public static <T extends ImageBase> WaveletDenoiseFilter<T>
-	waveletSure( Class<?> imageType , int numLevels )
+	waveletSure( Class<T> imageType , int numLevels )
 	{
 		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
 		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels);
-		DenoiseWavelet denoiser;
-
-		if( info.getSumType() == float.class )
-			denoiser = FactoryDenoiseWavelet.sure_F32();
-		else
-			throw new IllegalArgumentException("Unsupported");
+		DenoiseWavelet denoiser = FactoryDenoiseWaveletAlg.sure(imageType);
 
 		return new WaveletDenoiseFilter<T>(descTran,denoiser);
 	}

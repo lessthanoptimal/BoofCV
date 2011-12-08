@@ -41,7 +41,7 @@ public class TestDenoiseBayesShrink_F32 extends GenericWaveletDenoiseTests<Image
 
 	@Override
 	public void denoiseWavelet(ImageBase transformedImg, int numLevels ) {
-		DenoiseBayesShrink_F32 alg = new DenoiseBayesShrink_F32();
+		DenoiseBayesShrink_F32 alg = new DenoiseBayesShrink_F32(null);
 		alg.denoise((ImageFloat32)transformedImg,numLevels);
 	}
 }

@@ -29,6 +29,7 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.denoise.FactoryDenoiseWaveletAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.wavelet.FactoryWaveletCoiflet;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
@@ -97,9 +98,9 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 
 		this.imageType = imageType;
 
-		addAlgorithm(0,"BayesShrink",new DenoiseBayesShrink_F32());
-		addAlgorithm(0,"SureShrink",new DenoiseSureShrink_F32());
-		addAlgorithm(0,"VisuShrink",new DenoiseVisuShrink_F32());
+		addAlgorithm(0,"BayesShrink", FactoryDenoiseWaveletAlg.bayes(null,imageType));
+		addAlgorithm(0,"SureShrink",FactoryDenoiseWaveletAlg.sure(imageType));
+		addAlgorithm(0,"VisuShrink",FactoryDenoiseWaveletAlg.visu(imageType));
 		FilterImageInterface<T,T> filter;
 		filter = FactoryBlurFilter.gaussian(imageType,-1,1);
 		addAlgorithm(0,"Gaussian",filter);
@@ -149,7 +150,7 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 
 		// add noise to the image
 		noisy.setTo(input);
-		GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma);
+		GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma,0,255);
 		GPixelMath.boundImage(noisy,0,255);
 		// compute edge image for weighted error
 		GImageDerivativeOps.laplace(input,deriv);
@@ -246,7 +247,7 @@ public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W exten
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				noisy.setTo(input);
-				GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma);
+				GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma,0,255);
 				GPixelMath.boundImage(noisy,0,255);
 				performDenoising();
 			}});
