@@ -80,6 +80,6 @@ public abstract class GenericDenoiseTests<T extends ImageBase> {
 
 		// create the noisy image
 		imageNoisy = (T)image.clone();
-		GeneralizedImageOps.addGaussian(imageNoisy,rand,noiseSigma);
+		GeneralizedImageOps.addGaussian(imageNoisy,rand,noiseSigma,0,255);
 	}
 }

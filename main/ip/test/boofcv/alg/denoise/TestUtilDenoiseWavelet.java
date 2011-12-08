@@ -43,7 +43,7 @@ public class TestUtilDenoiseWavelet {
 		ImageFloat32 image = new ImageFloat32(width,height);
 
 		double sigma = 12;
-		ImageTestingOps.addGaussian(image,rand,sigma);
+		ImageTestingOps.addGaussian(image,rand,sigma,0,255);
 
 		double found = UtilDenoiseWavelet.estimateNoiseStdDev(image,null);
 
