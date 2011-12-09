@@ -109,9 +109,6 @@ public class Zhang98DecomposeHomography {
 
 		UtilVector3D_F64.createMatrix(R, v1, v2, v3);
 
-		DenseMatrix64F W = new DenseMatrix64F(3,3);
-
-
 		Se3_F64 ret = new Se3_F64();
 		// the R matrix is probably not a real rotation matrix.  So find
 		// the closest real rotation matrix

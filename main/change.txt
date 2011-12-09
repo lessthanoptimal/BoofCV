@@ -6,6 +6,12 @@ Date Format: year/month/day
 Date    : 
 Version : Alpha 0.3
 
+- Camera Calibration
+  * Planar grid (Zhang 98)
+  * Camera calibration matrix from homographies
+  * Linear radial distortion
+  * Decomposition of homography for calibration
+  * Nonlinear optimization of all parameters
 - Added min and max values to ImageTestingOps.addGaussian()
 - Tweaked factories related to wavelet denoising so that they take in
   an image type.
