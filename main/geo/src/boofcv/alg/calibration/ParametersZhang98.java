@@ -28,18 +28,115 @@ import georegression.struct.so.Rodrigues;
  */
 public class ParametersZhang98 {
 	// camera calibration matrix
-	double a,b,c,x0,y0;
+	public double a,b,c,x0,y0;
 	// radial distortion
-	double distortion[];
+	public double distortion[];
 
-	View[] views;
+	// position of each view of the target
+	public View[] views;
+
+	public ParametersZhang98( int numDistort , int numViews ) {
+		distortion = new double[numDistort];
+		setNumberOfViews(numViews);
+	}
+
+	public ParametersZhang98( int numDistort ) {
+		distortion = new double[numDistort];
+	}
+
+	public ParametersZhang98() {
+	}
+
+	public void setNumberOfViews( int numViews ) {
+			views = new View[numViews];
+		for( int i = 0; i < numViews; i++ ) {
+			views[i] = new View();
+		}
+	}
+
+	public ParametersZhang98 createNew() {
+		return new ParametersZhang98(distortion.length,views.length);
+	}
+
+	public ParametersZhang98 copy() {
+		ParametersZhang98 ret = createNew();
+		ret.a = a;
+		ret.b = b;
+		ret.c = c;
+		ret.x0 = x0;
+		ret.y0 = y0;
+
+		for( int i = 0; i < distortion.length; i++ ) {
+			ret.distortion[i] = distortion[i];
+		}
+
+		for( int i = 0; i < views.length; i++ ) {
+			View a = views[i];
+			View b = ret.views[i];
+
+			b.rotation.unitAxisRotation.set(a.rotation.unitAxisRotation);
+			b.rotation.theta = a.rotation.theta;
+			b.T.set(a.T);
+		}
+
+		return ret;
+	}
 
 	public static class View
 	{
-		// TODO use 3D vector instead
 		// description of rotation
-		public Rodrigues rotation;
+		public Rodrigues rotation = new Rodrigues();
 		// translation
-		public Vector3D_F64 T;
+		public Vector3D_F64 T = new Vector3D_F64();
+	}
+
+	public int size() {
+		return 5+distortion.length+(4+3)*views.length;
+	}
+
+	public void setFromParam( double param[] ) {
+		a = param[0];
+		b = param[1];
+		c = param[2];
+		x0 = param[3];
+		y0 = param[4];
+
+		int index = 5;
+		for( int i = 0; i < distortion.length; i++ ) {
+			distortion[i] = param[index++];
+		}
+
+		for( View v : views ) {
+			v.rotation.theta = param[index++];
+			v.rotation.unitAxisRotation.x = param[index++];
+			v.rotation.unitAxisRotation.y = param[index++];
+			v.rotation.unitAxisRotation.z = param[index++];
+			v.T.x = param[index++];
+			v.T.y = param[index++];
+			v.T.z = param[index++];
+		}
+	}
+
+	public void convertToParam( double param[] ) {
+		param[0] = a;
+		param[1] = b;
+		param[2] = c;
+		param[3] = x0;
+		param[4] = y0;
+
+		int index = 5;
+		for( int i = 0; i < distortion.length; i++ ) {
+			param[index++] = distortion[i];
+		}
+
+		for( View v : views ) {
+			param[index++] = v.rotation.theta;
+			param[index++] = v.rotation.unitAxisRotation.x;
+			param[index++] = v.rotation.unitAxisRotation.y;
+			param[index++] = v.rotation.unitAxisRotation.z;
+			param[index++] = v.T.x;
+			param[index++] = v.T.y;
+			param[index++] = v.T.z;
+		}
 	}
 }

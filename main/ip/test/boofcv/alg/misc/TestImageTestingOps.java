@@ -193,7 +193,7 @@ public class TestImageTestingOps {
 		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		GeneralizedImageOps.fill(orig,mean);
-		m.invoke(null,orig,rand,2.0);
+		m.invoke(null,orig,rand,2.0,0,255);
 
 		double stdev2 = 0;
 		SingleBandImage a = FactorySingleBandImage.wrap(orig);
@@ -205,7 +205,7 @@ public class TestImageTestingOps {
 		}
 
 		GeneralizedImageOps.fill(orig,mean);
-		m.invoke(null,orig,rand,10.0);
+		m.invoke(null,orig,rand,10.0,0,255);
 
 		double stdev10 = 0;
 		for( int i = 0; i < height; i++ ) {

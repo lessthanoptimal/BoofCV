@@ -1,6 +1,8 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.alg.calibration.CalibrationGridConfig;
+import boofcv.alg.calibration.CalibrationPlanarGridZhang98;
+import boofcv.alg.calibration.ParametersZhang98;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
@@ -27,18 +29,16 @@ public class GenericCalibrationGrid {
 	public static DenseMatrix64F createStandardCalibration() {
 		DenseMatrix64F K = new DenseMatrix64F(3,3);
 
-		double c_x = 200;
-		double c_y = 220;
-		double f = (c_x/Math.tan(Math.PI*30/180.0)); // 60 degree field of view
+		double c_x = 255;
+		double c_y = 260;
+		double a = 1250;
+		double b = 900;
+		double c = 1.09083;
 
-		double sx = 0.35/f;
-		double sy = sx*0.9;
-		double sk = 0.00001;
-
-		K.set(0,0,f*sx);
-		K.set(0,1,f*sk);
+		K.set(0,0,a);
+		K.set(0,1,c);
 		K.set(0,2,c_x);
-		K.set(1,1,f*sy);
+		K.set(1,1,b);
 		K.set(1,2,c_y);
 		K.set(2,2,1);
 
@@ -137,5 +137,79 @@ public class GenericCalibrationGrid {
 		}
 
 		return homographies;
+	}
+
+	static ParametersZhang98 createStandardParam(boolean zeroSkew, int numSkew, int numView, Random rand) {
+		ParametersZhang98 ret = new ParametersZhang98(numSkew,numView);
+
+		DenseMatrix64F K = createStandardCalibration();
+		ret.a = K.get(0,0);
+		ret.b = K.get(1,1);
+		ret.c = K.get(0,1);
+		ret.x0 = K.get(0,2);
+		ret.y0 = K.get(1,2);
+		if( zeroSkew ) ret.c = 0;
+
+		ret.distortion = new double[numSkew];
+		for( int i = 0; i < numSkew;i++ ) {
+			ret.distortion[i] = rand.nextGaussian()*0.001;
+		}
+
+		for(ParametersZhang98.View v : ret.views ) {
+			double rotX = (rand.nextDouble()-0.5)*0.1;
+			double rotY = (rand.nextDouble()-0.5)*0.1;
+			double rotZ = (rand.nextDouble()-0.5)*0.1;
+			DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(rotX,rotY,rotZ,null);
+			RotationMatrixGenerator.matrixToRodrigues(R,v.rotation);
+
+			double x = rand.nextDouble()*50;
+			double y = rand.nextDouble()*50;
+			double z = rand.nextDouble()*50-1100;
+
+			v.T.set(x,y,z);
+		}
+		return ret;
+	}
+
+	/**
+	 * Creates a set of observed points in pixel coordinates given zhang parameters and a calibration
+	 * grid.
+	 */
+	public static List<List<Point2D_F64>> createObservations( ParametersZhang98 config,
+															  List<Point2D_F64> grid)
+	{
+		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();
+
+		Point3D_F64 cameraPt = new Point3D_F64();
+		Point2D_F64 calibratedPt = new Point2D_F64();
+
+		for( ParametersZhang98.View v : config.views ) {
+			List<Point2D_F64> obs = new ArrayList<Point2D_F64>();
+			Se3_F64 se = new Se3_F64();
+			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
+			se.T = v.T;
+
+			for( Point2D_F64 grid2D : grid ) {
+				Point3D_F64 grid3D = new Point3D_F64(grid2D.x,grid2D.y,0);
+
+				// Put the point in the camera's reference frame
+				SePointOps_F64.transform(se,grid3D, cameraPt);
+
+				// calibrated pixel coordinates
+				calibratedPt.x = cameraPt.x/ cameraPt.z;
+				calibratedPt.y = cameraPt.y/ cameraPt.z;
+
+				// apply radial distortion
+				CalibrationPlanarGridZhang98.applyDistortion(calibratedPt, config.distortion);
+
+				// convert to pixel coordinates
+				double x = config.a*calibratedPt.x + config.c*calibratedPt.y + config.x0;
+				double y = config.b*calibratedPt.y + config.y0;
+
+				obs.add(new Point2D_F64(x,y));
+			}
+			ret.add(obs);
+		}
+		return ret;
 	}
 }

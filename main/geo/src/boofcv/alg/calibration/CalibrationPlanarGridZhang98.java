@@ -18,6 +18,7 @@
 
 package boofcv.alg.calibration;
 
+import boofcv.numerics.optimization.LevenbergMarquardt;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -29,12 +30,17 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
+// todo add new skew support to non-linear
 public class CalibrationPlanarGridZhang98 {
 
 	Zhang98ComputeTargetHomography computeHomography;
 	Zhang98CalibrationMatrixFromHomographies computeK;
 	RadialDistortionEstimateLinear computeRadial;
 	Zhang98DecomposeHomography decomposeH = new Zhang98DecomposeHomography();
+
+	ParametersZhang98 optimized;
+
+	List<Point2D_F64> grid;
 
 	public CalibrationPlanarGridZhang98( CalibrationGridConfig config ,
 										 boolean assumeZeroSkew ,
@@ -43,7 +49,8 @@ public class CalibrationPlanarGridZhang98 {
 		computeHomography = new Zhang98ComputeTargetHomography(config);
 		computeK = new Zhang98CalibrationMatrixFromHomographies(assumeZeroSkew);
 		computeRadial = new RadialDistortionEstimateLinear(config,numSkewParam);
-
+		grid = config.computeGridPoints();
+		optimized = new ParametersZhang98(numSkewParam);
 	}
 
 	/**
@@ -52,13 +59,16 @@ public class CalibrationPlanarGridZhang98 {
 	 */
 	public boolean process(  List<List<Point2D_F64>> observations ) {
 
+		optimized.setNumberOfViews(observations.size());
+
 		// compute initial parameter estimates using linear algebra
 		ParametersZhang98 initial =  initialParam(observations);
 		if( initial == null )
 			return false;
 
 		// perform non-linear optimization to improve results
-		// todo do this part
+		if( !optimizedParam(observations,grid,initial,optimized))
+			return false;
 
 		return true;
 	}
@@ -75,12 +85,16 @@ public class CalibrationPlanarGridZhang98 {
 			DenseMatrix64F H = computeHomography.getHomography();
 
 			homographies.add(H);
-			motions.add(decomposeH.decompose(H));
 		}
 
 		computeK.process(homographies);
 
 		DenseMatrix64F K = computeK.getCalibrationMatrix();
+
+		decomposeH.setCalibrationMatrix(K);
+		for( DenseMatrix64F H : homographies ) {
+			motions.add(decomposeH.decompose(H));
+		}
 
 		computeRadial.process(K,homographies,observations);
 
@@ -89,12 +103,40 @@ public class CalibrationPlanarGridZhang98 {
 		return convertIntoZhangParam(motions, K, distort);
 	}
 
+	public static boolean optimizedParam( List<List<Point2D_F64>> observations ,
+										  List<Point2D_F64> grid ,
+										  ParametersZhang98 initial ,
+										  ParametersZhang98 found )
+	{
+		int numModelParam = initial.size();
+		Zhang98OptimizationFunction func = new Zhang98OptimizationFunction(initial.createNew(),grid);
+
+		LevenbergMarquardt<List<Point2D_F64>,Integer> lm =
+				new LevenbergMarquardt<List<Point2D_F64>,Integer>(numModelParam,func);
+
+		// todo this is stupid
+		List<Integer> state = new ArrayList<Integer>();
+		for( int i = 0; i < observations.size(); i++ ) {
+			state.add(i);
+		}
+
+		double model[] = new double[ initial.size() ];
+		initial.convertToParam(model);
+		if( !lm.process(model,observations,state) ) {
+			throw new RuntimeException("Egads");
+		}
+
+		double param[] = lm.getModelParameters();
+		found.setFromParam(param);
+		return true;
+	}
+
 	/**
 	 * Converts results fond in the linear algorithms into {@link ParametersZhang98}
 	 */
-	private ParametersZhang98 convertIntoZhangParam(List<Se3_F64> motions,
-													DenseMatrix64F K,
-													double[] distort) {
+	public static ParametersZhang98 convertIntoZhangParam(List<Se3_F64> motions,
+														  DenseMatrix64F K,
+														  double[] distort) {
 		ParametersZhang98 ret = new ParametersZhang98();
 
 		ret.a = K.get(0,0);
@@ -111,13 +153,32 @@ public class CalibrationPlanarGridZhang98 {
 
 			ParametersZhang98.View v = new ParametersZhang98.View();
 			v.T = m.getT();
-			// todo use 3 vector instead
-			v.rotation = RotationMatrixGenerator.matrixToRodrigues(m.getR(), null);
+			RotationMatrixGenerator.matrixToRodrigues(m.getR(), v.rotation);
 
 			ret.views[i] = v;
 		}
 
 		return ret;
+	}
+
+	/**
+	 * Applies radial distortion to the point.
+	 *
+	 * @param pt point in calibrated pixel coordinates
+	 * @param radial radial distortion parameters
+	 */
+	public static void applyDistortion(Point2D_F64 pt, double[] radial)
+	{
+		double a = 0;
+		double r2 = pt.x*pt.x + pt.y*pt.y;
+		double r = r2;
+		for( int i = 0; i < radial.length; i++ ) {
+			a += radial[i]*r;
+			r *= r2;
+		}
+
+		pt.x += pt.x*a;
+		pt.y += pt.y*a;
 	}
 
 }

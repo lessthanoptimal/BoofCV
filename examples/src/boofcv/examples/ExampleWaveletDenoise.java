@@ -46,10 +46,10 @@ public class ExampleWaveletDenoise {
 		GeneralizedImageOps.addGaussian(noisy,rand,20,0,255);
 		ImageFloat32 denoised = new ImageFloat32(input.width,input.height);
 
-		// create the noise removal filter
+		// How many levels in wavelet transform
 		int numLevels = 4;
+		// Create the noise removal algorithm
 		WaveletDenoiseFilter<ImageFloat32> denoiser = FactoryImageDenoise.waveletBayes(ImageFloat32.class,numLevels);
-
 
 		// remove noise from the image
 		denoiser.process(noisy,denoised);
