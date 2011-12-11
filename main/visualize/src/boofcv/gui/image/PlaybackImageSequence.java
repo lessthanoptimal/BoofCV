@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.io.image;
+package boofcv.gui.image;
 
-import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
+import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 
 import java.awt.image.BufferedImage;

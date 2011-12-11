@@ -1,0 +1,25 @@
+%!PS
+% paper size
+/pagewidth 8.5 72 mul def
+/pageheight 10 72 mul def 
+
+% ----- Define centimeter
+/cm {28.346 mul} def
+% ----- square width
+/w {3 cm} def
+/ww {w 2 mul} def
+/r {w 2 div} def
+% ----- Define procedure for drawing a box
+/box {w 0 rlineto 0 w rlineto -1 w mul 0 rlineto closepath} def
+
+% take in account the size of a square
+/pagewidth pagewidth ww sub def
+/pagewidth pageheight ww sub def
+
+% draw all the boxes it can across a single row
+/rowboxes {w ww pagewidth {newpath y moveto box fill} for} def
+
+% increments the y variable and draws all the rows
+w ww pageheight { /y exch def rowboxes } for
+
+showpage
