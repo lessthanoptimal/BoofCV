@@ -4,19 +4,14 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="BoofCV IO" />
+    <orderEntry type="module" module-name="BoofCV Image Processing" />
     <orderEntry type="module" module-name="BoofCV Feature" />
     <orderEntry type="module" module-name="BoofCV Geometric Vision" />
-    <orderEntry type="module" module-name="BoofCV Image Processing" />
-    <orderEntry type="module" module-name="BoofCV IO" />
-    <orderEntry type="module" module-name="BoofCV Numerics" />
-    <orderEntry type="module" module-name="ejml" />
     <orderEntry type="module" module-name="GeoRegression" />
-    <orderEntry type="module" module-name="libpja" />
-    <orderEntry type="module" module-name="BoofCV Visualize" />
   </component>
 </module>
 

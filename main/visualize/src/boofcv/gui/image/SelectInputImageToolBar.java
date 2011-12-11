@@ -1,4 +1,4 @@
-package boofcv.io.image;
+package boofcv.gui.image;
 
 import javax.swing.*;
 import java.awt.*;

@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.io.image;
+package boofcv.gui.image;
 
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
 
 import javax.swing.*;

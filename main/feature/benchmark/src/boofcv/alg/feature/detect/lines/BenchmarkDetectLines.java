@@ -23,13 +23,15 @@ import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.line.FactoryDetectLine;
-import boofcv.io.image.UtilImageIO;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
 
@@ -110,8 +112,8 @@ public class BenchmarkDetectLines<T extends ImageBase, D extends ImageBase> {
 		System.out.println("done");
 	}
 
-	public static void main(String args[]) {
-		BufferedImage image = UtilImageIO.loadImage("../evaluation/data/lines_indoors.jpg");
+	public static void main(String args[]) throws IOException {
+		BufferedImage image = ImageIO.read(new File("../evaluation/data/lines_indoors.jpg"));
 //		BufferedImage image = UtilImageIO.loadImage("../applet/data/lines_indoors.jpg");
 
 		System.out.println("=========  Profile Image Size " + image.getWidth() + " x " + image.getHeight()+ " ==========");

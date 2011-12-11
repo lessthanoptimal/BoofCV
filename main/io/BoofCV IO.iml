@@ -8,10 +8,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="BoofCV Image Processing" />
-    <orderEntry type="module" module-name="BoofCV Feature" />
-    <orderEntry type="module" module-name="GeoRegression" />
-    <orderEntry type="module" module-name="BoofCV Geometric Vision" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -22,6 +18,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="testing" level="project" />
+    <orderEntry type="module" module-name="BoofCV Image Processing" />
   </component>
 </module>
 
