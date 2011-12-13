@@ -43,7 +43,7 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	Color colors[];
 
 	public AssociationPanel(int borderSize ) {
-		super(borderSize);
+		super(borderSize,true);
 	}
 
 	public synchronized void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts,
@@ -75,35 +75,38 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	protected void drawFeatures(Graphics2D g2 ,
 							 double scaleLeft, int leftX, int leftY,
 							 double scaleRight, int rightX, int rightY) {
-		if( selectedIndex == -1 )
+		if( selected.isEmpty() )
 			drawAllFeatures(g2, scaleLeft,scaleRight,rightX);
 		else {
-			// draw just an individual feature pair
-			Point2D_F64 l,r;
-			Color color;
 
-			if( selectedIsLeft ) {
-				l = leftPts.get(selectedIndex);
-				if( assocLeft[selectedIndex] < 0 ) {
-					r = null; color = null;
+			for( int selectedIndex : selected ) {
+				// draw just an individual feature pair
+				Point2D_F64 l,r;
+				Color color;
+
+				if( selectedIsLeft ) {
+					l = leftPts.get(selectedIndex);
+					if( assocLeft[selectedIndex] < 0 ) {
+						r = null; color = null;
+					} else {
+						r = rightPts.get(assocLeft[selectedIndex]);
+						color = colors[selectedIndex];
+					}
 				} else {
-					r = rightPts.get(assocLeft[selectedIndex]);
-					color = colors[selectedIndex];
+					r = rightPts.get(selectedIndex);
+					if( assocRight[selectedIndex] < 0 ) {
+						l = null; color = null;
+					} else {
+						l = leftPts.get(assocRight[selectedIndex]);
+						color = colors[assocRight[selectedIndex]];
+					}
 				}
-			} else {
-				r = rightPts.get(selectedIndex);
-				if( assocRight[selectedIndex] < 0 ) {
-					l = null; color = null;
-				} else {
-					l = leftPts.get(assocRight[selectedIndex]);
-					color = colors[assocRight[selectedIndex]];
-				}
+
+				if( color == null ) // clicking on something with no association is annoying
+					drawAllFeatures(g2, scaleLeft,scaleRight,rightX);
+				else
+					drawAssociation(g2, scaleLeft,scaleRight,rightX, l, r, color);
 			}
-
-			if( color == null ) // clicking on something with no association is annoying
-				drawAllFeatures(g2, scaleLeft,scaleRight,rightX);
-			else
-				drawAssociation(g2, scaleLeft,scaleRight,rightX, l, r, color);
 		}
 	}
 

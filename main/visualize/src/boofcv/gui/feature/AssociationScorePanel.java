@@ -53,7 +53,7 @@ public class AssociationScorePanel<D>
 	double best;
 
 	public AssociationScorePanel( double containmentFraction ) {
-		super(20);
+		super(20,false);
 		if( containmentFraction <= 0  )
 			throw new IllegalArgumentException("containmentFraction must be more than zero");
 		this.containmentFraction = containmentFraction;
@@ -102,12 +102,17 @@ public class AssociationScorePanel<D>
 		}
 
 		// draw all the found features in both images since nothing has been selected yet
-		if( selectedIndex == -1 ) {
+		if( selected.isEmpty() ) {
 			drawPoints(g2,leftPts,leftX,leftY,scaleLeft);
 			drawPoints(g2,rightPts,rightX,rightY,scaleRight);
 			return;
+		} else if( selected.size() != 1 ) {
+			System.err.println("Selected more than one feature!");
+			return;
 		}
-
+		
+		int selectedIndex = selected.get(0);
+		
 		// compute association score
 		computeScore(selectedIsLeft,selectedIndex);
 

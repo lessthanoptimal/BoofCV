@@ -19,9 +19,14 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.filter.binary.impl.*;
+import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
+import boofcv.alg.filter.binary.impl.ImplBinaryBorderOps;
+import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
+import boofcv.alg.filter.binary.impl.LabelNode;
+import boofcv.alg.misc.ImageTestingOps;
+import boofcv.core.image.border.ImageBorderValue;
+import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
@@ -107,7 +112,6 @@ public class BinaryImageOps {
 	public static ImageUInt8 edge4(ImageUInt8 input, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		ImplBinaryNaiveOps.edge4(input, output);
 		ImplBinaryInnerOps.edge4(input, output);
 		ImplBinaryBorderOps.edge4(input, output);
 
@@ -339,7 +343,7 @@ public class BinaryImageOps {
 	 *
 	 * @param labelImage The labeled image.
 	 * @param numLabels Number of labeled objects inside the image.
-	 * @param queue Predeclare returned points.  Improves runtime performance.
+	 * @param queue Predeclare returned points.  Improves runtime performance. Can be null.
 	 * @return List of pixels in each cluster.
 	 */
 	public static List<List<Point2D_I32>> labelToClusters( ImageSInt32 labelImage ,
@@ -350,7 +354,10 @@ public class BinaryImageOps {
 		for( int i = 0; i < numLabels+1; i++ ) {
 			ret.add( new ArrayList<Point2D_I32>() );
 		}
-		queue.reset();
+		if( queue == null ) {
+			queue = new FastQueue<Point2D_I32>(numLabels,Point2D_I32.class,true);
+		} else
+			queue.reset();
 
 		for( int y = 0; y < labelImage.height; y++ ) {
 			int start = labelImage.startIndex + y*labelImage.stride;
@@ -372,13 +379,68 @@ public class BinaryImageOps {
 		return ret;
 	}
 
-	private static GrowingArrayInt checkDeclareMaxConnect(GrowingArrayInt maxConnect) {
-		if( maxConnect == null )
-			maxConnect = new GrowingArrayInt(20);
+	/**
+	 * Extracts edges from a labeled blob image using a 4-connect rule
+	 *
+	 * @param labelImage labeled image
+	 * @param numLabels Number of labels in the image
+	 * @param queue Optional queue with predeclared points.  Can be null.
+	 * @return List of found contours around labeled image.
+	 */
+	public static List<List<Point2D_I32>> labelEdgeCluster4( ImageSInt32 labelImage ,
+															 int numLabels ,
+															 FastQueue<Point2D_I32> queue )
+	{
+		List<List<Point2D_I32>> ret = new ArrayList<List<Point2D_I32>>();
+		for( int i = 0; i < numLabels+1; i++ ) {
+			ret.add( new ArrayList<Point2D_I32>() );
+		}
+		if( queue == null ) {
+			queue = new FastQueue<Point2D_I32>(numLabels,Point2D_I32.class,true);
+		} else
+			queue.reset();
 
-		return maxConnect;
+		// todo this method is slow and should be speed up with an inner and outer version
+		ImageBorder_I32 in = ImageBorderValue.wrap(labelImage, 0);
+		
+		for( int y = 0; y < labelImage.height; y++ ) {
+
+			for( int x = 0; x < labelImage.width; x++ ) {
+				int v = in.get(x,y);
+				if( v == 0 )
+					continue;
+				if( in.get(x-1,y) == 0 || in.get(x+1,y) == 0 || in.get(x,y-1) == 0 || in.get(x,y+1) == 0 ) {
+					Point2D_I32 p = queue.pop();
+					p.set(x,y);
+					ret.get(v).add(p);
+				}
+			}
+		}
+		// first list is a place holder and should be empty
+		if( ret.get(0).size() != 0 )
+			throw new RuntimeException("BUG!");
+		ret.remove(0);
+		return ret;
 	}
 
+	/**
+	 * Sets each pixel in the list of clusters to one in the binary image.
+	 *
+	 * @param clusters List of all the clusters.
+	 * @param binary Output
+	 */
+	public static void clusterToBinary( List<List<Point2D_I32>> clusters ,
+										ImageUInt8 binary )
+	{
+		ImageTestingOps.fill(binary,0);
+		
+		for( List<Point2D_I32> l : clusters ) {
+			for( Point2D_I32 p : l ) {
+				binary.set(p.x,p.y,1);
+			}
+		}
+	}
+	
 	/**
 	 * Several blob rending functions take in an array of colors so that the random blobs can be drawn
 	 * with the same color each time.  This function selects a random color for each blob and returns it

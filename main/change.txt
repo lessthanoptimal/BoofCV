@@ -15,8 +15,10 @@ Version : Alpha 0.3
 - Added min and max values to ImageTestingOps.addGaussian()
 - Tweaked factories related to wavelet denoising so that they take in
   an image type.
-
-
+- Removed cyclical dependency between modules by creating a visualize modules
+- Added to BinaryImageOps
+  * label to clusters
+  * clusters to binary
 
 ---------------------------------------------
 Date    : 2011/12/01 
