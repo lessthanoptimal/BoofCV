@@ -19,15 +19,19 @@
 package boofcv.numerics.optimization;
 
 /**
+ * A function tha can compute the residuals given a model and a set of observations
+ *
  * @author Peter Abeles
  */
-public interface OptimizationFunction<State> {
+public interface OptimizationResidual<Observed,State> extends OptimizationFunction<State> {
 
-	public void setModel( double[] model );
-
-	public int getNumberOfFunctions();
-
-	public int getModelSize();
-
-	public boolean estimate( State state ,double estimated[] );
+	/**
+	 * Computes the residuals, which are defined as: residuals[i] = obs[i] - estimated[i];
+	 *
+	 * @param observed observed value of each function
+	 * @param state Optional state parameters
+	 * @param residuals Computed residuals
+	 * @return true if successfully computed and false otherwise
+	 */
+	public boolean computeResiduals( Observed observed , State state, double residuals[] );
 }

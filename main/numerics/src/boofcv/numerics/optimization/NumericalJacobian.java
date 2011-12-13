@@ -41,14 +41,14 @@ public class NumericalJacobian<Observation,State> implements OptimizationDerivat
 	double differenceScale;
 
 	// function whose derivative is being numerically estimated
-	OptimizationFunction<Observation,State> function;
+	OptimizationFunction<State> function;
 
-	public NumericalJacobian(OptimizationFunction<Observation,State> function )
+	public NumericalJacobian(OptimizationFunction<State> function )
 	{
 		this(function, Math.sqrt(UtilEjml.EPS));
 	}
 
-	public NumericalJacobian(OptimizationFunction<Observation,State> function,
+	public NumericalJacobian(OptimizationFunction<State> function,
 							 double differenceScale ) {
 		this.function = function;
 		model = new double[ function.getModelSize() ];

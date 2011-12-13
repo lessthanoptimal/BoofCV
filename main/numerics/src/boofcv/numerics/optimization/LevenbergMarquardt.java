@@ -55,7 +55,7 @@ public class LevenbergMarquardt<Observed,State> {
 	private int totalObservations;
 
 	// Computes observation residuals given a model
-	private OptimizationFunction<Observed,State> function;
+	private OptimizationResidual<Observed,State> function;
 	// Computes the derivatives of observation residuals given a model
 	private OptimizationDerivative<State> derivative;
 
@@ -94,21 +94,23 @@ public class LevenbergMarquardt<Observed,State> {
 	 * @param numModelParam Number of model parameters to be optimized.
 	 * @param function Function that is being optimized.
 	 */
+	// todo numModelParam is specified in the function
+	// todo make this setFunction() instead
 	public LevenbergMarquardt( int numModelParam,
-							   OptimizationFunction<Observed,State> function )
+							   OptimizationResidual<Observed,State> function )
 	{
 		this(numModelParam,function,new NumericalJacobian<Observed,State>(function),DEFAULT_XTOL,DEFAULT_XTOL,100);
 	}
 
 	public LevenbergMarquardt( int numModelParam,
-							   OptimizationFunction<Observed,State> function ,
+							   OptimizationResidual<Observed,State> function ,
 							   OptimizationDerivative<State> derivative)
 	{
 		this(numModelParam,function,derivative,DEFAULT_XTOL,DEFAULT_XTOL,100);
 	}
 
 	public LevenbergMarquardt( int numModelParam,
-							   OptimizationFunction<Observed,State> function ,
+							   OptimizationResidual<Observed,State> function ,
 							   OptimizationDerivative<State> derivative,
 							   double xtol , double ftol , int maxIterations )
 	{
@@ -188,14 +190,17 @@ public class LevenbergMarquardt<Observed,State> {
 		for( int iter = 0; iter < maxIterations && prevCost > 0; iter++ ) {
             System.out.println("Iteration: "+iter+"  recomp "+recomputeDerivatives);
 
+			// TODO don't compute A directly   pg 119
 			if( recomputeDerivatives ) {
 				computeMatrices(dataObserved,dataState, numFunctions);
 			}
 
-
 			computeA(A, H, lambda);
 
-			solve();
+			if( !solve() ) {
+				lambda *= 10;
+				continue;
+			}
 
 //			correction.print();
 //			System.out.println("--------------------");
@@ -225,8 +230,6 @@ public class LevenbergMarquardt<Observed,State> {
 			if( performXTest(workModel,lambda))
 				break;
 
-
-
 			if( recomputeDerivatives ) {
 				prevCost = cost;
 			}
@@ -240,12 +243,25 @@ public class LevenbergMarquardt<Observed,State> {
 	/**
 	 * A*x=d
 	 */
-	private void solve() {
+	private boolean solve() {
 		if( !decomposition.decompose(A))
 			throw new RuntimeException("Should never fail");
 
-		DenseMatrix64F Q = decomposition.getQ(null,true);
 		DenseMatrix64F R = decomposition.getR(null,true);
+		
+		// see if it is positive definite
+		double det = 1.0;
+		int rank = decomposition.getRank();
+		for( int i = 0; i < rank; i++ ) {
+			det *= R.get(i,i);
+		}
+		if( det <= 0 )  {
+			A.print();
+			R.print();
+			return false;
+		}
+//
+		DenseMatrix64F Q = decomposition.getQ(null,true);
 
 		// get the pivots and transpose them
 		int pivotTran[] = new int[numModelParam];
@@ -257,20 +273,16 @@ public class LevenbergMarquardt<Observed,State> {
 		DenseMatrix64F y = new DenseMatrix64F(d.numRows,d.numCols);
 		CommonOps.multTransA(Q,d,y);
 
-		int rank = decomposition.getRank();
 		TriangularSolver.solveU(R.data, y.data, rank);
 
 		correction.zero();
-
-		double max = Math.abs(R.get(0, 0));
-
-//		R.print();
 
 		// apply larger corrections along the direction it is most confident in
 		for( int i = 0; i < rank; i++ ) {
 			double val = y.data[i];//*(Math.abs(R.get(i,i))/max);
 			correction.data[pivotTran[i]] = val;
 		}
+		return true;
 	}
 
 	/**

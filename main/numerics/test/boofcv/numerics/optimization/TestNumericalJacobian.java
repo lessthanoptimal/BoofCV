@@ -14,7 +14,7 @@ public class TestNumericalJacobian {
 	 */
 	@Test
 	public void compareToKnown() {
-		OptimizationFunction<double[],double[]> func = new TestLevenbergMarquardt.NonlinearResidual();
+		OptimizationFunction<double[]> func = new TestLevenbergMarquardt.NonlinearResidual();
 		OptimizationDerivative<double[]> derivTrue = new TestLevenbergMarquardt.NonlinearGradient();
 
 		OptimizationDerivative<double[]> deriv = new NumericalJacobian<double[],double[]>(func);

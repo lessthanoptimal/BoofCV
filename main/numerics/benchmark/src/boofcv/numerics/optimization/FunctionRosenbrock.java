@@ -19,15 +19,43 @@
 package boofcv.numerics.optimization;
 
 /**
+ * <p>
+ * Well known test function, should be easily solved by any robust solver.
+ * </p>
+ * 
+ * <p>
+ * [1] J. More, B. Garbow, K. Hillstrom, "Testing Unconstrained Optimization Software"
+ * 1981 ACM Transactions on Mathematical Software, Vol 7, No. 1, Match 1981, pages 17-41
+ * </p>
+ * 
  * @author Peter Abeles
  */
-public interface OptimizationFunction<State> {
+public class FunctionRosenbrock implements OptimizationFunction<Object>{
+	
+	double x1,x2;
+	
+	@Override
+	public void setModel(double[] model) {
+		x1 = model[0];
+		x2 = model[1];
+	}
 
-	public void setModel( double[] model );
+	@Override
+	public int getNumberOfFunctions() {
+		return 2;
+	}
 
-	public int getNumberOfFunctions();
+	@Override
+	public int getModelSize() {
+		return 2;
+	}
 
-	public int getModelSize();
+	@Override
+	public boolean estimate(Object o, double[] estimated) {
 
-	public boolean estimate( State state ,double estimated[] );
+		estimated[0] = 10.0*(x2-x1*x1);
+		estimated[1] = 1-x1;
+
+		return true;
+	}
 }
