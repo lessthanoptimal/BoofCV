@@ -95,7 +95,7 @@ public class TestLevenbergMarquardt {
 		return ret;
 	}
 
-	private static class LineResidual implements OptimizationFunction<double[],double[]>
+	private static class LineResidual implements OptimizationResidual<double[],double[]>
 	{
 		double a,b;
 
@@ -148,7 +148,7 @@ public class TestLevenbergMarquardt {
 		}
 	}
 
-	public static class NonlinearResidual implements OptimizationFunction<double[],double[]>
+	public static class NonlinearResidual implements OptimizationResidual<double[],double[]>
 	{
 		double a,b;
 

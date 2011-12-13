@@ -26,7 +26,7 @@ package boofcv.numerics.optimization;
 public class JacobianChecker {
 
 	public static <Observed,State> double[][]
-	compareToNumerical(OptimizationFunction<Observed, State> function,
+	compareToNumerical(OptimizationFunction<State> function,
 					   OptimizationDerivative<State> gradient,
 					   State state, double... param)
 	{
