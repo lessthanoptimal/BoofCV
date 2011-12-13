@@ -20,12 +20,15 @@ package boofcv.gui.feature;
 
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -34,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class CompareTwoImagePanel extends JPanel implements MouseListener {
+public abstract class CompareTwoImagePanel extends JPanel implements MouseListener , MouseMotionListener{
 
 	// how close a click needs to be to a point
 	private double clickDistance = 20;
@@ -43,9 +46,12 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 	protected List<Point2D_F64> leftPts,rightPts;
 
 	// draw a selected pair
-	protected int selectedIndex=-1;
+	List<Integer> selected = new ArrayList<Integer>();
 	protected boolean selectedIsLeft;
 
+	// can it select more than one?
+	protected boolean selectRegion;
+	
 	// size of the border between the images
 	protected int borderSize;
 
@@ -53,15 +59,22 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 	protected BufferedImage leftImage,rightImage;
 	protected double scaleLeft,scaleRight;
 
-	public CompareTwoImagePanel(int borderSize ) {
+	// where it first clicked when selecting a region
+	protected Point2D_I32 firstClick;
+	// current position of the mouse while being dragged
+	protected Point2D_I32 mousePosition = new Point2D_I32();
+	
+	public CompareTwoImagePanel(int borderSize , boolean canSelectRegion) {
 		this.borderSize = borderSize;
+		this.selectRegion = canSelectRegion;
 		addMouseListener(this);
+		addMouseMotionListener(this);
 	}
 
 	public void setLocation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts) {
 		this.leftPts = leftPts;
 		this.rightPts = rightPts;
-		selectedIndex = -1;
+		selected.clear();
 	}
 
 	/**
@@ -102,6 +115,21 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 		g2.drawImage(rightImage,x2,0,x3,y2,0,0,rightImage.getWidth(),rightImage.getHeight(),null);
 
 		drawFeatures(g2,scaleLeft,0,0,scaleRight,x2,0);
+		
+		// draw the selected region
+		if( selectRegion && firstClick != null ) {
+			int x0 = mousePosition.getX() < firstClick.x ? mousePosition.getX() : firstClick.x;
+			x1 = mousePosition.getX() >= firstClick.x ? mousePosition.getX() : firstClick.x;
+			int y0 = mousePosition.getY() < firstClick.y ? mousePosition.getY() : firstClick.y;
+			y1 = mousePosition.getY() >= firstClick.y ? mousePosition.getY() : firstClick.y;
+
+			g2.setColor(Color.WHITE);
+			g2.setStroke(new BasicStroke(3));
+			g2.drawRect(x0,y0,x1-x0,y1-y0);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(1));
+			g2.drawRect(x0,y0,x1-x0,y1-y0);
+		}
 	}
 
 	/**
@@ -143,7 +171,8 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		selectedIndex = -1;
+		firstClick = null;
+		selected.clear();
 		if( e.getClickCount() > 1 ) {
 			repaint();
 			return;
@@ -161,7 +190,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 			int bestIndex = findBestPoint(x, y, leftPts );
 
 			if( bestIndex != -1 ) {
-				selectedIndex = bestIndex;
+				selected.add( bestIndex );
 			}
 
 		} else if( e.getX() >= rightBeginX ) {
@@ -173,7 +202,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 			int bestIndex = findBestPoint(x, y, rightPts );
 
 			if( bestIndex != -1 ) {
-				selectedIndex = bestIndex;
+				selected.add( bestIndex );
 			}
 
 		}
@@ -201,14 +230,82 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 	protected abstract boolean isValidPoint( int index );
 
 	@Override
-	public void mousePressed(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {
+		if( selectRegion )
+			firstClick = new Point2D_I32(e.getX(),e.getY());
+	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {
+		if( !selectRegion ) {
+			return;
+		}
+
+		// adjust the selected region for scale and the image that was selected
+		int leftEndX = (int)(scaleLeft*leftImage.getWidth());
+		int rightBeginX = leftEndX + borderSize;
+		selectedIsLeft = e.getX() < leftEndX;
+
+		int x0 = e.getX() < firstClick.x ? e.getX() : firstClick.x;
+		int x1 = e.getX() >= firstClick.x ? e.getX() : firstClick.x;
+		int y0 = e.getY() < firstClick.y ? e.getY() : firstClick.y;
+		int y1 = e.getY() >= firstClick.y ? e.getY() : firstClick.y;
+
+		double scale = selectedIsLeft ? scaleLeft : scaleRight;
+		
+		if( selectedIsLeft) {
+			x0 /= scale;
+			x1 /= scale;
+		} else {
+			x0 = (int)((x0 - rightBeginX)/scale);
+			x1 = (int)((x1 - rightBeginX)/scale);
+		}
+		y0 /= scale;
+		y1 /= scale;
+		
+		// find all the points in the region
+		if( selectedIsLeft ) {
+			findPointsInRegion(x0,y0,x1,y1,leftPts);
+		} else {
+			findPointsInRegion(x0,y0,x1,y1,rightPts);
+		}
+		
+		// reset the selector
+		firstClick = null;
+
+		repaint();
+	}
+	
+	private void findPointsInRegion( int x0 , int y0 , int x1 , int y1 , List<Point2D_F64> pts )
+	{
+		selected.clear();
+		for( int i = 0; i < pts.size(); i++ ) {
+			if( !isValidPoint(i) )
+				continue;
+
+			Point2D_F64 p = pts.get(i);
+			
+			if( p.x >= x0 && p.x < x1 && p.y >= y0 && p.y < y1 ) {
+				selected.add(i);
+			}
+		}
+	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {}
 
 	@Override
 	public void mouseExited(MouseEvent e) {}
+
+	@Override
+	public void mouseDragged(MouseEvent e){
+		if( selectRegion ) {
+			mousePosition.x = e.getX();
+			mousePosition.y = e.getY();
+			repaint();
+		}
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e){}
 }

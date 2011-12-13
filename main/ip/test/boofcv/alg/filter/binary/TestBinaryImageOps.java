@@ -21,6 +21,7 @@ package boofcv.alg.filter.binary;
 import boofcv.alg.filter.binary.impl.CompareToBinaryNaive;
 import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import boofcv.alg.filter.binary.impl.TestImplBinaryBlobLabeling;
+import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt32;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -187,5 +189,38 @@ public class TestBinaryImageOps {
 		assertEquals(2,ret.get(2).size());
 		assertEquals(4,ret.get(3).size());
 		assertEquals(1,ret.get(4).size());
+	}
+
+	@Test
+	public void labelEdgeCluster4() {
+		ImageUInt8 binary = new ImageUInt8(30,30);
+		ImageSInt32 labels = new ImageSInt32(30,30);
+		ImageUInt8 expected = new ImageUInt8(30,30);
+		
+		// create a random image and find clusters
+		GeneralizedImageOps.randomize(binary,rand,0,1);
+		// make sure there are some islands
+		for( int i = 0; i < 30; i++ ) {
+			binary.set(15,i,0);
+			binary.set(i,15,0);
+		}
+		int numLabels = BinaryImageOps.labelBlobs4(binary,labels);
+		
+		// extract edges from binary
+		BinaryImageOps.edge4(binary,expected);
+		// find edge using labeled
+		List<List<Point2D_I32>> list = BinaryImageOps.labelEdgeCluster4(labels,numLabels,null);
+		
+		// makes ure its edges only
+		int total = 0;
+		for( List<Point2D_I32> l : list ) {
+			total += l.size();
+			for( Point2D_I32 p : l ) {
+				assertTrue(expected.get(p.x,p.y) == 1);
+			}
+		}
+
+		// should be the same number
+		assertEquals(PixelMath.sum(expected),total);
 	}
 }
