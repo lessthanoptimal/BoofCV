@@ -46,7 +46,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Runs a KLT tracker through a video sequence
+ * Runs a point tracker and stabilizes a video sequence
  *
  * @author Peter Abeles
  */
