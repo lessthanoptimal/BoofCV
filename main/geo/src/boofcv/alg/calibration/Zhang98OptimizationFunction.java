@@ -19,6 +19,7 @@
 package boofcv.alg.calibration;
 
 import boofcv.numerics.optimization.OptimizationFunction;
+import boofcv.numerics.optimization.OptimizationResidual;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class Zhang98OptimizationFunction implements OptimizationFunction<List<Point2D_F64>,Integer> {
+public class Zhang98OptimizationFunction implements OptimizationResidual<List<Point2D_F64>,Integer> {
 
 	// description of the calibration grid
 	List<Point3D_F64> grid = new ArrayList<Point3D_F64>();

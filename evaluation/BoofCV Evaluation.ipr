@@ -430,7 +430,7 @@
       <module fileurl="file://$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" filepath="$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/visualize/BoofCV Visualize.iml" filepath="$PROJECT_DIR$/../main/visualize/BoofCV Visualize.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" filepath="$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../georegression/GeoRegression.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../GeoRegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../GeoRegression/GeoRegression.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../../ejml/trunk/ejml.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../libpjajava/libpja.iml" filepath="$PROJECT_DIR$/../../libpjajava/libpja.iml" />
     </modules>
@@ -572,7 +572,7 @@
   <component name="libraryTable">
     <library name="testing">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/junit-4.9.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/junit-4.10.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
