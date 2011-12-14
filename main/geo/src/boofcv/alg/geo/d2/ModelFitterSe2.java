@@ -23,6 +23,7 @@ import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.optimization.LevenbergMarquardt;
 import boofcv.numerics.optimization.OptimizationDerivative;
 import boofcv.numerics.optimization.OptimizationFunction;
+import boofcv.numerics.optimization.OptimizationResidual;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -70,7 +71,7 @@ public class ModelFitterSe2 implements ModelFitter<Se2_F64,AssociatedPair> {
 		return 3;
 	}
 
-	protected static class Function implements OptimizationFunction<Object,AssociatedPair>
+	protected static class Function implements OptimizationResidual<Object,AssociatedPair>
 	{
 		Se2_F64 m = new Se2_F64();
 		Point2D_F64 p = new Point2D_F64();
