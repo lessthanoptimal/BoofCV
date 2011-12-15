@@ -31,7 +31,7 @@ import boofcv.struct.image.*;
  */
 public class FactorySingleBandImage {
 
-	public static SingleBandImage wrap( ImageBase image ) {
+	public static SingleBandImage wrap( ImageSingleBand image ) {
 		if( ImageInteger.class.isAssignableFrom(image.getClass()) )
 			return new SingleBandInt( (ImageInteger)image );
 		else if( image.getClass() == ImageSInt64.class )
@@ -199,7 +199,7 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static abstract class SingleBaseInt<T extends ImageBase> extends SingleBase<T>
+	public static abstract class SingleBaseInt<T extends ImageSingleBand> extends SingleBase<T>
 	{
 		public SingleBaseInt(T image) {
 			super(image);
@@ -211,7 +211,7 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static abstract class SingleBase<T extends ImageBase> implements SingleBandImage {
+	public static abstract class SingleBase<T extends ImageSingleBand> implements SingleBandImage {
 
 		protected T image;
 
@@ -230,7 +230,7 @@ public class FactorySingleBandImage {
 		}
 
 		@Override
-		public ImageBase getImage() {
+		public ImageSingleBand getImage() {
 			return image;
 		}
 	}
@@ -254,7 +254,7 @@ public class FactorySingleBandImage {
 		}
 
 		@Override
-		public ImageBase getImage() {
+		public ImageSingleBand getImage() {
 			return image.getImage();
 		}
 	}

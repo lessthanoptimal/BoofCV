@@ -22,8 +22,8 @@ import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.wavelet.WaveletTransform;
 import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.alg.transform.wavelet.UtilWavelet;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -34,16 +34,16 @@ import boofcv.struct.image.ImageDimension;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class WaveletDenoiseFilter<T extends ImageBase > implements FilterImageInterface<T, T> {
+public class WaveletDenoiseFilter<T extends ImageSingleBand> implements FilterImageInterface<T, T> {
 
 	// performs the wavelet transform
-	private WaveletTransform<T,ImageBase,?> wavelet;
+	private WaveletTransform<T,ImageSingleBand,?> wavelet;
 
 	// algorithm used to denoise the image
 	private DenoiseWavelet alg;
 
 	// where the wavelet transform is stored
-	private ImageBase transform;
+	private ImageSingleBand transform;
 
 	/**
 	 * Specifies which wavelet and algorithm is used for removing image noise.
@@ -53,7 +53,7 @@ public class WaveletDenoiseFilter<T extends ImageBase > implements FilterImageIn
 	 */
 	public WaveletDenoiseFilter(WaveletTransform<T, ?, ?> wavelet,
 								DenoiseWavelet denoiser) {
-		this.wavelet = (WaveletTransform<T,ImageBase,?>)wavelet;
+		this.wavelet = (WaveletTransform<T,ImageSingleBand,?>)wavelet;
 		this.alg = denoiser;
 	}
 

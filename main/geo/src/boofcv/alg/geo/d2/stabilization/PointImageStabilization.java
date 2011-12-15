@@ -28,7 +28,7 @@ import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps;
@@ -59,7 +59,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PointImageStabilization<I extends ImageBase > {
+public class PointImageStabilization<I extends ImageSingleBand> {
 
 	// tracks point features in the image
 	private ImagePointTracker<I> tracker;

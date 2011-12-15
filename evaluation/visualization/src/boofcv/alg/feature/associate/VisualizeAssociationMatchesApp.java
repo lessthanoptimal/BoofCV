@@ -39,8 +39,8 @@ import boofcv.io.image.ImageListManager;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -58,7 +58,7 @@ import java.util.List;
  */
 // todo add waiting tool bar
 // todo show partial results
-public class VisualizeAssociationMatchesApp<T extends ImageBase, D extends ImageBase>
+public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends ImageSingleBand>
 	extends SelectAlgorithmImagePanel implements ProcessInput
 {
 	int maxMatches = 200;

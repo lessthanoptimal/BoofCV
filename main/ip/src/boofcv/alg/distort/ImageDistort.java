@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ImageDistort<T extends ImageBase> {
+public interface ImageDistort<T extends ImageSingleBand> {
 
 	/**
 	 * Specifies how pixel coordinates are transformed from the destination

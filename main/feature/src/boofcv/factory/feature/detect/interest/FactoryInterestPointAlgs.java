@@ -36,7 +36,7 @@ import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * @author Peter Abeles
@@ -53,7 +53,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	FeatureLaplaceScaleSpace<T,D> harrisLaplace( int featureRadius ,
 												 float cornerThreshold ,
 												 int maxFeatures ,
@@ -80,7 +80,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	FeatureLaplaceScaleSpace<T,D> hessianLaplace( int featureRadius ,
 												  float cornerThreshold ,
 												  int maxFeatures ,
@@ -106,7 +106,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	FeaturePyramid<T,D> hessianPyramid( int featureRadius ,
 										float cornerThreshold ,
 										int maxFeatures ,
@@ -132,7 +132,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	FeaturePyramid<T,D> harrisPyramid( int featureRadius ,
 									   float cornerThreshold ,
 									   int maxFeatures ,
@@ -159,7 +159,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	FeatureLaplacePyramid<T,D> hessianLaplacePyramid( int featureRadius ,
 													  float cornerThreshold ,
 													  int maxFeatures ,
@@ -187,7 +187,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	FeatureLaplacePyramid<T,D> harrisLaplacePyramid( int featureRadius ,
 													 float cornerThreshold ,
 													 int maxFeatures ,
@@ -215,7 +215,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	FeatureScaleSpace<T,D> harrisScaleSpace( int featureRadius ,
 											 float cornerThreshold ,
 											 int maxFeatures ,
@@ -240,7 +240,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	FeatureScaleSpace<T,D> hessianScaleSpace( int featureRadius ,
 												float cornerThreshold ,
 												int maxFeatures ,
@@ -254,7 +254,7 @@ public class FactoryInterestPointAlgs {
 		return new FeatureScaleSpace<T,D>(detector,2);
 	}
 
-	private static <T extends ImageBase, D extends ImageBase>
+	private static <T extends ImageSingleBand, D extends ImageSingleBand>
 	FeatureExtractor createExtractor(int featureRadius, float cornerThreshold, GeneralFeatureIntensity<T, D> intensity) {
 		int intensityBorder = intensity.getIgnoreBorder();
 		return FactoryFeatureExtractor.nonmax(featureRadius, cornerThreshold, intensityBorder, false, true);

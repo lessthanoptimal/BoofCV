@@ -20,7 +20,7 @@ package boofcv.gui;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoListManager;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -34,7 +34,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public abstract class VideoProcessAppBase<I extends ImageBase, D extends ImageBase>
+public abstract class VideoProcessAppBase<I extends ImageSingleBand, D extends ImageSingleBand>
 		extends SelectAlgorithmImagePanel implements ProcessInput , MouseListener , ChangeListener
 {
 	protected SimpleImageSequence<I> sequence;

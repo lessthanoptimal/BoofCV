@@ -21,7 +21,7 @@ package boofcv.alg.filter.basic.impl;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -50,9 +50,9 @@ public class TestImplGrayImageOps {
 
 	public void invert( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class param[] = m.getParameterTypes();
-		ImageBase input = GeneralizedImageOps.createImage(param[0],width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(param[0],width,height);
 		GeneralizedImageOps.randomize(input, rand, 0, 100);
-		ImageBase output = GeneralizedImageOps.createImage(param[0],width,height);
+		ImageSingleBand output = GeneralizedImageOps.createImage(param[0],width,height);
 
 		m.invoke(null,input, 255, output);
 
@@ -74,8 +74,8 @@ public class TestImplGrayImageOps {
 
 	public void brighten(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class param[] = m.getParameterTypes();
-		ImageBase input = GeneralizedImageOps.createImage(param[0],width,height);
-		ImageBase output = GeneralizedImageOps.createImage(param[0],width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(param[0],width,height);
+		ImageSingleBand output = GeneralizedImageOps.createImage(param[0],width,height);
 		GeneralizedImageOps.fill(input, 23);
 
 		m.invoke(null,input, 10,255, output);
@@ -105,8 +105,8 @@ public class TestImplGrayImageOps {
 
 	public void stretch(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class param[] = m.getParameterTypes();
-		ImageBase input = GeneralizedImageOps.createImage(param[0],width,height);
-		ImageBase output = GeneralizedImageOps.createImage(param[0],width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(param[0],width,height);
+		ImageSingleBand output = GeneralizedImageOps.createImage(param[0],width,height);
 		GeneralizedImageOps.fill(input, 23);
 
 		m.invoke(null,input, 2.5,10,255, output);

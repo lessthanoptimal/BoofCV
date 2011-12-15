@@ -24,9 +24,9 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorderValue;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -54,7 +54,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		performTests(9);
 	}
 
-	protected void fillTestImage(ImageBase smaller, ImageBase larger) {
+	protected void fillTestImage(ImageSingleBand smaller, ImageSingleBand larger) {
 		// set the while image equal to the specified value
 		SingleBandImage image = FactorySingleBandImage.wrap(larger);
 		for( int y = 0; y < image.getHeight(); y++ ) {
@@ -92,12 +92,12 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 			ret = new Object[]{targetParam[0],targetParam[1],targetParam[2],false};
 		}
 
-		ImageBase inputImage = ((ImageBorder)targetParam[1]).getImage();
+		ImageSingleBand inputImage = ((ImageBorder)targetParam[1]).getImage();
 
 		ret[1] = inputImage._createNew(width+kernelRadius*2,height+kernelRadius*2);
-		ret[2] = ((ImageBase)targetParam[2])._createNew(width+kernelRadius*2,height+kernelRadius*2);
+		ret[2] = ((ImageSingleBand)targetParam[2])._createNew(width+kernelRadius*2,height+kernelRadius*2);
 
-		fillTestImage(inputImage,(ImageBase)ret[1]);
+		fillTestImage(inputImage,(ImageSingleBand)ret[1]);
 
 		return ret;
 	}
@@ -108,9 +108,9 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 
 		Object kernel = createKernel(paramTypes[0]);
 
-		ImageBase src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
+		ImageSingleBand src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
 		GeneralizedImageOps.randomize(src, rand, 0, 5);
-		ImageBase dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
+		ImageSingleBand dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
 		Object[][] ret = new Object[1][paramTypes.length];
 		ret[0][0] = kernel;
@@ -124,8 +124,8 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-		ImageBase targetOut = (ImageBase)targetParam[2];
-		ImageBase validationOut = (ImageBase)validationParam[2];
+		ImageSingleBand targetOut = (ImageSingleBand)targetParam[2];
+		ImageSingleBand validationOut = (ImageSingleBand)validationParam[2];
 
 		// remove the border
 		validationOut = stripBorder(validationOut);

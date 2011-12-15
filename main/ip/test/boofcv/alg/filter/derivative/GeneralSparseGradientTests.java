@@ -21,7 +21,7 @@ package boofcv.alg.filter.derivative;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.deriv.GradientValue;
 import boofcv.struct.deriv.SparseImageGradient;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 
 import java.util.Random;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 public abstract class GeneralSparseGradientTests
-<T extends ImageBase , D extends ImageBase,G extends GradientValue>
+<T extends ImageSingleBand, D extends ImageSingleBand,G extends GradientValue>
 {
 	Random rand = new Random(12342);
 	int width = 30;

@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperLaplacianBlobIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageBase;
  */
 public class FactoryBlobDetector {
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T,D> createLaplace( int featureRadius , float pixelTol , int maxFeatures ,
 											   Class<D> derivType , HessianBlobIntensity.Type type )
 	{

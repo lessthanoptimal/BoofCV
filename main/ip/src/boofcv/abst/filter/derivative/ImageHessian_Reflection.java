@@ -22,7 +22,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class ImageHessian_Reflection<Output extends ImageBase>
+public class ImageHessian_Reflection<Output extends ImageSingleBand>
 		implements ImageHessian<Output>
 {
 	// How the image border should be handled

@@ -19,7 +19,7 @@
 package boofcv.alg.transform.wavelet.impl;
 
 import boofcv.core.image.border.BorderIndex1D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlBorderCoef;
 import boofcv.struct.wavelet.WlCoef;
@@ -62,8 +62,8 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 	public void checkHorizontal( Method m ) {
 		PermuteWaveletCompare test = new BorderCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageBase input,
-									   ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
+									   ImageSingleBand expected, ImageSingleBand found ) {
 				BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};
@@ -74,8 +74,8 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 	public void checkVertical( Method m ) {
 		PermuteWaveletCompare test = new BorderCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageBase input,
-									   ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
+									   ImageSingleBand expected, ImageSingleBand found ) {
 				BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};
@@ -86,8 +86,8 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 	public void checkHorizontalInverse( Method m ) {
 		PermuteWaveletCompare test = new BorderCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageBase input,
-									   ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
+									   ImageSingleBand expected, ImageSingleBand found ) {
 //				System.out.println();
 //				BoofTesting.printDiff(expected,found);
 				BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
@@ -100,8 +100,8 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 	public void checkVerticalInverse( Method m ) {
 		PermuteWaveletCompare test = new BorderCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageBase input,
-									   ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
+									   ImageSingleBand expected, ImageSingleBand found ) {
 				BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
 			}
 		};
@@ -111,7 +111,7 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 
 	private abstract class BorderCompare extends BaseCompare {
 		@Override
-		public void applyTransform(WaveletDescription<?> desc, ImageBase input, ImageBase output) {
+		public void applyTransform(WaveletDescription<?> desc, ImageSingleBand input, ImageSingleBand output) {
 			TestImplWaveletTransformInner.applyInnerMethod(functionName,desc,input,output);
 			
 			Method m;

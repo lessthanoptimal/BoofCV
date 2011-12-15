@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detect.line;
 
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.line.LineSegment2D_F32;
 
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface DetectLineSegment<T extends ImageBase> {
+public interface DetectLineSegment<T extends ImageSingleBand> {
 
 	/**
 	 * Detect lines inside the image.

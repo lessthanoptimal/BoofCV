@@ -29,7 +29,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class BaseTestDescribeBrief <T extends ImageBase> {
+public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 
 	Random rand = new Random(234);
 	int width = 30;

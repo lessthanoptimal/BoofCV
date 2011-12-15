@@ -24,7 +24,7 @@ import boofcv.alg.filter.convolve.ConvolveDownNormalized;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.Method;
@@ -47,7 +47,7 @@ public class FactoryConvolveDown {
 	 * @param border How the image border is handled.
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
-	public static <Input extends ImageBase, Output extends ImageBase>
+	public static <Input extends ImageSingleBand, Output extends ImageSingleBand>
 	GenericConvolveDown<Input,Output>
 	convolve( Kernel1D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border ,
 			  boolean isHorizontal , int skip )
@@ -91,7 +91,7 @@ public class FactoryConvolveDown {
 	 * @param border How the image border is handled.
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
-	public static <Input extends ImageBase, Output extends ImageBase>
+	public static <Input extends ImageSingleBand, Output extends ImageSingleBand>
 	GenericConvolveDown<Input,Output>
 	convolve( Kernel2D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border , int skip )
 	{

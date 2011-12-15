@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public interface FeatureIntensity<T extends ImageBase> {
+public interface FeatureIntensity<T extends ImageSingleBand> {
 
 	/**
 	 * Returns the radius of the feature being computed.  Features are square in shape with a width = 2*radius+1.

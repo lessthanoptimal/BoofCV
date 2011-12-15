@@ -25,7 +25,7 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -43,8 +43,8 @@ public class CompareDerivativeToConvolution {
 	Method m;
 	FilterImageInterface outputFilters[];
 
-	Class<ImageBase> inputType;
-	Class<ImageBase> outputType;
+	Class<ImageSingleBand> inputType;
+	Class<ImageSingleBand> outputType;
 
 	boolean processBorder;
 	int borderSize = 0;
@@ -54,8 +54,8 @@ public class CompareDerivativeToConvolution {
 		Class<?> []param = m.getParameterTypes();
 		outputFilters = new FilterImageInterface<?,?>[ param.length ];
 
-		inputType = (Class<ImageBase>)param[0];
-		outputType = (Class<ImageBase>)param[1];
+		inputType = (Class<ImageSingleBand>)param[0];
+		outputType = (Class<ImageSingleBand>)param[1];
 	}
 
 	public void setKernel( int which , Kernel1D horizontal , Kernel1D vertical ) {
@@ -83,30 +83,30 @@ public class CompareDerivativeToConvolution {
 		if( borderSize < kernel.getRadius() )
 			borderSize = kernel.getRadius();
 	}
-	public void compare( ImageBase inputImage , ImageBase ...outputImages)  {
+	public void compare( ImageSingleBand inputImage , ImageSingleBand...outputImages)  {
 		compare(false,inputImage,outputImages);
 		compare(true,inputImage,outputImages);
 	}
 
-	public void compare( boolean processBorder , ImageBase inputImage , ImageBase ...outputImages)  {
+	public void compare( boolean processBorder , ImageSingleBand inputImage , ImageSingleBand...outputImages)  {
 		this.processBorder = processBorder;
 		innerCompare(inputImage,outputImages);
 
 		inputImage = BoofTesting.createSubImageOf(inputImage);
-		ImageBase subOut[] = new ImageBase[ outputImages.length ];
+		ImageSingleBand subOut[] = new ImageSingleBand[ outputImages.length ];
 		for( int i = 0; i < outputImages.length; i++ )
 			subOut[i] = BoofTesting.createSubImageOf(outputImages[i]);
 		innerCompare(inputImage,subOut);
 	}
 
-	protected void innerCompare( ImageBase inputImage , ImageBase ...outputImages)  {
+	protected void innerCompare( ImageSingleBand inputImage , ImageSingleBand...outputImages)  {
 		Class<?> []param = m.getParameterTypes();
 		int numImageOutputs = countImageOutputs(param);
 		if( outputImages.length != numImageOutputs )
 			throw new RuntimeException("Unexpected number of outputImages passed in");
 
 		// declare and compute the validation results
-		ImageBase expectedOutput[] = new ImageBase[param.length-2];
+		ImageSingleBand expectedOutput[] = new ImageSingleBand[param.length-2];
 		for( int i = 0; i < expectedOutput.length; i++ ) {
 			expectedOutput[i] = outputImages[i]._createNew(inputImage.width,inputImage.height);
 			outputFilters[i].process(inputImage,expectedOutput[i]);
@@ -153,7 +153,7 @@ public class CompareDerivativeToConvolution {
 		int count = 0;
 
 		for( int i = 1; i < param.length; i++ ) {
-			if( ImageBase.class.isAssignableFrom(param[i])) {
+			if( ImageSingleBand.class.isAssignableFrom(param[i])) {
 				count++;
 			}
 		}

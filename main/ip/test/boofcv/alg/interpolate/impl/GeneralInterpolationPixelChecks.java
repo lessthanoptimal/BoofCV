@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralInterpolationPixelChecks< T extends ImageBase> {
+public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand> {
 	protected Random rand = new Random(0xff34);
 
 	protected int width = 320;

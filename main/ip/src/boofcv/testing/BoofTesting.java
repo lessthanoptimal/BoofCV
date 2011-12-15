@@ -78,7 +78,7 @@ public class BoofTesting {
 	 * </p>
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageBase> T createSubImageOf(T input) {
+	public static <T extends ImageSingleBand> T createSubImageOf(T input) {
 		// create the larger image
 		T ret = (T) input._createNew(input.width + 10, input.height + 12);
 		// create a sub-image of the inner portion
@@ -153,7 +153,7 @@ public class BoofTesting {
 			return false;
 
 		for (Class<?> p : params) {
-			if (!ImageBase.class.isAssignableFrom(p)) {
+			if (!ImageSingleBand.class.isAssignableFrom(p)) {
 				return false;
 			}
 		}
@@ -179,14 +179,14 @@ public class BoofTesting {
 									 boolean checkEquals,
 									 Object... inputParam) {
 		try {
-			ImageBase[] larger = new ImageBase[inputParam.length];
-			ImageBase[] subImg = new ImageBase[inputParam.length];
+			ImageSingleBand[] larger = new ImageSingleBand[inputParam.length];
+			ImageSingleBand[] subImg = new ImageSingleBand[inputParam.length];
 			Class<?> paramDesc[] = new Class<?>[inputParam.length];
 			Object[] inputModified = new Object[inputParam.length];
 
 			for (int i = 0; i < inputParam.length; i++) {
-				if( ImageBase.class.isAssignableFrom(inputParam[i].getClass())) {
-					ImageBase<?> img = (ImageBase<?>)inputParam[i];
+				if( ImageSingleBand.class.isAssignableFrom(inputParam[i].getClass())) {
+					ImageSingleBand<?> img = (ImageSingleBand<?>)inputParam[i];
 
 					// copy the original image inside of a larger image
 					larger[i] = img._createNew(img.getWidth() + 10, img.getHeight() + 12);
@@ -383,7 +383,7 @@ public class BoofTesting {
 	 * @param imgA An image.
 	 * @param imgB An image.
 	 */
-	public static void assertEqualsGeneric(ImageBase imgA, ImageBase imgB, int tolInt, double tolFloat) {
+	public static void assertEqualsGeneric(ImageSingleBand imgA, ImageSingleBand imgB, int tolInt, double tolFloat) {
 
 		if( imgA.getTypeInfo().isInteger() && imgB.getTypeInfo().isInteger() ) {
 			assertEquals((ImageInteger)imgA,(ImageInteger)imgB,tolInt);
@@ -397,7 +397,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static void assertEqualsGeneric(ImageBase imgA, ImageBase imgB, int tolInt, double tolFloat,
+	public static void assertEqualsGeneric(ImageSingleBand imgA, ImageSingleBand imgB, int tolInt, double tolFloat,
 										   int ignoreBorder ) {
 
 		if (ImageInteger.class.isAssignableFrom(imgA.getClass())) {
@@ -560,7 +560,7 @@ public class BoofTesting {
 	/**
 	 * Checks to see if only the image borders are equal to each other within tolerance
 	 */
-	public static void assertEqualsBorder( ImageBase imgA, ImageBase imgB, double tol, int borderX , int borderY ) {
+	public static void assertEqualsBorder( ImageSingleBand imgA, ImageSingleBand imgB, double tol, int borderX , int borderY ) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -596,7 +596,7 @@ public class BoofTesting {
 			throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
 	}
 
-	public static void checkEquals(BufferedImage imgA, ImageBase imgB , double tol ) {
+	public static void checkEquals(BufferedImage imgA, ImageSingleBand imgB , double tol ) {
 		if( ImageUInt8.class == imgB.getClass()) {
 			checkEquals(imgA,(ImageUInt8)imgB);
 		} else if( ImageFloat32.class == imgB.getClass()) {
@@ -735,7 +735,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static void checkBorderZero(ImageBase outputImage, int border) {
+	public static void checkBorderZero(ImageSingleBand outputImage, int border) {
 		SingleBandImage img = FactorySingleBandImage.wrap(outputImage);
 
 		for (int y = 0; y < img.getHeight(); y++) {
@@ -751,7 +751,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static void printDiff( ImageBase imgA , ImageBase imgB ) {
+	public static void printDiff( ImageSingleBand imgA , ImageSingleBand imgB ) {
 
 		SingleBandImage a = FactorySingleBandImage.wrap(imgA);
 		SingleBandImage b = FactorySingleBandImage.wrap(imgB);

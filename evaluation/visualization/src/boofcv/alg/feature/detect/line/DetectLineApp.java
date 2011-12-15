@@ -30,8 +30,8 @@ import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,7 +44,7 @@ import java.awt.image.BufferedImage;
  */
 // todo configure: blur, edge threshold, non-max radius,  min counts
 // todo show binary image, transform
-public class DetectLineApp<T extends ImageBase, D extends ImageBase>
+public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends SelectAlgorithmImagePanel implements ProcessInput , ImageCorruptPanel.Listener
 {
 	Class<T> imageType;

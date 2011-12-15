@@ -24,8 +24,8 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleInterestPoint {
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void detect( BufferedImage image , Class<T> imageType ) {
 		T input = ConvertBufferedImage.convertFrom(image,null,imageType);
 
@@ -57,7 +57,7 @@ public class ExampleInterestPoint {
 		displayResults(image, detector);
 	}
 
-	private static <T extends ImageBase> void displayResults(BufferedImage image,
+	private static <T extends ImageSingleBand> void displayResults(BufferedImage image,
 															 InterestPointDetector<T> detector)
 	{
 		Graphics2D g2 = image.createGraphics();

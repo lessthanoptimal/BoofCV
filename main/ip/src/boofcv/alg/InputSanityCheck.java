@@ -19,7 +19,7 @@
 package boofcv.alg;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * @author Peter Abeles
@@ -38,7 +38,7 @@ public class InputSanityCheck {
 	 * @param <T>
 	 * @return
 	 */
-	public static <T extends ImageBase> T checkReshape( T target , ImageBase testImage , Class<T> targetType )
+	public static <T extends ImageSingleBand> T checkReshape( T target , ImageSingleBand testImage , Class<T> targetType )
 	{
 		if( target == null ) {
 			return GeneralizedImageOps.createImage(targetType,testImage.width,testImage.height);
@@ -52,7 +52,7 @@ public class InputSanityCheck {
 	 * If the output has not been declared a new instance is declared.  If an instance of the output
 	 * is provided its bounds are checked.
 	 */
-	public static <T extends ImageBase> T checkDeclare(T input, T output) {
+	public static <T extends ImageSingleBand> T checkDeclare(T input, T output) {
 		if (output == null) {
 			output = (T) input._createNew(input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)
@@ -60,7 +60,7 @@ public class InputSanityCheck {
 		return output;
 	}
 
-	public static <T extends ImageBase> T checkDeclare(ImageBase<?> input, T output , Class<T> outputType ) {
+	public static <T extends ImageSingleBand> T checkDeclare(ImageSingleBand<?> input, T output , Class<T> outputType ) {
 		if (output == null) {
 			output = (T) GeneralizedImageOps.createImage(outputType,input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)
@@ -68,28 +68,28 @@ public class InputSanityCheck {
 		return output;
 	}
 
-	public static void checkSameShape(ImageBase<?> imgA, ImageBase<?> imgB) {
+	public static void checkSameShape(ImageSingleBand<?> imgA, ImageSingleBand<?> imgB) {
 		if (imgA.width != imgB.width)
 			throw new IllegalArgumentException("Image widths do not match.");
 		if (imgA.height != imgB.height)
 			throw new IllegalArgumentException("Image heights do not match.");
 	}
 
-	public static void checkSameShape(ImageBase<?> imgA, ImageBase<?> imgB, ImageBase<?> imgC) {
+	public static void checkSameShape(ImageSingleBand<?> imgA, ImageSingleBand<?> imgB, ImageSingleBand<?> imgC) {
 		if (imgA.width != imgB.width || imgA.width != imgC.width)
 			throw new IllegalArgumentException("Image widths do not match.");
 		if (imgA.height != imgB.height || imgA.height != imgC.height)
 			throw new IllegalArgumentException("Image heights do not match.");
 	}
 
-	public static void checkSameShape(ImageBase<?> imgA, ImageBase<?> imgB, ImageBase<?> imgC , ImageBase<?> imgD) {
+	public static void checkSameShape(ImageSingleBand<?> imgA, ImageSingleBand<?> imgB, ImageSingleBand<?> imgC , ImageSingleBand<?> imgD) {
 		if (imgA.width != imgB.width || imgA.width != imgC.width || imgA.width != imgD.width )
 			throw new IllegalArgumentException("Image widths do not match.");
 		if (imgA.height != imgB.height || imgA.height != imgC.height || imgA.height != imgD.height )
 			throw new IllegalArgumentException("Image heights do not match.");
 	}
 
-	public static void checkSameShape(ImageBase<?> imgA, ImageBase<?> imgB, ImageBase<?> imgC , ImageBase<?> imgD , ImageBase<?> imgE) {
+	public static void checkSameShape(ImageSingleBand<?> imgA, ImageSingleBand<?> imgB, ImageSingleBand<?> imgC , ImageSingleBand<?> imgD , ImageSingleBand<?> imgE) {
 		if (imgA.width != imgB.width || imgA.width != imgC.width || imgA.width != imgD.width || imgA.width != imgE.width )
 			throw new IllegalArgumentException("Image widths do not match.");
 		if (imgA.height != imgB.height || imgA.height != imgC.height || imgA.height != imgD.height || imgA.height != imgE.height)

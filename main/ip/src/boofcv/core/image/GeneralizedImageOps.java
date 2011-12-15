@@ -48,7 +48,7 @@ public class GeneralizedImageOps {
 	 * @param typeDst The type of output image.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageBase> T convert( ImageBase<?> src , T dst , Class<T> typeDst  )
+	public static <T extends ImageSingleBand> T convert( ImageSingleBand<?> src , T dst , Class<T> typeDst  )
 	{
 		if (dst == null) {
 			dst =(T) createImage(typeDst,src.width, src.height);
@@ -68,10 +68,10 @@ public class GeneralizedImageOps {
 	 * @return Converted image.
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static void convert( ImageBase<?> src , ImageBase<?> dst )
+	public static void convert( ImageSingleBand<?> src , ImageSingleBand<?> dst )
 	{
 		if( src.getClass() == dst.getClass()) {
-			((ImageBase)dst).setTo(src);
+			((ImageSingleBand)dst).setTo(src);
 			return;
 		}
 
@@ -85,7 +85,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static double sum(ImageBase imgA ) {
+	public static double sum(ImageSingleBand imgA ) {
 		if (imgA.getClass() == ImageUInt8.class ) {
 			return PixelMath.sum( (ImageUInt8) imgA );
 		} else if (imgA.getClass() == ImageSInt8.class ) {
@@ -107,7 +107,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void boundImage(ImageBase imgA , double lower , double upper ) {
+	public static void boundImage(ImageSingleBand imgA , double lower , double upper ) {
 		if (imgA.getClass() == ImageUInt8.class ) {
 			PixelMath.boundImage( (ImageUInt8) imgA , (int)lower , (int)upper );
 		} else if (imgA.getClass() == ImageSInt8.class ) {
@@ -129,7 +129,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static double computeMeanSquaredError(ImageBase imgA, ImageBase imgB ) {
+	public static double computeMeanSquaredError(ImageSingleBand imgA, ImageSingleBand imgB ) {
 		if (imgA.getClass() == ImageUInt8.class ) {
 			return ImageTestingOps.computeMeanSquaredError((ImageUInt8) imgA, (ImageUInt8) imgB);
 		} else if (imgA.getClass() == ImageSInt8.class ) {
@@ -149,7 +149,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void fillRectangle(ImageBase img, double value , int x0 , int y0 , int width , int height ) {
+	public static void fillRectangle(ImageSingleBand img, double value , int x0 , int y0 , int width , int height ) {
 		if (img.getClass() == ImageUInt8.class ) {
 			ImageTestingOps.fillRectangle((ImageUInt8) img, (int)value , x0 , y0 , width , height );
 		} else if (img.getClass() == ImageSInt8.class ) {
@@ -169,7 +169,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void addGaussian(ImageBase img, Random rand, double sigma , double min , double max ) {
+	public static void addGaussian(ImageSingleBand img, Random rand, double sigma , double min , double max ) {
 		if (img.getClass() == ImageUInt8.class ) {
 			ImageTestingOps.addGaussian((ImageUInt8) img, rand, sigma , (int)min , (int)max );
 		} else if (img.getClass() == ImageSInt8.class ) {
@@ -189,7 +189,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void randomize(ImageBase img, Random rand, int min, int max) {
+	public static void randomize(ImageSingleBand img, Random rand, int min, int max) {
 		if (img.getClass() == ImageUInt8.class || img.getClass() == ImageSInt8.class ) {
 			ImageTestingOps.randomize((ImageInt8) img, rand, min, max);
 		} else if (img.getClass() == ImageSInt16.class || img.getClass() == ImageUInt16.class) {
@@ -215,7 +215,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static double get(ImageBase img, int x, int y) {
+	public static double get(ImageSingleBand img, int x, int y) {
 		if (img instanceof ImageUInt8) {
 			return ((ImageUInt8) img).get(x, y);
 		} else if (img instanceof ImageSInt16) {
@@ -231,7 +231,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void fill(ImageBase img, double value) {
+	public static void fill(ImageSingleBand img, double value) {
 		if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
 			ImageTestingOps.fill((ImageInt8)img,(int)value);
 		} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
@@ -249,7 +249,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static <T extends ImageBase> T createImage(Class<T> type, int width, int height) {
+	public static <T extends ImageSingleBand> T createImage(Class<T> type, int width, int height) {
 		type = BoofTesting.convertGenericToSpecificType(type);
 
 		if (type == ImageUInt8.class) {
@@ -277,7 +277,7 @@ public class GeneralizedImageOps {
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}
 
-	public static void set(ImageBase img, int x, int y, double value) {
+	public static void set(ImageSingleBand img, int x, int y, double value) {
 		if (ImageInteger.class.isAssignableFrom(img.getClass())) {
 			((ImageInteger)img).set(x,y,(int)value);
 		} else if (img instanceof ImageFloat32) {

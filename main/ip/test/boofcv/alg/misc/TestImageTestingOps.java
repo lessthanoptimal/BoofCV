@@ -21,7 +21,7 @@ package boofcv.alg.misc;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -88,12 +88,12 @@ public class TestImageTestingOps {
 		if( param.length < 2 )
 			return false;
 
-		return ImageBase.class.isAssignableFrom(param[0]);
+		return ImageSingleBand.class.isAssignableFrom(param[0]);
 	}
 
 	private void testFill( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
-		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.randomize(orig, rand, 0,20);
 
 		if( orig.getTypeInfo().isInteger()) {
@@ -112,7 +112,7 @@ public class TestImageTestingOps {
 
 	private void testFillRectangle( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
-		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		int x0 = 2;
 		int y0 = 3;
@@ -138,7 +138,7 @@ public class TestImageTestingOps {
 
 	private void testRandomize( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
-		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		if( orig.getTypeInfo().isInteger() ) {
 			if( orig.getTypeInfo().isSigned() )
@@ -167,7 +167,7 @@ public class TestImageTestingOps {
 
 	private void testAddUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
-		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 		GeneralizedImageOps.fill(orig,1);
 
 		if( orig.getTypeInfo().isInteger() ) {
@@ -190,7 +190,7 @@ public class TestImageTestingOps {
 		double mean = 10;
 
 		Class paramTypes[] = m.getParameterTypes();
-		ImageBase orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		GeneralizedImageOps.fill(orig,mean);
 		m.invoke(null,orig,rand,2.0,0,255);
@@ -222,10 +222,10 @@ public class TestImageTestingOps {
 	private void testComputeMSE( Method m ) throws InvocationTargetException, IllegalAccessException {
 
 		Class paramTypes[] = m.getParameterTypes();
-		ImageBase imgA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand imgA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
 
 		GeneralizedImageOps.fill(imgA,10);
-		ImageBase imgB = imgA.clone();
+		ImageSingleBand imgB = imgA.clone();
 
 		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
 		b.set(5,5,20);

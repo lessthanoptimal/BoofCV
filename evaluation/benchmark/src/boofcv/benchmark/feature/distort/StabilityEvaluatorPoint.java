@@ -21,7 +21,7 @@ package boofcv.benchmark.feature.distort;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class StabilityEvaluatorPoint<T extends ImageBase>
+public abstract class StabilityEvaluatorPoint<T extends ImageSingleBand>
 		implements StabilityEvaluator<T>
 {
 	protected int borderSize;

@@ -25,7 +25,7 @@ import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.convolve.Kernel1D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 import boofcv.struct.pyramid.PyramidUpdaterFloat;
 
@@ -46,7 +46,7 @@ public class FactoryPyramid {
 	 * @param radius Radius of the Gaussian kernel.  If < 0 then the radius is selected using sigma.
 	 * @return PyramidUpdaterDiscrete
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	PyramidUpdaterDiscrete<T> discreteGaussian( Class<T> imageType , double sigma , int radius ) {
 
 		Class<Kernel1D> kernelType = FactoryKernel.getKernelType(imageType,1);
@@ -62,7 +62,7 @@ public class FactoryPyramid {
 	 * @param sigmas Gaussian blur magnitude for each layer.
 	 * @return PyramidUpdaterFloat
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	PyramidUpdaterFloat<T> floatGaussian( Class<T> imageType , double ...sigmas ) {
 
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);

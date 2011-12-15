@@ -2,7 +2,7 @@ package boofcv.abst.feature.detect.line;
 
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
@@ -34,7 +34,7 @@ public abstract class GeneralDetectLineTests {
 		this.imageTypes = imageTypes;
 	}
 
-	public abstract <T extends ImageBase> DetectLine<T> createAlg( Class<T> imageType );
+	public abstract <T extends ImageSingleBand> DetectLine<T> createAlg( Class<T> imageType );
 
 	/**
 	 * See if it can detect an obvious line in an image.
@@ -56,7 +56,7 @@ public abstract class GeneralDetectLineTests {
 		}
 	}
 
-	private <T extends ImageBase> void obviousLine( Class<T> imageType ) {
+	private <T extends ImageSingleBand> void obviousLine( Class<T> imageType ) {
 		T input = GeneralizedImageOps.createImage(imageType,width,height);
 
 		GeneralizedImageOps.fillRectangle(input,30,0,0,lineLocation,height);
@@ -85,7 +85,7 @@ public abstract class GeneralDetectLineTests {
 		assertTrue(foundMatch);
 	}
 
-	private <T extends ImageBase> void subImages( Class<T> imageType ) {
+	private <T extends ImageSingleBand> void subImages( Class<T> imageType ) {
 		T input = GeneralizedImageOps.createImage(imageType,width,height);
 
 		GeneralizedImageOps.fillRectangle(input,30,0,0,lineLocation,height);

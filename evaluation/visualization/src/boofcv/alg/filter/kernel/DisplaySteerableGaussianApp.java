@@ -23,8 +23,8 @@ import boofcv.factory.filter.kernel.FactorySteerable;
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.*;
 
@@ -32,7 +32,7 @@ import java.awt.*;
 /**
  * @author Peter Abeles
  */
-public class DisplaySteerableGaussianApp <T extends ImageBase, K extends Kernel2D>
+public class DisplaySteerableGaussianApp <T extends ImageSingleBand, K extends Kernel2D>
 	extends DisplaySteerableBase<T,K>
 {
 	public DisplaySteerableGaussianApp(Class<T> imageType) {

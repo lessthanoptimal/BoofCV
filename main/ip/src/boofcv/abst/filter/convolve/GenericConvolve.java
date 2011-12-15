@@ -22,7 +22,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,7 +34,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class GenericConvolve<Input extends ImageBase, Output extends ImageBase>
+public class GenericConvolve<Input extends ImageSingleBand, Output extends ImageSingleBand>
 	implements ConvolveInterface<Input,Output>
 {
 	Method m;

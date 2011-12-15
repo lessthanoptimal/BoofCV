@@ -21,8 +21,8 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -54,9 +54,9 @@ public class TestImplHessianBlobIntensity {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageBase derivXX = GeneralizedImageOps.createImage(param[1],width,height);
-			ImageBase derivYY = GeneralizedImageOps.createImage(param[1],width,height);
-			ImageBase derivXY = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageSingleBand derivXX = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageSingleBand derivYY = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageSingleBand derivXY = GeneralizedImageOps.createImage(param[1],width,height);
 			ImageFloat32 intensity = new ImageFloat32(width,height);
 
 			GeneralizedImageOps.randomize(derivXX,rand,-10,10);
@@ -71,7 +71,7 @@ public class TestImplHessianBlobIntensity {
 	}
 
 	public void performDeterminant( Method m , ImageFloat32 intensity,
-									ImageBase derivXX, ImageBase derivYY, ImageBase derivXY )
+									ImageSingleBand derivXX, ImageSingleBand derivYY, ImageSingleBand derivXY )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		m.invoke(null,intensity,derivXX,derivYY,derivXY);
@@ -96,8 +96,8 @@ public class TestImplHessianBlobIntensity {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageBase derivXX = GeneralizedImageOps.createImage(param[1],width,height);
-			ImageBase derivYY = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageSingleBand derivXX = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageSingleBand derivYY = GeneralizedImageOps.createImage(param[1],width,height);
 			ImageFloat32 intensity = new ImageFloat32(width,height);
 
 			GeneralizedImageOps.randomize(derivXX,rand,-10,10);
@@ -111,7 +111,7 @@ public class TestImplHessianBlobIntensity {
 	}
 
 	public void performTrace( Method m , ImageFloat32 intensity,
-									ImageBase derivXX, ImageBase derivYY )
+									ImageSingleBand derivXX, ImageSingleBand derivYY )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		m.invoke(null,intensity,derivXX,derivYY);

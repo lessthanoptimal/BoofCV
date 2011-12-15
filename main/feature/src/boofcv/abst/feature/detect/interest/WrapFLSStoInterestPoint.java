@@ -22,7 +22,7 @@ import boofcv.alg.feature.detect.interest.FeatureLaplaceScaleSpace;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.gss.GaussianScaleSpace;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapFLSStoInterestPoint<T extends ImageBase, D extends ImageBase> implements InterestPointDetector<T>{
+public class WrapFLSStoInterestPoint<T extends ImageSingleBand, D extends ImageSingleBand> implements InterestPointDetector<T>{
 
 	FeatureLaplaceScaleSpace<T,D> detector;
 	List<ScalePoint> location;

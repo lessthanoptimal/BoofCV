@@ -19,7 +19,7 @@
 package boofcv.gui.image;
 
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
 
@@ -28,7 +28,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class PlaybackImageSequence<T extends ImageBase> extends ProcessImageSequence<T> {
+public class PlaybackImageSequence<T extends ImageSingleBand> extends ProcessImageSequence<T> {
 
 	ImagePanel panel;
 

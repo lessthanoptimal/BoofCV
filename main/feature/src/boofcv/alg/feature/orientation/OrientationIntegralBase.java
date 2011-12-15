@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation;
 
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class OrientationIntegralBase<T extends ImageBase>
+public abstract class OrientationIntegralBase<T extends ImageSingleBand>
 		implements OrientationIntegral<T>
 {
 	// integral image transform of input image

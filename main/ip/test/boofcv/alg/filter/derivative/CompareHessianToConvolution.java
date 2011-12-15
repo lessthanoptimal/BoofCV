@@ -27,7 +27,7 @@ import boofcv.core.image.border.ImageBorder1D_I32;
 import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -46,7 +46,7 @@ public class CompareHessianToConvolution {
 	Method m;
 	FilterImageInterface outputFilters[] = new FilterImageInterface[2];
 
-	Class<ImageBase> inputType;
+	Class<ImageSingleBand> inputType;
 
 	boolean processBorder;
 	int borderSize = 0;
@@ -55,7 +55,7 @@ public class CompareHessianToConvolution {
 		this.m = m;
 		Class<?> []param = m.getParameterTypes();
 
-		inputType = (Class<ImageBase>)param[0];
+		inputType = (Class<ImageSingleBand>)param[0];
 	}
 
 	public void setKernel( int which , Kernel1D horizontal , Kernel1D vertical ) {
@@ -83,16 +83,16 @@ public class CompareHessianToConvolution {
 		if( borderSize < kernel.getRadius() )
 			borderSize = kernel.getRadius();
 	}
-	public void compare( ImageBase ...images)  {
+	public void compare( ImageSingleBand...images)  {
 		compare(false,images);
 		compare(true,images);
 	}
 
-	public void compare( boolean processBorder , ImageBase ...images)  {
+	public void compare( boolean processBorder , ImageSingleBand...images)  {
 		this.processBorder = processBorder;
 		innerCompare(images);
 
-		ImageBase subOut[] = new ImageBase[ images.length ];
+		ImageSingleBand subOut[] = new ImageSingleBand[ images.length ];
 		for( int i = 0; i < images.length; i++ )
 			subOut[i] = BoofTesting.createSubImageOf(images[i]);
 		innerCompare(subOut);
@@ -100,7 +100,7 @@ public class CompareHessianToConvolution {
 
 
 
-	protected void innerCompare( ImageBase ...images)  {
+	protected void innerCompare( ImageSingleBand...images)  {
 		Class<?> []param = m.getParameterTypes();
 
 		if( images.length != 5 )
@@ -110,7 +110,7 @@ public class CompareHessianToConvolution {
 		int height = images[0].height;
 
 		// now compute the second derivative using provided convolution filters
-		ImageBase expectedOutput[] = new ImageBase[3];
+		ImageSingleBand expectedOutput[] = new ImageSingleBand[3];
 		for( int i = 0; i < expectedOutput.length; i++ ) {
 			expectedOutput[i] = images[0]._createNew(width,height);
 		}

@@ -23,8 +23,8 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidFloat;
 import boofcv.struct.pyramid.PyramidUpdaterFloat;
@@ -39,7 +39,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExamplePyramidFloat<T extends ImageBase> {
+public class ExamplePyramidFloat<T extends ImageSingleBand> {
 
 	// specifies the image type
 	Class<T> imageType;

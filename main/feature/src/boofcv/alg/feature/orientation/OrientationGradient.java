@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.orientation;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface OrientationGradient<D extends ImageBase> extends RegionOrientation {
+public interface OrientationGradient<D extends ImageSingleBand> extends RegionOrientation {
 
 	/**
 	 * Specifies input image data for estimating orientation.

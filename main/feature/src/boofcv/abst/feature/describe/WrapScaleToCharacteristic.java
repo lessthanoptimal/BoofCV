@@ -25,7 +25,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -34,7 +34,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class WrapScaleToCharacteristic <T extends ImageBase, D extends ImageBase>
+public abstract class WrapScaleToCharacteristic <T extends ImageSingleBand, D extends ImageSingleBand>
 		implements DescribeRegionPoint<T>
 {
 	protected ImageGradient<T,D> gradient;

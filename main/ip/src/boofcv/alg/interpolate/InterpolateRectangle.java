@@ -18,8 +18,8 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Performs interpolation across a whole rectangular region inside the image.  This can be significantly faster than
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public interface InterpolateRectangle<T extends ImageBase> {
+public interface InterpolateRectangle<T extends ImageSingleBand> {
 
 	/**
 	 * Change the image that is being interpolated.

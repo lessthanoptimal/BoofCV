@@ -20,7 +20,7 @@ package boofcv.benchmark.feature.describe;
 
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class UtilStabilityBenchmark {
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	List<BenchmarkAlgorithm> createAlgorithms(int radius, Class<T> imageType , Class<D> derivType ) {
 		List<BenchmarkAlgorithm> ret = new ArrayList<BenchmarkAlgorithm>();
 

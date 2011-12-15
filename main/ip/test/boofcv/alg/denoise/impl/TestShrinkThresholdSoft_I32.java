@@ -22,8 +22,8 @@ import boofcv.alg.denoise.ShrinkThresholdRule;
 import boofcv.alg.denoise.wavelet.ShrinkThresholdSoft_I32;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -41,7 +41,7 @@ public class TestShrinkThresholdSoft_I32 {
 		performBasicSoftTest(new ImageSInt32(width,height),new ShrinkThresholdSoft_I32());
 	}
 
-	public static <T extends ImageBase> void performBasicSoftTest( T image , ShrinkThresholdRule<T> rule ) {
+	public static <T extends ImageSingleBand> void performBasicSoftTest( T image , ShrinkThresholdRule<T> rule ) {
 		final int height = image.height;
 		final int width = image.width;
 

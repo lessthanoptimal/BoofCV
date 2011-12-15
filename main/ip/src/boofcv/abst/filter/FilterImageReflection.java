@@ -18,7 +18,7 @@
 
 package boofcv.abst.filter;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
 /**
  * Turns functions into implementations of {@link FilterImageInterface} Wraps around any function which has two images as input and output.
  */
-public class FilterImageReflection<Input extends ImageBase, Output extends ImageBase>
+public class FilterImageReflection<Input extends ImageSingleBand, Output extends ImageSingleBand>
 		implements FilterImageInterface<Input, Output> {
 
 	// method being invoke for the filter
@@ -51,8 +51,8 @@ public class FilterImageReflection<Input extends ImageBase, Output extends Image
 		Class param[] = m.getParameterTypes();
 		if (param.length != 2)
 			throw new IllegalArgumentException("Input method must have two inputs");
-		if (!ImageBase.class.isAssignableFrom(param[0]) || !ImageBase.class.isAssignableFrom(param[0]))
-			throw new IllegalArgumentException("TWo input parameters must be of type ImageBase");
+		if (!ImageSingleBand.class.isAssignableFrom(param[0]) || !ImageSingleBand.class.isAssignableFrom(param[0]))
+			throw new IllegalArgumentException("TWo input parameters must be of type ImageSingleBand");
 	}
 
 
@@ -67,8 +67,8 @@ public class FilterImageReflection<Input extends ImageBase, Output extends Image
 		Class param[] = m.getParameterTypes();
 		if (param.length != 2)
 			throw new IllegalArgumentException("Input method must have two inputs");
-		if (!ImageBase.class.isAssignableFrom(param[0]) || !ImageBase.class.isAssignableFrom(param[0]))
-			throw new IllegalArgumentException("TWo input parameters must be of type ImageBase");
+		if (!ImageSingleBand.class.isAssignableFrom(param[0]) || !ImageSingleBand.class.isAssignableFrom(param[0]))
+			throw new IllegalArgumentException("TWo input parameters must be of type ImageSingleBand");
 	}
 
 	@Override

@@ -18,7 +18,7 @@
 
 package boofcv.abst.filter.derivative;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ImageHessian<Output extends ImageBase> extends ImageDerivative<Output,Output> {
+public interface ImageHessian<Output extends ImageSingleBand> extends ImageDerivative<Output,Output> {
 
 	/**
 	 * Computes all the second derivative terms in the image.

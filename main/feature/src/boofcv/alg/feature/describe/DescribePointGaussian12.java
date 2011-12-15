@@ -28,7 +28,7 @@ import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactorySteerable;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -52,7 +52,7 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class DescribePointGaussian12 <T extends ImageBase, K extends Kernel2D> {
+public class DescribePointGaussian12 <T extends ImageSingleBand, K extends Kernel2D> {
 
 	// the set of steerable kernels used to compute image feature points.
 	SteerableKernel<K> kernels[];

@@ -21,9 +21,9 @@ package boofcv.alg.feature.describe.impl;
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.struct.deriv.GradientValue;
 import boofcv.struct.deriv.SparseImageGradient;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -148,7 +148,7 @@ public class ImplSurfDescribeOps {
 	/**
 	 * Simple algorithm for computing the gradient of a region.  Can handle image borders
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void naiveGradient(T ii, double c_x, double c_y,
 					   int radiusRegions, int kernelSize, double scale,
 					   boolean useHaar, double[] derivX, double derivY[])

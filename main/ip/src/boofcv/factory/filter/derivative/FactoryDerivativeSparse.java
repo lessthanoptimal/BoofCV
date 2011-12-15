@@ -26,9 +26,9 @@ import boofcv.core.image.border.*;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Creates filters for performing sparse derivative calculations.
@@ -45,7 +45,7 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null {@link BorderType#EXTENDED} will be used.
 	 * @return Filter for performing a sparse laplacian.
 	 */
-	public static <T extends ImageBase> ImageFunctionSparse<T> createLaplacian( Class<T> imageType , ImageBorder<T> border )
+	public static <T extends ImageSingleBand> ImageFunctionSparse<T> createLaplacian( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( border == null ) {
 			border = FactoryImageBorder.general(imageType,BorderType.EXTENDED);

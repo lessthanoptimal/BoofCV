@@ -18,7 +18,7 @@
 
 package boofcv.testing;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -134,8 +134,8 @@ public abstract class CompareEquivalentFunctions {
 		for( int i = 0; i < param.length; i++ ) {
 			if( param[i] == null )
 				continue;
-			if( ImageBase.class.isAssignableFrom(param[i].getClass())) {
-				ret[i] = BoofTesting.createSubImageOf((ImageBase)param[i]);
+			if( ImageSingleBand.class.isAssignableFrom(param[i].getClass())) {
+				ret[i] = BoofTesting.createSubImageOf((ImageSingleBand)param[i]);
 			} else {
 				ret[i] = param[i];
 			}

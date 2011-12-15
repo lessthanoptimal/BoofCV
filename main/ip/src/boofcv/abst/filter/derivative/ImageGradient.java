@@ -18,7 +18,7 @@
 
 package boofcv.abst.filter.derivative;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ImageGradient<Input extends ImageBase, Output extends ImageBase> extends ImageDerivative<Input,Output> {
+public interface ImageGradient<Input extends ImageSingleBand, Output extends ImageSingleBand> extends ImageDerivative<Input,Output> {
 
 	/**
 	 * Compues the image gradient from the input image and stores the results into

@@ -23,8 +23,8 @@ import boofcv.core.image.border.BorderIndex1D;
 import boofcv.core.image.border.BorderIndex1D_Reflect;
 import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.*;
 import boofcv.testing.BoofTesting;
 
@@ -75,9 +75,9 @@ public abstract class PermuteWaveletCompare {
 			heightOut = t;
 		}
 
-		ImageBase input = GeneralizedImageOps.createImage(inputType,widthIn,heightIn);
-		ImageBase found = GeneralizedImageOps.createImage(outputType,widthOut,heightOut);
-		ImageBase expected = GeneralizedImageOps.createImage(outputType,widthOut,heightOut);
+		ImageSingleBand input = GeneralizedImageOps.createImage(inputType,widthIn,heightIn);
+		ImageSingleBand found = GeneralizedImageOps.createImage(outputType,widthOut,heightOut);
+		ImageSingleBand expected = GeneralizedImageOps.createImage(outputType,widthOut,heightOut);
 
 		GeneralizedImageOps.randomize(input, rand, 0 , 50);
 
@@ -102,18 +102,18 @@ public abstract class PermuteWaveletCompare {
 		}
 	}
 
-	public void innerTest(ImageBase input, ImageBase found, ImageBase expected,
+	public void innerTest(ImageSingleBand input, ImageSingleBand found, ImageSingleBand expected,
 						  WaveletDescription<?> desc) {
 		applyTransform(desc,input,found);
 //		BoofTesting.printDiff(found,expected);
 		compareResults(desc, input , expected , found);
 	}
 
-	public abstract void applyValidation( WaveletDescription<?> desc , ImageBase input , ImageBase output );
+	public abstract void applyValidation( WaveletDescription<?> desc , ImageSingleBand input , ImageSingleBand output );
 
-	public abstract void applyTransform( WaveletDescription<?> desc , ImageBase input , ImageBase output );
+	public abstract void applyTransform( WaveletDescription<?> desc , ImageSingleBand input , ImageSingleBand output );
 
-	public abstract void compareResults( WaveletDescription<?> desc, ImageBase input , ImageBase expected, ImageBase found );
+	public abstract void compareResults( WaveletDescription<?> desc, ImageSingleBand input , ImageSingleBand expected, ImageSingleBand found );
 
 	private WaveletDescription<?> createDesc(int offset, int length, BorderType type ) {
 		if( inputType == ImageFloat32.class ) {

@@ -26,8 +26,8 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
 
@@ -50,7 +50,7 @@ public class DetectFastHessianApp {
 
 	static int NUM_FEATURES = 120;
 
-	private static <T extends ImageBase> void doStuff( Class<T> imageType , BufferedImage input ) {
+	private static <T extends ImageSingleBand> void doStuff( Class<T> imageType , BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax( 5 , 1 , 5, false, true);

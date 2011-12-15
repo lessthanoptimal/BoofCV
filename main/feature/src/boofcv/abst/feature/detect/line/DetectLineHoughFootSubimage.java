@@ -28,8 +28,8 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.FastQueue;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
 
@@ -56,7 +56,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectLineHoughFootSubimage<I extends ImageBase, D extends ImageBase>
+public class DetectLineHoughFootSubimage<I extends ImageSingleBand, D extends ImageSingleBand>
 		implements DetectLine<I>
 {
 	int totalHorizontalDivisions;

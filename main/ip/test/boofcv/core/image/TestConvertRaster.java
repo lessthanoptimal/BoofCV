@@ -18,8 +18,8 @@
 
 package boofcv.core.image;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -32,8 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -47,6 +46,11 @@ public class TestConvertRaster {
 
 	int numMethods = 15;
 
+	@Test
+	public void addMultiSpectral() {
+		fail("Add multispectral");
+	}
+	
 	/**
 	 * Use reflections to test all the functions.
 	 */
@@ -111,8 +115,8 @@ public class TestConvertRaster {
 		if( types.length != 2 )
 			return false;
 
-		if( ImageBase.class.isAssignableFrom(types[0]) ||
-				ImageBase.class.isAssignableFrom(types[1]) )
+		if( ImageSingleBand.class.isAssignableFrom(types[0]) ||
+				ImageSingleBand.class.isAssignableFrom(types[1]) )
 		return true;
 
 		return false;
@@ -125,7 +129,7 @@ public class TestConvertRaster {
 
 		input = createBufferedTestImages(paramTypes[0]);
 
-		ImageBase output = GeneralizedImageOps.createImage(paramTypes[1],imgWidth,imgHeight);
+		ImageSingleBand output = GeneralizedImageOps.createImage(paramTypes[1],imgWidth,imgHeight);
 
 		for( int i = 0; i < input.length; i++ ) {
 			BoofTesting.checkSubImage(this, "performBufferedTo", true, m,input[i],output);
@@ -154,7 +158,7 @@ public class TestConvertRaster {
 		return input;
 	}
 
-	public void performBufferedTo( Method m , BufferedImage input , ImageBase output ) {
+	public void performBufferedTo( Method m , BufferedImage input , ImageSingleBand output ) {
 		try {
 			if( Raster.class.isAssignableFrom(m.getParameterTypes()[0]) )
 				m.invoke(null,input.getRaster(),output);
@@ -173,7 +177,7 @@ public class TestConvertRaster {
 
 		Class paramTypes[] = m.getParameterTypes();
 
-		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0],imgWidth,imgHeight);
+		ImageSingleBand input = GeneralizedImageOps.createImage(paramTypes[0],imgWidth,imgHeight);
 		GeneralizedImageOps.randomize(input, rand, 0,50);
 
 		BufferedImage output[] = createBufferedTestImages(paramTypes[1]);
@@ -184,7 +188,7 @@ public class TestConvertRaster {
 		}
 	}
 
-	public void performGrayTo( Method m , ImageBase input , BufferedImage output ) {
+	public void performGrayTo( Method m , ImageSingleBand input , BufferedImage output ) {
 		try {
 			if( Raster.class.isAssignableFrom(m.getParameterTypes()[1]) )
 				m.invoke(null,input,output.getRaster());

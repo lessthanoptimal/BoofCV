@@ -21,7 +21,7 @@ package boofcv.alg.transform.gss;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.transform.pyramid.PyramidUpdateGaussianScale;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
 
 
@@ -44,7 +44,7 @@ import boofcv.struct.pyramid.PyramidFloat;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class ScaleSpacePyramid<T extends ImageBase> extends PyramidFloat<T> {
+public class ScaleSpacePyramid<T extends ImageSingleBand> extends PyramidFloat<T> {
 
 	// updates each layer in the pyramid by applying Gaussian blur and then sub-sampling it.
 	protected PyramidUpdateGaussianScale<T> updater;

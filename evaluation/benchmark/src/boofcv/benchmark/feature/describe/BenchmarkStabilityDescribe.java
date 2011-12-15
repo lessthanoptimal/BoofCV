@@ -27,8 +27,8 @@ import boofcv.benchmark.feature.distort.FactoryBenchmarkFeatureDistort;
 import boofcv.benchmark.feature.distort.StabilityEvaluator;
 import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BenchmarkStabilityDescribe <T extends ImageBase, D extends ImageBase>
+public class BenchmarkStabilityDescribe <T extends ImageSingleBand, D extends ImageSingleBand>
 {
 	Class<T> imageType;
 	Class<D> derivType;

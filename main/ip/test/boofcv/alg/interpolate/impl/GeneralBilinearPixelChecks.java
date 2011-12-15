@@ -25,7 +25,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralBilinearPixelChecks<T extends ImageBase> extends GeneralInterpolationPixelChecks<T> {
+public abstract class GeneralBilinearPixelChecks<T extends ImageSingleBand> extends GeneralInterpolationPixelChecks<T> {
 
 	@Override
 	protected InterpolatePixel<T> wrap(T image) {

@@ -28,7 +28,7 @@ import java.util.Random;
 import static org.junit.Assert.*;
 
 /**
- * Standard tests for children of {@link boofcv.struct.image.ImageBase}.  Ensures that they contain
+ * Standard tests for children of {@link ImageSingleBand}.  Ensures that they contain
  * all the expected functions and that they have the expected behavior.  This is done
  * through extensive use of reflections.
  *
@@ -45,7 +45,7 @@ public abstract class StandardImageInterleavedTests {
 	/**
 	 * Sets each element in the image to a random value.
 	 */
-	public void setRandom(ImageBase img) {
+	public void setRandom(ImageSingleBand img) {
 		Object data = img._getData();
 
 		int N = Array.getLength(data);
@@ -138,7 +138,7 @@ public abstract class StandardImageInterleavedTests {
 		checkException(img, method, type, typeData, 0, 0, img.getNumBands());
 	}
 
-	private void checkException(ImageBase img, String method,
+	private void checkException(ImageSingleBand img, String method,
 								int type, Object typeData, int... where) {
 		boolean found = false;
 		try {
@@ -150,7 +150,7 @@ public abstract class StandardImageInterleavedTests {
 		assertTrue("No exception was thrown", found);
 	}
 
-	private Object call(ImageBase img, String method,
+	private Object call(ImageSingleBand img, String method,
 						int type, Object typeData, int... where) {
 		try {
 			Class<?>[] paramTypes = type == 0 ?

@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.intensity;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface FastCornerIntensity<T extends ImageBase> extends FeatureIntensity<T> {
+public interface FastCornerIntensity<T extends ImageSingleBand> extends FeatureIntensity<T> {
 
 	/**
 	 * Extracts corner features from the provided image.

@@ -37,8 +37,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
 
 import javax.swing.*;
@@ -50,7 +50,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class CompareFeatureExtractorApp<T extends ImageBase, D extends ImageBase>
+public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends SelectAlgorithmImagePanel implements ProcessInput , GeneralExtractConfigPanel.Listener
 {
 	T grayImage;

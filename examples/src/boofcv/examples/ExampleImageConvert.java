@@ -26,8 +26,8 @@ import boofcv.core.image.border.BorderType;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
@@ -48,7 +48,7 @@ public class ExampleImageConvert {
 	 * @param imageType Image type for work image.
 	 * @param derivType Image type for image derivative.
 	 */
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	void convertBufferedImage(BufferedImage input, Class<T> imageType, Class<D> derivType) {
 		// If the gray scale image has a pixel range that includes 0 to 255 then it can
 		T gray = ConvertBufferedImage.convertFrom(input,null,imageType);

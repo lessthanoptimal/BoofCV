@@ -31,7 +31,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.struct.gss.GaussianScaleSpace;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Factory for creating/wrapping interest points detectors.
@@ -48,7 +48,7 @@ public class FactoryInterestPoint {
 	 * @param inputType Image type for gradient.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageBase, D extends ImageBase >
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> wrapCorner(GeneralFeatureDetector<T, D> feature, Class<T> inputType, Class<D> derivType) {
 
 		ImageGradient<T,D> gradient = null;
@@ -73,7 +73,7 @@ public class FactoryInterestPoint {
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageBase, D extends ImageBase >
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> wrapDetector(FeatureLaplaceScaleSpace<T, D> feature,
 										  double[] scales,
 										  Class<T> inputType) {
@@ -92,7 +92,7 @@ public class FactoryInterestPoint {
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageBase, D extends ImageBase >
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> wrapDetector(FeatureLaplacePyramid<T, D> feature,
 										  double[] scales,
 										  Class<T> inputType) {
@@ -110,7 +110,7 @@ public class FactoryInterestPoint {
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageBase, D extends ImageBase >
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> wrapDetector(FeatureScaleSpace<T, D> feature,
 										  double[] scales,
 										  Class<T> inputType) {
@@ -129,7 +129,7 @@ public class FactoryInterestPoint {
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageBase, D extends ImageBase >
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> wrapDetector(FeaturePyramid<T, D> feature,
 										  double[] scales,
 										  Class<T> inputType) {
@@ -154,7 +154,7 @@ public class FactoryInterestPoint {
 	 * @param numberOfOctaves Typically 4.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	InterestPointDetector<T> fastHessian(float threshold,
 										 int nonMaxRadius, int maxFeaturesPerScale,
 										 int initialSampleSize, int initialSize,

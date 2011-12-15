@@ -23,7 +23,7 @@ import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.benchmark.feature.distort.DistortParam;
 import boofcv.benchmark.feature.distort.StabilityEvaluator;
 import boofcv.benchmark.feature.distort.StabilityEvaluatorPoint;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps;
@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class DetectEvaluator<T extends ImageBase> implements StabilityEvaluator<T> {
+public class DetectEvaluator<T extends ImageSingleBand> implements StabilityEvaluator<T> {
 
 	// two points are considered to be the same if they are within this tolerance
 	double matchTolerance = 3;

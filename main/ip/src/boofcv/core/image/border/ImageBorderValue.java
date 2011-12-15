@@ -27,7 +27,7 @@ import boofcv.struct.image.*;
  */
 public class ImageBorderValue {
 
-	public static ImageBorder wrap( ImageBase image , double value ) {
+	public static ImageBorder wrap( ImageSingleBand image , double value ) {
 		if( image.getTypeInfo().isInteger() ) {
 			if( image.getTypeInfo().getNumBits() <= 32 )
 				return wrap((ImageInteger)image,(int)value);

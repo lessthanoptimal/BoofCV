@@ -27,19 +27,19 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryImageBorder {
 
-//	public static <T extends ImageBase> ImageBorder<T> extend( T image ) {
+//	public static <T extends ImageSingleBand> ImageBorder<T> extend( T image ) {
 //		ImageBorder<T> ret = general(image.getClass(),BorderIndex1D_Extend.class);
 //		ret.setImage(image);
 //		return ret;
 //	}
 //
-//	public static <T extends ImageBase> ImageBorder<T> reflect( T image ) {
+//	public static <T extends ImageSingleBand> ImageBorder<T> reflect( T image ) {
 //		ImageBorder<T> ret = general(image.getClass(),BorderIndex1D_Reflect.class);
 //		ret.setImage(image);
 //		return ret;
 //	}
 //
-//	public static <T extends ImageBase> ImageBorder<T> wrap( T image ) {
+//	public static <T extends ImageSingleBand> ImageBorder<T> wrap( T image ) {
 //		ImageBorder<T> ret = general(image.getClass(),BorderIndex1D_Wrap.class);
 //		ret.setImage(image);
 //		return ret;
@@ -58,7 +58,7 @@ public class FactoryImageBorder {
 //			throw new IllegalArgumentException("Unknown image type");
 //	}
 
-	public static <T extends ImageBase> ImageBorder<T> general( T image , BorderType borderType ) {
+	public static <T extends ImageSingleBand> ImageBorder<T> general( T image , BorderType borderType ) {
 		ImageBorder<T> ret = general(image.getClass(),borderType);
 		ret.setImage(image);
 		return ret;
@@ -77,7 +77,7 @@ public class FactoryImageBorder {
 			throw new IllegalArgumentException("Unknown image type");
 	}
 
-	public static <T extends ImageBase> ImageBorder<T> value( Class<?> imageType , double value ) {
+	public static <T extends ImageSingleBand> ImageBorder<T> value( Class<?> imageType , double value ) {
 		if( imageType == ImageFloat32.class ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_F32((float)value);
 		} else if( imageType == ImageFloat64.class ) {
@@ -88,7 +88,7 @@ public class FactoryImageBorder {
 			throw new IllegalArgumentException("Unknown image type");
 		}
 	}
-	public static <T extends ImageBase> ImageBorder<T> general( Class<?> imageType , BorderType borderType ) {
+	public static <T extends ImageSingleBand> ImageBorder<T> general( Class<?> imageType , BorderType borderType ) {
 
 		Class<?> borderClass;
 		switch(borderType) {

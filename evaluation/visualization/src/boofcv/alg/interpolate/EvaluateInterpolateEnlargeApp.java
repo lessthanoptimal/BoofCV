@@ -27,8 +27,8 @@ import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;
@@ -40,7 +40,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
+public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 	extends SelectAlgorithmImagePanel implements ProcessInput, ComponentListener
 {
 	Class<T> imageType;

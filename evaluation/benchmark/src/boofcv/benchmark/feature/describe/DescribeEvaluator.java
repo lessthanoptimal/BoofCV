@@ -32,7 +32,7 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 
@@ -46,7 +46,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DescribeEvaluator<T extends ImageBase>
+public class DescribeEvaluator<T extends ImageSingleBand>
 	extends StabilityEvaluatorPoint<T>
 {
 	// list of descriptions from the initial image

@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve.border;
 
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.CompareEquivalentFunctions;
 
 import java.lang.reflect.Method;
@@ -49,13 +49,13 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 		Class<?> e[] = m.getParameterTypes();
 
 		for( Class<?> c : e ) {
-			if( ImageBase.class.isAssignableFrom(c))
+			if( ImageSingleBand.class.isAssignableFrom(c))
 				return true;
 		}
 		return false;
 	}
 	
-	protected ImageBase stripBorder( ImageBase a ) {
+	protected ImageSingleBand stripBorder( ImageSingleBand a ) {
 		return a.subimage(kernelRadius,kernelRadius,width+kernelRadius,height+kernelRadius);
 	}
 

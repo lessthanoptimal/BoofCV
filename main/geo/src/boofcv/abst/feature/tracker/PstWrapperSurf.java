@@ -29,7 +29,7 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PstWrapperSurf<I extends ImageBase,II extends ImageBase>
+public class PstWrapperSurf<I extends ImageSingleBand,II extends ImageSingleBand>
 	extends DetectAssociateTracker<I,SurfFeature>
 {
 	II integralImage;

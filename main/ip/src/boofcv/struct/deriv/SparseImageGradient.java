@@ -18,7 +18,7 @@
 
 package boofcv.struct.deriv;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface SparseImageGradient<T extends ImageBase, G extends GradientValue> 
+public interface SparseImageGradient<T extends ImageSingleBand, G extends GradientValue>
 {
 	public void setImage(T input );
 

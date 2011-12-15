@@ -28,8 +28,8 @@ import boofcv.gui.image.ProcessImageSequence;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
@@ -40,7 +40,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoDetectInterestPoints<T extends ImageBase>
+public class VideoDetectInterestPoints<T extends ImageSingleBand>
 		extends ProcessImageSequence<T> {
 
 	InterestPointDetector<T> detector;
@@ -99,7 +99,7 @@ public class VideoDetectInterestPoints<T extends ImageBase>
 		}
 	}
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	void perform( String fileName , Class<T> imageType , Class<D> derivType )
 	{
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, imageType);

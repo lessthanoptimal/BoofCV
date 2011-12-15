@@ -32,7 +32,7 @@ import boofcv.alg.feature.detect.line.gridline.GridLineModelFitter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.line.LinePolar2D_F32;
 
 /**
@@ -54,7 +54,7 @@ public class FactoryDetectLine {
 	 * @param <D>
 	 * @return
 	 */
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	DetectLineSegmentsGridRansac<I,D> lineRansac(int regionSize ,
 												 double thresholdEdge ,
 												 double thresholdAngle ,
@@ -79,7 +79,7 @@ public class FactoryDetectLine {
 		return new DetectLineSegmentsGridRansac<I,D>(alg,connect,gradient,thresholdEdge,imageType,derivType);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	DetectLineHoughFoot<I,D> houghFoot(int localMaxRadius,
 									   int minCounts ,
 									   int minDistanceFromOrigin ,
@@ -93,7 +93,7 @@ public class FactoryDetectLine {
 		return new DetectLineHoughFoot<I,D>(localMaxRadius,minCounts,minDistanceFromOrigin,thresholdEdge,maxLines,gradient);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	DetectLineHoughFootSubimage<I,D> houghFootSub(int localMaxRadius,
 									   int minCounts ,
 									   int minDistanceFromOrigin ,
@@ -124,7 +124,7 @@ public class FactoryDetectLine {
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
 	 */
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	DetectLineHoughPolar<I,D> houghPolar(int localMaxRadius,
 										 int minCounts,
 										 double resolutionRange ,

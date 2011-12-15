@@ -27,8 +27,8 @@ import boofcv.gui.image.DiscretePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.convolve.Kernel1D;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
@@ -41,7 +41,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExamplePyramidDiscrete<T extends ImageBase> {
+public class ExamplePyramidDiscrete<T extends ImageSingleBand> {
 
 	// specifies the image type
 	Class<T> imageType;

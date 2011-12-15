@@ -24,7 +24,7 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import static boofcv.factory.filter.kernel.FactoryKernelGaussian.sigmaForRadius;
 
@@ -35,7 +35,7 @@ import static boofcv.factory.filter.kernel.FactoryKernelGaussian.sigmaForRadius;
  *
  * @author Peter Abeles
  */
-public class ImageGradient_Gaussian<I extends ImageBase, D extends ImageBase >
+public class ImageGradient_Gaussian<I extends ImageSingleBand, D extends ImageSingleBand>
 		implements ImageGradient<I, D> {
 
 	// default border.

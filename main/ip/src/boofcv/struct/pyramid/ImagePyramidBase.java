@@ -20,7 +20,7 @@ package boofcv.struct.pyramid;
 
 import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.inst.FactoryImageGenerator;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class ImagePyramidBase<T extends ImageBase>
+public abstract class ImagePyramidBase<T extends ImageSingleBand>
 	implements ImagePyramid<T>
 {
 	// shape of full resolution input image

@@ -31,7 +31,7 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.Random;
 
@@ -53,7 +53,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageBase, II extends ImageBase>
+	public static <T extends ImageSingleBand, II extends ImageSingleBand>
 	DescribeRegionPoint<T> surf( boolean isOriented , Class<T> imageType) {
 		OrientationIntegral<II> orientation = null;
 
@@ -77,7 +77,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageBase, II extends ImageBase>
+	public static <T extends ImageSingleBand, II extends ImageSingleBand>
 	DescribeRegionPoint<T> surfm(boolean isOriented, Class<T> imageType) {
 		OrientationIntegral<II> orientation = null;
 
@@ -91,7 +91,7 @@ public class FactoryDescribeRegionPoint {
 		return new WrapDescribeSurf<T,II>( alg ,orientation);
 	}
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	DescribeRegionPoint<T> gaussian12( int radius ,Class<T> imageType , Class<D> derivType ) {
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
@@ -100,7 +100,7 @@ public class FactoryDescribeRegionPoint {
 		return new WrapDescribeGaussian12<T,D>(steer,gradient,imageType,derivType);
 	}
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	DescribeRegionPoint<T> steerableGaussian( int radius , boolean normalized ,
 													Class<T> imageType , Class<D> derivType ) {
 
@@ -124,7 +124,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of gray scale image it processes.
 	 * @return BRIEF descriptor
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	DescribeRegionPoint<T> brief(int radius, int numPoints,
 									   double blurSigma, int blurRadius,
 									   boolean isFixed,
@@ -153,7 +153,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return Pixel region descriptor
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	DescribeRegionPoint<T> pixel( int regionWidth , int regionHeight , Class<T> imageType ) {
 		return new WrapDescribePixelRegion(FactoryDescribePointAlgs.pixelRegion(regionWidth,regionHeight,imageType));
 	}
@@ -168,7 +168,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return Pixel region descriptor
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	DescribeRegionPoint<T> pixelNCC( int regionWidth , int regionHeight , Class<T> imageType ) {
 		return new WrapDescribePixelRegionNCC(FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType));
 	}

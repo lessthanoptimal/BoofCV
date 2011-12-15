@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.blur;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class GBlurImageOps {
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	T mean(T input, T output, int radius, T storage ) {
 		if( input instanceof ImageUInt8 ) {
 			return (T)BlurImageOps.mean((ImageUInt8)input,(ImageUInt8)output,radius,(ImageUInt8)storage);
@@ -39,7 +39,7 @@ public class GBlurImageOps {
 		}
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	T median(T input, T output, int radius ) {
 		if( input instanceof ImageUInt8 ) {
 			return (T)BlurImageOps.median((ImageUInt8)input,(ImageUInt8)output,radius);
@@ -50,7 +50,7 @@ public class GBlurImageOps {
 		}
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	T gaussian(T input, T output, double sigma , int radius, T storage ) {
 		if( input instanceof ImageUInt8 ) {
 			return (T)BlurImageOps.gaussian((ImageUInt8)input,(ImageUInt8)output,sigma,radius,(ImageUInt8)storage);

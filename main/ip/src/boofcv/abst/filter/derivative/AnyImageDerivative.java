@@ -26,7 +26,7 @@ import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -37,7 +37,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class AnyImageDerivative<I extends ImageBase , D extends ImageBase> {
+public class AnyImageDerivative<I extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// filters for computing image derivatives
 	private ConvolveInterface<I, D> derivX;
@@ -186,12 +186,12 @@ public class AnyImageDerivative<I extends ImageBase , D extends ImageBase> {
 	}
 
 	private void declareTree( int maxDerivativeOrder ) {
-		derivatives = (D[][])new ImageBase[maxDerivativeOrder][];
+		derivatives = (D[][])new ImageSingleBand[maxDerivativeOrder][];
 		stale = new boolean[maxDerivativeOrder][];
 
 		for( int i = 0; i < maxDerivativeOrder; i++) {
 			int N = (int)Math.pow(2,i+1);
-			derivatives[i] = (D[])new ImageBase[N];
+			derivatives[i] = (D[])new ImageSingleBand[N];
 			stale[i] = new boolean[N];
 			for( int j = 0; j < N; j++ ) {
 				stale[i][j] = true;

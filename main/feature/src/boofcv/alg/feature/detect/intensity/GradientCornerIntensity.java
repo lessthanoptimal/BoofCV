@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -49,7 +49,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface GradientCornerIntensity<T extends ImageBase> extends FeatureIntensity<T> {
+public interface GradientCornerIntensity<T extends ImageSingleBand> extends FeatureIntensity<T> {
 
 	/**
 	 * Computes feature intensity image.

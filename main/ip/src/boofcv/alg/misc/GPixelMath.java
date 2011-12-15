@@ -34,7 +34,7 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static <T extends ImageBase> void abs( T input , T output )
+	public static <T extends ImageSingleBand> void abs( T input , T output )
 	{
 		if( ImageSInt8.class == input.getClass() ) {
 			PixelMath.abs((ImageSInt8)input,(ImageSInt8)output);
@@ -55,7 +55,7 @@ public class GPixelMath {
 	 * @param input Input image. Not modified.
 	 * @return Largest pixel absolute value.
 	 */
-	public static double maxAbs( ImageBase input ) {
+	public static double maxAbs( ImageSingleBand input ) {
 		if( ImageUInt8.class == input.getClass() ) {
 			return PixelMath.maxAbs((ImageUInt8)input);
 		} else if( ImageSInt8.class == input.getClass() ) {
@@ -79,7 +79,7 @@ public class GPixelMath {
 	 * @param input Input image. Not modified.
 	 * @return Maximum pixel value.
 	 */
-	public static double max( ImageBase input ) {
+	public static double max( ImageSingleBand input ) {
 		if( ImageUInt8.class == input.getClass() ) {
 			return PixelMath.max((ImageUInt8) input);
 		} else if( ImageSInt8.class == input.getClass() ) {
@@ -103,7 +103,7 @@ public class GPixelMath {
 	 * @param input Input image. Not modified.
 	 * @return Minimum pixel value.
 	 */
-	public static double min( ImageBase input ) {
+	public static double min( ImageSingleBand input ) {
 		if( ImageUInt8.class == input.getClass() ) {
 			return PixelMath.min((ImageUInt8) input);
 		} else if( ImageSInt8.class == input.getClass() ) {
@@ -129,7 +129,7 @@ public class GPixelMath {
 	 * @param output The output image. Modified.
 	 * @param denominator What each element is divided by.
 	 */
-	public static <T extends ImageBase> void divide( T input , T output , double denominator ) {
+	public static <T extends ImageSingleBand> void divide( T input , T output , double denominator ) {
 
 		if( ImageInteger.class.isAssignableFrom(input.getClass())) {
 			if( ImageUInt8.class == input.getClass() ) {
@@ -162,7 +162,7 @@ public class GPixelMath {
 	 * @param output The output image. Modified.
 	 * @param scale What each element is divided by.
 	 */
-	public static <T extends ImageBase> void multiply( T input , T output , double scale ) {
+	public static <T extends ImageSingleBand> void multiply( T input , T output , double scale ) {
 
 		if( ImageInteger.class.isAssignableFrom(input.getClass())) {
 			if( ImageUInt8.class == input.getClass() ) {
@@ -195,7 +195,7 @@ public class GPixelMath {
 	 * @param output The output image. Modified.
 	 * @param value What is added to each element.
 	 */
-	public static <T extends ImageBase> void plus( T input , T output, double value ) {
+	public static <T extends ImageSingleBand> void plus( T input , T output, double value ) {
 		if( ImageInteger.class.isAssignableFrom(input.getClass())) {
 			int scaleI = (int)value;
 
@@ -228,7 +228,7 @@ public class GPixelMath {
 	 *
 	 * @param input Input image. Not modified.
 	 */
-	public static <T extends ImageBase> double sum( T input ) {
+	public static <T extends ImageSingleBand> double sum( T input ) {
 
 		if( ImageUInt8.class == input.getClass() ) {
 			return PixelMath.sum((ImageUInt8)input);
@@ -256,7 +256,7 @@ public class GPixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static <T extends ImageBase> void boundImage( T input , double min , double max ) {
+	public static <T extends ImageSingleBand> void boundImage( T input , double min , double max ) {
 
 		if( ImageUInt8.class == input.getClass() ) {
 			PixelMath.boundImage((ImageUInt8)input,(int)min,(int)max);

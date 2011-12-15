@@ -18,8 +18,8 @@
 
 package boofcv.gui;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,7 +38,7 @@ public class ImageHistogramPanel extends JPanel {
 		this.bins = new int[ totalBins ];
 	}
 
-	public void update( ImageBase image ) {
+	public void update( ImageSingleBand image ) {
 
 		for( int i = 0; i < bins.length; i++ )
 			bins[i] = 0;

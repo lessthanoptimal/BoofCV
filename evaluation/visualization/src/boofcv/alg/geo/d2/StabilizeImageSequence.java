@@ -32,8 +32,8 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.affine.Affine2D_F64;
 
 import java.awt.*;
@@ -45,7 +45,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class StabilizeImageSequence<I extends ImageBase> extends ProcessImageSequence<I> {
+public class StabilizeImageSequence<I extends ImageSingleBand> extends ProcessImageSequence<I> {
 
 	static int thresholdChange = 80;
 	static int thresholdReset = 30;
@@ -130,7 +130,7 @@ public class StabilizeImageSequence<I extends ImageBase> extends ProcessImageSeq
 	}
 
 
-	private static <I extends ImageBase,D extends ImageBase>
+	private static <I extends ImageSingleBand,D extends ImageSingleBand>
 	void doStuff( String fileName , Class<I> imageType )
 	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);

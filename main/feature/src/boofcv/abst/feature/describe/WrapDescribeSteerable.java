@@ -21,7 +21,7 @@ package boofcv.abst.feature.describe;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribePointSteerable2D;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class WrapDescribeSteerable <T extends ImageBase, D extends ImageBase>
+public class WrapDescribeSteerable <T extends ImageSingleBand, D extends ImageSingleBand>
 		extends WrapScaleToCharacteristic<T,D>
 {
 	DescribePointSteerable2D<T,?> steer;

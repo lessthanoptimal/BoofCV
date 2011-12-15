@@ -22,7 +22,7 @@ import boofcv.benchmark.feature.AlgorithmResult;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.benchmark.feature.MetricResult;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CompileImageResults<T extends ImageBase> {
+public class CompileImageResults<T extends ImageSingleBand> {
 
 	private List<String> fileNames = new ArrayList<String>();
 	private List<BenchmarkAlgorithm> algs;

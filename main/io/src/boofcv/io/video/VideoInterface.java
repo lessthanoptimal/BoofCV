@@ -1,7 +1,7 @@
 package boofcv.io.video;
 
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -11,5 +11,5 @@ import boofcv.struct.image.ImageBase;
  */
 public interface VideoInterface {
 
-	public <T extends ImageBase> SimpleImageSequence<T> load( String fileName , Class<T> imageType );
+	public <T extends ImageSingleBand> SimpleImageSequence<T> load( String fileName , Class<T> imageType );
 }

@@ -21,8 +21,8 @@ package boofcv;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.Random;
 
@@ -129,7 +129,7 @@ public class AreGenericsSlower {
 		}
 	}
 
-	private static abstract class BaseGeneric <T extends ImageBase>
+	private static abstract class BaseGeneric <T extends ImageSingleBand>
 	{
 		protected T image;
 

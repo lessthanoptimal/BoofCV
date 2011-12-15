@@ -26,7 +26,7 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmPanel;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public abstract class DisplaySteerableBase<T extends ImageBase, K extends Kernel2D>
+public abstract class DisplaySteerableBase<T extends ImageSingleBand, K extends Kernel2D>
 		extends SelectAlgorithmPanel
 {
 	protected static int imageSize = 400;

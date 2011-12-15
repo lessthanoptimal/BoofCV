@@ -27,8 +27,8 @@ import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.MatrixOfList;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineSegment2D_F32;
 
@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class DetectLineSegmentsGridRansac<T extends ImageBase, D extends ImageBase>
+public class DetectLineSegmentsGridRansac<T extends ImageSingleBand, D extends ImageSingleBand>
 		implements DetectLineSegment<T>
 {
 	GridRansacLineDetector detectorGrid;

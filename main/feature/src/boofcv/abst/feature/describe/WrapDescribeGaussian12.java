@@ -21,7 +21,7 @@ package boofcv.abst.feature.describe;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribePointGaussian12;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class WrapDescribeGaussian12<T extends ImageBase, D extends ImageBase>
+public class WrapDescribeGaussian12<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends WrapScaleToCharacteristic<T,D>
 {
 	DescribePointGaussian12<T,?> steer;

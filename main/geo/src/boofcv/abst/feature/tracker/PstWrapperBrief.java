@@ -26,7 +26,7 @@ import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BriefFeatureQueue;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -34,7 +34,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class PstWrapperBrief <I extends ImageBase>
+public class PstWrapperBrief <I extends ImageSingleBand>
 		extends DetectAssociateTracker<I,BriefFeature>
 {
 	private DescribePointBrief<I> alg;

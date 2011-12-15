@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -37,7 +37,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface HarrisCornerIntensity<T extends ImageBase> extends GradientCornerIntensity<T> {
+public interface HarrisCornerIntensity<T extends ImageSingleBand> extends GradientCornerIntensity<T> {
 
 	/**
 	 * Returns the value of the tuning parameter.

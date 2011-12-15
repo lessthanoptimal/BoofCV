@@ -22,7 +22,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -90,8 +90,8 @@ public class TestConvolveImageStandard {
 	private void testMethod( Method m ) {
 		Class param[] = m.getParameterTypes();
 
-		ImageBase input = GeneralizedImageOps.createImage(param[1],width,height);
-		ImageBase output = GeneralizedImageOps.createImage(param[2],width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(param[1],width,height);
+		ImageSingleBand output = GeneralizedImageOps.createImage(param[2],width,height);
 
 		GeneralizedImageOps.randomize(input, rand, 1,10);
 
@@ -122,7 +122,7 @@ public class TestConvolveImageStandard {
 	/**
 	 * Unit test for horizontal convolution.
 	 */
-	public void horizontal(ImageBase img, ImageBase dest) {
+	public void horizontal(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		invokeMethod("horizontal", ker, img, dest, false);
@@ -143,7 +143,7 @@ public class TestConvolveImageStandard {
 	/**
 	 * Unit test for horizontal convolution with division.
 	 */
-	public void horizontalDiv(ImageBase img, ImageBase dest) {
+	public void horizontalDiv(ImageSingleBand img, ImageSingleBand dest) {
 		int divisor = 11;
 		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
@@ -167,7 +167,7 @@ public class TestConvolveImageStandard {
 	/**
 	 * Unit test for vertical convolution.
 	 */
-	public void vertical(ImageBase img, ImageBase dest) {
+	public void vertical(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		invokeMethod("vertical", ker, img, dest, false);
@@ -188,7 +188,7 @@ public class TestConvolveImageStandard {
 	/**
 	 * Unit test for vertical convolution with division.
 	 */
-	public void verticalDiv(ImageBase img, ImageBase dest) {
+	public void verticalDiv(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		int divisor = 11;
@@ -212,7 +212,7 @@ public class TestConvolveImageStandard {
 	/**
 	 * Unit test for 2D convolution.
 	 */
-	public void convolve(ImageBase img, ImageBase dest) {
+	public void convolve(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker;
 		if (!img.getTypeInfo().isInteger())
 			ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
@@ -247,7 +247,7 @@ public class TestConvolveImageStandard {
 	/**
 	 * Unit test for 2D convolution with division.
 	 */
-	public void convolveDiv(ImageBase img, ImageBase dest) {
+	public void convolveDiv(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker;
 		if (!img.getTypeInfo().isInteger())
 			ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));

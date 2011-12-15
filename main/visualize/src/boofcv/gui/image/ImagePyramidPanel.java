@@ -24,7 +24,7 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
 import java.awt.image.BufferedImage;
@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class ImagePyramidPanel<T extends ImageBase> extends ListDisplayPanel {
+public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPanel {
 
 	// the image pyramid.
 	ImagePyramid<T> pyramid;

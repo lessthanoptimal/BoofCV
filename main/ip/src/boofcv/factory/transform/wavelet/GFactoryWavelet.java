@@ -19,9 +19,9 @@
 package boofcv.factory.transform.wavelet;
 
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -34,7 +34,7 @@ import boofcv.struct.wavelet.WlCoef;
 @SuppressWarnings({"unchecked"})
 public class GFactoryWavelet {
 
-	public static <C extends WlCoef, T extends ImageBase>
+	public static <C extends WlCoef, T extends ImageSingleBand>
 	WaveletDescription<C> haar( Class<T> imageType )
 	{
 		if( imageType == ImageFloat32.class )
@@ -46,7 +46,7 @@ public class GFactoryWavelet {
 		}
 	}
 
-	public static <C extends WlCoef, T extends ImageBase>
+	public static <C extends WlCoef, T extends ImageSingleBand>
 	WaveletDescription<C> daubJ( Class<T> imageType , int J )
 	{
 		if( imageType == ImageFloat32.class )
@@ -56,7 +56,7 @@ public class GFactoryWavelet {
 		}
 	}
 
-	public static <C extends WlCoef, T extends ImageBase>
+	public static <C extends WlCoef, T extends ImageSingleBand>
 	WaveletDescription<C> biorthogoal( Class<T> imageType , int J , BorderType borderType)
 	{
 		if( imageType == ImageFloat32.class )
@@ -68,7 +68,7 @@ public class GFactoryWavelet {
 		}
 	}
 
-	public static <C extends WlCoef, T extends ImageBase>
+	public static <C extends WlCoef, T extends ImageSingleBand>
 	WaveletDescription<C> coiflet( Class<T> imageType , int J )
 	{
 		if( imageType == ImageFloat32.class )

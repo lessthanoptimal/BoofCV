@@ -18,9 +18,9 @@
 
 package boofcv.alg.filter.basic;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -45,7 +45,7 @@ public class GGrayImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static <T extends ImageBase> T stretch(T input, double gamma, double beta, double max , T output) {
+	public static <T extends ImageSingleBand> T stretch(T input, double gamma, double beta, double max , T output) {
 		if( input instanceof ImageFloat32 ) {
 			return (T)GrayImageOps.stretch((ImageFloat32)input,gamma,(float)beta,(float)max,(ImageFloat32)output);
 		} else if( input instanceof ImageUInt8) {
@@ -71,7 +71,7 @@ public class GGrayImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static <T extends ImageBase> T brighten( T input , double beta, double max , T output )
+	public static <T extends ImageSingleBand> T brighten( T input , double beta, double max , T output )
 	{
 		if( input instanceof ImageFloat32 ) {
 			return (T)GrayImageOps.brighten((ImageFloat32) input, (float) beta, (float) max, (ImageFloat32) output);

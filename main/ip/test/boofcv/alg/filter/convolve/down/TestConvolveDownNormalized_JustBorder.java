@@ -25,7 +25,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.CompareEquivalentFunctions;
 import org.junit.Test;
 
@@ -87,9 +87,9 @@ public class TestConvolveDownNormalized_JustBorder {
 				divW = divH = skip;
 			}
 
-			ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
+			ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 			GeneralizedImageOps.randomize(src, rand, 0, 130);
-			ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
+			ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
 
 			Object[][] ret = new Object[1][paramTypes.length];
 
@@ -108,7 +108,7 @@ public class TestConvolveDownNormalized_JustBorder {
 			Class<?> e[] = m.getParameterTypes();
 
 			for( Class<?> c : e ) {
-				if( ImageBase.class.isAssignableFrom(c))
+				if( ImageSingleBand.class.isAssignableFrom(c))
 					return true;
 			}
 			return false;
@@ -147,8 +147,8 @@ public class TestConvolveDownNormalized_JustBorder {
 			int kernelDimen = ((KernelBase)targetParam[0]).getDimension();
 			int validationParams = targetParam.length-1;
 
-			ImageBase input = (ImageBase)targetParam[1];
-			ImageBase output = (ImageBase)targetParam[2];
+			ImageSingleBand input = (ImageSingleBand)targetParam[1];
+			ImageSingleBand output = (ImageSingleBand)targetParam[2];
 
 			Object[] ret = new Object[ validationParams ];
 
@@ -172,8 +172,8 @@ public class TestConvolveDownNormalized_JustBorder {
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
-			SingleBandImage t = FactorySingleBandImage.wrap((ImageBase)targetParam[2]);
-			SingleBandImage v = FactorySingleBandImage.wrap((ImageBase)validationParam[2]);
+			SingleBandImage t = FactorySingleBandImage.wrap((ImageSingleBand)targetParam[2]);
+			SingleBandImage v = FactorySingleBandImage.wrap((ImageSingleBand)validationParam[2]);
 
 			int ratioWidth = v.getWidth() != t.getWidth() ? skip : 1;
 			int ratioHeight = v.getHeight() != t.getHeight() ? skip : 1;

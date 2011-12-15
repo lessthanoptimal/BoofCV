@@ -25,8 +25,8 @@ import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.DiscretePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
@@ -38,7 +38,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizePyramidDiscreteApp <T extends ImageBase>
+public class VisualizePyramidDiscreteApp <T extends ImageSingleBand>
 	extends SelectImagePanel implements ProcessInput
 {
 	int scales[] = new int[]{1,2,4,8,16};

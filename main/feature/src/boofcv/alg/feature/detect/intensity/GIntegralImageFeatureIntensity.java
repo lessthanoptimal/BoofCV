@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -35,7 +35,7 @@ public class GIntegralImageFeatureIntensity {
 	 * @param size Hessian kernel's size.
 	 * @param intensity Output intensity image.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void hessian( T integral, int skip , int size ,
 				  ImageFloat32 intensity) {
 

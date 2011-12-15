@@ -27,7 +27,7 @@ import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.benchmark.feature.distort.StabilityEvaluatorPoint;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.evaluation.ErrorStatistics;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 
@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class OrientationEvaluator <T extends ImageBase,D extends ImageBase>
+public class OrientationEvaluator <T extends ImageSingleBand,D extends ImageSingleBand>
 		extends StabilityEvaluatorPoint<T> {
 
 	ImageGradient<T,D> gradient;

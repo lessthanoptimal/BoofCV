@@ -26,7 +26,7 @@ import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -39,7 +39,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizePyramidFloatApp <T extends ImageBase>
+public class VisualizePyramidFloatApp <T extends ImageSingleBand>
 	extends SelectImagePanel implements ProcessInput
 {
 	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};

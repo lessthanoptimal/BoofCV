@@ -37,7 +37,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public abstract class ImageInteger<T extends ImageInteger> extends ImageBase<T>{
+public abstract class ImageInteger<T extends ImageInteger> extends ImageSingleBand<T> {
 
 	protected ImageInteger(int width, int height ) {
 		super(width, height);

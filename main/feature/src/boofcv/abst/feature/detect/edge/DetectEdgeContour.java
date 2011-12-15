@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.edge;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.List;
@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface DetectEdgeContour<T extends ImageBase> {
+public interface DetectEdgeContour<T extends ImageSingleBand> {
 
 	/**
 	 * Processes the input image and extract object contours.

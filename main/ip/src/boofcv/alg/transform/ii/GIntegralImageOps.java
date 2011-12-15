@@ -18,9 +18,9 @@
 
 package boofcv.alg.transform.ii;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -35,7 +35,7 @@ public class GIntegralImageOps {
 	/**
 	 * Given the input image, return the type of image the integral image should be.
 	 */
-	public static <I extends ImageBase, II extends ImageBase>
+	public static <I extends ImageSingleBand, II extends ImageSingleBand>
 	Class<II> getIntegralType( Class<I> inputType ) {
 		if( inputType == ImageFloat32.class ) {
 			return (Class<II>)ImageFloat32.class;
@@ -55,7 +55,7 @@ public class GIntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static <I extends ImageBase, T extends ImageBase>
+	public static <I extends ImageSingleBand, T extends ImageSingleBand>
 	T transform( I input , T transformed ) {
 		if( input instanceof ImageFloat32 ) {
 			return (T)IntegralImageOps.transform((ImageFloat32)input,(ImageFloat32)transformed);
@@ -76,7 +76,7 @@ public class GIntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	T convolve( T integral ,
 				IntegralKernel kernel,
 				T output ) {
@@ -98,7 +98,7 @@ public class GIntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	T convolveBorder( T integral ,
 					  IntegralKernel kernel,
 					  T output , int borderX , int borderY ) {
@@ -120,7 +120,7 @@ public class GIntegralImageOps {
 	 * @param y Pixel the convolution is performed at.
 	 * @return Value of the convolution
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	double convolveSparse( T integral ,
 						   IntegralKernel kernel ,
 						   int x , int y ) {

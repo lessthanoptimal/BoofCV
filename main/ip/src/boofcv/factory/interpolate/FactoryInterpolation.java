@@ -33,7 +33,7 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryInterpolation {
 
-	public static <T extends ImageBase> InterpolatePixel<T>
+	public static <T extends ImageSingleBand> InterpolatePixel<T>
 	createPixel(double min, double max, TypeInterpolate type, Class<T> imageType)
 	{
 		switch( type ) {
@@ -52,7 +52,7 @@ public class FactoryInterpolation {
 		throw new IllegalArgumentException("Add type: "+type);
 	}
 
-	public static <T extends ImageBase> InterpolatePixel<T> bilinearPixel( T image ) {
+	public static <T extends ImageSingleBand> InterpolatePixel<T> bilinearPixel( T image ) {
 
 		InterpolatePixel<T> ret = bilinearPixel((Class)image.getClass());
 		ret.setImage(image);
@@ -60,7 +60,7 @@ public class FactoryInterpolation {
 		return ret;
 	}
 
-	public static <T extends ImageBase> InterpolatePixel<T> bilinearPixel(Class<T> type ) {
+	public static <T extends ImageSingleBand> InterpolatePixel<T> bilinearPixel(Class<T> type ) {
 		if( type == ImageFloat32.class )
 			return (InterpolatePixel<T>)new ImplBilinearPixel_F32();
 		else if( type == ImageUInt8.class )
@@ -73,7 +73,7 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageBase> InterpolateRectangle<T> bilinearRectangle( T image ) {
+	public static <T extends ImageSingleBand> InterpolateRectangle<T> bilinearRectangle( T image ) {
 
 		InterpolateRectangle<T> ret = bilinearRectangle((Class)image.getClass());
 		ret.setImage(image);
@@ -81,7 +81,7 @@ public class FactoryInterpolation {
 		return ret;
 	}
 
-	public static <T extends ImageBase> InterpolateRectangle<T> bilinearRectangle( Class<T> type ) {
+	public static <T extends ImageSingleBand> InterpolateRectangle<T> bilinearRectangle( Class<T> type ) {
 		if( type == ImageFloat32.class )
 			return (InterpolateRectangle<T>)new BilinearRectangle_F32();
 		else if( type == ImageUInt8.class )
@@ -92,7 +92,7 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageBase> InterpolatePixel<T> nearestNeighborPixel( Class<T> type ) {
+	public static <T extends ImageSingleBand> InterpolatePixel<T> nearestNeighborPixel( Class<T> type ) {
 		if( type == ImageFloat32.class )
 			return (InterpolatePixel<T>)new NearestNeighborPixel_F32();
 		else if( type == ImageUInt8.class )
@@ -105,7 +105,7 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageBase> InterpolateRectangle<T> nearestNeighborRectangle( Class<?> type ) {
+	public static <T extends ImageSingleBand> InterpolateRectangle<T> nearestNeighborRectangle( Class<?> type ) {
 		if( type == ImageFloat32.class )
 			return (InterpolateRectangle<T>)new NearestNeighborRectangle_F32();
 //		else if( type == ImageUInt8.class )
@@ -116,7 +116,7 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageBase> InterpolatePixel<T> bicubic(float param, float min , float max ,Class<T> type) {
+	public static <T extends ImageSingleBand> InterpolatePixel<T> bicubic(float param, float min , float max ,Class<T> type) {
 		BicubicKernel_F32 kernel = new BicubicKernel_F32(param);
 		if( type == ImageFloat32.class )
 			return (InterpolatePixel<T>)new ImplInterpolatePixelConvolution_F32(kernel,min,max);
@@ -128,7 +128,7 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageBase> InterpolatePixel<T> polynomial( int maxDegree , double min , double max , Class<T> type ) {
+	public static <T extends ImageSingleBand> InterpolatePixel<T> polynomial( int maxDegree , double min , double max , Class<T> type ) {
 		if( type == ImageFloat32.class )
 			return (InterpolatePixel<T>)new ImplPolynomialPixel_F32(maxDegree,(float)min,(float)max);
 		else if( ImageInteger.class.isAssignableFrom(type) ) {

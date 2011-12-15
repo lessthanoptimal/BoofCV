@@ -23,7 +23,7 @@ import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.ImageBorder1D_F32;
 import boofcv.core.image.border.ImageBorder1D_I32;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -75,13 +75,13 @@ public class StandardGradientChecks {
 	 */
 	private void testSecondDerivative(Method m1 , Method m2) {
 		Class params[] = m1.getParameterTypes();
-		ImageBase input = GeneralizedImageOps.createImage(params[0],width,height);
-		ImageBase derivX = GeneralizedImageOps.createImage(params[1],width,height);
-		ImageBase derivY = GeneralizedImageOps.createImage(params[2],width,height);
-		ImageBase derivXX = GeneralizedImageOps.createImage(params[1],width,height);
-		ImageBase derivYY = GeneralizedImageOps.createImage(params[2],width,height);
-		ImageBase derivXY = GeneralizedImageOps.createImage(params[1],width,height);
-		ImageBase derivYX = GeneralizedImageOps.createImage(params[1],width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(params[0],width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(params[1],width,height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(params[2],width,height);
+		ImageSingleBand derivXX = GeneralizedImageOps.createImage(params[1],width,height);
+		ImageSingleBand derivYY = GeneralizedImageOps.createImage(params[2],width,height);
+		ImageSingleBand derivXY = GeneralizedImageOps.createImage(params[1],width,height);
+		ImageSingleBand derivYX = GeneralizedImageOps.createImage(params[1],width,height);
 
 		GeneralizedImageOps.randomize(input,rand,0,40);
 

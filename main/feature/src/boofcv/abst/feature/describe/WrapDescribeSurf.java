@@ -23,13 +23,13 @@ import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
  * @author Peter Abeles
  */
-public class WrapDescribeSurf<T extends ImageBase, II extends ImageBase>
+public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleBand>
 		implements DescribeRegionPoint<T> {
 
 	// computes SURF feature descriptor

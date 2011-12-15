@@ -18,7 +18,7 @@
 
 package boofcv.abst.filter;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface FilterImageInterface<Input extends ImageBase, Output extends ImageBase>
+public interface FilterImageInterface<Input extends ImageSingleBand, Output extends ImageSingleBand>
 {
 	/**
 	 * Processes the input image and writes the results to the output image.

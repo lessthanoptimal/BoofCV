@@ -18,7 +18,7 @@
 
 package boofcv.struct.pyramid;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidDiscrete<T extends ImageBase> extends ImagePyramidBase<T> {
+public class PyramidDiscrete<T extends ImageSingleBand> extends ImagePyramidBase<T> {
 
 	// scale of each layer relative to the previous layer
 	public int scale[];

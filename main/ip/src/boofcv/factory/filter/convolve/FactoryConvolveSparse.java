@@ -26,9 +26,9 @@ import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Factory for creating sparse convolutions.
@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageInteger;
 @SuppressWarnings({"unchecked"})
 public class FactoryConvolveSparse {
 
-	public static <T extends ImageBase, K extends Kernel2D>
+	public static <T extends ImageSingleBand, K extends Kernel2D>
 	ImageConvolveSparse<T,K> create( Class<T> imageType , K kernel ) {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
 			return (ImageConvolveSparse<T,K>)new Convolve_F32((Kernel2D_F32)kernel);

@@ -25,8 +25,8 @@ import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.gss.GaussianScaleSpace;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FeatureScaleSpace<T extends ImageBase, D extends ImageBase>
+public class FeatureScaleSpace<T extends ImageSingleBand, D extends ImageSingleBand>
 		implements InterestPointScaleSpace<T,D>
 {
 

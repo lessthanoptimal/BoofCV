@@ -35,8 +35,8 @@ import boofcv.factory.feature.detect.line.FactoryDetectLine;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_F64;
 
@@ -49,7 +49,7 @@ import java.util.Random;
 // todo canny edge
 // todo hough line
 // todo
-public class BenchmarkForOpenCV<T extends ImageBase, D extends ImageBase> {
+public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	final Class<T> imageType;
 	final Class<D> derivType;

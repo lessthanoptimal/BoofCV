@@ -21,7 +21,7 @@ package boofcv.alg.filter.blur.impl;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.CompareEquivalentFunctions;
 import org.junit.Test;
 
@@ -69,8 +69,8 @@ public class TestImplMedianSortEdgeNaive extends CompareEquivalentFunctions {
 
 		Class c[] = candidate.getParameterTypes();
 
-		ImageBase input = GeneralizedImageOps.createImage(c[0],width,height);
-		ImageBase output = GeneralizedImageOps.createImage(c[1],width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(c[0],width,height);
+		ImageSingleBand output = GeneralizedImageOps.createImage(c[1],width,height);
 
 
 		Object[][] ret = new Object[1][ c.length ];
@@ -90,8 +90,8 @@ public class TestImplMedianSortEdgeNaive extends CompareEquivalentFunctions {
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
-		SingleBandImage found = FactorySingleBandImage.wrap((ImageBase)targetParam[1]);
-		SingleBandImage expected = FactorySingleBandImage.wrap((ImageBase)validationParam[1]);
+		SingleBandImage found = FactorySingleBandImage.wrap((ImageSingleBand)targetParam[1]);
+		SingleBandImage expected = FactorySingleBandImage.wrap((ImageSingleBand)validationParam[1]);
 
 
 		for( int y = 0; y < height; y++ ) {

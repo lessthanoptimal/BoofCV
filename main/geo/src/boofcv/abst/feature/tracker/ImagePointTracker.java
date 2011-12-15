@@ -19,7 +19,7 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface ImagePointTracker <T extends ImageBase> {
+public interface ImagePointTracker <T extends ImageSingleBand> {
 
 	/**
 	 * Process input image and perform tracking.

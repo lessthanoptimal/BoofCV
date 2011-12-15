@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.pklt;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface PyramidKltFeatureSelector<InputImage extends ImageBase, DerivativeImage extends ImageBase> {
+public interface PyramidKltFeatureSelector<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand> {
 
 	/**
 	 * Given the image and its gradient, select features for the tracker to track.

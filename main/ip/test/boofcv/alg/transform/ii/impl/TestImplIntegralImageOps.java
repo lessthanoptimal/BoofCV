@@ -21,9 +21,9 @@ package boofcv.alg.transform.ii.impl;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -64,7 +64,7 @@ public class TestImplIntegralImageOps {
 		BoofTesting.checkSubImage(this,"checkResults",true,a,b);
 	}
 
-	public void checkResults(ImageBase a, ImageBase b) {
+	public void checkResults(ImageSingleBand a, ImageSingleBand b) {
 
 		SingleBandImage aa = FactorySingleBandImage.wrap(a);
 		SingleBandImage bb = FactorySingleBandImage.wrap(b);

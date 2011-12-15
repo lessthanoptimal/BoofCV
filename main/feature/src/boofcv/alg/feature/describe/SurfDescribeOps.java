@@ -26,9 +26,9 @@ import boofcv.factory.transform.ii.FactorySparseIntegralFilters;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.deriv.GradientValue;
 import boofcv.struct.deriv.SparseImageGradient;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -60,7 +60,7 @@ public class SurfDescribeOps {
 	 * @param derivX Derivative x wavelet output. length = radiusRegions*radiusRegions
 	 * @param derivY Derivative y wavelet output. length = radiusRegions*radiusRegions
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void gradient(T ii, int c_x, int c_y,
 				  int radiusRegion, int kernelWidth, double scale,
 				  boolean useHaar, double[] derivX, double derivY[])
@@ -102,7 +102,7 @@ public class SurfDescribeOps {
 	 * @param imageType Type of image being processed.
 	 * @return Sparse gradient algorithm
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	SparseImageGradient<T,?> createGradient( boolean assumeInsideImage ,
 											 boolean useHaar , int kernelWidth , double scale,
 											 Class<T> imageType )
@@ -139,7 +139,7 @@ public class SurfDescribeOps {
 	 * @param kernelWidth Size of the kernel's width in pixels at a scale of 1
 	 * @param scale Scale factor for the region.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	boolean isInside( T ii , int c_x , int c_y , int radiusRegions , int kernelWidth , double scale) {
 
 		// size of the convolution kernel
@@ -178,7 +178,7 @@ public class SurfDescribeOps {
 	 * @param scale Scale factor for the region.
 	 * @param theta Orientation of the region
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	boolean isInside( T ii , int c_x , int c_y , int radiusRegions , int kernelSize ,
 					  double scale, double theta )
 	{
@@ -240,7 +240,7 @@ public class SurfDescribeOps {
 	 * @param gradient Computes the image gradient at the specified points.  Make sure the scale and image are set.
 	 * @param features Where the features are written to.  Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void features(double c_x, double c_y,
 				  double theta, double scale, Kernel2D_F64 weight,
 				  int widthLargeGrid, int widthSubRegion,
@@ -325,7 +325,7 @@ public class SurfDescribeOps {
 	 * @param gradient Computes the image gradient at the specified points.  Make sure the scale and image are set.
 	 * @param features Where the features are written to.  Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void featuresMod(double c_x, double c_y,
 					 double theta,
 					 double scale, Kernel2D_F64 weightGrid,

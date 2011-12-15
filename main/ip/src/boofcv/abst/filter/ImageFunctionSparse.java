@@ -18,14 +18,14 @@
 
 package boofcv.abst.filter;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Interface for computing the output of functions which take as an input an image and a pixel coordinate.
  *
  * @author Peter Abeles
  */
-public interface ImageFunctionSparse< T extends ImageBase> {
+public interface ImageFunctionSparse< T extends ImageSingleBand> {
 
 	/**
 	 * Specify which image is to provide the input.

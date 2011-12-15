@@ -36,8 +36,8 @@ import boofcv.gui.image.ProcessImageSequence;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
@@ -50,7 +50,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
+public class TrackVideoPyramidKLT<I extends ImageSingleBand, D extends ImageSingleBand>
 		extends ProcessImageSequence<I> {
 
 	private PkltManager<I, D> tracker;
@@ -148,7 +148,7 @@ public class TrackVideoPyramidKLT<I extends ImageBase, D extends ImageBase>
 		}
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	void run( String fileName , Class<I> imageType , Class<D> derivType ) {
 
 		SimpleImageSequence<I> sequence = BoofVideoManager.loadManagerDefault().load(fileName,imageType);

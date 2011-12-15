@@ -28,7 +28,7 @@ import java.util.Random;
 import static org.junit.Assert.*;
 
 /**
- * Standard tests for children of {@link ImageBase}.  Ensures that they contain
+ * Standard tests for children of {@link ImageSingleBand}.  Ensures that they contain
  * all the expected functions and that they have the expected behavior.  This is done
  * through extensive use of reflections.
  *
@@ -38,14 +38,14 @@ public abstract class StandardImageTests {
 
 	public Random rand = new Random(234);
 
-	public abstract ImageBase createImage(int width, int height);
+	public abstract ImageSingleBand createImage(int width, int height);
 
 	public abstract Number randomNumber();
 
 	/**
 	 * Sets each element in the image to a random value.
 	 */
-	public void setRandom(ImageBase img) {
+	public void setRandom(ImageSingleBand img) {
 		Object data = img._getData();
 
 		int N = Array.getLength(data);
@@ -59,7 +59,7 @@ public abstract class StandardImageTests {
 	 */
 	@Test
 	public void get_set() {
-		ImageBase img = createImage(10, 20);
+		ImageSingleBand img = createImage(10, 20);
 		setRandom(img);
 
 		Number expected = randomNumber();
@@ -86,13 +86,13 @@ public abstract class StandardImageTests {
 	 */
 	@Test
 	public void accessorBounds() {
-		ImageBase img = createImage(10, 20);
+		ImageSingleBand img = createImage(10, 20);
 
 		checkBound(img, "get", 0, null);
 		checkBound(img, "set", 1, randomNumber());
 	}
 
-	private void checkBound(ImageBase img, String method,
+	private void checkBound(ImageSingleBand img, String method,
 							int type, Object typeData) {
 		checkException(img, method, type, typeData, -1, 0);
 		checkException(img, method, type, typeData, 0, -1);
@@ -100,7 +100,7 @@ public abstract class StandardImageTests {
 		checkException(img, method, type, typeData, 0, img.getHeight());
 	}
 
-	private void checkException(ImageBase img, String method,
+	private void checkException(ImageSingleBand img, String method,
 								int type, Object typeData, int... where) {
 		boolean found = false;
 		try {
@@ -112,7 +112,7 @@ public abstract class StandardImageTests {
 		assertTrue("No exception was thrown", found);
 	}
 
-	private Object call(ImageBase img, String method,
+	private Object call(ImageSingleBand img, String method,
 						int type, Object typeData, int... where) {
 		try {
 			Class<?>[] paramTypes = type == 0 ?

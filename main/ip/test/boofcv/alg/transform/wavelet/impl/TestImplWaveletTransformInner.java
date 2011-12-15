@@ -21,7 +21,7 @@ package boofcv.alg.transform.wavelet.impl;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 import boofcv.testing.BoofTesting;
@@ -66,8 +66,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	public void checkHorizontal( Method m ) {
 		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageBase input,
-									   ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
+									   ImageSingleBand expected, ImageSingleBand found ) {
 				equalsTranHorizontal(desc,input,expected,found );
 			}
 		};
@@ -78,8 +78,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	public void checkVertical( Method m ) {
 		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageBase input,
-									   ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
+									   ImageSingleBand expected, ImageSingleBand found ) {
 				equalsTranVertical(desc,input,expected,found );
 			}
 		};
@@ -90,8 +90,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	public void checkHorizontalInverse( Method m ) {
 		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageBase input,
-									   ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
+									   ImageSingleBand expected, ImageSingleBand found ) {
 //				BoofTesting.printDiff(expected,found);
 				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse(),desc.getBorder());
 				int upperBorder = UtilWavelet.borderInverseUpper(desc.getInverse(),desc.getBorder(),found.getWidth());
@@ -114,8 +114,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	public void checkVerticalInverse( Method m ) {
 		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageBase input,
-									   ImageBase expected, ImageBase found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
+									   ImageSingleBand expected, ImageSingleBand found ) {
 				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse(),desc.getBorder());
 				int upperBorder = UtilWavelet.borderInverseUpper(desc.getInverse(),desc.getBorder(),found.getHeight());
 
@@ -138,8 +138,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	 * affect the borders of internal segments inside the transformation.
 	 */
 	private void equalsTranHorizontal( WaveletDescription<?> desc,
-									   ImageBase input ,
-									   ImageBase expected , ImageBase found ) {
+									   ImageSingleBand input ,
+									   ImageSingleBand expected , ImageSingleBand found ) {
 		int w = expected.width;
 		int h = expected.height;
 
@@ -154,7 +154,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	 * Compares two wavelet transformations while ignoring the input image borders.  Input borders
 	 * affect the borders of internal segments inside the transformation.
 	 */
-	private void equalsTranHorizontal( ImageBase expected , ImageBase found ,
+	private void equalsTranHorizontal( ImageSingleBand expected , ImageSingleBand found ,
 									   int begin , int end , String quad ) {
 
 		SingleBandImage e = FactorySingleBandImage.wrap(expected);
@@ -173,8 +173,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	}
 
 	private void equalsTranVertical( WaveletDescription<?> desc,
-									 ImageBase input ,
-									 ImageBase expected , ImageBase found ) {
+									 ImageSingleBand input ,
+									 ImageSingleBand expected , ImageSingleBand found ) {
 		int w = expected.width;
 		int h = expected.height;
 
@@ -185,7 +185,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		equalsTranVertical(expected.subimage(0,h/2,w,h),found.subimage(0,h/2,w,h),lowerBorder/2,upperBorder/2,"bottom");
 	}
 
-	private void equalsTranVertical( ImageBase expected , ImageBase found ,
+	private void equalsTranVertical( ImageSingleBand expected , ImageSingleBand found ,
 									 int begin , int end , String quad ) {
 
 		SingleBandImage e = FactorySingleBandImage.wrap(expected);
@@ -208,12 +208,12 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 
 	private abstract class InnerCompare extends BaseCompare {
 		@Override
-		public void applyTransform(WaveletDescription<?> desc, ImageBase input, ImageBase output) {
+		public void applyTransform(WaveletDescription<?> desc, ImageSingleBand input, ImageSingleBand output) {
 			applyInnerMethod(functionName,desc, input, output);
 		}
 	}
 
-	public static void applyInnerMethod( String functionName , WaveletDescription<?> desc, ImageBase input, ImageBase output ) {
+	public static void applyInnerMethod( String functionName , WaveletDescription<?> desc, ImageSingleBand input, ImageSingleBand output ) {
 
 		Method m;
 		Object args[];

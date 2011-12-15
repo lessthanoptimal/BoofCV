@@ -18,7 +18,7 @@
 
 package boofcv.testing;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.lang.reflect.Method;
 
@@ -39,7 +39,7 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 		Class<?> e[] = m.getParameterTypes();
 
 		for( Class<?> c : e ) {
-			if( ImageBase.class.isAssignableFrom(c))
+			if( ImageSingleBand.class.isAssignableFrom(c))
 				return true;
 		}
 		return false;
@@ -68,8 +68,8 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 		Object[] ret = new Object[ targetParam.length ];
 
 		for( int i = 0; i < targetParam.length; i++ ) {
-			if( ImageBase.class.isAssignableFrom(targetParam[i].getClass()) ) {
-				ret[i] = ((ImageBase)targetParam[i]).clone();
+			if( ImageSingleBand.class.isAssignableFrom(targetParam[i].getClass()) ) {
+				ret[i] = ((ImageSingleBand)targetParam[i]).clone();
 			} else {
 				ret[i] = targetParam[i];
 			}
@@ -81,11 +81,11 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 		for( int i = 0; i < targetParam.length; i++ ) {
-			if( !ImageBase.class.isAssignableFrom(targetParam[i].getClass()) )
+			if( !ImageSingleBand.class.isAssignableFrom(targetParam[i].getClass()) )
 				continue;
 
-			ImageBase t = (ImageBase)targetParam[i];
-			ImageBase v = (ImageBase)validationParam[i];
+			ImageSingleBand t = (ImageSingleBand)targetParam[i];
+			ImageSingleBand v = (ImageSingleBand)validationParam[i];
 
 			BoofTesting.assertEqualsGeneric(v,t,1,1e-4);// todo is this tolerance too big?  some operations with a slightly different ordering seem to require it
 		}

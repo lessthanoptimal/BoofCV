@@ -20,15 +20,15 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Wrapper around children of {@link boofcv.alg.feature.detect.intensity.GradientCornerIntensity}.
  * 
  * @author Peter Abeles
  */
-public class WrapperGradientCornerIntensity<I extends ImageBase,D extends ImageBase>
+public class WrapperGradientCornerIntensity<I extends ImageSingleBand,D extends ImageSingleBand>
 		implements GeneralFeatureIntensity<I,D>
 {
 

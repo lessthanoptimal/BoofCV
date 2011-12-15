@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
 
 import static org.junit.Assert.assertTrue;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public class GenericOrientationGradientTests<D extends ImageBase> {
+public class GenericOrientationGradientTests<D extends ImageSingleBand> {
 
 	int width = 30;
 	int height = 40;

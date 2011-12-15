@@ -21,8 +21,8 @@ package boofcv.alg.filter.binary;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageBase input = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSingleBand input = GeneralizedImageOps.createImage(param[0],width,height);
 			ImageUInt8 output = new ImageUInt8(width,height);
 
 			SingleBandImage a = FactorySingleBandImage.wrap(input);
@@ -84,7 +84,7 @@ public class TestThresholdImageOps {
 		assertEquals(6,total);
 	}
 
-	public void performThreshold( Method m , ImageBase input , ImageUInt8 output )
+	public void performThreshold( Method m , ImageSingleBand input , ImageUInt8 output )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		m.invoke(null,input,output,7,true);
@@ -105,7 +105,7 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageBase input = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSingleBand input = GeneralizedImageOps.createImage(param[0],width,height);
 			ImageSInt32 labeled = new ImageSInt32(width,height);
 
 			SingleBandImage a = FactorySingleBandImage.wrap(input);
@@ -123,7 +123,7 @@ public class TestThresholdImageOps {
 		assertEquals(6,total);
 	}
 
-	public void performThresholdBlobs( Method m , ImageBase input , ImageSInt32 labeled )
+	public void performThresholdBlobs( Method m , ImageSingleBand input , ImageSInt32 labeled )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		int results[] = new int[width];
@@ -158,8 +158,8 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageBase inputDown = GeneralizedImageOps.createImage(param[0],width,height);
-			ImageBase inputUp = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSingleBand inputDown = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSingleBand inputUp = GeneralizedImageOps.createImage(param[0],width,height);
 			ImageSInt32 labeled = new ImageSInt32(width,height);
 
 			SingleBandImage a = FactorySingleBandImage.wrap(inputDown);
@@ -197,8 +197,8 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageBase inputDown = GeneralizedImageOps.createImage(param[0],width,height);
-			ImageBase inputUp = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSingleBand inputDown = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSingleBand inputUp = GeneralizedImageOps.createImage(param[0],width,height);
 			ImageSInt32 labeled = new ImageSInt32(width,height);
 
 			SingleBandImage a = FactorySingleBandImage.wrap(inputDown);
@@ -222,7 +222,7 @@ public class TestThresholdImageOps {
 		assertEquals(6,total);
 	}
 
-	public void performHysteresisLabel( Method m , Integer expected , ImageBase inputDown , ImageBase inputUp , ImageSInt32 labeled )
+	public void performHysteresisLabel( Method m , Integer expected , ImageSingleBand inputDown , ImageSingleBand inputUp , ImageSInt32 labeled )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		int numFound = (Integer)m.invoke(null,inputUp,labeled,3,5,true,null);
@@ -234,7 +234,7 @@ public class TestThresholdImageOps {
 		assertEquals(expected, countNotZero(labeled),1e-4);
 	}
 
-	private int countNotZero( ImageBase image ) {
+	private int countNotZero( ImageSingleBand image ) {
 		SingleBandImage a = FactorySingleBandImage.wrap(image);
 
 		int ret = 0;

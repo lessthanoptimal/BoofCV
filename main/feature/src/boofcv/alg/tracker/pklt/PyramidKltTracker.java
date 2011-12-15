@@ -20,7 +20,7 @@ package boofcv.alg.tracker.pklt;
 
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.KltTracker;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
 /**
@@ -38,7 +38,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
-public class PyramidKltTracker<InputImage extends ImageBase, DerivativeImage extends ImageBase> {
+public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand> {
 
 	// basic KLT tracker which works on a single image
 	KltTracker<InputImage, DerivativeImage> tracker;

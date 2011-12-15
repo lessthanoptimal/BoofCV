@@ -18,10 +18,10 @@
 
 package boofcv.alg.feature.detect.edge;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageSInt32;
  */
 public class GGradientToEdgeFeatures {
 
-	static public <D extends ImageBase>
+	static public <D extends ImageSingleBand>
 	void intensityE( D derivX , D derivY , ImageFloat32 intensity )
 	{
 		if( derivX instanceof ImageFloat32 ) {
@@ -45,7 +45,7 @@ public class GGradientToEdgeFeatures {
 		}
 	}
 
-	static public <D extends ImageBase>
+	static public <D extends ImageSingleBand>
 	void intensityAbs( D derivX , D derivY , ImageFloat32 intensity )
 	{
 		if( derivX instanceof ImageFloat32 ) {
@@ -59,7 +59,7 @@ public class GGradientToEdgeFeatures {
 		}
 	}
 
-	static public <D extends ImageBase>
+	static public <D extends ImageSingleBand>
 	void direction( D derivX , D derivY , ImageFloat32 angle )
 	{
 		if( derivX instanceof ImageFloat32 ) {
@@ -73,7 +73,7 @@ public class GGradientToEdgeFeatures {
 		}
 	}
 
-	static public <D extends ImageBase>
+	static public <D extends ImageSingleBand>
 	void direction2( D derivX , D derivY , ImageFloat32 angle )
 	{
 		if( derivX instanceof ImageFloat32 ) {
@@ -87,7 +87,7 @@ public class GGradientToEdgeFeatures {
 		}
 	}
 
-	static public <D extends ImageBase>
+	static public <D extends ImageSingleBand>
 	void nonMaxSuppressionCrude4( ImageFloat32 intensity , D derivX , D derivY , ImageFloat32 output )
 	{
 		if( derivX instanceof ImageFloat32 ) {

@@ -20,7 +20,7 @@ package boofcv.alg.tracker.pklt;
 
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.point.Point2D_I16;
 
@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GenericPkltFeatSelector<InputImage extends ImageBase, DerivativeImage extends ImageBase>
+public class GenericPkltFeatSelector<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand>
 		implements PyramidKltFeatureSelector<InputImage,DerivativeImage>
 {
 	// selects corners

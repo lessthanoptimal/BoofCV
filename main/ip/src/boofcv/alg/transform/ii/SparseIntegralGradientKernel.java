@@ -20,7 +20,7 @@ package boofcv.alg.transform.ii;
 
 import boofcv.struct.deriv.GradientValue_F64;
 import boofcv.struct.deriv.SparseImageGradient;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class SparseIntegralGradientKernel<T extends ImageBase>
+public class SparseIntegralGradientKernel<T extends ImageSingleBand>
 		implements SparseImageGradient<T, GradientValue_F64>
 {
 	// input integral image

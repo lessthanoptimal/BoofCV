@@ -18,14 +18,14 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Base class for describing a rectangular region using pixels.
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointRectangleRegion<T extends ImageBase>
+public abstract class DescribePointRectangleRegion<T extends ImageSingleBand>
 {
 	// image that descriptors are being extracted from
 	protected T image;

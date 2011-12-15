@@ -30,8 +30,8 @@ import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class EdgeIntensitiesApp<T extends ImageBase> {
+public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 
 	Class<T> imageType;
 

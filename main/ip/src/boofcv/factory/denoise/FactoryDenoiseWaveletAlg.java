@@ -24,9 +24,8 @@ import boofcv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
 import boofcv.alg.denoise.wavelet.DenoiseSureShrink_F32;
 import boofcv.alg.denoise.wavelet.DenoiseVisuShrink_F32;
 import boofcv.alg.denoise.wavelet.ShrinkThresholdSoft_F32;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -44,7 +43,7 @@ public class FactoryDenoiseWaveletAlg {
 	 * @param imageType Type of image it will process.
 	 * @return Bayes Shrink
 	 */
-	public static <T extends ImageBase> DenoiseWavelet<T> bayes( ShrinkThresholdRule<T> rule , Class<T> imageType )
+	public static <T extends ImageSingleBand> DenoiseWavelet<T> bayes( ShrinkThresholdRule<T> rule , Class<T> imageType )
 	{
 		if( rule == null ) {
 			rule = (ShrinkThresholdRule<T>)new ShrinkThresholdSoft_F32();
@@ -63,7 +62,7 @@ public class FactoryDenoiseWaveletAlg {
 	 * @param imageType Type of image it will process.
 	 * @return Bayes Shrink
 	 */
-	public static <T extends ImageBase> DenoiseWavelet<T> sure( Class<T> imageType )
+	public static <T extends ImageSingleBand> DenoiseWavelet<T> sure( Class<T> imageType )
 	{
 		if( imageType == ImageFloat32.class ) {
 			return (DenoiseWavelet<T>)new DenoiseSureShrink_F32();
@@ -78,7 +77,7 @@ public class FactoryDenoiseWaveletAlg {
 	 * @param imageType Type of image it will process.
 	 * @return Bayes Shrink
 	 */
-	public static <T extends ImageBase> DenoiseWavelet<T> visu( Class<T> imageType )
+	public static <T extends ImageSingleBand> DenoiseWavelet<T> visu( Class<T> imageType )
 	{
 		if( imageType == ImageFloat32.class ) {
 			return (DenoiseWavelet<T>)new DenoiseVisuShrink_F32();

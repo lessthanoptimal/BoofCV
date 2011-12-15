@@ -22,7 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.SingleBandImage;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class EvaluateImageStabilization<I extends ImageBase> {
+public class EvaluateImageStabilization<I extends ImageSingleBand> {
 
 	List<Double> averagePixelError = new ArrayList<Double>();
 	List<Double> fractionOverlap = new ArrayList<Double>();

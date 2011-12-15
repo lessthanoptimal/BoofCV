@@ -20,8 +20,8 @@ package boofcv.alg.tracker.klt;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -51,7 +51,7 @@ import boofcv.struct.image.ImageFloat32;
  * @author Peter Abeles
  */
 @SuppressWarnings({"SuspiciousNameCombination"})
-public class KltTracker<InputImage extends ImageBase, DerivativeImage extends ImageBase> {
+public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand> {
 
 	// input image
 	protected InputImage image;

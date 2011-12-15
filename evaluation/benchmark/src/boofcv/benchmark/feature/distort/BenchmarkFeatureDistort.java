@@ -22,7 +22,7 @@ import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.benchmark.feature.MetricResult;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public abstract class BenchmarkFeatureDistort<T extends ImageBase> {
+public abstract class BenchmarkFeatureDistort<T extends ImageSingleBand> {
 		// rand number generator used to add noise
 	protected Random rand;
 	// type of input image

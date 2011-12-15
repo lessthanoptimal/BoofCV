@@ -30,8 +30,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DisplayGaussianKernelApp<T extends ImageBase> extends SelectAlgorithmPanel {
+public class DisplayGaussianKernelApp<T extends ImageSingleBand> extends SelectAlgorithmPanel {
 	int imageSize = 400;
 
 	T largeImg;

@@ -21,8 +21,8 @@ package boofcv.abst.feature.detect.extract;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
 
 /**
@@ -31,7 +31,7 @@ import georegression.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class GeneralFeatureDetector<I extends ImageBase, D extends ImageBase > {
+public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// selects the features with the largest intensity
 	protected SelectNBestFeatures selectBest;

@@ -22,8 +22,8 @@ import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralBilinearRectangleChecks<T extends ImageBase> {
+public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> {
 	Class<T> imageType;
 
 	Random rand = new Random(0xff34);

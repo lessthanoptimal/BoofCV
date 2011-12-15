@@ -19,8 +19,8 @@
 package boofcv.alg.feature.detect.edge.impl;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -51,8 +51,8 @@ public class TestImplGradientToEdgeFeatures {
 	public void intensityE( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageBase derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageBase derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
 
 		GeneralizedImageOps.randomize(derivX,rand,-20,20);
 	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
@@ -62,7 +62,7 @@ public class TestImplGradientToEdgeFeatures {
 		BoofTesting.checkSubImage(this,"intensityE",false,m, derivX, derivY, intensity);
 	}
 
-	public void intensityE(Method m, ImageBase derivX, ImageBase derivY, ImageFloat32 intensity) throws IllegalAccessException, InvocationTargetException {
+	public void intensityE(Method m, ImageSingleBand derivX, ImageSingleBand derivY, ImageFloat32 intensity) throws IllegalAccessException, InvocationTargetException {
 		m.invoke(null,derivX,derivY,intensity);
 
 		double x = GeneralizedImageOps.get(derivX,5,10);
@@ -82,8 +82,8 @@ public class TestImplGradientToEdgeFeatures {
 	public void intensityAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageBase derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageBase derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
 
 		GeneralizedImageOps.randomize(derivX,rand,-20,20);
 	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
@@ -93,7 +93,7 @@ public class TestImplGradientToEdgeFeatures {
 		BoofTesting.checkSubImage(this,"intensityAbs",false,m, derivX, derivY, intensity);
 	}
 
-	public void intensityAbs(Method m, ImageBase derivX, ImageBase derivY, ImageFloat32 intensity) throws IllegalAccessException, InvocationTargetException {
+	public void intensityAbs(Method m, ImageSingleBand derivX, ImageSingleBand derivY, ImageFloat32 intensity) throws IllegalAccessException, InvocationTargetException {
 		m.invoke(null,derivX,derivY,intensity);
 
 		double x = GeneralizedImageOps.get(derivX,5,10);
@@ -113,8 +113,8 @@ public class TestImplGradientToEdgeFeatures {
 	public void direction( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageBase derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageBase derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
 
 		GeneralizedImageOps.randomize(derivX,rand,-20,20);
 	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
@@ -124,7 +124,7 @@ public class TestImplGradientToEdgeFeatures {
 		BoofTesting.checkSubImage(this,"direction",false,m, derivX, derivY, angle);
 	}
 
-	public void direction(Method m, ImageBase derivX, ImageBase derivY, ImageFloat32 angle) throws IllegalAccessException, InvocationTargetException {
+	public void direction(Method m, ImageSingleBand derivX, ImageSingleBand derivY, ImageFloat32 angle) throws IllegalAccessException, InvocationTargetException {
 		m.invoke(null,derivX,derivY,angle);
 
 		double x = GeneralizedImageOps.get(derivX,5,10);
@@ -144,8 +144,8 @@ public class TestImplGradientToEdgeFeatures {
 	public void direction2( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageBase derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageBase derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
 
 		GeneralizedImageOps.randomize(derivX,rand,-20,20);
 	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
@@ -155,7 +155,7 @@ public class TestImplGradientToEdgeFeatures {
 		BoofTesting.checkSubImage(this,"direction2",false,m, derivX, derivY, angle);
 	}
 
-	public void direction2(Method m, ImageBase derivX, ImageBase derivY, ImageFloat32 angle) throws IllegalAccessException, InvocationTargetException {
+	public void direction2(Method m, ImageSingleBand derivX, ImageSingleBand derivY, ImageFloat32 angle) throws IllegalAccessException, InvocationTargetException {
 		m.invoke(null,derivX,derivY,angle);
 
 		double x = GeneralizedImageOps.get(derivX,5,10);

@@ -27,7 +27,7 @@ import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.alg.transform.pyramid.PyramidUpdateIntegerDown;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
@@ -41,7 +41,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PstWrapperKltPyramid <I extends ImageBase,D extends ImageBase>
+public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSingleBand>
 		implements ImagePointTracker<I>
 {
 

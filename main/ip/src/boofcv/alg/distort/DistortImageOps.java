@@ -25,7 +25,7 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -45,7 +45,7 @@ public class DistortImageOps {
 	 * @param output Rescaled input image. Modified.
 	 * @param interpType Which interpolation algorithm should be used.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void scale( T input , T output , TypeInterpolate interpType ) {
 		Class<T> inputType = (Class<T>)input.getClass();
 		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
@@ -53,7 +53,7 @@ public class DistortImageOps {
 		scale(input,output,interp);
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void scale( T input , T output , InterpolatePixel<T> interp ) {
 		Class<T> inputType = (Class<T>)input.getClass();
 
@@ -81,7 +81,7 @@ public class DistortImageOps {
 	 * @param interpType Which type of interpolation will be used.
 	 * @param angleInputToOutput Angle of rotation in radians. From input to output, CCW rotation.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void rotate( T input , T output , TypeInterpolate interpType , float angleInputToOutput ) {
 
 		Class<T> inputType = (Class<T>)input.getClass();
@@ -107,7 +107,7 @@ public class DistortImageOps {
 	 * @param interp The interpolation algorithm which is to be used.
 	 * @param angleInputToOutput Angle of rotation in radians.  From input to output, CCW rotation.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void rotate( T input , T output , InterpolatePixel<T> interp ,
 				 float angleInputToOutput ) {
 		Class<T> inputType = (Class<T>)input.getClass();

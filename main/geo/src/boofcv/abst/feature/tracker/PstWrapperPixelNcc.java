@@ -26,7 +26,7 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.feature.NccFeatureQueue;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -34,7 +34,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class PstWrapperPixelNcc<I extends ImageBase>
+public class PstWrapperPixelNcc<I extends ImageSingleBand>
 		extends DetectAssociateTracker<I,NccFeature>
 {
 	private DescribePointPixelRegionNCC<I> alg;

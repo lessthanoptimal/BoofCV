@@ -40,8 +40,9 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoListManager;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.homo.Homography2D_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.transform.homo.HomographyPointOps;
@@ -57,7 +58,8 @@ import java.util.List;
 // TODO change scale
 // TODO turn off looping
 // TODO KLT Issue;  When zooming out features get clumped together, Need to prune features!
-public class ImageMosaicApp <I extends ImageBase, D extends ImageBase>
+// todo improve processing of multi-special images
+public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBand>
 		extends VideoProcessAppBase<I,D> implements ProcessInput
 {
 	int maxFeatures = 250;
@@ -71,8 +73,11 @@ public class ImageMosaicApp <I extends ImageBase, D extends ImageBase>
 	ModelMatcher<Object,AssociatedPair> modelMatcher;
 
 	MosaicImagePointKey<I> mosaicAlg;
-	I imageMosaic;
+	MultiSpectral<I> imageMosaic;
+	MultiSpectral<I> tempMosaic;
 
+	MultiSpectral<I> frameMulti;
+	
 	PixelTransformHomography_F32 distort = new PixelTransformHomography_F32();
 	ImageDistort<I> distorter;
 
@@ -106,7 +111,9 @@ public class ImageMosaicApp <I extends ImageBase, D extends ImageBase>
 
 		InterpolatePixel<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
 		
-		imageMosaic = GeneralizedImageOps.createImage(imageType,1000,600);
+		imageMosaic = new MultiSpectral<I>(imageType,1000,600,3);
+		tempMosaic = new MultiSpectral<I>(imageType,1000,600,3);
+		frameMulti = new MultiSpectral<I>(imageType,1,1,3);
 		distorter = DistortSupport.createDistort(imageType,null,interp,null);
 
 		final BufferedImage out = ConvertBufferedImage.convertTo(imageMosaic,null);
@@ -140,14 +147,8 @@ public class ImageMosaicApp <I extends ImageBase, D extends ImageBase>
 			return;
 
 		mosaicAlg.process(frame);
-
-		// render the mosaic
-		Homography2D_F32 currToWorld = mosaicAlg.getCurrToWorld();
-
-		distort.set(currToWorld);
-
-		distorter.setModel(distort);
-		distorter.apply(frame, imageMosaic);
+		
+		// todo move convert back here
 	}
 
 	private Homography2D_F32 createInitialTransform() {
@@ -236,6 +237,18 @@ public class ImageMosaicApp <I extends ImageBase, D extends ImageBase>
 	@Override
 	protected void updateAlgGUI(I frame, BufferedImage imageGUI, final double fps) {
 
+		frameMulti.reshape(imageGUI.getWidth(),imageGUI.getHeight());
+		ConvertBufferedImage.convertFromMulti(imageGUI,frameMulti,imageType);
+		
+		// render the mosaic
+		Homography2D_F32 currToWorld = mosaicAlg.getCurrToWorld();
+
+		distort.set(currToWorld);
+
+		distorter.setModel(distort);
+		for( int i = 0; i < imageMosaic.getNumBands(); i++ )
+			distorter.apply(frameMulti.getBand(i), imageMosaic.getBand(i));
+		
 		if( mosaicAlg.isKeyFrameChanged() )
 			totalKeyFrames++;
 		
@@ -244,14 +257,19 @@ public class ImageMosaicApp <I extends ImageBase, D extends ImageBase>
 			Homography2D_F32 oldToNew = new Homography2D_F32();
 			mosaicAlg.refocus(oldToNew);
 
-			I temp = (I)imageMosaic._createNew(imageMosaic.width,imageMosaic.height);
 			distort.set(oldToNew);
 			distorter.setModel(distort);
-			distorter.apply(imageMosaic, temp);
-			imageMosaic.setTo(temp);
+			for( int i = 0; i < imageMosaic.getNumBands(); i++ ) {
+				GeneralizedImageOps.fill(tempMosaic.getBand(i),0);
+				distorter.apply(imageMosaic.getBand(i), tempMosaic.getBand(i));
+			}
+			// swap the two images
+			MultiSpectral<I> s = imageMosaic;
+			imageMosaic = tempMosaic;
+			tempMosaic = s;
 		}
 
-		Homography2D_F32 currToWorld = mosaicAlg.getCurrToWorld();
+		currToWorld = mosaicAlg.getCurrToWorld();
 		final Homography2D_F32 foo = currToWorld.invert(null);
 //			distort.set(a);
 
@@ -324,7 +342,8 @@ public class ImageMosaicApp <I extends ImageBase, D extends ImageBase>
 
 		totalKeyFrames = 0;
 		// clear the mosaic
-		GeneralizedImageOps.fill(imageMosaic,0);
+		for( int i = 0; i < imageMosaic.getNumBands(); i++ )
+			GeneralizedImageOps.fill(imageMosaic.getBand(i),0);
 
 		startWorkerThread();
 	}
@@ -349,6 +368,6 @@ public class ImageMosaicApp <I extends ImageBase, D extends ImageBase>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Video Stabilization");
+		ShowImages.showWindow(app, "Video Image Mosaic");
 	}
 }

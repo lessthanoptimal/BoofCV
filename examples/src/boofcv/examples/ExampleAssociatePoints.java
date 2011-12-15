@@ -32,8 +32,8 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.image.BufferedImage;
@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleAssociatePoints<T extends ImageBase> {
+public class ExampleAssociatePoints<T extends ImageSingleBand> {
 
 	// algorithm used to detect interest points
 	InterestPointDetector<T> detector;

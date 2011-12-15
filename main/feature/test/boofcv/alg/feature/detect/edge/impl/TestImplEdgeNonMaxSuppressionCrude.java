@@ -3,8 +3,8 @@ package boofcv.alg.feature.detect.edge.impl;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -38,8 +38,8 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 output = new ImageFloat32(width,height);
-		ImageBase derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageBase derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
 
 		input.set(2,2,20);
 		input.set(1,1,30);
@@ -89,7 +89,7 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 		}
 	}
 
-	public static <D extends ImageBase>
+	public static <D extends ImageSingleBand>
 	void inner( Method m , ImageFloat32 input , D derivX , D derivY , ImageFloat32 output , Boolean suppressed )
 	{
 		try {
@@ -117,8 +117,8 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 output = new ImageFloat32(width,height);
-		ImageBase derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageBase derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
 
 		Random rand = new Random(123);
 		GeneralizedImageOps.randomize(input,rand,0,30);
@@ -128,7 +128,7 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 		BoofTesting.checkSubImage(this, "border", true, m, input, derivX, derivY, output );
 	}
 
-	public static <D extends ImageBase>
+	public static <D extends ImageSingleBand>
 	void border( Method m , ImageFloat32 input , D derivX , D derivY , ImageFloat32 output )
 	{
 		try {

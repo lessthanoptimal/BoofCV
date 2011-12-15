@@ -30,8 +30,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ImageListManager;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -44,7 +44,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class WaveletVisualizeApp
-		<T extends ImageBase, W extends ImageBase, C extends WlCoef>
+		<T extends ImageSingleBand, W extends ImageSingleBand, C extends WlCoef>
 		extends SelectAlgorithmImagePanel implements ProcessInput
 {
 	int numLevels = 3;

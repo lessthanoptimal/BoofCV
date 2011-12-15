@@ -18,7 +18,7 @@
 
 package boofcv.core.image;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ImageGenerator<T extends ImageBase> {
+public interface ImageGenerator<T extends ImageSingleBand> {
 
 	public T[] createArray( int number );
 

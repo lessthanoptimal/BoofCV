@@ -25,8 +25,8 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -92,14 +92,14 @@ public class TestConvolveImageStandardSparse {
 		expectedOutput = computeExpected(floatImage);
 		boolean isFloatingKernel = method.getParameterTypes()[0] == Kernel1D_F32.class;
 
-		ImageBase inputImage = GeneralizedImageOps.convert(floatImage,null,(Class)method.getParameterTypes()[2]);
+		ImageSingleBand inputImage = GeneralizedImageOps.convert(floatImage,null,(Class)method.getParameterTypes()[2]);
 		Object inputKernel = isFloatingKernel ? kernelF32 : kernelI32;
 		Object inputStorage = isFloatingKernel ? new float[kernelI32.width] : new int[ kernelI32.width];
 
 		checkResults(method,inputKernel,inputImage,inputStorage);
 	}
 
-	private void checkResults(Method method, Object inputKernel, ImageBase<?> inputImage, Object inputStorage) {
+	private void checkResults(Method method, Object inputKernel, ImageSingleBand<?> inputImage, Object inputStorage) {
 		try {
 			Number result;
 			if( method.getParameterTypes().length == 6 )

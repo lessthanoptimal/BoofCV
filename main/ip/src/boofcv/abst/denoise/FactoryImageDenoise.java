@@ -24,7 +24,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.denoise.FactoryDenoiseWaveletAlg;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageTypeInfo;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
@@ -49,7 +49,7 @@ public class FactoryImageDenoise {
 	 * @param numLevels Number of levels in the wavelet transform.  If not sure, try using 3.
 	 * @return filter for image noise removal.
 	 */
-	public static <T extends ImageBase> WaveletDenoiseFilter<T>
+	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
 	waveletVisu( Class<T> imageType , int numLevels )
 	{
 		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
@@ -66,7 +66,7 @@ public class FactoryImageDenoise {
 	 * @param numLevels Number of levels in the wavelet transform.  If not sure, try using 3.
 	 * @return filter for image noise removal.
 	 */
-	public static <T extends ImageBase> WaveletDenoiseFilter<T>
+	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
 	waveletBayes( Class<T> imageType , int numLevels )
 	{
 		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
@@ -83,7 +83,7 @@ public class FactoryImageDenoise {
 	 * @param numLevels Number of levels in the wavelet transform.  If not sure, try using 3.
 	 * @return filter for image noise removal.
 	 */
-	public static <T extends ImageBase> WaveletDenoiseFilter<T>
+	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
 	waveletSure( Class<T> imageType , int numLevels )
 	{
 		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);

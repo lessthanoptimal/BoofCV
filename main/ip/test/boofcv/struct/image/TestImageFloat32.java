@@ -25,7 +25,7 @@ public class TestImageFloat32 extends StandardImageTests {
 
 
 	@Override
-	public ImageBase createImage(int width, int height) {
+	public ImageSingleBand createImage(int width, int height) {
 		return new ImageFloat32(width, height);
 	}
 

@@ -34,9 +34,9 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
@@ -69,7 +69,7 @@ public class ExampleImageFilter {
 		ShowImages.showWindow(outputImage,"Procedural Fixed Type");
 	}
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	void generalized( T input )
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
@@ -90,7 +90,7 @@ public class ExampleImageFilter {
 		ShowImages.showWindow(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	void filter( T input )
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
@@ -113,14 +113,14 @@ public class ExampleImageFilter {
 		ShowImages.showWindow(outputImage,"Filter "+inputType.getSimpleName());
 	}
 
-	public static void nogenerics( ImageBase input )
+	public static void nogenerics( ImageSingleBand input )
 	{
 		Class inputType = input.getClass();
 		Class derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		ImageBase blurred = GeneralizedImageOps.createImage(inputType,input.width, input.height);
-		ImageBase derivX = GeneralizedImageOps.createImage(derivType,input.width, input.height);
-		ImageBase derivY = GeneralizedImageOps.createImage(derivType,input.width, input.height);
+		ImageSingleBand blurred = GeneralizedImageOps.createImage(inputType,input.width, input.height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,input.width, input.height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,input.width, input.height);
 
 		// Gaussian blur: Convolve a Gaussian kernel
 		GBlurImageOps.gaussian(input, blurred, -1, blurRadius, null);

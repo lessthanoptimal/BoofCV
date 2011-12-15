@@ -157,7 +157,7 @@ public class ConvolveDownNoBorder {
 			ConvolveDownNoBorderStandard.convolve(kernel,input,output,skip,divisor);
 		}
 	}
-	public static void checkParametersH( ImageBase input , ImageBase output , int skip ) {
+	public static void checkParametersH( ImageSingleBand input , ImageSingleBand output , int skip ) {
 		if( skip <= 0  )
 			throw new IllegalArgumentException("Skip must be >= 1");
 		if( output.width < input.width/skip )
@@ -166,7 +166,7 @@ public class ConvolveDownNoBorder {
 			throw new IllegalArgumentException("Output height is too small");
 	}
 
-	public static void checkParametersV( ImageBase input , ImageBase output , int skip ) {
+	public static void checkParametersV( ImageSingleBand input , ImageSingleBand output , int skip ) {
 		if( skip <= 0  )
 			throw new IllegalArgumentException("Skip must be >= 1");
 		if( output.width < input.width )
@@ -175,7 +175,7 @@ public class ConvolveDownNoBorder {
 			throw new IllegalArgumentException("Output height is too small");
 	}
 
-	public static void checkParameters( ImageBase input , ImageBase output , int skip ) {
+	public static void checkParameters( ImageSingleBand input , ImageSingleBand output , int skip ) {
 		if( skip <= 0  )
 			throw new IllegalArgumentException("Skip must be >= 1");
 		if( output.width < input.width/skip )

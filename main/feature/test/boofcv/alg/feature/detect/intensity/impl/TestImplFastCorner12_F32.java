@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
 import org.junit.Test;
 
@@ -40,7 +40,7 @@ public class TestImplFastCorner12_F32 {
 
 	}
 
-	private void setOffsets(ImageBase img) {
+	private void setOffsets(ImageSingleBand img) {
 		int stride = img.stride;
 
 		int center = 3 * stride + 3;

@@ -39,8 +39,8 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 
@@ -70,7 +70,7 @@ public class ExampleImageStitching {
 	 * Using abstracted code, find a transform which minimizes the difference between corresponding features
 	 * in both images.  This code is completely model independent and is the core algorithms.
 	 */
-	public static<T extends ImageBase> Homography2D_F64
+	public static<T extends ImageSingleBand> Homography2D_F64
 	computeTransform( T imageA , T imageB ,
 					  InterestPointDetector<T> detector ,
 					  DescribeRegionPoint<T> describe ,
@@ -122,7 +122,7 @@ public class ExampleImageStitching {
 	/**
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
-	private static <T extends ImageBase> void describeImage(T image,
+	private static <T extends ImageSingleBand> void describeImage(T image,
 															InterestPointDetector<T> detector,
 															DescribeRegionPoint<T> describe,
 															List<Point2D_F64> points,
@@ -151,7 +151,7 @@ public class ExampleImageStitching {
 	/**
 	 * Given two input images create and display an image where the two have been overlayed on top of each other.
 	 */
-	public static <T extends ImageBase> void stitch( BufferedImage imageA , BufferedImage imageB ,
+	public static <T extends ImageSingleBand> void stitch( BufferedImage imageA , BufferedImage imageB ,
 													 Class<T> imageType )
 	{
 		T inputA = ConvertBufferedImage.convertFrom(imageA , null, imageType);
