@@ -24,7 +24,7 @@ import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.KltTracker;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PkltManager<I extends ImageBase, D extends ImageBase> {
+public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	// configuration for the track manager
 	protected PkltManagerConfig<I,D> config;
 

@@ -18,12 +18,12 @@
 
 package boofcv.evaluation;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * @author Peter Abeles
  */
-public interface EvaluationImageSequence<T extends ImageBase>  {
+public interface EvaluationImageSequence<T extends ImageSingleBand>  {
 
 	public boolean next();
 

@@ -27,7 +27,7 @@ import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 import java.util.Random;
@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class GeneralImageDistortTests<T extends ImageBase> {
+public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 
 	Random rand = new Random(123);
 

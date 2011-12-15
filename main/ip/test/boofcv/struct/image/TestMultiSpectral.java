@@ -33,7 +33,7 @@ public class TestMultiSpectral {
 
 	@Test
 	public void constructor() {
-		DummySpectral img = new DummySpectral(imgWidth, imgHeight, 3);
+		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,imgWidth, imgHeight, 3);
 
 		assertTrue(ImageUInt8.class == img.getType());
 		assertTrue(3 == img.bands.length);
@@ -48,7 +48,7 @@ public class TestMultiSpectral {
 
 	@Test
 	public void getBand() {
-		DummySpectral img = new DummySpectral(imgWidth, imgHeight, 3);
+		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,imgWidth, imgHeight, 3);
 
 		assertTrue(img.getBand(0) != null);
 
@@ -66,14 +66,13 @@ public class TestMultiSpectral {
 		}
 	}
 
-	public static class DummySpectral extends MultiSpectral<ImageUInt8> {
-		public DummySpectral(int width, int height, int numBands) {
-			super(ImageUInt8.class, width, height, numBands);
-		}
+	@Test
+	public void subimage() {
+		fail("implement");
+	}
 
-		@Override
-		protected ImageUInt8 declareImage(int width, int height) {
-			return new ImageUInt8(width, height);
-		}
+	@Test
+	public void reshape() {
+		fail("implement");
 	}
 }

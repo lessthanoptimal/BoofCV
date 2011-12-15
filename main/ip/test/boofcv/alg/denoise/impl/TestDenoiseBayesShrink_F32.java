@@ -21,8 +21,8 @@ package boofcv.alg.denoise.impl;
 import boofcv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
 import boofcv.alg.denoise.wavelet.ShrinkThresholdSoft_F32;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 
@@ -41,7 +41,7 @@ public class TestDenoiseBayesShrink_F32 extends GenericWaveletDenoiseTests<Image
 	}
 
 	@Override
-	public void denoiseWavelet(ImageBase transformedImg, int numLevels ) {
+	public void denoiseWavelet(ImageSingleBand transformedImg, int numLevels ) {
 		DenoiseBayesShrink_F32 alg = new DenoiseBayesShrink_F32(new ShrinkThresholdSoft_F32());
 		alg.denoise((ImageFloat32)transformedImg,numLevels);
 	}

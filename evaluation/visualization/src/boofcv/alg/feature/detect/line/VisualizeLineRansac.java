@@ -34,9 +34,9 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import boofcv.struct.feature.MatrixOfList;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
@@ -50,7 +50,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeLineRansac<I extends ImageBase , D extends ImageBase> {
+public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingleBand> {
 
 	Class<I> imageType;
 	Class<D> derivType;

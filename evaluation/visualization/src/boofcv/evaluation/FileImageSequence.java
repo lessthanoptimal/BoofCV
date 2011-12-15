@@ -21,7 +21,7 @@ package boofcv.evaluation;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FileImageSequence<T extends ImageBase> implements EvaluationImageSequence<T> {
+public class FileImageSequence<T extends ImageSingleBand> implements EvaluationImageSequence<T> {
 
 	List<String> fileNames = new ArrayList<String>();
 	int index = 0;

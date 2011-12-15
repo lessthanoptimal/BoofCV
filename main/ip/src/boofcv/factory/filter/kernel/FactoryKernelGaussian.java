@@ -21,7 +21,7 @@ package boofcv.factory.filter.kernel;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import pja.stats.UtilGaussian;
 
 
@@ -64,7 +64,7 @@ public class FactoryKernelGaussian {
 	 * @param radius Number of pixels in the kernel's radius.  If <= 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
-	public static <T extends ImageBase , K extends Kernel1D>
+	public static <T extends ImageSingleBand, K extends Kernel1D>
 	K gaussian1D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
@@ -79,7 +79,7 @@ public class FactoryKernelGaussian {
 	 * @param radius Number of pixels in the kernel's radius.  If <= 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
-	public static <T extends ImageBase , K extends Kernel2D>
+	public static <T extends ImageSingleBand, K extends Kernel2D>
 	K gaussian2D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
@@ -131,7 +131,7 @@ public class FactoryKernelGaussian {
 		}
 	}
 
-	public static <T extends ImageBase , K extends Kernel1D>
+	public static <T extends ImageSingleBand, K extends Kernel1D>
 	K derivativeI( Class<T> imageType , int order,
 				   double sigma, int radius )
 	{

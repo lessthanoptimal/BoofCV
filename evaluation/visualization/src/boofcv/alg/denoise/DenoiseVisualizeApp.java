@@ -22,9 +22,6 @@ import boofcv.abst.denoise.WaveletDenoiseFilter;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.wavelet.WaveletTransform;
-import boofcv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
-import boofcv.alg.denoise.wavelet.DenoiseSureShrink_F32;
-import boofcv.alg.denoise.wavelet.DenoiseVisuShrink_F32;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
@@ -40,8 +37,8 @@ import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -59,7 +56,7 @@ import java.util.Vector;
  *
  * @author Peter Abeles
  */
-public class DenoiseVisualizeApp<T extends ImageBase,D extends ImageBase,W extends WlCoef>
+public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingleBand,W extends WlCoef>
 	extends SelectAlgorithmImagePanel implements ProcessInput, DenoiseInfoPanel.Listener
 {
 

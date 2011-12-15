@@ -22,7 +22,7 @@ import boofcv.alg.filter.basic.GGrayImageOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -92,7 +92,7 @@ public class ImageCorruptPanel extends StandardAlgConfigPanel implements ChangeL
 	 * @param original Original uncorrupted image.
 	 * @param corrupted Corrupted mage.
 	 */
-	public <T extends ImageBase> void corruptImage( T original , T corrupted )
+	public <T extends ImageSingleBand> void corruptImage( T original , T corrupted )
 	{
 		GGrayImageOps.stretch(original, valueScale, valueOffset, 255.0, corrupted);
 		GeneralizedImageOps.addGaussian(corrupted,rand,valueNoise,0,255);

@@ -29,7 +29,7 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryOrientationAlgs {
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	OrientationHistogram<T> histogram( int numAngles , int radius , boolean weighted ,
 									   Class<T> derivType )
 	{
@@ -50,7 +50,7 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	OrientationImageAverage<T> nogradient( int radius , Class<T> imageType )
 	{
 		OrientationImageAverage<T> ret;
@@ -68,7 +68,7 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	OrientationAverage<T> average( int radius , boolean weighted , Class<T> derivType )
 	{
 		OrientationAverage<T> ret;
@@ -88,7 +88,7 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	OrientationSlidingWindow<T> sliding( int numAngles, double windowSize , 
 										 int radius , boolean weighted , Class<T> derivType )
 	{
@@ -109,7 +109,7 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	OrientationIntegral<T> average_ii( int radius , boolean weighted , Class<T> imageType)
 	{
 		if( imageType == ImageFloat32.class )
@@ -120,7 +120,7 @@ public class FactoryOrientationAlgs {
 			throw new IllegalArgumentException("Image type not supported. "+imageType.getSimpleName());
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	OrientationIntegral<T> sliding_ii( int numAngles, double windowSize ,
 									   int radius , boolean weighted , Class<T> imageType)
 	{

@@ -22,7 +22,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class ImageGradient_Reflection<Input extends ImageBase, Output extends ImageBase>
+public class ImageGradient_Reflection<Input extends ImageSingleBand, Output extends ImageSingleBand>
 		implements ImageGradient<Input, Output>
 {
 	// How the image border should be handled

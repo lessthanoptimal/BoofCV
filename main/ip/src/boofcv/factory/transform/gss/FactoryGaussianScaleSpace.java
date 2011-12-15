@@ -21,9 +21,9 @@ package boofcv.factory.transform.gss;
 import boofcv.alg.transform.gss.NoCacheScaleSpace;
 import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.inst.SingleBandGenerator;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class FactoryGaussianScaleSpace {
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	NoCacheScaleSpace<T,D> nocache( Class<T> imageType  ) {
 		if( imageType == ImageFloat32.class ) {
 			return (NoCacheScaleSpace<T,D>)nocache_F32();

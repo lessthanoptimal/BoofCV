@@ -21,14 +21,14 @@ package boofcv.benchmark.feature.detect;
 import boofcv.benchmark.feature.distort.BenchmarkFeatureDistort;
 import boofcv.benchmark.feature.distort.CompileImageResults;
 import boofcv.benchmark.feature.distort.FactoryBenchmarkFeatureDistort;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkStabilityDetect<T extends ImageBase, D extends ImageBase> {
+public class BenchmarkStabilityDetect<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	Class<T> imageType;
 	Class<D> derivType;

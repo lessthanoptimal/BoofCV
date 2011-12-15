@@ -19,7 +19,7 @@
 package boofcv.io.image;
 
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -56,12 +56,12 @@ public class UtilImageIO {
 	 * @param imageType Type of image that should be returned.
 	 * @return The image or null if the image could not be loaded.
 	 */
-	public static <T extends ImageBase> T loadImage(String fileName, Class<T> imageType ) {
+	public static <T extends ImageSingleBand> T loadImage(String fileName, Class<T> imageType ) {
 		BufferedImage img = loadImage(fileName);
 		if( img == null )
 			return null;
 
-		return ConvertBufferedImage.convertFrom(img,null,imageType);
+		return ConvertBufferedImage.convertFrom(img,(T)null,imageType);
 	}
 
 	public static void saveImage(BufferedImage img, String fileName) {

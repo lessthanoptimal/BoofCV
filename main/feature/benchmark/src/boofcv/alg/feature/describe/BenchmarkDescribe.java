@@ -29,8 +29,8 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.Random;
@@ -39,7 +39,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkDescribe<I extends ImageBase, D extends ImageBase, II extends ImageBase> {
+public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleBand, II extends ImageSingleBand> {
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);

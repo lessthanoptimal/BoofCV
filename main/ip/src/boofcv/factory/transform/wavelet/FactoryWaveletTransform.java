@@ -21,10 +21,10 @@ package boofcv.factory.transform.wavelet;
 import boofcv.abst.wavelet.WaveletTransform;
 import boofcv.abst.wavelet.impl.WaveletTransformFloat32;
 import boofcv.abst.wavelet.impl.WaveletTransformInt;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 import boofcv.struct.wavelet.WlCoef_F32;
@@ -41,7 +41,7 @@ public class FactoryWaveletTransform {
 
 
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageBase, W extends ImageBase, C extends WlCoef>
+	public static <T extends ImageSingleBand, W extends ImageSingleBand, C extends WlCoef>
 	WaveletTransform<T,W,C> create( Class<T> imageType , WaveletDescription<C> waveletDesc , int numLevels )
 	{
 		if( waveletDesc.getForward().getType() == float.class ) {

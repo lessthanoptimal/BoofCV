@@ -19,7 +19,7 @@
 package boofcv.struct.gss;
 
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface GaussianScaleSpace<T extends ImageBase, D extends ImageBase> {
+public interface GaussianScaleSpace<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	/**
 	 * Sets the scales/blur magnitudes for which the scale-space should be computed over.
@@ -59,7 +59,7 @@ public interface GaussianScaleSpace<T extends ImageBase, D extends ImageBase> {
 	public void setImage( T input );
 
 	/**
-	 * Sets the active scale.  Must call {@link #setImage(boofcv.struct.image.ImageBase)}
+	 * Sets the active scale.  Must call {@link #setImage(boofcv.struct.image.ImageSingleBand)}
 	 * before this function.
 	 *
 	 * @param index Index of active scale

@@ -25,8 +25,8 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.line.FactoryDetectLine;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -38,7 +38,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkDetectLines<T extends ImageBase, D extends ImageBase> {
+public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);

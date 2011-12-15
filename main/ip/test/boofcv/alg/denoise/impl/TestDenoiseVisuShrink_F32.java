@@ -20,8 +20,8 @@ package boofcv.alg.denoise.impl;
 
 import boofcv.alg.denoise.wavelet.DenoiseVisuShrink_F32;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 
@@ -40,7 +40,7 @@ public class TestDenoiseVisuShrink_F32 extends GenericWaveletDenoiseTests<ImageF
 	}
 
 	@Override
-	public void denoiseWavelet(ImageBase transformedImg, int numLevels ) {
+	public void denoiseWavelet(ImageSingleBand transformedImg, int numLevels ) {
 		DenoiseVisuShrink_F32 alg = new DenoiseVisuShrink_F32();
 		alg.denoise((ImageFloat32)transformedImg,numLevels);
 	}

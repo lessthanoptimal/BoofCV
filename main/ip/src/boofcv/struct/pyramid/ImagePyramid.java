@@ -18,7 +18,7 @@
 
 package boofcv.struct.pyramid;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public interface ImagePyramid<T extends ImageBase> {
+public interface ImagePyramid<T extends ImageSingleBand> {
 
 	/**
 	 * Creates the pyramids internal data structures.  The provided image must be of the same type

@@ -22,10 +22,10 @@ import boofcv.core.image.border.BorderIndex1D;
 import boofcv.core.image.border.BorderIndex1D_Reflect;
 import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WlBorderCoef;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -45,7 +45,7 @@ public class UtilWavelet {
 	 * @param original Original input image.
 	 * @param transformed Image which has been transformed.
 	 */
-	public static void checkShape( ImageBase original , ImageBase transformed )
+	public static void checkShape( ImageSingleBand original , ImageSingleBand transformed )
 	{
 		if( transformed.width % 2 == 1 || transformed.height % 2 == 1 )
 			throw new IllegalArgumentException("Image containing the wavelet transform must have an even width and height.");
@@ -59,7 +59,7 @@ public class UtilWavelet {
 	}
 
 
-	public static void checkShape( WlCoef desc , ImageBase original , ImageBase transformed , int level )
+	public static void checkShape( WlCoef desc , ImageSingleBand original , ImageSingleBand transformed , int level )
 	{
 		ImageDimension tranDim = UtilWavelet.transformDimension(original,level);
 
@@ -93,7 +93,7 @@ public class UtilWavelet {
 	 * Returns dimension which is required for the transformed image in a multilevel
 	 * wavelet transform.
 	 */
-	public static ImageDimension transformDimension( ImageBase orig , int level )
+	public static ImageDimension transformDimension( ImageSingleBand orig , int level )
 	{
 		return transformDimension(orig.width,orig.height,level);
 	}
@@ -332,7 +332,7 @@ public class UtilWavelet {
 	 * @param transform
 	 * @param numLevels Number of levels in the transform
 	 */
-	public static void adjustForDisplay( ImageBase transform , int numLevels , double valueRange ) {
+	public static void adjustForDisplay( ImageSingleBand transform , int numLevels , double valueRange ) {
 		if( transform instanceof ImageFloat32 )
 			adjustForDisplay((ImageFloat32)transform,numLevels,(float)valueRange);
 		else

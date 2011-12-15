@@ -21,7 +21,7 @@ package boofcv.gui.image;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -36,7 +36,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public abstract class ProcessImageSequence<T extends ImageBase> implements MouseListener, KeyListener {
+public abstract class ProcessImageSequence<T extends ImageSingleBand> implements MouseListener, KeyListener {
 	private SimpleImageSequence<T> sequence;
 
 	private T image;

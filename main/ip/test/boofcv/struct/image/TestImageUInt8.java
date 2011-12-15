@@ -27,7 +27,7 @@ public class TestImageUInt8 extends StandardImageIntegerTests {
 	}
 
 	@Override
-	public ImageBase createImage(int width, int height) {
+	public ImageSingleBand createImage(int width, int height) {
 		return new ImageUInt8(width, height);
 	}
 

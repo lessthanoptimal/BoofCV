@@ -27,7 +27,7 @@ package boofcv.struct.image;
 @SuppressWarnings({"unchecked"})
 public class FactoryImage {
 
-	public static <T extends ImageBase> T create( Class<T> type , int width , int height )
+	public static <T extends ImageSingleBand> T create( Class<T> type , int width , int height )
 	{
 		if( type == ImageUInt8.class) {
 			return (T)new ImageUInt8(width,height);

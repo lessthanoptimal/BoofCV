@@ -24,7 +24,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public final class ImageTypeInfo <T extends ImageBase> {
+public final class ImageTypeInfo <T extends ImageSingleBand> {
 	/** Single Band Unsigned 8-bit image */
 	public static ImageTypeInfo<ImageUInt8> U8 = new ImageTypeInfo<ImageUInt8>(false,byte.class,ImageUInt8.class);
 	/** Single Band Signed 8-bit image */

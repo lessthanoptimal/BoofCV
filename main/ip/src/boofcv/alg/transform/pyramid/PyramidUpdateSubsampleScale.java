@@ -20,7 +20,7 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
 import boofcv.struct.pyramid.PyramidUpdaterFloat;
 
@@ -34,7 +34,7 @@ import boofcv.struct.pyramid.PyramidUpdaterFloat;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidUpdateSubsampleScale< T extends ImageBase>
+public class PyramidUpdateSubsampleScale< T extends ImageSingleBand>
 		implements PyramidUpdaterFloat<T> {
 
 	// interpolation algorithm

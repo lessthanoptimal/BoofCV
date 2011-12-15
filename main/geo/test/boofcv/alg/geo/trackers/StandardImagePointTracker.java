@@ -21,8 +21,8 @@ package boofcv.alg.geo.trackers;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class StandardImagePointTracker <T extends ImageBase> {
+public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 
 	public ImagePointTracker<T> tracker;
 	Random rand = new Random(234);

@@ -26,7 +26,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public class ImageSInt64 extends ImageBase<ImageSInt64> {
+public class ImageSInt64 extends ImageSingleBand<ImageSInt64> {
 
 	public long data[];
 

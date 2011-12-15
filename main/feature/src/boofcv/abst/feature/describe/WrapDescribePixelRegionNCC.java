@@ -21,7 +21,7 @@ package boofcv.abst.feature.describe;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Wrapper around {@link boofcv.alg.feature.describe.DescribePointPixelRegionNCC} for
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class WrapDescribePixelRegionNCC<T extends ImageBase>
+public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 		implements DescribeRegionPoint<T>
 {
 	DescribePointPixelRegionNCC<T> alg;

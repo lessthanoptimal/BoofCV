@@ -26,7 +26,7 @@ import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class UtilOrientationBenchmark {
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> defaultDetector( Class<T> imageType , Class<D> derivType ) {
 		return FactoryInterestPoint.<T>fastHessian(1, 2, 200, 1, 9, 4, 4);
 //		GeneralFeatureDetector<T, D> detector = FactoryCornerDetector.createKlt(2,0.1f,150,derivType);
@@ -46,7 +46,7 @@ public class UtilOrientationBenchmark {
 //		return FactoryInterestPoint.wrapDetector(ff,scales,imageType);
 	}
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	List<BenchmarkAlgorithm> createAlgorithms( int radius , Class<T> imageType , Class<D> derivType )
 	{
 		List<BenchmarkAlgorithm> ret = new ArrayList<BenchmarkAlgorithm>();
@@ -71,7 +71,7 @@ public class UtilOrientationBenchmark {
 		return ret;
 	}
 
-	private static class WrapII<T extends ImageBase, II extends ImageBase> implements  OrientationImage<T> {
+	private static class WrapII<T extends ImageSingleBand, II extends ImageSingleBand> implements  OrientationImage<T> {
 
 		OrientationIntegral<II> alg;
 		II ii;

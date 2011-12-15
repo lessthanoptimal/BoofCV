@@ -24,14 +24,14 @@ import boofcv.benchmark.feature.distort.BenchmarkFeatureDistort;
 import boofcv.benchmark.feature.distort.CompileImageResults;
 import boofcv.benchmark.feature.distort.FactoryBenchmarkFeatureDistort;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkStabilityOrientation<T extends ImageBase, D extends ImageBase> {
+public class BenchmarkStabilityOrientation<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	int randSeed = 234234;
 	Class<T> imageType;

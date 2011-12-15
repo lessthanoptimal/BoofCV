@@ -3,7 +3,7 @@ package boofcv.io.wrapper.images;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSequence<T> {
+public class JpegByteImageSequence<T extends ImageSingleBand> implements SimpleImageSequence<T> {
 
 	int index;
 	List<byte[]> jpegData = new ArrayList<byte[]>();

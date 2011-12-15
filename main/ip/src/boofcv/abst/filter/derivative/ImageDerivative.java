@@ -19,13 +19,13 @@
 package boofcv.abst.filter.derivative;
 
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
  * @author Peter Abeles
  */
-public interface ImageDerivative<T extends ImageBase, D extends ImageBase> {
+public interface ImageDerivative<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	/**
 	 * Overrides the default border behavior.  See {@link boofcv.factory.filter.derivative.FactoryDerivative} for a discussion

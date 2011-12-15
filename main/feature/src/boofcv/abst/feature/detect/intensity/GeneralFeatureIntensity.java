@@ -19,8 +19,8 @@
 package boofcv.abst.feature.detect.intensity;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Extracts corners from a the image and or its gradient.  This is a generalized interface and lacks some of the functionality
@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public interface GeneralFeatureIntensity<I extends ImageBase,D extends ImageBase > {
+public interface GeneralFeatureIntensity<I extends ImageSingleBand,D extends ImageSingleBand> {
 
 	/**
 	 * Computes the corner's intensity.  Before computing the various image derivatives call

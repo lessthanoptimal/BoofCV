@@ -47,7 +47,7 @@ import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.Random;
 
@@ -68,7 +68,7 @@ public class FactoryPointSequentialTracker {
 	 * @param derivType Image derivative  type.
 	 * @return KLT based tracker.
 	 */
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImagePointTracker<I> klt( int maxFeatures , int scaling[] , Class<I> imageType , Class<D> derivType )
 	{
 		PkltManagerConfig<I, D> config =
@@ -86,7 +86,7 @@ public class FactoryPointSequentialTracker {
 	 * @param config Config for the tracker. Try PkltManagerConfig.createDefault().
 	 * @return KLT based tracker.
 	 */
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImagePointTracker<I> klt( PkltManagerConfig<I, D> config )
 	{
 		PkltManager<I, D> trackManager = new PkltManager<I, D>(config);
@@ -105,7 +105,7 @@ public class FactoryPointSequentialTracker {
 	 * @param <II> Integral image type.
 	 * @return SURF based tracker.
 	 */
-	public static <I extends ImageBase,II extends ImageBase>
+	public static <I extends ImageSingleBand,II extends ImageSingleBand>
 	ImagePointTracker<I> surf( int maxMatches , int detectPerScale , int minSeparation ,
 									Class<I> imageType )
 	{
@@ -131,7 +131,7 @@ public class FactoryPointSequentialTracker {
 	 * @param pixelDetectTol Tolerance for detecting FAST features.  Try 20.
 	 * @param imageType Type of image being processed.
 	 */
-	public static <I extends ImageBase>
+	public static <I extends ImageSingleBand>
 	ImagePointTracker<I> brief( int maxFeatures , int maxAssociationError , int pixelDetectTol , Class<I> imageType ) {
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
@@ -155,7 +155,7 @@ public class FactoryPointSequentialTracker {
 	 * @param pixelDetectTol Tolerance for detecting features.  Try 20.
 	 * @param imageType Type of image being processed.
 	 */
-	public static <I extends ImageBase,D extends ImageBase>
+	public static <I extends ImageSingleBand,D extends ImageSingleBand>
 	ImagePointTracker<I> pixelNCC( int maxFeatures , int regionWidth , int regionHeight ,
 								   int pixelDetectTol , Class<I> imageType , Class<D> derivType ) {
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType);

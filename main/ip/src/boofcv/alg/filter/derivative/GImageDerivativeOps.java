@@ -33,7 +33,7 @@ import boofcv.struct.image.*;
  */
 public class GImageDerivativeOps {
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	void laplace( I input , D output ) {
 		if( input instanceof ImageFloat32 ) {
 			LaplacianEdge.process((ImageFloat32)input,(ImageFloat32)output);
@@ -50,7 +50,7 @@ public class GImageDerivativeOps {
 	 * @param imageType Input image type.
 	 * @return Appropriate output image type.
 	 */
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 		Class<D> getDerivativeType( Class<I> imageType ) {
 		if( imageType == ImageFloat32.class ) {
 			return (Class<D>)ImageFloat32.class;
@@ -63,7 +63,7 @@ public class GImageDerivativeOps {
 		}
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	void sobel( I input , D derivX , D derivY , BorderType borderType )
 	{
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.general(input,borderType);
@@ -79,7 +79,7 @@ public class GImageDerivativeOps {
 		}
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	void prewitt( I input , D derivX , D derivY , BorderType borderType )
 	{
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.general(input,borderType);
@@ -95,7 +95,7 @@ public class GImageDerivativeOps {
 		}
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	void three( I input , D derivX , D derivY , BorderType borderType )
 	{
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.general(input,borderType);
@@ -111,7 +111,7 @@ public class GImageDerivativeOps {
 		}
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	void hessianSobel( I input , D derivXX , D derivYY , D derivXY , BorderType borderType )
 	{
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.general(input,borderType);
@@ -125,7 +125,7 @@ public class GImageDerivativeOps {
 		}
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	void hessianThree( I input , D derivXX , D derivYY , D derivXY , BorderType borderType )
 	{
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.general(input,borderType);
@@ -139,7 +139,7 @@ public class GImageDerivativeOps {
 		}
 	}
 
-	public static <D extends ImageBase>
+	public static <D extends ImageSingleBand>
 	void hessianSobel( D inputDerivX , D inputDerivY , D derivXX , D derivYY , D derivXY , BorderType borderType )
 	{
 		ImageBorder<D> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.general(inputDerivX,borderType);
@@ -153,7 +153,7 @@ public class GImageDerivativeOps {
 		}
 	}
 
-	public static <D extends ImageBase>
+	public static <D extends ImageSingleBand>
 	void hessianPrewitt( D inputDerivX , D inputDerivY , D derivXX , D derivYY , D derivXY , BorderType borderType )
 	{
 		ImageBorder<D> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.general(inputDerivX,borderType);
@@ -167,7 +167,7 @@ public class GImageDerivativeOps {
 		}
 	}
 
-	public static <D extends ImageBase>
+	public static <D extends ImageSingleBand>
 	void hessianThree( D inputDerivX , D inputDerivY , D derivXX , D derivYY , D derivXY , BorderType borderType )
 	{
 		ImageBorder<D> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.general(inputDerivX,borderType);
@@ -199,7 +199,7 @@ public class GImageDerivativeOps {
 	 * @param <D> Image derivative type.
 	 * @return AnyImageDerivative
 	 */
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	AnyImageDerivative<I,D> createDerivatives( Class<I> inputType , ImageGenerator<D> derivGen ) {
 
 		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(inputType);
@@ -218,7 +218,7 @@ public class GImageDerivativeOps {
 	 * @param <D> Image derivative type.
 	 * @return AnyImageDerivative
 	 */
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	AnyImageDerivative<I,D> createDerivatives( Class<I> inputType , Class<D> derivType ) {
 
 		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(inputType);

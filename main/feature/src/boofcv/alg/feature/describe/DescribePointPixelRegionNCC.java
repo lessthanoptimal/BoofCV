@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.struct.feature.NccFeature;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Describes a rectangular region using its raw pixel intensities which have been normalized for intensity.  This
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointPixelRegionNCC<T extends ImageBase>
+public abstract class DescribePointPixelRegionNCC<T extends ImageSingleBand>
 		extends DescribePointRectangleRegion<T>
 {
 	protected DescribePointPixelRegionNCC(int regionWidth, int regionHeight) {

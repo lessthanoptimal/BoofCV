@@ -19,7 +19,7 @@
 package boofcv.misc;
 
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class TestBoofMiscOps {
 
 	private void checkBound( int x0, int y0, int x1 , int y1,
 							 int ex0, int ey0, int ex1, int ey1 ,
-							 ImageBase image )
+							 ImageSingleBand image )
 	{
 		ImageRectangle a = new ImageRectangle(x0,y0,x1,y1);
 		BoofMiscOps.boundRectangleInside(image,a);

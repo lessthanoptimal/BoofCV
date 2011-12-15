@@ -20,8 +20,8 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class WrapperLaplacianBlobIntensity <I extends ImageBase, D extends ImageBase> implements GeneralFeatureIntensity<I,D> {
+public class WrapperLaplacianBlobIntensity <I extends ImageSingleBand, D extends ImageSingleBand> implements GeneralFeatureIntensity<I,D> {
 
 	HessianBlobIntensity.Type type;
 	ImageFloat32 intensity = new ImageFloat32(1,1);

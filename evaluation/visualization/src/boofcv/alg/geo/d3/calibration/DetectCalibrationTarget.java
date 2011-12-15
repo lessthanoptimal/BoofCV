@@ -23,8 +23,8 @@ import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
 
@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class DetectCalibrationTarget<T extends ImageBase> {
+public class DetectCalibrationTarget<T extends ImageSingleBand> {
 	Class<T> imageType;
 
 	// number of black squares in the horizontal and vertical directions

@@ -18,7 +18,7 @@
 
 package boofcv.struct.pyramid;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -28,5 +28,5 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface PyramidUpdaterDiscrete<T extends ImageBase> extends PyramidUpdater<T, PyramidDiscrete<T>> {
+public interface PyramidUpdaterDiscrete<T extends ImageSingleBand> extends PyramidUpdater<T, PyramidDiscrete<T>> {
 }

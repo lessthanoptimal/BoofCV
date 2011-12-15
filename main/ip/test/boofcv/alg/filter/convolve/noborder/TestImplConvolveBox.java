@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.alg.filter.convolve.TestConvolveImageBox;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import boofcv.testing.CompareEquivalentFunctions;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 		if( params.length != 4)
 			return false;
 
-		return ImageBase.class.isAssignableFrom(params[0]);
+		return ImageSingleBand.class.isAssignableFrom(params[0]);
 	}
 
 	@Override
@@ -78,8 +78,8 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 
 		Class c[] = candidate.getParameterTypes();
 
-		ImageBase input = GeneralizedImageOps.createImage(c[0],width,height);
-		ImageBase output = GeneralizedImageOps.createImage(c[1],width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(c[0],width,height);
+		ImageSingleBand output = GeneralizedImageOps.createImage(c[1],width,height);
 
 		GeneralizedImageOps.randomize(input,rand,0,20);
 
@@ -95,15 +95,15 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 		Class<?> params[] = m.getParameterTypes();
 		Object kernel = TestConvolveImageBox.createTableKernel(params[0],kernelRadius,rand);
 
-		ImageBase output = ((ImageBase)targetParam[1]).clone();
+		ImageSingleBand output = ((ImageSingleBand)targetParam[1]).clone();
 
 		return new Object[]{kernel,targetParam[0],output,targetParam[3]};
 	}
 
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-		ImageBase expected = (ImageBase)validationParam[2];
-		ImageBase found = (ImageBase)targetParam[1];
+		ImageSingleBand expected = (ImageSingleBand)validationParam[2];
+		ImageSingleBand found = (ImageSingleBand)targetParam[1];
 
 		BoofTesting.assertEqualsGeneric(expected,found,0,1e-4);
 	}

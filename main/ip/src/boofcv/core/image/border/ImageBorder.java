@@ -18,7 +18,7 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * A wrapper around a normal image that returns a numeric value if a pixel is requested that is outside of the image
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder<T extends ImageBase> {
+public abstract class ImageBorder<T extends ImageSingleBand> {
 
 	T image;
 

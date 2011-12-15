@@ -32,9 +32,9 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 import javax.swing.*;
@@ -46,7 +46,7 @@ import java.util.Random;
 /**
  * Demonstrates the affects of different binary operations on an image.
  */
-public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgorithmImagePanel
+public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends SelectAlgorithmImagePanel
 		implements ProcessInput , SelectHistogramThresholdPanel.Listener {
 
 	Random rand = new Random(234234);
@@ -57,7 +57,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageBase> extends SelectAlgor
 	ImageUInt8 imageOutput1;
 	ImageUInt8 imageOutput2;
 	ImageSInt32 imageLabeled;
-	ImageBase selectedVisualize;
+	ImageSingleBand selectedVisualize;
 
 	FilterImageInterface<ImageUInt8, ImageUInt8> filter1;
 	FilterImageInterface<ImageUInt8, ImageUInt8> filter2;

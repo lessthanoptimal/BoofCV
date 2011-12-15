@@ -19,7 +19,7 @@
 package boofcv.abst.filter.blur;
 
 import boofcv.alg.filter.blur.BlurImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class BlurStorageFilter<T extends ImageBase> implements BlurFilter<T> {
+public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<T> {
 
 	// the blur function inside of BlurImageOps being invoked
 	private Method m;
@@ -40,7 +40,7 @@ public class BlurStorageFilter<T extends ImageBase> implements BlurFilter<T> {
 	// size of the blur region
 	private int radius;
 	// stores intermediate results
-	private ImageBase storage;
+	private ImageSingleBand storage;
 	// if sigma is an input or not
 	private boolean hasSigma;
 

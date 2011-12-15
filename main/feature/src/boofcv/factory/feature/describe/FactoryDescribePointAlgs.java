@@ -30,8 +30,8 @@ import boofcv.factory.filter.kernel.FactorySteerable;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -43,17 +43,17 @@ import boofcv.struct.image.ImageUInt8;
 @SuppressWarnings({"unchecked"})
 public class FactoryDescribePointAlgs {
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	DescribePointSurf<T> surf(Class<T> imageType) {
 		return new DescribePointSurf<T>();
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	DescribePointSurf<T> msurf(Class<T> imageType) {
 		return new DescribePointSurfMod<T>();
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	DescribePointBrief<T> brief(BriefDefinition_I32 definition, BlurFilter<T> filterBlur ) {
 		Class<T> imageType = filterBlur.getInputType();
 
@@ -67,7 +67,7 @@ public class FactoryDescribePointAlgs {
 	}
 
 	// todo remove filterBlur for all BRIEF change to radius,sigma,type
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	DescribePointBriefSO<T> briefso(BriefDefinition_I32 definition, BlurFilter<T> filterBlur) {
 		Class<T> imageType = filterBlur.getInputType();
 
@@ -76,7 +76,7 @@ public class FactoryDescribePointAlgs {
 		return new DescribePointBriefSO<T>(definition,filterBlur,interp);
 	}
 
-	public static <T extends ImageBase, K extends Kernel2D>
+	public static <T extends ImageSingleBand, K extends Kernel2D>
 	DescribePointGaussian12<T,K> steerableGaussian12( int radius , Class<T> imageType )
 	{
 		return new DescribePointGaussian12<T,K>(radius,imageType);
@@ -84,7 +84,7 @@ public class FactoryDescribePointAlgs {
 
 
 	// todo comment
-	public static <T extends ImageBase, K extends Kernel2D>
+	public static <T extends ImageSingleBand, K extends Kernel2D>
 	DescribePointSteerable2D<T,K> steerableGaussian( boolean normalized ,
 													 double sigma ,
 													 int radius ,
@@ -110,7 +110,7 @@ public class FactoryDescribePointAlgs {
 		return new DescribePointSteerable2D<T,K>(kernels,normalized,imageType);
 	}
 
-	public static <T extends ImageBase, D extends TupleDesc>
+	public static <T extends ImageSingleBand, D extends TupleDesc>
 	DescribePointPixelRegion<T,D> pixelRegion( int regionWidth , int regionHeight , Class<T> imageType )
 	{
 		if( imageType == ImageFloat32.class ) {
@@ -122,7 +122,7 @@ public class FactoryDescribePointAlgs {
 		}
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	DescribePointPixelRegionNCC<T> pixelRegionNCC( int regionWidth , int regionHeight , Class<T> imageType )
 	{
 		if( imageType == ImageFloat32.class ) {

@@ -19,9 +19,9 @@
 package boofcv.alg.filter.kernel;
 
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -60,7 +60,7 @@ public class GKernelMath {
 		}
 	}
 
-	public static <T extends ImageBase> T convertToImage( Kernel2D kernel ) {
+	public static <T extends ImageSingleBand> T convertToImage( Kernel2D kernel ) {
 		if( kernel.isInteger() ) {
 			return (T)KernelMath.convertToImage((Kernel2D_I32)kernel);
 		} else {
@@ -68,7 +68,7 @@ public class GKernelMath {
 		}
 	}
 
-	public static Kernel2D convertToKernel( ImageBase image ) {
+	public static Kernel2D convertToKernel( ImageSingleBand image ) {
 		if( image.getTypeInfo().isInteger() ) {
 			return KernelMath.convertToKernel((ImageInteger)image);
 		} else {

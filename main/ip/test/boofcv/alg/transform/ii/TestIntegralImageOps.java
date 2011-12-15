@@ -61,15 +61,15 @@ public class TestIntegralImageOps {
 		Class inputType = paramType[0];
 		Class outputType = paramType[1];
 
-		ImageBase input = GeneralizedImageOps.createImage(inputType,width,height);
-		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(inputType,width,height);
+		ImageSingleBand integral = GeneralizedImageOps.createImage(outputType,width,height);
 
 		GeneralizedImageOps.randomize(input,rand,0,100);
 
 		BoofTesting.checkSubImage(this,"checkTransformResults",true,m,input,integral);
 	}
 
-	public void checkTransformResults(Method m , ImageBase a, ImageBase b) throws InvocationTargetException, IllegalAccessException {
+	public void checkTransformResults(Method m , ImageSingleBand a, ImageSingleBand b) throws InvocationTargetException, IllegalAccessException {
 
 		m.invoke(null,a,b);
 
@@ -103,14 +103,14 @@ public class TestIntegralImageOps {
 		Class outputType = paramType[2];
 		Class origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
 
-		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
-		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(origType,width,height);
+		ImageSingleBand integral = GeneralizedImageOps.createImage(outputType,width,height);
 
 		GeneralizedImageOps.randomize(input,rand,0,10);
 		GIntegralImageOps.transform(input,integral);
 
-		ImageBase expected = GeneralizedImageOps.createImage(outputType,width,height);
-		ImageBase found = GeneralizedImageOps.createImage(outputType,width,height);
+		ImageSingleBand expected = GeneralizedImageOps.createImage(outputType,width,height);
+		ImageSingleBand found = GeneralizedImageOps.createImage(outputType,width,height);
 
 		if( paramType[0] == ImageFloat32.class ) {
 			Kernel2D_F32 kernel = new Kernel2D_F32(3, new float[]{1,1,1,2,2,2,1,1,1});
@@ -145,14 +145,14 @@ public class TestIntegralImageOps {
 		Class outputType = paramType[2];
 		Class origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
 
-		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
-		ImageBase integral = GeneralizedImageOps.createImage(outputType,width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(origType,width,height);
+		ImageSingleBand integral = GeneralizedImageOps.createImage(outputType,width,height);
 
 		GeneralizedImageOps.randomize(input,rand,0,10);
 		GIntegralImageOps.transform(input,integral);
 
-		ImageBase expected = GeneralizedImageOps.createImage(outputType,width,height);
-		ImageBase found = GeneralizedImageOps.createImage(outputType,width,height);
+		ImageSingleBand expected = GeneralizedImageOps.createImage(outputType,width,height);
+		ImageSingleBand found = GeneralizedImageOps.createImage(outputType,width,height);
 
 		if( paramType[0] == ImageFloat32.class ) {
 			Kernel2D_F32 kernel = new Kernel2D_F32(3, new float[]{1,1,1,2,2,2,1,1,1});
@@ -184,11 +184,11 @@ public class TestIntegralImageOps {
 		Class paramType[] = m.getParameterTypes();
 		Class inputType = paramType[0];
 
-		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);
+		ImageSingleBand integral = GeneralizedImageOps.createImage(inputType,width,height);
 
 		GeneralizedImageOps.randomize(integral,rand,0,1000);
 
-		ImageBase expected = GeneralizedImageOps.createImage(inputType,width,height);
+		ImageSingleBand expected = GeneralizedImageOps.createImage(inputType,width,height);
 
 		IntegralKernel kernel = new IntegralKernel(2);
 		kernel.blocks[0] = new ImageRectangle(-2,-2,1,1);
@@ -219,8 +219,8 @@ public class TestIntegralImageOps {
 		Class inputType = paramType[0];
 		Class origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
 
-		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
-		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(origType,width,height);
+		ImageSingleBand integral = GeneralizedImageOps.createImage(inputType,width,height);
 
 		GeneralizedImageOps.fill(input,1);
 		GIntegralImageOps.transform(input,integral);
@@ -241,8 +241,8 @@ public class TestIntegralImageOps {
 		Class inputType = paramType[0];
 		Class origType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageFloat32.class : ImageUInt8.class;
 
-		ImageBase input = GeneralizedImageOps.createImage(origType,width,height);
-		ImageBase integral = GeneralizedImageOps.createImage(inputType,width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(origType,width,height);
+		ImageSingleBand integral = GeneralizedImageOps.createImage(inputType,width,height);
 
 		GeneralizedImageOps.fill(input,1);
 		GIntegralImageOps.transform(input,integral);

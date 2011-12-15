@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Describes a rectangular region using its raw pixel intensities. Score between two regions of this type is typically
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointPixelRegion<T extends ImageBase, D extends TupleDesc>
+public abstract class DescribePointPixelRegion<T extends ImageSingleBand, D extends TupleDesc>
 		extends DescribePointRectangleRegion<T>
 {
 

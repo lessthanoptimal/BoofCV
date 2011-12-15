@@ -25,7 +25,7 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageBase;
  */
 public class FactoryDetectEdgeContour {
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	DetectEdgeContour<T> canny( float threshLow , float threshHigh ,
 								Class<T> imageType , Class<D> derivType )
 	{
@@ -45,7 +45,7 @@ public class FactoryDetectEdgeContour {
 		return new CannyEdgeContour<T,D>(blur,gradient,threshLow,threshHigh);
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	DetectEdgeContour<T> binarySimple( double threshold , boolean down )
 	{
 		return new WrapBinaryContour<T>(threshold,down);

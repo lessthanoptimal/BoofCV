@@ -22,7 +22,7 @@ import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidFloat;
 import boofcv.struct.pyramid.PyramidUpdater;
@@ -50,7 +50,7 @@ import boofcv.struct.pyramid.PyramidUpdaterFloat;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidUpdateGaussianScale< T extends ImageBase> implements PyramidUpdaterFloat<T> {
+public class PyramidUpdateGaussianScale< T extends ImageSingleBand> implements PyramidUpdaterFloat<T> {
 
 	// interpolation algorithm
 	protected InterpolatePixel<T> interpolate;

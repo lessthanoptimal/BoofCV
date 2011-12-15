@@ -34,8 +34,8 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
 
 import java.awt.*;
@@ -46,7 +46,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoDetectCorners<T extends ImageBase, D extends ImageBase>
+public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends ProcessImageSequence<T> {
 
 	GeneralFeatureDetector<T, D> detector;
@@ -122,7 +122,7 @@ public class VideoDetectCorners<T extends ImageBase, D extends ImageBase>
 		}
 	}
 
-	public static <T extends ImageBase, D extends ImageBase>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	void perform( String fileName , Class<T> imageType , Class<D> derivType )
 	{
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, imageType);

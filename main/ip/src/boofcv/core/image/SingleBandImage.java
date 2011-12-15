@@ -18,7 +18,7 @@
 
 package boofcv.core.image;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Generalized interface for single banded images.  Due to the slow performance associated with working with this
@@ -38,5 +38,5 @@ public interface SingleBandImage {
 
 	void set( int x , int y , Number num );
 
-	ImageBase getImage();
+	ImageSingleBand getImage();
 }

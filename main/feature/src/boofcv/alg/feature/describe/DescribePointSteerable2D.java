@@ -26,7 +26,7 @@ import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -43,7 +43,7 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class DescribePointSteerable2D <T extends ImageBase, K extends Kernel2D> {
+public class DescribePointSteerable2D <T extends ImageSingleBand, K extends Kernel2D> {
 
 	// the set of steerable kernels used to compute image feature points.
 	SteerableKernel<K> kernels[];

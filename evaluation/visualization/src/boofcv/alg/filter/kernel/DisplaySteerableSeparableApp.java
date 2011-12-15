@@ -21,14 +21,14 @@ package boofcv.alg.filter.kernel;
 import boofcv.factory.filter.kernel.FactorySteerable;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
  * @author Peter Abeles
  */
-public class DisplaySteerableSeparableApp<T extends ImageBase, K extends Kernel2D>
+public class DisplaySteerableSeparableApp<T extends ImageSingleBand, K extends Kernel2D>
 	extends DisplaySteerableBase<T,K>
 {
 	public DisplaySteerableSeparableApp(Class<T> imageType, Class<K> kernelType) {

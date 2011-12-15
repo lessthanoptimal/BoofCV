@@ -26,7 +26,7 @@ import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.gss.GaussianScaleSpace;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
@@ -36,7 +36,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizeScaleSpaceApp <T extends ImageBase, D extends ImageBase>
+public class VisualizeScaleSpaceApp <T extends ImageSingleBand, D extends ImageSingleBand>
 	extends SelectImagePanel implements ProcessInput
 {
 	GaussianScaleSpace<T,D> ss;

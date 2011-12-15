@@ -19,7 +19,7 @@
 package boofcv.abst.wavelet;
 
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -36,7 +36,7 @@ import boofcv.struct.wavelet.WlCoef;
  * @author Peter Abeles
  */
 public interface WaveletTransform
-		<O extends ImageBase, T extends ImageBase, C extends WlCoef >
+		<O extends ImageSingleBand, T extends ImageSingleBand, C extends WlCoef >
 {
 	/**
 	 * Computes the wavelet transform of the input image.  If no output/transform image is provided a new image is

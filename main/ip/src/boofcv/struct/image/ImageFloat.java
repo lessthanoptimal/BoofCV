@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public abstract class ImageFloat <T extends ImageFloat> extends ImageBase<T> {
+public abstract class ImageFloat <T extends ImageFloat> extends ImageSingleBand<T> {
 
 	protected ImageFloat(int width, int height) {
 		super(width, height);

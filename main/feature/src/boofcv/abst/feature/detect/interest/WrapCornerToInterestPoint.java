@@ -23,7 +23,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.core.image.ImageGenerator;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 
@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapCornerToInterestPoint< T extends ImageBase, D extends ImageBase> implements InterestPointDetector<T>
+public class WrapCornerToInterestPoint< T extends ImageSingleBand, D extends ImageSingleBand> implements InterestPointDetector<T>
 {
 
 	ImageGenerator<D> derivativeGenerator;

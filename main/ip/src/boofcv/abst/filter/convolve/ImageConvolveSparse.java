@@ -21,14 +21,14 @@ package boofcv.abst.filter.convolve;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Abstract class for sparse image convolution.  A convolution is performed at the specified point.
  *
  * @author Peter Abeles
  */
-public abstract class ImageConvolveSparse< T extends ImageBase, K extends Kernel2D > implements ImageFunctionSparse<T> {
+public abstract class ImageConvolveSparse< T extends ImageSingleBand, K extends Kernel2D > implements ImageFunctionSparse<T> {
 
 	// kernel being convolved
 	protected K kernel;

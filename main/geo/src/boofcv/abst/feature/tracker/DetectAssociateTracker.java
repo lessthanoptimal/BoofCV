@@ -21,7 +21,7 @@ package boofcv.abst.feature.tracker;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class DetectAssociateTracker<I extends ImageBase, D >
+public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		implements ImagePointTracker<I> {
 
 	// location of interest points

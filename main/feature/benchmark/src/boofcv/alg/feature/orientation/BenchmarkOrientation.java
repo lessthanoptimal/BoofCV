@@ -24,9 +24,9 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.Random;
@@ -37,7 +37,7 @@ import static boofcv.factory.feature.orientation.FactoryOrientationAlgs.*;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkOrientation<I extends ImageBase, D extends ImageBase> {
+public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSingleBand> {
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);
@@ -50,7 +50,7 @@ public class BenchmarkOrientation<I extends ImageBase, D extends ImageBase> {
 	I image;
 	D derivX;
 	D derivY;
-	ImageBase ii;
+	ImageSingleBand ii;
 
 	Point2D_I32 pts[];
 

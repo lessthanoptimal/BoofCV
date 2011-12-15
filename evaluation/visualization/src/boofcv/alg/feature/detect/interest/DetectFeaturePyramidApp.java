@@ -28,8 +28,8 @@ import boofcv.gui.feature.ScaleSpacePyramidPointPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
 
@@ -38,7 +38,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DetectFeaturePyramidApp <T extends ImageBase, D extends ImageBase>
+public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends ImageSingleBand>
 		extends SelectAlgorithmImagePanel implements ProcessInput
 {
 	static int NUM_FEATURES = 100;

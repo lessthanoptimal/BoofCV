@@ -22,7 +22,7 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
 
 /**
@@ -44,7 +44,7 @@ import georegression.struct.point.Point2D_I32;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointBrief<T extends ImageBase> {
+public abstract class DescribePointBrief<T extends ImageSingleBand> {
 	// describes the BRIEF feature
 	protected BriefDefinition_I32 definition;
 	// blurs the image prior to sampling

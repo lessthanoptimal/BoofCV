@@ -25,7 +25,7 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.CompareIdenticalFunctions;
 
 import java.lang.reflect.Method;
@@ -70,9 +70,9 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 			throw new RuntimeException("Unknown kernel type");
 		}
 
-		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
+		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 		GeneralizedImageOps.randomize(src, rand, 0, 130);
-		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
+		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 
 		if( candidate.getName().compareTo("convolve") != 0 ) {
 			Object[][] ret = new Object[2][paramTypes.length];

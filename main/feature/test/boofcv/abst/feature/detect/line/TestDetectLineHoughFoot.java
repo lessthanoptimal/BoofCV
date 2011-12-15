@@ -20,8 +20,8 @@ package boofcv.abst.feature.detect.line;
 
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.line.FactoryDetectLine;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -37,7 +37,7 @@ public class TestDetectLineHoughFoot extends GeneralDetectLineTests {
 	}
 
 	@Override
-	public <T extends ImageBase>
+	public <T extends ImageSingleBand>
 	DetectLine<T> createAlg(Class<T> imageType) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);

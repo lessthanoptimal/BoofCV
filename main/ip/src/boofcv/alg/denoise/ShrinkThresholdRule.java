@@ -18,7 +18,7 @@
 
 package boofcv.alg.denoise;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ShrinkThresholdRule<T extends ImageBase> {
+public interface ShrinkThresholdRule<T extends ImageSingleBand> {
 
 	/**
 	 * Applies shrinkage to entire image.  If the rule should only be applied to part

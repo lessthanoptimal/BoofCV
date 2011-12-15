@@ -21,8 +21,8 @@ package boofcv.abst.feature.detect.edge;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.FastQueue;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
 
@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapBinaryContour<T extends ImageBase> implements DetectEdgeContour<T>{
+public class WrapBinaryContour<T extends ImageSingleBand> implements DetectEdgeContour<T>{
 
 	// threshold description
 	double threshold;

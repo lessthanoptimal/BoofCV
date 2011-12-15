@@ -40,7 +40,7 @@ public class ConvolutionTestHelper {
 	/**
 	 * Creates an image of the specified type
 	 */
-	public static ImageBase createImage(Class<?> imageType, int width, int height) {
+	public static ImageSingleBand createImage(Class<?> imageType, int width, int height) {
 
 		// swap generic types with an arbitrary specific one
 		if( imageType == ImageInt8.class )
@@ -49,7 +49,7 @@ public class ConvolutionTestHelper {
 			imageType = ImageSInt16.class;
 
 		try {
-			ImageBase img = (ImageBase) imageType.newInstance();
+			ImageSingleBand img = (ImageSingleBand) imageType.newInstance();
 			return img._createNew(width, height);
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
@@ -65,10 +65,10 @@ public class ConvolutionTestHelper {
 		Object[] output = new Object[input.length];
 		for (int i = 0; i < input.length; i++) {
 			Object o = input[i];
-			if (o instanceof ImageBase) {
-				ImageBase b = (ImageBase)o;
-				ImageBase img = b._createNew(b.width, b.height);
-				img.setTo((ImageBase) o);
+			if (o instanceof ImageSingleBand) {
+				ImageSingleBand b = (ImageSingleBand)o;
+				ImageSingleBand img = b._createNew(b.width, b.height);
+				img.setTo((ImageSingleBand) o);
 				output[i] = img;
 			} else {
 				output[i] = o;

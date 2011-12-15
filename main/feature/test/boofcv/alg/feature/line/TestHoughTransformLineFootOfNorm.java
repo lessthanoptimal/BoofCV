@@ -47,7 +47,7 @@ public class TestHoughTransformLineFootOfNorm {
 		obviousLines(ImageSInt32.class);
 	}
 
-	private <D extends ImageBase> void obviousLines( Class<D> derivType ) {
+	private <D extends ImageSingleBand> void obviousLines( Class<D> derivType ) {
 		ImageUInt8 binary = new ImageUInt8(width,height);
 		D derivX = GeneralizedImageOps.createImage(derivType,width, height);
 		D derivY = GeneralizedImageOps.createImage(derivType,width, height);

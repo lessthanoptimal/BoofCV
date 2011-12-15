@@ -24,7 +24,7 @@ import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
 
 /**
@@ -36,7 +36,7 @@ import georegression.struct.point.Point2D_I32;
  *
  * @author Peter Abeles
  */
-public class DescribePointBriefSO<T extends ImageBase> {
+public class DescribePointBriefSO<T extends ImageSingleBand> {
 	// describes the BRIEF feature
 	protected BriefDefinition_I32 definition;
 

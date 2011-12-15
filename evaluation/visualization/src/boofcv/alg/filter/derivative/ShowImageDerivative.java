@@ -29,8 +29,8 @@ import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -42,7 +42,7 @@ import static boofcv.factory.filter.derivative.FactoryDerivative.*;
  *
  * @author Peter Abeles
  */
-public class ShowImageDerivative<T extends ImageBase, D extends ImageBase>
+public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingleBand>
 	extends SelectAlgorithmImagePanel implements ProcessInput
 {
 	Class<T> imageType;

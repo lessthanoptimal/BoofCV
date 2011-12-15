@@ -23,9 +23,9 @@ import boofcv.alg.filter.derivative.*;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 import java.lang.reflect.Method;
@@ -55,48 +55,48 @@ import java.lang.reflect.Method;
  */
 public class FactoryDerivative {
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> prewitt( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findDerivative(GradientPrewitt.class,inputType,derivType);
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> sobel( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findDerivative(GradientSobel.class,inputType,derivType);
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> three( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findDerivative(GradientThree.class,inputType,derivType);
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageHessianDirect<I,D> hessianDirectThree( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findHessian(HessianThree.class,inputType,derivType);
 		return new ImageHessianDirect_Reflection<I,D>(m);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageHessianDirect<I,D> hessianDirectSobel( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findHessian(HessianSobel.class,inputType,derivType);
 		return new ImageHessianDirect_Reflection<I,D>(m);
 	}
 
-	public static <D extends ImageBase>
+	public static <D extends ImageSingleBand>
 	ImageHessian<D> hessian( Class<?> gradientType , Class<D> derivType ) {
 		Method m = findHessianFromGradient(gradientType,derivType);
 		return new ImageHessian_Reflection<D>(m);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> gaussian( double sigma , int radius , Class<I> inputType , Class<D> derivType) {
 		return new ImageGradient_Gaussian<I,D>(sigma,radius,inputType,derivType);
 	}
@@ -141,7 +141,7 @@ public class FactoryDerivative {
 		return hessianDirectSobel(ImageUInt8.class,ImageSInt16.class);
 	}
 
-	public static <D extends ImageBase> ImageHessian<D> hessianSobel( Class<D> derivType ) {
+	public static <D extends ImageSingleBand> ImageHessian<D> hessianSobel( Class<D> derivType ) {
 		if( derivType == ImageFloat32.class )
 			return (ImageHessian<D>)hessian(GradientSobel.class,ImageFloat32.class);
 		else if( derivType == ImageSInt16.class )
@@ -150,7 +150,7 @@ public class FactoryDerivative {
 			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static <D extends ImageBase> ImageHessian<D> hessianPrewitt( Class<D> derivType ) {
+	public static <D extends ImageSingleBand> ImageHessian<D> hessianPrewitt( Class<D> derivType ) {
 		if( derivType == ImageFloat32.class )
 			return (ImageHessian<D>)hessian(GradientPrewitt.class,ImageFloat32.class);
 		else if( derivType == ImageSInt16.class )
@@ -159,7 +159,7 @@ public class FactoryDerivative {
 			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static <D extends ImageBase> ImageHessian<D> hessianThree( Class<D> derivType ) {
+	public static <D extends ImageSingleBand> ImageHessian<D> hessianThree( Class<D> derivType ) {
 		if( derivType == ImageFloat32.class )
 			return (ImageHessian<D>)hessian(GradientThree.class,ImageFloat32.class);
 		else if( derivType == ImageSInt16.class )

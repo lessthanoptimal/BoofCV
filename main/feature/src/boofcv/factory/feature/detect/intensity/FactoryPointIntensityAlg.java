@@ -22,9 +22,9 @@ import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
 import boofcv.alg.feature.detect.intensity.impl.*;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -43,7 +43,7 @@ public class FactoryPointIntensityAlg {
 	 * @param imageType Type of input image it is computed form.
 	 * @return Fast corner
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	FastCornerIntensity<T> createFast12(int pixelTol, int minCont, Class<T> imageType)
 	{
 		if( imageType == ImageFloat32.class )
@@ -62,7 +62,7 @@ public class FactoryPointIntensityAlg {
 	 * @param derivType Image derivative type it is computed from.
 	 * @return Harris corner
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	HarrisCornerIntensity<T> createHarris(int windowRadius, float kappa, Class<T> derivType)
 	{
 		if( derivType == ImageFloat32.class )
@@ -80,7 +80,7 @@ public class FactoryPointIntensityAlg {
 	 * @param derivType Image derivative type it is computed from.
 	 * @return KLT corner
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	KltCornerIntensity<T> createKlt(int windowRadius, Class<T> derivType)
 	{
 		if( derivType == ImageFloat32.class )

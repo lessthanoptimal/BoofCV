@@ -21,7 +21,7 @@ package boofcv.alg.feature.orientation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class OrientationImageAverage<T extends ImageBase> implements OrientationImage<T> {
+public abstract class OrientationImageAverage<T extends ImageSingleBand> implements OrientationImage<T> {
 
 	// input image
 	protected T image;

@@ -22,7 +22,7 @@ import boofcv.abst.filter.convolve.GenericConvolveDown;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolveDown;
 import boofcv.struct.convolve.Kernel1D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
@@ -40,7 +40,7 @@ import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidUpdateIntegerDown<T extends ImageBase> implements PyramidUpdaterDiscrete<T> {
+public class PyramidUpdateIntegerDown<T extends ImageSingleBand> implements PyramidUpdaterDiscrete<T> {
 
 	// stores the results from the first convolution
 	private T temp;

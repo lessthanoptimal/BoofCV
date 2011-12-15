@@ -25,7 +25,7 @@ import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 import javax.swing.*;
@@ -41,7 +41,7 @@ import java.beans.PropertyChangeListener;
  *
  * @author Peter Abeles
  */
-public class ShowImageBlurApp<T extends ImageBase>
+public class ShowImageBlurApp<T extends ImageSingleBand>
 	extends SelectAlgorithmImagePanel implements ProcessInput , ChangeListener
 {
 	int radius = 2;

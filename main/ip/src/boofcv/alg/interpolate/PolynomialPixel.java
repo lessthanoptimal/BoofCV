@@ -20,7 +20,7 @@ package boofcv.alg.interpolate;
 
 
 import boofcv.alg.interpolate.array.PolynomialNevilleFixed_F32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class PolynomialPixel<T extends ImageBase> implements InterpolatePixel<T> {
+public abstract class PolynomialPixel<T extends ImageSingleBand> implements InterpolatePixel<T> {
 	// the image that is being interpolated
 	protected T image;
 

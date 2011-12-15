@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -45,7 +45,7 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public interface KltCornerIntensity<T extends ImageBase> extends GradientCornerIntensity<T> {
+public interface KltCornerIntensity<T extends ImageSingleBand> extends GradientCornerIntensity<T> {
 
 	/**
 	 * Returns the radius of the feature being computed.  Features are square in shape with a width = 2*radius+1.

@@ -20,7 +20,7 @@ package boofcv.io.wrapper.images;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -40,7 +40,7 @@ import java.util.Collections;
  *
  * @author Peter Abeles
  */
-public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSequence<T> {
+public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleImageSequence<T> {
 
 	String directoryName;
 	String suffix;

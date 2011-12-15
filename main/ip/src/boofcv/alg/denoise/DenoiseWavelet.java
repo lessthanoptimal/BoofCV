@@ -18,7 +18,7 @@
 
 package boofcv.alg.denoise;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface DenoiseWavelet <T extends ImageBase>  {
+public interface DenoiseWavelet <T extends ImageSingleBand>  {
 
 	/**
 	 * Removes noise from the multi-level wavelet transform.

@@ -18,13 +18,13 @@
 
 package boofcv.benchmark.feature.detect;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkInterestParameters<T extends ImageBase, D extends ImageBase> 
+public class BenchmarkInterestParameters<T extends ImageSingleBand, D extends ImageSingleBand>
 {
 	// radius of the feature it is detecting
 	public int radius = 2;

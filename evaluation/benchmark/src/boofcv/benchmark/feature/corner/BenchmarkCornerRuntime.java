@@ -27,9 +27,9 @@ import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -56,7 +56,7 @@ public class BenchmarkCornerRuntime {
 	// should it include the gradient calculation in the benchmark?
 	static boolean includeGradient = true;
 
-	public static class Detector<T extends ImageBase, D extends ImageBase> extends PerformerBase {
+	public static class Detector<T extends ImageSingleBand, D extends ImageSingleBand> extends PerformerBase {
 		GeneralFeatureDetector<T,D> alg;
 		ImageGradient<T,D> gradient;
 		ImageHessian<D> hessian;
@@ -97,7 +97,7 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static void benchmark(GeneralFeatureDetector alg, String name) {
-		ImageBase input = imageType == ImageFloat32.class ? image_F32 : image_I8;
+		ImageSingleBand input = imageType == ImageFloat32.class ? image_F32 : image_I8;
 		double opsPerSec = ProfileOperation.profileOpsPerSec(new Detector(alg,input,imageType,derivType), TEST_TIME, false);
 
 		System.out.printf("%30s ops/sec = %6.2f\n", name, opsPerSec);

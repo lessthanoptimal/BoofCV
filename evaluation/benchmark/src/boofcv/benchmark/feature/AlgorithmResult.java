@@ -18,7 +18,7 @@
 
 package boofcv.benchmark.feature;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class AlgorithmResult<T extends ImageBase> {
+public class AlgorithmResult<T extends ImageSingleBand> {
 	public String algName;
 	public List<MetricResult> performance;
 }

@@ -19,7 +19,7 @@
 package boofcv.alg.denoise;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 
 import java.util.Random;
@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class GenericDenoiseTests<T extends ImageBase> {
+public abstract class GenericDenoiseTests<T extends ImageSingleBand> {
 
 	Random rand = new Random(10);
 	int width = 20;

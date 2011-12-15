@@ -28,7 +28,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -78,8 +78,8 @@ public class FactorySteerable {
 		Kernel2D []basis = new Kernel2D[order+1];
 
 		// convert it into an image which can be rotated
-		ImageBase image = GKernelMath.convertToImage(kernel);
-		ImageBase imageRotated = image._createNew(image.width,image.height);
+		ImageSingleBand image = GKernelMath.convertToImage(kernel);
+		ImageSingleBand imageRotated = image._createNew(image.width,image.height);
 
 		basis[0] = kernel;
 

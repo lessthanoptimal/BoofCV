@@ -21,7 +21,7 @@ package boofcv.alg.filter.blur.impl;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -55,8 +55,8 @@ public class TestImplMedianSortNaive {
 
 			Class params[] = m.getParameterTypes();
 
-			ImageBase input = GeneralizedImageOps.createImage(params[0],4,4);
-			ImageBase found = GeneralizedImageOps.createImage(params[1],4,4);
+			ImageSingleBand input = GeneralizedImageOps.createImage(params[0],4,4);
+			ImageSingleBand found = GeneralizedImageOps.createImage(params[1],4,4);
 
 			GeneralizedImageOps.convert(templateImage,input);
 
@@ -67,7 +67,7 @@ public class TestImplMedianSortNaive {
 		assertEquals(2,numFound);
 	}
 
-	public void trivialTest( Method m , ImageBase _image, ImageBase _found ) {
+	public void trivialTest( Method m , ImageSingleBand _image, ImageSingleBand _found ) {
 
 		try {
 			m.invoke(null,_image,_found,1,null);

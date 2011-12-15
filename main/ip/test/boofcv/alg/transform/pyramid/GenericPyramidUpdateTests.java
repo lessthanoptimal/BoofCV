@@ -19,7 +19,7 @@
 package boofcv.alg.transform.pyramid;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidUpdater;
 
@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class GenericPyramidUpdateTests<T extends ImageBase> {
+public abstract class GenericPyramidUpdateTests<T extends ImageSingleBand> {
 
 	Random rand = new Random(234);
 	int width = 80;
@@ -51,7 +51,7 @@ public abstract class GenericPyramidUpdateTests<T extends ImageBase> {
 	 */
 	public void checkInitialized() {
 
-		ImageBase input = GeneralizedImageOps.createImage(imageType,width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(imageType,width,height);
 		ImagePyramid pyramid = createPyramid(1,2,4);
 
 		assertFalse(pyramid.isInitialized());
@@ -66,7 +66,7 @@ public abstract class GenericPyramidUpdateTests<T extends ImageBase> {
 	 * Checks to see if every layer in the pyramid has been modified on a call to update
 	 */
 	public void checkModifiesLayersOnUpdate() {
-		ImageBase input = GeneralizedImageOps.createImage(imageType,width,height);
+		ImageSingleBand input = GeneralizedImageOps.createImage(imageType,width,height);
 		ImagePyramid pyramid = createPyramid(1,2,4);
 		GeneralizedImageOps.randomize(input,rand,0,100);
 
@@ -74,7 +74,7 @@ public abstract class GenericPyramidUpdateTests<T extends ImageBase> {
 		updater.update(input,pyramid);
 
 		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
-			ImageBase image = pyramid.getLayer(i);
+			ImageSingleBand image = pyramid.getLayer(i);
 
 			assertTrue( GeneralizedImageOps.sum(image) > 0 );
 		}

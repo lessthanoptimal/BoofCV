@@ -92,7 +92,7 @@ public class HoughTransformLineFootOfNorm {
 	 * @param derivY Image derivative along y-axis.
 	 * @param binary Non-zero pixels are considered to be line pixels.
 	 */
-	public <D extends ImageBase> void transform( D derivX , D derivY , ImageUInt8 binary )
+	public <D extends ImageSingleBand> void transform( D derivX , D derivY , ImageUInt8 binary )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,binary);
 

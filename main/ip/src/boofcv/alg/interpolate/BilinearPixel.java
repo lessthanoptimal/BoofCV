@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class BilinearPixel<T extends ImageBase> implements InterpolatePixel<T> {
+public abstract class BilinearPixel<T extends ImageSingleBand> implements InterpolatePixel<T> {
 
 	protected T orig;
 	protected int stride;

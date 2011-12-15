@@ -33,8 +33,8 @@ import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
 
 import javax.swing.*;
@@ -48,7 +48,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class ShowEdgeContourApp<T extends ImageBase, D extends ImageBase>
+public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends SelectAlgorithmImagePanel implements ProcessInput , CannyControlBar.Listener , SelectHistogramThresholdPanel.Listener
 {
 	// shows panel for displaying input image

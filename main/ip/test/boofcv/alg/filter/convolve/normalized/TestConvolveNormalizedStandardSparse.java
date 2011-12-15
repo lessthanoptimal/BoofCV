@@ -24,9 +24,9 @@ import boofcv.core.image.ConvertImage;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -110,7 +110,7 @@ public class TestConvolveNormalizedStandardSparse {
 		boolean isFloatingKernel = method.getParameterTypes()[0] == Kernel1D_F32.class;
 
 		Class<?> imageType = method.getParameterTypes()[2];
-		ImageBase<?> inputImage;
+		ImageSingleBand<?> inputImage;
 
 		if( imageType == ImageFloat32.class) {
 			inputImage = floatImage;
@@ -129,7 +129,7 @@ public class TestConvolveNormalizedStandardSparse {
 		checkResults(method,inputKernel,inputImage,inputStorage);
 	}
 
-	private void checkResults(Method method, Object inputKernel, ImageBase<?> inputImage, Object inputStorage) {
+	private void checkResults(Method method, Object inputKernel, ImageSingleBand<?> inputImage, Object inputStorage) {
 		try {
 			Number result = (Number)method.invoke(null,inputKernel,inputKernel,inputImage,targetX,targetY,inputStorage);
 			assertEquals(expectedOutput,result.floatValue(),1e-4);

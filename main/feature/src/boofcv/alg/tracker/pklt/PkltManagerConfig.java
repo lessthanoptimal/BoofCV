@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.pklt;
 
 import boofcv.alg.tracker.klt.KltConfig;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
+public class PkltManagerConfig<I extends ImageSingleBand, D extends ImageSingleBand> {
 	/** configuration for low level KLT tracker */
 	public KltConfig config;
 	/** Maximum number of features it can track.  Determines how many features are spawned */
@@ -48,7 +48,7 @@ public class PkltManagerConfig<I extends ImageBase, D extends ImageBase> {
 	 * create a reasonable default.
 	 * @return
 	 */
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	PkltManagerConfig<I,D> createDefault(Class<I> typeInput,
 										 Class<D> typeDeriv) {
 		PkltManagerConfig<I,D> ret = new PkltManagerConfig<I,D>();

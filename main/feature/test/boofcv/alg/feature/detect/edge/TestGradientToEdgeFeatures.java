@@ -23,9 +23,9 @@ import boofcv.alg.misc.ImageTestingOps;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import georegression.metric.UtilAngle;
 import org.junit.Test;
@@ -61,8 +61,8 @@ public class TestGradientToEdgeFeatures {
 	{
 		Class params[] = m.getParameterTypes();
 
-		ImageBase derivX = GeneralizedImageOps.createImage(params[0],width,height);
-		ImageBase derivY = GeneralizedImageOps.createImage(params[0],width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(params[0],width,height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(params[0],width,height);
 
 		GeneralizedImageOps.randomize(derivX,rand,0,10);
 		GeneralizedImageOps.randomize(derivY,rand,0,10);
@@ -70,7 +70,7 @@ public class TestGradientToEdgeFeatures {
 		BoofTesting.checkSubImage(this,"intensityE",true,m,derivX,derivY,intensity);
 	}
 
-	public void intensityE( Method m , ImageBase derivX , ImageBase derivY , ImageFloat32 intensity )
+	public void intensityE( Method m , ImageSingleBand derivX , ImageSingleBand derivY , ImageFloat32 intensity )
 			throws InvocationTargetException, IllegalAccessException {
 		m.invoke(null,derivX,derivY,intensity);
 
@@ -94,8 +94,8 @@ public class TestGradientToEdgeFeatures {
 	{
 		Class params[] = m.getParameterTypes();
 
-		ImageBase derivX = GeneralizedImageOps.createImage(params[0],width,height);
-		ImageBase derivY = GeneralizedImageOps.createImage(params[0],width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(params[0],width,height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(params[0],width,height);
 
 		GeneralizedImageOps.randomize(derivX,rand,0,10);
 		GeneralizedImageOps.randomize(derivY,rand,0,10);
@@ -103,7 +103,7 @@ public class TestGradientToEdgeFeatures {
 		BoofTesting.checkSubImage(this,"intensityAbs",true,m,derivX,derivY,intensity);
 	}
 
-	public void intensityAbs( Method m , ImageBase derivX , ImageBase derivY , ImageFloat32 intensity )
+	public void intensityAbs( Method m , ImageSingleBand derivX , ImageSingleBand derivY , ImageFloat32 intensity )
 			throws InvocationTargetException, IllegalAccessException {
 		m.invoke(null,derivX,derivY,intensity);
 
@@ -128,8 +128,8 @@ public class TestGradientToEdgeFeatures {
 	{
 		Class params[] = m.getParameterTypes();
 
-		ImageBase derivX = GeneralizedImageOps.createImage(params[0],width,height);
-		ImageBase derivY = GeneralizedImageOps.createImage(params[0],width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createImage(params[0],width,height);
+		ImageSingleBand derivY = GeneralizedImageOps.createImage(params[0],width,height);
 
 		GeneralizedImageOps.randomize(derivX,rand,0,10);
 		GeneralizedImageOps.randomize(derivY,rand,0,10);
@@ -137,7 +137,7 @@ public class TestGradientToEdgeFeatures {
 		BoofTesting.checkSubImage(this,"direction",true,m,derivX,derivY,intensity);
 	}
 
-	public void direction( Method m , ImageBase derivX , ImageBase derivY , ImageFloat32 direction )
+	public void direction( Method m , ImageSingleBand derivX , ImageSingleBand derivY , ImageFloat32 direction )
 			throws InvocationTargetException, IllegalAccessException {
 		m.invoke(null,derivX,derivY,direction);
 

@@ -2,7 +2,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface InterestPointScaleSpacePyramid<T extends ImageBase> {
+public interface InterestPointScaleSpacePyramid<T extends ImageSingleBand> {
 
 	/**
 	 * Detect features in the scale space image

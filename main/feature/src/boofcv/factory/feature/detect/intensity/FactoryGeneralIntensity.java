@@ -24,7 +24,7 @@ import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Provides intensity feature intensity algorithms which conform to the {@link GeneralFeatureIntensity} interface.
@@ -33,35 +33,35 @@ import boofcv.struct.image.ImageBase;
  */
 public class FactoryGeneralIntensity {
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  fast( int pixelTol, int minCont, Class<I> imageType ) {
 		FastCornerIntensity<I> alg =  FactoryPointIntensityAlg.createFast12(pixelTol,minCont,imageType);
 		return new WrapperFastCornerIntensity<I, D>(alg);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  harris( int windowRadius, float kappa , Class<D> derivType ) {
 		HarrisCornerIntensity<D> alg =  FactoryPointIntensityAlg.createHarris(windowRadius,kappa, derivType);
 		return new WrapperGradientCornerIntensity<I, D>(alg);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  klt( int windowRadius , Class<D> derivType ) {
 		KltCornerIntensity<D> alg =  FactoryPointIntensityAlg.createKlt(windowRadius, derivType);
 		return new WrapperGradientCornerIntensity<I, D>(alg);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  kitros( Class<D> derivType ) {
 		return new WrapperKitRosCornerIntensity<I, D>(derivType);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  median( MedianImageFilter<I> filter , Class<I> imageType ) {
 		return new WrapperMedianCornerIntensity<I, D>(filter,imageType);
 	}
 
-	public static <I extends ImageBase, D extends ImageBase>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  laplacian( HessianBlobIntensity.Type type , Class<D> derivType) {
 		return new WrapperLaplacianBlobIntensity<I, D>(type,derivType);
 	}

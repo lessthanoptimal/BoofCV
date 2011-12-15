@@ -29,7 +29,7 @@ import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.affine.Affine2D_F32;
 
 
@@ -42,31 +42,31 @@ public class FactoryBenchmarkFeatureDistort {
 
 	private static final long SEED = 234243;
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	BenchmarkFeatureDistort<T> noise( Class<T> imageType ) {
 		double sigmas[]=new double[]{1,2,4,8,12,16,20,40};
 		return new AddNoise<T>(SEED,sigmas,imageType);
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	BenchmarkFeatureDistort<T> intensity( Class<T> imageType ) {
 		double gammas[]=new double[]{0.25,0.5,0.8,1,1.5,2,4};
 		return new Intensity<T>(SEED,gammas,imageType);
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	BenchmarkFeatureDistort<T> rotate(  Class<T> imageType ) {
 		double thetas[]=UtilOrientationBenchmark.makeSample(0,2.0*Math.PI,20);
 		return new Rotation<T>(SEED,thetas,imageType);
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	BenchmarkFeatureDistort<T> scale( Class<T> imageType ) {
 		double ratio[]=new double[]{0.5,0.75,1,1.25,1.5,2,3,4,8};
 		return new Scale<T>(SEED,ratio,imageType);
 	}
 
-	private static class AddNoise<T extends ImageBase>
+	private static class AddNoise<T extends ImageSingleBand>
 			extends BenchmarkFeatureDistort<T>
 	{
 		protected AddNoise(long randomSeed, double[] variable,  Class<T> imageType) {
@@ -86,7 +86,7 @@ public class FactoryBenchmarkFeatureDistort {
 		}
 	}
 
-	private static class Intensity<T extends ImageBase>
+	private static class Intensity<T extends ImageSingleBand>
 			extends BenchmarkFeatureDistort<T>
 	{
 		protected Intensity(long randomSeed, double[] variable, Class<T> imageType) {
@@ -105,7 +105,7 @@ public class FactoryBenchmarkFeatureDistort {
 		}
 	}
 
-	private static class Rotation<T extends ImageBase>
+	private static class Rotation<T extends ImageSingleBand>
 			extends BenchmarkFeatureDistort<T>
 	{
 		protected Rotation(long randomSeed, double[] variable, Class<T> imageType) {
@@ -125,7 +125,7 @@ public class FactoryBenchmarkFeatureDistort {
 		}
 	}
 
-	private static class Scale<T extends ImageBase>
+	private static class Scale<T extends ImageSingleBand>
 			extends BenchmarkFeatureDistort<T>
 	{
 		protected Scale(long randomSeed, double[] variable, Class<T> imageType) {

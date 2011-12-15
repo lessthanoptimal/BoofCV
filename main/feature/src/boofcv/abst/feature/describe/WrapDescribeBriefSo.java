@@ -21,12 +21,12 @@ package boofcv.abst.feature.describe;
 import boofcv.alg.feature.describe.DescribePointBriefSO;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * @author Peter Abeles
  */
-public class WrapDescribeBriefSo<T extends ImageBase> implements DescribeRegionPoint<T> {
+public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeRegionPoint<T> {
 
 	int length;
 	DescribePointBriefSO<T> alg;

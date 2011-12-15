@@ -21,7 +21,7 @@ package boofcv.alg.denoise.impl;
 import boofcv.abst.wavelet.WaveletTransform;
 import boofcv.alg.denoise.GenericDenoiseTests;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.testing.BoofTesting;
 
@@ -32,7 +32,7 @@ import boofcv.testing.BoofTesting;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class GenericWaveletDenoiseTests<T extends ImageBase> extends GenericDenoiseTests<T> {
+public abstract class GenericWaveletDenoiseTests<T extends ImageSingleBand> extends GenericDenoiseTests<T> {
 
 
 	WaveletTransform transform;
@@ -44,12 +44,12 @@ public abstract class GenericWaveletDenoiseTests<T extends ImageBase> extends Ge
 		transform = FactoryWaveletTransform.create(imageType,waveletDesc,numLevels);
 	}
 
-	public abstract void denoiseWavelet( ImageBase transformedImg , int numLevels );
+	public abstract void denoiseWavelet( ImageSingleBand transformedImg , int numLevels );
 
 	@Override
 	public void denoiseImage(T imageNoisy, T imageDenoised) {
 
-		ImageBase transformedImg = transform.transform(imageNoisy,null);
+		ImageSingleBand transformedImg = transform.transform(imageNoisy,null);
 
 		// if the input is a subimage make the transform a subimage
 		// so this condition is also tested

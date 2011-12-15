@@ -28,7 +28,7 @@ import boofcv.struct.image.*;
  */
 public class GThresholdImageOps {
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	ImageUInt8 threshold( T input , ImageUInt8 output ,
 						  double threshold , boolean down )
 	{
@@ -49,7 +49,7 @@ public class GThresholdImageOps {
 		}
 	}
 
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	void thresholdBlobs( T input , ImageSInt32 labeled ,
 						 int results[] , int numBlobs ,
 						 double threshold , boolean down )
@@ -92,7 +92,7 @@ public class GThresholdImageOps {
 	 * @param work Work image which stores intermediate results and is the same size as the input image.  If null one will be declared internally.
 	 * @return Number of blobs found.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 			void hysteresisLabel4( T input , ImageSInt32 output ,
 								   double lowerThreshold , double upperThreshold , boolean down ,
 								   ImageUInt8 work )
@@ -133,7 +133,7 @@ public class GThresholdImageOps {
 	 * @param work Work image which stores intermediate results and is the same size as the input image.  If null one will be declared internally.
 	 * @return Number of blobs found.
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 			void hysteresisLabel8( T input , ImageSInt32 output ,
 								   double lowerThreshold , double upperThreshold , boolean down ,
 								   ImageUInt8 work )

@@ -18,8 +18,8 @@
 
 package boofcv.core.image;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -64,8 +64,8 @@ public class TestConvertImage {
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {
-		ImageBase input = GeneralizedImageOps.createImage(inputType,imgWidth,imgHeight);
-		ImageBase output = GeneralizedImageOps.createImage(outputType,imgWidth,imgHeight);
+		ImageSingleBand input = GeneralizedImageOps.createImage(inputType,imgWidth,imgHeight);
+		ImageSingleBand output = GeneralizedImageOps.createImage(outputType,imgWidth,imgHeight);
 
 		boolean inputSigned = true;
 		boolean outputSigned = true;
@@ -85,14 +85,14 @@ public class TestConvertImage {
 		BoofTesting.checkSubImage(this,"checkConvert",true,m,input,output);
 	}
 
-	public void checkConvert( Method m , ImageBase<?> input , ImageBase<?> output ) {
+	public void checkConvert( Method m , ImageSingleBand<?> input , ImageSingleBand<?> output ) {
 		try {
 			// check it with a non-null output
-			ImageBase<?> ret = (ImageBase<?>)m.invoke(null,input,output);
+			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
 			BoofTesting.assertEqualsGeneric(input,ret,0,1e-4);
 
 			// check it with a null output
-			ret = (ImageBase<?>)m.invoke(null,input,null);
+			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
 			BoofTesting.assertEqualsGeneric(input,ret,0,1e-4);
 
 		} catch (IllegalAccessException e) {

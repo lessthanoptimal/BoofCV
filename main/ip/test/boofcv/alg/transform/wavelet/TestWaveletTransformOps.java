@@ -21,10 +21,10 @@ package boofcv.alg.transform.wavelet;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -57,7 +57,7 @@ public class TestWaveletTransformOps {
 		}
 	}
 
-	public <T extends ImageBase> void testSmallImage( Class<T> typeInput ) {
+	public <T extends ImageSingleBand> void testSmallImage( Class<T> typeInput ) {
 		this.typeInput = typeInput;
 		WaveletDescription<?> desc = createDesc(typeInput);
 
@@ -106,14 +106,14 @@ public class TestWaveletTransformOps {
 		for( int adjust = 0; adjust < 5; adjust++ ) {
 			int w = width+adjust;
 			int h = height+adjust;
-			ImageBase input = GeneralizedImageOps.createImage(typeInput,w,h);
-			ImageBase found = GeneralizedImageOps.createImage(typeInput,w,h);
+			ImageSingleBand input = GeneralizedImageOps.createImage(typeInput,w,h);
+			ImageSingleBand found = GeneralizedImageOps.createImage(typeInput,w,h);
 
 			GeneralizedImageOps.randomize(input,rand,0,50);
 
 			for( int level = 1; level <= 5; level++ ) {
 				ImageDimension dim = UtilWavelet.transformDimension(w,h,level);
-				ImageBase output = GeneralizedImageOps.createImage(typeInput,dim.width,dim.height);
+				ImageSingleBand output = GeneralizedImageOps.createImage(typeInput,dim.width,dim.height);
 //				System.out.println("adjust "+adjust+" level "+level+" scale "+ div);
 
 				invokeTransform("transformN","inverseN",desc, input.clone(), output, found,level);
@@ -123,7 +123,7 @@ public class TestWaveletTransformOps {
 		}
 	}
 
-	private void invokeTransform(String nameTran , String nameInv , WaveletDescription<?> desc, ImageBase input, ImageBase output, ImageBase found) {
+	private void invokeTransform(String nameTran , String nameInv , WaveletDescription<?> desc, ImageSingleBand input, ImageSingleBand output, ImageSingleBand found) {
 		try {
 			Method m = WaveletTransformOps.class.getMethod(nameTran,desc.getClass(),typeInput,typeInput,typeInput);
 			m.invoke(null,desc,input,output,null);
@@ -140,7 +140,7 @@ public class TestWaveletTransformOps {
 
 	private void invokeTransform(String nameTran , String nameInv ,
 								 WaveletDescription<?> desc,
-								 ImageBase input, ImageBase output, ImageBase found,
+								 ImageSingleBand input, ImageSingleBand output, ImageSingleBand found,
 								 int level) {
 		try {
 			Method m = WaveletTransformOps.class.getMethod(nameTran,desc.getClass(),typeInput,typeInput,typeInput,int.class);

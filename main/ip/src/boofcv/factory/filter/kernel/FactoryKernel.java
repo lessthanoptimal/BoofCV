@@ -19,9 +19,9 @@
 package boofcv.factory.filter.kernel;
 
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.Random;
 
@@ -213,7 +213,7 @@ public class FactoryKernel {
 			return (Class<K1>)Kernel1D_I32.class;
 	}
 
-	public static <K extends KernelBase, T extends ImageBase>
+	public static <K extends KernelBase, T extends ImageSingleBand>
 	Class<K> getKernelType( Class<T> imageType , int DOF ) {
 		if( imageType == ImageFloat32.class ) {
 			if( DOF == 1 )

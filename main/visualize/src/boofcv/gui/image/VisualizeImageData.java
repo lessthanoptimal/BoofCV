@@ -21,9 +21,9 @@ package boofcv.gui.image;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
@@ -35,7 +35,7 @@ import java.awt.image.BufferedImage;
  */
 public class VisualizeImageData {
 
-	public static BufferedImage standard( ImageBase<?> src , BufferedImage dst )
+	public static BufferedImage standard( ImageSingleBand<?> src , BufferedImage dst )
 	{
 		if( src.getTypeInfo().isInteger() ) {
 			ImageInteger srcInt = (ImageInteger)src;
@@ -85,7 +85,7 @@ public class VisualizeImageData {
 	 * @param normalize Used to normalize the input image.
 	 * @return Rendered image.
 	 */
-	public static BufferedImage colorizeSign( ImageBase src, BufferedImage dst, double normalize ) {
+	public static BufferedImage colorizeSign( ImageSingleBand src, BufferedImage dst, double normalize ) {
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
 		if( normalize <= 0 ) {
@@ -153,7 +153,7 @@ public class VisualizeImageData {
 	 * @param normalize Used to normalize the input image.
 	 * @return Rendered image.
 	 */
-	public static BufferedImage grayMagnitude( ImageBase src, BufferedImage dst, double normalize )
+	public static BufferedImage grayMagnitude( ImageSingleBand src, BufferedImage dst, double normalize )
 	{
 		if( normalize < 0 )
 			normalize = GPixelMath.maxAbs(src);

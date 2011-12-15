@@ -19,7 +19,7 @@
 package boofcv.benchmark.feature.distort;
 
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface StabilityEvaluator<T extends ImageBase> {
+public interface StabilityEvaluator<T extends ImageSingleBand> {
 
 	/**
 	 * Extracts information from the original image

@@ -20,7 +20,7 @@ package boofcv.alg.transform.wavelet.impl;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderIndex1D;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlBorderCoef;
 import boofcv.testing.BoofTesting;
@@ -97,7 +97,7 @@ public class CompareToNaiveWavelet {
 		}
 
 		@Override
-		public void applyValidation(WaveletDescription<?> desc, ImageBase input, ImageBase output) {
+		public void applyValidation(WaveletDescription<?> desc, ImageSingleBand input, ImageSingleBand output) {
 			Method m;
 			Object args[];
 			if( functionName.contains("Inverse")) {

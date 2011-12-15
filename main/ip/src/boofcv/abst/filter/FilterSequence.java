@@ -19,7 +19,7 @@
 package boofcv.abst.filter;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FilterSequence<Input extends ImageBase, Output extends ImageBase>
+public class FilterSequence<Input extends ImageSingleBand, Output extends ImageSingleBand>
 		implements FilterImageInterface<Input,Output> {
 
 	FilterImageInterface<Input,Output> firstFilter;

@@ -27,7 +27,7 @@ public class TestImageSInt64 extends StandardImageTests {
 	}
 
 	@Override
-	public ImageBase createImage(int width, int height) {
+	public ImageSingleBand createImage(int width, int height) {
 		return new ImageSInt64(width, height);
 	}
 

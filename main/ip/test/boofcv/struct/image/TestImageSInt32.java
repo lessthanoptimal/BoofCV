@@ -28,7 +28,7 @@ public class TestImageSInt32 extends StandardImageIntegerTests {
 	}
 
 	@Override
-	public ImageBase createImage(int width, int height) {
+	public ImageSingleBand createImage(int width, int height) {
 		return new ImageSInt32(width, height);
 	}
 

@@ -22,7 +22,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -34,7 +34,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class OrientationAverage<D extends ImageBase> implements OrientationGradient<D> {
+public abstract class OrientationAverage<D extends ImageSingleBand> implements OrientationGradient<D> {
 	// image gradient
 	protected D derivX;
 	protected D derivY;

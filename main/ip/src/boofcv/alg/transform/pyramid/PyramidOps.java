@@ -21,7 +21,7 @@ package boofcv.alg.transform.pyramid;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
 import java.util.Random;
@@ -42,7 +42,7 @@ public class PyramidOps {
 	 * @param min min value.
 	 * @param max maximum value.
 	 */
-	public static <I extends ImageBase>
+	public static <I extends ImageSingleBand>
 	void randomize( ImagePyramid<I> pyramid , Random rand , int min , int max ) {
 
 		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
@@ -66,7 +66,7 @@ public class PyramidOps {
 	 * @param filter Filter being applied to the pyramid.
 	 * @param output Output pyramid where filter results are saved.
 	 */
-	public static <I extends ImageBase, O extends ImageBase>
+	public static <I extends ImageSingleBand, O extends ImageSingleBand>
 	void filter(ImagePyramid<I> input, FilterImageInterface<I, O> filter, ImagePyramid<O> output
 	)
 	{
@@ -97,7 +97,7 @@ public class PyramidOps {
 	 * @param derivX Pyramid where x-derivative is stored.
 	 * @param derivY Pyramid where y-derivative is stored.
 	 */
-	public static <I extends ImageBase, O extends ImageBase>
+	public static <I extends ImageSingleBand, O extends ImageSingleBand>
 	void gradient(ImagePyramid<I> input,
 				  ImageGradient<I, O> gradient, ImagePyramid<O> derivX,
 				  ImagePyramid<O> derivY )

@@ -21,7 +21,7 @@ package boofcv.io.wrapper.images;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BufferedFileImageSequence<T extends ImageBase> implements SimpleImageSequence<T> {
+public class BufferedFileImageSequence<T extends ImageSingleBand> implements SimpleImageSequence<T> {
 
 	BufferedImage orig[];
 	T[] images;
@@ -71,11 +71,11 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 		Collections.sort(listNames);
 
 		orig = new BufferedImage[ files.length ];
-		images = (T[])new ImageBase[ files.length ];
+		images = (T[])new ImageSingleBand[ files.length ];
 		int index = 0;
 		for (String s : listNames) {
 			BufferedImage b = orig[index] = UtilImageIO.loadImage(directory.getPath()+"/"+s);
-			images[index++] = ConvertBufferedImage.convertFrom(b,null,type);
+			images[index++] = ConvertBufferedImage.convertFrom(b,(T)null,type);
 		}
 	}
 
@@ -85,10 +85,10 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 	public BufferedFileImageSequence(Class<T> type, BufferedImage[] orig) {
 		this.type = type;
 		this.orig = orig;
-		images = (T[])new ImageBase[ orig.length ];
+		images = (T[])new ImageSingleBand[ orig.length ];
 
 		for( int i = 0; i < orig.length; i++ ) {
-			images[i] = ConvertBufferedImage.convertFrom(orig[i],null,type);
+			images[i] = ConvertBufferedImage.convertFrom(orig[i],(T)null,type);
 		}
 	}
 

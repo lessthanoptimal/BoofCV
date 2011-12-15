@@ -21,8 +21,8 @@ package boofcv.abst.feature.detect.intensity;
 import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
  * 
  * @author Peter Abeles
  */
-public class WrapperMedianCornerIntensity<I extends ImageBase, D extends ImageBase> implements GeneralFeatureIntensity<I,D> {
+public class WrapperMedianCornerIntensity<I extends ImageSingleBand, D extends ImageSingleBand> implements GeneralFeatureIntensity<I,D> {
 
 	ImageFloat32 intensity = new ImageFloat32(1,1);
 	Method m;

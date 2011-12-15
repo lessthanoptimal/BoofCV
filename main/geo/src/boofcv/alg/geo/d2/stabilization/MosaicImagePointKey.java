@@ -21,7 +21,7 @@ package boofcv.alg.geo.d2.stabilization;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homo.Homography2D_F32;
 import georegression.struct.homo.Homography2D_F64;
@@ -36,7 +36,7 @@ import java.util.List;
 	// todo create a class just for rending the point
 	// todo prune features if too close together KLT
 	// todo respawn number realtive to number
-public class MosaicImagePointKey<I extends ImageBase> {
+public class MosaicImagePointKey<I extends ImageSingleBand> {
 	int maxFeatures = 250;
 	static int thresholdChange = 80;
 

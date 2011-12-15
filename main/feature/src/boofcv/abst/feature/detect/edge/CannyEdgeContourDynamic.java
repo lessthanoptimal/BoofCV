@@ -20,7 +20,7 @@ package boofcv.abst.feature.detect.edge;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class CannyEdgeContourDynamic<T extends ImageBase, D extends ImageBase> extends CannyEdgeContour<T,D>
+public class CannyEdgeContourDynamic<T extends ImageSingleBand, D extends ImageSingleBand> extends CannyEdgeContour<T,D>
 {
 	// threshold is specified to be
 	float fractionLow, fractionHigh;

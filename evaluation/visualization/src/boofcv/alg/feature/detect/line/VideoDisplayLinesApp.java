@@ -28,8 +28,8 @@ import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoListManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +41,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoDisplayLinesApp<I extends ImageBase, D extends ImageBase>
+public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSingleBand>
 		extends VideoProcessAppBase<I,D> implements ProcessInput , MouseListener
 {
 	I blur;
@@ -136,7 +136,7 @@ public class VideoDisplayLinesApp<I extends ImageBase, D extends ImageBase>
 	}
 
 	@Override
-	protected void updateAlgGUI(ImageBase frame, BufferedImage imageGUI, double fps) {
+	protected void updateAlgGUI(ImageSingleBand frame, BufferedImage imageGUI, double fps) {
 		gui.setBackground(imageGUI);
 	}
 

@@ -29,7 +29,7 @@ import boofcv.factory.feature.detect.interest.FactoryBlobDetector;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class BenchmarkDetectHelper {
-	public static <T extends ImageBase,D extends ImageBase>
+	public static <T extends ImageSingleBand,D extends ImageSingleBand>
 	List<BenchmarkAlgorithm> createAlgs( BenchmarkInterestParameters<T,D> param )
 	{
 	    int radius = param.radius;

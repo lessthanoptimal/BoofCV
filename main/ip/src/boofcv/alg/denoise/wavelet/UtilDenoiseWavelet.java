@@ -18,8 +18,8 @@
 
 package boofcv.alg.denoise.wavelet;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import pja.sorting.QuickSelectArray;
 
 
@@ -98,7 +98,7 @@ public class UtilDenoiseWavelet {
 	 * @param noiseSigma Estimated noise sigma.
 	 * @return universal threshold.
 	 */
-	public static double universalThreshold( ImageBase image , double noiseSigma ) {
+	public static double universalThreshold( ImageSingleBand image , double noiseSigma ) {
 		int w = image.width;
 		int h = image.height;
 

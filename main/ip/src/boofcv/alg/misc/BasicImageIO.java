@@ -18,9 +18,9 @@
 
 package boofcv.alg.misc;
 
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageInteger;
  */
 public class BasicImageIO {
 
-	public static void print(ImageBase a) {
+	public static void print(ImageSingleBand a) {
 
 		if( a.getTypeInfo().isInteger() ) {
 			print((ImageInteger)a);

@@ -28,7 +28,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.gss.GaussianScaleSpace;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -40,7 +40,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class NoCacheScaleSpace<I extends ImageBase, D extends ImageBase>
+public class NoCacheScaleSpace<I extends ImageSingleBand, D extends ImageSingleBand>
 		implements GaussianScaleSpace<I,D>
 {
 	// reference to the original input image

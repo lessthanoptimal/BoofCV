@@ -36,8 +36,8 @@ import boofcv.numerics.fitting.modelset.distance.StatisticalDistanceModelMatcher
 import boofcv.numerics.fitting.modelset.lmeds.LeastMedianOfSquares;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import boofcv.struct.FastQueue;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 
@@ -50,7 +50,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoStabilizePointApp<I extends ImageBase, D extends ImageBase>
+public class VideoStabilizePointApp<I extends ImageSingleBand, D extends ImageSingleBand>
 		extends VideoProcessAppBase<I,D> implements ProcessInput
 {
 	int maxFeatures = 250;

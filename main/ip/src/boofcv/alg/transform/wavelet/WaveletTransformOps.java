@@ -22,9 +22,9 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformBorder;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformInner;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformNaive;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
@@ -58,7 +58,7 @@ public class WaveletTransformOps {
 	/**
 	 * Returns the appropriate image type for the wavelet transform
 	 */
-	public static <T extends ImageBase , W extends ImageBase>
+	public static <T extends ImageSingleBand, W extends ImageSingleBand>
 	Class<W> getWaveletType( Class<T> imageType ) {
 		if( imageType == ImageFloat32.class ) {
 			return (Class<W>)ImageFloat32.class;

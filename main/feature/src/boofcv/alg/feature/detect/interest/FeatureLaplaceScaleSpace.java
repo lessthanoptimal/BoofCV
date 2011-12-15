@@ -24,7 +24,7 @@ import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.gss.GaussianScaleSpace;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase>
+public class FeatureLaplaceScaleSpace<T extends ImageSingleBand, D extends ImageSingleBand>
 	implements InterestPointScaleSpace<T,D>
 {
 
@@ -103,7 +103,7 @@ public class FeatureLaplaceScaleSpace<T extends ImageBase, D extends ImageBase>
 		this.baseThreshold = detector.getThreshold();
 		this.scalePower = scalePower;
 
-		localSpace = (T[])new ImageBase[3];
+		localSpace = (T[])new ImageSingleBand[3];
 
 		maximums = new List[ 3 ];
 		maximums[0] = new ArrayList<Point2D_I16>();

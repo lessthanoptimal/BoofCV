@@ -178,7 +178,7 @@ public class ConvertBufferedImage {
 	 * Converts a buffered image into an image of the specified type.  In a 'dst' image is provided
 	 * it will be used for output, otherwise a new image will be created.
 	 */
-	public static <T extends ImageBase> T convertFrom(BufferedImage src, T dst, Class<T> type) {
+	public static <T extends ImageSingleBand> T convertFrom(BufferedImage src, T dst, Class<T> type) {
 		if (type == ImageUInt8.class) {
 			return (T) convertFrom(src, (ImageUInt8) dst);
 		} else if (type == ImageFloat32.class) {
@@ -222,7 +222,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link boofcv.struct.image.ImageUInt8}.  If the buffered image
+	 * Converts the buffered image into an {@link boofcv.struct.image.ImageFloat32}.  If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
@@ -256,19 +256,90 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts an image which extends {@link ImageBase} into a BufferedImage.
+	 * Converts the buffered image into an {@link boofcv.struct.image.MultiSpectral} image of the specified
+	 * type. 
+	 *
+	 * @param src Input image.
+	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
+	 * @return Converted image.
+	 */
+	public static <T extends ImageSingleBand> MultiSpectral<T>
+	convertFromMulti(BufferedImage src, MultiSpectral<T> dst , Class<T> type )
+	{
+		if (dst != null) {
+			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
+				throw new IllegalArgumentException("image dimension are different");
+			}
+		} else {
+			dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),3);
+		}
+
+		if( type == ImageUInt8.class ) {
+			try {
+				if (src.getRaster() instanceof ByteInterleavedRaster &&
+						src.getType() != BufferedImage.TYPE_BYTE_GRAY ) {
+					ConvertRaster.bufferedToMulti_U8((ByteInterleavedRaster) src.getRaster(), (MultiSpectral<ImageUInt8>)dst);
+				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
+					ConvertRaster.bufferedToMulti_U8((IntegerInterleavedRaster) src.getRaster(), (MultiSpectral<ImageUInt8>)dst);
+				} else {
+					ConvertRaster.bufferedToMulti_U8(src, (MultiSpectral<ImageUInt8>)dst);
+				}
+			} catch( java.security.AccessControlException e) {
+				// Applets don't allow access to the raster()
+				ConvertRaster.bufferedToMulti_U8(src, (MultiSpectral<ImageUInt8>)dst);
+			}
+		} else if( type == ImageFloat32.class ) {
+			try {
+				if (src.getRaster() instanceof ByteInterleavedRaster &&
+						src.getType() != BufferedImage.TYPE_BYTE_GRAY ) {
+					ConvertRaster.bufferedToMulti_F32((ByteInterleavedRaster) src.getRaster(), (MultiSpectral<ImageFloat32>)dst);
+				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
+					ConvertRaster.bufferedToMulti_F32((IntegerInterleavedRaster) src.getRaster(), (MultiSpectral<ImageFloat32>)dst);
+				} else {
+					ConvertRaster.bufferedToMulti_F32(src, (MultiSpectral<ImageFloat32>)dst);
+				}
+			} catch( java.security.AccessControlException e) {
+				// Applets don't allow access to the raster()
+				ConvertRaster.bufferedToMulti_F32(src, (MultiSpectral<ImageFloat32>)dst);
+			}
+		} else {
+			throw new IllegalArgumentException("Band type not supported yet");
+		}
+
+		return dst;
+	}
+
+	/**
+	 * Converts an image which extends {@link boofcv.struct.image.ImageSingleBand} into a BufferedImage.
 	 *
 	 * @param src Input image.  Pixels must have a value from 0 to 255.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo( ImageBase src, BufferedImage dst) {
+	public static BufferedImage convertTo( ImageSingleBand src, BufferedImage dst) {
 		if( ImageUInt8.class == src.getClass() ) {
 			return convertTo((ImageUInt8)src,dst);
 		} else if( ImageSInt16.class == src.getClass() ) {
 			return convertTo((ImageSInt16)src,dst);
 		} else if( ImageFloat32.class == src.getClass() ) {
 			return convertTo((ImageFloat32)src,dst);
+		} else {
+			throw new IllegalArgumentException("Image type is not yet supported: "+src.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Converts an image which extends {@link boofcv.struct.image.ImageSingleBand} into a BufferedImage.
+	 *
+	 * @param src Input image.  Pixels must have a value from 0 to 255.
+	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @return Converted image.
+	 */
+	public static BufferedImage convertTo( MultiSpectral src, BufferedImage dst) {
+		if( ImageUInt8.class == src.getType() ) {
+			return convertTo_U8((MultiSpectral<ImageUInt8>) src, dst);
+		} else if( ImageFloat32.class == src.getType() ) {
+			return convertTo_F32((MultiSpectral<ImageFloat32>) src, dst);
 		} else {
 			throw new IllegalArgumentException("Image type is not yet supported: "+src.getClass().getSimpleName());
 		}
@@ -359,6 +430,61 @@ public class ConvertBufferedImage {
 		return dst;
 	}
 
+	/**
+	 * Converts a {@link boofcv.struct.image.ImageUInt8} into a BufferedImage.  If the buffered image
+	 * has multiple channels the intensities of each channel are averaged together.
+	 *
+	 * @param src Input image.
+	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @return Converted image.
+	 */
+	public static BufferedImage convertTo_U8(MultiSpectral<ImageUInt8> src, BufferedImage dst) {
+		dst = checkInputs(src, dst);
+
+		try {
+			if (dst.getRaster() instanceof ByteInterleavedRaster) {
+				ConvertRaster.multToBuffered_U8(src, (ByteInterleavedRaster) dst.getRaster());
+			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
+				ConvertRaster.multToBuffered_U8(src, (IntegerInterleavedRaster) dst.getRaster());
+			} else {
+				ConvertRaster.multToBuffered_U8(src, dst);
+			}
+			// hack so that it knows the buffer has been modified
+			dst.setRGB(0,0,dst.getRGB(0,0));
+		} catch( java.security.AccessControlException e) {
+			ConvertRaster.multToBuffered_U8(src, dst);
+		}
+
+		return dst;
+	}
+
+	/**
+	 * Converts a {@link boofcv.struct.image.ImageUInt8} into a BufferedImage.  If the buffered image
+	 * has multiple channels the intensities of each channel are averaged together.
+	 *
+	 * @param src Input image.
+	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @return Converted image.
+	 */
+	public static BufferedImage convertTo_F32(MultiSpectral<ImageFloat32> src, BufferedImage dst) {
+		dst = checkInputs(src, dst);
+
+		try {
+			if (dst.getRaster() instanceof ByteInterleavedRaster) {
+				ConvertRaster.multToBuffered_F32(src, (ByteInterleavedRaster) dst.getRaster());
+			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
+				ConvertRaster.multToBuffered_F32(src, (IntegerInterleavedRaster) dst.getRaster());
+			} else {
+				ConvertRaster.multToBuffered_F32(src, dst);
+			}
+			// hack so that it knows the buffer has been modified
+			dst.setRGB(0,0,dst.getRGB(0,0));
+		} catch( java.security.AccessControlException e) {
+			ConvertRaster.multToBuffered_F32(src, dst);
+		}
+
+		return dst;
+	}
 	/**
 	 * If null the dst is declared, otherwise it checks to see if the 'dst' as the same shape as 'src'.
 	 */

@@ -2,7 +2,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.gss.GaussianScaleSpace;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface InterestPointScaleSpace<T extends ImageBase, D extends ImageBase> {
+public interface InterestPointScaleSpace<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	/**
 	 * Detect features in the scale space image

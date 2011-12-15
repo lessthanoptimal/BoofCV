@@ -20,7 +20,7 @@ package boofcv.abst.filter.convolve;
 
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -32,7 +32,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class GenericConvolveDown<Input extends ImageBase, Output extends ImageBase>
+public class GenericConvolveDown<Input extends ImageSingleBand, Output extends ImageSingleBand>
 	implements ConvolveInterface<Input,Output>
 {
 	Method m;

@@ -24,7 +24,7 @@ import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.*;
@@ -81,8 +81,8 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 //		System.out.println("level "+level);
 		if( level > 0 ) {
 
-			ImageBase small = ss.getLayer(level-1);
-			ImageBase enlarge = GeneralizedImageOps.createImage(small.getClass(),ss.getInputWidth(),ss.getInputHeight());
+			ImageSingleBand small = ss.getLayer(level-1);
+			ImageSingleBand enlarge = GeneralizedImageOps.createImage(small.getClass(),ss.getInputWidth(),ss.getInputHeight());
 			DistortImageOps.scale(small,enlarge, TypeInterpolate.NEAREST_NEIGHBOR);
 
 			// if the size isn't the same null it so a new image will be declared

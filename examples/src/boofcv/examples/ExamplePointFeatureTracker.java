@@ -30,8 +30,8 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -50,7 +50,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExamplePointFeatureTracker< T extends ImageBase , D extends ImageBase >
+public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends ImageSingleBand>
 {
 	// type of input image
 	Class<T> imageType;

@@ -22,7 +22,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public class DescribePointSurfMod<II extends ImageBase> extends DescribePointSurf<II> {
+public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePointSurf<II> {
 
 	// how many sample points sub-regions overlap.
 	private int overLap;

@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.interest;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public interface InterestPointDetector< T extends ImageBase> {
+public interface InterestPointDetector< T extends ImageSingleBand> {
 
 	/**
 	 * Detects interest points inside the provided image.

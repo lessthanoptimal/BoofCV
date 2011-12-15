@@ -41,7 +41,7 @@ public class DistortSupport {
 	 * directly from the size of the two input images and independently scales
 	 * the x and y axises.
 	 */
-	public static PixelTransformAffine_F32 transformScale(ImageBase from, ImageBase to)
+	public static PixelTransformAffine_F32 transformScale(ImageSingleBand from, ImageSingleBand to)
 	{
 		float scaleX = (float)to.width/(float)from.width;
 		float scaleY = (float)to.height/(float)from.height;
@@ -92,7 +92,7 @@ public class DistortSupport {
 	 * @param dstToSrc Transform from dst to src image.
 	 * @param border
 	 */
-	public static <T extends ImageBase>
+	public static <T extends ImageSingleBand>
 	ImageDistort<T> createDistort(Class<T> imageType,
 								  PixelTransform_F32 dstToSrc,
 								  InterpolatePixel<T> interp, ImageBorder border)

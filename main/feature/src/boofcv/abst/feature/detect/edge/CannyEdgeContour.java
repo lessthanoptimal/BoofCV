@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CannyEdgeContour<T extends ImageBase, D extends ImageBase> implements DetectEdgeContour<T> {
+public class CannyEdgeContour<T extends ImageSingleBand, D extends ImageSingleBand> implements DetectEdgeContour<T> {
 
 	// blurs the input image
 	BlurFilter<T> blur;

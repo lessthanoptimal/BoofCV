@@ -55,7 +55,7 @@ public enum AutoTypeImage {
 		imageName = imageType.getSimpleName();
 		bitWise = "";
 		try {
-			ImageBase img = (ImageBase)imageType.newInstance();
+			ImageSingleBand img = (ImageSingleBand)imageType.newInstance();
 			primitiveType = img.getTypeInfo().getDataType();
 			dataType = primitiveType.getSimpleName();
 			numBits = img.getTypeInfo().getNumBits();

@@ -25,8 +25,8 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
@@ -82,7 +82,7 @@ import java.util.List;
  */
 // todo Do not compute intensity along the border, instead set it to zero?
 // TODO or handle the border in a more intelligent way
-public class FastHessianFeatureDetector<T extends ImageBase> {
+public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 
 	// finds features from 2D intensity image
 	private FeatureExtractor extractor;

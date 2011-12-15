@@ -30,8 +30,8 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 import javax.swing.*;
@@ -43,7 +43,7 @@ import java.awt.image.BufferedImage;
  * Demonstrates the affects of different binary operations on an image.
  */
 // todo clean up appearance
-public class DemoBinaryImageOpsApp<T extends ImageBase> extends SelectAlgorithmImagePanel
+public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgorithmImagePanel
 		implements ProcessInput , SelectHistogramThresholdPanel.Listener
 {
 	Class<T> imageType;

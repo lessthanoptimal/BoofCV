@@ -20,15 +20,15 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Wrapper around children of {@link boofcv.alg.feature.detect.intensity.FastCornerIntensity}.
  * 
  * @author Peter Abeles
  */
-public class WrapperFastCornerIntensity<I extends ImageBase, D extends ImageBase> implements GeneralFeatureIntensity<I,D> {
+public class WrapperFastCornerIntensity<I extends ImageSingleBand, D extends ImageSingleBand> implements GeneralFeatureIntensity<I,D> {
 
 	FastCornerIntensity<I> alg;
 

@@ -76,8 +76,8 @@ public class HomographyStitchPanel extends JPanel {
 	public synchronized void configure(BufferedImage imageA, BufferedImage imageB ,
 									   Homography2D_F64 fromAtoB ) {
 
-		ImageFloat32 grayA = ConvertBufferedImage.convertFrom(imageA, null, ImageFloat32.class);
-		ImageFloat32 grayB = ConvertBufferedImage.convertFrom(imageB, null, ImageFloat32.class);
+		ImageFloat32 grayA = ConvertBufferedImage.convertFrom(imageA, (ImageFloat32)null, ImageFloat32.class);
+		ImageFloat32 grayB = ConvertBufferedImage.convertFrom(imageB, (ImageFloat32)null, ImageFloat32.class);
 
 		ImageFloat32 work = new ImageFloat32(workWidth,workHeight);
 

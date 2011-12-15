@@ -21,7 +21,7 @@ package boofcv.alg.filter.convolve.down;
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.CompareIdenticalFunctions;
 
 import java.lang.reflect.Method;
@@ -65,9 +65,9 @@ public class CompareToStandardConvolveDownNormalized extends CompareIdenticalFun
 			divW = divH = skip;
 		}
 
-		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
+		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 		GeneralizedImageOps.randomize(src, rand, 1, 10);
-		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
+		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
 
 		Object[][] ret = new Object[1][paramTypes.length];
 		ret[0][0] = kernel;

@@ -20,7 +20,7 @@ package boofcv.alg.denoise.wavelet;
 
 import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.alg.denoise.ShrinkThresholdRule;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class SubbandShrink<I extends ImageBase<I>> implements DenoiseWavelet<I> {
+public abstract class SubbandShrink<I extends ImageSingleBand<I>> implements DenoiseWavelet<I> {
 
 	// specifies how the threshold is applied to each pixel in the image
 	protected ShrinkThresholdRule<I> rule;

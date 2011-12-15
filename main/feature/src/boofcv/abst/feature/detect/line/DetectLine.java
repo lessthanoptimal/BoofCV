@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detect.line;
 
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.line.LineParametric2D_F32;
 
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface DetectLine<T extends ImageBase> {
+public interface DetectLine<T extends ImageSingleBand> {
 
 	/**
 	 * Detect lines inside the image.

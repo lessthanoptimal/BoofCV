@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface InterpolatePixel<T extends ImageBase> {
+public interface InterpolatePixel<T extends ImageSingleBand> {
 
 	/**
 	 * Change the image that is being interpolated.

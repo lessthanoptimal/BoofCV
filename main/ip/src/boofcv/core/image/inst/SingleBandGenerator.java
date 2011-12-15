@@ -19,7 +19,7 @@
 package boofcv.core.image.inst;
 
 import boofcv.core.image.ImageGenerator;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -31,7 +31,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author Peter Abeles
  */
-public class SingleBandGenerator<T extends ImageBase> implements ImageGenerator<T> {
+public class SingleBandGenerator<T extends ImageSingleBand> implements ImageGenerator<T> {
 
 	Class<T> type;
 

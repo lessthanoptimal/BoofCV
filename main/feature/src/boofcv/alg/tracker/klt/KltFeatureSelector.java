@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.klt;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface KltFeatureSelector<InputImage extends ImageBase, DerivativeImage extends ImageBase> {
+public interface KltFeatureSelector<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand> {
 
 	/**
 	 * Sets the current image and image derivatives
