@@ -54,8 +54,8 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 
 	public EdgeIntensitiesApp(Class<T> imageType) {
 		this.imageType = imageType;
-		input = GeneralizedImageOps.createImage(imageType,width,height);
-		derivY = GeneralizedImageOps.createImage(imageType,width,height);
+		input = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		derivY = GeneralizedImageOps.createSingleBand(imageType, width, height);
 	}
 
 	public void init() {
@@ -76,10 +76,10 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 	 * Validate that convolution/derivative is in fact associative
 	 */
 	public void convolveDerivOrder() {
-		T blur = GeneralizedImageOps.createImage(imageType,width,height);
-		T blurDeriv = GeneralizedImageOps.createImage(imageType,width,height);
-		T deriv = GeneralizedImageOps.createImage(imageType,width,height);
-		T derivBlur = GeneralizedImageOps.createImage(imageType,width,height);
+		T blur = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		T deriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		T derivBlur = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,radius);
 		ImageGradient<T,T> funcDeriv = FactoryDerivative.three(imageType,imageType);
@@ -98,9 +98,9 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 	 * Compare computing the image
 	 */
 	public void gaussianDerivToDirectDeriv() {
-		T blur = GeneralizedImageOps.createImage(imageType,width,height);
-		T blurDeriv = GeneralizedImageOps.createImage(imageType,width,height);
-		T gaussDeriv = GeneralizedImageOps.createImage(imageType,width,height);
+		T blur = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		T gaussDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,radius);
 		ImageGradient<T,T> funcDeriv = FactoryDerivative.three(imageType,imageType);
@@ -117,7 +117,7 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 
 	public void derivByGaussDeriv() {
 		System.out.println("DxG*I");
-		T blurDeriv = GeneralizedImageOps.createImage(imageType,width,height);
+		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int level = 1; level <= 3; level++ ) {
 			ImageGradient<T,T> funcGaussDeriv = FactoryDerivative.gaussian(level,-1,imageType,imageType);
@@ -130,8 +130,8 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 	public void derivByBlurThenDeriv() {
 		System.out.println("Dx*(G*I)");
 		ImageGradient<T,T> funcDeriv = FactoryDerivative.three(imageType,imageType);
-		T blur = GeneralizedImageOps.createImage(imageType,width,height);
-		T blurDeriv = GeneralizedImageOps.createImage(imageType,width,height);
+		T blur = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
 			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);
@@ -145,8 +145,8 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 	public void derivByDerivThenBlur() {
 		System.out.println("G*(Dx*I)");
 		ImageGradient<T,T> funcDeriv = FactoryDerivative.three(imageType,imageType);
-		T blur = GeneralizedImageOps.createImage(imageType,width,height);
-		T deriv = GeneralizedImageOps.createImage(imageType,width,height);
+		T blur = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		T deriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
 			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);
@@ -159,7 +159,7 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 
 	public void derivByDerivOfBlur() {
 		System.out.println("(Dx*G)*I");
-		T blur = GeneralizedImageOps.createImage(imageType,width,height);
+		T blur = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
 			Kernel1D g = FactoryKernelGaussian.gaussian1D(ImageFloat32.class,sigma,-1);
@@ -174,8 +174,8 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 
 	public void derivByGaussThenGausDeriv() {
 		System.out.println("DxG*(G*I)");
-		T blur = GeneralizedImageOps.createImage(imageType,width,height);
-		T blurDeriv = GeneralizedImageOps.createImage(imageType,width,height);
+		T blur = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
 			ImageGradient<T,T> funcGaussDeriv = FactoryDerivative.gaussian(sigma,-1,imageType,imageType);
@@ -190,9 +190,9 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 	public void derivByGaussGausThenDeriv() {
 		System.out.println("Dx*(G*(G*I))");
 		ImageGradient<T,T> funcDeriv = FactoryDerivative.three(imageType,imageType);
-		T blur = GeneralizedImageOps.createImage(imageType,width,height);
-		T blur2 = GeneralizedImageOps.createImage(imageType,width,height);
-		T blurDeriv = GeneralizedImageOps.createImage(imageType,width,height);
+		T blur = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		T blur2 = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		T blurDeriv = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
 			BlurStorageFilter<T> funcBlur = FactoryBlurFilter.gaussian(imageType,sigma,-1);

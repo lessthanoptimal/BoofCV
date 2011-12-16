@@ -131,15 +131,28 @@ public class TestConvertBufferedImage {
 
 	@Test
 	public void convertFrom_generic() {
+		// test single band
+
+		// test multi-spectral
+		fail("implement");
+	}
+
+	@Test
+	public void convertFromSingle() {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
 
-		ImageUInt8 imgInt8 = ConvertBufferedImage.convertFrom(origImg,(ImageUInt8)null, ImageUInt8.class);
+		ImageUInt8 imgInt8 = ConvertBufferedImage.convertFromSingle(origImg, (ImageUInt8) null, ImageUInt8.class);
 		assertEquals(imgWidth,imgInt8.width);
 		assertEquals(imgHeight,imgInt8.height);
 
-		ImageFloat32 imgF32 = ConvertBufferedImage.convertFrom(origImg,(ImageFloat32)null,ImageFloat32.class);
+		ImageFloat32 imgF32 = ConvertBufferedImage.convertFromSingle(origImg, (ImageFloat32) null, ImageFloat32.class);
 		assertEquals(imgWidth,imgF32.width);
 		assertEquals(imgHeight,imgF32.height);
+	}
+
+	@Test
+	public void convertFromMulti() {
+		fail("implement");
 	}
 
 	@Test

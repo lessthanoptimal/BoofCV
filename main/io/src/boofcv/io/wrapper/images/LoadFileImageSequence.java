@@ -145,7 +145,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 			else
 				imageGUI = ImageIO.read(new File(fileNames.get(index--)));
 
-			image = ConvertBufferedImage.convertFrom(imageGUI, image, type);
+			image = ConvertBufferedImage.convertFromSingle(imageGUI, image, type);
 
 			// no changes needed so return the original
 			if (scalefactor == 1)

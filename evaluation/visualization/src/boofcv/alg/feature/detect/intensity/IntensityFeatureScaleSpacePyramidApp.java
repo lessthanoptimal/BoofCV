@@ -133,7 +133,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageSingleBand, D e
 	public void process( final BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
-		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		scaledIntensity = new ImageFloat32(workImage.width,workImage.height);
 		pyramid.setImage(workImage);
 		SwingUtilities.invokeLater(new Runnable() {

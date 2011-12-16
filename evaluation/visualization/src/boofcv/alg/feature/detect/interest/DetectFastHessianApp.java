@@ -51,7 +51,7 @@ public class DetectFastHessianApp {
 	static int NUM_FEATURES = 120;
 
 	private static <T extends ImageSingleBand> void doStuff( Class<T> imageType , BufferedImage input ) {
-		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax( 5 , 1 , 5, false, true);
 		FastHessianFeatureDetector<T> det = new FastHessianFeatureDetector<T>(extractor,NUM_FEATURES, 2, 9,4,4);

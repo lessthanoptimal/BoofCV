@@ -20,7 +20,9 @@ package boofcv.core.image;
 
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.MultiSpectral;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -38,20 +40,23 @@ public class BenchmarkConvertBufferedImage {
 
 	static BufferedImage imgBuff;
 	static ImageUInt8 imgInt8;
+	static MultiSpectral<ImageUInt8> multiInt8;
+	
+	static ImageBase boofImg;
 
-	public static class FromBuffToInt8 extends PerformerBase
+	public static class FromBuffToBoof extends PerformerBase
 	{
 		@Override
 		public void process() {
-			ConvertBufferedImage.convertFrom(imgBuff,imgInt8);
+			ConvertBufferedImage.convertFrom(imgBuff,boofImg);
 		}
 	}
 
-	public static class FromInt8ToBuff extends PerformerBase
+	public static class FromBoofToBuff extends PerformerBase
 	{
 		@Override
 		public void process() {
-			ConvertBufferedImage.convertTo(imgInt8,imgBuff);
+			ConvertBufferedImage.convertTo(boofImg,imgBuff);
 		}
 	}
 
@@ -90,35 +95,47 @@ public class BenchmarkConvertBufferedImage {
 		}
 	}
 
+	public static void evaluateConvert( ImageBase image , String name )
+	{
+		boofImg = image;
+		System.out.printf("Buffered to %s  %10.2f ops/sec\n",name,
+				ProfileOperation.profileOpsPerSec(new FromBuffToBoof(),1000, false));
+		System.out.printf("%s to Buffered  %10.2f ops/sec\n",name,
+				ProfileOperation.profileOpsPerSec(new FromBoofToBuff(),1000, false));
+
+	}
+	
 	public static void main( String args[] ) {
 		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
+		multiInt8 = new MultiSpectral<ImageUInt8>(ImageUInt8.class,imgWidth,imgHeight,3);
+		
+		GeneralizedImageOps.randomize(imgInt8,rand,0,100);
+		for( int i = 0; i < multiInt8.getNumBands(); i++ )
+			GeneralizedImageOps.randomize(multiInt8.getBand(0),rand,0,100);
 
 		System.out.println("=========  Profiling for ImageUInt8 ==========");
 		System.out.println();
 
 		createBufferedImage(BufferedImage.TYPE_3BYTE_BGR);
+		System.out.println("------- BufferedImage RGB interface ---------- ");
 		System.out.printf("BufferedImage to ImageUInt8   %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new FromInt8ToGenericBuff(),1000, false));
-		System.out.printf("TYPE_3BYTE_BGR to ImageUInt8  %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000, false));
-		System.out.printf("ImageUInt8 to TYPE_3BYTE_BGR  %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000, false));
+		System.out.println("---- TYPE_3BYTE_BGR ----");
+		evaluateConvert(imgInt8,"ImageUInt8");
+		evaluateConvert(multiInt8,"MultiSpectral_U8");
 
+		System.out.println("---- TYPE_INT_RGB ----");
 		createBufferedImage(BufferedImage.TYPE_INT_RGB);
-		System.out.printf("TYPE_INT_RGB to ImageUInt8    %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000, false));
-		System.out.printf("ImageUInt8 to TYPE_INT_RGB    %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000, false));
+		evaluateConvert(imgInt8,"ImageUInt8");
+		evaluateConvert(multiInt8,"MultiSpectral_U8");
 
+		System.out.println("---- TYPE_BYTE_GRAY ----");
 		createBufferedImage(BufferedImage.TYPE_BYTE_GRAY);
-		System.out.printf("TYPE_BYTE_GRAY to ImageUInt8  %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromBuffToInt8(),1000, false));
-		System.out.printf("ImageUInt8 to TYPE_BYTE_GRAY  %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new FromInt8ToBuff(),1000, false));
+		evaluateConvert(imgInt8,"ImageUInt8");
 
 		System.out.printf("extractImageInt8             %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new ExtractImageInt8(),1000, false));
-		System.out.printf("wxtractBuffered              %10.2f ops/sec\n",
+		System.out.printf("extractBuffered              %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new ExtractBuffered(),1000, false));
 
 		System.out.println();

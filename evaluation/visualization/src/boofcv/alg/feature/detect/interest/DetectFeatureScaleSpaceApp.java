@@ -74,7 +74,7 @@ public class DetectFeatureScaleSpaceApp<T extends ImageSingleBand, D extends Ima
 
 	public void process( BufferedImage input ) {
 		setInputImage(input);
-		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		ss.setImage(workImage);
 		panel.setBackground(input);
 		hasImage = true;

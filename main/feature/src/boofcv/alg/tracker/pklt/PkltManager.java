@@ -188,6 +188,7 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 		if( !active.remove(feature))
 			throw new IllegalArgumentException("Feature not in active list");
 		dropped.add(feature);
+		unused.add(feature);
 	}
 
 	/**
@@ -196,6 +197,7 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	public void spawnTracks( ImagePyramid<I> image ,
 							 ImagePyramid<D> derivX ,
 							 ImagePyramid<D> derivY ) {
+		spawned.clear();
 		int numBefore = active.size();
 		featureSelector.setInputs(image,derivX,derivY);
 		featureSelector.compute(active,unused);

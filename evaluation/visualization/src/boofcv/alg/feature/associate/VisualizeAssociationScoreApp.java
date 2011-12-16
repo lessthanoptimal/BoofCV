@@ -80,8 +80,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		super(3);
 		this.imageType = imageType;
 
-		imageLeft = GeneralizedImageOps.createImage(imageType,1,1);
-		imageRight = GeneralizedImageOps.createImage(imageType,1,1);
+		imageLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		imageRight = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 		GeneralFeatureDetector<T,D> alg;
 
@@ -112,8 +112,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		imageLeft.reshape(buffLeft.getWidth(),buffLeft.getHeight());
 		imageRight.reshape(buffRight.getWidth(),buffRight.getHeight());
 
-		ConvertBufferedImage.convertFrom(buffLeft,imageLeft,imageType);
-		ConvertBufferedImage.convertFrom(buffRight,imageRight,imageType);
+		ConvertBufferedImage.convertFromSingle(buffLeft, imageLeft, imageType);
+		ConvertBufferedImage.convertFromSingle(buffRight, imageRight, imageType);
 
 		// update the GUI's background images
 		scorePanel.setImages(buffLeft,buffRight);

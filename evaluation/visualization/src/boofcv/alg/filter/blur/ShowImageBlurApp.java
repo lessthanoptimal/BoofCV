@@ -66,9 +66,9 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 		addAlgorithm(0,"Median",2);
 
 		this.imageType = imageType;
-		input = GeneralizedImageOps.createImage(imageType,1,1);
-		output = GeneralizedImageOps.createImage(imageType,1,1);
-		storage = GeneralizedImageOps.createImage(imageType,1,1);
+		input = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		output = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		storage = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 		addToToolbar(createRadialSelect());
 
@@ -109,7 +109,7 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 		output.reshape(image.getWidth(),image.getHeight());
 		storage.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFrom(image,input,imageType);
+		ConvertBufferedImage.convertFromSingle(image, input, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

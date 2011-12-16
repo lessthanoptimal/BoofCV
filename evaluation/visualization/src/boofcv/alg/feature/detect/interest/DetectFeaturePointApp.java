@@ -107,7 +107,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 	public void process( BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
-		grayImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		grayImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		corruptImage = (T)grayImage._createNew(grayImage.width,grayImage.height);
 		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_BGR);
 		panel.setBufferedImage(workImage);

@@ -75,13 +75,13 @@ public class StandardGradientChecks {
 	 */
 	private void testSecondDerivative(Method m1 , Method m2) {
 		Class params[] = m1.getParameterTypes();
-		ImageSingleBand input = GeneralizedImageOps.createImage(params[0],width,height);
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(params[1],width,height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(params[2],width,height);
-		ImageSingleBand derivXX = GeneralizedImageOps.createImage(params[1],width,height);
-		ImageSingleBand derivYY = GeneralizedImageOps.createImage(params[2],width,height);
-		ImageSingleBand derivXY = GeneralizedImageOps.createImage(params[1],width,height);
-		ImageSingleBand derivYX = GeneralizedImageOps.createImage(params[1],width,height);
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[1], width, height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[2], width, height);
+		ImageSingleBand derivXX = GeneralizedImageOps.createSingleBand(params[1], width, height);
+		ImageSingleBand derivYY = GeneralizedImageOps.createSingleBand(params[2], width, height);
+		ImageSingleBand derivXY = GeneralizedImageOps.createSingleBand(params[1], width, height);
+		ImageSingleBand derivYX = GeneralizedImageOps.createSingleBand(params[1], width, height);
 
 		GeneralizedImageOps.randomize(input,rand,0,40);
 

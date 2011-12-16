@@ -45,7 +45,7 @@ public class ExampleBinaryImage {
 	public static void binaryExample( BufferedImage image )
 	{
 		// convert into a usable format
-		ImageFloat32 input = ConvertBufferedImage.convertFrom(image,null,ImageFloat32.class);
+		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
 		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
 
 		// the mean pixel value is often a reasonable threshold when creating a binary image
@@ -65,7 +65,7 @@ public class ExampleBinaryImage {
 	public static void labeledExample( BufferedImage image )
 	{
 		// convert into a usable format
-		ImageFloat32 input = ConvertBufferedImage.convertFrom(image,null,ImageFloat32.class);
+		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
 		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
 		ImageSInt32 blobs = new ImageSInt32(input.width,input.height);
 

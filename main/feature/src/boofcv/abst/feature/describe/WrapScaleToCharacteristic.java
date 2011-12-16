@@ -56,9 +56,9 @@ public abstract class WrapScaleToCharacteristic <T extends ImageSingleBand, D ex
 		int w = steerR*2+1+2;
 		// +2 is for image border when computing the image derivative
 
-		scaledImage = GeneralizedImageOps.createImage(inputType,w,w);
-		scaledDerivX = GeneralizedImageOps.createImage(derivType,w,w);
-		scaledDerivY = GeneralizedImageOps.createImage(derivType,w,w);
+		scaledImage = GeneralizedImageOps.createSingleBand(inputType, w, w);
+		scaledDerivX = GeneralizedImageOps.createSingleBand(derivType, w, w);
+		scaledDerivY = GeneralizedImageOps.createSingleBand(derivType, w, w);
 	}
 
 	@Override

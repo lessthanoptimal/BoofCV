@@ -64,10 +64,10 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 
 		Class integralType = ImageFloat32.class == imageType ? ImageFloat32.class : ImageSInt32.class;
 
-		image = GeneralizedImageOps.createImage(imageType,width,height);
-		ii = GeneralizedImageOps.createImage(integralType,width,height);
-		derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		image = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		ii = GeneralizedImageOps.createSingleBand(integralType, width, height);
+		derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GeneralizedImageOps.randomize(image,rand,0,100);
 		GIntegralImageOps.transform(image,ii);

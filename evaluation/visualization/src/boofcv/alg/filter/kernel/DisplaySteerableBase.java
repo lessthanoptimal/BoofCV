@@ -59,7 +59,7 @@ public abstract class DisplaySteerableBase<T extends ImageSingleBand, K extends 
 		this.imageType = imageType;
 		this.kernelType = kernelType;
 
-		largeImg = GeneralizedImageOps.createImage(imageType,imageSize,imageSize);
+		largeImg = GeneralizedImageOps.createSingleBand(imageType, imageSize, imageSize);
 
 		addAlgorithm("Deriv X",new DisplayGaussianKernelApp.DerivType(1,0));
 		addAlgorithm("Deriv XX",new DisplayGaussianKernelApp.DerivType(2,0));

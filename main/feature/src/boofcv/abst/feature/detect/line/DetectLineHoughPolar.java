@@ -125,8 +125,8 @@ public class DetectLineHoughPolar<I extends ImageSingleBand, D extends ImageSing
 		this.resolutionAngle = resolutionAngle;
 		this.maxLines = maxLines <= 0 ? Integer.MAX_VALUE : maxLines;
 		extractor = FactoryFeatureExtractor.nonmax(localMaxRadius, minCounts, 0, true, true);
-		derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),1,1);
-		derivY = GeneralizedImageOps.createImage(gradient.getDerivType(), 1, 1);
+		derivX = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), 1, 1);
+		derivY = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), 1, 1);
 	}
 
 	@Override

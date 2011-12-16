@@ -62,7 +62,7 @@ public class VisualizePyramidDiscreteApp <T extends ImageSingleBand>
 
 	public void process( BufferedImage input ) {
 		setInputImage(input);
-		final T gray = ConvertBufferedImage.convertFrom(input,null,imageType);
+		final T gray = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
 		// update the pyramid
 		updater.update(gray,pyramid);

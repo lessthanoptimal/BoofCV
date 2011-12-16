@@ -82,8 +82,8 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 
 	public class Sobel extends PerformerBase
 	{
-		D derivX = GeneralizedImageOps.createImage(derivType,input.width,input.height);
-		D derivY = GeneralizedImageOps.createImage(derivType,input.width,input.height);
+		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
+		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
 		@Override
 		public void process() {
@@ -93,8 +93,8 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 
 	public class Harris extends PerformerBase
 	{
-		D derivX = GeneralizedImageOps.createImage(derivType,input.width,input.height);
-		D derivY = GeneralizedImageOps.createImage(derivType,input.width,input.height);
+		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
+		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 		GeneralFeatureDetector<T,D> detector;
 
 		public Harris() {
@@ -111,8 +111,8 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 
 	public class HoughLine extends PerformerBase
 	{
-		D derivX = GeneralizedImageOps.createImage(derivType,input.width,input.height);
-		D derivY = GeneralizedImageOps.createImage(derivType,input.width,input.height);
+		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
+		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 		DetectLineHoughPolar<T,D> detector;
 
 		public HoughLine() {

@@ -65,7 +65,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		integralType = GIntegralImageOps.getIntegralType(imageType);
 
-		image = GeneralizedImageOps.createImage(imageType,width,height);
+		image = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		GeneralizedImageOps.randomize(image,rand,0,100);
 

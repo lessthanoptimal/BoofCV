@@ -47,7 +47,7 @@ public class FileImageSequence<T extends ImageSingleBand> implements EvaluationI
 		for (String s : names) {
 			fileNames.add(s);
 		}
-		output = GeneralizedImageOps.createImage(imageType,1,1);
+		output = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		this.imageType = imageType;
 	}
 
@@ -73,7 +73,7 @@ public class FileImageSequence<T extends ImageSingleBand> implements EvaluationI
 	@Override
 	public T getImage() {
 		output.reshape(image.getWidth(), image.getHeight());
-		return ConvertBufferedImage.convertFrom(image,output,imageType);
+		return ConvertBufferedImage.convertFromSingle(image, output, imageType);
 	}
 
 	@Override

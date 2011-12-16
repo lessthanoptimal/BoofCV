@@ -62,7 +62,7 @@ public abstract class DescribePointBrief<T extends ImageSingleBand> {
 		this.definition = definition;
 		this.filterBlur = filterBlur;
 
-		blur = GeneralizedImageOps.createImage(filterBlur.getInputType(),1,1);
+		blur = GeneralizedImageOps.createSingleBand(filterBlur.getInputType(), 1, 1);
 
 		offsets = new int[ definition.samplePoints.length ];
 		offsetsA = new int[ definition.compare.length ];

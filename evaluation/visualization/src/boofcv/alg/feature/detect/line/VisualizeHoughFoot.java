@@ -50,10 +50,10 @@ public class VisualizeHoughFoot<I extends ImageSingleBand, D extends ImageSingle
 	}
 
 	public void process( BufferedImage image ) {
-		I input = GeneralizedImageOps.createImage(imageType,image.getWidth(),image.getHeight());
-		I blur = GeneralizedImageOps.createImage(imageType,image.getWidth(),image.getHeight());
+		I input = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
+		I blur = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
 
-		ConvertBufferedImage.convertFrom(image, input, imageType);
+		ConvertBufferedImage.convertFromSingle(image, input, imageType);
 		GBlurImageOps.gaussian(input, blur, -1, 2, null);
 
 		DetectLineHoughFoot<I,D> alg =  FactoryDetectLine.houghFoot(6, 12, 5, 25, 10, imageType, derivType);

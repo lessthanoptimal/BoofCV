@@ -43,7 +43,7 @@ public class DebugDescribeTransform {
 		int r = alg.getCanonicalRadius()+8;
 		int w = r*2+1;
 
-		T orig = GeneralizedImageOps.createImage(imageType,w,w);
+		T orig = GeneralizedImageOps.createSingleBand(imageType, w, w);
 
 		GeneralizedImageOps.randomize(orig,new Random(123),0,100);
 

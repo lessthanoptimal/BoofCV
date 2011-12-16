@@ -58,7 +58,7 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 		this.filterBlur = filterBlur;
 		this.interp = interp;
 
-		blur = GeneralizedImageOps.createImage(filterBlur.getInputType(),1,1);
+		blur = GeneralizedImageOps.createSingleBand(filterBlur.getInputType(), 1, 1);
 		values = new float[ definition.samplePoints.length ];
 	}
 

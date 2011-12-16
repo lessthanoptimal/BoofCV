@@ -158,6 +158,7 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 		// remove dropped features
 		for( PyramidKltFeature t : trackManager.getDropped() ) {
 			dropped.add( (AssociatedPair)t.cookie);
+			// todo slow way to remove features from a large list
 			if( !active.remove(t.cookie) )
 				throw new IllegalArgumentException("Feature dropped not in active list");
 			t.cookie = null;
@@ -168,10 +169,6 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 			PyramidKltFeature p = t.getDescription();
 			t.currLoc.set(p.x,p.y);
 		}
-
-		if( !trackManager.getSpawned().isEmpty() )
-			throw new RuntimeException("Bug.  nothing should be spawned here");
-
 	}
 
 	@Override
@@ -184,7 +181,11 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 
 	@Override
 	public void dropTrack(AssociatedPair track) {
+		if( !active.remove(track) ) {
+			throw new RuntimeException("Not in active list!");
+		}
 		trackManager.dropTrack( (PyramidKltFeature)track.description );
+		dropped.add(track);
 	}
 
 	@Override

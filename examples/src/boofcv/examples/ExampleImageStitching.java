@@ -154,8 +154,8 @@ public class ExampleImageStitching {
 	public static <T extends ImageSingleBand> void stitch( BufferedImage imageA , BufferedImage imageB ,
 													 Class<T> imageType )
 	{
-		T inputA = ConvertBufferedImage.convertFrom(imageA , null, imageType);
-		T inputB = ConvertBufferedImage.convertFrom(imageB, null, imageType);
+		T inputA = ConvertBufferedImage.convertFromSingle(imageA, null, imageType);
+		T inputB = ConvertBufferedImage.convertFromSingle(imageB, null, imageType);
 
 		// Detect using the standard SURF feature descriptor and describer
 		InterestPointDetector<T> detector = FactoryInterestPoint.fastHessian(1, 2, 400, 1, 9, 4, 4);

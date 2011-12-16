@@ -70,8 +70,8 @@ public abstract class GenericDenoiseTests<T extends ImageSingleBand> {
 	}
 
 	private void declareImages() {
-		image = GeneralizedImageOps.createImage(imageType,width,height);
-		imageDenoised = GeneralizedImageOps.createImage(imageType,width,height);
+		image = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		imageDenoised = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		// render a simple scene
 		GeneralizedImageOps.fill(image,20);

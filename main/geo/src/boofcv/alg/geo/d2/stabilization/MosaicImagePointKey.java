@@ -33,15 +33,16 @@ import java.util.List;
  * @author Peter Abeles
  */
 // todo create a common alg with stabilize?
-	// todo create a class just for rending the point
-	// todo prune features if too close together KLT
-	// todo respawn number realtive to number
+// todo create a class just for rending the point
 public class MosaicImagePointKey<I extends ImageSingleBand> {
-	int maxFeatures = 250;
-	static int thresholdChange = 80;
+
+	int absoluteMinimumTracks = 50;
+	double respawnTrackFraction = 0.5;
+	// number of detected features
+	int totalSpawned;
 
 	// if less than this fraction of the window is convered by features switch views
-	double coverageFrac= 0.80;
+	double respawnCoverageFraction = 0.80;
 	// coverage right after spawning new features
 	double maxCoverage;
 
@@ -50,18 +51,18 @@ public class MosaicImagePointKey<I extends ImageSingleBand> {
 
 	ImagePointTracker<I> tracker;
 	ModelMatcher<Object,AssociatedPair> modelMatcher;
+	PruneCloseTracks pruneClose = new PruneCloseTracks(3,1,1);
 
 	// transform of image to world
 	Homography2D_F32 Hinit = new Homography2D_F32(1,0,0,0,1,0,0,0,1);
 
-	// transform from the key frame ot the world frame
-	Homography2D_F32 keyToWorld = new Homography2D_F32();
-	// transform from current image to key frame
-	Homography2D_F32 currToKey = new Homography2D_F32();
-	// transform from current to world frame
-	Homography2D_F32 currToWorld = new Homography2D_F32();
+	// transform from the world frame to the key frame
+	Homography2D_F32 worldToKey = new Homography2D_F32();
+	// transform from key frame to current frame
+	Homography2D_F32 keyToCurr = new Homography2D_F32();
+	// transform from world to current frame
+	Homography2D_F32 worldToCurr = new Homography2D_F32();
 
-	
 	public MosaicImagePointKey(ImagePointTracker<I> tracker,
 							   ModelMatcher<Object, AssociatedPair> modelMatcher )
 	{
@@ -75,11 +76,11 @@ public class MosaicImagePointKey<I extends ImageSingleBand> {
 
 	public void refocus( Homography2D_F32 oldWorldToNewWorld ) {
 
-		Homography2D_F32 worldToKey = keyToWorld.invert(null);
+		Homography2D_F32 worldToKey = this.worldToKey.invert(null);
 		Hinit.concat(worldToKey, oldWorldToNewWorld);
 
-		keyToWorld.set(Hinit);
-		keyToWorld.concat(currToKey,currToWorld);
+		this.worldToKey.set(Hinit);
+		this.worldToKey.concat(keyToCurr, worldToCurr);
 	}
 
 	public void process( I frame ) {
@@ -90,8 +91,9 @@ public class MosaicImagePointKey<I extends ImageSingleBand> {
 		if( firstFrame ) {
 			firstFrame = false;
 			tracker.spawnTracks();
-			maxCoverage = imageCoverageFraction(frame.width,frame.height,tracker.getActiveTracks());
-			keyToWorld.set(Hinit);
+			maxCoverage = imageCoverageFraction(frame.width,frame.height, tracker.getActiveTracks());
+			worldToKey.set(Hinit);
+			pruneClose.resize(frame.width,frame.height);
 		}
 
 		List<AssociatedPair> pairs = tracker.getActiveTracks();
@@ -100,26 +102,46 @@ public class MosaicImagePointKey<I extends ImageSingleBand> {
 			return;
 		}
 
-		convertModelToHomography(currToKey,modelMatcher.getModel());
+		convertModelToHomography(keyToCurr, modelMatcher.getModel());
 
-		keyToWorld.concat(currToKey,currToWorld);
+		worldToKey.concat(keyToCurr, worldToCurr);
 
-		if( imageCoverageFraction(frame.width,frame.height,pairs) < coverageFrac*maxCoverage ||
-				modelMatcher.getMatchSet().size() < thresholdChange ) {
-			keyFrameChanged = true;
-			tracker.setCurrentToKeyFrame();
-			tracker.spawnTracks();
-			maxCoverage = imageCoverageFraction(frame.width,frame.height,tracker.getActiveTracks());
-			keyToWorld.set(currToWorld);
+		double fractionCovered = imageCoverageFraction(frame.width,frame.height,pairs);
+		int matchSetSize = modelMatcher.getMatchSet().size();
+
+		if( fractionCovered < respawnCoverageFraction *maxCoverage ||
+				matchSetSize <absoluteMinimumTracks || matchSetSize < totalSpawned* respawnTrackFraction) {
+			System.out.println("change key frame: "+(fractionCovered/maxCoverage)+"  "+matchSetSize);
+			spawnTracks(frame.width,frame.height);
+			worldToKey.set(worldToCurr);
 		}
 	}
 
-	public Homography2D_F32 getCurrToWorld() {
-		return currToWorld;
+	private void spawnTracks( int width , int height ) {
+		keyFrameChanged = true;
+		tracker.setCurrentToKeyFrame();
+		tracker.spawnTracks();
+		maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
+
+		// for some trackers like KLT, they keep old features and these features can get squeezed together
+		// this will remove some of the really close features
+		if( maxCoverage < respawnCoverageFraction) {
+			// prune some of the ones which are too close
+			pruneClose.process(tracker);
+			// see if it can find some more in diverse locations
+			tracker.spawnTracks();
+			maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
+		}
+
+		totalSpawned = tracker.getActiveTracks().size();
 	}
 
-	public Homography2D_F32 getKeyToWorld() {
-		return keyToWorld;
+	public Homography2D_F32 getWorldToCurr() {
+		return worldToCurr;
+	}
+
+	public Homography2D_F32 getWorldToKey() {
+		return worldToKey;
 	}
 
 	public ImagePointTracker<I> getTracker() {
@@ -146,7 +168,7 @@ public class MosaicImagePointKey<I extends ImageSingleBand> {
 			if( p.currLoc.y >= y1 )
 				y1 = p.currLoc.y;
 		}
-		return ((x1-x0)*(y1-x0))/(width*height);
+		return ((x1-x0)*(y1-y0))/(width*height);
 	}
 
 	private void convertModelToHomography( Homography2D_F32 currToKey , Object m ) {

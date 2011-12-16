@@ -57,7 +57,7 @@ public abstract class GeneralDetectLineTests {
 	}
 
 	private <T extends ImageSingleBand> void obviousLine( Class<T> imageType ) {
-		T input = GeneralizedImageOps.createImage(imageType,width,height);
+		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		GeneralizedImageOps.fillRectangle(input,30,0,0,lineLocation,height);
 
@@ -86,7 +86,7 @@ public abstract class GeneralDetectLineTests {
 	}
 
 	private <T extends ImageSingleBand> void subImages( Class<T> imageType ) {
-		T input = GeneralizedImageOps.createImage(imageType,width,height);
+		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		GeneralizedImageOps.fillRectangle(input,30,0,0,lineLocation,height);
 		T sub = BoofTesting.createSubImageOf(input);

@@ -108,7 +108,7 @@ public class BoofTesting {
 			Class params[] = m.getParameterTypes();
 			Object[] inputs = new Object[params.length];
 			for (int i = 0; i < params.length; i++) {
-				inputs[i] = GeneralizedImageOps.createImage(params[i], 10, 20);
+				inputs[i] = GeneralizedImageOps.createSingleBand(params[i], 10, 20);
 			}
 
 			try {
@@ -123,9 +123,9 @@ public class BoofTesting {
 			for (int target = 0; target < params.length; target++) {
 				for (int i = 0; i < params.length; i++) {
 					if (i != target)
-						inputs[i] = GeneralizedImageOps.createImage(params[i], 10, 20);
+						inputs[i] = GeneralizedImageOps.createSingleBand(params[i], 10, 20);
 					else
-						inputs[i] = GeneralizedImageOps.createImage(params[i], 11, 22);
+						inputs[i] = GeneralizedImageOps.createSingleBand(params[i], 11, 22);
 				}
 
 				try {

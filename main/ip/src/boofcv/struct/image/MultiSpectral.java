@@ -48,7 +48,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageBase<MultiSpe
 		bands = (T[]) Array.newInstance(type, numBands);
 
 		for (int i = 0; i < numBands; i++) {
-			bands[i] = GeneralizedImageOps.createImage(type, width, height);
+			bands[i] = GeneralizedImageOps.createSingleBand(type, width, height);
 		}
 	}
 

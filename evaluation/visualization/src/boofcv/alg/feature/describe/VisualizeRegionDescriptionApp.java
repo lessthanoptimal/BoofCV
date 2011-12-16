@@ -82,7 +82,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 	}
 
 	public void process( final BufferedImage image ) {
-		input = ConvertBufferedImage.convertFrom(image,null,imageType);
+		input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 		if( describe != null ) {
 			describe.setImage(input);
 		}

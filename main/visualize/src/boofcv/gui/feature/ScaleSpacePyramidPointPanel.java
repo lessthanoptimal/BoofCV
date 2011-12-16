@@ -82,7 +82,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 		if( level > 0 ) {
 
 			ImageSingleBand small = ss.getLayer(level-1);
-			ImageSingleBand enlarge = GeneralizedImageOps.createImage(small.getClass(),ss.getInputWidth(),ss.getInputHeight());
+			ImageSingleBand enlarge = GeneralizedImageOps.createSingleBand(small.getClass(), ss.getInputWidth(), ss.getInputHeight());
 			DistortImageOps.scale(small,enlarge, TypeInterpolate.NEAREST_NEIGHBOR);
 
 			// if the size isn't the same null it so a new image will be declared

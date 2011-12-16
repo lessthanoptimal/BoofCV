@@ -109,4 +109,20 @@ public class DistortSupport {
 			throw new IllegalArgumentException("Image type not supported: "+imageType.getSimpleName());
 		}
 	}
+
+	/**
+	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
+	 * and interpolation instance.
+	 *
+	 * @param dstToSrc Transform from dst to src image.
+	 * @param border
+	 */
+	public static <T extends ImageSingleBand>
+	ImageDistort<MultiSpectral<T>> createDistortMS(Class<T> imageType,
+												   PixelTransform_F32 dstToSrc,
+												   InterpolatePixel<T> interp, ImageBorder border)
+	{
+		ImageDistort<T> bandDistort = createDistort(imageType,dstToSrc,interp,border);
+		return new ImplImageDistort_MS<T>(bandDistort);
+	}
 }

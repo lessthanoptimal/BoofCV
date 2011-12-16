@@ -54,9 +54,9 @@ public class TestImplHessianBlobIntensity {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand derivXX = GeneralizedImageOps.createImage(param[1],width,height);
-			ImageSingleBand derivYY = GeneralizedImageOps.createImage(param[1],width,height);
-			ImageSingleBand derivXY = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageSingleBand derivXX = GeneralizedImageOps.createSingleBand(param[1], width, height);
+			ImageSingleBand derivYY = GeneralizedImageOps.createSingleBand(param[1], width, height);
+			ImageSingleBand derivXY = GeneralizedImageOps.createSingleBand(param[1], width, height);
 			ImageFloat32 intensity = new ImageFloat32(width,height);
 
 			GeneralizedImageOps.randomize(derivXX,rand,-10,10);
@@ -96,8 +96,8 @@ public class TestImplHessianBlobIntensity {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand derivXX = GeneralizedImageOps.createImage(param[1],width,height);
-			ImageSingleBand derivYY = GeneralizedImageOps.createImage(param[1],width,height);
+			ImageSingleBand derivXX = GeneralizedImageOps.createSingleBand(param[1], width, height);
+			ImageSingleBand derivYY = GeneralizedImageOps.createSingleBand(param[1], width, height);
 			ImageFloat32 intensity = new ImageFloat32(width,height);
 
 			GeneralizedImageOps.randomize(derivXX,rand,-10,10);

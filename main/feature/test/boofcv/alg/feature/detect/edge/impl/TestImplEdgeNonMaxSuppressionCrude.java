@@ -38,8 +38,8 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 output = new ImageFloat32(width,height);
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		input.set(2,2,20);
 		input.set(1,1,30);
@@ -117,8 +117,8 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 output = new ImageFloat32(width,height);
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		Random rand = new Random(123);
 		GeneralizedImageOps.randomize(input,rand,0,30);

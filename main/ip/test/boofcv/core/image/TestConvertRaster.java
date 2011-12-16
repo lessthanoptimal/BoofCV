@@ -129,7 +129,7 @@ public class TestConvertRaster {
 
 		input = createBufferedTestImages(paramTypes[0]);
 
-		ImageSingleBand output = GeneralizedImageOps.createImage(paramTypes[1],imgWidth,imgHeight);
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[1], imgWidth, imgHeight);
 
 		for( int i = 0; i < input.length; i++ ) {
 			BoofTesting.checkSubImage(this, "performBufferedTo", true, m,input[i],output);
@@ -177,7 +177,7 @@ public class TestConvertRaster {
 
 		Class paramTypes[] = m.getParameterTypes();
 
-		ImageSingleBand input = GeneralizedImageOps.createImage(paramTypes[0],imgWidth,imgHeight);
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], imgWidth, imgHeight);
 		GeneralizedImageOps.randomize(input, rand, 0,50);
 
 		BufferedImage output[] = createBufferedTestImages(paramTypes[1]);

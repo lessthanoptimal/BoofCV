@@ -176,9 +176,28 @@ public class ConvertBufferedImage {
 
 	/**
 	 * Converts a buffered image into an image of the specified type.  In a 'dst' image is provided
+	 * it will be used for output.
+	 * 
+	 * @param src Input BufferedImage which is to be converted
+	 * @param dst The image which it is being converted into   
+	 */
+	public static <T extends ImageBase> void convertFrom(BufferedImage src, T dst ) {
+		if( dst instanceof ImageSingleBand ) {
+			ImageSingleBand sb = (ImageSingleBand)dst;
+			convertFromSingle(src, sb, (Class<ImageSingleBand>) sb.getClass());
+		} else if( dst instanceof MultiSpectral ) {
+			MultiSpectral ms = (MultiSpectral)dst;
+			convertFromMulti(src,ms,ms.getType());
+		} else {
+			throw new IllegalArgumentException("Unknown type " + dst.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Converts a buffered image into an image of the specified type.  In a 'dst' image is provided
 	 * it will be used for output, otherwise a new image will be created.
 	 */
-	public static <T extends ImageSingleBand> T convertFrom(BufferedImage src, T dst, Class<T> type) {
+	public static <T extends ImageSingleBand> T convertFromSingle(BufferedImage src, T dst, Class<T> type) {
 		if (type == ImageUInt8.class) {
 			return (T) convertFrom(src, (ImageUInt8) dst);
 		} else if (type == ImageFloat32.class) {
@@ -316,33 +335,29 @@ public class ConvertBufferedImage {
 	 * @param dst Where the converted image is written to.  If null a new image is created.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo( ImageSingleBand src, BufferedImage dst) {
-		if( ImageUInt8.class == src.getClass() ) {
-			return convertTo((ImageUInt8)src,dst);
-		} else if( ImageSInt16.class == src.getClass() ) {
-			return convertTo((ImageSInt16)src,dst);
-		} else if( ImageFloat32.class == src.getClass() ) {
-			return convertTo((ImageFloat32)src,dst);
-		} else {
-			throw new IllegalArgumentException("Image type is not yet supported: "+src.getClass().getSimpleName());
+	public static BufferedImage convertTo( ImageBase src, BufferedImage dst) {
+		if( src instanceof ImageSingleBand ) {
+			if( ImageUInt8.class == src.getClass() ) {
+				return convertTo((ImageUInt8)src,dst);
+			} else if( ImageSInt16.class == src.getClass() ) {
+				return convertTo((ImageSInt16)src,dst);
+			} else if( ImageFloat32.class == src.getClass() ) {
+				return convertTo((ImageFloat32)src,dst);
+			} else {
+				throw new IllegalArgumentException("ImageSingleBand type is not yet supported: "+src.getClass().getSimpleName());
+			}
+		} else if( src instanceof MultiSpectral ) {
+			MultiSpectral ms = (MultiSpectral)src;
+			if( ImageUInt8.class == ms.getType() ) {
+				return convertTo_U8((MultiSpectral<ImageUInt8>) ms, dst);
+			} else if( ImageFloat32.class == ms.getType() ) {
+				return convertTo_F32((MultiSpectral<ImageFloat32>) ms, dst);
+			} else {
+				throw new IllegalArgumentException("MultiSpectral type is not yet supported: "+ ms.getType().getSimpleName());
+			}
 		}
-	}
 
-	/**
-	 * Converts an image which extends {@link boofcv.struct.image.ImageSingleBand} into a BufferedImage.
-	 *
-	 * @param src Input image.  Pixels must have a value from 0 to 255.
-	 * @param dst Where the converted image is written to.  If null a new image is created.
-	 * @return Converted image.
-	 */
-	public static BufferedImage convertTo( MultiSpectral src, BufferedImage dst) {
-		if( ImageUInt8.class == src.getType() ) {
-			return convertTo_U8((MultiSpectral<ImageUInt8>) src, dst);
-		} else if( ImageFloat32.class == src.getType() ) {
-			return convertTo_F32((MultiSpectral<ImageFloat32>) src, dst);
-		} else {
-			throw new IllegalArgumentException("Image type is not yet supported: "+src.getClass().getSimpleName());
-		}
+		throw new IllegalArgumentException("Image type is not yet supported: "+src.getClass().getSimpleName());
 	}
 
 	/**

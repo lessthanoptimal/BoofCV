@@ -41,7 +41,7 @@ public class InputSanityCheck {
 	public static <T extends ImageSingleBand> T checkReshape( T target , ImageSingleBand testImage , Class<T> targetType )
 	{
 		if( target == null ) {
-			return GeneralizedImageOps.createImage(targetType,testImage.width,testImage.height);
+			return GeneralizedImageOps.createSingleBand(targetType, testImage.width, testImage.height);
 		} else if( target.width != testImage.width || target.height != testImage.height ) {
 			target.reshape(testImage.width,testImage.height);
 		}
@@ -62,7 +62,7 @@ public class InputSanityCheck {
 
 	public static <T extends ImageSingleBand> T checkDeclare(ImageSingleBand<?> input, T output , Class<T> outputType ) {
 		if (output == null) {
-			output = (T) GeneralizedImageOps.createImage(outputType,input.width, input.height);
+			output = (T) GeneralizedImageOps.createSingleBand(outputType, input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)
 			throw new IllegalArgumentException("Width and/or height of input and output do not match.");
 		return output;

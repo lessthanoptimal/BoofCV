@@ -124,7 +124,7 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageSingleBand, D extends 
 	public void process( final BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
-		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		ss.setImage(workImage);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

@@ -58,8 +58,8 @@ public class OrientationEvaluator <T extends ImageSingleBand,D extends ImageSing
 	@Override
 	public void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_F64> points) {
 		if( derivX == null ) {
-			derivX = GeneralizedImageOps.createImage(gradient.getDerivType(),image.width,image.height);
-			derivY = GeneralizedImageOps.createImage(gradient.getDerivType(),image.width,image.height);
+			derivX = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), image.width, image.height);
+			derivY = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), image.width, image.height);
 		} else {
 			derivX.reshape(image.width,image.height);
 			derivY.reshape(image.width,image.height);

@@ -52,7 +52,7 @@ public class GenericOrientationImageTests<T extends ImageSingleBand> {
 		this.regionSize = regionSize;
 		this.alg = alg;
 
-		image = GeneralizedImageOps.createImage(imageType,width,height);
+		image = GeneralizedImageOps.createSingleBand(imageType, width, height);
 	}
 
 	/**

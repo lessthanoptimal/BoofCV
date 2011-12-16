@@ -54,7 +54,7 @@ public class DisplayGaussianKernelApp<T extends ImageSingleBand> extends SelectA
 	public DisplayGaussianKernelApp( Class<T> imageType ) {
 		this.imageType = imageType;
 
-		largeImg = GeneralizedImageOps.createImage(imageType,imageSize,imageSize);
+		largeImg = GeneralizedImageOps.createSingleBand(imageType, imageSize, imageSize);
 		addAlgorithm("Gaussian",new DerivType(0,0));
 		addAlgorithm("Deriv X",new DerivType(1,0));
 		addAlgorithm("Deriv XX",new DerivType(2,0));

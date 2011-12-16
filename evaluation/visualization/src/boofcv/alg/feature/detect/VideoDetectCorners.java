@@ -77,8 +77,8 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 
 		if( detector.getRequiresGradient() ) {
 			if (derivX == null) {
-				derivX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
-				derivY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+				derivX = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
+				derivY = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
 			}
 
 			// compute the image gradient
@@ -87,9 +87,9 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 
 		if( detector.getRequiresHessian() ) {
 			if (derivXX == null) {
-				derivXX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
-				derivYY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
-				derivXY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+				derivXX = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
+				derivYY = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
+				derivXY = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
 			}
 
 			// compute the image gradient

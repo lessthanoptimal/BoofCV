@@ -37,6 +37,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+// TODO rename to GImageOps ?
 public class GeneralizedImageOps {
 
 	/**
@@ -51,7 +52,7 @@ public class GeneralizedImageOps {
 	public static <T extends ImageSingleBand> T convert( ImageSingleBand<?> src , T dst , Class<T> typeDst  )
 	{
 		if (dst == null) {
-			dst =(T) createImage(typeDst,src.width, src.height);
+			dst =(T) createSingleBand(typeDst, src.width, src.height);
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}
@@ -169,39 +170,59 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void addGaussian(ImageSingleBand img, Random rand, double sigma , double min , double max ) {
-		if (img.getClass() == ImageUInt8.class ) {
-			ImageTestingOps.addGaussian((ImageUInt8) img, rand, sigma , (int)min , (int)max );
-		} else if (img.getClass() == ImageSInt8.class ) {
-			ImageTestingOps.addGaussian((ImageSInt8) img, rand, sigma , (int)min , (int)max);
-		} else if (img.getClass() == ImageUInt16.class ) {
-			ImageTestingOps.addGaussian((ImageUInt16) img, rand, sigma , (int)min , (int)max);
-		} else if (img.getClass() == ImageSInt16.class ) {
-			ImageTestingOps.addGaussian((ImageSInt16) img, rand, sigma , (int)min , (int)max);
-		} else if (img.getClass() == ImageSInt32.class ) {
-			ImageTestingOps.addGaussian((ImageSInt32) img, rand, sigma , (int)min , (int)max);
-		} else if (img.getClass() == ImageFloat32.class) {
-			ImageTestingOps.addGaussian((ImageFloat32) img, rand, sigma , (float)min , (float)max);
-		} else if (img.getClass() == ImageFloat64.class) {
-			ImageTestingOps.addGaussian((ImageFloat64) img, rand, sigma , (double)min , (double)max);
+	public static void addGaussian(ImageBase img, Random rand, double sigma , double min , double max ) {
+		if( img instanceof ImageSingleBand ) {
+			if (img.getClass() == ImageUInt8.class ) {
+				ImageTestingOps.addGaussian((ImageUInt8) img, rand, sigma , (int)min , (int)max );
+			} else if (img.getClass() == ImageSInt8.class ) {
+				ImageTestingOps.addGaussian((ImageSInt8) img, rand, sigma , (int)min , (int)max);
+			} else if (img.getClass() == ImageUInt16.class ) {
+				ImageTestingOps.addGaussian((ImageUInt16) img, rand, sigma , (int)min , (int)max);
+			} else if (img.getClass() == ImageSInt16.class ) {
+				ImageTestingOps.addGaussian((ImageSInt16) img, rand, sigma , (int)min , (int)max);
+			} else if (img.getClass() == ImageSInt32.class ) {
+				ImageTestingOps.addGaussian((ImageSInt32) img, rand, sigma , (int)min , (int)max);
+			} else if (img.getClass() == ImageFloat32.class) {
+				ImageTestingOps.addGaussian((ImageFloat32) img, rand, sigma , (float)min , (float)max);
+			} else if (img.getClass() == ImageFloat64.class) {
+				ImageTestingOps.addGaussian((ImageFloat64) img, rand, sigma , (double)min , (double)max);
+			} else {
+				throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
+			}
+		} else if( img instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)img;
+			int N = m.getNumBands();
+			for( int i = 0; i < N; i++ ) {
+				addGaussian(m.getBand(i), rand, sigma, min, max);
+			}
 		} else {
 			throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
 		}
 	}
 
-	public static void randomize(ImageSingleBand img, Random rand, int min, int max) {
-		if (img.getClass() == ImageUInt8.class || img.getClass() == ImageSInt8.class ) {
-			ImageTestingOps.randomize((ImageInt8) img, rand, min, max);
-		} else if (img.getClass() == ImageSInt16.class || img.getClass() == ImageUInt16.class) {
-			ImageTestingOps.randomize((ImageInt16) img, rand, min, max);
-		} else if (img.getClass() == ImageSInt32.class ) {
-			ImageTestingOps.randomize((ImageSInt32) img, rand, min, max);
-		} else if (img.getClass() == ImageSInt64.class ) {
-			ImageTestingOps.randomize((ImageSInt64) img, rand, min, max);
-		} else if (img.getClass() == ImageFloat32.class) {
-			ImageTestingOps.randomize((ImageFloat32) img, rand, min, max);
-		} else if (img.getClass() == ImageFloat64.class) {
-			ImageTestingOps.randomize((ImageFloat64) img, rand, min, max);
+	public static void randomize(ImageBase img, Random rand, int min, int max) {
+		if( img instanceof ImageSingleBand ) {
+			if (img.getClass() == ImageUInt8.class || img.getClass() == ImageSInt8.class ) {
+				ImageTestingOps.randomize((ImageInt8) img, rand, min, max);
+			} else if (img.getClass() == ImageSInt16.class || img.getClass() == ImageUInt16.class) {
+				ImageTestingOps.randomize((ImageInt16) img, rand, min, max);
+			} else if (img.getClass() == ImageSInt32.class ) {
+				ImageTestingOps.randomize((ImageSInt32) img, rand, min, max);
+			} else if (img.getClass() == ImageSInt64.class ) {
+				ImageTestingOps.randomize((ImageSInt64) img, rand, min, max);
+			} else if (img.getClass() == ImageFloat32.class) {
+				ImageTestingOps.randomize((ImageFloat32) img, rand, min, max);
+			} else if (img.getClass() == ImageFloat64.class) {
+				ImageTestingOps.randomize((ImageFloat64) img, rand, min, max);
+			} else {
+				throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
+			}
+		} else if( img instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)img;
+			int N = m.getNumBands();
+			for( int i = 0; i < N; i++ ) {
+				randomize(m.getBand(i),rand,min,max);
+			}
 		} else {
 			throw new RuntimeException("Unknown type: "+img.getClass().getSimpleName());
 		}
@@ -231,25 +252,33 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void fill(ImageSingleBand img, double value) {
-		if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
-			ImageTestingOps.fill((ImageInt8)img,(int)value);
-		} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
-			ImageTestingOps.fill((ImageInt16)img,(int)value);
-		} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
-			ImageTestingOps.fill((ImageSInt32)img,(int)value);
-		} else if ( ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
-			ImageTestingOps.fill((ImageSInt64)img,(int)value);
-		} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
-			ImageTestingOps.fill((ImageFloat32)img,(float)value);
-		} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
-			ImageTestingOps.fill((ImageFloat64)img,value);
+	public static void fill( ImageBase img, double value) {
+		if( img instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.fill((ImageInt8)img,(int)value);
+			} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.fill((ImageInt16)img,(int)value);
+			} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.fill((ImageSInt32)img,(int)value);
+			} else if ( ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.fill((ImageSInt64)img,(int)value);
+			} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.fill((ImageFloat32)img,(float)value);
+			} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.fill((ImageFloat64)img,value);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+			}
+		} else if( img instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)img;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				fill(m.getBand(i),value);
 		} else {
-			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unknown image type: " + img.getClass().getSimpleName());
 		}
 	}
 
-	public static <T extends ImageSingleBand> T createImage(Class<T> type, int width, int height) {
+	public static <T extends ImageSingleBand> T createSingleBand(Class<T> type, int width, int height) {
 		type = BoofTesting.convertGenericToSpecificType(type);
 
 		if (type == ImageUInt8.class) {

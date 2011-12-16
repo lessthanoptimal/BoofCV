@@ -69,7 +69,7 @@ public class ExamplePyramidFloat<T extends ImageSingleBand> {
 	 * Updates and displays the pyramid.
 	 */
 	public void process( BufferedImage image ) {
-		T input = ConvertBufferedImage.convertFrom(image,null,imageType);
+		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 		updater.update(input,pyramid);
 
 		ImagePyramidPanel<T> gui = new ImagePyramidPanel<T>();

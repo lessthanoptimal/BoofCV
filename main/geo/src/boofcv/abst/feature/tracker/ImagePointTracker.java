@@ -88,6 +88,8 @@ public interface ImagePointTracker <T extends ImageSingleBand> {
 	 *
 	 * @param track The track which is to be dropped
 	 */
+	// todo more efficient way to drop tracks
+	// this will be slow since it need to searh through the whole list
 	public void dropTrack(AssociatedPair track);
 
 	/**

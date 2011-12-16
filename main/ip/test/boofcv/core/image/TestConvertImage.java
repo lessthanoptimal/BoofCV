@@ -64,8 +64,8 @@ public class TestConvertImage {
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {
-		ImageSingleBand input = GeneralizedImageOps.createImage(inputType,imgWidth,imgHeight);
-		ImageSingleBand output = GeneralizedImageOps.createImage(outputType,imgWidth,imgHeight);
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, imgWidth, imgHeight);
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
 
 		boolean inputSigned = true;
 		boolean outputSigned = true;

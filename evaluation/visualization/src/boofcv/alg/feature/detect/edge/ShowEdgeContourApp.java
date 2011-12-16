@@ -89,7 +89,7 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 	public void process( BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
-		workImage = ConvertBufferedImage.convertFrom(input, null, imageType);
+		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
 		// update the binary histogram threshold for this image
 		final double threshold = GPixelMath.sum(workImage)/(workImage.width*workImage.height);

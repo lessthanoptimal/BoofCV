@@ -35,7 +35,7 @@ public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<
 
 	// the blur function inside of BlurImageOps being invoked
 	private Method m;
-	// the Gaussians standard deviation
+	// the Gaussian's standard deviation
 	private double sigma;
 	// size of the blur region
 	private int radius;
