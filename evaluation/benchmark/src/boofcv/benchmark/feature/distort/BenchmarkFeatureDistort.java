@@ -63,7 +63,7 @@ public abstract class BenchmarkFeatureDistort<T extends ImageSingleBand> {
 		this.variable = variable;
 		this.variableName = variableName;
 
-		distortedImage = GeneralizedImageOps.createImage(imageType,1,1);
+		distortedImage = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 	}
 
 	public void setAlg(BenchmarkAlgorithm alg) {
@@ -75,7 +75,7 @@ public abstract class BenchmarkFeatureDistort<T extends ImageSingleBand> {
 	}
 
 	public List<MetricResult> evaluate( BufferedImage original ) {
-		T image = ConvertBufferedImage.convertFrom(original,null,imageType);
+		T image = ConvertBufferedImage.convertFromSingle(original, null, imageType);
 
 		evaluator.extractInitial(alg,image);
 

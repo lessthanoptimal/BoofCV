@@ -49,8 +49,8 @@ public class TestHoughTransformLineFootOfNorm {
 
 	private <D extends ImageSingleBand> void obviousLines( Class<D> derivType ) {
 		ImageUInt8 binary = new ImageUInt8(width,height);
-		D derivX = GeneralizedImageOps.createImage(derivType,width, height);
-		D derivY = GeneralizedImageOps.createImage(derivType,width, height);
+		D derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		D derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		for( int i = 0; i < height; i++ ) {
 			binary.set(5, i, 1);

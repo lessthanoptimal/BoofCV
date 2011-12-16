@@ -59,7 +59,7 @@ public class PstWrapperSurf<I extends ImageSingleBand,II extends ImageSingleBand
 		this.orientation = orientation;
 		this.describe = describe;
 		this.assoc = assoc;
-		this.integralImage = GeneralizedImageOps.createImage(integralType,1,1);
+		this.integralImage = GeneralizedImageOps.createSingleBand(integralType, 1, 1);
 		setPruneThreshold(20);
 	}
 

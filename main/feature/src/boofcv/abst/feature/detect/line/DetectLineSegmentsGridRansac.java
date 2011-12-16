@@ -62,8 +62,8 @@ public class DetectLineSegmentsGridRansac<T extends ImageSingleBand, D extends I
 		this.gradient = gradient;
 		this.edgeThreshold = edgeThreshold;
 
-		derivX = GeneralizedImageOps.createImage(derivType,1,1);
-		derivY = GeneralizedImageOps.createImage(derivType,1,1);
+		derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
+		derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 		edgeIntensity = new ImageFloat32(1,1);
 		detected = new ImageUInt8(1,1);
 	}

@@ -90,8 +90,8 @@ public class TestConvolveImageStandard {
 	private void testMethod( Method m ) {
 		Class param[] = m.getParameterTypes();
 
-		ImageSingleBand input = GeneralizedImageOps.createImage(param[1],width,height);
-		ImageSingleBand output = GeneralizedImageOps.createImage(param[2],width,height);
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[1], width, height);
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(param[2], width, height);
 
 		GeneralizedImageOps.randomize(input, rand, 1,10);
 

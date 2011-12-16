@@ -247,7 +247,7 @@ public class VideoStabilizePointApp<I extends ImageSingleBand, D extends ImageSi
 	}
 
 	@Override
-	protected void updateAlg(I frame) {
+	protected void updateAlg(I frame, BufferedImage buffImage) {
 		stabilizer.process(frame);
 	}
 

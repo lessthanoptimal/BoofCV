@@ -56,7 +56,7 @@ public class VisualizeScaleSpaceApp <T extends ImageSingleBand, D extends ImageS
 
 	public void process(BufferedImage image) {
 		setInputImage(image);
-		T gray = ConvertBufferedImage.convertFrom(image,null,imageType);
+		T gray = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 
 		ss.setImage(gray);
 		gui.reset();

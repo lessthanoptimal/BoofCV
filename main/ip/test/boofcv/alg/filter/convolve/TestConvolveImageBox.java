@@ -83,8 +83,8 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 
 		Class c[] = candidate.getParameterTypes();
 
-		ImageSingleBand input = GeneralizedImageOps.createImage(c[0],width,height);
-		ImageSingleBand output = GeneralizedImageOps.createImage(c[1],width,height);
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(c[0], width, height);
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(c[1], width, height);
 
 		GeneralizedImageOps.randomize(input,rand,0,20);
 

@@ -93,7 +93,7 @@ public class TestImageTestingOps {
 
 	private void testFill( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
-		ImageSingleBand orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		GeneralizedImageOps.randomize(orig, rand, 0,20);
 
 		if( orig.getTypeInfo().isInteger()) {
@@ -112,7 +112,7 @@ public class TestImageTestingOps {
 
 	private void testFillRectangle( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
-		ImageSingleBand orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		int x0 = 2;
 		int y0 = 3;
@@ -138,7 +138,7 @@ public class TestImageTestingOps {
 
 	private void testRandomize( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
-		ImageSingleBand orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		if( orig.getTypeInfo().isInteger() ) {
 			if( orig.getTypeInfo().isSigned() )
@@ -167,7 +167,7 @@ public class TestImageTestingOps {
 
 	private void testAddUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
-		ImageSingleBand orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		GeneralizedImageOps.fill(orig,1);
 
 		if( orig.getTypeInfo().isInteger() ) {
@@ -190,7 +190,7 @@ public class TestImageTestingOps {
 		double mean = 10;
 
 		Class paramTypes[] = m.getParameterTypes();
-		ImageSingleBand orig = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		GeneralizedImageOps.fill(orig,mean);
 		m.invoke(null,orig,rand,2.0,0,255);
@@ -222,7 +222,7 @@ public class TestImageTestingOps {
 	private void testComputeMSE( Method m ) throws InvocationTargetException, IllegalAccessException {
 
 		Class paramTypes[] = m.getParameterTypes();
-		ImageSingleBand imgA = GeneralizedImageOps.createImage(paramTypes[0],width,height);
+		ImageSingleBand imgA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		GeneralizedImageOps.fill(imgA,10);
 		ImageSingleBand imgB = imgA.clone();

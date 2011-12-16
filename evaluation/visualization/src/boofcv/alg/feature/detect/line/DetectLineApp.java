@@ -72,9 +72,9 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		addAlgorithm(0,"Hough Foot Sub Image",FactoryDetectLine.houghFootSub(3, 8, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType));
 		addAlgorithm(0,"Grid Line", FactoryDetectLine.lineRansac(40, 30, 2.36, true, imageType, derivType));
 
-		input = GeneralizedImageOps.createImage(imageType,1,1);
-		inputCorrupted = GeneralizedImageOps.createImage(imageType,1,1);
-		blur = GeneralizedImageOps.createImage(imageType,1,1);
+		input = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		inputCorrupted = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		blur = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();
@@ -90,7 +90,7 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		inputCorrupted.reshape(image.getWidth(),image.getHeight());
 		blur.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFrom(image,input,imageType);
+		ConvertBufferedImage.convertFromSingle(image, input, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

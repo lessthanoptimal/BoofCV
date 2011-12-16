@@ -61,7 +61,7 @@ public class UtilImageIO {
 		if( img == null )
 			return null;
 
-		return ConvertBufferedImage.convertFrom(img,(T)null,imageType);
+		return ConvertBufferedImage.convertFromSingle(img, (T) null, imageType);
 	}
 
 	public static void saveImage(BufferedImage img, String fileName) {

@@ -64,7 +64,7 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 		addAlgorithm(0,"Grid Line", FactoryDetectLine.lineRansac(40, 30, 2.36, true, imageType, derivType));
 
 
-		blur = GeneralizedImageOps.createImage(imageType,1,1);
+		blur = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		gui.addMouseListener(this);
 		gui.requestFocus();
 		setMainGUI(gui);
@@ -109,7 +109,7 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 	}
 
 	@Override
-	protected void updateAlg(final I frame) {
+	protected void updateAlg(final I frame, BufferedImage buffImage) {
 
 		if( lineDetector instanceof DetectLine) {
 			GBlurImageOps.gaussian(frame, blur, -1, blurRadius, null);

@@ -73,7 +73,7 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand, D extends I
 
 	protected abstract void process( SimpleImageSequence<I> sequence );
 
-	protected abstract void updateAlg( I frame );
+	protected abstract void updateAlg(I frame, BufferedImage buffImage );
 
 	protected abstract void updateAlgGUI( I frame , BufferedImage imageGUI , double fps );
 
@@ -113,13 +113,14 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand, D extends I
 
 					if( sequence.hasNext() ) {
 						I frame = sequence.next();
+						BufferedImage buffImage = sequence.getGuiImage();
 
 						long startTracker = System.nanoTime();
-						updateAlg(frame);
+						updateAlg(frame, buffImage);
 						totalTrackerTime += System.nanoTime()-startTracker;
 						totalFrames++;
 
-						updateAlgGUI(frame,sequence.getGuiImage(),1e9/(totalTrackerTime/totalFrames));
+						updateAlgGUI(frame,buffImage,1e9/(totalTrackerTime/totalFrames));
 
 						gui.repaint();
 

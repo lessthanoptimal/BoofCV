@@ -40,7 +40,7 @@ public class JpegByteImageSequence<T extends ImageSingleBand> implements SimpleI
 		this.jpegData = jpegData;
 		this.loop = loop;
 
-		output = GeneralizedImageOps.createImage(imageType,1,1);
+		output = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class JpegByteImageSequence<T extends ImageSingleBand> implements SimpleI
 		}
 
 		output.reshape(imageGUI.getWidth(),imageGUI.getHeight());
-		ConvertBufferedImage.convertFrom(imageGUI,output, imageType);
+		ConvertBufferedImage.convertFromSingle(imageGUI, output, imageType);
 
 		return output;
 	}

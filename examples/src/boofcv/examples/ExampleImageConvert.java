@@ -51,14 +51,14 @@ public class ExampleImageConvert {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	void convertBufferedImage(BufferedImage input, Class<T> imageType, Class<D> derivType) {
 		// If the gray scale image has a pixel range that includes 0 to 255 then it can
-		T gray = ConvertBufferedImage.convertFrom(input,null,imageType);
+		T gray = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
 		// Can also pass in an image instead of having the function declare one each time
-		// T gray = GeneralizedImageOps.createImage(imageType,input.getWidth(),input.getHeight());
-		// ConvertBufferedImage.convertFrom(input,gray,imageType);
+		// T gray = GeneralizedImageOps.createSingleBand(imageType,input.getWidth(),input.getHeight());
+		// ConvertBufferedImage.convertFromSingle(input,gray,imageType);
 
-		D derivX = GeneralizedImageOps.createImage(derivType,input.getWidth(),input.getHeight());
-		D derivY = GeneralizedImageOps.createImage(derivType,input.getWidth(),input.getHeight());
+		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.getWidth(), input.getHeight());
+		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.getWidth(), input.getHeight());
 
 		GImageDerivativeOps.sobel(gray,derivX,derivY, BorderType.EXTENDED);
 

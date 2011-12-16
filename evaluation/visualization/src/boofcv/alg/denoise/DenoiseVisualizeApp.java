@@ -117,12 +117,12 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 //		waveletList.add(FactoryWaveletDaub.biorthogonal_F32(5, BorderType.WRAP));
 		waveletDesc = waveletList.get(0);
 
-		input = GeneralizedImageOps.createImage(imageType,1,1);
-		noisy = GeneralizedImageOps.createImage(imageType,1,1);
-		output = GeneralizedImageOps.createImage(imageType,1,1);
+		input = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		noisy = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		output = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
-		deriv = GeneralizedImageOps.createImage(derivType,1,1);
+		deriv = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 
 		gui.setLayout(new BorderLayout());
 		gui.add(info,BorderLayout.WEST);
@@ -143,7 +143,7 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 		output.reshape(input.width,input.height);
 		deriv.reshape(input.width,input.height);
 
-		ConvertBufferedImage.convertFrom(image,input,imageType);
+		ConvertBufferedImage.convertFromSingle(image, input, imageType);
 
 		// add noise to the image
 		noisy.setTo(input);

@@ -72,7 +72,7 @@ public class WaveletVisualizeApp
 	public void process( BufferedImage input ) {
 		setInputImage(input);
 		
-		image = ConvertBufferedImage.convertFrom(input,null,imageType);
+		image = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		imageInv = (T)image._createNew(image.width,image.height);
 
 		SwingUtilities.invokeLater(new Runnable() {

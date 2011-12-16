@@ -99,10 +99,10 @@ public class TestConvolveWithBorderSparse {
 		Class inputType = borderToInputType(borderType);
 		Class outputType = borderToOutputType(borderType);
 
-		ImageSingleBand input = GeneralizedImageOps.createImage(inputType,width,height);
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, width, height);
 		GeneralizedImageOps.randomize(input,rand,0,20);
 
-		ImageSingleBand expected = GeneralizedImageOps.createImage(outputType,width,height);
+		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(outputType, width, height);
 		Object kernel = createKernel(kernelType,2);
 		ImageBorder border = createBorder(borderType);
 

@@ -19,6 +19,13 @@ Version : Alpha 0.3
 - Added to BinaryImageOps
   * label to clusters
   * clusters to binary
+- Renamed ImageBase to ImageSingleBand
+- Created a new ImageBase
+- Flushed out MultSpectral image type more and extended ImageBase
+  * Created functions to convert to and from BufferedImage
+- Changed behavior of several functions in GeneralizedImageOps to include
+  MultiSpectral images
+  * refactor createImage -> createSingleBand 
 
 ---------------------------------------------
 Date    : 2011/12/01 

@@ -75,9 +75,9 @@ public abstract class PermuteWaveletCompare {
 			heightOut = t;
 		}
 
-		ImageSingleBand input = GeneralizedImageOps.createImage(inputType,widthIn,heightIn);
-		ImageSingleBand found = GeneralizedImageOps.createImage(outputType,widthOut,heightOut);
-		ImageSingleBand expected = GeneralizedImageOps.createImage(outputType,widthOut,heightOut);
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, widthIn, heightIn);
+		ImageSingleBand found = GeneralizedImageOps.createSingleBand(outputType, widthOut, heightOut);
+		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(outputType, widthOut, heightOut);
 
 		GeneralizedImageOps.randomize(input, rand, 0 , 50);
 

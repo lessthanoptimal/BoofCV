@@ -92,7 +92,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 	}
 
 	@Test
-	public void testTrackDrop() {
+	public void testUpdateTrackDrop() {
 		tracker = createTracker();
 		addTracks(5);
 		assertEquals(5,tracker.getActiveTracks().size());
@@ -102,6 +102,19 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 
 		assertEquals(0,tracker.getActiveTracks().size());
 		assertEquals(5,tracker.getDroppedTracks().size());
+	}
+	
+	@Test
+	public void testRequestDrop() {
+		tracker = createTracker();
+		addTracks(5);
+		
+		List<AssociatedPair> tracks = tracker.getActiveTracks();
+		
+		tracker.dropTrack(tracks.get(2));
+		
+		assertEquals(4,tracker.getActiveTracks().size());
+		assertEquals(1,tracker.getDroppedTracks().size());
 	}
 
 	@Test

@@ -139,7 +139,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 	}
 
 	@Override
-	protected void updateAlg(I frame) {
+	protected void updateAlg(I frame, BufferedImage buffImage) {
 		tracker.process(frame);
 
 		if( tracker.getActiveTracks().size() < minFeatures ) {

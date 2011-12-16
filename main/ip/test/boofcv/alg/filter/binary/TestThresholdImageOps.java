@@ -67,7 +67,7 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand input = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
 			ImageUInt8 output = new ImageUInt8(width,height);
 
 			SingleBandImage a = FactorySingleBandImage.wrap(input);
@@ -105,7 +105,7 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand input = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
 			ImageSInt32 labeled = new ImageSInt32(width,height);
 
 			SingleBandImage a = FactorySingleBandImage.wrap(input);
@@ -158,8 +158,8 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand inputDown = GeneralizedImageOps.createImage(param[0],width,height);
-			ImageSingleBand inputUp = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSingleBand inputDown = GeneralizedImageOps.createSingleBand(param[0], width, height);
+			ImageSingleBand inputUp = GeneralizedImageOps.createSingleBand(param[0], width, height);
 			ImageSInt32 labeled = new ImageSInt32(width,height);
 
 			SingleBandImage a = FactorySingleBandImage.wrap(inputDown);
@@ -197,8 +197,8 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand inputDown = GeneralizedImageOps.createImage(param[0],width,height);
-			ImageSingleBand inputUp = GeneralizedImageOps.createImage(param[0],width,height);
+			ImageSingleBand inputDown = GeneralizedImageOps.createSingleBand(param[0], width, height);
+			ImageSingleBand inputUp = GeneralizedImageOps.createSingleBand(param[0], width, height);
 			ImageSInt32 labeled = new ImageSInt32(width,height);
 
 			SingleBandImage a = FactorySingleBandImage.wrap(inputDown);

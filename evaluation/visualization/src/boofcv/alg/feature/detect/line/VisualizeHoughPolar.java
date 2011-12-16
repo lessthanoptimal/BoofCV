@@ -52,10 +52,10 @@ public class VisualizeHoughPolar<I extends ImageSingleBand, D extends ImageSingl
 	}
 
 	public void process( BufferedImage image ) {
-		I input = GeneralizedImageOps.createImage(imageType,image.getWidth(),image.getHeight());
-		I blur = GeneralizedImageOps.createImage(imageType,image.getWidth(),image.getHeight());
+		I input = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
+		I blur = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
 
-		ConvertBufferedImage.convertFrom(image, input, imageType);
+		ConvertBufferedImage.convertFromSingle(image, input, imageType);
 		GBlurImageOps.gaussian(input, blur, -1, 2, null);
 
 		DetectLineHoughPolar<I,D> alg =  FactoryDetectLine.houghPolar(5, 10, 2, Math.PI/180, 25, 10, imageType, derivType);

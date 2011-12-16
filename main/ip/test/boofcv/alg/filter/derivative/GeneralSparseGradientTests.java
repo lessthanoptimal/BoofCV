@@ -61,9 +61,9 @@ public abstract class GeneralSparseGradientTests
 		this.derivType = derivType;
 		this.borderRadius = borderRadius;
 
-		input = GeneralizedImageOps.createImage(inputType,width,height);
-		derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		input = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GeneralizedImageOps.randomize(input,rand,0,100);
 		imageGradient(input,derivX,derivY);

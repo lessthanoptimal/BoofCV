@@ -79,9 +79,9 @@ public class CannyEdgeContour<T extends ImageSingleBand, D extends ImageSingleBa
 		Class<T> imageType = blur.getInputType();
 		Class<D> derivType = gradient.getDerivType();
 
-		blurred = GeneralizedImageOps.createImage(imageType,1,1);
-		derivX = GeneralizedImageOps.createImage(derivType,1,1);
-		derivY = GeneralizedImageOps.createImage(derivType,1,1);
+		blurred = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
+		derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 	}
 
 	@Override

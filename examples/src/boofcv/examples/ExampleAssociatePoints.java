@@ -75,8 +75,8 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 	 */
 	public void associate( BufferedImage imageA , BufferedImage imageB )
 	{
-		T inputA = ConvertBufferedImage.convertFrom(imageA, null, imageType);
-		T inputB = ConvertBufferedImage.convertFrom(imageB, null, imageType);
+		T inputA = ConvertBufferedImage.convertFromSingle(imageA, null, imageType);
+		T inputB = ConvertBufferedImage.convertFromSingle(imageB, null, imageType);
 
 		// stores the location of detected interest points
 		List<Point2D_F64> pointsA = new ArrayList<Point2D_F64>();

@@ -72,11 +72,11 @@ public class BenchmarkCornerRuntime {
 			gradient = FactoryDerivative.sobel(imageType,derivType);
 			hessian = FactoryDerivative.hessianSobel(derivType);
 
-			derivX = GeneralizedImageOps.createImage(derivType,imgWidth,imgHeight);
-			derivY = GeneralizedImageOps.createImage(derivType,imgWidth,imgHeight);
-			derivXX = GeneralizedImageOps.createImage(derivType,imgWidth,imgHeight);
-			derivYY = GeneralizedImageOps.createImage(derivType,imgWidth,imgHeight);
-			derivXY = GeneralizedImageOps.createImage(derivType,imgWidth,imgHeight);
+			derivX = GeneralizedImageOps.createSingleBand(derivType, imgWidth, imgHeight);
+			derivY = GeneralizedImageOps.createSingleBand(derivType, imgWidth, imgHeight);
+			derivXX = GeneralizedImageOps.createSingleBand(derivType, imgWidth, imgHeight);
+			derivYY = GeneralizedImageOps.createSingleBand(derivType, imgWidth, imgHeight);
+			derivXY = GeneralizedImageOps.createSingleBand(derivType, imgWidth, imgHeight);
 		}
 
 		@Override

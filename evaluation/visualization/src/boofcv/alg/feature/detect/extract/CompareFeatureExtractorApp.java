@@ -111,7 +111,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 
 	public void process( BufferedImage input ) {
 		this.input = input;
-		grayImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		grayImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_BGR);
 
 		SwingUtilities.invokeLater(new Runnable() {

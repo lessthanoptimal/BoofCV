@@ -51,7 +51,7 @@ public abstract class GenericPyramidUpdateTests<T extends ImageSingleBand> {
 	 */
 	public void checkInitialized() {
 
-		ImageSingleBand input = GeneralizedImageOps.createImage(imageType,width,height);
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		ImagePyramid pyramid = createPyramid(1,2,4);
 
 		assertFalse(pyramid.isInitialized());
@@ -66,7 +66,7 @@ public abstract class GenericPyramidUpdateTests<T extends ImageSingleBand> {
 	 * Checks to see if every layer in the pyramid has been modified on a call to update
 	 */
 	public void checkModifiesLayersOnUpdate() {
-		ImageSingleBand input = GeneralizedImageOps.createImage(imageType,width,height);
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		ImagePyramid pyramid = createPyramid(1,2,4);
 		GeneralizedImageOps.randomize(input,rand,0,100);
 

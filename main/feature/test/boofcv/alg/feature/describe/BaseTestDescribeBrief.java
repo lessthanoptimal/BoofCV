@@ -58,7 +58,7 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 	}
 
 	protected  T createImage( int width , int height ) {
-		T ret = GeneralizedImageOps.createImage(imageType, width, height);
+		T ret = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		GeneralizedImageOps.randomize(ret,rand,0,50);
 		return ret;
 	}

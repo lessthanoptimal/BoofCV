@@ -63,9 +63,9 @@ public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingl
 	public void process( BufferedImage image ) {
 		int regionSize = 40;
 
-		I input = GeneralizedImageOps.createImage(imageType,image.getWidth(),image.getHeight());
-		D derivX = GeneralizedImageOps.createImage(derivType,image.getWidth(),image.getHeight());
-		D derivY = GeneralizedImageOps.createImage(derivType,image.getWidth(),image.getHeight());
+		I input = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
+		D derivX = GeneralizedImageOps.createSingleBand(derivType, image.getWidth(), image.getHeight());
+		D derivY = GeneralizedImageOps.createSingleBand(derivType, image.getWidth(), image.getHeight());
 		ImageFloat32 edgeIntensity =  new ImageFloat32(input.width,input.height);
 		ImageFloat32 suppressed =  new ImageFloat32(input.width,input.height);
 		ImageFloat32 orientation =  new ImageFloat32(input.width,input.height);
@@ -82,7 +82,7 @@ public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingl
 
 		System.out.println("Image width "+input.width+" height "+input.height);
 
-		ConvertBufferedImage.convertFrom(image, input, imageType);
+		ConvertBufferedImage.convertFromSingle(image, input, imageType);
 		gradient.process(input, derivX, derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, edgeIntensity);
 

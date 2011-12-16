@@ -53,7 +53,7 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 	public BenchmarkDetectLines( Class<T> imageType , Class<D> derivType ) {
 		this.imageType = imageType;
 		this.derivType = derivType;
-		input = GeneralizedImageOps.createImage(imageType,1,1);
+		input = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 	}
 
@@ -103,7 +103,7 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 
 	public void benchmark( BufferedImage image ) {
 		input.reshape(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,input,imageType);
+		ConvertBufferedImage.convertFromSingle(image, input, imageType);
 
 		ProfileOperation.printOpsPerSec(new HoughPolar(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new HoughFoot(), TEST_TIME);

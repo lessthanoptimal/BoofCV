@@ -77,7 +77,7 @@ public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 		setInputImage(original);
 
 		this.original = original;
-		image = ConvertBufferedImage.convertFrom(original,null,imageType);
+		image = ConvertBufferedImage.convertFromSingle(original, null, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -99,16 +99,16 @@ public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 		if( image == null )
 			return;
 
-		D derivX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
-		D derivY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+		D derivX = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
+		D derivY = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
 
 		panel.reset();
 
 		Helper h = (Helper)cookie;
 
-		D derivXX = GeneralizedImageOps.createImage(derivType,image.width,image.height);
-		D derivYY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
-		D derivXY = GeneralizedImageOps.createImage(derivType,image.width,image.height);
+		D derivXX = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
+		D derivYY = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
+		D derivXY = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
 
 		h.gradient.process(image,derivX,derivY);
 		h.hessian.process(derivX,derivY,derivXX,derivYY,derivXY);

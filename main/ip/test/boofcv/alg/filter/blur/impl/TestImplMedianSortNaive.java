@@ -55,8 +55,8 @@ public class TestImplMedianSortNaive {
 
 			Class params[] = m.getParameterTypes();
 
-			ImageSingleBand input = GeneralizedImageOps.createImage(params[0],4,4);
-			ImageSingleBand found = GeneralizedImageOps.createImage(params[1],4,4);
+			ImageSingleBand input = GeneralizedImageOps.createSingleBand(params[0], 4, 4);
+			ImageSingleBand found = GeneralizedImageOps.createSingleBand(params[1], 4, 4);
 
 			GeneralizedImageOps.convert(templateImage,input);
 

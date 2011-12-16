@@ -44,7 +44,7 @@ public class ExampleInterestPoint {
 
 	public static <T extends ImageSingleBand>
 	void detect( BufferedImage image , Class<T> imageType ) {
-		T input = ConvertBufferedImage.convertFrom(image,null,imageType);
+		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 
 		// Create a Fast Hessian detector from the SURF paper.
 		// Other detectors can be used in this example too.

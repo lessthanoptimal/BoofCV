@@ -36,7 +36,7 @@ public class ShowDistortImageOps
 {
 	public static void main( String args[] ) {
 		BufferedImage image = UtilImageIO.loadImage("data/sunflowers.png");
-		ImageFloat32  input = ConvertBufferedImage.convertFrom(image,null,ImageFloat32.class);
+		ImageFloat32  input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
 
 		ImageFloat32 output = new ImageFloat32(input.height,input.width);
 

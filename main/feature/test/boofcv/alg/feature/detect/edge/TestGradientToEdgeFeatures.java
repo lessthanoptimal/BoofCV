@@ -61,8 +61,8 @@ public class TestGradientToEdgeFeatures {
 	{
 		Class params[] = m.getParameterTypes();
 
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(params[0],width,height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(params[0],width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
 
 		GeneralizedImageOps.randomize(derivX,rand,0,10);
 		GeneralizedImageOps.randomize(derivY,rand,0,10);
@@ -94,8 +94,8 @@ public class TestGradientToEdgeFeatures {
 	{
 		Class params[] = m.getParameterTypes();
 
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(params[0],width,height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(params[0],width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
 
 		GeneralizedImageOps.randomize(derivX,rand,0,10);
 		GeneralizedImageOps.randomize(derivY,rand,0,10);
@@ -128,8 +128,8 @@ public class TestGradientToEdgeFeatures {
 	{
 		Class params[] = m.getParameterTypes();
 
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(params[0],width,height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(params[0],width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
 
 		GeneralizedImageOps.randomize(derivX,rand,0,10);
 		GeneralizedImageOps.randomize(derivY,rand,0,10);

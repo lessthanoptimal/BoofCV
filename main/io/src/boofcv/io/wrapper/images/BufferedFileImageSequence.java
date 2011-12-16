@@ -75,7 +75,7 @@ public class BufferedFileImageSequence<T extends ImageSingleBand> implements Sim
 		int index = 0;
 		for (String s : listNames) {
 			BufferedImage b = orig[index] = UtilImageIO.loadImage(directory.getPath()+"/"+s);
-			images[index++] = ConvertBufferedImage.convertFrom(b,(T)null,type);
+			images[index++] = ConvertBufferedImage.convertFromSingle(b, (T) null, type);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class BufferedFileImageSequence<T extends ImageSingleBand> implements Sim
 		images = (T[])new ImageSingleBand[ orig.length ];
 
 		for( int i = 0; i < orig.length; i++ ) {
-			images[i] = ConvertBufferedImage.convertFrom(orig[i],(T)null,type);
+			images[i] = ConvertBufferedImage.convertFromSingle(orig[i], (T) null, type);
 		}
 	}
 

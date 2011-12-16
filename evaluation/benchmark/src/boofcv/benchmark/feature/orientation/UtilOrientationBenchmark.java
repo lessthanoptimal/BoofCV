@@ -80,7 +80,7 @@ public class UtilOrientationBenchmark {
 		private WrapII(OrientationIntegral<II> alg , Class<T> imageType ) {
 			this.alg = alg;
 			this.imageType = imageType;
-			ii = GeneralizedImageOps.createImage(alg.getImageType(),1,1);
+			ii = GeneralizedImageOps.createSingleBand(alg.getImageType(), 1, 1);
 		}
 
 		@Override

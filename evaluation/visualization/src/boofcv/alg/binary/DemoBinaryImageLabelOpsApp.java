@@ -97,7 +97,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 		body.add(createControlPanel(),BorderLayout.NORTH);
 		body.add(gui,BorderLayout.CENTER);
 
-		imageInput = GeneralizedImageOps.createImage(imageType,1,1);
+		imageInput = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		imageBinary = new ImageUInt8(1,1);
 		imageOutput1 = new ImageUInt8(1,1);
 		imageOutput2 = new ImageUInt8(1,1);
@@ -138,7 +138,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 		imageOutput2.reshape(image.getWidth(),image.getHeight());
 		imageLabeled.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFrom(image,imageInput,imageType);
+		ConvertBufferedImage.convertFromSingle(image, imageInput, imageType);
 
 		// average pixel intensity should be a reasonable threshold
 		final double threshold = GPixelMath.sum(imageInput)/(imageInput.width*imageInput.height);

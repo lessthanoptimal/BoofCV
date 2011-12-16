@@ -19,18 +19,12 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PixelTransformHomography_F32;
-import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.d2.stabilization.MosaicImagePointKey;
-import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.geo.d2.stabilization.RenderImageMosaic;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -40,9 +34,9 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoListManager;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
 import georegression.struct.homo.Homography2D_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.transform.homo.HomographyPointOps;
@@ -56,38 +50,30 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO change scale
-// TODO turn off looping
-// TODO KLT Issue;  When zooming out features get clumped together, Need to prune features!
-// todo improve processing of multi-special images
-public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBand>
+// todo create stabilize app using common code
+// TODO get SURF tracker to stop spawning so many new frames
+public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBand, O extends ImageBase>
 		extends VideoProcessAppBase<I,D> implements ProcessInput
 {
-	int maxFeatures = 250;
-	static int thresholdChange = 80;
+	private int maxFeatures = 250;
+	private static int thresholdChange = 80;
 
-	int totalKeyFrames = 0;
+	private int totalKeyFrames = 0;
 
-	Class<I> imageType;
+	private ImagePointTracker<I> tracker;
+	private ModelMatcher<Object,AssociatedPair> modelMatcher;
 
-	ImagePointTracker<I> tracker;
-	ModelMatcher<Object,AssociatedPair> modelMatcher;
+	private MosaicImagePointKey<I> mosaicAlg;
+	private RenderImageMosaic<I,?> mosaicRender;
 
-	MosaicImagePointKey<I> mosaicAlg;
-	MultiSpectral<I> imageMosaic;
-	MultiSpectral<I> tempMosaic;
+	private StabilizationInfoPanel infoPanel;
+	private ImagePanel gui = new ImagePanel();
 
-	MultiSpectral<I> frameMulti;
-	
-	PixelTransformHomography_F32 distort = new PixelTransformHomography_F32();
-	ImageDistort<I> distorter;
+	private int mosaicWidth = 1000;
+	private int mosaicHeight = 600;
 
-	StabilizationInfoPanel infoPanel;
-	ImagePanel gui = new ImagePanel();
-
-	public ImageMosaicApp( Class<I> imageType , Class<D> derivType ) {
+	public ImageMosaicApp( Class<I> imageType , Class<D> derivType , boolean colorOutput ) {
 		super(1);
-
-		this.imageType = imageType;
 
 		ModelFitterAffine2D modelFitter = new ModelFitterAffine2D();
 		DistanceAffine2DSq distance = new DistanceAffine2DSq();
@@ -109,17 +95,13 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 		modelMatcher = new SimpleInlierRansac(123123,
 				modelFitter,distance,50,numSample,numSample,10000,4.0);
 
-		InterpolatePixel<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
+		mosaicRender = new RenderImageMosaic<I,ImageBase>(mosaicWidth,mosaicHeight,imageType,colorOutput);
 		
-		imageMosaic = new MultiSpectral<I>(imageType,1000,600,3);
-		tempMosaic = new MultiSpectral<I>(imageType,1000,600,3);
-		frameMulti = new MultiSpectral<I>(imageType,1,1,3);
-		distorter = DistortSupport.createDistort(imageType,null,interp,null);
 
-		final BufferedImage out = ConvertBufferedImage.convertTo(imageMosaic,null);
+		final BufferedImage out = new BufferedImage(mosaicWidth,mosaicHeight,BufferedImage.TYPE_INT_BGR);
 
 		gui.setBufferedImage(out);
-		gui.setPreferredSize(new Dimension(imageMosaic.width, imageMosaic.height));
+		gui.setPreferredSize(new Dimension(mosaicWidth, mosaicHeight));
 		gui.setMinimumSize(gui.getPreferredSize());
 
 		infoPanel = new StabilizationInfoPanel();
@@ -142,20 +124,20 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 	}
 
 	@Override
-	protected void updateAlg(I frame) {
+	protected void updateAlg(I frame, BufferedImage buffImage) {
 		if( mosaicAlg == null )
 			return;
 
 		mosaicAlg.process(frame);
-		
-		// todo move convert back here
+
+		mosaicRender.update(frame,buffImage,mosaicAlg.getWorldToCurr());
 	}
 
 	private Homography2D_F32 createInitialTransform() {
 		float scale = 0.5f;
 
-		Homography2D_F32 H = new Homography2D_F32(scale,0, imageMosaic.width/4,
-				0,scale, imageMosaic.height/4,
+		Homography2D_F32 H = new Homography2D_F32(scale,0, mosaicWidth/4,
+				0,scale, mosaicHeight/4,
 				0,0,1);
 		return H.invert(null);
 	}
@@ -179,16 +161,16 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 	}
 	
 	public boolean closeToImageBounds( int frameWidth , int frameHeight, int tol )  {
-		Homography2D_F32 currToWorld = mosaicAlg.getCurrToWorld();
-		Homography2D_F32 worldToCurr = currToWorld.invert(null); // TODO these transform are skewed up
+		Homography2D_F32 worldToCurr = mosaicAlg.getWorldToCurr();
+		Homography2D_F32 currToWorld = worldToCurr.invert(null);
 
-		if( closeToBorder(0,0,tol,worldToCurr) )
+		if( closeToBorder(0,0,tol,currToWorld) )
 			return true;
-		if( closeToBorder(frameWidth,0,tol,worldToCurr) )
+		if( closeToBorder(frameWidth,0,tol,currToWorld) )
 			return true;
-		if( closeToBorder(frameWidth,frameHeight,tol,worldToCurr) )
+		if( closeToBorder(frameWidth,frameHeight,tol,currToWorld) )
 			return true;
-		if( closeToBorder(0,frameHeight,tol,worldToCurr) )
+		if( closeToBorder(0,frameHeight,tol,currToWorld) )
 			return true;
 		
 		return false;
@@ -198,13 +180,11 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 
 		Point2D_F32 pt = new Point2D_F32(x,y);
 		HomographyPointOps.transform(currToWorld, pt, pt);
-		
-		int w = imageMosaic.width;
-		int h = imageMosaic.height;
+
 		
 		if( pt.x < tolerance || pt.y < tolerance )
 			return true;
-		return( pt.x >= w-tolerance || pt.y >= h-tolerance );
+		return( pt.x >= mosaicWidth-tolerance || pt.y >= mosaicHeight-tolerance );
 	}
 
 	private void drawFeatures( Homography2D_F32 currToGlobal, Graphics2D g2 ) {
@@ -237,18 +217,6 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 	@Override
 	protected void updateAlgGUI(I frame, BufferedImage imageGUI, final double fps) {
 
-		frameMulti.reshape(imageGUI.getWidth(),imageGUI.getHeight());
-		ConvertBufferedImage.convertFromMulti(imageGUI,frameMulti,imageType);
-		
-		// render the mosaic
-		Homography2D_F32 currToWorld = mosaicAlg.getCurrToWorld();
-
-		distort.set(currToWorld);
-
-		distorter.setModel(distort);
-		for( int i = 0; i < imageMosaic.getNumBands(); i++ )
-			distorter.apply(frameMulti.getBand(i), imageMosaic.getBand(i));
-		
 		if( mosaicAlg.isKeyFrameChanged() )
 			totalKeyFrames++;
 		
@@ -257,21 +225,11 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 			Homography2D_F32 oldToNew = new Homography2D_F32();
 			mosaicAlg.refocus(oldToNew);
 
-			distort.set(oldToNew);
-			distorter.setModel(distort);
-			for( int i = 0; i < imageMosaic.getNumBands(); i++ ) {
-				GeneralizedImageOps.fill(tempMosaic.getBand(i),0);
-				distorter.apply(imageMosaic.getBand(i), tempMosaic.getBand(i));
-			}
-			// swap the two images
-			MultiSpectral<I> s = imageMosaic;
-			imageMosaic = tempMosaic;
-			tempMosaic = s;
+			mosaicRender.distortMosaic(oldToNew);
 		}
 
-		currToWorld = mosaicAlg.getCurrToWorld();
-		final Homography2D_F32 foo = currToWorld.invert(null);
-//			distort.set(a);
+		Homography2D_F32 worldToCurr = mosaicAlg.getWorldToCurr();
+		final Homography2D_F32 currToWorld = worldToCurr.invert(null);
 
 		final int width = frame.width;
 		final int height = frame.height;
@@ -279,7 +237,7 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 		final int numAssociated = modelMatcher.getMatchSet().size();
 		final int numFeatures = tracker.getActiveTracks().size();
 
-		
+		// update GUI
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				infoPanel.setFPS(fps);
@@ -289,12 +247,12 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 				infoPanel.repaint();
 				
 				BufferedImage out = gui.getImage();
-				ConvertBufferedImage.convertTo(imageMosaic, out);
+				ConvertBufferedImage.convertTo(mosaicRender.getMosaic(), out);
 
 				Graphics2D g2 = out.createGraphics();
 
-				drawImageBounds(width,height, foo, g2);
-				drawFeatures(foo, g2);
+				drawImageBounds(width,height, currToWorld, g2);
+				drawFeatures(currToWorld, g2);
 
 				gui.repaint();
 			}
@@ -339,17 +297,15 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 		tracker.dropTracks();
 		mosaicAlg = new MosaicImagePointKey<I>(tracker,modelMatcher);
 		mosaicAlg.setInitialTransform(createInitialTransform());
-
+		
 		totalKeyFrames = 0;
-		// clear the mosaic
-		for( int i = 0; i < imageMosaic.getNumBands(); i++ )
-			GeneralizedImageOps.fill(imageMosaic.getBand(i),0);
+		mosaicRender.clear();
 
 		startWorkerThread();
 	}
 
 	public static void main( String args[] ) {
-		ImageMosaicApp app = new ImageMosaicApp(ImageFloat32.class, ImageFloat32.class);
+		ImageMosaicApp app = new ImageMosaicApp(ImageFloat32.class, ImageFloat32.class, true);
 
 		VideoListManager manager = new VideoListManager(ImageFloat32.class);
 		manager.add("Plane 1", "MJPEG", "/home/pja/a/foo15.mjpeg");

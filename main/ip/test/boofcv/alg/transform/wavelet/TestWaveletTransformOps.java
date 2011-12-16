@@ -65,9 +65,9 @@ public class TestWaveletTransformOps {
 
 		for( int i = length; i < 20; i++ ) {
 
-			T input = GeneralizedImageOps.createImage(typeInput,i,i);
-			T output = GeneralizedImageOps.createImage(typeInput,input.width+(input.width%2),input.height+(input.height%2));
-			T found = GeneralizedImageOps.createImage(typeInput,input.width,input.height);
+			T input = GeneralizedImageOps.createSingleBand(typeInput, i, i);
+			T output = GeneralizedImageOps.createSingleBand(typeInput, input.width + (input.width % 2), input.height + (input.height % 2));
+			T found = GeneralizedImageOps.createSingleBand(typeInput, input.width, input.height);
 
 			GeneralizedImageOps.randomize(input,rand,0,50);
 
@@ -106,14 +106,14 @@ public class TestWaveletTransformOps {
 		for( int adjust = 0; adjust < 5; adjust++ ) {
 			int w = width+adjust;
 			int h = height+adjust;
-			ImageSingleBand input = GeneralizedImageOps.createImage(typeInput,w,h);
-			ImageSingleBand found = GeneralizedImageOps.createImage(typeInput,w,h);
+			ImageSingleBand input = GeneralizedImageOps.createSingleBand(typeInput, w, h);
+			ImageSingleBand found = GeneralizedImageOps.createSingleBand(typeInput, w, h);
 
 			GeneralizedImageOps.randomize(input,rand,0,50);
 
 			for( int level = 1; level <= 5; level++ ) {
 				ImageDimension dim = UtilWavelet.transformDimension(w,h,level);
-				ImageSingleBand output = GeneralizedImageOps.createImage(typeInput,dim.width,dim.height);
+				ImageSingleBand output = GeneralizedImageOps.createSingleBand(typeInput, dim.width, dim.height);
 //				System.out.println("adjust "+adjust+" level "+level+" scale "+ div);
 
 				invokeTransform("transformN","inverseN",desc, input.clone(), output, found,level);

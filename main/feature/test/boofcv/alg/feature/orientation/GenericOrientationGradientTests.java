@@ -53,8 +53,8 @@ public class GenericOrientationGradientTests<D extends ImageSingleBand> {
 
 		Class<D> imageType = alg.getImageType();
 
-		derivX = GeneralizedImageOps.createImage(imageType,width,height);
-		derivY = GeneralizedImageOps.createImage(imageType,width,height);
+		derivX = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		derivY = GeneralizedImageOps.createSingleBand(imageType, width, height);
 	}
 
 	/**

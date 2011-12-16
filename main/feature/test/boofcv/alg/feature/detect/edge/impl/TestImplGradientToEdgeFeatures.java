@@ -51,8 +51,8 @@ public class TestImplGradientToEdgeFeatures {
 	public void intensityE( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GeneralizedImageOps.randomize(derivX,rand,-20,20);
 	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
@@ -82,8 +82,8 @@ public class TestImplGradientToEdgeFeatures {
 	public void intensityAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GeneralizedImageOps.randomize(derivX,rand,-20,20);
 	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
@@ -113,8 +113,8 @@ public class TestImplGradientToEdgeFeatures {
 	public void direction( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GeneralizedImageOps.randomize(derivX,rand,-20,20);
 	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
@@ -144,8 +144,8 @@ public class TestImplGradientToEdgeFeatures {
 	public void direction2( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,width,height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,width,height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GeneralizedImageOps.randomize(derivX,rand,-20,20);
 	    GeneralizedImageOps.randomize(derivY,rand,-20,20);

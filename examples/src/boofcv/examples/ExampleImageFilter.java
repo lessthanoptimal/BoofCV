@@ -75,9 +75,9 @@ public class ExampleImageFilter {
 		Class<T> inputType = (Class<T>)input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		T blurred = GeneralizedImageOps.createImage(inputType,input.width, input.height);
-		D derivX = GeneralizedImageOps.createImage(derivType,input.width, input.height);
-		D derivY = GeneralizedImageOps.createImage(derivType,input.width, input.height);
+		T blurred = GeneralizedImageOps.createSingleBand(inputType, input.width, input.height);
+		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
+		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
 		// Gaussian blur: Convolve a Gaussian kernel
 		GBlurImageOps.gaussian(input, blurred, -1, blurRadius, null);
@@ -96,9 +96,9 @@ public class ExampleImageFilter {
 		Class<T> inputType = (Class<T>)input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		T blurred = GeneralizedImageOps.createImage(inputType, input.width, input.height);
-		D derivX = GeneralizedImageOps.createImage(derivType, input.width, input.height);
-		D derivY = GeneralizedImageOps.createImage(derivType, input.width, input.height);
+		T blurred = GeneralizedImageOps.createSingleBand(inputType, input.width, input.height);
+		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
+		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
 		// declare image filters
 		BlurFilter<T> filterBlur = FactoryBlurFilter.gaussian(inputType, -1, blurRadius);
@@ -118,9 +118,9 @@ public class ExampleImageFilter {
 		Class inputType = input.getClass();
 		Class derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		ImageSingleBand blurred = GeneralizedImageOps.createImage(inputType,input.width, input.height);
-		ImageSingleBand derivX = GeneralizedImageOps.createImage(derivType,input.width, input.height);
-		ImageSingleBand derivY = GeneralizedImageOps.createImage(derivType,input.width, input.height);
+		ImageSingleBand blurred = GeneralizedImageOps.createSingleBand(inputType, input.width, input.height);
+		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
+		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
 		// Gaussian blur: Convolve a Gaussian kernel
 		GBlurImageOps.gaussian(input, blurred, -1, blurRadius, null);
@@ -138,12 +138,12 @@ public class ExampleImageFilter {
 		BufferedImage image = UtilImageIO.loadImage("../evaluation/data/standard/lena512.bmp");
 
 		// produces the same results
-		procedural(ConvertBufferedImage.convertFrom(image,null,ImageUInt8.class));
-		generalized(ConvertBufferedImage.convertFrom(image, null, ImageUInt8.class));
-		filter(ConvertBufferedImage.convertFrom(image, null, ImageUInt8.class));
-		nogenerics(ConvertBufferedImage.convertFrom(image, null, ImageUInt8.class));
+		procedural(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));
+		generalized(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));
+		filter(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));
+		nogenerics(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));
 
 		// try another image input type
-		generalized(ConvertBufferedImage.convertFrom(image,null,ImageFloat32.class));
+		generalized(ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class));
 	}
 }

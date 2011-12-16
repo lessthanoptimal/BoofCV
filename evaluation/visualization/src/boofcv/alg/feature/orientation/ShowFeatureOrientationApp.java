@@ -106,7 +106,7 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 		
 		RegionOrientation orientation = (RegionOrientation)cookie;
 
-		T workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		AnyImageDerivative<T,D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 		deriv.setInput(workImage);
 

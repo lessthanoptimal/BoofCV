@@ -112,7 +112,7 @@ public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends Image
 	public void process( final BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
-		workImage = ConvertBufferedImage.convertFrom(input,null,imageType);
+		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		temp = new BufferedImage(workImage.width,workImage.height,BufferedImage.TYPE_INT_BGR);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
