@@ -18,9 +18,7 @@
 
 package boofcv.core.image;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 import sun.awt.image.ByteInterleavedRaster;
@@ -32,7 +30,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -44,13 +43,8 @@ public class TestConvertRaster {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	int numMethods = 15;
+	int numMethods = 27;
 
-	@Test
-	public void addMultiSpectral() {
-		fail("Add multispectral");
-	}
-	
 	/**
 	 * Use reflections to test all the functions.
 	 */
@@ -67,7 +61,7 @@ public class TestConvertRaster {
 			System.out.println("Examining: "+m.getName());
 			if( m.getName().contains("bufferedTo"))
 				testBufferedTo(m);
-			else if( m.getName().contains("grayTo"))
+			else if( m.getName().contains("ToBuffered") )
 				testGrayTo(m);
 			else
 				throw new RuntimeException("Unknown convert type.");
@@ -115,8 +109,8 @@ public class TestConvertRaster {
 		if( types.length != 2 )
 			return false;
 
-		if( ImageSingleBand.class.isAssignableFrom(types[0]) ||
-				ImageSingleBand.class.isAssignableFrom(types[1]) )
+		if( ImageBase.class.isAssignableFrom(types[0]) ||
+				ImageBase.class.isAssignableFrom(types[1]) )
 		return true;
 
 		return false;
@@ -129,12 +123,32 @@ public class TestConvertRaster {
 
 		input = createBufferedTestImages(paramTypes[0]);
 
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[1], imgWidth, imgHeight);
-
 		for( int i = 0; i < input.length; i++ ) {
+			ImageBase output =  createImage(m, paramTypes[1],input[i]);
 			BoofTesting.checkSubImage(this, "performBufferedTo", true, m,input[i],output);
 		}
+	}
 
+	private ImageBase createImage(Method m, Class imageType, BufferedImage inputBuff ) {
+
+		int numBands = inputBuff.getRaster().getNumBands();
+
+		ImageBase output;
+		if( ImageSingleBand.class.isAssignableFrom(imageType) ) {
+			output = GeneralizedImageOps.createSingleBand(imageType, imgWidth, imgHeight);
+		} else {
+			Class type;
+			if( m.getName().contains("U8")) {
+				type = ImageUInt8.class;
+			} else if( m.getName().contains("F32")) {
+				type = ImageFloat32.class;
+			} else {
+				throw new IllegalArgumentException("Unexpected: "+m.getName());
+			}
+
+			output = new MultiSpectral(type,imgWidth,imgHeight,numBands);
+		}
+		return output;
 	}
 
 	/**
@@ -158,7 +172,7 @@ public class TestConvertRaster {
 		return input;
 	}
 
-	public void performBufferedTo( Method m , BufferedImage input , ImageSingleBand output ) {
+	public void performBufferedTo( Method m , BufferedImage input , ImageBase output ) {
 		try {
 			if( Raster.class.isAssignableFrom(m.getParameterTypes()[0]) )
 				m.invoke(null,input.getRaster(),output);
@@ -177,18 +191,17 @@ public class TestConvertRaster {
 
 		Class paramTypes[] = m.getParameterTypes();
 
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], imgWidth, imgHeight);
-		GeneralizedImageOps.randomize(input, rand, 0,50);
-
 		BufferedImage output[] = createBufferedTestImages(paramTypes[1]);
 
-
 		for( int i = 0; i < output.length; i++ ) {
+			ImageBase input = createImage(m,paramTypes[0], output[i]);
+			GeneralizedImageOps.randomize(input, rand, 0,50);
+
 			BoofTesting.checkSubImage(this, "performGrayTo", true, m,input,output[i]);
 		}
 	}
 
-	public void performGrayTo( Method m , ImageSingleBand input , BufferedImage output ) {
+	public void performGrayTo( Method m , ImageBase input , BufferedImage output ) {
 		try {
 			if( Raster.class.isAssignableFrom(m.getParameterTypes()[1]) )
 				m.invoke(null,input,output.getRaster());

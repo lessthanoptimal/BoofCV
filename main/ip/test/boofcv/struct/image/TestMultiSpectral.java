@@ -20,8 +20,7 @@ package boofcv.struct.image;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -68,11 +67,29 @@ public class TestMultiSpectral {
 
 	@Test
 	public void subimage() {
-		fail("implement");
+		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		MultiSpectral<ImageUInt8> sub = img.subimage(2,3,4,6);
+		
+		assertEquals(3,sub.getNumBands());
+		assertEquals(2,sub.getWidth());
+		assertEquals(3,sub.getHeight());
+
+		for( int i = 0; i < sub.getNumBands(); i++ )
+			assertEquals(img.getBand(i).get(2,3),sub.getBand(i).get(0,0));
 	}
 
 	@Test
 	public void reshape() {
-		fail("implement");
+		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+
+		// reshape to something smaller
+		img.reshape(5,4);
+		assertEquals(5,img.getWidth());
+		assertEquals(4,img.getHeight());
+
+		// reshape to something larger
+		img.reshape(15,21);
+		assertEquals(15,img.getWidth());
+		assertEquals(21,img.getHeight());
 	}
 }

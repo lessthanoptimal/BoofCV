@@ -21,7 +21,7 @@ package boofcv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageFloat32 extends StandardImageTests {
+public class TestImageFloat32 extends StandardSingleBandTests {
 
 
 	@Override

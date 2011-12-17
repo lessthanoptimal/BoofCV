@@ -21,7 +21,7 @@ package boofcv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageSInt64 extends StandardImageTests {
+public class TestImageSInt64 extends StandardSingleBandTests {
 
 	public TestImageSInt64() {
 	}

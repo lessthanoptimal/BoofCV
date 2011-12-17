@@ -18,6 +18,8 @@
 
 package boofcv.struct.image;
 
+import boofcv.core.image.FactorySingleBandImage;
+import boofcv.core.image.SingleBandImage;
 import org.junit.Test;
 
 import java.lang.reflect.Array;
@@ -34,7 +36,7 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class StandardImageTests {
+public abstract class StandardSingleBandTests {
 
 	public Random rand = new Random(234);
 
@@ -128,8 +130,6 @@ public abstract class StandardImageTests {
 			if (type == 1) {
 				paramTypes[index] = img.getTypeInfo().getSumType();
 				args[index] = typeData;
-//				paramTypes[index] = img.getTypeInfo().getDataType();
-//				args[index] = typeData;
 			} else if (type == 2) {
 				String name = "[" + img.getTypeInfo().getDataType().getName().toUpperCase().charAt(0);
 				paramTypes[index] = Class.forName(name);
@@ -149,5 +149,37 @@ public abstract class StandardImageTests {
 			throw (RuntimeException) e.getCause();
 		}
 		throw new RuntimeException("Shouldn't be here");
+	}
+	
+	@Test
+	public void subimage() {
+		ImageSingleBand img = createImage(10, 20);
+		setRandom(img);
+		
+		ImageSingleBand sub = img.subimage(2,3,3,5);
+		
+		assertEquals(1,sub.getWidth());
+		assertEquals(2,sub.getHeight());
+
+		SingleBandImage a = FactorySingleBandImage.wrap(img);
+		SingleBandImage b = FactorySingleBandImage.wrap(sub);
+		
+		assertEquals(a.get(2,3),b.get(0,0));
+		assertEquals(a.get(2,4),b.get(0,1));
+	}
+	
+	@Test
+	public void reshape() {
+		ImageSingleBand img = createImage(10, 20);
+		
+		// reshape to something smaller
+		img.reshape(5,4);
+		assertEquals(5,img.getWidth());
+		assertEquals(4,img.getHeight());
+
+		// reshape to something larger
+		img.reshape(15,21);
+		assertEquals(15,img.getWidth());
+		assertEquals(21,img.getHeight());
 	}
 }

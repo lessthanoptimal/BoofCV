@@ -596,13 +596,15 @@ public class BoofTesting {
 			throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
 	}
 
-	public static void checkEquals(BufferedImage imgA, ImageSingleBand imgB , double tol ) {
+	public static void checkEquals(BufferedImage imgA, ImageBase imgB , double tol ) {
 		if( ImageUInt8.class == imgB.getClass()) {
 			checkEquals(imgA,(ImageUInt8)imgB);
 		} else if( ImageFloat32.class == imgB.getClass()) {
 			checkEquals(imgA,(ImageFloat32)imgB,(float)tol);
 		} else if( ImageInterleavedInt8.class == imgB.getClass()) {
 			checkEquals(imgA,(ImageInterleavedInt8)imgB);
+		} else if( MultiSpectral.class == imgB.getClass() ) {
+			checkEquals(imgA,(MultiSpectral)imgB,(float)tol);
 		}
 	}
 
@@ -734,6 +736,61 @@ public class BoofTesting {
 			}
 		}
 	}
+
+	public static void checkEquals(BufferedImage imgA, MultiSpectral imgB, float tol ) {
+
+		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
+			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
+
+			if (raster.getNumBands() == 1) {
+				SingleBandImage band = FactorySingleBandImage.wrap(imgB.getBand(0));
+
+				// handle a special case where the RGB conversion is screwed
+				for (int i = 0; i < imgA.getHeight(); i++) {
+					for (int j = 0; j < imgA.getWidth(); j++) {
+						double valB = band.get(j, i).doubleValue();
+						int valA = raster.getDataStorage()[i * imgA.getWidth() + j];
+						valA &= 0xFF;
+
+						if (Math.abs(valA - valB) > tol)
+							throw new RuntimeException("Images are not equal: A = "+valA+" B = "+valB);
+					}
+				}
+				return;
+			}
+		}
+
+		SingleBandImage band1 = FactorySingleBandImage.wrap(imgB.getBand(0));
+		SingleBandImage band2 = FactorySingleBandImage.wrap(imgB.getBand(1));
+		SingleBandImage band3 = FactorySingleBandImage.wrap(imgB.getBand(2));
+
+		for (int y = 0; y < imgA.getHeight(); y++) {
+			for (int x = 0; x < imgA.getWidth(); x++) {
+				int rgb = imgA.getRGB(x, y);
+
+				int val1 = ((rgb >>> 16) & 0xFF);
+				int val2 = ((rgb >>> 8) & 0xFF);
+				int val3 = (rgb & 0xFF);
+
+				float mult1 = band1.get(x, y).floatValue();
+				float mult2 = band2.get(x, y).floatValue();
+				float mult3 = band3.get(x, y).floatValue();
+
+
+				if (Math.abs(val1 - mult1) > tol) {
+					throw new RuntimeException("images are not equal: A = "+val1+" B = "+mult1);
+				}
+				if (Math.abs(val2 - mult2) > tol) {
+					throw new RuntimeException("images are not equal: A = "+val2+" B = "+mult2);
+				}
+				if (Math.abs(val3 - mult3) > tol) {
+					throw new RuntimeException("images are not equal: A = "+val3+" B = "+mult3);
+				}
+			}
+		}
+	}
+
+
 
 	public static void checkBorderZero(ImageSingleBand outputImage, int border) {
 		SingleBandImage img = FactorySingleBandImage.wrap(outputImage);
