@@ -57,6 +57,7 @@ import java.util.List;
 // TODO change scale
 // todo create stabilize app using common code
 // TODO get SURF tracker to stop spawning so many new frames
+// TODO SURF should support drop track
 public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBand, O extends ImageBase>
 		extends VideoProcessAppBase<I,D> implements ProcessInput
 {
@@ -103,7 +104,7 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 		mosaicRender = new RenderImageMosaic<I,ImageBase>(mosaicWidth,mosaicHeight,imageType,colorOutput);
 		
 
-		final BufferedImage out = new BufferedImage(mosaicWidth,mosaicHeight,BufferedImage.TYPE_INT_BGR);
+		final BufferedImage out = new BufferedImage(mosaicWidth,mosaicHeight,BufferedImage.TYPE_INT_RGB);
 
 		gui.setBufferedImage(out);
 		gui.setPreferredSize(new Dimension(mosaicWidth, mosaicHeight));

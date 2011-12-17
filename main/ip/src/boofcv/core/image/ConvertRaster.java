@@ -137,9 +137,10 @@ public class ConvertRaster {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
 				for (; indexDst < indexDstEnd; indexDst++) {
-					band1[indexDst] = srcData[indexSrc++];
-					band2[indexDst] = srcData[indexSrc++];
+					// only BGR is allowed for ByteInterleaved
 					band3[indexDst] = srcData[indexSrc++];
+					band2[indexDst] = srcData[indexSrc++];
+					band1[indexDst] = srcData[indexSrc++];
 				}
 			}
 		} else {
@@ -180,9 +181,10 @@ public class ConvertRaster {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
 				for (; indexDst < indexDstEnd; indexDst++) {
-					band1[indexDst] = srcData[indexSrc++] & 0xFF;
-					band2[indexDst] = srcData[indexSrc++] & 0xFF;
+					// only BGR is allowed for ByteInterleaved
 					band3[indexDst] = srcData[indexSrc++] & 0xFF;
+					band2[indexDst] = srcData[indexSrc++] & 0xFF;
+					band1[indexDst] = srcData[indexSrc++] & 0xFF;
 				}
 			}
 		} else {
@@ -423,7 +425,6 @@ public class ConvertRaster {
 		byte[] band2 = dst.getBand(1).data;
 		byte[] band3 = dst.getBand(2).data;
 
-
 		for (int y = 0; y < height; y++) {
 			int index = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < width; x++ , index++ ) {
@@ -455,7 +456,6 @@ public class ConvertRaster {
 		float[] band1 = dst.getBand(0).data;
 		float[] band2 = dst.getBand(1).data;
 		float[] band3 = dst.getBand(2).data;
-
 
 		for (int y = 0; y < height; y++) {
 			int index = dst.startIndex + y*dst.stride;
@@ -600,9 +600,10 @@ public class ConvertRaster {
 				int indexSrcEnd = indexSrc + src.width;
 
 				for (; indexSrc < indexSrcEnd; indexSrc++) {
-					dstData[indexDst++] = band1[indexSrc];
-					dstData[indexDst++] = band2[indexSrc];
+					// only BGR ordering is allowed byte ByteInterleaved
 					dstData[indexDst++] = band3[indexSrc];
+					dstData[indexDst++] = band2[indexSrc];
+					dstData[indexDst++] = band1[indexSrc];
 				}
 			}
 		} else {
@@ -644,9 +645,10 @@ public class ConvertRaster {
 				int indexSrcEnd = indexSrc + src.width;
 
 				for (; indexSrc < indexSrcEnd; indexSrc++) {
-					dstData[indexDst++] = (byte)band1[indexSrc];
-					dstData[indexDst++] = (byte)band2[indexSrc];
+					// only BGR ordering is allowed byte ByteInterleaved
 					dstData[indexDst++] = (byte)band3[indexSrc];
+					dstData[indexDst++] = (byte)band2[indexSrc];
+					dstData[indexDst++] = (byte)band1[indexSrc];
 				}
 			}
 		} else {

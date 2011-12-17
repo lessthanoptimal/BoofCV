@@ -21,14 +21,17 @@ package boofcv.alg.misc;
 import boofcv.core.image.FactorySingleBandImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.SingleBandImage;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -40,7 +43,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 78;
+		int numExpected = 86;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -71,7 +74,7 @@ public class TestPixelMath {
 				} else if( m.getName().compareTo("sum") == 0 ) {
 					testSum(m);
 				} else if( m.getName().compareTo("bandAve") == 0 ) {
-					fail("implement");
+					testBandAve(m);
 				} else {
 					throw new RuntimeException("Unknown function: "+m.getName());
 				}
@@ -96,7 +99,7 @@ public class TestPixelMath {
 		if( param.length < 1 )
 			return false;
 
-		return ImageSingleBand.class.isAssignableFrom(param[0]);
+		return ImageBase.class.isAssignableFrom(param[0]);
 	}
 
 	private void testAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
@@ -359,5 +362,43 @@ public class TestPixelMath {
 		}
 
 		assertEquals(total,((Number)result).doubleValue(),1e-4);
+	}
+
+	private void testBandAve( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		MultiSpectral input = new MultiSpectral(paramTypes[1], width, height,3);
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+
+		if( output.getTypeInfo().isSigned() ) {
+			GeneralizedImageOps.randomize(input, rand, -20,20);
+		} else {
+			GeneralizedImageOps.randomize(input, rand, 0,20);
+		}
+
+		m.invoke(null,input,output);
+
+		SingleBandImage a = FactorySingleBandImage.wrap(input.getBand(0));
+		SingleBandImage b = FactorySingleBandImage.wrap(input.getBand(1));
+		SingleBandImage c = FactorySingleBandImage.wrap(input.getBand(2));
+		SingleBandImage d = FactorySingleBandImage.wrap(output);
+
+		boolean isInteger = output.getTypeInfo().isInteger();
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double expected = 0;
+				expected += a.get(j,i).doubleValue();
+				expected += b.get(j,i).doubleValue();
+				expected += c.get(j,i).doubleValue();
+				expected /= 3;
+
+				double found = d.get(j,i).doubleValue();
+
+				if( isInteger )
+					expected = (int)expected;
+			
+				assertEquals(expected,found,1e-4);
+			}
+		}
 	}
 }
