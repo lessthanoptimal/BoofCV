@@ -28,8 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -71,6 +70,8 @@ public class TestPixelMath {
 				    testDiffAbs(m);
 				} else if( m.getName().compareTo("sum") == 0 ) {
 					testSum(m);
+				} else if( m.getName().compareTo("bandAve") == 0 ) {
+					fail("implement");
 				} else {
 					throw new RuntimeException("Unknown function: "+m.getName());
 				}

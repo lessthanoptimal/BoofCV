@@ -874,6 +874,4 @@ import boofcv.struct.image.*;
 
 		return output;
 	}
-
-
 }

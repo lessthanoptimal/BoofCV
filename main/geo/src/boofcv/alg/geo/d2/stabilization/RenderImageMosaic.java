@@ -23,6 +23,7 @@ import boofcv.alg.distort.PixelTransformHomography_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -70,18 +71,30 @@ public class RenderImageMosaic<I extends ImageSingleBand, O extends ImageBase> {
 		setColorOutput(color);
 	}
 	
-	public void setColorOutput( boolean color ) {
+	public synchronized void setColorOutput( boolean color ) {
 		this.colorOutput = color;
 
 		InterpolatePixel<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
 
 		if( colorOutput ) {
-			imageMosaic = (O)new MultiSpectral<I>(imageType,mosaicWidth,mosaicHeight,3);
+			// convert the single band mosaic into a MultiSpectral mosaic
+			MultiSpectral<I> temp = new MultiSpectral<I>(imageType,mosaicWidth,mosaicHeight,3);
+			if( imageMosaic != null ) {
+				for( int i = 0; i < temp.getNumBands(); i++ )
+					temp.getBand(i).setTo((ImageSingleBand)imageMosaic);
+			}
+
+			imageMosaic = (O)temp;
 			tempMosaic = (O)new MultiSpectral<I>(imageType,mosaicWidth,mosaicHeight,3);
 			frameMulti = (O)new MultiSpectral<I>(imageType,1,1,3);
 			distorter = (ImageDistort<O>) DistortSupport.createDistortMS(imageType, null, interp, null);
 		} else {
-			imageMosaic = (O) GeneralizedImageOps.createSingleBand(imageType, mosaicWidth, mosaicHeight);
+			// convert the previous mosaic into a gray scale image
+			ImageSingleBand temp = GeneralizedImageOps.createSingleBand(imageType, mosaicWidth, mosaicHeight);
+			if( imageMosaic != null ) {
+				GPixelMath.bandAve((MultiSpectral)imageMosaic,temp);
+			}
+			imageMosaic = (O) temp;
 			tempMosaic = (O)GeneralizedImageOps.createSingleBand(imageType, mosaicWidth, mosaicHeight);
 			distorter = (ImageDistort<O>)DistortSupport.createDistort(imageType,null,interp,null);
 		}
@@ -94,7 +107,7 @@ public class RenderImageMosaic<I extends ImageSingleBand, O extends ImageBase> {
 	 * @param buffImage Color image of the current frame.
 	 * @param worldToCurr Transformation from the world into the current frame.
 	 */
-	public void update(I frame, BufferedImage buffImage , Homography2D_F32 worldToCurr ) {
+	public synchronized void update(I frame, BufferedImage buffImage , Homography2D_F32 worldToCurr ) {
 
 		distort.set(worldToCurr);
 		distorter.setModel(distort);
@@ -114,7 +127,7 @@ public class RenderImageMosaic<I extends ImageSingleBand, O extends ImageBase> {
 	 *
 	 * @param oldToNew  Transform from the old mosaic to the new mosaic's coordinate system
 	 */
-	public void distortMosaic( Homography2D_F32 oldToNew ) {
+	public synchronized void distortMosaic( Homography2D_F32 oldToNew ) {
 		distort.set(oldToNew);
 		distorter.setModel(distort);
 		GeneralizedImageOps.fill(tempMosaic,0);
@@ -138,5 +151,12 @@ public class RenderImageMosaic<I extends ImageSingleBand, O extends ImageBase> {
 	 */
 	public void clear() {
 		GeneralizedImageOps.fill(imageMosaic,0);
+	}
+
+	/**
+	 * If the output is in color or not
+	 */
+	public boolean getColorOutput() {
+		return colorOutput;
 	}
 }
