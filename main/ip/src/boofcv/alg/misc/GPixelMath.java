@@ -276,4 +276,31 @@ public class GPixelMath {
 			throw new IllegalArgumentException("Unknown integer image Type");
 		}
 	}
+
+	/**
+	 * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.
+	 *
+	 * @param input MultiSpectral image
+	 * @param output Gray scale image containing average pixel values
+	 */
+	public static <T extends ImageSingleBand> void bandAve( MultiSpectral<T> input , T output) {
+
+		if( ImageUInt8.class == input.getType() ) {
+			PixelMath.bandAve((MultiSpectral<ImageUInt8>)input,(ImageUInt8)output);
+		} else if( ImageSInt8.class == input.getType() ) {
+			PixelMath.bandAve((MultiSpectral<ImageSInt8>)input,(ImageSInt8)output);
+		} else if( ImageUInt16.class == input.getType() ) {
+			PixelMath.bandAve((MultiSpectral<ImageUInt16>)input,(ImageUInt16)output);
+		} else if( ImageSInt16.class == input.getType() ) {
+			PixelMath.bandAve((MultiSpectral<ImageSInt16>)input,(ImageSInt16)output);
+		} else if( ImageSInt32.class == input.getType() ) {
+			PixelMath.bandAve((MultiSpectral<ImageSInt32>)input,(ImageSInt32)output);
+		} else if( ImageFloat32.class == input.getType() ) {
+			PixelMath.bandAve((MultiSpectral<ImageFloat32>)input,(ImageFloat32)output);
+		} else if( ImageFloat64.class == input.getType() ) {
+			PixelMath.bandAve((MultiSpectral<ImageFloat64>)input,(ImageFloat64)output);
+		} else {
+			throw new IllegalArgumentException("Unknown integer image Type");
+		}
+	}
 }

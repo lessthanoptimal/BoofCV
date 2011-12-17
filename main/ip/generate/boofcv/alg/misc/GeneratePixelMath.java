@@ -19,11 +19,9 @@
 package boofcv.alg.misc;
 
 import boofcv.misc.AutoTypeImage;
-import boofcv.misc.CodeGeneratorUtil;
+import boofcv.misc.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 
 /**
@@ -31,30 +29,22 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public class GeneratePixelMath {
+public class GeneratePixelMath extends CodeGeneratorBase {
 
 	String className = "PixelMath";
 
-	PrintStream out;
-
 	private AutoTypeImage input;
 
-	public GeneratePixelMath() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
-	}
-
-	public void generate() {
+	public void generate() throws FileNotFoundException {
 		printPreamble();
 		printAllSigned();
 		printAll();
 		out.println("}");
 	}
 
-	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.misc;\n" +
-				"\n" +
-				"import boofcv.struct.image.*;\n" +
+	private void printPreamble() throws FileNotFoundException {
+		setOutputFile(className);
+		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
 				"import boofcv.alg.InputSanityCheck;\n" +
 				"import java.util.Random;\n" +
@@ -83,6 +73,7 @@ public class GeneratePixelMath {
 			printBoundImage();
 			printDiffAbs();
 			printSum();
+			printBandAve();
 		}
 	}
 
@@ -407,6 +398,42 @@ public class GeneratePixelMath {
 				"\t\t}\n" +
 				"\t\t\n" +
 				"\t\treturn total;\n" +
+				"\t}\n\n");
+	}
+	
+	public void printBandAve() {
+		
+		String imageName = input.getImageName();
+		String sumType = input.getSumType();
+		String typecast = input.getTypeCastFromSum();
+		String bitwise = input.getBitWise();
+		
+		out.print("\t/**\n" +
+				"\t * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.\n" +
+				"\t * \n" +
+				"\t * @param input MultiSpectral image\n" +
+				"\t * @param output Gray scale image containing average pixel values\n" +
+				"\t */\n" +
+				"\tpublic static void bandAve( MultiSpectral<"+imageName+"> input , "+imageName+" output ) {\n" +
+				"\t\tfinal int h = input.getHeight();\n" +
+				"\t\tfinal int w = input.getWidth();\n" +
+				"\n" +
+				"\t\t"+imageName+"[] bands = input.bands;\n" +
+				"\t\t\n" +
+				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tint indexInput = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tint indexOutput = output.getStartIndex() + y * output.getStride();\n" +
+				"\n" +
+				"\t\t\tint indexEnd = indexInput+w;\n" +
+				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
+				"\t\t\tfor (; indexInput < indexEnd; indexInput++, indexOutput++ ) {\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\tfor( int i = 0; i < bands.length; i++ ) {\n" +
+				"\t\t\t\t\ttotal += bands[i].data[ indexInput ]"+bitwise+";\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\toutput.data[indexOutput] = "+typecast+"(total / bands.length);\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
 				"\t}\n\n");
 	}
 

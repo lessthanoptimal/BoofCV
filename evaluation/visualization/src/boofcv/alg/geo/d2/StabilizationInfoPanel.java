@@ -34,6 +34,7 @@ import java.awt.event.ItemListener;
 public class StabilizationInfoPanel extends StandardAlgConfigPanel implements ItemListener, ActionListener {
 
 	JButton resetButton;
+	JCheckBox showColor;
 	JCheckBox showInliers;
 	JCheckBox showAll;
 	JTextArea displayFPS;
@@ -41,6 +42,7 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 	JTextArea displayNumTracks;
 	JTextArea displayNumInliers;
 
+	boolean setColor = true;
 	boolean setShowInliers = false;
 	boolean setShowAll = false;
 	boolean shouldReset = false;
@@ -52,6 +54,9 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 		resetButton = new JButton("Reset");
 		resetButton.addActionListener(this);
 
+		showColor = new JCheckBox("Color");
+		showColor.addItemListener(this);
+		showColor.setSelected(setColor);
 		showAll = new JCheckBox("Show All");
 		showAll.addItemListener(this);
 		showAll.setSelected(setShowAll);
@@ -65,6 +70,7 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 		displayNumInliers = createTextInfo();
 
 		addAlignLeft(resetButton, this);
+		addAlignLeft(showColor, this);
 		addAlignLeft(showAll, this);
 		addAlignLeft(showInliers, this);
 		addSeparator(200);
@@ -96,6 +102,8 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 			setShowInliers = e.getStateChange() != ItemEvent.DESELECTED;
 		} else if( e.getItem() == showAll) {
 			setShowAll = e.getStateChange() != ItemEvent.DESELECTED;
+		} else if( e.getItem() == showColor ) {
+			setColor = e.getStateChange() != ItemEvent.DESELECTED;
 		}
 	}
 
@@ -121,6 +129,10 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 
 	public boolean getShowAll() {
 		return setShowAll;
+	}
+
+	public boolean getColor() {
+		return setColor;
 	}
 
 	public boolean resetRequested() {

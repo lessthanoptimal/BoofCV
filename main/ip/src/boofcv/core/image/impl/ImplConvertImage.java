@@ -794,6 +794,4 @@ public class ImplConvertImage {
 			}
 		}
 	}
-
-
 }

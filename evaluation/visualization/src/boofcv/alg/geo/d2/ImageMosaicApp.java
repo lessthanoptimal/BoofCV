@@ -47,7 +47,12 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
+ *
+ *
  * @author Peter Abeles
+ * @param <I> Input image type
+ * @param <D> Image derivative type
+ * @param <O> Output image type
  */
 // TODO change scale
 // todo create stabilize app using common code
@@ -64,7 +69,7 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 	private ModelMatcher<Object,AssociatedPair> modelMatcher;
 
 	private MosaicImagePointKey<I> mosaicAlg;
-	private RenderImageMosaic<I,?> mosaicRender;
+	private final RenderImageMosaic<I,?> mosaicRender;
 
 	private StabilizationInfoPanel infoPanel;
 	private ImagePanel gui = new ImagePanel();
@@ -160,7 +165,7 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 		g2.drawLine((int)d.x,(int)d.y,(int)a.x,(int)a.y);
 	}
 	
-	public boolean closeToImageBounds( int frameWidth , int frameHeight, int tol )  {
+	private boolean closeToImageBounds( int frameWidth , int frameHeight, int tol )  {
 		Homography2D_F32 worldToCurr = mosaicAlg.getWorldToCurr();
 		Homography2D_F32 currToWorld = worldToCurr.invert(null);
 
@@ -224,8 +229,14 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 		if( infoPanel.resetRequested() || closeToImageBounds(frame.width,frame.height,30)) {
 			Homography2D_F32 oldToNew = new Homography2D_F32();
 			mosaicAlg.refocus(oldToNew);
-
 			mosaicRender.distortMosaic(oldToNew);
+		}
+
+		// switch between B&W and color mosaic modes
+		if( infoPanel.getColor() != mosaicRender.getColorOutput() ) {
+			synchronized ( mosaicRender ) {
+				mosaicRender.setColorOutput(infoPanel.getColor());
+			}
 		}
 
 		Homography2D_F32 worldToCurr = mosaicAlg.getWorldToCurr();
@@ -236,7 +247,7 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 
 		final int numAssociated = modelMatcher.getMatchSet().size();
 		final int numFeatures = tracker.getActiveTracks().size();
-
+		
 		// update GUI
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -245,14 +256,16 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 				infoPanel.setNumTracks(numFeatures);
 				infoPanel.setKeyFrames(totalKeyFrames);
 				infoPanel.repaint();
-				
-				BufferedImage out = gui.getImage();
-				ConvertBufferedImage.convertTo(mosaicRender.getMosaic(), out);
 
+				// todo synchronization on mosaicRender
+				BufferedImage out = gui.getImage();
+				synchronized ( mosaicRender ) {
+					ConvertBufferedImage.convertTo(mosaicRender.getMosaic(), out);
+				}
 				Graphics2D g2 = out.createGraphics();
 
 				drawImageBounds(width,height, currToWorld, g2);
-				drawFeatures(currToWorld, g2);
+				drawFeatures(currToWorld, g2);//todo potential thread problem here
 
 				gui.repaint();
 			}
@@ -308,10 +321,10 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 		ImageMosaicApp app = new ImageMosaicApp(ImageFloat32.class, ImageFloat32.class, true);
 
 		VideoListManager manager = new VideoListManager(ImageFloat32.class);
-		manager.add("Plane 1", "MJPEG", "/home/pja/a/foo15.mjpeg");
-		manager.add("Plane 2", "MJPEG", "/home/pja/a/foo6.mjpeg");
-		manager.add("Plane 3", "MJPEG", "/home/pja/a/foo20.mjpeg");
-		manager.add("Plane 4", "MJPEG", "/home/pja/a/foo21.mjpeg");
+		manager.add("Plane 1", "MJPEG", "../foo15.mjpeg");
+		manager.add("Plane 2", "MJPEG", "../foo6.mjpeg");
+		manager.add("Plane 3", "MJPEG", "../foo20.mjpeg");
+		manager.add("Plane 4", "MJPEG", "../foo21.mjpeg");
 
 		manager.add("Shake", "MJPEG", "../applet/data/shake.mjpeg");
 		manager.add("Zoom", "MJPEG", "../applet/data/zoom.mjpeg");
