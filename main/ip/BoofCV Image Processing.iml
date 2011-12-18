@@ -12,8 +12,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="libpja" />
     <orderEntry type="module" module-name="GeoRegression" />
-    <orderEntry type="library" scope="TEST" name="testing" level="project" />
     <orderEntry type="module" module-name="ejml" />
+    <orderEntry type="library" scope="TEST" name="testing" level="project" />
   </component>
 </module>
 

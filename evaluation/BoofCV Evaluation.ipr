@@ -19,16 +19,6 @@
       <properties />
     </buildFile>
   </component>
-  <component name="ArtifactManager">
-    <artifact name="libpja:jar">
-      <output-path>$PROJECT_DIR$/../../libpjajava</output-path>
-      <root id="root">
-        <element id="archive" name="libpja.jar">
-          <element id="module-output" name="libpja" />
-        </element>
-      </root>
-    </artifact>
-  </component>
   <component name="CCaseConfig">
     <option name="checkoutReserved" value="false" />
     <option name="markExternalChangeAsUpToDate" value="true" />
@@ -228,10 +218,12 @@
           <option name="m_ignoreExpressionsContainingConstants" value="false" />
         </inspection_tool>
         <inspection_tool class="SimplifiableIfStatement" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="TestCaseInProductCode" enabled="true" level="ERROR" enabled_by_default="true" />
         <inspection_tool class="UnnecessaryLocalVariable" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_ignoreImmediatelyReturnedVariables" value="false" />
           <option name="m_ignoreAnnotatedVariables" value="false" />
         </inspection_tool>
+        <inspection_tool class="UseOfObsoleteAssert" enabled="true" level="ERROR" enabled_by_default="true" />
       </profile>
     </profiles>
     <option name="PROJECT_PROFILE" value="Project Default" />
@@ -430,7 +422,7 @@
       <module fileurl="file://$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" filepath="$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/visualize/BoofCV Visualize.iml" filepath="$PROJECT_DIR$/../main/visualize/BoofCV Visualize.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" filepath="$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../georegression/GeoRegression.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../GeoRegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../GeoRegression/GeoRegression.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../../ejml/trunk/ejml.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../libpjajava/libpja.iml" filepath="$PROJECT_DIR$/../../libpjajava/libpja.iml" />
     </modules>

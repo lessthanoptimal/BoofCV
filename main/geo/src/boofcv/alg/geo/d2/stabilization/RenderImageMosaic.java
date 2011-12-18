@@ -19,7 +19,6 @@
 package boofcv.alg.geo.d2.stabilization;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PixelTransformHomography_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -27,10 +26,10 @@ import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
-import georegression.struct.homo.Homography2D_F32;
 
 import java.awt.image.BufferedImage;
 
@@ -60,7 +59,6 @@ public class RenderImageMosaic<I extends ImageSingleBand, O extends ImageBase> {
 	// Color input image in a format BoofCV understands
 	O frameMulti;
 
-	PixelTransformHomography_F32 distort = new PixelTransformHomography_F32();
 	ImageDistort<O> distorter;
 
 	public RenderImageMosaic( int mosaicWidth , int mosaicHeight , Class<I> imageType , boolean color ) {
@@ -107,10 +105,9 @@ public class RenderImageMosaic<I extends ImageSingleBand, O extends ImageBase> {
 	 * @param buffImage Color image of the current frame.
 	 * @param worldToCurr Transformation from the world into the current frame.
 	 */
-	public synchronized void update(I frame, BufferedImage buffImage , Homography2D_F32 worldToCurr ) {
+	public synchronized void update(I frame, BufferedImage buffImage , PixelTransform_F32 worldToCurr ) {
 
-		distort.set(worldToCurr);
-		distorter.setModel(distort);
+		distorter.setModel(worldToCurr);
 
 		if( colorOutput ) {
 			frameMulti.reshape(frame.width,frame.height);
@@ -127,9 +124,8 @@ public class RenderImageMosaic<I extends ImageSingleBand, O extends ImageBase> {
 	 *
 	 * @param oldToNew  Transform from the old mosaic to the new mosaic's coordinate system
 	 */
-	public synchronized void distortMosaic( Homography2D_F32 oldToNew ) {
-		distort.set(oldToNew);
-		distorter.setModel(distort);
+	public synchronized void distortMosaic( PixelTransform_F32 oldToNew ) {
+		distorter.setModel(oldToNew);
 		GeneralizedImageOps.fill(tempMosaic,0);
 		distorter.apply(imageMosaic, tempMosaic);
 

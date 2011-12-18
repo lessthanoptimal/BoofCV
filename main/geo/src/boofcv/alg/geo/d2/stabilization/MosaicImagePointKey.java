@@ -22,10 +22,7 @@ import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.affine.Affine2D_F64;
-import georegression.struct.homo.Homography2D_F32;
-import georegression.struct.homo.Homography2D_F64;
-import georegression.struct.homo.UtilHomography;
+import georegression.struct.InvertibleTransform;
 
 import java.util.List;
 
@@ -34,171 +31,132 @@ import java.util.List;
  */
 // todo create a common alg with stabilize?
 // todo create a class just for rending the point
-public class MosaicImagePointKey<I extends ImageSingleBand> {
+public class MosaicImagePointKey<I extends ImageSingleBand, T extends InvertibleTransform> {
 
-	int absoluteMinimumTracks = 50;
-	double respawnTrackFraction = 0.5;
 	// number of detected features
-	int totalSpawned;
-
-	// if less than this fraction of the window is convered by features switch views
-	double respawnCoverageFraction = 0.80;
-	// coverage right after spawning new features
-	double maxCoverage;
+	private int totalSpawned;
 
 	boolean firstFrame = true;
-	boolean keyFrameChanged = false;
-
 	ImagePointTracker<I> tracker;
-	ModelMatcher<Object,AssociatedPair> modelMatcher;
+	ModelMatcher<T,AssociatedPair> modelMatcher;
 	PruneCloseTracks pruneClose = new PruneCloseTracks(3,1,1);
 
 	// transform of image to world
-	Homography2D_F32 Hinit = new Homography2D_F32(1,0,0,0,1,0,0,0,1);
+	T Hinit;
 
 	// transform from the world frame to the key frame
-	Homography2D_F32 worldToKey = new Homography2D_F32();
+	T worldToKey;
 	// transform from key frame to current frame
-	Homography2D_F32 keyToCurr = new Homography2D_F32();
+	T keyToCurr;
 	// transform from world to current frame
-	Homography2D_F32 worldToCurr = new Homography2D_F32();
+	T worldToCurr;
 
 	public MosaicImagePointKey(ImagePointTracker<I> tracker,
-							   ModelMatcher<Object, AssociatedPair> modelMatcher )
+							   ModelMatcher<T, AssociatedPair> modelMatcher,
+							   T model )
 	{
 		this.tracker = tracker;
 		this.modelMatcher = modelMatcher;
+		
+		Hinit = (T)model.createInstance();
+		worldToKey = (T)model.createInstance();
+		keyToCurr = (T)model.createInstance();
+		worldToCurr = (T)model.createInstance();
 	}
 
-	public void setInitialTransform( Homography2D_F32 H ) {
+	public void setInitialTransform( T H ) {
 		Hinit.set(H);
 	}
 
-	public void refocus( Homography2D_F32 oldWorldToNewWorld ) {
+	/**
+	 * Makes the current frame the first frame and discards the part history
+	 */
+	public void reset() {
+		worldToKey.set(Hinit);
+		keyToCurr.set(Hinit);
+		worldToCurr.set(Hinit);
+		tracker.setCurrentToKeyFrame();
+		tracker.spawnTracks();
+	}
 
-		Homography2D_F32 worldToKey = this.worldToKey.invert(null);
+	public void refocus( T oldWorldToNewWorld ) {
+
+		T worldToKey = (T)this.worldToKey.invert(null);
 		Hinit.concat(worldToKey, oldWorldToNewWorld);
 
 		this.worldToKey.set(Hinit);
 		this.worldToKey.concat(keyToCurr, worldToCurr);
 	}
 
-	public void process( I frame ) {
-		keyFrameChanged = false;
-
+	public boolean process( I frame ) {
 		tracker.process(frame);
 		
 		if( firstFrame ) {
 			firstFrame = false;
 			tracker.spawnTracks();
-			maxCoverage = imageCoverageFraction(frame.width,frame.height, tracker.getActiveTracks());
 			worldToKey.set(Hinit);
+			worldToCurr.set(Hinit);
 			pruneClose.resize(frame.width,frame.height);
+			return true;
 		}
 
 		List<AssociatedPair> pairs = tracker.getActiveTracks();
 		if( !modelMatcher.process(pairs,null) ) {
-			System.out.println("crap");
-			return;
+			return false;
 		}
 
-		convertModelToHomography(keyToCurr, modelMatcher.getModel());
+		keyToCurr.set(modelMatcher.getModel());
 
 		worldToKey.concat(keyToCurr, worldToCurr);
 
-		double fractionCovered = imageCoverageFraction(frame.width,frame.height,pairs);
-		int matchSetSize = modelMatcher.getMatchSet().size();
 
-		if( fractionCovered < respawnCoverageFraction *maxCoverage ||
-				matchSetSize <absoluteMinimumTracks || matchSetSize < totalSpawned* respawnTrackFraction) {
-			System.out.println("change key frame: "+(fractionCovered/maxCoverage)+"  "+matchSetSize);
-			spawnTracks(frame.width,frame.height);
-			worldToKey.set(worldToCurr);
-		}
+		return true;
 	}
 
-	private void spawnTracks( int width , int height ) {
-		keyFrameChanged = true;
+	public void changeKeyFrame() {
 		tracker.setCurrentToKeyFrame();
 		tracker.spawnTracks();
-		maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
-
-		// for some trackers like KLT, they keep old features and these features can get squeezed together
-		// this will remove some of the really close features
-		if( maxCoverage < respawnCoverageFraction) {
-			// prune some of the ones which are too close
-			pruneClose.process(tracker);
-			// see if it can find some more in diverse locations
-			tracker.spawnTracks();
-			maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
-		}
+//		maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
+//
+//		// for some trackers like KLT, they keep old features and these features can get squeezed together
+//		// this will remove some of the really close features
+//		if( maxCoverage < respawnCoverageFraction) {
+//			// prune some of the ones which are too close
+//			pruneClose.process(tracker);
+//			// see if it can find some more in diverse locations
+//			tracker.spawnTracks();
+//			maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
+//		}
 
 		totalSpawned = tracker.getActiveTracks().size();
+		worldToKey.set(worldToCurr);
 	}
 
-	public Homography2D_F32 getWorldToCurr() {
+	public T getWorldToCurr() {
 		return worldToCurr;
 	}
 
-	public Homography2D_F32 getWorldToKey() {
+	public T getWorldToKey() {
 		return worldToKey;
+	}
+
+	public T getKeyToCurr() {
+		return keyToCurr;
 	}
 
 	public ImagePointTracker<I> getTracker() {
 		return tracker;
 	}
 
-	public ModelMatcher<Object, AssociatedPair> getModelMatcher() {
+	public ModelMatcher<T, AssociatedPair> getModelMatcher() {
 		return modelMatcher;
-	}
-
-	private double imageCoverageFraction( int width , int height , List<AssociatedPair> tracks ) {
-		double x0 = width;
-		double x1 = 0;
-		double y0 = height;
-		double y1 = 0;
-
-		for( AssociatedPair p : tracks ) {
-			if( p.currLoc.x < x0 )
-				x0 = p.currLoc.x;
-			if( p.currLoc.x >= x1 )
-				x1 = p.currLoc.x;
-			if( p.currLoc.y < y0 )
-				y0 = p.currLoc.y;
-			if( p.currLoc.y >= y1 )
-				y1 = p.currLoc.y;
-		}
-		return ((x1-x0)*(y1-y0))/(width*height);
-	}
-
-	private void convertModelToHomography( Homography2D_F32 currToKey , Object m ) {
-		if( m instanceof Affine2D_F64) {
-			Affine2D_F64 affine = (Affine2D_F64)m;
-
-			currToKey.a11 = (float)affine.a11;
-			currToKey.a12 = (float)affine.a12;
-			currToKey.a21 = (float)affine.a21;
-			currToKey.a22 = (float)affine.a22;
-			currToKey.a13 = (float)affine.tx;
-			currToKey.a23 = (float)affine.ty;
-			currToKey.a31 = 0;
-			currToKey.a32 = 0;
-			currToKey.a33 = 1;
-		} else if( m instanceof Homography2D_F64) {
-			Homography2D_F64 h = (Homography2D_F64)m;
-
-			UtilHomography.convert(h, currToKey);
-
-		} else {
-			throw new RuntimeException("Unexpected type: "+m.getClass().getSimpleName());
-		}
 	}
 
 	public boolean getHasProcessedImage() {
 		return !firstFrame;
 	}
 
-	public boolean isKeyFrameChanged() {
-		return keyFrameChanged;
+	public int getTotalSpawned() {
+		return totalSpawned;
 	}
 }

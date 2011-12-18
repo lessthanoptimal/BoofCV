@@ -34,15 +34,18 @@ import java.awt.event.ItemListener;
 public class StabilizationInfoPanel extends StandardAlgConfigPanel implements ItemListener, ActionListener {
 
 	JButton resetButton;
+	JCheckBox showView;
 	JCheckBox showColor;
 	JCheckBox showInliers;
 	JCheckBox showAll;
 	JTextArea displayFPS;
 	JTextArea displayNumKeyFrames;
+	JTextArea displayNumFatalErrors;
 	JTextArea displayNumTracks;
 	JTextArea displayNumInliers;
 
-	boolean setColor = true;
+	boolean setShowView = true;
+	boolean setColor = false;
 	boolean setShowInliers = false;
 	boolean setShowAll = false;
 	boolean shouldReset = false;
@@ -54,6 +57,9 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 		resetButton = new JButton("Reset");
 		resetButton.addActionListener(this);
 
+		showView = new JCheckBox("View");
+		showView.addItemListener(this);
+		showView.setSelected(setShowView);
 		showColor = new JCheckBox("Color");
 		showColor.addItemListener(this);
 		showColor.setSelected(setColor);
@@ -66,16 +72,19 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 
 		displayFPS = createTextInfo();
 		displayNumKeyFrames = createTextInfo();
+		displayNumFatalErrors = createTextInfo();
 		displayNumTracks = createTextInfo();
 		displayNumInliers = createTextInfo();
 
 		addAlignLeft(resetButton, this);
+		addAlignLeft(showView, this);
 		addAlignLeft(showColor, this);
 		addAlignLeft(showAll, this);
 		addAlignLeft(showInliers, this);
 		addSeparator(200);
 		addLabeled(displayFPS,"Algorithm FPS:",this);
 		addLabeled(displayNumKeyFrames,"Key Frames:",this);
+		addLabeled(displayNumFatalErrors,"Fatal Errors:",this);
 		addLabeled(displayNumTracks,"Tracks:",this);
 		addLabeled(displayNumInliers,"Inliers:",this);
 
@@ -104,11 +113,17 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 			setShowAll = e.getStateChange() != ItemEvent.DESELECTED;
 		} else if( e.getItem() == showColor ) {
 			setColor = e.getStateChange() != ItemEvent.DESELECTED;
+		} else if( e.getItem() == showView ) {
+			setShowView = e.getStateChange() != ItemEvent.DESELECTED;
 		}
 	}
 
 	public void setFPS( double fps ) {
 		displayFPS.setText(String.format("%5.1f", fps));
+	}
+
+	public void setFatalErrors(int errors ) {
+		displayNumFatalErrors.setText(String.format("%5d", errors));
 	}
 
 	public void setKeyFrames(int totalFaults) {
@@ -133,6 +148,10 @@ public class StabilizationInfoPanel extends StandardAlgConfigPanel implements It
 
 	public boolean getColor() {
 		return setColor;
+	}
+
+	public boolean getShowView() {
+		return setShowView;
 	}
 
 	public boolean resetRequested() {
