@@ -19,7 +19,7 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.d2.stabilization.MosaicImagePointKey;
+import boofcv.alg.geo.d2.stabilization.ImageDistortPointKey;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.ProcessInput;
@@ -87,14 +87,14 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 	}
 
 	private Affine2D_F64 createInitialTransform() {
-		float scale = 0.5f;
+		float scale = 0.8f;
 
 		Affine2D_F64 H = new Affine2D_F64(scale,0,0,scale,outputWidth/4, outputHeight/4);
 		return H.invert(null);
 	}
 
 	private boolean closeToImageBounds( int frameWidth , int frameHeight, int tol )  {
-		T worldToCurr = mosaicAlg.getWorldToCurr();
+		T worldToCurr = distortAlg.getWorldToCurr();
 
 		Homography2D_F32 currToWorld = convertToHomography(worldToCurr.invert(null));
 		
@@ -124,7 +124,7 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 	@Override
 	protected void handleFatalError() {
 		mosaicRender.clear();
-		mosaicAlg.reset();
+		distortAlg.reset();
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 
 		boolean keyframe = false;
 		int matchSetSize = modelMatcher.getMatchSet().size();
-		if( matchSetSize < mosaicAlg.getTotalSpawned()* respawnTrackFraction  || matchSetSize < absoluteMinimumTracks ) {
+		if( matchSetSize < distortAlg.getTotalSpawned()* respawnTrackFraction  || matchSetSize < absoluteMinimumTracks ) {
 			keyframe = true;
 		}
 
@@ -141,11 +141,22 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 			keyframe = true;
 		}
 
-
-		if( keyframe) {
-			mosaicAlg.changeKeyFrame();
+		if( keyframe ) {
+			distortAlg.changeKeyFrame();
 			totalKeyFrames++;
 		}
+
+//		maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
+//
+//		// for some trackers like KLT, they keep old features and these features can get squeezed together
+//		// this will remove some of the really close features
+//		if( maxCoverage < respawnCoverageFraction) {
+//			// prune some of the ones which are too close
+//			pruneClose.process(tracker);
+//			// see if it can find some more in diverse locations
+//			tracker.spawnTracks();
+//			maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
+//		}
 	}
 
 	private double imageCoverageFraction( int width , int height , List<AssociatedPair> tracks ) {
@@ -173,7 +184,7 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 		// reset the world coordinate system to the current key frame
 		if( infoPanel.resetRequested() || closeToImageBounds(frame.width,frame.height,30)) {
 			T oldToNew = fitModel.createInstance();
-			mosaicAlg.refocus(oldToNew);
+			distortAlg.refocus(oldToNew);
 			PixelTransform_F32 pixelTran = createPixelTransform(oldToNew);
 			mosaicRender.distortMosaic(pixelTran);
 		}
@@ -186,9 +197,9 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 		// make sure there is nothing left over from before
 		tracker.dropTracks();
 		createModelMatcher(maxIterations,4);
-		mosaicAlg = new MosaicImagePointKey<I,T>(tracker,modelMatcher,fitModel);
+		distortAlg = new ImageDistortPointKey<I,T>(tracker,modelMatcher,fitModel);
 		T initTran = ConvertTransform_F64.convert(createInitialTransform(), fitModel.createInstance());
-		mosaicAlg.setInitialTransform(initTran);
+		distortAlg.setInitialTransform(initTran);
 		totalKeyFrames = 0;
 		mosaicRender.clear();
 
@@ -199,14 +210,9 @@ public class ImageMosaicApp <I extends ImageSingleBand, D extends ImageSingleBan
 		ImageMosaicApp app = new ImageMosaicApp(ImageFloat32.class, ImageFloat32.class);
 
 		VideoListManager manager = new VideoListManager(ImageFloat32.class);
-		manager.add("Plane 1", "MJPEG", "../foo15.mjpeg");
-		manager.add("Plane 2", "MJPEG", "../foo6.mjpeg");
-		manager.add("Plane 3", "MJPEG", "../foo20.mjpeg");
-		manager.add("Plane 4", "MJPEG", "../foo21.mjpeg");
-
+		manager.add("Plane 1", "MJPEG", "../applet/data/mosaic/airplane01.mjpeg");
+		manager.add("Plane 2", "MJPEG", "../applet/data/mosaic/airplane02.mjpeg");
 		manager.add("Shake", "MJPEG", "../applet/data/shake.mjpeg");
-		manager.add("Zoom", "MJPEG", "../applet/data/zoom.mjpeg");
-		manager.add("Rotate", "MJPEG", "../applet/data/rotate.mjpeg");
 
 		app.setInputManager(manager);
 

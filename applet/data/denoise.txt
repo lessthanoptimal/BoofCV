@@ -1,5 +1,0 @@
-Lena:standard/lena512.jpg
-Barbara:standard/barbara.jpg
-Boat:standard/boat.jpg
-Fingerprint:standard/fingerprint.jpg
-Peppers:standard/peppers256.jpg

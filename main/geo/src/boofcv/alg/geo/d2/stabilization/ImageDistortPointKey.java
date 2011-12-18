@@ -1,0 +1,189 @@
+/*
+ * Copyright (c) 2011, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://www.boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.geo.d2.stabilization;
+
+import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.alg.geo.AssociatedPair;
+import boofcv.numerics.fitting.modelset.ModelMatcher;
+import boofcv.struct.image.ImageSingleBand;
+import georegression.struct.InvertibleTransform;
+
+import java.util.List;
+
+/**
+ * Computes the transform from the first image in a sequence to the current frame. Designed to be
+ * useful for stabilization and mosaic creation.
+ *
+ * @author Peter Abeles
+ * @param <I> Input image type
+ * @param <T> Motion model data type
+ */
+public class ImageDistortPointKey<I extends ImageSingleBand, T extends InvertibleTransform> {
+
+	// number of detected features
+	private int totalSpawned;
+
+	// total number of frames processed
+	int totalProcessed = 0;
+	// feature tracker
+	ImagePointTracker<I> tracker;
+	// Fits a model to the tracked features
+	ModelMatcher<T,AssociatedPair> modelMatcher;
+	// used to prune feature tracks which are too close together
+	PruneCloseTracks pruneClose = new PruneCloseTracks(3,1,1);
+
+	// assumed initial transform from the first image to the world
+	T worldToInit;
+
+	// transform from the world frame to the key frame
+	T worldToKey;
+	// transform from key frame to current frame
+	T keyToCurr;
+	// transform from world to current frame
+	T worldToCurr;
+
+	/**
+	 * Specify algorithms to use internally.  Each of these classes must work with
+	 * compatible data structures.
+	 *
+	 * @param tracker feature tracker
+	 * @param modelMatcher Fits model to track data
+	 * @param model Motion model data structure
+	 */
+	public ImageDistortPointKey(ImagePointTracker<I> tracker,
+								ModelMatcher<T, AssociatedPair> modelMatcher,
+								T model)
+	{
+		this.tracker = tracker;
+		this.modelMatcher = modelMatcher;
+		
+		worldToInit = (T)model.createInstance();
+		worldToKey = (T)model.createInstance();
+		keyToCurr = (T)model.createInstance();
+		worldToCurr = (T)model.createInstance();
+	}
+
+	/**
+	 * Specifies the initially assumed transform from the world frame
+	 * to the first image.
+	 *
+	 * @param worldToInit The transform.
+	 */
+	public void setInitialTransform( T worldToInit) {
+		this.worldToInit.set(worldToInit);
+	}
+
+	/**
+	 * Makes the current frame the first frame and discards its past history
+	 */
+	public void reset() {
+		worldToKey.set(worldToInit);
+		keyToCurr.set(worldToInit);
+		worldToCurr.set(worldToInit);
+		tracker.setCurrentToKeyFrame();
+		tracker.spawnTracks();
+		totalProcessed = 1;
+	}
+
+	/**
+	 * Transforms the world frame into another coordinate system.
+	 *
+	 * @param oldWorldToNewWorld Transform from the old world frame to the new world frame
+	 */
+	public void refocus( T oldWorldToNewWorld ) {
+
+		T worldToKey = (T) this.worldToKey.invert(null);
+		worldToInit.concat(worldToKey, oldWorldToNewWorld);
+
+		this.worldToKey.set(worldToInit);
+		this.worldToKey.concat(keyToCurr, worldToCurr);
+	}
+
+	/**
+	 * Processes the next frame in the sequence.
+	 *
+	 * @param frame Next frame in the video sequence
+	 * @return If a fatal error occurred or not.
+	 */
+	public boolean process( I frame ) {
+		// update the feature tracker
+		tracker.process(frame);
+		totalProcessed++;
+
+		// set up data structures and spawn tracks
+		if( totalProcessed == 1 ) {
+			tracker.spawnTracks();
+			worldToKey.set(worldToInit);
+			worldToCurr.set(worldToInit);
+			pruneClose.resize(frame.width,frame.height);
+			return true;
+		}
+
+		// fit the motion model to the feature tracks
+		List<AssociatedPair> pairs = tracker.getActiveTracks();
+		if( !modelMatcher.process(pairs,null) ) {
+			return false;
+		}
+
+		// Update the motion
+		keyToCurr.set(modelMatcher.getModel());
+		worldToKey.concat(keyToCurr, worldToCurr);
+
+		return true;
+	}
+
+	/**
+	 * Make the current frame the first frame in the sequence
+	 */
+	public void changeKeyFrame() {
+		tracker.setCurrentToKeyFrame();
+		tracker.spawnTracks();
+
+		totalSpawned = tracker.getActiveTracks().size();
+		worldToKey.set(worldToCurr);
+	}
+
+	public T getWorldToCurr() {
+		return worldToCurr;
+	}
+
+	public T getWorldToKey() {
+		return worldToKey;
+	}
+
+	public T getKeyToCurr() {
+		return keyToCurr;
+	}
+
+	public ImagePointTracker<I> getTracker() {
+		return tracker;
+	}
+
+	public ModelMatcher<T, AssociatedPair> getModelMatcher() {
+		return modelMatcher;
+	}
+
+	public int getTotalProcessed() {
+		return totalProcessed;
+	}
+
+	public int getTotalSpawned() {
+		return totalSpawned;
+	}
+}

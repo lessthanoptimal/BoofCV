@@ -181,7 +181,7 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		tracksActive.clear();
 		tracksDropped.clear();
 
-		if( keyFrameSet ) {
+		if( keyFrameSet && matches != null ) {
 			for( int i = 0; i < featDst.size; i++ ) {
 				Point2D_F64 loc = locDst.get(i);
 				// see if the track had been associated with an older one
@@ -262,6 +262,7 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		tracksActive.clear();
 		tracksAll.clear();
 		tracksNew.clear();
+		matches = null;
 
 		keyFrameSet = false;
 		if( featSrc != null ) {

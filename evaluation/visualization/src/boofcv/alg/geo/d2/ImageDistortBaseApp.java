@@ -22,7 +22,7 @@ import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.PixelTransformHomography_F32;
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.d2.stabilization.MosaicImagePointKey;
+import boofcv.alg.geo.d2.stabilization.ImageDistortPointKey;
 import boofcv.alg.geo.d2.stabilization.RenderImageMosaic;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ProcessInput;
@@ -52,7 +52,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Parent for applications which distort the input image using extracted point features
+ * Parent class for applications which distort the input image based upon fit parameters to a model on extracted
+ * point features.  Only gray scale images are processed, but the output can be in gray scale or color.
  *
  * @author Peter Abeles
  */
@@ -60,42 +61,59 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		T extends InvertibleTransform>
 		extends VideoProcessAppBase<I,D> implements ProcessInput
 {
+	// If the input and output images are being shown, this is the width of a border between them.
 	private final static int outputBorder = 10;
-	
+
+	// tracks feature in the video stream
 	protected ImagePointTracker<I> tracker;
+	// finds the best fit model parameters to describe feature motion
 	protected ModelMatcher<T,AssociatedPair> modelMatcher;
-	protected MosaicImagePointKey<I,T> mosaicAlg;
+	// computes motion across multiple frames intelligently
+	protected ImageDistortPointKey<I,T> distortAlg;
 	
 	protected RenderImageMosaic<I,?> mosaicRender;
 
 	BufferedImage distortedImage;
 
-	protected StabilizationInfoPanel infoPanel;
+	protected DistortInfoPanel infoPanel;
 	private DisplayPanel gui = new DisplayPanel();
-	
+
+	// dimension of output image, specified by child
 	protected int outputWidth;
 	protected int outputHeight;
 
+	// dimension of input image, extracted from stream
 	protected int inputWidth;
 	protected int inputHeight;
-	
+
+	// data type which is being fit
 	T fitModel;
+	// type of gray scale
 	Class<I> imageType;
 	boolean colorOutput = true;
 
+	// crude performance statistics
 	protected int totalKeyFrames = 0;
 	protected int totalFatalErrors = 0;
 
+	// display options
 	protected boolean showInput;
 	protected boolean showImageView = true;
 
+	/**
+	 * Specifies setup
+	 * 
+	 * @param showInput Will the input be shown along with the distorted image?
+	 * @param imageType Type of gray scale image being processed
+	 * @param numAlgFamilies Number of algs in GUI bar
+	 */
 	public ImageDistortBaseApp( boolean showInput , Class<I> imageType , int numAlgFamilies)
 	{
 		super(numAlgFamilies);
 		this.showInput = showInput;
 		this.imageType = imageType;
 
-		infoPanel = new StabilizationInfoPanel();
+		infoPanel = new DistortInfoPanel();
 		infoPanel.setMaximumSize(infoPanel.getPreferredSize());
 		gui.addMouseListener(this);
 
@@ -121,55 +139,88 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		gui.setMinimumSize(gui.getPreferredSize());
 	}
 
+	/**
+	 * Start processing the image sequence
+	 * 
+	 * @param sequence Image sequence being processed
+	 */
 	@Override
 	protected void process(SimpleImageSequence<I> sequence) {
 		if( !sequence.hasNext() )
 			return;
+		// stop the image processing code
 		stopWorker();
 
 		this.sequence = sequence;
 		
+		// save the input image dimension
 		I input = sequence.next();
 		inputWidth = input.width;
 		inputHeight = input.height;
 
+		// start everything up and resume processing
 		doRefreshAll();
 	}
 
+	/**
+	 * Updates the distortion estimation, but no GUI work here
+	 * @param frame gray scale frame being processed
+	 * @param buffImage color image being processed
+	 */
 	@Override
 	protected void updateAlg(I frame, BufferedImage buffImage) {
-		if( mosaicAlg == null )
+		if( distortAlg == null )
 			return;
 
-		if( !mosaicAlg.process(frame) ) {
+		// update the image motion estimation
+		if( !distortAlg.process(frame) ) {
 			totalFatalErrors++;
 			handleFatalError();
+		} else if( distortAlg.getTotalProcessed() == 1 ) {
+			// if only one frame has been processed it has no tracks yet
+			return;
 		}
 
-		renderCurrentTransform(frame, buffImage);
+		// render the results onto the distorted image
+		renderCurrentTransform(frame, buffImage); // todo let child decide if it wants to do this?
+		
+		// get the transform from the key frame to the current frame
+		// and let the child decide what to do (e.g. fault, reset, do nothing)
 		PixelTransform_F32 pixelTran;
 
-		T keyToCurr = mosaicAlg.getKeyToCurr();
+		T keyToCurr = distortAlg.getKeyToCurr();
 		pixelTran = createPixelTransform(keyToCurr);
-		checkStatus(pixelTran,frame,buffImage);
+		checkStatus(pixelTran, frame, buffImage);
 	}
 
+	/**
+	 * Adds the current frame onto the distorted image
+	 */
 	protected void renderCurrentTransform(I frame, BufferedImage buffImage) {
-		T worldToCurr = mosaicAlg.getWorldToCurr();
+		T worldToCurr = distortAlg.getWorldToCurr();
 		PixelTransform_F32 pixelTran = createPixelTransform(worldToCurr);
 
-		mosaicRender.update(frame,buffImage,pixelTran);
+		mosaicRender.update(frame, buffImage, pixelTran);
 	}
 
+	/**
+	 * The child should check the tracks status here and decide what to do
+	 */
 	protected abstract void checkStatus( PixelTransform_F32 keyToCurr , I frame , BufferedImage buffImage  );
 
-	protected PixelTransform_F32 createPixelTransform(T worldToCurr) {
+	/**
+	 * Given a motion model create a PixelTransform used to distort the image
+	 *
+	 * @param transform Motion transform
+	 * @return PixelTransform_F32 used to distort the image
+	 */
+	protected PixelTransform_F32 createPixelTransform(T transform) {
 		PixelTransform_F32 pixelTran;
-		if( worldToCurr instanceof Homography2D_F64) {
-			Homography2D_F32 t = UtilHomography.convert((Homography2D_F64)worldToCurr,null);
+		if( transform instanceof Homography2D_F64) {
+			Homography2D_F32 t = UtilHomography.convert((Homography2D_F64)transform,null);
 			pixelTran = new PixelTransformHomography_F32(t);
-		} else if( worldToCurr instanceof  Affine2D_F64 ) {
-			Affine2D_F32 t = UtilAffine.convert((Affine2D_F64) worldToCurr, null);
+		} else if( transform instanceof  Affine2D_F64 ) {
+			Affine2D_F32 t = UtilAffine.convert((Affine2D_F64) transform, null);
 			pixelTran = new PixelTransformAffine_F32(t);
 		} else {
 			throw new RuntimeException("Unknown model type");
@@ -187,7 +238,7 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 			}
 		}
 
-		T worldToCurr = mosaicAlg.getWorldToCurr();
+		T worldToCurr = distortAlg.getWorldToCurr();
 		final T currToWorld = (T)worldToCurr.invert(null);
 
 		ConvertBufferedImage.convertTo(mosaicRender.getMosaic(), distortedImage);
@@ -227,6 +278,11 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		});
 	}
 
+	/**
+	 * Convert other motion models that are 64 bit into a 32 bit homography
+	 * @param m 64F motion model
+	 * @return Homography2D_F32
+	 */
 	protected Homography2D_F32 convertToHomography(T m) {
 
 		Homography2D_F32 H = new Homography2D_F32();
@@ -255,6 +311,17 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		return H;
 	}
 
+	/**
+	 * Draws the location of the current image onto the distorted image as a red quadrilateral.
+	 * 
+	 * @param scale The scale from distorted image to its display output
+	 * @param offsetX  Offset in the display output
+	 * @param offsetY  Offset in the display output
+	 * @param width  Width of input image
+	 * @param height Height of input image
+	 * @param currToGlobal Transform from current frame to global reference frame
+	 * @param g2 Drawing object
+	 */
 	protected void drawImageBounds( float scale , int offsetX , int offsetY , int width , int height, Homography2D_F32 currToGlobal, Graphics g2) {
 		Point2D_F32 a = new Point2D_F32(0,0);
 		Point2D_F32 b = new Point2D_F32(0+width,0);
@@ -338,7 +405,7 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 
 	@Override
 	public boolean getHasProcessedImage() {
-		return mosaicAlg != null && mosaicAlg.getHasProcessedImage();
+		return distortAlg != null && distortAlg.getTotalProcessed() > 0;
 	}
 
 	@Override
@@ -374,11 +441,18 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		startEverything();
 	}
 
+	/**
+	 * Displays the results as either just the distorted output image or as the input and distorted image
+	 * side by side.
+	 */
 	private class DisplayPanel extends JPanel
 	{
+		// original input image
 		BufferedImage orig;
-		BufferedImage stabilized;
+		// rendered distorted image
+		BufferedImage distorted;
 
+		// copies of feature location for GUI thread
 		FastQueue<Point2D_F32> inliers = new FastQueue<Point2D_F32>(300,Point2D_F32.class,true);
 		FastQueue<Point2D_F32> allTracks = new FastQueue<Point2D_F32>(300,Point2D_F32.class,true);
 
@@ -387,7 +461,7 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		public void setImages( BufferedImage orig , BufferedImage stabilized )
 		{
 			this.orig = orig;
-			this.stabilized = stabilized;
+			this.distorted = stabilized;
 		}
 
 		public synchronized void setInliers(java.util.List<AssociatedPair> list) {
@@ -414,7 +488,7 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		public synchronized void paintComponent(Graphics g) {
 			super.paintComponent(g);
 
-			if( orig == null || stabilized == null )
+			if( orig == null || distorted == null )
 				return;
 
 			Graphics2D g2 = (Graphics2D)g;
@@ -430,17 +504,17 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 			int w = getWidth();
 			int h = getHeight();
 
-			double scaleX = w/(double)stabilized.getWidth();
-			double scaleY = h/(double)stabilized.getHeight();
+			double scaleX = w/(double) distorted.getWidth();
+			double scaleY = h/(double) distorted.getHeight();
 
 			double scale = Math.min(scaleX,scaleY);
 			if( scale > 1 ) scale = 1;
 
-			int scaledWidth = (int)(scale*stabilized.getWidth());
-			int scaledHeight = (int)(scale*stabilized.getHeight());
+			int scaledWidth = (int)(scale* distorted.getWidth());
+			int scaledHeight = (int)(scale* distorted.getHeight());
 
 			// draw stabilized on right
-			g2.drawImage(stabilized,0,0,scaledWidth,scaledHeight,0,0,stabilized.getWidth(),stabilized.getHeight(),null);
+			g2.drawImage(distorted,0,0,scaledWidth,scaledHeight,0,0, distorted.getWidth(), distorted.getHeight(),null);
 
 			drawFeatures((float)scale,0,0,allTracks,inliers,currToWorld,g2);
 
@@ -450,8 +524,8 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		
 		private void drawBoth( Graphics2D g2 ) {
 			
-			int desiredWidth = orig.getWidth()+stabilized.getWidth();
-			int desiredHeight = Math.max(orig.getHeight(),stabilized.getHeight());
+			int desiredWidth = orig.getWidth()+ distorted.getWidth();
+			int desiredHeight = Math.max(orig.getHeight(), distorted.getHeight());
 
 			int w = getWidth()-outputBorder;
 			int h = getHeight();
@@ -465,14 +539,14 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 			int scaledInputWidth = (int)(scale*orig.getWidth());
 			int scaledInputHeight = (int)(scale*orig.getHeight());
 
-			int scaledOutputWidth = (int)(scale*stabilized.getWidth());
-			int scaledOutputHeight = (int)(scale*stabilized.getHeight());
+			int scaledOutputWidth = (int)(scale* distorted.getWidth());
+			int scaledOutputHeight = (int)(scale* distorted.getHeight());
 
 			//  draw undistorted on left
 			g2.drawImage(orig,0,0,scaledInputWidth,scaledInputHeight,0,0,orig.getWidth(),orig.getHeight(),null);
 
 			// draw distorted on right
-			g2.drawImage(stabilized,scaledInputWidth+outputBorder,0,scaledInputWidth+scaledOutputWidth+outputBorder,scaledOutputHeight,0,0,outputWidth,outputHeight,null);
+			g2.drawImage(distorted,scaledInputWidth+outputBorder,0,scaledInputWidth+scaledOutputWidth+outputBorder,scaledOutputHeight,0,0,outputWidth,outputHeight,null);
 
 			drawFeatures((float)scale,0,0,allTracks,inliers,g2);
 			drawFeatures((float)scale,scaledInputWidth+outputBorder,0,allTracks,inliers,currToWorld,g2);
@@ -486,6 +560,12 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		}
 	}
 
+	/**
+	 * Create a {@link ModelMatcher} for the type of model it is fitting to
+	 *
+	 * @param maxIterations Maximum number of iterations in RANSAC
+	 * @param thresholdFit Inlier fit threshold
+	 */
 	protected void createModelMatcher( int maxIterations , double thresholdFit ) {
 
 		ModelFitter fitter;

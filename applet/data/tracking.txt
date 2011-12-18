@@ -1,4 +1,0 @@
-shake:MJPEG:shake.mjpeg
-zoom:MJPEG:zoom.mjpeg
-rotate:MJPEG:rotate.mjpeg
-
