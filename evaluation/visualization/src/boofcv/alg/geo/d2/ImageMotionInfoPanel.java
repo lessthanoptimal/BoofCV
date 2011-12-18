@@ -33,7 +33,7 @@ import java.awt.event.ItemListener;
  *
  * @author Peter Abeles
  */
-public class DistortInfoPanel extends StandardAlgConfigPanel implements ItemListener, ActionListener {
+public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements ItemListener, ActionListener {
 
 	JButton resetButton;
 	JCheckBox showView;
@@ -42,17 +42,16 @@ public class DistortInfoPanel extends StandardAlgConfigPanel implements ItemList
 	JCheckBox showAll;
 	JTextArea displayFPS;
 	JTextArea displayNumKeyFrames;
-	JTextArea displayNumFatalErrors;
 	JTextArea displayNumTracks;
 	JTextArea displayNumInliers;
 
 	boolean setShowView = true;
-	boolean setColor = false;
+	boolean setColor = true;
 	boolean setShowInliers = false;
 	boolean setShowAll = false;
 	boolean shouldReset = false;
 
-	public DistortInfoPanel() {
+	public ImageMotionInfoPanel() {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
@@ -74,7 +73,6 @@ public class DistortInfoPanel extends StandardAlgConfigPanel implements ItemList
 
 		displayFPS = createTextInfo();
 		displayNumKeyFrames = createTextInfo();
-		displayNumFatalErrors = createTextInfo();
 		displayNumTracks = createTextInfo();
 		displayNumInliers = createTextInfo();
 
@@ -86,7 +84,6 @@ public class DistortInfoPanel extends StandardAlgConfigPanel implements ItemList
 		addSeparator(200);
 		addLabeled(displayFPS,"Algorithm FPS:",this);
 		addLabeled(displayNumKeyFrames,"Key Frames:",this);
-		addLabeled(displayNumFatalErrors,"Fatal Errors:",this);
 		addLabeled(displayNumTracks,"Tracks:",this);
 		addLabeled(displayNumInliers,"Inliers:",this);
 
@@ -122,10 +119,6 @@ public class DistortInfoPanel extends StandardAlgConfigPanel implements ItemList
 
 	public void setFPS( double fps ) {
 		displayFPS.setText(String.format("%5.1f", fps));
-	}
-
-	public void setFatalErrors(int errors ) {
-		displayNumFatalErrors.setText(String.format("%5d", errors));
 	}
 
 	public void setKeyFrames(int totalFaults) {

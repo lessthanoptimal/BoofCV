@@ -19,11 +19,10 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.distort.PixelTransformHomography_F32;
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.d2.stabilization.ImageDistortPointKey;
-import boofcv.alg.geo.d2.stabilization.RenderImageMosaic;
+import boofcv.alg.geo.d2.stabilization.ImageMotionPointKey;
+import boofcv.alg.geo.d2.stabilization.RenderImageMotion;
+import boofcv.alg.geo.d2.stabilization.UtilImageMotion;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.VideoProcessAppBase;
@@ -38,9 +37,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
-import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
-import georegression.struct.affine.UtilAffine;
 import georegression.struct.homo.Homography2D_F32;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.homo.UtilHomography;
@@ -52,12 +49,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Parent class for applications which distort the input image based upon fit parameters to a model on extracted
+ * Parent class for applications which estimate image motion based upon fit parameters to a model on extracted
  * point features.  Only gray scale images are processed, but the output can be in gray scale or color.
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends ImageSingleBand , 
+public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends ImageSingleBand ,
 		T extends InvertibleTransform>
 		extends VideoProcessAppBase<I,D> implements ProcessInput
 {
@@ -69,13 +66,15 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 	// finds the best fit model parameters to describe feature motion
 	protected ModelMatcher<T,AssociatedPair> modelMatcher;
 	// computes motion across multiple frames intelligently
-	protected ImageDistortPointKey<I,T> distortAlg;
-	
-	protected RenderImageMosaic<I,?> mosaicRender;
+	// MUST be declared by child class
+	protected ImageMotionPointKey<I,T> distortAlg;
+
+	// render the found motion on the output image
+	protected RenderImageMotion<I,?> motionRender;
 
 	BufferedImage distortedImage;
 
-	protected DistortInfoPanel infoPanel;
+	protected ImageMotionInfoPanel infoPanel;
 	private DisplayPanel gui = new DisplayPanel();
 
 	// dimension of output image, specified by child
@@ -94,7 +93,6 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 
 	// crude performance statistics
 	protected int totalKeyFrames = 0;
-	protected int totalFatalErrors = 0;
 
 	// display options
 	protected boolean showInput;
@@ -102,18 +100,18 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 
 	/**
 	 * Specifies setup
-	 * 
+	 *
 	 * @param showInput Will the input be shown along with the distorted image?
 	 * @param imageType Type of gray scale image being processed
 	 * @param numAlgFamilies Number of algs in GUI bar
 	 */
-	public ImageDistortBaseApp( boolean showInput , Class<I> imageType , int numAlgFamilies)
+	public ImageMotionBaseApp(boolean showInput, Class<I> imageType, int numAlgFamilies)
 	{
 		super(numAlgFamilies);
 		this.showInput = showInput;
 		this.imageType = imageType;
 
-		infoPanel = new DistortInfoPanel();
+		infoPanel = new ImageMotionInfoPanel();
 		infoPanel.setMaximumSize(infoPanel.getPreferredSize());
 		gui.addMouseListener(this);
 
@@ -128,7 +126,7 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		this.outputWidth = width;
 		this.outputHeight = height;
 
-		mosaicRender = new RenderImageMosaic<I,ImageBase>(outputWidth,outputHeight,imageType,colorOutput);
+		motionRender = new RenderImageMotion<I,ImageBase>(outputWidth,outputHeight,imageType,colorOutput);
 		distortedImage= new BufferedImage(outputWidth,outputHeight,BufferedImage.TYPE_INT_RGB);
 
 		if(showInput) {
@@ -174,23 +172,11 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 
 		// update the image motion estimation
 		if( !distortAlg.process(frame) ) {
-			totalFatalErrors++;
 			handleFatalError();
-		} else if( distortAlg.getTotalProcessed() == 1 ) {
-			// if only one frame has been processed it has no tracks yet
-			return;
 		}
 
 		// render the results onto the distorted image
-		renderCurrentTransform(frame, buffImage); // todo let child decide if it wants to do this?
-		
-		// get the transform from the key frame to the current frame
-		// and let the child decide what to do (e.g. fault, reset, do nothing)
-		PixelTransform_F32 pixelTran;
-
-		T keyToCurr = distortAlg.getKeyToCurr();
-		pixelTran = createPixelTransform(keyToCurr);
-		checkStatus(pixelTran, frame, buffImage);
+		renderCurrentTransform(frame, buffImage);
 	}
 
 	/**
@@ -198,50 +184,26 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 	 */
 	protected void renderCurrentTransform(I frame, BufferedImage buffImage) {
 		T worldToCurr = distortAlg.getWorldToCurr();
-		PixelTransform_F32 pixelTran = createPixelTransform(worldToCurr);
+		PixelTransform_F32 pixelTran = UtilImageMotion.createPixelTransform(worldToCurr);
 
-		mosaicRender.update(frame, buffImage, pixelTran);
+		motionRender.update(frame, buffImage, pixelTran);
 	}
 
-	/**
-	 * The child should check the tracks status here and decide what to do
-	 */
-	protected abstract void checkStatus( PixelTransform_F32 keyToCurr , I frame , BufferedImage buffImage  );
-
-	/**
-	 * Given a motion model create a PixelTransform used to distort the image
-	 *
-	 * @param transform Motion transform
-	 * @return PixelTransform_F32 used to distort the image
-	 */
-	protected PixelTransform_F32 createPixelTransform(T transform) {
-		PixelTransform_F32 pixelTran;
-		if( transform instanceof Homography2D_F64) {
-			Homography2D_F32 t = UtilHomography.convert((Homography2D_F64)transform,null);
-			pixelTran = new PixelTransformHomography_F32(t);
-		} else if( transform instanceof  Affine2D_F64 ) {
-			Affine2D_F32 t = UtilAffine.convert((Affine2D_F64) transform, null);
-			pixelTran = new PixelTransformAffine_F32(t);
-		} else {
-			throw new RuntimeException("Unknown model type");
-		}
-		return pixelTran;
-	}
 
 	@Override
 	protected void updateAlgGUI(I frame, BufferedImage imageGUI, final double fps) {
 
 		// switch between B&W and color mosaic modes
-		if( infoPanel.getColor() != mosaicRender.getColorOutput() ) {
-			synchronized ( mosaicRender ) {
-				mosaicRender.setColorOutput(infoPanel.getColor());
+		if( infoPanel.getColor() != motionRender.getColorOutput() ) {
+			synchronized (motionRender) {
+				motionRender.setColorOutput(infoPanel.getColor());
 			}
 		}
 
 		T worldToCurr = distortAlg.getWorldToCurr();
 		final T currToWorld = (T)worldToCurr.invert(null);
 
-		ConvertBufferedImage.convertTo(mosaicRender.getMosaic(), distortedImage);
+		ConvertBufferedImage.convertTo(motionRender.getMosaic(), distortedImage);
 
 		// toggle on and off the view window
 		showImageView = infoPanel.getShowView();
@@ -267,7 +229,6 @@ public abstract class ImageDistortBaseApp <I extends ImageSingleBand, D extends 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				infoPanel.setFPS(fps);
-				infoPanel.setFatalErrors(totalFatalErrors);
 				infoPanel.setNumInliers(numAssociated);
 				infoPanel.setNumTracks(numFeatures);
 				infoPanel.setKeyFrames(totalKeyFrames);
