@@ -149,6 +149,7 @@ public class PointImageStabilization<I extends ImageSingleBand> {
 				double distance2 = testPoint.distance2(testResult);
 
 				if( distance2 > thresholdDistance2 ) {
+					System.out.println("Distnace exceeded");
 					// not enough overlap with the reference frame
 					referenceFrameChanged = true;
 				} else {
@@ -160,21 +161,25 @@ public class PointImageStabilization<I extends ImageSingleBand> {
 						distort.apply(input,imageOut);
 					
 						if( matchSet < thresholdChange ) {
+							System.out.println("Match set less than change");
 							// too few features in the inlier set, so change the keyframe
 							totalMotion.set(m);
 							tracker.setCurrentToKeyFrame();
 							tracker.spawnTracks();
 						}
 					} else {
+						System.out.println("Match set less than reset");
 						referenceFrameChanged = true;
 					}
 				}
 			} else {
+				System.out.println("Fit failed");
 				referenceFrameChanged = true;
 			}
 		}
 
 		if( referenceFrameChanged ) {
+			System.out.println("Reference Frame Changed "+referenceFrameChanged);
 			// track has been lost, make this the new keyframe
 			tracker.setCurrentToKeyFrame();
 			tracker.spawnTracks();

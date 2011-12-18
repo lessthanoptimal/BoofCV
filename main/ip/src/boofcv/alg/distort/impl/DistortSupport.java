@@ -78,7 +78,7 @@ public class DistortSupport {
 		sequence.computeTransform(total);
 		Se2_F32 inv = total.invert(null);
 
-		Affine2D_F32 affine = ConvertTransform_F32.convert(inv,null);
+		Affine2D_F32 affine = ConvertTransform_F32.convert(inv,(Affine2D_F32)null);
 		PixelTransformAffine_F32 distort = new PixelTransformAffine_F32();
 		distort.set(affine);
 
