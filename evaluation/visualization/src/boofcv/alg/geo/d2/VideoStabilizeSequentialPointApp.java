@@ -18,13 +18,12 @@
 
 package boofcv.alg.geo.d2;
 
-import boofcv.alg.geo.d2.stabilization.ImageDistortPointKey;
+import boofcv.alg.geo.d2.stabilization.MotionStabilizePointKey;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.video.VideoListManager;
-import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
@@ -43,8 +42,8 @@ import java.awt.image.BufferedImage;
  * @param <I> Input image type
  * @param <D> Image derivative type
  */
-public class ImageStabilizeApp<I extends ImageSingleBand, D extends ImageSingleBand, T extends InvertibleTransform<T>>
-		extends ImageDistortBaseApp<I,D,T> implements ProcessInput
+public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand, T extends InvertibleTransform<T>>
+		extends ImageMotionBaseApp<I,D,T> implements ProcessInput
 {
 	private int maxFeatures = 250;
 	private static int thresholdKeyFrame = 80;
@@ -53,7 +52,7 @@ public class ImageStabilizeApp<I extends ImageSingleBand, D extends ImageSingleB
 	
 	int largeMotionThreshold = 5000;
 
-	public ImageStabilizeApp(Class<I> imageType, Class<D> derivType ) {
+	public VideoStabilizeSequentialPointApp(Class<I> imageType, Class<D> derivType) {
 		super(true,imageType,2);
 
 
@@ -84,51 +83,20 @@ public class ImageStabilizeApp<I extends ImageSingleBand, D extends ImageSingleB
 			doRefreshAll();
 		}
 
+		MotionStabilizePointKey alg = (MotionStabilizePointKey)distortAlg;
+
+		if( alg.isReset() ) {
+			totalKeyFrames++;
+		}
+
 		// perform standard update
 		super.updateAlgGUI(frame,imageGUI,fps);
 	}
 
 	@Override
 	protected void handleFatalError() {
-		mosaicRender.clear();
+		motionRender.clear();
 		distortAlg.reset();
-	}
-
-	@Override
-	protected void checkStatus(  PixelTransform_F32 keyToCurr , I frame , BufferedImage buffImage ) {
-		
-		int inliers = distortAlg.getModelMatcher().getMatchSet().size();
-		
-		if( inliers < thresholdReset ) {
-			totalKeyFrames++;
-			distortAlg.reset();
-			renderCurrentTransform(frame, buffImage);
-		} else if( inliers < thresholdKeyFrame ) {
-			distortAlg.changeKeyFrame();
-		}
-		// sudden very large movements tend to be divergence
-		// check for four corners for large changes
-		int w = frame.width;
-		int h = frame.height;
-		if( checkLargeDistortion(0,0,keyToCurr) ||
-				checkLargeDistortion(w,0,keyToCurr) ||
-				checkLargeDistortion(w,h,keyToCurr) ||
-				checkLargeDistortion(0,h,keyToCurr))
-		{
-			totalFatalErrors++;
-			distortAlg.reset();
-			renderCurrentTransform(frame, buffImage);
-		}
-	}
-	
-	private boolean checkLargeDistortion( int x , int y , PixelTransform_F32 tran )
-	{
-		tran.compute(x,y);
-		
-		if( Math.abs(tran.distX-x) > largeMotionThreshold || Math.abs(tran.distY-y) > largeMotionThreshold ) {
-			return true;
-		}
-		return false;
 	}
 
 	@Override
@@ -136,25 +104,26 @@ public class ImageStabilizeApp<I extends ImageSingleBand, D extends ImageSingleB
 		// make sure there is nothing left over from before
 		tracker.dropTracks();
 		createModelMatcher(maxIterations,4);
-		distortAlg = new ImageDistortPointKey<I,T>(tracker,modelMatcher,fitModel);
+		distortAlg = new MotionStabilizePointKey<I,T>(tracker,modelMatcher,fitModel,
+				thresholdKeyFrame,thresholdReset,largeMotionThreshold);
 //		distortAlg.setInitialTransform(createInitialTransform());
 
 		totalKeyFrames = 0;
 
 		I image = sequence.next();
 		setOutputSize(image.width,image.height);
-		mosaicRender.clear();
+		motionRender.clear();
 
 		startWorkerThread();
 	}
 
 	public static void main( String args[] ) {
-		ImageStabilizeApp app = new ImageStabilizeApp(ImageFloat32.class, ImageFloat32.class);
+		VideoStabilizeSequentialPointApp app = new VideoStabilizeSequentialPointApp(ImageFloat32.class, ImageFloat32.class);
 
 		VideoListManager manager = new VideoListManager(ImageFloat32.class);
-		manager.add("Shake", "MJPEG", "../applet/data/shake.mjpeg");
-		manager.add("Zoom", "MJPEG", "../applet/data/zoom.mjpeg");
-		manager.add("Rotate", "MJPEG", "../applet/data/rotate.mjpeg");
+		manager.add("Shake", "MJPEG", "../data/applet/shake.mjpeg");
+		manager.add("Zoom", "MJPEG", "../data/applet/zoom.mjpeg");
+		manager.add("Rotate", "MJPEG", "../data/applet/rotate.mjpeg");
 
 		app.setInputManager(manager);
 

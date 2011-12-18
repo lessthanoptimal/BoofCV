@@ -34,29 +34,27 @@ import java.util.List;
  * @param <I> Input image type
  * @param <T> Motion model data type
  */
-public class ImageDistortPointKey<I extends ImageSingleBand, T extends InvertibleTransform> {
+public class ImageMotionPointKey<I extends ImageSingleBand, T extends InvertibleTransform> {
 
 	// number of detected features
 	private int totalSpawned;
 
 	// total number of frames processed
-	int totalProcessed = 0;
+	protected int totalProcessed = 0;
 	// feature tracker
-	ImagePointTracker<I> tracker;
+	protected ImagePointTracker<I> tracker;
 	// Fits a model to the tracked features
-	ModelMatcher<T,AssociatedPair> modelMatcher;
-	// used to prune feature tracks which are too close together
-	PruneCloseTracks pruneClose = new PruneCloseTracks(3,1,1);
+	protected ModelMatcher<T,AssociatedPair> modelMatcher;
 
 	// assumed initial transform from the first image to the world
-	T worldToInit;
+	protected T worldToInit;
 
 	// transform from the world frame to the key frame
-	T worldToKey;
+	protected T worldToKey;
 	// transform from key frame to current frame
-	T keyToCurr;
+	protected T keyToCurr;
 	// transform from world to current frame
-	T worldToCurr;
+	protected T worldToCurr;
 
 	/**
 	 * Specify algorithms to use internally.  Each of these classes must work with
@@ -66,9 +64,9 @@ public class ImageDistortPointKey<I extends ImageSingleBand, T extends Invertibl
 	 * @param modelMatcher Fits model to track data
 	 * @param model Motion model data structure
 	 */
-	public ImageDistortPointKey(ImagePointTracker<I> tracker,
-								ModelMatcher<T, AssociatedPair> modelMatcher,
-								T model)
+	public ImageMotionPointKey(ImagePointTracker<I> tracker,
+							   ModelMatcher<T, AssociatedPair> modelMatcher,
+							   T model)
 	{
 		this.tracker = tracker;
 		this.modelMatcher = modelMatcher;
@@ -131,7 +129,6 @@ public class ImageDistortPointKey<I extends ImageSingleBand, T extends Invertibl
 			tracker.spawnTracks();
 			worldToKey.set(worldToInit);
 			worldToCurr.set(worldToInit);
-			pruneClose.resize(frame.width,frame.height);
 			return true;
 		}
 

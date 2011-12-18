@@ -178,59 +178,24 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 	public void spawnTracks() {
 //		System.out.println("Spawning Tracks");
 		tracksNew.clear();
-		tracksActive.clear();
 		tracksDropped.clear();
-
-		if( keyFrameSet && matches != null ) {
-			for( int i = 0; i < featDst.size; i++ ) {
-				Point2D_F64 loc = locDst.get(i);
-				// see if the track had been associated with an older one
-				boolean matched = false;
-				for( int j = 0; j < matches.size; j++ ) {
-					AssociatedIndex indexes = matches.data[j];
-
-					if( indexes.dst == i ) {
-						matched = true;
-						AssociatedPair p = tracksAll.get(indexes.src);
-						tracksActive.add(p);
-						break;
-					}
-				}
-
-				if( !matched ) {
-					AssociatedPair p = getUnused();
-					p.currLoc.set(loc.x,loc.y);
-					p.keyLoc.set(p.currLoc);
-					p.featureId = featureID++;
-					setDescription(((TrackInfo)p.getDescription()).desc, featDst.get(i));
-					tracksActive.add(p);
-					tracksNew.add(p);
-				}
-			}
-		} else {
-			// create new tracks from latest detected features
-			for( int i = 0; i < featDst.size; i++ ) {
-				AssociatedPair p = getUnused();
-				Point2D_F64 loc = locDst.get(i);
-				p.currLoc.set(loc.x,loc.y);
-				p.keyLoc.set(p.currLoc);
-				setDescription(((TrackInfo)p.getDescription()).desc, featDst.get(i));
-				p.featureId = featureID++;
-
-				tracksNew.add(p);
-				tracksActive.add(p);
-			}
-		}
-
-		// add unused to the lists
-		for(AssociatedPair p : tracksAll ) {
-			if( !tracksActive.contains(p) ) {
-				tracksDropped.add(p);
-				unused.add(p);
-			}
-		}
+		tracksActive.clear();
+		unused.addAll(tracksAll);
 		tracksAll.clear();
-		tracksAll.addAll(tracksActive);
+
+		// create new tracks from latest detected features
+		for( int i = 0; i < featDst.size; i++ ) {
+			AssociatedPair p = getUnused();
+			Point2D_F64 loc = locDst.get(i);
+			p.currLoc.set(loc.x,loc.y);
+			p.keyLoc.set(p.currLoc);
+			setDescription(((TrackInfo)p.getDescription()).desc, featDst.get(i));
+			p.featureId = featureID++;
+
+			tracksNew.add(p);
+			tracksActive.add(p);
+			tracksAll.add(p);
+		}
 
 		featSrc.reset();
 		for( AssociatedPair p : tracksAll ) {
@@ -278,9 +243,19 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		}
 	}
 
+	/**
+	 * Remove from active list and mark so that it is dropped in the next cycle
+	 *
+	 * @param track The track which is to be dropped
+	 */
 	@Override
 	public void dropTrack(AssociatedPair track) {
-		throw new IllegalArgumentException("Not supported yet");
+		// first mark the track as being old so that it will get dropped on the next cycle
+		TrackInfo info = (TrackInfo)track.description;
+		info.lastAssociated = -pruneThreshold;
+
+		// remove it from the active list
+		tracksActive.remove(track);
 	}
 
 	@Override
