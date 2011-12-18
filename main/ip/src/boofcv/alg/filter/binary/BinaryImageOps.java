@@ -40,7 +40,7 @@ import java.util.Random;
  * Contains a standard set of operations performed on binary images. A pixel has a value of false if it is equal
  * to zero or true equal to one.
  * </p>
- * <p/>
+ *
  * <p>
  * NOTE: If an element's value is not zero or one then each function's behavior is undefined.
  * </p>

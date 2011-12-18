@@ -150,7 +150,7 @@ public class CreateMJpeg {
 
 
 	public static void main( String args[] ) throws IOException {
-		File directory = new File("/home/pja/Videos/original/2011_10_08/www/a");
+		File directory = new File("/home/pja/temp/images");
 
 		File[] files = directory.listFiles();
 

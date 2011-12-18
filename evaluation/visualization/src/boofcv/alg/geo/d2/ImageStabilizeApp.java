@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.d2;
 
-import boofcv.alg.geo.d2.stabilization.MosaicImagePointKey;
+import boofcv.alg.geo.d2.stabilization.ImageDistortPointKey;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.ProcessInput;
@@ -34,15 +34,15 @@ import georegression.struct.homo.Homography2D_F64;
 import java.awt.image.BufferedImage;
 
 /**
- *
+ * Attempts to remove camera jitter across multiple video frames by detecting point features inside the image
+ * and tracking their motion.  Models are then fit to the feature's motion and the inverse transform
+ * computer and rendered.  RANSAC is used internally to remove noise.  Different feature descriptors and motion
+ * models can be used. Both the unstabilized input and stabilized output are shown in a window.
  *
  * @author Peter Abeles
  * @param <I> Input image type
  * @param <D> Image derivative type
  */
-// TODO switch rule is slowing it down  (distance versus coverage)
-// TODO do full reset
-	// todo do image transform using native model
 public class ImageStabilizeApp<I extends ImageSingleBand, D extends ImageSingleBand, T extends InvertibleTransform<T>>
 		extends ImageDistortBaseApp<I,D,T> implements ProcessInput
 {
@@ -73,6 +73,9 @@ public class ImageStabilizeApp<I extends ImageSingleBand, D extends ImageSingleB
 		addAlgorithm(1,"Homography", new Homography2D_F64());
 	}
 
+	/**
+	 * Updates the GUI and response to user requests.
+	 */
 	@Override
 	protected void updateAlgGUI(I frame, BufferedImage imageGUI, final double fps) {
 
@@ -81,26 +84,27 @@ public class ImageStabilizeApp<I extends ImageSingleBand, D extends ImageSingleB
 			doRefreshAll();
 		}
 
+		// perform standard update
 		super.updateAlgGUI(frame,imageGUI,fps);
 	}
 
 	@Override
 	protected void handleFatalError() {
 		mosaicRender.clear();
-		mosaicAlg.reset();
+		distortAlg.reset();
 	}
 
 	@Override
 	protected void checkStatus(  PixelTransform_F32 keyToCurr , I frame , BufferedImage buffImage ) {
 		
-		int inliers = mosaicAlg.getModelMatcher().getMatchSet().size();
+		int inliers = distortAlg.getModelMatcher().getMatchSet().size();
 		
 		if( inliers < thresholdReset ) {
 			totalKeyFrames++;
-			mosaicAlg.reset();
+			distortAlg.reset();
 			renderCurrentTransform(frame, buffImage);
 		} else if( inliers < thresholdKeyFrame ) {
-			mosaicAlg.changeKeyFrame();
+			distortAlg.changeKeyFrame();
 		}
 		// sudden very large movements tend to be divergence
 		// check for four corners for large changes
@@ -112,7 +116,7 @@ public class ImageStabilizeApp<I extends ImageSingleBand, D extends ImageSingleB
 				checkLargeDistortion(0,h,keyToCurr))
 		{
 			totalFatalErrors++;
-			mosaicAlg.reset();
+			distortAlg.reset();
 			renderCurrentTransform(frame, buffImage);
 		}
 	}
@@ -132,8 +136,8 @@ public class ImageStabilizeApp<I extends ImageSingleBand, D extends ImageSingleB
 		// make sure there is nothing left over from before
 		tracker.dropTracks();
 		createModelMatcher(maxIterations,4);
-		mosaicAlg = new MosaicImagePointKey<I,T>(tracker,modelMatcher,fitModel);
-//		mosaicAlg.setInitialTransform(createInitialTransform());
+		distortAlg = new ImageDistortPointKey<I,T>(tracker,modelMatcher,fitModel);
+//		distortAlg.setInitialTransform(createInitialTransform());
 
 		totalKeyFrames = 0;
 
