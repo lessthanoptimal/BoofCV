@@ -1,8 +1,9 @@
 <project name="BoofCV" basedir="." default="main">
 
-    <property name="lib.dir"     value="../lib"/>
-    <property name="jar.dir"     value="jar"/>
-    <property name="doc.dir"     value="api"/>
+    <property name="lib.dir"     value="${basedir}/../lib"/>
+    <property name="jar.dir"     value="${basedir}/jar"/>
+    <property name="doc.dir"     value="${basedir}/api"/>
+    <property name="testreport.dir"  value="${basedir}/report"/>
 
     <path id="project.classpath">
         <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/junit*"/>
@@ -31,6 +32,9 @@
             <include name="boofcv/**"/>
           </packageset>
 	  <packageset dir="geo/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
+	  </packageset>
+	  <packageset dir="visualize/src" defaultexcludes="yes">
             <include name="boofcv/**"/>
           </packageset>
 
@@ -93,6 +97,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
           </packageset>
 	  <packageset dir="geo/src" defaultexcludes="yes">
             <include name="boofcv/**"/>
+	  </packageset>
+	  <packageset dir="visualize/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
           </packageset>
 
             <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
@@ -101,21 +108,42 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         </javadoc>
     </target>
 
+    <target name="test">
+	<ant dir="ip/" target="test"/>
+	<ant dir="numerics/" target="test"/>
+	<ant dir="feature/" target="test"/>
+	<ant dir="geo/" target="test"/>
+	<ant dir="io/" target="test"/>
+	<ant dir="visualize/" target="test"/>
+    </target>
+
+    <target name="testreport">
+        <junitreport todir="${testreport.dir}">
+            <fileset dir="${testreport.dir}" includes="TEST-*.xml"/>
+            <report todir="${testreport.dir}"/>
+        </junitreport>
+    </target>
+
     <target name="clean">
         <delete dir="${jar.dir}"/>
+	<delete dir="${testreport.dir}"/>
 	<delete file="${lib.dir}/${ant.project.name}.jar"/>
 	<ant dir="ip/" target="clean"/>
-	<ant dir="io/" target="clean"/>
 	<ant dir="numerics/" target="clean"/>
-	<ant dir="geo/" target="clean"/>
 	<ant dir="feature/" target="clean"/>
+	<ant dir="geo/" target="clean"/>
+	<ant dir="io/" target="clean"/>
+	<ant dir="visualize/" target="clean"/>
     </target>
+
     <target name="jar">
+        <mkdir dir="${jar.dir}"/>
 	<ant dir="ip" inheritAll="false"/>
 	<ant dir="numerics" inheritAll="false"/>
 	<ant dir="feature" inheritAll="false"/>
 	<ant dir="geo" inheritAll="false"/>
 	<ant dir="io" inheritAll="false"/>
+	<ant dir="visualize/" inheritAll="false"/>
 	<jar destfile="${lib.dir}/${ant.project.name}.jar">
 	  <zipgroupfileset dir="${jar.dir}" includes="*.jar"/> 
 	</jar>

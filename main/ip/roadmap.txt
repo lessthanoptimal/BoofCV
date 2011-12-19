@@ -15,18 +15,17 @@ SFM
    * Sparse Bundle Adjustment
    * Dense Stereo
    * Image Rectification
- - Geometry 2D
+#- Geometry 2D
 #  * Image Stabilization
-   * Image Mosaic
+#  * Image Mosaic
  - Camera Calibration
    * From calibration grid
 #- Denoising
- - Detect Features
+#- Detect Features
 #  * corners
-   * line
+#  * line
 #  * blobs
 #  * SURF
-   * CenSurE (Detector/Modified SURF descriptor)
  - Region
    * Watershed?
    * Super Pixel

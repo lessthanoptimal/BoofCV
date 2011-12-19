@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.fitting.modelset.distance;
+package boofcv.alg.geo.d2;
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import org.junit.Test;

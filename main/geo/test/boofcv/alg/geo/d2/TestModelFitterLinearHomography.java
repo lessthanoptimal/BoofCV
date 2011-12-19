@@ -2,7 +2,6 @@ package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelFitter;
-import boofcv.numerics.fitting.modelset.StandardModelFitterTests;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homo.HomographyPointOps;
