@@ -1,0 +1,4 @@
+
+- Speed up ImageMotionBaseApp by translating the buffered image into a BoofCV interleaved int32 image
+  * Faster to distort the color image later on
+  * Might make gray scale slightly slower

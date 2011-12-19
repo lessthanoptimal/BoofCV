@@ -52,7 +52,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		extends ImageMotionBaseApp<I,D,T> implements ProcessInput
 {
 	private final static int maxFeatures = 250;
-	private final static int maxIterations = 80;
+	private final static int maxIterations = 100;
 	
 	public VideoMosaicSequentialPointApp(Class<I> imageType, Class<D> derivType) {
 		super(false,imageType,2);

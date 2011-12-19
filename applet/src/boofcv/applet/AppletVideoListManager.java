@@ -23,7 +23,7 @@ import boofcv.io.video.VideoJpegZipCodec;
 import boofcv.io.video.VideoListManager;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class AppletVideoListManager<T extends ImageBase> extends VideoListManager {
+public class AppletVideoListManager<T extends ImageSingleBand> extends VideoListManager {
 	URL codebase;
 
 	public AppletVideoListManager( Class<T> imageType , URL codebase) {

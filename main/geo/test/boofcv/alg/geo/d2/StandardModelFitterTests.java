@@ -1,6 +1,7 @@
-package boofcv.numerics.fitting.modelset;
+package boofcv.alg.geo.d2;
 
 
+import boofcv.numerics.fitting.modelset.ModelFitter;
 import org.junit.Test;
 
 import java.util.ArrayList;
