@@ -98,7 +98,7 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 
 			maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
 
-			// for some trackers like KLT, they keep old features and these features can get squeezed together
+			// for some trackers, like KLT, they keep old features and these features can get squeezed together
 			// this will remove some of the really close features
 			if( maxCoverage < respawnCoverageFraction) {
 				pruneClose.resize(width,height);
@@ -113,7 +113,16 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 		return true;
 	}
 
-	private double imageCoverageFraction( int width , int height , List<AssociatedPair> tracks ) {
+	/**
+	 * Finds the minimal axis aligned rectangle in the image which will contain all the features in the current frame
+	 * then computes the fraction of the total image which it covers.
+	 *
+	 * @param width image width
+	 * @param height image height
+	 * @param tracks current tracks
+	 * @return coverage fraction 0 to 1
+	 */
+	public static double imageCoverageFraction( int width , int height , List<AssociatedPair> tracks ) {
 		double x0 = width;
 		double x1 = 0;
 		double y0 = height;

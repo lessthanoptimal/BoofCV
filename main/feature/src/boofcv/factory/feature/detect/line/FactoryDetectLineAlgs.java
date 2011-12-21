@@ -40,10 +40,11 @@ import georegression.struct.line.LinePolar2D_F32;
  *
  * @author Peter Abeles
  */
-public class FactoryDetectLine {
+public class FactoryDetectLineAlgs {
 
 	/**
-	 *
+	 * Detects line segments inside an image using the {@link DetectLineSegmentsGridRansac} algorithm.
+	 * 
 	 * @param regionSize
 	 * @param thresholdEdge
 	 * @param thresholdAngle Tolerance in angle for allowing two edgels to be paired up, in radians.  Try 2.36
@@ -79,6 +80,22 @@ public class FactoryDetectLine {
 		return new DetectLineSegmentsGridRansac<I,D>(alg,connect,gradient,thresholdEdge,imageType,derivType);
 	}
 
+	/**
+	 * Detects lines using the foot of norm parametrization, see {@link DetectLineHoughFoot}.  The polar
+	 * parametrization is more common, but more difficult to tune.
+	 *
+	 * @param localMaxRadius Lines in transform space must be a local max in a region with this radius. Try 5;
+	 * @param minCounts Minimum number of counts/votes inside the transformed image. Try 5.
+	 * @param minDistanceFromOrigin Lines which are this close to the origin of the transformed image are ignored.  Try 5.
+	 * @param thresholdEdge Threshold for classifying pixels as edge or not.  Try 30.
+	 * @param maxLines Maximum number of lines to return. If <= 0 it will return them all.
+	 * @param imageType Type of single band input image.
+	 * @param derivType Image derivative type.                    
+	 * @param <I> Input image type.
+	 * @param <D> Image derivative type.
+	 * @return Line detector.
+	 * @return Line detector.
+	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	DetectLineHoughFoot<I,D> houghFoot(int localMaxRadius,
 									   int minCounts ,
@@ -93,6 +110,24 @@ public class FactoryDetectLine {
 		return new DetectLineHoughFoot<I,D>(localMaxRadius,minCounts,minDistanceFromOrigin,thresholdEdge,maxLines,gradient);
 	}
 
+	/**
+	 * Detects lines using a foot of norm parametrization and sub images to reduce degenerate
+	 * configurations, see {@link DetectLineHoughFootSubimage} for details.
+	 *
+	 * @param localMaxRadius Lines in transform space must be a local max in a region with this radius. Try 5;
+	 * @param minCounts Minimum number of counts/votes inside the transformed image. Try 5.
+	 * @param minDistanceFromOrigin Lines which are this close to the origin of the transformed image are ignored.  Try 5.
+	 * @param thresholdEdge Threshold for classifying pixels as edge or not.  Try 30.
+	 * @param maxLines Maximum number of lines to return. If <= 0 it will return them all.
+	 * @param totalHorizontalDivisions Number of sub-images in horizontal direction Try 2
+	 * @param totalVerticalDivisions Number of sub images in vertical direction.  Try 2
+	 * @param imageType Type of single band input image.
+	 * @param derivType Image derivative type.
+	 * @param <I> Input image type.
+	 * @param <D> Image derivative type.
+	 * @return Line detector.
+	 * @return Line detector.
+	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	DetectLineHoughFootSubimage<I,D> houghFootSub(int localMaxRadius,
 									   int minCounts ,
@@ -112,7 +147,8 @@ public class FactoryDetectLine {
 	}
 
 	/**
-	 * Creates a Hough line detector based on polar paramterization.
+	 * Creates a Hough line detector based on polar paramterization.  See {@link DetectLineHoughPolar} for
+	 * a more detailed description.
 	 *
 	 * @param localMaxRadius Radius for local maximum suppression.  Try 2.
 	 * @param minCounts Minimum number of counts for detected line.  Critical tuning parameter and image dependent.
@@ -120,6 +156,8 @@ public class FactoryDetectLine {
 	 * @param resolutionAngle Resolution of line angle in radius.  Try PI/180
 	 * @param thresholdEdge Edge detection threshold. Try 50.
 	 * @param maxLines Maximum number of lines to return. If <= 0 it will return them all.
+	 * @param imageType Type of single band input image.
+	 * @param derivType Image derivative type.                    
 	 * @param <I> Input image type.
 	 * @param <D> Image derivative type.
 	 * @return Line detector.

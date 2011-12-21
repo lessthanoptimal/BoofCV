@@ -29,35 +29,35 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class FactorySingleBandImage {
+public class FactoryGeneralizedSingleBand {
 
-	public static SingleBandImage wrap( ImageSingleBand image ) {
+	public static GImageSingleBand wrap( ImageSingleBand image ) {
 		if( ImageInteger.class.isAssignableFrom(image.getClass()) )
-			return new SingleBandInt( (ImageInteger)image );
+			return new GSingle_I32( (ImageInteger)image );
 		else if( image.getClass() == ImageSInt64.class )
-			return new SingleBandInt64( (ImageSInt64)image );
+			return new GSingle_I64( (ImageSInt64)image );
 		else if( image.getClass() == ImageFloat32.class )
-			return new SingleBandFloat32( (ImageFloat32)image );
+			return new GSingle_F32( (ImageFloat32)image );
 		else if( image.getClass() == ImageFloat64.class )
-			return new SingleBandFloat64( (ImageFloat64)image );
+			return new GSingle_F64( (ImageFloat64)image );
 		else
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 	}
 
-	public static SingleBandImage wrap( ImageBorder image ) {
+	public static GImageSingleBand wrap( ImageBorder image ) {
 		if( ImageInteger.class.isAssignableFrom(image.getImage().getClass()) )
-			return new SingleBandBorderInt( (ImageBorder_I32)image );
+			return new Border_I32( (ImageBorder_I32)image );
 		else if( image.getImage().getClass() == ImageFloat32.class )
-			return new SingleBandBorderFloat32( (ImageBorder_F32)image );
+			return new Border_F32( (ImageBorder_F32)image );
 		else if( image.getImage().getClass() == ImageFloat64.class )
-			return new SingleBandBorderFloat64( (ImageBorder_F64)image );
+			return new Border_F64( (ImageBorder_F64)image );
 		else
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 	}
 
-	public static class SingleBandBorderInt extends SingleBorder<ImageBorder_I32>
+	public static class Border_I32 extends GSingleBorder<ImageBorder_I32>
 	{
-		public SingleBandBorderInt(ImageBorder_I32 image) {
+		public Border_I32(ImageBorder_I32 image) {
 			super(image);
 		}
 
@@ -77,9 +77,9 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static class SingleBandBorderFloat32 extends SingleBorder<ImageBorder_F32>
+	public static class Border_F32 extends GSingleBorder<ImageBorder_F32>
 	{
-		public SingleBandBorderFloat32(ImageBorder_F32 image) {
+		public Border_F32(ImageBorder_F32 image) {
 			super(image);
 		}
 
@@ -99,9 +99,9 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static class SingleBandBorderFloat64 extends SingleBorder<ImageBorder_F64>
+	public static class Border_F64 extends GSingleBorder<ImageBorder_F64>
 	{
-		public SingleBandBorderFloat64(ImageBorder_F64 image) {
+		public Border_F64(ImageBorder_F64 image) {
 			super(image);
 		}
 
@@ -121,9 +121,9 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static class SingleBandInt extends SingleBaseInt<ImageInteger>
+	public static class GSingle_I32 extends GSingleBaseInt<ImageInteger>
 	{
-		public SingleBandInt(ImageInteger image) {
+		public GSingle_I32(ImageInteger image) {
 			super(image);
 		}
 
@@ -138,9 +138,9 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static class SingleBandInt64 extends SingleBaseInt<ImageSInt64>
+	public static class GSingle_I64 extends GSingleBaseInt<ImageSInt64>
 	{
-		public SingleBandInt64(ImageSInt64 image) {
+		public GSingle_I64(ImageSInt64 image) {
 			super(image);
 		}
 
@@ -155,9 +155,9 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static class SingleBandFloat32 extends SingleBase<ImageFloat32>
+	public static class GSingle_F32 extends GSingleBase<ImageFloat32>
 	{
-		public SingleBandFloat32(ImageFloat32 image) {
+		public GSingle_F32(ImageFloat32 image) {
 			super(image);
 		}
 
@@ -177,9 +177,9 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static class SingleBandFloat64 extends SingleBase<ImageFloat64>
+	public static class GSingle_F64 extends GSingleBase<ImageFloat64>
 	{
-		public SingleBandFloat64(ImageFloat64 image) {
+		public GSingle_F64(ImageFloat64 image) {
 			super(image);
 		}
 
@@ -199,9 +199,9 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static abstract class SingleBaseInt<T extends ImageSingleBand> extends SingleBase<T>
+	public static abstract class GSingleBaseInt<T extends ImageSingleBand> extends GSingleBase<T>
 	{
-		public SingleBaseInt(T image) {
+		public GSingleBaseInt(T image) {
 			super(image);
 		}
 
@@ -211,11 +211,11 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static abstract class SingleBase<T extends ImageSingleBand> implements SingleBandImage {
+	public static abstract class GSingleBase<T extends ImageSingleBand> implements GImageSingleBand {
 
 		protected T image;
 
-		public SingleBase(T image) {
+		public GSingleBase(T image) {
 			this.image = image;
 		}
 
@@ -235,11 +235,11 @@ public class FactorySingleBandImage {
 		}
 	}
 
-	public static abstract class SingleBorder<T extends ImageBorder> implements SingleBandImage {
+	public static abstract class GSingleBorder<T extends ImageBorder> implements GImageSingleBand {
 
 		protected T image;
 
-		public SingleBorder(T image) {
+		public GSingleBorder(T image) {
 			this.image = image;
 		}
 

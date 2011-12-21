@@ -104,7 +104,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 *
 	 * @param oldWorldToNewWorld Transform from the old world frame to the new world frame
 	 */
-	public void refocus( T oldWorldToNewWorld ) {
+	public void changeWorld(T oldWorldToNewWorld) {
 
 		T worldToKey = (T) this.worldToKey.invert(null);
 		worldToInit.concat(worldToKey, oldWorldToNewWorld);

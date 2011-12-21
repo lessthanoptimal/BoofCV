@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.line;
+package boofcv.gui.feature;
 
 
+import boofcv.alg.feature.detect.line.LineImageOps;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 
@@ -35,8 +36,8 @@ import java.util.List;
  */
 public class ImageLinePanel extends JPanel {
 
-	BufferedImage background;
-	List<LineSegment2D_F32> lines = new ArrayList<LineSegment2D_F32>();
+	public BufferedImage background;
+	public List<LineSegment2D_F32> lines = new ArrayList<LineSegment2D_F32>();
 
 	public synchronized void setBackground(BufferedImage background) {
 		this.background = background;

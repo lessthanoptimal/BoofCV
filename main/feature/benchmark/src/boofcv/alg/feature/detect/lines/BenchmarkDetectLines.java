@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.detect.line.FactoryDetectLine;
+import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
@@ -60,7 +60,7 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 	public class HoughPolar extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLine.houghPolar(3, 30, 4, Math.PI/180, edgeThreshold, maxLines , imageType, derivType);
+				FactoryDetectLineAlgs.houghPolar(3, 30, 4, Math.PI / 180, edgeThreshold, maxLines, imageType, derivType);
 
 		@Override
 		public void process() {
@@ -71,7 +71,7 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 	public class HoughFoot extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLine.houghFoot(3, 10, 5, edgeThreshold, maxLines , imageType, derivType);
+				FactoryDetectLineAlgs.houghFoot(3, 10, 5, edgeThreshold, maxLines, imageType, derivType);
 
 		@Override
 		public void process() {
@@ -82,7 +82,7 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 	public class HoughFootSub extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLine.houghFootSub(3, 6, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType);
+				FactoryDetectLineAlgs.houghFootSub(3, 6, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType);
 
 		@Override
 		public void process() {
@@ -93,7 +93,7 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 	public class LineRansac extends PerformerBase {
 
 		DetectLineSegment<T> detector =
-				FactoryDetectLine.lineRansac(40, 30, 2.36, true, imageType, derivType);
+				FactoryDetectLineAlgs.lineRansac(40, 30, 2.36, true, imageType, derivType);
 
 		@Override
 		public void process() {

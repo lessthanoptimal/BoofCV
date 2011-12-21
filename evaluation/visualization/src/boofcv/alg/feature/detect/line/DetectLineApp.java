@@ -25,9 +25,10 @@ import boofcv.alg.feature.detect.ImageCorruptPanel;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.detect.line.FactoryDetectLine;
+import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
@@ -67,10 +68,10 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 
 		this.imageType = imageType;
 
-		addAlgorithm(0,"Hough Polar",FactoryDetectLine.houghPolar(3, 30, 2, Math.PI / 180, edgeThreshold, maxLines, imageType, derivType));
-		addAlgorithm(0,"Hough Foot",FactoryDetectLine.houghFoot(3, 8, 5, edgeThreshold, maxLines, imageType, derivType));
-		addAlgorithm(0,"Hough Foot Sub Image",FactoryDetectLine.houghFootSub(3, 8, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType));
-		addAlgorithm(0,"Grid Line", FactoryDetectLine.lineRansac(40, 30, 2.36, true, imageType, derivType));
+		addAlgorithm(0,"Hough Polar", FactoryDetectLineAlgs.houghPolar(3, 30, 2, Math.PI / 180, edgeThreshold, maxLines, imageType, derivType));
+		addAlgorithm(0,"Hough Foot", FactoryDetectLineAlgs.houghFoot(3, 8, 5, edgeThreshold, maxLines, imageType, derivType));
+		addAlgorithm(0,"Hough Foot Sub Image", FactoryDetectLineAlgs.houghFootSub(3, 8, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType));
+		addAlgorithm(0,"Grid Line", FactoryDetectLineAlgs.lineRansac(40, 30, 2.36, true, imageType, derivType));
 
 		input = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		inputCorrupted = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
@@ -161,8 +162,8 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		DetectLineApp app = new DetectLineApp(imageType,derivType);
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("Objects","data/simple_objects.jpg");
-		manager.add("Indoors","data/lines_indoors.jpg");
+		manager.add("Objects","../data/evaluation/simple_objects.jpg");
+		manager.add("Indoors","../data/evaluation/lines_indoors.jpg");
 		app.setInputManager(manager);
 
 		// wait for it to process one image so that the size isn't all screwed up

@@ -18,8 +18,8 @@
 
 package boofcv.struct.image;
 
-import boofcv.core.image.FactorySingleBandImage;
-import boofcv.core.image.SingleBandImage;
+import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import org.junit.Test;
 
 import java.lang.reflect.Array;
@@ -161,8 +161,8 @@ public abstract class StandardSingleBandTests {
 		assertEquals(1,sub.getWidth());
 		assertEquals(2,sub.getHeight());
 
-		SingleBandImage a = FactorySingleBandImage.wrap(img);
-		SingleBandImage b = FactorySingleBandImage.wrap(sub);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(img);
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(sub);
 		
 		assertEquals(a.get(2,3),b.get(0,0));
 		assertEquals(a.get(2,4),b.get(0,1));

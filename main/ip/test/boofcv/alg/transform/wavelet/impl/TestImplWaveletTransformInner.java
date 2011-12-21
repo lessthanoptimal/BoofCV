@@ -19,8 +19,8 @@
 package boofcv.alg.transform.wavelet.impl;
 
 import boofcv.alg.transform.wavelet.UtilWavelet;
-import boofcv.core.image.FactorySingleBandImage;
-import boofcv.core.image.SingleBandImage;
+import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
@@ -157,8 +157,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	private void equalsTranHorizontal( ImageSingleBand expected , ImageSingleBand found ,
 									   int begin , int end , String quad ) {
 
-		SingleBandImage e = FactorySingleBandImage.wrap(expected);
-		SingleBandImage f = FactorySingleBandImage.wrap(found);
+		GImageSingleBand e = FactoryGeneralizedSingleBand.wrap(expected);
+		GImageSingleBand f = FactoryGeneralizedSingleBand.wrap(found);
 
 		for( int y = 0; y < expected.height; y++ ) {
 			for( int x = 0; x < expected.width; x++ ) {
@@ -188,8 +188,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	private void equalsTranVertical( ImageSingleBand expected , ImageSingleBand found ,
 									 int begin , int end , String quad ) {
 
-		SingleBandImage e = FactorySingleBandImage.wrap(expected);
-		SingleBandImage f = FactorySingleBandImage.wrap(found);
+		GImageSingleBand e = FactoryGeneralizedSingleBand.wrap(expected);
+		GImageSingleBand f = FactoryGeneralizedSingleBand.wrap(found);
 
 		for( int y = 0; y < expected.height; y++ ) {
 			// see if the inner image is identical to the naive implementation

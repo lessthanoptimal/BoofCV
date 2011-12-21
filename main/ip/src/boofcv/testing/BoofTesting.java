@@ -18,9 +18,9 @@
 
 package boofcv.testing;
 
-import boofcv.core.image.FactorySingleBandImage;
+import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.SingleBandImage;
 import boofcv.struct.image.*;
 import sun.awt.image.ByteInterleavedRaster;
 
@@ -510,8 +510,8 @@ public class BoofTesting {
 		if (imgA.getHeight() != imgB.getHeight())
 			throw new RuntimeException("Heights are not equals");
 
-		SingleBandImage a = FactorySingleBandImage.wrap(imgA);
-		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(imgA);
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(imgB);
 
 		for (int y = 0; y < imgA.getHeight(); y++) {
 			for (int x = 0; x < imgA.getWidth(); x++) {
@@ -528,8 +528,8 @@ public class BoofTesting {
 		if (imgA.getHeight() != imgB.getHeight())
 			throw new RuntimeException("Heights are not equals");
 
-		SingleBandImage a = FactorySingleBandImage.wrap(imgA);
-		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(imgA);
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(imgB);
 
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
@@ -567,8 +567,8 @@ public class BoofTesting {
 		if (imgA.getHeight() != imgB.getHeight())
 			throw new RuntimeException("Heights are not equals");
 
-		SingleBandImage a = FactorySingleBandImage.wrap(imgA);
-		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(imgA);
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(imgB);
 
 		for (int y = 0; y < imgA.getHeight(); y++) {
 			for (int x = 0; x < borderX; x++) {
@@ -589,7 +589,7 @@ public class BoofTesting {
 		}
 	}
 
-	private static void compareValues(double tol, SingleBandImage a, SingleBandImage b, int x, int y) {
+	private static void compareValues(double tol, GImageSingleBand a, GImageSingleBand b, int x, int y) {
 		double normalizer = Math.abs(a.get(x, y).doubleValue()) + Math.abs(b.get(x, y).doubleValue());
 		if( normalizer < 1.0 ) normalizer = 1.0;
 		if (Math.abs(a.get(x, y).doubleValue() - b.get(x, y).doubleValue())/normalizer > tol)
@@ -743,7 +743,7 @@ public class BoofTesting {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
 
 			if (raster.getNumBands() == 1) {
-				SingleBandImage band = FactorySingleBandImage.wrap(imgB.getBand(0));
+				GImageSingleBand band = FactoryGeneralizedSingleBand.wrap(imgB.getBand(0));
 
 				// handle a special case where the RGB conversion is screwed
 				for (int i = 0; i < imgA.getHeight(); i++) {
@@ -760,9 +760,9 @@ public class BoofTesting {
 			}
 		}
 
-		SingleBandImage band1 = FactorySingleBandImage.wrap(imgB.getBand(0));
-		SingleBandImage band2 = FactorySingleBandImage.wrap(imgB.getBand(1));
-		SingleBandImage band3 = FactorySingleBandImage.wrap(imgB.getBand(2));
+		GImageSingleBand band1 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(0));
+		GImageSingleBand band2 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(1));
+		GImageSingleBand band3 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(2));
 
 		for (int y = 0; y < imgA.getHeight(); y++) {
 			for (int x = 0; x < imgA.getWidth(); x++) {
@@ -793,7 +793,7 @@ public class BoofTesting {
 
 
 	public static void checkBorderZero(ImageSingleBand outputImage, int border) {
-		SingleBandImage img = FactorySingleBandImage.wrap(outputImage);
+		GImageSingleBand img = FactoryGeneralizedSingleBand.wrap(outputImage);
 
 		for (int y = 0; y < img.getHeight(); y++) {
 			if( y >= border && y < img.getHeight()-border )
@@ -810,8 +810,8 @@ public class BoofTesting {
 
 	public static void printDiff( ImageSingleBand imgA , ImageSingleBand imgB ) {
 
-		SingleBandImage a = FactorySingleBandImage.wrap(imgA);
-		SingleBandImage b = FactorySingleBandImage.wrap(imgB);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(imgA);
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(imgB);
 
 		System.out.println("------- Difference -----------");
 		for( int y = 0; y < imgA.getHeight(); y++ ) {

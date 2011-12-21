@@ -18,9 +18,9 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.core.image.FactorySingleBandImage;
+import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.SingleBandImage;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -70,7 +70,7 @@ public class TestThresholdImageOps {
 			ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
 			ImageUInt8 output = new ImageUInt8(width,height);
 
-			SingleBandImage a = FactorySingleBandImage.wrap(input);
+			GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
 			for( int y = 0; y < input.height; y++ ) {
 				for( int x = 0; x < input.width; x++ ) {
 					a.set(x,y,x);
@@ -108,7 +108,7 @@ public class TestThresholdImageOps {
 			ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
 			ImageSInt32 labeled = new ImageSInt32(width,height);
 
-			SingleBandImage a = FactorySingleBandImage.wrap(input);
+			GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
 			for( int y = 0; y < input.height; y++ ) {
 				for( int x = 0; x < input.width; x++ ) {
 					a.set(x,y,x);
@@ -162,14 +162,14 @@ public class TestThresholdImageOps {
 			ImageSingleBand inputUp = GeneralizedImageOps.createSingleBand(param[0], width, height);
 			ImageSInt32 labeled = new ImageSInt32(width,height);
 
-			SingleBandImage a = FactorySingleBandImage.wrap(inputDown);
+			GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(inputDown);
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {
 					a.set(x,y,patternDo[y*width+x]);
 				}
 			}
 
-			a = FactorySingleBandImage.wrap(inputUp);
+			a = FactoryGeneralizedSingleBand.wrap(inputUp);
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {
 					a.set(x,y,patternUp[y*width+x]);
@@ -201,14 +201,14 @@ public class TestThresholdImageOps {
 			ImageSingleBand inputUp = GeneralizedImageOps.createSingleBand(param[0], width, height);
 			ImageSInt32 labeled = new ImageSInt32(width,height);
 
-			SingleBandImage a = FactorySingleBandImage.wrap(inputDown);
+			GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(inputDown);
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {
 					a.set(x,y,patternDo[y*width+x]);
 				}
 			}
 
-			a = FactorySingleBandImage.wrap(inputUp);
+			a = FactoryGeneralizedSingleBand.wrap(inputUp);
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {
 					a.set(x,y,patternUp[y*width+x]);
@@ -235,7 +235,7 @@ public class TestThresholdImageOps {
 	}
 
 	private int countNotZero( ImageSingleBand image ) {
-		SingleBandImage a = FactorySingleBandImage.wrap(image);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(image);
 
 		int ret = 0;
 

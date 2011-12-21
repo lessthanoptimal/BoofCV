@@ -19,8 +19,8 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.core.image.FactorySingleBandImage;
-import boofcv.core.image.SingleBandImage;
+import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -43,7 +43,7 @@ public abstract class GeneralBilinearPixelChecks<T extends ImageSingleBand> exte
 	@Override
 	protected float compute(T _img, float x, float y) {
 		ImageBorder<?> imgB = FactoryImageBorder.general(_img, BorderType.EXTENDED);
-		SingleBandImage img = FactorySingleBandImage.wrap(imgB);
+		GImageSingleBand img = FactoryGeneralizedSingleBand.wrap(imgB);
 
 
 		int gX = (int) x;
