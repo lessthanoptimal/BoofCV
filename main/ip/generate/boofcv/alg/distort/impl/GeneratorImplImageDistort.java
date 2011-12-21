@@ -50,8 +50,9 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 	private void createFile() throws FileNotFoundException {
 		printPreamble();
 		printFunction();
+		printFunctionCrop();
 		printDistort();
-		printNoDistort();
+		printNoBorderDistort();
 		out.println("}");
 	}
 
@@ -99,6 +100,9 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\t// handle the image border\n" +
 				"\tprivate "+borderType+" border;\n" +
 				"\n" +
+				"\t// crop boundary\n" +
+				"\tint x0,y0,x1,y1;\n" +
+				"\n" +
 				"\tpublic "+className+"(PixelTransform_F32 dstToSrc, InterpolatePixel<"+imageName+"> interp , ImageBorder<"+borderImageType+"> border ) {\n" +
 				"\t\tthis.dstToSrc = dstToSrc;\n" +
 				"\t\tthis.interp = interp;\n" +
@@ -119,6 +123,25 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\tpublic void apply( "+imageName+" srcImg , "+imageName+" dstImg ) {\n" +
 				"\t\tinterp.setImage(srcImg);\n" +
 				"\n" +
+				"\t\tx0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;\n" +
+				"\n" +
+				"\t\tif( border != null )\n" +
+				"\t\t\tapplyBorder(srcImg, dstImg);\n" +
+				"\t\telse\n" +
+				"\t\t\tapplyNoBorder(srcImg, dstImg);\n" +
+				"\t}\n\n");
+	}
+
+	private void printFunctionCrop() {
+
+		String imageName = image.isInteger() ? "T" : image.getImageName();
+
+		out.print("\t@Override\n" +
+				"\tpublic void apply( "+imageName+" srcImg , "+imageName+" dstImg , int dstX0, int dstY0, int dstX1, int dstY1 ) {\n" +
+				"\t\tinterp.setImage(srcImg);\n" +
+				"\n" +
+				"\t\tx0 = dstX0;y0 = dstY0;x1 = dstX1;y1 = dstY1;\n" +
+				"\n" +
 				"\t\tif( border != null )\n" +
 				"\t\t\tapplyBorder(srcImg, dstImg);\n" +
 				"\t\telse\n" +
@@ -136,9 +159,9 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\t\tfinal float widthF = srcImg.getWidth();\n" +
 				"\t\tfinal float heightF = srcImg.getHeight();\n" +
 				"\n" +
-				"\t\tfor( int y = 0; y < dstImg.height; y++ ) {\n" +
-				"\t\t\tint indexDst = dstImg.startIndex + dstImg.stride*y;\n" +
-				"\t\t\tfor( int x = 0; x < dstImg.width; x++ , indexDst++ ) {\n" +
+				"\t\tfor( int y = y0; y < y1; y++ ) {\n" +
+				"\t\t\tint indexDst = dstImg.startIndex + dstImg.stride*y + x0;\n" +
+				"\t\t\tfor( int x = x0; x < x1; x++ , indexDst++ ) {\n" +
 				"\t\t\t\tdstToSrc.compute(x,y);\n" +
 				"\n" +
 				"\t\t\t\tfinal float sx = dstToSrc.distX;\n" +
@@ -154,7 +177,7 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printNoDistort() {
+	private void printNoBorderDistort() {
 
 		String typeCast = image.isInteger() ? "("+image.getDataType()+")" : "";
 		String imageName = image.isInteger() ? "T" : image.getImageName();
@@ -164,9 +187,9 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\t\tfinal float widthF = srcImg.getWidth();\n" +
 				"\t\tfinal float heightF = srcImg.getHeight();\n" +
 				"\n" +
-				"\t\tfor( int y = 0; y < dstImg.height; y++ ) {\n" +
-				"\t\t\tint indexDst = dstImg.startIndex + dstImg.stride*y;\n" +
-				"\t\t\tfor( int x = 0; x < dstImg.width; x++ , indexDst++ ) {\n" +
+				"\t\tfor( int y = y0; y < y1; y++ ) {\n" +
+				"\t\t\tint indexDst = dstImg.startIndex + dstImg.stride*y + x0;\n" +
+				"\t\t\tfor( int x = x0; x < x1; x++ , indexDst++ ) {\n" +
 				"\t\t\t\tdstToSrc.compute(x,y);\n" +
 				"\n" +
 				"\t\t\t\tfinal float sx = dstToSrc.distX;\n" +

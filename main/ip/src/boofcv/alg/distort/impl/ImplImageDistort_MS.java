@@ -51,4 +51,16 @@ public class ImplImageDistort_MS <T extends ImageSingleBand> implements ImageDis
 			layerDistort.apply(srcImg.getBand(i),dstImg.getBand(i));
 		}
 	}
+
+	@Override
+	public void apply(MultiSpectral<T> srcImg, MultiSpectral<T> dstImg, 
+					  int dstX0, int dstY0, int dstX1, int dstY1) {
+		if( srcImg.getNumBands() != dstImg.getNumBands() )
+			throw new IllegalArgumentException("Number of bands must be the same");
+		int N = srcImg.getNumBands();
+
+		for( int i = 0; i < N; i++ ) {
+			layerDistort.apply(srcImg.getBand(i),dstImg.getBand(i),dstX0, dstY0, dstX1, dstY1);
+		}
+	}
 }

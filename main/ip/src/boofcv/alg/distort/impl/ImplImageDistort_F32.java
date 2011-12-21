@@ -45,6 +45,9 @@ public class ImplImageDistort_F32 implements ImageDistort<ImageFloat32> {
 	// handle the image border
 	private ImageBorder_F32 border;
 
+	// crop boundary
+	int x0,y0,x1,y1;
+
 	public ImplImageDistort_F32(PixelTransform_F32 dstToSrc, InterpolatePixel<ImageFloat32> interp , ImageBorder<ImageFloat32> border ) {
 		this.dstToSrc = dstToSrc;
 		this.interp = interp;
@@ -60,6 +63,20 @@ public class ImplImageDistort_F32 implements ImageDistort<ImageFloat32> {
 	public void apply( ImageFloat32 srcImg , ImageFloat32 dstImg ) {
 		interp.setImage(srcImg);
 
+		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
+
+		if( border != null )
+			applyBorder(srcImg, dstImg);
+		else
+			applyNoBorder(srcImg, dstImg);
+	}
+
+	@Override
+	public void apply( ImageFloat32 srcImg , ImageFloat32 dstImg , int dstX0, int dstY0, int dstX1, int dstY1 ) {
+		interp.setImage(srcImg);
+
+		x0 = dstX0;y0 = dstY0;x1 = dstX1;y1 = dstY1;
+
 		if( border != null )
 			applyBorder(srcImg, dstImg);
 		else
@@ -71,9 +88,9 @@ public class ImplImageDistort_F32 implements ImageDistort<ImageFloat32> {
 		final float widthF = srcImg.getWidth();
 		final float heightF = srcImg.getHeight();
 
-		for( int y = 0; y < dstImg.height; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y;
-			for( int x = 0; x < dstImg.width; x++ , indexDst++ ) {
+		for( int y = y0; y < y1; y++ ) {
+			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
+			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				dstToSrc.compute(x,y);
 
 				final float sx = dstToSrc.distX;
@@ -93,9 +110,9 @@ public class ImplImageDistort_F32 implements ImageDistort<ImageFloat32> {
 		final float widthF = srcImg.getWidth();
 		final float heightF = srcImg.getHeight();
 
-		for( int y = 0; y < dstImg.height; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y;
-			for( int x = 0; x < dstImg.width; x++ , indexDst++ ) {
+		for( int y = y0; y < y1; y++ ) {
+			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
+			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				dstToSrc.compute(x,y);
 
 				final float sx = dstToSrc.distX;

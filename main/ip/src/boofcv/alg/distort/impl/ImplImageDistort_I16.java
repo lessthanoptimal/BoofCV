@@ -46,6 +46,9 @@ public class ImplImageDistort_I16<T extends ImageInt16> implements ImageDistort<
 	// handle the image border
 	private ImageBorder_I32 border;
 
+	// crop boundary
+	int x0,y0,x1,y1;
+
 	public ImplImageDistort_I16(PixelTransform_F32 dstToSrc, InterpolatePixel<T> interp , ImageBorder<ImageInteger> border ) {
 		this.dstToSrc = dstToSrc;
 		this.interp = interp;
@@ -61,6 +64,20 @@ public class ImplImageDistort_I16<T extends ImageInt16> implements ImageDistort<
 	public void apply( T srcImg , T dstImg ) {
 		interp.setImage(srcImg);
 
+		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
+
+		if( border != null )
+			applyBorder(srcImg, dstImg);
+		else
+			applyNoBorder(srcImg, dstImg);
+	}
+
+	@Override
+	public void apply( T srcImg , T dstImg , int dstX0, int dstY0, int dstX1, int dstY1 ) {
+		interp.setImage(srcImg);
+
+		x0 = dstX0;y0 = dstY0;x1 = dstX1;y1 = dstY1;
+
 		if( border != null )
 			applyBorder(srcImg, dstImg);
 		else
@@ -72,9 +89,9 @@ public class ImplImageDistort_I16<T extends ImageInt16> implements ImageDistort<
 		final float widthF = srcImg.getWidth();
 		final float heightF = srcImg.getHeight();
 
-		for( int y = 0; y < dstImg.height; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y;
-			for( int x = 0; x < dstImg.width; x++ , indexDst++ ) {
+		for( int y = y0; y < y1; y++ ) {
+			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
+			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				dstToSrc.compute(x,y);
 
 				final float sx = dstToSrc.distX;
@@ -94,9 +111,9 @@ public class ImplImageDistort_I16<T extends ImageInt16> implements ImageDistort<
 		final float widthF = srcImg.getWidth();
 		final float heightF = srcImg.getHeight();
 
-		for( int y = 0; y < dstImg.height; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y;
-			for( int x = 0; x < dstImg.width; x++ , indexDst++ ) {
+		for( int y = y0; y < y1; y++ ) {
+			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
+			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				dstToSrc.compute(x,y);
 
 				final float sx = dstToSrc.distX;
