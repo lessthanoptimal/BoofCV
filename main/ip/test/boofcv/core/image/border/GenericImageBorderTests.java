@@ -19,8 +19,8 @@
 package boofcv.core.image.border;
 
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.core.image.FactorySingleBandImage;
-import boofcv.core.image.SingleBandImage;
+import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -46,14 +46,14 @@ public abstract class GenericImageBorderTests {
 
 	public abstract ImageBorder_F32 wrap( ImageFloat32 image );
 
-	public abstract Number get( SingleBandImage img , int x , int y );
+	public abstract Number get( GImageSingleBand img , int x , int y );
 
 	/**
 	 * The border was set to the specified value.  See if it had the expected affect
 	 */
 	public abstract void checkBorderSet( int x , int y , Number val ,
-										 SingleBandImage border,
-										 SingleBandImage orig );
+										 GImageSingleBand border,
+										 GImageSingleBand orig );
 
 	@Test
 	public void get_I8() {
@@ -62,8 +62,8 @@ public abstract class GenericImageBorderTests {
 
 		ImageBorder_I32 fooA = wrap(imgA);
 
-		SingleBandImage orig = FactorySingleBandImage.wrap(imgA);
-		SingleBandImage border = FactorySingleBandImage.wrap(fooA);
+		GImageSingleBand orig = FactoryGeneralizedSingleBand.wrap(imgA);
+		GImageSingleBand border = FactoryGeneralizedSingleBand.wrap(fooA);
 
 		checkGet(orig, border);
 	}
@@ -75,13 +75,13 @@ public abstract class GenericImageBorderTests {
 
 		ImageBorder_F32 fooA = wrap(imgA);
 
-		SingleBandImage orig = FactorySingleBandImage.wrap(imgA);
-		SingleBandImage border = FactorySingleBandImage.wrap(fooA);
+		GImageSingleBand orig = FactoryGeneralizedSingleBand.wrap(imgA);
+		GImageSingleBand border = FactoryGeneralizedSingleBand.wrap(fooA);
 
 		checkGet(orig, border);
 	}
 
-	private void checkGet(SingleBandImage orig, SingleBandImage border) {
+	private void checkGet(GImageSingleBand orig, GImageSingleBand border) {
 		// test the image's inside where there is no border condition
 		assertEquals(orig.get(1,1),border.get(1,1));
 		assertEquals(orig.get(0,0),border.get(0,0));
@@ -99,7 +99,7 @@ public abstract class GenericImageBorderTests {
 		checkBorder(width-1,height+1,border,orig);
 	}
 
-	private void checkBorder( int x , int y , SingleBandImage border , SingleBandImage orig ) {
+	private void checkBorder( int x , int y , GImageSingleBand border , GImageSingleBand orig ) {
 		assertEquals(get(orig,x,y).floatValue(),border.get(x,y).floatValue(),1e-4f);
 	}
 
@@ -110,8 +110,8 @@ public abstract class GenericImageBorderTests {
 
 		ImageBorder_I32 fooA = wrap(imgA);
 
-		SingleBandImage orig = FactorySingleBandImage.wrap(imgA);
-		SingleBandImage border = FactorySingleBandImage.wrap(fooA);
+		GImageSingleBand orig = FactoryGeneralizedSingleBand.wrap(imgA);
+		GImageSingleBand border = FactoryGeneralizedSingleBand.wrap(fooA);
 
 		checkSet(orig, border);
 	}
@@ -123,13 +123,13 @@ public abstract class GenericImageBorderTests {
 
 		ImageBorder_F32 fooA = wrap(imgA);
 
-		SingleBandImage orig = FactorySingleBandImage.wrap(imgA);
-		SingleBandImage border = FactorySingleBandImage.wrap(fooA);
+		GImageSingleBand orig = FactoryGeneralizedSingleBand.wrap(imgA);
+		GImageSingleBand border = FactoryGeneralizedSingleBand.wrap(fooA);
 
 		checkSet(orig, border);
 	}
 
-	private void checkSet(SingleBandImage orig, SingleBandImage border) {
+	private void checkSet(GImageSingleBand orig, GImageSingleBand border) {
 		// test the image's inside where there is no border condition
 		border.set(0,0,1);
 		border.set(width-1,height-1,2);

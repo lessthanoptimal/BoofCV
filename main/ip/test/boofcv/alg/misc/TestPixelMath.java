@@ -18,9 +18,9 @@
 
 package boofcv.alg.misc;
 
-import boofcv.core.image.FactorySingleBandImage;
+import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.SingleBandImage;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
@@ -110,8 +110,8 @@ public class TestPixelMath {
 
 		m.invoke(null,input,output);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(input);
-		SingleBandImage b = FactorySingleBandImage.wrap(output);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(output);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				assertEquals(Math.abs(a.get(j,i).doubleValue()),b.get(j,i).doubleValue(),1e-4);
@@ -123,7 +123,7 @@ public class TestPixelMath {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(input);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
 
 		if( input.getTypeInfo().isSigned() ) {
 			GeneralizedImageOps.randomize(input, rand, -20,20);
@@ -143,7 +143,7 @@ public class TestPixelMath {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(input);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
 
 		if( input.getTypeInfo().isSigned() ) {
 			GeneralizedImageOps.randomize(input, rand, -20,-5);
@@ -163,7 +163,7 @@ public class TestPixelMath {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(input);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
 
 		if( input.getTypeInfo().isSigned() ) {
 			GeneralizedImageOps.randomize(input, rand, -20,-5);
@@ -196,8 +196,8 @@ public class TestPixelMath {
 		else
 			m.invoke(null,input,output,10.0f);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(input);
-		SingleBandImage b = FactorySingleBandImage.wrap(output);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(output);
 		if( input.getTypeInfo().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
@@ -230,8 +230,8 @@ public class TestPixelMath {
 		else
 			m.invoke(null,input,output,2.0f);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(input);
-		SingleBandImage b = FactorySingleBandImage.wrap(output);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(output);
 		if( input.getTypeInfo().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
@@ -263,8 +263,8 @@ public class TestPixelMath {
 		else
 			m.invoke(null,input,output,2.0f);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(input);
-		SingleBandImage b = FactorySingleBandImage.wrap(output);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(output);
 		if( input.getTypeInfo().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
@@ -294,7 +294,7 @@ public class TestPixelMath {
 		} else
 			m.invoke(null,input,2.0f,10.0f);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(input);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
 		if( input.getTypeInfo().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
@@ -328,9 +328,9 @@ public class TestPixelMath {
 
 		m.invoke(null,inputA,inputB,inputC);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(inputA);
-		SingleBandImage b = FactorySingleBandImage.wrap(inputB);
-		SingleBandImage c = FactorySingleBandImage.wrap(inputC);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(inputA);
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(inputB);
+		GImageSingleBand c = FactoryGeneralizedSingleBand.wrap(inputC);
 
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
@@ -352,7 +352,7 @@ public class TestPixelMath {
 
 		Object result = m.invoke(null,inputA);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(inputA);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(inputA);
 
 		double total = 0;
 		for( int i = 0; i < height; i++ ) {
@@ -377,10 +377,10 @@ public class TestPixelMath {
 
 		m.invoke(null,input,output);
 
-		SingleBandImage a = FactorySingleBandImage.wrap(input.getBand(0));
-		SingleBandImage b = FactorySingleBandImage.wrap(input.getBand(1));
-		SingleBandImage c = FactorySingleBandImage.wrap(input.getBand(2));
-		SingleBandImage d = FactorySingleBandImage.wrap(output);
+		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input.getBand(0));
+		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(input.getBand(1));
+		GImageSingleBand c = FactoryGeneralizedSingleBand.wrap(input.getBand(2));
+		GImageSingleBand d = FactoryGeneralizedSingleBand.wrap(output);
 
 		boolean isInteger = output.getTypeInfo().isInteger();
 

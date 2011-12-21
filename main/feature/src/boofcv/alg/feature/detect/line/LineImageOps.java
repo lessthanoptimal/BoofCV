@@ -231,7 +231,7 @@ public class LineImageOps {
 	/**
 	 * Find the point in which the line intersects the image border and create a line segment at those points
 	 */
-	static LineSegment2D_F32 convert(LineParametric2D_F32 l,
+	public static LineSegment2D_F32 convert(LineParametric2D_F32 l,
 									 int width, int height) {
 		double t0 = (0-l.p.x)/l.getSlopeX();
 		double t1 = (0-l.p.y)/l.getSlopeY();
@@ -256,7 +256,7 @@ public class LineImageOps {
 		return new LineSegment2D_F32(inside.get(0),inside.get(1));
 	}
 
-	static void checkAddInside(int width, int height, Point2D_F32 a, List<Point2D_F32> inside) {
+	public static void checkAddInside(int width, int height, Point2D_F32 a, List<Point2D_F32> inside) {
 		if( a.x >= -foo && a.x <= width+foo && a.y >= -foo && a.y <= height+foo ) {
 
 			for( Point2D_F32 p : inside ) {
@@ -267,7 +267,7 @@ public class LineImageOps {
 		}
 	}
 
-	static Point2D_F32 computePoint(LineParametric2D_F32 l, double t) {
+	public static Point2D_F32 computePoint(LineParametric2D_F32 l, double t) {
 		return new Point2D_F32((float)(t*l.slope.x+l.p.x) , (float)(t*l.slope.y + l.p.y));
 	}
 }

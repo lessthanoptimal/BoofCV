@@ -19,9 +19,9 @@
 package boofcv.alg.filter.convolve.border;
 
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
-import boofcv.core.image.FactorySingleBandImage;
+import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.SingleBandImage;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorderValue;
 import boofcv.struct.image.ImageFloat32;
@@ -56,7 +56,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 
 	protected void fillTestImage(ImageSingleBand smaller, ImageSingleBand larger) {
 		// set the while image equal to the specified value
-		SingleBandImage image = FactorySingleBandImage.wrap(larger);
+		GImageSingleBand image = FactoryGeneralizedSingleBand.wrap(larger);
 		for( int y = 0; y < image.getHeight(); y++ ) {
 			for( int x = 0; x < image.getWidth(); x++ ) {
 				image.set(x,y,fillValue);
@@ -130,8 +130,8 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		// remove the border
 		validationOut = stripBorder(validationOut);
 
-		SingleBandImage t = FactorySingleBandImage.wrap(targetOut);
-		SingleBandImage v = FactorySingleBandImage.wrap(validationOut);
+		GImageSingleBand t = FactoryGeneralizedSingleBand.wrap(targetOut);
+		GImageSingleBand v = FactoryGeneralizedSingleBand.wrap(validationOut);
 
 		for( int y = 0; y < targetOut.height; y++ ) {
 			if( y >= kernelRadius &&  y < targetOut.height-kernelRadius )

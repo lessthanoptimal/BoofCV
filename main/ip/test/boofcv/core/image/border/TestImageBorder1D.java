@@ -18,7 +18,7 @@
 
 package boofcv.core.image.border;
 
-import boofcv.core.image.SingleBandImage;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 
@@ -47,7 +47,7 @@ public class TestImageBorder1D extends GenericImageBorderTests {
 	}
 
 	@Override
-	public Number get(SingleBandImage img, int x, int y) {
+	public Number get(GImageSingleBand img, int x, int y) {
 		wrap.setLength(img.getWidth());
 		x = wrap.getIndex(x);
 		wrap.setLength(img.getHeight());
@@ -57,7 +57,7 @@ public class TestImageBorder1D extends GenericImageBorderTests {
 	}
 
 	@Override
-	public void checkBorderSet(int x, int y, Number val, SingleBandImage border, SingleBandImage orig) {
+	public void checkBorderSet(int x, int y, Number val, GImageSingleBand border, GImageSingleBand orig) {
 		border.set(x,y,val);
 
 		wrap.setLength(orig.getWidth());

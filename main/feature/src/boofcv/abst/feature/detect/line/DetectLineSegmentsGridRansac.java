@@ -37,6 +37,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
+// TODO update description in FactoryDetectLineAlgs
 public class DetectLineSegmentsGridRansac<T extends ImageSingleBand, D extends ImageSingleBand>
 		implements DetectLineSegment<T>
 {

@@ -132,7 +132,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		// reset the world coordinate system to the current key frame
 		if( infoPanel.resetRequested() || closeToImageBounds(frame.width,frame.height,30)) {
 			T oldToNew = fitModel.createInstance();
-			distortAlg.refocus(oldToNew);
+			distortAlg.changeWorld(oldToNew);
 			PixelTransform_F32 pixelTran = UtilImageMotion.createPixelTransform(oldToNew);
 			motionRender.distortMosaic(pixelTran);
 		}

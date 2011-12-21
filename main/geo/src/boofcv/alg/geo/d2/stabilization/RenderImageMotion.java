@@ -65,7 +65,7 @@ public class RenderImageMotion<I extends ImageSingleBand, O extends ImageBase> {
 		this.mosaicWidth = mosaicWidth;
 		this.mosaicHeight = mosaicHeight;
 		this.imageType = imageType;
-		
+
 		setColorOutput(color);
 	}
 	
@@ -107,6 +107,8 @@ public class RenderImageMotion<I extends ImageSingleBand, O extends ImageBase> {
 	 */
 	public synchronized void update(I frame, BufferedImage buffImage , PixelTransform_F32 worldToCurr ) {
 
+		// todo does distort step through each pixel in the mosaic or source image?
+		//      If it is the mosaic it could be speed up by only considering the region being changed
 		distorter.setModel(worldToCurr);
 
 		if( colorOutput ) {

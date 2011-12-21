@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface SingleBandImage {
+public interface GImageSingleBand {
 
 	int getWidth();
 

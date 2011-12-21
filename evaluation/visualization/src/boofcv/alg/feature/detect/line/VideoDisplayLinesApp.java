@@ -22,9 +22,10 @@ import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.detect.line.FactoryDetectLine;
+import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.VideoProcessAppBase;
+import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoListManager;
@@ -58,10 +59,10 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 	public VideoDisplayLinesApp(Class<I> imageType, Class<D> derivType) {
 		super(1);
 
-		addAlgorithm(0,"Hough Foot",FactoryDetectLine.houghFoot(3, 8, 5, edgeThreshold, maxLines, imageType, derivType));
-		addAlgorithm(0,"Hough Polar", FactoryDetectLine.houghPolar(3, 30, 2, Math.PI/180, edgeThreshold, maxLines, imageType, derivType));
-		addAlgorithm(0,"Hough Foot Sub Image",FactoryDetectLine.houghFootSub(3, 8, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType));
-		addAlgorithm(0,"Grid Line", FactoryDetectLine.lineRansac(40, 30, 2.36, true, imageType, derivType));
+		addAlgorithm(0,"Hough Foot", FactoryDetectLineAlgs.houghFoot(3, 8, 5, edgeThreshold, maxLines, imageType, derivType));
+		addAlgorithm(0,"Hough Polar", FactoryDetectLineAlgs.houghPolar(3, 30, 2, Math.PI / 180, edgeThreshold, maxLines, imageType, derivType));
+		addAlgorithm(0,"Hough Foot Sub Image", FactoryDetectLineAlgs.houghFootSub(3, 8, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType));
+		addAlgorithm(0,"Grid Line", FactoryDetectLineAlgs.lineRansac(40, 30, 2.36, true, imageType, derivType));
 
 
 		blur = GeneralizedImageOps.createSingleBand(imageType, 1, 1);

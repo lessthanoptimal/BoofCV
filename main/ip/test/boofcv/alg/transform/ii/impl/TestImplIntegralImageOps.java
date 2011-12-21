@@ -18,9 +18,9 @@
 
 package boofcv.alg.transform.ii.impl;
 
-import boofcv.core.image.FactorySingleBandImage;
+import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.SingleBandImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
@@ -66,8 +66,8 @@ public class TestImplIntegralImageOps {
 
 	public void checkResults(ImageSingleBand a, ImageSingleBand b) {
 
-		SingleBandImage aa = FactorySingleBandImage.wrap(a);
-		SingleBandImage bb = FactorySingleBandImage.wrap(b);
+		GImageSingleBand aa = FactoryGeneralizedSingleBand.wrap(a);
+		GImageSingleBand bb = FactoryGeneralizedSingleBand.wrap(b);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
