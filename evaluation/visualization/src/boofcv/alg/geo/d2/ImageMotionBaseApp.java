@@ -185,8 +185,9 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 	protected void renderCurrentTransform(I frame, BufferedImage buffImage) {
 		T worldToCurr = distortAlg.getWorldToCurr();
 		PixelTransform_F32 pixelTran = UtilImageMotion.createPixelTransform(worldToCurr);
+		PixelTransform_F32 pixelTranInv = UtilImageMotion.createPixelTransform(worldToCurr.invert(null));
 
-		motionRender.update(frame, buffImage, pixelTran);
+		motionRender.update(frame, buffImage, pixelTran,pixelTranInv);
 	}
 
 

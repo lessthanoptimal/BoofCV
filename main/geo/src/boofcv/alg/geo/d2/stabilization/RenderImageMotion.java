@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.d2.stabilization;
 
+import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
@@ -30,6 +31,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
+import georegression.struct.shapes.Rectangle2D_I32;
 
 import java.awt.image.BufferedImage;
 
@@ -105,19 +107,27 @@ public class RenderImageMotion<I extends ImageSingleBand, O extends ImageBase> {
 	 * @param buffImage Color image of the current frame.
 	 * @param worldToCurr Transformation from the world into the current frame.
 	 */
-	public synchronized void update(I frame, BufferedImage buffImage , PixelTransform_F32 worldToCurr ) {
+	public synchronized void update(I frame, BufferedImage buffImage ,
+									PixelTransform_F32 worldToCurr ,
+									PixelTransform_F32 currToWorld  ) {
 
-		// todo does distort step through each pixel in the mosaic or source image?
-		//      If it is the mosaic it could be speed up by only considering the region being changed
+		// only process a cropped portion to speed up processing
+		Rectangle2D_I32 box = DistortImageOps.boundBox(frame.width,frame.height,
+				imageMosaic.width,imageMosaic.height,currToWorld);
+		int x0 = box.tl_x;
+		int y0 = box.tl_y;
+		int x1 = box.tl_x + box.width;
+		int y1 = box.tl_y + box.height;
+
 		distorter.setModel(worldToCurr);
 
 		if( colorOutput ) {
 			frameMulti.reshape(frame.width,frame.height);
 			ConvertBufferedImage.convertFrom(buffImage, frameMulti);
 
-			distorter.apply(frameMulti, imageMosaic);
+			distorter.apply(frameMulti, imageMosaic,x0,y0,x1,y1);
 		} else {
-			distorter.apply((O)frame, imageMosaic);
+			distorter.apply((O)frame, imageMosaic,x0,y0,x1,y1);
 		}
 	}
 

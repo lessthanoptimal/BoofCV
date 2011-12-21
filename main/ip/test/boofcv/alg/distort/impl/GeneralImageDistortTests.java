@@ -90,6 +90,42 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 			}
 		}
 	}
+	
+	@Test
+	public void testCrop() {
+		// the crop region
+		int x0=12,y0=10,x1=17,y1=18;
+
+		T src = generator.createInstance(width,height);
+		T dst = generator.createInstance(width,height);
+
+		GeneralizedImageOps.randomize(src, rand, 0,10);
+
+		ImageDistort<T> tran = createDistort(new BasicTransform(),interp,border);
+		tran.apply(src,dst,x0,y0,x1,y1);
+
+		for( int dstY = 0; dstY < height; dstY++ ) {
+			for( int dstX = 0; dstX < width; dstX++ ) {
+				// should be zero outside of the crop region
+				if( dstX < x0 || dstX >= x1 || dstY < y0 || dstY >= y1 )
+					assertEquals(0,GeneralizedImageOps.get(dst,dstX,dstY),1e-4);
+				else {
+					int srcX = dstX + offX;
+					int srcY = dstY + offY;
+
+					double dstVal = GeneralizedImageOps.get(dst,dstX,dstY);
+
+					if( src.isInBounds(srcX,srcY) ) {
+						double srcVal = GeneralizedImageOps.get(src,srcX,srcY);
+						assertEquals(srcVal,dstVal,1e-4);
+					} else {
+						assertEquals(5,dstVal,1e-4);
+					}
+				}
+			}
+		}
+
+	}
 
 	public class BasicTransform extends PixelTransform_F32 {
 

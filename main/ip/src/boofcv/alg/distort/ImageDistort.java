@@ -39,10 +39,22 @@ public interface ImageDistort<T extends ImageBase> {
 	public void setModel( PixelTransform_F32 dstToSrc );
 
 	/**
-	 * Applies the transform while skipping over pixels without a match.
+	 * Applies the transform to the entire destination image.
 	 *
 	 * @param srcImg Input image. Not modified.
 	 * @param dstImg Output image. Modified.
 	 */
 	public void apply( T srcImg , T dstImg );
+
+	/**
+	 * Applies the transform to only the specified region inside the destination image.
+	 *
+	 * @param srcImg Input image. Not modified.
+	 * @param dstImg Output image. Modified.
+	 * @param dstX0 Left most crop boundary.
+	 * @param dstY0 Top most crop boundary.
+	 * @param dstX1 Right most crop boundary.
+	 * @param dstY1 Bottom most crop boundary.
+	 */
+	public void apply( T srcImg , T dstImg , int dstX0 , int dstY0 , int dstX1 , int dstY1 );
 }
