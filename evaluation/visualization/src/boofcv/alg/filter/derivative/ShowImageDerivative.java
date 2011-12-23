@@ -164,9 +164,10 @@ public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 //				= new ShowImageDerivative<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","data/shapes01.png");
-		manager.add("sunflowers","data/sunflowers.png");
-		manager.add("beach","data/scale/beach02.jpg");
+		manager.add("shapes","../data/evaluation/shapes01.png");
+		manager.add("sunflowers","../data/evaluation/sunflowers.png");
+		manager.add("beach","../data/evaluation/scale/beach02.jpg");
+		manager.add("xray","../data/applet/xray01.jpg");
 
 		app.setInputManager(manager);
 

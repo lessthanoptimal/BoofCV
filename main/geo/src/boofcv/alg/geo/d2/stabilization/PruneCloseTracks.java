@@ -24,11 +24,13 @@ import boofcv.alg.geo.AssociatedPair;
 import java.util.List;
 
 /**
- * Detects if tracks are too close together and discards some of the close ones
+ * Detects if tracks are too close together and discards some of the close ones.  Tracks are projected into
+ * a smaller grid (specified by scale) and if more than one lands on the same grid element it is pruned.
  * 
  * @author Peter Abeles
  */
 public class PruneCloseTracks {
+	// how close the tracks can be before they are pruned.
 	int scale;
 	int imgWidth;
 	int imgHeight;

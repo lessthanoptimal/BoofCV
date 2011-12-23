@@ -54,6 +54,13 @@ public class DescribePointSteerable2D <T extends ImageSingleBand, K extends Kern
 	// this provides some intensity invariance
 	boolean normalize;
 
+	/**
+	 * Configure the descriptor.
+	 *
+	 * @param kernels Set of steerable kernels used to compute features.
+	 * @param normalize Should the feature vector be normalized to one?
+	 * @param imageType Type of input image
+	 */
 	public DescribePointSteerable2D( SteerableKernel<K> kernels[] ,
 									 boolean normalize ,
 									 Class<T> imageType ) {

@@ -454,6 +454,13 @@
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
       <map>
+        <entry key="$PROJECT_DIR$/../../bubo">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="svn+ssh://127.0.0.1/opt/svn/buborepo" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../../ejml">
           <value>
             <SvnBranchConfiguration>
@@ -464,20 +471,6 @@
         <entry key="$PROJECT_DIR$/../../libpjajava">
           <value>
             <SvnBranchConfiguration>
-              <option name="branchMap">
-                <map>
-                  <entry key="svn+ssh://127.0.0.1/opt/repos/libpjajava/branches">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                  <entry key="svn+ssh://127.0.0.1/opt/repos/libpjajava/tags">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                </map>
-              </option>
               <option name="branchUrls">
                 <list>
                   <option value="svn+ssh://127.0.0.1/opt/repos/libpjajava/branches" />
@@ -515,6 +508,7 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../bubo" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../georegression" vcs="Git" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />

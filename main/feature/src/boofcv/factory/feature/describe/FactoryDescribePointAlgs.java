@@ -76,6 +76,23 @@ public class FactoryDescribePointAlgs {
 		return new DescribePointBriefSO<T>(definition,filterBlur,interp);
 	}
 
+	/**
+	 * <p>
+	 * Creates a steerable Gaussian descriptor with 12-DOF.  See description in {@link DescribePointGaussian12}
+	 * for more details..
+	 * </p>
+	 * 
+	 * <p>
+	 * NOTE: A covariance matrix is typically used when comparing descriptions of this type.  Without
+	 * this covariance association will perform worse than as stated in the literature.
+	 * </p>
+	 *
+	 * @param radius How large the kernel should be.
+	 * @param imageType Type of image it can process.
+	 * @param <T> Input image type.
+	 * @param <K> Kernel2D type.
+	 * @return  Steerable gaussian descriptor.
+	 */
 	public static <T extends ImageSingleBand, K extends Kernel2D>
 	DescribePointGaussian12<T,K> steerableGaussian12( int radius , Class<T> imageType )
 	{

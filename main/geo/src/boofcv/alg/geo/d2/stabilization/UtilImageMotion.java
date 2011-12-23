@@ -45,9 +45,13 @@ public class UtilImageMotion {
 		if( transform instanceof Homography2D_F64) {
 			Homography2D_F32 t = UtilHomography.convert((Homography2D_F64) transform, null);
 			pixelTran = new PixelTransformHomography_F32(t);
+		} else if( transform instanceof Homography2D_F32) {
+				pixelTran = new PixelTransformHomography_F32((Homography2D_F32)transform);
 		} else if( transform instanceof Affine2D_F64) {
 			Affine2D_F32 t = UtilAffine.convert((Affine2D_F64) transform, null);
 			pixelTran = new PixelTransformAffine_F32(t);
+		} else if( transform instanceof Affine2D_F32) {
+			pixelTran = new PixelTransformAffine_F32((Affine2D_F32)transform);
 		} else {
 			throw new RuntimeException("Unknown model type");
 		}

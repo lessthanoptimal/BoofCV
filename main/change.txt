@@ -29,6 +29,8 @@ Version : Alpha 0.3
 - Updated ant scripts
   * Common template is now used for the different modules
   * Fixed unit test and make it work across the whole project
+- Added crop to ImageDistort
+  * If cropping is used the only part of the destimation image is processed
 
 ---------------------------------------------
 Date    : 2011/12/01 

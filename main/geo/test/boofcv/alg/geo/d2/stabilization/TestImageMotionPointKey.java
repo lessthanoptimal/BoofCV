@@ -3,8 +3,8 @@ package boofcv.alg.geo.d2.stabilization;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import georegression.struct.InvertibleTransform;
 import georegression.struct.se.Se2_F32;
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ public class TestImageMotionPointKey {
 		Se2_F32 computed = new Se2_F32(4,5,6);
 		Se2_F32 model = new Se2_F32();
 		DummyTracker tracker = new DummyTracker();
-		DummyModelMatcher matcher = new DummyModelMatcher(computed,5);
+		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<Se2_F32>(computed,5);
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 		
@@ -92,7 +92,7 @@ public class TestImageMotionPointKey {
 		Se2_F32 computed = new Se2_F32(4,5,6);
 		Se2_F32 model = new Se2_F32();
 		DummyTracker tracker = new DummyTracker();
-		DummyModelMatcher matcher = new DummyModelMatcher(computed,5);
+		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<Se2_F32>(computed,5);
 		
 		ImageUInt8 input = new ImageUInt8(20,30);
 
@@ -118,14 +118,15 @@ public class TestImageMotionPointKey {
 		worldToKey = alg.getWorldToKey();
 		assertEquals(computed.getX(),worldToKey.getX(),1e-8);
 	}
-	
-	private static class DummyTracker implements ImagePointTracker
+
+	public static class DummyTracker implements ImagePointTracker<ImageUInt8>
 	{
 		public int numSpawn = 0;
 		public int numSetKeyframe = 0;
+		public int numDropped = 0;
 
 		@Override
-		public void process(ImageSingleBand image) {}
+		public void process(ImageUInt8 image) {}
 
 		@Override
 		public boolean addTrack(double x, double y) {
@@ -142,7 +143,7 @@ public class TestImageMotionPointKey {
 		public void setCurrentToKeyFrame() {numSetKeyframe++;}
 
 		@Override
-		public void dropTrack(AssociatedPair track) {}
+		public void dropTrack(AssociatedPair track) {numDropped++;}
 
 		@Override
 		public List<AssociatedPair> getActiveTracks() {
@@ -160,23 +161,23 @@ public class TestImageMotionPointKey {
 		}
 	}
 	
-	private class DummyModelMatcher implements ModelMatcher<Se2_F32,AssociatedPair> {
+	public static class DummyModelMatcher<T extends InvertibleTransform> implements ModelMatcher<T,AssociatedPair> {
 
-		Se2_F32 found;
+		T found;
 		int matchSetSize;
 
-		private DummyModelMatcher(Se2_F32 found, int matchSetSize) {
+		public DummyModelMatcher(T found, int matchSetSize) {
 			this.found = found;
 			this.matchSetSize = matchSetSize;
 		}
 
 		@Override
-		public boolean process(List<AssociatedPair> dataSet, Se2_F32 initialGuess) {
+		public boolean process(List<AssociatedPair> dataSet, T initialGuess) {
 			return true;
 		}
 
 		@Override
-		public Se2_F32 getModel() {
+		public T getModel() {
 			return found;
 		}
 
@@ -192,6 +193,10 @@ public class TestImageMotionPointKey {
 		@Override
 		public double getError() {
 			return 0;
+		}
+
+		public void setMotion(T se) {
+			found = se;
 		}
 	}
 }
