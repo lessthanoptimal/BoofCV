@@ -20,9 +20,7 @@ package boofcv.core.image;
 
 import boofcv.alg.misc.ImageInterleavedTestingOps;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInterleavedInt8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -42,11 +40,6 @@ public class TestConvertBufferedImage {
 
 	int imgWidth = 10;
 	int imgHeight = 20;
-
-	@Test
-	public void addMultiSpectralTests() {
-		fail("add these tests");
-	}
 
 	@Test
 	public void extractInterlacedInt8() {
@@ -129,12 +122,33 @@ public class TestConvertBufferedImage {
 		BoofTesting.checkEquals(img, srcImg);
 	}
 
+	/**
+	 * Predeclare an image to convert the buffered image into and step through each data type and image type
+	 */
 	@Test
-	public void convertFrom_generic() {
-		// test single band
+	public void convertFrom_single_ms() {
+		Class[] types = new Class[]{ImageUInt8.class,ImageFloat32.class};
+		
+		
+		for( Class t : types ) {
+			for( int i = 0; i < 2; i++ ) {
+				ImageBase image;
+				if( i == 0 ) {
+					image = GeneralizedImageOps.createSingleBand(t,imgWidth,imgHeight);
+				} else {
+					image = new MultiSpectral(t,imgWidth,imgHeight,3);
+				}
 
-		// test multi-spectral
-		fail("implement");
+				BoofTesting.checkSubImage(this, "convertFrom_single_ms", false, image);
+			}
+		}
+	}
+
+	public void convertFrom_single_ms( ImageBase dstImg) {
+		BufferedImage origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
+		ConvertBufferedImage.convertFrom(origImg, dstImg);
+
+		BoofTesting.checkEquals(origImg, dstImg, 1e-3f);
 	}
 
 	@Test
@@ -152,65 +166,45 @@ public class TestConvertBufferedImage {
 
 	@Test
 	public void convertFromMulti() {
-		fail("implement");
-	}
-
-	@Test
-	public void convertFrom_Int8() {
-		ImageUInt8 dstImg = new ImageUInt8(imgWidth, imgHeight);
-
-		BoofTesting.checkSubImage(this, "convertFrom_Int8", false, dstImg);
-	}
-
-	public void convertFrom_Int8(ImageUInt8 dstImg) {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
-		ConvertBufferedImage.convertFrom(origImg, dstImg);
 
-		BoofTesting.checkEquals(origImg, dstImg);
+		MultiSpectral<ImageUInt8> imgInt8 = ConvertBufferedImage.convertFromMulti(origImg, null, ImageUInt8.class);
+		assertEquals(imgWidth,imgInt8.width);
+		assertEquals(imgHeight, imgInt8.height);
+
+		MultiSpectral<ImageFloat32> imgF32 = ConvertBufferedImage.convertFromMulti(origImg, null, ImageFloat32.class);
+		assertEquals(imgWidth,imgF32.width);
+		assertEquals(imgHeight, imgF32.height);
 	}
 
+	/**
+	 * Create an image and convert it into a buffered image
+	 */
 	@Test
-	public void convertFrom_F32() {
-		ImageFloat32 dstImg = new ImageFloat32(imgWidth, imgHeight);
+	public void convertTo_single_ms() {
+		Class[] types = new Class[]{ImageUInt8.class,ImageFloat32.class};
 
-		BoofTesting.checkSubImage(this, "convertFrom_F32", false, dstImg);
+
+		for( Class t : types ) {
+			for( int i = 0; i < 2; i++ ) {
+				ImageBase image;
+				if( i == 0 ) {
+					image = GeneralizedImageOps.createSingleBand(t,imgWidth,imgHeight);
+				} else {
+					image = new MultiSpectral(t,imgWidth,imgHeight,3);
+				}
+				GeneralizedImageOps.randomize(image, rand, 0, 100);
+
+				BoofTesting.checkSubImage(this, "convertTo_single_ms", false, image);
+			}
+		}
 	}
 
-	public void convertFrom_F32(ImageFloat32 dstImg) {
-		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
-		ConvertBufferedImage.convertFrom(origImg, dstImg);
-
-		BoofTesting.checkEquals(origImg, dstImg, 1e-3f);
-	}
-
-	@Test
-	public void convertTo_Int8() {
-		ImageUInt8 srcImg = new ImageUInt8(imgWidth, imgHeight);
-		ImageTestingOps.randomize(srcImg, rand, 0, 100);
-
-		BoofTesting.checkSubImage(this, "convertTo_Int8", true, srcImg);
-	}
-
-	public void convertTo_Int8(ImageUInt8 srcImg) {
-		BufferedImage dstImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
+	public void convertTo_single_ms(ImageBase srcImg) {
+		BufferedImage dstImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
 		ConvertBufferedImage.convertTo(srcImg, dstImg);
 
-		BoofTesting.checkEquals(dstImg, srcImg);
-	}
-
-	@Test
-	public void convertTo_F32() {
-		ImageFloat32 srcImg = new ImageFloat32(imgWidth, imgHeight);
-		ImageTestingOps.randomize(srcImg, rand, 0, 100);
-
-		BoofTesting.checkSubImage(this, "convertTo_F32", true, srcImg);
-	}
-
-	public void convertTo_F32( ImageFloat32 srcImg) {
-		BufferedImage dstImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
-		ConvertBufferedImage.convertTo(srcImg, dstImg);
-
-		BoofTesting.checkEquals(dstImg, srcImg, 1f);
+		BoofTesting.checkEquals(dstImg, srcImg,1);
 	}
 
 	@Test

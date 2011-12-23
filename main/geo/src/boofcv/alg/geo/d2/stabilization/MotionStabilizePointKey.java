@@ -55,6 +55,9 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 	 * @param tracker feature tracker
 	 * @param modelMatcher Fits model to track data
 	 * @param model Motion model data structure
+	 * @param thresholdKeyFrame  If the number of inlier is less than this number the keyframe will change.
+	 * @param thresholdReset If the number of inlier is less than this number a reset will occur.
+	 * @param largeMotionThreshold  If the transform from the key frame to the current frame is more than this a reset will occur.
 	 */
 	public MotionStabilizePointKey(ImagePointTracker<I> tracker, 
 								   ModelMatcher<T, AssociatedPair> modelMatcher, 
@@ -63,6 +66,10 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 								   int largeMotionThreshold )
 	{
 		super(tracker, modelMatcher, model);
+
+		if( thresholdKeyFrame > thresholdReset ) {
+			throw new IllegalArgumentException("Threshold for key frame should be less than reset");
+		}
 		
 		this.thresholdKeyFrame = thresholdKeyFrame;
 		this.thresholdReset = thresholdReset;
