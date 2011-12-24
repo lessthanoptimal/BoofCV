@@ -18,8 +18,6 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveBox;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -29,6 +27,9 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import com.google.caliper.Param;
+import com.google.caliper.Runner;
+import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -36,10 +37,11 @@ import java.util.Random;
  * Benchmark for different convolution operations.
  * @author Peter Abeles
  */
-public class BenchmarkConvolveBox {
+@SuppressWarnings("UnusedDeclaration")
+public class BenchmarkConvolveBox extends SimpleBenchmark {
+
 	static int width = 640;
 	static int height = 480;
-	static int radius;
 	static long TEST_TIME = 1000;
 	static Random rand = new Random(234);
 
@@ -54,124 +56,87 @@ public class BenchmarkConvolveBox {
 	static ImageSInt16 out_I16 = new ImageSInt16(width,height);
 	static ImageSInt32 out_I32 = new ImageSInt32(width,height);
 
-	public static class Convolve_Vertical_I8_I16 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I16,false);
-		}
-	}
+	// iterate through different sized kernel radius
+	@Param({"1", "2", "3", "5","10"}) private int radius;
 
-	public static class Convolve_Vertical_I8_I32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I32,false);
-		}
-	}
-
-	public static class Box_U8_I16_Vertical extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveBox.vertical(input_I8,out_I16,radius,false);
-		}
-	}
-
-	public static class Box_U8_I32_Vertical extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveBox.vertical(input_I8,out_I32,radius,false);
-		}
-	}
-
-	public static class Box_S16_I16_Vertical extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveBox.vertical(input_I16,out_I16,radius,false);
-		}
-	}
-
-	public static class Box_F32_F32_Vertical extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveBox.vertical(input_F32,out_F32,radius,false);
-		}
-	}
-
-	public static class BoxAlt_F32_F32_Vertical extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveBoxAlt.vertical(input_F32,out_F32,radius,false);
-		}
-	}
-
-	public static class Box_U8_I16_Horizontal extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveBox.horizontal(input_I8,out_I16,radius,false);
-		}
-	}
-
-	public static class Box_U8_I32_Horizontal extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveBox.horizontal(input_I8,out_I32,radius,false);
-		}
-	}
-
-	public static class Box_S16_I16_Horizontal extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveBox.horizontal(input_I16,out_I16,radius,false);
-		}
-	}
-
-	public static class Box_F32_F32_Horizontal extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveBox.horizontal(input_F32,out_F32,radius,false);
-		}
-	}
-
-	public static void main( String args[] ) {
+	public BenchmarkConvolveBox() {
 		ImageTestingOps.randomize(input_I8,rand,0,20);
 		ImageTestingOps.randomize(input_I16,rand,0,20);
 		ImageTestingOps.randomize(input_F32,rand,0,20);
+	}
 
+	@Override protected void setUp() throws Exception {
+		kernelF32 = FactoryKernel.table1D_F32(radius,false);
+		kernelI32 = FactoryKernel.table1D_I32(radius);
+	}
 
-		System.out.println("=========  Profile Image Size "+ width +" x "+ height +" ==========");
-		System.out.println();
+	public int timeConvolve_Vertical_I8_I16(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I16,false);
+		return 0;
+	}
 
-		for( int radius = 1; radius < 10; radius += 1 ) {
-			System.out.println("Radius: "+radius);
-			System.out.println();
-			BenchmarkConvolveBox.radius = radius;
-			kernelF32 = FactoryKernel.table1D_F32(radius,false);
-			kernelI32 = FactoryKernel.table1D_I32(radius);
+	public int timeConvolve_Vertical_I8_I32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I32,false);
+		return 0;
+	}
 
-			ProfileOperation.printOpsPerSec(new Box_U8_I16_Vertical(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_U8_I32_Vertical(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_S16_I16_Vertical(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_F32_F32_Vertical(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new BoxAlt_F32_F32_Vertical(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_U8_I16_Horizontal(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_U8_I32_Horizontal(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_S16_I16_Horizontal(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Box_F32_F32_Horizontal(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Convolve_Vertical_I8_I16(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Convolve_Vertical_I8_I32(),TEST_TIME);
+	public int timeBox_U8_I16_Vertical(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveBox.vertical(input_I8,out_I16,radius,false);
+		return 0;
+	}
 
-		}
+	public int timeBox_U8_I32_Vertical(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveBox.vertical(input_I8,out_I32,radius,false);
+		return 0;
+	}
 
+	public int timeBox_S16_I16_Vertical(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveBox.vertical(input_I16,out_I16,radius,false);
+		return 0;
+	}
 
+	public int timeBox_F32_F32_Vertical(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveBox.vertical(input_F32,out_F32,radius,false);
+		return 0;
+	}
+
+	public int timeBoxAlt_F32_F32_Vertical(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveBoxAlt.vertical(input_F32,out_F32,radius,false);
+		return 0;
+	}
+
+	public int timeBox_U8_I16_Horizontal(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveBox.horizontal(input_I8, out_I16, radius, false);
+		return 0;
+	}
+
+	public int timeBox_U8_I32_Horizontal(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveBox.horizontal(input_I8,out_I32,radius,false);
+		return 0;
+	}
+
+	public int timeBox_S16_I16_Horizontal(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveBox.horizontal(input_I16,out_I16,radius,false);
+		return 0;
+	}
+
+	public int timeBox_F32_F32_Horizontal(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveBox.horizontal(input_F32,out_F32,radius,false);
+		return 0;
+	}
+
+	public static void main( String args[] ) {
+		Runner.main(BenchmarkConvolveBox.class, args);
 	}
 }
