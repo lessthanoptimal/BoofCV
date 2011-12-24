@@ -240,7 +240,7 @@ public class BinaryImageOps {
 	 * pre-allocating the array was shown to improve performance about 5 times.
 	 * </p>
 	 *
-	 * @param input Binary input image.
+	 * @param input Binary input image. Not modified.
 	 * @param output The labeled blob image. Modified.
 	 * @return How many blobs were found.
 	 */
@@ -401,7 +401,7 @@ public class BinaryImageOps {
 			queue.reset();
 
 		// todo this method is slow and should be speed up with an inner and outer version
-		ImageBorder_I32 in = ImageBorderValue.wrap(labelImage, 0);
+		ImageBorder_I32 in = ImageBorderValue.wrap(labelImage, 1);
 		
 		for( int y = 0; y < labelImage.height; y++ ) {
 
@@ -409,6 +409,7 @@ public class BinaryImageOps {
 				int v = in.get(x,y);
 				if( v == 0 )
 					continue;
+				// see if any part of it (4-connect) is touching a non-member pixel
 				if( in.get(x-1,y) == 0 || in.get(x+1,y) == 0 || in.get(x,y-1) == 0 || in.get(x,y+1) == 0 ) {
 					Point2D_I32 p = queue.pop();
 					p.set(x,y);

@@ -82,4 +82,13 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageSingleBa
 	public ImageTypeInfo<T> getTypeInfo() {
 		return (ImageTypeInfo<T>)ImageTypeInfo.I;
 	}
+
+	public void print() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf("%3d ",get(x,y));
+			}
+			System.out.println();
+		}
+	}
 }

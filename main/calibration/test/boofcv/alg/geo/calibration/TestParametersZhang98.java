@@ -1,6 +1,5 @@
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.calibration.ParametersZhang98;
 import org.junit.Test;
 
 import java.util.Random;

@@ -1,6 +1,5 @@
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.calibration.Zhang98CalibrationMatrixFromHomographies;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 

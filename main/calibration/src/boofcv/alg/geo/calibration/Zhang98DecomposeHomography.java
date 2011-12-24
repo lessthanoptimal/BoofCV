@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.calibration;
+package boofcv.alg.geo.calibration;
 
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.geometry.UtilVector3D_F64;

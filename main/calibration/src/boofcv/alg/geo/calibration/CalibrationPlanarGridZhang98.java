@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.calibration;
+package boofcv.alg.geo.calibration;
 
 import boofcv.numerics.optimization.LevenbergMarquardt;
 import georegression.geometry.RotationMatrixGenerator;

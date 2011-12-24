@@ -1,8 +1,5 @@
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.calibration.CalibrationGridConfig;
-import boofcv.alg.calibration.CalibrationPlanarGridZhang98;
-import boofcv.alg.calibration.ParametersZhang98;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;

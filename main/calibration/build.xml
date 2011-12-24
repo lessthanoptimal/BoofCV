@@ -1,0 +1,5 @@
+<project name="BoofCV_CALIB" basedir="." default="main">
+
+  <import file="../build_common.xml"/>
+
+</project>

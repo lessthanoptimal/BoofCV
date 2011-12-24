@@ -31,6 +31,8 @@ Version : Alpha 0.3
   * Fixed unit test and make it work across the whole project
 - Added crop to ImageDistort
   * If cropping is used the only part of the destimation image is processed
+- Created calibration package to hold calibration related code
+- Moved jars not part of the primary build into boofcv/lib/testing
 
 ---------------------------------------------
 Date    : 2011/12/01 
