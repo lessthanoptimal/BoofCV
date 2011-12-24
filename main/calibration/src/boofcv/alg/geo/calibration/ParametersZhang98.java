@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.calibration;
+package boofcv.alg.geo.calibration;
 
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.so.Rodrigues;

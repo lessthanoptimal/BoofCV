@@ -18,9 +18,12 @@
 
 package boofcv.alg.geo.d3.calibration;
 
+import boofcv.alg.feature.detect.calibgrid.FindQuadCorners;
+import boofcv.alg.feature.detect.calibgrid.SquareBlob;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageSInt32;
@@ -28,7 +31,9 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,6 +52,8 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 	ImageSInt32 blobs = new ImageSInt32(1,1);
 	
 	int minContourSize = 20*4;
+
+	FindQuadCorners cornerFinder = new FindQuadCorners();
 
 	public DetectCalibrationTarget(Class<T> imageType , int gridWidth , int gridHeight ) {
 		this.imageType = imageType;
@@ -80,6 +87,17 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		// remove blobs which touch the image edge
 		filterTouchEdge(contours,image.width,image.height);
 
+		// create  list of squares and find an initial estimate of their corners
+		List<SquareBlob> squares = new ArrayList<SquareBlob>();
+		for( List<Point2D_I32> l : contours ) {
+			if( l.size() < minContourSize ) {
+				// this might be a bug or maybe an artifact of detecting with 8 versus 4-connect
+				continue;
+			}
+			List<Point2D_I32> corners = cornerFinder.process(l);
+			squares.add(new SquareBlob(l, corners));
+		}
+		
 		// remove blobs which are not like a polygon at all
 
 		// use original binary image to find corners
@@ -89,6 +107,13 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		BinaryImageOps.clusterToBinary(contours,threshold);
 		BufferedImage b = VisualizeBinaryData.renderBinary(threshold, null);
 		BufferedImage c = VisualizeBinaryData.renderLabeled(blobs, numBlobs, null);
+
+		Graphics2D g2 = c.createGraphics();
+		for( SquareBlob s : squares ) {
+			for( Point2D_I32 p : s.corners ) {
+				VisualizeFeatures.drawPoint(g2,p.x,p.y,Color.RED);
+			}
+		}
 
 		ShowImages.showWindow(b,"Threshold");
 		ShowImages.showWindow(c,"Blobs");
@@ -115,16 +140,11 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		}
 	}
 
-	public static void main( String args[] ) {
-		DetectCalibrationTarget<ImageUInt8> app = new DetectCalibrationTarget<ImageUInt8>(ImageUInt8.class,4,3);
-
-		ImageUInt8 input = UtilImageIO.loadImage("data/calibration/Sony_DSC-HX5V/image01.jpg",ImageUInt8.class);
-		app.process(input);
-
-	}
-
 	/**
-	 * Remove blobs with holes and blobs with a contour that is too small
+	 * Remove blobs with holes and blobs with a contour that is too small.  Holes are detected by
+	 * finding contour pixels in each blob.  If more than one set of contours exist then there
+	 * must be a hole inside
+	 *
 	 * @param binary
 	 * @param labeled
 	 * @param numLabels
@@ -134,7 +154,7 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 	{
 		ImageUInt8 contourImg = new ImageUInt8(labeled.width,labeled.height);
 		ImageSInt32 contourBlobs = new ImageSInt32(labeled.width,labeled.height);
-		
+
 		BinaryImageOps.edge8(binary,contourImg);
 		int numContours = BinaryImageOps.labelBlobs8(contourImg,contourBlobs);
 		List<List<Point2D_I32>> contours = BinaryImageOps.labelToClusters(contourBlobs, numContours, null);
@@ -157,15 +177,26 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		counter[0] = 0;
 		int counts = 1;
 		for( int i = 1; i < counter.length; i++ ) {
+
 			if( counter[i] > 1 )
 				counter[i] = 0;
-			else
+			else if( counter[i] != 0 )
 				counter[i] = counts++;
+			else
+				throw new RuntimeException("BUG!");
 		}
 
 		// relabel the image to remove blobs with holes inside
 		BinaryImageOps.relabel(labeled,counter);
 
 		return counts;
+	}
+
+	public static void main( String args[] ) {
+		DetectCalibrationTarget<ImageUInt8> app = new DetectCalibrationTarget<ImageUInt8>(ImageUInt8.class,4,3);
+
+		ImageUInt8 input = UtilImageIO.loadImage("../data/evaluation/calibration/Sony_DSC-HX5V/image01.jpg",ImageUInt8.class);
+		app.process(input);
+
 	}
 }

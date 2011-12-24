@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.calibration;
+package boofcv.alg.geo.calibration;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.d3.epipolar.HomographyLinear4;

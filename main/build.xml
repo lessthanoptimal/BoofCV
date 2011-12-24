@@ -1,12 +1,12 @@
 <project name="BoofCV" basedir="." default="main">
 
     <property name="lib.dir"     value="${basedir}/../lib"/>
-    <property name="jar.dir"     value="${basedir}/jar"/>
+    <property name="jar.dir"     value="${basedir}/testing/jar"/>
     <property name="doc.dir"     value="${basedir}/api"/>
     <property name="testreport.dir"  value="${basedir}/report"/>
 
     <path id="project.classpath">
-        <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/junit*"/>
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
         <fileset dir="${jar.dir}" includes="**/*.jar"/>
     </path>
 
@@ -35,6 +35,9 @@
             <include name="boofcv/**"/>
 	  </packageset>
 	  <packageset dir="visualize/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
+          </packageset>
+	  <packageset dir="calibration/src" defaultexcludes="yes">
             <include name="boofcv/**"/>
           </packageset>
 
@@ -101,6 +104,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	  <packageset dir="visualize/src" defaultexcludes="yes">
             <include name="boofcv/**"/>
           </packageset>
+	  <packageset dir="calibration/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
+          </packageset>
 
             <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
             <bottom><![CDATA[<b>Copyright &copy; 2011 Peter Abeles</b>]]></bottom>
@@ -115,6 +121,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="geo/" target="test"/>
 	<ant dir="io/" target="test"/>
 	<ant dir="visualize/" target="test"/>
+	<ant dir="calibration/" target="test"/>
     </target>
 
     <target name="testreport">
@@ -134,6 +141,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="geo/" target="clean"/>
 	<ant dir="io/" target="clean"/>
 	<ant dir="visualize/" target="clean"/>
+	<ant dir="calibration/" target="clean"/>
     </target>
 
     <target name="jar">
@@ -144,6 +152,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="geo" inheritAll="false"/>
 	<ant dir="io" inheritAll="false"/>
 	<ant dir="visualize/" inheritAll="false"/>
+	<ant dir="calibration/" inheritAll="false"/>
 	<jar destfile="${lib.dir}/${ant.project.name}.jar">
 	  <zipgroupfileset dir="${jar.dir}" includes="*.jar"/> 
 	</jar>

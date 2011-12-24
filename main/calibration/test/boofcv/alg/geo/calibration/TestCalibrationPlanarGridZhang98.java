@@ -1,8 +1,5 @@
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.calibration.CalibrationGridConfig;
-import boofcv.alg.calibration.CalibrationPlanarGridZhang98;
-import boofcv.alg.calibration.ParametersZhang98;
 import georegression.misc.test.GeometryUnitTest;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;

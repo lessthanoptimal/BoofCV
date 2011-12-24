@@ -1,6 +1,5 @@
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.calibration.CalibrationGridConfig;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 

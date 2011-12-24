@@ -413,6 +413,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../main/calibration/BoofCV Calibration.iml" filepath="$PROJECT_DIR$/../main/calibration/BoofCV Calibration.iml" />
       <module fileurl="file://$PROJECT_DIR$/BoofCV Evaluation.iml" filepath="$PROJECT_DIR$/BoofCV Evaluation.iml" />
       <module fileurl="file://$PROJECT_DIR$/../examples/BoofCV Examples.iml" filepath="$PROJECT_DIR$/../examples/BoofCV Examples.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/feature/BoofCV Feature.iml" filepath="$PROJECT_DIR$/../main/feature/BoofCV Feature.iml" />
@@ -524,7 +525,7 @@
   <component name="libraryTable">
     <library name="testing">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/junit-4.10.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/testing/junit-4.10.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

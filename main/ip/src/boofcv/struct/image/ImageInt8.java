@@ -71,13 +71,4 @@ public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
 	public ImageTypeInfo<T> getTypeInfo() {
 		return (ImageTypeInfo<T>)ImageTypeInfo.I8;
 	}
-
-	public void print() {
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				System.out.printf("%3d ",get(x,y));
-			}
-			System.out.println();
-		}
-	}
 }

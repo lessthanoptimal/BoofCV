@@ -193,27 +193,32 @@ public class TestBinaryImageOps {
 
 	@Test
 	public void labelEdgeCluster4() {
-		ImageUInt8 binary = new ImageUInt8(30,30);
-		ImageSInt32 labels = new ImageSInt32(30,30);
-		ImageUInt8 expected = new ImageUInt8(30,30);
+		int w = 30;
+		int w2 = w/2;
+
+		ImageUInt8 binary = new ImageUInt8(w,w);
+		ImageSInt32 labels = new ImageSInt32(w,w);
+		ImageUInt8 expected = new ImageUInt8(w,w);
 		
 		// create a random image and find clusters
-		GeneralizedImageOps.randomize(binary,rand,0,1);
+		GeneralizedImageOps.randomize(binary,rand,0,2);
 		// make sure there are some islands
-		for( int i = 0; i < 30; i++ ) {
-			binary.set(15,i,0);
-			binary.set(i,15,0);
+		for( int i = 0; i < w; i++ ) {
+			binary.set(w2,i,0);
+			binary.set(i,w2,0);
 		}
 		int numLabels = BinaryImageOps.labelBlobs4(binary,labels);
+		assertTrue( numLabels > 0 );
 		
 		// extract edges from binary
 		BinaryImageOps.edge4(binary,expected);
 		// find edge using labeled
 		List<List<Point2D_I32>> list = BinaryImageOps.labelEdgeCluster4(labels,numLabels,null);
 		
-		// makes ure its edges only
+		// makes sure its edges only
 		int total = 0;
 		for( List<Point2D_I32> l : list ) {
+			assertTrue(l.size() != 0 );
 			total += l.size();
 			for( Point2D_I32 p : l ) {
 				assertTrue(expected.get(p.x,p.y) == 1);

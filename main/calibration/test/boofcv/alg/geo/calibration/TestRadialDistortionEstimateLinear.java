@@ -1,7 +1,5 @@
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.calibration.CalibrationGridConfig;
-import boofcv.alg.calibration.RadialDistortionEstimateLinear;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;

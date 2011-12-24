@@ -1,6 +1,5 @@
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.calibration.Zhang98DecomposeHomography;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;

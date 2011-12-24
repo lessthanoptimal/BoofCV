@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.calibration;
+package boofcv.alg.geo.calibration;
 
-import boofcv.numerics.optimization.OptimizationFunction;
 import boofcv.numerics.optimization.OptimizationResidual;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
