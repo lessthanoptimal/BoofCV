@@ -20,18 +20,25 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.filter.blur.BlurImageOps;
+import boofcv.alg.filter.convolve.down.ConvolveDownNoBorderStandard;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.kernel.FactoryKernel;
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import com.google.caliper.Param;
+import com.google.caliper.Runner;
+import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -39,10 +46,9 @@ import java.util.Random;
  * Benchmark for different convolution operations.
  * @author Peter Abeles
  */
-public class BenchmarkConvolveMean {
+public class BenchmarkConvolveMean extends SimpleBenchmark {
 	static int width = 640;
 	static int height = 480;
-	static int radius;
 	static long TEST_TIME = 1000;
 	static Random rand = new Random(234);
 
@@ -54,102 +60,69 @@ public class BenchmarkConvolveMean {
 	static ImageUInt8 input_I8 = new ImageUInt8(width,height);
 	static ImageSInt16 input_I16 = new ImageSInt16(width,height);
 	static ImageUInt8 out_I8 = new ImageUInt8(width,height);
-	static ImageSInt16 out_I16 = new ImageSInt16(width,height);
-	static ImageSInt32 out_I32 = new ImageSInt32(width,height);
 
-	public static class Convolve_Vertical_U8_I8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I8,radius*2+1,false);
-		}
-	}
+	BlurFilter<ImageFloat32> filter;
 
-	public static class Convolve_Horizontal_U8_I8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveImageNoBorder.horizontal(kernelI32, input_I8,out_I8,radius*2+1,false);
-		}
-	}
+	// iterate through different sized kernel radius
+	@Param({"1", "2", "3", "5","10"}) private int radius;
 
-	public static class Mean_U8_I8_Vertical extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveMean.vertical(input_I8,out_I8,radius,false);
-		}
-	}
-
-	public static class Mean_U8_I8_Horizontal extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveMean.horizontal(input_I8,out_I8,radius,false);
-		}
-	}
-
-	public static class Mean_F32_F32_Vertical extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveMean.vertical(input_F32,out_F32,radius,false);
-		}
-	}
-
-	public static class Mean_F32_F32_Horizontal extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplConvolveMean.horizontal(input_F32,out_F32,radius,false);
-		}
-	}
-
-	public static class Mean_F32_F32_Blur extends PerformerBase
-	{
-		@Override
-		public void process() {
-			BlurImageOps.mean(input_F32,out_F32,radius,storageF32);
-		}
-	}
-
-	public static class Mean_F32_F32_BlurAbst extends PerformerBase
-	{
-		BlurFilter<ImageFloat32> filter = FactoryBlurFilter.mean(ImageFloat32.class,radius);
-
-		@Override
-		public void process() {
-			filter.process(input_F32,out_F32);
-		}
-	}
-
-
-	public static void main( String args[] ) {
+	public BenchmarkConvolveMean() {
 		ImageTestingOps.randomize(input_I8,rand,0,20);
 		ImageTestingOps.randomize(input_I16,rand,0,20);
 		ImageTestingOps.randomize(input_F32,rand,0,20);
+	}
 
+	@Override protected void setUp() throws Exception {
+		filter = FactoryBlurFilter.mean(ImageFloat32.class,radius);
+		kernelF32 = FactoryKernel.table1D_F32(radius, true);
+		kernelI32 = FactoryKernel.table1D_I32(radius);
+	}
+
+	public int timeConvolve_Vertical_U8_I8(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I8,radius*2+1,false);
+		return 0;
+	}
+
+	public int timeConvolve_Horizontal_U8_I8(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveImageNoBorder.horizontal(kernelI32, input_I8, out_I8, radius * 2 + 1, false);
+		return 0;
+	}
+
+	public int timeMean_U8_I8_Vertical(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveMean.vertical(input_I8, out_I8, radius, false);
+		return 0;
+	}
+
+	public int timeMean_F32_F32_Vertical(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveMean.vertical(input_F32,out_F32,radius,false);
+		return 0;
+	}
+
+	public int timeMean_F32_F32_Horizontal(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplConvolveMean.horizontal(input_F32, out_F32, radius, false);
+		return 0;
+	}
+
+	public int timeMean_F32_F32_Blur(int reps) {
+		for( int i = 0; i < reps; i++ )
+			BlurImageOps.mean(input_F32, out_F32, radius, storageF32);
+		return 0;
+	}
+
+	public int timeMean_F32_F32_BlurAbst(int reps) {
+		for( int i = 0; i < reps; i++ )
+			filter.process(input_F32, out_F32);
+		return 0;
+	}
+
+	public static void main( String args[] ) {
 		System.out.println("=========  Profile Image Size "+ width +" x "+ height +" ==========");
-		System.out.println();
 
-		for( int radius = 1; radius < 10; radius += 1 ) {
-			System.out.println("Radius: "+radius);
-			System.out.println();
-			BenchmarkConvolveMean.radius = radius;
-			kernelF32 = FactoryKernel.table1D_F32(radius,true);
-			kernelI32 = FactoryKernel.table1D_I32(radius);
-
-			ProfileOperation.printOpsPerSec(new Mean_U8_I8_Horizontal(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Mean_F32_F32_Horizontal(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Mean_U8_I8_Vertical(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Mean_F32_F32_Vertical(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Mean_F32_F32_Blur(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Mean_F32_F32_BlurAbst(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Convolve_Horizontal_U8_I8(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Convolve_Vertical_U8_I8(),TEST_TIME);
-
-		}
-
-
+		Runner.main(BenchmarkConvolveMean.class, args);
 	}
 }
