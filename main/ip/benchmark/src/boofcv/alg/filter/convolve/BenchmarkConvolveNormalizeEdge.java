@@ -18,6 +18,8 @@
 
 package boofcv.alg.filter.convolve;
 
+import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
@@ -31,6 +33,9 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import com.google.caliper.Param;
+import com.google.caliper.Runner;
+import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -39,82 +44,27 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class BenchmarkConvolveNormalizeEdge {
-	static int imgWidth = 640;
-	static int imgHeight = 480;
-	static int radius;
-	static long TEST_TIME = 1000;
+@SuppressWarnings({"UnusedDeclaration"})
+public class BenchmarkConvolveNormalizeEdge extends SimpleBenchmark {
+	static private int imgWidth = 640;
+	static private int imgHeight = 480;
 
-	static Kernel2D_F32 kernel2D_F32;
-	static Kernel1D_F32 kernelF32;
-	static ImageFloat32 imgFloat32;
-	static ImageFloat32 out_F32;
-	static Kernel1D_I32 kernelI32;
-	static Kernel2D_I32 kernel2D_I32;
-	static ImageUInt8 imgInt8;
-	static ImageSInt16 imgInt16;
-	static ImageUInt8 out_I8;
-	static ImageSInt16 out_I16;
-	static ImageSInt32 out_I32;
+	static private Kernel2D_F32 kernel2D_F32;
+	static private Kernel1D_F32 kernelF32;
+	static private ImageFloat32 imgFloat32;
+	static private ImageFloat32 out_F32;
+	static private Kernel1D_I32 kernelI32;
+	static private Kernel2D_I32 kernel2D_I32;
+	static private ImageUInt8 imgInt8;
+	static private ImageSInt16 imgInt16;
+	static private ImageUInt8 out_I8;
+	static private ImageSInt16 out_I16;
+	static private ImageSInt32 out_I32;
 
-	public static class Horizontal_Naive_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveNormalizedNaive.horizontal(kernelF32,imgFloat32,out_F32);
-		}
-	}
+	// iterate through different sized kernel radius
+	@Param({"1", "2", "3", "5","10"}) private int radius;
 
-	public static class Horizontal_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveNormalized.horizontal(kernelF32,imgFloat32,out_F32);
-		}
-	}
-
-	public static class Horizontal_I8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveNormalized.horizontal(kernelI32,imgInt8,out_I8);
-		}
-	}
-
-	public static class Horizontal_I16 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveNormalized.horizontal(kernelI32,imgInt16,out_I16);
-		}
-	}
-
-	public static class Vertical_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveNormalized.vertical(kernelF32,imgFloat32,out_F32);
-		}
-	}
-
-	public static class Vertical_I8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveNormalized.vertical(kernelI32,imgInt8,out_I8);
-		}
-	}
-
-	public static class Vertical_I16 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveNormalized.vertical(kernelI32,imgInt16,out_I16);
-		}
-	}
-
-
-	public static void main( String args[] ) {
+	public BenchmarkConvolveNormalizeEdge() {
 		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
 		imgInt16 = new ImageSInt16(imgWidth,imgHeight);
 		out_I32 = new ImageSInt32(imgWidth,imgHeight);
@@ -127,29 +77,60 @@ public class BenchmarkConvolveNormalizeEdge {
 		ImageTestingOps.randomize(imgInt8,rand, 0, 100);
 		ImageTestingOps.randomize(imgInt16,rand,0,200);
 		ImageTestingOps.randomize(imgFloat32,rand,0,200);
+	}
 
+	@Override protected void setUp() throws Exception {
+		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);
+		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class, -1, radius);
+		kernel2D_F32 = FactoryKernelGaussian.gaussian(Kernel2D_F32.class,-1,radius);
+		kernel2D_I32 = FactoryKernelGaussian.gaussian(Kernel2D_I32.class, -1, radius);
+	}
 
-		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
-		System.out.println();
+	public int timeHorizontal_Naive_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveNormalizedNaive.horizontal(kernelF32, imgFloat32, out_F32);
+		return 0;
+	}
 
-		for( int radius = 1; radius < 10; radius += 1 ) {
-			System.out.println("Radius: "+radius);
-			System.out.println();
-			BenchmarkConvolveNormalizeEdge.radius = radius;
-			kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,radius);
-			kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,radius);
-			kernel2D_F32 = FactoryKernelGaussian.gaussian(Kernel2D_F32.class,-1,radius);
-			kernel2D_I32 = FactoryKernelGaussian.gaussian(Kernel2D_I32.class,-1,radius);
-			
-			ProfileOperation.printOpsPerSec(new Horizontal_Naive_F32(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Horizontal_F32(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Horizontal_I8(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Horizontal_I16(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Vertical_F32(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Vertical_I8(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Vertical_I16(),TEST_TIME);
-		}
+	public int timeHorizontal_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveNormalized.horizontal(kernelF32,imgFloat32,out_F32);
+		return 0;
+	}
 
+	public int timeHorizontal_I8(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveNormalized.horizontal(kernelI32,imgInt8,out_I8);
+		return 0;
+	}
 
+	public int timeHorizontal_I16(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveNormalized.horizontal(kernelI32,imgInt16,out_I16);
+		return 0;
+	}
+
+	public int timeVertical_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveNormalized.vertical(kernelF32, imgFloat32, out_F32);
+		return 0;
+	}
+
+	public int timeVertical_I8(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveNormalized.vertical(kernelI32,imgInt8,out_I8);
+		return 0;
+	}
+
+	public int timeVertical_I16(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveNormalized.vertical(kernelI32,imgInt16,out_I16);
+		return 0;
+	}
+
+	public static void main( String args[] ) {
+		System.out.println("=========  Profile Image Size "+ imgWidth +" x "+ imgHeight +" ==========");
+
+		Runner.main(BenchmarkConvolveMean.class, args);
 	}
 }

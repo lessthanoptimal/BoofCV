@@ -20,21 +20,14 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.filter.blur.BlurImageOps;
-import boofcv.alg.filter.convolve.down.ConvolveDownNoBorderStandard;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.kernel.FactoryKernel;
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import com.google.caliper.Param;
 import com.google.caliper.Runner;
@@ -46,22 +39,22 @@ import java.util.Random;
  * Benchmark for different convolution operations.
  * @author Peter Abeles
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class BenchmarkConvolveMean extends SimpleBenchmark {
-	static int width = 640;
-	static int height = 480;
-	static long TEST_TIME = 1000;
-	static Random rand = new Random(234);
+	static private int width = 640;
+	static private int height = 480;
+	static private Random rand = new Random(234);
 
-	static Kernel1D_F32 kernelF32;
-	static ImageFloat32 input_F32 = new ImageFloat32(width,height);
-	static ImageFloat32 out_F32 = new ImageFloat32(width,height);
-	static ImageFloat32 storageF32 = new ImageFloat32(width,height);
-	static Kernel1D_I32 kernelI32;
-	static ImageUInt8 input_I8 = new ImageUInt8(width,height);
-	static ImageSInt16 input_I16 = new ImageSInt16(width,height);
-	static ImageUInt8 out_I8 = new ImageUInt8(width,height);
+	static private Kernel1D_F32 kernelF32;
+	static private ImageFloat32 input_F32 = new ImageFloat32(width,height);
+	static private ImageFloat32 out_F32 = new ImageFloat32(width,height);
+	static private ImageFloat32 storageF32 = new ImageFloat32(width,height);
+	static private Kernel1D_I32 kernelI32;
+	static private ImageUInt8 input_I8 = new ImageUInt8(width,height);
+	static private ImageSInt16 input_I16 = new ImageSInt16(width,height);
+	static private ImageUInt8 out_I8 = new ImageUInt8(width,height);
 
-	BlurFilter<ImageFloat32> filter;
+	static private BlurFilter<ImageFloat32> filter;
 
 	// iterate through different sized kernel radius
 	@Param({"1", "2", "3", "5","10"}) private int radius;
