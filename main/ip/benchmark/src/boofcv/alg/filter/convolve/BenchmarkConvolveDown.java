@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
+import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.alg.filter.convolve.down.ConvolveDownNoBorderStandard;
@@ -34,6 +35,9 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import com.google.caliper.Param;
+import com.google.caliper.Runner;
+import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -41,12 +45,11 @@ import java.util.Random;
  * Benchmark for different convolution operations.
  * @author Peter Abeles
  */
-public class BenchmarkConvolveDown {
+@SuppressWarnings({"UnusedDeclaration"})
+public class BenchmarkConvolveDown extends SimpleBenchmark {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
-	static int radius;
 	static int skip = 2;
-	static long TEST_TIME = 1000;
 
 	static Kernel2D_F32 kernel2D_F32;
 	static Kernel1D_F32 kernelF32;
@@ -61,93 +64,10 @@ public class BenchmarkConvolveDown {
 	static ImageSInt16 out_I16;
 	static ImageSInt32 out_I32;
 
-	public static class HorizontalStandard_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveDownNoBorderStandard.horizontal(kernelF32,imgFloat32,out_F32,skip);
-		}
-	}
+	// iterate through different sized kernel radius
+	@Param({"1", "2", "3", "5","10"}) private int radius;
 
-	public static class HorizontalUnrolled_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			if( !ConvolveDownNoBorderUnrolled_F32_F32.horizontal(kernelF32,imgFloat32,out_F32,skip) )
-				throw new RuntimeException();
-		}
-	}
-
-	public static class VerticalStandard_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveDownNoBorderStandard.vertical(kernelF32,imgFloat32,out_F32,skip);
-		}
-	}
-
-	public static class VerticalUnrolled_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			if( !ConvolveDownNoBorderUnrolled_F32_F32.vertical(kernelF32,imgFloat32,out_F32,skip) )
-				throw new RuntimeException();
-		}
-	}
-
-	public static class Convolve2DStandard_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveDownNoBorderStandard.convolve(kernel2D_F32,imgFloat32,out_F32,skip);
-		}
-	}
-
-	public static class Convolve2DUnrolled_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			if( !ConvolveDownNoBorderUnrolled_F32_F32.convolve(kernel2D_F32,imgFloat32,out_F32,skip) )
-				throw new RuntimeException();
-		}
-	}
-
-	public static class VerticalStandard_U8_I16 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveDownNoBorderStandard.vertical(kernelI32,imgInt8,out_I16,skip);
-		}
-	}
-
-	public static class VerticalUnrolled_U8_I16 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			if( !ConvolveDownNoBorderUnrolled_U8_I16.vertical(kernelI32,imgInt8,out_I16,skip) )
-				throw new RuntimeException();
-		}
-	}
-
-	public static class VerticalStandard_U8_I8_Div extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvolveDownNoBorderStandard.vertical(kernelI32,imgInt8,out_I8,skip,10);
-		}
-	}
-
-	public static class VerticalUnrolled_U8_I8_Div extends PerformerBase
-	{
-		@Override
-		public void process() {
-			if( !ConvolveDownNoBorderUnrolled_U8_I8_Div.vertical(kernelI32,imgInt8,out_I8,skip,10) )
-				throw new RuntimeException();
-		}
-	}
-
-	public static void main( String args[] ) {
-
+	public BenchmarkConvolveDown() {
 		int outWidth = imgWidth/skip;
 		int outHeight = imgHeight/skip;
 
@@ -164,35 +84,83 @@ public class BenchmarkConvolveDown {
 		ImageTestingOps.randomize(imgInt8,rand, 0, 100);
 		ImageTestingOps.randomize(imgInt16,rand,0,200);
 		ImageTestingOps.randomize(imgFloat32,rand,0,200);
+	}
 
+	@Override protected void setUp() throws Exception {
+		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);
+		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,radius);
+		kernel2D_F32 = FactoryKernelGaussian.gaussian(Kernel2D_F32.class,-1,radius);
+		kernel2D_I32 = FactoryKernelGaussian.gaussian(Kernel2D_I32.class, -1, radius);
+	}
 
-		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
-		System.out.println();
+	public int timeHorizontalStandard_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveDownNoBorderStandard.horizontal(kernelF32,imgFloat32,out_F32,skip);
+		return 0;
+	}
 
-		for( int radius = 1; radius < 10; radius += 1 ) {
-			System.out.println("Radius: "+radius);
-			System.out.println();
-			BenchmarkConvolveDown.radius = radius;
-			kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,radius);
-			kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,radius);
-			kernel2D_F32 = FactoryKernelGaussian.gaussian(Kernel2D_F32.class,-1,radius);
-			kernel2D_I32 = FactoryKernelGaussian.gaussian(Kernel2D_I32.class,-1,radius);
-			
-			ProfileOperation.printOpsPerSec(new HorizontalStandard_F32(),TEST_TIME);
-//			ProfileOperation.printOpsPerSec(new HorizontalUnrolled_F32(),TEST_TIME);
-//			ProfileOperation.printOpsPerSec(new VerticalStandard_F32(),TEST_TIME);
-//			ProfileOperation.printOpsPerSec(new VerticalUnrolled_F32(),TEST_TIME);
-//			ProfileOperation.printOpsPerSec(new Convolve2DStandard_F32(),TEST_TIME);
-//			ProfileOperation.printOpsPerSec(new Convolve2DUnrolled_F32(),TEST_TIME);
-//
-//			ProfileOperation.printOpsPerSec(new VerticalStandard_U8_I16(),TEST_TIME);
-//			ProfileOperation.printOpsPerSec(new VerticalUnrolled_U8_I16(),TEST_TIME);
-//
-//			ProfileOperation.printOpsPerSec(new VerticalStandard_U8_I8_Div(),TEST_TIME);
-//			ProfileOperation.printOpsPerSec(new VerticalUnrolled_U8_I8_Div(),TEST_TIME);
+	public int timeHorizontalUnrolled_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			if( !ConvolveDownNoBorderUnrolled_F32_F32.horizontal(kernelF32,imgFloat32,out_F32,skip) )
+				throw new RuntimeException();
+		return 0;
+	}
 
-		}
+	public int timeVerticalStandard_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveDownNoBorderStandard.vertical(kernelF32,imgFloat32,out_F32,skip);
+		return 0;
+	}
 
+	public int timeVerticalUnrolled_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			if( !ConvolveDownNoBorderUnrolled_F32_F32.vertical(kernelF32,imgFloat32,out_F32,skip) )
+				throw new RuntimeException();
+		return 0;
+	}
 
+	public int timeConvolve2DStandard_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveDownNoBorderStandard.convolve(kernel2D_F32,imgFloat32,out_F32,skip);
+		return 0;
+	}
+
+	public int timeConvolve2DUnrolled_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			if( !ConvolveDownNoBorderUnrolled_F32_F32.convolve(kernel2D_F32,imgFloat32,out_F32,skip) )
+				throw new RuntimeException();
+		return 0;
+	}
+
+	public int timeVerticalStandard_U8_I16(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveDownNoBorderStandard.vertical(kernelI32,imgInt8,out_I16,skip);
+		return 0;
+	}
+
+	public int timeVerticalUnrolled_U8_I16(int reps) {
+		for( int i = 0; i < reps; i++ )
+			if( !ConvolveDownNoBorderUnrolled_U8_I16.vertical(kernelI32,imgInt8,out_I16,skip) )
+				throw new RuntimeException();
+		return 0;
+	}
+
+	public int timeVerticalStandard_U8_I8_Div(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveDownNoBorderStandard.vertical(kernelI32,imgInt8,out_I8,skip,10);
+		return 0;
+	}
+
+	public int timeVerticalUnrolled_U8_I8_Div(int reps) {
+		for( int i = 0; i < reps; i++ )
+			if( !ConvolveDownNoBorderUnrolled_U8_I8_Div.vertical(kernelI32,imgInt8,out_I8,skip,10) )
+				throw new RuntimeException();
+		return 0;
+	}
+
+	public static void main( String args[] ) {
+		System.out.println("=========  Profile Image Size "+ imgWidth +" x "+ imgHeight +" ==========");
+
+		Runner.main(BenchmarkConvolveDown.class, args);
 	}
 }
