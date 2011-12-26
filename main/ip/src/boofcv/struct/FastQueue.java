@@ -54,6 +54,10 @@ public class FastQueue<T> {
 	protected FastQueue(Class<T> type, boolean declareInstances ) {
 		this(0,type,declareInstances);
 	}
+	
+	public List<T> toList() {
+		return new WrapArrayIntoList<T>(data,size);
+	}
 
 	public void removeTail() {
 		if( size > 0 )

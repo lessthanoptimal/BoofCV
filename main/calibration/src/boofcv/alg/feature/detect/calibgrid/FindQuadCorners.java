@@ -28,16 +28,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Given a set of unordered pixels that form the outside edge of a convex blob, it finds the 4 extreme points that
- * are the corners of a quadrilateral.  First  the two points
+ * Given a set of unordered pixels that form the outside edge of a convex blob.  The first two corner points
+ * are found by finding the two points which are farthest part.  The next two points are found by maximizing
+ * the number of inlier points between a corner already found and a line between defined by another point
+ * in the contour.
  *
  * @author Peter Abeles
  */
-// TODO create unit test
 public class FindQuadCorners {
 
 	// how close a pixel can be to be considered part of the same line
-	double lineTolerance=2;
+	double lineTolerance;
+
+	/**
+	 *
+	 * @param lineTolerance Defines how close a point is to be an inlier.  Euclidean distance
+	 */
+	public FindQuadCorners(double lineTolerance) {
+		this.lineTolerance = lineTolerance*lineTolerance;
+	}
 
 	/**
 	 * Finds corners from list of contour points and orders contour points into clockwise order.
@@ -47,8 +56,8 @@ public class FindQuadCorners {
 	 */
 	public List<Point2D_I32> process( List<Point2D_I32> contour ) {
 		// order points in clockwise order
-		Point2D_I32 center = findCenter(contour);
-		sortByAngle(center,contour);
+		Point2D_I32 center = findAverage(contour);
+		sortByAngleCCW(center, contour);
 
 		// find the first corner
 		int corner0 = findFarthest( contour.get(0) , contour );
@@ -66,7 +75,7 @@ public class FindQuadCorners {
 		findCorner(corner1,corner0,contour,corners);
 
 		// sort the corners to make future calculations easier
-		sortByAngle(center,corners);
+		sortByAngleCCW(center, corners);
 
 		return corners;
 	}
@@ -92,7 +101,13 @@ public class FindQuadCorners {
 		return index;
 	}
 
-	protected Point2D_I32 findCenter( List<Point2D_I32> contour ) {
+	/**
+	 * Find the average of all the points in the list.
+	 *
+	 * @param contour
+	 * @return
+	 */
+	protected static Point2D_I32 findAverage(List<Point2D_I32> contour) {
 
 		int x = 0;
 		int y = 0;
@@ -107,9 +122,15 @@ public class FindQuadCorners {
 
 		return new Point2D_I32(x,y);
 	}
-	
-	
-	protected void sortByAngle( Point2D_I32 center , List<Point2D_I32> contour ) {
+
+
+	/**
+	 * Sorts the points in counter clockwise direction around the provided point
+	 *
+	 * @param center Point that the angle is computed relative to
+	 * @param contour List of all the points which are to be sorted by angle
+	 */
+	protected static void sortByAngleCCW(Point2D_I32 center, List<Point2D_I32> contour) {
 		double angles[] = new double[ contour.size() ];
 		int indexes[] = new int[ angles.length ];
 		
@@ -133,7 +154,18 @@ public class FindQuadCorners {
 		contour.clear();
 		contour.addAll(sorted);
 	}
-	
+
+	/**
+	 * Finds two candidate corners in the CW and CCW direction given two already found corners.
+	 * Selects the corner which if farthest away from corners already in the corners list.  Corners
+	 * are found by maximizing the number of inliers along a line defined from an existing corner
+	 * to a candidate corner.
+	 *
+	 * @param start First corner point already found
+	 * @param stop Second corner point already found.
+	 * @param contour List of pixels around the blob
+	 * @param corners List of corners already found
+	 */
 	private void findCorner( int start , int stop , List<Point2D_I32> contour , List<Point2D_I32> corners )
 	{
 		int candidate0 = findMaxInlier(start,stop,1,contour);
@@ -155,7 +187,17 @@ public class FindQuadCorners {
 			corners.add(c1);
 		}
 	}
-	
+
+	/**
+	 * Finds the line which has the most inliers.  All the lines which begin at 'start' and have the other end
+	 * point at 'start' to 'stop' are considered.  The direction through the circular list is specified by dir.
+	 *
+	 * @param start First index considered and the first end point in the line.
+	 * @param stop List index considered
+	 * @param dir Direction of stepping through the list
+	 * @param contour Circular list of points.
+	 * @return
+	 */
 	private int findMaxInlier(int start, int stop, int dir, List<Point2D_I32> contour) {
 		
 		int bestCount = -1;
@@ -174,7 +216,18 @@ public class FindQuadCorners {
 		
 		return bestIndex;
 	}
-	
+
+	/**
+	 * Counts the number of points between start and stop which are within tolerance of
+	 * the line defined by the points at start and stop.
+	 *
+	 * @param start Start of the line
+	 * @param stop End of the line
+	 * @param dir Direction of increment
+	 * @param contour List of all the points in the cyclical list
+	 * @param lineTolerance How close a point needs to be to be considered an inlier
+	 * @return Number of inliers
+	 */
 	protected static int countInliers( int start , int stop , int dir ,
 									   List<Point2D_I32> contour ,
 									   double lineTolerance ) {
@@ -199,7 +252,14 @@ public class FindQuadCorners {
 		
 		return count;
 	}
-	
+
+	/**
+	 * Returns the next point in the list assuming a cyclical list
+	 * @param i current index
+	 * @param dir Direction and amount of increment
+	 * @param size Size of the list
+	 * @return i+dir taking in account the list's cyclical nature
+	 */
 	protected static int incrementCircle( int i , int dir , int size ) {
 		i += dir;
 		if( i < 0 ) i = size+i;
