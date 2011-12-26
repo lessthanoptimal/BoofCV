@@ -21,6 +21,8 @@ package boofcv.struct;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 
@@ -42,6 +44,24 @@ public class TestFastQueue {
 		assertTrue(alg.data[0] == null);
 	}
 
+	@Test
+	public void toList() {
+		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(10,Point2D_I32.class,true);
+
+		List<Point2D_I32> l = alg.toList();
+		assertEquals(0,l.size());
+		
+		alg.pop().set(1,2);
+		alg.pop().set(1,2);
+		alg.pop().set(2,3);
+		alg.removeTail();
+
+		l = alg.toList();
+		assertEquals(2,l.size());
+		assertEquals(1,l.get(0).x);
+		assertEquals(1,l.get(1).x);
+	}
+	
 	@Test
 	public void removeTail() {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(10,Point2D_I32.class,true);

@@ -53,7 +53,7 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 	
 	int minContourSize = 20*4;
 
-	FindQuadCorners cornerFinder = new FindQuadCorners();
+	FindQuadCorners cornerFinder = new FindQuadCorners(1.5);
 
 	public DetectCalibrationTarget(Class<T> imageType , int gridWidth , int gridHeight ) {
 		this.imageType = imageType;
