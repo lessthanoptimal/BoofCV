@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://www.boofcv.org).
  *
@@ -67,8 +67,8 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 	{
 		super(tracker, modelMatcher, model);
 
-		if( thresholdKeyFrame > thresholdReset ) {
-			throw new IllegalArgumentException("Threshold for key frame should be less than reset");
+		if( thresholdKeyFrame < thresholdReset ) {
+			throw new IllegalArgumentException("Threshold for key frame should be more than reset");
 		}
 		
 		this.thresholdKeyFrame = thresholdKeyFrame;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://www.boofcv.org).
  *
@@ -20,13 +20,10 @@ package boofcv.factory.filter.kernel;
 
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.struct.convolve.*;
-import junit.framework.Assert;
 import org.junit.Test;
 import pja.stats.UtilGaussian;
 
-import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 

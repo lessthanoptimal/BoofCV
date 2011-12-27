@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://www.boofcv.org).
  *
@@ -18,10 +18,10 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import boofcv.alg.misc.ImageTestingOps;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
