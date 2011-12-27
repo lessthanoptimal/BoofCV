@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://www.boofcv.org).
  *
@@ -18,9 +18,6 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.alg.filter.convolve.down.ConvolveDownNoBorderStandard;
 import boofcv.alg.filter.convolve.down.ConvolveDownNoBorderUnrolled_F32_F32;
 import boofcv.alg.filter.convolve.down.ConvolveDownNoBorderUnrolled_U8_I16;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://www.boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.denoise;
 
+import boofcv.alg.misc.ImageTestingOps;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
-import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
 
 import java.util.Collections;

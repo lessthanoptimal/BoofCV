@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://www.boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.optimization.LevenbergMarquardt;
 import boofcv.numerics.optimization.OptimizationDerivative;
-import boofcv.numerics.optimization.OptimizationFunction;
 import boofcv.numerics.optimization.OptimizationResidual;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;

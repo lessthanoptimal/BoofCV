@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://www.boofcv.org).
  *
@@ -18,12 +18,12 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.alg.feature.detect.intensity.IntegralImageFeatureIntensity;
 import boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
 
 import java.util.Random;
