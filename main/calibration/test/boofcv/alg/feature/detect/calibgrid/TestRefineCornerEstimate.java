@@ -24,8 +24,6 @@ import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import java.util.Random;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -44,11 +42,11 @@ public class TestRefineCornerEstimate {
 		ImageSInt16 derivY = new ImageSInt16(width,height);
 
 		ImageTestingOps.fillRectangle(orig, 100, 10, 10, 40, 50);
-		ImageTestingOps.addGaussian(orig,new Random(),5,0,255);
+//		ImageTestingOps.addGaussian(orig,new Random(),20,0,255);
 
 		GradientSobel.process(orig,derivX,derivY,null);
 				
-		RefineCornerEstimate<ImageSInt16> alg = new RefineCornerEstimate<ImageSInt16>();
+		RefineCornerEstimate<ImageSInt16> alg = new RefineCornerEstimate<ImageSInt16>(0.5);
 		alg.setInputs(derivX,derivY);
 
 		assertTrue(alg.process(0, 0, 20, 20));
