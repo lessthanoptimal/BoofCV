@@ -20,39 +20,59 @@ package boofcv.alg.feature.detect.calibgrid;
 
 import boofcv.core.image.FactoryGeneralizedSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.numerics.fitting.modelset.ModelFitter;
-import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.point.Point2D_F64;
 
-import java.util.List;
-
 /**
+ * <p>
+ * Computes a corner's location by finding the intersection of lines defined at each pixel using their
+ * location and gradient.  Each pixel defines  line based on its location and the gradient, where its location
+ * is a point on the line and the gradient is tangential to the line's slope.   If a pixel has a gradient of zero
+ * then it is ignored.  The gradient's magnitude determine's its weight when computing the solution. In theory noise
+ * will have a much smaller magnitude and average out.
+ * </p>
+ *
+ * <p>
+ * The basic assumption that each pixel represents a line that intersects at the corner is broken at corner pixels.
+ * Here the gradient will be pointed at an acute angle relative to the corner's sides.  This introduces an error
+ * into the solution, even when the gradient is computed from a noise free image.
+ * </p>
+ *
+ * <p>
+ * How the gradient is computed can also introduce a bias in the corner location.  For example a 3x3 gradient kernel
+ * will cause a shift of 1/2 a pixel.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class RefineCornerEstimate<D extends ImageSingleBand> {
-	
-	Point2D_F64 found = new Point2D_F64();
 
-	FastQueue<LineParametric2D_F64> lines = new FastQueue<LineParametric2D_F64>(50,LineParametric2D_F64.class,true);
+	// where the corner was found to be
+	private Point2D_F64 found = new Point2D_F64();
+
+	// algorithm to compute corner location
+	private FastQueue<LineParametric2D_F64> lines = new FastQueue<LineParametric2D_F64>(50,LineParametric2D_F64.class,true);
 
 	// gradient, using a horrible slow image interface
-	GImageSingleBand derivX,derivY;
+	private GImageSingleBand derivX,derivY;
+
+	// the edge detector will cause a shift from the true edge location
+	// this offset will counteract that offset
+	private double edgeOffset;
+
+	public RefineCornerEstimate(double edgeOffset) {
+		this.edgeOffset = edgeOffset;
+	}
 
 	public void setInputs( D derivX , D derivY ) {
 		this.derivX = FactoryGeneralizedSingleBand.wrap(derivX);
 		this.derivY = FactoryGeneralizedSingleBand.wrap(derivY);
 	}
 	
-	public boolean process( int x0 , int y0 , int x1, int y1 ) {
-		
-		int x_c = 0;//(x1+x0)/2;
-		int y_c = 0;//(y1+y0)/2;
-
+	public boolean process( int x0 , int y0 , int x1, int y1 )
+	{
 		lines.reset();
 		for( int y = y0; y < y1; y++ ) {
 			for( int x = x0; x < x1; x++ ) {
@@ -62,110 +82,32 @@ public class RefineCornerEstimate<D extends ImageSingleBand> {
 				// skip pixels with no gradient since they contain no information
 				if( dx == 0 && dy == 0 )
 					continue;
-				
-//				if( Math.abs(dx) < 100 && Math.abs(dy) < 100 )
-//					continue;
 
 				LineParametric2D_F64 l = lines.pop();
-				l.setPoint(x-x_c,y-y_c);
+				l.setPoint(x,y);
 				l.setSlope(-dy,-dx);
 				System.out.println(l.getX()+" "+l.getY()+"  slope = "+l.getSlopeX()+" "+l.getSlopeY());
 			}
 		}
 
 		IntersectLinesLinear estimator = new IntersectLinesLinear();
-		estimator.process(lines.toList());
-		
-		System.out.println("BATCH: "+estimator.getPoint().toString());
-		
-		if( !ransac(1, x_c, y_c))
+		if( !estimator.process(lines.toList()) ) {
 			return false;
+		}
+
+		found.set(estimator.getPoint());
+
+		found.x += edgeOffset;
+		found.y += edgeOffset;
 
 		return true;
 	}
 
-	private boolean ransac( double inlierThreshold , int x_c , int y_c ) {
-
-		HelperFitter fitter = new HelperFitter();
-		HelperDistance dist = new HelperDistance();
-
-		SimpleInlierRansac<Point2D_F64,LineParametric2D_F64> ransac =
-				new SimpleInlierRansac<Point2D_F64, LineParametric2D_F64>(234234,fitter,dist,
-						100,2,2,99999,inlierThreshold);
-
-		List<LineParametric2D_F64> list = lines.toList();
-		if( !ransac.process(list,null) )
-			return false;
-
-		found.set(ransac.getModel());
-
-		found.x += x_c;
-		found.y += y_c;
-		
-		System.out.println("inlier size "+ransac.getMatchSet().size()+"  input "+list.size());
-
-		return true;
-	}
-	
 	public double getX() {
-		return found.getX();
+		return found.x;
 	}
 
 	public double getY() {
-		return found.getY();
+		return found.y;
 	}
-
-	private static class HelperFitter implements ModelFitter<Point2D_F64,LineParametric2D_F64>
-	{
-		IntersectLinesLinear estimator = new IntersectLinesLinear();
-		
-		@Override
-		public Point2D_F64 declareModel() {
-			return new Point2D_F64();
-		}
-
-		@Override
-		public boolean fitModel(List<LineParametric2D_F64> dataSet,
-								Point2D_F64 initParam,
-								Point2D_F64 foundModel) {
-			if( !estimator.process(dataSet) )
-				return false;
-			
-			foundModel.set(estimator.getPoint());
-			
-			return true;
-		}
-
-		@Override
-		public int getMinimumPoints() {
-			return 2;
-		}
-	}
-	
-	private static class HelperDistance implements DistanceFromModel<Point2D_F64,LineParametric2D_F64>
-	{
-		Point2D_F64 model = new Point2D_F64();
-
-		@Override
-		public void setModel(Point2D_F64 p) {
-			model.set(p);
-		}
-
-		@Override
-		public double computeDistance(LineParametric2D_F64 pt) {
-
-			return Distance2D_F64.distance(pt,model);
-		}
-
-		@Override
-		public void computeDistance(List<LineParametric2D_F64> list, double[] distance) {
-
-			for( int i = 0; i < list.size(); i++ ) {
-				LineParametric2D_F64 pt = list.get(i);
-
-				distance[i] = Distance2D_F64.distance(pt,model);
-			}
-		}
-	}
-	
 }

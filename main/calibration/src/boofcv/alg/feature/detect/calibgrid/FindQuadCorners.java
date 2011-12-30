@@ -147,7 +147,6 @@ public class FindQuadCorners {
 		
 		List<Point2D_I32> sorted = new ArrayList<Point2D_I32>(contour.size());
 		for( int i = 0; i < indexes.length; i++ ) {
-			
 			sorted.add( contour.get( indexes[i]));
 		}
 		
