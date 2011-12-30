@@ -18,10 +18,14 @@
 
 package boofcv.alg.geo.d3.calibration;
 
+import boofcv.alg.feature.detect.calibgrid.FindGridFromSquares;
 import boofcv.alg.feature.detect.calibgrid.FindQuadCorners;
 import boofcv.alg.feature.detect.calibgrid.SquareBlob;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.core.image.ConvertBufferedImage;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
@@ -34,7 +38,9 @@ import georegression.struct.point.Point2D_I32;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author Peter Abeles
@@ -53,6 +59,9 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 	
 	int minContourSize = 20*4;
 
+	// maximum different between smallest and largest side in a candidate square
+	double polySideRatio = 0.25;
+
 	FindQuadCorners cornerFinder = new FindQuadCorners(1.5);
 
 	public DetectCalibrationTarget(Class<T> imageType , int gridWidth , int gridHeight ) {
@@ -61,13 +70,14 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		this.gridHeight = gridHeight;
 	}
 
-	public void process( T image ) {
+	public void process( T image )
+	{
 		threshold.reshape(image.width,image.height);
 		binaryA.reshape(image.width,image.height);
 		binaryB.reshape(image.width,image.height);
-		blobs.reshape(image.width,image.height);
+		blobs.reshape(image.width, image.height);
 
-		GThresholdImageOps.threshold(image,threshold,30,true);
+		GThresholdImageOps.threshold(image,threshold,60,true);
 
 		// filter out small objects
 		BinaryImageOps.erode8(threshold,binaryA);
@@ -99,10 +109,12 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		}
 		
 		// remove blobs which are not like a polygon at all
+		filterNotPolygon(squares);
 
-		// use original binary image to find corners
-
-		// optimize corners
+		FindGridFromSquares foo = new FindGridFromSquares(squares);
+		
+		foo.process();
+		List<Point2D_I32> corners = foo.getCorners();
 
 		BinaryImageOps.clusterToBinary(contours,threshold);
 		BufferedImage b = VisualizeBinaryData.renderBinary(threshold, null);
@@ -114,9 +126,51 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 				VisualizeFeatures.drawPoint(g2,p.x,p.y,Color.RED);
 			}
 		}
+		
+		g2.setColor(Color.BLUE);
+		g2.drawLine(corners.get(0).x,corners.get(0).y,corners.get(1).x,corners.get(1).y);
+		g2.drawLine(corners.get(1).x,corners.get(1).y,corners.get(2).x,corners.get(2).y);
+		g2.drawLine(corners.get(2).x,corners.get(2).y,corners.get(3).x,corners.get(3).y);
+		g2.drawLine(corners.get(3).x,corners.get(3).y,corners.get(0).x,corners.get(0).y);
 
+		ShowImages.showWindow(ConvertBufferedImage.convertTo(image,null),"Original");
 		ShowImages.showWindow(b,"Threshold");
 		ShowImages.showWindow(c,"Blobs");
+	}
+
+	/**
+	 * Looks at the ratio of each blob's side and sees if it could possibly by a square target or not
+	 */
+	private void filterNotPolygon( List<SquareBlob> squares )
+	{
+		Iterator<SquareBlob> iter = squares.iterator();
+		
+		double d[] = new double[4];
+		
+		while( iter.hasNext() ) {
+			SquareBlob blob = iter.next();
+			List<Point2D_I32> corners = blob.corners;
+			Point2D_I32 p1 = corners.get(0);
+			Point2D_I32 p2 = corners.get(1);
+			Point2D_I32 p3 = corners.get(2);
+			Point2D_I32 p4 = corners.get(3);
+
+			d[0] = Math.sqrt(p1.distance2(p2));
+			d[1] = Math.sqrt(p2.distance2(p3));
+			d[2] = Math.sqrt(p3.distance2(p4));
+			d[3] = Math.sqrt(p4.distance2(p1));
+
+			double max = -1;
+			double min = Double.MAX_VALUE;
+			for( double v : d ) {
+				if( v > max ) max = v;
+				if( v < min ) min = v;
+			}
+			
+			if( min/max < polySideRatio ) {
+				iter.remove();
+			}
+		}
 	}
 
 	/**
@@ -195,7 +249,8 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 	public static void main( String args[] ) {
 		DetectCalibrationTarget<ImageUInt8> app = new DetectCalibrationTarget<ImageUInt8>(ImageUInt8.class,4,3);
 
-		ImageUInt8 input = UtilImageIO.loadImage("../data/evaluation/calibration/Sony_DSC-HX5V/image01.jpg",ImageUInt8.class);
+//		ImageUInt8 input = UtilImageIO.loadImage("../data/evaluation/calibration/Sony_DSC-HX5V/image01.jpg",ImageUInt8.class);
+		ImageUInt8 input = UtilImageIO.loadImage("../data/evaluation/calibration/Sony_DSC-HX5V/image12.jpg",ImageUInt8.class);
 		app.process(input);
 
 	}
