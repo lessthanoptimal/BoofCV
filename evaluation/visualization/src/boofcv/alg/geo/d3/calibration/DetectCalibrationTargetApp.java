@@ -19,7 +19,6 @@
 package boofcv.alg.geo.d3.calibration;
 
 import boofcv.alg.feature.detect.calibgrid.DetectCalibrationTarget;
-import boofcv.alg.feature.detect.calibgrid.SquareBlob;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ProcessInput;
@@ -45,18 +44,21 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO Select threshold
+// TODO improve filtering of noisy blobs
+//  -- If too many, filter by brightness uniformity?
+//  -- Compute a quality of polygon?
+//  Form a grid graph with all objects.
+//     * Prune islands
+//     * break off connections in which the distance is much  greater than either side
 public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 		extends SelectImagePanel implements ProcessInput , GridCalibPanel.Listener
 {
 	Class<T> imageType;
+	// detects the calibration target
 	DetectCalibrationTarget<T> alg;
 
 	// gray scale image that targets are detected inside of
 	T gray;
-
-	// threshold used to create binary image
-	int threshold = 60;
 
 	// GUI components
 	GridCalibPanel calibGUI;
@@ -75,7 +77,7 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 
 	public DetectCalibrationTargetApp(Class<T> imageType) {
 		this.imageType = imageType;
-		alg = new DetectCalibrationTarget<T>(imageType);
+		alg = new DetectCalibrationTarget<T>(imageType,500,4,3);
 		gray = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 		JPanel panel = new JPanel();
@@ -97,7 +99,7 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 		gray.reshape(input.getWidth(),input.getHeight());
 		ConvertBufferedImage.convertFrom(input,gray);
 
-		foundTarget = alg.process(gray,threshold);
+		foundTarget = alg.process(gray,calibGUI.getThresholdLevel());
 		if( !foundTarget ) {
 			System.out.println("Extract target failed!");
 		}
@@ -197,13 +199,6 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 		}
 	}
 
-	private void drawCenter( Graphics2D g2 , java.util.List<SquareBlob> blobs) {
-		for( int i = 0; i < blobs.size(); i++ ) {
-			Point2D_I32 p = blobs.get(i).center;
-			VisualizeFeatures.drawPoint(g2, p.x, p.y, Color.CYAN);
-		}
-	}
-
 	@Override
 	public void changeImage(String name, int index) {
 		ImageListManager manager = getInputManager();
@@ -223,6 +218,21 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 	public void calibEventGUI() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				renderOutput();
+			}
+		});
+	}
+
+	@Override
+	public synchronized void calibEventProcess() {
+		foundTarget = alg.process(gray,calibGUI.getThresholdLevel());
+		if( !foundTarget ) {
+			System.out.println("Extract target failed!");
+		}
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui.setPreferredSize(new Dimension(input.getWidth(), input.getHeight()));
 				renderOutput();
 			}
 		});

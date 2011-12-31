@@ -23,7 +23,11 @@ import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import georegression.metric.Intersection2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.Polygon2D_F64;
+import pja.util.Shuffle;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -72,8 +76,20 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 	// list if found corners/blobs
 	List<SquareBlob> squares;
 
-	public DetectCalibrationTarget(Class<T> imageType ) {
+	// number of black squares in calibration grid
+	int gridWidth;
+	int gridHeight;
+
+	// maximum number of possible targets it will consider
+	int maxShuffle;
+
+	public DetectCalibrationTarget(Class<T> imageType ,
+								   int maxShuffle ,
+								   int gridWidth , int gridHeight ) {
 		this.imageType = imageType;
+		this.gridWidth = gridWidth;
+		this.gridHeight = gridHeight;
+		this.maxShuffle = maxShuffle;
 	}
 
 	/**
@@ -125,14 +141,82 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		// remove blobs which are not like a polygon at all
 		filterNotPolygon(squares);
 
-		// All remaining squares are assumed to be part of the calibration target now
-		// Given this set of squares order and extract calibration points
-		try {
-			extractTarget = new ExtractOrderedTargetPoints();
-			extractTarget.process(squares);
-		} catch (ExtractOrderedTargetPoints.InvalidTarget invalidTarget) {
-			System.err.println(invalidTarget.toString());
+		// given all the blobs, only consider N at one time until a valid target is found
+		return shuffleToFindTarget();
+	}
+
+	/**
+	 * Shuffles through all the different possible sets of blobs to find the valid target
+	 *
+	 * @return true of it worked
+	 */
+	private boolean shuffleToFindTarget() {
+		
+		int N = gridWidth*gridHeight;
+		if( squares.size() < N )
 			return false;
+
+		Shuffle<SquareBlob> shuffle = new Shuffle<SquareBlob>(squares,N);
+
+//		System.out.println("------------------------------------"+squares.size()+"  N "+N);
+//		System.out.println("Total Shuffles: "+shuffle.numShuffles());
+		if( shuffle.numShuffles() > maxShuffle ) {
+			return false;
+		}
+
+		List<SquareBlob> list = new ArrayList<SquareBlob>();
+
+		int num = 0;
+		boolean success = false;
+		while( true ) {
+			shuffle.getList(list);
+
+			// assumes that all the items in the list are part of a target
+			// see if it fails internal sanity checks
+			try {
+				extractTarget = new ExtractOrderedTargetPoints();
+				extractTarget.process(list);
+
+				// additional validation checks
+				if( validateTarget(list)) {
+					success = true;
+					break;
+				}
+			} catch (InvalidTarget invalidTarget) {
+				System.out.println(invalidTarget.getMessage());
+			}
+
+			try {
+				shuffle.shuffle();
+			} catch (Shuffle.ExhaustedException e) {
+				break;
+			}
+		}
+		
+		return success;
+	}
+
+	/**
+	 * Performs additional validation checks to make sure a valid target was found
+	 */
+	private boolean validateTarget( List<SquareBlob> list ) {
+		// see if each blob's center is inside the bounding quadrilateral
+		List<Point2D_I32> quad_I = extractTarget.getQuadrilateral();
+
+		Polygon2D_F64 poly = new Polygon2D_F64(4);
+		for( int i = 0; i < 4; i++ ) {
+			Point2D_I32 p = quad_I.get(i);
+			poly.vertexes[3-i].set(p.x, p.y);
+		}
+
+		Point2D_F64 center = new Point2D_F64();
+		for( SquareBlob b : list ) {
+			center.set(b.center.x,b.center.y);
+
+			if( !Intersection2D_F64.containConvex(poly,center)) {
+//				System.out.println("Failed EXTRA");
+				return false;
+			}
 		}
 
 		return true;

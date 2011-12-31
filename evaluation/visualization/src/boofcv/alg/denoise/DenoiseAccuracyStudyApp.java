@@ -192,7 +192,7 @@ public class DenoiseAccuracyStudyApp {
 	public static void main( String args[] ) {
 		DenoiseAccuracyStudyApp app = new DenoiseAccuracyStudyApp();
 
-		String path = "evaluation/data/standard/";
+		String path = "data/evaluation/standard/";
 
 		List<String> fileNames = new ArrayList<String>();
 		fileNames.add(path+"barbara.png");

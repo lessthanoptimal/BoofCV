@@ -38,15 +38,15 @@ import java.awt.image.BufferedImage;
  */
 public class DetectFastHessianApp {
 
-//	static String fileName = "evaluation/data/outdoors01.jpg";
+//	static String fileName = "data/evaluation/outdoors01.jpg";
 	static String fileName = "data/sunflowers.png";
-//	static String fileName = "evaluation/data/particles01.jpg";
-//	static String fileName = "evaluation/data/scale/beach02.jpg";
-//	static String fileName = "evaluation/data/indoors01.jpg";
-//	static String fileName = "evaluation/data/shapes01.png";
-//	static String fileName = "evaluation/data/scale/mountain_4p2mm.jpg";
-//	static String fileName = "evaluation/data/scale/mountain_7p1mm.jpg";
-//	static String fileName = "evaluation/data/scale/mountain_19p9mm.jpg";
+//	static String fileName = "data/evaluation/particles01.jpg";
+//	static String fileName = "data/evaluation/scale/beach02.jpg";
+//	static String fileName = "data/evaluation/indoors01.jpg";
+//	static String fileName = "data/evaluation/shapes01.png";
+//	static String fileName = "data/evaluation/scale/mountain_4p2mm.jpg";
+//	static String fileName = "data/evaluation/scale/mountain_7p1mm.jpg";
+//	static String fileName = "data/evaluation/scale/mountain_19p9mm.jpg";
 
 	static int NUM_FEATURES = 120;
 

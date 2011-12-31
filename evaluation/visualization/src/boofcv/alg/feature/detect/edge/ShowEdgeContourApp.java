@@ -213,10 +213,10 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","../applet/data/shapes01.png");
-		manager.add("Room","../applet/data/indoors01.jpg");
-		manager.add("Objects","../applet/data/simple_objects.jpg");
-		manager.add("Indoors","../applet/data/lines_indoors.jpg");
+		manager.add("shapes","../data/applet/shapes01.png");
+		manager.add("Room","../data/applet/indoors01.jpg");
+		manager.add("Objects","../data/applet/simple_objects.jpg");
+		manager.add("Indoors","../data/applet/lines_indoors.jpg");
 
 		app.setInputManager(manager);
 

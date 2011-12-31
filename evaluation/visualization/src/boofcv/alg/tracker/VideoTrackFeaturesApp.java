@@ -162,9 +162,9 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		VideoTrackFeaturesApp app = new VideoTrackFeaturesApp(imageType, derivType);
 
 		VideoListManager manager = new VideoListManager(imageType);
-		manager.add("Shake", "MJPEG", "../applet/data/shake.mjpeg");
-		manager.add("Zoom", "MJPEG", "../applet/data/zoom.mjpeg");
-		manager.add("Rotate", "MJPEG", "../applet/data/rotate.mjpeg");
+		manager.add("Shake", "MJPEG", "../data/applet/shake.mjpeg");
+		manager.add("Zoom", "MJPEG", "../data/applet/zoom.mjpeg");
+		manager.add("Rotate", "MJPEG", "../data/applet/rotate.mjpeg");
 
 		app.setInputManager(manager);
 

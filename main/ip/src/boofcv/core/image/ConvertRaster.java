@@ -122,7 +122,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_U8(ByteInterleavedRaster src, MultiSpectral<ImageUInt8> dst) {
+	public static void bufferedToMulti_U8(ByteInterleavedRaster src, MultiSpectral<ImageUInt8> dst ) {
 		byte[] srcData = src.getDataStorage();
 
 		int numBands = src.getNumBands();

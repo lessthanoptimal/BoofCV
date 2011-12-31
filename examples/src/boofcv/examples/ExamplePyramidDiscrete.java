@@ -103,7 +103,7 @@ public class ExamplePyramidDiscrete<T extends ImageSingleBand> {
 	}
 
 	public static void main( String[] args ) {
-		BufferedImage image = UtilImageIO.loadImage("data/standard/barbara.png");
+		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/standard/barbara.png");
 
 		ExamplePyramidDiscrete<ImageFloat32> app = new ExamplePyramidDiscrete<ImageFloat32>(ImageFloat32.class);
 //		ExamplePyramidDiscrete<ImageUInt8> app = new ExamplePyramidDiscrete<ImageUInt8>(ImageUInt8.class);

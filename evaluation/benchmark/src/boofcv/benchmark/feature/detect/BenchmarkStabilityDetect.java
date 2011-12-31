@@ -68,11 +68,11 @@ public class BenchmarkStabilityDetect<T extends ImageSingleBand, D extends Image
 		param.derivType = derivType;
 
 		CompileImageResults<T> compile = new CompileImageResults<T>(benchmark);
-		compile.addImage("evaluation/data/outdoors01.jpg");
-		compile.addImage("evaluation/data/indoors01.jpg");
-		compile.addImage("evaluation/data/scale/beach01.jpg");
-		compile.addImage("evaluation/data/scale/mountain_7p1mm.jpg");
-		compile.addImage("evaluation/data/sunflowers.png");
+		compile.addImage("data/evaluation/outdoors01.jpg");
+		compile.addImage("data/evaluation/indoors01.jpg");
+		compile.addImage("data/evaluation/scale/beach01.jpg");
+		compile.addImage("data/evaluation/scale/mountain_7p1mm.jpg");
+		compile.addImage("data/evaluation/sunflowers.png");
 
 		DetectEvaluator<T> evaluator = new DetectEvaluator<T>();
 

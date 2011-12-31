@@ -132,15 +132,15 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 		Class imageType = ImageFloat32.class;
 
 		// select which algorithms to use
-		InterestPointDetector detector = FactoryInterestPoint.fastHessian(1, 2, 400, 1, 9, 4, 4);
+		InterestPointDetector detector = FactoryInterestPoint.fastHessian(1, 2, 300, 1, 9, 4, 4);
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surf(true, imageType);
 		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(new ScoreAssociateEuclideanSq(), 2, -1, true);
 
 		// load and match images
 		ExampleAssociatePoints app = new ExampleAssociatePoints(detector,describe,associate,imageType);
 
-		BufferedImage imageA = UtilImageIO.loadImage("../evaluation/data/stitch/kayak_01.jpg");
-		BufferedImage imageB = UtilImageIO.loadImage("../evaluation/data/stitch/kayak_03.jpg");
+		BufferedImage imageA = UtilImageIO.loadImage("../data/evaluation/stitch/kayak_01.jpg");
+		BufferedImage imageB = UtilImageIO.loadImage("../data/evaluation/stitch/kayak_03.jpg");
 
 		app.associate(imageA,imageB);
 	}

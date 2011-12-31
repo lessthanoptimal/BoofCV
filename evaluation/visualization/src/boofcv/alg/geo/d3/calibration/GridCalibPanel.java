@@ -21,6 +21,8 @@ package boofcv.alg.geo.d3.calibration;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,7 +33,7 @@ import java.awt.event.ActionListener;
  * @author Peter Abeles
  */
 public class GridCalibPanel extends StandardAlgConfigPanel 
-		implements ActionListener
+		implements ActionListener , ChangeListener
 {
 	// indicates if a calibration grid was found or not
 	JLabel successIndicator;
@@ -39,9 +41,13 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	// selects which image to view
 	JComboBox viewSelector;
 
+	// toggle what is visible or not
 	JCheckBox showBound;
 	JCheckBox showPoints;
 	JCheckBox showNumbers;
+
+	// selects threshold to create binary image from
+	JSpinner thresholdSpinner;
 
 	boolean doShowBound = true;
 	boolean doShowPoints = true;
@@ -50,6 +56,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	Listener listener;
 	
 	int selectedView = 0;
+	int thresholdLevel = 60;
 
 	public GridCalibPanel() {
 		viewSelector = new JComboBox();
@@ -76,9 +83,14 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		showNumbers.addActionListener(this);
 		showNumbers.setMaximumSize(showNumbers.getPreferredSize());
 
-		addLabeled(successIndicator,"Found:",this);
+		thresholdSpinner = new JSpinner(new SpinnerNumberModel(thresholdLevel,0, 255, 20));
+		thresholdSpinner.addChangeListener(this);
+		thresholdSpinner.setMaximumSize(thresholdSpinner.getPreferredSize());
+
+		addLabeled(successIndicator, "Found:",this);
 		addSeparator(100);
-		addLabeled(viewSelector,"View",this);
+		addLabeled(viewSelector,"View ",this);
+		addLabeled(thresholdSpinner,"Threshold",this);
 		addSeparator(100);
 		addAlignLeft(showBound, this);
 		addAlignLeft(showPoints,this);
@@ -101,6 +113,18 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		}
 
 		listener.calibEventGUI();
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if( listener == null )
+			return;
+
+		if( e.getSource() == thresholdSpinner) {
+			thresholdLevel = ((Number) thresholdSpinner.getValue()).intValue();
+		}
+		
+		listener.calibEventProcess();
 	}
 
 	public void setSuccessMessage( String message , boolean worked )
@@ -128,6 +152,10 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		return doShowNumbers;
 	}
 
+	public int getThresholdLevel() {
+		return thresholdLevel;
+	}
+
 	public void setListener( Listener listener) {
 		this.listener = listener;
 	}
@@ -135,5 +163,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	public static interface Listener
 	{
 		public void calibEventGUI();
+		
+		public void calibEventProcess();
 	}
 }

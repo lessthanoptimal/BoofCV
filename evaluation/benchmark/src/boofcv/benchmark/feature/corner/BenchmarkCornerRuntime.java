@@ -124,7 +124,7 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static void main(String args[]) {
-		String pre = "evaluation/data/";
+		String pre = "../data/evaluation/";
 
 		FileImageSequence<ImageUInt8> sequence_U8 = new FileImageSequence<ImageUInt8>(ImageUInt8.class,"indoors01.jpg", "outdoors01.jpg", "particles01.jpg");
 		FileImageSequence<ImageFloat32> sequence_F32 = new FileImageSequence<ImageFloat32>(ImageFloat32.class,"indoors01.jpg", "outdoors01.jpg", "particles01.jpg");
