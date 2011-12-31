@@ -86,8 +86,8 @@ public class ExtractOrderedTargetPoints {
 		resetConnections(blobs);
 		
 		// find the bounding quadrilateral around target blobs
-		List<Point2D_I32> points = toPointList(blobs);
-		targetCorners = FindBoundingQuadrilateral.findCorners(points);
+		targetObs = toPointList(blobs);
+		targetCorners = FindBoundingQuadrilateral.findCorners(targetObs);
 
 		// connect blobs to each other making extraction of rows and columns easier later on
 		connect(blobs);
@@ -116,8 +116,28 @@ public class ExtractOrderedTargetPoints {
 		List<SquareBlob> rightCol = findLine(topRow.get(topRow.size()-1),targetCorners.get(2));
 
 		if( leftCol.size() != rightCol.size() )
-			throw new InvalidTarget("Left and right columns have different length");
+			throw new InvalidTarget("Left and right columns have different length: "+leftCol.size()+" "+rightCol.size());
 
+		int N = blobs.size();
+		int cols = topRow.size();
+		int totalConnections = 0;
+		for( SquareBlob b : blobs ) {
+			totalConnections += b.conn.size();
+		}
+		int expected = N*4 - (2*cols + 2*N/cols);
+		if( expected != totalConnections )
+			throw new InvalidTarget("Bad connection graph");
+		
+		for( int i = 0; i < leftCol.size(); i++ ) {
+			int x0 = leftCol.get(i).center.x;
+			int y0 = leftCol.get(i).center.y;
+			int x1 = rightCol.get(i).center.x;
+			int y1 = rightCol.get(i).center.y;
+
+			System.out.println("columns "+x0+" "+y0+"  ,  "+x1+" "+y1);
+		}
+		
+		
 		// Corners of bounding quadrilateral, which are updated as rows are removed
 		Point2D_I32 topLeft = targetCorners.get(0);
 		Point2D_I32 topRight = targetCorners.get(1);
@@ -126,6 +146,9 @@ public class ExtractOrderedTargetPoints {
 
 		// order corners in the blobs in the first row
 		orderBlobRow(topRow,topLeft,topRight);
+
+		System.out.println("Bottom left "+bottomLeft+"  right "+bottomRight);
+		System.out.println("Top left "+topLeft+"  right "+topRight);
 
 		// extract the remaining rows
 		numRows = 1;
@@ -139,17 +162,24 @@ public class ExtractOrderedTargetPoints {
 			leftCol.remove(0);
 			rightCol.remove(0);
 
-			if(  blobs.size() > 0 ) {
+			if( blobs.size() > 0 ) {
 				numRows++;
 				// find the next row
 				topRow = findLine(leftCol.get(0), rightCol.get(0).center);
+				System.out.println("row size "+topRow.size());
+				if( topRow.size() != 4 ) {
+					for( SquareBlob b : topRow ) {
+						System.out.println(b.center.x+" num connections: "+b.conn.size());
+					}
+				}
 				// update the top corners used to order corners inside the row
 				topLeft = selectFarthest(leftCol.get(0).corners, bottomLeft, bottomRight);
-				topRight = selectFarthest(rightCol.get(0).corners, bottomLeft, bottomRight);
+				topRight = selectFarthest(rightCol.get(0).corners, bottomRight , bottomLeft);
+				System.out.println("Top left "+topLeft+"  right "+topRight);
 				// order corners inside the row
-				orderBlobRow(topRow,topLeft,topRight);
+				orderBlobRow(topRow, topLeft, topRight);
 				if( topRow.size() != numCols )
-					throw new InvalidTarget("Unexpected row size");
+					throw new InvalidTarget("Unexpected row size: found "+topRow.size()+" expected "+numCols);
 			} else {
 				break;
 			}
@@ -158,15 +188,28 @@ public class ExtractOrderedTargetPoints {
 	}
 
 	/**
-	 * Selects the point in the list which has the greatest combined distance from points 'a' and 'b'
+	 * Selects the point in the list which has the greatest combined distance from points 'a' and 'b'.
+	 * Distance is computed as Manhattan distance, which mean it is computed independently along a coordinate
+	 * system's axis.  The axis is specified by points a and b.
 	 */
 	protected static Point2D_I32 selectFarthest( List<Point2D_I32> corners , Point2D_I32 a , Point2D_I32 b )
 	{
+		LineParametric2D_F64 b_to_a = new LineParametric2D_F64(b.x,b.y,a.x-b.x,a.y-b.y);
+		// normalize to make t in same units as everything else
+		b_to_a.slope.normalize();
+		LineParametric2D_F64 a_to_n = new LineParametric2D_F64(a.x,a.y,-b_to_a.slope.y,b_to_a.slope.x);
+		
 		Point2D_I32 best = null;
-		int bestDist = 0;
+		double bestDist = 0;
 		
 		for( Point2D_I32 p : corners ) {
-			int d = p.distance2(a) + p.distance2(b);
+			
+			double distA = ClosestPoint2D_F64.closestPointT(b_to_a,new Point2D_F64(p.x,p.y));
+			double distB = ClosestPoint2D_F64.closestPointT(a_to_n,new Point2D_F64(p.x,p.y));
+			distA = Math.abs(distA);
+			distB = Math.abs(distB);
+			
+			double d = distA + distB;
 			if( d > bestDist ) {
 				bestDist = d;
 				best = p;
@@ -245,6 +288,7 @@ public class ExtractOrderedTargetPoints {
 	 * @param rowSize Number of blobs per row (number of columns).
 	 */
 	private void orderedBlobsIntoPoints( List<SquareBlob> blobs , List<Point2D_I32> points , int rowSize ) {
+		points.clear();
 		for( int i = 0; i < blobs.size(); i += rowSize ) {
 			for( int j = 0; j < rowSize; j++ ) {
 				SquareBlob b = blobs.get(i+j);
@@ -290,19 +334,23 @@ public class ExtractOrderedTargetPoints {
 
 		while( blob != null ) {
 			ret.add(blob);
+			double best = Double.MAX_VALUE;
 			SquareBlob found = null;
-
+			
 			// see if any of  the connected point towards the target
 			for( SquareBlob c : blob.conn ) {
 				double angle = Math.atan2(c.center.y-blob.center.y,c.center.x-blob.center.x);
 				double acute = UtilAngle.dist(targetAngle,angle);
-				if( acute < Math.PI/3 ) {
+				if( acute < best ) {
+					best = acute;
 					found = c;
-					break;
 				}
 			}
-
-			blob = found;
+			if( best < Math.PI/3 ) {
+				blob = found;
+			} else {
+				blob = null;
+			}
 		}
 
 		return ret;
@@ -363,7 +411,7 @@ public class ExtractOrderedTargetPoints {
 	 * For each blob it finds the blobs which are directly next to it.  Up to 4 blobs can be next to
 	 * any blob and two connected blobs should have the closes side approximately parallel.
 	 */
-	public static void connect( List<SquareBlob> blobs ) {
+	public static void connect( List<SquareBlob> blobs ) throws InvalidTarget {
 
 		LineSegment2D_F64 centerLine = new LineSegment2D_F64();
 		LineSegment2D_F64 cornerLine = new LineSegment2D_F64();
@@ -374,6 +422,9 @@ public class ExtractOrderedTargetPoints {
 			// center line between blobs must intersect line segment between two corners
 
 			centerLine.a.set(b.center.x,b.center.y);
+			
+			if( b.center.x == 229 && b.center.y == 418)
+				System.out.println("this is it!");
 
 			// examine each side in the blob
 			for( int j = 0; j < 4; j++ ) {
@@ -383,6 +434,11 @@ public class ExtractOrderedTargetPoints {
 				cornerLine.a.set(c0.x,c0.y);
 				cornerLine.b.set(c1.x,c1.y);
 			
+				// see if another node already placed a connection to this side
+				if( checkConnection(b.conn,centerLine,cornerLine)) {
+					continue;
+				}
+				
 				double best = Double.MAX_VALUE;
 				SquareBlob bestBlob = null;
 
@@ -394,7 +450,6 @@ public class ExtractOrderedTargetPoints {
 
 					// two sides are declared approximately parallel if the center line intersects
 					// the sides of blob 'b'
-
 					if(Intersection2D_F64.intersection(cornerLine,centerLine,null) != null ) {
 						double d = c.center.distance2(b.center);
 						if( d < best ) {
@@ -409,8 +464,28 @@ public class ExtractOrderedTargetPoints {
 					b.conn.add(bestBlob);
 				}
 			}
-			            
+
+			// corners will have two connections, sides 3, and inner ones 4
+			if( b.conn.size() < 2 && b.conn.size() > 4 )
+				throw new InvalidTarget("Bad number of square connections. "+b.conn.size());
 		}
+	}
+
+	/**
+	 * Checks to see if a connection has already been added to this side
+	 */
+	private static boolean checkConnection( List<SquareBlob> connections ,
+									 LineSegment2D_F64 centerLine,
+									 LineSegment2D_F64 cornerLine ) {
+		
+		for( SquareBlob b : connections ) {
+			centerLine.b.set(b.center.x,b.center.y);
+			if(Intersection2D_F64.intersection(cornerLine,centerLine,null) != null ) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/**

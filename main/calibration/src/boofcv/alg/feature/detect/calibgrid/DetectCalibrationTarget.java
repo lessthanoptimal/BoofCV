@@ -67,6 +67,10 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 
 	// given a blob it finds the 4 corners in the blob
 	FindQuadCorners cornerFinder = new FindQuadCorners(1.5);
+	private int numBlobs;
+
+	// list if found corners/blobs
+	List<SquareBlob> squares;
 
 	public DetectCalibrationTarget(Class<T> imageType ) {
 		this.imageType = imageType;
@@ -96,7 +100,7 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		BinaryImageOps.dilate8(binaryA,binaryB);
 
 		// find blobs
-		int numBlobs = BinaryImageOps.labelBlobs8(binaryB,blobs);
+		numBlobs = BinaryImageOps.labelBlobs8(binaryB,blobs);
 
 		//remove blobs with holes
 		numBlobs = removeBlobsHoles(binaryB,blobs,numBlobs);
@@ -108,7 +112,7 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		filterTouchEdge(contours,image.width,image.height);
 
 		// create  list of squares and find an initial estimate of their corners
-		List<SquareBlob> squares = new ArrayList<SquareBlob>();
+		squares = new ArrayList<SquareBlob>();
 		for( List<Point2D_I32> l : contours ) {
 			if( l.size() < minContourSize ) {
 				// this might be a bug or maybe an artifact of detecting with 8 versus 4-connect
@@ -127,6 +131,7 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 			extractTarget = new ExtractOrderedTargetPoints();
 			extractTarget.process(squares);
 		} catch (ExtractOrderedTargetPoints.InvalidTarget invalidTarget) {
+			System.err.println(invalidTarget.toString());
 			return false;
 		}
 
@@ -250,4 +255,19 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		return counts;
 	}
 
+	public ImageUInt8 getThresholded() {
+		return thresholded;
+	}
+
+	public ImageSInt32 getBlobs() {
+		return blobs;
+	}
+
+	public int getNumBlobs() {
+		return numBlobs;
+	}
+
+	public List<SquareBlob> getSquares() {
+		return squares;
+	}
 }
