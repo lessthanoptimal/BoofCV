@@ -25,7 +25,9 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -50,7 +52,7 @@ public class HomographyStitchPanel extends JPanel {
 	int workHeight;
 
 	PixelTransformHomography_F32 model;
-	ImageDistort<ImageFloat32> distort;
+	ImageDistort<MultiSpectral<ImageFloat32>> distort;
 	Point2D_I32 corners[];
 
 	public HomographyStitchPanel( double scale , int workWidth , int workHeight ) {
@@ -60,7 +62,7 @@ public class HomographyStitchPanel extends JPanel {
 
 		model = new PixelTransformHomography_F32();
 		InterpolatePixel<ImageFloat32> interp = new ImplBilinearPixel_F32();
-		distort = DistortSupport.createDistort(ImageFloat32.class, model, interp, null);
+		distort = DistortSupport.createDistortMS(ImageFloat32.class, model, interp, null);
 
 		corners = new Point2D_I32[4];
 		for( int i = 0; i < corners.length; i++ ) {
@@ -68,27 +70,26 @@ public class HomographyStitchPanel extends JPanel {
 		}
 	}
 
-	private Homography2D_F64 createFromWorkToA( ImageFloat32 grayA ) {
+	private Homography2D_F64 createFromWorkToA( ImageBase grayA ) {
 		Homography2D_F64 fromAToWork = new Homography2D_F64(scale,0,grayA.width/4,0,scale,grayA.height/4,0,0,1);
 		return fromAToWork.invert(null);
 	}
 
 	public synchronized void configure(BufferedImage imageA, BufferedImage imageB ,
 									   Homography2D_F64 fromAtoB ) {
+		MultiSpectral<ImageFloat32> colorA = ConvertBufferedImage.convertFromMulti(imageA, null, ImageFloat32.class);
+		MultiSpectral<ImageFloat32> colorB = ConvertBufferedImage.convertFromMulti(imageB, null, ImageFloat32.class);
 
-		ImageFloat32 grayA = ConvertBufferedImage.convertFromSingle(imageA, (ImageFloat32) null, ImageFloat32.class);
-		ImageFloat32 grayB = ConvertBufferedImage.convertFromSingle(imageB, (ImageFloat32) null, ImageFloat32.class);
+		MultiSpectral<ImageFloat32> work = new MultiSpectral<ImageFloat32>(ImageFloat32.class,workWidth,workHeight,3);
 
-		ImageFloat32 work = new ImageFloat32(workWidth,workHeight);
-
-		Homography2D_F64 fromWorkToA = createFromWorkToA(grayA);
+		Homography2D_F64 fromWorkToA = createFromWorkToA(colorA);
 		model.set(fromWorkToA);
-		distort.apply(grayA,work);
+		distort.apply(colorA,work);
 
 		Homography2D_F64 fromWorkToB = fromWorkToA.concat(fromAtoB,null);
 		model.set(fromWorkToB);
 
-		distort.apply(grayB,work);
+		distort.apply(colorB,work);
 
 		output = new BufferedImage(work.width,work.height,BufferedImage.TYPE_INT_BGR);
 		ConvertBufferedImage.convertTo(work,output);
@@ -96,9 +97,9 @@ public class HomographyStitchPanel extends JPanel {
 		// save the corners of the distorted image
 		Homography2D_F64 fromBtoWork = fromWorkToB.invert(null);
 		corners[0] = renderPoint(0,0,fromBtoWork);
-		corners[1] = renderPoint(grayB.width,0,fromBtoWork);
-		corners[2] = renderPoint(grayB.width,grayB.height,fromBtoWork);
-		corners[3] = renderPoint(0,grayB.height,fromBtoWork);
+		corners[1] = renderPoint(colorB.width,0,fromBtoWork);
+		corners[2] = renderPoint(colorB.width,colorB.height,fromBtoWork);
+		corners[3] = renderPoint(0,colorB.height,fromBtoWork);
 
 		setPreferredSize(new Dimension(output.getWidth(),output.getHeight()));
 	}

@@ -18,32 +18,112 @@
 
 package boofcv.alg.feature.detect.calibgrid;
 
+import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestFindBoundingQuadrilateral {
+	
+	Random rand = new Random(234);
 
+	/**
+	 * Test it against an easy case where the corners are aligned along the image's axis and easily
+	 * identifiable.
+	 */
 	@Test
-	public void findCorners() {
-		fail("implement");
+	public void findCorners_simple() {
+		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		
+		for( int i = 0; i <= 5; i++ ) {
+			list.add( new Point2D_I32(i,2));
+			list.add( new Point2D_I32(i,8));
+		}
+		list.add( new Point2D_I32(0,3));
+		list.add( new Point2D_I32(5,3));
+		
+		Collections.shuffle(list);
+		
+		List<Point2D_I32> corners = FindBoundingQuadrilateral.findCorners(list);
+		
+		assertEquals(4,corners.size());
+
+		assertEquals(1,count(0,2,list));
+		assertEquals(1,count(0,8,list));
+		assertEquals(1,count(5,2,list));
+		assertEquals(1,count(5,8,list));
+	}
+	
+	private int count( int x , int y , List<Point2D_I32> list ) {
+		int ret = 0;
+		
+		for( Point2D_I32 p : list ) {
+			if( p.x == x && p.y == y )
+				ret++;
+		}
+		return ret;
 	}
 
 	@Test
 	public void area() {
-		fail("implement");
+		Point2D_I32 a = new Point2D_I32(1,5);
+		Point2D_I32 b = new Point2D_I32(6,1);
+		Point2D_I32 c = new Point2D_I32(1,1);
+	
+		double expected = 0.5*(4*5);
+		double found = FindBoundingQuadrilateral.area(a,b,c);
+		
+		assertEquals(expected,found,1e-8);
 	}
 
 	@Test
 	public void maximizeArea() {
-		fail("implement");
+		Point2D_I32 a = new Point2D_I32(1,5);
+		Point2D_I32 b = new Point2D_I32(6,1);
+		Point2D_I32 c = new Point2D_I32(-10,-10);
+
+		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		list.add(c);
+		for( int i = 0; i < 5; i++ ) {
+			int x = rand.nextInt(10)-5;
+			int y = rand.nextInt(10)-5;
+			list.add(new Point2D_I32(x,y));
+		}
+		Collections.shuffle(list,rand);
+
+		Point2D_I32 found = FindBoundingQuadrilateral.maximizeArea(a,b,list);
+
+		assertEquals(c.x, found.x);
+		assertEquals(c.y, found.y);
 	}
 
 	@Test
 	public void maximizeForth() {
-		fail("implement");
+		Point2D_I32 a = new Point2D_I32(1,5);
+		Point2D_I32 b = new Point2D_I32(6,1);
+		Point2D_I32 c = new Point2D_I32(7,8);
+		Point2D_I32 d = new Point2D_I32(-10,-12);
+
+		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		list.add(d);
+		for( int i = 0; i < 5; i++ ) {
+			int x = rand.nextInt(10)-5;
+			int y = rand.nextInt(10)-5;
+			list.add(new Point2D_I32(x,y));
+		}
+		Collections.shuffle(list,rand);
+
+		Point2D_I32 found = FindBoundingQuadrilateral.maximizeForth(a,b,c,list);
+
+		assertEquals(d.x, found.x);
+		assertEquals(d.y, found.y);
 	}
 }

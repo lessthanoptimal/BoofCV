@@ -12,6 +12,9 @@ Version : Alpha 0.3
   * Linear radial distortion
   * Decomposition of homography for calibration
   * Nonlinear optimization of all parameters
+- Calibration Grid Detection
+  * Detects corners up to "pixel accuracy", in reality its probably worse than that
+  * Sub-pixel accuracy code exists but needs more work
 - Added min and max values to ImageTestingOps.addGaussian()
 - Tweaked factories related to wavelet denoising so that they take in
   an image type.
@@ -33,6 +36,8 @@ Version : Alpha 0.3
   * If cropping is used the only part of the destimation image is processed
 - Created calibration package to hold calibration related code
 - Moved jars not part of the primary build into boofcv/lib/testing
+- Started converting runtime benchmark code over to Caliper
+  * http://code.google.com/p/caliper/
 
 ---------------------------------------------
 Date    : 2011/12/01 

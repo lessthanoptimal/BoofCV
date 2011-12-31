@@ -20,10 +20,8 @@ package boofcv.alg.feature.detect.calibgrid;
 
 import georegression.metric.ClosestPoint2D_F64;
 import georegression.metric.Distance2D_F64;
-import georegression.metric.Intersection2D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F64;
-import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import pja.sorting.QuickSort_F64;
@@ -57,32 +55,31 @@ import java.util.List;
  */
 public class ExtractOrderedTargetPoints {
 	// list of blobs provided
-	List<SquareBlob> blobs;
+	private List<SquareBlob> blobs;
 
 	// bounding quadrilateral 
 	List<Point2D_I32> targetCorners;
 	// sorting algorithm
-	QuickSort_F64 sort = new QuickSort_F64();
+	private QuickSort_F64 sort = new QuickSort_F64();
 
-	
 	// ordered calibration points
-	List<Point2D_I32> targetObs = new ArrayList<Point2D_I32>();
+	private List<Point2D_I32> targetObs = new ArrayList<Point2D_I32>();
 	// number of elements in each row
-	int numCols;
+	private int numCols;
 	// number of rows
-	int numRows;
+	private int numRows;
 
 	/**
 	 * Processes the list of squares to find and orient corner points in the calibration target. Only
 	 * corners in the target are assumed to be in this list.  If anything goes wrong an i{@link InvalidTarget}
 	 * exception is thrown.
 	 * 
-	 * @param blob List of square blobs that compose a target
+	 * @param blob List of square blobs that compose a target.  Blobs should already
 	 * @throws InvalidTarget
 	 */
 	public void process( List<SquareBlob> blob ) throws InvalidTarget {
 		// set up data structures
-		this.blobs = blob;
+		this.blobs = new ArrayList<SquareBlob>(blob);
 		resetConnections(blobs);
 		
 		// find the bounding quadrilateral around target blobs
@@ -90,7 +87,7 @@ public class ExtractOrderedTargetPoints {
 		targetCorners = FindBoundingQuadrilateral.findCorners(targetObs);
 
 		// connect blobs to each other making extraction of rows and columns easier later on
-		connect(blobs);
+		ConnectGridSquares.connect(blobs);
 		List<SquareBlob> orderedBlob = putBlobsIntoOrder();
 
 		orderedBlobsIntoPoints(orderedBlob,targetObs,numCols);
@@ -115,28 +112,8 @@ public class ExtractOrderedTargetPoints {
 		List<SquareBlob> leftCol = findLine(seed,targetCorners.get(3));
 		List<SquareBlob> rightCol = findLine(topRow.get(topRow.size()-1),targetCorners.get(2));
 
-		if( leftCol.size() != rightCol.size() )
-			throw new InvalidTarget("Left and right columns have different length: "+leftCol.size()+" "+rightCol.size());
-
-		int N = blobs.size();
-		int cols = topRow.size();
-		int totalConnections = 0;
-		for( SquareBlob b : blobs ) {
-			totalConnections += b.conn.size();
-		}
-		int expected = N*4 - (2*cols + 2*N/cols);
-		if( expected != totalConnections )
-			throw new InvalidTarget("Bad connection graph");
-		
-		for( int i = 0; i < leftCol.size(); i++ ) {
-			int x0 = leftCol.get(i).center.x;
-			int y0 = leftCol.get(i).center.y;
-			int x1 = rightCol.get(i).center.x;
-			int y1 = rightCol.get(i).center.y;
-
-			System.out.println("columns "+x0+" "+y0+"  ,  "+x1+" "+y1);
-		}
-		
+		// perform a high level sanity check of what's been extracted so far
+		sanityCheckTarget(topRow, leftCol, rightCol);
 		
 		// Corners of bounding quadrilateral, which are updated as rows are removed
 		Point2D_I32 topLeft = targetCorners.get(0);
@@ -147,14 +124,12 @@ public class ExtractOrderedTargetPoints {
 		// order corners in the blobs in the first row
 		orderBlobRow(topRow,topLeft,topRight);
 
-		System.out.println("Bottom left "+bottomLeft+"  right "+bottomRight);
-		System.out.println("Top left "+topLeft+"  right "+topRight);
-
 		// extract the remaining rows
 		numRows = 1;
 		numCols = topRow.size();
 		if( blobs.size() % numCols != 0 )
 			throw new InvalidTarget("Total square not divisible by row size");
+
 		while( true ) {
 			orderedBlob.addAll(topRow);
 			removeRow(topRow,blobs);
@@ -166,16 +141,11 @@ public class ExtractOrderedTargetPoints {
 				numRows++;
 				// find the next row
 				topRow = findLine(leftCol.get(0), rightCol.get(0).center);
-				System.out.println("row size "+topRow.size());
-				if( topRow.size() != 4 ) {
-					for( SquareBlob b : topRow ) {
-						System.out.println(b.center.x+" num connections: "+b.conn.size());
-					}
-				}
+
 				// update the top corners used to order corners inside the row
 				topLeft = selectFarthest(leftCol.get(0).corners, bottomLeft, bottomRight);
 				topRight = selectFarthest(rightCol.get(0).corners, bottomRight , bottomLeft);
-				System.out.println("Top left "+topLeft+"  right "+topRight);
+
 				// order corners inside the row
 				orderBlobRow(topRow, topLeft, topRight);
 				if( topRow.size() != numCols )
@@ -185,6 +155,43 @@ public class ExtractOrderedTargetPoints {
 			}
 		}
 		return orderedBlob;
+	}
+
+	/**
+	 * Make sure what has been found so far meets expectations
+	 */
+	private void sanityCheckTarget(List<SquareBlob> topRow, 
+								   List<SquareBlob> leftCol, 
+								   List<SquareBlob> rightCol) 
+			throws InvalidTarget 
+	{
+		if( leftCol.size() != rightCol.size() )
+			throw new InvalidTarget("Left and right columns have different length: "+leftCol.size()+" "+rightCol.size());
+
+		int N = blobs.size();
+		int cols = topRow.size();
+
+		// see if enough blobs have been detected for it to be a whole target
+		if( N % cols != 0 )
+			throw new InvalidTarget("Partial target");
+
+		// See if the connection grid is valid
+		int totalConnections = 0;
+		for( SquareBlob b : blobs ) {
+			totalConnections += b.conn.size();
+		}
+		int expected = N*4 - (2*cols + 2*N/cols);
+		if( expected != totalConnections )
+			throw new InvalidTarget("Bad connection graph. Unexpected number of connections.");
+
+//		for( int i = 0; i < leftCol.size(); i++ ) {
+//			int x0 = leftCol.get(i).center.x;
+//			int y0 = leftCol.get(i).center.y;
+//			int x1 = rightCol.get(i).center.x;
+//			int y1 = rightCol.get(i).center.y;
+//
+//			System.out.println("columns "+x0+" "+y0+"  ,  "+x1+" "+y1);
+//		}
 	}
 
 	/**
@@ -272,11 +279,11 @@ public class ExtractOrderedTargetPoints {
 			blob.corners.add(closeA);
 		}
 		if( distC < distD ) {
-			blob.corners.add(farC);
 			blob.corners.add(farD);
+			blob.corners.add(farC);
 		} else {
-			blob.corners.add(farD);
 			blob.corners.add(farC);
+			blob.corners.add(farD);
 		}
 	}
 
@@ -297,8 +304,8 @@ public class ExtractOrderedTargetPoints {
 			}
 			for( int j = 0; j < rowSize; j++ ) {
 				SquareBlob b = blobs.get(i+j);
-				points.add(b.corners.get(2));
 				points.add(b.corners.get(3));
+				points.add(b.corners.get(2));
 			}
 		}
 	}
@@ -406,87 +413,6 @@ public class ExtractOrderedTargetPoints {
 			b.conn.clear();
 		}
 	}
-	
-	/**
-	 * For each blob it finds the blobs which are directly next to it.  Up to 4 blobs can be next to
-	 * any blob and two connected blobs should have the closes side approximately parallel.
-	 */
-	public static void connect( List<SquareBlob> blobs ) throws InvalidTarget {
-
-		LineSegment2D_F64 centerLine = new LineSegment2D_F64();
-		LineSegment2D_F64 cornerLine = new LineSegment2D_F64();
-		
-		for( int i = 0; i < blobs.size(); i++ ) {
-			SquareBlob b = blobs.get(i);
-			// for each pair of corners, find the closest blob
-			// center line between blobs must intersect line segment between two corners
-
-			centerLine.a.set(b.center.x,b.center.y);
-			
-			if( b.center.x == 229 && b.center.y == 418)
-				System.out.println("this is it!");
-
-			// examine each side in the blob
-			for( int j = 0; j < 4; j++ ) {
-				Point2D_I32 c0 = b.corners.get(j);
-				Point2D_I32 c1 = b.corners.get((j+1)%4);
-
-				cornerLine.a.set(c0.x,c0.y);
-				cornerLine.b.set(c1.x,c1.y);
-			
-				// see if another node already placed a connection to this side
-				if( checkConnection(b.conn,centerLine,cornerLine)) {
-					continue;
-				}
-				
-				double best = Double.MAX_VALUE;
-				SquareBlob bestBlob = null;
-
-				// find the blob which is closest to it and "approximately parallel"
-				for( int k = i+1; k < blobs.size(); k++ ) {
-					SquareBlob c = blobs.get(k);
-					
-					centerLine.b.set(c.center.x,c.center.y);
-
-					// two sides are declared approximately parallel if the center line intersects
-					// the sides of blob 'b'
-					if(Intersection2D_F64.intersection(cornerLine,centerLine,null) != null ) {
-						double d = c.center.distance2(b.center);
-						if( d < best ) {
-							best = d;
-							bestBlob = c;
-						}
-					}
-				}
-				
-				if( bestBlob != null ) {
-					bestBlob.conn.add(b);
-					b.conn.add(bestBlob);
-				}
-			}
-
-			// corners will have two connections, sides 3, and inner ones 4
-			if( b.conn.size() < 2 && b.conn.size() > 4 )
-				throw new InvalidTarget("Bad number of square connections. "+b.conn.size());
-		}
-	}
-
-	/**
-	 * Checks to see if a connection has already been added to this side
-	 */
-	private static boolean checkConnection( List<SquareBlob> connections ,
-									 LineSegment2D_F64 centerLine,
-									 LineSegment2D_F64 cornerLine ) {
-		
-		for( SquareBlob b : connections ) {
-			centerLine.b.set(b.center.x,b.center.y);
-			if(Intersection2D_F64.intersection(cornerLine,centerLine,null) != null ) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
 
 	/**
 	 * List of target points in calibration grid.  Row-major ordering.
@@ -507,14 +433,5 @@ public class ExtractOrderedTargetPoints {
 	 */
 	public int getNumRows() {
 		return numRows;
-	}
-
-	/**
-	 * Exception used to indicate that some thing went wrong when extract the calibration grid's points.
-	 */
-	public static class InvalidTarget extends Exception{
-		public InvalidTarget(String message) {
-			super(message);
-		}
 	}
 }

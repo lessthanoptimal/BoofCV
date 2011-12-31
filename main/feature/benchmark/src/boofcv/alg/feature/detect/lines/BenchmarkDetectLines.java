@@ -113,8 +113,8 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 	}
 
 	public static void main(String args[]) throws IOException {
-		BufferedImage image = ImageIO.read(new File("../evaluation/data/lines_indoors.jpg"));
-//		BufferedImage image = UtilImageIO.loadImage("../applet/data/lines_indoors.jpg");
+		BufferedImage image = ImageIO.read(new File("../data/evaluation/lines_indoors.jpg"));
+//		BufferedImage image = UtilImageIO.loadImage("../data/applet/lines_indoors.jpg");
 
 		System.out.println("=========  Profile Image Size " + image.getWidth() + " x " + image.getHeight()+ " ==========");
 		System.out.println();

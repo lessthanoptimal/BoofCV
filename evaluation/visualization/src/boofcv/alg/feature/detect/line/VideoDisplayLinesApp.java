@@ -145,7 +145,7 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 		VideoDisplayLinesApp app = new VideoDisplayLinesApp(ImageFloat32.class, ImageFloat32.class);
 
 		VideoListManager manager = new VideoListManager(ImageFloat32.class);
-		manager.add("Appartment", "MJPEG", "../applet/data/lines_indoors.mjpeg");
+		manager.add("Appartment", "MJPEG", "../data/applet/lines_indoors.mjpeg");
 
 		app.setInputManager(manager);
 

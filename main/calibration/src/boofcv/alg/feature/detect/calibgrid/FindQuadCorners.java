@@ -176,8 +176,8 @@ public class FindQuadCorners {
 		int dist0 = 0, dist1 = 0;
 		
 		for( Point2D_I32 p : corners ) {
-			dist0 += p.distance2(c0);
-			dist1 += p.distance2(c1);
+			dist0 += Math.sqrt(p.distance2(c0));
+			dist1 += Math.sqrt(p.distance2(c1));
 		}
 
 		if( dist0 > dist1 ) {

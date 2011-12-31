@@ -18,7 +18,11 @@
 
 package boofcv.alg.feature.detect.calibgrid;
 
+import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.fail;
 
@@ -52,8 +56,21 @@ public class TestExtractOrderedTargetPoints {
 		fail("implement");
 	}
 
-	@Test
-	public void connect() {
-		fail("implement");
+
+	public static SquareBlob createBlob( int x0 , int y0 , int r )
+	{
+		return createBlob(x0-r,y0+r,x0+r,y0+r,x0+r,y0-r,x0-r,y0-r);
+	}
+
+	public static SquareBlob createBlob( int x0 , int y0 , int x1 , int y1 ,
+										  int x2 , int y2 , int x3 , int y3 )
+	{
+		List<Point2D_I32> corners = new ArrayList<Point2D_I32>();
+		corners.add( new Point2D_I32(x0,y0));
+		corners.add( new Point2D_I32(x1,y1));
+		corners.add( new Point2D_I32(x2,y2));
+		corners.add( new Point2D_I32(x3,y3));
+
+		return new SquareBlob(corners,corners);
 	}
 }

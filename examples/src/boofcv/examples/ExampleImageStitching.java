@@ -178,14 +178,14 @@ public class ExampleImageStitching {
 
 	public static void main( String args[] ) {
 		BufferedImage imageA,imageB;
-		imageA = UtilImageIO.loadImage("../evaluation/data/stitch/mountain_rotate_01.jpg");
-		imageB = UtilImageIO.loadImage("../evaluation/data/stitch//mountain_rotate_03.jpg");
+		imageA = UtilImageIO.loadImage("../data/evaluation/stitch/mountain_rotate_01.jpg");
+		imageB = UtilImageIO.loadImage("../data/evaluation/stitch//mountain_rotate_03.jpg");
 		stitch(imageA,imageB, ImageFloat32.class);
-		imageA = UtilImageIO.loadImage("../evaluation/data/stitch/kayak_01.jpg");
-		imageB = UtilImageIO.loadImage("../evaluation/data/stitch/kayak_03.jpg");
+		imageA = UtilImageIO.loadImage("../data/evaluation/stitch/kayak_01.jpg");
+		imageB = UtilImageIO.loadImage("../data/evaluation/stitch/kayak_03.jpg");
 		stitch(imageA,imageB, ImageFloat32.class);
-		imageA = UtilImageIO.loadImage("../evaluation/data/scale/rainforest_01.jpg");
-		imageB = UtilImageIO.loadImage("../evaluation/data/scale/rainforest_02.jpg");
+		imageA = UtilImageIO.loadImage("../data/evaluation/scale/rainforest_01.jpg");
+		imageB = UtilImageIO.loadImage("../data/evaluation/scale/rainforest_02.jpg");
 		stitch(imageA,imageB, ImageFloat32.class);
 	}
 }

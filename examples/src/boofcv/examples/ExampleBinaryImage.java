@@ -92,7 +92,7 @@ public class ExampleBinaryImage {
 
 	public static void main( String args[] ) {
 		// load and convert the image into a unable format
-		BufferedImage image = UtilImageIO.loadImage("../applet/data/particles01.jpg");
+		BufferedImage image = UtilImageIO.loadImage("../data/applet/particles01.jpg");
 
 		binaryExample(image);
 		labeledExample(image);

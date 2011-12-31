@@ -90,7 +90,7 @@ public class ExampleImageConvert {
 
 
 	public static void main( String args[] ) {
-		BufferedImage image = UtilImageIO.loadImage("data/standard/barbara.png");
+		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/standard/barbara.png");
 
 //		convertBufferedImage(image, ImageFloat32.class, ImageFloat32.class);
 		convertBufferedImage(image, ImageUInt8.class, ImageSInt16.class);

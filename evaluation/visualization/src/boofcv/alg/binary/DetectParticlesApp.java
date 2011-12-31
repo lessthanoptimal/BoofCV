@@ -104,7 +104,7 @@ public class DetectParticlesApp {
 	}
 
 	public static void main( String args[] ) {
-		BufferedImage originalBuff = UtilImageIO.loadImage("data/particles01.jpg");
+		BufferedImage originalBuff = UtilImageIO.loadImage("../data/evaluation/particles01.jpg");
 		ImageUInt8 original = ConvertBufferedImage.convertFrom(originalBuff,(ImageUInt8)null);
 
 		ShowImages.showWindow(original,"Original");

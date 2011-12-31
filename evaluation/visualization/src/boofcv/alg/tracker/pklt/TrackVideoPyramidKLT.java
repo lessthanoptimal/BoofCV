@@ -153,7 +153,7 @@ public class TrackVideoPyramidKLT<I extends ImageSingleBand, D extends ImageSing
 
 		SimpleImageSequence<I> sequence = BoofVideoManager.loadManagerDefault().load(fileName,imageType);
 
-//		sequence = new LoadFileImageSequence<I>(imageType,"../applet/data/snow_rail","jpg");
+//		sequence = new LoadFileImageSequence<I>(imageType,"../data/applet/snow_rail","jpg");
 
 		KltConfig configKLt = new KltConfig();
 		configKLt.forbiddenBorder = 0;

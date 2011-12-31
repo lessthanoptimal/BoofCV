@@ -43,11 +43,11 @@ import java.util.Random;
 // todo abstract image type.  Put in integer images
 public class VisualizeCannySteps {
 
-	//	static String fileName = "evaluation/data/outdoors01.jpg";
-//	static String fileName = "evaluation/data/sunflowers.png";
-//	static String fileName = "evaluation/data/particles01.jpg";
-//	static String fileName = "evaluation/data/scale/beach02.jpg";
-//	static String fileName = "evaluation/data/indoors01.jpg";
+	//	static String fileName = "data/evaluation/outdoors01.jpg";
+//	static String fileName = "data/evaluation/sunflowers.png";
+//	static String fileName = "data/evaluation/particles01.jpg";
+//	static String fileName = "data/evaluation/scale/beach02.jpg";
+//	static String fileName = "data/evaluation/indoors01.jpg";
 	static String fileName = "data/shapes01.png";
 
 	public static void main( String args[] ){

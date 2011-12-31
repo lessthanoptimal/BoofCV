@@ -149,7 +149,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 
 		// loads an MJPEG video sequence
 		VideoMjpegCodec codec = new VideoMjpegCodec();
-		List<byte[]> data = codec.read(new FileInputStream("../applet/data/zoom.mjpeg"));
+		List<byte[]> data = codec.read(new FileInputStream("../data/applet/zoom.mjpeg"));
 		SimpleImageSequence sequence = new JpegByteImageSequence(imageType,data,true);
 
 		ExamplePointFeatureTracker app = new ExamplePointFeatureTracker(imageType);

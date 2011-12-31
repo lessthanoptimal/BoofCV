@@ -119,6 +119,6 @@ public class FindBoundingQuadrilateral {
 	public static double area( Point2D_I32 a , Point2D_I32 b , Point2D_I32 c )
 	{
 		double top = a.x*(b.y-c.y) + b.x*(c.y-a.y) + c.x*(a.y-b.y);
-		return top/2.0;
+		return Math.abs(top)/2.0;
 	}
 }

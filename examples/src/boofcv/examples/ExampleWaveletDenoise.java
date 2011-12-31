@@ -40,7 +40,7 @@ public class ExampleWaveletDenoise {
 
 		// load the input image, declare data structures, create a noisy image
 		Random rand = new Random(234);
-		ImageFloat32 input = UtilImageIO.loadImage("data/standard/lena512.bmp",ImageFloat32.class);
+		ImageFloat32 input = UtilImageIO.loadImage("../data/evaluation/standard/lena512.bmp",ImageFloat32.class);
 
 		ImageFloat32 noisy = input.clone();
 		GeneralizedImageOps.addGaussian(noisy,rand,20,0,255);

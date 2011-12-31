@@ -85,7 +85,7 @@ public class ExampleInterestPoint {
 	}
 
 	public static void main( String args[] ) {
-		BufferedImage image = UtilImageIO.loadImage("../evaluation/data/sunflowers.png");
+		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
 		detect(image, ImageFloat32.class);
 	}
 }

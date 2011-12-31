@@ -203,8 +203,8 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 		DemoBinaryImageOpsApp app = new DemoBinaryImageOpsApp(ImageFloat32.class);
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("lena","data/particles01.jpg");
-		manager.add("barbara","data/shapes01.png");
+		manager.add("lena","../data/evaluation/particles01.jpg");
+		manager.add("barbara","../data/evaluation/shapes01.png");
 
 		app.setInputManager(manager);
 

@@ -86,7 +86,7 @@ public class ExamplePyramidFloat<T extends ImageSingleBand> {
 
 
 	public static void main( String[] args ) {
-		BufferedImage image = UtilImageIO.loadImage("data/standard/barbara.png");
+		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/standard/barbara.png");
 
 		ExamplePyramidFloat<ImageFloat32> app = new ExamplePyramidFloat<ImageFloat32>(ImageFloat32.class);
 //		ExamplePyramidFloat<ImageUInt8> app = new ExamplePyramidFloat<ImageUInt8>(ImageUInt8.class);
