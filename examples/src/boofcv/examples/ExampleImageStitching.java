@@ -122,11 +122,12 @@ public class ExampleImageStitching {
 	/**
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
-	private static <T extends ImageSingleBand> void describeImage(T image,
-															InterestPointDetector<T> detector,
-															DescribeRegionPoint<T> describe,
-															List<Point2D_F64> points,
-															FastQueue<TupleDesc_F64> descs) {
+	private static <T extends ImageSingleBand>
+	void describeImage(T image,
+					   InterestPointDetector<T> detector,
+					   DescribeRegionPoint<T> describe,
+					   List<Point2D_F64> points,
+					   FastQueue<TupleDesc_F64> descs) {
 		detector.detect(image);
 		describe.setImage(image);
 
@@ -166,7 +167,8 @@ public class ExampleImageStitching {
 		ModelFitterLinearHomography modelFitter = new ModelFitterLinearHomography();
 		DistanceHomographySq distance = new DistanceHomographySq();
 		int minSamples = modelFitter.getMinimumPoints();
-		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher = new SimpleInlierRansac<Homography2D_F64,AssociatedPair>(123,modelFitter,distance,60,minSamples,30,1000,9);
+		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher =
+				new SimpleInlierRansac<Homography2D_F64,AssociatedPair>(123,modelFitter,distance,60,minSamples,30,1000,9);
 
 		Homography2D_F64 H = computeTransform(inputA, inputB, detector, describe, associate, modelMatcher);
 

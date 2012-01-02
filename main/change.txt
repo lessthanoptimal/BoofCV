@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 
+Date    : 2012/01/02
 Version : Alpha 0.3
 
 - Camera Calibration

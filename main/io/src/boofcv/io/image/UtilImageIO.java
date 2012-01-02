@@ -51,7 +51,6 @@ public class UtilImageIO {
 	/**
 	 * Loads the image and converts into the specified image type.
 	 *
-	 *
 	 * @param fileName Path to image file.
 	 * @param imageType Type of image that should be returned.
 	 * @return The image or null if the image could not be loaded.
