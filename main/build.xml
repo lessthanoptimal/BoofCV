@@ -1,7 +1,7 @@
 <project name="BoofCV" basedir="." default="main">
 
     <property name="lib.dir"     value="${basedir}/../lib"/>
-    <property name="jar.dir"     value="${basedir}/testing/jar"/>
+    <property name="jar.dir"     value="${basedir}/jar"/>
     <property name="doc.dir"     value="${basedir}/api"/>
     <property name="testreport.dir"  value="${basedir}/report"/>
 
