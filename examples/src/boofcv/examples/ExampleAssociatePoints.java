@@ -132,7 +132,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 		Class imageType = ImageFloat32.class;
 
 		// select which algorithms to use
-		InterestPointDetector detector = FactoryInterestPoint.fastHessian(1, 2, 300, 1, 9, 4, 4);
+		InterestPointDetector detector = FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4);
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surf(true, imageType);
 		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(new ScoreAssociateEuclideanSq(), 2, -1, true);
 
