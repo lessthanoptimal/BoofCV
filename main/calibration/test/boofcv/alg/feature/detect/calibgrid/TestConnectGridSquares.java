@@ -18,22 +18,66 @@
 
 package boofcv.alg.feature.detect.calibgrid;
 
+import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.alg.feature.detect.calibgrid.TestExtractOrderedTargetPoints.createBlob;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestConnectGridSquares {
 
+	/**
+	 * Creates a copy of the sub-graph and makes sure only references to nodes in
+	 * the sub-graph are saved.
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void copy() {
+		List<SquareBlob> all = new ArrayList<SquareBlob>();
+		all.add(createSquare(50,60,10,12));
+		all.add(createSquare(51,61,11,13));
+		all.add(createSquare(52, 62, 12, 14));
+		all.add(createSquare(53, 63, 13, 15));
+		connect(0,1,all);
+		connect(0,2,all);
+		connect(0,3,all);
+		connect(1,3,all);
+		connect(2,3,all);
+
+		List<SquareBlob> sub = new ArrayList<SquareBlob>();
+		sub.add( all.get(0));
+		sub.add( all.get(1));
+		sub.add( all.get(2));
+
+		List<SquareBlob> found = ConnectGridSquares.copy(sub);
+
+		checkSquare(found.get(0),50,60,10,12,2);
+		checkSquare(found.get(1),51,61,11,13,1);
+		checkSquare(found.get(2),52,62,12,14,1);
+	}
+
+	@Test
+	public void findIsland() {
+		List<SquareBlob> all = new ArrayList<SquareBlob>();
+		all.add(createSquare(50,60,10,12));
+		all.add(createSquare(51,61,11,13));
+		all.add(createSquare(52, 62, 12, 14));
+		all.add(createSquare(53, 63, 13, 15));
+		all.add(createSquare(70, 63, 15, 15));
+		connect(0,1,all);
+		connect(0,2,all);
+		connect(0,3,all);
+		connect(1,3,all);
+		connect(2,3,all);
+		
+		List<SquareBlob> found = ConnectGridSquares.findIsland(all.remove(1),all);
+		assertEquals(4,found.size());
 	}
 
 	@Test
@@ -60,6 +104,42 @@ public class TestConnectGridSquares {
 		// sanity check one of the nodes specific connections
 		assertTrue(blobs.get(2).conn.contains(blobs.get(1)));
 		assertTrue(blobs.get(2).conn.contains(blobs.get(5)));
+	}
+
+	private void checkSquare( SquareBlob square , double largestSide , double smallestSide,
+							  int x , int y , int numConnections )
+	{
+		assertEquals(largestSide,square.largestSide,1e-8);
+		assertEquals(smallestSide,square.smallestSide,1e-8);
+		assertEquals(x,square.center.x);
+		assertEquals(y,square.center.y);
+		assertEquals(numConnections,square.conn.size());
+	}
+
+	public static void connect( int a , int b , List<SquareBlob> input ) {
+		input.get(a).conn.add( input.get(b) );
+		input.get(b).conn.add( input.get(a) );
+	}
+
+	private SquareBlob createSquare( double largestSide , double smallestSide,
+									 int x , int y )
+	{
+		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> corners = new ArrayList<Point2D_I32>();
+
+		for( int i = 0; i < 4; i++ ) {
+			contour.add( new Point2D_I32(1,2));
+			corners.add( new Point2D_I32(1,2));
+		}
+
+		SquareBlob ret = new SquareBlob(contour,corners);
+
+		ret.largestSide = largestSide;
+		ret.smallestSide = smallestSide;
+		ret.center.x = x;
+		ret.center.y = y;
+
+		return ret;
 	}
 
 }

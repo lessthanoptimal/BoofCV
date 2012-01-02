@@ -72,22 +72,22 @@ public class ExtractOrderedTargetPoints {
 	/**
 	 * Processes the list of squares to find and orient corner points in the calibration target. Only
 	 * corners in the target are assumed to be in this list.  If anything goes wrong an i{@link InvalidTarget}
-	 * exception is thrown.
+	 * exception is thrown. Connections between the blobs needs to be computed already and must only refer
+	 * to blobs inside this list.
 	 * 
-	 * @param blob List of square blobs that compose a target.  Blobs should already
+	 * @param blob List of square blobs that compose a target.  Connections are modified for book keeping.
 	 * @throws InvalidTarget
 	 */
 	public void process( List<SquareBlob> blob ) throws InvalidTarget {
 		// set up data structures
 		this.blobs = new ArrayList<SquareBlob>(blob);
-		resetConnections(blobs);
 		
 		// find the bounding quadrilateral around target blobs
 		targetObs = toPointList(blobs);
 		targetCorners = FindBoundingQuadrilateral.findCorners(targetObs);
 
 		// connect blobs to each other making extraction of rows and columns easier later on
-		ConnectGridSquares.connect(blobs);
+//		ConnectGridSquares.connect(blobs);
 		List<SquareBlob> orderedBlob = putBlobsIntoOrder();
 
 		orderedBlobsIntoPoints(orderedBlob,targetObs,numCols);
@@ -170,10 +170,10 @@ public class ExtractOrderedTargetPoints {
 
 		int N = blobs.size();
 		int cols = topRow.size();
+		int rows = leftCol.size();
 
-		// see if enough blobs have been detected for it to be a whole target
-		if( N % cols != 0 )
-			throw new InvalidTarget("Partial target");
+		if( N != cols*rows )
+			throw new InvalidTarget("Total number of elements does not match number of rows/columns.");
 
 		// See if the connection grid is valid
 		int totalConnections = 0;
@@ -292,17 +292,17 @@ public class ExtractOrderedTargetPoints {
 	 *
 	 * @param blobs Set of ordered blobs that compose the target
 	 * @param points Output set of points.
-	 * @param rowSize Number of blobs per row (number of columns).
+	 * @param numCols Number of blobs per row (number of columns).
 	 */
-	private void orderedBlobsIntoPoints( List<SquareBlob> blobs , List<Point2D_I32> points , int rowSize ) {
+	protected static void orderedBlobsIntoPoints( List<SquareBlob> blobs , List<Point2D_I32> points , int numCols ) {
 		points.clear();
-		for( int i = 0; i < blobs.size(); i += rowSize ) {
-			for( int j = 0; j < rowSize; j++ ) {
+		for( int i = 0; i < blobs.size(); i += numCols ) {
+			for( int j = 0; j < numCols; j++ ) {
 				SquareBlob b = blobs.get(i+j);
 				points.add(b.corners.get(0));
 				points.add(b.corners.get(1));
 			}
-			for( int j = 0; j < rowSize; j++ ) {
+			for( int j = 0; j < numCols; j++ ) {
 				SquareBlob b = blobs.get(i+j);
 				points.add(b.corners.get(3));
 				points.add(b.corners.get(2));
@@ -318,9 +318,11 @@ public class ExtractOrderedTargetPoints {
 	private void removeRow( List<SquareBlob> row , List<SquareBlob> all ) {
 		for( SquareBlob b : row ) {
 			for( SquareBlob c : b.conn ) {
-				c.conn.remove(b);
+				if( !c.conn.remove(b) )
+					throw new RuntimeException("Bug, element not contained");
 			}
-			all.remove(b);
+			if( !all.remove(b) )
+				throw new RuntimeException("Bug");
 		}
 	}
 
@@ -403,15 +405,6 @@ public class ExtractOrderedTargetPoints {
 	 */
 	public List<Point2D_I32> getQuadrilateral() {
 		return targetCorners;
-	}
-
-	/**
-	 * Make sure there are no connections stored in each blob
-	 */
-	public static void resetConnections( List<SquareBlob> blobs ) {
-		for( SquareBlob b : blobs ) {
-			b.conn.clear();
-		}
 	}
 
 	/**

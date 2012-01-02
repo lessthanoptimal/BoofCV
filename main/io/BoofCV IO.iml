@@ -18,7 +18,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="testing" level="project" />
+    <orderEntry type="library" scope="TEST" name="testing" level="project" />
     <orderEntry type="module" module-name="BoofCV Image Processing" />
   </component>
 </module>

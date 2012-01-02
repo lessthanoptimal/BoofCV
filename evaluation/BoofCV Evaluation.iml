@@ -16,7 +16,7 @@
     <orderEntry type="module" module-name="ejml" />
     <orderEntry type="module" module-name="GeoRegression" />
     <orderEntry type="module" module-name="libpja" />
-    <orderEntry type="library" name="testing" level="project" />
+    <orderEntry type="library" scope="TEST" name="testing" level="project" />
     <orderEntry type="module" module-name="BoofCV Numerics" />
     <orderEntry type="module" module-name="BoofCV Visualize" />
     <orderEntry type="module" module-name="BoofCV Calibration" />

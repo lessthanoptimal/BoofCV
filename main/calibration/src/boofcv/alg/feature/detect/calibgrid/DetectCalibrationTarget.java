@@ -75,6 +75,7 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 
 	// list if found corners/blobs
 	List<SquareBlob> squares;
+	List<SquareBlob> squaresPruned;
 
 	// number of black squares in calibration grid
 	int gridWidth;
@@ -137,12 +138,18 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 			List<Point2D_I32> corners = cornerFinder.process(l);
 			squares.add(new SquareBlob(l, corners));
 		}
-		
+
 		// remove blobs which are not like a polygon at all
 		filterNotPolygon(squares);
 
+		// find connections between squares
+		ConnectGridSquares.connect(squares);
+
+		// Remove all but the largest islands in the graph to reduce the number of combinations
+		List<SquareBlob> squaresPruned = ConnectGridSquares.pruneSmallIslands(squares);
+
 		// given all the blobs, only consider N at one time until a valid target is found
-		return shuffleToFindTarget();
+		return shuffleToFindTarget(squaresPruned);
 	}
 
 	/**
@@ -150,7 +157,7 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 	 *
 	 * @return true of it worked
 	 */
-	private boolean shuffleToFindTarget() {
+	private boolean shuffleToFindTarget( List<SquareBlob> squares ) {
 		
 		int N = gridWidth*gridHeight;
 		if( squares.size() < N )
@@ -174,16 +181,17 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 			// assumes that all the items in the list are part of a target
 			// see if it fails internal sanity checks
 			try {
+				List<SquareBlob> subgraph = ConnectGridSquares.copy(list);
 				extractTarget = new ExtractOrderedTargetPoints();
-				extractTarget.process(list);
+				extractTarget.process(subgraph);
 
 				// additional validation checks
-				if( validateTarget(list)) {
+				if( validateTarget(subgraph)) {
 					success = true;
 					break;
 				}
 			} catch (InvalidTarget invalidTarget) {
-				System.out.println(invalidTarget.getMessage());
+//				System.out.println(invalidTarget.getMessage());
 			}
 
 			try {

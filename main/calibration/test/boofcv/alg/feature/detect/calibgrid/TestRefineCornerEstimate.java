@@ -50,7 +50,7 @@ public class TestRefineCornerEstimate {
 		alg.setInputs(derivX,derivY);
 
 		assertTrue(alg.process(0, 0, 20, 20));
-		System.out.println("found = "+alg.getX()+"  "+alg.getY());
+//		System.out.println("found = "+alg.getX()+"  "+alg.getY());
 		assertEquals(10, alg.getX(), 1e-8);
 		assertEquals(10,alg.getY(),1e-8);
 

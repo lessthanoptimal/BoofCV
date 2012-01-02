@@ -22,23 +22,66 @@ import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_I32;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Connects calibration grid squares together.
  *
  * @author Peter Abeles
  */
-// TODO require both nodes to have center line intersect side
-// TODO require line connecting to be a reasonable length relative to max side length
-// TODO modify DetectCalibrationTarget to not modify the grid!
 public class ConnectGridSquares {
 
+	/**
+	 * Finds the largest island in the graph and returns that
+	 */
+	public static List<SquareBlob> pruneSmallIslands(List<SquareBlob> blobs) {
+		blobs = new ArrayList<SquareBlob>(blobs);
+		List<SquareBlob> largest = new ArrayList<SquareBlob>();
+		
+		while( blobs.size() > 0 ) {
+			List<SquareBlob> c = findIsland(blobs.remove(0),blobs);
+			if( c.size() > largest.size() )
+				largest = c;
+		}
+
+		return largest;
+	}
+
+	/**
+	 * Given an initial node, it searches for every node which is connect to it.  Seed
+	 * is assumed to have already been removed from 'all'
+	 *
+	 */
+	public static List<SquareBlob> findIsland( SquareBlob seed , List<SquareBlob> all )
+	{
+		List<SquareBlob> ret = new ArrayList<SquareBlob>();
+		Stack<SquareBlob> open = new Stack<SquareBlob>();
+
+		ret.add(seed);
+		open.push(seed);
+		
+		while( open.size() > 0 ) {
+			SquareBlob s = open.pop();
+			
+			for( SquareBlob c : s.conn ) {
+				if( !ret.contains(c) ) {
+					all.remove(c);
+					ret.add(c);
+					open.add(c);
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 * For each blob it finds the blobs which are directly next to it.  Up to 4 blobs can be next to
 	 * any blob and two connected blobs should have the closes side approximately parallel.
 	 */
-	public static void connect( List<SquareBlob> blobs ) throws InvalidTarget {
+	public static void connect( List<SquareBlob> blobs ) {
 
 		LineSegment2D_F64 centerLine = new LineSegment2D_F64();
 		LineSegment2D_F64 cornerLine = new LineSegment2D_F64();
@@ -76,9 +119,17 @@ public class ConnectGridSquares {
 					// the sides of blob 'b'
 					if(Intersection2D_F64.intersection(cornerLine, centerLine, null) != null ) {
 						double d = c.center.distance2(b.center);
-						if( d < best ) {
-							best = d;
-							bestBlob = c;
+						if( d < best  ) {
+							// the physical distance between centers is 2 time a side's length
+							// and perspective distortion would only make it shorter,
+							// 2.5 = 2 + fudge factor
+							// NOTE: Could be improved by having it be the length of perpendicular sides
+							double max = Math.min(c.largestSide, b.largestSide)*2.5;
+							max *= max;
+							if( d < max ) {
+								best = d;
+								bestBlob = c;
+							}
 						}
 					}
 				}
@@ -88,10 +139,6 @@ public class ConnectGridSquares {
 					b.conn.add(bestBlob);
 				}
 			}
-
-			// corners will have two connections, sides 3, and inner ones 4
-			if( b.conn.size() < 2 && b.conn.size() > 4 )
-				throw new InvalidTarget("Bad number of square connections. "+b.conn.size());
 		}
 	}
 
@@ -110,5 +157,40 @@ public class ConnectGridSquares {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Creates a proper copy of the sub-graph removing any references to nodes not
+	 * in this sub-graph.
+	 */
+	public static List<SquareBlob> copy( List<SquareBlob> input ) {
+		List<SquareBlob> output = new ArrayList<SquareBlob>();
+
+		for( SquareBlob i : input ) {
+			SquareBlob o = new SquareBlob();
+			o.contour = i.contour;
+			o.corners = i.corners;
+			o.center = i.center;
+
+			o.largestSide = i.largestSide;
+			o.smallestSide = i.smallestSide;
+
+			output.add(o);
+		}
+
+		// only add connections if they are in the sub-graph
+		for( int index = 0; index < input.size(); index++ ) {
+			SquareBlob in = input.get(index);
+			SquareBlob out = output.get(index);
+
+			for( SquareBlob c : in.conn ) {
+				int i = input.indexOf(c);
+				if( i >= 0) {
+					out.conn.add(output.get(i));
+				}
+			}
+		}
+
+		return output;
 	}
 }

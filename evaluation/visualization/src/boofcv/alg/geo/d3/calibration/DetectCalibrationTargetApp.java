@@ -19,6 +19,7 @@
 package boofcv.alg.geo.d3.calibration;
 
 import boofcv.alg.feature.detect.calibgrid.DetectCalibrationTarget;
+import boofcv.alg.feature.detect.calibgrid.SquareBlob;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ProcessInput;
@@ -44,12 +45,6 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO improve filtering of noisy blobs
-//  -- If too many, filter by brightness uniformity?
-//  -- Compute a quality of polygon?
-//  Form a grid graph with all objects.
-//     * Prune islands
-//     * break off connections in which the distance is much  greater than either side
 public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 		extends SelectImagePanel implements ProcessInput , GridCalibPanel.Listener
 {
@@ -142,6 +137,8 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 			drawPoints(g2, targetPoints);
 		if( calibGUI.isShowNumbers())
 			drawNumbers(g2, targetPoints);
+		if( calibGUI.isShowGraph())
+			drawGraph(g2, alg.getSquares());
 
 		if( foundTarget )
 			calibGUI.setSuccessMessage("FOUND",true);
@@ -167,6 +164,25 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 		for( int i = 0; i < foundTarget.size(); i++ ) {
 			Point2D_I32 p = foundTarget.get(i);
 			VisualizeFeatures.drawPoint(g2, p.x, p.y, Color.RED);
+		}
+	}
+
+	private void drawGraph(Graphics2D g2, List<SquareBlob> squares) {
+
+		g2.setStroke(new BasicStroke(2.0f));
+		for( int i = 0; i < squares.size(); i++ ) {
+			SquareBlob p = squares.get(i);
+			Point2D_I32 c = p.center;
+
+			g2.setColor(Color.ORANGE);
+			for( SquareBlob w : p.conn ) {
+				g2.drawLine(c.x,c.y,w.center.x,w.center.y);
+			}
+		}
+		for( int i = 0; i < squares.size(); i++ ) {
+			SquareBlob p = squares.get(i);
+			Point2D_I32 c = p.center;
+			VisualizeFeatures.drawPoint(g2, c.x, c.y, Color.GREEN );
 		}
 	}
 
