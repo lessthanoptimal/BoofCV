@@ -51,7 +51,10 @@ public class SquareBlob {
 		center = FindQuadCorners.findAverage(contour);
 		compute();
 	}
-	
+
+	public SquareBlob() {
+	}
+
 	public void compute() {
 		Point2D_I32 a = corners.get(0);
 		Point2D_I32 b = corners.get(1);

@@ -45,6 +45,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	JCheckBox showBound;
 	JCheckBox showPoints;
 	JCheckBox showNumbers;
+	JCheckBox showGraph;
 
 	// selects threshold to create binary image from
 	JSpinner thresholdSpinner;
@@ -52,6 +53,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	boolean doShowBound = true;
 	boolean doShowPoints = true;
 	boolean doShowNumbers = true;
+	boolean doShowGraph = true;
 
 	Listener listener;
 	
@@ -83,6 +85,11 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		showNumbers.addActionListener(this);
 		showNumbers.setMaximumSize(showNumbers.getPreferredSize());
 
+		showGraph = new JCheckBox("Show Graph");
+		showGraph.setSelected(doShowGraph);
+		showGraph.addActionListener(this);
+		showGraph.setMaximumSize(showGraph.getPreferredSize());
+
 		thresholdSpinner = new JSpinner(new SpinnerNumberModel(thresholdLevel,0, 255, 20));
 		thresholdSpinner.addChangeListener(this);
 		thresholdSpinner.setMaximumSize(thresholdSpinner.getPreferredSize());
@@ -95,6 +102,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		addAlignLeft(showBound, this);
 		addAlignLeft(showPoints,this);
 		addAlignLeft(showNumbers,this);
+		addAlignLeft(showGraph,this);
 	}
 
 	@Override
@@ -110,6 +118,8 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 			doShowNumbers = showNumbers.isSelected();
 		} else if( e.getSource() == showPoints ) {
 			doShowPoints = showPoints.isSelected();
+		} else if( e.getSource() == showGraph ) {
+			doShowGraph = showGraph.isSelected();
 		}
 
 		listener.calibEventGUI();
@@ -150,6 +160,10 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 
 	public boolean isShowNumbers() {
 		return doShowNumbers;
+	}
+
+	public boolean isShowGraph() {
+		return doShowGraph;
 	}
 
 	public int getThresholdLevel() {
