@@ -91,7 +91,7 @@ public class HomographyStitchPanel extends JPanel {
 
 		distort.apply(colorB,work);
 
-		output = new BufferedImage(work.width,work.height,BufferedImage.TYPE_INT_BGR);
+		output = new BufferedImage(work.width,work.height,imageA.getType());
 		ConvertBufferedImage.convertTo(work,output);
 
 		// save the corners of the distorted image

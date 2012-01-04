@@ -137,10 +137,9 @@ public class ConvertRaster {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
 				for (; indexDst < indexDstEnd; indexDst++) {
-					// only BGR is allowed for ByteInterleaved
-					band3[indexDst] = srcData[indexSrc++];
-					band2[indexDst] = srcData[indexSrc++];
 					band1[indexDst] = srcData[indexSrc++];
+					band2[indexDst] = srcData[indexSrc++];
+					band3[indexDst] = srcData[indexSrc++];
 				}
 			}
 		} else {
@@ -181,10 +180,9 @@ public class ConvertRaster {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
 				for (; indexDst < indexDstEnd; indexDst++) {
-					// only BGR is allowed for ByteInterleaved
-					band3[indexDst] = srcData[indexSrc++] & 0xFF;
-					band2[indexDst] = srcData[indexSrc++] & 0xFF;
 					band1[indexDst] = srcData[indexSrc++] & 0xFF;
+					band2[indexDst] = srcData[indexSrc++] & 0xFF;
+					band3[indexDst] = srcData[indexSrc++] & 0xFF;
 				}
 			}
 		} else {
@@ -600,10 +598,9 @@ public class ConvertRaster {
 				int indexSrcEnd = indexSrc + src.width;
 
 				for (; indexSrc < indexSrcEnd; indexSrc++) {
-					// only BGR ordering is allowed byte ByteInterleaved
-					dstData[indexDst++] = band3[indexSrc];
-					dstData[indexDst++] = band2[indexSrc];
 					dstData[indexDst++] = band1[indexSrc];
+					dstData[indexDst++] = band2[indexSrc];
+					dstData[indexDst++] = band3[indexSrc];
 				}
 			}
 		} else {
@@ -645,10 +642,9 @@ public class ConvertRaster {
 				int indexSrcEnd = indexSrc + src.width;
 
 				for (; indexSrc < indexSrcEnd; indexSrc++) {
-					// only BGR ordering is allowed byte ByteInterleaved
-					dstData[indexDst++] = (byte)band3[indexSrc];
-					dstData[indexDst++] = (byte)band2[indexSrc];
 					dstData[indexDst++] = (byte)band1[indexSrc];
+					dstData[indexDst++] = (byte)band2[indexSrc];
+					dstData[indexDst++] = (byte)band3[indexSrc];
 				}
 			}
 		} else {

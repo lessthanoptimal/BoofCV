@@ -3,6 +3,16 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 
+Version : Alpha 0.4
+
+- Changed behavior of ConvertBufferedImage so that it won't automatically swap
+  bands in MultiSpecitral image
+  * orderBandsIntoRGB() has been provided to do that manually if needed
+- All automatic convert to/from BGR and been removed from ConvertRaster
+
+
+---------------------------------------------
 Date    : 2012/01/02
 Version : Alpha 0.3
 

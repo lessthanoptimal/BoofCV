@@ -225,4 +225,30 @@ public class TestConvertBufferedImage {
 
 		// could check to see that the pixels are not all uniform....
 	}
+	
+	@Test
+	public void orderBandsIntoRGB() {
+		MultiSpectral<ImageUInt8> input = new MultiSpectral<ImageUInt8>(ImageUInt8.class,10,10,3);
+
+		ImageUInt8 band0 = input.getBand(0);
+		ImageUInt8 band1 = input.getBand(1);
+		ImageUInt8 band2 = input.getBand(2);
+		
+		// test no swap first
+		ConvertBufferedImage.orderBandsIntoRGB(input,BufferedImage.TYPE_INT_RGB);
+		assertTrue(band0==input.getBand(0));
+		assertTrue(band1==input.getBand(1));
+		assertTrue(band2==input.getBand(2));
+
+		// check swaps now
+		ConvertBufferedImage.orderBandsIntoRGB(input,BufferedImage.TYPE_3BYTE_BGR);
+		assertTrue(band2==input.getBand(0));
+		assertTrue(band1==input.getBand(1));
+		assertTrue(band0==input.getBand(2));
+
+		ConvertBufferedImage.orderBandsIntoRGB(input,BufferedImage.TYPE_INT_BGR);
+		assertTrue(band0==input.getBand(0));
+		assertTrue(band1==input.getBand(1));
+		assertTrue(band2==input.getBand(2));
+	}
 }

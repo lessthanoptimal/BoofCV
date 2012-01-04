@@ -26,6 +26,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
+import java.lang.reflect.Array;
 
 /**
  * Functions for converting to and from {@link BufferedImage}.
@@ -293,13 +294,6 @@ public class ConvertBufferedImage {
 			dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),3);
 		}
 
-		boolean swapOrder = false;
-
-		if( src.getType() == BufferedImage.TYPE_3BYTE_BGR ||
-				src.getType() == BufferedImage.TYPE_INT_BGR ) {
-			swapOrder = true;
-		}
-
 		if( type == ImageUInt8.class ) {
 			try {
 				if (src.getRaster() instanceof ByteInterleavedRaster &&
@@ -330,16 +324,6 @@ public class ConvertBufferedImage {
 			}
 		} else {
 			throw new IllegalArgumentException("Band type not supported yet");
-		}
-
-		if( swapOrder ) {
-			T[] temp = (T[])new ImageSingleBand[dst.getNumBands()];
-			for( int i = 0; i < temp.length; i++ ) {
-				temp[temp.length-i-1] = dst.bands[i];
-			}
-			for( int i = 0; i < temp.length; i++ ) {
-				dst.bands[i] = temp[i];
-			}
 		}
 
 		return dst;
@@ -549,5 +533,30 @@ public class ConvertBufferedImage {
 		return storage;
 	}
 
+	/**
+	 * If a MultiSpectral was created from a BufferedImage its colors might not be in the expected order.
+	 * Invoking this function ensures that the image will have the expected ordering.
+	 */
+	public static <T extends ImageSingleBand>
+	void orderBandsIntoRGB( MultiSpectral<T> image , int bufferedImageType ) {
+		
+		boolean swap = false;
+		
+		if( bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
+				bufferedImageType == BufferedImage.TYPE_INT_BGR ) {
+			swap = true;
+		}
+		
+		if( swap ) {
+			T[] temp = (T[])Array.newInstance(image.getType(),3);
 
+			temp[0] = image.getBand(2);
+			temp[1] = image.getBand(1);
+			temp[2] = image.getBand(0);
+
+			image.bands[0] = temp[0];
+			image.bands[1] = temp[1];
+			image.bands[2] = temp[2];
+		}
+	}
 }
