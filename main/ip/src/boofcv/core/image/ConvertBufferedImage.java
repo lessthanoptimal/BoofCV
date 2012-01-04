@@ -538,14 +538,28 @@ public class ConvertBufferedImage {
 	 * Invoking this function ensures that the image will have the expected ordering.
 	 */
 	public static <T extends ImageSingleBand>
-	void orderBandsIntoRGB( MultiSpectral<T> image , int bufferedImageType ) {
+	void orderBandsIntoRGB( MultiSpectral<T> image , BufferedImage input ) {
 		
 		boolean swap = false;
-		
-		if( bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
-				bufferedImageType == BufferedImage.TYPE_INT_BGR ) {
-			swap = true;
+
+		// see if access to the raster is restricted or not
+		try {
+			WritableRaster raster = input.getRaster();
+			if( raster instanceof ByteInterleavedRaster ) {
+				((ByteInterleavedRaster)raster).getDataStorage();
+			} else if( raster instanceof IntegerInterleavedRaster ) {
+				((ByteInterleavedRaster)raster).getDataStorage();
+			}
+
+			int bufferedImageType = input.getType();
+			if( bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
+					bufferedImageType == BufferedImage.TYPE_INT_BGR ) {
+				swap = true;
+			}
+		} catch( java.security.AccessControlException e) {
+			// its in an applet or something and will need to use getRGB() to read/write from the image
 		}
+
 		
 		if( swap ) {
 			T[] temp = (T[])Array.newInstance(image.getType(),3);

@@ -126,7 +126,7 @@ public class RenderImageMotion<I extends ImageSingleBand, O extends ImageBase> {
 			ConvertBufferedImage.convertFrom(buffImage, frameMulti);
 
 			// make sure it's in an RGB format
-			ConvertBufferedImage.orderBandsIntoRGB((MultiSpectral)frameMulti,buffImage.getType());
+			ConvertBufferedImage.orderBandsIntoRGB((MultiSpectral)frameMulti,buffImage);
 
 			distorter.apply(frameMulti, imageMosaic,x0,y0,x1,y1);
 		} else {
