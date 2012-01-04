@@ -233,20 +233,24 @@ public class TestConvertBufferedImage {
 		ImageUInt8 band0 = input.getBand(0);
 		ImageUInt8 band1 = input.getBand(1);
 		ImageUInt8 band2 = input.getBand(2);
-		
+
+
 		// test no swap first
-		ConvertBufferedImage.orderBandsIntoRGB(input,BufferedImage.TYPE_INT_RGB);
+		BufferedImage orig = new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB);
+		ConvertBufferedImage.orderBandsIntoRGB(input,orig);
 		assertTrue(band0==input.getBand(0));
 		assertTrue(band1==input.getBand(1));
 		assertTrue(band2==input.getBand(2));
 
 		// check swaps now
-		ConvertBufferedImage.orderBandsIntoRGB(input,BufferedImage.TYPE_3BYTE_BGR);
+		orig = new BufferedImage(10,10,BufferedImage.TYPE_3BYTE_BGR);
+		ConvertBufferedImage.orderBandsIntoRGB(input,orig);
 		assertTrue(band2==input.getBand(0));
 		assertTrue(band1==input.getBand(1));
 		assertTrue(band0==input.getBand(2));
 
-		ConvertBufferedImage.orderBandsIntoRGB(input,BufferedImage.TYPE_INT_BGR);
+		orig = new BufferedImage(10,10,BufferedImage.TYPE_INT_BGR);
+		ConvertBufferedImage.orderBandsIntoRGB(input,orig);
 		assertTrue(band0==input.getBand(0));
 		assertTrue(band1==input.getBand(1));
 		assertTrue(band2==input.getBand(2));
