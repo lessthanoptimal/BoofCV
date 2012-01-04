@@ -161,9 +161,15 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 	}
 
 	public static void main( String args[] ) {
-		VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(ImageFloat32.class, ImageFloat32.class);
+		Class type = ImageFloat32.class;
+		Class derivType = type;
 
-		VideoListManager manager = new VideoListManager(ImageFloat32.class);
+//		Class type = ImageUInt8.class;
+//		Class derivType = ImageSInt16.class;
+		
+		VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(type,derivType);
+
+		VideoListManager manager = new VideoListManager(type);
 		manager.add("Plane 1", "MJPEG", "../data/applet/mosaic/airplane01.mjpeg");
 		manager.add("Plane 2", "MJPEG", "../data/applet/mosaic/airplane02.mjpeg");
 		manager.add("Shake", "MJPEG", "../data/applet/shake.mjpeg");

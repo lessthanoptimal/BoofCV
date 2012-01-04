@@ -72,7 +72,11 @@ public class NumericalJacobian<Observation,State> implements OptimizationDerivat
 			double x = model[i];
 			double h = x != 0 ? differenceScale*Math.abs(x) : differenceScale;
 
-			model[i] += h;
+			// takes in account round off error
+			double temp = x+h;
+			h = temp-x;
+			
+			model[i] = temp;
 			function.setModel(model);
 			function.estimate(state,outputModified);
 

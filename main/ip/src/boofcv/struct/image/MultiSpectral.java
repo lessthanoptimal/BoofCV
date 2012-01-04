@@ -23,8 +23,38 @@ import boofcv.core.image.GeneralizedImageOps;
 import java.lang.reflect.Array;
 
 /**
- * Image class for images that are composed of multiple bands.  Each band is a gray scale image of the same type.
- * Each of these images has the same width, height, startIndex, and stride.
+ * <p>
+ * An image class for images with multiple bands/colors where each band is stored as an independent 
+ * {@link ImageSingleBand}. MultiSpectral image fully supports all functions inside of 
+ * {@link ImageBase}. Each internal image has the same width, height, startIndex, and stride. 
+ * </p>
+ * 
+ * <p>
+ * For example, in a RGB image there would be three bands one for each color,
+ * and each color would be stored in its own gray scale image.  To access the image for a particular
+ * band call {@link #getBand(int)}. To get the RGB value for a pixel (x,y) one would need to:
+ * <pre>
+ * int red = image.get(0).get(x,y);
+ * int green = image.get(1).get(x,y);
+ * int blue = image.get(2).get(x,y);
+ * </pre>
+ * Setting the RGB value of pixel (x,y) is done in a similar manor:
+ * <pre>
+ * image.get(0).get(x,y,red);
+ * image.get(1).get(x,y,green);
+ * image.get(2).get(x,y,blue);
+ * </pre>
+ * </p>
+ * 
+ * <p>
+ * May image processing operations can be run independently on each color band. This is useful since many
+ * operations have been written for {@link ImageSingleBand}, but not MultiSpectral yet.
+ * <pre>
+ * for( int i = 0; i < image.numBands(); i++ ) {
+ *     SomeGrayImageFilter.process( image.getBand(0) );
+ * }    
+ * </pre>
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -40,6 +70,14 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageBase<MultiSpe
 	 */
 	public T bands[];
 
+	/**
+	 * Creates a MultiSpectral image with the specified properties.
+	 *
+	 * @param type The type of image which each band is stored as.
+	 * @param width Width of the image.
+	 * @param height Height of the image.
+	 * @param numBands Total number of bands.
+	 */
 	public MultiSpectral(Class<T> type, int width, int height, int numBands) {
 		this.type = type;
 		this.stride = width;
@@ -51,22 +89,42 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageBase<MultiSpe
 			bands[i] = GeneralizedImageOps.createSingleBand(type, width, height);
 		}
 	}
-
+	
+	/**
+	 * Declares internal arrays for storing each band, but not the images in each band.
+	 *
+	 * @param type The type of image which each band is stored as. 
+	 * @param numBands Number of bands in the image.
+	 */
 	protected MultiSpectral(Class<T> type, int numBands) {
 		this.type = type;
 		bands = (T[]) Array.newInstance(type, numBands);
 	}
-	
-	
 
+
+	/**
+	 * Type of image each band is stored as.
+	 * 
+	 * @return The type of ImageSingleBand which each band is stored as.
+	 */
 	public Class<T> getType() {
 		return type;
 	}
 
+	/**
+	 * Returns the number of bands or colors stored in this image.
+	 * 
+	 * @return Number of bands in the image.
+	 */
 	public int getNumBands() {
 		return bands.length;
 	}
 
+	/**
+	 * 
+	 * @param band Which band should be returned.
+	 * @return
+	 */
 	public T getBand(int band) {
 		if (band >= bands.length || band < 0)
 			throw new IllegalArgumentException("The specified band is out of bounds");

@@ -760,9 +760,19 @@ public class BoofTesting {
 			}
 		}
 
-		GImageSingleBand band1 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(0));
-		GImageSingleBand band2 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(1));
-		GImageSingleBand band3 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(2));
+		GImageSingleBand band1,band2,band3;
+		boolean swap = imgA.getType() == BufferedImage.TYPE_3BYTE_BGR ||
+				imgA.getType() == BufferedImage.TYPE_INT_BGR;
+
+		if( swap ) {
+			band1 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(2));
+			band2 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(1));
+			band3 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(0));
+		} else {
+			band1 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(0));
+			band2 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(1));
+			band3 = FactoryGeneralizedSingleBand.wrap(imgB.getBand(2));
+		}
 
 		for (int y = 0; y < imgA.getHeight(); y++) {
 			for (int x = 0; x < imgA.getWidth(); x++) {
