@@ -84,6 +84,7 @@ public class VideoInputApplet extends JApplet {
 		String directory = getDirectory(fileName);
 
 		AppletVideoListManager ret = new AppletVideoListManager(imageType,getCodeBase());
+		ret.setOwnerGUI(this);
 		try {
 			InputStreamReader isr = new InputStreamReader(new URL(getCodeBase(),fileName).openStream());
 			BufferedReader reader = new BufferedReader(isr);

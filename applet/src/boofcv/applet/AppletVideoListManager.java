@@ -25,8 +25,9 @@ import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageSingleBand;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -37,9 +38,18 @@ import java.util.List;
 public class AppletVideoListManager<T extends ImageSingleBand> extends VideoListManager {
 	URL codebase;
 
+	Component ownerGUI;
+	boolean done;
+	
+	int totalDownloaded;
+	
 	public AppletVideoListManager( Class<T> imageType , URL codebase) {
 		super(imageType);
 		this.codebase = codebase;
+	}
+
+	public void setOwnerGUI(Component ownerGUI) {
+		this.ownerGUI = ownerGUI;
 	}
 
 	@Override
@@ -49,8 +59,12 @@ public class AppletVideoListManager<T extends ImageSingleBand> extends VideoList
 		String n = ((String[])fileNames.get(labelIndex))[imageIndex];
 		URL url = null;
 		BufferedInputStream stream = null;
+
+		int fileSize = -1;
+
 		try {
 			url = new URL(codebase, n);
+            fileSize = url.openConnection().getContentLength();
 			stream = new BufferedInputStream(url.openStream());
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
@@ -58,13 +72,22 @@ public class AppletVideoListManager<T extends ImageSingleBand> extends VideoList
 			throw new RuntimeException(e);
 		}
 
+		// first read in the data byte stream and update the download status while doing so
+		ByteArrayInputStream byteStream;
+		try {
+			byteStream = readNetworkData(stream,fileSize);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		// now convert it into some other format
 		if( type.compareToIgnoreCase("JPEG_ZIP") == 0 ) {
 			VideoJpegZipCodec codec = new VideoJpegZipCodec();
-			List<byte[]> data = codec.read(stream);
+			List<byte[]> data = codec.read(byteStream);
 			return new JpegByteImageSequence<T>(imageType,data,true);
 		} else if( type.compareToIgnoreCase("MJPEG") == 0 ) {
 			VideoMjpegCodec codec = new VideoMjpegCodec();
-			List<byte[]> data = codec.read(stream);
+			List<byte[]> data = codec.read(byteStream);
 //			System.out.println("Loaded "+data.size()+" jpeg images!");
 			return new JpegByteImageSequence<T>(imageType,data,true);
 		} else {
@@ -72,5 +95,51 @@ public class AppletVideoListManager<T extends ImageSingleBand> extends VideoList
 		}
 
 		return null;
+	}
+
+	private ByteArrayInputStream readNetworkData(InputStream streamIn , int fileSize ) throws IOException {
+		totalDownloaded = 0;
+		done = false;
+		new ProcessThread(fileSize).start();
+		
+		ByteArrayOutputStream temp = new ByteArrayOutputStream(1024);
+		byte[] data = new byte[ 1024 ];
+		int length;
+		while( ( length = streamIn.read(data)) != -1 ) {
+			totalDownloaded += length;
+			temp.write(data,0,length);
+		}
+		done = true;
+		return new ByteArrayInputStream(temp.toByteArray());
+	}
+
+	/**
+	 * Displays a progress monitor and updates its state periodically
+	 */
+	public class ProcessThread extends Thread
+	{
+		ProgressMonitor progressMonitor;
+		public ProcessThread( int fileSize ) {
+			String text = String.format("Loading Data %d KiB",(fileSize/1024));
+			progressMonitor = new ProgressMonitor(ownerGUI, text, "", 0, fileSize);
+		}
+		
+
+		@Override
+		public void run() {
+			while( !done ) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						progressMonitor.setProgress(totalDownloaded);
+					}});
+				synchronized ( this ) {
+					try {
+						wait(100);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+			progressMonitor.close();
+		}
 	}
 }
