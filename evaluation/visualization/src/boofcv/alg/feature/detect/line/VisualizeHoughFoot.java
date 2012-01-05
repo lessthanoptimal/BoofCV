@@ -76,7 +76,7 @@ public class VisualizeHoughFoot<I extends ImageSingleBand, D extends ImageSingle
 		VisualizeHoughFoot<ImageFloat32,ImageFloat32> app =
 				new VisualizeHoughFoot<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-//		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
-		app.process(UtilImageIO.loadImage("data/lines_indoors.jpg"));
+//		app.process(UtilImageIO.loadImage("../data/evaluation/simple_objects.jpg"));
+		app.process(UtilImageIO.loadImage("../data/evaluation/lines_indoors.jpg"));
 	}
 }

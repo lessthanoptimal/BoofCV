@@ -548,7 +548,7 @@ public class ConvertBufferedImage {
 			if( raster instanceof ByteInterleavedRaster ) {
 				((ByteInterleavedRaster)raster).getDataStorage();
 			} else if( raster instanceof IntegerInterleavedRaster ) {
-				((ByteInterleavedRaster)raster).getDataStorage();
+				((IntegerInterleavedRaster)raster).getDataStorage();
 			}
 
 			int bufferedImageType = input.getType();

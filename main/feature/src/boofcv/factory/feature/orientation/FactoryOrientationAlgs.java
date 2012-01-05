@@ -127,7 +127,7 @@ public class FactoryOrientationAlgs {
 		if( imageType == ImageFloat32.class )
 			return (OrientationIntegral<T>)new ImplOrientationSlidingWindowIntegral_F32(numAngles,windowSize,radius,weighted, 4);
 		else if( imageType == ImageSInt32.class )
-			return (OrientationIntegral<T>)new ImplOrientationAverageIntegral_I32(radius,weighted);
+			return (OrientationIntegral<T>)new ImplOrientationSlidingWindowIntegral_I32(numAngles,windowSize,radius,weighted, 4);
 		else
 			throw new IllegalArgumentException("Image type not supported. "+imageType.getSimpleName());
 	}

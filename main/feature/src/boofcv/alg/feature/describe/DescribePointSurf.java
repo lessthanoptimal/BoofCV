@@ -134,15 +134,12 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 	 */
 	public SurfFeature describe( double x , double y ,
 								 double scale , double angle ,
-								 SurfFeature ret ) {
-		// some functions require an integer pixel coordinate, rounding is more accurate
-		int xInt = (int)Math.round(x);
-		int yInt = (int)Math.round(y);
-
+								 SurfFeature ret )
+	{
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
 		boolean isInBounds =
-				SurfDescribeOps.isInside(ii,xInt,yInt,(widthLargeGrid*widthSubRegion)/2,widthSample,scale,angle);
+				SurfDescribeOps.isInside(ii,x,y,(widthLargeGrid*widthSubRegion)/2,widthSample,scale,angle);
 
 		// declare the feature if needed
 		if( ret == null )
@@ -162,7 +159,7 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		SurfDescribeOps.normalizeFeatures(ret.value);
 
 		// Laplacian's sign
-		ret.laplacianPositive = computeLaplaceSign(xInt,yInt, scale);
+		ret.laplacianPositive = computeLaplaceSign((int)Math.round(x),(int)Math.round(y), scale);
 
 		return ret;
 	}

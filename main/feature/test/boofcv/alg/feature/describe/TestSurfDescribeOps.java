@@ -117,8 +117,8 @@ public class TestSurfDescribeOps {
 		int regionRadius = 10;
 		int kernelSize = 3;
 
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1));
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,2));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1, 0));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,2, 0));
 		// check lower boundary
 		for( int i = 0; i < 2; i++ ) {
 			boolean swap = i != 0;
@@ -134,14 +134,15 @@ public class TestSurfDescribeOps {
 		checkInside(c_x,height-regionRadius-1,false,regionRadius,kernelSize,1,false);
 	}
 
-	private void checkInside( int x , int y , boolean swap , int regionRadius, int kernelSize , double scale , boolean result )
+	private void checkInside( double x , double y , boolean swap , int regionRadius, int kernelSize ,
+							  double scale , boolean result )
 	{
 		if( swap ) {
-			int temp = x;
+			double temp = x;
 			x = y;
 			y = temp;
 		}
-		assertTrue(result == SurfDescribeOps.isInside(inputF32,x,y,regionRadius,kernelSize,scale));
+		assertTrue(result == SurfDescribeOps.isInside(inputF32,x,y,regionRadius,kernelSize,scale, 0));
 	}
 
 	@Test

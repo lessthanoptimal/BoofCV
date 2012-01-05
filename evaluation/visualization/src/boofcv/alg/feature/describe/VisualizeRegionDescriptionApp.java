@@ -165,9 +165,9 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 		VisualizeRegionDescriptionApp app = new VisualizeRegionDescriptionApp(imageType,derivType);
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("Cave","data/stitch/cave_01.jpg","data/stitch/cave_02.jpg");
-		manager.add("Kayak","data/stitch/kayak_02.jpg","data/stitch/kayak_03.jpg");
-		manager.add("Forest","data/scale/rainforest_01.jpg","data/scale/rainforest_02.jpg");
+		manager.add("Cave","../data/evaluation/stitch/cave_01.jpg","../data/evaluation/stitch/cave_02.jpg");
+		manager.add("Kayak","../data/evaluation/stitch/kayak_02.jpg","../data/evaluation/stitch/kayak_03.jpg");
+		manager.add("Forest","../data/evaluation/scale/rainforest_01.jpg","../data/evaluation/scale/rainforest_02.jpg");
 
 		app.setPreferredSize(new Dimension(500,500));
 		app.setSize(500,500);
