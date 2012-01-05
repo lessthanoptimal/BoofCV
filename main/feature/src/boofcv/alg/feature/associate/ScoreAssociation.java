@@ -28,10 +28,11 @@ package boofcv.alg.feature.associate;
 public interface ScoreAssociation<T> {
 
 	/**
-	 * Compte the fit score between the two features.
+	 * Compute the fit score between the two features.
+	 *
 	 * @param a first feature
 	 * @param b second feature
-	 * @return Quality of fit score.
+	 * @return Quality of fit score.  Lower is better.
 	 */
 	public double score( T a , T b );
 

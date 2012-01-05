@@ -31,6 +31,19 @@ import boofcv.alg.feature.associate.ScoreAssociation;
  */
 public class FactoryAssociation {
 
+	/**
+	 * Returns an algorithm for associating features together which uses a brute force greedy algorithm.
+	 * See {@link AssociateGreedy} for details.
+	 * 
+	 * @param score Computes the fit score between two features.
+	 * @param maxError Maximum allowed error/fit score between two features
+	 * @param maxMatches  Maximum number of matches returned.  If more than this are found then only the ones with the 
+	 *                  best fit score are returned.
+	 * @param backwardsValidation If true associations are validated by associating in the reverse direction.  If the 
+	 *                  forward and reverse matches fit an association is excepted.
+	 * @param <D> Data structure being associated
+	 * @return 
+	 */
 	public static <D> GeneralAssociation<D>
 	greedy( ScoreAssociation<D> score ,
 			double maxError ,

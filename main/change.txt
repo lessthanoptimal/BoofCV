@@ -10,7 +10,12 @@ Version : Alpha 0.4
   bands in MultiSpecitral image
   * orderBandsIntoRGB() has been provided to do that manually if needed
 - All automatic convert to/from BGR and been removed from ConvertRaster
-
+- Fixed SURF related issue
+  * Image bounds check was being incorrectly performed for integral image
+    orientation estimation algorithms (Thanks Oleg Chernoguz for pointing this out)
+  * FactoryOrientationAlgs.sliding_ii() was creating an average orienation alg for I32 images
+  * Some coordinates were integer instead of double
+- Added comments to several factories and other classes
 
 ---------------------------------------------
 Date    : 2012/01/02

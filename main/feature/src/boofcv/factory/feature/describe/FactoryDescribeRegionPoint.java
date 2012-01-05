@@ -49,6 +49,8 @@ public class FactoryDescribeRegionPoint {
 	 * to illumination, orientation, and scale.
 	 * </p>
 	 *
+	 * @see DescribePointSurf
+	 *
 	 * @param isOriented True for orientation invariant.
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
@@ -73,6 +75,8 @@ public class FactoryDescribeRegionPoint {
 	 * than {@link #surf(boolean, Class)}, but produces more stable results.
 	 * </p>
 	 *
+	 * @see DescribePointSurf
+	 *
 	 * @param isOriented True for orientation invariant.
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
@@ -91,11 +95,23 @@ public class FactoryDescribeRegionPoint {
 		return new WrapDescribeSurf<T,II>( alg ,orientation);
 	}
 
+	/**
+	 * Steerable Gaussian descriptor normalized by 1st order gradient.
+	 *
+	 * @see DescribePointGaussian12
+	 *
+	 * @param radius How large the kernel should be. Try 20.
+	 * @param imageType Type of input image.
+	 * @param derivType Type of image the gradient is.
+	 * @param <T> Input image type
+	 * @param <D> Derivative type
+	 * @return Steerable gaussian descriptor.
+	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	DescribeRegionPoint<T> gaussian12( int radius ,Class<T> imageType , Class<D> derivType ) {
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-		DescribePointGaussian12<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian12(radius,imageType);
+		DescribePointGaussian12<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian12(radius, imageType);
 
 		return new WrapDescribeGaussian12<T,D>(steer,gradient,imageType,derivType);
 	}
@@ -105,7 +121,7 @@ public class FactoryDescribeRegionPoint {
 													Class<T> imageType , Class<D> derivType ) {
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-		DescribePointSteerable2D<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian(normalized,-1,radius,imageType);
+		DescribePointSteerable2D<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian(normalized, -1, radius, imageType);
 
 		return new WrapDescribeSteerable<T,D>(steer,gradient,imageType,derivType);
 	}
@@ -115,6 +131,9 @@ public class FactoryDescribeRegionPoint {
 	 * The BRIEF descriptor is HORRIBLY inefficient when used through this interface.  This functionality is only
 	 * provided for testing and validation purposes.
 	 * </p>
+	 *
+	 * @see boofcv.alg.feature.describe.DescribePointBrief
+	 * @see boofcv.alg.feature.describe.DescribePointBriefSO
 	 *
 	 * @param radius Region's radius.  Typical value is 16.
 	 * @param numPoints Number of feature/points.  Typical value is 512.
@@ -147,6 +166,8 @@ public class FactoryDescribeRegionPoint {
 	 * Creates a region descriptor based on pixel intensity values alone.  A classic and fast to compute
 	 * descriptor, but much less stable than more modern ones.
 	 *
+	 * @see boofcv.alg.feature.describe.DescribePointPixelRegion
+	 *
 	 * @param regionWidth How wide the pixel region is.
 	 * @param regionHeight How tall the pixel region is.
 	 * @param imageType Type of image it will process.
@@ -161,6 +182,8 @@ public class FactoryDescribeRegionPoint {
 	/**
 	 * Creates a region descriptor based on normalized pixel intensity values alone.  This descriptor
 	 * is designed to be light invariance, but is still less stable than more modern ones.
+	 *
+	 * @see boofcv.alg.feature.describe.DescribePointPixelRegionNCC
 	 *
 	 * @param regionWidth How wide the pixel region is.
 	 * @param regionHeight How tall the pixel region is.

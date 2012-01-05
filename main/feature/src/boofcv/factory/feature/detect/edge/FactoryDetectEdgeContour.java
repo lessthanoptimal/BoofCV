@@ -29,22 +29,43 @@ import boofcv.struct.image.ImageSingleBand;
 
 
 /**
- * Factory for creating {@link boofcv.abst.feature.detect.edge.DetectEdgeContour}.
+ * Factory for creating algorithms that implement {@link boofcv.abst.feature.detect.edge.DetectEdgeContour}.
  *
  * @author Peter Abeles
  */
 public class FactoryDetectEdgeContour {
 
+	/**
+	 * Detects the edge of an object using the canny edge detector.  This edge detector tends to work
+	 * well but can be slower than others.
+	 *
+	 * @see CannyEdgeContour
+	 *
+	 * @param threshLow Low threshold for flagging edges
+	 * @param threshHigh High threshold for flagging edges.
+	 * @param imageType Type of input image.
+	 * @param derivType Type of image derivative.
+	 * @return Canny edge detector
+	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	DetectEdgeContour<T> canny( float threshLow , float threshHigh ,
 								Class<T> imageType , Class<D> derivType )
 	{
+		// blurring the image first
 		BlurFilter<T> blur = FactoryBlurFilter.gaussian(imageType,-1,2);
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
 		return new CannyEdgeContour<T,D>(blur,gradient,threshLow,threshHigh);
 	}
 
+	/**
+	 * Finds the contour of shapes by thresholding the image then detecting pixels which lie
+	 * along the edges of the binary image.
+	 *
+	 * @param threshold Threshold for creating binary image.
+	 * @param down Should it threshold up or down.
+	 * @return Binary image based contour
+	 */
 	public static <T extends ImageSingleBand>
 	DetectEdgeContour<T> binarySimple( double threshold , boolean down )
 	{
