@@ -33,7 +33,10 @@ import java.util.List;
 
 
 /**
- * Implementation of canny edge detector.
+ * Implementation of canny edge detector.  The canny edge detector detects the edges of objects
+ * using a hysteresis threshold.  When scanning the image pixels with edge intensities below
+ * the high threshold are ignored.  After a pixel is found that exceeds the high threshold any
+ * pixel that is connect to it directly or indirectly just needs to exceed the low threshold.
  *
  * @author Peter Abeles
  */

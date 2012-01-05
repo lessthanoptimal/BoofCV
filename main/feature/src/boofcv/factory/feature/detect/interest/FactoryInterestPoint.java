@@ -34,7 +34,8 @@ import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Factory for creating/wrapping interest points detectors.
+ * Factory for creating interest point detectors which conform to the {@link InterestPointDetector}
+ * interface.
  *
  * @author Peter Abeles
  */

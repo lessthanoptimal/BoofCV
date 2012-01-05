@@ -25,9 +25,18 @@ import pja.storage.GrowQueue_I32;
 
 
 /**
- * Different variants of greedy association for objects described by a {@link TupleDesc_F64}.  An
- * object is associated with whichever object has the best fit score.  Each variant is different
- * in how it scores this fit.
+ * <p>
+ * Brute force greedy association for objects described by a {@link TupleDesc_F64}.  An
+ * object is associated with whichever object has the best fit score and every possible combination
+ * is examined.  If there are a large number of features this can be quite slow.
+ * </p>
+ *
+ * <p>
+ * Optionally, backwards validation can be used to reduce the number of false associations.
+ * Backwards validation works by checking to see if two objects are mutually the best association
+ * for each other.  First an association is found from src to dst, then the best fit in dst is
+ * associated with feature in src.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -54,6 +63,12 @@ public class AssociateGreedy<T> {
 		this.backwardsValidation = backwardsValidation;
 	}
 
+	/**
+	 * Associates the two sets objects against each other by minimizing fit score.
+	 *
+	 * @param src Source list.
+	 * @param dst Destination list.
+	 */
 	public void associate( FastQueue<T> src ,
 						   FastQueue<T> dst )
 	{
@@ -100,10 +115,23 @@ public class AssociateGreedy<T> {
 		}
 	}
 
+	/**
+	 * Returns a list of association pairs.  Each element in the returned list corresponds
+	 * to an element in the src list.  The value contained in the index indicate which element
+	 * in the dst list that object was associated with.  If a value of -1 is stored then
+	 * no association was found.
+	 *
+	 * @return Array containing associations by src index.
+	 */
 	public int[] getPairs() {
 		return pairs.data;
 	}
 
+	/**
+	 * Quality of fit scores for each association.  Lower fit scores are better.
+	 *
+	 * @return Array of fit sources by src index.
+	 */
 	public double[] getFitQuality() {
 		return fitQuality.data;
 	}
