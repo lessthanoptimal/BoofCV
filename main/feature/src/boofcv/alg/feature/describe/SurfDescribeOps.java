@@ -61,11 +61,11 @@ public class SurfDescribeOps {
 	 * @param derivY Derivative y wavelet output. length = radiusRegions*radiusRegions
 	 */
 	public static <T extends ImageSingleBand>
-	void gradient(T ii, int c_x, int c_y,
+	void gradient(T ii, double c_x, double c_y,
 				  int radiusRegion, int kernelWidth, double scale,
 				  boolean useHaar, double[] derivX, double derivY[])
 	{
-		ImplSurfDescribeOps.naiveGradient(ii,c_x,c_y, radiusRegion, kernelWidth, scale, useHaar, derivX,derivY);
+		ImplSurfDescribeOps.naiveGradient(ii, c_x, c_y, radiusRegion, kernelWidth, scale, useHaar, derivX, derivY);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class SurfDescribeOps {
 	 * of the image.  This includes the convolution kernel's radius.
 	 */
 	public static
-	void gradient_noborder( ImageFloat32 ii , int c_x , int c_y ,
+	void gradient_noborder( ImageFloat32 ii , double c_x , double c_y ,
 							int radius , int kernelWidth , double scale,
 							float[] derivX , float[] derivY )
 	{
@@ -85,7 +85,7 @@ public class SurfDescribeOps {
 	 * of the image.  This includes the convolution kernel's radius.
 	 */
 	public static
-	void gradient_noborder( ImageSInt32 ii , int c_x , int c_y ,
+	void gradient_noborder( ImageSInt32 ii , double c_x , double c_y ,
 							int radius , int kernelWidth , double scale,
 							int[] derivX , int[] derivY )
 	{
@@ -131,57 +131,22 @@ public class SurfDescribeOps {
 
 	/**
 	 * Checks to see if the region is contained inside the image.  This includes convolution
-	 * kernel.
-	 *
-	 * @param c_x Center of the interest point.
-	 * @param c_y Center of the interest point.
-	 * @param radiusRegions Radius in pixels of the whole region at a scale of 1
-	 * @param kernelWidth Size of the kernel's width in pixels at a scale of 1
-	 * @param scale Scale factor for the region.
-	 */
-	public static <T extends ImageSingleBand>
-	boolean isInside( T ii , int c_x , int c_y , int radiusRegions , int kernelWidth , double scale) {
-
-		// size of the convolution kernel
-		kernelWidth = (int)Math.ceil(kernelWidth*scale);
-		int kernelRadius = kernelWidth/2;
-
-		// find the radius of the whole area being sampled
-		int radius = (int)Math.ceil(radiusRegions*scale);
-
-		// integral image convolutions sample the pixel before the region starts
-		// which is why the extra minus one is there
-		int kernelPaddingMinus = -radius-kernelRadius-1;
-		int kernelPaddingPlus = radius+kernelRadius;
-
-		// compute the new bounds and see if its inside
-		int x0 = c_x+kernelPaddingMinus;
-		if( x0 < 0 ) return false;
-		int x1 = c_x+kernelPaddingPlus;
-		if( x1 >= ii.width ) return false;
-		int y0 = c_y+kernelPaddingMinus;
-		if( y0 < 0 ) return false;
-		int y1 = c_y+kernelPaddingPlus;
-		if( y1 >= ii.height) return false;
-
-		return true;
-	}
-
-	/**
-	 * Checks to see if the region is contained inside the image.  This includes convolution
 	 * kernel.  Take in account the orientation of the region.
 	 *
-	 * @param c_x Center of the interest point.
-	 * @param c_y Center of the interest point.
+	 * @param X Center of the interest point.
+	 * @param Y Center of the interest point.
 	 * @param radiusRegions Radius in pixels of the whole region at a scale of 1
 	 * @param kernelSize Size of the kernel in pixels at a scale of 1
 	 * @param scale Scale factor for the region.
 	 * @param theta Orientation of the region
 	 */
 	public static <T extends ImageSingleBand>
-	boolean isInside( T ii , int c_x , int c_y , int radiusRegions , int kernelSize ,
+	boolean isInside( T ii , double X , double Y , int radiusRegions , int kernelSize ,
 					  double scale, double theta )
 	{
+		int c_x = (int)Math.round(X);
+		int c_y = (int)Math.round(Y);
+		
 		kernelSize = (int)Math.ceil(kernelSize*scale);
 		int kernelRadius = kernelSize/2+(kernelSize%2);
 
@@ -194,15 +159,17 @@ public class SurfDescribeOps {
 		int kernelPaddingPlus = radius+kernelRadius;
 
 		// take in account the rotation
-		double c = Math.cos(theta);
-		double s = Math.sin(theta);
-		double xx = Math.abs(c*kernelPaddingMinus - s*kernelPaddingMinus);
-		double yy = Math.abs(s*kernelPaddingMinus + c*kernelPaddingMinus);
+		if( theta != 0 ) {
+			double c = Math.cos(theta);
+			double s = Math.sin(theta);
+			double xx = Math.abs(c*kernelPaddingMinus - s*kernelPaddingMinus);
+			double yy = Math.abs(s*kernelPaddingMinus + c*kernelPaddingMinus);
 
-		double delta = xx>yy? xx - kernelPaddingMinus : yy - kernelPaddingMinus;
+			double delta = xx>yy? xx - kernelPaddingMinus : yy - kernelPaddingMinus;
 
-		kernelPaddingMinus += (int)Math.ceil(delta);
-		kernelPaddingPlus += (int)Math.ceil(delta);
+			kernelPaddingMinus += (int)Math.ceil(delta);
+			kernelPaddingPlus += (int)Math.ceil(delta);
+		}
 
 		// compute the new bounds and see if its inside
 		int x0 = c_x-kernelPaddingMinus;

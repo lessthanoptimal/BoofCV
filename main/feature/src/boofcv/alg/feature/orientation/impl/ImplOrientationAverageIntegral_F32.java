@@ -59,16 +59,13 @@ public class ImplOrientationAverageIntegral_F32
 	}
 
 	@Override
-	public double compute(double X, double Y) {
-
-		int c_x = (int)X;
-		int c_y = (int)Y;
+	public double compute(double x_c, double c_y) {
 
 		// use a faster algorithm if it is entirely inside
-		if( SurfDescribeOps.isInside(ii,c_x,c_y,radius,5,scale))  {
-			SurfDescribeOps.gradient_noborder(ii,c_x,c_y,radius,4,scale,derivX,derivY);
+		if( SurfDescribeOps.isInside(ii,x_c,c_y,radius,5,scale,0))  {
+			SurfDescribeOps.gradient_noborder(ii,x_c,c_y,radius,4,scale,derivX,derivY);
 		} else {
-			SurfDescribeOps.gradient(ii,c_x,c_y,radius,4,scale, false, borderDerivX,borderDerivY);
+			SurfDescribeOps.gradient(ii,x_c,c_y,radius,4,scale, false, borderDerivX,borderDerivY);
 			BoofMiscOps.convertTo_F32(borderDerivX,derivX);
 			BoofMiscOps.convertTo_F32(borderDerivY,derivY);
 		}

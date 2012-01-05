@@ -80,8 +80,8 @@ public class VisualizeHoughPolar<I extends ImageSingleBand, D extends ImageSingl
 		VisualizeHoughPolar<ImageFloat32,ImageFloat32> app =
 				new VisualizeHoughPolar<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-		app.process(UtilImageIO.loadImage("data/simple_objects.jpg"));
-//		app.process(UtilImageIO.loadImage("data/lines_indoors.jpg"));
-//		app.process(UtilImageIO.loadImage("data/outdoors01.jpg"));
+		app.process(UtilImageIO.loadImage("../data/evaluation/simple_objects.jpg"));
+//		app.process(UtilImageIO.loadImage("../data/evaluation/lines_indoors.jpg"));
+//		app.process(UtilImageIO.loadImage("../data/evaluation/outdoors01.jpg"));
 	}
 }

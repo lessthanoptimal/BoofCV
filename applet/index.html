@@ -3,16 +3,17 @@
       <title>BoofCV Applet</title>
   </head>
   <body>
+
       <h1>Applet below</h1>
       <hr>
-      <applet archive="BoofCV_Applet.jar"
-	      code=boofcv.applet.VideoInputApplet.class width=640 height=510>
-          <param name="panelPath" value="boofcv.alg.geo.d2.VideoStabilizePointApp">
-          <param name="dataset" value="data/stabilize.txt">
+      <applet code="boofcv.applet.VideoInputApplet.class" width="1200" height="450" archive="BoofCV_Applet.jar">
+	<param name="panelPath" value="boofcv.alg.geo.d2.VideoStabilizeSequentialPointApp">
 
-	alt="Your browser understands the &lt;APPLET&gt; tag but isn't running the applet, for some reason."
+	<param name="dataset" value="data/stabilize.txt">
+alt="Your browser understands the &lt;APPLET&gt; tag but is not running the applet, for some reason."
 	Your browser is completely ignoring the &lt;APPLET&gt; tag!
       </applet>
+
       <hr>
   </body>
 </html>

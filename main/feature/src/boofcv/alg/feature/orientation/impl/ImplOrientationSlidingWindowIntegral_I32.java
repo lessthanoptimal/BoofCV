@@ -77,12 +77,10 @@ public class ImplOrientationSlidingWindowIntegral_I32
 	}
 
 	@Override
-	public double compute(double X, double Y) {
+	public double compute(double c_x, double c_y) {
 
-		int c_x = (int)X;
-		int c_y = (int)Y;
 		// use a faster algorithm if it is entirely inside
-		if( SurfDescribeOps.isInside(ii,c_x,c_y,radius,sampleKernelWidth,scale))  {
+		if( SurfDescribeOps.isInside(ii,c_x,c_y,radius,sampleKernelWidth,scale, 0))  {
 			SurfDescribeOps.gradient_noborder(ii,c_x,c_y,radius,sampleKernelWidth,scale,derivX,derivY);
 		} else {
 			SurfDescribeOps.gradient(ii,c_x,c_y,radius,sampleKernelWidth,scale, true, borderDerivX,borderDerivY);
