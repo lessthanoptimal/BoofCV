@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 
+Date    : 2012/01/06
 Version : Alpha 0.4
 
 - Changed behavior of ConvertBufferedImage so that it won't automatically swap
@@ -16,6 +16,7 @@ Version : Alpha 0.4
   * FactoryOrientationAlgs.sliding_ii() was creating an average orienation alg for I32 images
   * Some coordinates were integer instead of double
 - Added comments to several factories and other classes
+- Added ant script for examples and readme.txt explaining how to use it
 
 ---------------------------------------------
 Date    : 2012/01/02
