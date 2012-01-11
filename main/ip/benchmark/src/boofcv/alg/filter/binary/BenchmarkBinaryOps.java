@@ -21,9 +21,9 @@ package boofcv.alg.filter.binary;
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryNaiveOps;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageUInt8;
+import com.google.caliper.Runner;
+import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -32,197 +32,150 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class BenchmarkBinaryOps {
+public class BenchmarkBinaryOps extends SimpleBenchmark {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
-	static long TEST_TIME = 1000;
 
-	static ImageUInt8 input;
-	static ImageUInt8 output;
+	static ImageUInt8 input = new ImageUInt8(imgWidth, imgHeight);
+	static ImageUInt8 output = new ImageUInt8(imgWidth, imgHeight);
 
-	public static class NaiveErode4 extends PerformerBase {
-		@Override
-		public void process() {
+	public BenchmarkBinaryOps() {
+		Random rand = new Random(234);
+		// test structures and unstructured images
+		// naive is some times faster in unstructured because it can escape earlier
+		ImageTestingOps.randomize(input, rand, 0, 1);
+//		ImageTestingOps.fillRectangle(input,1,100,200,150,100);
+	}
+
+	public int timeNaiveErode4(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryNaiveOps.erode4(input, output);
-		}
+		return 0;
 	}
 
-	public static class NaiveErode8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeNaiveErode8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryNaiveOps.erode8(input, output);
-		}
+		return 0;
 	}
 
-	public static class NaiveDilate4 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeNaiveDilate4(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryNaiveOps.dilate4(input, output);
-		}
+		return 0;
 	}
 
-	public static class NaiveDilate8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeNaiveDilate8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryNaiveOps.dilate8(input, output);
-		}
+		return 0;
 	}
 
-	public static class NaiveEdge4 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeNaiveEdge4(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryNaiveOps.edge4(input, output);
-		}
+		return 0;
 	}
 
-	public static class NaiveEdge8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeNaiveEdge8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryNaiveOps.edge8(input, output);
-		}
+		return 0;
 	}
 
-	public static class NaiveRemovePointNoise extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeNaiveRemovePointNoise(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryNaiveOps.removePointNoise(input, output);
-		}
+		return 0;
 	}
 
-	public static class InnerErode4 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeInnerErode4(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryInnerOps.erode4(input, output);
-		}
+		return 0;
 	}
 
-	public static class InnerErode8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeInnerErode8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryInnerOps.erode8(input, output);
-		}
+		return 0;
 	}
 
-	public static class InnerDilate4 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeInnerDilate4(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryInnerOps.dilate4(input, output);
-		}
+		return 0;
 	}
 
-	public static class InnerDilate8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeInnerDilate8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryInnerOps.dilate8(input, output);
-		}
+		return 0;
 	}
 
-	public static class InnerEdge4 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeInnerEdge4(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryInnerOps.edge4(input, output);
-		}
+		return 0;
 	}
 
-	public static class InnerEdge8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeInnerEdge8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryInnerOps.edge8(input, output);
-		}
+		return 0;
 	}
 
-	public static class InnerRemovePointNoise extends PerformerBase {
-		@Override
-		public void process() {
-			ImplBinaryInnerOps.edge8(input, output);
-		}
+	public int timeInnerRemovePointNoise(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplBinaryInnerOps.removePointNoise(input, output);
+		return 0;
 	}
 
-	public static class Erode4 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeErode4(int reps) {
+		for( int i = 0; i < reps; i++ )
 			BinaryImageOps.erode4(input, output);
-		}
+		return 0;
 	}
 
-	public static class Dilate4 extends PerformerBase {
-		@Override
-		public void process() {
-			BinaryImageOps.dilate4(input, output);
-		}
-	}
-
-	public static class Edge4 extends PerformerBase {
-		@Override
-		public void process() {
-			BinaryImageOps.edge4(input, output);
-		}
-	}
-
-	public static class Erode8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeErode8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			BinaryImageOps.erode8(input, output);
-		}
+		return 0;
 	}
 
-	public static class Dilate8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeDilate4(int reps) {
+		for( int i = 0; i < reps; i++ )
+			BinaryImageOps.dilate4(input, output);
+		return 0;
+	}
+
+	public int timeDilate8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			BinaryImageOps.dilate8(input, output);
-		}
+		return 0;
 	}
 
-	public static class Edge8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeEdge4(int reps) {
+		for( int i = 0; i < reps; i++ )
+			BinaryImageOps.edge4(input, output);
+		return 0;
+	}
+
+	public int timeEdge8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			BinaryImageOps.edge8(input, output);
-		}
+		return 0;
 	}
 
-	public static class RemovePointNoise extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeRemovePointNoise(int reps) {
+		for( int i = 0; i < reps; i++ )
 			BinaryImageOps.removePointNoise(input, output);
-		}
+		return 0;
 	}
 
 	public static void main(String args[]) {
-		input = new ImageUInt8(imgWidth, imgHeight);
-		output = new ImageUInt8(imgWidth, imgHeight);
-		Random rand = new Random(234);
-		ImageTestingOps.randomize(input, rand, 0, 1);
-
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new Erode4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new NaiveErode4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new InnerErode4(), TEST_TIME);
-		System.out.println();
-		ProfileOperation.printOpsPerSec(new Erode8(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new NaiveErode8(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new InnerErode8(), TEST_TIME);
-		System.out.println();
-		ProfileOperation.printOpsPerSec(new Dilate4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new NaiveDilate4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new InnerDilate4(), TEST_TIME);
-		System.out.println();
-		ProfileOperation.printOpsPerSec(new Dilate8(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new NaiveDilate8(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new InnerDilate8(), TEST_TIME);
-		System.out.println();
-		ProfileOperation.printOpsPerSec(new Edge4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new NaiveEdge4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new InnerEdge4(), TEST_TIME);
-		System.out.println();
-		ProfileOperation.printOpsPerSec(new Edge8(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new NaiveEdge8(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new InnerEdge8(), TEST_TIME);
-		System.out.println();
-		ProfileOperation.printOpsPerSec(new RemovePointNoise(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new NaiveRemovePointNoise(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new InnerRemovePointNoise(), TEST_TIME);
-
+		Runner.main(BenchmarkBinaryOps.class, args);
 	}
 }

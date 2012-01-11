@@ -20,10 +20,10 @@ package boofcv.alg.filter.binary;
 
 import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import com.google.caliper.Runner;
+import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -32,71 +32,57 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class BenchmarkBinaryBlobLabeling {
+public class BenchmarkBinaryBlobLabeling extends SimpleBenchmark {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
-	static long TEST_TIME = 1000;
 
-	static ImageUInt8 input;
-	static ImageSInt32 output;
+	static ImageUInt8 input = new ImageUInt8(imgWidth, imgHeight);
+	static ImageSInt32 output = new ImageSInt32(imgWidth, imgHeight);
 
+	public BenchmarkBinaryBlobLabeling() {
+		Random rand = new Random(234);
+		ImageTestingOps.randomize(input, rand, 0, 1);
+	}
 
-	public static class Normal8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeNormal8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryBlobLabeling.quickLabelBlobs8(input, output);
-		}
+		return 0;
 	}
 
-	public static class Normal4 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeNormal4(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryBlobLabeling.quickLabelBlobs4(input, output);
-		}
+		return 0;
 	}
 
-	public static class Naive8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeNaive8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input, output);
-		}
+		return 0;
 	}
 
-	public static class Naive4 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeNaive4(int reps) {
+		for( int i = 0; i < reps; i++ )
 			ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input, output);
-		}
+		return 0;
 	}
 
-	public static class Full8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeFull8(int reps) {
+		for( int i = 0; i < reps; i++ )
 			BinaryImageOps.labelBlobs8(input, output);
-		}
+		return 0;
 	}
 
-	public static class Full4 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeFull4(int reps) {
+		for( int i = 0; i < reps; i++ )
 			BinaryImageOps.labelBlobs4(input, output);
-		}
+		return 0;
 	}
 
 	public static void main(String args[]) {
-		input = new ImageUInt8(imgWidth, imgHeight);
-		output = new ImageSInt32(imgWidth, imgHeight);
-		Random rand = new Random(234);
-		ImageTestingOps.randomize(input, rand, 0, 1);
+		System.out.println("=========  Profile Image Size "+ imgWidth +" x "+ imgHeight  +" ==========");
 
-		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-		System.out.println();
-
-		ProfileOperation.printOpsPerSec(new Normal8(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Normal4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Naive8(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Naive4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Full8(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Full4(), TEST_TIME);
+		Runner.main(BenchmarkBinaryBlobLabeling.class, args);
 	}
 }
