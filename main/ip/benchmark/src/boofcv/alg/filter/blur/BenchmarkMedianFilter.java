@@ -22,12 +22,13 @@ import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInnerNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import com.google.caliper.Param;
+import com.google.caliper.Runner;
+import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -35,97 +36,68 @@ import java.util.Random;
  * Benchmark for different convolution operations.
  * @author Peter Abeles
  */
-public class BenchmarkMedianFilter {
+public class BenchmarkMedianFilter extends SimpleBenchmark {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
-	static int radius;
 	static long TEST_TIME = 1000;
 
-	static ImageFloat32 imgFloat32;
-	static ImageFloat32 out_F32;
-	static ImageUInt8 imgInt8;
-	static ImageSInt16 imgInt16;
-	static ImageUInt8 out_I8;
-	static ImageSInt16 out_I16;
-	static ImageSInt32 out_I32;
+	static ImageFloat32 imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
+	static ImageFloat32 out_F32 = new ImageFloat32(imgWidth,imgHeight);
+	static ImageUInt8 imgInt8 = new ImageUInt8(imgWidth,imgHeight);
+	static ImageSInt16 imgInt16 = new ImageSInt16(imgWidth,imgHeight);
+	static ImageUInt8 out_I8 = new ImageUInt8(imgWidth,imgHeight);
+	static ImageSInt16 out_I16 = new ImageSInt16(imgWidth,imgHeight);
+	static ImageSInt32 out_I32 = new ImageSInt32(imgWidth,imgHeight);
 
-	public static class BlurOps_I8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			BlurImageOps.median(imgInt8,out_I8,radius);
-		}
-	}
+	// iterate through different sized kernel radius
+	@Param({"1", "2", "3", "5","10"}) private int radius;
 
-	public static class BlurOps_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			BlurImageOps.median(imgFloat32,out_F32,radius);
-		}
-	}
-
-	public static class HistogramNaive_I8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplMedianHistogramInnerNaive.process(imgInt8,out_I8,radius,null,null);
-		}
-	}
-
-	public static class Histogram_I8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplMedianHistogramInner.process(imgInt8,out_I8,radius,null,null);
-		}
-	}
-
-	public static class SortNaive_I8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplMedianSortNaive.process(imgInt8,out_I8,radius,null);
-		}
-	}
-
-	public static class SortNaive_F32 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ImplMedianSortNaive.process(imgFloat32,out_F32,radius,null);
-		}
-	}
-
-	public static void main( String args[] ) {
-		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
-		imgInt16 = new ImageSInt16(imgWidth,imgHeight);
-		out_I32 = new ImageSInt32(imgWidth,imgHeight);
-		out_I16 = new ImageSInt16(imgWidth,imgHeight);
-		out_I8 = new ImageUInt8(imgWidth,imgHeight);
-		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
-		out_F32 = new ImageFloat32(imgWidth,imgHeight);
-
+	public BenchmarkMedianFilter() {
 		Random rand = new Random(234);
 		ImageTestingOps.randomize(imgInt8,rand, 0, 100);
 		ImageTestingOps.randomize(imgFloat32,rand,0,200);
+	}
 
+	public int timeBlurImageOps_I8(int reps) {
+		for( int i = 0; i < reps; i++ )
+			BlurImageOps.median(imgInt8, out_I8, radius);
+		return 0;
+	}
+
+	public int timeBlurImageOps_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			BlurImageOps.median(imgFloat32,out_F32,radius);
+		return 0;
+	}
+
+	public int timeHistogramNaive_I8(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplMedianHistogramInnerNaive.process(imgInt8, out_I8, radius, null, null);
+		return 0;
+	}
+
+	public int timeHistogram_I8(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplMedianHistogramInner.process(imgInt8,out_I8,radius,null,null);
+		return 0;
+	}
+
+	public int timeSortNaive_I8(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplMedianSortNaive.process(imgInt8,out_I8,radius,null);
+		return 0;
+	}
+
+	public int timeSortNaive_F32(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ImplMedianSortNaive.process(imgFloat32,out_F32,radius,null);
+		return 0;
+	}
+
+	public static void main( String args[] ) {
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
 		System.out.println();
 
-		for( int radius = 1; radius < 10; radius += 1 ) {
-			System.out.println("Radius: "+radius);
-			System.out.println();
-			BenchmarkMedianFilter.radius = radius;
-			
-			ProfileOperation.printOpsPerSec(new BlurOps_I8(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new BlurOps_F32(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new HistogramNaive_I8(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Histogram_I8(),TEST_TIME);
-			ProfileOperation.printOpsPerSec(new SortNaive_I8(),TEST_TIME);
-		    ProfileOperation.printOpsPerSec(new SortNaive_F32(),TEST_TIME);
-		}
-
-
+		Runner.main(BenchmarkMedianFilter.class, args);
 	}
 }

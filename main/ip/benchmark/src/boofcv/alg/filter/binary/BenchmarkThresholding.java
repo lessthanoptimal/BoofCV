@@ -19,10 +19,10 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import com.google.caliper.Runner;
+import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -31,7 +31,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class BenchmarkThresholding {
+public class BenchmarkThresholding extends SimpleBenchmark {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
@@ -45,38 +45,38 @@ public class BenchmarkThresholding {
 	static int threshUpper = 30;
 
 
-	public static class Threshold extends PerformerBase {
-		@Override
-		public void process() {
-			ThresholdImageOps.threshold(input, output_U8 ,threshLower,true);
-		}
+	public BenchmarkThresholding() {
+		Random rand = new Random(234);
+		ImageTestingOps.randomize(input, rand, 0, 100);
 	}
 
-	public static class HysteresisLabel4 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeThreshold(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ThresholdImageOps.threshold(input, output_U8, threshLower, true);
+		return 0;
+	}
+
+	public int timeHysteresisLabel4(int reps) {
+		for( int i = 0; i < reps; i++ ) {
 			ThresholdImageOps.hysteresisLabel4(input, output_S32,threshLower,threshUpper,true,work);
 			BinaryImageOps.labelToBinary(output_S32,output_U8);
 		}
+		return 0;
 	}
 
-	public static class HysteresisLabel8 extends PerformerBase {
-		@Override
-		public void process() {
+	public int timeHysteresisLabel8(int reps) {
+		for( int i = 0; i < reps; i++ ) {
 			ThresholdImageOps.hysteresisLabel8(input, output_S32,threshLower,threshUpper,true,work);
 			BinaryImageOps.labelToBinary(output_S32,output_U8);
 		}
+		return 0;
 	}
 
 	public static void main(String args[]) {
-		Random rand = new Random(234);
-		ImageTestingOps.randomize(input, rand, 0, 100);
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new HysteresisLabel4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new HysteresisLabel8(), TEST_TIME);
+		Runner.main(BenchmarkThresholding.class, args);
 	}
 }

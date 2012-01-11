@@ -22,7 +22,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../lib/testing/caliper.jar!/" />
+          <root url="file://$MODULE_DIR$/../../../thirdparty/caliper/caliper/src/main/java" />
         </SOURCES>
       </library>
     </orderEntry>
