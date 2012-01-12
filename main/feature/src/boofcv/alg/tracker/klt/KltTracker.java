@@ -31,8 +31,8 @@ import boofcv.struct.image.ImageSingleBand;
  * </p>
  *
  * <p>
- * For this particular implementation of KLT image derivatives only need to be computed when setDescription() is called.
- * Tracker will degrade if features change orientation, but can be significantly faster.
+ * For this particular implementation of KLT, image derivatives is only needed when setDescription() is called.
+ * Tracker quality will degrade if features change orientation, but this technique is significantly faster.
  * </p>
  *
  * <p>
@@ -162,7 +162,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 
 	/**
 	 * <p>
-	 * Updates the feature's location inside the image.  The feature's positon can be modified
+	 * Updates the feature's location inside the image.  The feature's position can be modified
 	 * even if tracking fails.
 	 * </p>
 	 *
@@ -189,9 +189,6 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 			return KltTrackFault.FAILED;
 		}
 
-		float x = feature.x;
-		float y = feature.y;
-
 		// compute the feature's width and temporary storage related to it
 		widthFeature = feature.radius * 2 + 1;
 		lengthFeature = widthFeature * widthFeature;
@@ -209,7 +206,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 			feature.x += dx;
 			feature.y += dy;
 
-			// see if it move outside of the image
+			// see if it moved outside of the image
 			if (!isFullyInside(feature.x, feature.y))
 				return KltTrackFault.OUT_OF_BOUNDS;
 
