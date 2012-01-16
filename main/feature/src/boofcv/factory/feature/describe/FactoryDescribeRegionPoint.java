@@ -62,10 +62,24 @@ public class FactoryDescribeRegionPoint {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		if( isOriented )
-			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
+			orientation = FactoryOrientationAlgs.average_ii(6, 1 , 6, -1, integralType);
 //			orientation = FactoryOrientationAlgs.sliding_ii(42,Math.PI/3.0,6,true,integralType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>surf(integralType);
+		return new WrapDescribeSurf<T,II>( alg ,orientation);
+	}
+
+	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	DescribeRegionPoint<T> surf2( boolean isOriented , Class<T> imageType) {
+		OrientationIntegral<II> orientation = null;
+
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+
+		if( isOriented )
+//			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
+			orientation = FactoryOrientationAlgs.sliding_ii(42,Math.PI/3.0,6,-1,integralType);
+
+		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>surf2(integralType);
 		return new WrapDescribeSurf<T,II>( alg ,orientation);
 	}
 
@@ -89,7 +103,7 @@ public class FactoryDescribeRegionPoint {
 
 		if( isOriented )
 //			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
-			orientation = FactoryOrientationAlgs.sliding_ii(42,Math.PI/3.0,6,true,integralType);
+			orientation = FactoryOrientationAlgs.sliding_ii(42,Math.PI/3.0,6,-1,integralType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>msurf(integralType);
 		return new WrapDescribeSurf<T,II>( alg ,orientation);

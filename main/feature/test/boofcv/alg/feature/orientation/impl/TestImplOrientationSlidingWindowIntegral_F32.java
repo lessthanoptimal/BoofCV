@@ -35,7 +35,7 @@ public class TestImplOrientationSlidingWindowIntegral_F32 {
 	public void standardUnweighted() {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationIntegralBase<ImageFloat32> alg = new ImplOrientationSlidingWindowIntegral_F32(20,Math.PI/3,r,false, 4);
+		OrientationIntegralBase<ImageFloat32> alg = new ImplOrientationSlidingWindowIntegral_F32(20,Math.PI/3,r,0, 4);
 
 		// region samples is r*2 +1 + sampleRadius
 		tests.setup(angleTol, r*2+3 , alg,ImageFloat32.class);
@@ -46,7 +46,7 @@ public class TestImplOrientationSlidingWindowIntegral_F32 {
 	public void standardWeighted() {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationIntegralBase<ImageFloat32> alg = new ImplOrientationSlidingWindowIntegral_F32(20,Math.PI/3,r,true, 4);
+		OrientationIntegralBase<ImageFloat32> alg = new ImplOrientationSlidingWindowIntegral_F32(20,Math.PI/3,r,2, 4);
 
 		tests.setup(angleTol, r*2+3 ,alg,ImageFloat32.class);
 		tests.performAll();

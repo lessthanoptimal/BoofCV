@@ -46,16 +46,25 @@ public abstract class OrientationIntegralBase<T extends ImageSingleBand>
 	// optional weights
 	protected Kernel2D_F64 weights;
 
+	// size of sample kernels
+	protected int sampleWidth;
+
+	// how often the image is sampled
+	protected double period;
 	/**
 	 *
 	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
-	 * @param weighted If edge intensities are weighted using a Gaussian kernel.
+	 * @param period How often the image is sampled.  This number is scaled.  Typically 1.   
+	 * @param sampleWidth How wide of a kernel should be used to sample.
+	 * @param weightSigma Sigma for weighting.  zero for unweighted.
 	 */
-	public OrientationIntegralBase(int radius, boolean weighted) {
+	public OrientationIntegralBase(int radius, double period, int sampleWidth , double weightSigma) {
 		this.radius = radius;
+		this.period = period;
+		this.sampleWidth = sampleWidth;
 		this.width = radius*2+1;
-		if( weighted )
-			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, -1,radius);
+		if( weightSigma != 0 )
+			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, weightSigma,radius);
 	}
 
 	@Override

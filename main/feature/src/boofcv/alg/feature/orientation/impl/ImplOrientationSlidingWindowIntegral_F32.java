@@ -47,8 +47,6 @@ public class ImplOrientationSlidingWindowIntegral_F32
 	protected int numAngles;
 	// the size of the angle window it will consider in radians
 	protected double windowSize;
-	// size of the sample kernel
-	protected int sampleKernelWidth;
 	// the angle each pixel is pointing
 	protected double angles[];
 
@@ -57,15 +55,14 @@ public class ImplOrientationSlidingWindowIntegral_F32
 	 * @param numAngles Number of different center points for the sliding window that will be considered
 	 * @param windowSize Angular window that is slide across
 	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
-	 * @param weighted If edge intensities are weighted using a Gaussian kernel.
+	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
 	 * @param sampleKernelWidth Size of kernel doing the sampling.  Typically 4.
 	 */
 	public ImplOrientationSlidingWindowIntegral_F32(int numAngles, double windowSize,
-													int radius, boolean weighted, int sampleKernelWidth) {
-		super(radius,weighted);
+													int radius, double weightSigma, int sampleKernelWidth) {
+		super(radius,1,sampleKernelWidth,weightSigma);
 		this.numAngles = numAngles;
 		this.windowSize = windowSize;
-		this.sampleKernelWidth = sampleKernelWidth;
 
 		derivX = new float[width*width];
 		derivY = new float[width*width];
@@ -79,11 +76,16 @@ public class ImplOrientationSlidingWindowIntegral_F32
 	@Override
 	public double compute(double c_x, double c_y) {
 
+		double period = scale*this.period;
+		// top left corner of the region being sampled
+		double tl_x = c_x - radius*period;
+		double tl_y = c_y - radius*period;
+
 		// use a faster algorithm if it is entirely inside
-		if( SurfDescribeOps.isInside(ii,c_x,c_y,radius,sampleKernelWidth,scale, 0))  {
-			SurfDescribeOps.gradient_noborder(ii,c_x,c_y,radius,sampleKernelWidth,scale,derivX,derivY);
+		if( SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y,width*period,sampleWidth*scale))  {
+			SurfDescribeOps.gradient_noborder(ii,tl_x,tl_y,period,width,sampleWidth*scale,derivX,derivY);
 		} else {
-			SurfDescribeOps.gradient(ii,c_x,c_y,radius,sampleKernelWidth,scale, true, borderDerivX,borderDerivY);
+			SurfDescribeOps.gradient(ii,tl_x,tl_y,period,width,sampleWidth*scale, false, borderDerivX,borderDerivY);
 			BoofMiscOps.convertTo_F32(borderDerivX,derivX);
 			BoofMiscOps.convertTo_F32(borderDerivY,derivY);
 		}

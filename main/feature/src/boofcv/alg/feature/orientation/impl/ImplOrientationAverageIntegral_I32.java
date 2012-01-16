@@ -46,10 +46,10 @@ public class ImplOrientationAverageIntegral_I32
 	/**
 	 *
 	 * @param radius Radius of the region being considered in terms of Wavelet samples. Typically 6.
-	 * @param weighted If edge intensities are weighted using a Gaussian kernel.
+	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
 	 */
-	public ImplOrientationAverageIntegral_I32( int radius , boolean weighted ) {
-		super(radius,weighted);
+	public ImplOrientationAverageIntegral_I32( int radius , double period , int sampleWidth , double weightSigma ) {
+		super(radius,period,sampleWidth,weightSigma);
 
 		derivX = new int[width*width];
 		derivY = new int[width*width];
@@ -61,11 +61,15 @@ public class ImplOrientationAverageIntegral_I32
 	@Override
 	public double compute(double c_x, double c_y) {
 
+		double period = scale*this.period;
+		double tl_x = c_x - radius*period;
+		double tl_y = c_y - radius*period;
+
 		// use a faster algorithm if it is entirely inside
-		if( SurfDescribeOps.isInside(ii,c_x,c_y,5,radius,scale, 0))  {
-			SurfDescribeOps.gradient_noborder(ii,c_x,c_y,radius,4,scale,derivX,derivY);
+		if( SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y,width*period,sampleWidth*scale))  {
+			SurfDescribeOps.gradient_noborder(ii,tl_x,tl_y,period,width,sampleWidth*scale,derivX,derivY);
 		} else {
-			SurfDescribeOps.gradient(ii,c_x,c_y,radius,4,scale, false, borderDerivX,borderDerivY);
+			SurfDescribeOps.gradient(ii,tl_x,tl_y,period,width,sampleWidth*scale, false, borderDerivX,borderDerivY);
 			BoofMiscOps.convertTo_I32(borderDerivX,derivX);
 			BoofMiscOps.convertTo_I32(borderDerivY,derivY);
 		}

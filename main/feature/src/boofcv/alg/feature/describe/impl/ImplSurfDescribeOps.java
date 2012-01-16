@@ -39,27 +39,30 @@ public class ImplSurfDescribeOps {
 	 * Computes the gradient for a using the derivX kernel found in {@link boofcv.alg.transform.ii.DerivativeIntegralImage)}.
 	 * Assumes that the entire region, including the surrounding pixels, are inside the image.
 	 */
-	public static void gradientInner(ImageFloat32 ii, double c_x, double c_y,
-									 int radius, int kernelSize, double scale,
+	public static void gradientInner(ImageFloat32 ii, double tl_x, double tl_y, double samplePeriod ,
+									 int regionSize, double kernelSize,
 									 float[] derivX, float derivY[])
 	{
 		// add 0.5 to c_x and c_y to have it round when converted to an integer pixel
 		// this is faster than the straight forward method
-		c_x += 0.5;
-		c_y += 0.5;
+		tl_x += 0.5;
+		tl_y += 0.5;
 
-		int r = (int)Math.ceil(kernelSize * scale)/2;
-		int w = r*2+1;
+		// round the kernel size
+		int w = (int)(kernelSize+0.5);
+		int r = w/2 + w%2;
+		w = r*2+1;
+
 		int i = 0;
-		for( int y = -radius; y <= radius; y++ ) {
-			int pixelsY = (int)(c_y + y * scale);
+		for( int y = 0; y < regionSize; y++ ) {
+			int pixelsY = (int)(tl_y + y * samplePeriod);
 			int indexRow1 = ii.startIndex + (pixelsY-r-1)*ii.stride - r - 1;
 			int indexRow2 = indexRow1 + r*ii.stride;
 			int indexRow3 = indexRow2 + ii.stride;
 			int indexRow4 = indexRow3 + r*ii.stride;
 
-			for( int x = -radius; x <= radius; x++ , i++) {
-				int pixelsX = (int)(c_x + x * scale);
+			for( int x = 0; x < regionSize; x++ , i++) {
+				int pixelsX = (int)(tl_x + x * samplePeriod);
 
 				final int indexSrc1 = indexRow1 + pixelsX;
 				final int indexSrc2 = indexRow2 + pixelsX;
@@ -94,27 +97,30 @@ public class ImplSurfDescribeOps {
 	 * Computes the gradient for a using the derivX kernel found in {@link boofcv.alg.transform.ii.DerivativeIntegralImage)}.
 	 * Assumes that the entire region, including the surrounding pixels, are inside the image.
 	 */
-	public static void gradientInner(ImageSInt32 ii, double c_x, double c_y,
-									 int radius, int kernelSize, double scale,
+	public static void gradientInner(ImageSInt32 ii, double tl_x, double tl_y, double samplePeriod ,
+									 int regionSize, double kernelSize,
 									 int[] derivX, int derivY[])
 	{
 		// add 0.5 to c_x and c_y to have it round when converted to an integer pixel
 		// this is faster than the straight forward method
-		c_x += 0.5;
-		c_y += 0.5;
+		tl_x += 0.5;
+		tl_y += 0.5;
 
-		int r = (int)Math.ceil(kernelSize*scale)/2;
-		int w = r*2+1;
+		// round the kernel size
+		int w = (int)(kernelSize+0.5);
+		int r = w/2 + w%2;
+		w = r*2+1;
+
 		int i = 0;
-		for( int y = -radius; y <= radius; y++ ) {
-			int pixelsY = (int)(c_y + y * scale);
+		for( int y = 0; y < regionSize; y++ ) {
+			int pixelsY = (int)(tl_y + y * samplePeriod);
 			int indexRow1 = ii.startIndex + (pixelsY-r-1)*ii.stride - r - 1;
 			int indexRow2 = indexRow1 + r*ii.stride;
 			int indexRow3 = indexRow2 + ii.stride;
 			int indexRow4 = indexRow3 + r*ii.stride;
 
-			for( int x = -radius; x <= radius; x++ , i++) {
-				int pixelsX = (int)(c_x + x * scale);
+			for( int x = 0; x < regionSize; x++ , i++) {
+				int pixelsX = (int)(tl_x + x * samplePeriod);
 
 				final int indexSrc1 = indexRow1 + pixelsX;
 				final int indexSrc2 = indexRow2 + pixelsX;
@@ -149,23 +155,23 @@ public class ImplSurfDescribeOps {
 	 * Simple algorithm for computing the gradient of a region.  Can handle image borders
 	 */
 	public static <T extends ImageSingleBand>
-	void naiveGradient(T ii, double c_x, double c_y,
-					   int radiusRegions, int kernelSize, double scale,
+	void naiveGradient(T ii, double tl_x, double tl_y, double samplePeriod ,
+					   int regionSize, double kernelSize,
 					   boolean useHaar, double[] derivX, double derivY[])
 	{
-		SparseImageGradient<T,?> g =  SurfDescribeOps.createGradient(false,useHaar,kernelSize,scale,(Class<T>)ii.getClass());
+		SparseImageGradient<T,?> g =  SurfDescribeOps.createGradient(false,useHaar,(int)(kernelSize/samplePeriod),samplePeriod,(Class<T>)ii.getClass());
 		g.setImage(ii);
 
 		// add 0.5 to c_x and c_y to have it round when converted to an integer pixel
 		// this is faster than the straight forward method
-		c_x += 0.5;
-		c_y += 0.5;
+		tl_x += 0.5;
+		tl_y += 0.5;
 
 		int i = 0;
-		for( int y = -radiusRegions; y <= radiusRegions; y++ ) {
-			for( int x = -radiusRegions; x <= radiusRegions; x++ , i++) {
-				int xx = (int)(c_x + x * scale);
-				int yy = (int)(c_y + y * scale);
+		for( int y = 0; y < regionSize; y++ ) {
+			for( int x = 0; x < regionSize; x++ , i++) {
+				int xx = (int)(tl_x + x * samplePeriod);
+				int yy = (int)(tl_y + y * samplePeriod);
 
 				GradientValue deriv = g.compute(xx,yy);
 				derivX[i] = deriv.getX();
