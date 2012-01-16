@@ -35,7 +35,7 @@ public class TestImplOrientationAverageIntegral_I32 {
 	public void standardUnweighted() {
 		GenericOrientationIntegralTests<ImageSInt32> tests = new GenericOrientationIntegralTests<ImageSInt32>();
 
-		OrientationIntegralBase<ImageSInt32> alg = new ImplOrientationAverageIntegral_I32(r,false);
+		OrientationIntegralBase<ImageSInt32> alg = new ImplOrientationAverageIntegral_I32(r,1,4,0);
 
 		tests.setup(angleTol, r * 2 + 1, alg, ImageSInt32.class);
 		tests.performAll();
@@ -45,7 +45,7 @@ public class TestImplOrientationAverageIntegral_I32 {
 	public void standardWeighted() {
 		GenericOrientationIntegralTests<ImageSInt32> tests = new GenericOrientationIntegralTests<ImageSInt32>();
 
-		OrientationIntegralBase<ImageSInt32> alg = new ImplOrientationAverageIntegral_I32(r,true);
+		OrientationIntegralBase<ImageSInt32> alg = new ImplOrientationAverageIntegral_I32(r,1,4,2);
 
 		tests.setup(angleTol, r * 2 + 1, alg, ImageSInt32.class);
 		tests.performAll();

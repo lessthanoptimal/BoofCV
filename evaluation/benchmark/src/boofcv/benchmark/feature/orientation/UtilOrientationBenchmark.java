@@ -65,8 +65,8 @@ public class UtilOrientationBenchmark {
 		ret.add(new BenchmarkAlgorithm("No Gradient", FactoryOrientationAlgs.nogradient(radius,imageType)));
 
 		Class typeII = GIntegralImageOps.getIntegralType(imageType);
-		ret.add(new BenchmarkAlgorithm("II Ave", new WrapII(FactoryOrientationAlgs.average_ii(radius, false, typeII),imageType)));
-		ret.add(new BenchmarkAlgorithm("II Ave Weighted", new WrapII(FactoryOrientationAlgs.average_ii(radius, true, typeII),imageType)));
+		ret.add(new BenchmarkAlgorithm("II Ave", new WrapII(FactoryOrientationAlgs.average_ii(radius, 1,4,0, typeII),imageType)));
+		ret.add(new BenchmarkAlgorithm("II Ave Weighted", new WrapII(FactoryOrientationAlgs.average_ii(radius, 1,4,-1, typeII),imageType)));
 
 		return ret;
 	}

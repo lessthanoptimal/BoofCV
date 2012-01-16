@@ -136,10 +136,12 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 								 double scale , double angle ,
 								 SurfFeature ret )
 	{
+		double c = Math.cos(angle),s=Math.sin(angle);
+		
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
 		boolean isInBounds =
-				SurfDescribeOps.isInside(ii,x,y,(widthLargeGrid*widthSubRegion)/2,widthSample,scale,angle);
+				SurfDescribeOps.isInside(ii,x,y,(widthLargeGrid*widthSubRegion)/2,widthSample,scale,c,s);
 
 		// declare the feature if needed
 		if( ret == null )
@@ -152,7 +154,7 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		gradient.setImage(ii);
 
 		// extract descriptor
-		SurfDescribeOps.features(x, y, angle, scale, weight, widthLargeGrid, widthSubRegion, gradient, ret.value);
+		SurfDescribeOps.features(x, y, c,s, scale, weight, widthLargeGrid, widthSubRegion, gradient, ret.value);
 
 		// normalize feature vector to have an Euclidean length of 1
 		// adds light invariance

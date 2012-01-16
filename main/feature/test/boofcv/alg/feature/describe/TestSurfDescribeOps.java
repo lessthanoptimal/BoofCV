@@ -63,17 +63,17 @@ public class TestSurfDescribeOps {
 		double foundY[] = new double[ w*w ];
 
 		// check inside the image
-		SurfDescribeOps.gradient(inputF32,c_x,c_y,radiusRegions,4,1.5, false, foundX,foundY);
-		ImplSurfDescribeOps.naiveGradient(inputF32,c_x,c_y,radiusRegions, 4, 1.5, false, expectedX,expectedY);
+		SurfDescribeOps.gradient(inputF32,c_x,c_y,1.5,w,4*1.5, false, foundX,foundY);
+		ImplSurfDescribeOps.naiveGradient(inputF32,c_x,c_y,1.5,w, 4*1.5, false, expectedX,expectedY);
 
 		BoofTesting.assertEquals(foundX,expectedX,1e-4);
 		BoofTesting.assertEquals(foundY,expectedY,1e-4);
 
 		// check the border
-		SurfDescribeOps.gradient(inputF32,0,0,radiusRegions,4,1.5, false, foundX,foundY);
-		ImplSurfDescribeOps.naiveGradient(inputF32,0,0,radiusRegions, 4, 1.5, false, expectedX,expectedY);
+		SurfDescribeOps.gradient(inputF32,-2,-1,1.5,w,4*1.5, false, foundX,foundY);
+		ImplSurfDescribeOps.naiveGradient(inputF32, -2, -1, 1.5, w, 4 * 1.5, false, expectedX, expectedY);
 
-		BoofTesting.assertEquals(foundX,expectedX,1e-4);
+		BoofTesting.assertEquals(foundX, expectedX, 1e-4);
 		BoofTesting.assertEquals(foundY,expectedY,1e-4);
 	}
 
@@ -87,8 +87,8 @@ public class TestSurfDescribeOps {
 		float foundY[] = new float[ w*w ];
 
 		// check inside the image
-		SurfDescribeOps.gradient_noborder(inputF32,c_x,c_y,radiusRegions, 4,1.5,foundX,foundY);
-		ImplSurfDescribeOps.naiveGradient(inputF32,c_x,c_y,radiusRegions, 4, 1.5, false, expectedX,expectedY);
+		SurfDescribeOps.gradient_noborder(inputF32,c_x,c_y,1.5,w, 4*1.5,foundX,foundY);
+		ImplSurfDescribeOps.naiveGradient(inputF32,c_x,c_y,1.5,w, 4*1.5, false, expectedX,expectedY);
 
 		BoofTesting.assertEquals(expectedX,foundX,1e-4);
 		BoofTesting.assertEquals(expectedY,foundY,1e-4);
@@ -104,8 +104,8 @@ public class TestSurfDescribeOps {
 		int foundY[] = new int[ w*w ];
 
 		// check inside the image
-		SurfDescribeOps.gradient_noborder(inputI32,c_x,c_y,radiusRegions, 4,1.5,foundX,foundY);
-		ImplSurfDescribeOps.naiveGradient(inputI32,c_x,c_y,radiusRegions, 4, 1.5, false, expectedX,expectedY);
+		SurfDescribeOps.gradient_noborder(inputI32,c_x,c_y,1.5,w, 4*1.5,foundX,foundY);
+		ImplSurfDescribeOps.naiveGradient(inputI32,c_x,c_y,1.5,w, 4*1.5, false, expectedX,expectedY);
 
 		BoofTesting.assertEquals(expectedX,foundX);
 		BoofTesting.assertEquals(expectedY,foundY);
@@ -117,8 +117,8 @@ public class TestSurfDescribeOps {
 		int regionRadius = 10;
 		int kernelSize = 3;
 
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1, 0));
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,2, 0));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1, 0,0));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,2, 0,0));
 		// check lower boundary
 		for( int i = 0; i < 2; i++ ) {
 			boolean swap = i != 0;
@@ -142,7 +142,7 @@ public class TestSurfDescribeOps {
 			x = y;
 			y = temp;
 		}
-		assertTrue(result == SurfDescribeOps.isInside(inputF32,x,y,regionRadius,kernelSize,scale, 0));
+		assertTrue(result == SurfDescribeOps.isInside(inputF32,x,y,regionRadius,kernelSize,scale, 0,0));
 	}
 
 	@Test
@@ -157,36 +157,45 @@ public class TestSurfDescribeOps {
 		int e = (int)Math.ceil(r)-fullRadius;
 
 		// some positive examples
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1,0));
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,2,0));
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1,d90));
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,2,d90));
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1,0.5));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1,0,0));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,2,0,0));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1,Math.cos(d90),Math.sin(d90)));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,2,Math.cos(d90),Math.sin(d90)));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1,Math.cos(0.5),Math.sin(0.5)));
 
 		// boundary test cases
 		// +2 = kernel radius, + 1 = needing to sample x-1,y-1 below in the integral image
-		assertFalse(SurfDescribeOps.isInside(inputF32,regionRadius+2,c_y,regionRadius,kernelSize,1,0));
-		assertFalse(SurfDescribeOps.isInside(inputF32,c_x,regionRadius+2,regionRadius,kernelSize,1,0));
-		assertFalse(SurfDescribeOps.isInside(inputF32,width-regionRadius-1-1,c_y,regionRadius,kernelSize,1,0));
-		assertFalse(SurfDescribeOps.isInside(inputF32,c_x,height-regionRadius-1-1,regionRadius,kernelSize,1,0));
+		assertFalse(SurfDescribeOps.isInside(inputF32,regionRadius+2,c_y,regionRadius,kernelSize,1,0,0));
+		assertFalse(SurfDescribeOps.isInside(inputF32,c_x,regionRadius+2,regionRadius,kernelSize,1,0,0));
+		assertFalse(SurfDescribeOps.isInside(inputF32,width-regionRadius-1-1,c_y,regionRadius,kernelSize,1,0,0));
+		assertFalse(SurfDescribeOps.isInside(inputF32,c_x,height-regionRadius-1-1,regionRadius,kernelSize,1,0,0));
 
-		assertTrue(SurfDescribeOps.isInside(inputF32,regionRadius+2+1,c_y,regionRadius,kernelSize,1,0));
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,regionRadius+2+1,regionRadius,kernelSize,1,0));
-		assertTrue(SurfDescribeOps.isInside(inputF32,width-regionRadius-2-1,c_y,regionRadius,kernelSize,1,0));
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,height-regionRadius-2-1,regionRadius,kernelSize,1,0));
+		assertTrue(SurfDescribeOps.isInside(inputF32,regionRadius+2+1,c_y,regionRadius,kernelSize,1,0,0));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,regionRadius+2+1,regionRadius,kernelSize,1,0,0));
+		assertTrue(SurfDescribeOps.isInside(inputF32,width-regionRadius-2-1,c_y,regionRadius,kernelSize,1,0,0));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,height-regionRadius-2-1,regionRadius,kernelSize,1,0,0));
 
 		// boundary with a rotation
-		assertFalse(SurfDescribeOps.isInside(inputF32,regionRadius+2+1,c_y,regionRadius,kernelSize,1,0.5));
-		assertFalse(SurfDescribeOps.isInside(inputF32,c_x,regionRadius+2+1,regionRadius,kernelSize,1,0.5));
-		assertFalse(SurfDescribeOps.isInside(inputF32,width-regionRadius-2-1,c_y,regionRadius,kernelSize,1,0.5));
-		assertFalse(SurfDescribeOps.isInside(inputF32,c_x,height-regionRadius-2-1,regionRadius,kernelSize,1,0.5));
+		double c5 = Math.cos(0.5);
+		double s5 = Math.sin(0.5);
+		assertFalse(SurfDescribeOps.isInside(inputF32,regionRadius+2+1,c_y,regionRadius,kernelSize,1,c5,s5));
+		assertFalse(SurfDescribeOps.isInside(inputF32,c_x,regionRadius+2+1,regionRadius,kernelSize,1,c5,s5));
+		assertFalse(SurfDescribeOps.isInside(inputF32,width-regionRadius-2-1,c_y,regionRadius,kernelSize,1,c5,s5));
+		assertFalse(SurfDescribeOps.isInside(inputF32,c_x,height-regionRadius-2-1,regionRadius,kernelSize,1,c5,s5));
 
-		assertFalse(SurfDescribeOps.isInside(inputF32,regionRadius+2+e,c_y,regionRadius,kernelSize,1,d45));
-		assertFalse(SurfDescribeOps.isInside(inputF32,c_x,regionRadius+2+e,regionRadius,kernelSize,1,d45));
-		assertTrue(SurfDescribeOps.isInside(inputF32,regionRadius+2+1+e,c_y,regionRadius,kernelSize,1,d45));
-		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,regionRadius+2+1+e,regionRadius,kernelSize,1,d45));
+		double c45 = Math.cos(d45);
+		double s45 = Math.sin(d45);
+		assertFalse(SurfDescribeOps.isInside(inputF32,regionRadius+2+e,c_y,regionRadius,kernelSize,1,c45,s45));
+		assertFalse(SurfDescribeOps.isInside(inputF32,c_x,regionRadius+2+e,regionRadius,kernelSize,1,c45,s45));
+		assertTrue(SurfDescribeOps.isInside(inputF32,regionRadius+2+1+e,c_y,regionRadius,kernelSize,1,c45,s45));
+		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,regionRadius+2+1+e,regionRadius,kernelSize,1,c45,s45));
 	}
 
+	@Test
+	public void isInside_rect() {
+		fail("implement");
+	}
+	
 	/**
 	 * Compare against some hand computed examples
 	 */

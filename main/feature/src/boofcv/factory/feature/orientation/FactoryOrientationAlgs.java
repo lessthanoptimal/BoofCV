@@ -110,24 +110,24 @@ public class FactoryOrientationAlgs {
 	}
 
 	public static <T extends ImageSingleBand>
-	OrientationIntegral<T> average_ii( int radius , boolean weighted , Class<T> imageType)
+	OrientationIntegral<T> average_ii( int radius , double samplePeriod , int sampleWidth, double weightSigma , Class<T> imageType)
 	{
 		if( imageType == ImageFloat32.class )
-			return (OrientationIntegral<T>)new ImplOrientationAverageIntegral_F32(radius,weighted);
+			return (OrientationIntegral<T>)new ImplOrientationAverageIntegral_F32(radius,samplePeriod,sampleWidth,weightSigma);
 		else if( imageType == ImageSInt32.class )
-			return (OrientationIntegral<T>)new ImplOrientationAverageIntegral_I32(radius,weighted);
+			return (OrientationIntegral<T>)new ImplOrientationAverageIntegral_I32(radius,samplePeriod,sampleWidth,weightSigma);
 		else
 			throw new IllegalArgumentException("Image type not supported. "+imageType.getSimpleName());
 	}
 
 	public static <T extends ImageSingleBand>
 	OrientationIntegral<T> sliding_ii( int numAngles, double windowSize ,
-									   int radius , boolean weighted , Class<T> imageType)
+									   int radius , double weightSigma , Class<T> imageType)
 	{
 		if( imageType == ImageFloat32.class )
-			return (OrientationIntegral<T>)new ImplOrientationSlidingWindowIntegral_F32(numAngles,windowSize,radius,weighted, 4);
+			return (OrientationIntegral<T>)new ImplOrientationSlidingWindowIntegral_F32(numAngles,windowSize,radius,weightSigma, 4);
 		else if( imageType == ImageSInt32.class )
-			return (OrientationIntegral<T>)new ImplOrientationSlidingWindowIntegral_I32(numAngles,windowSize,radius,weighted, 4);
+			return (OrientationIntegral<T>)new ImplOrientationSlidingWindowIntegral_I32(numAngles,windowSize,radius,weightSigma, 4);
 		else
 			throw new IllegalArgumentException("Image type not supported. "+imageType.getSimpleName());
 	}

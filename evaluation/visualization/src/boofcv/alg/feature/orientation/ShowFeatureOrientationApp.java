@@ -73,8 +73,8 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 		addAlgorithm(0, "Gradient Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType));
 		addAlgorithm(0, "Gradient Sliding Window", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
 		addAlgorithm(0, "Gradient Sliding Window Weighted", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
-		addAlgorithm(0, "Integral Average", FactoryOrientationAlgs.average_ii(radius,false,imageType));
-		addAlgorithm(0, "Integral Average Weighted", FactoryOrientationAlgs.average_ii(radius,true,imageType));
+		addAlgorithm(0, "Integral Average", FactoryOrientationAlgs.average_ii(radius,1,4,0,imageType));
+		addAlgorithm(0, "Integral Average Weighted", FactoryOrientationAlgs.average_ii(radius,1,4,-1,imageType));
 
 		panel = new ImagePanel();
 		setMainGUI(panel);

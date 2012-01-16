@@ -105,10 +105,11 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 								 double scale , double angle ,
 								 SurfFeature ret )
 	{
+		double c = Math.cos(angle) , s= Math.sin(angle);
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
 		boolean isInBounds =
-				SurfDescribeOps.isInside(ii,x,y,(widthLargeGrid*widthSubRegion)/2+overLap,widthSample,scale,angle);
+				SurfDescribeOps.isInside(ii,x,y,(widthLargeGrid*widthSubRegion)/2+overLap,widthSample,scale,c,s);
 
 		// declare the feature if needed
 		if( ret == null )
@@ -120,7 +121,7 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 		SparseImageGradient<II,?> gradient = SurfDescribeOps.createGradient(isInBounds, useHaar, widthSample, scale, (Class<II>) ii.getClass());
 		gradient.setImage(ii);
 
-		SurfDescribeOps.featuresMod(x, y, angle, scale, weightGrid, weightSub,
+		SurfDescribeOps.featuresMod(x, y, c,s, scale, weightGrid, weightSub,
 				widthLargeGrid, widthSubRegion, overLap , gradient, ret.value);
 
 		// normalize feature vector to have an Euclidean length of 1

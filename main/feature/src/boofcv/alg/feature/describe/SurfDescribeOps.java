@@ -51,21 +51,21 @@ public class SurfDescribeOps {
 	 * </ul>
 	 * </p>
 	 *
-	 * @param c_x Center pixel.
-	 * @param c_y Center pixel.
-	 * @param radiusRegion Radius of region being considered in samples points (not pixels).
-	 * @param kernelWidth Size of the kernel's width (in pixels) at scale of 1.
-	 * @param scale Scale of feature.  Changes sample points.
+	 * @param tl_x Top left corner.
+	 * @param tl_y Top left corner.
+	 * @param samplePeriod Distance between sample points (in pixels)
+	 * @param regionSize Width of region being considered in samples points (not pixels).
+	 * @param kernelWidth Size of the kernel's width (in pixels) .
 	 * @param useHaar
 	 * @param derivX Derivative x wavelet output. length = radiusRegions*radiusRegions
 	 * @param derivY Derivative y wavelet output. length = radiusRegions*radiusRegions
 	 */
 	public static <T extends ImageSingleBand>
-	void gradient(T ii, double c_x, double c_y,
-				  int radiusRegion, int kernelWidth, double scale,
+	void gradient(T ii, double tl_x, double tl_y, double samplePeriod ,
+				  int regionSize, double kernelWidth,
 				  boolean useHaar, double[] derivX, double derivY[])
 	{
-		ImplSurfDescribeOps.naiveGradient(ii, c_x, c_y, radiusRegion, kernelWidth, scale, useHaar, derivX, derivY);
+		ImplSurfDescribeOps.naiveGradient(ii, tl_x, tl_y, samplePeriod , regionSize, kernelWidth, useHaar, derivX, derivY);
 	}
 
 	/**
@@ -73,11 +73,11 @@ public class SurfDescribeOps {
 	 * of the image.  This includes the convolution kernel's radius.
 	 */
 	public static
-	void gradient_noborder( ImageFloat32 ii , double c_x , double c_y ,
-							int radius , int kernelWidth , double scale,
+	void gradient_noborder( ImageFloat32 ii , double tl_x , double tl_y , double samplePeriod ,
+							int regionSize , double kernelWidth ,
 							float[] derivX , float[] derivY )
 	{
-		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, kernelWidth, scale, derivX,derivY);
+		ImplSurfDescribeOps.gradientInner(ii,tl_x,tl_y,samplePeriod,regionSize, kernelWidth, derivX,derivY);
 	}
 
 	/**
@@ -85,11 +85,11 @@ public class SurfDescribeOps {
 	 * of the image.  This includes the convolution kernel's radius.
 	 */
 	public static
-	void gradient_noborder( ImageSInt32 ii , double c_x , double c_y ,
-							int radius , int kernelWidth , double scale,
+	void gradient_noborder( ImageSInt32 ii , double tl_x , double tl_y , double samplePeriod ,
+							int regionSize , double kernelWidth ,
 							int[] derivX , int[] derivY )
 	{
-		ImplSurfDescribeOps.gradientInner(ii,c_x,c_y,radius, kernelWidth, scale, derivX,derivY);
+		ImplSurfDescribeOps.gradientInner(ii,tl_x,tl_y,samplePeriod, regionSize, kernelWidth, derivX,derivY);
 	}
 
 	/**
@@ -138,11 +138,12 @@ public class SurfDescribeOps {
 	 * @param radiusRegions Radius in pixels of the whole region at a scale of 1
 	 * @param kernelSize Size of the kernel in pixels at a scale of 1
 	 * @param scale Scale factor for the region.
-	 * @param theta Orientation of the region
+	 * @param c Cosine of the orientation
+	 * @param s Sine of the orientation   
 	 */
 	public static <T extends ImageSingleBand>
 	boolean isInside( T ii , double X , double Y , int radiusRegions , int kernelSize ,
-					  double scale, double theta )
+					  double scale, double c , double s )
 	{
 		int c_x = (int)Math.round(X);
 		int c_y = (int)Math.round(Y);
@@ -159,9 +160,7 @@ public class SurfDescribeOps {
 		int kernelPaddingPlus = radius+kernelRadius;
 
 		// take in account the rotation
-		if( theta != 0 ) {
-			double c = Math.cos(theta);
-			double s = Math.sin(theta);
+		if( c != 0 || s != 0) {
 			double xx = Math.abs(c*kernelPaddingMinus - s*kernelPaddingMinus);
 			double yy = Math.abs(s*kernelPaddingMinus + c*kernelPaddingMinus);
 
@@ -184,6 +183,33 @@ public class SurfDescribeOps {
 		return true;
 	}
 
+	public static boolean isInside( int width , int height, 
+									double tl_x , double tl_y , 
+									double regionSize  , double sampleSize )
+	{
+		int w = (int)(sampleSize+0.5);
+		int r = w/2 + w%2;
+		
+		int x0 = (int)(tl_x+0.5) - r - 1;
+		int y0 = (int)(tl_y+0.5) - r - 1;
+
+		if( x0 < 0 || y0 < 0)
+			return false;
+
+		int x1 = (int)(tl_x+regionSize+0.5) + r;
+		int y1 = (int)(tl_y+regionSize+0.5) + r;
+
+		if( x1 >= width || y1 >= height )
+			return false;
+
+		return true;
+	}
+
+	public static double rotatedWidth( double width , double c , double s )
+	{
+		return Math.abs(c)*width + Math.abs(s)*width;
+	}
+	
 	/**
 	 * <p>
 	 * Computes features in the SURF descriptor.
@@ -199,7 +225,8 @@ public class SurfDescribeOps {
 	 *
 	 * @param c_x Center of the feature x-coordinate.
 	 * @param c_y Center of the feature y-coordinate.
-	 * @param theta Orientation of the features. -pi/2 to pi/2
+	 * @param c cosine of the orientation
+	 * @param s sine of the orientation
 	 * @param scale The scale of the wavelets.
 	 * @param weight Gaussian normalization.
 	 * @param widthLargeGrid Number of sub-regions wide the large grid is.
@@ -209,7 +236,7 @@ public class SurfDescribeOps {
 	 */
 	public static <T extends ImageSingleBand>
 	void features(double c_x, double c_y,
-				  double theta, double scale, Kernel2D_F64 weight,
+				  double c , double s, double scale, Kernel2D_F64 weight,
 				  int widthLargeGrid, int widthSubRegion,
 				  SparseImageGradient<T, ?> gradient,
 				  double[] features)
@@ -223,9 +250,6 @@ public class SurfDescribeOps {
 		int regionEnd = regionSize-regionR;
 
 		int regionIndex = 0;
-
-		double c = Math.cos(theta);
-		double s = Math.sin(theta);
 
 		// when computing the pixel coordinates it is more precise to round to the nearest integer
 		// since pixels are always positive round() is equivalent to adding 0.5 and then converting
@@ -282,7 +306,8 @@ public class SurfDescribeOps {
 	 *
 	 * @param c_x Center of the feature x-coordinate.
 	 * @param c_y Center of the feature y-coordinate.
-	 * @param theta Orientation of the features. -pi/2 to pi/2
+	 * @param c cosine of the orientation
+	 * @param s sine of the orientation
 	 * @param scale The scale of the wavelets.
 	 * @param weightGrid Gaussian normalization across the large grid.
 	 * @param weightSub Gaussian normalization across the sub-region.
@@ -294,7 +319,7 @@ public class SurfDescribeOps {
 	 */
 	public static <T extends ImageSingleBand>
 	void featuresMod(double c_x, double c_y,
-					 double theta,
+					 double c , double s,
 					 double scale, Kernel2D_F64 weightGrid,
 					 Kernel2D_F64 weightSub,
 					 int widthLargeGrid, int widthSubRegion, int overLap,
@@ -309,9 +334,6 @@ public class SurfDescribeOps {
 		int regionEnd = regionSize-regionR;
 
 		int regionIndex = 0;
-
-		double c = Math.cos(theta);
-		double s = Math.sin(theta);
 
 		// when computing the pixel coordinates it is more precise to round to the nearest integer
 		// since pixels are always positive round() is equivalent to adding 0.5 and then converting
