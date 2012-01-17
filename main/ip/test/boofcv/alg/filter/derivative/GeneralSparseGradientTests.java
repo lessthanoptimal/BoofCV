@@ -27,6 +27,7 @@ import boofcv.testing.BoofTesting;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -37,26 +38,27 @@ import static org.junit.Assert.assertEquals;
 public abstract class GeneralSparseGradientTests
 <T extends ImageSingleBand, D extends ImageSingleBand,G extends GradientValue>
 {
-	Random rand = new Random(12342);
-	int width = 30;
-	int height = 40;
+	protected Random rand = new Random(12342);
+	protected int width = 30;
+	protected int height = 40;
 
 	public Class<T> inputType;
 	public Class<D> derivType;
 
-	T input;
+	protected T input;
+	// "true" derivative.  Used to validate results
 	D derivX;
 	D derivY;
 
-
 	// the algorithm being tests
-	SparseImageGradient<T,G>  alg;
+	protected SparseImageGradient<T,G>  alg;
 
 	// size of the image border
 	int borderRadius;
 
 	protected GeneralSparseGradientTests(Class<T> inputType, Class<D> derivType,
 										 int borderRadius ) {
+		this.alg = alg;
 		this.inputType = inputType;
 		this.derivType = derivType;
 		this.borderRadius = borderRadius;
@@ -66,7 +68,6 @@ public abstract class GeneralSparseGradientTests
 		derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GeneralizedImageOps.randomize(input,rand,0,100);
-		imageGradient(input,derivX,derivY);
 	}
 
 	/**
@@ -76,8 +77,11 @@ public abstract class GeneralSparseGradientTests
 	 * border.
 	 */
 	public void allTests( boolean includeBorder ) {
+		if( alg == null )
+			throw new RuntimeException("must setup alg!");
 		testCenterImage();
-		testSubSample();
+		testSubImage();
+		isInBounds();
 		if( includeBorder )
 			testBorder();
 	}
@@ -86,9 +90,11 @@ public abstract class GeneralSparseGradientTests
 	 * Test to see if it produces identical results for pixels inside the image
 	 */
 	public void testCenterImage() {
+		imageGradient(input,derivX,derivY);
+		alg.setImage(input);
 		for( int y = borderRadius; y < height-borderRadius; y++ ) {
 			for( int x = borderRadius; x < width-borderRadius; x++ ) {
-				G g = sparseGradient(input,x,y);
+				G g = alg.compute(x,y);
 				double expectedX = GeneralizedImageOps.get(derivX,x,y);
 				double expectedY = GeneralizedImageOps.get(derivY,x,y);
 
@@ -102,12 +108,14 @@ public abstract class GeneralSparseGradientTests
 	/**
 	 * Provide a sub-image as an input image and see if it produces the expected results
 	 */
-	public void testSubSample() {
+	public void testSubImage() {
+		imageGradient(input,derivX,derivY);
 		T subImage = BoofTesting.createSubImageOf(input);
+		alg.setImage(subImage);
 
 		for( int y = borderRadius; y < height-borderRadius; y++ ) {
 			for( int x = borderRadius; x < width-borderRadius; x++ ) {
-				G g = sparseGradient(subImage,x,y);
+				G g = alg.compute(x,y);
 				double expectedX = GeneralizedImageOps.get(derivX,x,y);
 				double expectedY = GeneralizedImageOps.get(derivY,x,y);
 
@@ -118,14 +126,31 @@ public abstract class GeneralSparseGradientTests
 	}
 
 	/**
+	 * See if it recognizes that it's along the border
+	 */
+	public void isInBounds() {
+		alg.setImage(input);
+
+		assertTrue(alg.isInBounds(width/2,height/2));
+		
+		assertTrue(!alg.isInBounds(0,0));
+		assertTrue(!alg.isInBounds(width/2,0));
+		assertTrue(!alg.isInBounds(width/2,height-1));
+		assertTrue(!alg.isInBounds(0,height/2));
+		assertTrue(!alg.isInBounds(width-1,height/2));
+	}
+	
+	/**
 	 * Compute the input along the image border and see if has the expected results
 	 */
 	public void testBorder() {
+		imageGradient(input,derivX,derivY);
+		alg.setImage(input);
 		for( int y = 0; y < height; y++ ) {
 			if( y < borderRadius || y >= height-borderRadius) {
 				for( int x = 0; x < width; x++ ) {
 					if( y < borderRadius || y >= height-borderRadius) {
-						G g = sparseGradient(input,x,y);
+						G g = alg.compute(x,y);
 						double expectedX = GeneralizedImageOps.get(derivX,x,y);
 						double expectedY = GeneralizedImageOps.get(derivY,x,y);
 
@@ -137,7 +162,10 @@ public abstract class GeneralSparseGradientTests
 		}
 	}
 
+	/**
+	 * Compute the image gradient.  Should not be computed using the exact same code as
+	 *  the gradient operator
+	 */
 	protected abstract void imageGradient( T input , D derivX , D derivY);
 
-	protected abstract G sparseGradient( T input , int x , int y );
 }

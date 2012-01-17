@@ -22,10 +22,16 @@ package boofcv.struct.deriv;
 /**
  * @author Peter Abeles
  */
-public class GradientValue_F64 implements GradientValue{
+public class GradientValue_F64 implements GradientValue {
 
 	public double x;
 	public double y;
+
+	@Override
+	public void set(double dx, double dy) {
+		this.x = dx;
+		this.y = dy;
+	}
 
 	@Override
 	public double getX() {

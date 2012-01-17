@@ -20,6 +20,7 @@ package boofcv.alg.feature.describe.impl;
 
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.struct.deriv.GradientValue;
+import boofcv.struct.deriv.SparseGradientSafe;
 import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
@@ -89,6 +90,7 @@ public class ImplSurfDescribeOps {
 
 				derivX[i] = right-left;
 				derivY[i] = bottom-top;
+//				System.out.printf("%2d %2d %2d %2d dx = %6.2f  dy = %6.2f\n",x,y,pixelsX,pixelsY,derivX[i],derivY[i]);
 			}
 		}
 	}
@@ -159,8 +161,9 @@ public class ImplSurfDescribeOps {
 					   int regionSize, double kernelSize,
 					   boolean useHaar, double[] derivX, double derivY[])
 	{
-		SparseImageGradient<T,?> g =  SurfDescribeOps.createGradient(false,useHaar,(int)(kernelSize/samplePeriod),samplePeriod,(Class<T>)ii.getClass());
+		SparseImageGradient<T,?> g =  SurfDescribeOps.createGradient(useHaar,(int)(kernelSize+0.5),(Class<T>)ii.getClass());
 		g.setImage(ii);
+		g = new SparseGradientSafe(g);
 
 		// add 0.5 to c_x and c_y to have it round when converted to an integer pixel
 		// this is faster than the straight forward method
@@ -176,7 +179,7 @@ public class ImplSurfDescribeOps {
 				GradientValue deriv = g.compute(xx,yy);
 				derivX[i] = deriv.getX();
 				derivY[i] = deriv.getY();
-//				System.out.printf("%2d %2d dx = %6.2f  dy = %6.2f\n",x,y,derivX[i],derivY[i]);
+//				System.out.printf("%2d %2d %2d %2d dx = %6.2f  dy = %6.2f\n",x,y,xx,yy,derivX[i],derivY[i]);
 			}
 		}
 	}

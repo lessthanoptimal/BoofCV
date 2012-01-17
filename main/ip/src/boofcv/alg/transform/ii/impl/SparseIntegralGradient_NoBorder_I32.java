@@ -39,26 +39,36 @@ public class SparseIntegralGradient_NoBorder_I32
 	}
 
 	@Override
+	public void setScale(double scale) {
+		super.setScale(scale);
+
+		x0=-r-1;
+		y0=-r-1;
+		x1=r+2;
+		y1=r+2;
+	}
+
+	@Override
 	public GradientValue_I32 compute(int x, int y) {
 
 		int horizontalOffset = x-r-1;
-		int indexSrc1 = ii.startIndex + (y-r-1)*ii.stride + horizontalOffset;
-		int indexSrc2 = indexSrc1 + r*ii.stride;
-		int indexSrc3 = indexSrc2 + ii.stride;
-		int indexSrc4 = indexSrc3 + r*ii.stride;
+		int indexSrc1 = input.startIndex + (y-r-1)*input.stride + horizontalOffset;
+		int indexSrc2 = indexSrc1 + r*input.stride;
+		int indexSrc3 = indexSrc2 + input.stride;
+		int indexSrc4 = indexSrc3 + r*input.stride;
 
-		int p0 = ii.data[indexSrc1];
-		int p1 = ii.data[indexSrc1+r];
-		int p2 = ii.data[indexSrc1+r+1];
-		int p3 = ii.data[indexSrc1+w];
-		int p11 = ii.data[indexSrc2];
-		int p4 = ii.data[indexSrc2+w];
-		int p10 = ii.data[indexSrc3];
-		int p5 = ii.data[indexSrc3+w];
-		int p9 = ii.data[indexSrc4];
-		int p8 = ii.data[indexSrc4+r];
-		int p7 = ii.data[indexSrc4+r+1];
-		int p6 = ii.data[indexSrc4+w];
+		int p0 = input.data[indexSrc1];
+		int p1 = input.data[indexSrc1+r];
+		int p2 = input.data[indexSrc1+r+1];
+		int p3 = input.data[indexSrc1+w];
+		int p11 = input.data[indexSrc2];
+		int p4 = input.data[indexSrc2+w];
+		int p10 = input.data[indexSrc3];
+		int p5 = input.data[indexSrc3+w];
+		int p9 = input.data[indexSrc4];
+		int p8 = input.data[indexSrc4+r];
+		int p7 = input.data[indexSrc4+r+1];
+		int p6 = input.data[indexSrc4+w];
 
 		int left = p8-p9-p1+p0;
 		int right = p6-p7-p3+p2;
@@ -69,5 +79,10 @@ public class SparseIntegralGradient_NoBorder_I32
 		ret.y = bottom-top;
 
 		return ret;
+	}
+
+	@Override
+	public Class<GradientValue_I32> getGradientType() {
+		return GradientValue_I32.class;
 	}
 }

@@ -18,11 +18,10 @@
 
 package boofcv.alg.transform.ii.impl;
 
-import boofcv.alg.filter.derivative.GeneralSparseGradientTests;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
-import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.alg.transform.ii.GeneralSparseGradientIntegralTests;
 import boofcv.alg.transform.ii.IntegralKernel;
-import boofcv.struct.deriv.GradientValue;
+import boofcv.struct.deriv.GradientValue_F32;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -30,37 +29,25 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestSparseIntegralGradient_NoBorder_F32 extends GeneralSparseGradientTests<ImageFloat32,ImageFloat32,GradientValue>
+public class TestSparseIntegralGradient_NoBorder_F32
+		extends GeneralSparseGradientIntegralTests<ImageFloat32,ImageFloat32,GradientValue_F32>
 {
 
 	final static int size = 5;
 	final static int radius = size/2;
-	SparseIntegralGradient_NoBorder_F32 alg;
 
 	public TestSparseIntegralGradient_NoBorder_F32() {
-		super(ImageFloat32.class, ImageFloat32.class,size/2+1);
+		super(ImageFloat32.class, ImageFloat32.class,size);
 
 		alg = new SparseIntegralGradient_NoBorder_F32(size/2);
+		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius);
+		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius);
+
+		setKernels(kernelX, kernelY);
 	}
 
 	@Test
 	public void allStandard() {
 		allTests(false);
-	}
-
-
-	@Override
-	protected void imageGradient(ImageFloat32 input, ImageFloat32 derivX, ImageFloat32 derivY) {
-		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius);
-		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius);
-
-		GIntegralImageOps.convolve(input,kernelX,derivX);
-		GIntegralImageOps.convolve(input,kernelY,derivY);
-	}
-
-	@Override
-	protected GradientValue sparseGradient(ImageFloat32 input, int x, int y) {
-		alg.setImage(input);
-		return alg.compute(x,y);
 	}
 }

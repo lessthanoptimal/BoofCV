@@ -19,7 +19,7 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.alg.filter.derivative.GeneralSparseGradientTests;
-import boofcv.struct.deriv.GradientValue;
+import boofcv.struct.deriv.GradientValue_F64;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -28,12 +28,10 @@ import org.junit.Test;
  * @author Peter Abeles
  */
 public class TestSparseIntegralGradientKernel
-		extends GeneralSparseGradientTests<ImageFloat32,ImageFloat32,GradientValue>
+		extends GeneralSparseGradientTests<ImageFloat32,ImageFloat32,GradientValue_F64>
 {
-
 	final static int size = 5;
 	final static int radius = size/2;
-	SparseIntegralGradientKernel<ImageFloat32> alg;
 
 	public TestSparseIntegralGradientKernel() {
 		super(ImageFloat32.class, ImageFloat32.class,size/2);
@@ -59,9 +57,4 @@ public class TestSparseIntegralGradientKernel
 		GIntegralImageOps.convolve(input,kernelY,derivY);
 	}
 
-	@Override
-	protected GradientValue sparseGradient(ImageFloat32 input, int x, int y) {
-		alg.setImage(input);
-		return alg.compute(x,y);
-	}
 }

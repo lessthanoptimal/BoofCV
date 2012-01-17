@@ -303,4 +303,27 @@ public class IntegralImageOps {
 			System.out.println();
 		}
 	}
+
+	/**
+	 * Checks to see if the kernel is applied at this specific spot if all the pixels
+	 * would be inside the image bounds or not
+	 *
+	 * @param x
+	 * @param y
+	 * @param kernel
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public static boolean isInBounds( int x , int y , IntegralKernel kernel , int width , int height )
+	{
+		for(ImageRectangle r : kernel.blocks ) {
+			if( x+r.x0 < 0 || y+r.y0 < 0 )
+				return false;
+			if( x+r.x1 >= width || y+r.y1 >= height )
+				return false;
+		}
+
+		return true;
+	}
 }

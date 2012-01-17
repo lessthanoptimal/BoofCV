@@ -33,6 +33,6 @@ public class TestSurfDescribeOps_feature extends StandardSurfTests{
 	protected void describe(double x, double y, double yaw, double scale, double[] features) {
 		double c = Math.cos(yaw);
 		double s = Math.sin(yaw);
-		SurfDescribeOps.features(x,y,c,s, scale, weightSurf,4,5, sparse,features);
+//		SurfDescribeOps.features(x,y,c,s, scale, weightSurf,4,5, sparse,features);
 	}
 }
