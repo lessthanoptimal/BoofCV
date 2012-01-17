@@ -37,7 +37,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 
 /**
@@ -53,7 +53,7 @@ public class TestIntegralImageOps {
 	@Test
 	public void transform() {
 		int numFound = BoofTesting.findMethodThenCall(this,"transform",IntegralImageOps.class,"transform");
-		assertEquals(3,numFound);
+		Assert.assertEquals(3, numFound);
 	}
 
 	public void transform( Method m ) {
@@ -261,5 +261,27 @@ public class TestIntegralImageOps {
 
 		found = ((Number)m.invoke(null,integral,width+1,height+2,width+6,height+8)).doubleValue();
 		assertEquals(0,found,1e-4f);
+	}
+	
+	@Test
+	public void isInBounds() {
+		IntegralKernel kernel = new IntegralKernel(2);
+		kernel.blocks[0] = new ImageRectangle(-1,-2,1,2);
+		kernel.blocks[1] = new ImageRectangle(-3,-2,1,2);
+
+		// obvious cases
+		assertTrue(IntegralImageOps.isInBounds(30,30,kernel,100,100));
+		assertFalse(IntegralImageOps.isInBounds(-10, -20, kernel, 100, 100));
+		// positive border cases
+		assertTrue(IntegralImageOps.isInBounds(3,30,kernel,100,100));
+		assertTrue(IntegralImageOps.isInBounds(98,30,kernel,100,100));
+		assertTrue(IntegralImageOps.isInBounds(30,2,kernel,100,100));
+		assertTrue(IntegralImageOps.isInBounds(30,97,kernel,100,100));
+		// negative border cases
+		assertFalse(IntegralImageOps.isInBounds(2, 30, kernel, 100, 100));
+		assertFalse(IntegralImageOps.isInBounds(99, 30, kernel, 100, 100));
+		assertFalse(IntegralImageOps.isInBounds(30, 1, kernel, 100, 100));
+		assertFalse(IntegralImageOps.isInBounds(30, 98, kernel, 100, 100));
+
 	}
 }

@@ -45,6 +45,17 @@ public class SparseIntegralGradientKernel<T extends ImageSingleBand>
 	}
 
 	@Override
+	public boolean isInBounds(int x, int y) {
+
+		if( !IntegralImageOps.isInBounds(x,y,kernelX,ii.width,ii.height))
+			return false;
+		if( !IntegralImageOps.isInBounds(x,y,kernelY,ii.width,ii.height))
+			return false;
+
+		return true;
+	}
+
+	@Override
 	public void setImage(T integralImage) {
 		this.ii = integralImage;
 	}
@@ -56,5 +67,10 @@ public class SparseIntegralGradientKernel<T extends ImageSingleBand>
 		ret.y = GIntegralImageOps.convolveSparse(ii,kernelY,x,y);
 
 		return ret;
+	}
+
+	@Override
+	public Class<GradientValue_F64> getGradientType() {
+		return GradientValue_F64.class;
 	}
 }

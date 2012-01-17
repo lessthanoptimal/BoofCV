@@ -45,17 +45,17 @@ public class FactoryDescribePointAlgs {
 
 	public static <T extends ImageSingleBand>
 	DescribePointSurf<T> surf(Class<T> imageType) {
-		return new DescribePointSurf<T>();
+		return new DescribePointSurf<T>(imageType);
 	}
 
 	public static <T extends ImageSingleBand>
 	DescribePointSurf<T> surf2(Class<T> imageType) {
-		return new DescribePointSurf2<T>();
+		return new DescribePointSurf2<T>(imageType);
 	}
 
 	public static <T extends ImageSingleBand>
 	DescribePointSurf<T> msurf(Class<T> imageType) {
-		return new DescribePointSurfMod<T>();
+		return new DescribePointSurfMod<T>(imageType);
 	}
 
 	public static <T extends ImageSingleBand>

@@ -40,22 +40,32 @@ public class SparseIntegralHaar_NoBorder_F32
 	}
 
 	@Override
+	public void setScale(double scale) {
+		super.setScale(scale);
+
+		x0=-r;
+		y0=-r;
+		x1=r+1;
+		y1=r+1;
+	}
+
+	@Override
 	public GradientValue_F32 compute(int x, int y) {
 
 		int horizontalOffset = x-r;
-		int indexSrc1 = ii.startIndex + (y-r)*ii.stride + horizontalOffset;
-		int indexSrc2 = ii.startIndex + y*ii.stride + horizontalOffset;
-		int indexSrc3 = ii.startIndex + (y+r)*ii.stride + horizontalOffset;
+		int indexSrc1 = input.startIndex + (y-r)*input.stride + horizontalOffset;
+		int indexSrc2 = input.startIndex + y*input.stride + horizontalOffset;
+		int indexSrc3 = input.startIndex + (y+r)*input.stride + horizontalOffset;
 
 
-		float p0 = ii.data[indexSrc1];
-		float p1 = ii.data[indexSrc1+r];
-		float p2 = ii.data[indexSrc1+w];
-		float p3 = ii.data[indexSrc2];
-		float p5 = ii.data[indexSrc2+w];
-		float p6 = ii.data[indexSrc3];
-		float p7 = ii.data[indexSrc3+r];
-		float p8 = ii.data[indexSrc3+w];
+		float p0 = input.data[indexSrc1];
+		float p1 = input.data[indexSrc1+r];
+		float p2 = input.data[indexSrc1+w];
+		float p3 = input.data[indexSrc2];
+		float p5 = input.data[indexSrc2+w];
+		float p6 = input.data[indexSrc3];
+		float p7 = input.data[indexSrc3+r];
+		float p8 = input.data[indexSrc3+w];
 
 
 		float left = p7-p1-p6+p0;
@@ -67,5 +77,10 @@ public class SparseIntegralHaar_NoBorder_F32
 		ret.y = bottom-top;
 
 		return ret;
+	}
+
+	@Override
+	public Class<GradientValue_F32> getGradientType() {
+		return GradientValue_F32.class;
 	}
 }

@@ -16,22 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe;
+package boofcv.struct.deriv;
 
-import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointSurf  extends BaseTestDescribeSurf<ImageFloat32>{
+public class TestSparseGradientSafe {
 
-	public TestDescribePointSurf() {
-		super(ImageFloat32.class);
-	}
-
-	@Override
-	public DescribePointSurf<ImageFloat32> createAlg() {
-		return new DescribePointSurf<ImageFloat32>(ImageFloat32.class);
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

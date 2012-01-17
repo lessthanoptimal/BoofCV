@@ -20,6 +20,8 @@ package boofcv.alg.feature.describe;
 
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
+import boofcv.struct.deriv.GradientValue;
+import boofcv.struct.deriv.SparseGradientSafe;
 import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageSingleBand;
@@ -63,8 +65,8 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 	public DescribePointSurfMod(int widthLargeGrid, int widthSubRegion,
 								int widthSample, int overLap ,
 								double sigmaLargeGrid , double sigmaSubRegion ,
-								boolean useHaar) {
-		super(widthLargeGrid, widthSubRegion, widthSample, 1, useHaar);
+								boolean useHaar, Class<II> imageType ) {
+		super(widthLargeGrid, widthSubRegion, widthSample, 1, useHaar,imageType);
 
 		this.overLap = overLap;
 
@@ -83,8 +85,8 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 	/**
 	 * Create a SURF-64 descriptor.  See [1] for details.
 	 */
-	public DescribePointSurfMod() {
-		this(4,5,2,2, 2.5 , 2.5 , false );
+	public DescribePointSurfMod(Class<II> imageType) {
+		this(4,5,2,2, 2.5 , 2.5 , false ,imageType);
 	}
 
 	/**
@@ -118,11 +120,15 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
 
 		// extract descriptor
-		SparseImageGradient<II,?> gradient = SurfDescribeOps.createGradient(isInBounds, useHaar, widthSample, scale, (Class<II>) ii.getClass());
 		gradient.setImage(ii);
+		gradient.setScale(scale);
 
-		SurfDescribeOps.featuresMod(x, y, c,s, scale, weightGrid, weightSub,
-				widthLargeGrid, widthSubRegion, overLap , gradient, ret.value);
+		// use a safe method if its along the image border
+		SparseImageGradient gradient = isInBounds ?
+				this.gradient : new SparseGradientSafe(this.gradient);
+
+		// compute image features
+		features(x, y, c, s, scale, gradient , ret.value);
 
 		// normalize feature vector to have an Euclidean length of 1
 		// adds light invariance
@@ -132,6 +138,80 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 		ret.laplacianPositive = computeLaplaceSign((int)Math.round(x),(int)Math.round(y), scale);
 
 		return ret;
+	}
+
+	/**
+	 * <p>
+	 * An improved SURF descriptor as presented in CenSurE paper.   The sub-regions now overlap and more
+	 * points are sampled in the sub-region to allow overlap.
+	 * </p>
+	 *
+	 * @param c_x Center of the feature x-coordinate.
+	 * @param c_y Center of the feature y-coordinate.
+	 * @param c cosine of the orientation
+	 * @param s sine of the orientation
+	 * @param scale The scale of the wavelets.
+	 * @param features Where the features are written to.  Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
+	 */
+	public void features(double c_x, double c_y,
+						 double c , double s,
+						 double scale,  SparseImageGradient gradient , double[] features)
+	{
+		int regionSize = widthLargeGrid*widthSubRegion;
+
+		int totalSampleWidth = widthSubRegion+overLap*2;
+
+		int regionR = regionSize/2;
+		int regionEnd = regionSize-regionR;
+
+		int regionIndex = 0;
+
+		// when computing the pixel coordinates it is more precise to round to the nearest integer
+		// since pixels are always positive round() is equivalent to adding 0.5 and then converting
+		// to an int, which floors the variable.
+		c_x += 0.5;
+		c_y += 0.5;
+
+		int indexGridWeight = 0;
+		// step through the sub-regions
+		for( int rY = -regionR; rY < regionEnd; rY += widthSubRegion ) {
+			for( int rX = -regionR; rX < regionEnd; rX += widthSubRegion ) {
+				double sum_dx = 0, sum_dy=0, sum_adx=0, sum_ady=0;
+
+				// compute and sum up the response  inside the sub-region
+				for( int i = 0; i < totalSampleWidth; i++ ) {
+					double regionY = (rY + i - overLap)*scale;
+					for( int j = 0; j < totalSampleWidth; j++ ) {
+						double regionX = (rX + j - overLap)*scale;
+
+						double w = weightSub.get(j,i);
+						// rotate the pixel along the feature's direction
+						int pixelX = (int)(c_x + c*regionX - s*regionY);
+						int pixelY = (int)(c_y + s*regionX + c*regionY);
+
+						GradientValue g = gradient.compute(pixelX,pixelY);
+						double dx = w*g.getX();
+						double dy = w*g.getY();
+
+						// align the gradient along image patch
+						// note the transform is transposed
+						double pdx =  c*dx + s*dy;
+						double pdy = -s*dx + c*dy;
+
+						sum_dx += pdx;
+						sum_adx += Math.abs(pdx);
+						sum_dy += pdy;
+						sum_ady += Math.abs(pdy);
+					}
+				}
+
+				double w = weightGrid.data[indexGridWeight++];
+				features[regionIndex++] = w*sum_dx;
+				features[regionIndex++] = w*sum_adx;
+				features[regionIndex++] = w*sum_dy;
+				features[regionIndex++] = w*sum_ady;
+			}
+		}
 	}
 
 	@Override

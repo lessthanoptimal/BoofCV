@@ -28,6 +28,12 @@ public class GradientValue_F32 implements GradientValue{
 	public float y;
 
 	@Override
+	public void set(double dx, double dy) {
+		this.x = (float)dx;
+		this.y = (float)dy;
+	}
+
+	@Override
 	public double getX() {
 		return x;
 	}

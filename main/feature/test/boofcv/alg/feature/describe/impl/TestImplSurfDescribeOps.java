@@ -21,7 +21,7 @@ package boofcv.alg.feature.describe.impl;
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.deriv.SparseImageGradient;
+import boofcv.struct.deriv.SparseScaleGradient;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import org.junit.Test;
@@ -53,8 +53,10 @@ public class TestImplSurfDescribeOps {
 		float foundX[] = new float[w*w];
 		float foundY[] = new float[w*w];
 
-		for( double scale = 0.5; scale <= 1.8; scale += 0.2 ) {
+		for( double scale = 0.2; scale <= 1.8; scale += 0.2 ) {
+//			System.out.println("scale = "+scale);
 			ImplSurfDescribeOps.naiveGradient(ii,8,9,scale,w, 4*scale, false, expectedX,expectedY);
+//			System.out.println("------------------------");
 			ImplSurfDescribeOps.gradientInner(ii,8,9,scale,w, 4*scale, foundX,foundY);
 
 			for( int i = 0; i < foundX.length; i++ ) {
@@ -167,10 +169,11 @@ public class TestImplSurfDescribeOps {
 		return ret;
 	}
 
-	public static SparseImageGradient<ImageFloat32,?> createGradient( ImageFloat32 ii , double scale) {
-		SparseImageGradient<ImageFloat32,?> ret =
-				SurfDescribeOps.createGradient(false,false,4,scale,ImageFloat32.class);
+	public static SparseScaleGradient<ImageFloat32,?> createGradient( ImageFloat32 ii , double scale) {
+		SparseScaleGradient<ImageFloat32,?> ret =
+				SurfDescribeOps.createGradient(false,4,ImageFloat32.class);
 		ret.setImage(ii);
+		ret.setScale(scale);
 		return ret;
 	}
 }

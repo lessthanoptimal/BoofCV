@@ -32,6 +32,13 @@ public class ImageRectangle {
 		this.y1 = y1;
 	}
 
+	public ImageRectangle( ImageRectangle orig ) {
+		this.x0 = orig.x0;
+		this.y0 = orig.y0;
+		this.x1 = orig.x1;
+		this.y1 = orig.y1;
+	}
+
 	public ImageRectangle() {
 	}
 }

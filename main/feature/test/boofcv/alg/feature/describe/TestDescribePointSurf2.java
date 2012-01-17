@@ -32,7 +32,7 @@ public class TestDescribePointSurf2 extends BaseTestDescribeSurf<ImageFloat32> {
 
 	@Override
 	public DescribePointSurf<ImageFloat32> createAlg() {
-		return new DescribePointSurf2<ImageFloat32>();
+		return new DescribePointSurf2<ImageFloat32>(ImageFloat32.class);
 	}
 
 }

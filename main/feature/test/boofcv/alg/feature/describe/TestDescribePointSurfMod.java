@@ -32,6 +32,6 @@ public class TestDescribePointSurfMod  extends BaseTestDescribeSurf<ImageFloat32
 
 	@Override
 	public DescribePointSurf<ImageFloat32> createAlg() {
-		return new DescribePointSurfMod<ImageFloat32>();
+		return new DescribePointSurfMod<ImageFloat32>(ImageFloat32.class);
 	}
 }

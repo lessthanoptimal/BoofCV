@@ -16,22 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe;
+package boofcv.struct.deriv;
 
-import boofcv.struct.image.ImageFloat32;
-
+import boofcv.struct.image.ImageSingleBand;
 
 /**
+ * Provides basic functions for {@link boofcv.struct.deriv.SparseImageGradient} and function for scaling
+ * the gradient up and down.
+ * 
  * @author Peter Abeles
  */
-public class TestDescribePointSurf  extends BaseTestDescribeSurf<ImageFloat32>{
+public abstract class SparseScaleGradient<T extends ImageSingleBand,G extends GradientValue>
+		implements SparseImageGradient<T, G>
+{
+	protected T input;
+	
+	// defines the kernel's bounds
+	protected int x0,y0,x1,y1;
+	
+	public abstract void setScale( double scale );
 
-	public TestDescribePointSurf() {
-		super(ImageFloat32.class);
+	@Override
+	public void setImage(T input ) {
+		this.input = input;
 	}
 
 	@Override
-	public DescribePointSurf<ImageFloat32> createAlg() {
-		return new DescribePointSurf<ImageFloat32>(ImageFloat32.class);
+	public boolean isInBounds( int x , int y ) {
+		return( x+x0 >= 0 && y+y0 >= 0 && x+x1 <= input.width && y+y1 <= input.height );
 	}
 }

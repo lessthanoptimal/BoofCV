@@ -19,7 +19,8 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
-import boofcv.struct.deriv.GradientValue_F64;
+import boofcv.struct.deriv.GradientValue;
+import boofcv.struct.deriv.SparseGradientSafe;
 import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
@@ -39,15 +40,15 @@ public class DescribePointSurf2<II extends ImageSingleBand> extends DescribePoin
 	ImplBilinearPixel_F32 interpY = new ImplBilinearPixel_F32();
 
 	public DescribePointSurf2(int widthLargeGrid, int widthSubRegion, int widthSample,
-							  double weightSigma , boolean useHaar) {
-		super(widthLargeGrid, widthSubRegion, widthSample, weightSigma, useHaar);
+							  double weightSigma , boolean useHaar, Class<II> imageType ) {
+		super(widthLargeGrid, widthSubRegion, widthSample, weightSigma, useHaar,imageType);
 	}
 
 	/**
 	 * Create a SURF-64 descriptor.  See [1] for details.
 	 */
-	public DescribePointSurf2() {
-		this(4,5,2, 5.5 , true);
+	public DescribePointSurf2(Class<II> imageType) {
+		this(4,5,2, 5.5 , true,imageType);
 	}
 
 	/**
@@ -80,7 +81,7 @@ public class DescribePointSurf2<II extends ImageSingleBand> extends DescribePoin
 
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
-//		boolean isInBounds = SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y,subRegionWidth,widthSample*scale);
+		boolean isInBounds = SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y,widthSubRegion,widthSample*scale);
 
 		// declare the feature if needed
 		if( ret == null )
@@ -89,8 +90,12 @@ public class DescribePointSurf2<II extends ImageSingleBand> extends DescribePoin
 			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
 
 		// extract descriptor
-		SparseImageGradient gradient = SurfDescribeOps.createGradient(false, useHaar, widthSample, scale, ii.getClass());
 		gradient.setImage(ii);
+		gradient.setScale(scale);
+
+		// use a safe method if its along the image border
+		SparseImageGradient gradient = isInBounds ?
+				this.gradient : new SparseGradientSafe(this.gradient);
 
 		// extra sample for interpolation
 		sampleWidth += 1;
@@ -104,10 +109,10 @@ public class DescribePointSurf2<II extends ImageSingleBand> extends DescribePoin
 			for( int x = 0; x < sampleWidth; x++ ) {
 				int pixelX = (int)(tl_x + x*scale + 0.5);
 
-				GradientValue_F64 g = (GradientValue_F64)gradient.compute(pixelX,pixelY);
+				GradientValue g = gradient.compute(pixelX,pixelY);
 				
-				derivX.set(x,y,(float)g.x);
-				derivY.set(x,y,(float)g.y);
+				derivX.set(x,y,(float)g.getX());
+				derivY.set(x,y,(float)g.getY());
 			}
 		}
 

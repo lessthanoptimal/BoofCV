@@ -39,4 +39,14 @@ public class IntegralKernel {
 	public int getNumBlocks() {
 		return blocks.length;
 	}
+
+	public IntegralKernel copy() {
+		IntegralKernel ret = new IntegralKernel( blocks.length );
+		for( int i = 0; i < blocks.length; i++ ) {
+			this.blocks[i] = new ImageRectangle(blocks[i]);
+			this.scales[i] = scales[i];
+		}
+
+		return ret;
+	}
 }

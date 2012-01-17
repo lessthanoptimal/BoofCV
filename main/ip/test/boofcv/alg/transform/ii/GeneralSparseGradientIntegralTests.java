@@ -18,39 +18,41 @@
 
 package boofcv.alg.transform.ii;
 
+import boofcv.alg.filter.derivative.GeneralSparseGradientTests;
 import boofcv.struct.deriv.GradientValue;
-import boofcv.struct.deriv.SparseScaleGradient;
 import boofcv.struct.image.ImageSingleBand;
 
-
 /**
- * Computes the gradient from an integral image.  Does not check for border conditions.
- * Much faster than generalized algorithms that can handle image borders, but is unsafe and
- * bounds must be checked before use.
- *
  * @author Peter Abeles
  */
-public abstract class SparseIntegralGradient_NoBorder <T extends ImageSingleBand, G extends GradientValue>
-		extends SparseScaleGradient<T, G>
+public abstract class GeneralSparseGradientIntegralTests
+		<T extends ImageSingleBand, D extends ImageSingleBand,G extends GradientValue>
+	extends GeneralSparseGradientTests<T,D,G>
 {
-	// the radius at a scale of one
-	protected int baseR;
-	
-	// radius of the kernel
-	protected int r;
-	// width of the kernel
-	protected int w;
+	// kernels for testing derivative output
+	IntegralKernel kernelX;
+	IntegralKernel kernelY;
 
-	public SparseIntegralGradient_NoBorder(int baseRadius) {
-		baseR = baseRadius;
-		setScale(1);
+	int radius;
+
+	protected GeneralSparseGradientIntegralTests(Class<T> inputType, Class<D> derivType,
+												 int size )
+	{
+		super(inputType, derivType, size/2+1);
+		radius = size/2;
+	}
+
+	public void setKernels( IntegralKernel kernelX , IntegralKernel kernelY )
+	{
+		this.kernelX = kernelX;
+		this.kernelY = kernelY;
 	}
 
 	@Override
-	public void setScale(double scale) {
-		r = (int)(baseR*scale+0.5);
-		if( r < 0 )
-			r = 1;
-		w = r*2+1;
+	protected void imageGradient(T input, D derivX, D derivY) {
+
+		GIntegralImageOps.convolve(input,kernelX,derivX);
+		GIntegralImageOps.convolve(input,kernelY,derivY);
 	}
+
 }

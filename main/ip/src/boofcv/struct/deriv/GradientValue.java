@@ -26,6 +26,8 @@ package boofcv.struct.deriv;
  */
 public interface GradientValue {
 
+	public void set( double dx , double dy );
+
 	/**
 	 * Derivative along the x-axis
 	 */

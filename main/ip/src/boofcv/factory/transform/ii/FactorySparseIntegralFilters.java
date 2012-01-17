@@ -22,7 +22,7 @@ import boofcv.alg.transform.ii.impl.SparseIntegralGradient_NoBorder_F32;
 import boofcv.alg.transform.ii.impl.SparseIntegralGradient_NoBorder_I32;
 import boofcv.alg.transform.ii.impl.SparseIntegralHaar_NoBorder_F32;
 import boofcv.alg.transform.ii.impl.SparseIntegralHaar_NoBorder_I32;
-import boofcv.struct.deriv.SparseImageGradient;
+import boofcv.struct.deriv.SparseScaleGradient;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
@@ -36,21 +36,21 @@ import boofcv.struct.image.ImageSingleBand;
 public class FactorySparseIntegralFilters {
 
 	public static <T extends ImageSingleBand>
-	SparseImageGradient<T,?> gradient( int radius , Class<T> imageType ) {
+	SparseScaleGradient<T,?> gradient( int radius , Class<T> imageType ) {
 		if( imageType == ImageFloat32.class )
-			return (SparseImageGradient<T,?>)new SparseIntegralGradient_NoBorder_F32(radius);
+			return (SparseScaleGradient<T,?>)new SparseIntegralGradient_NoBorder_F32(radius);
 		else if( imageType == ImageSInt32.class )
-			return (SparseImageGradient<T,?>)new SparseIntegralGradient_NoBorder_I32(radius);
+			return (SparseScaleGradient<T,?>)new SparseIntegralGradient_NoBorder_I32(radius);
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}
 
 	public static <T extends ImageSingleBand>
-	SparseImageGradient<T,?> haar( int radius , Class<T> imageType ) {
+	SparseScaleGradient<T,?> haar( int radius , Class<T> imageType ) {
 		if( imageType == ImageFloat32.class )
-			return (SparseImageGradient<T,?>)new SparseIntegralHaar_NoBorder_F32(radius);
+			return (SparseScaleGradient<T,?>)new SparseIntegralHaar_NoBorder_F32(radius);
 		else if( imageType == ImageSInt32.class )
-			return (SparseImageGradient<T,?>)new SparseIntegralHaar_NoBorder_I32(radius);
+			return (SparseScaleGradient<T,?>)new SparseIntegralHaar_NoBorder_I32(radius);
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}

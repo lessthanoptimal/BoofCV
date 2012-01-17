@@ -30,5 +30,13 @@ public interface SparseImageGradient<T extends ImageSingleBand, G extends Gradie
 {
 	public void setImage(T input );
 
+	/**
+	 * Checks to see if the entire sample region is contained inside the image or not.
+	 * Depending on the implementation it might be able to handle out of bounds pixels or not.
+	 */
+	public boolean isInBounds( int x , int y );
+
 	public G compute( int x , int y );
+	
+	public Class<G> getGradientType();
 }
