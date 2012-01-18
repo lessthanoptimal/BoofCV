@@ -16,23 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe;
-
-
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.convolve.Kernel2D_F64;
+package boofcv.numerics.optimization;
 
 /**
  * @author Peter Abeles
  */
-public class TestSurfDescribeOps_feature extends StandardSurfTests{
+public class CallCounterStoS implements FunctionStoS {
 
-	Kernel2D_F64 weightSurf = FactoryKernelGaussian.gaussianWidth(-1, 20);
+	int count;
+	FunctionStoS func;
+
+	public CallCounterStoS(FunctionStoS func) {
+		this.func = func;
+	}
 
 	@Override
-	protected void describe(double x, double y, double yaw, double scale, double[] features) {
-		double c = Math.cos(yaw);
-		double s = Math.sin(yaw);
-//		SurfDescribeOps.features(x,y,c,s, scale, weightSurf,4,5, sparse,features);
+	public double process(double input) {
+		count++;
+		return func.process(input);
 	}
 }

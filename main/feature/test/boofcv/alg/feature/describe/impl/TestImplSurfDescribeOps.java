@@ -20,10 +20,13 @@ package boofcv.alg.feature.describe.impl;
 
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
+import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.deriv.SparseScaleGradient;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 import java.util.Random;
@@ -83,7 +86,7 @@ public class TestImplSurfDescribeOps {
 		int foundX[] = new int[w*w];
 		int foundY[] = new int[w*w];
 
-		for( double scale = 0.5; scale <= 1.8; scale += 0.2 ) {
+		for( double scale = 0.2; scale <= 1.8; scale += 0.2 ) {
 			ImplSurfDescribeOps.naiveGradient(ii,10,9,scale,w, 4*scale, false, expectedX,expectedY);
 			ImplSurfDescribeOps.gradientInner(ii,10,9,scale,w, 4*scale,foundX,foundY);
 
@@ -128,7 +131,8 @@ public class TestImplSurfDescribeOps {
 		double derivY[] = new double[w*w];
 
 		for( double theta = -Math.PI; theta <= Math.PI; theta += 0.15 ) {
-			ImageFloat32 img = createGradient(width,height,theta);
+			ImageFloat32 img = new ImageFloat32(width,height);
+			createGradient(theta,img);
 			ImageFloat32 ii = IntegralImageOps.transform(img,null);
 
 			ImplSurfDescribeOps.naiveGradient(ii,r*2,r*2,scale,w, 4*scale, false, derivX,derivY);
@@ -153,25 +157,26 @@ public class TestImplSurfDescribeOps {
 	/**
 	 * Creates an image with a constant gradient in the specified direction
 	 */
-	public static ImageFloat32 createGradient( int width , int height , double theta ) {
-		ImageFloat32 ret = new ImageFloat32(width,height);
+	public static <I extends ImageSingleBand>
+	void createGradient( double theta , I image ) {
+		GImageSingleBand ret = FactoryGeneralizedSingleBand.wrap(image);
 
 		double c = Math.cos(theta);
 		double s = Math.sin(theta);
 
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x++ ) {
+		for( int y = 0; y < image.height; y++ ) {
+			for( int x = 0; x < image.width; x++ ) {
 				double xx = c*x;
 				double yy = s*y;
 				ret.set(x,y,(float)(xx+yy));
 			}
 		}
-		return ret;
 	}
 
-	public static SparseScaleGradient<ImageFloat32,?> createGradient( ImageFloat32 ii , double scale) {
-		SparseScaleGradient<ImageFloat32,?> ret =
-				SurfDescribeOps.createGradient(false,4,ImageFloat32.class);
+	public static < II extends ImageSingleBand> 
+	SparseScaleGradient<II,?> createGradient( II ii , double scale) {
+		SparseScaleGradient<II,?> ret =
+				SurfDescribeOps.createGradient(false,4,(Class<II>)ii.getClass());
 		ret.setImage(ii);
 		ret.setScale(scale);
 		return ret;

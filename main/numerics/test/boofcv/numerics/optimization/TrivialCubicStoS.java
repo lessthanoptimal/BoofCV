@@ -16,24 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe;
-
-
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.convolve.Kernel2D_F64;
+package boofcv.numerics.optimization;
 
 /**
+ * Function used for testing optimization functions
+ *
  * @author Peter Abeles
  */
-public class TestSurfDescribeOps_featureMod extends StandardSurfTests{
+public class TrivialCubicStoS implements FunctionStoS {
 
-	Kernel2D_F64 weightLarge = FactoryKernelGaussian.gaussianWidth(2.5,4);
-	Kernel2D_F64 weightSub = FactoryKernelGaussian.gaussianWidth(2.5,9);
+	double center;
+
+	public TrivialCubicStoS(double center) {
+		this.center = center;
+	}
 
 	@Override
-	protected void describe(double x, double y, double yaw, double scale, double[] features) {
-		double c = Math.cos(yaw);
-		double s = Math.sin(yaw);
-//		SurfDescribeOps.featuresMod(x,y,c,s,scale, weightLarge,weightSub,4,5, 2,sparse,features);
+	public double process(double input) {
+
+		double v = input-center;
+
+		return v*v;
 	}
 }

@@ -51,7 +51,8 @@ public class ImplSurfDescribeOps {
 
 		// round the kernel size
 		int w = (int)(kernelSize+0.5);
-		int r = w/2 + w%2;
+		int r = w/2;
+		if( r <= 0 ) r = 1;
 		w = r*2+1;
 
 		int i = 0;
@@ -110,7 +111,8 @@ public class ImplSurfDescribeOps {
 
 		// round the kernel size
 		int w = (int)(kernelSize+0.5);
-		int r = w/2 + w%2;
+		int r = w/2;
+		if( r <= 0 ) r = 1;
 		w = r*2+1;
 
 		int i = 0;

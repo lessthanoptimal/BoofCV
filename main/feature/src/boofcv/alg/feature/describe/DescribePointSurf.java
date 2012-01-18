@@ -86,9 +86,9 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 	/**
 	 * Creates a SURF descriptor of arbitrary dimension by changing how the local region is sampled.
 	 *
-	 * @param widthLargeGrid Number of sub-regions wide the large grid is.
-	 * @param widthSubRegion Number of sample points wide a sub-region is.
-	 * @param widthSample The size of a sample point.
+	 * @param widthLargeGrid Number of sub-regions wide the large grid is. Typically 4
+	 * @param widthSubRegion Number of sample points wide a sub-region is. Typically 5
+	 * @param widthSample The width of a sample point. Typically 4
 	 * @param weightSigma Weighting factor's sigma.  Try 3.8
 	 * @param useHaar If true the Haar wavelet will be used (what was used in [1]), false means an image gradient
 	 * approximation will be used.  False is recommended.
@@ -112,6 +112,7 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		// each sub-region provides 4 features
 		featureDOF = widthLargeGrid*widthLargeGrid*4;
 
+		// create the function that the gradient is sampled with
 		gradient = SurfDescribeOps.createGradient(useHaar,widthSample, inputType);
 	}
 
@@ -119,7 +120,7 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 	 * Create a SURF-64 descriptor.  See [1] for details.
 	 */
 	public DescribePointSurf(Class<II> inputType ) {
-		this(4,5,2, 4.5 , false,inputType);
+		this(4,5,3, 4.5 , false,inputType);
 	}
 
 	public void setImage( II integralImage ) {

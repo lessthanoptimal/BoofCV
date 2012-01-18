@@ -100,7 +100,8 @@ public class SurfDescribeOps {
 	SparseScaleGradient<T,?> createGradient( boolean useHaar , int kernelWidth ,
 											 Class<T> imageType )
 	{
-		int regionRadius = kernelWidth/2 + kernelWidth%2;
+		int regionRadius = kernelWidth/2;
+		if( regionRadius <= 0 ) regionRadius = 1;
 
 		if( useHaar )
 			return FactorySparseIntegralFilters.haar(regionRadius, imageType);

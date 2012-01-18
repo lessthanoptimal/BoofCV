@@ -48,7 +48,7 @@ public class DescribePointSurf2<II extends ImageSingleBand> extends DescribePoin
 	 * Create a SURF-64 descriptor.  See [1] for details.
 	 */
 	public DescribePointSurf2(Class<II> imageType) {
-		this(4,5,2, 5.5 , true,imageType);
+		this(4,5,3, 4.5 , false,imageType);
 	}
 
 	/**
@@ -81,7 +81,8 @@ public class DescribePointSurf2<II extends ImageSingleBand> extends DescribePoin
 
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
-		boolean isInBounds = SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y,widthSubRegion,widthSample*scale);
+		boolean isInBounds = false;// TODO adjust for this class
+//				SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y,widthSubRegion,widthSample*scale);
 
 		// declare the feature if needed
 		if( ret == null )
