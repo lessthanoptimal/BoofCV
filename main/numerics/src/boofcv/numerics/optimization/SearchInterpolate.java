@@ -56,6 +56,15 @@ public class SearchInterpolate {
 		return -top/bottom;
 	}
 
+	public static double quadratic2( double g0 , double alpha0 , double g1  , double alpha1) {
+
+		double a = (g1-g0)/(2*(alpha1-alpha0));
+		double b = g0 - 2*a*alpha0;
+//		double c = f0 - g0*alpha0 + a*alpha0*alpha0;
+
+		return -b/(2*a);
+	}
+
 	/**
 	 * Interpolates the next step using a cubic model.  Interpolation works by solving for 'a' and 'b' in
 	 * the equation below. Designed to minimize the number of times the derivative
@@ -92,5 +101,23 @@ public class SearchInterpolate {
 		double b = a21*y1 + a22*y2;
 		
 	 	return (-b+Math.sqrt(b*b-3*a*g0))/(3.0*a);
+	}
+
+
+	/**
+	 * Cubic interpolation using two function values and derivatives.
+	 */
+	public static double cubic2( double f0 , double g0 , double alpha0 ,
+								 double f1 , double g1 , double alpha1 ) {
+
+		double d1 = g0+g1-3*(f0-f1)/(alpha0-alpha1);
+		double d2 = Math.signum(alpha1-alpha0)*Math.sqrt(d1*d1-g0*g1);
+
+		if( Double.isNaN(d2)) {
+			double test = cubic2(f1,g1,alpha1,f0,g0,alpha0);
+			return test;
+		}
+		
+		return alpha1-(alpha1-alpha0)*(g1+d2-d1)/(g1-g0+2*d2);
 	}
 }

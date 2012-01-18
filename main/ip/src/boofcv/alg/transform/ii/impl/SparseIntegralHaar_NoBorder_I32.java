@@ -36,13 +36,13 @@ public class SparseIntegralHaar_NoBorder_I32
 
 	public SparseIntegralHaar_NoBorder_I32(int radius) {
 		super(radius);
-		w = 2*radius;
+
 	}
 
 	@Override
 	public void setScale(double scale) {
 		super.setScale(scale);
-
+		w = 2*r;
 		x0=-r;
 		y0=-r;
 		x1=r+1;

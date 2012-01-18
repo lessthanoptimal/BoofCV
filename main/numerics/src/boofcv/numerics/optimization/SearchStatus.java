@@ -16,22 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe;
-
-import boofcv.struct.image.ImageFloat32;
-
+package boofcv.numerics.optimization;
 
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointSurfMod  extends BaseTestDescribeSurf<ImageFloat32,ImageFloat32> {
-
-	public TestDescribePointSurfMod() {
-		super(ImageFloat32.class,ImageFloat32.class);
-	}
-
-	@Override
-	public DescribePointSurf<ImageFloat32> createAlg() {
-		return new DescribePointSurfMod<ImageFloat32>(ImageFloat32.class);
-	}
+public enum SearchStatus {
 }

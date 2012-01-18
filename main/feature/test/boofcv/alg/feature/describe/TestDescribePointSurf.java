@@ -24,10 +24,10 @@ import boofcv.struct.image.ImageFloat32;
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointSurf  extends BaseTestDescribeSurf<ImageFloat32>{
+public class TestDescribePointSurf  extends BaseTestDescribeSurf<ImageFloat32,ImageFloat32>{
 
 	public TestDescribePointSurf() {
-		super(ImageFloat32.class);
+		super(ImageFloat32.class,ImageFloat32.class);
 	}
 
 	@Override

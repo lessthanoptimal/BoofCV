@@ -16,22 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe;
-
-import boofcv.struct.image.ImageFloat32;
-
+package boofcv.numerics.optimization;
 
 /**
+ * Function used for testing optimization functions
+ *
  * @author Peter Abeles
  */
-public class TestDescribePointSurfMod  extends BaseTestDescribeSurf<ImageFloat32,ImageFloat32> {
+public class TrivialCubicDerivStoS implements FunctionStoS {
 
-	public TestDescribePointSurfMod() {
-		super(ImageFloat32.class,ImageFloat32.class);
+	double center;
+
+	public TrivialCubicDerivStoS(double center) {
+		this.center = center;
 	}
 
 	@Override
-	public DescribePointSurf<ImageFloat32> createAlg() {
-		return new DescribePointSurfMod<ImageFloat32>(ImageFloat32.class);
+	public double process(double input) {
+		return 2*(input-center);
 	}
 }

@@ -53,14 +53,15 @@ public class ImplOrientationSlidingWindowIntegral_F32
 	/**
 	 *
 	 * @param numAngles Number of different center points for the sliding window that will be considered
+	 * @param samplePeriod How often (in units of scale) does it sample the image?
 	 * @param windowSize Angular window that is slide across
 	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
 	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
 	 * @param sampleKernelWidth Size of kernel doing the sampling.  Typically 4.
 	 */
-	public ImplOrientationSlidingWindowIntegral_F32(int numAngles, double windowSize,
+	public ImplOrientationSlidingWindowIntegral_F32(int numAngles, double samplePeriod, double windowSize,
 													int radius, double weightSigma, int sampleKernelWidth) {
-		super(radius,1,sampleKernelWidth,weightSigma);
+		super(radius,samplePeriod,sampleKernelWidth,weightSigma);
 		this.numAngles = numAngles;
 		this.windowSize = windowSize;
 

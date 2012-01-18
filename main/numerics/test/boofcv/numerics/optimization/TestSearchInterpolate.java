@@ -43,6 +43,23 @@ public class TestSearchInterpolate {
 	
 		assertEquals(expected,found,1e-8);
 	}
+
+	@Test
+	public void quadratic2() {
+		double a = 2;
+		double b = -3;
+		double c = 1;
+
+		double alpha0 = 1;
+		double g0 = quadDeriv(a,b,alpha0);
+		double alpha1 = 3.35;
+		double g1 = quadDeriv(a,b,alpha1);
+
+		double expected = -b/(2*a);
+		double found = SearchInterpolate.quadratic2(g0,alpha0,g1,alpha1);
+
+		assertEquals(expected,found,1e-8);
+	}
 	
 	private double quad( double a , double b , double c , double x ) {
 		return a*x*x + b*x + c;
@@ -66,9 +83,28 @@ public class TestSearchInterpolate {
 		double alpha2 = 1.5;
 		double f2 = cubic(a,b,c,d,alpha2);
 
-		// just picked one of two roots, I seemed to have picked the right one
 		double expected = (-b + Math.sqrt(b*b-3*a*c))/(3*a);
 		double found = SearchInterpolate.cubic(f0, g0, f1, alpha1, f2, alpha2);
+
+		assertEquals(expected,found,1e-8);
+	}
+
+	@Test
+	public void cubic2() {
+		double a = 2;
+		double b = -3;
+		double c = 1;
+		double d = 3.5;
+
+		double alpha0 = 1.5;
+		double f0 = cubic(a, b, c, d, alpha0);
+		double g0 = cubicDeriv(a, b, c, alpha0);
+		double alpha1 = 2;
+		double f1 = cubic(a, b, c, d, alpha1);
+		double g1 = cubicDeriv(a, b, c, alpha1);
+
+		double expected = (-b + Math.sqrt(b*b-3*a*c))/(3*a);
+		double found = SearchInterpolate.cubic2(f0,g0,alpha0,f1,g1,alpha1);
 
 		assertEquals(expected,found,1e-8);
 	}

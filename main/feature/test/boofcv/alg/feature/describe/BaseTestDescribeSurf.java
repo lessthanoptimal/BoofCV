@@ -18,7 +18,10 @@
 
 package boofcv.alg.feature.describe;
 
+import boofcv.alg.feature.describe.impl.TestImplSurfDescribeOps;
+import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
@@ -26,13 +29,12 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
-public abstract class BaseTestDescribeSurf<I extends ImageSingleBand> {
+public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends ImageSingleBand> {
 	Random rand = new Random(234);
 	int width = 50;
 	int height = 60;
@@ -40,25 +42,28 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand> {
 	int c_x = width/2;
 	int c_y = height/2;
 
-	DescribePointSurf<I> alg = createAlg();
-	I ii;
+	DescribePointSurf<II> alg = createAlg();
+	protected SparseImageGradient<II,?> sparse;
+	II ii;
+	I input;
 
-	public BaseTestDescribeSurf( Class<I> imageType ) {
-		ii = GeneralizedImageOps.createSingleBand(imageType,width,height);
-		GeneralizedImageOps.randomize(ii, rand, 0, 100);
+	public BaseTestDescribeSurf( Class<I> inputType , Class<II> integralType ) {
+		input = GeneralizedImageOps.createSingleBand(inputType,width,height);
+		ii = GeneralizedImageOps.createSingleBand(integralType,width,height);
 	}
 
-	public abstract DescribePointSurf<I> createAlg();
+	public abstract DescribePointSurf<II> createAlg();
 
 	/**
 	 * Does it produce a the same features when given a subimage?
 	 */
 	@Test
 	public void checkSubImage() {
+		GeneralizedImageOps.randomize(ii, rand, 0, 100);
 		alg.setImage(ii);
 		SurfFeature expected = alg.describe(c_x,c_y,1,0,null);
 
-		I sub = BoofTesting.createSubImageOf(ii);
+		II sub = BoofTesting.createSubImageOf(ii);
 
 		alg.setImage(sub);
 		SurfFeature found = alg.describe(c_x,c_y,1,0,null);
@@ -71,6 +76,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand> {
 	 */
 	@Test
 	public void changeScale() {
+		GeneralizedImageOps.randomize(ii, rand, 0, 100);
 		alg.setImage(ii);
 		SurfFeature a = alg.describe(c_x,c_y,1,0,null);
 		SurfFeature b = alg.describe(c_x,c_y,1.5,0,null);
@@ -83,6 +89,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand> {
 	 */
 	@Test
 	public void changeRotation() {
+		GeneralizedImageOps.randomize(ii, rand, 0, 100);
 		alg.setImage(ii);
 		SurfFeature a = alg.describe(c_x,c_y,1,0,null);
 		SurfFeature b = alg.describe(c_x,c_y,1,1,null);
@@ -115,6 +122,79 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand> {
 			double angle = (2.0*Math.PI*i)/10;
 			alg.describe(0,0,1,angle,null);
 			alg.describe(ii.width-1,ii.height-1,1,angle,null);
+		}
+	}
+
+	/**
+	 * If the image has a constant value then all the features should be zero.
+	 */
+	@Test
+	public void features_constant() {
+		GeneralizedImageOps.fill(input, 50);
+
+		GIntegralImageOps.transform(input, ii);
+		sparse = TestImplSurfDescribeOps.createGradient(ii, 1);
+		alg.setImage(ii);
+		
+		SurfFeature feat = alg.describe(20,20,1,0.75,null);
+
+		for( double f : feat.value )
+			assertEquals(0,f,1e-4);
+	}
+
+	/**
+	 * Create an image which has a constant slope.  The features aligned along that
+	 * direction should be large.  This also checks that the orientation parameter
+	 * is being used correctly and that absolute value is being done.
+	 */
+	@Test
+	public void features_increasing() {
+		// test the gradient along the x-axis only
+		TestImplSurfDescribeOps.createGradient(0,input);
+		GIntegralImageOps.transform(input, ii);
+		sparse = TestImplSurfDescribeOps.createGradient(ii, 1);
+
+		// orient the feature along the x-axis
+		alg.setImage(ii);
+		SurfFeature feat = alg.describe(15,15,1,0,null);
+
+		for( int i = 0; i < 64; i+= 4) {
+			assertEquals(feat.value[i],feat.value[i+1],1e-4);
+			assertTrue(feat.value[i] > 0);
+			assertEquals(0,feat.value[i+2],1e-4);
+			assertEquals(0,feat.value[i+3],1e-4);
+		}
+
+		// now orient the feature along the y-axis
+		feat = alg.describe(15,15,1, Math.PI / 2.0,null);
+
+		for( int i = 0; i < 64; i+= 4) {
+			assertEquals(-feat.value[i+2],feat.value[i+3],1e-4);
+			assertTrue(feat.value[i+2] < 0);
+			assertEquals(0,feat.value[i],1e-4);
+			assertEquals(0,feat.value[i+1],1e-4);
+		}
+	}
+
+	/**
+	 * Give it a scale factor which is a fraction and see if it blows up
+	 */
+	@Test
+	public void features_fraction() {
+		// test the gradient along the x-axis only
+		TestImplSurfDescribeOps.createGradient( 0,input);
+		GIntegralImageOps.transform(input,ii);
+		sparse = TestImplSurfDescribeOps.createGradient(ii,1.5);
+
+		// orient the feature along the x-axis
+		alg.setImage(ii);
+		SurfFeature feat = alg.describe(25,25,1.5,0,null);
+
+		for( int i = 0; i < 64; i+= 4) {
+			assertEquals(feat.value[i],feat.value[i+1],1e-4);
+			assertTrue(feat.value[i] > 0);
+			assertEquals(0,feat.value[i+2],1e-4);
+			assertEquals(0,feat.value[i+3],1e-4);
 		}
 	}
 }

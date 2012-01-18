@@ -55,7 +55,7 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 	 *
 	 * @param widthLargeGrid Number of sub-regions wide the large grid is.  Typically 4.
 	 * @param widthSubRegion Number of sample points wide a sub-region is.  Typically 5.
-	 * @param widthSample The size of a sample point. Typically 2.
+	 * @param widthSample The size of a sample point. Typically 4.
 	 * @param overLap Number of sample points sub-regions overlap, Typically 2.
 	 * @param sigmaLargeGrid Sigma used to weight points in the large grid. Typically 2.5
 	 * @param sigmaSubRegion Sigma used to weight points in the sub-region grid. Typically 2.5
@@ -86,7 +86,7 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 	 * Create a SURF-64 descriptor.  See [1] for details.
 	 */
 	public DescribePointSurfMod(Class<II> imageType) {
-		this(4,5,2,2, 2.5 , 2.5 , false ,imageType);
+		this(4,5,3,2, 2.5 , 2.5 , false ,imageType);
 	}
 
 	/**
