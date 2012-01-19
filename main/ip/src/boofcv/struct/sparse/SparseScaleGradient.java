@@ -16,27 +16,32 @@
  * limitations under the License.
  */
 
-package boofcv.struct.deriv;
+package boofcv.struct.sparse;
 
 import boofcv.struct.image.ImageSingleBand;
 
-
 /**
- * Computes the image gradient on a per pixel basis.
- *
+ * Interface for {@link SparseImageGradient} whose size can be scaled up and down.
+ * 
  * @author Peter Abeles
  */
-public interface SparseImageGradient<T extends ImageSingleBand, G extends GradientValue>
+public abstract class SparseScaleGradient<T extends ImageSingleBand,G extends GradientValue>
+		implements SparseImageGradient<T, G>
 {
-	public void setImage(T input );
-
-	/**
-	 * Checks to see if the entire sample region is contained inside the image or not.
-	 * Depending on the implementation it might be able to handle out of bounds pixels or not.
-	 */
-	public boolean isInBounds( int x , int y );
-
-	public G compute( int x , int y );
+	protected T input;
 	
-	public Class<G> getGradientType();
+	// defines the kernel's bounds
+	protected int x0,y0,x1,y1;
+	
+	public abstract void setScale( double scale );
+
+	@Override
+	public void setImage(T input ) {
+		this.input = input;
+	}
+
+	@Override
+	public boolean isInBounds( int x , int y ) {
+		return( x+x0 >= 0 && y+y0 >= 0 && x+x1 <= input.width && y+y1 <= input.height );
+	}
 }

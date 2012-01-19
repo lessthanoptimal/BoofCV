@@ -16,30 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.struct.deriv;
+package boofcv.struct.sparse;
 
+import boofcv.struct.image.ImageBase;
 
 /**
+ * Interface for operations which are applied to a single pixel or region around
+ * a single pixel
+ *
  * @author Peter Abeles
  */
-public class GradientValue_F64 implements GradientValue {
+public interface SparseImageOperator <T extends ImageBase>
+{
+	/**
+	 * Specifies the image being processed.
+	 *
+	 * @param input Image being processed
+	 */
+	public void setImage(T input );
 
-	public double x;
-	public double y;
-
-	@Override
-	public void set(double dx, double dy) {
-		this.x = dx;
-		this.y = dy;
-	}
-
-	@Override
-	public double getX() {
-		return x;
-	}
-
-	@Override
-	public double getY() {
-		return y;
-	}
+	/**
+	 * Checks to see if the entire sample region is contained inside the image or not.
+	 * Depending on the implementation it might be able to handle out of bounds pixels or not.
+	 */
+	public boolean isInBounds( int x , int y );
 }

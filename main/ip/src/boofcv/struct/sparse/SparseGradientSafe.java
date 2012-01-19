@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.struct.deriv;
+package boofcv.struct.sparse;
 
 import boofcv.struct.image.ImageSingleBand;
 
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageSingleBand;
  * 
  * @author Peter Abeles
  */
-public class SparseGradientSafe<T extends ImageSingleBand, G extends GradientValue> 
+public class SparseGradientSafe<T extends ImageSingleBand, G extends GradientValue>
 	implements SparseImageGradient<T,G>
 {
 	SparseImageGradient<T,G> wrap;

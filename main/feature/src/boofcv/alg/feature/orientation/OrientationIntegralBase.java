@@ -18,9 +18,12 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sparse.GradientValue;
+import boofcv.struct.sparse.SparseScaleGradient;
 
 
 /**
@@ -30,7 +33,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class OrientationIntegralBase<T extends ImageSingleBand>
+public abstract class OrientationIntegralBase<T extends ImageSingleBand,G extends GradientValue>
 		implements OrientationIntegral<T>
 {
 	// integral image transform of input image
@@ -51,6 +54,11 @@ public abstract class OrientationIntegralBase<T extends ImageSingleBand>
 
 	// how often the image is sampled
 	protected double period;
+
+	// used to sample the image when it's on the image's border
+	protected SparseScaleGradient<T,G> g;
+
+	Class<T> imageType;
 	/**
 	 *
 	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
@@ -58,22 +66,34 @@ public abstract class OrientationIntegralBase<T extends ImageSingleBand>
 	 * @param sampleWidth How wide of a kernel should be used to sample.
 	 * @param weightSigma Sigma for weighting.  zero for unweighted.
 	 */
-	public OrientationIntegralBase(int radius, double period, int sampleWidth , double weightSigma) {
+	public OrientationIntegralBase(int radius, double period, 
+								   int sampleWidth , double weightSigma ,
+								   Class<T> imageType ) {
 		this.radius = radius;
 		this.period = period;
 		this.sampleWidth = sampleWidth;
 		this.width = radius*2+1;
+		this.imageType = imageType;
 		if( weightSigma != 0 )
 			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, weightSigma,radius);
-	}
 
+		g = (SparseScaleGradient<T,G>)SurfDescribeOps.createGradient(false, sampleWidth, imageType);
+	}
+	
 	@Override
 	public void setScale(double scale) {
 		this.scale = scale;
+		g.setScale(scale);
 	}
 
 	@Override
 	public void setImage(T integralImage) {
 		this.ii = integralImage;
+		g.setImage(ii);
+	}
+
+	@Override
+	public Class<T> getImageType() {
+		return imageType;
 	}
 }

@@ -23,12 +23,12 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
-import boofcv.struct.deriv.GradientValue;
-import boofcv.struct.deriv.SparseGradientSafe;
-import boofcv.struct.deriv.SparseImageGradient;
-import boofcv.struct.deriv.SparseScaleGradient;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sparse.GradientValue;
+import boofcv.struct.sparse.SparseGradientSafe;
+import boofcv.struct.sparse.SparseImageGradient;
+import boofcv.struct.sparse.SparseScaleGradient;
 
 /**
  * <p>

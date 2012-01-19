@@ -18,9 +18,9 @@
 
 package boofcv.alg.transform.ii;
 
-import boofcv.struct.deriv.GradientValue_F64;
-import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sparse.GradientValue_F64;
+import boofcv.struct.sparse.SparseImageGradient;
 
 
 /**

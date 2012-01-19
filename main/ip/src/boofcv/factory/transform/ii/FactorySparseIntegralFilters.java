@@ -18,14 +18,12 @@
 
 package boofcv.factory.transform.ii;
 
-import boofcv.alg.transform.ii.impl.SparseIntegralGradient_NoBorder_F32;
-import boofcv.alg.transform.ii.impl.SparseIntegralGradient_NoBorder_I32;
-import boofcv.alg.transform.ii.impl.SparseIntegralHaar_NoBorder_F32;
-import boofcv.alg.transform.ii.impl.SparseIntegralHaar_NoBorder_I32;
-import boofcv.struct.deriv.SparseScaleGradient;
+import boofcv.alg.transform.ii.impl.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sparse.SparseScaleGradient;
+import boofcv.struct.sparse.SparseScaleSample;
 
 
 /**
@@ -34,6 +32,16 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public class FactorySparseIntegralFilters {
+
+	public static <T extends ImageSingleBand>
+	SparseScaleSample<T> sample( int radius , Class<T> imageType ) {
+		if( imageType == ImageFloat32.class )
+			return (SparseScaleSample<T>)new SparseIntegralSample_F32(radius);
+		else if( imageType == ImageSInt32.class )
+			return (SparseScaleSample<T>)new SparseIntegralSample_I32(radius);
+		else
+			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
+	}
 
 	public static <T extends ImageSingleBand>
 	SparseScaleGradient<T,?> gradient( int radius , Class<T> imageType ) {

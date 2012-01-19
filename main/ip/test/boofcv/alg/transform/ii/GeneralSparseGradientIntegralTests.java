@@ -19,8 +19,8 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.alg.filter.derivative.GeneralSparseGradientTests;
-import boofcv.struct.deriv.GradientValue;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sparse.GradientValue;
 
 /**
  * @author Peter Abeles

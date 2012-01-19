@@ -16,33 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.struct.deriv;
+package boofcv.struct.sparse;
 
-import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Provides basic functions for {@link boofcv.struct.deriv.SparseImageGradient} and function for scaling
- * the gradient up and down.
- * 
  * @author Peter Abeles
  */
-public abstract class SparseScaleGradient<T extends ImageSingleBand,G extends GradientValue>
-		implements SparseImageGradient<T, G>
-{
-	protected T input;
-	
-	// defines the kernel's bounds
-	protected int x0,y0,x1,y1;
-	
-	public abstract void setScale( double scale );
+public class GradientValue_F32 implements GradientValue{
+
+	public float x;
+	public float y;
 
 	@Override
-	public void setImage(T input ) {
-		this.input = input;
+	public void set(double dx, double dy) {
+		this.x = (float)dx;
+		this.y = (float)dy;
 	}
 
 	@Override
-	public boolean isInBounds( int x , int y ) {
-		return( x+x0 >= 0 && y+y0 >= 0 && x+x1 <= input.width && y+y1 <= input.height );
+	public double getX() {
+		return x;
+	}
+
+	@Override
+	public double getY() {
+		return y;
 	}
 }

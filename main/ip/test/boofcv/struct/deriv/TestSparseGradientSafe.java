@@ -18,17 +18,66 @@
 
 package boofcv.struct.deriv;
 
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.sparse.GradientValue_F32;
+import boofcv.struct.sparse.SparseGradientSafe;
+import boofcv.struct.sparse.SparseImageGradient;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestSparseGradientSafe {
 
+	static int r = 2;
+	static int width = 20;
+	static int height = 30;
+
+	/**
+	 * Read in a border and see if it returns zeros
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void checkMakeBorderSafe() {
+		Dummy d = new Dummy();
+		SparseImageGradient<ImageFloat32,GradientValue_F32> safe =
+				new SparseGradientSafe<ImageFloat32, GradientValue_F32>(d);
+
+		// read the border case
+		GradientValue_F32 v = safe.compute(0,0);
+		assertTrue(v.x==0);
+		assertTrue(v.y==0);
+
+		// read inside and see if it has the expected results
+		assertTrue(safe.compute(width/2,height/2) == null);
+	}
+	
+	
+	private static class Dummy implements SparseImageGradient<ImageFloat32,GradientValue_F32>
+	{
+
+		@Override
+		public GradientValue_F32 compute(int x, int y) {
+			if( !isInBounds(x,y) )
+				throw new RuntimeException("Bad stuff");
+			
+			return null;
+		}
+
+		@Override
+		public Class<GradientValue_F32> getGradientType() {
+			return GradientValue_F32.class;
+		}
+
+		@Override
+		public void setImage(ImageFloat32 input) {
+
+		}
+
+		@Override
+		public boolean isInBounds(int x, int y) {
+			return !( x <= r || x >= width-r || y <= r || y >= height-r );
+		}
 	}
 }
