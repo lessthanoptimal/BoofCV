@@ -19,8 +19,8 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.alg.filter.derivative.GeneralSparseGradientTests;
-import boofcv.struct.deriv.GradientValue_F64;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.sparse.GradientValue_F64;
 import org.junit.Test;
 
 

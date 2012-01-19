@@ -115,7 +115,7 @@ public class TestSurfDescribeOps {
 	@Test
 	public void isInside_aligned() {
 		int regionRadius = 10;
-		int kernelSize = 3;
+		int kernelSize = 2;
 
 		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,1, 0,0));
 		assertTrue(SurfDescribeOps.isInside(inputF32,c_x,c_y,regionRadius,kernelSize,2, 0,0));
@@ -123,9 +123,9 @@ public class TestSurfDescribeOps {
 		for( int i = 0; i < 2; i++ ) {
 			boolean swap = i != 0;
 			checkInside(regionRadius+1+1,c_y,swap,regionRadius,kernelSize,1,true);
-			checkInside(2*regionRadius+3+1,c_y,swap,regionRadius,kernelSize,2,true);
+			checkInside(2*regionRadius+2+1,c_y,swap,regionRadius,kernelSize,2,true);
 			checkInside(regionRadius+1,c_y,swap,regionRadius,kernelSize,1,false);
-			checkInside(2*regionRadius+3,c_y,swap,regionRadius,kernelSize,2,false);
+			checkInside(2*regionRadius+2,c_y,swap,regionRadius,kernelSize,2,false);
 		}
 		// check upper boundary
 		checkInside(width-regionRadius-1-1,c_y,false,regionRadius,kernelSize,1,true);
@@ -193,7 +193,34 @@ public class TestSurfDescribeOps {
 
 	@Test
 	public void isInside_rect() {
-		fail("implement");
+		// test a positive example
+		assertTrue(SurfDescribeOps.isInside(20,30,2.3,4.5,8.7,2.0));
+
+		// test positive border conditions
+		assertTrue(SurfDescribeOps.isInside(20,30,2,2,8.7,2.0));
+		assertTrue(SurfDescribeOps.isInside(20,30,8,18,10,2.0));
+
+		// test negative border conditions
+		assertFalse(SurfDescribeOps.isInside(20,30,1,1,8.7,2.0));
+		assertFalse(SurfDescribeOps.isInside(20,30,9,19,10,2.0));
+	}
+	
+	@Test
+	public void rotatedWidth() {
+		// test rotations by 90 degrees because these cases are simple
+		assertEquals(10,SurfDescribeOps.rotatedWidth(10,1,0),1e-8);
+		assertEquals(10,SurfDescribeOps.rotatedWidth(10,0,1),1e-8);
+		assertEquals(10,SurfDescribeOps.rotatedWidth(10,-1,0),1e-8);
+		assertEquals(10,SurfDescribeOps.rotatedWidth(10,0,-1),1e-8);
+		
+		// test the maximum increase at 45 degrees
+		double w = 2*Math.sqrt(2*25);
+		double theta = Math.PI/4.0;
+		assertEquals(w,SurfDescribeOps.rotatedWidth(10,Math.cos(theta),Math.sin(theta)),1e-8);
+		theta += Math.PI;
+		assertEquals(w,SurfDescribeOps.rotatedWidth(10,Math.cos(theta),Math.sin(theta)),1e-8);
+		theta -= Math.PI*2;
+		assertEquals(w,SurfDescribeOps.rotatedWidth(10,Math.cos(theta),Math.sin(theta)),1e-8);
 	}
 	
 	/**

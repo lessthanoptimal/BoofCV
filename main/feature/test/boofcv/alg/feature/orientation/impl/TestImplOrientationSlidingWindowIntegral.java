@@ -21,13 +21,14 @@ package boofcv.alg.feature.orientation.impl;
 import boofcv.alg.feature.orientation.GenericOrientationIntegralTests;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.sparse.GradientValue_F32;
 import org.junit.Test;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplOrientationSlidingWindowIntegral_F32 {
+public class TestImplOrientationSlidingWindowIntegral {
 	double angleTol = Math.PI/9;
 	int r = 3;
 
@@ -35,7 +36,8 @@ public class TestImplOrientationSlidingWindowIntegral_F32 {
 	public void standardUnweighted() {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationIntegralBase<ImageFloat32> alg = new ImplOrientationSlidingWindowIntegral_F32(20, 1, Math.PI/3,r,0, 4);
+		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg =
+				new ImplOrientationSlidingWindowIntegral(20, 1, Math.PI/3,r,0, 4,ImageFloat32.class);
 
 		// region samples is r*2 +1 + sampleRadius
 		tests.setup(angleTol, r*2+3 , alg,ImageFloat32.class);
@@ -46,7 +48,8 @@ public class TestImplOrientationSlidingWindowIntegral_F32 {
 	public void standardWeighted() {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationIntegralBase<ImageFloat32> alg = new ImplOrientationSlidingWindowIntegral_F32(20, 1, Math.PI/3,r,2, 4);
+		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg =
+				new ImplOrientationSlidingWindowIntegral(20, 1, Math.PI/3,r,2, 4,ImageFloat32.class);
 
 		tests.setup(angleTol, r*2+3 ,alg,ImageFloat32.class);
 		tests.performAll();

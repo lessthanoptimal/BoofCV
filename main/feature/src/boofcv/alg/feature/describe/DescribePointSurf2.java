@@ -19,12 +19,12 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
-import boofcv.struct.deriv.GradientValue;
-import boofcv.struct.deriv.SparseGradientSafe;
-import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sparse.GradientValue;
+import boofcv.struct.sparse.SparseGradientSafe;
+import boofcv.struct.sparse.SparseImageGradient;
 
 /**
  * TODO write

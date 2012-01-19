@@ -20,10 +20,10 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.feature.describe.impl.ImplSurfDescribeOps;
 import boofcv.factory.transform.ii.FactorySparseIntegralFilters;
-import boofcv.struct.deriv.SparseScaleGradient;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sparse.SparseScaleGradient;
 
 
 /**
@@ -163,13 +163,36 @@ public class SurfDescribeOps {
 		return true;
 	}
 
+	/**
+	 * <p>
+	 * Tests to see if the rectangular region being sampled is contained inside the image.  Sampling
+	 * is done using a square region with the specified size, where size corresponds to the length
+	 * of each side.  The sample region's size is discretized and rounded up, making this a conservative
+	 * estimate for containment.
+	 * </p>
+	 * <p>
+	 * This takes in account how integral images are read.  To read in a rectangular region the pixel
+	 * below the lower left corner is read, which results in an extra minus along enough axis for the
+	 * lower bound.  It is also assumed that points are discretized by rounding.
+	 * </p>
+	 *
+	 *
+	 * @param width Image's width.
+	 * @param height Image's height.
+	 * @param tl_x Top left corner of region being sampled.
+	 * @param tl_y Top left corner of region being sampled.
+	 * @param regionSize Size of the region being sampled.
+	 * @param sampleSize Length of each side in the sample region.  See comment above.
+	 * @return If all samples are contained inside the image.
+	 */
 	public static boolean isInside( int width , int height, 
 									double tl_x , double tl_y , 
 									double regionSize  , double sampleSize )
 	{
 		int w = (int)(sampleSize+0.5);
-		int r = w/2 + w%2;
-		
+		int r = w/2 + w%2; // be conservative  and round up
+
+		// the extra minus one is because integral images are being used
 		int x0 = (int)(tl_x+0.5) - r - 1;
 		int y0 = (int)(tl_y+0.5) - r - 1;
 
@@ -185,6 +208,14 @@ public class SurfDescribeOps {
 		return true;
 	}
 
+	/**
+	 * Computes the width of a square containment region that contains a rotated rectangle.
+	 *
+	 * @param width Size of the original rectangle.
+	 * @param c Cosine(theta)
+	 * @param s Sine(theta)
+	 * @return Side length of the containment square.
+	 */
 	public static double rotatedWidth( double width , double c , double s )
 	{
 		return Math.abs(c)*width + Math.abs(s)*width;

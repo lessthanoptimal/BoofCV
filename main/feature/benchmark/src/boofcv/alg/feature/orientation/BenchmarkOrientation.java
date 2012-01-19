@@ -168,10 +168,12 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		ProfileOperation.printOpsPerSec(new Gradient("Histogram W", histogram(15, RADIUS, true, derivType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Sliding", sliding(15, Math.PI / 3.0, RADIUS, false, derivType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Sliding W", sliding(15, Math.PI / 3.0, RADIUS, true, derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Image II", image_ii(RADIUS, 1, 4, 0, imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Image II W", image_ii(RADIUS, 1, 4, -1, imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Average II", average_ii(RADIUS, 1,4,0, imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Average II W", average_ii(RADIUS, 1,4,-1, imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Sliding II", sliding_ii(41, 1, Math.PI / 3.0, RADIUS, 0, 4, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Sliding II W", sliding_ii(41, 1, Math.PI / 3.0, RADIUS, 2, 4, imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Sliding II W", sliding_ii(41, 1, Math.PI / 3.0, RADIUS, -1, 4, imageType)), TEST_TIME);
 
 	}
 

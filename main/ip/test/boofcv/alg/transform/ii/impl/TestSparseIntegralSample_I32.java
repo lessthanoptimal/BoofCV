@@ -18,36 +18,23 @@
 
 package boofcv.alg.transform.ii.impl;
 
-import boofcv.alg.transform.ii.DerivativeIntegralImage;
-import boofcv.alg.transform.ii.GeneralSparseGradientIntegralTests;
-import boofcv.alg.transform.ii.IntegralKernel;
+import boofcv.alg.filter.derivative.GeneralSparseSampleTests;
 import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.sparse.GradientValue_I32;
 import org.junit.Test;
-
 
 /**
  * @author Peter Abeles
  */
-public class TestSparseIntegralHaar_NoBorder_I32
-		extends GeneralSparseGradientIntegralTests<ImageSInt32,ImageSInt32,GradientValue_I32>
-{
-	final static int size = 4;
-	final static int radius = size/2;
+public class TestSparseIntegralSample_I32 extends GeneralSparseSampleTests<ImageSInt32> {
 
-	public TestSparseIntegralHaar_NoBorder_I32() {
-		super(ImageSInt32.class, ImageSInt32.class,size);
+	private static int baseR = 2;
 
-		alg = new SparseIntegralHaar_NoBorder_I32(radius);
-
-		IntegralKernel kernelX = DerivativeIntegralImage.kernelHaarX(radius);
-		IntegralKernel kernelY = DerivativeIntegralImage.kernelHaarY(radius);
-		setKernels(kernelX,kernelY);
+	public TestSparseIntegralSample_I32() {
+		super(ImageSInt32.class, new SparseIntegralSample_I32(baseR));
 	}
 
 	@Test
-	public void allStandard() {
-		allTests(false);
+	public void testAll() {
+		super.performAllTests();
 	}
-
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.struct.deriv;
+package boofcv.struct.sparse;
 
 
 /**

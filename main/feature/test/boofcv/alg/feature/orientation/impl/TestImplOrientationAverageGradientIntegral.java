@@ -20,34 +20,38 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationIntegralTests;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.sparse.GradientValue_F32;
 import org.junit.Test;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplOrientationAverageIntegral_I32 {
-	double angleTol = 0.02;
+public class TestImplOrientationAverageGradientIntegral {
+	double angleTol = 0.01;
 	int r = 3;
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationIntegralTests<ImageSInt32> tests = new GenericOrientationIntegralTests<ImageSInt32>();
+		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationIntegralBase<ImageSInt32> alg = new ImplOrientationAverageIntegral_I32(r,1,4,0);
+		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg = 
+				new ImplOrientationAverageGradientIntegral(r,1,2,0,ImageFloat32.class);
 
-		tests.setup(angleTol, r * 2 + 1, alg, ImageSInt32.class);
+		tests.setup(angleTol, r*2+1+2 , alg,ImageFloat32.class);
+		tests.checkSubImages();
 		tests.performAll();
 	}
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationIntegralTests<ImageSInt32> tests = new GenericOrientationIntegralTests<ImageSInt32>();
+		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationIntegralBase<ImageSInt32> alg = new ImplOrientationAverageIntegral_I32(r,1,4,2);
+		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg =
+				new ImplOrientationAverageGradientIntegral(r,1,2,-1,ImageFloat32.class);
 
-		tests.setup(angleTol, r * 2 + 1, alg, ImageSInt32.class);
+		tests.setup(angleTol, r*2+1+2 ,alg,ImageFloat32.class);
 		tests.performAll();
 	}
 }

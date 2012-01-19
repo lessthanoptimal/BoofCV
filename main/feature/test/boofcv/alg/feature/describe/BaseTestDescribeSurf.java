@@ -21,9 +21,9 @@ package boofcv.alg.feature.describe;
 import boofcv.alg.feature.describe.impl.TestImplSurfDescribeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.deriv.SparseImageGradient;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sparse.SparseImageGradient;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 

@@ -18,9 +18,9 @@
 
 package boofcv.alg.transform.ii;
 
-import boofcv.struct.deriv.GradientValue;
-import boofcv.struct.deriv.SparseScaleGradient;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sparse.GradientValue;
+import boofcv.struct.sparse.SparseScaleGradient;
 
 
 /**

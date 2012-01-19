@@ -19,8 +19,8 @@
 package boofcv.alg.transform.ii.impl;
 
 import boofcv.alg.transform.ii.SparseIntegralGradient_NoBorder;
-import boofcv.struct.deriv.GradientValue_I32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.sparse.GradientValue_I32;
 
 
 /**

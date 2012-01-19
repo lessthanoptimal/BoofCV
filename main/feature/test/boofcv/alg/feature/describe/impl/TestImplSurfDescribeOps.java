@@ -23,10 +23,10 @@ import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.FactoryGeneralizedSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.deriv.SparseScaleGradient;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sparse.SparseScaleGradient;
 import org.junit.Test;
 
 import java.util.Random;

@@ -16,30 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.struct.deriv;
+package boofcv.struct.sparse;
 
+import boofcv.struct.image.ImageSingleBand;
 
 /**
+ * Applies a kernel to an individual pixel
+ *
  * @author Peter Abeles
  */
-public class GradientValue_F32 implements GradientValue{
-
-	public float x;
-	public float y;
-
-	@Override
-	public void set(double dx, double dy) {
-		this.x = (float)dx;
-		this.y = (float)dy;
-	}
-
-	@Override
-	public double getX() {
-		return x;
-	}
-
-	@Override
-	public double getY() {
-		return y;
-	}
+public interface SparseImageSample<T extends ImageSingleBand>
+	extends SparseImageOperator<T>
+{
+	public double compute( int x , int y );
 }

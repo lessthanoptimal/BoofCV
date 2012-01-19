@@ -21,8 +21,8 @@ package boofcv.alg.transform.ii.impl;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
 import boofcv.alg.transform.ii.GeneralSparseGradientIntegralTests;
 import boofcv.alg.transform.ii.IntegralKernel;
-import boofcv.struct.deriv.GradientValue_I32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.sparse.GradientValue_I32;
 import org.junit.Test;
 
 

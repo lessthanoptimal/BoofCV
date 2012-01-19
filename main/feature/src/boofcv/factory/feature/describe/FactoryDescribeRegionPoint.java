@@ -62,6 +62,7 @@ public class FactoryDescribeRegionPoint {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		if( isOriented )
+//			orientation = FactoryOrientationAlgs.image_ii(6, 1 , 6, -1, integralType);
 			orientation = FactoryOrientationAlgs.average_ii(6, 1 , 6, -1, integralType);
 //			orientation = FactoryOrientationAlgs.sliding_ii(42,Math.PI/3.0,6,true,integralType);
 

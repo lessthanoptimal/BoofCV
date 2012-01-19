@@ -19,8 +19,8 @@
 package boofcv.alg.transform.ii.impl;
 
 import boofcv.alg.transform.ii.SparseIntegralGradient_NoBorder;
-import boofcv.struct.deriv.GradientValue_F32;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.sparse.GradientValue_F32;
 
 
 /**
@@ -44,8 +44,8 @@ public class SparseIntegralGradient_NoBorder_F32
 
 		x0=-r-1;
 		y0=-r-1;
-		x1=r+2;
-		y1=r+2;
+		x1=r+1;
+		y1=r+1;
 	}
 
 	@Override
