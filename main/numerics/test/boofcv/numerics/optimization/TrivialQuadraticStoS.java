@@ -19,15 +19,16 @@
 package boofcv.numerics.optimization;
 
 /**
- * Function used for testing optimization functions
+ * Function used for testing optimization functions.  Slightly perturbed from a quadratic.
  *
  * @author Peter Abeles
  */
-public class TrivialCubicStoS implements FunctionStoS {
+public class TrivialQuadraticStoS implements FunctionStoS {
 
+	public static final double PERTURBATION = 0.00001;
 	double center;
 
-	public TrivialCubicStoS(double center) {
+	public TrivialQuadraticStoS(double center) {
 		this.center = center;
 	}
 
@@ -36,6 +37,6 @@ public class TrivialCubicStoS implements FunctionStoS {
 
 		double v = input-center;
 
-		return v*v;
+		return v*v+PERTURBATION*v*v*v*v;
 	}
 }

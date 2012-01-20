@@ -20,6 +20,9 @@ package boofcv.numerics.optimization;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Peter Abeles
  */
@@ -31,29 +34,34 @@ public class TestLineSearchMore94 {
 	 */
 	@Test
 	public void checkBasic() {
-//		double expected = 10;
-//		FunctionStoS f = new TrivialCubicStoS(expected);
-//		FunctionStoS d = new TrivialCubicDerivStoS(expected);
-//
-//		// the initial value should pass all the tests with this setting
-//		LineSearch alg = new LineSearchMore94(0.1,0.9,0,1.1,7.0/12.0,0.66,50);
-//		alg.setFunction(f,d);
-//
-//		double valueZero = f.process(0);
-//		double derivZero = d.process(0);
-//		double initValue = f.process(1);
-//
-//		double foundLoose = alg.search(valueZero,derivZero,initValue,1);
-//
-//		// now try it with tighter bounds
-//		alg = new LineSearchMore94(1e-4,0.1,0,1.1,7.0/12.0,0.66,50);
-//		alg.setFunction(f,d);
-//		double foundTight = alg.search(valueZero, derivZero, initValue, 1);
-//
-//		// see if the tighter bounds is more accurate
-//		assertTrue(Math.abs(foundTight - expected) < Math.abs(foundLoose - expected));
-//
-//		// since it is a quadratic function it should find a perfect solution too
-//		assertEquals(expected, foundTight, 1e-8);
+		double expected = 10;
+		FunctionStoS f = new TrivialQuadraticStoS(expected);
+		FunctionStoS d = new TrivialQuadraticDerivStoS(expected);
+
+		// the initial value should pass all the tests with this setting
+		LineSearch alg = new LineSearchMore94(0.0001,0.1,0.001,1e-8,30);
+		alg.setFunction(f,d);
+
+		double valueZero = f.process(0);
+		double derivZero = d.process(0);
+		double initValue = f.process(1);
+
+		alg.init(valueZero,derivZero,initValue,1);
+		assertTrue(UtilOptimize.process(alg, 50));
+		double foundLoose = alg.getStep();
+
+		// now try it with tighter bounds
+		alg = new LineSearchMore94(0.00001,0.000000000001,0.001,1e-8,30);
+		alg.setFunction(f,d);
+		alg.init(valueZero,derivZero,initValue,1);
+		assertTrue(UtilOptimize.process(alg, 50));
+		assertTrue(alg.getWarning()==null);
+		double foundTight = alg.getStep();
+
+		// see if the tighter bounds is more accurate
+		assertTrue(Math.abs(foundTight - expected) < Math.abs(foundLoose - expected));
+
+		// since it is a quadratic function it should find a perfect solution too
+		assertEquals(expected, foundTight, 1e-8);
 	}
 }

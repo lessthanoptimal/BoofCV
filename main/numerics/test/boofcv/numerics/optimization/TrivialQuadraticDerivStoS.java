@@ -23,16 +23,17 @@ package boofcv.numerics.optimization;
  *
  * @author Peter Abeles
  */
-public class TrivialCubicDerivStoS implements FunctionStoS {
+public class TrivialQuadraticDerivStoS implements FunctionStoS {
 
 	double center;
 
-	public TrivialCubicDerivStoS(double center) {
+	public TrivialQuadraticDerivStoS(double center) {
 		this.center = center;
 	}
 
 	@Override
 	public double process(double input) {
-		return 2*(input-center);
+		double v = input-center;
+		return 2*v+4*TrivialQuadraticStoS.PERTURBATION*v*v*v;
 	}
 }

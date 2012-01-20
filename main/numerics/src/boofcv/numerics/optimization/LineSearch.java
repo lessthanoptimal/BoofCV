@@ -39,23 +39,32 @@ public interface LineSearch {
 	/**
 	 * Initializes and resets the line search.
 	 *
-	 * @param funcZero Value of f(0)
-	 * @param derivZero Derivative of at f(0)
-	 * @param funcInit Value of f at initial value of step: f(step)
+	 * @param funcAtZero Value of f(0)
+	 * @param derivAtZero Derivative of at f(0)
+	 * @param funcAtInit Value of f at initial value of step: f(step)
 	 * @param stepInit Initial step size
 	 * @return Approximate value of alpha which minimizes the function
 	 */
-	public void init( final double funcZero, final double derivZero,
-					  final double funcInit, final double stepInit );
+	public void init( final double funcAtZero, final double derivAtZero,
+					  final double funcAtInit, final double stepInit );
 
 
 	/**
-	 * Updates the line search.
+	 * Updates the line search. Check the return value to see if it needs to be iterated more.
+	 * After it returns true {@link #isConverged} should be called to see if it converged to a solution
+	 * or stopped for some other reason.
 	 *
-	 * @return true if stopping conditions have been meet
+	 * @return If true that means that it has converged or that no more progress can be made.
 	 */
 	public boolean iterate() throws OptimizationException;
 
+	/**
+	 * Indicates if iteration stopped due to convergence or not.
+	 *
+	 * @return True if iteration stopped because it converged.
+	 */
+	public boolean isConverged();
+	
 	/**
 	 * Returns the current approximate solution for the line search
 	 *
@@ -65,7 +74,8 @@ public interface LineSearch {
 
 	/**
 	 * Provides feed back if something went wrong, but still produced a solution.
-	 * If there is no message then null is returned.
+	 * If there is no message then null is returned.  The meaning and type of messages
+	 * are implementation specific.
 	 *
 	 * @return Additional info on the computed solution.
 	 */

@@ -21,6 +21,7 @@ package boofcv.numerics.optimization;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -32,14 +33,15 @@ public class TestSearchInterpolate {
 		double a = 2;
 		double b = -3;
 		double c = 1;
-		
-		double f0 = quad(a,b,c,0);
-		double g0 = quadDeriv(a,b,0);
+
+		double alpha0 = 0.67;
+		double f0 = quad(a,b,c,alpha0);
+		double g0 = quadDeriv(a,b,alpha0);
 		double alpha1 = 3.35;
 		double f1 = quad(a,b,c,alpha1);
 		
 		double expected = -b/(2*a);
-		double found = SearchInterpolate.quadratic(f0,g0,f1,alpha1);
+		double found = SearchInterpolate.quadratic(f0,g0,alpha0,f1,alpha1);
 	
 		assertEquals(expected,found,1e-8);
 	}
@@ -107,6 +109,11 @@ public class TestSearchInterpolate {
 		double found = SearchInterpolate.cubic2(f0,g0,alpha0,f1,g1,alpha1);
 
 		assertEquals(expected,found,1e-8);
+	}
+	
+	@Test
+	public void cubicSafe() {
+		fail("implement");
 	}
 
 	private double cubic( double a , double b , double c ,double d , double x ) {
