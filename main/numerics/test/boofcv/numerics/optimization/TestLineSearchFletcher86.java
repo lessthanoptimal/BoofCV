@@ -20,7 +20,8 @@ package boofcv.numerics.optimization;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -34,8 +35,8 @@ public class TestLineSearchFletcher86 {
 	@Test
 	public void checkBasic() {
 		double expected = 10;
-		FunctionStoS f = new TrivialCubicStoS(expected);
-		FunctionStoS d = new TrivialCubicDerivStoS(expected);
+		FunctionStoS f = new TrivialQuadraticStoS(expected);
+		FunctionStoS d = new TrivialQuadraticDerivStoS(expected);
 
 		// the initial value should pass all the tests with this setting
 		LineSearchFletcher86 alg = new LineSearchFletcher86(0.1,0.9,9,0,0,50);
@@ -46,14 +47,14 @@ public class TestLineSearchFletcher86 {
 		double initValue = f.process(1);
 
 		alg.init(valueZero,derivZero,initValue,1);
-//		assertFalse(UtilOptimize.process(alg,50));
+		assertTrue(UtilOptimize.process(alg, 50));
 		double foundLoose = alg.getStep();
 
 		// now try it with tighter bounds
 		alg = new LineSearchFletcher86(1e-5,0.1,9,0.05,0.5,50);
 		alg.setFunction(f,d);
 		alg.init(valueZero,derivZero,initValue,1);
-		assertFalse(UtilOptimize.process(alg,50));
+		assertTrue(UtilOptimize.process(alg, 50));
 		double foundTight = alg.getStep();
 
 		// see if the tighter bounds is more accurate

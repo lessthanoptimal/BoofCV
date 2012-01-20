@@ -24,14 +24,12 @@ package boofcv.numerics.optimization;
 public class UtilOptimize {
 	
 	public static boolean process( LineSearch search , int maxIterations ) {
-		boolean failed = true;
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( search.iterate() ) {
-				failed = false;
-				break;
+				return search.isConverged();
 			}
 		}
 
-		return failed;
+		return true;
 	}
 }

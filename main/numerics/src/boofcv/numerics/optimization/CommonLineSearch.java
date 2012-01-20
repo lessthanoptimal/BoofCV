@@ -43,27 +43,6 @@ public abstract class CommonLineSearch implements LineSearch {
 	protected double valueT;
 	protected double derivT;
 
-	/**
-	 * @inheritdoc
-	 */
-	@Override
-	public void setFunction(FunctionStoS function, FunctionStoS derivative) {
-		this.function = function;
-		this.derivative = derivative;
-	}
 
-	protected void initializeSearch( final double valueZero , final double derivZero ,
-									 final double initValue , final double initAlpha ) {
-		if( derivZero >= 0 )
-			throw new IllegalArgumentException("Derivative at zero must be decreasing");
-		if( initAlpha <= 0 )
-			throw  new IllegalArgumentException("initAlpha must be more than zero");
-
-		this.valueZero = valueZero;
-		this.derivZero = derivZero;
-		alphaT = initAlpha;
-		valueT = initValue;
-		derivT = Double.NaN;
-	}
 
 }

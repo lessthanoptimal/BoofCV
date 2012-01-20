@@ -18,6 +18,8 @@
 
 package boofcv.numerics.optimization;
 
+import org.ejml.UtilEjml;
+
 /**
  * <p>
  * Line search which meets the strong Wolfe line condition.  The Wolfe condition stipulates that &alpha;<sub>k</sub> (the step size)
@@ -43,29 +45,49 @@ package boofcv.numerics.optimization;
  * 
  * @author Peter Abeles
  */
-public class LineSearchFletcher86 extends CommonLineSearch {
+public class LineSearchFletcher86 implements LineSearch {
+
+	// step tolerance change
+	protected double tolStep = UtilEjml.EPS;
+
+	// function being minimized
+	protected FunctionStoS function;
+	// derivative of function being minimized
+	protected FunctionStoS derivative;
+
+	// function value at alpha = 0
+	protected double valueZero;
+	// function derivative at alpha = 0
+	protected double derivZero;
+
+	// current step length, function value, and derivative
+	protected double stp;
+	protected double fp;
+	protected double gp;
 
 	// prevents alpha from getting too close to the bound's extreme values
 	double t1,t2,t3;
 
 	// search parameters that defined the Wolfe condition
 	private double c1,c2;
-	// maximum allowed step bounds
-	private double alphaMax;
-
 	// previous iteration step length and value
-	protected double alphaPrev;
-	protected double valuePrev;
-	protected double derivPrev;
+	protected double stprev;
 
+	protected double fprev;
+	protected double gprev;
 	// mode that the search is in
 	int mode;
-	
-	double alphaLow;
-	double alphaHi;
-	double valueLow;
+
+	// maximum allowed step
+	private double stpmax;
+
+	// bounds on stp
+	double pLow;
+	double pHi;
+	double fLow; // the value at pLow
 
 	String message;
+	boolean converged;
 	
 	/**
 	 *
@@ -74,13 +96,13 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 	 * @param t1 Prevents alpha from growing too large during bracket phase.  Try 9
 	 * @param t2 Prevents alpha from being too close to bounds during sectioning.  Recommend t2 < c2. Try 0.1
 	 * @param t3 Prevents alpha from being too close to bounds during sectioning.  Try 0.5
-	 * @param alphaMax Maximum allowed value of alpha.  Problem dependent.
+	 * @param stpmax Maximum allowed value of alpha.  Problem dependent.
 
 	 */
 	public LineSearchFletcher86(double c1, double c2,
 								double t1, double t2, double t3,
-								double alphaMax) {
-		if( alphaMax <= 0 )
+								double stpmax) {
+		if( stpmax <= 0 )
 			throw new IllegalArgumentException("Maximum alpha must be greater than zero");
 		if( c1 < 0 )
 			throw new IllegalArgumentException("c1 must be more than zero");
@@ -94,20 +116,44 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 		this.t1 = t1;
 		this.t2 = t2;
 		this.t3 = t3;
-		this.alphaMax = alphaMax;
+		this.stpmax = stpmax;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	@Override
+	public void setFunction(FunctionStoS function, FunctionStoS derivative) {
+		this.function = function;
+		this.derivative = derivative;
 	}
 
 	@Override
-	public void init(double valueZero, double derivZero, double initValue, double initAlpha) {
-		initializeSearch(valueZero,derivZero,initValue,initAlpha);
+	public void init(double funcAtZero, double derivAtZero, double funcAtInit, double initAlpha) {
+		initializeSearch(funcAtZero, derivAtZero, funcAtInit,initAlpha);
 
-		alphaPrev = 0;
-		valuePrev = valueZero;
-		derivPrev = derivZero;
+		stprev = 0;
+		fprev = funcAtZero;
+		gprev = derivAtZero;
 
 		mode = 0;
 
 		message = null;
+		converged = false;
+	}
+
+	protected void initializeSearch( final double valueZero , final double derivZero ,
+									 final double initValue , final double initAlpha ) {
+		if( derivZero >= 0 )
+			throw new IllegalArgumentException("Derivative at zero must be decreasing");
+		if( initAlpha <= 0 )
+			throw  new IllegalArgumentException("initAlpha must be more than zero");
+
+		this.valueZero = valueZero;
+		this.derivZero = derivZero;
+		stp = initAlpha;
+		fp = initValue;
+		gp = Double.NaN;
 	}
 
 	/**
@@ -117,9 +163,9 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 	public boolean iterate()
 	{
 		if( mode <= 1 ) {
-			return bracket();
+			return converged = bracket();
 		} else {
-			return section();
+			return converged = section();
 		}
 	}
 
@@ -130,38 +176,38 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 	protected boolean bracket() {
 		// the value of alpha was passed in
 		if( mode != 0 ) {
-			valueT = function.process(alphaT);
-			derivT = Double.NaN;
+			fp = function.process(stp);
+			gp = Double.NaN;
 		} else {
 			mode = 1;
 		}
 
 		// check for upper bounds
-		if( valueT > valueZero + c1* alphaT *derivZero ) {
-			setModeToSection(alphaPrev,valuePrev,alphaT);
+		if( fp > valueZero + c1* stp *derivZero ) {
+			setModeToSection(stprev, fprev, stp);
 			return false;
 		}
-		if( valueT >= valuePrev ) {
-			setModeToSection(alphaPrev,valuePrev,alphaT);
+		if( fp >= fprev) {
+			setModeToSection(stprev, fprev, stp);
 			return false;
 		}
 
-		derivT = derivative.process(alphaT);
-		if( Math.abs(derivT) <= -c2*derivZero ) {
+		gp = derivative.process(stp);
+		if( Math.abs(gp) <= -c2*derivZero ) {
 			return true;
 		}
 
-		if( derivT >= 0 ) {
-			setModeToSection(alphaT,valueT,alphaPrev);
+		if( gp >= 0 ) {
+			setModeToSection(stp, fp, stprev);
 			return false;
 		}
 
 		// use interpolation to pick the next sample point
-		double temp = alphaT;
-		alphaT = interpolate(2* alphaT -alphaPrev, Math.min(alphaMax, alphaT +t1*(alphaT -alphaPrev)));
-		alphaPrev = temp;
-		derivPrev = derivT;
-		valuePrev = valueT;
+		double temp = stp;
+		stp = interpolate(2* stp - stprev, Math.min(stpmax, stp +t1*(stp - stprev)));
+		stprev = temp;
+		gprev = gp;
+		fprev = fp;
 
 		// see if it is taking significant steps
 		if( checkSmallStep() ) {
@@ -174,9 +220,9 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 
 	private void setModeToSection( double alphaLow , double valueLow , double alphaHigh )
 	{
-		this.alphaLow = alphaLow;
-		this.valueLow = valueLow;
-		this.alphaHi = alphaHigh;
+		this.pLow = alphaLow;
+		this.fLow = valueLow;
+		this.pHi = alphaHigh;
 		mode = 2;
 	}
 	
@@ -186,14 +232,14 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 	protected boolean section()
 	{
 		// compute the value at the new sample point
-		double temp = alphaT;
-		alphaT = interpolate(alphaLow+t2*(alphaHi-alphaLow),alphaHi-t3*(alphaHi-alphaLow));
+		double temp = stp;
+		stp = interpolate(pLow +t2*(pHi - pLow), pHi -t3*(pHi - pLow));
 		// save the previous step
-		if( !Double.isNaN(derivT)) {
+		if( !Double.isNaN(gp)) {
 			// needs to keep a step with a derivative
-			alphaPrev = temp;
-			valuePrev = valueT;
-			derivPrev = derivT;
+			stprev = temp;
+			fprev = fp;
+			gprev = gp;
 		}
 
 		// see if there is a significant change in alpha
@@ -202,27 +248,27 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 			return true;
 		}
 
-		valueT = function.process(alphaT);
-		derivT = Double.NaN;
+		fp = function.process(stp);
+		gp = Double.NaN;
 
 		// check for convergence
-		if( valueT > valueZero + c1* alphaT *derivZero  || valueT >= valueLow ) {
-			alphaHi = alphaT;
+		if( fp > valueZero + c1* stp *derivZero  || fp >= fLow) {
+			pHi = stp;
 		} else {
-			derivT = derivative.process(alphaT);
+			gp = derivative.process(stp);
 
 			// check for termination
-			if( Math.abs(derivT) <= -c2*derivZero )
+			if( Math.abs(gp) <= -c2*derivZero )
 				return true;
 
-			if( derivT *(alphaHi-alphaLow) >= 0 )
-				alphaHi = alphaLow;
+			if( gp *(pHi - pLow) >= 0 )
+				pHi = pLow;
 			// check on numerical prevision
-			if( Math.abs((alphaLow - alphaT)* derivT) <= tolStep ) {
+			if( Math.abs((pLow - stp)* gp) <= tolStep ) {
 				return true;
 			}
-			alphaLow = alphaT;
-			valueLow = valueT;
+			pLow = stp;
+			fLow = fp;
 		}
 
 		return false;
@@ -230,7 +276,7 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 
 	@Override
 	public double getStep() {
-		return alphaT;
+		return stp;
 	}
 
 	@Override
@@ -243,8 +289,8 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 	 * it can get stuck in a loop\
 	 */
 	protected boolean checkSmallStep() {
-		double max = Math.max(alphaT,alphaPrev);
-		return( Math.abs(alphaT -alphaPrev)/max < tolStep );
+		double max = Math.max(stp, stprev);
+		return( Math.abs(stp - stprev)/max < tolStep );
 	}
 
 	/**
@@ -255,12 +301,12 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 		double alphaNew;
 
 		// interpolate minimum for rapid convergence
-		if( Double.isNaN(derivT) ) {
-			alphaNew = SearchInterpolate.quadratic(valuePrev, derivPrev, valueT, alphaT);
+		if( Double.isNaN(gp) ) {
+			alphaNew = SearchInterpolate.quadratic(fprev, gprev, stprev, fp, stp);
 		} else {
-			alphaNew = SearchInterpolate.cubic2(valuePrev,derivPrev,alphaPrev, valueT, derivT, alphaT);
+			alphaNew = SearchInterpolate.cubic2(fprev, gprev, stprev, fp, gp, stp);
 			if( Double.isNaN(alphaNew))
-				alphaNew = SearchInterpolate.quadratic(valuePrev, derivPrev, valueT, alphaT);
+				alphaNew = SearchInterpolate.quadratic(fprev, gprev, stprev, fp, stp);
 		}
 
 		// order the bound
@@ -278,5 +324,10 @@ public class LineSearchFletcher86 extends CommonLineSearch {
 			alphaNew = u;
 
 		return alphaNew;
+	}
+
+	@Override
+	public boolean isConverged() {
+		return converged;
 	}
 }
