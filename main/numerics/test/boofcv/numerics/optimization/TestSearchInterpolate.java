@@ -21,7 +21,6 @@ package boofcv.numerics.optimization;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -110,10 +109,52 @@ public class TestSearchInterpolate {
 
 		assertEquals(expected,found,1e-8);
 	}
-	
+
+	/**
+	 * Cubic safe with a well defined cubic
+	 */
 	@Test
-	public void cubicSafe() {
-		fail("implement");
+	public void cubicSafe_nominal() {
+		double a = 2;
+		double b = -3;
+		double c = 1;
+		double d = 3.5;
+
+		double alpha0 = 1.5;
+		double f0 = cubic(a, b, c, d, alpha0);
+		double g0 = cubicDeriv(a, b, c, alpha0);
+		double alpha1 = 2;
+		double f1 = cubic(a, b, c, d, alpha1);
+		double g1 = cubicDeriv(a, b, c, alpha1);
+
+		double expected = (-b + Math.sqrt(b*b-3*a*c))/(3*a);
+		double found = SearchInterpolate.cubicSafe(f0, g0, alpha0, f1, g1, alpha1, 10, 100);
+
+		assertEquals(expected,found,1e-8);
+	}
+
+	/**
+	 * Give it a cubic that
+	 */
+	@Test
+	public void cubicSafe_infinity() {
+		double a = 2;
+		double b = 0;
+		double c = 1;
+		double d = 3.5;
+
+		double alpha0 = 1.5;
+		double f0 = cubic(a, b, c, d, alpha0);
+		double g0 = cubicDeriv(a, b, c, alpha0);
+		double alpha1 = 2;
+		double f1 = cubic(a, b, c, d, alpha1);
+		double g1 = cubicDeriv(a, b, c, alpha1);
+
+		double found = SearchInterpolate.cubicSafe(f0,g0,alpha0,f1,g1,alpha1,0.1,100);
+		assertEquals(0.1,found,1e-8);
+
+		found = SearchInterpolate.cubicSafe(f1,g1,alpha1,f0,g0,alpha0,0.1,100);
+		assertEquals(100,found,1e-8);
 	}
 
 	private double cubic( double a , double b , double c ,double d , double x ) {

@@ -18,50 +18,88 @@
 
 package boofcv.numerics.optimization;
 
+import java.util.List;
+
 /**
  * @author Peter Abeles
  */
 public class EvaluateLineSearchMore94 extends LineSearchEvaluator {
 
-	double c1,c2;
+	double ftol, gtol,xtol=1e-10;
 
-	@Override
-	protected LineSearch createSearch() {
-		return new LineSearchMore94();
-	}
-
-
-	@Override
-	public void fletcher1() {
-		c1=1e-3;
-		c2=0.1;
-		super.fletcher1();
+	public EvaluateLineSearchMore94(boolean verbose) {
+		super(verbose);
 	}
 
 	@Override
-	public void more1() {
-		c1=1e-3;
-		c2=0.1;
-		super.more1();
-		System.out.println("==========");
-		c1=0.1;
-		c2=0.1;
-		super.more1();
+	protected LineSearch createSearch( double alpha0 ) {
+		return new LineSearchMore94(ftol, gtol,xtol,0,4.0*Math.max(1,alpha0));
 	}
 
 	@Override
-	public void more2() {
-		c1=1e-4;
-		c2=0.1;
-		super.more2();
+	public List<Results> fletcher1() {
+		ftol = 1e-3;
+		gtol = 0.1;
+		return super.fletcher1();
+	}
+
+	@Override
+	public List<Results> more1() {
+		ftol = 1e-3;
+		gtol = 0.1;
+		return super.more1();
+	}
+
+	@Override
+	public List<Results> more2() {
+		ftol = 0.1;
+		gtol = 0.1;
+		return super.more2();
+	}
+
+	@Override
+	public List<Results> more3() {
+		ftol = 0.1;
+		gtol = 0.1;
+		return super.more3();
+	}
+
+	@Override
+	public List<Results> more4() {
+		ftol = 0.001;
+		gtol = 0.001;
+		return super.more4();
+	}
+
+	@Override
+	public List<Results> more5() {
+		ftol = 0.001;
+		gtol = 0.001;
+		return super.more5();
+	}
+
+	@Override
+	public List<Results> more6() {
+		ftol = 0.001;
+		gtol = 0.001;
+		return super.more6();
 	}
 
 	public static void main( String []args ) {
-		EvaluateLineSearchMore94 eval = new EvaluateLineSearchMore94();
+		EvaluateLineSearchMore94 eval = new EvaluateLineSearchMore94(true);
+		System.out.println("----------------- fletcher 1");
 		eval.fletcher1();
-//		System.out.println("-----------------");
-//		eval.more1();
-//		System.out.println("-----------------");
-//		eval.more2();
+		System.out.println("----------------- more 1");
+		eval.more1();
+		System.out.println("----------------- more 2");
+		eval.more2();
+		System.out.println("----------------- more 3");
+		eval.more3();
+		System.out.println("----------------- more 4");
+		eval.more4();
+		System.out.println("----------------- more 5");
+		eval.more5();
+		System.out.println("----------------- more 6");
+		eval.more6();
 	}
 }

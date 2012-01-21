@@ -23,13 +23,13 @@ import org.ejml.UtilEjml;
 /**
  * <p>
  * Line search which meets the strong Wolfe line condition.  The Wolfe condition stipulates that &alpha;<sub>k</sub> (the step size)
- * should give sufficient decrease in the objective function below. The two parameters 0 < c<sub>1</sub> < c<sub>2</sub> 1
+ * should give sufficient decrease in the objective function below. The two parameters 0 < ftol &le; gtol < 1
  * determine how stringent the search is. For a full description of optimization parameters see [1].
  * </p>
  * <p>
  * Wolfe condition<br>
- * &phi;(&alpha;) &le; &phi;(0) + c<sub>1</sub>&alpha;&phi;'(0)<br>
- * | &phi;'(&alpha;)| &le; c<sub>2</sub> |&phi;'(0)|<br>
+ * &phi;(&alpha;) &le; &phi;(0) + ftol*&alpha;*&phi;'(0)<br>
+ * | &phi;'(&alpha;)| &le; gtol*|&phi;'(0)|<br>
  * where &phi; is the objective function and &phi;' is its derivative.
  * </p>
  *
@@ -68,8 +68,16 @@ public class LineSearchFletcher86 implements LineSearch {
 	// prevents alpha from getting too close to the bound's extreme values
 	double t1,t2,t3;
 
+	// double value of the function and derivative at zero
+	double fzero,gzero;
+
+	// largest allowed step
+	double stmax;
+	// minimum acceptable value of f
+	double fmin;
+
 	// search parameters that defined the Wolfe condition
-	private double c1,c2;
+	private double ftol, gtol;
 	// previous iteration step length and value
 	protected double stprev;
 
@@ -91,32 +99,34 @@ public class LineSearchFletcher86 implements LineSearch {
 	
 	/**
 	 *
-	 * @param c1 Controls required reduction in value. Try 1e-4
-	 * @param c2 Controls decrease in derivative magnitude. Try 0.9
+	 * @param ftol Controls required reduction in value. Try 1e-4
+	 * @param gtol Controls decrease in derivative magnitude. Try 0.9
+	 * @param fmin Minimum acceptable value of f(x). zero for least squares.
 	 * @param t1 Prevents alpha from growing too large during bracket phase.  Try 9
 	 * @param t2 Prevents alpha from being too close to bounds during sectioning.  Recommend t2 < c2. Try 0.1
 	 * @param t3 Prevents alpha from being too close to bounds during sectioning.  Try 0.5
 	 * @param stpmax Maximum allowed value of alpha.  Problem dependent.
 
 	 */
-	public LineSearchFletcher86(double c1, double c2,
+	public LineSearchFletcher86(double ftol, double gtol, double fmin,
 								double t1, double t2, double t3,
 								double stpmax) {
 		if( stpmax <= 0 )
 			throw new IllegalArgumentException("Maximum alpha must be greater than zero");
-		if( c1 < 0 )
+		if( ftol < 0 )
 			throw new IllegalArgumentException("c1 must be more than zero");
-		else if( c1 >= c2 )
-			throw new IllegalArgumentException("c1 must be less than c2");
-		else if( c2 >= 1 )
+		else if( ftol > gtol)
+			throw new IllegalArgumentException("c1 must be less or equal to than c2");
+		else if( gtol >= 1 )
 			throw new IllegalArgumentException("c2 must be less than one");
 
-		this.c1 = c1;
-		this.c2 = c2;
+		this.ftol = ftol;
+		this.gtol = gtol;
 		this.t1 = t1;
 		this.t2 = t2;
 		this.t3 = t3;
 		this.stpmax = stpmax;
+		this.fmin = fmin;
 	}
 
 	/**
@@ -132,6 +142,9 @@ public class LineSearchFletcher86 implements LineSearch {
 	public void init(double funcAtZero, double derivAtZero, double funcAtInit, double initAlpha) {
 		initializeSearch(funcAtZero, derivAtZero, funcAtInit,initAlpha);
 
+		fzero = funcAtZero;
+		gzero = derivAtZero;
+		
 		stprev = 0;
 		fprev = funcAtZero;
 		gprev = derivAtZero;
@@ -140,6 +153,8 @@ public class LineSearchFletcher86 implements LineSearch {
 
 		message = null;
 		converged = false;
+
+		this.stmax = (fmin-fzero)/(ftol*gzero);
 	}
 
 	protected void initializeSearch( final double valueZero , final double derivZero ,
@@ -162,18 +177,21 @@ public class LineSearchFletcher86 implements LineSearch {
 	@Override
 	public boolean iterate()
 	{
+		boolean ret;
 		if( mode <= 1 ) {
-			return converged = bracket();
+			ret = converged = bracket();
 		} else {
-			return converged = section();
+			ret = converged = section();
 		}
+
+		return ret;
 	}
 
 	/**
 	 * Searches for an upper bound.
-	 * @return
 	 */
 	protected boolean bracket() {
+//		System.out.println("------------- bracket");
 		// the value of alpha was passed in
 		if( mode != 0 ) {
 			fp = function.process(stp);
@@ -183,7 +201,7 @@ public class LineSearchFletcher86 implements LineSearch {
 		}
 
 		// check for upper bounds
-		if( fp > valueZero + c1* stp *derivZero ) {
+		if( fp > valueZero + ftol * stp *derivZero ) {
 			setModeToSection(stprev, fprev, stp);
 			return false;
 		}
@@ -193,21 +211,30 @@ public class LineSearchFletcher86 implements LineSearch {
 		}
 
 		gp = derivative.process(stp);
-		if( Math.abs(gp) <= -c2*derivZero ) {
+		if( Math.abs(gp) <= -gtol *derivZero ) {
 			return true;
 		}
 
+		// if the derivative is positive it is on the other side of the dip and has
+		// been bracketed
 		if( gp >= 0 ) {
 			setModeToSection(stp, fp, stprev);
 			return false;
 		}
-
-		// use interpolation to pick the next sample point
-		double temp = stp;
-		stp = interpolate(2* stp - stprev, Math.min(stpmax, stp +t1*(stp - stprev)));
-		stprev = temp;
-		gprev = gp;
-		fprev = fp;
+		
+		if( stmax <= 2*stp - stprev ) {
+			stprev = stp;
+			gprev = gp;
+			fprev = fp;
+			stp = stmax;
+		} else {
+			// use interpolation to pick the next sample point
+			double temp = stp;
+			stp = interpolate(2*stp - stprev, Math.min(stpmax, stp +t1*(stp - stprev)));
+			stprev = temp;
+			gprev = gp;
+			fprev = fp;
+		}
 
 		// see if it is taking significant steps
 		if( checkSmallStep() ) {
@@ -231,6 +258,7 @@ public class LineSearchFletcher86 implements LineSearch {
 	 */
 	protected boolean section()
 	{
+//		System.out.println("------------- section");
 		// compute the value at the new sample point
 		double temp = stp;
 		stp = interpolate(pLow +t2*(pHi - pLow), pHi -t3*(pHi - pLow));
@@ -252,13 +280,13 @@ public class LineSearchFletcher86 implements LineSearch {
 		gp = Double.NaN;
 
 		// check for convergence
-		if( fp > valueZero + c1* stp *derivZero  || fp >= fLow) {
+		if( fp > valueZero + ftol * stp *derivZero  || fp >= fLow) {
 			pHi = stp;
 		} else {
 			gp = derivative.process(stp);
 
 			// check for termination
-			if( Math.abs(gp) <= -c2*derivZero )
+			if( Math.abs(gp) <= -gtol *derivZero )
 				return true;
 
 			if( gp *(pHi - pLow) >= 0 )
