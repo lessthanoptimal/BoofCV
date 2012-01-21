@@ -28,9 +28,9 @@ package boofcv.numerics.optimization;
  *
  * <p>
  * Wolfe condition<br>
- * &phi;(&alpha;) &le; &phi;(0) + &mu;&alpha;&phi;'(0)<br>
- * | &phi;'(&alpha;)| &le; &eta; |&phi;'(0)|<br>
- * wher
+ * &phi;(&alpha;) &le; &phi;(0) + ftol*&alpha;&phi;'(0)<br>
+ * | &phi;'(&alpha;)| &le; gtol*|&phi;'(0)|<br>
+ * where ftol and gtol determine the precision needed to terminate the search..
  *
  * <p>
  * [1] Jorge J. More and David J. Thuente, "Line Search Algorithms with Guaranteed Sufficient Decrease"
@@ -58,8 +58,9 @@ public class LineSearchMore94 implements LineSearch {
 	// value of the function and derivative at 0
 	private double finit;
 	private double ginit;
-
+	// Equal to ftol*ginit.
 	private double gtest;
+	// size of the bracketed region
 	private double width;
 	private double width1;
 
@@ -69,16 +70,20 @@ public class LineSearchMore94 implements LineSearch {
 	private int stage;
 	
 	// stx and sty define the closed interval that the solution must lie inside of.
-	// the order of stx and sty (lower and upper bound) can change as the search progresses
-	// stx = alpha_l in the paper, this is the current best step
+	// - Before a bound/bracket is found stx < sty.
+	// - After the bracket has been found stx and sty defined the allowed interval's end points.
+	//   The relative magnitude of stx and sty is variable.
+
+	// stx is alpha_l in the paper and is the best possible step found so far
 	private double stx,fx,gx;
 	// sty = alpha_u in the paper
 	private double sty,fy,gy;
+	// Adaptively found lower and upper bounds used to bracket the solution
 	private double stmin,stmax;
 	// Current trial value for the step.  Corresponds to alpha_t in the paper
 	private double stp, fp, gp;
-	// lower and upper bound for the step stp
-	private double stpmin,stpmax;
+	// User specified lower and upper bound for the step stp
+	private final double stpmin,stpmax;
 
 	// Indicates if there were any numerical issues that caused it to stop iterating
 	private String message;
@@ -93,14 +98,14 @@ public class LineSearchMore94 implements LineSearch {
 	 * @param ftol Tolerance for sufficient decrease. ftol > 0. Smaller value for loose tolerance.  Try 1e-4
 	 * @param gtol Tolerance for curvature condition. gtol >= 0. Larger value for loose tolerance.  Try 1e-3
 	 * @param xtol Relative tolerance for acceptable step. xtol >= 0. Larger value for loose tolerance.  Try 1e-4.
-	 * @param stpmin
-	 * @param stepmax
+	 * @param stpmin The minimum allowed step.
+	 * @param stpmax The maximum allowed step.
 	 */
 	public LineSearchMore94(double ftol, double gtol, double xtol, 
-							double stpmin, double stepmax) {
-		if( stepmax < stpmin )
+							double stpmin, double stpmax) {
+		if( stpmax < stpmin )
 			throw new IllegalArgumentException("stpmin must be < stpmax");
-		if( stpmin <= 0 )
+		if( stpmin < 0 )
 			throw new IllegalArgumentException("stpmin must be > 0");
 		if( ftol < 0 )
 			throw new IllegalArgumentException("ftol must be >= 0 ");
@@ -113,7 +118,7 @@ public class LineSearchMore94 implements LineSearch {
 		this.gtol = gtol;
 		this.xtol = xtol;
 		this.stpmin = stpmin;
-		this.stpmax = stepmax;
+		this.stpmax = stpmax;
 	}
 
 	@Override
@@ -168,22 +173,23 @@ public class LineSearchMore94 implements LineSearch {
 			firstIteration = false;
 		}
 
-		// check to see if it should enter the second stage
+		// Enter the second stage if a point has been found which meets the first wolfe condition
+		// and is known to be past the optimal condition by having a positive derivative
 		double ftest = finit + stp*gtest;
 		if( stage == 0 && fp <= ftest && gp >= 0 )
 			stage = 1;
 		
 		// check warning conditions
-		if( bracket && (stp <= stpmin || stp >= stpmax))
+		if( bracket && (stp <= stmin || stp >= stmax))
 			message = "Rounding error preventing progress.";
-		if( bracket && stpmax - stpmin <= xtol* stpmax)
+		if( bracket && stmax - stmin <= xtol* stmax)
 			message = "XTOL test satisfied";
 		if( stp == stpmax && fp <= ftest && gp <= gtest )
 			message = "stp == stpmax";
-		if( stp == stpmin && (fp > ftest || gp <= gtest ))
-			message = "stp = stpmin";
+		if( stp == stpmin && (fp > ftest || gp >= gtest ))
+			message = "stp == stpmin";
 
-		// test for convergence
+		// Check for convergence using the Wolfe conditions
 		if( fp <= ftest && Math.abs(gp) <= gtol*(-ginit)) {
 			converged = true;
 			return true;
@@ -193,11 +199,12 @@ public class LineSearchMore94 implements LineSearch {
 		if( message != null )
 			return true;
 
-		// todo comment what fx is in stage 0
+		// See if it is searching for the upper bound still
 		if( stage == 0 && fp <= fx && fp > ftest ) {
-			// transform values using the axially function phi(x) that measures the difference between the function
-			// being optimized and its upper bound as specified by the first Wolfe equation
-			// phi(x) = f(x) - f(0) - mu*f'(0)*x
+			// Transform values using the function phi(x).  See pg 291
+			// This function has been modified from what's in the paper by removing phi(0) since it
+			// did not effect the outcome of the inequalities.
+			// phi(x) = f(x) - ftol*f'(0)*x
 			fp -= stp*gtest;
 			fx -= stx*gtest;
 			fy -= sty*gtest;
@@ -214,13 +221,15 @@ public class LineSearchMore94 implements LineSearch {
 			gx += gtest;
 			gy += gtest;
 		} else {
+			// A upper bound has been found and the step is being refined
 			dcstep();
 		}
 		
 		// decide if a bisection step is needed
 		if( bracket ) {
 			if( Math.abs(sty-stx) >= p66*width1 )
-				width1 = width;
+				stp = stx + p5*(sty-stx);
+			width1 = width;
 			width = Math.abs(sty-stx);
 		}
 		
@@ -235,7 +244,7 @@ public class LineSearchMore94 implements LineSearch {
 			stmax = stp + xtrapu*(stp-stx);
 		}
 
-		// force the stp to be within the bound stpmax and stpmin
+		// force the stp to be within the user specified bound
 		stp = Math.max(stp, stpmin);
 		stp = Math.min(stp, stpmax);
 
@@ -253,6 +262,7 @@ public class LineSearchMore94 implements LineSearch {
 	private void dcstep() {
 		double sgnd = gp*Math.signum(gx);
 
+		// the new step
 		double stpf;
 
 		if( fp > fx ) {
@@ -264,12 +274,15 @@ public class LineSearchMore94 implements LineSearch {
 		} else {
 			stpf = handleCase4();
 		}
-		
+
+		// update the bracket which contains the solution
 		if( fp > fx ) {
+			// found an upper bound
 			sty = stp;
 			fy = fp;
 			gy = gp;
 		} else {
+			// see if its on the other side of the dip
 			if( sgnd < 0 ) {
 				sty = stx;
 				fy = fx;
@@ -280,44 +293,64 @@ public class LineSearchMore94 implements LineSearch {
 			gx = gp;
 		}
 		
+//		System.out.printf("stpf = %4.1e\n",stpf);
 		stp = stpf;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * stp has a higher value than stx.  The minimum must be between these two values.
+	 * Pick a point which is close to stx since it has a lower value.
+	 *
+	 * @return The new step.
 	 */
 	private double handleCase1() {
 
 		double stpc = SearchInterpolate.cubic2(fx, gx, stx, fp, gp, stp);
 		double stpq = SearchInterpolate.quadratic(fx,gx,stx,fp,stp);
 
+		// If the cubic step is closer to stx than the quadratic step take that
 		bracket = true;
 		if( Math.abs(stpc-stx) < Math.abs(stpq-stx)) {
 			return stpc;
 		} else {
+			// otherwise go with the average of the twp
 			return stpc + (stpq-stpc)/2.0;
 		}
 	}
 
+	/**
+	 * The sign of the derivative has swapped, indicating that the function is on the other
+	 * side of the dip and that a bracket has been found.
+	 *
+	 * @return The new step.
+	 */
 	private double handleCase2() {
 		double stpc = SearchInterpolate.cubic2(fp, gp, stp, fx, gx, stx);
 		double stps = SearchInterpolate.quadratic2(gp,stp,gx,stx);
 
+		// use which ever is closest to stp since it is lower than stx
 		bracket = true;
-		if( Math.abs(stpc -stp) > Math.abs(stps-stp)) {
+		if( Math.abs(stpc - stp) > Math.abs(stps - stp)) {
 			return stpc;
 		} else {
 			return stps;
 		}
 	}
 
+	/**
+	 * The derivative at stp has a smaller magnitude than at stx and is likely to be closer to the minimum.  However
+	 * there are special cases that need to be dealt with here.
+	 *
+	 * @return The new step.
+	 */
 	private double handleCase3() {
 		double stpf;
-		double stpc = SearchInterpolate.cubicSafe(fp, gp, stp, fx, gx, stx, stpmin, stpmax);
-		double stpq = SearchInterpolate.quadratic(fp,gp,stp,fx,stx);
+		// use cubic interpolation only if it is safe
+		double stpc = SearchInterpolate.cubicSafe(fp, gp, stp, fx, gx, stx, stmin, stmax);
+		double stpq = SearchInterpolate.quadratic2(gp,stp,gx,stx);
 
 		if( bracket ) {
+			// Use which ever step is closer to stp
 			if( Math.abs(stpc-stp) < Math.abs(stpq-stp)){
 				stpf = stpc;
 			} else {
@@ -329,28 +362,32 @@ public class LineSearchMore94 implements LineSearch {
 				stpf = Math.max(stp+p66*(sty-stp),stpf);
 			}
 		} else {
+			// because a bracket has not been found, take whichever step is farther from stp
 			if( Math.abs(stpc-stp) > Math.abs(stpq-stp)) {
 				stpf = stpc;
 			} else {
 				stpf = stpq;
 			}
-			stpf = Math.min(stpmax,stpf);
-			stpf = Math.max(stpmin,stpf);
+			stpf = Math.min(stmax,stpf);
+			stpf = Math.max(stmin,stpf);
 		}
 		return stpf;
 	}
 
+	/**
+	 * Lower function value. On the same side of the dip because the gradients have the same sign. The magnitude
+	 * of the derivative did not decrease.
+	 *
+	 * @return The new step.
+	 */
 	private double handleCase4() {
-		double stpf;
 		if( bracket ) {
-			double stpc = SearchInterpolate.cubic2(fp, gp, stp, fy, gy, sty);
-			stpf = stpc;
-		} else if( stp < stx ) {
-			stpf = stpmax;
+			return SearchInterpolate.cubic2(fp, gp, stp, fy, gy, sty);
+		} else if( stp > stx ) {
+			return stmax;
 		} else {
-			stpf = stpmin;
+			return stmin;
 		}
-		return stpf;
 	}
 
 	@Override

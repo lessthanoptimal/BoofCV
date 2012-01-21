@@ -18,63 +18,133 @@
 
 package boofcv.numerics.optimization;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Runs a standard battery of tests against line search algorithms
  * 
  * @author Peter Abeles
  */
 public abstract class LineSearchEvaluator {
-	
-	protected abstract LineSearch createSearch();
-	
-	private void performTest( FunctionStoS func , FunctionStoS deriv ,
-							  double alpha0 )
+
+	// should it output results to standard out
+	boolean verbose;
+
+	protected LineSearchEvaluator(boolean verbose) {
+		this.verbose = verbose;
+	}
+
+	/**
+	 * Creates a line search algorithm
+	 *
+	 * @param initStep Initial step.  Sometimes needed to select a max bound
+	 * @return Line search algorithm
+	 */
+	protected abstract LineSearch createSearch( double initStep );
+
+	/**
+	 * Run the line search algorithm on the two inputs and compute statistics
+	 * 
+	 * @param func Function being searched
+	 * @param deriv Derivative being searched
+	 * @param initStep Initial step
+	 * @return statics
+	 */
+	private Results performTest( FunctionStoS func , FunctionStoS deriv , double initStep )
 	{
 		CallCounterStoS f = new CallCounterStoS(func);
 		CallCounterStoS d = new CallCounterStoS(deriv);
 
-		LineSearch alg = createSearch();
+		LineSearch alg = createSearch(initStep);
 		alg.setFunction(f,d);
 
 		double valueZero = func.process(0);
 		double derivZero = deriv.process(0);
-		double valueInit = func.process(alpha0);
+		double valueInit = func.process(initStep);
 
-		alg.init(valueZero,derivZero,valueInit,alpha0);
+		alg.init(valueZero,derivZero,valueInit,initStep);
 		
 		for( int i = 0; i < 50 && !alg.iterate() ; i++ ){}
 		double found = alg.getStep();
 		double foundDeriv = deriv.process(found);
-	
-		System.out.printf("alpha %f found = %f deriv %5.2e  count f = %d d = %d\n", alpha0, found,foundDeriv, f.count, d.count);
+
+		if( verbose ) {
+		System.out.printf("step{ init %4.1e final = %6.3f} deriv %9.2e  count f = %2d d = %2d\n", 
+				initStep, found,foundDeriv, f.count, d.count);
+		}
+
+		Results ret = new Results();
+		ret.numIterations = d.count;
+		ret.deriv = foundDeriv;
+		ret.f = func.process(found);
+		ret.deriv = foundDeriv;
+		ret.x = found;
+		
+		return ret;
 	}
 
-	public void fletcher1() {
+	/**
+	 * Processes and compile results for the function at the specified initial steps
+	 */
+	private List<Results> process( FunctionStoS f , FunctionStoS g , double ...initSteps )
+	{
+		List<Results> results = new ArrayList<Results>();
+		
+		for( double step : initSteps ) {
+			results.add(performTest(f,g,step));
+		}
+
+		return results;
+	}
+
+	public List<Results> fletcher1() {
 		FunctionStoS f = new FletcherFunction1();
 		FunctionStoS g = new FletcherDerivative1();
 
-		performTest(f,g,0.1);
-		performTest(f,g,1);
+		return process(f,g,0.1,1);
 	}
 
-	public void more1() {
+	public List<Results> more1() {
 		FunctionStoS f = new MoreFunction1(2);
 		FunctionStoS g = new MoreDerivative1(2);
 
-		performTest(f,g,1e-3);
-		performTest(f,g,1e-1);
-		performTest(f,g,10);
-		performTest(f,g,1e3);
+		return process(f,g,1e-3,1e-1,10,1e3);
 	}
 
-	public void more2() {
+	public List<Results> more2() {
 		FunctionStoS f = new MoreFunction2(0.004);
 		FunctionStoS g = new MoreDerivative2(0.004);
 
-		performTest(f,g,1e-3);
-		performTest(f,g,1e-1);
-		performTest(f,g,10);
-		performTest(f,g,1e3);
+		return process(f,g,1e-3,1e-1,10,1e3);
+	}
+
+	public List<Results> more3() {
+		FunctionStoS f = new MoreFunction3(39,0.01);
+		FunctionStoS g = new MoreDerivative3(39,0.01);
+
+		return process(f,g,1e-3,1e-1,10,1e3);
+	}
+
+	public List<Results> more4() {
+		FunctionStoS f = new MoreFunction4(0.001,0.001);
+		FunctionStoS g = new MoreDerivative4(0.001,0.001);
+
+		return process(f,g,1e-3,1e-1,10,1e3);
+	}
+
+	public List<Results> more5() {
+		FunctionStoS f = new MoreFunction4(0.01,0.001);
+		FunctionStoS g = new MoreDerivative4(0.01,0.001);
+
+		return process(f,g,1e-3,1e-1,10,1e3);
+	}
+
+	public List<Results> more6() {
+		FunctionStoS f = new MoreFunction4(0.001,0.01);
+		FunctionStoS g = new MoreDerivative4(0.001,0.01);
+
+		return process(f,g,1e-3,1e-1,10,1e3);
 	}
 
 	private static class FletcherFunction1 implements FunctionStoS
@@ -116,11 +186,8 @@ public abstract class LineSearchEvaluator {
 		}
 
 		@Override
-		public double process(double input) {
-			double input2 = input*input;
-			double inner = input2+beta;
-
-			return -1/inner + 2*input2*Math.pow(inner,-2);
+		public double process(double x) {
+			return  (x*x-beta)/Math.pow(x*x+beta,2);
 		}
 	}
 
@@ -133,8 +200,9 @@ public abstract class LineSearchEvaluator {
 		}
 
 		@Override
-		public double process(double input) {
-			return Math.pow(input+beta,5) - 2*Math.pow(input+beta,4);
+		public double process(double x) {
+			double t = x + beta;
+			return Math.pow(t,5) - 2*Math.pow(t,4);
 		}
 	}
 
@@ -147,8 +215,117 @@ public abstract class LineSearchEvaluator {
 		}
 
 		@Override
-		public double process(double input) {
-			return 5*Math.pow(input+beta,4) - 8*Math.pow(input+beta,3);
+		public double process(double x) {
+			double t = x + beta;
+			return 5*Math.pow(t,4) - 8*Math.pow(t,3);
 		}
+	}
+
+	private static class MoreFunction3 implements FunctionStoS
+	{
+		double l,beta;
+
+		private MoreFunction3(double l , double beta) {
+			this.l = l;
+			this.beta = beta;
+		}
+
+		@Override
+		public double process(double input) {
+			double right = (2.0*(1-beta)/(l*Math.PI))*Math.sin((l*Math.PI)*input/2.0);
+			return func(input) + right;
+		}
+		
+		private double func( double input ) {
+			if( input <= 1 - beta ) {
+				return 1-input;
+			} else if( input >= 1 + beta ) {
+				return input - 1;
+			} else {
+				return (1.0/(2.0*beta))*Math.pow(input-1,2.0) + beta/2.0;
+			}
+		}
+	}
+
+	private static class MoreDerivative3 implements FunctionStoS
+	{
+		double l,beta;
+
+		private MoreDerivative3(double l , double beta) {
+			this.l = l;
+			this.beta = beta;
+		}
+
+		@Override
+		public double process(double input) {
+			double right = (1 - beta) * Math.cos((l*Math.PI)*input/2.0);
+			return func(input) + right;
+		}
+
+		private double func( double input ) {
+			if( input <= 1 - beta ) {
+				return -1;
+			} else if( input >= 1 + beta ) {
+				return 1;
+			} else {
+				return (1.0/beta)*(input-1);
+			}
+		}
+	}
+
+	private static class MoreFunction4 implements FunctionStoS
+	{
+		double b1,b2;
+
+		private MoreFunction4(double b1 , double b2) {
+			this.b1 = b1;
+			this.b2 = b2;
+		}
+
+		@Override
+		public double process(double x) {
+			double t1 = gamma(b1);
+			double t2 = gamma(b2);
+			double f = t1*Math.sqrt(Math.pow(1-x,2)+b2*b2) + t2*Math.sqrt(x*x+b1*b1);
+			return f;
+		}
+		
+		private double gamma( double b ) {
+			return Math.sqrt(1+b*b) - b;
+		}
+	}
+	private static class MoreDerivative4 implements FunctionStoS
+	{
+		double b1,b2;
+
+		private MoreDerivative4(double b1 , double b2) {
+			this.b1 = b1;
+			this.b2 = b2;
+		}
+
+		@Override
+		public double process(double x) {
+			double t1 = gamma(b1);
+			double t2 = gamma(b2);
+
+			return -t1*((1-x)/Math.sqrt(Math.pow(1-x,2)+b2*b2)) +
+					+ t2*(x/Math.sqrt(x*x+b1*b1));
+		}
+
+		private double gamma( double b ) {
+			return Math.sqrt(1+b*b) - b;
+		}
+	}
+	
+	public static class Results
+	{
+		// number of iterations it took
+		public int numIterations;
+		// value of the function at the output
+		public double f;
+		// value of the derivative at the output
+		public double deriv;
+		// final step
+		public double x;
 	}
 }

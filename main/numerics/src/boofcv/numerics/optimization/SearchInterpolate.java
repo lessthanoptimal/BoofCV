@@ -140,7 +140,7 @@ public class SearchInterpolate {
 		double s = Math.max(Math.abs(theta),Math.abs(g0));
 		s= Math.max(s,Math.abs(g1));
 		double gamma = s*Math.sqrt((theta/s)*(theta/s) - (g0/s)*(g1/s));
-		if( x1 < x0 )
+		if( x0 > x1 )
 			gamma = -gamma;
 		double p = (gamma-g0) + theta;
 		double q = ((gamma-g0)+gamma) + g1;
@@ -151,7 +151,7 @@ public class SearchInterpolate {
 	/**
 	 * <p>
 	 * Use cubic interpolation only if the cubic tends to infinity in the direction of the step or if the minim of the
-	 * cubic is beyound x1.  Otherwise the cubic step is defined to be the secant step.
+	 * cubic is beyond x1.  Otherwise the the step will be max if x0 > x1 else it will be min.
 	 * </p>
 	 * <p>
 	 * [1] MINPACK-2 source code http://ftp.mcs.anl.gov/pub/MINPACK-2/dcstep.f
@@ -183,7 +183,7 @@ public class SearchInterpolate {
 		// gamma == 0 only rises if the cubic does not tend to infinity in the direction of the step
 		
 		if( r < 0 && gamma != 0 ) {
-			return x0 + (p/q)*(x1-x0);
+			return x0 + r*(x1-x0);
 		} else if( x0 > x1 ) {
 			return max;
 		} else {
