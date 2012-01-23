@@ -18,16 +18,17 @@
 
 package boofcv.alg.feature.orientation.impl;
 
-import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
 import georegression.metric.UtilAngle;
+import pja.sorting.QuickSort_F64;
 
 
 /**
  * <p>
  * Implementation of {@link boofcv.alg.feature.orientation.OrientationSlidingWindow} for integral images.
+ * TODO comment how this implementation works
  * </p>
  *
  * @author Peter Abeles
@@ -40,35 +41,36 @@ public class ImplOrientationSlidingWindowIntegral
 	double[] derivX;
 	double[] derivY;
 
-	// number of different angles it will consider
-	protected int numAngles;
 	// the size of the angle window it will consider in radians
 	protected double windowSize;
 	// the angle each pixel is pointing
 	protected double angles[];
-	// number of valid sample points
-	protected int num;
+	
+	// clockwise ordering of angles
+	protected int order[];
+
+	int total = 0;
+
+	QuickSort_F64 sorter = new QuickSort_F64();
 
 	/**
 	 *
-	 * @param numAngles Number of different center points for the sliding window that will be considered
-	 * @param samplePeriod How often (in units of scale) does it sample the image?
 	 * @param windowSize Angular window that is slide across
 	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
 	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
 	 * @param sampleKernelWidth Size of kernel doing the sampling.  Typically 4.
 	 */
-	public ImplOrientationSlidingWindowIntegral(int numAngles, double samplePeriod, double windowSize,
+	public ImplOrientationSlidingWindowIntegral(double samplePeriod, double windowSize,
 												int radius, double weightSigma, int sampleKernelWidth,
 												Class<T> imageType) {
 		super(radius,samplePeriod,sampleKernelWidth,weightSigma,imageType);
-		this.numAngles = numAngles;
 		this.windowSize = windowSize;
 
 		derivX = new double[width*width];
 		derivY = new double[width*width];
 
 		angles = new double[ width*width ];
+		order = new int[ angles.length ];
 	}
 
 	@Override
@@ -79,122 +81,110 @@ public class ImplOrientationSlidingWindowIntegral
 		double tl_x = c_x - radius*period;
 		double tl_y = c_y - radius*period;
 
-		// use a faster algorithm if it is entirely inside
-		if( SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y,width*period,sampleWidth*scale))  {
-			gradientInner(tl_x,tl_y,period);
-		} else {
-			gradientBorder(tl_x,tl_y,period);
-		}
+		computeGradient(tl_x,tl_y,period);
 
-		for( int i = 0; i < derivX.length; i++ ) {
+		// apply weight to each gradient dependent on its position
+		if( weights != null ) {
+			for( int i = 0; i < total; i++ ) {
+				double w = weights.data[i];
+				derivX[i] *= w;
+				derivY[i] *= w;
+			} 
+		}
+		
+		for( int i = 0; i < total; i++ ) {
 			angles[i] = Math.atan2(derivY[i],derivX[i]);
 		}
 
-		if( weights == null ) {
-			return unweighted();
-		} else {
-			return weighted();
-		}
+		// order points from lowest to highest
+		sorter.sort(angles, angles.length, order);
+
+		return estimateAngle();
 	}
 
-	/**
-	 * Compute the gradient while checking for border conditions
-	 */
-	protected void gradientBorder( double tl_x, double tl_y, double samplePeriod )
+	private void computeGradient( double tl_x , double tl_y , double samplePeriod ) 
 	{
 		// add 0.5 to c_x and c_y to have it round when converted to an integer pixel
 		// this is faster than the straight forward method
 		tl_x += 0.5;
 		tl_y += 0.5;
 
-		num = 0;
+		int thresh = radius*radius;
+		
+		total = 0;
 		for( int y = 0; y < width; y++ ) {
-			int pixelsY = (int)(tl_y + y * samplePeriod);
+			int ry = y-radius;
+			
+			for( int x = 0; x < width; x++ , total++ ) {
+				int rx = x-radius;
 
-			for( int x = 0; x < width; x++ ) {
-				int pixelsX = (int)(tl_x + x * samplePeriod);
+				int xx = (int)(tl_x + x * samplePeriod);
+				int yy = (int)(tl_y + y * samplePeriod);
 
-				if( g.isInBounds(pixelsX, pixelsY)) {
-					G v = g.compute(pixelsX,pixelsY);
-					derivX[num] = v.getX();
-					derivY[num] = v.getY();
-					num++;
+//				if( ry*ry + rx*rx <= thresh && gradient.isInBounds(xx,yy) ) {
+				if( g.isInBounds(xx,yy) ) {
+					GradientValue deriv = g.compute(xx,yy);
+					double dx = deriv.getX();
+					double dy = deriv.getY();
+
+					derivX[total] = dx;
+					derivY[total] = dy;
+				} else {
+					derivX[total] = 0;
+					derivY[total] = 0;
 				}
 			}
 		}
 	}
+	
+	private double estimateAngle() {
+		int start = 0;
+		int end = 1;
 
-	protected void gradientInner( double tl_x, double tl_y, double samplePeriod )
-	{
-		// add 0.5 to c_x and c_y to have it round when converted to an integer pixel
-		// this is faster than the straight forward method
-		tl_x += 0.5;
-		tl_y += 0.5;
+		int startIndex = order[start];
+		int endIndex = order[end];
+		double sumX=derivX[startIndex];
+		double sumY=derivY[startIndex];
+		double best=sumX*sumX+sumY*sumY;
+		double bestX=sumX;
+		double bestY=sumY;
 
-		num = 0;
-		for( int y = 0; y < width; y++ ) {
-			int pixelsY = (int)(tl_y + y * samplePeriod);
+		double endAngle = angles[endIndex];
 
-			for( int x = 0; x < width; x++ ) {
-				int pixelsX = (int)(tl_x + x * samplePeriod);
+		while( start != total ) {
+			startIndex = order[start];
+			double startAngle = angles[startIndex];
 
-				G v = g.compute(pixelsX,pixelsY);
-				derivX[num] = v.getX();
-				derivY[num] = v.getY();
-				num++;
-			}
-		}
-	}
+			// only compute the average if the angles are close to each other
+			while( UtilAngle.dist(startAngle,endAngle) <= windowSize ) {
+				sumX += derivX[endIndex];
+				sumY += derivY[endIndex];
 
-	private double unweighted() {
-		double windowRadius = windowSize/2.0;
-		double bestScore = -1;
-		double bestAngle = 0;
-		double stepAngle = Math.PI*2.0/numAngles;
-
-		for( double angle = -Math.PI; angle < Math.PI; angle += stepAngle ) {
-			double dx = 0;
-			double dy = 0;
-			for( int i = 0; i < num; i++ ) {
-				double diff = UtilAngle.dist(angle, angles[i]);
-				if( diff <= windowRadius) {
-					dx += derivX[i];
-					dy += derivY[i];
+				// see if the magnitude of the gradient inside this bound is greater
+				// than the previous best
+				double mag = sumX*sumX + sumY*sumY;
+				if( mag > best ) {
+					best = mag;
+					bestX = sumX;
+					bestY = sumY;
 				}
+				end++;
+				if( end >= total )
+					end = 0;
+				endIndex = order[end];
+				endAngle = angles[endIndex];
+
+				// if it cycled all the way around stop
+				if( endIndex == startIndex )
+					break;
 			}
-			double n = dx*dx + dy*dy;
-			if( n > bestScore) {
-				bestAngle = Math.atan2(dy,dx);
-				bestScore = n;
-			}
+
+			// remove the first element from the list
+			sumX -= derivX[startIndex];
+			sumY -= derivY[startIndex];
+			start++;
 		}
 
-		return bestAngle;
-	}
-
-	private double weighted() {
-		double windowRadius = windowSize/2.0;
-		double bestScore = -1;
-		double bestAngle = 0;
-		double stepAngle = Math.PI*2.0/numAngles;
-
-		for( double angle = -Math.PI; angle < Math.PI; angle += stepAngle ) {
-			double dx = 0;
-			double dy = 0;
-			for( int i = 0; i < num; i++ ) {
-				double diff = UtilAngle.dist(angle, angles[i]);
-				if( diff <= windowRadius) {
-					dx += weights.data[i]*derivX[i];
-					dy += weights.data[i]*derivY[i];
-				}
-			}
-			double n = dx*dx + dy*dy;
-			if( n > bestScore) {
-				bestAngle = Math.atan2(dy,dx);
-				bestScore = n;
-			}
-		}
-
-		return bestAngle;
+		return Math.atan2(bestY,bestX);
 	}
 }

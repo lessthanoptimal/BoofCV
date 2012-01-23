@@ -50,6 +50,12 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 	private Kernel2D_F64 weightGrid;
 	private Kernel2D_F64 weightSub;
 
+	private double samplesX[];
+	private double samplesY[];
+
+	// how wide the grid is that's being sampled in units of samples
+	int sampleWidth;
+	
 	/**
 	 * Creates a SURF descriptor of arbitrary dimension by changing how the local region is sampled.
 	 *
@@ -80,6 +86,10 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 		div = weightSub.get(weightSub.getRadius(),weightSub.getRadius());
 		for( int i = 0; i < weightSub.data.length; i++ )
 			weightSub.data[i] /= div;
+
+		sampleWidth = widthLargeGrid*widthSubRegion+overLap*2;
+		samplesX = new double[sampleWidth*sampleWidth];
+		samplesY = new double[sampleWidth*sampleWidth];
 	}
 
 	/**
@@ -172,26 +182,37 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 		c_x += 0.5;
 		c_y += 0.5;
 
+		// first sample the whole grid at once to avoid sampling overlapping regions twice
+		int index = 0;
+		for( int rY = -regionR-overLap,i=0; rY < regionEnd+overLap; rY++,i++) {
+			double regionY = rY*scale;
+			for( int rX = -regionR-overLap,j=0; rX < regionEnd+overLap; rX++,j++,index++ ) {
+				double regionX = rX*scale;
+
+				// rotate the pixel along the feature's direction
+				int pixelX = (int)(c_x + c*regionX - s*regionY);
+				int pixelY = (int)(c_y + s*regionX + c*regionY);
+
+				GradientValue g = gradient.compute(pixelX,pixelY);
+				samplesX[index] = g.getX();
+				samplesY[index] = g.getY();
+			}
+		}
+
+		// compute descriptor using precomputed samples
 		int indexGridWeight = 0;
-		// step through the sub-regions
 		for( int rY = -regionR; rY < regionEnd; rY += widthSubRegion ) {
 			for( int rX = -regionR; rX < regionEnd; rX += widthSubRegion ) {
 				double sum_dx = 0, sum_dy=0, sum_adx=0, sum_ady=0;
 
 				// compute and sum up the response  inside the sub-region
+				index = (rY+regionR)*sampleWidth + rX+regionR;
 				for( int i = 0; i < totalSampleWidth; i++ ) {
-					double regionY = (rY + i - overLap)*scale;
-					for( int j = 0; j < totalSampleWidth; j++ ) {
-						double regionX = (rX + j - overLap)*scale;
-
+					for( int j = 0; j < totalSampleWidth; j++ , index++ ) {
 						double w = weightSub.get(j,i);
-						// rotate the pixel along the feature's direction
-						int pixelX = (int)(c_x + c*regionX - s*regionY);
-						int pixelY = (int)(c_y + s*regionX + c*regionY);
 
-						GradientValue g = gradient.compute(pixelX,pixelY);
-						double dx = w*g.getX();
-						double dy = w*g.getY();
+						double dx = w*samplesX[index];
+						double dy = w*samplesY[index];
 
 						// align the gradient along image patch
 						// note the transform is transposed

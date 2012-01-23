@@ -78,7 +78,7 @@ public class FactoryDescribeRegionPoint {
 
 		if( isOriented )
 //			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
-			orientation = FactoryOrientationAlgs.sliding_ii(42, 0.65, Math.PI/3.0,8,-1, 6, integralType);
+			orientation = FactoryOrientationAlgs.sliding_ii(0.65, Math.PI/3.0,8,-1, 6, integralType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>surf2(integralType);
 		return new WrapDescribeSurf<T,II>( alg ,orientation);
@@ -104,7 +104,7 @@ public class FactoryDescribeRegionPoint {
 
 		if( isOriented )
 //			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
-			orientation = FactoryOrientationAlgs.sliding_ii(42, 0.65, Math.PI/3.0,8,-1, 6, integralType);
+			orientation = FactoryOrientationAlgs.sliding_ii(0.65, Math.PI/3.0,8,-1, 6, integralType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>msurf(integralType);
 		return new WrapDescribeSurf<T,II>( alg ,orientation);
