@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
 
 import org.junit.Test;
 
@@ -153,7 +153,7 @@ public class TestSearchInterpolate {
 		double found = SearchInterpolate.cubicSafe(f0,g0,alpha0,f1,g1,alpha1,0.1,100);
 		assertEquals(0.1,found,1e-8);
 
-		found = SearchInterpolate.cubicSafe(f1,g1,alpha1,f0,g0,alpha0,0.1,100);
+		found = SearchInterpolate.cubicSafe(f1, g1, alpha1, f0, g0, alpha0, 0.1, 100);
 		assertEquals(100,found,1e-8);
 	}
 

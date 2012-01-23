@@ -16,13 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
 
+import boofcv.numerics.optimization.EvaluateLineSearchFletcher86;
+import boofcv.numerics.optimization.FunctionStoS;
+import boofcv.numerics.optimization.LineSearchEvaluator;
 import org.junit.Test;
 
 import java.util.List;
 
-import static boofcv.numerics.optimization.TestLineSearchMore94.testResults;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -44,21 +46,21 @@ public class TestLineSearchFletcher86 {
 		FunctionStoS d = new TrivialQuadraticDerivStoS(expected);
 
 		// the initial value should pass all the tests with this setting
-		LineSearchFletcher86 alg = new LineSearchFletcher86(0.1,0.9,0,9,0,0,50);
+		LineSearchFletcher86 alg = new LineSearchFletcher86(0.1,0.9,0,9,0,0);
 		alg.setFunction(f,d);
 
 		double valueZero = f.process(0);
 		double derivZero = d.process(0);
 		double initValue = f.process(1);
 
-		alg.init(valueZero,derivZero,initValue,1);
+		alg.init(valueZero,derivZero,initValue,1,0,100);
 		assertTrue(UtilOptimize.process(alg, 50));
 		double foundLoose = alg.getStep();
 
 		// now try it with tighter bounds
-		alg = new LineSearchFletcher86(1e-5,0.1,0,9,0.05,0.5,50);
+		alg = new LineSearchFletcher86(1e-5,0.1,0,9,0.05,0.5);
 		alg.setFunction(f,d);
-		alg.init(valueZero,derivZero,initValue,1);
+		alg.init(valueZero,derivZero,initValue,1,0,100);
 		assertTrue(UtilOptimize.process(alg, 50));
 		double foundTight = alg.getStep();
 
@@ -73,7 +75,7 @@ public class TestLineSearchFletcher86 {
 	public void compareFletcher1() {
 		List<LineSearchEvaluator.Results> results = eval.fletcher1();
 		
-		testResults(results.get(0),3,0.16);
-		testResults(results.get(1),3,0.16);
+		TestLineSearchMore94.testResults(results.get(0), 3, 0.16);
+		TestLineSearchMore94.testResults(results.get(1), 3, 0.16);
 	}
 }

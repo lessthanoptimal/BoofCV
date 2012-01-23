@@ -23,5 +23,7 @@ package boofcv.numerics.optimization;
  */
 public interface FunctionNtoN {
 
+	public int getN();
+
 	public void process( double input[] , double[] output );
 }

@@ -16,24 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
+
+import boofcv.numerics.optimization.FunctionStoS;
 
 /**
- * Function used for testing optimization functions
+ * Function used for testing optimization functions.  Slightly perturbed from a quadratic.
  *
  * @author Peter Abeles
  */
-public class TrivialQuadraticDerivStoS implements FunctionStoS {
+public class TrivialQuadraticStoS implements FunctionStoS {
 
+	public static final double PERTURBATION = 0.00001;
 	double center;
 
-	public TrivialQuadraticDerivStoS(double center) {
+	public TrivialQuadraticStoS(double center) {
 		this.center = center;
 	}
 
 	@Override
 	public double process(double input) {
+
 		double v = input-center;
-		return 2*v+4*TrivialQuadraticStoS.PERTURBATION*v*v*v;
+
+		return v*v+PERTURBATION*v*v*v*v;
 	}
 }

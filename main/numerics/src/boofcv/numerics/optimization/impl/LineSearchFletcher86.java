@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
 
+import boofcv.numerics.optimization.FunctionStoS;
+import boofcv.numerics.optimization.LineSearch;
 import org.ejml.UtilEjml;
 
 /**
@@ -105,12 +107,10 @@ public class LineSearchFletcher86 implements LineSearch {
 	 * @param t1 Prevents alpha from growing too large during bracket phase.  Try 9
 	 * @param t2 Prevents alpha from being too close to bounds during sectioning.  Recommend t2 < c2. Try 0.1
 	 * @param t3 Prevents alpha from being too close to bounds during sectioning.  Try 0.5
-	 * @param stpmax Maximum allowed value of alpha.  Problem dependent.
 
 	 */
 	public LineSearchFletcher86(double ftol, double gtol, double fmin,
-								double t1, double t2, double t3,
-								double stpmax) {
+								double t1, double t2, double t3 ) {
 		if( stpmax <= 0 )
 			throw new IllegalArgumentException("Maximum alpha must be greater than zero");
 		if( ftol < 0 )
@@ -125,7 +125,6 @@ public class LineSearchFletcher86 implements LineSearch {
 		this.t1 = t1;
 		this.t2 = t2;
 		this.t3 = t3;
-		this.stpmax = stpmax;
 		this.fmin = fmin;
 	}
 
@@ -139,7 +138,8 @@ public class LineSearchFletcher86 implements LineSearch {
 	}
 
 	@Override
-	public void init(double funcAtZero, double derivAtZero, double funcAtInit, double initAlpha) {
+	public void init(double funcAtZero, double derivAtZero, double funcAtInit, double initAlpha,
+					 double stepMin, double stepMax ) {
 		initializeSearch(funcAtZero, derivAtZero, funcAtInit,initAlpha);
 
 		fzero = funcAtZero;
@@ -155,6 +155,7 @@ public class LineSearchFletcher86 implements LineSearch {
 		converged = false;
 
 		this.stmax = (fmin-fzero)/(ftol*gzero);
+		this.stpmax = stepMax;
 	}
 
 	protected void initializeSearch( final double valueZero , final double derivZero ,

@@ -19,14 +19,15 @@
 package boofcv.numerics.optimization;
 
 /**
- *
- * f'(0) < 0
- * alpha >= 0
- *
+ * <p>
+ * Line search for nonlinear optimization.  Computes function values at different step lengths.
+ * all step lengths must be greater than or equal to zero.  The derivative at step zero must be
+ * less than zero.
+ * </p>
  *
  * @author Peter Abeles
  */
-public interface LineSearch {
+public interface LineSearch extends IterativeOptimization {
 
 	/**
 	 * Sets the function being optimized.
@@ -37,47 +38,25 @@ public interface LineSearch {
 	public void setFunction( FunctionStoS function , FunctionStoS derivative );
 
 	/**
-	 * Initializes and resets the line search.
+	 * Initializes and resets the line search.  In some implementations a reasonable
+	 * minimum and maximum step bound is set here.
 	 *
 	 * @param funcAtZero Value of f(0)
 	 * @param derivAtZero Derivative of at f(0)
 	 * @param funcAtInit Value of f at initial value of step: f(step)
 	 * @param stepInit Initial step size
+	 * @param stepMin Minimum allowed step.
+	 * @param stepMax Maximum allowed step.
 	 * @return Approximate value of alpha which minimizes the function
 	 */
 	public void init( final double funcAtZero, final double derivAtZero,
-					  final double funcAtInit, final double stepInit );
+					  final double funcAtInit, final double stepInit ,
+					  double stepMin, double stepMax );
 
-
-	/**
-	 * Updates the line search. Check the return value to see if it needs to be iterated more.
-	 * After it returns true {@link #isConverged} should be called to see if it converged to a solution
-	 * or stopped for some other reason.
-	 *
-	 * @return If true that means that it has converged or that no more progress can be made.
-	 */
-	public boolean iterate() throws OptimizationException;
-
-	/**
-	 * Indicates if iteration stopped due to convergence or not.
-	 *
-	 * @return True if iteration stopped because it converged.
-	 */
-	public boolean isConverged();
-	
 	/**
 	 * Returns the current approximate solution for the line search
 	 *
 	 * @return current solution
 	 */
 	public double getStep();
-
-	/**
-	 * Provides feed back if something went wrong, but still produced a solution.
-	 * If there is no message then null is returned.  The meaning and type of messages
-	 * are implementation specific.
-	 *
-	 * @return Additional info on the computed solution.
-	 */
-	public String getWarning();
 }

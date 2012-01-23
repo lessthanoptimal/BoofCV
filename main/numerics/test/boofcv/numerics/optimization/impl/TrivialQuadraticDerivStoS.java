@@ -16,27 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
+
+import boofcv.numerics.optimization.FunctionStoS;
 
 /**
- * Function for non-linear optimization that has a single output and N inputs.
+ * Function used for testing optimization functions
  *
  * @author Peter Abeles
  */
-public interface FunctionNtoS {
+public class TrivialQuadraticDerivStoS implements FunctionStoS {
 
-	/**
-	 * The number of inputs.
-	 *
-	 * @return Number of inputs.
-	 */
-	public int getN();
+	double center;
 
-	/**
-	 * Computes the output given an array of inputs.
-	 *
-	 * @param input Array containing input values
-	 * @return The output.
-	 */
-	public double process( double input[] );
+	public TrivialQuadraticDerivStoS(double center) {
+		this.center = center;
+	}
+
+	@Override
+	public double process(double input) {
+		double v = input-center;
+		return 2*v+4*TrivialQuadraticStoS.PERTURBATION*v*v*v;
+	}
 }

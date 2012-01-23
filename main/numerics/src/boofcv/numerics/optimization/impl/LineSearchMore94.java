@@ -16,7 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
+
+import boofcv.numerics.optimization.FunctionStoS;
+import boofcv.numerics.optimization.LineSearch;
+import boofcv.numerics.optimization.OptimizationException;
 
 /**
  * <p>
@@ -31,6 +35,13 @@ package boofcv.numerics.optimization;
  * &phi;(&alpha;) &le; &phi;(0) + ftol*&alpha;&phi;'(0)<br>
  * | &phi;'(&alpha;)| &le; gtol*|&phi;'(0)|<br>
  * where ftol and gtol determine the precision needed to terminate the search..
+ *
+ * <p>
+ * Parts of this code
+ * MINPACK-2 Project. November 1993.<br>
+ * Argonne National Laboratory and University of Minnesota.<br>
+ * Brett M. Averick, Richard G. Carter, and Jorge J. More'.<br>
+ * </p>
  *
  * <p>
  * [1] Jorge J. More and David J. Thuente, "Line Search Algorithms with Guaranteed Sufficient Decrease"
@@ -83,7 +94,10 @@ public class LineSearchMore94 implements LineSearch {
 	// Current trial value for the step.  Corresponds to alpha_t in the paper
 	private double stp, fp, gp;
 	// User specified lower and upper bound for the step stp
-	private final double stpmin,stpmax;
+	private double stpmin,stpmax;
+	// minimum possible function value, used to set stpmax.
+	private double minimumFunctionValue;
+
 
 	// Indicates if there were any numerical issues that caused it to stop iterating
 	private String message;
@@ -94,15 +108,16 @@ public class LineSearchMore94 implements LineSearch {
 	private boolean converged;
 
 	/**
+	 * Configures the line search.
 	 *
 	 * @param ftol Tolerance for sufficient decrease. ftol > 0. Smaller value for loose tolerance.  Try 1e-4
 	 * @param gtol Tolerance for curvature condition. gtol >= 0. Larger value for loose tolerance.  Try 1e-3
 	 * @param xtol Relative tolerance for acceptable step. xtol >= 0. Larger value for loose tolerance.  Try 1e-4.
-	 * @param stpmin The minimum allowed step.
-	 * @param stpmax The maximum allowed step.
+	 * @param minimumFunctionValue Minimum output function value.  Used to automatically set upper bound on step.
+	 *                             Set to infinity to set upper bound to infinity.
 	 */
 	public LineSearchMore94(double ftol, double gtol, double xtol, 
-							double stpmin, double stpmax) {
+							double minimumFunctionValue ) {
 		if( stpmax < stpmin )
 			throw new IllegalArgumentException("stpmin must be < stpmax");
 		if( stpmin < 0 )
@@ -117,8 +132,7 @@ public class LineSearchMore94 implements LineSearch {
 		this.ftol = ftol;
 		this.gtol = gtol;
 		this.xtol = xtol;
-		this.stpmin = stpmin;
-		this.stpmax = stpmax;
+		this.minimumFunctionValue = minimumFunctionValue;
 	}
 
 	@Override
@@ -128,15 +142,18 @@ public class LineSearchMore94 implements LineSearch {
 	}
 
 	@Override
-	public void init(double funcAtZero, double derivAtZero, double funcAtInit, double stepInit ) {
+	public void init(double funcAtZero, double derivAtZero, double funcAtInit, double stepInit ,
+					 double stepMin, double stepMax ) {
 
-		if( stepInit < stpmin)
+		if( stepInit < stepMin)
 			throw new IllegalArgumentException("Initial step is less than the minimum allowed step.");
-		if( stepInit > stpmax)
+		if( stepInit > stepMax)
 			throw new IllegalArgumentException("Initial step is more than the maximum allowed step.");
 		if( derivAtZero >= 0 )
 			throw new IllegalArgumentException("Initial derivative is >= 0");
-		
+
+		this.stpmin = stepMin;
+		this.stpmax = stepMax;
 		this.bracket = false;
 		this.stage = 0;
 		this.finit = funcAtZero;
@@ -160,6 +177,8 @@ public class LineSearchMore94 implements LineSearch {
 		message = null;
 		firstIteration = true;
 		converged = false;
+
+
 	}
 
 	@Override

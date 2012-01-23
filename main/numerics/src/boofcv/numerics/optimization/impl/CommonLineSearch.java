@@ -16,20 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
+
+import boofcv.numerics.optimization.FunctionStoS;
+import boofcv.numerics.optimization.LineSearch;
+import org.ejml.UtilEjml;
 
 /**
  * @author Peter Abeles
  */
-public class UtilOptimize {
-	
-	public static boolean process( LineSearch search , int maxIterations ) {
-		for( int i = 0; i < maxIterations; i++ ) {
-			if( search.iterate() ) {
-				return search.isConverged();
-			}
-		}
+public abstract class CommonLineSearch implements LineSearch {
 
-		return true;
-	}
+	// step tolerance change
+	protected double tolStep = UtilEjml.EPS;
+
+	// function being minimized
+	protected FunctionStoS function;
+	// derivative of function being minimized
+	protected FunctionStoS derivative;
+
+	// function value at alpha = 0
+	protected double valueZero;
+	// function derivative at alpha = 0
+	protected double derivZero;
+
+	// current step length, function value, and derivative
+	protected double alphaT;
+	protected double valueT;
+	protected double derivT;
+
+
+
 }

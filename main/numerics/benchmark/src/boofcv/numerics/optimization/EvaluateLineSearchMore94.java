@@ -18,6 +18,8 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.impl.LineSearchMore94;
+
 import java.util.List;
 
 /**
@@ -32,8 +34,8 @@ public class EvaluateLineSearchMore94 extends LineSearchEvaluator {
 	}
 
 	@Override
-	protected LineSearch createSearch( double alpha0 ) {
-		return new LineSearchMore94(ftol, gtol,xtol,0,4.0*Math.max(1,alpha0));
+	protected LineSearch createSearch() {
+		return new LineSearchMore94(ftol, gtol,xtol,0);
 	}
 
 	@Override

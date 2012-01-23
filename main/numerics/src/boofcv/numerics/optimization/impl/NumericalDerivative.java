@@ -16,10 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
+
+import boofcv.numerics.optimization.FunctionStoS;
 
 /**
+ * Numerically computes a functions derivative using forward difference equation.
+ *
  * @author Peter Abeles
  */
-public enum SearchStatus {
+public class NumericalDerivative implements FunctionStoS
+{
+	@Override
+	public double process(double input) {
+		return 0;  //To change body of implemented methods use File | Settings | File Templates.
+	}
 }
