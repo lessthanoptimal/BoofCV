@@ -16,27 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Function for non-linear optimization that has a single output and N inputs.
- *
  * @author Peter Abeles
  */
-public interface FunctionNtoS {
+public class TestNumericalDerivative {
 
-	/**
-	 * The number of inputs.
-	 *
-	 * @return Number of inputs.
-	 */
-	public int getN();
-
-	/**
-	 * Computes the output given an array of inputs.
-	 *
-	 * @param input Array containing input values
-	 * @return The output.
-	 */
-	public double process( double input[] );
+	@Test
+	public void stuff() {
+		fail("implement");
+	}
 }

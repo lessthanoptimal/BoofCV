@@ -38,10 +38,9 @@ public abstract class LineSearchEvaluator {
 	/**
 	 * Creates a line search algorithm
 	 *
-	 * @param initStep Initial step.  Sometimes needed to select a max bound
 	 * @return Line search algorithm
 	 */
-	protected abstract LineSearch createSearch( double initStep );
+	protected abstract LineSearch createSearch();
 
 	/**
 	 * Run the line search algorithm on the two inputs and compute statistics
@@ -51,19 +50,20 @@ public abstract class LineSearchEvaluator {
 	 * @param initStep Initial step
 	 * @return statics
 	 */
-	private Results performTest( FunctionStoS func , FunctionStoS deriv , double initStep )
+	private Results performTest( FunctionStoS func , FunctionStoS deriv , 
+								 double initStep , double minStep , double maxStep )
 	{
 		CallCounterStoS f = new CallCounterStoS(func);
 		CallCounterStoS d = new CallCounterStoS(deriv);
 
-		LineSearch alg = createSearch(initStep);
+		LineSearch alg = createSearch();
 		alg.setFunction(f,d);
 
 		double valueZero = func.process(0);
 		double derivZero = deriv.process(0);
 		double valueInit = func.process(initStep);
 
-		alg.init(valueZero,derivZero,valueInit,initStep);
+		alg.init(valueZero,derivZero,valueInit,initStep,minStep,maxStep);
 		
 		for( int i = 0; i < 50 && !alg.iterate() ; i++ ){}
 		double found = alg.getStep();
@@ -92,7 +92,19 @@ public abstract class LineSearchEvaluator {
 		List<Results> results = new ArrayList<Results>();
 		
 		for( double step : initSteps ) {
-			results.add(performTest(f,g,step));
+			results.add(performTest(f,g,step,0,Double.POSITIVE_INFINITY));
+		}
+
+		return results;
+	}
+
+	private List<Results> processMore( FunctionStoS f , FunctionStoS g , double ...initSteps )
+	{
+		List<Results> results = new ArrayList<Results>();
+
+		for( double step : initSteps ) {
+			double maxStep = 4.0*Math.max(1,step);
+			results.add(performTest(f,g,step,0,maxStep));
 		}
 
 		return results;
@@ -109,42 +121,42 @@ public abstract class LineSearchEvaluator {
 		FunctionStoS f = new MoreFunction1(2);
 		FunctionStoS g = new MoreDerivative1(2);
 
-		return process(f,g,1e-3,1e-1,10,1e3);
+		return processMore(f, g, 1e-3, 1e-1, 10, 1e3);
 	}
 
 	public List<Results> more2() {
 		FunctionStoS f = new MoreFunction2(0.004);
 		FunctionStoS g = new MoreDerivative2(0.004);
 
-		return process(f,g,1e-3,1e-1,10,1e3);
+		return processMore(f, g, 1e-3, 1e-1, 10, 1e3);
 	}
 
 	public List<Results> more3() {
 		FunctionStoS f = new MoreFunction3(39,0.01);
 		FunctionStoS g = new MoreDerivative3(39,0.01);
 
-		return process(f,g,1e-3,1e-1,10,1e3);
+		return processMore(f, g, 1e-3, 1e-1, 10, 1e3);
 	}
 
 	public List<Results> more4() {
 		FunctionStoS f = new MoreFunction4(0.001,0.001);
 		FunctionStoS g = new MoreDerivative4(0.001,0.001);
 
-		return process(f,g,1e-3,1e-1,10,1e3);
+		return processMore(f, g, 1e-3, 1e-1, 10, 1e3);
 	}
 
 	public List<Results> more5() {
 		FunctionStoS f = new MoreFunction4(0.01,0.001);
 		FunctionStoS g = new MoreDerivative4(0.01,0.001);
 
-		return process(f,g,1e-3,1e-1,10,1e3);
+		return processMore(f, g, 1e-3, 1e-1, 10, 1e3);
 	}
 
 	public List<Results> more6() {
 		FunctionStoS f = new MoreFunction4(0.001,0.01);
 		FunctionStoS g = new MoreDerivative4(0.001,0.01);
 
-		return process(f,g,1e-3,1e-1,10,1e3);
+		return processMore(f, g, 1e-3, 1e-1, 10, 1e3);
 	}
 
 	private static class FletcherFunction1 implements FunctionStoS

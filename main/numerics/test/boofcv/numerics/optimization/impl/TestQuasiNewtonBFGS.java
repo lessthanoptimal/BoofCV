@@ -16,27 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Function for non-linear optimization that has a single output and N inputs.
- *
  * @author Peter Abeles
  */
-public interface FunctionNtoS {
+public class TestQuasiNewtonBFGS {
 
 	/**
-	 * The number of inputs.
-	 *
-	 * @return Number of inputs.
+	 * Very basic test that is easily solved.
 	 */
-	public int getN();
+	@Test
+	public void basicTest() {
+		fail("implement");
+	}
 
 	/**
-	 * Computes the output given an array of inputs.
-	 *
-	 * @param input Array containing input values
-	 * @return The output.
+	 * Basic test with no user provided gradient
 	 */
-	public double process( double input[] );
+	@Test
+	public void basicNoGradient() {
+		fail("implement");
+	}
 }

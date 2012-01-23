@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
 
 /**
  * <p>
@@ -42,9 +42,6 @@ public class SearchInterpolate {
 	 * <p>
 	 * Quadratic interpolation using two function values and one derivative.
 	 * </p>
-	 * <p>
-	 * [1] MINPACK-2 source code http://ftp.mcs.anl.gov/pub/MINPACK-2/dcstep.f
-	 * </p>
 	 *
 	 * @param f0 Value of f(x0)
 	 * @param g0 Derivative f'(x0)
@@ -61,9 +58,6 @@ public class SearchInterpolate {
 	/**
 	 * <p>
 	 * Quadratic interpolation using two derivatives.
-	 * </p>
-	 * <p>
-	 * [1] MINPACK-2 source code http://ftp.mcs.anl.gov/pub/MINPACK-2/dcstep.f
 	 * </p>
 	 *
 	 * @param g0 Derivative f'(x0)
@@ -134,8 +128,8 @@ public class SearchInterpolate {
 	 * @return Interpolated point
 	 */
 	public static double cubic2( double f0 , double g0 , double x0 ,
-								 double f1 , double g1 , double x1 ) {
-
+								 double f1 , double g1 , double x1 )
+	{
 		double theta = 3.0*(f0-f1)/(x1-x0) + g0 + g1;
 		double s = Math.max(Math.abs(theta),Math.abs(g0));
 		s= Math.max(s,Math.abs(g1));
@@ -168,7 +162,6 @@ public class SearchInterpolate {
 	public static double cubicSafe( double f0 , double g0 , double x0 ,
 									double f1 , double g1 , double x1 ,
 									double min , double max ) {
-
 		double theta = 3.0*(f0-f1)/(x1-x0) + g0 + g1;
 		double s = Math.max(Math.abs(theta),Math.abs(g0));
 		s= Math.max(s,Math.abs(g1));
@@ -181,7 +174,6 @@ public class SearchInterpolate {
 		double r = p/q;
 
 		// gamma == 0 only rises if the cubic does not tend to infinity in the direction of the step
-		
 		if( r < 0 && gamma != 0 ) {
 			return x0 + r*(x1-x0);
 		} else if( x0 > x1 ) {

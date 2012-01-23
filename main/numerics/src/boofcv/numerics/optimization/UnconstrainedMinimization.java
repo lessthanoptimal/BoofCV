@@ -25,7 +25,30 @@ package boofcv.numerics.optimization;
  *
  * @author Peter Abeles
  */
-public interface UnconstrainedMinimization {
-	
-	public boolean optimize( double initial[] , double result[] );
+public interface UnconstrainedMinimization extends IterativeOptimization {
+
+	/**
+	 * Specifies the function being optimized. A numerical Jacobian will be computed
+	 * if null is passed in.
+	 *
+	 * @param function Function being optimized.
+	 * @param jacobian Partial derivative for each input in the function. If null a numerical
+	 *                 Jacobian will be computed.
+	 */
+	public void setFunction( FunctionNtoS function , FunctionNtoN jacobian );
+
+	/**
+	 * Specify the initial set of parameters from which to start from. Call after
+	 * {@link #setFunction} has been called.
+	 * 
+	 * @param initial Initial parameters or guess.
+	 */
+	public void initialize( double initial[] );
+
+	/**
+	 * After each iteration this function can be called to get the current best
+	 * set of parameters.
+	 */
+	public double[] getParameters();
+
 }

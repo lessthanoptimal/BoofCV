@@ -18,6 +18,8 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.impl.LineSearchFletcher86;
+
 import java.util.List;
 
 /**
@@ -32,8 +34,8 @@ public class EvaluateLineSearchFletcher86 extends LineSearchEvaluator {
 	}
 
 	@Override
-	protected LineSearch createSearch( double alpha0 ) {
-		return new LineSearchFletcher86(c1,c2,0,9,0.1,0.5,100);
+	protected LineSearch createSearch() {
+		return new LineSearchFletcher86(c1,c2,0,9,0.1,0.5);
 	}
 
 

@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
 
+import boofcv.numerics.optimization.OptimizationDerivative;
+import boofcv.numerics.optimization.OptimizationFunction;
 import org.ejml.UtilEjml;
 
 /**

@@ -16,27 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
+
+import boofcv.numerics.optimization.FunctionNtoN;
+import boofcv.numerics.optimization.FunctionNtoS;
 
 /**
- * Function for non-linear optimization that has a single output and N inputs.
+ * Numerically computes a functions gradient using forward difference equation.
  *
  * @author Peter Abeles
  */
-public interface FunctionNtoS {
+public class NumericalGradient implements FunctionNtoN
+{
+	FunctionNtoS function;
+	
+	@Override
+	public int getN() {
+		return 0;  //To change body of implemented methods use File | Settings | File Templates.
+	}
 
-	/**
-	 * The number of inputs.
-	 *
-	 * @return Number of inputs.
-	 */
-	public int getN();
-
-	/**
-	 * Computes the output given an array of inputs.
-	 *
-	 * @param input Array containing input values
-	 * @return The output.
-	 */
-	public double process( double input[] );
+	@Override
+	public void process(double[] input, double[] output) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 }
