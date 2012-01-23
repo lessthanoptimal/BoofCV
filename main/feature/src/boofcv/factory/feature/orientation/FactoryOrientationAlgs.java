@@ -128,11 +128,11 @@ public class FactoryOrientationAlgs {
 	}
 
 	public static <T extends ImageSingleBand>
-	OrientationIntegral<T> sliding_ii(int numAngles, double samplePeriod, double windowSize, int radius,
+	OrientationIntegral<T> sliding_ii(double samplePeriod, double windowSize, int radius,
 									  double weightSigma, int sampleWidth, Class<T> imageType)
 	{
 		return (OrientationIntegral<T>)
-				new ImplOrientationSlidingWindowIntegral(numAngles, samplePeriod,
+				new ImplOrientationSlidingWindowIntegral(samplePeriod,
 						windowSize,radius,weightSigma, sampleWidth,imageType);
 	}
 }
