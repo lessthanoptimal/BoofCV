@@ -111,8 +111,6 @@ public class LineSearchFletcher86 implements LineSearch {
 	 */
 	public LineSearchFletcher86(double ftol, double gtol, double fmin,
 								double t1, double t2, double t3 ) {
-		if( stpmax <= 0 )
-			throw new IllegalArgumentException("Maximum alpha must be greater than zero");
 		if( ftol < 0 )
 			throw new IllegalArgumentException("c1 must be more than zero");
 		else if( ftol > gtol)
@@ -140,6 +138,9 @@ public class LineSearchFletcher86 implements LineSearch {
 	@Override
 	public void init(double funcAtZero, double derivAtZero, double funcAtInit, double initAlpha,
 					 double stepMin, double stepMax ) {
+		if( stepMax <= 0 )
+			throw new IllegalArgumentException("stepMax must be greater than zero");
+
 		initializeSearch(funcAtZero, derivAtZero, funcAtInit,initAlpha);
 
 		fzero = funcAtZero;

@@ -16,27 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization.impl;
-
-import boofcv.numerics.optimization.FunctionNtoN;
-import boofcv.numerics.optimization.FunctionNtoS;
+package boofcv.numerics.optimization;
 
 /**
- * Numerically computes a functions gradient using forward difference equation.
- *
  * @author Peter Abeles
  */
-public class NumericalGradient implements FunctionNtoN
-{
-	FunctionNtoS function;
-	
+public class EvaluateQuasiNewtonBFGS extends UnconstrainedMinimizationEvaluator{
 	@Override
-	public int getN() {
-		return 0;  //To change body of implemented methods use File | Settings | File Templates.
+	protected UnconstrainedMinimization createSearch(double minimumValue) {
+		return FactoryOptimization.unconstrained(1e-5,1e-8,minimumValue);
 	}
-
-	@Override
-	public void process(double[] input, double[] output) {
-		//To change body of implemented methods use File | Settings | File Templates.
+	
+	public static void main( String args[] ) {
+		EvaluateQuasiNewtonBFGS eval = new EvaluateQuasiNewtonBFGS();
+		
+//		System.out.println("Helical Valley   ----------------");
+//		eval.helicalValley();
+		System.out.println("Rosenbrock       ----------------");
+		eval.rosenbrock();
 	}
 }

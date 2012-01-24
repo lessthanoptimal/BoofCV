@@ -18,6 +18,7 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.funcs.FunctionRosenbrock;
 import boofcv.numerics.optimization.impl.LevenbergMarquardt;
 
 import java.util.ArrayList;

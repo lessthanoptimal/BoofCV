@@ -18,17 +18,25 @@
 
 package boofcv.numerics.optimization.impl;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.numerics.optimization.FunctionNtoS;
 
 /**
+ * Test function with a minimum at 0 and minimum value of 0.  One of the variables
+ * is redundant.
+ *
  * @author Peter Abeles
  */
-public class TestNumericalGradient {
+public class TrivialFunctionNtoS implements FunctionNtoS {
+	@Override
+	public int getN() {
+		return 3;
+	}
 
-	@Test
-	public void stuff() {
-		fail("implement");
+	@Override
+	public double process(double[] input) {
+		double x1 = input[0];
+		double x2 = input[1];
+
+		return 3*x1*x1 + 6*x2*x2 + 0.000001*Math.pow(x1+x2,4);
 	}
 }

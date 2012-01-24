@@ -46,7 +46,7 @@ public class TestLineSearchFletcher86 {
 		FunctionStoS d = new TrivialQuadraticDerivStoS(expected);
 
 		// the initial value should pass all the tests with this setting
-		LineSearchFletcher86 alg = new LineSearchFletcher86(0.1,0.9,0,9,0,0);
+		LineSearchFletcher86 alg = new LineSearchFletcher86(0.1,0.9,0,9,0.1,0.5);
 		alg.setFunction(f,d);
 
 		double valueZero = f.process(0);
