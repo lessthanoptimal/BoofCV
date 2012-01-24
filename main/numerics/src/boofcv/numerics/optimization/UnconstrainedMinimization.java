@@ -32,10 +32,10 @@ public interface UnconstrainedMinimization extends IterativeOptimization {
 	 * if null is passed in.
 	 *
 	 * @param function Function being optimized.
-	 * @param jacobian Partial derivative for each input in the function. If null a numerical
+	 * @param gradient Partial derivative for each input in the function. If null a numerical
 	 *                 Jacobian will be computed.
 	 */
-	public void setFunction( FunctionNtoS function , FunctionNtoN jacobian );
+	public void setFunction( FunctionNtoS function , FunctionNtoN gradient );
 
 	/**
 	 * Specify the initial set of parameters from which to start from. Call after

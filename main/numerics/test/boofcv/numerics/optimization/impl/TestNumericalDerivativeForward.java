@@ -16,14 +16,38 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.impl;
+
+import boofcv.numerics.optimization.FunctionStoS;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public interface FunctionNtoNxN {
+public class TestNumericalDerivativeForward {
 
-	public int getN();
+	@Test
+	public void simple() {
+		// give it a function where one variable does not effect the output
+		// to make the test more interesting
+		SimpleFunction f = new SimpleFunction();
+		NumericalDerivativeForward alg = new NumericalDerivativeForward(f);
 
-	public void process( double input[] , double[] output );
+		double output = alg.process(3);
+
+		assertEquals(36,output,1e-5);
+	}
+
+	private static class SimpleFunction implements FunctionStoS
+	{
+
+		@Override
+		public double process(double x) {
+
+
+			return 6*x*x;
+		}
+	}
 }

@@ -20,20 +20,19 @@ package boofcv.numerics.optimization.impl;
 
 import boofcv.numerics.optimization.FunctionNtoN;
 import boofcv.numerics.optimization.FunctionNtoS;
-import boofcv.numerics.optimization.LineSearch;
-import boofcv.numerics.optimization.UnconstrainedMinimization;
 import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.NormOps;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * <p>
  * Quasi-Newton nonlinear optimization using BFGS update on the approximate inverse Hessian with
  * a line search.  The function and its gradient is required.  If no gradient is available then a numerical
  * gradient will be used.  The line search must meet the Wolfe or strong Wolfe condition.  This
- * technique is automatically scale invariant and no scale matrix is required.  Based on the
- * description provided in [1].
+ * technique is automatically scale invariant and no scale matrix is required.  In most situations
+ * super-linear convergence can be expected. Based on the description provided in [1].
  * </p>
  *
  * <p>
@@ -55,7 +54,7 @@ import org.ejml.ops.NormOps;
  */
 // TODO take advantage of B being symmetric - might be able to do more.  See dlmmv() function dvmlm.f
 // TODO add optional sanity checks to make sure it is symmetric positive definite
-public class QuasiNewtonBFGS implements UnconstrainedMinimization
+public class QuasiNewtonBFGS
 {
 	// number of inputs
 	private int N;
@@ -102,33 +101,32 @@ public class QuasiNewtonBFGS implements UnconstrainedMinimization
 
 	// is it the first iteration
 	private boolean firstIteration;
-	
+
 	/**
+	 * Configures the search.
 	 *
+	 * @param function Function being optimized
+	 * @param gradient Computes the function's gradient
 	 * @param lineSearch Line search that selects a solution that meets the Wolfe condition.
+	 * @param relativeErrorTol Relative error termination condition. >= 0
+	 * @param absoluteErrorTol Absolute error termination condition. >= 0
 	 */
-	public QuasiNewtonBFGS(LineSearch lineSearch ,
-						   double relativeErrorTol ,
-						   double absoluteErrorTol ,
-						   double minimumFunctionOutput ,
-						   double gtol )
+	public QuasiNewtonBFGS( FunctionNtoS function , FunctionNtoN gradient,
+							LineSearchManager lineSearch ,
+							double relativeErrorTol ,
+							double absoluteErrorTol )
 	{
-		this.lineSearch = new LineSearchManager(lineSearch,minimumFunctionOutput,gtol);
+		if( relativeErrorTol < 0 )
+			throw new IllegalArgumentException("relativeErrorTol < 0");
+		if( absoluteErrorTol < 0 )
+			throw new IllegalArgumentException("absoluteErrorTol < 0");
+
+		this.lineSearch = lineSearch;
+		this.function = function;
+		this.gradient = gradient;
 		this.relativeErrorTol = relativeErrorTol;
 		this.absoluteErrorTol = absoluteErrorTol;
-	}
 
-	@Override
-	public void setFunction( FunctionNtoS function , FunctionNtoN jacobian )
-	{
-		// todo handle null jacobian
-		if( function.getN() != jacobian.getN() )
-			throw new IllegalArgumentException("The two functions do not have the same N");
-
-		this.lineSearch.setFunctions(function,jacobian);
-		this.gradient = jacobian;
-		this.function = function;
-		
 		N = function.getN();
 		
 		B = new DenseMatrix64F(N,N);
@@ -151,7 +149,6 @@ public class QuasiNewtonBFGS implements UnconstrainedMinimization
 		manualB = true;
 	}
 
-	@Override
 	public void initialize(double[] initial) {
 		this.mode = 0;
 		this.hasConverged = false;
@@ -167,53 +164,72 @@ public class QuasiNewtonBFGS implements UnconstrainedMinimization
 
 		// save the initial value of x
 		System.arraycopy(initial, 0, x.data, 0, N);
+
+		fx = function.process(initial);
 	}
 
-	@Override
+
 	public double[] getParameters() {
 		return x.data;
 	}
 
-	@Override
+
+	/**
+	 * Perform one iteration in the optimization.
+	 *
+	 * @return true if the optimization has stopped.
+	 */
 	public boolean iterate() {
-
 		if( mode == 0 ) {
-			// Compute the function's value and gradient
-			fx = function.process(x.data);
-			gradient.process(x.data, tempNx1.data);
-			
-			// compute the change in the gradient
-			for( int i = 0; i < N; i++ ) {
-				y.data[i] = tempNx1.data[i] - g.data[i];
-				g.data[i] = tempNx1.data[i];
-			}
-
-			// Update the inverse Hessian matrix
-			if( !firstIteration ) {
-				updateBFGS();
-			}
-
-			// compute the search direction
-			CommonOps.mult(B,g, searchVector);
-
-			// Optionally, use gradient information to adjust the initial B automatically
-			if( firstIteration && !manualB ) {
-				automaticScaleB();
-			}
-
-			// use the line search to find the next x
-			lineSearch.initialize(fx, x.data,g.data, searchVector.data,1);
-
-			mode = 1;
-			firstIteration = false;
-
-		} else if( mode == 1 ) {
+//			System.out.println("----------------- Compute search direction");
+			computeSearchDirection();
+			return false;
+		} else {
+//			System.out.println("----------------- Perform line search");
 			return performLineSearch();
 		}
-
-		return false;
 	}
 
+	/**
+	 * Computes the next search direction using BFGS
+	 */
+	private void computeSearchDirection() {
+		// Compute the function's value and gradient
+//		fx = function.process(x.data); // todo hasn't this been computed already?
+		gradient.process(x.data, tempNx1.data); // todo gradient computed twice when not numerical
+
+		// compute the change in the gradient
+		for( int i = 0; i < N; i++ ) {
+			y.data[i] = tempNx1.data[i] - g.data[i];
+			g.data[i] = tempNx1.data[i];
+		}
+
+		// Update the inverse Hessian matrix
+		if( !firstIteration ) {
+			updateBFGS();
+		}
+
+		// compute the search direction
+		CommonOps.mult(-1,B,g, searchVector);
+
+		// Optionally, use gradient information to adjust the initial B automatically
+		if( firstIteration && !manualB ) {
+			automaticScaleB();
+		}
+
+		// use the line search to find the next x
+		lineSearch.initialize(fx, x.data,g.data, searchVector.data,1,N);
+
+		mode = 1;
+		firstIteration = false;
+	}
+
+	/**
+	 * Performs a 1-D line search along the chosen direction until the Wolfe conditions
+	 * have been meet.
+	 *
+	 * @return true if the search has terminated.
+	 */
 	private boolean performLineSearch() {
 		if( lineSearch.iterate() ) {
 			// see if the line search failed
@@ -241,6 +257,9 @@ public class QuasiNewtonBFGS implements UnconstrainedMinimization
 			if( Math.abs(fstp-fx) <= relativeErrorTol*Math.abs(fx)
 					&& step*Math.abs(g0) <= relativeErrorTol*Math.abs(fx) )
 				return terminateSearch(true,null);
+
+			// current function value is now the previous
+			fx = fstp;
 
 			// start the loop again
 			mode = 0;
@@ -270,7 +289,7 @@ public class QuasiNewtonBFGS implements UnconstrainedMinimization
 		}
 
 		// recompute the search direction
-		CommonOps.mult(B,g, searchVector);
+		CommonOps.mult(-1,B,g, searchVector);
 	}
 
 	/**
@@ -280,16 +299,21 @@ public class QuasiNewtonBFGS implements UnconstrainedMinimization
 	 *                + y(k)*y(k)'/[y(k)'*s(k)]
 	 */
 	private void updateBFGS() {
-		// s(k)'*B(k)*s(k)
-		double middleBottom = VectorVectorMult.innerProdA(s,B,s);
-		// B(k)*s(k)
-		CommonOps.mult(B,s, tempNx1);
+		SimpleMatrix y = new SimpleMatrix(this.y);
+		SimpleMatrix s = new SimpleMatrix(this.s);
+		SimpleMatrix B = new SimpleMatrix(this.B);
+		SimpleMatrix I = SimpleMatrix.identity(N);
+		
+		double p = 1.0/y.dot(s);
 
-		// y(k)'*s(k)
-		double rightBottom = VectorVectorMult.innerProd(y, s);
+		SimpleMatrix A1 = I.minus(s.mult(y.transpose()).scale(p));
+		SimpleMatrix A2 = I.minus(y.mult(s.transpose()).scale(p));
+		SimpleMatrix SS = s.mult(s.transpose()).scale(p);
+		SimpleMatrix M = A1.mult(B).mult(A2).plus(SS);
 
-		// perform the update
-		specialOuter(B,tempNx1,middleBottom,y,rightBottom);
+		this.B.set(M.getMatrix());
+		
+		System.out.println("B det = "+M.determinant());
 	}
 
 	/**
@@ -315,19 +339,26 @@ public class QuasiNewtonBFGS implements UnconstrainedMinimization
 		}
 	}
 
-	public boolean terminateSearch( boolean converged , String message ) {
+	/**
+	 * Helper function that lets converged and the final message bet set in one line
+	 */
+	private boolean terminateSearch( boolean converged , String message ) {
 		this.hasConverged = converged;
 		this.message = message;
 		
-		return converged;
+		return true;
 	}
-	
-	@Override
+
+	/**
+	 * True if the line search converged to a solution
+	 */
 	public boolean isConverged() {
 		return hasConverged;
 	}
 
-	@Override
+	/**
+	 * Returns the warning message, or null if there is none
+	 */
 	public String getWarning() {
 		return message;
 	}

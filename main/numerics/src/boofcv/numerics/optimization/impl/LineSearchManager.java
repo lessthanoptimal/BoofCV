@@ -18,15 +18,16 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionNtoN;
-import boofcv.numerics.optimization.FunctionNtoS;
+import boofcv.numerics.optimization.FunctionStoS;
 import boofcv.numerics.optimization.LineSearch;
 
 /**
  * <p>
  * Manages data structures and simplifies line searches for nonlinear optimization.  A line search works by
  * searching a 1-dimensional subspace of an n-dimensional function for a local minimum.  A specialized
- * line search algorithm is passed in and is iterated until it converges to a solution.
+ * line search algorithm is passed in and is iterated until it converges to a solution.  The line derivative
+ * can either be numerically computed and coupled to the linear search, or computed directly from
+ * the gradient.
  * </p>
  *
  * <p>
@@ -37,60 +38,52 @@ import boofcv.numerics.optimization.LineSearch;
  */
 public class LineSearchManager {
 
-	// number of input parameters
-	int N;
-	
-	// functions
-	FunctionNtoS function;
-	FunctionNtoN gradient;
-
 	// initial derivative along the line
-	double derivAtZero;
+	private double derivAtZero;
 
 	// Line search functions
-	LineStepFunction lineFunction;
-	LineStepDerivative lineDerivative;
+	private LineStepFunction lineFunction;
+	private FunctionStoS lineDerivative;
 
 	// line search algorithm
-	LineSearch search;
+	private LineSearch search;
 
 	// function value at the step at the end of the search
-	double fstp;
+	private double fstp;
 	// minimum possible function value
-	double funcMinValue;
+	private double funcMinValue;
 	// gtol in wolfe condition
-	double gtol;
+	private double gtol;
 
-	public LineSearchManager( LineSearch search , double funcMinValue , double gtol )
+	/**
+	 * Specifies line search parameters.  'lineDerivative' can either be coupled or decoupled from
+	 * 'lineFunction'.  Typically if a numerical derivative is used then it is coupled.  Coupled
+	 * means that when line parameters are set in 'lineFunction' they are automatically set in
+	 * 'lineDerivative'.  If 'lineDerivative' is of type LineStepDerivative it is assumed to not
+	 * be coupled.
+	 *
+	 * @param search Line search algorithm
+	 * @param lineFunction Line search function
+	 * @param lineDerivative Line search function derivative
+	 * @param funcMinValue Minimum possible function value
+	 * @param gtol slope coefficient for wolfe condition. 0 < gtol <= 1
+	 */
+	public LineSearchManager( LineSearch search ,
+							  LineStepFunction lineFunction ,
+							  FunctionStoS lineDerivative ,
+							  double funcMinValue , double gtol )
 	{
 		this.search = search;
+		this.lineFunction = lineFunction;
+		this.lineDerivative = lineDerivative;
 		this.funcMinValue = funcMinValue;
 		this.gtol = gtol;
-	}
 
-	/**
-	 * Species the optimization function.
-	 *
-	 * @param function Function being optimized.
-	 * @param gradient Specifies the gradient.  If null then the line's derivative will be numerically computed.
-	 */
-	public void setFunctions( FunctionNtoS function, FunctionNtoN gradient ) {
-		this.function = function;
-		this.lineFunction = new LineStepFunction(function);
-
-		if( gradient != null ) {
-			this.gradient = gradient;
-			this.lineDerivative = new LineStepDerivative(gradient);
-		} else {
-			// todo handle null gradient
-		}
-		
 		search.setFunction(lineFunction,lineDerivative);
-		
-		this.N = function.getN();
 	}
 
 	/**
+	 * Setup the line search from a new point and direction.
 	 *
 	 * @param funcAtStart Function's value at startPoint.
 	 * @param startPoint Sample point.
@@ -99,25 +92,33 @@ public class LineSearchManager {
 	 * @param initialStep Size of the initial step.  Typically 1.
 	 */
 	public void initialize( double funcAtStart , double[] startPoint , double[] startDeriv,
-							double[] direction , double initialStep ) {
+							double[] direction , double initialStep , int N ) {
 		// derivative of the line search is the dot product of the gradient and search direction
 		derivAtZero = 0;
+		double norm = 0;
 		for( int i = 0; i < N; i++ ) {
 			derivAtZero += startDeriv[i]*direction[i];
+			norm += startDeriv[i]*startDeriv[i];
 		}
+		
+		System.out.println("gradient norm "+Math.sqrt(norm));
 
-		lineFunction.setLine(startPoint,direction);
-		double funcAtInit = lineFunction.process(initialStep);
+		// setup line functions
+		setLine(startPoint, direction);
 
 		// use wolfe condition to set the maximum step size
 		double maxStep = (funcMinValue-funcAtStart)/(gtol*derivAtZero);
+		if( initialStep > maxStep )
+			initialStep = maxStep;
+		double funcAtInit = lineFunction.process(initialStep);
 		search.init(funcAtStart,derivAtZero,funcAtInit,initialStep,0,maxStep);
 	}
 
-	public double getLineDerivativeAtZero() {
-		return derivAtZero;
-	}
-	
+	/**
+	 * Next iteration in the line search
+	 *
+	 * @return True of the line search has stopped.
+	 */
 	public boolean iterate() {
 		if( search.iterate() ) {
 
@@ -128,7 +129,31 @@ public class LineSearchManager {
 		}
 		return false;
 	}
-	
+
+	/**
+	 * Returns the line derivative at the start point
+	 */
+	public double getLineDerivativeAtZero() {
+		return derivAtZero;
+	}
+
+	/**
+	 * Specify the line that is being searched
+	 *
+	 * @param startPoint start of of the line
+	 * @param direction The direction of the line
+	 */
+	protected void setLine( double[] startPoint , double []direction ) {
+		lineFunction.setLine(startPoint,direction);
+
+		if( lineDerivative instanceof LineStepDerivative ) {
+			((LineStepDerivative)lineDerivative).setLine(startPoint,direction);
+		}
+	}
+
+	/**
+	 * True if the line search converged.
+	 */
 	public boolean isSuccess() {
 		return search.isConverged();
 	}

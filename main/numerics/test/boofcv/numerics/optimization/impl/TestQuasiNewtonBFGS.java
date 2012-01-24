@@ -18,9 +18,14 @@
 
 package boofcv.numerics.optimization.impl;
 
+import boofcv.numerics.optimization.FunctionNtoN;
+import boofcv.numerics.optimization.FunctionNtoS;
+import boofcv.numerics.optimization.FunctionStoS;
+import boofcv.numerics.optimization.LineSearch;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -28,18 +33,35 @@ import static org.junit.Assert.fail;
 public class TestQuasiNewtonBFGS {
 
 	/**
-	 * Very basic test that is easily solved.
+	 * Basic test that is easily solved.
 	 */
 	@Test
 	public void basicTest() {
-		fail("implement");
+		QuasiNewtonBFGS alg = createAlg(new TrivialFunctionNtoS());
+		
+		alg.initialize(new double[]{1,1,1});
+
+		int i = 0;
+		for( ; i < 200 && !alg.iterate(); i++ ){}
+
+		assertTrue(alg.isConverged());
+
+		double[] found = alg.getParameters();
+
+		assertEquals(0,found[0],1e-4);
+		assertEquals(0,found[1],1e-4);
+		assertEquals(1,found[2],1e-4);  // no change expected in last parameter
 	}
 
-	/**
-	 * Basic test with no user provided gradient
-	 */
-	@Test
-	public void basicNoGradient() {
-		fail("implement");
+	public QuasiNewtonBFGS createAlg( FunctionNtoS function ) {
+		double gtol = 0.9;
+		LineSearch lineSearch = new LineSearchMore94(1e-3,gtol,0.1);
+		FunctionNtoN gradient = new NumericalGradientForward(function);
+		LineStepFunction lineFunction = new LineStepFunction(function);
+		FunctionStoS lineDerivative = new NumericalDerivativeForward(lineFunction);
+
+		LineSearchManager line = new LineSearchManager(lineSearch,lineFunction,lineDerivative,0,gtol);
+
+		return new QuasiNewtonBFGS(function,gradient,line,1e-7,1e-7);
 	}
 }

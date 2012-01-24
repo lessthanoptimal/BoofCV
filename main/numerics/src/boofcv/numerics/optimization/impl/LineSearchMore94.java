@@ -35,6 +35,7 @@ import boofcv.numerics.optimization.OptimizationException;
  * &phi;(&alpha;) &le; &phi;(0) + ftol*&alpha;&phi;'(0)<br>
  * | &phi;'(&alpha;)| &le; gtol*|&phi;'(0)|<br>
  * where ftol and gtol determine the precision needed to terminate the search..
+ * </p>
  *
  * <p>
  * Parts of this code
@@ -95,9 +96,6 @@ public class LineSearchMore94 implements LineSearch {
 	private double stp, fp, gp;
 	// User specified lower and upper bound for the step stp
 	private double stpmin,stpmax;
-	// minimum possible function value, used to set stpmax.
-	private double minimumFunctionValue;
-
 
 	// Indicates if there were any numerical issues that caused it to stop iterating
 	private String message;
@@ -113,11 +111,8 @@ public class LineSearchMore94 implements LineSearch {
 	 * @param ftol Tolerance for sufficient decrease. ftol > 0. Smaller value for loose tolerance.  Try 1e-4
 	 * @param gtol Tolerance for curvature condition. gtol >= 0. Larger value for loose tolerance.  Try 1e-3
 	 * @param xtol Relative tolerance for acceptable step. xtol >= 0. Larger value for loose tolerance.  Try 1e-4.
-	 * @param minimumFunctionValue Minimum output function value.  Used to automatically set upper bound on step.
-	 *                             Set to infinity to set upper bound to infinity.
 	 */
-	public LineSearchMore94(double ftol, double gtol, double xtol, 
-							double minimumFunctionValue ) {
+	public LineSearchMore94(double ftol, double gtol, double xtol ) {
 		if( stpmax < stpmin )
 			throw new IllegalArgumentException("stpmin must be < stpmax");
 		if( stpmin < 0 )
@@ -132,7 +127,6 @@ public class LineSearchMore94 implements LineSearch {
 		this.ftol = ftol;
 		this.gtol = gtol;
 		this.xtol = xtol;
-		this.minimumFunctionValue = minimumFunctionValue;
 	}
 
 	@Override
@@ -143,8 +137,8 @@ public class LineSearchMore94 implements LineSearch {
 
 	@Override
 	public void init(double funcAtZero, double derivAtZero, double funcAtInit, double stepInit ,
-					 double stepMin, double stepMax ) {
-
+					 double stepMin, double stepMax )
+	{
 		if( stepInit < stepMin)
 			throw new IllegalArgumentException("Initial step is less than the minimum allowed step.");
 		if( stepInit > stepMax)
@@ -177,8 +171,6 @@ public class LineSearchMore94 implements LineSearch {
 		message = null;
 		firstIteration = true;
 		converged = false;
-
-
 	}
 
 	@Override
@@ -201,8 +193,10 @@ public class LineSearchMore94 implements LineSearch {
 		// check warning conditions
 		if( bracket && (stp <= stmin || stp >= stmax))
 			message = "Rounding error preventing progress.";
-		if( bracket && stmax - stmin <= xtol* stmax)
+		if( bracket && stmax - stmin <= xtol* stmax) {
+			converged = true;
 			message = "XTOL test satisfied";
+		}
 		if( stp == stpmax && fp <= ftest && gp <= gtest )
 			message = "stp == stpmax";
 		if( stp == stpmin && (fp > ftest || gp >= gtest ))
@@ -312,7 +306,7 @@ public class LineSearchMore94 implements LineSearch {
 			gx = gp;
 		}
 		
-//		System.out.printf("stpf = %4.1e\n",stpf);
+		System.out.printf("stpf = %4.1e\n",stpf);
 		stp = stpf;
 	}
 

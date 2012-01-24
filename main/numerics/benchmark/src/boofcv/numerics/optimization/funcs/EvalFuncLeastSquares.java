@@ -16,19 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization.impl;
+package boofcv.numerics.optimization.funcs;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.numerics.optimization.FunctionNtoM;
 
 /**
  * @author Peter Abeles
  */
-public class TestNumericalDerivative {
+public interface EvalFuncLeastSquares {
 
-	@Test
-	public void stuff() {
-		fail("implement");
-	}
+	public FunctionNtoM getFunction();
+
+	public double[] getInitial();
+
+	public double[] getOptimal();
 }

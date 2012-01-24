@@ -35,7 +35,7 @@ public class EvaluateLineSearchMore94 extends LineSearchEvaluator {
 
 	@Override
 	protected LineSearch createSearch() {
-		return new LineSearchMore94(ftol, gtol,xtol,0);
+		return new LineSearchMore94(ftol, gtol,xtol);
 	}
 
 	@Override
