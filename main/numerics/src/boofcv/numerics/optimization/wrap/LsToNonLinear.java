@@ -16,21 +16,42 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization.funcs;
+package boofcv.numerics.optimization.wrap;
 
 import boofcv.numerics.optimization.FunctionNtoM;
-import boofcv.numerics.optimization.FunctionNtoMxN;
+import boofcv.numerics.optimization.FunctionNtoS;
 
 /**
+ * Converts a least squares function into a nonlinear optimization function.
+ *
+ * F(x) = sum f_i(x)^2
+ *
  * @author Peter Abeles
  */
-public interface EvalFuncLeastSquares {
+public class LsToNonLinear implements FunctionNtoS {
 
-	public FunctionNtoM getFunction();
+	FunctionNtoM func;
+	
+	double output[];
 
-	public FunctionNtoMxN getJacobian();
+	public LsToNonLinear(FunctionNtoM func) {
+		this.func = func;
+		output = new double[ func.getM() ];
+	}
 
-	public double[] getInitial();
+	@Override
+	public int getN() {
+		return func.getN();
+	}
 
-	public double[] getOptimal();
+	@Override
+	public double process(double[] input) {
+		func.process(input,output);
+
+		double result = 0;
+		for( int i = 0; i < output.length; i++ ) {
+			result += output[i]*output[i];
+		}
+		return result;
+	}
 }

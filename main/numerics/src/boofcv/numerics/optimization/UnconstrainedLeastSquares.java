@@ -19,36 +19,34 @@
 package boofcv.numerics.optimization;
 
 /**
- * <p>
- * Optimization algorithm which seeks to minimize F(X) &isin; &real; and X &isin; &real;<sup>N</sup>
- * </p>
+ * TODO Update
+ *
+ * describe jacobian format
  *
  * @author Peter Abeles
  */
-public interface UnconstrainedMinimization extends IterativeOptimization {
+public interface UnconstrainedLeastSquares extends IterativeOptimization {
 
 	/**
 	 * Specifies the function being optimized. A numerical Jacobian will be computed
-	 * if null is passed in.
+	 * if null is passed in.   TODO Update
 	 *
 	 * @param function Function being optimized.
-	 * @param gradient Partial derivative for each input in the function. If null a numerical
-	 *                 gradient will be computed.
+	 * @param jacobian
 	 */
-	public void setFunction( FunctionNtoS function , FunctionNtoN gradient );
+	public void setFunction( FunctionNtoM function , FunctionNtoMxN jacobian );
 
 	/**
 	 * Specify the initial set of parameters from which to start from. Call after
-	 * {@link #setFunction} has been called.
-	 * 
+	 * {@link #setFunction} has been called.      TODO Update
+	 *
 	 * @param initial Initial parameters or guess.
 	 */
 	public void initialize( double initial[] );
 
 	/**
 	 * After each iteration this function can be called to get the current best
-	 * set of parameters.
+	 * set of parameters.         TODO Update
 	 */
 	public double[] getParameters();
-
 }

@@ -20,10 +20,8 @@ package boofcv.numerics.optimization.funcs;
 
 import boofcv.numerics.optimization.FunctionNtoM;
 import boofcv.numerics.optimization.FunctionNtoMxN;
-import org.ejml.data.DenseMatrix64F;
 
 /**
- *
  *
  * <p>
  * [1] J. More, B. Garbow, K. Hillstrom, "Testing Unconstrained Optimization Software"
@@ -32,80 +30,66 @@ import org.ejml.data.DenseMatrix64F;
  *
  * @author Peter Abeles
  */
-public class EvalFuncHelicalValley implements EvalFuncLeastSquares {
+public class EvalFuncBadlyScaledBrown implements EvalFuncLeastSquares {
+
 	@Override
 	public FunctionNtoM getFunction() {
 		return new Func();
 	}
 
-
 	@Override
 	public FunctionNtoMxN getJacobian() {
-		return null;
+		return new Deriv();
 	}
 
 	@Override
 	public double[] getInitial() {
-		return new double[]{-1,0,0};
+		return new double[]{1,1};
 	}
-	
+
 	@Override
 	public double[] getOptimal() {
-		return new double[]{1,0,0};
+		return new double[]{1e6,2e-6};
 	}
 
-	public static class Func implements FunctionNtoM
+	public class Func implements FunctionNtoM
 	{
 		@Override
-		public int getN() {
-			return 3;
-		}
+		public int getN() {return 2;}
 
 		@Override
-		public int getM() {
-			return 3;
-		}
+		public int getM() {return 3;}
 
 		@Override
 		public void process(double[] input, double[] output) {
 			double x1 = input[0];
 			double x2 = input[1];
-			double x3 = input[2];
-			
-			output[0] = 10*(x3 - 10*phi(x1,x2));
-			output[1] = 10*(Math.sqrt(x1*x1 + x2*x2)-1);
-			output[2] = x3;
-		}
-		
-		private double phi( double a , double b ) {
-			double left = 1.0/(2*Math.PI);
-			
-			if( a > 0 ) {
-				return left*Math.atan(b/a);
-			} else {
-				return left*Math.atan(b/a) + 0.5;
-			}
+
+			output[0] = x1-1e6;
+			output[1] = x2-2e-6;
+			output[2] = x1*x2-2;
 		}
 	}
-	
-	public static class Deriv implements FunctionNtoMxN
+
+	public class Deriv implements FunctionNtoMxN
 	{
 		@Override
-		public int getN() {
-			return 3;
-		}
+		public int getN() {return 2;}
 
 		@Override
-		public int getM() {
-			return 3;
-		}
+		public int getM() {return 3;}
 
 		@Override
 		public void process(double[] input, double[] output) {
-			DenseMatrix64F J = DenseMatrix64F.wrap(3,3,output);
 			double x1 = input[0];
 			double x2 = input[1];
-			double x3 = input[2];
+
+			output[0] = 1;
+			output[1] = 0;
+			output[2] = 0;
+			output[3] = 1;
+			output[4] = x2;
+			output[5] = x1;
 		}
 	}
 }

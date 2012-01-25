@@ -20,11 +20,8 @@ package boofcv.numerics.optimization.impl;
 
 import boofcv.numerics.optimization.FunctionNtoN;
 import boofcv.numerics.optimization.FunctionNtoS;
-import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
-import org.ejml.ops.NormOps;
-import org.ejml.simple.SimpleMatrix;
 
 /**
  * <p>
@@ -52,8 +49,8 @@ import org.ejml.simple.SimpleMatrix;
  * </p>
  * @author Peter Abeles
  */
-// TODO take advantage of B being symmetric - might be able to do more.  See dlmmv() function dvmlm.f
 // TODO add optional sanity checks to make sure it is symmetric positive definite
+// TODO make H's magnitude configurable
 public class QuasiNewtonBFGS
 {
 	// number of inputs
@@ -70,9 +67,6 @@ public class QuasiNewtonBFGS
 	// searches for a parameter that meets the Wolfe condition
 	private LineSearchManager lineSearch;
 
-	// is the initial H_inverse manually provided?
-	private boolean manualB;
-	
 	// inverse of the Hessian approximation
 	private DenseMatrix64F B;
 	// search direction
@@ -90,7 +84,8 @@ public class QuasiNewtonBFGS
 	private double fx;
 
 	// storage
-	private DenseMatrix64F tempNx1;
+	private DenseMatrix64F temp0_Nx1;
+	private DenseMatrix64F temp1_Nx1;
 
 	// mode that the algorithm is in
 	private int mode;
@@ -99,8 +94,8 @@ public class QuasiNewtonBFGS
 	// if it converged to a solution or not
 	private boolean hasConverged;
 
-	// is it the first iteration
-	private boolean firstIteration;
+	// How many full processing cycles have there been
+	private int iterations;
 
 	/**
 	 * Configures the search.
@@ -136,8 +131,8 @@ public class QuasiNewtonBFGS
 		y = new DenseMatrix64F(N,1);
 		x = new DenseMatrix64F(N,1);
 
-		tempNx1 = new DenseMatrix64F(N,1);
-		manualB = false;
+		temp0_Nx1 = new DenseMatrix64F(N,1);
+		temp1_Nx1 = new DenseMatrix64F(N,1);
 	}
 
 	/**
@@ -145,16 +140,14 @@ public class QuasiNewtonBFGS
 	 * @param Hinverse Initial hessian approximation
 	 */
 	public void setInitialHInv( DenseMatrix64F Hinverse) {
-		B.set(Hinverse); 
-		manualB = true;
+		B.set(Hinverse);
 	}
 
 	public void initialize(double[] initial) {
 		this.mode = 0;
 		this.hasConverged = false;
-		this.message = null;        
-		this.manualB = false;
-		this.firstIteration = true;
+		this.message = null;
+		this.iterations = 0;
 
 		// set the change in x to be zero
 		s.zero();
@@ -180,6 +173,7 @@ public class QuasiNewtonBFGS
 	 * @return true if the optimization has stopped.
 	 */
 	public boolean iterate() {
+//		System.out.println("QN iterations "+iterations);
 		if( mode == 0 ) {
 //			System.out.println("----------------- Compute search direction");
 			computeSearchDirection();
@@ -194,34 +188,29 @@ public class QuasiNewtonBFGS
 	 * Computes the next search direction using BFGS
 	 */
 	private void computeSearchDirection() {
-		// Compute the function's value and gradient
-//		fx = function.process(x.data); // todo hasn't this been computed already?
-		gradient.process(x.data, tempNx1.data); // todo gradient computed twice when not numerical
+//		System.out.println("funv = "+fx);
+		// Compute the function's gradient
+		gradient.process(x.data, temp0_Nx1.data); // todo gradient computed twice when not numerical
 
-		// compute the change in the gradient
+		// compute the change in gradient
 		for( int i = 0; i < N; i++ ) {
-			y.data[i] = tempNx1.data[i] - g.data[i];
-			g.data[i] = tempNx1.data[i];
+			y.data[i] = temp0_Nx1.data[i] - g.data[i];
+			g.data[i] = temp0_Nx1.data[i];
 		}
 
 		// Update the inverse Hessian matrix
-		if( !firstIteration ) {
-			updateBFGS();
+		if( iterations != 0 ) {
+			EquationsBFGS.inverseUpdate(B, s, y, temp0_Nx1, temp1_Nx1);
 		}
 
 		// compute the search direction
 		CommonOps.mult(-1,B,g, searchVector);
 
-		// Optionally, use gradient information to adjust the initial B automatically
-		if( firstIteration && !manualB ) {
-			automaticScaleB();
-		}
-
 		// use the line search to find the next x
 		lineSearch.initialize(fx, x.data,g.data, searchVector.data,1,N);
 
 		mode = 1;
-		firstIteration = false;
+		iterations++;
 	}
 
 	/**
@@ -265,78 +254,6 @@ public class QuasiNewtonBFGS
 			mode = 0;
 		}
 		return false;
-	}
-
-	/**
-	 * Use the initial step computed from the provisional identity B matrix to compute
-	 * a B matrix which has a better scale.
-	 */
-	private void automaticScaleB() {
-		// compute the new point
-		for( int i = 0; i < N; i++ ) {
-			s.data[i] = x.data[i] + searchVector.data[i];
-		}
-		
-		// compute the change in gradient
-		gradient.process(s.data, y.data);
-		CommonOps.sub(y,g,y);
-		
-		// change the scale of the initial identity matrix
-		double a = VectorVectorMult.innerProd(y, searchVector)/ NormOps.fastNormF(y);
-		
-		for( int i = 0; i < N; i++ ) {
-			B.set(i,i,a);
-		}
-
-		// recompute the search direction
-		CommonOps.mult(-1,B,g, searchVector);
-	}
-
-	/**
-	 *  Perform the BFGS update
-	 *  
-	 *  B(k+1) = B(k) + [B(k)*s(k)*s(k)'*B(k)]/[s(k)'*B(k)*s(k)] 
-	 *                + y(k)*y(k)'/[y(k)'*s(k)]
-	 */
-	private void updateBFGS() {
-		SimpleMatrix y = new SimpleMatrix(this.y);
-		SimpleMatrix s = new SimpleMatrix(this.s);
-		SimpleMatrix B = new SimpleMatrix(this.B);
-		SimpleMatrix I = SimpleMatrix.identity(N);
-		
-		double p = 1.0/y.dot(s);
-
-		SimpleMatrix A1 = I.minus(s.mult(y.transpose()).scale(p));
-		SimpleMatrix A2 = I.minus(y.mult(s.transpose()).scale(p));
-		SimpleMatrix SS = s.mult(s.transpose()).scale(p);
-		SimpleMatrix M = A1.mult(B).mult(A2).plus(SS);
-
-		this.B.set(M.getMatrix());
-		
-		System.out.println("B det = "+M.determinant());
-	}
-
-	/**
-	 * A = A - (v0*v0')/divisor0 + (v1*v1')/divisor1
-	 *
-	 * Highly specialized double outer product to speed up the update function and require less
-	 * extra memory
-	 */
-	protected static void specialOuter( DenseMatrix64F A ,
-										DenseMatrix64F v0 , double divisor0 ,
-										DenseMatrix64F v1 , double divisor1 )
-	{
-		final int N = A.numCols;
-
-		int indexA = 0;
-		for( int y = 0; y < N; y++ ) {
-			double a0 = v0.data[y];
-			double a1 = v1.data[y];
-
-			for( int x = 0; x < N; x++ ) {
-				A.data[indexA++] += a1*v1.data[x]/divisor1 - a0*v0.data[x]/divisor0;
-			}
-		}
 	}
 
 	/**

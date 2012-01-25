@@ -24,12 +24,12 @@ package boofcv.numerics.optimization;
 public interface FunctionNtoMxN {
 
 	/**
-	 * Number of input parameters
+	 * Number of input parameters and columns in output matrix.
 	 */
 	public int getN();
 
 	/**
-	 * Number of functions.
+	 * Number of rows in output matrix.
 	 */
 	public int getM();
 

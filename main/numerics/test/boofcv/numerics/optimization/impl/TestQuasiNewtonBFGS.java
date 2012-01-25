@@ -18,10 +18,7 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionNtoN;
-import boofcv.numerics.optimization.FunctionNtoS;
-import boofcv.numerics.optimization.FunctionStoS;
-import boofcv.numerics.optimization.LineSearch;
+import boofcv.numerics.optimization.*;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -31,6 +28,8 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestQuasiNewtonBFGS {
+
+	EvaluateQuasiNewtonBFGS evaluator = new EvaluateQuasiNewtonBFGS(false);
 
 	/**
 	 * Basic test that is easily solved.
@@ -63,5 +62,52 @@ public class TestQuasiNewtonBFGS {
 		LineSearchManager line = new LineSearchManager(lineSearch,lineFunction,lineDerivative,0,gtol);
 
 		return new QuasiNewtonBFGS(function,gradient,line,1e-7,1e-7);
+	}
+
+	@Test
+	public void helicalvalley() {
+		NonlinearResults results = evaluator.helicalValley();
+
+		// no algorithm to compare it against, just do some sanity checks for changes
+		assertTrue(results.numFunction<100);
+		assertTrue(results.numGradient<100);
+		assertEquals(1,results.x[0],1e-4);
+		assertEquals(0,results.x[1],1e-4);
+		assertEquals(0,results.x[2],1e-4);
+		assertEquals(0,results.f,1e-4);
+	}
+
+	@Test
+	public void rosenbrock() {
+		NonlinearResults results = evaluator.rosenbrock();
+
+		// no algorithm to compare it against, just do some sanity checks for changes
+		assertTrue(results.numFunction<100);
+		assertTrue(results.numGradient<100);
+		assertEquals(1,results.x[0],1e-4);
+		assertEquals(1,results.x[1],1e-4);
+		assertEquals(0,results.f,1e-4);
+	}
+
+	@Test
+	public void badlyScaledBrown() {
+		NonlinearResults results = evaluator.badlyScaledBrown();
+
+		// no algorithm to compare it against, just do some sanity checks for changes
+		assertTrue(results.numFunction<100);
+		assertTrue(results.numGradient<100);
+		assertEquals(1e6,results.x[0],1e-4);
+		assertEquals(2e-6,results.x[1],1e-4);
+		assertEquals(0,results.f,1e-4);
+	}
+
+	@Test
+	public void trigonometric() {
+		NonlinearResults results = evaluator.trigonometric();
+
+		// no algorithm to compare it against, just do some sanity checks for changes
+		assertTrue(results.numFunction<100);
+		assertTrue(results.numGradient < 100);
+		assertEquals(0,results.f,1e-4);
 	}
 }
