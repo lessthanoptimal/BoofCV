@@ -18,13 +18,17 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.functions.FunctionNtoN;
+
 /**
+ * Wraps around a function and counts the number of times it processes an input.
+ *
  * @author Peter Abeles
  */
 public class CallCounterNtoN implements FunctionNtoN {
 
-	int count;
-	FunctionNtoN func;
+	public int count;
+	public FunctionNtoN func;
 
 	public CallCounterNtoN(FunctionNtoN func) {
 		this.func = func;

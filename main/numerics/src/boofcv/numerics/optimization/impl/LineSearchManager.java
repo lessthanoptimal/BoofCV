@@ -18,8 +18,8 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionStoS;
 import boofcv.numerics.optimization.LineSearch;
+import boofcv.numerics.optimization.functions.LineSearchFunction;
 
 /**
  * <p>
@@ -42,14 +42,11 @@ public class LineSearchManager {
 	private double derivAtZero;
 
 	// Line search functions
-	private LineStepFunction lineFunction;
-	private FunctionStoS lineDerivative;
+	private LineSearchFunction function;
 
 	// line search algorithm
 	private LineSearch search;
 
-	// function value at the step at the end of the search
-	private double fstp;
 	// minimum possible function value
 	private double funcMinValue;
 	// gtol in wolfe condition
@@ -63,23 +60,20 @@ public class LineSearchManager {
 	 * be coupled.
 	 *
 	 * @param search Line search algorithm
-	 * @param lineFunction Line search function
-	 * @param lineDerivative Line search function derivative
+	 * @param function Line search function
 	 * @param funcMinValue Minimum possible function value
 	 * @param gtol slope coefficient for wolfe condition. 0 < gtol <= 1
 	 */
 	public LineSearchManager( LineSearch search ,
-							  LineStepFunction lineFunction ,
-							  FunctionStoS lineDerivative ,
+							  LineSearchFunction function ,
 							  double funcMinValue , double gtol )
 	{
 		this.search = search;
-		this.lineFunction = lineFunction;
-		this.lineDerivative = lineDerivative;
+		this.function = function;
 		this.funcMinValue = funcMinValue;
 		this.gtol = gtol;
 
-		search.setFunction(lineFunction,lineDerivative);
+		search.setFunction(function);
 	}
 
 	/**
@@ -100,13 +94,14 @@ public class LineSearchManager {
 		}
 
 		// setup line functions
-		setLine(startPoint, direction);
+		function.setLine(startPoint, direction);
 
 		// use wolfe condition to set the maximum step size
 		double maxStep = (funcMinValue-funcAtStart)/(gtol*derivAtZero);
 		if( initialStep > maxStep )
 			initialStep = maxStep;
-		double funcAtInit = lineFunction.process(initialStep);
+		function.setInput(initialStep);
+		double funcAtInit = function.computeFunction();
 		search.init(funcAtStart,derivAtZero,funcAtInit,initialStep,0,maxStep);
 	}
 
@@ -117,10 +112,6 @@ public class LineSearchManager {
 	 */
 	public boolean iterate() {
 		if( search.iterate() ) {
-
-			// line search function caches the previous
-			fstp = lineFunction.process(search.getStep());
-
 			return true;
 		}
 		return false;
@@ -133,19 +124,6 @@ public class LineSearchManager {
 		return derivAtZero;
 	}
 
-	/**
-	 * Specify the line that is being searched
-	 *
-	 * @param startPoint start of of the line
-	 * @param direction The direction of the line
-	 */
-	protected void setLine( double[] startPoint , double []direction ) {
-		lineFunction.setLine(startPoint,direction);
-
-		if( lineDerivative instanceof LineStepDerivative ) {
-			((LineStepDerivative)lineDerivative).setLine(startPoint,direction);
-		}
-	}
 
 	/**
 	 * True if the line search converged.
@@ -176,6 +154,6 @@ public class LineSearchManager {
 	 * Function value at 'step'
 	 */
 	public double getFStep() {
-		return fstp;
+		return search.getFunction();
 	}
 }

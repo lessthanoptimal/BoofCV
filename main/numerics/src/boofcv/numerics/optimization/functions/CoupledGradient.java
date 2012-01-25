@@ -16,32 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
-
-import boofcv.numerics.optimization.functions.FunctionNtoS;
+package boofcv.numerics.optimization.functions;
 
 /**
- * Wraps around a function and counts the number of times it processes an input.
- *
  * @author Peter Abeles
  */
-public class CallCounterNtoS implements FunctionNtoS {
-
-	public int count;
-	public FunctionNtoS func;
-
-	public CallCounterNtoS(FunctionNtoS func) {
-		this.func = func;
-	}
-
-	@Override
-	public int getN() {
-		return func.getN();
-	}
-
-	@Override
-	public double process(double[] input) {
-		count++;
-		return func.process(input);
-	}
+public interface CoupledGradient {
+	
+	public int getN();
+	
+	public void setInput( double []x );
+	
+	public double computeFunction();
+	
+	public void computeGradient( double []gradient );
 }

@@ -19,8 +19,9 @@
 package boofcv.numerics.optimization.impl;
 
 import boofcv.numerics.optimization.EvaluateLineSearchFletcher86;
-import boofcv.numerics.optimization.FunctionStoS;
 import boofcv.numerics.optimization.LineSearchEvaluator;
+import boofcv.numerics.optimization.functions.FunctionStoS;
+import boofcv.numerics.optimization.wrap.WrapCoupledDerivative;
 import org.junit.Test;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class TestLineSearchFletcher86 {
 
 		// the initial value should pass all the tests with this setting
 		LineSearchFletcher86 alg = new LineSearchFletcher86(0.1,0.9,0,9,0.1,0.5);
-		alg.setFunction(f,d);
+		alg.setFunction(new WrapCoupledDerivative(f,d));
 
 		double valueZero = f.process(0);
 		double derivZero = d.process(0);
@@ -59,7 +60,7 @@ public class TestLineSearchFletcher86 {
 
 		// now try it with tighter bounds
 		alg = new LineSearchFletcher86(1e-5,0.1,0,9,0.05,0.5);
-		alg.setFunction(f,d);
+		alg.setFunction(new WrapCoupledDerivative(f,d));
 		alg.init(valueZero,derivZero,initValue,1,0,100);
 		assertTrue(UtilOptimize.process(alg, 50));
 		double foundTight = alg.getStep();

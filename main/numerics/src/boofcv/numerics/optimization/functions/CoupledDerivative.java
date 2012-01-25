@@ -16,14 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.functions;
 
 /**
  * @author Peter Abeles
  */
-public interface FunctionNtoN {
+public interface CoupledDerivative {
 
-	public int getN();
+	public void setInput( double x );
 
-	public void process( double input[] , double[] output );
+	public double computeFunction();
+
+	public double computeDerivative();
 }

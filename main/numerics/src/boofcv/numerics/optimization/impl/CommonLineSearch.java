@@ -18,8 +18,8 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionStoS;
 import boofcv.numerics.optimization.LineSearch;
+import boofcv.numerics.optimization.functions.FunctionStoS;
 import org.ejml.UtilEjml;
 
 /**

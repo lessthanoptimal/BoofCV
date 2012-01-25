@@ -1,2 +1,4 @@
 - improve QuasiNewtonBFGS to reduce number of gradient calls
 - Low memeory quasi newton BFGS
+- CachedNumericalGradientLineFunction
+  * Use already computed function value to remove the need to compute the current value

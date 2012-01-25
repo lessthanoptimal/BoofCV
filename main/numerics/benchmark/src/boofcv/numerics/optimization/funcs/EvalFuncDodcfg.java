@@ -18,8 +18,8 @@
 
 package boofcv.numerics.optimization.funcs;
 
-import boofcv.numerics.optimization.FunctionNtoN;
-import boofcv.numerics.optimization.FunctionNtoS;
+import boofcv.numerics.optimization.functions.FunctionNtoN;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
 
 /**
  * Test function for large scale unconstrained minimization.

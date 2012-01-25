@@ -16,27 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.functions;
 
 /**
- * Function for non-linear optimization that has a single output and N inputs.
- *
  * @author Peter Abeles
  */
-public interface FunctionNtoS {
+public interface LineSearchFunction extends CoupledDerivative {
 
-	/**
-	 * The number of inputs.
-	 *
-	 * @return Number of inputs.
-	 */
-	public int getN();
-
-	/**
-	 * Computes the output given an array of inputs.
-	 *
-	 * @param input Array containing input values
-	 * @return The output.
-	 */
-	public double process( double input[] );
+	public void setLine( double []start , double[] direction );
 }

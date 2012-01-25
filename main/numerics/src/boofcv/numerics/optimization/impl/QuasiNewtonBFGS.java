@@ -18,8 +18,7 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionNtoN;
-import boofcv.numerics.optimization.FunctionNtoS;
+import boofcv.numerics.optimization.functions.GradientLineFunction;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
@@ -61,8 +60,7 @@ public class QuasiNewtonBFGS
 	double absoluteErrorTol; // absolute error tolerance
 
 	// function being minimized and its gradient
-	private FunctionNtoS function;
-	private FunctionNtoN gradient;
+	private GradientLineFunction function;
 
 	// searches for a parameter that meets the Wolfe condition
 	private LineSearchManager lineSearch;
@@ -101,12 +99,11 @@ public class QuasiNewtonBFGS
 	 * Configures the search.
 	 *
 	 * @param function Function being optimized
-	 * @param gradient Computes the function's gradient
 	 * @param lineSearch Line search that selects a solution that meets the Wolfe condition.
 	 * @param relativeErrorTol Relative error termination condition. >= 0
 	 * @param absoluteErrorTol Absolute error termination condition. >= 0
 	 */
-	public QuasiNewtonBFGS( FunctionNtoS function , FunctionNtoN gradient,
+	public QuasiNewtonBFGS( GradientLineFunction function ,
 							LineSearchManager lineSearch ,
 							double relativeErrorTol ,
 							double absoluteErrorTol )
@@ -118,7 +115,6 @@ public class QuasiNewtonBFGS
 
 		this.lineSearch = lineSearch;
 		this.function = function;
-		this.gradient = gradient;
 		this.relativeErrorTol = relativeErrorTol;
 		this.absoluteErrorTol = absoluteErrorTol;
 
@@ -158,7 +154,8 @@ public class QuasiNewtonBFGS
 		// save the initial value of x
 		System.arraycopy(initial, 0, x.data, 0, N);
 
-		fx = function.process(initial);
+		function.setInput(initial);
+		fx = function.computeFunction();
 	}
 
 
@@ -190,7 +187,7 @@ public class QuasiNewtonBFGS
 	private void computeSearchDirection() {
 //		System.out.println("funv = "+fx);
 		// Compute the function's gradient
-		gradient.process(x.data, temp0_Nx1.data); // todo gradient computed twice when not numerical
+		function.computeGradient(temp0_Nx1.data);
 
 		// compute the change in gradient
 		for( int i = 0; i < N; i++ ) {

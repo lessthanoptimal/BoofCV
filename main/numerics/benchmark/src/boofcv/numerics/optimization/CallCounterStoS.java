@@ -18,13 +18,17 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.functions.FunctionStoS;
+
 /**
+ * Wraps around a function and counts the number of times it processes an input.
+ *
  * @author Peter Abeles
  */
 public class CallCounterStoS implements FunctionStoS {
 
-	int count;
-	FunctionStoS func;
+	public int count;
+	public FunctionStoS func;
 
 	public CallCounterStoS(FunctionStoS func) {
 		this.func = func;

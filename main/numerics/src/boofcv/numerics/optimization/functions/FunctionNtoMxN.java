@@ -16,22 +16,32 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.functions;
 
 /**
+ * Function that takes in a vector of length N and outputs a matrix with dimension M x N.
+ *
  * @author Peter Abeles
  */
-public interface FunctionNtoM {
+public interface FunctionNtoMxN {
 
 	/**
-	 * Number of input elements.
+	 * Number of input parameters and columns in output matrix.
 	 */
 	public int getN();
 
 	/**
-	 * Number of output elements.
+	 * Number of rows in output matrix.
 	 */
 	public int getM();
 
-	public void process(double input[], double[] output);
+	/**
+	 * Processes the input vector to output a 2D a matrix.  The matrix has a dimension of M rows and N columns
+	 * and is formatted as a row major 1D-array.  EJML can be used to provide a matrix wrapper around
+	 * the output array: DenseMatrix J = DenseMatrix.wrap(m,n,output);
+	 *
+	 * @param input Vector with input parameters.
+	 * @param output Row major array with M rows and N columns.
+	 */
+	public void process( double input[] , double[] output );
 }

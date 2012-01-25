@@ -18,7 +18,7 @@
 
 package boofcv.numerics.optimization.wrap;
 
-import boofcv.numerics.optimization.FunctionNtoS;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
 import org.junit.Test;
 
 import static boofcv.numerics.optimization.wrap.TestLsToNonLinearDeriv.FuncLS;
