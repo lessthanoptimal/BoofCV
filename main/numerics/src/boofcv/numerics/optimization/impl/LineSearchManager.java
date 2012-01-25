@@ -95,13 +95,9 @@ public class LineSearchManager {
 							double[] direction , double initialStep , int N ) {
 		// derivative of the line search is the dot product of the gradient and search direction
 		derivAtZero = 0;
-		double norm = 0;
 		for( int i = 0; i < N; i++ ) {
 			derivAtZero += startDeriv[i]*direction[i];
-			norm += startDeriv[i]*startDeriv[i];
 		}
-		
-		System.out.println("gradient norm "+Math.sqrt(norm));
 
 		// setup line functions
 		setLine(startPoint, direction);

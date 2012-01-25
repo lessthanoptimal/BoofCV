@@ -18,10 +18,10 @@
 
 package boofcv.numerics.optimization;
 
-import boofcv.numerics.optimization.funcs.EvalFuncHelicalValley;
-import boofcv.numerics.optimization.funcs.EvalFuncLeastSquares;
-import boofcv.numerics.optimization.funcs.EvalFuncRosenbrock;
+import boofcv.numerics.optimization.funcs.*;
 import boofcv.numerics.optimization.impl.NumericalGradientForward;
+import boofcv.numerics.optimization.wrap.LsToNonLinear;
+import boofcv.numerics.optimization.wrap.LsToNonLinearDeriv;
 
 /**
  * @author Peter Abeles
@@ -29,7 +29,11 @@ import boofcv.numerics.optimization.impl.NumericalGradientForward;
 public abstract class UnconstrainedMinimizationEvaluator {
 
 	boolean verbose = true;
-	int maxIteration = 200;
+	int maxIteration = 500;
+
+	protected UnconstrainedMinimizationEvaluator(boolean verbose) {
+		this.verbose = verbose;
+	}
 
 	/**
 	 * Creates a line search algorithm
@@ -62,12 +66,13 @@ public abstract class UnconstrainedMinimizationEvaluator {
 		double initialValue = func.process(initial);
 
 		alg.initialize(initial);
-		int iter = 0;
+		int iter;
 		for( iter = 0; iter < maxIteration && !alg.iterate() ; iter++ ){
 			printError(optimal, alg);
 		}
 		printError(optimal, alg);
-		System.out.println("*** total iterations = "+iter);
+		if( verbose )
+			System.out.println("*** total iterations = "+iter);
 		double found[] = alg.getParameters();
 
 		double finalValue = func.process(found);
@@ -81,6 +86,7 @@ public abstract class UnconstrainedMinimizationEvaluator {
 		ret.numFunction = f.count;
 		ret.numGradient = d.count;
 		ret.f = finalValue;
+		ret.x = found;
 
 		return ret;
 	}
@@ -93,17 +99,33 @@ public abstract class UnconstrainedMinimizationEvaluator {
 				double dx = x[j]-optimal[j];
 				n += dx*dx;
 			}
-			System.out.println("||x(k)-x(*)|| = "+Math.sqrt(n));
+			if( verbose )
+				System.out.println("||x(k)-x(*)|| = "+Math.sqrt(n));
 		}
 	}
 
 	private NonlinearResults performTest( EvalFuncLeastSquares func ) {
 		FunctionNtoS nl = new LsToNonLinear(func.getFunction());
 		double[] initial = func.getInitial();
-		
-		System.out.println("optimal = "+nl.process(func.getOptimal()));
 
-		return performTest(nl,null,initial,func.getOptimal(),0);
+		FunctionNtoMxN jacobian = func.getJacobian();
+		FunctionNtoN gradient = jacobian == null ? null : new LsToNonLinearDeriv(func.getFunction(),jacobian);
+
+		if( verbose && func.getOptimal() != null )
+			System.out.println("optimal = "+nl.process(func.getOptimal()));
+
+		return performTest(nl,gradient,initial,func.getOptimal(),0);
+	}
+
+	private NonlinearResults performTest( EvalFuncMinimization func ) {
+		double[] initial = func.getInitial();
+		
+		FunctionNtoS nl = func.getFunction();
+
+		if( verbose && func.getOptimal() != null )
+			System.out.println("optimal = "+nl.process(func.getOptimal()));
+
+		return performTest(nl,func.getGradient(),initial,func.getOptimal(),func.getMinimum());
 	}
 
 	public NonlinearResults helicalValley() {
@@ -112,5 +134,20 @@ public abstract class UnconstrainedMinimizationEvaluator {
 
 	public NonlinearResults rosenbrock() {
 		return performTest(new EvalFuncRosenbrock());
+	}
+
+	public NonlinearResults dodcfg() {
+		return performTest(new EvalFuncDodcfg(50,50,8.0e-3));
+	}
+
+	public NonlinearResults variably() {
+		return performTest(new EvalFuncVariablyDimensioned(10));
+	}
+
+	public NonlinearResults trigonometric() {
+		return performTest(new EvalFuncTrigonometric(10));
+	}
+	public NonlinearResults badlyScaledBrown() {
+		return performTest(new EvalFuncBadlyScaledBrown());
 	}
 }

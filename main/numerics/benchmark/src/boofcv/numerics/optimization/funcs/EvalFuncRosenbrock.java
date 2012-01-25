@@ -19,14 +19,27 @@
 package boofcv.numerics.optimization.funcs;
 
 import boofcv.numerics.optimization.FunctionNtoM;
+import boofcv.numerics.optimization.FunctionNtoMxN;
+import org.ejml.data.DenseMatrix64F;
 
 /**
+ *
+ * <p>
+ * [1] J. More, B. Garbow, K. Hillstrom, "Testing Unconstrained Optimization Software"
+ * 1981 ACM Transactions on Mathematical Software, Vol 7, No. 1, Match 1981, pages 17-41
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class EvalFuncRosenbrock implements EvalFuncLeastSquares {
 	@Override
 	public FunctionNtoM getFunction() {
 		return new Func();
+	}
+
+	@Override
+	public FunctionNtoMxN getJacobian() {
+		return new Deriv();
 	}
 
 	@Override
@@ -58,6 +71,30 @@ public class EvalFuncRosenbrock implements EvalFuncLeastSquares {
 			
 			output[0] = 10.0*(x2-x1*x1);
 			output[1] = 1.0 - x1;
+		}
+	}
+
+	public static class Deriv implements FunctionNtoMxN
+	{
+		@Override
+		public int getN() {
+			return 2;
+		}
+
+		@Override
+		public int getM() {
+			return 2;
+		}
+
+		@Override
+		public void process(double[] input, double[] output) {
+			DenseMatrix64F J = DenseMatrix64F.wrap(2,2,output);
+			double x1 = input[0];
+			
+			J.set(0,0,-20*x1);
+			J.set(0,1,10);
+			J.set(1,0,-1);
+			J.set(1,1,0);
 		}
 	}
 }

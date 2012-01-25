@@ -22,17 +22,30 @@ package boofcv.numerics.optimization;
  * @author Peter Abeles
  */
 public class EvaluateQuasiNewtonBFGS extends UnconstrainedMinimizationEvaluator{
+
+	public EvaluateQuasiNewtonBFGS(boolean verbose) {
+		super(verbose);
+	}
+
 	@Override
 	protected UnconstrainedMinimization createSearch(double minimumValue) {
 		return FactoryOptimization.unconstrained(1e-5,1e-8,minimumValue);
 	}
 	
 	public static void main( String args[] ) {
-		EvaluateQuasiNewtonBFGS eval = new EvaluateQuasiNewtonBFGS();
+		EvaluateQuasiNewtonBFGS eval = new EvaluateQuasiNewtonBFGS(true);
 		
 //		System.out.println("Helical Valley   ----------------");
 //		eval.helicalValley();
-		System.out.println("Rosenbrock       ----------------");
-		eval.rosenbrock();
+//		System.out.println("Rosenbrock       ----------------");
+//		eval.rosenbrock();
+//		System.out.println("dodcfg       ----------------");
+//		eval.dodcfg();
+//		System.out.println("variably       ----------------");
+//		eval.variably();
+//		System.out.println("trigonometric       ----------------");
+//		eval.trigonometric();
+		System.out.println("Bady Scaled Brown       ----------------");
+		eval.badlyScaledBrown();
 	}
 }

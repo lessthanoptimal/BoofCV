@@ -60,4 +60,6 @@ public class FunctionRosenbrock implements OptimizationFunction<Object> {
 
 		return true;
 	}
+
+
 }

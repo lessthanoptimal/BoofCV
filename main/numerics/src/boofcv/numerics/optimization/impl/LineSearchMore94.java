@@ -265,7 +265,7 @@ public class LineSearchMore94 implements LineSearch {
 		// the best point obtained so far
 		if( bracket && (stp <= stmin || stp >= stmax ) ||  (bracket && stmax-stmin <= xtol*stmax))
 			stp=stx;
-		
+
 		return false;
 	}
 
@@ -306,7 +306,6 @@ public class LineSearchMore94 implements LineSearch {
 			gx = gp;
 		}
 		
-		System.out.printf("stpf = %4.1e\n",stpf);
 		stp = stpf;
 	}
 

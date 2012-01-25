@@ -16,35 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.funcs;
+
+import boofcv.numerics.optimization.FunctionNtoN;
+import boofcv.numerics.optimization.FunctionNtoS;
 
 /**
  * @author Peter Abeles
  */
-public class LsToNonLinear implements FunctionNtoS {
+public interface EvalFuncMinimization {
+	public FunctionNtoS getFunction();
 
-	FunctionNtoM func;
-	
-	double output[];
+	public FunctionNtoN getGradient();
 
-	public LsToNonLinear(FunctionNtoM func) {
-		this.func = func;
-		output = new double[ func.getM() ];
-	}
+	public double[] getInitial();
 
-	@Override
-	public int getN() {
-		return func.getN();
-	}
+	public double[] getOptimal();
 
-	@Override
-	public double process(double[] input) {
-		func.process(input,output);
-
-		double result = 0;
-		for( int i = 0; i < output.length; i++ ) {
-			result += output[i]*output[i];
-		}
-		return result;
-	}
+	public double getMinimum();
 }

@@ -16,21 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization.funcs;
+package boofcv.numerics.optimization.wrap;
 
-import boofcv.numerics.optimization.FunctionNtoM;
-import boofcv.numerics.optimization.FunctionNtoMxN;
+import boofcv.numerics.optimization.FunctionNtoS;
+import org.junit.Test;
+
+import static boofcv.numerics.optimization.wrap.TestLsToNonLinearDeriv.FuncLS;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public interface EvalFuncLeastSquares {
+public class TestLsToNonLinear {
 
-	public FunctionNtoM getFunction();
+	@Test
+	public void compareToNumeric() {
+		FuncLS funcLS = new FuncLS();
+		FunctionNtoS func = new LsToNonLinear(funcLS);
 
-	public FunctionNtoMxN getJacobian();
+		double point[] = new double[]{1,2};
+		double output[] = new double[funcLS.getM()];
+		funcLS.process(point,output);
 
-	public double[] getInitial();
+		double found = func.process(point);
+		double expected = 0;
+		for( int i = 0; i < output.length; i++ )
+			expected += output[i]*output[i];
 
-	public double[] getOptimal();
+		assertEquals(expected,found,1e-8);
+	}
 }

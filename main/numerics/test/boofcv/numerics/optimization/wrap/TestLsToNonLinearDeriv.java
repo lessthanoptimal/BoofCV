@@ -16,83 +16,48 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization.funcs;
+package boofcv.numerics.optimization.wrap;
 
 import boofcv.numerics.optimization.FunctionNtoM;
 import boofcv.numerics.optimization.FunctionNtoMxN;
-import org.ejml.data.DenseMatrix64F;
+import boofcv.numerics.optimization.FunctionNtoN;
+import boofcv.numerics.optimization.FunctionNtoS;
+import boofcv.numerics.optimization.impl.NumericalGradientForward;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- *
- *
- * <p>
- * [1] J. More, B. Garbow, K. Hillstrom, "Testing Unconstrained Optimization Software"
- * 1981 ACM Transactions on Mathematical Software, Vol 7, No. 1, Match 1981, pages 17-41
- * </p>
- *
  * @author Peter Abeles
  */
-public class EvalFuncHelicalValley implements EvalFuncLeastSquares {
-	@Override
-	public FunctionNtoM getFunction() {
-		return new Func();
-	}
+public class TestLsToNonLinearDeriv {
 
+	@Test
+	public void compareToNumeric() {
+		FuncLS funcLS = new FuncLS();
+		DerivLS derivLS = new DerivLS();
+		FunctionNtoS func = new LsToNonLinear(funcLS);
 
-	@Override
-	public FunctionNtoMxN getJacobian() {
-		return null;
-	}
-
-	@Override
-	public double[] getInitial() {
-		return new double[]{-1,0,0};
-	}
-	
-	@Override
-	public double[] getOptimal() {
-		return new double[]{1,0,0};
-	}
-
-	public static class Func implements FunctionNtoM
-	{
-		@Override
-		public int getN() {
-			return 3;
-		}
-
-		@Override
-		public int getM() {
-			return 3;
-		}
-
-		@Override
-		public void process(double[] input, double[] output) {
-			double x1 = input[0];
-			double x2 = input[1];
-			double x3 = input[2];
-			
-			output[0] = 10*(x3 - 10*phi(x1,x2));
-			output[1] = 10*(Math.sqrt(x1*x1 + x2*x2)-1);
-			output[2] = x3;
-		}
+		FunctionNtoN deriv = new LsToNonLinearDeriv(funcLS,derivLS);
+		FunctionNtoN derivNumeric = new NumericalGradientForward(func);
 		
-		private double phi( double a , double b ) {
-			double left = 1.0/(2*Math.PI);
-			
-			if( a > 0 ) {
-				return left*Math.atan(b/a);
-			} else {
-				return left*Math.atan(b/a) + 0.5;
-			}
+		double point[] = new double[]{1,2};
+		double expected[] = new double[2];
+		double found[] = new double[2];
+		
+		deriv.process(point,found);
+		derivNumeric.process(point,expected);
+		
+		for( int i = 0; i < expected.length; i++ ) {
+			assertEquals(expected[i],found[i],1e-4);
 		}
 	}
-	
-	public static class Deriv implements FunctionNtoMxN
+
+	public static class FuncLS implements FunctionNtoM
 	{
 		@Override
 		public int getN() {
-			return 3;
+			return 2;
 		}
 
 		@Override
@@ -102,10 +67,38 @@ public class EvalFuncHelicalValley implements EvalFuncLeastSquares {
 
 		@Override
 		public void process(double[] input, double[] output) {
-			DenseMatrix64F J = DenseMatrix64F.wrap(3,3,output);
 			double x1 = input[0];
 			double x2 = input[1];
-			double x3 = input[2];
+
+			output[0] = x1 + 10*x2*x2;
+			output[1] = x2;
+			output[2] = 2*x1+x2;
+		}
+	}
+
+	public static class DerivLS implements FunctionNtoMxN
+	{
+		@Override
+		public int getN() {
+			return 2;
+		}
+
+		@Override
+		public int getM() {
+			return 3;
+		}
+
+		@Override
+		public void process(double[] input, double[] output) {
+			double x1 = input[0];
+			double x2 = input[1];
+
+			output[0] = 1;
+			output[1] = 20*x2;
+			output[2] = 0;
+			output[3] = 1;
+			output[4] = 2;
+			output[5] = 1;
 		}
 	}
 }
