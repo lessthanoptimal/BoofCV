@@ -18,10 +18,10 @@
 
 package boofcv.numerics.optimization.wrap;
 
-import boofcv.numerics.optimization.FunctionNtoM;
-import boofcv.numerics.optimization.FunctionNtoMxN;
-import boofcv.numerics.optimization.FunctionNtoN;
-import boofcv.numerics.optimization.FunctionNtoS;
+import boofcv.numerics.optimization.functions.FunctionNtoM;
+import boofcv.numerics.optimization.functions.FunctionNtoMxN;
+import boofcv.numerics.optimization.functions.FunctionNtoN;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
 import boofcv.numerics.optimization.impl.NumericalGradientForward;
 import org.junit.Test;
 

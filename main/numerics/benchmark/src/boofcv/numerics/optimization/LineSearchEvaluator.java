@@ -18,6 +18,9 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.functions.FunctionStoS;
+import boofcv.numerics.optimization.wrap.WrapCoupledDerivative;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +60,7 @@ public abstract class LineSearchEvaluator {
 		CallCounterStoS d = new CallCounterStoS(deriv);
 
 		LineSearch alg = createSearch();
-		alg.setFunction(f,d);
+		alg.setFunction(new WrapCoupledDerivative(f,d));
 
 		double valueZero = func.process(0);
 		double derivZero = deriv.process(0);

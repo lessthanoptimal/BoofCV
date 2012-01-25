@@ -19,6 +19,9 @@
 package boofcv.numerics.optimization;
 
 import boofcv.numerics.optimization.funcs.*;
+import boofcv.numerics.optimization.functions.FunctionNtoMxN;
+import boofcv.numerics.optimization.functions.FunctionNtoN;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
 import boofcv.numerics.optimization.impl.NumericalGradientForward;
 import boofcv.numerics.optimization.wrap.LsToNonLinear;
 import boofcv.numerics.optimization.wrap.LsToNonLinearDeriv;

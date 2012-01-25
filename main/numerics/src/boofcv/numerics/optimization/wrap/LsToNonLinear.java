@@ -18,8 +18,8 @@
 
 package boofcv.numerics.optimization.wrap;
 
-import boofcv.numerics.optimization.FunctionNtoM;
-import boofcv.numerics.optimization.FunctionNtoS;
+import boofcv.numerics.optimization.functions.FunctionNtoM;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
 
 /**
  * Converts a least squares function into a nonlinear optimization function.

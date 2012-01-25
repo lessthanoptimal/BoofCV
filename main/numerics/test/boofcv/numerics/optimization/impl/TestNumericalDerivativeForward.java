@@ -18,7 +18,7 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionStoS;
+import boofcv.numerics.optimization.functions.FunctionStoS;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

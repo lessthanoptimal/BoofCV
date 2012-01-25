@@ -18,7 +18,7 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionStoS;
+import boofcv.numerics.optimization.functions.FunctionStoS;
 
 /**
  * Function used for testing optimization functions.  Slightly perturbed from a quadratic.

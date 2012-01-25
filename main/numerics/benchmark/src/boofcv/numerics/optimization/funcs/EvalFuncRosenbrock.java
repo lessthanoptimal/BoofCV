@@ -18,8 +18,8 @@
 
 package boofcv.numerics.optimization.funcs;
 
-import boofcv.numerics.optimization.FunctionNtoM;
-import boofcv.numerics.optimization.FunctionNtoMxN;
+import boofcv.numerics.optimization.functions.FunctionNtoM;
+import boofcv.numerics.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
 
 /**

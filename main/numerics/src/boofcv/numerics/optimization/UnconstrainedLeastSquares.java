@@ -18,6 +18,9 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.functions.FunctionNtoM;
+import boofcv.numerics.optimization.functions.FunctionNtoMxN;
+
 /**
  * TODO Update
  *

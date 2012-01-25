@@ -18,8 +18,8 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionStoS;
 import boofcv.numerics.optimization.LineSearch;
+import boofcv.numerics.optimization.functions.CoupledDerivative;
 import org.ejml.UtilEjml;
 
 /**
@@ -53,9 +53,7 @@ public class LineSearchFletcher86 implements LineSearch {
 	protected double tolStep = UtilEjml.EPS;
 
 	// function being minimized
-	protected FunctionStoS function;
-	// derivative of function being minimized
-	protected FunctionStoS derivative;
+	protected CoupledDerivative function;
 
 	// function value at alpha = 0
 	protected double valueZero;
@@ -130,9 +128,8 @@ public class LineSearchFletcher86 implements LineSearch {
 	 * @inheritdoc
 	 */
 	@Override
-	public void setFunction(FunctionStoS function, FunctionStoS derivative) {
+	public void setFunction(CoupledDerivative function ) {
 		this.function = function;
-		this.derivative = derivative;
 	}
 
 	@Override
@@ -195,8 +192,9 @@ public class LineSearchFletcher86 implements LineSearch {
 	protected boolean bracket() {
 //		System.out.println("------------- bracket");
 		// the value of alpha was passed in
+		function.setInput(stp);
 		if( mode != 0 ) {
-			fp = function.process(stp);
+			fp = function.computeFunction();
 			gp = Double.NaN;
 		} else {
 			mode = 1;
@@ -212,7 +210,7 @@ public class LineSearchFletcher86 implements LineSearch {
 			return false;
 		}
 
-		gp = derivative.process(stp);
+		gp = function.computeDerivative();
 		if( Math.abs(gp) <= -gtol *derivZero ) {
 			return true;
 		}
@@ -278,14 +276,15 @@ public class LineSearchFletcher86 implements LineSearch {
 			return true;
 		}
 
-		fp = function.process(stp);
+		function.setInput(stp);
+		fp = function.computeFunction();
 		gp = Double.NaN;
 
 		// check for convergence
 		if( fp > valueZero + ftol * stp *derivZero  || fp >= fLow) {
 			pHi = stp;
 		} else {
-			gp = derivative.process(stp);
+			gp = function.computeDerivative();
 
 			// check for termination
 			if( Math.abs(gp) <= -gtol *derivZero )
@@ -359,5 +358,10 @@ public class LineSearchFletcher86 implements LineSearch {
 	@Override
 	public boolean isConverged() {
 		return converged;
+	}
+
+	@Override
+	public double getFunction() {
+		return fp;
 	}
 }

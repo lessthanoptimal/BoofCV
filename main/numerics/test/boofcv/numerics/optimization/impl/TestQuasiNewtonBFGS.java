@@ -18,7 +18,12 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.*;
+import boofcv.numerics.optimization.EvaluateQuasiNewtonBFGS;
+import boofcv.numerics.optimization.LineSearch;
+import boofcv.numerics.optimization.NonlinearResults;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
+import boofcv.numerics.optimization.functions.GradientLineFunction;
+import boofcv.numerics.optimization.wrap.CachedNumericalGradientLineFunction;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -55,13 +60,11 @@ public class TestQuasiNewtonBFGS {
 	public QuasiNewtonBFGS createAlg( FunctionNtoS function ) {
 		double gtol = 0.9;
 		LineSearch lineSearch = new LineSearchMore94(1e-3,gtol,0.1);
-		FunctionNtoN gradient = new NumericalGradientForward(function);
-		LineStepFunction lineFunction = new LineStepFunction(function);
-		FunctionStoS lineDerivative = new NumericalDerivativeForward(lineFunction);
+		GradientLineFunction f = new CachedNumericalGradientLineFunction(function);
 
-		LineSearchManager line = new LineSearchManager(lineSearch,lineFunction,lineDerivative,0,gtol);
+		LineSearchManager line = new LineSearchManager(lineSearch,f,0,gtol);
 
-		return new QuasiNewtonBFGS(function,gradient,line,1e-7,1e-7);
+		return new QuasiNewtonBFGS(f,line,1e-7,1e-7);
 	}
 
 	@Test

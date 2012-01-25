@@ -18,9 +18,9 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionStoS;
 import boofcv.numerics.optimization.LineSearch;
 import boofcv.numerics.optimization.OptimizationException;
+import boofcv.numerics.optimization.functions.CoupledDerivative;
 
 /**
  * <p>
@@ -56,10 +56,8 @@ public class LineSearchMore94 implements LineSearch {
 	// Various magic numbers.  See [1]
 	private static final double p5=0.5,p66=0.66,xtrapl=1.1,xtrapu=4.0;
 
-	// computes the function value
-	private FunctionStoS function;
-	// computes the function derivative
-	private FunctionStoS derivative;
+	// computes the function value and derivative
+	private CoupledDerivative function;
 
 	// thresholds to test for convergence
 	private double ftol; // tolerance for sufficient decrease.  ftol > 0
@@ -130,9 +128,8 @@ public class LineSearchMore94 implements LineSearch {
 	}
 
 	@Override
-	public void setFunction(FunctionStoS function, FunctionStoS derivative) {
+	public void setFunction( CoupledDerivative function) {
 		this.function = function;
-		this.derivative = derivative;
 	}
 
 	@Override
@@ -177,9 +174,10 @@ public class LineSearchMore94 implements LineSearch {
 	public boolean iterate() throws OptimizationException {
 
 		// update the function and derivative values at stp
-		gp = derivative.process(stp);
+		function.setInput(stp);
+		gp = function.computeDerivative();
 		if( !firstIteration ) {
-			fp = function.process(stp);
+			fp = function.computeFunction();
 		} else {
 			firstIteration = false;
 		}
@@ -415,5 +413,10 @@ public class LineSearchMore94 implements LineSearch {
 	@Override
 	public String getWarning() {
 		return message;
+	}
+
+	@Override
+	public double getFunction() {
+		return fp;
 	}
 }

@@ -18,9 +18,11 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionNtoN;
-import boofcv.numerics.optimization.FunctionNtoS;
 import boofcv.numerics.optimization.LineSearch;
+import boofcv.numerics.optimization.functions.FunctionNtoN;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
+import boofcv.numerics.optimization.functions.LineSearchFunction;
+import boofcv.numerics.optimization.wrap.CachedGradientLineFunction;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,10 +41,9 @@ public class TestLineSearchManager {
 		LineSearch search = new LineSearchMore94(0.1,1e-3,1e-4);
 		Gradient gradient = new Gradient();
 		Function function = new Function();
-		LineStepFunction lineFunction = new LineStepFunction(function);
-		LineStepDerivative lineDerivative = new LineStepDerivative(gradient);
+		LineSearchFunction f = new CachedGradientLineFunction(function,gradient);
 		
-		LineSearchManager manager = new LineSearchManager(search,lineFunction,lineDerivative,0,0.5);
+		LineSearchManager manager = new LineSearchManager(search,f,0,0.5);
 		
 		double[]start = new double[]{1,1};
 		double[]direction = new double[]{-1,0};

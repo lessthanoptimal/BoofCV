@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization.impl;
+package boofcv.numerics.optimization.wrap;
 
-import boofcv.numerics.optimization.FunctionNtoS;
+import boofcv.numerics.optimization.impl.TrivialQuadraticStoS;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,38 +26,21 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestLineStepFunction {
+public class TestWrapCoupledDerivative {
 
+	/**
+	 * Sanity check to see if it blows up
+	 */
 	@Test
-	public void basicTest() {
-		double[] p0 = new double[]{1,2};
-		double[] v = new double[]{0.5,-2.3};
-		
-		LineStepFunction alg = new LineStepFunction(new Function());
-		
-		alg.setLine(p0, v);
-		
-		double found = alg.process(2);
-		double expected = function(new double[]{1+1,2-2*2.3});
-		
-		assertEquals(found,expected,1e-8);
-	}
-	
-	public static double function( double param[] ) {
-		return 2*param[0] + 3*param[1]*param[1];
-	}
+	public void trivial() {
+		TrivialQuadraticStoS f = new TrivialQuadraticStoS(5);
+		TrivialQuadraticStoS g = new TrivialQuadraticStoS(2);
+		WrapCoupledDerivative alg = new WrapCoupledDerivative(f,g);
 
-	public static class Function implements FunctionNtoS
-	{
-
-		@Override
-		public int getN() {
-			return 2;
-		}
-
-		@Override
-		public double process(double[] input) {
-			return function(input);
-		}
+		double x = 2.1;
+		alg.setInput(x);
+		
+		assertEquals(f.process(x),alg.computeFunction(),1e-8);
+		assertEquals(g.process(x), alg.computeDerivative(), 1e-8);
 	}
 }

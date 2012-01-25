@@ -43,9 +43,9 @@ public class EvaluateQuasiNewtonBFGS extends UnconstrainedMinimizationEvaluator{
 //		eval.dodcfg();
 //		System.out.println("variably       ----------------");
 //		eval.variably();
-//		System.out.println("trigonometric       ----------------");
-//		eval.trigonometric();
-		System.out.println("Bady Scaled Brown       ----------------");
-		eval.badlyScaledBrown();
+		System.out.println("trigonometric       ----------------");
+		eval.trigonometric();
+//		System.out.println("Bady Scaled Brown       ----------------");
+//		eval.badlyScaledBrown();
 	}
 }

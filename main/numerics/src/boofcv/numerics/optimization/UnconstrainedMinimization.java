@@ -18,6 +18,9 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.functions.FunctionNtoN;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
+
 /**
  * <p>
  * Optimization algorithm which seeks to minimize F(X) &isin; &real; and X &isin; &real;<sup>N</sup>

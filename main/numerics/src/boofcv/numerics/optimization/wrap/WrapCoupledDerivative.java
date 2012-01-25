@@ -16,13 +16,37 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.wrap;
+
+import boofcv.numerics.optimization.functions.CoupledDerivative;
+import boofcv.numerics.optimization.functions.FunctionStoS;
 
 /**
- * Function with a single input and a single output
- *
  * @author Peter Abeles
  */
-public interface FunctionStoS {
-	public double process( double input );
+public class WrapCoupledDerivative implements CoupledDerivative {
+
+	double input;
+	FunctionStoS function;
+	FunctionStoS derivative;
+
+	public WrapCoupledDerivative(FunctionStoS function, FunctionStoS derivative) {
+		this.function = function;
+		this.derivative = derivative;
+	}
+
+	@Override
+	public void setInput(double x) {
+		input = x;
+	}
+
+	@Override
+	public double computeFunction() {
+		return function.process(input);
+	}
+
+	@Override
+	public double computeDerivative() {
+		return derivative.process(input);
+	}
 }

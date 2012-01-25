@@ -18,6 +18,8 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.functions.CoupledDerivative;
+
 /**
  * <p>
  * Line search for nonlinear optimization.  Computes function values at different step lengths.
@@ -32,10 +34,9 @@ public interface LineSearch extends IterativeOptimization {
 	/**
 	 * Sets the function being optimized.
 	 *
-	 * @param function Function being optimized.
-	 * @param derivative Function's derivative.
+	 * @param function Line search function and derivative
 	 */
-	public void setFunction( FunctionStoS function , FunctionStoS derivative );
+	public void setFunction( CoupledDerivative function );
 
 	/**
 	 * Initializes and resets the line search.  In some implementations a reasonable
@@ -59,4 +60,9 @@ public interface LineSearch extends IterativeOptimization {
 	 * @return current solution
 	 */
 	public double getStep();
+
+	/**
+	 * Function value at the current step
+	 */
+	public double getFunction();
 }

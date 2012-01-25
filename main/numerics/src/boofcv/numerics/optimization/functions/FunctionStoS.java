@@ -16,27 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.optimization;
+package boofcv.numerics.optimization.functions;
 
 /**
+ * Function with a single scalar input and a single scalar output.
+ *
  * @author Peter Abeles
  */
-public interface FunctionNtoMxN {
-
+public interface FunctionStoS {
 	/**
-	 * Number of input parameters and columns in output matrix.
-	 */
-	public int getN();
-
-	/**
-	 * Number of rows in output matrix.
-	 */
-	public int getM();
-
-	/**
+	 * Processes the input to compute an output.
 	 *
-	 * @param input Vector with input parameters.
-	 * @param output Row major array with M rows and N columns.
+	 * @param input input parameter
+	 * @return output value
 	 */
-	public void process( double input[] , double[] output );
+	public double process( double input );
 }

@@ -18,7 +18,7 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.FunctionNtoS;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
 
 /**
  * Test function with a minimum at 0 and minimum value of 0.  One of the variables

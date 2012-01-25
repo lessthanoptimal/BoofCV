@@ -18,8 +18,15 @@
 
 package boofcv.numerics.optimization.wrap;
 
-import boofcv.numerics.optimization.*;
-import boofcv.numerics.optimization.impl.*;
+import boofcv.numerics.optimization.LineSearch;
+import boofcv.numerics.optimization.OptimizationException;
+import boofcv.numerics.optimization.UnconstrainedMinimization;
+import boofcv.numerics.optimization.functions.FunctionNtoN;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
+import boofcv.numerics.optimization.functions.GradientLineFunction;
+import boofcv.numerics.optimization.impl.LineSearchManager;
+import boofcv.numerics.optimization.impl.LineSearchMore94;
+import boofcv.numerics.optimization.impl.QuasiNewtonBFGS;
 
 /**
  * @author Peter Abeles
@@ -49,19 +56,18 @@ public class WrapQuasiNewtonBFGS implements UnconstrainedMinimization {
 	public void setFunction(FunctionNtoS function, FunctionNtoN gradient) {
 		LineSearch lineSearch = new LineSearchMore94(ftol,gtol,xtol);
 
-		FunctionStoS lineDerivative;
-		LineStepFunction lineFunction = new LineStepFunction(function);
+		GradientLineFunction gradLine;
+
 		if( gradient == null ) {
-			gradient = new NumericalGradientForward(function);
-			lineDerivative = new NumericalDerivativeForward(lineFunction);
+			gradLine = new CachedNumericalGradientLineFunction(function);
 		} else {
-			lineDerivative = new LineStepDerivative(gradient);
+			gradLine = new CachedGradientLineFunction(function,gradient);
 		}
 
 		LineSearchManager manager =
-				new LineSearchManager(lineSearch,lineFunction,lineDerivative,minFunctionValue,gtol);
+				new LineSearchManager(lineSearch,gradLine,minFunctionValue,gtol);
 
-		alg = new QuasiNewtonBFGS(function,gradient,manager,relativeErrorTol,absoluteErrorTol);
+		alg = new QuasiNewtonBFGS(gradLine,manager,relativeErrorTol,absoluteErrorTol);
 	}
 
 	@Override
