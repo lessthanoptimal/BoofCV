@@ -24,7 +24,7 @@ package boofcv.numerics.optimization;
 public class EvaluateQuasiNewtonBFGS extends UnconstrainedMinimizationEvaluator{
 
 	public EvaluateQuasiNewtonBFGS(boolean verbose) {
-		super(verbose);
+		super(verbose,true);
 	}
 
 	@Override
@@ -33,19 +33,21 @@ public class EvaluateQuasiNewtonBFGS extends UnconstrainedMinimizationEvaluator{
 	}
 	
 	public static void main( String args[] ) {
-		EvaluateQuasiNewtonBFGS eval = new EvaluateQuasiNewtonBFGS(true);
-		
-//		System.out.println("Helical Valley   ----------------");
-//		eval.helicalValley();
-//		System.out.println("Rosenbrock       ----------------");
-//		eval.rosenbrock();
-//		System.out.println("dodcfg       ----------------");
+		EvaluateQuasiNewtonBFGS eval = new EvaluateQuasiNewtonBFGS(false);
+
+		System.out.println("Powell              ----------------");
+		eval.powell();
+		System.out.println("Helical Valley      ----------------");
+		eval.helicalValley();
+		System.out.println("Rosenbrock          ----------------");
+		eval.rosenbrock();
+//		System.out.println("dodcfg              ----------------");
 //		eval.dodcfg();
-//		System.out.println("variably       ----------------");
-//		eval.variably();
+		System.out.println("variably            ----------------");
+		eval.variably();
 		System.out.println("trigonometric       ----------------");
 		eval.trigonometric();
-//		System.out.println("Bady Scaled Brown       ----------------");
-//		eval.badlyScaledBrown();
+		System.out.println("Bady Scaled Brown   ----------------");
+		eval.badlyScaledBrown();
 	}
 }

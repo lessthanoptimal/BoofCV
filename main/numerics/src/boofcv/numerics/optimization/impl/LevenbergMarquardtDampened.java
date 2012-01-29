@@ -38,7 +38,7 @@ import org.ejml.ops.NormOps;
  *
  * <p>
  * The step 'x' is computed using the following formula:
- * (J(k)'*J(k) + &mu;I)x = -g = -J'*f<br>
+ * (J(k)'*J(k) + &mu;diag(J(k)'*J(k)))x = -g = -J'*f<br>
  * where J is the Jacobian, &mu; is the damping coefficient, I is an identify matrix, g is the gradient,
  * f is the functions output.
  * </p>
@@ -50,13 +50,23 @@ import org.ejml.ops.NormOps;
  * </p>
  *
  * <p>
+ * Unlike some implementations, the option for a scaling matrix is not provided.  Scaling can be done inside
+ * the function itself and would add even more complexity to the code. The dampening parameter is updated
+ * using the equation below from [1]: <br>
+ * damp = damp * max( 1/3 , 1 - (2*ratio-1)^3 )<br>
+ * where ratio is the actual reduction over the predicted reduction.
+ * </p>
+ *
+ * <p>
  * [1] K. Madsen and H. B. Nielsen and O. Tingleff, "Methods for Non-Linear Least Squares Problems (2nd ed.)"
  * Informatics and Mathematical Modelling, Technical University of Denmark
  * </p>
  *
  * @author Peter Abeles
  */
-// TODO add scaling variables
+// Design Note: A) (J(k)'*J(k) + &mu;diag(J(k)'*J(k)))x = -g
+//              B) (J(k)'*J(k) + &mu;*I)x = -g
+// On singular and nearly singular systems (A) seems to do better, but on better behaved systems (B) does well too
 public class LevenbergMarquardtDampened {
 
 	// number of parameters
@@ -72,23 +82,23 @@ public class LevenbergMarquardtDampened {
 	private double relativeErrorTol;
 	
 	// current set of parameters being considered
-	private DenseMatrix64F x;
+	private DenseMatrix64F x = new DenseMatrix64F(1,1);
 
 	// Current x being considered
-	private DenseMatrix64F xtest;
-	private DenseMatrix64F xdelta;
+	private DenseMatrix64F xtest = new DenseMatrix64F(1,1);
+	private DenseMatrix64F xdelta = new DenseMatrix64F(1,1);
 
 	// function residuals values at x
-	private DenseMatrix64F funcVals;
+	private DenseMatrix64F funcVals = new DenseMatrix64F(1,1);
 	// jacobian at x
-	private DenseMatrix64F jacobianVals;
+	private DenseMatrix64F jacobianVals = new DenseMatrix64F(1,1);
 
 	// B=J'*J
-	private DenseMatrix64F B;
+	private DenseMatrix64F B = new DenseMatrix64F(1,1);
+	// diagonal elements of B
+	private DenseMatrix64F Bdiag = new DenseMatrix64F(1,1); 
 	// y=-J'*r
-	private DenseMatrix64F g;
-	// B plus dampening
-	private DenseMatrix64F Btest;
+	private DenseMatrix64F g = new DenseMatrix64F(1,1);
 
 	// solver used to compute (A + mu*diag(A))d = g
 	private LinearSolver<DenseMatrix64F> solver;
@@ -102,6 +112,8 @@ public class LevenbergMarquardtDampened {
 
 	// levenberg marquardt dampening parameter
 	private double dampParam;
+	private double initialDampParam;
+
 	// used to scale the dampening parameter
 	private double v;
 
@@ -110,9 +122,7 @@ public class LevenbergMarquardtDampened {
 
 	// has it converged or not
 	private boolean hasConverged;
-	// warning message
-	private String message;
-	
+
 	// total number of iterations
 	private int iterationCount;
 
@@ -121,18 +131,30 @@ public class LevenbergMarquardtDampened {
 	 * speed and robustness.
 	 *
 	 * @param solver Linear solver. Cholesky or pseudo-inverse are recommended.
+	 * @param initialDampParam Initial value of the dampening parameter.  Tune.. try 1e-3;
 	 * @param absoluteErrorTol Absolute convergence test.
 	 * @param relativeErrorTol Relative convergence test based on function magnitude.
 	 */
 	public LevenbergMarquardtDampened(LinearSolver<DenseMatrix64F> solver,
+									  double initialDampParam,
 									  double absoluteErrorTol,
 									  double relativeErrorTol) {
 		this.solver = solver;
+		this.initialDampParam = initialDampParam;
 		this.absoluteErrorTol = absoluteErrorTol;
 		this.relativeErrorTol = relativeErrorTol;
 
 		if( solver.modifiesA() || solver.modifiesB() )
 			this.solver = new LinearSolverSafe<DenseMatrix64F>(solver);
+	}
+
+	/**
+	 * Specify the initial value of the dampening parameter.
+	 *
+	 * @param initialDampParam initial value
+	 */
+	public void setInitialDampParam(double initialDampParam) {
+		this.initialDampParam = initialDampParam;
 	}
 
 	/**
@@ -147,16 +169,15 @@ public class LevenbergMarquardtDampened {
 		this.N = function.getN();
 		this.M = function.getM();
 
-		x = new DenseMatrix64F(N,1);
-		xdelta = new DenseMatrix64F(N,1);
-		xtest = new DenseMatrix64F(N,1);
-		funcVals = new DenseMatrix64F(M,1);
-		jacobianVals = new DenseMatrix64F(M,N);
+		x.reshape(N, 1, false);
+		xdelta.reshape(N, 1, false);
+		xtest.reshape(N,1,false);
+		funcVals.reshape(M,1,false);
+		jacobianVals.reshape(M,N,false);
 
-		B = new DenseMatrix64F(N,N);
-		g = new DenseMatrix64F(N,1);
-
-		Btest = new DenseMatrix64F(N,N);
+		B.reshape(N,N,false);
+		Bdiag.reshape(N,1,false);
+		g.reshape(N,1,false);
 	}
 
 	/**
@@ -173,12 +194,12 @@ public class LevenbergMarquardtDampened {
 		function.setInput(initial);
 		function.computeFunctions(funcVals.data);
 		// error at this point
-		fnorm = NormOps.normF(funcVals);
+		fnorm = computeError();
 
 		hasConverged = false;
 		mode = 0;
 		fnormPrev = 0;
-		dampParam = 1;
+		dampParam = initialDampParam;
 		step = 0;
 		v = 2;
 		iterationCount = 0;
@@ -209,8 +230,8 @@ public class LevenbergMarquardtDampened {
 	 *
 	 * @return true if it has converged
 	 */
+//	double mu;
 	private boolean initSamplePoint() {
-		System.out.println("-------- init sample");
 		// calculate the Jacobian values at the current sample point
 		function.computeJacobian(jacobianVals.data);
 
@@ -219,16 +240,8 @@ public class LevenbergMarquardtDampened {
 		CommonOps.multTransA(jacobianVals,funcVals, g);
 		CommonOps.scale(-1, g);
 
-//		System.out.println("--------- Jacobian");
-//		jacobianVals.print();
-//		System.out.println("--------- B");
-//		B.print();
-
 		// calculate the function and jacobean norm
-		fnorm = NormOps.normF(funcVals);
 		double gx = CommonOps.elementMaxAbs(g);
-
-		System.out.println(" gx = "+gx);
 		
 		// check for absolute convergence
 		if( Math.abs(fnorm-fnormPrev) <= absoluteErrorTol && step*Math.abs(gx) <= absoluteErrorTol )
@@ -238,9 +251,10 @@ public class LevenbergMarquardtDampened {
 		if( Math.abs(fnorm-fnormPrev) <= relativeErrorTol*Math.abs(fnorm)
 				&& step*Math.abs(gx) <= relativeErrorTol*Math.abs(fnorm) )
 			return terminateSearch(true, null);
-
-		// todo replace with just saving the diagonal elements
-		Btest.set(B);
+		
+		// extract diagonal elements from B
+		CommonOps.diag(B, Bdiag);
+		
 		mode = 1;
 		return false;
 	}
@@ -248,62 +262,57 @@ public class LevenbergMarquardtDampened {
 	private void computeStep() {
 		// add dampening parameter
 		for( int i = 0; i < N; i++ ) {
-			int index = Btest.getIndex(i,i);
-			Btest.data[index] = (1+dampParam)*B.data[index];
+			int index = B.getIndex(i,i);
+			B.data[index] = (1+dampParam)*Bdiag.data[i];
 		}
 
 		// compute the change in step.
-		if( !solver.setA(Btest) ) {
-			// the matrix is singular, which can only be caused by a gradient with zero values
-			throw new OptimizationException("Singular matrix encountered.  Use psuedo inverse solver instead");
-		} else {
-			// solve for change in x
-			solver.solve(g,xdelta);
+		if( !solver.setA(B) ) {
+			throw new OptimizationException("Singularity encountered.  Try a more robust solver line pseudo inverse");
+		}
+		// solve for change in x
+		solver.solve(g,xdelta);
 
-			// xtest = x + delta x
-			CommonOps.add(x, xdelta, xtest);
+		// xtest = x + delta x
+		CommonOps.add(x, xdelta, xtest);
+		// take in account rounding error
+		CommonOps.sub(xtest,x,xdelta);
 
-			// compute the residuals at x
-			function.setInput(xtest.data);
-			function.computeFunctions(funcVals.data);
+		// compute the residuals at x
+		function.setInput(xtest.data);
+		function.computeFunctions(funcVals.data);
 
-			// actual reduction
-			double ftestnorm = NormOps.normF(funcVals);
-			double actualReduction = fnorm - ftestnorm;
+		// actual reduction
+		double ftestnorm = computeError();
+		double actualReduction = fnorm - ftestnorm;
 
-			// Predicted reduction
-			double predictedReduction = predictedReduction(xdelta,dampParam);
+		// Predicted reduction
+		double predictedReduction = predictedReduction(xdelta,dampParam);
+
+		// update the dampParam depending on the results
+		if( predictedReduction > 0 && actualReduction > 0 ) {
+			// set the test point to be the new point
+			DenseMatrix64F temp = x;
+			x = xtest; xtest = temp;
+			// updated residual norm
+			fnormPrev = fnorm;
+			fnorm = ftestnorm;
+			// update step magnitude
+			step = NormOps.normF(xdelta);
 
 			// reduction ratio
 			double ratio = actualReduction/predictedReduction;
+			// reduce the amount of dampening
+			dampParam *= Math.max(0.333,1-Math.pow(2*ratio-1,3));
+			v = 2;
 
-			// update the dampParam depending on the results
-			if( ratio > 0 && actualReduction > 0 ) {
-				// set the test point to be the new point
-				DenseMatrix64F temp = x;
-				x = xtest; xtest = temp;
-				// updated residual norm
-				fnormPrev = fnorm;
-				fnorm = ftestnorm;
-				// update step magnitude
-				step = NormOps.normF(xdelta);
-
-				// reduce the amount of dampening
-				dampParam *= Math.max(0.333,1-Math.pow(2*ratio-1,3));
-				v = 2;
-
-				System.out.println("Damp adjust: "+dampParam+"  ratio "+ratio);
-
-				// start the iteration over again
-				mode = 0;
-				iterationCount++;
-			} else {
-				// increase the dampening and try again
-				dampParam *= v;
-				v *= 2;
-				
-				System.out.println("Damp Up: "+dampParam);
-			}
+			// start the iteration over again
+			mode = 0;
+			iterationCount++;
+		} else {
+			// did not improve, increase the amount of dampening
+			dampParam *= v;
+			v *= 2;
 		}
 	}
 
@@ -320,10 +329,10 @@ public class LevenbergMarquardtDampened {
 		double p_dot_g = VectorVectorMult.innerProd(p,g);
 		double p_JJ_p = 0;
 		for( int i = 0; i < N; i++ )
-			p_JJ_p += p.data[i]*B.get(i,i)*p.data[i];
+			p_JJ_p += p.data[i]*Bdiag.data[i]*p.data[i];
 
 		// The variable g is really the negative of g
-		return 0.5*(p_dot_g-mu*p_JJ_p);
+		return 0.5*(p_dot_g + mu*p_JJ_p);
 	}
 
 	/**
@@ -331,17 +340,21 @@ public class LevenbergMarquardtDampened {
 	 */
 	private boolean terminateSearch( boolean converged , String message ) {
 		this.hasConverged = converged;
-		this.message = message;
 
 		return true;
 	}
 
-	public boolean isConverged() {
-		return hasConverged;
+	/**
+	 * Computes the residual's error:
+	 *
+	 * sum_i 0.5*fi(x)^2
+	 */
+	private double computeError() {
+		return VectorVectorMult.innerProd(funcVals,funcVals)/2;
 	}
 
-	public String getWarning() {
-		return message;
+	public boolean isConverged() {
+		return hasConverged;
 	}
 
 	public int getIterationCount() {

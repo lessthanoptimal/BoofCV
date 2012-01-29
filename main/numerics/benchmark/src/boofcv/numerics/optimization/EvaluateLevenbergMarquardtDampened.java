@@ -30,12 +30,12 @@ import org.ejml.data.DenseMatrix64F;
 public class EvaluateLevenbergMarquardtDampened extends UnconstrainedLeastSquaresEvaluator {
 
 	boolean robust = true;
-	double absoluteErrorTol = 1e-5;
-	double relativeErrorTol = 1e-8;
-
+	double absoluteErrorTol = 1e-15;
+	double relativeErrorTol = 1e-15;
+	double dampInit = 1e-3;
 
 	public EvaluateLevenbergMarquardtDampened(boolean verbose) {
-		super(verbose);
+		super(verbose, true);
 	}
 
 	@Override
@@ -48,25 +48,27 @@ public class EvaluateLevenbergMarquardtDampened extends UnconstrainedLeastSquare
 			solver = LinearSolverFactory.symmPosDef(10);
 		}
 
-		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,
+		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,dampInit,
 				absoluteErrorTol,relativeErrorTol);
 		return new WrapLevenbergMarquardtDampened(alg);
 	}
 
 	public static void main( String args[] ) {
-		EvaluateLevenbergMarquardtDampened eval = new EvaluateLevenbergMarquardtDampened(true);
+		EvaluateLevenbergMarquardtDampened eval = new EvaluateLevenbergMarquardtDampened(false);
 
-//		System.out.println("Helical Valley   ----------------");
-//		eval.helicalValley();
-//		System.out.println("Rosenbrock       ----------------");
-//		eval.rosenbrock();
-		System.out.println("Rosenbrock Mod   ----------------");
+		System.out.println("Powell              ----------------");
+		eval.powell();
+		System.out.println("Helical Valley      ----------------");
+		eval.helicalValley();
+		System.out.println("Rosenbrock          ----------------");
+		eval.rosenbrock();
+		System.out.println("Rosenbrock Mod      ----------------");
 		eval.rosenbrockMod(1000);
-//		System.out.println("variably       ----------------");
-//		eval.variably();
-//		System.out.println("trigonometric       ----------------");
-//		eval.trigonometric();
-//		System.out.println("Bady Scaled Brown       ----------------");
-//		eval.badlyScaledBrown();
+		System.out.println("variably            ----------------");
+		eval.variably();
+		System.out.println("trigonometric       ----------------");
+		eval.trigonometric();
+		System.out.println("Bady Scaled Brown   ----------------");
+		eval.badlyScaledBrown();
 	}
 }

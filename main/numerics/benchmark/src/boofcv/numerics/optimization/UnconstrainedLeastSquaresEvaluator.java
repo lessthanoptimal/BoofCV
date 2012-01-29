@@ -31,10 +31,12 @@ import org.ejml.ops.NormOps;
 public abstract class UnconstrainedLeastSquaresEvaluator {
 
 	boolean verbose = true;
+	boolean printSummary;
 	int maxIteration = 500;
 
-	protected UnconstrainedLeastSquaresEvaluator(boolean verbose) {
+	protected UnconstrainedLeastSquaresEvaluator(boolean verbose, boolean printSummary) {
 		this.verbose = verbose;
+		this.printSummary = printSummary;
 	}
 
 	/**
@@ -83,7 +85,7 @@ public abstract class UnconstrainedLeastSquaresEvaluator {
 		func.process(found,output.data);
 		double finalError = NormOps.normF(output);
 
-		if( verbose ) {
+		if( printSummary ) {
 			System.out.printf("value{ init %4.1e final = %6.2e} count f = %2d d = %2d\n",
 					initialError, finalError, f.count, d.count);
 		}
@@ -138,5 +140,9 @@ public abstract class UnconstrainedLeastSquaresEvaluator {
 	}
 	public NonlinearResults badlyScaledBrown() {
 		return performTest(new EvalFuncBadlyScaledBrown());
+	}
+
+	public NonlinearResults powell() {
+		return performTest(new EvalFuncPowell());
 	}
 }

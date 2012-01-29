@@ -110,5 +110,6 @@ public class EquationsBFGS {
 		VectorVectorMult.rank1Update(-p, H , tempV0, s);
 		VectorVectorMult.rank1Update(-p, H , s, tempV1);
 		VectorVectorMult.rank1Update(p*alpha*p+p, H , s, s);
+
 	}
 }
