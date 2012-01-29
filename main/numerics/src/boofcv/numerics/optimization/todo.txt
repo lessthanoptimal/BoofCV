@@ -1,4 +1,10 @@
-- improve QuasiNewtonBFGS to reduce number of gradient calls
-- Low memeory quasi newton BFGS
-- CachedNumericalGradientLineFunction
-  * Use already computed function value to remove the need to compute the current value
+- Low memory quasi newton BFGS
+  * Hmm what is this?
+- Least Squares
+  * QR decomposition with fast dampening param update
+    - polynomial search for optimal param?
+- Sparse Least Squares
+  * Create its own interface
+  * Sparse jacobian update
+  * Sparse solvers?
+

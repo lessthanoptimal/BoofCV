@@ -18,7 +18,12 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.impl.LevenbergMarquardtDampened;
+import boofcv.numerics.optimization.wrap.WrapLevenbergMarquardtDampened;
 import boofcv.numerics.optimization.wrap.WrapQuasiNewtonBFGS;
+import org.ejml.alg.dense.linsol.LinearSolver;
+import org.ejml.alg.dense.linsol.LinearSolverFactory;
+import org.ejml.data.DenseMatrix64F;
 
 /**
  * Creates optimization algorithms using easy to use interfaces.  These implementations/interfaces
@@ -44,5 +49,32 @@ public class FactoryOptimization {
 														   double minFunctionValue )
 	{
 		return new WrapQuasiNewtonBFGS(relativeErrorTol,absoluteErrorTol,minFunctionValue);
+	}
+
+	/**
+	 * Unconstrained least squares Levenberg-Marquardt (LM) optimizer for dense problems.  There are many
+	 * different variants of LM and this function provides an easy to use interface for selecting and
+	 * configuring them.
+	 *
+	 *
+	 * @param relativeErrorTol tolerance used to terminate the optimization. 0 <= x < 1
+	 * @param absoluteErrorTol Absolute tolerance used to terminate the optimization. 0 <= x
+	 * @param robust If true a slower, more robust algorithm that can handle more degenerate cases will be used.
+	 * @return UnconstrainedLeastSquares
+	 */
+	public static UnconstrainedLeastSquares leastSquaresLM( double relativeErrorTol,
+															double absoluteErrorTol,
+															boolean robust )
+	{
+		LinearSolver<DenseMatrix64F> solver;
+
+		if( robust ) {
+			solver = LinearSolverFactory.solverPseudoInverse();
+		} else {
+			solver = LinearSolverFactory.symmPosDef(10);
+		}
+
+		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,absoluteErrorTol,relativeErrorTol);
+		return new WrapLevenbergMarquardtDampened(alg);
 	}
 }

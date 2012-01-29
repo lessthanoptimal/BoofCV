@@ -18,7 +18,7 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.functions.FunctionNtoS;
+import boofcv.numerics.optimization.functions.FunctionNtoM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,24 +26,28 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestNumericalGradientForward {
+public class TestNumericalJacobianForward {
 
 	@Test
 	public void simple() {
 		// give it a function where one variable does not effect the output
 		// to make the test more interesting
 		SimpleFunction f = new SimpleFunction();
-		NumericalGradientForward alg = new NumericalGradientForward(f);
-		
-		double output[] = new double[]{1,1,1};
+		NumericalJacobianForward alg = new NumericalJacobianForward(f);
+
+		double output[] = new double[]{1,1,1,1,1,1};
 		alg.process(new double[]{2,3,7},output);
-		
+
 		assertEquals(3,output[0],1e-5);
 		assertEquals(-36,output[1],1e-5);
 		assertEquals(0,output[2],1e-5);
+
+		assertEquals(3,output[3],1e-5);
+		assertEquals(2,output[4],1e-5);
+		assertEquals(1,output[5],1e-5);
 	}
-	
-	private static class SimpleFunction implements FunctionNtoS
+
+	private static class SimpleFunction implements FunctionNtoM
 	{
 		@Override
 		public int getN() {
@@ -51,11 +55,18 @@ public class TestNumericalGradientForward {
 		}
 
 		@Override
-		public double process(double[] input) {
+		public int getM() {
+			return 2;
+		}
+
+		@Override
+		public void process(double[] input, double output[]) {
 			double x1 = input[0];
 			double x2 = input[1];
+			double x3 = input[2];
 
-			return 3*x1 - 6*x2*x2;
+			output[0] = 3*x1 - 6*x2*x2;
+			output[1] = x1*x2+x3;
 		}
 	}
 }
