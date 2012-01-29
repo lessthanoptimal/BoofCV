@@ -68,6 +68,18 @@ public class TestQuasiNewtonBFGS {
 	}
 
 	@Test
+	public void powell() {
+		NonlinearResults results = evaluator.powell();
+
+		// no algorithm to compare it against, just do some sanity checks for changes
+		assertTrue(results.numFunction<100);
+		assertTrue(results.numGradient < 100);
+		assertEquals(0,results.x[0],1e-4);
+		assertEquals(0,results.x[1],1e-4);
+		assertEquals(0,results.f,1e-4);
+	}
+
+	@Test
 	public void helicalvalley() {
 		NonlinearResults results = evaluator.helicalValley();
 

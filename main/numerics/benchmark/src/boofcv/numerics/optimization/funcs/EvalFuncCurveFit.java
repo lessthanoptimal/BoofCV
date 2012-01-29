@@ -23,16 +23,22 @@ import boofcv.numerics.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
 
 /**
- * Frandsen et al 1999
  *
  * @author Peter Abeles
  */
-public class EvalFuncRosenbrockMod implements EvalFuncLeastSquares {
+public class EvalFuncCurveFit implements EvalFuncLeastSquares {
+	
+	double t[];
+	double f[];
 
-	double lambda;
-
-	public EvalFuncRosenbrockMod(double lambda) {
-		this.lambda = lambda;
+	public EvalFuncCurveFit(double x1, double x2, double x3, double x4, double deltaT, int N) {
+		t = new double[N];
+		f = new double[N];
+		
+		for( int i = 0; i < N; i++ ) {
+			t[i] = deltaT*i;
+			f[i] = model(x1,x2,x3,x4,t[i]);
+		}
 	}
 
 	@Override
@@ -55,30 +61,36 @@ public class EvalFuncRosenbrockMod implements EvalFuncLeastSquares {
 		return new double[]{1,1};
 	}
 	
+	public static double model( double x1 ,double x2, double x3 , double x4 , double t ) {
+		return x3*Math.exp(x1*t) + x4*Math.exp(x2*t);
+	}
+	
 	public class Func implements FunctionNtoM
 	{
 		@Override
 		public int getN() {
-			return 2;
+			return 4;
 		}
 
 		@Override
 		public int getM() {
-			return 3;
+			return t.length;
 		}
 
 		@Override
 		public void process(double[] input, double[] output) {
 			double x1 = input[0];
 			double x2 = input[1];
+			double x3 = input[2];
+			double x4 = input[3];
 			
-			output[0] = 10.0*(x2-x1*x1);
-			output[1] = 1.0 - x1;
-			output[2] = lambda;
+			for( int i = 0; i < t.length; i++ ) {
+				output[i] = f[i] - model(x1,x2,x3,x4,t[i]);
+			}
 		}
 	}
 
-	public static class Deriv implements FunctionNtoMxN
+	public class Deriv implements FunctionNtoMxN
 	{
 		@Override
 		public int getN() {
@@ -87,20 +99,35 @@ public class EvalFuncRosenbrockMod implements EvalFuncLeastSquares {
 
 		@Override
 		public int getM() {
-			return 3;
+			return t.length;
 		}
 
 		@Override
 		public void process(double[] input, double[] output) {
-			DenseMatrix64F J = DenseMatrix64F.wrap(3,2,output);
+			DenseMatrix64F J = DenseMatrix64F.wrap(t.length,2,output);
 			double x1 = input[0];
+			double x2 = input[1];
+			double x3 = input[2];
+			double x4 = input[3];
+
+			for( int i = 0; i < t.length; i++ ) {
+				double g1 = -x3*t[i]*Math.exp(x1*t[i]);
+				double g2 = -x4*t[i]*Math.exp(x2*t[i]);
+				double g3 = -Math.exp(x1*t[i]);
+				double g4 = -Math.exp(x2*t[i]);
+
+				J.set(i,0,g1);
+				J.set(i,1,g2);
+				J.set(i,2,g3);
+				J.set(i,3,g4);
+			}
+
 			
-			J.set(0,0,-20*x1);
-			J.set(0,1,10);
-			J.set(1,0,-1);
-			J.set(1,1,0);
-			J.set(2,0,0);
-			J.set(2,1,0);
+			J.set(0,0,1);
+			J.set(0,1,0);
+			J.set(1,0,1.0/Math.pow(x1+0.1,2));
+			J.set(1,1,4*x2);
 		}
 	}
+
 }

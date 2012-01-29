@@ -23,18 +23,14 @@ import boofcv.numerics.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
 
 /**
- * Frandsen et al 1999
+ *
+ * <p>
+ * Powel 1970
+ * </p>
  *
  * @author Peter Abeles
  */
-public class EvalFuncRosenbrockMod implements EvalFuncLeastSquares {
-
-	double lambda;
-
-	public EvalFuncRosenbrockMod(double lambda) {
-		this.lambda = lambda;
-	}
-
+public class EvalFuncPowell implements EvalFuncLeastSquares {
 	@Override
 	public FunctionNtoM getFunction() {
 		return new Func();
@@ -47,15 +43,15 @@ public class EvalFuncRosenbrockMod implements EvalFuncLeastSquares {
 
 	@Override
 	public double[] getInitial() {
-		return new double[]{-1.2,1};
+		return new double[]{3,1};
 	}
 
 	@Override
 	public double[] getOptimal() {
-		return new double[]{1,1};
+		return new double[]{0,0};
 	}
 	
-	public class Func implements FunctionNtoM
+	public static class Func implements FunctionNtoM
 	{
 		@Override
 		public int getN() {
@@ -64,7 +60,7 @@ public class EvalFuncRosenbrockMod implements EvalFuncLeastSquares {
 
 		@Override
 		public int getM() {
-			return 3;
+			return 2;
 		}
 
 		@Override
@@ -72,9 +68,8 @@ public class EvalFuncRosenbrockMod implements EvalFuncLeastSquares {
 			double x1 = input[0];
 			double x2 = input[1];
 			
-			output[0] = 10.0*(x2-x1*x1);
-			output[1] = 1.0 - x1;
-			output[2] = lambda;
+			output[0] = x1;
+			output[1] = 10*x1/(x1+0.1) + 2*x2*x2;
 		}
 	}
 
@@ -87,20 +82,19 @@ public class EvalFuncRosenbrockMod implements EvalFuncLeastSquares {
 
 		@Override
 		public int getM() {
-			return 3;
+			return 2;
 		}
 
 		@Override
 		public void process(double[] input, double[] output) {
-			DenseMatrix64F J = DenseMatrix64F.wrap(3,2,output);
+			DenseMatrix64F J = DenseMatrix64F.wrap(2,2,output);
 			double x1 = input[0];
+			double x2 = input[1];
 			
-			J.set(0,0,-20*x1);
-			J.set(0,1,10);
-			J.set(1,0,-1);
-			J.set(1,1,0);
-			J.set(2,0,0);
-			J.set(2,1,0);
+			J.set(0,0,1);
+			J.set(0,1,0);
+			J.set(1,0,1.0/Math.pow(x1 + 0.1, 2));
+			J.set(1,1,4*x2);
 		}
 	}
 }

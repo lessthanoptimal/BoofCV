@@ -57,13 +57,15 @@ public class FactoryOptimization {
 	 * configuring them.
 	 *
 	 *
-	 * @param relativeErrorTol tolerance used to terminate the optimization. 0 <= x < 1
-	 * @param absoluteErrorTol Absolute tolerance used to terminate the optimization. 0 <= x
+	 * @param relativeErrorTol tolerance used to terminate the optimization. 0 <= tol < 1
+	 * @param absoluteErrorTol Absolute tolerance used to terminate the optimization. 0 <= tol
+	 * @param dampInit Initial value of dampening parameter.  Tune.  Start at around 1e-3.
 	 * @param robust If true a slower, more robust algorithm that can handle more degenerate cases will be used.
 	 * @return UnconstrainedLeastSquares
 	 */
 	public static UnconstrainedLeastSquares leastSquaresLM( double relativeErrorTol,
 															double absoluteErrorTol,
+															double dampInit ,
 															boolean robust )
 	{
 		LinearSolver<DenseMatrix64F> solver;
@@ -74,7 +76,8 @@ public class FactoryOptimization {
 			solver = LinearSolverFactory.symmPosDef(10);
 		}
 
-		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,absoluteErrorTol,relativeErrorTol);
+		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,
+				dampInit,absoluteErrorTol,relativeErrorTol);
 		return new WrapLevenbergMarquardtDampened(alg);
 	}
 }

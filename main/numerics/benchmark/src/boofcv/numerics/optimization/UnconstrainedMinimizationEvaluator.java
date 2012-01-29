@@ -32,10 +32,12 @@ import boofcv.numerics.optimization.wrap.LsToNonLinearDeriv;
 public abstract class UnconstrainedMinimizationEvaluator {
 
 	boolean verbose = true;
+	boolean printSummary = true;
 	int maxIteration = 500;
 
-	protected UnconstrainedMinimizationEvaluator(boolean verbose) {
+	protected UnconstrainedMinimizationEvaluator(boolean verbose, boolean printSummary) {
 		this.verbose = verbose;
+		this.printSummary = printSummary;
 	}
 
 	/**
@@ -80,7 +82,7 @@ public abstract class UnconstrainedMinimizationEvaluator {
 
 		double finalValue = func.process(found);
 
-		if( verbose ) {
+		if( printSummary ) {
 			System.out.printf("value{ init %4.1e final = %6.2e} count f = %2d d = %2d\n",
 					initialValue, finalValue, f.count, d.count);
 		}
@@ -154,7 +156,12 @@ public abstract class UnconstrainedMinimizationEvaluator {
 	public NonlinearResults trigonometric() {
 		return performTest(new EvalFuncTrigonometric(10));
 	}
+
 	public NonlinearResults badlyScaledBrown() {
 		return performTest(new EvalFuncBadlyScaledBrown());
+	}
+
+	public NonlinearResults powell() {
+		return performTest(new EvalFuncPowell());
 	}
 }
