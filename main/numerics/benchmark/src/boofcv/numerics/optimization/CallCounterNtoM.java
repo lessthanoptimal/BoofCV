@@ -18,16 +18,35 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.functions.FunctionNtoM;
+
 /**
- * This message is thrown if something bad happens while optimizing that would be the results invalid
+ * Wraps around a function and counts the number of times it processes an input.
  *
  * @author Peter Abeles
  */
-public class OptimizationException extends RuntimeException {
-	public OptimizationException() {
+public class CallCounterNtoM implements FunctionNtoM {
+
+	public int count;
+	public FunctionNtoM func;
+
+	public CallCounterNtoM(FunctionNtoM func) {
+		this.func = func;
 	}
 
-	public OptimizationException(String message) {
-		super(message);
+	@Override
+	public int getN() {
+		return func.getN();
+	}
+
+	@Override
+	public int getM() {
+		return func.getM();
+	}
+
+	@Override
+	public void process(double[] input, double[] output) {
+		count++;
+		func.process(input,output);
 	}
 }

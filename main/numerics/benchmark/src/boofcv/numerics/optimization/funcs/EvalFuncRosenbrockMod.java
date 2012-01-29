@@ -20,22 +20,18 @@ package boofcv.numerics.optimization.funcs;
 
 import boofcv.numerics.optimization.functions.FunctionNtoM;
 import boofcv.numerics.optimization.functions.FunctionNtoMxN;
+import org.ejml.data.DenseMatrix64F;
 
 /**
  *
- * <p>
- * [1] J. More, B. Garbow, K. Hillstrom, "Testing Unconstrained Optimization Software"
- * 1981 ACM Transactions on Mathematical Software, Vol 7, No. 1, Match 1981, pages 17-41
- * </p>
- *
  * @author Peter Abeles
  */
-public class EvalFuncVariablyDimensioned implements EvalFuncLeastSquares {
-	
-	int N;
+public class EvalFuncRosenbrockMod implements EvalFuncLeastSquares {
 
-	public EvalFuncVariablyDimensioned(int n) {
-		N = n;
+	double lambda;
+
+	public EvalFuncRosenbrockMod(double lambda) {
+		this.lambda = lambda;
 	}
 
 	@Override
@@ -45,53 +41,65 @@ public class EvalFuncVariablyDimensioned implements EvalFuncLeastSquares {
 
 	@Override
 	public FunctionNtoMxN getJacobian() {
-		return null;
+		return new Deriv();
 	}
 
 	@Override
 	public double[] getInitial() {
-		double x[] = new double[N];
-		
-		for( int i = 0; i < N; i++ ) {
-			x[i] = 1-((double)i/(double)N);
-		}
-		
-		return x;
+		return new double[]{-1.2,1};
 	}
 
 	@Override
 	public double[] getOptimal() {
-		double x[] = new double[N];
-		for( int i = 0; i < N; i++ )
-			x[i] = 1;
-		return x;
+		return new double[]{1,1};
 	}
-
+	
 	public class Func implements FunctionNtoM
 	{
 		@Override
 		public int getN() {
-			return N;
+			return 2;
 		}
 
 		@Override
 		public int getM() {
-			return N+2;
+			return 3;
 		}
 
 		@Override
 		public void process(double[] input, double[] output) {
-			for( int i = 0; i < N; i++ ) {
-				output[i] = input[i]-1;
-			}
-			double sum = 0;
-			for( int i = 0; i < N; i++ ) {
-				sum += (i+1)*(input[i]-1);
-			}
+			double x1 = input[0];
+			double x2 = input[1];
 			
-			output[N] = sum;
-			output[N+1] = sum*sum;
+			output[0] = 10.0*(x2-x1*x1);
+			output[1] = 1.0 - x1;
+			output[2] = lambda;
 		}
 	}
 
+	public static class Deriv implements FunctionNtoMxN
+	{
+		@Override
+		public int getN() {
+			return 2;
+		}
+
+		@Override
+		public int getM() {
+			return 3;
+		}
+
+		@Override
+		public void process(double[] input, double[] output) {
+			DenseMatrix64F J = DenseMatrix64F.wrap(3,2,output);
+			double x1 = input[0];
+			
+			J.set(0,0,-20*x1);
+			J.set(0,1,10);
+			J.set(1,0,-1);
+			J.set(1,1,0);
+			J.set(2,0,0);
+			J.set(2,1,0);
+		}
+	}
 }
