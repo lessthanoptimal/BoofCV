@@ -19,7 +19,6 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.numerics.optimization.JacobianChecker;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -67,22 +66,4 @@ public class TestModelFitterSe2 {
 		assertEquals(model.getYaw(),found.getYaw(),0.01);
 	}
 
-	/**
-	 * Make sure the jacobian its using internally is correct
-	 */
-	@Test
-	public void checkJacobian() {
-		ModelFitterSe2.Function func = new ModelFitterSe2.Function();
-		ModelFitterSe2.Derivative deriv = new ModelFitterSe2.Derivative();
-
-		Se2_F64 model = new Se2_F64(1,2,-0.3);
-
-		Point2D_F64 a = new Point2D_F64(rand.nextDouble()*4,rand.nextDouble()*4);
-		Point2D_F64 b = SePointOps_F64.transform(model,a,null);
-		AssociatedPair p = new AssociatedPair(a,b,false);
-
-		double errors[][] = JacobianChecker.compareToNumerical(func, deriv, p, 1, 2, -0.3);
-
-		assertTrue(JacobianChecker.checkErrors(errors,1e-4));
-	}
 }

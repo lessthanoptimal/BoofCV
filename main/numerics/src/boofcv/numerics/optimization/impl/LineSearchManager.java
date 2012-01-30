@@ -19,6 +19,7 @@
 package boofcv.numerics.optimization.impl;
 
 import boofcv.numerics.optimization.LineSearch;
+import boofcv.numerics.optimization.OptimizationException;
 import boofcv.numerics.optimization.functions.LineSearchFunction;
 
 /**
@@ -92,6 +93,9 @@ public class LineSearchManager {
 		for( int i = 0; i < N; i++ ) {
 			derivAtZero += startDeriv[i]*direction[i];
 		}
+
+		if( derivAtZero > 0 )
+			throw new OptimizationException("Derivative is positive along search. Was inv(H) negative definite?");
 
 		// setup line functions
 		function.setLine(startPoint, direction);

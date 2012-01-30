@@ -1,5 +1,9 @@
 - Low memory quasi newton BFGS
-  * Hmm what is this?
+  * See large matrix BFGS
+- Conjugate update for BFGS
+  * [1] D. Byatt and I. D. Coope and C. J. Price, "Effect of limited precision on the BFGS quasi-Newton algorithm"
+  * Proc. of 11th Computational Techniques and Applications Conference CTAC-2003
+
 - Least Squares
   * QR decomposition with fast dampening param update
     - polynomial search for optimal param?
@@ -7,4 +11,5 @@
   * Create its own interface
   * Sparse jacobian update
   * Sparse solvers?
+- Trust Region Least Squares
 

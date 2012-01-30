@@ -20,9 +20,11 @@ package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelFitter;
-import boofcv.numerics.optimization.LevenbergMarquardt;
-import boofcv.numerics.optimization.OptimizationDerivative;
-import boofcv.numerics.optimization.OptimizationResidual;
+import boofcv.numerics.optimization.FactoryOptimization;
+import boofcv.numerics.optimization.UnconstrainedLeastSquares;
+import boofcv.numerics.optimization.functions.FunctionNtoM;
+import boofcv.numerics.optimization.functions.FunctionNtoMxN;
+import boofcv.numerics.optimization.impl.UtilOptimize;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -34,11 +36,19 @@ import java.util.List;
  */
 public class ModelFitterSe2 implements ModelFitter<Se2_F64,AssociatedPair> {
 
-	LevenbergMarquardt<?,AssociatedPair> alg;
+	UnconstrainedLeastSquares ls = FactoryOptimization.leastSquaresLM(1e-8,1e-8,1e-3,false);
+
+	List<AssociatedPair> pairs;
+	
+	FunctionNtoM function;
+	FunctionNtoMxN jacobian;
+	
 	double param[] = new double[3];
 
 	public ModelFitterSe2() {
-		alg = new LevenbergMarquardt<Object, AssociatedPair>(3,new Function(),new Derivative());
+		ls = FactoryOptimization.leastSquaresLM(1e-8,1e-8,1e-3,false);
+		function = new F();
+		jacobian = new D();
 	}
 
 	@Override
@@ -51,18 +61,23 @@ public class ModelFitterSe2 implements ModelFitter<Se2_F64,AssociatedPair> {
 							Se2_F64 initParam,
 							Se2_F64 foundModel )
 	{
+		this.pairs = dataSet;
 		param[0] = initParam.getX();
 		param[1] = initParam.getY();
 		param[2] = initParam.getYaw();
 
-		if( !alg.process(param,null,dataSet) )
+		ls.setFunction(function,jacobian);
+		ls.initialize(param);
+
+		if(UtilOptimize.process(ls, 100) ) {
+			double found[] = ls.getParameters();
+
+			foundModel.set(found[0],found[1],found[2]);
+
+			return true;
+		} else {
 			return false;
-
-		double found[] = alg.getModelParameters();
-
-		foundModel.set(found[0],found[1],found[2]);
-
-		return true;
+		}
 	}
 
 	@Override
@@ -70,71 +85,63 @@ public class ModelFitterSe2 implements ModelFitter<Se2_F64,AssociatedPair> {
 		return 3;
 	}
 
-	protected static class Function implements OptimizationResidual<Object,AssociatedPair>
+	protected class F implements FunctionNtoM
 	{
 		Se2_F64 m = new Se2_F64();
 		Point2D_F64 p = new Point2D_F64();
 
 		@Override
-		public void setModel(double[] model) {
-			m.set(model[0],model[1],model[2]);
-		}
-
-		@Override
-		public int getNumberOfFunctions() {
-			return 2;
-		}
-
-		@Override
-		public int getModelSize() {
+		public int getN() {
 			return 3;
 		}
 
 		@Override
-		public boolean estimate(AssociatedPair associatedPair, double[] estimated) {
-			SePointOps_F64.transform(m,associatedPair.currLoc,p);
-			estimated[0] = p.x;
-			estimated[1] = p.y;
-
-			return true;
+		public int getM() {
+			return pairs.size()*2;
 		}
 
 		@Override
-		public boolean computeResiduals(Object o, AssociatedPair associatedPair, double[] residuals) {
-			estimate(associatedPair,residuals);
+		public void process(double[] model, double[] output) {
+			m.set(model[0],model[1],model[2]);
+			int i = 0;
+			for( AssociatedPair pair : pairs ) {
+				SePointOps_F64.transform(m,pair.currLoc,p);
 
-			residuals[0] = -(associatedPair.keyLoc.x-residuals[0]);
-			residuals[1] = -(associatedPair.keyLoc.y-residuals[1]);
-
-			return true;
+				output[i++] = p.x - pair.keyLoc.x;
+				output[i++] = p.y - pair.keyLoc.y;
+			}
 		}
 	}
 
-	protected static class Derivative implements OptimizationDerivative<AssociatedPair>
+	protected class D implements FunctionNtoMxN
 	{
-		double c;
-		double s;
 		@Override
-		public void setModel(double[] model) {
-			double theta = model[2];
-			c = Math.cos(theta);
-			s = Math.sin(theta);
+		public int getN() {
+			return 3;
 		}
 
 		@Override
-		public boolean computeDerivative(AssociatedPair associatedPair, double[][] gradient) {
-			double x = associatedPair.currLoc.x;
-			double y = associatedPair.currLoc.y;
+		public int getM() {
+			return pairs.size()*2;
+		}
 
-			gradient[0][0] = 1;
-			gradient[0][1] = 0;
-			gradient[0][2] = -x*s - y*c;
+		@Override
+		public void process(double[] model, double[] output) {
+			double c = Math.cos(model[2]);
+			double s = Math.sin(model[2]);
+			
+			int i = 0;
+			for( AssociatedPair pair : pairs ) {
+				Point2D_F64 p = pair.currLoc;
 
-			gradient[1][0] = 0;
-			gradient[1][1] = 1;
-			gradient[1][2] = x*c - y*s;
+				output[i++] = 1;
+				output[i++] = 0;
+				output[i++] = -p.x*s - p.y*c;
 
-			return true;
+				output[i++] = 0;
+				output[i++] = 1;
+				output[i++] = p.x*c - p.y*s;
+			}
 		}
 	}
 }

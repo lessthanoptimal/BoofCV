@@ -6,6 +6,18 @@ Date Format: year/month/day
 Date    : 
 Version : Alpha 0.5
 
+- Improved SURF performance
+  * Fixed various bugs and changed algorithm to improve performance
+    - Both speed and stibility have been improved
+  * Now is the best performing SURF implementation in the benchmark
+- ImplOrientationSlidingWindowIntegral has been replaced with a faster and more accurate algorithm
+- Improved integral image support
+- Refactored sparse image operator code
+  * Added SparseImageSample interface
+- Added/Improved unconstrained non-linear optimization code
+  * Quasi-Newton line search
+  * Levenberg-Marquardt
+
 ---------------------------------------------
 Date    : 2012/01/06
 Version : Alpha 0.4

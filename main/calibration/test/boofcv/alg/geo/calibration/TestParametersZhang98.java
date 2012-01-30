@@ -18,9 +18,12 @@
 
 package boofcv.alg.geo.calibration;
 
+import georegression.misc.test.GeometryUnitTest;
 import org.junit.Test;
 
 import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -34,6 +37,12 @@ public class TestParametersZhang98 {
 	 */
 	@Test
 	public void toAndFromParametersArray() {
+		checkToAndFromParam(true);
+		checkToAndFromParam(false);
+	}
+
+	public void checkToAndFromParam( boolean assumeZeroSkew )
+	{
 		ParametersZhang98 p = new ParametersZhang98(3,2);
 
 		p.a = 2;p.b=3;p.c=4;p.x0=5;p.y0=6;
@@ -47,13 +56,39 @@ public class TestParametersZhang98 {
 
 		// convert it into array format
 		double array[] = new double[ p.size() ];
-		p.convertToParam(array);
+		p.convertToParam(assumeZeroSkew,array);
 
 		// create a new set of parameters and assign its value from the array
 		ParametersZhang98 found = new ParametersZhang98(3,2);
-		found.setFromParam(array);
+		found.setFromParam(assumeZeroSkew,array);
 
 		// compare the two sets of parameters
-		TestCalibrationPlanarGridZhang98.checkEquals(p,found);
+		checkEquals(p,found,assumeZeroSkew);
+	}
+
+	private void checkEquals(ParametersZhang98 expected ,
+							 ParametersZhang98 found ,
+							 boolean assumeZeroSkew ) {
+		double tol = 1e-6;
+
+		assertEquals(expected.a,found.a,tol);
+		assertEquals(expected.b,found.b,tol);
+		if( !assumeZeroSkew )
+			assertEquals(expected.c,found.c,tol);
+		assertEquals(expected.x0,found.x0,tol);
+		assertEquals(expected.y0,found.y0,tol);
+
+		for( int i = 0; i < expected.distortion.length; i++ ) {
+			assertEquals(expected.distortion[i],found.distortion[i],tol);
+		}
+
+		for( int i = 0; i < 2; i++ ) {
+			ParametersZhang98.View pp = expected.views[i];
+			ParametersZhang98.View ff = found.views[i];
+
+			GeometryUnitTest.assertEquals(pp.T, ff.T, tol);
+			GeometryUnitTest.assertEquals(pp.rotation.unitAxisRotation,ff.rotation.unitAxisRotation,tol);
+			assertEquals(pp.rotation.theta,ff.rotation.theta,tol);
+		}
 	}
 }

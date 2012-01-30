@@ -23,6 +23,7 @@ import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
 import boofcv.numerics.optimization.functions.FunctionNtoMxN;
 import boofcv.numerics.optimization.impl.LevenbergMarquardtDampened;
+import boofcv.numerics.optimization.impl.NumericalJacobianForward;
 
 /**
  * Wrapper around {@link LevenbergMarquardtDampened} for {@link UnconstrainedLeastSquares}
@@ -39,6 +40,10 @@ public class WrapLevenbergMarquardtDampened implements UnconstrainedLeastSquares
 
 	@Override
 	public void setFunction(FunctionNtoM function, FunctionNtoMxN jacobian) {
+
+		if( jacobian == null )
+			jacobian = new NumericalJacobianForward(function);
+
 		alg.setFunction(new WrapCoupledJacobian(function,jacobian));
 	}
 
