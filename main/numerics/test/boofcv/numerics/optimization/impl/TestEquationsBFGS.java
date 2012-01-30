@@ -47,7 +47,7 @@ public class TestEquationsBFGS {
 		DenseMatrix64F found = H.copy();
 
 		EquationsBFGS.naiveInverseUpdate(expected, s, y);
-		EquationsBFGS.inverseUpdate(found,s,y,tempV0,tempV1);
+		EquationsBFGS.inverseUpdate(found,s,y.copy(),tempV0,tempV1);
 
 		assertTrue(MatrixFeatures.isIdentical(expected, found, 1e-8));
 	}

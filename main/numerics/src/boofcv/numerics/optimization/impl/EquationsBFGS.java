@@ -110,6 +110,70 @@ public class EquationsBFGS {
 		VectorVectorMult.rank1Update(-p, H , tempV0, s);
 		VectorVectorMult.rank1Update(-p, H , s, tempV1);
 		VectorVectorMult.rank1Update(p*alpha*p+p, H , s, s);
+	}
 
+	/**
+	 *
+	 *
+	 * <p>
+	 * [1] D. Byatt and I. D. Coope and C. J. Price, "Effect of limited precision on the BFGS quasi-Newton algorithm"
+	 * Proc. of 11th Computational Techniques and Applications Conference CTAC-2003
+	 * </p>
+	 *
+	 * @param C
+	 * @param d
+	 * @param y
+	 * @param tempV0
+	 */
+	public static void conjugateUpdateD( DenseMatrix64F C , DenseMatrix64F d , DenseMatrix64F y ,
+										 double step, DenseMatrix64F tempV0 )
+	{
+		DenseMatrix64F z = tempV0;
+
+		CommonOps.multTransA(C, y, z);
+		
+		double dTd = VectorVectorMult.innerProd(d,d);
+		double dTz = VectorVectorMult.innerProd(d,z);
+		
+		double middleScale = -dTd/dTz;
+		double rightScale = dTd/Math.sqrt(-dTd*dTz/step);
+		
+		int N = d.getNumElements();
+		for( int i = 0; i < N; i++ ) {
+			d.data[i] += middleScale*z.data[i] + rightScale*d.data[i];
+		}
+	}
+
+	/**
+	 *
+	 *
+	 * <p>
+	 * [1] D. Byatt and I. D. Coope and C. J. Price, "Effect of limited precision on the BFGS quasi-Newton algorithm"
+	 * Proc. of 11th Computational Techniques and Applications Conference CTAC-2003
+	 * </p>
+	 *
+	 * @param C
+	 * @param d
+	 * @param y
+	 * @param tempV0
+	 */
+	public static void conjugateUpdateC( DenseMatrix64F C , DenseMatrix64F d , DenseMatrix64F y ,
+										 double step, DenseMatrix64F tempV0 , DenseMatrix64F tempV1)
+	{
+		DenseMatrix64F z = tempV0;
+		DenseMatrix64F d_bar = tempV1;
+
+		CommonOps.multTransA(C,y,z);
+
+		double dTd = VectorVectorMult.innerProd(d,d);
+		double dTz = VectorVectorMult.innerProd(d,z);
+
+		double middleScale = -dTd/dTz;
+		double rightScale = dTd/Math.sqrt(-dTd*dTz/step);
+
+		int N = d.getNumElements();
+		for( int i = 0; i < N; i++ ) {
+			d.data[i] += middleScale*z.data[i] + rightScale*d.data[i];
+		}
 	}
 }

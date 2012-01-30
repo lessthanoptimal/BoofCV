@@ -25,7 +25,8 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -34,20 +35,25 @@ public class TestCalibrationPlanarGridZhang98 {
 
 	Random rand = new Random(234);
 
+	/**
+	 * Create a set of observations from a known grid, give it the observations and see if it can
+	 * reconstruct the known parameters.
+	 */
 	@Test
 	public void fullTest() {
 		CalibrationGridConfig config = GenericCalibrationGrid.createStandardConfig();
 		List<Point2D_F64> grid = config.computeGridPoints();
-		ParametersZhang98 initial = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
+		ParametersZhang98 expected = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
 
-		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
+		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(expected,grid);
 
 		CalibrationPlanarGridZhang98 alg = new CalibrationPlanarGridZhang98(config,true,2);
 
 		assertTrue(alg.process(observations));
 
-		fail("add test here");
-//		checkIntrinsicOnly(initial, found,0.01,0.1);
+		ParametersZhang98 found = alg.getOptimized();
+
+		checkIntrinsicOnly(expected, found,0.01,0.1);
 	}
 
 	/**
@@ -81,9 +87,9 @@ public class TestCalibrationPlanarGridZhang98 {
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
-		assertTrue(CalibrationPlanarGridZhang98.optimizedParam(observations, grid, initial, found));
+		assertTrue(CalibrationPlanarGridZhang98.optimizedParam(observations, grid,true, initial, found));
 
-		checkEquals(initial, found);
+		checkEquals(initial, found,initial);
 	}
 
 	/**
@@ -107,9 +113,13 @@ public class TestCalibrationPlanarGridZhang98 {
 		initial.x0 += rand.nextDouble()*0.01*Math.abs(initial.x0);
 		initial.y0 += rand.nextDouble()*0.01*Math.abs(initial.y0);
 
-		assertTrue(CalibrationPlanarGridZhang98.optimizedParam(observations,grid,initial,found));
+		for( int i = 0; i < expected.distortion.length; i++ ) {
+			initial.distortion[i] = rand.nextGaussian()*expected.distortion[i]*0.1;
+		}
 
-		checkEquals(expected, found);
+		assertTrue(CalibrationPlanarGridZhang98.optimizedParam(observations,grid,true,initial,found));
+
+		checkEquals(expected, found, initial);
 	}
 
 	private void checkIntrinsicOnly(ParametersZhang98 initial,
@@ -125,27 +135,34 @@ public class TestCalibrationPlanarGridZhang98 {
 		}
 	}
 
-	public static void checkEquals( ParametersZhang98 expected , ParametersZhang98 found )
+	public static void checkEquals( ParametersZhang98 expected , 
+									ParametersZhang98 found ,
+									ParametersZhang98 initial )
 	{
-		double tol=1e-6;
+		double pixelTol=0.5;
+		double paramTol=0.3;
 
-		assertEquals(expected.a,found.a,tol);
-		assertEquals(expected.b,found.b,tol);
-		assertEquals(expected.c,found.c,tol);
-		assertEquals(expected.x0,found.x0,tol);
-		assertEquals(expected.y0,found.y0,tol);
+		// see if it improved the estimate
+		assertTrue(Math.abs(initial.a-found.a)*paramTol >= Math.abs(expected.a-found.a));
+		assertTrue(Math.abs(initial.b-found.b)*paramTol >= Math.abs(expected.b-found.b));
+		assertEquals(expected.c, found.c, 1e-5);
+		assertTrue(Math.abs(initial.x0-found.x0)*paramTol >= Math.abs(expected.x0-found.x0));
+		assertTrue(Math.abs(initial.y0-found.y0)*paramTol >= Math.abs(expected.y0-found.y0));
 
 		for( int i = 0; i < expected.distortion.length; i++ ) {
-			assertEquals(expected.distortion[i],found.distortion[i],tol);
+			double e = expected.distortion[i];
+			double f = found.distortion[i];
+			double init = initial.distortion[i];
+			assertTrue(Math.abs(init - f) * 0.5 >= Math.abs(f - e));
 		}
 
 		for( int i = 0; i < 2; i++ ) {
 			ParametersZhang98.View pp = expected.views[i];
 			ParametersZhang98.View ff = found.views[i];
 
-			GeometryUnitTest.assertEquals(pp.T, ff.T, tol);
-			GeometryUnitTest.assertEquals(pp.rotation.unitAxisRotation,ff.rotation.unitAxisRotation,tol);
-			assertEquals(pp.rotation.theta,ff.rotation.theta,tol);
+			GeometryUnitTest.assertEquals(pp.T, ff.T, pixelTol);
+			GeometryUnitTest.assertEquals(pp.rotation.unitAxisRotation,ff.rotation.unitAxisRotation,pixelTol);
+			assertEquals(pp.rotation.theta,ff.rotation.theta,pixelTol);
 		}
 	}
 

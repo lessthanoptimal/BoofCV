@@ -18,7 +18,9 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.numerics.optimization.LevenbergMarquardt;
+import boofcv.numerics.optimization.FactoryOptimization;
+import boofcv.numerics.optimization.UnconstrainedLeastSquares;
+import boofcv.numerics.optimization.impl.UtilOptimize;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -30,7 +32,6 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-// todo add new skew support to non-linear
 public class CalibrationPlanarGridZhang98 {
 
 	Zhang98ComputeTargetHomography computeHomography;
@@ -42,6 +43,8 @@ public class CalibrationPlanarGridZhang98 {
 
 	List<Point2D_F64> grid;
 
+	boolean assumeZeroSkew;
+
 	public CalibrationPlanarGridZhang98( CalibrationGridConfig config ,
 										 boolean assumeZeroSkew ,
 										 int numSkewParam )
@@ -51,6 +54,7 @@ public class CalibrationPlanarGridZhang98 {
 		computeRadial = new RadialDistortionEstimateLinear(config,numSkewParam);
 		grid = config.computeGridPoints();
 		optimized = new ParametersZhang98(numSkewParam);
+		this.assumeZeroSkew = assumeZeroSkew;
 	}
 
 	/**
@@ -67,7 +71,7 @@ public class CalibrationPlanarGridZhang98 {
 			return false;
 
 		// perform non-linear optimization to improve results
-		if( !optimizedParam(observations,grid,initial,optimized))
+		if( !optimizedParam(observations,grid,assumeZeroSkew,initial,optimized))
 			return false;
 
 		return true;
@@ -105,29 +109,28 @@ public class CalibrationPlanarGridZhang98 {
 
 	public static boolean optimizedParam( List<List<Point2D_F64>> observations ,
 										  List<Point2D_F64> grid ,
+										  boolean assumeZeroSkew ,
 										  ParametersZhang98 initial ,
 										  ParametersZhang98 found )
 	{
-		int numModelParam = initial.size();
-		Zhang98OptimizationFunction func = new Zhang98OptimizationFunction(initial.createNew(),grid);
+		Zhang98OptimizationFunction func = new Zhang98OptimizationFunction(
+				initial.createNew(),assumeZeroSkew , grid,observations);
 
-		LevenbergMarquardt<List<Point2D_F64>,Integer> lm =
-				new LevenbergMarquardt<List<Point2D_F64>,Integer>(numModelParam,func);
+		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresLM(1e-8,1e-8,1e-3,true);
 
-		// todo this is stupid
-		List<Integer> state = new ArrayList<Integer>();
-		for( int i = 0; i < observations.size(); i++ ) {
-			state.add(i);
-		}
 
 		double model[] = new double[ initial.size() ];
-		initial.convertToParam(model);
-		if( !lm.process(model,observations,state) ) {
-			throw new RuntimeException("Egads");
+		initial.convertToParam(assumeZeroSkew,model);
+
+		lm.setFunction(func,null);
+		lm.initialize(model);
+
+		if( !UtilOptimize.process(lm,200) ) {
+			return false;
 		}
 
-		double param[] = lm.getModelParameters();
-		found.setFromParam(param);
+		double param[] = lm.getParameters();
+		found.setFromParam(assumeZeroSkew,param);
 		return true;
 	}
 
@@ -181,4 +184,7 @@ public class CalibrationPlanarGridZhang98 {
 		pt.y += pt.y*a;
 	}
 
+	public ParametersZhang98 getOptimized() {
+		return optimized;
+	}
 }

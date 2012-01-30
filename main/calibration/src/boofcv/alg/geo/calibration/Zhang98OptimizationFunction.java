@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.numerics.optimization.OptimizationResidual;
+import boofcv.numerics.optimization.functions.FunctionNtoM;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -33,19 +33,26 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class Zhang98OptimizationFunction implements OptimizationResidual<List<Point2D_F64>,Integer> {
+public class Zhang98OptimizationFunction implements FunctionNtoM {
 
+	int N,M;
+	
 	// description of the calibration grid
 	List<Point3D_F64> grid = new ArrayList<Point3D_F64>();
 	// optimization parameters
 	ParametersZhang98 param;
+	
+	// should it assume the skew parameter is zero?
+	private boolean assumeZeroSkew;
 
 	// variables for storing intermediate results
 	Se3_F64 se = new Se3_F64();
 
 	Point3D_F64 cameraPt = new Point3D_F64();
 	Point2D_F64 calibratedPt = new Point2D_F64();
-	double[] estimated;
+
+	// observations
+	List<List<Point2D_F64>> observations;
 
 	/**
 	 * Configurations the optimization function.
@@ -54,72 +61,71 @@ public class Zhang98OptimizationFunction implements OptimizationResidual<List<Po
 	 * and radial terms
 	 * @param grid Location of points on the calibration grid.  z=0
 	 */
-	public Zhang98OptimizationFunction( ParametersZhang98 param , List<Point2D_F64> grid ) {
+	public Zhang98OptimizationFunction( ParametersZhang98 param ,
+										boolean assumeZeroSkew,
+										List<Point2D_F64> grid ,
+										List<List<Point2D_F64>> observations ) {
+		if( param.views.length != observations.size() )
+			throw new IllegalArgumentException("For each view there should be one observation");
+
 		this.param = param;
+		this.observations = observations;
+		this.assumeZeroSkew = assumeZeroSkew;
 
 		for( Point2D_F64 p : grid ) {
 			this.grid.add( new Point3D_F64(p.x,p.y,0) );
 		}
 
-		estimated = new double[grid.size()*2];
+		N = assumeZeroSkew ? param.size() -1 : param.size();
+		M = observations.size()*grid.size()*2;
 	}
 
 	@Override
-	public void setModel(double[] model) {
-		param.setFromParam(model);
+	public int getN() {
+		return N;
 	}
 
 	@Override
-	public int getNumberOfFunctions() {
-		return estimated.length;
+	public int getM() {
+		return M;
 	}
 
 	@Override
-	public int getModelSize() {
-		return param.size();
-	}
-
-	@Override
-	public boolean estimate(Integer viewIndex, double[] estimated) {
-		ParametersZhang98.View v = param.views[viewIndex];
-
-		RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
-		se.T = v.T;
-
+	public void process(double[] input, double[] output) {
+		param.setFromParam(assumeZeroSkew,input);
+		
 		int index = 0;
-		for( int i = 0; i < grid.size(); i++ ) {
-			// Put the point in the camera's reference frame
-			SePointOps_F64.transform(se,grid.get(i), cameraPt);
+		for( int indexView = 0; indexView < param.views.length; indexView++ ) {
+			
+			ParametersZhang98.View v = param.views[indexView];
+			
+			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
+			se.T = v.T;
 
-			// calibrated pixel coordinates
-			calibratedPt.x = cameraPt.x/ cameraPt.z;
-			calibratedPt.y = cameraPt.y/ cameraPt.z;
+			List<Point2D_F64> obs = observations.get(indexView);
+			
+			for( int i = 0; i < grid.size(); i++ ) {
+				// Put the point in the camera's reference frame
+				SePointOps_F64.transform(se,grid.get(i), cameraPt);
 
-			// apply radial distortion
-			CalibrationPlanarGridZhang98.applyDistortion(calibratedPt, param.distortion);
+				// calibrated pixel coordinates
+				calibratedPt.x = cameraPt.x/ cameraPt.z;
+				calibratedPt.y = cameraPt.y/ cameraPt.z;
 
-			// convert to pixel coordinates
-			double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;
-			double y = param.b*calibratedPt.y + param.y0;
+				// apply radial distortion
+				CalibrationPlanarGridZhang98.applyDistortion(calibratedPt, param.distortion);
 
-			estimated[index++] = x;
-			estimated[index++] = y;
+				// convert to pixel coordinates
+				double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;
+				double y = param.b*calibratedPt.y + param.y0;
+
+				Point2D_F64 p = obs.get(i);
+				
+				output[index++] = p.x-x;
+				output[index++] = p.y-y;
+			}
 		}
-
-		return true;
 	}
 
-	@Override
-	public boolean computeResiduals(List<Point2D_F64> obs, Integer viewIndex, double[] residuals) {
-		estimate(viewIndex,estimated);
 
-		int index = 0;
-		for( int i = 0; i < obs.size(); i++ ) {
-			Point2D_F64 p = obs.get(i);
-			residuals[index] = p.x - estimated[index++];
-			residuals[index] = p.y - estimated[index++];
-		}
-
-		return true;
-	}
 }

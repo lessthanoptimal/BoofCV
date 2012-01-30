@@ -18,14 +18,18 @@
 
 package boofcv.alg.geo.calibration;
 
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -34,65 +38,73 @@ public class TestZhang98OptimizationFunction {
 
 	Random rand = new Random(234);
 
+	/**
+	 * Give it perfect observations and see if the residuals are all zero
+	 */
 	@Test
-	public void estimate() {
+	public void computeResidualsPerfect() {
 		CalibrationGridConfig config = GenericCalibrationGrid.createStandardConfig();
 		ParametersZhang98 param = GenericCalibrationGrid.createStandardParam(false, 2, 3, rand);
 
 		double array[] = new double[ param.size() ];
-		param.convertToParam(array);
+		param.convertToParam(false,array);
+		
+		List<Point2D_F64> gridPts = config.computeGridPoints();
 
-		Zhang98OptimizationFunction alg =
-				new Zhang98OptimizationFunction( new ParametersZhang98(2,3),config.computeGridPoints() );
-
-		alg.setModel(array);
-		double estimates[] = new double[ alg.getNumberOfFunctions() ];
+		List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
 
 		for( int i = 0; i < param.views.length; i++ ) {
-			alg.estimate(i,estimates);
+			observations.add( estimate(param,param.views[i],gridPts));
+		}
 
-			// just a really crude test to see if it blows up or done nothing
-			for( double d : estimates ) {
-				assertFalse(Double.isInfinite(d) || Double.isNaN(d));
-				assertTrue(d!=0);
-			}
+		Zhang98OptimizationFunction alg =
+				new Zhang98OptimizationFunction( new ParametersZhang98(2,3),false,gridPts,observations );
+
+		double residuals[] = new double[ alg.getM()];
+		for( int i = 0; i < residuals.length; i++ )
+			residuals[i] = 1;
+		
+		alg.process(array,residuals);
+		
+		for( double r : residuals ) {
+			assertEquals(0,r,1e-8);
 		}
 	}
+	
+	private List<Point2D_F64> estimate( ParametersZhang98 param ,
+								  ParametersZhang98.View v ,
+								  List<Point2D_F64> grid ) {
 
-	@Test
-	public void computeResiduals() {
-		CalibrationGridConfig config = GenericCalibrationGrid.createStandardConfig();
-		ParametersZhang98 param = GenericCalibrationGrid.createStandardParam(false, 2, 3, rand);
+		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+		
+		Se3_F64 se = new Se3_F64();
+		Point3D_F64 cameraPt = new Point3D_F64();
+		Point2D_F64 calibratedPt = new Point2D_F64();
 
-		double array[] = new double[ param.size() ];
-		param.convertToParam(array);
+		RotationMatrixGenerator.rodriguesToMatrix(v.rotation, se.getR());
+		se.T = v.T;
 
-		Zhang98OptimizationFunction alg =
-				new Zhang98OptimizationFunction( new ParametersZhang98(2,3),config.computeGridPoints() );
+		for( int i = 0; i < grid.size(); i++ ) {
+			Point2D_F64 gridPt = grid.get(i);
+			
+			// Put the point in the camera's reference frame
+			SePointOps_F64.transform(se, new Point3D_F64(gridPt.x,gridPt.y,0), cameraPt);
 
-		alg.setModel(array);
-		double estimates[] = new double[ alg.getNumberOfFunctions() ];
-		double residual[] = new double[ alg.getNumberOfFunctions() ];
+			// calibrated pixel coordinates
+			calibratedPt.x = cameraPt.x/ cameraPt.z;
+			calibratedPt.y = cameraPt.y/ cameraPt.z;
 
-		for( int i = 0; i < param.views.length; i++ ) {
-			// compute perfect observations then added some error
-			alg.estimate(i,estimates);
-			List<Point2D_F64> obs = new ArrayList<Point2D_F64>();
-			for( int j = 0; j < estimates.length; j += 2 ) {
-				Point2D_F64 p = new Point2D_F64();
-				p.x = estimates[j]+1;
-				p.y = estimates[j+1]+2;
-				obs.add(p);
-			}
+			// apply radial distortion
+			CalibrationPlanarGridZhang98.applyDistortion(calibratedPt, param.distortion);
 
-			// see if each element has the expected error
-			alg.computeResiduals(obs,i,residual);
-
-			for( int j = 0; j < residual.length; j += 2 ) {
-				assertEquals(1,residual[j],1e-8);
-				assertEquals(2,residual[j+1],1e-8);
-			}
+			// convert to pixel coordinates
+			double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;
+			double y = param.b*calibratedPt.y + param.y0;
+			
+			ret.add( new Point2D_F64(x,y));
 		}
+
+		return ret;
 	}
 
 }

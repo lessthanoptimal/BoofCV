@@ -47,7 +47,7 @@ public interface UnconstrainedLeastSquares extends IterativeOptimization {
 	 * on output data format.
 	 *
 	 * @param function Computes the output of M functions which take in M inputs.
-	 * @param jacobian Computes the Jacobian.
+	 * @param jacobian Computes the Jacobian.  If null a numerical Jacobian will be used.
 	 */
 	public void setFunction( FunctionNtoM function , FunctionNtoMxN jacobian );
 

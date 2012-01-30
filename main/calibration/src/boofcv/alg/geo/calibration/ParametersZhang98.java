@@ -94,14 +94,16 @@ public class ParametersZhang98 {
 		return 5+distortion.length+(4+3)*views.length;
 	}
 
-	public void setFromParam( double param[] ) {
-		a = param[0];
-		b = param[1];
-		c = param[2];
-		x0 = param[3];
-		y0 = param[4];
+	public void setFromParam( boolean assumeZeroSkew , double param[] ) {
+		int index = 0;
 
-		int index = 5;
+		a = param[index++];
+		b = param[index++];
+		if( !assumeZeroSkew )
+			c = param[index++];
+		x0 = param[index++];
+		y0 = param[index++];
+
 		for( int i = 0; i < distortion.length; i++ ) {
 			distortion[i] = param[index++];
 		}
@@ -117,14 +119,16 @@ public class ParametersZhang98 {
 		}
 	}
 
-	public void convertToParam( double param[] ) {
-		param[0] = a;
-		param[1] = b;
-		param[2] = c;
-		param[3] = x0;
-		param[4] = y0;
+	public void convertToParam( boolean assumeZeroSkew , double param[] ) {
+		int index = 0;
 
-		int index = 5;
+		param[index++] = a;
+		param[index++] = b;
+		if( !assumeZeroSkew )
+			param[index++] = c;
+		param[index++] = x0;
+		param[index++] = y0;
+
 		for( int i = 0; i < distortion.length; i++ ) {
 			param[index++] = distortion[i];
 		}

@@ -81,7 +81,6 @@ public class TestCachedNumericalGradientLineFunction {
 	@Test
 	public void testSetInput_step() {
 		CallCounterNtoS func = new CallCounterNtoS(new TrivialFunctionNtoS());
-		FunctionNtoN gradient = new NumericalGradientForward(new TrivialFunctionNtoS());
 
 		CachedNumericalGradientLineFunction alg = new CachedNumericalGradientLineFunction(func);
 
@@ -114,7 +113,7 @@ public class TestCachedNumericalGradientLineFunction {
 		alg.computeDerivative();
 
 		// see if the process counter went up one
-		assertEquals(11,func.count);
+		assertEquals(10,func.count);
 
 		// make sure the value is as expected
 		x = new double[]{1+2,2+2,3+2};

@@ -35,8 +35,10 @@ import org.ejml.data.DenseMatrix64F;
 public class FactoryOptimization {
 
 	/**
+	 * <p>
 	 * Creates a solver for the unconstrained minimization problem.  Here a function has N parameters
 	 * and a single output.  The goal is the minimize the output given the function and its derivative.
+	 * </p>
 	 *
 	 * @param relativeErrorTol Relative tolerance used to terminate the optimization. 0 <= x < 1
 	 * @param absoluteErrorTol Absolute tolerance used to terminate the optimization. 0 <= x
@@ -52,10 +54,11 @@ public class FactoryOptimization {
 	}
 
 	/**
+	 * <p>
 	 * Unconstrained least squares Levenberg-Marquardt (LM) optimizer for dense problems.  There are many
 	 * different variants of LM and this function provides an easy to use interface for selecting and
-	 * configuring them.
-	 *
+	 * configuring them.  Scaling of function parameters and output might be needed to ensure good results.
+	 * </p>
 	 *
 	 * @param relativeErrorTol tolerance used to terminate the optimization. 0 <= tol < 1
 	 * @param absoluteErrorTol Absolute tolerance used to terminate the optimization. 0 <= tol
