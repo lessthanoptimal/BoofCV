@@ -18,6 +18,7 @@
 
 package boofcv.numerics.optimization.impl;
 
+import boofcv.numerics.optimization.LineSearch;
 import boofcv.numerics.optimization.functions.GradientLineFunction;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -48,8 +49,6 @@ import org.ejml.ops.CommonOps;
  * </p>
  * @author Peter Abeles
  */
-// TODO add optional sanity checks to make sure it is symmetric positive definite
-// TODO make H's magnitude configurable
 public class QuasiNewtonBFGS
 {
 	// number of inputs
@@ -62,8 +61,13 @@ public class QuasiNewtonBFGS
 	// function being minimized and its gradient
 	private GradientLineFunction function;
 
+	// ----- variables and classes related to line search
 	// searches for a parameter that meets the Wolfe condition
-	private LineSearchManager lineSearch;
+	private LineSearch lineSearch;
+	private double funcMinValue;
+	private double gtol;
+	// derivative at the start of the line search
+	private double derivAtZero;
 
 	// inverse of the Hessian approximation
 	private DenseMatrix64F B;
@@ -100,11 +104,15 @@ public class QuasiNewtonBFGS
 	 *
 	 * @param function Function being optimized
 	 * @param lineSearch Line search that selects a solution that meets the Wolfe condition.
+	 * @param funcMinValue Minimum possible function value .
+	 * @param gtol slope coefficient for wolfe condition. 0 < gtol <= 1
 	 * @param relativeErrorTol Relative error termination condition. >= 0
 	 * @param absoluteErrorTol Absolute error termination condition. >= 0
 	 */
 	public QuasiNewtonBFGS( GradientLineFunction function ,
-							LineSearchManager lineSearch ,
+							LineSearch lineSearch ,
+							double funcMinValue ,
+							double gtol ,
 							double relativeErrorTol ,
 							double absoluteErrorTol )
 	{
@@ -114,9 +122,13 @@ public class QuasiNewtonBFGS
 			throw new IllegalArgumentException("absoluteErrorTol < 0");
 
 		this.lineSearch = lineSearch;
+		this.funcMinValue = funcMinValue;
+		this.gtol = gtol;
 		this.function = function;
 		this.relativeErrorTol = relativeErrorTol;
 		this.absoluteErrorTol = absoluteErrorTol;
+
+		lineSearch.setFunction(function);
 
 		N = function.getN();
 		
@@ -204,10 +216,63 @@ public class QuasiNewtonBFGS
 		CommonOps.mult(-1,B,g, searchVector);
 
 		// use the line search to find the next x
-		lineSearch.initialize(fx, x.data,g.data, searchVector.data,1,N);
+		if( !setupLineSearch(fx, x.data, g.data, searchVector.data, 1) ) {
+			// the search direction has a positive derivative, meaning the B matrix is
+			// no longer SPD.  Attempt to fix the situation by resetting the matrix
+			resetMatrixB();
+			// do the search again, it can't fail this time
+			CommonOps.mult(-1,B,g, searchVector);
+			setupLineSearch(fx, x.data, g.data, searchVector.data, 1);
+		}
 
 		mode = 1;
 		iterations++;
+	}
+
+	/**
+	 * This is a total hack.  Set B to a diagonal matrix where each diagonal element
+	 * is the value of the largest absolute value in B.  This will be SPD and hopefully
+	 * not screw up the search.
+	 */
+	private void resetMatrixB() {
+		// find the magnitude of the largest diagonal element
+		double maxDiag = 0;
+		for( int i = 0; i < N; i++ ) {
+			double d = Math.abs(B.get(i,i));
+			if( d > maxDiag )
+				maxDiag = d;
+		}
+
+		B.zero();
+		for( int i = 0; i < N; i++ ) {
+			B.set(i,i,maxDiag);
+		}
+	}
+
+	private boolean setupLineSearch( double funcAtStart , double[] startPoint , double[] startDeriv,
+									 double[] direction , double initialStep ) {
+		// derivative of the line search is the dot product of the gradient and search direction
+		derivAtZero = 0;
+		for( int i = 0; i < N; i++ ) {
+			derivAtZero += startDeriv[i]*direction[i];
+		}
+
+		// degenerate case
+		if( derivAtZero > 0 )
+			return false;
+
+		// setup line functions
+		function.setLine(startPoint, direction);
+
+		// use wolfe condition to set the maximum step size
+		double maxStep = (funcMinValue-funcAtStart)/(gtol*derivAtZero);
+		if( initialStep > maxStep )
+			initialStep = maxStep;
+		function.setInput(initialStep);
+		double funcAtInit = function.computeFunction();
+		lineSearch.init(funcAtStart,derivAtZero,funcAtInit,initialStep,0,maxStep);
+
+		return true;
 	}
 
 	/**
@@ -219,7 +284,7 @@ public class QuasiNewtonBFGS
 	private boolean performLineSearch() {
 		if( lineSearch.iterate() ) {
 			// see if the line search failed
-			if( !lineSearch.isSuccess() ) {
+			if( !lineSearch.isConverged() ) {
 				return terminateSearch(false,lineSearch.getWarning());
 			}
 
@@ -231,17 +296,17 @@ public class QuasiNewtonBFGS
 				x.data[i] += s.data[i] = step * searchVector.data[i];
 
 			// convergence tests
-			double g0 = lineSearch.getLineDerivativeAtZero();
-			double fstp = lineSearch.getFStep();
+			// function value at end of line search
+			double fstp = lineSearch.getFunction();
 
 			// see if the actual different and predicted differences are smaller than the
 			// error tolerance
-			if( Math.abs(fstp-fx) <= absoluteErrorTol && step*Math.abs(g0) <= absoluteErrorTol )
+			if( Math.abs(fstp-fx) <= absoluteErrorTol && step*Math.abs(derivAtZero) <= absoluteErrorTol )
 				return terminateSearch(true,null);
 
 			// check for relative convergence
 			if( Math.abs(fstp-fx) <= relativeErrorTol*Math.abs(fx)
-					&& step*Math.abs(g0) <= relativeErrorTol*Math.abs(fx) )
+					&& step*Math.abs(derivAtZero) <= relativeErrorTol*Math.abs(fx) )
 				return terminateSearch(true,null);
 
 			// current function value is now the previous

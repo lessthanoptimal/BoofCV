@@ -23,8 +23,8 @@ package boofcv.numerics.optimization;
  */
 public class EvaluateQuasiNewtonBFGS extends UnconstrainedMinimizationEvaluator{
 
-	public EvaluateQuasiNewtonBFGS(boolean verbose) {
-		super(verbose,true);
+	public EvaluateQuasiNewtonBFGS(boolean verbose, boolean printScore ) {
+		super(verbose,printScore);
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class EvaluateQuasiNewtonBFGS extends UnconstrainedMinimizationEvaluator{
 	}
 	
 	public static void main( String args[] ) {
-		EvaluateQuasiNewtonBFGS eval = new EvaluateQuasiNewtonBFGS(false);
+		EvaluateQuasiNewtonBFGS eval = new EvaluateQuasiNewtonBFGS(false,true);
 
 		System.out.println("Powell              ----------------");
 		eval.powell();

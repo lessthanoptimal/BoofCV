@@ -24,7 +24,6 @@ import boofcv.numerics.optimization.UnconstrainedMinimization;
 import boofcv.numerics.optimization.functions.FunctionNtoN;
 import boofcv.numerics.optimization.functions.FunctionNtoS;
 import boofcv.numerics.optimization.functions.GradientLineFunction;
-import boofcv.numerics.optimization.impl.LineSearchManager;
 import boofcv.numerics.optimization.impl.LineSearchMore94;
 import boofcv.numerics.optimization.impl.QuasiNewtonBFGS;
 
@@ -64,10 +63,7 @@ public class WrapQuasiNewtonBFGS implements UnconstrainedMinimization {
 			gradLine = new CachedGradientLineFunction(function,gradient);
 		}
 
-		LineSearchManager manager =
-				new LineSearchManager(lineSearch,gradLine,minFunctionValue,gtol);
-
-		alg = new QuasiNewtonBFGS(gradLine,manager,relativeErrorTol,absoluteErrorTol);
+		alg = new QuasiNewtonBFGS(gradLine,lineSearch,minFunctionValue,gtol,relativeErrorTol,absoluteErrorTol);
 	}
 
 	@Override
