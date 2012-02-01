@@ -33,12 +33,6 @@ import org.ejml.ops.CommonOps;
  * </p>
  *
  * <p>
- * If no initial estimate for the inverse Hessian matrix is provided a scaled identify matrix will be
- * used.  The scale of the identify matrix is generated with a heuristic that using the gradient at
- * two sample points.  The procedure with justification is described on page 143 in [1].
- * </p>
- *
- * <p>
  * The inverse Hessian update requires only a rank-2 making it efficient.  Stability requires that the
  * line search maintain the Wolfe or strong Wolfe condition or else the inverse Hessian matrix can stop
  * being symmetric positive definite.
@@ -55,8 +49,8 @@ public class QuasiNewtonBFGS
 	private int N;
 
 	// convergence conditions
-	double relativeErrorTol; // relative error tolerance
-	double absoluteErrorTol; // absolute error tolerance
+	private double relativeErrorTol; // relative error tolerance
+	private double absoluteErrorTol; // absolute error tolerance
 
 	// function being minimized and its gradient
 	private GradientLineFunction function;
@@ -65,6 +59,8 @@ public class QuasiNewtonBFGS
 	// searches for a parameter that meets the Wolfe condition
 	private LineSearch lineSearch;
 	private double funcMinValue;
+	// from wolfe condition.  Used to estimate max line search step
+	// This must be the same as what's specified internally in 'lineSearch'
 	private double gtol;
 	// derivative at the start of the line search
 	private double derivAtZero;
@@ -184,11 +180,9 @@ public class QuasiNewtonBFGS
 	public boolean iterate() {
 //		System.out.println("QN iterations "+iterations);
 		if( mode == 0 ) {
-//			System.out.println("----------------- Compute search direction");
 			computeSearchDirection();
 			return false;
 		} else {
-//			System.out.println("----------------- Perform line search");
 			return performLineSearch();
 		}
 	}
@@ -197,7 +191,6 @@ public class QuasiNewtonBFGS
 	 * Computes the next search direction using BFGS
 	 */
 	private void computeSearchDirection() {
-//		System.out.println("funv = "+fx);
 		// Compute the function's gradient
 		function.computeGradient(temp0_Nx1.data);
 

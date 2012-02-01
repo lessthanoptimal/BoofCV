@@ -86,7 +86,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		alg = FactoryCornerDetector.createKlt(2,1,500,derivType);
 		addAlgorithm(0,"KLT",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 
-		addAlgorithm(1,"SURF", FactoryDescribeRegionPoint.surf(true, imageType));
+		addAlgorithm(1,"SURF", FactoryDescribeRegionPoint.surfm(true, imageType));
 		addAlgorithm(1,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(1,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(1,"Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));

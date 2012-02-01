@@ -71,10 +71,12 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 		addAlgorithm(0, "Gradient Average Weighted", FactoryOrientationAlgs.average(radius,true,derivType));
 		addAlgorithm(0, "Gradient Histogram 10", FactoryOrientationAlgs.histogram(10,radius,false,derivType));
 		addAlgorithm(0, "Gradient Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType));
-		addAlgorithm(0, "Gradient Sliding Window", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
-		addAlgorithm(0, "Gradient Sliding Window Weighted", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
+		addAlgorithm(0, "Gradient Sliding", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
+		addAlgorithm(0, "Gradient Sliding Weighted", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
 		addAlgorithm(0, "Integral Average", FactoryOrientationAlgs.average_ii(radius,1,4,0,imageType));
 		addAlgorithm(0, "Integral Average Weighted", FactoryOrientationAlgs.average_ii(radius,1,4,-1,imageType));
+		addAlgorithm(0, "Integral Sliding", FactoryOrientationAlgs.sliding_ii(1, 1,4,0, 4, imageType));
+		addAlgorithm(0, "Integral Sliding Weighted", FactoryOrientationAlgs.sliding_ii(1, 1,4,-1, 4, imageType));
 
 		panel = new ImagePanel();
 		setMainGUI(panel);
@@ -179,9 +181,9 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","data/shapes01.png");
-		manager.add("sunflowers","data/sunflowers.png");
-		manager.add("beach","data/scale/beach02.jpg");
+		manager.add("shapes","../data/evaluation/shapes01.png");
+		manager.add("sunflowers","../data/evaluation/sunflowers.png");
+		manager.add("beach","../data/evaluation/scale/beach02.jpg");
 
 		app.setInputManager(manager);
 
