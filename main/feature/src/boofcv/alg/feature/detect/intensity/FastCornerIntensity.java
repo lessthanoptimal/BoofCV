@@ -29,6 +29,11 @@ import boofcv.struct.image.ImageSingleBand;
  * approach to corner detection" by Edward Rosten, Reid Porter, and Tom Drummond.
  * <p/>
  *
+ * <p>
+ * NOTE: This implementation might vary from the original algorithm.  Take care when using this class for
+ * academic research.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public interface FastCornerIntensity<T extends ImageSingleBand> extends FeatureIntensity<T> {

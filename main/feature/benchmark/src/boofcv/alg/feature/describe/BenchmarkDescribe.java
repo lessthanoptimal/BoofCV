@@ -143,7 +143,6 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		System.out.println();
 
 		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryDescribeRegionPoint.<I,II>surf(true, imageType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("SURF2", FactoryDescribeRegionPoint.<I,II>surf2(true, imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryDescribeRegionPoint.<I,II>surfm(true, imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("SURF UP", FactoryDescribeRegionPoint.<I,II>surf(false, imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("MSURF UP", FactoryDescribeRegionPoint.<I,II>surfm(false, imageType)),TEST_TIME);

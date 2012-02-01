@@ -70,20 +70,6 @@ public class FactoryDescribeRegionPoint {
 		return new WrapDescribeSurf<T,II>( alg ,orientation);
 	}
 
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T> surf2( boolean isOriented , Class<T> imageType) {
-		OrientationIntegral<II> orientation = null;
-
-		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
-
-		if( isOriented )
-//			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
-			orientation = FactoryOrientationAlgs.sliding_ii(0.65, Math.PI/3.0,8,-1, 6, integralType);
-
-		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>surf2(integralType);
-		return new WrapDescribeSurf<T,II>( alg ,orientation);
-	}
-
 	/**
 	 * <p>
 	 * Modified SURF descriptor configured for optimal descriptor stability.  Runs slower
