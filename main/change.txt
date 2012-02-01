@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 
+Date    : 2012/02/01
 Version : Alpha 0.5
 
 - Improved SURF performance
@@ -12,11 +12,14 @@ Version : Alpha 0.5
   * Now is the best performing SURF implementation in the benchmark
 - ImplOrientationSlidingWindowIntegral has been replaced with a faster and more accurate algorithm
 - Improved integral image support
+- Improved sparse gradient support
 - Refactored sparse image operator code
   * Added SparseImageSample interface
 - Added/Improved unconstrained non-linear optimization code
   * Quasi-Newton line search
   * Levenberg-Marquardt
+- Geometric vision and calibration code which uses non-linear optimization now works correectly
+- Started converting internal micro benchmarks to use Caliper
 
 ---------------------------------------------
 Date    : 2012/01/06
