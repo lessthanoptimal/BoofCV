@@ -174,6 +174,7 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 		int regionR = regionSize/2;
 		int regionEnd = regionSize-regionR;
 
+		int sampleGridWidth = regionSize+2*overLap;
 		int regionIndex = 0;
 
 		// when computing the pixel coordinates it is more precise to round to the nearest integer
@@ -184,9 +185,9 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 
 		// first sample the whole grid at once to avoid sampling overlapping regions twice
 		int index = 0;
-		for( int rY = -regionR-overLap,i=0; rY < regionEnd+overLap; rY++,i++) {
+		for( int rY = -regionR-overLap; rY < regionEnd+overLap; rY++) {
 			double regionY = rY*scale;
-			for( int rX = -regionR-overLap,j=0; rX < regionEnd+overLap; rX++,j++,index++ ) {
+			for( int rX = -regionR-overLap; rX < regionEnd+overLap; rX++,index++ ) {
 				double regionX = rX*scale;
 
 				// rotate the pixel along the feature's direction
@@ -206,8 +207,8 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 				double sum_dx = 0, sum_dy=0, sum_adx=0, sum_ady=0;
 
 				// compute and sum up the response  inside the sub-region
-				index = (rY+regionR)*sampleWidth + rX+regionR;
 				for( int i = 0; i < totalSampleWidth; i++ ) {
+					index = (rY+regionR+i)*sampleGridWidth + rX+regionR;
 					for( int j = 0; j < totalSampleWidth; j++ , index++ ) {
 						double w = weightSub.get(j,i);
 
