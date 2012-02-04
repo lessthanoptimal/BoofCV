@@ -48,7 +48,10 @@ public class VisualizeFeatures {
 	}
 
 	public static void drawPoint( Graphics2D g2 , int x , int y , Color color ) {
-		int r = 5;
+		drawPoint(g2,x,y,5,color);
+	}
+
+	public static void drawPoint( Graphics2D g2 , int x , int y ,int r,  Color color ) {
 		int w = r*2+1;
 
 		int r2 = r+2;

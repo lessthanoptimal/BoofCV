@@ -177,7 +177,7 @@ public class TrackVideoPyramidKLT<I extends ImageSingleBand, D extends ImageSing
 
 		GeneralFeatureIntensity<I,D> intensity =
 				new WrapperGradientCornerIntensity<I,D>(
-						FactoryPointIntensityAlg.createKlt(config.featureRadius, derivType));
+						FactoryPointIntensityAlg.createKlt(config.featureRadius, false , derivType));
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config.featureRadius+2,configKLt.minDeterminant,0,false, true);
 		extractor.setInputBorder(config.featureRadius * scalingTop);
 		GeneralFeatureDetector<I,D> detector =

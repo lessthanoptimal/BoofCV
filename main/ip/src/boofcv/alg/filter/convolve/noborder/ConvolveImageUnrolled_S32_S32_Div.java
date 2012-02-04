@@ -1,27 +1,24 @@
 /*
- * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ * Copyright 2011 Peter Abeles
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageInt16;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSInt32;
 
 /**
  * <p>
@@ -40,9 +37,9 @@ import boofcv.struct.image.ImageSInt16;
  *
  * @author Peter Abeles
  */
-public class ConvolveImageUnrolled_I16_I16_Div {
+public class ConvolveImageUnrolled_S32_S32_Div {
 	public static boolean horizontal( Kernel1D_I32 kernel ,
-								   ImageSInt16 image, ImageInt16 dest,
+								   ImageSInt32 image, ImageSInt32 dest,
 								   int divisor, boolean includeBorder) {
 		switch( kernel.width ) {
 			case 3:
@@ -72,7 +69,7 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 	}
 
 	public static boolean vertical( Kernel1D_I32 kernel ,
-								   ImageSInt16 image, ImageInt16 dest,
+								   ImageSInt32 image, ImageSInt32 dest,
 								   int divisor, boolean includeBorder) {
 		switch( kernel.width ) {
 			case 3:
@@ -102,7 +99,7 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 	}
 
 	public static boolean convolve( Kernel2D_I32 kernel ,
-								   ImageSInt16 image, ImageInt16 dest, int divisor ) {
+								   ImageSInt32 image, ImageSInt32 dest, int divisor ) {
 		switch( kernel.width ) {
 			case 3:
 				convolve3(kernel,image,dest,divisor);
@@ -131,10 +128,10 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 	}
 
 	public static void horizontal3( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageInt16 dest,
+									ImageSInt32 image, ImageSInt32 dest,
 									int divisor, boolean includeBorder) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -158,16 +155,16 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc])*k3;
 
-				dataDst[indexDst++] = ( short )(total/divisor);
+				dataDst[indexDst++] = (total/divisor);
 			}
 		}
 	}
 
 	public static void horizontal5( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageInt16 dest,
+									ImageSInt32 image, ImageSInt32 dest,
 									int divisor, boolean includeBorder) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -195,16 +192,16 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				total += (dataSrc[indexSrc++])*k4;
 				total += (dataSrc[indexSrc])*k5;
 
-				dataDst[indexDst++] = ( short )(total/divisor);
+				dataDst[indexDst++] = (total/divisor);
 			}
 		}
 	}
 
 	public static void horizontal7( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageInt16 dest,
+									ImageSInt32 image, ImageSInt32 dest,
 									int divisor, boolean includeBorder) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -236,16 +233,16 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				total += (dataSrc[indexSrc++])*k6;
 				total += (dataSrc[indexSrc])*k7;
 
-				dataDst[indexDst++] = ( short )(total/divisor);
+				dataDst[indexDst++] = (total/divisor);
 			}
 		}
 	}
 
 	public static void horizontal9( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageInt16 dest,
+									ImageSInt32 image, ImageSInt32 dest,
 									int divisor, boolean includeBorder) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -281,16 +278,16 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				total += (dataSrc[indexSrc++])*k8;
 				total += (dataSrc[indexSrc])*k9;
 
-				dataDst[indexDst++] = ( short )(total/divisor);
+				dataDst[indexDst++] = (total/divisor);
 			}
 		}
 	}
 
 	public static void horizontal11( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageInt16 dest,
+									ImageSInt32 image, ImageSInt32 dest,
 									int divisor, boolean includeBorder) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -330,17 +327,17 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				total += (dataSrc[indexSrc++])*k10;
 				total += (dataSrc[indexSrc])*k11;
 
-				dataDst[indexDst++] = ( short )(total/divisor);
+				dataDst[indexDst++] = (total/divisor);
 			}
 		}
 	}
 
 	public static void vertical3( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
+								 ImageSInt32 image, ImageSInt32 dest,
 								 int divisor , boolean includeBorder)
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -369,17 +366,17 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k3;
 
-				dataDst[indexDst++] = ( short )(total/divisor);
+				dataDst[indexDst++] = (total/divisor);
 			}
 		}
 	}
 
 	public static void vertical5( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
+								 ImageSInt32 image, ImageSInt32 dest,
 								 int divisor , boolean includeBorder)
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -414,17 +411,17 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k5;
 
-				dataDst[indexDst++] = ( short )(total/divisor);
+				dataDst[indexDst++] = (total/divisor);
 			}
 		}
 	}
 
 	public static void vertical7( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
+								 ImageSInt32 image, ImageSInt32 dest,
 								 int divisor , boolean includeBorder)
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -465,17 +462,17 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k7;
 
-				dataDst[indexDst++] = ( short )(total/divisor);
+				dataDst[indexDst++] = (total/divisor);
 			}
 		}
 	}
 
 	public static void vertical9( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
+								 ImageSInt32 image, ImageSInt32 dest,
 								 int divisor , boolean includeBorder)
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -522,17 +519,17 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k9;
 
-				dataDst[indexDst++] = ( short )(total/divisor);
+				dataDst[indexDst++] = (total/divisor);
 			}
 		}
 	}
 
 	public static void vertical11( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
+								 ImageSInt32 image, ImageSInt32 dest,
 								 int divisor , boolean includeBorder)
 	{
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = image.data;
+		final int[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -585,15 +582,15 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k11;
 
-				dataDst[indexDst++] = ( short )(total/divisor);
+				dataDst[indexDst++] = (total/divisor);
 			}
 		}
 	}
 
-	public static void convolve3( Kernel2D_I32 kernel, ImageSInt16 src, ImageInt16 dest , int divisor )
+	public static void convolve3( Kernel2D_I32 kernel, ImageSInt32 src, ImageSInt32 dest , int divisor )
 	{
-		final short[] dataSrc = src.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -641,15 +638,15 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 			}
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
+				dataDst[indexDst++] = (totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve5( Kernel2D_I32 kernel, ImageSInt16 src, ImageInt16 dest , int divisor )
+	public static void convolve5( Kernel2D_I32 kernel, ImageSInt32 src, ImageSInt32 dest , int divisor )
 	{
-		final short[] dataSrc = src.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -705,15 +702,15 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 			}
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
+				dataDst[indexDst++] = (totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve7( Kernel2D_I32 kernel, ImageSInt16 src, ImageInt16 dest , int divisor )
+	public static void convolve7( Kernel2D_I32 kernel, ImageSInt32 src, ImageSInt32 dest , int divisor )
 	{
-		final short[] dataSrc = src.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -777,15 +774,15 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 			}
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
+				dataDst[indexDst++] = (totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve9( Kernel2D_I32 kernel, ImageSInt16 src, ImageInt16 dest , int divisor )
+	public static void convolve9( Kernel2D_I32 kernel, ImageSInt32 src, ImageSInt32 dest , int divisor )
 	{
-		final short[] dataSrc = src.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -857,15 +854,15 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 			}
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
+				dataDst[indexDst++] = (totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve11( Kernel2D_I32 kernel, ImageSInt16 src, ImageInt16 dest , int divisor )
+	public static void convolve11( Kernel2D_I32 kernel, ImageSInt32 src, ImageSInt32 dest , int divisor )
 	{
-		final short[] dataSrc = src.data;
-		final short[] dataDst = dest.data;
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -945,7 +942,7 @@ public class ConvolveImageUnrolled_I16_I16_Div {
 			}
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ( short )(totalRow[x] / divisor);
+				dataDst[indexDst++] = (totalRow[x] / divisor);
 			}
 		}
 	}

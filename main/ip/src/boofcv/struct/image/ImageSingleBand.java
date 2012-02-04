@@ -197,16 +197,4 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 	 * @param data data array
 	 */
 	protected abstract void _setData(Object data);
-
-	/**
-	 * Returns a new image.  If either width or height are
-	 * set to -1 then none of the class parameters set. Otherwise
-	 * a new image is created with the specified dimensions which has all
-	 * other parameters the same as the original matrix.
-	 *
-	 * @param imgWidth
-	 * @param imgHeight
-	 * @return new image
-	 */
-	public abstract T _createNew(int imgWidth, int imgHeight);
 }

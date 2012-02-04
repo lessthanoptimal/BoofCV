@@ -89,7 +89,7 @@ public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<
 	public void process(T input, T output) {
 		try {
 			if( storage == null ) {
-				storage = output._createNew(output.width,output.height);
+				storage = (ImageSingleBand)output._createNew(output.width,output.height);
 			} else {
 				storage.reshape(output.width,output.height);
 			}

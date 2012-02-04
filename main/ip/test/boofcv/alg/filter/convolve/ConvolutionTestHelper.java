@@ -50,7 +50,7 @@ public class ConvolutionTestHelper {
 
 		try {
 			ImageSingleBand img = (ImageSingleBand) imageType.newInstance();
-			return img._createNew(width, height);
+			return (ImageSingleBand)img._createNew(width, height);
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
@@ -67,7 +67,7 @@ public class ConvolutionTestHelper {
 			Object o = input[i];
 			if (o instanceof ImageSingleBand) {
 				ImageSingleBand b = (ImageSingleBand)o;
-				ImageSingleBand img = b._createNew(b.width, b.height);
+				ImageSingleBand img = (ImageSingleBand)b._createNew(b.width, b.height);
 				img.setTo((ImageSingleBand) o);
 				output[i] = img;
 			} else {

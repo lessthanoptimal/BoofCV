@@ -27,6 +27,7 @@ import boofcv.gui.SelectImagePanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageSingleBand;
@@ -57,9 +58,9 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 
 	// GUI components
 	GridCalibPanel calibGUI;
-	ImagePanel gui = new ImagePanel();
+	ImageZoomPanel gui = new ImageZoomPanel();
 
-	// has an iamge been processed
+	// has an image been processed
 	boolean processedImage = false;
 
 	// work buffer that stuff is drawn inside of and displayed
@@ -81,7 +82,7 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 		calibGUI = new GridCalibPanel();
 		calibGUI.setListener( this );
 		calibGUI.setMinimumSize(calibGUI.getPreferredSize());
-		
+
 		panel.add(calibGUI,BorderLayout.WEST);
 		panel.add(gui,BorderLayout.CENTER);
 		
@@ -146,6 +147,7 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 			calibGUI.setSuccessMessage("FAILED", false);
 		
 		gui.setBufferedImage(workImage);
+		gui.setScale(calibGUI.getScale());
 		gui.repaint();
 		
 		processedImage = true;
@@ -161,9 +163,10 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 	}
 
 	private void drawPoints( Graphics2D g2 , java.util.List<Point2D_I32> foundTarget) {
+		g2.setStroke(new BasicStroke(1.0f));
 		for( int i = 0; i < foundTarget.size(); i++ ) {
 			Point2D_I32 p = foundTarget.get(i);
-			VisualizeFeatures.drawPoint(g2, p.x, p.y, Color.RED);
+			VisualizeFeatures.drawPoint(g2, p.x, p.y, 2 , Color.RED);
 		}
 	}
 
@@ -194,21 +197,16 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 		Font regular = new Font("Serif", Font.PLAIN, 16);
 		g2.setFont(regular);
 
-		g2.setStroke(new BasicStroke(4.0f));
-
 		AffineTransform origTran = g2.getTransform();
 		for( int i = 0; i < foundTarget.size(); i++ ) {
 			Point2D_I32 p = foundTarget.get(i);
 			String text = String.format("%2d",i);
 
-			GlyphVector gv = regular.createGlyphVector(g2.getFontRenderContext(), text);
-			Shape shape = gv.getOutline();
-
-			AffineTransform adjusted = AffineTransform.getTranslateInstance(p.x, p.y);
-			adjusted.concatenate(origTran);
-			g2.setTransform(adjusted);
 			g2.setColor(Color.BLACK);
-			g2.draw(shape);
+			g2.drawString(text,p.x-1,p.y);
+			g2.drawString(text,p.x+1,p.y);
+			g2.drawString(text,p.x,p.y-1);
+			g2.drawString(text,p.x,p.y+1);
 			g2.setTransform(origTran);
 			g2.setColor(Color.GREEN);
 			g2.drawString(text,p.x,p.y);

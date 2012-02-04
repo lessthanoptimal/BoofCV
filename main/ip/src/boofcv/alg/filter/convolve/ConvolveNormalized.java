@@ -168,6 +168,25 @@ public class ConvolveNormalized {
 	}
 
 	/**
+	 * Performs a horizontal 1D convolution across the image while re-normalizing the kernel depending on its
+	 * overlap with the image.
+	 *
+	 * @param image	 The original image. Not modified.
+	 * @param dest	 Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void horizontal(Kernel1D_I32 kernel, ImageSInt32 image, ImageSInt32 dest ) {
+		InputSanityCheck.checkSameShape(image, dest);
+
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.horizontal(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.horizontal(kernel,image,dest,kernel.computeSum(),true);
+			ConvolveNormalized_JustBorder.horizontal(kernel,image,dest);
+		}
+	}
+
+	/**
 	 * Performs a vertical 1D convolution across the image while re-normalizing the kernel depending on its
 	 * overlap with the image.
 	 *
@@ -176,6 +195,25 @@ public class ConvolveNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
+		InputSanityCheck.checkSameShape(image, dest);
+
+		if( kernel.width >= image.height ) {
+			ConvolveNormalizedNaive.vertical(kernel,image,dest);
+		} else {
+			ConvolveImageNoBorder.vertical(kernel,image,dest,kernel.computeSum(),true);
+			ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
+		}
+	}
+
+	/**
+	 * Performs a vertical 1D convolution across the image while re-normalizing the kernel depending on its
+	 * overlap with the image.
+	 *
+	 * @param image	 The original image. Not modified.
+	 * @param dest	 Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void vertical(Kernel1D_I32 kernel, ImageSInt32 image, ImageSInt32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.height ) {

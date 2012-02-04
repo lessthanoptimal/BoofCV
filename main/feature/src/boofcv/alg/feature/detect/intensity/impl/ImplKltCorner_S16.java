@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageSInt16;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} based off of {@link ImplSsdCornerNaive_S16}.
+ * Implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} based off of {@link ImplSsdCornerNaive}.
  * </p>
  *
  * @author Peter Abeles

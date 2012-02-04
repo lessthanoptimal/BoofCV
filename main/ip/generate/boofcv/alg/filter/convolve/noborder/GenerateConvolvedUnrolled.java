@@ -18,6 +18,8 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
+import boofcv.misc.AutoTypeImage;
+import boofcv.misc.CodeGeneratorBase;
 import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
@@ -27,12 +29,10 @@ import java.io.PrintStream;
 /**
  * @author Peter Abeles
  */
-public class GenerateConvolvedUnrolled {
+public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 
 	final static int numUnrolled = 5;
 
-	PrintStream out;
-	String className;
 	String typeKernel;
 	String typeInput;
 	String typeOutput;
@@ -43,92 +43,39 @@ public class GenerateConvolvedUnrolled {
 	String sumType;
 	boolean hasDivisor;
 
-	public void createAll() throws FileNotFoundException {
-		createF32();
-		createU8_I8();
-		createU8_I16();
-		createS16_I16();
-		createS16_I16_div();
+	@Override
+	public void generate() throws FileNotFoundException {
+		create(AutoTypeImage.F32,AutoTypeImage.F32,false);
+		create(AutoTypeImage.U8,AutoTypeImage.I8,true);
+		create(AutoTypeImage.U8,AutoTypeImage.I16,false);
+		create(AutoTypeImage.S16,AutoTypeImage.I16,false);
+		create(AutoTypeImage.S16,AutoTypeImage.I16,true);
+		create(AutoTypeImage.S32,AutoTypeImage.S32,false);
+		create(AutoTypeImage.S32,AutoTypeImage.S32,true);
 	}
 
-	public void createF32() throws FileNotFoundException {
-		className = "ConvolveImageUnrolled_F32_F32";
-		typeKernel = "F32";
-		typeInput = "ImageFloat32";
-		typeOutput = "ImageFloat32";
-		dataKernel = "float";
-		dataInput = "float";
-		dataOutput = "float";
-		sumType = "float";
-		bitWise = "";
-		hasDivisor = false;
+	protected void create( AutoTypeImage inputImg , AutoTypeImage outputImg , boolean divided ) throws FileNotFoundException {
+		boolean isInteger = inputImg.isInteger();
 
-		createFile();
+		String name = "ConvolveImageUnrolled_"+inputImg.getAbbreviatedType()+"_"+outputImg.getAbbreviatedType();
+		if( divided )
+			name += "_Div";
+
+		typeKernel = isInteger ? "I32" : "F32";
+		typeInput = inputImg.getImageName();
+		typeOutput = outputImg.getImageName();
+		dataKernel = isInteger ? "int" : "float";
+		dataInput = inputImg.getDataType();
+		dataOutput = outputImg.getDataType();
+		sumType = isInteger ? "int" : "float";
+		bitWise = inputImg.getBitWise();
+		hasDivisor = divided;
+
+		createFile(name);
 	}
 
-	public void createU8_I8() throws FileNotFoundException {
-		className = "ConvolveImageUnrolled_I8_I8_Div";
-		typeKernel = "I32";
-		typeInput = "ImageUInt8";
-		typeOutput = "ImageInt8";
-		dataKernel = "int";
-		dataInput = "byte";
-		dataOutput = "byte";
-		sumType = "int";
-		bitWise = " & 0xFF";
-		hasDivisor = true;
-
-		createFile();
-	}
-
-	public void createU8_I16() throws FileNotFoundException {
-		className = "ConvolveImageUnrolled_I8_I16";
-		typeKernel = "I32";
-		typeInput = "ImageUInt8";
-		typeOutput = "ImageInt16";
-		dataKernel = "int";
-		dataInput = "byte";
-		dataOutput = "short";
-		sumType = "int";
-		bitWise = " & 0xFF";
-		hasDivisor = false;
-
-		createFile();
-	}
-
-	public void createS16_I16() throws FileNotFoundException {
-		className = "ConvolveImageUnrolled_I16_I16";
-		typeKernel = "I32";
-		typeInput = "ImageSInt16";
-		typeOutput = "ImageInt16";
-		dataKernel = "int";
-		dataInput = "short";
-		dataOutput = "short";
-		sumType = "int";
-		bitWise = "";
-		hasDivisor = false;
-
-		createFile();
-	}
-
-	public void createS16_I16_div() throws FileNotFoundException {
-		className = "ConvolveImageUnrolled_I16_I16_Div";
-		typeKernel = "I32";
-		typeInput = "ImageSInt16";
-		typeOutput = "ImageInt16";
-		dataKernel = "int";
-		dataInput = "short";
-		dataOutput = "short";
-		sumType = "int";
-		bitWise = "";
-		hasDivisor = true;
-
-		createFile();
-	}
-
-	public void createFile() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
-
+	public void createFile( String fileName ) throws FileNotFoundException {
+		setOutputFile(fileName);
 		printPreamble();
 		createMaster("horizontal",1,hasDivisor);
 		createMaster("vertical",1,hasDivisor);
@@ -151,9 +98,6 @@ public class GenerateConvolvedUnrolled {
 	}
 
 	public void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.filter.convolve.noborder;\n");
-		out.println();
 		out.print("import boofcv.struct.convolve.Kernel1D_" + typeKernel + ";\n");
 		out.print("import boofcv.struct.convolve.Kernel2D_" + typeKernel + ";\n");
 		out.print("import boofcv.struct.image." + typeInput + ";\n");
@@ -451,6 +395,6 @@ public class GenerateConvolvedUnrolled {
 	public static void main(String args[]) throws FileNotFoundException {
 		GenerateConvolvedUnrolled a = new GenerateConvolvedUnrolled();
 
-		a.createAll();
+		a.generate();
 	}
 }

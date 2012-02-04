@@ -19,7 +19,12 @@
 package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.PixelTransformAffine_F32;
+import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
 import boofcv.struct.pyramid.PyramidUpdaterFloat;
@@ -39,7 +44,6 @@ public class PyramidUpdateSubsampleScale< T extends ImageSingleBand>
 
 	// interpolation algorithm
 	protected InterpolatePixel<T> interpolate;
-
 
 	public PyramidUpdateSubsampleScale(InterpolatePixel<T> interpolate) {
 		this.interpolate = interpolate;
@@ -63,7 +67,8 @@ public class PyramidUpdateSubsampleScale< T extends ImageSingleBand>
 			else
 				s = (float)pyramid.scale[0];
 
-			DistortImageOps.scale(prev,layer,interpolate);
+			PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,prev);
+			DistortImageOps.distortSingle(prev,layer,model,interpolate);
 		}
 	}
 }

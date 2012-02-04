@@ -32,16 +32,17 @@ public class TestConvolveNormalized_JustBorder {
 	@Test
 	public void compareToNaive() {
 		CompareToNaive test = new CompareToNaive();
+		int numFunctions = 12;
 
 		for( int i = 0; i < 2; i++ ) {
 			test.setImageDimension(15+i,20+i);          
 			// convolve with different kernel sizes relative to the skip amount
 			test.setKernelRadius(1);
-			test.performTests(9);
+			test.performTests(numFunctions);
 			test.setKernelRadius(2);
-			test.performTests(9);
+			test.performTests(numFunctions);
 			test.setKernelRadius(3);
-			test.performTests(9);
+			test.performTests(numFunctions);
 
 			// NOTE it intentionally can't handle this special case
 			// now try a pathological case where the kernel is larger than the image

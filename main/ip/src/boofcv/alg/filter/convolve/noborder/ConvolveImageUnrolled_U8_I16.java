@@ -1,27 +1,25 @@
 /*
- * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ * Copyright 2011 Peter Abeles
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageInt8;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageInt16;
 
 /**
  * <p>
@@ -40,29 +38,29 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class ConvolveImageUnrolled_I8_I8_Div {
+public class ConvolveImageUnrolled_U8_I16 {
 	public static boolean horizontal( Kernel1D_I32 kernel ,
-								   ImageUInt8 image, ImageInt8 dest,
-								   int divisor, boolean includeBorder) {
+								   ImageUInt8 image, ImageInt16 dest,
+								   boolean includeBorder) {
 		switch( kernel.width ) {
 			case 3:
-				horizontal3(kernel,image,dest,divisor,includeBorder);
+				horizontal3(kernel,image,dest,includeBorder);
 				break;
 
 			case 5:
-				horizontal5(kernel,image,dest,divisor,includeBorder);
+				horizontal5(kernel,image,dest,includeBorder);
 				break;
 
 			case 7:
-				horizontal7(kernel,image,dest,divisor,includeBorder);
+				horizontal7(kernel,image,dest,includeBorder);
 				break;
 
 			case 9:
-				horizontal9(kernel,image,dest,divisor,includeBorder);
+				horizontal9(kernel,image,dest,includeBorder);
 				break;
 
 			case 11:
-				horizontal11(kernel,image,dest,divisor,includeBorder);
+				horizontal11(kernel,image,dest,includeBorder);
 				break;
 
 			default:
@@ -72,27 +70,27 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static boolean vertical( Kernel1D_I32 kernel ,
-								   ImageUInt8 image, ImageInt8 dest,
-								   int divisor, boolean includeBorder) {
+								   ImageUInt8 image, ImageInt16 dest,
+								   boolean includeBorder) {
 		switch( kernel.width ) {
 			case 3:
-				vertical3(kernel,image,dest,divisor,includeBorder);
+				vertical3(kernel,image,dest,includeBorder);
 				break;
 
 			case 5:
-				vertical5(kernel,image,dest,divisor,includeBorder);
+				vertical5(kernel,image,dest,includeBorder);
 				break;
 
 			case 7:
-				vertical7(kernel,image,dest,divisor,includeBorder);
+				vertical7(kernel,image,dest,includeBorder);
 				break;
 
 			case 9:
-				vertical9(kernel,image,dest,divisor,includeBorder);
+				vertical9(kernel,image,dest,includeBorder);
 				break;
 
 			case 11:
-				vertical11(kernel,image,dest,divisor,includeBorder);
+				vertical11(kernel,image,dest,includeBorder);
 				break;
 
 			default:
@@ -102,26 +100,26 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static boolean convolve( Kernel2D_I32 kernel ,
-								   ImageUInt8 image, ImageInt8 dest, int divisor ) {
+								   ImageUInt8 image, ImageInt16 dest) {
 		switch( kernel.width ) {
 			case 3:
-				convolve3(kernel,image,dest,divisor);
+				convolve3(kernel,image,dest);
 				break;
 
 			case 5:
-				convolve5(kernel,image,dest,divisor);
+				convolve5(kernel,image,dest);
 				break;
 
 			case 7:
-				convolve7(kernel,image,dest,divisor);
+				convolve7(kernel,image,dest);
 				break;
 
 			case 9:
-				convolve9(kernel,image,dest,divisor);
+				convolve9(kernel,image,dest);
 				break;
 
 			case 11:
-				convolve11(kernel,image,dest,divisor);
+				convolve11(kernel,image,dest);
 				break;
 
 			default:
@@ -131,10 +129,10 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 	}
 
 	public static void horizontal3( Kernel1D_I32 kernel ,
-									ImageUInt8 image, ImageInt8 dest,
-									int divisor, boolean includeBorder) {
+									ImageUInt8 image, ImageInt16 dest,
+									boolean includeBorder) {
 		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -154,20 +152,20 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				int total = (dataSrc[indexSrc++] & 0xFF)*k1;
-				total += (dataSrc[indexSrc++] & 0xFF)*k2;
-				total += (dataSrc[indexSrc] & 0xFF)*k3;
+				int total = (dataSrc[indexSrc++]& 0xFF)*k1;
+				total += (dataSrc[indexSrc++]& 0xFF)*k2;
+				total += (dataSrc[indexSrc]& 0xFF)*k3;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( short )total;
 			}
 		}
 	}
 
 	public static void horizontal5( Kernel1D_I32 kernel ,
-									ImageUInt8 image, ImageInt8 dest,
-									int divisor, boolean includeBorder) {
+									ImageUInt8 image, ImageInt16 dest,
+									boolean includeBorder) {
 		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -189,22 +187,22 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				int total = (dataSrc[indexSrc++] & 0xFF)*k1;
-				total += (dataSrc[indexSrc++] & 0xFF)*k2;
-				total += (dataSrc[indexSrc++] & 0xFF)*k3;
-				total += (dataSrc[indexSrc++] & 0xFF)*k4;
-				total += (dataSrc[indexSrc] & 0xFF)*k5;
+				int total = (dataSrc[indexSrc++]& 0xFF)*k1;
+				total += (dataSrc[indexSrc++]& 0xFF)*k2;
+				total += (dataSrc[indexSrc++]& 0xFF)*k3;
+				total += (dataSrc[indexSrc++]& 0xFF)*k4;
+				total += (dataSrc[indexSrc]& 0xFF)*k5;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( short )total;
 			}
 		}
 	}
 
 	public static void horizontal7( Kernel1D_I32 kernel ,
-									ImageUInt8 image, ImageInt8 dest,
-									int divisor, boolean includeBorder) {
+									ImageUInt8 image, ImageInt16 dest,
+									boolean includeBorder) {
 		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -228,24 +226,24 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				int total = (dataSrc[indexSrc++] & 0xFF)*k1;
-				total += (dataSrc[indexSrc++] & 0xFF)*k2;
-				total += (dataSrc[indexSrc++] & 0xFF)*k3;
-				total += (dataSrc[indexSrc++] & 0xFF)*k4;
-				total += (dataSrc[indexSrc++] & 0xFF)*k5;
-				total += (dataSrc[indexSrc++] & 0xFF)*k6;
-				total += (dataSrc[indexSrc] & 0xFF)*k7;
+				int total = (dataSrc[indexSrc++]& 0xFF)*k1;
+				total += (dataSrc[indexSrc++]& 0xFF)*k2;
+				total += (dataSrc[indexSrc++]& 0xFF)*k3;
+				total += (dataSrc[indexSrc++]& 0xFF)*k4;
+				total += (dataSrc[indexSrc++]& 0xFF)*k5;
+				total += (dataSrc[indexSrc++]& 0xFF)*k6;
+				total += (dataSrc[indexSrc]& 0xFF)*k7;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( short )total;
 			}
 		}
 	}
 
 	public static void horizontal9( Kernel1D_I32 kernel ,
-									ImageUInt8 image, ImageInt8 dest,
-									int divisor, boolean includeBorder) {
+									ImageUInt8 image, ImageInt16 dest,
+									boolean includeBorder) {
 		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -271,26 +269,26 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				int total = (dataSrc[indexSrc++] & 0xFF)*k1;
-				total += (dataSrc[indexSrc++] & 0xFF)*k2;
-				total += (dataSrc[indexSrc++] & 0xFF)*k3;
-				total += (dataSrc[indexSrc++] & 0xFF)*k4;
-				total += (dataSrc[indexSrc++] & 0xFF)*k5;
-				total += (dataSrc[indexSrc++] & 0xFF)*k6;
-				total += (dataSrc[indexSrc++] & 0xFF)*k7;
-				total += (dataSrc[indexSrc++] & 0xFF)*k8;
-				total += (dataSrc[indexSrc] & 0xFF)*k9;
+				int total = (dataSrc[indexSrc++]& 0xFF)*k1;
+				total += (dataSrc[indexSrc++]& 0xFF)*k2;
+				total += (dataSrc[indexSrc++]& 0xFF)*k3;
+				total += (dataSrc[indexSrc++]& 0xFF)*k4;
+				total += (dataSrc[indexSrc++]& 0xFF)*k5;
+				total += (dataSrc[indexSrc++]& 0xFF)*k6;
+				total += (dataSrc[indexSrc++]& 0xFF)*k7;
+				total += (dataSrc[indexSrc++]& 0xFF)*k8;
+				total += (dataSrc[indexSrc]& 0xFF)*k9;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( short )total;
 			}
 		}
 	}
 
 	public static void horizontal11( Kernel1D_I32 kernel ,
-									ImageUInt8 image, ImageInt8 dest,
-									int divisor, boolean includeBorder) {
+									ImageUInt8 image, ImageInt16 dest,
+									boolean includeBorder) {
 		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -318,29 +316,29 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				int total = (dataSrc[indexSrc++] & 0xFF)*k1;
-				total += (dataSrc[indexSrc++] & 0xFF)*k2;
-				total += (dataSrc[indexSrc++] & 0xFF)*k3;
-				total += (dataSrc[indexSrc++] & 0xFF)*k4;
-				total += (dataSrc[indexSrc++] & 0xFF)*k5;
-				total += (dataSrc[indexSrc++] & 0xFF)*k6;
-				total += (dataSrc[indexSrc++] & 0xFF)*k7;
-				total += (dataSrc[indexSrc++] & 0xFF)*k8;
-				total += (dataSrc[indexSrc++] & 0xFF)*k9;
-				total += (dataSrc[indexSrc++] & 0xFF)*k10;
-				total += (dataSrc[indexSrc] & 0xFF)*k11;
+				int total = (dataSrc[indexSrc++]& 0xFF)*k1;
+				total += (dataSrc[indexSrc++]& 0xFF)*k2;
+				total += (dataSrc[indexSrc++]& 0xFF)*k3;
+				total += (dataSrc[indexSrc++]& 0xFF)*k4;
+				total += (dataSrc[indexSrc++]& 0xFF)*k5;
+				total += (dataSrc[indexSrc++]& 0xFF)*k6;
+				total += (dataSrc[indexSrc++]& 0xFF)*k7;
+				total += (dataSrc[indexSrc++]& 0xFF)*k8;
+				total += (dataSrc[indexSrc++]& 0xFF)*k9;
+				total += (dataSrc[indexSrc++]& 0xFF)*k10;
+				total += (dataSrc[indexSrc]& 0xFF)*k11;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( short )total;
 			}
 		}
 	}
 
 	public static void vertical3( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageInt8 dest,
-								 int divisor , boolean includeBorder)
+								 ImageUInt8 image, ImageInt16 dest,
+								 boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -363,23 +361,23 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				int total = (dataSrc[indexSrc] & 0xFF) * k1;
+				int total = (dataSrc[indexSrc]& 0xFF) * k1;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k2;
+				total += (dataSrc[indexSrc]& 0xFF)*k2;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k3;
+				total += (dataSrc[indexSrc]& 0xFF)*k3;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( short )total;
 			}
 		}
 	}
 
 	public static void vertical5( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageInt8 dest,
-								 int divisor , boolean includeBorder)
+								 ImageUInt8 image, ImageInt16 dest,
+								 boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -404,27 +402,27 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				int total = (dataSrc[indexSrc] & 0xFF) * k1;
+				int total = (dataSrc[indexSrc]& 0xFF) * k1;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k2;
+				total += (dataSrc[indexSrc]& 0xFF)*k2;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k3;
+				total += (dataSrc[indexSrc]& 0xFF)*k3;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k4;
+				total += (dataSrc[indexSrc]& 0xFF)*k4;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k5;
+				total += (dataSrc[indexSrc]& 0xFF)*k5;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( short )total;
 			}
 		}
 	}
 
 	public static void vertical7( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageInt8 dest,
-								 int divisor , boolean includeBorder)
+								 ImageUInt8 image, ImageInt16 dest,
+								 boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -451,31 +449,31 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				int total = (dataSrc[indexSrc] & 0xFF) * k1;
+				int total = (dataSrc[indexSrc]& 0xFF) * k1;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k2;
+				total += (dataSrc[indexSrc]& 0xFF)*k2;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k3;
+				total += (dataSrc[indexSrc]& 0xFF)*k3;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k4;
+				total += (dataSrc[indexSrc]& 0xFF)*k4;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k5;
+				total += (dataSrc[indexSrc]& 0xFF)*k5;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k6;
+				total += (dataSrc[indexSrc]& 0xFF)*k6;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k7;
+				total += (dataSrc[indexSrc]& 0xFF)*k7;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( short )total;
 			}
 		}
 	}
 
 	public static void vertical9( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageInt8 dest,
-								 int divisor , boolean includeBorder)
+								 ImageUInt8 image, ImageInt16 dest,
+								 boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -504,35 +502,35 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				int total = (dataSrc[indexSrc] & 0xFF) * k1;
+				int total = (dataSrc[indexSrc]& 0xFF) * k1;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k2;
+				total += (dataSrc[indexSrc]& 0xFF)*k2;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k3;
+				total += (dataSrc[indexSrc]& 0xFF)*k3;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k4;
+				total += (dataSrc[indexSrc]& 0xFF)*k4;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k5;
+				total += (dataSrc[indexSrc]& 0xFF)*k5;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k6;
+				total += (dataSrc[indexSrc]& 0xFF)*k6;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k7;
+				total += (dataSrc[indexSrc]& 0xFF)*k7;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k8;
+				total += (dataSrc[indexSrc]& 0xFF)*k8;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k9;
+				total += (dataSrc[indexSrc]& 0xFF)*k9;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( short )total;
 			}
 		}
 	}
 
 	public static void vertical11( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageInt8 dest,
-								 int divisor , boolean includeBorder)
+								 ImageUInt8 image, ImageInt16 dest,
+								 boolean includeBorder)
 	{
 		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -563,43 +561,42 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 			for( i += xBorder; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				int total = (dataSrc[indexSrc] & 0xFF) * k1;
+				int total = (dataSrc[indexSrc]& 0xFF) * k1;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k2;
+				total += (dataSrc[indexSrc]& 0xFF)*k2;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k3;
+				total += (dataSrc[indexSrc]& 0xFF)*k3;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k4;
+				total += (dataSrc[indexSrc]& 0xFF)*k4;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k5;
+				total += (dataSrc[indexSrc]& 0xFF)*k5;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k6;
+				total += (dataSrc[indexSrc]& 0xFF)*k6;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k7;
+				total += (dataSrc[indexSrc]& 0xFF)*k7;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k8;
+				total += (dataSrc[indexSrc]& 0xFF)*k8;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k9;
+				total += (dataSrc[indexSrc]& 0xFF)*k9;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k10;
+				total += (dataSrc[indexSrc]& 0xFF)*k10;
 				indexSrc += image.stride;
-				total += (dataSrc[indexSrc] & 0xFF)*k11;
+				total += (dataSrc[indexSrc]& 0xFF)*k11;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( short )total;
 			}
 		}
 	}
 
-	public static void convolve3( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
+	public static void convolve3( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt16 dest)
 	{
 		final byte[] dataSrc = src.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
 		final int kernelRadius = kernel.getRadius();
-		final int totalRow[] = new int[ width ];
 
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
@@ -608,20 +605,22 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 			int k2 = kernel.data[1];
 			int k3 = kernel.data[2];
 
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
 				int total = 0;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k1;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k2;
-				total += (dataSrc[indexSrc]  & 0xFF)* k3;
+				total += (dataSrc[indexSrc++] & 0xFF)* k1;
+				total += (dataSrc[indexSrc++] & 0xFF)* k2;
+				total += (dataSrc[indexSrc] & 0xFF)* k3;
 
-				totalRow[x] = total;
+				dataDst[indexDst++] = ( short )total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 3; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
 				
 				k1 = kernel.data[i*3 + 0];
@@ -632,30 +631,25 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 					int indexSrc = indexSrcRow+x;
 
 					int total = 0;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k1;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k2;
-					total += (dataSrc[indexSrc]  & 0xFF)* k3;
+					total += (dataSrc[indexSrc++] & 0xFF)* k1;
+					total += (dataSrc[indexSrc++] & 0xFF)* k2;
+					total += (dataSrc[indexSrc] & 0xFF)* k3;
 
-					totalRow[x] += total;
+					dataDst[indexDst++] += ( short )total;
 				}
-			}
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ( byte )(totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve5( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
+	public static void convolve5( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt16 dest)
 	{
 		final byte[] dataSrc = src.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
 		final int kernelRadius = kernel.getRadius();
-		final int totalRow[] = new int[ width ];
 
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
@@ -666,22 +660,24 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 			int k4 = kernel.data[3];
 			int k5 = kernel.data[4];
 
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
 				int total = 0;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k1;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k2;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k3;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k4;
-				total += (dataSrc[indexSrc]  & 0xFF)* k5;
+				total += (dataSrc[indexSrc++] & 0xFF)* k1;
+				total += (dataSrc[indexSrc++] & 0xFF)* k2;
+				total += (dataSrc[indexSrc++] & 0xFF)* k3;
+				total += (dataSrc[indexSrc++] & 0xFF)* k4;
+				total += (dataSrc[indexSrc] & 0xFF)* k5;
 
-				totalRow[x] = total;
+				dataDst[indexDst++] = ( short )total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 5; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
 				
 				k1 = kernel.data[i*5 + 0];
@@ -694,32 +690,27 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 					int indexSrc = indexSrcRow+x;
 
 					int total = 0;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k1;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k2;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k3;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k4;
-					total += (dataSrc[indexSrc]  & 0xFF)* k5;
+					total += (dataSrc[indexSrc++] & 0xFF)* k1;
+					total += (dataSrc[indexSrc++] & 0xFF)* k2;
+					total += (dataSrc[indexSrc++] & 0xFF)* k3;
+					total += (dataSrc[indexSrc++] & 0xFF)* k4;
+					total += (dataSrc[indexSrc] & 0xFF)* k5;
 
-					totalRow[x] += total;
+					dataDst[indexDst++] += ( short )total;
 				}
-			}
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ( byte )(totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve7( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
+	public static void convolve7( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt16 dest)
 	{
 		final byte[] dataSrc = src.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
 		final int kernelRadius = kernel.getRadius();
-		final int totalRow[] = new int[ width ];
 
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
@@ -732,24 +723,26 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 			int k6 = kernel.data[5];
 			int k7 = kernel.data[6];
 
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
 				int total = 0;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k1;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k2;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k3;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k4;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k5;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k6;
-				total += (dataSrc[indexSrc]  & 0xFF)* k7;
+				total += (dataSrc[indexSrc++] & 0xFF)* k1;
+				total += (dataSrc[indexSrc++] & 0xFF)* k2;
+				total += (dataSrc[indexSrc++] & 0xFF)* k3;
+				total += (dataSrc[indexSrc++] & 0xFF)* k4;
+				total += (dataSrc[indexSrc++] & 0xFF)* k5;
+				total += (dataSrc[indexSrc++] & 0xFF)* k6;
+				total += (dataSrc[indexSrc] & 0xFF)* k7;
 
-				totalRow[x] = total;
+				dataDst[indexDst++] = ( short )total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 7; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
 				
 				k1 = kernel.data[i*7 + 0];
@@ -764,34 +757,29 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 					int indexSrc = indexSrcRow+x;
 
 					int total = 0;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k1;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k2;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k3;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k4;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k5;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k6;
-					total += (dataSrc[indexSrc]  & 0xFF)* k7;
+					total += (dataSrc[indexSrc++] & 0xFF)* k1;
+					total += (dataSrc[indexSrc++] & 0xFF)* k2;
+					total += (dataSrc[indexSrc++] & 0xFF)* k3;
+					total += (dataSrc[indexSrc++] & 0xFF)* k4;
+					total += (dataSrc[indexSrc++] & 0xFF)* k5;
+					total += (dataSrc[indexSrc++] & 0xFF)* k6;
+					total += (dataSrc[indexSrc] & 0xFF)* k7;
 
-					totalRow[x] += total;
+					dataDst[indexDst++] += ( short )total;
 				}
-			}
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ( byte )(totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve9( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
+	public static void convolve9( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt16 dest)
 	{
 		final byte[] dataSrc = src.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
 		final int kernelRadius = kernel.getRadius();
-		final int totalRow[] = new int[ width ];
 
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
@@ -806,26 +794,28 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 			int k8 = kernel.data[7];
 			int k9 = kernel.data[8];
 
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
 				int total = 0;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k1;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k2;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k3;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k4;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k5;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k6;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k7;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k8;
-				total += (dataSrc[indexSrc]  & 0xFF)* k9;
+				total += (dataSrc[indexSrc++] & 0xFF)* k1;
+				total += (dataSrc[indexSrc++] & 0xFF)* k2;
+				total += (dataSrc[indexSrc++] & 0xFF)* k3;
+				total += (dataSrc[indexSrc++] & 0xFF)* k4;
+				total += (dataSrc[indexSrc++] & 0xFF)* k5;
+				total += (dataSrc[indexSrc++] & 0xFF)* k6;
+				total += (dataSrc[indexSrc++] & 0xFF)* k7;
+				total += (dataSrc[indexSrc++] & 0xFF)* k8;
+				total += (dataSrc[indexSrc] & 0xFF)* k9;
 
-				totalRow[x] = total;
+				dataDst[indexDst++] = ( short )total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 9; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
 				
 				k1 = kernel.data[i*9 + 0];
@@ -842,36 +832,31 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 					int indexSrc = indexSrcRow+x;
 
 					int total = 0;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k1;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k2;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k3;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k4;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k5;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k6;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k7;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k8;
-					total += (dataSrc[indexSrc]  & 0xFF)* k9;
+					total += (dataSrc[indexSrc++] & 0xFF)* k1;
+					total += (dataSrc[indexSrc++] & 0xFF)* k2;
+					total += (dataSrc[indexSrc++] & 0xFF)* k3;
+					total += (dataSrc[indexSrc++] & 0xFF)* k4;
+					total += (dataSrc[indexSrc++] & 0xFF)* k5;
+					total += (dataSrc[indexSrc++] & 0xFF)* k6;
+					total += (dataSrc[indexSrc++] & 0xFF)* k7;
+					total += (dataSrc[indexSrc++] & 0xFF)* k8;
+					total += (dataSrc[indexSrc] & 0xFF)* k9;
 
-					totalRow[x] += total;
+					dataDst[indexDst++] += ( short )total;
 				}
-			}
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ( byte )(totalRow[x] / divisor);
 			}
 		}
 	}
 
-	public static void convolve11( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
+	public static void convolve11( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt16 dest)
 	{
 		final byte[] dataSrc = src.data;
-		final byte[] dataDst = dest.data;
+		final short[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
 		final int kernelRadius = kernel.getRadius();
-		final int totalRow[] = new int[ width ];
 
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
@@ -888,28 +873,30 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 			int k10 = kernel.data[9];
 			int k11 = kernel.data[10];
 
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
 				int total = 0;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k1;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k2;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k3;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k4;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k5;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k6;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k7;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k8;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k9;
-				total += (dataSrc[indexSrc++]  & 0xFF)* k10;
-				total += (dataSrc[indexSrc]  & 0xFF)* k11;
+				total += (dataSrc[indexSrc++] & 0xFF)* k1;
+				total += (dataSrc[indexSrc++] & 0xFF)* k2;
+				total += (dataSrc[indexSrc++] & 0xFF)* k3;
+				total += (dataSrc[indexSrc++] & 0xFF)* k4;
+				total += (dataSrc[indexSrc++] & 0xFF)* k5;
+				total += (dataSrc[indexSrc++] & 0xFF)* k6;
+				total += (dataSrc[indexSrc++] & 0xFF)* k7;
+				total += (dataSrc[indexSrc++] & 0xFF)* k8;
+				total += (dataSrc[indexSrc++] & 0xFF)* k9;
+				total += (dataSrc[indexSrc++] & 0xFF)* k10;
+				total += (dataSrc[indexSrc] & 0xFF)* k11;
 
-				totalRow[x] = total;
+				dataDst[indexDst++] = ( short )total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 11; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
 				
 				k1 = kernel.data[i*11 + 0];
@@ -928,24 +915,20 @@ public class ConvolveImageUnrolled_I8_I8_Div {
 					int indexSrc = indexSrcRow+x;
 
 					int total = 0;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k1;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k2;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k3;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k4;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k5;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k6;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k7;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k8;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k9;
-					total += (dataSrc[indexSrc++]  & 0xFF)* k10;
-					total += (dataSrc[indexSrc]  & 0xFF)* k11;
+					total += (dataSrc[indexSrc++] & 0xFF)* k1;
+					total += (dataSrc[indexSrc++] & 0xFF)* k2;
+					total += (dataSrc[indexSrc++] & 0xFF)* k3;
+					total += (dataSrc[indexSrc++] & 0xFF)* k4;
+					total += (dataSrc[indexSrc++] & 0xFF)* k5;
+					total += (dataSrc[indexSrc++] & 0xFF)* k6;
+					total += (dataSrc[indexSrc++] & 0xFF)* k7;
+					total += (dataSrc[indexSrc++] & 0xFF)* k8;
+					total += (dataSrc[indexSrc++] & 0xFF)* k9;
+					total += (dataSrc[indexSrc++] & 0xFF)* k10;
+					total += (dataSrc[indexSrc] & 0xFF)* k11;
 
-					totalRow[x] += total;
+					dataDst[indexDst++] += ( short )total;
 				}
-			}
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ( byte )(totalRow[x] / divisor);
 			}
 		}
 	}

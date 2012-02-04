@@ -25,7 +25,10 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
+import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.shapes.Rectangle2D_I32;
 
 
@@ -39,6 +42,74 @@ import georegression.struct.shapes.Rectangle2D_I32;
 public class DistortImageOps {
 
 	/**
+	 * <p>
+	 * Applies an affine transformation from the input image to the output image.
+	 * </p>
+	 *
+	 * <p>
+	 * Input coordinates (x,y) to output coordinate (x',y')<br>
+	 * x' = a11*x + a12*y + dx<br>
+	 * y' = a21*x + a22*y + dy
+	 * </p>
+	 *
+	 * @param input Which which is being rotated.
+	 * @param output The image in which the output is written to.
+	 * @param interpType Which type of interpolation will be used.
+	 */
+	public static <T extends ImageBase>
+	void affine( T input , T output , TypeInterpolate interpType ,
+				 double a11 , double a12, double a21 , double a22 ,
+				 double dx, double dy )
+	{
+		Affine2D_F32 m = new Affine2D_F32();
+		m.a11 = (float)a11;
+		m.a12 = (float)a12;
+		m.a21 = (float)a21;
+		m.a22 = (float)a22;
+		m.tx = (float)dx;
+		m.ty = (float)dy;
+
+		m = m.invert(null);
+
+		PixelTransformAffine_F32 model = new PixelTransformAffine_F32(m);
+		
+		if( input instanceof ImageSingleBand ) {
+			transformSingle((ImageSingleBand)input,(ImageSingleBand)output,interpType,model);
+		} else if( input instanceof MultiSpectral ) {
+			transformMulti((MultiSpectral)input,(MultiSpectral)output,interpType,model);
+		}
+	}
+
+	private static <T extends ImageSingleBand>
+	void transformSingle( T input , T output ,
+						  TypeInterpolate interpType ,
+						  PixelTransform_F32 transform )
+	{
+		Class<T> inputType = (Class<T>)input.getClass();
+		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
+		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,transform,interp, FactoryImageBorder.value(inputType, 0));
+		distorter.apply(input,output);
+	}
+	
+	private static <T extends ImageSingleBand,M extends MultiSpectral<T>>
+	void transformMulti( M input , M output ,
+						 TypeInterpolate interpType ,
+						 PixelTransform_F32 transform ) 
+	{
+		Class<T> bandType = input.getType();
+		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, bandType);
+		ImageDistort<T> distorter = DistortSupport.createDistort(bandType,transform,interp, FactoryImageBorder.value(bandType, 0));
+		int N = input.getNumBands();
+		
+		for( int i = 0; i < N; i++ ) {
+			T bandIn = input.getBand(i);
+			T bandOut = output.getBand(i);
+			
+			distorter.apply(bandIn,bandOut);
+		}
+	}
+
+	/**
 	 * Rescales the input image and writes the results into the output image.  The scale
 	 * factor is determined independently of the width and height.
 	 *
@@ -46,22 +117,25 @@ public class DistortImageOps {
 	 * @param output Rescaled input image. Modified.
 	 * @param interpType Which interpolation algorithm should be used.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageBase>
 	void scale( T input , T output , TypeInterpolate interpType ) {
-		Class<T> inputType = (Class<T>)input.getClass();
-		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
 
-		scale(input,output,interp);
+		PixelTransformAffine_F32 model = DistortSupport.transformScale(output, input);
+
+		if( input instanceof ImageSingleBand ) {
+			transformSingle((ImageSingleBand)input,(ImageSingleBand)output,interpType,model);
+		} else if( input instanceof MultiSpectral ) {
+			transformMulti((MultiSpectral)input,(MultiSpectral)output,interpType,model);
+		}
 	}
 
+	/**
+	 * Applies distortion to a single band image.  Place holder for more generic code later on
+	 */
 	public static <T extends ImageSingleBand>
-	void scale( T input , T output , InterpolatePixel<T> interp ) {
+	void distortSingle( T input , T output , PixelTransformAffine_F32 model , InterpolatePixel<T> interp ) {
 		Class<T> inputType = (Class<T>)input.getClass();
-
-		PixelTransform_F32 model = DistortSupport.transformScale(output, input);
-		ImageBorder<T> border = FactoryImageBorder.value(inputType, 0);
-		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp, border);
-
+		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp, FactoryImageBorder.value(inputType, 0));
 		distorter.apply(input,output);
 	}
 
@@ -82,44 +156,20 @@ public class DistortImageOps {
 	 * @param interpType Which type of interpolation will be used.
 	 * @param angleInputToOutput Angle of rotation in radians. From input to output, CCW rotation.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageBase>
 	void rotate( T input , T output , TypeInterpolate interpType , float angleInputToOutput ) {
-
-		Class<T> inputType = (Class<T>)input.getClass();
-		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
-
-		rotate(input, output, interp, angleInputToOutput);
-	}
-
-	/**
-	 * <p>
-	 * Rotates the image using the specified interpolation.  The rotation is performed
-	 * around the specified center of rotation in the input image.
-	 * </p>
-	 *
-	 * <p>
-	 * Input coordinates (x,y) to output coordinate (x',y')<br>
-	 * x' = x_c + c*(x-x_c) - s(y - y_c)<br>
-	 * y' = y_c + s*(x-x_c) + c(y - y_c)
-	 * </p>
-	 *
-	 * @param input Which which is being rotated.
-	 * @param output The image in which the output is written to.
-	 * @param interp The interpolation algorithm which is to be used.
-	 * @param angleInputToOutput Angle of rotation in radians.  From input to output, CCW rotation.
-	 */
-	public static <T extends ImageSingleBand>
-	void rotate( T input , T output , InterpolatePixel<T> interp ,
-				 float angleInputToOutput ) {
-		Class<T> inputType = (Class<T>)input.getClass();
 
 		float offX = 0;//(output.width+1)%2;
 		float offY = 0;//(output.height+1)%2;
 
-		PixelTransform_F32 model = DistortSupport.transformRotate(input.width/2,input.height/2,output.width/2-offX,output.height/2-offY,angleInputToOutput);
-		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp, FactoryImageBorder.value(inputType, 0));
+		PixelTransform_F32 model = DistortSupport.transformRotate(input.width/2,input.height/2,
+				output.width/2-offX,output.height/2-offY,angleInputToOutput);
 
-		distorter.apply(input,output);
+		if( input instanceof ImageSingleBand ) {
+			transformSingle((ImageSingleBand)input,(ImageSingleBand)output,interpType,model);
+		} else if( input instanceof MultiSpectral ) {
+			transformMulti((MultiSpectral)input,(MultiSpectral)output,interpType,model);
+		}
 	}
 
 	/**

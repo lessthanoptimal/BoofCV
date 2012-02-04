@@ -18,55 +18,47 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
+import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 /**
  * Code generator for {@link ConvolveImageStandard}.
  *
  * @author Peter Abeles
  */
-public class GenerateConvolveStandard extends CodeGeneratorBase {
+public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 	String className = "ConvolveImageStandard";
 
-	PrintStream out;
-
-	public GenerateConvolveStandard() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
-	}
+	String kernelType;
+	String inputType;
+	String outputType;
+	String kernelData;
+	String inputData;
+	String outputData;
+	String sumType;
+	String typeCast;
+	String bitWise;
+	boolean hasDivide;
 
 	@Override
-	public void generate() {
+	public void generate()throws FileNotFoundException {
 		printPreamble();
-		printAllOps("F32", "ImageFloat32", "ImageFloat32",
-				"float", "float", "float",
-				"float", "", "", false);
-		printAllOps("I32", "ImageUInt8", "ImageInt16",
-				"int", "byte", "short",
-				"int", "(short)", "& 0xFF", false);
-		printAllOps("I32", "ImageUInt8", "ImageSInt32",
-				"int", "byte", "int",
-				"int", "", "& 0xFF", false);
-		printAllOps("I32", "ImageSInt16", "ImageInt16",
-				"int", "short", "short",
-				"int", "(short)", "", false);
-		printAllOps("I32", "ImageUInt8", "ImageInt8",
-				"int", "byte", "byte",
-				"int", "(byte)", "& 0xFF", true);
-		printAllOps("I32", "ImageSInt16", "ImageInt16",
-				"int", "short", "short",
-				"int", "(short)", "", true);
+		printAllOps(AutoTypeImage.F32,AutoTypeImage.F32,false);
+		printAllOps(AutoTypeImage.U8,AutoTypeImage.I16,false);
+		printAllOps(AutoTypeImage.U8,AutoTypeImage.S32,false);
+		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,false);
+		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,true);
+		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,true);
+		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,false);
+		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,true);
+
 		out.println("}");
 	}
 
-	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.filter.convolve.noborder;\n");
-		out.println();
+	private void printPreamble() throws FileNotFoundException {
+		setOutputFile(className);
 		out.print("import boofcv.struct.convolve.Kernel1D_F32;\n" +
 				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
 				"import boofcv.struct.convolve.Kernel2D_F32;\n" +
@@ -85,7 +77,7 @@ public class GenerateConvolveStandard extends CodeGeneratorBase {
 				" * </p>\n" +
 				" * \n" +
 				" * <p>\n" +
-				" * NOTE: This code was automatically generated using {@link GenerateConvolveStandard}.\n" +
+				" * NOTE: This code was automatically generated using {@link GenerateConvolveImageStandard}.\n" +
 				" * </p>\n" +
 				" * \n" +
 				" * @author Peter Abeles\n" +
@@ -94,17 +86,27 @@ public class GenerateConvolveStandard extends CodeGeneratorBase {
 				"public class " + className + " {\n\n");
 	}
 
-	private void printAllOps(String kernelType, String inputType, String outputType,
-							 String kernelData, String inputData, String outputData,
-							 String sumType, String typeCast, String bitWise, boolean hasDivide) {
-		printHorizontal(kernelType, inputType, outputType, kernelData, inputData, outputData, sumType, typeCast, bitWise, hasDivide);
-		printVerticle(kernelType, inputType, outputType, kernelData, inputData, outputData, sumType, typeCast, bitWise, hasDivide);
-		printConvolve2D(kernelType, inputType, outputType, kernelData, inputData, outputData, sumType, typeCast, bitWise, hasDivide);
+	private void printAllOps( AutoTypeImage input , AutoTypeImage output , boolean hasDivide )
+	{
+		boolean isInteger = input.isInteger();
+
+		typeCast = output.getTypeCastFromSum();
+		kernelType = isInteger ? "I32" : "F32";
+		inputType = input.getImageName();
+		outputType = output.getImageName();
+		kernelData = isInteger ? "int" : "float";
+		inputData = input.getDataType();
+		outputData = output.getDataType();
+		sumType = isInteger ? "int" : "float";
+		bitWise = input.getBitWise();
+		this.hasDivide = hasDivide;
+
+		printHorizontal();
+		printVerticle();
+		printConvolve2D();
 	}
 
-	private void printHorizontal(String kernelType, String inputType, String outputType,
-								 String kernelData, String inputData, String outputData,
-								 String sumType, String typeCast, String bitWise, boolean hasDivide) {
+	private void printHorizontal() {
 		String paramDiv = hasDivide ? " int divisor," : "";
 		String totalDiv = hasDivide ? "(total/divisor)" : "total";
 
@@ -140,9 +142,7 @@ public class GenerateConvolveStandard extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printVerticle(String kernelType, String inputType, String outputType,
-							   String kernelData, String inputData, String outputData,
-							   String sumType, String typeCast, String bitWise, boolean hasDivide) {
+	private void printVerticle() {
 		String paramDiv = hasDivide ? " int divisor," : "";
 		String totalDiv = hasDivide ? "(total/divisor)" : "total";
 
@@ -182,9 +182,7 @@ public class GenerateConvolveStandard extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printConvolve2D(String kernelType, String inputType, String outputType,
-								 String kernelData, String inputData, String outputData,
-								 String sumType, String typeCast, String bitWise, boolean hasDivide) {
+	private void printConvolve2D() {
 
 		String paramDiv = hasDivide ? ", int divisor " : "";
 		String totalDiv = hasDivide ? "(total/divisor)" : "total";
@@ -217,7 +215,7 @@ public class GenerateConvolveStandard extends CodeGeneratorBase {
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
-		GenerateConvolveStandard gen = new GenerateConvolveStandard();
+		GenerateConvolveImageStandard gen = new GenerateConvolveImageStandard();
 		gen.generate();
 	}
 }
