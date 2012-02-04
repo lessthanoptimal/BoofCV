@@ -1,19 +1,17 @@
 /*
- * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ * Copyright 2011 Peter Abeles
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package boofcv.alg.filter.convolve.normalized;
@@ -279,6 +277,99 @@ public class ConvolveNormalizedNaive {
 	}
 
 	public static void convolve(Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output ) {
+
+		final int radius = kernel.getRadius();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+
+				int startX = x - radius;
+				int endX = x + radius;
+
+				if( startX < 0 ) startX = 0;
+				if( endX >= width ) endX = width-1;
+
+				int startY = y - radius;
+				int endY = y + radius;
+
+				if( startY < 0 ) startY = 0;
+				if( endY >= height ) endY = height-1;
+
+				int total = 0;
+				int div = 0;
+
+				for( int i = startY; i <= endY; i++ ) {
+					for( int j = startX; j <= endX; j++ ) {
+						int v = kernel.get(j-x+radius,i-y+radius);
+						total += input.get(j,i)*v;
+						div += v;
+					}
+				}
+				output.set(x,y, total/div );
+			}
+		}
+	}
+
+	public static void horizontal(Kernel1D_I32 kernel, ImageSInt32 input, ImageSInt32 output ) {
+
+		final int radius = kernel.getRadius();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+				int div = 0;
+
+				int startX = x - radius;
+				int endX = x + radius;
+
+				if( startX < 0 ) startX = 0;
+				if( endX >= width ) endX = width-1;
+
+				for( int j = startX; j <= endX; j++ ) {
+					int v = kernel.get(j-x+radius);
+					total += input.get(j,y)*v;
+					div += v;
+				}
+				output.set(x,y, total/div );
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_I32 kernel, ImageSInt32 input, ImageSInt32 output ) {
+
+		final int radius = kernel.getRadius();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+				int div = 0;
+
+				int startY = y - radius;
+				int endY = y + radius;
+
+				if( startY < 0 ) startY = 0;
+				if( endY >= height ) endY = height-1;
+
+				for( int i = startY; i <= endY; i++ ) {
+					int v = kernel.get(i-y+radius);
+					total += input.get(x,i)*v;
+					div += v;
+				}
+				output.set(x,y, total/div );
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_I32 kernel, ImageSInt32 input, ImageSInt32 output ) {
 
 		final int radius = kernel.getRadius();
 

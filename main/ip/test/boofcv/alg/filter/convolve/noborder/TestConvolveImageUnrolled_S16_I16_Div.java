@@ -21,8 +21,8 @@ package boofcv.alg.filter.convolve.noborder;
 import boofcv.alg.filter.convolve.CompareToStandardConvolution;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageInt8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageInt16;
+import boofcv.struct.image.ImageSInt16;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -30,36 +30,36 @@ import java.lang.reflect.Method;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveImageUnrolled_I8_I8_Div {
-	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_I8_I8_Div.class);
+public class TestConvolveImageUnrolled_S16_I16_Div {
+	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_S16_I16_Div.class);
 
 	@Test
 	public void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_I8_I8_Div.class.getMethod("convolve",
-					Kernel2D_I32.class, ImageUInt8.class, ImageInt8.class , int.class);
+			Method m = ConvolveImageUnrolled_S16_I16_Div.class.getMethod("convolve",
+					Kernel2D_I32.class, ImageSInt16.class, ImageInt16.class , int.class);
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
 		}
 	}
 
 	@Test
-	public void horizontal_divide() throws NoSuchMethodException {
+	public void horizontal() throws NoSuchMethodException {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_I8_I8_Div.class.getMethod("horizontal",
-					Kernel1D_I32.class, ImageUInt8.class, ImageInt8.class, int.class, boolean.class);
+			Method m = ConvolveImageUnrolled_S16_I16_Div.class.getMethod("horizontal",
+					Kernel1D_I32.class, ImageSInt16.class, ImageInt16.class, int.class, boolean.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
 	}
 
 	@Test
-	public void vertical_divide() throws NoSuchMethodException {
+	public void vertical() throws NoSuchMethodException {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_I8_I8_Div.class.getMethod("vertical",
-					Kernel1D_I32.class, ImageUInt8.class, ImageInt8.class, int.class, boolean.class);
+			Method m = ConvolveImageUnrolled_S16_I16_Div.class.getMethod("vertical",
+					Kernel1D_I32.class, ImageSInt16.class, ImageInt16.class, int.class, boolean.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

@@ -91,6 +91,13 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		Class<?> e[] = evaluation.getParameterTypes();
 		Class<?> c[] = candidate.getParameterTypes();
 
+		if( evaluation.getName().compareTo("convolve") == 0) {
+			if( e.length != c.length+1 )
+				return false;
+		} else  {
+			if( e.length != c.length )
+				return false;
+		}
 		if( e[0] != c[0] )
 			return false;
 		if( !e[1].isAssignableFrom(c[1]) )

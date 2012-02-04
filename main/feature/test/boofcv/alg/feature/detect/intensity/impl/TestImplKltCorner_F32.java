@@ -42,7 +42,6 @@ public class TestImplKltCorner_F32 {
 	int width = 15;
 	int height = 15;
 
-
 	@Test
 	public void genericTests() {
 		GenericCornerIntensityTests generic = new GenericCornerIntensityGradientTests(){
@@ -77,12 +76,12 @@ public class TestImplKltCorner_F32 {
 		ImageFloat32 derivX_F = ConvertImage.convert(derivX_I, (ImageFloat32)null);
 		ImageFloat32 derivY_F = ConvertImage.convert(derivY_I, (ImageFloat32)null);
 
-		BoofTesting.checkSubImage(this, "compareToNaive", true, derivX_I, derivY_I, derivX_F, derivY_F);
+		BoofTesting.checkSubImage(this, "compareToNaive", true, derivX_F, derivY_F);
 	}
 
-	public void compareToNaive(ImageSInt16 derivX_I, ImageSInt16 derivY_I, ImageFloat32 derivX_F, ImageFloat32 derivY_F) {
-		ImplSsdCornerNaive_S16 ssd_I = new ImplSsdCornerNaive_S16(width, height, 3);
-		ssd_I.process(derivX_I, derivY_I);
+	public void compareToNaive( ImageFloat32 derivX_F, ImageFloat32 derivY_F) {
+		ImplSsdCornerNaive<ImageFloat32> ssd_I = new ImplSsdCornerNaive<ImageFloat32>(width, height, 3, false);
+		ssd_I.process(derivX_F, derivY_F);
 
 		ImplKltCorner_F32 ssd_F = new ImplKltCorner_F32( 3);
 		ssd_F.process(derivX_F, derivY_F);

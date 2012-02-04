@@ -77,17 +77,24 @@ public class FactoryPointIntensityAlg {
 	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} from different image types.
 	 *
 	 * @param windowRadius Size of the feature it detects,
+	 * @param weighted Should the it be weighted by a Gaussian kernel?  Unweighted is much faster.
 	 * @param derivType Image derivative type it is computed from.
 	 * @return KLT corner
 	 */
 	public static <T extends ImageSingleBand>
-	KltCornerIntensity<T> createKlt(int windowRadius, Class<T> derivType)
+	KltCornerIntensity<T> createKlt(int windowRadius, boolean weighted , Class<T> derivType)
 	{
-		if( derivType == ImageFloat32.class )
-			return (KltCornerIntensity<T>)new ImplKltCorner_F32(windowRadius);
-		else if( derivType == ImageSInt16.class )
-			return (KltCornerIntensity<T>)new ImplKltCorner_S16(windowRadius);
-		else
+		if( derivType == ImageFloat32.class ) {
+			if( weighted )
+				return (KltCornerIntensity<T>)new ImplKltCornerWeighted_F32(windowRadius);
+			else
+				return (KltCornerIntensity<T>)new ImplKltCorner_F32(windowRadius);
+		} else if( derivType == ImageSInt16.class ) {
+			if( weighted )
+				return (KltCornerIntensity<T>)new ImplKltCornerWeighted_S16(windowRadius);
+			else
+				return (KltCornerIntensity<T>)new ImplKltCorner_S16(windowRadius);
+		} else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}
 }

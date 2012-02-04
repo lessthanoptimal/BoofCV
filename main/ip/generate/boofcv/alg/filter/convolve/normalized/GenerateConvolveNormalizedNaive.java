@@ -43,6 +43,7 @@ public class GenerateConvolveNormalizedNaive {
 		printAllOps("F32", "ImageFloat32","ImageFloat32","float","float");
 		printAllOps("I32", "ImageUInt8","ImageInt8","int","int");
 		printAllOps("I32", "ImageSInt16","ImageInt16","int","int");
+		printAllOps("I32", "ImageSInt32","ImageSInt32","int","int");
 		out.println("}");
 	}
 

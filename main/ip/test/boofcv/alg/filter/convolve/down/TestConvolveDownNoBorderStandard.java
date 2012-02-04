@@ -125,8 +125,13 @@ public class TestConvolveDownNoBorderStandard {
 			Class<?> e[] = evaluation.getParameterTypes();
 			Class<?> c[] = candidate.getParameterTypes();
 
-			if( c.length < 3 )
-				return false;
+			if( evaluation.getName().compareTo("convolve") == 0) {
+				if( e.length != c.length+1 )
+					return false;
+			} else  {
+				if( e.length != c.length )
+					return false;
+			}
 
 			for( int i = 0; i < 3; i++ ) {
 				if( e[i] != c[i])

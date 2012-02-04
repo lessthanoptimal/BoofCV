@@ -19,6 +19,8 @@
 package boofcv.alg.interpolate;
 
 import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.distort.PixelTransformAffine_F32;
+import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -95,7 +97,8 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 		InterpolatePixel<T> interp = (InterpolatePixel<T>)cookie;
 
 		scaledImage.reshape(panel.getWidth(),panel.getHeight());
-		DistortImageOps.scale(gray,scaledImage,interp);
+		PixelTransformAffine_F32 model = DistortSupport.transformScale(scaledImage,gray);
+		DistortImageOps.distortSingle(gray,scaledImage,model,interp);
 
 		// numerical round off error can cause the interpolation to go outside
 		// of pixel value bounds
@@ -141,8 +144,8 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 
 		app.setPreferredSize(new Dimension(500,500));
 		ImageListManager manager = new ImageListManager();
-		manager.add("eye 1","data/eye01.jpg");
-		manager.add("eye 2","data/eye02.jpg");
+		manager.add("eye 1","../data/evaluation/eye01.jpg");
+		manager.add("eye 2","../data/evaluation/eye02.jpg");
 
 		app.setInputManager(manager);
 

@@ -27,27 +27,28 @@ import org.junit.Test;
 public class TestConvolveNormalized {
 	@Test
 	public void compareToNaive() {
+		int numFunctions = 11;
 		CompareToStandardConvolutionNormalized test = new CompareToStandardConvolutionNormalized(ConvolveNormalized.class);
 
 		for( int i = 0; i < 2; i++ ) {
 			test.setImageDimension(15+i,20+i);
 			// convolve with different kernel sizes relative to the skip amount
 			test.setKernelRadius(1);
-			test.performTests(9);
+			test.performTests(numFunctions);
 			test.setKernelRadius(2);
-			test.performTests(9);
+			test.performTests(numFunctions);
 			test.setKernelRadius(3);
-			test.performTests(9);
+			test.performTests(numFunctions);
 
 //			// now try a pathological case where the kernel is larger than the image
 			// --- too big for width
 			test.setKernelRadius(8);
-			test.performTests(9);
+			test.performTests(numFunctions);
 
 			// -- too big for height
 			test.setImageDimension(20+i,15+i);
 			test.setKernelRadius(8);
-			test.performTests(9);
+			test.performTests(numFunctions);
 		}
 	}
 }

@@ -20,7 +20,11 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.PixelTransformAffine_F32;
+import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -98,7 +102,8 @@ public class PyramidUpdateGaussianScale< T extends ImageSingleBand> implements P
 			tempImage.reshape(prev.width,prev.height);
 			blur.process(prev,tempImage);
 
-			DistortImageOps.scale(tempImage,layer,interpolate);
+			PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,tempImage);
+			DistortImageOps.distortSingle(tempImage,layer,model,interpolate);
 		}
 	}
 

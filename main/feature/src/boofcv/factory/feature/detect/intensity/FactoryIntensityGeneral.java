@@ -24,6 +24,7 @@ import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -31,7 +32,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class FactoryGeneralIntensity {
+public class FactoryIntensityGeneral {
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  fast( int pixelTol, int minCont, Class<I> imageType ) {
@@ -47,7 +48,7 @@ public class FactoryGeneralIntensity {
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  klt( int windowRadius , Class<D> derivType ) {
-		KltCornerIntensity<D> alg =  FactoryPointIntensityAlg.createKlt(windowRadius, derivType);
+		KltCornerIntensity<D> alg =  FactoryPointIntensityAlg.createKlt(windowRadius, false ,  derivType);
 		return new WrapperGradientCornerIntensity<I, D>(alg);
 	}
 
@@ -57,7 +58,8 @@ public class FactoryGeneralIntensity {
 	}
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureIntensity<I,D>  median( MedianImageFilter<I> filter , Class<I> imageType ) {
+	GeneralFeatureIntensity<I,D>  median( int radius , Class<I> imageType ) {
+		MedianImageFilter<I> filter = FactoryBlurFilter.median(imageType,radius);
 		return new WrapperMedianCornerIntensity<I, D>(filter,imageType);
 	}
 
