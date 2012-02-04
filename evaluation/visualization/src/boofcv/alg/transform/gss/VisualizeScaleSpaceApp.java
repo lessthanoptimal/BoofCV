@@ -91,9 +91,9 @@ public class VisualizeScaleSpaceApp <T extends ImageSingleBand, D extends ImageS
 		VisualizeScaleSpaceApp app = new VisualizeScaleSpaceApp(ImageUInt8.class);
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("boat","data/standard/boat.png");
-		manager.add("shapes","data/shapes01.png");
-		manager.add("sunflowers","data/sunflowers.png");
+		manager.add("boat","../data/evaluation/standard/boat.png");
+		manager.add("shapes","../data/evaluation/shapes01.png");
+		manager.add("sunflowers","../data/evaluation/sunflowers.png");
 
 		app.setInputManager(manager);
 

@@ -51,19 +51,12 @@ public class TestDistortImageOps {
 	public void scale_InterpTypeStyle() {
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 output = new ImageFloat32(width,height);
-		ImageFloat32 output2 = new ImageFloat32(width,height);
 
 		GeneralizedImageOps.randomize(input,rand,0,100);
 
+		DistortImageOps.scale(input,output, TypeInterpolate.BILINEAR);
+
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
-
-		// check the two scale function
-		DistortImageOps.scale(input,output,interp);
-		DistortImageOps.scale(input,output2, TypeInterpolate.BILINEAR);
-
-		// they should be identical
-		BoofTesting.assertEquals(output,output2);
-
 		interp.setImage(input);
 
 		float scaleX = (float)input.width/(float)output.width;
@@ -103,24 +96,6 @@ public class TestDistortImageOps {
 			}
 		}
 		assertTrue(error / (output.width * output.height) < 0.1);
-	}
-
-	@Test
-	public void rotate_InterpTypeStyle() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 output = new ImageFloat32(width,height);
-		ImageFloat32 output2 = new ImageFloat32(width,height);
-
-		GeneralizedImageOps.randomize(input,rand,0,100);
-
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
-
-
-		DistortImageOps.rotate(input,output,interp,(float)Math.PI/2f);
-		DistortImageOps.rotate(input,output2,TypeInterpolate.BILINEAR,(float)Math.PI/2f);
-
-		// they should be identical
-		BoofTesting.assertEquals(output,output2);
 	}
 
 	/**

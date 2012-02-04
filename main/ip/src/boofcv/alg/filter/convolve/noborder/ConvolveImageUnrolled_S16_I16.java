@@ -20,8 +20,8 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageInt16;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageInt16;
 
 /**
  * <p>
@@ -40,7 +40,7 @@ import boofcv.struct.image.ImageSInt16;
  *
  * @author Peter Abeles
  */
-public class ConvolveImageUnrolled_I16_I16 {
+public class ConvolveImageUnrolled_S16_I16 {
 	public static boolean horizontal( Kernel1D_I32 kernel ,
 								   ImageSInt16 image, ImageInt16 dest,
 								   boolean includeBorder) {

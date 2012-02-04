@@ -112,7 +112,7 @@ public class CompareHessianToConvolution {
 		// now compute the second derivative using provided convolution filters
 		ImageSingleBand expectedOutput[] = new ImageSingleBand[3];
 		for( int i = 0; i < expectedOutput.length; i++ ) {
-			expectedOutput[i] = images[0]._createNew(width,height);
+			expectedOutput[i] = (ImageSingleBand)images[0]._createNew(width,height);
 		}
 		outputFilters[0].process(images[0],expectedOutput[0]);
 		outputFilters[1].process(images[1],expectedOutput[1]);

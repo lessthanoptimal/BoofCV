@@ -72,7 +72,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KLT_Naive_I16 extends PerformerBase {
-		ImplSsdCornerNaive_S16 corner = new ImplSsdCornerNaive_S16(imgWidth, imgHeight, windowRadius);
+		ImplSsdCornerNaive corner = new ImplSsdCornerNaive(imgWidth, imgHeight, windowRadius,false);
 
 		@Override
 		public void process() {

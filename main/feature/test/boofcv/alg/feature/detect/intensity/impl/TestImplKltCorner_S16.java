@@ -37,7 +37,7 @@ import java.util.Random;
  */
 public class TestImplKltCorner_S16 {
 	int width = 15;
-	int height = 15;
+	int height = 20;
 
 	@Test
 	public void genericTests() {
@@ -72,7 +72,7 @@ public class TestImplKltCorner_S16 {
 	}
 
 	public void compareToNaive(ImageSInt16 derivX, ImageSInt16 derivY) {
-		ImplSsdCornerNaive_S16 naive = new ImplSsdCornerNaive_S16(width, height, 3);
+		ImplSsdCornerNaive naive = new ImplSsdCornerNaive(width, height, 3, false);
 		naive.process(derivX, derivY);
 
 		ImplKltCorner_S16 fast = new ImplKltCorner_S16(3);

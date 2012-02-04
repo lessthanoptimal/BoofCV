@@ -28,7 +28,7 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.detect.intensity.FactoryGeneralIntensity;
+import boofcv.factory.feature.detect.intensity.FactoryIntensityGeneral;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.FancyInterestPointRender;
@@ -83,12 +83,12 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		super(1);
 		this.imageType = imageType;
 
-		addAlgorithm(0, "Harris", FactoryGeneralIntensity.harris(radius,0.04f,imageType));
-		addAlgorithm(0, "KLT", FactoryGeneralIntensity.klt(radius, derivType));
-		addAlgorithm(0, "FAST", FactoryGeneralIntensity.fast(5, 11, derivType));
-		addAlgorithm(0, "KitRos", FactoryGeneralIntensity.kitros(derivType));
-		addAlgorithm(0, "Laplace Det", FactoryGeneralIntensity.laplacian(HessianBlobIntensity.Type.DETERMINANT,derivType));
-		addAlgorithm(0, "Laplace Trace", FactoryGeneralIntensity.laplacian(HessianBlobIntensity.Type.TRACE,derivType));
+		addAlgorithm(0, "Harris", FactoryIntensityGeneral.harris(radius, 0.04f, imageType));
+		addAlgorithm(0, "KLT", FactoryIntensityGeneral.klt(radius, derivType));
+		addAlgorithm(0, "FAST", FactoryIntensityGeneral.fast(5, 11, derivType));
+		addAlgorithm(0, "KitRos", FactoryIntensityGeneral.kitros(derivType));
+		addAlgorithm(0, "Laplace Det", FactoryIntensityGeneral.laplacian(HessianBlobIntensity.Type.DETERMINANT, derivType));
+		addAlgorithm(0, "Laplace Trace", FactoryIntensityGeneral.laplacian(HessianBlobIntensity.Type.TRACE, derivType));
 
 		deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
@@ -240,9 +240,9 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		CompareFeatureExtractorApp app = new CompareFeatureExtractorApp(ImageFloat32.class,ImageFloat32.class);
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","data/shapes01.png");
-		manager.add("sunflowers","data/sunflowers.png");
-		manager.add("beach","data/scale/beach02.jpg");
+		manager.add("shapes","../data/evaluation/shapes01.png");
+		manager.add("sunflowers","../data/evaluation/sunflowers.png");
+		manager.add("beach","../data/evaluation/scale/beach02.jpg");
 
 		app.setInputManager(manager);
 

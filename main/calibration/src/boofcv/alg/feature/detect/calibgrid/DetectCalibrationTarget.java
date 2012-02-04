@@ -70,7 +70,7 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 	double polySideRatio = 0.25;
 
 	// given a blob it finds the 4 corners in the blob
-	FindQuadCorners cornerFinder = new FindQuadCorners(1.5);
+	FindQuadCorners cornerFinder = new FindQuadCorners(1.5,10);
 	private int numBlobs;
 
 	// list if found corners/blobs

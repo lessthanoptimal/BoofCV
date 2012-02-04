@@ -139,11 +139,11 @@ public class WaveletVisualizeApp
 //		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageUInt8.class);
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("lena","data/standard/lena512.bmp");
-		manager.add("boat","data/standard/boat.png");
-		manager.add("fingerprint","data/standard/fingerprint.png");
-		manager.add("shapes","data/shapes01.png");
-		manager.add("sunflowers","data/sunflowers.png");
+		manager.add("lena","../data/evaluation/standard/lena512.bmp");
+		manager.add("boat","../data/evaluation/standard/boat.png");
+		manager.add("fingerprint","../data/evaluation/standard/fingerprint.png");
+		manager.add("shapes","../data/evaluation/shapes01.png");
+		manager.add("sunflowers","../data/evaluation/sunflowers.png");
 
 		app.setInputManager(manager);
 

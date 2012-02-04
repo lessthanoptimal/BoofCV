@@ -47,6 +47,9 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	JCheckBox showNumbers;
 	JCheckBox showGraph;
 
+	// allows the user to change the image zoom
+	JSpinner selectZoom;
+
 	// selects threshold to create binary image from
 	JSpinner thresholdSpinner;
 
@@ -54,6 +57,8 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	boolean doShowPoints = true;
 	boolean doShowNumbers = true;
 	boolean doShowGraph = true;
+
+	double scale = 1;
 
 	Listener listener;
 	
@@ -68,6 +73,10 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		viewSelector.addActionListener(this);
 		viewSelector.setMaximumSize(viewSelector.getPreferredSize());
 
+		selectZoom = new JSpinner(new SpinnerNumberModel(1,0.1,50,1));
+		selectZoom.addChangeListener(this);
+		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
+		
 		successIndicator = new JLabel();
 
 		showBound = new JCheckBox("Show Bound");
@@ -99,6 +108,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		addLabeled(viewSelector,"View ",this);
 		addLabeled(thresholdSpinner,"Threshold",this);
 		addSeparator(100);
+		addLabeled(selectZoom,"Zoom ",this);
 		addAlignLeft(showBound, this);
 		addAlignLeft(showPoints,this);
 		addAlignLeft(showNumbers,this);
@@ -132,6 +142,8 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 
 		if( e.getSource() == thresholdSpinner) {
 			thresholdLevel = ((Number) thresholdSpinner.getValue()).intValue();
+		} else if( e.getSource() == selectZoom ) {
+			scale = ((Number)selectZoom.getValue()).doubleValue();
 		}
 		
 		listener.calibEventProcess();
@@ -172,6 +184,10 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 
 	public void setListener( Listener listener) {
 		this.listener = listener;
+	}
+
+	public double getScale() {
+		return scale;
 	}
 
 	public static interface Listener

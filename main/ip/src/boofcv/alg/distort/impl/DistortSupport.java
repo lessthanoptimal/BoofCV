@@ -41,7 +41,7 @@ public class DistortSupport {
 	 * directly from the size of the two input images and independently scales
 	 * the x and y axises.
 	 */
-	public static PixelTransformAffine_F32 transformScale(ImageSingleBand from, ImageSingleBand to)
+	public static PixelTransformAffine_F32 transformScale(ImageBase from, ImageBase to)
 	{
 		float scaleX = (float)to.width/(float)from.width;
 		float scaleY = (float)to.height/(float)from.height;
@@ -90,7 +90,9 @@ public class DistortSupport {
 	 * and interpolation instance.
 	 *
 	 * @param dstToSrc Transform from dst to src image.
-	 * @param border
+	 * @param interp Which interpolation algorithm should be used.
+	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
+	 *               happens to pixels which have a source pixel outside the image.
 	 */
 	public static <T extends ImageSingleBand>
 	ImageDistort<T> createDistort(Class<T> imageType,
@@ -111,11 +113,13 @@ public class DistortSupport {
 	}
 
 	/**
-	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
+	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the multi-spectral images of the specified image type, transformation
 	 * and interpolation instance.
 	 *
 	 * @param dstToSrc Transform from dst to src image.
-	 * @param border
+	 * @param interp Which interpolation algorithm should be used.
+	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
+	 *               happens to pixels which have a source pixel outside the image.
 	 */
 	public static <T extends ImageSingleBand>
 	ImageDistort<MultiSpectral<T>> createDistortMS(Class<T> imageType,

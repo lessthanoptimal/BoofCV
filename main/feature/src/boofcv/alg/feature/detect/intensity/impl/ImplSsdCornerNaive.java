@@ -19,8 +19,12 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Naive implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} which performs computations in a straight
@@ -30,19 +34,22 @@ import boofcv.struct.image.ImageSInt16;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ImplSsdCornerNaive_S16 implements KltCornerIntensity<ImageSInt16> {
+public class ImplSsdCornerNaive<T extends ImageSingleBand> implements KltCornerIntensity<T> {
 
 	// feature's radius
 	private int radius;
 
 	// the intensity of the found features in the image
 	private ImageFloat32 featureIntensity;
+	private Kernel2D_I32 weights;
 
-	public ImplSsdCornerNaive_S16(int imageWidth, int imageHeight,
-							  int windowRadius) {
+	public ImplSsdCornerNaive(int imageWidth, int imageHeight,
+							  int windowRadius, boolean weighted) {
 		this.radius = windowRadius;
 
 		featureIntensity = new ImageFloat32(imageWidth, imageHeight);
+		if( weighted )
+			weights = FactoryKernelGaussian.gaussian(Kernel2D_I32.class,-1,radius);
 	}
 
 	@Override
@@ -61,32 +68,46 @@ public class ImplSsdCornerNaive_S16 implements KltCornerIntensity<ImageSInt16> {
 	}
 
 	@Override
-	public void process(ImageSInt16 derivX, ImageSInt16 derivY) {
+	public void process(T derivX, T derivY) {
 
 		final int imgHeight = derivX.getHeight();
 		final int imgWidth = derivX.getWidth();
 
 		for (int row = radius; row < imgHeight - radius; row++) {
 			for (int col = radius; col < imgWidth - radius; col++) {
-				int dxdx = 0;
-				int dxdy = 0;
-				int dydy = 0;
+				double dxdx = 0;
+				double dxdy = 0;
+				double dydy = 0;
+				double totalW = 0;
 
 				for (int i = -radius; i <= radius; i++) {
 					for (int j = -radius; j <= radius; j++) {
-						int dx = derivX.get(col + j, row + i);
-						int dy = derivY.get(col + j, row + i);
+						
+						double dx = GeneralizedImageOps.get(derivX,col + j, row + i);
+						double dy = GeneralizedImageOps.get(derivY,col + j, row + i);
 
-						dxdx += dx * dx;
-						dydy += dy * dy;
-						dxdy += dx * dy;
+						double w = 1;
+						
+						if( weights != null )
+							w = weights.get(j+radius,i+radius);
+						
+						dxdx += w * dx * dx;
+						dydy += w * dy * dy;
+						dxdy += w * dx * dy;
+						totalW += w;
 					}
+				}
+
+				if( weights != null ) {
+					dxdx /= totalW;
+					dydy /= totalW;
+					dxdy /= totalW;
 				}
 
 				// compute the eigen values
 				double left = (dxdx + dydy) * 0.5;
 				double b = (dxdx - dydy) * 0.5;
-				double right = Math.sqrt(b * b + (double)dxdy * dxdy);
+				double right = Math.sqrt(b * b + dxdy * dxdy);
 
 				featureIntensity.set(col, row, (float) (left - right));
 			}

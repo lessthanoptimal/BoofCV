@@ -184,4 +184,16 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageBase<MultiSpe
 		this.width = width;
 		this.height = height;
 	}
+
+	/**
+	 * Creates a new image of the same type and number of bands
+	 *
+	 * @param imgWidth image width
+	 * @param imgHeight image height
+	 * @return new image
+	 */
+	@Override
+	public MultiSpectral<T> _createNew(int imgWidth, int imgHeight) {
+		return new MultiSpectral<T>(type,imgWidth,imgHeight,bands.length);
+	}
 }

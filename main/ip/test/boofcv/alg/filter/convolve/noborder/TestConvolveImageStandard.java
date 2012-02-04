@@ -55,7 +55,7 @@ public class TestConvolveImageStandard {
 	 */
 	@Test
 	public void checkAll() {
-		int numExpected = 18;
+		int numExpected = 24;
 		Method methods[] = ConvolveImageStandard.class.getMethods();
 
 		// sanity check to make sure the functions are being found

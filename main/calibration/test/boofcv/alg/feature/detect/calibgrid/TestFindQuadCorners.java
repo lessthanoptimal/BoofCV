@@ -53,7 +53,7 @@ public class TestFindQuadCorners {
 		// remove any structure from the input
 		Collections.shuffle(contour,new Random(1234));
 		
-		FindQuadCorners alg = new FindQuadCorners(0.5);
+		FindQuadCorners alg = new FindQuadCorners(0.5,10);
 
 		List<Point2D_I32> corners = alg.process(contour);
 
@@ -140,6 +140,32 @@ public class TestFindQuadCorners {
 		assertEquals(5,FindQuadCorners.countInliers(7,1,-1,list,1));
 	}
 
+	@Test
+	public void refineCorner() {
+		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+
+		// create a list with a 90 degree corner in it
+		list.add( new Point2D_I32(-2,0));
+		list.add( new Point2D_I32(-1,0));
+		list.add( new Point2D_I32(0,0));
+		list.add( new Point2D_I32(1,0));
+		list.add( new Point2D_I32(2,0));
+		list.add( new Point2D_I32(3,0));
+		list.add( new Point2D_I32(4,0));
+		list.add( new Point2D_I32(4,1));
+		list.add( new Point2D_I32(4,2));
+		list.add( new Point2D_I32(4,3));
+		list.add( new Point2D_I32(4,4));
+		list.add( new Point2D_I32(4,5));
+		list.add( new Point2D_I32(4,6));
+
+		// have the center be at a sub-optimal location
+		int found = FindQuadCorners.refineCorner(5,2,list);
+
+		// see if it picked the crux of the corner
+		assertEquals(6,found);
+	}
+	
 	@Test
 	public void incrementCircle() {
 		assertEquals(1,FindQuadCorners.incrementCircle(0,1,8));
