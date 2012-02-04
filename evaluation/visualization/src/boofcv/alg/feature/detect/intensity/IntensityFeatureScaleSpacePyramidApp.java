@@ -68,7 +68,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageSingleBand, D e
 		addAlgorithm(0, "Hessian Det", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
 		addAlgorithm(0, "Laplacian", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
 		addAlgorithm(0, "Harris",new WrapperGradientCornerIntensity<T,D>(FactoryPointIntensityAlg.createHarris(2, 0.4f, derivType)));
-		addAlgorithm(0, "KLT",new WrapperGradientCornerIntensity<T,D>( FactoryPointIntensityAlg.createKlt(2, derivType)));
+		addAlgorithm(0, "KLT",new WrapperGradientCornerIntensity<T,D>( FactoryPointIntensityAlg.createKlt(2,false ,  derivType)));
 		addAlgorithm(0, "FAST 12",new WrapperFastCornerIntensity<T,D>(FactoryPointIntensityAlg.createFast12(5, 11, imageType)));
 		addAlgorithm(0, "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
 		addAlgorithm(0, "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));

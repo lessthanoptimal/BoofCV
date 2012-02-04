@@ -97,9 +97,9 @@ public class VisualizePyramidDiscreteApp <T extends ImageSingleBand>
 		VisualizePyramidDiscreteApp<ImageFloat32> app = new VisualizePyramidDiscreteApp<ImageFloat32>(ImageFloat32.class);
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("lena","data/standard/lena512.bmp");
-		manager.add("boat","data/standard/boat.png");
-		manager.add("fingerprint","data/standard/fingerprint.png");
+		manager.add("lena","../data/evaluation/standard/lena512.bmp");
+		manager.add("boat","../data/evaluation/standard/boat.png");
+		manager.add("fingerprint","../data/evaluation/standard/fingerprint.png");
 
 		app.setInputManager(manager);
 

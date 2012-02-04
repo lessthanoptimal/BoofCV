@@ -108,7 +108,7 @@ public class CompareDerivativeToConvolution {
 		// declare and compute the validation results
 		ImageSingleBand expectedOutput[] = new ImageSingleBand[param.length-2];
 		for( int i = 0; i < expectedOutput.length; i++ ) {
-			expectedOutput[i] = outputImages[i]._createNew(inputImage.width,inputImage.height);
+			expectedOutput[i] = (ImageSingleBand)outputImages[i]._createNew(inputImage.width,inputImage.height);
 			outputFilters[i].process(inputImage,expectedOutput[i]);
 		}
 

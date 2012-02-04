@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.calibgrid;
 
 import georegression.metric.Distance2D_F64;
+import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -39,13 +40,19 @@ public class FindQuadCorners {
 
 	// how close a pixel can be to be considered part of the same line
 	double lineTolerance;
+	
+	// size of the local region for corner refinement
+	int refinementRadius;
 
 	/**
 	 *
 	 * @param lineTolerance Defines how close a point is to be an inlier.  Euclidean distance
+	 * @param refinementRadius After candidate corners points have been found they are refined by searching the local
+	 *                         region for points which have a smaller acute angle
 	 */
-	public FindQuadCorners(double lineTolerance) {
+	public FindQuadCorners(double lineTolerance , int refinementRadius ) {
 		this.lineTolerance = lineTolerance*lineTolerance;
+		this.refinementRadius = refinementRadius;
 	}
 
 	/**
@@ -71,8 +78,20 @@ public class FindQuadCorners {
 		corners.add( contour.get(corner1));
 
 		// find points which maximize the inlier to a line model and are not close to existing points
-		findCorner(corner0,corner1,contour,corners);
-		findCorner(corner1,corner0,contour,corners);
+		int corner2 = findCorner(corner0,corner1,contour,corners);
+		int corner3 = findCorner(corner1,corner0,contour,corners);
+
+		// refine the corner estimates by maximizing the acute angle
+		corner0 = refineCorner(corner0, refinementRadius,contour);
+		corner1 = refineCorner(corner1, refinementRadius,contour);
+		corner2 = refineCorner(corner2, refinementRadius,contour);
+		corner3 = refineCorner(corner3, refinementRadius,contour);
+
+		corners.clear();
+		corners.add(contour.get(corner0));
+		corners.add(contour.get(corner1));
+		corners.add(contour.get(corner2));
+		corners.add(contour.get(corner3));
 
 		// sort the corners to make future calculations easier
 		sortByAngleCCW(center, corners);
@@ -165,7 +184,7 @@ public class FindQuadCorners {
 	 * @param contour List of pixels around the blob
 	 * @param corners List of corners already found
 	 */
-	private void findCorner( int start , int stop , List<Point2D_I32> contour , List<Point2D_I32> corners )
+	private int findCorner( int start , int stop , List<Point2D_I32> contour , List<Point2D_I32> corners )
 	{
 		int candidate0 = findMaxInlier(start,stop,1,contour);
 		int candidate1 = findMaxInlier(start,stop,-1,contour);
@@ -182,8 +201,10 @@ public class FindQuadCorners {
 
 		if( dist0 > dist1 ) {
 			corners.add(c0);
+			return candidate0;
 		} else {
 			corners.add(c1);
+			return candidate1;
 		}
 	}
 
@@ -253,13 +274,54 @@ public class FindQuadCorners {
 	}
 
 	/**
+	 * Searches the local region around cornerIndex to find the point which has the smallest acute angle
+	 * with points locaRadius away from it.
+	 *
+	 * @param cornerIndex  Center point in area being examined
+	 * @param localRadius size of the region being eamined
+	 * @param contour list of ordered points
+	 * @return index of the best one found
+	 */
+	protected static int refineCorner( int cornerIndex , int localRadius ,
+									   List<Point2D_I32> contour ) {
+		int N = contour.size();
+		int start = incrementCircle(cornerIndex,-localRadius,N);
+		int stop = incrementCircle(cornerIndex,localRadius,N);
+		
+		double bestAngle = Double.MAX_VALUE;
+		int bestIndex = -1;
+		
+		for( int i = start; i != stop; i = incrementCircle(i,1,N) ) {
+			int i0 = incrementCircle(i,-localRadius,N);
+			int i1 = incrementCircle(i,localRadius,N);
+
+			Point2D_I32 p = contour.get(i);
+			Point2D_I32 p0 = contour.get(i0);
+			Point2D_I32 p1 = contour.get(i1);
+
+			double angle0 = Math.atan2(p0.y-p.y,p0.x-p.x);
+			double angle1 = Math.atan2(p1.y-p.y,p1.x-p.x);
+			
+			double acute = UtilAngle.dist(angle0,angle1);
+			
+			if( acute < bestAngle ) {
+				bestAngle = acute;
+				bestIndex = i;
+			}
+		}
+
+		return bestIndex;
+	}
+	
+	
+	/**
 	 * Returns the next point in the list assuming a cyclical list
 	 * @param i current index
 	 * @param dir Direction and amount of increment
 	 * @param size Size of the list
 	 * @return i+dir taking in account the list's cyclical nature
 	 */
-	protected static int incrementCircle( int i , int dir , int size ) {
+	public static int incrementCircle( int i , int dir , int size ) {
 		i += dir;
 		if( i < 0 ) i = size+i;
 		else if( i >= size ) i = i - size;

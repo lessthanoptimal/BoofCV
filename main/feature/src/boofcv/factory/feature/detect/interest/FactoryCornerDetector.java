@@ -52,7 +52,7 @@ public class FactoryCornerDetector {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T,D> createKlt( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
 	{
-		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createKlt(featureRadius, derivType);
+		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createKlt(featureRadius, false , derivType);
 		return createGeneral(cornerIntensity,featureRadius,cornerThreshold,maxFeatures);
 	}
 

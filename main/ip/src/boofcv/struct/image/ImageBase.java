@@ -104,4 +104,16 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 		index -= startIndex;
 		return new Point2D_I32( index % stride , index / stride );
 	}
+
+	/**
+	 * Returns a new image.  If either width or height are
+	 * set to -1 then none of the class parameters set. Otherwise
+	 * a new image is created with the specified dimensions which has all
+	 * other parameters the same as the original matrix.
+	 *
+	 * @param imgWidth
+	 * @param imgHeight
+	 * @return new image
+	 */
+	public abstract T _createNew(int imgWidth, int imgHeight);
 }

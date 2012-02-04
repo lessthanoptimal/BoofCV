@@ -18,6 +18,8 @@
 
 package boofcv.alg.filter.convolve.normalized;
 
+import boofcv.misc.AutoTypeImage;
+import boofcv.misc.CodeGeneratorBase;
 import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
@@ -29,28 +31,34 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public class GenerateConvolveNormalized_JustBorder {
-	String className = "ConvolveNormalized_JustBorder";
+public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 
-	PrintStream out;
+	String kernelType;
+	String inputType;
+	String outputType;
+	String kernelData;
+	String inputData;
+	String outputData;
+	String sumType;
+	String bitWiseOp;
 
 	public GenerateConvolveNormalized_JustBorder() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
+		setOutputFile("ConvolveNormalized_JustBorder");
 	}
 
 	public void generate() {
 		printPreamble();
-		printAllOps("F32", "ImageFloat32","ImageFloat32","float","float","float","float","");
-		printAllOps("I32", "ImageUInt8","ImageInt8","int","byte","byte","int"," & 0xFF");
-		printAllOps("I32", "ImageSInt16","ImageInt16","int","short","short","int","");
+
+		printAllOps(AutoTypeImage.F32,AutoTypeImage.F32);
+		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8);
+		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16);
+		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32);
+
 		out.println("}");
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.filter.convolve.normalized;\n" +
-				"\n" +
-				"import boofcv.struct.convolve.Kernel2D_F32;\n" +
+		out.print("import boofcv.struct.convolve.Kernel2D_F32;\n" +
 				"import boofcv.struct.convolve.Kernel2D_I32;\n" +
 				"import boofcv.struct.convolve.Kernel1D_F32;\n" +
 				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
@@ -72,18 +80,26 @@ public class GenerateConvolveNormalized_JustBorder {
 				"public class "+className+" {\n\n");
 	}
 
-	private void printAllOps( String kernelType , String inputType , String outputType ,
-								  String kernelData, String inputData, String outputData ,
-								  String sumType, String  bitWiseOp )
+	private void printAllOps( AutoTypeImage input , AutoTypeImage output )
 	{
-		printHorizontal(kernelType,inputType,outputType,kernelData,inputData,outputData,sumType,bitWiseOp);
-		printVertical(kernelType,inputType,outputType,kernelData,inputData,outputData,sumType,bitWiseOp);
-		printConvolve(kernelType,inputType,outputType,kernelData,inputData,outputData,sumType,bitWiseOp);
+		boolean isInteger = input.isInteger();
+
+		kernelType = isInteger ? "I32" : "F32";
+		inputType = input.getImageName();
+		outputType = output.getImageName();
+		kernelData = isInteger ? "int" : "float";
+		inputData = input.getDataType();
+		outputData = output.getDataType();
+		sumType = isInteger ? "int" : "float";
+		bitWiseOp = input.getBitWise();
+
+		printHorizontal();
+		printVertical();
+		printConvolve();
+
 	}
 
-	private void printHorizontal( String kernelType , String inputType , String outputType ,
-								  String kernelData, String inputData, String outputData ,
-								  String sumType, String  bitWiseOp) {
+	private void printHorizontal() {
 		
 		String typeCast = outputData.compareTo(sumType) == 0 ? "" : "("+outputData+")";
 
@@ -137,9 +153,7 @@ public class GenerateConvolveNormalized_JustBorder {
 				"\t}\n\n");
 	}
 
-	private void printVertical( String kernelType , String inputType , String outputType ,
-								String kernelData, String inputData, String outputData ,
-								String sumType, String  bitWiseOp) {
+	private void printVertical() {
 
 		String typeCast = outputData.compareTo(sumType) == 0 ? "" : "("+outputData+")";
 
@@ -202,9 +216,7 @@ public class GenerateConvolveNormalized_JustBorder {
 				"\t}\n\n");
 	}
 
-	public void printConvolve( String kernelType , String inputType , String outputType ,
-							   String kernelData, String inputData, String outputData ,
-							   String sumType, String  bitWiseOp) {
+	public void printConvolve() {
 
 		String typeCast = outputData.compareTo(sumType) == 0 ? "" : "("+outputData+")";
 
