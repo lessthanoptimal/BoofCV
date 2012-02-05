@@ -42,7 +42,7 @@ public class FactoryIntensityGeneral {
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  harris( int windowRadius, float kappa , Class<D> derivType ) {
-		HarrisCornerIntensity<D> alg =  FactoryPointIntensityAlg.createHarris(windowRadius,kappa, derivType);
+		HarrisCornerIntensity<D> alg =  FactoryPointIntensityAlg.createHarris(windowRadius,kappa, false, derivType);
 		return new WrapperGradientCornerIntensity<I, D>(alg);
 	}
 

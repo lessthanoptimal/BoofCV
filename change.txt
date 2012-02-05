@@ -3,6 +3,13 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2012/
+Version : Alpha 0.6
+
+- Added convolution related code for ImageSInt32
+- Added weighted KLT and Harris corner detectors
+
+---------------------------------------------
 Date    : 2012/02/01
 Version : Alpha 0.5
 

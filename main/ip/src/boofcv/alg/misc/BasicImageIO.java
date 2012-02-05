@@ -19,6 +19,7 @@
 package boofcv.alg.misc;
 
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -32,15 +33,27 @@ public class BasicImageIO {
 
 		if( a.getTypeInfo().isInteger() ) {
 			print((ImageInteger)a);
-		} else {
+		} else if( a instanceof  ImageFloat32 ) {
 			print((ImageFloat32)a);
+		} else {
+			print((ImageFloat64)a);
 		}
+	}
+
+	public static void print(ImageFloat64 a) {
+		for (int y = 0; y < a.height; y++) {
+			for (int x = 0; x < a.width; x++) {
+				System.out.printf("%6.2f ", a.get(x, y));
+			}
+			System.out.println();
+		}
+		System.out.println();
 	}
 
 	public static void print(ImageFloat32 a) {
 		for (int y = 0; y < a.height; y++) {
 			for (int x = 0; x < a.width; x++) {
-				System.out.printf("%5.2f ", a.get(x, y));
+				System.out.printf("%6.2f ", a.get(x, y));
 			}
 			System.out.println();
 		}

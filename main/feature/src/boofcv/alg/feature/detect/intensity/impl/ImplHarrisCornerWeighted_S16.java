@@ -18,32 +18,41 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
+import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.struct.image.ImageSInt16;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity}
- * that samples pixels using a Gaussian distribution based off of {@link ImplSsdCornerWeighted_F32}.
+ * Implementation of {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity}
+ * that samples pixels using a Gaussian distribution and is based off of {@link boofcv.alg.feature.detect.intensity.impl.ImplSsdCornerWeighted_F32}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImplKltCornerWeighted_S16 extends ImplSsdCornerWeighted_S16
-		implements KltCornerIntensity<ImageSInt16>
+public class ImplHarrisCornerWeighted_S16 extends ImplSsdCornerWeighted_S16
+		implements HarrisCornerIntensity<ImageSInt16>
 {
-	public ImplKltCornerWeighted_S16(int radius) {
-		super(radius);
+	float kappa;
+
+	public ImplHarrisCornerWeighted_S16(int windowRadius, float kappa) {
+		super(windowRadius);
+		this.kappa = kappa;
 	}
 
 	@Override
 	protected float computeResponse() {
-		// compute the smallest eigenvalue
-		double left = (totalXX + totalYY) * 0.5;
-		double b = (totalXX - totalYY) * 0.5;
-		double right = Math.sqrt(b * b + totalXY * totalXY);
+		// det(A) + kappa*trace(A)^2
+		float trace = totalXX + totalYY;
+		return (totalXX * totalYY - totalXY * totalXY) + kappa * trace*trace;
+	}
 
-		// the smallest eigenvalue will be minus the right side
-		return (float)(left - right);
+	@Override
+	public float getKappa() {
+		return kappa;
+	}
+
+	@Override
+	public void setKappa(float kappa) {
+		this.kappa = kappa;
 	}
 }

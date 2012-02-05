@@ -35,7 +35,9 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 
 import javax.swing.*;
 import java.awt.*;
@@ -75,7 +77,7 @@ public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends Image
 
 		addAlgorithm(0, "Laplacian", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
 		addAlgorithm(0, "Hessian Det", new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
-		addAlgorithm(0, "Harris",new WrapperGradientCornerIntensity<T,D>(FactoryPointIntensityAlg.createHarris(2, 0.4f, derivType)));
+		addAlgorithm(0, "Harris",new WrapperGradientCornerIntensity<T,D>(FactoryPointIntensityAlg.createHarris(2, 0.4f, false, derivType)));
 		addAlgorithm(0, "KLT",new WrapperGradientCornerIntensity<T,D>( FactoryPointIntensityAlg.createKlt(2,false , derivType)));
 		addAlgorithm(0, "KLT Weighted",new WrapperGradientCornerIntensity<T,D>( FactoryPointIntensityAlg.createKlt(2,true , derivType)));
 		addAlgorithm(0, "FAST 12",new WrapperFastCornerIntensity<T,D>(FactoryPointIntensityAlg.createFast12(5, 11, imageType)));
@@ -144,11 +146,11 @@ public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends Image
 	}
 
 	public static void main( String args[] ) {
-		IntensityPointFeatureApp<ImageFloat32,ImageFloat32> app =
-				new IntensityPointFeatureApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+//		IntensityPointFeatureApp<ImageFloat32,ImageFloat32> app =
+//				new IntensityPointFeatureApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-//		IntensityPointFeatureApp<ImageUInt8, ImageSInt16> app =
-//				new IntensityPointFeatureApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
+		IntensityPointFeatureApp<ImageUInt8, ImageSInt16> app =
+				new IntensityPointFeatureApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("shapes","../data/evaluation/shapes01.png");

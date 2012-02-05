@@ -45,7 +45,7 @@ public class FactoryCornerDetector {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T,D> createHarris( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
 	{
-		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createHarris(featureRadius, 0.04f, derivType);
+		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createHarris(featureRadius, 0.04f, false, derivType);
 		return createGeneral(cornerIntensity,featureRadius,cornerThreshold,maxFeatures);
 	}
 

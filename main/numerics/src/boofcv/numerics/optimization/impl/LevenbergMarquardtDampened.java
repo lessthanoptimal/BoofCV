@@ -253,7 +253,7 @@ public class LevenbergMarquardtDampened {
 			return terminateSearch(true, null);
 		
 		// extract diagonal elements from B
-		CommonOps.diag(B, Bdiag);
+		CommonOps.extractDiag(B, Bdiag);
 		
 		mode = 1;
 		return false;

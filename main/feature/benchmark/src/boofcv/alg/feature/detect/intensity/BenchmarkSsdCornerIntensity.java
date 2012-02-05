@@ -62,8 +62,25 @@ public class BenchmarkSsdCornerIntensity {
 		}
 	}
 
+	public static class KLT_WEIGHT_F32 extends PerformerBase {
+		ImplKltCornerWeighted_F32 corner = new ImplKltCornerWeighted_F32(windowRadius);
+
+		@Override
+		public void process() {
+			corner.process(derivX_F32, derivY_F32);
+		}
+	}
+
 	public static class KLT_I16 extends PerformerBase {
 		ImplKltCorner_S16 corner = new ImplKltCorner_S16(windowRadius);
+
+		@Override
+		public void process() {
+			corner.process(derivX_I16, derivY_I16);
+		}
+	}
+	public static class KLT_WEIGHT_I16 extends PerformerBase {
+		ImplKltCornerWeighted_S16 corner = new ImplKltCornerWeighted_S16(windowRadius);
 
 		@Override
 		public void process() {
@@ -141,9 +158,11 @@ public class BenchmarkSsdCornerIntensity {
 		System.out.println();
 
 		ProfileOperation.printOpsPerSec(new KLT_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new KLT_WEIGHT_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Harris_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new KitRos_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new KLT_I16(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new KLT_WEIGHT_I16(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Harris_I16(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new KitRos_I16(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new KLT_Naive_I16(), TEST_TIME);

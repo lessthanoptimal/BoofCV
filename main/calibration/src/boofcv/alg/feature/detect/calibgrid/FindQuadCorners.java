@@ -26,6 +26,7 @@ import georegression.struct.point.Point2D_I32;
 import pja.sorting.QuickSort_F64;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -82,17 +83,16 @@ public class FindQuadCorners {
 		int corner3 = findCorner(corner1,corner0,contour,corners);
 
 		// refine the corner estimates by maximizing the acute angle
-		corner0 = refineCorner(corner0, refinementRadius,contour);
-		corner1 = refineCorner(corner1, refinementRadius,contour);
-		corner2 = refineCorner(corner2, refinementRadius,contour);
-		corner3 = refineCorner(corner3, refinementRadius,contour);
+		List<Integer> refined = refineCorners(corner0,corner1,corner2,corner3,contour);
 
 		corners.clear();
-		corners.add(contour.get(corner0));
-		corners.add(contour.get(corner1));
-		corners.add(contour.get(corner2));
-		corners.add(contour.get(corner3));
-
+		for( int i = 0; i < 4; i++ ) {
+			int index = refined.get(i);
+			if( index < 0 )
+				System.out.println("Egdas");
+			corners.add(contour.get(refined.get(i)));
+		}
+			
 		// sort the corners to make future calculations easier
 		sortByAngleCCW(center, corners);
 
@@ -274,6 +274,45 @@ public class FindQuadCorners {
 	}
 
 	/**
+	 * Given the four corners, it refines their location by minimizing the acute angle.
+	 * The area it searches is dependent on the distance the corner is from its
+	 * neighbors.
+	 */
+	protected static List<Integer> refineCorners( int corner0 , int corner1 , 
+												  int corner2 , int corner3 ,
+												  List<Point2D_I32> contour )
+	{
+		// order the corners
+		List<Integer> order = new ArrayList<Integer>();
+		order.add(corner0);
+		order.add(corner1);
+		order.add(corner2);
+		order.add(corner3);
+
+		Collections.sort(order);
+
+		
+		for( int i = 0; i < 4; i++ ) {
+			// get the index location
+			int a = order.get(incrementCircle(i,-1,4));
+			int b = order.get(i);
+			int c = order.get(incrementCircle(i,1,4));
+
+			// find the distance the corners are apart so it can compute the local radius
+			int distA = distanceCircle(b,a,-1,contour.size());
+			int distC = distanceCircle(b,c,1,contour.size());
+
+			int radius = Math.min(distA,distC)/2;
+			
+			int location = refineCorner(b,radius,contour);
+
+			order.set(i,location);
+		}
+		
+		return order;
+	}
+	
+	/**
 	 * Searches the local region around cornerIndex to find the point which has the smallest acute angle
 	 * with points locaRadius away from it.
 	 *
@@ -289,7 +328,7 @@ public class FindQuadCorners {
 		int stop = incrementCircle(cornerIndex,localRadius,N);
 		
 		double bestAngle = Double.MAX_VALUE;
-		int bestIndex = -1;
+		int bestIndex = cornerIndex;
 		
 		for( int i = start; i != stop; i = incrementCircle(i,1,N) ) {
 			int i0 = incrementCircle(i,-localRadius,N);
@@ -310,6 +349,8 @@ public class FindQuadCorners {
 			}
 		}
 
+		// if two corners are very close to each other this function can fail
+		// in which case the original corner is returned
 		return bestIndex;
 	}
 	
@@ -326,5 +367,27 @@ public class FindQuadCorners {
 		if( i < 0 ) i = size+i;
 		else if( i >= size ) i = i - size;
 		return i;
+	}
+
+	/**
+	 * 
+	 * dist = (dir > 0 ) i1-i0 ? i0-i1;
+	 * if( dist < 0 )
+	 * 	distance = size+distance;
+	 * 
+	 * @param i0 First point.
+	 * @param i1 Second point.
+	 * @param dir 0 > counting down, 0 < counting up
+	 * @param size
+	 * @return
+	 */
+	public static int distanceCircle( int i0 , int i1 , int dir , int size ) {
+
+		int distance = ( dir > 0 ) ? i1-i0 : i0-i1;
+		
+		if( distance < 0 )
+			distance = size+distance;
+		
+		return distance;
 	}
 }

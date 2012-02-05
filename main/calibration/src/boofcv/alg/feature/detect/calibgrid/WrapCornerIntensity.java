@@ -20,7 +20,6 @@ package boofcv.alg.feature.detect.calibgrid;
 
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityGeneral;
@@ -93,10 +92,23 @@ public class WrapCornerIntensity<T extends ImageSingleBand, D extends ImageSingl
 					}
 				}
 			}
+
+			double sumX=0,sumY=0;
+			double total=0;
+			for( int y=-1;y<=1;y++){
+				for( int x=-1;x<=1;x++ ){
+					float v = Math.abs(intensity.get(x + maxX, y + maxY));
+					sumX += x*v;
+					sumY += y*v;
+
+					total += v;
+
+				}
+			}
 			
 			Point2D_F32 rp = refinedCorners.get(i);
-			rp.x = maxX;
-			rp.y = maxY;
+			rp.x = (float)(sumX/total+maxX);
+			rp.y = (float)(sumY/total+maxY);
 		}
 	}
 }
