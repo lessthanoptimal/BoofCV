@@ -19,18 +19,10 @@
 package boofcv.alg.geo.d3.calibration;
 
 import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.distort.impl.DistortSupport;
-import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.VisualizeFeatures;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -38,10 +30,7 @@ import georegression.struct.point.Point2D_I32;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
-import java.util.*;
 import java.util.List;
 
 /**
@@ -98,7 +87,6 @@ public class SubpixelGridTargetDisplay<T extends ImageSingleBand>
 	}
 	
 	private synchronized void render( Rectangle visibleRect ) {
-		System.out.println("render scale = "+scale);
 		
 		if( visibleRect.width == 0 || visibleRect.height == 0 )
 			return;
@@ -110,8 +98,6 @@ public class SubpixelGridTargetDisplay<T extends ImageSingleBand>
 		}
 		double x = -visibleRect.x;
 		double y = -visibleRect.y;
-
-		System.out.println("   x = "+x+" y = "+y+"   workimage.width "+workImage.getWidth()+"  vis.w = "+visibleRect.getWidth());
 
 		DistortImageOps.affine(input,transformed,TypeInterpolate.NEAREST_NEIGHBOR,scale,0,0,scale,x,y);
 		ConvertBufferedImage.convertTo(transformed,workImage);

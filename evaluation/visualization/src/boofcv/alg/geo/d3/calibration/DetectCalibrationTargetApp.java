@@ -18,25 +18,24 @@
 
 package boofcv.alg.geo.d3.calibration;
 
+import boofcv.alg.feature.detect.calibgrid.AutoThresholdCalibrationGrid;
 import boofcv.alg.feature.detect.calibgrid.DetectCalibrationTarget;
 import boofcv.alg.feature.detect.calibgrid.SquareBlob;
+import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectImagePanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
-import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -46,15 +45,16 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationTargetApp <T extends ImageSingleBand>
+public class DetectCalibrationTargetApp
 		extends SelectImagePanel implements ProcessInput , GridCalibPanel.Listener
 {
-	Class<T> imageType;
 	// detects the calibration target
-	DetectCalibrationTarget<T> alg;
+	DetectCalibrationTarget alg = new DetectCalibrationTarget(500,4,3);
 
 	// gray scale image that targets are detected inside of
-	T gray;
+	ImageFloat32 gray = new ImageFloat32(1,1);
+	// binary image
+	ImageUInt8 binary = new ImageUInt8(1,1);
 
 	// GUI components
 	GridCalibPanel calibGUI;
@@ -68,14 +68,13 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 	// original untainted image
 	BufferedImage input;
 
+	// used to automatically select the threshold
+	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(alg,255,20);
+
 	// if a target was found or not
 	boolean foundTarget;
 
-	public DetectCalibrationTargetApp(Class<T> imageType) {
-		this.imageType = imageType;
-		alg = new DetectCalibrationTarget<T>(imageType,500,4,3);
-		gray = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-
+	public DetectCalibrationTargetApp() {
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
 		
@@ -93,12 +92,10 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 		this.input = input;
 		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_RGB);
 		gray.reshape(input.getWidth(),input.getHeight());
+		binary.reshape(gray.width,gray.height);
 		ConvertBufferedImage.convertFrom(input,gray);
 
-		foundTarget = alg.process(gray,calibGUI.getThresholdLevel());
-		if( !foundTarget ) {
-			System.out.println("Extract target failed!");
-		}
+		detectTarget();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -116,7 +113,7 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 				break;
 
 			case 1:
-				VisualizeBinaryData.renderBinary(alg.getThresholded(), workImage);
+				VisualizeBinaryData.renderBinary(binary, workImage);
 				break;
 
 			case 2:
@@ -239,10 +236,7 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 
 	@Override
 	public synchronized void calibEventProcess() {
-		foundTarget = alg.process(gray,calibGUI.getThresholdLevel());
-		if( !foundTarget ) {
-			System.out.println("Extract target failed!");
-		}
+		detectTarget();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -252,12 +246,30 @@ public class DetectCalibrationTargetApp <T extends ImageSingleBand>
 		});
 	}
 
+	/**
+	 * Process the gray scale image.  Use a manually selected threshold or
+	 */
+	private void detectTarget() {
+
+		if( calibGUI.isManual() ) {
+			GThresholdImageOps.threshold(gray,binary,calibGUI.getThresholdLevel(),true);
+
+			foundTarget = alg.process(binary);
+		} else {
+			foundTarget = auto.process(gray);
+			if( foundTarget ) {
+				calibGUI.setThreshold((int)auto.getThreshold());
+				binary.setTo(auto.getBinary());
+			}
+		}
+
+	}
+
 	public static void main(String args[]) {
 
 //		DetectCalibrationTargetApp<ImageFloat32> app
 //				= new DetectCalibrationTargetApp<ImageFloat32>(ImageFloat32.class);
-		DetectCalibrationTargetApp<ImageUInt8> app
-				= new DetectCalibrationTargetApp<ImageUInt8>(ImageUInt8.class);
+		DetectCalibrationTargetApp app = new DetectCalibrationTargetApp();
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("View 01","../data/evaluation/calibration/hp_dm1/img01.jpg");

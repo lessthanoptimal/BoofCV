@@ -23,7 +23,6 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -48,7 +47,7 @@ public class SubpixelCalibControlPanel extends StandardAlgConfigPanel
 	boolean doShowPixel = true;
 	boolean doShowSubpixel = true;
 
-	int thresholdLevel = 60;
+	int thresholdLevel = 120;
 	
 	public SubpixelCalibControlPanel( Listener listener ) {
 		this.listener = listener;

@@ -19,9 +19,7 @@
 package boofcv.alg.feature.detect.calibgrid;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
-import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -35,11 +33,10 @@ import java.util.List;
 
 /**
  * <p>
- * Detect square grid calibration targets from gray scale images.  The output is a set of ordered calibration
+ * Detect square grid calibration targets from binary images.  The output is a set of ordered calibration
  * points with the number of rows and columns.  Calibration points are in a row-major ordering. Processing
  * steps:
  * <ol>
- * <li>Create binary image by thresholding using a uniform intensity value</li>
  * <li>Morphological noise reduction</li>
  * <li>Create blob clusters</li>
  * <li>Detect rectangles</li>
@@ -50,44 +47,44 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationTarget<T extends ImageSingleBand> {
-	// type of gray scale image being processed
-	Class<T> imageType;
+public class DetectCalibrationTarget {
 
 	// images which store intermediate steps in processing cycle
-	ImageUInt8 thresholded = new ImageUInt8(1,1);
-	ImageUInt8 binaryA = new ImageUInt8(1,1);
-	ImageUInt8 binaryB = new ImageUInt8(1,1);
-	ImageSInt32 blobs = new ImageSInt32(1,1);
+	private ImageUInt8 binaryA = new ImageUInt8(1,1);
+	private ImageUInt8 binaryB = new ImageUInt8(1,1);
+	private ImageSInt32 blobs = new ImageSInt32(1,1);
 
 	// Orders corner points found in the image
-	ExtractOrderedTargetPoints extractTarget;
+	private ExtractOrderedTargetPoints extractTarget;
 
 	// smallest allowed size of a blob;s contour
-	int minContourSize = 20*4;
+	private int minContourSize = 20*4;
 
 	// maximum different between smallest and largest side in a candidate square
-	double polySideRatio = 0.25;
+	private double polySideRatio = 0.25;
 
 	// given a blob it finds the 4 corners in the blob
 	FindQuadCorners cornerFinder = new FindQuadCorners(1.5,10);
 	private int numBlobs;
 
 	// list if found corners/blobs
-	List<SquareBlob> squares;
-	List<SquareBlob> squaresPruned;
+	private List<SquareBlob> squares;
 
 	// number of black squares in calibration grid
-	int gridWidth;
-	int gridHeight;
+	private int gridWidth;
+	private int gridHeight;
 
 	// maximum number of possible targets it will consider
-	int maxShuffle;
+	private int maxShuffle;
 
-	public DetectCalibrationTarget(Class<T> imageType ,
-								   int maxShuffle ,
+	/**
+	 *
+	 * @param maxShuffle Maximum number of combinations of squares it will try when looking for a target.
+	 * @param gridWidth Number of squares wide the grid is.
+	 * @param gridHeight Numbre of squares tall the grid is.
+	 */
+	public DetectCalibrationTarget(int maxShuffle ,
 								   int gridWidth , int gridHeight ) {
-		this.imageType = imageType;
 		this.gridWidth = gridWidth;
 		this.gridHeight = gridHeight;
 		this.maxShuffle = maxShuffle;
@@ -97,18 +94,14 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 	 * Processes the image and detects calibration targets.  If one is found then
 	 * true is returned and calibration points are extracted
 	 *
-	 * @param image Gray scale image being processed
-	 * @param binaryThreshold Threshold used to detect blobs
+	 * @param thresholded Binary image where potential grid squares are set to one.
 	 * @return True if it was successful and false otherwise
 	 */
-	public boolean process( T image , int binaryThreshold )
+	public boolean process( ImageUInt8 thresholded )
 	{
-		thresholded.reshape(image.width, image.height);
-		binaryA.reshape(image.width,image.height);
-		binaryB.reshape(image.width,image.height);
-		blobs.reshape(image.width, image.height);
-
-		GThresholdImageOps.threshold(image, thresholded,binaryThreshold,true);
+		binaryA.reshape(thresholded.width,thresholded.height);
+		binaryB.reshape(thresholded.width,thresholded.height);
+		blobs.reshape(thresholded.width, thresholded.height);
 
 		// filter out small objects
 		BinaryImageOps.erode8(thresholded,binaryA);
@@ -119,6 +112,10 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		// find blobs
 		numBlobs = BinaryImageOps.labelBlobs8(binaryB,blobs);
 
+		// See if there are enough blobs for there to be a chance of it being a complete grid
+		if( numBlobs < gridWidth*gridHeight )
+			return false;
+
 		//remove blobs with holes
 		numBlobs = removeBlobsHoles(binaryB,blobs,numBlobs);
 
@@ -126,7 +123,7 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		List<List<Point2D_I32>> contours = BinaryImageOps.labelEdgeCluster4(blobs,numBlobs,null);
 
 		// remove blobs which touch the image edge
-		filterTouchEdge(contours,image.width,image.height);
+		filterTouchEdge(contours,thresholded.width,thresholded.height);
 
 		// create  list of squares and find an initial estimate of their corners
 		squares = new ArrayList<SquareBlob>();
@@ -345,10 +342,6 @@ public class DetectCalibrationTarget<T extends ImageSingleBand> {
 		BinaryImageOps.relabel(labeled,counter);
 
 		return counts;
-	}
-
-	public ImageUInt8 getThresholded() {
-		return thresholded;
 	}
 
 	public ImageSInt32 getBlobs() {

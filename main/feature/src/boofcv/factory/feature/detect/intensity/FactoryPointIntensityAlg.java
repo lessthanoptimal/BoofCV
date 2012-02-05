@@ -59,17 +59,25 @@ public class FactoryPointIntensityAlg {
 	 *
 	 * @param windowRadius Size of the feature it is detects,
 	 * @param kappa Tuning parameter, typically a small number around 0.04
-	 * @param derivType Image derivative type it is computed from.
-	 * @return Harris corner
+	 * @param weighted Is the gradient weighted using a Gaussian distribution?  Weighted is much slower than unweighted.
+	 *@param derivType Image derivative type it is computed from.  @return Harris corner
 	 */
 	public static <T extends ImageSingleBand>
-	HarrisCornerIntensity<T> createHarris(int windowRadius, float kappa, Class<T> derivType)
+	HarrisCornerIntensity<T> createHarris(int windowRadius, float kappa, boolean weighted, Class<T> derivType)
 	{
-		if( derivType == ImageFloat32.class )
-			return (HarrisCornerIntensity<T>)new ImplHarrisCorner_F32(windowRadius,kappa);
-		else if( derivType == ImageSInt16.class )
-			return (HarrisCornerIntensity<T>)new ImplHarrisCorner_S16(windowRadius,kappa);
-		else
+		if( derivType == ImageFloat32.class ) {
+			if( weighted )
+				return (HarrisCornerIntensity<T>)new ImplHarrisCorner_F32(windowRadius,kappa);
+			else
+				return (HarrisCornerIntensity<T>)new ImplHarrisCornerWeighted_F32(windowRadius,kappa);
+
+		} else if( derivType == ImageSInt16.class ) {
+			if( weighted )
+				return (HarrisCornerIntensity<T>)new ImplHarrisCorner_S16(windowRadius,kappa);
+			else
+				return (HarrisCornerIntensity<T>)new ImplHarrisCornerWeighted_S16(windowRadius,kappa);
+
+		}else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}
 

@@ -18,16 +18,16 @@
 
 package boofcv.alg.geo.d3.calibration;
 
-import boofcv.alg.feature.detect.calibgrid.*;
+import boofcv.alg.feature.detect.calibgrid.AutoThresholdCalibrationGrid;
+import boofcv.alg.feature.detect.calibgrid.DetectCalibrationTarget;
+import boofcv.alg.feature.detect.calibgrid.RefineCalibrationGridCorner;
+import boofcv.alg.feature.detect.calibgrid.WrapRefineLineFit;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -35,7 +35,7 @@ import georegression.struct.point.Point2D_I32;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.ArrayList;
 
 /**
  * @author Peter Abeles
@@ -43,20 +43,20 @@ import java.util.*;
 // TODO show original corners
 // TODO zoom in and out
 // TODO Show sub-pixel corners
-public class DebugSubpixelTargetApp <T extends ImageSingleBand>
+public class DebugSubpixelTargetApp
 		extends SelectImagePanel implements ProcessInput , SubpixelCalibControlPanel.Listener
 {
-	Class<T> imageType;
 	// detects the calibration target
-	DetectCalibrationTarget<T> detectAlg;
+	DetectCalibrationTarget detectAlg = new DetectCalibrationTarget(500,4,3);
+	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(detectAlg,255,20);
 
-	RefineCalibrationGridCorner<T> refineAlg;
+	RefineCalibrationGridCorner<ImageFloat32> refineAlg;
 
 	// gray scale image that targets are detected inside of
-	T gray;
+	ImageFloat32 gray = new ImageFloat32(1,1);
 
 	JScrollPane scroll;
-	SubpixelGridTargetDisplay<T> display;
+	SubpixelGridTargetDisplay<ImageFloat32> display;
 	SubpixelCalibControlPanel control;
 
 	java.util.List<Point2D_I32> crudePoints;
@@ -65,18 +65,16 @@ public class DebugSubpixelTargetApp <T extends ImageSingleBand>
 	// has an image been processed
 	boolean processedImage = false;
 
-	public DebugSubpixelTargetApp(Class<T> imageType) {
-		this.imageType = imageType;
-		detectAlg = new DetectCalibrationTarget<T>(imageType,500,4,3);
-		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
+	public DebugSubpixelTargetApp() {
 
-		refineAlg = new WrapCornerIntensity<T,ImageSingleBand>(10,imageType);
+//		refineAlg = new WrapCornerIntensity<T,ImageSingleBand>(1,imageType);
+		refineAlg = new WrapRefineLineFit<ImageFloat32>();
 
 		// construct the GUI
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
 
-		display = new SubpixelGridTargetDisplay<T>(imageType);
+		display = new SubpixelGridTargetDisplay<ImageFloat32>(ImageFloat32.class);
 		control = new SubpixelCalibControlPanel(this);
 
 		scroll = new JScrollPane(display);
@@ -89,10 +87,11 @@ public class DebugSubpixelTargetApp <T extends ImageSingleBand>
 	}
 
 	public void process( BufferedImage image ) {
+		System.out.println("Processing subpixel app");
 		gray.reshape(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image, gray);
+		ConvertBufferedImage.convertFrom(image,gray);
 
-		if( !detectAlg.process(gray,control.getThresholdLevel()) ) {
+		if( !auto.process(gray) ) {
 			System.out.println("Detect Target Failed!");
 		} else {
 			// TODO Clean up
@@ -151,12 +150,25 @@ public class DebugSubpixelTargetApp <T extends ImageSingleBand>
 		scroll.getVerticalScrollBar().setValue(y);
 	}
 
+	@Override
+	public void changeScale(final double scale) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				Point2D_F64 center = display.getCenter();
+				display.setScale(scale);
+				scroll.getViewport().setView(display);
+
+				// center the view
+				centerView(center.x,center.y);
+
+				display.repaint();
+			}});
+	}
+
+
 	public static void main(String args[]) {
 
-		DebugSubpixelTargetApp<ImageFloat32> app
-				= new DebugSubpixelTargetApp<ImageFloat32>(ImageFloat32.class);
-//		DebugSubpixelTargetApp<ImageUInt8> app
-//				= new DebugSubpixelTargetApp<ImageUInt8>(ImageUInt8.class);
+		DebugSubpixelTargetApp app = new DebugSubpixelTargetApp();
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("View 01","../data/evaluation/calibration/hp_dm1/img01.jpg");
@@ -176,20 +188,5 @@ public class DebugSubpixelTargetApp <T extends ImageSingleBand>
 		}
 
 		ShowImages.showWindow(app, "Calibration Target Subpixel Refinement");
-	}
-
-	@Override
-	public void changeScale(final double scale) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				Point2D_F64 center = display.getCenter();
-				display.setScale(scale);
-				scroll.getViewport().setView(display);
-
-				// center the view
-				centerView(center.x,center.y);
-
-				display.repaint();
-			}});
 	}
 }

@@ -18,32 +18,25 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
+import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
 import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
 
 /**
- * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity}
- * that samples pixels using a Gaussian distribution based off of {@link ImplSsdCornerWeighted_F32}.
- * </p>
- *
  * @author Peter Abeles
  */
-public class ImplKltCornerWeighted_F32 extends ImplSsdCornerWeighted_F32
-		implements KltCornerIntensity<ImageFloat32>
-{
-	public ImplKltCornerWeighted_F32(int radius) {
-		super(radius);
+public class TestImplHarrisCornerWeighted_F32 extends GenericCornerIntensityGradientTests {
+
+	ImplHarrisCornerWeighted_F32 detector = new ImplHarrisCornerWeighted_F32(1,0.04f);
+
+	@Test
+	public void genericTests() {
+		performAllTests();
 	}
 
 	@Override
-	protected float computeResponse() {
-		// compute the smallest eigenvalue
-		float left = (totalXX + totalYY) * 0.5f;
-		float b = (totalXX - totalYY) * 0.5f;
-		double right = Math.sqrt(b * b + totalXY * totalXY);
-		
-		// the smallest eigenvalue will be minus the right side
-		return (float)(left - right);
+	public ImageFloat32 computeIntensity() {
+		detector.process(derivX_F32,derivY_F32);
+		return detector.getIntensity();
 	}
 }

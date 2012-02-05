@@ -24,8 +24,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * Shows calibration grid detector status, configure display, and adjust parameters.
@@ -33,7 +33,7 @@ import java.awt.event.ActionListener;
  * @author Peter Abeles
  */
 public class GridCalibPanel extends StandardAlgConfigPanel 
-		implements ActionListener , ChangeListener
+		implements  ChangeListener, ItemListener
 {
 	// indicates if a calibration grid was found or not
 	JLabel successIndicator;
@@ -52,6 +52,8 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 
 	// selects threshold to create binary image from
 	JSpinner thresholdSpinner;
+	// should the threshold be manually selected or automatically
+	JCheckBox manualThreshold;
 
 	boolean doShowBound = true;
 	boolean doShowPoints = true;
@@ -59,6 +61,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	boolean doShowGraph = true;
 
 	double scale = 1;
+	boolean isManual = false;
 
 	Listener listener;
 	
@@ -70,7 +73,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		viewSelector.addItem("Original");
 		viewSelector.addItem("Threshold");
 		viewSelector.addItem("Cluster");
-		viewSelector.addActionListener(this);
+		viewSelector.addItemListener(this);
 		viewSelector.setMaximumSize(viewSelector.getPreferredSize());
 
 		selectZoom = new JSpinner(new SpinnerNumberModel(1,0.1,50,1));
@@ -81,31 +84,42 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 
 		showBound = new JCheckBox("Show Bound");
 		showBound.setSelected(doShowBound);
-		showBound.addActionListener(this);
+		showBound.addItemListener(this);
 		showBound.setMaximumSize(showBound.getPreferredSize());
 		
 		showPoints = new JCheckBox("Show Points");
 		showPoints.setSelected(doShowPoints);
-		showPoints.addActionListener(this);
+		showPoints.addItemListener(this);
 		showPoints.setMaximumSize(showPoints.getPreferredSize());
 
 		showNumbers = new JCheckBox("Show Numbers");
 		showNumbers.setSelected(doShowNumbers);
-		showNumbers.addActionListener(this);
+		showNumbers.addItemListener(this);
 		showNumbers.setMaximumSize(showNumbers.getPreferredSize());
 
 		showGraph = new JCheckBox("Show Graph");
 		showGraph.setSelected(doShowGraph);
-		showGraph.addActionListener(this);
+		showGraph.addItemListener(this);
 		showGraph.setMaximumSize(showGraph.getPreferredSize());
 
 		thresholdSpinner = new JSpinner(new SpinnerNumberModel(thresholdLevel,0, 255, 20));
 		thresholdSpinner.addChangeListener(this);
 		thresholdSpinner.setMaximumSize(thresholdSpinner.getPreferredSize());
 
-		addLabeled(successIndicator, "Found:",this);
+		manualThreshold = new JCheckBox("Manual");
+		manualThreshold.setSelected(isManual);
+		manualThreshold.addItemListener(this);
+		manualThreshold.setMaximumSize(manualThreshold.getPreferredSize());
+		
+		if( !isManual ) {
+			thresholdSpinner.setEnabled(false);
+		}
+
+		addLabeled(successIndicator, "Found:", this);
 		addSeparator(100);
 		addLabeled(viewSelector,"View ",this);
+		addSeparator(100);
+		addAlignLeft(manualThreshold,this);
 		addLabeled(thresholdSpinner,"Threshold",this);
 		addSeparator(100);
 		addLabeled(selectZoom,"Zoom ",this);
@@ -116,37 +130,19 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( listener == null )
-			return;
-
-		if( e.getSource() == viewSelector ) {
-			selectedView = viewSelector.getSelectedIndex();
-		} else if( e.getSource() == showBound ) {
-			doShowBound = showBound.isSelected();
-		} else if( e.getSource() == showNumbers ) {
-			doShowNumbers = showNumbers.isSelected();
-		} else if( e.getSource() == showPoints ) {
-			doShowPoints = showPoints.isSelected();
-		} else if( e.getSource() == showGraph ) {
-			doShowGraph = showGraph.isSelected();
-		}
-
-		listener.calibEventGUI();
-	}
-
-	@Override
 	public void stateChanged(ChangeEvent e) {
 		if( listener == null )
 			return;
 
 		if( e.getSource() == thresholdSpinner) {
 			thresholdLevel = ((Number) thresholdSpinner.getValue()).intValue();
+			// Only need to recompute
+			if( isManual )
+				listener.calibEventProcess();
 		} else if( e.getSource() == selectZoom ) {
 			scale = ((Number)selectZoom.getValue()).doubleValue();
+			listener.calibEventGUI();
 		}
-		
-		listener.calibEventProcess();
 	}
 
 	public void setSuccessMessage( String message , boolean worked )
@@ -182,12 +178,61 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		return thresholdLevel;
 	}
 
+	public boolean isManual() {
+		return isManual;
+	}
+
 	public void setListener( Listener listener) {
 		this.listener = listener;
 	}
 
 	public double getScale() {
 		return scale;
+	}
+
+	public void setThreshold(int threshold) {
+		thresholdSpinner.setValue(threshold);
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if( listener == null )
+			return;
+
+		if( e.getSource() == viewSelector ) {
+			selectedView = viewSelector.getSelectedIndex();
+			listener.calibEventGUI();
+		} else if( e.getSource() == showBound ) {
+			doShowBound = showBound.isSelected();
+			listener.calibEventGUI();
+		} else if( e.getSource() == showNumbers ) {
+			doShowNumbers = showNumbers.isSelected();
+			listener.calibEventGUI();
+		} else if( e.getSource() == showPoints ) {
+			doShowPoints = showPoints.isSelected();
+			listener.calibEventGUI();
+		} else if( e.getSource() == showGraph ) {
+			doShowGraph = showGraph.isSelected();
+			listener.calibEventGUI();
+		} else if( e.getSource() == thresholdSpinner) {
+			thresholdLevel = ((Number) thresholdSpinner.getValue()).intValue();
+			// Only need to recompute
+			if( isManual )
+				listener.calibEventProcess();
+		} else if( e.getSource() == selectZoom ) {
+			scale = ((Number)selectZoom.getValue()).doubleValue();
+			listener.calibEventGUI();
+		} else if( e.getSource() == manualThreshold) {
+			if( isManual != manualThreshold.isSelected() ) {
+				isManual = manualThreshold.isSelected();
+				thresholdSpinner.setEnabled(isManual);
+
+				// if it switched into manual mode the threshold has not changed since it was
+				// in automatic made and does not need to be recomputed
+				if( !isManual )
+					listener.calibEventProcess();
+			}
+		}
 	}
 
 	public static interface Listener
