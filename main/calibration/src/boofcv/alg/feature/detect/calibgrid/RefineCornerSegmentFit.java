@@ -1,0 +1,448 @@
+/*
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://www.boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.feature.detect.calibgrid;
+
+import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.numerics.optimization.FactoryOptimization;
+import boofcv.numerics.optimization.UnconstrainedMinimization;
+import boofcv.numerics.optimization.functions.FunctionNtoS;
+import boofcv.numerics.optimization.impl.UtilOptimize;
+import boofcv.struct.FastQueue;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageUInt8;
+import georegression.geometry.UtilPoint2D_F64;
+import georegression.metric.Distance2D_F64;
+import georegression.struct.line.LineParametric2D_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * <p>
+ * Given an image it assumes a corner of a square is contained inside.  The square
+ * is assumed to be much darker than the white background. Local statistics are used to
+ * declare which pixels are part of the black square and interpolation is taken in
+ * account when performing non-linear optimization.  Typically a subimage is passed in
+ * that only contains a local region around a single corner.
+ * </p>
+ *
+ * <p>
+ * STEPS:<br>
+ * 1) Local statistics of the square and background are found by first computing the mean then splitting pixels into two
+ * groups which are above or below the mean.<br>
+ * 2) The mean and standard deviation of each group is computed while removing outliers.<br>
+ * 3) Using these statistics two binary images are computed using a threshold 1/2 between
+ *    the light and dark, and another one much closer to the light.<br>
+ * 4) Using logical operators the edge region is found.<br>
+ * 5) Points are extract from the edge and weighted based on how dark they are. <br>
+ * 6) The corner is modeled as the intersection of two lines.  An initial estimate is extracted
+ *    and optimized.
+ * </p>
+ *
+ * <p>
+ * Noise is removed when thresholding by only keeping the largest island of pixels.  The cost
+ * function being optimized minimizes the distance of a closest point on either line to a point.
+ * </p>
+ *
+ * @author Peter Abeles
+ */
+public class RefineCornerSegmentFit {
+
+	// computes statistics of white and black sections
+	private FitGaussianPrune low = new FitGaussianPrune(20,4);
+	private FitGaussianPrune high = new FitGaussianPrune(20,4);
+	
+	// binary images signifying the background and square
+	private ImageUInt8 regionWhite = new ImageUInt8(1,1);
+	private ImageUInt8 regionBlack = new ImageUInt8(1,1);
+
+	private ImageUInt8 binary = new ImageUInt8(1,1);
+
+	private ImageUInt8 binaryHigh = new ImageUInt8(1,1);
+	private ImageUInt8 binaryMiddle = new ImageUInt8(1,1);
+
+	// stores points in the boundary region
+	private FastQueue<PointInfo> points = new FastQueue<PointInfo>(100,PointInfo.class,true);
+	
+	// saved clustered binary image
+	private ImageSInt32 blobs = new ImageSInt32(1,1);
+
+	// list of pixels along the image's edge
+	private Point2D_I32 pointsAlongEdge[] = new Point2D_I32[]{new Point2D_I32()};
+
+	// information about the image being processed in a more convenient format
+	private int width;
+	private int height;
+	private int N;
+	private int numEdges;
+	
+	// initial line parameter estimate
+	private InitialEstimate initial = new InitialEstimate();
+
+	// structures used to refine pixel estimate to sub-pixel accuracy
+	private CostFunction func = new CostFunction();
+	private UnconstrainedMinimization alg = FactoryOptimization.unconstrained(1e-8,1e-8,0);
+
+	// output corner
+	private Point2D_F64 corner;
+
+	/**
+	 * Detects and refines to sub-pixel accuracy a corner in the provided image
+	 *
+	 * @param image  Image containing a single corner from a black square
+	 */
+	public void process( ImageFloat32 image ) {
+		init(image);
+
+		computeStatistics(image);
+
+		detectEdgePoints(image);
+
+		selectEdgeParam();
+		selectCornerParam();
+
+		corner = optimizeFit();
+	}
+
+	/**
+	 * Computes the mean pixel intensity, then separates pixels into two sets that are
+	 * above and below.  Once segmented the mean and standard deviation is computed while
+	 * pruning outliers
+	 */
+	private void computeStatistics(ImageFloat32 image) {
+		low.reset(N);
+		high.reset(N);
+
+		double mean = 0;
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				mean += image.get(x,y);
+			}
+		}
+		mean /= N;
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				double v = image.get(x,y);
+				if( v < mean ) {
+					low.add(v);
+				} else {
+					high.add(v);
+				}
+			}
+		}
+
+		low.process();
+		high.process();
+	}
+
+	/**
+	 * Returns the estimated corner pixel to sub-pixel accuracy
+	 *
+	 * @return Corner point.
+	 */
+	public Point2D_F64 getCorner() {
+		return corner;
+	}
+
+	/**
+	 * Initialized data structures
+	 */
+	private void init(ImageFloat32 image) {
+		this.width = image.width;
+		this.height = image.height;
+		N = width*height;
+		numEdges = 2*(width+height-2);
+
+		regionWhite.reshape(width,height);
+		regionBlack.reshape(width,height);
+		binaryHigh.reshape(width, height);
+		binaryMiddle.reshape(width, height);
+		binary.reshape(width,height);
+		blobs.reshape(width,height);
+
+		setupEdgeArray();
+	}
+
+	/**
+	 * Creates a list of points along the image's edge.  Simplifies code later on.
+	 */
+	private void setupEdgeArray() {
+		if( pointsAlongEdge.length < numEdges ) {
+			pointsAlongEdge = new Point2D_I32[numEdges];
+			for( int i = 0; i < numEdges; i++ ) {
+				pointsAlongEdge[i] = new Point2D_I32();
+			}
+		}
+
+		int index = 0;
+		for( int i = 0; i < width; i++ ) {
+			pointsAlongEdge[index++].set(i, 0);
+		}
+		for( int i = 1; i < height-1; i++ ) {
+			pointsAlongEdge[index++].set(width - 1, i);
+		}
+		for( int i = width - 1; i >= 0; i-- ) {
+			pointsAlongEdge[index++].set(i, height - 1);
+		}
+		for(int i = height-2; i >= 1; i-- ) {
+			pointsAlongEdge[index++].set(0, i);
+		}
+	}
+
+	/**
+	 * Detects edges along the black square.  If the square is partially inside a pixel the
+	 * pixel's value will be between the dark and light value.   In a perfect sensor the border
+	 * region would be at most two pixels thick, both values lighter than the pure black square.
+	 * This border is captured using two threshold, one 1/2 between light and dark, and one much
+	 * close to light.
+	 */
+	private void detectEdgePoints( ImageFloat32 image ) {
+		// Added or subtracted one to handle pathological case where sigma is zero
+		double lowThresh = low.getMean()+low.getSigma()*3+1;
+		double highThresh = high.getMean()-high.getSigma()*3-1;
+
+		// sanity check
+		if( highThresh <= lowThresh )
+			throw new RuntimeException("Bad statistics");
+
+		// do a threshold in the middle first
+		double middleThresh = (lowThresh+highThresh)/2.0;
+
+		// extract two regions at different threshold levels
+		GThresholdImageOps.threshold(image, binaryMiddle,middleThresh,true);
+		removeBinaryNoise(binaryMiddle);
+		// binaryMiddle will be a subset of binaryHigh
+		GThresholdImageOps.threshold(image, binaryHigh,highThresh,true);
+		removeBinaryNoise(binaryHigh);
+
+		// find the region outside of 'binaryMiddle' in 'binaryHigh' and include
+		// the edges in 'binaryMiddle'
+		BinaryImageOps.logicXor(binaryMiddle, binaryHigh, binaryHigh);
+		BinaryImageOps.edge4(binaryMiddle, binary);
+		BinaryImageOps.logicOr(binaryHigh,binary,binary);
+
+		// extract the points from the binary image and compute weights
+		// weight is a linear function of distance from black square value
+		points.reset();
+		double spread = high.getMean()-low.getMean();
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				if( binary.get(x,y) == 1 ) {
+					PointInfo p = points.pop();
+					p.set(x,y);
+					double v = image.get(x,y);
+					p.weight = (v-high.getMean())/spread;
+					if( p.weight <= 0.01 )
+						p.weight = 0.01;
+					else if( p.weight > 1 )
+						p.weight = 1;
+					
+				}
+			}
+		}
+	}
+
+	/**
+	 * Remove all but the largest blob.  Any sporadic pixels will be zapped this way
+	 * 
+	 * @param binary Initial binary image.  Modified
+	 */
+	private void removeBinaryNoise(ImageUInt8 binary) {
+		// remove potential noise by only saving the largest cluster
+		int numBlobs = BinaryImageOps.labelBlobs4(binary, blobs);
+
+		// find the largest blob
+		numBlobs++;
+		int count[] = new int[numBlobs];
+		for( int i = 0; i < width*height; i++ ) {
+			count[blobs.data[i]]++;
+		}
+		int largest = -1;
+		int largestIndex = -1;
+		for( int i = 1; i < numBlobs; i++ ) {
+			if( count[i] > largest ) {
+				largestIndex = i;
+				largest = count[i];
+			}
+		}
+
+		for( int i = 0; i < numBlobs; i++ ) {
+			count[i] = i != largestIndex ? 0 : i;
+		}
+		BinaryImageOps.relabel(blobs,count);
+		BinaryImageOps.labelToBinary(blobs,binary);
+	}
+
+	/**
+	 * Given the initial estimate of the corner parameters, perform non-linear estimation to
+	 * find the best fit corner
+	 *
+	 * @return best corner
+	 */
+	private Point2D_F64 optimizeFit() {
+		
+		double param[] = new double[4];
+		param[0] = initial.corner.x;
+		param[1] = initial.corner.y;
+		param[2] = Math.atan2(initial.sideA.y-initial.corner.y,initial.sideA.x-initial.corner.x);
+		param[3] = Math.atan2(initial.sideB.y-initial.corner.y,initial.sideB.x-initial.corner.x);
+
+		alg.setFunction(func,null);
+		alg.initialize(param);
+
+		if( !UtilOptimize.process(alg,50) ) {
+			throw new RuntimeException("Minimization failed?!?");
+		}
+
+		double found[] = alg.getParameters();
+
+		return new Point2D_F64(found[0],found[1]);
+	}
+
+	/**
+	 * Selects initial corner parameter as two points on image edge
+	 */
+	private void selectEdgeParam() {
+		// find points on edge
+		List<Integer> onEdge = new ArrayList<Integer>();
+
+		for( int i = 0; i < numEdges; i++ ) {
+			Point2D_I32 p = pointsAlongEdge[i];
+			if( binary.get(p.x,p.y) == 1 ) {
+				onEdge.add(i);
+			}
+		}
+
+		// find the two points which are farthest part
+		int bestDistance = -1;
+		int bestA = -1;
+		int bestB = -1;
+		for( int i = 0; i < onEdge.size(); i++ ) {
+			int first = onEdge.get(i);
+			for( int j = i+1; j < onEdge.size(); j++ ) {
+				int second = onEdge.get(j);
+				int distance = UtilCalibrationGrid.distanceCircle(first, second, numEdges);
+				if( distance > bestDistance ) {
+					bestDistance = distance;
+					bestA = first;
+					bestB = second;
+				}
+			}
+		}
+
+		initial.sideA = pointsAlongEdge[bestA];
+		initial.sideB = pointsAlongEdge[bestB];
+
+	}
+
+	/**
+	 * Initial estimate of the corner location is selected to be the point farthest away from the
+	 * two points select on the image's edge
+	 */
+	private void selectCornerParam() {
+		Point2D_I32 a = initial.sideA;
+		Point2D_I32 b = initial.sideB;
+
+		PointInfo bestPoint = null;
+		double bestDist = -1;
+
+		for( int i = 0; i < points.size(); i++ ) {
+			PointInfo p = points.get(i);
+
+			double distA = UtilPoint2D_F64.distance(a.x,a.y, p.x,p.y);
+			double distB = UtilPoint2D_F64.distance(b.x,b.y, p.x,p.y);
+
+			double sum = distA+distB;
+
+			if( sum > bestDist ) {
+				bestDist = sum;
+				bestPoint = p;
+			}
+		}
+
+		initial.corner = bestPoint;
+	}
+
+	/**
+	 * Structure containing initial corner estimate
+	 */
+	private static class InitialEstimate
+	{
+		Point2D_I32 sideA;
+		Point2D_I32 sideB;
+		Point2D_F64 corner;
+	}
+
+	/**
+	 * Cost function which computes the cost as the sum of distances between the set of points
+	 * and the corner.  Distance from a point to the corner is defined as the minimum distance of
+	 * a point from the two lines.
+	 */
+	private class CostFunction implements FunctionNtoS
+	{
+		LineParametric2D_F64 lineA = new LineParametric2D_F64();
+		LineParametric2D_F64 lineB = new LineParametric2D_F64();
+
+		@Override
+		public int getN() {
+			return 4;
+		}
+
+		@Override
+		public double process(double[] input) {
+			double x = input[0];
+			double y = input[1];
+			double thetaA = input[2];
+			double thetaB = input[3];
+			
+			lineA.p.set(x,y);
+			lineB.p.set(x, y);
+
+			lineA.slope.set(Math.cos(thetaA),Math.sin(thetaA));
+			lineB.slope.set(Math.cos(thetaB),Math.sin(thetaB));
+			
+			double cost = 0;
+
+			for( int i = 0; i < points.size; i++ ) {
+
+				PointInfo p = points.get(i);
+
+				double distA = Distance2D_F64.distanceSq(lineA,p);
+				double distB = Distance2D_F64.distanceSq(lineB,p);
+				
+				cost += p.weight*Math.min(distA,distB);
+			}
+
+			return cost;
+		}
+	}
+
+	/**
+	 * Location of a boundary point and its weight.
+	 */
+	public static class PointInfo extends Point2D_F64
+	{
+		public double weight;
+	}
+
+}

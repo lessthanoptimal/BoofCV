@@ -18,10 +18,7 @@
 
 package boofcv.alg.geo.d3.calibration;
 
-import boofcv.alg.feature.detect.calibgrid.AutoThresholdCalibrationGrid;
-import boofcv.alg.feature.detect.calibgrid.DetectCalibrationTarget;
-import boofcv.alg.feature.detect.calibgrid.RefineCalibrationGridCorner;
-import boofcv.alg.feature.detect.calibgrid.WrapRefineLineFit;
+import boofcv.alg.feature.detect.calibgrid.*;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectImagePanel;
@@ -36,6 +33,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -46,11 +44,14 @@ import java.util.ArrayList;
 public class DebugSubpixelTargetApp
 		extends SelectImagePanel implements ProcessInput , SubpixelCalibControlPanel.Listener
 {
-	// detects the calibration target
-	DetectCalibrationTarget detectAlg = new DetectCalibrationTarget(500,4,3);
-	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(detectAlg,255,20);
+	int targetColumns = 4;
+	int targetRows = 3;
 
-	RefineCalibrationGridCorner<ImageFloat32> refineAlg;
+	// detects the calibration target
+	DetectCalibrationTarget detectAlg = new DetectCalibrationTarget(500,targetColumns,targetRows);
+	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(255,20);
+
+	RefineCalibrationGridCorner refineAlg;
 
 	// gray scale image that targets are detected inside of
 	ImageFloat32 gray = new ImageFloat32(1,1);
@@ -59,8 +60,7 @@ public class DebugSubpixelTargetApp
 	SubpixelGridTargetDisplay<ImageFloat32> display;
 	SubpixelCalibControlPanel control;
 
-	java.util.List<Point2D_I32> crudePoints;
-	java.util.List<Point2D_F32> refinedPoints = new ArrayList<Point2D_F32>();
+	List<Point2D_I32> crudePoints = new ArrayList<Point2D_I32>();
 
 	// has an image been processed
 	boolean processedImage = false;
@@ -68,7 +68,7 @@ public class DebugSubpixelTargetApp
 	public DebugSubpixelTargetApp() {
 
 //		refineAlg = new WrapCornerIntensity<T,ImageSingleBand>(1,imageType);
-		refineAlg = new WrapRefineLineFit<ImageFloat32>();
+		refineAlg = new WrapRefineLineFit();
 
 		// construct the GUI
 		JPanel panel = new JPanel();
@@ -91,28 +91,32 @@ public class DebugSubpixelTargetApp
 		gray.reshape(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
 
-		if( !auto.process(gray) ) {
+		List<Point2D_I32> crude = null;
+		List<Point2D_F32> refined = null;
+		
+		if( !auto.process(detectAlg,gray) ) {
 			System.out.println("Detect Target Failed!");
 		} else {
-			// TODO Clean up
-			crudePoints = detectAlg.getCalibrationPoints();
-			refinedPoints.clear();
-			for( int i = 0; i < crudePoints.size(); i++ ) {
-				refinedPoints.add( new Point2D_F32());
-			}
-			refineAlg.refine(crudePoints,4,3,gray,refinedPoints);
+			List<SquareBlob> squares = detectAlg.getOrderedSquares();
+			crude = new ArrayList<Point2D_I32>();
+			refined = new ArrayList<Point2D_F32>();
 
-			display.setRefinedPoints(refinedPoints);
-			display.setCrudePoints(detectAlg.getCalibrationPoints());
+			refineAlg.refine(detectAlg.getSquares(),gray);
+
+			UtilCalibrationGrid.extractOrderedPoints(squares,crude,targetColumns);
+			UtilCalibrationGrid.extractOrderedSubpixel(squares,refined,targetColumns);
 		}
-
-
 		
+		final List<Point2D_I32> _crude = crude;
+		final List<Point2D_F32> _refined = refined;
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				display.setImage(gray);
+				display.setRefinedPoints(_refined);
+				display.setCrudePoints(_crude);
 				display.setPreferredSize(new Dimension(gray.width,gray.height));
-
+				display.repaint();
 				processedImage = true;
 			}
 		});
@@ -151,15 +155,17 @@ public class DebugSubpixelTargetApp
 	}
 
 	@Override
-	public void changeScale(final double scale) {
+	public void updateGUI() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				Point2D_F64 center = display.getCenter();
-				display.setScale(scale);
+				display.setScale(control.getScale());
 				scroll.getViewport().setView(display);
 
+				display.setShow( control.isShowPixel(),control.isShowSubpixel());
+
 				// center the view
-				centerView(center.x,center.y);
+				centerView(center.x, center.y);
 
 				display.repaint();
 			}});

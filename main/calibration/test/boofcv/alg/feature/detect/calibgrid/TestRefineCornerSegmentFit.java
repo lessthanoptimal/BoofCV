@@ -18,24 +18,36 @@
 
 package boofcv.alg.feature.detect.calibgrid;
 
+import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
+import georegression.struct.point.Point2D_F64;
+import org.junit.Test;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
 
 /**
- * Interface for computing sub-pixel accurate corners given a set of corners with are within a few
- * pixels of the true corners
- *
  * @author Peter Abeles
  */
-public interface RefineCalibrationGridCorner {
+public class TestRefineCornerSegmentFit {
 
-	/**
-	 * Refines the initial corner estimates in the blobs with a sub-pixel estimate.  The sub-pixel
-	 * estimates are stored in each {@link SquareBlob}.
-	 *
-	 * @param squares List of square blobs whose corner estimates need to be refined. Modified
-	 * @param image Original image being processed.
-	 */
-	public void refine( List<SquareBlob> squares , ImageFloat32 image );
+	int width = 50;
+	int height = 60;
+
+	@Test
+	public void stuff() {
+		ImageFloat32 orig = new ImageFloat32(width,height);
+
+		ImageTestingOps.fillRectangle(orig, 210, 0, 0, width, height);
+		ImageTestingOps.fillRectangle(orig, 52, 20, 15, width, height);
+
+		RefineCornerSegmentFit alg = new RefineCornerSegmentFit();
+
+		alg.process(orig);
+
+		Point2D_F64 corner = alg.getCorner();
+
+		assertEquals(20,corner.getX(), 1e-8);
+		assertEquals(15,corner.getY(),1e-8);
+
+	}
 }

@@ -223,7 +223,7 @@ public class FindQuadCorners {
 		int bestCount = -1;
 		int bestIndex = 0;
 		
-		for( int i = start; i != stop; i = incrementCircle(i,dir,contour.size()) ) {
+		for( int i = start; i != stop; i = UtilCalibrationGrid.incrementCircle(i, dir, contour.size()) ) {
 
 			int count = countInliers(start,i,dir,contour,lineTolerance);
 //			System.out.println(" i = "+i+" count = "+count);
@@ -259,7 +259,7 @@ public class FindQuadCorners {
 		LineParametric2D_F64 line = new LineParametric2D_F64(a.x,a.y,b.x-a.x,b.y-a.y);
 
 		Point2D_F64 p = new Point2D_F64();
-		for( int i = start; i != stop;  i = incrementCircle(i,dir,contour.size())) {
+		for( int i = start; i != stop;  i = UtilCalibrationGrid.incrementCircle(i, dir, contour.size())) {
 			Point2D_I32 c = contour.get(i);
 			p.x = c.x;
 			p.y = c.y;
@@ -294,13 +294,13 @@ public class FindQuadCorners {
 		
 		for( int i = 0; i < 4; i++ ) {
 			// get the index location
-			int a = order.get(incrementCircle(i,-1,4));
+			int a = order.get(UtilCalibrationGrid.incrementCircle(i, -1, 4));
 			int b = order.get(i);
-			int c = order.get(incrementCircle(i,1,4));
+			int c = order.get(UtilCalibrationGrid.incrementCircle(i, 1, 4));
 
 			// find the distance the corners are apart so it can compute the local radius
-			int distA = distanceCircle(b,a,-1,contour.size());
-			int distC = distanceCircle(b,c,1,contour.size());
+			int distA = UtilCalibrationGrid.distanceCircle(b, a, -1, contour.size());
+			int distC = UtilCalibrationGrid.distanceCircle(b, c, 1, contour.size());
 
 			int radius = Math.min(distA,distC)/2;
 			
@@ -324,15 +324,15 @@ public class FindQuadCorners {
 	protected static int refineCorner( int cornerIndex , int localRadius ,
 									   List<Point2D_I32> contour ) {
 		int N = contour.size();
-		int start = incrementCircle(cornerIndex,-localRadius,N);
-		int stop = incrementCircle(cornerIndex,localRadius,N);
+		int start = UtilCalibrationGrid.incrementCircle(cornerIndex, -localRadius, N);
+		int stop = UtilCalibrationGrid.incrementCircle(cornerIndex, localRadius, N);
 		
 		double bestAngle = Double.MAX_VALUE;
 		int bestIndex = cornerIndex;
 		
-		for( int i = start; i != stop; i = incrementCircle(i,1,N) ) {
-			int i0 = incrementCircle(i,-localRadius,N);
-			int i1 = incrementCircle(i,localRadius,N);
+		for( int i = start; i != stop; i = UtilCalibrationGrid.incrementCircle(i, 1, N) ) {
+			int i0 = UtilCalibrationGrid.incrementCircle(i, -localRadius, N);
+			int i1 = UtilCalibrationGrid.incrementCircle(i, localRadius, N);
 
 			Point2D_I32 p = contour.get(i);
 			Point2D_I32 p0 = contour.get(i0);
@@ -353,41 +353,6 @@ public class FindQuadCorners {
 		// in which case the original corner is returned
 		return bestIndex;
 	}
-	
-	
-	/**
-	 * Returns the next point in the list assuming a cyclical list
-	 * @param i current index
-	 * @param dir Direction and amount of increment
-	 * @param size Size of the list
-	 * @return i+dir taking in account the list's cyclical nature
-	 */
-	public static int incrementCircle( int i , int dir , int size ) {
-		i += dir;
-		if( i < 0 ) i = size+i;
-		else if( i >= size ) i = i - size;
-		return i;
-	}
 
-	/**
-	 * 
-	 * dist = (dir > 0 ) i1-i0 ? i0-i1;
-	 * if( dist < 0 )
-	 * 	distance = size+distance;
-	 * 
-	 * @param i0 First point.
-	 * @param i1 Second point.
-	 * @param dir 0 > counting down, 0 < counting up
-	 * @param size
-	 * @return
-	 */
-	public static int distanceCircle( int i0 , int i1 , int dir , int size ) {
 
-		int distance = ( dir > 0 ) ? i1-i0 : i0-i1;
-		
-		if( distance < 0 )
-			distance = size+distance;
-		
-		return distance;
-	}
 }

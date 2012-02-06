@@ -21,6 +21,7 @@ package boofcv.alg.geo.d3.calibration;
 import boofcv.alg.feature.detect.calibgrid.AutoThresholdCalibrationGrid;
 import boofcv.alg.feature.detect.calibgrid.DetectCalibrationTarget;
 import boofcv.alg.feature.detect.calibgrid.SquareBlob;
+import boofcv.alg.feature.detect.calibgrid.UtilCalibrationGrid;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ProcessInput;
@@ -38,6 +39,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,8 +50,11 @@ import java.util.List;
 public class DetectCalibrationTargetApp
 		extends SelectImagePanel implements ProcessInput , GridCalibPanel.Listener
 {
+	int targetColumns = 4;
+	int targetRows = 3;
+
 	// detects the calibration target
-	DetectCalibrationTarget alg = new DetectCalibrationTarget(500,4,3);
+	DetectCalibrationTarget alg = new DetectCalibrationTarget(500,targetColumns,targetRows);
 
 	// gray scale image that targets are detected inside of
 	ImageFloat32 gray = new ImageFloat32(1,1);
@@ -69,7 +74,7 @@ public class DetectCalibrationTargetApp
 	BufferedImage input;
 
 	// used to automatically select the threshold
-	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(alg,255,20);
+	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(255,20);
 
 	// if a target was found or not
 	boolean foundTarget;
@@ -125,7 +130,11 @@ public class DetectCalibrationTargetApp
 				throw new RuntimeException("Unknown mode");
 		}
 		List<Point2D_I32> targetBounds = alg.getTargetQuadrilateral();
-		List<Point2D_I32> targetPoints = alg.getCalibrationPoints();
+
+		List<SquareBlob> squares = alg.getOrderedSquares();
+		List<Point2D_I32> targetPoints = new ArrayList<Point2D_I32>();
+
+		UtilCalibrationGrid.extractOrderedPoints(squares,targetPoints,targetColumns);
 
 		Graphics2D g2 = workImage.createGraphics();
 
@@ -256,7 +265,7 @@ public class DetectCalibrationTargetApp
 
 			foundTarget = alg.process(binary);
 		} else {
-			foundTarget = auto.process(gray);
+			foundTarget = auto.process(alg,gray);
 			if( foundTarget ) {
 				calibGUI.setThreshold((int)auto.getThreshold());
 				binary.setTo(auto.getBinary());

@@ -45,21 +45,26 @@ public class SubpixelGridTargetDisplay<T extends ImageSingleBand>
 	BufferedImage workImage;
 
 	// transform
-	double scale;
+	double scale=1;
 
 	List<Point2D_I32> crudePoints;
 	List<Point2D_F32> refinedPoints;
-	
+
+	boolean showCrude = true;
+	boolean showRefined = true;
+
 	public SubpixelGridTargetDisplay( Class<T> imageType ) {
 		this.imageType = imageType;
 		transformed = GeneralizedImageOps.createSingleBand(imageType,1,1);
 	}
-	
+
+	public void setShow( boolean showCrude , boolean showRefined ) {
+		this.showCrude = showCrude;
+		this.showRefined = showRefined;
+	}
+
 	public synchronized void setImage( T input ) {
 		this.input = input;
-
-		// reset the transform
-		scale = 1;
 	}
 
 	public synchronized void setScale( double scale ) {
@@ -116,21 +121,25 @@ public class SubpixelGridTargetDisplay<T extends ImageSingleBand>
 
 		render(r);
 		g2.drawImage(workImage,r.x,r.y,null);
-		
-		for( Point2D_I32 p : crudePoints ) {
-			// put it in the center of a pixel
-			int x = (int)Math.round(p.x*scale+0.5*scale);
-			int y = (int)Math.round(p.y*scale+0.5*scale);
 
-			VisualizeFeatures.drawPoint(g2,x,y,Color.GRAY);
+		if( showCrude && crudePoints != null ) {
+			for( Point2D_I32 p : crudePoints ) {
+				// put it in the center of a pixel
+				int x = (int)Math.round(p.x*scale+0.5*scale);
+				int y = (int)Math.round(p.y*scale+0.5*scale);
+
+				VisualizeFeatures.drawPoint(g2,x,y,Color.GRAY);
+			}
 		}
 
-		for( Point2D_F32 p : refinedPoints ) {
-			// put it in the center of a pixel
-			int x = (int)Math.round(p.x*scale+0.5*scale);
-			int y = (int)Math.round(p.y*scale+0.5*scale);
+		if( showRefined && refinedPoints != null ) {
+			for( Point2D_F32 p : refinedPoints ) {
+				// put it in the center of a pixel
+				int x = (int)Math.round(p.x*scale+0.5*scale);
+				int y = (int)Math.round(p.y*scale+0.5*scale);
 
-			VisualizeFeatures.drawPoint(g2,x,y,Color.RED);
+				VisualizeFeatures.drawPoint(g2,x,y,Color.RED);
+			}
 		}
 	}
 

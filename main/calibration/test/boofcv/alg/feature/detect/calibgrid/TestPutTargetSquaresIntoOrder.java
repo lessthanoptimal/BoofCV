@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.calibgrid;
 
 import georegression.misc.test.GeometryUnitTest;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
@@ -31,7 +32,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestExtractOrderedTargetPoints {
+public class TestPutTargetSquaresIntoOrder {
 
 	@Test
 	public void process_positive() {
@@ -47,7 +48,7 @@ public class TestExtractOrderedTargetPoints {
 		TestConnectGridSquares.connect(2,3,blobs);
 		TestConnectGridSquares.connect(1,3,blobs);
 
-		ExtractOrderedTargetPoints alg = new ExtractOrderedTargetPoints();
+		PutTargetSquaresIntoOrder alg = new PutTargetSquaresIntoOrder();
 		try {
 			alg.process(blobs);
 		} catch (InvalidTarget invalidTarget) {
@@ -55,12 +56,12 @@ public class TestExtractOrderedTargetPoints {
 		}
 
 		List<Point2D_I32> quad = alg.getQuadrilateral();
-		List<Point2D_I32> points = alg.getTargetPoints();
+		List<SquareBlob> ordered = alg.getBlobsOrdered();
 
 		// high level checks
 		assertEquals(2,alg.getNumCols());
 		assertEquals(2,alg.getNumRows());
-		assertEquals(16,points.size());
+		assertEquals(ordered.size(),blobs.size());
 		assertEquals(4,quad.size());
 
 		// CCW ordering of extreme points
@@ -70,28 +71,8 @@ public class TestExtractOrderedTargetPoints {
 		GeometryUnitTest.assertEquals(-5,60,quad.get(3));
 
 		// just check some of the points
-		GeometryUnitTest.assertEquals(-5,-5,points.get(0));
-		GeometryUnitTest.assertEquals(60,65,points.get(15));
-	}
-
-	@Test
-	public void orderedBlobsIntoPoints() {
-		List<SquareBlob> blobs = new ArrayList<SquareBlob>();
-		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
-		
-		blobs.add( createBlob(5,5,10));
-		blobs.add( createBlob(50,4,10));
-
-		ExtractOrderedTargetPoints.orderedBlobsIntoPoints(blobs,points,2);
-
-		// add first row
-		GeometryUnitTest.assertEquals(-5,15,points.get(0));
-		GeometryUnitTest.assertEquals(15,15,points.get(1));
-		GeometryUnitTest.assertEquals(40,14,points.get(2));
-		GeometryUnitTest.assertEquals(60,14,points.get(3));
-		// add second row, and remember they are added in circular order, so some indexes are swapped
-		GeometryUnitTest.assertEquals(-5,-5,points.get(4));
-		GeometryUnitTest.assertEquals(15,-5,points.get(5));
+		GeometryUnitTest.assertEquals(-5, -5, ordered.get(0).corners.get(0));
+		GeometryUnitTest.assertEquals(60, 65, ordered.get(3).corners.get(2));
 	}
 
 	public static SquareBlob createBlob( int x0 , int y0 , int r )
@@ -108,6 +89,15 @@ public class TestExtractOrderedTargetPoints {
 		corners.add( new Point2D_I32(x2,y2));
 		corners.add( new Point2D_I32(x3,y3));
 
-		return new SquareBlob(corners,corners);
+		List<Point2D_F32> subpixel = new ArrayList<Point2D_F32>();
+		subpixel.add( new Point2D_F32(x0,y0));
+		subpixel.add( new Point2D_F32(x1,y1));
+		subpixel.add( new Point2D_F32(x2,y2));
+		subpixel.add( new Point2D_F32(x3,y3));
+
+		SquareBlob ret = new SquareBlob(corners,corners);
+		ret.subpixel = subpixel;
+
+		return ret;
 	}
 }
