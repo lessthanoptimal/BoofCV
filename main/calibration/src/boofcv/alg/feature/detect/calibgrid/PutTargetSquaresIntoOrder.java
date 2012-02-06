@@ -31,16 +31,16 @@ import java.util.List;
 
 /**
  * <p>
- * Given a complete set of {@link SquareBlob}, that compose an entire calibration target, it extracts and orders
- * the corner points so that they can be processed a calibration algorithm.  Additional sub-pixel refinement of
- * corner points might be necessary for optimal performance.
+ * Given a complete set of {@link SquareBlob} that is in arbitrary order and composes an entire calibration target,
+ * find a logical ordering of the squares and check the target's validity,  The corners in each blob are also put
+ * into correct order.
  * </p>
  * 
  * <p>
  * Assumptions:
  * <ul>
  * <li> {@link SquareBlob} are unordered in the provided list.</li>
- * <li> Corner points or in a CCW order</li>
+ * <li> Corner points are in a CCW order</li>
  * <li> Every row in calibration target has the same number of squares in it.</li>
  * <li> The whole target is observed.</li>
  * </ul>
@@ -53,17 +53,18 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExtractOrderedTargetPoints {
+public class PutTargetSquaresIntoOrder {
 	// list of blobs provided
 	private List<SquareBlob> blobs;
+
+	// list of blobs put into a valid order
+	private List<SquareBlob> blobsOrdered;
 
 	// bounding quadrilateral 
 	List<Point2D_I32> targetCorners;
 	// sorting algorithm
 	private QuickSort_F64 sort = new QuickSort_F64();
 
-	// ordered calibration points
-	private List<Point2D_I32> targetObs = new ArrayList<Point2D_I32>();
 	// number of elements in each row
 	private int numCols;
 	// number of rows
@@ -83,14 +84,12 @@ public class ExtractOrderedTargetPoints {
 		this.blobs = new ArrayList<SquareBlob>(blob);
 		
 		// find the bounding quadrilateral around target blobs
-		targetObs = toPointList(blobs);
+		List<Point2D_I32> targetObs = toPointList(blobs);
 		targetCorners = FindBoundingQuadrilateral.findCorners(targetObs);
 
 		// connect blobs to each other making extraction of rows and columns easier later on
 //		ConnectGridSquares.connect(blobs);
-		List<SquareBlob> orderedBlob = putBlobsIntoOrder();
-
-		orderedBlobsIntoPoints(orderedBlob,targetObs,numCols);
+		blobsOrdered = putBlobsIntoOrder();
 	}
 
 	/**
@@ -288,29 +287,6 @@ public class ExtractOrderedTargetPoints {
 	}
 
 	/**
-	 * Converts the list of square blobs that are in order with ordered corners into a list of points.
-	 *
-	 * @param blobs Set of ordered blobs that compose the target
-	 * @param points Output set of points.
-	 * @param numCols Number of blobs per row (number of columns).
-	 */
-	protected static void orderedBlobsIntoPoints( List<SquareBlob> blobs , List<Point2D_I32> points , int numCols ) {
-		points.clear();
-		for( int i = 0; i < blobs.size(); i += numCols ) {
-			for( int j = 0; j < numCols; j++ ) {
-				SquareBlob b = blobs.get(i+j);
-				points.add(b.corners.get(0));
-				points.add(b.corners.get(1));
-			}
-			for( int j = 0; j < numCols; j++ ) {
-				SquareBlob b = blobs.get(i+j);
-				points.add(b.corners.get(3));
-				points.add(b.corners.get(2));
-			}
-		}
-	}
-
-	/**
 	 * Remove the specified row from the list and all connections to elements in the row
 	 * @param row Squares which are to be removed.
 	 * @param all List of all squares, is modified.
@@ -407,11 +383,8 @@ public class ExtractOrderedTargetPoints {
 		return targetCorners;
 	}
 
-	/**
-	 * List of target points in calibration grid.  Row-major ordering.
-	 */
-	public List<Point2D_I32> getTargetPoints() {
-		return targetObs;
+	public List<SquareBlob> getBlobsOrdered() {
+		return blobsOrdered;
 	}
 
 	/**

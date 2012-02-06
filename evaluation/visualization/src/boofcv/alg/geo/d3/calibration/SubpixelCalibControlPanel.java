@@ -23,14 +23,14 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * @author Peter Abeles
  */
 public class SubpixelCalibControlPanel extends StandardAlgConfigPanel
-		implements ActionListener, ChangeListener
+		implements ItemListener, ChangeListener
 {
 	// toggle what is visible or not
 	JCheckBox showPixel;
@@ -39,37 +39,59 @@ public class SubpixelCalibControlPanel extends StandardAlgConfigPanel
 	// allows the user to change the image zoom
 	JSpinner selectZoom;
 
-	// selects threshold to create binary image from
-	JSpinner thresholdSpinner;
-
 	Listener listener;
 	
 	boolean doShowPixel = true;
 	boolean doShowSubpixel = true;
 
-	int thresholdLevel = 120;
-	
+	double zoom=1;
+
 	public SubpixelCalibControlPanel( Listener listener ) {
 		this.listener = listener;
 
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,1,100,1));
+		selectZoom = new JSpinner(new SpinnerNumberModel(zoom,1,100,1));
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
-		addLabeled(selectZoom, "Zoom:",this);
-	}
+		showPixel = new JCheckBox("Show Crude");
+		showPixel.setSelected(doShowPixel);
+		showPixel.addItemListener(this);
+		showPixel.setMaximumSize(showPixel.getPreferredSize());
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
+		showSubpixel = new JCheckBox("Show Refined");
+		showSubpixel.setSelected(doShowSubpixel);
+		showSubpixel.addItemListener(this);
+		showSubpixel.setMaximumSize(showSubpixel.getPreferredSize());
+
+		addLabeled(selectZoom, "Zoom:",this);
+		addAlignLeft(showPixel, this);
+		addAlignLeft(showSubpixel,this);
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
+		if( listener == null )
+			return;
+		
 		if( e.getSource() == selectZoom ) {
-			double value = ((Number)selectZoom.getValue()).doubleValue();
-			listener.changeScale(value);
+			zoom = ((Number)selectZoom.getValue()).doubleValue();
 		}
+
+		listener.updateGUI();
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if( listener == null )
+			return;
+
+		if( e.getSource() == showPixel ) {
+			doShowPixel = showPixel.isSelected();
+		} else if( e.getSource() == showSubpixel ) {
+			doShowSubpixel = showSubpixel.isSelected();
+		}
+
+		listener.updateGUI();
 	}
 
 	public boolean isShowPixel() {
@@ -80,12 +102,12 @@ public class SubpixelCalibControlPanel extends StandardAlgConfigPanel
 		return doShowSubpixel;
 	}
 
-	public int getThresholdLevel() {
-		return thresholdLevel;
+	public double getScale() {
+		return zoom;
 	}
 
 	public static interface Listener
 	{
-		public void changeScale( double scale );
+		public void updateGUI();
 	}
 }

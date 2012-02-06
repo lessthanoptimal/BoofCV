@@ -24,7 +24,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.feature.detect.calibgrid.TestExtractOrderedTargetPoints.createBlob;
+import static boofcv.alg.feature.detect.calibgrid.TestPutTargetSquaresIntoOrder.createBlob;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

@@ -18,12 +18,16 @@
 
 package boofcv.alg.feature.detect.calibgrid;
 
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Contains information on blobs extracted from the binary image.  Eventually these blobs are declared to
+ * be a square and processed further down the line.
+ *
  * @author Peter Abeles
  */
 public class SquareBlob {
@@ -31,6 +35,9 @@ public class SquareBlob {
 	// corners in CCW direction from the corner closest to -PI radians
 	public List<Point2D_I32> corners;
 
+	// accurate estimate of corner locations computed by sub-pixel algorithm
+	public List<Point2D_F32> subpixel;
+	
 	public Point2D_I32 center;
 
 
@@ -45,6 +52,7 @@ public class SquareBlob {
 	public List<SquareBlob> conn = new ArrayList<SquareBlob>();
 
 	public SquareBlob(List<Point2D_I32> contour, List<Point2D_I32> corners) {
+		this();
 		this.contour = contour;
 		this.corners = corners;
 
@@ -53,6 +61,10 @@ public class SquareBlob {
 	}
 
 	public SquareBlob() {
+		subpixel = new ArrayList<Point2D_F32>();
+		for( int i = 0; i < 4; i++ ) {
+			subpixel.add( new Point2D_F32());
+		}
 	}
 
 	public void compute() {

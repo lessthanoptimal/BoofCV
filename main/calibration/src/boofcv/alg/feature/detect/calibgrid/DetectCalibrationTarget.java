@@ -55,7 +55,7 @@ public class DetectCalibrationTarget {
 	private ImageSInt32 blobs = new ImageSInt32(1,1);
 
 	// Orders corner points found in the image
-	private ExtractOrderedTargetPoints extractTarget;
+	private PutTargetSquaresIntoOrder extractTarget;
 
 	// smallest allowed size of a blob;s contour
 	private int minContourSize = 20*4;
@@ -179,7 +179,7 @@ public class DetectCalibrationTarget {
 			// see if it fails internal sanity checks
 			try {
 				List<SquareBlob> subgraph = ConnectGridSquares.copy(list);
-				extractTarget = new ExtractOrderedTargetPoints();
+				extractTarget = new PutTargetSquaresIntoOrder();
 				extractTarget.process(subgraph);
 
 				// additional validation checks
@@ -235,10 +235,10 @@ public class DetectCalibrationTarget {
 	}
 
 	/**
-	 * Returns all the found calibration points the correct order.
+	 * Returns the observed squares in correct grid order
 	 */
-	public List<Point2D_I32> getCalibrationPoints() {
-		return extractTarget.getTargetPoints();
+	public List<SquareBlob> getOrderedSquares() {
+		return extractTarget.getBlobsOrdered();
 	}
 	
 	/**
@@ -353,6 +353,6 @@ public class DetectCalibrationTarget {
 	}
 
 	public List<SquareBlob> getSquares() {
-		return squares;
+		return extractTarget.getBlobsOrdered();
 	}
 }

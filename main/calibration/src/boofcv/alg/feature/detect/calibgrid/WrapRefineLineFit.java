@@ -18,11 +18,9 @@
 
 package boofcv.alg.feature.detect.calibgrid;
 
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 
@@ -31,38 +29,43 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class WrapRefineLineFit<T extends ImageSingleBand> 
-	implements RefineCalibrationGridCorner<T>
+public class WrapRefineLineFit
+	implements RefineCalibrationGridCorner
 {
-	ImageFloat32 floatImage = new ImageFloat32(1,1);
-	
-	int searchRadius = 12;
 
-	RefineLineFit alg = new RefineLineFit();
+	RefineCornerSegmentFit alg = new RefineCornerSegmentFit();
 	
 	@Override
-	public void refine(List<Point2D_I32> crudeCorners, 
-					   int gridWidth, int gridHeight,
-					   T image, 
-					   List<Point2D_F32> refinedCorners) 
+	public void refine(List<SquareBlob> squares,
+					   ImageFloat32 image ) 
 	{
-		floatImage.reshape(image.width,image.height);
-		GeneralizedImageOps.convert(image,floatImage);
+		for( SquareBlob s : squares) {
 
-		for( int i = 0; i < crudeCorners.size(); i++ ) {
-			Point2D_I32 cp = crudeCorners.get(i);
-
-			ImageRectangle r = new ImageRectangle(cp.x- searchRadius,cp.y - searchRadius,cp.x + searchRadius +1,cp.y+ searchRadius +1);
-			BoofMiscOps.boundRectangleInside(image, r);
+			// search the smallest side size to avoid accidentally including
+			// another corner in the region being considered.
+			// hmm if the square is at a 45 degree angle this might not work.... Oh well don't use small squares
+			// Also need to be careful of perspective distortion, it can cause the smallest side to be
+			// too short too
+			int searchRadius = (int)s.smallestSide-2;
+			if( searchRadius > 12 )
+				searchRadius = 12;
+			if( searchRadius < 3 )
+				searchRadius = 3;
 			
-			ImageFloat32 sub = floatImage.subimage(r.x0,r.y0,r.x1,r.y1);
-			
-			Point2D_F32 cr = refinedCorners.get(i);
+			for( int i = 0; i < 4; i++ ) {
+				Point2D_I32 cp = s.corners.get(i);
+				Point2D_F32 rp = s.subpixel.get(i);
+				
+				ImageRectangle r = new ImageRectangle(cp.x- searchRadius,cp.y - searchRadius,
+						cp.x + searchRadius +1,cp.y+ searchRadius +1);
+				BoofMiscOps.boundRectangleInside(image, r);
 
+				ImageFloat32 sub = image.subimage(r.x0,r.y0,r.x1,r.y1);
 
-			alg.process(sub);
-			cr.x = r.x0 + alg.getCorner().x;
-			cr.y = r.y0 + alg.getCorner().y;
+				alg.process(sub);
+				rp.x = r.x0 + (float)alg.getCorner().x;
+				rp.y = r.y0 + (float)alg.getCorner().y;
+			}
 		}
 	}
 }

@@ -57,7 +57,7 @@ public class FitGaussianPrune {
 	public void process() {
 		for( int i = 0; i < maxIterations; i++ ) {
 			updateStatistics();
-			if( !prune() )
+			if( sigma == 0 || !prune() )
 				break;
 		}
 	}

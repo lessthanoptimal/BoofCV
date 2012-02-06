@@ -165,14 +165,4 @@ public class TestFindQuadCorners {
 		// see if it picked the crux of the corner
 		assertEquals(6,found);
 	}
-	
-	@Test
-	public void incrementCircle() {
-		assertEquals(1,FindQuadCorners.incrementCircle(0,1,8));
-		assertEquals(7,FindQuadCorners.incrementCircle(6,1,8));
-		assertEquals(0,FindQuadCorners.incrementCircle(7,1,8));
-		assertEquals(7,FindQuadCorners.incrementCircle(0,-1,8));
-		assertEquals(6,FindQuadCorners.incrementCircle(7,-1,8));
-		assertEquals(0,FindQuadCorners.incrementCircle(1,-1,8));
-	}
 }
