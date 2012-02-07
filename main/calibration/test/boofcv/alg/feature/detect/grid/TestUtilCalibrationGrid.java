@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
 import georegression.misc.test.GeometryUnitTest;
 import georegression.struct.point.Point2D_F32;
@@ -24,16 +24,65 @@ import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
-import static boofcv.alg.feature.detect.calibgrid.TestPutTargetSquaresIntoOrder.createBlob;
+import static boofcv.alg.feature.detect.grid.TestPutTargetSquaresIntoOrder.createBlob;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestUtilCalibrationGrid {
+
+	@Test
+	public void findAverage() {
+		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		list.add( new Point2D_I32(1,2));
+		list.add( new Point2D_I32(5,3));
+		list.add( new Point2D_I32(2,8));
+
+		Point2D_I32 c = UtilCalibrationGrid.findAverage(list);
+
+		assertEquals(2,c.x);
+		assertEquals(4, c.y);
+	}
+
+	@Test
+	public void sortByAngle() {
+		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+
+		for( int i = 0; i < 10; i++ )
+			list.add( new Point2D_I32(i,0));
+
+		Point2D_I32 c = new Point2D_I32(5,-10);
+
+		// randomize the order
+		Collections.shuffle(list, new Random(8234));
+
+		// sanity check
+		assertTrue(0 != list.get(0).x);
+
+		UtilCalibrationGrid.sortByAngleCCW(c, list);
+
+		for( int i = 0; i < 10; i++ )
+			assertEquals(9-i, list.get(i).x);
+	}
+
+	@Test
+	public void findFarthest() {
+		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		list.add( new Point2D_I32(1,2));
+		list.add( new Point2D_I32(2,23));
+		list.add( new Point2D_I32(8,8));
+
+		int index = UtilCalibrationGrid.findFarthest(new Point2D_I32(1,3),list);
+
+		assertEquals(1,index);
+	}
+
 	@Test
 	public void extractOrderedPoints() {
 		List<SquareBlob> blobs = new ArrayList<SquareBlob>();
@@ -87,11 +136,25 @@ public class TestUtilCalibrationGrid {
 
 	@Test
 	public void distanceCircle_dir() {
-		fail("implement");
+		assertEquals(0, UtilCalibrationGrid.distanceCircle(0, 0, 1 , 8));
+		assertEquals(1, UtilCalibrationGrid.distanceCircle(0, 1, 1, 8));
+		assertEquals(2, UtilCalibrationGrid.distanceCircle(0, 2, 1 , 8));
+		assertEquals(0, UtilCalibrationGrid.distanceCircle(6, 6, 1 , 8));
+		assertEquals(1, UtilCalibrationGrid.distanceCircle(6, 7, 1 , 8));
+		assertEquals(2, UtilCalibrationGrid.distanceCircle(6, 0, 1 , 8));
+		assertEquals(7, UtilCalibrationGrid.distanceCircle(6, 5, 1 , 8));
+
+		assertEquals(0, UtilCalibrationGrid.distanceCircle(6, 6, -1 , 8));
+		assertEquals(7, UtilCalibrationGrid.distanceCircle(6, 7, -1 , 8));
+		assertEquals(6, UtilCalibrationGrid.distanceCircle(6, 0, -1 , 8));
+		assertEquals(1, UtilCalibrationGrid.distanceCircle(6, 5, -1 , 8));
 	}
 
 	@Test
 	public void distanceCircle() {
-		fail("implement");
+		assertEquals(0, UtilCalibrationGrid.distanceCircle(6, 6, 8));
+		assertEquals(1, UtilCalibrationGrid.distanceCircle(6, 7, 8));
+		assertEquals(2, UtilCalibrationGrid.distanceCircle(6, 0, 8));
+		assertEquals(1, UtilCalibrationGrid.distanceCircle(6, 5, 8));
 	}
 }

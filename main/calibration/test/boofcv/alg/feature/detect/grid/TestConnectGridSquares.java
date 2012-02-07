@@ -16,15 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.feature.detect.calibgrid.TestPutTargetSquaresIntoOrder.createBlob;
+import static boofcv.alg.feature.detect.grid.TestPutTargetSquaresIntoOrder.createBlob;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -81,7 +82,7 @@ public class TestConnectGridSquares {
 	}
 
 	@Test
-	public void basic() throws InvalidTarget {
+	public void basic() throws InvalidCalibrationTarget {
 		List<SquareBlob> blobs = new ArrayList<SquareBlob>();
 
 		blobs.add( createBlob(5,5,1));

@@ -16,26 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
-
-import boofcv.struct.image.ImageFloat32;
-
-import java.util.List;
+package boofcv.alg.feature.detect;
 
 /**
- * Interface for computing sub-pixel accurate corners given a set of corners with are within a few
- * pixels of the true corners
+ * Exception used to indicate that some thing went wrong when extract the calibration grid's points.
  *
  * @author Peter Abeles
  */
-public interface RefineCalibrationGridCorner {
-
-	/**
-	 * Refines the initial corner estimates in the blobs with a sub-pixel estimate.  The sub-pixel
-	 * estimates are stored in each {@link SquareBlob}.
-	 *
-	 * @param squares List of square blobs whose corner estimates need to be refined. Modified
-	 * @param image Original image being processed.
-	 */
-	public void refine( List<SquareBlob> squares , ImageFloat32 image );
+public class InvalidCalibrationTarget extends Exception{
+	public InvalidCalibrationTarget(String message) {
+		super(message);
+	}
 }

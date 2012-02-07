@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
@@ -56,7 +56,7 @@ public class SquareBlob {
 		this.contour = contour;
 		this.corners = corners;
 
-		center = FindQuadCorners.findAverage(contour);
+		center = UtilCalibrationGrid.findAverage(contour);
 		compute();
 	}
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestAutoThresholdCalibrationGrid {
+public class TestFitGaussianPrune {
 
 	@Test
 	public void stuff() {

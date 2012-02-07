@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineSegment2D_F64;

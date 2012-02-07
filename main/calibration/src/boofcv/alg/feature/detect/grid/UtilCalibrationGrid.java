@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
+import pja.sorting.QuickSort_F64;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -131,5 +133,78 @@ public class UtilCalibrationGrid {
 		int distanceB = distanceCircle(i0,i1,-1,size);
 
 		return Math.min(distanceA,distanceB);
+	}
+
+	/**
+	 * Find the average of all the points in the list.
+	 *
+	 * @param contour
+	 * @return
+	 */
+	protected static Point2D_I32 findAverage(List<Point2D_I32> contour) {
+
+		int x = 0;
+		int y = 0;
+
+		for( Point2D_I32 p : contour ) {
+			x += p.x;
+			y += p.y;
+		}
+
+		x /= contour.size();
+		y /= contour.size();
+
+		return new Point2D_I32(x,y);
+	}
+
+	/**
+	 * Sorts the points in counter clockwise direction around the provided point
+	 *
+	 * @param center Point that the angle is computed relative to
+	 * @param contour List of all the points which are to be sorted by angle
+	 */
+	protected static void sortByAngleCCW(Point2D_I32 center, List<Point2D_I32> contour) {
+		double angles[] = new double[ contour.size() ];
+		int indexes[] = new int[ angles.length ];
+
+		for( int i = 0; i < contour.size(); i++ ) {
+			Point2D_I32 c = contour.get(i);
+			int dx = c.x-center.x;
+			int dy = c.y-center.y;
+
+			angles[i] = Math.atan2(dy,dx);
+		}
+
+		QuickSort_F64 sort = new QuickSort_F64();
+		sort.sort(angles,angles.length,indexes);
+
+		List<Point2D_I32> sorted = new ArrayList<Point2D_I32>(contour.size());
+		for( int i = 0; i < indexes.length; i++ ) {
+			sorted.add( contour.get( indexes[i]));
+		}
+
+		contour.clear();
+		contour.addAll(sorted);
+	}
+
+	/**
+	 * Returns the index of the point farthest away from the sample point
+	 */
+	public static int findFarthest( Point2D_I32 a , List<Point2D_I32> contour ) {
+		int best = -1;
+		int index = -1;
+
+		for( int i = 0; i < contour.size(); i++ ) {
+			Point2D_I32 b = contour.get(i);
+
+			int d = a.distance2(b);
+
+			if( d > best ) {
+				best = d;
+				index = i;
+			}
+		}
+
+		return index;
 	}
 }

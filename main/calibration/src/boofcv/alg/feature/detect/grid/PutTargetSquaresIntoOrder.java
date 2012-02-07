@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import georegression.metric.ClosestPoint2D_F64;
 import georegression.metric.Distance2D_F64;
 import georegression.metric.UtilAngle;
@@ -72,14 +73,14 @@ public class PutTargetSquaresIntoOrder {
 
 	/**
 	 * Processes the list of squares to find and orient corner points in the calibration target. Only
-	 * corners in the target are assumed to be in this list.  If anything goes wrong an i{@link InvalidTarget}
+	 * corners in the target are assumed to be in this list.  If anything goes wrong an i{@link boofcv.alg.feature.detect.InvalidCalibrationTarget}
 	 * exception is thrown. Connections between the blobs needs to be computed already and must only refer
 	 * to blobs inside this list.
 	 * 
 	 * @param blob List of square blobs that compose a target.  Connections are modified for book keeping.
-	 * @throws InvalidTarget
+	 * @throws boofcv.alg.feature.detect.InvalidCalibrationTarget Thrown if anything bad happened
 	 */
-	public void process( List<SquareBlob> blob ) throws InvalidTarget {
+	public void process( List<SquareBlob> blob ) throws InvalidCalibrationTarget {
 		// set up data structures
 		this.blobs = new ArrayList<SquareBlob>(blob);
 		
@@ -96,9 +97,9 @@ public class PutTargetSquaresIntoOrder {
 	 * Given the bounding quadrilateral it orders the blobs and the corners inside each blobs
 	 *
 	 * @return  List of blobs in row-major order
-	 * @throws InvalidTarget
+	 * @throws boofcv.alg.feature.detect.InvalidCalibrationTarget
 	 */
-	private List<SquareBlob> putBlobsIntoOrder() throws InvalidTarget {
+	private List<SquareBlob> putBlobsIntoOrder() throws InvalidCalibrationTarget {
 		// select the blob in the top left corner of the target
 		// Which corner is selected is arbitrary
 		SquareBlob seed = findBlobWithPoint(targetCorners.get(0));
@@ -127,7 +128,7 @@ public class PutTargetSquaresIntoOrder {
 		numRows = 1;
 		numCols = topRow.size();
 		if( blobs.size() % numCols != 0 )
-			throw new InvalidTarget("Total square not divisible by row size");
+			throw new InvalidCalibrationTarget("Total square not divisible by row size");
 
 		while( true ) {
 			orderedBlob.addAll(topRow);
@@ -148,7 +149,7 @@ public class PutTargetSquaresIntoOrder {
 				// order corners inside the row
 				orderBlobRow(topRow, topLeft, topRight);
 				if( topRow.size() != numCols )
-					throw new InvalidTarget("Unexpected row size: found "+topRow.size()+" expected "+numCols);
+					throw new InvalidCalibrationTarget("Unexpected row size: found "+topRow.size()+" expected "+numCols);
 			} else {
 				break;
 			}
@@ -162,17 +163,17 @@ public class PutTargetSquaresIntoOrder {
 	private void sanityCheckTarget(List<SquareBlob> topRow, 
 								   List<SquareBlob> leftCol, 
 								   List<SquareBlob> rightCol) 
-			throws InvalidTarget 
+			throws InvalidCalibrationTarget
 	{
 		if( leftCol.size() != rightCol.size() )
-			throw new InvalidTarget("Left and right columns have different length: "+leftCol.size()+" "+rightCol.size());
+			throw new InvalidCalibrationTarget("Left and right columns have different length: "+leftCol.size()+" "+rightCol.size());
 
 		int N = blobs.size();
 		int cols = topRow.size();
 		int rows = leftCol.size();
 
 		if( N != cols*rows )
-			throw new InvalidTarget("Total number of elements does not match number of rows/columns.");
+			throw new InvalidCalibrationTarget("Total number of elements does not match number of rows/columns.");
 
 		// See if the connection grid is valid
 		int totalConnections = 0;
@@ -181,7 +182,7 @@ public class PutTargetSquaresIntoOrder {
 		}
 		int expected = N*4 - (2*cols + 2*N/cols);
 		if( expected != totalConnections )
-			throw new InvalidTarget("Bad connection graph. Unexpected number of connections.");
+			throw new InvalidCalibrationTarget("Bad connection graph. Unexpected number of connections.");
 
 //		for( int i = 0; i < leftCol.size(); i++ ) {
 //			int x0 = leftCol.get(i).center.x;

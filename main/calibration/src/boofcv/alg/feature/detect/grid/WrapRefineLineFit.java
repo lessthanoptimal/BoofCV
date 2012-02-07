@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
@@ -47,8 +47,8 @@ public class WrapRefineLineFit
 			// Also need to be careful of perspective distortion, it can cause the smallest side to be
 			// too short too
 			int searchRadius = (int)s.smallestSide-2;
-			if( searchRadius > 12 )
-				searchRadius = 12;
+			if( searchRadius > 15 )
+				searchRadius = 15;
 			if( searchRadius < 3 )
 				searchRadius = 3;
 			
