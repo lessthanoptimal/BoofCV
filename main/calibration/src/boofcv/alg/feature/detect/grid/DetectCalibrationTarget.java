@@ -86,9 +86,9 @@ public class DetectCalibrationTarget {
 	
 	/**
 	 *
-	 * @param maxShuffle Maximum number of combinations of squares it will try when looking for a target.
-	 * @param gridWidth Number of squares wide the grid is.
-	 * @param gridHeight Numbre of squares tall the grid is.
+	 * @param maxShuffle Maximum number of combinations of squares it will try when looking for a target. Try 500.
+	 * @param gridWidth Number of squares wide the grid is. Target dependent.
+	 * @param gridHeight Number of squares tall the grid is. Target dependent.
 	 */
 	public DetectCalibrationTarget(int maxShuffle ,
 								   int gridWidth , int gridHeight ) {

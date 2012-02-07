@@ -46,7 +46,7 @@ BoofCV is in general very easy to build on just about any system.  Because it is
 
 ========= Developing With BoofCV =============
 
-BoofCV has been written with the use of an IDE in mind.  IntelliJ and Eclipse are too excellent IDEs for Java.  I personally prefer IntelliJ.  After you learn the basics of BoofCV it is possible to highly customize the code and throw away discard abstractions which are designed to make it easier to use, but less efficient.  The best way to write highly optimized code is to start by looking at the factory containing the code you wish to use, then tracing through the algorithms it invokes.  The code is designed to be readable and documentation actually improves inside of low level algorithms. 
+BoofCV has been written to be used with an integrated development evironment (IDE) and access to the source code.  IntelliJ and Eclipse are two excellent IDEs for Java.  With IntelliJ being my personally preference.  After you learn the basics of BoofCV it is possible to highly customize the code and discard abstractions that make programming easier, but less efficient.  The best way to write highly optimized code is to start by looking at the factory containing the code you wish to use, then tracing through the algorithms it invokes.  The code is designed to be readable and documentation actually improves inside of low level algorithms. 
 
 ========= Contact ===========================
 

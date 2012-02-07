@@ -41,15 +41,20 @@ public class FitGaussianPrune {
 	// valid range of bins in histogram.  indexLow <= i < indexHigh
 	private int indexLow;
 	private int indexHigh;
-	
+
+	// the closest that a point will be pruned. prevents some pathological situations from over fitting
+	int minSeparation = 1;
+
 	/**
 	 *
 	 * @param maxIterations Maximum number of iterations.  Try 20
 	 * @param thresholdSigma Number of standard deviations a point is away for it to be pruned.  Try 4
+	 * @param minSeparation A bin will not be pruned if it is this close to the mean.  1 or 3 typically
 	 */
-	public FitGaussianPrune(int maxIterations, double thresholdSigma ) {
+	public FitGaussianPrune(int maxIterations, double thresholdSigma , int minSeparation ) {
 		this.maxIterations = maxIterations;
 		this.thresholdSigma = thresholdSigma;
+		this.minSeparation = minSeparation;
 	}
 
 	/**
@@ -106,14 +111,26 @@ public class FitGaussianPrune {
 		
 		// see if the extreme ends are outside the prune threshold
 		while( Math.abs(mean-indexLow)/sigma > thresholdSigma ) {
-			change = true;
-			indexLow++;
-		}
-		while( Math.abs(mean-indexHigh)/sigma > thresholdSigma ) {
-			change = true;
-			indexHigh--;
-		}
+			double diff = Math.abs(mean-indexLow);
 
+			if( diff > sigma*thresholdSigma && diff >= minSeparation ) {
+				change = true;
+				indexLow++;
+			} else {
+				break;
+			}
+		}
+		while( true ) {
+			double diff = Math.abs(mean-indexHigh);
+
+			if( diff > sigma*thresholdSigma && diff >= minSeparation ) {
+				change = true;
+				indexHigh--;
+			} else {
+				break;
+			}
+		}
+		
 		return change;
 	}
 

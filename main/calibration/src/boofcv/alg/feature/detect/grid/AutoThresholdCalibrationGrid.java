@@ -55,13 +55,13 @@ public class AutoThresholdCalibrationGrid {
 
 	// pixel values around corners
 	IntensityHistogram histHighRes = new IntensityHistogram(256,256);
-	IntensityHistogram histLowRes = new IntensityHistogram(256,256);
+	IntensityHistogram histLowRes = new IntensityHistogram(20,256);
 
 	HistogramTwoPeaks peaks = new HistogramTwoPeaks(2);
 
 	// computes statistics of white and black sections
-	private FitGaussianPrune low = new FitGaussianPrune(20,3);
-	private FitGaussianPrune high = new FitGaussianPrune(20,3);
+	private FitGaussianPrune low = new FitGaussianPrune(20,3,5);
+	private FitGaussianPrune high = new FitGaussianPrune(20,3,5);
 
 	/**
 	 * Configures auto threshold.

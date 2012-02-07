@@ -70,8 +70,8 @@ import java.util.List;
 public class RefineCornerSegmentFit {
 
 	// computes statistics of white and black sections
-	private FitGaussianPrune low = new FitGaussianPrune(20,3);
-	private FitGaussianPrune high = new FitGaussianPrune(20,3);
+	private FitGaussianPrune low = new FitGaussianPrune(20,3,5);
+	private FitGaussianPrune high = new FitGaussianPrune(20,3,5);
 	
 	// binary images signifying the background and square
 	private ImageUInt8 regionWhite = new ImageUInt8(1,1);
@@ -106,6 +106,10 @@ public class RefineCornerSegmentFit {
 	// output corner
 	private Point2D_F64 corner;
 
+	// used for computing local thresholds
+	IntensityHistogram histHighRes = new IntensityHistogram(256,256);
+	IntensityHistogram histLowRes = new IntensityHistogram(20,256);
+
 	/**
 	 * Detects and refines to sub-pixel accuracy a corner in the provided image
 	 *
@@ -118,7 +122,7 @@ public class RefineCornerSegmentFit {
 
 		detectEdgePoints(image);
 
-		selectEdgeParam();
+		selectEdgeParam(image);
 		selectCornerParam();
 
 		corner = optimizeFit();
@@ -159,8 +163,6 @@ public class RefineCornerSegmentFit {
 	private void computeStatistics(ImageFloat32 image) {
 
 		// Find the high and low peaks using a histogram
-		IntensityHistogram histHighRes = new IntensityHistogram(256,256);
-		IntensityHistogram histLowRes = new IntensityHistogram(20,256);
 		HistogramTwoPeaks peaks = new HistogramTwoPeaks(2);
 
 		histHighRes.reset();
@@ -180,6 +182,12 @@ public class RefineCornerSegmentFit {
 		low.process(histHighRes,0,indexThresh);
 		high.process(histHighRes,indexThresh,255);
 
+		if( Double.isNaN(high.getMean())) {
+			for( int i = 0; i < histHighRes.histogram.length; i++ ) {
+				System.out.println("h["+i+"] = "+histHighRes.histogram[i]);
+			}
+			System.out.println();
+		}
 //		System.out.println("   region stat low = "+low.getMean()+"  high "+high.getMean());
 	}
 
@@ -331,7 +339,7 @@ public class RefineCornerSegmentFit {
 	/**
 	 * Selects initial corner parameter as two points on image edge
 	 */
-	private void selectEdgeParam() {
+	private void selectEdgeParam( ImageFloat32 image ) {
 		// find points on edge
 		List<Integer> onEdge = new ArrayList<Integer>();
 
@@ -357,6 +365,12 @@ public class RefineCornerSegmentFit {
 					bestB = second;
 				}
 			}
+		}
+
+		if( bestA == -1 ) {
+			UtilImageIO.print(image);
+			UtilImageIO.print(binary);
+			System.out.println("-------------------");
 		}
 
 		initial.sideA = pointsAlongEdge[bestA];

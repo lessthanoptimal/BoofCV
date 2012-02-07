@@ -18,10 +18,10 @@
 
 package boofcv.alg.geo.d3.calibration;
 
-import boofcv.alg.feature.detect.calibgrid.AutoThresholdCalibrationGrid;
-import boofcv.alg.feature.detect.calibgrid.DetectCalibrationTarget;
-import boofcv.alg.feature.detect.calibgrid.SquareBlob;
-import boofcv.alg.feature.detect.calibgrid.UtilCalibrationGrid;
+import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
+import boofcv.alg.feature.detect.grid.DetectCalibrationTarget;
+import boofcv.alg.feature.detect.grid.SquareBlob;
+import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ProcessInput;
@@ -129,28 +129,30 @@ public class DetectCalibrationTargetApp
 			default:
 				throw new RuntimeException("Unknown mode");
 		}
-		List<Point2D_I32> targetBounds = alg.getTargetQuadrilateral();
-
-		List<SquareBlob> squares = alg.getOrderedSquares();
-		List<Point2D_I32> targetPoints = new ArrayList<Point2D_I32>();
-
-		UtilCalibrationGrid.extractOrderedPoints(squares,targetPoints,targetColumns);
-
 		Graphics2D g2 = workImage.createGraphics();
+		if( foundTarget ) {
+			List<Point2D_I32> targetBounds = alg.getTargetQuadrilateral();
+			List<SquareBlob> squares = alg.getOrderedSquares();
+			List<Point2D_I32> targetPoints = new ArrayList<Point2D_I32>();
 
-		if( calibGUI.isShowBound())
-			drawBounds(g2,targetBounds);
-		if( calibGUI.isShowPoints())
-			drawPoints(g2, targetPoints);
-		if( calibGUI.isShowNumbers())
-			drawNumbers(g2, targetPoints);
-		if( calibGUI.isShowGraph())
-			drawGraph(g2, alg.getSquares());
+			UtilCalibrationGrid.extractOrderedPoints(squares,targetPoints,targetColumns);
 
-		if( foundTarget )
+			if( calibGUI.isShowBound())
+				drawBounds(g2,targetBounds);
+			if( calibGUI.isShowPoints())
+				drawPoints(g2, targetPoints);
+			if( calibGUI.isShowNumbers())
+				drawNumbers(g2, targetPoints);
+			if( calibGUI.isShowGraph())
+				drawGraph(g2, alg.getSquaresOrdered());
+
 			calibGUI.setSuccessMessage("FOUND",true);
-		else
+		} else {
+			drawSquareCorners(g2,alg.getSquaresUnordered(),Color.RED);
+			drawSquareCorners(g2,alg.getSquaresBad(),Color.BLUE);
+
 			calibGUI.setSuccessMessage("FAILED", false);
+		}
 		
 		gui.setBufferedImage(workImage);
 		gui.setScale(calibGUI.getScale());
@@ -219,6 +221,15 @@ public class DetectCalibrationTargetApp
 		}
 	}
 
+	private void drawSquareCorners( Graphics2D g2 , java.util.List<SquareBlob> squares , Color color ) {
+
+		for( SquareBlob s : squares ) {
+			for( Point2D_I32 c : s.corners ) {
+				VisualizeFeatures.drawPoint(g2, c.x, c.y, 2 , color);
+			}
+		}
+	}
+
 	@Override
 	public void changeImage(String name, int index) {
 		ImageListManager manager = getInputManager();
@@ -266,18 +277,14 @@ public class DetectCalibrationTargetApp
 			foundTarget = alg.process(binary);
 		} else {
 			foundTarget = auto.process(alg,gray);
-			if( foundTarget ) {
-				calibGUI.setThreshold((int)auto.getThreshold());
-				binary.setTo(auto.getBinary());
-			}
+			calibGUI.setThreshold((int)auto.getThreshold());
+			binary.setTo(auto.getBinary());
 		}
 
 	}
 
 	public static void main(String args[]) {
 
-//		DetectCalibrationTargetApp<ImageFloat32> app
-//				= new DetectCalibrationTargetApp<ImageFloat32>(ImageFloat32.class);
 		DetectCalibrationTargetApp app = new DetectCalibrationTargetApp();
 
 		ImageListManager manager = new ImageListManager();
@@ -290,8 +297,8 @@ public class DetectCalibrationTargetApp
 		manager.add("View 07","../data/evaluation/calibration/hp_dm1/img07.jpg");
 		manager.add("View 08","../data/evaluation/calibration/hp_dm1/img08.jpg");
 
-		manager.add("BView 01","../data/evaluation/calibration/Sony_DSC-HX5V/image01.jpg");
 		manager.add("View 10","../data/evaluation/calibration/Sony_DSC-HX5V/image10.jpg");
+		manager.add("BView 01","../data/evaluation/calibration/Sony_DSC-HX5V/image01.jpg");
 		manager.add("View 12","../data/evaluation/calibration/Sony_DSC-HX5V/image12.jpg");
 
 		app.setInputManager(manager);

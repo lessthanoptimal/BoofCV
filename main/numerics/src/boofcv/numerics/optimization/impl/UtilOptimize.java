@@ -20,6 +20,7 @@ package boofcv.numerics.optimization.impl;
 
 import boofcv.numerics.optimization.LineSearch;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
+import boofcv.numerics.optimization.UnconstrainedMinimization;
 
 /**
  * @author Peter Abeles
@@ -30,6 +31,16 @@ public class UtilOptimize {
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( search.iterate() ) {
 				return search.isConverged();
+			}
+		}
+
+		return true;
+	}
+
+	public static boolean process( UnconstrainedMinimization alg , int maxIterations ) {
+		for( int i = 0; i < maxIterations; i++ ) {
+			if( alg.iterate() ) {
+				return alg.isConverged();
 			}
 		}
 
