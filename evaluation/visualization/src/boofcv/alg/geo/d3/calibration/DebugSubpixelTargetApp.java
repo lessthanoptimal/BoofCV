@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.d3.calibration;
 
-import boofcv.alg.feature.detect.calibgrid.*;
+import boofcv.alg.feature.detect.grid.*;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectImagePanel;
@@ -68,7 +68,7 @@ public class DebugSubpixelTargetApp
 	public DebugSubpixelTargetApp() {
 
 //		refineAlg = new WrapCornerIntensity<T,ImageSingleBand>(1,imageType);
-		refineAlg = new WrapRefineLineFit();
+		refineAlg = new WrapRefineCornerSegmentFit();
 
 		// construct the GUI
 		JPanel panel = new JPanel();
@@ -101,7 +101,7 @@ public class DebugSubpixelTargetApp
 			crude = new ArrayList<Point2D_I32>();
 			refined = new ArrayList<Point2D_F32>();
 
-			refineAlg.refine(detectAlg.getSquares(),gray);
+			refineAlg.refine(detectAlg.getSquaresOrdered(),gray);
 
 			UtilCalibrationGrid.extractOrderedPoints(squares,crude,targetColumns);
 			UtilCalibrationGrid.extractOrderedSubpixel(squares,refined,targetColumns);

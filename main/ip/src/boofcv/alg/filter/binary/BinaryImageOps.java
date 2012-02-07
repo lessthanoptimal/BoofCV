@@ -58,6 +58,89 @@ import java.util.Random;
 public class BinaryImageOps {
 
 	/**
+	 * For each pixel it applies the logical 'and' operator between two images.
+	 *
+	 * @param inputA First input image. Not modified.
+	 * @param inputB Second input image. Not modified.
+	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
+	 * @return Output of logical operation.
+	 */
+	public static ImageUInt8 logicAnd( ImageUInt8 inputA , ImageUInt8 inputB , ImageUInt8 output )
+	{
+		InputSanityCheck.checkSameShape(inputA,inputB);
+		output = InputSanityCheck.checkDeclare(inputA, output);
+
+		for( int y = 0; y < inputA.height; y++ ) {
+			int indexA = inputA.startIndex + y*inputA.stride;
+			int indexB = inputB.startIndex + y*inputB.stride;
+			int indexOut = output.startIndex + y*output.stride;
+
+			int end = indexA + inputA.width;
+			for( ; indexA < end; indexA++,indexB++,indexOut++) {
+				int valA = inputA.data[indexA];
+				output.data[indexOut] = valA == 1 && valA == inputB.data[indexB] ? (byte)1 : (byte)0;
+			}
+		}
+
+		return output;
+	}
+
+	/**
+	 * For each pixel it applies the logical 'or' operator between two images.
+	 *
+	 * @param inputA First input image. Not modified.
+	 * @param inputB Second input image. Not modified.
+	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
+	 * @return Output of logical operation.
+	 */
+	public static ImageUInt8 logicOr( ImageUInt8 inputA , ImageUInt8 inputB , ImageUInt8 output )
+	{
+		InputSanityCheck.checkSameShape(inputA,inputB);
+		output = InputSanityCheck.checkDeclare(inputA, output);
+
+		for( int y = 0; y < inputA.height; y++ ) {
+			int indexA = inputA.startIndex + y*inputA.stride;
+			int indexB = inputB.startIndex + y*inputB.stride;
+			int indexOut = output.startIndex + y*output.stride;
+
+			int end = indexA + inputA.width;
+			for( ; indexA < end; indexA++,indexB++,indexOut++) {
+				output.data[indexOut] =
+						inputA.data[indexA] == 1 ||  1 == inputB.data[indexB] ? (byte)1 : (byte)0;
+			}
+		}
+
+		return output;
+	}
+
+	/**
+	 * For each pixel it applies the logical 'xor' operator between two images.
+	 *
+	 * @param inputA First input image. Not modified.
+	 * @param inputB Second input image. Not modified.
+	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
+	 * @return Output of logical operation.
+	 */
+	public static ImageUInt8 logicXor( ImageUInt8 inputA , ImageUInt8 inputB , ImageUInt8 output )
+	{
+		InputSanityCheck.checkSameShape(inputA,inputB);
+		output = InputSanityCheck.checkDeclare(inputA, output);
+
+		for( int y = 0; y < inputA.height; y++ ) {
+			int indexA = inputA.startIndex + y*inputA.stride;
+			int indexB = inputB.startIndex + y*inputB.stride;
+			int indexOut = output.startIndex + y*output.stride;
+
+			int end = indexA + inputA.width;
+			for( ; indexA < end; indexA++,indexB++,indexOut++) {
+				output.data[indexOut] = inputA.data[indexA] != inputB.data[indexB] ? (byte)1 : (byte)0;
+			}
+		}
+
+		return output;
+	}
+
+	/**
 	 * <p>
 	 * Erodes an image according to a 4-neighborhood.  Unless a pixel is connected to all its neighbors its value
 	 * is set to zero.

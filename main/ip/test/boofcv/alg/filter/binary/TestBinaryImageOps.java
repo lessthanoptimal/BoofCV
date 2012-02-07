@@ -33,8 +33,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -75,6 +74,21 @@ public class TestBinaryImageOps {
 			 0,0,0,0,0,0,0,0,0,0,0,0,0,
 			 0,0,0,0,0,0,0,0,0,0,0,0,0};
 
+	@Test
+	public void logicAnd() {
+		fail("implement");
+	}
+	@Test
+	public void logicOr() {
+		fail("implement");
+	}
+
+	@Test
+	public void logicXor() {
+		fail("implement");
+	}
+
+	
 	@Test
 	public void compareToNaive() {
 		CompareToBinaryNaive tests = new CompareToBinaryNaive(BinaryImageOps.class);

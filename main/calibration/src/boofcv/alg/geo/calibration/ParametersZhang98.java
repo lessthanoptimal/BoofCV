@@ -24,6 +24,8 @@ import georegression.struct.so.Rodrigues;
 /**
  * Parameters for batch optimization.
  *
+ * Calibration matrix = [ a b x0 ; 0 c y0; 0 0 1];
+ *
  * @author Peter Abeles
  */
 public class ParametersZhang98 {

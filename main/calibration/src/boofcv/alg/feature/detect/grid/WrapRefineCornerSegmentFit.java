@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class WrapRefineLineFit
+public class WrapRefineCornerSegmentFit
 	implements RefineCalibrationGridCorner
 {
 

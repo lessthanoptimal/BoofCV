@@ -29,12 +29,12 @@ import java.util.List;
 public class CalibrationGridConfig {
 
 	// how many elements wide is the grid
-	int gridWidth;
+	public int gridWidth;
 	// how many elements tall is the grid
-	int gridHeight;
+	public int gridHeight;
 
 	// width of each square element in the grid in world units
-	double cellSize;
+	public double cellSize;
 
 	public CalibrationGridConfig(int gridWidth, int gridHeight, double cellSize) {
 		this.gridWidth = gridWidth;

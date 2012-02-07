@@ -93,17 +93,21 @@ public class Zhang98OptimizationFunction implements FunctionNtoM {
 	@Override
 	public void process(double[] input, double[] output) {
 		param.setFromParam(assumeZeroSkew,input);
-		
+
+		process(param,output);
+	}
+
+	public void process( ParametersZhang98 param , double []residuals ) {
 		int index = 0;
 		for( int indexView = 0; indexView < param.views.length; indexView++ ) {
-			
+
 			ParametersZhang98.View v = param.views[indexView];
-			
+
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
 			se.T = v.T;
 
 			List<Point2D_F64> obs = observations.get(indexView);
-			
+
 			for( int i = 0; i < grid.size(); i++ ) {
 				// Put the point in the camera's reference frame
 				SePointOps_F64.transform(se,grid.get(i), cameraPt);
@@ -120,12 +124,10 @@ public class Zhang98OptimizationFunction implements FunctionNtoM {
 				double y = param.b*calibratedPt.y + param.y0;
 
 				Point2D_F64 p = obs.get(i);
-				
-				output[index++] = p.x-x;
-				output[index++] = p.y-y;
+
+				residuals[index++] = p.x-x;
+				residuals[index++] = p.y-y;
 			}
 		}
 	}
-
-
 }
