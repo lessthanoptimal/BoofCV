@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -64,11 +65,14 @@ public class DetectCalibrationTarget {
 	private double polySideRatio = 0.25;
 
 	// given a blob it finds the 4 corners in the blob
-	FindQuadCorners cornerFinder = new FindQuadCorners(1.5,10);
+//	FindQuadCorners cornerFinder = new FindQuadCorners(1.5,10);
+	FindQuadCorners cornerFinder = new FindQuadCorners();
 	private int numBlobs;
 
 	// list if found corners/blobs
-	private List<SquareBlob> squares;
+	private List<SquareBlob> squares = new ArrayList<SquareBlob>();
+	// list of squares that were rejected
+	private List<SquareBlob> squaresBad = new ArrayList<SquareBlob>();
 
 	// number of black squares in calibration grid
 	private int gridWidth;
@@ -76,7 +80,10 @@ public class DetectCalibrationTarget {
 
 	// maximum number of possible targets it will consider
 	private int maxShuffle;
-
+	
+	// Explaining why it failed
+	private String errorMessage;
+	
 	/**
 	 *
 	 * @param maxShuffle Maximum number of combinations of squares it will try when looking for a target.
@@ -99,6 +106,8 @@ public class DetectCalibrationTarget {
 	 */
 	public boolean process( ImageUInt8 thresholded )
 	{
+		squaresBad.clear();
+		squares.clear();
 		binaryA.reshape(thresholded.width,thresholded.height);
 		binaryB.reshape(thresholded.width,thresholded.height);
 		blobs.reshape(thresholded.width, thresholded.height);
@@ -114,7 +123,7 @@ public class DetectCalibrationTarget {
 
 		// See if there are enough blobs for there to be a chance of it being a complete grid
 		if( numBlobs < gridWidth*gridHeight )
-			return false;
+			return fail("Not enough blobs detected");
 
 		//remove blobs with holes
 		numBlobs = removeBlobsHoles(binaryB,blobs,numBlobs);
@@ -133,11 +142,14 @@ public class DetectCalibrationTarget {
 				continue;
 			}
 			List<Point2D_I32> corners = cornerFinder.process(l);
-			squares.add(new SquareBlob(l, corners));
+			if( corners.size() == 4 )
+				squares.add(new SquareBlob(l, corners));
 		}
 
 		// remove blobs which are not like a polygon at all
 		filterNotPolygon(squares);
+		if( squares.size() < gridWidth*gridHeight )
+			return fail("Too few valid squares");
 
 		// find connections between squares
 		ConnectGridSquares.connect(squares);
@@ -157,15 +169,12 @@ public class DetectCalibrationTarget {
 	private boolean shuffleToFindTarget( List<SquareBlob> squares ) {
 		
 		int N = gridWidth*gridHeight;
-		if( squares.size() < N )
-			return false;
-
 		Shuffle<SquareBlob> shuffle = new Shuffle<SquareBlob>(squares,N);
 
 //		System.out.println("------------------------------------"+squares.size()+"  N "+N);
 //		System.out.println("Total Shuffles: "+shuffle.numShuffles());
 		if( shuffle.numShuffles() > maxShuffle ) {
-			return false;
+			return fail("Not enough blobs detected");
 		}
 
 		List<SquareBlob> list = new ArrayList<SquareBlob>();
@@ -187,7 +196,7 @@ public class DetectCalibrationTarget {
 					success = true;
 					break;
 				}
-			} catch (InvalidTarget invalidTarget) {
+			} catch (InvalidCalibrationTarget invalidTarget) {
 //				System.out.println(invalidTarget.getMessage());
 			}
 
@@ -198,7 +207,9 @@ public class DetectCalibrationTarget {
 			}
 		}
 		
-		return success;
+		if( !success )
+			return fail("No target found after shuffling");
+		return true;
 	}
 
 	/**
@@ -231,6 +242,8 @@ public class DetectCalibrationTarget {
 	 * Returns corner points in quadrilateral that bounds all the target points, approximately.
 	 */
 	public List<Point2D_I32> getTargetQuadrilateral() {
+		if( extractTarget == null )
+			return null;
 		return extractTarget.getQuadrilateral();
 	}
 
@@ -271,6 +284,7 @@ public class DetectCalibrationTarget {
 			}
 			
 			if( min/max < polySideRatio ) {
+				squaresBad.add(blob);
 				iter.remove();
 			}
 		}
@@ -344,6 +358,11 @@ public class DetectCalibrationTarget {
 		return counts;
 	}
 
+	private boolean fail( String message ) {
+		this.errorMessage = message;
+		return false;
+	}
+	
 	public ImageSInt32 getBlobs() {
 		return blobs;
 	}
@@ -352,7 +371,19 @@ public class DetectCalibrationTarget {
 		return numBlobs;
 	}
 
-	public List<SquareBlob> getSquares() {
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public List<SquareBlob> getSquaresUnordered() {
+		return squares;
+	}
+
+	public List<SquareBlob> getSquaresOrdered() {
 		return extractTarget.getBlobsOrdered();
+	}
+
+	public List<SquareBlob> getSquaresBad() {
+		return squaresBad;
 	}
 }

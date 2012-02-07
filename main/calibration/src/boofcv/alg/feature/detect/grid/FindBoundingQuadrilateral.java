@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
 import georegression.struct.point.Point2D_I32;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.feature.detect.calibgrid.FindQuadCorners.*;
+import static boofcv.alg.feature.detect.grid.UtilCalibrationGrid.findFarthest;
 
 /**
  * Given a set of points that are contained inside a quadrilateral and have at least one point
@@ -57,8 +57,8 @@ public class FindBoundingQuadrilateral {
 		ret.add(corner3);
 
 		// organize the corners
-		Point2D_I32 center = findAverage(ret);
-		sortByAngleCCW(center,ret);
+		Point2D_I32 center = UtilCalibrationGrid.findAverage(ret);
+		UtilCalibrationGrid.sortByAngleCCW(center, ret);
 
 		return ret;
 	}

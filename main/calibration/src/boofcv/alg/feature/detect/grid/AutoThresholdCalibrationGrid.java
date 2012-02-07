@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.misc.BoofMiscOps;
@@ -44,10 +44,6 @@ public class AutoThresholdCalibrationGrid {
 	// maximum number of thresholds it will test
 	private int maxAttempts;
 
-	// used to compute statistics on dark/light regions
-	private FitGaussianPrune fitDark = new FitGaussianPrune(20,4);
-	private FitGaussianPrune fitWhite = new FitGaussianPrune(20,4);
-
 	// the final threshold it selected
 	private double selectedThreshold;
 
@@ -58,7 +54,14 @@ public class AutoThresholdCalibrationGrid {
 	private List<Double> attempts = new ArrayList<Double>();
 
 	// pixel values around corners
-	private double values[] = new double[1];
+	IntensityHistogram histHighRes = new IntensityHistogram(256,256);
+	IntensityHistogram histLowRes = new IntensityHistogram(256,256);
+
+	HistogramTwoPeaks peaks = new HistogramTwoPeaks(2);
+
+	// computes statistics of white and black sections
+	private FitGaussianPrune low = new FitGaussianPrune(20,3);
+	private FitGaussianPrune high = new FitGaussianPrune(20,3);
 
 	/**
 	 * Configures auto threshold.
@@ -85,25 +88,23 @@ public class AutoThresholdCalibrationGrid {
 		attempts.clear();
 
 		binary.reshape(gray.width,gray.height);
-		if( values.length < gray.width*gray.height ) {
-			values = new double[ gray.width*gray.height ];
-		}
 
 		// first find a threshold which detects the target
 		for( int i = 0; i < maxAttempts; i++ ) {
-			selectedThreshold = selectNext();
+			selectedThreshold = 89;//selectNext();
 
 			GThresholdImageOps.threshold(gray,binary,selectedThreshold,true);
 
 			// see if the target was detected
 			if( detector.process(binary) ) {
-				selectedThreshold = refineThreshold(detector.getSquares(),gray);
+				selectedThreshold = refineThreshold(detector.getSquaresOrdered(),gray);
 				GThresholdImageOps.threshold(gray,binary,selectedThreshold,true);
 				if( !detector.process(binary) ) {
 					throw new RuntimeException("Crap new threshold doesn't work!");
 				}
 				return true;
 			}
+			return false;
 		}
 
 		return false;
@@ -159,9 +160,7 @@ public class AutoThresholdCalibrationGrid {
 	private double refineThreshold( List<SquareBlob> blobs , ImageFloat32 gray ) {
 
 		// create a list of pixel intensity values around all the corners
-		// and compute the mean pixel value around the corners
-		double mean = 0;
-		int N = 0;
+		histHighRes.reset();
 		for( SquareBlob b : blobs ) {
 			int r = (int)Math.ceil(b.smallestSide)/3;
 			
@@ -171,35 +170,24 @@ public class AutoThresholdCalibrationGrid {
 				
 				for( int y = rect.y0; y < rect.y1; y++ ) {
 					for( int x = rect.x0; x < rect.x1; x++ ) {
-						mean += values[N++] = gray.get(x,y);
+						histHighRes.add(gray.get(x,y));
 					}
 				}
 			}
 		}
-		
-		mean /= N;
 
-		// compute statistics for dark and light pixels
-		fitWhite.reset(N);
-		fitDark.reset(N);
-		
-		for( int i = 0; i < N; i++ ) {
-			if( values[i] < mean ) {
-				fitDark.add(values[i]);
-			} else {
-				fitWhite.add(values[i]);
-			}
-		}
+		// Find the high and low peaks using a histogram and compute the threshold
+		histLowRes.reset();
+		histLowRes.downSample(histHighRes);
 
-		fitDark.process();
-		fitWhite.process();
+		peaks.computePeaks(histLowRes);
 
-		double meanDark = fitDark.getMean();
-		double meanWhite = fitWhite.getMean();
+		int indexThresh = (int)((peaks.peakLow+peaks.peakHigh)/2.0);
 
-		// pick a threshold closer to white than dark so that more in between pixels are classified
-		// as being black
-		return meanDark*0.3+meanWhite*0.7;
+		low.process(histHighRes,0,indexThresh);
+		high.process(histHighRes,indexThresh,255);
+
+		return (low.getMean()+high.getMean())/2.0;
 	}
 
 	/**

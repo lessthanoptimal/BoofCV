@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import georegression.misc.test.GeometryUnitTest;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
@@ -51,7 +52,7 @@ public class TestPutTargetSquaresIntoOrder {
 		PutTargetSquaresIntoOrder alg = new PutTargetSquaresIntoOrder();
 		try {
 			alg.process(blobs);
-		} catch (InvalidTarget invalidTarget) {
+		} catch (InvalidCalibrationTarget invalidTarget) {
 			fail("Failed");
 		}
 

@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.calibgrid;
+package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.io.image.UtilImageIO;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedMinimization;
 import boofcv.numerics.optimization.functions.FunctionNtoS;
@@ -69,8 +70,8 @@ import java.util.List;
 public class RefineCornerSegmentFit {
 
 	// computes statistics of white and black sections
-	private FitGaussianPrune low = new FitGaussianPrune(20,4);
-	private FitGaussianPrune high = new FitGaussianPrune(20,4);
+	private FitGaussianPrune low = new FitGaussianPrune(20,3);
+	private FitGaussianPrune high = new FitGaussianPrune(20,3);
 	
 	// binary images signifying the background and square
 	private ImageUInt8 regionWhite = new ImageUInt8(1,1);
@@ -93,7 +94,6 @@ public class RefineCornerSegmentFit {
 	// information about the image being processed in a more convenient format
 	private int width;
 	private int height;
-	private int N;
 	private int numEdges;
 	
 	// initial line parameter estimate
@@ -125,37 +125,6 @@ public class RefineCornerSegmentFit {
 	}
 
 	/**
-	 * Computes the mean pixel intensity, then separates pixels into two sets that are
-	 * above and below.  Once segmented the mean and standard deviation is computed while
-	 * pruning outliers
-	 */
-	private void computeStatistics(ImageFloat32 image) {
-		low.reset(N);
-		high.reset(N);
-
-		double mean = 0;
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x++ ) {
-				mean += image.get(x,y);
-			}
-		}
-		mean /= N;
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x++ ) {
-				double v = image.get(x,y);
-				if( v < mean ) {
-					low.add(v);
-				} else {
-					high.add(v);
-				}
-			}
-		}
-
-		low.process();
-		high.process();
-	}
-
-	/**
 	 * Returns the estimated corner pixel to sub-pixel accuracy
 	 *
 	 * @return Corner point.
@@ -170,17 +139,48 @@ public class RefineCornerSegmentFit {
 	private void init(ImageFloat32 image) {
 		this.width = image.width;
 		this.height = image.height;
-		N = width*height;
 		numEdges = 2*(width+height-2);
 
-		regionWhite.reshape(width,height);
-		regionBlack.reshape(width,height);
+		regionWhite.reshape(width, height);
+		regionBlack.reshape(width, height);
 		binaryHigh.reshape(width, height);
 		binaryMiddle.reshape(width, height);
 		binary.reshape(width,height);
 		blobs.reshape(width,height);
 
 		setupEdgeArray();
+	}
+
+	/**
+	 * Use a histogram to find the two peaks caused by dark and light pixels.  Then segment
+	 * the pixel intensities into two groups using the mid point between the two peaks.  statistics
+	 * are then computed from both those group after pruning.
+	 */
+	private void computeStatistics(ImageFloat32 image) {
+
+		// Find the high and low peaks using a histogram
+		IntensityHistogram histHighRes = new IntensityHistogram(256,256);
+		IntensityHistogram histLowRes = new IntensityHistogram(20,256);
+		HistogramTwoPeaks peaks = new HistogramTwoPeaks(2);
+
+		histHighRes.reset();
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				histHighRes.add(image.get(x,y));
+			}
+		}
+
+		histLowRes.reset();
+		histLowRes.downSample(histHighRes);
+
+		peaks.computePeaks(histLowRes);
+
+		int indexThresh = (int)((peaks.peakLow+peaks.peakHigh)/2.0);
+
+		low.process(histHighRes,0,indexThresh);
+		high.process(histHighRes,indexThresh,255);
+
+//		System.out.println("   region stat low = "+low.getMean()+"  high "+high.getMean());
 	}
 
 	/**
@@ -215,6 +215,9 @@ public class RefineCornerSegmentFit {
 	 * region would be at most two pixels thick, both values lighter than the pure black square.
 	 * This border is captured using two threshold, one 1/2 between light and dark, and one much
 	 * close to light.
+	 *
+	 * One case is not handled correctly given perfect observations.  If the line splits 1/2 way down
+	 * two pixels then the edge will only be one pixel thick and not two.
 	 */
 	private void detectEdgePoints( ImageFloat32 image ) {
 		// Added or subtracted one to handle pathological case where sigma is zero
@@ -222,8 +225,11 @@ public class RefineCornerSegmentFit {
 		double highThresh = high.getMean()-high.getSigma()*3-1;
 
 		// sanity check
-		if( highThresh <= lowThresh )
-			throw new RuntimeException("Bad statistics");
+		if( highThresh <= lowThresh ) {
+			UtilImageIO.print(image);
+			return;
+//			throw new RuntimeException("Bad statistics");
+		}
 
 		// do a threshold in the middle first
 		double middleThresh = (lowThresh+highThresh)/2.0;
@@ -241,6 +247,9 @@ public class RefineCornerSegmentFit {
 		BinaryImageOps.edge4(binaryMiddle, binary);
 		BinaryImageOps.logicOr(binaryHigh,binary,binary);
 
+//		UtilImageIO.print(image);
+//		UtilImageIO.print(binary);
+
 		// extract the points from the binary image and compute weights
 		// weight is a linear function of distance from black square value
 		points.reset();
@@ -251,12 +260,12 @@ public class RefineCornerSegmentFit {
 					PointInfo p = points.pop();
 					p.set(x,y);
 					double v = image.get(x,y);
-					p.weight = (v-high.getMean())/spread;
+					p.weight = (high.getMean()-v)/spread;
 					if( p.weight <= 0.01 )
 						p.weight = 0.01;
 					else if( p.weight > 1 )
 						p.weight = 1;
-					
+
 				}
 			}
 		}
