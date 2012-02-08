@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,6 @@ import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles

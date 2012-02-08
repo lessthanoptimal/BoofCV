@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ public class FactoryIntensityPoint {
 	/**
 	 * Feature intensity for Harris corner detector.  See {@link HarrisCornerIntensity} for more details.
 	 *
-	 * @param windowRadius Size of the feature it is detects,
+	 * @param windowRadius Size of the feature it is detects, Try 2.
 	 * @param kappa Tuning parameter, typically a small number around 0.04
 	 * @param weighted Is the gradient weighted using a Gaussian distribution?  Weighted is much slower than unweighted.
 	 * @param derivType Image derivative type it is computed from.  @return Harris corner
@@ -75,7 +75,7 @@ public class FactoryIntensityPoint {
 	/**
 	 * Feature intensity for KLT corner detector.  See {@link KltCornerIntensity} for more details.
 	 *
-	 * @param windowRadius Size of the feature it detects,
+	 * @param windowRadius Size of the feature it detects, Try 2.
 	 * @param weighted Should the it be weighted by a Gaussian kernel?  Unweighted is much faster.
 	 * @param derivType Image derivative type it is computed from.	 * @param derivType Image derivative type it is computed from.  @return Harris corner
 	 * @param <I> Input image type.
