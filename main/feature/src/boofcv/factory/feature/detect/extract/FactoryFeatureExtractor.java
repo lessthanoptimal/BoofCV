@@ -19,20 +19,46 @@
 package boofcv.factory.feature.detect.extract;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.extract.WrapperNonMax;
 import boofcv.abst.feature.detect.extract.WrapperNonMaxCandidate;
+import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.FastNonMaxExtractor;
 import boofcv.alg.feature.detect.extract.NonMaxBorderExtractor;
 import boofcv.alg.feature.detect.extract.NonMaxCandidateRelaxed;
 import boofcv.alg.feature.detect.extract.NonMaxCandidateStrict;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Creates {@link FeatureExtractor} for finding local maximums in feature intensity images.
+ *
+ * @see boofcv.factory.feature.detect.intensity.FactoryIntensityPoint
  *
  * @author Peter Abeles
  */
 public class FactoryFeatureExtractor
 {
+	/**
+	 * Creates a generalized feature detector/extractor that adds n-best capability to {@link FeatureExtractor}
+	 * and performs other house keeping tasks. Handles calling {@link GeneralFeatureIntensity} itself.
+	 *
+	 * @param intensity Feature intensity algorithm
+	 * @param extractor Feature extraction algorithm.
+	 * @param maxFeatures Maximum number of features it should return. -1 to return them all.
+	 * @param <I> Input image type.
+	 * @param <D> Image derivative type.
+	 * @return General feature detector
+	 */
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	GeneralFeatureDetector<I,D> general( GeneralFeatureIntensity<I, D> intensity,
+										 FeatureExtractor extractor,
+										 int maxFeatures) {
+		return new GeneralFeatureDetector<I, D>(intensity,extractor,maxFeatures);
+	}
+	
+	
+	
+	
 	/**
 	 * Standard non-max feature extractor.
 	 *

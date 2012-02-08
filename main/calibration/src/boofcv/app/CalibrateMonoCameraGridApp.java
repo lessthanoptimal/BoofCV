@@ -111,7 +111,7 @@ public class CalibrateMonoCameraGridApp {
 		double totalError = 0;
 		for( int i = 0; i < results.size(); i++ ) {
 			ImageResults r = results.get(i);
-			totalError += r.maxError;
+			totalError += r.meanError;
 			
 			System.out.printf("image %3d Euclidean ( mean = %7.1e max = %7.1e ) bias ( X = %8.1e Y %8.1e )\n",i,r.meanError,r.maxError,r.biasX,r.biasY);
 		}
@@ -173,9 +173,8 @@ public class CalibrateMonoCameraGridApp {
 
 		CalibrateMonoCameraGridApp app = new CalibrateMonoCameraGridApp(detector);
 
-		app.configure(config,true,1);
+		app.configure(config,false,2);
 
-		app.process("/home/pja/saved");
-
+		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V");
 	}
 }

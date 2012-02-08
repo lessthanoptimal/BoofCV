@@ -48,7 +48,7 @@ public class DebugSubpixelTargetApp
 	int targetRows = 3;
 
 	// detects the calibration target
-	DetectCalibrationTarget detectAlg = new DetectCalibrationTarget(500,targetColumns,targetRows);
+	DetectSpacedSquareGrid detectAlg = new DetectSpacedSquareGrid(500,targetColumns,targetRows);
 	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(255,20);
 
 	RefineCalibrationGridCorner refineAlg;
@@ -176,15 +176,16 @@ public class DebugSubpixelTargetApp
 
 		DebugSubpixelTargetApp app = new DebugSubpixelTargetApp();
 
+		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V/";
+
 		ImageListManager manager = new ImageListManager();
-		manager.add("View 01","../data/evaluation/calibration/hp_dm1/img01.jpg");
-		manager.add("View 02","../data/evaluation/calibration/hp_dm1/img02.jpg");
-		manager.add("View 03","../data/evaluation/calibration/hp_dm1/img03.jpg");
-		manager.add("View 04","../data/evaluation/calibration/hp_dm1/img04.jpg");
-		manager.add("View 05","../data/evaluation/calibration/hp_dm1/img05.jpg");
-		manager.add("View 06","../data/evaluation/calibration/hp_dm1/img06.jpg");
-		manager.add("View 07","../data/evaluation/calibration/hp_dm1/img07.jpg");
-		manager.add("View 08","../data/evaluation/calibration/hp_dm1/img08.jpg");
+		manager.add("View 01",prefix+"frame01.jpg");
+		manager.add("View 02",prefix+"frame02.jpg");
+		manager.add("View 03",prefix+"frame03.jpg");
+		manager.add("View 04",prefix+"frame04.jpg");
+		manager.add("View 05",prefix+"frame05.jpg");
+		manager.add("View 06",prefix+"frame06.jpg");
+		manager.add("View 07",prefix+"frame07.jpg");
 
 		app.setInputManager(manager);
 

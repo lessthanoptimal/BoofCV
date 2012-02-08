@@ -28,7 +28,7 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.detect.intensity.FactoryIntensityGeneral;
+import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.feature.FancyInterestPointRender;
@@ -83,12 +83,12 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		super(1);
 		this.imageType = imageType;
 
-		addAlgorithm(0, "Harris", FactoryIntensityGeneral.harris(radius, 0.04f, imageType));
-		addAlgorithm(0, "KLT", FactoryIntensityGeneral.klt(radius, derivType));
-		addAlgorithm(0, "FAST", FactoryIntensityGeneral.fast(5, 11, derivType));
-		addAlgorithm(0, "KitRos", FactoryIntensityGeneral.kitros(derivType));
-		addAlgorithm(0, "Laplace Det", FactoryIntensityGeneral.laplacian(HessianBlobIntensity.Type.DETERMINANT, derivType));
-		addAlgorithm(0, "Laplace Trace", FactoryIntensityGeneral.laplacian(HessianBlobIntensity.Type.TRACE, derivType));
+		addAlgorithm(0, "Harris", FactoryIntensityPoint.harris(radius, 0.04f, false, imageType));
+		addAlgorithm(0, "KLT", FactoryIntensityPoint.klt(radius, false, derivType));
+		addAlgorithm(0, "FAST", FactoryIntensityPoint.fast(5, 11, derivType));
+		addAlgorithm(0, "KitRos", FactoryIntensityPoint.kitros(derivType));
+		addAlgorithm(0, "Laplace Det", FactoryIntensityPoint.laplacian(HessianBlobIntensity.Type.DETERMINANT, derivType));
+		addAlgorithm(0, "Laplace Trace", FactoryIntensityPoint.laplacian(HessianBlobIntensity.Type.TRACE, derivType));
 
 		deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 

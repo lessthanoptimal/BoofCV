@@ -33,7 +33,8 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -76,16 +77,52 @@ public class TestBinaryImageOps {
 
 	@Test
 	public void logicAnd() {
-		fail("implement");
+		ImageUInt8 image0 = new ImageUInt8(5,6);
+		ImageUInt8 image1 = new ImageUInt8(5,6);
+
+		image0.set(0,0,1);
+		image0.set(1,1,1);
+		image1.set(0,0,0);
+		image1.set(1,1,1);
+
+		ImageUInt8 out = BinaryImageOps.logicAnd(image0,image1,null);
+		
+		assertEquals(0, out.get(0, 0));
+		assertEquals(1,out.get(1,1));
+		assertEquals(0,out.get(0,1));
 	}
 	@Test
 	public void logicOr() {
-		fail("implement");
+		ImageUInt8 image0 = new ImageUInt8(5,6);
+		ImageUInt8 image1 = new ImageUInt8(5,6);
+
+		image0.set(0,0,1);
+		image0.set(1,1,1);
+		image1.set(0,0,0);
+		image1.set(1,1,1);
+
+		ImageUInt8 out = BinaryImageOps.logicOr(image0, image1, null);
+
+		assertEquals(1,out.get(0,0));
+		assertEquals(1,out.get(1,1));
+		assertEquals(0, out.get(0, 1));
 	}
 
 	@Test
 	public void logicXor() {
-		fail("implement");
+		ImageUInt8 image0 = new ImageUInt8(5,6);
+		ImageUInt8 image1 = new ImageUInt8(5,6);
+
+		image0.set(0,0,1);
+		image0.set(1,1,1);
+		image1.set(0,0,0);
+		image1.set(1,1,1);
+
+		ImageUInt8 out = BinaryImageOps.logicXor(image0, image1, null);
+
+		assertEquals(1,out.get(0,0));
+		assertEquals(0,out.get(1,1));
+		assertEquals(0, out.get(0, 1));
 	}
 
 	

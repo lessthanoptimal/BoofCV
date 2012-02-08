@@ -26,8 +26,12 @@ import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
 
 /**
- * Generic class for extracting features of different types. Can return all the found features or just the features with the highest
- * intensity.
+ * <p>
+ * Generic class for extracting features of different types. Can return all the found features or
+ * just the features with the highest intensity.  The main advantage of this class over
+ * {@link boofcv.abst.feature.detect.interest.InterestPointDetector} is that it allows image derivatives
+ * to be passed in, allowing for tighter integration of algorithms.
+ * </p>
  *
  * @author Peter Abeles
  */

@@ -28,12 +28,14 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
- * Factory for creating various types of corner intensity detectors.
+ * Factory for creating various types of interest point intensity algorithms.
+ *
+ * @see FactoryIntensityPoint
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FactoryPointIntensityAlg {
+public class FactoryIntensityPointAlg {
 
 	/**
 	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.KitRosCornerIntensity} from different image types.
@@ -44,7 +46,7 @@ public class FactoryPointIntensityAlg {
 	 * @return Fast corner
 	 */
 	public static <T extends ImageSingleBand>
-	FastCornerIntensity<T> createFast12(int pixelTol, int minCont, Class<T> imageType)
+	FastCornerIntensity<T> fast12(int pixelTol, int minCont, Class<T> imageType)
 	{
 		if( imageType == ImageFloat32.class )
 			return (FastCornerIntensity<T>)new ImplFastCorner12_F32(pixelTol,minCont);
@@ -60,10 +62,10 @@ public class FactoryPointIntensityAlg {
 	 * @param windowRadius Size of the feature it is detects,
 	 * @param kappa Tuning parameter, typically a small number around 0.04
 	 * @param weighted Is the gradient weighted using a Gaussian distribution?  Weighted is much slower than unweighted.
-	 *@param derivType Image derivative type it is computed from.  @return Harris corner
+	 * @param derivType Image derivative type it is computed from.  @return Harris corner
 	 */
 	public static <T extends ImageSingleBand>
-	HarrisCornerIntensity<T> createHarris(int windowRadius, float kappa, boolean weighted, Class<T> derivType)
+	HarrisCornerIntensity<T> harris(int windowRadius, float kappa, boolean weighted, Class<T> derivType)
 	{
 		if( derivType == ImageFloat32.class ) {
 			if( weighted )
@@ -90,7 +92,7 @@ public class FactoryPointIntensityAlg {
 	 * @return KLT corner
 	 */
 	public static <T extends ImageSingleBand>
-	KltCornerIntensity<T> createKlt(int windowRadius, boolean weighted , Class<T> derivType)
+	KltCornerIntensity<T> klt(int windowRadius, boolean weighted, Class<T> derivType)
 	{
 		if( derivType == ImageFloat32.class ) {
 			if( weighted )

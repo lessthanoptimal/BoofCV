@@ -70,7 +70,7 @@ public class HistogramTwoPeaks {
 		for( int i = 1; i < N-2; i++ ) {
 			int response = 2*h.histogram[i] - h.histogram[i-1] - h.histogram[i+1];
 			if( response > 0 ) {
-				peaks.add(new Data(i,response));
+				peaks.add(new Data(i,h.histogram[i]));
 			}
 		}
 		

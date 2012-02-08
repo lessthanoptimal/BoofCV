@@ -34,7 +34,7 @@ import java.util.List;
 
 /**
  * <p>
- * Detect square grid calibration targets from binary images.  The output is a set of ordered calibration
+ * Detects square grid calibration targets from binary images.  The output is a set of ordered calibration
  * points with the number of rows and columns.  Calibration points are in a row-major ordering. Processing
  * steps:
  * <ol>
@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationTarget {
+public class DetectSpacedSquareGrid {
 
 	// images which store intermediate steps in processing cycle
 	private ImageUInt8 binaryA = new ImageUInt8(1,1);
@@ -90,8 +90,8 @@ public class DetectCalibrationTarget {
 	 * @param gridWidth Number of squares wide the grid is. Target dependent.
 	 * @param gridHeight Number of squares tall the grid is. Target dependent.
 	 */
-	public DetectCalibrationTarget(int maxShuffle ,
-								   int gridWidth , int gridHeight ) {
+	public DetectSpacedSquareGrid(int maxShuffle,
+								  int gridWidth, int gridHeight) {
 		this.gridWidth = gridWidth;
 		this.gridHeight = gridHeight;
 		this.maxShuffle = maxShuffle;

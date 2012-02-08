@@ -36,7 +36,7 @@ public class WrapPlanarGridTarget implements CalibrationGridInterface{
 	
 	RefineCalibrationGridCorner refine;
 	AutoThresholdCalibrationGrid autoThreshold;
-	DetectCalibrationTarget detect;
+	DetectSpacedSquareGrid detect;
 
 	// set of found points
 	List<Point2D_F64> ret;
@@ -51,7 +51,7 @@ public class WrapPlanarGridTarget implements CalibrationGridInterface{
 		squareColumns = config.gridWidth/2;
 		int squareRows = config.gridHeight/2;
 
-		detect = new DetectCalibrationTarget(500, squareColumns,squareRows);
+		detect = new DetectSpacedSquareGrid(500, squareColumns,squareRows);
 		autoThreshold = new AutoThresholdCalibrationGrid(255,30);
 
 	}
