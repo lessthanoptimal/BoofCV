@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,8 @@ package boofcv.alg.filter.convolve.normalized;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 /**
  * Code generator which creates re-normalizing convolution code

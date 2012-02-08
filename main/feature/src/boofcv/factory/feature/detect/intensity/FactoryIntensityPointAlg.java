@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,25 +59,25 @@ public class FactoryIntensityPointAlg {
 	/**
 	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity} from different image types.
 	 *
-	 * @param windowRadius Size of the feature it is detects,
+	 * @param windowRadius Size of the feature it is detects,Try 2.
 	 * @param kappa Tuning parameter, typically a small number around 0.04
 	 * @param weighted Is the gradient weighted using a Gaussian distribution?  Weighted is much slower than unweighted.
 	 * @param derivType Image derivative type it is computed from.  @return Harris corner
 	 */
-	public static <T extends ImageSingleBand>
-	HarrisCornerIntensity<T> harris(int windowRadius, float kappa, boolean weighted, Class<T> derivType)
+	public static <D extends ImageSingleBand>
+	HarrisCornerIntensity<D> harris(int windowRadius, float kappa, boolean weighted, Class<D> derivType)
 	{
 		if( derivType == ImageFloat32.class ) {
 			if( weighted )
-				return (HarrisCornerIntensity<T>)new ImplHarrisCorner_F32(windowRadius,kappa);
+				return (HarrisCornerIntensity<D>)new ImplHarrisCorner_F32(windowRadius,kappa);
 			else
-				return (HarrisCornerIntensity<T>)new ImplHarrisCornerWeighted_F32(windowRadius,kappa);
+				return (HarrisCornerIntensity<D>)new ImplHarrisCornerWeighted_F32(windowRadius,kappa);
 
 		} else if( derivType == ImageSInt16.class ) {
 			if( weighted )
-				return (HarrisCornerIntensity<T>)new ImplHarrisCorner_S16(windowRadius,kappa);
+				return (HarrisCornerIntensity<D>)new ImplHarrisCorner_S16(windowRadius,kappa);
 			else
-				return (HarrisCornerIntensity<T>)new ImplHarrisCornerWeighted_S16(windowRadius,kappa);
+				return (HarrisCornerIntensity<D>)new ImplHarrisCornerWeighted_S16(windowRadius,kappa);
 
 		}else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
@@ -86,24 +86,24 @@ public class FactoryIntensityPointAlg {
 	/**
 	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} from different image types.
 	 *
-	 * @param windowRadius Size of the feature it detects,
+	 * @param windowRadius Size of the feature it detects, Try 2.
 	 * @param weighted Should the it be weighted by a Gaussian kernel?  Unweighted is much faster.
 	 * @param derivType Image derivative type it is computed from.
 	 * @return KLT corner
 	 */
-	public static <T extends ImageSingleBand>
-	KltCornerIntensity<T> klt(int windowRadius, boolean weighted, Class<T> derivType)
+	public static <D extends ImageSingleBand>
+	KltCornerIntensity<D> klt(int windowRadius, boolean weighted, Class<D> derivType)
 	{
 		if( derivType == ImageFloat32.class ) {
 			if( weighted )
-				return (KltCornerIntensity<T>)new ImplKltCornerWeighted_F32(windowRadius);
+				return (KltCornerIntensity<D>)new ImplKltCornerWeighted_F32(windowRadius);
 			else
-				return (KltCornerIntensity<T>)new ImplKltCorner_F32(windowRadius);
+				return (KltCornerIntensity<D>)new ImplKltCorner_F32(windowRadius);
 		} else if( derivType == ImageSInt16.class ) {
 			if( weighted )
-				return (KltCornerIntensity<T>)new ImplKltCornerWeighted_S16(windowRadius);
+				return (KltCornerIntensity<D>)new ImplKltCornerWeighted_S16(windowRadius);
 			else
-				return (KltCornerIntensity<T>)new ImplKltCorner_S16(windowRadius);
+				return (KltCornerIntensity<D>)new ImplKltCorner_S16(windowRadius);
 		} else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}

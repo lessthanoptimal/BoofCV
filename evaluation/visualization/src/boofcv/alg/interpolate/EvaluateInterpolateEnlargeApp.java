@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
