@@ -53,7 +53,7 @@ public class ImageListManager implements InputListManager {
 	public BufferedImage loadImage( int index ) {
 		BufferedImage image = UtilImageIO.loadImage(fileNames.get(index)[0]);
 		if( image == null ) {
-			System.err.println("Can't load image "+fileNames.get(index));
+			System.err.println("Can't load image "+fileNames.get(index)[0]);
 		}
 		return image;
 	}
@@ -61,7 +61,7 @@ public class ImageListManager implements InputListManager {
 	public BufferedImage loadImage( int labelIndex , int imageIndex ) {
 		BufferedImage image = UtilImageIO.loadImage(fileNames.get(labelIndex)[imageIndex]);
 		if( image == null ) {
-			System.err.println("Can't load image "+fileNames.get(labelIndex));
+			System.err.println("Can't load image "+fileNames.get(labelIndex)[0]);
 		}
 		return image;
 	}

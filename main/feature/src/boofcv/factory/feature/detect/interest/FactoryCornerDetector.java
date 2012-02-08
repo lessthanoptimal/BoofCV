@@ -25,7 +25,7 @@ import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
+import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -45,14 +45,14 @@ public class FactoryCornerDetector {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T,D> createHarris( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
 	{
-		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createHarris(featureRadius, 0.04f, false, derivType);
+		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.harris(featureRadius, 0.04f, false, derivType);
 		return createGeneral(cornerIntensity,featureRadius,cornerThreshold,maxFeatures);
 	}
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T,D> createKlt( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
 	{
-		GradientCornerIntensity<D> cornerIntensity = FactoryPointIntensityAlg.createKlt(featureRadius, false , derivType);
+		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.klt(featureRadius, false, derivType);
 		return createGeneral(cornerIntensity,featureRadius,cornerThreshold,maxFeatures);
 	}
 
@@ -66,7 +66,7 @@ public class FactoryCornerDetector {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T,D> createFast( int featureRadius , int pixelTol , int maxFeatures , Class<T> imageType)
 	{
-		FastCornerIntensity<T> alg = FactoryPointIntensityAlg.createFast12(pixelTol, 11, imageType);
+		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast12(pixelTol, 11, imageType);
 		GeneralFeatureIntensity<T,D> intensity = new WrapperFastCornerIntensity<T,D>(alg);
 		return createGeneral(intensity,featureRadius,pixelTol,maxFeatures);
 	}

@@ -39,8 +39,8 @@ public class FitGaussianPrune {
 	// histogram of pixel intensity values
 	private IntensityHistogram h;
 	// valid range of bins in histogram.  indexLow <= i < indexHigh
-	private int indexLow;
-	private int indexHigh;
+	protected int indexLow;
+	protected int indexHigh;
 
 	// the closest that a point will be pruned. prevents some pathological situations from over fitting
 	int minSeparation = 1;
@@ -120,6 +120,7 @@ public class FitGaussianPrune {
 				break;
 			}
 		}
+
 		while( true ) {
 			double diff = Math.abs(mean-indexHigh);
 

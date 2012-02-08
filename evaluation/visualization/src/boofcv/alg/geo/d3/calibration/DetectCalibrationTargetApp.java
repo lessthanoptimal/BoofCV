@@ -19,7 +19,7 @@
 package boofcv.alg.geo.d3.calibration;
 
 import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
-import boofcv.alg.feature.detect.grid.DetectCalibrationTarget;
+import boofcv.alg.feature.detect.grid.DetectSpacedSquareGrid;
 import boofcv.alg.feature.detect.grid.SquareBlob;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.filter.binary.GThresholdImageOps;
@@ -54,7 +54,7 @@ public class DetectCalibrationTargetApp
 	int targetRows = 3;
 
 	// detects the calibration target
-	DetectCalibrationTarget alg = new DetectCalibrationTarget(500,targetColumns,targetRows);
+	DetectSpacedSquareGrid alg = new DetectSpacedSquareGrid(500,targetColumns,targetRows);
 
 	// gray scale image that targets are detected inside of
 	ImageFloat32 gray = new ImageFloat32(1,1);
@@ -287,19 +287,16 @@ public class DetectCalibrationTargetApp
 
 		DetectCalibrationTargetApp app = new DetectCalibrationTargetApp();
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("View 01","../data/evaluation/calibration/hp_dm1/img01.jpg");
-		manager.add("View 02","../data/evaluation/calibration/hp_dm1/img02.jpg");
-		manager.add("View 03","../data/evaluation/calibration/hp_dm1/img03.jpg");
-		manager.add("View 04","../data/evaluation/calibration/hp_dm1/img04.jpg");
-		manager.add("View 05","../data/evaluation/calibration/hp_dm1/img05.jpg");
-		manager.add("View 06","../data/evaluation/calibration/hp_dm1/img06.jpg");
-		manager.add("View 07","../data/evaluation/calibration/hp_dm1/img07.jpg");
-		manager.add("View 08","../data/evaluation/calibration/hp_dm1/img08.jpg");
+		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V/";
 
-		manager.add("View 10","../data/evaluation/calibration/Sony_DSC-HX5V/image10.jpg");
-		manager.add("BView 01","../data/evaluation/calibration/Sony_DSC-HX5V/image01.jpg");
-		manager.add("View 12","../data/evaluation/calibration/Sony_DSC-HX5V/image12.jpg");
+		ImageListManager manager = new ImageListManager();
+		manager.add("View 01",prefix+"frame01.jpg");
+		manager.add("View 02",prefix+"frame02.jpg");
+		manager.add("View 03",prefix+"frame03.jpg");
+		manager.add("View 04",prefix+"frame04.jpg");
+		manager.add("View 05",prefix+"frame05.jpg");
+		manager.add("View 06",prefix+"frame06.jpg");
+		manager.add("View 07",prefix+"frame07.jpg");
 
 		app.setInputManager(manager);
 

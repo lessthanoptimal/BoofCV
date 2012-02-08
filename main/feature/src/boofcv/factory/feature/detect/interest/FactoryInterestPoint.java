@@ -37,6 +37,9 @@ import boofcv.struct.image.ImageSingleBand;
  * Factory for creating interest point detectors which conform to the {@link InterestPointDetector}
  * interface.
  *
+ * @see FactoryFeatureExtractor
+ * @see FactoryInterestPoint
+ *
  * @author Peter Abeles
  */
 public class FactoryInterestPoint {

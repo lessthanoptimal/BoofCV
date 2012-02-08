@@ -27,7 +27,7 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.detect.intensity.FactoryPointIntensityAlg;
+import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
@@ -177,7 +177,7 @@ public class TrackVideoPyramidKLT<I extends ImageSingleBand, D extends ImageSing
 
 		GeneralFeatureIntensity<I,D> intensity =
 				new WrapperGradientCornerIntensity<I,D>(
-						FactoryPointIntensityAlg.createKlt(config.featureRadius, false , derivType));
+						FactoryIntensityPointAlg.klt(config.featureRadius, false, derivType));
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config.featureRadius+2,configKLt.minDeterminant,0,false, true);
 		extractor.setInputBorder(config.featureRadius * scalingTop);
 		GeneralFeatureDetector<I,D> detector =

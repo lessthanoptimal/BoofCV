@@ -19,62 +19,50 @@
 package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Random;
 
-import static boofcv.alg.misc.ImageTestingOps.fillRectangle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestAutoThresholdCalibrationGrid {
+public class TestDetectSpacedSquareGrid {
 
-	Random rand = new Random(234);
-	
 	/**
-	 * Synthetic target at some non obvious threshold
+	 * Create a synthetic target and see if it can detect it
 	 */
 	@Test
 	public void basicTest() {
 		int squareLength = 30;
 		int w = 400;
 		int h = 500;
-		ImageFloat32 gray = new ImageFloat32(w,h);
+		ImageUInt8 binary = new ImageUInt8(w,h);
 
-		fillRectangle(gray,100,0,0,w,h);
-		
 		// create the grid
 		for( int y = 0; y < 3; y++) {
 			for( int x = 0; x < 4; x++ ) {
 				int pixelY = y*(squareLength+10)+10;
 				int pixelX = x*(squareLength+10)+15;
 
-				fillRectangle(gray, 20, pixelX, pixelY, squareLength, squareLength);
+				ImageTestingOps.fillRectangle(binary,1,pixelX,pixelY,squareLength,squareLength);
 			}
 		}
+		
+		// add a bit of noise
+		ImageTestingOps.fillRectangle(binary,1,400,100,25,22);
 
-		// add a little bit of noise
-		ImageTestingOps.addGaussian(gray,rand,0.5,0,255);
+		DetectSpacedSquareGrid alg = new DetectSpacedSquareGrid(100,3,4);
 
+		assertTrue(alg.process(binary));
 
-		AutoThresholdCalibrationGrid alg = new AutoThresholdCalibrationGrid(255,20);
-		DetectSpacedSquareGrid detector = new DetectSpacedSquareGrid(100,3,4);
-		assertTrue(alg.process(detector, gray));
-
-		// sanity check threshold
-		double thresh = alg.getThreshold();
-		assertTrue(thresh > 20 && thresh < 100 );
-
-		// check the grid it found
-		List<SquareBlob> squares = detector.getOrderedSquares();
-
+		List<SquareBlob> squares = alg.getOrderedSquares();
+		
 		assertEquals(12,squares.size());
-
+		
 		SquareBlob b = squares.get(0);
 		assertEquals(15,b.corners.get(0).x);
 		assertEquals(10,b.corners.get(0).y);

@@ -54,10 +54,10 @@ public class AutoThresholdCalibrationGrid {
 	private List<Double> attempts = new ArrayList<Double>();
 
 	// pixel values around corners
-	IntensityHistogram histHighRes = new IntensityHistogram(256,256);
-	IntensityHistogram histLowRes = new IntensityHistogram(20,256);
+	private IntensityHistogram histHighRes = new IntensityHistogram(256,256);
+	private IntensityHistogram histLowRes = new IntensityHistogram(20,256);
 
-	HistogramTwoPeaks peaks = new HistogramTwoPeaks(2);
+	private HistogramTwoPeaks peaks = new HistogramTwoPeaks(2);
 
 	// computes statistics of white and black sections
 	private FitGaussianPrune low = new FitGaussianPrune(20,3,5);
@@ -84,7 +84,7 @@ public class AutoThresholdCalibrationGrid {
 	 * @param gray Gray scale image which is being thresholded
 	 * @return true if a threshold was successfully found and target detected.
 	 */
-	public boolean process( DetectCalibrationTarget detector , ImageFloat32 gray ) {
+	public boolean process( DetectSpacedSquareGrid detector , ImageFloat32 gray ) {
 		attempts.clear();
 
 		binary.reshape(gray.width,gray.height);
