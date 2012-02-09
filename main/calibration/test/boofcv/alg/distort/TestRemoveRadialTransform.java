@@ -16,15 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect;
+package boofcv.alg.distort;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Exception used to indicate that some thing went wrong when extract the calibration grid's points.
- *
  * @author Peter Abeles
  */
-public class InvalidCalibrationTarget extends RuntimeException {
-	public InvalidCalibrationTarget(String message) {
-		super(message);
+public class TestRemoveRadialTransform {
+
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

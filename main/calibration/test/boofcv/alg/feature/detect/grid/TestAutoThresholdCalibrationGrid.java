@@ -71,7 +71,7 @@ public class TestAutoThresholdCalibrationGrid {
 		assertTrue(thresh > 20 && thresh < 100 );
 
 		// check the grid it found
-		List<SquareBlob> squares = detector.getOrderedSquares();
+		List<SquareBlob> squares = detector.getSquaresOrdered();
 
 		assertEquals(12,squares.size());
 

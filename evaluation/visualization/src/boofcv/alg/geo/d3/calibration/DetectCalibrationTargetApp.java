@@ -132,7 +132,7 @@ public class DetectCalibrationTargetApp
 		Graphics2D g2 = workImage.createGraphics();
 		if( foundTarget ) {
 			List<Point2D_I32> targetBounds = alg.getTargetQuadrilateral();
-			List<SquareBlob> squares = alg.getOrderedSquares();
+			List<SquareBlob> squares = alg.getSquaresOrdered();
 			List<Point2D_I32> targetPoints = new ArrayList<Point2D_I32>();
 
 			UtilCalibrationGrid.extractOrderedPoints(squares,targetPoints,targetColumns);

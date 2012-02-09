@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.feature.detect.grid.*;
 import boofcv.alg.geo.calibration.CalibrationGridConfig;
 import boofcv.struct.image.ImageFloat32;
@@ -59,16 +60,20 @@ public class WrapPlanarGridTarget implements CalibrationGridInterface{
 	@Override
 	public boolean process(ImageFloat32 input) {
 
-
 		// detect the target at pixel level accuracy
 		if( !autoThreshold.process(detect,input) )
 			return false;
-		
-		List<SquareBlob> squares = detect.getOrderedSquares();
+
+		List<SquareBlob> squares = detect.getSquaresOrdered();
 		
 		// refine the corner accuracy estimate to sub-pixel
-		refine.refine(squares,input);
-		
+		try {
+			refine.refine(squares,input);
+		} catch( InvalidCalibrationTarget e ) {
+			e.printStackTrace();
+			return false;
+		}
+			
 		List<Point2D_F32> found = new ArrayList<Point2D_F32>();
 		UtilCalibrationGrid.extractOrderedSubpixel(squares,found, squareColumns);
 

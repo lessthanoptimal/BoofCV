@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.io.image.UtilImageIO;
@@ -181,14 +182,6 @@ public class RefineCornerSegmentFit {
 
 		low.process(histHighRes,0,indexThresh);
 		high.process(histHighRes,indexThresh,255);
-
-		if( Double.isNaN(high.getMean())) {
-			for( int i = 0; i < histHighRes.histogram.length; i++ ) {
-				System.out.println("h["+i+"] = "+histHighRes.histogram[i]);
-			}
-			System.out.println();
-		}
-//		System.out.println("   region stat low = "+low.getMean()+"  high "+high.getMean());
 	}
 
 	/**
@@ -240,7 +233,7 @@ public class RefineCornerSegmentFit {
 		}
 
 		// do a threshold in the middle first
-		double middleThresh = (lowThresh+highThresh)/2.0;
+		double middleThresh = (lowThresh*0.1+highThresh*0.9); // seems to work better than the actual middle
 
 		// extract two regions at different threshold levels
 		GThresholdImageOps.threshold(image, binaryMiddle,middleThresh,true);
@@ -254,9 +247,6 @@ public class RefineCornerSegmentFit {
 		BinaryImageOps.logicXor(binaryMiddle, binaryHigh, binaryHigh);
 		BinaryImageOps.edge4(binaryMiddle, binary);
 		BinaryImageOps.logicOr(binaryHigh,binary,binary);
-
-//		UtilImageIO.print(image);
-//		UtilImageIO.print(binary);
 
 		// extract the points from the binary image and compute weights
 		// weight is a linear function of distance from black square value
@@ -328,7 +318,7 @@ public class RefineCornerSegmentFit {
 		alg.initialize(param);
 
 		if( !UtilOptimize.process(alg,50) ) {
-			throw new RuntimeException("Minimization failed?!?");
+			throw new InvalidCalibrationTarget("Minimization failed?!? "+alg.getWarning());
 		}
 
 		double found[] = alg.getParameters();
@@ -365,12 +355,6 @@ public class RefineCornerSegmentFit {
 					bestB = second;
 				}
 			}
-		}
-
-		if( bestA == -1 ) {
-			UtilImageIO.print(image);
-			UtilImageIO.print(binary);
-			System.out.println("-------------------");
 		}
 
 		initial.sideA = pointsAlongEdge[bestA];

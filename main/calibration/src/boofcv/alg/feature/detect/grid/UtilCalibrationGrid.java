@@ -31,6 +31,36 @@ import java.util.List;
 public class UtilCalibrationGrid {
 
 	/**
+	 * Given a set of squares, transpose the squares and the corners inside the squares.
+	 *
+	 * @param orderedBlobs List of blobs in a valid order, but transposed
+	 * @param numRows Number of rows in the desired grid
+	 * @param numCols Number of cols in the desired grid
+	 * @return Transposed detected target
+	 */
+	public static List<SquareBlob> transposeOrdered( List<SquareBlob> orderedBlobs , int numRows , int numCols ) {
+		List<SquareBlob> temp = new ArrayList<SquareBlob>();
+
+		for( int i = 0; i < numRows; i++ ) {
+			for( int j = 0; j < numCols; j++ ) {
+				SquareBlob b = orderedBlobs.get(j*numRows+i);
+				temp.add(b);
+				Point2D_I32 a0 = b.corners.get(0);
+				Point2D_I32 a1 = b.corners.get(1);
+				Point2D_I32 a2 = b.corners.get(2);
+				Point2D_I32 a3 = b.corners.get(3);
+
+				b.corners.clear();
+				b.corners.add(a0);
+				b.corners.add(a3);
+				b.corners.add(a2);
+				b.corners.add(a1);
+			}
+		}
+		return temp;
+	}
+	
+	/**
 	 * Converts the list of square blobs that are in order with ordered corners into a list of points.
 	 * Both the square and the points inside the squares must be in a logical ordering for a complete target.
 	 *
