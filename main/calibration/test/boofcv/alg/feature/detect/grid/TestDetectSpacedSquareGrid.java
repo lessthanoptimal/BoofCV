@@ -59,7 +59,7 @@ public class TestDetectSpacedSquareGrid {
 
 		assertTrue(alg.process(binary));
 
-		List<SquareBlob> squares = alg.getOrderedSquares();
+		List<SquareBlob> squares = alg.getSquaresOrdered();
 		
 		assertEquals(12,squares.size());
 		

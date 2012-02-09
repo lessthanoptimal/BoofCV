@@ -22,12 +22,12 @@ package boofcv.app;
  * @author Peter Abeles
  */
 public class ImageResults {
-	double meanError;
-	double maxError;
-	double biasX;
-	double biasY;
+	public double meanError;
+	public double maxError;
+	public double biasX;
+	public double biasY;
 	
-	double pointError[];
+	public double[] pointError;
 
 	public ImageResults( int numPoints ) {
 		pointError = new double[numPoints];

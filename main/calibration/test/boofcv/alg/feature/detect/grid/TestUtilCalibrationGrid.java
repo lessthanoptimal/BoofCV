@@ -29,14 +29,18 @@ import java.util.List;
 import java.util.Random;
 
 import static boofcv.alg.feature.detect.grid.TestPutTargetSquaresIntoOrder.createBlob;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
 public class TestUtilCalibrationGrid {
 
+	@Test
+	public void transposeOrdered() {
+		fail("implement");
+	}
+	
 	@Test
 	public void findAverage() {
 		List<Point2D_I32> list = new ArrayList<Point2D_I32>();

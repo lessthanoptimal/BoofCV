@@ -75,25 +75,28 @@ public class DetectSpacedSquareGrid {
 	private List<SquareBlob> squaresBad = new ArrayList<SquareBlob>();
 
 	// number of black squares in calibration grid
-	private int gridWidth;
-	private int gridHeight;
+	private int gridCols;
+	private int gridRows;
 
 	// maximum number of possible targets it will consider
 	private int maxShuffle;
 	
 	// Explaining why it failed
 	private String errorMessage;
+
+	// blobs in correct order and orientation
+	List<SquareBlob> orderedBlobs;
 	
 	/**
 	 *
 	 * @param maxShuffle Maximum number of combinations of squares it will try when looking for a target. Try 500.
-	 * @param gridWidth Number of squares wide the grid is. Target dependent.
-	 * @param gridHeight Number of squares tall the grid is. Target dependent.
+	 * @param gridCols Number of squares wide the grid is. Target dependent.
+	 * @param gridRows Number of squares tall the grid is. Target dependent.
 	 */
 	public DetectSpacedSquareGrid(int maxShuffle,
-								  int gridWidth, int gridHeight) {
-		this.gridWidth = gridWidth;
-		this.gridHeight = gridHeight;
+								  int gridCols, int gridRows) {
+		this.gridCols = gridCols;
+		this.gridRows = gridRows;
 		this.maxShuffle = maxShuffle;
 	}
 
@@ -122,7 +125,7 @@ public class DetectSpacedSquareGrid {
 		numBlobs = BinaryImageOps.labelBlobs8(binaryB,blobs);
 
 		// See if there are enough blobs for there to be a chance of it being a complete grid
-		if( numBlobs < gridWidth*gridHeight )
+		if( numBlobs < gridCols * gridRows)
 			return fail("Not enough blobs detected");
 
 		//remove blobs with holes
@@ -148,7 +151,7 @@ public class DetectSpacedSquareGrid {
 
 		// remove blobs which are not like a polygon at all
 		filterNotPolygon(squares);
-		if( squares.size() < gridWidth*gridHeight )
+		if( squares.size() < gridCols * gridRows)
 			return fail("Too few valid squares");
 
 		// find connections between squares
@@ -168,7 +171,7 @@ public class DetectSpacedSquareGrid {
 	 */
 	private boolean shuffleToFindTarget( List<SquareBlob> squares ) {
 		
-		int N = gridWidth*gridHeight;
+		int N = gridCols * gridRows;
 		Shuffle<SquareBlob> shuffle = new Shuffle<SquareBlob>(squares,N);
 
 //		System.out.println("------------------------------------"+squares.size()+"  N "+N);
@@ -211,7 +214,7 @@ public class DetectSpacedSquareGrid {
 			return fail("No target found after shuffling");
 		return true;
 	}
-
+	
 	/**
 	 * Performs additional validation checks to make sure a valid target was found
 	 */
@@ -235,6 +238,12 @@ public class DetectSpacedSquareGrid {
 			}
 		}
 
+		// see if it is transposed from what it should be and if it is, transpose the output
+		orderedBlobs = extractTarget.getBlobsOrdered();
+		if( gridRows != gridCols && extractTarget.getNumCols() == gridRows) {
+			orderedBlobs = UtilCalibrationGrid.transposeOrdered(orderedBlobs, gridRows, gridCols);
+		}
+
 		return true;
 	}
 
@@ -245,13 +254,6 @@ public class DetectSpacedSquareGrid {
 		if( extractTarget == null )
 			return null;
 		return extractTarget.getQuadrilateral();
-	}
-
-	/**
-	 * Returns the observed squares in correct grid order
-	 */
-	public List<SquareBlob> getOrderedSquares() {
-		return extractTarget.getBlobsOrdered();
 	}
 	
 	/**
@@ -380,7 +382,7 @@ public class DetectSpacedSquareGrid {
 	}
 
 	public List<SquareBlob> getSquaresOrdered() {
-		return extractTarget.getBlobsOrdered();
+		return orderedBlobs;
 	}
 
 	public List<SquareBlob> getSquaresBad() {

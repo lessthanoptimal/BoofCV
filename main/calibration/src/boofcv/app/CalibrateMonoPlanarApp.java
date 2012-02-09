@@ -22,10 +22,12 @@ import boofcv.alg.geo.calibration.CalibrationGridConfig;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang98;
 import boofcv.alg.geo.calibration.ParametersZhang98;
 import boofcv.alg.geo.calibration.Zhang98OptimizationFunction;
+import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,16 +39,29 @@ import java.util.List;
 // TODO Show rectified and unrectified images side by side
 // TODO print point error
 // todo show image coverage, recommend more images or not
-public class CalibrateMonoCameraGridApp {
+public class CalibrateMonoPlanarApp {
 
-	CalibrationGridInterface detector;
+	protected CalibrationGridInterface detector;
 
-	CalibrationPlanarGridZhang98 zhang98;
-	CalibrationGridConfig configGrid;
-	boolean assumeZeroSkew;
+	protected CalibrationPlanarGridZhang98 zhang98;
+	protected CalibrationGridConfig configGrid;
+	protected boolean assumeZeroSkew;
 
-	public CalibrateMonoCameraGridApp(CalibrationGridInterface detector) {
+	protected ParametersZhang98 found;
+
+	boolean saveImages;
+	
+	protected List<String> imageNames;
+	protected List<BufferedImage> images;
+	protected List<List<Point2D_F64>> observations;
+	protected List<ImageResults> errors;
+	
+	public int state;
+	public String message;
+
+	public CalibrateMonoPlanarApp(CalibrationGridInterface detector , boolean saveImages ) {
 		this.detector = detector;
+		this.saveImages = saveImages;
 	}
 	
 	public void configure( CalibrationGridConfig config ,
@@ -58,8 +73,13 @@ public class CalibrateMonoCameraGridApp {
 		detector.configure(config);
 		zhang98 = new CalibrationPlanarGridZhang98(config,assumeZeroSkew,numRadialParam);
 	}
+
+	public void reset() {
+		state = 0;
+		message = "";
+	}
 	
-	private List<ImageResults> computeErrors( List<List<Point2D_F64>> observation , ParametersZhang98 param ) 
+	protected List<ImageResults> computeErrors( List<List<Point2D_F64>> observation , ParametersZhang98 param )
 	{
 		List<Point2D_F64> grid = configGrid.computeGridPoints();
 		
@@ -70,8 +90,8 @@ public class CalibrateMonoCameraGridApp {
 		function.process(param,residuals);
 
 		List<ImageResults> ret = new ArrayList<ImageResults>();
-		
-		int N = observation.size();
+
+		int N = grid.size();
 		int index = 0;
 		for( int indexObs = 0; indexObs < observation.size(); indexObs++ ) {
 			ImageResults r = new ImageResults(N);
@@ -97,9 +117,9 @@ public class CalibrateMonoCameraGridApp {
 				}
 			}
 
-			r.biasX = meanX /= residuals.length;
-			r.biasY = meanY /= residuals.length;
-			r.meanError = meanErrorMag /= residuals.length;
+			r.biasX = meanX /= N;
+			r.biasY = meanY /= N;
+			r.meanError = meanErrorMag /= N;
 			r.maxError = maxError;
 			ret.add(r);
 		}
@@ -117,42 +137,57 @@ public class CalibrateMonoCameraGridApp {
 		}
 		System.out.println("Total Mean Error = "+totalError);
 	}
-	
-	public void process( String directory ) {
+
+	public void loadImages( String directory ) {
 		File d = new File(directory);
-		
+
 		if( !d.isDirectory() )
 			throw new IllegalArgumentException("Must specify an directory");
-		
+
 		File files[] = d.listFiles();
 
-		List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
+		imageNames = new ArrayList<String>();
+		images = new ArrayList<BufferedImage>();
+		observations = new ArrayList<List<Point2D_F64>>();
+
 		for( File f : files ) {
 			if( f.isDirectory() || f.isHidden() )
 				continue;
-			
-			ImageFloat32 image = UtilImageIO.loadImage(f.getAbsolutePath(),ImageFloat32.class);
-			if( image == null )
+
+			BufferedImage orig = UtilImageIO.loadImage(f.getAbsolutePath());
+			if( orig == null ) {
 				continue;
-			System.out.println("Processing image "+f.getName());
-			
+			}
+			System.out.println("Processing "+f.getName());
+			ImageFloat32 image = ConvertBufferedImage.convertFrom(orig, (ImageFloat32) null);
+
 			if( !detector.process(image) )
 				System.err.println("  Failed to process image: "+f.getName());
-			
-			observations.add(detector.getPoints());
+			else {
+				imageNames.add(f.getName());
+				observations.add(detector.getPoints());
+				if( saveImages ) {
+					images.add(orig);
+				}
+				updateStatus(0,"Feature Extraction "+imageNames.size());
+			}
 		}
 
 		if( observations.size() == 0 )
 			throw new RuntimeException("No images found in "+directory+"!");
+	}
 
+	public void process() {
+		updateStatus(1,"Estimating Parameters");
 		System.out.println("Estimating and optimizing numerical parameters");
 		if( !zhang98.process(observations) ) {
 			throw new RuntimeException("Zhang98 algorithm failed!");
 		}
 
-		ParametersZhang98 found = zhang98.getOptimized();
+		found = zhang98.getOptimized();
 
-		List<ImageResults> errors = computeErrors(observations,found);
+		updateStatus(2,"Computing Errors");
+		errors = computeErrors(observations,found);
 		printErrors(errors);
 
 		System.out.println("center x = "+found.x0);
@@ -163,18 +198,45 @@ public class CalibrateMonoCameraGridApp {
 		for( int i = 0; i < found.distortion.length; i++ ) {
 			System.out.printf("radial[%d] = %6.2e\n",i,found.distortion[i]);
 		}
-		// todo save to a file
+		updateStatus(3,"Done");
+	}
+
+	public void updateStatus( int state , String message ) {
+		this.state = state;
+		this.message = message;
 	}
 	
+	public List<String> getImageNames() {
+		return imageNames;
+	}
+
+	public List<BufferedImage> getImages() {
+		return images;
+	}
+
+	public List<List<Point2D_F64>> getObservations() {
+		return observations;
+	}
+
+	public List<ImageResults> getErrors() {
+		return errors;
+	}
+
+	public ParametersZhang98 getFound() {
+		return found;
+	}
+
 	public static void main( String args[] ) {
 		CalibrationGridInterface detector = new WrapPlanarGridTarget();
 
 		CalibrationGridConfig config = new CalibrationGridConfig(8,6,30);
 
-		CalibrateMonoCameraGridApp app = new CalibrateMonoCameraGridApp(detector);
+		CalibrateMonoPlanarApp app = new CalibrateMonoPlanarApp(detector,false);
 
 		app.configure(config,false,2);
 
-		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V");
+//		app.loadImages("../data/evaluation/calibration/mono/Sony_DSC-HX5V");
+		app.loadImages("/home/pja/saved/a");
+		app.process();
 	}
 }

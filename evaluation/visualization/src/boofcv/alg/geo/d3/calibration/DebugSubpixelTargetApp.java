@@ -97,7 +97,7 @@ public class DebugSubpixelTargetApp
 		if( !auto.process(detectAlg,gray) ) {
 			System.out.println("Detect Target Failed!");
 		} else {
-			List<SquareBlob> squares = detectAlg.getOrderedSquares();
+			List<SquareBlob> squares = detectAlg.getSquaresOrdered();
 			crude = new ArrayList<Point2D_I32>();
 			refined = new ArrayList<Point2D_F32>();
 
