@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.basic.impl;
 
-import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
@@ -56,8 +56,8 @@ public class TestImplGrayImageOps {
 
 		m.invoke(null,input, 255, output);
 
-		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(input);
-		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(output);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -80,7 +80,7 @@ public class TestImplGrayImageOps {
 
 		m.invoke(null,input, 10,255, output);
 
-		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(output);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -111,7 +111,7 @@ public class TestImplGrayImageOps {
 
 		m.invoke(null,input, 2.5,10,255, output);
 
-		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(output);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				if( output.getTypeInfo().isInteger() )

@@ -20,8 +20,8 @@ package boofcv.alg.geo.d3.calibration;
 
 import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
 import boofcv.alg.feature.detect.grid.DetectSpacedSquareGrid;
-import boofcv.alg.feature.detect.grid.SquareBlob;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ProcessInput;
@@ -47,7 +47,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationTargetApp
+public class DetectCalibrationSquaresApp
 		extends SelectImagePanel implements ProcessInput , GridCalibPanel.Listener
 {
 	int targetColumns = 4;
@@ -79,7 +79,7 @@ public class DetectCalibrationTargetApp
 	// if a target was found or not
 	boolean foundTarget;
 
-	public DetectCalibrationTargetApp() {
+	public DetectCalibrationSquaresApp() {
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
 		
@@ -122,7 +122,7 @@ public class DetectCalibrationTargetApp
 				break;
 
 			case 2:
-				int numLabels = alg.getNumBlobs();
+				int numLabels = alg.getNumberOfLabels();
 				VisualizeBinaryData.renderLabeled(alg.getBlobs(),numLabels,workImage);
 				break;
 
@@ -132,7 +132,7 @@ public class DetectCalibrationTargetApp
 		Graphics2D g2 = workImage.createGraphics();
 		if( foundTarget ) {
 			List<Point2D_I32> targetBounds = alg.getTargetQuadrilateral();
-			List<SquareBlob> squares = alg.getSquaresOrdered();
+			List<QuadBlob> squares = alg.getSquaresOrdered();
 			List<Point2D_I32> targetPoints = new ArrayList<Point2D_I32>();
 
 			UtilCalibrationGrid.extractOrderedPoints(squares,targetPoints,targetColumns);
@@ -161,13 +161,18 @@ public class DetectCalibrationTargetApp
 		processedImage = true;
 	}
 
-	private void drawBounds( Graphics2D g2 , java.util.List<Point2D_I32> corners ) {
+	public static void drawBounds( Graphics2D g2 , java.util.List<Point2D_I32> corners ) {
+		Point2D_I32 c0 = corners.get(0);
+		Point2D_I32 c1 = corners.get(1);
+		Point2D_I32 c2 = corners.get(2);
+		Point2D_I32 c3 = corners.get(3);
+
 		g2.setColor(Color.BLUE);
 		g2.setStroke(new BasicStroke(2.0f));
-		g2.drawLine(corners.get(0).x,corners.get(0).y,corners.get(1).x,corners.get(1).y);
-		g2.drawLine(corners.get(1).x,corners.get(1).y,corners.get(2).x,corners.get(2).y);
-		g2.drawLine(corners.get(2).x,corners.get(2).y,corners.get(3).x,corners.get(3).y);
-		g2.drawLine(corners.get(3).x,corners.get(3).y,corners.get(0).x,corners.get(0).y);
+		g2.drawLine(c0.x,c0.y,c1.x,c1.y);
+		g2.drawLine(c1.x,c1.y,c2.x,c2.y);
+		g2.drawLine(c2.x,c2.y,c3.x,c3.y);
+		g2.drawLine(c3.x,c3.y,c0.x,c0.y);
 	}
 
 	private void drawPoints( Graphics2D g2 , java.util.List<Point2D_I32> foundTarget) {
@@ -178,20 +183,20 @@ public class DetectCalibrationTargetApp
 		}
 	}
 
-	private void drawGraph(Graphics2D g2, List<SquareBlob> squares) {
+	public static void drawGraph(Graphics2D g2, List<QuadBlob> squares) {
 
 		g2.setStroke(new BasicStroke(2.0f));
 		for( int i = 0; i < squares.size(); i++ ) {
-			SquareBlob p = squares.get(i);
+			QuadBlob p = squares.get(i);
 			Point2D_I32 c = p.center;
 
 			g2.setColor(Color.ORANGE);
-			for( SquareBlob w : p.conn ) {
+			for( QuadBlob w : p.conn ) {
 				g2.drawLine(c.x,c.y,w.center.x,w.center.y);
 			}
 		}
 		for( int i = 0; i < squares.size(); i++ ) {
-			SquareBlob p = squares.get(i);
+			QuadBlob p = squares.get(i);
 			Point2D_I32 c = p.center;
 			VisualizeFeatures.drawPoint(g2, c.x, c.y, Color.GREEN );
 		}
@@ -200,7 +205,7 @@ public class DetectCalibrationTargetApp
 	/**
 	 * Draw the number assigned to each corner point with a bold outline
 	 */
-	private void drawNumbers( Graphics2D g2 , java.util.List<Point2D_I32> foundTarget ) {
+	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_I32> foundTarget ) {
 
 		Font regular = new Font("Serif", Font.PLAIN, 16);
 		g2.setFont(regular);
@@ -221,9 +226,9 @@ public class DetectCalibrationTargetApp
 		}
 	}
 
-	private void drawSquareCorners( Graphics2D g2 , java.util.List<SquareBlob> squares , Color color ) {
+	private void drawSquareCorners( Graphics2D g2 , java.util.List<QuadBlob> squares , Color color ) {
 
-		for( SquareBlob s : squares ) {
+		for( QuadBlob s : squares ) {
 			for( Point2D_I32 c : s.corners ) {
 				VisualizeFeatures.drawPoint(g2, c.x, c.y, 2 , color);
 			}
@@ -285,7 +290,7 @@ public class DetectCalibrationTargetApp
 
 	public static void main(String args[]) {
 
-		DetectCalibrationTargetApp app = new DetectCalibrationTargetApp();
+		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp();
 
 		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V/";
 

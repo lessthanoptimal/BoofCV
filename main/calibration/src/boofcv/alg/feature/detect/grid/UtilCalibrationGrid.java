@@ -18,7 +18,9 @@
 
 package boofcv.alg.feature.detect.grid;
 
-import georegression.struct.point.Point2D_F32;
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
+import georegression.metric.UtilAngle;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import pja.sorting.QuickSort_F64;
 
@@ -31,6 +33,45 @@ import java.util.List;
 public class UtilCalibrationGrid {
 
 	/**
+	 *
+	 * Note that when viewed on the monitor this will appear to be clockwise because
+	 * the y-axis points down.
+	 *
+	 * @param points
+	 * @param numRows
+	 * @param numCols
+	 */
+	public static void enforceClockwiseOrder( List<Point2D_F64> points , 
+											  int numRows , int numCols ) {
+		Point2D_F64 a = points.get(0);
+		Point2D_F64 b = points.get(points.size()-1);
+		Point2D_F64 c = points.get(numCols-1);
+
+		double x_c = (a.x+b.x)/2;
+		double y_c = (a.y+b.y)/2;
+
+		double angA = Math.atan2(a.x-x_c,a.y-y_c);
+		double angB = Math.atan2(c.x-x_c,c.y-y_c);
+
+		double dist = UtilAngle.minus(angB, angA);
+
+		if( dist > 0 )
+			return;
+
+		// flip the points
+		for( int i = 0; i < numRows; i++ ) {
+			int rowIndex = i*numCols;
+			for( int j = 0; j < numCols/2; j++ ) {
+				a = points.get(rowIndex+j);
+				b = points.get(rowIndex+numCols-j-1);
+				points.set(rowIndex+j,b);
+				points.set(rowIndex+numCols-j-1,a);
+			}
+		}
+
+	}
+
+	/**
 	 * Given a set of squares, transpose the squares and the corners inside the squares.
 	 *
 	 * @param orderedBlobs List of blobs in a valid order, but transposed
@@ -38,12 +79,12 @@ public class UtilCalibrationGrid {
 	 * @param numCols Number of cols in the desired grid
 	 * @return Transposed detected target
 	 */
-	public static List<SquareBlob> transposeOrdered( List<SquareBlob> orderedBlobs , int numRows , int numCols ) {
-		List<SquareBlob> temp = new ArrayList<SquareBlob>();
+	public static List<QuadBlob> transposeOrdered( List<QuadBlob> orderedBlobs , int numRows , int numCols ) {
+		List<QuadBlob> temp = new ArrayList<QuadBlob>();
 
 		for( int i = 0; i < numRows; i++ ) {
 			for( int j = 0; j < numCols; j++ ) {
-				SquareBlob b = orderedBlobs.get(j*numRows+i);
+				QuadBlob b = orderedBlobs.get(j*numRows+i);
 				temp.add(b);
 				Point2D_I32 a0 = b.corners.get(0);
 				Point2D_I32 a1 = b.corners.get(1);
@@ -68,18 +109,18 @@ public class UtilCalibrationGrid {
 	 * @param points Output set of points.
 	 * @param numCols Number of blobs per row (number of columns).
 	 */
-	public static void extractOrderedPoints( List<SquareBlob> blobs ,
+	public static void extractOrderedPoints( List<QuadBlob> blobs ,
 											 List<Point2D_I32> points ,
 											 int numCols ) {
 		points.clear();
 		for( int i = 0; i < blobs.size(); i += numCols ) {
 			for( int j = 0; j < numCols; j++ ) {
-				SquareBlob b = blobs.get(i+j);
+				QuadBlob b = blobs.get(i+j);
 				points.add(b.corners.get(0));
 				points.add(b.corners.get(1));
 			}
 			for( int j = 0; j < numCols; j++ ) {
-				SquareBlob b = blobs.get(i+j);
+				QuadBlob b = blobs.get(i+j);
 				points.add(b.corners.get(3));
 				points.add(b.corners.get(2));
 			}
@@ -94,18 +135,18 @@ public class UtilCalibrationGrid {
 	 * @param points Output set of points at sub-pixel accuracy.
 	 * @param numCols Number of blobs per row (number of columns).
 	 */
-	public static void extractOrderedSubpixel( List<SquareBlob> blobs ,
-											   List<Point2D_F32> points ,
+	public static void extractOrderedSubpixel( List<QuadBlob> blobs ,
+											   List<Point2D_F64> points ,
 											   int numCols ) {
 		points.clear();
 		for( int i = 0; i < blobs.size(); i += numCols ) {
 			for( int j = 0; j < numCols; j++ ) {
-				SquareBlob b = blobs.get(i + j);
+				QuadBlob b = blobs.get(i + j);
 				points.add(b.subpixel.get(0));
 				points.add(b.subpixel.get(1));
 			}
 			for( int j = 0; j < numCols; j++ ) {
-				SquareBlob b = blobs.get(i+j);
+				QuadBlob b = blobs.get(i+j);
 				points.add(b.subpixel.get(3));
 				points.add(b.subpixel.get(2));
 			}
@@ -171,7 +212,7 @@ public class UtilCalibrationGrid {
 	 * @param contour
 	 * @return
 	 */
-	protected static Point2D_I32 findAverage(List<Point2D_I32> contour) {
+	public static Point2D_I32 findAverage(List<Point2D_I32> contour) {
 
 		int x = 0;
 		int y = 0;
@@ -193,7 +234,7 @@ public class UtilCalibrationGrid {
 	 * @param center Point that the angle is computed relative to
 	 * @param contour List of all the points which are to be sorted by angle
 	 */
-	protected static void sortByAngleCCW(Point2D_I32 center, List<Point2D_I32> contour) {
+	public static void sortByAngleCCW(Point2D_I32 center, List<Point2D_I32> contour) {
 		double angles[] = new double[ contour.size() ];
 		int indexes[] = new int[ angles.length ];
 

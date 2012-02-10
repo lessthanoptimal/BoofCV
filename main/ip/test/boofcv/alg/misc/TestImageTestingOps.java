@@ -18,7 +18,7 @@
 
 package boofcv.alg.misc;
 
-import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
@@ -102,7 +102,7 @@ public class TestImageTestingOps {
 			m.invoke(null,orig,10.0f);
 		}
 
-		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(orig);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				assertEquals(10.0,a.get(j,i).doubleValue(),1e-4);
@@ -125,7 +125,7 @@ public class TestImageTestingOps {
 			m.invoke(null,orig,10.0f,x0,y0,width,height);
 		}
 
-		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(orig);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				if( j < x0 || i < y0 || i >= (x0+width) || j >= (y0+height ))
@@ -152,7 +152,7 @@ public class TestImageTestingOps {
 
 		int numZero = 0;
 
-		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(orig);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
@@ -176,7 +176,7 @@ public class TestImageTestingOps {
 			m.invoke(null,orig,rand,1,10);
 		}
 
-		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(orig);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
@@ -196,7 +196,7 @@ public class TestImageTestingOps {
 		m.invoke(null,orig,rand,2.0,0,255);
 
 		double stdev2 = 0;
-		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(orig);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
@@ -227,7 +227,7 @@ public class TestImageTestingOps {
 		GeneralizedImageOps.fill(imgA,10);
 		ImageSingleBand imgB = imgA.clone();
 
-		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(imgB);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(imgB);
 		b.set(5,5,20);
 
 		Number error = (Number)m.invoke(null,imgA,imgB);

@@ -34,7 +34,7 @@ import static boofcv.alg.feature.detect.grid.UtilCalibrationGrid.findFarthest;
  */
 public class FindBoundingQuadrilateral {
 	/**
-	 * Finds the corners of the quadrilateral.
+	 * Finds the corners of the quadrilateral.  Points are put into CCW order
 	 *
 	 * @param list List unordered corner points in the target. At least one point must be on a corner.
 	 * @return The 4 corner points.

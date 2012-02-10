@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve.down;
 
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
-import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -172,8 +172,8 @@ public class TestConvolveDownNormalized_JustBorder {
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
-			GImageSingleBand t = FactoryGeneralizedSingleBand.wrap((ImageSingleBand) targetParam[2]);
-			GImageSingleBand v = FactoryGeneralizedSingleBand.wrap((ImageSingleBand) validationParam[2]);
+			GImageSingleBand t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[2]);
+			GImageSingleBand v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[2]);
 
 			int ratioWidth = v.getWidth() != t.getWidth() ? skip : 1;
 			int ratioHeight = v.getHeight() != t.getHeight() ? skip : 1;

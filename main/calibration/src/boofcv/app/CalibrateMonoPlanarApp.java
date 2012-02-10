@@ -33,37 +33,72 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>
+ * Performs the full processing loop for calibrating a mono camera from a planar grid.  A
+ * directory is specified that the images are read in from.  Calibration points are detected
+ * inside the image and feed into the Zhang98 algorithm for parameter estimation.
+ * </p>
+ * 
+ * <p>
+ * Internally it supports status updates for a GUI and skips over bad images. Invoke functions
+ * in the following order:
+ * <ol>
+ * <li>{@link #configure}</li> 
+ * <li>{@link #reset}</li>
+ * <li>{@link #loadImages}</li>
+ * <li>{@link #process}</li>
+ * <li>{@link #getFound}</li>
+ * </ol>
+ * </p>
+ *
  * @author Peter Abeles
  */
-// TODO Status bar showing what is being processed
-// TODO Show rectified and unrectified images side by side
-// TODO print point error
-// todo show image coverage, recommend more images or not
 public class CalibrateMonoPlanarApp {
 
+	// detects calibration points inside of images
 	protected CalibrationGridInterface detector;
 
+	// computes calibration parameters
 	protected CalibrationPlanarGridZhang98 zhang98;
+	// calibration configuration
 	protected CalibrationGridConfig configGrid;
 	protected boolean assumeZeroSkew;
 
+	// computed parameters
 	protected ParametersZhang98 found;
 
+	// should it save the images
 	boolean saveImages;
 	
+	// Information on calibration targets and results
 	protected List<String> imageNames;
 	protected List<BufferedImage> images;
 	protected List<List<Point2D_F64>> observations;
 	protected List<ImageResults> errors;
-	
+
+	// how far along in the process is it
 	public int state;
+	// status message describing what it is up to
 	public String message;
 
+	/**
+	 * High level configuration
+	 * 
+	 * @param detector Target detection.
+	 * @param saveImages Save all images in a list.  Useful for displaying results, should be false otherwise.
+	 */
 	public CalibrateMonoPlanarApp(CalibrationGridInterface detector , boolean saveImages ) {
 		this.detector = detector;
 		this.saveImages = saveImages;
 	}
-	
+
+	/**
+	 * Specify calibration assumptions.
+	 * 
+	 * @param config Describes the calibration grid.
+	 * @param assumeZeroSkew If true zero skew is assumed.
+	 * @param numRadialParam Number of radial parameters
+	 */
 	public void configure( CalibrationGridConfig config ,
 						   boolean assumeZeroSkew ,
 						   int numRadialParam )
@@ -74,15 +109,99 @@ public class CalibrateMonoPlanarApp {
 		zhang98 = new CalibrationPlanarGridZhang98(config,assumeZeroSkew,numRadialParam);
 	}
 
+	/**
+	 * Resets internal data structures.  Call before {@link #loadImages(String)}
+	 */
 	public void reset() {
 		state = 0;
 		message = "";
 	}
-	
+
+	/**
+	 * Searches directory for image files and extracts calibration points.  Call before
+	 * {@link #process()}
+	 * 
+	 * @param directory Director containing images.
+	 */
+	public void loadImages( String directory ) {
+		File d = new File(directory);
+
+		if( !d.isDirectory() )
+			throw new IllegalArgumentException("Must specify an directory");
+
+		File files[] = d.listFiles();
+
+		imageNames = new ArrayList<String>();
+		images = new ArrayList<BufferedImage>();
+		observations = new ArrayList<List<Point2D_F64>>();
+
+		for( File f : files ) {
+			if( f.isDirectory() || f.isHidden() )
+				continue;
+
+			BufferedImage orig = UtilImageIO.loadImage(f.getAbsolutePath());
+			if( orig == null ) {
+				continue;
+			}
+			System.out.println("Processing "+f.getName());
+			ImageFloat32 image = ConvertBufferedImage.convertFrom(orig, (ImageFloat32) null);
+
+			if( !detector.process(image) )
+				System.err.println("  Failed to process image: "+f.getName());
+			else {
+				imageNames.add(f.getName());
+				observations.add(detector.getPoints());
+				if( saveImages ) {
+					images.add(orig);
+				}
+				updateStatus(0,"Feature Extraction "+imageNames.size());
+			}
+		}
+
+		if( observations.size() == 0 )
+			throw new RuntimeException("No images found in "+directory+"!");
+	}
+
+	/**
+	 * After calibration points have been found this invokes the Zhang98 algorithm to
+	 * estimate calibration parameters.  Error statistics are also computed.
+	 */
+	public void process() {
+		updateStatus(1,"Estimating Parameters");
+		System.out.println("Estimating and optimizing numerical parameters");
+		if( !zhang98.process(observations) ) {
+			throw new RuntimeException("Zhang98 algorithm failed!");
+		}
+
+		found = zhang98.getOptimized();
+
+		updateStatus(2,"Computing Errors");
+		errors = computeErrors(observations,found);
+		printErrors(errors);
+
+		System.out.println("center x = "+found.x0);
+		System.out.println("center y = "+found.y0);
+		System.out.println("a = "+found.a);
+		System.out.println("b = "+found.b);
+		System.out.println("c = "+found.c);
+		for( int i = 0; i < found.distortion.length; i++ ) {
+			System.out.printf("radial[%d] = %6.2e\n",i,found.distortion[i]);
+		}
+		updateStatus(3,"Done");
+	}
+
+	/**
+	 * After the parameters have been estimated this computes the error for each calibration point in
+	 * each image and summary error statistics.
+	 *
+	 * @param observation Observed control point location
+	 * @param param Found calibration parameters
+	 * @return List of error statistics
+	 */
 	protected List<ImageResults> computeErrors( List<List<Point2D_F64>> observation , ParametersZhang98 param )
 	{
 		List<Point2D_F64> grid = configGrid.computeGridPoints();
-		
+
 		Zhang98OptimizationFunction function =
 				new Zhang98OptimizationFunction(param,assumeZeroSkew,grid,observation);
 
@@ -126,82 +245,25 @@ public class CalibrateMonoPlanarApp {
 
 		return ret;
 	}
-	
+
+	/**
+	 * Prints out error information to standard out
+	 */
 	public void printErrors( List<ImageResults> results ) {
 		double totalError = 0;
 		for( int i = 0; i < results.size(); i++ ) {
 			ImageResults r = results.get(i);
 			totalError += r.meanError;
-			
+
 			System.out.printf("image %3d Euclidean ( mean = %7.1e max = %7.1e ) bias ( X = %8.1e Y %8.1e )\n",i,r.meanError,r.maxError,r.biasX,r.biasY);
 		}
 		System.out.println("Total Mean Error = "+totalError);
 	}
 
-	public void loadImages( String directory ) {
-		File d = new File(directory);
-
-		if( !d.isDirectory() )
-			throw new IllegalArgumentException("Must specify an directory");
-
-		File files[] = d.listFiles();
-
-		imageNames = new ArrayList<String>();
-		images = new ArrayList<BufferedImage>();
-		observations = new ArrayList<List<Point2D_F64>>();
-
-		for( File f : files ) {
-			if( f.isDirectory() || f.isHidden() )
-				continue;
-
-			BufferedImage orig = UtilImageIO.loadImage(f.getAbsolutePath());
-			if( orig == null ) {
-				continue;
-			}
-			System.out.println("Processing "+f.getName());
-			ImageFloat32 image = ConvertBufferedImage.convertFrom(orig, (ImageFloat32) null);
-
-			if( !detector.process(image) )
-				System.err.println("  Failed to process image: "+f.getName());
-			else {
-				imageNames.add(f.getName());
-				observations.add(detector.getPoints());
-				if( saveImages ) {
-					images.add(orig);
-				}
-				updateStatus(0,"Feature Extraction "+imageNames.size());
-			}
-		}
-
-		if( observations.size() == 0 )
-			throw new RuntimeException("No images found in "+directory+"!");
-	}
-
-	public void process() {
-		updateStatus(1,"Estimating Parameters");
-		System.out.println("Estimating and optimizing numerical parameters");
-		if( !zhang98.process(observations) ) {
-			throw new RuntimeException("Zhang98 algorithm failed!");
-		}
-
-		found = zhang98.getOptimized();
-
-		updateStatus(2,"Computing Errors");
-		errors = computeErrors(observations,found);
-		printErrors(errors);
-
-		System.out.println("center x = "+found.x0);
-		System.out.println("center y = "+found.y0);
-		System.out.println("a = "+found.a);
-		System.out.println("b = "+found.b);
-		System.out.println("c = "+found.c);
-		for( int i = 0; i < found.distortion.length; i++ ) {
-			System.out.printf("radial[%d] = %6.2e\n",i,found.distortion[i]);
-		}
-		updateStatus(3,"Done");
-	}
-
-	public void updateStatus( int state , String message ) {
+	/**
+	 * Lets the world know what it is doing
+	 */
+	private void updateStatus( int state , String message ) {
 		this.state = state;
 		this.message = message;
 	}

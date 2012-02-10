@@ -18,8 +18,9 @@
 
 package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import georegression.misc.test.GeometryUnitTest;
-import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
@@ -35,6 +36,11 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public class TestUtilCalibrationGrid {
+
+	@Test
+	public void enforceClockwiseOrder() {
+		fail("implement");
+	}
 
 	@Test
 	public void transposeOrdered() {
@@ -89,7 +95,7 @@ public class TestUtilCalibrationGrid {
 
 	@Test
 	public void extractOrderedPoints() {
-		List<SquareBlob> blobs = new ArrayList<SquareBlob>();
+		List<QuadBlob> blobs = new ArrayList<QuadBlob>();
 		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
 
 		blobs.add( createBlob(5,5,10));
@@ -109,8 +115,8 @@ public class TestUtilCalibrationGrid {
 
 	@Test
 	public void extractOrderedSubpixel() {
-		List<SquareBlob> blobs = new ArrayList<SquareBlob>();
-		List<Point2D_F32> points = new ArrayList<Point2D_F32>();
+		List<QuadBlob> blobs = new ArrayList<QuadBlob>();
+		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
 
 		blobs.add( createBlob(5,5,10));
 		blobs.add( createBlob(50,4,10));
@@ -118,13 +124,13 @@ public class TestUtilCalibrationGrid {
 		UtilCalibrationGrid.extractOrderedSubpixel(blobs, points, 2);
 
 		// add first row
-		GeometryUnitTest.assertEquals(-5, 15, points.get(0),1e-8f);
-		GeometryUnitTest.assertEquals(15,15,points.get(1),1e-8f);
-		GeometryUnitTest.assertEquals(40,14,points.get(2),1e-8f);
-		GeometryUnitTest.assertEquals(60,14,points.get(3),1e-8f);
+		GeometryUnitTest.assertEquals(-5, 15, points.get(0),1e-8);
+		GeometryUnitTest.assertEquals(15,15,points.get(1),1e-8);
+		GeometryUnitTest.assertEquals(40,14,points.get(2),1e-8);
+		GeometryUnitTest.assertEquals(60,14,points.get(3),1e-8);
 		// add second row, and remember they are added in circular order, so some indexes are swapped
-		GeometryUnitTest.assertEquals(-5,-5,points.get(4),1e-8f);
-		GeometryUnitTest.assertEquals(15,-5,points.get(5),1e-8f);
+		GeometryUnitTest.assertEquals(-5,-5,points.get(4),1e-8);
+		GeometryUnitTest.assertEquals(15,-5,points.get(5),1e-8);
 	}
 
 

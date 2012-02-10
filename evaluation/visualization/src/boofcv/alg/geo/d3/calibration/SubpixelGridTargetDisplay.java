@@ -24,7 +24,6 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 
@@ -34,6 +33,9 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
+ * GUI display for {@link DebugSquaresSubpixelApp}.  Shows feature location, backgroudn image, and
+ * allows the user to zoom in and out.
+ * 
  * @author Peter Abeles
  */
 public class SubpixelGridTargetDisplay<T extends ImageSingleBand> 
@@ -48,7 +50,7 @@ public class SubpixelGridTargetDisplay<T extends ImageSingleBand>
 	double scale=1;
 
 	List<Point2D_I32> crudePoints;
-	List<Point2D_F32> refinedPoints;
+	List<Point2D_F64> refinedPoints;
 
 	boolean showCrude = true;
 	boolean showRefined = true;
@@ -133,7 +135,7 @@ public class SubpixelGridTargetDisplay<T extends ImageSingleBand>
 		}
 
 		if( showRefined && refinedPoints != null ) {
-			for( Point2D_F32 p : refinedPoints ) {
+			for( Point2D_F64 p : refinedPoints ) {
 				// put it in the center of a pixel
 				int x = (int)Math.round(p.x*scale+0.5*scale);
 				int y = (int)Math.round(p.y*scale+0.5*scale);
@@ -151,7 +153,7 @@ public class SubpixelGridTargetDisplay<T extends ImageSingleBand>
 		this.crudePoints = crudePoints;
 	}
 
-	public void setRefinedPoints(List<Point2D_F32> refinedPoints) {
+	public void setRefinedPoints(List<Point2D_F64> refinedPoints) {
 		this.refinedPoints = refinedPoints;
 	}
 }

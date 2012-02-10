@@ -27,6 +27,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 /**
+ * Control panel for {@link DebugSquaresSubpixelApp}
+ * 
  * @author Peter Abeles
  */
 public class SubpixelCalibControlPanel extends StandardAlgConfigPanel

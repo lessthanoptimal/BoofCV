@@ -23,7 +23,7 @@ import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.misc.GPixelMath;
-import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
@@ -196,7 +196,7 @@ public class TestDescribePointBriefSO {
 		ImageFloat32 blurred = input._createNew(width, height);
 		filterBlur.process(input,blurred);
 
-		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(blurred);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(blurred);
 
 		DescribePointBriefSO<ImageFloat32> alg = createAlg();
 

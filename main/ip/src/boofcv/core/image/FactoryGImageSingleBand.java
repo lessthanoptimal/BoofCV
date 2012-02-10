@@ -29,7 +29,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class FactoryGeneralizedSingleBand {
+public class FactoryGImageSingleBand {
 
 	public static GImageSingleBand wrap( ImageSingleBand image ) {
 		if( ImageInteger.class.isAssignableFrom(image.getClass()) )

@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
@@ -157,11 +158,11 @@ public class AutoThresholdCalibrationGrid {
 	 *
 	 * @return New threshold
 	 */
-	private double refineThreshold( List<SquareBlob> blobs , ImageFloat32 gray ) {
+	private double refineThreshold( List<QuadBlob> blobs , ImageFloat32 gray ) {
 
 		// create a list of pixel intensity values around all the corners
 		histHighRes.reset();
-		for( SquareBlob b : blobs ) {
+		for( QuadBlob b : blobs ) {
 			int r = (int)Math.ceil(b.smallestSide)/3;
 			
 			for( Point2D_I32 p : b.corners ) {

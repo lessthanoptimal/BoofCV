@@ -19,8 +19,9 @@
 package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import georegression.misc.test.GeometryUnitTest;
-import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
@@ -38,7 +39,7 @@ public class TestPutTargetSquaresIntoOrder {
 	@Test
 	public void process_positive() {
 		// declare square and create a graph
-		List<SquareBlob> blobs = new ArrayList<SquareBlob>();
+		List<QuadBlob> blobs = new ArrayList<QuadBlob>();
 		blobs.add( createBlob(5,5,10));
 		blobs.add( createBlob(50,4,10));
 		blobs.add( createBlob(5,50,10));
@@ -57,7 +58,7 @@ public class TestPutTargetSquaresIntoOrder {
 		}
 
 		List<Point2D_I32> quad = alg.getQuadrilateral();
-		List<SquareBlob> ordered = alg.getBlobsOrdered();
+		List<QuadBlob> ordered = alg.getBlobsOrdered();
 
 		// high level checks
 		assertEquals(2,alg.getNumCols());
@@ -76,12 +77,12 @@ public class TestPutTargetSquaresIntoOrder {
 		GeometryUnitTest.assertEquals(60, 65, ordered.get(3).corners.get(2));
 	}
 
-	public static SquareBlob createBlob( int x0 , int y0 , int r )
+	public static QuadBlob createBlob( int x0 , int y0 , int r )
 	{
 		return createBlob(x0-r,y0+r,   x0+r,y0+r,   x0+r,y0-r,  x0-r,y0-r);
 	}
 
-	public static SquareBlob createBlob( int x0 , int y0 , int x1 , int y1 ,
+	public static QuadBlob createBlob( int x0 , int y0 , int x1 , int y1 ,
 										  int x2 , int y2 , int x3 , int y3 )
 	{
 		List<Point2D_I32> corners = new ArrayList<Point2D_I32>();
@@ -90,13 +91,13 @@ public class TestPutTargetSquaresIntoOrder {
 		corners.add( new Point2D_I32(x2,y2));
 		corners.add( new Point2D_I32(x3,y3));
 
-		List<Point2D_F32> subpixel = new ArrayList<Point2D_F32>();
-		subpixel.add( new Point2D_F32(x0,y0));
-		subpixel.add( new Point2D_F32(x1,y1));
-		subpixel.add( new Point2D_F32(x2,y2));
-		subpixel.add( new Point2D_F32(x3,y3));
+		List<Point2D_F64> subpixel = new ArrayList<Point2D_F64>();
+		subpixel.add( new Point2D_F64(x0,y0));
+		subpixel.add( new Point2D_F64(x1,y1));
+		subpixel.add( new Point2D_F64(x2,y2));
+		subpixel.add( new Point2D_F64(x3,y3));
 
-		SquareBlob ret = new SquareBlob(corners,corners);
+		QuadBlob ret = new QuadBlob(corners,corners);
 		ret.subpixel = subpixel;
 
 		return ret;

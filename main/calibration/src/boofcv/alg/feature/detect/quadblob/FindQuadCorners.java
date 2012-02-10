@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
+package boofcv.alg.feature.detect.quadblob;
 
+import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;

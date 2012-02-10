@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
+package boofcv.alg.feature.detect.quadblob;
 
-import georegression.struct.point.Point2D_F32;
+import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.ArrayList;
@@ -26,17 +27,19 @@ import java.util.List;
 
 /**
  * Contains information on blobs extracted from the binary image.  Eventually these blobs are declared to
- * be a square and processed further down the line.
+ * be a square and processed further down the line.  Additional data structures have been designed for
+ * calibration target detection.
  *
  * @author Peter Abeles
  */
-public class SquareBlob {
+public class QuadBlob {
+	// pixels surrounding the outside border
 	public List<Point2D_I32> contour;
 	// corners in CCW direction from the corner closest to -PI radians
 	public List<Point2D_I32> corners;
 
 	// accurate estimate of corner locations computed by sub-pixel algorithm
-	public List<Point2D_F32> subpixel;
+	public List<Point2D_F64> subpixel;
 	
 	public Point2D_I32 center;
 
@@ -49,9 +52,9 @@ public class SquareBlob {
 	public double sideLengths[] = new double[4];
 
 	// what each corner is connected to
-	public List<SquareBlob> conn = new ArrayList<SquareBlob>();
+	public List<QuadBlob> conn = new ArrayList<QuadBlob>();
 
-	public SquareBlob(List<Point2D_I32> contour, List<Point2D_I32> corners) {
+	public QuadBlob(List<Point2D_I32> contour, List<Point2D_I32> corners) {
 		this();
 		this.contour = contour;
 		this.corners = corners;
@@ -60,10 +63,10 @@ public class SquareBlob {
 		compute();
 	}
 
-	public SquareBlob() {
-		subpixel = new ArrayList<Point2D_F32>();
+	public QuadBlob() {
+		subpixel = new ArrayList<Point2D_F64>();
 		for( int i = 0; i < 4; i++ ) {
-			subpixel.add( new Point2D_F32());
+			subpixel.add( new Point2D_F64());
 		}
 	}
 
