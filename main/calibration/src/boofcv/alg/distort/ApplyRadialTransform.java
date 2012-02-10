@@ -41,26 +41,31 @@ public class ApplyRadialTransform extends PixelTransform_F32 {
 	Point2D_F32 temp0 = new Point2D_F32();
 	Point2D_F32 temp1 = new Point2D_F32();
 
-	/**
-	 *
-	 * @param x_c Camera center in pixels
-	 * @param y_c Camera center in pixels
-	 * @param kappa Radial distortion parameters
-	 */
-	public ApplyRadialTransform(double a, double b, double c, double x_c, double y_c, double[] kappa) {
 
-		K_inv.set(0,0,a);
-		K_inv.set(1,1,b);
-		K_inv.set(0,1,c);
+	/**
+	 * Specify camera calibration parameters
+	 *
+	 * @param fx
+	 * @param fy
+	 * @param skew
+	 * @param x_c
+	 * @param y_c
+	 * @param kappa
+	 */
+	public void set(double fx, double fy, double skew, double x_c, double y_c, double[] kappa) {
+
+		K_inv.set(0,0,fx);
+		K_inv.set(1,1,fy);
+		K_inv.set(0,1,skew);
 		K_inv.set(0,2,x_c);
 		K_inv.set(1,2,y_c);
 		K_inv.set(2,2,1);
 
 		CommonOps.invert(K_inv);
 
-		this.a = a;
-		this.b = b;
-		this.c = c;
+		this.a = fx;
+		this.b = fy;
+		this.c = skew;
 		
 		this.x_c = (float)x_c;
 		this.y_c = (float)y_c;

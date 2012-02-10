@@ -19,7 +19,7 @@
 package boofcv.core.image.border;
 
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -62,8 +62,8 @@ public abstract class GenericImageBorderTests {
 
 		ImageBorder_I32 fooA = wrap(imgA);
 
-		GImageSingleBand orig = FactoryGeneralizedSingleBand.wrap(imgA);
-		GImageSingleBand border = FactoryGeneralizedSingleBand.wrap(fooA);
+		GImageSingleBand orig = FactoryGImageSingleBand.wrap(imgA);
+		GImageSingleBand border = FactoryGImageSingleBand.wrap(fooA);
 
 		checkGet(orig, border);
 	}
@@ -75,8 +75,8 @@ public abstract class GenericImageBorderTests {
 
 		ImageBorder_F32 fooA = wrap(imgA);
 
-		GImageSingleBand orig = FactoryGeneralizedSingleBand.wrap(imgA);
-		GImageSingleBand border = FactoryGeneralizedSingleBand.wrap(fooA);
+		GImageSingleBand orig = FactoryGImageSingleBand.wrap(imgA);
+		GImageSingleBand border = FactoryGImageSingleBand.wrap(fooA);
 
 		checkGet(orig, border);
 	}
@@ -110,8 +110,8 @@ public abstract class GenericImageBorderTests {
 
 		ImageBorder_I32 fooA = wrap(imgA);
 
-		GImageSingleBand orig = FactoryGeneralizedSingleBand.wrap(imgA);
-		GImageSingleBand border = FactoryGeneralizedSingleBand.wrap(fooA);
+		GImageSingleBand orig = FactoryGImageSingleBand.wrap(imgA);
+		GImageSingleBand border = FactoryGImageSingleBand.wrap(fooA);
 
 		checkSet(orig, border);
 	}
@@ -123,8 +123,8 @@ public abstract class GenericImageBorderTests {
 
 		ImageBorder_F32 fooA = wrap(imgA);
 
-		GImageSingleBand orig = FactoryGeneralizedSingleBand.wrap(imgA);
-		GImageSingleBand border = FactoryGeneralizedSingleBand.wrap(fooA);
+		GImageSingleBand orig = FactoryGImageSingleBand.wrap(imgA);
+		GImageSingleBand border = FactoryGImageSingleBand.wrap(fooA);
 
 		checkSet(orig, border);
 	}

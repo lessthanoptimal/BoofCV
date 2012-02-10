@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -71,11 +72,11 @@ public class TestAutoThresholdCalibrationGrid {
 		assertTrue(thresh > 20 && thresh < 100 );
 
 		// check the grid it found
-		List<SquareBlob> squares = detector.getSquaresOrdered();
+		List<QuadBlob> squares = detector.getSquaresOrdered();
 
 		assertEquals(12,squares.size());
 
-		SquareBlob b = squares.get(0);
+		QuadBlob b = squares.get(0);
 		assertEquals(15,b.corners.get(0).x);
 		assertEquals(10,b.corners.get(0).y);
 	}

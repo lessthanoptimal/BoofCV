@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppression;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
@@ -74,8 +74,8 @@ public class TestGradientToEdgeFeatures {
 			throws InvocationTargetException, IllegalAccessException {
 		m.invoke(null,derivX,derivY,intensity);
 
-		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(derivX);
-		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(derivY);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(derivX);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(derivY);
 
 		float expected = (float)Math.sqrt( Math.pow(a.get(1,2).doubleValue(),2) + Math.pow(b.get(1,2).doubleValue(),2));
 
@@ -107,8 +107,8 @@ public class TestGradientToEdgeFeatures {
 			throws InvocationTargetException, IllegalAccessException {
 		m.invoke(null,derivX,derivY,intensity);
 
-		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(derivX);
-		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(derivY);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(derivX);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(derivY);
 
 
 		float expected = Math.abs(a.get(1,2).floatValue()) + Math.abs(b.get(1,2).floatValue());
@@ -141,8 +141,8 @@ public class TestGradientToEdgeFeatures {
 			throws InvocationTargetException, IllegalAccessException {
 		m.invoke(null,derivX,derivY,direction);
 
-		GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(derivX);
-		GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(derivY);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(derivX);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(derivY);
 
 
 		float expected = (float)Math.atan(b.get(1,2).floatValue()/a.get(1,2).floatValue());

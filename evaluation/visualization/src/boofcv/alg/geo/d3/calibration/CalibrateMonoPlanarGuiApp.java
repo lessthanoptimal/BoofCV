@@ -36,52 +36,78 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
+ * Computes intrinsic camera calibration parameters from a set of calibration images.  Results
+ * are displayed in a window allowing their accuracy to be easily seen.
+ *
  * @author Peter Abeles
  */
 public class CalibrateMonoPlanarGuiApp extends JPanel {
 
+	// computes calibration parameters
 	CalibrateMonoPlanarApp calibrator;
+	// displays results
 	MonoPlanarPanel gui = new MonoPlanarPanel();
+	// needed by ProcessThread for displaying its dialog
 	JPanel owner;
-	
+
+	// tells ProcessThread if it should be running or not
 	boolean processing;
 
+	// transform used to undistort image
+	ApplyRadialTransform tran;
+	ImageDistort<ImageFloat32> dist;
 	
 	public CalibrateMonoPlanarGuiApp(CalibrateMonoPlanarApp calibrator) {
 		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(750,525));
+		setPreferredSize(new Dimension(800,525));
 		this.calibrator = calibrator;
 		this.owner = this;
 		
 		add(gui,BorderLayout.CENTER);
+
+		// Distortion algorithm for removing radial distortion
+		tran = new ApplyRadialTransform();
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class,0);
+		dist = DistortSupport.createDistort(ImageFloat32.class,tran,interp,border);
 	}
-	
+
+	/**
+	 * Processes all images in the directory.  Updates status of GUI while doing so
+	 *
+	 * @param directory Directory containing calibration images
+	 */
 	public void process( String directory ) {
 		processing = true;
 		calibrator.reset();
 		new ProcessThread().start();
 		
 		calibrator.loadImages(directory);
-		gui.setImages(calibrator.getImageNames(),
-				calibrator.getImages(),calibrator.getObservations());
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui.setImages(calibrator.getImageNames(),
+						calibrator.getImages(),calibrator.getObservations());
+			}});
 		gui.repaint();
 
 		calibrator.process();
-		gui.setResults(calibrator.getErrors());
-
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui.setResults(calibrator.getErrors());
+				gui.setCalibration(calibrator.getFound());
+			}});
 		processing = false;
-		
-		ParametersZhang98 found = calibrator.getFound();
-		
-		ApplyRadialTransform tran = new ApplyRadialTransform(found.a,found.b,found.c,found.x0,found.y0,found.distortion);
 
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
-		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class,0);
-		ImageDistort<ImageFloat32> dist = DistortSupport.createDistort(ImageFloat32.class,tran,interp,border);
+		// tell it how to undistort the image
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				ParametersZhang98 found = calibrator.getFound();
 
-		gui.setCorrection(dist);
+				tran.set(found.a,found.b,found.c,found.x0,found.y0,found.distortion);
+				gui.setCorrection(dist);
 		
-		gui.repaint();
+				gui.repaint();
+			}});
 	}
 
 
@@ -130,8 +156,8 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 		frame.pack();
 		frame.setVisible(true);
 		
-		app.process("/home/pja/saved/a");
-//		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V");
+//		app.process("/home/pja/saved/a");
+		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V");
 
 	}
 }

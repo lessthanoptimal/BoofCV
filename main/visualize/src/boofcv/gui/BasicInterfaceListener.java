@@ -16,27 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
-
-import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import boofcv.struct.image.ImageFloat32;
-
-import java.util.List;
+package boofcv.gui;
 
 /**
- * Interface for computing sub-pixel accurate corners given a set of corners with are within a few
- * pixels of the true corners
+ * Simple interface for a GUI to tell the main processing that it needs to render the display
+ * or reprocess that data.  Settings are accessed else where and more fine control over what
+ * has changed is not provided.
  *
  * @author Peter Abeles
  */
-public interface RefineCalibrationGridCorner {
+public interface BasicInterfaceListener {
 
 	/**
-	 * Refines the initial corner estimates in the blobs with a sub-pixel estimate.  The sub-pixel
-	 * estimates are stored in each {@link boofcv.alg.feature.detect.quadblob.QuadBlob}.
-	 *
-	 * @param squares List of square blobs whose corner estimates need to be refined. Modified
-	 * @param image Original image being processed.
+	 * The data does not need to be reprocessed but the user has requested that different
+	 * information be displayed.
 	 */
-	public void refine( List<QuadBlob> squares , ImageFloat32 image );
+	public void eventUpdateGui();
+
+	/**
+	 * Data needs to be reprocessed using the new settings
+	 */
+	public void eventReprocess();
 }

@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
@@ -40,7 +41,7 @@ public class TestConnectGridSquares {
 	 */
 	@Test
 	public void copy() {
-		List<SquareBlob> all = new ArrayList<SquareBlob>();
+		List<QuadBlob> all = new ArrayList<QuadBlob>();
 		all.add(createSquare(50,60,10,12));
 		all.add(createSquare(51,61,11,13));
 		all.add(createSquare(52, 62, 12, 14));
@@ -51,12 +52,12 @@ public class TestConnectGridSquares {
 		connect(1,3,all);
 		connect(2,3,all);
 
-		List<SquareBlob> sub = new ArrayList<SquareBlob>();
+		List<QuadBlob> sub = new ArrayList<QuadBlob>();
 		sub.add( all.get(0));
 		sub.add( all.get(1));
 		sub.add( all.get(2));
 
-		List<SquareBlob> found = ConnectGridSquares.copy(sub);
+		List<QuadBlob> found = ConnectGridSquares.copy(sub);
 
 		checkSquare(found.get(0),50,60,10,12,2);
 		checkSquare(found.get(1),51,61,11,13,1);
@@ -65,7 +66,7 @@ public class TestConnectGridSquares {
 
 	@Test
 	public void findIsland() {
-		List<SquareBlob> all = new ArrayList<SquareBlob>();
+		List<QuadBlob> all = new ArrayList<QuadBlob>();
 		all.add(createSquare(50,60,10,12));
 		all.add(createSquare(51,61,11,13));
 		all.add(createSquare(52, 62, 12, 14));
@@ -77,13 +78,13 @@ public class TestConnectGridSquares {
 		connect(1,3,all);
 		connect(2,3,all);
 		
-		List<SquareBlob> found = ConnectGridSquares.findIsland(all.remove(1),all);
+		List<QuadBlob> found = ConnectGridSquares.findIsland(all.remove(1),all);
 		assertEquals(4,found.size());
 	}
 
 	@Test
 	public void basic() throws InvalidCalibrationTarget {
-		List<SquareBlob> blobs = new ArrayList<SquareBlob>();
+		List<QuadBlob> blobs = new ArrayList<QuadBlob>();
 
 		blobs.add( createBlob(5,5,1));
 		blobs.add( createBlob(7,5,1));
@@ -107,7 +108,7 @@ public class TestConnectGridSquares {
 		assertTrue(blobs.get(2).conn.contains(blobs.get(5)));
 	}
 
-	private void checkSquare( SquareBlob square , double largestSide , double smallestSide,
+	private void checkSquare( QuadBlob square , double largestSide , double smallestSide,
 							  int x , int y , int numConnections )
 	{
 		assertEquals(largestSide,square.largestSide,1e-8);
@@ -117,12 +118,12 @@ public class TestConnectGridSquares {
 		assertEquals(numConnections,square.conn.size());
 	}
 
-	public static void connect( int a , int b , List<SquareBlob> input ) {
+	public static void connect( int a , int b , List<QuadBlob> input ) {
 		input.get(a).conn.add( input.get(b) );
 		input.get(b).conn.add( input.get(a) );
 	}
 
-	private SquareBlob createSquare( double largestSide , double smallestSide,
+	private QuadBlob createSquare( double largestSide , double smallestSide,
 									 int x , int y )
 	{
 		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
@@ -133,7 +134,7 @@ public class TestConnectGridSquares {
 			corners.add( new Point2D_I32(1,2));
 		}
 
-		SquareBlob ret = new SquareBlob(contour,corners);
+		QuadBlob ret = new QuadBlob(contour,corners);
 
 		ret.largestSide = largestSide;
 		ret.smallestSide = smallestSide;

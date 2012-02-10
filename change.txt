@@ -8,6 +8,16 @@ Version : Alpha 0.6
 
 - Added convolution related code for ImageSInt32
 - Added weighted KLT and Harris corner detectors
+- Refactored factory names and other classes to make them easier to find
+  and more consistent
+- Planar calibration grid detectors
+  * Chess board pattern
+  * Square grid pattern
+- Generic code for detecting squares in binary images
+  * Inside of calibration module
+- Application for calibration from planar calibration targets
+  * GUI and commandline 
+ 
 
 ---------------------------------------------
 Date    : 2012/02/01

@@ -20,9 +20,9 @@ package boofcv.app;
 
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.feature.detect.grid.*;
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.geo.calibration.CalibrationGridConfig;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
@@ -34,7 +34,10 @@ import java.util.List;
 public class WrapPlanarGridTarget implements CalibrationGridInterface{
 
 	int squareColumns;
-	
+
+	int pointColumns;
+	int pointRows;
+
 	RefineCalibrationGridCorner refine;
 	AutoThresholdCalibrationGrid autoThreshold;
 	DetectSpacedSquareGrid detect;
@@ -52,6 +55,9 @@ public class WrapPlanarGridTarget implements CalibrationGridInterface{
 		squareColumns = config.gridWidth/2;
 		int squareRows = config.gridHeight/2;
 
+		pointColumns = squareColumns*2;
+		pointRows = squareRows*2;
+
 		detect = new DetectSpacedSquareGrid(500, squareColumns,squareRows);
 		autoThreshold = new AutoThresholdCalibrationGrid(255,30);
 
@@ -64,7 +70,7 @@ public class WrapPlanarGridTarget implements CalibrationGridInterface{
 		if( !autoThreshold.process(detect,input) )
 			return false;
 
-		List<SquareBlob> squares = detect.getSquaresOrdered();
+		List<QuadBlob> squares = detect.getSquaresOrdered();
 		
 		// refine the corner accuracy estimate to sub-pixel
 		try {
@@ -74,15 +80,10 @@ public class WrapPlanarGridTarget implements CalibrationGridInterface{
 			return false;
 		}
 			
-		List<Point2D_F32> found = new ArrayList<Point2D_F32>();
-		UtilCalibrationGrid.extractOrderedSubpixel(squares,found, squareColumns);
-
 		ret = new ArrayList<Point2D_F64>();
-		
-		for( Point2D_F32 p : found ) {
-			ret.add( new Point2D_F64(p.x,p.y));
-		}
-		
+		UtilCalibrationGrid.extractOrderedSubpixel(squares,ret, squareColumns);
+		UtilCalibrationGrid.enforceClockwiseOrder(ret,pointRows,pointColumns);
+
 		return true;
 	}
 

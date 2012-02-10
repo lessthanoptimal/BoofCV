@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import georegression.metric.ClosestPoint2D_F64;
 import georegression.metric.Distance2D_F64;
 import georegression.metric.UtilAngle;
@@ -32,7 +33,7 @@ import java.util.List;
 
 /**
  * <p>
- * Given a complete set of {@link SquareBlob} that is in arbitrary order and composes an entire calibration target,
+ * Given a complete set of {@link boofcv.alg.feature.detect.quadblob.QuadBlob} that is in arbitrary order and composes an entire calibration target,
  * find a logical ordering of the squares and check the target's validity,  The corners in each blob are also put
  * into correct order.
  * </p>
@@ -40,7 +41,7 @@ import java.util.List;
  * <p>
  * Assumptions:
  * <ul>
- * <li> {@link SquareBlob} are unordered in the provided list.</li>
+ * <li> {@link boofcv.alg.feature.detect.quadblob.QuadBlob} are unordered in the provided list.</li>
  * <li> Corner points are in a CCW order</li>
  * <li> Every row in calibration target has the same number of squares in it.</li>
  * <li> The whole target is observed.</li>
@@ -56,10 +57,10 @@ import java.util.List;
  */
 public class PutTargetSquaresIntoOrder {
 	// list of blobs provided
-	private List<SquareBlob> blobs;
+	private List<QuadBlob> blobs;
 
 	// list of blobs put into a valid order
-	private List<SquareBlob> blobsOrdered;
+	private List<QuadBlob> blobsOrdered;
 
 	// bounding quadrilateral 
 	List<Point2D_I32> targetCorners;
@@ -80,9 +81,9 @@ public class PutTargetSquaresIntoOrder {
 	 * @param blob List of square blobs that compose a target.  Connections are modified for book keeping.
 	 * @throws boofcv.alg.feature.detect.InvalidCalibrationTarget Thrown if anything bad happened
 	 */
-	public void process( List<SquareBlob> blob ) throws InvalidCalibrationTarget {
+	public void process( List<QuadBlob> blob ) throws InvalidCalibrationTarget {
 		// set up data structures
-		this.blobs = new ArrayList<SquareBlob>(blob);
+		this.blobs = new ArrayList<QuadBlob>(blob);
 		
 		// find the bounding quadrilateral around target blobs
 		List<Point2D_I32> targetObs = toPointList(blobs);
@@ -99,18 +100,18 @@ public class PutTargetSquaresIntoOrder {
 	 * @return  List of blobs in row-major order
 	 * @throws boofcv.alg.feature.detect.InvalidCalibrationTarget
 	 */
-	private List<SquareBlob> putBlobsIntoOrder() throws InvalidCalibrationTarget {
+	private List<QuadBlob> putBlobsIntoOrder() throws InvalidCalibrationTarget {
 		// select the blob in the top left corner of the target
 		// Which corner is selected is arbitrary
-		SquareBlob seed = findBlobWithPoint(targetCorners.get(0));
+		QuadBlob seed = findBlobWithPoint(targetCorners.get(0));
 
 		// list in which the blobs are ordered
-		List<SquareBlob> orderedBlob = new ArrayList<SquareBlob>();
+		List<QuadBlob> orderedBlob = new ArrayList<QuadBlob>();
 
 		// extract the top most row, and the columns on the left and right side of the grid
-		List<SquareBlob> topRow = findLine(seed,targetCorners.get(1));
-		List<SquareBlob> leftCol = findLine(seed,targetCorners.get(3));
-		List<SquareBlob> rightCol = findLine(topRow.get(topRow.size()-1),targetCorners.get(2));
+		List<QuadBlob> topRow = findLine(seed,targetCorners.get(1));
+		List<QuadBlob> leftCol = findLine(seed,targetCorners.get(3));
+		List<QuadBlob> rightCol = findLine(topRow.get(topRow.size()-1),targetCorners.get(2));
 
 		// perform a high level sanity check of what's been extracted so far
 		sanityCheckTarget(topRow, leftCol, rightCol);
@@ -160,9 +161,9 @@ public class PutTargetSquaresIntoOrder {
 	/**
 	 * Make sure what has been found so far meets expectations
 	 */
-	private void sanityCheckTarget(List<SquareBlob> topRow, 
-								   List<SquareBlob> leftCol, 
-								   List<SquareBlob> rightCol) 
+	private void sanityCheckTarget(List<QuadBlob> topRow,
+								   List<QuadBlob> leftCol,
+								   List<QuadBlob> rightCol)
 			throws InvalidCalibrationTarget
 	{
 		if( leftCol.size() != rightCol.size() )
@@ -177,7 +178,7 @@ public class PutTargetSquaresIntoOrder {
 
 		// See if the connection grid is valid
 		int totalConnections = 0;
-		for( SquareBlob b : blobs ) {
+		for( QuadBlob b : blobs ) {
 			totalConnections += b.conn.size();
 		}
 		int expected = N*4 - (2*cols + 2*N/cols);
@@ -235,11 +236,11 @@ public class PutTargetSquaresIntoOrder {
 	 * @param begin Top left corner of row
 	 * @param end Top right corner of row
 	 */
-	protected void orderBlobRow( List<SquareBlob> blobs , Point2D_I32 begin , Point2D_I32 end )
+	protected void orderBlobRow( List<QuadBlob> blobs , Point2D_I32 begin , Point2D_I32 end )
 	{
 		LineParametric2D_F64 line = new LineParametric2D_F64(begin.x,begin.y,end.x-begin.x,end.y-begin.y);
 
-		for( SquareBlob b : blobs )
+		for( QuadBlob b : blobs )
 			orderCorners(b,line);
 	}
 	
@@ -247,7 +248,7 @@ public class PutTargetSquaresIntoOrder {
 	 * Order the corners in the blob such that the first two are closest to the line and the
 	 * first one is closest to the origin of the line.
 	 */
-	protected void orderCorners( SquareBlob blob , LineParametric2D_F64 line) {
+	protected void orderCorners( QuadBlob blob , LineParametric2D_F64 line) {
 
 		
 		// find the two points closest to the line
@@ -292,9 +293,9 @@ public class PutTargetSquaresIntoOrder {
 	 * @param row Squares which are to be removed.
 	 * @param all List of all squares, is modified.
 	 */
-	private void removeRow( List<SquareBlob> row , List<SquareBlob> all ) {
-		for( SquareBlob b : row ) {
-			for( SquareBlob c : b.conn ) {
+	private void removeRow( List<QuadBlob> row , List<QuadBlob> all ) {
+		for( QuadBlob b : row ) {
+			for( QuadBlob c : b.conn ) {
 				if( !c.conn.remove(b) )
 					throw new RuntimeException("Bug, element not contained");
 			}
@@ -312,8 +313,8 @@ public class PutTargetSquaresIntoOrder {
 	 * @param target Top right corner in calibration target.
 	 * @return
 	 */
-	public List<SquareBlob> findLine( SquareBlob blob , Point2D_I32 target ) {
-		List<SquareBlob> ret = new ArrayList<SquareBlob>();
+	public List<QuadBlob> findLine( QuadBlob blob , Point2D_I32 target ) {
+		List<QuadBlob> ret = new ArrayList<QuadBlob>();
 
 		// get the direction the graph should be traversed
 		double targetAngle = Math.atan2( target.y - blob.center.y , target.x - blob.center.x );
@@ -321,10 +322,10 @@ public class PutTargetSquaresIntoOrder {
 		while( blob != null ) {
 			ret.add(blob);
 			double best = Double.MAX_VALUE;
-			SquareBlob found = null;
+			QuadBlob found = null;
 			
 			// see if any of  the connected point towards the target
-			for( SquareBlob c : blob.conn ) {
+			for( QuadBlob c : blob.conn ) {
 				double angle = Math.atan2(c.center.y-blob.center.y,c.center.x-blob.center.x);
 				double acute = UtilAngle.dist(targetAngle,angle);
 				if( acute < best ) {
@@ -345,9 +346,9 @@ public class PutTargetSquaresIntoOrder {
 	/**
 	 * Search through the list of blobs for a blob which contains the specified point
 	 */
-	public SquareBlob findBlobWithPoint( Point2D_I32 pt )
+	public QuadBlob findBlobWithPoint( Point2D_I32 pt )
 	{
-		for( SquareBlob b : blobs ) {
+		for( QuadBlob b : blobs ) {
 			if (contains(pt, b))
 				return b;
 		}
@@ -355,7 +356,7 @@ public class PutTargetSquaresIntoOrder {
 		return null;
 	}
 
-	private boolean contains(Point2D_I32 pt, SquareBlob b) {
+	private boolean contains(Point2D_I32 pt, QuadBlob b) {
 		for( Point2D_I32 c : b.corners ) {
 			if( c.x == pt.x && c.y == pt.y ) {
 				return true;
@@ -367,10 +368,10 @@ public class PutTargetSquaresIntoOrder {
 	/**
 	 * Converts the list of squares into a list of points composed of the square's corners
 	 */
-	public static List<Point2D_I32> toPointList( List<SquareBlob> blobs ) {
+	public static List<Point2D_I32> toPointList( List<QuadBlob> blobs ) {
 		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
 		
-		for( SquareBlob s : blobs ) {
+		for( QuadBlob s : blobs ) {
 			ret.addAll(s.corners);
 		}
 		
@@ -384,7 +385,7 @@ public class PutTargetSquaresIntoOrder {
 		return targetCorners;
 	}
 
-	public List<SquareBlob> getBlobsOrdered() {
+	public List<QuadBlob> getBlobsOrdered() {
 		return blobsOrdered;
 	}
 

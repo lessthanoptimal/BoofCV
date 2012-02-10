@@ -19,13 +19,13 @@
 package boofcv.alg.geo.d3.calibration;
 
 import boofcv.alg.feature.detect.grid.*;
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 
@@ -36,14 +36,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Application for debugging sub-pixel algorithm of square corner calibration grids.  Displays
+ * the initial "crude" corner location estimate along with the refined.  Zooming in and out
+ * of the image allows a better view of the difference between the two corner estimates.
+ *
  * @author Peter Abeles
  */
-// TODO show original corners
-// TODO zoom in and out
-// TODO Show sub-pixel corners
-public class DebugSubpixelTargetApp
+public class DebugSquaresSubpixelApp
 		extends SelectImagePanel implements ProcessInput , SubpixelCalibControlPanel.Listener
 {
+	// target size
 	int targetColumns = 4;
 	int targetRows = 3;
 
@@ -51,21 +53,21 @@ public class DebugSubpixelTargetApp
 	DetectSpacedSquareGrid detectAlg = new DetectSpacedSquareGrid(500,targetColumns,targetRows);
 	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(255,20);
 
+	// refines the initial corner estimate
 	RefineCalibrationGridCorner refineAlg;
 
 	// gray scale image that targets are detected inside of
 	ImageFloat32 gray = new ImageFloat32(1,1);
 
+	// GUI related classes
 	JScrollPane scroll;
 	SubpixelGridTargetDisplay<ImageFloat32> display;
 	SubpixelCalibControlPanel control;
 
-	List<Point2D_I32> crudePoints = new ArrayList<Point2D_I32>();
-
 	// has an image been processed
 	boolean processedImage = false;
 
-	public DebugSubpixelTargetApp() {
+	public DebugSquaresSubpixelApp() {
 
 //		refineAlg = new WrapCornerIntensity<T,ImageSingleBand>(1,imageType);
 		refineAlg = new WrapRefineCornerSegmentFit();
@@ -78,7 +80,6 @@ public class DebugSubpixelTargetApp
 		control = new SubpixelCalibControlPanel(this);
 
 		scroll = new JScrollPane(display);
-//		scroll.setHorizontalScrollBarPolicy();
 
 		panel.add(scroll,BorderLayout.CENTER);
 		panel.add(control,BorderLayout.WEST);
@@ -92,14 +93,14 @@ public class DebugSubpixelTargetApp
 		ConvertBufferedImage.convertFrom(image,gray);
 
 		List<Point2D_I32> crude = null;
-		List<Point2D_F32> refined = null;
+		List<Point2D_F64> refined = null;
 		
 		if( !auto.process(detectAlg,gray) ) {
 			System.out.println("Detect Target Failed!");
 		} else {
-			List<SquareBlob> squares = detectAlg.getSquaresOrdered();
+			List<QuadBlob> squares = detectAlg.getSquaresOrdered();
 			crude = new ArrayList<Point2D_I32>();
-			refined = new ArrayList<Point2D_F32>();
+			refined = new ArrayList<Point2D_F64>();
 
 			refineAlg.refine(detectAlg.getSquaresOrdered(),gray);
 
@@ -108,7 +109,7 @@ public class DebugSubpixelTargetApp
 		}
 		
 		final List<Point2D_I32> _crude = crude;
-		final List<Point2D_F32> _refined = refined;
+		final List<Point2D_F64> _refined = refined;
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -174,7 +175,7 @@ public class DebugSubpixelTargetApp
 
 	public static void main(String args[]) {
 
-		DebugSubpixelTargetApp app = new DebugSubpixelTargetApp();
+		DebugSquaresSubpixelApp app = new DebugSquaresSubpixelApp();
 
 		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V/";
 

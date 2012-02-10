@@ -19,7 +19,7 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
@@ -105,8 +105,8 @@ public class EvaluateImageStabilization<I extends ImageSingleBand> {
 			int numOverlap = 0;
 			double error = 0;
 
-			GImageSingleBand a = FactoryGeneralizedSingleBand.wrap(currentFrame);
-			GImageSingleBand b = FactoryGeneralizedSingleBand.wrap(keyFrame);
+			GImageSingleBand a = FactoryGImageSingleBand.wrap(currentFrame);
+			GImageSingleBand b = FactoryGImageSingleBand.wrap(keyFrame);
 
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {

@@ -19,6 +19,7 @@
 package boofcv.alg.geo.d3.calibration;
 
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.geo.calibration.ParametersZhang98;
 import boofcv.app.ImageResults;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -31,8 +32,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
@@ -40,9 +39,12 @@ import java.util.List;
 import java.util.Vector;
 
 /**
+ * GUI interface for {@link CalibrateMonoPlanarGuiApp}.  Displays results for each calibration
+ * image in a window.
+ * 
  * @author Peter Abeles
  */
-public class MonoPlanarPanel extends JPanel implements ActionListener , ItemListener ,
+public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		ListSelectionListener 
 {
 
@@ -56,6 +58,12 @@ public class MonoPlanarPanel extends JPanel implements ActionListener , ItemList
 
 	JTextArea meanError;
 	JTextArea maxError;
+
+	JTextArea paramCenterX;
+	JTextArea paramCenterY;
+	JTextArea paramA;
+	JTextArea paramB;
+	JTextArea paramC;
 
 	boolean showPoints = true;
 	boolean showErrors = true;
@@ -72,7 +80,7 @@ public class MonoPlanarPanel extends JPanel implements ActionListener , ItemList
 	double errorScale = 20;
 
 	MultiSpectral<ImageFloat32> origMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
-	MultiSpectral<ImageFloat32> correctedMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);;
+	MultiSpectral<ImageFloat32> correctedMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
 
 	ImageDistort<ImageFloat32> undoRadial;
 
@@ -112,6 +120,11 @@ public class MonoPlanarPanel extends JPanel implements ActionListener , ItemList
 
 		meanError = createErrorComponent();
 		maxError = createErrorComponent();
+		paramCenterX = createErrorComponent();
+		paramCenterY = createErrorComponent();
+		paramA = createErrorComponent();
+		paramB = createErrorComponent();
+		paramC = createErrorComponent();
 
 		add(toolBar, BorderLayout.PAGE_START);
 		add(mainView, BorderLayout.CENTER);
@@ -144,18 +157,41 @@ public class MonoPlanarPanel extends JPanel implements ActionListener , ItemList
 
 	public void setResults(List<ImageResults> results) {
 		this.results = results;
-
+		ImageResults r = results.get(selectedImage);
+		String textMean = String.format("%5.1e",r.meanError);
+		String textMax = String.format("%5.1e",r.maxError);
+		meanError.setText(textMean);
+		maxError.setText(textMax);
 	}
-	
+
+	public void setCalibration(ParametersZhang98 found) {
+		String textX = String.format("%5.1f",found.x0);
+		String textY = String.format("%5.1f",found.y0);
+		paramCenterX.setText(textX);
+		paramCenterY.setText(textY);
+
+		String textA = String.format("%5.1f",found.a);
+		String textB = String.format("%5.1f",found.b);
+		paramA.setText(textA);
+		paramB.setText(textB);
+		String textC = String.format("%5.1e",found.c);
+		paramC.setText(textC);
+	}
+
 	public void setCorrection( ImageDistort<ImageFloat32> undoRadial )
 	{
 		this.undoRadial = undoRadial;
 		checkUndistorted.setEnabled(true);
-	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
+		BufferedImage image = images.get(selectedImage);
+		ConvertBufferedImage.convertFromMulti(image,origMS,ImageFloat32.class);
+		for( int i = 0; i < 3; i++ ) {
+			ImageFloat32 in = origMS.getBand(i);
+			ImageFloat32 out = correctedMS.getBand(i);
+
+			undoRadial.apply(in,out);
+		}
+		ConvertBufferedImage.convertTo(correctedMS,undistorted);
 	}
 
 	@Override
@@ -202,18 +238,11 @@ public class MonoPlanarPanel extends JPanel implements ActionListener , ItemList
 
 				undoRadial.apply(in,out);
 			}
+			ConvertBufferedImage.convertTo(correctedMS,undistorted);
 		}
-		ConvertBufferedImage.convertTo(correctedMS,undistorted);
 
-		if( results != null ) {
-			ImageResults r = results.get(selected);
-			String textMean = String.format("%5.1e",r.meanError);
-			String textMax = String.format("%5.1e",r.maxError);
-			meanError.setText(textMean);
-			maxError.setText(textMax);
-		}
 	}
-	
+
 	private class MainView extends JPanel
 	{
 		@Override
@@ -291,7 +320,13 @@ public class MonoPlanarPanel extends JPanel implements ActionListener , ItemList
 			JScrollPane scroll = new JScrollPane(imageList);
 
 			addLabeled(meanError,"Mean Error",this);
-			addLabeled(maxError,"Max Error",this);
+			addLabeled(maxError, "Max Error", this);
+			addSeparator(200);
+			addLabeled(paramCenterX,"Xc",this);
+			addLabeled(paramCenterY,"Yc",this);
+			addLabeled(paramA,"fx",this);
+			addLabeled(paramB,"fy",this);
+			addLabeled(paramC,"skew",this);
 			addSeparator(200);
 			add(scroll);
 		}

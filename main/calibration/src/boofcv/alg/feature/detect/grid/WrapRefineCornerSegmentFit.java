@@ -18,10 +18,11 @@
 
 package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.List;
@@ -36,10 +37,10 @@ public class WrapRefineCornerSegmentFit
 	RefineCornerSegmentFit alg = new RefineCornerSegmentFit();
 	
 	@Override
-	public void refine(List<SquareBlob> squares,
+	public void refine(List<QuadBlob> squares,
 					   ImageFloat32 image ) 
 	{
-		for( SquareBlob s : squares) {
+		for( QuadBlob s : squares) {
 
 			// search the smallest side size to avoid accidentally including
 			// another corner in the region being considered.
@@ -54,7 +55,7 @@ public class WrapRefineCornerSegmentFit
 			
 			for( int i = 0; i < 4; i++ ) {
 				Point2D_I32 cp = s.corners.get(i);
-				Point2D_F32 rp = s.subpixel.get(i);
+				Point2D_F64 rp = s.subpixel.get(i);
 				
 				ImageRectangle r = new ImageRectangle(cp.x- searchRadius,cp.y - searchRadius,
 						cp.x + searchRadius +1,cp.y+ searchRadius +1);

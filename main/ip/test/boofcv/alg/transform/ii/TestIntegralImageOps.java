@@ -19,7 +19,7 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.alg.filter.convolve.ConvolveWithBorder;
-import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -73,8 +73,8 @@ public class TestIntegralImageOps {
 
 		m.invoke(null,a,b);
 
-		GImageSingleBand aa = FactoryGeneralizedSingleBand.wrap(a);
-		GImageSingleBand bb = FactoryGeneralizedSingleBand.wrap(b);
+		GImageSingleBand aa = FactoryGImageSingleBand.wrap(a);
+		GImageSingleBand bb = FactoryGImageSingleBand.wrap(b);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -197,7 +197,7 @@ public class TestIntegralImageOps {
 
 		GIntegralImageOps.convolve(integral,kernel,expected);
 
-		GImageSingleBand e = FactoryGeneralizedSingleBand.wrap(expected);
+		GImageSingleBand e = FactoryGImageSingleBand.wrap(expected);
 
 		double found0 = ((Number)m.invoke(null,integral,kernel,0,0)).doubleValue();
 		double found1 = ((Number)m.invoke(null,integral,kernel,10,12)).doubleValue();

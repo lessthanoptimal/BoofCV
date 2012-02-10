@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -59,11 +60,11 @@ public class TestDetectSpacedSquareGrid {
 
 		assertTrue(alg.process(binary));
 
-		List<SquareBlob> squares = alg.getSquaresOrdered();
+		List<QuadBlob> squares = alg.getSquaresOrdered();
 		
 		assertEquals(12,squares.size());
 		
-		SquareBlob b = squares.get(0);
+		QuadBlob b = squares.get(0);
 		assertEquals(15,b.corners.get(0).x);
 		assertEquals(10,b.corners.get(0).y);
 	}

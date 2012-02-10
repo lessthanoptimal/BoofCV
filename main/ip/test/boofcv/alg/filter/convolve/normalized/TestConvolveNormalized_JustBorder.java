@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.convolve.normalized;
 
-import boofcv.core.image.FactoryGeneralizedSingleBand;
+import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
@@ -62,8 +62,8 @@ public class TestConvolveNormalized_JustBorder {
 		 */
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-			GImageSingleBand t = FactoryGeneralizedSingleBand.wrap((ImageSingleBand) targetParam[2]);
-			GImageSingleBand v = FactoryGeneralizedSingleBand.wrap((ImageSingleBand) validationParam[2]);
+			GImageSingleBand t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[2]);
+			GImageSingleBand v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[2]);
 
 			final int width = t.getWidth();
 			final int height = t.getHeight();
