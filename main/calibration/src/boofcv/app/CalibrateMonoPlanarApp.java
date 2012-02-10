@@ -56,7 +56,7 @@ import java.util.List;
 public class CalibrateMonoPlanarApp {
 
 	// detects calibration points inside of images
-	protected CalibrationGridInterface detector;
+	protected PlanarCalibrationDetector detector;
 
 	// computes calibration parameters
 	protected CalibrationPlanarGridZhang98 zhang98;
@@ -87,7 +87,7 @@ public class CalibrateMonoPlanarApp {
 	 * @param detector Target detection.
 	 * @param saveImages Save all images in a list.  Useful for displaying results, should be false otherwise.
 	 */
-	public CalibrateMonoPlanarApp(CalibrationGridInterface detector , boolean saveImages ) {
+	public CalibrateMonoPlanarApp(PlanarCalibrationDetector detector , boolean saveImages ) {
 		this.detector = detector;
 		this.saveImages = saveImages;
 	}
@@ -257,7 +257,7 @@ public class CalibrateMonoPlanarApp {
 
 			System.out.printf("image %3d Euclidean ( mean = %7.1e max = %7.1e ) bias ( X = %8.1e Y %8.1e )\n",i,r.meanError,r.maxError,r.biasX,r.biasY);
 		}
-		System.out.println("Total Mean Error = "+totalError);
+		System.out.println("Average Mean Error = "+(totalError/results.size()));
 	}
 
 	/**
@@ -289,16 +289,18 @@ public class CalibrateMonoPlanarApp {
 	}
 
 	public static void main( String args[] ) {
-		CalibrationGridInterface detector = new WrapPlanarGridTarget();
+//		PlanarCalibrationDetector detector = new WrapPlanarGridTarget();
+		PlanarCalibrationDetector detector = new WrapPlanarChessTarget();
 
-		CalibrationGridConfig config = new CalibrationGridConfig(8,6,30);
+//		CalibrationGridConfig config = new CalibrationGridConfig(8,6,30);
+		CalibrationGridConfig config = new CalibrationGridConfig(6,4,30);
 
 		CalibrateMonoPlanarApp app = new CalibrateMonoPlanarApp(detector,false);
 
 		app.configure(config,false,2);
 
 //		app.loadImages("../data/evaluation/calibration/mono/Sony_DSC-HX5V");
-		app.loadImages("/home/pja/saved/a");
+		app.loadImages("/home/pja/saved2/a");
 		app.process();
 	}
 }

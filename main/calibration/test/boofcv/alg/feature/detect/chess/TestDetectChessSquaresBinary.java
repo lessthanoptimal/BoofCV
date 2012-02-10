@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
+package boofcv.alg.feature.detect.chess;
 
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.misc.ImageTestingOps;
@@ -31,14 +31,15 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDetectSpacedSquareGrid {
+public class TestDetectChessSquaresBinary {
 
 	/**
-	 * Create a synthetic target and see if it can detect it
+	 * Give it a simple target and see if it finds the expected number of squares
 	 */
 	@Test
 	public void basicTest() {
 		int squareLength = 30;
+		int squareLength2 = 28;
 		int w = 400;
 		int h = 500;
 		ImageUInt8 binary = new ImageUInt8(w,h);
@@ -46,26 +47,29 @@ public class TestDetectSpacedSquareGrid {
 		// create the grid
 		for( int y = 0; y < 3; y++) {
 			for( int x = 0; x < 4; x++ ) {
-				int pixelY = y*(squareLength+10)+10;
-				int pixelX = x*(squareLength+10)+15;
+				int pixelY = 2*y*squareLength+10;
+				int pixelX = 2*x*squareLength+15;
 
-				ImageTestingOps.fillRectangle(binary,1,pixelX,pixelY,squareLength,squareLength);
+				ImageTestingOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength, squareLength);
+			}
+		}
+		for( int y = 0; y < 2; y++) {
+			for( int x = 0; x < 3; x++ ) {
+				int pixelY = 2*y*squareLength+10+squareLength+1;
+				int pixelX = 2*x*squareLength+15+squareLength+1;
+
+				ImageTestingOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength2, squareLength2);
 			}
 		}
 		
-		// add a bit of noise
-		ImageTestingOps.fillRectangle(binary,1,400,100,25,22);
-
-		DetectSpacedSquareGrid alg = new DetectSpacedSquareGrid(100,3,4);
-
+		DetectChessSquaresBinary alg = new DetectChessSquaresBinary(4,3,50);
+		
 		assertTrue(alg.process(binary));
+		
+		List<QuadBlob> allBlobs = alg.getGraphBlobs();
+		List<QuadBlob> cornerBlobs = alg.getCornerBlobs();
 
-		List<QuadBlob> squares = alg.getSquaresOrdered();
-		
-		assertEquals(12,squares.size());
-		
-		QuadBlob b = squares.get(0);
-		assertEquals(15,b.corners.get(0).x);
-		assertEquals(10,b.corners.get(0).y);
+		assertEquals(3*4+2*3,allBlobs.size());
+		assertEquals(4,cornerBlobs.size());
 	}
 }

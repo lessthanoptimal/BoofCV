@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.alg.geo.calibration.CalibrationGridConfig;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -25,21 +26,31 @@ import georegression.struct.point.Point2D_F64;
 import java.util.List;
 
 /**
- * Interface for extracting points from a planar calibration grid.
- *
+ * Wrapper around {@link DetectChessCalibrationPoints} for {@Link PlanarCalibrationDetector}
+ * 
  * @author Peter Abeles
  */
-public interface CalibrationGridInterface {
+public class WrapPlanarChessTarget implements PlanarCalibrationDetector {
 
-	public void configure( CalibrationGridConfig config );
+	DetectChessCalibrationPoints<ImageFloat32,ImageFloat32> alg;
+	
+	@Override
+	public void configure(CalibrationGridConfig config) {
+		int numColSquares = config.gridWidth/2+1;
+		int numRowSquares = config.gridHeight/2+1;
 
-	public boolean process( ImageFloat32 input );
+		alg = new DetectChessCalibrationPoints<ImageFloat32, ImageFloat32>(numColSquares,numRowSquares,
+				5,20,255,ImageFloat32.class);
+	}
 
-	/**
-	 * Returns the set of detected points.  Each time this function is invoked a new instance
-	 * of the list and points is returned.  No data reuse here.
-	 *
-	 * @return List of detected points in grid order.
-	 */
-	public List<Point2D_F64> getPoints();
+	@Override
+	public boolean process(ImageFloat32 input) {
+		return alg.process(input);
+	}
+
+	@Override
+	public List<Point2D_F64> getPoints() {
+		// points should be at sub-pixel accuracy and in the correct orientation
+		return alg.getPoints();
+	}
 }

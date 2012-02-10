@@ -54,6 +54,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	JCheckBox checkErrors;
 	JCheckBox checkUndistorted;
 	JCheckBox checkAll;
+	JCheckBox checkNumbers;
 	JList imageList;
 
 	JTextArea meanError;
@@ -69,6 +70,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	boolean showErrors = true;
 	boolean showUndistorted = false;
 	boolean showAll = false;
+	boolean showNumbers = true;
 
 	int selectedImage = 0;
 
@@ -84,7 +86,8 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	ImageDistort<ImageFloat32> undoRadial;
 
-	
+	// true if the undistorted image has been computed
+	boolean hasUndistorted = false;
 	BufferedImage undistorted;
 	
 	public MonoPlanarPanel() {
@@ -108,11 +111,16 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		checkUndistorted.setSelected(showUndistorted);
 		checkUndistorted.addItemListener(this);
 		checkUndistorted.setEnabled(false);
+
+		checkNumbers = new JCheckBox("Numbers");
+		checkNumbers.setSelected(showNumbers);
+		checkNumbers.addItemListener(this);
 		
 		toolBar.add(checkPoints);
 		toolBar.add(checkErrors);
 		toolBar.add(checkAll);
 		toolBar.add(checkUndistorted);
+		toolBar.add(checkNumbers);
 
 		imageList = new JList();
 		imageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -145,9 +153,8 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		this.images = images;
 		this.features = features;
 
-		setSelected(0);
-		
 		imageList.setListData(new Vector<Object>(names));
+		imageList.setSelectedIndex(0);
 		
 		BufferedImage image = images.get(selectedImage);
 		mainView.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
@@ -204,6 +211,8 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			showAll = checkAll.isSelected();
 		} else if( e.getSource() == checkUndistorted ) {
 			showUndistorted = checkUndistorted.isSelected();
+		} else if( e.getSource() == checkNumbers ) {
+			showNumbers = checkNumbers.isSelected();
 		}
 		
 		mainView.repaint();
@@ -220,7 +229,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	private void setSelected( int selected ) {
 		selectedImage = selected;
 		BufferedImage image = images.get(selected);
-
+		hasUndistorted = false;
 		
 		if( undistorted == null ||
 				undistorted.getWidth() != image.getWidth() || 
@@ -230,17 +239,18 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			correctedMS.reshape(undistorted.getWidth(),undistorted.getHeight());
 		}
 
-		if( undoRadial != null ) {
-			ConvertBufferedImage.convertFromMulti(image,origMS,ImageFloat32.class);
-			for( int i = 0; i < 3; i++ ) {
-				ImageFloat32 in = origMS.getBand(i);
-				ImageFloat32 out = correctedMS.getBand(i);
 
-				undoRadial.apply(in,out);
-			}
-			ConvertBufferedImage.convertTo(correctedMS,undistorted);
+	}
+
+	private void undoRadialDistortion(BufferedImage image) {
+		ConvertBufferedImage.convertFromMulti(image, origMS, ImageFloat32.class);
+		for( int i = 0; i < 3; i++ ) {
+			ImageFloat32 in = origMS.getBand(i);
+			ImageFloat32 out = correctedMS.getBand(i);
+
+			undoRadial.apply(in,out);
 		}
-
+		ConvertBufferedImage.convertTo(correctedMS,undistorted);
 	}
 
 	private class MainView extends JPanel
@@ -256,9 +266,13 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			
 			Graphics2D g2 = (Graphics2D)g;
 			
-			if( showUndistorted)
+			if( showUndistorted) {
+				if( !hasUndistorted) {
+					undoRadialDistortion(image);
+					hasUndistorted = true;
+				}
 				g2.drawImage(undistorted,0,0,null);
-			else
+			} else
 				g2.drawImage(image,0,0,null);
 
 			if( showPoints ) {
@@ -273,6 +287,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 						VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,2,Color.BLUE);
 					}
 				}
+			}
+
+			if( showNumbers ) {
+				DetectCalibrationChessApp.drawNumbers(g2,points);
 			}
 
 			if( showErrors && results != null ) {
@@ -296,7 +314,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 				}
 
 				g2.setStroke(before);
-				g2.setColor(Color.GREEN);
+				g2.setColor(Color.ORANGE);
 				for( int i = 0; i < points.size(); i++ ) {
 					Point2D_F64 p = points.get(i);
 

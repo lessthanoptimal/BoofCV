@@ -30,25 +30,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Given a binary image it detects the presence of chess board calibration grids. 1) Detect blobs
+ * in binary image and select square like ones. 2) Connect blobs based distance of corners. 3)
+ * prune graph. 4) sanity check graph structure. 5) Find bounding quadrilateral.
+ *
  * @author Peter Abeles
  */
-public class FindChessBoundBinary {
+public class DetectChessSquaresBinary {
 
-	DetectQuadBlobsBinary detectBlobs;
+	// square blob detector
+	private DetectQuadBlobsBinary detectBlobs;
 
-	int expectedBlobs;
+	// how many blobs it expects to find
+	private int expectedBlobs;
 
-	int numRows;
-	int numCols;
+	// number of rows and columns in blob grid
+	private int numRows;
+	private int numCols;
 
-	List<Point2D_I32> boundingQuad;
-	List<QuadBlob> graphBlobs;
-	List<QuadBlob> cornerBlobs;
+	// quadrilateral bounding all the blobs
+	private List<Point2D_I32> boundingQuad;
+	// graph of connected bobs
+	private List<QuadBlob> graphBlobs;
+	private List<QuadBlob> cornerBlobs;
 
 	// how close two corners need to be for them to be connected
-	int connectThreshold;
+	private int connectThreshold;
 
-	public FindChessBoundBinary(int numRows, int numCols , int minContourSize )
+	/**
+	 * Configures chess board detector.
+	 *
+	 * @param numCols Number of columns in square grid
+	 * @param numRows Number of rows in square grid
+	 * @param minContourSize Prune blobs which have a contour with few than this number of pixels.
+	 */
+	public DetectChessSquaresBinary(int numCols, int numRows, int minContourSize)
 	{
 		this.numRows = numRows;
 		this.numCols = numCols;
@@ -59,6 +75,13 @@ public class FindChessBoundBinary {
 		detectBlobs = new DetectQuadBlobsBinary(minContourSize,0.25,expectedBlobs);
 	}
 
+	/**
+	 * Detects chessboard in the binary image.  Square corners must be disconnected.
+	 * Returns true if a chessboard was found, false otherwise.
+	 *
+	 * @param binary Binary image of chessboard
+	 * @return True if successful.
+	 */
 	public boolean process( ImageUInt8 binary ) {
 
 		// detect blobs
@@ -68,7 +91,7 @@ public class FindChessBoundBinary {
 		// connect blobs
 		graphBlobs = detectBlobs.getDetected();
 
-		connect(graphBlobs, 15);
+		connect(graphBlobs, connectThreshold);
 
 		// Remove all but the largest islands in the graph to reduce the number of combinations
 		ConnectGridSquares.pruneSmallIslands(graphBlobs);
@@ -156,7 +179,10 @@ public class FindChessBoundBinary {
 
 		return true;
 	}
-	
+
+	/**
+	 * Finds bounding quadrilateral using corner points
+	 */
 	public List<Point2D_I32> findBoundingQuad(  List<QuadBlob> corners ) {
 		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
 		
@@ -189,6 +215,9 @@ public class FindChessBoundBinary {
 		return graphBlobs;
 	}
 
+	/**
+	 * Returns blobs at the chess board corner
+	 */
 	public List<QuadBlob> getCornerBlobs() {
 		return cornerBlobs;
 	}

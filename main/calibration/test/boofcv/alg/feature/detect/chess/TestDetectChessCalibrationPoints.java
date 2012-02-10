@@ -16,29 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
+package boofcv.alg.feature.detect.chess;
 
-import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Random;
 
-import static boofcv.alg.misc.ImageTestingOps.fillRectangle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestAutoThresholdCalibrationGrid {
+@SuppressWarnings("unchecked")
+public class TestDetectChessCalibrationPoints {
 
 	Random rand = new Random(234);
 	
 	/**
-	 * Synthetic target at some non obvious threshold
+	 * Give it a simple target and see if it finds the expected number of squares
 	 */
 	@Test
 	public void basicTest() {
@@ -46,38 +46,38 @@ public class TestAutoThresholdCalibrationGrid {
 		int w = 400;
 		int h = 500;
 		ImageFloat32 gray = new ImageFloat32(w,h);
+		ImageTestingOps.fill(gray,80f);
 
-		fillRectangle(gray,100,0,0,w,h);
-		
 		// create the grid
 		for( int y = 0; y < 3; y++) {
 			for( int x = 0; x < 4; x++ ) {
-				int pixelY = y*(squareLength+10)+10;
-				int pixelX = x*(squareLength+10)+15;
+				int pixelY = 2*y*squareLength+10;
+				int pixelX = 2*x*squareLength+15;
 
-				fillRectangle(gray, 20, pixelX, pixelY, squareLength, squareLength);
+				ImageTestingOps.fillRectangle(gray, 20, pixelX, pixelY, squareLength, squareLength);
 			}
 		}
+		for( int y = 0; y < 2; y++) {
+			for( int x = 0; x < 3; x++ ) {
+				int pixelY = 2*y*squareLength+10+squareLength;
+				int pixelX = 2*x*squareLength+15+squareLength;
 
-		// add a little bit of noise
-		ImageTestingOps.addGaussian(gray,rand,0.5,0,255);
+				ImageTestingOps.fillRectangle(gray, 20, pixelX, pixelY, squareLength, squareLength);
+			}
+		}
+		ImageTestingOps.addGaussian(gray,rand,0.1,0,255);
 
+		DetectChessCalibrationPoints alg = new DetectChessCalibrationPoints(4,3,5,20,255,ImageFloat32.class);
 
-		AutoThresholdCalibrationGrid alg = new AutoThresholdCalibrationGrid(255,20);
-		DetectSquareCalibrationPoints detector = new DetectSquareCalibrationPoints(100,3,4);
-		assertTrue(alg.process(detector, gray));
+		assertTrue(alg.process(gray));
 
-		// sanity check threshold
-		double thresh = alg.getThreshold();
-		assertTrue(thresh > 20 && thresh < 100 );
+		List<Point2D_F64> points = alg.getPoints();
 
-		// check the grid it found
-		List<QuadBlob> squares = detector.getSquaresOrdered();
+		assertEquals(4*6,points.size());
 
-		assertEquals(12,squares.size());
-
-		QuadBlob b = squares.get(0);
-		assertEquals(15,b.corners.get(0).x);
-		assertEquals(10,b.corners.get(0).y);
+		// should also test for row-major ordering
+		// and that the points are in a clockwise orientation
+		// then feed it a bunch of different synthetic targets
+		// but that would be a lot of work
 	}
 }

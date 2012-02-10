@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.d3.calibration;
 
-import boofcv.alg.feature.detect.chess.DetectChessGrid;
+import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -48,7 +48,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		
 {
 	Class<T> imageType;
-	DetectChessGrid<T,D> alg;
+	DetectChessCalibrationPoints<T,D> alg;
 
 	GridCalibPanel calibGUI;
 	ImageZoomPanel gui = new ImageZoomPanel();
@@ -65,13 +65,13 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	
 	public DetectCalibrationChessApp(Class<T> imageType) {
 		this.imageType = imageType;
-		alg = new DetectChessGrid<T,D>(4,3,5,imageType);
+		alg = new DetectChessCalibrationPoints<T,D>(4,3,5,20,255,imageType);
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
 
-		calibGUI = new GridCalibPanel();
+		calibGUI = new GridCalibPanel(false);
 		calibGUI.setListener( this );
 		calibGUI.setMinimumSize(calibGUI.getPreferredSize());
 		
@@ -88,9 +88,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		gray.reshape(input.getWidth(),input.getHeight());
 		ConvertBufferedImage.convertFrom(input, gray);
 
-
 		detectTarget();
-
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -102,6 +100,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 	private void detectTarget() {
 		foundTarget = alg.process(gray);
+		calibGUI.setThreshold((int)alg.getSelectedThreshold());
 	}
 
 	private void renderOutput() {

@@ -30,7 +30,8 @@ import java.util.List;
 import java.util.Random;
 
 import static boofcv.alg.feature.detect.grid.TestPutTargetSquaresIntoOrder.createBlob;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -39,12 +40,62 @@ public class TestUtilCalibrationGrid {
 
 	@Test
 	public void enforceClockwiseOrder() {
-		fail("implement");
+		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
+		
+		list.add(new Point2D_F64(0,10));
+		list.add(new Point2D_F64(10,10));
+		list.add(new Point2D_F64(10,0));
+		list.add(new Point2D_F64(0,0));
+		
+		// first case, no change
+		UtilCalibrationGrid.enforceClockwiseOrder(list,2,2);
+
+		GeometryUnitTest.assertEquals(0,10,list.get(0),1e-8);
+		GeometryUnitTest.assertEquals(10,10,list.get(1),1e-8);
+		GeometryUnitTest.assertEquals(10,0,list.get(2),1e-8);
+		GeometryUnitTest.assertEquals(0,0,list.get(3),1e-8);
+
+		// Second case, it will need to flip
+		list.clear();
+		list.add(new Point2D_F64(10,10));
+		list.add(new Point2D_F64(0,10));
+		list.add(new Point2D_F64(0,0));
+		list.add(new Point2D_F64(10,0));
+		UtilCalibrationGrid.enforceClockwiseOrder(list,2,2);
+
+		GeometryUnitTest.assertEquals(0,10,list.get(0),1e-8);
+		GeometryUnitTest.assertEquals(10,10,list.get(1),1e-8);
+		GeometryUnitTest.assertEquals(10,0,list.get(2),1e-8);
+		GeometryUnitTest.assertEquals(0,0,list.get(3),1e-8);
 	}
 
 	@Test
 	public void transposeOrdered() {
-		fail("implement");
+		List<QuadBlob> list = new ArrayList<QuadBlob>();
+		List<Point2D_I32> ptsOrig = new ArrayList<Point2D_I32>();
+		
+		list.add(createBlob(0,10,3));
+		list.add(createBlob(10,10,3));
+		list.add(createBlob(10,0,3));
+		list.add(createBlob(0,0,3));
+
+		ptsOrig.addAll(list.get(0).corners);
+		
+		// first case, no change
+		List<QuadBlob> tran = UtilCalibrationGrid.transposeOrdered(list,2,2);
+
+		// see if quads have been transposed
+		assertTrue(tran.get(0)==list.get(0));
+		assertTrue(tran.get(1)==list.get(2));
+		assertTrue(tran.get(2)==list.get(1));
+		assertTrue(tran.get(3)==list.get(3));
+		
+		// see if points internally have been transposed
+		List<Point2D_I32> ptsTran = tran.get(0).corners;
+		assertTrue(ptsTran.get(0)==ptsOrig.get(0));
+		assertTrue(ptsTran.get(1)==ptsOrig.get(3));
+		assertTrue(ptsTran.get(2)==ptsOrig.get(2));
+		assertTrue(ptsTran.get(3)==ptsOrig.get(1));
 	}
 	
 	@Test
