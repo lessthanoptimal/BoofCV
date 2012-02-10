@@ -19,7 +19,7 @@
 package boofcv.alg.geo.d3.calibration;
 
 import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
-import boofcv.alg.feature.detect.grid.DetectSpacedSquareGrid;
+import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
@@ -54,7 +54,7 @@ public class DetectCalibrationSquaresApp
 	int targetRows = 3;
 
 	// detects the calibration target
-	DetectSpacedSquareGrid alg = new DetectSpacedSquareGrid(500,targetColumns,targetRows);
+	DetectSquareCalibrationPoints alg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
 
 	// gray scale image that targets are detected inside of
 	ImageFloat32 gray = new ImageFloat32(1,1);
@@ -83,7 +83,7 @@ public class DetectCalibrationSquaresApp
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
 		
-		calibGUI = new GridCalibPanel();
+		calibGUI = new GridCalibPanel(true);
 		calibGUI.setListener( this );
 		calibGUI.setMinimumSize(calibGUI.getPreferredSize());
 

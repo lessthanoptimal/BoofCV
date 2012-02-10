@@ -25,7 +25,7 @@ import boofcv.alg.geo.calibration.CalibrationGridConfig;
 import boofcv.alg.geo.calibration.ParametersZhang98;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.app.CalibrateMonoPlanarApp;
-import boofcv.app.CalibrationGridInterface;
+import boofcv.app.PlanarCalibrationDetector;
 import boofcv.app.WrapPlanarGridTarget;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -56,6 +56,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 	// transform used to undistort image
 	ApplyRadialTransform tran;
 	ImageDistort<ImageFloat32> dist;
+
 	
 	public CalibrateMonoPlanarGuiApp(CalibrateMonoPlanarApp calibrator) {
 		setLayout(new BorderLayout());
@@ -141,12 +142,14 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 	}
 
 	public static void main( String args[] ) {
-		CalibrationGridInterface detector = new WrapPlanarGridTarget();
+		PlanarCalibrationDetector detector = new WrapPlanarGridTarget();
+//		PlanarCalibrationDetector detector = new WrapPlanarChessTarget();
 
 		CalibrationGridConfig config = new CalibrationGridConfig(8,6,30);
+//		CalibrationGridConfig config = new CalibrationGridConfig(6,4,30);
 
 		CalibrateMonoPlanarApp calibrator = new CalibrateMonoPlanarApp(detector,true);
-		calibrator.configure(config,false,2);
+		calibrator.configure(config,true,2);
 		
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp(calibrator);
 		
@@ -155,9 +158,10 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 		frame.add(app, BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true);
-		
-//		app.process("/home/pja/saved/a");
-		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V");
+
+//		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess");
+//		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square");
+		app.process("/home/pja/saved/a");
 
 	}
 }

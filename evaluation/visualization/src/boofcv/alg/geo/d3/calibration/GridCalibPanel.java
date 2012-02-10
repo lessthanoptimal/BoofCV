@@ -68,7 +68,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	int selectedView = 0;
 	int thresholdLevel = 60;
 
-	public GridCalibPanel() {
+	public GridCalibPanel( boolean hasManualMode ) {
 		viewSelector = new JComboBox();
 		viewSelector.addItem("Original");
 		viewSelector.addItem("Threshold");
@@ -119,7 +119,8 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		addSeparator(100);
 		addLabeled(viewSelector,"View ",this);
 		addSeparator(100);
-		addAlignLeft(manualThreshold,this);
+		if( hasManualMode )
+			addAlignLeft(manualThreshold,this);
 		addLabeled(thresholdSpinner,"Threshold",this);
 		addSeparator(100);
 		addLabeled(selectZoom,"Zoom ",this);

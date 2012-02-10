@@ -50,7 +50,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectSpacedSquareGrid {
+public class DetectSquareCalibrationPoints {
 
 	// images which store intermediate steps in processing cycle
 	private ImageUInt8 binaryA = new ImageUInt8(1,1);
@@ -84,8 +84,8 @@ public class DetectSpacedSquareGrid {
 	 * @param gridCols Number of squares wide the grid is. Target dependent.
 	 * @param gridRows Number of squares tall the grid is. Target dependent.
 	 */
-	public DetectSpacedSquareGrid(int maxShuffle,
-								  int gridCols, int gridRows) {
+	public DetectSquareCalibrationPoints(int maxShuffle,
+										 int gridCols, int gridRows) {
 		this.gridCols = gridCols;
 		this.gridRows = gridRows;
 		this.maxShuffle = maxShuffle;

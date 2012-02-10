@@ -26,16 +26,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Uses the QuadBlob graph to predict where calibration points will be.  The order of the returned
+ * points will be in the proper grid order.  Clockwise or counter clockwise orientation is not
+ * guaranteed.  These points
+ *
  * @author Peter Abeles
  */
-public class PredictChessPoints {
+public class ApproximateChessPoints {
 	/**
 	 * Predict the location of calibration points using the graph. Calibration points should appear
 	 * at intersecting corners of squares.
 	 *
 	 * @return list of ordered approximate calibration points
 	 */
-	public static List<Point2D_I32> predictPoints( QuadBlob corner , int numRows , int numCols ) {
+	public static List<Point2D_I32> predictPoints(QuadBlob corner, int numCols, int numRows) {
 
 		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
 
@@ -70,6 +74,9 @@ public class PredictChessPoints {
 		return points;
 	}
 
+	/**
+	 * Add a whole row to the list
+	 */
 	public static void addRow( QuadBlob a , QuadBlob b , List<Point2D_I32> points , boolean bottom ) {
 		while( b != null ) {
 			addPoint(points,a,b);
@@ -79,6 +86,9 @@ public class PredictChessPoints {
 		}
 	}
 
+	/**
+	 * Computes the mean between the two centers
+	 */
 	public static void addPoint(List<Point2D_I32> points , QuadBlob a , QuadBlob b ) {
 
 		int x = (a.center.x+b.center.x)/2;
@@ -87,6 +97,9 @@ public class PredictChessPoints {
 		points.add(new Point2D_I32(x,y));
 	}
 
+	/**
+	 * Traverses the graph to the next position
+	 */
 	public static QuadBlob next( QuadBlob a , QuadBlob b , boolean cw ) {
 
 		// angle from a to b

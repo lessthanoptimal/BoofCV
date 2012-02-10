@@ -33,16 +33,15 @@ import java.util.List;
 public class UtilCalibrationGrid {
 
 	/**
-	 *
 	 * Note that when viewed on the monitor this will appear to be clockwise because
 	 * the y-axis points down.
 	 *
-	 * @param points
-	 * @param numRows
-	 * @param numCols
+	 * @param points Calibration points on the grid
+	 * @param numCols Number of columns
+	 * @param numRows Number of rows
 	 */
-	public static void enforceClockwiseOrder( List<Point2D_F64> points , 
-											  int numRows , int numCols ) {
+	public static void enforceClockwiseOrder(List<Point2D_F64> points,
+											 int numCols, int numRows) {
 		Point2D_F64 a = points.get(0);
 		Point2D_F64 b = points.get(points.size()-1);
 		Point2D_F64 c = points.get(numCols-1);

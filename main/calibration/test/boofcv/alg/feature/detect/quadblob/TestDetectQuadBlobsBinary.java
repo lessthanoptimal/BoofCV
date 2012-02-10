@@ -18,17 +18,48 @@
 
 package boofcv.alg.feature.detect.quadblob;
 
+import boofcv.alg.misc.ImageTestingOps;
+import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestDetectQuadBlobsBinary {
 
+	/**
+	 * Give it a few easy to detect squares and one that is too skinny and should be filtered
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void basicTest() {
+		int squareLength = 30;
+		int w = 400;
+		int h = 500;
+		ImageUInt8 binary = new ImageUInt8(w,h);
+
+		// create the grid
+		for( int y = 0; y < 3; y++) {
+			for( int x = 0; x < 4; x++ ) {
+				int pixelY = y*(squareLength+10)+10;
+				int pixelX = x*(squareLength+10)+15;
+
+				ImageTestingOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength, squareLength);
+			}
+		}
+
+		// add a rectangle that is too skinny
+		ImageTestingOps.fillRectangle(binary, 1, w-50, 100, 25, 2);
+
+		// another one touching the border
+		ImageTestingOps.fillRectangle(binary, 1, w-20, h-20, 20, 20);
+		
+		DetectQuadBlobsBinary alg = new DetectQuadBlobsBinary(15,0.25,0);
+		
+		assertTrue(alg.process(binary));
+		
+		assertEquals(3*4,alg.getDetected().size());
 	}
 }

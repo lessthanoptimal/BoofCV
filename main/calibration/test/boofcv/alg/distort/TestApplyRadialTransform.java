@@ -18,17 +18,60 @@
 
 package boofcv.alg.distort;
 
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestApplyRadialTransform {
 
+	/**
+	 * Manually compute the distorted coordinate for a point and see if it matches
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void againstManual() {
+		double fx = 600;
+		double fy = 500;
+		double skew = 2;
+		double xc = 300;
+		double yc = 350;
+
+		double radial[]= new double[]{0.01,-0.03};
+
+		Point2D_F64 orig = new Point2D_F64(20,400);
+		Point2D_F64 dist = new Point2D_F64();
+
+		Point2D_F64 normPt = new Point2D_F64();
+
+		DenseMatrix64F K = new DenseMatrix64F(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K, K_inv);
+
+		// compute normalized image coordinate
+		GeometryMath_F64.mult(K_inv, orig, normPt);
+
+		double c2 = normPt.x*normPt.x + normPt.y*normPt.y;
+		double r = 1;
+		double sum = 0;
+		for( int i = 0; i < radial.length; i++ ) {
+			r *= c2;
+			sum += radial[i]*r;
+		}
+
+		dist.x = orig.x + (orig.x-xc)*sum;
+		dist.y = orig.y + (orig.y-yc)*sum;
+
+		ApplyRadialTransform alg = new ApplyRadialTransform(fx,fy,skew,xc,yc,radial);
+
+		alg.compute(20,400);
+
+		assertEquals(dist.x,alg.distX,1e-4);
+		assertEquals(dist.y,alg.distY,1e-4);
 	}
 }

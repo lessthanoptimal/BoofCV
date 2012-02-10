@@ -29,6 +29,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
+import boofcv.numerics.solver.FitQuadratic3by3;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
@@ -40,63 +41,86 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
-import org.ejml.alg.dense.linsol.LinearSolverSafe;
-import org.ejml.data.DenseMatrix64F;
 import pja.sorting.QuickSort_F64;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid.selectNext;
+
 /**
+ * <p>
+ * Detects calibration points inside a chessboard calibration target.  A crude approximation of the chess
+ * board is found by thresholding the image dynamically.  Once found corner points are detected and pruned.
+ * The remaining points are computed to sub-pixel accuracy by fitting a 2D quadratic to feature intensity
+ * in a 3x3 region.
+ * </p>
  *
+ * <p>
  * The found control points are ensured to be returned in a row-major format with the correct number of rows and columns,
  * with a counter clockwise ordering.  Note that when viewed on the monitor this will appear to be clockwise because
  * the y-axis points down.
+ *  </p>
  *
  * @author Peter Abeles
  */
-public class DetectChessGrid<T extends ImageSingleBand, D extends ImageSingleBand>
+public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends ImageSingleBand>
 {
-	D derivX;
-	D derivY;
+	// stores image derivative
+	private D derivX;
+	private D derivY;
 
-	int numColsGrid;
-	int numRowsGrid;
+	// number of control points 
+	private int numColsPoints;
+	private int numRowsPoints;
 
-	int numColsPoints;
-	int numRowsPoints;
+	// detects the chess board 
+	private DetectChessSquaresBinary findBound;
+	// binary images used to detect chess board
+	private ImageUInt8 binary = new ImageUInt8(1,1);
+	private ImageUInt8 eroded = new ImageUInt8(1,1);
+	// number of attempts it will make to find the chessboard
+	private int maxAttempts ;
+	private double selectedThreshold;
+	private List<Double> thresholdAttempts = new ArrayList<Double>();
+	// maximum pixel intensity value
+	private double maxPixelValue;
+	
+	// point detection algorithms
+	private GeneralFeatureIntensity<T,D> intensityAlg;
+	private GeneralFeatureDetector<T,D> detectorAlg;
 
-	FindChessBoundBinary findBound;
-
-	GeneralFeatureIntensity<T,D> intensityAlg;
-	GeneralFeatureDetector<T,D> detectorAlg;
-
-
-	List<Point2D_I32> points;
-	List<Point2D_F64> subpixel;
+	// point location at subpixel accuracy
+	private List<Point2D_F64> subpixel;
 
 	// number of points it expects to observer in the target
-	int expectedPoints;
-	
-	ImageUInt8 binary = new ImageUInt8(1,1);
-	ImageUInt8 eroded = new ImageUInt8(1,1);
+	private int expectedPoints;
 	
 	// used for sub-pixel refinement
-	LinearSolver<DenseMatrix64F> solver;
-	DenseMatrix64F M = new DenseMatrix64F(9,6);
-	DenseMatrix64F X = new DenseMatrix64F(6,1);
-	DenseMatrix64F Y = new DenseMatrix64F(9,1);
+	private FitQuadratic3by3 quadFit = new FitQuadratic3by3();
 
-	public DetectChessGrid(int numCols, int numRows, int radius, Class<T> imageType) {
+	/**
+	 * Configures detection parameters
+	 * 
+	 * @param numCols Number of columns in square block grid.  Target dependent.
+	 * @param numRows Number of rows in square block grid.  Target dependent.
+	 * @param radius Side of interest point detection region.  Typically 5
+	 * @param maxAttempts Maximum number of different threshold it will try to detect the image
+	 * @param maxPixelValue Maximum pixel intensity value.  Almost always 255
+	 * @param imageType Type of image being processed
+	 */
+	public DetectChessCalibrationPoints(int numCols, int numRows, int radius,
+										int maxAttempts, double maxPixelValue,
+										Class<T> imageType)
+	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
-		this.numColsGrid = numCols;
-		this.numRowsGrid = numRows;
 
 		this.numColsPoints = 2*(numCols-1);
 		this.numRowsPoints = 2*(numRows-1);
+		
+		this.maxAttempts = maxAttempts;
+		this.maxPixelValue = maxPixelValue;
 
 		expectedPoints = numColsPoints*numRowsPoints;
 
@@ -109,36 +133,15 @@ public class DetectChessGrid<T extends ImageSingleBand, D extends ImageSingleBan
 		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg,extractor,0);
 
 
-		findBound = new FindChessBoundBinary(numRows,numCols,20*4);
-
-		// set up matrix for solving the quadratic
-		int index = 0;
-		for( int i = -1; i <= 1; i++ ) {
-			for( int j = -1; j <= 1; j++ , index++ ) {
-				M.set(index,0,j*j);
-				M.set(index,1,i*j);
-				M.set(index,2,i*i);
-				M.set(index,3,j);
-				M.set(index,4,i);
-				M.set(index,5,1);
-			}
-		}
-
-		solver = new LinearSolverSafe<DenseMatrix64F>(LinearSolverFactory.leastSquares(9,6));
+		findBound = new DetectChessSquaresBinary(numCols, numRows, 20*4);
 	}
 
 	public boolean process( T gray ) {
 		binary.reshape(gray.width,gray.height);
 		eroded.reshape(gray.width, gray.height);
 
-		// TODO try different thresholds
-		GThresholdImageOps.threshold(gray, binary, 89, true);
-
-		// erode to make the squares separated
-		BinaryImageOps.erode8(binary, eroded);
-//		BinaryImageOps.erode8(eroded, binary);
-
-		if( !findBound.process(eroded) )
+		// detect the chess board
+		if( !detectChessBoard(gray) )
 			return false;
 
 		List<Point2D_I32> boundary = findBound.getBoundingQuad();
@@ -159,64 +162,100 @@ public class DetectChessGrid<T extends ImageSingleBand, D extends ImageSingleBan
 		QueueCorner corners = detectorAlg.getFeatures();
 
 		// put points into original image coordinates
-		points = convert(corners,rect.x0,rect.y0);
+		List<Point2D_I32> points = convert(corners, rect.x0, rect.y0);
 
 		// prune features not inside the bounding quadrilateral
 		pruneOutside(points,boundary);
+
+		// make sure enough points were detected
+		if( points.size() < expectedPoints )
+			return false;
 
 		// select N brightest features
 		points = selectBrightest(points, intensityAlg.getIntensity(),rect.x0,rect.y0);
 
 		// put points into grid order
 		List<Point2D_I32> predicted =
-				PredictChessPoints.predictPoints(findBound.getCornerBlobs().get(0),
-						numRowsPoints, numColsPoints);
-		points = orderPoints(predicted,points);
+				ApproximateChessPoints.predictPoints(findBound.getCornerBlobs().get(0),
+						numColsPoints, numRowsPoints);
+		points = orderPoints(predicted, points);
 
+		// compute pixels to sub-pixel accuracy
 		subpixel = new ArrayList<Point2D_F64>();
-		for( Point2D_I32 p : points )
+		for( Point2D_I32 p : points)
 			subpixel.add( refineSubpixel(p,rect.x0,rect.y0,intensityAlg.getIntensity()));
 
-		UtilCalibrationGrid.enforceClockwiseOrder(subpixel,numRowsPoints, numColsPoints);
-
-		// todo refine pixel estimate
+		UtilCalibrationGrid.enforceClockwiseOrder(subpixel, numColsPoints, numRowsPoints);
 
 		return true;
 	}
 
+	/**
+	 * Tests several different thresholds while attempting to detect a calibration grid in the image
+	 */
+	private boolean detectChessBoard( T gray ) {
+		thresholdAttempts.clear();
+
+		for( int i = 0; i < maxAttempts; i++ ) {
+			selectedThreshold = selectNext(thresholdAttempts,maxPixelValue);
+
+			GThresholdImageOps.threshold(gray, binary, selectedThreshold, true);
+
+			// erode to make the squares separated
+			BinaryImageOps.erode8(binary, eroded);
+
+			if( findBound.process(eroded) )
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Computes a feature location to sub-pixel accuracy by fitting a 2D quadratic polynomial
+	 * to corner intensities
+	 *
+	 * @param pt Point in image coordinates
+	 * @param x0 intensity image x offset
+	 * @param y0 intensity image y offset
+	 * @param intensity Intensity image
+	 * @return Sub-pixel point location
+	 */
 	private Point2D_F64 refineSubpixel( Point2D_I32 pt , 
 										int x0 , int y0 , 
 										ImageFloat32 intensity ) 
 	{
+		// sample feature intensity values in the local 3x3 region
 		int index = 0;
 		for( int i = -1; i <= 1; i++ ) {
 			for( int j = -1; j <= 1; j++ , index++ ) {
 				double value = intensity.get(pt.x-x0+j,pt.y-y0+i);
-				
-				Y.set(index,0,value);
+
+				quadFit.setValue(index,value);
 			}
 		}
 
-		if( !solver.setA(M) )
-			return new Point2D_F64(pt.x,pt.y);
+		quadFit.process();
 		
-		solver.solve(Y,X);
-		
-		double a = X.data[0];
-		double b = X.data[1];
-		double c = X.data[2];
-		double d = X.data[3];
-		double e = X.data[4];
+		double dx = quadFit.getDeltaX();
+		double dy = quadFit.getDeltaY();
 
-		double var0 = b-4*a*c/b;
-		double var1 = 2*a*e/b-d;
-		
-		double y = var1/var0;
-		double x = (-2*c*y-e)/b;
-		
-		return new Point2D_F64(pt.x+x,pt.y+y);
+		if( Math.abs(dx) >= 1 || Math.abs(dy) >= 1 ) {
+			// because it is an over determined system it can generate a solution
+			// outside the bounds.  If that happens ignore the sub-pixel approximation
+			return new Point2D_F64(pt.x,pt.y);
+		} else {
+			return new Point2D_F64(pt.x+quadFit.getDeltaX(),pt.y+quadFit.getDeltaY());
+		}
 	}
-	
+
+	/**
+	 * Ensures tht the detected points are in correct grid order.  This is done by using the
+	 * predicted point locations, which are already in order
+	 *
+	 * @param predicted Predicted and order points
+	 * @param detected Detect corner location
+	 * @return Ordered detected points
+	 */
 	private List<Point2D_I32> orderPoints( List<Point2D_I32> predicted , List<Point2D_I32> detected )
 	{
 		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
@@ -239,8 +278,10 @@ public class DetectChessGrid<T extends ImageSingleBand, D extends ImageSingleBan
 
 		return ret;
 	}
-	
-	
+
+	/**
+	 * Finds an axis aligned rectangle that contains the bounding quadrilateral
+	 */
 	private ImageRectangle findImageRectangle( List<Point2D_I32> quad )
 	{
 		int x0,y0,x1,y1;
@@ -265,6 +306,9 @@ public class DetectChessGrid<T extends ImageSingleBand, D extends ImageSingleBan
 		return new ImageRectangle(x0,y0,x1,y1);
 	}
 
+	/**
+	 * Prunes detected corners not inside the image
+	 */
 	private void pruneOutside( List<Point2D_I32> corners , List<Point2D_I32> quad ) {
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
 		for( int i = 0; i < 4; i++ ) {
@@ -284,6 +328,9 @@ public class DetectChessGrid<T extends ImageSingleBand, D extends ImageSingleBan
 		}
 	}
 
+	/**
+	 * Converts from a corner in the sub-image into a point in the full image
+	 */
 	private List<Point2D_I32> convert(QueueCorner found , int x0 , int y0 ) {
 		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
 		for( int i = 0; i < found.size(); i++ ) {
@@ -293,6 +340,9 @@ public class DetectChessGrid<T extends ImageSingleBand, D extends ImageSingleBan
 		return points;
 	}
 
+	/**
+	 * Out of the remaining points, just select the brightest to remove any remaining false positives
+	 */
 	private List<Point2D_I32> selectBrightest( List<Point2D_I32> points , ImageFloat32 intensity ,
 											   int offX , int offY ) {
 		if( points.size() == expectedPoints )
@@ -319,7 +369,7 @@ public class DetectChessGrid<T extends ImageSingleBand, D extends ImageSingleBan
 		return ret;
 	}
 
-	public FindChessBoundBinary getFindBound() {
+	public DetectChessSquaresBinary getFindBound() {
 		return findBound;
 	}
 
@@ -329,5 +379,9 @@ public class DetectChessGrid<T extends ImageSingleBand, D extends ImageSingleBan
 
 	public ImageUInt8 getBinary() {
 		return eroded;
+	}
+
+	public double getSelectedThreshold() {
+		return selectedThreshold;
 	}
 }

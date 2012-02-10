@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class WrapPlanarGridTarget implements CalibrationGridInterface{
+public class WrapPlanarGridTarget implements PlanarCalibrationDetector {
 
 	int squareColumns;
 
@@ -40,7 +40,7 @@ public class WrapPlanarGridTarget implements CalibrationGridInterface{
 
 	RefineCalibrationGridCorner refine;
 	AutoThresholdCalibrationGrid autoThreshold;
-	DetectSpacedSquareGrid detect;
+	DetectSquareCalibrationPoints detect;
 
 	// set of found points
 	List<Point2D_F64> ret;
@@ -58,7 +58,7 @@ public class WrapPlanarGridTarget implements CalibrationGridInterface{
 		pointColumns = squareColumns*2;
 		pointRows = squareRows*2;
 
-		detect = new DetectSpacedSquareGrid(500, squareColumns,squareRows);
+		detect = new DetectSquareCalibrationPoints(500, squareColumns,squareRows);
 		autoThreshold = new AutoThresholdCalibrationGrid(255,30);
 
 	}
@@ -82,7 +82,7 @@ public class WrapPlanarGridTarget implements CalibrationGridInterface{
 			
 		ret = new ArrayList<Point2D_F64>();
 		UtilCalibrationGrid.extractOrderedSubpixel(squares,ret, squareColumns);
-		UtilCalibrationGrid.enforceClockwiseOrder(ret,pointRows,pointColumns);
+		UtilCalibrationGrid.enforceClockwiseOrder(ret, pointColumns, pointRows);
 
 		return true;
 	}

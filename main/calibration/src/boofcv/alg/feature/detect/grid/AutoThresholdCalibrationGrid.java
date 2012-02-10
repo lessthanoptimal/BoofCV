@@ -85,14 +85,14 @@ public class AutoThresholdCalibrationGrid {
 	 * @param gray Gray scale image which is being thresholded
 	 * @return true if a threshold was successfully found and target detected.
 	 */
-	public boolean process( DetectSpacedSquareGrid detector , ImageFloat32 gray ) {
+	public boolean process( DetectSquareCalibrationPoints detector , ImageFloat32 gray ) {
 		attempts.clear();
 
 		binary.reshape(gray.width,gray.height);
 
 		// first find a threshold which detects the target
 		for( int i = 0; i < maxAttempts; i++ ) {
-			selectedThreshold = 89;//selectNext();
+			selectedThreshold = selectNext(attempts,maxValue);
 
 			GThresholdImageOps.threshold(gray,binary,selectedThreshold,true);
 
@@ -105,7 +105,6 @@ public class AutoThresholdCalibrationGrid {
 				}
 				return true;
 			}
-			return false;
 		}
 
 		return false;
@@ -123,7 +122,7 @@ public class AutoThresholdCalibrationGrid {
 	/**
 	 * Select thresholds by doing a binary search.
 	 */
-	private double selectNext() {
+	public static double selectNext( List<Double> attempts , double maxValue ) {
 		if( attempts.size() == 0 ) {
 			attempts.add(maxValue/2.0);
 			return maxValue/2.0;

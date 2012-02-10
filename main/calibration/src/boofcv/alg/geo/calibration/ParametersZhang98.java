@@ -50,7 +50,7 @@ public class ParametersZhang98 {
 	}
 
 	public void setNumberOfViews( int numViews ) {
-			views = new View[numViews];
+		views = new View[numViews];
 		for( int i = 0; i < numViews; i++ ) {
 			views[i] = new View();
 		}

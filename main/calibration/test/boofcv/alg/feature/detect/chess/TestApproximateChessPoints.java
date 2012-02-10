@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPredictChessPoints {
+public class TestApproximateChessPoints {
 
 	int numRows = 2;
 	int numCols = 4;
@@ -46,7 +46,7 @@ public class TestPredictChessPoints {
 	QuadBlob a33 = create(30,30);
 	QuadBlob a35 = create(50,30);
 
-	public TestPredictChessPoints() {
+	public TestApproximateChessPoints() {
 		connect(a11,a22);
 		connect(a13,a22);
 		connect(a13,a24);
@@ -62,17 +62,17 @@ public class TestPredictChessPoints {
 	 */
 	@Test
 	public void predictPoints() {
-		List<Point2D_I32> all = PredictChessPoints.predictPoints(a11,numRows,numCols);
+		List<Point2D_I32> all = ApproximateChessPoints.predictPoints(a11, numCols, numRows);
 		
 		assertEquals(8,all.size());
 
-		all = PredictChessPoints.predictPoints(a15,numRows,numCols);
+		all = ApproximateChessPoints.predictPoints(a15, numCols, numRows);
 		assertEquals(8,all.size());
 
-		all = PredictChessPoints.predictPoints(a31,numRows,numCols);
+		all = ApproximateChessPoints.predictPoints(a31, numCols, numRows);
 		assertEquals(8,all.size());
 
-		all = PredictChessPoints.predictPoints(a35,numRows,numCols);
+		all = ApproximateChessPoints.predictPoints(a35, numCols, numRows);
 		assertEquals(8,all.size());
 	}
 
@@ -81,8 +81,8 @@ public class TestPredictChessPoints {
 		List<Point2D_I32> rowBottom = new ArrayList<Point2D_I32>();
 		List<Point2D_I32> rowTop = new ArrayList<Point2D_I32>();
 
-		PredictChessPoints.addRow(a11,a22,rowBottom,true);
-		PredictChessPoints.addRow(a31,a22,rowTop,false);
+		ApproximateChessPoints.addRow(a11, a22, rowBottom, true);
+		ApproximateChessPoints.addRow(a31, a22, rowTop, false);
 
 		assertEquals(4,rowBottom.size());
 		assertEquals(4,rowTop.size());
@@ -108,15 +108,15 @@ public class TestPredictChessPoints {
 	@Test
 	public void next() {
 		// add top left
-		QuadBlob found = PredictChessPoints.next(a11,a22,false);
+		QuadBlob found = ApproximateChessPoints.next(a11, a22, false);
 		assertTrue(found==a13);
-		found = PredictChessPoints.next(a11,a22,true);
+		found = ApproximateChessPoints.next(a11, a22, true);
 		assertTrue(found==a31);
 
 		// add top right
-		found = PredictChessPoints.next(a15,a24,false);
+		found = ApproximateChessPoints.next(a15, a24, false);
 		assertTrue(found==a35);
-		found = PredictChessPoints.next(a15,a24,true);
+		found = ApproximateChessPoints.next(a15, a24, true);
 		assertTrue(found==a13);
 
 	}

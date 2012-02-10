@@ -50,7 +50,7 @@ public class DebugSquaresSubpixelApp
 	int targetRows = 3;
 
 	// detects the calibration target
-	DetectSpacedSquareGrid detectAlg = new DetectSpacedSquareGrid(500,targetColumns,targetRows);
+	DetectSquareCalibrationPoints detectAlg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
 	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(255,20);
 
 	// refines the initial corner estimate

@@ -25,32 +25,31 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
 /**
- * Adds radial distortion to a distortion free image
+ * Adds radial distortion to a distortion free pixel coordinates
  *
  * @author Peter Abeles
  */
 public class ApplyRadialTransform extends PixelTransform_F32 {
 
-	double a,b,c;
-	float x_c,y_c;
+	// principle point / image center
+	private float x_c,y_c;
 	// radial distortion
-	float kappa[];
+	private float kappa[];
 
-	DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
-	
-	Point2D_F32 temp0 = new Point2D_F32();
-	Point2D_F32 temp1 = new Point2D_F32();
+	private DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
+	private Point2D_F32 temp0 = new Point2D_F32();
+	private Point2D_F32 temp1 = new Point2D_F32();
+
+	public ApplyRadialTransform(double fx, double fy, double skew, double x_c, double y_c, double[] kappa) {
+		set(fx,fy,skew,x_c,y_c,kappa);
+	}
+
+	public ApplyRadialTransform() {
+	}
 
 	/**
 	 * Specify camera calibration parameters
-	 *
-	 * @param fx
-	 * @param fy
-	 * @param skew
-	 * @param x_c
-	 * @param y_c
-	 * @param kappa
 	 */
 	public void set(double fx, double fy, double skew, double x_c, double y_c, double[] kappa) {
 
@@ -63,10 +62,6 @@ public class ApplyRadialTransform extends PixelTransform_F32 {
 
 		CommonOps.invert(K_inv);
 
-		this.a = fx;
-		this.b = fy;
-		this.c = skew;
-		
 		this.x_c = (float)x_c;
 		this.y_c = (float)y_c;
 
@@ -79,7 +74,6 @@ public class ApplyRadialTransform extends PixelTransform_F32 {
 	@Override
 	public void compute(int x, int y) {
 		float sum = 0;
-
 
 		temp0.x = x;
 		temp0.y = y;
