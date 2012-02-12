@@ -416,21 +416,30 @@ public class ConvertRaster {
 	 * @param dst Output image.
 	 */
 	public static void bufferedToMulti_U8(BufferedImage src, MultiSpectral<ImageUInt8> dst) {
+		
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
-		byte[] band1 = dst.getBand(0).data;
-		byte[] band2 = dst.getBand(1).data;
-		byte[] band3 = dst.getBand(2).data;
+		if( dst.getNumBands() == 3 ) {
+			byte[] band1 = dst.getBand(0).data;
+			byte[] band2 = dst.getBand(1).data;
+			byte[] band3 = dst.getBand(2).data;
 
-		for (int y = 0; y < height; y++) {
-			int index = dst.startIndex + y*dst.stride;
-			for (int x = 0; x < width; x++ , index++ ) {
-				int argb = src.getRGB(x, y);
+			for (int y = 0; y < height; y++) {
+				int index = dst.startIndex + y*dst.stride;
+				for (int x = 0; x < width; x++ , index++ ) {
+					int argb = src.getRGB(x, y);
 
-				band1[index] = (byte)(argb >>> 16);
-				band2[index] = (byte)(argb >>> 8);
-				band3[index] = (byte)argb;
+					band1[index] = (byte)(argb >>> 16);
+					band2[index] = (byte)(argb >>> 8);
+					band3[index] = (byte)argb;
+				}
+			}
+		} else {
+			ConvertRaster.bufferedToGray(src,dst.getBand(0));
+			ImageUInt8 band1 = dst.getBand(0);
+			for( int i = 1; i < dst.getNumBands(); i++ ) {
+				dst.getBand(i).setTo(band1);
 			}
 		}
 	}
@@ -451,18 +460,26 @@ public class ConvertRaster {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
-		float[] band1 = dst.getBand(0).data;
-		float[] band2 = dst.getBand(1).data;
-		float[] band3 = dst.getBand(2).data;
+		if( dst.getNumBands() == 3 ) {
+			final float[] band1 = dst.getBand(0).data;
+			final float[] band2 = dst.getBand(1).data;
+			final float[] band3 = dst.getBand(2).data;
 
-		for (int y = 0; y < height; y++) {
-			int index = dst.startIndex + y*dst.stride;
-			for (int x = 0; x < width; x++ , index++ ) {
-				int argb = src.getRGB(x, y);
+			for (int y = 0; y < height; y++) {
+				int index = dst.startIndex + y*dst.stride;
+				for (int x = 0; x < width; x++ , index++ ) {
+					int argb = src.getRGB(x, y);
 
-				band1[index] = (argb >>> 16) & 0xFF;
-				band2[index] = (argb >>> 8) & 0xFF;
-				band3[index] = argb & 0xFF;
+					band1[index] = (argb >>> 16) & 0xFF;
+					band2[index] = (argb >>> 8) & 0xFF;
+					band3[index] = argb & 0xFF;
+				}
+			}
+		} else {
+			ConvertRaster.bufferedToGray(src,dst.getBand(0));
+			ImageFloat32 band1 = dst.getBand(0);
+			for( int i = 1; i < dst.getNumBands(); i++ ) {
+				dst.getBand(i).setTo(band1);
 			}
 		}
 	}

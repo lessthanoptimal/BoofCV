@@ -28,7 +28,7 @@ import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import pja.util.Shuffle;
+import pja.util.Combinations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +70,7 @@ public class DetectSquareCalibrationPoints {
 	private int gridRows;
 
 	// maximum number of possible targets it will consider
-	private int maxShuffle;
+	private int maxCombinations;
 	
 	// Explaining why it failed
 	private String errorMessage;
@@ -80,15 +80,15 @@ public class DetectSquareCalibrationPoints {
 
 	/**
 	 *
-	 * @param maxShuffle Maximum number of combinations of squares it will try when looking for a target. Try 500.
+	 * @param maxCombinations Maximum number of combinations of squares it will try when looking for a target. Try 500.
 	 * @param gridCols Number of squares wide the grid is. Target dependent.
 	 * @param gridRows Number of squares tall the grid is. Target dependent.
 	 */
-	public DetectSquareCalibrationPoints(int maxShuffle,
+	public DetectSquareCalibrationPoints(int maxCombinations,
 										 int gridCols, int gridRows) {
 		this.gridCols = gridCols;
 		this.gridRows = gridRows;
-		this.maxShuffle = maxShuffle;
+		this.maxCombinations = maxCombinations;
 
 		detectBlobs = new DetectQuadBlobsBinary(20*4,0.25,gridCols*gridRows);
 	}
@@ -121,7 +121,8 @@ public class DetectSquareCalibrationPoints {
 
 		// Remove all but the largest islands in the graph to reduce the number of combinations
 		List<QuadBlob> squaresPruned = ConnectGridSquares.pruneSmallIslands(squares);
-
+		System.out.println("Found "+squaresPruned.size()+" blobs");
+		
 		// given all the blobs, only consider N at one time until a valid target is found
 		return shuffleToFindTarget(squaresPruned);
 	}
@@ -134,11 +135,11 @@ public class DetectSquareCalibrationPoints {
 	private boolean shuffleToFindTarget( List<QuadBlob> squares ) {
 		
 		int N = gridCols * gridRows;
-		Shuffle<QuadBlob> shuffle = new Shuffle<QuadBlob>(squares,N);
+		Combinations<QuadBlob> combinations = new Combinations<QuadBlob>(squares,N);
 
-//		System.out.println("------------------------------------"+squares.size()+"  N "+N);
-//		System.out.println("Total Shuffles: "+shuffle.numShuffles());
-		if( shuffle.numShuffles() > maxShuffle ) {
+		System.out.println("------------------------------------"+squares.size()+"  N "+N);
+		System.out.println("Total Shuffles: "+combinations.numShuffles());
+		if( combinations.numShuffles() > maxCombinations) {
 			return fail("Not enough blobs detected");
 		}
 
@@ -147,7 +148,8 @@ public class DetectSquareCalibrationPoints {
 		int num = 0;
 		boolean success = false;
 		while( true ) {
-			shuffle.getList(list);
+			System.out.println("Next combination "+num++);
+			combinations.getList(list);
 
 			// assumes that all the items in the list are part of a target
 			// see if it fails internal sanity checks
@@ -166,8 +168,8 @@ public class DetectSquareCalibrationPoints {
 			}
 
 			try {
-				shuffle.shuffle();
-			} catch (Shuffle.ExhaustedException e) {
+				combinations.shuffle();
+			} catch (Combinations.ExhaustedException e) {
 				break;
 			}
 		}

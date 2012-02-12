@@ -37,8 +37,8 @@ import java.util.Random;
  */
 public class GenericCalibrationGrid {
 
-	public static CalibrationGridConfig createStandardConfig() {
-		return new CalibrationGridConfig(5,6,30);
+	public static PlanarCalibrationTarget createStandardConfig() {
+		return FactoryPlanarCalibrationTarget.gridSquare(4,5,30,30);
 	}
 
 	public static DenseMatrix64F createStandardCalibration() {
@@ -60,11 +60,11 @@ public class GenericCalibrationGrid {
 		return K;
 	}
 
-	public static List<Point3D_F64> gridPoints3D( CalibrationGridConfig config )
+	public static List<Point3D_F64> gridPoints3D( PlanarCalibrationTarget config )
 	{
 		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
 
-		List<Point2D_F64> obs2D = config.computeGridPoints();
+		List<Point2D_F64> obs2D = config.points;
 
 		for( Point2D_F64 p2 : obs2D ) {
 			ret.add(new Point3D_F64(p2.x,p2.y,0));
@@ -73,11 +73,11 @@ public class GenericCalibrationGrid {
 		return ret;
 	}
 
-	public static List<Point2D_F64> observations( Se3_F64 motion , CalibrationGridConfig config )
+	public static List<Point2D_F64> observations( Se3_F64 motion , PlanarCalibrationTarget config )
 	{
 		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
 
-		List<Point2D_F64> obs2D = config.computeGridPoints();
+		List<Point2D_F64> obs2D = config.points;
 
 		for( Point2D_F64 p2 : obs2D ) {
 			Point3D_F64 p3 = new Point3D_F64(p2.x,p2.y,0);
@@ -90,11 +90,11 @@ public class GenericCalibrationGrid {
 		return ret;
 	}
 
-	public static List<Point2D_F64> observations( DenseMatrix64F H, CalibrationGridConfig config )
+	public static List<Point2D_F64> observations( DenseMatrix64F H, PlanarCalibrationTarget config )
 	{
 		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
 
-		List<Point2D_F64> obs2D = config.computeGridPoints();
+		List<Point2D_F64> obs2D = config.points;
 
 		for( Point2D_F64 p2 : obs2D ) {
 			Point2D_F64 t = new Point2D_F64();

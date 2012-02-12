@@ -46,7 +46,7 @@ public class TestRadialDistortionEstimateLinear {
 		DenseMatrix64F K = GenericCalibrationGrid.createStandardCalibration();
 		List<DenseMatrix64F> homographies = GenericCalibrationGrid.createHomographies(K, 2, rand);
 
-		CalibrationGridConfig config = GenericCalibrationGrid.createStandardConfig();
+		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
 
 		List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
 

@@ -41,18 +41,18 @@ public class CalibrationPlanarGridZhang98 {
 
 	ParametersZhang98 optimized;
 
-	List<Point2D_F64> grid;
+	PlanarCalibrationTarget target;
 
 	boolean assumeZeroSkew;
 
-	public CalibrationPlanarGridZhang98( CalibrationGridConfig config ,
+	public CalibrationPlanarGridZhang98( PlanarCalibrationTarget target ,
 										 boolean assumeZeroSkew ,
 										 int numRadialParam )
 	{
-		computeHomography = new Zhang98ComputeTargetHomography(config);
+		computeHomography = new Zhang98ComputeTargetHomography(target);
 		computeK = new Zhang98CalibrationMatrixFromHomographies(assumeZeroSkew);
-		computeRadial = new RadialDistortionEstimateLinear(config,numRadialParam);
-		grid = config.computeGridPoints();
+		computeRadial = new RadialDistortionEstimateLinear(target,numRadialParam);
+		this.target = target;
 		optimized = new ParametersZhang98(numRadialParam);
 		this.assumeZeroSkew = assumeZeroSkew;
 	}
@@ -71,7 +71,7 @@ public class CalibrationPlanarGridZhang98 {
 			return false;
 
 		// perform non-linear optimization to improve results
-		if( !optimizedParam(observations,grid,assumeZeroSkew,initial,optimized))
+		if( !optimizedParam(observations,target.points,assumeZeroSkew,initial,optimized))
 			return false;
 
 		return true;

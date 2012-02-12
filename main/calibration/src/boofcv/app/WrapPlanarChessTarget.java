@@ -19,7 +19,7 @@
 package boofcv.app;
 
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
-import boofcv.alg.geo.calibration.CalibrationGridConfig;
+import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
@@ -33,12 +33,8 @@ import java.util.List;
 public class WrapPlanarChessTarget implements PlanarCalibrationDetector {
 
 	DetectChessCalibrationPoints<ImageFloat32,ImageFloat32> alg;
-	
-	@Override
-	public void configure(CalibrationGridConfig config) {
-		int numColSquares = config.gridWidth/2+1;
-		int numRowSquares = config.gridHeight/2+1;
 
+	public WrapPlanarChessTarget( int numColSquares , int numRowSquares ) {
 		alg = new DetectChessCalibrationPoints<ImageFloat32, ImageFloat32>(numColSquares,numRowSquares,
 				5,20,255,ImageFloat32.class);
 	}

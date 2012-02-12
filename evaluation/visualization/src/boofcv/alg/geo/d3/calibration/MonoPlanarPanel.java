@@ -81,8 +81,8 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	double errorScale = 20;
 
-	MultiSpectral<ImageFloat32> origMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
-	MultiSpectral<ImageFloat32> correctedMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
+	MultiSpectral<ImageFloat32> origMS;
+	MultiSpectral<ImageFloat32> correctedMS;
 
 	ImageDistort<ImageFloat32> undoRadial;
 
@@ -164,11 +164,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	public void setResults(List<ImageResults> results) {
 		this.results = results;
-		ImageResults r = results.get(selectedImage);
-		String textMean = String.format("%5.1e",r.meanError);
-		String textMax = String.format("%5.1e",r.maxError);
-		meanError.setText(textMean);
-		maxError.setText(textMax);
+		updateResultsGUI();
 	}
 
 	public void setCalibration(ParametersZhang98 found) {
@@ -189,16 +185,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	{
 		this.undoRadial = undoRadial;
 		checkUndistorted.setEnabled(true);
-
-		BufferedImage image = images.get(selectedImage);
-		ConvertBufferedImage.convertFromMulti(image,origMS,ImageFloat32.class);
-		for( int i = 0; i < 3; i++ ) {
-			ImageFloat32 in = origMS.getBand(i);
-			ImageFloat32 out = correctedMS.getBand(i);
-
-			undoRadial.apply(in,out);
-		}
-		ConvertBufferedImage.convertTo(correctedMS,undistorted);
+		hasUndistorted = false;
 	}
 
 	@Override
@@ -228,29 +215,49 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	private void setSelected( int selected ) {
 		selectedImage = selected;
-		BufferedImage image = images.get(selected);
 		hasUndistorted = false;
-		
-		if( undistorted == null ||
-				undistorted.getWidth() != image.getWidth() || 
-				undistorted.getHeight() != image.getHeight() ) {
-			undistorted = new BufferedImage(image.getWidth(),image.getHeight(),image.getType());
-			origMS.reshape(undistorted.getWidth(),undistorted.getHeight());
-			correctedMS.reshape(undistorted.getWidth(),undistorted.getHeight());
+
+		BufferedImage image = images.get(selected);
+		int numBands = image.getRaster().getNumBands();
+
+		if( origMS == null ) {
+			origMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
+			correctedMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
+		}
+		if( image.getWidth() != origMS.getWidth() || image.getHeight() != origMS.getHeight() ) {
+			int type = numBands == 1 ? BufferedImage.TYPE_INT_BGR : image.getType();
+			undistorted = new BufferedImage(image.getWidth(),image.getHeight(),type);
+			origMS.reshape(image.getWidth(),image.getHeight());
+			correctedMS.reshape(image.getWidth(),image.getHeight());
 		}
 
+		if( results != null ) {
+			updateResultsGUI();
+		}
+	}
 
+	private void updateResultsGUI() {
+		ImageResults r = results.get(selectedImage);
+		String textMean = String.format("%5.1e",r.meanError);
+		String textMax = String.format("%5.1e",r.maxError);
+		meanError.setText(textMean);
+		maxError.setText(textMax);
 	}
 
 	private void undoRadialDistortion(BufferedImage image) {
 		ConvertBufferedImage.convertFromMulti(image, origMS, ImageFloat32.class);
-		for( int i = 0; i < 3; i++ ) {
+		for( int i = 0; i < origMS.getNumBands(); i++ ) {
 			ImageFloat32 in = origMS.getBand(i);
 			ImageFloat32 out = correctedMS.getBand(i);
 
 			undoRadial.apply(in,out);
 		}
-		ConvertBufferedImage.convertTo(correctedMS,undistorted);
+		if( correctedMS.getNumBands() == 3 )
+			ConvertBufferedImage.convertTo(correctedMS,undistorted);
+		else if( correctedMS.getNumBands() == 1 )
+			ConvertBufferedImage.convertTo(correctedMS.getBand(0),undistorted);
+		else
+			throw new RuntimeException("What kind of image has "+correctedMS.getNumBands()+"???");
 	}
 
 	private class MainView extends JPanel

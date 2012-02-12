@@ -310,9 +310,13 @@ public class ConvertBufferedImage {
 			}
 		} else if( type == ImageFloat32.class ) {
 			try {
-				if (src.getRaster() instanceof ByteInterleavedRaster &&
-						src.getType() != BufferedImage.TYPE_BYTE_GRAY ) {
-					ConvertRaster.bufferedToMulti_F32((ByteInterleavedRaster) src.getRaster(), (MultiSpectral<ImageFloat32>)dst);
+				if (src.getRaster() instanceof ByteInterleavedRaster ) {
+					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
+						for( int i = 0; i < dst.getNumBands(); i++ )
+							ConvertRaster.bufferedToGray(src,((MultiSpectral<ImageFloat32>)dst).getBand(i));
+					} else {
+						ConvertRaster.bufferedToMulti_F32((ByteInterleavedRaster) src.getRaster(), (MultiSpectral<ImageFloat32>)dst);
+					}
 				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 					ConvertRaster.bufferedToMulti_F32((IntegerInterleavedRaster) src.getRaster(), (MultiSpectral<ImageFloat32>)dst);
 				} else {

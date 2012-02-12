@@ -42,7 +42,7 @@ public class TestZhang98ComputeTargetHomography {
 	@Test
 	public void basicTest() {
 		// create a grid an apply an arbitrary transform to it
-		CalibrationGridConfig config = GenericCalibrationGrid.createStandardConfig();
+		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
 
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.02,-0.05,0.01,null);
 		Vector3D_F64 T = new Vector3D_F64(0,0,-1000);
@@ -58,7 +58,7 @@ public class TestZhang98ComputeTargetHomography {
 		DenseMatrix64F H = alg.getHomography();
 
 		// test this homography property: x2 = H*x1
-		List<Point2D_F64> gridPoints = config.computeGridPoints();
+		List<Point2D_F64> gridPoints = config.points;
 		for( int i = 0; i < observations.size(); i++ ) {
 			Point2D_F64 a = GeometryMath_F64.mult(H, gridPoints.get(i), new Point2D_F64());
 

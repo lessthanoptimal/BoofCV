@@ -25,7 +25,6 @@ import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -38,10 +37,8 @@ import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,10 +91,10 @@ public class ExampleFeatureSurf {
 	}
 
 	/**
-	 * Configured to exactly the same as the easy example, but require a lot more code and a more in depth understanding
-	 * of how SURF works and is configured.  SurfFeature are computed in this case.  They are essentially
-	 * TupleDesc_F64, but contain the Laplacian's sign which can be used to speed up association.   That is an example
-	 * of how uses less generalized interfaces can improve performance.
+	 * Configured exactly the same as the easy example above, but require a lot more code and a more in depth understanding
+	 * of how SURF works and is configured.  Instead of TupleDesc_F64, SurfFeature are computed in this case.  They are
+	 * almost the same as TupleDesc_F64, but contain the Laplacian's sign which can be used to speed up association.
+	 * That is an example of how using less generalized interfaces can improve performance.
 	 * 
 	 * @param image Input image type. DOES NOT NEED TO BE ImageFloat32, ImageUInt8 works too
 	 */
@@ -118,7 +115,7 @@ public class ExampleFeatureSurf {
 		
 		// compute the integral image of 'image'
 		II integral = GeneralizedImageOps.createSingleBand(integralType,image.width,image.height);
-	    GIntegralImageOps.transform(image, integral);
+		GIntegralImageOps.transform(image, integral);
 
 		// detect fast hessian features
 		detector.detect(integral);
@@ -157,5 +154,4 @@ public class ExampleFeatureSurf {
 		System.out.println("Done!");
 		
 	}
-
 }
