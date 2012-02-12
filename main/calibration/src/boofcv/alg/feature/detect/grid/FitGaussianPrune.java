@@ -86,7 +86,17 @@ public class FitGaussianPrune {
 	 * Compute the mean and standard deviation in terms of indexes
 	 */
 	private void updateStatistics() {
-		
+
+//		int max = 0;
+//		int total = 0;
+//		for( int i = indexLow; i < indexHigh; i++ ) {
+//			total += h.histogram[i];
+//			if( h.histogram[i] > max ) {
+//				max = h.histogram[i];
+//				mean = i;
+//			}
+//		}
+
 		int total = 0;
 		mean = 0;
 		for( int i = indexLow; i < indexHigh; i++ ) {
@@ -94,7 +104,7 @@ public class FitGaussianPrune {
 			mean += i*h.histogram[i];
 		}
 		mean /= total;
-		
+
 		sigma = 0;
 		for( int i = indexLow; i < indexHigh; i++ ) {
 			double dx = i-mean;

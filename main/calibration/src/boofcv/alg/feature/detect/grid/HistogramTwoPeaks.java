@@ -60,14 +60,15 @@ public class HistogramTwoPeaks {
 
 		int N = h.histogram.length;
 
+		// todo handel case where there are two adjacent but significant bins with the same value?
 		// check ends
 		if( h.histogram[0] > h.histogram[1] )
-			peaks.add( new Data(0,h.histogram[0]-h.histogram[1]));
+			peaks.add( new Data(0,h.histogram[0]));
 		if( h.histogram[N-1] > h.histogram[N-2])
-			peaks.add( new Data(N-1,h.histogram[N-1]-h.histogram[N-2]));
+			peaks.add( new Data(N-1,h.histogram[N-1]));
 		
 		// check middle
-		for( int i = 1; i < N-2; i++ ) {
+		for( int i = 1; i < N-1; i++ ) {
 			int response = 2*h.histogram[i] - h.histogram[i-1] - h.histogram[i+1];
 			if( response > 0 ) {
 				peaks.add(new Data(i,h.histogram[i]));
