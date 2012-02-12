@@ -161,11 +161,10 @@ public class RefineCornerSegmentFit {
 	 * the pixel intensities into two groups using the mid point between the two peaks.  statistics
 	 * are then computed from both those group after pruning.
 	 */
+	HistogramTwoPeaks peaks = new HistogramTwoPeaks(6);
 	private void computeStatistics(ImageFloat32 image) {
 
 		// Find the high and low peaks using a histogram
-		HistogramTwoPeaks peaks = new HistogramTwoPeaks(2);
-
 		histHighRes.reset();
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -179,7 +178,7 @@ public class RefineCornerSegmentFit {
 		peaks.computePeaks(histLowRes);
 
 		int indexThresh = (int)((peaks.peakLow+peaks.peakHigh)/2.0);
-
+		
 		low.process(histHighRes,0,indexThresh);
 		high.process(histHighRes,indexThresh,255);
 	}
@@ -228,8 +227,14 @@ public class RefineCornerSegmentFit {
 		// sanity check
 		if( highThresh <= lowThresh ) {
 			UtilImageIO.print(image);
-			return;
-//			throw new RuntimeException("Bad statistics");
+			for( int i = 0; i < histHighRes.histogram.length; i++ ) {
+				int c = histHighRes.histogram[i];
+				if( c != 0 ) {
+					System.out.println("["+i+"] = "+c);
+				}
+			}
+//			return;
+			throw new RuntimeException("Bad statistics");
 		}
 
 		// do a threshold in the middle first
