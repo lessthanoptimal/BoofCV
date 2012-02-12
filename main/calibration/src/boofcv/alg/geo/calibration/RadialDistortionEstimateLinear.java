@@ -79,8 +79,8 @@ public class RadialDistortionEstimateLinear {
 	 * @param gridDesc Description of calibration grid
 	 * @param numParam Number of radial distortion parameters. Two is a good number.
 	 */
-	public RadialDistortionEstimateLinear(CalibrationGridConfig gridDesc, int numParam) {
-		worldPoints = gridDesc.computeGridPoints();
+	public RadialDistortionEstimateLinear(PlanarCalibrationTarget gridDesc, int numParam) {
+		worldPoints = gridDesc.points;
 		X = new DenseMatrix64F(numParam,1);
 	}
 

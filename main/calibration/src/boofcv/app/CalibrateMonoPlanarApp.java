@@ -18,10 +18,7 @@
 
 package boofcv.app;
 
-import boofcv.alg.geo.calibration.CalibrationGridConfig;
-import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang98;
-import boofcv.alg.geo.calibration.ParametersZhang98;
-import boofcv.alg.geo.calibration.Zhang98OptimizationFunction;
+import boofcv.alg.geo.calibration.*;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -61,7 +58,7 @@ public class CalibrateMonoPlanarApp {
 	// computes calibration parameters
 	protected CalibrationPlanarGridZhang98 zhang98;
 	// calibration configuration
-	protected CalibrationGridConfig configGrid;
+	protected PlanarCalibrationTarget target;
 	protected boolean assumeZeroSkew;
 
 	// computed parameters
@@ -95,18 +92,17 @@ public class CalibrateMonoPlanarApp {
 	/**
 	 * Specify calibration assumptions.
 	 * 
-	 * @param config Describes the calibration grid.
+	 * @param target Describes the calibration target.
 	 * @param assumeZeroSkew If true zero skew is assumed.
 	 * @param numRadialParam Number of radial parameters
 	 */
-	public void configure( CalibrationGridConfig config ,
+	public void configure( PlanarCalibrationTarget target ,
 						   boolean assumeZeroSkew ,
 						   int numRadialParam )
 	{
 		this.assumeZeroSkew = assumeZeroSkew;
-		this.configGrid = config;
-		detector.configure(config);
-		zhang98 = new CalibrationPlanarGridZhang98(config,assumeZeroSkew,numRadialParam);
+		this.target = target;
+		zhang98 = new CalibrationPlanarGridZhang98(target,assumeZeroSkew,numRadialParam);
 	}
 
 	/**
@@ -200,7 +196,7 @@ public class CalibrateMonoPlanarApp {
 	 */
 	protected List<ImageResults> computeErrors( List<List<Point2D_F64>> observation , ParametersZhang98 param )
 	{
-		List<Point2D_F64> grid = configGrid.computeGridPoints();
+		List<Point2D_F64> grid = target.points;
 
 		Zhang98OptimizationFunction function =
 				new Zhang98OptimizationFunction(param,assumeZeroSkew,grid,observation);
@@ -290,14 +286,13 @@ public class CalibrateMonoPlanarApp {
 
 	public static void main( String args[] ) {
 //		PlanarCalibrationDetector detector = new WrapPlanarGridTarget();
-		PlanarCalibrationDetector detector = new WrapPlanarChessTarget();
+		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(8,8);
 
-//		CalibrationGridConfig config = new CalibrationGridConfig(8,6,30);
-		CalibrationGridConfig config = new CalibrationGridConfig(6,4,30);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 1, 7 / 18);
 
 		CalibrateMonoPlanarApp app = new CalibrateMonoPlanarApp(detector,false);
 
-		app.configure(config,false,2);
+		app.configure(target,false,2);
 
 //		app.loadImages("../data/evaluation/calibration/mono/Sony_DSC-HX5V");
 		app.loadImages("/home/pja/saved2/a");

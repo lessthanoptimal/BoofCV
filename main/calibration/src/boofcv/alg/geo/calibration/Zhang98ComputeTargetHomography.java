@@ -47,8 +47,8 @@ public class Zhang98ComputeTargetHomography {
 	// the z-axis is assumed to be zero
 	List<Point2D_F64> worldPoints;
 
-	public Zhang98ComputeTargetHomography(CalibrationGridConfig config) {
-		this.worldPoints = config.computeGridPoints();
+	public Zhang98ComputeTargetHomography(PlanarCalibrationTarget config) {
+		this.worldPoints = config.points;
 	}
 
 	/**

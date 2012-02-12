@@ -50,8 +50,8 @@ import java.util.List;
 public class DetectCalibrationSquaresApp
 		extends SelectImagePanel implements ProcessInput , GridCalibPanel.Listener
 {
-	int targetColumns = 4;
-	int targetRows = 3;
+	int targetColumns;
+	int targetRows;
 
 	// detects the calibration target
 	DetectSquareCalibrationPoints alg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
@@ -79,7 +79,10 @@ public class DetectCalibrationSquaresApp
 	// if a target was found or not
 	boolean foundTarget;
 
-	public DetectCalibrationSquaresApp() {
+	public DetectCalibrationSquaresApp( int numCols , int numRows ) {
+		this.targetColumns = numCols;
+		this.targetRows = numRows;
+
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
 		
@@ -290,11 +293,12 @@ public class DetectCalibrationSquaresApp
 
 	public static void main(String args[]) {
 
-		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp();
+		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp(4,3);
 
-		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V/";
+		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
 
 		ImageListManager manager = new ImageListManager();
+		manager.add("foo","../CalibIm1.jpg");
 		manager.add("View 01",prefix+"frame01.jpg");
 		manager.add("View 02",prefix+"frame02.jpg");
 		manager.add("View 03",prefix+"frame03.jpg");

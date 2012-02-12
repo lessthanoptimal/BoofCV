@@ -43,13 +43,13 @@ public class TestZhang98OptimizationFunction {
 	 */
 	@Test
 	public void computeResidualsPerfect() {
-		CalibrationGridConfig config = GenericCalibrationGrid.createStandardConfig();
+		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
 		ParametersZhang98 param = GenericCalibrationGrid.createStandardParam(false, 2, 3, rand);
 
 		double array[] = new double[ param.size() ];
 		param.convertToParam(false,array);
 		
-		List<Point2D_F64> gridPts = config.computeGridPoints();
+		List<Point2D_F64> gridPts = config.points;
 
 		List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
 

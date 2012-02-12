@@ -16,33 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.alg.geo.calibration;
 
-import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
 
 /**
- * Interface for extracting points from a planar calibration grid.
+ * Specifies location of points on a planar calibration target
  *
  * @author Peter Abeles
  */
-public interface PlanarCalibrationDetector {
+public class PlanarCalibrationTarget {
 
-	/**
-	 * Image processing for calibration target detection
-	 *
-	 * @param input Gray scale image containing calibration target
-	 * @return true if target was detected and false if not
-	 */
-	public boolean process( ImageFloat32 input );
+	public List<Point2D_F64> points;
 
-	/**
-	 * Returns the set of detected points.  Each time this function is invoked a new instance
-	 * of the list and points is returned.  No data reuse here.
-	 *
-	 * @return List of detected points in row major grid order.
-	 */
-	public List<Point2D_F64> getPoints();
+	public PlanarCalibrationTarget(List<Point2D_F64> points) {
+		this.points = points;
+	}
 }

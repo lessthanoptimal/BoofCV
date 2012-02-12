@@ -21,8 +21,9 @@ package boofcv.alg.geo.d3.calibration;
 import boofcv.alg.distort.ApplyRadialTransform;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.impl.DistortSupport;
-import boofcv.alg.geo.calibration.CalibrationGridConfig;
+import boofcv.alg.geo.calibration.FactoryPlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.ParametersZhang98;
+import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.app.CalibrateMonoPlanarApp;
 import boofcv.app.PlanarCalibrationDetector;
@@ -142,14 +143,13 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector = new WrapPlanarGridTarget();
+		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(8,8);
 //		PlanarCalibrationDetector detector = new WrapPlanarChessTarget();
 
-		CalibrationGridConfig config = new CalibrationGridConfig(8,6,30);
-//		CalibrationGridConfig config = new CalibrationGridConfig(6,4,30);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8,8,0.5,7.0/18.0);
 
 		CalibrateMonoPlanarApp calibrator = new CalibrateMonoPlanarApp(detector,true);
-		calibrator.configure(config,true,2);
+		calibrator.configure(target,true,2);
 		
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp(calibrator);
 		
@@ -161,7 +161,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 
 //		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess");
 //		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square");
-		app.process("/home/pja/saved/a");
+		app.process("../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang");
 
 	}
 }

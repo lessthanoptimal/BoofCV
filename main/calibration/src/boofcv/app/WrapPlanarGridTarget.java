@@ -21,7 +21,6 @@ package boofcv.app;
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.feature.detect.grid.*;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import boofcv.alg.geo.calibration.CalibrationGridConfig;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
@@ -45,22 +44,16 @@ public class WrapPlanarGridTarget implements PlanarCalibrationDetector {
 	// set of found points
 	List<Point2D_F64> ret;
 
-	public WrapPlanarGridTarget() {
+	public WrapPlanarGridTarget( int numSquareColumns , int numSquareRows ) {
 		refine = new WrapRefineCornerSegmentFit();
-	}
 
-	@Override
-	public void configure(CalibrationGridConfig config) {
-		
-		squareColumns = config.gridWidth/2;
-		int squareRows = config.gridHeight/2;
+		this.squareColumns = numSquareColumns;
 
 		pointColumns = squareColumns*2;
-		pointRows = squareRows*2;
+		pointRows = numSquareRows*2;
 
-		detect = new DetectSquareCalibrationPoints(500, squareColumns,squareRows);
+		detect = new DetectSquareCalibrationPoints(500, squareColumns,numSquareRows);
 		autoThreshold = new AutoThresholdCalibrationGrid(255,30);
-
 	}
 
 	@Override

@@ -41,8 +41,8 @@ public class TestCalibrationPlanarGridZhang98 {
 	 */
 	@Test
 	public void fullTest() {
-		CalibrationGridConfig config = GenericCalibrationGrid.createStandardConfig();
-		List<Point2D_F64> grid = config.computeGridPoints();
+		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
+		List<Point2D_F64> grid = config.points;
 		ParametersZhang98 expected = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(expected,grid);
@@ -61,8 +61,8 @@ public class TestCalibrationPlanarGridZhang98 {
 	 */
 	@Test
 	public void initialParam() {
-		CalibrationGridConfig config = GenericCalibrationGrid.createStandardConfig();
-		List<Point2D_F64> grid = config.computeGridPoints();
+		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
+		List<Point2D_F64> grid = config.points;
 		ParametersZhang98 initial = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
@@ -80,8 +80,8 @@ public class TestCalibrationPlanarGridZhang98 {
 	@Test
 	public void optimizedParam_perfect() {
 
-		CalibrationGridConfig config = GenericCalibrationGrid.createStandardConfig();
-		List<Point2D_F64> grid = config.computeGridPoints();
+		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
+		List<Point2D_F64> grid = config.points;
 		ParametersZhang98 initial = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
 		ParametersZhang98 found = new ParametersZhang98(2,3);
 
@@ -98,8 +98,8 @@ public class TestCalibrationPlanarGridZhang98 {
 	@Test
 	public void optimizedParam_noisy() {
 
-		CalibrationGridConfig config = GenericCalibrationGrid.createStandardConfig();
-		List<Point2D_F64> grid = config.computeGridPoints();
+		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
+		List<Point2D_F64> grid = config.points;
 		ParametersZhang98 initial = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
 		ParametersZhang98 expected = initial.copy();
 		ParametersZhang98 found = new ParametersZhang98(2,3);
@@ -169,7 +169,7 @@ public class TestCalibrationPlanarGridZhang98 {
 	private static class Helper extends CalibrationPlanarGridZhang98
 	{
 
-		public Helper(CalibrationGridConfig config, boolean assumeZeroSkew, int numSkewParam) {
+		public Helper(PlanarCalibrationTarget config, boolean assumeZeroSkew, int numSkewParam) {
 			super(config, assumeZeroSkew, numSkewParam);
 		}
 
