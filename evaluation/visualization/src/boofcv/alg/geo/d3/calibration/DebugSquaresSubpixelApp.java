@@ -46,11 +46,11 @@ public class DebugSquaresSubpixelApp
 		extends SelectImagePanel implements ProcessInput , SubpixelCalibControlPanel.Listener
 {
 	// target size
-	int targetColumns = 4;
-	int targetRows = 3;
+	int targetColumns;
+	int targetRows;
 
 	// detects the calibration target
-	DetectSquareCalibrationPoints detectAlg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
+	DetectSquareCalibrationPoints detectAlg;
 	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(255,20);
 
 	// refines the initial corner estimate
@@ -67,7 +67,11 @@ public class DebugSquaresSubpixelApp
 	// has an image been processed
 	boolean processedImage = false;
 
-	public DebugSquaresSubpixelApp() {
+	public DebugSquaresSubpixelApp( int numSquaresCol , int numSquaresRow ) {
+		this.targetColumns = numSquaresCol;
+		this.targetRows = numSquaresRow;
+
+		detectAlg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
 
 //		refineAlg = new WrapCornerIntensity<T,ImageSingleBand>(1,imageType);
 		refineAlg = new WrapRefineCornerSegmentFit();
@@ -175,11 +179,13 @@ public class DebugSquaresSubpixelApp
 
 	public static void main(String args[]) {
 
-		DebugSquaresSubpixelApp app = new DebugSquaresSubpixelApp();
+		DebugSquaresSubpixelApp app = new DebugSquaresSubpixelApp(1,1);
 
-		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V/";
-
+//		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V/";
+		String prefix = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang/";
+		
 		ImageListManager manager = new ImageListManager();
+		manager.add("adsasd",prefix+"trash1.gif");
 		manager.add("View 01",prefix+"frame01.jpg");
 		manager.add("View 02",prefix+"frame02.jpg");
 		manager.add("View 03",prefix+"frame03.jpg");

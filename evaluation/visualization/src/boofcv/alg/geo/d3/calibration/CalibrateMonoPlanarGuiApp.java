@@ -144,9 +144,11 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 
 	public static void main( String args[] ) {
 		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(8,8);
+//		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(3,4);
 //		PlanarCalibrationDetector detector = new WrapPlanarChessTarget();
 
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8,8,0.5,7.0/18.0);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
 
 		CalibrateMonoPlanarApp calibrator = new CalibrateMonoPlanarApp(detector,true);
 		calibrator.configure(target,true,2);
