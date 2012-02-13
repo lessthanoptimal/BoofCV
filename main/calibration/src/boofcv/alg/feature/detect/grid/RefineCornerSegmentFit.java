@@ -181,6 +181,9 @@ public class RefineCornerSegmentFit {
 		
 		low.process(histHighRes,0,indexThresh);
 		high.process(histHighRes,indexThresh,255);
+		
+		System.out.printf("peaks: %6.2f %6.2f -  mean %6.2f  %6.2f   %5.2f  %5.2f\n"
+				,peaks.peakLow,peaks.peakHigh,low.getMean(),high.getMean(),low.getSigma(),high.getSigma());
 	}
 
 	/**
@@ -247,6 +250,10 @@ public class RefineCornerSegmentFit {
 		GThresholdImageOps.threshold(image, binaryHigh,highThresh,true);
 		removeBinaryNoise(binaryHigh);
 
+		UtilImageIO.print(image);
+		UtilImageIO.print(binaryHigh);
+		System.out.println("--------------------");
+		
 		// find the region outside of 'binaryMiddle' in 'binaryHigh' and include
 		// the edges in 'binaryMiddle'
 		BinaryImageOps.logicXor(binaryMiddle, binaryHigh, binaryHigh);

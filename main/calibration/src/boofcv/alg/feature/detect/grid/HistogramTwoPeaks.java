@@ -60,8 +60,6 @@ public class HistogramTwoPeaks {
 
 		int N = h.histogram.length;
 
-		// todo handel case where there are two adjacent but significant bins with the same value?
-		// check ends
 		if( h.histogram[0] > h.histogram[1] )
 			peaks.add( new Data(0,h.histogram[0]));
 		if( h.histogram[N-1] > h.histogram[N-2])
@@ -72,6 +70,30 @@ public class HistogramTwoPeaks {
 			int response = 2*h.histogram[i] - h.histogram[i-1] - h.histogram[i+1];
 			if( response > 0 ) {
 				peaks.add(new Data(i,h.histogram[i]));
+			}
+		}
+		
+		// handle situations where the "peak" has same value in a row
+		for( int i = 1; i < N; i++ ) {
+			if( h.histogram[i] == h.histogram[i-1] ) {
+				boolean allGood = true;
+				if( i > 1 ) {
+					allGood = h.histogram[i] >= h.histogram[i-2];
+				}
+				
+				if( allGood ) {
+					for( int j = i+1; j < N; j++ ) {
+						if( h.histogram[i] < h.histogram[j] ) {
+							allGood = false;
+							break;
+						} else if( h.histogram[i] > h.histogram[j] ) {
+							break;
+						}
+					}
+				}
+				if( allGood ) {
+					peaks.add(new Data(i,h.histogram[i]));
+				}
 			}
 		}
 		
