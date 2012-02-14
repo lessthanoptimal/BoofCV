@@ -22,6 +22,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.ImageGenerator;
+import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.inst.FactoryImageGenerator;
@@ -58,7 +59,7 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 		this.imageType = imageType;
 		interp = FactoryInterpolation.nearestNeighborPixel(imageType);
 		generator = FactoryImageGenerator.create((Class<T>)imageType);
-		border = FactoryImageBorder.value(imageType,5);
+		border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 	}
 
 	public abstract ImageDistort<T> createDistort(PixelTransform_F32 dstToSrc, InterpolatePixel<T> interp, ImageBorder border );
@@ -66,10 +67,17 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 
 	@Test
 	public void testDefaultValue() {
+		testDefaultValue(true);
+		testDefaultValue(false);
+	}
+
+	public void testDefaultValue( boolean withBorder ) {
 		T src = generator.createInstance(width,height);
 		T dst = generator.createInstance(width,height);
 
 		GeneralizedImageOps.randomize(src, rand, 0,10);
+
+		ImageBorder border = withBorder ? this.border : null;
 
 		ImageDistort<T> tran = createDistort(new BasicTransform(),interp,border);
 		tran.apply(src,dst);
@@ -84,8 +92,9 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 				if( src.isInBounds(srcX,srcY) ) {
 					double srcVal = GeneralizedImageOps.get(src,srcX,srcY);
 					assertEquals(srcVal,dstVal,1e-4);
-				} else {
-					assertEquals(5,dstVal,1e-4);
+				} else if( withBorder ) {
+					double expected = border.getGeneral(srcX,srcY);
+					assertEquals(expected,dstVal,1e-4);
 				}
 			}
 		}
@@ -93,6 +102,11 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 	
 	@Test
 	public void testCrop() {
+		testCrop(true);
+		testCrop(false);
+	}
+
+	public void testCrop( boolean withBorder ) {
 		// the crop region
 		int x0=12,y0=10,x1=17,y1=18;
 
@@ -100,6 +114,8 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 		T dst = generator.createInstance(width,height);
 
 		GeneralizedImageOps.randomize(src, rand, 0,10);
+
+		ImageBorder border = withBorder ? this.border : null;
 
 		ImageDistort<T> tran = createDistort(new BasicTransform(),interp,border);
 		tran.apply(src,dst,x0,y0,x1,y1);
@@ -118,13 +134,59 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 					if( src.isInBounds(srcX,srcY) ) {
 						double srcVal = GeneralizedImageOps.get(src,srcX,srcY);
 						assertEquals(srcVal,dstVal,1e-4);
-					} else {
-						assertEquals(5,dstVal,1e-4);
+					} else if( withBorder ) {
+						double expected = border.getGeneral(srcX,srcY);
+						assertEquals(expected,dstVal,1e-4);
 					}
 				}
 			}
 		}
+	}
 
+	/**
+	 * Request a pixel outside the image border
+	 */
+	@Test
+	public void testOutsideCrop() {
+		testOutsideCrop(true);
+		testOutsideCrop(false);
+	}
+
+	public void testOutsideCrop( boolean withBorder ) {
+		// the crop region
+		int x0=12,y0=10,x1=width,y1=height;
+
+		T src = generator.createInstance(width,height);
+		T dst = generator.createInstance(width,height);
+
+		GeneralizedImageOps.randomize(src, rand, 0,10);
+
+		ImageBorder border = withBorder ? this.border : null;
+
+		ImageDistort<T> tran = createDistort(new BasicTransform(),interp,border);
+		tran.apply(src,dst,x0,y0,x1,y1);
+
+		for( int dstY = 0; dstY < height; dstY++ ) {
+			for( int dstX = 0; dstX < width; dstX++ ) {
+				// should be zero outside of the crop region
+				if( dstX < x0 || dstX >= x1 || dstY < y0 || dstY >= y1 )
+					assertEquals(0,GeneralizedImageOps.get(dst,dstX,dstY),1e-4);
+				else {
+					int srcX = dstX + offX;
+					int srcY = dstY + offY;
+
+					double dstVal = GeneralizedImageOps.get(dst,dstX,dstY);
+
+					if( src.isInBounds(srcX,srcY) ) {
+						double srcVal = GeneralizedImageOps.get(src,srcX,srcY);
+						assertEquals(srcVal,dstVal,1e-4);
+					} else if( withBorder ) {
+						double expected = border.getGeneral(srcX,srcY);
+						assertEquals(expected,dstVal,1e-4);
+					}
+				}
+			}
+		}
 	}
 
 	public class BasicTransform extends PixelTransform_F32 {

@@ -172,7 +172,7 @@ public class CalibrateMonoPlanarApp {
 		found = zhang98.getOptimized();
 
 		updateStatus(2,"Computing Errors");
-		errors = computeErrors(observations,found);
+		errors = computeErrors(observations,found,target.points,assumeZeroSkew);
 		printErrors(errors);
 
 		System.out.println("center x = "+found.x0);
@@ -194,10 +194,11 @@ public class CalibrateMonoPlanarApp {
 	 * @param param Found calibration parameters
 	 * @return List of error statistics
 	 */
-	protected List<ImageResults> computeErrors( List<List<Point2D_F64>> observation , ParametersZhang98 param )
+	public static List<ImageResults> computeErrors( List<List<Point2D_F64>> observation ,
+													ParametersZhang98 param ,
+													List<Point2D_F64> grid ,
+													boolean assumeZeroSkew)
 	{
-		List<Point2D_F64> grid = target.points;
-
 		Zhang98OptimizationFunction function =
 				new Zhang98OptimizationFunction(param,assumeZeroSkew,grid,observation);
 
@@ -245,7 +246,7 @@ public class CalibrateMonoPlanarApp {
 	/**
 	 * Prints out error information to standard out
 	 */
-	public void printErrors( List<ImageResults> results ) {
+	public static void printErrors( List<ImageResults> results ) {
 		double totalError = 0;
 		for( int i = 0; i < results.size(); i++ ) {
 			ImageResults r = results.get(i);

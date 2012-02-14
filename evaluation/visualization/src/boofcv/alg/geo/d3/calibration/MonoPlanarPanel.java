@@ -169,7 +169,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	public void setCalibration(ParametersZhang98 found) {
 		String textX = String.format("%5.1f",found.x0);
-		String textY = String.format("%5.1f",found.y0);
+		String textY = String.format("%5.1f", found.y0);
 		paramCenterX.setText(textX);
 		paramCenterY.setText(textY);
 
@@ -238,7 +238,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	private void updateResultsGUI() {
 		ImageResults r = results.get(selectedImage);
-		String textMean = String.format("%5.1e",r.meanError);
+		String textMean = String.format("%5.1e", r.meanError);
 		String textMax = String.format("%5.1e",r.maxError);
 		meanError.setText(textMean);
 		maxError.setText(textMax);
@@ -283,8 +283,15 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 				g2.drawImage(image,0,0,null);
 
 			if( showPoints ) {
+				g2.setColor(Color.BLACK);
+				g2.setStroke(new BasicStroke(3));
 				for( Point2D_F64 p : points ) {
-					VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,2,Color.RED);
+					VisualizeFeatures.drawCross(g2, (int) p.x, (int) p.y, 4);
+				}
+				g2.setStroke(new BasicStroke(1));
+				g2.setColor(Color.RED);
+				for( Point2D_F64 p : points ) {
+					VisualizeFeatures.drawCross(g2, (int) p.x, (int) p.y, 4);
 				}
 			}
 

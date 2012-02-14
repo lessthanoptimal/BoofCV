@@ -16,37 +16,38 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.alg.interpolate;
 
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * A wrapper around a normal image that returns a numeric value if a pixel is requested that is outside of the image
- * boundary.  The additional sanity checks can significantly slow down algorithms and should only be used when needed.
+ *  Performs nearest neighbor interpolation to extract values between pixels in an image.
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder<T extends ImageSingleBand> {
+public abstract class NearestNeighborPixel<T extends ImageSingleBand> implements InterpolatePixel<T> {
+	protected T orig;
+	protected int stride;
+	protected int width;
+	protected int height;
 
-	T image;
-
-	protected ImageBorder(T image) {
-		setImage(image);
-	}
-
-	protected ImageBorder() {
-	}
-
-	public void setImage( T image ) {
-		this.image = image;
-	}
-
+	@Override
 	public T getImage() {
-		return image;
+		return orig;
 	}
 
-	/**
-	 * Generalized non image type specific set.  This can be very slow
-	 */
-	public abstract double getGeneral( int x , int y );
+	@Override
+	public boolean isInSafeBounds(float x, float y) {
+		return( x >= 0 && y >= 0 && x < width && y < height );
+	}
+
+	@Override
+	public int getUnsafeBorderX() {
+		return 0;
+	}
+
+	@Override
+	public int getUnsafeBorderY() {
+		return 0;
+	}
 }

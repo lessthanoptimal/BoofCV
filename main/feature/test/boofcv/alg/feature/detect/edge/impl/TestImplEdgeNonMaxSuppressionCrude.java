@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.edge.impl;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -152,7 +152,7 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 		try {
 			m.invoke(null,input,derivX,derivY,output);
 
-			ImageBorder_F32 intensity = FactoryImageBorder.value(input, 0);
+			ImageBorder_F32 intensity = (ImageBorder_F32)FactoryImageBorderAlgs.value(input, 0);
 
 			for( int y = 0; y < input.height; y++ ) {
 				if( y != 0 && y != input.height-1 )

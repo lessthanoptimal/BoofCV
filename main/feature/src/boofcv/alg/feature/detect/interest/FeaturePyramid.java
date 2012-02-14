@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
-import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
@@ -178,9 +178,9 @@ public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand
 		int index2 = (spaceIndex + 2) % 3;
 
 		List<Point2D_I16> candidates = maximums[index1];
-		ImageBorder_F32 inten0 = FactoryImageBorder.value(intensities[index0],0);
+		ImageBorder_F32 inten0 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensities[index0], 0);
 		ImageFloat32 inten1 = intensities[index1];
-		ImageBorder_F32 inten2 = FactoryImageBorder.value(intensities[index2],0);
+		ImageBorder_F32 inten2 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensities[index2], 0);
 
 		float scale0 = (float)ss.scale[layerID-1];
 		float scale1 = (float)ss.scale[layerID];

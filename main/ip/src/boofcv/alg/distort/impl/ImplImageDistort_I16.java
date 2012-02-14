@@ -86,6 +86,13 @@ public class ImplImageDistort_I16<T extends ImageInt16> implements ImageDistort<
 
 	public void applyBorder( T srcImg , T dstImg ) {
 
+		border.setImage(srcImg);
+
+		final float minInterpX = interp.getUnsafeBorderX();
+		final float minInterpY = interp.getUnsafeBorderY();
+		final float maxInterpX = srcImg.getWidth()-interp.getUnsafeBorderX();
+		final float maxInterpY = srcImg.getHeight()-interp.getUnsafeBorderY();
+
 		final float widthF = srcImg.getWidth();
 		final float heightF = srcImg.getHeight();
 
@@ -97,10 +104,13 @@ public class ImplImageDistort_I16<T extends ImageInt16> implements ImageDistort<
 				final float sx = dstToSrc.distX;
 				final float sy = dstToSrc.distY;
 
-				if( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {
-					dstImg.data[indexDst] = (short)border.getOutside((int)sx,(int)sy);
+				if( sx < minInterpX || sx >= maxInterpX || sy < minInterpY || sy >= maxInterpY ) {
+					if( sx >= 0f && sx < widthF && sy >= 0f && sy < heightF )
+						dstImg.data[indexDst] = (short)interp.get(sx,sy);
+					else
+						dstImg.data[indexDst] = (short)border.getOutside((int)sx,(int)sy);
 				} else {
-					dstImg.data[indexDst] = (short)interp.get(sx,sy);
+					dstImg.data[indexDst] = (short)interp.get_unsafe(sx,sy);
 				}
 			}
 		}
@@ -108,6 +118,11 @@ public class ImplImageDistort_I16<T extends ImageInt16> implements ImageDistort<
 
 	public void applyNoBorder( T srcImg , T dstImg ) {
 
+		final float minInterpX = interp.getUnsafeBorderX();
+		final float minInterpY = interp.getUnsafeBorderY();
+		final float maxInterpX = srcImg.getWidth()-interp.getUnsafeBorderX();
+		final float maxInterpY = srcImg.getHeight()-interp.getUnsafeBorderY();
+
 		final float widthF = srcImg.getWidth();
 		final float heightF = srcImg.getHeight();
 
@@ -119,8 +134,11 @@ public class ImplImageDistort_I16<T extends ImageInt16> implements ImageDistort<
 				final float sx = dstToSrc.distX;
 				final float sy = dstToSrc.distY;
 
-				if( sx >= 0f && sx < widthF && sy >= 0f && sy < heightF ) {
-					dstImg.data[indexDst] = (short)interp.get(sx,sy);
+				if( sx < minInterpX || sx >= maxInterpX || sy < minInterpY || sy >= maxInterpY ) {
+					if( sx >= 0f && sx < widthF && sy >= 0f && sy < heightF )
+						dstImg.data[indexDst] = (short)interp.get(sx,sy);
+				} else {
+					dstImg.data[indexDst] = (short)interp.get_unsafe(sx,sy);
 				}
 			}
 		}

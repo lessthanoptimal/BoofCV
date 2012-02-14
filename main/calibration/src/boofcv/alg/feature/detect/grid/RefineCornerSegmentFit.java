@@ -182,8 +182,8 @@ public class RefineCornerSegmentFit {
 		low.process(histHighRes,0,indexThresh);
 		high.process(histHighRes,indexThresh,255);
 		
-		System.out.printf("peaks: %6.2f %6.2f -  mean %6.2f  %6.2f   %5.2f  %5.2f\n"
-				,peaks.peakLow,peaks.peakHigh,low.getMean(),high.getMean(),low.getSigma(),high.getSigma());
+//		System.out.printf("peaks: %6.2f %6.2f -  mean %6.2f  %6.2f   %5.2f  %5.2f\n"
+//				,peaks.peakLow,peaks.peakHigh,low.getMean(),high.getMean(),low.getSigma(),high.getSigma());
 	}
 
 	/**
@@ -241,7 +241,7 @@ public class RefineCornerSegmentFit {
 		}
 
 		// do a threshold in the middle first
-		double middleThresh = (lowThresh*0.1+highThresh*0.9); // seems to work better than the actual middle
+		double middleThresh = (lowThresh*0.5+highThresh*0.5);
 
 		// extract two regions at different threshold levels
 		GThresholdImageOps.threshold(image, binaryMiddle,middleThresh,true);
@@ -250,9 +250,9 @@ public class RefineCornerSegmentFit {
 		GThresholdImageOps.threshold(image, binaryHigh,highThresh,true);
 		removeBinaryNoise(binaryHigh);
 
-		UtilImageIO.print(image);
-		UtilImageIO.print(binaryHigh);
-		System.out.println("--------------------");
+//		UtilImageIO.print(image);
+//		UtilImageIO.print(binaryHigh);
+
 		
 		// find the region outside of 'binaryMiddle' in 'binaryHigh' and include
 		// the edges in 'binaryMiddle'
@@ -260,9 +260,13 @@ public class RefineCornerSegmentFit {
 		BinaryImageOps.edge4(binaryMiddle, binary);
 		BinaryImageOps.logicOr(binaryHigh,binary,binary);
 
+//		UtilImageIO.print(binary);
+//		System.out.println("--------------------");
+
 		// extract the points from the binary image and compute weights
 		// weight is a linear function of distance from black square value
 		points.reset();
+		double middle = (high.getMean()+low.getMean())/2;
 		double spread = high.getMean()-low.getMean();
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -270,12 +274,10 @@ public class RefineCornerSegmentFit {
 					PointInfo p = points.pop();
 					p.set(x,y);
 					double v = image.get(x,y);
-					p.weight = (high.getMean()-v)/spread;
-					if( p.weight <= 0.01 )
-						p.weight = 0.01;
-					else if( p.weight > 1 )
-						p.weight = 1;
-
+					// weight pixels more that are close to the middle value since only an
+					// edge point can have that value
+					p.weight = 1.0-Math.abs(middle-v)/middle;
+					p.weight = p.weight*p.weight;
 				}
 			}
 		}

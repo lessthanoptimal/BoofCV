@@ -48,6 +48,11 @@ public abstract class ImageBorder_F32 extends ImageBorder<ImageFloat32> {
 		return getOutside( x , y );
 	}
 
+	@Override
+	public double getGeneral(int x, int y) {
+		return get(x,y);
+	}
+
 	public abstract float getOutside( int x , int y );
 
 	public abstract void setOutside( int x , int y , float val );

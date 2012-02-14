@@ -21,7 +21,6 @@ package boofcv.alg.filter.derivative;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import boofcv.alg.filter.derivative.impl.HessianThree_Standard;
-import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -84,7 +83,7 @@ public class HessianThree {
 		if( border != null ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_I32, 2 , border );
 			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_I32, 2 , border );
-			ConvolveJustBorder_General.convolve(kernelCross_I32, FactoryImageBorder.extend(orig),derivXY,2);
+			ConvolveJustBorder_General.convolve(kernelCross_I32, border,derivXY,2);
 		}
 	}
 
@@ -106,7 +105,7 @@ public class HessianThree {
 		if( border != null ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_F32, 2 , border );
 			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_F32, 2 , border );
-			ConvolveJustBorder_General.convolve(kernelCross_F32, FactoryImageBorder.extend(orig),derivXY,2);
+			ConvolveJustBorder_General.convolve(kernelCross_F32,border,derivXY,2);
 		}
 	}
 }

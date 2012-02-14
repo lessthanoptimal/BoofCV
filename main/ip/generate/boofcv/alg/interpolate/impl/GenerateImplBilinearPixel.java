@@ -75,7 +75,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\tpublic "+className+"("+image.getImageName()+" orig) {\n" +
 				"\t\tsetImage(orig);\n" +
-				"\t}\n\n");
+				"\t}\n");
 
 	}
 

@@ -28,7 +28,7 @@ import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.image.ShowImages;
@@ -62,7 +62,7 @@ public class ExampleImageFilter {
 		BlurImageOps.gaussian(input,blurred,-1,blurRadius,null);
 
 		// Calculate image's derivative
-		GradientSobel.process(blurred, derivX, derivY, FactoryImageBorder.extend(input));
+		GradientSobel.process(blurred, derivX, derivY, FactoryImageBorderAlgs.extend(input));
 
 		// display the results
 		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX,null,-1);

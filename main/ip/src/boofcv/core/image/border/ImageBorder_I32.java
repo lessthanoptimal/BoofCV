@@ -25,9 +25,9 @@ import boofcv.struct.image.ImageInteger;
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_I32 extends ImageBorder<ImageInteger> {
+public abstract class ImageBorder_I32<T extends ImageInteger> extends ImageBorder<T> {
 
-	public ImageBorder_I32(ImageInteger<?> image) {
+	public ImageBorder_I32(T image) {
 		super(image);
 	}
 
@@ -48,6 +48,11 @@ public abstract class ImageBorder_I32 extends ImageBorder<ImageInteger> {
 			image.set(x,y,value);
 
 		setOutside( x , y , value);
+	}
+
+	@Override
+	public double getGeneral(int x, int y) {
+		return get(x,y);
 	}
 
 	public abstract void setOutside( int x , int y , int value );

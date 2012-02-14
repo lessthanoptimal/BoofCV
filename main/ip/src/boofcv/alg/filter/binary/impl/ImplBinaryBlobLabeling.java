@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -52,7 +52,7 @@ public class ImplBinaryBlobLabeling {
 	 * Simple but slower algorithm for quickLabel using an 8-connect rule.
 	 */
 	public static List<LabelNode> quickLabelBlobs8_Naive( ImageUInt8 input , ImageSInt32 _output ) {
-		ImageBorder_I32 output = FactoryImageBorder.value(_output,0);
+		ImageBorder_I32 output = (ImageBorder_I32)FactoryImageBorderAlgs.value(_output, 0);
 		List<LabelNode> labels = new ArrayList<LabelNode>();
 
 		// add the background node
@@ -102,7 +102,7 @@ public class ImplBinaryBlobLabeling {
 	 * Simple but slower algorithm for quickLabel using an 8-connect rule.
 	 */
 	public static List<LabelNode> quickLabelBlobs4_Naive( ImageUInt8 input , ImageSInt32 _output ) {
-		ImageBorder_I32 output = FactoryImageBorder.value(_output,0);
+		ImageBorder_I32 output = (ImageBorder_I32)FactoryImageBorderAlgs.value(_output, 0);
 		List<LabelNode> labels = new ArrayList<LabelNode>();
 
 		// add the background node
@@ -154,7 +154,7 @@ public class ImplBinaryBlobLabeling {
 	 * Faster algorithm for quickLabel using an 8-connect rule.
 	 */
 	public static List<LabelNode> quickLabelBlobs8( ImageUInt8 input , ImageSInt32 output ) {
-		ImageBorder_I32 outputSafe = FactoryImageBorder.value(output,0);
+		ImageBorder_I32 outputSafe = (ImageBorder_I32)FactoryImageBorderAlgs.value(output, 0);
 		List<LabelNode> labels = new ArrayList<LabelNode>();
 
 		// add the background node
@@ -230,7 +230,7 @@ public class ImplBinaryBlobLabeling {
 	 */
 	public static List<LabelNode> quickLabelBlobs4( ImageUInt8 input , ImageSInt32 output )
 	{
-		ImageBorder_I32 outputSafe = FactoryImageBorder.value(output,0);
+		ImageBorder_I32 outputSafe = (ImageBorder_I32)FactoryImageBorderAlgs.value(output, 0);
 		List<LabelNode> labels = new ArrayList<LabelNode>();
 		// add the background node
 		labels.add( new LabelNode(0));

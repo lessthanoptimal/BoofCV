@@ -50,5 +50,10 @@ public abstract class ImageBorder_I64 extends ImageBorder<ImageSInt64> {
 		setOutside( x , y , value);
 	}
 
+	@Override
+	public double getGeneral(int x, int y) {
+		return get(x,y);
+	}
+
 	public abstract void setOutside( int x , int y , long value );
 }

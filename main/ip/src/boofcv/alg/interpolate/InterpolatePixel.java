@@ -76,4 +76,18 @@ public interface InterpolatePixel<T extends ImageSingleBand> {
 	 */
 	public boolean isInSafeBounds( float x , float y );
 
+	/**
+	 * Border around the image that {@link #get_unsafe(float, float)} cannot be called.
+	 *
+	 * @return Border size in pixels
+	 */
+	public int getUnsafeBorderX();
+
+	/**
+	 * Border around the image that {@link #get_unsafe(float, float)} cannot be called.
+	 *
+	 * @return Border size in pixels
+	 */
+	public int getUnsafeBorderY();
+
 }

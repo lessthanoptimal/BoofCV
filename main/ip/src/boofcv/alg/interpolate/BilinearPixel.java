@@ -52,4 +52,14 @@ public abstract class BilinearPixel<T extends ImageSingleBand> implements Interp
 	public boolean isInSafeBounds(float x, float y) {
 		return !(x < 0 || y < 0 || x >= width || y >= height);
 	}
+
+	@Override
+	public int getUnsafeBorderX() {
+		return 0;
+	}
+
+	@Override
+	public int getUnsafeBorderY() {
+		return 0;
+	}
 }

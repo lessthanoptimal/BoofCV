@@ -24,14 +24,14 @@ import boofcv.struct.image.ImageInteger;
 /**
  * @author Peter Abeles
  */
-public class ImageBorder1D_I32 extends ImageBorder_I32 {
+public class ImageBorder1D_I32<T extends ImageInteger> extends ImageBorder_I32<T> {
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 
-	public ImageBorder1D_I32(Class<?> type ) {
+	public ImageBorder1D_I32(Class<BorderIndex1D> type ) {
 		try {
-			this.rowWrap = (BorderIndex1D)type.newInstance();
-			this.colWrap = (BorderIndex1D)type.newInstance();
+			this.rowWrap = type.newInstance();
+			this.colWrap = type.newInstance();
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
@@ -44,7 +44,7 @@ public class ImageBorder1D_I32 extends ImageBorder_I32 {
 		this.colWrap = colWrap;
 	}
 
-	public ImageBorder1D_I32(ImageInteger<?> image, BorderIndex1D rowWrap, BorderIndex1D colWrap) {
+	public ImageBorder1D_I32(T image, BorderIndex1D rowWrap, BorderIndex1D colWrap) {
 		super(image);
 		this.rowWrap = rowWrap;
 		this.colWrap = colWrap;
@@ -59,7 +59,7 @@ public class ImageBorder1D_I32 extends ImageBorder_I32 {
 	}
 
 	@Override
-	public void setImage( ImageInteger image ) {
+	public void setImage( T image ) {
 		super.setImage(image);
 		colWrap.setLength(image.width);
 		rowWrap.setLength(image.height);

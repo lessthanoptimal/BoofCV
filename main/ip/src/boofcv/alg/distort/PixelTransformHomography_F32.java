@@ -33,7 +33,6 @@ import georegression.transform.homo.HomographyPointOps;
 public class PixelTransformHomography_F32 extends PixelTransform_F32 {
 
 	Homography2D_F32 homo = new Homography2D_F32();
-	Point2D_F32 input = new Point2D_F32();
 	Point2D_F32 tran = new Point2D_F32();
 
 	public PixelTransformHomography_F32() {
@@ -64,9 +63,7 @@ public class PixelTransformHomography_F32 extends PixelTransform_F32 {
 
 	@Override
 	public void compute(int x, int y) {
-		input.x = x;
-		input.y = y;
-		HomographyPointOps.transform(homo, input, tran);
+		HomographyPointOps.transform(homo, x,y, tran);
 		distX = tran.x;
 		distY = tran.y;
 	}

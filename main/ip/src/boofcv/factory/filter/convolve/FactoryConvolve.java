@@ -54,7 +54,7 @@ public class FactoryConvolve {
 	{
 		outputType = BoofTesting.convertToGenericType(outputType);
 
-		Class<?> borderClassType = FactoryImageBorder.lookupBorderClassType(inputType);
+		Class<?> borderClassType = FactoryImageBorder.lookupBorderClassType((Class)inputType);
 		String direction = isHorizontal ? "horizontal" : "vertical";
 		Method m;
 		try {
@@ -107,7 +107,7 @@ public class FactoryConvolve {
 	{
 		outputType = BoofTesting.convertToGenericType(outputType);
 
-		Class<?> borderClassType = FactoryImageBorder.lookupBorderClassType(inputType);
+		Class<?> borderClassType = FactoryImageBorder.lookupBorderClassType((Class)inputType);
 		Method m;
 		try {
 			switch(borderType) {
