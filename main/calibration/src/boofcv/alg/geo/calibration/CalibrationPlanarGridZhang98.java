@@ -125,12 +125,13 @@ public class CalibrationPlanarGridZhang98 {
 		lm.setFunction(func,null);
 		lm.initialize(model);
 
-		if( !UtilOptimize.process(lm,200) ) {
+		if( !UtilOptimize.process(lm,50) ) {
 			return false;
 		}
 
 		double param[] = lm.getParameters();
 		found.setFromParam(assumeZeroSkew,param);
+
 		return true;
 	}
 

@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.NearestNeighborPixel;
 import boofcv.struct.image.ImageSInt16;
 
 
@@ -27,14 +27,9 @@ import boofcv.struct.image.ImageSInt16;
  *
  * @author Peter Abeles
  */
-public class NearestNeighborPixel_S16 implements InterpolatePixel<ImageSInt16> {
-
-	private ImageSInt16 orig;
+public class NearestNeighborPixel_S16 extends NearestNeighborPixel<ImageSInt16> {
 
 	private short data[];
-	private int stride;
-	private int width;
-	private int height;
 
 	public NearestNeighborPixel_S16() {
 	}
@@ -53,11 +48,6 @@ public class NearestNeighborPixel_S16 implements InterpolatePixel<ImageSInt16> {
 	}
 
 	@Override
-	public ImageSInt16 getImage() {
-		return orig;
-	}
-
-	@Override
 	public float get_unsafe(float x, float y) {
 		return data[ orig.startIndex + ((int)y)*stride + (int)x];
 	}
@@ -72,8 +62,4 @@ public class NearestNeighborPixel_S16 implements InterpolatePixel<ImageSInt16> {
 		return data[ orig.startIndex + yy*stride + xx];
 	}
 
-	@Override
-	public boolean isInSafeBounds(float x, float y) {
-		return( x >= 0 && y >= 0 && x < width && y < height );
-	}
 }

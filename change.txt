@@ -17,6 +17,14 @@ Version : Alpha 0.6
   * Inside of calibration module
 - Application for calibration from planar calibration targets
   * GUI and commandline 
+- ImageDistort
+  * Fixed bug where border.setImage() was not being called
+- ImageBorder
+  * Added generalized get(x,y) 
+- Refactored FactoryImageBorder into two factories
+- Fixed bug in several derivative operators where the passed in border was being
+  ignored and an extended border being used instead
+- Change ImplImageDistort* to use interpolate.get_unsafe() to speed it up by a large margin
  
 
 ---------------------------------------------

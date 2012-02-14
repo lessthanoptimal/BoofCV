@@ -146,6 +146,14 @@ public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixel<Imag
 		
 		return (x-r >= 0 && y-r >= 0 && x+r < image.width && y+r <image.height);
 	}
+	@Override
+	public int getUnsafeBorderX() {
+		return kernel.getRadius();
+	}
 
+	@Override
+	public int getUnsafeBorderY() {
+		return kernel.getRadius();
+	}
 
 }

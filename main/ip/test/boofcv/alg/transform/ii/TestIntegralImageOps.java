@@ -22,7 +22,7 @@ import boofcv.alg.filter.convolve.ConvolveWithBorder;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.ImageRectangle;
@@ -114,11 +114,11 @@ public class TestIntegralImageOps {
 
 		if( paramType[0] == ImageFloat32.class ) {
 			Kernel2D_F32 kernel = new Kernel2D_F32(3, new float[]{1,1,1,2,2,2,1,1,1});
-			ImageBorder_F32 border = FactoryImageBorder.value((ImageFloat32)input,0);
+			ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value((ImageFloat32) input, 0);
 			ConvolveWithBorder.convolve(kernel,(ImageFloat32)input,(ImageFloat32)expected,border);
 		} else {
 			Kernel2D_I32 kernel = new Kernel2D_I32(3, new int[]{1,1,1,2,2,2,1,1,1});
-			ImageBorder_I32 border = FactoryImageBorder.value((ImageInteger)input,0);
+			ImageBorder_I32 border = (ImageBorder_I32)FactoryImageBorderAlgs.value((ImageInteger) input, 0);
 			ConvolveWithBorder.convolve(kernel,(ImageUInt8)input,(ImageSInt32)expected,border);
 		}
 
@@ -156,11 +156,11 @@ public class TestIntegralImageOps {
 
 		if( paramType[0] == ImageFloat32.class ) {
 			Kernel2D_F32 kernel = new Kernel2D_F32(3, new float[]{1,1,1,2,2,2,1,1,1});
-			ImageBorder_F32 border = FactoryImageBorder.value((ImageFloat32)input,0);
+			ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value((ImageFloat32) input, 0);
 			ConvolveWithBorder.convolve(kernel,(ImageFloat32)input,(ImageFloat32)expected,border);
 		} else {
 			Kernel2D_I32 kernel = new Kernel2D_I32(3, new int[]{1,1,1,2,2,2,1,1,1});
-			ImageBorder_I32 border = FactoryImageBorder.value((ImageInteger)input,0);
+			ImageBorder_I32 border = (ImageBorder_I32)FactoryImageBorderAlgs.value((ImageInteger) input, 0);
 			ConvolveWithBorder.convolve(kernel,(ImageUInt8)input,(ImageSInt32)expected,border);
 		}
 

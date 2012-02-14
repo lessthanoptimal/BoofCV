@@ -191,7 +191,16 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\t\tfloat r = kernel.getRadius();\n" +
 				"\t\t\n" +
 				"\t\treturn (x-r >= 0 && y-r >= 0 && x+r < image.width && y+r <image.height);\n" +
-				"\t}\n\n");
+				"\t}\n"+
+				"\t@Override\n" +
+				"\tpublic int getUnsafeBorderX() {\n" +
+				"\t\treturn kernel.getRadius();\n" +
+				"\t}\n" +
+				"\n" +
+				"\t@Override\n" +
+				"\tpublic int getUnsafeBorderY() {\n" +
+				"\t\treturn kernel.getRadius();\n" +
+				"\t}\n");
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {

@@ -88,7 +88,7 @@ public class GradientSobel {
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(ImageUInt8 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_I32 border ) {
+	public static void process(ImageUInt8 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_I32<ImageUInt8> border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 
@@ -107,7 +107,7 @@ public class GradientSobel {
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(ImageSInt16 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_I32 border ) {
+	public static void process(ImageSInt16 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_I32<ImageSInt16> border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 

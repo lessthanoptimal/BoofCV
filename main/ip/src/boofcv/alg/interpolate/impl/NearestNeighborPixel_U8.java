@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.NearestNeighborPixel;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -27,14 +27,10 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class NearestNeighborPixel_U8 implements InterpolatePixel<ImageUInt8> {
+public class NearestNeighborPixel_U8 extends NearestNeighborPixel<ImageUInt8> {
 
-	private ImageUInt8 orig;
 
 	private byte data[];
-	private int stride;
-	private int width;
-	private int height;
 
 	public NearestNeighborPixel_U8() {
 	}
@@ -53,11 +49,6 @@ public class NearestNeighborPixel_U8 implements InterpolatePixel<ImageUInt8> {
 	}
 
 	@Override
-	public ImageUInt8 getImage() {
-		return orig;
-	}
-
-	@Override
 	public float get_unsafe(float x, float y) {
 		return data[ orig.startIndex + ((int)y)*stride + (int)x] & 0xFF;
 	}
@@ -70,10 +61,5 @@ public class NearestNeighborPixel_U8 implements InterpolatePixel<ImageUInt8> {
 			throw new IllegalArgumentException("Point is outside of the image");
 
 		return data[ orig.startIndex + yy*stride + xx] & 0xFF;
-	}
-
-	@Override
-	public boolean isInSafeBounds(float x, float y) {
-		return( x >= 0 && y >= 0 && x < width && y < height );
 	}
 }

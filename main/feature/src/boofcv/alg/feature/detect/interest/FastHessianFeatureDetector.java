@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
-import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
@@ -226,9 +226,9 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 		int index1 = (spaceIndex + 1) % 3;
 		int index2 = (spaceIndex + 2) % 3;
 
-		ImageBorder_F32 inten0 = FactoryImageBorder.value(intensity[index0],0);
+		ImageBorder_F32 inten0 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensity[index0], 0);
 		ImageFloat32 inten1 = intensity[index1];
-		ImageBorder_F32 inten2 = FactoryImageBorder.value(intensity[index2],0);
+		ImageBorder_F32 inten2 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensity[index2], 0);
 
 		// find local maximums in image 2D space.  Borders need to be ignored since
 		// false positives are found around them as an artifact of pixels outside being

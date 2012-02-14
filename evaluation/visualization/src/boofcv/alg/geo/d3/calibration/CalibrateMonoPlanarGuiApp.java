@@ -70,7 +70,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 		// Distortion algorithm for removing radial distortion
 		tran = new ApplyRadialTransform();
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
-		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class,0);
+		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class, 0);
 		dist = DistortSupport.createDistort(ImageFloat32.class,tran,interp,border);
 	}
 

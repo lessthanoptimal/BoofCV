@@ -27,67 +27,25 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryImageBorder {
 
-//	public static <T extends ImageSingleBand> ImageBorder<T> extend( T image ) {
-//		ImageBorder<T> ret = general(image.getClass(),BorderIndex1D_Extend.class);
-//		ret.setImage(image);
-//		return ret;
-//	}
-//
-//	public static <T extends ImageSingleBand> ImageBorder<T> reflect( T image ) {
-//		ImageBorder<T> ret = general(image.getClass(),BorderIndex1D_Reflect.class);
-//		ret.setImage(image);
-//		return ret;
-//	}
-//
-//	public static <T extends ImageSingleBand> ImageBorder<T> wrap( T image ) {
-//		ImageBorder<T> ret = general(image.getClass(),BorderIndex1D_Wrap.class);
-//		ret.setImage(image);
-//		return ret;
-//	}
-//
-//	public static ImageBorder extend( Class<?> imageType ) {
-//		if( imageType == ImageFloat32.class )
-//			return new ImageBorder1D_F32(BorderIndex1D_Extend.class);
-//		if( imageType == ImageFloat64.class )
-//			return new ImageBorder1D_F64(BorderIndex1D_Extend.class);
-//		else if( ImageInteger.class.isAssignableFrom(imageType) )
-//			return new ImageBorder1D_I32(BorderIndex1D_Extend.class);
-//		else if( imageType == ImageSInt64.class )
-//			return new ImageBorder1D_I64(BorderIndex1D_Extend.class);
-//		else
-//			throw new IllegalArgumentException("Unknown image type");
-//	}
-
 	public static <T extends ImageSingleBand> ImageBorder<T> general( T image , BorderType borderType ) {
 		ImageBorder<T> ret = general(image.getClass(),borderType);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static Class<?> lookupBorderClassType( Class<?> imageType ) {
-		if( imageType == ImageFloat32.class )
-			return ImageBorder1D_F32.class;
-		if( imageType == ImageFloat64.class )
-			return ImageBorder1D_F64.class;
+	public static Class<ImageBorder> lookupBorderClassType( Class<ImageSingleBand> imageType ) {
+		if( (Class)imageType == ImageFloat32.class )
+			return (Class)ImageBorder1D_F32.class;
+		if( (Class)imageType == ImageFloat64.class )
+			return (Class)ImageBorder1D_F64.class;
 		else if( ImageInteger.class.isAssignableFrom(imageType) )
-			return ImageBorder1D_I32.class;
-		else if( imageType == ImageSInt64.class )
-			return ImageBorder1D_I64.class;
+			return (Class)ImageBorder1D_I32.class;
+		else if( (Class)imageType == ImageSInt64.class )
+			return (Class)ImageBorder1D_I64.class;
 		else
 			throw new IllegalArgumentException("Unknown image type");
 	}
 
-	public static <T extends ImageSingleBand> ImageBorder<T> value( Class<?> imageType , double value ) {
-		if( imageType == ImageFloat32.class ) {
-			return (ImageBorder<T>)new ImageBorderValue.Value_F32((float)value);
-		} else if( imageType == ImageFloat64.class ) {
-			return (ImageBorder<T>)new ImageBorderValue.Value_F64(value);
-		} else if( ImageInteger.class.isAssignableFrom(imageType) ) {
-			return (ImageBorder<T>)new ImageBorderValue.Value_I((int)value);
-		} else {
-			throw new IllegalArgumentException("Unknown image type");
-		}
-	}
 	public static <T extends ImageSingleBand> ImageBorder<T> general( Class<?> imageType , BorderType borderType ) {
 
 		Class<?> borderClass;
@@ -120,94 +78,29 @@ public class FactoryImageBorder {
 		if( imageType == ImageFloat64.class )
 			return (ImageBorder<T>)new ImageBorder1D_F64(borderClass);
 		else if( ImageInteger.class.isAssignableFrom(imageType) )
-			return (ImageBorder<T>)new ImageBorder1D_I32(borderClass);
+			return (ImageBorder<T>)new ImageBorder1D_I32((Class)borderClass);
 		else if( imageType == ImageSInt64.class )
 			return (ImageBorder<T>)new ImageBorder1D_I64(borderClass);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 	}
 
-	public static ImageBorder1D_F64 general( ImageFloat64 image , BorderIndex1D type) {
-		ImageBorder1D_F64 ret = new ImageBorder1D_F64(type,type);
-		ret.setImage(image);
-		return ret;
+	public static ImageBorder value( ImageSingleBand image , double value ) {
+		Class borderType = lookupBorderClassType((Class)image.getClass());
+		ImageBorder border = value(borderType,value);
+		border.setImage(image);
+		return border;
 	}
 
-	public static ImageBorder1D_F64 extend( ImageFloat64 image ) {
-		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Extend.class);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder1D_F64 reflect( ImageFloat64 image ) {
-		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Reflect.class);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder1D_F64 wrap( ImageFloat64 image ) {
-		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Wrap.class);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder_F64 value( ImageFloat64 image , double value ) {
-		return ImageBorderValue.wrap(image,value);
-	}
-
-	public static ImageBorder1D_F32 general( ImageFloat32 image , BorderIndex1D type) {
-		ImageBorder1D_F32 ret = new ImageBorder1D_F32(type,type);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder1D_F32 extend( ImageFloat32 image ) {
-		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder1D_F32 reflect( ImageFloat32 image ) {
-		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Reflect.class);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder1D_F32 wrap( ImageFloat32 image ) {
-		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Wrap.class);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder_F32 value( ImageFloat32 image , float value ) {
-		return ImageBorderValue.wrap(image,value);
-	}
-
-	public static ImageBorder1D_I32 general( ImageInteger image , BorderIndex1D type ) {
-		ImageBorder1D_I32 ret = new ImageBorder1D_I32(type,type);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder1D_I32 extend( ImageInteger image ) {
-		ImageBorder1D_I32 ret = new ImageBorder1D_I32(BorderIndex1D_Extend.class);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder1D_I32 reflect( ImageInteger image ) {
-		ImageBorder1D_I32 ret = new ImageBorder1D_I32(BorderIndex1D_Reflect.class);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder1D_I32 wrap( ImageInteger image ) {
-		ImageBorder1D_I32 ret = new ImageBorder1D_I32(BorderIndex1D_Wrap.class);
-		ret.setImage(image);
-		return ret;
-	}
-
-	public static ImageBorder_I32 value( ImageInteger image , int value ) {
-		return ImageBorderValue.wrap(image,value);
+	public static <T extends ImageSingleBand> ImageBorder<T> value( Class<T> imageType , double value ) {
+		if( imageType == ImageFloat32.class ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_F32((float)value);
+		} else if( imageType == ImageFloat64.class ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_F64(value);
+		} else if( ImageInteger.class.isAssignableFrom(imageType) ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_I((int)value);
+		} else {
+			throw new IllegalArgumentException("Unknown image type");
+		}
 	}
 }

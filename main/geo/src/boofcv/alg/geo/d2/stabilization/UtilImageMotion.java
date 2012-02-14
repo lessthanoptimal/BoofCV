@@ -43,7 +43,7 @@ public class UtilImageMotion {
 	public static PixelTransform_F32 createPixelTransform(InvertibleTransform transform) {
 		PixelTransform_F32 pixelTran;
 		if( transform instanceof Homography2D_F64) {
-			Homography2D_F32 t = UtilHomography.convert((Homography2D_F64) transform, null);
+			Homography2D_F32 t = UtilHomography.convert((Homography2D_F64) transform, (Homography2D_F32)null);
 			pixelTran = new PixelTransformHomography_F32(t);
 		} else if( transform instanceof Homography2D_F32) {
 				pixelTran = new PixelTransformHomography_F32((Homography2D_F32)transform);

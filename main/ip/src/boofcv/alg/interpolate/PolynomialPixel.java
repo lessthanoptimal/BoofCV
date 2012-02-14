@@ -89,4 +89,14 @@ public abstract class PolynomialPixel<T extends ImageSingleBand> implements Inte
 
 		return (x0 >= 0 && y0 >= 0 && x1 < image.width && y1 <image.height);
 	}
+
+	@Override
+	public int getUnsafeBorderX() {
+		return M;
+	}
+
+	@Override
+	public int getUnsafeBorderY() {
+		return M;
+	}
 }

@@ -22,7 +22,7 @@ import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.alg.filter.convolve.ConvolveWithBorder;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.ImageFloat32;
@@ -53,7 +53,7 @@ public class TestDerivativeIntegralImage {
 
 		IntegralImageOps.transform(orig,integral);
 
-		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value(orig, 0);
 
 		for( int r = 1; r < 5; r++ ) {
 			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivX(r);
@@ -78,7 +78,7 @@ public class TestDerivativeIntegralImage {
 
 		IntegralImageOps.transform(orig,integral);
 
-		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value(orig, 0);
 
 		for( int r = 1; r < 5; r++ ) {
 			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivY(r);
@@ -104,7 +104,7 @@ public class TestDerivativeIntegralImage {
 
 		IntegralImageOps.transform(orig,integral);
 
-		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value(orig, 0);
 
 		for( int r = 1; r < 5; r++ ) {
 			IntegralKernel kernelI = DerivativeIntegralImage.kernelHaarX(r);
@@ -129,7 +129,7 @@ public class TestDerivativeIntegralImage {
 
 		IntegralImageOps.transform(orig,integral);
 
-		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value(orig, 0);
 
 		for( int i = 1; i < 5; i++ ) {
 			int size = i*2;
@@ -156,7 +156,7 @@ public class TestDerivativeIntegralImage {
 
 		IntegralImageOps.transform(orig,integral);
 
-		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value(orig, 0);
 
 		for( int i = 1; i <= 5; i += 2 ) {
 			int size = i*3;
@@ -208,7 +208,7 @@ public class TestDerivativeIntegralImage {
 
 		IntegralImageOps.transform(orig,integral);
 
-		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value(orig, 0);
 
 		for( int i = 1; i <= 5; i += 2 ) {
 			int size = i*3;
@@ -263,7 +263,7 @@ public class TestDerivativeIntegralImage {
 
 		IntegralImageOps.transform(orig,integral);
 
-		ImageBorder_F32 border = FactoryImageBorder.value(orig,0);
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value(orig, 0);
 
 		for( int i = 1; i <= 5; i += 2 ) {
 			int size = i*3;

@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.edge.impl;
 
-import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
@@ -81,7 +81,7 @@ public class ImplEdgeNonMaxSuppression {
 		final int w = _intensity.width;
 		final int h = _intensity.height;
 
-		ImageBorder_F32 intensity = FactoryImageBorder.value(_intensity,0);
+		ImageBorder_F32 intensity = (ImageBorder_F32)FactoryImageBorderAlgs.value(_intensity, 0);
 
 		for( int y = 0; y < h; y++ ) {
 			for( int x = 0; x < w; x++ ) {
@@ -121,7 +121,7 @@ public class ImplEdgeNonMaxSuppression {
 		int w = _intensity.width;
 		int h = _intensity.height-1;
 
-		ImageBorder_F32 intensity = FactoryImageBorder.value(_intensity,0);
+		ImageBorder_F32 intensity = (ImageBorder_F32)FactoryImageBorderAlgs.value(_intensity, 0);
 
 		// top border
 		for( int x = 0; x < w; x++ ) {
@@ -277,7 +277,7 @@ public class ImplEdgeNonMaxSuppression {
 		final int w = _intensity.width;
 		final int h = _intensity.height;
 
-		ImageBorder_F32 intensity = FactoryImageBorder.value(_intensity,0);
+		ImageBorder_F32 intensity = (ImageBorder_F32)FactoryImageBorderAlgs.value(_intensity, 0);
 
 		for( int y = 0; y < h; y++ ) {
 			for( int x = 0; x < w; x++ ) {
@@ -317,7 +317,7 @@ public class ImplEdgeNonMaxSuppression {
 		int w = _intensity.width;
 		int h = _intensity.height-1;
 
-		ImageBorder_F32 intensity = FactoryImageBorder.value(_intensity,0);
+		ImageBorder_F32 intensity = (ImageBorder_F32)FactoryImageBorderAlgs.value(_intensity, 0);
 
 		// top border
 		for( int x = 0; x < w; x++ ) {

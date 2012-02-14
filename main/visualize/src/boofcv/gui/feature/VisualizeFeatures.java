@@ -64,6 +64,11 @@ public class VisualizeFeatures {
 		g2.fillOval(x-r,y-r,w,w);
 	}
 
+	public static void drawCross( Graphics2D g2 , int x , int y ,int r ) {
+		g2.drawLine(x-r,y,x+r,y);
+		g2.drawLine(x,y-r,x,y+r);
+	}
+
 	public static void drawScalePoints( Graphics2D g2 , java.util.List<ScalePoint> points , double radius ) {
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(3));

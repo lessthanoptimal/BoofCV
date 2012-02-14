@@ -63,8 +63,7 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 		String borderImageType = image.isInteger() ? "ImageInteger" : imageName;
 
 		setOutputFile(className);
-		out.print("import boofcv.alg.InputSanityCheck;\n" +
-				"import boofcv.alg.interpolate.InterpolatePixel;\n" +
+		out.print("import boofcv.alg.interpolate.InterpolatePixel;\n" +
 				"import boofcv.alg.distort.ImageDistort;\n" +
 				"import boofcv.struct.image."+imageName+";\n" +
 				"import boofcv.struct.distort.PixelTransform_F32;\n" +
@@ -156,6 +155,13 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 
 		out.print("\tpublic void applyBorder( "+imageName+" srcImg , "+imageName+" dstImg ) {\n" +
 				"\n" +
+				"\t\tborder.setImage(srcImg);\n" +
+				"\n" +
+				"\t\tfinal float minInterpX = interp.getUnsafeBorderX();\n" +
+				"\t\tfinal float minInterpY = interp.getUnsafeBorderY();\n" +
+				"\t\tfinal float maxInterpX = srcImg.getWidth()-interp.getUnsafeBorderX();\n" +
+				"\t\tfinal float maxInterpY = srcImg.getHeight()-interp.getUnsafeBorderY();\n" +
+				"\n" +
 				"\t\tfinal float widthF = srcImg.getWidth();\n" +
 				"\t\tfinal float heightF = srcImg.getHeight();\n" +
 				"\n" +
@@ -167,10 +173,13 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\t\t\t\tfinal float sx = dstToSrc.distX;\n" +
 				"\t\t\t\tfinal float sy = dstToSrc.distY;\n" +
 				"\n" +
-				"\t\t\t\tif( sx < 0f || sx >= widthF || sy < 0f || sy >= heightF ) {\n" +
-				"\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"border.getOutside((int)sx,(int)sy);\n" +
+				"\t\t\t\tif( sx < minInterpX || sx >= maxInterpX || sy < minInterpY || sy >= maxInterpY ) {\n" +
+				"\t\t\t\t\tif( sx >= 0f && sx < widthF && sy >= 0f && sy < heightF )\n" +
+				"\t\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"interp.get(sx,sy);\n" +
+				"\t\t\t\t\telse\n" +
+				"\t\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"border.getOutside((int)sx,(int)sy);\n" +
 				"\t\t\t\t} else {\n" +
-				"\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"interp.get(sx,sy);\n" +
+				"\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"interp.get_unsafe(sx,sy);\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -184,6 +193,11 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 
 		out.print("\tpublic void applyNoBorder( "+imageName+" srcImg , "+imageName+" dstImg ) {\n" +
 				"\n" +
+				"\t\tfinal float minInterpX = interp.getUnsafeBorderX();\n" +
+				"\t\tfinal float minInterpY = interp.getUnsafeBorderY();\n" +
+				"\t\tfinal float maxInterpX = srcImg.getWidth()-interp.getUnsafeBorderX();\n" +
+				"\t\tfinal float maxInterpY = srcImg.getHeight()-interp.getUnsafeBorderY();\n" +
+				"\n" +
 				"\t\tfinal float widthF = srcImg.getWidth();\n" +
 				"\t\tfinal float heightF = srcImg.getHeight();\n" +
 				"\n" +
@@ -195,8 +209,11 @@ public class GeneratorImplImageDistort extends CodeGeneratorBase {
 				"\t\t\t\tfinal float sx = dstToSrc.distX;\n" +
 				"\t\t\t\tfinal float sy = dstToSrc.distY;\n" +
 				"\n" +
-				"\t\t\t\tif( sx >= 0f && sx < widthF && sy >= 0f && sy < heightF ) {\n" +
-				"\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"interp.get(sx,sy);\n" +
+				"\t\t\t\tif( sx < minInterpX || sx >= maxInterpX || sy < minInterpY || sy >= maxInterpY ) {\n" +
+				"\t\t\t\t\tif( sx >= 0f && sx < widthF && sy >= 0f && sy < heightF )\n" +
+				"\t\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"interp.get(sx,sy);\n"+
+				"\t\t\t\t} else {\n" +
+				"\t\t\t\t\tdstImg.data[indexDst] = "+typeCast+"interp.get_unsafe(sx,sy);\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +

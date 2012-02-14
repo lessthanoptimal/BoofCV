@@ -16,37 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.alg.distort;
 
-import boofcv.struct.image.ImageSingleBand;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * A wrapper around a normal image that returns a numeric value if a pixel is requested that is outside of the image
- * boundary.  The additional sanity checks can significantly slow down algorithms and should only be used when needed.
- *
  * @author Peter Abeles
  */
-public abstract class ImageBorder<T extends ImageSingleBand> {
+public class TestImageDistortMap {
 
-	T image;
-
-	protected ImageBorder(T image) {
-		setImage(image);
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
-
-	protected ImageBorder() {
-	}
-
-	public void setImage( T image ) {
-		this.image = image;
-	}
-
-	public T getImage() {
-		return image;
-	}
-
-	/**
-	 * Generalized non image type specific set.  This can be very slow
-	 */
-	public abstract double getGeneral( int x , int y );
 }

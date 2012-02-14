@@ -21,7 +21,6 @@ package boofcv.alg.filter.derivative;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import boofcv.alg.filter.derivative.impl.HessianSobel_Shared;
-import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
@@ -120,9 +119,9 @@ public class HessianSobel {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelXX_I32, FactoryImageBorder.extend(orig),derivXX,2);
-			ConvolveJustBorder_General.convolve(kernelYY_I32, FactoryImageBorder.extend(orig),derivYY,2);
-			ConvolveJustBorder_General.convolve(kernelXY_I32, FactoryImageBorder.extend(orig),derivXY,2);
+			ConvolveJustBorder_General.convolve(kernelXX_I32, border,derivXX,2);
+			ConvolveJustBorder_General.convolve(kernelYY_I32, border,derivYY,2);
+			ConvolveJustBorder_General.convolve(kernelXY_I32, border,derivXY,2);
 		}
 	}
 

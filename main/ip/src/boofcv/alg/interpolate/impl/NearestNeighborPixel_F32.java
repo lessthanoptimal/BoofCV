@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.NearestNeighborPixel;
 import boofcv.struct.image.ImageFloat32;
 
 
@@ -27,14 +27,9 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class NearestNeighborPixel_F32 implements InterpolatePixel<ImageFloat32> {
-
-	private ImageFloat32 orig;
+public class NearestNeighborPixel_F32 extends NearestNeighborPixel<ImageFloat32> {
 
 	private float data[];
-	private int stride;
-	private int width;
-	private int height;
 
 	public NearestNeighborPixel_F32() {
 	}
@@ -53,11 +48,6 @@ public class NearestNeighborPixel_F32 implements InterpolatePixel<ImageFloat32> 
 	}
 
 	@Override
-	public ImageFloat32 getImage() {
-		return orig;
-	}
-
-	@Override
 	public float get_unsafe(float x, float y) {
 		return data[ orig.startIndex + ((int)y)*stride + (int)x];
 	}
@@ -70,10 +60,5 @@ public class NearestNeighborPixel_F32 implements InterpolatePixel<ImageFloat32> 
 			throw new IllegalArgumentException("Point is outside of the image");
 
 		return data[ orig.startIndex + yy*stride + xx];
-	}
-
-	@Override
-	public boolean isInSafeBounds(float x, float y) {
-		return( x >= 0 && y >= 0 && x < width && y < height );
 	}
 }
