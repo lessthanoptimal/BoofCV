@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 package boofcv.numerics.fitting.modelset.ransac;
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.numerics.fitting.modelset.ModelFitter;
+import boofcv.numerics.fitting.modelset.ModelGenerator;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class SimpleScoreRansac<Model, Point> extends SimpleRansacCommon<Model, P
 	 * Creates a new instance of the ransac algorithm.
 	 *
 	 * @param randSeed		   The random seed used by the random number generator.
-	 * @param modelFitter		Computes the model parameters given a set of points.
+	 * @param modelGenerator	Creates new model(s) given a small number of points.
 	 * @param modelDistance	  Computes the difference between a point an a model.
 	 * @param maxIterations	  The maximum number of iterations the RANSAC algorithm will perform.
 	 * @param fitScorer		  Computes the goodness of fit for the points against the model
@@ -67,14 +67,14 @@ public class SimpleScoreRansac<Model, Point> extends SimpleRansacCommon<Model, P
 	 * @param exitIterThreshold  If the match set is better than this threshold it will stop running.
 	 */
 	public SimpleScoreRansac(long randSeed,
-							 ModelFitter<Model,Point> modelFitter,
+							 ModelGenerator<Model,Point> modelGenerator ,
 							 DistanceFromModel<Model,Point> modelDistance,
 							 RansacFitScore<Model,Point> fitScorer,
 							 int maxIterations,
 							 int numInitialSample, double initialModelThresh,
 							 int minMatchSetSize, double matchSetThreshold,
 							 double exitIterThreshold) {
-		super(modelFitter, modelDistance, randSeed, maxIterations);
+		super(modelGenerator, modelDistance, randSeed, maxIterations);
 
 		this.fitScorer = fitScorer;
 		this.numInitialSample = numInitialSample;
@@ -112,39 +112,37 @@ public class SimpleScoreRansac<Model, Point> extends SimpleRansacCommon<Model, P
 		for (i = 0; i < maxIterations; i++) {
 			randomDraw(dataSet, numInitialSample, initialSample, rand);
 
-			if (!modelFitter.fitModel(initialSample, initialModel, candidateParam))
-				continue;
+			candidates.reset();
+			modelGenerator.generate(initialSample, candidates);
 
-			modelDistance.setModel(candidateParam);
-
-			// see if the fit to the initial set is good enough
-			if (fitScorer.computeFitScore(initialSample, modelDistance) < initialModelThresh) {
-
-				// select points which match that fit
-				if (!selectMatchSet(dataSet, matchSetThreshold, minMatchSetSize, candidateParam)) {
-					continue;
-				}
-
-				// fit a model to all the candidates points
-				if (!modelFitter.fitModel(candidatePoints, initialModel, candidateParam))
-					continue;
-
-
-				// see if the results are better than the previous results
+			for( int j = 0; j < candidates.size(); j++ ) {
+				Model candidateParam = candidates.get(j);
+				
 				modelDistance.setModel(candidateParam);
+
+				// see if the fit to the initial set is good enough
 				double score = fitScorer.computeFitScore(initialSample, modelDistance);
-				if (score < bestFitError) {
-					bestFitError = score;
-					bestFitPoints.clear();
-					bestFitPoints.addAll(candidatePoints);
+				if (score < initialModelThresh) {
 
-					// set the current model to be the best
-					Model temp = bestFitParam;
-					bestFitParam = candidateParam;
-					candidateParam = temp;
+					// select points which match that fit
+					if (!selectMatchSet(dataSet, matchSetThreshold, minMatchSetSize, candidateParam)) {
+						continue;
+					}
 
-					if (bestFitError < exitIterThreshold) {
-						break;
+					// see if the results are better than the previous results
+					modelDistance.setModel(candidateParam);
+					score = fitScorer.computeFitScore(initialSample, modelDistance);
+					if (score < bestFitError) {
+						bestFitError = score;
+						bestFitPoints.clear();
+						bestFitPoints.addAll(candidatePoints);
+
+						// set the current model to be the best
+						bestFitParam = candidates.swap(j,bestFitParam);
+
+						if (bestFitError < exitIterThreshold) {
+							break;
+						}
 					}
 				}
 			}

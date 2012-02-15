@@ -19,7 +19,9 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelFitter;
+import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.fitting.affine.MotionAffinePoint2D_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -33,7 +35,10 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ModelFitterAffine2D implements ModelFitter<Affine2D_F64,AssociatedPair> {
+public class GenerateRefineAffine2D implements
+		ModelGenerator<Affine2D_F64,AssociatedPair>,
+		ModelFitter<Affine2D_F64,AssociatedPair>
+{
 
 	// model affine fitter
 	MotionAffinePoint2D_F64 fitter = new MotionAffinePoint2D_F64();
@@ -44,13 +49,12 @@ public class ModelFitterAffine2D implements ModelFitter<Affine2D_F64,AssociatedP
 	List<Point2D_F64> to = new ArrayList<Point2D_F64>();
 
 	@Override
-	public Affine2D_F64 declareModel() {
+	public Affine2D_F64 createModelInstance() {
 		return new Affine2D_F64();
 	}
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> dataSet,
-						 Affine2D_F64 initParam , Affine2D_F64 foundParam) {
+	public boolean fitModel(List<AssociatedPair> dataSet, Affine2D_F64 initial, Affine2D_F64 found) {
 		from.clear();
 		to.clear();
 
@@ -63,9 +67,27 @@ public class ModelFitterAffine2D implements ModelFitter<Affine2D_F64,AssociatedP
 		if( !fitter.process(from,to) )
 			return false;
 
-		foundParam.set(fitter.getMotion());
-
+		found.set(fitter.getMotion());
 		return true;
+	}
+
+	@Override
+	public void generate(List<AssociatedPair> dataSet, HypothesisList<Affine2D_F64> models) {
+
+		from.clear();
+		to.clear();
+
+		for( int i = 0; i < dataSet.size(); i++ ) {
+			AssociatedPair p = dataSet.get(i);
+			from.add(p.keyLoc);
+			to.add(p.currLoc);
+		}
+
+		if( !fitter.process(from,to) )
+			return;
+
+		Affine2D_F64 foundParam = models.pop();
+		foundParam.set(fitter.getMotion());
 	}
 
 	@Override

@@ -30,6 +30,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.numerics.fitting.modelset.ModelFitter;
+import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import boofcv.struct.FastQueue;
@@ -65,6 +66,9 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 	protected ImagePointTracker<I> tracker;
 	// finds the best fit model parameters to describe feature motion
 	protected ModelMatcher<T,AssociatedPair> modelMatcher;
+	// batch refinement algorithm
+	protected ModelFitter<T,AssociatedPair> modelRefiner;
+
 	// computes motion across multiple frames intelligently
 	// MUST be declared by child class
 	protected ImageMotionPointKey<I,T> distortAlg;
@@ -530,15 +534,19 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 	 */
 	protected void createModelMatcher( int maxIterations , double thresholdFit ) {
 
-		ModelFitter fitter;
+		ModelGenerator fitter;
 		DistanceFromModel distance;
 		
 		if( fitModel instanceof Homography2D_F64 ) {
-			fitter = new ModelFitterLinearHomography();
+			GenerateHomographyLinear mf = new GenerateHomographyLinear();
+			fitter = mf;
+			modelRefiner = (ModelFitter)mf;
 			distance = new DistanceHomographySq();
 		} else if( fitModel instanceof Affine2D_F64 ) {
-			fitter = new ModelFitterAffine2D();
+			GenerateRefineAffine2D mf = new GenerateRefineAffine2D();
+			fitter = mf;
 			distance = new DistanceAffine2DSq();
+			modelRefiner = (ModelFitter)mf;
 		} else {
 			throw new RuntimeException("Unknown model type");
 		}
@@ -546,6 +554,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 		int numSample =  fitter.getMinimumPoints();
 		modelMatcher = new SimpleInlierRansac(123123,
 				fitter,distance,maxIterations,numSample,numSample,10000,thresholdFit);
+
 	}
 
 	protected abstract void startEverything();

@@ -52,7 +52,7 @@ public class TestImageMotionPointKey {
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 		
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,model);
+		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model);
 
 		// specify an initial transform
 		alg.setInitialTransform(initial);
@@ -88,7 +88,7 @@ public class TestImageMotionPointKey {
 		Se2_F32 model = new Se2_F32();
 
 		// the world frame will initially be the identify matrix
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(null,null,model);
+		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(null,null,null,model);
 
 		// change it to this frame
 		alg.changeWorld(oldToNew);
@@ -114,7 +114,7 @@ public class TestImageMotionPointKey {
 		
 		ImageUInt8 input = new ImageUInt8(20,30);
 
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,model);
+		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model);
 		
 		// process twice to change the transforms
 		alg.process(input);

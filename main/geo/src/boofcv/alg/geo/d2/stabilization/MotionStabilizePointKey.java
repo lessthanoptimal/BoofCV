@@ -20,6 +20,7 @@ package boofcv.alg.geo.d2.stabilization;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
@@ -54,18 +55,20 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 	 *
 	 * @param tracker feature tracker
 	 * @param modelMatcher Fits model to track data
+	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
 	 * @param model Motion model data structure
 	 * @param thresholdKeyFrame  If the number of inlier is less than this number the keyframe will change.
 	 * @param thresholdReset If the number of inlier is less than this number a reset will occur.
 	 * @param largeMotionThreshold  If the transform from the key frame to the current frame is more than this a reset will occur.
 	 */
 	public MotionStabilizePointKey(ImagePointTracker<I> tracker, 
-								   ModelMatcher<T, AssociatedPair> modelMatcher, 
+								   ModelMatcher<T, AssociatedPair> modelMatcher,
+								   ModelFitter<T,AssociatedPair> modelRefiner,
 								   T model ,
 								   int thresholdKeyFrame , int thresholdReset ,
 								   int largeMotionThreshold )
 	{
-		super(tracker, modelMatcher, model);
+		super(tracker, modelMatcher, modelRefiner, model);
 
 		if( thresholdKeyFrame < thresholdReset ) {
 			throw new IllegalArgumentException("Threshold for key frame should be more than reset");

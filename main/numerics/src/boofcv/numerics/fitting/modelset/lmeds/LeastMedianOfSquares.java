@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ package boofcv.numerics.fitting.modelset.lmeds;
 
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.numerics.fitting.modelset.ModelFitter;
+import boofcv.numerics.fitting.modelset.HypothesisList;
+import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleRansacCommon;
 import pja.sorting.QuickSelectArray;
@@ -51,7 +52,7 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 	// if the best model has more than this error then it is considered a bad match
 	private double maxMedianError;
 	// fits a model to the provided data
-	private ModelFitter<Model,Point> fitter;
+	private ModelGenerator<Model,Point> generator;
 	// computes the error for a point to the model
 	private DistanceFromModel<Model,Point> errorMetric;
 
@@ -62,7 +63,7 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 	private Model bestParam;
 	private double bestMedian;
 	// temporary parameter
-	private Model param;
+	private HypothesisList<Model> candidates;
 
 	// stores all the errors for quicker sorting
 	private double []errors;
@@ -77,7 +78,7 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 	 * @param totalCycles Number of random draws it will make when estimating model parameters.
 	 * @param maxMedianError If the best median error is larger than this it is considered a failure.
 	 * @param inlierFraction Data which is this fraction or lower is considered an inlier and used to recompute model parameters at the end.  Set to 0 to turn off. Domain: 0 to 1.
-	 * @param fitter
+	 * @param generator Creates a list of model hypotheses from a small set of points.
 	 * @param errorMetric
 	 */
 	public LeastMedianOfSquares( long randSeed ,
@@ -85,7 +86,7 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 								 int totalCycles ,
 								 double maxMedianError ,
 								 double inlierFraction ,
-								 ModelFitter<Model,Point> fitter ,
+								 ModelGenerator<Model,Point> generator,
 								 DistanceFromModel<Model,Point> errorMetric )
 	{
 		this.rand = new Random(randSeed);
@@ -93,11 +94,11 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 		this.totalCycles = totalCycles;
 		this.maxMedianError = maxMedianError;
 		this.inlierFrac = inlierFraction;
-		this.fitter = fitter;
+		this.generator = generator;
 		this.errorMetric = errorMetric;
 
-		bestParam = fitter.declareModel();
-		param = fitter.declareModel();
+		bestParam = generator.createModelInstance();
+		candidates = new HypothesisList<Model>(generator);
 
 		errors = new double[10];
 
@@ -124,18 +125,21 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 		for( int i = 0; i < totalCycles; i++ ) {
 			SimpleRansacCommon.randomDraw(dataSet,sampleSize,smallSet,rand);
 
-			fitter.fitModel(smallSet,paramInitial,param);
+			candidates.reset();
+			generator.generate(smallSet,candidates);
+			for( int j = 0; j < candidates.size(); j++ ) {
+				Model candidate = candidates.get(j);
 
-			errorMetric.setModel(param);
-			errorMetric.computeDistance(dataSet,errors);
+				errorMetric.setModel(candidate);
+				errorMetric.computeDistance(dataSet,errors);
 
-			double median = QuickSelectArray.select(errors,N/2,N);
+				double median = QuickSelectArray.select(errors,N/2,N);
 
-			if( median < bestMedian ) {
-				bestMedian = median;
-				Model temp = bestParam;
-				bestParam = param;
-				param = temp;
+				if( median < bestMedian ) {
+					bestMedian = median;
+					bestParam = candidates.swap(j,bestParam);
+				}
+
 			}
 		}
 
@@ -158,8 +162,6 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 			for( int i = 0; i < numPts; i++ ) {
 				inlierSet.add( dataSet.get(indexes[i]) );
 			}
-
-			fitter.fitModel(inlierSet,paramInitial,bestParam);
 		} else {
 			inlierSet = dataSet;
 		}

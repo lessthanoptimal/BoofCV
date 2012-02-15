@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 package boofcv.numerics.fitting.modelset.ransac;
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.numerics.fitting.modelset.ModelFitter;
+import boofcv.numerics.fitting.modelset.ModelGenerator;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ public class SimpleInlierRansac<Model, Point> extends SimpleRansacCommon<Model, 
 	 * Creates a new instance of the ransac algorithm.
 	 *
 	 * @param randSeed		 The random seed used by the random number generator.
-	 * @param modelFitter	  Computes the model parameters given a set of points.
+	 * @param modelGenerator	Creates new model(s) given a small number of points.
 	 * @param modelDistance	Computes the difference between a point an a model.
 	 * @param maxIterations	The maximum number of iterations the RANSAC algorithm will perform.
 	 * @param numInitialSample How many points will it initially draw to create a model.
@@ -57,14 +57,14 @@ public class SimpleInlierRansac<Model, Point> extends SimpleRansacCommon<Model, 
 	 * @param thresholdFit	 How close of a fit a points needs to be to the model to be considered a fit.  In pixels.
 	 */
 	public SimpleInlierRansac(long randSeed,
-							  ModelFitter<Model,Point> modelFitter,
+							  ModelGenerator<Model,Point> modelGenerator ,
 							  DistanceFromModel<Model,Point> modelDistance,
 							  int maxIterations,
 							  int numInitialSample,
 							  int minFitPoints,
 							  int exitFitPoints,
 							  double thresholdFit) {
-		super(modelFitter, modelDistance,randSeed, maxIterations);
+		super(modelGenerator, modelDistance,randSeed, maxIterations);
 		this.numInitialSample = numInitialSample;
 		this.minFitPoints = minFitPoints;
 		this.exitFitPoints = exitFitPoints;
@@ -104,45 +104,40 @@ public class SimpleInlierRansac<Model, Point> extends SimpleRansacCommon<Model, 
 		for (i = 0; i < maxIterations; i++) {
 			// sample the a small set of points
 			randomDraw(dataSet, numInitialSample, initialSample, rand);
+			
+			// get the candidate(s) for this sample set
+			candidates.reset();
+			modelGenerator.generate(initialSample, candidates);
 
-			// compute the best fit model parameters to this set
-			if (!modelFitter.fitModel(initialSample, paramInitial, candidateParam))
-				continue;
+			for( int j = 0; j < candidates.size(); j++ ) {
+				Model candidate = candidates.get(j);
 
-			// determine how may points are needed to either produce a valid model set or beat the
-			// current best model set
-			int numFitPoints = bestFitCount < minFitPoints ? minFitPoints : bestFitCount + 1;
+				// determine how may points are needed to either produce a valid model set or beat the
+				// current best model set
+				int numFitPoints = bestFitCount < minFitPoints ? minFitPoints : bestFitCount + 1;
 
-			// see if the minimum number of points fit this set
-			if (!selectMatchSet(dataSet, thresholdFit, numFitPoints, candidateParam)) {
-				continue;
-			}
+				// see if the minimum number of points fit this set
+				if (!selectMatchSet(dataSet, thresholdFit, numFitPoints, candidate)) {
+					continue;
+				}
 
-			// save this results
-			if (bestFitCount < candidatePoints.size()) {
-				bestFitCount = candidatePoints.size();
-				bestFitPoints.clear();
-				bestFitPoints.addAll(candidatePoints);
+				// save this results
+				if (bestFitCount < candidatePoints.size()) {
+					bestFitCount = candidatePoints.size();
+					bestFitPoints.clear();
+					bestFitPoints.addAll(candidatePoints);
 
-				// set the current model to be the best
-				Model temp = bestFitParam;
-				bestFitParam = candidateParam;
-				candidateParam = temp;
+					// set the current model to be the best
+					bestFitParam = candidates.swap(j,bestFitParam);
 
-				// see if it has reached an exit condition
-				if (bestFitCount >= exitFitPoints)
-					break;
-			}
-		}
-
-		// compute model parameters for the best fit using all the inlier sample points
-		if (bestFitCount > 0) {
-			if (modelFitter.fitModel(bestFitPoints, paramInitial , bestFitParam)) {
-				return true;
+					// see if it has reached an exit condition
+					if (bestFitCount >= exitFitPoints)
+						break;
+				}
 			}
 		}
 
-		return false;
+		return bestFitCount > 0;
 	}
 
 	public int getMinFitPoints() {

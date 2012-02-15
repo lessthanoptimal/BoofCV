@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 package boofcv.numerics.fitting.modelset.ransac;
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.numerics.fitting.modelset.ModelFitter;
+import boofcv.numerics.fitting.modelset.HypothesisList;
+import boofcv.numerics.fitting.modelset.ModelGenerator;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -145,7 +146,7 @@ public class TestSimpleRansacCommon {
 
 	public static class RandsacDebug extends SimpleRansacCommon<double[],Integer> {
 
-		public RandsacDebug(ModelFitter<double[],Integer> integerModelFitter,
+		public RandsacDebug(ModelGenerator<double[],Integer> integerModelFitter,
 							DistanceFromModel<double[],Integer> modelDistance) {
 			super(integerModelFitter, modelDistance, 0, 0);
 		}
@@ -162,7 +163,7 @@ public class TestSimpleRansacCommon {
 	}
 
 	public static class DebugModelStuff implements
-			DistanceFromModel<double[],Integer>, ModelFitter<double[],Integer> {
+			DistanceFromModel<double[],Integer>, ModelGenerator<double[],Integer> {
 
 		int threshold;
 
@@ -190,12 +191,15 @@ public class TestSimpleRansacCommon {
 		}
 
 		@Override
-		public double[] declareModel() {
+		public double[] createModelInstance() {
 			return new double[1];
 		}
 
 		@Override
-		public boolean fitModel(List<Integer> dataSet, double []initP, double[] p) {
+		public void generate(List<Integer> dataSet, HypothesisList<double[]> models) {
+
+			double p[] = models.pop();
+			
 			error = 0;
 
 			int offset = (int) p[0];
@@ -208,7 +212,6 @@ public class TestSimpleRansacCommon {
 
 			error += offset;
 			p[0] = error;
-			return true;
 		}
 
 		@Override

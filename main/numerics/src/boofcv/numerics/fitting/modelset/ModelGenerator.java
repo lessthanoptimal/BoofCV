@@ -21,11 +21,13 @@ package boofcv.numerics.fitting.modelset;
 import java.util.List;
 
 /**
- * Computes a model from a set of points and optionally an initial estimate.
+ * Given a set of points create a model hypothesis.  In most applications just a single hypothesis
+ * will be generated.  In SFM applications geometric ambiguities can cause multiple hypotheses to be
+ * created.
  *
  * @author Peter Abeles
  */
-public interface ModelFitter<Model,Point> {
+public interface ModelGenerator<Model,Point> {
 
 	/**
 	 * Creates a new instance of the model
@@ -33,14 +35,20 @@ public interface ModelFitter<Model,Point> {
 	 * @return New model instance
 	 */
 	public Model createModelInstance();
+	
+	/**
+	 * Creates a list of hypotheses from the set of sample points.
+	 *
+	 * @param dataSet Set of sample points.  Typically the minimum number possible.
+	 * @param models List of models generated from the set of points.  Can assume that reset() has already been called
+	 * @return List of models created from sample points.
+	 */
+	public void generate( List<Point> dataSet , HypothesisList<Model> models );
 
 	/**
-	 * Fits a model to a set of points.
+	 * The minimum number of points required to fit a data set
 	 *
-	 * @param dataSet Set of points the model is being fit to.
-	 * @param initial Initial hypothesis
-	 * @param found The found model.
-	 * @return true if a model was found and false if one was not.
+	 * @return Number of points.
 	 */
-	public boolean fitModel(List<Point> dataSet, Model initial, Model found);
+	public int getMinimumPoints();
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@
 
 package boofcv.numerics.fitting.modelset.lmeds;
 
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.numerics.fitting.modelset.GenericModelSetTests;
-import boofcv.numerics.fitting.modelset.ModelFitter;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
+import boofcv.numerics.fitting.modelset.*;
 import org.junit.Test;
 
 
@@ -38,8 +35,9 @@ public class TestLeastMedianOfSquares extends GenericModelSetTests {
 
 	@Override
 	public ModelMatcher<double[],Double> createModelMatcher(DistanceFromModel<double[],Double> distance,
+															ModelGenerator<double[],Double> generator,
 												ModelFitter<double[],Double> fitter,
 												int minPoints, double fitThreshold) {
-		return new LeastMedianOfSquares<double[],Double>(4234,10,10000,fitThreshold,0.9,fitter,distance);
+		return new LeastMedianOfSquares<double[],Double>(4234,10,10000,fitThreshold,0.9,generator,distance);
 	}
 }

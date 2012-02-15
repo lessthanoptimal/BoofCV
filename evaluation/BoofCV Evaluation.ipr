@@ -421,6 +421,7 @@
       <module fileurl="file://$PROJECT_DIR$/../main/io/BoofCV IO.iml" filepath="$PROJECT_DIR$/../main/io/BoofCV IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/../main/ip/BoofCV Image Processing.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" filepath="$PROJECT_DIR$/../main/numerics/BoofCV Numerics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../main/sfm/BoofCV SFM.iml" filepath="$PROJECT_DIR$/../main/sfm/BoofCV SFM.iml" />
       <module fileurl="file://$PROJECT_DIR$/../main/visualize/BoofCV Visualize.iml" filepath="$PROJECT_DIR$/../main/visualize/BoofCV Visualize.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" filepath="$PROJECT_DIR$/../../bubo/io/trunk/Bubo IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../georegression/GeoRegression.iml" />

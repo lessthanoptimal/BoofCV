@@ -18,46 +18,17 @@
 
 package boofcv.numerics.fitting.modelset;
 
-import java.util.List;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 /**
- * Computes the mean of a set of points.
- *
  * @author Peter Abeles
  */
-public class MeanModelFitter implements ModelFitter<double[],Double> ,
-		ModelGenerator<double[],Double>{
+public class TestHypothesisList {
 
-	@Override
-	public double[] createModelInstance() {
-		return new double[1];
-	}
-
-	@Override
-	public void generate(List<Double> dataSet, HypothesisList<double[]> models) {
-		double[] param = models.pop();
-
-		fitModel(dataSet,null,param);
-	}
-
-	@Override
-	public boolean fitModel(List<Double> dataSet, double[] initParam, double[] foundParam) {
-		double mean = 0;
-
-		for (double d : dataSet) {
-			mean += d;
-		}
-
-		mean /= dataSet.size();
-
-		foundParam[0] = mean;
-
-		return true;
-	}
-
-	@Override
-	public int getMinimumPoints() {
-		return 1;
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }
