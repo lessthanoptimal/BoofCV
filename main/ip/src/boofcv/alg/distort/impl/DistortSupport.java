@@ -18,10 +18,10 @@
 
 package boofcv.alg.distort.impl;
 
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
+import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.*;
 import georegression.struct.affine.Affine2D_F32;
@@ -86,7 +86,7 @@ public class DistortSupport {
 	}
 
 	/**
-	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
+	 * Creates a {@link boofcv.struct.distort.ImageDistort} for the specified image type, transformation
 	 * and interpolation instance.
 	 *
 	 * @param dstToSrc Transform from dst to src image.
@@ -113,7 +113,7 @@ public class DistortSupport {
 	}
 
 	/**
-	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the multi-spectral images of the specified image type, transformation
+	 * Creates a {@link boofcv.struct.distort.ImageDistort} for the multi-spectral images of the specified image type, transformation
 	 * and interpolation instance.
 	 *
 	 * @param dstToSrc Transform from dst to src image.

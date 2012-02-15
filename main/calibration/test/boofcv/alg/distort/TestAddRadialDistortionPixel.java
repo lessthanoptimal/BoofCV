@@ -19,6 +19,7 @@
 package boofcv.alg.distort;
 
 import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -29,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestApplyRadialTransform {
+public class TestAddRadialDistortionPixel {
 
 	/**
 	 * Manually compute the distorted coordinate for a point and see if it matches
@@ -44,7 +45,7 @@ public class TestApplyRadialTransform {
 
 		double radial[]= new double[]{0.01,-0.03};
 
-		Point2D_F64 orig = new Point2D_F64(20,400);
+		Point2D_F64 orig = new Point2D_F64(19.5,400.1);
 		Point2D_F64 dist = new Point2D_F64();
 
 		Point2D_F64 normPt = new Point2D_F64();
@@ -67,11 +68,13 @@ public class TestApplyRadialTransform {
 		dist.x = orig.x + (orig.x-xc)*sum;
 		dist.y = orig.y + (orig.y-yc)*sum;
 
-		ApplyRadialTransform alg = new ApplyRadialTransform(fx,fy,skew,xc,yc,radial);
+		AddRadialDistortionPixel alg = new AddRadialDistortionPixel(fx,fy,skew,xc,yc,radial);
 
-		alg.compute(20,400);
+		Point2D_F32 found = new Point2D_F32();
 
-		assertEquals(dist.x,alg.distX,1e-4);
-		assertEquals(dist.y,alg.distY,1e-4);
+		alg.compute(19.5f,400.1f,found);
+
+		assertEquals(dist.x,found.x,1e-4);
+		assertEquals(dist.y,found.y,1e-4);
 	}
 }

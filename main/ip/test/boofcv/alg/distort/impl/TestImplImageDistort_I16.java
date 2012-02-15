@@ -18,9 +18,9 @@
 
 package boofcv.alg.distort.impl;
 
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
+import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSInt16;
 

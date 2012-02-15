@@ -16,26 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.impl;
+package boofcv.alg.distort;
 
-import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
-
+import boofcv.struct.distort.PointTransform_F32;
+import georegression.struct.point.Point2D_F32;
 
 /**
+ * Allows a {@link PointToPixelTransform_F32} to be invoked as a {@link boofcv.struct.distort.PixelTransform_F32}.
+ * 
  * @author Peter Abeles
  */
-public class TestImplImageDistort_F32 extends GeneralImageDistortTests<ImageFloat32>{
+public class PointToPixelTransform_F32 extends PixelTransform_F32 {
+	PointTransform_F32 alg;
 
-	public TestImplImageDistort_F32() {
-		super(ImageFloat32.class);
+	Point2D_F32 point = new Point2D_F32();
+
+	public PointToPixelTransform_F32(PointTransform_F32 alg) {
+		this.alg = alg;
 	}
 
 	@Override
-	public ImageDistort<ImageFloat32> createDistort(PixelTransform_F32 dstToSrc, InterpolatePixel<ImageFloat32> interp, ImageBorder border) {
-		return new ImplImageDistort_F32(dstToSrc,interp,border);
+	public void compute(int x, int y) {
+		alg.compute(x,y,point);
+		distX = point.x;
+		distY = point.y;
 	}
 }

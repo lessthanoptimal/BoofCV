@@ -18,40 +18,38 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PointTransform_F32;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
 /**
- * Adds radial distortion to a distortion free pixel coordinates
+ * Given an undistorted pixel coordinate, compute the distorted coordinate.
  *
  * @author Peter Abeles
  */
-public class ApplyRadialTransform extends PixelTransform_F32 {
+public class AddRadialDistortionPixel implements PointTransform_F32 {
 
 	// principle point / image center
 	private float x_c,y_c;
 	// radial distortion
-	private float kappa[];
+	private float radial[];
 
 	private DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
-
 	private Point2D_F32 temp0 = new Point2D_F32();
-	private Point2D_F32 temp1 = new Point2D_F32();
 
-	public ApplyRadialTransform(double fx, double fy, double skew, double x_c, double y_c, double[] kappa) {
-		set(fx,fy,skew,x_c,y_c,kappa);
+	public AddRadialDistortionPixel() {
 	}
 
-	public ApplyRadialTransform() {
+	public AddRadialDistortionPixel(double fx, double fy, double skew, double x_c, double y_c, double[] radial) {
+		set(fx,fy,skew,x_c,y_c, radial);
 	}
 
 	/**
 	 * Specify camera calibration parameters
 	 */
-	public void set(double fx, double fy, double skew, double x_c, double y_c, double[] kappa) {
+	public void set(double fx, double fy, double skew, double x_c, double y_c, double[] radial) {
 
 		K_inv.set(0,0,fx);
 		K_inv.set(1,1,fy);
@@ -65,31 +63,38 @@ public class ApplyRadialTransform extends PixelTransform_F32 {
 		this.x_c = (float)x_c;
 		this.y_c = (float)y_c;
 
-		this.kappa = new float[kappa.length];
-		for( int i = 0; i < kappa.length; i++ ) {
-			this.kappa[i] = (float)kappa[i];
+		this.radial = new float[radial.length];
+		for( int i = 0; i < radial.length; i++ ) {
+			this.radial[i] = (float)radial[i];
 		}
 	}
-	
+
+	/**
+	 * Adds radial distortion
+	 *
+	 * @param x Undistorted x-coordinate pixel
+	 * @param y Undistorted y-coordinate pixel
+	 * @param out Distorted coordinate.
+	 */
 	@Override
-	public void compute(int x, int y) {
+	public void compute(float x, float y, Point2D_F32 out) {
 		float sum = 0;
 
 		temp0.x = x;
 		temp0.y = y;
-		
-		GeometryMath_F32.mult(K_inv,temp0,temp1);
 
-		float r2 = temp1.x*temp1.x + temp1.y*temp1.y;
+		GeometryMath_F32.mult(K_inv, temp0, out);
+
+		float r2 = out.x*out.x + out.y*out.y;
 
 		float r = r2;
 
-		for( int i = 0; i < kappa.length; i++ ) {
-			sum += kappa[i]*r;
+		for( int i = 0; i < radial.length; i++ ) {
+			sum += radial[i]*r;
 			r *= r2;
 		}
 
-		distX = x + (x-x_c)*sum;
-		distY = y + (y-y_c)*sum;
+		out.x = x + (x-x_c)*sum;
+		out.y = y + (y-y_c)*sum;
 	}
 }

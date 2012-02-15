@@ -19,12 +19,12 @@
 package boofcv.gui.image;
 
 
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformHomography_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;

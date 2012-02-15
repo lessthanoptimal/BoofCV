@@ -16,26 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.impl;
+package boofcv.alg.distort;
 
-import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.distort.ImageDistort;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplImageDistort_F32 extends GeneralImageDistortTests<ImageFloat32>{
+public class TestPointToPixelTransform_F32 {
 
-	public TestImplImageDistort_F32() {
-		super(ImageFloat32.class);
-	}
-
-	@Override
-	public ImageDistort<ImageFloat32> createDistort(PixelTransform_F32 dstToSrc, InterpolatePixel<ImageFloat32> interp, ImageBorder border) {
-		return new ImplImageDistort_F32(dstToSrc,interp,border);
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }
