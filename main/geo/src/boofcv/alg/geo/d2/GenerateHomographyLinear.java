@@ -21,7 +21,9 @@ package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.d3.epipolar.HomographyLinear4;
+import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelFitter;
+import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.homo.UtilHomography;
 import org.ejml.data.DenseMatrix64F;
@@ -33,27 +35,37 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ModelFitterLinearHomography implements ModelFitter<Homography2D_F64,AssociatedPair> {
+public class GenerateHomographyLinear implements
+		ModelGenerator<Homography2D_F64,AssociatedPair> ,
+		ModelFitter<Homography2D_F64,AssociatedPair>
+{
 
 	HomographyLinear4 alg = new HomographyLinear4(true);
 
 	@Override
-	public Homography2D_F64 declareModel() {
+	public Homography2D_F64 createModelInstance() {
 		return new Homography2D_F64();
 	}
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> dataSet,
-							Homography2D_F64 initParam,
-							Homography2D_F64 foundModel)
-	{
+	public boolean fitModel(List<AssociatedPair> dataSet, Homography2D_F64 initial, Homography2D_F64 found) {
 		if( !alg.process(dataSet) )
 			return false;
 
 		DenseMatrix64F m = alg.getHomography();
-		UtilHomography.convert(m,foundModel);
-
+		UtilHomography.convert(m,found);
 		return true;
+	}
+
+	@Override
+	public void generate(List<AssociatedPair> dataSet, HypothesisList<Homography2D_F64> models) {
+
+		if( !alg.process(dataSet) )
+			return;
+
+		Homography2D_F64 foundModel = models.pop();
+		DenseMatrix64F m = alg.getHomography();
+		UtilHomography.convert(m,foundModel);
 	}
 
 	@Override

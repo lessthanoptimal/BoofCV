@@ -25,7 +25,11 @@ Version : Alpha 0.6
 - Fixed bug in several derivative operators where the passed in border was being
   ignored and an extended border being used instead
 - Change ImplImageDistort* to use interpolate.get_unsafe() to speed it up by a large margin
- 
+- Moved ImageDistort from boofcv.alg.distort to boofcv.struct.distort
+- Added PointTransform_F32
+- Added both forward and reverse radial distortion PixelTransform_F32 implementations
+- ModelMatcher classes can now create multiple model hypotheses from a single set of
+  points.
 
 ---------------------------------------------
 Date    : 2012/02/01

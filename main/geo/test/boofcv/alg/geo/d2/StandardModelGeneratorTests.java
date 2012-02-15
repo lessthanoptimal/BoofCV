@@ -19,7 +19,8 @@
 package boofcv.alg.geo.d2;
 
 
-import boofcv.numerics.fitting.modelset.ModelFitter;
+import boofcv.numerics.fitting.modelset.HypothesisList;
+import boofcv.numerics.fitting.modelset.ModelGenerator;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -34,20 +35,20 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class StandardModelFitterTests<Model, Point> {
+public abstract class StandardModelGeneratorTests<Model, Point> {
 
 	int dof;
 
 	protected Random rand = new Random(234);
 
-	protected StandardModelFitterTests(int dof) {
+	protected StandardModelGeneratorTests(int dof) {
 		this.dof = dof;
 	}
 
 	/**
 	 * Creates a new model fitter\
 	 */
-	public abstract ModelFitter<Model, Point> createAlg();
+	public abstract ModelGenerator<Model, Point> createAlg();
 
 	/**
 	 * Creates a random model
@@ -66,7 +67,7 @@ public abstract class StandardModelFitterTests<Model, Point> {
 
 	@Test
 	public void checkMinPoints() {
-		ModelFitter<Model, Point> fitter = createAlg();
+		ModelGenerator<Model, Point> fitter = createAlg();
 		assertEquals(dof,fitter.getMinimumPoints());
 	}
 
@@ -87,13 +88,14 @@ public abstract class StandardModelFitterTests<Model, Point> {
 			dataSet.add(p);
 		}
 
-		ModelFitter<Model, Point> fitter = createAlg();
+		ModelGenerator<Model, Point> fitter = createAlg();
 
-		Model found = createRandomModel();
-		fitter.fitModel(dataSet,null,found);
+		HypothesisList<Model> list = new HypothesisList<Model>(fitter);
+		fitter.generate(dataSet,list);
+		assertEquals(1,list.size());
 
 		// test the found transform by seeing if it recomputes the current points
-		assertTrue(doPointsFitModel(found,dataSet));
+		assertTrue(doPointsFitModel(list.get(0),dataSet));
 	}
 
 }

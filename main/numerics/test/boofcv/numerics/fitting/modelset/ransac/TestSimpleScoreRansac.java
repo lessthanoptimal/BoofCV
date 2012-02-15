@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@
 
 package boofcv.numerics.fitting.modelset.ransac;
 
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.numerics.fitting.modelset.GenericModelSetTests;
-import boofcv.numerics.fitting.modelset.ModelFitter;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
+import boofcv.numerics.fitting.modelset.*;
 import org.junit.Test;
 
 import java.util.List;
@@ -33,20 +30,21 @@ public class TestSimpleScoreRansac extends GenericModelSetTests {
 
 	@Test
 	public void performStandardTests() {
-		configure(0.8, 0.2, true);
+		configure(0.5, 0.2, true);
 		performSimpleModelFit();
 		runMultipleTimes();
 	}
 
 	@Override
 	public ModelMatcher<double[],Double> createModelMatcher(DistanceFromModel<double[],Double> distance,
-												   ModelFitter<double[],Double> fitter,
-												   int minPoints, double fitThreshold) {
+															ModelGenerator<double[],Double> generator,
+															ModelFitter<double[],Double> fitter,
+															int minPoints, double fitThreshold) {
 
 
 		MyScorer scorer = new MyScorer();
 
-		return new SimpleScoreRansac<double[],Double>(3443, fitter, distance, scorer, 300, 2,
+		return new SimpleScoreRansac<double[],Double>(3443, generator, distance, scorer, 300, 2,
 				fitThreshold, minPoints, fitThreshold, 0.0);
 	}
 

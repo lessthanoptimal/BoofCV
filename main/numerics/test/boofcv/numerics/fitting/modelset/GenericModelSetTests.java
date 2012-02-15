@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,11 +155,14 @@ public abstract class GenericModelSetTests {
 		DistanceFromMeanModel dist = new DistanceFromMeanModel();
 		MeanModelFitter fitter = new MeanModelFitter();
 
-		return createModelMatcher(dist, fitter, minPoints, fitThreshold);
+		return createModelMatcher(dist, fitter,fitter, minPoints, fitThreshold);
 	}
 
 	public abstract ModelMatcher<double[],Double> createModelMatcher(
-			DistanceFromModel<double[],Double> distance, ModelFitter<double[],Double> fitter, int minPoints, double fitThreshold);
+			DistanceFromModel<double[],Double> distance,
+			ModelGenerator<double[],Double> generator,
+			ModelFitter<double[],Double> fitter,
+			int minPoints, double fitThreshold);
 
 
 }

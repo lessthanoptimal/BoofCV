@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 package boofcv.numerics.fitting.modelset.ransac;
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.numerics.fitting.modelset.ModelFitter;
+import boofcv.numerics.fitting.modelset.HypothesisList;
+import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 
 import java.util.ArrayList;
@@ -47,8 +48,8 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public abstract class SimpleRansacCommon<Model, Point> implements ModelMatcher<Model, Point> {
-	// fits a model to the set of points its provided
-	protected ModelFitter<Model,Point> modelFitter;
+	// generates an initial model given a set of points
+	protected ModelGenerator<Model,Point> modelGenerator;
 	// computes the distance a point is from the model
 	protected DistanceFromModel<Model,Point> modelDistance;
 
@@ -61,7 +62,9 @@ public abstract class SimpleRansacCommon<Model, Point> implements ModelMatcher<M
 	// list of samples from the best fit model
 	protected List<Point> bestFitPoints = new ArrayList<Point>();
 	protected Model bestFitParam;
-	protected Model candidateParam;
+
+	// hypothesis list created by model generator
+	HypothesisList<Model> candidates;
 
 	// the maximum number of iterations it will perform
 	protected int maxIterations;
@@ -70,16 +73,16 @@ public abstract class SimpleRansacCommon<Model, Point> implements ModelMatcher<M
 	protected List<Point> initialSample = new ArrayList<Point>();
 
 
-	public SimpleRansacCommon(ModelFitter<Model,Point> modelFitter,
+	public SimpleRansacCommon(ModelGenerator<Model,Point> modelGenerator,
 							  DistanceFromModel<Model,Point> modelDistance,
 							  long randSeed, int maxIterations) {
-		this.modelFitter = modelFitter;
+		this.modelGenerator = modelGenerator;
 		this.modelDistance = modelDistance;
+		this.candidates = new HypothesisList<Model>(modelGenerator);
 
 		rand = new Random(randSeed);
 		this.maxIterations = maxIterations;
-		bestFitParam = modelFitter.declareModel();
-		candidateParam = modelFitter.declareModel();
+		bestFitParam = modelGenerator.createModelInstance();
 	}
 
 	public SimpleRansacCommon() {

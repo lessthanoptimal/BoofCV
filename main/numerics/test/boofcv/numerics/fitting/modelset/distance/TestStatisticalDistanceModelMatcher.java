@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,9 @@ public class TestStatisticalDistanceModelMatcher extends GenericModelSetTests {
 
 	@Override
 	public ModelMatcher<double[],Double> createModelMatcher(DistanceFromModel<double[],Double> distance,
-												   ModelFitter<double[],Double> fitter,
-												   int minPoints, double fitThreshold) {
+															ModelGenerator<double[],Double> generator,
+															ModelFitter<double[],Double> fitter,
+															int minPoints, double fitThreshold) {
 		return new StatisticalDistanceModelMatcher<double[],Double>(5, 0, 0, 10000, minPoints,
 				StatisticalDistance.PERCENTILE,
 				0.95, fitter, distance, new ArrayCodec());

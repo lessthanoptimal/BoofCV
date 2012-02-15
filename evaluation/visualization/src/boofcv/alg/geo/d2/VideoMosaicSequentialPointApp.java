@@ -151,7 +151,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		// make sure there is nothing left over from before
 		tracker.dropTracks();
 		createModelMatcher(maxIterations,4);
-		distortAlg = new MotionMosaicPointKey<I,T>(tracker,modelMatcher,fitModel,40,0.3,0.8);
+		distortAlg = new MotionMosaicPointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,40,0.3,0.8);
 		T initTran = ConvertTransform_F64.convert(createInitialTransform(), fitModel.createInstance());
 		distortAlg.setInitialTransform(initTran);
 		totalKeyFrames = 0;

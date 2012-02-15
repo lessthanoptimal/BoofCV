@@ -25,7 +25,7 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.d2.DistanceHomographySq;
-import boofcv.alg.geo.d2.ModelFitterLinearHomography;
+import boofcv.alg.geo.d2.GenerateHomographyLinear;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -164,7 +164,7 @@ public class ExampleImageStitching {
 		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(new ScoreAssociateEuclideanSq(),2,-1,true);
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
-		ModelFitterLinearHomography modelFitter = new ModelFitterLinearHomography();
+		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear();
 		DistanceHomographySq distance = new DistanceHomographySq();
 		int minSamples = modelFitter.getMinimumPoints();
 		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher =

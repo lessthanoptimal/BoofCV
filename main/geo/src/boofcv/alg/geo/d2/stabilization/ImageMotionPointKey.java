@@ -20,6 +20,7 @@ package boofcv.alg.geo.d2.stabilization;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
@@ -45,6 +46,8 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	protected ImagePointTracker<I> tracker;
 	// Fits a model to the tracked features
 	protected ModelMatcher<T,AssociatedPair> modelMatcher;
+	// Refines the model using the complete inlier set
+	protected ModelFitter<T,AssociatedPair> modelRefiner;
 
 	// assumed initial transform from the first image to the world
 	protected T worldToInit;
@@ -62,14 +65,17 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 *
 	 * @param tracker feature tracker
 	 * @param modelMatcher Fits model to track data
+	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
 	 * @param model Motion model data structure
 	 */
 	public ImageMotionPointKey(ImagePointTracker<I> tracker,
 							   ModelMatcher<T, AssociatedPair> modelMatcher,
+							   ModelFitter<T,AssociatedPair> modelRefiner,
 							   T model)
 	{
 		this.tracker = tracker;
 		this.modelMatcher = modelMatcher;
+		this.modelRefiner = modelRefiner;
 		
 		worldToInit = (T)model.createInstance();
 		worldToKey = (T)model.createInstance();
@@ -138,8 +144,14 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 			return false;
 		}
 
+		// refine the motion estimate
+		if( modelRefiner == null ||
+				!modelRefiner.fitModel(modelMatcher.getMatchSet(),modelMatcher.getModel(),keyToCurr))
+		{
+			keyToCurr.set(modelMatcher.getModel());
+		}
+
 		// Update the motion
-		keyToCurr.set(modelMatcher.getModel());
 		worldToKey.concat(keyToCurr, worldToCurr);
 
 		return true;

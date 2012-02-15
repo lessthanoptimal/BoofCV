@@ -104,7 +104,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		// make sure there is nothing left over from before
 		tracker.dropTracks();
 		createModelMatcher(maxIterations,4);
-		distortAlg = new MotionStabilizePointKey<I,T>(tracker,modelMatcher,fitModel,
+		distortAlg = new MotionStabilizePointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,
 				thresholdKeyFrame,thresholdReset,largeMotionThreshold);
 //		distortAlg.setInitialTransform(createInitialTransform());
 

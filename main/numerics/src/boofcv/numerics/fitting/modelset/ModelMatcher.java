@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ public interface ModelMatcher<Model, Point> {
 	 * @param initialGuess An initial guess for what the model parameters might be. Can be null.
 	 * @return If it found a solution or not.
 	 */
+	// TODO delete initialGuess?
 	public boolean process(List<Point> dataSet, Model initialGuess);
 
 	/**

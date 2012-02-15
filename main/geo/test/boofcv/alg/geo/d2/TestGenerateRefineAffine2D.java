@@ -19,61 +19,70 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.numerics.fitting.modelset.ModelFitter;
-import georegression.struct.homo.Homography2D_F64;
+import boofcv.numerics.fitting.modelset.ModelGenerator;
+import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homo.HomographyPointOps;
+import georegression.transform.affine.AffinePointOps;
+import org.junit.Test;
 
 import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.fail;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestModelFitterLinearHomography extends StandardModelFitterTests<Homography2D_F64,AssociatedPair> {
+public class TestGenerateRefineAffine2D extends StandardModelGeneratorTests<Affine2D_F64,AssociatedPair> {
 
-	public TestModelFitterLinearHomography() {
-		super(4);
+	Random rand = new Random(234);
+
+	public TestGenerateRefineAffine2D() {
+		super(3);
+	}
+
+	@Test
+	public void addRefinementTest() {
+		fail("implement");
 	}
 
 	@Override
-	public ModelFitter<Homography2D_F64, AssociatedPair> createAlg() {
-		return new ModelFitterLinearHomography();
+	public ModelGenerator<Affine2D_F64, AssociatedPair> createAlg() {
+		return new GenerateRefineAffine2D();
 	}
 
 	@Override
-	public Homography2D_F64 createRandomModel() {
-		Homography2D_F64 model = new Homography2D_F64();
+	public Affine2D_F64 createRandomModel() {
+		Affine2D_F64 model = new Affine2D_F64();
 		model.a11 = rand.nextDouble();
 		model.a12 = rand.nextDouble();
-		model.a13 = rand.nextDouble();
 		model.a21 = rand.nextDouble();
 		model.a22 = rand.nextDouble();
-		model.a23 = rand.nextDouble();
-		model.a31 = rand.nextDouble();
-		model.a32 = rand.nextDouble();
-		model.a33 = rand.nextDouble();
+		model.tx = rand.nextDouble();
+		model.ty = rand.nextDouble();
 
 		return model;
 	}
 
 	@Override
-	public AssociatedPair createRandomPointFromModel(Homography2D_F64 transform) {
+	public AssociatedPair createRandomPointFromModel(Affine2D_F64 affine) {
 		AssociatedPair ret = new AssociatedPair();
 		ret.keyLoc.x = rand.nextDouble()*10;
 		ret.keyLoc.y = rand.nextDouble()*10;
 
-		HomographyPointOps.transform(transform, ret.keyLoc, ret.currLoc);
+		AffinePointOps.transform(affine,ret.keyLoc,ret.currLoc);
 
 		return ret;
 	}
 
 	@Override
-	public boolean doPointsFitModel(Homography2D_F64 transform, List<AssociatedPair> dataSet) {
+	public boolean doPointsFitModel(Affine2D_F64 affine, List<AssociatedPair> dataSet) {
+
 		Point2D_F64 expected = new Point2D_F64();
 
 		for( AssociatedPair p : dataSet ) {
-			HomographyPointOps.transform(transform,p.keyLoc,expected);
+			AffinePointOps.transform(affine,p.keyLoc,expected);
 
 			if( expected.distance(p.currLoc) > 0.01 )
 				return false;

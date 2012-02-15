@@ -20,6 +20,7 @@ package boofcv.alg.geo.d2.stabilization;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
@@ -56,15 +57,17 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 	 *
 	 * @param tracker feature tracker
 	 * @param modelMatcher Fits model to track data
+	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
 	 * @param model Motion model data structure
 	 */
 	public MotionMosaicPointKey(ImagePointTracker<I> tracker,
 								ModelMatcher<T, AssociatedPair> modelMatcher,
+								ModelFitter<T,AssociatedPair> modelRefiner,
 								T model,
 								int absoluteMinimumTracks, double respawnTrackFraction,
 								double respawnCoverageFraction)
 	{
-		super(tracker, modelMatcher, model);
+		super(tracker, modelMatcher, modelRefiner, model);
 		
 		this.absoluteMinimumTracks = absoluteMinimumTracks;
 		this.respawnTrackFraction = respawnTrackFraction;

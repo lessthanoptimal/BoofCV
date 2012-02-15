@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,10 @@ import java.util.List;
  * deviate the most are removed and the best fit parameters are recomputed.  This is done
  * until some error metric changes very little or the maximum number of iterations has been
  * exceeded.  Works well when the inlier set is much greater than the noise.
+ * </p>
+ *
+ * <p>
+ * Anyone have a good reference paper for this approach?
  * </p>
  *
  * @author Peter Abeles
@@ -108,8 +112,8 @@ public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatch
 		this.modelError = modelError;
 		this.codec = codec;
 
-		param = modelFitter.declareModel();
-		currParam = modelFitter.declareModel();
+		param = modelFitter.createModelInstance();
+		currParam = modelFitter.createModelInstance();
 
 		switch (statistics) {
 			case MEAN:
