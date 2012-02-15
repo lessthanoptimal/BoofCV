@@ -18,7 +18,6 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
@@ -26,6 +25,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
 import georegression.struct.affine.Affine2D_F32;

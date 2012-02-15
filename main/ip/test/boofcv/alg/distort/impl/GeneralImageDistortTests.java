@@ -18,7 +18,6 @@
 
 package boofcv.alg.distort.impl;
 
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.ImageGenerator;
@@ -27,6 +26,7 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;

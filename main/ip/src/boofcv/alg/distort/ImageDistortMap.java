@@ -21,6 +21,7 @@ package boofcv.alg.distort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
+import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F32;

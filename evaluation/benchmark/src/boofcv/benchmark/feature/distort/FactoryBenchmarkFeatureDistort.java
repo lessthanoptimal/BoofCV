@@ -19,7 +19,6 @@
 package boofcv.benchmark.feature.distort;
 
 import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.filter.basic.GGrayImageOps;
@@ -29,6 +28,7 @@ import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.affine.Affine2D_F32;
 

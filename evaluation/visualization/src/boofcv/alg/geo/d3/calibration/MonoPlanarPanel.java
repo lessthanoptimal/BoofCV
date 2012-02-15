@@ -18,12 +18,12 @@
 
 package boofcv.alg.geo.d3.calibration;
 
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.calibration.ParametersZhang98;
 import boofcv.app.ImageResults;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.VisualizeFeatures;
+import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
@@ -220,7 +220,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		BufferedImage image = images.get(selected);
 		int numBands = image.getRaster().getNumBands();
 
-		if( origMS == null ) {
+		if( origMS == null || origMS.getNumBands() != numBands ) {
 			origMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
 			correctedMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
 		}
@@ -246,6 +246,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	private void undoRadialDistortion(BufferedImage image) {
 		ConvertBufferedImage.convertFromMulti(image, origMS, ImageFloat32.class);
+		System.out.println("number of bands "+origMS.getNumBands());
 		for( int i = 0; i < origMS.getNumBands(); i++ ) {
 			ImageFloat32 in = origMS.getBand(i);
 			ImageFloat32 out = correctedMS.getBand(i);
