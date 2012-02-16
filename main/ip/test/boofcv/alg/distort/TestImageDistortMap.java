@@ -18,9 +18,13 @@
 
 package boofcv.alg.distort;
 
+import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
+import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.image.ImageFloat32;
+import georegression.struct.affine.Affine2D_F32;
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -28,7 +32,14 @@ import static org.junit.Assert.fail;
 public class TestImageDistortMap {
 
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void compare() {
+
+		Affine2D_F32 affine = new Affine2D_F32(1,2,3,4,5,6);
+		PixelTransformAffine_F32 tran = new PixelTransformAffine_F32(affine);
+
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class,1);
+
+//		ImageDistortCache
 	}
 }

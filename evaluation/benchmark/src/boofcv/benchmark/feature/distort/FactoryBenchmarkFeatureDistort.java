@@ -19,16 +19,16 @@
 package boofcv.benchmark.feature.distort;
 
 import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.filter.basic.GGrayImageOps;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.affine.Affine2D_F32;
 
@@ -140,8 +140,8 @@ public class FactoryBenchmarkFeatureDistort {
 			Affine2D_F32 imageToInit = initToImage.invert(null);
 			PixelTransformAffine_F32 affine = new PixelTransformAffine_F32(imageToInit);
 			InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
-			ImageDistort<T> distorter = DistortSupport.createDistort(imageType,affine,interp, FactoryImageBorder.value(imageType, 0));
-
+			ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(imageType, 0), imageType);
+			distorter.setModel(affine);
 			distorter.apply(image,distortedImage);
 		}
 

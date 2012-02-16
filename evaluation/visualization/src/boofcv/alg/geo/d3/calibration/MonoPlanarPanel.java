@@ -18,12 +18,12 @@
 
 package boofcv.alg.geo.d3.calibration;
 
+import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.calibration.ParametersZhang98;
 import boofcv.app.ImageResults;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.VisualizeFeatures;
-import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
