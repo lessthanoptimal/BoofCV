@@ -19,14 +19,15 @@
 package boofcv.alg.geo.d2.stabilization;
 
 import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
@@ -96,7 +97,7 @@ public class RenderImageMotion<I extends ImageSingleBand, O extends ImageBase> {
 			}
 			imageMosaic = (O) temp;
 			tempMosaic = (O)GeneralizedImageOps.createSingleBand(imageType, mosaicWidth, mosaicHeight);
-			distorter = (ImageDistort<O>)DistortSupport.createDistort(imageType,null,interp,null);
+			distorter = (ImageDistort<O>) FactoryDistort.distort( interp,null,imageType);
 		}
 	}
 

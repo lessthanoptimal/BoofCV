@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.impl;
 
-import boofcv.struct.distort.ImageDistort;
+import boofcv.alg.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;

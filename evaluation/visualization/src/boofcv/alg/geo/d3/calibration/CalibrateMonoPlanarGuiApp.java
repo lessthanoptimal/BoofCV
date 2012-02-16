@@ -19,8 +19,8 @@
 package boofcv.alg.geo.d3.calibration;
 
 import boofcv.alg.distort.AddRadialDistortionPixel;
+import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.geo.calibration.FactoryPlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.ParametersZhang98;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
@@ -30,8 +30,8 @@ import boofcv.app.PlanarCalibrationDetector;
 import boofcv.app.WrapPlanarGridTarget;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
+import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 
@@ -73,7 +73,8 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 		PixelTransform_F32 tran = new PointToPixelTransform_F32(this.tran);
 		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class, 0);
-		dist = DistortSupport.createDistort(ImageFloat32.class,tran,interp,border);
+		dist = FactoryDistort.distort(interp,border,ImageFloat32.class);
+		dist.setModel(tran);
 	}
 
 	/**

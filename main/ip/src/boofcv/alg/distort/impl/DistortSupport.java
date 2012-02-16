@@ -18,12 +18,15 @@
 
 package boofcv.alg.distort.impl;
 
+import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.distort.ImageDistort;
+import boofcv.factory.distort.FactoryDistort;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.*;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.se.InvertibleTransformSequence;
 import georegression.struct.se.Se2_F32;
@@ -86,34 +89,7 @@ public class DistortSupport {
 	}
 
 	/**
-	 * Creates a {@link boofcv.struct.distort.ImageDistort} for the specified image type, transformation
-	 * and interpolation instance.
-	 *
-	 * @param dstToSrc Transform from dst to src image.
-	 * @param interp Which interpolation algorithm should be used.
-	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
-	 *               happens to pixels which have a source pixel outside the image.
-	 */
-	public static <T extends ImageSingleBand>
-	ImageDistort<T> createDistort(Class<T> imageType,
-								  PixelTransform_F32 dstToSrc,
-								  InterpolatePixel<T> interp, ImageBorder border)
-	{
-		if( imageType == ImageFloat32.class ) {
-			return (ImageDistort<T>)new ImplImageDistort_F32(dstToSrc,(InterpolatePixel<ImageFloat32>)interp,border);
-		} else if( ImageSInt32.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_S32(dstToSrc,(InterpolatePixel<ImageSInt32>)interp,border);
-		} else if( ImageInt16.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_I16(dstToSrc,(InterpolatePixel<ImageInt16>)interp,border);
-		} else if( ImageInt8.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_I8(dstToSrc,(InterpolatePixel<ImageInt8>)interp,border);
-		} else {
-			throw new IllegalArgumentException("Image type not supported: "+imageType.getSimpleName());
-		}
-	}
-
-	/**
-	 * Creates a {@link boofcv.struct.distort.ImageDistort} for the multi-spectral images of the specified image type, transformation
+	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the multi-spectral images of the specified image type, transformation
 	 * and interpolation instance.
 	 *
 	 * @param dstToSrc Transform from dst to src image.
@@ -126,7 +102,8 @@ public class DistortSupport {
 												   PixelTransform_F32 dstToSrc,
 												   InterpolatePixel<T> interp, ImageBorder border)
 	{
-		ImageDistort<T> bandDistort = createDistort(imageType,dstToSrc,interp,border);
+		ImageDistort<T> bandDistort = FactoryDistort.distort(interp, border, imageType);
+		bandDistort.setModel(dstToSrc);
 		return new ImplImageDistort_MS<T>(bandDistort);
 	}
 }

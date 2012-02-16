@@ -80,6 +80,8 @@ public class HypothesisList<Model> {
 			temp[i] = generator.createModelInstance();
 		}
 		h = temp;
-		N = 0;
+		
+		if( N > size )
+			N = size;
 	}
 }

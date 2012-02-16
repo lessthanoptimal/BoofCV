@@ -18,28 +18,24 @@
 
 package boofcv.alg.distort.impl;
 
-import boofcv.alg.distort.ImageDistortBasic;
+import boofcv.alg.distort.ImageDistortCache;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.image.ImageInt16;
-
+import boofcv.struct.image.ImageFloat32;
 
 /**
- * <p>Implementation of {@link boofcv.alg.distort.ImageDistort}.</p>
- *
  * @author Peter Abeles
  */
-@SuppressWarnings({"UnnecessaryLocalVariable"})
-public class ImplImageDistort_I16<T extends ImageInt16> extends ImageDistortBasic<T> {
+public class TestImplImageDistortCache_F32 extends CommonImageDistortCacheTests<ImageFloat32> {
 
-	public ImplImageDistort_I16(InterpolatePixel<T> interp,
-								ImageBorder<T> border) {
-		super(interp, border);
+	public TestImplImageDistortCache_F32() {
+		super(ImageFloat32.class);
 	}
 
 	@Override
-	protected void assign(int indexDst, float value) {
-		dstImg.data[indexDst] = (byte)value;
+	public ImageDistortCache<ImageFloat32> create(InterpolatePixel<ImageFloat32> interp,
+												  ImageBorder<ImageFloat32> border ,
+												  Class<ImageFloat32> imageType) {
+		return new ImplImageDistortCache_F32(interp,border);
 	}
-
 }

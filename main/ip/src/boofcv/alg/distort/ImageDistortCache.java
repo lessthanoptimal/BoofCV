@@ -20,40 +20,43 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F32;
 
 /**
+ * Except for very simple functions, computing the per pixel distortion is an expensive operation.
+ * To overcome this problem the distortion is computed once and cached.  Then when the image is distorted
+ * again the save results are simply recalled and not computed again.
+ *
  * @author Peter Abeles
  */
-public class ImageDistortMap implements ImageDistort<ImageFloat32> {
+public abstract class ImageDistortCache<T extends ImageSingleBand> implements ImageDistort<T> {
 
-	int width,height;
-	Point2D_F32 map[];
+	// size of output image
+	private int width=-1,height=-1;
+	private Point2D_F32 map[];
 	// sub pixel interpolation
-	private InterpolatePixel<ImageFloat32> interp;
+	private InterpolatePixel<T> interp;
 	// handle the image border
-	private ImageBorder_F32 border;
+	private ImageBorder<T> border;
 
 	// crop boundary
-	int x0,y0,x1,y1;
+	private int x0,y0,x1,y1;
 
-	public ImageDistortMap(int width, int height, 
-						   InterpolatePixel<ImageFloat32> interp , 
-						   ImageBorder<ImageFloat32> border) {
-		this.width = width;
-		this.height = height;
+	protected T srcImg;
+	protected T dstImg;
 
+	/**
+	 * Specifies configuration parameters
+	 *
+	 * @param interp Interpolation algorithm
+	 * @param border How borders are handled
+	 */
+	public ImageDistortCache(InterpolatePixel<T> interp,
+							 ImageBorder<T> border) {
 		this.interp = interp;
-		this.border = (ImageBorder_F32)border;
-
-		map = new Point2D_F32[width*height];
-		for( int i = 0; i < map.length; i++ ) {
-			map[i] = new Point2D_F32();
-		}
+		this.border = border;
 	}
 
 	@Override
@@ -68,36 +71,46 @@ public class ImageDistortMap implements ImageDistort<ImageFloat32> {
 	}
 
 	@Override
-	public void apply(ImageFloat32 srcImg, ImageFloat32 dstImg) {
-		if( dstImg.width != width || dstImg.height != height )
-			throw new IllegalArgumentException("Unexpected dstImg dimension");
-
-		interp.setImage(srcImg);
+	public void apply(T srcImg, T dstImg) {
+		init(srcImg, dstImg);
 
 		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
 
 		if( border != null )
-			applyBorder(srcImg, dstImg);
+			applyBorder();
 		else
-			applyNoBorder(srcImg, dstImg);
+			applyNoBorder();
 	}
 
 	@Override
-	public void apply(ImageFloat32 srcImg, ImageFloat32 dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
-		if( dstImg.width != width || dstImg.height != height )
-			throw new IllegalArgumentException("Unexpected dstImg dimension");
-
-		interp.setImage(srcImg);
+	public void apply(T srcImg, T dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
+		init(srcImg, dstImg);
 
 		x0 = dstX0;y0 = dstY0;x1 = dstX1;y1 = dstY1;
 
 		if( border != null )
-			applyBorder(srcImg, dstImg);
+			applyBorder();
 		else
-			applyNoBorder(srcImg, dstImg);
+			applyNoBorder();
 	}
 
-	public void applyBorder( ImageFloat32 srcImg , ImageFloat32 dstImg ) {
+	private void init(T srcImg, T dstImg) {
+		if( width == -1 ) {
+			width = dstImg.width;
+			height = dstImg.height;
+			map = new Point2D_F32[width*height];
+			for( int i = 0; i < map.length; i++ ) {
+				map[i] = new Point2D_F32();
+			}
+		} else if( dstImg.width != width || dstImg.height != height )
+			throw new IllegalArgumentException("Unexpected dstImg dimension");
+
+		this.srcImg = srcImg;
+		this.dstImg = dstImg;
+		interp.setImage(srcImg);
+	}
+
+	public void applyBorder() {
 
 		border.setImage(srcImg);
 
@@ -115,19 +128,18 @@ public class ImageDistortMap implements ImageDistort<ImageFloat32> {
 				Point2D_F32 s = map[indexDst];
 
 				if( s.x < minInterpX || s.x >= maxInterpX || s.y < minInterpY || s.y >= maxInterpY ) {
-					if( s.x >= 0f && s.x < widthF && s.y >= 0f && s.y < heightF )
-						dstImg.data[indexDst] = interp.get(s.x,s.y);
+					if( s.x < 0f || s.x >= widthF || s.y < 0f || s.y >= heightF )
+						assign(indexDst,(float)border.getGeneral((int)s.x,(int)s.y));
 					else
-						dstImg.data[indexDst] = border.getOutside((int)s.x,(int)s.y);
+						assign(indexDst,interp.get(s.x, s.y));
 				} else {
-					dstImg.data[indexDst] = interp.get(s.x,s.y);
+					assign(indexDst,interp.get_unsafe(s.x, s.y));
 				}
 			}
 		}
 	}
 
-	public void applyNoBorder( ImageFloat32 srcImg , ImageFloat32 dstImg ) {
-
+	public void applyNoBorder() {
 		final float minInterpX = interp.getUnsafeBorderX();
 		final float minInterpY = interp.getUnsafeBorderY();
 		final float maxInterpX = srcImg.getWidth()-interp.getUnsafeBorderX();
@@ -143,11 +155,13 @@ public class ImageDistortMap implements ImageDistort<ImageFloat32> {
 
 				if( s.x < minInterpX || s.x >= maxInterpX || s.y < minInterpY || s.y >= maxInterpY ) {
 					if( s.x >= 0f && s.x < widthF && s.y >= 0f && s.y < heightF )
-						dstImg.data[indexDst] = interp.get(s.x,s.y);
+						assign(indexDst,interp.get(s.x, s.y));
 				} else {
-					dstImg.data[indexDst] = interp.get_unsafe(s.x, s.y);
+					assign(indexDst,interp.get_unsafe(s.x, s.y));
 				}
 			}
 		}
 	}
+
+	protected abstract void assign( int indexDst , float value );
 }

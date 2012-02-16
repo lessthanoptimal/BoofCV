@@ -22,8 +22,8 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
@@ -87,7 +87,8 @@ public class DistortImageOps {
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
 		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
-		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,transform,interp, FactoryImageBorder.value(inputType, 0));
+		ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(inputType, 0), inputType);
+		distorter.setModel(transform);
 		distorter.apply(input,output);
 	}
 	
@@ -98,7 +99,8 @@ public class DistortImageOps {
 	{
 		Class<T> bandType = input.getType();
 		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, bandType);
-		ImageDistort<T> distorter = DistortSupport.createDistort(bandType,transform,interp, FactoryImageBorder.value(bandType, 0));
+		ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(bandType, 0), bandType);
+		distorter.setModel(transform);
 		int N = input.getNumBands();
 		
 		for( int i = 0; i < N; i++ ) {
@@ -135,7 +137,8 @@ public class DistortImageOps {
 	public static <T extends ImageSingleBand>
 	void distortSingle( T input , T output , PixelTransformAffine_F32 model , InterpolatePixel<T> interp ) {
 		Class<T> inputType = (Class<T>)input.getClass();
-		ImageDistort<T> distorter = DistortSupport.createDistort(inputType,model,interp, FactoryImageBorder.value(inputType, 0));
+		ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(inputType, 0),inputType);
+		distorter.setModel(model);
 		distorter.apply(input,output);
 	}
 

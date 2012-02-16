@@ -18,14 +18,14 @@
 
 package boofcv.alg.interpolate.impl;
 
+import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
+import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.ImageDistort;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import georegression.struct.affine.Affine2D_F32;
@@ -62,12 +62,14 @@ public class TestImplPolynomialPixel_I extends GeneralInterpolationPixelChecks<I
 		InterpolatePixel<ImageUInt8> alg = (InterpolatePixel)new ImplPolynomialPixel_I(2,0,255);
 
 		ImageBorder<ImageUInt8> border = FactoryImageBorder.value(ImageUInt8.class, 0);
-		ImageDistort<ImageUInt8> distorter = DistortSupport.createDistort(ImageUInt8.class, new PixelTransformAffine_F32(tran), alg, border);
+		ImageDistort<ImageUInt8> distorter = FactoryDistort.distort(alg, border, ImageUInt8.class);
+		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 
 		InterpolatePixel<ImageUInt8> bilinear = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
 
-		distorter = DistortSupport.createDistort(ImageUInt8.class, new PixelTransformAffine_F32(tran), bilinear, border);
+		distorter = FactoryDistort.distort(bilinear, border,ImageUInt8.class);
+		distorter.setModel(new PixelTransformAffine_F32(tran));
         distorter.apply(img, expected);
 
 		BoofTesting.assertEquals(expected, found, 0);

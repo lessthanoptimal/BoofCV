@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.struct.distort;
+package boofcv.alg.distort;
 
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 
 
