@@ -86,6 +86,9 @@ public class DetectSquareCalibrationPoints {
 	 */
 	public DetectSquareCalibrationPoints(int maxCombinations,
 										 int gridCols, int gridRows) {
+		if( gridCols <= 0 || gridRows <= 0 )
+			throw new IllegalArgumentException("Columns and rows must be more than zero");
+
 		this.gridCols = gridCols;
 		this.gridRows = gridRows;
 		this.maxCombinations = maxCombinations;
