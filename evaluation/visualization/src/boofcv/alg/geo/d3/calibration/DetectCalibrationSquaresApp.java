@@ -54,7 +54,7 @@ public class DetectCalibrationSquaresApp
 	int targetRows;
 
 	// detects the calibration target
-	DetectSquareCalibrationPoints alg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
+	DetectSquareCalibrationPoints alg;
 
 	// gray scale image that targets are detected inside of
 	ImageFloat32 gray = new ImageFloat32(1,1);
@@ -82,6 +82,8 @@ public class DetectCalibrationSquaresApp
 	public DetectCalibrationSquaresApp( int numCols , int numRows ) {
 		this.targetColumns = numCols;
 		this.targetRows = numRows;
+
+		alg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
 
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
@@ -295,11 +297,12 @@ public class DetectCalibrationSquaresApp
 
 		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp(4,3);
 
-		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
+//		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
+		String prefix = "../data/evaluation/calibration/stereo/temp/";
 
 		ImageListManager manager = new ImageListManager();
-		manager.add("foo","../CalibIm1.jpg");
-		manager.add("View 01",prefix+"frame01.jpg");
+//		manager.add("foo","../CalibIm1.jpg");
+		manager.add("View 01",prefix+"frame10.jpg");
 		manager.add("View 02",prefix+"frame02.jpg");
 		manager.add("View 03",prefix+"frame03.jpg");
 		manager.add("View 04",prefix+"frame04.jpg");

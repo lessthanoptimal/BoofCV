@@ -56,4 +56,9 @@ public class FactoryPlanarCalibrationTarget {
 
 		return new PlanarCalibrationTarget(all);
 	}
+
+	public static PlanarCalibrationTarget gridChess( int numCols , int numRows , double squareWidth )
+	{
+		return gridSquare(numCols-1,numRows-1,squareWidth,squareWidth);
+	}
 }

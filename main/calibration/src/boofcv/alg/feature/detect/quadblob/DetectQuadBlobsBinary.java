@@ -107,11 +107,11 @@ public class DetectQuadBlobsBinary {
 		//remove blobs with holes
 		numLabels = removeBlobsHoles(binary, labeledBlobs,numLabels);
 
+		// remove blobs that touch the image border
+		numLabels = filterTouchEdge(labeledBlobs,numLabels);
+
 		// find their contours
 		List<List<Point2D_I32>> contours = BinaryImageOps.labelEdgeCluster4(labeledBlobs,numLabels,null);
-
-		// remove blobs which touch the image edge
-		filterTouchEdge(contours,binary.width,binary.height);
 
 		// create  list of squares and find an initial estimate of their corners
 		squares = new ArrayList<QuadBlob>();
@@ -177,28 +177,46 @@ public class DetectQuadBlobsBinary {
 		// relabel the image to remove blobs with holes inside
 		BinaryImageOps.relabel(labeled,counter);
 
-		return counts;
+		return counts-1;
 	}
 
 	/**
-	 * Remove contours which touch the image's edge
+	 * Set the value of any blob which touches the image border to zero.  Then
+	 * relabel the binary image.
 	 */
-	private void filterTouchEdge(List<List<Point2D_I32>> contours , int w , int h ) {
-		w--;
-		h--;
-
-		for( int i = 0; i < contours.size(); ) {
-			boolean touched = false;
-			for( Point2D_I32 p : contours.get(i)) {
-				if( p.x == 0 || p.y == 0 || p.x == w || p.y == h ) {
-					contours.remove(i);
-					touched = true;
-					break;
-				}
-			}
-			if( !touched )
-				i++;
+	private int filterTouchEdge(ImageSInt32 labeled , int numLabels ) {
+		int value[] = new int[ numLabels + 1 ];
+		for( int i = 0; i < value.length; i++ ) {
+			value[i] = i;
 		}
+
+		for( int y = 0; y < labeled.height; y++ ) {
+			int row = labeled.startIndex + labeled.stride*y;
+			int rowEnd = row+labeled.width-1;
+
+			value[labeled.data[row]] = 0;
+			value[labeled.data[rowEnd]] = 0;
+		}
+
+		for( int x = 0; x < labeled.width; x++ ) {
+			int top = labeled.startIndex + x;
+			int bottom = labeled.startIndex + labeled.stride*(labeled.height-1) + x;
+
+			value[labeled.data[top]] = 0;
+			value[labeled.data[bottom]] = 0;
+		}
+
+		int count = 1;
+		for( int i = 0; i < value.length; i++ ) {
+			if( value[i] != 0 ) {
+				value[i] = count++;
+			}
+		}
+
+		// relabel the image to remove blobs with holes inside
+		BinaryImageOps.relabel(labeled,value);
+
+		return count-1;
 	}
 
 	/**
