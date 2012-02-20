@@ -76,7 +76,6 @@ public class PositiveDepthConstraintCheck {
 		// adjust camera B's pointing vector
 		GeometryMath_F64.mult(fromBtoA.getR(), lineB.getSlope(), lineB.getSlope());
 
-
 		if( !ClosestPoint3D_F64.closestPoints(lineA, lineB, closestPoints) )
 			return false;
 

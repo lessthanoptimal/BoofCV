@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,19 @@ import boofcv.numerics.optimization.OptimizationException;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
 import boofcv.numerics.optimization.functions.FunctionNtoMxN;
-import boofcv.numerics.optimization.impl.LevenbergMarquardtDampened;
+import boofcv.numerics.optimization.impl.LevenbergDampened;
 import boofcv.numerics.optimization.impl.NumericalJacobianForward;
 
 /**
- * Wrapper around {@link LevenbergMarquardtDampened} for {@link UnconstrainedLeastSquares}
- * 
+ * Wrapper around {@link boofcv.numerics.optimization.impl.LevenbergMarquardtDampened} for {@link boofcv.numerics.optimization.UnconstrainedLeastSquares}
+ *
  * @author Peter Abeles
  */
-public class WrapLevenbergMarquardtDampened implements UnconstrainedLeastSquares {
-	
-	LevenbergMarquardtDampened alg;
+public class WrapLevenbergDampened implements UnconstrainedLeastSquares {
 
-	public WrapLevenbergMarquardtDampened(LevenbergMarquardtDampened alg) {
+	LevenbergDampened alg;
+
+	public WrapLevenbergDampened(LevenbergDampened alg) {
 		this.alg = alg;
 	}
 

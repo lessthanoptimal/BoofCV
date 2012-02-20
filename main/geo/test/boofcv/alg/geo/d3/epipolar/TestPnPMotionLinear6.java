@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class TestMotionLinear6 extends CommonMotionNPoint {
+public class TestPnPMotionLinear6 extends CommonMotionNPoint {
 
 	/**
 	 * Standard test using only the minimum number of observation
@@ -48,7 +48,7 @@ public class TestMotionLinear6 extends CommonMotionNPoint {
 
 	@Override
 	public Se3_F64 compute(List<AssociatedPair> obs, List<Point3D_F64> locations) {
-		MotionLinear6 alg = new MotionLinear6();
+		PnPMotionLinear6 alg = new PnPMotionLinear6();
 
 		alg.process(obs,locations);
 

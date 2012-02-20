@@ -18,43 +18,32 @@
 
 package boofcv.numerics.optimization;
 
-import boofcv.numerics.optimization.impl.LevenbergMarquardtDampened;
+import boofcv.numerics.optimization.impl.LevenbergDampened;
 import boofcv.numerics.optimization.wrap.WrapLevenbergDampened;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
-import org.ejml.data.DenseMatrix64F;
 
 /**
  * @author Peter Abeles
  */
-public class EvaluateLevenbergMarquardtDampened extends UnconstrainedLeastSquaresEvaluator {
+public class EvaluateLevenbergDampened extends UnconstrainedLeastSquaresEvaluator {
 
-	boolean robust = true;
 	double absoluteErrorTol = 1e-15;
 	double relativeErrorTol = 1e-15;
 	double dampInit = 1e-3;
 
-	public EvaluateLevenbergMarquardtDampened(boolean verbose) {
+	public EvaluateLevenbergDampened(boolean verbose) {
 		super(verbose, false);
 	}
 
 	@Override
 	protected UnconstrainedLeastSquares createSearch(double minimumValue) {
-		LinearSolver<DenseMatrix64F> solver;
 
-		if( robust ) {
-			solver = LinearSolverFactory.solverPseudoInverse();
-		} else {
-			solver = LinearSolverFactory.symmPosDef(10);
-		}
-
-		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,dampInit,
+		LevenbergDampened alg = new LevenbergDampened(dampInit,
 				absoluteErrorTol,relativeErrorTol);
 		return new WrapLevenbergDampened(alg);
 	}
 
 	public static void main( String args[] ) {
-		EvaluateLevenbergMarquardtDampened eval = new EvaluateLevenbergMarquardtDampened(false);
+		EvaluateLevenbergDampened eval = new EvaluateLevenbergDampened(false);
 
 		System.out.println("Powell              ----------------");
 		eval.powell();
