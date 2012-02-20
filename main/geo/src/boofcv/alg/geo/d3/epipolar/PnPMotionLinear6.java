@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * <p>
  * Estimates the camera motion using linear algebra given a set of N associated point observations and the
- * depth (z-coordinate) of each object, where N >= 6.  This is known as the perspective N point problem.  All
+ * depth (z-coordinate) of each object, where N >= 6.  This is known as the Perspective N Point (PnP) problem.  All
  * observations are in calibrated pixel coordinates.
  * </p>
  *
@@ -64,7 +64,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class MotionLinear6 {
+public class PnPMotionLinear6 {
 
 	// The rank 11 linear system
 	private DenseMatrix64F A = new DenseMatrix64F(1,12);

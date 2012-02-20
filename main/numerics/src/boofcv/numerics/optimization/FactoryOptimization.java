@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@
 
 package boofcv.numerics.optimization;
 
+import boofcv.numerics.optimization.impl.LevenbergDampened;
 import boofcv.numerics.optimization.impl.LevenbergMarquardtDampened;
-import boofcv.numerics.optimization.wrap.WrapLevenbergMarquardtDampened;
+import boofcv.numerics.optimization.wrap.WrapLevenbergDampened;
 import boofcv.numerics.optimization.wrap.WrapQuasiNewtonBFGS;
 import org.ejml.alg.dense.linsol.LinearSolver;
 import org.ejml.alg.dense.linsol.LinearSolverFactory;
@@ -81,6 +82,25 @@ public class FactoryOptimization {
 
 		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,
 				dampInit,absoluteErrorTol,relativeErrorTol);
-		return new WrapLevenbergMarquardtDampened(alg);
+		return new WrapLevenbergDampened(alg);
+	}
+
+	/**
+	 * <p>
+	 * Unconstrained least squares Levenberg optimizer for dense problems.  Some times works better than
+	 * </p>
+	 *
+	 * @param relativeErrorTol tolerance used to terminate the optimization. 0 <= tol < 1
+	 * @param absoluteErrorTol Absolute tolerance used to terminate the optimization. 0 <= tol
+	 * @param dampInit Initial value of dampening parameter.  Tune.  Start at around 1e-3.
+	 * @return UnconstrainedLeastSquares
+	 */
+	public static UnconstrainedLeastSquares leastSquareLevenberg( double relativeErrorTol,
+																  double absoluteErrorTol,
+																  double dampInit )
+	{
+
+		LevenbergDampened alg = new LevenbergDampened(dampInit,absoluteErrorTol,relativeErrorTol);
+		return new WrapLevenbergDampened(alg);
 	}
 }
