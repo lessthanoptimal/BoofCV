@@ -110,7 +110,7 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 	}
 
 	@Override
-	public boolean process(List<Point> dataSet, Model paramInitial) {
+	public boolean process(List<Point> dataSet) {
 		if( dataSet.size() < sampleSize )
 			return false;
         
@@ -144,12 +144,12 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 		}
 
 		// if configured to do so compute the inlier set
-		computeInlierSet(dataSet, paramInitial, N);
+		computeInlierSet(dataSet, N);
 
 		return bestMedian <= maxMedianError;
 	}
 
-	private void computeInlierSet(List<Point> dataSet, Model paramInitial, int n) {
+	private void computeInlierSet(List<Point> dataSet, int n) {
 		int numPts = (int)(n *inlierFrac);
 
 		if( inlierFrac > 0 && numPts > sampleSize ) {

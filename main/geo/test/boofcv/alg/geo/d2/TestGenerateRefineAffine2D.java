@@ -19,6 +19,7 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -28,29 +29,41 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.fail;
-
 
 /**
  * @author Peter Abeles
  */
-public class TestGenerateRefineAffine2D extends StandardModelGeneratorTests<Affine2D_F64,AssociatedPair> {
-
+public class TestGenerateRefineAffine2D implements ModelTestingInterface<Affine2D_F64,AssociatedPair>
+{
 	Random rand = new Random(234);
 
-	public TestGenerateRefineAffine2D() {
-		super(3);
+	@Test
+	public void fitModel() {
+		StandardModelFitterTests<Affine2D_F64,AssociatedPair> alg =
+				new StandardModelFitterTests<Affine2D_F64,AssociatedPair>(this,3) {
+					@Override
+					public ModelFitter<Affine2D_F64,AssociatedPair> createAlg() {
+						return new GenerateRefineAffine2D();
+					}
+				};
+
+		alg.simpleTest();
 	}
 
 	@Test
-	public void addRefinementTest() {
-		fail("implement");
+	public void modelGenerator() {
+		StandardModelGeneratorTests<Affine2D_F64,AssociatedPair> alg =
+				new StandardModelGeneratorTests<Affine2D_F64,AssociatedPair>(this,3) {
+			@Override
+			public ModelGenerator<Affine2D_F64,AssociatedPair> createAlg() {
+				return new GenerateRefineAffine2D();
+			}
+		};
+
+		alg.checkMinPoints();
+		alg.simpleTest();
 	}
 
-	@Override
-	public ModelGenerator<Affine2D_F64, AssociatedPair> createAlg() {
-		return new GenerateRefineAffine2D();
-	}
 
 	@Override
 	public Affine2D_F64 createRandomModel() {

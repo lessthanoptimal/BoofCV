@@ -21,9 +21,12 @@ package boofcv.alg.geo.d3.epipolar;
 import boofcv.alg.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
+import org.ejml.simple.SimpleMatrix;
+import org.ejml.simple.SimpleSVD;
 
 import java.util.List;
 
@@ -195,6 +198,33 @@ public class UtilEpipolar {
 		CommonOps.mult(temp,K_inv,H);
 
 		return H;
+	}
+
+	/**
+	 * <p>
+	 * Extracts the epipoles from an essential or fundamental matrix.  The epipoles are extracted
+	 * from the left and right null space of the provided matrix.  Note that the found epipoles are
+	 * in homogeneous coordinates.  If the epipole is at infinity then z=0
+	 * </p>
+	 *
+	 * <p>
+	 * e<sub>2</sub><sup>T</sup>*F = 0 <br>
+	 * F*e<sub>1</sub> = 0
+	 * </p>
+	 *
+	 * @param F Fundamental or Essential 3x3 matrix.  Not modified.
+	 * @param e1 Found right epipole in homogeneous coordinates, Modified.
+	 * @param e2 Found left epipole in homogeneous coordinates, Modified.
+	 */
+	public static void extractEpipoles( DenseMatrix64F F , Point3D_F64 e1 , Point3D_F64 e2 ) {
+		SimpleMatrix f = SimpleMatrix.wrap(F);
+		SimpleSVD svd = f.svd();
+		
+		SimpleMatrix U = svd.getU();
+		SimpleMatrix V = svd.getV();
+
+		e2.set(U.get(0,2),U.get(1,2),U.get(2,2));
+		e1.set(V.get(0,2),V.get(1,2),V.get(2,2));
 	}
 
 }

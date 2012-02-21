@@ -281,4 +281,12 @@ public class FundamentalLinear8 {
 	public DenseMatrix64F getSvdV() {
 		return svdV;
 	}
+
+	/**
+	 * Returns true if it is computing a fundamental matrix or false if it is an essential matrix.
+	 * @return true for fundamental and false for essential
+	 */
+	public boolean isComputeFundamental() {
+		return computeFundamental;
+	}
 }
