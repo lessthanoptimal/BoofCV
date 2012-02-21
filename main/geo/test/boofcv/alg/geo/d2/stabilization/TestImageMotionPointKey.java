@@ -186,7 +186,7 @@ public class TestImageMotionPointKey {
 		}
 
 		@Override
-		public boolean process(List<AssociatedPair> dataSet, T initialGuess) {
+		public boolean process(List<AssociatedPair> dataSet) {
 			return true;
 		}
 

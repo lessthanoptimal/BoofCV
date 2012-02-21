@@ -87,7 +87,7 @@ public class SimpleInlierRansac<Model, Point> extends SimpleRansacCommon<Model, 
 	}
 
 	@Override
-	public boolean process(List<Point> dataSet, Model paramInitial ) {
+	public boolean process(List<Point> dataSet ) {
 
 		bestFitCount = 0;
 		bestFitPoints.clear();

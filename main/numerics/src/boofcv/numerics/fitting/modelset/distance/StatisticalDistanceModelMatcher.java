@@ -130,7 +130,7 @@ public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatch
 	}
 
 	@Override
-	public boolean process(List<Point> dataSet, Model paramInital) {
+	public boolean process(List<Point> dataSet ) {
 		// there must be at least the minFitPoints for it to run
 		if (dataSet.size() < minFitPoints)
 			return false;
@@ -146,7 +146,7 @@ public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatch
 		// iterate until it converges or the maximum number of iterations has been exceeded
 		int i = 0;
 		for (; i < maxIterations && !converged && inliers.size() >= minFitPoints; i++) {
-			if (!modelFitter.fitModel(inliers, paramInital, currParam)) {
+			if (!modelFitter.fitModel(inliers, null, currParam)) {
 				// failed to fit the model, so stop before it screws things up
 				break;
 			}

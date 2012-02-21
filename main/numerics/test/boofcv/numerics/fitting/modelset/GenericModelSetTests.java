@@ -71,7 +71,7 @@ public abstract class GenericModelSetTests {
 
 		List<Double> samples = createSampleSet(100, mean, tol, 0.1);
 
-		assertTrue(alg.process(samples, new double[1]));
+		assertTrue(alg.process(samples));
 
 		List<Double> matchSet = alg.getMatchSet();
 
@@ -98,7 +98,7 @@ public abstract class GenericModelSetTests {
 			int N = 200 - i * 10;
 			List<Double> samples = createSampleSet(N, mean, tol * 0.90, 0.1);
 
-			assertTrue(alg.process(samples, new double[1]));
+			assertTrue(alg.process(samples));
 
 			List<Double> matchSet = alg.getMatchSet();
 

@@ -19,6 +19,7 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -26,27 +27,40 @@ import georegression.transform.homo.HomographyPointOps;
 import org.junit.Test;
 
 import java.util.List;
-
-import static org.junit.Assert.fail;
+import java.util.Random;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestGenerateHomographyLinear extends StandardModelGeneratorTests<Homography2D_F64,AssociatedPair> {
+public class TestGenerateHomographyLinear implements ModelTestingInterface<Homography2D_F64,AssociatedPair>
+{
+	Random rand = new Random(234);
 
-	public TestGenerateHomographyLinear() {
-		super(4);
+	@Test
+	public void fitModel() {
+		StandardModelFitterTests<Homography2D_F64,AssociatedPair> alg =
+				new StandardModelFitterTests<Homography2D_F64,AssociatedPair>(this,4) {
+					@Override
+					public ModelFitter<Homography2D_F64,AssociatedPair> createAlg() {
+						return new GenerateHomographyLinear();
+					}
+				};
+
+		alg.allTest();
 	}
 
 	@Test
-	public void addRefinementTest() {
-		fail("implement");
-	}
+	public void modelGenerator() {
+		StandardModelGeneratorTests<Homography2D_F64,AssociatedPair> alg =
+				new StandardModelGeneratorTests<Homography2D_F64,AssociatedPair>(this,4) {
+					@Override
+					public ModelGenerator<Homography2D_F64,AssociatedPair> createAlg() {
+						return new GenerateHomographyLinear();
+					}
+				};
 
-	@Override
-	public ModelGenerator<Homography2D_F64, AssociatedPair> createAlg() {
-		return new GenerateHomographyLinear();
+		alg.allTest();
 	}
 
 	@Override

@@ -152,7 +152,7 @@ public class TestSimpleRansacCommon {
 		}
 
 		@Override
-		public boolean process(List<Integer> dataSet, double[] paramInital) {
+		public boolean process(List<Integer> dataSet) {
 			return false;
 		}
 

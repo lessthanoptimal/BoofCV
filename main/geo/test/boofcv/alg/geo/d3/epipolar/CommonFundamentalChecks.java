@@ -47,9 +47,12 @@ public class CommonFundamentalChecks {
 	// create a reasonable calibration matrix
 	DenseMatrix64F K = new DenseMatrix64F(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
 
-	public void checkEpipolarMatrix( int N , boolean isFundamental , FundamentalLinear8 alg ) {
+	protected Se3_F64 motion;
+	protected List<AssociatedPair> pairs;
+	
+	public void init( int N , boolean isFundamental ) {
 		// define the camera's motion
-		Se3_F64 motion = new Se3_F64();
+		motion = new Se3_F64();
 		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
 		motion.getT().set(0.1,-0.1,0.01);
 
@@ -57,7 +60,7 @@ public class CommonFundamentalChecks {
 		List<Point3D_F64> pts = GeoTestingOps.randomPoints_F32(-1, 1, -1, 1, 2, 3, N, rand);
 
 		// transform points into second camera's reference frame
-		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+		pairs = new ArrayList<AssociatedPair>();
 		for(Point3D_F64 p1 : pts ) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
@@ -71,6 +74,11 @@ public class CommonFundamentalChecks {
 				GeometryMath_F64.mult(K,pair.currLoc,pair.currLoc);
 			}
 		}
+	}
+	
+	
+	public void checkEpipolarMatrix( int N , boolean isFundamental , FundamentalLinear8 alg ) {
+		init(N,isFundamental);
 
 		// compute essential
 		assertTrue(alg.process(pairs));

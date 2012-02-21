@@ -39,11 +39,9 @@ public interface ModelMatcher<Model, Point> {
 	 * computes the fit parameters for the model.
 	 *
 	 * @param dataSet Set of points (with noise) that are to be fit.
-	 * @param initialGuess An initial guess for what the model parameters might be. Can be null.
 	 * @return If it found a solution or not.
 	 */
-	// TODO delete initialGuess?
-	public boolean process(List<Point> dataSet, Model initialGuess);
+	public boolean process(List<Point> dataSet );
 
 	/**
 	 * Model for the match set

@@ -99,7 +99,7 @@ public class SimpleScoreRansac<Model, Point> extends SimpleRansacCommon<Model, P
 	}
 
 	@Override
-	public boolean process(List<Point> dataSet, Model initialModel ) {
+	public boolean process(List<Point> dataSet) {
 
 		bestFitError = Double.MAX_VALUE;
 		bestFitPoints.clear();

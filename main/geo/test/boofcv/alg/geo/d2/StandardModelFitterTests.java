@@ -19,15 +19,13 @@
 package boofcv.alg.geo.d2;
 
 
-import boofcv.numerics.fitting.modelset.HypothesisList;
-import boofcv.numerics.fitting.modelset.ModelGenerator;
+import boofcv.numerics.fitting.modelset.ModelFitter;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -35,32 +33,26 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class StandardModelGeneratorTests<Model, Point> {
+public abstract class StandardModelFitterTests<Model, Point> {
 
-	int dof;
+	int minPoints;
 
 	protected Random rand = new Random(234);
+
 	ModelTestingInterface<Model,Point> helper;
 
-	protected StandardModelGeneratorTests(ModelTestingInterface<Model,Point> helper,int dof) {
-		this.dof = dof;
+	protected StandardModelFitterTests(ModelTestingInterface<Model,Point> helper , int minPoints) {
+		this.minPoints = minPoints;
 		this.helper = helper;
 	}
 
 	/**
-	 * Creates a new model fitter\
+	 * Creates a new model fitter
 	 */
-	public abstract ModelGenerator<Model, Point> createAlg();
+	public abstract ModelFitter<Model, Point> createAlg();
 
 	public void allTest() {
-		checkMinPoints();
 		simpleTest();
-	}
-
-	@Test
-	public void checkMinPoints() {
-		ModelGenerator<Model, Point> fitter = createAlg();
-		assertEquals(dof,fitter.getMinimumPoints());
 	}
 
 	/**
@@ -69,25 +61,34 @@ public abstract class StandardModelGeneratorTests<Model, Point> {
 	 */
 	@Test
 	public void simpleTest() {
+		testWithN(minPoints);
+	}
+
+
+	@Test
+	public void testMoreThanMinimum() {
+		testWithN(minPoints+2);
+	}
+
+	public void testWithN( int numObs ) {
 
 		Model model = helper.createRandomModel();
+		Model found = helper.createRandomModel();
 
 		List<Point> dataSet = new ArrayList<Point>();
 
 		// give it perfect observations
-		for( int i = 0; i < 10; i++ ) {
+		for( int i = 0; i < numObs; i++ ) {
 			Point p = helper.createRandomPointFromModel(model);
 			dataSet.add(p);
 		}
 
-		ModelGenerator<Model, Point> fitter = createAlg();
+		ModelFitter<Model, Point> fitter = createAlg();
 
-		HypothesisList<Model> list = new HypothesisList<Model>(fitter);
-		fitter.generate(dataSet,list);
-		assertEquals(1,list.size());
+		assertTrue(fitter.fitModel(dataSet,model,found));
 
 		// test the found transform by seeing if it recomputes the current points
-		assertTrue(helper.doPointsFitModel(list.get(0), dataSet));
+		assertTrue(helper.doPointsFitModel(found,dataSet));
 	}
 
 }

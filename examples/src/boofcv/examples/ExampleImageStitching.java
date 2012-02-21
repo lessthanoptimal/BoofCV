@@ -112,7 +112,7 @@ public class ExampleImageStitching {
 		}
 
 		// find the best fit model to describe the change between these images
-		if( !modelMatcher.process(pairs,null) )
+		if( !modelMatcher.process(pairs) )
 			throw new RuntimeException("Model Matcher failed!");
 
 		// return the found image transform

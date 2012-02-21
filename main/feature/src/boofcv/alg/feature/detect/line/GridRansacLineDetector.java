@@ -172,7 +172,7 @@ public class GridRansacLineDetector {
 
 		// exit if not enough points or max iterations exceeded
 		while( iterations++ < maxDetectLines) {
-			if( !robustMatcher.process(list,null) )
+			if( !robustMatcher.process(list) )
 				break;
 
 			// remove the found edges from the main list

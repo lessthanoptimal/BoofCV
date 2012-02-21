@@ -144,7 +144,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 
 		// fit the motion model to the feature tracks
 		List<AssociatedPair> pairs = tracker.getPairs();
-		if( !modelMatcher.process(pairs,null) ) {
+		if( !modelMatcher.process(pairs) ) {
 			return false;
 		}
 

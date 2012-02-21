@@ -27,6 +27,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.NormOps;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -199,5 +201,28 @@ public class TestUtilEpipolar {
 		GeometryMath_F64.mult(H, x0, found);
 		assertEquals(x1.x,found.x,1e-8);
 		assertEquals(x1.y,found.y,1e-8);
+	}
+	
+	@Test
+	public void extractEpipoles() {
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
+		
+		DenseMatrix64F E = UtilEpipolar.computeEssential(R,T);
+		
+		assertTrue(NormOps.normF(E)!=0);
+		
+		Point3D_F64 e1 = new Point3D_F64();
+		Point3D_F64 e2 = new Point3D_F64();
+		
+		UtilEpipolar.extractEpipoles(E,e1,e2);
+
+		Point3D_F64 temp = new Point3D_F64();
+		
+		GeometryMath_F64.mult(E,e1,temp);
+		assertEquals(0,temp.norm(),1e-8);
+
+		GeometryMath_F64.multTran(E,e2,temp);
+		assertEquals(0,temp.norm(),1e-8);
 	}
 }
