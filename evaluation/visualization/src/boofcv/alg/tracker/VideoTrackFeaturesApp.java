@@ -19,7 +19,7 @@
 package boofcv.alg.tracker;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.alg.geo.AssociatedPair;
+import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.ProcessInput;
@@ -118,16 +118,16 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		Graphics2D g2 = workImage.createGraphics();
 
 		g2.drawImage(orig,0,0,orig.getWidth(),orig.getHeight(),null);
-		for( AssociatedPair p : tracker.getActiveTracks() ) {
-			int x = (int)p.currLoc.x;
-			int y = (int)p.currLoc.y;
+		for( PointTrack p : tracker.getActiveTracks() ) {
+			int x = (int)p.x;
+			int y = (int)p.y;
 
 			VisualizeFeatures.drawPoint(g2,x,y,Color.blue);
 		}
 
-		for( AssociatedPair p : tracker.getNewTracks() ) {
-			int x = (int)p.currLoc.x;
-			int y = (int)p.currLoc.y;
+		for( PointTrack p : tracker.getNewTracks() ) {
+			int x = (int)p.x;
+			int y = (int)p.y;
 
 			VisualizeFeatures.drawPoint(g2,x,y,Color.green);
 		}

@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageSingleBand;
@@ -49,12 +48,12 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 
 	private boolean keyFrameSet = false;
 
-	private List<AssociatedPair> tracksAll = new ArrayList<AssociatedPair>();
-	private List<AssociatedPair> tracksActive = new ArrayList<AssociatedPair>();
-	private List<AssociatedPair> tracksDropped = new ArrayList<AssociatedPair>();
-	private List<AssociatedPair> tracksNew = new ArrayList<AssociatedPair>();
+	private List<PointTrack> tracksAll = new ArrayList<PointTrack>();
+	private List<PointTrack> tracksActive = new ArrayList<PointTrack>();
+	private List<PointTrack> tracksDropped = new ArrayList<PointTrack>();
+	private List<PointTrack> tracksNew = new ArrayList<PointTrack>();
 
-	private List<AssociatedPair> unused = new ArrayList<AssociatedPair>();
+	private List<PointTrack> unused = new ArrayList<PointTrack>();
 
 	private FastQueue<AssociatedIndex> matches;
 
@@ -127,9 +126,9 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 
 			for( int i = 0; i < matches.size; i++ ) {
 				AssociatedIndex indexes = matches.data[i];
-				AssociatedPair pair = tracksAll.get(indexes.src);
+				PointTrack pair = tracksAll.get(indexes.src);
 				Point2D_F64 loc = locDst.data[indexes.dst];
-				pair.currLoc.set(loc.x,loc.y);
+				pair.set(loc.x,loc.y);
 				tracksActive.add(pair);
 				TrackInfo info = (TrackInfo)pair.getDescription();
 				info.lastAssociated = tick;
@@ -146,9 +145,9 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 
 	private void pruneTracks() {
 		featSrc.reset();
-		Iterator<AssociatedPair> iter = tracksAll.iterator();
+		Iterator<PointTrack> iter = tracksAll.iterator();
 		while( iter.hasNext() ) {
-			AssociatedPair p = iter.next();
+			PointTrack p = iter.next();
 			TrackInfo info = (TrackInfo)p.description;
 			if( tick - info.lastAssociated > pruneThreshold ) {
 //				System.out.println("Dropping track");
@@ -185,10 +184,9 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 
 		// create new tracks from latest detected features
 		for( int i = 0; i < featDst.size; i++ ) {
-			AssociatedPair p = getUnused();
+			PointTrack p = getUnused();
 			Point2D_F64 loc = locDst.get(i);
-			p.currLoc.set(loc.x,loc.y);
-			p.keyLoc.set(p.currLoc);
+			p.set(loc.x,loc.y);
 			setDescription(((TrackInfo)p.getDescription()).desc, featDst.get(i));
 			p.featureId = featureID++;
 
@@ -198,20 +196,20 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		}
 
 		featSrc.reset();
-		for( AssociatedPair p : tracksAll ) {
+		for( PointTrack p : tracksAll ) {
 			featSrc.add(p.<TrackInfo>getDescription().desc);
 		}
 
 		keyFrameSet = true;
 	}
 
-	private AssociatedPair getUnused() {
-		AssociatedPair p;
+	private PointTrack getUnused() {
+		PointTrack p;
 		if( unused.size() > 0 ) {
 			p = unused.remove( unused.size()-1 );
 			((TrackInfo)p.getDescription()).reset();
 		} else {
-			p = new AssociatedPair();
+			p = new PointTrack();
 			TrackInfo info = new TrackInfo();
 			info.desc = createDescription();
 			p.setDescription(info);
@@ -236,22 +234,15 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		}
 	}
 
-	@Override
-	public void setCurrentToKeyFrame() {
-		for( AssociatedPair a : tracksAll ) {
-			a.keyLoc.set(a.currLoc);
-		}
-	}
-
 	/**
 	 * Remove from active list and mark so that it is dropped in the next cycle
 	 *
 	 * @param track The track which is to be dropped
 	 */
 	@Override
-	public void dropTrack(AssociatedPair track) {
+	public void dropTrack(PointTrack track) {
 		// first mark the track as being old so that it will get dropped on the next cycle
-		TrackInfo info = (TrackInfo)track.description;
+		TrackInfo info = track.getDescription();
 		info.lastAssociated = -pruneThreshold;
 
 		// remove it from the active list
@@ -259,17 +250,17 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 	}
 
 	@Override
-	public List<AssociatedPair> getActiveTracks() {
+	public List<PointTrack> getActiveTracks() {
 		return tracksActive;
 	}
 
 	@Override
-	public List<AssociatedPair> getDroppedTracks() {
+	public List<PointTrack> getDroppedTracks() {
 		return tracksDropped;
 	}
 
 	@Override
-	public List<AssociatedPair> getNewTracks() {
+	public List<PointTrack> getNewTracks() {
 		return tracksNew;
 	}
 

@@ -34,11 +34,11 @@ public class TestMotionMosaicPointKey {
 	@Test
 	public void imageCoverageFraction() {
 		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
-		pairs.add( new AssociatedPair(0,10,15,20,25));
-		pairs.add( new AssociatedPair(0,10,15,100,30));
-		pairs.add( new AssociatedPair(0,10,15,29,120));
+		pairs.add( new AssociatedPair(10,15,20,25));
+		pairs.add( new AssociatedPair(10,15,100,30));
+		pairs.add( new AssociatedPair(10,15,29,120));
 		// give it a useless pair which will not contribute to the solution
-		pairs.add( new AssociatedPair(0,10,15,50,56));
+		pairs.add( new AssociatedPair(10,15,50,56));
 
 		double area = 80*95;
 

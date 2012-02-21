@@ -18,9 +18,11 @@
 
 package boofcv.alg.distort;
 
+import boofcv.struct.distort.PointTransform_F32;
+import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,7 +30,24 @@ import static org.junit.Assert.fail;
 public class TestPointToPixelTransform_F32 {
 
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void manual() {
+		Dummy p = new Dummy();
+		PointToPixelTransform_F32 alg = new PointToPixelTransform_F32(p);
+		
+		alg.compute(1,2);
+		Point2D_F32 expected = new Point2D_F32();
+		p.compute(1,2,expected);
+		
+		assertEquals(expected.x,alg.distX,1e-6);
+		assertEquals(expected.y,alg.distY,1e-6);
+	}
+
+	private static class Dummy implements PointTransform_F32 {
+
+		@Override
+		public void compute(float x, float y, Point2D_F32 out) {
+			out.x = x + 0.1f;
+			out.y = y + 0.2f;
+		}
 	}
 }

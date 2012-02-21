@@ -19,12 +19,14 @@
 package boofcv.alg.geo.d2.stabilization;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,6 +52,9 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 
 	// if the internal key frame has changed
 	boolean keyFrame;
+	
+	// stores list of tracks to prune
+	List<PointTrack> prune = new ArrayList<PointTrack>();
 
 	/**
 	 * Specify algorithms to use internally.  Each of these classes must work with
@@ -99,17 +104,22 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 			int width = frame.width;
 			int height = frame.height;
 
-			maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
+			maxCoverage = imageCoverageFraction(width, height,pairs);
 
 			// for some trackers, like KLT, they keep old features and these features can get squeezed together
 			// this will remove some of the really close features
 			if( maxCoverage < respawnCoverageFraction) {
 				pruneClose.resize(width,height);
 				// prune some of the ones which are too close
-				pruneClose.process(tracker);
+				prune.clear();
+				pruneClose.process(tracker.getActiveTracks(),prune);
+				for( PointTrack t : prune ) {
+					tracker.dropTrack(t);
+				}
 				// see if it can find some more in diverse locations
-				tracker.spawnTracks();
-				maxCoverage = imageCoverageFraction(width, height,tracker.getActiveTracks());
+				changeKeyFrame();
+
+				maxCoverage = imageCoverageFraction(width, height,pairs);
 			}
 		}
 
