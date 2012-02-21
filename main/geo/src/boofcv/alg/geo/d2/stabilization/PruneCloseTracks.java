@@ -18,8 +18,7 @@
 
 package boofcv.alg.geo.d2.stabilization;
 
-import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.alg.geo.AssociatedPair;
+import boofcv.abst.feature.tracker.PointTrack;
 
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class PruneCloseTracks {
 	int scale;
 	int imgWidth;
 	int imgHeight;
-	AssociatedPair[] pairImage;
+	PointTrack[] pairImage;
 
 	public PruneCloseTracks(int scale, int imgWidth, int imgHeight) {
 		this.scale = scale;
@@ -49,12 +48,11 @@ public class PruneCloseTracks {
 		int h = imgHeight/scale;
 		
 		if( pairImage == null || pairImage.length < w*h ) {
-			pairImage = new AssociatedPair[ w*h ];
+			pairImage = new PointTrack[ w*h ];
 		}
 	}
 	
-	public void process( ImagePointTracker<?> tracker ) {
-		List<AssociatedPair> tracks = tracker.getActiveTracks();
+	public void process( List<PointTrack> tracks , List<PointTrack> dropTracks ) {
 
 		int w = imgWidth/scale;
 		int h = imgHeight/scale;
@@ -63,19 +61,18 @@ public class PruneCloseTracks {
 		for( int i = 0; i < l; i++ )
 			pairImage[i] = null;
 
-		for( int i = 0; i < tracks.size(); ) {
-			AssociatedPair p = tracks.get(i);
+		for( int i = 0; i < tracks.size(); i++ ) {
+			PointTrack p = tracks.get(i);
 			
-			int x = (int)(p.currLoc.x/scale);
-			int y = (int)(p.currLoc.y/scale);
+			int x = (int)(p.x/scale);
+			int y = (int)(p.y/scale);
 			
 			int index = y*w+x;
 			
 			if( pairImage[index] == null ) {
 				pairImage[index] = p;
-				i++;
 			} else {
-				tracker.dropTrack(p);
+				dropTracks.add(p);
 			}
 		}
 	}

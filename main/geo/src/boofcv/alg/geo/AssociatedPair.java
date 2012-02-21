@@ -31,15 +31,6 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class AssociatedPair {
-	/**
-	 * Unique ID associated with this feature
-	 */
-	public long featureId;
-
-	/**
-	 * Where tracker specific information is stored on this feature.
-	 */
-	public Object description;
 
 	/**
 	 * Location of the feature in the key frame.
@@ -58,15 +49,13 @@ public class AssociatedPair {
 	/**
 	 * Creates a new associated point from the two provided points.
 	 *
-	 * @param featureId feature ID number
 	 * @param x1 keyframe location x-axis.
 	 * @param y1 keyframe location y-axis.
 	 * @param x2 current location x-axis.
 	 * @param y2 current location y-axis.
 	 */
-	public AssociatedPair(long featureId, double x1, double y1,
+	public AssociatedPair(double x1, double y1,
 						  double x2, double y2) {
-		this.featureId = featureId;
 		keyLoc = new Point2D_F64(x1, y1);
 		currLoc = new Point2D_F64(x2, y2);
 	}
@@ -96,13 +85,5 @@ public class AssociatedPair {
 			this.keyLoc = keyLoc;
 			this.currLoc = currLoc;
 		}
-	}
-
-	public <T> T getDescription() {
-		return (T) description;
-	}
-
-	public void setDescription(Object description) {
-		this.description = description;
 	}
 }

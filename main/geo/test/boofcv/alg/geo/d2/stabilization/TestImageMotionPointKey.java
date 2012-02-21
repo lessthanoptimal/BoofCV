@@ -19,6 +19,7 @@
 package boofcv.alg.geo.d2.stabilization;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.image.ImageUInt8;
@@ -129,7 +130,6 @@ public class TestImageMotionPointKey {
 		alg.changeKeyFrame();
 		
 		// the keyframe should be changed and new tracks spawned
-		assertEquals(1,tracker.numSetKeyframe);
 		assertEquals(2,tracker.numSpawn);
 		
 		// worldToKey should now be equal to worldToCurr
@@ -140,7 +140,6 @@ public class TestImageMotionPointKey {
 	public static class DummyTracker implements ImagePointTracker<ImageUInt8>
 	{
 		public int numSpawn = 0;
-		public int numSetKeyframe = 0;
 		public int numDropped = 0;
 
 		@Override
@@ -158,24 +157,21 @@ public class TestImageMotionPointKey {
 		public void dropTracks() {}
 
 		@Override
-		public void setCurrentToKeyFrame() {numSetKeyframe++;}
+		public void dropTrack(PointTrack track) {numDropped++;}
 
 		@Override
-		public void dropTrack(AssociatedPair track) {numDropped++;}
-
-		@Override
-		public List<AssociatedPair> getActiveTracks() {
-			return new ArrayList<AssociatedPair>();
+		public List<PointTrack> getActiveTracks() {
+			return new ArrayList<PointTrack>();
 		}
 
 		@Override
-		public List<AssociatedPair> getDroppedTracks() {
-			return null;
+		public List<PointTrack> getDroppedTracks() {
+			return new ArrayList<PointTrack>();
 		}
 
 		@Override
-		public List<AssociatedPair> getNewTracks() {
-			return null;
+		public List<PointTrack> getNewTracks() {
+			return new ArrayList<PointTrack>();
 		}
 	}
 	

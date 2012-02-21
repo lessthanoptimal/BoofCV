@@ -19,7 +19,6 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.tracker.pklt.PkltManager;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.alg.tracker.pklt.PyramidKltFeature;
@@ -53,9 +52,9 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 	ImagePyramid<D> derivX;
 	ImagePyramid<D> derivY;
 
-	List<AssociatedPair> active = new ArrayList<AssociatedPair>();
-	List<AssociatedPair> spawned = new ArrayList<AssociatedPair>();
-	List<AssociatedPair> dropped = new ArrayList<AssociatedPair>();
+	List<PointTrack> active = new ArrayList<PointTrack>();
+	List<PointTrack> spawned = new ArrayList<PointTrack>();
+	List<PointTrack> dropped = new ArrayList<PointTrack>();
 
 	long totalFeatures = 0;
 
@@ -135,7 +134,7 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 	}
 
 	private void addSpawnedFeature(PyramidKltFeature t) {
-		AssociatedPair p = new AssociatedPair(totalFeatures++,t.x,t.y,t.x,t.y);
+		PointTrack p = new PointTrack(t.x,t.y,totalFeatures++);
 		p.description = t;
 		t.setCookie(p);
 
@@ -157,7 +156,7 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 
 		// remove dropped features
 		for( PyramidKltFeature t : trackManager.getDropped() ) {
-			dropped.add( (AssociatedPair)t.cookie);
+			dropped.add( (PointTrack)t.cookie);
 			// todo slow way to remove features from a large list
 			if( !active.remove(t.cookie) )
 				throw new IllegalArgumentException("Feature dropped not in active list");
@@ -165,22 +164,14 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 		}
 
 		// update the position of all active tracks
-		for( AssociatedPair t : active ) {
+		for( PointTrack t : active ) {
 			PyramidKltFeature p = t.getDescription();
-			t.currLoc.set(p.x,p.y);
+			t.set(p.x,p.y);
 		}
 	}
 
 	@Override
-	public void setCurrentToKeyFrame() {
-		// update the position of all active tracks
-		for( AssociatedPair t : active ) {
-			t.keyLoc.set(t.currLoc);
-		}
-	}
-
-	@Override
-	public void dropTrack(AssociatedPair track) {
+	public void dropTrack(PointTrack track) {
 		if( !active.remove(track) ) {
 			throw new RuntimeException("Not in active list!");
 		}
@@ -189,17 +180,17 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 	}
 
 	@Override
-	public List<AssociatedPair> getActiveTracks() {
+	public List<PointTrack> getActiveTracks() {
 		return active;
 	}
 
 	@Override
-	public List<AssociatedPair> getDroppedTracks() {
+	public List<PointTrack> getDroppedTracks() {
 		return dropped;
 	}
 
 	@Override
-	public List<AssociatedPair> getNewTracks() {
+	public List<PointTrack> getNewTracks() {
 		return spawned;
 	}
 

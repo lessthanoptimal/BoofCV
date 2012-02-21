@@ -19,8 +19,8 @@
 package boofcv.examples;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -104,19 +104,13 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		Graphics2D g2 = orig.createGraphics();
 
 		// draw active tracks as blue dots
-		for( AssociatedPair p : tracker.getActiveTracks() ) {
-			int x = (int)p.currLoc.x;
-			int y = (int)p.currLoc.y;
-
-			VisualizeFeatures.drawPoint(g2, x, y, Color.blue);
+		for( PointTrack p : tracker.getActiveTracks() ) {
+			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, Color.blue);
 		}
 
 		// draw tracks which have just been spawned green
-		for( AssociatedPair p : tracker.getNewTracks() ) {
-			int x = (int)p.currLoc.x;
-			int y = (int)p.currLoc.y;
-
-			VisualizeFeatures.drawPoint(g2, x, y, Color.green);
+		for( PointTrack p : tracker.getNewTracks() ) {
+			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, Color.green);
 		}
 
 		// tell the GUI to update

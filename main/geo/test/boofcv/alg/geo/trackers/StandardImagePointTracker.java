@@ -19,15 +19,13 @@
 package boofcv.alg.geo.trackers;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.alg.geo.AssociatedPair;
+import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.point.Point2D_F64;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -109,7 +107,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker = createTracker();
 		addTracks(5);
 		
-		List<AssociatedPair> tracks = tracker.getActiveTracks();
+		List<PointTrack> tracks = tracker.getActiveTracks();
 		
 		tracker.dropTrack(tracks.get(2));
 		
@@ -122,10 +120,6 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker = createTracker();
 		addTracks(5);
 		assertEquals(5,tracker.getActiveTracks().size());
-		for( AssociatedPair p : tracker.getActiveTracks() ) {
-			assertTrue(p.currLoc.x == p.keyLoc.x);
-			assertTrue(p.currLoc.y == p.keyLoc.y);
-		}
 		checkUniqueFeatureID();
 
 		// by adding a little bit of noise the features should move slightly
@@ -136,40 +130,6 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		// hmm it is totally possible that some features would be dropped.  might
 		// have to make this more robust in the future
 		assertEquals(5,tracker.getActiveTracks().size());
-		for( AssociatedPair p : tracker.getActiveTracks() ) {
-			assertTrue(p.currLoc.x != p.keyLoc.x);
-			assertTrue(p.currLoc.y != p.keyLoc.y);
-		}
-	}
-
-	@Test
-	public void testSetKeyFrame() {
-		tracker = createTracker();
-		addTracks(5);
-
-		// by adding a little bit of noise the features should move slightly
-		ImageTestingOps.addUniform(image,rand,0,5);
-		trackUpdateChangePosition(tracker);
-
-		// the initial location and the current location should be different
-		assertEquals(5,tracker.getActiveTracks().size());
-		List<Point2D_F64> currPts = new ArrayList<Point2D_F64>();
-		for( AssociatedPair p : tracker.getActiveTracks() ) {
-			currPts.add(p.currLoc.copy());
-			assertTrue(p.currLoc.x != p.keyLoc.x);
-			assertTrue(p.currLoc.y != p.keyLoc.y);
-		}
-
-		// after set to keyframe is called they should be the same
-		tracker.setCurrentToKeyFrame();
-		for( int i = 0; i < currPts.size(); i++ ) {
-			Point2D_F64 c = currPts.get(i);
-			AssociatedPair p = tracker.getActiveTracks().get(i);
-
-			assertTrue(c.x == p.keyLoc.x);
-			assertTrue(c.y == p.keyLoc.y);
-		}
-		checkUniqueFeatureID();
 	}
 
 	private void addTracks( int num ) {
@@ -185,12 +145,12 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 	 * Makes sure each feature has a unique feature number
 	 */
 	private void checkUniqueFeatureID() {
-		List<AssociatedPair> l = tracker.getActiveTracks();
+		List<PointTrack> l = tracker.getActiveTracks();
 
 		for( int i = 0; i < l.size(); i++ ) {
-			AssociatedPair a = l.get(i);
+			PointTrack a = l.get(i);
 			for( int j = i+1; j < l.size(); j++ ) {
-				AssociatedPair b = l.get(j);
+				PointTrack b = l.get(j);
 
 				assertTrue(a.featureId != b.featureId);
 			}

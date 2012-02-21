@@ -19,6 +19,7 @@
 package boofcv.alg.geo.d2.stabilization;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.KeyFramePointTracker;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
@@ -43,7 +44,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	// total number of frames processed
 	protected int totalProcessed = 0;
 	// feature tracker
-	protected ImagePointTracker<I> tracker;
+	protected KeyFramePointTracker<I> tracker;
 	// Fits a model to the tracked features
 	protected ModelMatcher<T,AssociatedPair> modelMatcher;
 	// Refines the model using the complete inlier set
@@ -73,7 +74,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 							   ModelFitter<T,AssociatedPair> modelRefiner,
 							   T model)
 	{
-		this.tracker = tracker;
+		this.tracker = new KeyFramePointTracker<I>(tracker);
 		this.modelMatcher = modelMatcher;
 		this.modelRefiner = modelRefiner;
 		
@@ -100,8 +101,9 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		worldToKey.set(worldToInit);
 		keyToCurr.set(worldToInit);
 		worldToCurr.set(worldToInit);
-		tracker.setCurrentToKeyFrame();
+		tracker.reset();
 		tracker.spawnTracks();
+		tracker.setKeyFrame();
 		totalProcessed = 1;
 	}
 
@@ -133,13 +135,15 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		// set up data structures and spawn tracks
 		if( totalProcessed == 1 ) {
 			tracker.spawnTracks();
+			tracker.setKeyFrame();
+
 			worldToKey.set(worldToInit);
 			worldToCurr.set(worldToInit);
 			return true;
 		}
 
 		// fit the motion model to the feature tracks
-		List<AssociatedPair> pairs = tracker.getActiveTracks();
+		List<AssociatedPair> pairs = tracker.getPairs();
 		if( !modelMatcher.process(pairs,null) ) {
 			return false;
 		}
@@ -161,8 +165,8 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 * Make the current frame the first frame in the sequence
 	 */
 	public void changeKeyFrame() {
-		tracker.setCurrentToKeyFrame();
 		tracker.spawnTracks();
+		tracker.setKeyFrame();
 
 		totalSpawned = tracker.getActiveTracks().size();
 		worldToKey.set(worldToCurr);
@@ -181,7 +185,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	}
 
 	public ImagePointTracker<I> getTracker() {
-		return tracker;
+		return tracker.getTracker();
 	}
 
 	public ModelMatcher<T, AssociatedPair> getModelMatcher() {

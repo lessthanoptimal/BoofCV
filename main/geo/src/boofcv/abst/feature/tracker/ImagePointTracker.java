@@ -18,8 +18,7 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.alg.geo.AssociatedPair;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 
 import java.util.List;
 
@@ -42,14 +41,15 @@ import java.util.List;
  * can affect the tracking outcome. </li>
  * <li> If a track is dropped its description will not be modified.</li>
  * <li> Each time a new track is spawned it is given a new unique ID </li>
- * <li> New tracks are only added when {@link #setCurrentToKeyFrame()} is called </li>
  * <li> The location of the current frame is only modified when {@link #setCurrentToKeyFrame()} is called </li>
  * </ul>
  * </p>
  *
+ * TODO UPDATE THIS
+ *
  * @author Peter Abeles
  */
-public interface ImagePointTracker <T extends ImageSingleBand> {
+public interface ImagePointTracker <T extends ImageBase> {
 
 	/**
 	 * Process input image and perform tracking.
@@ -78,34 +78,28 @@ public interface ImagePointTracker <T extends ImageSingleBand> {
 	public void dropTracks();
 
 	/**
-	 * Sets the current frame to be the key frame.  If configured to spawn new features, a new
-	 * feature will be spawned here.
-	 */
-	public void setCurrentToKeyFrame();
-
-	/**
 	 * Manually forces a track to be dropped.
 	 *
 	 * @param track The track which is to be dropped
 	 */
 	// todo more efficient way to drop tracks
 	// this will be slow since it need to searh through the whole list
-	public void dropTrack(AssociatedPair track);
+	public void dropTrack(PointTrack track);
 
 	/**
 	 * Returns a list of active tracks.
 	 */
-	public List<AssociatedPair> getActiveTracks();
+	public List<PointTrack> getActiveTracks();
 
 	/**
 	 * Returns a list of tracks that were dropped the last time track features was
 	 * called.
 	 */
-	public List<AssociatedPair> getDroppedTracks();
+	public List<PointTrack> getDroppedTracks();
 
 	/**
-	 * Returns a list of tracks that were added when {@link #setCurrentToKeyFrame()} was called.
+	 * Returns a list of tracks that have been added since process was called.
 	 */
-	public List<AssociatedPair> getNewTracks();
+	public List<PointTrack> getNewTracks();
 }
 

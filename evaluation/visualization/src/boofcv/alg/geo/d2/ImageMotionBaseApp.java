@@ -19,6 +19,7 @@
 package boofcv.alg.geo.d2;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.d2.stabilization.ImageMotionPointKey;
 import boofcv.alg.geo.d2.stabilization.RenderImageMotion;
@@ -440,12 +441,12 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 			}
 		}
 
-		public synchronized void setAllTracks(java.util.List<AssociatedPair> list) {
+		public synchronized void setAllTracks(java.util.List<PointTrack> list) {
 			allTracks.reset();
 
 			if( list != null ) {
-				for( AssociatedPair p : list ) {
-					allTracks.pop().set((float)p.currLoc.x,(float)p.currLoc.y);
+				for( PointTrack p : list ) {
+					allTracks.pop().set((float)p.x,(float)p.y);
 				}
 			}
 		}
