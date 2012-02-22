@@ -57,7 +57,7 @@ public class CommonFundamentalChecks {
 		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
-		List<Point3D_F64> pts = GeoTestingOps.randomPoints_F32(-1, 1, -1, 1, 2, 3, N, rand);
+		List<Point3D_F64> pts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 
 		// transform points into second camera's reference frame
 		pairs = new ArrayList<AssociatedPair>();

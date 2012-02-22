@@ -47,13 +47,27 @@ public abstract class CommonMotionNPoint {
 	 * Test a set of random points in general position
 	 * @param N number of observed point objects
 	 */
+	public void testNoMotion( int N ) {
+		Se3_F64 motion = new Se3_F64();
+
+		checkMotion(N, motion);
+	}
+
+	/**
+	 * Test a set of random points in general position
+	 * @param N number of observed point objects
+	 */
 	public void standardTest( int N ) {
 		Se3_F64 motion = new Se3_F64();
 		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
 		motion.getT().set(0.1,-0.1,0.01);
 
+		checkMotion(N, motion);
+	}
+
+	private void checkMotion(int N, Se3_F64 motion) {
 		// randomly generate points in space
-		List<Point3D_F64> pts = GeoTestingOps.randomPoints_F32(-1, 1, -1, 1, 2, 3, N, rand);
+		List<Point3D_F64> pts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 		List<Point3D_F64> ptsB = new ArrayList<Point3D_F64>();
 
 		// transform points into second camera's reference frame
