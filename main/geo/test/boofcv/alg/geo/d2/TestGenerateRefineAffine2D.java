@@ -64,7 +64,6 @@ public class TestGenerateRefineAffine2D implements ModelTestingInterface<Affine2
 		alg.simpleTest();
 	}
 
-
 	@Override
 	public Affine2D_F64 createRandomModel() {
 		Affine2D_F64 model = new Affine2D_F64();
