@@ -63,7 +63,7 @@ public class PixelDepthLinear {
 	/**
 	 * Computes the pixel depth from N views of the same object.  Pixel depth in the first frame.
 	 *
-	 * @param obs List of observations
+	 * @param obs List of observations in normalized coordinates
 	 * @param motion List of camera motions.  Each index 'i' is the motion from view 0 to view i+1.
 	 * @return
 	 */

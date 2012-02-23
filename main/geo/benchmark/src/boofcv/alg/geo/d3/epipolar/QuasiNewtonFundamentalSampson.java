@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.epipolar;
+package boofcv.alg.geo.d3.epipolar;
 
+import boofcv.abst.geo.epipolar.RefineEpipolarMatrix;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.ParameterizeModel;
-import boofcv.alg.geo.d3.epipolar.f.FunctionSampsonFundamental;
 import boofcv.alg.geo.d3.epipolar.f.ParamFundamentalEpipolar;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedMinimization;
@@ -31,9 +31,11 @@ import java.util.List;
 /**
  * Improves upon the initial estimate of the Fundamental matrix by minimizing the sampson error.
  *
+ * Found to be much slower and doesn't produce as good of an answer as least squares.
+ *
  * @author Peter Abeles
  */
-public class RefineFundamentalSampson implements RefineFundamental {
+public class QuasiNewtonFundamentalSampson implements RefineEpipolarMatrix {
 	ParameterizeModel<DenseMatrix64F> paramModel;
 	FunctionSampsonFundamental func = new FunctionSampsonFundamental();
 	double param[];
@@ -43,18 +45,18 @@ public class RefineFundamentalSampson implements RefineFundamental {
 	DenseMatrix64F found = new DenseMatrix64F(3,3);
 	int maxIterations;
 
-	public RefineFundamentalSampson(double convergenceTol , int maxIterations ) {
+	public QuasiNewtonFundamentalSampson(double convergenceTol, int maxIterations) {
 		this( new ParamFundamentalEpipolar() , convergenceTol, maxIterations);
 	}
 
-	public RefineFundamentalSampson( ParameterizeModel<DenseMatrix64F> paramModel ,
-									 double convergenceTol , int maxIterations) {
+	public QuasiNewtonFundamentalSampson(ParameterizeModel<DenseMatrix64F> paramModel,
+										 double convergenceTol, int maxIterations) {
 		this.paramModel = paramModel;
 		this.maxIterations = maxIterations;
 
 		param = new double[paramModel.numParameters()];
 
-		minimizer = FactoryOptimization.unconstrained(0,convergenceTol,0);
+		minimizer = FactoryOptimization.unconstrained(convergenceTol,convergenceTol,0);
 	}
 
 	@Override

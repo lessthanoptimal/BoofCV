@@ -19,42 +19,36 @@
 package boofcv.abst.geo.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.alg.geo.d3.epipolar.HomographyLinear4;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
 
 /**
- * Interface for computing the fundamental or essential matrix given a set of associated pairs.
- *
+ * Wrapper around {@link HomographyLinear4} for {@link EpipolarMatrixEstimator}.
+ * 
  * @author Peter Abeles
  */
-public interface FundamentalInterface {
+public class WrapHomographyLinear implements EpipolarMatrixEstimator {
 
-	/**
-	 * Is it configured to estimate a fundamental or essential matrix.
-	 * @return true of fundamental, false for essential
-	 */
-	public boolean isFundamental();
+	HomographyLinear4 alg;
 
-	/**
-	 * Estimates the fundamental matrix given a set of observations.
-	 *
-	 * @param points Observations. Pixel if fundamental and normalized if essential.
-	 * @return true if successful
-	 */
-	public boolean process( List<AssociatedPair> points );
+	public WrapHomographyLinear(HomographyLinear4 alg) {
+		this.alg = alg;
+	}
 
-	/**
-	 * Estimated fundamental/essential matrix.
-	 *
-	 * @return Estimated matrix.
-	 */
-	public DenseMatrix64F getF();
+	@Override
+	public boolean process(List<AssociatedPair> points) {
+		return alg.process(points);
+	}
 
-	/**
-	 * Minimum number of points required to estimate the fundamental matrix.
-	 *
-	 * @return number of points.
-	 */
-	public int getMinPoints();
+	@Override
+	public DenseMatrix64F getEpipolarMatrix() {
+		return alg.getHomography();
+	}
+
+	@Override
+	public int getMinPoints() {
+		return 4;
+	}
 }

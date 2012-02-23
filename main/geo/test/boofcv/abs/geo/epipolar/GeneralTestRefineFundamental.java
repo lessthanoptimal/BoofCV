@@ -18,7 +18,7 @@
 
 package boofcv.abs.geo.epipolar;
 
-import boofcv.abst.geo.epipolar.RefineFundamentalSampson;
+import boofcv.abst.geo.epipolar.RefineEpipolarMatrix;
 import boofcv.alg.geo.d3.epipolar.CommonFundamentalChecks;
 import boofcv.alg.geo.d3.epipolar.UtilEpipolar;
 import georegression.struct.point.Vector3D_F64;
@@ -32,7 +32,10 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestRefineFundamentalSampson extends CommonFundamentalChecks {
+public abstract class GeneralTestRefineFundamental extends CommonFundamentalChecks {
+
+
+	public abstract RefineEpipolarMatrix createAlgorithm();
 
 	@Test
 	public void perfectInput() {
@@ -41,15 +44,15 @@ public class TestRefineFundamentalSampson extends CommonFundamentalChecks {
 		// compute true essential matrix
 		DenseMatrix64F E = UtilEpipolar.computeEssential(motion.getR(), motion.getT());
 
-		RefineFundamentalSampson alg = new RefineFundamentalSampson(1e-8,100);
-		
+		RefineEpipolarMatrix alg = createAlgorithm();
+
 		//give it the perfect matrix and see if it screwed it up
 		assertTrue(alg.process(E, pairs));
 
 		DenseMatrix64F found = alg.getRefinement();
 
 		// normalize so that they are the same
-		CommonOps.divide(E.get(2,2),E);
+		CommonOps.divide(E.get(2, 2), E);
 		CommonOps.divide(found.get(2,2),found);
 
 		assertTrue(MatrixFeatures.isEquals(E, found, 1e-8));
@@ -67,18 +70,18 @@ public class TestRefineFundamentalSampson extends CommonFundamentalChecks {
 		T.x += 0.5;
 		DenseMatrix64F Emod = UtilEpipolar.computeEssential(motion.getR(), T);
 
-		RefineFundamentalSampson alg = new RefineFundamentalSampson(1e-8,100);
+		RefineEpipolarMatrix alg = createAlgorithm();
 
 		// compute and compare results
 		assertTrue(alg.process(Emod, pairs));
-		
+
 		DenseMatrix64F found = alg.getRefinement();
 
 		// normalize to allow comparison
 		CommonOps.divide(E.get(2,2),E);
 		CommonOps.divide(Emod.get(2,2),Emod);
 		CommonOps.divide(found.get(2,2),found);
-		
+
 		double error0 = 0;
 		double error1 = 0;
 
@@ -88,6 +91,7 @@ public class TestRefineFundamentalSampson extends CommonFundamentalChecks {
 			error1 += Math.abs(found.data[i]-E.data[i]);
 		}
 
+//		System.out.println("error "+error1);
 		assertTrue(error1 < error0);
 	}
 }

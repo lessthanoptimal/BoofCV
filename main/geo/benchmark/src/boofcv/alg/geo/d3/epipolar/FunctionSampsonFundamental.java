@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar.f;
+package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.ParameterizeModel;

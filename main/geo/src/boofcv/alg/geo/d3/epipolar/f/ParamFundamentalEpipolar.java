@@ -21,6 +21,7 @@ package boofcv.alg.geo.d3.epipolar.f;
 import boofcv.alg.geo.ParameterizeModel;
 import boofcv.alg.geo.d3.epipolar.UtilEpipolar;
 import georegression.struct.point.Point3D_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.simple.SimpleMatrix;
 
@@ -129,8 +130,8 @@ public class ParamFundamentalEpipolar implements ParameterizeModel<DenseMatrix64
 
 		UtilEpipolar.extractEpipoles(F, e1, e2);
 
-		// if the right epipole is zero then don't use the first two columns 
-		if( Math.abs(e1.z) < Math.abs(e2.z)) {
+		// if the right epipole lies at infinity (z=0) then don't use the first two columns
+		if( Math.abs(e2.z) <= UtilEjml.EPS ) {
 			col0 = 1; col1 = 2; col2 = 0;
 		} else {
 			col0 = 0; col1 = 1; col2 = 2;

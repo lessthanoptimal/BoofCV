@@ -24,26 +24,31 @@ import org.ejml.data.DenseMatrix64F;
 import java.util.List;
 
 /**
- * Interface for performing non-linear optimization on an essential or fundamental matrix.
+ * Interface for computing the fundamental, essential, homography matrix given a set of associated pairs.
  *
  * @author Peter Abeles
  */
-public interface RefineFundamental {
+public interface EpipolarMatrixEstimator {
 
 	/**
-	 * Processes and refined the specified fundamental/essential matrix.  Be sure the order
-	 * of the observations on 'obs' is correct for the given matrix.
+	 * Estimates the fundamental matrix given a set of observations.
 	 *
-	 * @param F Fundamental or essential matrix.
-	 * @param obs List of observations.  Pixel for fundamental or normalized for essential.
-	 * @return true if it was successful.
+	 * @param points Observations. Pixel if fundamental and normalized if essential.
+	 * @return true if successful
 	 */
-	public boolean process( DenseMatrix64F F , List<AssociatedPair> obs );
+	public boolean process( List<AssociatedPair> points );
 
 	/**
-	 * The refined fundamental/essential matrix.
+	 * Estimated 3x3 matrix.
 	 *
-	 * @return Found solution.
+	 * @return Estimated matrix.
 	 */
-	public DenseMatrix64F getRefinement();
+	public DenseMatrix64F getEpipolarMatrix();
+
+	/**
+	 * Minimum number of points required to estimate the fundamental matrix.
+	 *
+	 * @return number of points.
+	 */
+	public int getMinPoints();
 }

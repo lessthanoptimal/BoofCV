@@ -20,6 +20,10 @@ package boofcv.factory.geo.d3.epipolar;
 
 import boofcv.abst.geo.epipolar.*;
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.alg.geo.d3.epipolar.EpipolarResiduals;
+import boofcv.alg.geo.d3.epipolar.HomographyLinear4;
+import boofcv.alg.geo.d3.epipolar.h.ResidualsHomographySampson;
+import boofcv.alg.geo.d3.epipolar.h.ResidualsHomographyTransfer;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import org.ejml.data.DenseMatrix64F;
 
@@ -29,6 +33,43 @@ import org.ejml.data.DenseMatrix64F;
 public class FactoryEpipolar {
 
 	/**
+	 * Returns an algorithm for estimating a homography matrix given a set of
+	 * {@link AssociatedPair}.
+	 *
+	 * @return Fundamental algorithm.
+	 */
+	public static EpipolarMatrixEstimator computeHomography( boolean normalize ) {
+		HomographyLinear4 alg = new HomographyLinear4(normalize);
+		return new WrapHomographyLinear(alg);
+	}
+
+	/**
+	 * Creates a non-linear optimizer for refining estimates of homography matrices.
+	 *
+	 * @param tol Tolerance for convergence.  Try 1e-8
+	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
+	 * @return Refinement
+	 */
+	public static RefineEpipolarMatrix refineHomography( double tol , int maxIterations  ,
+														 EpipolarError type ) {
+		EpipolarResiduals func;
+		switch( type ) {
+			case SIMPLE:
+				func = new ResidualsHomographyTransfer();
+				break;
+
+			case SAMPSON:
+				func = new ResidualsHomographySampson();
+				break;
+
+			default:
+				throw new IllegalArgumentException("Type not supported: "+type);
+		}
+
+		return new LeastSquaresHomography(tol,maxIterations,func);
+	}
+
+	/**
 	 * Returns an algorithm for estimating a fundamental/essential matrix given a set of 
 	 * {@link AssociatedPair}.
 	 * 
@@ -36,7 +77,7 @@ public class FactoryEpipolar {
 	 * @param minPoints Selects which algorithms to use.  Only 7 and 8 supported.
 	 * @return Fundamental algorithm.
 	 */
-	public static FundamentalInterface computeFundamental( boolean isFundamental , int minPoints ) {
+	public static EpipolarMatrixEstimator computeFundamental( boolean isFundamental , int minPoints ) {
 		return new WrapFundamentalLinear(isFundamental,minPoints);
 	}
 
@@ -47,7 +88,7 @@ public class FactoryEpipolar {
 	 * @return ModelGenerator
 	 */
 	public static ModelGenerator<DenseMatrix64F,AssociatedPair>
-	robustModel( FundamentalInterface fundamentalAlg ) {
+	robustModel( EpipolarMatrixEstimator fundamentalAlg ) {
 		return new FundamentalModelGenerator(fundamentalAlg);
 	}
 
@@ -55,10 +96,16 @@ public class FactoryEpipolar {
 	 * Creates a non-linear optimizer for refining estimates of fundamental or essential matrices.
 	 *
 	 * @param tol Tolerance for convergence.  Try 1e-8
-	 * @param maxIterations Maximum number of iterations it will perform.  Try 100.
+	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
 	 * @return Refinement
 	 */
-	public static RefineFundamental refineFundamental( double tol , int maxIterations ) {
-		return new RefineFundamentalSampson(tol,maxIterations);
+	public static RefineEpipolarMatrix refineFundamental( double tol , int maxIterations ,
+														  EpipolarError type ) {
+		switch( type ) {
+			case SAMPSON:
+				return new LeastSquaresFundamentalSampson(tol,maxIterations);
+		}
+
+		throw new IllegalArgumentException("Type not supported: "+type);
 	}
 }
