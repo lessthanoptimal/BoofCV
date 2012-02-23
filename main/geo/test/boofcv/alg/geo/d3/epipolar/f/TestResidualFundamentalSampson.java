@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFunctionSampsonFundamental extends CommonFundamentalChecks {
+public class TestResidualFundamentalSampson extends CommonFundamentalChecks {
 
 	/**
 	 * First check to see if the error is very low for perfect parameters.  Then
@@ -43,17 +43,29 @@ public class TestFunctionSampsonFundamental extends CommonFundamentalChecks {
 		DenseMatrix64F E = UtilEpipolar.computeEssential(motion.getR(),motion.getT());
 		
 		ParamFundamentalEpipolar param = new ParamFundamentalEpipolar();
-		
-		FunctionSampsonFundamental alg = new FunctionSampsonFundamental(param,pairs);
+
+		ResidualsFundamentalSampson alg = new ResidualsFundamentalSampson(param,pairs);
 		
 		// see if it returns no error for the perfect model
 		double[] d = new double[7];
 		param.modelToParam(E,d);
 		
-		assertEquals(0,alg.process(d),1e-8);
+		double residuals[] = new double[alg.getM()];
+		alg.process(d,residuals);
+		
+		assertEquals(0, computeCost(residuals), 1e-8);
 		
 		// now make it a bit off
 		d[1] += 0.1;
-		assertTrue(alg.process(d) > 1e-8);
+		alg.process(d,residuals);
+		assertTrue(computeCost(residuals) > 1e-8);
+	}
+	
+	public static double computeCost( double residuals[] ) {
+		double ret = 0;
+		for( int i = 0; i < residuals.length; i++ ) {
+			ret += residuals[i]*residuals[i];
+		}
+		return ret;
 	}
 }

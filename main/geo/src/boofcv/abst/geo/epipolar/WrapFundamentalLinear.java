@@ -26,9 +26,12 @@ import org.ejml.data.DenseMatrix64F;
 import java.util.List;
 
 /**
+ * Wrapper around either {@link FundamentalLinear8} or {@link FundamentalLinear7}
+ * for {@link EpipolarMatrixEstimator}.
+ * 
  * @author Peter Abeles
  */
-public class WrapFundamentalLinear implements FundamentalInterface{
+public class WrapFundamentalLinear implements EpipolarMatrixEstimator {
 	FundamentalLinear8 alg;
 	int minPoints;
 
@@ -45,17 +48,12 @@ public class WrapFundamentalLinear implements FundamentalInterface{
 	}
 
 	@Override
-	public boolean isFundamental() {
-		return alg.isComputeFundamental();
-	}
-
-	@Override
 	public boolean process(List<AssociatedPair> points) {
 		return alg.process(points);
 	}
 
 	@Override
-	public DenseMatrix64F getF() {
+	public DenseMatrix64F getEpipolarMatrix() {
 		return alg.getF();
 	}
 

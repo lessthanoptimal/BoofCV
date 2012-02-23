@@ -26,16 +26,16 @@ import org.ejml.data.DenseMatrix64F;
 import java.util.List;
 
 /**
- * Wrapper around {@link FundamentalInterface} for {@link ModelGenerator}.  Used for robust model
+ * Wrapper around {@link EpipolarMatrixEstimator} for {@link ModelGenerator}.  Used for robust model
  * fitting with outliers.
  * 
  * @author Peter Abeles
  */
 public class FundamentalModelGenerator implements ModelGenerator<DenseMatrix64F,AssociatedPair> {
 
-	FundamentalInterface alg;
+	EpipolarMatrixEstimator alg;
 
-	public FundamentalModelGenerator(FundamentalInterface alg) {
+	public FundamentalModelGenerator(EpipolarMatrixEstimator alg) {
 		this.alg = alg;
 	}
 
@@ -47,7 +47,7 @@ public class FundamentalModelGenerator implements ModelGenerator<DenseMatrix64F,
 	@Override
 	public void generate(List<AssociatedPair> dataSet, HypothesisList<DenseMatrix64F> models) {
 		if( alg.process(dataSet) ) {
-			DenseMatrix64F found = alg.getF();
+			DenseMatrix64F found = alg.getEpipolarMatrix();
 			models.pop().set(found);
 		}
 	}
