@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestResidualFundamentalSampson extends CommonFundamentalChecks {
+public class TestResidualFundamentalSimple extends CommonFundamentalChecks {
 
 	/**
 	 * First check to see if the error is very low for perfect parameters.  Then
@@ -44,7 +44,7 @@ public class TestResidualFundamentalSampson extends CommonFundamentalChecks {
 		
 		ParamFundamentalEpipolar param = new ParamFundamentalEpipolar();
 
-		ResidualsFundamentalSampson alg = new ResidualsFundamentalSampson(param,pairs);
+		ResidualsFundamentalSimple alg = new ResidualsFundamentalSimple(param,pairs);
 		
 		// see if it returns no error for the perfect model
 		double[] d = new double[7];

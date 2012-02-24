@@ -19,44 +19,38 @@
 package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.abst.geo.epipolar.EpipolarMatrixEstimator;
-import boofcv.abst.geo.epipolar.RefineEpipolarMatrix;
-import boofcv.factory.geo.d3.epipolar.EpipolarError;
 import boofcv.factory.geo.d3.epipolar.FactoryEpipolar;
-import boofcv.misc.Performer;
+import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import org.ejml.data.DenseMatrix64F;
-
-import static boofcv.factory.geo.d3.epipolar.FactoryEpipolar.refineFundamental;
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkRefineFundamental extends ArtificialStereoScene{
+public class BenchmarkSolvePnP extends ArtificialStereoScene{
 	static final long TEST_TIME = 1000;
 	static final int NUM_POINTS = 500;
 	static final boolean FUNDAMENTAL = false;
 	
 	protected DenseMatrix64F initialF;
 
-	public class Refine implements Performer {
+	public class EPnP extends PerformerBase {
 
-		RefineEpipolarMatrix alg;
-		String name;
-
-		public Refine( String name , RefineEpipolarMatrix alg) {
-			this.alg = alg;
-			this.name = name;
-		}
+		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
 		@Override
 		public void process() {
-			alg.process(initialF,pairs);
-			alg.getRefinement();
+			alg.process(worldPoints,observationCurrent);
 		}
+	}
+
+	public class PairLinear extends PerformerBase {
+
+		PoseFromPairLinear6 alg = new PoseFromPairLinear6();
 
 		@Override
-		public String getName() {
-			return name;
+		public void process() {
+			alg.process(pairs,worldPoints);
 		}
 	}
 	
@@ -64,8 +58,6 @@ public class BenchmarkRefineFundamental extends ArtificialStereoScene{
 		System.out.println("=========  Profile numFeatures "+NUM_POINTS);
 		System.out.println();
 
-		double tol = 1e-16;
-		int MAX_ITER = 100;
 
 		init(NUM_POINTS,FUNDAMENTAL,false);
 
@@ -73,16 +65,15 @@ public class BenchmarkRefineFundamental extends ArtificialStereoScene{
 		computeAlg.process(pairs);
 		initialF = computeAlg.getEpipolarMatrix();
 
-		ProfileOperation.printOpsPerSec(new Refine("LS Sampson",refineFundamental(tol, MAX_ITER, EpipolarError.SAMPSON)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Refine("LS Simple",refineFundamental(tol, MAX_ITER, EpipolarError.SIMPLE)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Refine("QN Sampson",new QuasiNewtonFundamentalSampson(tol,MAX_ITER)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new EPnP(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new PairLinear(), TEST_TIME);
 
 		System.out.println();
 		System.out.println("Done");
 	}
 	
 	public static void main( String args[] ) {
-		BenchmarkRefineFundamental alg = new BenchmarkRefineFundamental();
+		BenchmarkSolvePnP alg = new BenchmarkSolvePnP();
 
 		alg.runAll();
 	}

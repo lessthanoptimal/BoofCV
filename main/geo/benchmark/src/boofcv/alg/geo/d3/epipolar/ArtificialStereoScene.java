@@ -22,6 +22,7 @@ import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.GeoTestingOps;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -42,6 +43,8 @@ public class ArtificialStereoScene {
 
 	protected Se3_F64 motion;
 	protected List<AssociatedPair> pairs;
+	protected List<Point2D_F64> observationCurrent;
+	protected List<Point3D_F64> worldPoints;
 
 	public void init( int N , boolean isPixels , boolean planar ) {
 		// define the camera's motion
@@ -50,21 +53,23 @@ public class ArtificialStereoScene {
 		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
-		List<Point3D_F64> pts;
 		if( planar )
-			pts = createPlanarScene(N);
+			worldPoints = createPlanarScene(N);
 		else
-			pts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
+			worldPoints = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 
 		// transform points into second camera's reference frame
 		pairs = new ArrayList<AssociatedPair>();
-		for(Point3D_F64 p1 : pts ) {
+		observationCurrent = new ArrayList<Point2D_F64>();
+		for(Point3D_F64 p1 : worldPoints) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
 			pair.keyLoc.set(p1.x/p1.z,p1.y/p1.z);
 			pair.currLoc.set(p2.x/p2.z,p2.y/p2.z);
 			pairs.add(pair);
+
+			observationCurrent.add(pair.currLoc);
 
 			if( isPixels ) {
 				GeometryMath_F64.mult(K, pair.keyLoc, pair.keyLoc);

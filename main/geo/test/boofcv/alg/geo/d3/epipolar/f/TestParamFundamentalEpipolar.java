@@ -45,8 +45,8 @@ public class TestParamFundamentalEpipolar {
 		ParamFundamentalEpipolar alg = new ParamFundamentalEpipolar();
 		
 		DenseMatrix64F found = new DenseMatrix64F(3,3);
-		alg.modelToParam(E,param);
-		alg.paramToModel(param,found);
+		alg.encode(E, param);
+		alg.decode(param, found);
 
 		// normalize to take in account scale different when testing
 		CommonOps.divide(E.get(2,2),E);

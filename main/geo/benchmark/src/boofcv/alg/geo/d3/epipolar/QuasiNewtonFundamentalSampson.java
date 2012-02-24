@@ -20,8 +20,8 @@ package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.abst.geo.epipolar.RefineEpipolarMatrix;
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.ParameterizeModel;
 import boofcv.alg.geo.d3.epipolar.f.ParamFundamentalEpipolar;
+import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedMinimization;
 import org.ejml.data.DenseMatrix64F;
@@ -36,7 +36,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class QuasiNewtonFundamentalSampson implements RefineEpipolarMatrix {
-	ParameterizeModel<DenseMatrix64F> paramModel;
+	ModelCodec<DenseMatrix64F> paramModel;
 	FunctionSampsonFundamental func = new FunctionSampsonFundamental();
 	double param[];
 
@@ -49,12 +49,12 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolarMatrix {
 		this( new ParamFundamentalEpipolar() , convergenceTol, maxIterations);
 	}
 
-	public QuasiNewtonFundamentalSampson(ParameterizeModel<DenseMatrix64F> paramModel,
+	public QuasiNewtonFundamentalSampson(ModelCodec<DenseMatrix64F> paramModel,
 										 double convergenceTol, int maxIterations) {
 		this.paramModel = paramModel;
 		this.maxIterations = maxIterations;
 
-		param = new double[paramModel.numParameters()];
+		param = new double[paramModel.getParamLength()];
 
 		minimizer = FactoryOptimization.unconstrained(convergenceTol,convergenceTol,0);
 	}
@@ -63,7 +63,7 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolarMatrix {
 	public boolean process(DenseMatrix64F F, List<AssociatedPair> obs) {
 		func.set(paramModel, obs);
 		
-		paramModel.modelToParam(F, param);
+		paramModel.encode(F, param);
 
 		minimizer.setFunction(func,null);
 
@@ -74,7 +74,7 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolarMatrix {
 				break;
 		}
 
-		paramModel.paramToModel(minimizer.getParameters(),found);
+		paramModel.decode(minimizer.getParameters(), found);
 
 		return true;
 	}

@@ -103,7 +103,9 @@ public class FactoryEpipolar {
 														  EpipolarError type ) {
 		switch( type ) {
 			case SAMPSON:
-				return new LeastSquaresFundamentalSampson(tol,maxIterations);
+				return new LeastSquaresFundamental(tol,maxIterations,true);
+			case SIMPLE:
+				return new LeastSquaresFundamental(tol,maxIterations,false);
 		}
 
 		throw new IllegalArgumentException("Type not supported: "+type);
