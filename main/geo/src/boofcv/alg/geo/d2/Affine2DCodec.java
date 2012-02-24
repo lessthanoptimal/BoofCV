@@ -36,13 +36,8 @@ public class Affine2DCodec implements ModelCodec<Affine2D_F64> {
 	}
 
 	@Override
-	public Affine2D_F64 decode(double[] param, Affine2D_F64 model) {
-		if( model == null )
-			model = new Affine2D_F64();
-
+	public void decode(double[] param, Affine2D_F64 model) {
 		decodeStatic(param, model);
-
-		return model;
 	}
 
 	public static void decodeStatic(double[] param, Affine2D_F64 model) {
@@ -55,13 +50,8 @@ public class Affine2DCodec implements ModelCodec<Affine2D_F64> {
 	}
 
 	@Override
-	public double[] encode(Affine2D_F64 model, double[] param) {
-		if( param == null )
-			param = new double[6];
-
+	public void encode(Affine2D_F64 model, double[] param) {
 		encodeStatic(model, param);
-
-		return param;
 	}
 
 	public static void encodeStatic(Affine2D_F64 model, double[] param) {

@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.d3.epipolar.f;
 
-import boofcv.alg.geo.ParameterizeModel;
 import boofcv.alg.geo.d3.epipolar.UtilEpipolar;
+import boofcv.numerics.fitting.modelset.ModelCodec;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.UtilEjml;
 import org.ejml.data.DenseMatrix64F;
@@ -42,7 +42,7 @@ import org.ejml.simple.SimpleMatrix;
  * 
  * @author Peter Abeles
  */
-public class ParamFundamentalEpipolar implements ParameterizeModel<DenseMatrix64F> {
+public class ParamFundamentalEpipolar implements ModelCodec<DenseMatrix64F> {
 
 	// order of columns
 	int col0,col1,col2;
@@ -51,7 +51,7 @@ public class ParamFundamentalEpipolar implements ParameterizeModel<DenseMatrix64
 	int indexes[] = new int[6];
 	
 	@Override
-	public int numParameters() {
+	public int getParamLength() {
 		return 7;
 	}
 
@@ -59,7 +59,7 @@ public class ParamFundamentalEpipolar implements ParameterizeModel<DenseMatrix64
 	 * Examines the matrix structure to determine how to parameterize F.  
 	 */
 	@Override
-	public void modelToParam(DenseMatrix64F F, double[] param) {
+	public void encode(DenseMatrix64F F, double[] param) {
 		// see if which columns are to be used
 		selectColumns(F);
 		
@@ -139,7 +139,7 @@ public class ParamFundamentalEpipolar implements ParameterizeModel<DenseMatrix64
 	}
 
 	@Override
-	public void paramToModel(double[] param, DenseMatrix64F F) {
+	public void decode(double[] param, DenseMatrix64F F) {
 		F.data[indexes[0]] = param[0];
 		F.data[indexes[1]] = param[1];
 		F.data[indexes[2]] = param[2];

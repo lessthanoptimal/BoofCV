@@ -67,7 +67,7 @@ public abstract class GeneralTestRefineFundamental extends CommonFundamentalChec
 
 		// create an alternative incorrect matrix
 		Vector3D_F64 T = motion.getT().copy();
-		T.x += 0.5;
+		T.x += 0.1;
 		DenseMatrix64F Emod = UtilEpipolar.computeEssential(motion.getR(), T);
 
 		RefineEpipolarMatrix alg = createAlgorithm();
@@ -91,7 +91,7 @@ public abstract class GeneralTestRefineFundamental extends CommonFundamentalChec
 			error1 += Math.abs(found.data[i]-E.data[i]);
 		}
 
-//		System.out.println("error "+error1);
+//		System.out.println("error "+error1+"   other "+error0);
 		assertTrue(error1 < error0);
 	}
 }

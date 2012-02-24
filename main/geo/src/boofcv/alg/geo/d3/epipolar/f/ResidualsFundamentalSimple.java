@@ -23,24 +23,17 @@ import boofcv.alg.geo.d3.epipolar.EpipolarResiduals;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.UtilEjml;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
 
 /**
  * <p>
- * Computes the Sampson distance residual for a set of observations given a fundamental matrix.  For use
- * in least-squares non-linear optimization algorithms.
- * </p>
- *
- * <p>
- * Page 287 in: R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
- * </p>
+ * Computes the residual just using the fundamental matrix constraint
  *
  * @author Peter Abeles
  */
-public class ResidualsFundamentalSampson implements EpipolarResiduals {
+public class ResidualsFundamentalSimple implements EpipolarResiduals {
 
 	// converts parameters to and from the fundamental matrix
 	ModelCodec<DenseMatrix64F> param;
@@ -51,13 +44,13 @@ public class ResidualsFundamentalSampson implements EpipolarResiduals {
 	Point3D_F64 temp = new Point3D_F64();
 	DenseMatrix64F F = new DenseMatrix64F(3,3);
 
-	public ResidualsFundamentalSampson(ModelCodec<DenseMatrix64F> param,
-									   List<AssociatedPair> obs) {
+	public ResidualsFundamentalSimple(ModelCodec<DenseMatrix64F> param,
+									  List<AssociatedPair> obs) {
 		this(param);
 		this.obs = obs;
 	}
 
-	public ResidualsFundamentalSampson(ModelCodec<DenseMatrix64F> param) {
+	public ResidualsFundamentalSimple(ModelCodec<DenseMatrix64F> param) {
 		this.param = param;
 	}
 
@@ -83,21 +76,9 @@ public class ResidualsFundamentalSampson implements EpipolarResiduals {
 		for( int i = 0; i < obs.size(); i++ ) {
 			AssociatedPair p = obs.get(i);
 
-			double bottom = 0;
+			GeometryMath_F64.multTran(F,p.currLoc,temp);
 
-			GeometryMath_F64.mult(F, p.keyLoc, temp);
-			bottom += temp.x*temp.x + temp.y*temp.y;
-
-			GeometryMath_F64.multTran(F, p.currLoc, temp);
-			bottom += temp.x*temp.x + temp.y*temp.y;
-
-			if( bottom <= UtilEjml.EPS) {
-				output[i] = 0;
-			} else {
-				GeometryMath_F64.multTran(F,p.currLoc,temp);
-
-				output[i] = (temp.x*p.keyLoc.x + temp.y*p.keyLoc.y + temp.z)/bottom;
-			}
+			output[i] = temp.x*p.keyLoc.x + temp.y*p.keyLoc.y + temp.z;
 		}
 	}
 }

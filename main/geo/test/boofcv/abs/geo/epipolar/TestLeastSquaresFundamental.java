@@ -18,17 +18,17 @@
 
 package boofcv.abs.geo.epipolar;
 
-import boofcv.abst.geo.epipolar.LeastSquaresFundamentalSampson;
+import boofcv.abst.geo.epipolar.LeastSquaresFundamental;
 import boofcv.abst.geo.epipolar.RefineEpipolarMatrix;
 
 /**
  * @author Peter Abeles
  */
-public class TestLeastSquaresFundamentalSampson extends GeneralTestRefineFundamental {
+public class TestLeastSquaresFundamental extends GeneralTestRefineFundamental {
 
 	@Override
 	public RefineEpipolarMatrix createAlgorithm() {
-		return new LeastSquaresFundamentalSampson(1e-8,200);
+		return new LeastSquaresFundamental(1e-16,200,false);
 	}
 
 }

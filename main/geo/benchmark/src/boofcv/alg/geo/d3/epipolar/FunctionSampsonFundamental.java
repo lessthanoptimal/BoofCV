@@ -19,7 +19,7 @@
 package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.ParameterizeModel;
+import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.functions.FunctionNtoS;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class FunctionSampsonFundamental implements FunctionNtoS {
 	// converts parameters to and from the fundamental matrix
-	ParameterizeModel<DenseMatrix64F> param;
+	ModelCodec<DenseMatrix64F> param;
 	// list of observations
 	List<AssociatedPair> obs;
 
@@ -49,7 +49,7 @@ public class FunctionSampsonFundamental implements FunctionNtoS {
 	Point3D_F64 temp = new Point3D_F64();
 	DenseMatrix64F F = new DenseMatrix64F(3,3);
 
-	public FunctionSampsonFundamental(ParameterizeModel<DenseMatrix64F> param,
+	public FunctionSampsonFundamental(ModelCodec<DenseMatrix64F> param,
 									  List<AssociatedPair> obs) {
 		set(param,obs);
 	}
@@ -57,19 +57,19 @@ public class FunctionSampsonFundamental implements FunctionNtoS {
 	public FunctionSampsonFundamental() {
 	}
 
-	public void set( ParameterizeModel<DenseMatrix64F> param , List<AssociatedPair> obs ) {
+	public void set( ModelCodec<DenseMatrix64F> param , List<AssociatedPair> obs ) {
 		this.param = param;
 		this.obs = obs;
 	}
 
 	@Override
 	public int getN() {
-		return param.numParameters();
+		return param.getParamLength();
 	}
 
 	@Override
 	public double process(double[] input) {
-		param.paramToModel(input, F);
+		param.decode(input, F);
 		
 		double sum = 0;
 		
