@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar;
+package boofcv.alg.geo.d3.epipolar.f;
 
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.alg.geo.d3.epipolar.UtilEpipolar;
 import boofcv.misc.BoofMiscOps;
 import boofcv.numerics.solver.PolynomialSolver;
 import org.ejml.data.Complex64F;

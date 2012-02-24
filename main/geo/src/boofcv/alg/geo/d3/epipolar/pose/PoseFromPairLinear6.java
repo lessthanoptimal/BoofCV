@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar;
+package boofcv.alg.geo.d3.epipolar.pose;
 
 import boofcv.alg.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;

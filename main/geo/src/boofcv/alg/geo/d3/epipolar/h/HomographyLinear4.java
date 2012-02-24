@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar;
+package boofcv.alg.geo.d3.epipolar.h;
 
 
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.alg.geo.d3.epipolar.UtilEpipolar;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.alg.dense.decomposition.DecompositionFactory;

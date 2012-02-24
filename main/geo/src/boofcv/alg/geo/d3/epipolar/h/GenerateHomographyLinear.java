@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d2;
+package boofcv.alg.geo.d3.epipolar.h;
 
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.d3.epipolar.HomographyLinear4;
 import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;

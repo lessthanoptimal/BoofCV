@@ -21,7 +21,7 @@ package boofcv.factory.geo.d3.epipolar;
 import boofcv.abst.geo.epipolar.*;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.d3.epipolar.EpipolarResiduals;
-import boofcv.alg.geo.d3.epipolar.HomographyLinear4;
+import boofcv.alg.geo.d3.epipolar.h.HomographyLinear4;
 import boofcv.alg.geo.d3.epipolar.h.ResidualsHomographySampson;
 import boofcv.alg.geo.d3.epipolar.h.ResidualsHomographyTransfer;
 import boofcv.numerics.fitting.modelset.ModelGenerator;

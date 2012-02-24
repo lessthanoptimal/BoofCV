@@ -64,7 +64,7 @@ public class LevenbergMarquardtDampened extends LevenbergDampened {
 	 * Solves the linear system to find the change in x
 	 */
 	@Override
-	protected void solveForXDelta() {
+	protected boolean solveForXDelta() {
 		// add dampening parameter
 		for( int i = 0; i < N; i++ ) {
 			int index = B.getIndex(i,i);
@@ -77,6 +77,8 @@ public class LevenbergMarquardtDampened extends LevenbergDampened {
 		}
 		// solve for change in x
 		solver.solve(g, xdelta);
+
+		return true;
 	}
 
 	/**

@@ -16,25 +16,32 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar;
+package boofcv.alg.geo.d3.epipolar.triangulate;
 
+import georegression.struct.point.Point3D_F64;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestFundamentalLinear8 extends CommonFundamentalChecks {
+public class TestTriangulateGeometric extends CommonTriangulationChecks{
 
+	/**
+	 * Create 2 perfect observations and solve for the position
+	 */
 	@Test
-	public void perfectFundamental() {
-		checkEpipolarMatrix(8,true,new FundamentalLinear8(true));
-		checkEpipolarMatrix(15,true,new FundamentalLinear8(true));
-	}
+	public void triangulate_two() {
+		createScene();
 
-	@Test
-	public void perfectEssential() {
-		checkEpipolarMatrix(8,false,new FundamentalLinear8(false));
-		checkEpipolarMatrix(15,false,new FundamentalLinear8(false));
+		TriangulateGeometric alg = new TriangulateGeometric();
+
+		Point3D_F64 found = new Point3D_F64();
+		alg.triangulate(obsPts.get(1),obsPts.get(0),motion.get(1),found);
+
+		assertEquals(worldPoint.x,found.x,1e-8);
+		assertEquals(worldPoint.y,found.y,1e-8);
+		assertEquals(worldPoint.z,found.z,1e-8);
 	}
 }

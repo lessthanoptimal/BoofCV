@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar;
+package boofcv.alg.geo.d3.epipolar.pose;
 
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
@@ -75,6 +75,8 @@ public class PnPLepetitEPnP {
 	private DenseMatrix64F L = new DenseMatrix64F(6,6);
 	// distance of world control points from each other
 	private DenseMatrix64F y = new DenseMatrix64F(6,1);
+	// solution for betas
+	private DenseMatrix64F x = new DenseMatrix64F(6,1);
 
 	// how many controls points 4 for general case and 3 for planar
 	private int numControl;
@@ -300,15 +302,12 @@ public class PnPLepetitEPnP {
 		DenseMatrix64F A = new DenseMatrix64F(4,4);
 		for( int i = 0; i < 4; i++ ) {
 			Point3D_F64 c = controlWorldPts.get(i);
-			A.set(i,0,c.x);
-			A.set(i,1,c.y);
-			A.set(i,2,c.z);
+			A.set(0,i,c.x);
+			A.set(1,i,c.y);
+			A.set(2,i,c.z);
+			A.set(3,i,1);
 		}
-		for( int i = 0; i < 4; i++ )
-			A.set(i,3,1);
 
-		CommonOps.transpose(A);
-		
 		if( !CommonOps.invert(A) )
 			throw new RuntimeException("Control points are singular?!?");
 		
@@ -496,16 +495,16 @@ public class PnPLepetitEPnP {
 	 * of potential control points.
 	 */
 	protected void estimateCase1( double betas[] ) {
-		Arrays.fill(betas,0);
 		betas[0] = matchScale(nullPts[0], controlWorldPts);
 		betas[0] = adjustBetaSign(betas[0],nullPts[0]);
+		betas[1] = 0;
+		betas[2] = 0;
+		betas[3] = 0;
 	}
 
 	protected void estimateCase2( double betas[] ) {
-		Arrays.fill(betas,0);
 
-		DenseMatrix64F x = new DenseMatrix64F(3,1);
-
+		x.reshape(3,1,false);
 		L.reshape(6,3,false);
 		UtilLepetitEPnP.constraintMatrix6x3(L_6x10,L);
 
@@ -517,6 +516,8 @@ public class PnPLepetitEPnP {
 		betas[0] = Math.sqrt(Math.abs(x.get(0)));
 		betas[1] = Math.sqrt(Math.abs(x.get(2)));
 		betas[1] *= Math.signum(x.get(0))*Math.signum(x.get(1));
+		betas[2] = 0;
+		betas[3] = 0;
 
 		refine(betas);
 	}
@@ -524,8 +525,7 @@ public class PnPLepetitEPnP {
 	protected void estimateCase3( double betas[] ) {
 		Arrays.fill(betas,0);
 
-		DenseMatrix64F x = new DenseMatrix64F(6,1);
-
+		x.reshape(6,1,false);
 		L.reshape(6,6,false);
 		UtilLepetitEPnP.constraintMatrix6x6(L_6x10, L);
 
@@ -539,6 +539,7 @@ public class PnPLepetitEPnP {
 		betas[2] = Math.sqrt(Math.abs(x.get(5)));
 		betas[1] *= Math.signum(x.get(0))*Math.signum(x.get(1));
 		betas[2] *= Math.signum(x.get(0))*Math.signum(x.get(2));
+		betas[3] = 0;
 
 		refine(betas);
 	}

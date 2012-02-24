@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar;
+package boofcv.alg.geo.d3.epipolar.pose;
 
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DenseMatrix64F;

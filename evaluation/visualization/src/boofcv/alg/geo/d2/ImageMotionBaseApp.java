@@ -24,6 +24,8 @@ import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.d2.stabilization.ImageMotionPointKey;
 import boofcv.alg.geo.d2.stabilization.RenderImageMotion;
 import boofcv.alg.geo.d2.stabilization.UtilImageMotion;
+import boofcv.alg.geo.d3.epipolar.h.DistanceHomographySq;
+import boofcv.alg.geo.d3.epipolar.h.GenerateHomographyLinear;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.VideoProcessAppBase;

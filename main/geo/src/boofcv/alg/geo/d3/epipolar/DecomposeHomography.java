@@ -33,8 +33,8 @@ import java.util.List;
 /**
  * <p>
  * Decomposes a homography matrix to extract its internal geometric structure.  There are four possible solutions,
- * with two that are physically possible.  The physically possible solution can be found by emposing a positive
- * depth constraint.  See {@link PositiveDepthConstraintCheck} for details on how to do that.
+ * with two that are physically possible.  The physically possible solution can be found by imposing a positive
+ * depth constraint.  See {@link boofcv.alg.geo.d3.epipolar.PositiveDepthConstraintCheck} for details on how to do that.
  * </p>
  *
  * <p>

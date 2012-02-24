@@ -16,23 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
+package boofcv.alg.geo.d3.epipolar.triangulate;
 
+import boofcv.numerics.optimization.functions.FunctionNtoM;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se3_F64;
 
 import java.util.List;
 
 /**
- * Specifies location of points on a planar calibration target
- *
  * @author Peter Abeles
  */
-public class PlanarCalibrationTarget {
-
-	// location of calibration points on calibration grid in world units
-	public List<Point2D_F64> points;
-
-	public PlanarCalibrationTarget(List<Point2D_F64> points) {
-		this.points = points;
+public class TestResidualsTriangulateSimple
+		extends ResidualTriangulateChecks
+{
+	@Override
+	public FunctionNtoM createAlg(List<Point2D_F64> observations, List<Se3_F64> motionGtoC) {
+		ResidualsTriangulateSimple alg = new ResidualsTriangulateSimple();
+		alg.setObservations(observations,motionGtoC);
+		return alg;
 	}
 }

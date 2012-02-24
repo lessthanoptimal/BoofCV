@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo.d3.epipolar.f;
 
-import boofcv.alg.geo.d3.epipolar.CommonFundamentalChecks;
 import boofcv.alg.geo.d3.epipolar.UtilEpipolar;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;

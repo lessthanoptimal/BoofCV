@@ -16,23 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
+package boofcv.abst.geo.epipolar;
 
+import boofcv.alg.geo.d3.epipolar.triangulate.TriangulateGeometric;
 import georegression.struct.point.Point2D_F64;
-
-import java.util.List;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 
 /**
- * Specifies location of points on a planar calibration target
- *
+ * Wrapper around {@link TriangulateGeometric} for {@link TriangulateTwoViewsCalibrated}.
+ * 
  * @author Peter Abeles
  */
-public class PlanarCalibrationTarget {
+public class WrapGeometricTriangulation implements TriangulateTwoViewsCalibrated {
 
-	// location of calibration points on calibration grid in world units
-	public List<Point2D_F64> points;
+	TriangulateGeometric alg = new TriangulateGeometric();
 
-	public PlanarCalibrationTarget(List<Point2D_F64> points) {
-		this.points = points;
+	@Override
+	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,
+							   Se3_F64 fromAtoB, Point3D_F64 found) {
+
+		alg.triangulate(obsA,obsB,fromAtoB,found);
+		return true;
 	}
 }

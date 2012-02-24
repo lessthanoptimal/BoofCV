@@ -69,6 +69,6 @@ public class WrapLevenbergDampened implements UnconstrainedLeastSquares {
 
 	@Override
 	public String getWarning() {
-		return null;
+		return alg.getMessage();
 	}
 }

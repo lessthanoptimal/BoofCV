@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar;
+package boofcv.alg.geo.d3.epipolar.triangulate;
 
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;

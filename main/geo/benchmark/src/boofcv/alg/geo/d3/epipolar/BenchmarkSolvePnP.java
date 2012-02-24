@@ -19,6 +19,8 @@
 package boofcv.alg.geo.d3.epipolar;
 
 import boofcv.abst.geo.epipolar.EpipolarMatrixEstimator;
+import boofcv.alg.geo.d3.epipolar.pose.PnPLepetitEPnP;
+import boofcv.alg.geo.d3.epipolar.pose.PoseFromPairLinear6;
 import boofcv.factory.geo.d3.epipolar.FactoryEpipolar;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;

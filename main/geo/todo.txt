@@ -1,16 +1,30 @@
-- Image Stabilization
-  * more error functions
-  * compare different robustness
-  * evaluation app
+- EPnP
+  * Case 4
+  * Planar data
+  * Nonlinear optimization
 
-- Panoramic Images
+- Bundle Adjustment
+  * Unweighted
+  * Weighted
 
-- Camera Calibration
+- PnP Stability Evaluator
+  * General Case
+  * Planar Data
+  * Variables
+    - Number of observations
+    - Noise magnitude
+    - Distance of points
 
+- Triangulation Stability
+  * Vary acute angle
 
-- Visual Odometry
-
-
-
-- Various
+- Long Term
  * Sparse Bundle Adjustment
+ * P3P algorithm
+ * 5-pt Fundamental
+
+- Move Trackers to Features?
+- Remove distinction between 2D and 3D algorithms?
+- Reconsider how DLT is handled
+ * Have normalization be handled outside of the estimator algorithms
+ * Change documentation to make this fact extremely clear

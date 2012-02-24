@@ -185,8 +185,11 @@ public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatch
 	 */
 	protected double computeDiff(Model modelA, Model modelB ) {
 
-		double paramA[] = codec.encode(modelA,null);
-		double paramB[] = codec.encode(modelB,null);
+		double paramA[] = new double[ codec.getParamLength() ];
+		double paramB[] = new double[ codec.getParamLength() ];
+
+		codec.encode(modelA,paramA);
+		codec.encode(modelB,paramB);
 
 		double total = 0;
 
