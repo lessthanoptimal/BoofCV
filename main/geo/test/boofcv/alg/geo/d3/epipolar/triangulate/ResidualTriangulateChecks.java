@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar.h;
+package boofcv.alg.geo.d3.epipolar.triangulate;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
-import org.ejml.data.DenseMatrix64F;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
 import java.util.List;
@@ -32,32 +32,32 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class HomographyResidualTests extends CommonHomographyChecks {
+public abstract class ResidualTriangulateChecks extends CommonTriangulationChecks {
 
-	public abstract FunctionNtoM createAlg( List<AssociatedPair> pairs );
+	public abstract FunctionNtoM createAlg( List<Point2D_F64> observations , List<Se3_F64> motionGtoC );
 
+	/**
+	 * Give it perfect parameters and no noise in observations then try introducing some errors
+	 */
 	@Test
-	public void basicTest() {
-		createScene(20,false);
+	public void perfect() {
+		createScene();
+		FunctionNtoM alg = createAlg(obsPts, motion);
 
-		// use the linear algorithm to compute the homography
-		HomographyLinear4 estimator = new HomographyLinear4(true);
-		estimator.process(pairs);
-		DenseMatrix64F H = estimator.getHomography();
+		double input[] = new double[]{worldPoint.x,worldPoint.y,worldPoint.z};
+		double output[] = new double[ alg.getM() ];
+		
+		alg.process(input,output);
 
-		FunctionNtoM alg = createAlg(pairs);
+		// there should be no errors
+		double error = computeCost(output);
+		assertEquals(0,error,1e-8);
 
-		// no noise
-		double []residuals = new double[alg.getM()];
-		alg.process(H.data,residuals);
+		// corrupt the parameter, which should cause errors in the residuals
+		input[0] += 1;
+		alg.process(input,output);
 
-		assertEquals(0, computeCost(residuals),1e-8);
-
-		// with model error
-		H.data[0] += 0.6;
-		H.data[4] += 0.6;
-		alg.process(H.data,residuals);
-
-		assertTrue(computeCost(residuals) > 1e-8);
+		error = computeCost(output);
+		assertTrue( error > 0.1);
 	}
 }

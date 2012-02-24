@@ -64,7 +64,7 @@ public class CalibrateMonoPlanarApp {
 	// computed parameters
 	protected ParametersZhang98 found;
 
-	// should it save the images
+	// should it save the images in memory
 	boolean saveImages;
 	
 	// Information on calibration targets and results

@@ -16,23 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
+package boofcv.alg.geo.d3.epipolar.f;
 
-import georegression.struct.point.Point2D_F64;
+import org.junit.Test;
 
-import java.util.List;
 
 /**
- * Specifies location of points on a planar calibration target
- *
  * @author Peter Abeles
  */
-public class PlanarCalibrationTarget {
+public class TestFundamentalLinear8 extends CommonFundamentalChecks {
 
-	// location of calibration points on calibration grid in world units
-	public List<Point2D_F64> points;
+	@Test
+	public void perfectFundamental() {
+		checkEpipolarMatrix(8,true,new FundamentalLinear8(true));
+		checkEpipolarMatrix(15,true,new FundamentalLinear8(true));
+	}
 
-	public PlanarCalibrationTarget(List<Point2D_F64> points) {
-		this.points = points;
+	@Test
+	public void perfectEssential() {
+		checkEpipolarMatrix(8,false,new FundamentalLinear8(false));
+		checkEpipolarMatrix(15,false,new FundamentalLinear8(false));
 	}
 }

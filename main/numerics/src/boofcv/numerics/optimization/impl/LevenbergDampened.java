@@ -121,6 +121,9 @@ public class LevenbergDampened {
 	// total number of iterations
 	private int iterationCount;
 
+	// message explaining failure
+	private String message;
+
 	/**
 	 * Specifies termination condition and linear solver.  Selection of the linear solver an effect
 	 * speed and robustness.
@@ -228,7 +231,8 @@ public class LevenbergDampened {
 		if( mode == 0 ) {
 			return initSamplePoint();
 		} else {
-			computeStep();
+			if( !computeStep() )
+				return true;
 		}
 
 		return false;
@@ -273,11 +277,12 @@ public class LevenbergDampened {
 		return false;
 	}
 
-	private void computeStep() {
+	private boolean computeStep() {
 		// Solves for xdelta
 		// (B + mu*I)xdelta = -g
 		// where mu is dampParam
-		solveForXDelta();
+		if( !solveForXDelta() )
+			return false;
 
 		// xtest = x + delta x
 		CommonOps.add(x, xdelta, xtest);
@@ -322,13 +327,15 @@ public class LevenbergDampened {
 			dampParam *= nu;
 			nu *= 2;
 		}
+		
+		return true;
 	}
 
 	/**
 	 * Sets up the linear system to find the change in x.  If the solver fails or is nearly singular
 	 * then the dampParam is increased.
 	 */
-	protected void solveForXDelta() {
+	protected boolean solveForXDelta() {
 		double max = CommonOps.elementMax(Bdiag);
 
 		// if the matrix is null do a simple gradient descent search
@@ -336,13 +343,13 @@ public class LevenbergDampened {
 			for( int i = 0; i < N; i++ ) {
 				xdelta.data[i] = g.data[i]/dampParam;
 			}
-			return;
+			return true;
 		}
 
 		// Adjust the dampening parameter until the solution can be solved
 		// This is not designed to take advantage of QR decomposition, which is why cholesky is recommended
 		boolean failed = true;
-		while( failed ) {
+		for( int iter = 0; iter < 1000 && failed; iter++ ) {
 			// add dampening parameter
 			for( int i = 0; i < N; i++ ) {
 				int index = B.getIndex(i,i);
@@ -359,9 +366,15 @@ public class LevenbergDampened {
 				dampParam = Math.max(10*dampParam,max*UtilEjml.EPS);
 			}
 		}
+		if( failed ) {
+			message = "Failed to find dampParam which cold be solved";
+			return false;
+		}
+
 		// solve for change in x
 		solver.solve(g, xdelta);
 
+		return true;
 	}
 
 	/**
@@ -402,5 +415,9 @@ public class LevenbergDampened {
 
 	public int getIterationCount() {
 		return iterationCount;
+	}
+
+	public String getMessage() {
+		return message;
 	}
 }

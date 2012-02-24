@@ -19,8 +19,8 @@
 package boofcv.abs.geo.epipolar;
 
 import boofcv.abst.geo.epipolar.RefineEpipolarMatrix;
-import boofcv.alg.geo.d3.epipolar.CommonHomographyChecks;
-import boofcv.alg.geo.d3.epipolar.HomographyLinear4;
+import boofcv.alg.geo.d3.epipolar.h.CommonHomographyChecks;
+import boofcv.alg.geo.d3.epipolar.h.HomographyLinear4;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;

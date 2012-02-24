@@ -22,9 +22,11 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.so.Rodrigues;
 
 /**
- * Parameters for batch optimization.
- *
+ * <p>
+ * Parameters for batch optimization.<br>
+ * <br>
  * Calibration matrix = [ a c x0 ; 0 b y0; 0 0 1];
+ * </p>
  *
  * @author Peter Abeles
  */

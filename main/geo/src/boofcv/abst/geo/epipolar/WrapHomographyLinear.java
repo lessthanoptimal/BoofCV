@@ -19,7 +19,7 @@
 package boofcv.abst.geo.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.d3.epipolar.HomographyLinear4;
+import boofcv.alg.geo.d3.epipolar.h.HomographyLinear4;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

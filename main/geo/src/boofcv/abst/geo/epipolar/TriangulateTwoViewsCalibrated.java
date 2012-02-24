@@ -16,23 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
+package boofcv.abst.geo.epipolar;
 
 import georegression.struct.point.Point2D_F64;
-
-import java.util.List;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 
 /**
- * Specifies location of points on a planar calibration target
+ * Triangulate the location of a point from two views of a feature given a calibrated
+ * camera and known camera motion.
  *
  * @author Peter Abeles
  */
-public class PlanarCalibrationTarget {
+public interface TriangulateTwoViewsCalibrated {
 
-	// location of calibration points on calibration grid in world units
-	public List<Point2D_F64> points;
-
-	public PlanarCalibrationTarget(List<Point2D_F64> points) {
-		this.points = points;
-	}
+	/**
+	 * Triangulate the points location.
+	 *
+	 * @param obsA View from position A in normalized image coordinates.
+	 * @param obsB View from position B in normalized image coordinates.
+	 * @param fromAtoB Transform from camera location A to location B
+	 * @param found The found triangulated point.
+	 * @return true if successful, false otherwise.
+	 */
+	public boolean triangulate( Point2D_F64 obsA , Point2D_F64 obsB ,
+								Se3_F64 fromAtoB , Point3D_F64 found );
 }

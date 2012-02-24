@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar;
+package boofcv.alg.geo.d3.epipolar.triangulate;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
@@ -63,9 +63,9 @@ public class PixelDepthLinear {
 	/**
 	 * Computes the pixel depth from N views of the same object.  Pixel depth in the first frame.
 	 *
-	 * @param obs List of observations in normalized coordinates
+	 * @param obs List of observations on a single feature in normalized coordinates
 	 * @param motion List of camera motions.  Each index 'i' is the motion from view 0 to view i+1.
-	 * @return
+	 * @return depth of the pixels
 	 */
 	public double depthNView( List<Point2D_F64> obs ,
 							  List<Se3_F64> motion )

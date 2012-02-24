@@ -30,21 +30,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Full implementation of the Zhang98 camera calibration algorithm using planar calibration targets.  First
+ * linear approximations of camera parameters are computed, which are then refined using non-linear estimation.
+ *
+ * <p>
+ * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations," 1998
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class CalibrationPlanarGridZhang98 {
 
-	Zhang98ComputeTargetHomography computeHomography;
-	Zhang98CalibrationMatrixFromHomographies computeK;
-	RadialDistortionEstimateLinear computeRadial;
-	Zhang98DecomposeHomography decomposeH = new Zhang98DecomposeHomography();
+	// estimation algorithms
+	private Zhang98ComputeTargetHomography computeHomography;
+	private Zhang98CalibrationMatrixFromHomographies computeK;
+	private RadialDistortionEstimateLinear computeRadial;
+	private Zhang98DecomposeHomography decomposeH = new Zhang98DecomposeHomography();
 
-	ParametersZhang98 optimized;
+	// contains found parameters
+	private ParametersZhang98 optimized;
 
-	PlanarCalibrationTarget target;
+	// description of the calibration target with point locations
+	private PlanarCalibrationTarget target;
 
-	boolean assumeZeroSkew;
+	// if true the intrinsic calibration matrix will have the skew parameter set to zero
+	private boolean assumeZeroSkew;
 
+	/**
+	 * Configures calibration process.
+	 *
+	 * @param target Description of the known calibration target
+	 * @param assumeZeroSkew Should it assumed the camera has zero skew. Typically true.
+	 * @param numRadialParam Number of radial distortion parameters to consider.  Typically 0,1,2.
+	 */
 	public CalibrationPlanarGridZhang98( PlanarCalibrationTarget target ,
 										 boolean assumeZeroSkew ,
 										 int numRadialParam )
@@ -58,8 +76,11 @@ public class CalibrationPlanarGridZhang98 {
 	}
 
 	/**
+	 * Processes observed calibration point coordinates and computes camera intrinsic and extrinsic
+	 * parameters.
 	 *
 	 * @param observations Set of observed grid locations in pixel coordinates.
+	 * @return true if successful and false if it failed
 	 */
 	public boolean process( List<List<Point2D_F64>> observations ) {
 
@@ -77,6 +98,9 @@ public class CalibrationPlanarGridZhang98 {
 		return true;
 	}
 
+	/**
+	 * Find an initial estimate for calibration parameters using linear techniques.
+	 */
 	protected ParametersZhang98 initialParam( List<List<Point2D_F64>> observations )
 	{
 		List<DenseMatrix64F> homographies = new ArrayList<DenseMatrix64F>();
@@ -107,6 +131,9 @@ public class CalibrationPlanarGridZhang98 {
 		return convertIntoZhangParam(motions, K, distort);
 	}
 
+	/**
+	 * Use non-linear optimization to improve the parameter estimtes
+	 */
 	public static boolean optimizedParam( List<List<Point2D_F64>> observations ,
 										  List<Point2D_F64> grid ,
 										  boolean assumeZeroSkew ,
@@ -117,7 +144,6 @@ public class CalibrationPlanarGridZhang98 {
 				initial.createNew(),assumeZeroSkew , grid,observations);
 
 		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresLM(1e-8,1e-8,1e-3,true);
-
 
 		double model[] = new double[ initial.size() ];
 		initial.convertToParam(assumeZeroSkew,model);

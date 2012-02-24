@@ -35,24 +35,24 @@ import java.util.List;
  */
 public class Zhang98OptimizationFunction implements FunctionNtoM {
 
-	int N,M;
+	private int N,M;
 	
 	// description of the calibration grid
-	List<Point3D_F64> grid = new ArrayList<Point3D_F64>();
+	private List<Point3D_F64> grid = new ArrayList<Point3D_F64>();
 	// optimization parameters
-	ParametersZhang98 param;
+	private ParametersZhang98 param;
 	
 	// should it assume the skew parameter is zero?
 	private boolean assumeZeroSkew;
 
 	// variables for storing intermediate results
-	Se3_F64 se = new Se3_F64();
+	private Se3_F64 se = new Se3_F64();
 
-	Point3D_F64 cameraPt = new Point3D_F64();
-	Point2D_F64 calibratedPt = new Point2D_F64();
+	private Point3D_F64 cameraPt = new Point3D_F64();
+	private Point2D_F64 calibratedPt = new Point2D_F64();
 
 	// observations
-	List<List<Point2D_F64>> observations;
+	private List<List<Point2D_F64>> observations;
 
 	/**
 	 * Configurations the optimization function.
@@ -60,6 +60,7 @@ public class Zhang98OptimizationFunction implements FunctionNtoM {
 	 * @param param Storage for calibration parameters. Effectively specifies the number of target views
 	 * and radial terms
 	 * @param grid Location of points on the calibration grid.  z=0
+	 * @param observations calibration point observation pixel coordinates
 	 */
 	public Zhang98OptimizationFunction( ParametersZhang98 param ,
 										boolean assumeZeroSkew,

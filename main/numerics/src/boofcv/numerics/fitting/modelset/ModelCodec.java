@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public interface ModelCodec<T> {
 	 * @param outputModel Option (can be null) model.
 	 * @return Converted model
 	 */
-	T decode( double param[] , T outputModel );
+	void decode( double param[] , T outputModel );
 
 	/**
 	 * Converts the provided model into the array format.
@@ -42,7 +42,7 @@ public interface ModelCodec<T> {
 	 * @param param Output parameterized model. Can be null.
 	 * @return parameterized model.
 	 */
-	double[] encode( T model , double param[] );
+	void encode( T model , double param[] );
 
 	/**
 	 * Number of elements in array encoded parameters.

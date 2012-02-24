@@ -1,0 +1,10 @@
+- Square Grid
+ * Try using canny edge detector in refinement step
+
+- Checker
+ * Compare against OpenCV
+ * Suspicious that corner detector isn't as good as it should be
+
+- Zhang 98
+ * Not optimizing as well as it should be.
+ * Least squares is suspect, try dogleg instead

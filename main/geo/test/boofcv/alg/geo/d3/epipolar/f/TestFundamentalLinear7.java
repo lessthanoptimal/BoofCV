@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar;
+package boofcv.alg.geo.d3.epipolar.f;
 
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class TestFundamentalLinear7 extends CommonFundamentalChecks{
 
 		double coefs[] = new double[4];
 
-		FundamentalLinear7.computeCoefficients(F1.getMatrix(),F2.getMatrix(),coefs);
+		FundamentalLinear7.computeCoefficients(F1.getMatrix(), F2.getMatrix(), coefs);
 
 		double alpha = 0.4;
 

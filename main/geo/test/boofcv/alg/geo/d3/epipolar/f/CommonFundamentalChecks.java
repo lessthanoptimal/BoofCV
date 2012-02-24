@@ -16,45 +16,48 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.epipolar;
+package boofcv.alg.geo.d3.epipolar.f;
 
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.alg.geo.GeoTestingOps;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.NormOps;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
- * Creates two views of a planar scene for checking homography related algorithms
+ * Standardized checks for computing fundamental matrices
  *
  * @author Peter Abeles
  */
-public class CommonHomographyChecks {
+public class CommonFundamentalChecks {
 
-	protected Random rand = new Random(234234);
+	Random rand = new Random(234234);
 
 	// create a reasonable calibration matrix
-	protected DenseMatrix64F K = new DenseMatrix64F(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
+	DenseMatrix64F K = new DenseMatrix64F(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
 
 	protected Se3_F64 motion;
-	protected List<Point3D_F64> pts;
 	protected List<AssociatedPair> pairs;
-	protected double d=3; // distance plane is from camera
-
-	public void createScene( int numPoints , boolean isPixels ) {
+	
+	public void init( int N , boolean isFundamental ) {
 		// define the camera's motion
 		motion = new Se3_F64();
 		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
 		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
-		pts = createRandomPlane(numPoints);
+		List<Point3D_F64> pts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 
 		// transform points into second camera's reference frame
 		pairs = new ArrayList<AssociatedPair>();
@@ -66,27 +69,30 @@ public class CommonHomographyChecks {
 			pair.currLoc.set(p2.x/p2.z,p2.y/p2.z);
 			pairs.add(pair);
 
-			if( isPixels ) {
+			if( isFundamental ) {
 				GeometryMath_F64.mult(K, pair.keyLoc, pair.keyLoc);
-				GeometryMath_F64.mult(K, pair.currLoc,pair.currLoc);
+				GeometryMath_F64.mult(K,pair.currLoc,pair.currLoc);
 			}
 		}
 	}
+	
+	
+	public void checkEpipolarMatrix( int N , boolean isFundamental , FundamentalLinear8 alg ) {
+		init(N,isFundamental);
 
-	/**
-	 * Creates a set of random points along the (X,Y) plane
-	 */
-	private List<Point3D_F64> createRandomPlane( int N )
-	{
-		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
+		// compute essential
+		assertTrue(alg.process(pairs));
 
-		for( int i = 0; i < N; i++ ) {
-			double x = (rand.nextDouble()-0.5)*2;
-			double y = (rand.nextDouble()-0.5)*2;
+		// validate by testing essential properties
+		DenseMatrix64F F = alg.getF();
 
-			ret.add( new Point3D_F64(x,y,d));
+		// sanity check, F is not zero
+		assertTrue(NormOps.normF(F) > 0.1 );
+
+		// see if it follows the epipolar constraint
+		for( AssociatedPair p : pairs ) {
+			double val = GeometryMath_F64.innerProd(p.currLoc, F, p.keyLoc);
+			assertEquals(0,val,1e-8);
 		}
-
-		return ret;
 	}
 }

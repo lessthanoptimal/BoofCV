@@ -16,9 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d2;
+package boofcv.alg.geo.d3.epipolar.h;
 
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.alg.geo.d2.ModelTestingInterface;
+import boofcv.alg.geo.d2.StandardModelFitterTests;
+import boofcv.alg.geo.d2.StandardModelGeneratorTests;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.struct.homo.Homography2D_F64;
