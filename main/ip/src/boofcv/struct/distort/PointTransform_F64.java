@@ -18,31 +18,21 @@
 
 package boofcv.struct.distort;
 
+import georegression.struct.point.Point2D_F64;
 
 /**
- * Computes the location of a pixel after an arbitrary distortion has been applied to the image.
+ * Applies a transform to a 2D point.
  *
  * @author Peter Abeles
  */
-public abstract class PixelTransform_F32 {
-
-	// distorted pixel coordinates
-	public float distX;
-	public float distY;
+public interface PointTransform_F64 {
 
 	/**
-	 * applies a transform to a pixel coordinte
+	 * Applies transformation
 	 *
-	 * @param x Pixel x-coordinate
-	 * @param y Pixel y-coordinate
+	 * @param x x-coordinate of point
+	 * @param y y-coordinate of point
+	 * @param out Transformed point location.
 	 */
-	public abstract void compute( int x , int y );
-
-	public float getDistX() {
-		return distX;
-	}
-
-	public float getDistY() {
-		return distY;
-	}
+	public void compute(double x, double y, Point2D_F64 out);
 }

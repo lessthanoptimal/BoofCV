@@ -143,12 +143,12 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(8,8);
-//		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(3,4);
+//		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(8,8);
+		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(3,4);
 //		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(3,4);
 
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8,8,0.5,7.0/18.0);
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8,8,0.5,7.0/18.0);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
 		CalibrateMonoPlanarApp calibrator = new CalibrateMonoPlanarApp(detector,true);
@@ -163,8 +163,8 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 		frame.setVisible(true);
 
 //		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess");
-//		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square");
-		app.process("../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang");
+		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square");
+//		app.process("../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang");
 
 	}
 }

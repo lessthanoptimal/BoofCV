@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.d2;
 
-import boofcv.alg.geo.d2.stabilization.MotionMosaicPointKey;
-import boofcv.alg.geo.d2.stabilization.UtilImageMotion;
+import boofcv.alg.sfm.d2.MotionMosaicPointKey;
+import boofcv.alg.sfm.d2.UtilImageMotion;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.ProcessInput;

@@ -20,6 +20,7 @@
     <orderEntry type="module" module-name="BoofCV Numerics" />
     <orderEntry type="module" module-name="BoofCV Visualize" />
     <orderEntry type="module" module-name="BoofCV Calibration" />
+    <orderEntry type="module" module-name="BoofCV SFM" />
   </component>
 </module>
 

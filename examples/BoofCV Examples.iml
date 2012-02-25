@@ -16,6 +16,7 @@
     <orderEntry type="module" module-name="GeoRegression" />
     <orderEntry type="module" module-name="libpja" />
     <orderEntry type="module" module-name="BoofCV Visualize" />
+    <orderEntry type="module" module-name="BoofCV SFM" />
   </component>
 </module>
 

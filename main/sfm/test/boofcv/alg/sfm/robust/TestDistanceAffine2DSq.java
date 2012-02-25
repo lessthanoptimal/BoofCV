@@ -16,33 +16,32 @@
  * limitations under the License.
  */
 
-package boofcv.struct.distort;
+package boofcv.alg.sfm.robust;
+
+import boofcv.alg.geo.AssociatedPair;
+import boofcv.numerics.fitting.modelset.DistanceFromModel;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.transform.affine.AffinePointOps;
 
 
 /**
- * Computes the location of a pixel after an arbitrary distortion has been applied to the image.
- *
  * @author Peter Abeles
  */
-public abstract class PixelTransform_F32 {
+public class TestDistanceAffine2DSq extends TestDistanceAffine2D {
 
-	// distorted pixel coordinates
-	public float distX;
-	public float distY;
-
-	/**
-	 * applies a transform to a pixel coordinte
-	 *
-	 * @param x Pixel x-coordinate
-	 * @param y Pixel y-coordinate
-	 */
-	public abstract void compute( int x , int y );
-
-	public float getDistX() {
-		return distX;
+	@Override
+	public DistanceFromModel<Affine2D_F64, AssociatedPair> create() {
+		return new DistanceAffine2DSq();
 	}
 
-	public float getDistY() {
-		return distY;
+	@Override
+	public double distance(Affine2D_F64 affine, AssociatedPair associatedPair) {
+
+		Point2D_F64 result = new Point2D_F64();
+
+		AffinePointOps.transform(affine,associatedPair.keyLoc,result);
+
+		return result.distance2(associatedPair.currLoc);
 	}
 }

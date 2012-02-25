@@ -37,12 +37,13 @@ public class TestKeyFramePointTracker {
 
 	@Test
 	public void process() {
-		Dummy tracker = new Dummy(5,2);
+		Dummy tracker = new Dummy(0,2,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
 
-		assertEquals(5, alg.getActiveTracks().size());
+		assertEquals(0, alg.getActiveTracks().size());
 		assertEquals(0, alg.getPairs().size());
 
+		alg.spawnTracks();
 		alg.setKeyFrame();
 		assertEquals(5, alg.getPairs().size());
 
@@ -50,38 +51,38 @@ public class TestKeyFramePointTracker {
 
 		assertEquals(3, alg.getActiveTracks().size());
 		assertEquals(3, alg.getPairs().size());
-		assertEquals(0, tracker.numCalledSpawn);
+		assertEquals(1, tracker.numCalledSpawn);
 	}
 
 	@Test
 	public void setKeyFrame() {
-		Dummy tracker = new Dummy(5,0);
+		Dummy tracker = new Dummy(0,0,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
 
-		assertEquals(5, alg.getActiveTracks().size());
 		assertEquals(0, alg.getPairs().size());
 
+		alg.spawnTracks();
 		alg.setKeyFrame();
 
 		assertEquals(5, alg.getActiveTracks().size());
 		assertEquals(5, alg.getPairs().size());
-		assertEquals(0, tracker.numCalledSpawn);
+		assertEquals(1, tracker.numCalledSpawn);
 	}
 
 	@Test
 	public void spawnTracks() {
-		Dummy tracker = new Dummy(5,0);
+		Dummy tracker = new Dummy(0,0,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
 		
 		alg.spawnTracks();
 
-		assertEquals(0, alg.getPairs().size());
+		assertEquals(5, alg.getPairs().size());
 		assertEquals(1, tracker.numCalledSpawn);
 	}
 
 	@Test
 	public void dropTrack() {
-		Dummy tracker = new Dummy(5,0);
+		Dummy tracker = new Dummy(0,0,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
 		
 		alg.spawnTracks();
@@ -94,7 +95,7 @@ public class TestKeyFramePointTracker {
 
 	@Test
 	public void reset() {
-		Dummy tracker = new Dummy(5,0);
+		Dummy tracker = new Dummy(0,0,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
 
 		alg.spawnTracks();
@@ -109,6 +110,7 @@ public class TestKeyFramePointTracker {
 
 	private static class Dummy implements ImagePointTracker {
 
+		List<PointTrack> spawned = new ArrayList<PointTrack>();
 		List<PointTrack> active = new ArrayList<PointTrack>();
 		List<PointTrack> dropped = new ArrayList<PointTrack>();
 
@@ -117,15 +119,17 @@ public class TestKeyFramePointTracker {
 		int numCalledDrop= 0;
 		
 		int numDrop;
+		int numToSpawn;
 
 		public Dummy() {
 		}
 		
-		public Dummy( int numActive , int numDrop ) {
-			 for( int i = 0; i < numActive; i++ ) {
-				 active.add( new PointTrack());
-			 }
+		public Dummy( int numActive , int numDrop , int numToSpawn ) {
+			for( int i = 0; i < numActive; i++ ) {
+				active.add( new PointTrack());
+			}
 			this.numDrop = numDrop;
+			this.numToSpawn = numToSpawn;
 		}
 
 		@Override
@@ -144,6 +148,11 @@ public class TestKeyFramePointTracker {
 
 		@Override
 		public void spawnTracks() {
+			for( int i = 0; i < numToSpawn; i++ ) {
+				spawned.add( new PointTrack() );
+			}
+			active.addAll(spawned);
+
 			numCalledSpawn++;
 		}
 
@@ -169,7 +178,7 @@ public class TestKeyFramePointTracker {
 
 		@Override
 		public List<PointTrack> getNewTracks() {
-			return null;
+			return spawned;
 		}
 	}
 }

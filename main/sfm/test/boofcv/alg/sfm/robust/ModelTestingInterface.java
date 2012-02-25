@@ -16,33 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.struct.distort;
+package boofcv.alg.sfm.robust;
 
+import java.util.List;
 
 /**
- * Computes the location of a pixel after an arbitrary distortion has been applied to the image.
- *
  * @author Peter Abeles
  */
-public abstract class PixelTransform_F32 {
-
-	// distorted pixel coordinates
-	public float distX;
-	public float distY;
+public interface ModelTestingInterface<Model, Point> {
 
 	/**
-	 * applies a transform to a pixel coordinte
-	 *
-	 * @param x Pixel x-coordinate
-	 * @param y Pixel y-coordinate
+	 * Creates a random model
 	 */
-	public abstract void compute( int x , int y );
+	public Model createRandomModel();
 
-	public float getDistX() {
-		return distX;
-	}
+	/**
+	 * Creates a random point that fits the provided model
+	 */
+	public Point createRandomPointFromModel( Model model );
 
-	public float getDistY() {
-		return distY;
-	}
+	/**
+	 * Checks to see of the dat set are described by the model correctly
+	 */
+	public boolean doPointsFitModel( Model model , List<Point> dataSet );
 }
