@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.d2;
 
+import boofcv.abst.geo.robust.GenerateRefineAffine2D;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;

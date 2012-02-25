@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.calibration;
+package boofcv.alg.geo.calibration;
 
 import boofcv.gui.StandardAlgConfigPanel;
 

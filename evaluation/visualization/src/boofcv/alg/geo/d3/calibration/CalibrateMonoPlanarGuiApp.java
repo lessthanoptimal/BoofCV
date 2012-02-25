@@ -16,14 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.calibration;
+package boofcv.alg.geo.calibration;
 
 import boofcv.alg.distort.AddRadialDistortionPixel;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.geo.calibration.FactoryPlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.ParametersZhang98;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.app.CalibrateMonoPlanarApp;
 import boofcv.app.PlanarCalibrationDetector;

@@ -19,7 +19,7 @@
 package boofcv.abst.geo.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.d3.epipolar.EpipolarResiduals;
+import boofcv.alg.geo.epipolar.EpipolarResiduals;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import org.ejml.data.DenseMatrix64F;

@@ -20,10 +20,11 @@ package boofcv.factory.geo.d3.epipolar;
 
 import boofcv.abst.geo.epipolar.*;
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.d3.epipolar.EpipolarResiduals;
-import boofcv.alg.geo.d3.epipolar.h.HomographyLinear4;
-import boofcv.alg.geo.d3.epipolar.h.ResidualsHomographySampson;
-import boofcv.alg.geo.d3.epipolar.h.ResidualsHomographyTransfer;
+import boofcv.alg.geo.epipolar.EpipolarResiduals;
+import boofcv.alg.geo.epipolar.h.HomographyLinear4;
+import boofcv.alg.geo.epipolar.h.ResidualsHomographySampson;
+import boofcv.alg.geo.epipolar.h.ResidualsHomographyTransfer;
+import boofcv.alg.geo.epipolar.pose.PnPLepetitEPnP;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import org.ejml.data.DenseMatrix64F;
 
@@ -95,6 +96,9 @@ public class FactoryEpipolar {
 	/**
 	 * Creates a non-linear optimizer for refining estimates of fundamental or essential matrices.
 	 *
+	 * @see boofcv.alg.geo.epipolar.f.ResidualsFundamentalSampson
+	 * @see boofcv.alg.geo.epipolar.f.ResidualsFundamentalSimple
+	 *
 	 * @param tol Tolerance for convergence.  Try 1e-8
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
 	 * @return Refinement
@@ -109,5 +113,18 @@ public class FactoryEpipolar {
 		}
 
 		throw new IllegalArgumentException("Type not supported: "+type);
+	}
+
+	/**
+	 * Returns a solution to the PnP problem for 4 or more points using EPnP. Fast and fairly
+	 * accurate algorithm.  Can handle general and planar scenario.
+	 *
+	 * @see PnPLepetitEPnP
+	 *
+	 * @return  PerspectiveNPoint
+	 */
+	public static PerspectiveNPoint pnpEfficientPnP() {
+		PnPLepetitEPnP alg = new PnPLepetitEPnP();
+		return new WrapPnPLepetitEPnP(alg);
 	}
 }

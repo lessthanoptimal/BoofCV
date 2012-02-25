@@ -31,7 +31,16 @@ Version : Alpha 0.6
 - ModelMatcher classes can now create multiple model hypotheses from a single set of points.
 - Changed ImagePointTracker to use PointTrack instead of AssociatedPair
   * Created KeyFramePointTracker to track features and create AssociatedPairs
-
+- Added FactoryEpipolar
+- Added FactoryTriangulate
+- Added non-linear refinement for:
+  * Fundamental/Essential matrix
+  * Homography matrix
+  * Triangulation
+- Added 2-view and N-View triangulation algorithms
+  * DLT
+  * Closest point from two lines
+- Added EPnP from Lepetit 2009 paper
 
 ---------------------------------------------
 Date    : 2012/02/01

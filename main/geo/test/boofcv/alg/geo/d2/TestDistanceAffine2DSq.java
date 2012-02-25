@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.d2;
 
+import boofcv.abst.geo.robust.DistanceAffine2DSq;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import georegression.struct.affine.Affine2D_F64;

@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.d2;
 
+import boofcv.abst.geo.robust.Affine2DCodec;
 import georegression.struct.affine.Affine2D_F64;
 import org.junit.Test;
 

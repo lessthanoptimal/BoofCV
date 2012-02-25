@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.calibration;
+package boofcv.alg.geo.calibration;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.geo.calibration.ParametersZhang98;
 import boofcv.app.ImageResults;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.StandardAlgConfigPanel;

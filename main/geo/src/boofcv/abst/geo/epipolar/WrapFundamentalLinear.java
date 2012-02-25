@@ -19,8 +19,8 @@
 package boofcv.abst.geo.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.d3.epipolar.f.FundamentalLinear7;
-import boofcv.alg.geo.d3.epipolar.f.FundamentalLinear8;
+import boofcv.alg.geo.epipolar.f.FundamentalLinear7;
+import boofcv.alg.geo.epipolar.f.FundamentalLinear8;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
