@@ -20,12 +20,14 @@ package boofcv.alg.geo.d2;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
+import boofcv.abst.geo.robust.DistanceAffine2DSq;
+import boofcv.abst.geo.robust.GenerateRefineAffine2D;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.d2.stabilization.ImageMotionPointKey;
 import boofcv.alg.geo.d2.stabilization.RenderImageMotion;
 import boofcv.alg.geo.d2.stabilization.UtilImageMotion;
-import boofcv.alg.geo.d3.epipolar.h.DistanceHomographySq;
-import boofcv.alg.geo.d3.epipolar.h.GenerateHomographyLinear;
+import boofcv.alg.geo.epipolar.h.DistanceHomographySq;
+import boofcv.alg.geo.epipolar.h.GenerateHomographyLinear;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.VideoProcessAppBase;

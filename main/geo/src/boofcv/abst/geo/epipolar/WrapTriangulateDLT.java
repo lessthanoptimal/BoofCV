@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.epipolar;
 
-import boofcv.alg.geo.d3.epipolar.triangulate.TriangulateLinearDLT;
+import boofcv.alg.geo.epipolar.triangulate.TriangulateLinearDLT;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;

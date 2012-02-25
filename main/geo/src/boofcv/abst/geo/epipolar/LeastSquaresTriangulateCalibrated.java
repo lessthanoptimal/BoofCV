@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.epipolar;
 
-import boofcv.alg.geo.d3.epipolar.triangulate.ResidualsTriangulateSimple;
+import boofcv.alg.geo.epipolar.triangulate.ResidualsTriangulateSimple;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import georegression.struct.point.Point2D_F64;

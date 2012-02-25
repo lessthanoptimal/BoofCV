@@ -31,7 +31,7 @@ public class FactoryTriangulate {
 	/**
 	 * Triangulate two view by finding the intersection of two rays.
 	 *
-	 * @see boofcv.alg.geo.d3.epipolar.triangulate.TriangulateGeometric
+	 * @see boofcv.alg.geo.epipolar.triangulate.TriangulateGeometric
 	 *
 	 * @return Two view triangulation algorithm
 	 */
@@ -42,7 +42,7 @@ public class FactoryTriangulate {
 	/**
 	 * Triangulate two view using the Discrete Linear Transform (DLT)
 	 *
-	 * @see boofcv.alg.geo.d3.epipolar.triangulate.TriangulateLinearDLT
+	 * @see boofcv.alg.geo.epipolar.triangulate.TriangulateLinearDLT
 	 *
 	 * @return Two view triangulation algorithm
 	 */
@@ -53,7 +53,7 @@ public class FactoryTriangulate {
 	/**
 	 * Triangulate two view by finding the depth of the pixel using a linear algorithm.
 	 *
-	 * @see boofcv.alg.geo.d3.epipolar.triangulate.PixelDepthLinear
+	 * @see boofcv.alg.geo.epipolar.triangulate.PixelDepthLinear
 	 *
 	 * @return Two view triangulation algorithm
 	 */
@@ -64,7 +64,7 @@ public class FactoryTriangulate {
 	/**
 	 * Refine the triangulation using Sampson error.  Approximately takes in account epipolar constraints.
 	 *
-	 * @see boofcv.alg.geo.d3.epipolar.triangulate.ResidualsTriangulateSampson
+	 * @see boofcv.alg.geo.epipolar.triangulate.ResidualsTriangulateSampson
 	 *
 	 * @param convergenceTol Tolerance for finishing optimization
 	 * @param maxIterations Maximum number of allowed iterations
@@ -78,7 +78,7 @@ public class FactoryTriangulate {
 	 * Refine the triangulation by computing the difference between predicted and actual pixel location.
 	 * Does not take in account epipolar constraints.
 	 *
-	 * @see boofcv.alg.geo.d3.epipolar.triangulate.ResidualsTriangulateSimple
+	 * @see boofcv.alg.geo.epipolar.triangulate.ResidualsTriangulateSimple
 	 *
 	 * @param convergenceTol Tolerance for finishing optimization
 	 * @param maxIterations Maximum number of allowed iterations

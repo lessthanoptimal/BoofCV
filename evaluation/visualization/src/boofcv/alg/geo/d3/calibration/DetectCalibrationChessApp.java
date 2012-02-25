@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d3.calibration;
+package boofcv.alg.geo.calibration;
 
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;

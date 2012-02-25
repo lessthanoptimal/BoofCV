@@ -19,10 +19,10 @@
 package boofcv.abst.geo.epipolar;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.d3.epipolar.EpipolarResiduals;
-import boofcv.alg.geo.d3.epipolar.f.ParamFundamentalEpipolar;
-import boofcv.alg.geo.d3.epipolar.f.ResidualsFundamentalSampson;
-import boofcv.alg.geo.d3.epipolar.f.ResidualsFundamentalSimple;
+import boofcv.alg.geo.epipolar.EpipolarResiduals;
+import boofcv.alg.geo.epipolar.f.ParamFundamentalEpipolar;
+import boofcv.alg.geo.epipolar.f.ResidualsFundamentalSampson;
+import boofcv.alg.geo.epipolar.f.ResidualsFundamentalSimple;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
