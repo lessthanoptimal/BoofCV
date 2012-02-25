@@ -72,6 +72,9 @@ public class BenchmarkRefineFundamental extends ArtificialStereoScene{
 		EpipolarMatrixEstimator computeAlg = FactoryEpipolar.computeFundamental(FUNDAMENTAL,8);
 		computeAlg.process(pairs);
 		initialF = computeAlg.getEpipolarMatrix();
+		initialF.data[0] += 0.1;
+		initialF.data[4] -= 0.15;
+		initialF.data[7] -= 0.2;
 
 		ProfileOperation.printOpsPerSec(new Refine("LS Sampson",refineFundamental(tol, MAX_ITER, EpipolarError.SAMPSON)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Refine("LS Simple",refineFundamental(tol, MAX_ITER, EpipolarError.SIMPLE)), TEST_TIME);

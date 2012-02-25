@@ -51,12 +51,12 @@ public class KeyFramePointTracker<T extends ImageBase> {
 	 */
 	public void process( T image ) {
 		tracker.process(image);
-		
-		List<PointTrack> dropped = tracker.getDroppedTracks();
 
-		for( int i = 0; i < dropped.size(); i++ ) {
-			if( !pairs.remove((AssociatedPair)dropped.get(i).cookie) )
-				throw new IllegalArgumentException("Bug: Dropped track does not exist");
+		pairs.clear();
+		List<PointTrack> tracks = tracker.getActiveTracks();
+		for( PointTrack t : tracks ) {
+			AssociatedPair p = t.getCookie();
+			pairs.add(p);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class KeyFramePointTracker<T extends ImageBase> {
 	public void setKeyFrame() {
 		pairs.clear();
 		reserveA.reset();
-		
+
 		List<PointTrack> tracks = tracker.getActiveTracks();
 		for( PointTrack t : tracks ) {
 			AssociatedPair p = reserveA.pop();
