@@ -18,10 +18,8 @@
 
 package boofcv.alg.geo.epipolar;
 
-import boofcv.abst.geo.epipolar.EpipolarMatrixEstimator;
 import boofcv.alg.geo.epipolar.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.epipolar.pose.PoseFromPairLinear6;
-import boofcv.factory.geo.d3.epipolar.FactoryEpipolar;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import org.ejml.data.DenseMatrix64F;
@@ -29,7 +27,7 @@ import org.ejml.data.DenseMatrix64F;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkSolvePnP extends ArtificialStereoScene{
+public class BenchmarkComputePose extends ArtificialStereoScene{
 	static final long TEST_TIME = 1000;
 	static final int NUM_POINTS = 500;
 	static final boolean FUNDAMENTAL = false;
@@ -63,10 +61,6 @@ public class BenchmarkSolvePnP extends ArtificialStereoScene{
 
 		init(NUM_POINTS,FUNDAMENTAL,false);
 
-		EpipolarMatrixEstimator computeAlg = FactoryEpipolar.computeFundamental(FUNDAMENTAL,8);
-		computeAlg.process(pairs);
-		initialF = computeAlg.getEpipolarMatrix();
-
 		ProfileOperation.printOpsPerSec(new EPnP(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new PairLinear(), TEST_TIME);
 
@@ -75,7 +69,7 @@ public class BenchmarkSolvePnP extends ArtificialStereoScene{
 	}
 	
 	public static void main( String args[] ) {
-		BenchmarkSolvePnP alg = new BenchmarkSolvePnP();
+		BenchmarkComputePose alg = new BenchmarkComputePose();
 
 		alg.runAll();
 	}

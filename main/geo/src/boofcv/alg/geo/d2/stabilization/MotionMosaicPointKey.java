@@ -84,6 +84,7 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 		if( !super.process(frame) )
 			return false;
 
+		// todo add a check to see if it is a keyframe or not- two spawns on first frame
 		keyFrame = false;
 
 		int matchSetSize = modelMatcher.getMatchSet().size();
@@ -97,7 +98,7 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 		if( fractionCovered < respawnCoverageFraction *maxCoverage ) {
 			keyFrame = true;
 		}
-
+		
 		if(keyFrame) {
 			changeKeyFrame();
 

@@ -69,7 +69,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
 		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 10, imageType));
 		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.surf(300, 200, 2, imageType));
-		
+
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());
 	}

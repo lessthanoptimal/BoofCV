@@ -20,9 +20,11 @@ package boofcv.alg.geo.epipolar;
 
 import boofcv.abst.geo.epipolar.EpipolarMatrixEstimator;
 import boofcv.abst.geo.epipolar.RefineEpipolarMatrix;
+import boofcv.alg.geo.epipolar.h.HomographyLinear4;
 import boofcv.factory.geo.d3.epipolar.EpipolarError;
 import boofcv.factory.geo.d3.epipolar.FactoryEpipolar;
 import boofcv.misc.Performer;
+import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import org.ejml.data.DenseMatrix64F;
 
@@ -59,22 +61,37 @@ public class BenchmarkRefineHomography extends ArtificialStereoScene{
 			return name;
 		}
 	}
+
+	public class Linear4 extends PerformerBase {
+
+		HomographyLinear4 alg = new HomographyLinear4(true);
+
+		@Override
+		public void process() {
+			alg.process(pairs);
+		}
+	}
 	
 	public void runAll() {
 		System.out.println("=========  Profile numFeatures "+NUM_POINTS);
 		System.out.println();
 
 		double tol = 1e-16;
-		int MAX_ITER = 100;
+		int MAX_ITER = 200;
 
 		init(NUM_POINTS, PIXELS, true);
 
 		EpipolarMatrixEstimator computeAlg = FactoryEpipolar.computeHomography(true);
 		computeAlg.process(pairs);
 		initialF = computeAlg.getEpipolarMatrix();
+		initialF.data[0] += 0.1;
+		initialF.data[4] -= 0.15;
+		initialF.data[7] -= 0.2;
+
 
 		ProfileOperation.printOpsPerSec(new Refine("Simple",refineHomography(tol, MAX_ITER, EpipolarError.SIMPLE)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Refine("Sampson",refineHomography(tol, MAX_ITER, EpipolarError.SAMPSON)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Linear4(), TEST_TIME);
 
 		
 		System.out.println();

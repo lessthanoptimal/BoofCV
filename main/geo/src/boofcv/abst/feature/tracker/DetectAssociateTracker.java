@@ -105,7 +105,6 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 			featDst = createFeatureDescQueue(true);
 		}
 
-//		System.out.println("process");
 		setInputImage(input);
 		tick++;
 
@@ -126,11 +125,11 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 
 			for( int i = 0; i < matches.size; i++ ) {
 				AssociatedIndex indexes = matches.data[i];
-				PointTrack pair = tracksAll.get(indexes.src);
+				PointTrack track = tracksAll.get(indexes.src);
 				Point2D_F64 loc = locDst.data[indexes.dst];
-				pair.set(loc.x,loc.y);
-				tracksActive.add(pair);
-				TrackInfo info = (TrackInfo)pair.getDescription();
+				track.set(loc.x, loc.y);
+				tracksActive.add(track);
+				TrackInfo info = (TrackInfo)track.getDescription();
 				info.lastAssociated = tick;
 
 				// update the description
@@ -150,7 +149,6 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 			PointTrack p = iter.next();
 			TrackInfo info = (TrackInfo)p.description;
 			if( tick - info.lastAssociated > pruneThreshold ) {
-//				System.out.println("Dropping track");
 				tracksDropped.add(p);
 				unused.add(p);
 				iter.remove();
@@ -175,7 +173,6 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 	 */
 	@Override
 	public void spawnTracks() {
-//		System.out.println("Spawning Tracks");
 		tracksNew.clear();
 		tracksDropped.clear();
 		tracksActive.clear();
@@ -262,6 +259,10 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 	@Override
 	public List<PointTrack> getNewTracks() {
 		return tracksNew;
+	}
+
+	public List<PointTrack> getTracksAll() {
+		return tracksAll;
 	}
 
 	private class TrackInfo

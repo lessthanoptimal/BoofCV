@@ -22,6 +22,9 @@
  * Sparse Bundle Adjustment
  * P3P algorithm
  * 5-pt Fundamental
+ * Switch homography from DenseMatrix64F to Homography2D_F64?
+  - Need to add functions to geometry math or create a new class
+  - Also add a generic Matrix3x3_F64 to georegression
 
 - Move Trackers to Features?
 - Remove distinction between 2D and 3D algorithms?
