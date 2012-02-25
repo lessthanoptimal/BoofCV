@@ -21,9 +21,18 @@ package boofcv.struct.distort;
 import georegression.struct.point.Point2D_F32;
 
 /**
+ * Applies a transform to a 2D point.
+ *
  * @author Peter Abeles
  */
 public interface PointTransform_F32 {
 
+	/**
+	 * Applies transformation
+	 *
+	 * @param x x-coordinate of point
+	 * @param y y-coordinate of point
+	 * @param out Transformed point location.
+	 */
 	public void compute( float x , float y , Point2D_F32 out );
 }

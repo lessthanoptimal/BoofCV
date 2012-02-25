@@ -297,11 +297,9 @@ public class DetectCalibrationSquaresApp
 
 		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp(4,3);
 
-//		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
-		String prefix = "../data/evaluation/calibration/stereo/temp/";
+		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
 
 		ImageListManager manager = new ImageListManager();
-//		manager.add("foo","../CalibIm1.jpg");
 		manager.add("View 01",prefix+"frame10.jpg");
 		manager.add("View 02",prefix+"frame02.jpg");
 		manager.add("View 03",prefix+"frame03.jpg");

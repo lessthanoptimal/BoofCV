@@ -16,33 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.struct.distort;
+package boofcv.abst.feature.tracker;
 
+import boofcv.alg.geo.AssociatedPair;
 
 /**
- * Computes the location of a pixel after an arbitrary distortion has been applied to the image.
- *
  * @author Peter Abeles
  */
-public abstract class PixelTransform_F32 {
+public class KeyFrameTrack extends AssociatedPair {
+	long trackID;
 
-	// distorted pixel coordinates
-	public float distX;
-	public float distY;
+	public void reset() {
 
-	/**
-	 * applies a transform to a pixel coordinte
-	 *
-	 * @param x Pixel x-coordinate
-	 * @param y Pixel y-coordinate
-	 */
-	public abstract void compute( int x , int y );
-
-	public float getDistX() {
-		return distX;
 	}
 
-	public float getDistY() {
-		return distY;
-	}
 }

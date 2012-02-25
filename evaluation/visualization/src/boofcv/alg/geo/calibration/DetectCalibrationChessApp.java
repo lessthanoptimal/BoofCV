@@ -217,13 +217,17 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 		DetectCalibrationChessApp app = new DetectCalibrationChessApp(ImageFloat32.class);
 
-		String prefix = "/home/pja/saved2/a/";
+		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess/";
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("View 01",prefix+"frame01.jpg");
 		manager.add("View 02",prefix+"frame02.jpg");
 		manager.add("View 03",prefix+"frame03.jpg");
 		manager.add("View 04",prefix+"frame04.jpg");
+		manager.add("View 05",prefix+"frame05.jpg");
+		manager.add("View 06",prefix+"frame06.jpg");
+		manager.add("View 07",prefix+"frame07.jpg");
+		manager.add("View 08",prefix+"frame08.jpg");
 
 		app.setInputManager(manager);
 

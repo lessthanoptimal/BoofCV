@@ -19,7 +19,8 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.struct.FastQueue;
+import boofcv.struct.distort.DoNothingTransform_F64;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
 
 import java.util.ArrayList;
@@ -31,17 +32,37 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class KeyFramePointTracker<T extends ImageBase> {
+// TODO is data being lost/leaked by point trackers?
+// TODO purge all non-active tracks on spawn.  point/detect tracker
+// todo maintain track ID after spawn/set key frame
+// todo custom track data type.  create KeyFrameTrack?
+public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> {
 	// point feature tracker
-	ImagePointTracker<T> tracker;
+	ImagePointTracker<I> tracker;
+	
+	// track type
+	Class<R> trackType;
 
 	// pairs of associated tracks
-	List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
-	// saved associated pairs
-	FastQueue<AssociatedPair> reserveA = new FastQueue<AssociatedPair>(100,AssociatedPair.class,true);
+	List<R> pairs = new ArrayList<R>();
 
-	public KeyFramePointTracker(ImagePointTracker<T> tracker) {
+	// applies a distortion to each feature's track location
+	// can be used to convert points into normalized image coordinates
+	PointTransform_F64 pixelTransform;
+
+	public KeyFramePointTracker(ImagePointTracker<I> tracker,
+								PointTransform_F64 transform , 
+								Class<R> trackType ) {
 		this.tracker = tracker;
+		if( transform == null )
+			this.pixelTransform = new DoNothingTransform_F64();
+		else
+			this.pixelTransform = transform;
+		this.trackType = trackType;
+	}
+
+	public KeyFramePointTracker(ImagePointTracker<I> tracker) {
+		this(tracker,null,(Class)KeyFrameTrack.class);
 	}
 
 	/**
@@ -49,13 +70,14 @@ public class KeyFramePointTracker<T extends ImageBase> {
 	 *
 	 * @param image
 	 */
-	public void process( T image ) {
+	public void process( I image ) {
 		tracker.process(image);
 
 		pairs.clear();
 		List<PointTrack> tracks = tracker.getActiveTracks();
 		for( PointTrack t : tracks ) {
-			AssociatedPair p = t.getCookie();
+			R p = t.getCookie();
+			pixelTransform.compute(t.x,t.y,p.currLoc);
 			pairs.add(p);
 		}
 	}
@@ -65,14 +87,15 @@ public class KeyFramePointTracker<T extends ImageBase> {
 	 */
 	public void setKeyFrame() {
 		pairs.clear();
-		reserveA.reset();
 
+		// todo purge non-active tracks here
 		List<PointTrack> tracks = tracker.getActiveTracks();
 		for( PointTrack t : tracks ) {
-			AssociatedPair p = reserveA.pop();
-			p.keyLoc.set(t);
-			p.currLoc = t;
-			t.cookie = p;
+			if( t.cookie == null )
+				throw new RuntimeException("Bug, cookie should have been set");
+			R p = t.getCookie();
+			pixelTransform.compute(t.x, t.y, p.keyLoc);
+			p.currLoc.set(p.keyLoc);
 			pairs.add(p);
 		}
 	}
@@ -80,8 +103,30 @@ public class KeyFramePointTracker<T extends ImageBase> {
 	/**
 	 * Requests that the tracker spawn new tracks
 	 */
-	public void spawnTracks() {
+	public List<R> spawnTracks() {
+		List<R> spawned = new ArrayList<R>();
+		
 		tracker.spawnTracks();
+		List<PointTrack> tracks = tracker.getNewTracks();
+		for( PointTrack t : tracks ) {
+			if( t.cookie == null )
+				try {
+					t.cookie = trackType.newInstance();
+				} catch (InstantiationException e) {
+					throw new RuntimeException(e);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			R p = t.getCookie();
+			p.reset();
+			p.trackID = t.featureId;
+			pixelTransform.compute(t.x, t.y, p.keyLoc);
+			p.currLoc.set(p.keyLoc);
+			pairs.add(p);
+			spawned.add(p);
+		}
+		
+		return spawned;
 	}
 
 	/**
@@ -110,7 +155,7 @@ public class KeyFramePointTracker<T extends ImageBase> {
 	 *
 	 * @return associated pairs
 	 */
-	public List<AssociatedPair> getPairs() {
+	public List<R> getPairs() {
 		return pairs;
 	}
 
@@ -119,11 +164,10 @@ public class KeyFramePointTracker<T extends ImageBase> {
 	 */
 	public void reset() {
 		pairs.clear();
-		reserveA.reset();
 		tracker.dropTracks();
 	}
 
-	public ImagePointTracker<T> getTracker() {
+	public ImagePointTracker<I> getTracker() {
 		return tracker;
 	}
 }
