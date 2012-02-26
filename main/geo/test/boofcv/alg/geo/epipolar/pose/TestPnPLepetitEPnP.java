@@ -20,6 +20,7 @@ package boofcv.alg.geo.epipolar.pose;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.GeoTestingOps;
+import boofcv.alg.geo.epipolar.h.CommonHomographyChecks;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -56,32 +57,39 @@ public class TestPnPLepetitEPnP {
 				
 				alg.process(locations,currObs);
 
-				return alg.getSolutionMotion();
+//				return alg.getSolutionMotion();
+				RefineLepetitEPnP refine = new RefineLepetitEPnP(alg,1e-8,200);
+				refine.refine();
+
+				return refine.getMotion();
 			}
 		};
 
-		for( int i = 10; i <= 10; i++ ) {
-			test.testNoMotion(i);
-			test.standardTest(i);
-			test.planarTest(i);
+		for( int i = 4; i <= 200; i++ ) {
+
+//			test.testNoMotion(5);
+			test.standardTest(5);
+//			test.planarTest(5);
 		}
 	}
 	
 	@Test
-	public void selectWorldControlPoints() {
+	public void selectWorldControlPoints_planar() {
 
-		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
+		List<Point3D_F64> worldPts = CommonHomographyChecks.createRandomPlane(rand, 3, 30);
 		List<Point3D_F64> controlPts = declarePointList(4);
 		
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
 		alg.selectWorldControlPoints(worldPts, controlPts);
 		
+		assertEquals(3,alg.numControl);
+		
 		// check that each row is unique
-		for( int i = 0; i < 4; i++ ) {
+		for( int i = 0; i < 3; i++ ) {
 			Point3D_F64 ci = controlPts.get(i);
 			
-			for( int j = i+1; j < 4; j++ ) {
+			for( int j = i+1; j < 3; j++ ) {
 				Point3D_F64 cj = controlPts.get(j);
 
 				double dx = ci.x - cj.x;
@@ -96,11 +104,31 @@ public class TestPnPLepetitEPnP {
 	}
 
 	@Test
-	public void selectControlPoints_planar() {
-		
-		fail("give it planar data");
-		
-		fail("check the axis to see if they are correct");
+	public void selectControlPoints() {
+
+		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
+		List<Point3D_F64> controlPts = declarePointList(4);
+
+		PnPLepetitEPnP alg = new PnPLepetitEPnP();
+
+		alg.selectWorldControlPoints(worldPts, controlPts);
+
+		// check that each row is unique
+		for( int i = 0; i < 4; i++ ) {
+			Point3D_F64 ci = controlPts.get(i);
+
+			for( int j = i+1; j < 4; j++ ) {
+				Point3D_F64 cj = controlPts.get(j);
+
+				double dx = ci.x - cj.x;
+				double dy = ci.y - cj.y;
+				double dz = ci.z - cj.z;
+
+				double sum = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
+
+				assertTrue(sum > 0.00001 );
+			}
+		}
 	}
 
 	@Test
@@ -162,6 +190,7 @@ public class TestPnPLepetitEPnP {
 		SimpleMatrix M = SimpleMatrix.wrap(RandomMatrices.createSingularValues(12, 40, rand, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0));
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
+		alg.numControl = 4;
 		alg.extractNullPoints(M.getMatrix());
 
 		// see if the first set of null points is the null space pf M*M
@@ -192,6 +221,7 @@ public class TestPnPLepetitEPnP {
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
 		// skip the adjust step
+		alg.numControl = 4;
 		alg.alphas = new DenseMatrix64F(0,0);
 		alg.nullPts[0] = GeoTestingOps.randomPoints_F64(5,10,-1, 2, -5, 20, 4, rand);
 		double beta = 10;

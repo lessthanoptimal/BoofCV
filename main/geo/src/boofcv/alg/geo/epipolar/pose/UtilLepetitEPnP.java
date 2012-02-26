@@ -63,6 +63,20 @@ public class UtilLepetitEPnP {
 	}
 
 	/**
+	 * Extracts the linear constraint matrix for case 1 from the full 6x10 constraint matrix.
+	 */
+	public static void constraintMatrix6x4( DenseMatrix64F L_6x10 , DenseMatrix64F L_6x4 ) {
+
+		int index = 0;
+		for( int i = 0; i < 6; i++ ) {
+			L_6x4.data[index++] = L_6x10.get(i,0);
+			L_6x4.data[index++] = L_6x10.get(i,1);
+			L_6x4.data[index++] = L_6x10.get(i,3);
+			L_6x4.data[index++] = L_6x10.get(i,6);
+		}
+	}
+
+	/**
 	 * Extracts the linear constraint matrix for case 2 from the full 6x10 constraint matrix.
 	 */
 	public static void constraintMatrix6x3( DenseMatrix64F L_6x10 , DenseMatrix64F L_6x3 ) {
@@ -158,6 +172,19 @@ public class UtilLepetitEPnP {
 				L.set(row,8,2*dcd);
 				L.set(row,9,dd);
 			}
+		}
+	}
+
+	/**
+	 * Extracts the linear constraint matrix for case 1 from the full 6x10 constraint matrix.
+	 */
+	public static void constraintMatrix3x3a( DenseMatrix64F L_3x6 , DenseMatrix64F L_3x3 ) {
+
+		int index = 0;
+		for( int i = 0; i < 3; i++ ) {
+			L_3x3.data[index++] = L_3x6.get(i,0);
+			L_3x3.data[index++] = L_3x6.get(i,1);
+			L_3x3.data[index++] = L_3x6.get(i,2);
 		}
 	}
 
