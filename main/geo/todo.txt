@@ -27,7 +27,6 @@
   - Also add a generic Matrix3x3_F64 to georegression
 
 - Move Trackers to Features?
-- Remove distinction between 2D and 3D algorithms?
 - Reconsider how DLT is handled
  * Have normalization be handled outside of the estimator algorithms
  * Change documentation to make this fact extremely clear

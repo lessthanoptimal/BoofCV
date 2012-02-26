@@ -29,7 +29,6 @@ import org.ejml.alg.dense.decomposition.DecompositionFactory;
 import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.alg.dense.linsol.LinearSolver;
 import org.ejml.alg.dense.linsol.LinearSolverFactory;
-import org.ejml.alg.dense.mult.MatrixVectorMult;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
@@ -58,6 +57,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// todo some how nicely move non-linear refinement into here?
 public class PnPLepetitEPnP {
 
 	// used to solve various linear problems
@@ -71,7 +71,7 @@ public class PnPLepetitEPnP {
 	private DenseMatrix64F W = new DenseMatrix64F(12,12);
 	
 	// linear constraint matrix
-	private DenseMatrix64F L_6x10 = new DenseMatrix64F(6,10);
+	private DenseMatrix64F L_full = new DenseMatrix64F(6,10);
 	private DenseMatrix64F L = new DenseMatrix64F(6,6);
 	// distance of world control points from each other
 	private DenseMatrix64F y = new DenseMatrix64F(6,1);
@@ -96,6 +96,8 @@ public class PnPLepetitEPnP {
 
 	// the estimated camera motion.  from world to camera
 	private Se3_F64 solutionMotion = new Se3_F64();
+	// index of which solution in the initial set was the best
+	private int bestSolution;
 	
 	public PnPLepetitEPnP() {
 		// just a sanity check
@@ -128,50 +130,42 @@ public class PnPLepetitEPnP {
 		selectWorldControlPoints(worldPts, controlWorldPts);
 		
 		// compute barycentric coordinates for the world control points
-		computeBarycentricCoordinates(controlWorldPts, alphas, worldPts);
+		computeBarycentricCoordinates(controlWorldPts, alphas, worldPts );
 		// create the linear system whose null space will contain the camera control points
 		constructM(observed, alphas, M);
 		// the camera points are a linear combination of these null points
 		extractNullPoints(M);
 
-		// compute the full constraint matrix, the others are extracted from this
-		UtilLepetitEPnP.constraintMatrix6x10(L_6x10,y,controlWorldPts,nullPts);
+		solutionPts.clear();
+		for( int i = 0; i < numControl; i++ ) {
+			solutionPts.add( new Point3D_F64());
+		}
 		
-		// compute 4 solutions using the null points
-		estimateCase1(solutions.get(0));
-		estimateCase2(solutions.get(1));
-		estimateCase3(solutions.get(2));
+		// compute the full constraint matrix, the others are extracted from this
+		if( numControl == 4 ) {
+			L_full.reshape(6, 10, false);
+			y.reshape(6,1,false);
+			UtilLepetitEPnP.constraintMatrix6x10(L_full,y,controlWorldPts,nullPts);
+		
+			// compute 4 solutions using the null points
+			estimateCase1(solutions.get(0));
+			estimateCase2(solutions.get(1));
+			estimateCase3(solutions.get(2));
+		} else {
+			L_full.reshape(3, 6, false);
+			y.reshape(3,1,false);
+			UtilLepetitEPnP.constraintMatrix3x6(L_full, y, controlWorldPts, nullPts);
+
+			// compute 4 solutions using the null points
+			estimateCase1(solutions.get(0));
+			estimateCase2(solutions.get(1));
+		}
 		// todo case 4
 		// todo stop estimating if better solutions found?
 
+		// todo can this function be changed to the one which minimizes
+		// the distance difference between control points like in non-linear optimization?
 		selectBestMotion(worldPts,observed);
-	}
-
-	/**
-	 * Given a set of scale factors for each null space, compute the sum
-	 * @param beta
-	 */
-	private void computeMotion( double beta[] ) {
-
-		for( int i = 0; i < 4; i++ ) {
-			solutionPts.get(i).set(0,0,0);
-		}
-		
-		for( int i = 0; i < 4; i++ ) {
-			double b = beta[i];
-//			System.out.printf("%7.3f ", b);
-
-			for( int j = 0; j < 4; j++ ) {
-				Point3D_F64 s = solutionPts.get(j);
-				Point3D_F64 p = nullPts[i].get(j);
-				s.x += b*p.x;
-				s.y += b*p.y;
-				s.z += b*p.z;
-			}
-		}
-//		System.out.println();
-
-		motionFit.process(controlWorldPts,solutionPts);
 	}
 
 	/**
@@ -182,12 +176,14 @@ public class PnPLepetitEPnP {
 		double bestScore = Double.MAX_VALUE;
 		
 		for( int i = 0; i < 3; i++ ) {
-			computeMotion(solutions.get(i));
+			UtilLepetitEPnP.computeCameraControl(solutions.get(i),nullPts,solutionPts);
+			motionFit.process(controlWorldPts, solutionPts);
 			Se3_F64 found = motionFit.getMotion();
 			double score = scoreMotion(found,worldPts,observed);
 			if( score < bestScore ) {
 				bestScore = score;
 				best.set(found);
+				bestSolution = i;
 			}
 //			System.out.println(" Solution score "+score);
 		}
@@ -232,7 +228,7 @@ public class PnPLepetitEPnP {
 		Point3D_F64 mean = UtilPoint3D_F64.mean(worldPts);
 
 		// covariance matrix elements, summed up here for speed
-		double c11 = 0, c12 = 0, c13 = 0, c22=0,c23=0,c33=0;
+		double c11=0,c12=0,c13=0,c22=0,c23=0,c33=0;
 
 		final int N = worldPts.size();
 		for( int i = 0; i < N; i++ ) {
@@ -261,23 +257,26 @@ public class PnPLepetitEPnP {
 		if( W.get(0,0)<W.get(2,2)*1e13 ) {
 			numControl = 4;
 		} else {
-			System.out.println("Plane detected, but ignoring that");
-//			numControl = 3;
-			numControl = 4;
+			numControl = 3;
 		}
 
+
 		// first control point in the centroid
-		controlWorldPts.get(0).set(mean.x, mean.y, mean.z);
+		controlWorldPts.clear();
+		controlWorldPts.add(new Point3D_F64(mean.x, mean.y, mean.z));
+//		controlWorldPts.add(new Point3D_F64(0,0,0));
 
 		// rest of the control points are along the data's major axises
 		for( int i = 0; i < numControl-1; i++ ) {
-			double m = Math.sqrt(W.get(i,i));
+			double m = Math.sqrt(W.get(i,i))*3;
+			// increasing this number helps the matrix inversion for barycentric go well
 
 			double vx = V.unsafe_get(0, i)*m;
 			double vy = V.unsafe_get(1, i)*m;
 			double vz = V.unsafe_get(2, i)*m;
 
-			controlWorldPts.get(i+1).set(mean.x + vx, mean.y + vy, mean.z + vz);
+			controlWorldPts.add(new Point3D_F64(mean.x + vx, mean.y + vy, mean.z + vz));
+//			controlWorldPts.add(new Point3D_F64(vx, vy, vz));
 		}
 	}
 
@@ -293,26 +292,32 @@ public class PnPLepetitEPnP {
 	 * X = [ cameraPts' ; ones(1,N) ]
 	 * </p>
 	 */
-	protected static void computeBarycentricCoordinates(List<Point3D_F64> controlWorldPts,
-														DenseMatrix64F alphas,
-														List<Point3D_F64> worldPts)
+	protected void computeBarycentricCoordinates(List<Point3D_F64> controlWorldPts,
+												 DenseMatrix64F alphas,
+												 List<Point3D_F64> worldPts )
 	{
-		alphas.reshape(worldPts.size(),4,false);
-		
-		DenseMatrix64F A = new DenseMatrix64F(4,4);
-		for( int i = 0; i < 4; i++ ) {
+		alphas.reshape(worldPts.size(),numControl,false);
+
+		DenseMatrix64F A = new DenseMatrix64F(4,numControl);
+		for( int i = 0; i < numControl; i++ ) {
 			Point3D_F64 c = controlWorldPts.get(i);
 			A.set(0,i,c.x);
 			A.set(1,i,c.y);
 			A.set(2,i,c.z);
 			A.set(3,i,1);
 		}
+		
+//		A.print();
+		if( !solver.setA(A) )
+			throw new RuntimeException("solve failed!");
 
-		if( !CommonOps.invert(A) )
-			throw new RuntimeException("Control points are singular?!?");
+		System.out.println("quality "+solver.quality());
+		
+//		if( !CommonOps.invert(A) )
+//			throw new RuntimeException("Control points are singular?!?");
 		
 		DenseMatrix64F v = new DenseMatrix64F(4,1);
-		DenseMatrix64F w = new DenseMatrix64F(4,1);
+		DenseMatrix64F w = new DenseMatrix64F(numControl,1);
 		
 		// set last element to one
 		v.set(3, 1);
@@ -323,10 +328,11 @@ public class PnPLepetitEPnP {
 			v.data[1] = p.y;
 			v.data[2] = p.z;
 
-			MatrixVectorMult.mult(A,v,w);
+			solver.solve(v,w);
+//			MatrixVectorMult.mult(A,v,w);
 			
 			int rowIndex = alphas.numCols*i;
-			for( int j = 0; j < 4; j++ )
+			for( int j = 0; j < numControl; j++ )
 				alphas.data[rowIndex++] = w.data[j];
 		}
 	}
@@ -345,7 +351,7 @@ public class PnPLepetitEPnP {
 									 DenseMatrix64F alphas, DenseMatrix64F M)
 	{
 		int N = obsPts.size();
-		M.reshape(12,2*N,false);
+		M.reshape(3*alphas.numCols,2*N,false);
 		M.zero();
 
 		// todo adjust order
@@ -354,14 +360,14 @@ public class PnPLepetitEPnP {
 
 			int row = i*2;
 
-			for( int j = 0; j < 4; j++ ) {
+			for( int j = 0; j < alphas.numCols; j++ ) {
 				int col = j*3;
 
 				double alpha = alphas.unsafe_get(i, j);
-				M.set(col,row,alpha);
-				M.set(col+2,row,-alpha*p2.x);
-				M.set(col+1,row+1,alpha);
-				M.set(col+2,row+1,-alpha*p2.y);
+				M.unsafe_set(col, row, alpha);
+				M.unsafe_set(col + 2, row, -alpha * p2.x);
+				M.unsafe_set(col + 1, row + 1, alpha);
+				M.unsafe_set(col + 2, row + 1, -alpha * p2.y);
 			}
 		}
 	}
@@ -373,6 +379,7 @@ public class PnPLepetitEPnP {
 	protected void extractNullPoints( DenseMatrix64F M )
 	{
 		// compute MM and find its null space
+		MM.reshape(M.numRows,M.numRows,false);
 		CommonOps.multTransB(M, M, MM);
 
 		if( !svd.decompose(MM) )
@@ -383,14 +390,20 @@ public class PnPLepetitEPnP {
 
 		SingularOps.descendingOrder(null,false,W,V,false);
 
+		System.out.println("singular values");
+		for( int i = 0; i < W.numCols; i++ )
+			System.out.println(" "+W.get(i,i));
+		
 		// extract null points from the null space
 		for( int i = 0; i < 4; i++ ) {
-			int column = 11-i;
-			for( int j = 0; j < 4; j++ ) {
-				Point3D_F64 p = nullPts[i].get(j);
+			int column = M.numRows-1-i;
+			nullPts[i].clear();
+			for( int j = 0; j < numControl; j++ ) {
+				Point3D_F64 p = new Point3D_F64();
 				p.x = V.get(j*3+0,column);
 				p.y = V.get(j*3+1,column);
 				p.z = V.get(j*3+2,column);
+				nullPts[i].add(p);
 			}
 		}
 	}
@@ -409,7 +422,7 @@ public class PnPLepetitEPnP {
 		double top = 0;
 		double bottom = 0;
 
-		for( int i = 0; i < 4; i++ ) {
+		for( int i = 0; i < numControl; i++ ) {
 			Point3D_F64 wi = controlWorldPts.get(i);
 			Point3D_F64 ni = nullPts.get(i);
 
@@ -445,7 +458,7 @@ public class PnPLepetitEPnP {
 
 		for( int i = 0; i < N; i++ ) {
 			double z = 0;
-			for( int j = 0; j < 4; j++ ) {
+			for( int j = 0; j < numControl; j++ ) {
 				Point3D_F64 c = controlCameraPts.get(j);
 				z += alphas.get(i,j)*c.z;
 			}
@@ -469,7 +482,7 @@ public class PnPLepetitEPnP {
 	private void refine( double betas[] ) {
 		List<Point3D_F64> v = new ArrayList<Point3D_F64>();
 
-		for( int i = 0; i < 4; i++ ) {
+		for( int i = 0; i < numControl; i++ ) {
 			double x=0,y=0,z=0;
 
 			for( int j = 0; j < 4; j++ ) {
@@ -505,12 +518,19 @@ public class PnPLepetitEPnP {
 	protected void estimateCase2( double betas[] ) {
 
 		x.reshape(3,1,false);
-		L.reshape(6,3,false);
-		UtilLepetitEPnP.constraintMatrix6x3(L_6x10,L);
+		if( numControl == 4 ) {
+			L.reshape(6,3,false);
+			UtilLepetitEPnP.constraintMatrix6x3(L_full,L);
+		} else {
+			L.reshape(3,3,false);
+			UtilLepetitEPnP.constraintMatrix3x3(L_full,L);
+		}
 
 		if( !solver.setA(L) )
 			throw new RuntimeException("Oh crap");
 		
+		L.print();
+		System.out.println("Quality estimateCase2 "+solver.quality());
 		solver.solve(y,x);
 		
 		betas[0] = Math.sqrt(Math.abs(x.get(0)));
@@ -527,11 +547,12 @@ public class PnPLepetitEPnP {
 
 		x.reshape(6,1,false);
 		L.reshape(6,6,false);
-		UtilLepetitEPnP.constraintMatrix6x6(L_6x10, L);
+		UtilLepetitEPnP.constraintMatrix6x6(L_full, L);
 
 		if( !solver.setA(L) )
 			throw new RuntimeException("Oh crap");
 
+		System.out.println("Quality estimateCase3 "+solver.quality());
 		solver.solve(y,x);
 
 		betas[0] = Math.sqrt(Math.abs(x.get(0)));
@@ -586,5 +607,12 @@ public class PnPLepetitEPnP {
 	 */
 	public Se3_F64 getSolutionMotion() {
 		return solutionMotion;
+	}
+
+	/**
+	 * Returns the weights associated with the best solution
+	 */
+	public double[] getBestControlWeights() {
+		return solutions.get(bestSolution);
 	}
 }

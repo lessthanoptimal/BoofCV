@@ -32,6 +32,37 @@ import java.util.List;
 public class UtilLepetitEPnP {
 
 	/**
+	 * Computes the camera control points as weighted sum of null points.
+	 *
+	 * @param beta Beta values which describe the weights of null points
+	 * @param nullPts Null points that the camera point is a weighted sum of
+	 * @param cameraPts The output
+	 */
+	public static void computeCameraControl(double beta[],
+											List<Point3D_F64> nullPts[],
+											List<Point3D_F64> cameraPts ) {
+
+		int N = cameraPts.size();
+
+		for( int i = 0; i < N; i++ ) {
+			cameraPts.get(i).set(0,0,0);
+		}
+
+		for( int i = 0; i < beta.length; i++ ) {
+			double b = beta[i];
+//			System.out.printf("%7.3f ", b);
+
+			for( int j = 0; j < N; j++ ) {
+				Point3D_F64 s = cameraPts.get(j);
+				Point3D_F64 p = nullPts[i].get(j);
+				s.x += b*p.x;
+				s.y += b*p.y;
+				s.z += b*p.z;
+			}
+		}
+	}
+
+	/**
 	 * Extracts the linear constraint matrix for case 2 from the full 6x10 constraint matrix.
 	 */
 	public static void constraintMatrix6x3( DenseMatrix64F L_6x10 , DenseMatrix64F L_6x3 ) {
@@ -61,7 +92,7 @@ public class UtilLepetitEPnP {
 	}
 
 	/**
-	 * Linear constraint matrix used in case 4
+	 * Linear constraint matrix used in case 4 in the general case
 	 *
 	 * @param L Constraint matrix
 	 * @param y Vector containing distance between world control points
@@ -126,6 +157,76 @@ public class UtilLepetitEPnP {
 				L.set(row,7,dc);
 				L.set(row,8,2*dcd);
 				L.set(row,9,dd);
+			}
+		}
+	}
+
+	/**
+	 * Extracts the linear constraint matrix for planar case 2 from the full 4x6 constraint matrix.
+	 */
+	public static void constraintMatrix3x3( DenseMatrix64F L_3x6 ,
+											DenseMatrix64F L_6x3 ) {
+
+		int index = 0;
+		for( int i = 0; i < 3; i++ ) {
+			L_6x3.data[index++] = L_3x6.get(i,0);
+			L_6x3.data[index++] = L_3x6.get(i,1);
+			L_6x3.data[index++] = L_3x6.get(i,3);
+		}
+	}
+
+	/**
+	 * Linear constraint matrix for case 4 in the planar case
+	 *
+	 * @param L Constraint matrix
+	 * @param y Vector containing distance between world control points
+	 * @param controlWorldPts List of world control points
+	 * @param nullPts Null points
+	 */
+	public static void constraintMatrix3x6( DenseMatrix64F L , DenseMatrix64F y ,
+											 List<Point3D_F64> controlWorldPts ,
+											 List<Point3D_F64> nullPts[] ) {
+		int row = 0;
+		for( int i = 0; i < 3; i++ ) {
+			Point3D_F64 ci = controlWorldPts.get(i);
+			Point3D_F64 vai = nullPts[0].get(i);
+			Point3D_F64 vbi = nullPts[1].get(i);
+			Point3D_F64 vci = nullPts[2].get(i);
+
+			for( int j = i+1; j < 3; j++ , row++) {
+				Point3D_F64 cj = controlWorldPts.get(j);
+				Point3D_F64 vaj = nullPts[0].get(j);
+				Point3D_F64 vbj = nullPts[1].get(j);
+				Point3D_F64 vcj = nullPts[2].get(j);
+
+				y.set(row,0,ci.distance2(cj));
+
+				double xa = vai.x-vaj.x;
+				double ya = vai.y-vaj.y;
+				double za = vai.z-vaj.z;
+
+				double xb = vbi.x-vbj.x;
+				double yb = vbi.y-vbj.y;
+				double zb = vbi.z-vbj.z;
+
+				double xc = vci.x-vcj.x;
+				double yc = vci.y-vcj.y;
+				double zc = vci.z-vcj.z;
+
+				double da = xa*xa + ya*ya + za*za;
+				double db = xb*xb + yb*yb + zb*zb;
+				double dc = xc*xc + yc*yc + zc*zc;
+
+				double dab = xa*xb + ya*yb + za*zb;
+				double dac = xa*xc + ya*yc + za*zc;
+				double dbc = xb*xc + yb*yc + zb*zc;
+
+				L.set(row,0,da);
+				L.set(row,1,2*dab);
+				L.set(row,2,2*dac);
+				L.set(row,3,db);
+				L.set(row,4,2*dbc);
+				L.set(row,5,dc);
 			}
 		}
 	}

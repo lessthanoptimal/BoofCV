@@ -60,14 +60,15 @@ public class TestPnPLepetitEPnP {
 			}
 		};
 
-		for( int i = 5; i <= 10; i++ ) {
+		for( int i = 10; i <= 10; i++ ) {
 			test.testNoMotion(i);
 			test.standardTest(i);
+			test.planarTest(i);
 		}
 	}
 	
 	@Test
-	public void selectControlPoints() {
+	public void selectWorldControlPoints() {
 
 		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
 		List<Point3D_F64> controlPts = declarePointList(4);
@@ -112,7 +113,8 @@ public class TestPnPLepetitEPnP {
 		alg.selectWorldControlPoints(worldPoints, worldControlPts);
 
 		DenseMatrix64F alpha = new DenseMatrix64F(1,1);
-		PnPLepetitEPnP.computeBarycentricCoordinates(worldControlPts, alpha, worldPoints);
+
+		alg.computeBarycentricCoordinates(worldControlPts, alpha, worldPoints);
 		
 		// make sure it sums up to one and it should add up to the original point
 		for( int i = 0; i < worldPoints.size(); i++ ) {

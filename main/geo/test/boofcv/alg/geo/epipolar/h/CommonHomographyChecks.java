@@ -54,7 +54,7 @@ public class CommonHomographyChecks {
 		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
-		pts = createRandomPlane(numPoints);
+		pts = createRandomPlane(rand,d,numPoints);
 
 		// transform points into second camera's reference frame
 		pairs = new ArrayList<AssociatedPair>();
@@ -76,7 +76,7 @@ public class CommonHomographyChecks {
 	/**
 	 * Creates a set of random points along the (X,Y) plane
 	 */
-	private List<Point3D_F64> createRandomPlane( int N )
+	public static List<Point3D_F64> createRandomPlane( Random rand , double d , int N )
 	{
 		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
 
