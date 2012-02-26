@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,16 @@ import boofcv.numerics.optimization.UnconstrainedMinimization;
  * @author Peter Abeles
  */
 public class UtilOptimize {
-	
+
+	public static double leastSquaresError( double output[] , int N ) {
+		double total = 0;
+		for( int i = 0; i < output.length; i++ ) {
+			total += output[i]*output[i];
+		}
+
+		return total;
+	}
+
 	public static boolean process( LineSearch search , int maxIterations ) {
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( search.iterate() ) {

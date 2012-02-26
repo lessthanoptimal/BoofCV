@@ -20,6 +20,7 @@ package boofcv.alg.geo.epipolar.pose;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.GeoTestingOps;
+import boofcv.alg.geo.epipolar.h.CommonHomographyChecks;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -50,7 +51,7 @@ public abstract class CommonMotionNPoint {
 	public void testNoMotion( int N ) {
 		Se3_F64 motion = new Se3_F64();
 
-		checkMotion(N, motion);
+		checkMotion(N, motion,false);
 	}
 
 	/**
@@ -62,12 +63,31 @@ public abstract class CommonMotionNPoint {
 		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
 		motion.getT().set(0.1,-0.1,0.01);
 
-		checkMotion(N, motion);
+		checkMotion(N, motion,false);
 	}
 
-	private void checkMotion(int N, Se3_F64 motion) {
+	/**
+	 * Test a set of random points in general position
+	 * @param N number of observed point objects
+	 */
+	public void planarTest( int N ) {
+		Se3_F64 motion = new Se3_F64();
+		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		motion.getT().set(0.1,-0.1,0.01);
+
+		checkMotion(N, motion,true);
+	}
+
+	private void checkMotion(int N, Se3_F64 motion, boolean planar ) {
 		// randomly generate points in space
-		List<Point3D_F64> pts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
+		List<Point3D_F64> pts;
+		
+		if( planar ) {
+			pts = CommonHomographyChecks.createRandomPlane(rand,3,N);
+		} else {
+			pts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
+		}
+
 		List<Point3D_F64> ptsB = new ArrayList<Point3D_F64>();
 
 		// transform points into second camera's reference frame
@@ -93,11 +113,13 @@ public abstract class CommonMotionNPoint {
 
 			Point3D_F64 foundPt = SePointOps_F64.transform(found, p1, null);
 
-			assertEquals(p2.x,foundPt.x,1e-8);
-			assertEquals(p2.y,foundPt.y,1e-8);
-			assertEquals(p2.z,foundPt.z,1e-8);
+			assertEquals(p2.x,foundPt.x,1e-7);
+			assertEquals(p2.y,foundPt.y,1e-7);
+			assertEquals(p2.z,foundPt.z,1e-7);
 		}
 	}
+	
+	
 }
 
 

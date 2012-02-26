@@ -253,6 +253,8 @@ public class LevenbergDampened {
 		CommonOps.multTransA(jacobianVals, funcVals, g);
 		CommonOps.scale(-1, g);
 
+//		System.out.println("fn = "+fnorm);
+		
 		// calculate the Jacobian norm, function norm already computed
 		double gx = CommonOps.elementMaxAbs(g);
 
@@ -327,6 +329,9 @@ public class LevenbergDampened {
 			dampParam *= nu;
 			nu *= 2;
 		}
+		
+		if( Double.isInfinite(dampParam) || Double.isNaN(dampParam))
+			return false;
 		
 		return true;
 	}

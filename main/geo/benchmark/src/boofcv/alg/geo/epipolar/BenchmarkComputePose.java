@@ -20,6 +20,7 @@ package boofcv.alg.geo.epipolar;
 
 import boofcv.alg.geo.epipolar.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.epipolar.pose.PoseFromPairLinear6;
+import boofcv.alg.geo.epipolar.pose.RefineLepetitEPnP;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import org.ejml.data.DenseMatrix64F;
@@ -44,6 +45,18 @@ public class BenchmarkComputePose extends ArtificialStereoScene{
 		}
 	}
 
+	public class EPnPRefine extends PerformerBase {
+
+		PnPLepetitEPnP alg = new PnPLepetitEPnP();
+		RefineLepetitEPnP refine = new RefineLepetitEPnP(alg,1e-12,200);
+
+		@Override
+		public void process() {
+			alg.process(worldPoints,observationCurrent);
+			refine.refine();
+		}
+	}
+
 	public class PairLinear extends PerformerBase {
 
 		PoseFromPairLinear6 alg = new PoseFromPairLinear6();
@@ -58,10 +71,10 @@ public class BenchmarkComputePose extends ArtificialStereoScene{
 		System.out.println("=========  Profile numFeatures "+NUM_POINTS);
 		System.out.println();
 
-
 		init(NUM_POINTS,FUNDAMENTAL,false);
 
 		ProfileOperation.printOpsPerSec(new EPnP(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new EPnPRefine(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new PairLinear(), TEST_TIME);
 
 		System.out.println();

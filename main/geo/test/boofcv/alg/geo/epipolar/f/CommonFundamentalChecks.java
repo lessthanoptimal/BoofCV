@@ -22,6 +22,7 @@ import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.GeoTestingOps;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -48,7 +49,9 @@ public class CommonFundamentalChecks {
 	DenseMatrix64F K = new DenseMatrix64F(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
 
 	protected Se3_F64 motion;
+	protected List<Point3D_F64> worldPts;
 	protected List<AssociatedPair> pairs;
+	protected List<Point2D_F64> currentObs;
 	
 	public void init( int N , boolean isFundamental ) {
 		// define the camera's motion
@@ -57,11 +60,13 @@ public class CommonFundamentalChecks {
 		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
-		List<Point3D_F64> pts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
+		worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 
 		// transform points into second camera's reference frame
 		pairs = new ArrayList<AssociatedPair>();
-		for(Point3D_F64 p1 : pts ) {
+		currentObs = new ArrayList<Point2D_F64>();
+
+		for(Point3D_F64 p1 : worldPts) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
@@ -73,6 +78,8 @@ public class CommonFundamentalChecks {
 				GeometryMath_F64.mult(K, pair.keyLoc, pair.keyLoc);
 				GeometryMath_F64.mult(K,pair.currLoc,pair.currLoc);
 			}
+
+			currentObs.add(pair.currLoc);
 		}
 	}
 	

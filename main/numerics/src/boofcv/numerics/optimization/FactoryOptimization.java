@@ -34,6 +34,8 @@ import org.ejml.data.DenseMatrix64F;
  * @author Peter Abeles
  */
 public class FactoryOptimization {
+	// TODO Move convergence tolerances out of these functions and into the interface?
+	// can't predeclare optimizer and specify the tolerances later with the current design
 
 	/**
 	 * <p>
