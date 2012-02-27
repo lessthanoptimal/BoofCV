@@ -46,16 +46,32 @@ import java.util.List;
  * </p>
  *
  * <p>
- * Expresses the n 3D point as a weighted sum of four virtual control points.  Problem then becomes to estimate
+ * Expresses the N 3D point as a weighted sum of four virtual control points.  Problem then becomes to estimate
  * the coordinates of the control points in the camera referential, which can be done in O(n) time.
  * </p>
  *
+ * <p>
+ * After estimating the control points the solution can be refined using Gauss Newton non-linear
+ * optimization.  The objective function being optimizes
+ * reduces the difference between world and camera control point distances by adjusting
+ * the values of beta.  Optimization is very fast, but can degrade accuracy if over optimized.
+ * See warning below.  To turn on non-linear optimization set {@link #setNumIterations(int)} to
+ * a positive number.
+ * </p>
+ * 
  * <p>
  * NOTES: This implementation deviates in some minor ways from what was described in the paper.  However, their
  * own example code (Matlab and C++) are mutually different in significant ways too.  See how solutions are scored,
  * linear systems are solved, and how world control points are computed.  How control points are computed here
  * is inspired from their C++ example (technique used in their matlab example has some stability issues), but
  * there is probably room for more improvement.
+ * </p>
+ *
+ * <p>
+ * WARNING: Setting the number of optimization iterations too high can actually degrade accuracy.  The
+ * objective function being minimized is not observation residuals.  Locally it appears
+ * to be a good approximation, but can diverge and actually produce worse results. Because
+ * of this behavior, more advanced optimization routines are unnecessary and counter productive.
  * </p>
  *
  * <p>
@@ -79,10 +95,10 @@ public class PnPLepetitEPnP {
 	private DenseMatrix64F W = new DenseMatrix64F(12,12);
 
 	// linear constraint matrix
-	private DenseMatrix64F L_full = new DenseMatrix64F(6,10);
+	protected DenseMatrix64F L_full = new DenseMatrix64F(6,10);
 	private DenseMatrix64F L = new DenseMatrix64F(6,6);
 	// distance of world control points from each other
-	private DenseMatrix64F y = new DenseMatrix64F(6,1);
+	protected DenseMatrix64F y = new DenseMatrix64F(6,1);
 	// solution for betas
 	private DenseMatrix64F x = new DenseMatrix64F(6,1);
 
@@ -97,7 +113,7 @@ public class PnPLepetitEPnP {
 
 	// list of found solutions
 	private List<double []> solutions = new ArrayList<double[]>();
-	private List<Point3D_F64> solutionPts = new ArrayList<Point3D_F64>();
+	protected List<Point3D_F64> solutionPts = new ArrayList<Point3D_F64>();
 
 	// estimates rigid body motion between two associated sets of points
 	private MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
@@ -109,6 +125,9 @@ public class PnPLepetitEPnP {
 
 	// mean location of world points
 	private Point3D_F64 meanWorldPts;
+	
+	// number of iterations it will perform
+	private int numIterations;
 
 	public PnPLepetitEPnP() {
 		// just a sanity check
@@ -124,6 +143,16 @@ public class PnPLepetitEPnP {
 				nullPts[i].add( new Point3D_F64());
 			}
 		}
+	}
+
+	/**
+	 * Used to turn on and off non-linear optimization.  To turn on set to a positive number.
+	 * See warning in class description about setting the number of iterations too high.
+	 *
+	 * @param numIterations  NUmber of iterations.  Try 10.
+	 */
+	public void setNumIterations(int numIterations) {
+		this.numIterations = numIterations;
 	}
 
 	/**
@@ -178,7 +207,8 @@ public class PnPLepetitEPnP {
 	}
 
 	/**
-	 * Selects the best motion hypothesis based on the actual observations
+	 * Selects the best motion hypothesis based on the actual observations and optionally
+	 * optimizes the solution.
 	 */
 	private void selectBestMotion( ) {
 		double bestScore = Double.MAX_VALUE;
@@ -191,9 +221,14 @@ public class PnPLepetitEPnP {
 			}
 		}
 
-		UtilLepetitEPnP.computeCameraControl(solutions.get(bestSolution),nullPts,solutionPts);
+		double []solution = solutions.get(bestSolution);
+		if( numIterations > 0 ) {
+			gaussNewton(solution);
+		}
+
+		UtilLepetitEPnP.computeCameraControl(solution,nullPts,solutionPts);
 		motionFit.process(controlWorldPts, solutionPts);
-		
+
 		solutionMotion.set(motionFit.getMotion());
 	}
 
@@ -548,7 +583,7 @@ public class PnPLepetitEPnP {
 	}
 
 	protected void estimateCase3( double betas[] ) {
-		Arrays.fill(betas,0);
+		Arrays.fill(betas, 0);
 
 		x.reshape(6,1,false);
 		L.reshape(6,6,false);
@@ -571,7 +606,7 @@ public class PnPLepetitEPnP {
 	}
 
 	protected void estimateCase4( double betas[] ) {
-		Arrays.fill(betas,0);
+		Arrays.fill(betas, 0);
 
 		DenseMatrix64F x = new DenseMatrix64F(10,1);
 
@@ -582,7 +617,7 @@ public class PnPLepetitEPnP {
 
 		DenseMatrix64F W = svd.getW(null);
 		DenseMatrix64F V = svd.getV(false);
-		SingularOps.descendingOrder(null,false,W,V,false);
+		SingularOps.descendingOrder(null, false, W, V, false);
 
 		double [][]ns = new double[4][10];
 		for( int i = 0; i < 4; i++ ) {
@@ -593,6 +628,49 @@ public class PnPLepetitEPnP {
 
 		// remove parasitic solutions by imposing additional constraints
 
+	}
+
+	/**
+	 * Optimize beta values using Gauss Newton.
+	 *
+	 * @param betas Beta values being optimized.
+	 */
+	private void gaussNewton( double betas[] ) {
+
+		DenseMatrix64F A = new DenseMatrix64F(L_full.numRows,numControl);
+		DenseMatrix64F r = new DenseMatrix64F(L_full.numRows,1);
+		x.reshape(numControl,1,false);
+
+		// don't check numControl inside in hope that the JVM can optimize the code better
+		if( numControl == 4 ) {
+			for( int i = 0; i < numIterations; i++ ) {
+				UtilLepetitEPnP.jacobian_Control4(L_full,betas,A);
+				UtilLepetitEPnP.residuals_Control4(L_full,y,betas,r.data);
+
+				if( !solver.setA(A) )
+					return;
+			
+				solver.solve(r,x);
+
+				for( int j = 0; j < numControl; j++ ) {
+					betas[j] -= x.data[j];
+				}
+			}
+		} else {
+			for( int i = 0; i < numIterations; i++ ) {
+				UtilLepetitEPnP.jacobian_Control3(L_full,betas,A);
+				UtilLepetitEPnP.residuals_Control3(L_full,y,betas,r.data);
+
+				if( !solver.setA(A) )
+					return;
+
+				solver.solve(r,x);
+
+				for( int j = 0; j < numControl; j++ ) {
+					betas[j] -= x.data[j];
+				}
+			}
+		}
 	}
 
 	/**

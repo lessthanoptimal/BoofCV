@@ -78,6 +78,18 @@ public class ArtificialStereoScene {
 		}
 	}
 	
+	public void addObservationNoise( double mag ) {
+		for( AssociatedPair p : pairs ) {
+			p.currLoc.x += rand.nextGaussian()*mag;
+			p.currLoc.y += rand.nextGaussian()*mag;
+
+			p.keyLoc.x += rand.nextGaussian()*mag;
+			p.keyLoc.y += rand.nextGaussian()*mag;
+		}
+
+		// observationCurrent simply references the data in pairs
+	}
+	
 	private List<Point3D_F64> createPlanarScene( int N ) {
 		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
 

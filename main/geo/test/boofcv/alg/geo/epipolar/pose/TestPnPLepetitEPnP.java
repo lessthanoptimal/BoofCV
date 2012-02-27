@@ -54,22 +54,20 @@ public class TestPnPLepetitEPnP {
 				for( AssociatedPair a : obs ) {
 					currObs.add(a.currLoc);
 				}
-				
+
+				alg.setNumIterations(5);
 				alg.process(locations,currObs);
 
-//				return alg.getSolutionMotion();
-				RefineLepetitEPnP refine = new RefineLepetitEPnP(alg,1e-8,200);
-				refine.refine();
-
-				return refine.getMotion();
+				return alg.getSolutionMotion();
 			}
 		};
 
-		for( int i = 4; i <= 200; i++ ) {
-
-//			test.testNoMotion(5);
-			test.standardTest(5);
-//			test.planarTest(5);
+		for( int i = 0; i < 20; i++ ) {
+			for( int N = 4; N < 10; N++ ) {
+				test.testNoMotion(N);
+				test.standardTest(N);
+				test.planarTest(N-1);
+			}
 		}
 	}
 	

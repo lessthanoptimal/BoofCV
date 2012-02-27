@@ -28,7 +28,6 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-// TODO merge back into main class?
 public class UtilLepetitEPnP {
 
 	/**
@@ -255,6 +254,87 @@ public class UtilLepetitEPnP {
 				L.set(row,4,2*dbc);
 				L.set(row,5,dc);
 			}
+		}
+	}
+
+	public static void residuals_Control4( DenseMatrix64F L_full , DenseMatrix64F y , 
+										   double beta[] , double r[] )
+	{
+		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2]; double b3 = beta[3];
+
+		final double ld[] = L_full.data;
+
+		for( int i = 0; i < 6; i++ ) {
+			int li = L_full.numCols*i;
+			double residual = -y.data[i];
+			residual += ld[li++]*b0*b0;
+			residual += ld[li++]*b0*b1;
+			residual += ld[li++]*b0*b2;
+			residual += ld[li++]*b0*b3;
+			residual += ld[li++]*b1*b1;
+			residual += ld[li++]*b1*b2;
+			residual += ld[li++]*b1*b3;
+			residual += ld[li++]*b2*b2;
+			residual += ld[li++]*b2*b3;
+			residual += ld[li  ]*b3*b3;
+
+			r[i] = residual;
+		}
+	}
+
+	public static void residuals_Control3( DenseMatrix64F L_full , DenseMatrix64F y ,
+										   double beta[] , double r[] )
+	{
+		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2];
+
+		final double ld[] = L_full.data;
+
+		for( int i = 0; i < 3; i++ ) {
+			double residual = -y.data[i];
+			int li = L_full.numCols*i;
+			residual += ld[li++]*b0*b0;
+			residual += ld[li++]*b0*b1;
+			residual += ld[li++]*b0*b2;
+			residual += ld[li++]*b1*b1;
+			residual += ld[li++]*b1*b2;
+			residual += ld[li  ]*b2*b2;
+
+			r[i] = residual;
+		}
+	}
+
+	public static void jacobian_Control4( DenseMatrix64F L_full ,
+										  double beta[] , DenseMatrix64F A )
+	{
+		int indexA = 0;
+
+		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2]; double b3 = beta[3];
+
+		final double ld[] = L_full.data;
+
+		for( int i = 0; i < 6; i++ ) {
+			int li = L_full.numCols*i;
+			A.data[indexA++] = 2*ld[li+0]*b0 +   ld[li+1]*b1 +   ld[li+2]*b2 +   ld[li+3]*b3;
+			A.data[indexA++] =   ld[li+1]*b0 + 2*ld[li+4]*b1 +   ld[li+5]*b2 +   ld[li+6]*b3;
+			A.data[indexA++] =   ld[li+2]*b0 +   ld[li+5]*b1 + 2*ld[li+7]*b2 +   ld[li+8]*b3;
+			A.data[indexA++] =   ld[li+3]*b0 +   ld[li+6]*b1 +   ld[li+8]*b2 + 2*ld[li+9]*b3;
+		}
+	}
+
+	public static void jacobian_Control3( DenseMatrix64F L_full ,
+											double beta[] ,  DenseMatrix64F A)
+	{
+		int indexA = 0;
+
+		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2];
+
+		final double ld[] = L_full.data;
+
+		for( int i = 0; i < 3; i++ ) {
+			int li = L_full.numCols*i;
+			A.data[indexA++] = 2*ld[li+0]*b0 +   ld[li+1]*b1 +   ld[li+2]*b2;
+			A.data[indexA++] =   ld[li+1]*b0 + 2*ld[li+3]*b1 +   ld[li+4]*b2;
+			A.data[indexA++] =   ld[li+2]*b0 +   ld[li+4]*b1 + 2*ld[li+5]*b2;
 		}
 	}
 
