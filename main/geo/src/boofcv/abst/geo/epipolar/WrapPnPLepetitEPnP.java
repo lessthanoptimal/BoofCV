@@ -39,7 +39,9 @@ public class WrapPnPLepetitEPnP implements PerspectiveNPoint {
 	List<Point3D_F64> worldPts = new ArrayList<Point3D_F64>();
 	List<Point2D_F64> observed = new ArrayList<Point2D_F64>();
 
-	public WrapPnPLepetitEPnP(PnPLepetitEPnP alg) {
+	Se3_F64 motion;
+
+	public WrapPnPLepetitEPnP(PnPLepetitEPnP alg ) {
 		this.alg = alg;
 	}
 
@@ -53,6 +55,7 @@ public class WrapPnPLepetitEPnP implements PerspectiveNPoint {
 		}
 		
 		alg.process(worldPts,observed);
+		motion = alg.getSolutionMotion();
 		
 		worldPts.clear();
 		observed.clear();
@@ -60,7 +63,7 @@ public class WrapPnPLepetitEPnP implements PerspectiveNPoint {
 
 	@Override
 	public Se3_F64 getPose() {
-		return alg.getSolutionMotion();
+		return motion;
 	}
 
 	@Override

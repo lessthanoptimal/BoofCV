@@ -20,21 +20,23 @@ package boofcv.alg.geo.epipolar;
 
 import boofcv.abst.geo.epipolar.EpipolarMatrixEstimator;
 import boofcv.abst.geo.epipolar.RefineEpipolarMatrix;
+import boofcv.alg.geo.epipolar.h.HomographyLinear4;
 import boofcv.factory.geo.d3.epipolar.EpipolarError;
 import boofcv.factory.geo.d3.epipolar.FactoryEpipolar;
 import boofcv.misc.Performer;
+import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import org.ejml.data.DenseMatrix64F;
 
-import static boofcv.factory.geo.d3.epipolar.FactoryEpipolar.refineFundamental;
+import static boofcv.factory.geo.d3.epipolar.FactoryEpipolar.refineHomography;
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkRefineFundamental extends ArtificialStereoScene{
+public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 	static final long TEST_TIME = 1000;
 	static final int NUM_POINTS = 500;
-	static final boolean FUNDAMENTAL = false;
+	static final boolean PIXELS = false;
 	
 	protected DenseMatrix64F initialF;
 
@@ -43,9 +45,9 @@ public class BenchmarkRefineFundamental extends ArtificialStereoScene{
 		RefineEpipolarMatrix alg;
 		String name;
 
-		public Refine( String name , RefineEpipolarMatrix alg) {
-			this.alg = alg;
+		public Refine(String name ,RefineEpipolarMatrix alg) {
 			this.name = name;
+			this.alg = alg;
 		}
 
 		@Override
@@ -59,33 +61,45 @@ public class BenchmarkRefineFundamental extends ArtificialStereoScene{
 			return name;
 		}
 	}
+
+	public class Linear4 extends PerformerBase {
+
+		HomographyLinear4 alg = new HomographyLinear4(true);
+
+		@Override
+		public void process() {
+			alg.process(pairs);
+		}
+	}
 	
 	public void runAll() {
 		System.out.println("=========  Profile numFeatures "+NUM_POINTS);
 		System.out.println();
 
 		double tol = 1e-16;
-		int MAX_ITER = 100;
+		int MAX_ITER = 200;
 
-		init(NUM_POINTS,FUNDAMENTAL,false);
+		init(NUM_POINTS, PIXELS, true);
 
-		EpipolarMatrixEstimator computeAlg = FactoryEpipolar.computeFundamental(FUNDAMENTAL,8);
+		EpipolarMatrixEstimator computeAlg = FactoryEpipolar.computeHomography(true);
 		computeAlg.process(pairs);
 		initialF = computeAlg.getEpipolarMatrix();
 		initialF.data[0] += 0.1;
 		initialF.data[4] -= 0.15;
 		initialF.data[7] -= 0.2;
 
-		ProfileOperation.printOpsPerSec(new Refine("LS Sampson",refineFundamental(tol, MAX_ITER, EpipolarError.SAMPSON)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Refine("LS Simple",refineFundamental(tol, MAX_ITER, EpipolarError.SIMPLE)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Refine("QN Sampson",new QuasiNewtonFundamentalSampson(tol,MAX_ITER)), TEST_TIME);
 
+		ProfileOperation.printOpsPerSec(new Refine("Simple",refineHomography(tol, MAX_ITER, EpipolarError.SIMPLE)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Refine("Sampson",refineHomography(tol, MAX_ITER, EpipolarError.SAMPSON)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Linear4(), TEST_TIME);
+
+		
 		System.out.println();
 		System.out.println("Done");
 	}
 	
 	public static void main( String args[] ) {
-		BenchmarkRefineFundamental alg = new BenchmarkRefineFundamental();
+		BenchmarkRuntimeRefineHomography alg = new BenchmarkRuntimeRefineHomography();
 
 		alg.runAll();
 	}

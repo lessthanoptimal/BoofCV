@@ -20,24 +20,25 @@ package boofcv.alg.geo.epipolar;
 
 import boofcv.alg.geo.epipolar.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.epipolar.pose.PoseFromPairLinear6;
-import boofcv.alg.geo.epipolar.pose.RefineLepetitEPnP;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import org.ejml.data.DenseMatrix64F;
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkComputePose extends ArtificialStereoScene{
+public class BenchmarkRuntimePose extends ArtificialStereoScene {
 	static final long TEST_TIME = 1000;
 	static final int NUM_POINTS = 500;
 	static final boolean FUNDAMENTAL = false;
-	
-	protected DenseMatrix64F initialF;
 
 	public class EPnP extends PerformerBase {
 
-		PnPLepetitEPnP alg = new PnPLepetitEPnP();
+		PnPLepetitEPnP alg;
+
+		public EPnP( int numIterations ) {
+			alg = new PnPLepetitEPnP();
+			alg.setNumIterations(numIterations);
+		}
 
 		@Override
 		public void process() {
@@ -45,17 +46,6 @@ public class BenchmarkComputePose extends ArtificialStereoScene{
 		}
 	}
 
-	public class EPnPRefine extends PerformerBase {
-
-		PnPLepetitEPnP alg = new PnPLepetitEPnP();
-		RefineLepetitEPnP refine = new RefineLepetitEPnP(alg,1e-12,200);
-
-		@Override
-		public void process() {
-			alg.process(worldPoints,observationCurrent);
-			refine.refine();
-		}
-	}
 
 	public class PairLinear extends PerformerBase {
 
@@ -73,8 +63,8 @@ public class BenchmarkComputePose extends ArtificialStereoScene{
 
 		init(NUM_POINTS,FUNDAMENTAL,false);
 
-		ProfileOperation.printOpsPerSec(new EPnP(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new EPnPRefine(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new EPnP(0), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new EPnP(5), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new PairLinear(), TEST_TIME);
 
 		System.out.println();
@@ -82,7 +72,7 @@ public class BenchmarkComputePose extends ArtificialStereoScene{
 	}
 	
 	public static void main( String args[] ) {
-		BenchmarkComputePose alg = new BenchmarkComputePose();
+		BenchmarkRuntimePose alg = new BenchmarkRuntimePose();
 
 		alg.runAll();
 	}

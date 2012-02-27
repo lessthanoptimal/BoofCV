@@ -123,8 +123,10 @@ public class FactoryEpipolar {
 	 *
 	 * @return  PerspectiveNPoint
 	 */
-	public static PerspectiveNPoint pnpEfficientPnP() {
+	public static PerspectiveNPoint pnpEfficientPnP( int numIterations ) {
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
+		alg.setNumIterations(numIterations);
 		return new WrapPnPLepetitEPnP(alg);
 	}
+
 }

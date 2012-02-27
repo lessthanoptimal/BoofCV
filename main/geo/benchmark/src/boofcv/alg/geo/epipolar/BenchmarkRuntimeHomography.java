@@ -30,13 +30,13 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkComputeFundamental extends ArtificialStereoScene{
+public class BenchmarkRuntimeHomography extends ArtificialStereoScene {
 	static final long TEST_TIME = 1000;
 	static final int NUM_POINTS = 500;
-	static final boolean FUNDAMENTAL = false;
+	static final boolean PIXELS = true;
 
-	List<AssociatedPair> pairs8 = new ArrayList<AssociatedPair>();
-	List<AssociatedPair> pairs7 = new ArrayList<AssociatedPair>();
+	List<AssociatedPair> pairs4 = new ArrayList<AssociatedPair>();
+
 
 	public class Estimate implements Performer {
 
@@ -66,25 +66,23 @@ public class BenchmarkComputeFundamental extends ArtificialStereoScene{
 		System.out.println("=========  Profile numFeatures "+NUM_POINTS);
 		System.out.println();
 
-		init(NUM_POINTS,FUNDAMENTAL,false);
+		init(NUM_POINTS, PIXELS,true);
 		
-		for( int i = 0; i < 7; i++ ) {
-			pairs7.add(pairs.get(i));
-			pairs8.add(pairs.get(i));
+		for( int i = 0; i < 4; i++ ) {
+			pairs4.add(pairs.get(i));
 		}
-		pairs8.add(pairs.get(7));
 
 		System.out.println("Minimum Number");
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 8",FactoryEpipolar.computeFundamental(FUNDAMENTAL,8),pairs8), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 7",FactoryEpipolar.computeFundamental(FUNDAMENTAL,7),pairs7), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("Linear 4 Norm", FactoryEpipolar.computeHomography(true), pairs4), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("Linear 4 Unorm",FactoryEpipolar.computeHomography(false),pairs4), TEST_TIME);
 
 		System.out.println("N");
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 8",FactoryEpipolar.computeFundamental(FUNDAMENTAL,8),pairs), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("Linear 4",FactoryEpipolar.computeHomography(true),pairs), TEST_TIME);
 
 	}
 	
 	public static void main( String args[] ) {
-		BenchmarkComputeFundamental alg = new BenchmarkComputeFundamental();
+		BenchmarkRuntimeHomography alg = new BenchmarkRuntimeHomography();
 
 		alg.runAll();
 	}
