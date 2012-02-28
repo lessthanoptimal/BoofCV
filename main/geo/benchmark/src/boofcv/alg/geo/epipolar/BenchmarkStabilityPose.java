@@ -46,6 +46,7 @@ public class BenchmarkStabilityPose extends ArtificialStereoScene {
 		List<PointPositionPair> inputs = new ArrayList<PointPositionPair>();
 		
 		for( int i = 0; i <= N; i++ ) {
+			inputs.clear();
 			double mag = (max-min)*i/N+min;
 			
 			init(NUM_POINTS,false,isPlanar);
@@ -73,17 +74,19 @@ public class BenchmarkStabilityPose extends ArtificialStereoScene {
 			}
 			errorEuler = Math.sqrt(errorEuler);
 
-			System.out.printf("%3d angle %6.2f  translation %6.2f\n", i,errorEuler, errorTran);
+			System.out.printf("%3d angle %6.2e  translation %6.2e\n", i,errorEuler, errorTran);
 		}
 	}
 	
 	public static void main( String args[] ) {
-		double max = 0.1;
+		double max = 0.05;
+		boolean planar = false;
 
 		BenchmarkStabilityPose app = new BenchmarkStabilityPose();
-		app.target = FactoryEpipolar.pnpEfficientPnP(0);
-		app.evaluateObservationNoise(0,max,20,false);
-		app.target = FactoryEpipolar.pnpEfficientPnP(5);
-		app.evaluateObservationNoise(0,max,20,false);
+		app.target = FactoryEpipolar.pnpEfficientPnP(0,0.1);
+		app.evaluateObservationNoise(0,max,20,planar);
+		app.target = FactoryEpipolar.pnpEfficientPnP(10,0.1);
+		app.evaluateObservationNoise(0,max,20,planar);
+
 	}
 }

@@ -257,6 +257,9 @@ public class UtilLepetitEPnP {
 		}
 	}
 
+	/**
+	 * Computes the residuals (difference between observed and predicted) given 4 control points.
+	 */
 	public static void residuals_Control4( DenseMatrix64F L_full , DenseMatrix64F y , 
 										   double beta[] , double r[] )
 	{
@@ -282,6 +285,9 @@ public class UtilLepetitEPnP {
 		}
 	}
 
+	/**
+	 * Computes the residuals (difference between observed and predicted given 3 control points.
+	 */
 	public static void residuals_Control3( DenseMatrix64F L_full , DenseMatrix64F y ,
 										   double beta[] , double r[] )
 	{
@@ -303,6 +309,9 @@ public class UtilLepetitEPnP {
 		}
 	}
 
+	/**
+	 * Computes the Jacobian given 4 control points.
+	 */
 	public static void jacobian_Control4( DenseMatrix64F L_full ,
 										  double beta[] , DenseMatrix64F A )
 	{
@@ -321,6 +330,9 @@ public class UtilLepetitEPnP {
 		}
 	}
 
+	/**
+	 * Computes the Jacobian given 3 control points.
+	 */
 	public static void jacobian_Control3( DenseMatrix64F L_full ,
 											double beta[] ,  DenseMatrix64F A)
 	{
@@ -337,5 +349,4 @@ public class UtilLepetitEPnP {
 			A.data[indexA++] =   ld[li+2]*b0 +   ld[li+4]*b1 + 2*ld[li+5]*b2;
 		}
 	}
-
 }

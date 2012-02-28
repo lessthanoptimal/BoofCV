@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public class TestLevenbergMarquardtDampened {
 		FunctionNtoM residual = new TrivialLeastSquaresResidual(a,b);
 		FunctionNtoMxN jacobian = new NumericalJacobianForward(residual);
 
-		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.solverPseudoInverse();
+		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.pseudoInverse();
 
 		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,1e-3,1e-6,1e-6);
 

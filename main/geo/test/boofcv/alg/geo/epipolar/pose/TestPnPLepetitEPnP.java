@@ -33,7 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -44,18 +45,27 @@ public class TestPnPLepetitEPnP {
 	
 	@Test
 	public void standardTests() {
+		standardTest(0);
+	}
+
+	@Test
+	public void standardTests_iteration() {
+		standardTest(10);
+	}
+
+	private void standardTest( final int numIterations ) {
 		CommonMotionNPoint test = new CommonMotionNPoint() {
 			@Override
 			public Se3_F64 compute(List<AssociatedPair> obs, List<Point3D_F64> locations) {
 
 				PnPLepetitEPnP alg = new PnPLepetitEPnP();
-				
+
 				List<Point2D_F64> currObs = new ArrayList<Point2D_F64>();
 				for( AssociatedPair a : obs ) {
 					currObs.add(a.currLoc);
 				}
 
-				alg.setNumIterations(5);
+				alg.setNumIterations(numIterations);
 				alg.process(locations,currObs);
 
 				return alg.getSolutionMotion();
@@ -63,11 +73,13 @@ public class TestPnPLepetitEPnP {
 		};
 
 		for( int i = 0; i < 20; i++ ) {
+			// the minimal case is not tested here since its too unstable
 			for( int N = 4; N < 10; N++ ) {
 				test.testNoMotion(N);
 				test.standardTest(N);
 				test.planarTest(N-1);
 			}
+			System.out.println();
 		}
 	}
 	
@@ -75,7 +87,7 @@ public class TestPnPLepetitEPnP {
 	public void selectWorldControlPoints_planar() {
 
 		List<Point3D_F64> worldPts = CommonHomographyChecks.createRandomPlane(rand, 3, 30);
-		List<Point3D_F64> controlPts = declarePointList(4);
+		List<Point3D_F64> controlPts = GeoTestingOps.createList3_F64(4);
 		
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
@@ -105,7 +117,7 @@ public class TestPnPLepetitEPnP {
 	public void selectControlPoints() {
 
 		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
-		List<Point3D_F64> controlPts = declarePointList(4);
+		List<Point3D_F64> controlPts = GeoTestingOps.createList3_F64(4);
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
@@ -132,7 +144,7 @@ public class TestPnPLepetitEPnP {
 	@Test
 	public void computeBarycentricCoordinates() {
 		List<Point3D_F64> worldPoints = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
-		List<Point3D_F64> worldControlPts = declarePointList(4);
+		List<Point3D_F64> worldControlPts = GeoTestingOps.createList3_F64(4);
 		
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
@@ -237,18 +249,5 @@ public class TestPnPLepetitEPnP {
 		assertEquals(0,betas[1],1e-8);
 		assertEquals(0,betas[2],1e-8);
 		assertEquals(0,betas[3],1e-8);
-	}
-
-	@Test
-	public void estimateCase4() {
-		fail("finish");
-	}
-
-	private List<Point3D_F64> declarePointList( int N ) {
-		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
-		for( int i = 0; i < N; i++ ) {
-			ret.add( new Point3D_F64());
-		}
-		return ret;
 	}
 }

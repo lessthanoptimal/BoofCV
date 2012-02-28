@@ -49,7 +49,7 @@ public class ArtificialStereoScene {
 	public void init( int N , boolean isPixels , boolean planar ) {
 		// define the camera's motion
 		motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.2, -0.03, 0.02));
 		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
