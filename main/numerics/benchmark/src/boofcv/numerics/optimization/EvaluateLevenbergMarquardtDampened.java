@@ -43,7 +43,7 @@ public class EvaluateLevenbergMarquardtDampened extends UnconstrainedLeastSquare
 		LinearSolver<DenseMatrix64F> solver;
 
 		if( robust ) {
-			solver = LinearSolverFactory.solverPseudoInverse();
+			solver = LinearSolverFactory.pseudoInverse();
 		} else {
 			solver = LinearSolverFactory.symmPosDef(10);
 		}

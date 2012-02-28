@@ -58,7 +58,19 @@ import java.util.List;
  * See warning below.  To turn on non-linear optimization set {@link #setNumIterations(int)} to
  * a positive number.
  * </p>
- * 
+ *
+ * <p>
+ * After experimentation there doesn't seem to be any universally best way to choose the control
+ * point distribution.  To allow tuning for specific problems the 'magic number' has been provided.
+ * Larger values increase the control point distribution's size. In general smaller numbers appear
+ * to be better for noisier data, but can degrade results if too small.
+ * </p>
+ *
+ * <p>
+ * MINIMUM POINTS: In theory only 4 points are needed for the general case and 3 for planar data.
+ *
+ * </p>
+ *
  * <p>
  * NOTES: This implementation deviates in some minor ways from what was described in the paper.  However, their
  * own example code (Matlab and C++) are mutually different in significant ways too.  See how solutions are scored,
@@ -81,7 +93,6 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// todo some how nicely move non-linear refinement into here?
 public class PnPLepetitEPnP {
 
 	// used to solve various linear problems
@@ -92,7 +103,6 @@ public class PnPLepetitEPnP {
 	protected DenseMatrix64F alphas = new DenseMatrix64F(1,1);
 	private DenseMatrix64F M = new DenseMatrix64F(12,12);
 	private DenseMatrix64F MM = new DenseMatrix64F(12,12);
-	private DenseMatrix64F W = new DenseMatrix64F(12,12);
 
 	// linear constraint matrix
 	protected DenseMatrix64F L_full = new DenseMatrix64F(6,10);
@@ -120,8 +130,6 @@ public class PnPLepetitEPnP {
 
 	// the estimated camera motion.  from world to camera
 	private Se3_F64 solutionMotion = new Se3_F64();
-	// index of which solution in the initial set was the best
-	private int bestSolution;
 
 	// mean location of world points
 	private Point3D_F64 meanWorldPts;
@@ -129,7 +137,32 @@ public class PnPLepetitEPnP {
 	// number of iterations it will perform
 	private int numIterations;
 
+	// adjusts world control point distribution
+	private double magicNumber;
+
+	// handles the hard cases
+	Relinearlize relinearizeBeta = new Relinearlize();
+
+
+
+
+	/**
+	 * Constructor which uses the default magic number
+	 */
 	public PnPLepetitEPnP() {
+		this(0.1);
+	}
+
+	/**
+	 * Constructor which allows configuration of the magic number.
+	 *
+	 * @param magicNumber Magic number changes distribution of world control points.
+	 *                    Values less than one seem to work best. Try 0.1
+	 */
+	public PnPLepetitEPnP( double magicNumber ) {
+
+		this.magicNumber = magicNumber;
+
 		// just a sanity check
 		if( motionFit.getMinimumPoints() > 4 )
 			throw new IllegalArgumentException("Crap");
@@ -176,12 +209,14 @@ public class PnPLepetitEPnP {
 		// the camera points are a linear combination of these null points
 		extractNullPoints(M);
 
+		// todo clean up declaration of data
 		solutionPts.clear();
 		for( int i = 0; i < numControl; i++ ) {
 			solutionPts.add( new Point3D_F64());
 		}
 
 		// compute the full constraint matrix, the others are extracted from this
+		outside:
 		if( numControl == 4 ) {
 			L_full.reshape(6, 10, false);
 			y.reshape(6,1,false);
@@ -191,6 +226,7 @@ public class PnPLepetitEPnP {
 			estimateCase1(solutions.get(0));
 			estimateCase2(solutions.get(1));
 			estimateCase3(solutions.get(2));
+			estimateCase4(solutions.get(3));
 		} else {
 			L_full.reshape(3, 6, false);
 			y.reshape(3,1,false);
@@ -199,20 +235,19 @@ public class PnPLepetitEPnP {
 			// compute 4 solutions using the null points
 			estimateCase1(solutions.get(0));
 			estimateCase2(solutions.get(1));
+			estimateCase3_planar(solutions.get(2));
 		}
-		// todo case 4
-		// todo stop estimating if better solutions found?
 
-		selectBestMotion();
+		computeResultFromBest();
 	}
 
 	/**
 	 * Selects the best motion hypothesis based on the actual observations and optionally
 	 * optimizes the solution.
 	 */
-	private void selectBestMotion( ) {
+	private void computeResultFromBest( ) {
 		double bestScore = Double.MAX_VALUE;
-
+		int bestSolution=-1;
 		for( int i = 0; i < 4; i++ ) {
 			double score = score(solutions.get(i));
 			if( score < bestScore ) {
@@ -290,13 +325,13 @@ public class PnPLepetitEPnP {
 
 		// find the data's orientation and check to see if it is planar
 		svd.decompose(covar);
-		DenseMatrix64F W = svd.getW(null);
+		double []singularValues = svd.getSingularValues();
 		DenseMatrix64F V = svd.getV(false);
 
-		SingularOps.descendingOrder(null,false,W,V,false);
+		SingularOps.descendingOrder(null,false,singularValues,3,V,false);
 
 		// planar check
-		if( W.get(0,0)<W.get(2,2)*1e13 ) {
+		if( singularValues[0]<singularValues[2]*1e13 ) {
 			numControl = 4;
 		} else {
 			numControl = 3;
@@ -307,8 +342,7 @@ public class PnPLepetitEPnP {
 
 		// rest of the control points are along the data's major axises
 		for( int i = 0; i < numControl-1; i++ ) {
-			double m = Math.sqrt(W.get(i,i))*3;
-			// increasing this number helps the matrix inversion for barycentric go well
+			double m = Math.sqrt(singularValues[1])*magicNumber;
 
 			double vx = V.unsafe_get(0, i)*m;
 			double vy = V.unsafe_get(1, i)*m;
@@ -429,10 +463,10 @@ public class PnPLepetitEPnP {
 		if( !svd.decompose(MM) )
 			throw new IllegalArgumentException("SVD failed?!?!");
 
-		svd.getW(W);
+		double []singularValues = svd.getSingularValues();
 		DenseMatrix64F V = svd.getV(false);
 
-		SingularOps.descendingOrder(null,false,W,V,false);
+		SingularOps.descendingOrder(null,false,singularValues,3,V,false);
 
 		// extract null points from the null space
 		for( int i = 0; i < 4; i++ ) {
@@ -510,8 +544,6 @@ public class PnPLepetitEPnP {
 		if( positiveCount < N/2 )
 			beta *= -1;
 
-//		System.out.println("positive count "+positiveCount+"  N "+N+"  beta "+beta);
-
 		return beta;
 	}
 
@@ -550,9 +582,7 @@ public class PnPLepetitEPnP {
 	protected void estimateCase1( double betas[] ) {
 		betas[0] = matchScale(nullPts[0], controlWorldPts);
 		betas[0] = adjustBetaSign(betas[0],nullPts[0]);
-		betas[1] = 0;
-		betas[2] = 0;
-		betas[3] = 0;
+		betas[1] = 0; betas[2] = 0; betas[3] = 0;
 	}
 
 	// todo try alternative case1 here again later.  maybe it will create a reasonable solution?
@@ -576,8 +606,7 @@ public class PnPLepetitEPnP {
 		betas[0] = Math.sqrt(Math.abs(x.get(0)));
 		betas[1] = Math.sqrt(Math.abs(x.get(2)));
 		betas[1] *= Math.signum(x.get(0))*Math.signum(x.get(1));
-		betas[2] = 0;
-		betas[3] = 0;
+		betas[2] = 0; betas[3] = 0;
 
 		refine(betas);
 	}
@@ -605,29 +634,22 @@ public class PnPLepetitEPnP {
 		refine(betas);
 	}
 
+	/**
+	 * If the data is planar use relinearize to estimate betas
+	 */
+	protected void estimateCase3_planar( double betas[] ) {
+		relinearizeBeta.setNumberControl(3);
+		relinearizeBeta.process(L_full,y,betas);
+
+		refine(betas);
+	}
+
 	protected void estimateCase4( double betas[] ) {
-		Arrays.fill(betas, 0);
 
-		DenseMatrix64F x = new DenseMatrix64F(10,1);
+		relinearizeBeta.setNumberControl(4);
+		relinearizeBeta.process(L_full,y,betas);
 
-		// extract the constraint matrix null space
-		if( !svd.decompose(L) ) {
-			throw new RuntimeException("Egads SVD failed!");
-		}
-
-		DenseMatrix64F W = svd.getW(null);
-		DenseMatrix64F V = svd.getV(false);
-		SingularOps.descendingOrder(null, false, W, V, false);
-
-		double [][]ns = new double[4][10];
-		for( int i = 0; i < 4; i++ ) {
-			for( int j = 0; j < 10; j++ ) {
-				ns[i][j] = V.get(j,6+i);
-			}
-		}
-
-		// remove parasitic solutions by imposing additional constraints
-
+		refine(betas);
 	}
 
 	/**
@@ -674,12 +696,14 @@ public class PnPLepetitEPnP {
 	}
 
 	/**
-	 * Returns the minimum number of points required to make an estimate
+	 * Returns the minimum number of points required to make an estimate.  The four
+	 * point case seems to be a bit unstable in some situations.  five or more is very
+	 * stable.
 	 *
 	 * @return minimum number of points
 	 */
 	public int getMinPoints () {
-		return 5; // 4 after 4th case is handled
+		return 4;
 	}
 
 	/**
@@ -689,12 +713,5 @@ public class PnPLepetitEPnP {
 	 */
 	public Se3_F64 getSolutionMotion() {
 		return solutionMotion;
-	}
-
-	/**
-	 * Returns the weights associated with the best solution
-	 */
-	public double[] getBestControlWeights() {
-		return solutions.get(bestSolution);
 	}
 }

@@ -113,9 +113,9 @@ public abstract class CommonMotionNPoint {
 
 			Point3D_F64 foundPt = SePointOps_F64.transform(found, p1, null);
 
-			assertEquals(p2.x,foundPt.x,1e-7);
-			assertEquals(p2.y,foundPt.y,1e-7);
-			assertEquals(p2.z,foundPt.z,1e-7);
+			assertEquals(p2.x,foundPt.x,1e-6);
+			assertEquals(p2.y,foundPt.y,1e-6);
+			assertEquals(p2.z,foundPt.z,1e-6);
 		}
 	}
 	

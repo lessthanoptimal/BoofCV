@@ -117,14 +117,16 @@ public class FactoryEpipolar {
 
 	/**
 	 * Returns a solution to the PnP problem for 4 or more points using EPnP. Fast and fairly
-	 * accurate algorithm.  Can handle general and planar scenario.
+	 * accurate algorithm.  Can handle general and planar scenario automatically.
 	 *
 	 * @see PnPLepetitEPnP
 	 *
+	 * @param numIterations If more then zero then non-linear optimization is done.  More is not always better.  Try 10
+	 * @param magicNumber Affects how the problem is linearized.  See comments in {@link PnPLepetitEPnP}.  Try 0.1
 	 * @return  PerspectiveNPoint
 	 */
-	public static PerspectiveNPoint pnpEfficientPnP( int numIterations ) {
-		PnPLepetitEPnP alg = new PnPLepetitEPnP();
+	public static PerspectiveNPoint pnpEfficientPnP( int numIterations , double magicNumber ) {
+		PnPLepetitEPnP alg = new PnPLepetitEPnP(magicNumber);
 		alg.setNumIterations(numIterations);
 		return new WrapPnPLepetitEPnP(alg);
 	}
