@@ -21,6 +21,7 @@ package boofcv.alg.geo.epipolar.pose;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.GeoTestingOps;
 import boofcv.alg.geo.epipolar.h.CommonHomographyChecks;
+import boofcv.struct.FastQueue;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -74,9 +75,9 @@ public class TestPnPLepetitEPnP {
 
 		for( int i = 0; i < 20; i++ ) {
 			// the minimal case is not tested here since its too unstable
-			for( int N = 4; N < 10; N++ ) {
-				test.testNoMotion(N);
-				test.standardTest(N);
+			for( int N = 5; N < 10; N++ ) {
+//				test.testNoMotion(N);
+//				test.standardTest(N);
 				test.planarTest(N-1);
 			}
 			System.out.println();
@@ -87,18 +88,18 @@ public class TestPnPLepetitEPnP {
 	public void selectWorldControlPoints_planar() {
 
 		List<Point3D_F64> worldPts = CommonHomographyChecks.createRandomPlane(rand, 3, 30);
-		List<Point3D_F64> controlPts = GeoTestingOps.createList3_F64(4);
-		
+		FastQueue<Point3D_F64> controlPts = new FastQueue<Point3D_F64>(4,Point3D_F64.class,true);
+
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
 		alg.selectWorldControlPoints(worldPts, controlPts);
-		
+
 		assertEquals(3,alg.numControl);
-		
+
 		// check that each row is unique
 		for( int i = 0; i < 3; i++ ) {
 			Point3D_F64 ci = controlPts.get(i);
-			
+
 			for( int j = i+1; j < 3; j++ ) {
 				Point3D_F64 cj = controlPts.get(j);
 
@@ -107,7 +108,7 @@ public class TestPnPLepetitEPnP {
 				double dz = ci.z - cj.z;
 
 				double sum = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
-				
+
 				assertTrue(sum > 0.00001 );
 			}
 		}
@@ -117,7 +118,7 @@ public class TestPnPLepetitEPnP {
 	public void selectControlPoints() {
 
 		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
-		List<Point3D_F64> controlPts = GeoTestingOps.createList3_F64(4);
+		FastQueue<Point3D_F64> controlPts = new FastQueue<Point3D_F64>(4,Point3D_F64.class,true);
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
@@ -144,8 +145,8 @@ public class TestPnPLepetitEPnP {
 	@Test
 	public void computeBarycentricCoordinates() {
 		List<Point3D_F64> worldPoints = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
-		List<Point3D_F64> worldControlPts = GeoTestingOps.createList3_F64(4);
-		
+		FastQueue<Point3D_F64> worldControlPts = new FastQueue<Point3D_F64>(4,Point3D_F64.class,true);
+
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
 		alg.selectWorldControlPoints(worldPoints, worldControlPts);
@@ -153,11 +154,11 @@ public class TestPnPLepetitEPnP {
 		DenseMatrix64F alpha = new DenseMatrix64F(1,1);
 
 		alg.computeBarycentricCoordinates(worldControlPts, alpha, worldPoints);
-		
+
 		// make sure it sums up to one and it should add up to the original point
 		for( int i = 0; i < worldPoints.size(); i++ ) {
 			double x=0,y=0,z=0;
-			
+
 			double sum = 0;
 			for( int j = 0; j < 4; j++ ) {
 				Point3D_F64 cj = worldControlPts.get(j);
@@ -169,7 +170,7 @@ public class TestPnPLepetitEPnP {
 				z += a*cj.z;
 			}
 			Point3D_F64 p = worldPoints.get(i);
-			
+
 			assertEquals(1,sum,1e-8);
 			assertEquals(p.x,x,1e-8);
 			assertEquals(p.y,y,1e-8);
@@ -182,7 +183,7 @@ public class TestPnPLepetitEPnP {
 		List<Point2D_F64> obsPts = GeoTestingOps.randomPoints_F64(-1, 2, -5, 20, 30, rand);
 		DenseMatrix64F M = RandomMatrices.createRandom(2 * obsPts.size(), 12,rand);
 		DenseMatrix64F alpha = RandomMatrices.createRandom(obsPts.size(),4,rand);
-		
+
 		PnPLepetitEPnP.constructM(obsPts, alpha, M);
 
 		// check for zeros in the expected locations
@@ -205,7 +206,7 @@ public class TestPnPLepetitEPnP {
 
 		// see if the first set of null points is the null space pf M*M
 		List<Point3D_F64> l = alg.nullPts[0];
-		
+
 		SimpleMatrix v = new SimpleMatrix(12,1);
 		for( int i = 0; i < 4; i++ ) {
 			Point3D_F64 p = l.get(i);
@@ -213,13 +214,13 @@ public class TestPnPLepetitEPnP {
 			v.set(3*i+1,p.y);
 			v.set(3*i+2,p.z);
 		}
-		
+
 		SimpleMatrix MM = M.mult(M.transpose());
-		
+
 		SimpleMatrix x = MM.mult(v);
-		
+
 		double mag = x.normF();
-		
+
 		assertEquals(0,mag,1e-8);
 	}
 
@@ -235,14 +236,14 @@ public class TestPnPLepetitEPnP {
 		alg.alphas = new DenseMatrix64F(0,0);
 		alg.nullPts[0] = GeoTestingOps.randomPoints_F64(5,10,-1, 2, -5, 20, 4, rand);
 		double beta = 10;
-		int i = 0;
-		for( Point3D_F64 p : alg.nullPts[0]) {
-			Point3D_F64 c = alg.controlWorldPts.get(i++);
+		for( int i = 0; i < alg.numControl; i++ ) {
+			Point3D_F64 p = alg.nullPts[0].get(i);
+			Point3D_F64 c = alg.controlWorldPts.pop();
 			c.x = p.x*beta;
 			c.y = p.y*beta;
 			c.z = p.z*beta;
 		}
-		
+
 		double betas[] = new double[]{1,2,3,4};
 		alg.estimateCase1(betas);
 		assertEquals(beta,betas[0],1e-8);

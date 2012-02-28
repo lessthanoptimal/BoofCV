@@ -27,6 +27,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,17 +40,24 @@ public class ArtificialStereoScene {
 	Random rand = new Random(234234);
 
 	// create a reasonable calibration matrix
-	DenseMatrix64F K = new DenseMatrix64F(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
+	DenseMatrix64F K = new DenseMatrix64F(3,3,true,705,0.001,326,0,704,224,0,0,1);
+	DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
 	protected Se3_F64 motion;
 	protected List<AssociatedPair> pairs;
 	protected List<Point2D_F64> observationCurrent;
 	protected List<Point3D_F64> worldPoints;
+	protected boolean isPixels;
+
+	public ArtificialStereoScene() {
+		CommonOps.invert(K,K_inv);
+	}
 
 	public void init( int N , boolean isPixels , boolean planar ) {
+		this.isPixels = isPixels;
 		// define the camera's motion
 		motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.2, -0.03, 0.02));
+		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.5 , -1, 1));
 		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
@@ -78,13 +86,29 @@ public class ArtificialStereoScene {
 		}
 	}
 	
-	public void addObservationNoise( double mag ) {
-		for( AssociatedPair p : pairs ) {
-			p.currLoc.x += rand.nextGaussian()*mag;
-			p.currLoc.y += rand.nextGaussian()*mag;
+	public void addPixelNoise( double mag ) {
 
-			p.keyLoc.x += rand.nextGaussian()*mag;
-			p.keyLoc.y += rand.nextGaussian()*mag;
+		Point3D_F64 noiseCurr = new Point3D_F64();
+		Point3D_F64 noiseKey = new Point3D_F64();
+
+		for( AssociatedPair p : pairs ) {
+			double cx=0,cy=0,kx=0,ky=0;
+
+			noiseCurr.x = rand.nextGaussian()*mag;
+			noiseCurr.y = rand.nextGaussian()*mag;
+			noiseKey.x = rand.nextGaussian()*mag;
+			noiseKey.y = rand.nextGaussian()*mag;
+			
+			if( !isPixels ) {
+				GeometryMath_F64.mult(K_inv,noiseCurr,noiseCurr);
+				GeometryMath_F64.mult(K_inv,noiseKey,noiseKey);
+			}
+
+			p.currLoc.x += noiseCurr.x;
+			p.currLoc.y += noiseCurr.y;
+
+			p.keyLoc.x += noiseKey.x;
+			p.keyLoc.y += noiseKey.y;
 		}
 
 		// observationCurrent simply references the data in pairs

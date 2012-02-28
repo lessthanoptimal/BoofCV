@@ -1,3 +1,5 @@
+- Compare EPnP directly to author's c code
+
 - Bundle Adjustment
   * Unweighted
   * Weighted
