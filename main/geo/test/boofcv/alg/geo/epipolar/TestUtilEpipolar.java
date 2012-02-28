@@ -184,8 +184,6 @@ public class TestUtilEpipolar {
 		double d = 2;
 		Vector3D_F64 N = new Vector3D_F64(0,0,1);
 
-		K.print();
-
 		DenseMatrix64F H = UtilEpipolar.computeHomography(R, T, d, N, K);
 
 		// Test using the following theorem:  x2 = H*x1

@@ -27,7 +27,12 @@ import org.ejml.ops.CommonOps;
 
 /**
  * <p>
- * Used in case 4 of EPnP.  See [1] for details.
+ * Used in case 4 of EPnP.  See [1] for details.  This technique appears to not be all that accurate
+ * in practice, but better than nothing.  Or maybe there is a bug in the implementation below
+ * since even with perfect data it appears to generate large errors.  One possible source
+ * of implementation error is that the entire null space is not being used.  More of
+ * the null space (particularly in the planar case) could be used if more relinearization
+ * was run mutliple times.
  * </p>
  *
  * <p>
@@ -41,22 +46,25 @@ public class Relinearlize {
 	// number of control points.  4 for general 3 for planar
 	int numControl;
 
+	// how much of the null space is sued
+	int numNull;
+
 	// contains the null space
 	DenseMatrix64F V;
 	// contains one possible solution
 	DenseMatrix64F x0 = new DenseMatrix64F(1,1);
 	// lookup table for indices
-	int table[] = new int[4*4];
+	int table[] = new int[10*10];
 
 	SingularValueDecomposition<DenseMatrix64F> svd =
 			DecompositionFactory.svd(3, 3, false, true, false);
 
 	// used inside of solveConstraintMatrix
-	DenseMatrix64F AA = new DenseMatrix64F(10,9);
-	DenseMatrix64F yy = new DenseMatrix64F(10,1);
-	DenseMatrix64F xx = new DenseMatrix64F(9,1);
+	DenseMatrix64F AA = new DenseMatrix64F(1,1);
+	DenseMatrix64F yy = new DenseMatrix64F(1,1);
+	DenseMatrix64F xx = new DenseMatrix64F(1,1);
 
-	// used to compute one possible soluton
+	// used to compute one possible solution
 	LinearSolver<DenseMatrix64F> pseudo = LinearSolverFactory.pseudoInverse();
 
 	// stores constraints
@@ -70,23 +78,26 @@ public class Relinearlize {
 	 */
 	public void setNumberControl( int numControl ) {
 		this.numControl = numControl;
-		int index = 0;
-		for( int i = 0; i < numControl; i++ ) {
-			for( int j = i; j < numControl; j++ ) {
-				table[i*numControl+j] = table[j*numControl+i] = index++;
-			}
-		}
 
 		if( numControl == 4 ) {
 			x0.reshape(10,1,false);
 			AA.reshape(10,9,false);
 			yy.reshape(10,1,false);
 			xx.reshape(9,1,false);
+			numNull = 3;
 		} else {
 			x0.reshape(6,1,false);
-			AA.reshape(10,9,false);
-			yy.reshape(10,1,false);
-			xx.reshape(9,1,false);
+			AA.reshape(4,2,false);
+			yy.reshape(4,1,false);
+			xx.reshape(2,1,false);
+			numNull = 1;
+		}
+
+		int index = 0;
+		for( int i = 0; i < numControl; i++ ) {
+			for( int j = i; j < numControl; j++ ) {
+				table[i*numControl+j] = table[j*numControl+i] = index++;
+			}
 		}
 	}
 
@@ -112,16 +123,11 @@ public class Relinearlize {
 		DenseMatrix64F alphas = solveConstraintMatrix();
 
 		// compute the final solution
-		for( int i = 0; i < x0.numCols; i++ ) {
-			for( int j = 0; j < 3; j++ ) {
+		for( int i = 0; i < x0.numRows; i++ ) {
+			for( int j = 0; j < numNull; j++ ) {
 				x0.data[i] += alphas.data[j]*valueNull(j,i);
 			}
 		}
-		
-		y.print();
-		CommonOps.mult(L_full,x0,y);
-		y.print();
-		
 
 		if( numControl == 4 ) {
 			betas[0] = Math.sqrt(Math.abs(x0.data[0]));
@@ -147,54 +153,56 @@ public class Relinearlize {
 	protected DenseMatrix64F solveConstraintMatrix() {
 
 		int rowAA = 0;
-		for( int i = 0; i < 4; i++ ) {
-			for( int j = i+1; j < 4; j++ ) {
-				for( int k = j; k < 4; k++ , rowAA++ ) {
+		for( int i = 0; i < numControl; i++ ) {
+			for( int j = i+1; j < numControl; j++ ) {
+				for( int k = j; k < numControl; k++ , rowAA++ ) {
 					// x_{ii}*x_{jk} = x_{ik}*x_{ji}
 					extractXaXb(getIndex(i, i), getIndex(j, k), XiiXjk);
 					extractXaXb(getIndex(i, k), getIndex(j, i), XikXji);
 
-					for( int l = 1; l < 10; l++ ) {
+					for( int l = 1; l <= AA.numCols; l++ ) {
 						AA.set(rowAA,l-1,XikXji[l]-XiiXjk[l]);
 					}
 					yy.set(rowAA,XiiXjk[0]-XikXji[0]);
 				}
 			}
 		}
-
+//		AA.print();
 		CommonOps.solve(AA, yy, xx);
-		
+
 		return xx;
 	}
-	
+
 	public double valueNull( int which , int index ) {
 		return V.get(V.numCols-numControl+which,index);
 	}
-	
+
 	private int getIndex( int i , int j ) {
 		return table[i*numControl+j];
 	}
-	
+
 	private void extractXaXb(int indexA, int indexB, double quadratic[]) {
 
 		double x0a = x0.get(indexA);
 		double v0a = valueNull(0, indexA);
-		double v1a = valueNull(1, indexA);
 
 		double x0b = x0.get(indexB);
 		double v0b = valueNull(0, indexB);
-		double v1b = valueNull(1, indexB);
 
 		if( numControl == 4 ) {
+			double v1a = valueNull(1, indexA);
 			double v2a = valueNull(2, indexA);
+			
+			double v1b = valueNull(1, indexB);
 			double v2b = valueNull(2, indexB);
 			multiplyQuadratic4(x0a,v0a,v1a,v2a,x0b,v0b,v1b,v2b,quadratic);
-		} else
-			multiplyQuadratic3(x0a,v0a,v1a,x0b,v0b,v1b,quadratic);
+		} else {
+			multiplyQuadratic2(x0a,v0a,x0b,v0b,quadratic);
+		}
 	}
 
-	
-	private void multiplyQuadratic4( double x0 , double x1 , double x2 , double x3 , 
+
+	private void multiplyQuadratic4( double x0 , double x1 , double x2 , double x3 ,
 									 double y0 , double y1 , double y2 , double y3 ,
 									 double quadratic[] )
 	{
@@ -210,15 +218,12 @@ public class Relinearlize {
 		quadratic[9] = x3*y3;
 	}
 
-	private void multiplyQuadratic3( double x0 , double x1 , double x2 ,
-									 double y0 , double y1 , double y2  ,
+	private void multiplyQuadratic2( double x0 , double x1 ,
+									 double y0 , double y1 ,
 									 double quadratic[] )
 	{
 		quadratic[0] = x0*y0;
 		quadratic[1] = x0*y1 + y0*x1;
-		quadratic[2] = x0*y2 + y0*x2;
-		quadratic[3] = x1*y1;
-		quadratic[4] = x1*y2 + y1*x2;
-		quadratic[5] = x2*y2;
+		quadratic[2] = x1*y1;
 	}
 }

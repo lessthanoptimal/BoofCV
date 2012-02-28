@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.epipolar.pose;
 
+import boofcv.struct.FastQueue;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -25,7 +26,7 @@ import java.util.List;
 
 /**
  * Various utility functions for {@link PnPLepetitEPnP}.
- * 
+ *
  * @author Peter Abeles
  */
 public class UtilLepetitEPnP {
@@ -39,19 +40,19 @@ public class UtilLepetitEPnP {
 	 */
 	public static void computeCameraControl(double beta[],
 											List<Point3D_F64> nullPts[],
-											List<Point3D_F64> cameraPts ) {
-
-		int N = cameraPts.size();
-
-		for( int i = 0; i < N; i++ ) {
-			cameraPts.get(i).set(0,0,0);
+											FastQueue<Point3D_F64> cameraPts ,
+											int numControl )
+	{
+		cameraPts.reset();
+		for( int i = 0; i < numControl; i++ ) {
+			cameraPts.pop().set(0,0,0);
 		}
 
-		for( int i = 0; i < beta.length; i++ ) {
+		for( int i = 0; i < numControl; i++ ) {
 			double b = beta[i];
 //			System.out.printf("%7.3f ", b);
 
-			for( int j = 0; j < N; j++ ) {
+			for( int j = 0; j < numControl; j++ ) {
 				Point3D_F64 s = cameraPts.get(j);
 				Point3D_F64 p = nullPts[i].get(j);
 				s.x += b*p.x;
@@ -113,7 +114,7 @@ public class UtilLepetitEPnP {
 	 * @param nullPts Null points
 	 */
 	public static void constraintMatrix6x10( DenseMatrix64F L , DenseMatrix64F y ,
-											 List<Point3D_F64> controlWorldPts ,
+											 FastQueue<Point3D_F64> controlWorldPts ,
 											 List<Point3D_F64> nullPts[] ) {
 		int row = 0;
 		for( int i = 0; i < 4; i++ ) {
@@ -210,8 +211,8 @@ public class UtilLepetitEPnP {
 	 * @param nullPts Null points
 	 */
 	public static void constraintMatrix3x6( DenseMatrix64F L , DenseMatrix64F y ,
-											 List<Point3D_F64> controlWorldPts ,
-											 List<Point3D_F64> nullPts[] ) {
+											FastQueue<Point3D_F64> controlWorldPts ,
+											List<Point3D_F64> nullPts[] ) {
 		int row = 0;
 		for( int i = 0; i < 3; i++ ) {
 			Point3D_F64 ci = controlWorldPts.get(i);
@@ -260,7 +261,7 @@ public class UtilLepetitEPnP {
 	/**
 	 * Computes the residuals (difference between observed and predicted) given 4 control points.
 	 */
-	public static void residuals_Control4( DenseMatrix64F L_full , DenseMatrix64F y , 
+	public static void residuals_Control4( DenseMatrix64F L_full , DenseMatrix64F y ,
 										   double beta[] , double r[] )
 	{
 		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2]; double b3 = beta[3];
@@ -334,7 +335,7 @@ public class UtilLepetitEPnP {
 	 * Computes the Jacobian given 3 control points.
 	 */
 	public static void jacobian_Control3( DenseMatrix64F L_full ,
-											double beta[] ,  DenseMatrix64F A)
+										  double beta[] ,  DenseMatrix64F A)
 	{
 		int indexA = 0;
 

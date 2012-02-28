@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.epipolar.pose;
 
+import boofcv.struct.FastQueue;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 import georegression.geometry.UtilPoint3D_F64;
@@ -39,8 +40,8 @@ import java.util.List;
 
 /**
  * <p>
- * Implementation of the EPnP algorithm from [1] for solving the PnP problem when N >= 4 for the general case
- * and N >= 3 for planar data.  Given a calibrated camera, n pairs of 2D point observations and the known 3D
+ * Implementation of the EPnP algorithm from [1] for solving the PnP problem when N >= 5 for the general case
+ * and N >= 4 for planar data (see note below).  Given a calibrated camera, n pairs of 2D point observations and the known 3D
  * world coordinates, it solves the for camera's pose.. This solution is non-iterative and claims to be much
  * faster and more accurate than the alternatives.  Works for both planar and non-planar configurations.
  * </p>
@@ -68,7 +69,10 @@ import java.util.List;
  *
  * <p>
  * MINIMUM POINTS: In theory only 4 points are needed for the general case and 3 for planar data.
- *
+ * In practice it produces very poor results on average.  The matlab code provided by the original author
+ * also exhibits instability in the minimum case.  The article also does not show results for the minimum
+ * case, making it hard to judge what should be expected.  However, I'm not ruling out there being a bug
+ * in relinearization.  See that code for comments.
  * </p>
  *
  * <p>
@@ -98,6 +102,7 @@ public class PnPLepetitEPnP {
 	// used to solve various linear problems
 	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(12,12,false,true,false);
 	private LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.leastSquares(6,4);
+	private LinearSolver<DenseMatrix64F> solverPinv = LinearSolverFactory.pseudoInverse();
 
 	// weighting factor to go from control point into world coordinate
 	protected DenseMatrix64F alphas = new DenseMatrix64F(1,1);
@@ -119,11 +124,11 @@ public class PnPLepetitEPnP {
 	protected List<Point3D_F64> nullPts[] = new ArrayList[4];
 
 	// control points in world coordinate frame
-	protected List<Point3D_F64> controlWorldPts = new ArrayList<Point3D_F64>();
+	protected FastQueue<Point3D_F64> controlWorldPts = new FastQueue<Point3D_F64>(4,Point3D_F64.class,true);
 
 	// list of found solutions
 	private List<double []> solutions = new ArrayList<double[]>();
-	protected List<Point3D_F64> solutionPts = new ArrayList<Point3D_F64>();
+	protected FastQueue<Point3D_F64> solutionPts = new FastQueue<Point3D_F64>(4,Point3D_F64.class,true);
 
 	// estimates rigid body motion between two associated sets of points
 	private MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
@@ -133,18 +138,23 @@ public class PnPLepetitEPnP {
 
 	// mean location of world points
 	private Point3D_F64 meanWorldPts;
-	
+
 	// number of iterations it will perform
 	private int numIterations;
 
 	// adjusts world control point distribution
 	private double magicNumber;
 
-	// handles the hard cases
+	// handles the hard case #4
 	Relinearlize relinearizeBeta = new Relinearlize();
 
-
-
+	// declaring data for local use inside a function
+	// in general its good to avoid declaring and destroying massive amounts of data in Java
+	// this is probably going too far though
+	private List<Point3D_F64> tempPts0 = new ArrayList<Point3D_F64>(); // 4 points stored in it
+	DenseMatrix64F A_temp = new DenseMatrix64F(1,1);
+	DenseMatrix64F v_temp = new DenseMatrix64F(3,1);
+	DenseMatrix64F w_temp = new DenseMatrix64F(1,1);
 
 	/**
 	 * Constructor which uses the default magic number
@@ -168,10 +178,9 @@ public class PnPLepetitEPnP {
 			throw new IllegalArgumentException("Crap");
 
 		for( int i = 0; i < 4; i++ ) {
-			controlWorldPts.add( new Point3D_F64() );
+			tempPts0.add( new Point3D_F64());
 			nullPts[i] = new ArrayList<Point3D_F64>();
 			solutions.add( new double[4]);
-			solutionPts.add(new Point3D_F64());
 			for( int j = 0; j < 4; j++ ) {
 				nullPts[i].add( new Point3D_F64());
 			}
@@ -201,7 +210,6 @@ public class PnPLepetitEPnP {
 
 		// select world control points using the points statistics
 		selectWorldControlPoints(worldPts, controlWorldPts);
-
 		// compute barycentric coordinates for the world control points
 		computeBarycentricCoordinates(controlWorldPts, alphas, worldPts );
 		// create the linear system whose null space will contain the camera control points
@@ -209,33 +217,28 @@ public class PnPLepetitEPnP {
 		// the camera points are a linear combination of these null points
 		extractNullPoints(M);
 
-		// todo clean up declaration of data
-		solutionPts.clear();
-		for( int i = 0; i < numControl; i++ ) {
-			solutionPts.add( new Point3D_F64());
-		}
-
 		// compute the full constraint matrix, the others are extracted from this
-		outside:
 		if( numControl == 4 ) {
-			L_full.reshape(6, 10, false);
-			y.reshape(6,1,false);
+			L_full.reshape(6, 10);
+			y.reshape(6,1);
 			UtilLepetitEPnP.constraintMatrix6x10(L_full,y,controlWorldPts,nullPts);
 
 			// compute 4 solutions using the null points
 			estimateCase1(solutions.get(0));
 			estimateCase2(solutions.get(1));
 			estimateCase3(solutions.get(2));
-			estimateCase4(solutions.get(3));
+			if( worldPts.size() == 4 ) // results are bad in general, so skip unless needed
+				estimateCase4(solutions.get(3));
 		} else {
-			L_full.reshape(3, 6, false);
-			y.reshape(3,1,false);
+			L_full.reshape(3, 6);
+			y.reshape(3,1);
 			UtilLepetitEPnP.constraintMatrix3x6(L_full, y, controlWorldPts, nullPts);
 
 			// compute 4 solutions using the null points
 			estimateCase1(solutions.get(0));
 			estimateCase2(solutions.get(1));
-			estimateCase3_planar(solutions.get(2));
+			if( worldPts.size() == 3 ) // results are bad in general, so skip unless needed
+				estimateCase3_planar(solutions.get(2));
 		}
 
 		computeResultFromBest();
@@ -248,12 +251,13 @@ public class PnPLepetitEPnP {
 	private void computeResultFromBest( ) {
 		double bestScore = Double.MAX_VALUE;
 		int bestSolution=-1;
-		for( int i = 0; i < 4; i++ ) {
+		for( int i = 0; i < numControl; i++ ) {
 			double score = score(solutions.get(i));
 			if( score < bestScore ) {
 				bestScore = score;
 				bestSolution = i;
 			}
+//			System.out.println(i+" score "+score);
 		}
 
 		double []solution = solutions.get(bestSolution);
@@ -261,8 +265,8 @@ public class PnPLepetitEPnP {
 			gaussNewton(solution);
 		}
 
-		UtilLepetitEPnP.computeCameraControl(solution,nullPts,solutionPts);
-		motionFit.process(controlWorldPts, solutionPts);
+		UtilLepetitEPnP.computeCameraControl(solution,nullPts,solutionPts,numControl);
+		motionFit.process(controlWorldPts.toList(), solutionPts.toList());
 
 		solutionMotion.set(motionFit.getMotion());
 	}
@@ -274,7 +278,7 @@ public class PnPLepetitEPnP {
 	 * paper.
 	 */
 	private double score(double betas[]) {
-		UtilLepetitEPnP.computeCameraControl(betas,nullPts, solutionPts);
+		UtilLepetitEPnP.computeCameraControl(betas,nullPts, solutionPts,numControl);
 
 		int index = 0;
 		double score = 0;
@@ -300,7 +304,7 @@ public class PnPLepetitEPnP {
 	 * The data's axis is determined by computing the covariance matrix then performing SVD.  The axis
 	 * is contained along the
 	 */
-	public void selectWorldControlPoints(List<Point3D_F64> worldPts, List<Point3D_F64> controlWorldPts) {
+	public void selectWorldControlPoints(List<Point3D_F64> worldPts, FastQueue<Point3D_F64> controlWorldPts) {
 
 		meanWorldPts = UtilPoint3D_F64.mean(worldPts);
 
@@ -337,10 +341,8 @@ public class PnPLepetitEPnP {
 			numControl = 3;
 		}
 
-		// first control point in the centroid
-		controlWorldPts.clear();
-
-		// rest of the control points are along the data's major axises
+		// put control points along the data's major axises
+		controlWorldPts.reset();
 		for( int i = 0; i < numControl-1; i++ ) {
 			double m = Math.sqrt(singularValues[1])*magicNumber;
 
@@ -348,9 +350,10 @@ public class PnPLepetitEPnP {
 			double vy = V.unsafe_get(1, i)*m;
 			double vz = V.unsafe_get(2, i)*m;
 
-			controlWorldPts.add(new Point3D_F64(meanWorldPts.x + vx, meanWorldPts.y + vy, meanWorldPts.z + vz));
+			controlWorldPts.pop().set(meanWorldPts.x + vx, meanWorldPts.y + vy, meanWorldPts.z + vz);
 		}
-		controlWorldPts.add(new Point3D_F64(meanWorldPts.x, meanWorldPts.y, meanWorldPts.z));
+		// set a control point to be the centroid
+		controlWorldPts.pop().set(meanWorldPts.x, meanWorldPts.y, meanWorldPts.z);
 	}
 
 	/**
@@ -365,53 +368,44 @@ public class PnPLepetitEPnP {
 	 * X = [ cameraPts' ; ones(1,N) ]
 	 * </p>
 	 */
-	protected void computeBarycentricCoordinates(List<Point3D_F64> controlWorldPts,
+	protected void computeBarycentricCoordinates(FastQueue<Point3D_F64> controlWorldPts,
 												 DenseMatrix64F alphas,
 												 List<Point3D_F64> worldPts )
 	{
 		alphas.reshape(worldPts.size(),numControl,false);
+		v_temp.reshape(3,1);
+		A_temp.reshape(3, numControl - 1);
 
-		DenseMatrix64F A = new DenseMatrix64F(3,numControl-1);
 		for( int i = 0; i < numControl-1; i++ ) {
 			Point3D_F64 c = controlWorldPts.get(i);
-			A.set(0,i,c.x- meanWorldPts.x);
-			A.set(1,i,c.y- meanWorldPts.y);
-			A.set(2,i,c.z- meanWorldPts.z);
+			A_temp.set(0, i, c.x - meanWorldPts.x);
+			A_temp.set(1, i, c.y - meanWorldPts.y);
+			A_temp.set(2, i, c.z - meanWorldPts.z);
 		}
 
-//		if( !solver.setA(A) )
-//			throw new RuntimeException("solve failed!");
-//
-//		System.out.println("quality "+solver.quality());
+		// invert the matrix
+		solverPinv.setA(A_temp);
+		A_temp.reshape(A_temp.numCols, A_temp.numRows);
+		solverPinv.invert(A_temp);
 
-		DenseMatrix64F A_inv = new DenseMatrix64F(A.numCols,A.numRows);
-		CommonOps.pinv(A,A_inv);
-//		if( !CommonOps.invert(A) )
-//			throw new RuntimeException("Control points are singular?!?");
-
-		DenseMatrix64F v = new DenseMatrix64F(3,1);
-		DenseMatrix64F w = new DenseMatrix64F(numControl-1,1);
-
-		// set last element to one
-//		v.set(3, 1);
+		w_temp.reshape(numControl - 1, 1);
 
 		for( int i = 0; i < worldPts.size(); i++ ) {
 			Point3D_F64 p = worldPts.get(i);
-			v.data[0] = p.x- meanWorldPts.x;
-			v.data[1] = p.y- meanWorldPts.y;
-			v.data[2] = p.z- meanWorldPts.z;
+			v_temp.data[0] = p.x- meanWorldPts.x;
+			v_temp.data[1] = p.y- meanWorldPts.y;
+			v_temp.data[2] = p.z- meanWorldPts.z;
 
-//			solver.solve(v,w);
-			MatrixVectorMult.mult(A_inv, v, w);
+			MatrixVectorMult.mult(A_temp, v_temp, w_temp);
 
 			int rowIndex = alphas.numCols*i;
 			for( int j = 0; j < numControl-1; j++ )
-				alphas.data[rowIndex++] = w.data[j];
+				alphas.data[rowIndex++] = w_temp.data[j];
 
 			if( numControl == 4 )
-				alphas.data[rowIndex] = 1 - w.data[0] - w.data[1] - w.data[2];
+				alphas.data[rowIndex] = 1 - w_temp.data[0] - w_temp.data[1] - w_temp.data[2];
 			else
-				alphas.data[rowIndex] = 1 - w.data[0] - w.data[1];
+				alphas.data[rowIndex] = 1 - w_temp.data[0] - w_temp.data[1];
 		}
 	}
 
@@ -469,15 +463,16 @@ public class PnPLepetitEPnP {
 		SingularOps.descendingOrder(null,false,singularValues,3,V,false);
 
 		// extract null points from the null space
-		for( int i = 0; i < 4; i++ ) {
+		for( int i = 0; i < numControl; i++ ) {
 			int column = M.numRows-1-i;
-			nullPts[i].clear();
+//			nullPts[i].clear();
 			for( int j = 0; j < numControl; j++ ) {
-				Point3D_F64 p = new Point3D_F64();
+				Point3D_F64 p = nullPts[i].get(j);
+//				Point3D_F64 p = new Point3D_F64();
 				p.x = V.get(j*3+0,column);
 				p.y = V.get(j*3+1,column);
 				p.z = V.get(j*3+2,column);
-				nullPts[i].add(p);
+//				nullPts[i].add(p);
 			}
 		}
 	}
@@ -487,10 +482,10 @@ public class PnPLepetitEPnP {
 	 * between world control points and the null points.
 	 */
 	protected double matchScale( List<Point3D_F64> nullPts ,
-								 List<Point3D_F64> controlWorldPts ) {
+								 FastQueue<Point3D_F64> controlWorldPts ) {
 
-		Point3D_F64 meanNull = UtilPoint3D_F64.mean(nullPts);
-		Point3D_F64 meanWorld = UtilPoint3D_F64.mean(controlWorldPts);
+		Point3D_F64 meanNull = UtilPoint3D_F64.mean(nullPts,numControl);
+		Point3D_F64 meanWorld = UtilPoint3D_F64.mean(controlWorldPts.toList(),numControl);
 
 		// compute the ratio of distance between world and null points from the centroid
 		double top = 0;
@@ -552,23 +547,21 @@ public class PnPLepetitEPnP {
 	 * using the {@llin #matchScale} function.
 	 */
 	private void refine( double betas[] ) {
-		List<Point3D_F64> v = new ArrayList<Point3D_F64>();
-
 		for( int i = 0; i < numControl; i++ ) {
 			double x=0,y=0,z=0;
 
-			for( int j = 0; j < 4; j++ ) {
+			for( int j = 0; j < numControl; j++ ) {
 				Point3D_F64 p = nullPts[j].get(i);
 				x += betas[j]*p.x;
 				y += betas[j]*p.y;
 				z += betas[j]*p.z;
 			}
 
-			v.add(new Point3D_F64(x,y,z));
+			tempPts0.get(i).set(x,y,z);
 		}
 
-		double adj = matchScale(v,controlWorldPts);
-		adj = adjustBetaSign(adj,v);
+		double adj = matchScale(tempPts0,controlWorldPts);
+		adj = adjustBetaSign(adj,tempPts0);
 
 		for( int i = 0; i < 4; i++ ) {
 			betas[i] *= adj;
@@ -584,8 +577,6 @@ public class PnPLepetitEPnP {
 		betas[0] = adjustBetaSign(betas[0],nullPts[0]);
 		betas[1] = 0; betas[2] = 0; betas[3] = 0;
 	}
-
-	// todo try alternative case1 here again later.  maybe it will create a reasonable solution?
 
 	protected void estimateCase2( double betas[] ) {
 
@@ -621,7 +612,6 @@ public class PnPLepetitEPnP {
 		if( !solver.setA(L) )
 			throw new RuntimeException("Oh crap");
 
-//		System.out.println("Quality estimateCase3 "+solver.quality());
 		solver.solve(y,x);
 
 		betas[0] = Math.sqrt(Math.abs(x.get(0)));
@@ -659,20 +649,20 @@ public class PnPLepetitEPnP {
 	 */
 	private void gaussNewton( double betas[] ) {
 
-		DenseMatrix64F A = new DenseMatrix64F(L_full.numRows,numControl);
-		DenseMatrix64F r = new DenseMatrix64F(L_full.numRows,1);
+		A_temp.reshape(L_full.numRows, numControl);
+		v_temp.reshape(L_full.numRows, 1);
 		x.reshape(numControl,1,false);
 
 		// don't check numControl inside in hope that the JVM can optimize the code better
 		if( numControl == 4 ) {
 			for( int i = 0; i < numIterations; i++ ) {
-				UtilLepetitEPnP.jacobian_Control4(L_full,betas,A);
-				UtilLepetitEPnP.residuals_Control4(L_full,y,betas,r.data);
+				UtilLepetitEPnP.jacobian_Control4(L_full,betas, A_temp);
+				UtilLepetitEPnP.residuals_Control4(L_full,y,betas,v_temp.data);
 
-				if( !solver.setA(A) )
+				if( !solver.setA(A_temp) )
 					return;
-			
-				solver.solve(r,x);
+
+				solver.solve(v_temp,x);
 
 				for( int j = 0; j < numControl; j++ ) {
 					betas[j] -= x.data[j];
@@ -680,13 +670,13 @@ public class PnPLepetitEPnP {
 			}
 		} else {
 			for( int i = 0; i < numIterations; i++ ) {
-				UtilLepetitEPnP.jacobian_Control3(L_full,betas,A);
-				UtilLepetitEPnP.residuals_Control3(L_full,y,betas,r.data);
+				UtilLepetitEPnP.jacobian_Control3(L_full,betas, A_temp);
+				UtilLepetitEPnP.residuals_Control3(L_full,y,betas,v_temp.data);
 
-				if( !solver.setA(A) )
+				if( !solver.setA(A_temp) )
 					return;
 
-				solver.solve(r,x);
+				solver.solve(v_temp,x);
 
 				for( int j = 0; j < numControl; j++ ) {
 					betas[j] -= x.data[j];
@@ -696,14 +686,14 @@ public class PnPLepetitEPnP {
 	}
 
 	/**
-	 * Returns the minimum number of points required to make an estimate.  The four
-	 * point case seems to be a bit unstable in some situations.  five or more is very
-	 * stable.
+	 * Returns the minimum number of points required to make an estimate.  Technically
+	 * it is 4 for general and 3 for planar.  The minimum number of point cases
+	 * seem to be a bit unstable in some situations.  minimum + 1 or more is stable.
 	 *
 	 * @return minimum number of points
 	 */
 	public int getMinPoints () {
-		return 4;
+		return 5;
 	}
 
 	/**

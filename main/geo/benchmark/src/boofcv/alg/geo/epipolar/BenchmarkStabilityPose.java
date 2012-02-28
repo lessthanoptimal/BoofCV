@@ -50,7 +50,7 @@ public class BenchmarkStabilityPose extends ArtificialStereoScene {
 			double mag = (max-min)*i/N+min;
 			
 			init(NUM_POINTS,false,isPlanar);
-			addObservationNoise(mag);
+			addPixelNoise(mag);
 			
 			for( int j = 0; j < NUM_POINTS; j++ ) {
 				inputs.add(new PointPositionPair(pairs.get(j).currLoc, worldPoints.get(j)));
@@ -66,24 +66,26 @@ public class BenchmarkStabilityPose extends ArtificialStereoScene {
 			Vector3D_F64 expectedTran = motion.getT();
 			Vector3D_F64 foundTran = found.getT();
 
-			double errorEuler = 0;
 			double errorTran = expectedTran.distance(foundTran);
+			double errorEuler = 0;
+			double sum = 0;
 			for( int j = 0; j < 3; j++ ) {
 				double e = expectedEuler[j]-foundEuler[j];
 				errorEuler += e*e;
+				sum += expectedEuler[j];
 			}
-			errorEuler = Math.sqrt(errorEuler);
+			errorEuler = 100*Math.sqrt(errorEuler)/Math.sqrt(sum);
 
-			System.out.printf("%3d angle %6.2e  translation %6.2e\n", i,errorEuler, errorTran);
+			System.out.printf("%3d angle %6.2f%% translation %6.2e\n", i,errorEuler, errorTran);
 		}
 	}
 	
 	public static void main( String args[] ) {
-		double max = 0.05;
+		double max = 15;
 		boolean planar = false;
 
 		BenchmarkStabilityPose app = new BenchmarkStabilityPose();
-		app.target = FactoryEpipolar.pnpEfficientPnP(0,0.1);
+		app.target = FactoryEpipolar.pnpEfficientPnP(0,1);
 		app.evaluateObservationNoise(0,max,20,planar);
 		app.target = FactoryEpipolar.pnpEfficientPnP(10,0.1);
 		app.evaluateObservationNoise(0,max,20,planar);
