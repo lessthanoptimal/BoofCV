@@ -21,6 +21,7 @@ package boofcv.io.video;
 import boofcv.io.InputListManager;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 
 import java.io.FileInputStream;
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VideoListManager<T extends ImageSingleBand> implements InputListManager {
+public class VideoListManager<T extends ImageBase> implements InputListManager {
 	protected List<String> labels = new ArrayList<String>();
 	protected List<String> videoType = new ArrayList<String>();
 	protected List<String[]> fileNames = new ArrayList<String[]>();

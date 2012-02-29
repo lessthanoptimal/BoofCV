@@ -28,8 +28,8 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.ConfigureReaderInterface;
-import boofcv.io.SimpleNumberSequenceReader;
+import boofcv.io.ConfigureFileInterface;
+import boofcv.io.SimpleStringNumberReader;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -42,7 +42,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
@@ -51,7 +50,7 @@ import java.util.List;
  */
 public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends SelectImagePanel implements ProcessInput, GridCalibPanel.Listener ,
-		ConfigureReaderInterface
+		ConfigureFileInterface
 		
 {
 	Class<T> imageType;
@@ -93,19 +92,24 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	@Override
-	public void configure(Reader input) {
-		SimpleNumberSequenceReader reader = new SimpleNumberSequenceReader('#');
-		try {
-			List<Double> s = reader.read(input);
-
-			int numCols = s.get(0).intValue();
-			int numRows = s.get(1).intValue();
-
-			configure(numCols,numRows);
-
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+	public void configure( String fileName ) {
+		Reader r = media.openFile(fileName);
+		
+		SimpleStringNumberReader reader = new SimpleStringNumberReader('#');
+		if( !reader.read(r) )
+			throw new RuntimeException("Parsing configuration failed");
+		
+		if( reader.remainingTokens() != 4)
+			throw new RuntimeException("Not enough tokens in config file");
+		
+		if( !(reader.nextString().compareToIgnoreCase("chess") == 0)) {
+			throw new RuntimeException("Not a chessboard config file");
 		}
+
+		int numCols = (int)reader.nextDouble();
+		int numRows = (int)reader.nextDouble();
+
+		configure(numCols,numRows);
 	}
 
 	public synchronized void process( final BufferedImage input ) {
@@ -125,12 +129,16 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		});
 	}
 
-	private void detectTarget() {
+	private synchronized void detectTarget() {
 		foundTarget = alg.process(gray);
-		calibGUI.setThreshold((int)alg.getSelectedThreshold());
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				calibGUI.setThreshold((int) alg.getSelectedThreshold());
+			}
+		});
 	}
 
-	private void renderOutput() {
+	private synchronized void renderOutput() {
 		switch( calibGUI.getSelectedView() ) {
 			case 0:
 				workImage.createGraphics().drawImage(input,null,null);
@@ -246,7 +254,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess/";
 
-		app.configure(new FileReader(prefix+"info.txt"));
+		app.configure(prefix+"info.txt");
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("View 01",prefix+"frame01.jpg");

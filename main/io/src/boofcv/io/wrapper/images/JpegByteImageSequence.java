@@ -21,6 +21,7 @@ package boofcv.io.wrapper.images;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 
 import javax.imageio.ImageIO;
@@ -37,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class JpegByteImageSequence<T extends ImageSingleBand> implements SimpleImageSequence<T> {
+public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSequence<T> {
 
 	int index;
 	List<byte[]> jpegData = new ArrayList<byte[]>();
@@ -58,7 +59,7 @@ public class JpegByteImageSequence<T extends ImageSingleBand> implements SimpleI
 		this.jpegData = jpegData;
 		this.loop = loop;
 
-		output = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		output = (T)GeneralizedImageOps.createSingleBand((Class)imageType, 1, 1);
 	}
 
 	@Override
@@ -91,7 +92,7 @@ public class JpegByteImageSequence<T extends ImageSingleBand> implements SimpleI
 		}
 
 		output.reshape(imageGUI.getWidth(),imageGUI.getHeight());
-		ConvertBufferedImage.convertFromSingle(imageGUI, output, imageType);
+		ConvertBufferedImage.convertFromSingle(imageGUI, (ImageSingleBand)output, (Class)imageType);
 
 		return output;
 	}

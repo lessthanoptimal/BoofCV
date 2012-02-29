@@ -18,20 +18,37 @@
 
 package boofcv.io;
 
-import java.io.InputStream;
-import java.io.Reader;
+import javax.swing.*;
 
 /**
- * Implementers of this interface can be configured using data from an {@link InputStream}
- *
  * @author Peter Abeles
  */
-public interface ConfigureReaderInterface {
+public abstract class ProgressMonitorThread extends Thread {
+	
+	volatile boolean active = true;
+	
+	public ProgressMonitor monitor;
 
-	/**
-	 * Provides an input stream to the configuration data
-	 *
-	 * @param input Stream for reading in configuration data
-	 */
-	public void configure( Reader input );
+	protected ProgressMonitorThread(ProgressMonitor monitor) {
+		this.monitor = monitor;
+	}
+
+	public synchronized void run() {
+		while( active ) {
+			doRun();
+			try {
+				wait(200);
+			} catch (InterruptedException e) {}
+		}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				monitor.close();
+			}});
+	}
+	
+	public abstract void doRun();
+
+	public void stopThread() {
+		active = false;
+	}
 }

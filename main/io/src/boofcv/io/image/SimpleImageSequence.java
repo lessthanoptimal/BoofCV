@@ -18,6 +18,7 @@
 
 package boofcv.io.image;
 
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
@@ -28,7 +29,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public interface SimpleImageSequence<T extends ImageSingleBand> {
+public interface SimpleImageSequence<T extends ImageBase> {
 
 	/**
 	 * If a new image is available.
