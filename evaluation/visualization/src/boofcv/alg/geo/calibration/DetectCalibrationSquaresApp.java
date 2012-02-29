@@ -30,8 +30,8 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.ConfigureReaderInterface;
-import boofcv.io.SimpleNumberSequenceReader;
+import boofcv.io.ConfigureFileInterface;
+import boofcv.io.SimpleStringNumberReader;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -43,7 +43,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +54,7 @@ import java.util.List;
  */
 public class DetectCalibrationSquaresApp
 		extends SelectImagePanel implements ProcessInput , GridCalibPanel.Listener ,
-		ConfigureReaderInterface
+		ConfigureFileInterface
 {
 	int targetColumns;
 	int targetRows;
@@ -108,19 +107,24 @@ public class DetectCalibrationSquaresApp
 	}
 
 	@Override
-	public void configure(Reader input) {
-		SimpleNumberSequenceReader reader = new SimpleNumberSequenceReader('#');
-		try {
-			List<Double> s = reader.read(input);
+	public void configure( String configName ) {
+		Reader r = media.openFile(configName);
+		
+		SimpleStringNumberReader reader = new SimpleStringNumberReader('#');
+		if( !reader.read(r) )
+			throw new RuntimeException("Parsing configuration failed");
 
-			int numCols = s.get(0).intValue();
-			int numRows = s.get(1).intValue();
+		if( reader.remainingTokens() != 5)
+			throw new RuntimeException("Not enough tokens in config file");
 
-			configure(numCols,numRows);
-
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		if( !(reader.nextString().compareToIgnoreCase("square") == 0)) {
+			throw new RuntimeException("Not a square grid config file");
 		}
+
+		int numCols = (int)reader.nextDouble();
+		int numRows = (int)reader.nextDouble();
+
+		configure(numCols,numRows);
 	}
 
 	public synchronized void process( final BufferedImage input ) {
@@ -129,6 +133,13 @@ public class DetectCalibrationSquaresApp
 		gray.reshape(input.getWidth(),input.getHeight());
 		binary.reshape(gray.width,gray.height);
 		ConvertBufferedImage.convertFrom(input,gray);
+
+		doRefreshAll();
+	}
+
+	@Override
+	public void refreshAll( Object[] cookies ) {
+		super.refreshAll(cookies);
 
 		detectTarget();
 
@@ -291,14 +302,7 @@ public class DetectCalibrationSquaresApp
 
 	@Override
 	public synchronized void calibEventProcess() {
-		detectTarget();
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setPreferredSize(new Dimension(input.getWidth(), input.getHeight()));
-				renderOutput();
-			}
-		});
+		doRefreshAll();
 	}
 
 	/**
@@ -324,7 +328,7 @@ public class DetectCalibrationSquaresApp
 
 		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
 
-		app.configure(new FileReader(prefix+"info.txt"));
+		app.configure(prefix+"info.txt");
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("View 01",prefix+"frame10.jpg");

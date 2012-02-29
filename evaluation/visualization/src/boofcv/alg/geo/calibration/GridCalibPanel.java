@@ -58,7 +58,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	boolean doShowBound = true;
 	boolean doShowPoints = true;
 	boolean doShowNumbers = true;
-	boolean doShowGraph = true;
+	boolean doShowGraph = false;
 
 	double scale = 1;
 	boolean isManual = false;

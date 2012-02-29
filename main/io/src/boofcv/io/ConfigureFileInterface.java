@@ -16,19 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.io.video;
+package boofcv.io;
 
-import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
-
+import java.io.InputStream;
+import java.io.Reader;
 
 /**
- * Abstract interface for loading video streams.
+ * Implementers of this interface can be configured using data from an {@link InputStream}
  *
  * @author Peter Abeles
  */
-public interface VideoInterface {
+public interface ConfigureFileInterface {
 
-	public <T extends ImageBase> SimpleImageSequence<T> load( String fileName , Class<T> imageType );
+	/**
+	 * Provides an input stream to the configuration data
+	 *
+	 * @param fileName Which file is to be used to configure
+	 */
+	public void configure( String fileName );
 }

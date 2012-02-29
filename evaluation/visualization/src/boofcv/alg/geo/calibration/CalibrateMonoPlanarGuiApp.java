@@ -23,17 +23,25 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.app.CalibrateMonoPlanarApp;
+import boofcv.app.ParseCalibrationConfig;
 import boofcv.app.PlanarCalibrationDetector;
 import boofcv.app.WrapPlanarGridTarget;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.gui.ProcessInput;
+import boofcv.io.*;
+import boofcv.io.image.UtilImageIO;
+import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.List;
 
 /**
  * Computes intrinsic camera calibration parameters from a set of calibration images.  Results
@@ -41,7 +49,8 @@ import java.awt.*;
  *
  * @author Peter Abeles
  */
-public class CalibrateMonoPlanarGuiApp extends JPanel {
+public class CalibrateMonoPlanarGuiApp extends JPanel 
+		implements ConfigureFileInterface, MediaManagerInput, ProcessInput {
 
 	// computes calibration parameters
 	CalibrateMonoPlanarApp calibrator;
@@ -50,15 +59,14 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 	// needed by ProcessThread for displaying its dialog
 	JPanel owner;
 
-	// tells ProcessThread if it should be running or not
-	boolean processing;
-
 	// transform used to undistort image
 	AddRadialDistortionPixel tran = new AddRadialDistortionPixel();
 	ImageDistort<ImageFloat32> dist;
 
+	List<String> images;
+	MediaManager media = DefaultMediaManager.INSTANCE;
 	
-	public CalibrateMonoPlanarGuiApp(CalibrateMonoPlanarApp calibrator) {
+	public CalibrateMonoPlanarGuiApp() {
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(800,525));
 		this.calibrator = calibrator;
@@ -74,21 +82,57 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 		dist.setModel(tran);
 	}
 
-	/**
-	 * Processes all images in the directory.  Updates status of GUI while doing so
-	 *
-	 * @param directory Directory containing calibration images
-	 */
-	public void process( String directory ) {
-		processing = true;
+	public void configure( PlanarCalibrationDetector detector ,
+						   PlanarCalibrationTarget target,
+						   List<String> images  ) {
+
+		calibrator = new CalibrateMonoPlanarApp(detector,true);
+		calibrator.configure(target,true,2);
+		this.images = images;
+	}
+
+	public void configure( PlanarCalibrationDetector detector ,
+						   PlanarCalibrationTarget target,
+						   String directory ) {
+
+		images = CalibrateMonoPlanarApp.directoryImageList(directory);
+
+		calibrator = new CalibrateMonoPlanarApp(detector,true);
+		calibrator.configure(target,true,2);
+	}
+
+	@Override
+	public void configure(String fileName) {
+		ParseCalibrationConfig parser = new ParseCalibrationConfig(media);
+
+		if( parser.parse(fileName) ) {
+			configure(parser.detector,parser.target,parser.images);
+		} else {
+			System.err.println("Configuration failed");
+		}
+	}
+	
+	public void process() {
 		calibrator.reset();
-		new ProcessThread().start();
+		ProcessThread monitor = new ProcessThread();
+		monitor.start();
+
+		for( int i = 0; i < images.size(); i++ ) {
+			final File file = new File(images.get(i));
+			final BufferedImage orig = media.openImage(images.get(i));
+			if( orig != null ) {
+				calibrator.addImage(file.getName(),orig);
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						gui.addImage(file.getName(),orig);
+						gui.repaint();
+					}});
+			}
+		}
 		
-		calibrator.loadImages(directory);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				gui.setImages(calibrator.getImageNames(),
-						calibrator.getImages(),calibrator.getObservations());
+				gui.setObservations(calibrator.getObservations());
 			}});
 		gui.repaint();
 
@@ -98,7 +142,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 				gui.setResults(calibrator.getErrors());
 				gui.setCalibration(calibrator.getFound());
 			}});
-		processing = false;
+		monitor.stopThread();
 
 		// tell it how to undistort the image
 		SwingUtilities.invokeLater(new Runnable() {
@@ -107,39 +151,47 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 
 				tran.set(found.a,found.b,found.c,found.x0,found.y0,found.distortion);
 				gui.setCorrection(dist);
-		
+
 				gui.repaint();
 			}});
 	}
 
+	@Override
+	public void setMediaManager(MediaManager manager) {
+		media = manager;
+	}
 
 	/**
 	 * Displays a progress monitor and updates its state periodically
 	 */
-	public class ProcessThread extends Thread
+	public class ProcessThread extends ProgressMonitorThread
 	{
-		ProgressMonitor progressMonitor;
 		public ProcessThread() {
-			progressMonitor = new ProgressMonitor(owner, "Computing Calibration", "", 0, 3);
+			super(new ProgressMonitor(owner, "Computing Calibration", "", 0, 3));
 		}
 
 		@Override
-		public void run() {
-			while( processing ) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						progressMonitor.setProgress(calibrator.state);
-						progressMonitor.setNote(calibrator.message);
-					}});
-				synchronized ( this ) {
-					try {
-						wait(100);
-					} catch (InterruptedException e) {
-					}
-				}
-			}
-			progressMonitor.close();
+		public void doRun() {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					monitor.setProgress(calibrator.state);
+					monitor.setNote(calibrator.message);
+				}});
 		}
+	}
+
+	@Override
+	public void setInputManager(InputListManager manager) {
+		new Thread() {
+			public void run() {
+				process();
+			}
+		}.start();
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return true;
 	}
 
 	public static void main( String args[] ) {
@@ -151,20 +203,18 @@ public class CalibrateMonoPlanarGuiApp extends JPanel {
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
-		CalibrateMonoPlanarApp calibrator = new CalibrateMonoPlanarApp(detector,true);
-		calibrator.configure(target,true,2);
-		
-		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp(calibrator);
-		
+//		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
+		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
+//		String directory = "../data/evaluation/calibration/mono/Sony_DSC-PULNiX_CCD_6mm_Zhang";
+
+		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
+		app.configure(detector,target,directory);
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true);
 
-//		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess");
-		app.process("../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square");
-//		app.process("../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang");
-
+		app.process();
 	}
 }

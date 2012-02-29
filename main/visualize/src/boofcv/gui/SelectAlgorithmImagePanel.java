@@ -20,6 +20,9 @@ package boofcv.gui;
 
 import boofcv.gui.image.ImagePanel;
 import boofcv.io.InputListManager;
+import boofcv.io.MediaManager;
+import boofcv.io.MediaManagerInput;
+import boofcv.io.wrapper.DefaultMediaManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +39,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public abstract class SelectAlgorithmImagePanel extends JPanel
-		implements ActionListener
+		implements ActionListener, MediaManagerInput
 {
 	JToolBar toolbar;
 	// each combo box is used to select different algorithms
@@ -58,6 +61,9 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 	Component gui;
 	// should it post algorithm change events yet?
 	boolean postAlgorithmEvents = false;
+
+	// abstract way of reading in media
+	protected MediaManager media = DefaultMediaManager.INSTANCE;
 
 	public SelectAlgorithmImagePanel(int numAlgFamilies) {
 		super(new BorderLayout());
@@ -264,6 +270,11 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 
 	public <T extends InputListManager> T getInputManager() {
 		return (T)imageManager;
+	}
+
+	@Override
+	public void setMediaManager(MediaManager manager) {
+		this.media = manager;
 	}
 
 	/**

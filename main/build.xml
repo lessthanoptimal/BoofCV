@@ -40,6 +40,9 @@
 	  <packageset dir="calibration/src" defaultexcludes="yes">
             <include name="boofcv/**"/>
           </packageset>
+	  <packageset dir="sfm/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
+          </packageset>
 
             <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
 	    <header><![CDATA[
@@ -107,6 +110,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	  <packageset dir="calibration/src" defaultexcludes="yes">
             <include name="boofcv/**"/>
           </packageset>
+	  <packageset dir="sfm/src" defaultexcludes="yes">
+            <include name="boofcv/**"/>
+          </packageset>
 
             <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
             <bottom><![CDATA[<b>Copyright &copy; 2011 Peter Abeles</b>]]></bottom>
@@ -142,6 +148,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="io/" target="clean"/>
 	<ant dir="visualize/" target="clean"/>
 	<ant dir="calibration/" target="clean"/>
+	<ant dir="sfm/" target="clean"/>
     </target>
 
     <target name="jar">
@@ -153,6 +160,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="io" inheritAll="false"/>
 	<ant dir="visualize/" inheritAll="false"/>
 	<ant dir="calibration/" inheritAll="false"/>
+	<ant dir="sfm/" inheritAll="false"/>
 	<jar destfile="${lib.dir}/${ant.project.name}.jar">
 	  <zipgroupfileset dir="${jar.dir}" includes="*.jar"/> 
 	</jar>

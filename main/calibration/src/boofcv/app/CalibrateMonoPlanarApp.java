@@ -42,7 +42,7 @@ import java.util.List;
  * <ol>
  * <li>{@link #configure}</li> 
  * <li>{@link #reset}</li>
- * <li>{@link #loadImages}</li>
+ * <li>{@link #addImage(String, java.awt.image.BufferedImage)}</li>
  * <li>{@link #process}</li>
  * <li>{@link #getFound}</li>
  * </ol>
@@ -68,9 +68,9 @@ public class CalibrateMonoPlanarApp {
 	boolean saveImages;
 	
 	// Information on calibration targets and results
-	protected List<String> imageNames;
-	protected List<BufferedImage> images;
-	protected List<List<Point2D_F64>> observations;
+	protected List<String> imageNames = new ArrayList<String>();
+	protected List<BufferedImage> images = new ArrayList<BufferedImage>();
+	protected List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
 	protected List<ImageResults> errors;
 
 	// how far along in the process is it
@@ -106,20 +106,35 @@ public class CalibrateMonoPlanarApp {
 	}
 
 	/**
-	 * Resets internal data structures.  Call before {@link #loadImages(String)}
+	 * Resets internal data structures.  Must call before adding images
 	 */
 	public void reset() {
 		state = 0;
 		message = "";
+		imageNames = new ArrayList<String>();
+		images = new ArrayList<BufferedImage>();
+		observations = new ArrayList<List<Point2D_F64>>();
 	}
 
-	/**
-	 * Searches directory for image files and extracts calibration points.  Call before
-	 * {@link #process()}
-	 * 
-	 * @param directory Director containing images.
-	 */
-	public void loadImages( String directory ) {
+	public void addImage( String name , BufferedImage orig ) {
+		ImageFloat32 image = ConvertBufferedImage.convertFrom(orig, (ImageFloat32) null);
+
+		System.out.println("processing "+name);
+		if( !detector.process(image) )
+			System.err.println("  Failed to process image: "+name);
+		else {
+			imageNames.add(name);
+			observations.add(detector.getPoints());
+			if( saveImages ) {
+				images.add(orig);
+			}
+			updateStatus(0,"Feature Extraction "+imageNames.size());
+		}
+	}
+
+	public static List<String> directoryImageList( String directory ) {
+		List<String> ret = new ArrayList<String>();
+		
 		File d = new File(directory);
 
 		if( !d.isDirectory() )
@@ -127,9 +142,6 @@ public class CalibrateMonoPlanarApp {
 
 		File files[] = d.listFiles();
 
-		imageNames = new ArrayList<String>();
-		images = new ArrayList<BufferedImage>();
-		observations = new ArrayList<List<Point2D_F64>>();
 
 		for( File f : files ) {
 			if( f.isDirectory() || f.isHidden() )
@@ -139,23 +151,10 @@ public class CalibrateMonoPlanarApp {
 			if( orig == null ) {
 				continue;
 			}
-			System.out.println("Processing "+f.getName());
-			ImageFloat32 image = ConvertBufferedImage.convertFrom(orig, (ImageFloat32) null);
-
-			if( !detector.process(image) )
-				System.err.println("  Failed to process image: "+f.getName());
-			else {
-				imageNames.add(f.getName());
-				observations.add(detector.getPoints());
-				if( saveImages ) {
-					images.add(orig);
-				}
-				updateStatus(0,"Feature Extraction "+imageNames.size());
-			}
+			ret.add(f.getAbsolutePath());
 		}
-
-		if( observations.size() == 0 )
-			throw new RuntimeException("No images found in "+directory+"!");
+		
+		return ret;
 	}
 
 	/**
@@ -293,10 +292,17 @@ public class CalibrateMonoPlanarApp {
 
 		CalibrateMonoPlanarApp app = new CalibrateMonoPlanarApp(detector,false);
 
+		app.reset();
 		app.configure(target,false,2);
 
-//		app.loadImages("../data/evaluation/calibration/mono/Sony_DSC-HX5V");
-		app.loadImages("/home/pja/saved2/a");
+		List<String> images = directoryImageList("../data/evaluation/calibration/mono/Sony_DSC-HX5V");
+		
+		for( String n : images ) {
+			BufferedImage input = UtilImageIO.loadImage(n);
+			if( n != null ) {
+				app.addImage(n,input);
+			}
+		}
 		app.process();
 	}
 }

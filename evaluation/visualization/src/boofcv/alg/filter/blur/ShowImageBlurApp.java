@@ -23,6 +23,7 @@ import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.ProgressMonitorThread;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -150,24 +151,9 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 		String message = active == 2 ? "Median is slow" : "";
 
 		progress = 0;
-		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
-				"Blurring the Image",
-				message, 0, input.getNumBands());
 
-		new Thread() {
-			public synchronized void run() {
-				while( progress < input.getNumBands() ) {
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							progressMonitor.setProgress(progress);
-						}});
-					try {
-						wait(100);
-					} catch (InterruptedException e) {}
-				}
-				progressMonitor.close();
-			}
-		}.start();
+		ProgressMonitorThread monitor = new MyMonitor(this,message);
+		monitor.start();
 		
 		for( int i = 0; i < input.getNumBands(); i++ , progress++ ) {
 			T bandIn = input.getBand(i);
@@ -188,12 +174,32 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 					break;
 			}
 		}
+		monitor.stopThread();
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				ConvertBufferedImage.convertTo(output, renderedImage);
 				gui.repaint();
 			}
 		});
+	}
+	
+	private class MyMonitor extends ProgressMonitorThread {
+
+		protected MyMonitor( Component comp , String message ) {
+			super( new ProgressMonitor(comp,
+					"Blurring the Image",
+					message, 0, input.getNumBands()));
+		}
+
+		@Override
+		public void doRun() {
+			System.out.print("Updating monitor");
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					monitor.setProgress(progress);
+				}});
+		}
 	}
 
 	@Override
@@ -213,12 +219,7 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				radius = lradius;
-				new Thread() {
-					public void run() {
-						performUpdate();
-					}
-				}.start();
-
+				performUpdate();
 			}});
 	}
 

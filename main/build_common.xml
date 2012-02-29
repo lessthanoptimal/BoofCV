@@ -6,7 +6,8 @@
 
     <property name="src.dir"     value="src"/>
     <property name="test.dir"    value="test"/>
-    <property name="gen.dir"    value="generate"/>
+    <property name="gen.dir"     value="generate"/>
+    <property name="bench.dir"   value="benchmark"/>
     <property name="lib.dir"     value="../../lib"/>
 
     <property name="build.dir"   value="build"/>
@@ -51,17 +52,16 @@
         <mkdir dir="${testreport.dir}"/>
         <mkdir dir="${testclasses.dir}"/>
 
-        <javac srcdir="${gen.dir}" destdir="${testclasses.dir}" includeantruntime="false">
+        <javac destdir="${testclasses.dir}" includeantruntime="false">
+	  <src path="${gen.dir}"/>
+	  <src path="${bench.dir}"/>
+	  <src path="${test.dir}"/>
+
            <classpath>
                 <path refid="test.classpath"/>
             </classpath>
         </javac> 
 
-        <javac srcdir="${test.dir}" destdir="${testclasses.dir}" includeantruntime="false">
-           <classpath>
-                <path refid="test.classpath"/>
-            </classpath>
-        </javac>
 
         <junit printsummary="yes" showoutput="yes">
             <classpath>

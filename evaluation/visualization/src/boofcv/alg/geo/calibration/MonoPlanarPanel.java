@@ -34,6 +34,7 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -73,10 +74,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	int selectedImage = 0;
 
-	List<String> names;
-	List<BufferedImage> images;
-	List<List<Point2D_F64>> features;
-	List<ImageResults> results;
+	List<String> names = new ArrayList<String>();
+	List<BufferedImage> images = new ArrayList<BufferedImage>();
+	List<List<Point2D_F64>> features = new ArrayList<List<Point2D_F64>>();
+	List<ImageResults> results = new ArrayList<ImageResults>();
 
 	double errorScale = 20;
 
@@ -144,21 +145,21 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		comp.setEditable(false);
 		return comp;
 	}
-
-	public void setImages( List<String> names , 
-						   List<BufferedImage> images ,
-						   List<List<Point2D_F64>> features  ) {
-		this.names = names;
-		this.images = images;
-		this.features = features;
+	
+	public void addImage( String name , BufferedImage image ) {
+		names.add(name);
+		images.add(image);
 
 		imageList.setListData(new Vector<Object>(names));
-		imageList.setSelectedIndex(0);
-		
-		BufferedImage image = images.get(selectedImage);
-		mainView.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
+		if( names.size() == 1 ) {
+			mainView.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
+			imageList.setSelectedIndex(0);
+			revalidate();
+		}
+	}
 
-		revalidate();
+	public void setObservations( List<List<Point2D_F64>> features  ) {
+		this.features = features;
 	}
 
 	public void setResults(List<ImageResults> results) {
@@ -208,8 +209,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	public void valueChanged(ListSelectionEvent e) {
 		if( e.getValueIsAdjusting() || e.getFirstIndex() == -1)
 			return;
-		setSelected(imageList.getSelectedIndex());
-		mainView.repaint();
+		if( imageList.getSelectedIndex() > 0 ) {
+			setSelected(imageList.getSelectedIndex());
+			mainView.repaint();
+		}
 	}
 
 	private void setSelected( int selected ) {
@@ -236,11 +239,13 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	}
 
 	private void updateResultsGUI() {
-		ImageResults r = results.get(selectedImage);
-		String textMean = String.format("%5.1e", r.meanError);
-		String textMax = String.format("%5.1e",r.maxError);
-		meanError.setText(textMean);
-		maxError.setText(textMax);
+		if( selectedImage < results.size() ) {
+			ImageResults r = results.get(selectedImage);
+			String textMean = String.format("%5.1e", r.meanError);
+			String textMax = String.format("%5.1e",r.maxError);
+			meanError.setText(textMean);
+			maxError.setText(textMax);
+		}
 	}
 
 	private void undoRadialDistortion(BufferedImage image) {
@@ -265,11 +270,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			if( images == null )
+			if( images == null || selectedImage >= images.size() )
 				return;
 			
 			BufferedImage image = images.get(selectedImage);
-			List<Point2D_F64> points = features.get(selectedImage);
 			
 			Graphics2D g2 = (Graphics2D)g;
 			
@@ -282,6 +286,14 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			} else
 				g2.drawImage(image,0,0,null);
 
+
+			if( features.size() > selectedImage ) {
+				drawFeatures(g2);
+			}
+		}
+
+		private void drawFeatures(Graphics2D g2) {
+			List<Point2D_F64> points = features.get(selectedImage);
 			if( showPoints ) {
 				g2.setColor(Color.BLACK);
 				g2.setStroke(new BasicStroke(3));
@@ -304,10 +316,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			}
 
 			if( showNumbers ) {
-				DetectCalibrationChessApp.drawNumbers(g2,points);
+				DetectCalibrationChessApp.drawNumbers(g2, points);
 			}
 
-			if( showErrors && results != null ) {
+			if( showErrors && results != null && results.size() > selectedImage ) {
 				ImageResults result = results.get(selectedImage);
 
 				Stroke before = g2.getStroke();
@@ -335,11 +347,11 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 					int r = (int)(errorScale*result.pointError[i]);
 					if( r < 1 )
 						continue;
-					
+
 					int x = (int)p.x - r ;
 					int y = (int)p.y - r;
 					int w = r*2+1;
-					
+
 					g2.drawOval(x, y, w, w);
 				}
 			}

@@ -25,6 +25,7 @@ import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectImagePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.ProgressMonitorThread;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
@@ -48,7 +49,7 @@ import java.beans.PropertyChangeListener;
 public class ShowLensDistortion<T extends ImageSingleBand>
 		extends SelectImagePanel implements ProcessInput, ChangeListener
 {
-	double radial1 = -0.2;
+	double radial1 = -0.65;
 	double radial2 = -0.1;
 
 	Class<T> imageType;
@@ -60,7 +61,10 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 
 	MultiSpectral<T> input;
 	MultiSpectral<T> output;
+	// rendered in main thread
 	BufferedImage renderedImage;
+	// rendered is copied to this in a GUI thread
+	BufferedImage outputImage;
 
 	// tells progress monitor the current progress
 	volatile int progress;
@@ -104,8 +108,9 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 				if( evt.getPropertyName().equals("enabled")) {
 					JPanel src = (JPanel)evt.getSource();
 					boolean value = (Boolean)evt.getNewValue();
-					src.getComponent(1).setEnabled(value);
-					src.getComponent(2).setEnabled(value);
+					for( int i = 0; i < src.getComponentCount(); i++ ) {
+						src.getComponent(i).setEnabled(value);
+					}
 				}
 			}
 		});
@@ -122,8 +127,9 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setInputImage(image);
+				outputImage = new BufferedImage(input.width, input.height,BufferedImage.TYPE_INT_BGR);
 				renderedImage = new BufferedImage(input.width, input.height,BufferedImage.TYPE_INT_BGR);
-				gui.setBufferedImage(renderedImage);
+				gui.setBufferedImage(outputImage);
 				gui.setPreferredSize(new Dimension(input.width,input.height));
 				gui.repaint();
 				processedImage = true;
@@ -146,28 +152,9 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 			return;
 
 		progress = 0;
-		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
-				"Applying Distortion",
-				"", 0, input.getNumBands());
 
-		new Thread() {
-			public synchronized void run() {
-				while( progress < input.getNumBands() ) {
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							progressMonitor.setProgress(progress);
-						}});
-					try {
-						wait(100);
-					} catch (InterruptedException e) {}
-				}
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						progressMonitor.close();
-					}
-				});
-			}
-		}.start();
+		ProgressMonitorThread thread = new MyMonitorThread(this);
+		thread.start();
 
 		PointTransform_F32 ptran =
 				new AddRadialDistortionPixel(input.width*0.8,input.width*0.8,0,
@@ -182,11 +169,12 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 
 			DistortImageOps.distortSingle(bandIn,bandOut,tran,interp);
 		}
-		progress = 100;
+		thread.stopThread();
+		ConvertBufferedImage.convertTo(output, renderedImage);
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				progressMonitor.close();
-				ConvertBufferedImage.convertTo(output, renderedImage);
+				outputImage.createGraphics().drawImage(renderedImage,0,0,null);
 				gui.repaint();
 			}
 		});
@@ -209,15 +197,24 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		if( e.getSource() == radialOrder2 )
 			radial2 = ((Number) radialOrder2.getValue()).doubleValue();
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				new Thread() {
-					public void run() {
-						performUpdate();
-					}
-				}.start();
+		performUpdate();
+	}
+	
+	private class MyMonitorThread extends ProgressMonitorThread {
 
-			}});
+		protected MyMonitorThread(Component comp) {
+			super(new ProgressMonitor(comp,
+					"Applying Distortion",
+					"", 0, input.getNumBands()));
+		}
+
+		@Override
+		public void doRun() {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					monitor.setProgress(progress);
+				}});
+		}
 	}
 
 	public static void main(String args[]) {
