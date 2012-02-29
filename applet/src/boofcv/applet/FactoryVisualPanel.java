@@ -44,6 +44,7 @@ public class FactoryVisualPanel {
 			return findConstructor(compType,imageType);
 
 		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 			System.err.println("Couldn't find path name");
 			return null;
 		} catch (InstantiationException e) {
@@ -108,6 +109,16 @@ public class FactoryVisualPanel {
 				}
 			}
 		}
+
+		// try a no argument constructor instead
+		for( Constructor<?> c : cs ) {
+			Class<?> params[] = c.getParameterTypes();
+
+			if( params.length == 0 ) {
+				return (JComponent)c.newInstance();
+			}
+		}
+
 		System.err.println("Couldn't find an appropriate constructor.");
 		return null;
 	}

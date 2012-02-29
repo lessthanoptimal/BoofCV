@@ -107,7 +107,8 @@ public class HessianFromGradient {
 		GradientSobel.process(inputDerivX,derivXX,derivXY,border);
 
 		if( border != null )
-			ConvolveWithBorder.convolve(GradientSobel.kernelDerivY_I32,inputDerivY,derivYY,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+			ConvolveWithBorder.convolve(GradientSobel.kernelDerivY_I32,inputDerivY,derivYY,
+					new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.convolve(GradientSobel.kernelDerivY_I32,inputDerivY,derivYY);
 	}
@@ -130,7 +131,8 @@ public class HessianFromGradient {
 		GradientSobel.process(inputDerivX,derivXX,derivXY,border);
 
 		if( border != null )
-			ConvolveWithBorder.convolve(GradientSobel.kernelDerivY_F32,inputDerivY,derivYY,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+			ConvolveWithBorder.convolve(GradientSobel.kernelDerivY_F32,inputDerivY,derivYY,
+					new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.convolve(GradientSobel.kernelDerivY_F32,inputDerivY,derivYY);
 	}
@@ -153,7 +155,8 @@ public class HessianFromGradient {
 		GradientThree.process(inputDerivX,derivXX,derivXY,border);
 
 		if( border != null )
-			ConvolveWithBorder.vertical(GradientThree.kernelDeriv_I32,inputDerivY,derivYY,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+			ConvolveWithBorder.vertical(GradientThree.kernelDeriv_I32,inputDerivY,derivYY,
+					new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.vertical(GradientThree.kernelDeriv_I32,inputDerivY,derivYY,false);
 	}
@@ -176,7 +179,8 @@ public class HessianFromGradient {
 		GradientThree.process(inputDerivX,derivXX,derivXY,border);
 
 		if( border != null )
-			ConvolveWithBorder.vertical(GradientThree.kernelDeriv_F32,inputDerivY,derivYY,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+			ConvolveWithBorder.vertical(GradientThree.kernelDeriv_F32,inputDerivY,derivYY,
+					new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.vertical(GradientThree.kernelDeriv_F32,inputDerivY,derivYY,false);
 	}

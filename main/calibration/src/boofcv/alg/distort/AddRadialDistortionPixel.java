@@ -42,7 +42,7 @@ public class AddRadialDistortionPixel implements PointTransform_F32 {
 	public AddRadialDistortionPixel() {
 	}
 
-	public AddRadialDistortionPixel(double fx, double fy, double skew, double x_c, double y_c, double[] radial) {
+	public AddRadialDistortionPixel(double fx, double fy, double skew, double x_c, double y_c, double... radial) {
 		set(fx,fy,skew,x_c,y_c, radial);
 	}
 

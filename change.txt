@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2012/
+Date    : 2012/03/01
 Version : Alpha 0.6
 
 - Added convolution related code for ImageSInt32
@@ -41,6 +41,12 @@ Version : Alpha 0.6
   * DLT
   * Closest point from two lines
 - Added EPnP from Lepetit 2009 paper
+  * Validation against author's code is pending
+- Added color processing to several Apps
+  * EvaluateInterpolateEnlargeApp
+  * ShowImageBlurApp
+- Added SimpleNumberSequenceReader for reading small sequences of numbers
+- Added lens distortion app
 
 ---------------------------------------------
 Date    : 2012/02/01

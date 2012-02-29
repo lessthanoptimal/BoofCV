@@ -87,6 +87,13 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 		isReset = false;
 		isKeyFrame = false;
 
+		if( totalProcessed == 1 ) {
+			// it just started tracking of there will be of course no motion so the motion
+			// matcher has not been run
+			isKeyFrame = true;
+			return true;
+		}
+
 		int inliers = modelMatcher.getMatchSet().size();
 
 		// too few features to have a reliable motion estimate?

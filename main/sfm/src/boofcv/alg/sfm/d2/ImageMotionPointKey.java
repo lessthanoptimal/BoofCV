@@ -106,7 +106,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		tracker.reset();
 		tracker.spawnTracks();
 		tracker.setKeyFrame();
-		totalProcessed = 1;
+		totalProcessed = 0;
 	}
 
 	/**

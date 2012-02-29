@@ -28,10 +28,10 @@ public class ImageBorder1D_I32<T extends ImageInteger> extends ImageBorder_I32<T
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 
-	public ImageBorder1D_I32(Class<BorderIndex1D> type ) {
+	public ImageBorder1D_I32(Class<?> type ) {
 		try {
-			this.rowWrap = type.newInstance();
-			this.colWrap = type.newInstance();
+			this.rowWrap = (BorderIndex1D)type.newInstance();
+			this.colWrap = (BorderIndex1D)type.newInstance();
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {

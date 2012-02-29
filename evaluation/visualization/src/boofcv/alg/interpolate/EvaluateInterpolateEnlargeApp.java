@@ -22,7 +22,6 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ProcessInput;
 import boofcv.gui.SelectAlgorithmImagePanel;
@@ -31,6 +30,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;
@@ -46,8 +46,9 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 	extends SelectAlgorithmImagePanel implements ProcessInput, ComponentListener
 {
 	Class<T> imageType;
-	T gray;
-	T scaledImage;
+	MultiSpectral<T> color;
+	MultiSpectral<T> scaledImage;
+
 
 	ImagePanel panel = new ImagePanel();
 	boolean hasProcessed = false;
@@ -59,8 +60,8 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 		panel.setResize(false);
 		setMainGUI(panel);
 
-		gray = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		scaledImage = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		color = new MultiSpectral<T>(imageType,1,1,3);
+		scaledImage = new MultiSpectral<T>(imageType,1,1,3);
 
 		addAlgorithm(0, "Nearest Neighbor",FactoryInterpolation.nearestNeighborPixel(imageType));
 		addAlgorithm(0, "Bilinear",FactoryInterpolation.bilinearPixel(imageType));
@@ -74,8 +75,8 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 	public void process(BufferedImage image) {
 		setInputImage(image);
 
-		gray.reshape(image.getWidth(),image.getHeight());
-		gray = ConvertBufferedImage.convertFromSingle(image, null, imageType);
+		color.reshape(image.getWidth(),image.getHeight());
+		ConvertBufferedImage.convertFromMulti(image,color,imageType);
 
 		hasProcessed = true;
 		doRefreshAll();
@@ -88,15 +89,16 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 	
 	@Override
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( gray == null || 0 == panel.getWidth() || 0 == panel.getHeight() ) {
+		if( color == null || 0 == panel.getWidth() || 0 == panel.getHeight() ) {
 			return;
 		}
 
 		InterpolatePixel<T> interp = (InterpolatePixel<T>)cookie;
 
 		scaledImage.reshape(panel.getWidth(),panel.getHeight());
-		PixelTransformAffine_F32 model = DistortSupport.transformScale(scaledImage,gray);
-		DistortImageOps.distortSingle(gray,scaledImage,model,interp);
+		PixelTransformAffine_F32 model = DistortSupport.transformScale(scaledImage,color);
+		for( int i = 0; i < color.getNumBands(); i++ )
+			DistortImageOps.distortSingle(color.getBand(i),scaledImage.getBand(i),model,interp);
 
 		// numerical round off error can cause the interpolation to go outside
 		// of pixel value bounds

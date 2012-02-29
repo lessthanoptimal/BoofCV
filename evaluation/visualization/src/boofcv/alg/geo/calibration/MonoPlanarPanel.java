@@ -245,7 +245,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	private void undoRadialDistortion(BufferedImage image) {
 		ConvertBufferedImage.convertFromMulti(image, origMS, ImageFloat32.class);
-		System.out.println("number of bands "+origMS.getNumBands());
+
 		for( int i = 0; i < origMS.getNumBands(); i++ ) {
 			ImageFloat32 in = origMS.getBand(i);
 			ImageFloat32 out = correctedMS.getBand(i);
