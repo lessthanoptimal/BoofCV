@@ -16,26 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.struct;
+package boofcv.io;
 
-import boofcv.core.image.border.*;
-
+import java.io.InputStream;
+import java.io.Reader;
 
 /**
+ * Implementers of this interface can be configured using data from an {@link InputStream}
+ *
  * @author Peter Abeles
  */
-public class BoofDefaults {
+public interface ConfigureReaderInterface {
 
 	/**
-	 * String specifying BoofCV's version.
+	 * Provides an input stream to the configuration data
+	 *
+	 * @param input Stream for reading in configuration data
 	 */
-	public static String version = "0.6";
-
-	// Use extended borders when computing image derivatives 
-	public static BorderType DERIV_BORDER_TYPE = BorderType.EXTENDED;
-	public static ImageBorder_I32 DERIV_BORDER_I32 = new ImageBorder1D_I32((Class)BorderIndex1D_Extend.class);
-	public static ImageBorder_F32 DERIV_BORDER_F32 = new ImageBorder1D_F32((Class)BorderIndex1D_Extend.class);
-
-	// multiplication factor to go from scale to pixel radius
-	public static final double SCALE_SPACE_CANONICAL_RADIUS = 2.5;
+	public void configure( Reader input );
 }

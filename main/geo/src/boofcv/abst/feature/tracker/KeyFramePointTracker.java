@@ -125,7 +125,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 			pairs.add(p);
 			spawned.add(p);
 		}
-		
+
 		return spawned;
 	}
 

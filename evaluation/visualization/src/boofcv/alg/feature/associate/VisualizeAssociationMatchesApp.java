@@ -75,6 +75,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	AssociationPanel panel = new AssociationPanel(20);
 
 	boolean processedImage = false;
+	// tells the progress monitor how far along it is
+	volatile int progress;
 
 	public VisualizeAssociationMatchesApp( Class<T> imageType , Class<D> derivType )
 	{
@@ -113,12 +115,12 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 		ConvertBufferedImage.convertFromSingle(buffLeft, imageLeft, imageType);
 		ConvertBufferedImage.convertFromSingle(buffRight, imageRight, imageType);
-
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				panel.setImages(buffLeft,buffRight);
-				doRefreshAll();
 				processedImage = true;
+				doRefreshAll();
 			}});
 	}
 
@@ -158,12 +160,37 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		final List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
 		TupleDescQueue leftDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
 		TupleDescQueue rightDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
+		
+		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
+				"Associating Features",
+				"Detecting Left", 0, 3);
+
+		// show a progress dialog if it is slow.  Needs to be in its own thread so if this stalls
+		// the window will pop up
+		progress = 0;
+		new Thread() {
+			public synchronized void run() {
+				while( progress < 3 ) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							progressMonitor.setProgress(progress);
+						}});
+					try {
+						wait(100);
+					} catch (InterruptedException e) {}
+				}
+				progressMonitor.close();
+			}
+		}.start();
+		
 
 		// find feature points  and descriptions
-		extractImageFeatures(imageLeft,leftDesc,leftPts);
+		extractImageFeatures(imageLeft, leftDesc, leftPts);
+		progress++;
 		extractImageFeatures(imageRight,rightDesc,rightPts);
-
+		progress++;
 		matcher.associate(leftDesc,rightDesc);
+		progress=3;
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

@@ -135,7 +135,7 @@ public class DistortImageOps {
 	 * Applies distortion to a single band image.  Place holder for more generic code later on
 	 */
 	public static <T extends ImageSingleBand>
-	void distortSingle( T input , T output , PixelTransformAffine_F32 model , InterpolatePixel<T> interp ) {
+	void distortSingle( T input , T output , PixelTransform_F32 model , InterpolatePixel<T> interp ) {
 		Class<T> inputType = (Class<T>)input.getClass();
 		ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(inputType, 0),inputType);
 		distorter.setModel(model);

@@ -28,6 +28,8 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.ConfigureReaderInterface;
+import boofcv.io.SimpleNumberSequenceReader;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -38,13 +40,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 
 /**
  * @author Peter Abeles
  */
 public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectImagePanel implements ProcessInput, GridCalibPanel.Listener
+		extends SelectImagePanel implements ProcessInput, GridCalibPanel.Listener ,
+		ConfigureReaderInterface
 		
 {
 	Class<T> imageType;
@@ -65,7 +72,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	
 	public DetectCalibrationChessApp(Class<T> imageType) {
 		this.imageType = imageType;
-		alg = new DetectChessCalibrationPoints<T,D>(4,3,5,20,255,imageType);
+
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
 		JPanel panel = new JPanel();
@@ -79,6 +86,26 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		panel.add(calibGUI,BorderLayout.WEST);
 		
 		setMainGUI(panel);
+	}
+
+	public void configure( int numCols , int numRows ) {
+		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,20,255,imageType);
+	}
+
+	@Override
+	public void configure(Reader input) {
+		SimpleNumberSequenceReader reader = new SimpleNumberSequenceReader('#');
+		try {
+			List<Double> s = reader.read(input);
+
+			int numCols = s.get(0).intValue();
+			int numRows = s.get(1).intValue();
+
+			configure(numCols,numRows);
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public synchronized void process( final BufferedImage input ) {
@@ -213,11 +240,13 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		});
 	}
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws FileNotFoundException {
 
 		DetectCalibrationChessApp app = new DetectCalibrationChessApp(ImageFloat32.class);
 
 		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess/";
+
+		app.configure(new FileReader(prefix+"info.txt"));
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("View 01",prefix+"frame01.jpg");

@@ -19,6 +19,7 @@
 package boofcv.applet;
 
 import boofcv.gui.ProcessInput;
+import boofcv.io.ConfigureReaderInterface;
 import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
@@ -63,9 +64,14 @@ public class ImageInputApplet extends JApplet {
 			return;
 		}
 
-		showStatus("Loading Image");
 		ProcessInput p = (ProcessInput)comp;
 
+		if( p instanceof ConfigureReaderInterface)
+			handleConfig(p);
+		else
+			System.out.println("NOT LOADING CONFIG");
+
+		showStatus("Loading Image");
 		AppletImageListManager manager = parseImageInput(dataset);
 
 		p.setInputManager(manager);
@@ -77,6 +83,29 @@ public class ImageInputApplet extends JApplet {
 
 		showStatus("Running");
 		getContentPane().add(comp, BorderLayout.CENTER);
+	}
+
+	/**
+	 * If one is specified load the configuration from a file
+	 */
+	protected boolean handleConfig(ProcessInput p) {
+
+		final String configPath = getParameter("config");
+		if( configPath == null ) {
+			System.err.println("Class takes a config file but no 'config' param was found");
+			return true;
+		}
+
+		showStatus("Loading Config File");
+		try {
+			InputStreamReader isr = new InputStreamReader(new URL(getCodeBase(),configPath).openStream());
+			BufferedReader reader = new BufferedReader(isr);
+
+			((ConfigureReaderInterface)p).configure(reader);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return false;
 	}
 
 	public AppletImageListManager parseImageInput( String fileName )

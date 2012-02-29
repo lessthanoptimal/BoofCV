@@ -225,10 +225,10 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		matches = null;
 
 		keyFrameSet = false;
-		if( featSrc != null ) {
-			featSrc.reset();
-			featDst.reset();
-		}
+//		if( featSrc != null ) {
+//			featSrc.reset();
+//			featDst.reset();
+//		}
 	}
 
 	/**

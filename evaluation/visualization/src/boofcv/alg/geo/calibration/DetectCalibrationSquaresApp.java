@@ -30,6 +30,8 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.ConfigureReaderInterface;
+import boofcv.io.SimpleNumberSequenceReader;
 import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -39,6 +41,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +54,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectCalibrationSquaresApp
-		extends SelectImagePanel implements ProcessInput , GridCalibPanel.Listener
+		extends SelectImagePanel implements ProcessInput , GridCalibPanel.Listener ,
+		ConfigureReaderInterface
 {
 	int targetColumns;
 	int targetRows;
@@ -79,12 +86,7 @@ public class DetectCalibrationSquaresApp
 	// if a target was found or not
 	boolean foundTarget;
 
-	public DetectCalibrationSquaresApp( int numCols , int numRows ) {
-		this.targetColumns = numCols;
-		this.targetRows = numRows;
-
-		alg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
-
+	public DetectCalibrationSquaresApp() {
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
 		
@@ -96,6 +98,29 @@ public class DetectCalibrationSquaresApp
 		panel.add(gui,BorderLayout.CENTER);
 		
 		setMainGUI(panel);
+	}
+
+	public void configure( int numCols , int numRows ) {
+		this.targetColumns = numCols;
+		this.targetRows = numRows;
+
+		alg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
+	}
+
+	@Override
+	public void configure(Reader input) {
+		SimpleNumberSequenceReader reader = new SimpleNumberSequenceReader('#');
+		try {
+			List<Double> s = reader.read(input);
+
+			int numCols = s.get(0).intValue();
+			int numRows = s.get(1).intValue();
+
+			configure(numCols,numRows);
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public synchronized void process( final BufferedImage input ) {
@@ -293,11 +318,13 @@ public class DetectCalibrationSquaresApp
 
 	}
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws FileNotFoundException {
 
-		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp(4,3);
+		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp();
 
 		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
+
+		app.configure(new FileReader(prefix+"info.txt"));
 
 		ImageListManager manager = new ImageListManager();
 		manager.add("View 01",prefix+"frame10.jpg");
