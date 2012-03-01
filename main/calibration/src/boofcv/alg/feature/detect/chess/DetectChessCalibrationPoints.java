@@ -102,6 +102,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 	// rectangle the target is contained inside of
 	private ImageRectangle targetRect;
+
+//	FitQuadratic2D quad = new FitQuadratic2D();
 	
 	/**
 	 * Configures detection parameters
@@ -217,7 +219,10 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 	/**
 	 * Computes a feature location to sub-pixel accuracy by fitting a 2D quadratic polynomial
-	 * to corner intensities
+	 * to corner intensities.
+	 *
+	 * Through experimentation the mean instead of a quadratic fit was found to produce a better
+	 * result.  Most papers seem to recommend using the quadratic.
 	 *
 	 * @param pt Point in image coordinates
 	 * @param x0 intensity image x offset
@@ -233,7 +238,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		ImageRectangle area = new ImageRectangle(pt.x-r-x0,pt.y-r-y0,pt.x+r-x0+1,pt.y+r+1-y0);
 		BoofMiscOps.boundRectangleInside(intensity,area);
 
-		// sample feature intensity values in the local 3x3 region
+		// sample feature intensity values in the local region
 		float meanX = 0,meanY = 0,sum=0;
 		for( int i = area.y0; i < area.y1; i++ ) {
 			for( int j = area.x0; j < area.x1; j++ ) {
@@ -247,9 +252,18 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		meanX /= sum;
 		meanY /= sum;
 
-		// todo try quadratic fit inside the same region instead
-
 		return new Point2D_F64(x0+meanX,y0+meanY);
+
+//		quad.reset();
+//		for( int i = area.y0; i < area.y1; i++ ) {
+//			for( int j = area.x0; j < area.x1; j++ ) {
+//				quad.add(j,i,intensity.get(j,i));
+//			}
+//		}
+//
+//		quad.process();
+//
+//		return new Point2D_F64(x0+quad.getFoundX(),y0+quad.getFoundY());
 	}
 
 	/**

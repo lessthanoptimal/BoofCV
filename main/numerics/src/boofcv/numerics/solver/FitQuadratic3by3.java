@@ -100,23 +100,10 @@ public class FitQuadratic3by3 {
 		double c = X.data[2];
 		double d = X.data[3];
 		double e = X.data[4];
-		
-		double val0 = 2*a-b;
-		double val1 = 2*c-b;
-		
-		if( Math.abs(val0) > Math.abs(val1) ) {
-			double slope = val1/val0;
-			double intercept = (e-d)/val0;
 
-			deltaY = -(e+b*intercept)/(b*slope+2*c);
-			deltaX = -(2*c*deltaY+e)/b;
-		} else {
-			double slope = val0/val1;
-			double intercept = (d-e)/val1;
-
-			deltaX = -(d+b*intercept)/(b*slope+2*a);
-			deltaY = -(2*a*deltaX+d)/b;
-		}
+		double bottom = 4*a*c - b*b;
+		deltaX = (b*e - 2*d*c)/bottom;
+		deltaY = (b*d - 2*a*e)/bottom;
 	}
 
 	public double getDeltaX() {

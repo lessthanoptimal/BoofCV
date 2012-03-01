@@ -150,12 +150,18 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		names.add(name);
 		images.add(image);
 
+		imageList.removeListSelectionListener(this);
 		imageList.setListData(new Vector<Object>(names));
 		if( names.size() == 1 ) {
+			imageList.addListSelectionListener(this);
 			mainView.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 			imageList.setSelectedIndex(0);
-			revalidate();
+		} else {
+			// each time an image is added it resets the selected value
+			imageList.setSelectedIndex(selectedImage);
+			imageList.addListSelectionListener(this);
 		}
+
 	}
 
 	public void setObservations( List<List<Point2D_F64>> features  ) {
@@ -209,7 +215,8 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	public void valueChanged(ListSelectionEvent e) {
 		if( e.getValueIsAdjusting() || e.getFirstIndex() == -1)
 			return;
-		if( imageList.getSelectedIndex() > 0 ) {
+
+		if( imageList.getSelectedIndex() >= 0 ) {
 			setSelected(imageList.getSelectedIndex());
 			mainView.repaint();
 		}
