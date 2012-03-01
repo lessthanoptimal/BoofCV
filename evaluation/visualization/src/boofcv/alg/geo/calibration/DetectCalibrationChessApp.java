@@ -279,6 +279,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		manager.add("View 07",prefix+"frame07.jpg");
 		manager.add("View 08",prefix+"frame08.jpg");
 		manager.add("View 11",prefix+"frame11.jpg");
+		manager.add("View 12",prefix+"frame12.jpg");
 
 		app.setInputManager(manager);
 
