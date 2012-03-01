@@ -286,7 +286,7 @@ public class CalibrateMonoPlanarApp {
 
 	public static void main( String args[] ) {
 //		PlanarCalibrationDetector detector = new WrapPlanarGridTarget();
-		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(8,8);
+		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(8,8,4);
 
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 1, 7 / 18);
 

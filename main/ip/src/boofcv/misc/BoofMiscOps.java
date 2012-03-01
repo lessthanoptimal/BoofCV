@@ -19,7 +19,7 @@
 package boofcv.misc;
 
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 
 /**
  * @author Peter Abeles
@@ -98,7 +98,7 @@ public class BoofMiscOps {
 	 * @param b An image.
 	 * @param r Rectangle
 	 */
-	public static void boundRectangleInside( ImageSingleBand b , ImageRectangle r )
+	public static void boundRectangleInside( ImageBase b , ImageRectangle r )
 	{
 		if( r.x0 < 0 )
 			r.x0 = 0;
@@ -111,7 +111,7 @@ public class BoofMiscOps {
 			r.y1 = b.height;
 	}
 
-	public static boolean checkInside(ImageSingleBand b, ImageRectangle r) {
+	public static boolean checkInside(ImageBase b, ImageRectangle r) {
 		if( r.x0 < 0 )
 			return false;
 		if( r.x1 > b.width )
@@ -124,7 +124,7 @@ public class BoofMiscOps {
 		return true;
 	}
 
-	public static boolean checkInside(ImageSingleBand b, int x , int y , int radius ) {
+	public static boolean checkInside(ImageBase b, int x , int y , int radius ) {
 		if( x-radius < 0 )
 			return false;
 		if( x+radius >= b.width )
@@ -137,7 +137,7 @@ public class BoofMiscOps {
 		return true;
 	}
 
-	public static boolean checkInside(ImageSingleBand b, int x , int y , int radiusWidth , int radiusHeight ) {
+	public static boolean checkInside(ImageBase b, int x , int y , int radiusWidth , int radiusHeight ) {
 		if( x-radiusWidth < 0 )
 			return false;
 		if( x+radiusWidth >= b.width )
@@ -150,7 +150,7 @@ public class BoofMiscOps {
 		return true;
 	}
 
-	public static boolean checkInside(ImageSingleBand b, int c_x , int c_y , int radius , double theta ) {
+	public static boolean checkInside(ImageBase b, int c_x , int c_y , int radius , double theta ) {
 		int r = radius;
 		float c = (float)Math.cos(theta);
 		float s = (float)Math.sin(theta);
@@ -168,7 +168,7 @@ public class BoofMiscOps {
 		return true;
 	}
 
-	private static boolean checkInBounds( ImageSingleBand b , int c_x , int c_y , int dx , int dy , float c , float s )
+	private static boolean checkInBounds( ImageBase b , int c_x , int c_y , int dx , int dy , float c , float s )
 	{
 		float x = c_x + c*dx - s*dy;
 		float y = c_y + s*dx + c*dy;

@@ -29,7 +29,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
-import boofcv.numerics.solver.FitQuadratic3by3;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
@@ -75,6 +75,9 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	private int numColsPoints;
 	private int numRowsPoints;
 
+	// radius of the feature being detected
+	private int radius;
+
 	// detects the chess board 
 	private DetectChessSquaresBinary findBound;
 	// binary images used to detect chess board
@@ -96,10 +99,10 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 	// number of points it expects to observer in the target
 	private int expectedPoints;
-	
-	// used for sub-pixel refinement
-	private FitQuadratic3by3 quadFit = new FitQuadratic3by3();
 
+	// rectangle the target is contained inside of
+	private ImageRectangle targetRect;
+	
 	/**
 	 * Configures detection parameters
 	 * 
@@ -116,6 +119,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
+		this.radius = radius;
+
 		this.numColsPoints = 2*(numCols-1);
 		this.numRowsPoints = 2*(numRows-1);
 		
@@ -128,10 +133,10 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		derivY = GeneralizedImageOps.createSingleBand(derivType,1,1);
 
 		intensityAlg = FactoryIntensityPoint.klt(radius,true,derivType);
+//		intensityAlg = FactoryIntensityPoint.harris(radius,0.04f,true,derivType);
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(radius,20,radius,false,true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(radius+2,20,radius,false,true);
 		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg,extractor,0);
-
 
 		findBound = new DetectChessSquaresBinary(numCols, numRows, 20*4);
 	}
@@ -147,9 +152,9 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		List<Point2D_I32> boundary = findBound.getBoundingQuad();
 
 		// find image rectangle and detect features inside
-		ImageRectangle rect = findImageRectangle(boundary);
+		targetRect = findImageRectangle(boundary);
 
-		T subGray = (T)gray.subimage(rect.x0,rect.y0,rect.x1,rect.y1);
+		T subGray = (T)gray.subimage(targetRect.x0,targetRect.y0,targetRect.x1,targetRect.y1);
 		derivX.reshape(subGray.width,subGray.height);
 		derivY.reshape(subGray.width,subGray.height);
 
@@ -157,12 +162,12 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		GImageDerivativeOps.sobel(subGray, derivX, derivY, BorderType.EXTENDED);
 
 		// detect interest points
-		detectorAlg.process(gray,derivX,derivY, null,null,null);
+		detectorAlg.process(subGray,derivX,derivY, null,null,null);
 
 		QueueCorner corners = detectorAlg.getFeatures();
 
 		// put points into original image coordinates
-		List<Point2D_I32> points = convert(corners, rect.x0, rect.y0);
+		List<Point2D_I32> points = convert(corners, targetRect.x0, targetRect.y0);
 
 		// prune features not inside the bounding quadrilateral
 		pruneOutside(points,boundary);
@@ -172,7 +177,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 			return false;
 
 		// select N brightest features
-		points = selectBrightest(points, intensityAlg.getIntensity(),rect.x0,rect.y0);
+		points = selectBrightest(points, intensityAlg.getIntensity(),targetRect.x0,targetRect.y0);
 
 		// put points into grid order
 		List<Point2D_I32> predicted =
@@ -183,7 +188,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		// compute pixels to sub-pixel accuracy
 		subpixel = new ArrayList<Point2D_F64>();
 		for( Point2D_I32 p : points)
-			subpixel.add( refineSubpixel(p,rect.x0,rect.y0,intensityAlg.getIntensity()));
+			subpixel.add( refineSubpixel(p,targetRect.x0,targetRect.y0,intensityAlg.getIntensity()));
 
 		UtilCalibrationGrid.enforceClockwiseOrder(subpixel, numColsPoints, numRowsPoints);
 
@@ -224,28 +229,27 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 										int x0 , int y0 , 
 										ImageFloat32 intensity ) 
 	{
-		// sample feature intensity values in the local 3x3 region
-		int index = 0;
-		for( int i = -1; i <= 1; i++ ) {
-			for( int j = -1; j <= 1; j++ , index++ ) {
-				double value = intensity.get(pt.x-x0+j,pt.y-y0+i);
+		int r = radius+3;
+		ImageRectangle area = new ImageRectangle(pt.x-r-x0,pt.y-r-y0,pt.x+r-x0+1,pt.y+r+1-y0);
+		BoofMiscOps.boundRectangleInside(intensity,area);
 
-				quadFit.setValue(index,value);
+		// sample feature intensity values in the local 3x3 region
+		float meanX = 0,meanY = 0,sum=0;
+		for( int i = area.y0; i < area.y1; i++ ) {
+			for( int j = area.x0; j < area.x1; j++ ) {
+				float value = intensity.get(j,i);
+
+				meanX += j*value;
+				meanY += i*value;
+				sum += value;
 			}
 		}
+		meanX /= sum;
+		meanY /= sum;
 
-		quadFit.process();
-		
-		double dx = quadFit.getDeltaX();
-		double dy = quadFit.getDeltaY();
+		// todo try quadratic fit inside the same region instead
 
-		if( Math.abs(dx) >= 1 || Math.abs(dy) >= 1 ) {
-			// because it is an over determined system it can generate a solution
-			// outside the bounds.  If that happens ignore the sub-pixel approximation
-			return new Point2D_F64(pt.x,pt.y);
-		} else {
-			return new Point2D_F64(pt.x+quadFit.getDeltaX(),pt.y+quadFit.getDeltaY());
-		}
+		return new Point2D_F64(x0+meanX,y0+meanY);
 	}
 
 	/**
@@ -369,6 +373,19 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		return ret;
 	}
 
+	/**
+	 * Only part of the image is processed when detecting features.  This copies the detected part into
+	 * the provided image
+	 *
+	 * @param wholeImage Image being written to
+	 */
+	public void renderIntensity( ImageFloat32 wholeImage ) {
+		ImageFloat32 found = intensityAlg.getIntensity();
+		ImageFloat32 out = wholeImage.subimage(targetRect.x0,targetRect.y0,targetRect.x1,targetRect.y1);
+		
+		out.setTo(found);
+	}
+	
 	public DetectChessSquaresBinary getFindBound() {
 		return findBound;
 	}

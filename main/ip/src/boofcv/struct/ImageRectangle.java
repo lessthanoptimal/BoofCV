@@ -41,4 +41,8 @@ public class ImageRectangle {
 
 	public ImageRectangle() {
 	}
+
+	public int area() {
+		return (y1-y0)*(x1-x0);
+	}
 }
