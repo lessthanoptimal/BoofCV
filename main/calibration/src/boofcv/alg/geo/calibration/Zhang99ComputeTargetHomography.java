@@ -34,12 +34,13 @@ import java.util.List;
  * </p>
  *
  * <p>
- * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations," 1998
+ * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations,",
+ * International Conference on Computer Vision (ICCV'99), Corfu, Greece, pages 666-673, September 1999.99
  * </p>
  *
  * @author Peter Abeles
  */
-public class Zhang98ComputeTargetHomography {
+public class Zhang99ComputeTargetHomography {
 
 	HomographyLinear4 linear = new HomographyLinear4(true);
 
@@ -47,7 +48,7 @@ public class Zhang98ComputeTargetHomography {
 	// the z-axis is assumed to be zero
 	List<Point2D_F64> worldPoints;
 
-	public Zhang98ComputeTargetHomography(PlanarCalibrationTarget config) {
+	public Zhang99ComputeTargetHomography(PlanarCalibrationTarget config) {
 		this.worldPoints = config.points;
 	}
 

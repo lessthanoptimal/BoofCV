@@ -53,7 +53,7 @@ import java.util.List;
  * </p>
  *
  * <p>
- * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations," 1998
+ * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations," 1999
  * </p>
  * @author Peter Abeles
  */

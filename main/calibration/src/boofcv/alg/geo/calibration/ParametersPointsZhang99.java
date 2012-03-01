@@ -25,14 +25,14 @@ import georegression.struct.point.Point2D_F64;
  * 
  * @author Peter Abeles
  */
-public class ParametersPointsZhang98 extends ParametersZhang98 {
+public class ParametersPointsZhang99 extends ParametersZhang99 {
 	// number of calibration points in each view
 	int numCalibrationPoints;
 	
 	// location of each point in the image
 	Point2D_F64[][] points;
 
-	public ParametersPointsZhang98(int numDistort, int numViews, int numCalibrationPoints) {
+	public ParametersPointsZhang99(int numDistort, int numViews, int numCalibrationPoints) {
 		super(numDistort, numViews);
 		this.numCalibrationPoints = numCalibrationPoints;
 		
@@ -46,12 +46,12 @@ public class ParametersPointsZhang98 extends ParametersZhang98 {
 		}
 	}
 
-	public ParametersPointsZhang98 createNew() {
-		return new ParametersPointsZhang98(distortion.length,views.length,numCalibrationPoints);
+	public ParametersPointsZhang99 createNew() {
+		return new ParametersPointsZhang99(distortion.length,views.length,numCalibrationPoints);
 	}
 
-	public ParametersPointsZhang98 copy() {
-		ParametersPointsZhang98 ret = createNew();
+	public ParametersPointsZhang99 copy() {
+		ParametersPointsZhang99 ret = createNew();
 		ret.a = a;
 		ret.b = b;
 		ret.c = c;

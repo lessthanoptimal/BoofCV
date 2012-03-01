@@ -18,8 +18,8 @@
 
 package boofcv.calibration;
 
-import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang98;
-import boofcv.alg.geo.calibration.ParametersZhang98;
+import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
+import boofcv.alg.geo.calibration.ParametersZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.app.CalibrateMonoPlanarApp;
 import boofcv.app.ImageResults;
@@ -41,7 +41,7 @@ import java.util.List;
 public class CalibrateUsingZhangData {
 	PlanarCalibrationTarget target;
 	List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
-	ParametersZhang98 found;
+	ParametersZhang99 found;
 	
 	public void loadModel( String fileName) throws IOException {
 		System.out.println("loading model "+fileName);
@@ -76,14 +76,14 @@ public class CalibrateUsingZhangData {
 
 	public void process(  boolean assumeZeroSkew ,
 						  int numRadialParam) {
-		CalibrationPlanarGridZhang98 zhang98
-				= new CalibrationPlanarGridZhang98(target,assumeZeroSkew,numRadialParam);
+		CalibrationPlanarGridZhang99 Zhang99
+				= new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam);
 
-		if( !zhang98.process(observations) ) {
-			throw new RuntimeException("Zhang98 algorithm failed!");
+		if( !Zhang99.process(observations) ) {
+			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
 
-		found = zhang98.getOptimized();
+		found = Zhang99.getOptimized();
 
 		List<ImageResults> errors =
 				CalibrateMonoPlanarApp.computeErrors(observations, found,target.points,assumeZeroSkew);

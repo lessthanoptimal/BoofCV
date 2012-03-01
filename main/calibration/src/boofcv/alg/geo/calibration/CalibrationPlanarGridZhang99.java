@@ -30,25 +30,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Full implementation of the Zhang98 camera calibration algorithm using planar calibration targets.  First
+ * Full implementation of the Zhang99 camera calibration algorithm using planar calibration targets.  First
  * linear approximations of camera parameters are computed, which are then refined using non-linear estimation.
  *
  * <p>
- * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations," 1998
+ * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations,",
+ * International Conference on Computer Vision (ICCV'99), Corfu, Greece, pages 666-673, September 1999.
  * </p>
  *
  * @author Peter Abeles
  */
-public class CalibrationPlanarGridZhang98 {
+public class CalibrationPlanarGridZhang99 {
 
 	// estimation algorithms
-	private Zhang98ComputeTargetHomography computeHomography;
-	private Zhang98CalibrationMatrixFromHomographies computeK;
+	private Zhang99ComputeTargetHomography computeHomography;
+	private Zhang99CalibrationMatrixFromHomographies computeK;
 	private RadialDistortionEstimateLinear computeRadial;
-	private Zhang98DecomposeHomography decomposeH = new Zhang98DecomposeHomography();
+	private Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
 
 	// contains found parameters
-	private ParametersZhang98 optimized;
+	private ParametersZhang99 optimized;
 
 	// description of the calibration target with point locations
 	private PlanarCalibrationTarget target;
@@ -63,15 +64,15 @@ public class CalibrationPlanarGridZhang98 {
 	 * @param assumeZeroSkew Should it assumed the camera has zero skew. Typically true.
 	 * @param numRadialParam Number of radial distortion parameters to consider.  Typically 0,1,2.
 	 */
-	public CalibrationPlanarGridZhang98( PlanarCalibrationTarget target ,
-										 boolean assumeZeroSkew ,
-										 int numRadialParam )
+	public CalibrationPlanarGridZhang99(PlanarCalibrationTarget target,
+										boolean assumeZeroSkew,
+										int numRadialParam)
 	{
-		computeHomography = new Zhang98ComputeTargetHomography(target);
-		computeK = new Zhang98CalibrationMatrixFromHomographies(assumeZeroSkew);
+		computeHomography = new Zhang99ComputeTargetHomography(target);
+		computeK = new Zhang99CalibrationMatrixFromHomographies(assumeZeroSkew);
 		computeRadial = new RadialDistortionEstimateLinear(target,numRadialParam);
 		this.target = target;
-		optimized = new ParametersZhang98(numRadialParam);
+		optimized = new ParametersZhang99(numRadialParam);
 		this.assumeZeroSkew = assumeZeroSkew;
 	}
 
@@ -87,7 +88,7 @@ public class CalibrationPlanarGridZhang98 {
 		optimized.setNumberOfViews(observations.size());
 
 		// compute initial parameter estimates using linear algebra
-		ParametersZhang98 initial =  initialParam(observations);
+		ParametersZhang99 initial =  initialParam(observations);
 		if( initial == null )
 			return false;
 
@@ -101,7 +102,7 @@ public class CalibrationPlanarGridZhang98 {
 	/**
 	 * Find an initial estimate for calibration parameters using linear techniques.
 	 */
-	protected ParametersZhang98 initialParam( List<List<Point2D_F64>> observations )
+	protected ParametersZhang99 initialParam( List<List<Point2D_F64>> observations )
 	{
 		List<DenseMatrix64F> homographies = new ArrayList<DenseMatrix64F>();
 		List<Se3_F64> motions = new ArrayList<Se3_F64>();
@@ -137,10 +138,10 @@ public class CalibrationPlanarGridZhang98 {
 	public static boolean optimizedParam( List<List<Point2D_F64>> observations ,
 										  List<Point2D_F64> grid ,
 										  boolean assumeZeroSkew ,
-										  ParametersZhang98 initial ,
-										  ParametersZhang98 found )
+										  ParametersZhang99 initial ,
+										  ParametersZhang99 found )
 	{
-		Zhang98OptimizationFunction func = new Zhang98OptimizationFunction(
+		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
 				initial.createNew(),assumeZeroSkew , grid,observations);
 
 		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresLM(1e-8,1e-8,1e-3,true);
@@ -162,12 +163,12 @@ public class CalibrationPlanarGridZhang98 {
 	}
 
 	/**
-	 * Converts results fond in the linear algorithms into {@link ParametersZhang98}
+	 * Converts results fond in the linear algorithms into {@link ParametersZhang99}
 	 */
-	public static ParametersZhang98 convertIntoZhangParam(List<Se3_F64> motions,
+	public static ParametersZhang99 convertIntoZhangParam(List<Se3_F64> motions,
 														  DenseMatrix64F K,
 														  double[] distort) {
-		ParametersZhang98 ret = new ParametersZhang98();
+		ParametersZhang99 ret = new ParametersZhang99();
 
 		ret.a = K.get(0,0);
 		ret.b = K.get(1,1);
@@ -177,11 +178,11 @@ public class CalibrationPlanarGridZhang98 {
 
 		ret.distortion = distort;
 
-		ret.views = new ParametersZhang98.View[motions.size()];
+		ret.views = new ParametersZhang99.View[motions.size()];
 		for( int i = 0; i < ret.views.length; i++ ) {
 			Se3_F64 m = motions.get(i);
 
-			ParametersZhang98.View v = new ParametersZhang98.View();
+			ParametersZhang99.View v = new ParametersZhang99.View();
 			v.T = m.getT();
 			RotationMatrixGenerator.matrixToRodrigues(m.getR(), v.rotation);
 
@@ -211,7 +212,7 @@ public class CalibrationPlanarGridZhang98 {
 		pt.y += pt.y*a;
 	}
 
-	public ParametersZhang98 getOptimized() {
+	public ParametersZhang99 getOptimized() {
 		return optimized;
 	}
 }

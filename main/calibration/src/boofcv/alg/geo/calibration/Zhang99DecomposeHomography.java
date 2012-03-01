@@ -30,7 +30,7 @@ import org.ejml.ops.SpecializedOps;
 /**
  * <p>
  * Decomposes a homography into rigid body motion (rotation and translation) utilizing specific
- * assumptions made inside the Zhang98 paper [1].
+ * assumptions made inside the Zhang99 paper [1].
  * </p>
  *
  * <p>
@@ -47,12 +47,13 @@ import org.ejml.ops.SpecializedOps;
  * </p>
  *
  * <p>
- * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations," 1998
+ * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations,",
+ * International Conference on Computer Vision (ICCV'99), Corfu, Greece, pages 666-673, September 1999.
  * </p>
  *
  * @author Peter Abeles
  */
-public class Zhang98DecomposeHomography {
+public class Zhang99DecomposeHomography {
 
 	// Rows in rotation matrix
 	DenseMatrix64F r1 = new DenseMatrix64F(3,1);
@@ -80,7 +81,7 @@ public class Zhang98DecomposeHomography {
 
 	/**
 	 * Compute the rigid body motion that composes the homography matrix H.  It is assumed
-	 * that H was computed using {@link Zhang98ComputeTargetHomography}.
+	 * that H was computed using {@link Zhang99ComputeTargetHomography}.
 	 *
 	 * @param H homography matrix.
 	 * @return Found camera motion.
