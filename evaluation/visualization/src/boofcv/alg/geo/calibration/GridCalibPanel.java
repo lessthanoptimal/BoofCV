@@ -130,6 +130,10 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		addAlignLeft(showGraph,this);
 	}
 
+	public void addView( String name ) {
+		viewSelector.addItem(name);
+	}
+	
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if( listener == null )

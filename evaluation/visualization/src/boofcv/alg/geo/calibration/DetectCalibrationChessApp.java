@@ -20,6 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
+import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ProcessInput;
@@ -28,6 +29,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.ConfigureFileInterface;
 import boofcv.io.SimpleStringNumberReader;
 import boofcv.io.image.ImageListManager;
@@ -41,7 +43,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.Reader;
 import java.util.List;
 
@@ -65,6 +66,8 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	BufferedImage input;
 	// gray scale image that targets are detected inside of
 	T gray;
+	// feature intensity image
+	ImageFloat32 intensity = new ImageFloat32(1,1);
 
 	boolean foundTarget;
 	boolean processed = false;
@@ -78,6 +81,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		panel.setLayout( new BorderLayout());
 
 		calibGUI = new GridCalibPanel(false);
+		calibGUI.addView("Feature");
 		calibGUI.setListener( this );
 		calibGUI.setMinimumSize(calibGUI.getPreferredSize());
 		
@@ -88,7 +92,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	public void configure( int numCols , int numRows ) {
-		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,20,255,imageType);
+		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,4,20,255,imageType);
 	}
 
 	@Override
@@ -118,6 +122,8 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 		gray.reshape(input.getWidth(),input.getHeight());
 		ConvertBufferedImage.convertFrom(input, gray);
+
+		intensity.reshape(gray.width,gray.height);
 
 		detectTarget();
 
@@ -153,6 +159,13 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 				int numLabels = detectBlobs.getNumLabels();
 				VisualizeBinaryData.renderLabeled(detectBlobs.getLabeledImage(),numLabels,workImage);
+				break;
+
+			case 3:
+				GeneralizedImageOps.fill(intensity,0);
+				alg.renderIntensity(intensity);
+				float max = PixelMath.maxAbs(intensity);
+				VisualizeImageData.colorizeSign(intensity,workImage,max);
 				break;
 
 			default:
@@ -265,6 +278,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		manager.add("View 06",prefix+"frame06.jpg");
 		manager.add("View 07",prefix+"frame07.jpg");
 		manager.add("View 08",prefix+"frame08.jpg");
+		manager.add("View 11",prefix+"frame11.jpg");
 
 		app.setInputManager(manager);
 

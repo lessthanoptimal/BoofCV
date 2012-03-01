@@ -69,15 +69,15 @@ public class FactoryIntensityPointAlg {
 	{
 		if( derivType == ImageFloat32.class ) {
 			if( weighted )
-				return (HarrisCornerIntensity<D>)new ImplHarrisCorner_F32(windowRadius,kappa);
-			else
 				return (HarrisCornerIntensity<D>)new ImplHarrisCornerWeighted_F32(windowRadius,kappa);
+			else
+				return (HarrisCornerIntensity<D>)new ImplHarrisCorner_F32(windowRadius,kappa);
 
 		} else if( derivType == ImageSInt16.class ) {
 			if( weighted )
-				return (HarrisCornerIntensity<D>)new ImplHarrisCorner_S16(windowRadius,kappa);
-			else
 				return (HarrisCornerIntensity<D>)new ImplHarrisCornerWeighted_S16(windowRadius,kappa);
+			else
+				return (HarrisCornerIntensity<D>)new ImplHarrisCorner_S16(windowRadius,kappa);
 
 		}else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
