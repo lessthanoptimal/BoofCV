@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestParametersZhang98 {
+public class TestParametersZhang99 {
 
 	Random rand = new Random(234);
 
@@ -43,12 +43,12 @@ public class TestParametersZhang98 {
 
 	public void checkToAndFromParam( boolean assumeZeroSkew )
 	{
-		ParametersZhang98 p = new ParametersZhang98(3,2);
+		ParametersZhang99 p = new ParametersZhang99(3,2);
 
 		p.a = 2;p.b=3;p.c=4;p.x0=5;p.y0=6;
 		p.distortion = new double[]{1,2,3};
 		for( int i = 0; i < 2; i++ ) {
-			ParametersZhang98.View v = p.views[i];
+			ParametersZhang99.View v = p.views[i];
 			v.T.set(rand.nextDouble(),rand.nextDouble(),rand.nextDouble());
 			v.rotation.theta = rand.nextDouble();
 			v.rotation.unitAxisRotation.set(rand.nextDouble(),rand.nextDouble(),rand.nextDouble());
@@ -59,15 +59,15 @@ public class TestParametersZhang98 {
 		p.convertToParam(assumeZeroSkew,array);
 
 		// create a new set of parameters and assign its value from the array
-		ParametersZhang98 found = new ParametersZhang98(3,2);
+		ParametersZhang99 found = new ParametersZhang99(3,2);
 		found.setFromParam(assumeZeroSkew,array);
 
 		// compare the two sets of parameters
 		checkEquals(p,found,assumeZeroSkew);
 	}
 
-	private void checkEquals(ParametersZhang98 expected ,
-							 ParametersZhang98 found ,
+	private void checkEquals(ParametersZhang99 expected ,
+							 ParametersZhang99 found ,
 							 boolean assumeZeroSkew ) {
 		double tol = 1e-6;
 
@@ -83,8 +83,8 @@ public class TestParametersZhang98 {
 		}
 
 		for( int i = 0; i < 2; i++ ) {
-			ParametersZhang98.View pp = expected.views[i];
-			ParametersZhang98.View ff = found.views[i];
+			ParametersZhang99.View pp = expected.views[i];
+			ParametersZhang99.View ff = found.views[i];
 
 			GeometryUnitTest.assertEquals(pp.T, ff.T, tol);
 			GeometryUnitTest.assertEquals(pp.rotation.unitAxisRotation,ff.rotation.unitAxisRotation,tol);

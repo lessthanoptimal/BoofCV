@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestZhang98CalibrationMatrixFromHomography {
+public class TestZhang99CalibrationMatrixFromHomography {
 
 	Random rand = new Random(123);
 	List<DenseMatrix64F> homographies;
@@ -43,8 +43,8 @@ public class TestZhang98CalibrationMatrixFromHomography {
 		for( int N = 3; N <= 6; N++ ) {
 			homographies = GenericCalibrationGrid.createHomographies(K, N, rand);
 
-			Zhang98CalibrationMatrixFromHomographies alg =
-					new Zhang98CalibrationMatrixFromHomographies(false);
+			Zhang99CalibrationMatrixFromHomographies alg =
+					new Zhang99CalibrationMatrixFromHomographies(false);
 
 			alg.process(homographies);
 
@@ -65,8 +65,8 @@ public class TestZhang98CalibrationMatrixFromHomography {
 
 			homographies = GenericCalibrationGrid.createHomographies(K, N, rand);
 
-			Zhang98CalibrationMatrixFromHomographies alg =
-					new Zhang98CalibrationMatrixFromHomographies(true);
+			Zhang99CalibrationMatrixFromHomographies alg =
+					new Zhang99CalibrationMatrixFromHomographies(true);
 
 			alg.process(homographies);
 

@@ -29,18 +29,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Function for performing non-linear optimization on the Zhang98 calibration parameters.
+ * Function for performing non-linear optimization on the Zhang99 calibration parameters.
  *
  * @author Peter Abeles
  */
-public class Zhang98OptimizationFunction implements FunctionNtoM {
+public class Zhang99OptimizationFunction implements FunctionNtoM {
 
 	private int N,M;
 	
 	// description of the calibration grid
 	private List<Point3D_F64> grid = new ArrayList<Point3D_F64>();
 	// optimization parameters
-	private ParametersZhang98 param;
+	private ParametersZhang99 param;
 	
 	// should it assume the skew parameter is zero?
 	private boolean assumeZeroSkew;
@@ -62,10 +62,10 @@ public class Zhang98OptimizationFunction implements FunctionNtoM {
 	 * @param grid Location of points on the calibration grid.  z=0
 	 * @param observations calibration point observation pixel coordinates
 	 */
-	public Zhang98OptimizationFunction( ParametersZhang98 param ,
-										boolean assumeZeroSkew,
-										List<Point2D_F64> grid ,
-										List<List<Point2D_F64>> observations ) {
+	public Zhang99OptimizationFunction(ParametersZhang99 param,
+									   boolean assumeZeroSkew,
+									   List<Point2D_F64> grid,
+									   List<List<Point2D_F64>> observations) {
 		if( param.views.length != observations.size() )
 			throw new IllegalArgumentException("For each view there should be one observation");
 
@@ -98,11 +98,11 @@ public class Zhang98OptimizationFunction implements FunctionNtoM {
 		process(param,output);
 	}
 
-	public void process( ParametersZhang98 param , double []residuals ) {
+	public void process( ParametersZhang99 param , double []residuals ) {
 		int index = 0;
 		for( int indexView = 0; indexView < param.views.length; indexView++ ) {
 
-			ParametersZhang98.View v = param.views[indexView];
+			ParametersZhang99.View v = param.views[indexView];
 
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
 			se.T = v.T;
@@ -118,7 +118,7 @@ public class Zhang98OptimizationFunction implements FunctionNtoM {
 				calibratedPt.y = cameraPt.y/ cameraPt.z;
 
 				// apply radial distortion
-				CalibrationPlanarGridZhang98.applyDistortion(calibratedPt, param.distortion);
+				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, param.distortion);
 
 				// convert to pixel coordinates
 				double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;

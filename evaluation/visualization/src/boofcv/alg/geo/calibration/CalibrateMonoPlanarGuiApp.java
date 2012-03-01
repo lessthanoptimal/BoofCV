@@ -32,7 +32,6 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ProcessInput;
 import boofcv.io.*;
-import boofcv.io.image.UtilImageIO;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
@@ -40,7 +39,7 @@ import boofcv.struct.image.ImageFloat32;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -147,7 +146,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		// tell it how to undistort the image
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				ParametersZhang98 found = calibrator.getFound();
+				ParametersZhang99 found = calibrator.getFound();
 
 				tran.set(found.a,found.b,found.c,found.x0,found.y0,found.distortion);
 				gui.setCorrection(dist);

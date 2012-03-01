@@ -33,7 +33,7 @@ import java.util.List;
  * <p>
  * Performs the full processing loop for calibrating a mono camera from a planar grid.  A
  * directory is specified that the images are read in from.  Calibration points are detected
- * inside the image and feed into the Zhang98 algorithm for parameter estimation.
+ * inside the image and feed into the Zhang99 algorithm for parameter estimation.
  * </p>
  * 
  * <p>
@@ -56,13 +56,13 @@ public class CalibrateMonoPlanarApp {
 	protected PlanarCalibrationDetector detector;
 
 	// computes calibration parameters
-	protected CalibrationPlanarGridZhang98 zhang98;
+	protected CalibrationPlanarGridZhang99 Zhang99;
 	// calibration configuration
 	protected PlanarCalibrationTarget target;
 	protected boolean assumeZeroSkew;
 
 	// computed parameters
-	protected ParametersZhang98 found;
+	protected ParametersZhang99 found;
 
 	// should it save the images in memory
 	boolean saveImages;
@@ -102,7 +102,7 @@ public class CalibrateMonoPlanarApp {
 	{
 		this.assumeZeroSkew = assumeZeroSkew;
 		this.target = target;
-		zhang98 = new CalibrationPlanarGridZhang98(target,assumeZeroSkew,numRadialParam);
+		Zhang99 = new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam);
 	}
 
 	/**
@@ -158,17 +158,17 @@ public class CalibrateMonoPlanarApp {
 	}
 
 	/**
-	 * After calibration points have been found this invokes the Zhang98 algorithm to
+	 * After calibration points have been found this invokes the Zhang99 algorithm to
 	 * estimate calibration parameters.  Error statistics are also computed.
 	 */
 	public void process() {
 		updateStatus(1,"Estimating Parameters");
 		System.out.println("Estimating and optimizing numerical parameters");
-		if( !zhang98.process(observations) ) {
-			throw new RuntimeException("Zhang98 algorithm failed!");
+		if( !Zhang99.process(observations) ) {
+			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
 
-		found = zhang98.getOptimized();
+		found = Zhang99.getOptimized();
 
 		updateStatus(2,"Computing Errors");
 		errors = computeErrors(observations,found,target.points,assumeZeroSkew);
@@ -194,12 +194,12 @@ public class CalibrateMonoPlanarApp {
 	 * @return List of error statistics
 	 */
 	public static List<ImageResults> computeErrors( List<List<Point2D_F64>> observation ,
-													ParametersZhang98 param ,
+													ParametersZhang99 param ,
 													List<Point2D_F64> grid ,
 													boolean assumeZeroSkew)
 	{
-		Zhang98OptimizationFunction function =
-				new Zhang98OptimizationFunction(param,assumeZeroSkew,grid,observation);
+		Zhang99OptimizationFunction function =
+				new Zhang99OptimizationFunction(param,assumeZeroSkew,grid,observation);
 
 		double residuals[] = new double[grid.size()*observation.size()*2];
 		function.process(param,residuals);
@@ -280,7 +280,7 @@ public class CalibrateMonoPlanarApp {
 		return errors;
 	}
 
-	public ParametersZhang98 getFound() {
+	public ParametersZhang99 getFound() {
 		return found;
 	}
 

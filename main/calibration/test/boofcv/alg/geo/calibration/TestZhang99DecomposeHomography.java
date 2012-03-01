@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestZhang98DecomposeHomography {
+public class TestZhang99DecomposeHomography {
 
 	/**
 	 * Test against a simple known case
@@ -43,7 +43,7 @@ public class TestZhang98DecomposeHomography {
 		DenseMatrix64F K = GenericCalibrationGrid.createStandardCalibration();
 		DenseMatrix64F H = GenericCalibrationGrid.computeHomography(K,R,T);
 
-		Zhang98DecomposeHomography alg = new Zhang98DecomposeHomography();
+		Zhang99DecomposeHomography alg = new Zhang99DecomposeHomography();
 		alg.setCalibrationMatrix(K);
 		Se3_F64 motion = alg.decompose(H);
 

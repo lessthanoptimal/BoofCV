@@ -51,10 +51,11 @@ import java.util.List;
  * </p>
  *
  * <p>
- * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations," 1998
+ * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations,",
+ * International Conference on Computer Vision (ICCV'99), Corfu, Greece, pages 666-673, September 1999.
  * </p>
  */
-public class Zhang98CalibrationMatrixFromHomographies {
+public class Zhang99CalibrationMatrixFromHomographies {
 
 	// system of equations
 	private DenseMatrix64F A = new DenseMatrix64F(1,1);
@@ -75,7 +76,7 @@ public class Zhang98CalibrationMatrixFromHomographies {
 	 *
 	 * @param assumeZeroSkew  Assume that skew matrix is zero or not
 	 */
-	public Zhang98CalibrationMatrixFromHomographies(boolean assumeZeroSkew) {
+	public Zhang99CalibrationMatrixFromHomographies(boolean assumeZeroSkew) {
 		this.assumeZeroSkew = assumeZeroSkew;
 
 		if( assumeZeroSkew )

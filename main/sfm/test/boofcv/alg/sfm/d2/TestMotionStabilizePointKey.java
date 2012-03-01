@@ -46,7 +46,8 @@ public class TestMotionStabilizePointKey {
 		
 		// sanity check here
 		assertTrue(alg.process(input));
-		assertFalse(alg.isKeyFrame());
+		// first processed frame is a keyframe by default
+		assertTrue(alg.isKeyFrame());
 		assertFalse(alg.isReset());
 
 		// make sure there is a huge motion that should trigger a reset

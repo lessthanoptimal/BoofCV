@@ -30,7 +30,7 @@ import georegression.struct.so.Rodrigues;
  *
  * @author Peter Abeles
  */
-public class ParametersZhang98 {
+public class ParametersZhang99 {
 	// camera calibration matrix
 	public double a,b,c,x0,y0;
 	// radial distortion
@@ -39,16 +39,16 @@ public class ParametersZhang98 {
 	// position of each view of the target
 	public View[] views;
 
-	public ParametersZhang98( int numDistort , int numViews ) {
+	public ParametersZhang99(int numDistort, int numViews) {
 		distortion = new double[numDistort];
 		setNumberOfViews(numViews);
 	}
 
-	public ParametersZhang98( int numDistort ) {
+	public ParametersZhang99(int numDistort) {
 		distortion = new double[numDistort];
 	}
 
-	public ParametersZhang98() {
+	public ParametersZhang99() {
 	}
 
 	public void setNumberOfViews( int numViews ) {
@@ -58,12 +58,12 @@ public class ParametersZhang98 {
 		}
 	}
 
-	public ParametersZhang98 createNew() {
-		return new ParametersZhang98(distortion.length,views.length);
+	public ParametersZhang99 createNew() {
+		return new ParametersZhang99(distortion.length,views.length);
 	}
 
-	public ParametersZhang98 copy() {
-		ParametersZhang98 ret = createNew();
+	public ParametersZhang99 copy() {
+		ParametersZhang99 ret = createNew();
 		ret.a = a;
 		ret.b = b;
 		ret.c = c;

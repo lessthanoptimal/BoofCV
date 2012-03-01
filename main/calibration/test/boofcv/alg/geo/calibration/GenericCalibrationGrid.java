@@ -108,7 +108,7 @@ public class GenericCalibrationGrid {
 	}
 
 	/**
-	 * Creates a homography as defined in Section 2.2 in Zhang98.
+	 * Creates a homography as defined in Section 2.2 in Zhang99.
 	 *
 	 * H = K*[r1 r2 t]
 	 */
@@ -154,8 +154,8 @@ public class GenericCalibrationGrid {
 		return homographies;
 	}
 
-	static ParametersZhang98 createStandardParam(boolean zeroSkew, int numSkew, int numView, Random rand) {
-		ParametersZhang98 ret = new ParametersZhang98(numSkew,numView);
+	static ParametersZhang99 createStandardParam(boolean zeroSkew, int numSkew, int numView, Random rand) {
+		ParametersZhang99 ret = new ParametersZhang99(numSkew,numView);
 
 		DenseMatrix64F K = createStandardCalibration();
 		ret.a = K.get(0,0);
@@ -170,7 +170,7 @@ public class GenericCalibrationGrid {
 			ret.distortion[i] = rand.nextGaussian()*0.001;
 		}
 
-		for(ParametersZhang98.View v : ret.views ) {
+		for(ParametersZhang99.View v : ret.views ) {
 			double rotX = (rand.nextDouble()-0.5)*0.1;
 			double rotY = (rand.nextDouble()-0.5)*0.1;
 			double rotZ = (rand.nextDouble()-0.5)*0.1;
@@ -190,7 +190,7 @@ public class GenericCalibrationGrid {
 	 * Creates a set of observed points in pixel coordinates given zhang parameters and a calibration
 	 * grid.
 	 */
-	public static List<List<Point2D_F64>> createObservations( ParametersZhang98 config,
+	public static List<List<Point2D_F64>> createObservations( ParametersZhang99 config,
 															  List<Point2D_F64> grid)
 	{
 		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();
@@ -198,7 +198,7 @@ public class GenericCalibrationGrid {
 		Point3D_F64 cameraPt = new Point3D_F64();
 		Point2D_F64 calibratedPt = new Point2D_F64();
 
-		for( ParametersZhang98.View v : config.views ) {
+		for( ParametersZhang99.View v : config.views ) {
 			List<Point2D_F64> obs = new ArrayList<Point2D_F64>();
 			Se3_F64 se = new Se3_F64();
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
@@ -215,7 +215,7 @@ public class GenericCalibrationGrid {
 				calibratedPt.y = cameraPt.y/ cameraPt.z;
 
 				// apply radial distortion
-				CalibrationPlanarGridZhang98.applyDistortion(calibratedPt, config.distortion);
+				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, config.distortion);
 
 				// convert to pixel coordinates
 				double x = config.a*calibratedPt.x + config.c*calibratedPt.y + config.x0;
