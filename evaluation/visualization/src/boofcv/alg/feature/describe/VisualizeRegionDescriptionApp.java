@@ -22,12 +22,11 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.SelectRegionDescriptionPanel;
 import boofcv.gui.feature.TupleDescPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -36,6 +35,7 @@ import georegression.struct.point.Point2D_I32;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 
 /**
@@ -44,7 +44,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends ImageSingleBand>
-	extends SelectAlgorithmImagePanel implements ProcessInput, SelectRegionDescriptionPanel.Listener
+	extends SelectAlgorithmAndInputPanel implements SelectRegionDescriptionPanel.Listener
 {
 	boolean processedImage = false;
 
@@ -99,6 +99,9 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public boolean getHasProcessedImage() {
 		return processedImage;
 	}
@@ -123,9 +126,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager m = getInputManager();
-		BufferedImage image = m.loadImage(index);
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
 		process(image);
 	}
@@ -164,14 +166,14 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 		VisualizeRegionDescriptionApp app = new VisualizeRegionDescriptionApp(imageType,derivType);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("Cave","../data/evaluation/stitch/cave_01.jpg","../data/evaluation/stitch/cave_02.jpg");
-		manager.add("Kayak","../data/evaluation/stitch/kayak_02.jpg","../data/evaluation/stitch/kayak_03.jpg");
-		manager.add("Forest","../data/evaluation/scale/rainforest_01.jpg","../data/evaluation/scale/rainforest_02.jpg");
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("Cave","../data/evaluation/stitch/cave_01.jpg"));
+		inputs.add(new PathLabel("Kayak","../data/evaluation/stitch/kayak_02.jpg"));
+		inputs.add(new PathLabel("Forest","../data/evaluation/scale/rainforest_01.jpg"));
 
 		app.setPreferredSize(new Dimension(500,500));
 		app.setSize(500,500);
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

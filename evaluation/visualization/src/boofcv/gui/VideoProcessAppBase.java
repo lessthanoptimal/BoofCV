@@ -19,7 +19,6 @@
 package boofcv.gui;
 
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.video.VideoListManager;
 import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
@@ -35,7 +34,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public abstract class VideoProcessAppBase<I extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmImagePanel implements ProcessInput , MouseListener , ChangeListener
+		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener , ChangeListener
 {
 	protected SimpleImageSequence<I> sequence;
 
@@ -46,10 +45,13 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand, D extends I
 	long framePeriod = 100;
 
 	JSpinner periodSpinner;
+	
+	Class<I> imageType;
 
-	public VideoProcessAppBase(int numAlgFamilies) {
+	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageType) {
 		super(numAlgFamilies);
 
+		this.imageType = imageType;
 		addToToolbar(createSelectDelay());
 	}
 
@@ -78,11 +80,10 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand, D extends I
 	protected abstract void updateAlgGUI( I frame , BufferedImage imageGUI , double fps );
 
 	@Override
-	public void changeImage(String name, int index) {
-		// todo add window showing load status
+	public void changeInput(String name, int index) {
 		stopWorker();
-		VideoListManager manager = getInputManager();
-		process(manager.loadSequence(index));
+		SimpleImageSequence<I> video = media.openVideo(inputRefs.get(index).getPath(),imageType);
+		process(video);
 	}
 
 	protected void stopWorker() {

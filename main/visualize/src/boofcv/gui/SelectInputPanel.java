@@ -16,18 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.io;
-
-import java.util.List;
-
+package boofcv.gui;
 
 /**
+ * Panel where a toolbar is provided for selecting an input image only.
+ *
  * @author Peter Abeles
  */
-public interface InputListManager {
-	public int size();
+public abstract class SelectInputPanel extends SelectAlgorithmAndInputPanel {
 
-	public List<String> getLabels();
+	public SelectInputPanel() {
+		super(0);
+	}
 
-	public String getLabel( int index );
+	@Override
+	public void refreshAll(Object[] cookies) {}
+
+	@Override
+	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {}
 }

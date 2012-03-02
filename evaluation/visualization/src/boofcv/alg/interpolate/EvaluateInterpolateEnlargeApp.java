@@ -23,11 +23,10 @@ import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
@@ -36,6 +35,7 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Compares different types of interpolation algorithms by enlarging an image.
@@ -43,7 +43,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
-	extends SelectAlgorithmImagePanel implements ProcessInput, ComponentListener
+	extends SelectAlgorithmAndInputPanel implements ComponentListener
 {
 	Class<T> imageType;
 	MultiSpectral<T> color;
@@ -83,6 +83,9 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public void refreshAll(Object[] cookies) {
 		setActiveAlgorithm(0,null,cookies[0]);
 	}
@@ -110,10 +113,9 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -143,11 +145,12 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 //		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(ImageUInt8.class);
 
 		app.setPreferredSize(new Dimension(500,500));
-		ImageListManager manager = new ImageListManager();
-		manager.add("eye 1","../data/evaluation/eye01.jpg");
-		manager.add("eye 2","../data/evaluation/eye02.jpg");
 
-		app.setInputManager(manager);
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("eye 1","../data/evaluation/eye01.jpg"));
+		inputs.add(new PathLabel("eye 2","../data/evaluation/eye02.jpg"));
+
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

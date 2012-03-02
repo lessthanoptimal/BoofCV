@@ -16,19 +16,36 @@
  * limitations under the License.
  */
 
-package boofcv.gui;
-
-import boofcv.io.InputListManager;
-
+package boofcv.io;
 
 /**
- * Common interface for visualization applications that process a single input image.
- *
+ * Object containing the path to a file and a label that is used to refer to the file
+ * 
  * @author Peter Abeles
  */
-public interface ProcessInput {
+public class PathLabel {
+	public String label;
+	public String []path;
 
-	public void setInputManager( InputListManager manager );
+	public PathLabel(String label, String path) {
+		this.label = label;
+		this.path = new String[]{path};
+	}
 
-	public boolean getHasProcessedImage();
+	public PathLabel(String label, String ...path) {
+		this.label = label;
+		this.path = path;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public String getPath() {
+		return path[0];
+	}
+	
+	public String getPath(int index ) {
+		return path[index];
+	}
 }

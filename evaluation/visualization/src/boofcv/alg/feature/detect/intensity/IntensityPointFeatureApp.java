@@ -28,12 +28,11 @@ import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
@@ -42,6 +41,7 @@ import boofcv.struct.image.ImageUInt8;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Displays the intensity of detected features inside an image
@@ -49,7 +49,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmImagePanel implements ProcessInput
+		extends SelectAlgorithmAndInputPanel
 {
 	// displays intensity image
 	ImagePanel gui;
@@ -126,15 +126,17 @@ public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends Image
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public void refreshAll(Object[] cookies) {
 		setActiveAlgorithm(0,null,cookies[0]);
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -152,12 +154,13 @@ public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends Image
 		IntensityPointFeatureApp<ImageUInt8, ImageSInt16> app =
 				new IntensityPointFeatureApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","../data/evaluation/shapes01.png");
-		manager.add("sunflowers","../data/evaluation/sunflowers.png");
-		manager.add("beach","../data/evaluation/scale/beach02.jpg");
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		app.setInputManager(manager);
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
+
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

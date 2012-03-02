@@ -24,11 +24,10 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.factory.transform.wavelet.GFactoryWavelet;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -38,6 +37,7 @@ import boofcv.struct.wavelet.WlCoef;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 
 /**
@@ -45,7 +45,7 @@ import java.awt.image.BufferedImage;
  */
 public class WaveletVisualizeApp
 		<T extends ImageSingleBand, W extends ImageSingleBand, C extends WlCoef>
-		extends SelectAlgorithmImagePanel implements ProcessInput
+		extends SelectAlgorithmAndInputPanel
 {
 	int numLevels = 3;
 
@@ -85,6 +85,9 @@ public class WaveletVisualizeApp
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public void refreshAll(Object[] cookies) {
 		setActiveAlgorithm(0,null,cookies[0]);
 	}
@@ -119,10 +122,9 @@ public class WaveletVisualizeApp
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -138,14 +140,14 @@ public class WaveletVisualizeApp
 		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageFloat32.class);
 //		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageUInt8.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("lena","../data/evaluation/standard/lena512.bmp");
-		manager.add("boat","../data/evaluation/standard/boat.png");
-		manager.add("fingerprint","../data/evaluation/standard/fingerprint.png");
-		manager.add("shapes","../data/evaluation/shapes01.png");
-		manager.add("sunflowers","../data/evaluation/sunflowers.png");
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("lena","../data/evaluation/standard/lena512.bmp"));
+		inputs.add(new PathLabel("boat","../data/evaluation/standard/boat.png"));
+		inputs.add(new PathLabel("fingerprint","../data/evaluation/standard/fingerprint.png"));
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

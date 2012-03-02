@@ -19,7 +19,6 @@
 package boofcv.io;
 
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.video.VideoListManager;
 import boofcv.struct.image.ImageBase;
 
 import java.awt.image.BufferedImage;

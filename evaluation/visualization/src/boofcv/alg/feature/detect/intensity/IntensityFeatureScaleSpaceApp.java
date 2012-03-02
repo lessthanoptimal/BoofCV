@@ -25,11 +25,10 @@ import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -37,6 +36,8 @@ import boofcv.struct.image.ImageSingleBand;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Displays the intensity of detected features across scalespace
@@ -44,7 +45,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class IntensityFeatureScaleSpaceApp<T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmImagePanel implements ProcessInput
+		extends SelectAlgorithmAndInputPanel
 {
 
 	ListDisplayPanel gui = new ListDisplayPanel();
@@ -78,6 +79,9 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageSingleBand, D extends 
 		}
 		ss.setScales(scales);
 	}
+
+	@Override
+	public void loadConfigurationFile(String fileName) {}
 
 	@Override
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
@@ -141,10 +145,8 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageSingleBand, D extends 
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
-
-		BufferedImage image = manager.loadImage(index);
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath() );
 		if( image != null ) {
 			process(image);
 		}
@@ -162,12 +164,14 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageSingleBand, D extends 
 //		IntensityFeatureScaleSpaceApp app =
 //				new IntensityFeatureScaleSpaceApp(ImageUInt8.class, ImageSInt16.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","data/shapes01.png");
-		manager.add("sunflowers","data/sunflowers.png");
-		manager.add("beach","data/scale/beach02.jpg");
+		String prefix = "../data/evaluation/";
 
-		app.setInputManager(manager);
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("shapes",prefix+"shapes01.png"));
+		inputs.add(new PathLabel("sunflowers",prefix+"sunflowers.png"));
+		inputs.add(new PathLabel("beach",prefix+"scale/beach02.jpg"));
+
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

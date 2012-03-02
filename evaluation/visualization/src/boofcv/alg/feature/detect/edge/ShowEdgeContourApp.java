@@ -28,11 +28,10 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
@@ -40,6 +39,7 @@ import georegression.struct.point.Point2D_I32;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -49,7 +49,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmImagePanel implements ProcessInput , CannyControlBar.Listener , SelectHistogramThresholdPanel.Listener
+		extends SelectAlgorithmAndInputPanel implements CannyControlBar.Listener , SelectHistogramThresholdPanel.Listener
 {
 	// shows panel for displaying input image
 	ImagePanel panel = new ImagePanel();
@@ -106,6 +106,9 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 				doRefreshAll();
 			}});
 	}
+
+	@Override
+	public void loadConfigurationFile(String fileName) {}
 
 	@Override
 	public void refreshAll(Object[] cookies) {
@@ -174,10 +177,9 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -212,13 +214,13 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 //		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","../data/applet/shapes01.png");
-		manager.add("Room","../data/applet/indoors01.jpg");
-		manager.add("Objects","../data/applet/simple_objects.jpg");
-		manager.add("Indoors","../data/applet/lines_indoors.jpg");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("shapes","../data/applet/shapes01.png"));
+		inputs.add(new PathLabel("Room","../data/applet/indoors01.jpg"));
+		inputs.add(new PathLabel("Objects","../data/applet/simple_objects.jpg"));
+		inputs.add(new PathLabel("Indoors","../data/applet/lines_indoors.jpg"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

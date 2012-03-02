@@ -24,15 +24,13 @@ import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectImagePanel;
+import boofcv.gui.SelectInputPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.ConfigureFileInterface;
+import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
-import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
@@ -42,7 +40,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +50,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectCalibrationSquaresApp
-		extends SelectImagePanel implements ProcessInput , GridCalibPanel.Listener ,
-		ConfigureFileInterface
+		extends SelectInputPanel implements GridCalibPanel.Listener
 {
 	int targetColumns;
 	int targetRows;
@@ -106,8 +102,9 @@ public class DetectCalibrationSquaresApp
 		alg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
 	}
 
+
 	@Override
-	public void configure( String configName ) {
+	public void loadConfigurationFile( String configName ) {
 		Reader r = media.openFile(configName);
 		
 		SimpleStringNumberReader reader = new SimpleStringNumberReader('#');
@@ -277,10 +274,9 @@ public class DetectCalibrationSquaresApp
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
 
-		BufferedImage image = manager.loadImage(index);
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 		if (image != null) {
 			process(image);
 		}
@@ -328,18 +324,19 @@ public class DetectCalibrationSquaresApp
 
 		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
 
-		app.configure(prefix+"info.txt");
+		app.loadConfigurationFile(prefix + "info.txt");
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("View 01",prefix+"frame10.jpg");
-		manager.add("View 02",prefix+"frame02.jpg");
-		manager.add("View 03",prefix+"frame03.jpg");
-		manager.add("View 04",prefix+"frame04.jpg");
-		manager.add("View 05",prefix+"frame05.jpg");
-		manager.add("View 06",prefix+"frame06.jpg");
-		manager.add("View 07",prefix+"frame07.jpg");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		app.setInputManager(manager);
+		inputs.add(new PathLabel("View 01",prefix+"frame10.jpg"));
+		inputs.add(new PathLabel("View 02",prefix+"frame02.jpg"));
+		inputs.add(new PathLabel("View 03",prefix+"frame03.jpg"));
+		inputs.add(new PathLabel("View 04",prefix+"frame04.jpg"));
+		inputs.add(new PathLabel("View 05",prefix+"frame05.jpg"));
+		inputs.add(new PathLabel("View 06",prefix+"frame06.jpg"));
+		inputs.add(new PathLabel("View 07",prefix+"frame07.jpg"));
+
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

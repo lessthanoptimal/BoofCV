@@ -19,9 +19,8 @@
 package boofcv.gui;
 
 import boofcv.gui.image.ImagePanel;
-import boofcv.io.InputListManager;
 import boofcv.io.MediaManager;
-import boofcv.io.MediaManagerInput;
+import boofcv.io.PathLabel;
 import boofcv.io.wrapper.DefaultMediaManager;
 
 import javax.swing.*;
@@ -29,17 +28,21 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
 
 /**
- * Provides pull a menubar for selecting the input image and which algorithm to use
+ * Provides pull a menubar for selecting the input source and which algorithm to use
  *
  * @author Peter Abeles
  */
-public abstract class SelectAlgorithmImagePanel extends JPanel
-		implements ActionListener, MediaManagerInput
+public abstract class SelectAlgorithmAndInputPanel extends JPanel
+		implements ActionListener, VisualizeApp
 {
 	JToolBar toolbar;
 	// each combo box is used to select different algorithms
@@ -49,7 +52,10 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 	// when selected it shows the original image
 	JCheckBox originalCheck;
 	List<Object> algCookies[];
-	InputListManager imageManager;
+	// list of input names and where to get the inputs
+	protected List<PathLabel> inputRefs;
+	protected String baseDirectory="";
+
 	// components which had been externally added
 	List<JComponent> addedComponents = new ArrayList<JComponent>();
 
@@ -65,7 +71,7 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 	// abstract way of reading in media
 	protected MediaManager media = DefaultMediaManager.INSTANCE;
 
-	public SelectAlgorithmImagePanel(int numAlgFamilies) {
+	public SelectAlgorithmAndInputPanel(int numAlgFamilies) {
 		super(new BorderLayout());
 		toolbar = new JToolBar();
 
@@ -93,6 +99,47 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 		originalCheck.setEnabled(false);
 
 		add(toolbar, BorderLayout.PAGE_START);
+	}
+
+	/**
+	 * Loads a standardized file for input references
+	 *
+	 * @param fileName path to config file
+	 */
+	@Override
+	public void loadInputData(String fileName) {
+		Reader r = media.openFile(fileName);
+
+		List<PathLabel> refs = new ArrayList<PathLabel>();
+		try {
+			BufferedReader reader = new BufferedReader(r);
+
+			String line;
+			while( (line = reader.readLine()) != null ) {
+
+				String[]z = line.split(":");
+				String[] names = new String[z.length-1];
+				for( int i = 1; i < z.length; i++ ) {
+					names[i-1] = baseDirectory+z[i];
+				}
+
+				refs.add(new PathLabel(z[0],names[0]));
+			}
+
+			setInputList(refs);
+
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Sets the directory that relative references are relative too
+	 */
+	public void setBaseDirectory(String baseDirectory) {
+		this.baseDirectory = baseDirectory;
 	}
 
 	/**
@@ -143,12 +190,18 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 			}});
 	}
 
-	public void setInputManager( final InputListManager manager ) {
-		this.imageManager = manager;
+	/**
+	 * Specifies a list of images to use as input and loads them
+	 *
+	 * @param inputRefs Name of input and where to get it
+	 */
+	public void setInputList(final List<PathLabel> inputRefs) {
+		this.inputRefs = inputRefs;
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				for( int i = 0; i < manager.size(); i++ ) {
-					imageBox.addItem(manager.getLabel(i));
+				for( int i = 0; i < inputRefs.size(); i++ ) {
+					imageBox.addItem(inputRefs.get(i).getLabel());
 				}
 			}});
 	}
@@ -238,7 +291,7 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 			final String name = (String)imageBox.getSelectedItem();
 			new Thread() {
 				public void run() {
-					performChangeImage(name, imageBox.getSelectedIndex());
+					performChangeInput(name, imageBox.getSelectedIndex());
 				}
 			}.start();
 		} else if( e.getSource() == originalCheck ) {
@@ -262,18 +315,14 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 		setActiveGUI(true);
 	}
 
-	private void performChangeImage(String name , int index ) {
+	private void performChangeInput(String name, int index) {
 		setActiveGUI(false);
-		changeImage( name , index );
+		changeInput(name, index);
 		setActiveGUI(true);
 	}
 
-	public <T extends InputListManager> T getInputManager() {
-		return (T)imageManager;
-	}
-
 	@Override
-	public void setMediaManager(MediaManager manager) {
+	public void setMediaManager( MediaManager manager) {
 		this.media = manager;
 	}
 
@@ -300,5 +349,5 @@ public abstract class SelectAlgorithmImagePanel extends JPanel
 	 * @param name Display name of the image.
 	 * @param index Which image in the list.
 	 */
-	public abstract void changeImage( String name , int index );
+	public abstract void changeInput(String name, int index);
 }

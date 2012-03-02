@@ -18,8 +18,6 @@
 
 package boofcv.gui;
 
-import boofcv.io.image.ImageListManager;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -40,7 +38,6 @@ public abstract class SelectAlgorithmPanel extends JPanel
 	JToolBar toolbar;
 	JComboBox algBox;
 	List<Object> algCookies = new ArrayList<Object>();
-	ImageListManager imageManager;
 	Component gui;
 
 	public SelectAlgorithmPanel() {
@@ -113,10 +110,6 @@ public abstract class SelectAlgorithmPanel extends JPanel
 			public void run() {
 				toolbar.setEnabled(true);
 			}});
-	}
-
-	public ImageListManager getImageManager() {
-		return imageManager;
 	}
 
 	public abstract void setActiveAlgorithm( String name , Object cookie );

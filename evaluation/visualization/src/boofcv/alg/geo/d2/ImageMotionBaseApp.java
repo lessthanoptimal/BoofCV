@@ -29,8 +29,8 @@ import boofcv.alg.sfm.robust.DistanceHomographySq;
 import boofcv.alg.sfm.robust.GenerateHomographyLinear;
 import boofcv.alg.sfm.robust.GenerateRefineAffine2D;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.gui.ProcessInput;
 import boofcv.gui.VideoProcessAppBase;
+import boofcv.gui.VisualizeApp;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
@@ -62,7 +62,7 @@ import java.awt.image.BufferedImage;
  */
 public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends ImageSingleBand ,
 		T extends InvertibleTransform>
-		extends VideoProcessAppBase<I,D> implements ProcessInput
+		extends VideoProcessAppBase<I,D> implements VisualizeApp
 {
 	// If the input and output images are being shown, this is the width of a border between them.
 	private final static int outputBorder = 10;
@@ -116,7 +116,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 	 */
 	public ImageMotionBaseApp(boolean showInput, Class<I> imageType, int numAlgFamilies)
 	{
-		super(numAlgFamilies);
+		super(numAlgFamilies,imageType);
 		this.showInput = showInput;
 		this.imageType = imageType;
 

@@ -18,20 +18,21 @@
 
 package boofcv.gui;
 
+import boofcv.io.MediaManager;
+
+
 /**
- * Panel where a toolbar is provided for selecting an input image only.
+ * Common interface for visualization applications that process a single input image.
  *
  * @author Peter Abeles
  */
-public abstract class SelectImagePanel extends SelectAlgorithmImagePanel {
+public interface VisualizeApp {
 
-	public SelectImagePanel() {
-		super(0);
-	}
+	public void setMediaManager( MediaManager manager );
 
-	@Override
-	public void refreshAll(Object[] cookies) {}
+	public void loadConfigurationFile(String fileName);
+	
+	public void loadInputData(String fileName);
 
-	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {}
+	public boolean getHasProcessedImage();
 }

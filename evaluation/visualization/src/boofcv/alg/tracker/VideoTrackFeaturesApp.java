@@ -22,13 +22,12 @@ import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
-import boofcv.gui.ProcessInput;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.video.VideoListManager;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -36,6 +35,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Runs a KLT tracker through a video sequence
@@ -44,7 +44,7 @@ import java.awt.image.BufferedImage;
  */
 // todo extract out base class for handling videos
 public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSingleBand>
-		extends VideoProcessAppBase<I,D> implements ProcessInput , MouseListener
+		extends VideoProcessAppBase<I,D> implements MouseListener
 {
 
 	int maxFeatures = 130;
@@ -57,7 +57,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 	BufferedImage workImage;
 
 	public VideoTrackFeaturesApp( Class<I> imageType , Class<D> derivType ) {
-		super(1);
+		super(1,imageType);
 
 		PkltManagerConfig<I, D> config =
 				PkltManagerConfig.createDefault(imageType,derivType);
@@ -75,6 +75,9 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		gui.requestFocus();
 		setMainGUI(gui);
 	}
+
+	@Override
+	public void loadConfigurationFile(String fileName) {}
 
 	@Override
 	public void process( SimpleImageSequence<I> sequence ) {
@@ -161,12 +164,12 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 
 		VideoTrackFeaturesApp app = new VideoTrackFeaturesApp(imageType, derivType);
 
-		VideoListManager manager = new VideoListManager(imageType);
-		manager.add("Shake", "MJPEG", "../data/applet/shake.mjpeg");
-		manager.add("Zoom", "MJPEG", "../data/applet/zoom.mjpeg");
-		manager.add("Rotate", "MJPEG", "../data/applet/rotate.mjpeg");
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("Shake", "../data/applet/shake.mjpeg"));
+		inputs.add(new PathLabel("Zoom", "../data/applet/zoom.mjpeg"));
+		inputs.add(new PathLabel("Rotate", "../data/applet/rotate.mjpeg"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

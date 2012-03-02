@@ -22,9 +22,8 @@ import boofcv.alg.sfm.d2.MotionMosaicPointKey;
 import boofcv.alg.sfm.d2.UtilImageMotion;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
-import boofcv.gui.ProcessInput;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.video.VideoListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -37,6 +36,8 @@ import georegression.transform.ConvertTransform_F64;
 import georegression.transform.homo.HomographyPointOps;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Creates a mosaic from an image sequence using tracked point features.  Each the input window
@@ -49,7 +50,7 @@ import java.awt.image.BufferedImage;
  */
 // TODO change scale in info panel
 public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand, T extends InvertibleTransform<T>>
-		extends ImageMotionBaseApp<I,D,T> implements ProcessInput
+		extends ImageMotionBaseApp<I,D,T>
 {
 	private final static int maxFeatures = 250;
 	private final static int maxIterations = 100;
@@ -73,6 +74,9 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());
 	}
+
+	@Override
+	public void loadConfigurationFile(String fileName) {}
 
 	private Affine2D_F64 createInitialTransform() {
 		float scale = 0.8f;
@@ -169,12 +173,12 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		
 		VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(type,derivType);
 
-		VideoListManager manager = new VideoListManager(type);
-		manager.add("Plane 1", "MJPEG", "../data/applet/mosaic/airplane01.mjpeg");
-		manager.add("Plane 2", "MJPEG", "../data/applet/mosaic/airplane02.mjpeg");
-		manager.add("Shake", "MJPEG", "../data/applet/shake.mjpeg");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("Plane 1", "../data/applet/mosaic/airplane01.mjpeg"));
+		inputs.add(new PathLabel("Plane 2", "../data/applet/mosaic/airplane02.mjpeg"));
+		inputs.add(new PathLabel("Shake", "../data/applet/shake.mjpeg"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

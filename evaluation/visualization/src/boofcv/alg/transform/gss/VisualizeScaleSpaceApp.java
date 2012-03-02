@@ -21,15 +21,16 @@ package boofcv.alg.transform.gss;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectImagePanel;
+import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Displays the scale space for a particular image.
@@ -37,7 +38,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizeScaleSpaceApp <T extends ImageSingleBand, D extends ImageSingleBand>
-	extends SelectImagePanel implements ProcessInput
+	extends SelectInputPanel
 {
 	GaussianScaleSpace<T,D> ss;
 
@@ -72,15 +73,17 @@ public class VisualizeScaleSpaceApp <T extends ImageSingleBand, D extends ImageS
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public boolean getHasProcessedImage() {
 		return processedImage;
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -90,12 +93,12 @@ public class VisualizeScaleSpaceApp <T extends ImageSingleBand, D extends ImageS
 //		VisualizeScaleSpaceApp app = new VisualizeScaleSpaceApp(ImageFloat32.class);
 		VisualizeScaleSpaceApp app = new VisualizeScaleSpaceApp(ImageUInt8.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("boat","../data/evaluation/standard/boat.png");
-		manager.add("shapes","../data/evaluation/shapes01.png");
-		manager.add("sunflowers","../data/evaluation/sunflowers.png");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("boat","../data/evaluation/standard/boat.png"));
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

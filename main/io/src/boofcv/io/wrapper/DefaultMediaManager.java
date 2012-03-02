@@ -30,7 +30,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Peter Abeles
@@ -39,6 +41,8 @@ public class DefaultMediaManager implements MediaManager {
 
 	public static final DefaultMediaManager INSTANCE = new DefaultMediaManager();
 
+	Map<String,BufferedImage> cachedImage = new HashMap<String, BufferedImage>();
+	
 	@Override
 	public Reader openFile(String fileName) {
 		try {
@@ -50,18 +54,35 @@ public class DefaultMediaManager implements MediaManager {
 
 	@Override
 	public BufferedImage openImage(String fileName) {
-		return UtilImageIO.loadImage(fileName);
+		
+		BufferedImage b = cachedImage.get(fileName);
+		
+		if( b == null ) {
+			b = UtilImageIO.loadImage(fileName);
+			
+			if( b == null )
+				throw new RuntimeException("Image cannot be found! "+fileName);
+			
+			cachedImage.put(fileName,b);
+		}
+		
+		return b;
 	}
 
 	@Override
 	public <T extends ImageBase> SimpleImageSequence<T>
 	openVideo(String fileName, Class<T> type) {
-		try {
-			VideoMjpegCodec codec = new VideoMjpegCodec();
-			List<byte[]> data = codec.read(new FileInputStream(fileName));
-			return new JpegByteImageSequence<T>(type,data,true);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
+
+		if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ) {
+			try {
+				VideoMjpegCodec codec = new VideoMjpegCodec();
+				List<byte[]> data = codec.read(new FileInputStream(fileName));
+				return new JpegByteImageSequence<T>(type,data,true);
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			throw new RuntimeException("Unknown movie type.  Must be an mjpeg");
 		}
 	}
 }

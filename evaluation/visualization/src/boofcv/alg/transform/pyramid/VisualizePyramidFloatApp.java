@@ -21,11 +21,10 @@ package boofcv.alg.transform.pyramid;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectImagePanel;
+import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.pyramid.PyramidFloat;
@@ -33,6 +32,7 @@ import boofcv.struct.pyramid.PyramidFloat;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Displays an image pyramid.
@@ -40,7 +40,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizePyramidFloatApp <T extends ImageSingleBand>
-	extends SelectImagePanel implements ProcessInput
+	extends SelectInputPanel
 {
 	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};
 
@@ -77,10 +77,12 @@ public class VisualizePyramidFloatApp <T extends ImageSingleBand>
 	}
 
 	@Override
-	public synchronized void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void loadConfigurationFile(String fileName) {}
 
-		BufferedImage image = manager.loadImage(index);
+	@Override
+	public synchronized void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
+
 		if( image != null ) {
 			process(image);
 		}
@@ -96,12 +98,12 @@ public class VisualizePyramidFloatApp <T extends ImageSingleBand>
 //		VisualizePyramidFloatApp<ImageFloat32> app = new VisualizePyramidFloatApp<ImageFloat32>(ImageFloat32.class);
 		VisualizePyramidFloatApp<ImageUInt8> app = new VisualizePyramidFloatApp<ImageUInt8>(ImageUInt8.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("boat","../data/evaluation/standard/boat.png");
-		manager.add("shapes","../data/evaluation/shapes01.png");
-		manager.add("sunflowers","../data/evaluation/sunflowers.png");
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("boat","../data/evaluation/standard/boat.png"));
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {
