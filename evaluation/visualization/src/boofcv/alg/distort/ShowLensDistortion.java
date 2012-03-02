@@ -21,12 +21,11 @@ package boofcv.alg.distort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectImagePanel;
+import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
-import boofcv.io.image.ImageListManager;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
@@ -40,6 +39,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Shows lens distortion with different amounts of radial distortion
@@ -47,7 +48,7 @@ import java.beans.PropertyChangeListener;
  * @author Peter Abeles
  */
 public class ShowLensDistortion<T extends ImageSingleBand>
-		extends SelectImagePanel implements ProcessInput, ChangeListener
+		extends SelectInputPanel implements ChangeListener
 {
 	double radial1 = -0.65;
 	double radial2 = -0.1;
@@ -138,6 +139,9 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public boolean getHasProcessedImage() {
 		return processedImage;
 	}
@@ -181,10 +185,9 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
 
-		BufferedImage image = manager.loadImage(index);
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 		if (image != null) {
 			process(image);
 		}
@@ -224,12 +227,13 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		ShowLensDistortion<ImageUInt8> app
 				= new ShowLensDistortion<ImageUInt8>(ImageUInt8.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","../data/evaluation/shapes01.png");
-		manager.add("beach","../data/evaluation/scale/beach02.jpg");
-		manager.add("sunflowers","../data/evaluation/sunflowers.png");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		app.setInputManager(manager);
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
+
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

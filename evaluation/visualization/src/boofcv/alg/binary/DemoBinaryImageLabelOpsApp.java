@@ -26,12 +26,11 @@ import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryBinaryImageOps;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
@@ -41,13 +40,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
  * Demonstrates the affects of different binary operations on an image.
  */
-public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends SelectAlgorithmImagePanel
-		implements ProcessInput , SelectHistogramThresholdPanel.Listener {
+public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends SelectAlgorithmAndInputPanel
+		implements SelectHistogramThresholdPanel.Listener {
 
 	Random rand = new Random(234234);
 
@@ -153,6 +154,9 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public boolean getHasProcessedImage() {
 		return processedImage;
 	}
@@ -214,10 +218,9 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -254,11 +257,11 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 	public static void main( String args[] ) {
 		DemoBinaryImageLabelOpsApp app = new DemoBinaryImageLabelOpsApp(ImageFloat32.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("lena","data/particles01.jpg");
-		manager.add("barbara","data/shapes01.png");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("particles","../data/evaluation/particles01.jpg"));
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

@@ -27,12 +27,11 @@ import boofcv.factory.feature.detect.interest.FactoryBlobDetector;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -40,6 +39,8 @@ import georegression.struct.point.Point2D_F64;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Displays a window showing the selected corner-laplace features across different scale spaces.
@@ -47,7 +48,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmImagePanel implements ProcessInput , ImageCorruptPanel.Listener
+		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener
 {
 
 	static int maxFeatures = 400;
@@ -122,6 +123,9 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public void refreshAll(Object[] cookies) {
 		setActiveAlgorithm(0, null, cookies[0]);
 	}
@@ -165,10 +169,9 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -188,12 +191,12 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageFloat32.class,ImageFloat32.class);
 //		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageUInt8.class,ImageSInt16.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","../data/evaluation/shapes01.png");
-		manager.add("sunflowers","../data/evaluation/sunflowers.png");
-		manager.add("beach","../data/evaluation/scale/beach02.jpg");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

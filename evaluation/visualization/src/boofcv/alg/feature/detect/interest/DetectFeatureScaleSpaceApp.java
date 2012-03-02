@@ -22,11 +22,10 @@ import boofcv.abst.feature.detect.interest.InterestPointScaleSpace;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.ScaleSpacePointPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageFloat32;
@@ -34,6 +33,8 @@ import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Displays a window showing selected features across scale spaces.
@@ -41,7 +42,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class DetectFeatureScaleSpaceApp<T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmImagePanel implements ProcessInput
+		extends SelectAlgorithmAndInputPanel
 {
 
 	static int NUM_FEATURES = 80;
@@ -82,6 +83,9 @@ public class DetectFeatureScaleSpaceApp<T extends ImageSingleBand, D extends Ima
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public void refreshAll(Object[] cookies) {
 		setActiveAlgorithm(0,null,cookies[0]);
 	}
@@ -98,10 +102,9 @@ public class DetectFeatureScaleSpaceApp<T extends ImageSingleBand, D extends Ima
 	}
 
 	@Override
-	public synchronized void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public synchronized void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -117,12 +120,13 @@ public class DetectFeatureScaleSpaceApp<T extends ImageSingleBand, D extends Ima
 //		DetectFeatureScaleSpaceApp app = new DetectFeatureScaleSpaceApp(ImageUInt8.class,ImageSInt16.class);
 
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","data/shapes01.png");
-		manager.add("sunflowers","data/sunflowers.png");
-		manager.add("beach","data/scale/beach02.jpg");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		app.setInputManager(manager);
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
+
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

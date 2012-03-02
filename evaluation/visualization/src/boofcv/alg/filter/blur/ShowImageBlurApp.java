@@ -19,12 +19,11 @@
 package boofcv.alg.filter.blur;
 
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
-import boofcv.io.image.ImageListManager;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -36,6 +35,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 
 /**
  * Shows the result of different blur operations
@@ -43,7 +43,7 @@ import java.beans.PropertyChangeListener;
  * @author Peter Abeles
  */
 public class ShowImageBlurApp<T extends ImageSingleBand>
-	extends SelectAlgorithmImagePanel implements ProcessInput , ChangeListener
+	extends SelectAlgorithmAndInputPanel implements ChangeListener
 {
 	int radius = 2;
 	int active = 0;
@@ -128,6 +128,9 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public boolean getHasProcessedImage() {
 		return processedImage;
 	}
@@ -194,7 +197,6 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 
 		@Override
 		public void doRun() {
-			System.out.print("Updating monitor");
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					monitor.setProgress(progress);
@@ -203,10 +205,9 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if (image != null) {
 			process(image);
 		}
@@ -230,12 +231,12 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 		ShowImageBlurApp<ImageUInt8> app
 				= new ShowImageBlurApp<ImageUInt8>(ImageUInt8.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","../data/evaluation/shapes01.png");
-		manager.add("sunflowers","../data/evaluation/sunflowers.png");
-		manager.add("beach","../data/evaluation/scale/beach02.jpg");
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

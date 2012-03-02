@@ -26,12 +26,11 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -40,6 +39,7 @@ import georegression.struct.point.Point2D_I16;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Displays a window showing the selected corner-laplace features across diffferent scale spaces.
@@ -47,7 +47,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmImagePanel implements ProcessInput
+		extends SelectAlgorithmAndInputPanel
 {
 	ImagePanel panel;
 
@@ -95,6 +95,9 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 				hasProcessed = true;
 			}});
 	}
+
+	@Override
+	public void loadConfigurationFile(String fileName) {}
 
 	@Override
 	public void refreshAll(Object[] cookies) {
@@ -159,10 +162,9 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 	}
 
 	@Override
-	public synchronized void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public synchronized void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -180,12 +182,12 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 //		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","../data/evaluation/shapes01.png");
-		manager.add("sunflowers","../data/evaluation/sunflowers.png");
-		manager.add("beach","../data/evaluation/scale/beach02.jpg");
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

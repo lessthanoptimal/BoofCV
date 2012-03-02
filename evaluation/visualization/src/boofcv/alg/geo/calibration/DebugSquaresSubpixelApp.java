@@ -21,10 +21,10 @@ package boofcv.alg.geo.calibration;
 import boofcv.alg.feature.detect.grid.*;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectImagePanel;
+import boofcv.gui.SelectInputPanel;
+import boofcv.gui.VisualizeApp;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -43,7 +43,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DebugSquaresSubpixelApp
-		extends SelectImagePanel implements ProcessInput , SubpixelCalibControlPanel.Listener
+		extends SelectInputPanel implements VisualizeApp, SubpixelCalibControlPanel.Listener
 {
 	// target size
 	int targetColumns;
@@ -126,17 +126,26 @@ public class DebugSquaresSubpixelApp
 			}
 		});
 	}
-	
+
+	@Override
+	public void loadConfigurationFile(String fileName) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	@Override
+	public void loadInputData(String fileName) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	@Override
 	public boolean getHasProcessedImage() {
 		return processedImage;
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
 
-		BufferedImage image = manager.loadImage(index);
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 		if (image != null) {
 			process(image);
 		}
@@ -184,17 +193,18 @@ public class DebugSquaresSubpixelApp
 //		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V/";
 		String prefix = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang/";
 		
-		ImageListManager manager = new ImageListManager();
-		manager.add("adsasd",prefix+"trash1.gif");
-		manager.add("View 01",prefix+"frame01.jpg");
-		manager.add("View 02",prefix+"frame02.jpg");
-		manager.add("View 03",prefix+"frame03.jpg");
-		manager.add("View 04",prefix+"frame04.jpg");
-		manager.add("View 05",prefix+"frame05.jpg");
-		manager.add("View 06",prefix+"frame06.jpg");
-		manager.add("View 07",prefix+"frame07.jpg");
+		List<PathLabel> images = new ArrayList<PathLabel>();
 
-		app.setInputManager(manager);
+		images.add( new PathLabel("View 01",prefix+"frame01.jpg"));
+		images.add( new PathLabel("View 02",prefix+"frame02.jpg"));
+		images.add( new PathLabel("View 03",prefix+"frame03.jpg"));
+		images.add( new PathLabel("View 04",prefix+"frame04.jpg"));
+		images.add( new PathLabel("View 05",prefix+"frame05.jpg"));
+		images.add( new PathLabel("View 06",prefix+"frame06.jpg"));
+		images.add( new PathLabel("View 07",prefix+"frame07.jpg"));
+
+		app.setInputList(images);
+
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

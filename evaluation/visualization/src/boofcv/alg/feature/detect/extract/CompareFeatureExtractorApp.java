@@ -29,13 +29,12 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -44,6 +43,7 @@ import georegression.struct.point.Point2D_I16;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Displays a window showing the selected corner-laplace features across different scale spaces.
@@ -51,7 +51,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmImagePanel implements ProcessInput , GeneralExtractConfigPanel.Listener
+		extends SelectAlgorithmAndInputPanel implements GeneralExtractConfigPanel.Listener
 {
 	T grayImage;
 
@@ -121,6 +121,9 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public void refreshAll(Object[] cookies) {
 		setActiveAlgorithm(0,null,cookies[0]);
 	}
@@ -174,10 +177,9 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -239,12 +241,12 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 	public static void main( String args[] ) {
 		CompareFeatureExtractorApp app = new CompareFeatureExtractorApp(ImageFloat32.class,ImageFloat32.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","../data/evaluation/shapes01.png");
-		manager.add("sunflowers","../data/evaluation/sunflowers.png");
-		manager.add("beach","../data/evaluation/scale/beach02.jpg");
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

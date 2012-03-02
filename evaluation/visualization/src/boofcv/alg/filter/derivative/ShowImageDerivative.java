@@ -24,16 +24,17 @@ import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import static boofcv.factory.filter.derivative.FactoryDerivative.*;
 
@@ -43,7 +44,7 @@ import static boofcv.factory.filter.derivative.FactoryDerivative.*;
  * @author Peter Abeles
  */
 public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingleBand>
-	extends SelectAlgorithmImagePanel implements ProcessInput
+	extends SelectAlgorithmAndInputPanel
 {
 	Class<T> imageType;
 	Class<D> derivType;
@@ -90,6 +91,9 @@ public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public void refreshAll(Object[] cookies) {
 		setActiveAlgorithm(0,null,cookies[0]);
 	}
@@ -131,10 +135,9 @@ public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -163,13 +166,13 @@ public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 //		ShowImageDerivative<ImageUInt8, ImageSInt16> app
 //				= new ShowImageDerivative<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("shapes","../data/evaluation/shapes01.png");
-		manager.add("sunflowers","../data/evaluation/sunflowers.png");
-		manager.add("beach","../data/evaluation/scale/beach02.jpg");
-		manager.add("xray","../data/applet/xray01.jpg");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
+		inputs.add(new PathLabel("xray","../data/applet/xray01.jpg"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

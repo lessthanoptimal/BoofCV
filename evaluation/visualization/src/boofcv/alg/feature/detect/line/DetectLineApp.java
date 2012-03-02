@@ -26,17 +26,17 @@ import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Shows detected lines inside of different images.
@@ -46,7 +46,7 @@ import java.awt.image.BufferedImage;
 // todo configure: blur, edge threshold, non-max radius,  min counts
 // todo show binary image, transform
 public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmImagePanel implements ProcessInput , ImageCorruptPanel.Listener
+		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener
 {
 	Class<T> imageType;
 
@@ -103,6 +103,9 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public boolean getHasProcessedImage() {
 		return processedImage;
 	}
@@ -143,9 +146,8 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager m = getInputManager();
-		BufferedImage image = m.loadImage(index,0);
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
 		process(image);
 	}
@@ -161,10 +163,10 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 
 		DetectLineApp app = new DetectLineApp(imageType,derivType);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("Objects","../data/evaluation/simple_objects.jpg");
-		manager.add("Indoors","../data/evaluation/lines_indoors.jpg");
-		app.setInputManager(manager);
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("Objects","../data/evaluation/simple_objects.jpg"));
+		inputs.add(new PathLabel("Indoors","../data/evaluation/lines_indoors.jpg"));
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

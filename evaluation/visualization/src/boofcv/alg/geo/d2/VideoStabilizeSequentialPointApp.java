@@ -21,9 +21,8 @@ package boofcv.alg.geo.d2;
 import boofcv.alg.sfm.d2.MotionStabilizePointKey;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
-import boofcv.gui.ProcessInput;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.video.VideoListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
@@ -31,6 +30,8 @@ import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homo.Homography2D_F64;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Attempts to remove camera jitter across multiple video frames by detecting point features inside the image
@@ -43,7 +44,7 @@ import java.awt.image.BufferedImage;
  * @param <D> Image derivative type
  */
 public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand, T extends InvertibleTransform<T>>
-		extends ImageMotionBaseApp<I,D,T> implements ProcessInput
+		extends ImageMotionBaseApp<I,D,T>
 {
 	private int maxFeatures = 250;
 	private static int thresholdKeyFrame = 80;
@@ -94,6 +95,9 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	protected void handleFatalError() {
 		motionRender.clear();
 		distortAlg.reset();
@@ -120,12 +124,12 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	public static void main( String args[] ) {
 		VideoStabilizeSequentialPointApp app = new VideoStabilizeSequentialPointApp(ImageFloat32.class, ImageFloat32.class);
 
-		VideoListManager manager = new VideoListManager(ImageFloat32.class);
-		manager.add("Shake", "MJPEG", "../data/applet/shake.mjpeg");
-		manager.add("Zoom", "MJPEG", "../data/applet/zoom.mjpeg");
-		manager.add("Rotate", "MJPEG", "../data/applet/rotate.mjpeg");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("Shake", "../data/applet/shake.mjpeg"));
+		inputs.add(new PathLabel("Zoom", "../data/applet/zoom.mjpeg"));
+		inputs.add(new PathLabel("Rotate", "../data/applet/rotate.mjpeg"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

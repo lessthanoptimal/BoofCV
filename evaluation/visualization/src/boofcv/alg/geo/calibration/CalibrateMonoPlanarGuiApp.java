@@ -30,8 +30,9 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.gui.ProcessInput;
-import boofcv.io.*;
+import boofcv.gui.VisualizeApp;
+import boofcv.io.MediaManager;
+import boofcv.io.ProgressMonitorThread;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
@@ -49,7 +50,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CalibrateMonoPlanarGuiApp extends JPanel 
-		implements ConfigureFileInterface, MediaManagerInput, ProcessInput {
+		implements VisualizeApp {
 
 	// computes calibration parameters
 	CalibrateMonoPlanarApp calibrator;
@@ -101,7 +102,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	@Override
-	public void configure(String fileName) {
+	public void loadConfigurationFile(String fileName) {
 		ParseCalibrationConfig parser = new ParseCalibrationConfig(media);
 
 		if( parser.parse(fileName) ) {
@@ -180,7 +181,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	@Override
-	public void setInputManager(InputListManager manager) {
+	public void loadInputData(String fileName) {
 		new Thread() {
 			public void run() {
 				process();

@@ -31,11 +31,10 @@ import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -59,7 +58,7 @@ import java.util.List;
 // todo add waiting tool bar
 // todo show partial results
 public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends ImageSingleBand>
-	extends SelectAlgorithmImagePanel implements ProcessInput
+	extends SelectAlgorithmAndInputPanel
 {
 	int maxMatches = 200;
 
@@ -123,6 +122,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 				doRefreshAll();
 			}});
 	}
+
+	@Override
+	public void loadConfigurationFile(String fileName) {}
 
 	@Override
 	public synchronized void refreshAll(Object[] cookies) {
@@ -241,10 +243,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager m = getInputManager();
-		BufferedImage left = m.loadImage(index,0);
-		BufferedImage right = m.loadImage(index,1);
+	public void changeInput(String name, int index) {
+		BufferedImage left = media.openImage(inputRefs.get(index).getPath(0) );
+		BufferedImage right = media.openImage(inputRefs.get(index).getPath(1) );
 
 		process(left,right);
 	}
@@ -259,16 +260,17 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 		VisualizeAssociationMatchesApp app = new VisualizeAssociationMatchesApp(imageType,derivType);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("Cave","../data/evaluation/stitch/cave_01.jpg","../data/evaluation/stitch/cave_02.jpg");
-		manager.add("Kayak","../data/evaluation/stitch/kayak_02.jpg","../data/evaluation/stitch/kayak_03.jpg");
-		manager.add("Forest","../data/evaluation/scale/rainforest_01.jpg","../data/evaluation/scale/rainforest_02.jpg");
-		manager.add("Building","../data/evaluation/stitch/apartment_building_01.jpg","../data/evaluation/stitch/apartment_building_02.jpg");
-		manager.add("Trees Rotate","../data/evaluation/stitch/trees_rotate_01.jpg","../data/evaluation/stitch/trees_rotate_03.jpg");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
+
+		inputs.add(new PathLabel("Cave","../data/evaluation/stitch/cave_01.jpg","../data/evaluation/stitch/cave_02.jpg"));
+		inputs.add(new PathLabel("Kayak","../data/evaluation/stitch/kayak_02.jpg","../data/evaluation/stitch/kayak_03.jpg"));
+		inputs.add(new PathLabel("Forest","../data/evaluation/scale/rainforest_01.jpg","../data/evaluation/scale/rainforest_02.jpg"));
+		inputs.add(new PathLabel("Building","../data/evaluation/stitch/apartment_building_01.jpg","../data/evaluation/stitch/apartment_building_02.jpg"));
+		inputs.add(new PathLabel("Trees Rotate","../data/evaluation/stitch/trees_rotate_01.jpg","../data/evaluation/stitch/trees_rotate_03.jpg"));
 
 		app.setPreferredSize(new Dimension(1000,500));
 		app.setSize(1000,500);
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

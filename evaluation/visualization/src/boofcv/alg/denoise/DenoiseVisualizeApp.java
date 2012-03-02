@@ -32,11 +32,10 @@ import boofcv.factory.transform.wavelet.FactoryWaveletCoiflet;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletHaar;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
-import boofcv.gui.ProcessInput;
-import boofcv.gui.SelectAlgorithmImagePanel;
+import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ImageListManager;
+import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WaveletDescription;
@@ -57,7 +56,7 @@ import java.util.Vector;
  * @author Peter Abeles
  */
 public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingleBand,W extends WlCoef>
-	extends SelectAlgorithmImagePanel implements ProcessInput, DenoiseInfoPanel.Listener
+	extends SelectAlgorithmAndInputPanel implements DenoiseInfoPanel.Listener
 {
 
 	// amount of noise added to the test images
@@ -165,6 +164,9 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 	}
 
 	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
 	public boolean getHasProcessedImage() {
 		return processedImage;
 	}
@@ -229,10 +231,9 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 	}
 
 	@Override
-	public void changeImage(String name, int index) {
-		ImageListManager manager = getInputManager();
+	public void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		BufferedImage image = manager.loadImage(index);
 		if( image != null ) {
 			process(image);
 		}
@@ -316,13 +317,13 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 	public static void main( String args[] ) {
 		DenoiseVisualizeApp app = new DenoiseVisualizeApp(ImageFloat32.class);
 
-		ImageListManager manager = new ImageListManager();
-		manager.add("lena","data/standard/lena512.bmp");
-		manager.add("barbara","data/standard/barbara.png");
-		manager.add("boat","data/standard/boat.png");
-		manager.add("fingerprint","data/standard/fingerprint.png");
+		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("lena","../data/evaluation/standard/lena512.bmp"));
+		inputs.add(new PathLabel("barbara","../data/evaluation/standard/barbara.png"));
+		inputs.add(new PathLabel("boat","../data/evaluation/standard/boat.png"));
+		inputs.add(new PathLabel("fingerprint","../data/evaluation/standard/fingerprint.png"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

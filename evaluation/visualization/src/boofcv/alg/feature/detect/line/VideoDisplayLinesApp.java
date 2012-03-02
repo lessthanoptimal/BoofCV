@@ -23,12 +23,11 @@ import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
-import boofcv.gui.ProcessInput;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.video.VideoListManager;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -36,6 +35,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Runs a KLT tracker through a video sequence
@@ -43,7 +43,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSingleBand>
-		extends VideoProcessAppBase<I,D> implements ProcessInput , MouseListener
+		extends VideoProcessAppBase<I,D> implements MouseListener
 {
 	I blur;
 
@@ -57,7 +57,7 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 	Object lineDetector;
 
 	public VideoDisplayLinesApp(Class<I> imageType, Class<D> derivType) {
-		super(1);
+		super(1,imageType);
 
 		addAlgorithm(0,"Hough Foot", FactoryDetectLineAlgs.houghFoot(3, 8, 5, edgeThreshold, maxLines, imageType, derivType));
 		addAlgorithm(0,"Hough Polar", FactoryDetectLineAlgs.houghPolar(3, 30, 2, Math.PI / 180, edgeThreshold, maxLines, imageType, derivType));
@@ -70,6 +70,9 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 		gui.requestFocus();
 		setMainGUI(gui);
 	}
+
+	@Override
+	public void loadConfigurationFile(String fileName) {}
 
 	@Override
 	public void process( SimpleImageSequence<I> sequence ) {
@@ -144,10 +147,10 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 	public static void main( String args[] ) {
 		VideoDisplayLinesApp app = new VideoDisplayLinesApp(ImageFloat32.class, ImageFloat32.class);
 
-		VideoListManager manager = new VideoListManager(ImageFloat32.class);
-		manager.add("Appartment", "MJPEG", "../data/applet/lines_indoors.mjpeg");
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("Appartment", "../data/applet/lines_indoors.mjpeg"));
 
-		app.setInputManager(manager);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {
