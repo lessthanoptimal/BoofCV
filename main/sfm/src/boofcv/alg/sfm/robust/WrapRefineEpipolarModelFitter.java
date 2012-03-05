@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.robust;
 
-import boofcv.abst.geo.epipolar.RefineEpipolarMatrix;
+import boofcv.abst.geo.RefineEpipolarMatrix;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import georegression.struct.homo.Homography2D_F64;

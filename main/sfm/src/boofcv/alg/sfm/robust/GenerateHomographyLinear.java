@@ -20,7 +20,7 @@ package boofcv.alg.sfm.robust;
 
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.epipolar.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;

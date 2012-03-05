@@ -26,14 +26,13 @@ import java.util.List;
  * <p>
  * Interface for tracking point features in a sequence of images for SFM applications.
  * </p>
- * <p/>
  * <p>
  * Lower level/mundane track maintenance is handled by implementations of this interface. This
  * includes selecting features, dropping features, and updating features. THe ability to manually
  * add tracks has intentionally been omitted from this interface for simplicity.  If that level
  * of control is needed then a more complex tracker should be used.
  * </p>
- * <p/>
+ *
  * <p>
  * Contract:
  * <ul>
@@ -41,7 +40,6 @@ import java.util.List;
  * can affect the tracking outcome. </li>
  * <li> If a track is dropped its description will not be modified.</li>
  * <li> Each time a new track is spawned it is given a new unique ID </li>
- * <li> The location of the current frame is only modified when {@link #setCurrentToKeyFrame()} is called </li>
  * </ul>
  * </p>
  *
@@ -65,6 +63,7 @@ public interface ImagePointTracker <T extends ImageBase> {
 	 * @param y coordinate of the new feature being tracked.
 	 * @return If a new track was added or not.
 	 */
+	// TODO remove this function?
 	public boolean addTrack( double x , double y );
 
 	/**

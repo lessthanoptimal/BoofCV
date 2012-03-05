@@ -18,8 +18,9 @@
 
 package boofcv.abst.geo.epipolar;
 
-import boofcv.alg.geo.epipolar.h.CommonHomographyChecks;
-import boofcv.alg.geo.epipolar.h.HomographyLinear4;
+import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.alg.geo.h.CommonHomographyChecks;
+import boofcv.alg.geo.h.HomographyLinear4;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
@@ -90,7 +91,7 @@ public abstract class GeneralTestRefineHomography extends CommonHomographyChecks
 			error1 += Math.abs(found.data[i]-H.data[i]);
 		}
 
-		System.out.println("error "+error1);
+//		System.out.println("error "+error1);
 		assertTrue(error1 < error0);
 	}
 }

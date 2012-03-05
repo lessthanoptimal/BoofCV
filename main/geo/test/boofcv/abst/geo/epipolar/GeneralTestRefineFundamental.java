@@ -18,8 +18,9 @@
 
 package boofcv.abst.geo.epipolar;
 
-import boofcv.alg.geo.epipolar.UtilEpipolar;
-import boofcv.alg.geo.epipolar.f.CommonFundamentalChecks;
+import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.alg.geo.UtilEpipolar;
+import boofcv.alg.geo.f.CommonFundamentalChecks;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;

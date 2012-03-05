@@ -2,13 +2,13 @@ package boofcv.alg.sfm;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
-import boofcv.abst.geo.epipolar.RefineEpipolarMatrix;
-import boofcv.abst.geo.epipolar.RefinePerspectiveNPoint;
-import boofcv.abst.geo.epipolar.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.abst.geo.RefinePerspectiveNPoint;
+import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.alg.geo.DecomposeEssential;
 import boofcv.alg.geo.PointPositionPair;
-import boofcv.alg.geo.epipolar.DecomposeEssential;
-import boofcv.alg.geo.epipolar.PositiveDepthConstraintCheck;
+import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.FastQueue;
 import boofcv.struct.distort.PointTransform_F64;

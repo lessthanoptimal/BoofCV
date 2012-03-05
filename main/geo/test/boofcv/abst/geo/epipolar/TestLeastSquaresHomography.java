@@ -18,8 +18,10 @@
 
 package boofcv.abst.geo.epipolar;
 
-import boofcv.alg.geo.epipolar.EpipolarResiduals;
-import boofcv.alg.geo.epipolar.h.ResidualsHomographySampson;
+import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.abst.geo.h.LeastSquaresHomography;
+import boofcv.alg.geo.ModelObservationResidualN;
+import boofcv.alg.geo.h.HomographyResidualSampson;
 
 /**
  * @author Peter Abeles
@@ -28,7 +30,7 @@ public class TestLeastSquaresHomography extends GeneralTestRefineHomography{
 
 	@Override
 	public RefineEpipolarMatrix createAlgorithm() {
-		EpipolarResiduals r = new ResidualsHomographySampson();
+		ModelObservationResidualN r = new HomographyResidualSampson();
 		return new LeastSquaresHomography(1e-8,200,r);
 	}
 }

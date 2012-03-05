@@ -18,6 +18,9 @@
 
 package boofcv.abst.geo.epipolar;
 
+import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.abst.geo.f.LeastSquaresFundamental;
+
 /**
  * @author Peter Abeles
  */

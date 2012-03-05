@@ -28,6 +28,8 @@ import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -45,7 +47,7 @@ import java.util.Vector;
  * @author Peter Abeles
  */
 public class MonoPlanarPanel extends JPanel implements ItemListener ,
-		ListSelectionListener 
+		ListSelectionListener, ChangeListener 
 {
 
 	MainView mainView = new MainView();
@@ -55,6 +57,8 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	JCheckBox checkUndistorted;
 	JCheckBox checkAll;
 	JCheckBox checkNumbers;
+	JSpinner selectErrorScale;
+	
 	JList imageList;
 
 	JTextArea meanError;
@@ -79,7 +83,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 	List<List<Point2D_F64>> features = new ArrayList<List<Point2D_F64>>();
 	List<ImageResults> results = new ArrayList<ImageResults>();
 
-	double errorScale = 20;
+	int errorScale = 20;
 
 	MultiSpectral<ImageFloat32> origMS;
 	MultiSpectral<ImageFloat32> correctedMS;
@@ -115,12 +119,18 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		checkNumbers = new JCheckBox("Numbers");
 		checkNumbers.setSelected(showNumbers);
 		checkNumbers.addItemListener(this);
-		
+
+		selectErrorScale = new JSpinner(new SpinnerNumberModel(errorScale, 1, 100, 5));
+		selectErrorScale.addChangeListener(this);
+		selectErrorScale.setMaximumSize(selectErrorScale.getPreferredSize());
+
 		toolBar.add(checkPoints);
 		toolBar.add(checkErrors);
 		toolBar.add(checkAll);
 		toolBar.add(checkUndistorted);
 		toolBar.add(checkNumbers);
+		toolBar.add(new JLabel("Error Scale"));
+		toolBar.add(selectErrorScale);
 
 		imageList = new JList();
 		imageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -270,6 +280,14 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			ConvertBufferedImage.convertTo(correctedMS.getBand(0),undistorted);
 		else
 			throw new RuntimeException("What kind of image has "+correctedMS.getNumBands()+"???");
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if( e.getSource() == selectErrorScale) {
+			errorScale = ((Number) selectErrorScale.getValue()).intValue();
+		}
+		repaint();
 	}
 
 	private class MainView extends JPanel
