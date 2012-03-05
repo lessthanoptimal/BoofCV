@@ -22,7 +22,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 
 /**
- * Observed point feature location on the image plane and its 3D position.
+ * Observed point feature location on the image plane and its 3D position in world coordinates.
  *
  * @author Peter Abeles
  */
@@ -32,7 +32,7 @@ public class PointPositionPair {
 	 */
 	public Point2D_F64 observed;
 	/**
-	 * 3D location of the feature
+	 * 3D location of the feature in world coordinates
 	 */
 	public Point3D_F64 location;
 

@@ -19,7 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.epipolar.h.HomographyLinear4;
+import boofcv.alg.geo.h.HomographyLinear4;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 
