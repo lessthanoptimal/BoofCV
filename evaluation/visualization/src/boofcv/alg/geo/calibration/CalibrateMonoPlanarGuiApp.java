@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.distort.AddRadialDistortionPixel;
+import boofcv.alg.distort.AddRadialPtoP_F32;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
@@ -60,7 +60,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	JPanel owner;
 
 	// transform used to undistort image
-	AddRadialDistortionPixel tran = new AddRadialDistortionPixel();
+	AddRadialPtoP_F32 tran = new AddRadialPtoP_F32();
 	ImageDistort<ImageFloat32> dist;
 
 	List<String> images;

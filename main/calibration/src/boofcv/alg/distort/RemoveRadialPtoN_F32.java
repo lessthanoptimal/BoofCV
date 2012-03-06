@@ -21,31 +21,32 @@ package boofcv.alg.distort;
 import boofcv.struct.distort.PointTransform_F32;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
 /**
- * Compute the inverse radial distortion using iteration.
+ * Converts the observed distorted pixels into normalized image coordinates.
  *
  * @author Peter Abeles
  */
-public class RemoveRadialDistortionPixel implements PointTransform_F32 {
+public class RemoveRadialPtoN_F32 implements PointTransform_F32 {
 
 	// principle point / image center
-	private float x_c,y_c;
+	protected float x_c,y_c;
 	// radial distortion
-	private float radial[];
+	protected float radial[];
 
-	private DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
-	private Point2D_F32 temp0 = new Point2D_F32();
+	// radial distortion magnitude
+	protected float sum;
+
+	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
 	private float tol=1e-5f;
 	
-	public RemoveRadialDistortionPixel() {
-	}
+	Point2D_F64 temp = new Point2D_F64();
 
-	public RemoveRadialDistortionPixel(double fx, double fy, double skew, double x_c, double y_c, double[] radial) {
-		set(fx,fy,skew,x_c,y_c, radial);
+	public RemoveRadialPtoN_F32() {
 	}
 
 	public void setTolerance(float tol) {
@@ -54,8 +55,15 @@ public class RemoveRadialDistortionPixel implements PointTransform_F32 {
 
 	/**
 	 * Specify camera calibration parameters
+	 *
+	 * @param fx Focal length x-axis in pixels
+	 * @param fy Focal length y-axis in pixels
+	 * @param skew skew in pixels
+	 * @param x_c camera center x-axis in pixels
+	 * @param y_c center center y-axis in pixels
+	 * @param radial Radial distortion parameters
 	 */
-	public void set(double fx, double fy, double skew, double x_c, double y_c, double[] radial) {
+	public void set(double fx, double fy, double skew, double x_c, double y_c, double... radial) {
 
 		K_inv.set(0,0,fx);
 		K_inv.set(1,1,fy);
@@ -80,28 +88,25 @@ public class RemoveRadialDistortionPixel implements PointTransform_F32 {
 	 *
 	 * @param x Distorted x-coordinate pixel
 	 * @param y Distorted y-coordinate pixel
-	 * @param out Undistorted coordinate.
+	 * @param out Undistorted normalized coordinate.
 	 */
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {
-		float sum=0;
-
-		temp0.x = x;
-		temp0.y = y;
+		out.set(x,y);
 
 		// initial estimate of undistorted point
-		GeometryMath_F32.mult(K_inv, temp0, out);
+		GeometryMath_F32.mult(K_inv, out, out);
 
 		float origX = out.x;
 		float origY = out.y;
-		
-		float prevSum = 0;
+
+		double prevSum = 0;
 
 		for( int iter = 0; iter < 20; iter++ ) {
 
 			// estimate the radial distance
-			float r2 = out.x*out.x + out.y*out.y;
-			float r = r2;
+			double r2 = out.x*out.x + out.y*out.y;
+			double r = r2;
 
 			sum = 0;
 			for( int i = 0; i < radial.length; i++ ) {
@@ -111,13 +116,10 @@ public class RemoveRadialDistortionPixel implements PointTransform_F32 {
 
 			out.x = origX/(1+sum);
 			out.y = origY/(1+sum);
-			
+
 			if( Math.abs(prevSum-sum) <= tol ) {
 				break;
 			}
 		}
-
-		out.x = (x+x_c*sum)/(1+sum);
-		out.y = (y+y_c*sum)/(1+sum);
 	}
 }

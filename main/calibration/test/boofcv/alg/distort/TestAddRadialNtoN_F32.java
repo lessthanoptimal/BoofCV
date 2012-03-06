@@ -16,34 +16,41 @@
  * limitations under the License.
  */
 
-package boofcv.geo.simpliation.impl;
+package boofcv.alg.distort;
 
-import boofcv.geo.simulation.impl.ForwardCameraMotion;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
-import static boofcv.geo.simpliation.impl.TestBasicEnvironment.DummyCamera;
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestForwardCameraMotion {
-
+public class TestAddRadialNtoN_F32 {
+	/**
+	 * Manually compute the distorted coordinate for a point and see if it matches
+	 */
 	@Test
-	public void move() {
-		DummyCamera cam = new DummyCamera();
+	public void againstManual() {
+		float radial[]= new float[]{0.01f,-0.03f};
 
-		RotationMatrixGenerator.eulerXYZ(0,Math.PI/2,0,cam.pose.getR());
-		
-		ForwardCameraMotion alg = new ForwardCameraMotion(2);
-		
-		alg.setCamera(cam);
-		
-		alg.update();
-		
-		assertEquals(2,cam.pose.getX(),1.e-8);
-		assertEquals(0,cam.pose.getY(),1.e-8);
-		assertEquals(0,cam.pose.getZ(),1.e-8);
+		Point2D_F32 orig = new Point2D_F32(0.1f,-0.2f);
+
+		// manually compute the distortion
+		float r2 = orig.x*orig.x + orig.y*orig.y;
+		float mag = radial[0]*r2 + radial[1]*r2*r2;
+
+		float distX = orig.x*(1+mag);
+		float distY = orig.y*(1+mag);
+
+		AddRadialNtoN_F32 alg = new AddRadialNtoN_F32();
+		alg.set(radial);
+
+		Point2D_F32 found = new Point2D_F32();
+
+		alg.compute(orig.x,orig.y,found);
+
+		assertEquals(distX,found.x,1e-4);
+		assertEquals(distY,found.y,1e-4);
 	}
 }

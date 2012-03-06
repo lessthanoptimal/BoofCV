@@ -21,6 +21,7 @@ package boofcv.factory.geo;
 import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.PerspectiveNPoint;
 import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.abst.geo.RefinePerspectiveNPoint;
 import boofcv.abst.geo.f.LeastSquaresFundamental;
 import boofcv.abst.geo.f.WrapFundamentalLinear;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
@@ -139,4 +140,19 @@ public class FactoryEpipolar {
 		return new WrapPnPLepetitEPnP(alg);
 	}
 
+	/**
+	 * Returns a solution to the PnP problem for 4 or more points using EPnP. Fast and fairly
+	 * accurate algorithm.  Can handle general and planar scenario automatically.
+	 *
+	 * @see PnPLepetitEPnP
+	 *
+	 * @param numIterations If more then zero then non-linear optimization is done.  More is not always better.  Try 10
+	 * @param magicNumber Affects how the problem is linearized.  See comments in {@link PnPLepetitEPnP}.  Try 0.1
+	 * @return  PerspectiveNPoint
+	 */
+	public static RefinePerspectiveNPoint refinePnpEfficient( int numIterations , double magicNumber ) {
+		PnPLepetitEPnP alg = new PnPLepetitEPnP(magicNumber);
+		alg.setNumIterations(numIterations);
+		return new WrapPnPLepetitEPnP(alg);
+	}
 }

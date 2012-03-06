@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.triangulate;
+package boofcv.alg.distort;
 
-import georegression.struct.point.Point3D_F64;
+import boofcv.struct.distort.PointTransform_F64;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,22 +27,26 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestTriangulateGeometric extends CommonTriangulationChecks {
+public class TestLeftToRightHanded_F64 {
 
-	/**
-	 * Create 2 perfect observations and solve for the position
-	 */
 	@Test
-	public void triangulate_two() {
-		createScene();
+	public void theSuperDuperTest() {
+		
+		LeftToRightHanded_F64 alg = new LeftToRightHanded_F64(new Dummy());
+		
+		Point2D_F64 out = new Point2D_F64();
+		alg.compute(2,3,out);
+		
+		assertEquals(2,out.x,1e-8);
+		assertEquals(3,-out.y,1e-8);
+	}
+	
+	private class Dummy implements PointTransform_F64 {
 
-		TriangulateGeometric alg = new TriangulateGeometric();
-
-		Point3D_F64 found = new Point3D_F64();
-		alg.triangulate(obsPts.get(0),obsPts.get(1), motionWorldToCamera.get(1),found);
-
-		assertEquals(worldPoint.x,found.x,1e-8);
-		assertEquals(worldPoint.y,found.y,1e-8);
-		assertEquals(worldPoint.z,found.z,1e-8);
+		@Override
+		public void compute(double x, double y, Point2D_F64 out) {
+			out.x = x;
+			out.y = y;
+		}
 	}
 }

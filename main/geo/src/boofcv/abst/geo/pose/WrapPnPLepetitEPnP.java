@@ -19,6 +19,7 @@
 package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.PerspectiveNPoint;
+import boofcv.abst.geo.RefinePerspectiveNPoint;
 import boofcv.alg.geo.PointPositionPair;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
 import georegression.struct.point.Point2D_F64;
@@ -33,7 +34,8 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class WrapPnPLepetitEPnP implements PerspectiveNPoint {
+public class WrapPnPLepetitEPnP
+		implements PerspectiveNPoint , RefinePerspectiveNPoint {
 
 	PnPLepetitEPnP alg;
 
@@ -63,6 +65,12 @@ public class WrapPnPLepetitEPnP implements PerspectiveNPoint {
 	}
 
 	@Override
+	public boolean process(Se3_F64 pose, List<PointPositionPair> obs) {
+		process(obs);
+		return true;
+	}
+
+	@Override
 	public Se3_F64 getPose() {
 		return motion;
 	}
@@ -70,5 +78,10 @@ public class WrapPnPLepetitEPnP implements PerspectiveNPoint {
 	@Override
 	public int getMinPoints() {
 		return alg.getMinPoints();
+	}
+
+	@Override
+	public Se3_F64 getRefinement() {
+		return motion;
 	}
 }

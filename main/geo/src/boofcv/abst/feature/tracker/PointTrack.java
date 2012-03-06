@@ -35,7 +35,7 @@ public class PointTrack extends Point2D_F64 {
 	public Object cookie;
 
 	// description of this feature
-	public Object description;
+	private Object description;
 
 	public PointTrack(double x, double y, long featureId) {
 		super(x, y);

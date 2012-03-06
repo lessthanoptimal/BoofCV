@@ -45,7 +45,7 @@ public abstract class GeneralTestRefineTriangulate extends CommonTriangulationCh
 
 		Point3D_F64 initial = worldPoint.copy();
 		Point3D_F64 found = new Point3D_F64();
-		triangulate(obsPts,motion,essential,initial,found);
+		triangulate(obsPts, motionWorldToCamera,essential,initial,found);
 
 		assertEquals(worldPoint.x, found.x, 1e-8);
 	}
@@ -60,7 +60,7 @@ public abstract class GeneralTestRefineTriangulate extends CommonTriangulationCh
 		initial.z += -0.05;
 
 		Point3D_F64 found = new Point3D_F64();
-		triangulate(obsPts,motion,essential,initial,found);
+		triangulate(obsPts, motionWorldToCamera,essential,initial,found);
 
 		double error2 = worldPoint.distance(initial);
 		double error = worldPoint.distance(found);

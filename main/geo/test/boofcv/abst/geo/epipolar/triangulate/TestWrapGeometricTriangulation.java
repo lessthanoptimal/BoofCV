@@ -16,32 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.triangulate;
+package boofcv.abst.geo.epipolar.triangulate;
 
-import georegression.struct.point.Point3D_F64;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.epipolar.GeneralTestTriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.triangulate.WrapGeometricTriangulation;
 
 /**
  * @author Peter Abeles
  */
-public class TestTriangulateGeometric extends CommonTriangulationChecks {
+public class TestWrapGeometricTriangulation extends GeneralTestTriangulateTwoViewsCalibrated {
 
-	/**
-	 * Create 2 perfect observations and solve for the position
-	 */
-	@Test
-	public void triangulate_two() {
-		createScene();
-
-		TriangulateGeometric alg = new TriangulateGeometric();
-
-		Point3D_F64 found = new Point3D_F64();
-		alg.triangulate(obsPts.get(0),obsPts.get(1), motionWorldToCamera.get(1),found);
-
-		assertEquals(worldPoint.x,found.x,1e-8);
-		assertEquals(worldPoint.y,found.y,1e-8);
-		assertEquals(worldPoint.z,found.z,1e-8);
+	public TriangulateTwoViewsCalibrated createAlg() {
+		return new WrapGeometricTriangulation();
 	}
 }

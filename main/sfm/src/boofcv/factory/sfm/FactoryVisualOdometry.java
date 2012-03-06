@@ -2,6 +2,7 @@ package boofcv.factory.sfm;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.abst.geo.RefinePerspectiveNPoint;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.DistanceFromModelResidualN;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
@@ -31,7 +32,7 @@ import org.ejml.data.DenseMatrix64F;
  */
 public class FactoryVisualOdometry {
 
-	public <T extends ImageBase>
+	public static <T extends ImageBase>
 	MonocularVisualOdometry<T> monoSimple( int minTracks , double minDistance ,
 										   double pixelNoise ,
 										   ImagePointTracker<T> tracker ,
@@ -60,8 +61,10 @@ public class FactoryVisualOdometry {
 				new SimpleInlierRansac<Se3_F64,PointPositionPair>(2323,generateMotion,distanceMotion,
 						100,N,N,100000,pixelNoise);
 
-		MonocularSimpleVo<T> mono = new MonocularSimpleVo<T>(minTracks,minDistance,tracker,pixelToNormalized,
-				computeE,refineE,computeMotion,null);
+		RefinePerspectiveNPoint refineMotion = FactoryEpipolar.refinePnpEfficient(5,0.1);
+
+		MonocularSimpleVo<T> mono = new MonocularSimpleVo<T>(minTracks,minTracks*2,minDistance,tracker,pixelToNormalized,
+				computeE,refineE,computeMotion,refineMotion);
 
 		return new WrapMonocularSimpleVo<T>(mono);
 	}

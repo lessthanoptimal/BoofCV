@@ -41,12 +41,12 @@ public class CommonTriangulationChecks {
 
 	protected Point3D_F64 worldPoint;
 	protected List<Point2D_F64> obsPts;
-	protected List<Se3_F64> motion;
+	protected List<Se3_F64> motionWorldToCamera;
 	protected List<DenseMatrix64F> essential;
 	
 	public void createScene() {
 		worldPoint = new Point3D_F64(0.1,-0.2,4);
-		motion = new ArrayList<Se3_F64>();
+		motionWorldToCamera = new ArrayList<Se3_F64>();
 		obsPts = new ArrayList<Point2D_F64>();
 		essential = new ArrayList<DenseMatrix64F>();
 		
@@ -54,21 +54,21 @@ public class CommonTriangulationChecks {
 		
 		for( int i = 0; i < N; i++ ) {
 			// random motion
-			Se3_F64 m = new Se3_F64();
+			Se3_F64 tranWtoI = new Se3_F64();
 			if( i > 0 ) {
-				m.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2,
+				tranWtoI.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2,
 						rand.nextGaussian()*0.01, rand.nextGaussian()*0.05, rand.nextGaussian()*0.1 ));
-				m.getT().set(0.2+rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, rand.nextGaussian()*0.01);
+				tranWtoI.getT().set(0.2+rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, rand.nextGaussian()*0.01);
 			}
 
-			DenseMatrix64F E = UtilEpipolar.computeEssential(m.getR(), m.getT());
-			
-			SePointOps_F64.transform(m,worldPoint,cameraPoint);
+			DenseMatrix64F E = UtilEpipolar.computeEssential(tranWtoI.getR(), tranWtoI.getT());
+
+			SePointOps_F64.transform(tranWtoI, worldPoint,cameraPoint);
 			
 			Point2D_F64 o = new Point2D_F64(cameraPoint.x/cameraPoint.z,cameraPoint.y/cameraPoint.z);
 
 			obsPts.add(o);
-			motion.add(m);
+			motionWorldToCamera.add(tranWtoI);
 			essential.add(E);
 		}
 	}

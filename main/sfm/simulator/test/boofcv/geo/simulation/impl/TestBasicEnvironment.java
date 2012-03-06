@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.geo.simpliation.impl;
+package boofcv.geo.simulation.impl;
 
 import boofcv.geo.simulation.CameraModel;
 import boofcv.geo.simulation.SimPoint3D;
-import boofcv.geo.simulation.impl.BasicEnvironment;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;

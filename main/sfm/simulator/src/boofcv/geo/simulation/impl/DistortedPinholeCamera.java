@@ -45,15 +45,15 @@ public class DistortedPinholeCamera implements CameraModel {
 	// camera calibration matrix
 	DenseMatrix64F K;
 
-	// distortion model: input pixels, output pixels
-	PointTransform_F64 distortPixels;
+	// adds distortion to pixels in normalized image coordinates
+	PointTransform_F64 distortNorm;
 	
 	// image size
 	int widthPixels;
 	int heightPixels;
 
 	// is the y-axis pointed up or down
-	boolean yaxisDown;
+	boolean yAxisDown;
 
 	// noise applied to each pixel
 	double sigmaPixel;
@@ -66,22 +66,22 @@ public class DistortedPinholeCamera implements CameraModel {
 	 *
 	 * @param rand Noise random number generator
 	 * @param K Camera calibration matrix
-	 * @param distortPixels Pixel distortion model.  Undistorted to distorted.  If null, no distortion.
+	 * @param distortNorm Adds distortion to pixels in normalized image coordinates  If null, no distortion.
 	 * @param widthPixels width of camera image in pixels
 	 * @param heightPixels height of camera image in pixels
-	 * @param yaxisDown Is the positive y-axis pointed down? Most of the time this is true
+	 * @param yAxisDown Is the positive y-axis pointed down? Most of the time this is true
 	 * @param sigmaPixel Noise added to each pixel
 	 */
-	public DistortedPinholeCamera(Random rand,  DenseMatrix64F K, PointTransform_F64 distortPixels,
+	public DistortedPinholeCamera(Random rand,  DenseMatrix64F K, PointTransform_F64 distortNorm,
 								  int widthPixels, int heightPixels,
-								  boolean yaxisDown, double sigmaPixel)
+								  boolean yAxisDown, double sigmaPixel)
 	{
 		this.rand = rand;
 		this.K = K;
-		this.distortPixels = distortPixels;
+		this.distortNorm = distortNorm;
 		this.widthPixels = widthPixels;
 		this.heightPixels = heightPixels;
-		this.yaxisDown = yaxisDown;
+		this.yAxisDown = yAxisDown;
 		this.sigmaPixel = sigmaPixel;
 	}
 
@@ -90,18 +90,22 @@ public class DistortedPinholeCamera implements CameraModel {
 
 		// from world to camera coordinate system
 		SePointOps_F64.transformReverse(cameraToWorld, world, cameraPt);
-		
-		// camera to pixel
-		GeometryMath_F64.mult(K,cameraPt,pixel);
+
+		// camera 3D to normalized pixel 2D
+		pixel.x = cameraPt.x/cameraPt.z;
+		pixel.y = cameraPt.y/cameraPt.z;
+
+		// add distortion to normalized pixel coordinates
+		if( distortNorm != null )
+			distortNorm.compute(pixel.x,pixel.y,pixel);
+
+		// normalized to to pixel
+		GeometryMath_F64.mult(K,pixel,pixel);
 
 		// adjust coordinate system
-		if( yaxisDown ) {
+		if(yAxisDown) {
 			pixel.y = heightPixels-pixel.y;
 		}
-
-		// apply distortion
-		if( distortPixels != null )
-			distortPixels.compute(pixel.x,pixel.y,pixel);
 
 		// add noise
 		pixel.x += rand.nextGaussian()*sigmaPixel;
@@ -129,11 +133,11 @@ public class DistortedPinholeCamera implements CameraModel {
 		this.sigmaPixel = sigmaPixel;
 	}
 
-	public boolean isYaxisDown() {
-		return yaxisDown;
+	public boolean isyAxisDown() {
+		return yAxisDown;
 	}
 
-	public void setYaxisDown(boolean yaxisDown) {
-		this.yaxisDown = yaxisDown;
+	public void setyAxisDown(boolean yAxisDown) {
+		this.yAxisDown = yAxisDown;
 	}
 }

@@ -226,4 +226,18 @@ public class UtilEpipolar {
 		e1.set(V.get(0,2),V.get(1,2),V.get(2,2));
 	}
 
+	/**
+	 * Given the parameters create a calibration matrix
+	 *
+	 * @param fx Focal length x-axis in pixels
+	 * @param fy Focal length y-axis in pixels
+	 * @param skew skew in pixels
+	 * @param xc camera center x-axis in pixels
+	 * @param yc center center y-axis in pixels
+	 * @return Calibration matrix 3x3
+	 */
+	public static DenseMatrix64F calibrationMatrix(double fx, double fy, double skew,
+												   double xc, double yc) {
+		return new DenseMatrix64F(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
+	}
 }

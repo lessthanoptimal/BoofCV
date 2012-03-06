@@ -36,12 +36,12 @@ public interface RefineTriangulationEpipolar {
 	 * Refines the triangulated point.
 	 *
 	 * @param observations Observations of feature in N views. Pixel or Normalized image coordinates.
-	 * @param fundamentalWorldToC Fundamental or essential matrix for each view.  World to Camera.
+	 * @param fundamentalWorldToCam Fundamental or essential matrix for each view.  World to Camera.
 	 * @param worldPt Initial estimate of point in world coordinates.
 	 * @param refinedPt The refined estimated point position.
 	 * @return if successful or not
 	 */
 	public boolean process(List<Point2D_F64> observations,
-						   List<DenseMatrix64F> fundamentalWorldToC ,
+						   List<DenseMatrix64F> fundamentalWorldToCam ,
 						   Point3D_F64 worldPt, Point3D_F64 refinedPt);
 }

@@ -65,6 +65,7 @@ public class SimulatedTracker implements ImagePointTracker {
 
 	@Override
 	public void process(ImageBase image) {
+		System.out.println("SimulatedTracker process");
 		// swap current and previous
 		List<PointTrack> temp = current;
 		current = previous;
@@ -96,9 +97,10 @@ public class SimulatedTracker implements ImagePointTracker {
 		// if a track was visible and no longer is it is then dropped
 		for( PointTrack p : previous ) {
 			if( !current.contains(p) ) {
+				// this marks the track as being dropped by the tracker
+				// but the point will still be around in the simulated world
 				SimPoint3D s = p.getDescription();
 				s.trackData = null;
-				p.description = null;
 				dropped.add(p);
 				unused.add(p);
 			}
@@ -112,6 +114,7 @@ public class SimulatedTracker implements ImagePointTracker {
 
 	@Override
 	public void spawnTracks() {
+		System.out.println("SimulatedTracker SPAWN");
 		int numSpawn = targetTracks - current.size();
 
 		List<SimPoint3D> simPoints = environment.requestSpawn(camera,numSpawn);
@@ -130,7 +133,7 @@ public class SimulatedTracker implements ImagePointTracker {
 						track = unused.pop();
 					}
 					track.set(pixel);
-					track.description = p;
+					track.setDescription(p);
 					p.trackData = track;
 					p.timeLastViewed = currentTick;
 					current.add(track);
