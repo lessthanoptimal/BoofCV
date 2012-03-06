@@ -222,4 +222,16 @@ public class TestUtilEpipolar {
 		GeometryMath_F64.multTran(E,e2,temp);
 		assertEquals(0,temp.norm(),1e-8);
 	}
+	
+	@Test
+	public void calibrationMatrix() {
+		DenseMatrix64F K = UtilEpipolar.calibrationMatrix(1,2,3,4,5);
+		
+		assertEquals(1,K.get(0,0),1e-3);
+		assertEquals(2,K.get(1,1),1e-3);
+		assertEquals(3,K.get(0,1),1e-3);
+		assertEquals(4,K.get(0,2),1e-3);
+		assertEquals(5,K.get(1,2),1e-3);
+		assertEquals(1,K.get(2,2),1e-3);
+	}
 }

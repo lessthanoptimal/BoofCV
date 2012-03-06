@@ -16,29 +16,41 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo;
+package boofcv.alg.distort;
 
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * Triangulate the location of a point from two views of a feature given a calibrated
- * camera and known camera motion.
- *
  * @author Peter Abeles
  */
-public interface TriangulateTwoViewsCalibrated {
-
+public class TestAddRadialNtoN_F64 {
 	/**
-	 * Triangulate the points location.
-	 *
-	 * @param obsA View from position A in normalized image coordinates.
-	 * @param obsB View from position B in normalized image coordinates.
-	 * @param fromAtoB Transform from camera location A to location B
-	 * @param foundInA The found triangulated point in A's reference frame.
-	 * @return true if successful, false otherwise.
+	 * Manually compute the distorted coordinate for a point and see if it matches
 	 */
-	public boolean triangulate( Point2D_F64 obsA , Point2D_F64 obsB ,
-								Se3_F64 fromAtoB, Point3D_F64 foundInA );
+	@Test
+	public void againstManual() {
+		double radial[]= new double[]{0.01,-0.03};
+
+		Point2D_F64 orig = new Point2D_F64(0.1,-0.2);
+
+		// manually compute the distortion
+		double r2 = orig.x*orig.x + orig.y*orig.y;
+		double mag = radial[0]*r2 + radial[1]*r2*r2;
+
+		double distX = orig.x*(1+mag);
+		double distY = orig.y*(1+mag);
+
+		AddRadialNtoN_F64 alg = new AddRadialNtoN_F64();
+		alg.set(radial);
+
+		Point2D_F64 found = new Point2D_F64();
+
+		alg.compute(orig.x,orig.y,found);
+
+		assertEquals(distX,found.x,1e-4);
+		assertEquals(distY,found.y,1e-4);
+	}
 }

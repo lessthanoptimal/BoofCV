@@ -29,7 +29,7 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public class AddRadialDistortionPixel implements PointTransform_F32 {
+public class AddRadialPtoP_F32 implements PointTransform_F32 {
 
 	// principle point / image center
 	private float x_c,y_c;
@@ -39,15 +39,22 @@ public class AddRadialDistortionPixel implements PointTransform_F32 {
 	private DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 	private Point2D_F32 temp0 = new Point2D_F32();
 
-	public AddRadialDistortionPixel() {
+	public AddRadialPtoP_F32() {
 	}
 
-	public AddRadialDistortionPixel(double fx, double fy, double skew, double x_c, double y_c, double... radial) {
+	public AddRadialPtoP_F32(double fx, double fy, double skew, double x_c, double y_c, double... radial) {
 		set(fx,fy,skew,x_c,y_c, radial);
 	}
 
 	/**
 	 * Specify camera calibration parameters
+	 *
+	 * @param fx Focal length x-axis in pixels
+	 * @param fy Focal length y-axis in pixels
+	 * @param skew skew in pixels
+	 * @param x_c camera center x-axis in pixels
+	 * @param y_c center center y-axis in pixels
+	 * @param radial Radial distortion parameters
 	 */
 	public void set(double fx, double fy, double skew, double x_c, double y_c, double[] radial) {
 
@@ -74,7 +81,7 @@ public class AddRadialDistortionPixel implements PointTransform_F32 {
 	 *
 	 * @param x Undistorted x-coordinate pixel
 	 * @param y Undistorted y-coordinate pixel
-	 * @param out Distorted coordinate.
+	 * @param out Distorted pixel coordinate.
 	 */
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {

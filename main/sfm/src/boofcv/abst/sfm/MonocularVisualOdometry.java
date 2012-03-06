@@ -33,6 +33,11 @@ public interface MonocularVisualOdometry<T extends ImageBase> {
 	public boolean process( T input );
 
 	/**
+	 * Forget past history and tracking results, returning it to its initial state.
+	 */
+	public void reset();
+
+	/**
 	 * If {@link #process} returns false then this function needs to be called to see if a fatal
 	 * error has occurred and the the motion estimate has lost track of where it is.
 	 *

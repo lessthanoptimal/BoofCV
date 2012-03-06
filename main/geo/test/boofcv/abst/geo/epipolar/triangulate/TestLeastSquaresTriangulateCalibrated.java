@@ -16,29 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo;
+package boofcv.abst.geo.epipolar.triangulate;
 
+import boofcv.abst.geo.epipolar.GeneralTestRefineTriangulate;
+import boofcv.abst.geo.triangulate.LeastSquaresTriangulateCalibrated;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ejml.data.DenseMatrix64F;
+
+import java.util.List;
 
 /**
- * Triangulate the location of a point from two views of a feature given a calibrated
- * camera and known camera motion.
- *
  * @author Peter Abeles
  */
-public interface TriangulateTwoViewsCalibrated {
+public class TestLeastSquaresTriangulateCalibrated extends GeneralTestRefineTriangulate {
 
-	/**
-	 * Triangulate the points location.
-	 *
-	 * @param obsA View from position A in normalized image coordinates.
-	 * @param obsB View from position B in normalized image coordinates.
-	 * @param fromAtoB Transform from camera location A to location B
-	 * @param foundInA The found triangulated point in A's reference frame.
-	 * @return true if successful, false otherwise.
-	 */
-	public boolean triangulate( Point2D_F64 obsA , Point2D_F64 obsB ,
-								Se3_F64 fromAtoB, Point3D_F64 foundInA );
+	LeastSquaresTriangulateCalibrated alg = new LeastSquaresTriangulateCalibrated(1e-8,200);
+
+	@Override
+	public void triangulate(List<Point2D_F64> obsPts, List<Se3_F64> motion,
+							List<DenseMatrix64F> essential,
+							Point3D_F64 initial, Point3D_F64 found)
+	{
+		alg.process(obsPts,motion,initial,found);
+	}
 }

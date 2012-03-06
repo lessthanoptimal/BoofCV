@@ -16,28 +16,31 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.epipolar;
+package boofcv.alg.distort;
 
-import boofcv.abst.geo.triangulate.LeastSquaresTriangulateCalibrated;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
-
-import java.util.List;
+import georegression.struct.point.Point2D_F32;
 
 /**
+ * Compute the inverse radial distortion using iteration.
+ *
  * @author Peter Abeles
  */
-public class TestLeastSquaresTriangulateCalibrated extends GeneralTestRefineTriangulate {
+public class RemoveRadialPtoP_F32 extends RemoveRadialPtoN_F32 {
 
-	LeastSquaresTriangulateCalibrated alg = new LeastSquaresTriangulateCalibrated(1e-8,200);
-
+	/**
+	 * Removes radial distortion
+	 *
+	 * @param x Distorted x-coordinate pixel
+	 * @param y Distorted y-coordinate pixel
+	 * @param out Undistorted pixel coordinate.
+	 */
 	@Override
-	public void triangulate(List<Point2D_F64> obsPts, List<Se3_F64> motion,
-							List<DenseMatrix64F> essential,
-							Point3D_F64 initial, Point3D_F64 found)
-	{
-		alg.process(obsPts,motion,initial,found);
+	public void compute(float x, float y, Point2D_F32 out) {
+		//  distorted pixel to undistorted normalized
+		super.compute(x,y,out);
+
+
+		out.x = (x+x_c*sum)/(1+sum);
+		out.y = (y+y_c*sum)/(1+sum);
 	}
 }

@@ -18,8 +18,44 @@
 
 package boofcv.geo.simulation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
+ * Class which puts together all the simulation components
+ *
  * @author Peter Abeles
  */
 public class SimulationEngine {
+
+	List<CameraModel> cameras = new ArrayList<CameraModel>();
+	List<CameraControl> cameraControl = new ArrayList<CameraControl>();
+
+	EnvironmentModel environment;
+
+	public SimulationEngine(EnvironmentModel environment) {
+		this.environment = environment;
+	}
+
+	public void addCamera(CameraModel model , CameraControl control ) {
+		cameras.add(model);
+		cameraControl.add(control);
+	}
+
+	/**
+	 * Updates the world.
+	 */
+	public void step() {
+		// update the camera positions
+		for( int i = 0; i < cameras.size(); i++ ) {
+			cameraControl.get(i).update();
+		}
+	}
+
+	/**
+	 * Removes unused objects
+	 */
+	public void maintenance() {
+		environment.maintenance();
+	}
 }

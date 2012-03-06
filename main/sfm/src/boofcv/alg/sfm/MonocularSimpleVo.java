@@ -9,15 +9,19 @@ import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.DecomposeEssential;
 import boofcv.alg.geo.PointPositionPair;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
+import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.FastQueue;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
 import pja.sorting.QuickSelectArray;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,26 +43,37 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO handle active/not active better
 public class MonocularSimpleVo<T extends ImageBase> {
 	KeyFramePointTracker<T,PointPoseTrack> tracker;
 
 	ModelMatcher<DenseMatrix64F,AssociatedPair> computeE;
 	RefineEpipolarMatrix refineE;
 	
-	DecomposeEssential decomposeE;
-	PositiveDepthConstraintCheck depthChecker;
+	DecomposeEssential decomposeE = new DecomposeEssential();
+	PositiveDepthConstraintCheck depthChecker = new PositiveDepthConstraintCheck(true);
 
-	TriangulateTwoViewsCalibrated triangulateAlg;
+	TriangulateTwoViewsCalibrated triangulateAlg = FactoryTriangulate.twoDLT();
 
 	ModelMatcher<Se3_F64,PointPositionPair> computeMotion;
 	RefinePerspectiveNPoint refineMotion;
 
-	// transform from the current image to the world frame
-	Se3_F64 currToWorld = new Se3_F64();
-	
+	// transform from work to current image.  Only used for output purposes
+	Se3_F64 worldToCurr = new Se3_F64();
+	// transform from the world frame to the keyframe
+	Se3_F64 worldToKey = new Se3_F64();
+	// transform from the keyframe to the current frame
+	Se3_F64 keyToCurr = new Se3_F64();
+	// transform from the keyframe to the most recent spawn point
+	Se3_F64 keyToSpawn = new Se3_F64();
+	// has a key frame been set?
+	boolean hasSpawned = false;
+
+
 	int mode;
 
 	int inlierSize;
+	// minimum distance a pixel needs to move for it to be considered significant motion
 	double minDistance;
 	int minFeatures;
 	int setKeyThreshold;
@@ -66,13 +81,26 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	// storage for pixel motion, used to decide if the camera has moved or not
 	double distance[];
 	
-	Se3_F64 nextInitialPose = new Se3_F64();
-	boolean nextSet = false;
+
 	
 	
 	FastQueue<PointPositionPair> queuePointPose = new FastQueue<PointPositionPair>(200,PointPositionPair.class,true);
 
-	public MonocularSimpleVo( int minFeatures , double minDistance ,
+	/**
+	 *
+	 * @param minFeatures
+	 * @param setKeyThreshold
+	 * @param minDistance
+	 * @param tracker
+	 * @param pixelToNormalized Pixel to calibrated normalized coordinates.  Right handed (y-axis positive is image up)
+	 *                          coordinate system is assumed.
+	 * @param computeE
+	 * @param refineE
+	 * @param computeMotion
+	 * @param refineMotion
+	 */
+	public MonocularSimpleVo( int minFeatures , int setKeyThreshold,
+							  double minDistance ,
 							  ImagePointTracker<T> tracker ,
 							  PointTransform_F64 pixelToNormalized ,
 							  ModelMatcher<DenseMatrix64F,AssociatedPair> computeE ,
@@ -81,6 +109,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 							  RefinePerspectiveNPoint refineMotion )
 	{
 		this.minFeatures = minFeatures;
+		this.setKeyThreshold = setKeyThreshold;
 		this.minDistance = minDistance;
 		this.tracker = new KeyFramePointTracker<T,PointPoseTrack>(tracker,pixelToNormalized,PointPoseTrack.class);
 		this.computeE = computeE;
@@ -104,6 +133,8 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	{
 		tracker.process(image);
 
+		System.out.println("Mode "+mode+" tracks "+tracker.getActiveTracks().size());
+		
 		if( mode == 0 ) {
 			tracker.setKeyFrame();
 			tracker.spawnTracks();
@@ -114,17 +145,20 @@ public class MonocularSimpleVo<T extends ImageBase> {
 			if( !updatePosition() ) {
 				// update failed so reset
 				mode = 0;
-				currToWorld.reset();
+				keyToCurr.reset();
 				tracker.reset();
 				tracker.spawnTracks();
 				return false;
 			} else {
 				// check and triangulate new features
-				if( nextSet && (inlierSize<minFeatures) || isSufficientMotion() ) {
+				if( hasSpawned && (inlierSize<minFeatures || isSufficientMotion()) ) {
 					triangulateNew();
 				}
 			}
 		}
+
+		// compute output position
+		worldToKey.concat(keyToCurr,worldToCurr);
 
 		return true;
 	}
@@ -153,14 +187,30 @@ public class MonocularSimpleVo<T extends ImageBase> {
 						List<Se3_F64> solutions = decomposeE.getSolutions();
 						
 						Se3_F64 best = selectBestPose(solutions, inliers);
-						currToWorld.set(best);
+//						best.invert(worldToCurr); // todo hack
+						keyToCurr.set(best);
 
 						// triangular feature points
+						double maxZ = 0;
 						for( PointPoseTrack t : pairs ) {
-							triangulateAlg.triangulate(t.currLoc,t.keyLoc, currToWorld,t.location);
+							triangulateAlg.triangulate(t.keyLoc,t.currLoc, keyToCurr,t.location);
+							t.active = true;
+							if( t.location.z > maxZ )
+								maxZ = t.location.z;
 						}
+						// rescale for numerical stability
+//						keyToCurr.getT().x /= maxZ;
+//						keyToCurr.getT().y /= maxZ;
+//						keyToCurr.getT().z /= maxZ;
+//
+//						for( PointPoseTrack t : pairs ) {
+//							Point3D_F64 p = t.location;
+//							p.x /= maxZ;
+//							p.y /= maxZ;
+//							p.z /= maxZ;
+//						}
 
-						nextSet = false;
+						hasSpawned = false;
 						mode = 2;
 					}
 				}
@@ -175,16 +225,20 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	 */
 	private boolean updatePosition() {
 		queuePointPose.reset();
+		List<PointPositionPair> active = new ArrayList<PointPositionPair>();
 		for( PointPoseTrack t : tracker.getPairs() ) {
 			if( !t.active )
 				continue;
 			PointPositionPair p = queuePointPose.pop();
 			p.location = t.location;
 			p.observed = t.currLoc;
+			active.add(p);
 		}
+		if( queuePointPose.size <= 0 )
+			return false;
 		
 		// estimate the camera's motion
-		if( !computeMotion.process(queuePointPose.toList()) ) {
+		if( !computeMotion.process(active) ) {
 			return false;
 		}
 		
@@ -193,19 +247,29 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		
 		refineMotion.process(computeMotion.getModel(), inliers);
 
-		currToWorld.set(refineMotion.getRefinement());
+		keyToCurr.set(refineMotion.getRefinement());
+
+		System.out.print("   after PnP Refine:  ");
+		computeResidualError();
 
 		// update point positions
 		for( PointPoseTrack t : tracker.getPairs() ) {
-			triangulateAlg.triangulate(t.currLoc,t.keyLoc, currToWorld,t.location);
+			if( t.active )
+				triangulateAlg.triangulate(t.keyLoc,t.currLoc, keyToCurr,t.location);
 		}
+		System.out.print("   after triangulate: ");
+		computeResidualError();
 		
+		System.out.println("   -- triangulate inliers "+inlierSize+"  out of "+active.size());
 		// handle spawning new features
-		if( !nextSet && inlierSize <= setKeyThreshold ) {
+		if( !hasSpawned && inlierSize <= setKeyThreshold ) {
+			System.out.println("--- Setting key frame");
 			tracker.spawnTracks();
-			nextInitialPose.set(currToWorld);
-			nextSet = true;
+			keyToSpawn.set(keyToCurr);
+			hasSpawned = true;
 		}
+
+		
 
 		return true;
 	}
@@ -214,23 +278,34 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	 * Triangulates the location of new features
 	 */
 	protected void triangulateNew() {
-		// transform to take a feature from triangulateNew coordinate system into currToKey
-		Se3_F64 inv = nextInitialPose.invert(null);
-		// change in position from nextInitialPose to currToKey
-		Se3_F64 motion = currToWorld.concat(inv,null);
+		System.out.println("---- Triangulating new features");
+		// change in position from key frame to current frame
+//		Se3_F64 worldToCurr = this.worldToCurr.invert(null);
+		Se3_F64 spawnToKey = keyToSpawn.invert(null);
+		Se3_F64 spawnToCurr = spawnToKey.concat(this.keyToCurr,null);
 
+		
 		for( PointPoseTrack t : tracker.getPairs() ) {
-			if( t.active )
-				continue;
-			
-			triangulateAlg.triangulate(t.currLoc, t.keyLoc, motion, t.location);
-			
-			// put the location into the correct reference frame
-			SePointOps_F64.transform(inv,t.location,t.location);
-			
-			t.active = true;
+			if( t.active ) {
+				// project its position to the spawn point
+				SePointOps_F64.transform(keyToSpawn,t.location,t.location);
+
+				// now project the observation
+				t.keyLoc.x = t.location.x/t.location.z;
+				t.keyLoc.y = t.location.y/t.location.z;
+
+			} else {
+				triangulateAlg.triangulate(t.keyLoc,t.currLoc,spawnToCurr, t.location);
+
+
+				t.active = true;
+			}
 		}
-		nextSet = false;
+		hasSpawned = false;
+
+		// make the spawn point the new keyframe
+		worldToKey.concat(keyToSpawn,spawnToKey);
+		worldToKey.set(spawnToKey);
 	}
 
 	/**
@@ -250,7 +325,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 				}
 			}
 			
-			if( count < bestCount ) {
+			if( count > bestCount ) {
 				bestCount = count;
 				bestModel = s;
 			}
@@ -259,6 +334,35 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		return bestModel;
 	}
 
+	private void computeResidualError() {
+		
+		Point3D_F64 currentView = new Point3D_F64();
+		
+		double total = 0;
+		int num = 0;
+		
+		for( PointPoseTrack t : tracker.getPairs() ) {
+			if( !t.active )
+				continue;
+
+			Point3D_F64 p = t.location;
+			Point2D_F64 obs = t.currLoc;
+			
+			SePointOps_F64.transform(keyToCurr,p,currentView);
+			
+			double x = currentView.x/currentView.z;
+			double y = currentView.y/currentView.z;
+
+			x = x - obs.x;
+			y = y - obs.y;
+
+			total += Math.sqrt(x*x + y*y);
+			num++;
+		}
+		total /= num;
+		System.out.printf("   -- residual error = %05e  N = %d\n",total,num);
+	}
+	
 	/**
 	 * Looks at inactive points and decides if there is enough motion to estimate their 
 	 * position.
@@ -275,18 +379,20 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		
 		int count = 0;
 		for( int i = 0; i < tracks.size(); i++ ) {
-			PointPoseTrack p = tracks.get(i);
-			if( p.active ) {
+			PointPoseTrack t = tracks.get(i);
+			AssociatedPair p = t.getPixel();
+			if( !t.active ) {
 				distance[count++] = p.currLoc.distance2(p.keyLoc);
 			}
 		}
+		System.out.println("  total inactive "+count+"  total "+tracks.size());
 
 		double median = QuickSelectArray.select(distance,count/2,count);
 	
-		return median <= minDistance*minDistance;
+		return median >= minDistance*minDistance;
 	}
 
 	public Se3_F64 getCameraLocation() {
-		return currToWorld;
+		return worldToCurr;
 	}
 }

@@ -24,7 +24,7 @@ import org.ejml.data.DenseMatrix64F;
 import java.util.List;
 
 /**
- * Interface for performing non-linear optimization on an essential,fundamental, homography matrix.
+ * Interface for performing non-linear optimization on an essential,fundamental,and homography matrix.
  * Basically any geometric transform describing the relationship between two images that uses a 3x3
  * matrix.
  *

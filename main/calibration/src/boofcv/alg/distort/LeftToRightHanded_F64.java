@@ -18,39 +18,28 @@
 
 package boofcv.alg.distort;
 
-import georegression.struct.point.Point2D_F32;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import boofcv.struct.distort.PointTransform_F64;
+import georegression.struct.point.Point2D_F64;
 
 /**
+ * It is common practice to have the +y axis point downward in computer images.  However,
+ * in 3D computer vision this creates a left handed coordinate system and +z points behind
+ * the camera.  Many algorithms assume +z is in front of the camera so the way around this
+ * problem is to invert the sign of y.
+ *
  * @author Peter Abeles
  */
-public class TestRemoveRadialDistortionPixel {
+public class LeftToRightHanded_F64 implements PointTransform_F64 {
 
-	@Test
-	public void checkAgainstAdd() {
-		double fx = 600;
-		double fy = 500;
-		double skew = 2;
-		double xc = 300;
-		double yc = 350;
+	PointTransform_F64 alg;
 
-		double radial[]= new double[]{0.12,-0.13};
+	public LeftToRightHanded_F64(PointTransform_F64 alg) {
+		this.alg = alg;
+	}
 
-		Point2D_F32 point = new Point2D_F32();
-
-		float undistX = 19.5f;
-		float undistY = 200.1f;
-
-		new AddRadialDistortionPixel(fx,fy,skew,xc,yc,radial).compute(undistX,undistY,point);
-
-		float distX = point.x;
-		float distY = point.y;
-
-		new RemoveRadialDistortionPixel(fx,fy,skew,xc,yc,radial).compute(distX,distY,point);
-
-		assertEquals(undistX,point.x,1e-4);
-		assertEquals(undistY,point.y,1e-4);
+	@Override
+	public void compute(double x, double y, Point2D_F64 out) {
+		alg.compute(x,y,out);
+		out.y = -out.y;
 	}
 }

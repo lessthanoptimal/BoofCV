@@ -16,19 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.geo.simpliation.impl;
+package boofcv.geo.simulation.impl;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.geo.simulation.CameraModel;
 import boofcv.geo.simulation.EnvironmentModel;
 import boofcv.geo.simulation.SimPoint3D;
-import boofcv.geo.simulation.impl.SimulatedTracker;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.geo.simpliation.impl.TestBasicEnvironment.DummyCamera;
+import static boofcv.geo.simulation.impl.TestBasicEnvironment.DummyCamera;
 import static org.junit.Assert.assertEquals;
 
 /**

@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAddRadialDistortionPixel {
+public class TestAddRadialPtoP_F32 {
 
 	/**
 	 * Manually compute the distorted coordinate for a point and see if it matches
@@ -68,7 +68,7 @@ public class TestAddRadialDistortionPixel {
 		dist.x = orig.x + (orig.x-xc)*sum;
 		dist.y = orig.y + (orig.y-yc)*sum;
 
-		AddRadialDistortionPixel alg = new AddRadialDistortionPixel(fx,fy,skew,xc,yc,radial);
+		AddRadialPtoP_F32 alg = new AddRadialPtoP_F32(fx,fy,skew,xc,yc,radial);
 
 		Point2D_F32 found = new Point2D_F32();
 

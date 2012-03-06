@@ -161,7 +161,7 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		thread.start();
 
 		PointTransform_F32 ptran =
-				new AddRadialDistortionPixel(input.width*0.8,input.width*0.8,0,
+				new AddRadialPtoP_F32(input.width*0.8,input.width*0.8,0,
 						input.width/2,input.height/2,radial1,radial2);
 		PixelTransform_F32 tran=new PointToPixelTransform_F32(ptran);
 

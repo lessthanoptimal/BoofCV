@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.geo.simpliation.impl;
+package boofcv.geo.simulation.impl;
 
-import boofcv.geo.simulation.impl.DistortedPinholeCamera;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -94,7 +93,7 @@ public class TestDistortedPinholeCamera {
 		assertTrue(found.y < imageHeight / 2);
 
 		// change the y-axis direction
-		alg.setYaxisDown(false);
+		alg.setyAxisDown(false);
 		assertTrue(alg.projectPoint(p3,found));
 		assertTrue(found.y>imageHeight/2);
 	}

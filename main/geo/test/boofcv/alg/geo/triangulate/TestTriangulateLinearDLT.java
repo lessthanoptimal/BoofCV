@@ -39,7 +39,7 @@ public class TestTriangulateLinearDLT extends CommonTriangulationChecks {
 
 		Point3D_F64 found = new Point3D_F64();
 
-		alg.triangulate(obsPts,motion,found);
+		alg.triangulate(obsPts, motionWorldToCamera,found);
 
 		assertEquals(worldPoint.x,found.x,1e-8);
 		assertEquals(worldPoint.y,found.y,1e-8);
@@ -56,7 +56,7 @@ public class TestTriangulateLinearDLT extends CommonTriangulationChecks {
 		TriangulateLinearDLT alg = new TriangulateLinearDLT();
 
 		Point3D_F64 found = new Point3D_F64();
-		alg.triangulate(obsPts.get(1),obsPts.get(0),motion.get(1),found);
+		alg.triangulate(obsPts.get(0),obsPts.get(1), motionWorldToCamera.get(1),found);
 
 		assertEquals(worldPoint.x,found.x,1e-8);
 		assertEquals(worldPoint.y,found.y,1e-8);

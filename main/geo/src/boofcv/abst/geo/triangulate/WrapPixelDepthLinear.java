@@ -35,13 +35,13 @@ public class WrapPixelDepthLinear implements TriangulateTwoViewsCalibrated {
 	
 	@Override
 	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB, 
-							   Se3_F64 fromAtoB, Point3D_F64 found) {
+							   Se3_F64 fromAtoB, Point3D_F64 foundInA) {
 		
-		double depth = alg.depth2View(obsA,obsB,fromAtoB);
+		double depth = alg.depth2View(obsA,obsB, fromAtoB);
 		
-		found.x = obsA.x*depth;
-		found.y = obsA.y*depth;
-		found.z = depth;
+		foundInA.x = obsA.x*depth;
+		foundInA.y = obsA.y*depth;
+		foundInA.z = depth;
 
 		return true;
 	}

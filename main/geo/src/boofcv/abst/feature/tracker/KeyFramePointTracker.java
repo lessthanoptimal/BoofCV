@@ -65,6 +65,9 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 		this(tracker,null,(Class)KeyFrameTrack.class);
 	}
 
+	protected KeyFramePointTracker() {
+	}
+
 	/**
 	 * Tracks features inside the image and updates feature locations.
 	 *
@@ -77,6 +80,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 		List<PointTrack> tracks = tracker.getActiveTracks();
 		for( PointTrack t : tracks ) {
 			R p = t.getCookie();
+			p.pixel.currLoc.set(t);
 			pixelTransform.compute(t.x,t.y,p.currLoc);
 			pairs.add(p);
 		}
@@ -94,6 +98,8 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 			if( t.cookie == null )
 				throw new RuntimeException("Bug, cookie should have been set");
 			R p = t.getCookie();
+			p.pixel.keyLoc.set(t);
+			p.pixel.currLoc.set(t);
 			pixelTransform.compute(t.x, t.y, p.keyLoc);
 			p.currLoc.set(p.keyLoc);
 			pairs.add(p);
@@ -120,6 +126,8 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 			R p = t.getCookie();
 			p.reset();
 			p.trackID = t.featureId;
+			p.pixel.keyLoc.set(t);
+			p.pixel.currLoc.set(t);
 			pixelTransform.compute(t.x, t.y, p.keyLoc);
 			p.currLoc.set(p.keyLoc);
 			pairs.add(p);

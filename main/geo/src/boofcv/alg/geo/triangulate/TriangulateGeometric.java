@@ -47,22 +47,22 @@ public class TriangulateGeometric {
 	 * @param a Observation 'a' in normalized coordinates. Not modified.
 	 * @param b Observation 'b' in normalized coordinates. Not modified.
 	 * @param fromAtoB Transformation from camera view 'a' to 'b'  Not modified.
-	 * @param found Output, the found 3D position of the point.  Modified.
+	 * @param foundInA Output, the found 3D position of the point in 'a' reference frame.  Modified.
 	 */
 	public void triangulate( Point2D_F64 a , Point2D_F64 b ,
 							 Se3_F64 fromAtoB ,
-							 Point3D_F64 found )
+							 Point3D_F64 foundInA )
 	{
 		// set camera B's principle point
 		Vector3D_F64 t = fromAtoB.getT();
-		rayA.p.set(-t.x,-t.y,-t.z);
+		rayB.p.set(-t.x, -t.y, -t.z);
 
 		// rotate into camera B's view
-		GeometryMath_F64.multTran(fromAtoB.getR(),rayA.p,rayA.p);
-		GeometryMath_F64.multTran(fromAtoB.getR(),a,rayA.slope);
+		GeometryMath_F64.multTran(fromAtoB.getR(),rayB.p,rayB.p);
+		GeometryMath_F64.multTran(fromAtoB.getR(),b,rayB.slope);
 
-		rayB.slope.set(b.x,b.y,1);
+		rayA.slope.set(a.x,a.y,1);
 
-		ClosestPoint3D_F64.closestPoint(rayA,rayB,found);
+		ClosestPoint3D_F64.closestPoint(rayA,rayB,foundInA);
 	}
 }

@@ -99,25 +99,25 @@ public class TriangulateLinearDLT {
 	 * @param a Observation 'a' in normalized coordinates. Not modified.
 	 * @param b Observation 'b' in normalized coordinates. Not modified.
 	 * @param fromAtoB Transformation from camera view 'a' to 'b'  Not modified.
-	 * @param found Output, the found 3D position of the point.  Modified.
+	 * @param foundInA Output, the found 3D position of the point.  Modified.
 	 */
 	public void triangulate( Point2D_F64 a , Point2D_F64 b ,
 							 Se3_F64 fromAtoB ,
-							 Point3D_F64 found ) {
+							 Point3D_F64 foundInA ) {
 		A.reshape(4, 4, false);
 
-		int index = addView(fromAtoB,a,0);
+		int index = addView(fromAtoB,b,0);
 
 		// third row
 		A.data[index++] = -1;
 		A.data[index++] = 0;
-		A.data[index++] = b.x;
+		A.data[index++] = a.x;
 		A.data[index++] = 0;
 		
 		// fourth row
 		A.data[index++] = 0;
 		A.data[index++] = -1;
-		A.data[index++] = b.y;
+		A.data[index++] = a.y;
 		A.data[index  ] = 0;
 		
 		if( !svd.decompose(A) )
@@ -126,9 +126,9 @@ public class TriangulateLinearDLT {
 		SingularOps.nullSpace(svd,v);
 		
 		double w = v.get(3);
-		found.x = v.get(0)/w;
-		found.y = v.get(1)/w;
-		found.z = v.get(2)/w;
+		foundInA.x = v.get(0)/w;
+		foundInA.y = v.get(1)/w;
+		foundInA.z = v.get(2)/w;
 	}
 	
 	private int addView( Se3_F64 motion , Point2D_F64 a , int index ) {

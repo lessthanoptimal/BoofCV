@@ -135,7 +135,7 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 
 	private void addSpawnedFeature(PyramidKltFeature t) {
 		PointTrack p = new PointTrack(t.x,t.y,totalFeatures++);
-		p.description = t;
+		p.setDescription(t);
 		t.setCookie(p);
 
 		active.add(p);
@@ -175,7 +175,7 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 		if( !active.remove(track) ) {
 			throw new RuntimeException("Not in active list!");
 		}
-		trackManager.dropTrack( (PyramidKltFeature)track.description );
+		trackManager.dropTrack( (PyramidKltFeature)track.getDescription() );
 		dropped.add(track);
 	}
 

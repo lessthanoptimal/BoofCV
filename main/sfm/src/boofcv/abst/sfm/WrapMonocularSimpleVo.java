@@ -28,6 +28,11 @@ public class WrapMonocularSimpleVo<T extends ImageBase>
 	}
 
 	@Override
+	public void reset() {
+		throw new RuntimeException("Implement");
+	}
+
+	@Override
 	public boolean isFatal() {
 		return fatal;
 	}

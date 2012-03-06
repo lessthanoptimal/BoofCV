@@ -41,7 +41,7 @@ public abstract class ResidualTriangulateChecks extends CommonTriangulationCheck
 	@Test
 	public void perfect() {
 		createScene();
-		FunctionNtoM alg = createAlg(obsPts, motion);
+		FunctionNtoM alg = createAlg(obsPts, motionWorldToCamera);
 
 		double input[] = new double[]{worldPoint.x,worldPoint.y,worldPoint.z};
 		double output[] = new double[ alg.getM() ];

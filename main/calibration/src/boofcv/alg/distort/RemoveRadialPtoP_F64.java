@@ -16,29 +16,31 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo;
+package boofcv.alg.distort;
 
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
 
 /**
- * Triangulate the location of a point from two views of a feature given a calibrated
- * camera and known camera motion.
+ * Compute the inverse radial distortion using iteration.
  *
  * @author Peter Abeles
  */
-public interface TriangulateTwoViewsCalibrated {
+public class RemoveRadialPtoP_F64 extends RemoveRadialPtoN_F64 {
 
 	/**
-	 * Triangulate the points location.
+	 * Removes radial distortion
 	 *
-	 * @param obsA View from position A in normalized image coordinates.
-	 * @param obsB View from position B in normalized image coordinates.
-	 * @param fromAtoB Transform from camera location A to location B
-	 * @param foundInA The found triangulated point in A's reference frame.
-	 * @return true if successful, false otherwise.
+	 * @param x Distorted x-coordinate pixel
+	 * @param y Distorted y-coordinate pixel
+	 * @param out Undistorted pixel coordinate.
 	 */
-	public boolean triangulate( Point2D_F64 obsA , Point2D_F64 obsB ,
-								Se3_F64 fromAtoB, Point3D_F64 foundInA );
+	@Override
+	public void compute(double x, double y, Point2D_F64 out) {
+		//  distorted pixel to undistorted normalized
+		super.compute(x,y,out);
+
+
+		out.x = (x+x_c*sum)/(1+sum);
+		out.y = (y+y_c*sum)/(1+sum);
+	}
 }

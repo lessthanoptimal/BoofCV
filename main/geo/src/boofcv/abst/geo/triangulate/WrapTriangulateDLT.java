@@ -35,9 +35,9 @@ public class WrapTriangulateDLT implements TriangulateTwoViewsCalibrated {
 
 	@Override
 	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,
-							   Se3_F64 fromAtoB, Point3D_F64 found) {
+							   Se3_F64 fromAtoB, Point3D_F64 foundInA) {
 		
-		alg.triangulate(obsA,obsB,fromAtoB,found);
+		alg.triangulate(obsA,obsB, fromAtoB, foundInA);
 		
 		return true;
 	}

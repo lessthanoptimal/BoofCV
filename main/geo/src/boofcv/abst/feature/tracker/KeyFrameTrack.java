@@ -21,13 +21,23 @@ package boofcv.abst.feature.tracker;
 import boofcv.alg.geo.AssociatedPair;
 
 /**
+ *
+ * observations in normalized pixel coordinates.
+ *
  * @author Peter Abeles
  */
 public class KeyFrameTrack extends AssociatedPair {
+
+	// observation is pixels
+	AssociatedPair pixel = new AssociatedPair();
+
 	long trackID;
 
 	public void reset() {
 
 	}
 
+	public AssociatedPair getPixel() {
+		return pixel;
+	}
 }

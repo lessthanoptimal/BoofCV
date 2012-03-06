@@ -16,32 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.triangulate;
+package boofcv.geo.simulation.impl;
 
-import georegression.struct.point.Point3D_F64;
+import georegression.geometry.RotationMatrixGenerator;
 import org.junit.Test;
 
+import static boofcv.geo.simulation.impl.TestBasicEnvironment.DummyCamera;
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestTriangulateGeometric extends CommonTriangulationChecks {
+public class TestForwardCameraMotion {
 
-	/**
-	 * Create 2 perfect observations and solve for the position
-	 */
 	@Test
-	public void triangulate_two() {
-		createScene();
+	public void move() {
+		DummyCamera cam = new DummyCamera();
 
-		TriangulateGeometric alg = new TriangulateGeometric();
-
-		Point3D_F64 found = new Point3D_F64();
-		alg.triangulate(obsPts.get(0),obsPts.get(1), motionWorldToCamera.get(1),found);
-
-		assertEquals(worldPoint.x,found.x,1e-8);
-		assertEquals(worldPoint.y,found.y,1e-8);
-		assertEquals(worldPoint.z,found.z,1e-8);
+		RotationMatrixGenerator.eulerXYZ(0,Math.PI/2,0,cam.pose.getR());
+		
+		ForwardCameraMotion alg = new ForwardCameraMotion(2);
+		
+		alg.setCamera(cam);
+		
+		alg.update();
+		
+		assertEquals(2,cam.pose.getX(),1.e-8);
+		assertEquals(0,cam.pose.getY(),1.e-8);
+		assertEquals(0,cam.pose.getZ(),1.e-8);
 	}
 }

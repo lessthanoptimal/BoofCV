@@ -147,7 +147,7 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		Iterator<PointTrack> iter = tracksAll.iterator();
 		while( iter.hasNext() ) {
 			PointTrack p = iter.next();
-			TrackInfo info = (TrackInfo)p.description;
+			TrackInfo info = p.getDescription();
 			if( tick - info.lastAssociated > pruneThreshold ) {
 				tracksDropped.add(p);
 				unused.add(p);
