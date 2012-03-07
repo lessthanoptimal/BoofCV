@@ -51,5 +51,5 @@ public interface MonocularVisualOdometry<T extends ImageBase> {
 	 *
 	 * @return Found pose.
 	 */
-	public Se3_F64 getPose();
+	public Se3_F64 getCameraToWorld();
 }

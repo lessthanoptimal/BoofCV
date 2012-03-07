@@ -49,10 +49,10 @@ public class ForwardCameraMotion implements CameraControl {
 	public void update() {
 		// compute the motion's direction
 		direction.set(0,0,1);
-		GeometryMath_F64.mult(camera.getCameraToWorld().getR(),direction,direction);
+		GeometryMath_F64.mult(camera.getWorldToCamera().getR(),direction,direction);
 		
 		// move the camera
-		Vector3D_F64 T = camera.getCameraToWorld().getT();
+		Vector3D_F64 T = camera.getWorldToCamera().getT();
 		T.x += direction.x*speed;
 		T.y += direction.y*speed;
 		T.z += direction.z*speed;

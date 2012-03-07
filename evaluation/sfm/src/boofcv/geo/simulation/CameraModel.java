@@ -40,5 +40,5 @@ public interface CameraModel {
 
 	public void setCameraToWorld(Se3_F64 pose);
 
-	public Se3_F64 getCameraToWorld();
+	public Se3_F64 getWorldToCamera();
 }
