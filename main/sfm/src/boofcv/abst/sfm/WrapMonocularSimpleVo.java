@@ -13,8 +13,7 @@ public class WrapMonocularSimpleVo<T extends ImageBase>
 		implements MonocularVisualOdometry<T>{
 	
 	MonocularSimpleVo<T> alg;
-	
-	boolean fatal;
+
 
 	public WrapMonocularSimpleVo(MonocularSimpleVo<T> alg) {
 		this.alg = alg;
@@ -22,9 +21,7 @@ public class WrapMonocularSimpleVo<T extends ImageBase>
 
 	@Override
 	public boolean process(T input) {
-		fatal = alg.process(input);
-		
-		return fatal;
+		return alg.process(input);
 	}
 
 	@Override
@@ -34,11 +31,11 @@ public class WrapMonocularSimpleVo<T extends ImageBase>
 
 	@Override
 	public boolean isFatal() {
-		return fatal;
+		return alg.isFatal();
 	}
 
 	@Override
-	public Se3_F64 getPose() {
+	public Se3_F64 getCameraToWorld() {
 		return alg.getCameraLocation();
 	}
 }

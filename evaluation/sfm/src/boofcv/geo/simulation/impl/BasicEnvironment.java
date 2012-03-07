@@ -82,7 +82,7 @@ public class BasicEnvironment implements EnvironmentModel {
 	@Override
 	public List<SimPoint3D> requestSpawn(CameraModel camera, int numFeatures) {
 		
-		Se3_F64 cameraToWorld = camera.getCameraToWorld();
+		Se3_F64 cameraToWorld = camera.getWorldToCamera();
 		
 		List<SimPoint3D> spawned = new ArrayList<SimPoint3D>();
 		

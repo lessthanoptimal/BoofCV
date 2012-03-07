@@ -124,7 +124,7 @@ public class TestBasicEnvironment {
 		}
 
 		@Override
-		public Se3_F64 getCameraToWorld() {
+		public Se3_F64 getWorldToCamera() {
 			return pose;
 		}
 	}

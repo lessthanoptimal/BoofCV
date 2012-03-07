@@ -68,7 +68,8 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	Se3_F64 keyToSpawn = new Se3_F64();
 	// has a key frame been set?
 	boolean hasSpawned = false;
-
+	// true if there was a fatal error
+	boolean fatal;
 
 	int mode;
 
@@ -116,6 +117,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		this.refineE = refineE;
 		this.computeMotion = computeMotion;
 		this.refineMotion = refineMotion;
+		this.fatal = fatal;
 
 		distance = new double[ minFeatures*2 ];
 	}
@@ -133,25 +135,30 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	{
 		tracker.process(image);
 
-		System.out.println("Mode "+mode+" tracks "+tracker.getActiveTracks().size());
+		System.out.println("***************** Mode "+mode+" tracks "+tracker.getActiveTracks().size());
 		
 		if( mode == 0 ) {
 			tracker.setKeyFrame();
 			tracker.spawnTracks();
 			mode = 1;
+			return false;
 		} else if( mode == 1 ) {
 			checkInitialize();
 		} else if( mode == 2 ) {
 			if( !updatePosition() ) {
+				System.out.println(" *** UPDATED FAILED ****");
 				// update failed so reset
-				mode = 0;
+				mode = 1;
+				worldToKey.reset();
 				keyToCurr.reset();
 				tracker.reset();
 				tracker.spawnTracks();
+				hasSpawned = false;
+				fatal = true;
 				return false;
 			} else {
 				// check and triangulate new features
-				if( hasSpawned && (inlierSize<minFeatures || isSufficientMotion()) ) {
+				if( hasSpawned && inlierSize < minFeatures && isSufficientMotion() ) {
 					triangulateNew();
 				}
 			}
@@ -164,6 +171,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	}
 
 	private void checkInitialize() {
+		fatal = false;
 		List<PointPoseTrack> pairs = tracker.getPairs();
 
 		if( pairs.size() < minFeatures ) {
@@ -173,49 +181,82 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		} else {
 			// see if there has been enough pixel motion to warrant the cost of computing E
 			if( isSufficientMotion()) {
-				// initial estimate of E
-				if( computeE.process((List)pairs) ) {
-					DenseMatrix64F initial = computeE.getModel();
-					List<AssociatedPair> inliers = computeE.getMatchSet();
-
-					// refine E using non-linear optimization
-					if( refineE.process(initial,inliers) ) {
-						DenseMatrix64F E = refineE.getRefinement();
-						decomposeE.decompose(E);
-
-						// select best possible motion from E
-						List<Se3_F64> solutions = decomposeE.getSolutions();
-						
-						Se3_F64 best = selectBestPose(solutions, inliers);
-//						best.invert(worldToCurr); // todo hack
-						keyToCurr.set(best);
-
-						// triangular feature points
-						double maxZ = 0;
-						for( PointPoseTrack t : pairs ) {
-							triangulateAlg.triangulate(t.keyLoc,t.currLoc, keyToCurr,t.location);
-							t.active = true;
-							if( t.location.z > maxZ )
-								maxZ = t.location.z;
-						}
-						// rescale for numerical stability
-//						keyToCurr.getT().x /= maxZ;
-//						keyToCurr.getT().y /= maxZ;
-//						keyToCurr.getT().z /= maxZ;
-//
-//						for( PointPoseTrack t : pairs ) {
-//							Point3D_F64 p = t.location;
-//							p.x /= maxZ;
-//							p.y /= maxZ;
-//							p.z /= maxZ;
-//						}
-
-						hasSpawned = false;
-						mode = 2;
-					}
+				if( estimateMotionFromEssential(false) ) {
+					hasSpawned = false;
+					mode = 2;
 				}
 			}
 		}
+	}
+
+	private boolean estimateMotionFromEssential( boolean hasPrevious) {
+		List<PointPoseTrack> pairs = tracker.getPairs();
+
+		// initial estimate of E
+		if( computeE.process((List)pairs) ) {
+			DenseMatrix64F initial = computeE.getModel();
+			List<AssociatedPair> inliers = computeE.getMatchSet();
+
+			inlierSize = inliers.size();
+
+			System.out.println("    Essential inliers "+inliers.size()+"  out of "+pairs.size());
+			
+			// refine E using non-linear optimization
+			if( refineE.process(initial,inliers) ) {
+				DenseMatrix64F E = refineE.getRefinement();
+				decomposeE.decompose(E);
+
+				// select best possible motion from E
+				List<Se3_F64> solutions = decomposeE.getSolutions();
+
+				Se3_F64 best = selectBestPose(solutions, inliers);
+					
+				if( hasPrevious ) {
+					double scale = keyToCurr.getT().norm();
+					double foundScale = best.getT().norm();
+					best.getT().x *= scale/foundScale;
+					best.getT().y *= scale/foundScale;
+					best.getT().z *= scale/foundScale;
+
+//					System.out.println("  SCALE RATIO "+(scale/foundScale));
+					
+					keyToCurr.set(best);
+					for( PointPoseTrack t : pairs ) {
+						if( !t.active )
+							throw new RuntimeException("CRAP INACTIVE HERE?!?!");
+						triangulateAlg.triangulate(t.keyLoc,t.currLoc, keyToCurr,t.location);
+					}
+				} else {
+					keyToCurr.set(best);
+
+					// triangular feature points
+					// Adjust scale for numerical stability
+					double max = 0;
+					for( PointPoseTrack t : pairs ) {
+						triangulateAlg.triangulate(t.keyLoc,t.currLoc, keyToCurr,t.location);
+						t.active = true;
+						if( t.location.z > max ) {
+							max = t.location.z;
+						}
+					}
+					for( PointPoseTrack t : pairs ) {
+						t.location.x /= max;
+						t.location.y /= max;
+						t.location.z /= max;
+					}
+					keyToCurr.getT().x /= max;
+					keyToCurr.getT().y /= max;
+					keyToCurr.getT().z /= max;
+				}
+				
+				System.out.print("   after estimate E:  ");
+				computeResidualError();
+				
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/**
@@ -245,6 +286,8 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		List<PointPositionPair> inliers = computeMotion.getMatchSet();
 		inlierSize = inliers.size();
 		
+		System.out.println("   Motion inliers "+inlierSize+"  out of "+active.size());
+		
 		refineMotion.process(computeMotion.getModel(), inliers);
 
 		keyToCurr.set(refineMotion.getRefinement());
@@ -259,17 +302,21 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		}
 		System.out.print("   after triangulate: ");
 		computeResidualError();
-		
-		System.out.println("   -- triangulate inliers "+inlierSize+"  out of "+active.size());
+
 		// handle spawning new features
 		if( !hasSpawned && inlierSize <= setKeyThreshold ) {
+			estimateMotionFromEssential(true);
+
 			System.out.println("--- Setting key frame");
+			for( PointPoseTrack t : tracker.getPairs() ) {
+				if( t.active ) {
+					t.spawnLoc.set(t.currLoc);
+				}
+			}
 			tracker.spawnTracks();
 			keyToSpawn.set(keyToCurr);
 			hasSpawned = true;
 		}
-
-		
 
 		return true;
 	}
@@ -277,6 +324,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	/**
 	 * Triangulates the location of new features
 	 */
+	// todo project to new key frame
 	protected void triangulateNew() {
 		System.out.println("---- Triangulating new features");
 		// change in position from key frame to current frame
@@ -284,19 +332,25 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		Se3_F64 spawnToKey = keyToSpawn.invert(null);
 		Se3_F64 spawnToCurr = spawnToKey.concat(this.keyToCurr,null);
 
-		
 		for( PointPoseTrack t : tracker.getPairs() ) {
 			if( t.active ) {
 				// project its position to the spawn point
 				SePointOps_F64.transform(keyToSpawn,t.location,t.location);
 
-				// now project the observation
-				t.keyLoc.x = t.location.x/t.location.z;
-				t.keyLoc.y = t.location.y/t.location.z;
+//				double x = t.location.x/t.location.z;
+//				double y = t.location.y/t.location.z;
 
+//				double dx = x - t.spawnLoc.x;
+//				double dy = y - t.spawnLoc.y;
+//
+//				double error = Math.sqrt(dx*dx + dy*dy);
+//
+//				System.out.println("  triangulation error active "+error);
+
+				// now project the observation
+				t.keyLoc.set(t.spawnLoc);
 			} else {
 				triangulateAlg.triangulate(t.keyLoc,t.currLoc,spawnToCurr, t.location);
-
 
 				t.active = true;
 			}
@@ -306,6 +360,10 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		// make the spawn point the new keyframe
 		worldToKey.concat(keyToSpawn,spawnToKey);
 		worldToKey.set(spawnToKey);
+		keyToCurr.set(spawnToCurr);
+
+		// now estimate everything again todo better comment
+		estimateMotionFromEssential(true);
 	}
 
 	/**
@@ -333,7 +391,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		
 		return bestModel;
 	}
-
+	
 	private void computeResidualError() {
 		
 		Point3D_F64 currentView = new Point3D_F64();
@@ -394,5 +452,9 @@ public class MonocularSimpleVo<T extends ImageBase> {
 
 	public Se3_F64 getCameraLocation() {
 		return worldToCurr;
+	}
+
+	public boolean isFatal() {
+		return fatal;
 	}
 }

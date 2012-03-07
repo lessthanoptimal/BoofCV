@@ -91,6 +91,10 @@ public class DistortedPinholeCamera implements CameraModel {
 		// from world to camera coordinate system
 		SePointOps_F64.transformReverse(cameraToWorld, world, cameraPt);
 
+		// discard points behind the camera
+		if( cameraPt.z <= 0 )
+			return false;
+
 		// camera 3D to normalized pixel 2D
 		pixel.x = cameraPt.x/cameraPt.z;
 		pixel.y = cameraPt.y/cameraPt.z;
@@ -121,7 +125,7 @@ public class DistortedPinholeCamera implements CameraModel {
 	}
 
 	@Override
-	public Se3_F64 getCameraToWorld() {
+	public Se3_F64 getWorldToCamera() {
 		return cameraToWorld;
 	}
 

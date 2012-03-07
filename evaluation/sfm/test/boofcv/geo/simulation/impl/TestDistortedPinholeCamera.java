@@ -41,6 +41,20 @@ public class TestDistortedPinholeCamera {
 	DenseMatrix64F K = new DenseMatrix64F(3,3,true,600,0,imageWidth/2,0,650,imageHeight/2,0,0,1);
 
 	/**
+	 * Make sure features behind the camera are not seen
+	 */
+	@Test
+	public void checkBehindCamera() {
+		DistortedPinholeCamera alg = createCamera(0);
+
+		// point along optical axis behind the camera
+		Point3D_F64 p3 = new Point3D_F64(0,2,-10);
+		Point2D_F64 found = new Point2D_F64(1,2);
+
+		assertFalse(alg.projectPoint(p3,found));
+	}
+
+	/**
 	 * Give it a few points with known positions or general locations
 	 */
 	@Test

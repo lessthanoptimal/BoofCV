@@ -55,6 +55,9 @@ public class SimulatedTracker implements ImagePointTracker {
 
 	// the maximum number of tracks it tries to maintain on each spawn
 	int targetTracks;
+	
+	// number of visible tracks
+	int numVisible;
 
 	public SimulatedTracker(EnvironmentModel environment,
 							CameraModel camera , int targetTracks ) {
@@ -65,7 +68,6 @@ public class SimulatedTracker implements ImagePointTracker {
 
 	@Override
 	public void process(ImageBase image) {
-		System.out.println("SimulatedTracker process");
 		// swap current and previous
 		List<PointTrack> temp = current;
 		current = previous;
@@ -93,6 +95,9 @@ public class SimulatedTracker implements ImagePointTracker {
 				}
 			}
 		}
+		// save the number of visible tracks.  can't use current.size()
+		// since that can be changed.
+		numVisible = current.size();
 
 		// if a track was visible and no longer is it is then dropped
 		for( PointTrack p : previous ) {
@@ -114,8 +119,7 @@ public class SimulatedTracker implements ImagePointTracker {
 
 	@Override
 	public void spawnTracks() {
-		System.out.println("SimulatedTracker SPAWN");
-		int numSpawn = targetTracks - current.size();
+		int numSpawn = targetTracks - numVisible;
 
 		List<SimPoint3D> simPoints = environment.requestSpawn(camera,numSpawn);
 
