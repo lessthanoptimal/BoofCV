@@ -16,32 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.tracker;
+package boofcv.abst.geo.triangulate;
 
-import boofcv.alg.geo.AssociatedPair;
-import georegression.struct.point.Point2D_F64;
+import boofcv.abst.geo.GeneralTestTriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 
 /**
- *
- * observations in normalized pixel coordinates.
- *
  * @author Peter Abeles
  */
-public class KeyFrameTrack extends AssociatedPair {
+public class TestWrapPixelDepthLinear extends GeneralTestTriangulateTwoViewsCalibrated {
 
-	// observation is pixels
-	AssociatedPair pixel = new AssociatedPair();
-
-	// feature location at the spawn point
-	public Point2D_F64 spawnLoc = new Point2D_F64();
-
-	long trackID;
-
-	public void reset() {
-
-	}
-
-	public AssociatedPair getPixel() {
-		return pixel;
+	public TriangulateTwoViewsCalibrated createAlg() {
+		return new WrapPixelDepthLinear();
 	}
 }

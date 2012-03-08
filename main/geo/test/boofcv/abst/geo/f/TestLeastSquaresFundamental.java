@@ -16,32 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.tracker;
+package boofcv.abst.geo.f;
 
-import boofcv.alg.geo.AssociatedPair;
-import georegression.struct.point.Point2D_F64;
+import boofcv.abst.geo.GeneralTestRefineFundamental;
+import boofcv.abst.geo.RefineEpipolarMatrix;
 
 /**
- *
- * observations in normalized pixel coordinates.
- *
  * @author Peter Abeles
  */
-public class KeyFrameTrack extends AssociatedPair {
+public class TestLeastSquaresFundamental extends GeneralTestRefineFundamental {
 
-	// observation is pixels
-	AssociatedPair pixel = new AssociatedPair();
-
-	// feature location at the spawn point
-	public Point2D_F64 spawnLoc = new Point2D_F64();
-
-	long trackID;
-
-	public void reset() {
-
+	@Override
+	public RefineEpipolarMatrix createAlgorithm() {
+		return new LeastSquaresFundamental(1e-16,200,false);
 	}
 
-	public AssociatedPair getPixel() {
-		return pixel;
-	}
 }

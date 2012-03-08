@@ -74,4 +74,12 @@ public class GeoTestingOps {
 
 		return ret;
 	}
+
+	public static double residualError( double[] residuals ) {
+		double total = 0;
+		for( double d : residuals ) {
+			total += d*d;
+		}
+		return total;
+	}
 }

@@ -58,6 +58,7 @@ public class EvaluateSimpleMono extends EvaluateMonoVisualOdometry {
 		System.out.printf("rotation50  %10.6f  rotation95 %10.6f\n",mc.rotation50,mc.rotation95);
 		System.out.printf("average fatal    %5.2f\n",mc.aveFatal);
 		System.out.printf("Total Exceptions %d\n",mc.numException);
+		System.out.printf("FPS50            %6.2f\n",mc.fps50);
 
 		System.out.println("Done");
 	}

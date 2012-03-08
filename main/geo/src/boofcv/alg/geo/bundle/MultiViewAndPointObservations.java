@@ -16,18 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.epipolar.triangulate;
+package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.abst.geo.epipolar.GeneralTestTriangulateTwoViewsCalibrated;
-import boofcv.abst.geo.triangulate.WrapPixelDepthLinear;
+import boofcv.struct.FastQueue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
+ * Observations for all views in bundle adjustment.  Compatible with calibrated and uncalibrated
+ * cameras.
+ *
  * @author Peter Abeles
  */
-public class TestWrapPixelDepthLinear extends GeneralTestTriangulateTwoViewsCalibrated {
+public class MultiViewAndPointObservations {
+	
+	
+	List<FastQueue<PointIndexObservation>> views =
+			new ArrayList<FastQueue<PointIndexObservation>>();
 
-	public TriangulateTwoViewsCalibrated createAlg() {
-		return new WrapPixelDepthLinear();
-	}
+
 }

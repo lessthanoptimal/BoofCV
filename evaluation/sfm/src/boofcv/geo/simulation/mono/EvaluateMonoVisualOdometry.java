@@ -61,6 +61,7 @@ public abstract class EvaluateMonoVisualOdometry {
 	int numFaults;
 	int numExceptions;
 	List<MonoMetrics> errors = new ArrayList<MonoMetrics>();
+	List<Double> processingTime = new ArrayList<Double>();
 
 	boolean hasPrevious;
 	Se3_F64 prevTruth = new Se3_F64();
@@ -111,6 +112,7 @@ public abstract class EvaluateMonoVisualOdometry {
 		numFaults = 0;
 		numExceptions = 0;
 		errors.clear();
+		processingTime.clear();
 	}
 
 
@@ -118,8 +120,11 @@ public abstract class EvaluateMonoVisualOdometry {
 		// update the simulator and pose estimate
 		boolean worked;
 		sim.step();
+		long deltaTime = 0;
 		try {
-		worked = alg.process(null);
+			long before = System.nanoTime();
+			worked = alg.process(null);
+			deltaTime = System.nanoTime()-before;
 		} catch( Exception e ) {
 			e.printStackTrace();
 			System.out.println("Random Seed = "+seed);
@@ -128,6 +133,8 @@ public abstract class EvaluateMonoVisualOdometry {
 		}
 		sim.maintenance();
 
+		processingTime.add( deltaTime / 1e9 );
+		
 		if( worked ) {
 			Se3_F64 worldToCamera = camera.getWorldToCamera();
 			Se3_F64 cameraToWorld = worldToCamera.invert(null);
@@ -208,6 +215,15 @@ public abstract class EvaluateMonoVisualOdometry {
 		return errorX+errorY+errorZ;
 	}
 
+	private void computeTimeMetrics(MonoTrialResults results) {
+		
+		double sum = 0;
+		for( double d : processingTime ) {
+			sum += d;
+		}
+		results.secondsPerFrame = sum/processingTime.size();
+	}
+	
 	private void computeScaleDrift(MonoTrialResults results) {
 		double aveDriftMag = 0;
 		for( int i = 1; i < errors.size(); i++ ) {
@@ -238,6 +254,7 @@ public abstract class EvaluateMonoVisualOdometry {
 		results.randomSeed = seed;
 		results.exception = numExceptions != 0;
 		results.numFaults = numFaults;
+		computeTimeMetrics(results);
 		computeScaleDrift(results);
 		computePoseError(results);
 		

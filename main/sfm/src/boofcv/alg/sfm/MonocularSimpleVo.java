@@ -82,7 +82,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	// storage for pixel motion, used to decide if the camera has moved or not
 	double distance[];
 	
-
+   Se3_F64 temp = new Se3_F64();
 	
 	
 	FastQueue<PointPositionPair> queuePointPose = new FastQueue<PointPositionPair>(200,PointPositionPair.class,true);
@@ -159,7 +159,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 			} else {
 				// check and triangulate new features
 				if( hasSpawned && inlierSize < minFeatures && isSufficientMotion() ) {
-					triangulateNew();
+					setSpawnToKeyFrame();
 				}
 			}
 		}
@@ -322,47 +322,35 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	}
 
 	/**
-	 * Triangulates the location of new features
+	 * Changes the last spawn point into the new keyframe.  All points have keyLoc
+	 * set to the observation at the spawn point and set active to true.  Then
+	 * the camera position and points are triangulated using motion from essential
+	 *
 	 */
-	// todo project to new key frame
-	protected void triangulateNew() {
-		System.out.println("---- Triangulating new features");
-		// change in position from key frame to current frame
-//		Se3_F64 worldToCurr = this.worldToCurr.invert(null);
-		Se3_F64 spawnToKey = keyToSpawn.invert(null);
-		Se3_F64 spawnToCurr = spawnToKey.concat(this.keyToCurr,null);
+	protected void setSpawnToKeyFrame() {
 
+		// update the key location and set inactive tracks to true which where
+		// spawned at the spane point
 		for( PointPoseTrack t : tracker.getPairs() ) {
 			if( t.active ) {
-				// project its position to the spawn point
-				SePointOps_F64.transform(keyToSpawn,t.location,t.location);
-
-//				double x = t.location.x/t.location.z;
-//				double y = t.location.y/t.location.z;
-
-//				double dx = x - t.spawnLoc.x;
-//				double dy = y - t.spawnLoc.y;
-//
-//				double error = Math.sqrt(dx*dx + dy*dy);
-//
-//				System.out.println("  triangulation error active "+error);
-
-				// now project the observation
 				t.keyLoc.set(t.spawnLoc);
 			} else {
-				triangulateAlg.triangulate(t.keyLoc,t.currLoc,spawnToCurr, t.location);
-
 				t.active = true;
 			}
 		}
 		hasSpawned = false;
 
 		// make the spawn point the new keyframe
-		worldToKey.concat(keyToSpawn,spawnToKey);
-		worldToKey.set(spawnToKey);
-		keyToCurr.set(spawnToCurr);
+		worldToKey.concat(keyToSpawn, temp);
+		worldToKey.set(temp);
 
-		// now estimate everything again todo better comment
+		keyToSpawn.invert(temp);
+		// s2k * k2c = s2c
+		keyToCurr.concat(temp,keyToSpawn);
+		keyToCurr.set(keyToSpawn);
+		
+
+		// now estimate the motion and triangulate points by computing the essential matrix
 		estimateMotionFromEssential(true);
 	}
 

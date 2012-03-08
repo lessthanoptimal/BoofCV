@@ -16,18 +16,21 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.epipolar.triangulate;
+package boofcv.abst.geo.h;
 
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.abst.geo.epipolar.GeneralTestTriangulateTwoViewsCalibrated;
-import boofcv.abst.geo.triangulate.WrapGeometricTriangulation;
+import boofcv.abst.geo.GeneralTestRefineHomography;
+import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.alg.geo.ModelObservationResidualN;
+import boofcv.alg.geo.h.HomographyResidualSampson;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapGeometricTriangulation extends GeneralTestTriangulateTwoViewsCalibrated {
+public class TestLeastSquaresHomography extends GeneralTestRefineHomography {
 
-	public TriangulateTwoViewsCalibrated createAlg() {
-		return new WrapGeometricTriangulation();
+	@Override
+	public RefineEpipolarMatrix createAlgorithm() {
+		ModelObservationResidualN r = new HomographyResidualSampson();
+		return new LeastSquaresHomography(1e-8,200,r);
 	}
 }

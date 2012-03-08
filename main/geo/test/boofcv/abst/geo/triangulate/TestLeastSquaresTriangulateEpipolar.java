@@ -16,21 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.epipolar;
+package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.RefineEpipolarMatrix;
-import boofcv.abst.geo.h.LeastSquaresHomography;
-import boofcv.alg.geo.ModelObservationResidualN;
-import boofcv.alg.geo.h.HomographyResidualSampson;
+import boofcv.abst.geo.GeneralTestRefineTriangulate;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
+import org.ejml.data.DenseMatrix64F;
+
+import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-public class TestLeastSquaresHomography extends GeneralTestRefineHomography{
+public class TestLeastSquaresTriangulateEpipolar extends GeneralTestRefineTriangulate {
+
+	LeastSquaresTriangulateEpipolar alg = new LeastSquaresTriangulateEpipolar(1e-8,200);
 
 	@Override
-	public RefineEpipolarMatrix createAlgorithm() {
-		ModelObservationResidualN r = new HomographyResidualSampson();
-		return new LeastSquaresHomography(1e-8,200,r);
+	public void triangulate(List<Point2D_F64> obsPts, List<Se3_F64> motion,
+							List<DenseMatrix64F> essential,
+							Point3D_F64 initial, Point3D_F64 found) {
+		alg.process(obsPts,essential,initial,found);
 	}
 }

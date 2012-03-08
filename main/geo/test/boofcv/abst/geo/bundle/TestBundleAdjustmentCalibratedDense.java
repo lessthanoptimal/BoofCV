@@ -16,19 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.epipolar;
+package boofcv.abst.geo.bundle;
 
-import boofcv.abst.geo.RefineEpipolarMatrix;
-import boofcv.abst.geo.f.LeastSquaresFundamental;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestLeastSquaresFundamental extends GeneralTestRefineFundamental {
+public class TestBundleAdjustmentCalibratedDense {
 
-	@Override
-	public RefineEpipolarMatrix createAlgorithm() {
-		return new LeastSquaresFundamental(1e-16,200,false);
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
-
 }

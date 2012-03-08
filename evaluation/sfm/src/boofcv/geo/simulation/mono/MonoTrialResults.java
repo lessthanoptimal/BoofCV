@@ -22,6 +22,7 @@ package boofcv.geo.simulation.mono;
  * @author Peter Abeles
  */
 public class MonoTrialResults {
+	public double secondsPerFrame;
 	public long randomSeed;
 	public boolean exception;
 	public int numFaults;
