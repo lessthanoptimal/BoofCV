@@ -8,3 +8,4 @@
 - Zhang 98
  * Not optimizing as well as it should be.
  * Least squares is suspect, try dogleg instead
+ * Check to see now Rodrigues is used.  Try other parameterizations

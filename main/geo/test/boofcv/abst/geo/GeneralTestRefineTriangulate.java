@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.epipolar;
+package boofcv.abst.geo;
 
 import boofcv.alg.geo.triangulate.CommonTriangulationChecks;
 import georegression.struct.point.Point2D_F64;

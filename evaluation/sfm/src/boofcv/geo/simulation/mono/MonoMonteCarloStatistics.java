@@ -38,16 +38,20 @@ public class MonoMonteCarloStatistics {
 	
 	double aveFatal;
 	int numException;
+	
+	double fps50;
 
 	public MonoMonteCarloStatistics( List<MonoTrialResults> results ) {
 		List<Double> drift = new ArrayList<Double>();
 		List<Double> location = new ArrayList<Double>();
 		List<Double> rotation = new ArrayList<Double>();
+		List<Double> time = new ArrayList<Double>();
 
 		for( MonoTrialResults r : results ) {
 			drift.add(r.scaleDrift);
 			location.add(r.translation);
 			rotation.add(r.rotation);
+			time.add(r.secondsPerFrame);
 
 			if( r.exception )
 				numException++;
@@ -62,6 +66,7 @@ public class MonoMonteCarloStatistics {
 		drift50 = drift.get(results.size()/2);
 		location50 = location.get(results.size()/2);
 		rotation50 = rotation.get(results.size()/2);
+		fps50 = 1.0/time.get(results.size()/2);
 
 		drift95 = drift.get((int)(results.size()*0.95));
 		location95 = location.get((int)(results.size()*0.95));

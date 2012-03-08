@@ -16,12 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.epipolar;
+package boofcv.abst.geo;
 
-import boofcv.abst.geo.RefineEpipolarMatrix;
-import boofcv.alg.geo.UtilEpipolar;
-import boofcv.alg.geo.f.CommonFundamentalChecks;
-import georegression.struct.point.Vector3D_F64;
+import boofcv.alg.geo.h.CommonHomographyChecks;
+import boofcv.alg.geo.h.HomographyLinear4;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
@@ -32,54 +30,55 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralTestRefineFundamental extends CommonFundamentalChecks {
-
+public abstract class GeneralTestRefineHomography extends CommonHomographyChecks {
 
 	public abstract RefineEpipolarMatrix createAlgorithm();
 
 	@Test
 	public void perfectInput() {
-		init(30,false);
+		createScene(30,false);
 
-		// compute true essential matrix
-		DenseMatrix64F E = UtilEpipolar.computeEssential(motion.getR(), motion.getT());
+		// use the linear algorithm to compute the homography
+		HomographyLinear4 estimator = new HomographyLinear4(true);
+		estimator.process(pairs);
+		DenseMatrix64F H = estimator.getHomography();
 
 		RefineEpipolarMatrix alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
-		assertTrue(alg.process(E, pairs));
+		assertTrue(alg.process(H, pairs));
 
 		DenseMatrix64F found = alg.getRefinement();
 
 		// normalize so that they are the same
-		CommonOps.divide(E.get(2, 2), E);
-		CommonOps.divide(found.get(2,2),found);
+		CommonOps.divide(H.get(2, 2), H);
+		CommonOps.divide(found.get(2, 2), found);
 
-		assertTrue(MatrixFeatures.isEquals(E, found, 1e-8));
+		assertTrue(MatrixFeatures.isEquals(H, found, 1e-8));
 	}
 
 	@Test
 	public void incorrectInput() {
-		init(30,false);
+		createScene(30,false);
 
-		// compute true essential matrix
-		DenseMatrix64F E = UtilEpipolar.computeEssential(motion.getR(), motion.getT());
-
-		// create an alternative incorrect matrix
-		Vector3D_F64 T = motion.getT().copy();
-		T.x += 0.1;
-		DenseMatrix64F Emod = UtilEpipolar.computeEssential(motion.getR(), T);
+		// use the linear algorithm to compute the homography
+		HomographyLinear4 estimator = new HomographyLinear4(true);
+		estimator.process(pairs);
+		DenseMatrix64F H = estimator.getHomography();
 
 		RefineEpipolarMatrix alg = createAlgorithm();
 
-		// compute and compare results
-		assertTrue(alg.process(Emod, pairs));
+		//give it the perfect matrix and see if it screwed it up
+		DenseMatrix64F Hmod = H.copy();
+		Hmod.data[0] += 0.1;
+		Hmod.data[5] += 0.1;
+		assertTrue(alg.process(Hmod, pairs));
 
 		DenseMatrix64F found = alg.getRefinement();
 
 		// normalize to allow comparison
-		CommonOps.divide(E.get(2,2),E);
-		CommonOps.divide(Emod.get(2,2),Emod);
+		CommonOps.divide(H.get(2,2),H);
+		CommonOps.divide(Hmod.get(2,2),Hmod);
 		CommonOps.divide(found.get(2,2),found);
 
 		double error0 = 0;
@@ -87,11 +86,11 @@ public abstract class GeneralTestRefineFundamental extends CommonFundamentalChec
 
 		// very crude error metric
 		for( int i = 0; i < 9; i++ ) {
-			error0 += Math.abs(Emod.data[i]-E.data[i]);
-			error1 += Math.abs(found.data[i]-E.data[i]);
+			error0 += Math.abs(Hmod.data[i]-H.data[i]);
+			error1 += Math.abs(found.data[i]-H.data[i]);
 		}
 
-//		System.out.println("error "+error1+"   other "+error0);
+//		System.out.println("error "+error1);
 		assertTrue(error1 < error0);
 	}
 }

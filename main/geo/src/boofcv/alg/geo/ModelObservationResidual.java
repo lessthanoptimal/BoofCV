@@ -34,9 +34,9 @@ public interface ModelObservationResidual<Model,Observation> {
 	/**
 	 * Specify the epipolar matrix being evaluated
 	 *
-	 * @param F The epipolar matrix
+	 * @param model The model being optimized
 	 */
-	public void setModel(Model F);
+	public void setModel(Model model);
 
 	/**
 	 * Compute the error for the observation

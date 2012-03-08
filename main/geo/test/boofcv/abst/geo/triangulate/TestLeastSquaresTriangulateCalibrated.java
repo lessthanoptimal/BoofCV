@@ -16,18 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.epipolar.triangulate;
+package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.abst.geo.epipolar.GeneralTestTriangulateTwoViewsCalibrated;
-import boofcv.abst.geo.triangulate.WrapTriangulateDLT;
+import boofcv.abst.geo.GeneralTestRefineTriangulate;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
+import org.ejml.data.DenseMatrix64F;
+
+import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapTriangulateDLT extends GeneralTestTriangulateTwoViewsCalibrated {
+public class TestLeastSquaresTriangulateCalibrated extends GeneralTestRefineTriangulate {
 
-	public TriangulateTwoViewsCalibrated createAlg() {
-		return new WrapTriangulateDLT();
+	LeastSquaresTriangulateCalibrated alg = new LeastSquaresTriangulateCalibrated(1e-8,200);
+
+	@Override
+	public void triangulate(List<Point2D_F64> obsPts, List<Se3_F64> motion,
+							List<DenseMatrix64F> essential,
+							Point3D_F64 initial, Point3D_F64 found)
+	{
+		alg.process(obsPts,motion,initial,found);
 	}
 }
