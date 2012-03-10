@@ -25,6 +25,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 
+import java.util.List;
+
 /**
  * <p>
  * Computes residuals for bundle adjustment given known camera calibration.
@@ -44,9 +46,9 @@ public class CalibPoseAndPointResiduals
 	ModelCodec<CalibratedPoseAndPoint> codec;
 
 	// expanded model for fast computations
-	CalibratedPoseAndPoint model = new CalibratedPoseAndPoint();
+	CalibratedPoseAndPoint model;
 	// observed location of features in each view
-	MultiViewAndPointObservations observations;
+	List<ViewPointObservations> observations;
 
 	// number of observations.  2 for each point in each view
 	int numObservations;
@@ -55,22 +57,22 @@ public class CalibPoseAndPointResiduals
 	Point3D_F64 cameraPt = new Point3D_F64();
 
 	/**
+	 * Configures the residual function.
 	 *
-	 * @param numViews Number of camera views
-	 * @param numPoints Number of points
+	 * @param model Model being processed
 	 * @param codec Decodes parameterized version of parameters
 	 * @param obs Contains camera observations of each point.
 	 */
-	public void configure( int numViews , int numPoints ,
-						   ModelCodec<CalibratedPoseAndPoint> codec ,
-						   MultiViewAndPointObservations obs ) {
-		model.configure(numViews, numPoints);
+	public void configure( ModelCodec<CalibratedPoseAndPoint> codec ,
+						   CalibratedPoseAndPoint model,
+						   List<ViewPointObservations> obs ) {
+		this.model = model;
 		this.codec = codec;
 		this.observations = obs;
 
 		numObservations = 0;
-		for( int view = 0; view < numViews; view++ ) {
-			numObservations += obs.views.get(view).size()*2;
+		for( int view = 0; view < model.getNumViews(); view++ ) {
+			numObservations += obs.get(view).getPoints().size()*2;
 		}
 	}
 
@@ -89,22 +91,26 @@ public class CalibPoseAndPointResiduals
 
 		codec.decode(input,model);
 
+		process(model,output);
+	}
+
+	public void process(CalibratedPoseAndPoint model , double[] output) {
 		int outputIndex = 0;
 
 		for( int view = 0; view < model.getNumViews(); view++) {
 			Se3_F64 worldToCamera = model.getWorldToCamera(view);
 
-			FastQueue<PointIndexObservation> observedPts = observations.views.get(view);
+			FastQueue<PointIndexObservation> observedPts = observations.get(view).getPoints();
 
 			for( int i = 0; i < observedPts.size; i++ ) {
 				PointIndexObservation o = observedPts.data[i];
 
 				Point3D_F64 worldPt = model.getPoint(o.pointIndex);
-				
-				SePointOps_F64.transform(worldToCamera,worldPt,cameraPt);
 
-				output[outputIndex++] = o.obs.x - cameraPt.x/cameraPt.z;
-				output[outputIndex++] = o.obs.y - cameraPt.y/cameraPt.z;
+				SePointOps_F64.transform(worldToCamera, worldPt, cameraPt);
+
+				output[outputIndex++] = cameraPt.x/cameraPt.z - o.obs.x;
+				output[outputIndex++] = cameraPt.y/cameraPt.z - o.obs.y;
 			}
 		}
 	}

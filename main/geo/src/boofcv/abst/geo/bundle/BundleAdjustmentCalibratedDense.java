@@ -19,12 +19,11 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.abst.geo.BundleAdjustmentCalibrated;
-import boofcv.abst.geo.optimization.ResidualsEpipolarMatrix;
-import boofcv.alg.geo.bundle.CalibPoseAndPointRodiguesCodec;
-import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
-import boofcv.alg.geo.bundle.MultiViewAndPointObservations;
+import boofcv.alg.geo.bundle.*;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
+
+import java.util.List;
 
 /**
  * Performs bundle adjustment using less efficient, but easier to implement dense matrices.  
@@ -34,34 +33,47 @@ import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 public class BundleAdjustmentCalibratedDense 
 		implements BundleAdjustmentCalibrated
 {
+	// converts to and from a parameterized version of the model
 	CalibPoseAndPointRodiguesCodec codec;
-	ResidualsEpipolarMatrix func;
+	// storage for model parameters
 	double param[] = new double[0];
 
+	// minimization algorithm
 	UnconstrainedLeastSquares minimizer;
+	// computes residuals for least-squares
+	CalibPoseAndPointResiduals func = new CalibPoseAndPointResiduals();
+	CalibPoseAndPointRodiguesJacobian jacobian = new CalibPoseAndPointRodiguesJacobian();
 
 	int maxIterations;
 
 	public BundleAdjustmentCalibratedDense(double convergenceTol,
 										   int maxIterations ) {
 		minimizer = FactoryOptimization.leastSquareLevenberg(convergenceTol, convergenceTol, 1e-3);
-
+		codec = new CalibPoseAndPointRodiguesCodec();
 		this.maxIterations = maxIterations;
 	}
 
 	@Override
-	public boolean process(CalibratedPoseAndPoint initialModel, 
-						   MultiViewAndPointObservations observations) {
-		
+	public boolean process(CalibratedPoseAndPoint initialModel,
+						   List<ViewPointObservations> observations) {
+
+
 		int numViews = initialModel.getNumViews();
 		int numPoints = initialModel.getNumPoints();
-		
-		codec.configure(numViews,numPoints);
+		int numViewsUnknown = initialModel.getNumUnknownViews();
+
+		codec.configure(numViews,numPoints,numViewsUnknown);
 		
 		if( param.length < codec.getParamLength() )
 			param = new double[ codec.getParamLength() ];
 
 		codec.encode(initialModel,param);
+		func.configure(codec,initialModel,observations);
+		jacobian.configure(observations,initialModel.getNumPoints(),initialModel.getKnownArray());
+
+		// use a numerical jacobian
+		minimizer.setFunction(func,null);
+		minimizer.initialize(param);
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,47 @@ import org.ejml.ops.MatrixFeatures;
  */
 public class JacobianChecker {
 
+	public static void jacobianPrint( FunctionNtoM func , FunctionNtoMxN jacobian ,
+									  double param[] , double tol )
+	{
+		NumericalJacobianForward numerical = new NumericalJacobianForward(func);
+
+		DenseMatrix64F found = new DenseMatrix64F(func.getM(),func.getN());
+		DenseMatrix64F expected = new DenseMatrix64F(func.getM(),func.getN());
+
+		jacobian.process(param,found.data);
+		numerical.process(param,expected.data);
+
+		System.out.println("FOUND:");
+		found.print();
+		System.out.println("-----------------------------");
+		System.out.println("Numerical");
+		expected.print();
+		
+		System.out.println("-----------------------------");
+		System.out.println("Large Differences");
+		for( int y = 0; y < found.numRows; y++ ) {
+			for( int x = 0; x < found.numCols; x++ ) {
+				double diff = Math.abs(found.get(y,x)-expected.get(y,x));
+				if( diff > tol )
+					System.out.print("1");
+				else
+					System.out.print("0");
+			}
+			System.out.println();
+		}
+	}
+	
 	public static boolean jacobian( FunctionNtoM func , FunctionNtoMxN jacobian ,
 									double param[] , double tol )
 	{
 		NumericalJacobianForward numerical = new NumericalJacobianForward(func);
+
+		if( numerical.getM() != jacobian.getM() )
+			throw new RuntimeException("M is not equal "+numerical.getM()+"  "+jacobian.getM());
+
+		if( numerical.getN() != jacobian.getN() )
+			throw new RuntimeException("N is not equal: "+numerical.getN()+"  "+jacobian.getN());
 
 		DenseMatrix64F found = new DenseMatrix64F(func.getM(),func.getN());
 		DenseMatrix64F expected = new DenseMatrix64F(func.getM(),func.getN());

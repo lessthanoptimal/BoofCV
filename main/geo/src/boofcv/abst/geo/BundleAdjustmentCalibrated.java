@@ -19,7 +19,9 @@
 package boofcv.abst.geo;
 
 import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
-import boofcv.alg.geo.bundle.MultiViewAndPointObservations;
+import boofcv.alg.geo.bundle.ViewPointObservations;
+
+import java.util.List;
 
 /**
  * Interface for performing bundle adjustment on data when the camera calibration is
@@ -35,9 +37,9 @@ public interface BundleAdjustmentCalibrated {
 	 * Refines the parameter estimated using bundle adjustment.
 	 *
 	 * @param initialModel Initial estimate at parameters.  Modified on output with refined results.
-	 * @param observations Observation of image features in each frame.
+	 * @param observations Observation of image features in each frame. Normalized coordinates.
 	 * @return true if successful
 	 */
 	public boolean process( CalibratedPoseAndPoint initialModel ,
-							MultiViewAndPointObservations observations );
+							List<ViewPointObservations> observations );
 }

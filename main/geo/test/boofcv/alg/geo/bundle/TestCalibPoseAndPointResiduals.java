@@ -19,13 +19,14 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.alg.geo.GeoTestingOps;
-import boofcv.struct.FastQueue;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static boofcv.alg.geo.bundle.TestCalibPoseAndPointRodiguesCodec.configure;
@@ -47,38 +48,36 @@ public class TestCalibPoseAndPointResiduals {
 
 		// randomly configure the model
 		CalibPoseAndPointRodiguesCodec codec = new CalibPoseAndPointRodiguesCodec();
-		codec.configure(numViews,numPoints);
+		codec.configure(numViews,numPoints,numViews);
 
 		// create the true model
 		CalibratedPoseAndPoint model = new CalibratedPoseAndPoint();
 		configure(model,numViews,numPoints,rand);
 		
 		// generate observations from the model
-		MultiViewAndPointObservations obs = new MultiViewAndPointObservations();
+		List<ViewPointObservations> obs = new ArrayList<ViewPointObservations>();
 		
 		for( int view = 0; view < numViews; view++ ) {
 			Se3_F64 m = model.getWorldToCamera(view);
 
-			FastQueue<PointIndexObservation> v = new
-					FastQueue<PointIndexObservation>(10,PointIndexObservation.class,true);
+			ViewPointObservations v = new ViewPointObservations();
 			
 			Point3D_F64 cameraPt = new Point3D_F64();
 			for( int i = 0; i < numPoints; i++ ) {
 				SePointOps_F64.transform(m,model.getPoint(i),cameraPt);
 				
-				PointIndexObservation o = v.pop();
+				PointIndexObservation o = v.getPoints().pop();
 				o.pointIndex = i;
 				o.obs = new Point2D_F64();
 				o.obs.x = cameraPt.x/cameraPt.z;
 				o.obs.y = cameraPt.y/cameraPt.z;
 			}
 
-			obs.views.add(v);
+			obs.add(v);
 		}
 		
-		
 		CalibPoseAndPointResiduals alg = new CalibPoseAndPointResiduals();
-		alg.configure(numViews,numPoints,codec,obs);
+		alg.configure(codec,model,obs);
 
 		// give it perfect data
 		double param[] = new double[ codec.getParamLength() ];

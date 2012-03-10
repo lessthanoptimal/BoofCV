@@ -2,6 +2,7 @@ package boofcv.alg.sfm;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
+import boofcv.abst.geo.BundleAdjustmentCalibrated;
 import boofcv.abst.geo.RefineEpipolarMatrix;
 import boofcv.abst.geo.RefinePerspectiveNPoint;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
@@ -9,6 +10,10 @@ import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.DecomposeEssential;
 import boofcv.alg.geo.PointPositionPair;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
+import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
+import boofcv.alg.geo.bundle.PointIndexObservation;
+import boofcv.alg.geo.bundle.ViewPointObservations;
+import boofcv.factory.geo.FactoryEpipolar;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.FastQueue;
@@ -46,6 +51,10 @@ import java.util.List;
 // TODO handle active/not active better
 public class MonocularSimpleVo<T extends ImageBase> {
 	KeyFramePointTracker<T,PointPoseTrack> tracker;
+
+	BundleAdjustmentCalibrated bundle = FactoryEpipolar.bundleCalibrated(1e-8,50);
+	CalibratedPoseAndPoint bundleModel = new CalibratedPoseAndPoint();
+	List<ViewPointObservations> bundleObs = new ArrayList<ViewPointObservations>();
 
 	ModelMatcher<DenseMatrix64F,AssociatedPair> computeE;
 	RefineEpipolarMatrix refineE;
@@ -120,6 +129,10 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		this.fatal = fatal;
 
 		distance = new double[ minFeatures*2 ];
+
+		// add two observations for the two views being used in bundle adjustment
+		bundleObs.add( new ViewPointObservations() );
+		bundleObs.add( new ViewPointObservations() );
 	}
 
 	/**
@@ -200,10 +213,11 @@ public class MonocularSimpleVo<T extends ImageBase> {
 			inlierSize = inliers.size();
 
 			System.out.println("    Essential inliers "+inliers.size()+"  out of "+pairs.size());
-			
+
+
 			// refine E using non-linear optimization
 			if( refineE.process(initial,inliers) ) {
-				DenseMatrix64F E = refineE.getRefinement();
+				DenseMatrix64F E = initial;// todo refineE.getRefinement();
 				decomposeE.decompose(E);
 
 				// select best possible motion from E
@@ -248,15 +262,51 @@ public class MonocularSimpleVo<T extends ImageBase> {
 					keyToCurr.getT().y /= max;
 					keyToCurr.getT().z /= max;
 				}
-				
+
 				System.out.print("   after estimate E:  ");
 				computeResidualError();
-				
+
+				// refine using bundle adjustment
+				performBundleAdjustment((List)inliers);
+
+				System.out.print("   after bundle    :  ");
+				computeResidualError();
+
+
 				return true;
 			}
 		}
 		
 		return false;
+	}
+
+	public void performBundleAdjustment( List<PointPoseTrack> inliers ) {
+		bundleModel.configure(2,inliers.size());
+		bundleModel.setViewKnown(0,true);
+		bundleModel.getWorldToCamera(1).set(keyToCurr);
+
+		FastQueue<PointIndexObservation> v0 = bundleObs.get(0).getPoints();
+		FastQueue<PointIndexObservation> v1 = bundleObs.get(1).getPoints();
+
+		v0.reset();
+		v1.reset();
+		
+		for( int i = 0; i < inliers.size(); i++ ) {
+			PointPoseTrack p = inliers.get(i);
+			
+			v0.pop().set(i,p.keyLoc);
+			v1.pop().set(i,p.currLoc);
+			bundleModel.getPoint(i).set(p.location);
+		}
+
+		bundle.process(bundleModel,bundleObs);
+
+		// todo remove later on when it becomes references
+		keyToCurr.set(bundleModel.getWorldToCamera(1));
+		for( int i = 0; i < inliers.size(); i++ ) {
+			PointPoseTrack p = inliers.get(i);
+			p.location.set(bundleModel.getPoint(i));
+		}
 	}
 
 	/**
