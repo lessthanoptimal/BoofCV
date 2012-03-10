@@ -42,6 +42,8 @@ public class CalibPoseAndPointRodiguesCodec
 	int numViews;
 	// number of points in world coordinates
 	int numPoints;
+	// number of views with unknown extrinsic parameters
+	int numViewsUnknown;
 
 	// storage
 	Rodrigues rotation = new Rodrigues();
@@ -54,9 +56,10 @@ public class CalibPoseAndPointRodiguesCodec
 	/**
 	 * Specify the number of views and points it can expected
 	 */
-	public void configure( int numViews , int numPoints ) {
+	public void configure( int numViews , int numPoints , int numViewsUnknown ) {
 		this.numViews = numViews;
 		this.numPoints = numPoints;
+		this.numViewsUnknown = numViewsUnknown;
 	}
 
 	@Override
@@ -66,17 +69,13 @@ public class CalibPoseAndPointRodiguesCodec
 
 		// first decode the transformation
 		for( int i = 0; i < numViews; i++ ) {
+			// don't decode if it is already known
+			if( outputModel.isViewKnown(i) )
+				continue;
+
 			Se3_F64 se = outputModel.getWorldToCamera(i);
 
-			rotation.unitAxisRotation.x = param[paramIndex++];
-			rotation.unitAxisRotation.y = param[paramIndex++];
-			rotation.unitAxisRotation.z = param[paramIndex++];
-
-			rotation.theta = rotation.unitAxisRotation.norm();
-
-			rotation.unitAxisRotation.x /= rotation.theta;
-			rotation.unitAxisRotation.y /= rotation.theta;
-			rotation.unitAxisRotation.z /= rotation.theta;
+			rotation.setParamVector(param[paramIndex++],param[paramIndex++],param[paramIndex++]);
 
 			RotationMatrixGenerator.rodriguesToMatrix(rotation,se.getR());
 
@@ -101,6 +100,10 @@ public class CalibPoseAndPointRodiguesCodec
 
 		// first decode the transformation
 		for( int i = 0; i < numViews; i++ ) {
+			// don't encode if it is already known
+			if( model.isViewKnown(i) )
+				continue;
+
 			Se3_F64 se = model.getWorldToCamera(i);
 
 			// force the "rotation matrix" to be an exact rotation matrix
@@ -138,6 +141,6 @@ public class CalibPoseAndPointRodiguesCodec
 
 	@Override
 	public int getParamLength() {
-		return numViews*7 + numPoints*3;
+		return numViewsUnknown*6 + numPoints*3;
 	}
 }

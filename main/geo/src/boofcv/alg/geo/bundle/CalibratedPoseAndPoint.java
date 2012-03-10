@@ -34,6 +34,8 @@ public class CalibratedPoseAndPoint {
 	// total number of 3D points being viewed
 	private int numPoints;
 
+	// if true the worldToCamera is assumed to be known
+	private boolean[] viewKnown = new boolean[0];
 	// transformation from world to camera frame
 	private Se3_F64[] worldToCamera = new Se3_F64[0];
 	// location of each point in 3D space, world coordinate
@@ -53,6 +55,8 @@ public class CalibratedPoseAndPoint {
 				temp[i] = new Se3_F64();
 			}
 			worldToCamera = temp;
+
+			viewKnown = new boolean[numViews];
 		}
 
 		if( points.length < numPoints ) {
@@ -66,6 +70,18 @@ public class CalibratedPoseAndPoint {
 
 		this.numPoints = numPoints;
 		this.numViews = numViews;
+
+		for( int i = 0; i < numViews; i++ ) {
+			viewKnown[i] = false;
+		}
+	}
+
+	public void setViewKnown( int view , boolean known ) {
+		viewKnown[view] = known;
+	}
+
+	public boolean isViewKnown( int view ) {
+		return viewKnown[view];
 	}
 
 	public Se3_F64 getWorldToCamera( int view ) {
@@ -82,5 +98,18 @@ public class CalibratedPoseAndPoint {
 
 	public int getNumViews() {
 		return numViews;
+	}
+
+	public int getNumUnknownViews() {
+		int ret = 0;
+		for( int i = 0; i < numViews; i++ ) {
+			if( !viewKnown[i] )
+				ret++;
+		}
+		return ret;
+	}
+
+	public boolean[] getKnownArray() {
+		return viewKnown;
 	}
 }

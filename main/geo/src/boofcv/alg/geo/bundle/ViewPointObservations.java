@@ -20,20 +20,22 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.struct.FastQueue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Observations for all views in bundle adjustment.  Compatible with calibrated and uncalibrated
- * cameras.
+ *
  *
  * @author Peter Abeles
  */
-public class MultiViewAndPointObservations {
-	
-	
-	List<FastQueue<PointIndexObservation>> views =
-			new ArrayList<FastQueue<PointIndexObservation>>();
+public class ViewPointObservations {
 
 
+	FastQueue<PointIndexObservation> points;
+
+	public ViewPointObservations() {
+		points = new FastQueue<PointIndexObservation>(
+				10,PointIndexObservation.class,true);
+	}
+
+	public FastQueue<PointIndexObservation> getPoints() {
+		return points;
+	}
 }

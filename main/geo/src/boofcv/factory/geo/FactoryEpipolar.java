@@ -18,10 +18,8 @@
 
 package boofcv.factory.geo;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
-import boofcv.abst.geo.PerspectiveNPoint;
-import boofcv.abst.geo.RefineEpipolarMatrix;
-import boofcv.abst.geo.RefinePerspectiveNPoint;
+import boofcv.abst.geo.*;
+import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedDense;
 import boofcv.abst.geo.f.LeastSquaresFundamental;
 import boofcv.abst.geo.f.WrapFundamentalLinear;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
@@ -41,6 +39,17 @@ import org.ejml.data.DenseMatrix64F;
  * @author Peter Abeles
  */
 public class FactoryEpipolar {
+
+	/**
+	 * Creates bundle adjustment for a camera with a know and fixed intrinsic calibration
+	 *
+	 * @param tol Convergence tolerance.  Try 1e-8
+	 * @param maxIterations Maximum number of iterations. Try 200 or more
+	 * @return Bundle Adjustment
+	 */
+	public static BundleAdjustmentCalibrated bundleCalibrated(double tol , int maxIterations) {
+		return new BundleAdjustmentCalibratedDense(tol,maxIterations);
+	}
 
 	/**
 	 * Returns an algorithm for estimating a homography matrix given a set of

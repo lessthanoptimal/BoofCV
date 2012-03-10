@@ -26,8 +26,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -51,7 +50,7 @@ public class TestCalibPoseAndPointRodiguesCodec {
 
 		// encode the model
 		CalibPoseAndPointRodiguesCodec codec = new CalibPoseAndPointRodiguesCodec();
-		codec.configure(numViews,numPoints);
+		codec.configure(numViews,numPoints,numViews);
 		
 		double param[] = new double[ codec.getParamLength() ];
 
@@ -78,6 +77,48 @@ public class TestCalibPoseAndPointRodiguesCodec {
 
 			assertEquals(0,o.distance(f),1e-8);
 		}
+	}
+
+	/**
+	 * A pathological situation for Rodigues coordinates is zero degrees
+	 */
+	@Test
+	public void checkZeroAngle() {
+		int numViews = 1;
+		int numPoints = 0;
+
+		// Set a world transform of zero degrees
+		CalibratedPoseAndPoint model = new CalibratedPoseAndPoint();
+		model.configure(numViews,numPoints);
+		model.getWorldToCamera(0).getT().set(1,2,3);
+		
+		// encode the model
+		CalibPoseAndPointRodiguesCodec codec = new CalibPoseAndPointRodiguesCodec();
+		codec.configure(numViews,numPoints,numViews);
+
+		double param[] = new double[ codec.getParamLength() ];
+
+		codec.encode(model,param);
+
+		// decode the model
+		CalibratedPoseAndPoint found = new CalibratedPoseAndPoint();
+		found.configure(numViews,numPoints);
+
+		codec.decode(param,found);
+
+		// compare results
+		for( int i = 0; i < numViews; i++ ) {
+			Se3_F64 o = model.getWorldToCamera(i);
+			Se3_F64 f = found.getWorldToCamera(i);
+
+			assertEquals(0,o.getT().distance(f.getT()),1e-8);
+			assertTrue(MatrixFeatures.isIdentical(o.getR(),f.getR(),1e-8));
+		}
+	}
+	
+	@Test
+	public void handleKnownViews() {
+		fail("implement");
 	}
 	
 	public static void configure(CalibratedPoseAndPoint model ,
