@@ -28,7 +28,6 @@ import org.ejml.data.DenseMatrix64F;
  *
  * @author Peter Abeles
  */
-// TODO don't compute last row since it isin't needed.  Update unit test
 public class RodriguesRotationJacobian {
 	// partial for vector x component
 	public DenseMatrix64F Rx = new DenseMatrix64F(3,3);
@@ -67,57 +66,52 @@ public class RodriguesRotationJacobian {
 			// Then the equations were further simplified by hand
 
 			double theta4 = theta2*theta2;
-			double theta32 = theta*theta*theta;
+			double theta3 = theta2*theta;
 
 			double s = Math.sin(theta);
 			double c = Math.cos(theta);
 			double cm = c-1;
-			double thd = 1/theta;
 
-			double xxx = x*x*x*s/theta32 + 2*cm*x*x*x/theta4;
-			double xxy = x*x*y*s/theta32 + 2*cm*x*x*y/theta4;
-			double xxz = x*x*z*s/theta32 + 2*cm*x*x*z/theta4;
-			double xyy = x*y*y*s/theta32 + 2*cm*x*y*y/theta4;
-			double xyz = x*y*z*s/theta32 + 2*cm*x*y*z/theta4;
-			double xzz = x*z*z*s/theta32 + 2*cm*x*z*z/theta4;
-			double yyy = y*y*y*s/theta32 + 2*cm*y*y*y/theta4;
-			double yyz = y*y*z*s/theta32 + 2*cm*y*y*z/theta4;
-			double yzz = y*z*z*s/theta32 + 2*cm*y*z*z/theta4;
-			double zzz = z*z*z*s/theta32 + 2*cm*z*z*z/theta4;
+			double xxx = x*x*x*s/theta3 + 2*cm*x*x*x/theta4;
+			double xxy = x*x*y*s/theta3 + 2*cm*x*x*y/theta4;
+			double xxz = x*x*z*s/theta3 + 2*cm*x*x*z/theta4;
+			double xyy = x*y*y*s/theta3 + 2*cm*x*y*y/theta4;
+			double xyz = x*y*z*s/theta3 + 2*cm*x*y*z/theta4;
+			double xzz = x*z*z*s/theta3 + 2*cm*x*z*z/theta4;
+			double yyy = y*y*y*s/theta3 + 2*cm*y*y*y/theta4;
+			double yyz = y*y*z*s/theta3 + 2*cm*y*y*z/theta4;
+			double yzz = y*z*z*s/theta3 + 2*cm*y*z*z/theta4;
+			double zzz = z*z*z*s/theta3 + 2*cm*z*z*z/theta4;
 
-			Rx.data[0] = xxx - thd*x*s - 2*cm*x/theta2;
-			Rx.data[1] = xxy - x*z*c/theta2 + x*z*s/theta32 - cm*y/theta2;
-			Rx.data[2] = xxz + x*y*c/theta2 - x*y*s/theta32 - cm*z/theta2;
-			Rx.data[3] = xxy + x*z*c/theta2 - x*z*s/theta32 - cm*y/theta2;
+			Rx.data[0] = xxx - x*s/theta - 2*cm*x/theta2;
+			Rx.data[1] = xxy - x*z*c/theta2 + x*z*s/theta3 - cm*y/theta2;
+			Rx.data[2] = xxz + x*y*c/theta2 - x*y*s/theta3 - cm*z/theta2;
+			Rx.data[3] = xxy + x*z*c/theta2 - x*z*s/theta3 - cm*y/theta2;
 			Rx.data[4] = xyy - x*s/theta;
-			Rx.data[5] = xyz - x*x*c/theta2 + x*x*s/theta32 - s/theta;
-			Rx.data[6] = xxz - x*y*c/theta2 + x*y*s/theta32 - cm*z/theta2;
-			Rx.data[7] = xyz + x*x*c/theta2 - x*x*s/theta32 + s/theta;
+			Rx.data[5] = xyz - x*x*c/theta2 + x*x*s/theta3 - s/theta;
+			Rx.data[6] = xxz - x*y*c/theta2 + x*y*s/theta3 - cm*z/theta2;
+			Rx.data[7] = xyz + x*x*c/theta2 - x*x*s/theta3 + s/theta;
 			Rx.data[8] = xzz - x*s/theta;
 
 			Ry.data[0] = xxy - y*s/theta;
-			Ry.data[1] = xyy - y*z*c/theta2 + y*z*s/theta32 - cm*x/theta2;
-			Ry.data[2] = xyz + y*y*c/theta2 - y*y*s/theta32 + s/theta;
-			Ry.data[3] = xyy + y*z*c/theta2 - y*z*s/theta32 - cm*x/theta2;
+			Ry.data[1] = xyy - y*z*c/theta2 + y*z*s/theta3 - cm*x/theta2;
+			Ry.data[2] = xyz + y*y*c/theta2 - y*y*s/theta3 + s/theta;
+			Ry.data[3] = xyy + y*z*c/theta2 - y*z*s/theta3 - cm*x/theta2;
 			Ry.data[4] = yyy - y*s/theta - 2*cm*y/theta2;
-			Ry.data[5] = yyz - x*y*c/theta2 + x*y*s/theta32 - cm*z/theta2;
-			Ry.data[6] = xyz - y*y*c/theta2 + y*y*s/theta32 - s/theta;
-			Ry.data[7] = yyz + x*y*c/theta2 - x*y*s/theta32 - cm*z/theta2;
+			Ry.data[5] = yyz - x*y*c/theta2 + x*y*s/theta3 - cm*z/theta2;
+			Ry.data[6] = xyz - y*y*c/theta2 + y*y*s/theta3 - s/theta;
+			Ry.data[7] = yyz + x*y*c/theta2 - x*y*s/theta3 - cm*z/theta2;
 			Ry.data[8] = yzz - y*s/theta;
 
 			Rz.data[0] = xxz - z*s/theta;
-			Rz.data[1] = xyz - z*z*c/theta2 + z*z*s/theta32 - s/theta;
-			Rz.data[2] = xzz + y*z*c/theta2 - y*z*s/theta32 - cm*x/theta2;
-			Rz.data[3] = xyz + z*z*c/theta2 - z*z*s/theta32 + s/theta;
+			Rz.data[1] = xyz - z*z*c/theta2 + z*z*s/theta3 - s/theta;
+			Rz.data[2] = xzz + y*z*c/theta2 - y*z*s/theta3 - cm*x/theta2;
+			Rz.data[3] = xyz + z*z*c/theta2 - z*z*s/theta3 + s/theta;
 			Rz.data[4] = yyz - z*s/theta;
-			Rz.data[5] = yzz - x*z*c/theta2 + x*z*s/theta32 - cm*y/theta2;
-			Rz.data[6] = xzz - y*z*c/theta2 + y*z*s/theta32 - cm*x/theta2;
-			Rz.data[7] = yzz + x*z*c/theta2 - x*z*s/theta32 - cm*y/theta2;
+			Rz.data[5] = yzz - x*z*c/theta2 + x*z*s/theta3 - cm*y/theta2;
+			Rz.data[6] = xzz - y*z*c/theta2 + y*z*s/theta3 - cm*x/theta2;
+			Rz.data[7] = yzz + x*z*c/theta2 - x*z*s/theta3 - cm*y/theta2;
 			Rz.data[8] = zzz - z*s/theta - 2*cm*z/theta2;
 		}
 	}
-
-
-
-
 }

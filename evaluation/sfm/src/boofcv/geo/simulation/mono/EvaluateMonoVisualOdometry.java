@@ -48,7 +48,7 @@ import java.util.Random;
 // TODO move into a separate package?
 public abstract class EvaluateMonoVisualOdometry {
 
-	int targetTracks = 300;
+	int targetTracks = 100;
 
 	Random rand;
 	long seed;

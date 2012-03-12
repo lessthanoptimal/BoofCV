@@ -24,6 +24,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
+import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues;
 import org.ejml.data.DenseMatrix64F;
 
@@ -37,8 +38,8 @@ import java.util.List;
  */
 public class CalibPoseAndPointRodiguesJacobian implements FunctionNtoMxN {
 
-	// specifies which views have a known extrinsic parameters
-	boolean knownExtrinsic[];
+	// if the extrinsic parameters are known, specify them here
+	Se3_F64 extrinsic[];
 	// observed location of features in each view
 	List<ViewPointObservations> observations;
 
@@ -79,19 +80,19 @@ public class CalibPoseAndPointRodiguesJacobian implements FunctionNtoMxN {
 	// reference to output Jacobian matrix
 	double[] output;
 	
-	public void configure( List<ViewPointObservations> observations , int numPoints , boolean ...knownExtrinsic) {
-		if( knownExtrinsic.length < observations.size() )
+	public void configure( List<ViewPointObservations> observations , int numPoints , Se3_F64 ...extrinsic) {
+		if( extrinsic.length < observations.size() )
 			throw new RuntimeException("knownExtrinsic length is less than the number of views in 'observations'");
 		
 		this.observations = observations;
-		this.knownExtrinsic = knownExtrinsic;
+		this.extrinsic = extrinsic;
 		this.numViews = observations.size();
 		this.numPoints = numPoints;
 		
 		numViewsUnknown = 0;
 		numObservations = 0;
 		for( int i = 0; i < numViews; i++ ) {
-			if( !knownExtrinsic[i] )
+			if( extrinsic[i] == null )
 				numViewsUnknown++;
 			numObservations += observations.get(i).points.size;
 		}
@@ -112,7 +113,7 @@ public class CalibPoseAndPointRodiguesJacobian implements FunctionNtoMxN {
 
 	@Override
 	public void process(double[] input, double[] output) {
-		long before = System.nanoTime();
+//		long before = System.nanoTime();
 		
 		this.output = output;
 		int paramIndex = 0;
@@ -122,27 +123,30 @@ public class CalibPoseAndPointRodiguesJacobian implements FunctionNtoMxN {
 		
 		// first decode the transformation
 		for( int i = 0; i < numViews; i++ ) {
-			double rodX = input[paramIndex++];
-			double rodY = input[paramIndex++];
-			double rodZ = input[paramIndex++];
+			if( extrinsic[i] == null ) {
+				double rodX = input[paramIndex++];
+				double rodY = input[paramIndex++];
+				double rodZ = input[paramIndex++];
 
-			T.x = input[paramIndex++];
-			T.y = input[paramIndex++];
-			T.z = input[paramIndex++];
+				T.x = input[paramIndex++];
+				T.y = input[paramIndex++];
+				T.z = input[paramIndex++];
 
-			rodrigues.setParamVector(rodX,rodY,rodZ);
-			rodJacobian.process(rodX,rodY,rodZ);
+				rodrigues.setParamVector(rodX,rodY,rodZ);
+				rodJacobian.process(rodX,rodY,rodZ);
 			
-			RotationMatrixGenerator.rodriguesToMatrix(rodrigues,R);
-
-			ViewPointObservations obs = observations.get(i);
-
-			if( knownExtrinsic[i] )
-				gradientViewPoint(input, obs);
-			else
+				RotationMatrixGenerator.rodriguesToMatrix(rodrigues,R);
+				ViewPointObservations obs = observations.get(i);
 				gradientViewMotionAndPoint(input, paramIndex-6, obs);
+			} else {
+				T.set( extrinsic[i].getT());
+				R.set( extrinsic[i].getR());
+				
+				ViewPointObservations obs = observations.get(i);
+				gradientViewPoint(input, obs);
+			}
 		}
-		System.out.println("    Done Jacobian:  "+(System.nanoTime()-before)/1e6+" (ms)");
+//		System.out.println("    Done Jacobian:  "+(System.nanoTime()-before)/1e6+" (ms)");
 	}
 
 	/**
@@ -192,7 +196,7 @@ public class CalibPoseAndPointRodiguesJacobian implements FunctionNtoMxN {
 	private void gradientViewPoint(double[] input,
 								   ViewPointObservations obs) 
 	{
-		for( int j = 0; j < obs.points.size; j++ ) {
+		for( int j = 0; j < obs.points.size; j++, countPointObs++ ) {
 			PointIndexObservation o = obs.points.get(j);
 			int indexParamWorld = indexFirstPoint+o.pointIndex*3;
 

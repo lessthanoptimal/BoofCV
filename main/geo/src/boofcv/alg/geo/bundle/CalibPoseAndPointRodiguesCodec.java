@@ -45,6 +45,9 @@ public class CalibPoseAndPointRodiguesCodec
 	// number of views with unknown extrinsic parameters
 	int numViewsUnknown;
 
+	// indicates if a view is known or not
+	boolean knownView[];
+
 	// storage
 	Rodrigues rotation = new Rodrigues();
 	DenseMatrix64F R = new DenseMatrix64F(3,3);
@@ -56,10 +59,14 @@ public class CalibPoseAndPointRodiguesCodec
 	/**
 	 * Specify the number of views and points it can expected
 	 */
-	public void configure( int numViews , int numPoints , int numViewsUnknown ) {
+	public void configure( int numViews , int numPoints , int numViewsUnknown , boolean []knownView) {
+		if( numViews < knownView.length )
+			throw new IllegalArgumentException("Number of views is less than knownView length");
+
 		this.numViews = numViews;
 		this.numPoints = numPoints;
 		this.numViewsUnknown = numViewsUnknown;
+		this.knownView = knownView;
 	}
 
 	@Override
@@ -70,7 +77,7 @@ public class CalibPoseAndPointRodiguesCodec
 		// first decode the transformation
 		for( int i = 0; i < numViews; i++ ) {
 			// don't decode if it is already known
-			if( outputModel.isViewKnown(i) )
+			if( knownView[i] )
 				continue;
 
 			Se3_F64 se = outputModel.getWorldToCamera(i);
@@ -101,7 +108,7 @@ public class CalibPoseAndPointRodiguesCodec
 		// first decode the transformation
 		for( int i = 0; i < numViews; i++ ) {
 			// don't encode if it is already known
-			if( model.isViewKnown(i) )
+			if( knownView[i] )
 				continue;
 
 			Se3_F64 se = model.getWorldToCamera(i);

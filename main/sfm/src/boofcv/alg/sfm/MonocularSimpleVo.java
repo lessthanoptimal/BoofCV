@@ -52,7 +52,7 @@ import java.util.List;
 public class MonocularSimpleVo<T extends ImageBase> {
 	KeyFramePointTracker<T,PointPoseTrack> tracker;
 
-	BundleAdjustmentCalibrated bundle = FactoryEpipolar.bundleCalibrated(1e-8,50);
+	BundleAdjustmentCalibrated bundle = FactoryEpipolar.bundleCalibrated(1e-5,30);
 	CalibratedPoseAndPoint bundleModel = new CalibratedPoseAndPoint();
 	List<ViewPointObservations> bundleObs = new ArrayList<ViewPointObservations>();
 
@@ -62,7 +62,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	DecomposeEssential decomposeE = new DecomposeEssential();
 	PositiveDepthConstraintCheck depthChecker = new PositiveDepthConstraintCheck(true);
 
-	TriangulateTwoViewsCalibrated triangulateAlg = FactoryTriangulate.twoDLT();
+	TriangulateTwoViewsCalibrated triangulateAlg = FactoryTriangulate.twoGeometric();
 
 	ModelMatcher<Se3_F64,PointPositionPair> computeMotion;
 	RefinePerspectiveNPoint refineMotion;
@@ -217,7 +217,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 
 			// refine E using non-linear optimization
 			if( refineE.process(initial,inliers) ) {
-				DenseMatrix64F E = initial;// todo refineE.getRefinement();
+				DenseMatrix64F E = refineE.getRefinement();
 				decomposeE.decompose(E);
 
 				// select best possible motion from E
@@ -264,13 +264,13 @@ public class MonocularSimpleVo<T extends ImageBase> {
 				}
 
 				System.out.print("   after estimate E:  ");
-				computeResidualError();
+				computeResidualError((List)inliers);  // todo just compute error on inliers
 
 				// refine using bundle adjustment
 				performBundleAdjustment((List)inliers);
 
 				System.out.print("   after bundle    :  ");
-				computeResidualError();
+				computeResidualError((List)inliers);
 
 
 				return true;
@@ -280,7 +280,11 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		return false;
 	}
 
+	// todo why doesn't numerical improve score at all?!?!
 	public void performBundleAdjustment( List<PointPoseTrack> inliers ) {
+		if( bundle == null )
+			return;
+
 		bundleModel.configure(2,inliers.size());
 		bundleModel.setViewKnown(0,true);
 		bundleModel.getWorldToCamera(1).set(keyToCurr);
@@ -343,7 +347,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		keyToCurr.set(refineMotion.getRefinement());
 
 		System.out.print("   after PnP Refine:  ");
-		computeResidualError();
+		computeResidualError(tracker.getPairs());
 
 		// update point positions
 		for( PointPoseTrack t : tracker.getPairs() ) {
@@ -351,7 +355,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 				triangulateAlg.triangulate(t.keyLoc,t.currLoc, keyToCurr,t.location);
 		}
 		System.out.print("   after triangulate: ");
-		computeResidualError();
+		computeResidualError(tracker.getPairs());
 
 		// handle spawning new features
 		if( !hasSpawned && inlierSize <= setKeyThreshold ) {
@@ -430,14 +434,14 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		return bestModel;
 	}
 	
-	private void computeResidualError() {
+	private void computeResidualError( List<PointPoseTrack> inliers ) {
 		
 		Point3D_F64 currentView = new Point3D_F64();
 		
 		double total = 0;
 		int num = 0;
 		
-		for( PointPoseTrack t : tracker.getPairs() ) {
+		for( PointPoseTrack t : inliers ) {
 			if( !t.active )
 				continue;
 
@@ -452,11 +456,24 @@ public class MonocularSimpleVo<T extends ImageBase> {
 			x = x - obs.x;
 			y = y - obs.y;
 
-			total += Math.sqrt(x*x + y*y);
+			total += x*x + y*y;
+			
+			// error in keyframe
+			x = p.x/p.z;
+			y = p.y/p.z;
+
+			x = x - t.keyLoc.x;
+			y = y - t.keyLoc.y;
+
+			total += x*x + y*y;
 			num++;
 		}
-		total /= num;
-		System.out.printf("   -- residual error = %05e  N = %d\n",total,num);
+
+		total /= 2.0;
+
+//		total /= num;
+//		System.out.printf("   -- residual error = %05e  N = %d\n",total,num);
+		System.out.println("   -- residual error = "+total+"  N = "+num);
 	}
 	
 	/**

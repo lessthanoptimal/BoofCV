@@ -143,11 +143,11 @@ public class TestCalibrationPlanarGridZhang99 {
 		double paramTol=0.3;
 
 		// see if it improved the estimate
-		assertTrue(Math.abs(initial.a-found.a)*paramTol >= Math.abs(expected.a-found.a));
-		assertTrue(Math.abs(initial.b-found.b)*paramTol >= Math.abs(expected.b-found.b));
+		assertTrue(Math.abs(expected.a-initial.a)*paramTol >= Math.abs(expected.a-found.a));
+		assertTrue(Math.abs(expected.b-initial.b)*paramTol >= Math.abs(expected.b-found.b));
 		assertEquals(expected.c, found.c, 1e-5);
-		assertTrue(Math.abs(initial.x0-found.x0)*paramTol >= Math.abs(expected.x0-found.x0));
-		assertTrue(Math.abs(initial.y0-found.y0)*paramTol >= Math.abs(expected.y0-found.y0));
+		assertTrue(Math.abs(expected.x0-initial.x0)*paramTol >= Math.abs(expected.x0-found.x0));
+		assertTrue(Math.abs(expected.y0-initial.y0)*paramTol >= Math.abs(expected.y0-found.y0));
 
 		for( int i = 0; i < expected.distortion.length; i++ ) {
 			double e = expected.distortion[i];
