@@ -80,6 +80,6 @@ public class GeoTestingOps {
 		for( double d : residuals ) {
 			total += d*d;
 		}
-		return total;
+		return total*0.5;
 	}
 }

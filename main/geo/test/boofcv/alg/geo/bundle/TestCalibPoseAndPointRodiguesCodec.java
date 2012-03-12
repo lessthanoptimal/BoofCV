@@ -26,7 +26,8 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -40,20 +41,39 @@ public class TestCalibPoseAndPointRodiguesCodec {
 	 */
 	@Test
 	public void encode_decode() {
-		int numViews = 2;
-		int numPoints = 3;
+		checkEncode_Decode(2,3,false,false);
+	}
 
+	/**
+	 * Have one of the views be known, thus its parameters are not encoded
+	 */
+	@Test
+	public void handleKnownViews() {
+		checkEncode_Decode(2,3,true,false);
+	}
+
+	public void checkEncode_Decode( int numViews , int numPoints , boolean ...known ) {
 		// randomly configure the model
 		CalibratedPoseAndPoint model = new CalibratedPoseAndPoint();
 
 		configure(model,numViews,numPoints,rand);
 
+		int numUnknown = 0;
+		for( int i = 0; i < known.length; i++ ) {
+			if( known[i])
+				model.setViewKnown(i,true);
+			numUnknown++;
+		}
+
 		// encode the model
 		CalibPoseAndPointRodiguesCodec codec = new CalibPoseAndPointRodiguesCodec();
-		codec.configure(numViews,numPoints,numViews);
+		codec.configure(numViews,numPoints,numViews,known);
 		
 		double param[] = new double[ codec.getParamLength() ];
 
+		// make sure there are the correct number of parameters
+		assertEquals(numUnknown*6+numPoints*3,codec.getParamLength());
+		
 		codec.encode(model,param);
 
 		// decode the model
@@ -64,6 +84,9 @@ public class TestCalibPoseAndPointRodiguesCodec {
 		
 		// compare results
 		for( int i = 0; i < numViews; i++ ) {
+			if( known[i])
+				continue;
+			
 			Se3_F64 o = model.getWorldToCamera(i);
 			Se3_F64 f = found.getWorldToCamera(i);
 			
@@ -94,7 +117,7 @@ public class TestCalibPoseAndPointRodiguesCodec {
 		
 		// encode the model
 		CalibPoseAndPointRodiguesCodec codec = new CalibPoseAndPointRodiguesCodec();
-		codec.configure(numViews,numPoints,numViews);
+		codec.configure(numViews,numPoints,numViews, new boolean[]{false});
 
 		double param[] = new double[ codec.getParamLength() ];
 
@@ -114,11 +137,6 @@ public class TestCalibPoseAndPointRodiguesCodec {
 			assertEquals(0,o.getT().distance(f.getT()),1e-8);
 			assertTrue(MatrixFeatures.isIdentical(o.getR(),f.getR(),1e-8));
 		}
-	}
-	
-	@Test
-	public void handleKnownViews() {
-		fail("implement");
 	}
 	
 	public static void configure(CalibratedPoseAndPoint model ,

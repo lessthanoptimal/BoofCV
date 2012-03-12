@@ -57,7 +57,7 @@ public class LevenbergMarquardtDampened extends LevenbergDampened {
 	 * @param relativeErrorTol Relative convergence test based on function magnitude.
 	 */
 	public LevenbergMarquardtDampened(LinearSolver<DenseMatrix64F> solver, double initialDampParam, double absoluteErrorTol, double relativeErrorTol) {
-		super(solver, initialDampParam, absoluteErrorTol, relativeErrorTol);
+		super(solver, false, initialDampParam, absoluteErrorTol, relativeErrorTol);
 	}
 
 	/**

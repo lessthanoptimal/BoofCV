@@ -27,6 +27,8 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -34,19 +36,36 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestRodriguesRotationGradient {
 
+	Random rand = new Random(234);
+	
 	@Test
 	public void checkUsingNumerical() {
 		RodToMatrix f = new RodToMatrix();
 		RodToGradient g = new RodToGradient();
 		
-		double param[] = new double[]{1,2,3};
-//		double param[] = new double[]{1e-6,2e-6,3e-6};
+		for( int i = 0; i < 20; i++ ) {
+			double param[] = new double[3];
+			param[0] = (rand.nextDouble()-0.5);
+			param[1] = (rand.nextDouble()-0.5);
+			param[2] = (rand.nextDouble()-0.5);
 
-//		JacobianChecker.jacobianPrint(f, g, param, 1e-6);
-		assertTrue(JacobianChecker.jacobian(f, g, param, 1e-6));
+			assertTrue(JacobianChecker.jacobian(f, g, param, 1e-6));
+		}
 	}
+
+// Commented out since I'm not sure if numerical or analytical Jacobian is correct
+// Potential room for improvement here
+//	@Test
+//	public void checkHardCases() {
+//
+//		RodToMatrix f = new RodToMatrix();
+//		RodToGradient g = new RodToGradient();
+//
+//		JacobianChecker.jacobianPrint(f, g, new double[]{1e-6,1e-6,1e-6}, 1e-6);
+//		assertTrue(JacobianChecker.jacobian(f, g, new double[]{1e-6,1e-6,1e-6}, 1e-6));
+//	}
 	
-	private static class RodToMatrix implements FunctionNtoM
+	public static class RodToMatrix implements FunctionNtoM
 	{
 		@Override
 		public int getN() {
@@ -69,7 +88,7 @@ public class TestRodriguesRotationGradient {
 		}
 	}
 
-	private static class RodToGradient implements FunctionNtoMxN
+	public static class RodToGradient implements FunctionNtoMxN
 	{
 		@Override
 		public int getN() {

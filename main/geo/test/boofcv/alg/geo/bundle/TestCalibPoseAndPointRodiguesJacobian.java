@@ -19,6 +19,7 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.numerics.optimization.JacobianChecker;
+import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
 import java.util.List;
@@ -27,7 +28,6 @@ import java.util.Random;
 import static boofcv.abst.geo.bundle.TestBundleAdjustmentCalibratedDense.createModel;
 import static boofcv.abst.geo.bundle.TestBundleAdjustmentCalibratedDense.createObservations;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -48,31 +48,44 @@ public class TestCalibPoseAndPointRodiguesJacobian {
 	 */
 	@Test
 	public void allUnknown() {
-		CalibratedPoseAndPoint model = createModel(numViews,numPoints,rand);
-		List<ViewPointObservations> observations = createObservations(model,numViews,numPoints);
-
-		boolean known[]= new boolean[]{false,false};
-
-		int numViewsUnknown = model.getNumUnknownViews();
-		codec.configure(numViews,numPoints,numViewsUnknown);
-		func.configure(codec,model,observations);
-		
-		CalibPoseAndPointRodiguesJacobian alg = new CalibPoseAndPointRodiguesJacobian();
-		alg.configure(observations,numPoints,known);
-
-		double []param = new double[ codec.getParamLength() ];
-
-		codec.encode(model,param);
-
-		JacobianChecker.jacobianPrint(func, alg, param, 1e-6);
-		assertTrue(JacobianChecker.jacobian(func, alg, param, 1e-6));
+		check(false,false);
 	}
 
 	/**
 	 * Check Jacobian against numerical.  All views have unknown extrinsic parameters
 	 */
 	@Test
-	public void oneKnown() {
-		fail("implement");
+	public void allKnown() {
+		check(true, true);
+	}
+	
+	private void check( boolean ...known ) {
+		CalibratedPoseAndPoint model = createModel(numViews,numPoints,rand);
+		List<ViewPointObservations> observations = createObservations(model,numViews,numPoints);
+
+		Se3_F64 extrinsic[] = new Se3_F64[known.length];
+		
+		for( int i = 0; i < known.length; i++ ) {
+			model.setViewKnown(i,known[i]);
+			if( known[i] ) {
+				Se3_F64 e = new Se3_F64();
+				e.set(model.getWorldToCamera(i));
+				extrinsic[i] = e;
+			}
+		}
+
+		int numViewsUnknown = model.getNumUnknownViews();
+		codec.configure(numViews,numPoints,numViewsUnknown,known);
+		func.configure(codec,model,observations);
+
+		CalibPoseAndPointRodiguesJacobian alg = new CalibPoseAndPointRodiguesJacobian();
+		alg.configure(observations,numPoints,extrinsic);
+
+		double []param = new double[ codec.getParamLength() ];
+
+		codec.encode(model,param);
+
+//		JacobianChecker.jacobianPrint(func, alg, param, 1e-6);
+		assertTrue(JacobianChecker.jacobian(func, alg, param, 1e-4));
 	}
 }

@@ -101,7 +101,6 @@ public class FactoryOptimization {
 																  double absoluteErrorTol,
 																  double dampInit )
 	{
-
 		LevenbergDampened alg = new LevenbergDampened(dampInit,absoluteErrorTol,relativeErrorTol);
 		return new WrapLevenbergDampened(alg);
 	}

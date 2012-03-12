@@ -41,4 +41,12 @@ public class PointIndexObservation {
 		pointIndex = -1;
 		obs = null;
 	}
+
+	public Point2D_F64 getObservation() {
+		return obs;
+	}
+
+	public int getPointIndex() {
+		return pointIndex;
+	}
 }

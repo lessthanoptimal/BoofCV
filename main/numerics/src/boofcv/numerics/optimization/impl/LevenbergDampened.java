@@ -24,6 +24,7 @@ import org.ejml.UtilEjml;
 import org.ejml.alg.dense.linsol.LinearSolver;
 import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.alg.dense.linsol.LinearSolverSafe;
+import org.ejml.alg.dense.mult.MatrixMultProduct;
 import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -88,9 +89,10 @@ public class LevenbergDampened {
 	// jacobian at x
 	private DenseMatrix64F jacobianVals = new DenseMatrix64F(1,1);
 
+	// Jacobian inner product. Used to approximate Hessian
 	// B=J'*J
 	protected DenseMatrix64F B = new DenseMatrix64F(1,1);
-	// diagonal elements of B
+	// diagonal elements of JtJ
 	protected DenseMatrix64F Bdiag = new DenseMatrix64F(1,1);
 	// y=-J'*r
 	protected DenseMatrix64F g = new DenseMatrix64F(1,1);
@@ -123,6 +125,9 @@ public class LevenbergDampened {
 
 	// message explaining failure
 	private String message;
+	
+	// is the solver cholesky and it can take additional shortcuts?
+	private boolean choleskySolver;
 
 	/**
 	 * Specifies termination condition and linear solver.  Selection of the linear solver an effect
@@ -145,12 +150,14 @@ public class LevenbergDampened {
 	 * Constructor which allows the solver to be specified.
 	 */
 	protected LevenbergDampened(LinearSolver<DenseMatrix64F> solver,
-							 double initialDampParam,
-							 double absoluteErrorTol,
-							 double relativeErrorTol) {
+								boolean choleskySolver ,
+								double initialDampParam,
+								double absoluteErrorTol,
+								double relativeErrorTol) {
 		this(initialDampParam,absoluteErrorTol,relativeErrorTol);
 		this.solver = solver;
-		if( solver.modifiesA() || solver.modifiesB() )
+		this.choleskySolver = choleskySolver;
+		if( solver.modifiesB() )
 			this.solver = new LinearSolverSafe<DenseMatrix64F>(solver);
 	}
 
@@ -181,13 +188,14 @@ public class LevenbergDampened {
 		funcVals.reshape(M,1,false);
 		jacobianVals.reshape(M,N,false);
 
-		B.reshape(N,N,false);
+		B.reshape(N, N, false);
 		Bdiag.reshape(N,1,false);
 		g.reshape(N,1,false);
 
 		if( solver == null ) {
 			solver = LinearSolverFactory.symmPosDef(N);
-			if( solver.modifiesA() || solver.modifiesB() )
+			choleskySolver = true;
+			if( solver.modifiesB() )
 				this.solver = new LinearSolverSafe<DenseMatrix64F>(solver);
 		}
 	}
@@ -249,7 +257,12 @@ public class LevenbergDampened {
 
 		// compute helper matrices
 		// B = J'*J;   g = J'*r
-		CommonOps.multTransA(jacobianVals, jacobianVals, B); // todo take advantage of symmetry
+		// Take advantage of symmetry when computing B and only compute the upper triangular
+		// portion used by cholesky decomposition
+		if( choleskySolver )
+			MatrixMultProduct.inner_reorder_upper(jacobianVals, B);
+		else
+			CommonOps.multInner(jacobianVals,B);
 		CommonOps.multTransA(jacobianVals, funcVals, g);
 		CommonOps.scale(-1, g);
 
@@ -360,13 +373,14 @@ public class LevenbergDampened {
 				int index = B.getIndex(i,i);
 				B.data[index] = Bdiag.data[i] + dampParam;
 			}
-			
+
 			// compute the change in step.
 			if( solver.setA(B) ) {
 				if( solver.quality() > UtilEjml.EPS ) {
 					failed = false;
 				}
 			}
+
 			if( failed ) {
 				dampParam = Math.max(10*dampParam,max*UtilEjml.EPS);
 			}
@@ -411,7 +425,7 @@ public class LevenbergDampened {
 	 * sum_i 0.5*fi(x)^2
 	 */
 	private double computeError() {
-		return VectorVectorMult.innerProd(funcVals,funcVals)/2;
+		return VectorVectorMult.innerProd(funcVals,funcVals)/2.0;
 	}
 
 	public boolean isConverged() {

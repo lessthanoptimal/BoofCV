@@ -22,6 +22,7 @@ import boofcv.abst.geo.BundleAdjustmentCalibrated;
 import boofcv.alg.geo.bundle.*;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
+import georegression.struct.se.Se3_F64;
 
 import java.util.List;
 
@@ -55,24 +56,34 @@ public class BundleAdjustmentCalibratedDense
 
 	@Override
 	public boolean process(CalibratedPoseAndPoint initialModel,
-						   List<ViewPointObservations> observations) {
-
-
+						   List<ViewPointObservations> observations) 
+	{
 		int numViews = initialModel.getNumViews();
 		int numPoints = initialModel.getNumPoints();
 		int numViewsUnknown = initialModel.getNumUnknownViews();
 
-		codec.configure(numViews,numPoints,numViewsUnknown);
+		codec.configure(numViews,numPoints,numViewsUnknown,initialModel.getKnownArray());
 		
 		if( param.length < codec.getParamLength() )
 			param = new double[ codec.getParamLength() ];
 
+		
+		// TODO redesign to minimize memory creation
+		boolean known[] = initialModel.getKnownArray();
+		Se3_F64 extrinsic[] = new Se3_F64[initialModel.getNumViews()];
+		for( int i = 0; i < extrinsic.length; i++ ) {
+			if( known[i]) {
+				extrinsic[i] = new Se3_F64();
+				extrinsic[i].set( initialModel.getWorldToCamera(i));
+			}
+		}
+		
 		codec.encode(initialModel,param);
 		func.configure(codec,initialModel,observations);
-		jacobian.configure(observations,initialModel.getNumPoints(),initialModel.getKnownArray());
+		jacobian.configure(observations,initialModel.getNumPoints(),extrinsic);
 
 		// use a numerical jacobian
-		minimizer.setFunction(func,null);
+		minimizer.setFunction(func,jacobian);
 		minimizer.initialize(param);
 
 		for( int i = 0; i < maxIterations; i++ ) {

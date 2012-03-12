@@ -48,7 +48,7 @@ public class TestCalibPoseAndPointResiduals {
 
 		// randomly configure the model
 		CalibPoseAndPointRodiguesCodec codec = new CalibPoseAndPointRodiguesCodec();
-		codec.configure(numViews,numPoints,numViews);
+		codec.configure(numViews,numPoints,numViews, new boolean[]{false,false});
 
 		// create the true model
 		CalibratedPoseAndPoint model = new CalibratedPoseAndPoint();

@@ -53,9 +53,11 @@ public class JacobianChecker {
 		for( int y = 0; y < found.numRows; y++ ) {
 			for( int x = 0; x < found.numCols; x++ ) {
 				double diff = Math.abs(found.get(y,x)-expected.get(y,x));
-				if( diff > tol )
+				if( diff > tol ) {
+//					double e = expected.get(y,x);
+//					double f = found.get(y,x);
 					System.out.print("1");
-				else
+				} else
 					System.out.print("0");
 			}
 			System.out.println();
