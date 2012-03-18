@@ -49,7 +49,7 @@ public class WrapHomographyLinear implements EpipolarMatrixEstimator {
 	}
 
 	@Override
-	public int getMinPoints() {
+	public int getMinimumPoints() {
 		return 4;
 	}
 }

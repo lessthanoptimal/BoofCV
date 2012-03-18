@@ -19,7 +19,6 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.alg.geo.AssociatedPair;
-import georegression.struct.point.Point2D_F64;
 
 /**
  *
@@ -31,9 +30,6 @@ public class KeyFrameTrack extends AssociatedPair {
 
 	// observation is pixels
 	AssociatedPair pixel = new AssociatedPair();
-
-	// feature location at the spawn point
-	public Point2D_F64 spawnLoc = new Point2D_F64();
 
 	long trackID;
 

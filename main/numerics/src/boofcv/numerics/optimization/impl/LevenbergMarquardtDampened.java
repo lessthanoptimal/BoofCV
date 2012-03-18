@@ -20,8 +20,10 @@ package boofcv.numerics.optimization.impl;
 
 import boofcv.numerics.optimization.OptimizationException;
 import org.ejml.alg.dense.linsol.LinearSolver;
+import org.ejml.alg.dense.linsol.LinearSolverSafe;
 import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 /**
  * <p>
@@ -45,7 +47,10 @@ import org.ejml.data.DenseMatrix64F;
  *
  * @author Peter Abeles
  */
-public class LevenbergMarquardtDampened extends LevenbergDampened {
+public class LevenbergMarquardtDampened extends LevenbergDenseBase {
+
+	// solver used to compute (A + mu*diag(A))d = g
+	protected LinearSolver<DenseMatrix64F> solver;
 
 	/**
 	 * Specifies termination condition and linear solver.  Selection of the linear solver an effect
@@ -56,19 +61,36 @@ public class LevenbergMarquardtDampened extends LevenbergDampened {
 	 * @param absoluteErrorTol Absolute convergence test.
 	 * @param relativeErrorTol Relative convergence test based on function magnitude.
 	 */
-	public LevenbergMarquardtDampened(LinearSolver<DenseMatrix64F> solver, double initialDampParam, double absoluteErrorTol, double relativeErrorTol) {
-		super(solver, false, initialDampParam, absoluteErrorTol, relativeErrorTol);
+	public LevenbergMarquardtDampened(LinearSolver<DenseMatrix64F> solver,
+									  double initialDampParam, double absoluteErrorTol, double relativeErrorTol) {
+		super(initialDampParam,absoluteErrorTol,relativeErrorTol);
+		this.solver = solver;
+		if( solver.modifiesB() )
+			this.solver = new LinearSolverSafe<DenseMatrix64F>(solver);
 	}
 
-	/**
-	 * Solves the linear system to find the change in x
-	 */
 	@Override
-	protected boolean solveForXDelta() {
+	protected void computeJacobian( DenseMatrix64F residuals , DenseMatrix64F gradient) {
+		// calculate the Jacobian values at the current sample point
+		function.computeJacobian(jacobianVals.data);
+
+		// compute helper matrices
+		// B = J'*J;   g = J'*r
+		// Take advantage of symmetry when computing B and only compute the upper triangular
+		// portion used by cholesky decomposition
+		CommonOps.multInner(jacobianVals, B);
+		CommonOps.multTransA(jacobianVals, residuals, gradient);
+
+		// extract diagonal elements from B
+		CommonOps.extractDiag(B, Bdiag);
+	}
+
+	@Override
+	protected boolean computeStep(double lambda, DenseMatrix64F gradientNegative, DenseMatrix64F step) {
 		// add dampening parameter
 		for( int i = 0; i < N; i++ ) {
 			int index = B.getIndex(i,i);
-			B.data[index] = (1+dampParam)*Bdiag.data[i];
+			B.data[index] = (1+lambda)*Bdiag.data[i];
 		}
 
 		// compute the change in step.
@@ -76,7 +98,7 @@ public class LevenbergMarquardtDampened extends LevenbergDampened {
 			throw new OptimizationException("Singularity encountered.  Try a more robust solver line pseudo inverse");
 		}
 		// solve for change in x
-		solver.solve(g, xdelta);
+		solver.solve(gradientNegative, step);
 
 		return true;
 	}
@@ -90,12 +112,12 @@ public class LevenbergMarquardtDampened extends LevenbergDampened {
 	 * @return predicted reduction
 	 */
 	@Override
-	protected double predictedReduction( DenseMatrix64F p, double mu ) {
+	protected double predictedReduction( DenseMatrix64F param, DenseMatrix64F gradientNegative , double mu ) {
 
-		double p_dot_g = VectorVectorMult.innerProd(p,g);
+		double p_dot_g = VectorVectorMult.innerProd(param,gradientNegative);
 		double p_JJ_p = 0;
 		for( int i = 0; i < N; i++ )
-			p_JJ_p += p.data[i]*Bdiag.data[i]*p.data[i];
+			p_JJ_p += param.data[i]*Bdiag.data[i]*param.data[i];
 
 		// The variable g is really the negative of g
 		return 0.5*(p_dot_g + mu*p_JJ_p);

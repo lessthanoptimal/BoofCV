@@ -21,6 +21,8 @@ package boofcv.app;
 import boofcv.alg.geo.calibration.*;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
@@ -160,8 +162,10 @@ public class CalibrateMonoPlanarApp {
 	/**
 	 * After calibration points have been found this invokes the Zhang99 algorithm to
 	 * estimate calibration parameters.  Error statistics are also computed.
+	 *
+	 * @param outputFileName Name of XML file calibration is saved to. If null the output is not saved.
 	 */
-	public void process() {
+	public void process( String outputFileName ) {
 		updateStatus(1,"Estimating Parameters");
 		System.out.println("Estimating and optimizing numerical parameters");
 		if( !Zhang99.process(observations) ) {
@@ -174,15 +178,14 @@ public class CalibrateMonoPlanarApp {
 		errors = computeErrors(observations,found,target.points,assumeZeroSkew);
 		printErrors(errors);
 
-		System.out.println("center x = "+found.x0);
-		System.out.println("center y = "+found.y0);
-		System.out.println("a = "+found.a);
-		System.out.println("b = "+found.b);
-		System.out.println("c = "+found.c);
-		for( int i = 0; i < found.distortion.length; i++ ) {
-			System.out.printf("radial[%d] = %6.2e\n",i,found.distortion[i]);
-		}
-		updateStatus(3,"Done");
+		// save results to a file
+		IntrinsicParameters intrinsic = found.convertToIntrinsic();
+		if( outputFileName != null )
+			BoofMiscOps.saveXML(intrinsic,outputFileName);
+		
+		// print out found calibration
+		intrinsic.print();
+		updateStatus(3, "Done");
 	}
 
 	/**
@@ -303,6 +306,6 @@ public class CalibrateMonoPlanarApp {
 				app.addImage(n,input);
 			}
 		}
-		app.process();
+		app.process("intrinsic.xml");
 	}
 }

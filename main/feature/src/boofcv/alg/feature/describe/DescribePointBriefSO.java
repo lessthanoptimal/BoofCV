@@ -23,9 +23,10 @@ import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
+
+import java.util.Arrays;
 
 /**
  * <p>
@@ -92,7 +93,7 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 		else if( !checkInBounds(pixelX,pixelY,r,-r,c,s,scale))
 			return false;
 
-		BoofMiscOps.zero(feature.data, feature.data.length);
+		Arrays.fill(feature.data, 0);
 
 		for( int i = 0; i < definition.samplePoints.length; i++ ) {
 			Point2D_I32 a = definition.samplePoints[i];

@@ -50,5 +50,5 @@ public interface EpipolarMatrixEstimator {
 	 *
 	 * @return number of points.
 	 */
-	public int getMinPoints();
+	public int getMinimumPoints();
 }

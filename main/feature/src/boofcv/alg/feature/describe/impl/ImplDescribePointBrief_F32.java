@@ -25,6 +25,8 @@ import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;
 
+import java.util.Arrays;
+
 /**
  * <p>
  * Implementation of {@link DescribePointBrief} for a specific image type.
@@ -51,7 +53,7 @@ public class ImplDescribePointBrief_F32 extends DescribePointBrief<ImageFloat32>
 		if( !BoofMiscOps.checkInside(blur,c_x,c_y,definition.radius) )
 			return false;
 
-		BoofMiscOps.zero(feature.data,feature.data.length);
+		Arrays.fill(feature.data, 0);
 
 		int index = blur.startIndex + blur.stride*c_y + c_x;
 

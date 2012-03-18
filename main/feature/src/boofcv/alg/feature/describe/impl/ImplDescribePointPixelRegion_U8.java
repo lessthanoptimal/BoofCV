@@ -23,6 +23,8 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc_U8;
 import boofcv.struct.image.ImageUInt8;
 
+import java.util.Arrays;
+
 /**
  * Implementation of {@link boofcv.alg.feature.describe.DescribePointPixelRegion}.
  *
@@ -44,7 +46,7 @@ public class ImplDescribePointPixelRegion_U8 extends DescribePointPixelRegion<Im
 			}
 		} else {
 			// all pixels outside the image will be zero
-			BoofMiscOps.zero(desc.value,desc.value.length);
+			Arrays.fill(desc.value,(byte)0);
 
 			// only read pixels inside the image
 			int x0 = c_x-radiusWidth;
