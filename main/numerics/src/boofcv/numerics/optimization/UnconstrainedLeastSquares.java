@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,4 +64,12 @@ public interface UnconstrainedLeastSquares extends IterativeOptimization {
 	 * set of parameters.
 	 */
 	public double[] getParameters();
+
+	/**
+	 * Returns the value of the objective function being evaluated at the current
+	 * parameters value.  If not supported then an exception is thrown.
+	 *
+	 * @return Objective function's value.
+	 */
+	public double getFunctionValue();
 }

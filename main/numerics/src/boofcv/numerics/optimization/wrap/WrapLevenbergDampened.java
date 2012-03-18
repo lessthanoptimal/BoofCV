@@ -22,7 +22,7 @@ import boofcv.numerics.optimization.OptimizationException;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
 import boofcv.numerics.optimization.functions.FunctionNtoMxN;
-import boofcv.numerics.optimization.impl.LevenbergDampened;
+import boofcv.numerics.optimization.impl.LevenbergDenseBase;
 import boofcv.numerics.optimization.impl.NumericalJacobianForward;
 
 /**
@@ -32,9 +32,9 @@ import boofcv.numerics.optimization.impl.NumericalJacobianForward;
  */
 public class WrapLevenbergDampened implements UnconstrainedLeastSquares {
 
-	LevenbergDampened alg;
+	LevenbergDenseBase alg;
 
-	public WrapLevenbergDampened(LevenbergDampened alg) {
+	public WrapLevenbergDampened(LevenbergDenseBase alg) {
 		this.alg = alg;
 	}
 
@@ -70,5 +70,15 @@ public class WrapLevenbergDampened implements UnconstrainedLeastSquares {
 	@Override
 	public String getWarning() {
 		return alg.getMessage();
+	}
+
+	@Override
+	public double getFunctionValue() {
+		return alg.getFnorm();
+	}
+
+	@Override
+	public boolean isUpdated() {
+		return alg.isUpdatedParameters();
 	}
 }

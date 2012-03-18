@@ -21,11 +21,43 @@ package boofcv.misc;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageBase;
 
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.Serializable;
+
 /**
  * @author Peter Abeles
  */
 public class BoofMiscOps {
 
+	public static void saveXML( Serializable o , String fileName ) {
+		XMLEncoder encoder = null;
+		try {
+			encoder = new XMLEncoder(
+					new FileOutputStream(fileName)
+			);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		encoder.writeObject(o);
+		encoder.close();
+	}
+	
+	public static <T> T loadXML( String fileName ) {
+		try {
+			XMLDecoder decoder = new XMLDecoder(new FileInputStream(fileName));
+		
+			T ret = (T)decoder.readObject();
+			decoder.close();
+			return ret;
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public static int countNotZero( int a[] , int size ) {
 		int ret = 0;
 		for( int i = 0; i < size; i++ ) {
@@ -33,36 +65,6 @@ public class BoofMiscOps {
 				ret++;
 		}
 		return ret;
-	}
-
-	public static void zero( byte a[] , int size ) {
-		for( int i = 0; i < size; i++ ) {
-			a[i] = 0;
-		}
-	}
-
-	public static void zero( short a[] , int size ) {
-		for( int i = 0; i < size; i++ ) {
-			a[i] = 0;
-		}
-	}
-
-	public static void zero( int a[] , int size ) {
-		for( int i = 0; i < size; i++ ) {
-			a[i] = 0;
-		}
-	}
-
-	public static void zero( float a[] , int size ) {
-		for( int i = 0; i < size; i++ ) {
-			a[i] = 0;
-		}
-	}
-
-	public static void zero( double a[] , int size ) {
-		for( int i = 0; i < size; i++ ) {
-			a[i] = 0;
-		}
 	}
 
 	public static double[] convertTo_F64( int a[] ) {

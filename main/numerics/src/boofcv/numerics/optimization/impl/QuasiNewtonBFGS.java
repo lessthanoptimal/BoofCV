@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,8 @@ public class QuasiNewtonBFGS
 
 	// How many full processing cycles have there been
 	private int iterations;
+	// was 'x' update this iteration?
+	private boolean updated;
 
 	/**
 	 * Configures the search.
@@ -178,6 +180,7 @@ public class QuasiNewtonBFGS
 	 * @return true if the optimization has stopped.
 	 */
 	public boolean iterate() {
+		updated = false;
 //		System.out.println("QN iterations "+iterations);
 		if( mode == 0 ) {
 			computeSearchDirection();
@@ -306,6 +309,7 @@ public class QuasiNewtonBFGS
 			fx = fstp;
 
 			// start the loop again
+			updated = true;
 			mode = 0;
 		}
 		return false;
@@ -333,5 +337,13 @@ public class QuasiNewtonBFGS
 	 */
 	public String getWarning() {
 		return message;
+	}
+
+	public double getFx() {
+		return fx;
+	}
+
+	public boolean isUpdatedParameters() {
+		return updated;
 	}
 }

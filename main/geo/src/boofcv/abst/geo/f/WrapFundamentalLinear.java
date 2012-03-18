@@ -59,7 +59,7 @@ public class WrapFundamentalLinear implements EpipolarMatrixEstimator {
 	}
 
 	@Override
-	public int getMinPoints() {
+	public int getMinimumPoints() {
 		return minPoints;
 	}
 }

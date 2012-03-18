@@ -28,10 +28,10 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class EvaluateSimpleMono extends EvaluateMonoVisualOdometry {
+public class EvaluateMonoSeparated extends EvaluateMonoVisualOdometry {
 
 
-	protected EvaluateSimpleMono(boolean visualize) {
+	protected EvaluateMonoSeparated(boolean visualize) {
 		super(visualize);
 	}
 
@@ -41,14 +41,16 @@ public class EvaluateSimpleMono extends EvaluateMonoVisualOdometry {
 	{
 		int minTracks = targetTracks/3;
 
-		return FactoryVisualOdometry.monoSimple(minTracks,3,1e-3,tracker,pixelToNormalized);
+		double angle = 5*Math.PI/180.0;
+		
+		return FactoryVisualOdometry.monoSeparated(minTracks,5,1,angle,tracker,pixelToNormalized);
 	}
 
 	public static void main( String args[] ) {
-		EvaluateSimpleMono target = new EvaluateSimpleMono(false);
+		EvaluateMonoSeparated target = new EvaluateMonoSeparated(false);
 		StandardMonoScenarios scenarios = new StandardMonoScenarios(target,10,3423);
 
-		List<MonoTrialResults> results = scenarios.forwardScenario(1);
+		List<MonoTrialResults> results = scenarios.forwardScenario(0);
 
 		// todo add final position error
 		MonoMonteCarloStatistics mc = new MonoMonteCarloStatistics(results);

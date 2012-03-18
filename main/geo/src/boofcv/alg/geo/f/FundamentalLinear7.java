@@ -20,13 +20,13 @@ package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.UtilEpipolar;
-import boofcv.misc.BoofMiscOps;
 import boofcv.numerics.solver.PolynomialSolver;
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SpecializedOps;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -159,7 +159,7 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 											DenseMatrix64F F2 ,
 											double coefs[] )
 	{
-		BoofMiscOps.zero(coefs,4);
+		Arrays.fill(coefs, 0);
 
 		computeCoefficients(F1,F2,0,4,8,coefs,false);
 		computeCoefficients(F1,F2,1,5,6,coefs,false);

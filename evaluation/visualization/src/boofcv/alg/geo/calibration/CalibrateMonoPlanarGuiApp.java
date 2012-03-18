@@ -112,7 +112,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		}
 	}
 	
-	public void process() {
+	public void process( String outputFileName ) {
 		calibrator.reset();
 		ProcessThread monitor = new ProcessThread();
 		monitor.start();
@@ -136,7 +136,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 			}});
 		gui.repaint();
 
-		calibrator.process();
+		calibrator.process(outputFileName);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				gui.setResults(calibrator.getErrors());
@@ -184,7 +184,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	public void loadInputData(String fileName) {
 		new Thread() {
 			public void run() {
-				process();
+				process(null);
 			}
 		}.start();
 	}
@@ -215,6 +215,6 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		frame.pack();
 		frame.setVisible(true);
 
-		app.process();
+		app.process("intrinsic.xml");
 	}
 }

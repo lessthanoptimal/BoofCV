@@ -1,3 +1,9 @@
+- Stereo VO
+ * Camera calibration
+ * Stereo Rectification
+ * Sparse Stereo Ranging
+ * Use Mono Code from here
+
 - Simple Mono
 - Simple Stereo
 - Nister Mono

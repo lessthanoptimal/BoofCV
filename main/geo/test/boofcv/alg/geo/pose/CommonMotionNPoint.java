@@ -42,6 +42,9 @@ public abstract class CommonMotionNPoint {
 
 	protected Random rand = new Random(234);
 
+	// the true motion
+	protected Se3_F64 motion;
+
 	public abstract Se3_F64 compute( List<AssociatedPair> obs , List<Point3D_F64> locations );
 
 	/**
@@ -79,6 +82,8 @@ public abstract class CommonMotionNPoint {
 	}
 
 	private void checkMotion(int N, Se3_F64 motion, boolean planar ) {
+		this.motion = motion;
+
 		// randomly generate points in space
 		List<Point3D_F64> pts;
 		

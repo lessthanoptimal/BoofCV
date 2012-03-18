@@ -6,14 +6,10 @@ import boofcv.abst.geo.BundleAdjustmentCalibrated;
 import boofcv.abst.geo.RefineEpipolarMatrix;
 import boofcv.abst.geo.RefinePerspectiveNPoint;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.DecomposeEssential;
-import boofcv.alg.geo.PointPositionPair;
-import boofcv.alg.geo.PositiveDepthConstraintCheck;
+import boofcv.alg.geo.*;
 import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
 import boofcv.alg.geo.bundle.PointIndexObservation;
 import boofcv.alg.geo.bundle.ViewPointObservations;
-import boofcv.factory.geo.FactoryEpipolar;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.FastQueue;
@@ -27,6 +23,7 @@ import org.ejml.data.DenseMatrix64F;
 import pja.sorting.QuickSelectArray;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -50,13 +47,16 @@ import java.util.List;
  */
 // TODO handle active/not active better
 public class MonocularSimpleVo<T extends ImageBase> {
+
+	double outlierResidualError = 0.5;
+
 	KeyFramePointTracker<T,PointPoseTrack> tracker;
 
-	BundleAdjustmentCalibrated bundle = FactoryEpipolar.bundleCalibrated(1e-5,30);
+	BundleAdjustmentCalibrated bundle = null;//FactoryEpipolar.bundleCalibrated(1e-5,30);
 	CalibratedPoseAndPoint bundleModel = new CalibratedPoseAndPoint();
 	List<ViewPointObservations> bundleObs = new ArrayList<ViewPointObservations>();
 
-	ModelMatcher<DenseMatrix64F,AssociatedPair> computeE;
+	ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion;
 	RefineEpipolarMatrix refineE;
 	
 	DecomposeEssential decomposeE = new DecomposeEssential();
@@ -84,7 +84,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 
 	int inlierSize;
 	// minimum distance a pixel needs to move for it to be considered significant motion
-	double minDistance;
+	double minPixelChange;
 	int minFeatures;
 	int setKeyThreshold;
 	
@@ -100,33 +100,32 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	 *
 	 * @param minFeatures
 	 * @param setKeyThreshold
-	 * @param minDistance
+	 * @param minPixelChange
 	 * @param tracker
 	 * @param pixelToNormalized Pixel to calibrated normalized coordinates.  Right handed (y-axis positive is image up)
 	 *                          coordinate system is assumed.
-	 * @param computeE
+	 * @param epipolarMotion
 	 * @param refineE
 	 * @param computeMotion
 	 * @param refineMotion
 	 */
 	public MonocularSimpleVo( int minFeatures , int setKeyThreshold,
-							  double minDistance ,
+							  double minPixelChange,
 							  ImagePointTracker<T> tracker ,
 							  PointTransform_F64 pixelToNormalized ,
-							  ModelMatcher<DenseMatrix64F,AssociatedPair> computeE ,
+							  ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion ,
 							  RefineEpipolarMatrix refineE ,
 							  ModelMatcher<Se3_F64,PointPositionPair> computeMotion ,
 							  RefinePerspectiveNPoint refineMotion )
 	{
 		this.minFeatures = minFeatures;
 		this.setKeyThreshold = setKeyThreshold;
-		this.minDistance = minDistance;
+		this.minPixelChange = minPixelChange;
 		this.tracker = new KeyFramePointTracker<T,PointPoseTrack>(tracker,pixelToNormalized,PointPoseTrack.class);
-		this.computeE = computeE;
+		this.epipolarMotion = epipolarMotion;
 		this.refineE = refineE;
 		this.computeMotion = computeMotion;
 		this.refineMotion = refineMotion;
-		this.fatal = fatal;
 
 		distance = new double[ minFeatures*2 ];
 
@@ -194,7 +193,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		} else {
 			// see if there has been enough pixel motion to warrant the cost of computing E
 			if( isSufficientMotion()) {
-				if( estimateMotionFromEssential(false) ) {
+				if( estimateMotionFromEssential(false,false) ) {
 					hasSpawned = false;
 					mode = 2;
 				}
@@ -202,21 +201,33 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		}
 	}
 
-	private boolean estimateMotionFromEssential( boolean hasPrevious) {
-		List<PointPoseTrack> pairs = tracker.getPairs();
+	private boolean estimateMotionFromEssential( boolean hasPrevious , boolean onlyActive ) {
+		List<PointPoseTrack> active;
 
-		// initial estimate of E
-		if( computeE.process((List)pairs) ) {
-			DenseMatrix64F initial = computeE.getModel();
-			List<AssociatedPair> inliers = computeE.getMatchSet();
+		if( onlyActive ) {
+			active = new ArrayList<PointPoseTrack>();
+			for( PointPoseTrack p : tracker.getPairs() ) {
+				if( p.active )
+					active.add(p);
+			}
+		} else {
+			active = tracker.getPairs();
+		}
+		
+		// initial motion estimate
+		if( epipolarMotion.process((List)active) ) {
+			Se3_F64 found = epipolarMotion.getModel();
+			List<AssociatedPair> inliers = epipolarMotion.getMatchSet();
 
 			inlierSize = inliers.size();
 
-			System.out.println("    Essential inliers "+inliers.size()+"  out of "+pairs.size());
+			System.out.println("    Essential inliers "+inliers.size()+"  out of "+active.size());
 
+			// TODO hack
+			DenseMatrix64F initialE = UtilEpipolar.computeEssential(found.getR(),found.getT());
 
 			// refine E using non-linear optimization
-			if( refineE.process(initial,inliers) ) {
+			if( refineE.process(initialE,inliers) ) {
 				DenseMatrix64F E = refineE.getRefinement();
 				decomposeE.decompose(E);
 
@@ -226,34 +237,50 @@ public class MonocularSimpleVo<T extends ImageBase> {
 				Se3_F64 best = selectBestPose(solutions, inliers);
 					
 				if( hasPrevious ) {
-					double scale = keyToCurr.getT().norm();
-					double foundScale = best.getT().norm();
-					best.getT().x *= scale/foundScale;
-					best.getT().y *= scale/foundScale;
-					best.getT().z *= scale/foundScale;
+					double ratios[] = new double[inliers.size()];
 
-//					System.out.println("  SCALE RATIO "+(scale/foundScale));
-					
-					keyToCurr.set(best);
-					for( PointPoseTrack t : pairs ) {
-						if( !t.active )
-							throw new RuntimeException("CRAP INACTIVE HERE?!?!");
-						triangulateAlg.triangulate(t.keyLoc,t.currLoc, keyToCurr,t.location);
+					int numPositive = 0;
+					int priorPositive = 0;
+					Point3D_F64 temp = new Point3D_F64();
+					for( int i = 0; i < inliers.size(); i++ ) {
+						PointPoseTrack t = (PointPoseTrack)inliers.get(i);
+						triangulateAlg.triangulate(t.keyLoc,t.currLoc, best,temp);
+						ratios[i] = t.location.z/temp.z;
+						if( temp.z > 0 )
+							numPositive++;
+						if( t.location.z > 0 )
+							priorPositive++;
 					}
+					Arrays.sort(ratios);
+					double r = ratios[ratios.length/2];
+					System.out.println("FOUND SCALE RATIO "+r);
+					if( r < 0 ) {
+						System.out.println("prior "+priorPositive+"  new "+numPositive);
+						System.out.println("OH CRAP");
+					}
+					r = 5e-4;
+					keyToCurr.set(best);
+					keyToCurr.T.x *= r;
+					keyToCurr.T.y *= r;
+					keyToCurr.T.z *= r;
+					for (PointPoseTrack t : active) {
+						triangulateAlg.triangulate(t.keyLoc, t.currLoc, keyToCurr, t.location);
+					}
+
 				} else {
 					keyToCurr.set(best);
 
 					// triangular feature points
 					// Adjust scale for numerical stability
 					double max = 0;
-					for( PointPoseTrack t : pairs ) {
+					for( PointPoseTrack t : active ) {
 						triangulateAlg.triangulate(t.keyLoc,t.currLoc, keyToCurr,t.location);
 						t.active = true;
 						if( t.location.z > max ) {
 							max = t.location.z;
 						}
 					}
-					for( PointPoseTrack t : pairs ) {
+					for( PointPoseTrack t : active ) {
 						t.location.x /= max;
 						t.location.y /= max;
 						t.location.z /= max;
@@ -347,19 +374,29 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		keyToCurr.set(refineMotion.getRefinement());
 
 		System.out.print("   after PnP Refine:  ");
-		computeResidualError(tracker.getPairs());
+		if( computeResidualError(tracker.getPairs()) > outlierResidualError ) {
+			System.out.println("   EMERGENCY ESSENTIAL 1");
+			return estimateMotionFromEssential(true,true);
+		}
 
 		// update point positions
+		int passPlusZ = 0;
+		int numActive = 0;
 		for( PointPoseTrack t : tracker.getPairs() ) {
-			if( t.active )
+			if( t.active ) {
+				numActive++;
 				triangulateAlg.triangulate(t.keyLoc,t.currLoc, keyToCurr,t.location);
+				if( t.location.z > 0 )
+					passPlusZ++;
+			}
 		}
 		System.out.print("   after triangulate: ");
-		computeResidualError(tracker.getPairs());
-
+		double error = computeResidualError(tracker.getPairs());
+		System.out.println("    +z "+passPlusZ+"  active "+numActive);
 		// handle spawning new features
 		if( !hasSpawned && inlierSize <= setKeyThreshold ) {
-			estimateMotionFromEssential(true);
+			if( !estimateMotionFromEssential(true,true) )
+				return false;
 
 			System.out.println("--- Setting key frame");
 			for( PointPoseTrack t : tracker.getPairs() ) {
@@ -370,8 +407,11 @@ public class MonocularSimpleVo<T extends ImageBase> {
 			tracker.spawnTracks();
 			keyToSpawn.set(keyToCurr);
 			hasSpawned = true;
+		} else if( error > outlierResidualError ) {
+			System.out.println("   EMERGENCY ESSENTIAL 2");
+			return estimateMotionFromEssential(true,true);
 		}
-
+		System.out.println("Local Pose: "+keyToCurr.getT());
 		return true;
 	}
 
@@ -398,14 +438,11 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		worldToKey.concat(keyToSpawn, temp);
 		worldToKey.set(temp);
 
-		keyToSpawn.invert(temp);
-		// s2k * k2c = s2c
-		keyToCurr.concat(temp,keyToSpawn);
-		keyToCurr.set(keyToSpawn);
-		
+		keyToCurr.invert(temp);
+		keyToSpawn.concat(temp, keyToCurr);
 
 		// now estimate the motion and triangulate points by computing the essential matrix
-		estimateMotionFromEssential(true);
+		estimateMotionFromEssential(true,false);
 	}
 
 	/**
@@ -434,7 +471,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		return bestModel;
 	}
 	
-	private void computeResidualError( List<PointPoseTrack> inliers ) {
+	private double computeResidualError( List<PointPoseTrack> inliers ) {
 		
 		Point3D_F64 currentView = new Point3D_F64();
 		
@@ -473,7 +510,9 @@ public class MonocularSimpleVo<T extends ImageBase> {
 
 //		total /= num;
 //		System.out.printf("   -- residual error = %05e  N = %d\n",total,num);
-		System.out.println("   -- residual error = "+total+"  N = "+num);
+		System.out.println("   -- residual error = "+total+"  N = "+num+"  ave  = "+(total/num));
+
+		return total/num;
 	}
 	
 	/**
@@ -498,14 +537,16 @@ public class MonocularSimpleVo<T extends ImageBase> {
 				distance[count++] = p.currLoc.distance2(p.keyLoc);
 			}
 		}
-		System.out.println("  total inactive "+count+"  total "+tracks.size());
+		// todo no need for quick select here, just see how many are within threshold
 
-		double median = QuickSelectArray.select(distance,count/2,count);
-	
-		return median >= minDistance*minDistance;
+		double median = QuickSelectArray.select(distance,(int)(count*0.9),count);
+
+		System.out.println("  total inactive "+count+"  total "+tracks.size()+" median "+median);
+
+		return median >= minPixelChange * minPixelChange;
 	}
 
-	public Se3_F64 getCameraLocation() {
+	public Se3_F64 getWorldToCamera() {
 		return worldToCurr;
 	}
 

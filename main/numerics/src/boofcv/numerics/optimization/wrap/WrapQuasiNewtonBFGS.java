@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,5 +89,15 @@ public class WrapQuasiNewtonBFGS implements UnconstrainedMinimization {
 	@Override
 	public String getWarning() {
 		return alg.getWarning();
+	}
+
+	@Override
+	public double getFunctionValue() {
+		return alg.getFx();
+	}
+
+	@Override
+	public boolean isUpdated() {
+		return alg.isUpdatedParameters();
 	}
 }

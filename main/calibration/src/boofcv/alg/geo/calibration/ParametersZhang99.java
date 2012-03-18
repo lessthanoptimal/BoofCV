@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.struct.calib.IntrinsicParameters;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.so.Rodrigues;
 
@@ -146,5 +147,24 @@ public class ParametersZhang99 {
 			param[index++] = v.T.y;
 			param[index++] = v.T.z;
 		}
+	}
+
+	/**
+	 * Converts to a generalized class that specifies camera intrinsic parameters
+	 * 
+	 * @return Intrinsic parameters
+	 */
+	public IntrinsicParameters convertToIntrinsic() {
+		IntrinsicParameters ret = new IntrinsicParameters();
+		
+		ret.fx = a;
+		ret.fy = c;
+		ret.skew = b;
+		ret.cx = x0;
+		ret.cy = y0;
+		ret.radial = new double[ distortion.length ];
+		System.arraycopy(distortion,0,ret.radial,0,distortion.length);
+
+		return ret;
 	}
 }

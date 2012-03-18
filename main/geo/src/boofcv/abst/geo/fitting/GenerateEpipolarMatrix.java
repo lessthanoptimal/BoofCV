@@ -55,6 +55,6 @@ public class GenerateEpipolarMatrix implements ModelGenerator<DenseMatrix64F,Ass
 
 	@Override
 	public int getMinimumPoints() {
-		return alg.getMinPoints();
+		return alg.getMinimumPoints();
 	}
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,13 @@ public interface IterativeOptimization extends Serializable {
 	 * @return true if it has converged or that no more progress can be made.
 	 */
 	public boolean iterate() throws OptimizationException;
+
+	/**
+	 * True if the parameter(s) being optimized have been updated
+	 *
+	 * @return True if parameters have been updated
+	 */
+	public boolean isUpdated();
 
 	/**
 	 * Indicates if iteration stopped due to convergence or not.
