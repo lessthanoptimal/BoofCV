@@ -85,7 +85,7 @@ public class GenericPkltFeatSelector<InputImage extends ImageSingleBand, Derivat
 		
 		// find new tracks
 		detector.setExcludedCorners(excludeList);
-		detector.setBestNumber(availableData.size());
+		detector.setMaxFeatures(excludeList.size()+availableData.size());
 		detector.process(image.getLayer(0),derivX.getLayer(0),derivY.getLayer(0),null,null,null);
 
 		// extract the features

@@ -18,40 +18,33 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.alg.geo.AssociatedPair;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestPoseFromPairLinear6 extends ChecksMotionNPoint {
+public class TestPoseRodriguesCodec {
 
-	/**
-	 * Standard test using only the minimum number of observation
-	 */
 	@Test
-	public void minimalObservationTest() {
-		standardTest(6);
-	}
-
-	/**
-	 * Standard test with an over determined system
-	 */
-	@Test
-	public void overdetermined() {
-		standardTest(20);
-	}
-
-	@Override
-	public Se3_F64 compute(List<AssociatedPair> obs, List<Point3D_F64> locations) {
-		PoseFromPairLinear6 alg = new PoseFromPairLinear6();
-
-		alg.process(obs,locations);
-
-		return alg.getMotion();
+	public void encode_decode() {
+		
+		double []orig = new double[]{.1,.2,.3,4,5,6};
+		double []found = new double[6];
+		
+		Se3_F64 encoded = new Se3_F64();
+		
+		PoseRodriguesCodec codec = new PoseRodriguesCodec();
+		
+		assertEquals(6,codec.getParamLength());
+		
+		codec.decode(orig,encoded);
+		codec.encode(encoded,found);
+		
+		for( int i = 0; i < 6; i++ ) {
+			assertEquals(orig[i],found[i],1e-6);
+		}
 	}
 }

@@ -59,10 +59,33 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	// used to automatically select new features in the image
 	protected PyramidKltFeatureSelector<I, D> featureSelector;
 
-	public PkltManager(PkltManagerConfig<I,D> config,
-					   InterpolateRectangle<I> interpInput,
-					   InterpolateRectangle<D> interpDeriv,
-					   GenericPkltFeatSelector<I, D> featureSelector) {
+	/**
+	 * Creates a PkltManager with a default interpolation and feature selector
+	 *
+	 * @param config Configuration for the tracker/manager.
+	 */
+	public PkltManager(PkltManagerConfig<I,D> config )
+	{
+		GeneralFeatureDetector<I,D> detector =
+				FactoryCornerDetector.createKlt(config.featureRadius,
+						config.config.minDeterminant,config.maxFeatures,config.typeDeriv);
+
+		GenericPkltFeatSelector<I, D> featureSelector =
+				new GenericPkltFeatSelector<I,D>( detector ,null);
+
+		configure(config,
+				FactoryInterpolation.<I>bilinearRectangle(config.typeInput),
+				FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv),
+				featureSelector);
+	}
+
+	public PkltManager() {
+	}
+
+	public void configure(PkltManagerConfig<I,D> config,
+						  InterpolateRectangle<I> interpInput,
+						  InterpolateRectangle<D> interpDeriv,
+						  GenericPkltFeatSelector<I, D> featureSelector) {
 
 		this.config = config;
 		this.featureSelector = featureSelector;
@@ -76,21 +99,6 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 		for (int i = 0; i < config.maxFeatures; i++) {
 			unused.add(new PyramidKltFeature(numLayers, config.featureRadius));
 		}
-	}
-
-	/**
-	 * Creates a PkltManager with a default interpolation and feature selector
-	 *
-	 * @param config Configuration for the tracker/manager.
-	 */
-	public PkltManager(PkltManagerConfig<I,D> config )
-	{
-		this(config,
-				FactoryInterpolation.<I>bilinearRectangle(config.typeInput),
-				FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv),
-				new GenericPkltFeatSelector<I,D>(
-				(GeneralFeatureDetector<I,D>)
-						FactoryCornerDetector.createKlt(config.featureRadius,config.config.minDeterminant,config.maxFeatures,config.typeDeriv),null));
 	}
 
 	/**

@@ -2,17 +2,18 @@ package boofcv.alg.sfm;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
-import boofcv.abst.geo.BundleAdjustmentCalibrated;
+import boofcv.abst.geo.RefinePerspectiveNPoint;
+import boofcv.abst.geo.TriangulateNViewsCalibrated;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.PointPositionPair;
-import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
-import boofcv.alg.geo.bundle.ViewPointObservations;
 import boofcv.alg.sfm.robust.ModelMatcherTranGivenRot;
+import boofcv.factory.geo.FactoryEpipolar;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -24,59 +25,96 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>
+ * Estimates camera motion up to a scale factor using a single calibrated camera.  The algorithm
+ * is heavily inspired from [1]. but modified to handle a more narrow field of view.  Rotational
+ * and translational components of motion are estimated separately, hence the class name.  A history
+ * of observations is stored for each feature allowing more accurate triangulation.  The rotational
+ * component is always computed and compounded, even if the translational component
+ * cannot be computed.  The translational component is only computed when there are features available
+ * which have been triangulated.  Motion is only estimated between key frames.
+ * </p>
+ *
+ * <p>
+ * High level algorithm summary, see code for details:
+ * <ol>
+ * <li> Select a key frame of X percent of image features have moved more than Y pixels.</li>
+ * <li> Using RANSAC, estimate the camera motion between the two most recent key frames.</li>
+ * <li> If first key frame, triangulate feature locations.</li>
+ * <li> Compound rotational component of motion </li>
+ * <li> Estimate translational component by assuming rotation is known and using previously
+ *      computed landmark locations.</li>
+ * <li> Update landmark locations of there the acute angle is sufficiently large to accurately
+ *      triangulate </li>
+ * </ol>
+ * </p>
+ *
+ * <p>
+ * [1] Tardif, J.-P., Pavlidis, Y., and Daniilidis, K. "Monocular visual odometry in urban
+ * environments using an omnidirectional camera," IROS 2008
+ * </p>
+ *
  * @author Peter Abeles
  */
-
-// TODo Handle case where location is never regained but tracks are being dropped too fast
-// TODO Make it work with bundle adjustment better
+// TODO It appears that triangulation and pose estimation slowly degrade and every recover
+//      This can be seen in how the translation inlier count drops, despite there being a lot
+//      of triangulated points.  Might need to add a reset to prevent total failure
+// TODO There are magic numbers spread throughout the code.  Remove those once debugging was finished
 public class MonocularSeparatedMotion<T extends ImageBase> {
 
-	BundleAdjustmentCalibrated bundleAdjustment;
-	
-	KeyFramePointTracker<T,MultiViewTrack> tracker;
-	ModelMatcher<Se3_F64,MultiViewTrack> epipolarMotion;
-	TriangulateTwoViewsCalibrated triangulate2 = FactoryTriangulate.twoGeometric();
+	// refines the full pose estimate
+	private RefinePerspectiveNPoint refinePose = FactoryEpipolar.refinePnP(1e-20,300);
 
-	ModelMatcherTranGivenRot estimateTran;
+	// tracks point features
+	private KeyFramePointTracker<T,MultiViewTrack> tracker;
+	// robustly estimates the motion between two key frames
+	private ModelMatcher<Se3_F64,MultiViewTrack> epipolarMotion;
+	// triangulation used when there are only two observations
+	private TriangulateTwoViewsCalibrated triangulate2 = FactoryTriangulate.twoGeometric();
+	// triangulation used when there are N observations
+	private TriangulateNViewsCalibrated triangulateN = FactoryTriangulate.nDLT();
 
-
-	List<MultiViewTrack> inliersTriangulated = new ArrayList<MultiViewTrack>();
+	// robustly estimates translation given the rotation
+	private ModelMatcherTranGivenRot estimateTran;
 	
 	// what is considered a large reprojection error
-	double largeReprojection;
-	
-	double pixelMotionThreshold;
-	double triangulateAngle;
+	private double largeReprojection;
+
+	// threshold used to select key frames
+	private double pixelMotionThreshold;
+	// threshold used to select which features can be triangulated.  acute angle in radians
+	private double triangulateAngle;
 
 	// transform from the world frame to 'start'
-	Se3_F64 worldToStart = new Se3_F64();
+	private Se3_F64 worldToStart = new Se3_F64();
 	// transform from 'start' to the latest keyframe
-	Se3_F64 startToKey = new Se3_F64();
+	private Se3_F64 startToKey = new Se3_F64();
 
-	boolean rotationOnlyUpdate;
-	boolean fatalError;
-	
-	int minTracks;
-	int numUpdateSkip;
-	
-	boolean hasLocation = false;
-	boolean hasFirstSpawn = false;
-	boolean lostScale = false;
+	// was only the rotational component updated in the past cycle
+	private boolean rotationOnlyUpdate;
 
+	// number of no orientation updates in a row
+	private int numNoOrientation;
+
+	// has the location ever been estimated
+	private boolean hasLocation = false;
+	// has the scale factor been lost?
+	private boolean lostScale = false;
+
+	// number of ticks
+	private long tick = 0;
+	
 	public MonocularSeparatedMotion(ImagePointTracker<T> tracker,
 									PointTransform_F64 pixelToNormalized,
 									ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion,
 									ModelMatcherTranGivenRot estimateTran,
-									BundleAdjustmentCalibrated bundleAdjustment ,
-									double largeReprojection, int minTracks,
+									double largeReprojection,
 									double pixelMotionThreshold, double triangulateAngle)
 	{
 		this.tracker = new KeyFramePointTracker<T,MultiViewTrack>(tracker,pixelToNormalized,MultiViewTrack.class);;
 		this.epipolarMotion = (ModelMatcher)epipolarMotion;
 		this.estimateTran = estimateTran;
-		this.bundleAdjustment = bundleAdjustment;
 		this.largeReprojection = largeReprojection;
-		this.minTracks = minTracks;
 		this.pixelMotionThreshold = pixelMotionThreshold;
 		this.triangulateAngle = triangulateAngle;
 	}
@@ -84,10 +122,9 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 	public void reset() {
 		worldToStart.reset();
 		startToKey.reset();
-		numUpdateSkip = 0;
-		fatalError = false;
+		numNoOrientation = 0;
+		tick = 0;
 		hasLocation = false;
-		hasFirstSpawn = false;
 		tracker.reset();
 		spawnTracks();
 	}
@@ -108,13 +145,40 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 		epipolarMotion.process(tracker.getPairs());
 
 		estimateMotion();
+		
+//		List<MultiViewTrack>  tracks = tracker.getPairs();
+//		for( int i = 0; i < tracks.size(); )  {
+//			MultiViewTrack t = tracks.get(i);
+//
+//			if( t.views.size <= 1 && tick - t.whenSpawned >= 8 ) {
+////				System.out.println("Dropping useless track");
+//				tracker.dropTrack(t);
+//			} else {
+//				i++;
+//			}
+//		}
+		
 		if( hasLocation ) {
-			if( !rotationOnlyUpdate )
-				performBundleAdjustment();
-			spawnTracks();
+			if( rotationOnlyUpdate ) {
+				if( numNoOrientation++ > 2 ) {
+					System.out.println(" REALLY has lost scale.");
+					hasLocation = false;
+					Se3_F64 temp = new Se3_F64();
+					worldToStart.concat(startToKey,temp);
+					worldToStart.set(temp);
+					startToKey.reset();
+					tracker.reset();
+					spawnTracks();
+				}
+				
+			} else {
+				spawnTracks();
+			}
 		}
+
 		tracker.setKeyFrame();
 		debugCrap();
+		tick++;
 		
 		return true;
 	}
@@ -125,7 +189,7 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 		for( MultiViewTrack t : tracker.getPairs() ) {
 			if( t.views.size() > 0 )
 				numTracksWithObs++;
-			if( t.views.size >= 2 )
+			if( t.views.size() >= 2 )
 				numTriangulated++;
 		}
 
@@ -136,20 +200,39 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 		else
 			System.out.println();
 	}
-	
+
+	/**
+	 * Creates and adds a new observations of the tracked feature
+	 */
+	protected MultiViewTrack.View popView( MultiViewTrack t ) {
+		MultiViewTrack.View v = new MultiViewTrack.View();
+		v.whenViewed = tick;
+		t.views.add(v);
+		return v;
+	}
+
+	/**
+	 * Requests that the tracker spawns new tracks and adds an observation
+	 */
 	public void spawnTracks() {
 		List<MultiViewTrack> spawned = tracker.spawnTracks();
 
 //		if( !rotationOnlyUpdate ) {
 			for( MultiViewTrack t : spawned ) {
-				MultiViewTrack.View v = t.views.pop();
+				t.whenSpawned = tick;
+				MultiViewTrack.View v = popView(t);
 				v.o.set(t.currLoc);
 				v.worldToView.set(startToKey);
 			}
 //		}
-		hasFirstSpawn = true;
+		System.out.println("  Spawned Tracks "+spawned.size());
 	}
-	
+
+	/**
+	 * Estimates the cameras motion.  The motion is estimated between the current frame
+	 * and the previous key frame. The rotational component is compounded to the current
+	 * motion estimate and translation estimated separately.
+	 */
 	public void estimateMotion() {
 		// extract rotation from Essential matrix
 		List<MultiViewTrack> inliers = epipolarMotion.getMatchSet();
@@ -162,43 +245,47 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 		
 		// compute translation from features with valid locations
 		List<PointPositionPair> list = new ArrayList<PointPositionPair>();
-		inliersTriangulated.clear();
 		
 		for( MultiViewTrack t : inliers ) {
-			if( t.views.size > 1 ) {
-				inliersTriangulated.add(t);
+			if( t.views.size() > 1 ) {
 				list.add( new PointPositionPair(t.currLoc,t.location));
 			}
 		}
 
 		// todo if rotation only for a while then assume scale lost
-		lostScale = list.size() <= 4;
-		if( lostScale ) numUpdateSkip++;
+		lostScale = list.size() <= 5;
 
 		if( hasLocation && lostScale ) {  // todo handle first frame better
 			// no triangulated tracks to update with so scale has been lost
 			System.out.println("LOST SCALE!!!");
 			handleLostScale();
+			startToKey.getR().set(rotationToCurr);
 		} else {
 			// estimate and see if it succeeded or not
 			if( estimateTran.process(list) ) {
 				System.out.println("Updating Position: inlier "+estimateTran.getMatchSet().size()+"  total "+list.size());
-				// TODO non-linear refinement
 
 				rotationOnlyUpdate = false;
-				keyToCurr.getT().set(estimateTran.getModel());
+
+				startToKey.getR().set(rotationToCurr);
+				startToKey.getT().set(estimateTran.getModel());
+
+				// non-linear refinement of rotation and translation
+				refinePose.process(startToKey,estimateTran.getMatchSet());
+				startToKey.getT().set(refinePose.getRefinement().getT());
+//				startToKey.set(refinePose.getRefinement());
+				
 			} else {
 				if( hasLocation ) {
 					System.out.println("Updating Rotation Only");
 					rotationOnlyUpdate = true;
 					keyToCurr.getT().set(0,0,0);
 				}
+				Se3_F64 temp = new Se3_F64();
+				startToKey.concat(keyToCurr,temp);
+				startToKey.set(temp);
 			}
 		}
-
-		Se3_F64 temp = new Se3_F64();
-		startToKey.concat(keyToCurr,temp);
-		startToKey.set(temp);
 
 		if( hasLocation ) {
 			// must have the full pose estimate to update the structure
@@ -209,6 +296,10 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 		}
 	}
 
+	/**
+	 * The scale has been lost, Concat the current motion estimate and make the current frame the start frame.
+	 * Discard previous views of the feature and start over again.
+	 */
 	private void handleLostScale() {
 		hasLocation = false;
 		Se3_F64 temp = new Se3_F64();
@@ -216,13 +307,14 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 		worldToStart.set(temp);
 		startToKey.reset();
 		for( MultiViewTrack t : tracker.getPairs() ) {
-			t.views.reset();
-			MultiViewTrack.View v = t.views.pop();
+			t.views.clear();
+			MultiViewTrack.View v = popView(t);
 			v.o.set(t.keyLoc);
 			v.worldToView.set(startToKey);
 		}
 	}
 
+	
 	public void updateStructure() {
 		List<MultiViewTrack> inliers = epipolarMotion.getMatchSet();
 		
@@ -231,32 +323,55 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 
 		for( MultiViewTrack t : positionTracks ) {
 			// add the current view
-			MultiViewTrack.View v = t.views.pop();
+			MultiViewTrack.View v = popView(t);
 			v.o.set(t.currLoc);
 			v.worldToView.set(startToKey);
 			
-			// triangulate using all the views
-			if( t.views.size == 2 ) {
-				MultiViewTrack.View v0 = t.views.get(0);
-				MultiViewTrack.View v1 = t.views.get(1);
-
-				triangulate2.triangulate(v0.o,v1.o,v1.worldToView,t.location);
-			} else {
-				// TODO N-view triangulate
-				MultiViewTrack.View v0 = t.views.get(t.views.size-2);
-				MultiViewTrack.View v1 = t.views.get(t.views.size-1);
-
-				triangulate2.triangulate(v0.o,v1.o,v1.worldToView,t.location);
-			}
+			triangulatePoint(t);
 		}
 	}
 
-	// TODO detect case where location is lost
+	// find tracks which can be triangulated well from these two observations
+	Se3_F64 inv = new Se3_F64();
+	Se3_F64 V1ToV2 = new Se3_F64();
+	
+	private void triangulatePoint( MultiViewTrack t) 
+	{
+		// triangulate point
+		if( t.views.size() == 2 ) {
+			MultiViewTrack.View v0 = t.views.get(0);
+			MultiViewTrack.View v1 = t.views.get(t.views.size()-1);
 
+			// transform from first to second view
+			v0.worldToView.invert(inv);
+			v1.worldToView.concat(inv, V1ToV2);
+
+			triangulate2.triangulate(v0.o,v1.o, V1ToV2,t.location);
+
+			// convert from being in v0's perspective
+			SePointOps_F64.transformReverse(v0.worldToView, t.location, t.location);
+		} else {
+			List<Point2D_F64> obs = new ArrayList<Point2D_F64>();
+			List<Se3_F64> where = new ArrayList<Se3_F64>();
+			
+			for( int i = 0; i < t.views.size(); i++ ) {
+				obs.add( t.views.get(i).o );
+				where.add( t.views.get(i).worldToView );
+			}
+			
+			triangulateN.triangulate(obs,where,t.location);
+
+//				System.out.println("  num views "+t.views.size);
+		}
+	}
+
+	/**
+	 * Attempts to estimate the cameras translational motion for the first time.  Gets a list of
+	 * features which are geometrically good enough to triangulate and triangulates their location.
+	 * The scale factor is then normalized using the downrange of the farthest feature.
+	 */
 	public void updateStructure_No_Location() {
 		List<MultiViewTrack> inliers = epipolarMotion.getMatchSet();
-
-		inliersTriangulated.clear();
 		
 		// tracks which are good to estimate position from
 		List<MultiViewTrack> positionTracks = findGoodTriangulate(inliers, startToKey);
@@ -268,7 +383,7 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 			double maxZ = 0;
 			for( MultiViewTrack t : positionTracks ) {
 				t.location.set(t.candidate);
-				MultiViewTrack.View v = t.views.pop();
+				MultiViewTrack.View v = popView(t);
 				v.o.set(t.currLoc);
 				v.worldToView.set(startToKey);
 
@@ -289,14 +404,13 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 
 			// add a first observation to all tracks without observations now that the location has been established
 			for( MultiViewTrack t : tracker.getPairs() ) { // todo is this needed?
-				if( t.views.size != 0 )
+				if( t.views.size() != 0 )
 					continue;
-				MultiViewTrack.View v = t.views.pop();
+				MultiViewTrack.View v = popView(t);
 				v.o.set(t.currLoc);
 				v.worldToView.set(startToKey);
 			}
 
-			inliersTriangulated.addAll(positionTracks);
 			rotationOnlyUpdate = false;
 			hasLocation = true;
 		} else {
@@ -306,8 +420,13 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 		}
 	}
 
-	// todo special unit test for this function
-	private List<MultiViewTrack> findGoodTriangulate(List<MultiViewTrack> candidates , Se3_F64 worldToKey ) {
+	/**
+	 * Creates a list of features which can be triangulated well.  A feature is declared as being good to
+	 * triangulate if the acute angle between its triangulated position and the two camera centers is
+	 * larger than a threshold.    The current camera center and the camera center of the most recently saved
+	 * observation are used.
+	 */
+	private List<MultiViewTrack> findGoodTriangulate(List<MultiViewTrack> candidates , Se3_F64 worldToCurr ) {
 		List<MultiViewTrack> positionTracks = new ArrayList<MultiViewTrack>();
 
 		// observation direction in world coordinates
@@ -327,10 +446,10 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 
 			// compare to most recent view to ensure it is not too far away now, when it might not
 			// have been in the past
-			MultiViewTrack.View v0 = t.views.get(t.views.size-1);
+			MultiViewTrack.View v0 = t.views.get(t.views.size()-1);
 
 			v0.worldToView.invert(inv);
-			inv.concat(worldToKey,viewToCurr);
+			worldToCurr.concat(inv, viewToCurr);
 
 			// triangulate the view
 			triangulate2.triangulate(v0.o,t.currLoc,viewToCurr,t.candidate);
@@ -347,32 +466,32 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 			XtoC1.z = -t.candidate.z;
 
 			// vector from point to second view camera center
-			XtoC2.x = -worldToKey.T.x-t.candidate.x;
-			XtoC2.y = -worldToKey.T.y-t.candidate.y;
-			XtoC2.z = -worldToKey.T.z-t.candidate.z;
+			XtoC2.x = -viewToCurr.T.x-t.candidate.x;
+			XtoC2.y = -viewToCurr.T.y-t.candidate.y;
+			XtoC2.z = -viewToCurr.T.z-t.candidate.z;
 
 			double dot = XtoC1.dot(XtoC2);
 			double theta = Math.acos( dot / (XtoC1.norm()*XtoC2.norm()));
 
-			if( theta > triangulateAngle ) {
-				// todo what about views without a known point, go over logic again
+			if( theta >= triangulateAngle ) {
 				// check reprojection errors now
-				SePointOps_F64.transform(worldToKey, t.candidate, cw);
+				SePointOps_F64.transform(viewToCurr, t.candidate, cw);
 
 				if( cw.z < 0 ){
 //					System.out.println("Failed +z second");
 					continue;
 				}
 
-				double x1 = t.keyLoc.x - t.candidate.x/t.candidate.z;
-				double y1 = t.keyLoc.y - t.candidate.y/t.candidate.z;
+				double x1 = v0.o.x - t.candidate.x/t.candidate.z;
+				double y1 = v0.o.y - t.candidate.y/t.candidate.z;
 				double x2 = t.currLoc.x - cw.x/cw.z;
 				double y2 = t.currLoc.y - cw.y/cw.z;
 
 				double error = (Math.sqrt(x1*x1 + y1*y1) + Math.sqrt(x2*x2 + y2*y2))/2.0;
 
-				if( error < largeReprojection)
+				if( error < largeReprojection) {
 					positionTracks.add(t);
+				}
 //				else
 //					System.out.println("Failed large error: " + error);
 			} else {
@@ -400,42 +519,16 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 				count++;
 		}
 		
-		return count/(double)tracks.size() > 0.9;
+		return count/(double)tracks.size() > 0.7;
 	}
 
-	private void performBundleAdjustment() {
-		if( bundleAdjustment == null )
-			return;
-
-		CalibratedPoseAndPoint model = new CalibratedPoseAndPoint();
-		model.configure(1,inliersTriangulated.size());
-		
-		model.getWorldToCamera(0).set(startToKey);
-		
-		ViewPointObservations view = new ViewPointObservations();
-		
-		for( int i = 0; i < inliersTriangulated.size(); i++ ) {
-			MultiViewTrack t = inliersTriangulated.get(i);
-			MultiViewTrack.View v = t.views.get(t.views.size-1);
-			view.getPoints().pop().set(i,v.o);
-			model.getPoint(i).set(t.location);
-		}
-
-		List<ViewPointObservations> views = new ArrayList<ViewPointObservations>();
-		views.add(view);
-
-		if( bundleAdjustment.process(model,views) ) {
-			startToKey.set(model.getWorldToCamera(0));
-			for( int i = 0; i < inliersTriangulated.size(); i++ ) {
-				MultiViewTrack t = inliersTriangulated.get(i);
-				t.location.set(model.getPoint(i));
-			}
-		}
-	}
-	
 	public Se3_F64 getWorldToKey() {
 		Se3_F64 worldToKey = new Se3_F64();
 		worldToStart.concat(startToKey,worldToKey);
 		return worldToKey;
+	}
+
+	public KeyFramePointTracker<T, MultiViewTrack> getTracker() {
+		return tracker;
 	}
 }

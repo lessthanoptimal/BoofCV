@@ -20,6 +20,10 @@ public class WrapMonocularSeparatedMotion<T extends ImageBase>
 		this.alg = alg;
 	}
 
+	public MonocularSeparatedMotion<T> getAlg() {
+		return alg;
+	}
+
 	@Override
 	public boolean process(T input) {
 		return alg.process(input);

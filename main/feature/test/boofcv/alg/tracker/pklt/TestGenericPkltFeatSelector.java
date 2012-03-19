@@ -58,7 +58,8 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 
 		// set the first layer to not be one
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(new DummyIntensity(), new DummyExtractor(), 100);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(new DummyIntensity(), new DummyExtractor());
+		detector.setMaxFeatures(100);
 		GenericPkltFeatSelector<ImageFloat32, ImageFloat32> selector =
 				new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,tracker);
 
@@ -172,7 +173,8 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		extractor.setInputBorder(3);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, maxFeatures);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
+		detector.setMaxFeatures(maxFeatures);
 
 		return new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,tracker);
 	}

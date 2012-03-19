@@ -20,8 +20,8 @@ package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.GeoTestingOps;
+import boofcv.alg.geo.PointPositionPair;
 import boofcv.alg.geo.h.CommonHomographyChecks;
-import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -30,101 +30,54 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Common testing code for algorithms which estimate motion from a set of associated observations
  * and known 3D coordinates.
  *
  * @author Peter Abeles
  */
-public abstract class CommonMotionNPoint {
+public class CommonMotionNPoint {
 
 	protected Random rand = new Random(234);
 
 	// the true motion
 	protected Se3_F64 motion;
+	// list of points in world reference frame
+	protected List<Point3D_F64> worldPts;
+	// list of points is camera reference frame
+	protected List<Point3D_F64> cameraPts;
+	// list of observation pairs in both reference frames
+	protected List<AssociatedPair> assocPairs;
+	// list of point pairs
+	protected List<PointPositionPair> pointPose;
 
-	public abstract Se3_F64 compute( List<AssociatedPair> obs , List<Point3D_F64> locations );
-
-	/**
-	 * Test a set of random points in general position
-	 * @param N number of observed point objects
-	 */
-	public void testNoMotion( int N ) {
-		Se3_F64 motion = new Se3_F64();
-
-		checkMotion(N, motion,false);
-	}
-
-	/**
-	 * Test a set of random points in general position
-	 * @param N number of observed point objects
-	 */
-	public void standardTest( int N ) {
-		Se3_F64 motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
-		motion.getT().set(0.1,-0.1,0.01);
-
-		checkMotion(N, motion,false);
-	}
-
-	/**
-	 * Test a set of random points in general position
-	 * @param N number of observed point objects
-	 */
-	public void planarTest( int N ) {
-		Se3_F64 motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
-		motion.getT().set(0.1,-0.1,0.01);
-
-		checkMotion(N, motion,true);
-	}
-
-	private void checkMotion(int N, Se3_F64 motion, boolean planar ) {
+	protected void generateScene(int N, Se3_F64 motion, boolean planar) {
 		this.motion = motion;
 
 		// randomly generate points in space
-		List<Point3D_F64> pts;
-		
 		if( planar ) {
-			pts = CommonHomographyChecks.createRandomPlane(rand, 3, N);
+			worldPts = CommonHomographyChecks.createRandomPlane(rand, 3, N);
 		} else {
-			pts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
+			worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 		}
 
-		List<Point3D_F64> ptsB = new ArrayList<Point3D_F64>();
+		cameraPts = new ArrayList<Point3D_F64>();
 
 		// transform points into second camera's reference frame
-		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
-		for(Point3D_F64 p1 : pts ) {
+		assocPairs = new ArrayList<AssociatedPair>();
+		pointPose = new ArrayList<PointPositionPair>();
+		for(Point3D_F64 p1 : worldPts ) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
 			pair.keyLoc.set(p1.x/p1.z,p1.y/p1.z);
 			pair.currLoc.set(p2.x/p2.z,p2.y/p2.z);
-			pairs.add(pair);
+			assocPairs.add(pair);
+			pointPose.add( new PointPositionPair(pair.currLoc,p1));
 
-			ptsB.add(p2);
-		}
-
-		// extract the motion
-		Se3_F64 found = compute(pairs,pts);
-
-		// see if the found motion produces the same output as the original motion
-		for( int i = 0; i < pts.size(); i++ ) {
-			Point3D_F64 p1 = pts.get(i);
-			Point3D_F64 p2 = ptsB.get(i);
-
-			Point3D_F64 foundPt = SePointOps_F64.transform(found, p1, null);
-
-			assertEquals(p2.x,foundPt.x,1e-6);
-			assertEquals(p2.y,foundPt.y,1e-6);
-			assertEquals(p2.z,foundPt.z,1e-6);
+			cameraPts.add(p2);
 		}
 	}
-	
-	
 }
 
 

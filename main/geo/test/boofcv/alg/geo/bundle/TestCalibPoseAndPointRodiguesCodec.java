@@ -66,7 +66,7 @@ public class TestCalibPoseAndPointRodiguesCodec {
 		}
 
 		// encode the model
-		CalibPoseAndPointRodiguesCodec codec = new CalibPoseAndPointRodiguesCodec();
+		CalibPoseAndPointRodriguesCodec codec = new CalibPoseAndPointRodriguesCodec();
 		codec.configure(numViews,numPoints,numViews,known);
 		
 		double param[] = new double[ codec.getParamLength() ];
@@ -116,7 +116,7 @@ public class TestCalibPoseAndPointRodiguesCodec {
 		model.getWorldToCamera(0).getT().set(1,2,3);
 		
 		// encode the model
-		CalibPoseAndPointRodiguesCodec codec = new CalibPoseAndPointRodiguesCodec();
+		CalibPoseAndPointRodriguesCodec codec = new CalibPoseAndPointRodriguesCodec();
 		codec.configure(numViews,numPoints,numViews, new boolean[]{false});
 
 		double param[] = new double[ codec.getParamLength() ];

@@ -55,7 +55,7 @@ public class TestPnPLepetitEPnP {
 	}
 
 	private void standardTest( final int numIterations ) {
-		CommonMotionNPoint test = new CommonMotionNPoint() {
+		ChecksMotionNPoint test = new ChecksMotionNPoint() {
 			@Override
 			public Se3_F64 compute(List<AssociatedPair> obs, List<Point3D_F64> locations) {
 
@@ -76,11 +76,11 @@ public class TestPnPLepetitEPnP {
 		for( int i = 0; i < 20; i++ ) {
 			// the minimal case is not tested here since its too unstable
 			for( int N = 5; N < 10; N++ ) {
-//				test.testNoMotion(N);
-//				test.standardTest(N);
+				test.testNoMotion(N);
+				test.standardTest(N);
 				test.planarTest(N-1);
 			}
-			System.out.println();
+//			System.out.println();
 		}
 	}
 	

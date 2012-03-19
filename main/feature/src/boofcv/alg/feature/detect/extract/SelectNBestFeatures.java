@@ -33,8 +33,8 @@ public class SelectNBestFeatures {
 
 	// list of the found best corners
 	QueueCorner bestCorners;
-	int indexes[];
-	float inten[];
+	int indexes[] = new int[1];
+	float inten[] = new float[1];
 
 	int N;
 
@@ -44,7 +44,7 @@ public class SelectNBestFeatures {
 	}
 
 	public void setN( int N ) {
-		if( N > this.N ) {
+		if( N > indexes.length ) {
 			indexes = new int[N];
 			inten = new float[N];
 		}

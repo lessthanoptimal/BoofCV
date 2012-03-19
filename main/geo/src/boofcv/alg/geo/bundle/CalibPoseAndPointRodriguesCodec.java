@@ -35,7 +35,7 @@ import org.ejml.ops.CommonOps;
  * 
  * @author Peter Abeles
  */
-public class CalibPoseAndPointRodiguesCodec
+public class CalibPoseAndPointRodriguesCodec
 	implements ModelCodec<CalibratedPoseAndPoint>
 {
 	// number of camera views

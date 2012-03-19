@@ -25,6 +25,8 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
 
+import java.util.Arrays;
+
 /**
  * <p>
  * Generic class for extracting features of different types. Can return all the found features or
@@ -38,13 +40,18 @@ import georegression.struct.point.Point2D_I16;
 public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// selects the features with the largest intensity
-	protected SelectNBestFeatures selectBest;
+	private SelectNBestFeatures selectBest = new SelectNBestFeatures(10);
+	// maximum number of features it will detect across the image
+	protected int maxFeatures;
 
 	// extracts corners from the intensity image
 	protected FeatureExtractor extractor;
 
+	// found corners in each region
+	protected QueueCorner regionCorners = new QueueCorner(10);
+	
 	// list of corners found by the extractor
-	protected QueueCorner foundCorners;
+	protected QueueCorner foundCorners = new QueueCorner(10);
 
 	// Corners which should be excluded
 	protected QueueCorner excludedCorners;
@@ -55,34 +62,49 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	// computes the corner intensity image
 	protected GeneralFeatureIntensity<I,D> intensity;
 
+	// description of sub-regions
+	int numColumns=1; 
+	int numRows=1;
+
+	// number of excluded features in each region
+	int regionCount[] = new int[1];
+	
 	/**
 	 * @param intensity Computes how much like the feature the region around each pixel is.
 	 * @param extractor   Extracts the corners from intensity image
-	 * @param maxFeatures If >= zero then only the best features are returned up to this number
 	 */
 	public GeneralFeatureDetector(GeneralFeatureIntensity<I, D> intensity,
-								  FeatureExtractor extractor,
-								  int maxFeatures)
+								  FeatureExtractor extractor )
 	{
 		if( extractor.getUsesCandidates() && !intensity.hasCandidates() )
 			throw new IllegalArgumentException("The extractor requires candidate features, which the intensity does not provide.");
 
 		this.intensity = intensity;
 		this.extractor = extractor;
-
-		if (maxFeatures > 0) {
-			foundCorners = new QueueCorner(maxFeatures);
-			selectBest = new SelectNBestFeatures(maxFeatures);
-		} else {
-			foundCorners = new QueueCorner(100);
-		}
-
 	}
 
+	/**
+	 * Specifies which corners should be excluded and not detected a second time
+	 *
+	 * @param excludedCorners List of corners being excluded
+	 */
 	public void setExcludedCorners(QueueCorner excludedCorners) {
 		this.excludedCorners = excludedCorners;
 	}
 
+	/**
+	 * Number of sub-regions that features are independently extracted in.  The image is divided
+	 * into rectangular segments along the horizontal and vertical direction.
+	 * 
+	 * @param numColumns Number of horizontal divisions.
+	 * @param numRows Number of vertical divisions
+	 */
+	public void setRegions( int numColumns , int numRows ) {
+		this.numColumns = numColumns;
+		this.numRows = numRows;
+		regionCount = new int[numColumns*numRows];
+	}
+	
 	/**
 	 * Computes corners from image gradients.
 	 *
@@ -95,42 +117,97 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	 */
 	public void process(I image , D derivX, D derivY, D derivXX, D derivYY , D derivXY ) {
 		intensity.process(image,derivX, derivY, derivXX, derivYY, derivXY );
-		foundCorners.reset();
 		ImageFloat32 intensityImage = intensity.getIntensity();
 
+		int regionWidth = image.width/numColumns + (image.width%numColumns);
+		int regionHeight = image.height/numRows + (image.height%numRows);
+
+		if( intensity.hasCandidates() && numColumns*numRows != 1 )
+			throw new RuntimeException("Candidates with subregions is not yet supported");
+		
 		// mark features which are in the excluded list so that they are not returned again
 		if( excludedCorners != null ) {
+			Arrays.fill(regionCount,0);
 			for (int i = 0; i < excludedCorners.size; i++) {
 				Point2D_I16 pt = excludedCorners.get(i);
 				intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
+
+				int c=pt.x/regionWidth,r=pt.y/regionHeight;
+				regionCount[r*numColumns+c]++;
 			}
 		}
 
-		extractor.setInputBorder(intensity.getIgnoreBorder());
+		extractFromRegions(intensityImage, regionWidth, regionHeight);
+	}
 
-		// extract features from inside the image
-		if( intensity.hasCandidates() ) {
-			extractor.process(intensityImage, intensity.getCandidates(), requestedFeatureNumber, foundCorners);
-		} else {
-			extractor.process(intensityImage, null, requestedFeatureNumber, foundCorners);
-		}
+	/**
+	 * Extracts corners from each region individually
+	 */
+	private void extractFromRegions(ImageFloat32 intensityImage, int regionWidth, int regionHeight) {
+		// compute the number requested per region
+		int regionRequest = requestedFeatureNumber/(numColumns*numRows);
+		int regionMax = maxFeatures/(numColumns*numRows);
 
-		if (selectBest != null) {
-			selectBest.process(intensityImage, foundCorners);
+		int ignoreBorder = intensity.getIgnoreBorder();
+		extractor.setInputBorder(0);
+
+		foundCorners.reset();
+		for( int i = 0; i < numRows; i++ ) {
+			int y0 = i*regionHeight;
+			int y1 = Math.min(intensityImage.height,y0+regionHeight);
+
+			// remove the ignore border from the region being processed
+			if( i == 0 ) y0 += ignoreBorder;
+			if( i == numRows-1 ) y1 -= ignoreBorder;
+
+			for( int j = 0; j < numColumns; j++ ) {
+				int x0 = j*regionWidth;
+				int x1 = Math.min(intensityImage.width,x0+regionWidth);
+				if( j == 0 ) x0 += ignoreBorder;
+				if( j == numColumns-1 ) x1 -= ignoreBorder;
+
+				// extract features from inside the sub-image in question
+				ImageFloat32 intenSub = intensityImage.subimage(x0,y0,x1,y1);
+
+				regionCorners.reset();
+				if( intensity.hasCandidates() ) {
+					extractor.process(intenSub, intensity.getCandidates(), regionRequest, regionCorners);
+				} else {
+					extractor.process(intenSub, null, regionRequest, regionCorners);
+				}
+
+				QueueCorner q;
+				if (maxFeatures > 0 ) {
+					int numSelect = regionMax-regionCount[i*numColumns+j];
+//					System.out.println("Region "+i+" "+j+"  target select "+numSelect);
+					if( numSelect > 0 ) {
+						selectBest.setN(numSelect);
+						selectBest.process(intensityImage, regionCorners);
+						q = selectBest.getBestCorners();
+					} else {
+						continue;
+					}
+				} else {
+					q = regionCorners;
+				}
+
+				for( int k = 0; k < q.size; k++ ) {
+					Point2D_I16 p = q.get(k);
+					foundCorners.pop().set(p.x+x0,p.y+y0);
+				}
+			}
 		}
 	}
 
 	/**
-	 * Turns on select best features and sets the number it should return.
+	 * Turns on select best features and sets the number it should return.  If a list of excluded features
+	 * is passed in, then the maximum number of returned features is 'numFeatures' minus the number of
+	 * excluded features.
 	 *
 	 * @param numFeatures Return at most this many features, which are the best.
 	 */
-	public void setBestNumber(int numFeatures) {
-		if( selectBest == null ) {
-			selectBest = new SelectNBestFeatures(numFeatures);
-		} else {
-			selectBest.setN(numFeatures);
-		}
+	public void setMaxFeatures(int numFeatures) {
+		this.maxFeatures = numFeatures;
 	}
 
 	/**
@@ -152,10 +229,7 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	}
 
 	public QueueCorner getFeatures() {
-		if (selectBest != null) {
-			return selectBest.getBestCorners();
-		} else
-			return foundCorners;
+		return foundCorners;
 	}
 
 	/**

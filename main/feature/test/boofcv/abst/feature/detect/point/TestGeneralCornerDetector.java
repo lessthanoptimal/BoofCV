@@ -37,12 +37,17 @@ public class TestGeneralCornerDetector {
 	int height=12;
 
 	@Test
+	public void testRegions() {
+		fail("Implement");
+	}
+	
+	@Test
 	public void testPositiveNoCandidates() {
 		HelperExtractor extractor = new HelperExtractor(false, true);
 		HelperIntensity intensity = new HelperIntensity(false,false,false);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 0);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -57,7 +62,7 @@ public class TestGeneralCornerDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 0);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -75,7 +80,7 @@ public class TestGeneralCornerDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 0);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -91,7 +96,7 @@ public class TestGeneralCornerDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 0);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -108,7 +113,8 @@ public class TestGeneralCornerDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 1);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
+		detector.setMaxFeatures(1);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
@@ -125,18 +131,18 @@ public class TestGeneralCornerDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor, 0);
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
 
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 
 		// two features are added by the extractor
 		assertEquals(2,detector.getFeatures().size());
 		// it should now create an n-best select
-		detector.setBestNumber(1);
+		detector.setMaxFeatures(1);
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 		assertEquals(1,detector.getFeatures().size());
 		// it should now return all two features
-		detector.setBestNumber(2);
+		detector.setMaxFeatures(2);
 		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
 		assertEquals(2,detector.getFeatures().size());
 	}

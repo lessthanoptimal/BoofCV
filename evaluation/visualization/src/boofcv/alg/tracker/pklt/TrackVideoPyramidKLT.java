@@ -181,7 +181,8 @@ public class TrackVideoPyramidKLT<I extends ImageSingleBand, D extends ImageSing
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config.featureRadius+2,configKLt.minDeterminant,0,false, true);
 		extractor.setInputBorder(config.featureRadius * scalingTop);
 		GeneralFeatureDetector<I,D> detector =
-				new GeneralFeatureDetector<I,D>(intensity,extractor, config.maxFeatures);
+				new GeneralFeatureDetector<I,D>(intensity,extractor);
+		detector.setMaxFeatures(config.maxFeatures);
 
 		GenericPkltFeatSelector<I, D> featureSelector =
 				new GenericPkltFeatSelector<I,D>(detector,null);
@@ -190,8 +191,8 @@ public class TrackVideoPyramidKLT<I extends ImageSingleBand, D extends ImageSing
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		PkltManager<I,D> manager =
-				new PkltManager<I,D>(config,interp,interpD,featureSelector);
+		PkltManager<I,D> manager = new PkltManager<I,D>();
+		manager.configure(config,interp,interpD,featureSelector);
 
 		TrackVideoPyramidKLT<I,D> alg = new TrackVideoPyramidKLT<I,D>(sequence,manager,
 				pyrUpdater,gradient);
@@ -200,7 +201,7 @@ public class TrackVideoPyramidKLT<I extends ImageSingleBand, D extends ImageSing
 	}
 
 	public static void main( String args[] ) {
-		String fileName = "/home/pja/2011_09_20/MAQ00688.MP4";
+		String fileName = "../data/applet/shake.mjpeg";
 
 		run(fileName,ImageFloat32.class,ImageFloat32.class);
 //		run(fileName, ImageUInt8.class, ImageSInt16.class);

@@ -138,7 +138,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 //		intensityAlg = FactoryIntensityPoint.harris(radius,0.04f,true,derivType);
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(radius+2,20,radius,false,true);
-		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg,extractor,0);
+		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg,extractor);
 
 		findBound = new DetectChessSquaresBinary(numCols, numRows, 20*4);
 	}

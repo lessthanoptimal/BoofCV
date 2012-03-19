@@ -35,6 +35,7 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.describe.brief.ScoreAssociationBrief;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.orientation.OrientationIntegral;
+import boofcv.alg.tracker.pklt.GenericPkltFeatSelector;
 import boofcv.alg.tracker.pklt.PkltManager;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.alg.transform.ii.GIntegralImageOps;
@@ -45,6 +46,7 @@ import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
@@ -64,18 +66,34 @@ public class FactoryPointSequentialTracker {
 	 *
 	 * @param maxFeatures Maximum number of features it can detect/track. Try 200 initially.
 	 * @param scaling Scales in the image pyramid. Recommend [1,2,4] or [2,4]
+	 * @param featureRadius Feature radius.  Try 3 or 5
+	 * @param spawnSubW Forces a more even distribution of features.  Width.  Try 2
+	 * @param spawnSubH Forces a more even distribution of features.  Height.  Try 3
 	 * @param imageType Input image type.
 	 * @param derivType Image derivative  type.
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> klt( int maxFeatures , int scaling[] , Class<I> imageType , Class<D> derivType )
+	ImagePointTracker<I> klt( int maxFeatures , int scaling[] , int featureRadius , int spawnSubW , int spawnSubH , Class<I> imageType , Class<D> derivType )
 	{
 		PkltManagerConfig<I, D> config =
 				PkltManagerConfig.createDefault(imageType,derivType);
 		config.pyramidScaling = scaling;
 		config.maxFeatures = maxFeatures;
-		PkltManager<I, D> trackManager = new PkltManager<I, D>(config);
+		config.featureRadius = featureRadius;
+
+		GeneralFeatureDetector<I,D> detector =
+				FactoryCornerDetector.createKlt(config.featureRadius,config.config.minDeterminant,config.maxFeatures,config.typeDeriv);
+		detector.setRegions(spawnSubW,spawnSubH);
+
+		GenericPkltFeatSelector<I, D> featureSelector = new GenericPkltFeatSelector<I,D>(detector,null);
+
+
+		PkltManager<I, D> trackManager = new PkltManager<I, D>();
+		trackManager.configure(config,
+				FactoryInterpolation.<I>bilinearRectangle(config.typeInput),
+				FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv),
+				featureSelector);
 
 		return new PstWrapperKltPyramid<I,D>(trackManager);
 	}
