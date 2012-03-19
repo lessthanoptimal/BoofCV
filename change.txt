@@ -3,6 +3,27 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2012/
+Version : Alpha 0.7
+
+- Redesigned how evaluation apps/applets handle data input and configuration
+- Removed the epipolar directory
+  * More than just stereo algorithms in there
+- Camera calibration outputs XML file containing intrinsic parameters
+  * Java XML serialization
+- 3D Vision Algorithms
+  * Estimate translation given rotation and two observations
+  * Refine pose estimate given set of 3D points and observations
+  * Interface for n-view triangulation
+  * Added bundle adjustment for calibrated cameras
+    - Analytic Jacobian
+    - A bit slow right now
+- Changed behavior of GeneralFeatureDetector
+  * Supports sub-region extraction.  Forces features to be more spread out
+  * Max N now is the total number of features, including excludes
+- Improved speed of Levenberg algorithm by taking advantage of symmetry
+
+---------------------------------------------
 Date    : 2012/03/01
 Version : Alpha 0.6
 

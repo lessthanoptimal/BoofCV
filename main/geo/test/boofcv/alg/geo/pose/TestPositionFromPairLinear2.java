@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPositionFromPairLinear2 extends CommonMotionNPoint {
+public class TestPositionFromPairLinear2 extends ChecksMotionNPoint {
 
 	PositionFromPairLinear2 alg = new PositionFromPairLinear2();
 

@@ -20,7 +20,7 @@ package boofcv.alg.sfm;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.sfm.MonocularVisualOdometry;
+import boofcv.abst.sfm.WrapMonocularSeparatedMotion;
 import boofcv.alg.distort.LeftToRightHanded_F64;
 import boofcv.alg.distort.RemoveRadialPtoN_F64;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
@@ -37,6 +37,7 @@ import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -49,25 +50,25 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeMonoVisualOdometry<I extends ImageSingleBand, D extends ImageSingleBand> 
+public class VisualizeMonoSeparated<I extends ImageSingleBand, D extends ImageSingleBand>
 extends VideoProcessAppBase<I,D> {
 
 	private final static int maxFeatures = 500;
-	
+
 	int inputWidth,inputHeight;
-	
+
 	ImagePointTracker<I> tracker;
-	MonocularVisualOdometry<I> alg;
+	MonocularSeparatedMotion<I> alg;
 
 	boolean processedImage = false;
 
 	ImagePanel videoPanel = new ImagePanel();
 	DisplayMonoPath pathGui = new DisplayMonoPath();
-	
+
 	int frameCount = 0;
 	boolean updatedEstimate;
 
-	public VisualizeMonoVisualOdometry( Class<I> imageType, Class<D> derivType) {
+	public VisualizeMonoSeparated(Class<I> imageType, Class<D> derivType) {
 		super(0,imageType);
 		
 		tracker = FactoryPointSequentialTracker.klt(maxFeatures,new int[]{1,2,4,8},5,3,2,imageType,derivType);
@@ -77,8 +78,9 @@ extends VideoProcessAppBase<I,D> {
 		p.add( pathGui,BorderLayout.EAST);
 		p.add( videoPanel , BorderLayout.CENTER);
 		pathGui.setPreferredSize(new Dimension(300,300));
-		setMainGUI(p);
+
 		videoPanel.addMouseListener(this);
+		setMainGUI(p);
 	}
 	
 	public void configure( IntrinsicParameters cameraParam )  {
@@ -86,10 +88,12 @@ extends VideoProcessAppBase<I,D> {
 		removeRadial.set(cameraParam.fx,cameraParam.skew,cameraParam.fy,cameraParam.cx,cameraParam.cy,cameraParam.radial);
 
 		PointTransform_F64 p2n = new LeftToRightHanded_F64(removeRadial);
-		
-		alg = FactoryVisualOdometry.monoSimple(maxFeatures/2, 20, 1, tracker, p2n);
-//		alg = FactoryVisualOdometry.monoSeparated(maxFeatures/2, 12, 2,  2*Math.PI/180.0, tracker, p2n);
 
+		WrapMonocularSeparatedMotion<I> w =
+				(WrapMonocularSeparatedMotion<I>)FactoryVisualOdometry.
+						monoSeparated(maxFeatures/2, 12, 1.2,  2.5*Math.PI/180.0, tracker, p2n);
+
+		alg = w.getAlg();
 	}
 
 	@Override
@@ -123,7 +127,9 @@ extends VideoProcessAppBase<I,D> {
 	@Override
 	protected void updateAlgGUI(I frame, BufferedImage imageGUI, double fps) {
 
-		Se3_F64 cameraToWorld = alg.getCameraToWorld();
+		Se3_F64 worldToCamera = alg.getWorldToKey();
+
+		Se3_F64 cameraToWorld = worldToCamera.invert(null);
 		pathGui.addLocation(cameraToWorld.getT());
 		pathGui.repaint();
 
@@ -134,16 +140,28 @@ extends VideoProcessAppBase<I,D> {
 			System.out.printf("  rotation x=%6.2f y=%6.2f z=%6.2f\n",euler[0],euler[1],euler[2]);
 		}
 
-		List<PointTrack> tracks = tracker.getActiveTracks();
-		
 		Graphics2D g2 = imageGUI.createGraphics();
-		for( PointTrack p : tracks ) {
-			VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,Color.RED);
+
+		// test to see if there are features not being shown
+//		for( PointTrack p : tracker.getActiveTracks() ) {
+//			VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,Color.GREEN);
+//		}
+
+		for( MultiViewTrack t : alg.getTracker().getPairs() ) {
+			Point2D_F64 p = t.getPixel().currLoc;
+			
+			if( t.views.size() == 1 ) {
+				VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,Color.BLUE);
+			} else if( t.views.size() >= 2 ) {
+				VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,Color.RED);
+			} else {
+				VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,Color.GRAY);
+			}
 		}
-		
+
 		List<PointTrack> spawned = tracker.getNewTracks();
 		for( PointTrack p : spawned ) {
-			VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,Color.BLUE);
+			VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,Color.PINK);
 		}
 		
 		videoPanel.setBufferedImage(imageGUI);
@@ -175,13 +193,13 @@ extends VideoProcessAppBase<I,D> {
 	}
 	
 	public static void main( String args[] ) {
-		VisualizeMonoVisualOdometry app = new VisualizeMonoVisualOdometry(ImageFloat32.class, ImageFloat32.class);
+		VisualizeMonoSeparated app = new VisualizeMonoSeparated(ImageFloat32.class, ImageFloat32.class);
 
 		IntrinsicParameters cameraParam = BoofMiscOps.loadXML("intrinsic.xml");
 		app.configure(cameraParam);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-//		inputs.add(new PathLabel("walking", "/home/pja/temp/foo.mjpeg"));
+//		inputs.add(new PathLabel("walking", "/home/pja/temp/easy_short.mjpeg"));
 //		inputs.add(new PathLabel("walking", "/home/pja/temp/low.mjpeg"));
 		inputs.add(new PathLabel("walking", "/home/pja/temp/low_curve.mjpeg"));
 

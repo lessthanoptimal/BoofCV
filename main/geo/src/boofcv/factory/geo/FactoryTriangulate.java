@@ -20,6 +20,7 @@ package boofcv.factory.geo;
 
 import boofcv.abst.geo.RefineTriangulationCalibrated;
 import boofcv.abst.geo.RefineTriangulationEpipolar;
+import boofcv.abst.geo.TriangulateNViewsCalibrated;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.geo.triangulate.*;
 
@@ -50,7 +51,18 @@ public class FactoryTriangulate {
 	 * @return Two view triangulation algorithm
 	 */
 	public static TriangulateTwoViewsCalibrated twoDLT() {
-		return new WrapTriangulateDLT();
+		return new WrapTwoViewsTriangulateDLT();
+	}
+
+	/**
+	 * Triangulate N views using the Discrete Linear Transform (DLT)
+	 *
+	 * @see boofcv.alg.geo.triangulate.TriangulateLinearDLT
+	 *
+	 * @return Two view triangulation algorithm
+	 */
+	public static TriangulateNViewsCalibrated nDLT() {
+		return new WrapNViewsTriangulateDLT();
 	}
 
 	/**

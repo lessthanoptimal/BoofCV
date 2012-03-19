@@ -35,7 +35,7 @@ public class BundleAdjustmentCalibratedDense
 		implements BundleAdjustmentCalibrated
 {
 	// converts to and from a parameterized version of the model
-	CalibPoseAndPointRodiguesCodec codec;
+	CalibPoseAndPointRodriguesCodec codec;
 	// storage for model parameters
 	double param[] = new double[0];
 
@@ -43,14 +43,14 @@ public class BundleAdjustmentCalibratedDense
 	UnconstrainedLeastSquares minimizer;
 	// computes residuals for least-squares
 	CalibPoseAndPointResiduals func = new CalibPoseAndPointResiduals();
-	CalibPoseAndPointRodiguesJacobian jacobian = new CalibPoseAndPointRodiguesJacobian();
+	CalibPoseAndPointRodriguesJacobian jacobian = new CalibPoseAndPointRodriguesJacobian();
 
 	int maxIterations;
 
 	public BundleAdjustmentCalibratedDense(double convergenceTol,
 										   int maxIterations ) {
 		minimizer = FactoryOptimization.leastSquareLevenberg(convergenceTol, convergenceTol, 1e-3);
-		codec = new CalibPoseAndPointRodiguesCodec();
+		codec = new CalibPoseAndPointRodriguesCodec();
 		this.maxIterations = maxIterations;
 	}
 

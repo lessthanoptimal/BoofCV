@@ -27,6 +27,6 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 public class TestWrapTriangulateDLT extends GeneralTestTriangulateTwoViewsCalibrated {
 
 	public TriangulateTwoViewsCalibrated createAlg() {
-		return new WrapTriangulateDLT();
+		return new WrapTwoViewsTriangulateDLT();
 	}
 }

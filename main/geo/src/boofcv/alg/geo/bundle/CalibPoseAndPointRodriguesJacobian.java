@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibPoseAndPointRodiguesJacobian implements FunctionNtoMxN {
+public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 
 	// if the extrinsic parameters are known, specify them here
 	Se3_F64 extrinsic[];

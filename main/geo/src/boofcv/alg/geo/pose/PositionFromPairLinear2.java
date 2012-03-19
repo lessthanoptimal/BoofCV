@@ -70,7 +70,7 @@ public class PositionFromPairLinear2 {
 	/**
 	 * Computes the translation given two or more feature observations and the known rotation
 	 *
-	 * @param R Rotation matrix.
+	 * @param R Rotation matrix. World to view.
 	 * @param worldPts Location of features in world coordinates.
 	 * @param observed Observations of point in current view.  Normalized coordinates.
 	 * @return true if it succeeded.

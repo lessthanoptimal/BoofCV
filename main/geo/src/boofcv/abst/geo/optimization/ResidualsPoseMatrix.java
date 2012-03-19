@@ -18,30 +18,29 @@
 
 package boofcv.abst.geo.optimization;
 
-import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.ModelObservationResidual;
+import boofcv.alg.geo.ModelObservationResidualN;
+import boofcv.alg.geo.PointPositionPair;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
-import org.ejml.data.DenseMatrix64F;
+import georegression.struct.se.Se3_F64;
 
 import java.util.List;
 
 /**
- * Computes residual errors for a set of observations from a 3x3 epipolar matrix.
- * Only a single output from the residual function.
+ * Computes residual errors for a set of observations from a Se3 motion.
  *
  * @author Peter Abeles
  */
-public class ResidualsEpipolarMatrix implements FunctionNtoM {
-	// converts parameters to and from the fundamental matrix
-	protected ModelCodec<DenseMatrix64F> param;
+public class ResidualsPoseMatrix implements FunctionNtoM {
+	// converts parameters to and from the motion
+	protected ModelCodec<Se3_F64> param;
 	// list of observations
-	protected List<AssociatedPair> obs;
+	protected List<PointPositionPair> obs;
 	// error function
-	protected ModelObservationResidual<DenseMatrix64F,AssociatedPair> residual;
+	protected ModelObservationResidualN<Se3_F64,PointPositionPair> residual;
 
 	// pre-declare temporary storage
-	protected DenseMatrix64F F = new DenseMatrix64F(3,3);
+	protected Se3_F64 pose = new Se3_F64();
 
 	/**
 	 * Configures algorithm
@@ -49,14 +48,13 @@ public class ResidualsEpipolarMatrix implements FunctionNtoM {
 	 * @param param Converts parameters into epipolar matrix
 	 * @param residual Function for computing the residuals
 	 */
-	public ResidualsEpipolarMatrix(ModelCodec<DenseMatrix64F> param,
-								   ModelObservationResidual<DenseMatrix64F,AssociatedPair> residual)
-	{
-		this.param = param == null ? new ModelCodecSwapData(9) : param;
+	public ResidualsPoseMatrix(ModelCodec<Se3_F64> param,
+							   ModelObservationResidualN<Se3_F64,PointPositionPair> residual) {
+		this.param = param;
 		this.residual = residual;
 	}
 
-	public void setObservations( List<AssociatedPair> obs ) {
+	public void setObservations( List<PointPositionPair> obs ) {
 		this.obs = obs;
 	}
 
@@ -67,17 +65,17 @@ public class ResidualsEpipolarMatrix implements FunctionNtoM {
 
 	@Override
 	public int getM() {
-		return obs.size();
+		return obs.size()*residual.getN();
 	}
 
 	@Override
 	public void process(double[] input, double[] output) {
-		param.decode(input, F);
+		param.decode(input, pose);
 
-		residual.setModel(F);
+		residual.setModel(pose);
+		int index = 0;
 		for( int i = 0; i < obs.size(); i++ ) {
-			AssociatedPair p = obs.get(i);
-			output[i] = residual.computeResidual(p);
+			index = residual.computeResiduals(obs.get(i),output,index);
 		}
 	}
 }

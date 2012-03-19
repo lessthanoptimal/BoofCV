@@ -158,7 +158,8 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		float threshold = max*thresholdFraction;
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, threshold, radius, false, true);
-		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensityAlg,extractor, numFeatures);
+		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensityAlg,extractor);
+		detector.setMaxFeatures(numFeatures);
 		detector.process(grayImage,derivX,derivY,derivXX,derivYY,derivXY);
 		QueueCorner foundCorners = detector.getFeatures();
 

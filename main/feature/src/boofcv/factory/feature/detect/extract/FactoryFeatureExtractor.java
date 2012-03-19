@@ -53,11 +53,11 @@ public class FactoryFeatureExtractor
 	GeneralFeatureDetector<I,D> general( GeneralFeatureIntensity<I, D> intensity,
 										 FeatureExtractor extractor,
 										 int maxFeatures) {
-		return new GeneralFeatureDetector<I, D>(intensity,extractor,maxFeatures);
+		GeneralFeatureDetector<I,D> det = new GeneralFeatureDetector<I,D>(intensity,extractor);
+		det.setMaxFeatures(maxFeatures);
+
+		return det;
 	}
-	
-	
-	
 	
 	/**
 	 * Standard non-max feature extractor.

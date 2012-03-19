@@ -57,23 +57,23 @@ public class TriangulateLinearDLT {
 	 * </p>
 	 *
 	 * @param observations Observation in each view in normalized coordinates. Not modified.
-	 * @param motion Transformations from world to the view.  Not modified.
+	 * @param worldToView Transformations from world to the view.  Not modified.
 	 * @param found Output, the found 3D position of the point.  Modified.
 	 */
 	public void triangulate( List<Point2D_F64> observations ,
-							 List<Se3_F64> motion ,
+							 List<Se3_F64> worldToView ,
 							 Point3D_F64 found ) {
-		if( observations.size() != motion.size() )
+		if( observations.size() != worldToView.size() )
 			throw new IllegalArgumentException("Number of observations must match the number of motions");
 		
-		final int N = motion.size();
+		final int N = worldToView.size();
 		
 		A.reshape(2*N,4,false);
 		
 		int index = 0;
 		
 		for( int i = 0; i < N; i++ ) {
-			index = addView(motion.get(i),observations.get(i),index);
+			index = addView(worldToView.get(i),observations.get(i),index);
 		}
 
 		if( !svd.decompose(A) )

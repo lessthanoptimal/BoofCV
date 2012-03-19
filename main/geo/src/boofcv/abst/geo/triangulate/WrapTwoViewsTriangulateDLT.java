@@ -16,42 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.pose;
+package boofcv.abst.geo.triangulate;
 
-import boofcv.alg.geo.AssociatedPair;
+import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.alg.geo.triangulate.TriangulateLinearDLT;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.junit.Test;
-
-import java.util.List;
 
 /**
+ * Wrapper around {@link TriangulateLinearDLT} for {@link boofcv.abst.geo.TriangulateTwoViewsCalibrated}.
+ * 
  * @author Peter Abeles
  */
-public class TestPoseFromPairLinear6 extends ChecksMotionNPoint {
+public class WrapTwoViewsTriangulateDLT implements TriangulateTwoViewsCalibrated {
 
-	/**
-	 * Standard test using only the minimum number of observation
-	 */
-	@Test
-	public void minimalObservationTest() {
-		standardTest(6);
-	}
-
-	/**
-	 * Standard test with an over determined system
-	 */
-	@Test
-	public void overdetermined() {
-		standardTest(20);
-	}
+	TriangulateLinearDLT alg = new TriangulateLinearDLT();
 
 	@Override
-	public Se3_F64 compute(List<AssociatedPair> obs, List<Point3D_F64> locations) {
-		PoseFromPairLinear6 alg = new PoseFromPairLinear6();
+	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,
+							   Se3_F64 fromAtoB, Point3D_F64 foundInA) {
 
-		alg.process(obs,locations);
+		alg.triangulate(obsA,obsB, fromAtoB, foundInA);
 
-		return alg.getMotion();
+		return true;
 	}
 }

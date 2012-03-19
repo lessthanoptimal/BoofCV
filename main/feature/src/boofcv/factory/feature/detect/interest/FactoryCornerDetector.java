@@ -91,6 +91,9 @@ public class FactoryCornerDetector {
 											  int minSeparation , float cornerThreshold , int maxFeatures ) {
 		int intensityBorder = intensity.getIgnoreBorder();
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, cornerThreshold, intensityBorder, false, true);
-		return new GeneralFeatureDetector<T,D>(intensity,extractor, maxFeatures);
+		GeneralFeatureDetector<T,D> det = new GeneralFeatureDetector<T,D>(intensity,extractor);
+		det.setMaxFeatures(maxFeatures);
+		
+		return det;
 	}
 }

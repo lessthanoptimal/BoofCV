@@ -1,7 +1,10 @@
 package boofcv.factory.sfm;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.abst.geo.*;
+import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.abst.geo.RefinePerspectiveNPoint;
+import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.geo.fitting.DistanceFromModelResidualN;
 import boofcv.abst.geo.fitting.GenerateMotionPnP;
 import boofcv.abst.sfm.MonocularVisualOdometry;
@@ -108,15 +111,14 @@ public class FactoryVisualOdometry {
 
 		ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion =
 				new SimpleInlierRansac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
-						300,N,N,100000,2*noise*noise);
+						2000,N,N,100000,2*noise*noise);
 
-		ModelMatcherTranGivenRot estimateTran = new ModelMatcherTranGivenRot(234,200,10000,noise*noise);
+		ModelMatcherTranGivenRot estimateTran = new ModelMatcherTranGivenRot(234,2000,10000,noise*noise);
 
-		BundleAdjustmentCalibrated ba = null;//FactoryEpipolar.bundleCalibrated(1e-8,50);
 
 		MonocularSeparatedMotion<T> mono =
 				new MonocularSeparatedMotion<T>(tracker,pixelToNormalized,epipolarMotion,estimateTran,
-						ba,4*noise,minTracks,minPixelChange,triangulateAngle);
+						4*noise,minTracks,minPixelChange,triangulateAngle);
 
 		return new WrapMonocularSeparatedMotion<T>(mono);
 	}

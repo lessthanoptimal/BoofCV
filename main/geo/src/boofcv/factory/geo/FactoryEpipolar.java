@@ -25,6 +25,7 @@ import boofcv.abst.geo.f.WrapFundamentalLinear;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
 import boofcv.abst.geo.h.LeastSquaresHomography;
 import boofcv.abst.geo.h.WrapHomographyLinear;
+import boofcv.abst.geo.pose.LeastSquaresPose;
 import boofcv.abst.geo.pose.WrapPnPLepetitEPnP;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.ModelObservationResidualN;
@@ -32,6 +33,7 @@ import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.alg.geo.h.HomographyResidualSampson;
 import boofcv.alg.geo.h.HomographyResidualTransfer;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
+import boofcv.alg.geo.pose.PoseRodriguesCodec;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import org.ejml.data.DenseMatrix64F;
 
@@ -163,5 +165,15 @@ public class FactoryEpipolar {
 		PnPLepetitEPnP alg = new PnPLepetitEPnP(magicNumber);
 		alg.setNumIterations(numIterations);
 		return new WrapPnPLepetitEPnP(alg);
+	}
+
+	/**
+	 * Refines a pose solution to the PnP problem using non-linear least squares..
+	 *
+	 * @param tol Convergence tolerance. Try 1e-8
+	 * @param maxIterations Maximum number of iterations.  Try 200
+	 */
+	public static RefinePerspectiveNPoint refinePnP( double tol , int maxIterations ) {
+		return new LeastSquaresPose(tol,maxIterations,new PoseRodriguesCodec());
 	}
 }

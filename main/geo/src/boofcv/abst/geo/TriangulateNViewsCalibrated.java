@@ -16,29 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.triangulate;
+package boofcv.abst.geo;
 
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.triangulate.TriangulateLinearDLT;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
+import java.util.List;
+
 /**
- * Wrapper around {@link TriangulateLinearDLT} for {@link boofcv.abst.geo.TriangulateTwoViewsCalibrated}.
- * 
+ * Triangulate the location of a point from N views of a feature given a calibrated
+ * camera and known camera motion.
+ *
  * @author Peter Abeles
  */
-public class WrapTriangulateDLT implements TriangulateTwoViewsCalibrated {
+public interface TriangulateNViewsCalibrated {
 
-	TriangulateLinearDLT alg = new TriangulateLinearDLT();
-
-	@Override
-	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,
-							   Se3_F64 fromAtoB, Point3D_F64 foundInA) {
-		
-		alg.triangulate(obsA,obsB, fromAtoB, foundInA);
-		
-		return true;
-	}
+	/**
+	 * Triangulate the points location.
+	 *
+	 * @param observations Observation of the point in normalized image coordinates.
+	 * @param worldToView Transform from world coordinate to different views
+	 * @param location Computed location of feature in world coordinates.
+	 * @return true if successful, false otherwise.
+	 */
+	public boolean triangulate( List<Point2D_F64> observations, List<Se3_F64> worldToView ,
+								Point3D_F64 location );
 }

@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
@@ -143,10 +142,21 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	 * @param track The track which is to be dropped
 	 */
 	public void dropTrack( PointTrack track ) {
-		if( !pairs.remove((AssociatedPair)track.cookie) )
+		//noinspection SuspiciousMethodCalls
+		if( !pairs.remove(track.cookie) )
 			throw new IllegalArgumentException("Bug: Dropped track does not exist");
 
 		tracker.dropTrack(track);
+	}
+
+	public void dropTrack( R track ) {
+		for( PointTrack t : tracker.getActiveTracks() ) {
+			if( t.getCookie() == track ) {
+				dropTrack(t);
+				return;
+			}
+		}
+		throw new RuntimeException("Couldn't find track to drop");
 	}
 
 	/**

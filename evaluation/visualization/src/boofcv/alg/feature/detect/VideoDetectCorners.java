@@ -138,8 +138,8 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 //		FeatureExtractor extractor = new WrapperNonMax( new NonMaxExtractorNaive(radius+10,10f));
 //		FeatureExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCandidateStrict(radius+10, 10f));
 
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, maxCorners);
-
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		detector.setMaxFeatures(maxCorners);
 
 		VideoDetectCorners<T,D> display = new VideoDetectCorners<T,D>(sequence, detector, derivType);
 

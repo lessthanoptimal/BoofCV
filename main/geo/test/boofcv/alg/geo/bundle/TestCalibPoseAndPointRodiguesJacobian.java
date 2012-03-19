@@ -40,7 +40,7 @@ public class TestCalibPoseAndPointRodiguesJacobian {
 			
 	
 
-	CalibPoseAndPointRodiguesCodec codec = new CalibPoseAndPointRodiguesCodec();
+	CalibPoseAndPointRodriguesCodec codec = new CalibPoseAndPointRodriguesCodec();
 	CalibPoseAndPointResiduals func = new CalibPoseAndPointResiduals();
 	
 	/**
@@ -78,7 +78,7 @@ public class TestCalibPoseAndPointRodiguesJacobian {
 		codec.configure(numViews,numPoints,numViewsUnknown,known);
 		func.configure(codec,model,observations);
 
-		CalibPoseAndPointRodiguesJacobian alg = new CalibPoseAndPointRodiguesJacobian();
+		CalibPoseAndPointRodriguesJacobian alg = new CalibPoseAndPointRodriguesJacobian();
 		alg.configure(observations,numPoints,extrinsic);
 
 		double []param = new double[ codec.getParamLength() ];
