@@ -1,12 +1,18 @@
 - Compare EPnP directly to author's c code
 
 - Bundle Adjustment
-  * Unweighted
-  * Weighted
-
+  * Using homogenous coordinates
+  * compare to opencv
 
 - Triangulation Stability
   * Vary acute angle
+
+- Stereo Rectification
+  * From Fundamental
+  * From Calibration
+
+- Dense Stereo
+- Sparse Stereo
 
 - Long Term
  * Sparse Bundle Adjustment

@@ -46,6 +46,7 @@ public class WrapPlanarGridTarget implements PlanarCalibrationDetector {
 
 	public WrapPlanarGridTarget( int numSquareColumns , int numSquareRows ) {
 		refine = new WrapRefineCornerSegmentFit();
+//		refine = new WrapRefineCornerCanny();
 
 		this.squareColumns = numSquareColumns;
 

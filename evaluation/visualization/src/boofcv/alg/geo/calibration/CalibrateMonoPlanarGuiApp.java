@@ -205,7 +205,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 
 		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
-//		String directory = "../data/evaluation/calibration/mono/Sony_DSC-PULNiX_CCD_6mm_Zhang";
+//		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
 		app.configure(detector,target,directory);

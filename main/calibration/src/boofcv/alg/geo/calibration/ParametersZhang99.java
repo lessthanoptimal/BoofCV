@@ -158,8 +158,8 @@ public class ParametersZhang99 {
 		IntrinsicParameters ret = new IntrinsicParameters();
 		
 		ret.fx = a;
-		ret.fy = c;
-		ret.skew = b;
+		ret.fy = b;
+		ret.skew = c;
 		ret.cx = x0;
 		ret.cy = y0;
 		ret.radial = new double[ distortion.length ];

@@ -85,7 +85,7 @@ extends VideoProcessAppBase<I,D> {
 	
 	public void configure( IntrinsicParameters cameraParam )  {
 		RemoveRadialPtoN_F64 removeRadial = new RemoveRadialPtoN_F64();
-		removeRadial.set(cameraParam.fx,cameraParam.skew,cameraParam.fy,cameraParam.cx,cameraParam.cy,cameraParam.radial);
+		removeRadial.set(cameraParam.fx,cameraParam.fy,cameraParam.skew,cameraParam.cx,cameraParam.cy,cameraParam.radial);
 
 		PointTransform_F64 p2n = new LeftToRightHanded_F64(removeRadial);
 

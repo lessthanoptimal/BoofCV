@@ -331,7 +331,7 @@ public class RefineCornerSegmentFit {
 		alg.setFunction(func,null);
 		alg.initialize(param);
 
-		if( !UtilOptimize.process(alg,50) ) {
+		if( !UtilOptimize.process(alg,500) ) {
 			throw new InvalidCalibrationTarget("Minimization failed?!? "+alg.getWarning());
 		}
 
@@ -390,8 +390,8 @@ public class RefineCornerSegmentFit {
 		for( int i = 0; i < points.size(); i++ ) {
 			PointInfo p = points.get(i);
 
-			double distA = UtilPoint2D_F64.distance(a.x,a.y, p.x,p.y);
-			double distB = UtilPoint2D_F64.distance(b.x,b.y, p.x,p.y);
+			double distA = UtilPoint2D_F64.distance(a.x, a.y, p.x, p.y);
+			double distB = UtilPoint2D_F64.distance(b.x, b.y, p.x, p.y);
 
 			double sum = distA+distB;
 
@@ -448,8 +448,8 @@ public class RefineCornerSegmentFit {
 
 				PointInfo p = points.get(i);
 
-				double distA = Distance2D_F64.distanceSq(lineA,p);
-				double distB = Distance2D_F64.distanceSq(lineB,p);
+				double distA = Distance2D_F64.distanceSq(lineA, p);
+				double distB = Distance2D_F64.distanceSq(lineB, p);
 				
 				cost += p.weight*Math.min(distA,distB);
 			}

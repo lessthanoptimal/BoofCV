@@ -118,7 +118,7 @@ public class FactoryVisualOdometry {
 
 		MonocularSeparatedMotion<T> mono =
 				new MonocularSeparatedMotion<T>(tracker,pixelToNormalized,epipolarMotion,estimateTran,
-						4*noise,minTracks,minPixelChange,triangulateAngle);
+						4*noise,minPixelChange,triangulateAngle);
 
 		return new WrapMonocularSeparatedMotion<T>(mono);
 	}
