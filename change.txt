@@ -11,11 +11,12 @@ Version : Alpha 0.7
   * More than just stereo algorithms in there
 - Camera calibration outputs XML file containing intrinsic parameters
   * Java XML serialization
+- For square calibration grids, added sub-pixel refinement using canny edge
 - 3D Vision Algorithms
   * Estimate translation given rotation and two observations
   * Refine pose estimate given set of 3D points and observations
   * Interface for n-view triangulation
-  * Added bundle adjustment for calibrated cameras
+  * Bundle adjustment for calibrated cameras
     - Analytic Jacobian
     - A bit slow right now
 - Changed behavior of GeneralFeatureDetector

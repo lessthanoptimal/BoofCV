@@ -74,7 +74,8 @@ public class DebugSquaresSubpixelApp
 		detectAlg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
 
 //		refineAlg = new WrapCornerIntensity<T,ImageSingleBand>(1,imageType);
-		refineAlg = new WrapRefineCornerSegmentFit();
+//		refineAlg = new WrapRefineCornerSegmentFit();
+		refineAlg = new WrapRefineCornerCanny();
 
 		// construct the GUI
 		JPanel panel = new JPanel();
@@ -188,12 +189,18 @@ public class DebugSquaresSubpixelApp
 
 	public static void main(String args[]) {
 
-		DebugSquaresSubpixelApp app = new DebugSquaresSubpixelApp(1,1);
+		DebugSquaresSubpixelApp app = new DebugSquaresSubpixelApp(3,4);
 
-//		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V/";
-		String prefix = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang/";
+		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
+//		String prefix = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang/";
 		
 		List<PathLabel> images = new ArrayList<PathLabel>();
+
+//		images.add( new PathLabel("View 01",prefix+"CalibIm1.gif"));
+//		images.add( new PathLabel("View 02",prefix+"CalibIm2.gif"));
+//		images.add( new PathLabel("View 03",prefix+"CalibIm3.gif"));
+//		images.add( new PathLabel("View 04",prefix+"CalibIm4.gif"));
+//		images.add( new PathLabel("View 05",prefix+"CalibIm5.gif"));
 
 		images.add( new PathLabel("View 01",prefix+"frame01.jpg"));
 		images.add( new PathLabel("View 02",prefix+"frame02.jpg"));
@@ -202,6 +209,7 @@ public class DebugSquaresSubpixelApp
 		images.add( new PathLabel("View 05",prefix+"frame05.jpg"));
 		images.add( new PathLabel("View 06",prefix+"frame06.jpg"));
 		images.add( new PathLabel("View 07",prefix+"frame07.jpg"));
+		images.add( new PathLabel("View 12",prefix+"frame12.jpg"));
 
 		app.setInputList(images);
 
