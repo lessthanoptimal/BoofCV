@@ -66,8 +66,9 @@ public class TestLevenbergMarquardtDampened {
 
 		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.pseudoInverse();
 
-		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,1e-3,1e-6,1e-6);
+		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,1e-3);
 
+		alg.setConvergence(1e-6);
 		alg.setFunction(new WrapCoupledJacobian(residual,jacobian));
 
 		return alg;

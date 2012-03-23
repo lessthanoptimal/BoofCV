@@ -58,12 +58,10 @@ public class LevenbergMarquardtDampened extends LevenbergDenseBase {
 	 *
 	 * @param solver		   Linear solver. Cholesky or pseudo-inverse are recommended.
 	 * @param initialDampParam Initial value of the dampening parameter.  Tune.. try 1e-3;
-	 * @param absoluteErrorTol Absolute convergence test.
-	 * @param relativeErrorTol Relative convergence test based on function magnitude.
 	 */
 	public LevenbergMarquardtDampened(LinearSolver<DenseMatrix64F> solver,
-									  double initialDampParam, double absoluteErrorTol, double relativeErrorTol) {
-		super(initialDampParam,absoluteErrorTol,relativeErrorTol);
+									  double initialDampParam) {
+		super(initialDampParam);
 		this.solver = solver;
 		if( solver.modifiesB() )
 			this.solver = new LinearSolverSafe<DenseMatrix64F>(solver);

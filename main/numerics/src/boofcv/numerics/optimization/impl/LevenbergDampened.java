@@ -70,11 +70,9 @@ public class LevenbergDampened extends LevenbergDenseBase {
 	 * Specifies termination condition and dampening parameter
 	 *
 	 * @param initialDampParam Initial value of the dampening parameter.  Tune.. try 1e-3;
-	 * @param absoluteErrorTol Absolute convergence test.
-	 * @param relativeErrorTol Relative convergence test based on function magnitude.
 	 */
-	public LevenbergDampened(double initialDampParam, double absoluteErrorTol, double relativeErrorTol) {
-		super(initialDampParam, absoluteErrorTol, relativeErrorTol);
+	public LevenbergDampened(double initialDampParam) {
+		super(initialDampParam);
 	}
 
 

@@ -43,17 +43,13 @@ public class FactoryOptimization {
 	 * and a single output.  The goal is the minimize the output given the function and its derivative.
 	 * </p>
 	 *
-	 * @param relativeErrorTol Relative tolerance used to terminate the optimization. 0 <= x < 1
-	 * @param absoluteErrorTol Absolute tolerance used to terminate the optimization. 0 <= x
 	 * @param minFunctionValue The smallest possible value out of the function.  Sometimes used to bound
 	 *                         the problem.
 	 * @return UnconstrainedMinimization
 	 */
-	public static UnconstrainedMinimization unconstrained( double relativeErrorTol,
-														   double absoluteErrorTol,
-														   double minFunctionValue )
+	public static UnconstrainedMinimization unconstrained( double minFunctionValue )
 	{
-		return new WrapQuasiNewtonBFGS(relativeErrorTol,absoluteErrorTol,minFunctionValue);
+		return new WrapQuasiNewtonBFGS(minFunctionValue);
 	}
 
 	/**
@@ -63,15 +59,11 @@ public class FactoryOptimization {
 	 * configuring them.  Scaling of function parameters and output might be needed to ensure good results.
 	 * </p>
 	 *
-	 * @param relativeErrorTol tolerance used to terminate the optimization. 0 <= tol < 1
-	 * @param absoluteErrorTol Absolute tolerance used to terminate the optimization. 0 <= tol
 	 * @param dampInit Initial value of dampening parameter.  Tune.  Start at around 1e-3.
 	 * @param robust If true a slower, more robust algorithm that can handle more degenerate cases will be used.
 	 * @return UnconstrainedLeastSquares
 	 */
-	public static UnconstrainedLeastSquares leastSquaresLM( double relativeErrorTol,
-															double absoluteErrorTol,
-															double dampInit ,
+	public static UnconstrainedLeastSquares leastSquaresLM( double dampInit ,
 															boolean robust )
 	{
 		LinearSolver<DenseMatrix64F> solver;
@@ -82,8 +74,7 @@ public class FactoryOptimization {
 			solver = LinearSolverFactory.symmPosDef(10);
 		}
 
-		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,
-				dampInit,absoluteErrorTol,relativeErrorTol);
+		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,dampInit);
 		return new WrapLevenbergDampened(alg);
 	}
 
@@ -92,16 +83,12 @@ public class FactoryOptimization {
 	 * Unconstrained least squares Levenberg optimizer for dense problems.  Some times works better than
 	 * </p>
 	 *
-	 * @param relativeErrorTol tolerance used to terminate the optimization. 0 <= tol < 1
-	 * @param absoluteErrorTol Absolute tolerance used to terminate the optimization. 0 <= tol
 	 * @param dampInit Initial value of dampening parameter.  Tune.  Start at around 1e-3.
 	 * @return UnconstrainedLeastSquares
 	 */
-	public static UnconstrainedLeastSquares leastSquareLevenberg( double relativeErrorTol,
-																  double absoluteErrorTol,
-																  double dampInit )
+	public static UnconstrainedLeastSquares leastSquareLevenberg( double dampInit )
 	{
-		LevenbergDampened alg = new LevenbergDampened(dampInit,absoluteErrorTol,relativeErrorTol);
+		LevenbergDampened alg = new LevenbergDampened(dampInit);
 		return new WrapLevenbergDampened(alg);
 	}
 }

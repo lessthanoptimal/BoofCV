@@ -61,8 +61,9 @@ public class TestLevenbergDampened {
 		FunctionNtoM residual = new TrivialLeastSquaresResidual(a,b);
 		FunctionNtoMxN jacobian = new NumericalJacobianForward(residual);
 
-		LevenbergDampened alg = new LevenbergDampened(1e-3,1e-6,1e-6);
+		LevenbergDampened alg = new LevenbergDampened(1e-3);
 
+		alg.setConvergence(1e-6);
 		alg.setFunction(new WrapCoupledJacobian(residual,jacobian));
 
 		return alg;

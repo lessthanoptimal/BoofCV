@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,9 @@ public class TestQuasiNewtonBFGS {
 		LineSearch lineSearch = new LineSearchMore94(1e-3,gtol,0.1);
 		GradientLineFunction f = new CachedNumericalGradientLineFunction(function);
 
-		return new QuasiNewtonBFGS(f,lineSearch,0,gtol,1e-7,1e-7);
+		QuasiNewtonBFGS alg = new QuasiNewtonBFGS(f,lineSearch,0);
+		alg.setConvergence(1e-7,1e-7,gtol);
+		return alg;
 	}
 
 	@Test
@@ -70,8 +72,8 @@ public class TestQuasiNewtonBFGS {
 		NonlinearResults results = evaluator.powell();
 
 		// no algorithm to compare it against, just do some sanity checks for changes
-		assertTrue(results.numFunction<100);
-		assertTrue(results.numGradient < 100);
+		assertTrue(results.numFunction<300);
+		assertTrue(results.numGradient < 300);
 
 		// The function is degenerate, this test sees if it converges to a solution and improves
 		// the parameter values.  It isn't very precise

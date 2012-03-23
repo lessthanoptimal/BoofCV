@@ -144,13 +144,13 @@ public class CalibrationPlanarGridZhang99 {
 		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
 				initial.createNew(),assumeZeroSkew , grid,observations);
 
-		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresLM(1e-8,1e-8,1e-3,true);
+		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresLM(1e-3,true);
 
 		double model[] = new double[ initial.size() ];
 		initial.convertToParam(assumeZeroSkew,model);
 
 		lm.setFunction(func,null);
-		lm.initialize(model);
+		lm.initialize(model,1e-12*observations.size());
 
 		if( !UtilOptimize.process(lm,50) ) {
 			return false;

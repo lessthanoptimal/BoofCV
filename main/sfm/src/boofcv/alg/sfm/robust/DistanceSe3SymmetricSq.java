@@ -21,9 +21,12 @@ import java.util.List;
  */
 public class DistanceSe3SymmetricSq implements DistanceFromModel<Se3_F64,AssociatedPair> {
 
-	Se3_F64 keyToCurr;
-	TriangulateTwoViewsCalibrated triangulate;
-	Point3D_F64 p = new Point3D_F64();
+	// transform from key frame to current frame
+	private Se3_F64 keyToCurr;
+	// triangulation algorithm
+	private TriangulateTwoViewsCalibrated triangulate;
+	// working storage
+	private Point3D_F64 p = new Point3D_F64();
 
 	public DistanceSe3SymmetricSq(TriangulateTwoViewsCalibrated triangulate) {
 		this.triangulate = triangulate;

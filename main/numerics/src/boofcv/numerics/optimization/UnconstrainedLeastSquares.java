@@ -30,6 +30,13 @@ import boofcv.numerics.optimization.functions.FunctionNtoMxN;
  * </p>
  *
  * <p>
+ * Convergence is tested using the g-test, which is based off the gradient's norm.<br>
+ * G-test:    gtol &le; ||g(x)||<sub>inf</sub><br>
+ * A relative f-test is not provided since that test breaks down when the expected function output
+ * is zero. An absolute f-test can be done by checking the value of {@link #getFunctionValue} in each iteration.
+ * </p>
+ *
+ * <p>
  * FORMATS:<br>
  * Input functions are specified using {@link FunctionNtoM} for the set of M functions, and {@link FunctionNtoMxN}
  * for the Jacobian.  The function's output is a vector of length M, where element i correspond to function i's output.
@@ -56,8 +63,9 @@ public interface UnconstrainedLeastSquares extends IterativeOptimization {
 	 * {@link #setFunction} has been called.
 	 *
 	 * @param initial Initial parameters or guess.
+	 * @param gtol Absolute threshold for convergence based on the gradient's norm. 0 disables test.  0 &le; gtol
 	 */
-	public void initialize( double initial[] );
+	public void initialize( double initial[] , double gtol );
 
 	/**
 	 * After each iteration this function can be called to get the current best

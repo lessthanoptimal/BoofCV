@@ -20,7 +20,9 @@ package boofcv.abst.feature.detect.point;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.extract.WrapperNonMax;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import boofcv.alg.feature.detect.extract.FastNonMaxExtractor;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -31,14 +33,50 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestGeneralCornerDetector {
+public class TestGeneralFeatureDetector {
 
 	int width=10;
 	int height=12;
 
+	/**
+	 * Makes sure individual regions have non-max applied individually.  also provides a basic sanity
+	 * check on the behavior
+	 */
 	@Test
-	public void testRegions() {
-		fail("Implement");
+	public void testRegionMaxFeatures() {
+		HelperIntensity intensity = new HelperIntensity(false,false,false);
+		
+		// put one feature in each region, intentionally avoid the border
+		intensity.img.set(1,1,10);
+		intensity.img.set(7,1,10);
+
+		intensity.img.set(1,5,10);
+		intensity.img.set(7,5,10);
+
+		intensity.img.set(1,9,10);
+		intensity.img.set(6,9,10);
+		
+		// put an extra feature in one of the regions
+		intensity.img.set(8,9,10);
+
+		// use a real extractor to see if it is passing in the correct sub-images
+		FeatureExtractor extractor = new WrapperNonMax(
+				new FastNonMaxExtractor(1, 0.001f,true), null);
+
+		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
+
+		// one feature should be pruned with this configuration
+		detector.setMaxFeatures(6);
+		detector.setRegions(2,3);
+		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
+		
+		assertEquals(6,detector.getFeatures().size());
+
+		// none of the features should be pruned now
+		detector.setMaxFeatures(12);
+		detector.process(new ImageFloat32(width,height),null,null,null,null,null);
+		assertEquals(7,detector.getFeatures().size());
 	}
 	
 	@Test
@@ -212,6 +250,8 @@ public class TestGeneralCornerDetector {
 		public QueueCorner candidates = new QueueCorner(10);
 		public int processCalled = 0;
 		public int candidatesCalled = 0;
+		
+		public ImageFloat32 img = new ImageFloat32(width,height);
 
 		public HelperIntensity(boolean requiresGradient, boolean requiresHessian, boolean hasCandidates) {
 			this.requiresGradient = requiresGradient;
@@ -226,7 +266,7 @@ public class TestGeneralCornerDetector {
 
 		@Override
 		public ImageFloat32 getIntensity() {
-			return new ImageFloat32(width,height);
+			return img;
 		}
 
 		@Override

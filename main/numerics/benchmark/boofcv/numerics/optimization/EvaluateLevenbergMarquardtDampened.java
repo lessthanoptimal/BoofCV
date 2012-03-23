@@ -30,8 +30,6 @@ import org.ejml.data.DenseMatrix64F;
 public class EvaluateLevenbergMarquardtDampened extends UnconstrainedLeastSquaresEvaluator {
 
 	boolean robust = true;
-	double absoluteErrorTol = 1e-15;
-	double relativeErrorTol = 1e-15;
 	double dampInit = 1e-3;
 
 	public EvaluateLevenbergMarquardtDampened(boolean verbose) {
@@ -48,8 +46,7 @@ public class EvaluateLevenbergMarquardtDampened extends UnconstrainedLeastSquare
 			solver = LinearSolverFactory.symmPosDef(10);
 		}
 
-		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,dampInit,
-				absoluteErrorTol,relativeErrorTol);
+		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,dampInit);
 		return new WrapLevenbergDampened(alg);
 	}
 

@@ -48,9 +48,10 @@ public class QuasiNewtonBFGS
 	// number of inputs
 	private int N;
 
-	// convergence conditions
-	private double relativeErrorTol; // relative error tolerance
-	private double absoluteErrorTol; // absolute error tolerance
+	// convergence conditions for change in function value, relative
+	private double ftol;
+	// convergence condition based on gradient norm. absolute
+	private double gtol;
 
 	// function being minimized and its gradient
 	private GradientLineFunction function;
@@ -61,7 +62,7 @@ public class QuasiNewtonBFGS
 	private double funcMinValue;
 	// from wolfe condition.  Used to estimate max line search step
 	// This must be the same as what's specified internally in 'lineSearch'
-	private double gtol;
+	private double lineGTol;
 	// derivative at the start of the line search
 	private double derivAtZero;
 
@@ -103,28 +104,14 @@ public class QuasiNewtonBFGS
 	 * @param function Function being optimized
 	 * @param lineSearch Line search that selects a solution that meets the Wolfe condition.
 	 * @param funcMinValue Minimum possible function value .
-	 * @param gtol slope coefficient for wolfe condition. 0 < gtol <= 1
-	 * @param relativeErrorTol Relative error termination condition. >= 0
-	 * @param absoluteErrorTol Absolute error termination condition. >= 0
 	 */
 	public QuasiNewtonBFGS( GradientLineFunction function ,
 							LineSearch lineSearch ,
-							double funcMinValue ,
-							double gtol ,
-							double relativeErrorTol ,
-							double absoluteErrorTol )
+							double funcMinValue )
 	{
-		if( relativeErrorTol < 0 )
-			throw new IllegalArgumentException("relativeErrorTol < 0");
-		if( absoluteErrorTol < 0 )
-			throw new IllegalArgumentException("absoluteErrorTol < 0");
-
 		this.lineSearch = lineSearch;
 		this.funcMinValue = funcMinValue;
-		this.gtol = gtol;
 		this.function = function;
-		this.relativeErrorTol = relativeErrorTol;
-		this.absoluteErrorTol = absoluteErrorTol;
 
 		lineSearch.setFunction(function);
 
@@ -139,6 +126,26 @@ public class QuasiNewtonBFGS
 
 		temp0_Nx1 = new DenseMatrix64F(N,1);
 		temp1_Nx1 = new DenseMatrix64F(N,1);
+	}
+
+	/**
+	 * Specify convergence tolerances
+	 *
+	 * @param ftol Relative error tolerance for function value  0 <= ftol <= 1
+	 * @param gtol Absolute convergence based on gradient norm  0 <= gtol
+	 * @param lineGTol Slope coefficient for wolfe condition used in line search. 0 < lineGTol <= 1
+	 */
+	public void setConvergence( double ftol , double gtol , double lineGTol ) {
+		if( ftol < 0 )
+			throw new IllegalArgumentException("ftol < 0");
+		if( gtol < 0 )
+			throw new IllegalArgumentException("gtol < 0");
+		if( lineGTol <= 0 || lineGTol > 1)
+			throw new IllegalArgumentException("lineGTol <= 0 || lineGTol > 1");
+
+		this.ftol = ftol;
+		this.gtol = gtol;
+		this.lineGTol = lineGTol;
 	}
 
 	/**
@@ -261,7 +268,7 @@ public class QuasiNewtonBFGS
 		function.setLine(startPoint, direction);
 
 		// use wolfe condition to set the maximum step size
-		double maxStep = (funcMinValue-funcAtStart)/(gtol*derivAtZero);
+		double maxStep = (funcMinValue-funcAtStart)/(lineGTol *derivAtZero);
 		if( initialStep > maxStep )
 			initialStep = maxStep;
 		function.setInput(initialStep);
@@ -297,12 +304,7 @@ public class QuasiNewtonBFGS
 
 			// see if the actual different and predicted differences are smaller than the
 			// error tolerance
-			if( Math.abs(fstp-fx) <= absoluteErrorTol && step*Math.abs(derivAtZero) <= absoluteErrorTol )
-				return terminateSearch(true,null);
-
-			// check for relative convergence
-			if( Math.abs(fstp-fx) <= relativeErrorTol*Math.abs(fx)
-					&& step*Math.abs(derivAtZero) <= relativeErrorTol*Math.abs(fx) )
+			if( Math.abs(fstp-fx) <= ftol*Math.abs(fx) || Math.abs(derivAtZero) < gtol )
 				return terminateSearch(true,null);
 
 			// current function value is now the previous

@@ -26,6 +26,18 @@ import boofcv.numerics.optimization.functions.FunctionNtoS;
  * Optimization algorithm which seeks to minimize F(X) &isin; &real; and X &isin; &real;<sup>N</sup>
  * </p>
  *
+ * <p>
+ * Two convergence thresholds are specified, f-test and g-test.  The f-test is a relative convergence
+ * test based on the function's value and is designed to test to see when it is near the optimal
+ * solution.  G-test is an absolute test based on the gradient's norm,
+ * </p>
+ *
+ * <p>
+ * F-test:    ftol &le; 1 - f(x+p)/f(x)<br>
+ * G-test:    gtol &le; ||g(x)||<sub>inf</sub><br>
+ * An absolute f-test can be done by checking the value of {@link #getFunctionValue} in each iteration.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public interface UnconstrainedMinimization extends IterativeOptimization {
@@ -45,8 +57,10 @@ public interface UnconstrainedMinimization extends IterativeOptimization {
 	 * {@link #setFunction} has been called.
 	 * 
 	 * @param initial Initial parameters or guess.
+	 * @param ftol Relative convergence test based on function value. 0 disables test.  0 &le; ftol < 1
+	 * @param gtol Absolute convergence test based on gradient. 0 disables test.  0 &le; gtol
 	 */
-	public void initialize( double initial[] );
+	public void initialize( double initial[] , double ftol , double gtol );
 
 	/**
 	 * After each iteration this function can be called to get the current best

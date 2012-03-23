@@ -22,7 +22,6 @@ import boofcv.numerics.optimization.OptimizationException;
 import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
-import org.ejml.ops.NormOps;
 
 /**
  * <p>
@@ -39,8 +38,7 @@ public abstract class LevenbergBase {
 	protected int M;
 
 	// tolerance for termination
-	private double absoluteErrorTol;
-	private double relativeErrorTol;
+	private double gtol;
 
 	// current set of parameters being considered
 	private DenseMatrix64F x = new DenseMatrix64F(1,1);
@@ -53,13 +51,8 @@ public abstract class LevenbergBase {
 	private DenseMatrix64F xtest = new DenseMatrix64F(1,1);
 	private DenseMatrix64F xdelta = new DenseMatrix64F(1,1);
 
-
 	// function value norm at x
 	private double fnorm;
-	private double fnormPrev;
-
-	// size of the step taken
-	private double step;
 
 	// levenberg marquardt dampening parameter
 	private double dampParam;
@@ -87,15 +80,21 @@ public abstract class LevenbergBase {
 	 * Specifies termination condition and dampening parameter
 	 *
 	 * @param initialDampParam Initial value of the dampening parameter.  Tune.. try 1e-3;
-	 * @param absoluteErrorTol Absolute convergence test.
-	 * @param relativeErrorTol Relative convergence test based on function magnitude.
 	 */
-	public LevenbergBase(double initialDampParam,
-						 double absoluteErrorTol,
-						 double relativeErrorTol) {
+	public LevenbergBase(double initialDampParam ) {
 		this.initialDampParam = initialDampParam;
-		this.absoluteErrorTol = absoluteErrorTol;
-		this.relativeErrorTol = relativeErrorTol;
+	}
+
+	/**
+	 * Specify convergence tolerances
+	 *
+	 * @param gtol absolute convergence tolerance based on gradient norm. 0 <= gtol
+	 */
+	public void setConvergence(  double gtol ) {
+		if( gtol < 0 )
+			throw new IllegalArgumentException("gtol < 0 ");
+
+		this.gtol = gtol;
 	}
 
 	/**
@@ -140,9 +139,7 @@ public abstract class LevenbergBase {
 
 		hasConverged = false;
 		mode = 0;
-		fnormPrev = 0;
 		dampParam = initialDampParam;
-		step = 0;
 		nu = 2;
 		iterationCount = 0;
 	}
@@ -206,13 +203,8 @@ public abstract class LevenbergBase {
 		// Find the derivative along the current Jacobian's direction
 		double gx = CommonOps.elementMaxAbs(g);
 
-		// check for absolute convergence
-		if( Math.abs(fnorm-fnormPrev) <= absoluteErrorTol && step*Math.abs(gx) <= absoluteErrorTol )
-			return terminateSearch(true, null);
-
-		// check for relative convergence
-		if( Math.abs(fnorm-fnormPrev) <= relativeErrorTol*Math.abs(fnorm)
-				&& step*Math.abs(gx) <= relativeErrorTol*Math.abs(fnorm) )
+		// check for convergence
+		if( fnorm == 0 || Math.abs(gx) <= gtol )
 			return terminateSearch(true, null);
 
 		mode = 1;
@@ -248,10 +240,7 @@ public abstract class LevenbergBase {
 			DenseMatrix64F temp = x;
 			x = xtest; xtest = temp;
 			// updated residual norm
-			fnormPrev = fnorm;
 			fnorm = ftestnorm;
-			// update step magnitude
-			step = NormOps.normF(xdelta);
 
 			// reduction ratio
 			double ratio = actualReduction/predictedReduction;

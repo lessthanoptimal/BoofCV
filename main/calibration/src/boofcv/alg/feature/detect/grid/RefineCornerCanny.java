@@ -45,7 +45,7 @@ public class RefineCornerCanny {
 
 	// structures used to refine pixel estimate to sub-pixel accuracy
 	private CostFunction func = new CostFunction();
-	private UnconstrainedMinimization alg = FactoryOptimization.unconstrained(1e-8, 1e-8, 0);
+	private UnconstrainedMinimization alg = FactoryOptimization.unconstrained(0);
 
 	DetectEdgeContour<ImageFloat32> detectEdge;
 
@@ -172,7 +172,7 @@ public class RefineCornerCanny {
 		param[3] = Math.atan2(initial.sideB.y-initial.corner.y,initial.sideB.x-initial.corner.x);
 
 		alg.setFunction(func,null);
-		alg.initialize(param);
+		alg.initialize(param,0,1e-8);
 
 		if( !UtilOptimize.process(alg, 500) ) {
 //			throw new InvalidCalibrationTarget("Minimization failed?!? "+alg.getWarning());

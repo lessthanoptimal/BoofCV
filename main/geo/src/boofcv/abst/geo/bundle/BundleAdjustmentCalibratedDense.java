@@ -46,10 +46,12 @@ public class BundleAdjustmentCalibratedDense
 	CalibPoseAndPointRodriguesJacobian jacobian = new CalibPoseAndPointRodriguesJacobian();
 
 	int maxIterations;
+	double convergenceTol;
 
 	public BundleAdjustmentCalibratedDense(double convergenceTol,
 										   int maxIterations ) {
-		minimizer = FactoryOptimization.leastSquareLevenberg(convergenceTol, convergenceTol, 1e-3);
+		this.convergenceTol = convergenceTol;
+		minimizer = FactoryOptimization.leastSquareLevenberg( 1e-3);
 		codec = new CalibPoseAndPointRodriguesCodec();
 		this.maxIterations = maxIterations;
 	}
@@ -84,7 +86,7 @@ public class BundleAdjustmentCalibratedDense
 
 		// use a numerical jacobian
 		minimizer.setFunction(func,jacobian);
-		minimizer.initialize(param);
+		minimizer.initialize(param,convergenceTol*observations.size());
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )

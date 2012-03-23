@@ -26,8 +26,6 @@ import boofcv.numerics.optimization.wrap.WrapLevenbergDampened;
  */
 public class EvaluateLevenbergDampened extends UnconstrainedLeastSquaresEvaluator {
 
-	double absoluteErrorTol = 1e-15;
-	double relativeErrorTol = 1e-15;
 	double dampInit = 1e-3;
 
 	public EvaluateLevenbergDampened(boolean verbose) {
@@ -37,8 +35,7 @@ public class EvaluateLevenbergDampened extends UnconstrainedLeastSquaresEvaluato
 	@Override
 	protected UnconstrainedLeastSquares createSearch(double minimumValue) {
 
-		LevenbergDampened alg = new LevenbergDampened(dampInit,
-				absoluteErrorTol,relativeErrorTol);
+		LevenbergDampened alg = new LevenbergDampened(dampInit);
 		return new WrapLevenbergDampened(alg);
 	}
 
