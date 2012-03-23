@@ -40,14 +40,16 @@ public class LeastSquaresHomography implements RefineEpipolarMatrix {
 
 	DenseMatrix64F found = new DenseMatrix64F(3,3);
 	int maxIterations;
+	double convergenceTol;
 
 	public LeastSquaresHomography(double convergenceTol,
 								  int maxIterations,
 								  ModelObservationResidualN residuals ) {
 		this.maxIterations = maxIterations;
+		this.convergenceTol = convergenceTol;
 		this.func = new ResidualsEpipolarMatrixN(null,residuals);
 
-		minimizer = FactoryOptimization.leastSquareLevenberg(convergenceTol, convergenceTol, 1e-3);
+		minimizer = FactoryOptimization.leastSquareLevenberg( 1e-3);
 	}
 
 	@Override
@@ -56,7 +58,7 @@ public class LeastSquaresHomography implements RefineEpipolarMatrix {
 		func.setObservations(obs);
 		minimizer.setFunction(func,null);
 
-		minimizer.initialize(F.data);
+		minimizer.initialize(F.data,convergenceTol*obs.size());
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )

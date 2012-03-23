@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ public class EvaluateQuasiNewtonBFGS extends UnconstrainedMinimizationEvaluator{
 
 	@Override
 	protected UnconstrainedMinimization createSearch(double minimumValue) {
-		return FactoryOptimization.unconstrained(1e-5,1e-8,minimumValue);
+		return FactoryOptimization.unconstrained(minimumValue);
 	}
 	
 	public static void main( String args[] ) {

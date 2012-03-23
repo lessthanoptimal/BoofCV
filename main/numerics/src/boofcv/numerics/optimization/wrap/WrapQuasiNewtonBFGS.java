@@ -33,27 +33,21 @@ import boofcv.numerics.optimization.impl.QuasiNewtonBFGS;
 public class WrapQuasiNewtonBFGS implements UnconstrainedMinimization {
 
 	// line search parmeters
-	private static final double gtol = 0.9;
-	private static final double ftol = 1e-3;
-	private static final double xtol = 0.1;
+	private static final double line_gtol = 0.9;
+	private static final double line_ftol = 1e-3;
+	private static final double line_xtol = 0.1;
 
 	QuasiNewtonBFGS alg;
-	double relativeErrorTol;
-	double absoluteErrorTol;
 	double minFunctionValue;
 
-	public WrapQuasiNewtonBFGS(double relativeErrorTol,
-							   double absoluteErrorTol,
-							   double minFunctionValue)
+	public WrapQuasiNewtonBFGS( double minFunctionValue)
 	{
-		this.relativeErrorTol = relativeErrorTol;
-		this.absoluteErrorTol = absoluteErrorTol;
 		this.minFunctionValue = minFunctionValue;
 	}
 
 	@Override
 	public void setFunction(FunctionNtoS function, FunctionNtoN gradient) {
-		LineSearch lineSearch = new LineSearchMore94(ftol,gtol,xtol);
+		LineSearch lineSearch = new LineSearchMore94(line_ftol,line_gtol,line_xtol);
 
 		GradientLineFunction gradLine;
 
@@ -63,11 +57,12 @@ public class WrapQuasiNewtonBFGS implements UnconstrainedMinimization {
 			gradLine = new CachedGradientLineFunction(function,gradient);
 		}
 
-		alg = new QuasiNewtonBFGS(gradLine,lineSearch,minFunctionValue,gtol,relativeErrorTol,absoluteErrorTol);
+		alg = new QuasiNewtonBFGS(gradLine,lineSearch,minFunctionValue);
 	}
 
 	@Override
-	public void initialize(double[] initial) {
+	public void initialize(double[] initial, double ftol, double gtol) {
+		alg.setConvergence(ftol,gtol,line_gtol);
 		alg.initialize(initial);
 	}
 

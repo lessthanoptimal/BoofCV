@@ -42,6 +42,7 @@ public class LeastSquaresPose implements RefinePerspectiveNPoint {
 
 	UnconstrainedLeastSquares minimizer;
 	int maxIterations;
+	double convergenceTol;
 
 	Se3_F64 found = new Se3_F64();
 
@@ -50,7 +51,8 @@ public class LeastSquaresPose implements RefinePerspectiveNPoint {
 	{
 		this.maxIterations = maxIterations;
 		this.paramModel = paramModel;
-		this.minimizer = FactoryOptimization.leastSquareLevenberg(convergenceTol, convergenceTol, 1e-3);
+		this.convergenceTol = convergenceTol;
+		this.minimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
 
 		func = new ResidualsPoseMatrix(paramModel,new PoseResidualsSimple());
 
@@ -66,7 +68,7 @@ public class LeastSquaresPose implements RefinePerspectiveNPoint {
 
 		minimizer.setFunction(func,null);
 
-		minimizer.initialize(param);
+		minimizer.initialize(param,convergenceTol*obs.size());
 
 		System.out.println("  error before "+minimizer.getFunctionValue());
 		for( int i = 0; i < maxIterations; i++ ) {

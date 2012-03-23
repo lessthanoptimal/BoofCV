@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ public abstract class UnconstrainedLeastSquaresEvaluator {
 
 		double initialError = NormOps.normF(output);
 		
-		alg.initialize(initial);
+		alg.initialize(initial,1e-20);
 		int iter;
 		for( iter = 0; iter < maxIteration && !alg.iterate() ; iter++ ){
 			printError(optimal, alg);

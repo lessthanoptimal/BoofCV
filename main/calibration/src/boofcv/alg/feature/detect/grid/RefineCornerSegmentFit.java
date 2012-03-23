@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.grid;
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.io.image.UtilImageIO;
+import boofcv.misc.BoofMiscOps;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedMinimization;
 import boofcv.numerics.optimization.functions.FunctionNtoS;
@@ -102,7 +102,7 @@ public class RefineCornerSegmentFit {
 
 	// structures used to refine pixel estimate to sub-pixel accuracy
 	private CostFunction func = new CostFunction();
-	private UnconstrainedMinimization alg = FactoryOptimization.unconstrained(1e-8,1e-8,0);
+	private UnconstrainedMinimization alg = FactoryOptimization.unconstrained(0);
 
 	// output corner
 	private Point2D_F64 corner;
@@ -229,7 +229,7 @@ public class RefineCornerSegmentFit {
 
 		// sanity check
 		if( highThresh <= lowThresh ) {
-			UtilImageIO.print(image);
+			BoofMiscOps.print(image);
 			for( int i = 0; i < histHighRes.histogram.length; i++ ) {
 				int c = histHighRes.histogram[i];
 				if( c != 0 ) {
@@ -329,7 +329,7 @@ public class RefineCornerSegmentFit {
 		param[3] = Math.atan2(initial.sideB.y-initial.corner.y,initial.sideB.x-initial.corner.x);
 
 		alg.setFunction(func,null);
-		alg.initialize(param);
+		alg.initialize(param,0,1e-8);
 
 		if( !UtilOptimize.process(alg,500) ) {
 			throw new InvalidCalibrationTarget("Minimization failed?!? "+alg.getWarning());

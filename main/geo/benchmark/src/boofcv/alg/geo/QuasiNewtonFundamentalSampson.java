@@ -43,6 +43,7 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolarMatrix {
 
 	DenseMatrix64F found = new DenseMatrix64F(3,3);
 	int maxIterations;
+	double convergenceTol;
 
 	public QuasiNewtonFundamentalSampson(double convergenceTol, int maxIterations) {
 		this( new ParamFundamentalEpipolar() , convergenceTol, maxIterations);
@@ -52,10 +53,11 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolarMatrix {
 										 double convergenceTol, int maxIterations) {
 		this.paramModel = paramModel;
 		this.maxIterations = maxIterations;
+		this.convergenceTol = convergenceTol;
 
 		param = new double[paramModel.getParamLength()];
 
-		minimizer = FactoryOptimization.unconstrained(convergenceTol,convergenceTol,0);
+		minimizer = FactoryOptimization.unconstrained(0);
 	}
 
 	@Override
@@ -66,7 +68,7 @@ public class QuasiNewtonFundamentalSampson implements RefineEpipolarMatrix {
 
 		minimizer.setFunction(func,null);
 
-		minimizer.initialize(param);
+		minimizer.initialize(param,0,convergenceTol*obs.size());
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )

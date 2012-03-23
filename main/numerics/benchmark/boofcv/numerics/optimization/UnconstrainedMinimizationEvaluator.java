@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public abstract class UnconstrainedMinimizationEvaluator {
 
 	boolean verbose = true;
 	boolean printSummary = true;
-	int maxIteration = 500;
+	int maxIteration = 1000;
 
 	protected UnconstrainedMinimizationEvaluator(boolean verbose, boolean printSummary) {
 		this.verbose = verbose;
@@ -70,7 +70,7 @@ public abstract class UnconstrainedMinimizationEvaluator {
 
 		double initialValue = func.process(initial);
 
-		alg.initialize(initial);
+		alg.initialize(initial,1e-12,1e-12);
 		int iter;
 		for( iter = 0; iter < maxIteration && !alg.iterate() ; iter++ ){
 			printError(optimal, alg);

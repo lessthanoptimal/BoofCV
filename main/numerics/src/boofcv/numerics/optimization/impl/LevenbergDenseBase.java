@@ -23,6 +23,8 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
 /**
+ * Base class for Levenberg solvers which use dense matrices.
+ *
  * @author Peter Abeles
  */
 public abstract class LevenbergDenseBase extends LevenbergBase {
@@ -39,8 +41,8 @@ public abstract class LevenbergDenseBase extends LevenbergBase {
 	// Least-squares Function being optimized
 	protected CoupledJacobian function;
 
-	public LevenbergDenseBase(double initialDampParam, double absoluteErrorTol, double relativeErrorTol) {
-		super(initialDampParam, absoluteErrorTol, relativeErrorTol);
+	public LevenbergDenseBase(double initialDampParam) {
+		super(initialDampParam);
 	}
 
 	@Override

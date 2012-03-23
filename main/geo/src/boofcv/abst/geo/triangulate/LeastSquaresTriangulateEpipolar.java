@@ -41,11 +41,13 @@ public class LeastSquaresTriangulateEpipolar implements RefineTriangulationEpipo
 
 	double param[] = new double[3];
 	int maxIterations;
+	double convergenceTol;
 
 	public LeastSquaresTriangulateEpipolar(double convergenceTol, int maxIterations)
 	{
 		this.maxIterations = maxIterations;
-		minimizer = FactoryOptimization.leastSquareLevenberg(convergenceTol, convergenceTol, 1e-3);
+		this.convergenceTol = convergenceTol;
+		minimizer = FactoryOptimization.leastSquareLevenberg( 1e-3);
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public class LeastSquaresTriangulateEpipolar implements RefineTriangulationEpipo
 		param[1] = worldPt.y;
 		param[2] = worldPt.z;
 
-		minimizer.initialize(param);
+		minimizer.initialize(param,convergenceTol*observations.size());
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )

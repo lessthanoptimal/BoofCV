@@ -46,6 +46,7 @@ public class LeastSquaresFundamental implements RefineEpipolarMatrix {
 
 	DenseMatrix64F found = new DenseMatrix64F(3,3);
 	int maxIterations;
+	double convergenceTol;
 
 	public LeastSquaresFundamental(double convergenceTol,
 								   int maxIterations,
@@ -59,6 +60,7 @@ public class LeastSquaresFundamental implements RefineEpipolarMatrix {
 								   boolean useSampson) {
 		this.paramModel = paramModel;
 		this.maxIterations = maxIterations;
+		this.convergenceTol = convergenceTol;
 
 		param = new double[paramModel.getParamLength()];
 
@@ -70,7 +72,7 @@ public class LeastSquaresFundamental implements RefineEpipolarMatrix {
 
 		func = new ResidualsEpipolarMatrix(paramModel,residual);
 
-		minimizer = FactoryOptimization.leastSquareLevenberg(convergenceTol, convergenceTol, 1e-3);
+		minimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
 	}
 
 	@Override
@@ -81,7 +83,7 @@ public class LeastSquaresFundamental implements RefineEpipolarMatrix {
 
 		minimizer.setFunction(func,null);
 
-		minimizer.initialize(param);
+		minimizer.initialize(param,convergenceTol*obs.size());
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )
