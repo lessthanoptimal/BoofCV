@@ -64,7 +64,7 @@ public class TestLevenbergMarquardtDampened {
 		FunctionNtoM residual = new TrivialLeastSquaresResidual(a,b);
 		FunctionNtoMxN jacobian = new NumericalJacobianForward(residual);
 
-		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.pseudoInverse();
+		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.pseudoInverse(true);
 
 		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,1e-3);
 

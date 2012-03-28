@@ -18,7 +18,6 @@
 
 package boofcv.numerics.optimization.impl;
 
-import boofcv.numerics.optimization.OptimizationException;
 import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -90,7 +89,7 @@ public abstract class LevenbergBase {
 	 *
 	 * @param gtol absolute convergence tolerance based on gradient norm. 0 <= gtol
 	 */
-	public void setConvergence(  double gtol ) {
+	public void setConvergence( double gtol ) {
 		if( gtol < 0 )
 			throw new IllegalArgumentException("gtol < 0 ");
 
@@ -176,9 +175,8 @@ public abstract class LevenbergBase {
 	 * Performs a single step in the optimization.
 	 *
 	 * @return true if the optimization has finished.
-	 * @throws boofcv.numerics.optimization.OptimizationException
 	 */
-	public boolean iterate() throws OptimizationException {
+	public boolean iterate() {
 		updatedParameters = false;
 		if( mode == 0 ) {
 			return initSamplePoint();

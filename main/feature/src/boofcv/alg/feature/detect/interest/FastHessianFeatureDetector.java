@@ -78,10 +78,10 @@ import java.util.List;
  * 110, Issue 3, pages 346-359
  * </p>
  *
+ * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
+ *
  * @author Peter Abeles
  */
-// todo Do not compute intensity along the border, instead set it to zero?
-// TODO or handle the border in a more intelligent way
 public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 
 	// finds features from 2D intensity image
@@ -103,11 +103,11 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 	private int numberOfOctaves;
 
 	// local variables that are predeclared
-	int sizes[];
+	private int sizes[];
 
 	// how often the image is sampled in the first octave
 	// a value of 1 would mean every pixel is sampled
-	int initialSampleRate;
+	private int initialSampleRate;
 
 	/**
 	 * <p>

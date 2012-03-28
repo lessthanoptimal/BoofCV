@@ -103,7 +103,7 @@ public class PnPLepetitEPnP {
 	// used to solve various linear problems
 	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(12,12,false,true,false);
 	private LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.leastSquares(6,4);
-	private LinearSolver<DenseMatrix64F> solverPinv = LinearSolverFactory.pseudoInverse();
+	private LinearSolver<DenseMatrix64F> solverPinv = LinearSolverFactory.pseudoInverse(true);
 
 	// weighting factor to go from control point into world coordinate
 	protected DenseMatrix64F alphas = new DenseMatrix64F(1,1);

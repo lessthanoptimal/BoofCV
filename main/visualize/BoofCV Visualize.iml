@@ -13,6 +13,7 @@
     <orderEntry type="module" module-name="BoofCV Feature" />
     <orderEntry type="module" module-name="BoofCV Geometric Vision" />
     <orderEntry type="module" module-name="GeoRegression" />
+    <orderEntry type="library" name="testing" level="project" />
   </component>
 </module>
 

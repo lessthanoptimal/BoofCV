@@ -65,7 +65,7 @@ public class Relinearlize {
 	DenseMatrix64F xx = new DenseMatrix64F(1,1);
 
 	// used to compute one possible solution
-	LinearSolver<DenseMatrix64F> pseudo = LinearSolverFactory.pseudoInverse();
+	LinearSolver<DenseMatrix64F> pseudo = LinearSolverFactory.pseudoInverse(true);
 
 	// stores constraints
 	double XiiXjk[] = new double[10];
