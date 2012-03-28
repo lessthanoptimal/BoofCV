@@ -69,7 +69,7 @@ public class FactoryOptimization {
 		LinearSolver<DenseMatrix64F> solver;
 
 		if( robust ) {
-			solver = LinearSolverFactory.pseudoInverse();
+			solver = LinearSolverFactory.pseudoInverse(true);
 		} else {
 			solver = LinearSolverFactory.symmPosDef(10);
 		}

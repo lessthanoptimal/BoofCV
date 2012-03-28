@@ -63,6 +63,8 @@ import java.util.List;
  * [2] Lindeberg, T., "Feature detection with automatic scale selection." IJCV 30(2) (1998) 79 – 116
  * </p>
  *
+ * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})

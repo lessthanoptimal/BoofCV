@@ -69,9 +69,9 @@ public abstract class LevenbergDenseBase extends LevenbergBase {
 		internalInitialize(function.getN(),function.getM());
 		this.function = function;
 
-		jacobianVals.reshape(M,N,false);
+		jacobianVals.reshape(M,N);
 
-		B.reshape(N, N, false);
-		Bdiag.reshape(N,1,false);
+		B.reshape(N, N);
+		Bdiag.reshape(N,1);
 	}
 }

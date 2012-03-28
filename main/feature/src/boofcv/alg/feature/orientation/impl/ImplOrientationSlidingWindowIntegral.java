@@ -54,11 +54,14 @@ public class ImplOrientationSlidingWindowIntegral
 	QuickSort_F64 sorter = new QuickSort_F64();
 
 	/**
+	 * Specifies configuration parameters and initializes data structures
 	 *
+	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
 	 * @param windowSize Angular window that is slide across
 	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
 	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
 	 * @param sampleKernelWidth Size of kernel doing the sampling.  Typically 4.
+	 * @param imageType Type of image being processed.
 	 */
 	public ImplOrientationSlidingWindowIntegral(double samplePeriod, double windowSize,
 												int radius, double weightSigma, int sampleKernelWidth,

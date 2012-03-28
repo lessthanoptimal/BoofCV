@@ -18,40 +18,27 @@
 
 package boofcv.numerics.optimization;
 
-import boofcv.numerics.optimization.impl.LevenbergMarquardtDampened;
-import boofcv.numerics.optimization.wrap.WrapLevenbergDampened;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
-import org.ejml.data.DenseMatrix64F;
+import boofcv.numerics.optimization.impl.DoglegStep;
+import boofcv.numerics.optimization.impl.TrustRegionLeastSquares;
+import boofcv.numerics.optimization.wrap.WrapTrustRegion;
 
 /**
  * @author Peter Abeles
  */
-public class EvaluateLevenbergMarquardtDampened extends UnconstrainedLeastSquaresEvaluator {
+public class EvaluateTrustRegion extends UnconstrainedLeastSquaresEvaluator {
 
-	boolean robust = true;
-	double dampInit = 1e-3;
-
-	public EvaluateLevenbergMarquardtDampened(boolean verbose) {
+	public EvaluateTrustRegion(boolean verbose) {
 		super(verbose, true);
 	}
 
 	@Override
 	protected UnconstrainedLeastSquares createSearch(double minimumValue) {
-		LinearSolver<DenseMatrix64F> solver;
-
-		if( robust ) {
-			solver = LinearSolverFactory.pseudoInverse(true);
-		} else {
-			solver = LinearSolverFactory.symmPosDef(10);
-		}
-
-		LevenbergMarquardtDampened alg = new LevenbergMarquardtDampened(solver,dampInit);
-		return new WrapLevenbergDampened(alg);
+		TrustRegionLeastSquares alg = new TrustRegionLeastSquares(100000,new DoglegStep());
+		return new WrapTrustRegion(alg);
 	}
 
 	public static void main( String args[] ) {
-		EvaluateLevenbergMarquardtDampened eval = new EvaluateLevenbergMarquardtDampened(false);
+		EvaluateTrustRegion eval = new EvaluateTrustRegion(false);
 
 		System.out.println("Powell              ----------------");
 		eval.powell();

@@ -127,6 +127,20 @@ public class FactoryOrientationAlgs {
 						,imageType);
 	}
 
+	/**
+	 * Estimates the orientation of a region by using a sliding window across the different potential
+	 * angles.
+	 *
+	 * @see OrientationSlidingWindow
+	 *
+	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
+	 * @param windowSize Angular window that is slide across
+	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
+	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
+	 * @param sampleWidth Size of kernel doing the sampling.  Typically 4.
+	 * @param imageType Type of image being processed.
+	 * @return OrientationIntegral
+	 */
 	public static <T extends ImageSingleBand>
 	OrientationIntegral<T> sliding_ii(double samplePeriod, double windowSize, int radius,
 									  double weightSigma, int sampleWidth, Class<T> imageType)
