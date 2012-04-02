@@ -18,27 +18,29 @@
 
 package boofcv.numerics.optimization;
 
-import boofcv.numerics.optimization.impl.DoglegStep;
+import boofcv.numerics.optimization.impl.DoglegStepF;
 import boofcv.numerics.optimization.impl.TrustRegionLeastSquares;
 import boofcv.numerics.optimization.wrap.WrapTrustRegion;
 
 /**
  * @author Peter Abeles
  */
-public class EvaluateTrustRegion extends UnconstrainedLeastSquaresEvaluator {
+public class EvaluateTrustRegionLeastSquares extends UnconstrainedLeastSquaresEvaluator {
 
-	public EvaluateTrustRegion(boolean verbose) {
-		super(verbose, true);
+	public EvaluateTrustRegionLeastSquares(boolean verbose) {
+		super(verbose, false);
 	}
 
 	@Override
 	protected UnconstrainedLeastSquares createSearch(double minimumValue) {
-		TrustRegionLeastSquares alg = new TrustRegionLeastSquares(100000,new DoglegStep());
+		TrustRegionLeastSquares alg = new TrustRegionLeastSquares(1,new DoglegStepF());
+//		TrustRegionLeastSquares alg = new TrustRegionLeastSquares(1,new DoglegStepFtF());
+//		TrustRegionLeastSquares alg = new TrustRegionLeastSquares(1,new CauchyStep());
 		return new WrapTrustRegion(alg);
 	}
 
 	public static void main( String args[] ) {
-		EvaluateTrustRegion eval = new EvaluateTrustRegion(false);
+		EvaluateTrustRegionLeastSquares eval = new EvaluateTrustRegionLeastSquares(false);
 
 		System.out.println("Powell              ----------------");
 		eval.powell();

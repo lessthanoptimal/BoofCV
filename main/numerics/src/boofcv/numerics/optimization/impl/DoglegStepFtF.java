@@ -27,12 +27,16 @@ import org.ejml.ops.NormOps;
 
 /**
  * <p>
- * Approximates the optimal step within the trust region using the so called dogleg.  This implementation
- * is based off the description found in [1,2], but some of the equations have been modified for simplicity and
- * correctness.
- *
+ * Approximates the optimal step within the trust region using the so called dogleg.
+ * The Gauss Newton step is computed by squaring the Jacobian.  In systems where the number
+ * of functions is much larger than the number of parameters this can be faster, but slightly
+ * less precise.
  * </p>
  *
+ * <p>
+ * This implementation is based off the description found in [1,2], but some of the equations
+ * have been modified for simplicity and correctness.
+ * </p>
  *
  * <p>
  * <ul>
@@ -43,10 +47,10 @@ import org.ejml.ops.NormOps;
  *
  * @author Peter Abeles
  */
-public class DoglegStep implements TrustRegionStep {
+public class DoglegStepFtF implements TrustRegionStep {
 
-	// use QR decomposition to solve the system, should work even if it is degenerate
-	private LinearSolver<DenseMatrix64F> pinv = LinearSolverFactory.pseudoInverse(false);
+	// Linear solver for positive semi-definite symmetric matrix
+	private LinearSolver<DenseMatrix64F> pinv;
 
 	// B=J'*J estimated Hessian
 	private DenseMatrix64F B = new DenseMatrix64F(1,1);
@@ -74,6 +78,23 @@ public class DoglegStep implements TrustRegionStep {
 	// intermediate values when computing cauchy step
 	private double gBg;
 	private double gnorm;
+
+	/**
+	 * Specify configuration
+	 *
+	 * @param pinv Linear solver for a positive semi-definite symmetric system
+	 */
+	public DoglegStepFtF(LinearSolver<DenseMatrix64F> pinv) {
+		this.pinv = pinv;
+	}
+
+	/**
+	 * Default solver
+	 */
+	public DoglegStepFtF() {
+		this(LinearSolverFactory.leastSquaresQrPivot(true,false));
+//		this(LinearSolverFactory.pseudoInverse(true));
+	}
 
 	@Override
 	public void init(int numParam, int numFunctions) {
@@ -115,6 +136,7 @@ public class DoglegStep implements TrustRegionStep {
 	 */
 	@Override
 	public void computeStep(double regionRadius, DenseMatrix64F step) {
+
 		// of the Gauss-Newton solution is inside the trust region use that
 		if( distanceGN <= regionRadius ) {
 			step.set(stepGN);
@@ -153,9 +175,38 @@ public class DoglegStep implements TrustRegionStep {
 	 * point.  The distance is computed so that it is at the edge of the allowed region.
 	 */
 	protected void combinedStep(double regionRadius, DenseMatrix64F step) {
-		// find a point that is a linear interpolation between the Cauchy and GN points
+		// find the Cauchy point
 		CommonOps.scale(-distanceCauchy, gradient, stepCauchy);
 
+		// compute the combined step
+		double beta = combinedStep(stepCauchy,stepGN,regionRadius,step);
+
+		// compute the predicted reduction
+
+		// This was found by plugging in h=beta*stepGN + stepC*(1-beta) to
+		// L(0) - L(h) = -F(x)'*J(x)*h - 0.5*h'*B*h
+
+		double dotGandGN = VectorVectorMult.innerProd(stepGN,gradient);
+		double oneMb = (1-beta);
+		double left = -0.5*distanceCauchy*distanceCauchy*oneMb*oneMb*gBg;
+		double middle = -distanceCauchy*oneMb*(beta-1)*gnorm*gnorm;
+		double right = (beta*beta/2.0 - beta)*dotGandGN;
+
+		predicted = left+middle+right;
+	}
+
+	/**
+	 * Combined step that is a linear interpolation between the cauchy and Gauss-Newton steps.
+	 * Returns the 'beta' variable.
+	 *
+	 * phi(beta) = ||a + beta*(b-1)||^2 - radius^2
+	 *
+	 * where a = Cauchy and b = Gauss-Newton steps
+	 *
+	 * @return 'beta' from equation above
+	 */
+	protected static double combinedStep( DenseMatrix64F stepCauchy , DenseMatrix64F stepGN ,
+										  double regionRadius , DenseMatrix64F step ) {
 		// c = a'*(b-a)
 		double c = 0;
 		for( int i = 0; i < stepCauchy.numRows; i++ )
@@ -188,18 +239,7 @@ public class DoglegStep implements TrustRegionStep {
 		for( int i = 0; i < stepCauchy.numRows; i++ )
 			step.data[i] = stepCauchy.data[i] + beta*(stepGN.data[i]-stepCauchy.data[i]);
 
-		// compute the predicted reduction
-
-		// This was found by plugging in h=beta*stepGN + stepC*(1-beta) to
-		// L(0) - L(h) = -F(x)'*J(x)*h - 0.5*h'*B*h
-
-		double dotGandGN = VectorVectorMult.innerProd(stepGN,gradient);
-		double oneMb = (1-beta);
-		double left = -0.5*distanceCauchy*distanceCauchy*oneMb*oneMb*gBg;
-		double middle = -distanceCauchy*oneMb*(beta-1)*gnorm*gnorm;
-		double right = (beta*beta/2.0 - beta)*dotGandGN;
-
-		predicted = left+middle+right;
+		return beta;
 	}
 
 	/**

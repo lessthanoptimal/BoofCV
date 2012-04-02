@@ -48,8 +48,8 @@ public class WrapLevenbergDampened implements UnconstrainedLeastSquares {
 	}
 
 	@Override
-	public void initialize(double[] initial, double gtol) {
-		alg.setConvergence(gtol);
+	public void initialize(double[] initial, double ftol , double gtol) {
+		alg.setConvergence(ftol,gtol);
 		alg.initialize(initial);
 	}
 

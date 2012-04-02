@@ -63,7 +63,7 @@ public class LeastSquaresTriangulateCalibrated implements RefineTriangulationCal
 		param[2] = worldPt.z;
 
 
-		minimizer.initialize(param,convergenceTol*observations.size());
+		minimizer.initialize(param,0,convergenceTol*observations.size());
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )

@@ -21,6 +21,7 @@ package boofcv.abst.geo.bundle;
 import boofcv.abst.geo.BundleAdjustmentCalibrated;
 import boofcv.alg.geo.bundle.*;
 import boofcv.numerics.optimization.FactoryOptimization;
+import boofcv.numerics.optimization.RegionStepType;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import georegression.struct.se.Se3_F64;
 
@@ -51,7 +52,7 @@ public class BundleAdjustmentCalibratedDense
 	public BundleAdjustmentCalibratedDense(double convergenceTol,
 										   int maxIterations ) {
 		this.convergenceTol = convergenceTol;
-		minimizer = FactoryOptimization.leastSquareLevenberg( 1e-3);
+		minimizer = FactoryOptimization.leastSquaresTrustRegion(1, RegionStepType.DOG_LEG_F,false);
 		codec = new CalibPoseAndPointRodriguesCodec();
 		this.maxIterations = maxIterations;
 	}
@@ -86,7 +87,7 @@ public class BundleAdjustmentCalibratedDense
 
 		// use a numerical jacobian
 		minimizer.setFunction(func,jacobian);
-		minimizer.initialize(param,convergenceTol*observations.size());
+		minimizer.initialize(param,0,convergenceTol*observations.size());
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )

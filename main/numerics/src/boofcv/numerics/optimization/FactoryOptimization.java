@@ -18,10 +18,10 @@
 
 package boofcv.numerics.optimization;
 
-import boofcv.numerics.optimization.impl.LevenbergDampened;
-import boofcv.numerics.optimization.impl.LevenbergMarquardtDampened;
+import boofcv.numerics.optimization.impl.*;
 import boofcv.numerics.optimization.wrap.WrapLevenbergDampened;
 import boofcv.numerics.optimization.wrap.WrapQuasiNewtonBFGS;
+import boofcv.numerics.optimization.wrap.WrapTrustRegion;
 import org.ejml.alg.dense.linsol.LinearSolver;
 import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.data.DenseMatrix64F;
@@ -90,5 +90,49 @@ public class FactoryOptimization {
 	{
 		LevenbergDampened alg = new LevenbergDampened(dampInit);
 		return new WrapLevenbergDampened(alg);
+	}
+
+	/**
+	 * Creates a trust region based optimization algorithm for least squares problem.
+	 *
+	 * @see TrustRegionLeastSquares
+	 *
+	 *
+	 * @param regionSize
+	 * @param type
+	 * @return
+	 */
+	public static UnconstrainedLeastSquares leastSquaresTrustRegion( double regionSize ,
+																	 RegionStepType type ,
+																	 boolean robustSolver )
+	{
+		TrustRegionStep stepAlg;
+
+		switch( type ) {
+			case CAUCHY:
+				stepAlg = new CauchyStep();
+				break;
+
+			case DOG_LEG_F:
+				if( robustSolver )
+					stepAlg = new DoglegStepF(LinearSolverFactory.pseudoInverse(true));
+				else
+					stepAlg = new DoglegStepF(LinearSolverFactory.leastSquaresQrPivot(true, false));
+				break;
+
+			case DOG_LEG_FTF:
+				if( robustSolver )
+					stepAlg = new DoglegStepFtF(LinearSolverFactory.pseudoInverse(true));
+				else
+					stepAlg = new DoglegStepFtF(LinearSolverFactory.leastSquaresQrPivot(true, false));
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown type = "+type);
+		}
+		
+		TrustRegionLeastSquares alg = new TrustRegionLeastSquares(regionSize,stepAlg);
+
+		return new WrapTrustRegion(alg);
 	}
 }

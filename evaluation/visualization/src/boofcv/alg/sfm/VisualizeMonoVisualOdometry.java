@@ -183,7 +183,7 @@ extends VideoProcessAppBase<I,D> {
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 //		inputs.add(new PathLabel("walking", "/home/pja/temp/foo.mjpeg"));
 //		inputs.add(new PathLabel("walking", "/home/pja/temp/low.mjpeg"));
-		inputs.add(new PathLabel("walking", "/home/pja/temp/low_curve.mjpeg"));
+		inputs.add(new PathLabel("walking", "/home/pja/temp/foo2.mjpeg"));
 
 		app.setInputList(inputs);
 

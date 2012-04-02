@@ -83,7 +83,7 @@ public class LeastSquaresFundamental implements RefineEpipolarMatrix {
 
 		minimizer.setFunction(func,null);
 
-		minimizer.initialize(param,convergenceTol*obs.size());
+		minimizer.initialize(param,0,convergenceTol*obs.size());
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )

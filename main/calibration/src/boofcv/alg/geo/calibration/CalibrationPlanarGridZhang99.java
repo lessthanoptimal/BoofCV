@@ -19,6 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.numerics.optimization.FactoryOptimization;
+import boofcv.numerics.optimization.RegionStepType;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.numerics.optimization.impl.UtilOptimize;
 import georegression.geometry.RotationMatrixGenerator;
@@ -144,15 +145,17 @@ public class CalibrationPlanarGridZhang99 {
 		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
 				initial.createNew(),assumeZeroSkew , grid,observations);
 
-		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresLM(1e-3,true);
+		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresTrustRegion(1, RegionStepType.DOG_LEG_FTF,false);
+//		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresLM(1e-3,true);
+//		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquareLevenberg(1e-3);
 
 		double model[] = new double[ initial.size() ];
 		initial.convertToParam(assumeZeroSkew,model);
 
 		lm.setFunction(func,null);
-		lm.initialize(model,1e-12*observations.size());
+		lm.initialize(model,1e-10,1e-25*observations.size());
 
-		if( !UtilOptimize.process(lm,50) ) {
+		if( !UtilOptimize.process(lm,500) ) {
 			return false;
 		}
 

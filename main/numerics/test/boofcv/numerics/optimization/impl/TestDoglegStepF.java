@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestDoglegStep {
+public class TestDoglegStepF {
 
 	double cauchyRadius = 0.5;
 	double gaussRadius = 10;
@@ -38,7 +38,7 @@ public class TestDoglegStep {
 
 	DenseMatrix64F J,x,residuals,gradient;
 
-	public TestDoglegStep() {
+	public TestDoglegStepF() {
 		J = new DenseMatrix64F(3,2,true,1,0.5,2,Math.sqrt(2),-2,4);
 
 		x = new DenseMatrix64F(2,1,true,0.5,1.5);
@@ -81,7 +81,7 @@ public class TestDoglegStep {
 	 */
 	@Test
 	public void computeStep_GaussNewton() {
-		DoglegStep alg = new DoglegStep();
+		DoglegStepFtF alg = new DoglegStepFtF();
 
 		alg.init(2, 3);
 		alg.setInputs(x, residuals, J, gradient, -1);
@@ -181,7 +181,7 @@ public class TestDoglegStep {
 		return 0.5*left + middle + 0.5*right;
 	}
 	
-	protected  static class WrappedDog extends DoglegStep {
+	protected  static class WrappedDog extends DoglegStepF {
 		boolean calledCombined = false;
 		boolean calledCauchy = false;
 

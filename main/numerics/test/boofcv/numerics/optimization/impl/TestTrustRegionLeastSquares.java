@@ -59,7 +59,7 @@ public class TestTrustRegionLeastSquares {
 
 		TrustRegionLeastSquares alg = new TrustRegionLeastSquares(2,stepAlg);
 
-		alg.setConvergence(1e-6);
+		alg.setConvergence(1e-6,1e-6);
 		alg.setFunction(new WrapCoupledJacobian(residual,jacobian));
 
 		return alg;
@@ -70,37 +70,33 @@ public class TestTrustRegionLeastSquares {
 	 */
 	@Test
 	public void basicTest_Cauchy() {
-		double a=2,b=0.1;
-
-		TrustRegionLeastSquares alg = createAlg(a,b,new CauchyStep());
-
-		alg.initialize(new double[]{1,0.5});
-		alg.setConvergence(1e-8);
-
-		int i;
-		for( i = 0; i < 200 && !alg.iterate(); i++ ) { }
-
-		// should converge way before this
-		assertTrue(i!=200);
-		assertTrue(alg.isConverged());
-
-		double found[] = alg.getParameters();
-
-		assertEquals(a,found[0],1e-4);
-		assertEquals(b, found[1], 1e-4);
+		basicTest(new CauchyStep());
 	}
 
 	/**
 	 * Basic test that is easily solved using the CauchyStep
 	 */
 	@Test
-	public void basicTest_Dogleg() {
+	public void basicTest_DoglegFtF() {
+		basicTest(new DoglegStepFtF());
+	}
+
+	/**
+	 * Basic test that is easily solved using the CauchyStep
+	 */
+	@Test
+	public void basicTest_DoglegF() {
+		basicTest(new DoglegStepF());
+	}
+
+
+	protected void basicTest( TrustRegionStep step ) {
 		double a=2,b=0.1;
 
-		TrustRegionLeastSquares alg = createAlg(a,b,new DoglegStep());
+		TrustRegionLeastSquares alg = createAlg(a,b,step);
 
 		alg.initialize(new double[]{1,0.5});
-		alg.setConvergence(1e-8);
+		alg.setConvergence(1e-8,1e-8);
 
 		int i;
 		for( i = 0; i < 200 && !alg.iterate(); i++ ) { }
@@ -114,6 +110,7 @@ public class TestTrustRegionLeastSquares {
 		assertEquals(a,found[0],1e-4);
 		assertEquals(b, found[1], 1e-4);
 	}
+	
 
 	static class DummyStep implements TrustRegionStep {
 
