@@ -36,8 +36,10 @@ public abstract class LevenbergBase {
 	// number of functions
 	protected int M;
 
-	// tolerance for termination
+	// tolerance for termination. magnitude of gradient. absolute
 	private double gtol;
+	// tolerance for termination, change in function value.  relative
+	private double ftol;
 
 	// current set of parameters being considered
 	private DenseMatrix64F x = new DenseMatrix64F(1,1);
@@ -52,6 +54,8 @@ public abstract class LevenbergBase {
 
 	// function value norm at x
 	private double fnorm;
+	// previous value of fnorm
+	private double fnormPrev;
 
 	// levenberg marquardt dampening parameter
 	private double dampParam;
@@ -89,11 +93,14 @@ public abstract class LevenbergBase {
 	 *
 	 * @param gtol absolute convergence tolerance based on gradient norm. 0 <= gtol
 	 */
-	public void setConvergence( double gtol ) {
+	public void setConvergence( double ftol , double gtol ) {
+		if( ftol < 0 || ftol >= 1 )
+			throw new IllegalArgumentException("0 <= ftol < 1");
 		if( gtol < 0 )
 			throw new IllegalArgumentException("gtol < 0 ");
 
 		this.gtol = gtol;
+		this.ftol = ftol;
 	}
 
 	/**
@@ -135,7 +142,8 @@ public abstract class LevenbergBase {
 
 		// error at this point
 		fnorm = computeError();
-
+		fnormPrev = 0;
+		
 		hasConverged = false;
 		mode = 0;
 		dampParam = initialDampParam;
@@ -202,9 +210,11 @@ public abstract class LevenbergBase {
 		double gx = CommonOps.elementMaxAbs(g);
 
 		// check for convergence
-		if( fnorm == 0 || Math.abs(gx) <= gtol )
+		if( Math.abs(fnorm-fnormPrev) <= ftol*Math.max(fnorm,fnormPrev) || Math.abs(gx) <= gtol )
 			return terminateSearch(true, null);
 
+		fnormPrev = fnorm;
+		
 		mode = 1;
 		return false;
 	}

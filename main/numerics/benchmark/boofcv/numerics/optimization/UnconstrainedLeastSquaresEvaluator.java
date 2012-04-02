@@ -22,8 +22,6 @@ import boofcv.numerics.optimization.funcs.*;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
 import boofcv.numerics.optimization.functions.FunctionNtoMxN;
 import boofcv.numerics.optimization.impl.NumericalJacobianForward;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.NormOps;
 
 /**
  * @author Peter Abeles
@@ -67,27 +65,33 @@ public abstract class UnconstrainedLeastSquaresEvaluator {
 		UnconstrainedLeastSquares alg = createSearch(minimValue);
 		alg.setFunction(f,d);
 
-		DenseMatrix64F output = new DenseMatrix64F(f.getM(),1);
-		func.process(initial,output.data);
-
-		double initialError = NormOps.normF(output);
-		
-		alg.initialize(initial,1e-20);
+		alg.initialize(initial,1e-10,1e-20);
+		double initialError = alg.getFunctionValue();
 		int iter;
-		for( iter = 0; iter < maxIteration && !alg.iterate() ; iter++ ){
-			printError(optimal, alg);
+		for( iter = 0; iter < maxIteration && !alg.iterate() ; iter++ ) {
+			if( verbose && alg.isUpdated() ) {
+				double error = alg.getFunctionValue();
+				System.out.println("  error = "+error);
+			}
 		}
-		printError(optimal, alg);
 		if( verbose )
 			System.out.println("*** total iterations = "+iter);
 		double found[] = alg.getParameters();
-
-		func.process(found,output.data);
-		double finalError = NormOps.normF(output);
+		double finalError = alg.getFunctionValue();
 
 		if( printSummary ) {
-			System.out.printf("value{ init %4.1e final = %6.2e} count f = %2d d = %2d\n",
-					initialError, finalError, f.count, d.count);
+			// compute distance from optimal solution if one is provided
+			double dist = Double.NaN;
+			if( optimal != null ) {
+				dist = 0;
+				for( int i = 0; i < func.getN(); i++ ) {
+					dist += Math.pow(found[i]-optimal[i],2);
+				}
+				dist = Math.sqrt(dist);
+			}
+			
+			System.out.printf("value{ init %7.1e final = %7.2e} optimal %7.1e count f = %2d d = %2d\n",
+					initialError, finalError, dist , f.count, d.count);
 		}
 
 		NonlinearResults ret = new NonlinearResults();
@@ -97,19 +101,6 @@ public abstract class UnconstrainedLeastSquaresEvaluator {
 		ret.x = found;
 
 		return ret;
-	}
-
-	private void printError(double[] optimal, UnconstrainedLeastSquares alg) {
-		if( optimal != null ) {
-			double x[] = alg.getParameters();
-			double n = 0;
-			for( int j = 0; j < x.length; j++ ) {
-				double dx = x[j]-optimal[j];
-				n += dx*dx;
-			}
-			if( verbose )
-				System.out.println("||x(k)-x(*)|| = "+Math.sqrt(n));
-		}
 	}
 
 	private NonlinearResults performTest( EvalFuncLeastSquares func ) {

@@ -58,7 +58,7 @@ public class LeastSquaresHomography implements RefineEpipolarMatrix {
 		func.setObservations(obs);
 		minimizer.setFunction(func,null);
 
-		minimizer.initialize(F.data,convergenceTol*obs.size());
+		minimizer.initialize(F.data,0,convergenceTol*obs.size());
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )

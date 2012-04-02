@@ -21,9 +21,23 @@ package boofcv.numerics.optimization.impl;
 import boofcv.numerics.optimization.functions.CoupledJacobian;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
+import org.ejml.ops.NormOps;
+import org.ejml.ops.SpecializedOps;
 
 /**
+ * <p>
+ * Trust region based optimization algorithms switch between the optimal Gauss Newton step and
+ * gradient descent.  A circular region is defined around the current estimate for which the
+ * Taylor series expansion is trusted.  If the Gauss Newton step falls within this "trust region"
+ * then it is used, otherwise the optimal quadratic solution is found subject to the trust
+ * region's constraint.
+ * </p>
  *
+ * <p>
+ * There are several different ways for which to estimate the solution to the trust region problem.
+ * The Levenberg-Marquardt algorithm is actually a type of trust region algorithm, even though
+ * it was originally proposed before the trust region approach had been.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -34,6 +48,8 @@ public class TrustRegionLeastSquares {
 
 	// error function at x
 	private double fx;
+	// the previous error
+	private double fx_prev;
 
 	// Jacobian
 	private DenseMatrix64F J = new DenseMatrix64F(1,1);
@@ -45,6 +61,8 @@ public class TrustRegionLeastSquares {
 	private DenseMatrix64F xdelta = new DenseMatrix64F(1,1);
 	// Residual error function
 	private DenseMatrix64F residuals = new DenseMatrix64F(1,1);
+	// Residual error for the candidate point
+	private DenseMatrix64F candidateResiduals = new DenseMatrix64F(1,1);
 	// Gradient of residuals
 	private DenseMatrix64F gradient = new DenseMatrix64F(1,1);
 
@@ -54,8 +72,10 @@ public class TrustRegionLeastSquares {
 	// maximum size of the trust region
 	private double maxRadius;
 
-	// gradient norm based
+	// tolerance for termination. magnitude of gradient. absolute
 	private double gtol;
+	// tolerance for termination, change in function value.  relative
+	private double ftol;
 
 	// function being optimized
 	private CoupledJacobian function;
@@ -70,7 +90,7 @@ public class TrustRegionLeastSquares {
 
 	public void setFunction( CoupledJacobian function ) {
 		this.function = function;
-		
+
 		int m = function.getM();
 		int n = function.getN();
 
@@ -79,6 +99,7 @@ public class TrustRegionLeastSquares {
 		xdelta.reshape(n,1);
 		J.reshape(m,n);
 		residuals.reshape(m,1);
+		candidateResiduals.reshape(m,1);
 		gradient.reshape(n, 1);
 
 		stepAlg.init(n,m);
@@ -89,11 +110,15 @@ public class TrustRegionLeastSquares {
 	 *
 	 * @param gtol absolute convergence tolerance based on gradient norm. 0 <= gtol
 	 */
-	public void setConvergence( double gtol ) {
+	public void setConvergence( double ftol , double gtol ) {
+		if( ftol < 0 || ftol >= 1 )
+			throw new IllegalArgumentException("0 <= ftol < 1");
+		
 		if( gtol < 0 )
 			throw new IllegalArgumentException("gtol < 0 ");
 
 		this.gtol = gtol;
+		this.ftol = ftol;
 	}
 
 	public void initialize(double[] initial) {
@@ -103,9 +128,15 @@ public class TrustRegionLeastSquares {
 
 		function.computeFunctions(residuals.data);
 		fx = cost(residuals);
+		fx_prev = 0;
 		regionRadius = maxRadius;
 	}
 
+	/**
+	 * Performs a single iteration.
+	 *
+	 * @return true if it has converged and false if it has not.
+	 */
 	public boolean iterate() {
 
 		updated = false;
@@ -117,7 +148,7 @@ public class TrustRegionLeastSquares {
 			// check for convergence
 			double gnorm = CommonOps.elementMaxAbs(gradient);
 
-			if( gnorm <= gtol) {
+			if( gnorm <= gtol || Math.abs(fx-fx_prev) <= ftol*Math.max(fx,fx_prev) ) {
 				mode = 2;
 				return true;
 			}
@@ -125,6 +156,7 @@ public class TrustRegionLeastSquares {
 			//initialize step finding
 			stepAlg.setInputs(x,residuals,J,gradient,fx);
 			mode = 1;
+			fx_prev = fx;
 
 		} else if( mode == 1 ) {
 			if( findStep() ) {
@@ -150,12 +182,15 @@ public class TrustRegionLeastSquares {
 		// evaluate the candidate point
 		CommonOps.add(x,xdelta,candidate);
 		function.setInput(candidate.data);
-		function.computeFunctions(residuals.data);
-		double fxp = cost(residuals);
+		function.computeFunctions(candidateResiduals.data);
+		double fxp = cost(candidateResiduals);
 
 		// ratio of predicted reduction versus actual reduction
 		double actual = fx-fxp;
 		double predicted = stepAlg.predictedReduction();
+
+		// uncomment to sanity check predicted reduction
+//		checkPredicted(predicted,xdelta);
 
 		boolean acceptCandidate;
 
@@ -163,19 +198,21 @@ public class TrustRegionLeastSquares {
 			acceptCandidate = true;
 		} else {
 			double reductionRatio = actual/predicted;
-
+//			System.out.println("      ratio "+reductionRatio);
+			
 			if( reductionRatio < 0.25 ) {
 				// if the model is a poor predictor reduce the size of the trust region
-				regionRadius = 0.25*regionRadius;
+				regionRadius = 0.5*regionRadius;
 			} else {
 				// only increase the size of the trust region if it is taking a step of maximum size
 				// otherwise just assume it's doing good enough job
-				if( reductionRatio > 0.75 && stepAlg.isMaxStep() ) {
-					regionRadius = Math.min(2*regionRadius,maxRadius);
+				if( reductionRatio > 0.75 ) {
+					double r = NormOps.normF(xdelta);
+					regionRadius = Math.max(regionRadius,3*r);
 				}
 			}
 
-			acceptCandidate = reductionRatio > 0.25;
+			acceptCandidate = reductionRatio > 0;
 		}
 
 		if( acceptCandidate ) {
@@ -183,21 +220,38 @@ public class TrustRegionLeastSquares {
 			DenseMatrix64F temp = x;
 			x = candidate;
 			candidate = temp;
+
+			temp=candidateResiduals;
+			candidateResiduals = residuals;
+			residuals=temp;
+
 			fx = fxp;
 			updated = true;
 		}
 
 		return acceptCandidate;
 	}
-	
+
+//	private void checkPredicted( double found , DenseMatrix64F step ) {
+//		SimpleMatrix J = SimpleMatrix.wrap(this.J);
+//		SimpleMatrix h = SimpleMatrix.wrap(step);
+//
+//		SimpleMatrix r = SimpleMatrix.wrap(residuals);
+//
+//		double z = SpecializedOps.elementSumSq(r.plus(J.mult(h)).getMatrix());
+//		double expected = fx-0.5*z;
+//
+//		if( Math.abs(found-expected)/Math.max(found,expected) > 1e-3 ) {
+//			System.out.println("found "+found+"  expected "+expected);
+//			throw new RuntimeException("Predicted reduction is unexpected");
+//		}
+//	}
+
+	/**
+	 * Cost is equal to (1/2)*f(x)<sup>T</sup>*f(x)
+	 */
 	private double cost( DenseMatrix64F residuals ) {
-		double ret = 0;
-		
-		for( int i = 0; i < residuals.numRows; i++ ) {
-			double r = residuals.data[i];
-			ret += r*r;
-		}
-		return 0.5*ret;
+		return 0.5*SpecializedOps.elementSumSq(residuals);
 	}
 
 	public double[] getParameters() {

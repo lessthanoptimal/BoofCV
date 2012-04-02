@@ -68,7 +68,7 @@ public class LeastSquaresPose implements RefinePerspectiveNPoint {
 
 		minimizer.setFunction(func,null);
 
-		minimizer.initialize(param,convergenceTol*obs.size());
+		minimizer.initialize(param,0,convergenceTol*obs.size());
 
 		System.out.println("  error before "+minimizer.getFunctionValue());
 		for( int i = 0; i < maxIterations; i++ ) {

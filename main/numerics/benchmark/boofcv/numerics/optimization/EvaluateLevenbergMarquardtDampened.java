@@ -33,7 +33,7 @@ public class EvaluateLevenbergMarquardtDampened extends UnconstrainedLeastSquare
 	double dampInit = 1e-3;
 
 	public EvaluateLevenbergMarquardtDampened(boolean verbose) {
-		super(verbose, true);
+		super(verbose, false);
 	}
 
 	@Override

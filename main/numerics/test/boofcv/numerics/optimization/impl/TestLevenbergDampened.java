@@ -63,7 +63,7 @@ public class TestLevenbergDampened {
 
 		LevenbergDampened alg = new LevenbergDampened(1e-3);
 
-		alg.setConvergence(1e-6);
+		alg.setConvergence(1e-6,1e-6);
 		alg.setFunction(new WrapCoupledJacobian(residual,jacobian));
 
 		return alg;

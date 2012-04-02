@@ -83,6 +83,19 @@ public class TestCauchyStep {
 		double middle = VectorVectorMult.innerProdA(residuals, J, h);
 		double right = VectorVectorMult.innerProdA(h, B, h);
 
+//		double cost =  0.5*left + middle + 0.5*right;
+//
+//		SimpleMatrix _r = SimpleMatrix.wrap(residuals);
+//		SimpleMatrix _J = SimpleMatrix.wrap(J);
+//		SimpleMatrix _h = SimpleMatrix.wrap(h);
+//
+//		double v = _r.plus(_J.mult(_h)).normF();
+//
+//		double alt = 0.5*v*v;
+//
+//		if( Math.abs(alt-cost) > 1e-8 )
+//			throw new RuntimeException("Oh crap");
+		
 		return 0.5*left + middle + 0.5*right;
 	}
 

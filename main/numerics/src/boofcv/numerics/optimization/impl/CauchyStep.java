@@ -40,17 +40,17 @@ import org.ejml.ops.NormOps;
  */
 public class CauchyStep implements TrustRegionStep {
 
-	DenseMatrix64F B = new DenseMatrix64F(1,1);
-	DenseMatrix64F gradient;
-	DenseMatrix64F residuals;
-	DenseMatrix64F J;
+	// square of the Jacobian
+	private DenseMatrix64F B = new DenseMatrix64F(1,1);
+	private DenseMatrix64F gradient;
 
-	double gBg;
-	double gnorm;
 
-	boolean maxStep;
+	private double gBg;
+	private double gnorm;
 
-	double predicted;
+	private boolean maxStep;
+
+	private double predicted;
 
 	public void init( int numParam , int numFunctions ) {
 		B.reshape(numParam,numParam);
@@ -65,10 +65,6 @@ public class CauchyStep implements TrustRegionStep {
 
 		gBg = VectorVectorMult.innerProdA(gradient, B, gradient);
 		gnorm = NormOps.normF(gradient);
-		
-		this.residuals = residuals;
-		this.J = J;
-
 	}
 
 	/**
