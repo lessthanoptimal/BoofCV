@@ -145,7 +145,8 @@ public class CalibrationPlanarGridZhang99 {
 		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
 				initial.createNew(),assumeZeroSkew , grid,observations);
 
-		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresTrustRegion(1, RegionStepType.DOG_LEG_FTF,false);
+		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresTrustRegion(1,
+				RegionStepType.DOG_LEG_FTF,false);
 //		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresLM(1e-3,true);
 //		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquareLevenberg(1e-3);
 
