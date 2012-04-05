@@ -38,6 +38,7 @@ public class ParametersZhang99 {
 	public double distortion[];
 
 	// position of each view of the target
+	// target to camera transform
 	public View[] views;
 
 	public ParametersZhang99(int numDistort, int numViews) {

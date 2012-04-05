@@ -23,6 +23,7 @@ import boofcv.alg.geo.calibration.ParametersZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.app.CalibrateMonoPlanar;
 import boofcv.app.ImageResults;
+import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import georegression.struct.point.Point2D_F64;
 
 import java.io.BufferedReader;
@@ -42,6 +43,8 @@ public class CalibrateUsingZhangData {
 	PlanarCalibrationTarget target;
 	List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
 	ParametersZhang99 found;
+
+	UnconstrainedLeastSquares optimizer;
 	
 	public void loadModel( String fileName) throws IOException {
 		System.out.println("loading model "+fileName);
@@ -78,6 +81,7 @@ public class CalibrateUsingZhangData {
 						  int numRadialParam) {
 		CalibrationPlanarGridZhang99 Zhang99
 				= new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam);
+		Zhang99.setOptimizer(optimizer);
 
 		if( !Zhang99.process(observations) ) {
 			throw new RuntimeException("Zhang99 algorithm failed!");
@@ -98,7 +102,19 @@ public class CalibrateUsingZhangData {
 			System.out.printf("radial[%d] = %6.2e\n",i,found.distortion[i]);
 		}
 	}
-	
+
+	public void printZhangError() {
+		ComputeZhangErrors.zhangResults(observations,target.points);
+	}
+
+	public void optimizeUsingZhang() {
+		ComputeZhangErrors.nonlinearUsingZhang(observations,target.points);
+	}
+
+	public void setOptimizer(UnconstrainedLeastSquares optimizer) {
+		this.optimizer = optimizer;
+	}
+
 	public static void main( String args[] ) throws IOException {
 		String base = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang/";
 
@@ -114,5 +130,13 @@ public class CalibrateUsingZhangData {
 		
 		System.out.println("Computing Calibration");
 		app.process(false,2);
+
+		System.out.println();
+		System.out.println("Results using Zhang's calibrated data");
+		app.printZhangError();
+
+		System.out.println();
+		System.out.println("Results using Zhang's initial parameters");
+		app.optimizeUsingZhang();
 	}
 }

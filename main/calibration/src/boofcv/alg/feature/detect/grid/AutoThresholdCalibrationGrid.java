@@ -93,7 +93,7 @@ public class AutoThresholdCalibrationGrid {
 		// first find a threshold which detects the target
 		for( int i = 0; i < maxAttempts; i++ ) {
 			selectedThreshold = selectNext(attempts,maxValue);
-			System.out.println("trying a threshold of "+selectedThreshold);
+//			System.out.println("trying a threshold of "+selectedThreshold);
 			
 			GThresholdImageOps.threshold(gray,binary,selectedThreshold,true);
 

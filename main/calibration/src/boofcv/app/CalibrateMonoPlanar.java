@@ -56,7 +56,7 @@ public class CalibrateMonoPlanar {
 	protected PlanarCalibrationDetector detector;
 
 	// computes calibration parameters
-	protected CalibrationPlanarGridZhang99 Zhang99;
+	protected CalibrationPlanarGridZhang99 zhang99;
 	// calibration configuration
 	protected PlanarCalibrationTarget target;
 	protected boolean assumeZeroSkew;
@@ -64,15 +64,11 @@ public class CalibrateMonoPlanar {
 	// computed parameters
 	protected ParametersZhang99 found;
 
-
 	// Information on calibration targets and results
 	protected List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
 	protected List<ImageResults> errors;
 
-	// how far along in the process is it
-	public int state;
-	// status message describing what it is up to
-	public String message;
+	public boolean verbose = false;
 
 	/**
 	 * High level configuration
@@ -96,16 +92,15 @@ public class CalibrateMonoPlanar {
 	{
 		this.assumeZeroSkew = assumeZeroSkew;
 		this.target = target;
-		Zhang99 = new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam);
+		zhang99 = new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam);
 	}
 
 	/**
 	 * Resets internal data structures.  Must call before adding images
 	 */
 	public void reset() {
-		state = 0;
-		message = "";
 		observations = new ArrayList<List<Point2D_F64>>();
+		errors = null;
 	}
 
 	/**
@@ -130,19 +125,19 @@ public class CalibrateMonoPlanar {
 	 * estimate calibration parameters.  Error statistics are also computed.
 	 */
 	public IntrinsicParameters process() {
-		updateStatus(1,"Estimating Parameters");
-		System.out.println("Estimating and optimizing numerical parameters");
-		if( !Zhang99.process(observations) ) {
+		if( !zhang99.process(observations) ) {
 			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
 
-		found = Zhang99.getOptimized();
+		found = zhang99.getOptimized();
 
-		updateStatus(2,"Computing Errors");
 		errors = computeErrors(observations,found,target.points,assumeZeroSkew);
-		printErrors(errors);
 
 		return found.convertToIntrinsic();
+	}
+
+	public void printStatistics() {
+		printErrors(errors);
 	}
 
 	/**
@@ -214,14 +209,6 @@ public class CalibrateMonoPlanar {
 			System.out.printf("image %3d Euclidean ( mean = %7.1e max = %7.1e ) bias ( X = %8.1e Y %8.1e )\n",i,r.meanError,r.maxError,r.biasX,r.biasY);
 		}
 		System.out.println("Average Mean Error = "+(totalError/results.size()));
-	}
-
-	/**
-	 * Lets the world know what it is doing
-	 */
-	private void updateStatus( int state , String message ) {
-		this.state = state;
-		this.message = message;
 	}
 
 	public List<List<Point2D_F64>> getObservations() {

@@ -65,18 +65,21 @@ public class CalibrateMonoPlanarApp {
 
 	public static void main( String args[] ) {
 //		PlanarCalibrationDetector detector = new WrapPlanarGridTarget();
-		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(8,8,4);
+//		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(8,8,4);
+		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(3,4,6);
 
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 1, 7 / 18);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 1, 7 / 18);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
 		CalibrateMonoPlanar app = new CalibrateMonoPlanar(detector);
 
 		app.reset();
 		app.configure(target,false,2);
 
-		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V";
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+//		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V";
 
-		List<String> images = directoryList(directory,"image");
+		List<String> images = directoryList(directory,"left");
 		
 		for( String n : images ) {
 			BufferedImage input = UtilImageIO.loadImage(n);
@@ -89,6 +92,11 @@ public class CalibrateMonoPlanarApp {
 
 		// save results to a file and print out
 		BoofMiscOps.saveXML(intrinsic,"intrinsic.xml");
+
+		app.printStatistics();
+		System.out.println();
+		System.out.println("--- Intrinsic Parameters ---");
+		System.out.println();
 		intrinsic.print();
 	}
 }

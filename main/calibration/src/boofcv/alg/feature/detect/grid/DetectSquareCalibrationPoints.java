@@ -124,7 +124,7 @@ public class DetectSquareCalibrationPoints {
 
 		// Remove all but the largest islands in the graph to reduce the number of combinations
 		List<QuadBlob> squaresPruned = ConnectGridSquares.pruneSmallIslands(squares);
-		System.out.println("Found "+squaresPruned.size()+" blobs");
+//		System.out.println("Found "+squaresPruned.size()+" blobs");
 		
 		// given all the blobs, only consider N at one time until a valid target is found
 		return shuffleToFindTarget(squaresPruned);
@@ -140,8 +140,8 @@ public class DetectSquareCalibrationPoints {
 		int N = gridCols * gridRows;
 		Combinations<QuadBlob> combinations = new Combinations<QuadBlob>(squares,N);
 
-		System.out.println("------------------------------------"+squares.size()+"  N "+N);
-		System.out.println("Total Shuffles: "+combinations.numShuffles());
+//		System.out.println("------------------------------------"+squares.size()+"  N "+N);
+//		System.out.println("Total Shuffles: "+combinations.numShuffles());
 		if( combinations.numShuffles() > maxCombinations) {
 			return fail("Not enough blobs detected");
 		}
@@ -151,7 +151,7 @@ public class DetectSquareCalibrationPoints {
 		int num = 0;
 		boolean success = false;
 		while( true ) {
-			System.out.println("Next combination "+num++);
+//			System.out.println("Next combination "+num++);
 			combinations.getList(list);
 
 			// assumes that all the items in the list are part of a target
