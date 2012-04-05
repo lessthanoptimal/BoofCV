@@ -69,7 +69,6 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	public CalibrateMonoPlanarGuiApp() {
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(800,525));
-		this.calibrator = calibrator;
 		this.owner = this;
 		
 		add(gui,BorderLayout.CENTER);
@@ -93,9 +92,10 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 
 	public void configure( PlanarCalibrationDetector detector ,
 						   PlanarCalibrationTarget target,
-						   String directory ) {
+						   String directory ,
+						   String prefix ) {
 
-		images = CalibrateMonoPlanarApp.directoryList(directory, "right");
+		images = CalibrateMonoPlanarApp.directoryList(directory, prefix );
 
 		calibrator = new CalibrateMonoPlanar(detector);
 		calibrator.configure(target,true,2);
@@ -114,7 +114,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	
 	public void process( String outputFileName ) {
 		calibrator.reset();
-		ProcessThread monitor = new ProcessThread();
+		final ProcessThread monitor = new ProcessThread();
 		monitor.start();
 
 		for( int i = 0; i < images.size(); i++ ) {
@@ -125,9 +125,11 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 				if( calibrator.addImage(input) ) {
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
-							gui.addImage(file.getName(),orig);
+							gui.addImage(file.getName(), orig);
 							gui.repaint();
-						}});
+							monitor.setMessage(0, file.getName());
+						}
+					});
 				} else {
 					System.out.println("Failed to detect image.  "+file.getName());
 				}
@@ -139,6 +141,11 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 				gui.setObservations(calibrator.getObservations());
 			}});
 		gui.repaint();
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				monitor.setMessage(1,"Estimating Parameters");
+			}});
 
 		IntrinsicParameters param = calibrator.process();
 		SwingUtilities.invokeLater(new Runnable() {
@@ -161,6 +168,13 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 
 				gui.repaint();
 			}});
+
+		// print the output
+		calibrator.printStatistics();
+		System.out.println();
+		System.out.println("--- Intrinsic Parameters ---");
+		System.out.println();
+		param.print();
 	}
 
 	@Override
@@ -174,16 +188,19 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	public class ProcessThread extends ProgressMonitorThread
 	{
 		public ProcessThread() {
-			super(new ProgressMonitor(owner, "Computing Calibration", "", 0, 3));
+			super(new ProgressMonitor(owner, "Computing Calibration", "", 0, 2));
+		}
+
+		public void setMessage( final int state , final String message ) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					monitor.setProgress(state);
+					monitor.setNote(message);
+				}});
 		}
 
 		@Override
 		public void doRun() {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					monitor.setProgress(calibrator.state);
-					monitor.setNote(calibrator.message);
-				}});
 		}
 	}
 
@@ -210,13 +227,14 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
-//		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
+		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
 //		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
-		app.configure(detector,target,directory);
+		app.configure(detector,target,directory,"frame");
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);
@@ -224,5 +242,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		frame.setVisible(true);
 
 		app.process("intrinsic.xml");
+
+
 	}
 }

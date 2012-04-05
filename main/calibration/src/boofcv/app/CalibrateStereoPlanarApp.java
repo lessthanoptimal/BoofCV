@@ -59,7 +59,6 @@ public class CalibrateStereoPlanarApp {
 
 	CalibrateMonoPlanar monoCalib;
 
-
 	public CalibrateStereoPlanarApp( PlanarCalibrationDetector detector )
 	{
 		monoCalib = new CalibrateMonoPlanar(detector);
@@ -98,8 +97,8 @@ public class CalibrateStereoPlanarApp {
 	public StereoParameters process() {
 
 		// calibrate left and right cameras
-		IntrinsicParameters leftCalib = calibrateMono(listLeft,viewLeft);
 		IntrinsicParameters rightCalib = calibrateMono(listRight,viewRight);
+		IntrinsicParameters leftCalib = calibrateMono(listLeft,viewLeft);
 
 		// fit motion from right to left
 		Se3_F64 leftToRight = computeLeftToRight();
@@ -153,9 +152,20 @@ public class CalibrateStereoPlanarApp {
 			Se3_F64 worldToLeft = viewLeft.get(i);
 			Se3_F64 worldToRight = viewRight.get(i);
 
+			System.out.println("----------------------------");
+			Se3_F64 l2w = new Se3_F64();
+			worldToLeft.invert(l2w);
+			Se3_F64 l2r = l2w.concat(worldToRight,null);
+			worldToLeft.getT().print();
+			worldToRight.getT().print();
+			l2r.getT().print();
+			double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(l2r.getR());
+			System.out.printf("  euler (%6f  %6f  %6f)\n",euler[0],euler[1],euler[2]);
+
+
 			for( Point3D_F64 p : points3D ) {
-				Point3D_F64 l = SePointOps_F64.transform(worldToLeft,p,null);
-				Point3D_F64 r = SePointOps_F64.transform(worldToRight,p,null);
+				Point3D_F64 l = SePointOps_F64.transform(worldToLeft, p, null);
+				Point3D_F64 r = SePointOps_F64.transform(worldToRight, p, null);
 
 				left.add(l);
 				right.add(r);
@@ -166,20 +176,20 @@ public class CalibrateStereoPlanarApp {
 	}
 
 	public static void main( String args[] ) {
-				PlanarCalibrationDetector detector = new WrapPlanarGridTarget(3,4);
-//		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(3,4,4);
+//		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(3,4);
+		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(3,4,6);
 
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3, 4, 30,30);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3, 4, 30,30);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 1, 7 / 18);
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
 		CalibrateStereoPlanarApp app = new CalibrateStereoPlanarApp(detector);
 
 //		app.reset();
 		app.configure(target,false,2);
 
-//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		List<String> left = CalibrateMonoPlanarApp.directoryList(directory, "left");
 		List<String> right = CalibrateMonoPlanarApp.directoryList(directory,"right");

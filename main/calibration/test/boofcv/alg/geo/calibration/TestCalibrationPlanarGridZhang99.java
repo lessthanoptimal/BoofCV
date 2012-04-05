@@ -87,7 +87,7 @@ public class TestCalibrationPlanarGridZhang99 {
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
-		assertTrue(CalibrationPlanarGridZhang99.optimizedParam(observations, grid, true, initial, found));
+		assertTrue(CalibrationPlanarGridZhang99.optimizedParam(observations, grid, true, initial, found,null));
 
 		checkEquals(initial, found,initial);
 	}
@@ -117,7 +117,7 @@ public class TestCalibrationPlanarGridZhang99 {
 			initial.distortion[i] = rand.nextGaussian()*expected.distortion[i]*0.1;
 		}
 
-		assertTrue(CalibrationPlanarGridZhang99.optimizedParam(observations, grid, true, initial, found));
+		assertTrue(CalibrationPlanarGridZhang99.optimizedParam(observations, grid, true, initial, found,null));
 
 		checkEquals(expected, found, initial);
 	}

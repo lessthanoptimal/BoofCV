@@ -19,7 +19,6 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.numerics.optimization.FactoryOptimization;
-import boofcv.numerics.optimization.RegionStepType;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.numerics.optimization.impl.UtilOptimize;
 import georegression.geometry.RotationMatrixGenerator;
@@ -58,6 +57,9 @@ public class CalibrationPlanarGridZhang99 {
 	// if true the intrinsic calibration matrix will have the skew parameter set to zero
 	private boolean assumeZeroSkew;
 
+	// optimization algorithm
+	private UnconstrainedLeastSquares optimizer;
+
 	/**
 	 * Configures calibration process.
 	 *
@@ -94,7 +96,7 @@ public class CalibrationPlanarGridZhang99 {
 			return false;
 
 		// perform non-linear optimization to improve results
-		if( !optimizedParam(observations,target.points,assumeZeroSkew,initial,optimized))
+		if( !optimizedParam(observations,target.points,assumeZeroSkew,initial,optimized,optimizer))
 			return false;
 
 		return true;
@@ -134,33 +136,36 @@ public class CalibrationPlanarGridZhang99 {
 	}
 
 	/**
-	 * Use non-linear optimization to improve the parameter estimtes
+	 * Use non-linear optimization to improve the parameter estimates
 	 */
 	public static boolean optimizedParam( List<List<Point2D_F64>> observations ,
 										  List<Point2D_F64> grid ,
 										  boolean assumeZeroSkew ,
 										  ParametersZhang99 initial ,
-										  ParametersZhang99 found )
+										  ParametersZhang99 found ,
+										  UnconstrainedLeastSquares optimizer )
 	{
 		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
 				initial.createNew(),assumeZeroSkew , grid,observations);
 
-		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresTrustRegion(1,
-				RegionStepType.DOG_LEG_FTF,false);
-//		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquaresLM(1e-3,true);
-//		UnconstrainedLeastSquares lm = FactoryOptimization.leastSquareLevenberg(1e-3);
+		if( optimizer == null ) {
+//			optimizer = FactoryOptimization.leastSquaresTrustRegion(1,
+//					RegionStepType.DOG_LEG_FTF,true);
+			optimizer = FactoryOptimization.leastSquaresLM(1e-3,true);
+//			optimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
+		}
 
 		double model[] = new double[ initial.size() ];
 		initial.convertToParam(assumeZeroSkew,model);
 
-		lm.setFunction(func,null);
-		lm.initialize(model,1e-10,1e-25*observations.size());
+		optimizer.setFunction(func,null);
+		optimizer.initialize(model,1e-10,1e-25*observations.size());
 
-		if( !UtilOptimize.process(lm,500) ) {
+		if( !UtilOptimize.process(optimizer,500) ) {
 			return false;
 		}
 
-		double param[] = lm.getParameters();
+		double param[] = optimizer.getParameters();
 		found.setFromParam(assumeZeroSkew,param);
 
 		return true;
@@ -214,6 +219,13 @@ public class CalibrationPlanarGridZhang99 {
 
 		pt.x += pt.x*a;
 		pt.y += pt.y*a;
+	}
+
+	/**
+	 * Specify which optimization algorithm to use
+	 */
+	public void setOptimizer(UnconstrainedLeastSquares optimizer) {
+		this.optimizer = optimizer;
 	}
 
 	public ParametersZhang99 getOptimized() {
