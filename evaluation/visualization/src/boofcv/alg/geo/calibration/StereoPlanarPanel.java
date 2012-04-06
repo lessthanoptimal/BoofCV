@@ -18,10 +18,8 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.distort.ImageDistort;
 import boofcv.app.ImageResults;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -38,75 +36,81 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * GUI interface for {@link CalibrateMonoPlanarGuiApp}.  Displays results for each calibration
- * image in a window.
- * 
+ * Panel for displaying information on observed calibration grids during the calibration process.
+ *
  * @author Peter Abeles
  */
-public class MonoPlanarPanel extends JPanel implements ItemListener ,
-		ListSelectionListener, ChangeListener 
+public class StereoPlanarPanel extends JPanel
+	implements ListSelectionListener, ItemListener, ChangeListener
 {
+	// display for calibration information on individual cmaeras
+	CalibratedImageGridPanel leftView = new CalibratedImageGridPanel();
+	CalibratedImageGridPanel rightView = new CalibratedImageGridPanel();
 
-	CalibratedImageGridPanel mainView = new CalibratedImageGridPanel();
-	
+	// list of images and calibration results
+	List<BufferedImage> listLeft = new ArrayList<BufferedImage>();
+	List<BufferedImage> listRight = new ArrayList<BufferedImage>();
+
+	List<ImageResults> leftResults;
+	List<ImageResults> rightResults;
+
+	// GUI components
 	JCheckBox checkPoints;
 	JCheckBox checkErrors;
 	JCheckBox checkUndistorted;
 	JCheckBox checkAll;
 	JCheckBox checkNumbers;
 	JSpinner selectErrorScale;
-	
+
+	JTextArea meanErrorLeft;
+	JTextArea maxErrorLeft;
+	JTextArea meanErrorRight;
+	JTextArea maxErrorRight;
+
 	JList imageList;
+	List<String> names = new ArrayList<String>();
 
-	JTextArea meanError;
-	JTextArea maxError;
-
-	JTextArea paramCenterX;
-	JTextArea paramCenterY;
-	JTextArea paramA;
-	JTextArea paramB;
-	JTextArea paramC;
+	int selectedImage;
 
 	boolean showPoints = true;
 	boolean showErrors = true;
 	boolean showUndistorted = false;
 	boolean showAll = false;
 	boolean showNumbers = true;
+	double errorScale = 20;
 
-	int selectedImage = 0;
-
-	List<String> names = new ArrayList<String>();
-	List<BufferedImage> images = new ArrayList<BufferedImage>();
-	List<List<Point2D_F64>> features = new ArrayList<List<Point2D_F64>>();
-	List<ImageResults> results = new ArrayList<ImageResults>();
-
-	int errorScale = 20;
-
-	ImageDistort<ImageFloat32> undoRadial;
-	
-	public MonoPlanarPanel() {
+	public StereoPlanarPanel() {
 		super(new BorderLayout());
 
-		JToolBar toolBar = createToolBar();
+		leftView.setImages(listLeft);
+		rightView.setImages(listRight);
 
 		imageList = new JList();
 		imageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		imageList.addListSelectionListener(this);
 
-		meanError = createErrorComponent();
-		maxError = createErrorComponent();
-		paramCenterX = createErrorComponent();
-		paramCenterY = createErrorComponent();
-		paramA = createErrorComponent();
-		paramB = createErrorComponent();
-		paramC = createErrorComponent();
+		meanErrorLeft = createTextComponent();
+		maxErrorLeft = createTextComponent();
+		meanErrorRight = createTextComponent();
+		maxErrorRight = createTextComponent();
 
-		mainView.setImages(images);
-		mainView.setResults(features,results);
+		JToolBar toolBar = createToolBar();
+
+		JPanel center = new JPanel();
+		center.setLayout(new GridLayout(1,2));
+		center.add(leftView);
+		center.add(rightView);
 
 		add(toolBar, BorderLayout.PAGE_START);
-		add(mainView, BorderLayout.CENTER);
+		add(center, BorderLayout.CENTER);
 		add(new SideBar(), BorderLayout.WEST);
+	}
+
+	private JTextArea createTextComponent() {
+		JTextArea comp = new JTextArea(1,6);
+		comp.setMaximumSize(comp.getPreferredSize());
+		comp.setEditable(false);
+		return comp;
 	}
 
 	private JToolBar createToolBar() {
@@ -147,60 +151,58 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		return toolBar;
 	}
 
-	private JTextArea createErrorComponent() {
-		JTextArea comp = new JTextArea(1,6);
-		comp.setMaximumSize(comp.getPreferredSize());
-		comp.setEditable(false);
-		return comp;
-	}
-	
-	public void addImage( String name , BufferedImage image ) {
+	public void addPair( String name , BufferedImage imageLeft , BufferedImage imageRight )
+	{
+		listLeft.add(imageLeft);
+		listRight.add(imageRight);
 		names.add(name);
-		images.add(image);
 
 		imageList.removeListSelectionListener(this);
 		imageList.setListData(new Vector<Object>(names));
 		if( names.size() == 1 ) {
 			imageList.addListSelectionListener(this);
-			mainView.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
+			leftView.setPreferredSize(new Dimension(imageLeft.getWidth(),imageLeft.getHeight()));
+			rightView.setPreferredSize(new Dimension(imageRight.getWidth(),imageRight.getHeight()));
 			imageList.setSelectedIndex(0);
 		} else {
-			// each time an image is added it resets the selected value
-			imageList.setSelectedIndex(selectedImage);
 			imageList.addListSelectionListener(this);
 		}
-
+		validate();
 	}
 
-	public void setObservations( List<List<Point2D_F64>> features  ) {
-		this.features = features;
-	}
+	public synchronized void setObservations( List<List<Point2D_F64>> leftObservations , List<ImageResults> leftResults ,
+											  List<List<Point2D_F64>> rightObservations , List<ImageResults> rightResults ) {
+		leftView.setResults(leftObservations,leftResults);
+		rightView.setResults(rightObservations,rightResults);
 
-	public void setResults(List<ImageResults> results) {
-		mainView.setResults(features,results);
-		this.results = results;
+		this.leftResults = leftResults;
+		this.rightResults = rightResults;
+
 		updateResultsGUI();
 	}
 
-	public void setCalibration(ParametersZhang99 found) {
-		String textX = String.format("%5.1f",found.x0);
-		String textY = String.format("%5.1f", found.y0);
-		paramCenterX.setText(textX);
-		paramCenterY.setText(textY);
+	protected void setSelected( int selected ) {
+		selectedImage = selected;
+		leftView.setSelected(selected);
+		rightView.setSelected(selected);
 
-		String textA = String.format("%5.1f",found.a);
-		String textB = String.format("%5.1f",found.b);
-		paramA.setText(textA);
-		paramB.setText(textB);
-		String textC = String.format("%5.1e",found.c);
-		paramC.setText(textC);
+		updateResultsGUI();
 	}
 
-	public void setCorrection( ImageDistort<ImageFloat32> undoRadial )
-	{
-		this.undoRadial = undoRadial;
-		checkUndistorted.setEnabled(true);
-		mainView.setDistorted(undoRadial);
+	private synchronized void updateResultsGUI() {
+		if( leftResults != null && rightResults != null && selectedImage < leftResults.size() ) {
+			ImageResults r = leftResults.get(selectedImage);
+			String textMean = String.format("%5.1e", r.meanError);
+			String textMax = String.format("%5.1e",r.maxError);
+			meanErrorLeft.setText(textMean);
+			maxErrorLeft.setText(textMax);
+
+			r = rightResults.get(selectedImage);
+			textMean = String.format("%5.1e", r.meanError);
+			textMax = String.format("%5.1e",r.maxError);
+			meanErrorRight.setText(textMean);
+			maxErrorRight.setText(textMax);
+		}
 	}
 
 	@Override
@@ -216,8 +218,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		} else if( e.getSource() == checkNumbers ) {
 			showNumbers = checkNumbers.isSelected();
 		}
-		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
-		mainView.repaint();
+		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		leftView.repaint();
+		rightView.repaint();
 	}
 
 	@Override
@@ -227,26 +231,8 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 		if( imageList.getSelectedIndex() >= 0 ) {
 			setSelected(imageList.getSelectedIndex());
-			mainView.repaint();
-		}
-	}
-
-	private void setSelected( int selected ) {
-		mainView.setSelected(selected);
-		selectedImage = selected;
-
-		if( results != null ) {
-			updateResultsGUI();
-		}
-	}
-
-	private void updateResultsGUI() {
-		if( selectedImage < results.size() ) {
-			ImageResults r = results.get(selectedImage);
-			String textMean = String.format("%5.1e", r.meanError);
-			String textMax = String.format("%5.1e",r.maxError);
-			meanError.setText(textMean);
-			maxError.setText(textMax);
+			leftView.repaint();
+			rightView.repaint();
 		}
 	}
 
@@ -256,8 +242,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			errorScale = ((Number) selectErrorScale.getValue()).intValue();
 		}
 
-		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
-		mainView.repaint();
+		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		leftView.repaint();
+		rightView.repaint();
 	}
 
 	private class SideBar extends StandardAlgConfigPanel
@@ -265,16 +253,17 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		public SideBar() {
 			JScrollPane scroll = new JScrollPane(imageList);
 
-			addLabeled(meanError,"Mean Error",this);
-			addLabeled(maxError, "Max Error", this);
+			addCenterLabel("Left",this);
+			addLabeled(meanErrorLeft,"Mean Error",this);
+			addLabeled(maxErrorLeft, "Max Error", this);
 			addSeparator(200);
-			addLabeled(paramCenterX,"Xc",this);
-			addLabeled(paramCenterY,"Yc",this);
-			addLabeled(paramA,"fx",this);
-			addLabeled(paramB,"fy",this);
-			addLabeled(paramC,"skew",this);
+			addCenterLabel("Right",this);
+			addLabeled(meanErrorRight,"Mean Error",this);
+			addLabeled(maxErrorRight, "Max Error", this);
 			addSeparator(200);
 			add(scroll);
 		}
 	}
+
+
 }

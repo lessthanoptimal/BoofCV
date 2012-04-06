@@ -48,12 +48,26 @@ import java.util.List;
  * </ol>
  * </p>
  *
+ * <p>
+ * If the image coordinates are in a left handed coordinate system, which is standard, then they can be put into
+ * a right handed coordinate system by setting the 'leftHanded' constructor flag to true.  If true, then
+ * the y-axis coordinate of observations is adjusted so that the image bottom left corner is the (0,0) coordinate
+ * and that the y-axis is pointed in the positive direction.  This is accomplished by setting y = height - 1 - obs.y,
+ * where height is the image height.  <b>If the camera calibration is adjusted into a right handed coordinate system
+ * as just specified then all other references to pixel coordinates need to be adjusted the same way.</b>
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class CalibrateMonoPlanar {
 
 	// detects calibration points inside of images
 	protected PlanarCalibrationDetector detector;
+
+	// are image coordinates in a left-handed coordinate system?
+	// most images have +y pointed down, which makes it left handed and breaks the standard right handed
+	// assumption in other algorithms.  If true then the y-axis is adjusted so that it is pointed up
+	protected boolean convertToRightHanded;
 
 	// computes calibration parameters
 	protected CalibrationPlanarGridZhang99 zhang99;
@@ -66,6 +80,8 @@ public class CalibrateMonoPlanar {
 
 	// Information on calibration targets and results
 	protected List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
+	// adjusted observations so that they are in a right handed coordinate system
+	protected List<List<Point2D_F64>> observationsAdj = new ArrayList<List<Point2D_F64>>();
 	protected List<ImageResults> errors;
 
 	public boolean verbose = false;
@@ -73,10 +89,13 @@ public class CalibrateMonoPlanar {
 	/**
 	 * High level configuration
 	 *
-	 * @param detector Target detection.
+	 * @param detector Target detection algorithm.
+	 * @param convertToRightHanded If true it will convert a left handed image coordinate system into a right handed one.
+	 *                             Normally this should be true.
 	 */
-	public CalibrateMonoPlanar(PlanarCalibrationDetector detector) {
+	public CalibrateMonoPlanar(PlanarCalibrationDetector detector , boolean convertToRightHanded ) {
 		this.detector = detector;
+		this.convertToRightHanded = convertToRightHanded;
 	}
 
 	/**
@@ -115,7 +134,22 @@ public class CalibrateMonoPlanar {
 		if( !detector.process(image) )
 			return false;
 		else {
-			observations.add(detector.getPoints());
+			int h = image.getHeight()-1;
+			List<Point2D_F64> points = detector.getPoints();
+			List<Point2D_F64> adjusted = new ArrayList<Point2D_F64>();
+
+			// make it so +y is pointed up not down, and becomes a right handed coordinate system
+			if(convertToRightHanded) {
+				for( Point2D_F64 p : points ) {
+					Point2D_F64 a = new Point2D_F64(p.x,h-p.y);
+					adjusted.add(a);
+				}
+			} else {
+				adjusted.addAll(points);
+			}
+
+			observations.add(points);
+			observationsAdj.add(adjusted);
 			return true;
 		}
 	}
@@ -125,13 +159,13 @@ public class CalibrateMonoPlanar {
 	 * estimate calibration parameters.  Error statistics are also computed.
 	 */
 	public IntrinsicParameters process() {
-		if( !zhang99.process(observations) ) {
+		if( !zhang99.process(observationsAdj) ) {
 			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
 
 		found = zhang99.getOptimized();
 
-		errors = computeErrors(observations,found,target.points,assumeZeroSkew);
+		errors = computeErrors(observationsAdj,found,target.points,assumeZeroSkew);
 
 		return found.convertToIntrinsic();
 	}

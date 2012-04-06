@@ -85,20 +85,9 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 						   PlanarCalibrationTarget target,
 						   List<String> images  ) {
 
-		calibrator = new CalibrateMonoPlanar(detector);
+		calibrator = new CalibrateMonoPlanar(detector,true);
 		calibrator.configure(target,true,2);
 		this.images = images;
-	}
-
-	public void configure( PlanarCalibrationDetector detector ,
-						   PlanarCalibrationTarget target,
-						   String directory ,
-						   String prefix ) {
-
-		images = CalibrateMonoPlanarApp.directoryList(directory, prefix );
-
-		calibrator = new CalibrateMonoPlanar(detector);
-		calibrator.configure(target,true,2);
 	}
 
 	@Override
@@ -234,7 +223,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
-		app.configure(detector,target,directory,"frame");
+		app.configure(detector,target,CalibrateMonoPlanarApp.directoryList(directory, "frame" ));
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);
@@ -242,7 +231,5 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		frame.setVisible(true);
 
 		app.process("intrinsic.xml");
-
-
 	}
 }

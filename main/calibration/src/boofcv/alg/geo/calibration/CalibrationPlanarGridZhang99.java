@@ -30,8 +30,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>
  * Full implementation of the Zhang99 camera calibration algorithm using planar calibration targets.  First
  * linear approximations of camera parameters are computed, which are then refined using non-linear estimation.
+ * </p>
+ *
+ * <p>
+ * When processing the results be sure to take in account the coordinate system being left or right handed.  Calibration
+ * works just fine with either coordinate system, but most 3D geometric algorithms assume a right handed coordinate
+ * system while most images are left handed.
+ * </p>
  *
  * <p>
  * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations,",
@@ -137,6 +145,13 @@ public class CalibrationPlanarGridZhang99 {
 
 	/**
 	 * Use non-linear optimization to improve the parameter estimates
+	 *
+	 * @param observations Observations of calibration points in each image
+	 * @param grid Location of calibration points on calibration target
+	 * @param assumeZeroSkew Assume zero skew when computing calibration parameters
+	 * @param initial Initial estimate of calibration parameters.
+	 * @param found The refined calibration parameters.
+	 * @param optimizer Algorithm used to optimize parameters
 	 */
 	public static boolean optimizedParam( List<List<Point2D_F64>> observations ,
 										  List<Point2D_F64> grid ,
