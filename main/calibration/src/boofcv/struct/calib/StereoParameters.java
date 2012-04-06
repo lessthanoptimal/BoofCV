@@ -18,6 +18,8 @@
 
 package boofcv.struct.calib;
 
+import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
 import java.io.Serializable;
@@ -33,13 +35,13 @@ public class StereoParameters implements Serializable {
 	// intrinsic camera parameters of right camera
 	public IntrinsicParameters right;
 	// transform from left camera to right camera
-	public Se3_F64 leftToRight;
+	public Se3_F64 rightToLeft;
 
 	public StereoParameters(IntrinsicParameters left,
 							IntrinsicParameters right,
-							Se3_F64 leftToRight ) {
+							Se3_F64 rightToLeft ) {
 		this.left = left;
-		this.leftToRight = leftToRight;
+		this.rightToLeft = rightToLeft;
 		this.right = right;
 	}
 
@@ -54,12 +56,12 @@ public class StereoParameters implements Serializable {
 		this.left = left;
 	}
 
-	public Se3_F64 getLeftToRight() {
-		return leftToRight;
+	public Se3_F64 getRightToLeft() {
+		return rightToLeft;
 	}
 
-	public void setLeftToRight(Se3_F64 leftToRight) {
-		this.leftToRight = leftToRight;
+	public void setRightToLeft(Se3_F64 rightToLeft) {
+		this.rightToLeft = rightToLeft;
 	}
 
 	public IntrinsicParameters getRight() {
@@ -68,5 +70,19 @@ public class StereoParameters implements Serializable {
 
 	public void setRight(IntrinsicParameters right) {
 		this.right = right;
+	}
+
+	public void print() {
+		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(rightToLeft.getR());
+		Vector3D_F64 t = rightToLeft.getT();
+		System.out.println();
+		System.out.println("Left Camera");
+		left.print();
+		System.out.println();
+		System.out.println("Right Camera");
+		right.print();
+		System.out.println("Right to Left");
+		System.out.printf("  Euler       [ %8.3f , %8.3f , %8.3f ]\n",euler[0],euler[1],euler[2]);
+		System.out.printf("  Translation [ %8.3f , %8.3f , %8.3f ]\n",t.x,t.y,t.z);
 	}
 }

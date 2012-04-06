@@ -71,7 +71,7 @@ public class CalibrateMonoPlanarApp {
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 1, 7 / 18);
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
-		CalibrateMonoPlanar app = new CalibrateMonoPlanar(detector);
+		CalibrateMonoPlanar app = new CalibrateMonoPlanar(detector,true);
 
 		app.reset();
 		app.configure(target,false,2);

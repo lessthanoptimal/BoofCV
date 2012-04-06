@@ -19,161 +19,27 @@
 package boofcv.app;
 
 import boofcv.alg.geo.calibration.FactoryPlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.ParametersZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
-import georegression.fitting.se.FitSpecialEuclideanOps_F64;
-import georegression.geometry.RotationMatrixGenerator;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Given a sequence of observations from a stereo camera compute the intrinsic calibration
- * of each camera and the extrinsic calibration between the two cameras.  A Planar calibration
- * grid is used, which must be completely visible in all images.
+ * <p>
+ * Application for calibrating stereo images.  See {@link CalibrateStereoPlanar} for details on calibration
+ * procedures.
+ * </p>
+ *
  *
  * @author Peter Abeles
  */
-// todo handle a bad image gracefully
 public class CalibrateStereoPlanarApp {
-
-	// images for left and right cameras
-	List<ImageFloat32> listLeft = new ArrayList<ImageFloat32>();
-	List<ImageFloat32> listRight = new ArrayList<ImageFloat32>();
-
-	// location of the left in left and right images
-	List<Se3_F64> viewLeft = new ArrayList<Se3_F64>();
-	List<Se3_F64> viewRight = new ArrayList<Se3_F64>();
-
-	CalibrateMonoPlanar monoCalib;
-
-	public CalibrateStereoPlanarApp( PlanarCalibrationDetector detector )
-	{
-		monoCalib = new CalibrateMonoPlanar(detector);
-	}
-
-	/**
-	 * Specify calibration assumptions.
-	 *
-	 * @param target Describes the calibration target.
-	 * @param assumeZeroSkew If true zero skew is assumed.
-	 * @param numRadialParam Number of radial parameters
-	 */
-	public void configure( PlanarCalibrationTarget target ,
-						   boolean assumeZeroSkew ,
-						   int numRadialParam )
-	{
-		monoCalib.configure(target,assumeZeroSkew,numRadialParam);
-	}
-
-	/**
-	 * Adds a pair of images that observed the same target.
-	 *
-	 * @param left Image of left target.
-	 * @param right Image of right target.
-	 */
-	public void addPair( ImageFloat32 left ,ImageFloat32 right ) {
-		listLeft.add(left);
-		listRight.add(right);
-	}
-
-	/**
-	 * Compute stereo calibration parameters
-	 *
-	 * @return Stereo calibration parameters
-	 */
-	public StereoParameters process() {
-
-		// calibrate left and right cameras
-		IntrinsicParameters rightCalib = calibrateMono(listRight,viewRight);
-		IntrinsicParameters leftCalib = calibrateMono(listLeft,viewLeft);
-
-		// fit motion from right to left
-		Se3_F64 leftToRight = computeLeftToRight();
-
-		return new StereoParameters(leftCalib,rightCalib,leftToRight);
-	}
-
-	/**
-	 * Compute intrinsic calibration for one of the cameras
-	 */
-	private IntrinsicParameters calibrateMono( List<ImageFloat32> images , List<Se3_F64> location )
-	{
-		monoCalib.reset();
-		for( int i = 0; i < images.size(); i++ )
-			if( !monoCalib.addImage(images.get(i)) )
-				throw new RuntimeException("Can't handle failed detect yet");
-
-		IntrinsicParameters intrinsic = monoCalib.process();
-
-		ParametersZhang99 zhangParam = monoCalib.getFound();
-
-		for( ParametersZhang99.View v : zhangParam.views ) {
-			Se3_F64 pose = new Se3_F64();
-			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,pose.getR());
-			pose.getT().set(v.T);
-			location.add(pose);
-		}
-
-		return intrinsic;
-	}
-
-	/**
-	 * Computes the motion by projecting all the grid points onto the left and right
-	 * view then computing the transform from the point clouds.  Computing the "average"
-	 * rotation matrix is tricky, but this is idiot proof.
-	 *
-	 * @return Transform from left to right view.
-	 */
-	private Se3_F64 computeLeftToRight() {
-		List<Point2D_F64> points2D = monoCalib.getTarget().points;
-		List<Point3D_F64> points3D = new ArrayList<Point3D_F64>();
-
-		for( Point2D_F64 p : points2D ) {
-			points3D.add( new Point3D_F64(p.x,p.y,0));
-		}
-
-		List<Point3D_F64> left = new ArrayList<Point3D_F64>();
-		List<Point3D_F64> right = new ArrayList<Point3D_F64>();
-
-		for( int i = 0; i < viewLeft.size(); i++ ) {
-			Se3_F64 worldToLeft = viewLeft.get(i);
-			Se3_F64 worldToRight = viewRight.get(i);
-
-			System.out.println("----------------------------");
-			Se3_F64 l2w = new Se3_F64();
-			worldToLeft.invert(l2w);
-			Se3_F64 l2r = l2w.concat(worldToRight,null);
-			worldToLeft.getT().print();
-			worldToRight.getT().print();
-			l2r.getT().print();
-			double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(l2r.getR());
-			System.out.printf("  euler (%6f  %6f  %6f)\n",euler[0],euler[1],euler[2]);
-
-
-			for( Point3D_F64 p : points3D ) {
-				Point3D_F64 l = SePointOps_F64.transform(worldToLeft, p, null);
-				Point3D_F64 r = SePointOps_F64.transform(worldToRight, p, null);
-
-				left.add(l);
-				right.add(r);
-			}
-		}
-
-		return FitSpecialEuclideanOps_F64.fitPoints3D(left,right);
-	}
 
 	public static void main( String args[] ) {
 //		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(3,4);
@@ -183,7 +49,7 @@ public class CalibrateStereoPlanarApp {
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 1, 7 / 18);
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
-		CalibrateStereoPlanarApp app = new CalibrateStereoPlanarApp(detector);
+		CalibrateStereoPlanar app = new CalibrateStereoPlanar(detector,true);
 
 //		app.reset();
 		app.configure(target,false,2);
@@ -211,6 +77,6 @@ public class CalibrateStereoPlanarApp {
 
 		// save results to a file and print out
 		BoofMiscOps.saveXML(stereoCalib, "stereo.xml");
-//		stereoCalib.print();
+		stereoCalib.print();
 	}
 }
