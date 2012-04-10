@@ -32,7 +32,7 @@ public class TestLeftToRightHanded_F64 {
 	@Test
 	public void theSuperDuperTest() {
 		
-		LeftToRightHanded_F64 alg = new LeftToRightHanded_F64(new Dummy());
+		LeftToRightHanded_F64 alg = new LeftToRightHanded_F64(new Dummy(),1);
 		
 		Point2D_F64 out = new Point2D_F64();
 		alg.compute(2,3,out);

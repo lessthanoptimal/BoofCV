@@ -26,6 +26,8 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
+import org.ejml.ops.MatrixFeatures;
 import org.ejml.ops.NormOps;
 import org.junit.Test;
 
@@ -233,5 +235,85 @@ public class TestUtilEpipolar {
 		assertEquals(4,K.get(0,2),1e-3);
 		assertEquals(5,K.get(1,2),1e-3);
 		assertEquals(1,K.get(2,2),1e-3);
+	}
+
+	@Test
+	public void canonicalCamera() {
+		DenseMatrix64F K = UtilEpipolar.calibrationMatrix(200,250,0,100,110);
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
+
+		DenseMatrix64F E = UtilEpipolar.computeEssential(R,T);
+		DenseMatrix64F F = computeF(E,K);
+
+		Point3D_F64 e1 = new Point3D_F64();
+		Point3D_F64 e2 = new Point3D_F64();
+
+		CommonOps.scale(-2.0/F.get(0,1),F);
+		UtilEpipolar.extractEpipoles(F, e1, e2);
+
+		DenseMatrix64F P = UtilEpipolar.canonicalCamera(F,e2);
+
+		// recompose the fundamental matrix using the special equation for canonical cameras
+		DenseMatrix64F foundF = new DenseMatrix64F(3,3);
+		DenseMatrix64F crossEpi = new DenseMatrix64F(3,3);
+
+		GeometryMath_F64.crossMatrix(e2, crossEpi);
+
+		DenseMatrix64F M = new DenseMatrix64F(3,3);
+		CommonOps.extract(P,0,3,0,3,M,0,0);
+		CommonOps.mult(crossEpi,M,foundF);
+
+		// see if they are equal up to a scale factor
+		CommonOps.scale(1.0 / foundF.get(0, 1), foundF);
+		CommonOps.scale(1.0 / F.get(0, 1), F);
+
+		assertTrue(MatrixFeatures.isIdentical(F,foundF,1e-8));
+	}
+
+	@Test
+	public void decomposeCameraMatrix() {
+		// compute an arbitrary projection matrix from known values
+		DenseMatrix64F K = UtilEpipolar.calibrationMatrix(200,250,0,100,110);
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
+
+		DenseMatrix64F P = new DenseMatrix64F(3,4);
+		DenseMatrix64F KP = new DenseMatrix64F(3,4);
+		CommonOps.insert(R,P,0,0);
+		P.set(0,3,T.x);
+		P.set(1,3,T.y);
+		P.set(2,3,T.z);
+
+		CommonOps.mult(K,P,KP);
+
+		// decompose the projection matrix
+		DenseMatrix64F foundK = new DenseMatrix64F(3,3);
+		Se3_F64 foundPose = new Se3_F64();
+		UtilEpipolar.decomposeCameraMatrix(KP, foundK, foundPose);
+
+		// recompute the projection matrix found the found results
+		DenseMatrix64F foundKP = new DenseMatrix64F(3,4);
+		CommonOps.insert(foundPose.getR(),P,0,0);
+		P.set(0,3,foundPose.T.x);
+		P.set(1,3,foundPose.T.y);
+		P.set(2,3,foundPose.T.z);
+		CommonOps.mult(foundK,P,foundKP);
+
+		// see if the two projection matrices are the same
+		assertTrue(MatrixFeatures.isEquals(foundKP,KP,1e-8));
+	}
+
+	public static DenseMatrix64F computeF( DenseMatrix64F E , DenseMatrix64F K ) {
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K,K_inv);
+
+		DenseMatrix64F F = new DenseMatrix64F(3,3);
+		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+
+		CommonOps.multTransA(K_inv,E,temp);
+		CommonOps.mult(temp,K_inv,F);
+
+		return F;
 	}
 }

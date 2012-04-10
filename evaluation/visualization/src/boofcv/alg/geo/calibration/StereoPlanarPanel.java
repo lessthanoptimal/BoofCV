@@ -137,7 +137,7 @@ public class StereoPlanarPanel extends JPanel
 		checkNumbers.setSelected(showNumbers);
 		checkNumbers.addItemListener(this);
 
-		selectErrorScale = new JSpinner(new SpinnerNumberModel(errorScale, 1, 100, 5));
+		selectErrorScale = new JSpinner(new SpinnerNumberModel(errorScale, 5, 100, 5));
 		selectErrorScale.addChangeListener(this);
 		selectErrorScale.setMaximumSize(selectErrorScale.getPreferredSize());
 
@@ -161,8 +161,8 @@ public class StereoPlanarPanel extends JPanel
 		imageList.setListData(new Vector<Object>(names));
 		if( names.size() == 1 ) {
 			imageList.addListSelectionListener(this);
-			leftView.setPreferredSize(new Dimension(imageLeft.getWidth(),imageLeft.getHeight()));
-			rightView.setPreferredSize(new Dimension(imageRight.getWidth(),imageRight.getHeight()));
+			leftView.setPreferredSize(new Dimension(imageLeft.getWidth(), imageLeft.getHeight()));
+			rightView.setPreferredSize(new Dimension(imageRight.getWidth(), imageRight.getHeight()));
 			imageList.setSelectedIndex(0);
 		} else {
 			imageList.addListSelectionListener(this);
@@ -177,6 +177,10 @@ public class StereoPlanarPanel extends JPanel
 
 		this.leftResults = leftResults;
 		this.rightResults = rightResults;
+
+		// synchronize configurations
+		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
+		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
 
 		updateResultsGUI();
 	}
