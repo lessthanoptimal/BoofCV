@@ -44,6 +44,10 @@ import java.io.Serializable;
  * @author Peter Abeles
  */
 public class IntrinsicParameters implements Serializable {
+
+	// image shape
+	public int width,height;
+
 	// focal length along x and y axis
 	public double fx,fy;
 	// skew parameter, typically 0
@@ -103,8 +107,8 @@ public class IntrinsicParameters implements Serializable {
 	}
 
 	public void print() {
-		System.out.println("center x = "+cx);
-		System.out.println("center y = "+cy);
+		System.out.println("Shape "+width+" "+height);
+		System.out.printf("center %7.2f %7.2f ",cx,cy);
 		System.out.println("fx = "+fx);
 		System.out.println("fy = "+fy);
 		System.out.println("skew = "+skew);

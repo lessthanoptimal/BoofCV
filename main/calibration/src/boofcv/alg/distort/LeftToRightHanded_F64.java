@@ -22,24 +22,31 @@ import boofcv.struct.distort.PointTransform_F64;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * It is common practice to have the +y axis point downward in computer images.  However,
- * in 3D computer vision this creates a left handed coordinate system and +z points behind
- * the camera.  Many algorithms assume +z is in front of the camera so the way around this
- * problem is to invert the sign of y.
+ * <p>
+ * Changes the input for a {@link PointTransform_F64} such that the pixel coordinate system has its
+ * origin at the lower left hand corner and that positive y-axis is pointed up, thus making it right handed.
+ * This transform is done using the following equation: y = height - y - 1
+ * </p>
+ *
+ * <p>
+ * WARNING: If using a calibrated camera distortion model make sure that the camera was calibrated using
+ * the same adjusted pixels!
+ * </p>
  *
  * @author Peter Abeles
  */
 public class LeftToRightHanded_F64 implements PointTransform_F64 {
 
-	PointTransform_F64 alg;
+	PointTransform_F64 pixelToNormalized;
+	int height;
 
-	public LeftToRightHanded_F64(PointTransform_F64 alg) {
-		this.alg = alg;
+	public LeftToRightHanded_F64(PointTransform_F64 pixelToNormalized , int imageHeight) {
+		this.pixelToNormalized = pixelToNormalized;
+		this.height = imageHeight - 1;
 	}
 
 	@Override
 	public void compute(double x, double y, Point2D_F64 out) {
-		alg.compute(x,y,out);
-		out.y = -out.y;
+		pixelToNormalized.compute(x, height - y, out);
 	}
 }

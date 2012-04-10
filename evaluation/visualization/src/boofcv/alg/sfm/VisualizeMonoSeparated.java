@@ -87,7 +87,7 @@ extends VideoProcessAppBase<I,D> {
 		RemoveRadialPtoN_F64 removeRadial = new RemoveRadialPtoN_F64();
 		removeRadial.set(cameraParam.fx,cameraParam.fy,cameraParam.skew,cameraParam.cx,cameraParam.cy,cameraParam.radial);
 
-		PointTransform_F64 p2n = new LeftToRightHanded_F64(removeRadial);
+		PointTransform_F64 p2n = new LeftToRightHanded_F64(removeRadial,cameraParam.height);
 
 		WrapMonocularSeparatedMotion<I> w =
 				(WrapMonocularSeparatedMotion<I>)FactoryVisualOdometry.

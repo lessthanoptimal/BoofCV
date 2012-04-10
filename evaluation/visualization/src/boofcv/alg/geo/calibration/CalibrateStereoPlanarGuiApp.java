@@ -52,10 +52,11 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	List<String> rightImages;
 
 	MediaManager media = DefaultMediaManager.INSTANCE;
+	boolean processedInput = false;
 
 	public CalibrateStereoPlanarGuiApp() {
 		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(1400,525));
+		setPreferredSize(new Dimension(1500,525));
 		this.owner = this;
 
 		add(gui,BorderLayout.CENTER);
@@ -73,8 +74,12 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 				ImageFloat32 leftInput = ConvertBufferedImage.convertFrom(leftOrig, (ImageFloat32) null);
 				ImageFloat32 rightInput = ConvertBufferedImage.convertFrom(rightOrig, (ImageFloat32) null);
 				if( calibrator.addPair(leftInput,rightInput ) ) {
-					gui.addPair("Image " + i, leftOrig, rightOrig);
-					gui.repaint();
+					final int number = i;
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							gui.addPair("Image " + number, leftOrig, rightOrig);
+							gui.repaint();
+						}});
 				}
 			}
 		}
@@ -163,7 +168,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 	@Override
 	public boolean getHasProcessedImage() {
-		return true;
+		return processedInput;
 	}
 
 	public static void main( String args[] ) {

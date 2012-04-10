@@ -100,7 +100,7 @@ public abstract class EvaluateMonoVisualOdometry {
 		p2n.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
 
 		tracker = new SimulatedTracker(environment,camera,targetTracks);
-		alg = createAlg(tracker,new LeftToRightHanded_F64(p2n));
+		alg = createAlg(tracker,new LeftToRightHanded_F64(p2n,imageHeight));
 
 		if( visualize ) {
 			gui = new MonoSimulationPanel(imageWidth,imageHeight);

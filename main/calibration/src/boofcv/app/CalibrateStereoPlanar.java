@@ -18,12 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.alg.geo.calibration.FactoryPlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.ParametersZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.core.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
@@ -34,9 +30,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -198,44 +192,5 @@ public class CalibrateStereoPlanar {
 
 	public CalibrateMonoPlanar getCalibRight() {
 		return calibRight;
-	}
-
-	public static void main( String args[] ) {
-//		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(3,4);
-		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(3,4,6);
-
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3, 4, 30,30);
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 1, 7 / 18);
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
-
-		CalibrateStereoPlanar app = new CalibrateStereoPlanar(detector,true);
-
-//		app.reset();
-		app.configure(target,false,2);
-
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
-//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
-
-		List<String> left = CalibrateMonoPlanarApp.directoryList(directory, "left");
-		List<String> right = CalibrateMonoPlanarApp.directoryList(directory,"right");
-
-		// ensure the lists are in the same order
-		Collections.sort(left);
-		Collections.sort(right);
-
-		for( int i = 0; i < left.size(); i++ ) {
-			BufferedImage l = UtilImageIO.loadImage(left.get(i));
-			BufferedImage r = UtilImageIO.loadImage(right.get(i));
-
-			ImageFloat32 imageLeft = ConvertBufferedImage.convertFrom(l,(ImageFloat32)null);
-			ImageFloat32 imageRight = ConvertBufferedImage.convertFrom(r,(ImageFloat32)null);
-
-			app.addPair(imageLeft,imageRight);
-		}
-		StereoParameters stereoCalib = app.process();
-
-		// save results to a file and print out
-		BoofMiscOps.saveXML(stereoCalib, "stereo.xml");
-		stereoCalib.print();
 	}
 }

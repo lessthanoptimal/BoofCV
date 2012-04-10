@@ -22,6 +22,9 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
+import georegression.struct.se.Se3_F64;
+import org.ejml.alg.dense.decomposition.DecompositionFactory;
+import org.ejml.alg.dense.decomposition.QRDecomposition;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.simple.SimpleMatrix;
@@ -211,7 +214,7 @@ public class UtilEpipolar {
 	 * F*e<sub>1</sub> = 0
 	 * </p>
 	 *
-	 * @param F Fundamental or Essential 3x3 matrix.  Not modified.
+	 * @param F Fundamental or Essential 3x3 matrix.  Not modified.        g
 	 * @param e1 Found right epipole in homogeneous coordinates, Modified.
 	 * @param e2 Found left epipole in homogeneous coordinates, Modified.
 	 */
@@ -240,4 +243,81 @@ public class UtilEpipolar {
 												   double xc, double yc) {
 		return new DenseMatrix64F(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
 	}
+
+	/**
+	 * <p>
+	 * Given a fundamental matrix a pair of projection matrices [R|T] can be extracted.  There are multiple
+	 * solutions which can be found, the canonical projection matrix is defined as: <br>
+	 * <pre>
+	 * P=[I|0] and P'=[[e']*F|e']
+	 * </pre>
+	 * where e' is the epipole F<sup>T</sup>e' = 0, and [e'] is the cross product matrix for the enclosed vector.
+	 * </p>
+	 *
+	 * <p>
+	 * Page 256 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
+	 * </p>
+	 *
+	 * @see #extractEpipoles
+	 *
+	 * @param F A fundamental matrix
+	 * @param e2 Left epipole.
+	 * @return The canonical camera matrix P'
+	 */
+	public static DenseMatrix64F canonicalCamera( DenseMatrix64F F , Point3D_F64 e2 ) {
+
+		DenseMatrix64F crossMatrix = new DenseMatrix64F(3,3);
+		GeometryMath_F64.crossMatrix(e2, crossMatrix);
+
+		DenseMatrix64F KR = new DenseMatrix64F(3,3);
+		CommonOps.mult(crossMatrix,F,KR);
+
+		DenseMatrix64F P = new DenseMatrix64F(3,4);
+		CommonOps.insert(KR,P,0,0);
+
+		P.set(0,3,e2.x);
+		P.set(1,3,e2.y);
+		P.set(2,3,e2.z);
+
+		return P;
+	}
+
+	/**
+	 * <p>
+	 * Decomposes a camera matrix P=A*[R|T], where A is an upper triangular camera calibration
+	 * matrix, R is a rotation matrix, and T is a translation vector.  NOTE: There are multiple valid solutions
+	 * to this problem and only one solution is returned. NOTE: The camera center will be on the plane at infinity.
+	 * </p>
+	 *
+	 * @param P Camera matrix, 3 by 4. Input
+	 * @param K Camera calibration matrix, 3 by 3.  Output.
+	 * @param pose The rotation and translation. Output.
+	 */
+	public static void decomposeCameraMatrix(DenseMatrix64F P, DenseMatrix64F K, Se3_F64 pose) {
+		DenseMatrix64F KR = new DenseMatrix64F(3,3);
+		CommonOps.extract(P, 0, 3, 0, 3, KR, 0, 0);
+
+		QRDecomposition<DenseMatrix64F> qr = DecompositionFactory.qr(3, 3);
+
+		if( !CommonOps.invert(KR) )
+			throw new RuntimeException("Inverse failed!  Bad input?");
+
+		if( !qr.decompose(KR) )
+			throw new RuntimeException("QR decomposition failed!  Bad input?");
+
+		DenseMatrix64F U = qr.getQ(null,false);
+		DenseMatrix64F B = qr.getR(null, false);
+
+		if( !CommonOps.invert(U,pose.getR()) )
+			throw new RuntimeException("Inverse failed!  Bad input?");
+
+		Point3D_F64 KT = new Point3D_F64(P.get(0,3),P.get(1,3),P.get(2,3));
+		GeometryMath_F64.mult(B, KT, pose.getT());
+
+		if( !CommonOps.invert(B,K) )
+			throw new RuntimeException("Inverse failed!  Bad input?");
+
+		CommonOps.scale(1.0/K.get(2,2),K);
+	}
+
 }

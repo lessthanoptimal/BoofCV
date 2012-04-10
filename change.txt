@@ -23,6 +23,11 @@ Version : Alpha 0.7
   * Supports sub-region extraction.  Forces features to be more spread out
   * Max N now is the total number of features, including excludes
 - Improved speed of Levenberg algorithm by taking advantage of symmetry
+- UtilEpipolar
+  * Added canonicalCamera() and decomposeCameraMatrix()
+- Stereo Rectification
+  * Calibrated cameras
+  * From fundamental matrices
 
 ---------------------------------------------
 Date    : 2012/03/01
