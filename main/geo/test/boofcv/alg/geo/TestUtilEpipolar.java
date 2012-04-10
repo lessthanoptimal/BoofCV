@@ -252,7 +252,7 @@ public class TestUtilEpipolar {
 		CommonOps.scale(-2.0/F.get(0,1),F);
 		UtilEpipolar.extractEpipoles(F, e1, e2);
 
-		DenseMatrix64F P = UtilEpipolar.canonicalCamera(F,e2);
+		DenseMatrix64F P = UtilEpipolar.canonicalCamera(F,e2, new Vector3D_F64(1,1,1),2);
 
 		// recompose the fundamental matrix using the special equation for canonical cameras
 		DenseMatrix64F foundF = new DenseMatrix64F(3,3);

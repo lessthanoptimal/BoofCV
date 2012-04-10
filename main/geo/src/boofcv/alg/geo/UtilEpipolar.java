@@ -249,9 +249,10 @@ public class UtilEpipolar {
 	 * Given a fundamental matrix a pair of projection matrices [R|T] can be extracted.  There are multiple
 	 * solutions which can be found, the canonical projection matrix is defined as: <br>
 	 * <pre>
-	 * P=[I|0] and P'=[[e']*F|e']
+	 * P=[I|0] and P'= [M|-M*t] = [[e']*F + e'*v^t | lambda*e']
 	 * </pre>
-	 * where e' is the epipole F<sup>T</sup>e' = 0, and [e'] is the cross product matrix for the enclosed vector.
+	 * where e' is the epipole F<sup>T</sup>e' = 0, [e'] is the cross product matrix for the enclosed vector,
+	 * v is an arbitrary 3-vector and lambda is a non-zero scalar.
 	 * </p>
 	 *
 	 * <p>
@@ -261,23 +262,29 @@ public class UtilEpipolar {
 	 * @see #extractEpipoles
 	 *
 	 * @param F A fundamental matrix
+	 * @param v Arbitrary 3-vector.  Just pick some value, say (1,1,1).
+	 * @param lambda A non zero scalar.  Try one.
 	 * @param e2 Left epipole.
 	 * @return The canonical camera matrix P'
 	 */
-	public static DenseMatrix64F canonicalCamera( DenseMatrix64F F , Point3D_F64 e2 ) {
+	public static DenseMatrix64F canonicalCamera( DenseMatrix64F F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
 
 		DenseMatrix64F crossMatrix = new DenseMatrix64F(3,3);
 		GeometryMath_F64.crossMatrix(e2, crossMatrix);
 
+		DenseMatrix64F outer = new DenseMatrix64F(3,3);
+		GeometryMath_F64.outerProd(e2,v,outer);
+
 		DenseMatrix64F KR = new DenseMatrix64F(3,3);
 		CommonOps.mult(crossMatrix,F,KR);
+		CommonOps.add(KR, outer, KR);
 
 		DenseMatrix64F P = new DenseMatrix64F(3,4);
 		CommonOps.insert(KR,P,0,0);
 
-		P.set(0,3,e2.x);
-		P.set(1,3,e2.y);
-		P.set(2,3,e2.z);
+		P.set(0,3,lambda*e2.x);
+		P.set(1,3,lambda*e2.y);
+		P.set(2,3,lambda*e2.z);
 
 		return P;
 	}

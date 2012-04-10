@@ -110,6 +110,44 @@ public class TestRectifyCalibrated {
 		assertEquals(0,epi2a.getZ(),1e-8);
 	}
 
+	/**
+	 * See if the transform align an observation to the same y-axis
+	 */
+	@Test
+	public void alignY() {
+		DenseMatrix64F K = new DenseMatrix64F(3,3,true,300,0,200,0,400,205,0,0,1);
+
+		// only rotate around the y-axis so that the rectified coordinate system will have to be
+		// the same as the global
+		Se3_F64 poseA1 = createPose(-0.3,0.05,0.07,   0.1,0,0.1).invert(null);
+		Se3_F64 poseA2 = createPose(0.2,-0.1,0.02,    1  ,0,0.1).invert(null);
+
+		// point being observed
+		Point3D_F64 X = new Point3D_F64(0,0,4);
+
+		// unrectified projection matrices
+		DenseMatrix64F P1 = computeP(K,poseA1);
+		DenseMatrix64F P2 = computeP(K,poseA2);
+
+		// unrectified observation
+		Point2D_F64 o1 = apply(P1,X);
+		Point2D_F64 o2 = apply(P2,X);
+
+		// compute transforms
+		RectifyCalibrated alg = new RectifyCalibrated();
+		alg.process(K,poseA1,K,poseA2);
+
+		// apply transform to create rectified observations
+		Point2D_F64 r1 = new Point2D_F64();
+		Point2D_F64 r2 = new Point2D_F64();
+
+		GeometryMath_F64.mult(alg.getRect1(),o1,r1);
+		GeometryMath_F64.mult(alg.getRect2(),o2,r2);
+
+		// see if they line up
+		assertEquals(r1.y,r2.y,1e-8);
+	}
+
 	private Se3_F64 createPose( double rotX , double rotY , double rotZ , double x , double y , double z )
 	{
 		Se3_F64 ret = new Se3_F64();

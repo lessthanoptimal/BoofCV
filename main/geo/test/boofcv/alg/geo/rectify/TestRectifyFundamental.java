@@ -24,16 +24,19 @@ import boofcv.alg.geo.TestUtilEpipolar;
 import boofcv.alg.geo.UtilEpipolar;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -54,6 +57,12 @@ public class TestRectifyFundamental {
 	public void checkEpipoles() {
 		createScene();
 
+		// extract eipoles
+		Point3D_F64 epipole1 = new Point3D_F64();
+		Point3D_F64 epipole2 = new Point3D_F64();
+
+		UtilEpipolar.extractEpipoles(F,epipole1,epipole2);
+
 		// compute the rectification transforms
 		RectifyFundamental alg = new RectifyFundamental();
 		alg.process(F,pairs,500,500);
@@ -61,17 +70,40 @@ public class TestRectifyFundamental {
 		DenseMatrix64F R1 = alg.getRect1();
 		DenseMatrix64F R2 = alg.getRect2();
 
-		// adjust F
-		DenseMatrix64F Fadj = new DenseMatrix64F(3,3);
-		DenseMatrix64F temp = new DenseMatrix64F(3,3);
-		CommonOps.multTransA(R2, F, temp);
-		CommonOps.mult(temp,R1,Fadj);
+		// sanity check
 
-		Point3D_F64 epipole1 = new Point3D_F64();
-		Point3D_F64 epipole2 = new Point3D_F64();
+		assertTrue(Math.abs(epipole1.z) > 1e-8);
+		assertTrue(Math.abs(epipole2.z) > 1e-8);
 
-		UtilEpipolar.extractEpipoles(Fadj,epipole1,epipole2);
+		// see if epipoles are projected to infinity
+		GeometryMath_F64.mult(R1,epipole1,epipole1);
+		GeometryMath_F64.mult(R2,epipole2,epipole2);
 
+		assertEquals(0, epipole1.z, 1e-12);
+		assertEquals(0, epipole2.z, 1e-12);
+	}
+
+	/**
+	 * See if the transform align an observation to the same y-axis
+	 */
+	@Test
+	public void alignY() {
+		createScene();
+
+		RectifyFundamental alg = new RectifyFundamental();
+		alg.process(F,pairs,500,500);
+
+		// unrectified observations
+		AssociatedPair unrect = pairs.get(0);
+
+		// rectified observations
+		Point2D_F64 r1 = new Point2D_F64();
+		Point2D_F64 r2 = new Point2D_F64();
+
+		GeometryMath_F64.mult(alg.getRect1(),unrect.keyLoc,r1);
+		GeometryMath_F64.mult(alg.getRect2(),unrect.currLoc,r2);
+
+		assertEquals(r1.y,r2.y,1e-8);
 	}
 
 	public void createScene() {
@@ -80,8 +112,8 @@ public class TestRectifyFundamental {
 
 		// define the camera's motion
 		motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
-		motion.getT().set(0.1,-0.1,0.01);
+		motion.getR().set(RotationMatrixGenerator.eulerXYZ(-0.01, 0.1, 0.05, null));
+		motion.getT().set(-0.5,0.1,-0.05);
 
 		DenseMatrix64F E = UtilEpipolar.computeEssential(motion.getR(),motion.getT());
 		F = TestUtilEpipolar.computeF(E,K);

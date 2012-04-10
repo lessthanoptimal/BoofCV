@@ -22,6 +22,7 @@ import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.UtilEpipolar;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.simple.SimpleMatrix;
 
@@ -29,12 +30,14 @@ import java.util.List;
 
 /**
  * <p>
- * Rectifies a stereo pair given a fundamental or essential matrix.  The rectification is selected such that
- * the center of the first image is the center of the rectified first image. See [1] for algorithmic details.
+ * Rectifies a stereo pair given a fundamental or essential matrix.  The rectification ensures that
+ * the epipolar lines project to infinity along the x-axis. The computed transforms are designed to
+ * minimize the range of disparity between the two images. See [1] for algorithmic details.
  * </p>
  *
  * <p>
- * [1] R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
+ * [1] R. Hartley, "Theory and Practice of Projective Rectification", International Journal of Computer Vision,
+ * vol 35, no 2, pages 115-127, 1999.
  * </p>
  *
  * @author Peter Abeles
@@ -56,26 +59,28 @@ public class RectifyFundamental {
 	public void process( DenseMatrix64F F , List<AssociatedPair> observations ,
 						 int width , int height ) {
 
+		int centerX = width/2;
+		int centerY = height/2;
+
 		Point3D_F64 epipole1 = new Point3D_F64();
 		Point3D_F64 epipole2 = new Point3D_F64();
 
 		UtilEpipolar.extractEpipoles(F,epipole1,epipole2);
 
-		SimpleMatrix R = rotateEpipole(epipole1);
-		SimpleMatrix T = translateToOrigin(width/2,height/2);
-		SimpleMatrix G = SimpleMatrix.identity(3);
-		G.set(2,0,-1.0/epipole2.norm());
+		// compute the transform H which will send epipole2 to infinity
+		SimpleMatrix R = rotateEpipole(epipole2,centerX,centerY);
+		SimpleMatrix T = translateToOrigin(centerX,centerY);
+		SimpleMatrix G = computeG(epipole2,centerX,centerY);
 
 		SimpleMatrix H = G.mult(R).mult(T);
-		SimpleMatrix Hzero = computeHZero(F,epipole2,H);
 
-		H.print();
-		Hzero.print();
+		//Find the two matching transforms
+		SimpleMatrix Hzero = computeHZero(F,epipole2,H);
 
 		SimpleMatrix Ha = computeAffineH(observations,H.getMatrix(),Hzero.getMatrix());
 
-		rect1.set(H.getMatrix());
-		rect2.set(Ha.mult(Hzero).getMatrix());
+		rect1.set(Ha.mult(Hzero).getMatrix());
+		rect2.set(H.getMatrix());
 	}
 
 	/**
@@ -94,23 +99,35 @@ public class RectifyFundamental {
 	/**
 	 * Apply a rotation such that the epipole  is equal to [f,0,1)\
 	 */
-	private SimpleMatrix rotateEpipole( Point3D_F64 epipole ) {
-		epipole.x = epipole.x / epipole.z;
-		epipole.y = epipole.y / epipole.z;
-
+	private SimpleMatrix rotateEpipole( Point3D_F64 epipole , int x0 , int y0 )
+	{
 		// compute rotation which will set
 		// x * sin(theta) + y * cos(theta) = 0
 
-		double theta = Math.atan2(-epipole.y,epipole.x);
+		double y = epipole.y/epipole.z-x0;
+		double x = epipole.x/epipole.z-y0;
+
+		double theta = Math.atan2(-y,x);
 		double c = Math.cos(theta);
 		double s = Math.sin(theta);
 
 		SimpleMatrix R = new SimpleMatrix(3,3);
-		R.setRow(0,0,c,-s);
-		R.setRow(1,0,s,c);
-		R.set(2,2,1);
+		R.setRow(0, 0, c,-s);
+		R.setRow(1, 0, s, c);
+		R.set(2, 2, 1);
 
 		return R;
+	}
+
+	private SimpleMatrix computeG( Point3D_F64 epipole , int x0 , int y0 ) {
+		double x = epipole.x/epipole.z - x0;
+		double y = epipole.y/epipole.z - y0;
+
+		double f = Math.sqrt(x*x + y*y);
+		SimpleMatrix G = SimpleMatrix.identity(3);
+		G.set(2,0,-1.0/f);
+
+		return G;
 	}
 
 	/**
@@ -133,14 +150,12 @@ public class RectifyFundamental {
 		for( int i = 0; i < observations.size(); i++ ) {
 			AssociatedPair a = observations.get(i);
 
-			GeometryMath_F64.mult(Hzero,a.currLoc,c);
-			GeometryMath_F64.mult(H,a.keyLoc,k);
+			GeometryMath_F64.mult(Hzero,a.keyLoc,k);
+			GeometryMath_F64.mult(H,a.currLoc,c);
 
-			A.setRow(i,0,c.x,c.y,1);
-			b.set(i,0,k.x);
+			A.setRow(i,0,k.x,k.y,1);
+			b.set(i,0,c.x);
 		}
-
-		A.print();
 
 		SimpleMatrix x = A.solve(b);
 
@@ -154,8 +169,13 @@ public class RectifyFundamental {
 	 * H0 = H'*M
 	 * P'=[M|m] from canonical camera
 	 */
-	private SimpleMatrix computeHZero( DenseMatrix64F F , Point3D_F64 e2 , SimpleMatrix H ) {
-		SimpleMatrix P = SimpleMatrix.wrap(UtilEpipolar.canonicalCamera(F, e2));
+	private SimpleMatrix computeHZero( DenseMatrix64F F , Point3D_F64 e2 ,
+									   SimpleMatrix H ) {
+
+		Vector3D_F64 v = new Vector3D_F64(1,1,1);
+
+		// need to make sure M is not singular for this technique to work
+		SimpleMatrix P = SimpleMatrix.wrap(UtilEpipolar.canonicalCamera(F, e2, v , 2));
 
 		SimpleMatrix M = P.extractMatrix(0,3,0,3);
 
