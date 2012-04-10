@@ -26,10 +26,16 @@ import org.ejml.simple.SimpleMatrix;
 
 /**
  * <p>
- * Rectifies a stereo pair with known camera calibration using a simple algorithm described in [1].
- * After rectification both images will have the same intrinsic calibration matrices, and rotation matrix,
- * but the optical centers will be the same. The calibration matrix is the standard upper triangular
- * matrix used throughout the library.
+ * Rectifies a stereo pair with known camera calibration using a simple algorithm described in [1]
+ * such that the epipoles project to infinity along the x-axis. After rectification both images will
+ * have the same intrinsic calibration matrix, same extrinsic rotation matrix, but the optical centers
+ * are not modified.
+ * </p>
+ *
+ * <p>
+ * The calibration matrix is the standard upper triangular matrix used throughout the library.  A single
+ * calibration matrix is computed for both images by averaging the two original and setting the skew
+ * to zero.
  * </p>
  *
  * <p>
