@@ -18,12 +18,12 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PointTransform_F64;
-import georegression.struct.point.Point2D_F64;
+import boofcv.struct.distort.PointTransform_F32;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * <p>
- * Changes the input for a {@link PointTransform_F64} such that the pixel coordinate system has its
+ * Changes the input for a {@link boofcv.struct.distort.PointTransform_F64} such that the pixel coordinate system has its
  * origin at the lower left hand corner and that positive y-axis is pointed up, thus making it right handed.
  * This transform is done using the following equation: y = height - y - 1
  * </p>
@@ -35,18 +35,17 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class LeftToRightHanded_F64 implements PointTransform_F64 {
+public class LeftToRightHanded_F32 implements PointTransform_F32 {
 
-	PointTransform_F64 pixelToNormalized;
 	int height;
 
-	public LeftToRightHanded_F64(PointTransform_F64 pixelToNormalized , int imageHeight) {
-		this.pixelToNormalized = pixelToNormalized;
+	public LeftToRightHanded_F32(int imageHeight) {
 		this.height = imageHeight - 1;
 	}
 
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
-		pixelToNormalized.compute(x, height - y, out);
+	public void compute(float x, float y, Point2D_F32 out) {
+		out.x = x;
+		out.y = height - y;
 	}
 }

@@ -76,7 +76,7 @@ public class DistortImageOps {
 		if( input instanceof ImageSingleBand ) {
 			transformSingle((ImageSingleBand)input,(ImageSingleBand)output,interpType,model);
 		} else if( input instanceof MultiSpectral ) {
-			transformMulti((MultiSpectral)input,(MultiSpectral)output,interpType,model);
+			transformMS((MultiSpectral) input, (MultiSpectral) output, interpType, model);
 		}
 	}
 
@@ -93,22 +93,16 @@ public class DistortImageOps {
 	}
 	
 	private static <T extends ImageSingleBand,M extends MultiSpectral<T>>
-	void transformMulti( M input , M output ,
-						 TypeInterpolate interpType ,
-						 PixelTransform_F32 transform ) 
+	void transformMS(M input, M output,
+					 TypeInterpolate interpType,
+					 PixelTransform_F32 transform)
 	{
 		Class<T> bandType = input.getType();
 		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, bandType);
 		ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(bandType, 0), bandType);
 		distorter.setModel(transform);
-		int N = input.getNumBands();
-		
-		for( int i = 0; i < N; i++ ) {
-			T bandIn = input.getBand(i);
-			T bandOut = output.getBand(i);
-			
-			distorter.apply(bandIn,bandOut);
-		}
+
+		distortMS(input,output,distorter);
 	}
 
 	/**
@@ -127,7 +121,7 @@ public class DistortImageOps {
 		if( input instanceof ImageSingleBand ) {
 			transformSingle((ImageSingleBand)input,(ImageSingleBand)output,interpType,model);
 		} else if( input instanceof MultiSpectral ) {
-			transformMulti((MultiSpectral)input,(MultiSpectral)output,interpType,model);
+			transformMS((MultiSpectral) input, (MultiSpectral) output, interpType, model);
 		}
 	}
 
@@ -171,8 +165,23 @@ public class DistortImageOps {
 		if( input instanceof ImageSingleBand ) {
 			transformSingle((ImageSingleBand)input,(ImageSingleBand)output,interpType,model);
 		} else if( input instanceof MultiSpectral ) {
-			transformMulti((MultiSpectral)input,(MultiSpectral)output,interpType,model);
+			transformMS((MultiSpectral) input, (MultiSpectral) output, interpType, model);
 		}
+	}
+
+	/**
+	 * Applies a distortion to a {@link MultiSpectral} image.
+	 *
+	 * @param input Image being distorted. Not modified.
+	 * @param output Output image. modified.
+	 * @param distortion The distortion model
+	 * @param <T> Band type.
+	 */
+	public static <T extends ImageSingleBand> void distortMS( MultiSpectral<T> input , MultiSpectral<T> output ,
+															   ImageDistort<T> distortion )
+	{
+		for( int band = 0; band < input.getNumBands(); band++ )
+			distortion.apply(input.getBand(band),output.getBand(band));
 	}
 
 	/**

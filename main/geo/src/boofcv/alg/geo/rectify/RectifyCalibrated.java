@@ -69,19 +69,21 @@ public class RectifyCalibrated {
 	 * matrix.
 	 *
 	 * @param K1 Calibration matrix for first camera.
-	 * @param pose1 Location of the first camera.
+	 * @param worldToCamera1 Location of the first camera.
 	 * @param K2 Calibration matrix for second camera.
-	 * @param pose2 Location of the second camera.
+	 * @param worldToCamera2 Location of the second camera.
 	 */
-	public void process( DenseMatrix64F K1 , Se3_F64 pose1 ,
-						 DenseMatrix64F K2 , Se3_F64 pose2 )
+	public void process( DenseMatrix64F K1 , Se3_F64 worldToCamera1 ,
+						 DenseMatrix64F K2 , Se3_F64 worldToCamera2 )
 	{
 		SimpleMatrix sK1 = SimpleMatrix.wrap(K1);
 		SimpleMatrix sK2 = SimpleMatrix.wrap(K2);
-		SimpleMatrix R1 = SimpleMatrix.wrap(pose1.getR());
-		SimpleMatrix R2 = SimpleMatrix.wrap(pose2.getR());
-		SimpleMatrix T1 = new SimpleMatrix(3,1,true,pose1.getT().x,pose1.getT().y,pose1.getT().z);
-		SimpleMatrix T2 = new SimpleMatrix(3,1,true,pose2.getT().x,pose2.getT().y,pose2.getT().z);
+		SimpleMatrix R1 = SimpleMatrix.wrap(worldToCamera1.getR());
+		SimpleMatrix R2 = SimpleMatrix.wrap(worldToCamera2.getR());
+		SimpleMatrix T1 = new SimpleMatrix(3,1,true,
+				worldToCamera1.getT().x,worldToCamera1.getT().y,worldToCamera1.getT().z);
+		SimpleMatrix T2 = new SimpleMatrix(3,1,true,
+				worldToCamera2.getT().x,worldToCamera2.getT().y,worldToCamera2.getT().z);
 
 		//  P = K*[R|T]
 		SimpleMatrix KR1 = sK1.mult(R1);

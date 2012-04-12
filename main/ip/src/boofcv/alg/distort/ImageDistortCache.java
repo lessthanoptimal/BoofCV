@@ -41,6 +41,9 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 	// handle the image border
 	private ImageBorder<T> border;
 
+	// transform
+	private PixelTransform_F32 dstToSrc;
+
 	// crop boundary
 	private int x0,y0,x1,y1;
 
@@ -61,13 +64,7 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 
 	@Override
 	public void setModel(PixelTransform_F32 dstToSrc) {
-		int index = 0;
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x++ ) {
-				dstToSrc.compute(x,y);
-				map[index++].set(dstToSrc.distX,dstToSrc.distY);
-			}
-		}
+		this.dstToSrc = dstToSrc;
 	}
 
 	@Override
@@ -101,6 +98,14 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 			map = new Point2D_F32[width*height];
 			for( int i = 0; i < map.length; i++ ) {
 				map[i] = new Point2D_F32();
+			}
+
+			int index = 0;
+			for( int y = 0; y < height; y++ ) {
+				for( int x = 0; x < width; x++ ) {
+					dstToSrc.compute(x,y);
+					map[index++].set(dstToSrc.distX,dstToSrc.distY);
+				}
 			}
 		} else if( dstImg.width != width || dstImg.height != height )
 			throw new IllegalArgumentException("Unexpected dstImg dimension");

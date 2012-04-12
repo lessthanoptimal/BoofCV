@@ -106,6 +106,22 @@ public class IntrinsicParameters implements Serializable {
 		this.skew = skew;
 	}
 
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
 	public void print() {
 		System.out.println("Shape "+width+" "+height);
 		System.out.printf("center %7.2f %7.2f ",cx,cy);

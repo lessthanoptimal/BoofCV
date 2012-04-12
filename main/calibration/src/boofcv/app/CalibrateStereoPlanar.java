@@ -58,7 +58,7 @@ import java.util.List;
  */
 public class CalibrateStereoPlanar {
 
-	// location of the left in left and right images
+	// transform from world to camera in each view
 	List<Se3_F64> viewLeft = new ArrayList<Se3_F64>();
 	List<Se3_F64> viewRight = new ArrayList<Se3_F64>();
 
@@ -138,7 +138,7 @@ public class CalibrateStereoPlanar {
 	{
 		IntrinsicParameters intrinsic = calib.process();
 
-		ParametersZhang99 zhangParam = calib.getFound();
+		ParametersZhang99 zhangParam = calib.getZhangParam();
 
 		for( ParametersZhang99.View v : zhangParam.views ) {
 			Se3_F64 pose = new Se3_F64();
@@ -173,6 +173,7 @@ public class CalibrateStereoPlanar {
 			Se3_F64 worldToLeft = viewLeft.get(i);
 			Se3_F64 worldToRight = viewRight.get(i);
 
+			// These points can really be arbitrary and don't have to be target points
 			for( Point3D_F64 p : points3D ) {
 				Point3D_F64 l = SePointOps_F64.transform(worldToLeft, p, null);
 				Point3D_F64 r = SePointOps_F64.transform(worldToRight, p, null);
