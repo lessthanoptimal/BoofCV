@@ -39,7 +39,8 @@ import java.util.List;
 public class ParseCalibrationConfig {
 
 	MediaManager media = DefaultMediaManager.INSTANCE;
-	
+
+	public boolean adjustLeftToRight;
 	public PlanarCalibrationDetector detector;
 	public PlanarCalibrationTarget target;
 	public List<String> images = new ArrayList<String>();
@@ -109,10 +110,11 @@ public class ParseCalibrationConfig {
 		if( !reader.read(input) )
 			throw new RuntimeException("Parsing configuration failed");
 
-		if( reader.remainingTokens() < 4 )
+		if( reader.remainingTokens() < 5 )
 			throw new RuntimeException("Not enough tokens in config file");
 
 		String type = reader.nextString();
+		adjustLeftToRight = Boolean.parseBoolean(reader.nextString());
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();
 

@@ -20,7 +20,7 @@ package boofcv.geo.simulation.mono;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.sfm.MonocularVisualOdometry;
-import boofcv.alg.distort.LeftToRightHanded_F64;
+import boofcv.alg.distort.LeftToRightHandedNorm_F64;
 import boofcv.alg.distort.RemoveRadialPtoN_F64;
 import boofcv.geo.simulation.CameraControl;
 import boofcv.geo.simulation.CameraModel;
@@ -100,7 +100,7 @@ public abstract class EvaluateMonoVisualOdometry {
 		p2n.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
 
 		tracker = new SimulatedTracker(environment,camera,targetTracks);
-		alg = createAlg(tracker,new LeftToRightHanded_F64(p2n,imageHeight));
+		alg = createAlg(tracker,new LeftToRightHandedNorm_F64(p2n,imageHeight));
 
 		if( visualize ) {
 			gui = new MonoSimulationPanel(imageWidth,imageHeight);

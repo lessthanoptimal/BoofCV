@@ -26,6 +26,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.MediaManager;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
 
@@ -100,6 +101,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		gui.repaint();
 
 		param.print();
+		if( outputFileName != null )
+			BoofMiscOps.saveXML(param,outputFileName);
 
 //		SwingUtilities.invokeLater(new Runnable() {
 //			public void run() {
@@ -140,17 +143,20 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	 *
 	 * @param detector Calibration target detector.
 	 * @param target Description of the target being detected.
+	 * @param convertToRightHanded If true it will convert a left handed image coordinate system into a right handed one.
+	 *                             Normally this should be true.
 	 * @param leftImages Images taken by left camera.
 	 * @param rightImages Images taken by right camera.
 	 */
 	public void configure( PlanarCalibrationDetector detector ,
 						   PlanarCalibrationTarget target,
+						   boolean convertToRightHanded ,
 						   List<String> leftImages , List<String> rightImages  ) {
 
 		if( leftImages.size() != rightImages.size() )
 			throw new IllegalArgumentException("Number of left and right images must be the same");
 
-		calibrator = new CalibrateStereoPlanar(detector,true);
+		calibrator = new CalibrateStereoPlanar(detector,convertToRightHanded);
 		calibrator.configure(target,true,2);
 		this.leftImages = leftImages;
 		this.rightImages = rightImages;
@@ -185,14 +191,14 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		List<String> rightImages = CalibrateMonoPlanarApp.directoryList(directory, "right");
 
 		CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
-		app.configure(detector,target, leftImages,rightImages);
+		app.configure(detector,target,true, leftImages,rightImages);
 
 		JFrame frame = new JFrame("Planar Stereo Calibration");
 		frame.add(app, BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true);
 
-		app.process("intrinsic.xml");
+		app.process("stereo.xml");
 
 	}
 }

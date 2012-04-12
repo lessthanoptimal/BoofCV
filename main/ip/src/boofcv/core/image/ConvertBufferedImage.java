@@ -281,6 +281,7 @@ public class ConvertBufferedImage {
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
+	 * @param type Which type of data structure is each band. (ImageUInt8 or ImageFloat32)
 	 * @return Converted image.
 	 */
 	public static <T extends ImageSingleBand> MultiSpectral<T>

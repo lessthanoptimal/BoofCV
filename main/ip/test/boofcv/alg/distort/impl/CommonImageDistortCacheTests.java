@@ -75,7 +75,7 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 		alg.setModel(tran);
 		
 		standard.apply(src,dst0);
-		standard.apply(src,dst1);
+		alg.apply(src,dst1);
 
 		BoofTesting.assertEqualsGeneric(dst0,dst1,0,1e-4);
 	}
@@ -90,7 +90,7 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 		alg.setModel(tran);
 
 		standard.apply(src,dst0,10,30,80,60);
-		standard.apply(src,dst1,10,30,80,60);
+		alg.apply(src,dst1,10,30,80,60);
 
 		BoofTesting.assertEqualsGeneric(dst0,dst1,0,1e-4);
 	}

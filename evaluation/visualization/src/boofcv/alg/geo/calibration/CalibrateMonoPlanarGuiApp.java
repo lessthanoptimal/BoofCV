@@ -18,23 +18,16 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.distort.AddRadialPtoP_F32;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.app.*;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder;
-import boofcv.factory.distort.FactoryDistort;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
@@ -59,10 +52,6 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	// needed by ProcessThread for displaying its dialog
 	JPanel owner;
 
-	// transform used to undistort image
-	AddRadialPtoP_F32 tran = new AddRadialPtoP_F32();
-	ImageDistort<ImageFloat32> dist;
-
 	List<String> images;
 	MediaManager media = DefaultMediaManager.INSTANCE;
 	
@@ -72,20 +61,14 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		this.owner = this;
 		
 		add(gui,BorderLayout.CENTER);
-
-		// Distortion algorithm for removing radial distortion
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
-		PixelTransform_F32 tran = new PointToPixelTransform_F32(this.tran);
-		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class, 0);
-		dist = FactoryDistort.distort(interp,border,ImageFloat32.class);
-		dist.setModel(tran);
 	}
 
 	public void configure( PlanarCalibrationDetector detector ,
 						   PlanarCalibrationTarget target,
-						   List<String> images  ) {
+						   List<String> images  ,
+						   boolean adjustLeftToRight ) {
 
-		calibrator = new CalibrateMonoPlanar(detector,true);
+		calibrator = new CalibrateMonoPlanar(detector,adjustLeftToRight);
 		calibrator.configure(target,true,2);
 		this.images = images;
 	}
@@ -95,7 +78,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		ParseCalibrationConfig parser = new ParseCalibrationConfig(media);
 
 		if( parser.parse(fileName) ) {
-			configure(parser.detector,parser.target,parser.images);
+			configure(parser.detector,parser.target,parser.images,parser.adjustLeftToRight);
 		} else {
 			System.err.println("Configuration failed");
 		}
@@ -136,11 +119,11 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 				monitor.setMessage(1,"Estimating Parameters");
 			}});
 
-		IntrinsicParameters param = calibrator.process();
+		final IntrinsicParameters param = calibrator.process();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				gui.setResults(calibrator.getErrors());
-				gui.setCalibration(calibrator.getFound());
+				gui.setCalibration(calibrator.getZhangParam());
 			}});
 		monitor.stopThread();
 
@@ -150,9 +133,9 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		// tell it how to undistort the image
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				ParametersZhang99 found = calibrator.getFound();
 
-				tran.set(found.a,found.b,found.c,found.x0,found.y0,found.distortion);
+				ImageDistort<ImageFloat32> dist = LensDistortionOps.removeRadialImage(
+						param,calibrator.isConvertToRightHanded(),ImageFloat32.class);
 				gui.setCorrection(dist);
 
 				gui.repaint();
@@ -223,7 +206,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
-		app.configure(detector,target,CalibrateMonoPlanarApp.directoryList(directory, "frame" ));
+		app.configure(detector,target,CalibrateMonoPlanarApp.directoryList(directory, "frame" ),true);
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);

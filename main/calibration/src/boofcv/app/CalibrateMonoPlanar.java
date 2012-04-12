@@ -44,7 +44,7 @@ import java.util.List;
  * <li>{@link #reset}</li>
  * <li>{@link #addImage}</li>
  * <li>{@link #process}</li>
- * <li>{@link #getFound}</li>
+ * <li>{@link #getIntrinsic}</li>
  * </ol>
  * </p>
  *
@@ -76,7 +76,8 @@ public class CalibrateMonoPlanar {
 	protected boolean assumeZeroSkew;
 
 	// computed parameters
-	protected ParametersZhang99 found;
+	protected ParametersZhang99 foundZhang;
+	protected IntrinsicParameters foundIntrinsic;
 
 	// Information on calibration targets and results
 	protected List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
@@ -85,6 +86,10 @@ public class CalibrateMonoPlanar {
 	protected List<ImageResults> errors;
 
 	public boolean verbose = false;
+
+	// shape of the image
+	private int widthImg;
+	private int heightImg;
 
 	/**
 	 * High level configuration
@@ -120,6 +125,7 @@ public class CalibrateMonoPlanar {
 	public void reset() {
 		observations = new ArrayList<List<Point2D_F64>>();
 		errors = null;
+		heightImg = widthImg = 0;
 	}
 
 	/**
@@ -130,6 +136,13 @@ public class CalibrateMonoPlanar {
 	 * @return true if a target was detected in the image or not
 	 */
 	public boolean addImage( ImageFloat32 image ) {
+
+		if( widthImg == 0 ) {
+			widthImg = image.width;
+			heightImg = image.height;
+		} else if( widthImg != image.width || heightImg != image.height ) {
+			throw new IllegalArgumentException("All images must have the same shape");
+		}
 
 		if( !detector.process(image) )
 			return false;
@@ -163,11 +176,15 @@ public class CalibrateMonoPlanar {
 			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
 
-		found = zhang99.getOptimized();
+		foundZhang = zhang99.getOptimized();
 
-		errors = computeErrors(observationsAdj,found,target.points,assumeZeroSkew);
+		errors = computeErrors(observationsAdj, foundZhang,target.points,assumeZeroSkew);
 
-		return found.convertToIntrinsic();
+		foundIntrinsic = foundZhang.convertToIntrinsic();
+		foundIntrinsic.width = widthImg;
+		foundIntrinsic.height = heightImg;
+
+		return foundIntrinsic;
 	}
 
 	public void printStatistics() {
@@ -253,12 +270,19 @@ public class CalibrateMonoPlanar {
 		return errors;
 	}
 
-	public ParametersZhang99 getFound() {
-		return found;
+	public ParametersZhang99 getZhangParam() {
+		return foundZhang;
+	}
+
+	public IntrinsicParameters getIntrinsic() {
+		return foundIntrinsic;
 	}
 
 	public PlanarCalibrationTarget getTarget() {
 		return target;
 	}
 
+	public boolean isConvertToRightHanded() {
+		return convertToRightHanded;
+	}
 }

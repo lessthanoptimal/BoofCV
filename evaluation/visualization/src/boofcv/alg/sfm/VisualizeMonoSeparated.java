@@ -21,8 +21,7 @@ package boofcv.alg.sfm;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.WrapMonocularSeparatedMotion;
-import boofcv.alg.distort.LeftToRightHanded_F64;
-import boofcv.alg.distort.RemoveRadialPtoN_F64;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.VideoProcessAppBase;
@@ -84,14 +83,11 @@ extends VideoProcessAppBase<I,D> {
 	}
 	
 	public void configure( IntrinsicParameters cameraParam )  {
-		RemoveRadialPtoN_F64 removeRadial = new RemoveRadialPtoN_F64();
-		removeRadial.set(cameraParam.fx,cameraParam.fy,cameraParam.skew,cameraParam.cx,cameraParam.cy,cameraParam.radial);
-
-		PointTransform_F64 p2n = new LeftToRightHanded_F64(removeRadial,cameraParam.height);
+		PointTransform_F64 removeRadial = LensDistortionOps.removeRadialToNorm(cameraParam,true);
 
 		WrapMonocularSeparatedMotion<I> w =
 				(WrapMonocularSeparatedMotion<I>)FactoryVisualOdometry.
-						monoSeparated(maxFeatures/2, 12, 1.2,  2.5*Math.PI/180.0, tracker, p2n);
+						monoSeparated(maxFeatures/2, 12, 1.2,  2.5*Math.PI/180.0, tracker, removeRadial);
 
 		alg = w.getAlg();
 	}

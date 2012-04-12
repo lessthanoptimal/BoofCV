@@ -395,6 +395,11 @@
     <option name="USE_PER_PROJECT_SETTINGS" value="true" />
   </component>
   <component name="ProjectDictionaryState">
+    <dictionary name="foo">
+      <words>
+        <w>epipolar</w>
+      </words>
+    </dictionary>
     <dictionary name="pja">
       <words>
         <w>discretization</w>

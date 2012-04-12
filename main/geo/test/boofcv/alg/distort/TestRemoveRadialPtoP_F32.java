@@ -18,8 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PointTransform_F64;
-import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -27,26 +26,33 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestLeftToRightHanded_F64 {
+public class TestRemoveRadialPtoP_F32 {
 
 	@Test
-	public void theSuperDuperTest() {
-		
-		LeftToRightHanded_F64 alg = new LeftToRightHanded_F64(new Dummy(),1);
-		
-		Point2D_F64 out = new Point2D_F64();
-		alg.compute(2,3,out);
-		
-		assertEquals(2,out.x,1e-8);
-		assertEquals(3,-out.y,1e-8);
-	}
-	
-	private class Dummy implements PointTransform_F64 {
+	public void checkAgainstAdd() {
+		double fx = 600;
+		double fy = 500;
+		double skew = 2;
+		double xc = 300;
+		double yc = 350;
 
-		@Override
-		public void compute(double x, double y, Point2D_F64 out) {
-			out.x = x;
-			out.y = y;
-		}
+		double radial[]= new double[]{0.12,-0.13};
+
+		Point2D_F32 point = new Point2D_F32();
+
+		float undistX = 19.5f;
+		float undistY = 200.1f;
+
+		new AddRadialPtoP_F32(fx,fy,skew,xc,yc,radial).compute(undistX,undistY,point);
+
+		float distX = point.x;
+		float distY = point.y;
+
+		RemoveRadialPtoP_F32 alg = new RemoveRadialPtoP_F32();
+		alg.set(fx,fy,skew,xc,yc,radial);
+		alg.compute(distX, distY, point);
+
+		assertEquals(undistX,point.x,1e-4);
+		assertEquals(undistY,point.y,1e-4);
 	}
 }
