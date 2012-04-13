@@ -18,12 +18,14 @@
 
 package boofcv.gui.feature;
 
+import boofcv.alg.geo.AssociatedPair;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -62,6 +64,32 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 			AssociatedIndex a = matches.get(i);
 			assocLeft[a.src] = a.dst;
 			assocRight[a.dst] = a.src;
+		}
+
+		Random rand = new Random(234);
+		colors = new Color[ leftPts.size() ];
+		for( int i = 0; i < colors.length; i++ ) {
+			colors[i] = new Color(rand.nextInt() | 0xFF000000 );
+		}
+	}
+
+	public synchronized void setAssociation( List<AssociatedPair> matches ) {
+		List<Point2D_F64> leftPts = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
+
+		for( AssociatedPair p : matches ) {
+			leftPts.add(p.keyLoc);
+			rightPts.add(p.currLoc);
+		}
+
+		setLocation(leftPts,rightPts);
+
+		assocLeft = new int[ leftPts.size() ];
+		assocRight = new int[ rightPts.size() ];
+
+		for( int i = 0; i < assocLeft.length; i++ ) {
+			assocLeft[i] = i;
+			assocRight[i] = i;
 		}
 
 		Random rand = new Random(234);

@@ -161,7 +161,7 @@ public class RectifyCalibrated {
 	 *
 	 * @return Calibration matrix for both cameras
 	 */
-	public SimpleMatrix getCalibrationMatrix() {
-		return K;
+	public DenseMatrix64F getCalibrationMatrix() {
+		return K.getMatrix();
 	}
 }

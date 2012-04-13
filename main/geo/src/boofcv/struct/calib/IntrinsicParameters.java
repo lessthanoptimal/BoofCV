@@ -43,6 +43,8 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
+// todo move distortion parameters into its own class?
+// todo Split width+height + isLeftHanded off into its own data structure?
 public class IntrinsicParameters implements Serializable {
 
 	// image shape
@@ -57,6 +59,24 @@ public class IntrinsicParameters implements Serializable {
 
 	// radial distortion parameters
 	public double radial[];
+
+	public IntrinsicParameters() {
+	}
+
+	public IntrinsicParameters(double fx, double fy,
+							   double skew,
+							   double cx, double cy,
+							   int width, int height,
+							   double[] radial) {
+		this.fx = fx;
+		this.fy = fy;
+		this.skew = skew;
+		this.cx = cx;
+		this.cy = cy;
+		this.width = width;
+		this.height = height;
+		this.radial = radial;
+	}
 
 	public double getCx() {
 		return cx;
@@ -124,8 +144,8 @@ public class IntrinsicParameters implements Serializable {
 
 	public void print() {
 		System.out.println("Shape "+width+" "+height);
-		System.out.printf("center %7.2f %7.2f ",cx,cy);
-		System.out.println("fx = "+fx);
+		System.out.printf("center %7.2f %7.2f\n", cx, cy);
+		System.out.println("fx = " + fx);
 		System.out.println("fy = "+fy);
 		System.out.println("skew = "+skew);
 		for( int i = 0; i < radial.length; i++ ) {

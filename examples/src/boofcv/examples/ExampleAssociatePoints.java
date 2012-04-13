@@ -58,6 +58,10 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 	// Associated descriptions together by minimizing an error metric
 	GeneralAssociation<TupleDesc_F64> associate;
 
+	// location of interest points
+	List<Point2D_F64> pointsA;
+	List<Point2D_F64> pointsB;
+
 	Class<T> imageType;
 
 	public ExampleAssociatePoints(InterestPointDetector<T> detector,
@@ -79,8 +83,8 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 		T inputB = ConvertBufferedImage.convertFromSingle(imageB, null, imageType);
 
 		// stores the location of detected interest points
-		List<Point2D_F64> pointsA = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> pointsB = new ArrayList<Point2D_F64>();
+		pointsA = new ArrayList<Point2D_F64>();
+		pointsB = new ArrayList<Point2D_F64>();
 
 		// stores the description of detected interest points
 		FastQueue<TupleDesc_F64> descA = new TupleDescQueue(describe.getDescriptionLength(),true);
@@ -96,7 +100,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 		// display the results
 		AssociationPanel panel = new AssociationPanel(20);
 		panel.setAssociation(pointsA,pointsB,associate.getMatches());
-		panel.setImages(imageA,imageB);
+		panel.setImages(imageA, imageB);
 
 		ShowImages.showWindow(panel,"Associated Features");
 	}
