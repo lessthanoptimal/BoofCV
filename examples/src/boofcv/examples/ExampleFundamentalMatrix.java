@@ -55,7 +55,11 @@ import java.util.List;
  *
  * Below are two examples of how a Fundamental matrix can be computed using different simplified interfaces.
  * The robust technique attempts to find the best fit Fundamental matrix to the data while removing noisy
- * matches, while the simple version just assumes that all the matches are correct.
+ * matches, while the simple version just assumes that all the matches are correct.  Similar techniques can be used
+ * to fit various other types of motion or structural models to observations.
+ *
+ * The input image and associated features are displayed in a window.  In another window only features included
+ * in the inlier set of the robust algorithm are shown.
  *
  * @author Peter Abeles
  */
@@ -84,7 +88,7 @@ public class ExampleFundamentalMatrix {
 		// Use LMedS to estimate F since it does not require knowledge of the expected error
 		ModelMatcher<DenseMatrix64F,AssociatedPair> robustF =
 				new SimpleInlierRansac<DenseMatrix64F, AssociatedPair>(123123,generateF,errorMetric,
-						1000,7,20,-1,1e-3);
+						3000,7,20,-1,0.5e-2);
 
 		// Estimate the fundamental matrix while removing outliers
 		if( !robustF.process(matches) )
@@ -128,7 +132,8 @@ public class ExampleFundamentalMatrix {
 	public static List<AssociatedPair> computeMatches( BufferedImage left , BufferedImage right ) {
 		InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4);
 		DescribeRegionPoint<ImageFloat32> describe = FactoryDescribeRegionPoint.surf(true, ImageFloat32.class);
-		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(new ScoreAssociateEuclideanSq(), 2, -1, true);
+		GeneralAssociation<TupleDesc_F64> associate =
+				FactoryAssociation.greedy(new ScoreAssociateEuclideanSq(), 2, -1, true);
 
 		ExampleAssociatePoints<ImageFloat32> findMatches =
 				new ExampleAssociatePoints<ImageFloat32>(detector, describe, associate, ImageFloat32.class);
@@ -151,8 +156,8 @@ public class ExampleFundamentalMatrix {
 
 		String dir = "../data/evaluation/structure/";
 
-		BufferedImage imageA = UtilImageIO.loadImage(dir + "mmk01.jpg");
-		BufferedImage imageB = UtilImageIO.loadImage(dir+"mmk02.jpg");
+		BufferedImage imageA = UtilImageIO.loadImage(dir + "cyto02.jpg");
+		BufferedImage imageB = UtilImageIO.loadImage(dir + "cyto04.jpg");
 
 		List<AssociatedPair> matches = computeMatches(imageA,imageB);
 
@@ -163,6 +168,7 @@ public class ExampleFundamentalMatrix {
 
 		// estimate and print the results using a robust and simple estimator
 		// The results should be difference since there are many false associations in the simple model
+		// Also note that the fundamental matrix is only defined up to a scale factor.
 		F = robustFundamental(matches, inliers);
 		System.out.println("Robust");
 		F.print();

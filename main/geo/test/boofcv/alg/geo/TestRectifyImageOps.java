@@ -36,15 +36,19 @@ public class TestRectifyImageOps {
 	int width = 300;
 	int height = 350;
 
+	/**
+	 * After the camera matrix has been adjusted and a forward rectification transform has been applied
+	 * the output image will be shrink and contained inside the output image.
+	 */
 	@Test
 	public void fullViewLeft_calibrated() {
 
-		IntrinsicParameters param = new IntrinsicParameters(300,300,0,150,150,width,height,new double[]{0.1,1e-4});
+		IntrinsicParameters param = new IntrinsicParameters(300,320,0,150,130,width,height,new double[]{0.1,1e-4});
 
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
 		DenseMatrix64F rect2 = CommonOps.identity(3);
-		DenseMatrix64F rectK = UtilEpipolar.calibrationMatrix(param);
+		DenseMatrix64F rectK = UtilIntrinsic.calibrationMatrix(param);
 
 		RectifyImageOps.fullViewLeft(param,false,rect1,rect2,rectK);
 
@@ -83,7 +87,7 @@ public class TestRectifyImageOps {
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
 		DenseMatrix64F rect2 = CommonOps.identity(3);
-		DenseMatrix64F rectK = UtilEpipolar.calibrationMatrix(param);
+		DenseMatrix64F rectK = UtilIntrinsic.calibrationMatrix(param);
 
 		RectifyImageOps.allInsideLeft(param, false, rect1, rect2, rectK);
 

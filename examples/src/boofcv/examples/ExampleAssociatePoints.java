@@ -100,7 +100,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 		// display the results
 		AssociationPanel panel = new AssociationPanel(20);
 		panel.setAssociation(pointsA,pointsB,associate.getMatches());
-		panel.setImages(imageA, imageB);
+		panel.setImages(imageA,imageB);
 
 		ShowImages.showWindow(panel,"Associated Features");
 	}

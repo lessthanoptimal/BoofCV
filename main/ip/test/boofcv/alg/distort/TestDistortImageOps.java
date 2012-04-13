@@ -176,7 +176,7 @@ public class TestDistortImageOps {
 		// basic sanity check
 		Affine2D_F32 affine = new Affine2D_F32(1,0,0,1,2,3);
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
-		Rectangle2D_F32 found = DistortImageOps.boundBox_F32(10, 20, transform);
+		Rectangle2D_F32 found = DistortImageOps.boundBox_F32(10,20,transform);
 
 		assertEquals(2,found.tl_x,1e-4);
 		assertEquals(3,found.tl_y,1e-4);

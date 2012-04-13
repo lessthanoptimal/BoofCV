@@ -21,7 +21,7 @@ package boofcv.examples;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.geo.UtilEpipolar;
+import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ShowImages;
@@ -85,8 +85,8 @@ public class ExampleRectifyCalibratedStereo {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = UtilEpipolar.calibrationMatrix(param.getLeft());
-		DenseMatrix64F K2 = UtilEpipolar.calibrationMatrix(param.getRight());
+		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(param.getLeft());
+		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(param.getRight());
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
