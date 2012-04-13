@@ -21,7 +21,6 @@ package boofcv.alg.distort;
 import boofcv.struct.distort.PointTransform_F32;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
@@ -43,8 +42,6 @@ public class RemoveRadialPtoN_F32 implements PointTransform_F32 {
 	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
 	private float tol=1e-5f;
-	
-	Point2D_F64 temp = new Point2D_F64();
 
 	public RemoveRadialPtoN_F32() {
 	}

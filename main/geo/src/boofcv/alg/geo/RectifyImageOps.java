@@ -52,8 +52,12 @@ public class RectifyImageOps {
 	 * <p>
 	 * Adjust the rectification such that the entire original left image can be seen.  For use with
 	 * calibrated stereo images having a known baseline.  Due to lens distortions it is possible for large parts of the
-	 * rectified image to have no overlap with the original.  This can cause issues when processing
-	 * the image. The rectification matrices are overwritten with the adjustment on output.
+	 * rectified image to have no overlap with the original and will appear to be black.  This can cause
+	 * issues when processing the image
+	 * </p>
+	 *
+	 * <p>
+	 * Input rectification matrices are overwritten with the adjustment on output.
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera
@@ -75,10 +79,28 @@ public class RectifyImageOps {
 		double scaleX = paramLeft.width/bound.width;
 		double scaleY = paramLeft.height/bound.height;
 
-		double scale = Math.min(scaleX,scaleY);
+		double scale = Math.min(scaleX, scaleY);
 
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
 	}
+
+	public static void fullViewLeft(int imageWidth,int imageHeight,
+									boolean applyLeftToRight,
+									DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight )
+	{
+		PointTransform_F32 tranLeft = rectifyTransform(imageHeight, applyLeftToRight, rectifyLeft);
+
+		Rectangle2D_F32 bound = DistortImageOps.boundBox_F32(imageWidth, imageHeight,
+				new PointToPixelTransform_F32(tranLeft));
+
+		double scaleX = imageHeight/bound.width;
+		double scaleY = imageHeight/bound.height;
+
+		double scale = Math.min(scaleX,scaleY);
+
+		adjustUncalibrated(rectifyLeft, rectifyRight, bound, scale);
+	}
+
 
 	/**
 	 * <p>
@@ -139,6 +161,22 @@ public class RectifyImageOps {
 		rectifyK.set(K.getMatrix());
 		rectifyLeft.set(K.mult(rL).getMatrix());
 		rectifyRight.set(K.mult(rR).getMatrix());
+	}
+
+	private static void adjustUncalibrated(DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
+										   Rectangle2D_F32 bound, double scale) {
+		// translation
+		double deltaX = -bound.tl_x*scale;
+		double deltaY = -bound.tl_y*scale;
+
+		// adjustment matrix
+		SimpleMatrix A = new SimpleMatrix(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
+		SimpleMatrix rL = SimpleMatrix.wrap(rectifyLeft);
+		SimpleMatrix rR = SimpleMatrix.wrap(rectifyRight);
+
+
+		rectifyLeft.set(A.mult(rL).getMatrix());
+		rectifyRight.set(A.mult(rR).getMatrix());
 	}
 
 
@@ -221,6 +259,51 @@ public class RectifyImageOps {
 		PointTransform_F32 transform = rectifyTransformInv(param, applyLeftToRight , rectify);
 
 		ret.setModel(new PointToPixelTransform_F32(transform));
+
+		return ret;
+	}
+
+	public static PointTransform_F32 rectifyTransform( int imageHeight ,
+													   boolean applyLeftToRight ,
+													   DenseMatrix64F rectify )
+	{
+		PointTransformHomography_F32 rectifyDistort = new PointTransformHomography_F32(rectify);
+
+		if( applyLeftToRight ) {
+			PointTransform_F32 l2r = new LeftToRightHanded_F32(imageHeight);
+			return new SequencePointTransform_F32(l2r,rectifyDistort,l2r);
+		} else {
+			return rectifyDistort;
+		}
+	}
+
+	public static PointTransform_F32 rectifyTransformInv( int imageHeight ,
+													   boolean applyLeftToRight ,
+													   DenseMatrix64F rectify )
+	{
+		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
+		CommonOps.invert(rectify,rectifyInv);
+		PointTransformHomography_F32 rectifyDistort = new PointTransformHomography_F32(rectifyInv);
+
+		if( applyLeftToRight ) {
+			PointTransform_F32 l2r = new LeftToRightHanded_F32(imageHeight);
+			return new SequencePointTransform_F32(l2r,rectifyDistort,l2r);
+		} else {
+			return rectifyDistort;
+		}
+	}
+
+	public static <T extends ImageSingleBand> ImageDistort<T>
+	rectifyImage( int imageHeight , boolean applyLeftToRight , DenseMatrix64F rectify , Class<T> imageType)
+	{
+		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+
+		PointTransform_F32 rectifyTran = rectifyTransformInv(imageHeight,applyLeftToRight,rectify);
+
+		// don't bother caching the results since it is likely to only be applied once and is cheap to compute
+		ImageDistort<T> ret = FactoryDistort.distort(interp, null, imageType);
+
+		ret.setModel(new PointToPixelTransform_F32(rectifyTran));
 
 		return ret;
 	}

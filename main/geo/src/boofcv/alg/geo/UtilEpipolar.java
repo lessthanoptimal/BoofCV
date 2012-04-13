@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo;
 
-import boofcv.struct.calib.IntrinsicParameters;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -230,30 +229,6 @@ public class UtilEpipolar {
 		e1.set(V.get(0,2),V.get(1,2),V.get(2,2));
 	}
 
-	/**
-	 * Given the intrinsic parameters create a calibration matrix
-	 *
-	 * @param fx Focal length x-axis in pixels
-	 * @param fy Focal length y-axis in pixels
-	 * @param skew skew in pixels
-	 * @param xc camera center x-axis in pixels
-	 * @param yc center center y-axis in pixels
-	 * @return Calibration matrix 3x3
-	 */
-	public static DenseMatrix64F calibrationMatrix(double fx, double fy, double skew,
-												   double xc, double yc) {
-		return new DenseMatrix64F(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
-	}
-
-	/**
-	 * Given the intrinsic parameters create a calibration matrix
-	 *
-	 * IntrinsicParameters param
-	 * @return Calibration matrix 3x3
-	 */
-	public static DenseMatrix64F calibrationMatrix( IntrinsicParameters param ) {
-		return new DenseMatrix64F(3,3,true,param.fx,param.skew,param.cx,0,param.fy,param.cy,0,0,1);
-	}
 
 	/**
 	 * <p>

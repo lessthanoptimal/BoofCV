@@ -180,7 +180,7 @@ public class DistortImageOps {
 	 * @param <T> Band type.
 	 */
 	public static <T extends ImageSingleBand> void distortMS( MultiSpectral<T> input , MultiSpectral<T> output ,
-															   ImageDistort<T> distortion )
+															  ImageDistort<T> distortion )
 	{
 		for( int band = 0; band < input.getNumBands(); band++ )
 			distortion.apply(input.getBand(band),output.getBand(band));

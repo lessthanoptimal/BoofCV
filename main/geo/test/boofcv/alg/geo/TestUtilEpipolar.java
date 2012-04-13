@@ -224,22 +224,10 @@ public class TestUtilEpipolar {
 		GeometryMath_F64.multTran(E,e2,temp);
 		assertEquals(0,temp.norm(),1e-8);
 	}
-	
-	@Test
-	public void calibrationMatrix() {
-		DenseMatrix64F K = UtilEpipolar.calibrationMatrix(1,2,3,4,5);
-		
-		assertEquals(1,K.get(0,0),1e-3);
-		assertEquals(2,K.get(1,1),1e-3);
-		assertEquals(3,K.get(0,1),1e-3);
-		assertEquals(4,K.get(0,2),1e-3);
-		assertEquals(5,K.get(1,2),1e-3);
-		assertEquals(1,K.get(2,2),1e-3);
-	}
 
 	@Test
 	public void canonicalCamera() {
-		DenseMatrix64F K = UtilEpipolar.calibrationMatrix(200,250,0,100,110);
+		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(200, 250, 0, 100, 110);
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
@@ -274,7 +262,7 @@ public class TestUtilEpipolar {
 	@Test
 	public void decomposeCameraMatrix() {
 		// compute an arbitrary projection matrix from known values
-		DenseMatrix64F K = UtilEpipolar.calibrationMatrix(200,250,0,100,110);
+		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(200, 250, 0, 100, 110);
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 

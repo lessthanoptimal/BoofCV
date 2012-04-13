@@ -25,9 +25,18 @@ Version : Alpha 0.7
 - Improved speed of Levenberg algorithm by taking advantage of symmetry
 - UtilEpipolar
   * Added canonicalCamera() and decomposeCameraMatrix()
+- Created the following Util and Ops classes
+  * UtilIntrinsic
+  * LensDistortionOps
+  * RectifyImageOps
 - Stereo Rectification
   * Calibrated cameras
   * From fundamental matrices
+- New Examples
+  * Estimate fundamental matrix
+  * Rectify calibrated
+  * Rectify fundamental matrix
+  * Remove lens distortion
 
 ---------------------------------------------
 Date    : 2012/03/01
