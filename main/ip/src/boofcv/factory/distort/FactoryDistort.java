@@ -58,11 +58,10 @@ public class FactoryDistort {
 	 * by caching the distortion for each pixel.  This can improve speed significantly when the distortion
 	 * and output image size are both constant.
 	 *
-	 * @param interp
-	 * @param border
-	 * @param imageType
-	 * @param <T>
-	 * @return
+	 * @param interp Which interpolation algorithm should be used.
+	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
+	 * @param imageType Type of image being processed.
+	 * @return Image distort which caches the distortion.
 	 */
 	public static <T extends ImageSingleBand>
 	ImageDistort<T> distortCached(InterpolatePixel<T> interp, ImageBorder border ,

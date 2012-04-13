@@ -24,11 +24,13 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.ImageRectangle_F32;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.shapes.Rectangle2D_F32;
 import georegression.struct.shapes.Rectangle2D_I32;
 
 
@@ -185,7 +187,7 @@ public class DistortImageOps {
 	}
 
 	/**
-	 * Founds an axis-aligned bounding box which would contain a image after it has been transformed.
+	 * Finds an axis-aligned bounding box which would contain a image after it has been transformed.
 	 * A sanity check is done to made sure it is contained inside the destination image's bounds.
 	 * If it is totally outside then a rectangle with negative width or height is returned.
 	 *
@@ -200,19 +202,46 @@ public class DistortImageOps {
 											int dstWidth , int dstHeight ,
 											PixelTransform_F32 transform )
 	{
+		Rectangle2D_I32 ret = boundBox(srcWidth,srcHeight,transform);
+
+		int x0 = ret.tl_x;
+		int y0 = ret.tl_y;
+		int x1 = ret.tl_x + ret.width;
+		int y1 = ret.tl_y + ret.height;
+
+		if( x0 < 0 ) x0 = 0;
+		if( x1 > dstWidth) x1 = dstWidth;
+		if( y0 < 0 ) y0 = 0;
+		if( y1 > dstHeight) y1 = dstHeight;
+
+		return new Rectangle2D_I32(x0,y0,x1-x0,y1-y0);
+	}
+
+	/**
+	 * Finds an axis-aligned bounding box which would contain a image after it has been transformed.
+	 * The returned bounding box can be larger then the original image.
+	 *
+	 * @param srcWidth Width of the source image
+	 * @param srcHeight Height of the source image
+	 * @param transform Transform being applied to the image
+	 * @return Bounding box
+	 */
+	public static Rectangle2D_I32 boundBox( int srcWidth , int srcHeight ,
+											PixelTransform_F32 transform )
+	{
 		int x0,y0,x1,y1;
 
 		transform.compute(0,0);
 		x0=x1=(int)transform.distX;
 		y0=y1=(int)transform.distY;
-		
+
 		for( int i = 1; i < 4; i++ ) {
 			if( i == 1 )
 				transform.compute(srcWidth,0);
 			else if( i == 2 )
 				transform.compute(0,srcHeight);
 			else if( i == 3 )
-				transform.compute(srcWidth,srcHeight);
+				transform.compute(srcWidth-1,srcHeight);
 
 			if( transform.distX < x0 )
 				x0 = (int)transform.distX;
@@ -224,12 +253,51 @@ public class DistortImageOps {
 				y1 = (int)transform.distY;
 		}
 
-		if( x0 < 0 ) x0 = 0;
-		if( x1 > dstWidth) x1 = dstWidth;
-		if( y0 < 0 ) y0 = 0;
-		if( y1 > dstHeight) y1 = dstHeight;
-
 		return new Rectangle2D_I32(x0,y0,x1-x0,y1-y0);
 	}
 
+	/**
+	 * Finds an axis-aligned bounding box which would contain a image after it has been transformed.
+	 * The returned bounding box can be larger then the original image.
+	 *
+	 * @param srcWidth Width of the source image
+	 * @param srcHeight Height of the source image
+	 * @param transform Transform being applied to the image
+	 * @return Bounding box
+	 */
+	public static Rectangle2D_F32 boundBox_F32( int srcWidth , int srcHeight ,
+												PixelTransform_F32 transform )
+	{
+		ImageRectangle_F32 r=new ImageRectangle_F32();
+
+		r.x0=r.y0=Float.MAX_VALUE;
+		r.x1=r.y1=Float.MIN_VALUE;
+
+		for( int y = 0; y < srcHeight; y++ ) {
+			transform.compute(0, y);
+			updateBoundBox(transform, r);
+			transform.compute(srcWidth, y);
+			updateBoundBox(transform, r);
+		}
+
+		for( int x = 0; x < srcWidth; x++ ) {
+			transform.compute(x, 0);
+			updateBoundBox(transform, r);
+			transform.compute(x, srcHeight);
+			updateBoundBox(transform, r);
+		}
+
+		return new Rectangle2D_F32(r.x0,r.y0,r.x1-r.x0,r.y1-r.y0);
+	}
+
+	private static void updateBoundBox(PixelTransform_F32 transform, ImageRectangle_F32 r) {
+		if( transform.distX < r.x0 )
+			r.x0 = transform.distX;
+		else if( transform.distX > r.x1 )
+			r.x1 = transform.distX;
+		if( transform.distY < r.y0 )
+			r.y0 = transform.distY;
+		else if( transform.distY > r.y1 )
+			r.y1 = transform.distY;
+	}
 }

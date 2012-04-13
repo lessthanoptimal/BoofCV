@@ -33,6 +33,7 @@ import boofcv.struct.image.ImageFloat32;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -189,6 +190,9 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 		List<String> leftImages = CalibrateMonoPlanarApp.directoryList(directory, "left");
 		List<String> rightImages = CalibrateMonoPlanarApp.directoryList(directory, "right");
+
+		Collections.sort(leftImages);
+		Collections.sort(rightImages);
 
 		CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
 		app.configure(detector,target,true, leftImages,rightImages);
