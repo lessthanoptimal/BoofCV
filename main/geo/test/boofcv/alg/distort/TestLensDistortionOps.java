@@ -25,7 +25,8 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.shapes.Rectangle2D_F32;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -73,9 +74,40 @@ public class TestLensDistortionOps {
 				p.y <= 1+tol || p.y >= height-1-tol );
 	}
 
+
+	/**
+	 * After the transforms, border pixels should only reference pixels which were inside the original image.
+	 */
 	@Test
 	public void allInside() {
-		fail("implement");
+		IntrinsicParameters param = new IntrinsicParameters(300,320,0,150,130,
+				width,height,new double[]{0.1,1e-4});
+
+		PointTransform_F32 adjusted = LensDistortionOps.allInside(param,false,null);
+
+		checkInside(adjusted);
+	}
+
+	private void checkInside(PointTransform_F32 tran) {
+		for( int y = 0; y < height; y++ ) {
+			checkInside(0,y,tran);
+			checkInside(width-1,y,tran);
+		}
+
+		for( int x = 0; x < width; x++ ) {
+			checkInside(x,0,tran);
+			checkInside(x,height-1,tran);
+		}
+	}
+
+	private void checkInside( int x , int y , PointTransform_F32 tran ) {
+		tran.compute(x, y, p);
+
+		float tol = 0.1f;
+
+		String s = x+" "+y+" -> "+p.x+" "+p.y;
+		assertTrue(s,p.x >= -tol && p.x < width+tol );
+		assertTrue(s,p.y >= -tol && p.y < height+tol );
 	}
 
 	@Test

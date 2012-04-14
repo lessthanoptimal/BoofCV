@@ -41,7 +41,17 @@ import org.ejml.data.DenseMatrix64F;
  */
 public class LensDistortionOps {
 
-	// todo comment
+	/**
+	 * Transforms the view such that the entire original image is visible after lens distortion has been removed.
+	 * The appropriate {@link PointTransform_F32} is returned and a new set of intrinsic camera parameters for
+	 * the "virtual" camera that is associated with the returned transformed.
+	 *
+	 * @param param Intrinsic camera parameters.
+	 * @param applyLeftToRight True if the intrinsic parameters were computed by adjusting the image coordinate system
+	 *                         to be right handed.
+	 * @param paramAdj If not null, the new camera parameters are stored here.
+	 * @return New transform that adjusts the view and removes lens distortion..
+	 */
 	public static PointTransform_F32 fullView( IntrinsicParameters param,
 											   boolean applyLeftToRight ,
 											   IntrinsicParameters paramAdj ) {
@@ -57,7 +67,7 @@ public class LensDistortionOps {
 		double scaleX = bound.width/param.width;
 		double scaleY = bound.height/param.height;
 
-		double scale = Math.min(scaleX, scaleY);
+		double scale = Math.max(scaleX, scaleY);
 
 		// translation
 		double deltaX = bound.tl_x;
@@ -66,7 +76,7 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		PointTransform_F32 tranAdj = UtilIntrinsic.adjustDistortion_F32(addDistort, param, A, paramAdj);
+		PointTransform_F32 tranAdj = UtilIntrinsic.adjustIntrinsic_F32(addDistort, false, param, A, paramAdj);
 
 		if( applyLeftToRight) {
 			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
@@ -75,7 +85,16 @@ public class LensDistortionOps {
 			return tranAdj;
 	}
 
-	// todo comment
+	/**
+	 * Adjusts the view such that each pixel has a correspondence to the original image while maximizing the
+	 * view area. In other words no black regions which can cause problems for some image processing algorithms.
+	 *
+	 * @param param Intrinsic camera parameters.
+	 * @param applyLeftToRight True if the intrinsic parameters were computed by adjusting the image coordinate system
+	 *                         to be right handed.
+	 * @param paramAdj If not null, the new camera parameters are stored here.
+	 * @return New transform that adjusts the view and removes lens distortion..
+	 */
 	public static PointTransform_F32 allInside( IntrinsicParameters param,
 												boolean applyLeftToRight ,
 												IntrinsicParameters paramAdj ) {
@@ -87,19 +106,19 @@ public class LensDistortionOps {
 		Rectangle2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
 				new PointToPixelTransform_F32(removeDistort));
 
-		double scaleX = param.width/bound.width;
-		double scaleY = param.height/bound.height;
+		double scaleX = bound.width/param.width;
+		double scaleY = bound.height/param.height;
 
 		double scale = Math.min(scaleX, scaleY);
 
-		// translation
-		double deltaX = bound.tl_x;
-		double deltaY = bound.tl_y;
+		// translation and shift over so that the small axis is in the middle
+		double deltaX = bound.tl_x + (scaleX-scale)*param.width/2.0;
+		double deltaY = bound.tl_y + (scaleY-scale)*param.height/2.0;
 
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		PointTransform_F32 tranAdj = UtilIntrinsic.adjustDistortion_F32(addDistort, param, A, paramAdj);
+		PointTransform_F32 tranAdj = UtilIntrinsic.adjustIntrinsic_F32(addDistort, false, param, A, paramAdj);
 
 		if( applyLeftToRight) {
 			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);

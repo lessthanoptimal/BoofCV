@@ -18,11 +18,18 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.PointTransform_F32;
+import georegression.geometry.GeometryMath_F32;
+import georegression.struct.point.Point2D_F32;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
+import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -31,7 +38,58 @@ public class TestUtilIntrinsic {
 
 	@Test
 	public void adjustDistortion_F32() {
-		fail("implement");
+
+		DenseMatrix64F A = new DenseMatrix64F(3,3,true,1,2,3,10,4,8,2,4,9);
+		DenseMatrix64F B = new DenseMatrix64F(3,3,true,2,0,1,0,3,2,0,0,1);
+
+		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300,null);
+		IntrinsicParameters paramAdj = new IntrinsicParameters();
+
+		PointTransformHomography_F32 firstTran = new PointTransformHomography_F32(A);
+
+		// test forward case
+		PointTransform_F32 foundTran = UtilIntrinsic.adjustIntrinsic_F32(firstTran, true, param, B, paramAdj);
+
+		Point2D_F32 X = new Point2D_F32(1,3);
+
+		Point2D_F32 foundPt = new Point2D_F32();
+		Point2D_F32 expectedPt = new Point2D_F32();
+
+		foundTran.compute(1,3,foundPt);
+
+		Point2D_F32 temp = new Point2D_F32();
+		GeometryMath_F32.mult(A, X, temp);
+		GeometryMath_F32.mult(B, temp, expectedPt);
+
+		assertEquals(expectedPt.x,foundPt.x,1e-4);
+		assertEquals(expectedPt.y,foundPt.y,1e-4);
+
+		// check the new intrinsic parameters
+		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(param);
+		DenseMatrix64F Kfound = UtilIntrinsic.calibrationMatrix(paramAdj);
+		DenseMatrix64F Kexpected = new DenseMatrix64F(3,3);
+
+		CommonOps.mult(B,K,Kexpected);
+		assertTrue(MatrixFeatures.isIdentical(Kexpected,Kfound,1e-8));
+
+		// test reverse case
+		foundTran = UtilIntrinsic.adjustIntrinsic_F32(firstTran, false, param, B, paramAdj);
+
+		foundTran.compute(1,3,foundPt);
+
+		GeometryMath_F32.mult(B, X, temp);
+		GeometryMath_F32.mult(A, temp, expectedPt);
+
+		assertEquals(expectedPt.x,foundPt.x,1e-4);
+		assertEquals(expectedPt.y,foundPt.y,1e-4);
+
+		// check the new intrinsic parameters
+		Kfound = UtilIntrinsic.calibrationMatrix(paramAdj);
+		CommonOps.invert(B);
+
+		CommonOps.mult(B,K,Kexpected);
+		assertTrue(MatrixFeatures.isIdentical(Kexpected,Kfound,1e-8));
+
 	}
 
 	@Test
