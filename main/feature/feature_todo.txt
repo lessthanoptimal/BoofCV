@@ -1,4 +1,7 @@
 
+- Associate
+ * Clean up interface and make it more elegant
+
 Trackers
 - Detect region/normalized cross correlation
 

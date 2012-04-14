@@ -115,7 +115,7 @@ public class ExampleRectifyCalibratedStereo {
 		BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null);
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
-		ShowImages.showWindow(new RectifiedPairPanel(true,origLeft,origRight),"Original");
+		ShowImages.showWindow(new RectifiedPairPanel(true, origLeft, origRight), "Original");
 		ShowImages.showWindow(new RectifiedPairPanel(true,outLeft,outRight),"Rectified");
 	}
 }

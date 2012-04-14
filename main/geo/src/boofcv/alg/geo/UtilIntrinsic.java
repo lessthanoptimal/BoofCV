@@ -32,9 +32,17 @@ public class UtilIntrinsic {
 
 	/**
 	 * <p>
-	 * Applies an invertible homography transform to the calibration matrix.  This can be used
-	 * to create a virtual camera where more of the distorted image is visible.  A new transform
-	 * is returned and (optionally) new intrinsic parameters are computed.
+	 * Creates a new {@link PointTransform_F32} which is the same as applying a homography transform
+	 * and another arbitrary transform.  A typical application is removing lens distortion from
+	 * camera.s  The order that each transform is applied depends on if the arbitrary transform is forward or
+	 * reverse transform.  A new set of camera parameters is computed to account for the adjustment.
+	 * </p>
+	 *
+	 * <p>
+	 * When removing camera distortion, the undistorted image is likely to have a different shape not
+	 * entirely encloded by the original image.  This can be compensated for by transforming the undistorted
+	 * image using a homography transform.  Typically this will translate and scale the undistorted image.
+	 * The end result is a new virtual camera which has the adjusted intrinsic camera parameters.
 	 * </p>
 	 *
 	 * <p>
@@ -44,27 +52,41 @@ public class UtilIntrinsic {
 	 * </p>
 	 *
 	 * @param distortPixel Transform that distorts the pixels in an image.
+	 * @param forwardTran If true then the distortion expects undistorted pixels as input, false means it
+	 *                    expects distorted pixels as input.
 	 * @param parameters Original intrinsic camera parameters
 	 * @param adjustMatrix Invertible homography
 	 * @param adjustedParam The new intrinsic calibration matrix.
 	 * @return The new transform.
 	 */
-	public static PointTransform_F32 adjustDistortion_F32( PointTransform_F32 distortPixel ,
-														   IntrinsicParameters parameters ,
-														   DenseMatrix64F adjustMatrix ,
-														   IntrinsicParameters adjustedParam )
+	public static PointTransform_F32 adjustIntrinsic_F32(PointTransform_F32 distortPixel,
+														 boolean forwardTran,
+														 IntrinsicParameters parameters,
+														 DenseMatrix64F adjustMatrix,
+														 IntrinsicParameters adjustedParam)
 	{
 		if( adjustedParam != null ) {
 			DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(parameters);
 			DenseMatrix64F K_adj = new DenseMatrix64F(3,3);
-			CommonOps.mult(adjustMatrix, K, K_adj);
+			DenseMatrix64F A;
+			// in the reverse case
+			if( !forwardTran ) {
+				A = new DenseMatrix64F(3,3);
+				CommonOps.invert(adjustMatrix,A);
+			} else {
+				A = adjustMatrix;
+			}
+			CommonOps.mult(A, K, K_adj);
 
 			UtilIntrinsic.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
 		}
 
 		PointTransformHomography_F32 adjust = new PointTransformHomography_F32(adjustMatrix);
 
-		return new SequencePointTransform_F32(adjust,distortPixel);
+		if( forwardTran )
+			return new SequencePointTransform_F32(distortPixel,adjust);
+		else
+			return new SequencePointTransform_F32(adjust,distortPixel);
 	}
 
 	/**
