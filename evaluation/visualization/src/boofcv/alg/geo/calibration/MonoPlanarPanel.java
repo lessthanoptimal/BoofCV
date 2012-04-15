@@ -82,7 +82,6 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	int errorScale = 20;
 
-	ImageDistort<ImageFloat32> undoRadial;
 	
 	public MonoPlanarPanel() {
 		super(new BorderLayout());
@@ -198,7 +197,6 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	public void setCorrection( ImageDistort<ImageFloat32> undoRadial )
 	{
-		this.undoRadial = undoRadial;
 		checkUndistorted.setEnabled(true);
 		mainView.setDistorted(undoRadial);
 	}

@@ -17,6 +17,7 @@
     <orderEntry type="module" module-name="libpja" />
     <orderEntry type="module" module-name="BoofCV Visualize" />
     <orderEntry type="module" module-name="BoofCV SFM" />
+    <orderEntry type="module" module-name="BoofCV Calibration" />
   </component>
 </module>
 

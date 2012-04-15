@@ -23,10 +23,9 @@ import boofcv.struct.image.*;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.Serializable;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -228,5 +227,34 @@ public class BoofMiscOps {
 			System.out.println();
 		}
 		System.out.println();
+	}
+
+	/**
+	 * Loads a list of files with the specified prefix.
+	 *
+	 * @param directory Directory it looks inside of
+	 * @param prefix Prefix that the file must have
+	 * @return List of files that are in the directory and match the prefix.
+	 */
+	public static List<String> directoryList( String directory , String prefix ) {
+		List<String> ret = new ArrayList<String>();
+
+		File d = new File(directory);
+
+		if( !d.isDirectory() )
+			throw new IllegalArgumentException("Must specify an directory");
+
+		File files[] = d.listFiles();
+
+		for( File f : files ) {
+			if( f.isDirectory() || f.isHidden() )
+				continue;
+
+			if( f.getName().contains(prefix )) {
+				ret.add(f.getAbsolutePath());
+			}
+		}
+
+		return ret;
 	}
 }

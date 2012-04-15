@@ -1,0 +1,146 @@
+/*
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.examples;
+
+import boofcv.alg.geo.calibration.FactoryPlanarCalibrationTarget;
+import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
+import boofcv.app.CalibrateStereoPlanar;
+import boofcv.app.PlanarCalibrationDetector;
+import boofcv.app.WrapPlanarChessTarget;
+import boofcv.app.WrapPlanarGridTarget;
+import boofcv.core.image.ConvertBufferedImage;
+import boofcv.io.image.UtilImageIO;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.image.ImageFloat32;
+
+import java.awt.image.BufferedImage;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * <p>
+ * Example of how to calibrate a stereo camera system using a planar calibration grid.  The intrinsic camera parameters
+ * are estimated for both cameras individually and the extrinsic parameters for the two cameras relative to each other.
+ * Rectification is optional and handled else where, see {@link ExampleRectifyCalibratedStereo}.
+ * </p>
+ *
+ * <p>
+ * Two types of calibration  targets can be processed by BoofCV, square grids and chessboard.  Square grid is composed
+ * of a set of square grids and chessboard is a classic chessboard pattern.  In general better quality results have
+ * been found using the chessboard patter, but parameter tuning is required to achieve optimal performance.
+ * </p>
+ *
+ * <p>
+ * All the image processing and calibration is taken care of inside of {@link CalibrateStereoPlanar}.  The code below
+ * images of calibration targets are loaded and pass in as inputs and the found calibration is saved to an XML file.
+ * See in code comments for tuning and implementation issues.
+ * </p>
+ *
+ * @see ExampleCalibrateStereoPlanar
+ *
+ * @author Peter Abeles
+ */
+public class ExampleCalibrateStereoPlanar {
+
+	// Detects the target and calibration point inside the target
+	PlanarCalibrationDetector detector;
+
+	// Description of the target's physical dimension
+	PlanarCalibrationTarget target;
+
+	// List of calibration images
+	List<String> left;
+	List<String> right;
+
+	// Most computer images are in a left handed coordinate system.  This can cause problems when algorithms
+	// that assume a right handed coordinate system are used later on.  To address this issue the image coordinate
+	// system is changed to a right handed one if true is passed in for the second parameter.
+	boolean isLeftHanded;
+
+	public void setupBumblebeeSquare() {
+		// Use the wrapper below for square grid targets.
+		detector = new WrapPlanarGridTarget(3,4);
+		// Target physical description
+		target = FactoryPlanarCalibrationTarget.gridSquare(3, 4, 30,30);
+
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
+
+		left = BoofMiscOps.directoryList(directory, "left");
+		right = BoofMiscOps.directoryList(directory, "right");
+
+		isLeftHanded = true;
+	}
+
+	public void setupBumblebeeChess() {
+		// Use the wrapper below for chessboard targets.  The last parameter adjusts the size of the corner detection
+		// region.  TUNE THIS PARAMETER FOR OPTIMAL ACCURACY!
+		detector = new WrapPlanarChessTarget(3,4,6);
+		// Target physical description
+		target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
+
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+
+		left = BoofMiscOps.directoryList(directory, "left");
+		right = BoofMiscOps.directoryList(directory, "right");
+
+		isLeftHanded = true;
+	}
+
+	/**
+	 * Process calibration images, compute intrinsic parameters, save to a file
+	 */
+	public void process() {
+		// Declare and setup the calibration algorithm
+		CalibrateStereoPlanar calibratorAlg = new CalibrateStereoPlanar(detector,isLeftHanded);
+		calibratorAlg.configure(target, false, 2);
+
+		// ensure the lists are in the same order
+		Collections.sort(left);
+		Collections.sort(right);
+
+		for( int i = 0; i < left.size(); i++ ) {
+			BufferedImage l = UtilImageIO.loadImage(left.get(i));
+			BufferedImage r = UtilImageIO.loadImage(right.get(i));
+
+			ImageFloat32 imageLeft = ConvertBufferedImage.convertFrom(l,(ImageFloat32)null);
+			ImageFloat32 imageRight = ConvertBufferedImage.convertFrom(r,(ImageFloat32)null);
+
+			calibratorAlg.addPair(imageLeft, imageRight);
+		}
+
+		// Process and compute calibration parameters
+		StereoParameters stereoCalib = calibratorAlg.process();
+
+		// save results to a file and print out
+		BoofMiscOps.saveXML(stereoCalib, "stereo.xml");
+		stereoCalib.print();
+	}
+
+	public static void main( String args[] ) {
+		ExampleCalibrateStereoPlanar alg = new ExampleCalibrateStereoPlanar();
+
+		// Select which set of targets to use
+		alg.setupBumblebeeChess();
+//		alg.setupBumblebeeSquare();
+
+		// compute and save results
+		alg.process();
+	}
+}

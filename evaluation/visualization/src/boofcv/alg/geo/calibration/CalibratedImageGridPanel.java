@@ -69,6 +69,9 @@ public class CalibratedImageGridPanel extends JPanel {
 	// how much errors are scaled up
 	double errorScale;
 
+	// int horizontal line
+	int lineY=-1;
+
 	public void setDisplay( boolean showPoints , boolean showErrors ,
 							boolean showUndistorted , boolean showAll , boolean showNumbers ,
 							double errorScale )
@@ -130,6 +133,12 @@ public class CalibratedImageGridPanel extends JPanel {
 
 		if( features.size() > selectedImage ) {
 			drawFeatures(g2);
+		}
+
+		if( lineY > -1 ) {
+			g2.setColor(Color.RED);
+			g2.setStroke(new BasicStroke(3));
+			g2.drawLine(0,lineY,getWidth(),lineY);
 		}
 	}
 
@@ -217,5 +226,9 @@ public class CalibratedImageGridPanel extends JPanel {
 
 	public void setDistorted (ImageDistort<ImageFloat32> undoRadial ) {
 		this.undoRadial = undoRadial;
+	}
+
+	public void setLine( int y ) {
+		this.lineY = y;
 	}
 }

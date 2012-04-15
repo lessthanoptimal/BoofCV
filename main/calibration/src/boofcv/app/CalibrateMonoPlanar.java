@@ -106,9 +106,9 @@ public class CalibrateMonoPlanar {
 	/**
 	 * Specify calibration assumptions.
 	 * 
-	 * @param target Describes the calibration target.
-	 * @param assumeZeroSkew If true zero skew is assumed.
-	 * @param numRadialParam Number of radial parameters
+	 * @param target Description of the calibration target's physical layout.
+	 * @param assumeZeroSkew If true then zero skew is assumed.  Typically this will be true.
+	 * @param numRadialParam Number of radial parameters. Typically set to 2.
 	 */
 	public void configure( PlanarCalibrationTarget target ,
 						   boolean assumeZeroSkew ,
