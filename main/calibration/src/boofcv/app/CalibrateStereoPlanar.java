@@ -194,4 +194,8 @@ public class CalibrateStereoPlanar {
 	public CalibrateMonoPlanar getCalibRight() {
 		return calibRight;
 	}
+
+	public boolean isConvertToRightHanded() {
+		return calibLeft.isConvertToRightHanded();
+	}
 }

@@ -36,8 +36,8 @@ public class FactoryPlanarCalibrationTarget {
 	 *
 	 * @param numCols Number of column in each calibration target
 	 * @param numRows Number of rows in calibration target
-	 * @param squareWidth How wide each square is.
-	 * @param spaceWidth Distance between the sides on each square.
+	 * @param squareWidth How wide each square is. Units are target dependent.
+	 * @param spaceWidth Distance between the sides on each square.  Units are target dependent.
 	 * @return Target description
 	 */
 	public static PlanarCalibrationTarget gridSquare( int numCols , int numRows , double squareWidth , double spaceWidth )
@@ -76,7 +76,7 @@ public class FactoryPlanarCalibrationTarget {
 	 *
 	 * @param numCols Number of column in each calibration target
 	 * @param numRows Number of rows in calibration target
-	 * @param squareWidth How wide each square is.
+	 * @param squareWidth How wide each square is.  Units are target dependent.
 	 * @return Target description
 	 */
 	public static PlanarCalibrationTarget gridChess( int numCols , int numRows , double squareWidth )

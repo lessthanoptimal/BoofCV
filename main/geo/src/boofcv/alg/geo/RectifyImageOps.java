@@ -235,6 +235,22 @@ public class RectifyImageOps {
 		}
 	}
 
+	// todo comment
+	public static <T extends ImageSingleBand> ImageDistort<T>
+	rectifyImage( int imageHeight , boolean applyLeftToRight , DenseMatrix64F rectify , Class<T> imageType)
+	{
+		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+
+		PointTransform_F32 rectifyTran = rectifyTransformInv(imageHeight,applyLeftToRight,rectify);
+
+		// don't bother caching the results since it is likely to only be applied once and is cheap to compute
+		ImageDistort<T> ret = FactoryDistort.distort(interp, null, imageType);
+
+		ret.setModel(new PointToPixelTransform_F32(rectifyTran));
+
+		return ret;
+	}
+
 	/**
 	 * Creates an {@link ImageDistort} for rectifying an image given its radial distortion and
 	 * rectification matrix.
@@ -263,6 +279,7 @@ public class RectifyImageOps {
 		return ret;
 	}
 
+	// todo comment
 	public static PointTransform_F32 rectifyTransform( int imageHeight ,
 													   boolean applyLeftToRight ,
 													   DenseMatrix64F rectify )
@@ -277,6 +294,7 @@ public class RectifyImageOps {
 		}
 	}
 
+	// todo comment
 	public static PointTransform_F32 rectifyTransformInv( int imageHeight ,
 													   boolean applyLeftToRight ,
 													   DenseMatrix64F rectify )
@@ -291,20 +309,5 @@ public class RectifyImageOps {
 		} else {
 			return rectifyDistort;
 		}
-	}
-
-	public static <T extends ImageSingleBand> ImageDistort<T>
-	rectifyImage( int imageHeight , boolean applyLeftToRight , DenseMatrix64F rectify , Class<T> imageType)
-	{
-		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
-
-		PointTransform_F32 rectifyTran = rectifyTransformInv(imageHeight,applyLeftToRight,rectify);
-
-		// don't bother caching the results since it is likely to only be applied once and is cheap to compute
-		ImageDistort<T> ret = FactoryDistort.distort(interp, null, imageType);
-
-		ret.setModel(new PointToPixelTransform_F32(rectifyTran));
-
-		return ret;
 	}
 }

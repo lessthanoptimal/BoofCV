@@ -18,8 +18,10 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.alg.distort.ImageDistort;
 import boofcv.app.ImageResults;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -30,6 +32,8 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +45,7 @@ import java.util.Vector;
  * @author Peter Abeles
  */
 public class StereoPlanarPanel extends JPanel
-	implements ListSelectionListener, ItemListener, ChangeListener
+	implements ListSelectionListener, ItemListener, ChangeListener, MouseListener
 {
 	// display for calibration information on individual cmaeras
 	CalibratedImageGridPanel leftView = new CalibratedImageGridPanel();
@@ -93,6 +97,9 @@ public class StereoPlanarPanel extends JPanel
 		maxErrorLeft = createTextComponent();
 		meanErrorRight = createTextComponent();
 		maxErrorRight = createTextComponent();
+
+		leftView.addMouseListener(this);
+		rightView.addMouseListener(this);
 
 		JToolBar toolBar = createToolBar();
 
@@ -149,6 +156,12 @@ public class StereoPlanarPanel extends JPanel
 		toolBar.add(new JLabel("Error Scale"));
 		toolBar.add(selectErrorScale);
 		return toolBar;
+	}
+
+	public void setRectification( ImageDistort<ImageFloat32> rectifyLeft , ImageDistort<ImageFloat32> rectifyRight ) {
+		leftView.setDistorted(rectifyLeft);
+		rightView.setDistorted(rectifyRight);
+		checkUndistorted.setEnabled(true);
 	}
 
 	public void addPair( String name , BufferedImage imageLeft , BufferedImage imageRight )
@@ -251,6 +264,26 @@ public class StereoPlanarPanel extends JPanel
 		leftView.repaint();
 		rightView.repaint();
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		leftView.setLine(e.getY());
+		rightView.setLine(e.getY());
+		leftView.repaint();
+		rightView.repaint();
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {}
+
+	@Override
+	public void mouseExited(MouseEvent e) {}
 
 	private class SideBar extends StandardAlgConfigPanel
 	{
