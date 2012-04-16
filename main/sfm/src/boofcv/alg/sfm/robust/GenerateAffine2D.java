@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GenerateRefineAffine2D implements
+public class GenerateAffine2D implements
 		ModelGenerator<Affine2D_F64,AssociatedPair>,
 		ModelFitter<Affine2D_F64,AssociatedPair>
 {

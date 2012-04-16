@@ -21,6 +21,7 @@ package boofcv.alg.geo.rectify;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.UtilEpipolar;
 import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -32,7 +33,15 @@ import java.util.List;
  * <p>
  * Rectifies a stereo pair given a fundamental or essential matrix.  The rectification ensures that
  * the epipolar lines project to infinity along the x-axis. The computed transforms are designed to
- * minimize the range of disparity between the two images. See [1] for algorithmic details.
+ * minimize the range of disparity between the two images. For this technique to work
+ * the epipoles must lie outside of both images.  See [1] for algorithmic details.
+ * </p>
+ *
+ * <p>
+ * WARNING: On paper this technique sounds straight forward.  In practice it requires a very
+ * precise fundamental matrix estimate to be of practical use.  Using the epipolar constraint alone is not
+ * sufficient to remove outliers because a point far away that lands on the epipolar line will have a small
+ * error.  Removing lens distortion from the image is recommended.
  * </p>
  *
  * <p>
@@ -45,8 +54,12 @@ import java.util.List;
 public class RectifyFundamental {
 
 	// rectifying transform for left and right images
-	DenseMatrix64F rect1 = new DenseMatrix64F(3,3);
-	DenseMatrix64F rect2 = new DenseMatrix64F(3,3);
+	private DenseMatrix64F rect1 = new DenseMatrix64F(3,3);
+	private DenseMatrix64F rect2 = new DenseMatrix64F(3,3);
+
+	// storage for epipoles
+	private Point3D_F64 epipole1 = new Point3D_F64();
+	private Point3D_F64 epipole2 = new Point3D_F64();
 
 	/**
 	 * Compute rectification transforms for the stereo pair given a fundamental matrix and its observations.
@@ -62,10 +75,9 @@ public class RectifyFundamental {
 		int centerX = width/2;
 		int centerY = height/2;
 
-		Point3D_F64 epipole1 = new Point3D_F64();
-		Point3D_F64 epipole2 = new Point3D_F64();
-
 		UtilEpipolar.extractEpipoles(F,epipole1,epipole2);
+		checkEpipoleInside(width, height);
+
 
 		// compute the transform H which will send epipole2 to infinity
 		SimpleMatrix R = rotateEpipole(epipole2,centerX,centerY);
@@ -81,6 +93,22 @@ public class RectifyFundamental {
 
 		rect1.set(Ha.mult(Hzero).getMatrix());
 		rect2.set(H.getMatrix());
+	}
+
+	/**
+	 * The epipoles need to be outside the image
+	 */
+	private void checkEpipoleInside(int width, int height) {
+
+		double x1 = epipole1.x/epipole1.z;
+		double y1 = epipole1.y/epipole1.z;
+		double x2 = epipole2.x/epipole2.z;
+		double y2 = epipole2.y/epipole2.z;
+
+		if( x1 >= 0 && x1 < width && y1 >= 0 && y1 < height )
+			throw new IllegalArgumentException("First epipole is inside the image");
+		if( x2 >= 0 && x2 < width && y2 >= 0 && y2 < height )
+			throw new IllegalArgumentException("Second epipole is inside the image");
 	}
 
 	/**
@@ -144,13 +172,13 @@ public class RectifyFundamental {
 		SimpleMatrix A = new SimpleMatrix(observations.size(),3);
 		SimpleMatrix b = new SimpleMatrix(A.numRows(),1);
 
-		Point3D_F64 c = new Point3D_F64();
-		Point3D_F64 k = new Point3D_F64();
+		Point2D_F64 c = new Point2D_F64();
+		Point2D_F64 k = new Point2D_F64();
 
 		for( int i = 0; i < observations.size(); i++ ) {
 			AssociatedPair a = observations.get(i);
 
-			GeometryMath_F64.mult(Hzero,a.keyLoc,k);
+			GeometryMath_F64.mult(Hzero, a.keyLoc, k);
 			GeometryMath_F64.mult(H,a.currLoc,c);
 
 			A.setRow(i,0,k.x,k.y,1);
@@ -172,10 +200,10 @@ public class RectifyFundamental {
 	private SimpleMatrix computeHZero( DenseMatrix64F F , Point3D_F64 e2 ,
 									   SimpleMatrix H ) {
 
-		Vector3D_F64 v = new Vector3D_F64(-4,3,0.5);
+		Vector3D_F64 v = new Vector3D_F64(.1,0.5,.2);
 
 		// need to make sure M is not singular for this technique to work
-		SimpleMatrix P = SimpleMatrix.wrap(UtilEpipolar.canonicalCamera(F, e2, v , 1.5));
+		SimpleMatrix P = SimpleMatrix.wrap(UtilEpipolar.canonicalCamera(F, e2, v , 1));
 
 		SimpleMatrix M = P.extractMatrix(0, 3, 0, 3);
 

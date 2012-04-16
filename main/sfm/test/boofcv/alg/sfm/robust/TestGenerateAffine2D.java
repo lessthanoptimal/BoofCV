@@ -33,7 +33,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestGenerateRefineAffine2D implements ModelTestingInterface<Affine2D_F64,AssociatedPair>
+public class TestGenerateAffine2D implements ModelTestingInterface<Affine2D_F64,AssociatedPair>
 {
 	Random rand = new Random(234);
 
@@ -43,7 +43,7 @@ public class TestGenerateRefineAffine2D implements ModelTestingInterface<Affine2
 				new StandardModelFitterTests<Affine2D_F64,AssociatedPair>(this,3) {
 					@Override
 					public ModelFitter<Affine2D_F64,AssociatedPair> createAlg() {
-						return new GenerateRefineAffine2D();
+						return new GenerateAffine2D();
 					}
 				};
 
@@ -56,7 +56,7 @@ public class TestGenerateRefineAffine2D implements ModelTestingInterface<Affine2
 				new StandardModelGeneratorTests<Affine2D_F64,AssociatedPair>(this,3) {
 			@Override
 			public ModelGenerator<Affine2D_F64,AssociatedPair> createAlg() {
-				return new GenerateRefineAffine2D();
+				return new GenerateAffine2D();
 			}
 		};
 

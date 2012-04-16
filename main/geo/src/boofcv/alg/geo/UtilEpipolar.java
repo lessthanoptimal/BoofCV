@@ -250,7 +250,7 @@ public class UtilEpipolar {
 	 * @param F A fundamental matrix
 	 * @param v Arbitrary 3-vector.  Just pick some value, say (1,1,1).
 	 * @param lambda A non zero scalar.  Try one.
-	 * @param e2 Left epipole.
+	 * @param e2 Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
 	 * @return The canonical camera matrix P'
 	 */
 	public static DenseMatrix64F canonicalCamera( DenseMatrix64F F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
@@ -262,7 +262,7 @@ public class UtilEpipolar {
 		GeometryMath_F64.outerProd(e2,v,outer);
 
 		DenseMatrix64F KR = new DenseMatrix64F(3,3);
-		CommonOps.mult(crossMatrix,F,KR);
+		CommonOps.mult(crossMatrix, F, KR);
 		CommonOps.add(KR, outer, KR);
 
 		DenseMatrix64F P = new DenseMatrix64F(3,4);
