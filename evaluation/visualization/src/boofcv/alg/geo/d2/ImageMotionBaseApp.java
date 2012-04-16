@@ -26,8 +26,8 @@ import boofcv.alg.sfm.d2.RenderImageMotion;
 import boofcv.alg.sfm.d2.UtilImageMotion;
 import boofcv.alg.sfm.robust.DistanceAffine2DSq;
 import boofcv.alg.sfm.robust.DistanceHomographySq;
+import boofcv.alg.sfm.robust.GenerateAffine2D;
 import boofcv.alg.sfm.robust.GenerateHomographyLinear;
-import boofcv.alg.sfm.robust.GenerateRefineAffine2D;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.VisualizeApp;
@@ -548,7 +548,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 			modelRefiner = (ModelFitter)mf;
 			distance = new DistanceHomographySq();
 		} else if( fitModel instanceof Affine2D_F64 ) {
-			GenerateRefineAffine2D mf = new GenerateRefineAffine2D();
+			GenerateAffine2D mf = new GenerateAffine2D();
 			fitter = mf;
 			distance = new DistanceAffine2DSq();
 			modelRefiner = (ModelFitter)mf;

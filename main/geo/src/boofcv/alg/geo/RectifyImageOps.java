@@ -40,11 +40,42 @@ import org.ejml.simple.SimpleMatrix;
  */
 public class RectifyImageOps {
 
+	/**
+	 * <p>
+	 * Rectification for calibrated stereo pairs.  Two stereo camera care considered calibrated if
+	 * their baseline is known.
+	 * </p>
+	 *
+	 * <p>
+	 * After the rectification has been found it might still need to be adjusted
+	 * for maximum viewing area.  See {@link #fullViewLeft(boofcv.struct.calib.IntrinsicParameters, boolean, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F)}
+	 * and {@link #allInsideLeft(boofcv.struct.calib.IntrinsicParameters, boolean, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F)}
+	 * for adjusting the rectification.
+	 * </p>
+	 *
+	 *
+	 * @return {@link RectifyCalibrated}
+	 */
 	public static RectifyCalibrated createCalibrated() {
 		return new RectifyCalibrated();
 	}
 
-	public static RectifyFundamental createFundamental() {
+	/**
+	 * <p>
+	 * Rectification for uncalibrated stereo pairs using the fundamental matrix.  Uncalibrated refers
+	 * to the stereo baseline being unknown.  For this technique to work the fundamental matrix needs
+	 * to be known very accurately.  See comments in {@link RectifyFundamental} for more details.
+	 * </p>
+	 *
+	 <p>
+	 * After the rectification has been found it might still need to be adjusted
+	 * for maximum viewing area.  See {@link #fullViewLeft(int, int, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F)}
+	 * and BLAH TODO safsdf
+	 * </p>
+	 *
+	 * @return {@link RectifyFundamental}
+	 */
+	public static RectifyFundamental createUncalibrated() {
 		return new RectifyFundamental();
 	}
 
@@ -86,10 +117,9 @@ public class RectifyImageOps {
 
 	// todo comment
 	public static void fullViewLeft(int imageWidth,int imageHeight,
-									boolean applyLeftToRight,
 									DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight )
 	{
-		PointTransform_F32 tranLeft = rectifyTransform(imageHeight, applyLeftToRight, rectifyLeft);
+		PointTransform_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
 
 		Rectangle2D_F32 bound = DistortImageOps.boundBox_F32(imageWidth, imageHeight,
 				new PointToPixelTransform_F32(tranLeft));
@@ -238,11 +268,13 @@ public class RectifyImageOps {
 
 	// todo comment
 	public static <T extends ImageSingleBand> ImageDistort<T>
-	rectifyImage( int imageHeight , boolean applyLeftToRight , DenseMatrix64F rectify , Class<T> imageType)
+	rectifyImage( DenseMatrix64F rectify , Class<T> imageType)
 	{
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
 
-		PointTransform_F32 rectifyTran = rectifyTransformInv(imageHeight,applyLeftToRight,rectify);
+		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
+		CommonOps.invert(rectify,rectifyInv);
+		PointTransformHomography_F32 rectifyTran = new PointTransformHomography_F32(rectifyInv);
 
 		// don't bother caching the results since it is likely to only be applied once and is cheap to compute
 		ImageDistort<T> ret = FactoryDistort.distort(interp, null, imageType);
@@ -280,35 +312,4 @@ public class RectifyImageOps {
 		return ret;
 	}
 
-	// todo comment
-	public static PointTransform_F32 rectifyTransform( int imageHeight ,
-													   boolean applyLeftToRight ,
-													   DenseMatrix64F rectify )
-	{
-		PointTransformHomography_F32 rectifyDistort = new PointTransformHomography_F32(rectify);
-
-		if( applyLeftToRight ) {
-			PointTransform_F32 l2r = new LeftToRightHanded_F32(imageHeight);
-			return new SequencePointTransform_F32(l2r,rectifyDistort,l2r);
-		} else {
-			return rectifyDistort;
-		}
-	}
-
-	// todo comment
-	public static PointTransform_F32 rectifyTransformInv( int imageHeight ,
-													   boolean applyLeftToRight ,
-													   DenseMatrix64F rectify )
-	{
-		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
-		CommonOps.invert(rectify,rectifyInv);
-		PointTransformHomography_F32 rectifyDistort = new PointTransformHomography_F32(rectifyInv);
-
-		if( applyLeftToRight ) {
-			PointTransform_F32 l2r = new LeftToRightHanded_F32(imageHeight);
-			return new SequencePointTransform_F32(l2r,rectifyDistort,l2r);
-		} else {
-			return rectifyDistort;
-		}
-	}
 }
