@@ -47,6 +47,8 @@ public class ExampleRectifyFundamental {
 	private List<AssociatedPair> matches;
 
 
+	private static boolean isLeftHanded = true;
+
 	public static void rectify( DenseMatrix64F F , List<AssociatedPair> inliers ,
 								BufferedImage origLeft , BufferedImage origRight ) {
 		// distorted images
@@ -69,7 +71,7 @@ public class ExampleRectifyFundamental {
 		DenseMatrix64F rect2 = rectifyAlg.getRect2();
 
 		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.fullViewLeft(origLeft.getWidth(),origLeft.getHeight(), true , rect1, rect2 );
+//		RectifyImageOps.fullViewLeft(origLeft.getWidth(),origLeft.getHeight(), true , rect1, rect2 );
 //		RectifyImageOps.allInsideLeft(param.left, leftHanded, rect1, rect2, rectK);
 
 		rect1.print();
@@ -77,9 +79,9 @@ public class ExampleRectifyFundamental {
 
 		// undistorted and rectify images
 		ImageDistort<ImageFloat32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(origLeft.getHeight(),true, rect1,ImageFloat32.class);
+				RectifyImageOps.rectifyImage(origLeft.getHeight(),isLeftHanded, rect1,ImageFloat32.class);
 		ImageDistort<ImageFloat32> imageDistortRight =
-				RectifyImageOps.rectifyImage(origLeft.getHeight(),true, rect2,ImageFloat32.class);
+				RectifyImageOps.rectifyImage(origLeft.getHeight(),isLeftHanded, rect2,ImageFloat32.class);
 
 		DistortImageOps.distortMS(distLeft, rectLeft, imageDistortLeft);
 		DistortImageOps.distortMS(distRight, rectRight, imageDistortRight);
@@ -90,7 +92,7 @@ public class ExampleRectifyFundamental {
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
 		ShowImages.showWindow(new RectifiedPairPanel(true, origLeft, origRight), "Original");
-		ShowImages.showWindow(new RectifiedPairPanel(true,outLeft,outRight),"Rectified");
+		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft,outRight),"Rectified");
 
 
 	}
@@ -99,8 +101,8 @@ public class ExampleRectifyFundamental {
 
 		String dir = "../data/evaluation/structure/";
 
-		BufferedImage imageA = UtilImageIO.loadImage(dir + "cyto02.jpg");
-		BufferedImage imageB = UtilImageIO.loadImage(dir + "cyto05.jpg");
+		BufferedImage imageA = UtilImageIO.loadImage(dir + "rect00.bmp");
+		BufferedImage imageB = UtilImageIO.loadImage(dir + "rect01.bmp");
 
 		List<AssociatedPair> matches = ExampleFundamentalMatrix.computeMatches(imageA,imageB);
 
@@ -110,12 +112,12 @@ public class ExampleRectifyFundamental {
 		}
 
 		List<AssociatedPair> inliers = new ArrayList<AssociatedPair>();
-		DenseMatrix64F F = ExampleFundamentalMatrix.robustFundamental(matches,inliers);
+		DenseMatrix64F F = ExampleFundamentalMatrix.robustFundamental(matches, inliers);
 
-		for( AssociatedPair p : inliers ) {
-			p.currLoc.y = imageA.getHeight() - p.currLoc.y-1;
-			p.keyLoc.y = imageA.getHeight() - p.keyLoc.y-1;
-		}
+//		for( AssociatedPair p : inliers ) {
+//			p.currLoc.y = imageA.getHeight() - p.currLoc.y-1;
+//			p.keyLoc.y = imageA.getHeight() - p.keyLoc.y-1;
+//		}
 
 		rectify(F,inliers,imageA,imageB);
 	}

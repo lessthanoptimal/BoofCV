@@ -84,6 +84,7 @@ public class RectifyImageOps {
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
 	}
 
+	// todo comment
 	public static void fullViewLeft(int imageWidth,int imageHeight,
 									boolean applyLeftToRight,
 									DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight )

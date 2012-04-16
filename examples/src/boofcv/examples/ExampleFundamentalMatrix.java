@@ -156,8 +156,8 @@ public class ExampleFundamentalMatrix {
 
 		String dir = "../data/evaluation/structure/";
 
-		BufferedImage imageA = UtilImageIO.loadImage(dir + "cyto02.jpg");
-		BufferedImage imageB = UtilImageIO.loadImage(dir + "cyto04.jpg");
+		BufferedImage imageA = UtilImageIO.loadImage(dir + "tran_cyto_00.jpg");
+		BufferedImage imageB = UtilImageIO.loadImage(dir + "tran_cyto_01.jpg");
 
 		List<AssociatedPair> matches = computeMatches(imageA,imageB);
 
@@ -178,12 +178,10 @@ public class ExampleFundamentalMatrix {
 		F.print();
 
 		// display the inlier matches found using the robust estimator
-		// show the inlier set
-		// display the results
 		AssociationPanel panel = new AssociationPanel(20);
 		panel.setAssociation(inliers);
 		panel.setImages(imageA,imageB);
 
-		ShowImages.showWindow(panel, "Associated Features");
+		ShowImages.showWindow(panel, "Inlier Pairs");
 	}
 }
