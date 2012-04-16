@@ -39,6 +39,12 @@ import java.util.List;
  * </p>
  *
  * <p>
+ * The computed fundamental matrix follow the following convention (with no noise) for the associated pair:
+ * x2<sup>T</sup>*F*x1 = 0<br>
+ * x1 = keyLoc and x2 = currLoc.
+ * </p>
+ *
+ * <p>
  * References:
  * <ul>
  * <li> Y. Ma, S. Soatto, J. Kosecka, and S. S. Sastry, "An Invitation to 3-D Vision" Springer-Verlad, 2004 </li>

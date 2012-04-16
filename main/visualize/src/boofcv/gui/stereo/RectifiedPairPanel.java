@@ -80,7 +80,9 @@ public class RectifiedPairPanel extends JPanel implements MouseListener {
 			if( scale > 1 ) scale = 1;
 
 			AffineTransform orig = g2.getTransform();
-			g2.setTransform(AffineTransform.getScaleInstance(scale, scale));
+			AffineTransform combined = (AffineTransform)orig.clone();
+			combined.concatenate(AffineTransform.getScaleInstance(scale, scale));
+			g2.setTransform(combined);
 			g2.drawImage(image1,0,0,null);
 			g2.drawImage(image2,image1.getWidth(),0,null);
 			g2.setTransform(orig);

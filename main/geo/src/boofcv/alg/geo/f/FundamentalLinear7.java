@@ -36,6 +36,12 @@ import java.util.List;
  * </p>
  *
  * <p>
+ * The computed fundamental matrix follow the following convention (with no noise) for the associated pair:
+ * x2<sup>T</sup>*F*x1 = 0<br>
+ * x1 = keyLoc and x2 = currLoc.
+ * </p>
+ *
+ * <p>
  * References:
  * <ul>
  * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>

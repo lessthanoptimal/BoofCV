@@ -24,6 +24,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.image.UtilImageIO;
@@ -115,7 +116,10 @@ public class ExampleRectifyCalibratedStereo {
 		BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null);
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
-		ShowImages.showWindow(new RectifiedPairPanel(true, origLeft, origRight), "Original");
-		ShowImages.showWindow(new RectifiedPairPanel(true,outLeft,outRight),"Rectified");
+		ListDisplayPanel panel = new ListDisplayPanel();
+		panel.addItem(new RectifiedPairPanel(true, origLeft, origRight), "Original");
+		panel.addItem(new RectifiedPairPanel(true, outLeft, outRight), "Rectified");
+
+		ShowImages.showWindow(panel,"Stereo Rectification Calibrated");
 	}
 }

@@ -104,8 +104,8 @@ public class RectifyFundamental {
 		// compute rotation which will set
 		// x * sin(theta) + y * cos(theta) = 0
 
-		double y = epipole.y/epipole.z-x0;
-		double x = epipole.x/epipole.z-y0;
+		double x = epipole.x/epipole.z-x0;
+		double y = epipole.y/epipole.z-y0;
 
 		double theta = Math.atan2(-y,x);
 		double c = Math.cos(theta);
@@ -166,18 +166,18 @@ public class RectifyFundamental {
 	}
 
 	/**
-	 * H0 = H'*M
-	 * P'=[M|m] from canonical camera
+	 * H0 = H*M
+	 * P=[M|m] from canonical camera
 	 */
 	private SimpleMatrix computeHZero( DenseMatrix64F F , Point3D_F64 e2 ,
 									   SimpleMatrix H ) {
 
-		Vector3D_F64 v = new Vector3D_F64(1,1,1);
+		Vector3D_F64 v = new Vector3D_F64(-4,3,0.5);
 
 		// need to make sure M is not singular for this technique to work
-		SimpleMatrix P = SimpleMatrix.wrap(UtilEpipolar.canonicalCamera(F, e2, v , 2));
+		SimpleMatrix P = SimpleMatrix.wrap(UtilEpipolar.canonicalCamera(F, e2, v , 1.5));
 
-		SimpleMatrix M = P.extractMatrix(0,3,0,3);
+		SimpleMatrix M = P.extractMatrix(0, 3, 0, 3);
 
 		return H.mult(M);
 	}

@@ -65,7 +65,7 @@ public class TestRectifyFundamental {
 
 		// compute the rectification transforms
 		RectifyFundamental alg = new RectifyFundamental();
-		alg.process(F,pairs,500,500);
+		alg.process(F,pairs,500,520);
 
 		DenseMatrix64F R1 = alg.getRect1();
 		DenseMatrix64F R2 = alg.getRect2();
@@ -91,7 +91,7 @@ public class TestRectifyFundamental {
 		createScene();
 
 		RectifyFundamental alg = new RectifyFundamental();
-		alg.process(F,pairs,500,500);
+		alg.process(F,pairs,500,520);
 
 		// unrectified observations
 		AssociatedPair unrect = pairs.get(0);
@@ -108,7 +108,7 @@ public class TestRectifyFundamental {
 
 	public void createScene() {
 
-		DenseMatrix64F K = new DenseMatrix64F(3,3,true,500,0,250,0,500,250,0,0,1);
+		DenseMatrix64F K = new DenseMatrix64F(3,3,true,500,0,250,0,520,270,0,0,1);
 
 		// define the camera's motion
 		motion = new Se3_F64();
