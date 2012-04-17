@@ -30,13 +30,17 @@ Version : Alpha 0.7
   * LensDistortionOps
   * RectifyImageOps
 - Stereo Rectification
-  * Calibrated cameras
-  * From fundamental matrices
+  * Calibrated with known baseline
+  * Uncalibrated, from using a fundamental matrix.
+  * Adjust rectification to maximize usefull viewing area
 - New Examples
   * Estimate fundamental matrix
   * Rectify calibrated
   * Rectify fundamental matrix
   * Remove lens distortion
+- The feature score was not being set in WrapAssociateGreedy
+  * Thanks Nir Amar
+  * Also changed AssociateSurfBasic for a similar reason
 
 ---------------------------------------------
 Date    : 2012/03/01

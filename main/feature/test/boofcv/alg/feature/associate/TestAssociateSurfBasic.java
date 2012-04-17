@@ -27,6 +27,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -84,6 +85,11 @@ public class TestAssociateSurfBasic {
 		assertEquals(2,matches.get(1).dst);
 		assertEquals(2,matches.get(2).src);
 		assertEquals(4,matches.get(2).dst);
+	}
+
+	@Test
+	public void addCheckScoreSet() {
+		fail("Implement");
 	}
 
 	private AssociateSurfBasic createAlg() {

@@ -58,9 +58,11 @@ import java.util.List;
  * Check list for correctly applying uncalibrated rectification:
  * <ul>
  * <li>Must remove all incorrect associated pairs</li>
- * <li>Do not rely on the epipolar constraint alone to remove noise</li>
- * <li>Use a robust estimation algorithm to compute F (e.g. RANSAC).</li>
- * <li>Remove lens distortion to improve accuracy</li>
+ * <ul>
+ *   <li>Do not rely on the epipolar constraint alone to remove noise</li>
+ *   <li>Use a robust estimation algorithm to compute F (e.g. RANSAC).</li>
+ *   <li>Remove lens distortion to improve accuracy</li>
+ * </ul>
  * <li>Curse CV books for not mentioning these important problems</li>
  * <ul>
  * </p>
