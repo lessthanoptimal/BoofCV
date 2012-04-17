@@ -1,10 +1,5 @@
 - Square Grid
- * Try using canny edge detector in refinement step
-
-- Stereo Calibration
+ * Try Hough transform for edge detection
 
 - Zhang 99
- * Not optimizing as well as it should be.
- * Least squares is suspect, try dogleg instead
- * Check to see now Rodrigues is used.  Try other parameterizations
  * Analytic Jacobian

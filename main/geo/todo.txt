@@ -9,9 +9,7 @@
 - Triangulation Stability
   * Vary acute angle
 
-- Stereo Rectification
-  * From Fundamental
-  * From Calibration
+- Trifocal Tensor
 
 - Dense Stereo
 - Sparse Stereo

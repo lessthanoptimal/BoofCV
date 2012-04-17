@@ -16,32 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.abst.feature.associate;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Indexes of two associated features.
- *
  * @author Peter Abeles
  */
-public class AssociatedIndex {
+public class TestWrapAssociateGreedy {
 
-	// index of the feature in the source image
-	public int src;
-	// index of the feature in the destination image
-	public int dst;
-	// The association score.  Meaning will very depending on implementation
-	public double fitScore;
-
-	public void setAssociation(int src , int dst , double fitScore ) {
-		this.src = src;
-		this.dst = dst;
-		this.fitScore = fitScore;
-	}
-
-	public void set( AssociatedIndex a ) {
-		src = a.src;
-		dst = a.dst;
-		fitScore = a.fitScore;
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }
