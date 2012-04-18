@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
 import georegression.struct.point.Point2D_F32;
@@ -82,7 +83,7 @@ public class TestRectifyImageOps {
 
 	@Test
 	public void allInsideLeft_calibrated() {
-		IntrinsicParameters param = new IntrinsicParameters(300,300,0,150,150,width,height,new double[]{0.1,1e-4});
+		IntrinsicParameters param = new IntrinsicParameters(300,320,0,150,130,width,height,new double[]{0.1,1e-4});
 
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
@@ -93,6 +94,36 @@ public class TestRectifyImageOps {
 
 		// check left image
 		PointTransform_F32 tran = RectifyImageOps.rectifyTransformInv(param, false, rect1);
+		checkInside(tran);
+		// the right view is not checked since it is not part of the contract
+	}
+
+	@Test
+	public void fullViewLeft_uncalibrated() {
+		// do nothing rectification
+		DenseMatrix64F rect1 = CommonOps.diag(2, 3, 1);
+		DenseMatrix64F rect2 = CommonOps.diag(0.5, 2, 1);
+
+		RectifyImageOps.fullViewLeft(300,250,rect1,rect2);
+
+		// check left image
+		PointTransformHomography_F32 tran = new PointTransformHomography_F32(rect1);
+		checkInside(tran);
+		// the right view is not checked since it is not part of the contract
+	}
+
+	@Test
+	public void allInsideLeft_uncalibrated() {
+		// do nothing rectification
+		DenseMatrix64F rect1 = CommonOps.diag(2, 3, 1);
+		DenseMatrix64F rect2 = CommonOps.diag(0.5, 2, 1);
+
+		RectifyImageOps.allInsideLeft(300, 250, rect1, rect2);
+
+		// check left image
+		DenseMatrix64F inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(rect1,inv);
+		PointTransformHomography_F32 tran = new PointTransformHomography_F32(inv);
 		checkInside(tran);
 		// the right view is not checked since it is not part of the contract
 	}

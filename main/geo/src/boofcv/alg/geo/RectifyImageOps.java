@@ -70,7 +70,7 @@ public class RectifyImageOps {
 	 <p>
 	 * After the rectification has been found it might still need to be adjusted
 	 * for maximum viewing area.  See {@link #fullViewLeft(int, int, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F)}
-	 * and BLAH TODO safsdf
+	 * and {@link #allInsideLeft(int, int, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F)}.
 	 * </p>
 	 *
 	 * @return {@link RectifyFundamental}
@@ -88,7 +88,7 @@ public class RectifyImageOps {
 	 * </p>
 	 *
 	 * <p>
-	 * Input rectification matrices are overwritten with the adjustment on output.
+	 * Input rectification matrices are overwritten with adjusted values on output.
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera
@@ -115,7 +115,21 @@ public class RectifyImageOps {
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
 	}
 
-	// todo comment
+	/**
+	 * <p>
+	 * Adjust the rectification such that the entire original left image can be seen.  For use with
+	 * uncalibrated stereo images with unknown baseline.
+	 * </p>
+	 *
+	 * <p>
+	 * Input rectification matrices are overwritten with adjusted values on output.
+	 * </p>
+	 *
+	 * @param imageWidth Width of left image.
+	 * @param imageHeight Height of left image.
+	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
+	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
+	 */
 	public static void fullViewLeft(int imageWidth,int imageHeight,
 									DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight )
 	{
@@ -124,7 +138,7 @@ public class RectifyImageOps {
 		Rectangle2D_F32 bound = DistortImageOps.boundBox_F32(imageWidth, imageHeight,
 				new PointToPixelTransform_F32(tranLeft));
 
-		double scaleX = imageHeight/bound.width;
+		double scaleX = imageWidth/bound.width;
 		double scaleY = imageHeight/bound.height;
 
 		double scale = Math.min(scaleX,scaleY);
@@ -138,7 +152,7 @@ public class RectifyImageOps {
 	 * Adjust the rectification such that only pixels which overlap the original left image can be seen.  For use with
 	 * calibrated stereo images having a known baseline. Image processing is easier since only the "true" image pixels
 	 * are visible, but information along the image border has been discarded.  The rectification matrices are
-	 * overwritten with the adjustment on output.
+	 * overwritten with adjusted values on output.
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera
@@ -163,6 +177,35 @@ public class RectifyImageOps {
 		double scale = Math.max(scaleX, scaleY);
 
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
+	}
+
+	/**
+	 * <p>
+	 * Adjust the rectification such that only pixels which overlap the original left image can be seen.  For use with
+	 * uncalibrated images with unknown baselines.  Image processing is easier since only the "true" image pixels
+	 * are visible, but information along the image border has been discarded.  The rectification matrices are
+	 * overwritten with adjusted values on output.
+	 * </p>
+	 *
+	 * @param imageWidth Width of left image.
+	 * @param imageHeight Height of left image.
+	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
+	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
+	 */
+	public static void allInsideLeft( int imageWidth,int imageHeight,
+									  DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight )
+	{
+		PointTransform_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
+
+		Rectangle2D_F32 bound = LensDistortionOps.boundBoxInside(imageWidth, imageHeight,
+				new PointToPixelTransform_F32(tranLeft));
+
+		double scaleX = imageWidth/(double)bound.width;
+		double scaleY = imageHeight/(double)bound.height;
+
+		double scale = Math.max(scaleX, scaleY);
+
+		adjustUncalibrated(rectifyLeft, rectifyRight, bound, scale);
 	}
 
 	/**
@@ -194,6 +237,9 @@ public class RectifyImageOps {
 		rectifyRight.set(K.mult(rR).getMatrix());
 	}
 
+	/**
+	 * Internal function which applies the rectification adjustment to an uncalibrated stereo pair
+	 */
 	private static void adjustUncalibrated(DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
 										   Rectangle2D_F32 bound, double scale) {
 		// translation
@@ -204,7 +250,6 @@ public class RectifyImageOps {
 		SimpleMatrix A = new SimpleMatrix(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 		SimpleMatrix rL = SimpleMatrix.wrap(rectifyLeft);
 		SimpleMatrix rR = SimpleMatrix.wrap(rectifyRight);
-
 
 		rectifyLeft.set(A.mult(rL).getMatrix());
 		rectifyRight.set(A.mult(rR).getMatrix());
@@ -266,7 +311,13 @@ public class RectifyImageOps {
 		}
 	}
 
-	// todo comment
+	/**
+	 * Creates an {@link ImageDistort} for rectifying an image given its rectification matrix.
+	 *
+	 * @param rectify Transform for rectifying the image.
+	 * @param imageType Type of single band image the transform is to be applied to.
+	 * @return ImageDistort for rectifying the image.
+	 */
 	public static <T extends ImageSingleBand> ImageDistort<T>
 	rectifyImage( DenseMatrix64F rectify , Class<T> imageType)
 	{
