@@ -27,7 +27,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -68,9 +68,9 @@ public class TestAssociateSurfBasic {
 		src.add( createDesc(true,12));
 		src.add( createDesc(false,5));
 		dst.add( createDesc(true,0));
-		dst.add( createDesc(true,10));
+		dst.add( createDesc(true,10.1));
 		dst.add( createDesc(true,13));
-		dst.add( createDesc(false,0));
+		dst.add( createDesc(false,0.1));
 		dst.add( createDesc(false,7));
 
 		alg.setSrc(src);
@@ -79,17 +79,15 @@ public class TestAssociateSurfBasic {
 		FastQueue<AssociatedIndex> matches = alg.getMatches();
 
 		assertEquals(3,matches.size());
+		assertTrue(matches.get(0).fitScore != 0);
 		assertEquals(0,matches.get(0).src);
 		assertEquals(1,matches.get(0).dst);
+		assertTrue(matches.get(1).fitScore != 0);
 		assertEquals(1,matches.get(1).src);
 		assertEquals(2,matches.get(1).dst);
+		assertTrue(matches.get(2).fitScore != 0);
 		assertEquals(2,matches.get(2).src);
 		assertEquals(4,matches.get(2).dst);
-	}
-
-	@Test
-	public void addCheckScoreSet() {
-		fail("Implement");
 	}
 
 	private AssociateSurfBasic createAlg() {

@@ -49,17 +49,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Fundamental matrix describes the epipolar relationship between two images.  If two point images, one from
+ * A Fundamental matrix describes the epipolar relationship between two images.  If two points, one from
  * each image, match, then the inner product around the Fundamental matrix will be zero.  If a fundamental
- * matrix is known then information about the scene and structure can be estimated.
+ * matrix is known, then information about the scene and structure can be extracted.
  *
- * Below are two examples of how a Fundamental matrix can be computed using different simplified interfaces.
+ * Below are two examples of how a Fundamental matrix can be computed using different.
  * The robust technique attempts to find the best fit Fundamental matrix to the data while removing noisy
- * matches, while the simple version just assumes that all the matches are correct.  Similar techniques can be used
+ * matches, The simple version just assumes that all the matches are correct.  Similar techniques can be used
  * to fit various other types of motion or structural models to observations.
  *
  * The input image and associated features are displayed in a window.  In another window only features included
- * in the inlier set of the robust algorithm are shown.
+ * in the inlier set of the robust algorithm are shown.  Note how there are clearly incorrect inliers even after
+ * the epipolar constraint has been applied?
  *
  * @author Peter Abeles
  */
@@ -88,7 +89,7 @@ public class ExampleFundamentalMatrix {
 		// Use LMedS to estimate F since it does not require knowledge of the expected error
 		ModelMatcher<DenseMatrix64F,AssociatedPair> robustF =
 				new SimpleInlierRansac<DenseMatrix64F, AssociatedPair>(123123,generateF,errorMetric,
-						3000,7,20,-1,0.5e-2);
+						3000,7,20,-1,0.2);
 
 		// Estimate the fundamental matrix while removing outliers
 		if( !robustF.process(matches) )
@@ -98,7 +99,7 @@ public class ExampleFundamentalMatrix {
 		inliers.addAll(robustF.getMatchSet());
 
 		// Improve the estimate of the fundamental matrix using non-linear optimization
-		RefineEpipolarMatrix refine = FactoryEpipolar.refineFundamental(1e-8, 400, EpipolarError.SIMPLE);
+		RefineEpipolarMatrix refine = FactoryEpipolar.refineFundamental(1e-8, 400, EpipolarError.SAMPSON);
 		if( !refine.process(robustF.getModel(), inliers) )
 			throw new IllegalArgumentException("Failed");
 
@@ -156,8 +157,8 @@ public class ExampleFundamentalMatrix {
 
 		String dir = "../data/evaluation/structure/";
 
-		BufferedImage imageA = UtilImageIO.loadImage(dir + "tran_cyto_00.jpg");
-		BufferedImage imageB = UtilImageIO.loadImage(dir + "tran_cyto_01.jpg");
+		BufferedImage imageA = UtilImageIO.loadImage(dir + "undist_cyto_01.jpg");
+		BufferedImage imageB = UtilImageIO.loadImage(dir + "undist_cyto_02.jpg");
 
 		List<AssociatedPair> matches = computeMatches(imageA,imageB);
 

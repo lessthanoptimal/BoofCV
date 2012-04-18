@@ -45,12 +45,19 @@ import java.util.List;
  * <p>
  * Given two uncalibrated images (stereo baseline is unknown) rectify the images by aligning the image rows.
  * The uncalibrated case is difficult to apply in practice because it requires an accurate fundamental
- * matrix estimate.  Any outliers or other errors will throw the estimate off by a significant amount.
+ * matrix estimate.  Any outliers or other errors will throw the estimate off by a significant amount. Note
+ * how rectification is off by several pixels even in this example.
  * </p>
  *
  * <p>
- * The epipolar constraint will remove many outliers, but still leave a significantly number behind.  In
- * the example below a hack is used to remove the last few outliers, applying a approximate affine constraint.
+ * An inaccurate fundamental matrix comes from two sources, feature localization and outlier removal.  General purpose
+ * feature detectors tend to be much less accurate than specialized feature detectors used
+ * in camera calibration.  The epipolar constraint used to robustly compute the fundamental matrix is not restrictive
+ * enough to remove all outliers.
+ * </p>
+ *
+ * <p>
+ * In the example below a hack is used to remove the last few outliers, applying a approximate affine constraint.
  * The affine constraint will work well for aerial scenes, but other cases it will not work as well.
  * </p>
  *
@@ -63,7 +70,7 @@ import java.util.List;
  *   <li>Use a robust estimation algorithm to compute F (e.g. RANSAC).</li>
  *   <li>Remove lens distortion to improve accuracy</li>
  * </ul>
- * <li>Curse CV books for not mentioning these important problems</li>
+ * <li>Curse CV books for not mentioning these important problems and making it sound trivial</li>
  * <ul>
  * </p>
  *
@@ -103,7 +110,7 @@ public class ExampleRectifyUncalibratedStereo {
 
 		// Adjust the rectification to make the view area more useful
 		RectifyImageOps.fullViewLeft(origLeft.getWidth(),origLeft.getHeight(), rect1, rect2 );
-//		RectifyImageOps.allInsideLeft(param.left, leftHanded, rect1, rect2, rectK);
+//		RectifyImageOps.allInsideLeft(origLeft.getWidth(),origLeft.getHeight(), rect1, rect2 );
 
 		// undistorted and rectify images
 		ImageDistort<ImageFloat32> imageDistortLeft =
@@ -130,7 +137,7 @@ public class ExampleRectifyUncalibratedStereo {
 	public static List<AssociatedPair>  pruneWithAffine( List<AssociatedPair> pairs ) {
 
 		// use a fairly crude threshold since its not really an affine scene
-		double threshold = 2;
+		double threshold = 5;
 
 		GenerateAffine2D modelFitter = new GenerateAffine2D();
 		DistanceAffine2D distance = new DistanceAffine2D();
@@ -149,8 +156,8 @@ public class ExampleRectifyUncalibratedStereo {
 
 		// load images with lens distortion removed
 		String dir = "../data/evaluation/structure/";
-		BufferedImage imageA = UtilImageIO.loadImage(dir + "rect00.bmp");
-		BufferedImage imageB = UtilImageIO.loadImage(dir + "rect01.bmp");
+		BufferedImage imageA = UtilImageIO.loadImage(dir + "undist_cyto_01.jpg");
+		BufferedImage imageB = UtilImageIO.loadImage(dir + "undist_cyto_02.jpg");
 
 		// Find a set of point feature matches
 		List<AssociatedPair> matches = ExampleFundamentalMatrix.computeMatches(imageA,imageB);

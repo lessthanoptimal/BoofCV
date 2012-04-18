@@ -37,23 +37,20 @@ import java.util.List;
 /**
  * <p>
  * Example of how to calibrate a stereo camera system using a planar calibration grid.  The intrinsic camera parameters
- * are estimated for both cameras individually and the extrinsic parameters for the two cameras relative to each other.
- * Rectification is optional and handled else where, see {@link ExampleRectifyCalibratedStereo}.
+ * are estimated for both cameras individually, then extrinsic parameters for the two cameras relative to each other
+ * are found   This example does not rectify the images, which is  required for some algorithms.
+ * See {@link ExampleRectifyCalibratedStereo}. Both square grid and chessboard targets are demonstrated in this example.
+ * See calibration tutorial for a discussion of different target types and how to collect good calibration images.
  * </p>
  *
- * <p>
- * Two types of calibration  targets can be processed by BoofCV, square grids and chessboard.  Square grid is composed
- * of a set of square grids and chessboard is a classic chessboard pattern.  In general better quality results have
- * been found using the chessboard patter, but parameter tuning is required to achieve optimal performance.
- * </p>
- *
- * <p>
+ * <<p>
  * All the image processing and calibration is taken care of inside of {@link CalibrateStereoPlanar}.  The code below
- * images of calibration targets are loaded and pass in as inputs and the found calibration is saved to an XML file.
- * See in code comments for tuning and implementation issues.
+ * loads calibration images as inputs, calibrates, and saves results to an XML file.  See in code comments for tuning
+ * and implementation issues.
  * </p>
  *
- * @see ExampleCalibrateStereoPlanar
+ * @see ExampleRectifyCalibratedStereo
+ * @see CalibrateStereoPlanar
  *
  * @author Peter Abeles
  */
@@ -69,11 +66,13 @@ public class ExampleCalibrateStereoPlanar {
 	List<String> left;
 	List<String> right;
 
-	// Most computer images are in a left handed coordinate system.  This can cause problems when algorithms
-	// that assume a right handed coordinate system are used later on.  To address this issue the image coordinate
-	// system is changed to a right handed one if true is passed in for the second parameter.
+	// Most computer images are in a left handed coordinate system.  If set to true it will be changed into
+	// a right handed coordinate system.  This is required for stereo calibration to work correctly.
 	boolean isLeftHanded;
 
+	/**
+	 * Square grid target taken by a PtGrey Bumblebee camera.
+	 */
 	public void setupBumblebeeSquare() {
 		// Use the wrapper below for square grid targets.
 		detector = new WrapPlanarGridTarget(3,4);
@@ -88,6 +87,9 @@ public class ExampleCalibrateStereoPlanar {
 		isLeftHanded = true;
 	}
 
+	/**
+	 * Chessboard target taken by a PtGrey Bumblebee camera.
+	 */
 	public void setupBumblebeeChess() {
 		// Use the wrapper below for chessboard targets.  The last parameter adjusts the size of the corner detection
 		// region.  TUNE THIS PARAMETER FOR OPTIMAL ACCURACY!

@@ -57,6 +57,8 @@ public class FundamentalResidualSampson
 		GeometryMath_F64.multTran(F, observation.currLoc, temp);
 		bottom += temp.x*temp.x + temp.y*temp.y;
 
+		bottom = Math.sqrt(bottom);
+
 		if( bottom <= UtilEjml.EPS) {
 			return Double.MAX_VALUE;
 		} else {

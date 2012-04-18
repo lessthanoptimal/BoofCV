@@ -35,19 +35,19 @@ import java.util.List;
 
 /**
  * <p>
- * Example of how to calibrate a single (monocular) camera using a planar calibration grid.  Two types of calibration
- * targets can be processed by BoofCV, square grids and chessboard.  Square grid is composed of a set of square
- * grids and chessboard is a classic chessboard pattern.  In general better quality results have been found using
- * the chessboard patter, but parameter tuning is required to achieve optimal performance.
+ * Example of how to calibrate a single (monocular) camera using a planar calibration grid.  The intrinsic camera
+ * parameters and lens distortion are estimated.  Both square grid and chessboard targets are demonstrated by this
+ * example. See calibration tutorial for a discussion of different target types and how to collect good calibration
+ * images.
  * </p>
  *
- * <p>
+ * <<p>
  * All the image processing and calibration is taken care of inside of {@link CalibrateMonoPlanar}.  The code below
- * images of calibration targets are loaded and pass in as inputs and the found calibration is saved to an XML file.
- * See in code comments for tuning and implementation issues.
+ * loads calibration images as inputs, calibrates, and saves results to an XML file.  See in code comments for tuning
+ * and implementation issues.
  * </p>
  *
- * @see ExampleCalibrateStereoPlanar
+ * @see CalibrateMonoPlanar
  *
  * @author Peter Abeles
  */
@@ -62,13 +62,13 @@ public class ExampleCalibrateMonocularPlanar {
 	// List of calibration images
 	List<String> images;
 
-	// Most computer images are in a left handed coordinate system.  This can cause problems when algorithms
-	// that assume a right handed coordinate system are used later on.  To address this issue the image coordinate
-	// system is changed to a right handed one if true is passed in for the second parameter.
+	// Most computer images are in a left handed coordinate system.  If set to true it will be changed into
+	// a right handed coordinate system to make processing with 3D vision algorithms easier.  Not always needed
+	// for processing monocular images.
 	boolean isLeftHanded;
 
 	/**
-	 * Use images from Zhang's website which were used inside his paper.
+	 * Images from Zhang's website.  Square grid pattern.
 	 */
 	private void setupZhang99() {
 		// Use the wrapper below for square grid targets.
@@ -85,6 +85,9 @@ public class ExampleCalibrateMonocularPlanar {
 		isLeftHanded = true;
 	}
 
+	/**
+	 * Images collected from a Bumblee Bee stereo camera.  Large amounts of radial distortion. Chessboard pattern.
+	 */
 	private void setupBumbleBee() {
 		// Use the wrapper below for chessboard targets.  The last parameter adjusts the size of the corner detection
 		// region.  TUNE THIS PARAMETER FOR OPTIMAL ACCURACY!
