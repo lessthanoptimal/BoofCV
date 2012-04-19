@@ -35,6 +35,10 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 
 /**
@@ -146,11 +150,14 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 
 		app.setPreferredSize(new Dimension(500,500));
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("eye 1","../data/evaluation/eye01.jpg"));
-		inputs.add(new PathLabel("eye 2","../data/evaluation/eye02.jpg"));
+		app.setBaseDirectory("../data/applet/");
+		app.loadInputData("../data/applet/interpolation.txt");
 
-		app.setInputList(inputs);
+//		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+//		inputs.add(new PathLabel("eye 1","../data/evaluation/eye01.jpg"));
+//		inputs.add(new PathLabel("eye 2","../data/evaluation/eye02.jpg"));
+//
+//		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

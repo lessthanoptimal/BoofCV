@@ -45,6 +45,8 @@
           <root url="file://$MODULE_DIR$/../main/io/src" />
           <root url="file://$MODULE_DIR$/../main/feature/src" />
           <root url="file://$MODULE_DIR$/../main/geo/src" />
+          <root url="file://$MODULE_DIR$/../main/calibration/src" />
+          <root url="file://$MODULE_DIR$/../main/visualize/src" />
         </SOURCES>
       </library>
     </orderEntry>

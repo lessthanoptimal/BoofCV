@@ -70,7 +70,7 @@ public class BaseCalibrationConfig {
 			detector = new WrapPlanarGridTarget(numCols,numRows);
 			target = FactoryPlanarCalibrationTarget.gridSquare(numCols, numRows, width, space);
 		} else if( type.compareToIgnoreCase("chess") == 0 ) {
-			detector = new WrapPlanarChessTarget(numCols,numRows,4);
+			detector = new WrapPlanarChessTarget(numCols,numRows,6);
 			target = FactoryPlanarCalibrationTarget.gridChess(numCols,numRows,width);
 		} else {
 			throw new RuntimeException("Unknown type: "+type);

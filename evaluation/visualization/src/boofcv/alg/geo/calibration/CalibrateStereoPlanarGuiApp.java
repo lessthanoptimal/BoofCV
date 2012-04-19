@@ -60,7 +60,6 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	List<String> rightImages;
 
 	MediaManager media = DefaultMediaManager.INSTANCE;
-	boolean processedInput = false;
 
 	public CalibrateStereoPlanarGuiApp() {
 		setLayout(new BorderLayout());
@@ -201,7 +200,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 	@Override
 	public boolean getHasProcessedImage() {
-		return processedInput;
+		return true;
 	}
 
 	public static void main( String args[] ) {
@@ -211,7 +210,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+		String directory = "../data/applet/calibration/stereo/Bumblebee2_Chess";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		List<String> leftImages = BoofMiscOps.directoryList(directory, "left");
@@ -229,6 +228,5 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		frame.setVisible(true);
 
 		app.process("stereo.xml");
-
 	}
 }
