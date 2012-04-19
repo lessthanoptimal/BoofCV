@@ -39,11 +39,10 @@ import java.awt.image.BufferedImage;
 
 /**
  * <p>
- * Show how to rectify a pair of stereo images which have already been calibrated and have
- * a known baseline.<br>
- * 1) The stereo parameters are loaded from an xml file along with a pair
- * of images.<br>
- * 2) The rectification is then computed.  This provides one rectification matrix
+ * Show how to rectify a pair of stereo images with known intrinsic parameters and stereo baseline.
+ * The example code does the following:<br>
+ * 1) Load stereo parameters from XML file with a pair of images.<br>
+ * 2) Undistort and rectify images..  This provides one rectification matrix
  * for each image along with a new camera calibration matrix.<br>
  * 3) The original rectification does not try to maximize view area, however it can be adjusted.
  * 4)After rectification is finished the results are displayed.<br>
@@ -75,7 +74,7 @@ public class ExampleRectifyCalibratedStereo {
 		MultiSpectral<ImageFloat32> distLeft = ConvertBufferedImage.convertFromMulti(origLeft, null, ImageFloat32.class);
 		MultiSpectral<ImageFloat32> distRight = ConvertBufferedImage.convertFromMulti(origRight, null, ImageFloat32.class);
 
-		// storage for rectified images
+		// storage for undistorted + rectified images
 		MultiSpectral<ImageFloat32> rectLeft = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
 				distLeft.getWidth(),distLeft.getHeight(),distLeft.getNumBands());
 		MultiSpectral<ImageFloat32> rectRight = new MultiSpectral<ImageFloat32>(ImageFloat32.class,

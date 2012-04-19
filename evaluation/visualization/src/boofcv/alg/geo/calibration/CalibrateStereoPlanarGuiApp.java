@@ -23,6 +23,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.app.CalibrateStereoPlanar;
+import boofcv.app.ParseStereoCalibrationConfig;
 import boofcv.app.PlanarCalibrationDetector;
 import boofcv.app.WrapPlanarChessTarget;
 import boofcv.core.image.ConvertBufferedImage;
@@ -113,33 +114,6 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		param.print();
 		if( outputFileName != null )
 			BoofMiscOps.saveXML(param,outputFileName);
-
-//		SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
-//				monitor.setMessage(1,"Estimating Parameters");
-//			}});
-//
-//		IntrinsicParameters param = calibrator.process();
-//		SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
-//				gui.setResults(calibrator.getErrors());
-//				gui.setCalibration(calibrator.getFound());
-//			}});
-//		monitor.stopThread();
-//
-//		if( outputFileName != null )
-//			BoofMiscOps.saveXML(param, outputFileName);
-//
-//		// tell it how to undistort the image
-//		SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
-//				ParametersZhang99 found = calibrator.getFound();
-//
-//				tran.set(found.a,found.b,found.c,found.x0,found.y0,found.distortion);
-//				gui.setCorrection(dist);
-//
-//				gui.repaint();
-//			}});
 	}
 
 	/**
@@ -206,12 +180,23 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 	@Override
 	public void loadConfigurationFile(String fileName) {
-		//To change body of implemented methods use File | Settings | File Templates.
+		ParseStereoCalibrationConfig parser = new ParseStereoCalibrationConfig(media);
+
+		if( parser.parse(fileName) ) {
+			configure(parser.detector,parser.target,parser.adjustLeftToRight,
+					parser.getLeftImages(),parser.getRightImages());
+		} else {
+			System.err.println("Configuration failed");
+		}
 	}
 
 	@Override
 	public void loadInputData(String fileName) {
-		//To change body of implemented methods use File | Settings | File Templates.
+		new Thread() {
+			public void run() {
+				process(null);
+			}
+		}.start();
 	}
 
 	@Override

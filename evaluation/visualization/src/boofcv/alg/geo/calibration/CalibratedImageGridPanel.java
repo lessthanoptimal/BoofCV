@@ -28,6 +28,7 @@ import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,12 +116,23 @@ public class CalibratedImageGridPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+
+		Graphics2D g2 = (Graphics2D)g;
+
 		if( images == null || selectedImage >= images.size() )
 			return;
 
 		BufferedImage image = images.get(selectedImage);
 
-		Graphics2D g2 = (Graphics2D)g;
+		double scaleX = getWidth()/(double)image.getWidth();
+		double scaleY = getHeight()/(double)image.getHeight();
+		double scale = Math.min(1,Math.min(scaleX,scaleY));
+
+		AffineTransform tranOrig = g2.getTransform();
+		AffineTransform tran = g2.getTransform();
+		tran.concatenate(AffineTransform.getScaleInstance(scale,scale));
+
+		g2.setTransform(tran);
 
 		if( showUndistorted) {
 			if( undoRadial != null && !isUndistorted ) {
@@ -131,8 +143,10 @@ public class CalibratedImageGridPanel extends JPanel {
 		} else
 			g2.drawImage(image,0,0,null);
 
+		g2.setTransform(tranOrig);
+
 		if( features.size() > selectedImage ) {
-			drawFeatures(g2);
+			drawFeatures(g2, scale);
 		}
 
 		if( lineY > -1 ) {
@@ -159,31 +173,31 @@ public class CalibratedImageGridPanel extends JPanel {
 			throw new RuntimeException("What kind of image has "+correctedMS.getNumBands()+"???");
 	}
 
-	private void drawFeatures(Graphics2D g2) {
+	private void drawFeatures(Graphics2D g2 , double scale) {
 		List<Point2D_F64> points = features.get(selectedImage);
 		if( showPoints ) {
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(3));
 			for( Point2D_F64 p : points ) {
-				VisualizeFeatures.drawCross(g2, (int) p.x, (int) p.y, 4);
+				VisualizeFeatures.drawCross(g2, (int) (p.x*scale), (int) (p.y*scale), 4);
 			}
 			g2.setStroke(new BasicStroke(1));
 			g2.setColor(Color.RED);
 			for( Point2D_F64 p : points ) {
-				VisualizeFeatures.drawCross(g2, (int) p.x, (int) p.y, 4);
+				VisualizeFeatures.drawCross(g2, (int) (p.x*scale), (int) (p.y*scale), 4);
 			}
 		}
 
 		if( showAll ) {
 			for( List<Point2D_F64> l : features ) {
 				for( Point2D_F64 p : l ) {
-					VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,2,Color.BLUE);
+					VisualizeFeatures.drawPoint(g2,(int)(p.x*scale),(int)(p.y*scale),2,Color.BLUE);
 				}
 			}
 		}
 
 		if( showNumbers ) {
-			DetectCalibrationChessApp.drawNumbers(g2, points);
+			DetectCalibrationChessApp.drawNumbers(g2, points,scale);
 		}
 
 		if( showErrors && results != null && results.size() > selectedImage ) {
@@ -199,8 +213,8 @@ public class CalibratedImageGridPanel extends JPanel {
 				if( r < 1 )
 					continue;
 
-				int x = (int)p.x - r ;
-				int y = (int)p.y - r;
+				int x = (int)(p.x*scale) - r;
+				int y = (int)(p.y*scale) - r;
 				int w = r*2+1;
 
 				g2.drawOval(x, y, w, w);
@@ -215,8 +229,8 @@ public class CalibratedImageGridPanel extends JPanel {
 				if( r < 1 )
 					continue;
 
-				int x = (int)p.x - r ;
-				int y = (int)p.y - r;
+				int x = (int)(p.x*scale) - r;
+				int y = (int)(p.y*scale) - r;
 				int w = r*2+1;
 
 				g2.drawOval(x, y, w, w);

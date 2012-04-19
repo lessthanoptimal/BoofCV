@@ -21,7 +21,7 @@ package boofcv.alg.geo.calibration;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.app.CalibrateMonoPlanar;
-import boofcv.app.ParseCalibrationConfig;
+import boofcv.app.ParseMonoCalibrationConfig;
 import boofcv.app.PlanarCalibrationDetector;
 import boofcv.app.WrapPlanarGridTarget;
 import boofcv.core.image.ConvertBufferedImage;
@@ -78,7 +78,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 
 	@Override
 	public void loadConfigurationFile(String fileName) {
-		ParseCalibrationConfig parser = new ParseCalibrationConfig(media);
+		ParseMonoCalibrationConfig parser = new ParseMonoCalibrationConfig(media);
 
 		if( parser.parse(fileName) ) {
 			configure(parser.detector,parser.target,parser.images,parser.adjustLeftToRight);

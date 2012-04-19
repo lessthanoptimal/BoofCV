@@ -189,7 +189,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			}
 			
 			if( calibGUI.isShowNumbers() ) {
-				drawNumbers(g2, alg.getPoints());
+				drawNumbers(g2, alg.getPoints(),1);
 			}
 		}
 
@@ -200,7 +200,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		processed = true;
 	}
 
-	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ) {
+	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget , double scale ) {
 
 		Font regular = new Font("Serif", Font.PLAIN, 16);
 		g2.setFont(regular);
@@ -210,8 +210,8 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			Point2D_F64 p = foundTarget.get(i);
 			String text = String.format("%2d",i);
 
-			int x = (int)p.x;
-			int y = (int)p.y;
+			int x = (int)(p.x*scale);
+			int y = (int)(p.y*scale);
 
 			g2.setColor(Color.BLACK);
 			g2.drawString(text,x-1,y);

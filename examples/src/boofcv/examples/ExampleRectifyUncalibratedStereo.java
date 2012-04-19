@@ -43,22 +43,16 @@ import java.util.List;
 
 /**
  * <p>
- * Given two uncalibrated images (stereo baseline is unknown) rectify the images by aligning the image rows.
- * The uncalibrated case is difficult to apply in practice because it requires an accurate fundamental
+ * Given two uncalibrated stereo images (stereo baseline is unknown) rectify the images by aligning the images along
+ * the y-axis.  The uncalibrated case is difficult to apply in practice because it requires an accurate fundamental
  * matrix estimate.  Any outliers or other errors will throw the estimate off by a significant amount. Note
  * how rectification is off by several pixels even in this example.
  * </p>
  *
  * <p>
- * An inaccurate fundamental matrix comes from two sources, feature localization and outlier removal.  General purpose
- * feature detectors tend to be much less accurate than specialized feature detectors used
- * in camera calibration.  The epipolar constraint used to robustly compute the fundamental matrix is not restrictive
- * enough to remove all outliers.
- * </p>
- *
- * <p>
- * In the example below a hack is used to remove the last few outliers, applying a approximate affine constraint.
- * The affine constraint will work well for aerial scenes, but other cases it will not work as well.
+ * In the example below a hack is used to remove the last few outliers, applying crude affine constraint.
+ * The affine constraint works moderately well in this example because the observed location of points after
+ * the true rigid body motion has applied is within several pixels of the affine model.
  * </p>
  *
  * <p>
@@ -134,7 +128,7 @@ public class ExampleRectifyUncalibratedStereo {
 	 * is assumed that there is only a small change between feature locations and any that
 	 * are far away will be pruned.
 	 */
-	public static List<AssociatedPair>  pruneWithAffine( List<AssociatedPair> pairs ) {
+	public static List<AssociatedPair> pruneWithAffine( List<AssociatedPair> pairs ) {
 
 		// use a fairly crude threshold since its not really an affine scene
 		double threshold = 5;
@@ -181,5 +175,4 @@ public class ExampleRectifyUncalibratedStereo {
 
 		rectify(F,inliers,imageA,imageB);
 	}
-
 }

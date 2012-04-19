@@ -47,7 +47,7 @@ import java.util.Vector;
 public class StereoPlanarPanel extends JPanel
 	implements ListSelectionListener, ItemListener, ChangeListener, MouseListener
 {
-	// display for calibration information on individual cmaeras
+	// display for calibration information on individual cameras
 	CalibratedImageGridPanel leftView = new CalibratedImageGridPanel();
 	CalibratedImageGridPanel rightView = new CalibratedImageGridPanel();
 
@@ -135,7 +135,7 @@ public class StereoPlanarPanel extends JPanel
 		checkAll.setSelected(showAll);
 		checkAll.addItemListener(this);
 
-		checkUndistorted = new JCheckBox("Undistort");
+		checkUndistorted = new JCheckBox("Rectify");
 		checkUndistorted.setSelected(showUndistorted);
 		checkUndistorted.addItemListener(this);
 		checkUndistorted.setEnabled(false);
@@ -153,7 +153,7 @@ public class StereoPlanarPanel extends JPanel
 		toolBar.add(checkAll);
 		toolBar.add(checkUndistorted);
 		toolBar.add(checkNumbers);
-		toolBar.add(new JLabel("Error Scale"));
+		toolBar.add(new JLabel("| Error Scale"));
 		toolBar.add(selectErrorScale);
 		return toolBar;
 	}

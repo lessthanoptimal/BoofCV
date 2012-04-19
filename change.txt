@@ -41,6 +41,7 @@ Version : Alpha 0.7
 - The feature score was not being set in WrapAssociateGreedy
   * Thanks Nir Amar
   * Also changed AssociateSurfBasic for a similar reason
+- Fixed problem in FundamentalResidualSampson where the denominator was being squared
 
 ---------------------------------------------
 Date    : 2012/03/01

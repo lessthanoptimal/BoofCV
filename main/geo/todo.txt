@@ -1,5 +1,8 @@
 - Remove distortion parameters from IntrinsicParameters
 
+- Fundamental Sampson Distance
+  * Create this class, residual requires an unnecessary sqrt() for distance calculations
+
 - Compare EPnP directly to author's c code
 
 - Bundle Adjustment

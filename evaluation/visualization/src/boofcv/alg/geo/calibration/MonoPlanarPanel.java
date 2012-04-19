@@ -141,7 +141,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		toolBar.add(checkAll);
 		toolBar.add(checkUndistorted);
 		toolBar.add(checkNumbers);
-		toolBar.add(new JLabel("Error Scale"));
+		toolBar.add(new JLabel("| Error Scale"));
 		toolBar.add(selectErrorScale);
 		return toolBar;
 	}
