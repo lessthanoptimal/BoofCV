@@ -123,7 +123,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 					names[i-1] = baseDirectory+z[i];
 				}
 
-				refs.add(new PathLabel(z[0],names[0]));
+				refs.add(new PathLabel(z[0],names));
 			}
 
 			setInputList(refs);

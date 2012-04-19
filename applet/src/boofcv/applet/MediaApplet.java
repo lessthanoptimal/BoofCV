@@ -18,17 +18,11 @@
 
 package boofcv.applet;
 
-import boofcv.gui.ProcessInput;
-import boofcv.io.video.VideoListManager;
+import boofcv.gui.VisualizeApp;
 import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 
 
 /**
@@ -36,12 +30,13 @@ import java.net.URL;
  *
  * @author Peter Abeles
  */
-public class VideoInputApplet extends JApplet {
+public class MediaApplet extends JApplet {
 
 	@Override
 	public void init() {
 		showStatus("Loading Parameters");
 		String dataset = getParameter("dataset");
+		String config = getParameter("config");
 
 		if( dataset == null ) {
 			showStatus("dataset parameter not set!");
@@ -57,17 +52,24 @@ public class VideoInputApplet extends JApplet {
 		if( comp == null ) {
 			showStatus("Failed to create GUI component");
 			return;
-		} else if( !(comp instanceof ProcessInput) ) {
-			showStatus("The loaded component is not of ProcessImage type");
+		} else if( !(comp instanceof VisualizeApp) ) {
+			showStatus("The loaded component is not of VisualizeApp type");
 			return;
 		}
 
-		showStatus("Loading Image");
-		ProcessInput p = (ProcessInput)comp;
+		VisualizeApp p = (VisualizeApp)comp;
 
-		VideoListManager manager = parseImageInput(inputType,dataset);
+		AppletMediaManager amm = new AppletMediaManager(getCodeBase());
+		amm.setOwnerGUI(this);
 
-		p.setInputManager(manager);
+		p.setMediaManager(amm);
+		String directory = getDirectory(dataset);
+		amm.setHomeDirectory(directory);
+
+		if( config != null )
+			p.loadConfigurationFile(config);
+
+		p.loadInputData(dataset);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !p.getHasProcessedImage() ) {
@@ -76,40 +78,6 @@ public class VideoInputApplet extends JApplet {
 
 		showStatus("Running");
 		getContentPane().add(comp, BorderLayout.CENTER);
-	}
-
-	public VideoListManager parseImageInput( Class imageType , String fileName )
-	{
-
-		String directory = getDirectory(fileName);
-
-		AppletVideoListManager ret = new AppletVideoListManager(imageType,getCodeBase());
-		ret.setOwnerGUI(this);
-		try {
-			InputStreamReader isr = new InputStreamReader(new URL(getCodeBase(),fileName).openStream());
-			BufferedReader reader = new BufferedReader(isr);
-
-			String line;
-			while( (line = reader.readLine()) != null ) {
-				if( line.length() == 0 )
-					continue;
-
-				String[]z = line.split(":");
-				String[] names = new String[z.length-2];
-				for( int i = 2; i < z.length; i++ ) {
-					names[i-2] = directory+z[i];
-				}
-
-				ret.add(z[0],z[1],names);
-			}
-
-			return ret;
-
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/**
@@ -129,6 +97,6 @@ public class VideoInputApplet extends JApplet {
 
 	@Override
 	public String getAppletInfo() {
-		return "Video Processing Applet";
+		return "Shows gradient of an image";
 	}
 }

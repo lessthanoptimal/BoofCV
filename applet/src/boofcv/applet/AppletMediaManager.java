@@ -20,15 +20,18 @@ package boofcv.applet;
 
 import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.video.VideoMjpegCodec;
+import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -40,13 +43,22 @@ public class AppletMediaManager implements MediaManager {
 	
 	// TODO REMOVE THIS MASSIVE HACK
 	boolean first = true;
-	
+
+	Component ownerGUI;
+	boolean done;
+
+	int totalDownloaded;
+
 	public AppletMediaManager(URL codebase) {
 		this.codebase = codebase;
 	}
 
 	public void setHomeDirectory(String homeDirectory) {
 		this.homeDirectory = homeDirectory;
+	}
+
+	public void setOwnerGUI(Component ownerGUI) {
+		this.ownerGUI = ownerGUI;
 	}
 
 	@Override
@@ -86,6 +98,85 @@ public class AppletMediaManager implements MediaManager {
 
 	@Override
 	public <T extends ImageBase> SimpleImageSequence<T> openVideo(String fileName, Class<T> imageType) {
-		throw new RuntimeException("NOpe not implemented yet");
+		String type = "MJPEG"; // todo should get from file name
+		URL url = null;
+		BufferedInputStream stream = null;
+
+		int fileSize = -1;
+
+		try {
+			url = new URL(codebase, homeDirectory + fileName);
+			fileSize = url.openConnection().getContentLength();
+			stream = new BufferedInputStream(url.openStream());
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		// first read in the data byte stream and update the download status while doing so
+		ByteArrayInputStream byteStream;
+		try {
+			byteStream = readNetworkData(stream,fileSize);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		// now convert it into some other format
+		if( type.compareToIgnoreCase("MJPEG") == 0 ) {
+			VideoMjpegCodec codec = new VideoMjpegCodec();
+			List<byte[]> data = codec.read(byteStream);
+//			System.out.println("Loaded "+data.size()+" jpeg images!");
+			return new JpegByteImageSequence<T>(imageType,data,true);
+		} else {
+			System.err.println("Unknown video type: "+type);
+		}
+
+		return null;
+	}
+
+	private ByteArrayInputStream readNetworkData(InputStream streamIn , int fileSize ) throws IOException {
+		totalDownloaded = 0;
+		done = false;
+		new ProcessThread(fileSize).start();
+
+		ByteArrayOutputStream temp = new ByteArrayOutputStream(1024);
+		byte[] data = new byte[ 1024 ];
+		int length;
+		while( ( length = streamIn.read(data)) != -1 ) {
+			totalDownloaded += length;
+			temp.write(data,0,length);
+		}
+		done = true;
+		return new ByteArrayInputStream(temp.toByteArray());
+	}
+
+	/**
+	 * Displays a progress monitor and updates its state periodically
+	 */
+	public class ProcessThread extends Thread
+	{
+		ProgressMonitor progressMonitor;
+		public ProcessThread( int fileSize ) {
+			String text = String.format("Loading Data %d KiB",(fileSize/1024));
+			progressMonitor = new ProgressMonitor(ownerGUI, text, "", 0, fileSize);
+		}
+
+		@Override
+		public void run() {
+			while( !done ) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						progressMonitor.setProgress(totalDownloaded);
+					}});
+				synchronized ( this ) {
+					try {
+						wait(100);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+			progressMonitor.close();
+		}
 	}
 }

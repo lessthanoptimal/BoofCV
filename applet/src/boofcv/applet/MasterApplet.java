@@ -41,7 +41,7 @@ public class MasterApplet extends JApplet {
 
 	@Override
 	public void init() {
-		image = loadImage("data/indoors01.jpg");
+		image = loadImage("data/sunflowers.jpg");
 
 //		ShowImages.showWindow(image,"Image");
 		ShowImageDerivative deriv = new ShowImageDerivative(inputType,derivType);

@@ -163,6 +163,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			imageList.addListSelectionListener(this);
 			mainView.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 			imageList.setSelectedIndex(0);
+			validate();
 		} else {
 			// each time an image is added it resets the selected value
 			imageList.setSelectedIndex(selectedImage);
