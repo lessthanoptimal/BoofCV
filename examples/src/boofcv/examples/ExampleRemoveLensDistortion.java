@@ -64,7 +64,7 @@ public class ExampleRemoveLensDistortion {
 		IntrinsicParameters param = BoofMiscOps.loadXML(calibDir + "intrinsic.xml");
 
 		// load images and convert the image into a color BoofCV format
-		BufferedImage orig = UtilImageIO.loadImage(imageDir + "tran_cyto_01.jpg");
+		BufferedImage orig = UtilImageIO.loadImage(imageDir + "dist_cyto_01.jpg");
 		MultiSpectral<ImageFloat32> distortedImg = ConvertBufferedImage.convertFromMulti(orig, null, ImageFloat32.class);
 
 		// compute the transform to remove lens distortion
