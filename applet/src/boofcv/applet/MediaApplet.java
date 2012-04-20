@@ -23,6 +23,7 @@ import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 
 /**
@@ -69,7 +70,7 @@ public class MediaApplet extends JApplet {
 		if( config != null )
 			p.loadConfigurationFile(config);
 
-		p.loadInputData(dataset);
+		p.loadInputData(new File(dataset).getName());
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !p.getHasProcessedImage() ) {

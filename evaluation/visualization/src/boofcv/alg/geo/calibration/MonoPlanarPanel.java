@@ -102,6 +102,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 		mainView.setImages(images);
 		mainView.setResults(features,results);
+		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,errorScale);
 
 		add(toolBar, BorderLayout.PAGE_START);
 		add(mainView, BorderLayout.CENTER);
@@ -169,7 +170,6 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 			imageList.setSelectedIndex(selectedImage);
 			imageList.addListSelectionListener(this);
 		}
-
 	}
 
 	public void setObservations( List<List<Point2D_F64>> features  ) {
