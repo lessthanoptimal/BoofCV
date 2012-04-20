@@ -57,7 +57,7 @@ public class TestDecomposeEssential {
 
 		checkUnique(solutions);
 
-		checkHasOriginal(solutions,E);
+		checkHasOriginal(solutions,R,T);
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class TestDecomposeEssential {
 
 		checkUnique(solutions);
 
-		checkHasOriginal(solutions, E);
+		checkHasOriginal(solutions, R,T);
 	}
 
 	/**
@@ -105,16 +105,16 @@ public class TestDecomposeEssential {
 	/**
 	 * See if an equivalent to the input matrix exists
 	 */
-	private void checkHasOriginal( List<Se3_F64> solutions , DenseMatrix64F origE ) {
+	private void checkHasOriginal( List<Se3_F64> solutions , DenseMatrix64F R ,Vector3D_F64 T  ) {
 
 		int numMatches = 0;
 		for( Se3_F64 se : solutions ) {
-			DenseMatrix64F foundE = UtilEpipolar.computeEssential(se.getR(), se.getT());
-
-			if(MatrixFeatures.isIdentical(origE,foundE,1e-4))
-				numMatches++;
+			if(MatrixFeatures.isIdentical(R,se.getR(),1e-4)) {
+				if( T.distance(se.getT()) < 1e-4 )
+					numMatches++;
+			}
 		}
 
-		assertEquals(2,numMatches);
+		assertEquals(1,numMatches);
 	}
 }

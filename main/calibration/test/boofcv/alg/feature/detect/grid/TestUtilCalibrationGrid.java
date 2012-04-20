@@ -34,9 +34,31 @@ import static org.junit.Assert.*;
  */
 public class TestUtilCalibrationGrid {
 
+	/**
+	 * Create a grid, then rotate and see if the points are expected
+	 */
 	@Test
 	public void rotatePoints() {
-		fail("IMplement");
+		int numCols = 3;
+		int numRows = 4;
+
+		List<Point2D_F64> original = new ArrayList<Point2D_F64>();
+
+		for( int i = 0; i < numRows; i++ ) {
+			for( int j = 0; j < numCols; j++ ) {
+				original.add(new Point2D_F64(j, i));
+			}
+		}
+
+		List<Point2D_F64> rotated = UtilCalibrationGrid.rotatePoints(original,numRows,numCols);
+
+		for( int i = 0; i < numCols; i++ ) {
+			for( int j = 0; j < numRows; j++ ) {
+				int index = j*numCols + (numCols-i-1);
+
+				assertTrue(original.get(index) == rotated.get(i*numRows+j));
+			}
+		}
 	}
 	
 	@Test

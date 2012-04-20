@@ -27,7 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-// todo comment
+/**
+ * Given a set of points that form an approximate grid, put them into grid order.  The order shall be in a row
+ * major format moving in the counter clockwise direction.  If the data is found to not be a grid then an expception
+ * is thrown.  Besides ordering points, the number of rows and columns is determined.  The initial starting point
+ * of the grid is arbitrary leading to the possibility that the orientation of the grid can be off.
+ */
 public class OrderPointsIntoGrid {
 	//  Final list of ordered points
 	private List<Point2D_F64> ordered;
@@ -43,6 +48,13 @@ public class OrderPointsIntoGrid {
 	private int numRows;
 
 
+	/**
+	 * Process the list of points and puts them into grid order
+	 *
+	 * @param unordered List of points not in any order.
+	 * @return Puts which have been put into grid order.
+	 * @throws InvalidCalibrationTarget Throw if the points are found to not be a grid.
+	 */
 	public List<Point2D_F64> process( List<Point2D_F64> unordered ) throws InvalidCalibrationTarget {
 
 		// internal copy of unordered list which can be modified.
@@ -57,6 +69,9 @@ public class OrderPointsIntoGrid {
 		return ordered;
 	}
 
+	/**
+	 * Puts the blobs into grid order using the previously found quadrilateral.
+	 */
 	private List<Point2D_F64> putBlobsIntoOrder( List<Point2D_F64> unordered ) throws InvalidCalibrationTarget {
 
 		// number of total points

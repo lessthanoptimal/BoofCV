@@ -40,13 +40,10 @@ public class TestPositiveDepthConstraintCheck {
 	 */
 	@Test
 	public void testPositive() {
-		// create transform from B to A
+		// create transform from A to B
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0, -0.05, 0, null);
 		Vector3D_F64 T = new Vector3D_F64(1,0,0);
-
-		Se3_F64 fromBtoA = new Se3_F64(R,T);
-		// transform from A to B
-		Se3_F64 fromAtoB = fromBtoA.invert(null);
+		Se3_F64 fromAtoB = new Se3_F64(R,T);
 
 		// point in front of both cameras
 		Point3D_F64 pt = new Point3D_F64(0,0,2);
@@ -56,9 +53,9 @@ public class TestPositiveDepthConstraintCheck {
 		Point3D_F64 pt_inB = SePointOps_F64.transform(fromAtoB,pt,null);
 		Point2D_F64 obsB = new Point2D_F64(pt_inB.x/pt_inB.z,pt_inB.y/pt_inB.z);
 
-		PositiveDepthConstraintCheck alg = new PositiveDepthConstraintCheck(true);
+		PositiveDepthConstraintCheck alg = new PositiveDepthConstraintCheck();
 
-		assertTrue(alg.checkConstraint(obsA,obsB,fromBtoA));
+		assertTrue(alg.checkConstraint(obsA,obsB,fromAtoB));
 	}
 
 	/**
@@ -66,13 +63,10 @@ public class TestPositiveDepthConstraintCheck {
 	 */
 	@Test
 	public void testNegative() {
-		// create transform from B to A
+		// create transform from A to B
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0, -0.05, 0, null);
 		Vector3D_F64 T = new Vector3D_F64(1,0,0);
-
-		Se3_F64 fromBtoA = new Se3_F64(R,T);
-		// transform from A to B
-		Se3_F64 fromAtoB = fromBtoA.invert(null);
+		Se3_F64 fromAtoB = new Se3_F64(R,T);
 
 		// point in front of both cameras
 		Point3D_F64 pt = new Point3D_F64(0,0,-1);
@@ -82,8 +76,8 @@ public class TestPositiveDepthConstraintCheck {
 		Point3D_F64 pt_inB = SePointOps_F64.transform(fromAtoB,pt,null);
 		Point2D_F64 obsB = new Point2D_F64(pt_inB.x/pt_inB.z,pt_inB.y/pt_inB.z);
 
-		PositiveDepthConstraintCheck alg = new PositiveDepthConstraintCheck(true);
+		PositiveDepthConstraintCheck alg = new PositiveDepthConstraintCheck();
 
-		assertFalse(alg.checkConstraint(obsA, obsB, fromBtoA));
+		assertFalse(alg.checkConstraint(obsA, obsB, fromAtoB));
 	}
 }

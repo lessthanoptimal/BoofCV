@@ -26,12 +26,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO comment
+ * Various functions for computing calibration grids.
  *
  * @author Peter Abeles
  */
 public class UtilCalibrationGrid {
 
+	/**
+	 * Automatically checks and adjusts the points.  if the number of rows/columns are swapped the
+	 * grid is rotated.  If no change is needed the original list is returned.  Otherwise null is returned
+	 * if some failure condition is present.
+	 *
+	 * @param points Ordered points in a grid.
+	 * @param numRows Number of rows in grid.
+	 * @param numCols Number of columns in grid.
+	 * @param expectedRows Number of expected rows.
+	 * @param expectedCols Number of expected columns.
+	 * @return Points in the correct order/crientation.
+	 */
 	public static List<Point2D_F64> rotatePoints( List<Point2D_F64> points ,
 												  int numRows , int numCols ,
 												  int expectedRows , int expectedCols ) {
@@ -43,7 +55,16 @@ public class UtilCalibrationGrid {
 		return null;
 	}
 
-	// todo unit test
+	/**
+	 * Rotates the grid by 90 degrees in the counter clockwise direction.  Useful when the points are organized
+	 * into a grid that has the number of rows and columns swapped.   The returned points will be a grid
+	 * with the input rows/columns swapped.
+	 *
+	 * @param points Ordered points in a grid.
+	 * @param numRows Number of rows in grid.
+	 * @param numCols Number of columns in grid.
+	 * @return Ordered points.
+	 */
 	public static List<Point2D_F64> rotatePoints( List<Point2D_F64> points ,
 												  int numRows , int numCols ) {
 

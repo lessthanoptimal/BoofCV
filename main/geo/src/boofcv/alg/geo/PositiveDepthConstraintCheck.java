@@ -18,6 +18,8 @@
 
 package boofcv.alg.geo;
 
+import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.factory.geo.FactoryTriangulate;
 import georegression.geometry.GeometryMath_F64;
 import georegression.metric.ClosestPoint3D_F64;
 import georegression.struct.line.LineParametric3D_F64;
@@ -31,43 +33,29 @@ import georegression.transform.se.SePointOps_F64;
  * Given two views of the same point and a known 3D transform checks to see if the point is in front
  * of both cameras.  This is the positive depth constraint.  A class is provided instead of a function
  * to reduce computational overhead each time the function is called.  Memory only needs to be
- * declared once.
+ * declared once.   Also less chance of messing up and only checking one view instead of two views
+ * if you use this class.
  * </p>
  *
  * <p>
  * COORDINATE SYSTEM: Right handed coordinate system with +z is pointing along the camera's optical axis,
  * </p>
  *
- * <p>
- * The triangulated point is found by computing the closest point on both rays to each other.  Observations
- * must be in calibrated coordinates.
- * </p>
- *
  * @author Peter Abeles
  */
 public class PositiveDepthConstraintCheck {
-	// pre-declare all data structure for faster bulk computations
+	// algorithm used to triangulate point locaiton
+	TriangulateTwoViewsCalibrated triangulate;
 
-	// the origin of the 3D coordinate system
-	Point3D_F64 origin = new Point3D_F64();
-	// Value of 't' in parametric line equation for the closest points
-	double closestPoints[] = new double[2];
+	// location of triangulated point in 3D space
+	Point3D_F64 P = new Point3D_F64();
 
-	// line from camera A to object
-	LineParametric3D_F64 lineA = new LineParametric3D_F64();
-	// line from camera B to object
-	LineParametric3D_F64 lineB = new LineParametric3D_F64();
+	public PositiveDepthConstraintCheck(TriangulateTwoViewsCalibrated triangulate) {
+		this.triangulate = triangulate;
+	}
 
-	boolean rightHanded;
-
-	/**
-	 * if the camera coordinate system is left handed then pass in false to the constructor.
-	 * If the positive y axis is pointing down then it is left handed.
-	 *
-	 * @param rightHanded Is a right handed coordinate system being used?
-	 */
-	public PositiveDepthConstraintCheck( boolean rightHanded ) {
-		this.rightHanded = rightHanded;
+	public PositiveDepthConstraintCheck() {
+		this(FactoryTriangulate.twoGeometric());
 	}
 
 	/**
@@ -75,22 +63,17 @@ public class PositiveDepthConstraintCheck {
 	 *
 	 * @param viewA View of the 3D point from the first camera.  Calibrated coordinates.
 	 * @param viewB View of the 3D point from the second camera.  Calibrated coordinates.
-	 * @param fromBtoA Transform from the B to A camera frame.
+	 * @param fromAtoB Transform from the B to A camera frame.
 	 * @return If the triangulated point appears in front of both cameras.
 	 */
-	public boolean checkConstraint( Point2D_F64 viewA , Point2D_F64 viewB , Se3_F64 fromBtoA ) {
-		// vector point from each camera's center to the point
-		lineA.getSlope().set(viewA.x,viewA.y,1.0);
-		lineB.getSlope().set(viewB.x,viewB.y,1.0);
+	public boolean checkConstraint( Point2D_F64 viewA , Point2D_F64 viewB , Se3_F64 fromAtoB ) {
 
-		// find location of camera B's origin in the first camera's frame
-		SePointOps_F64.transform(fromBtoA,origin,lineB.getPoint());
-		// adjust camera B's pointing vector
-		GeometryMath_F64.mult(fromBtoA.getR(), lineB.getSlope(), lineB.getSlope());
+		triangulate.triangulate(viewA,viewB,fromAtoB,P);
 
-		if( !ClosestPoint3D_F64.closestPoints(lineA, lineB, closestPoints) )
-			return false;
-
-		return( !(rightHanded ^ closestPoints[0] > 0) && !(rightHanded ^ closestPoints[1] > 0) );
+		if( P.z > 0 ) {
+			SePointOps_F64.transform(fromAtoB,P,P);
+			return P.z > 0;
+		}
+		return false;
 	}
 }
