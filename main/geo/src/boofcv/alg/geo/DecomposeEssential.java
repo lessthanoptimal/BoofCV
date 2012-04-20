@@ -32,9 +32,9 @@ import java.util.List;
 
 /**
  * <p>
- * Decomposed the essential matrix into a rigid body motion; rotation and translation.  A total
- * of four possible motions will be found and the ambiguity can be removed by calling
- * {@link PositiveDepthConstraintCheck} on each hypothesis.
+ * Decomposed the essential matrix into a rigid body motion; rotation and translation.  This is the rigid body
+ * transformation from the first camera frame into the second camera frame.  A total f four possible motions
+ * will be found and the ambiguity can be removed by calling {@link PositiveDepthConstraintCheck} on each hypothesis.
  * </p>
  *
  * <p>
@@ -123,7 +123,8 @@ public class DecomposeEssential {
 
 	/**
 	 * <p>
-	 * Returns the four possible solutions found in the decomposition.
+	 * Returns the four possible solutions found in the decomposition.  The returned motions go from the
+	 * first into the second camera frame.
 	 * </p>
 	 *
 	 * <p>

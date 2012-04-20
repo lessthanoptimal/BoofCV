@@ -57,13 +57,13 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	List<ViewPointObservations> bundleObs = new ArrayList<ViewPointObservations>();
 
 	ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion;
-	RefineEpipolarMatrix refineE;
-	
-	DecomposeEssential decomposeE = new DecomposeEssential();
-	PositiveDepthConstraintCheck depthChecker = new PositiveDepthConstraintCheck(true);
 
+	DecomposeEssential decomposeE = new DecomposeEssential();
 	TriangulateTwoViewsCalibrated triangulateAlg = FactoryTriangulate.twoGeometric();
 
+	PositiveDepthConstraintCheck depthChecker = new PositiveDepthConstraintCheck(triangulateAlg);
+
+	RefineEpipolarMatrix refineE;
 	ModelMatcher<Se3_F64,PointPositionPair> computeMotion;
 	RefinePerspectiveNPoint refineMotion;
 
@@ -234,7 +234,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 				// select best possible motion from E
 				List<Se3_F64> solutions = decomposeE.getSolutions();
 
-				Se3_F64 best = selectBestPose(solutions, inliers);
+				Se3_F64 motionKeyToCurr = selectBestPose(solutions, inliers);
 					
 				if( hasPrevious ) {
 					double ratios[] = new double[inliers.size()];
@@ -244,7 +244,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 					Point3D_F64 temp = new Point3D_F64();
 					for( int i = 0; i < inliers.size(); i++ ) {
 						PointPoseTrack t = (PointPoseTrack)inliers.get(i);
-						triangulateAlg.triangulate(t.keyLoc,t.currLoc, best,temp);
+						triangulateAlg.triangulate(t.keyLoc,t.currLoc, motionKeyToCurr,temp);
 						ratios[i] = t.location.z/temp.z;
 						if( temp.z > 0 )
 							numPositive++;
@@ -259,7 +259,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 						System.out.println("OH CRAP");
 					}
 					r = 5e-4;
-					keyToCurr.set(best);
+					keyToCurr.set(motionKeyToCurr);
 					keyToCurr.T.x *= r;
 					keyToCurr.T.y *= r;
 					keyToCurr.T.z *= r;
@@ -268,7 +268,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 					}
 
 				} else {
-					keyToCurr.set(best);
+					keyToCurr.set(motionKeyToCurr);
 
 					// triangular feature points
 					// Adjust scale for numerical stability
@@ -449,6 +449,8 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	 * When decomposing the essential matrix, several possible motion are created.  Since any
 	 * object which is seen by the camera must be in front of the camera the positive depth
 	 * constraint can be used to select the most likely motion from the set.
+	 *
+	 * @param motions List of candidate motions from key to curr
 	 */
 	private Se3_F64 selectBestPose(List<Se3_F64> motions, List<AssociatedPair> observations) {
 		int bestCount = 0;

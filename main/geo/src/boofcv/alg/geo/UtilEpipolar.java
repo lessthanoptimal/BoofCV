@@ -128,8 +128,11 @@ public class UtilEpipolar {
 
 	/**
 	 * <p>
-	 * Computes an essential matrix from a rotation and translation:<br>
-	 * E = hat(T)*R
+	 * Computes an essential matrix from a rotation and translation.  This motion
+	 * is the motion from the first camera frame into the second camera frame.  The essential
+	 * matrix 'E' is defined as:<br>
+	 * E = hat(T)*R<br>
+	 * where hat(T) is the skew symmetric cross product matrix for vector T.
 	 * </p>
 	 *
 	 * @param R Rotation matrix.
@@ -312,5 +315,4 @@ public class UtilEpipolar {
 
 		CommonOps.scale(1.0/K.get(2,2),K);
 	}
-
 }

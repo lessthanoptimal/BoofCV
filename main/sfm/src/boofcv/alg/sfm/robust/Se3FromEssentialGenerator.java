@@ -4,17 +4,21 @@ import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.DecomposeEssential;
+import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 import java.util.List;
 
 /**
  * Estimates the motion between two views up to a scale factor by computing an essential matrix,
- * decomposing it, and using the positive depth constraint to select the best candidate.
+ * decomposing it, and using the positive depth constraint to select the best candidate.  The returned
+ * motion is the motion from the first camera frame into the second camera frame.
  *
  * @author Peter Abeles
  */
@@ -24,11 +28,8 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	EpipolarMatrixEstimator computeEssential;
 	// decomposes essential matrix to extract motion
 	DecomposeEssential decomposeE = new DecomposeEssential();
-	// used to select the best candidate motion
-	TriangulateTwoViewsCalibrated triangulate;
-
-	// triangulated point in 3D
-	Point3D_F64 found = new Point3D_F64();
+	// used to select best hypothesis
+	PositiveDepthConstraintCheck depthCheck;
 
 	/**
 	 * Specifies how the essential matrix is computed
@@ -38,7 +39,7 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	public Se3FromEssentialGenerator(EpipolarMatrixEstimator computeEssential,
 									 TriangulateTwoViewsCalibrated triangulate ) {
 		this.computeEssential = computeEssential;
-		this.triangulate = triangulate;
+		this.depthCheck = new PositiveDepthConstraintCheck(triangulate);
 	}
 
 	@Override
@@ -47,7 +48,8 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	}
 
 	/**
-	 * Computes the camera motion from the set of observations.
+	 * Computes the camera motion from the set of observations.   The motion is from the first
+	 * into the second camera frame.
 	 *
 	 * @param dataSet Associated pairs in normalized camera coordinates.
 	 * @param models The best pose according to the positive depth constraint.
@@ -70,8 +72,7 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 			Se3_F64 s = candidates.get(i);
 			int count = 0;
 			for( AssociatedPair p : dataSet ) {
-				triangulate.triangulate(p.keyLoc,p.currLoc,s,found);
-				if( found.z > 0 ) {
+				if( depthCheck.checkConstraint(p.keyLoc,p.currLoc,s)) {
 					count++;
 				}
 			}
