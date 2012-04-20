@@ -21,7 +21,9 @@ package boofcv.alg.feature.detect.chess;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
+import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -103,6 +105,9 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// rectangle the target is contained inside of
 	private ImageRectangle targetRect;
 
+	// puts points into the correct order
+	private OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
+
 //	FitQuadratic2D quad = new FitQuadratic2D();
 	
 	/**
@@ -151,7 +156,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		if( !detectChessBoard(gray) )
 			return false;
 
-		List<Point2D_I32> boundary = findBound.getBoundingQuad();
+		List<Point2D_F64> boundary = findBound.getBoundingQuad();
 
 		// find image rectangle and detect features inside
 		targetRect = findImageRectangle(boundary);
@@ -169,7 +174,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		QueueCorner corners = detectorAlg.getFeatures();
 
 		// put points into original image coordinates
-		List<Point2D_I32> points = convert(corners, targetRect.x0, targetRect.y0);
+		List<Point2D_F64> points = convert(corners, targetRect.x0, targetRect.y0);
 
 		// prune features not inside the bounding quadrilateral
 		pruneOutside(points,boundary);
@@ -179,22 +184,23 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 			return false;
 
 		// select N brightest features
-		points = selectBrightest(points, intensityAlg.getIntensity(),targetRect.x0,targetRect.y0);
-
-		// put points into grid order
-		List<Point2D_I32> predicted =
-				ApproximateChessPoints.predictPoints(findBound.getCornerBlobs().get(0),
-						numColsPoints, numRowsPoints);
-		points = orderPoints(predicted, points);
+		points = selectBrightest(points, intensityAlg.getIntensity(), targetRect.x0, targetRect.y0);
 
 		// compute pixels to sub-pixel accuracy
 		subpixel = new ArrayList<Point2D_F64>();
-		for( Point2D_I32 p : points)
+		for( Point2D_F64 p : points)
 			subpixel.add( refineSubpixel(p,targetRect.x0,targetRect.y0,intensityAlg.getIntensity()));
 
-		UtilCalibrationGrid.enforceClockwiseOrder(subpixel, numColsPoints, numRowsPoints);
+		orderAlg.process(subpixel);
 
-		return true;
+		if( numColsPoints*numRowsPoints != orderAlg.getNumCols()*orderAlg.getNumRows() )
+			throw new InvalidCalibrationTarget("Unexpected grid size");
+
+		subpixel = UtilCalibrationGrid.rotatePoints(orderAlg.getOrdered(),
+				orderAlg.getNumRows(),orderAlg.getNumCols(),
+				numRowsPoints,numColsPoints);
+
+		return subpixel != null;
 	}
 
 	/**
@@ -230,12 +236,13 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * @param intensity Intensity image
 	 * @return Sub-pixel point location
 	 */
-	private Point2D_F64 refineSubpixel( Point2D_I32 pt , 
+	private Point2D_F64 refineSubpixel( Point2D_F64 pt ,
 										int x0 , int y0 , 
 										ImageFloat32 intensity ) 
 	{
 		int r = radius+3;
-		ImageRectangle area = new ImageRectangle(pt.x-r-x0,pt.y-r-y0,pt.x+r-x0+1,pt.y+r+1-y0);
+		ImageRectangle area = new ImageRectangle((int)(pt.x-r-x0),(int)(pt.y-r-y0),
+				(int)(pt.x+r-x0+1),(int)(pt.y+r+1-y0));
 		BoofMiscOps.boundRectangleInside(intensity,area);
 
 		// sample feature intensity values in the local region
@@ -253,21 +260,10 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		meanY /= sum;
 
 		return new Point2D_F64(x0+meanX,y0+meanY);
-
-//		quad.reset();
-//		for( int i = area.y0; i < area.y1; i++ ) {
-//			for( int j = area.x0; j < area.x1; j++ ) {
-//				quad.add(j,i,intensity.get(j,i));
-//			}
-//		}
-//
-//		quad.process();
-//
-//		return new Point2D_F64(x0+quad.getFoundX(),y0+quad.getFoundY());
 	}
 
 	/**
-	 * Ensures tht the detected points are in correct grid order.  This is done by using the
+	 * Ensures that the detected points are in correct grid order.  This is done by using the
 	 * predicted point locations, which are already in order
 	 *
 	 * @param predicted Predicted and order points
@@ -300,11 +296,11 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	/**
 	 * Finds an axis aligned rectangle that contains the bounding quadrilateral
 	 */
-	private ImageRectangle findImageRectangle( List<Point2D_I32> quad )
+	private ImageRectangle findImageRectangle( List<Point2D_F64> quad )
 	{
-		int x0,y0,x1,y1;
-		
-		Point2D_I32 p = quad.get(0);
+		double x0,y0,x1,y1;
+
+		Point2D_F64 p = quad.get(0);
 		x0=x1=p.x;
 		y0=y1=p.y;
 		
@@ -321,24 +317,24 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 				y1 = p.y;
 		}
 		
-		return new ImageRectangle(x0,y0,x1,y1);
+		return new ImageRectangle((int)x0,(int)y0,(int)x1,(int)y1);
 	}
 
 	/**
 	 * Prunes detected corners not inside the image
 	 */
-	private void pruneOutside( List<Point2D_I32> corners , List<Point2D_I32> quad ) {
+	private void pruneOutside( List<Point2D_F64> corners , List<Point2D_F64> quad ) {
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
 		for( int i = 0; i < 4; i++ ) {
-			Point2D_I32 p = quad.get(i);
+			Point2D_F64 p = quad.get(i);
 			poly.vertexes[i].set(p.x,p.y);
 		}
 
-		Iterator<Point2D_I32> iter = corners.iterator();
+		Iterator<Point2D_F64> iter = corners.iterator();
 
 		Point2D_F64 a = new Point2D_F64();
 		while( iter.hasNext() ) {
-			Point2D_I32 p = iter.next();
+			Point2D_F64 p = iter.next();
 			a.set(p.x,p.y);
 
 			if( !Intersection2D_F64.containConvex(poly,a) )
@@ -349,11 +345,11 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	/**
 	 * Converts from a corner in the sub-image into a point in the full image
 	 */
-	private List<Point2D_I32> convert(QueueCorner found , int x0 , int y0 ) {
-		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
+	private List<Point2D_F64> convert(QueueCorner found , int x0 , int y0 ) {
+		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
 		for( int i = 0; i < found.size(); i++ ) {
 			Point2D_I16 c = found.get(i);
-			points.add(new Point2D_I32(c.x+x0, c.y+y0));
+			points.add(new Point2D_F64(c.x+x0, c.y+y0));
 		}
 		return points;
 	}
@@ -361,7 +357,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	/**
 	 * Out of the remaining points, just select the brightest to remove any remaining false positives
 	 */
-	private List<Point2D_I32> selectBrightest( List<Point2D_I32> points , ImageFloat32 intensity ,
+	private List<Point2D_F64> selectBrightest( List<Point2D_F64> points , ImageFloat32 intensity ,
 											   int offX , int offY ) {
 		if( points.size() == expectedPoints )
 			return points;
@@ -371,14 +367,14 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		int indexes[] = new int[points.size()];
 
 		for( int i = 0; i < points.size(); i++ ) {
-			Point2D_I32 p = points.get(i);
+			Point2D_F64 p = points.get(i);
 
-			values[i] = -intensity.get(p.x-offX, p.y-offY);
+			values[i] = -intensity.get((int)(p.x-offX), (int)(p.y-offY));
 		}
 
 		new QuickSort_F64().sort(values,points.size(),indexes);
 
-		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
+		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
 
 		for( int i = 0; i < expectedPoints; i++ ) {
 			ret.add(points.get(indexes[i]));

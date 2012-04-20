@@ -24,6 +24,7 @@ import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPoint2D_I32;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class DetectChessSquaresBinary {
 	private int numCols;
 
 	// quadrilateral bounding all the blobs
-	private List<Point2D_I32> boundingQuad;
+	private List<Point2D_F64> boundingQuad;
 	// graph of connected bobs
 	private List<QuadBlob> graphBlobs;
 	private List<QuadBlob> cornerBlobs;
@@ -183,14 +184,14 @@ public class DetectChessSquaresBinary {
 	/**
 	 * Finds bounding quadrilateral using corner points
 	 */
-	public List<Point2D_I32> findBoundingQuad(  List<QuadBlob> corners ) {
-		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
-		
-		Point2D_I32 center = new Point2D_I32();
+	public List<Point2D_F64> findBoundingQuad(  List<QuadBlob> corners ) {
+		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+
+		Point2D_F64 center = new Point2D_F64();
 		
 		// add the centers
 		for( QuadBlob b : corners ) {
-			points.add(b.center);
+			points.add(new Point2D_F64(b.center.x,b.center.y));
 			center.x += b.center.x;
 			center.y += b.center.y;
 		}
@@ -203,7 +204,7 @@ public class DetectChessSquaresBinary {
 		return points;
 	}
 
-	public List<Point2D_I32> getBoundingQuad() {
+	public List<Point2D_F64> getBoundingQuad() {
 		return boundingQuad;
 	}
 

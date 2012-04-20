@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
+package boofcv.alg.feature.detect.grid.refine;
 
 import boofcv.abst.feature.detect.edge.DetectEdgeContour;
 import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;

@@ -60,7 +60,7 @@ public class TestDetectSquareCalibrationPoints {
 
 		assertTrue(alg.process(binary));
 
-		List<QuadBlob> squares = alg.getSquaresOrdered();
+		List<QuadBlob> squares = alg.getInterestSquares();
 		
 		assertEquals(12,squares.size());
 		

@@ -20,14 +20,13 @@ package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
+import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
-import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.shapes.Polygon2D_F64;
 import pja.util.Combinations;
 
 import java.util.ArrayList;
@@ -56,9 +55,6 @@ public class DetectSquareCalibrationPoints {
 	private ImageUInt8 binaryA = new ImageUInt8(1,1);
 	private ImageUInt8 binaryB = new ImageUInt8(1,1);
 
-	// Orders corner points found in the image
-	private PutTargetSquaresIntoOrder extractTarget;
-
 	// detects the initial list of squares
 	DetectQuadBlobsBinary detectBlobs;
 
@@ -75,8 +71,13 @@ public class DetectSquareCalibrationPoints {
 	// Explaining why it failed
 	private String errorMessage;
 
-	// blobs in correct order and orientation
-	List<QuadBlob> orderedBlobs;
+	// used to order points
+	OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
+
+	// Found interest points on order
+	List<Point2D_F64> interestPoints;
+	// squares that interest points originated from
+	private List<QuadBlob> interestSquares;
 
 	/**
 	 *
@@ -157,17 +158,19 @@ public class DetectSquareCalibrationPoints {
 			// assumes that all the items in the list are part of a target
 			// see if it fails internal sanity checks
 			try {
-				List<QuadBlob> subgraph = ConnectGridSquares.copy(list);
-				extractTarget = new PutTargetSquaresIntoOrder();
-				extractTarget.process(subgraph);
-
-				// additional validation checks
-				if( validateTarget(subgraph)) {
-					success = true;
-					break;
+				interestPoints = new ArrayList<Point2D_F64>();
+				for( QuadBlob b : list ) {
+					for( Point2D_I32 c : b.corners )
+						interestPoints.add(new Point2D_F64(c.x,c.y));
 				}
+
+				interestSquares = list;
+				orderAlg.process(interestPoints);
+				interestPoints = orderAlg.getOrdered();
+				success = true;
+				break;
 			} catch (InvalidCalibrationTarget invalidTarget) {
-//				System.out.println(invalidTarget.getMessage());
+				System.out.println(invalidTarget.getMessage());
 			}
 
 			try {
@@ -181,46 +184,12 @@ public class DetectSquareCalibrationPoints {
 			return fail("No target found after shuffling");
 		return true;
 	}
-	
-	/**
-	 * Performs additional validation checks to make sure a valid target was found
-	 */
-	private boolean validateTarget( List<QuadBlob> list ) {
-		// see if each blob's center is inside the bounding quadrilateral
-		List<Point2D_I32> quad_I = extractTarget.getQuadrilateral();
-
-		Polygon2D_F64 poly = new Polygon2D_F64(4);
-		for( int i = 0; i < 4; i++ ) {
-			Point2D_I32 p = quad_I.get(i);
-			poly.vertexes[3-i].set(p.x, p.y);
-		}
-
-		Point2D_F64 center = new Point2D_F64();
-		for( QuadBlob b : list ) {
-			center.set(b.center.x,b.center.y);
-
-			if( !Intersection2D_F64.containConvex(poly,center)) {
-//				System.out.println("Failed EXTRA");
-				return false;
-			}
-		}
-
-		// see if it is transposed from what it should be and if it is, transpose the output
-		orderedBlobs = extractTarget.getBlobsOrdered();
-		if( gridRows != gridCols && extractTarget.getNumCols() == gridRows) {
-			orderedBlobs = UtilCalibrationGrid.transposeOrdered(orderedBlobs, gridRows, gridCols);
-		}
-
-		return true;
-	}
 
 	/**
 	 * Returns corner points in quadrilateral that bounds all the target points, approximately.
 	 */
-	public List<Point2D_I32> getTargetQuadrilateral() {
-		if( extractTarget == null )
-			return null;
-		return extractTarget.getQuadrilateral();
+	public List<Point2D_F64> getTargetQuadrilateral() {
+		return orderAlg.getQuadrilateral();
 	}
 
 
@@ -237,12 +206,16 @@ public class DetectSquareCalibrationPoints {
 		return errorMessage;
 	}
 
-	public List<QuadBlob> getSquaresUnordered() {
+	public List<QuadBlob> getAllSquares() {
 		return squares;
 	}
 
-	public List<QuadBlob> getSquaresOrdered() {
-		return orderedBlobs;
+	public List<QuadBlob> getInterestSquares() {
+		return interestSquares;
+	}
+
+	public List<Point2D_F64> getInterestPoints() {
+		return interestPoints;
 	}
 
 	public List<QuadBlob> getSquaresBad() {

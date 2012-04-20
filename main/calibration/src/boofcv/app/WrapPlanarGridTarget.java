@@ -19,7 +19,12 @@
 package boofcv.app;
 
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
-import boofcv.alg.feature.detect.grid.*;
+import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
+import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
+import boofcv.alg.feature.detect.grid.RefineCalibrationGridCorner;
+import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
+import boofcv.alg.feature.detect.grid.refine.WrapRefineCornerSegmentFit;
+import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -44,6 +49,8 @@ public class WrapPlanarGridTarget implements PlanarCalibrationDetector {
 	// set of found points
 	List<Point2D_F64> ret;
 
+	OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
+
 	public WrapPlanarGridTarget( int numSquareColumns , int numSquareRows ) {
 		refine = new WrapRefineCornerSegmentFit();
 //		refine = new WrapRefineCornerCanny();
@@ -64,7 +71,7 @@ public class WrapPlanarGridTarget implements PlanarCalibrationDetector {
 		if( !autoThreshold.process(detect,input) )
 			return false;
 
-		List<QuadBlob> squares = detect.getSquaresOrdered();
+		List<QuadBlob> squares = detect.getInterestSquares();
 		
 		// refine the corner accuracy estimate to sub-pixel
 		try {
@@ -73,10 +80,21 @@ public class WrapPlanarGridTarget implements PlanarCalibrationDetector {
 			e.printStackTrace();
 			return false;
 		}
-			
-		ret = new ArrayList<Point2D_F64>();
-		UtilCalibrationGrid.extractOrderedSubpixel(squares,ret, squareColumns);
-		UtilCalibrationGrid.enforceClockwiseOrder(ret, pointColumns, pointRows);
+
+		List<Point2D_F64> unordered = new ArrayList<Point2D_F64>();
+		for( QuadBlob b : squares ) {
+			for( Point2D_F64 p : b.subpixel )
+				unordered.add(p);
+		}
+
+		orderAlg.process(unordered);
+
+		ret = UtilCalibrationGrid.rotatePoints(orderAlg.getOrdered(),
+				orderAlg.getNumRows(),orderAlg.getNumCols(),
+				pointRows,pointColumns);
+
+		if( ret == null )
+			throw new RuntimeException("rotatePoints failed!");
 
 		return true;
 	}

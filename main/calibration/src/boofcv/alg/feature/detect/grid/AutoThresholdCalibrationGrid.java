@@ -99,7 +99,7 @@ public class AutoThresholdCalibrationGrid {
 
 			// see if the target was detected
 			if( detector.process(binary) ) {
-				selectedThreshold = refineThreshold(detector.getSquaresOrdered(),gray);
+				selectedThreshold = refineThreshold(detector.getInterestSquares(),gray);
 				GThresholdImageOps.threshold(gray,binary,selectedThreshold,true);
 				if( !detector.process(binary) ) {
 					throw new RuntimeException("Crap new threshold doesn't work!");

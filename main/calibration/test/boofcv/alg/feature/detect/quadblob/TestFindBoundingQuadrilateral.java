@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
+package boofcv.alg.feature.detect.quadblob;
 
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -41,18 +41,18 @@ public class TestFindBoundingQuadrilateral {
 	 */
 	@Test
 	public void findCorners_simple() {
-		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
 		
 		for( int i = 0; i <= 5; i++ ) {
-			list.add( new Point2D_I32(i,2));
-			list.add( new Point2D_I32(i,8));
+			list.add( new Point2D_F64(i,2));
+			list.add( new Point2D_F64(i,8));
 		}
-		list.add( new Point2D_I32(0,3));
-		list.add( new Point2D_I32(5,3));
+		list.add( new Point2D_F64(0,3));
+		list.add( new Point2D_F64(5,3));
 		
 		Collections.shuffle(list);
 		
-		List<Point2D_I32> corners = FindBoundingQuadrilateral.findCorners(list);
+		List<Point2D_F64> corners = FindBoundingQuadrilateral.findCorners(list);
 		
 		assertEquals(4,corners.size());
 
@@ -62,10 +62,10 @@ public class TestFindBoundingQuadrilateral {
 		assertEquals(1,count(5,8,list));
 	}
 	
-	private int count( int x , int y , List<Point2D_I32> list ) {
+	private int count( int x , int y , List<Point2D_F64> list ) {
 		int ret = 0;
 		
-		for( Point2D_I32 p : list ) {
+		for( Point2D_F64 p : list ) {
 			if( p.x == x && p.y == y )
 				ret++;
 		}
@@ -74,9 +74,9 @@ public class TestFindBoundingQuadrilateral {
 
 	@Test
 	public void area() {
-		Point2D_I32 a = new Point2D_I32(1,5);
-		Point2D_I32 b = new Point2D_I32(6,1);
-		Point2D_I32 c = new Point2D_I32(1,1);
+		Point2D_F64 a = new Point2D_F64(1,5);
+		Point2D_F64 b = new Point2D_F64(6,1);
+		Point2D_F64 c = new Point2D_F64(1,1);
 	
 		double expected = 0.5*(4*5);
 		double found = FindBoundingQuadrilateral.area(a,b,c);
@@ -86,44 +86,44 @@ public class TestFindBoundingQuadrilateral {
 
 	@Test
 	public void maximizeArea() {
-		Point2D_I32 a = new Point2D_I32(1,5);
-		Point2D_I32 b = new Point2D_I32(6,1);
-		Point2D_I32 c = new Point2D_I32(-10,-10);
+		Point2D_F64 a = new Point2D_F64(1,5);
+		Point2D_F64 b = new Point2D_F64(6,1);
+		Point2D_F64 c = new Point2D_F64(-10,-10);
 
-		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
 		list.add(c);
 		for( int i = 0; i < 5; i++ ) {
 			int x = rand.nextInt(10)-5;
 			int y = rand.nextInt(10)-5;
-			list.add(new Point2D_I32(x,y));
+			list.add(new Point2D_F64(x,y));
 		}
 		Collections.shuffle(list,rand);
 
-		Point2D_I32 found = FindBoundingQuadrilateral.maximizeArea(a,b,list);
+		Point2D_F64 found = FindBoundingQuadrilateral.maximizeArea(a,b,list);
 
-		assertEquals(c.x, found.x);
-		assertEquals(c.y, found.y);
+		assertEquals(c.x, found.x,1e-8);
+		assertEquals(c.y, found.y,1e-8);
 	}
 
 	@Test
 	public void maximizeForth() {
-		Point2D_I32 a = new Point2D_I32(1,5);
-		Point2D_I32 b = new Point2D_I32(6,1);
-		Point2D_I32 c = new Point2D_I32(7,8);
-		Point2D_I32 d = new Point2D_I32(-10,-12);
+		Point2D_F64 a = new Point2D_F64(1,5);
+		Point2D_F64 b = new Point2D_F64(6,1);
+		Point2D_F64 c = new Point2D_F64(7,8);
+		Point2D_F64 d = new Point2D_F64(-10,-12);
 
-		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
 		list.add(d);
 		for( int i = 0; i < 5; i++ ) {
 			int x = rand.nextInt(10)-5;
 			int y = rand.nextInt(10)-5;
-			list.add(new Point2D_I32(x,y));
+			list.add(new Point2D_F64(x,y));
 		}
 		Collections.shuffle(list,rand);
 
-		Point2D_I32 found = FindBoundingQuadrilateral.maximizeForth(a,b,c,list);
+		Point2D_F64 found = FindBoundingQuadrilateral.maximizeForth(a,b,c,list);
 
-		assertEquals(d.x, found.x);
-		assertEquals(d.y, found.y);
+		assertEquals(d.x, found.x,1e-8);
+		assertEquals(d.y, found.y,1e-8);
 	}
 }
