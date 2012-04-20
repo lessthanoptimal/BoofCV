@@ -264,9 +264,12 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 		DetectCalibrationChessApp app = new DetectCalibrationChessApp(ImageFloat32.class);
 
-		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess/";
+		String prefix = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
 
 		app.loadConfigurationFile(prefix + "info.txt");
+
+//		app.setBaseDirectory(prefix);
+//		app.loadInputData(prefix+"images.txt");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 

@@ -40,9 +40,6 @@ public class AppletMediaManager implements MediaManager {
 	URL codebase;
 
 	String homeDirectory = "";
-	
-	// TODO REMOVE THIS MASSIVE HACK
-	boolean first = true;
 
 	Component ownerGUI;
 	boolean done;
@@ -64,14 +61,12 @@ public class AppletMediaManager implements MediaManager {
 	@Override
 	public Reader openFile(String fileName) {
 		try {
-			if( !first ) {
-				fileName = homeDirectory + fileName;
-			} else {
-				first = false;
-			}
+			fileName = homeDirectory + fileName;
 
 			return new InputStreamReader(new URL(codebase,fileName).openStream());
 		} catch (IOException e) {
+			System.err.println("IOException opening file "+fileName);
+			System.err.println("  homeDirectory = "+homeDirectory);
 			return null;
 		}
 	}
@@ -80,18 +75,15 @@ public class AppletMediaManager implements MediaManager {
 	public BufferedImage openImage(String fileName) {
 		URL url = null;
 		try {
-			if( !first ) {
-				fileName = homeDirectory + fileName;
-			} else {
-				first = false;
-			}
+			fileName = homeDirectory + fileName;
 
 			url = new URL(codebase, fileName);
 			return ImageIO.read(url);
 		} catch (MalformedURLException e) {
 			System.err.println("MalformedURL"+fileName);
 		} catch (IOException e) {
-			System.err.println("IOException reading "+fileName);
+			System.err.println("IOException opening image = "+fileName);
+			System.err.println("  homeDirectory = "+homeDirectory);
 		}
 		return null;
 	}
@@ -109,9 +101,12 @@ public class AppletMediaManager implements MediaManager {
 			fileSize = url.openConnection().getContentLength();
 			stream = new BufferedInputStream(url.openStream());
 		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
+			System.err.println("MalformedURL"+fileName);
+			return null;
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			System.err.println("IOException opening video = "+fileName);
+			System.err.println("  homeDirectory = "+homeDirectory);
+			return null;
 		}
 
 		// first read in the data byte stream and update the download status while doing so
