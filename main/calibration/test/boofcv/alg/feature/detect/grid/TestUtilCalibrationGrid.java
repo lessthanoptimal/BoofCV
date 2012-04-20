@@ -18,8 +18,6 @@
 
 package boofcv.alg.feature.detect.grid;
 
-import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import georegression.misc.test.GeometryUnitTest;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
@@ -29,9 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static boofcv.alg.feature.detect.grid.TestPutTargetSquaresIntoOrder.createBlob;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -39,63 +35,8 @@ import static org.junit.Assert.assertTrue;
 public class TestUtilCalibrationGrid {
 
 	@Test
-	public void enforceClockwiseOrder() {
-		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
-		
-		list.add(new Point2D_F64(0,10));
-		list.add(new Point2D_F64(10,10));
-		list.add(new Point2D_F64(10,0));
-		list.add(new Point2D_F64(0,0));
-		
-		// first case, no change
-		UtilCalibrationGrid.enforceClockwiseOrder(list,2,2);
-
-		GeometryUnitTest.assertEquals(0,10,list.get(0),1e-8);
-		GeometryUnitTest.assertEquals(10,10,list.get(1),1e-8);
-		GeometryUnitTest.assertEquals(10,0,list.get(2),1e-8);
-		GeometryUnitTest.assertEquals(0,0,list.get(3),1e-8);
-
-		// Second case, it will need to flip
-		list.clear();
-		list.add(new Point2D_F64(10,10));
-		list.add(new Point2D_F64(0,10));
-		list.add(new Point2D_F64(0,0));
-		list.add(new Point2D_F64(10,0));
-		UtilCalibrationGrid.enforceClockwiseOrder(list,2,2);
-
-		GeometryUnitTest.assertEquals(0,10,list.get(0),1e-8);
-		GeometryUnitTest.assertEquals(10,10,list.get(1),1e-8);
-		GeometryUnitTest.assertEquals(10,0,list.get(2),1e-8);
-		GeometryUnitTest.assertEquals(0,0,list.get(3),1e-8);
-	}
-
-	@Test
-	public void transposeOrdered() {
-		List<QuadBlob> list = new ArrayList<QuadBlob>();
-		List<Point2D_I32> ptsOrig = new ArrayList<Point2D_I32>();
-		
-		list.add(createBlob(0,10,3));
-		list.add(createBlob(10,10,3));
-		list.add(createBlob(10,0,3));
-		list.add(createBlob(0,0,3));
-
-		ptsOrig.addAll(list.get(0).corners);
-		
-		// first case, no change
-		List<QuadBlob> tran = UtilCalibrationGrid.transposeOrdered(list,2,2);
-
-		// see if quads have been transposed
-		assertTrue(tran.get(0)==list.get(0));
-		assertTrue(tran.get(1)==list.get(2));
-		assertTrue(tran.get(2)==list.get(1));
-		assertTrue(tran.get(3)==list.get(3));
-		
-		// see if points internally have been transposed
-		List<Point2D_I32> ptsTran = tran.get(0).corners;
-		assertTrue(ptsTran.get(0)==ptsOrig.get(0));
-		assertTrue(ptsTran.get(1)==ptsOrig.get(3));
-		assertTrue(ptsTran.get(2)==ptsOrig.get(2));
-		assertTrue(ptsTran.get(3)==ptsOrig.get(1));
+	public void rotatePoints() {
+		fail("IMplement");
 	}
 	
 	@Test
@@ -113,12 +54,12 @@ public class TestUtilCalibrationGrid {
 
 	@Test
 	public void sortByAngle() {
-		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
 
 		for( int i = 0; i < 10; i++ )
-			list.add( new Point2D_I32(i,0));
+			list.add( new Point2D_F64(i,0));
 
-		Point2D_I32 c = new Point2D_I32(5,-10);
+		Point2D_F64 c = new Point2D_F64(5,-10);
 
 		// randomize the order
 		Collections.shuffle(list, new Random(8234));
@@ -129,61 +70,20 @@ public class TestUtilCalibrationGrid {
 		UtilCalibrationGrid.sortByAngleCCW(c, list);
 
 		for( int i = 0; i < 10; i++ )
-			assertEquals(9-i, list.get(i).x);
+			assertEquals(9-i, list.get(i).x,1e-8);
 	}
 
 	@Test
 	public void findFarthest() {
-		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
-		list.add( new Point2D_I32(1,2));
-		list.add( new Point2D_I32(2,23));
-		list.add( new Point2D_I32(8,8));
+		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
+		list.add( new Point2D_F64(1,2));
+		list.add( new Point2D_F64(2,23));
+		list.add( new Point2D_F64(8,8));
 
-		int index = UtilCalibrationGrid.findFarthest(new Point2D_I32(1,3),list);
+		int index = UtilCalibrationGrid.findFarthest(new Point2D_F64(1,3),list);
 
-		assertEquals(1,index);
+		assertEquals(1, index);
 	}
-
-	@Test
-	public void extractOrderedPoints() {
-		List<QuadBlob> blobs = new ArrayList<QuadBlob>();
-		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
-
-		blobs.add( createBlob(5,5,10));
-		blobs.add( createBlob(50,4,10));
-
-		UtilCalibrationGrid.extractOrderedPoints(blobs,points,2);
-
-		// add first row
-		GeometryUnitTest.assertEquals(-5, 15, points.get(0));
-		GeometryUnitTest.assertEquals(15,15,points.get(1));
-		GeometryUnitTest.assertEquals(40,14,points.get(2));
-		GeometryUnitTest.assertEquals(60,14,points.get(3));
-		// add second row, and remember they are added in circular order, so some indexes are swapped
-		GeometryUnitTest.assertEquals(-5,-5,points.get(4));
-		GeometryUnitTest.assertEquals(15,-5,points.get(5));
-	}
-
-	@Test
-	public void extractOrderedSubpixel() {
-		List<QuadBlob> blobs = new ArrayList<QuadBlob>();
-		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
-
-		blobs.add( createBlob(5,5,10));
-		blobs.add( createBlob(50,4,10));
-
-		UtilCalibrationGrid.extractOrderedSubpixel(blobs, points, 2);
-
-		// add first row
-		GeometryUnitTest.assertEquals(-5, 15, points.get(0),1e-8);
-		GeometryUnitTest.assertEquals(15,15,points.get(1),1e-8);
-		GeometryUnitTest.assertEquals(40,14,points.get(2),1e-8);
-		GeometryUnitTest.assertEquals(60,14,points.get(3),1e-8);
-		// add second row, and remember they are added in circular order, so some indexes are swapped
-		GeometryUnitTest.assertEquals(-5,-5,points.get(4),1e-8);
-		GeometryUnitTest.assertEquals(15,-5,points.get(5),1e-8);
-	}
-
 
 	@Test
 	public void incrementCircle() {

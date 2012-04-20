@@ -18,7 +18,10 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.feature.detect.grid.*;
+import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
+import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
+import boofcv.alg.feature.detect.grid.RefineCalibrationGridCorner;
+import boofcv.alg.feature.detect.grid.refine.WrapRefineCornerCanny;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.SelectInputPanel;
@@ -103,14 +106,18 @@ public class DebugSquaresSubpixelApp
 		if( !auto.process(detectAlg,gray) ) {
 			System.out.println("Detect Target Failed!");
 		} else {
-			List<QuadBlob> squares = detectAlg.getSquaresOrdered();
+			List<QuadBlob> squares = detectAlg.getInterestSquares();
 			crude = new ArrayList<Point2D_I32>();
 			refined = new ArrayList<Point2D_F64>();
 
-			refineAlg.refine(detectAlg.getSquaresOrdered(),gray);
+			refineAlg.refine(detectAlg.getInterestSquares(),gray);
 
-			UtilCalibrationGrid.extractOrderedPoints(squares,crude,targetColumns);
-			UtilCalibrationGrid.extractOrderedSubpixel(squares,refined,targetColumns);
+			for( QuadBlob b : squares ) {
+				for( Point2D_I32 c : b.corners )
+					crude.add(c);
+				for( Point2D_F64 c : b.subpixel )
+					refined.add(c);
+			}
 		}
 		
 		final List<Point2D_I32> _crude = crude;

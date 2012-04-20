@@ -33,11 +33,11 @@ import java.util.List;
 public class HistogramTwoPeaks {
 
 	// values of low and high peak
-	double peakLow;
-	double peakHigh;
+	public double peakLow;
+	public double peakHigh;
 
 	// how far the second peak neesd to be away from the first
-	int minSeparation;
+	public int minSeparation;
 
 	/**
 	 *

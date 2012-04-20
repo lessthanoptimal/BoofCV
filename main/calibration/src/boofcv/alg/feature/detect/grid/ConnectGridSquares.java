@@ -126,8 +126,7 @@ public class ConnectGridSquares {
 							// 2.5 = 2 + fudge factor
 							// NOTE: Could be improved by having it be the length of perpendicular sides
 							double max = Math.min(c.largestSide, b.largestSide)*2.5;
-							max *= max;
-							if( d < max ) {
+							if( d < max*max ) {
 								best = d;
 								bestBlob = c;
 							}

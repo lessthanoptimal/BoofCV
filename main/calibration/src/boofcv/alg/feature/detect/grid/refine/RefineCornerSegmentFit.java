@@ -16,9 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
+package boofcv.alg.feature.detect.grid.refine;
 
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
+import boofcv.alg.feature.detect.grid.FitGaussianPrune;
+import boofcv.alg.feature.detect.grid.HistogramTwoPeaks;
+import boofcv.alg.feature.detect.grid.IntensityHistogram;
+import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.misc.BoofMiscOps;
@@ -267,7 +271,6 @@ public class RefineCornerSegmentFit {
 		// weight is a linear function of distance from black square value
 		points.reset();
 		double middle = (high.getMean()+low.getMean())/2;
-		double spread = high.getMean()-low.getMean();
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
 				if( binary.get(x,y) == 1 ) {

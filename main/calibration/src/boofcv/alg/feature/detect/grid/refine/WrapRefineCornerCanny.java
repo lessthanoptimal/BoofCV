@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
+package boofcv.alg.feature.detect.grid.refine;
 
+import boofcv.alg.feature.detect.grid.RefineCalibrationGridCorner;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;

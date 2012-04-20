@@ -35,7 +35,6 @@ import boofcv.io.SimpleStringNumberReader;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -102,12 +101,14 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		if( !reader.read(r) )
 			throw new RuntimeException("Parsing configuration failed");
 		
-		if( reader.remainingTokens() != 4)
+		if( reader.remainingTokens() != 5)
 			throw new RuntimeException("Not enough tokens in config file");
 		
 		if( !(reader.nextString().compareToIgnoreCase("chess") == 0)) {
 			throw new RuntimeException("Not a chessboard config file");
 		}
+
+		boolean isLeftHanded = reader.nextString().compareTo("true") == 0;
 
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();
@@ -180,10 +181,10 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			}
 
 			if( calibGUI.isShowBound() ) {
-				List<Point2D_I32> boundary =  alg.getFindBound().getBoundingQuad();
+				List<Point2D_F64> boundary =  alg.getFindBound().getBoundingQuad();
 				DetectCalibrationSquaresApp.drawBounds(g2,boundary);
 			}
-			
+
 			if( calibGUI.doShowGraph ) {
 				DetectCalibrationSquaresApp.drawGraph(g2,alg.getFindBound().getGraphBlobs());
 			}

@@ -28,13 +28,13 @@ import boofcv.struct.image.ImageFloat32;
 public class IntensityHistogram {
 
 	// counts in each bin
-	int histogram[];
+	public int histogram[];
 	// number of samples added
-	int total;
+	public int total;
 	// maximum allowed pixel value
-	double maxValue;
+	public double maxValue;
 	// divisor = maxValue/total
-	double divisor;
+	public double divisor;
 
 	/**
 	 *

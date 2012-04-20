@@ -20,7 +20,6 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
 import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
-import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
@@ -33,6 +32,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 
 import javax.swing.*;
@@ -111,12 +111,14 @@ public class DetectCalibrationSquaresApp
 		if( !reader.read(r) )
 			throw new RuntimeException("Parsing configuration failed");
 
-		if( reader.remainingTokens() != 5)
+		if( reader.remainingTokens() != 6)
 			throw new RuntimeException("Not enough tokens in config file");
 
 		if( !(reader.nextString().compareToIgnoreCase("square") == 0)) {
 			throw new RuntimeException("Not a square grid config file");
 		}
+
+		boolean isLeftHanded = reader.nextString().compareTo("true") == 0;
 
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();
@@ -168,29 +170,26 @@ public class DetectCalibrationSquaresApp
 				throw new RuntimeException("Unknown mode");
 		}
 		Graphics2D g2 = workImage.createGraphics();
+		List<Point2D_F64> targetBounds = alg.getTargetQuadrilateral();
 		if( foundTarget ) {
-			List<Point2D_I32> targetBounds = alg.getTargetQuadrilateral();
-			List<QuadBlob> squares = alg.getSquaresOrdered();
-			List<Point2D_I32> targetPoints = new ArrayList<Point2D_I32>();
 
-			UtilCalibrationGrid.extractOrderedPoints(squares,targetPoints,targetColumns);
-
-			if( calibGUI.isShowBound())
-				drawBounds(g2,targetBounds);
+			List<Point2D_F64> targetPoints = alg.getInterestPoints();
 			if( calibGUI.isShowPoints())
 				drawPoints(g2, targetPoints);
 			if( calibGUI.isShowNumbers())
 				drawNumbers(g2, targetPoints);
 			if( calibGUI.isShowGraph())
-				drawGraph(g2, alg.getSquaresOrdered());
+				drawGraph(g2, alg.getInterestSquares());
 
 			calibGUI.setSuccessMessage("FOUND",true);
 		} else {
-			drawSquareCorners(g2,alg.getSquaresUnordered(),Color.RED);
+			drawSquareCorners(g2,alg.getInterestSquares(),Color.RED);
 			drawSquareCorners(g2,alg.getSquaresBad(),Color.BLUE);
 
 			calibGUI.setSuccessMessage("FAILED", false);
 		}
+		if( calibGUI.isShowBound())
+			drawBounds(g2,targetBounds);
 		
 		gui.setBufferedImage(workImage);
 		gui.setScale(calibGUI.getScale());
@@ -199,25 +198,25 @@ public class DetectCalibrationSquaresApp
 		processedImage = true;
 	}
 
-	public static void drawBounds( Graphics2D g2 , java.util.List<Point2D_I32> corners ) {
-		Point2D_I32 c0 = corners.get(0);
-		Point2D_I32 c1 = corners.get(1);
-		Point2D_I32 c2 = corners.get(2);
-		Point2D_I32 c3 = corners.get(3);
+	public static void drawBounds( Graphics2D g2 , java.util.List<Point2D_F64> corners ) {
+		Point2D_F64 c0 = corners.get(0);
+		Point2D_F64 c1 = corners.get(1);
+		Point2D_F64 c2 = corners.get(2);
+		Point2D_F64 c3 = corners.get(3);
 
 		g2.setColor(Color.BLUE);
 		g2.setStroke(new BasicStroke(2.0f));
-		g2.drawLine(c0.x,c0.y,c1.x,c1.y);
-		g2.drawLine(c1.x,c1.y,c2.x,c2.y);
-		g2.drawLine(c2.x,c2.y,c3.x,c3.y);
-		g2.drawLine(c3.x,c3.y,c0.x,c0.y);
+		g2.drawLine((int)c0.x,(int)c0.y,(int)c1.x,(int)c1.y);
+		g2.drawLine((int)c1.x,(int)c1.y,(int)c2.x,(int)c2.y);
+		g2.drawLine((int)c2.x,(int)c2.y,(int)c3.x,(int)c3.y);
+		g2.drawLine((int)c3.x,(int)c3.y,(int)c0.x,(int)c0.y);
 	}
 
-	private void drawPoints( Graphics2D g2 , java.util.List<Point2D_I32> foundTarget) {
+	private void drawPoints( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget) {
 		g2.setStroke(new BasicStroke(1.0f));
 		for( int i = 0; i < foundTarget.size(); i++ ) {
-			Point2D_I32 p = foundTarget.get(i);
-			VisualizeFeatures.drawPoint(g2, p.x, p.y, 2 , Color.RED);
+			Point2D_F64 p = foundTarget.get(i);
+			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, 2 , Color.RED);
 		}
 	}
 
@@ -243,24 +242,27 @@ public class DetectCalibrationSquaresApp
 	/**
 	 * Draw the number assigned to each corner point with a bold outline
 	 */
-	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_I32> foundTarget ) {
+	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ) {
 
 		Font regular = new Font("Serif", Font.PLAIN, 16);
 		g2.setFont(regular);
 
 		AffineTransform origTran = g2.getTransform();
 		for( int i = 0; i < foundTarget.size(); i++ ) {
-			Point2D_I32 p = foundTarget.get(i);
+			Point2D_F64 p = foundTarget.get(i);
 			String text = String.format("%2d",i);
 
+			int x = (int)p.x;
+			int y = (int)p.y;
+
 			g2.setColor(Color.BLACK);
-			g2.drawString(text,p.x-1,p.y);
-			g2.drawString(text,p.x+1,p.y);
-			g2.drawString(text,p.x,p.y-1);
-			g2.drawString(text,p.x,p.y+1);
+			g2.drawString(text,x-1,y);
+			g2.drawString(text,x+1,y);
+			g2.drawString(text,x,y-1);
+			g2.drawString(text,x,y+1);
 			g2.setTransform(origTran);
 			g2.setColor(Color.GREEN);
-			g2.drawString(text,p.x,p.y);
+			g2.drawString(text,x,y);
 		}
 	}
 
@@ -322,19 +324,21 @@ public class DetectCalibrationSquaresApp
 
 		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp();
 
-		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
+//		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
+		String prefix = "../data/evaluation/calibration/stereo/Bumblebee2_Square/";
 
 		app.loadConfigurationFile(prefix + "info.txt");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("View 01",prefix+"frame10.jpg"));
-		inputs.add(new PathLabel("View 02",prefix+"frame02.jpg"));
-		inputs.add(new PathLabel("View 03",prefix+"frame03.jpg"));
-		inputs.add(new PathLabel("View 04",prefix+"frame04.jpg"));
-		inputs.add(new PathLabel("View 05",prefix+"frame05.jpg"));
-		inputs.add(new PathLabel("View 06",prefix+"frame06.jpg"));
-		inputs.add(new PathLabel("View 07",prefix+"frame07.jpg"));
+		for( int i = 1; i < 13; i++ ) {
+			String name = String.format("View %02d",i);
+//			String fileName = String.format("frame%02d.jpg",i);
+//			String fileName = String.format("left%02d.jpg",i);
+			String fileName = String.format("right%02d.jpg",i);
+			inputs.add(new PathLabel(name,prefix+fileName));
+		}
+//		inputs.add(new PathLabel("View 01",prefix+"right02.jpg"));
 
 		app.setInputList(inputs);
 

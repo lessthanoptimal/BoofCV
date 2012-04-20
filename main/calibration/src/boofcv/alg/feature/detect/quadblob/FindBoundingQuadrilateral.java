@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
+package boofcv.alg.feature.detect.quadblob;
 
-import georegression.struct.point.Point2D_I32;
+import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
+import georegression.geometry.UtilPoint2D_F64;
+import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,25 +41,25 @@ public class FindBoundingQuadrilateral {
 	 * @param list List unordered corner points in the target. At least one point must be on a corner.
 	 * @return The 4 corner points.
 	 */
-	public static List<Point2D_I32> findCorners(List<Point2D_I32> list) {
+	public static List<Point2D_F64> findCorners(List<Point2D_F64> list) {
 
 		// find the first corner
-		Point2D_I32 corner0 = list.get(findFarthest(list.get(0), list));
+		Point2D_F64 corner0 = list.get(findFarthest(list.get(0), list));
 		// and the second
-		Point2D_I32 corner1 = list.get(findFarthest(corner0, list));
+		Point2D_F64 corner1 = list.get(findFarthest(corner0, list));
 
 		// third point
-		Point2D_I32 corner2 = maximizeArea(corner0,corner1,list);
-		Point2D_I32 corner3 = maximizeForth(corner0, corner2, corner1, list);
+		Point2D_F64 corner2 = maximizeArea(corner0,corner1,list);
+		Point2D_F64 corner3 = maximizeForth(corner0, corner2, corner1, list);
 
-		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
+		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
 		ret.add(corner0);
 		ret.add(corner1);
 		ret.add(corner2);
 		ret.add(corner3);
 
 		// organize the corners
-		Point2D_I32 center = UtilCalibrationGrid.findAverage(ret);
+		Point2D_F64 center = UtilPoint2D_F64.mean(ret);
 		UtilCalibrationGrid.sortByAngleCCW(center, ret);
 
 		return ret;
@@ -72,12 +74,12 @@ public class FindBoundingQuadrilateral {
 	 * @param list Candidate points for the 3rd corner
 	 * @return The point which maximizes the area
 	 */
-	public static Point2D_I32 maximizeArea( Point2D_I32 a , Point2D_I32 b , List<Point2D_I32> list )
+	public static Point2D_F64 maximizeArea( Point2D_F64 a , Point2D_F64 b , List<Point2D_F64> list )
 	{
 		double max = 0;
-		Point2D_I32 maxPoint = null;
+		Point2D_F64 maxPoint = null;
 
-		for( Point2D_I32 c : list ) {
+		for( Point2D_F64 c : list ) {
 			double area = area(a,b,c);
 
 			if( area > max ) {
@@ -92,15 +94,15 @@ public class FindBoundingQuadrilateral {
 	/**
 	 * Finds the fourth point which maximizes the distance from a,b, and c.
 	 */
-	public static Point2D_I32 maximizeForth( Point2D_I32 a , Point2D_I32 b , Point2D_I32 c , List<Point2D_I32> list )
+	public static Point2D_F64 maximizeForth( Point2D_F64 a , Point2D_F64 b , Point2D_F64 c , List<Point2D_F64> list )
 	{
 		double max = 0;
-		Point2D_I32 maxPoint = null;
+		Point2D_F64 maxPoint = null;
 
-		for( Point2D_I32 d : list ) {
-			double l1 = Math.sqrt(a.distance2(d));
-			double l2 = Math.sqrt(b.distance2(d));
-			double l3 = Math.sqrt(c.distance2(d));
+		for( Point2D_F64 d : list ) {
+			double l1 = a.distance(d);
+			double l2 = b.distance(d);
+			double l3 = c.distance(d);
 
 			double score = l1+l2+l3;
 
@@ -116,7 +118,7 @@ public class FindBoundingQuadrilateral {
 	/**
 	 * Computes the area of a triangle given its vertices.
 	 */
-	public static double area( Point2D_I32 a , Point2D_I32 b , Point2D_I32 c )
+	public static double area( Point2D_F64 a , Point2D_F64 b , Point2D_F64 c )
 	{
 		double top = a.x*(b.y-c.y) + b.x*(c.y-a.y) + c.x*(a.y-b.y);
 		return Math.abs(top)/2.0;

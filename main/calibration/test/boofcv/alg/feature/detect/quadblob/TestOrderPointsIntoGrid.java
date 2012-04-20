@@ -16,37 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.grid;
+package boofcv.alg.feature.detect.quadblob;
 
-import boofcv.alg.misc.ImageTestingOps;
-import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestRefineCornerSegmentFit {
-
-	int width = 50;
-	int height = 60;
+public class TestOrderPointsIntoGrid {
 
 	@Test
-	public void simpleCase() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-
-		ImageTestingOps.fillRectangle(orig, 210, 0, 0, width, height);
-		ImageTestingOps.fillRectangle(orig, 52, 20, 15, width, height);
-
-		RefineCornerSegmentFit alg = new RefineCornerSegmentFit();
-
-		alg.process(orig);
-
-		Point2D_F64 corner = alg.getCorner();
-
-		assertEquals(20,corner.getX(), 1e-8);
-		assertEquals(15,corner.getY(),1e-8);
+	public void stuff() {
+		fail("implement");
 	}
 }
