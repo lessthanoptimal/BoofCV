@@ -56,6 +56,31 @@ public class BoofMiscOps {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public static String toString( Reader r ) {
+		char buff[] = new char[1024];
+
+		StringBuilder string = new StringBuilder();
+		try {
+			while(true) {
+				int size = r.read(buff);
+			    if( size < 0 )
+					break;
+				string.append(buff, 0, size);
+			}
+			return string.toString();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static <T> T loadXML( Reader r ) {
+		XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(toString(r).getBytes()));
+
+		T ret = (T)decoder.readObject();
+		decoder.close();
+		return ret;
+	}
 	
 	public static int countNotZero( int a[] , int size ) {
 		int ret = 0;
