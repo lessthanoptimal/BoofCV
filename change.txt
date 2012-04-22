@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2012/
+Date    : 2012/04/22
 Version : Alpha 0.7
 
 - Redesigned how evaluation apps/applets handle data input and configuration
@@ -12,6 +12,8 @@ Version : Alpha 0.7
 - Camera calibration outputs XML file containing intrinsic parameters
   * Java XML serialization
 - For square calibration grids, added sub-pixel refinement using canny edge
+- Fixed a bug in camera calibration where it transposed the grid instead of rotating it
+  if the number of rows/columns needed to be swapped.
 - 3D Vision Algorithms
   * Estimate translation given rotation and two observations
   * Refine pose estimate given set of 3D points and observations
@@ -42,6 +44,8 @@ Version : Alpha 0.7
   * Thanks Nir Amar
   * Also changed AssociateSurfBasic for a similar reason
 - Fixed problem in FundamentalResidualSampson where the denominator was being squared
+- Fixed problem in Se3 Essential generator
+- Changed positive depth constraint class
 
 ---------------------------------------------
 Date    : 2012/03/01
