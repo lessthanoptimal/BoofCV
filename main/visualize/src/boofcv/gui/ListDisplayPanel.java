@@ -112,6 +112,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 				}
 				Dimension d = listPanel.getMinimumSize();
 				listPanel.setPreferredSize(new Dimension(d.width + scroll.getVerticalScrollBar().getWidth(), d.height));
+				validate();
 			}
 		});
 	}
