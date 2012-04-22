@@ -128,6 +128,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="io/" target="test"/>
 	<ant dir="visualize/" target="test"/>
 	<ant dir="calibration/" target="test"/>
+	<ant dir="sfm/" target="test"/>
     </target>
 
     <target name="testreport">
