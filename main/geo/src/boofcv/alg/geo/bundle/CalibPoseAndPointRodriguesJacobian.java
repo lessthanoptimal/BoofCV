@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * TODO WRITE UP
+ * Computes the Jacobian for {@link CalibPoseAndPointResiduals}.
  *
  * @author Peter Abeles
  */

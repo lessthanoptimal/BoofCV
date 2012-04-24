@@ -29,6 +29,7 @@ import boofcv.app.WrapPlanarChessTarget;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.MediaManager;
+import boofcv.io.ProgressMonitorThread;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
@@ -70,6 +71,11 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	}
 
 	public void process( String outputFileName ) {
+		// displays progress so the impatient don't give up
+		final ProcessThread monitor = new ProcessThread();
+		monitor.start();
+
+		// load images
 		calibrator.reset();
 
 		int N = leftImages.size();
@@ -86,6 +92,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 						public void run() {
 							gui.addPair("Image " + number, leftOrig, rightOrig);
 							gui.repaint();
+							monitor.setMessage(0, "Image "+number);
 						}});
 				}
 			}
@@ -98,6 +105,11 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 			}});
 		gui.repaint();
 
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				monitor.setMessage(1,"Estimating Parameters");
+			}});
+
 		StereoParameters param = calibrator.process();
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -109,6 +121,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 		// compute stereo rectification
 		setRectification(param);
+
+		monitor.stopThread();
 
 		param.print();
 		if( outputFileName != null )
@@ -196,6 +210,28 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 				process(null);
 			}
 		}.start();
+	}
+
+	/**
+	 * Displays a progress monitor and updates its state periodically
+	 */
+	public class ProcessThread extends ProgressMonitorThread
+	{
+		public ProcessThread() {
+			super(new ProgressMonitor(owner, "Computing Calibration", "", 0, 2));
+		}
+
+		public void setMessage( final int state , final String message ) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					monitor.setProgress(state);
+					monitor.setNote(message);
+				}});
+		}
+
+		@Override
+		public void doRun() {
+		}
 	}
 
 	@Override

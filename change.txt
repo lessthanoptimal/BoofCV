@@ -3,6 +3,14 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 
+Version : Alpha 0.8
+
+- Added processing monitor to CalibrateStereoPlanarGuiApp
+- Fixed bug in calibration where Rodrigues coordinates were being parameterized incorrectly
+  * Calibration results would be less accurate, but have a lower residual due to the increased degree of freedom
+
+---------------------------------------------
 Date    : 2012/04/22
 Version : Alpha 0.7
 

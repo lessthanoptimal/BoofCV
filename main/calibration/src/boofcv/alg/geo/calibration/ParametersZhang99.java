@@ -97,7 +97,7 @@ public class ParametersZhang99 {
 	}
 
 	public int size() {
-		return 5+distortion.length+(4+3)*views.length;
+		return 5+distortion.length+(3+3)*views.length;
 	}
 
 	public void setFromParam( boolean assumeZeroSkew , double param[] ) {
@@ -115,10 +115,7 @@ public class ParametersZhang99 {
 		}
 
 		for( View v : views ) {
-			v.rotation.theta = param[index++];
-			v.rotation.unitAxisRotation.x = param[index++];
-			v.rotation.unitAxisRotation.y = param[index++];
-			v.rotation.unitAxisRotation.z = param[index++];
+			v.rotation.setParamVector(param[index++],param[index++],param[index++]);
 			v.T.x = param[index++];
 			v.T.y = param[index++];
 			v.T.z = param[index++];
@@ -140,10 +137,9 @@ public class ParametersZhang99 {
 		}
 
 		for( View v : views ) {
-			param[index++] = v.rotation.theta;
-			param[index++] = v.rotation.unitAxisRotation.x;
-			param[index++] = v.rotation.unitAxisRotation.y;
-			param[index++] = v.rotation.unitAxisRotation.z;
+			param[index++] = v.rotation.unitAxisRotation.x*v.rotation.theta;
+			param[index++] = v.rotation.unitAxisRotation.y*v.rotation.theta;
+			param[index++] = v.rotation.unitAxisRotation.z*v.rotation.theta;
 			param[index++] = v.T.x;
 			param[index++] = v.T.y;
 			param[index++] = v.T.z;
@@ -152,12 +148,12 @@ public class ParametersZhang99 {
 
 	/**
 	 * Converts to a generalized class that specifies camera intrinsic parameters
-	 * 
+	 *
 	 * @return Intrinsic parameters
 	 */
 	public IntrinsicParameters convertToIntrinsic() {
 		IntrinsicParameters ret = new IntrinsicParameters();
-		
+
 		ret.fx = a;
 		ret.fy = b;
 		ret.skew = c;
