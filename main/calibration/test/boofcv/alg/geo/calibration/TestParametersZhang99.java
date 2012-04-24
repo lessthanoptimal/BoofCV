@@ -51,7 +51,8 @@ public class TestParametersZhang99 {
 			ParametersZhang99.View v = p.views[i];
 			v.T.set(rand.nextDouble(),rand.nextDouble(),rand.nextDouble());
 			v.rotation.theta = rand.nextDouble();
-			v.rotation.unitAxisRotation.set(rand.nextDouble(),rand.nextDouble(),rand.nextDouble());
+			v.rotation.unitAxisRotation.set(rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian());
+			v.rotation.unitAxisRotation.normalize();
 		}
 
 		// convert it into array format

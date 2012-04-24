@@ -20,7 +20,10 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.app.*;
+import boofcv.app.CalibrateMonoPlanar;
+import boofcv.app.ParseMonoCalibrationConfig;
+import boofcv.app.PlanarCalibrationDetector;
+import boofcv.app.WrapPlanarGridTarget;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.MediaManager;
@@ -191,22 +194,23 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-//		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(8,8);
+		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(8,8);
 //		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(3,4);
-		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(3,4,6);
+//		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(3,4,6);
 
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8,8,0.5,7.0/18.0);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8,8,0.5,7.0/18.0);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
-//		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
+//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
-		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),true);
+//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),true);
+		app.configure(detector,target,BoofMiscOps.directoryList(directory, "CalibIm" ),true);
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);

@@ -37,8 +37,6 @@ public class TestCalibPoseAndPointRodiguesJacobian {
 	Random rand = new Random(48854);
 	int numViews = 2;
 	int numPoints = 3;
-			
-	
 
 	CalibPoseAndPointRodriguesCodec codec = new CalibPoseAndPointRodriguesCodec();
 	CalibPoseAndPointResiduals func = new CalibPoseAndPointResiduals();
