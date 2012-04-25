@@ -18,17 +18,9 @@
 
 package boofcv.app;
 
-import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.ParametersZhang99;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.calibration.CalibrateUsingZhangData;
-import georegression.struct.point.Point2D_F64;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Compute results using CommonsMath, which is a port of MinPack Levenbergh Marquardt

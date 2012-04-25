@@ -68,7 +68,6 @@ public class Zhang99DecomposeHomography {
 	DenseMatrix64F K;
 	DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
-
 	/**
 	 * Specifies the calibration matrix.
 	 *

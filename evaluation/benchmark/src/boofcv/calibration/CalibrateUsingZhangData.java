@@ -19,8 +19,8 @@
 package boofcv.calibration;
 
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.ParametersZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
+import boofcv.alg.geo.calibration.Zhang99Parameters;
 import boofcv.app.CalibrateMonoPlanar;
 import boofcv.app.ImageResults;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
@@ -42,7 +42,7 @@ import java.util.List;
 public class CalibrateUsingZhangData {
 	PlanarCalibrationTarget target;
 	List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
-	ParametersZhang99 found;
+	Zhang99Parameters found;
 
 	UnconstrainedLeastSquares optimizer;
 	
@@ -90,7 +90,7 @@ public class CalibrateUsingZhangData {
 		found = Zhang99.getOptimized();
 
 		List<ImageResults> errors =
-				CalibrateMonoPlanar.computeErrors(observations, found, target.points, assumeZeroSkew);
+				CalibrateMonoPlanar.computeErrors(observations, found, target.points);
 		CalibrateMonoPlanar.printErrors(errors);
 
 		System.out.println("center x = "+found.x0);

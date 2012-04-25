@@ -19,9 +19,9 @@
 package boofcv.app;
 
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.ParametersZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.Zhang99OptimizationFunction;
+import boofcv.alg.geo.calibration.Zhang99Parameters;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -76,7 +76,7 @@ public class CalibrateMonoPlanar {
 	protected boolean assumeZeroSkew;
 
 	// computed parameters
-	protected ParametersZhang99 foundZhang;
+	protected Zhang99Parameters foundZhang;
 	protected IntrinsicParameters foundIntrinsic;
 
 	// Information on calibration targets and results
@@ -178,7 +178,7 @@ public class CalibrateMonoPlanar {
 
 		foundZhang = zhang99.getOptimized();
 
-		errors = computeErrors(observationsAdj, foundZhang,target.points,assumeZeroSkew);
+		errors = computeErrors(observationsAdj, foundZhang,target.points);
 
 		foundIntrinsic = foundZhang.convertToIntrinsic();
 		foundIntrinsic.width = widthImg;
@@ -200,12 +200,11 @@ public class CalibrateMonoPlanar {
 	 * @return List of error statistics
 	 */
 	public static List<ImageResults> computeErrors( List<List<Point2D_F64>> observation ,
-													ParametersZhang99 param ,
-													List<Point2D_F64> grid ,
-													boolean assumeZeroSkew)
+													Zhang99Parameters param ,
+													List<Point2D_F64> grid )
 	{
 		Zhang99OptimizationFunction function =
-				new Zhang99OptimizationFunction(param,assumeZeroSkew,grid,observation);
+				new Zhang99OptimizationFunction(param,grid,observation);
 
 		double residuals[] = new double[grid.size()*observation.size()*2];
 		function.process(param,residuals);
@@ -270,7 +269,7 @@ public class CalibrateMonoPlanar {
 		return errors;
 	}
 
-	public ParametersZhang99 getZhangParam() {
+	public Zhang99Parameters getZhangParam() {
 		return foundZhang;
 	}
 

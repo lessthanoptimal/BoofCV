@@ -40,10 +40,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 	// description of the calibration grid
 	private List<Point3D_F64> grid = new ArrayList<Point3D_F64>();
 	// optimization parameters
-	private ParametersZhang99 param;
-	
-	// should it assume the skew parameter is zero?
-	private boolean assumeZeroSkew;
+	private Zhang99Parameters param;
 
 	// variables for storing intermediate results
 	private Se3_F64 se = new Se3_F64();
@@ -62,8 +59,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 	 * @param grid Location of points on the calibration grid.  z=0
 	 * @param observations calibration point observation pixel coordinates
 	 */
-	public Zhang99OptimizationFunction(ParametersZhang99 param,
-									   boolean assumeZeroSkew,
+	public Zhang99OptimizationFunction(Zhang99Parameters param,
 									   List<Point2D_F64> grid,
 									   List<List<Point2D_F64>> observations) {
 		if( param.views.length != observations.size() )
@@ -71,13 +67,12 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 
 		this.param = param;
 		this.observations = observations;
-		this.assumeZeroSkew = assumeZeroSkew;
 
 		for( Point2D_F64 p : grid ) {
 			this.grid.add( new Point3D_F64(p.x,p.y,0) );
 		}
 
-		N = assumeZeroSkew ? param.size() -1 : param.size();
+		N = param.size();
 		M = observations.size()*grid.size()*2;
 	}
 
@@ -93,16 +88,16 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 
 	@Override
 	public void process(double[] input, double[] output) {
-		param.setFromParam(assumeZeroSkew,input);
+		param.setFromParam(input);
 
 		process(param,output);
 	}
 
-	public void process( ParametersZhang99 param , double []residuals ) {
+	public void process( Zhang99Parameters param , double []residuals ) {
 		int index = 0;
 		for( int indexView = 0; indexView < param.views.length; indexView++ ) {
 
-			ParametersZhang99.View v = param.views[indexView];
+			Zhang99Parameters.View v = param.views[indexView];
 
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
 			se.T = v.T;
@@ -126,8 +121,8 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 
 				Point2D_F64 p = obs.get(i);
 
-				residuals[index++] = p.x-x;
-				residuals[index++] = p.y-y;
+				residuals[index++] = x-p.x;
+				residuals[index++] = y-p.y;
 			}
 		}
 	}

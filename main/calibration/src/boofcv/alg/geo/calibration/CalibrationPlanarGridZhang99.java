@@ -57,7 +57,7 @@ public class CalibrationPlanarGridZhang99 {
 	private Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
 
 	// contains found parameters
-	private ParametersZhang99 optimized;
+	private Zhang99Parameters optimized;
 
 	// description of the calibration target with point locations
 	private PlanarCalibrationTarget target;
@@ -83,8 +83,8 @@ public class CalibrationPlanarGridZhang99 {
 		computeK = new Zhang99CalibrationMatrixFromHomographies(assumeZeroSkew);
 		computeRadial = new RadialDistortionEstimateLinear(target,numRadialParam);
 		this.target = target;
-		optimized = new ParametersZhang99(numRadialParam);
 		this.assumeZeroSkew = assumeZeroSkew;
+		optimized = new Zhang99Parameters(assumeZeroSkew,numRadialParam);
 	}
 
 	/**
@@ -99,12 +99,12 @@ public class CalibrationPlanarGridZhang99 {
 		optimized.setNumberOfViews(observations.size());
 
 		// compute initial parameter estimates using linear algebra
-		ParametersZhang99 initial =  initialParam(observations);
+		Zhang99Parameters initial =  initialParam(observations);
 		if( initial == null )
 			return false;
 
 		// perform non-linear optimization to improve results
-		if( !optimizedParam(observations,target.points,assumeZeroSkew,initial,optimized,optimizer))
+		if( !optimizedParam(observations,target.points,initial,optimized,optimizer))
 			return false;
 
 		return true;
@@ -113,7 +113,7 @@ public class CalibrationPlanarGridZhang99 {
 	/**
 	 * Find an initial estimate for calibration parameters using linear techniques.
 	 */
-	protected ParametersZhang99 initialParam( List<List<Point2D_F64>> observations )
+	protected Zhang99Parameters initialParam( List<List<Point2D_F64>> observations )
 	{
 		List<DenseMatrix64F> homographies = new ArrayList<DenseMatrix64F>();
 		List<Se3_F64> motions = new ArrayList<Se3_F64>();
@@ -140,7 +140,7 @@ public class CalibrationPlanarGridZhang99 {
 
 		double distort[] = computeRadial.getParameters();
 
-		return convertIntoZhangParam(motions, K, distort);
+		return convertIntoZhangParam(motions, K,assumeZeroSkew, distort);
 	}
 
 	/**
@@ -148,21 +148,16 @@ public class CalibrationPlanarGridZhang99 {
 	 *
 	 * @param observations Observations of calibration points in each image
 	 * @param grid Location of calibration points on calibration target
-	 * @param assumeZeroSkew Assume zero skew when computing calibration parameters
 	 * @param initial Initial estimate of calibration parameters.
 	 * @param found The refined calibration parameters.
 	 * @param optimizer Algorithm used to optimize parameters
 	 */
 	public static boolean optimizedParam( List<List<Point2D_F64>> observations ,
 										  List<Point2D_F64> grid ,
-										  boolean assumeZeroSkew ,
-										  ParametersZhang99 initial ,
-										  ParametersZhang99 found ,
+										  Zhang99Parameters initial ,
+										  Zhang99Parameters found ,
 										  UnconstrainedLeastSquares optimizer )
 	{
-		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
-				initial.createNew(),assumeZeroSkew , grid,observations);
-
 		if( optimizer == null ) {
 //			optimizer = FactoryOptimization.leastSquaresTrustRegion(1,
 //					RegionStepType.DOG_LEG_FTF,true);
@@ -171,7 +166,15 @@ public class CalibrationPlanarGridZhang99 {
 		}
 
 		double model[] = new double[ initial.size() ];
-		initial.convertToParam(assumeZeroSkew,model);
+		initial.convertToParam(model);
+
+		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
+				initial.createNew(), grid,observations);
+
+// Both the numerical and analytical Jacobian appear to provide the same results, but the
+// unit test tolerance is so crude that I trust the numerical Jacobian more
+//		Zhang99OptimizationJacobian jacobian = new Zhang99OptimizationJacobian(
+//				initial.assumeZeroSkew,initial.distortion.length,observations.size(),grid);
 
 		optimizer.setFunction(func,null);
 		optimizer.initialize(model,1e-10,1e-25*observations.size());
@@ -181,18 +184,21 @@ public class CalibrationPlanarGridZhang99 {
 		}
 
 		double param[] = optimizer.getParameters();
-		found.setFromParam(assumeZeroSkew,param);
+		found.setFromParam(param);
 
 		return true;
 	}
 
 	/**
-	 * Converts results fond in the linear algorithms into {@link ParametersZhang99}
+	 * Converts results fond in the linear algorithms into {@link Zhang99Parameters}
 	 */
-	public static ParametersZhang99 convertIntoZhangParam(List<Se3_F64> motions,
+	public static Zhang99Parameters convertIntoZhangParam(List<Se3_F64> motions,
 														  DenseMatrix64F K,
+														  boolean assumeZeroSkew,
 														  double[] distort) {
-		ParametersZhang99 ret = new ParametersZhang99();
+		Zhang99Parameters ret = new Zhang99Parameters();
+
+		ret.assumeZeroSkew = assumeZeroSkew;
 
 		ret.a = K.get(0,0);
 		ret.b = K.get(1,1);
@@ -202,11 +208,11 @@ public class CalibrationPlanarGridZhang99 {
 
 		ret.distortion = distort;
 
-		ret.views = new ParametersZhang99.View[motions.size()];
+		ret.views = new Zhang99Parameters.View[motions.size()];
 		for( int i = 0; i < ret.views.length; i++ ) {
 			Se3_F64 m = motions.get(i);
 
-			ParametersZhang99.View v = new ParametersZhang99.View();
+			Zhang99Parameters.View v = new Zhang99Parameters.View();
 			v.T = m.getT();
 			RotationMatrixGenerator.matrixToRodrigues(m.getR(), v.rotation);
 
@@ -243,7 +249,7 @@ public class CalibrationPlanarGridZhang99 {
 		this.optimizer = optimizer;
 	}
 
-	public ParametersZhang99 getOptimized() {
+	public Zhang99Parameters getOptimized() {
 		return optimized;
 	}
 }

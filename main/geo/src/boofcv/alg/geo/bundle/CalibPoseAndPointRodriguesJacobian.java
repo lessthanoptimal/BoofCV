@@ -221,9 +221,9 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 	/**
 	 * Adds to the Jacobian matrix using the derivative from a Rodrigues parameter.
 	 *
-	 * deriv [x,y] = -dot(z)/(z^2)*(R*X+T) + (1/2)*dot(R)*X
+	 * deriv [x,y] = -dot(z)/(z^2)*(R*X+T) + (1/z)*dot(R)*X
 	 *
-	 * where R is rotation matirx, T is translation, z = z-coordinate of point in camera frame
+	 * where R is rotation matrix, T is translation, z = z-coordinate of point in camera frame
 	 *
 	 * @param Rj Jacobian for Rodrigues
 	 * @param worldPt Location of point in world coordinates
@@ -243,7 +243,7 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 	}
 
 	/**
-	 *
+	 * Derivative for translation element
 	 *
 	 * deriv [x,y] = -dot(z)*T/(z^2) + dot(T)/z
 	 *
