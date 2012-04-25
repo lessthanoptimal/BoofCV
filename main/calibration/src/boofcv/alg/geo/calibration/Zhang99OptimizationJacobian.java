@@ -20,18 +20,29 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.alg.geo.RodriguesRotationJacobian;
 import boofcv.numerics.optimization.functions.FunctionNtoMxN;
+import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues;
 import georegression.transform.se.SePointOps_F64;
+import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO comment
+ * <p>
+ * Analytical Jacobian for optimizing calibration parameters.
+ * </p>
+ *
+ * <p>
+ * NOTE: Accuracy is tested in a unit test using a numerical Jacobian.  A very crude tolerance
+ * was required to make it pass. I think this implementation is correct, but hand computing the
+ * Jacobian is error prone.  In practice it produces virtually the same final results as the numerical
+ * Jacobian.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -44,12 +55,13 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	Rodrigues rodrigues = new Rodrigues();
 
 	// number of functions and parameters being optimized
-	private int N,M;
+	private int numParam, numFuncs;
 
 	// description of the calibration grid
 	private List<Point3D_F64> grid = new ArrayList<Point3D_F64>();
-	// optimization parameters
-	private ParametersZhang99 param;
+
+	// number of calibration targets that were observed
+	private int numObservedTargets;
 
 	// should it assume the skew parameter is zero?
 	private boolean assumeZeroSkew;
@@ -57,83 +69,259 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	// variables for storing intermediate results
 	private Se3_F64 se = new Se3_F64();
 
+	// location of point in camera frame
 	private Point3D_F64 cameraPt = new Point3D_F64();
-	private Point2D_F64 calibratedPt = new Point2D_F64();
+	// observed point location in normalized image coordinates
+	private Point2D_F64 normPt = new Point2D_F64();
 
-	// observations
-	private List<List<Point2D_F64>> observations;
+	// intrinsic camera parameters
+	public double a,b,c,x0,y0;
+	// radial distortion
+	public double radial[];
+
+	// output index for x and y
+	int indexJacX;
+	int indexJacY;
+
+	Point3D_F64 Xdot = new Point3D_F64();
 
 	/**
 	 * Configurations the optimization function.
 	 *
-	 * @param param Storage for calibration parameters. Effectively specifies the number of target views
-	 * and radial terms
 	 * @param grid Location of points on the calibration grid.  z=0
-	 * @param observations calibration point observation pixel coordinates
 	 */
-	public Zhang99OptimizationJacobian(ParametersZhang99 param,
-									   boolean assumeZeroSkew,
-									   List<Point2D_F64> grid,
-									   List<List<Point2D_F64>> observations) {
-		if( param.views.length != observations.size() )
-			throw new IllegalArgumentException("For each view there should be one observation");
-
-		this.param = param;
-		this.observations = observations;
+	public Zhang99OptimizationJacobian(boolean assumeZeroSkew,
+									   int numRadial ,
+									   int numObservedTargets ,
+									   List<Point2D_F64> grid ) {
 		this.assumeZeroSkew = assumeZeroSkew;
+		this.numObservedTargets = numObservedTargets;
 
 		for( Point2D_F64 p : grid ) {
 			this.grid.add( new Point3D_F64(p.x,p.y,0) );
 		}
 
-		N = assumeZeroSkew ? param.size() -1 : param.size();
-		M = observations.size()*grid.size()*2;
+		numParam = numRadial+(3+3)*numObservedTargets;
+		if( assumeZeroSkew )
+			numParam += 4;
+		else
+			numParam += 5;
+
+		numFuncs = numObservedTargets*grid.size()*2;
+
+		radial = new double[numRadial];
+
+		if( assumeZeroSkew )
+			c = 0;
 	}
 
 	@Override
 	public int getN() {
-		return N;
+		return numParam;
 	}
 
 	@Override
 	public int getM() {
-		return M;
+		return numFuncs;
 	}
 
 	@Override
 	public void process(double[] input, double[] output) {
-		param.setFromParam(assumeZeroSkew,input);
-
 		int index = 0;
-		for( int indexView = 0; indexView < param.views.length; indexView++ ) {
 
-			ParametersZhang99.View v = param.views[indexView];
+		// extract calibration matrix parameters
+		a = input[index++];
+		b = input[index++];
+		if( !assumeZeroSkew )
+			c = input[index++];
+		x0 = input[index++];
+		y0 = input[index++];
 
-			RotationMatrixGenerator.rodriguesToMatrix(v.rotation, se.getR());
-			se.T = v.T;
+		// extract radial distortion parameters
+		for( int i = 0; i < radial.length; i++ ) {
+			radial[i] = input[index++];
+		}
 
-			List<Point2D_F64> obs = observations.get(indexView);
+		for( int indexView = 0; indexView < numObservedTargets; indexView++ ) {
+
+			// extract rotation and translation parameters
+			double rodX = input[index++];
+			double rodY = input[index++];
+			double rodZ = input[index++];
+			double tranX = input[index++];
+			double tranY = input[index++];
+			double tranZ = input[index++];
+
+			rodrigues.setParamVector(rodX,rodY,rodZ);
+			rodJacobian.process(rodX,rodY,rodZ);
+
+			RotationMatrixGenerator.rodriguesToMatrix(rodrigues, se.getR());
+			se.T.set(tranX, tranY, tranZ);
 
 			for( int i = 0; i < grid.size(); i++ ) {
+				// index = (function index)*numParam
+				indexJacX = (2*indexView*grid.size() + i*2     )*numParam;
+				indexJacY = (2*indexView*grid.size() + i*2 + 1 )*numParam;
+
 				// Put the point in the camera's reference frame
 				SePointOps_F64.transform(se, grid.get(i), cameraPt);
 
-				// calibrated pixel coordinates
-				calibratedPt.x = cameraPt.x/ cameraPt.z;
-				calibratedPt.y = cameraPt.y/ cameraPt.z;
+				// normalized pixel coordinates
+				normPt.x = cameraPt.x/ cameraPt.z;
+				normPt.y = cameraPt.y/ cameraPt.z;
 
-				// apply radial distortion
-				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, param.distortion);
+				calibrationGradient(output);
+				distortGradient(normPt,output);
 
-				// convert to pixel coordinates
-				double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;
-				double y = param.b*calibratedPt.y + param.y0;
+				indexJacX += indexView*6;
+				indexJacY += indexView*6;
 
-				Point2D_F64 p = obs.get(i);
+				rodriguesGradient(rodJacobian.Rx,grid.get(i),cameraPt, normPt,output);
+				rodriguesGradient(rodJacobian.Ry,grid.get(i),cameraPt, normPt,output);
+				rodriguesGradient(rodJacobian.Rz,grid.get(i),cameraPt, normPt,output);
 
-//				residuals[index++] = p.x-x;
-//				residuals[index++] = p.y-y;
+				translateGradient(cameraPt, normPt,output);
 			}
 		}
+	}
+
+	/**
+	 * Gradient for calibration matrix
+	 */
+	private void calibrationGradient( double[] output ) {
+		output[indexJacX++] = normPt.x;
+		output[indexJacX++] = 0;
+		if( !assumeZeroSkew )
+			output[indexJacX++] = normPt.y;
+		output[indexJacX++] = 1;
+		output[indexJacX++] = 0;
+
+		output[indexJacY++] = 0;
+		output[indexJacY++] = normPt.y;
+		if( !assumeZeroSkew )
+			output[indexJacY++] = 0;
+		output[indexJacY++] = 0;
+		output[indexJacY++] = 1;
+	}
+
+	/**
+	 * Gradient for radial distortion
+	 *
+	 * deriv [x,y] =  [x,y]*r
+	 *       [x,y] =  [x,y]*r*r
+	 */
+	private void distortGradient( Point2D_F64 pt , double[] output ) {
+
+		double r2 = pt.x*pt.x + pt.y*pt.y;
+		double r = r2;
+		for( int i = 0; i < radial.length; i++ ) {
+			double xdot = pt.x*r;
+			double ydot = pt.y*r;
+
+			output[indexJacX++] = a*xdot + c*ydot;
+			output[indexJacY++] = b*ydot;
+			r *= r2;
+		}
+	}
+
+	/**
+	 * Adds to the Jacobian matrix using the derivative from a Rodrigues parameter.
+	 *
+	 * deriv [x,y] = [distort deriv] - [dist]*dot(z)/(z^2)*(R*X+T) + [dist]*(1/z)*dot(R)*X
+	 *
+	 * where R is rotation matrix, T is translation, z = z-coordinate of point in camera frame
+	 *
+	 * @param Rdot Jacobian for Rodrigues
+	 * @param X Location of point in world coordinates
+	 */
+	private void rodriguesGradient( DenseMatrix64F Rdot ,
+									Point3D_F64 X ,
+									Point3D_F64 cameraPt ,
+									Point2D_F64 normPt ,
+									double[] output ) {
+
+		double r2 = normPt.x*normPt.x + normPt.y*normPt.y;
+		double r = r2;
+		double rdev = 1;
+
+		double sum = 0;
+		double sumdot = 0;
+
+		for( int i = 0; i < radial.length; i++ ) {
+			sum += radial[i]*r;
+			sumdot += radial[i]*2*(i+1)*rdev;
+
+			r *= r2;
+			rdev *= r2;
+		}
+
+		GeometryMath_F64.mult(Rdot,X,Xdot);
+
+		// part of radial distortion derivative
+		double r_dot = (normPt.x*Xdot.x + normPt.y*Xdot.y)/cameraPt.z - r2*Xdot.z/cameraPt.z;
+
+		// derivative of normPt
+		double n_dot_x = (-normPt.x*Xdot.z+Xdot.x)/cameraPt.z;
+		double n_dot_y = (-normPt.y*Xdot.z+Xdot.y)/cameraPt.z;
+//		double n_dot_z = 0;
+
+		// total partial derivative
+		double xdot = sumdot*r_dot*normPt.x + (1 + sum)*n_dot_x;
+		double ydot = sumdot*r_dot*normPt.y + (1 + sum)*n_dot_y;
+//		double zdot = 0;
+
+		output[indexJacX++] = a*xdot + c*ydot;
+		output[indexJacY++] = b*ydot;
+	}
+
+	/**
+	 * Gradient for translational motion component
+	 *
+	 * deriv [x,y] = [distort deriv] - [dist]*dot(z)*T/(z^2) + [dist]*dot(T)/z
+	 *
+	 * where T is translation, z = z-coordinate of point in camera frame
+	 */
+	private void translateGradient( Point3D_F64 cameraPt ,
+									Point2D_F64 normPt ,
+									double[] output ) {
+
+		double r2 = normPt.x*normPt.x + normPt.y*normPt.y;
+		double r = r2;
+		double rdev = 1;
+
+		double sum = 0;
+		double sumdot = 0;
+
+		for( int i = 0; i < radial.length; i++ ) {
+			sum += radial[i]*r;
+			sumdot += radial[i]*2*(i+1)*rdev;
+
+			r *= r2;
+			rdev *= r2;
+		}
+		// Partial T.x
+		double xdot = sumdot*normPt.x*normPt.x/cameraPt.z + (1+sum)/cameraPt.z;
+		double ydot = sumdot*normPt.x*normPt.y/cameraPt.z;
+		//double zdot = 0;
+
+		output[indexJacX++] = a*xdot + c*ydot;
+		output[indexJacY++] = b*ydot;
+
+		// Partial T.y
+		xdot = sumdot*normPt.y*normPt.x/cameraPt.z;
+		ydot = sumdot*normPt.y*normPt.y/cameraPt.z + (1 + sum)/cameraPt.z;
+
+		output[indexJacX++] = a*xdot + c*ydot;
+		output[indexJacY++] = b*ydot;
+
+		// Partial T.z
+		xdot = -sumdot*r2*normPt.x/cameraPt.z;
+		ydot = -sumdot*r2*normPt.y/cameraPt.z;
+
+		xdot += -(1 + sum)*normPt.x/cameraPt.z;
+		ydot += -(1 + sum)*normPt.y/cameraPt.z;
+
+		output[indexJacX++] = a*xdot + c*ydot;
+		output[indexJacY++] = b*ydot;
 	}
 }

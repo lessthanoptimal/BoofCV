@@ -25,15 +25,15 @@ import georegression.struct.point.Point2D_F64;
  * 
  * @author Peter Abeles
  */
-public class ParametersPointsZhang99 extends ParametersZhang99 {
+public class ParametersPointsZhang99 extends Zhang99Parameters {
 	// number of calibration points in each view
 	int numCalibrationPoints;
 	
 	// location of each point in the image
 	Point2D_F64[][] points;
 
-	public ParametersPointsZhang99(int numDistort, int numViews, int numCalibrationPoints) {
-		super(numDistort, numViews);
+	public ParametersPointsZhang99( boolean assumeZeroSkew , int numDistort, int numViews, int numCalibrationPoints) {
+		super(assumeZeroSkew,numDistort, numViews);
 		this.numCalibrationPoints = numCalibrationPoints;
 		
 		points = new Point2D_F64[numViews][];
@@ -46,10 +46,12 @@ public class ParametersPointsZhang99 extends ParametersZhang99 {
 		}
 	}
 
+	@Override
 	public ParametersPointsZhang99 createNew() {
-		return new ParametersPointsZhang99(distortion.length,views.length,numCalibrationPoints);
+		return new ParametersPointsZhang99(assumeZeroSkew,distortion.length,views.length,numCalibrationPoints);
 	}
 
+	@Override
 	public ParametersPointsZhang99 copy() {
 		ParametersPointsZhang99 ret = createNew();
 		ret.a = a;
@@ -87,8 +89,8 @@ public class ParametersPointsZhang99 extends ParametersZhang99 {
 	}
 
 	@Override
-	public void setFromParam( boolean assumeZeroSkew , double param[] ) {
-		super.setFromParam(assumeZeroSkew,param);
+	public void setFromParam( double param[] ) {
+		super.setFromParam(param);
 		
 		int index = super.size();
 		for( int viewIndex = 0; viewIndex < views.length; viewIndex++ ) {
@@ -101,8 +103,8 @@ public class ParametersPointsZhang99 extends ParametersZhang99 {
 	}
 
 	@Override
-	public void convertToParam( boolean assumeZeroSkew , double param[] ) {
-		super.convertToParam(assumeZeroSkew,param);
+	public void convertToParam( double param[] ) {
+		super.convertToParam(param);
 
 		int index = super.size();
 		for( int viewIndex = 0; viewIndex < views.length; viewIndex++ ) {

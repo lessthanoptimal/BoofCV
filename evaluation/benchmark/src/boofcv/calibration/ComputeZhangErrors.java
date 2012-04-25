@@ -19,7 +19,7 @@
 package boofcv.calibration;
 
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.ParametersZhang99;
+import boofcv.alg.geo.calibration.Zhang99Parameters;
 import boofcv.app.CalibrateMonoPlanar;
 import boofcv.app.ImageResults;
 import georegression.geometry.RotationMatrixGenerator;
@@ -73,19 +73,19 @@ public class ComputeZhangErrors {
 	 * Compute error metrics using parameters on Zhang's website
 	 */
 	public static void zhangResults( List<List<Point2D_F64>> observations , List<Point2D_F64> target ) {
-		ParametersZhang99 param = getZhangParam();
+		Zhang99Parameters param = getZhangParam();
 
 		param.convertToIntrinsic().print();
 		List<ImageResults> errors =
-				CalibrateMonoPlanar.computeErrors(observations, param, target, false);
+				CalibrateMonoPlanar.computeErrors(observations, param, target);
 		CalibrateMonoPlanar.printErrors(errors);
 	}
 
 	/**
 	 * Returns a set of parameters using the found results on Zhang's website
 	 */
-	private static ParametersZhang99 getZhangParam() {
-		ParametersZhang99 param = new ParametersZhang99(2,5);
+	private static Zhang99Parameters getZhangParam() {
+		Zhang99Parameters param = new Zhang99Parameters(false,2,5);
 
 		param.a = 832.5;
 		param.c = 0.204494;
@@ -117,15 +117,15 @@ public class ComputeZhangErrors {
 	 */
 	public static void nonlinearUsingZhang(List<List<Point2D_F64>> observations ,
 										   List<Point2D_F64> target) {
-		ParametersZhang99 param = getZhangParam();
-		ParametersZhang99 found = new ParametersZhang99(2,5);
+		Zhang99Parameters param = getZhangParam();
+		Zhang99Parameters found = new Zhang99Parameters(false,2,5);
 
 		// perform non-linear optimization to improve results
-		CalibrationPlanarGridZhang99.optimizedParam(observations,target,false,param,found,null);
+		CalibrationPlanarGridZhang99.optimizedParam(observations,target,param,found,null);
 
 		found.convertToIntrinsic().print();
 		List<ImageResults> errors =
-				CalibrateMonoPlanar.computeErrors(observations, found, target, false);
+				CalibrateMonoPlanar.computeErrors(observations, found, target);
 		CalibrateMonoPlanar.printErrors(errors);
 	}
 }

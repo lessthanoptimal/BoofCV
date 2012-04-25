@@ -182,7 +182,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		updateResultsGUI();
 	}
 
-	public void setCalibration(ParametersZhang99 found) {
+	public void setCalibration(Zhang99Parameters found) {
 		String textX = String.format("%5.1f",found.x0);
 		String textY = String.format("%5.1f", found.y0);
 		paramCenterX.setText(textX);

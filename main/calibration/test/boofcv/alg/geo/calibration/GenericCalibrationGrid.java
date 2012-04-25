@@ -154,8 +154,8 @@ public class GenericCalibrationGrid {
 		return homographies;
 	}
 
-	static ParametersZhang99 createStandardParam(boolean zeroSkew, int numSkew, int numView, Random rand) {
-		ParametersZhang99 ret = new ParametersZhang99(numSkew,numView);
+	static Zhang99Parameters createStandardParam(boolean zeroSkew, int numSkew, int numView, Random rand) {
+		Zhang99Parameters ret = new Zhang99Parameters(zeroSkew,numSkew,numView);
 
 		DenseMatrix64F K = createStandardCalibration();
 		ret.a = K.get(0,0);
@@ -170,16 +170,16 @@ public class GenericCalibrationGrid {
 			ret.distortion[i] = rand.nextGaussian()*0.001;
 		}
 
-		for(ParametersZhang99.View v : ret.views ) {
+		for(Zhang99Parameters.View v : ret.views ) {
 			double rotX = (rand.nextDouble()-0.5)*0.1;
 			double rotY = (rand.nextDouble()-0.5)*0.1;
 			double rotZ = (rand.nextDouble()-0.5)*0.1;
 			DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(rotX,rotY,rotZ,null);
 			RotationMatrixGenerator.matrixToRodrigues(R,v.rotation);
 
-			double x = rand.nextDouble()*50;
-			double y = rand.nextDouble()*50;
-			double z = rand.nextDouble()*50-1100;
+			double x = rand.nextGaussian()*5;
+			double y = rand.nextGaussian()*5;
+			double z = rand.nextGaussian()*5-750;
 
 			v.T.set(x,y,z);
 		}
@@ -190,7 +190,7 @@ public class GenericCalibrationGrid {
 	 * Creates a set of observed points in pixel coordinates given zhang parameters and a calibration
 	 * grid.
 	 */
-	public static List<List<Point2D_F64>> createObservations( ParametersZhang99 config,
+	public static List<List<Point2D_F64>> createObservations( Zhang99Parameters config,
 															  List<Point2D_F64> grid)
 	{
 		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();
@@ -198,7 +198,7 @@ public class GenericCalibrationGrid {
 		Point3D_F64 cameraPt = new Point3D_F64();
 		Point2D_F64 calibratedPt = new Point2D_F64();
 
-		for( ParametersZhang99.View v : config.views ) {
+		for( Zhang99Parameters.View v : config.views ) {
 			List<Point2D_F64> obs = new ArrayList<Point2D_F64>();
 			Se3_F64 se = new Se3_F64();
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());

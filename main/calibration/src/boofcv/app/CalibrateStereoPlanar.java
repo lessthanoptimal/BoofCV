@@ -18,8 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.alg.geo.calibration.ParametersZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
+import boofcv.alg.geo.calibration.Zhang99Parameters;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
@@ -138,9 +138,9 @@ public class CalibrateStereoPlanar {
 	{
 		IntrinsicParameters intrinsic = calib.process();
 
-		ParametersZhang99 zhangParam = calib.getZhangParam();
+		Zhang99Parameters zhangParam = calib.getZhangParam();
 
-		for( ParametersZhang99.View v : zhangParam.views ) {
+		for( Zhang99Parameters.View v : zhangParam.views ) {
 			Se3_F64 pose = new Se3_F64();
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,pose.getR());
 			pose.getT().set(v.T);

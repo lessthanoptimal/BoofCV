@@ -44,10 +44,10 @@ public class TestZhang99OptimizationFunction {
 	@Test
 	public void computeResidualsPerfect() {
 		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
-		ParametersZhang99 param = GenericCalibrationGrid.createStandardParam(false, 2, 3, rand);
+		Zhang99Parameters param = GenericCalibrationGrid.createStandardParam(false, 2, 3, rand);
 
 		double array[] = new double[ param.size() ];
-		param.convertToParam(false,array);
+		param.convertToParam(array);
 		
 		List<Point2D_F64> gridPts = config.points;
 
@@ -58,7 +58,7 @@ public class TestZhang99OptimizationFunction {
 		}
 
 		Zhang99OptimizationFunction alg =
-				new Zhang99OptimizationFunction( new ParametersZhang99(2,3),false,gridPts,observations );
+				new Zhang99OptimizationFunction( new Zhang99Parameters(false,2,3),gridPts,observations );
 
 		double residuals[] = new double[ alg.getM()];
 		for( int i = 0; i < residuals.length; i++ )
@@ -71,9 +71,9 @@ public class TestZhang99OptimizationFunction {
 		}
 	}
 	
-	private List<Point2D_F64> estimate( ParametersZhang99 param ,
-								  ParametersZhang99.View v ,
-								  List<Point2D_F64> grid ) {
+	protected static List<Point2D_F64> estimate( Zhang99Parameters param ,
+												 Zhang99Parameters.View v ,
+												 List<Point2D_F64> grid ) {
 
 		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
 		

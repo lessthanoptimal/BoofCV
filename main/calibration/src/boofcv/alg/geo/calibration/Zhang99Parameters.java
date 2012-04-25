@@ -31,26 +31,31 @@ import georegression.struct.so.Rodrigues;
  *
  * @author Peter Abeles
  */
-public class ParametersZhang99 {
+public class Zhang99Parameters {
 	// camera calibration matrix
 	public double a,b,c,x0,y0;
 	// radial distortion
 	public double distortion[];
 
+	// does it assume c = 0?
+	public boolean assumeZeroSkew;
+
 	// position of each view of the target
 	// target to camera transform
 	public View[] views;
 
-	public ParametersZhang99(int numDistort, int numViews) {
+	public Zhang99Parameters(boolean assumeZeroSkew , int numDistort, int numViews) {
+		this.assumeZeroSkew = assumeZeroSkew;
 		distortion = new double[numDistort];
 		setNumberOfViews(numViews);
 	}
 
-	public ParametersZhang99(int numDistort) {
+	public Zhang99Parameters(boolean assumeZeroSkew , int numDistort) {
+		this.assumeZeroSkew = assumeZeroSkew;
 		distortion = new double[numDistort];
 	}
 
-	public ParametersZhang99() {
+	public Zhang99Parameters() {
 	}
 
 	public void setNumberOfViews( int numViews ) {
@@ -60,12 +65,12 @@ public class ParametersZhang99 {
 		}
 	}
 
-	public ParametersZhang99 createNew() {
-		return new ParametersZhang99(distortion.length,views.length);
+	public Zhang99Parameters createNew() {
+		return new Zhang99Parameters(assumeZeroSkew,distortion.length,views.length);
 	}
 
-	public ParametersZhang99 copy() {
-		ParametersZhang99 ret = createNew();
+	public Zhang99Parameters copy() {
+		Zhang99Parameters ret = createNew();
 		ret.a = a;
 		ret.b = b;
 		ret.c = c;
@@ -97,10 +102,13 @@ public class ParametersZhang99 {
 	}
 
 	public int size() {
-		return 5+distortion.length+(3+3)*views.length;
+		if( assumeZeroSkew )
+			return 4+distortion.length+(3+3)*views.length;
+		else
+			return 5+distortion.length+(3+3)*views.length;
 	}
 
-	public void setFromParam( boolean assumeZeroSkew , double param[] ) {
+	public void setFromParam( double param[] ) {
 		int index = 0;
 
 		a = param[index++];
@@ -122,7 +130,7 @@ public class ParametersZhang99 {
 		}
 	}
 
-	public void convertToParam( boolean assumeZeroSkew , double param[] ) {
+	public void convertToParam( double param[] ) {
 		int index = 0;
 
 		param[index++] = a;
@@ -156,7 +164,8 @@ public class ParametersZhang99 {
 
 		ret.fx = a;
 		ret.fy = b;
-		ret.skew = c;
+		if( assumeZeroSkew )
+			ret.skew = 0;
 		ret.cx = x0;
 		ret.cy = y0;
 		ret.radial = new double[ distortion.length ];
