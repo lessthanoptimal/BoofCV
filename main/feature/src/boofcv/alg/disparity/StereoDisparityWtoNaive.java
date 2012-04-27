@@ -78,7 +78,7 @@ public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
 		for( int y = radiusY; y < h-radiusY; y++ ) {
 			for( int x = radiusX; x < w-radiusX; x++ ) {
 				// take in account image border when computing max disparity
-				int max = Math.min(w-radiusX,x+score.length)-x;
+				int max = x-Math.max(radiusX-1,x-score.length);
 
 				// compute match score across all candidates
 				processPixel( x , y , max );
@@ -99,7 +99,7 @@ public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
 	private void processPixel( int c_x , int c_y , int maxDisparity ) {
 
 		for( int i = 0; i < maxDisparity; i++ ) {
-			score[i] = computeScore( c_x , c_x+i,c_y);
+			score[i] = computeScore( c_x , c_x-i,c_y);
 		}
 	}
 

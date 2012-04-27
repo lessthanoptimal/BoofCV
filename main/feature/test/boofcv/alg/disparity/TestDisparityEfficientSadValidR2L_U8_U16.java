@@ -55,7 +55,7 @@ public class TestDisparityEfficientSadValidR2L_U8_U16 {
 
 					@Override
 					public void initialize(int maxDisparity) {
-						alg = new DisparityEfficientSadValidR2L_U8_U16(maxDisparity,2,3);
+						alg = new DisparityEfficientSadValidR2L_U8_U16(maxDisparity,2,3,-1);
 					}
 
 					@Override public int getBorderX() { return 2; }
@@ -87,7 +87,7 @@ public class TestDisparityEfficientSadValidR2L_U8_U16 {
 		int radiusY = 2;
 
 		DisparityEfficientSadValidR2L_U8_U16 alg =
-				new DisparityEfficientSadValidR2L_U8_U16(maxDisparity,radiusX,radiusY);
+				new DisparityEfficientSadValidR2L_U8_U16(maxDisparity,radiusX,radiusY,-1);
 		StereoDisparityWtoNaive<ImageUInt8> naive =
 				new StereoDisparityWtoNaive<ImageUInt8>(maxDisparity,radiusX,radiusY);
 
