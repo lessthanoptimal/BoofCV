@@ -62,7 +62,7 @@ public class BenchmarkDisparityAlgs {
 	public static class EfficientSad extends PerformerBase {
 
 		DisparityEfficientSadValidR2L_U8_U16 alg =
-				new DisparityEfficientSadValidR2L_U8_U16 (max,radiusX,radiusY);
+				new DisparityEfficientSadValidR2L_U8_U16 (max,radiusX,radiusY,-1);
 
 		@Override
 		public void process() {

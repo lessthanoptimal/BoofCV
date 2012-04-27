@@ -64,7 +64,7 @@ public abstract class BasicDisparityTests<T extends ImageSingleBand, D extends  
 		for( int y = 0; y < h; y++ ) {
 			for( int x = 0; x < w; x++ ) {
 				GeneralizedImageOps.set(left,x,y,10+x+y);
-				GeneralizedImageOps.set(right,x,y,10+x-disparity+y);
+				GeneralizedImageOps.set(right,x,y,10+x+disparity+y);
 			}
 		}
 
@@ -74,7 +74,7 @@ public abstract class BasicDisparityTests<T extends ImageSingleBand, D extends  
 		int borderY = getBorderY();
 
 		for( int y = borderY; y < h-borderY; y++ ) {
-			for( int x = borderX; x < w-disparity-borderX; x++ ) {
+			for( int x = borderX+disparity; x < w-borderX; x++ ) {
 				double found = GeneralizedImageOps.get(output,x,y);
 				assertEquals("x = "+x+" y = "+y,disparity,found,1e-8);
 			}

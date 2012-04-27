@@ -52,6 +52,9 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class DisparityEfficientSadValidR2L_U8_U16 {
 
+	// Allowed tolerance for right to left validation.  If less than zero then this step is skipped
+	int rightToLeftTolerance;
+
 	// maximum allowed image disparity
 	int maxDisparity;
 
@@ -68,7 +71,7 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	// summed scores along vertical axis
 	// This is simply the sum of like elements in horizontal score
 	int verticalScore[];
-	// score for a column across all disparities
+	// score for a region across all disparities
 	// this is needed to make post processing faster since verticalScore[] has its ordering mangled.
 	int columnScore[];
 
@@ -77,15 +80,25 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	// size of the region: radius*2 + 1
 	int regionWidth,regionHeight;
 
-	public DisparityEfficientSadValidR2L_U8_U16(int maxDisparity, int regionRadiusX, int regionRadiusY) {
+	public DisparityEfficientSadValidR2L_U8_U16(int maxDisparity,
+												int regionRadiusX, int regionRadiusY ,
+												int rightToLeftTolerance ) {
 		this.maxDisparity = maxDisparity;
-		this.regionWidth = regionRadiusX*2+1;
-		this.regionHeight = regionRadiusY*2+1;
-
 		this.radiusX = regionRadiusX;
 		this.radiusY = regionRadiusY;
+		this.rightToLeftTolerance = rightToLeftTolerance;
+
+		this.regionWidth = regionRadiusX*2+1;
+		this.regionHeight = regionRadiusY*2+1;
 	}
 
+	/**
+	 * Computes disparity between two stereo images
+	 *
+	 * @param left Left rectified stereo image. Input
+	 * @param right Right rectified stereo image. Input
+	 * @param disparity Disparity between the two images. Output
+	 */
 	public void process( ImageUInt8 left , ImageUInt8 right , ImageUInt16 disparity ) {
 		// initialize data structures
 		InputSanityCheck.checkSameShape(left,right,disparity);
@@ -104,6 +117,10 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 		computeRemainingRows(left, right, disparity);
 	}
 
+	/**
+	 * Initializes disparity calculation by finding the scores for the initial block of horizontal
+	 * rows.
+	 */
 	private void computeFirstRow(ImageUInt8 left, ImageUInt8 right , ImageUInt16 disparity ) {
 		// compute horizontal scores for first row block
 		for( int row = 0; row < regionHeight; row++ ) {
@@ -123,9 +140,14 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 		}
 
 		// compute disparity
-		selectRightToLeft(0,left.width,disparity);
+		selectLeftToRight(0, left.width, disparity);
 	}
 
+	/**
+	 * Using previously computed results it efficiently finds the disparity in the remaining rows.
+	 * When a new block is processes the last row/column is subtracted and the new row/column is
+	 * added.
+	 */
 	private void computeRemainingRows( ImageUInt8 left, ImageUInt8 right , ImageUInt16 disparity )
 	{
 		for( int row = regionHeight; row < left.height; row++ ) {
@@ -145,14 +167,18 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 			}
 
 			// compute disparity
-			selectRightToLeft(row - regionHeight + 1, left.width, disparity);
+			selectLeftToRight(row - regionHeight + 1, left.width, disparity);
 		}
 	}
 
-	private void selectRightToLeft( int row , int imageWidth , ImageUInt16 disparity) {
+	/**
+	 * Selects best fit region in the left to right direction for each column in the active row.
+	 * Results are written to disparity image.
+	 */
+	private void selectLeftToRight(int row, int imageWidth, ImageUInt16 disparity) {
 		for( int col = 0; col <= imageWidth-regionWidth; col++ ) {
 			// make sure the disparity search doesn't go outside the image border
-			int localMax = maxDisparityAtColumnL2R(imageWidth, col);
+			int localMax = maxDisparityAtColumnL2R(col);
 
 			int indexScore = col;
 
@@ -177,9 +203,13 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 //				System.out.println("crap");
 
 			// TODO right to left validation
-
+			// TODO Optional additional filtering
 			disparity.set(col + radiusX, row + radiusY, indexBest);
 		}
+	}
+
+	private int selectRightToLeft( int col , int localMax ) {
+		return 0;
 	}
 
 	/**
@@ -199,10 +229,10 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 		for( int d = 0; d < maxDisparity; d++ ) {
 			final int elementMax = left.width-d;
 			final int scoreMax = elementMax-regionWidth;
-			int indexScore = left.width*d;
+			int indexScore = left.width*d+d;
 
-			int indexLeft = left.startIndex + left.stride*row;
-			int indexRight =  right.startIndex + right.stride*row + d;
+			int indexLeft = left.startIndex + left.stride*row + d;
+			int indexRight =  right.startIndex + right.stride*row;
 
 			// Fill elementScore with all the scores for this row at disparity d
 			compoteScoreRow(left, right, elementMax, indexLeft, indexRight);
@@ -244,8 +274,8 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	 * Returns the maximum allowed disparity for a particular column in left to right direction,
 	 * as limited by the image border.
 	 */
-	private int maxDisparityAtColumnL2R(int imageWidth, int col) {
-		return Math.min(imageWidth-regionWidth+1,col+maxDisparity)-col;
+	private int maxDisparityAtColumnL2R( int col) {
+		return 1+col-Math.max(0,col-maxDisparity+1);
 	}
 
 	public int getMaxDisparity() {
