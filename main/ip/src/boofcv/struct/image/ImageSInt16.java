@@ -44,7 +44,7 @@ public class ImageSInt16 extends ImageInt16<ImageSInt16> {
 	}
 
 	@Override
-	protected int unsafe_get(int x, int y) {
+	public int unsafe_get(int x, int y) {
 		return data[getIndex(x, y)];
 	}
 

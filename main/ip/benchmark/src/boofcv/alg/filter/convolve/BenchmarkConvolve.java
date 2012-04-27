@@ -61,7 +61,7 @@ public class BenchmarkConvolve extends SimpleBenchmark {
 	static ImageSInt32 out_S32 = new ImageSInt32(width,height);
 
 	// iterate through different sized kernel radius
-	@Param({"1", "2", "3", "5","10"}) private int radius;
+	@Param({"1", "2"}) private int radius;
 
 	public BenchmarkConvolve() {
 		ImageTestingOps.randomize(input_U8,rand,0,20);
@@ -178,6 +178,12 @@ public class BenchmarkConvolve extends SimpleBenchmark {
 	public int timeConvolve2D_I8_I8_DIV(int reps) {
 		for( int i = 0; i < reps; i++ )
 			ConvolveImageNoBorder.convolve(kernel2D_I32, input_U8, out_U8,10);
+		return 0;
+	}
+
+	public int timeConvolveUnsafe2D_I8_I8_DIV(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ConvolveUnsafe_U8.convolve(kernel2D_I32, input_U8, out_U8,10);
 		return 0;
 	}
 

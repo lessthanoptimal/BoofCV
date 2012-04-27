@@ -51,6 +51,18 @@ public abstract class ImageInt16<T extends ImageInt16> extends ImageInteger<T> {
 		data[getIndex(x, y)] = (short) value;
 	}
 
+	/**
+	 * Sets the value of the specified pixel.
+	 *
+	 * @param x	 pixel coordinate.
+	 * @param y	 pixel coordinate.
+	 * @param value The pixel's new value.
+	 */
+	@Override
+	public void unsafe_set(int x, int y, int value) {
+		data[getIndex(x, y)] = (short) value;
+	}
+
 	@Override
 	protected Object _getData() {
 		return data;
