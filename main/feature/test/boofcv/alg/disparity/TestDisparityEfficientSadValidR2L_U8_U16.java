@@ -94,6 +94,10 @@ public class TestDisparityEfficientSadValidR2L_U8_U16 {
 		alg.process(left,right,found);
 		naive.process(left,right,expected);
 
+//		found.print();
+//		System.out.println("--------------");
+//		expected.printInt();
+
 		BoofTesting.assertEqualsGeneric(found, expected, 1, 1);
 	}
 }
