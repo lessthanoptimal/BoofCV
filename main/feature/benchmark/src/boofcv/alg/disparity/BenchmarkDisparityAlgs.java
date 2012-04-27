@@ -34,8 +34,8 @@ public class BenchmarkDisparityAlgs {
 	static final long TEST_TIME = 1000;
 	static final Random rand = new Random(234234);
 
-	static final int width=320;
-	static final int height=240;
+	static final int width=640;
+	static final int height=480;
 	static final int max=20;
 	static final int radiusX=2;
 	static final int radiusY=2;

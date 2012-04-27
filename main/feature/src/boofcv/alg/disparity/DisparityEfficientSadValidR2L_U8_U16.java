@@ -41,6 +41,13 @@ import boofcv.struct.image.ImageUInt8;
  * then it is more likely to be a good disparity estimate.
  * </p>
  *
+ * <p>
+ * Score Order:  The index of the score for column i at disparity d is 'index = imgWidth*d + i'
+ * This ordering is a bit unnatural when searching for the best disparity, but reduces cache misses
+ * when writing.  Performance boost is about 20%-30% depending on max disparity and image size.
+ * </p>
+ *
+ *
  * @author Peter Abeles
  */
 public class DisparityEfficientSadValidR2L_U8_U16 {
@@ -61,6 +68,9 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	// summed scores along vertical axis
 	// This is simply the sum of like elements in horizontal score
 	int verticalScore[];
+	// score for a column across all disparities
+	// this is needed to make post processing faster since verticalScore[] has its ordering mangled.
+	int columnScore[];
 
 	// radius of the region along x and y axis
 	int radiusX,radiusY;
@@ -74,8 +84,6 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 
 		this.radiusX = regionRadiusX;
 		this.radiusY = regionRadiusY;
-
-		elementScore = new int[ regionWidth ];
 	}
 
 	public void process( ImageUInt8 left , ImageUInt8 right , ImageUInt16 disparity ) {
@@ -86,6 +94,8 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 		if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
 			horizontalScore = new int[regionHeight][lengthHorizontal];
 			verticalScore = new int[lengthHorizontal];
+			columnScore = new int[maxDisparity];
+			elementScore = new int[ left.width ];
 		}
 
 		// initialize computation
@@ -126,6 +136,7 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 			for( int i = 0; i < lengthHorizontal; i++ ) {
 				verticalScore[i] -= scores[i];
 			}
+
 			computeScoreRow(left, right, row, scores);
 
 			// add the new score
@@ -134,7 +145,7 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 			}
 
 			// compute disparity
-			selectRightToLeft(row-regionHeight+1,left.width,disparity);
+			selectRightToLeft(row - regionHeight + 1, left.width, disparity);
 		}
 	}
 
@@ -143,20 +154,24 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 			// make sure the disparity search doesn't go outside the image border
 			int localMax = maxDisparityAtColumnL2R(imageWidth, col);
 
-			int indexScore = col*maxDisparity;
+			int indexScore = col;
 
 //			System.out.println("----  "+localMax+"  col = "+col);
 			int indexBest = 0;
-			int scoreBest = verticalScore[indexScore++];
+			int scoreBest = columnScore[0] = verticalScore[indexScore];
+			indexScore += imageWidth;
+
 //			System.out.printf("%d ",scoreBest);
-			for( int i = 1; i < localMax; i++ ,indexScore++) {
+			for( int i = 1; i < localMax; i++ ,indexScore += imageWidth) {
+				int s = verticalScore[indexScore];
+				columnScore[i] = s;
 //				System.out.printf("%d ",verticalScore[indexScore]);
-				if( verticalScore[indexScore] < scoreBest ) {
-					scoreBest = verticalScore[indexScore];
+				if( s < scoreBest ) {
+					scoreBest = s;
 					indexBest = i;
 				}
 			}
-//			System.out.println();
+//			System.out.println("  selected "+indexBest);
 
 //			if( indexBest == 9 )
 //				System.out.println("crap");
@@ -179,35 +194,49 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	 * @param scores Storage for disparity scores.
 	 */
 	protected void computeScoreRow(ImageUInt8 left, ImageUInt8 right, int row, int[] scores) {
+
 		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
 		for( int d = 0; d < maxDisparity; d++ ) {
-			int colMax = left.width-regionWidth+1-d;
-			int col = 0;
+			final int elementMax = left.width-d;
+			final int scoreMax = elementMax-regionWidth;
+			int indexScore = left.width*d;
 
-			int indexLeft = left.startIndex + left.stride*row + col;
-			int indexRight =  right.startIndex + right.stride*row + col + d;
-			int indexScore = col*maxDisparity+d;
+			int indexLeft = left.startIndex + left.stride*row;
+			int indexRight =  right.startIndex + right.stride*row + d;
 
+			// Fill elementScore with all the scores for this row at disparity d
+			compoteScoreRow(left, right, elementMax, indexLeft, indexRight);
+
+			// score at the first column
 			int score = 0;
-			for( int rCol = 0; rCol < regionWidth; rCol++ ) {
-				int diff = (left.data[ indexLeft++ ] & 0xFF) - (right.data[ indexRight++ ] & 0xFF);
+			for( int i = 0; i < regionWidth; i++ )
+				score += elementScore[i];
 
-//				score += elementScore[rCol] = diff*diff;
-				score += elementScore[rCol] = Math.abs(diff);
+			scores[indexScore++] = score;
+
+			// scores for the remaining columns
+			for( int col = 0; col < scoreMax; col++ , indexScore++ ) {
+				scores[indexScore] = score += elementScore[col+regionWidth] - elementScore[col];
 			}
-			scores[indexScore] = score;
-			indexScore += maxDisparity;
+		}
+	}
 
-			int which = 0;
-			for( col++; col < colMax; col++ , indexScore += maxDisparity ) {
-				score -= elementScore[which];
-				int diff = (left.data[ indexLeft++ ] & 0xFF) - (right.data[ indexRight++ ] & 0xFF);
-//				score += elementScore[which] = diff*diff;
-				score += elementScore[which] = Math.abs(diff);
-				which = col%regionWidth;
+	/**
+	 * compute the score for each element all at once to encourage the JVM to optimize and
+	 * encourage the JVM to optimize this section of code.
+	 *
+	 * Was original inline, but was actually slightly slower by about 3% consistently,  It
+	 * is in its own function so that it can be overiden and have different cost functions
+	 * inserted easily.
+	 */
+	protected void compoteScoreRow(ImageUInt8 left, ImageUInt8 right,
+								   int elementMax, int indexLeft, int indexRight)
+	{
+		for( int rCol = 0; rCol < elementMax; rCol++ ) {
+			int diff = (left.data[ indexLeft++ ] & 0xFF) - (right.data[ indexRight++ ] & 0xFF);
 
-				scores[indexScore] = score;
-			}
+//			elementScore[rCol] = diff*diff;
+			elementScore[rCol] = Math.abs(diff);
 		}
 	}
 
