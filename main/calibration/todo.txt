@@ -1,5 +1,2 @@
 - Square Grid
  * Try Hough transform for edge detection
-
-- Zhang 99
- * Analytic Jacobian

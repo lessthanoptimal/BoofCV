@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ public class NumericalJacobianForward implements FunctionNtoMxN
 			input[i] = temp;
 			function.process(input,output1);
 			for( int j = 0; j < M; j++ ) {
-				J.set(j,i,(output1[j] - output0[j])/h);
+				J.unsafe_set(j,i,(output1[j] - output0[j])/h);
 			}
 			input[i] = x;
 		}

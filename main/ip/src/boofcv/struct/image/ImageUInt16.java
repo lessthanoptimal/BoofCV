@@ -28,7 +28,6 @@ package boofcv.struct.image;
  */
 public class ImageUInt16 extends ImageInt16<ImageUInt16> {
 
-
 	/**
 	 * Creates a new gray scale (single band/color) image.
 	 *
@@ -43,7 +42,7 @@ public class ImageUInt16 extends ImageInt16<ImageUInt16> {
 	}
 
 	@Override
-	protected int unsafe_get(int x, int y) {
+	public int unsafe_get(int x, int y) {
 		return data[getIndex(x, y)] & 0xFFFF;
 	}
 

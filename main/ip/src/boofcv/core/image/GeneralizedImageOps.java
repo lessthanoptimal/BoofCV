@@ -237,10 +237,10 @@ public class GeneralizedImageOps {
 	}
 
 	public static double get(ImageSingleBand img, int x, int y) {
-		if (img instanceof ImageUInt8) {
-			return ((ImageUInt8) img).get(x, y);
-		} else if (img instanceof ImageSInt16) {
-			return ((ImageSInt16) img).get(x, y);
+		if (img instanceof ImageInt8) {
+			return ((ImageInt8) img).get(x, y);
+		} else if (img instanceof ImageInt16) {
+			return ((ImageInt16) img).get(x, y);
 		} else if (img instanceof ImageSInt32) {
 			return ((ImageSInt32) img).get(x, y);
 		} else if (img instanceof ImageFloat32) {

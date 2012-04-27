@@ -70,13 +70,22 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageSingleBa
 	public abstract void set(int x, int y, int value );
 
 	/**
+	 * Set function which does not perform bounds checking.
+	 *
+	 * @param x	 pixel coordinate.
+	 * @param y	 pixel coordinate.
+	 * @param value The pixel's new value.
+	 */
+	public abstract void unsafe_set( int x , int y , int value );
+
+	/**
 	 * Get function which does not perform bounds checking.
 	 *
 	 * @param x pixel coordinate.
 	 * @param y pixel coordinate.
 	 * @return an intensity value.
 	 */
-	protected abstract int unsafe_get( int x , int y );
+	public abstract int unsafe_get( int x , int y );
 
 	@Override
 	public ImageTypeInfo<T> getTypeInfo() {

@@ -47,7 +47,12 @@ public class ImageSInt32 extends ImageInteger<ImageSInt32> {
 	}
 
 	@Override
-	protected int unsafe_get(int x, int y) {
+	public void unsafe_set(int x, int y, int value) {
+		data[getIndex(x, y)] = value;
+	}
+
+	@Override
+	public int unsafe_get(int x, int y) {
 		return data[getIndex(x, y)];
 	}
 
