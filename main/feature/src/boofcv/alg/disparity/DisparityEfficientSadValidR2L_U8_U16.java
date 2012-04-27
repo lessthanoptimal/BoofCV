@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageUInt8;
  * <p>
  * Computes the disparity SAD score efficiently while minimizing CPU cache misses.  Provides support
  * for fast right to left validation.  First the sad score is computed horizontally then summed up
- * vertically while minimizing calculations.
+ * vertically while minimizing redundant calculations that naive implementation would have.
  * </p>
  *
  * <p>
@@ -51,6 +51,8 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	// number of score elements: (image width - regionWidth)*maxDisparity
 	int lengthHorizontal;
 
+	// stores the local scores for the width of the region
+	int elementScore[];
 	// scores along horizontal axis for current block
 	// To allow right to left validation all disparity scores are stored for the entire row
 	// size = num columns * maxDisparity
@@ -72,6 +74,8 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 
 		this.radiusX = regionRadiusX;
 		this.radiusY = regionRadiusY;
+
+		elementScore = new int[ regionWidth ];
 	}
 
 	public void process( ImageUInt8 left , ImageUInt8 right , ImageUInt16 disparity ) {
@@ -85,7 +89,7 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 		}
 
 		// initialize computation
-//		computeFirstRow(left, right,disparity);
+		computeFirstRow(left, right,disparity);
 		// efficiently compute rest of the rows using previous results to avoid repeat computations
 		computeRemainingRows(left, right, disparity);
 	}
@@ -164,7 +168,10 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	}
 
 	/**
-	 * Computes disparity score for an entire row
+	 * Computes disparity score for an entire row.
+	 *
+	 * For a given disparity, the score for each region on the left share many components in common.
+	 * Because of this the scores are computed with disparity being the outer most loop
 	 *
 	 * @param left left image
 	 * @param right Right image
@@ -172,31 +179,34 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	 * @param scores Storage for disparity scores.
 	 */
 	protected void computeScoreRow(ImageUInt8 left, ImageUInt8 right, int row, int[] scores) {
-		// compute the new row
-		for( int col = 0; col <= left.width-regionWidth; col++ ) {
-			// make sure the disparity search doesn't go outside the image border
-			int localMax = maxDisparityAtColumnL2R(left.width, col);
+		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
+		for( int d = 0; d < maxDisparity; d++ ) {
+			int colMax = left.width-regionWidth+1-d;
+			int col = 0;
 
-			int startLeft = left.startIndex + left.stride*row + col;
-			int startRight = right.startIndex + right.stride*row + col;
-			int indexScores = col*maxDisparity;
+			int indexLeft = left.startIndex + left.stride*row + col;
+			int indexRight =  right.startIndex + right.stride*row + col + d;
+			int indexScore = col*maxDisparity+d;
 
-			// compute the disparity scores for region in the left camera across
-			// all possible disparities
-			for( int d = 0; d < localMax; d++ ) {
-				int score = 0;
-				int indexLeft = startLeft;
-				int indexRight = startRight+d;
+			int score = 0;
+			for( int rCol = 0; rCol < regionWidth; rCol++ ) {
+				int diff = (left.data[ indexLeft++ ] & 0xFF) - (right.data[ indexRight++ ] & 0xFF);
 
-				int end = indexLeft + regionWidth;
-//				for( int rCol = 0; rCol < regionWidth; rCol++ )  {
-				while( indexLeft < end )  {
-					int diff = (left.data[ indexLeft++ ] & 0xFF) - (right.data[ indexRight++ ] & 0xFF);
+//				score += elementScore[rCol] = diff*diff;
+				score += elementScore[rCol] = Math.abs(diff);
+			}
+			scores[indexScore] = score;
+			indexScore += maxDisparity;
 
-					score += diff*diff;
-//					score += Math.abs(diff);
-				}
-				scores[indexScores++] = score;
+			int which = 0;
+			for( col++; col < colMax; col++ , indexScore += maxDisparity ) {
+				score -= elementScore[which];
+				int diff = (left.data[ indexLeft++ ] & 0xFF) - (right.data[ indexRight++ ] & 0xFF);
+//				score += elementScore[which] = diff*diff;
+				score += elementScore[which] = Math.abs(diff);
+				which = col%regionWidth;
+
+				scores[indexScore] = score;
 			}
 		}
 	}
