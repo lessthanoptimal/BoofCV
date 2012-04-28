@@ -20,7 +20,6 @@ package boofcv.alg.disparity;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -34,19 +33,21 @@ public class TestDisparityEfficientSadValidR2L_U8_U16 {
 
 	Random rand = new Random(234);
 
+	DisparitySelectRect_S32<ImageUInt8> compDisp = new SelectRectBasicWta_S32_U8();
+
 	/**
 	 * Basic generic disparity calculation tests
 	 */
 	@Test
 	public void basicTest() {
-		BasicDisparityTests<ImageUInt8,ImageUInt16> alg =
-				new BasicDisparityTests<ImageUInt8,ImageUInt16>(ImageUInt8.class) {
+		BasicDisparityTests<ImageUInt8,ImageUInt8> alg =
+				new BasicDisparityTests<ImageUInt8,ImageUInt8>(ImageUInt8.class) {
 
-					DisparityEfficientSadValidR2L_U8_U16 alg;
+					DisparityScoreSadRect_U8<ImageUInt8> alg;
 
 					@Override
-					public ImageUInt16 computeDisparity(ImageUInt8 left, ImageUInt8 right ) {
-						ImageUInt16 ret = new ImageUInt16(left.width,left.height);
+					public ImageUInt8 computeDisparity(ImageUInt8 left, ImageUInt8 right ) {
+						ImageUInt8 ret = new ImageUInt8(left.width,left.height);
 
 						alg.process(left,right,ret);
 
@@ -55,7 +56,7 @@ public class TestDisparityEfficientSadValidR2L_U8_U16 {
 
 					@Override
 					public void initialize(int maxDisparity) {
-						alg = new DisparityEfficientSadValidR2L_U8_U16(maxDisparity,2,3,-1);
+						alg = new DisparityScoreSadRect_U8<ImageUInt8>(maxDisparity,2,3,compDisp);
 					}
 
 					@Override public int getBorderX() { return 2; }
@@ -76,7 +77,7 @@ public class TestDisparityEfficientSadValidR2L_U8_U16 {
 		ImageUInt8 left = new ImageUInt8(w,h);
 		ImageUInt8 right = new ImageUInt8(w,h);
 
-		ImageUInt16 found = new ImageUInt16(w,h);
+		ImageUInt8 found = new ImageUInt8(w,h);
 		ImageFloat32 expected = new ImageFloat32(w,h);
 
 		GeneralizedImageOps.randomize(left,rand,0,20);
@@ -86,8 +87,8 @@ public class TestDisparityEfficientSadValidR2L_U8_U16 {
 		int radiusX = 3;
 		int radiusY = 2;
 
-		DisparityEfficientSadValidR2L_U8_U16 alg =
-				new DisparityEfficientSadValidR2L_U8_U16(maxDisparity,radiusX,radiusY,-1);
+		DisparityScoreSadRect_U8<ImageUInt8> alg =
+				new DisparityScoreSadRect_U8<ImageUInt8>(maxDisparity,radiusX,radiusY,compDisp);
 		StereoDisparityWtoNaive<ImageUInt8> naive =
 				new StereoDisparityWtoNaive<ImageUInt8>(maxDisparity,radiusX,radiusY);
 
