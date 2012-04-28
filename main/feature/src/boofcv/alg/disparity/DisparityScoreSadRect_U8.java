@@ -19,14 +19,15 @@
 package boofcv.alg.disparity;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
  * <p>
- * Computes the disparity SAD score efficiently while minimizing CPU cache misses.  Provides support
- * for fast right to left validation.  First the sad score is computed horizontally then summed up
- * vertically while minimizing redundant calculations that naive implementation would have.
+ * Computes the disparity SAD score efficiently for a single rectangular region while minimizing CPU cache misses.
+ * After the score has been computed for an entire row it is passed onto another algorithm to compute the actual
+ * disparity. Provides support for fast right to left validation.  First the sad score is computed horizontally
+ * then summed up vertically while minimizing redundant calculations that naive implementation would have.
  * </p>
  *
  * <p>
@@ -36,24 +37,21 @@ import boofcv.struct.image.ImageUInt8;
  * </p>
  *
  * <p>
- * Right to left validation is when the match is found going from the right image to the left image 
- * and compared to the result already found going from the left to right image. If the results match
- * then it is more likely to be a good disparity estimate.
- * </p>
- *
- * <p>
- * Score Order:  The index of the score for column i at disparity d is 'index = imgWidth*d + i'
+ * Score Format:  The index of the score for column i at disparity d is 'index = imgWidth*d + i'.  The
+ * first score element refers to column radiusX in the image.<br>
+ * Format Comment:<br>
  * This ordering is a bit unnatural when searching for the best disparity, but reduces cache misses
  * when writing.  Performance boost is about 20%-30% depending on max disparity and image size.
  * </p>
  *
+ * @see DisparitySelectRect_S32
  *
  * @author Peter Abeles
  */
-public class DisparityEfficientSadValidR2L_U8_U16 {
+public class DisparityScoreSadRect_U8 <Disparity extends ImageSingleBand> {
 
-	// Allowed tolerance for right to left validation.  If less than zero then this step is skipped
-	int rightToLeftTolerance;
+	// Computes disparity from scores
+	DisparitySelectRect_S32<Disparity> computeDisparity;
 
 	// maximum allowed image disparity
 	int maxDisparity;
@@ -71,22 +69,30 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	// summed scores along vertical axis
 	// This is simply the sum of like elements in horizontal score
 	int verticalScore[];
-	// score for a region across all disparities
-	// this is needed to make post processing faster since verticalScore[] has its ordering mangled.
-	int columnScore[];
 
 	// radius of the region along x and y axis
 	int radiusX,radiusY;
 	// size of the region: radius*2 + 1
 	int regionWidth,regionHeight;
 
-	public DisparityEfficientSadValidR2L_U8_U16(int maxDisparity,
-												int regionRadiusX, int regionRadiusY ,
-												int rightToLeftTolerance ) {
+	/**
+	 * Configures disparity calculation.
+	 *
+	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
+	 * @param regionRadiusX Radius of the rectangular region along x-axis.
+	 * @param regionRadiusY Radius of the rectangular region along y-axis.
+	 * @param computeDisparity Algorithm which computes the disparity from the score.
+	 */
+	public DisparityScoreSadRect_U8(int maxDisparity,
+									int regionRadiusX, int regionRadiusY,
+									DisparitySelectRect_S32<Disparity> computeDisparity ) {
+		if( maxDisparity <= 0 )
+			throw new IllegalArgumentException("Max disparity must be greater than zero");
+
 		this.maxDisparity = maxDisparity;
 		this.radiusX = regionRadiusX;
 		this.radiusY = regionRadiusY;
-		this.rightToLeftTolerance = rightToLeftTolerance;
+		this.computeDisparity = computeDisparity;
 
 		this.regionWidth = regionRadiusX*2+1;
 		this.regionHeight = regionRadiusY*2+1;
@@ -99,7 +105,7 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	 * @param right Right rectified stereo image. Input
 	 * @param disparity Disparity between the two images. Output
 	 */
-	public void process( ImageUInt8 left , ImageUInt8 right , ImageUInt16 disparity ) {
+	public void process( ImageUInt8 left , ImageUInt8 right , Disparity disparity ) {
 		// initialize data structures
 		InputSanityCheck.checkSameShape(left,right,disparity);
 
@@ -107,12 +113,13 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 		if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
 			horizontalScore = new int[regionHeight][lengthHorizontal];
 			verticalScore = new int[lengthHorizontal];
-			columnScore = new int[maxDisparity];
 			elementScore = new int[ left.width ];
 		}
 
+		computeDisparity.configure(disparity,maxDisparity,radiusX);
+
 		// initialize computation
-		computeFirstRow(left, right,disparity);
+		computeFirstRow(left, right, disparity);
 		// efficiently compute rest of the rows using previous results to avoid repeat computations
 		computeRemainingRows(left, right, disparity);
 	}
@@ -121,7 +128,7 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	 * Initializes disparity calculation by finding the scores for the initial block of horizontal
 	 * rows.
 	 */
-	private void computeFirstRow(ImageUInt8 left, ImageUInt8 right , ImageUInt16 disparity ) {
+	private void computeFirstRow(ImageUInt8 left, ImageUInt8 right , Disparity disparity ) {
 		// compute horizontal scores for first row block
 		for( int row = 0; row < regionHeight; row++ ) {
 
@@ -140,7 +147,7 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 		}
 
 		// compute disparity
-		selectLeftToRight(0, left.width, disparity);
+		computeDisparity.process(radiusY, verticalScore);
 	}
 
 	/**
@@ -148,7 +155,7 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 	 * When a new block is processes the last row/column is subtracted and the new row/column is
 	 * added.
 	 */
-	private void computeRemainingRows( ImageUInt8 left, ImageUInt8 right , ImageUInt16 disparity )
+	private void computeRemainingRows( ImageUInt8 left, ImageUInt8 right , Disparity disparity )
 	{
 		for( int row = regionHeight; row < left.height; row++ ) {
 			int oldRow = row%regionHeight;
@@ -167,49 +174,8 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 			}
 
 			// compute disparity
-			selectLeftToRight(row - regionHeight + 1, left.width, disparity);
+			computeDisparity.process(row - regionHeight + 1 + radiusY, verticalScore);
 		}
-	}
-
-	/**
-	 * Selects best fit region in the left to right direction for each column in the active row.
-	 * Results are written to disparity image.
-	 */
-	private void selectLeftToRight(int row, int imageWidth, ImageUInt16 disparity) {
-		for( int col = 0; col <= imageWidth-regionWidth; col++ ) {
-			// make sure the disparity search doesn't go outside the image border
-			int localMax = maxDisparityAtColumnL2R(col);
-
-			int indexScore = col;
-
-//			System.out.println("----  "+localMax+"  col = "+col);
-			int indexBest = 0;
-			int scoreBest = columnScore[0] = verticalScore[indexScore];
-			indexScore += imageWidth;
-
-//			System.out.printf("%d ",scoreBest);
-			for( int i = 1; i < localMax; i++ ,indexScore += imageWidth) {
-				int s = verticalScore[indexScore];
-				columnScore[i] = s;
-//				System.out.printf("%d ",verticalScore[indexScore]);
-				if( s < scoreBest ) {
-					scoreBest = s;
-					indexBest = i;
-				}
-			}
-//			System.out.println("  selected "+indexBest);
-
-//			if( indexBest == 9 )
-//				System.out.println("crap");
-
-			// TODO right to left validation
-			// TODO Optional additional filtering
-			disparity.set(col + radiusX, row + radiusY, indexBest);
-		}
-	}
-
-	private int selectRightToLeft( int col , int localMax ) {
-		return 0;
 	}
 
 	/**
@@ -268,14 +234,6 @@ public class DisparityEfficientSadValidR2L_U8_U16 {
 //			elementScore[rCol] = diff*diff;
 			elementScore[rCol] = Math.abs(diff);
 		}
-	}
-
-	/**
-	 * Returns the maximum allowed disparity for a particular column in left to right direction,
-	 * as limited by the image border.
-	 */
-	private int maxDisparityAtColumnL2R( int col) {
-		return 1+col-Math.max(0,col-maxDisparity+1);
 	}
 
 	public int getMaxDisparity() {

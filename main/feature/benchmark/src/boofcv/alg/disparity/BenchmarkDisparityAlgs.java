@@ -22,7 +22,6 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 
 import java.util.Random;
@@ -45,7 +44,7 @@ public class BenchmarkDisparityAlgs {
 	static final ImageUInt8 left = new ImageUInt8(width,height);
 	static final ImageUInt8 right = new ImageUInt8(width,height);
 
-	static final ImageUInt16 out_U16 = new ImageUInt16(width,height);
+	static final ImageUInt8 outU8 = new ImageUInt8(width,height);
 	static final ImageFloat32 out_F32 = new ImageFloat32(width,height);
 
 	public static class Naive extends PerformerBase {
@@ -61,12 +60,16 @@ public class BenchmarkDisparityAlgs {
 
 	public static class EfficientSad extends PerformerBase {
 
-		DisparityEfficientSadValidR2L_U8_U16 alg =
-				new DisparityEfficientSadValidR2L_U8_U16 (max,radiusX,radiusY,-1);
+//		DisparitySelectRect_S32<ImageUInt8> compDisp =
+//				new SelectRectBasicWta_S32_U8();
+		DisparitySelectRect_S32<ImageUInt8> compDisp =
+				new SelectRectStandard_S32_U8(250,2);
+		DisparityScoreSadRect_U8<ImageUInt8> alg =
+				new DisparityScoreSadRect_U8<ImageUInt8>(max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {
-			alg.process(left,right,out_U16);
+			alg.process(left,right, outU8);
 		}
 	}
 
