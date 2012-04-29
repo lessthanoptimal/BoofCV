@@ -83,7 +83,7 @@ extends VideoProcessAppBase<I,D> {
 	}
 	
 	public void configure( IntrinsicParameters cameraParam )  {
-		PointTransform_F64 removeRadial = LensDistortionOps.removeRadialToNorm(cameraParam,true);
+		PointTransform_F64 removeRadial = LensDistortionOps.removeRadialToNorm(cameraParam);
 
 		WrapMonocularSeparatedMotion<I> w =
 				(WrapMonocularSeparatedMotion<I>)FactoryVisualOdometry.

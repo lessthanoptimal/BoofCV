@@ -53,9 +53,6 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleRemoveLensDistortion {
 
-	// Assume image coordinate are left handed.  This is the most common standard and is almost always true.
-	private static boolean leftHanded = true;
-
 	public static void main( String args[] ) {
 		String calibDir = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess/";
 		String imageDir = "../data/evaluation/structure/";
@@ -70,13 +67,13 @@ public class ExampleRemoveLensDistortion {
 		// compute the transform to remove lens distortion
 		// The inverse transformation (adds distortion) is used when apply adjusting an image.
 		// In other application the forward transformation (removes distortion) is required.
-		PointTransform_F32 tran = LensDistortionOps.radialTransformInv(param, leftHanded);
+		PointTransform_F32 tran = LensDistortionOps.radialTransformInv(param);
 
 		// create new transforms to optimize view area
 		// After distortion the adjusted intrinsic camera parameters should be used.
 		// Since they are not being used in this example null is passed in.
-		PointTransform_F32 fullView = LensDistortionOps.fullView(param, leftHanded, null);
-		PointTransform_F32 allInside = LensDistortionOps.allInside(param, leftHanded, null);
+		PointTransform_F32 fullView = LensDistortionOps.fullView(param, null);
+		PointTransform_F32 allInside = LensDistortionOps.allInside(param, null);
 
 		// Set up image distort
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);

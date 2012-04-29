@@ -181,6 +181,7 @@ public class CalibrateMonoPlanar {
 		errors = computeErrors(observationsAdj, foundZhang,target.points);
 
 		foundIntrinsic = foundZhang.convertToIntrinsic();
+		foundIntrinsic.leftHanded = convertToRightHanded;
 		foundIntrinsic.width = widthImg;
 		foundIntrinsic.height = heightImg;
 

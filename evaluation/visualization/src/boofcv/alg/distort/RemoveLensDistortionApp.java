@@ -18,9 +18,6 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.geo.UtilIntrinsic;
-import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -30,17 +27,12 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.PathLabel;
-import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
-import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -91,11 +83,11 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		});
 
 		// add different types of adjustments
-		PointTransform_F32 tran = LensDistortionOps.radialTransformInv(param, true);
+		PointTransform_F32 tran = LensDistortionOps.radialTransformInv(param);
 		addUndistorted("No Adjustment", tran);
-		PointTransform_F32 allInside = LensDistortionOps.allInside(param, true, null);
+		PointTransform_F32 allInside = LensDistortionOps.allInside(param, null);
 		addUndistorted("All Inside", allInside);
-		PointTransform_F32 fullView = LensDistortionOps.fullView(param, true, null);
+		PointTransform_F32 fullView = LensDistortionOps.fullView(param, null);
 		addUndistorted("Full View", fullView);
 
 		hasProcessed = true;

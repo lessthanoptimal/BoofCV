@@ -160,9 +160,9 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		rectK = rectifyAlg.getCalibrationMatrix();
 
 		// adjust view to maximize viewing area while not including black regions
-		RectifyImageOps.allInsideLeft(calib.left, true, rect1, rect2, rectK);
-		ImageDistort<T> distortRect1 = RectifyImageOps.rectifyImage(calib.left, true, rect1, activeAlg.getInputType());
-		ImageDistort<T> distortRect2 = RectifyImageOps.rectifyImage(calib.right, true, rect2, activeAlg.getInputType());
+		RectifyImageOps.allInsideLeft(calib.left, rect1, rect2, rectK);
+		ImageDistort<T> distortRect1 = RectifyImageOps.rectifyImage(calib.left, rect1, activeAlg.getInputType());
+		ImageDistort<T> distortRect2 = RectifyImageOps.rectifyImage(calib.right, rect2, activeAlg.getInputType());
 
 		// rectify input images too
 		MultiSpectral<T> ms1 = ConvertBufferedImage.convertFromMulti(colorLeft,null,activeAlg.getInputType());

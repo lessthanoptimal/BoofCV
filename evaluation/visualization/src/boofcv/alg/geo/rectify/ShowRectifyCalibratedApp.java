@@ -107,9 +107,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 
 		// add different types of adjustments
 		addRectified("No Adjustment", rect1,rect2);
-		RectifyImageOps.allInsideLeft(param.left, true, rect1, rect2, rectK);
+		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK);
 		addRectified("All Inside", rect1,rect2);
-		RectifyImageOps.fullViewLeft(param.left, true, rect1, rect2, rectK);
+		RectifyImageOps.fullViewLeft(param.left, rect1, rect2, rectK);
 		addRectified("Full View", rect1,rect2);
 
 		hasProcessed = true;
@@ -118,9 +118,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 	private void addRectified( final String name , final DenseMatrix64F rect1 , final DenseMatrix64F rect2 ) {
 		// Will rectify the image
 		ImageDistort<ImageFloat32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), true, rect1, ImageFloat32.class);
+				RectifyImageOps.rectifyImage(param.getLeft(), rect1, ImageFloat32.class);
 		ImageDistort<ImageFloat32> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(),true, rect2,ImageFloat32.class);
+				RectifyImageOps.rectifyImage(param.getRight(), rect2,ImageFloat32.class);
 
 		// Fill the image with all black
 		GeneralizedImageOps.fill(rectLeft,0);
