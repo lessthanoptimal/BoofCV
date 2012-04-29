@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.disparity;
+package boofcv.alg.feature.disparity;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;

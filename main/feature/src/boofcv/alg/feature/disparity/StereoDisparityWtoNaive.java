@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.disparity;
+package boofcv.alg.feature.disparity;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.core.image.GeneralizedImageOps;
@@ -53,7 +53,7 @@ public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
 	 * @param radiusWidth Radius of the region along x-axis.
 	 * @param radiusHeight Radius of the region along y-axis.
 	 */
-	protected StereoDisparityWtoNaive(int maxDisparity, int radiusWidth, int radiusHeight) {
+	public StereoDisparityWtoNaive(int maxDisparity, int radiusWidth, int radiusHeight) {
 		this.score = new double[maxDisparity];
 		this.radiusX = radiusWidth;
 		this.radiusY = radiusHeight;

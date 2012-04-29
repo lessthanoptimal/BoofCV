@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.disparity;
+package boofcv.alg.feature.disparity;
 
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;

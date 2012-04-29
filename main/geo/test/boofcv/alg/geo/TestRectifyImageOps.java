@@ -49,7 +49,7 @@ public class TestRectifyImageOps {
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
 		DenseMatrix64F rect2 = CommonOps.identity(3);
-		DenseMatrix64F rectK = UtilIntrinsic.calibrationMatrix(param);
+		DenseMatrix64F rectK = UtilIntrinsic.calibrationMatrix(param,null);
 
 		RectifyImageOps.fullViewLeft(param,false,rect1,rect2,rectK);
 
@@ -88,7 +88,7 @@ public class TestRectifyImageOps {
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
 		DenseMatrix64F rect2 = CommonOps.identity(3);
-		DenseMatrix64F rectK = UtilIntrinsic.calibrationMatrix(param);
+		DenseMatrix64F rectK = UtilIntrinsic.calibrationMatrix(param,null);
 
 		RectifyImageOps.allInsideLeft(param, false, rect1, rect2, rectK);
 
