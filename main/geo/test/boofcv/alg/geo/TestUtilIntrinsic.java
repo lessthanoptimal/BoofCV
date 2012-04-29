@@ -65,8 +65,8 @@ public class TestUtilIntrinsic {
 		assertEquals(expectedPt.y,foundPt.y,1e-4);
 
 		// check the new intrinsic parameters
-		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(param);
-		DenseMatrix64F Kfound = UtilIntrinsic.calibrationMatrix(paramAdj);
+		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(param,null);
+		DenseMatrix64F Kfound = UtilIntrinsic.calibrationMatrix(paramAdj,null);
 		DenseMatrix64F Kexpected = new DenseMatrix64F(3,3);
 
 		CommonOps.mult(B,K,Kexpected);
@@ -84,7 +84,7 @@ public class TestUtilIntrinsic {
 		assertEquals(expectedPt.y,foundPt.y,1e-4);
 
 		// check the new intrinsic parameters
-		Kfound = UtilIntrinsic.calibrationMatrix(paramAdj);
+		Kfound = UtilIntrinsic.calibrationMatrix(paramAdj,null);
 		CommonOps.invert(B);
 
 		CommonOps.mult(B,K,Kexpected);

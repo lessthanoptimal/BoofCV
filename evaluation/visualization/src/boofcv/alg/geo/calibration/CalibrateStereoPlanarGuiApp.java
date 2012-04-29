@@ -136,8 +136,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		boolean toRight = calibrator.isConvertToRightHanded();
 
 		// calibration matrix for left and right camera
-		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(param.getLeft());
-		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(param.getRight());
+		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(param.getLeft(),null);
+		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(param.getRight(),null);
 
 		RectifyCalibrated rectify = RectifyImageOps.createCalibrated();
 		rectify.process(K1,new Se3_F64(),K2,param.getRightToLeft().invert(null));

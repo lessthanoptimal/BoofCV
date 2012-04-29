@@ -66,7 +66,7 @@ public class UtilIntrinsic {
 														 IntrinsicParameters adjustedParam)
 	{
 		if( adjustedParam != null ) {
-			DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(parameters);
+			DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(parameters,null);
 			DenseMatrix64F K_adj = new DenseMatrix64F(3,3);
 			DenseMatrix64F A;
 			// in the reverse case
@@ -108,10 +108,24 @@ public class UtilIntrinsic {
 	 * Given the intrinsic parameters create a calibration matrix
 	 *
 	 * @param param Intrinsic parameters structure that is to be converted into a matrix
+	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static DenseMatrix64F calibrationMatrix( IntrinsicParameters param ) {
-		return new DenseMatrix64F(3,3,true,param.fx,param.skew,param.cx,0,param.fy,param.cy,0,0,1);
+	public static DenseMatrix64F calibrationMatrix( IntrinsicParameters param , DenseMatrix64F K ) {
+
+		if( K == null ) {
+			K = new DenseMatrix64F(3,3);
+		}
+		CommonOps.set(K, 0);
+
+		K.data[0] = param.fx;
+		K.data[1] = param.skew;
+		K.data[2] = param.cx;
+		K.data[4] = param.fy;
+		K.data[5] = param.cy;
+		K.data[8] = 1;
+
+		return K;
 	}
 
 	/**

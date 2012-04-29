@@ -87,8 +87,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(param.getLeft());
-		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(param.getRight());
+		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(param.getLeft(),null);
+		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(param.getRight(),null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 

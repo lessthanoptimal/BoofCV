@@ -167,6 +167,30 @@ public class VisualizeImageData {
 		}
 	}
 
+	/**
+	 * <p>
+	 * Renders a gray scale image using color values from cold to hot.
+	 * </p>
+	 *
+	 * @param src Input single band image.
+	 * @param dst Where the image is rendered into.  If null a new BufferedImage will be created and return.
+	 * @param normalize Used to normalize the input image.
+	 * @return Rendered image.
+	 */
+	public static BufferedImage grayMagnitudeTemp( ImageSingleBand src, BufferedImage dst, double normalize )
+	{
+		if( normalize < 0 )
+			normalize = GPixelMath.maxAbs(src);
+
+		dst = ConvertBufferedImage.checkInputs(src, dst);
+
+		if( src.getTypeInfo().isInteger() ) {
+			return grayMagnitudeTemp((ImageInteger) src, dst, (int) normalize);
+		} else {
+			throw new RuntimeException("Add support");
+		}
+	}
+
 	private static BufferedImage grayMagnitude( ImageInteger src, BufferedImage dst, int maxValue )
 	{
 		for( int y = 0; y < src.height; y++ ) {
@@ -176,6 +200,38 @@ public class VisualizeImageData {
 				int rgb = 255 *v / maxValue;
 
 				dst.setRGB(x,y,rgb << 16 | rgb << 8 | rgb  );
+			}
+		}
+
+		return dst;
+	}
+
+	private static BufferedImage grayMagnitudeTemp( ImageInteger src, BufferedImage dst, int maxValue )
+	{
+		int halfValue = maxValue/2 + maxValue%2;
+
+		for( int y = 0; y < src.height; y++ ) {
+			for( int x = 0; x < src.width; x++ ) {
+				int v = Math.abs(src.get(x,y));
+
+				int r,b;
+
+				if( v >= halfValue ) {
+					r = 255*(v-halfValue)/halfValue;
+					b = 0;
+				} else {
+					r = 0;
+					b = 255*v/halfValue;
+				}
+
+				if( v == 0 ) {
+					r = b = 0;
+				} else {
+					r = 255*v/maxValue;
+					b = 255*(maxValue-v)/maxValue;
+				}
+
+				dst.setRGB(x,y,r << 16 | b );
 			}
 		}
 
