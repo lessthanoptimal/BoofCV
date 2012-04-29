@@ -133,7 +133,6 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	 * Computes stereo rectification and then passes the distortion along to the gui.
 	 */
 	private void setRectification(StereoParameters param) {
-		boolean toRight = calibrator.isConvertToRightHanded();
 
 		// calibration matrix for left and right camera
 		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(param.getLeft(),null);
@@ -149,9 +148,9 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 		// Rectification distortion for each image
 		final ImageDistort<ImageFloat32> distort1 = RectifyImageOps.rectifyImage(param.getLeft(),
-				toRight,rect1,ImageFloat32.class);
+				rect1,ImageFloat32.class);
 		final ImageDistort<ImageFloat32> distort2 = RectifyImageOps.rectifyImage(param.getRight(),
-				toRight,rect2,ImageFloat32.class);
+				rect2,ImageFloat32.class);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

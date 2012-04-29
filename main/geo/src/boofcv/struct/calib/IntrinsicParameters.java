@@ -47,8 +47,15 @@ import java.io.Serializable;
 // todo Split width+height + isLeftHanded off into its own data structure?
 public class IntrinsicParameters implements Serializable {
 
+	// serialization version
+	public static final long serialVersionUID = 1L;
+
 	// image shape
 	public int width,height;
+
+	// When calibrated was the y-axis adjusted with: y = (height - y - 1)
+	// to change it from a left handed to right handed coordinate system?
+	public boolean leftHanded;
 
 	// focal length along x and y axis
 	public double fx,fy;
@@ -67,7 +74,7 @@ public class IntrinsicParameters implements Serializable {
 							   double skew,
 							   double cx, double cy,
 							   int width, int height,
-							   double[] radial) {
+							   boolean leftHanded, double[] radial) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;
@@ -75,6 +82,7 @@ public class IntrinsicParameters implements Serializable {
 		this.cy = cy;
 		this.width = width;
 		this.height = height;
+		this.leftHanded = leftHanded;
 		this.radial = radial;
 	}
 
@@ -142,8 +150,16 @@ public class IntrinsicParameters implements Serializable {
 		this.height = height;
 	}
 
+	public boolean isLeftHanded() {
+		return leftHanded;
+	}
+
+	public void setLeftHanded(boolean leftHanded) {
+		this.leftHanded = leftHanded;
+	}
+
 	public void print() {
-		System.out.println("Shape "+width+" "+height);
+		System.out.println("Shape "+width+" "+height+" left = "+leftHanded);
 		System.out.printf("center %7.2f %7.2f\n", cx, cy);
 		System.out.println("fx = " + fx);
 		System.out.println("fy = "+fy);

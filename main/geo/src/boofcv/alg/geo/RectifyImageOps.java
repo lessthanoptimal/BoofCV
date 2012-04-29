@@ -48,9 +48,7 @@ public class RectifyImageOps {
 	 *
 	 * <p>
 	 * After the rectification has been found it might still need to be adjusted
-	 * for maximum viewing area.  See {@link #fullViewLeft(boofcv.struct.calib.IntrinsicParameters, boolean, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F)}
-	 * and {@link #allInsideLeft(boofcv.struct.calib.IntrinsicParameters, boolean, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F, org.ejml.data.DenseMatrix64F)}
-	 * for adjusting the rectification.
+	 * for maximum viewing area.  See fullViewLeft and allInsideLeft for adjusting the rectification.
 	 * </p>
 	 *
 	 *
@@ -92,17 +90,15 @@ public class RectifyImageOps {
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera
-	 * @param applyLeftToRight Has the coordinate system been changed from left to right handed.
 	 * @param rectifyLeft Rectification matrix for left image.
 	 * @param rectifyRight Rectification matrix for right image.
 	 * @param rectifyK Rectification calibration matrix.
 	 */
 	public static void fullViewLeft(IntrinsicParameters paramLeft,
-									boolean applyLeftToRight,
 									DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
 									DenseMatrix64F rectifyK)
 	{
-		PointTransform_F32 tranLeft = rectifyTransform(paramLeft, applyLeftToRight, rectifyLeft);
+		PointTransform_F32 tranLeft = rectifyTransform(paramLeft, rectifyLeft);
 
 		Rectangle2D_F32 bound = DistortImageOps.boundBox_F32(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft));
@@ -156,17 +152,15 @@ public class RectifyImageOps {
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera
-	 * @param leftHanded Has the coordinate system been changed from left to right handed.
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
 	public static void allInsideLeft(IntrinsicParameters paramLeft,
-									 boolean leftHanded,
 									 DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
 									 DenseMatrix64F rectifyK)
 	{
-		PointTransform_F32 tranLeft = rectifyTransform(paramLeft, leftHanded, rectifyLeft);
+		PointTransform_F32 tranLeft = rectifyTransform(paramLeft, rectifyLeft);
 
 		Rectangle2D_F32 bound = LensDistortionOps.boundBoxInside(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft));
@@ -261,13 +255,10 @@ public class RectifyImageOps {
 	 * Rectification includes removal of lens distortion.  Used for rendering rectified images.
 	 *
 	 * @param param Intrinsic parameters.
-	 * @param leftHanded Set to true if the image coordinate system was adjusted
-	 *                   to right handed during calibration.
 	 * @param rectify Transform for rectifying the image.
 	 * @return Inverse rectification transform.
 	 */
 	public static PointTransform_F32 rectifyTransformInv(IntrinsicParameters param,
-														 boolean leftHanded ,
 														 DenseMatrix64F rectify )
 	{
 		AddRadialPtoP_F32 radialDistort = new AddRadialPtoP_F32();
@@ -277,7 +268,7 @@ public class RectifyImageOps {
 		CommonOps.invert(rectify,rectifyInv);
 		PointTransformHomography_F32 rectifyDistort = new PointTransformHomography_F32(rectifyInv);
 
-		if( leftHanded ) {
+		if( param.leftHanded ) {
 			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
 			return new SequencePointTransform_F32(l2r,rectifyDistort,radialDistort,l2r);
 		} else {
@@ -289,13 +280,10 @@ public class RectifyImageOps {
 	 * Creates a transform that applies rectification to unrectified distorted pixels.
 	 *
 	 * @param param Intrinsic parameters.
-	 * @param leftHanded Set to true if the image coordinate system was adjusted
-	 *                   to right handed during calibration.
 	 * @param rectify Transform for rectifying the image.
 	 * @return
 	 */
 	public static PointTransform_F32 rectifyTransform(IntrinsicParameters param,
-													  boolean leftHanded ,
 													  DenseMatrix64F rectify )
 	{
 		RemoveRadialPtoP_F32 radialDistort = new RemoveRadialPtoP_F32();
@@ -303,7 +291,7 @@ public class RectifyImageOps {
 
 		PointTransformHomography_F32 rectifyDistort = new PointTransformHomography_F32(rectify);
 
-		if( leftHanded ) {
+		if( param.leftHanded ) {
 			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
 			return new SequencePointTransform_F32(l2r,radialDistort,rectifyDistort,l2r);
 		} else {
@@ -340,15 +328,12 @@ public class RectifyImageOps {
 	 * rectification matrix.
 	 *
 	 * @param param Intrinsic parameters.
-	 * @param leftHanded Set to true if the image coordinate system was adjusted
-	 *                   to right handed during calibration.
 	 * @param rectify Transform for rectifying the image.
 	 * @param imageType Type of single band image the transform is to be applied to.
 	 * @return ImageDistort for rectifying the image.
 	 */
 	public static <T extends ImageSingleBand> ImageDistort<T>
 	rectifyImage(IntrinsicParameters param,
-				 boolean leftHanded ,
 				 DenseMatrix64F rectify , Class<T> imageType)
 	{
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
@@ -356,7 +341,7 @@ public class RectifyImageOps {
 		// only compute the transform once
 		ImageDistort<T> ret = FactoryDistort.distortCached(interp,null,imageType);
 
-		PointTransform_F32 transform = rectifyTransformInv(param, leftHanded , rectify);
+		PointTransform_F32 transform = rectifyTransformInv(param , rectify);
 
 		ret.setModel(new PointToPixelTransform_F32(transform));
 

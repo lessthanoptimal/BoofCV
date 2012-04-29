@@ -42,7 +42,7 @@ public class TestUtilIntrinsic {
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,1,2,3,10,4,8,2,4,9);
 		DenseMatrix64F B = new DenseMatrix64F(3,3,true,2,0,1,0,3,2,0,0,1);
 
-		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300,null);
+		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300, true, null);
 		IntrinsicParameters paramAdj = new IntrinsicParameters();
 
 		PointTransformHomography_F32 firstTran = new PointTransformHomography_F32(A);
@@ -113,7 +113,7 @@ public class TestUtilIntrinsic {
 		double cy = 5;
 
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,fx,skew,cx,0,fy,cy,0,0,1);
-		IntrinsicParameters ret = UtilIntrinsic.matrixToParam(K, 100, 200, null);
+		IntrinsicParameters ret = UtilIntrinsic.matrixToParam(K, 100, 200, true, null);
 
 		assertTrue(ret.fx == fx);
 		assertTrue(ret.fy == fy);
@@ -122,5 +122,6 @@ public class TestUtilIntrinsic {
 		assertTrue(ret.cy == cy);
 		assertTrue(ret.width == 100);
 		assertTrue(ret.height == 200);
+		assertTrue(ret.leftHanded);
 	}
 }

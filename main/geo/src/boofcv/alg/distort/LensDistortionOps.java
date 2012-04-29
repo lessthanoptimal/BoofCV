@@ -47,13 +47,10 @@ public class LensDistortionOps {
 	 * the "virtual" camera that is associated with the returned transformed.
 	 *
 	 * @param param Intrinsic camera parameters.
-	 * @param applyLeftToRight True if the intrinsic parameters were computed by adjusting the image coordinate system
-	 *                         to be right handed.
 	 * @param paramAdj If not null, the new camera parameters are stored here.
 	 * @return New transform that adjusts the view and removes lens distortion..
 	 */
 	public static PointTransform_F32 fullView( IntrinsicParameters param,
-											   boolean applyLeftToRight ,
 											   IntrinsicParameters paramAdj ) {
 
 		RemoveRadialPtoP_F32 removeDistort = new RemoveRadialPtoP_F32();
@@ -78,7 +75,7 @@ public class LensDistortionOps {
 
 		PointTransform_F32 tranAdj = UtilIntrinsic.adjustIntrinsic_F32(addDistort, false, param, A, paramAdj);
 
-		if( applyLeftToRight) {
+		if( param.leftHanded ) {
 			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
 			return new SequencePointTransform_F32(l2r,tranAdj,l2r);
 		} else
@@ -90,13 +87,10 @@ public class LensDistortionOps {
 	 * view area. In other words no black regions which can cause problems for some image processing algorithms.
 	 *
 	 * @param param Intrinsic camera parameters.
-	 * @param applyLeftToRight True if the intrinsic parameters were computed by adjusting the image coordinate system
-	 *                         to be right handed.
 	 * @param paramAdj If not null, the new camera parameters are stored here.
 	 * @return New transform that adjusts the view and removes lens distortion..
 	 */
 	public static PointTransform_F32 allInside( IntrinsicParameters param,
-												boolean applyLeftToRight ,
 												IntrinsicParameters paramAdj ) {
 		RemoveRadialPtoP_F32 removeDistort = new RemoveRadialPtoP_F32();
 		AddRadialPtoP_F32 addDistort = new AddRadialPtoP_F32();
@@ -120,7 +114,7 @@ public class LensDistortionOps {
 
 		PointTransform_F32 tranAdj = UtilIntrinsic.adjustIntrinsic_F32(addDistort, false, param, A, paramAdj);
 
-		if( applyLeftToRight) {
+		if( param.leftHanded) {
 			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
 			return new SequencePointTransform_F32(l2r,tranAdj,l2r);
 		} else
@@ -131,17 +125,14 @@ public class LensDistortionOps {
 	 * Removes radial distortion from the image and converts it into normalized image coordinates
 	 *
 	 * @param param Intrinsic camera parameters
-	 * @param applyLeftToRight Set to true if the image coordinate system was adjusted
-	 *                         to right handed during calibration
 	 * @return Distorted pixel to normalized image coordinates
 	 */
-	public static PointTransform_F64 removeRadialToNorm( IntrinsicParameters param,
-														 boolean applyLeftToRight )
+	public static PointTransform_F64 removeRadialToNorm( IntrinsicParameters param )
 	{
 		RemoveRadialPtoN_F64 radialDistort = new RemoveRadialPtoN_F64();
 		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
 
-		if( applyLeftToRight ) {
+		if( param.leftHanded ) {
 			return new LeftToRightHandedNorm_F64(radialDistort,param.height);
 		} else {
 			return radialDistort;
@@ -153,17 +144,14 @@ public class LensDistortionOps {
 	 * TODO MAKE IT MATCH
 	 *
 	 * @param param Intrinsic camera parameters
-	 * @param applyLeftToRight Set to true if the image coordinate system was adjusted
-	 *                         to right handed during calibration.
 	 * @return Transform from undistorted to distorted image.
 	 */
-	public static PointTransform_F32 radialTransform_F32(IntrinsicParameters param,
-														 boolean applyLeftToRight )
+	public static PointTransform_F32 radialTransform_F32(IntrinsicParameters param )
 	{
 		RemoveRadialPtoP_F32 radialDistort = new RemoveRadialPtoP_F32();
 		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
 
-		if( applyLeftToRight ) {
+		if( param.leftHanded ) {
 			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
 			return new SequencePointTransform_F32(l2r,radialDistort,l2r);
 		} else {
@@ -176,17 +164,14 @@ public class LensDistortionOps {
 	 * Transform from undistorted image to an image with radial distortion.
 	 *
 	 * @param param Intrinsic camera parameters
-	 * @param applyLeftToRight Set to true if the image coordinate system was adjusted
-	 *                         to right handed during calibration.
 	 * @return Transform from undistorted to distorted image.
 	 */
-	public static PointTransform_F32 radialTransformInv(IntrinsicParameters param,
-														boolean applyLeftToRight )
+	public static PointTransform_F32 radialTransformInv(IntrinsicParameters param )
 	{
 		AddRadialPtoP_F32 radialDistort = new AddRadialPtoP_F32();
 		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
 
-		if( applyLeftToRight ) {
+		if( param.leftHanded ) {
 			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
 			return new SequencePointTransform_F32(l2r,radialDistort,l2r);
 		} else {
@@ -198,14 +183,11 @@ public class LensDistortionOps {
 	 * Creates an {@Link ImageDistort} which removes radial distortion.
 	 *
 	 * @param param Intrinsic camera parameters
-	 * @param applyLeftToRight Set to true if the image coordinate system was adjusted
-	 *                         to right handed during calibration.
 	 * @param imageType Type of single band image being processed
 	 * @return Image distort that removes radial distortion
 	 */
 	public static <T extends ImageSingleBand> ImageDistort<T>
 	removeRadialImage(IntrinsicParameters param,
-					  boolean applyLeftToRight ,
 					  Class<T> imageType)
 	{
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
@@ -214,7 +196,7 @@ public class LensDistortionOps {
 		// only compute the transform once
 		ImageDistort<T> ret = FactoryDistort.distortCached(interp, border, imageType);
 
-		PointTransform_F32 transform = radialTransformInv(param, applyLeftToRight );
+		PointTransform_F32 transform = radialTransformInv( param );
 
 		ret.setModel(new PointToPixelTransform_F32(transform));
 

@@ -62,10 +62,6 @@ public class ExampleRectifyCalibratedStereo {
 
 		StereoParameters param = BoofMiscOps.loadXML(dir+"stereo.xml");
 
-		// Image coordinate are left handed.  This is the most common standard
-		// and is almost always true.
-		boolean leftHanded = true;
-
 		// load images
 		BufferedImage origLeft = UtilImageIO.loadImage(dir+"left05.jpg");
 		BufferedImage origRight = UtilImageIO.loadImage(dir+"right05.jpg");
@@ -98,14 +94,14 @@ public class ExampleRectifyCalibratedStereo {
 		DenseMatrix64F rectK = rectifyAlg.getCalibrationMatrix();
 
 		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.fullViewLeft(param.left, leftHanded, rect1, rect2, rectK);
+		RectifyImageOps.fullViewLeft(param.left, rect1, rect2, rectK);
 //		RectifyImageOps.allInsideLeft(param.left, leftHanded, rect1, rect2, rectK);
 
 		// undistorted and rectify images
 		ImageDistort<ImageFloat32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), leftHanded, rect1, ImageFloat32.class);
+				RectifyImageOps.rectifyImage(param.getLeft(), rect1, ImageFloat32.class);
 		ImageDistort<ImageFloat32> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(),leftHanded, rect2,ImageFloat32.class);
+				RectifyImageOps.rectifyImage(param.getRight(), rect2, ImageFloat32.class);
 
 		DistortImageOps.distortMS(distLeft, rectLeft, imageDistortLeft);
 		DistortImageOps.distortMS(distRight, rectRight, imageDistortRight);

@@ -30,6 +30,10 @@ import java.io.Serializable;
  * @author Peter Abeles
  */
 public class StereoParameters implements Serializable {
+
+	// serialization version
+	public static final long serialVersionUID = 1L;
+
 	// intrinsic camera parameters of left camera
 	public IntrinsicParameters left;
 	// intrinsic camera parameters of right camera
