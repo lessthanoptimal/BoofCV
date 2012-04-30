@@ -39,6 +39,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JComboBox viewSelector;
 
 	JSpinner disparitySpinner;
+	JSpinner radiusSpinner;
 	JSpinner errorSpinner;
 	JSpinner reverseSpinner;
 
@@ -48,9 +49,11 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	// maximum disparity to calculate
 	int maxDisparity = 100;
 	// maximum allowed per pixel error
-	int pixelError = 20;
+	int pixelError = 30;
 	// reverse association tolerance
-	int reverseTol = 2;
+	int reverseTol = 6;
+	// how large the region radius is
+	int regionRadius = 3;
 
 	// listener for changes in states
 	Listener listener;
@@ -67,19 +70,24 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		disparitySpinner.addChangeListener(this);
 		disparitySpinner.setMaximumSize(disparitySpinner.getPreferredSize());
 
-		errorSpinner = new JSpinner(new SpinnerNumberModel(pixelError,-1, 50, 5));
+		radiusSpinner = new JSpinner(new SpinnerNumberModel(regionRadius,1, 30, 1));
+		radiusSpinner.addChangeListener(this);
+		radiusSpinner.setMaximumSize(radiusSpinner.getPreferredSize());
+
+		errorSpinner = new JSpinner(new SpinnerNumberModel(pixelError,-1, 80, 5));
 		errorSpinner.addChangeListener(this);
 		errorSpinner.setMaximumSize(errorSpinner.getPreferredSize());
 
-		reverseSpinner = new JSpinner(new SpinnerNumberModel(reverseTol,-1, 20, 1));
+		reverseSpinner = new JSpinner(new SpinnerNumberModel(reverseTol,-1, 50, 1));
 		reverseSpinner.addChangeListener(this);
 		reverseSpinner.setMaximumSize(reverseSpinner.getPreferredSize());
 
 		addLabeled(viewSelector,"View ",this);
 		addSeparator(100);
 		addLabeled(disparitySpinner, "Max Disparity", this);
-		addLabeled(errorSpinner, "Max Error", this);
-		addLabeled(reverseSpinner, "Reverse", this);
+		addLabeled(radiusSpinner,    "Region Radius", this);
+		addLabeled(errorSpinner,     "Max Error", this);
+		addLabeled(reverseSpinner,   "Reverse", this);
 	}
 
 	@Override
@@ -93,6 +101,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			maxDisparity = ((Number) disparitySpinner.getValue()).intValue();
 		} else if( e.getSource() == errorSpinner) {
 			pixelError = ((Number) errorSpinner.getValue()).intValue();
+		} else if( e.getSource() == radiusSpinner) {
+			regionRadius = ((Number) radiusSpinner.getValue()).intValue();
 		}
 		listener.disparitySettingChange();
 	}
@@ -106,6 +116,11 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			selectedView = viewSelector.getSelectedIndex();
 			listener.disparityGuiChange();
 		}
+	}
+
+	public void setActiveGui( boolean error , boolean reverse ) {
+		setEnabled(6,error);
+		setEnabled(7,reverse);
 	}
 
 	public void setListener(Listener listener ) {
@@ -127,6 +142,10 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 	public int getSelectedView() {
 		return selectedView;
+	}
+
+	public int getRegionRadius() {
+		return regionRadius;
 	}
 
 	public static interface Listener

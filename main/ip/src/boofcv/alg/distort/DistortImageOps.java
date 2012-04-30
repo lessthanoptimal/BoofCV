@@ -26,6 +26,7 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle_F32;
 import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
@@ -105,6 +106,29 @@ public class DistortImageOps {
 		distorter.setModel(transform);
 
 		distortMS(input,output,distorter);
+	}
+
+	/**
+	 * Easy way to create {@link ImageDistort} given {@link PixelTransform_F32}.  To improve
+	 * performance the distortion is automatically cached.
+	 *
+	 * @see FactoryDistort
+	 * @see FactoryInterpolation
+	 *
+	 * @param transform Image transform.
+	 * @param interpType Which interpolation. Try bilinear.
+	 * @param imageType Image of single band image it will process.
+	 * @return The {@link ImageDistort}
+	 */
+	public static <T extends ImageSingleBand>
+	ImageDistort<T> createImageDistort( PointTransform_F32 transform ,
+										TypeInterpolate interpType,
+										Class<T> imageType ) {
+		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, imageType);
+		ImageDistort<T> distorter = FactoryDistort.distortCached(interp, FactoryImageBorder.value(imageType, 0), imageType);
+		distorter.setModel(new PointToPixelTransform_F32(transform));
+
+		return distorter;
 	}
 
 	/**

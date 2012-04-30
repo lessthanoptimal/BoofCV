@@ -7,8 +7,21 @@ Date    :
 Version : Alpha 0.8
 
 - Added processing monitor to CalibrateStereoPlanarGuiApp
-- Fixed bug in calibration where Rodrigues coordinates were being parameterized incorrectly
+- Fixed bug in Zhang99 calibration where Rodrigues coordinates were being parameterized incorrectly
   * Calibration results would be less accurate, but have a lower residual due to the increased degree of freedom
+- Added analytic Jacobian to Zhang99
+  * Decided not to use it since it produces same estimation parameters as numerical.
+- Dense Stereo Disparity Image
+  * Rectangular region winner take all
+    - Validation: right to left, max error
+- IntrinsicParameters
+  * Added leftHanded to parameter list since it is vital information for many
+    calculations.
+- RectifyImageOps
+  * Fixed bug in functions that adjusted the rectification for viewing.
+    If left handed the coordinate systems got messed up
+- Changed allInside() so that the annoying single pixel black region is gone
+  * RectifyImageOps and LensDistortOps
 
 ---------------------------------------------
 Date    : 2012/04/22

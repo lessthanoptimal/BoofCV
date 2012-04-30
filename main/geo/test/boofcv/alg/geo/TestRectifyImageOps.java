@@ -44,7 +44,14 @@ public class TestRectifyImageOps {
 	@Test
 	public void fullViewLeft_calibrated() {
 
-		IntrinsicParameters param = new IntrinsicParameters(300,320,0,150,130,width,height, false, new double[]{0.1,1e-4});
+		fullViewLeft_calibrated(false);
+		fullViewLeft_calibrated(true);
+	}
+
+	public void fullViewLeft_calibrated( boolean leftHanded ) {
+
+		IntrinsicParameters param =
+				new IntrinsicParameters(300,320,0,150,130,width,height, leftHanded, new double[]{0.1,1e-4});
 
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
@@ -83,7 +90,13 @@ public class TestRectifyImageOps {
 
 	@Test
 	public void allInsideLeft_calibrated() {
-		IntrinsicParameters param = new IntrinsicParameters(300,320,0,150,130,width,height, false, new double[]{0.1,1e-4});
+		allInsideLeft_calibrated(false);
+		allInsideLeft_calibrated(true);
+	}
+
+	public void allInsideLeft_calibrated( boolean leftHanded ) {
+		IntrinsicParameters param =
+				new IntrinsicParameters(300,320,0,150,130,width,height, leftHanded, new double[]{0.1,1e-4});
 
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);

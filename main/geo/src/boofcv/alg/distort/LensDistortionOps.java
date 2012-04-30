@@ -100,6 +100,9 @@ public class LensDistortionOps {
 		Rectangle2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
 				new PointToPixelTransform_F32(removeDistort));
 
+		// ensure there are no strips of black
+		LensDistortionOps.roundInside(bound);
+
 		double scaleX = bound.width/param.width;
 		double scaleY = bound.height/param.height;
 
@@ -246,5 +249,21 @@ public class LensDistortionOps {
 		}
 
 		return new Rectangle2D_F32(x0,y0,x1-x0,y1-y0);
+	}
+
+	/**
+	 * Adjust bound to ensure the entire image is contained inside, otherwise there might be
+	 * single pixel wide black regions
+	 */
+	public static void roundInside( Rectangle2D_F32 bound ) {
+		float x0 = (float)Math.ceil(bound.tl_x);
+		float y0 = (float)Math.ceil(bound.tl_y);
+		float x1 = (float)Math.floor(bound.tl_x+bound.width);
+		float y1 = (float)Math.floor(bound.tl_y+bound.height);
+
+		bound.tl_x = x0;
+		bound.tl_y = y0;
+		bound.width = x1-x0;
+		bound.height = y1-y0;
 	}
 }

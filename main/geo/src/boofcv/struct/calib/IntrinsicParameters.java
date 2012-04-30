@@ -86,6 +86,13 @@ public class IntrinsicParameters implements Serializable {
 		this.radial = radial;
 	}
 
+	public IntrinsicParameters( IntrinsicParameters param ) {
+		this(param.fx,param.fy,param.skew,param.cx,param.cy,param.width,param.height,param.leftHanded,null);
+
+		if( param.radial != null )
+			radial = param.radial.clone();
+	}
+
 	public double getCx() {
 		return cx;
 	}

@@ -69,4 +69,15 @@ public class StandardAlgConfigPanel extends JPanel {
 		owner.add(p);
 	}
 
+	protected void setEnabled( int index , boolean enabled ) {
+		Component c = getComponent(index);
+		if( c instanceof JPanel ) {
+			JPanel p = (JPanel)c;
+			p.getComponent(0).setEnabled(enabled);
+			p.getComponent(2).setEnabled(enabled);
+		} else if( c instanceof JLabel ) {
+			c.setEnabled(enabled);
+		}
+	}
+
 }

@@ -77,7 +77,7 @@ public class DefaultMediaManager implements MediaManager {
 			try {
 				VideoMjpegCodec codec = new VideoMjpegCodec();
 				List<byte[]> data = codec.read(new FileInputStream(fileName));
-				return new JpegByteImageSequence<T>(type,data,true);
+				return new JpegByteImageSequence<T>(type,data,false);
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
