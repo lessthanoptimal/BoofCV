@@ -19,7 +19,6 @@
 package boofcv.io.image;
 
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
 
@@ -63,6 +62,13 @@ public interface SimpleImageSequence<T extends ImageBase> {
 	 * @return Frame ID number.
 	 */
 	public int getFrameNumber();
+
+	/**
+	 * Sets if the video should loop or not
+	 *
+	 * @param loop true for looping forever, false for once
+	 */
+	public void setLoop( boolean loop );
 
 	/**
 	 * Returns the type of class used to store the output image

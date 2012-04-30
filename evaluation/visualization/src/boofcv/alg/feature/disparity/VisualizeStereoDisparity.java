@@ -81,9 +81,10 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	public VisualizeStereoDisparity() {
 		super(1);
 
-
-		addAlgorithm(0,"WTA",0);
-		addAlgorithm(0,"WTA Denoised",1);
+		selectedAlg = 0;
+		activeAlg = createAlg();
+		addAlgorithm(0,"WTA Denoised",0);
+		addAlgorithm(0,"WTA",1);
 
 		control.setListener(this);
 
@@ -99,11 +100,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		if( !rectifiedImages )
 			return;
 
-		System.out.println("before process");
-		activeAlg.process(rectLeft,rectRight, disparity);
-		System.out.println("after process");
-
-		// todo render color disparity
+		activeAlg.process(rectLeft, rectRight, disparity);
 		disparityOut = VisualizeImageData.grayMagnitudeTemp(disparity,null,activeAlg.getMaxDisparity());
 
 		changeImageView();
@@ -147,6 +144,42 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		process();
 	}
 
+	@Override
+	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+		int s = ((Number)cookie).intValue();
+		if( s != selectedAlg ) {
+			selectedAlg = s;
+			activeAlg = createAlg();
+
+			doRefreshAll();
+		}
+	}
+
+	@Override
+	public synchronized void changeInput(String name, int index) {
+		colorLeft = media.openImage(inputRefs.get(index).getPath(0) );
+		colorRight = media.openImage(inputRefs.get(index).getPath(1) );
+
+		int w = colorLeft.getWidth();
+		int h = colorLeft.getHeight();
+
+		inputLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
+		inputRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
+		rectLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
+		rectRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
+		disparity = GeneralizedImageOps.createSingleBand(activeAlg.getDisparityType(),w,h);
+
+		ConvertBufferedImage.convertFrom(colorLeft,inputLeft);
+		ConvertBufferedImage.convertFrom(colorRight,inputRight);
+
+		rectifyInputImages();
+
+		doRefreshAll();
+	}
+
+	/**
+	 * Removes distortion and rectifies images.
+	 */
 	private void rectifyInputImages() {
 		// get intrinsic camera calibration matrices
 		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(calib.left, null);
@@ -185,38 +218,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		selectedAlg = ((Number)cookie).intValue();
-		activeAlg = createAlg();
-
-		doRefreshAll();
-	}
-
-	@Override
-	public synchronized void changeInput(String name, int index) {
-		colorLeft = media.openImage(inputRefs.get(index).getPath(0) );
-		colorRight = media.openImage(inputRefs.get(index).getPath(1) );
-
-		int w = colorLeft.getWidth();
-		int h = colorLeft.getHeight();
-
-		inputLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		inputRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		rectLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		rectRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		disparity = GeneralizedImageOps.createSingleBand(activeAlg.getDisparityType(),w,h);
-
-		ConvertBufferedImage.convertFrom(colorLeft,inputLeft);
-		ConvertBufferedImage.convertFrom(colorRight,inputRight);
-
-		rectifyInputImages();
-
-		doRefreshAll();
-	}
-
-	@Override
 	public void loadConfigurationFile(String fileName) {
-		//To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override
@@ -241,18 +243,34 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 	public StereoDisparity<T,D> createAlg() {
 
+		int r = control.regionRadius;
+
 		switch( selectedAlg ) {
 			case 0:
+				changeGuiActive(true,true);
 				return (StereoDisparity)FactoryStereoDisparity.rectWinnerTakeAll(
-						control.maxDisparity,3,3,-1,-1);
+						control.maxDisparity,r,r,control.pixelError,control.reverseTol);
 
 			case 1:
+				changeGuiActive(false,false);
 				return (StereoDisparity)FactoryStereoDisparity.rectWinnerTakeAll(
-						control.maxDisparity,3,3,control.pixelError,control.reverseTol);
+						control.maxDisparity,r,r,-1,-1);
 
 			default:
 				throw new RuntimeException("Unknown selection");
 		}
+
+	}
+
+	/**
+	 * Active and deactivates different GUI configurations
+	 */
+	private void changeGuiActive( final boolean error , final boolean reverse ) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				control.setActiveGui(error,reverse);
+			}
+		});
 	}
 
 	public static void main( String args[] ) {
@@ -265,9 +283,13 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		StereoParameters calib = BoofMiscOps.loadXML(dirCalib+"stereo.xml");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Calibration",dirCalib+"left02.jpg",dirCalib+"right02.jpg"));
-		inputs.add(new PathLabel("Room 1",dirImgs+"left01.jpg",dirImgs+"right01.jpg"));
-		inputs.add(new PathLabel("room 2",dirImgs+"left02.jpg",dirImgs+"right02.jpg"));
+		inputs.add(new PathLabel("Chair 1",dirImgs+"chair01_left.jpg",dirImgs+"chair01_right.jpg"));
+		inputs.add(new PathLabel("Chair 2",dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
+		inputs.add(new PathLabel("Chair 3",dirImgs+"chair03_left.jpg",dirImgs+"chair03_right.jpg"));
+		inputs.add(new PathLabel("Chair 4",dirImgs+"chair04_left.jpg",dirImgs+"chair04_right.jpg"));
+		inputs.add(new PathLabel("Stones 1",dirImgs+"stones01_left.jpg",dirImgs+"stones01_right.jpg"));
+		inputs.add(new PathLabel("Thing 1",dirImgs+"thing01_left.jpg",dirImgs+"thing01_right.jpg"));
+		inputs.add(new PathLabel("Wall 1",dirImgs+"wall01_left.jpg",dirImgs+"wall01_right.jpg"));
 
 		app.setCalib(calib);
 		app.setInputList(inputs);

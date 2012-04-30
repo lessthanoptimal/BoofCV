@@ -98,6 +98,10 @@ public class RectifyImageOps {
 									DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
 									DenseMatrix64F rectifyK)
 	{
+		// need to take in account the order in which image distort will remove rectification later on
+		paramLeft = new IntrinsicParameters(paramLeft);
+		paramLeft.leftHanded = false;
+
 		PointTransform_F32 tranLeft = rectifyTransform(paramLeft, rectifyLeft);
 
 		Rectangle2D_F32 bound = DistortImageOps.boundBox_F32(paramLeft.width, paramLeft.height,
@@ -160,10 +164,16 @@ public class RectifyImageOps {
 									 DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
 									 DenseMatrix64F rectifyK)
 	{
+		// need to take in account the order in which image distort will remove rectification later on
+		paramLeft = new IntrinsicParameters(paramLeft);
+		paramLeft.leftHanded = false;
+
 		PointTransform_F32 tranLeft = rectifyTransform(paramLeft, rectifyLeft);
 
 		Rectangle2D_F32 bound = LensDistortionOps.boundBoxInside(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft));
+
+		LensDistortionOps.roundInside(bound);
 
 		double scaleX = paramLeft.width/(double)bound.width;
 		double scaleY = paramLeft.height/(double)bound.height;

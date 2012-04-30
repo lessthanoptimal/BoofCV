@@ -98,6 +98,11 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 	}
 
 	@Override
+	public void setLoop(boolean loop) {
+		this.loop = loop;
+	}
+
+	@Override
 	public BufferedImage getGuiImage() {
 		return imageGUI;
 	}

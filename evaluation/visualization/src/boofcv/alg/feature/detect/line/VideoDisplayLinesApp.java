@@ -78,6 +78,7 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 	public void process( SimpleImageSequence<I> sequence ) {
 		stopWorker();
 		this.sequence = sequence;
+		sequence.setLoop(true);
 		doRefreshAll();
 	}
 
@@ -148,7 +149,7 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 		VideoDisplayLinesApp app = new VideoDisplayLinesApp(ImageFloat32.class, ImageFloat32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Appartment", "../data/applet/lines_indoors.mjpeg"));
+		inputs.add(new PathLabel("Apartment", "../data/applet/lines_indoors.mjpeg"));
 
 		app.setInputList(inputs);
 
