@@ -62,8 +62,8 @@ public class BenchmarkDisparityAlgs {
 
 //		DisparitySelectRect_S32<ImageUInt8> compDisp =
 //				new SelectRectBasicWta_S32_U8();
-		DisparitySelectRect_S32<ImageUInt8> compDisp =
-				new SelectRectStandard_S32_U8(250,2);
+		DisparitySelect_S32<ImageUInt8> compDisp =
+				new SelectRectStandard_S32_U8(250,2,0.1);
 		DisparityScoreSadRect_U8<ImageUInt8> alg =
 				new DisparityScoreSadRect_U8<ImageUInt8>(max,radiusX,radiusY,compDisp);
 

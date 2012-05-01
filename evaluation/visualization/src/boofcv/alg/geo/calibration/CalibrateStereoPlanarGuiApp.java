@@ -18,15 +18,16 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.abst.calib.PlanarCalibrationDetector;
+import boofcv.abst.calib.WrapPlanarChessTarget;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.app.CalibrateStereoPlanar;
 import boofcv.app.ParseStereoCalibrationConfig;
-import boofcv.app.PlanarCalibrationDetector;
-import boofcv.app.WrapPlanarChessTarget;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;

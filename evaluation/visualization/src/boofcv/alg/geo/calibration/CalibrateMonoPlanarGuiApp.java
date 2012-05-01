@@ -18,13 +18,13 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.app.CalibrateMonoPlanar;
 import boofcv.app.ParseMonoCalibrationConfig;
-import boofcv.app.PlanarCalibrationDetector;
-import boofcv.app.WrapPlanarGridTarget;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
@@ -193,11 +193,11 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(8,8);
-//		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(3,4);
-//		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(3,4,6);
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(8,8);
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4);
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3,4,6);
 
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8,8,0.5,7.0/18.0);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 0.5, 7.0 / 18.0);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 

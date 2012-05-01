@@ -44,14 +44,14 @@ import boofcv.struct.image.ImageUInt8;
  * when writing.  Performance boost is about 20%-30% depending on max disparity and image size.
  * </p>
  *
- * @see DisparitySelectRect_S32
+ * @see DisparitySelect_S32
  *
  * @author Peter Abeles
  */
 public class DisparityScoreSadRect_U8 <Disparity extends ImageSingleBand> {
 
 	// Computes disparity from scores
-	DisparitySelectRect_S32<Disparity> computeDisparity;
+	DisparitySelect_S32<Disparity> computeDisparity;
 
 	// maximum allowed image disparity
 	int maxDisparity;
@@ -85,7 +85,7 @@ public class DisparityScoreSadRect_U8 <Disparity extends ImageSingleBand> {
 	 */
 	public DisparityScoreSadRect_U8(int maxDisparity,
 									int regionRadiusX, int regionRadiusY,
-									DisparitySelectRect_S32<Disparity> computeDisparity ) {
+									DisparitySelect_S32<Disparity> computeDisparity ) {
 		if( maxDisparity <= 0 )
 			throw new IllegalArgumentException("Max disparity must be greater than zero");
 
@@ -119,7 +119,7 @@ public class DisparityScoreSadRect_U8 <Disparity extends ImageSingleBand> {
 		computeDisparity.configure(disparity,maxDisparity,radiusX);
 
 		// initialize computation
-		computeFirstRow(left, right, disparity);
+		computeFirstRow(left, right);
 		// efficiently compute rest of the rows using previous results to avoid repeat computations
 		computeRemainingRows(left, right, disparity);
 	}
@@ -128,7 +128,7 @@ public class DisparityScoreSadRect_U8 <Disparity extends ImageSingleBand> {
 	 * Initializes disparity calculation by finding the scores for the initial block of horizontal
 	 * rows.
 	 */
-	private void computeFirstRow(ImageUInt8 left, ImageUInt8 right , Disparity disparity ) {
+	private void computeFirstRow(ImageUInt8 left, ImageUInt8 right ) {
 		// compute horizontal scores for first row block
 		for( int row = 0; row < regionHeight; row++ ) {
 
@@ -201,7 +201,7 @@ public class DisparityScoreSadRect_U8 <Disparity extends ImageSingleBand> {
 			int indexRight =  right.startIndex + right.stride*row;
 
 			// Fill elementScore with all the scores for this row at disparity d
-			compoteScoreRow(left, right, elementMax, indexLeft, indexRight);
+			computeScoreRow(left, right, elementMax, indexLeft, indexRight);
 
 			// score at the first column
 			int score = 0;
@@ -222,10 +222,10 @@ public class DisparityScoreSadRect_U8 <Disparity extends ImageSingleBand> {
 	 * encourage the JVM to optimize this section of code.
 	 *
 	 * Was original inline, but was actually slightly slower by about 3% consistently,  It
-	 * is in its own function so that it can be overiden and have different cost functions
+	 * is in its own function so that it can be overridden and have different cost functions
 	 * inserted easily.
 	 */
-	protected void compoteScoreRow(ImageUInt8 left, ImageUInt8 right,
+	protected void computeScoreRow(ImageUInt8 left, ImageUInt8 right,
 								   int elementMax, int indexLeft, int indexRight)
 	{
 		for( int rCol = 0; rCol < elementMax; rCol++ ) {

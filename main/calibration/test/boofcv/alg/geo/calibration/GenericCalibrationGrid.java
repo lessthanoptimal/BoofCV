@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
@@ -38,7 +39,7 @@ import java.util.Random;
 public class GenericCalibrationGrid {
 
 	public static PlanarCalibrationTarget createStandardConfig() {
-		return FactoryPlanarCalibrationTarget.gridSquare(4,5,30,30);
+		return FactoryPlanarCalibrationTarget.gridSquare(4, 5, 30, 30);
 	}
 
 	public static DenseMatrix64F createStandardCalibration() {

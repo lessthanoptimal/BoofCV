@@ -21,30 +21,36 @@ package boofcv.abst.feature.disparity;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Given two rectified image compute corresponding dense disparity image.  Input images are assumed
- * to be rectified (epipoles are at infinity) along the x-axis, with the left image being to the
- * left (minus x-axis) of the right image.  A disparity of zero indicates no difference between
- * the two pixels or no corresponding match could be found.  Disparity goes from let to right image.
+ * Computes the disparity between two rectified images at specified points only.
  *
  * @author Peter Abeles
  */
-public interface StereoDisparity<Image extends ImageSingleBand, Disparity extends ImageSingleBand> {
+public interface StereoDisparitySparse<Image extends ImageSingleBand> {
 
 	/**
-	 * Computes stereo disparity.
+	 * Sets the input images that are to be processed.
 	 *
 	 * @param imageLeft Input left rectified image.
 	 * @param imageRight Input right rectified image.
-	 * @param output Output disparity from left to right image.
 	 */
-	public void process( Image imageLeft , Image imageRight , Disparity output );
+	public void setImages( Image imageLeft , Image imageRight );
 
 	/**
-	 * The maximum disparity which will be checked for.
+	 * Calculates the disparity at the specified point.  Returns true if a valid
+	 * correspondence was found between the two images.
 	 *
-	 * @return Maximum disparity.
+	 * @param x center of region x-axis
+	 * @param y center of region y-axis
+	 * @return true if a correspondence was found
 	 */
-	public int getMaxDisparity();
+	public boolean process( int x  , int y );
+
+	/**
+	 * The found disparity at the selected point
+	 *
+	 * @return disparity.
+	 */
+	public double getDisparity();
 
 	/**
 	 * Border around the image's x-axis which is not processed.
@@ -59,17 +65,16 @@ public interface StereoDisparity<Image extends ImageSingleBand, Disparity extend
 	public int getBorderY();
 
 	/**
+	 * The maximum disparity which will be checked for.
+	 *
+	 * @return Maximum disparity.
+	 */
+	public int getMaxDisparity();
+
+	/**
 	 * Type of input images it can process
 	 *
 	 * @return Input image type
 	 */
 	public Class<Image> getInputType();
-
-	/**
-	 * Type of disparity image it can write to.
-	 *
-	 * @return Output image type
-	 */
-	public Class<Disparity> getDisparityType();
-
 }

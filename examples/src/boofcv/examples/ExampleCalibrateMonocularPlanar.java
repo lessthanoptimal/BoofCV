@@ -18,13 +18,11 @@
 
 package boofcv.examples;
 
-import boofcv.alg.geo.calibration.FactoryPlanarCalibrationTarget;
+import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.app.CalibrateMonoPlanar;
-import boofcv.app.PlanarCalibrationDetector;
-import boofcv.app.WrapPlanarChessTarget;
-import boofcv.app.WrapPlanarGridTarget;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -72,7 +70,7 @@ public class ExampleCalibrateMonocularPlanar {
 	 */
 	private void setupZhang99() {
 		// Use the wrapper below for square grid targets.
-		detector = new WrapPlanarGridTarget(8,8);
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(8,8);
 
 		// physical description
 		target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 0.5, 7.0 / 18.0);
@@ -91,7 +89,7 @@ public class ExampleCalibrateMonocularPlanar {
 	private void setupBumbleBee() {
 		// Use the wrapper below for chessboard targets.  The last parameter adjusts the size of the corner detection
 		// region.  TUNE THIS PARAMETER FOR OPTIMAL ACCURACY!
-		detector = new WrapPlanarChessTarget(3,4,6);
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard(3,4,6);
 
 		// physical description
 		target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);

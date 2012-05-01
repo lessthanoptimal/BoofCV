@@ -40,8 +40,8 @@ public class TestSelectRectStandard_S32_U8 {
 		BasicDisparitySelectRectTests<ImageUInt8> test =
 				new BasicDisparitySelectRectTests<ImageUInt8>(ImageUInt8.class) {
 					@Override
-					public DisparitySelectRect_S32<ImageUInt8> createAlg() {
-						return new SelectRectStandard_S32_U8(-1,-1);
+					public DisparitySelect_S32<ImageUInt8> createAlg() {
+						return new SelectRectStandard_S32_U8(-1,-1,-1);
 					}
 				};
 
@@ -52,7 +52,7 @@ public class TestSelectRectStandard_S32_U8 {
 	public void maxError() {
 		int y = 3;
 
-		SelectRectStandard_S32_U8 alg = new SelectRectStandard_S32_U8(2,-1);
+		SelectRectStandard_S32_U8 alg = new SelectRectStandard_S32_U8(2,-1,-1);
 		alg.configure(disparity,maxDisparity,2);
 
 		int scores[] = new int[w*maxDisparity];
@@ -73,7 +73,7 @@ public class TestSelectRectStandard_S32_U8 {
 		assertEquals(0, GeneralizedImageOps.get(disparity, 4+2, y), 1e-8);
 
 		// Sanity check, much higher error threshold
-		alg = new SelectRectStandard_S32_U8(20,-1);
+		alg = new SelectRectStandard_S32_U8(20,-1,-1);
 		alg.configure(disparity,maxDisparity,2);
 		alg.process(y,scores);
 		assertEquals(1, GeneralizedImageOps.get(disparity, 3+2, y), 1e-8);
@@ -88,7 +88,7 @@ public class TestSelectRectStandard_S32_U8 {
 
 		int y = 3;
 
-		SelectRectStandard_S32_U8 alg = new SelectRectStandard_S32_U8(-1,1);
+		SelectRectStandard_S32_U8 alg = new SelectRectStandard_S32_U8(-1,1,-1);
 		alg.configure(disparity,maxDisparity,2);
 
 		int scores[] = new int[w*maxDisparity];
@@ -111,9 +111,64 @@ public class TestSelectRectStandard_S32_U8 {
 			assertEquals(5, GeneralizedImageOps.get(disparity, i+2, y), 1e-8);
 
 		// sanity check, I now set the tolerance to zero
-		alg = new SelectRectStandard_S32_U8(-1,0);
+		alg = new SelectRectStandard_S32_U8(-1,0,-1);
 		alg.configure(disparity,maxDisparity,2);
 		alg.process(y,scores);
 		assertEquals(0, GeneralizedImageOps.get(disparity, 4+2, y), 1e-8);
 	}
+
+	/**
+	 * Test the confidence in a region with very similar cost score (little texture)
+	 */
+	@Test
+	public void confidenceFlatRegion() {
+		int minValue = 3;
+		int y = 3;
+
+		SelectRectStandard_S32_U8 alg = new SelectRectStandard_S32_U8(-1,-1,3);
+		alg.configure(disparity,maxDisparity,2);
+
+		int scores[] = new int[w*maxDisparity];
+
+		for( int d = 0; d < 10; d++ ) {
+			for( int x = 0; x < w; x++ ) {
+				scores[w*d+x] = minValue + Math.abs(2-d);
+			}
+		}
+
+		alg.process(y,scores);
+
+		// it should reject the solution
+		assertEquals(0, GeneralizedImageOps.get(disparity, 4+2, y), 1e-8);
+	}
+
+	/**
+	 * There are two similar peaks.  Repeated pattern
+	 */
+	@Test
+	public void confidenceMultiplePeak() {
+		confidenceMultiplePeak(3);
+		confidenceMultiplePeak(0);
+	}
+
+	private void confidenceMultiplePeak(int minValue) {
+		int y = 3;
+
+		SelectRectStandard_S32_U8 alg = new SelectRectStandard_S32_U8(-1,-1,3);
+		alg.configure(disparity,maxDisparity,2);
+
+		int scores[] = new int[w*maxDisparity];
+
+		for( int d = 0; d < 10; d++ ) {
+			for( int x = 0; x < w; x++ ) {
+				scores[w*d+x] = minValue + (d % 3);
+			}
+		}
+
+		alg.process(y,scores);
+
+		// it should reject the solution
+		assertEquals(0, GeneralizedImageOps.get(disparity, 4 + 2, y), 1e-8);
+	}
+
 }

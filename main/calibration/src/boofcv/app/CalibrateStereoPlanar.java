@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.Zhang99Parameters;
 import boofcv.struct.calib.IntrinsicParameters;

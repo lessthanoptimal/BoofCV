@@ -29,11 +29,11 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestDisparityEfficientSadValidR2L_U8_U16 {
+public class TestDisparityScoreSadRect_U8 {
 
 	Random rand = new Random(234);
 
-	DisparitySelectRect_S32<ImageUInt8> compDisp = new SelectRectBasicWta_S32_U8();
+	DisparitySelect_S32<ImageUInt8> compDisp = new SelectRectBasicWta_S32_U8();
 
 	/**
 	 * Basic generic disparity calculation tests

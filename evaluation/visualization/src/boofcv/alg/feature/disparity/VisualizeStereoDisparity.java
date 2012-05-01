@@ -249,12 +249,12 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 			case 0:
 				changeGuiActive(true,true);
 				return (StereoDisparity)FactoryStereoDisparity.rectWinnerTakeAll(
-						control.maxDisparity,r,r,control.pixelError,control.reverseTol);
+						control.maxDisparity,r,r,control.pixelError,control.reverseTol,control.texture);
 
 			case 1:
 				changeGuiActive(false,false);
 				return (StereoDisparity)FactoryStereoDisparity.rectWinnerTakeAll(
-						control.maxDisparity,r,r,-1,-1);
+						control.maxDisparity,r,r,-1,-1,-1);
 
 			default:
 				throw new RuntimeException("Unknown selection");

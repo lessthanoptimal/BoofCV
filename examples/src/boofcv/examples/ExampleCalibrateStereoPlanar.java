@@ -18,13 +18,11 @@
 
 package boofcv.examples;
 
-import boofcv.alg.geo.calibration.FactoryPlanarCalibrationTarget;
+import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.app.CalibrateStereoPlanar;
-import boofcv.app.PlanarCalibrationDetector;
-import boofcv.app.WrapPlanarChessTarget;
-import boofcv.app.WrapPlanarGridTarget;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
@@ -75,7 +73,7 @@ public class ExampleCalibrateStereoPlanar {
 	 */
 	public void setupBumblebeeSquare() {
 		// Use the wrapper below for square grid targets.
-		detector = new WrapPlanarGridTarget(3,4);
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4);
 		// Target physical description
 		target = FactoryPlanarCalibrationTarget.gridSquare(3, 4, 30,30);
 
@@ -93,7 +91,7 @@ public class ExampleCalibrateStereoPlanar {
 	public void setupBumblebeeChess() {
 		// Use the wrapper below for chessboard targets.  The last parameter adjusts the size of the corner detection
 		// region.  TUNE THIS PARAMETER FOR OPTIMAL ACCURACY!
-		detector = new WrapPlanarChessTarget(3,4,6);
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard(3, 4, 6);
 		// Target physical description
 		target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
@@ -111,7 +109,7 @@ public class ExampleCalibrateStereoPlanar {
 	public void process() {
 		// Declare and setup the calibration algorithm
 		CalibrateStereoPlanar calibratorAlg = new CalibrateStereoPlanar(detector,isLeftHanded);
-		calibratorAlg.configure(target, false, 2);
+		calibratorAlg.configure(target, true, 2);
 
 		// ensure the lists are in the same order
 		Collections.sort(left);

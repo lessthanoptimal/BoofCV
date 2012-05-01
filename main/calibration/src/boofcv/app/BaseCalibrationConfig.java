@@ -18,8 +18,9 @@
 
 package boofcv.app;
 
-import boofcv.alg.geo.calibration.FactoryPlanarCalibrationTarget;
+import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.MediaManager;
 import boofcv.io.SimpleStringNumberReader;
 import boofcv.io.wrapper.DefaultMediaManager;
@@ -67,10 +68,10 @@ public class BaseCalibrationConfig {
 
 		if( type.compareToIgnoreCase("square") == 0 ) {
 			double space = reader.nextDouble();
-			detector = new WrapPlanarGridTarget(numCols,numRows);
+			detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(numCols, numRows);
 			target = FactoryPlanarCalibrationTarget.gridSquare(numCols, numRows, width, space);
 		} else if( type.compareToIgnoreCase("chess") == 0 ) {
-			detector = new WrapPlanarChessTarget(numCols,numRows,6);
+			detector = FactoryPlanarCalibrationTarget.detectorChessboard(numCols, numRows, 6);
 			target = FactoryPlanarCalibrationTarget.gridChess(numCols,numRows,width);
 		} else {
 			throw new RuntimeException("Unknown type: "+type);

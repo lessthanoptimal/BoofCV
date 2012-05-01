@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.abst.calib;
 
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class WrapPlanarGridTarget implements PlanarCalibrationDetector {
+public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 
 	int squareColumns;
 
@@ -51,7 +51,7 @@ public class WrapPlanarGridTarget implements PlanarCalibrationDetector {
 
 	OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
 
-	public WrapPlanarGridTarget( int numSquareColumns , int numSquareRows ) {
+	public WrapPlanarSquareGridTarget(int numSquareColumns, int numSquareRows ) {
 		refine = new WrapRefineCornerSegmentFit();
 //		refine = new WrapRefineCornerCanny();
 

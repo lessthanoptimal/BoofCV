@@ -16,36 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
-
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
-import georegression.struct.point.Point2D_F64;
-import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+package boofcv.alg.feature.disparity;
 
 /**
+ * Computes the disparity given disparity score calculations provided by
+ * {@link DisparitySparseScoreSadRect_U8}. The S32 in name refers to the score being provided
+ * as an integer array.
+ *
  * @author Peter Abeles
  */
-public class TestFactoryPlanarCalibrationTarget {
+public interface DisparitySparseSelect_S32 {
 
-	@Test
-	public void gridSquare() {
-		PlanarCalibrationTarget config = FactoryPlanarCalibrationTarget.gridSquare(2, 3, 0.1, 0.2);
-		List<Point2D_F64> l = config.points;
+	/**
+	 * Examines disparity scores and looks for the best correspondence. If no correspondence
+	 * can be found then false is returned.
+	 *
+	 * @param scores Set of disparity scores.
+	 * @param maxDisparity Maximum allowed disparity at this point
+	 * @return true if a valid correspondence was found
+	 */
+	public boolean select( int scores[] , int maxDisparity );
 
-		assertEquals(4*6,l.size());
-		
-		double w = l.get(1).x - l.get(0).x;
-		double h = l.get(4).y - l.get(0).y;
-
-		assertEquals(0.1,w,1e-8);
-		assertEquals(0.1,h,1e-8);
-		
-		double s = l.get(2).x - l.get(1).x;
-		
-		assertEquals(0.2,s,1e-8);
-	}
+	/**
+	 *
+	 * @return
+	 */
+	public double getDisparity();
 }

@@ -21,7 +21,7 @@ package boofcv.factory.feature.disparity;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.feature.disparity.WrapDisparitySadRect;
 import boofcv.alg.feature.disparity.DisparityScoreSadRect_U8;
-import boofcv.alg.feature.disparity.DisparitySelectRect_S32;
+import boofcv.alg.feature.disparity.DisparitySelect_S32;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -34,12 +34,13 @@ public class FactoryStereoDisparity {
 	rectWinnerTakeAll( int maxDisparity,
 					   int regionRadiusX, int regionRadiusY ,
 					   double maxPerPixelError ,
-					   int validateRtoL ) {
+					   int validateRtoL ,
+					   double texture ) {
 
 		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
 
-		DisparitySelectRect_S32<ImageUInt8> select =
-				FactoryStereoDisparityAlgs.selectDisparity_U8((int)maxError,validateRtoL);
+		DisparitySelect_S32<ImageUInt8> select =
+				FactoryStereoDisparityAlgs.selectDisparity_U8((int)maxError,validateRtoL,texture);
 
 		DisparityScoreSadRect_U8<ImageUInt8> alg =
 				FactoryStereoDisparityAlgs.scoreDisparitySadRect(
