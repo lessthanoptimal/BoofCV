@@ -37,7 +37,7 @@ public abstract class BasicDisparitySelectRectTests <D extends ImageSingleBand> 
 
 	D disparity;
 
-	DisparitySelectRect_S32<D> alg;
+	DisparitySelect_S32<D> alg;
 
 	protected BasicDisparitySelectRectTests( Class<D> imageType ) {
 
@@ -46,7 +46,7 @@ public abstract class BasicDisparitySelectRectTests <D extends ImageSingleBand> 
 		alg = createAlg();
 	}
 
-	public abstract DisparitySelectRect_S32<D> createAlg();
+	public abstract DisparitySelect_S32<D> createAlg();
 
 	/**
 	 * Give it a hand crafted score with known results for WTA.  See if it produces those results

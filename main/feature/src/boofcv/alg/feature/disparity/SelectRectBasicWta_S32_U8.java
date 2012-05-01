@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class SelectRectBasicWta_S32_U8 implements DisparitySelectRect_S32<ImageUInt8>
+public class SelectRectBasicWta_S32_U8 implements DisparitySelect_S32<ImageUInt8>
 {
 	ImageUInt8 imageDisparity;
 	int maxDisparity;

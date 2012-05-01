@@ -23,6 +23,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -42,6 +43,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JSpinner radiusSpinner;
 	JSpinner errorSpinner;
 	JSpinner reverseSpinner;
+	JSpinner textureSpinner;
 
 	// which image to show
 	int selectedView;
@@ -54,6 +56,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	int reverseTol = 6;
 	// how large the region radius is
 	int regionRadius = 3;
+	// How diverse the texture needs to be
+	double texture = 0.1;
 
 	// listener for changes in states
 	Listener listener;
@@ -82,12 +86,19 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		reverseSpinner.addChangeListener(this);
 		reverseSpinner.setMaximumSize(reverseSpinner.getPreferredSize());
 
+		textureSpinner = new JSpinner(new SpinnerNumberModel(texture,0.0, 0.5, 0.02));
+		textureSpinner.addChangeListener(this);
+		textureSpinner.setPreferredSize(new Dimension(60,reverseSpinner.getPreferredSize().height));
+		textureSpinner.setMaximumSize(textureSpinner.getPreferredSize());
+
 		addLabeled(viewSelector,"View ",this);
 		addSeparator(100);
 		addLabeled(disparitySpinner, "Max Disparity", this);
 		addLabeled(radiusSpinner,    "Region Radius", this);
 		addLabeled(errorSpinner,     "Max Error", this);
+		addLabeled(textureSpinner,   "Texture", this);
 		addLabeled(reverseSpinner,   "Reverse", this);
+		addVerticalGlue(this);
 	}
 
 	@Override
@@ -103,6 +114,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			pixelError = ((Number) errorSpinner.getValue()).intValue();
 		} else if( e.getSource() == radiusSpinner) {
 			regionRadius = ((Number) radiusSpinner.getValue()).intValue();
+		} else if( e.getSource() == textureSpinner) {
+			texture = ((Number) textureSpinner.getValue()).doubleValue();
 		}
 		listener.disparitySettingChange();
 	}
@@ -146,6 +159,10 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 	public int getRegionRadius() {
 		return regionRadius;
+	}
+
+	public double getTexture() {
+		return texture;
 	}
 
 	public static interface Listener

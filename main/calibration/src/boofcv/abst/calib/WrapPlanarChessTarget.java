@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.abst.calib;
 
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.struct.image.ImageFloat32;

@@ -21,13 +21,23 @@ package boofcv.alg.feature.disparity;
 import boofcv.struct.image.ImageUInt8;
 
 /**
- * TODO Comment Up
+ * <p>
+ * Selects the best disparity using a winner takes all strategy.  Then optionally can employ several different
+ * techniques to filter out bad disparity values.
+ * </p>
+ *
+ * <p>
+ * Filters:<br>
+ * <b>MaxError</b> is the largest error value the selected region can have.<br>
+ * <b>right To Left</b> validates the disparity by seeing if the matched region on the right has the same region on
+ * the left as its optimal solution, within tolerance.<br>
+ * <b>texture</b> Tolerance for how similar the best region is to the second best. Lower values indicate greater
+ * tolerance.  textureTol < (C2-C1)/C1, where C2 = second best region score and C1 = best region score
+ * </p>
  *
  * @author Peter Abeles
  */
-// TODO multiple peak filter
-// TODO flat region filter
-public class SelectRectStandard_S32_U8 implements DisparitySelectRect_S32<ImageUInt8>
+public class SelectRectStandard_S32_U8 implements DisparitySelect_S32<ImageUInt8>
 {
 	// output containing disparity
 	ImageUInt8 imageDisparity;
@@ -46,10 +56,23 @@ public class SelectRectStandard_S32_U8 implements DisparitySelectRect_S32<ImageU
 	int columnScore[] = new int[1];
 	int imageWidth;
 
-	// TODO comment that error grows with region size
-	public SelectRectStandard_S32_U8(int maxError, int rightToLeftTolerance) {
+	// texture threshold, use an integer value for speed.
+	int textureThreshold;
+	int discretizer = 10000;
+
+	/**
+	 * Configures tolerances
+	 *
+	 * @param maxError The maximum allowed error.  Note this is sum error and not per pixel error.
+	 *                    Try (region width*height)*30.
+	 * @param rightToLeftTolerance Tolerance for how difference the left to right associated values can be.  Try 6
+	 * @param texture Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
+	 *                Try 0.1
+	 */
+	public SelectRectStandard_S32_U8(int maxError, int rightToLeftTolerance, double texture) {
 		this.maxError = maxError <= 0 ? Integer.MAX_VALUE : maxError;
 		this.rightToLeftTolerance = rightToLeftTolerance;
+		this.textureThreshold = (int)(discretizer *texture);
 	}
 
 	@Override
@@ -72,24 +95,24 @@ public class SelectRectStandard_S32_U8 implements DisparitySelectRect_S32<ImageU
 			// make sure the disparity search doesn't go outside the image border
 			int localMax = maxDisparityAtColumnL2R(col);
 
+			// index of the element being examined in the score array
 			int indexScore = col;
 
-//			System.out.println("----  "+localMax+"  col = "+col);
+			// select the best disparity
 			int bestDisparity = 0;
 			int scoreBest = columnScore[0] = scores[indexScore];
 			indexScore += imageWidth;
 
-//			System.out.printf("%d ",scoreBest);
 			for( int i = 1; i < localMax; i++ ,indexScore += imageWidth) {
 				int s = scores[indexScore];
 				columnScore[i] = s;
-//				System.out.printf("%d ",verticalScore[indexScore]);
 				if( s < scoreBest ) {
 					scoreBest = s;
 					bestDisparity = i;
 				}
 			}
 
+			// detect bad matches
 			if( scoreBest > maxError ) {
 				// make sure the error isn't too large
 				bestDisparity = 0;
@@ -102,6 +125,27 @@ public class SelectRectStandard_S32_U8 implements DisparitySelectRect_S32<ImageU
 				if( !(Math.abs(disparityRtoL-bestDisparity) <= rightToLeftTolerance) ) {
 					bestDisparity = 0;
 				}
+			}
+			// test to see if the region lacks sufficient texture
+			if( bestDisparity != 0 && textureThreshold > 0 ) {
+				// find the second best disparity value and exclude its neighbors
+				columnScore[bestDisparity] = Integer.MAX_VALUE;
+				if( bestDisparity > 0 )
+					columnScore[bestDisparity-1] = Integer.MAX_VALUE;
+				if( bestDisparity < localMax - 1)
+					columnScore[localMax-1] = Integer.MAX_VALUE;
+
+				int secondBest = Integer.MAX_VALUE;
+				for( int i = 0; i < localMax; i++ ) {
+					if( columnScore[i] < secondBest ) {
+						secondBest = columnScore[i];
+					}
+				}
+
+				// similar scores indicate lack of texture
+				// C = (C2-C1)/C1
+				if( discretizer *(secondBest-scoreBest) <= textureThreshold *scoreBest )
+					bestDisparity = 0;
 			}
 
 			imageDisparity.set(col + radiusX, row, bestDisparity);

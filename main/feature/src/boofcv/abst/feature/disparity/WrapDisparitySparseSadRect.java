@@ -18,51 +18,57 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.alg.feature.disparity.DisparityScoreSadRect_U8;
+import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect_U8;
+import boofcv.alg.feature.disparity.DisparitySparseSelect_S32;
 import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class WrapDisparitySadRect implements StereoDisparity<ImageUInt8,ImageUInt8>
+public class WrapDisparitySparseSadRect implements StereoDisparitySparse<ImageUInt8>
 {
-	DisparityScoreSadRect_U8<ImageUInt8> alg;
+	DisparitySparseScoreSadRect_U8 computeScore;
+	DisparitySparseSelect_S32 select;
 
-	public WrapDisparitySadRect(DisparityScoreSadRect_U8<ImageUInt8> alg) {
-		this.alg = alg;
+	public WrapDisparitySparseSadRect(DisparitySparseScoreSadRect_U8 computeScore,
+									  DisparitySparseSelect_S32 select ) {
+		this.computeScore = computeScore;
+		this.select = select;
 	}
 
 	@Override
-	public void process(ImageUInt8 imageLeft, ImageUInt8 imageRight, ImageUInt8 output) {
-		alg.process(imageLeft,imageRight,output);
+	public void setImages(ImageUInt8 imageLeft, ImageUInt8 imageRight ) {
+		computeScore.setImages(imageLeft,imageRight);
+	}
+
+	@Override
+	public double getDisparity() {
+		return select.getDisparity();
+	}
+
+	@Override
+	public boolean process(int x, int y) {
+		computeScore.process(x,y);
+		return select.select(computeScore.getScore(),computeScore.getLocalMaxDisparity());
 	}
 
 	@Override
 	public int getBorderX() {
-		return alg.getBorderX();
+		return computeScore.getRadiusX();
 	}
 
 	@Override
 	public int getBorderY() {
-		return alg.getBorderY();
+		return computeScore.getRadiusY();
 	}
 
 	@Override
 	public int getMaxDisparity() {
-		return alg.getMaxDisparity();
+		return computeScore.getMaxDisparity();
 	}
 
 	@Override
 	public Class<ImageUInt8> getInputType() {
 		return ImageUInt8.class;
-	}
-
-	@Override
-	public Class<ImageUInt8> getDisparityType() {
-		return ImageUInt8.class;
-	}
-
-	public DisparityScoreSadRect_U8<ImageUInt8> getAlg() {
-		return alg;
 	}
 }

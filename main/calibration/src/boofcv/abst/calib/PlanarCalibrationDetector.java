@@ -16,36 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
+package boofcv.abst.calib;
 
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
-import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-
 /**
+ * Interface for extracting points from a planar calibration grid.
+ *
  * @author Peter Abeles
  */
-public class TestFactoryPlanarCalibrationTarget {
+public interface PlanarCalibrationDetector {
 
-	@Test
-	public void gridSquare() {
-		PlanarCalibrationTarget config = FactoryPlanarCalibrationTarget.gridSquare(2, 3, 0.1, 0.2);
-		List<Point2D_F64> l = config.points;
+	/**
+	 * Image processing for calibration target detection
+	 *
+	 * @param input Gray scale image containing calibration target
+	 * @return true if target was detected and false if not
+	 */
+	public boolean process( ImageFloat32 input );
 
-		assertEquals(4*6,l.size());
-		
-		double w = l.get(1).x - l.get(0).x;
-		double h = l.get(4).y - l.get(0).y;
-
-		assertEquals(0.1,w,1e-8);
-		assertEquals(0.1,h,1e-8);
-		
-		double s = l.get(2).x - l.get(1).x;
-		
-		assertEquals(0.2,s,1e-8);
-	}
+	/**
+	 * Returns the set of detected points.  Each time this function is invoked a new instance
+	 * of the list and points is returned.  No data reuse here.
+	 *
+	 * @return List of detected points in row major grid order.
+	 */
+	public List<Point2D_F64> getPoints();
 }

@@ -11,6 +11,8 @@ Version : Alpha 0.8
   * Calibration results would be less accurate, but have a lower residual due to the increased degree of freedom
 - Added analytic Jacobian to Zhang99
   * Decided not to use it since it produces same estimation parameters as numerical.
+- Added functions for creating detectors in FactoryPlanarCalibrationTarget
+  * changed code to reference those functions
 - Dense Stereo Disparity Image
   * Rectangular region winner take all
     - Validation: right to left, max error

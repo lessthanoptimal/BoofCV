@@ -69,6 +69,10 @@ public class StandardAlgConfigPanel extends JPanel {
 		owner.add(p);
 	}
 
+	protected void addVerticalGlue( JPanel owner ) {
+		owner.add(Box.createVerticalGlue());
+	}
+
 	protected void setEnabled( int index , boolean enabled ) {
 		Component c = getComponent(index);
 		if( c instanceof JPanel ) {

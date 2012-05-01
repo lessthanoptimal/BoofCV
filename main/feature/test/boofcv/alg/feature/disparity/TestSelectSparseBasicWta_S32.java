@@ -16,36 +16,31 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
+package boofcv.alg.feature.disparity;
 
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
-import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestFactoryPlanarCalibrationTarget {
+public class TestSelectSparseBasicWta_S32 {
 
 	@Test
-	public void gridSquare() {
-		PlanarCalibrationTarget config = FactoryPlanarCalibrationTarget.gridSquare(2, 3, 0.1, 0.2);
-		List<Point2D_F64> l = config.points;
+	public void simple() {
+		int maxDisparity = 30;
 
-		assertEquals(4*6,l.size());
-		
-		double w = l.get(1).x - l.get(0).x;
-		double h = l.get(4).y - l.get(0).y;
+		int scores[] = new int[50];
+		for( int i = 0; i < maxDisparity; i++) {
+			scores[i] = Math.abs(i-5)+2;
+		}
 
-		assertEquals(0.1,w,1e-8);
-		assertEquals(0.1,h,1e-8);
-		
-		double s = l.get(2).x - l.get(1).x;
-		
-		assertEquals(0.2,s,1e-8);
+		SelectSparseBasicWta_S32 alg = new SelectSparseBasicWta_S32();
+
+		assertTrue(alg.select(scores,maxDisparity));
+
+		assertEquals(5,(int)alg.getDisparity());
 	}
 }

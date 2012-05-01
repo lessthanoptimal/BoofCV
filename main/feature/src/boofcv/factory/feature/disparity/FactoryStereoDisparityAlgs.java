@@ -19,27 +19,29 @@
 package boofcv.factory.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityScoreSadRect_U8;
-import boofcv.alg.feature.disparity.DisparitySelectRect_S32;
+import boofcv.alg.feature.disparity.DisparitySelect_S32;
 import boofcv.alg.feature.disparity.SelectRectBasicWta_S32_U8;
 import boofcv.alg.feature.disparity.SelectRectStandard_S32_U8;
 import boofcv.struct.image.ImageUInt8;
 
 /**
+ * Algorithms related to computing the disparity between two rectified stereo images.
+ *
  * @author Peter Abeles
  */
 public class FactoryStereoDisparityAlgs {
 
-	public static DisparitySelectRect_S32<ImageUInt8> selectDisparity_U8( int maxError , int tolR2L ) {
-		if( maxError < 0 && tolR2L < 0 )
+	public static DisparitySelect_S32<ImageUInt8> selectDisparity_U8( int maxError , int tolR2L , double texture) {
+		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
 			return new SelectRectBasicWta_S32_U8();
 		else
-			return new SelectRectStandard_S32_U8(maxError,tolR2L);
+			return new SelectRectStandard_S32_U8(maxError,tolR2L,texture);
 	}
 
 	public static DisparityScoreSadRect_U8<ImageUInt8>
 	scoreDisparitySadRect( int maxDisparity,
 						   int regionRadiusX, int regionRadiusY,
-						   DisparitySelectRect_S32<ImageUInt8> computeDisparity)
+						   DisparitySelect_S32<ImageUInt8> computeDisparity)
 	{
 		return new DisparityScoreSadRect_U8<ImageUInt8>(
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);

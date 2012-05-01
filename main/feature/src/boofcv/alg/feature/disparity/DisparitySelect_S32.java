@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface DisparitySelectRect_S32<T extends ImageSingleBand> {
+public interface DisparitySelect_S32<T extends ImageSingleBand> {
 
 	/**
 	 *

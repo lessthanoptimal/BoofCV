@@ -30,7 +30,7 @@ public class TestSelectRectBasicWta_S32_U8 extends BasicDisparitySelectRectTests
 	}
 
 	@Override
-	public DisparitySelectRect_S32<ImageUInt8> createAlg() {
+	public DisparitySelect_S32<ImageUInt8> createAlg() {
 		return new SelectRectBasicWta_S32_U8();
 	}
 }

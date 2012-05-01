@@ -16,36 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
-
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
-import georegression.struct.point.Point2D_F64;
-import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+package boofcv.alg.feature.disparity;
 
 /**
+ * Most basic implementation of Winner Take All (WTA).  Just selects the diparity value
+ * with the lowest score.
+ *
  * @author Peter Abeles
  */
-public class TestFactoryPlanarCalibrationTarget {
+public class SelectSparseBasicWta_S32 implements DisparitySparseSelect_S32 {
 
-	@Test
-	public void gridSquare() {
-		PlanarCalibrationTarget config = FactoryPlanarCalibrationTarget.gridSquare(2, 3, 0.1, 0.2);
-		List<Point2D_F64> l = config.points;
+	int disparity;
 
-		assertEquals(4*6,l.size());
-		
-		double w = l.get(1).x - l.get(0).x;
-		double h = l.get(4).y - l.get(0).y;
+	@Override
+	public boolean select(int[] scores, int maxDisparity) {
+		disparity = 0;
+		int best = scores[0];
 
-		assertEquals(0.1,w,1e-8);
-		assertEquals(0.1,h,1e-8);
-		
-		double s = l.get(2).x - l.get(1).x;
-		
-		assertEquals(0.2,s,1e-8);
+		for( int i = 1; i < maxDisparity; i++ ) {
+			if( scores[i] < best ) {
+				best = scores[i];
+				disparity = i;
+			}
+		}
+
+		return true;
+	}
+
+	@Override
+	public double getDisparity() {
+		return disparity;
 	}
 }
