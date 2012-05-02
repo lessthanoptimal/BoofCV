@@ -121,7 +121,7 @@ public class DisparityScoreSadRect_U8 <Disparity extends ImageSingleBand> {
 		// initialize computation
 		computeFirstRow(left, right);
 		// efficiently compute rest of the rows using previous results to avoid repeat computations
-		computeRemainingRows(left, right, disparity);
+		computeRemainingRows(left, right);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class DisparityScoreSadRect_U8 <Disparity extends ImageSingleBand> {
 	 * When a new block is processes the last row/column is subtracted and the new row/column is
 	 * added.
 	 */
-	private void computeRemainingRows( ImageUInt8 left, ImageUInt8 right , Disparity disparity )
+	private void computeRemainingRows( ImageUInt8 left, ImageUInt8 right )
 	{
 		for( int row = regionHeight; row < left.height; row++ ) {
 			int oldRow = row%regionHeight;
@@ -248,4 +248,7 @@ public class DisparityScoreSadRect_U8 <Disparity extends ImageSingleBand> {
 		return radiusY;
 	}
 
+	public Class<Disparity> getDisparityType() {
+		return computeDisparity.getDisparityType();
+	}
 }

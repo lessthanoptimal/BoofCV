@@ -22,6 +22,8 @@ import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.feature.disparity.WrapDisparitySadRect;
 import boofcv.alg.feature.disparity.DisparityScoreSadRect_U8;
 import boofcv.alg.feature.disparity.DisparitySelect_S32;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -30,22 +32,53 @@ import boofcv.struct.image.ImageUInt8;
 public class FactoryStereoDisparity {
 
 
-	public static StereoDisparity<ImageUInt8,ImageUInt8>
-	rectWinnerTakeAll( int maxDisparity,
-					   int regionRadiusX, int regionRadiusY ,
-					   double maxPerPixelError ,
-					   int validateRtoL ,
-					   double texture ) {
+	public static <T extends ImageSingleBand> StereoDisparity<T,ImageUInt8>
+	regionWta( int maxDisparity,
+			   int regionRadiusX, int regionRadiusY ,
+			   double maxPerPixelError ,
+			   int validateRtoL ,
+			   double texture ,
+			   Class<T> imageType ) {
 
 		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
 
-		DisparitySelect_S32<ImageUInt8> select =
-				FactoryStereoDisparityAlgs.selectDisparity_U8((int)maxError,validateRtoL,texture);
+		DisparitySelect_S32<T> select;
 
-		DisparityScoreSadRect_U8<ImageUInt8> alg =
+		if( imageType == ImageUInt8.class )
+			select = (DisparitySelect_S32)FactoryStereoDisparityAlgs.
+					selectDisparity_U8((int) maxError, validateRtoL, texture);
+		else
+			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
+
+		DisparityScoreSadRect_U8<T> alg =
 				FactoryStereoDisparityAlgs.scoreDisparitySadRect(
 						maxDisparity,regionRadiusX,regionRadiusY,select);
 
-		return new WrapDisparitySadRect(alg);
+		return new WrapDisparitySadRect<T,ImageUInt8>(alg);
+	}
+
+	public static <T extends ImageSingleBand> StereoDisparity<T,ImageFloat32>
+	regionSubpixelWta( int maxDisparity,
+					   int regionRadiusX, int regionRadiusY ,
+					   double maxPerPixelError ,
+					   int validateRtoL ,
+					   double texture ,
+					   Class<T> imageType ) {
+
+		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
+
+		DisparitySelect_S32<T> select;
+		if( imageType == ImageUInt8.class )
+			select = (DisparitySelect_S32)FactoryStereoDisparityAlgs.
+					selectDisparitySubpixel_F32((int) maxError, validateRtoL, texture);
+		else
+			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
+
+
+		DisparityScoreSadRect_U8<T> alg =
+				FactoryStereoDisparityAlgs.scoreDisparitySadRect(
+						maxDisparity,regionRadiusX,regionRadiusY,select);
+
+		return new WrapDisparitySadRect<T,ImageFloat32>(alg);
 	}
 }

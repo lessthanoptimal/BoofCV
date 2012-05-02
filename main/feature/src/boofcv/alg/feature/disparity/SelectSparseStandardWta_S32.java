@@ -62,7 +62,7 @@ public class SelectSparseStandardWta_S32 implements DisparitySparseSelect_S32 {
 			if( best > 0 )
 				scores[best-1] = Integer.MAX_VALUE;
 			if( best < maxDisparity - 1)
-				scores[maxDisparity-1] = Integer.MAX_VALUE;
+				scores[best+1] = Integer.MAX_VALUE;
 
 			int secondBest = Integer.MAX_VALUE;
 			for( int i = 0; i < maxDisparity; i++ ) {

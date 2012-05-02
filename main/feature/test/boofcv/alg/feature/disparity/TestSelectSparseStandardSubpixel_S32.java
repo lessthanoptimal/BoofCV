@@ -18,20 +18,17 @@
 
 package boofcv.alg.feature.disparity;
 
-import boofcv.struct.image.ImageUInt8;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestSelectRectStandard_S32_U8 extends ChecksSelectRectStandardBase_S32<ImageUInt8>{
+public class TestSelectSparseStandardSubpixel_S32 {
 
-
-	public TestSelectRectStandard_S32_U8() {
-		super(ImageUInt8.class);
-	}
-
-	@Override
-	public SelectRectStandardBase_S32<ImageUInt8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
-		return new SelectRectStandard_S32_U8(maxError,rightToLeftTolerance,texture);
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }
