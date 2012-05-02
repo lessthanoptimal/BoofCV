@@ -48,6 +48,9 @@ public class SelectRectBasicWta_S32_U8 implements DisparitySelect_S32<ImageUInt8
 
 	@Override
 	public void process(int row, int[] scores) {
+
+		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX;
+
 		for( int col = 0; col <= imageWidth-regionWidth; col++ ) {
 			// make sure the disparity search doesn't go outside the image border
 			int localMax = maxDisparityAtColumnL2R(col);
@@ -67,8 +70,13 @@ public class SelectRectBasicWta_S32_U8 implements DisparitySelect_S32<ImageUInt8
 				}
 			}
 
-			imageDisparity.set(col + radiusX, row, bestDisparity);
+			imageDisparity.data[indexDisparity++] = (byte)bestDisparity;
 		}
+	}
+
+	@Override
+	public Class<ImageUInt8> getDisparityType() {
+		return ImageUInt8.class;
 	}
 
 	/**

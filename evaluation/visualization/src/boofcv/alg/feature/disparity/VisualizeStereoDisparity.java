@@ -35,6 +35,7 @@ import boofcv.io.PathLabel;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -248,13 +249,14 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		switch( selectedAlg ) {
 			case 0:
 				changeGuiActive(true,true);
-				return (StereoDisparity)FactoryStereoDisparity.rectWinnerTakeAll(
-						control.maxDisparity,r,r,control.pixelError,control.reverseTol,control.texture);
+				return (StereoDisparity)FactoryStereoDisparity.regionWta(
+						control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
+						ImageUInt8.class);
 
 			case 1:
 				changeGuiActive(false,false);
-				return (StereoDisparity)FactoryStereoDisparity.rectWinnerTakeAll(
-						control.maxDisparity,r,r,-1,-1,-1);
+				return (StereoDisparity)FactoryStereoDisparity.regionWta(
+						control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
 
 			default:
 				throw new RuntimeException("Unknown selection");

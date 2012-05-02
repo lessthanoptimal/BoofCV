@@ -45,4 +45,11 @@ public interface DisparitySelect_S32<T extends ImageSingleBand> {
 	 * @param scores Array containing scores.
 	 */
 	public void process( int row , int scores[] );
+
+	/**
+	 * Type of image the disparity is
+	 *
+	 * @return Image type for disparity
+	 */
+	public Class<T> getDisparityType();
 }

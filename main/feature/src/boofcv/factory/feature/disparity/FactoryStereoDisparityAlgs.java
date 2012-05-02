@@ -18,10 +18,9 @@
 
 package boofcv.factory.feature.disparity;
 
-import boofcv.alg.feature.disparity.DisparityScoreSadRect_U8;
-import boofcv.alg.feature.disparity.DisparitySelect_S32;
-import boofcv.alg.feature.disparity.SelectRectBasicWta_S32_U8;
-import boofcv.alg.feature.disparity.SelectRectStandard_S32_U8;
+import boofcv.alg.feature.disparity.*;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -38,12 +37,16 @@ public class FactoryStereoDisparityAlgs {
 			return new SelectRectStandard_S32_U8(maxError,tolR2L,texture);
 	}
 
-	public static DisparityScoreSadRect_U8<ImageUInt8>
+	public static DisparitySelect_S32<ImageFloat32> selectDisparitySubpixel_F32( int maxError , int tolR2L , double texture) {
+		return new SelectRectSubpixel_S32_F32(maxError,tolR2L,texture);
+	}
+
+	public static <T extends ImageSingleBand> DisparityScoreSadRect_U8<T>
 	scoreDisparitySadRect( int maxDisparity,
 						   int regionRadiusX, int regionRadiusY,
-						   DisparitySelect_S32<ImageUInt8> computeDisparity)
+						   DisparitySelect_S32<T> computeDisparity)
 	{
-		return new DisparityScoreSadRect_U8<ImageUInt8>(
+		return new DisparityScoreSadRect_U8<T>(
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 }
