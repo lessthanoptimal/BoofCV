@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.disparity;
 
+import boofcv.alg.feature.disparity.impl.*;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -39,10 +40,11 @@ public class BenchmarkDisparityAlgs {
 	static final int radiusX=2;
 	static final int radiusY=2;
 
-
-
 	static final ImageUInt8 left = new ImageUInt8(width,height);
 	static final ImageUInt8 right = new ImageUInt8(width,height);
+
+	static final ImageFloat32 left_F32 = new ImageFloat32(width,height);
+	static final ImageFloat32 right_F32 = new ImageFloat32(width,height);
 
 	static final ImageUInt8 outU8 = new ImageUInt8(width,height);
 	static final ImageFloat32 out_F32 = new ImageFloat32(width,height);
@@ -58,14 +60,14 @@ public class BenchmarkDisparityAlgs {
 		}
 	}
 
-	public static class EfficientSad extends PerformerBase {
+	public static class EfficientSad_U8 extends PerformerBase {
 
-//		DisparitySelect_S32<ImageUInt8> compDisp =
-//				new SelectRectBasicWta_S32_U8();
-		DisparitySelect_S32<ImageUInt8> compDisp =
-				new SelectRectStandard_S32_U8(250,2,0.1);
-		DisparityScoreSadRect_U8<ImageUInt8> alg =
-				new DisparityScoreSadRect_U8<ImageUInt8>(max,radiusX,radiusY,compDisp);
+//		DisparitySelect<int[],ImageUInt8> compDisp =
+//				new ImplSelectRectBasicWta_S32_U8();
+		DisparitySelect<int[],ImageUInt8> compDisp =
+				new ImplSelectRectStandard_S32_U8(250,2,0.1);
+		ImplDisparityScoreSadRect_U8<ImageUInt8> alg =
+				new ImplDisparityScoreSadRect_U8<ImageUInt8>(max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {
@@ -73,12 +75,27 @@ public class BenchmarkDisparityAlgs {
 		}
 	}
 
+	public static class EfficientSad_F32 extends PerformerBase {
+
+		//		DisparitySelect<int[],ImageUInt8> compDisp =
+//				new ImplSelectRectBasicWta_S32_U8();
+		DisparitySelect<float[],ImageUInt8> compDisp =
+				new ImplSelectRectStandard_F32_U8(250,2,0.1);
+		ImplDisparityScoreSadRect_F32<ImageUInt8> alg =
+				new ImplDisparityScoreSadRect_F32<ImageUInt8>(max,radiusX,radiusY,compDisp);
+
+		@Override
+		public void process() {
+			alg.process(left_F32,right_F32, outU8);
+		}
+	}
+
 	public static class EfficientSubpixelSad extends PerformerBase {
 
-		DisparitySelect_S32<ImageFloat32> compDisp =
-				new SelectRectSubpixel_S32_F32(250,2,0.1);
-		DisparityScoreSadRect_U8<ImageFloat32> alg =
-				new DisparityScoreSadRect_U8<ImageFloat32>(max,radiusX,radiusY,compDisp);
+		DisparitySelect<int[],ImageFloat32> compDisp =
+				new ImplSelectRectSubpixel.S32_F32(250,2,0.1);
+		ImplDisparityScoreSadRect_U8<ImageFloat32> alg =
+				new ImplDisparityScoreSadRect_U8<ImageFloat32>(max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {
@@ -92,9 +109,12 @@ public class BenchmarkDisparityAlgs {
 
 		GeneralizedImageOps.randomize(left,rand,0,30);
 		GeneralizedImageOps.randomize(right,rand,0,30);
+		GeneralizedImageOps.convert(left, left_F32);
+		GeneralizedImageOps.convert(right,right_F32);
 
 		// the "fastest" seems to always be the first one tested
-		ProfileOperation.printOpsPerSec(new EfficientSad(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new EfficientSad_U8(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new EfficientSad_F32(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new EfficientSubpixelSad(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Naive(), TEST_TIME);
 

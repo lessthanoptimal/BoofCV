@@ -18,8 +18,8 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect_U8;
-import boofcv.alg.feature.disparity.DisparitySparseSelect_S32;
+import boofcv.alg.feature.disparity.DisparitySparseSelect;
+import boofcv.alg.feature.disparity.impl.DisparitySparseScoreSadRect_U8;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -28,10 +28,10 @@ import boofcv.struct.image.ImageUInt8;
 public class WrapDisparitySparseSadRect implements StereoDisparitySparse<ImageUInt8>
 {
 	DisparitySparseScoreSadRect_U8 computeScore;
-	DisparitySparseSelect_S32 select;
+	DisparitySparseSelect select;
 
 	public WrapDisparitySparseSadRect(DisparitySparseScoreSadRect_U8 computeScore,
-									  DisparitySparseSelect_S32 select ) {
+									  DisparitySparseSelect select ) {
 		this.computeScore = computeScore;
 		this.select = select;
 	}

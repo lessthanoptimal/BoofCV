@@ -18,7 +18,9 @@
 
 package boofcv.factory.feature.disparity;
 
-import boofcv.alg.feature.disparity.*;
+import boofcv.alg.feature.disparity.DisparityScoreSadRect;
+import boofcv.alg.feature.disparity.DisparitySelect;
+import boofcv.alg.feature.disparity.impl.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -30,23 +32,45 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class FactoryStereoDisparityAlgs {
 
-	public static DisparitySelect_S32<ImageUInt8> selectDisparity_U8( int maxError , int tolR2L , double texture) {
+	public static DisparitySelect<int[],ImageUInt8> selectDisparity_S32( int maxError , int tolR2L , double texture) {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
-			return new SelectRectBasicWta_S32_U8();
+			return new ImplSelectRectBasicWta_S32_U8();
 		else
-			return new SelectRectStandard_S32_U8(maxError,tolR2L,texture);
+			return new ImplSelectRectStandard_S32_U8(maxError,tolR2L,texture);
 	}
 
-	public static DisparitySelect_S32<ImageFloat32> selectDisparitySubpixel_F32( int maxError , int tolR2L , double texture) {
-		return new SelectRectSubpixel_S32_F32(maxError,tolR2L,texture);
+	public static DisparitySelect<float[],ImageUInt8> selectDisparity_F32( int maxError , int tolR2L , double texture) {
+		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
+			return new ImplSelectRectBasicWta_F32_U8();
+		else
+			return new ImplSelectRectStandard_F32_U8(maxError,tolR2L,texture);
 	}
 
-	public static <T extends ImageSingleBand> DisparityScoreSadRect_U8<T>
-	scoreDisparitySadRect( int maxDisparity,
+	public static DisparitySelect<int[],ImageFloat32>
+	selectDisparitySubpixel_S32( int maxError , int tolR2L , double texture) {
+		return new ImplSelectRectSubpixel.S32_F32(maxError,tolR2L,texture);
+	}
+
+	public static DisparitySelect<float[],ImageFloat32>
+	selectDisparitySubpixel_F32( int maxError , int tolR2L , double texture) {
+		return new ImplSelectRectSubpixel.F32_F32(maxError,tolR2L,texture);
+	}
+
+	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageUInt8,T>
+	scoreDisparitySadRect_U8( int maxDisparity,
 						   int regionRadiusX, int regionRadiusY,
-						   DisparitySelect_S32<T> computeDisparity)
+						   DisparitySelect<int[],T> computeDisparity)
 	{
-		return new DisparityScoreSadRect_U8<T>(
+		return new ImplDisparityScoreSadRect_U8<T>(
+				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+	}
+
+	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageFloat32,T>
+	scoreDisparitySadRect_F32( int maxDisparity,
+							  int regionRadiusX, int regionRadiusY,
+							  DisparitySelect<float[],T> computeDisparity)
+	{
+		return new ImplDisparityScoreSadRect_F32<T>(
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 }
