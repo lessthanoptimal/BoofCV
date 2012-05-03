@@ -25,6 +25,7 @@ import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -65,8 +66,12 @@ public class DefaultMediaManager implements MediaManager {
 			
 			cachedImage.put(fileName,b);
 		}
-		
-		return b;
+
+		// return a copy of the image so that if it is modified strangeness won't happen
+		BufferedImage c = new BufferedImage(b.getWidth(),b.getHeight(),b.getType());
+		Graphics2D g2 = c.createGraphics();
+		g2.drawImage(b,0,0,null);
+		return c;
 	}
 
 	@Override

@@ -29,7 +29,6 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 
 	String dataAbr;
 	String sumType;
-	String sumTypeClass;
 	boolean isFloat;
 
 	@Override
@@ -42,11 +41,9 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 		this.isFloat = isFloat;
 		if( isFloat ) {
 			sumType = "float";
-			sumTypeClass = "Float";
 			dataAbr = "F32";
 		} else {
 			sumType = "int";
-			sumTypeClass = "Integer";
 			dataAbr = "S32";
 		}
 
@@ -165,8 +162,8 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 				"\t\t\t// test to see if the region lacks sufficient texture\n" +
 				"\t\t\tif( bestDisparity != 0 && textureThreshold > 0 ) {\n" +
 				"\t\t\t\t// find the second best disparity value and exclude its neighbors\n" +
-				"\t\t\t\t"+sumType+" secondBest = "+sumTypeClass+".MAX_VALUE;\n" +
-				"\t\t\t\tfor( int i = 0; i < bestDisparity-1; i++ ) {\n" +
+				"\t\t\t\t"+sumType+" secondBest = columnScore[0];\n" +
+				"\t\t\t\tfor( int i = 1; i < bestDisparity-1; i++ ) {\n" +
 				"\t\t\t\t\tif( columnScore[i] < secondBest ) {\n" +
 				"\t\t\t\t\t\tsecondBest = columnScore[i];\n" +
 				"\t\t\t\t\t}\n" +

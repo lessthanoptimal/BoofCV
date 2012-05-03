@@ -104,7 +104,7 @@ public class ImplDisparityScoreSadRect_F32<Disparity extends ImageSingleBand>
 
 		// compute score for the top possible row
 		for( int i = 0; i < lengthHorizontal; i++ ) {
-			int sum = 0;
+			float sum = 0;
 			for( int row = 0; row < regionHeight; row++ ) {
 				sum += horizontalScore[row][i];
 			}

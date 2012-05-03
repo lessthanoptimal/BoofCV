@@ -93,7 +93,7 @@ public class BenchmarkDisparityAlgs {
 	public static class EfficientSubpixelSad extends PerformerBase {
 
 		DisparitySelect<int[],ImageFloat32> compDisp =
-				new ImplSelectRectSubpixel.S32_F32(250,2,0.1);
+				new SelectRectSubpixel.S32_F32(250,2,0.1);
 		ImplDisparityScoreSadRect_U8<ImageFloat32> alg =
 				new ImplDisparityScoreSadRect_U8<ImageFloat32>(max,radiusX,radiusY,compDisp);
 

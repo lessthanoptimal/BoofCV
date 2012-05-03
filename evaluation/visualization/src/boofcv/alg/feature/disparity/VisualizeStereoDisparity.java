@@ -190,7 +190,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		rectifyAlg.process(K1,new Se3_F64(),K2,calib.getRightToLeft().invert(null));
 
 		rect1 = rectifyAlg.getRect1();
-		rect2 = rectifyAlg.getRect1();
+		rect2 = rectifyAlg.getRect2();
 		rectK = rectifyAlg.getCalibrationMatrix();
 
 		// adjust view to maximize viewing area while not including black regions

@@ -18,25 +18,24 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.alg.feature.disparity.SelectSparseStandardWta;
+import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestSelectSparseStandardSubpixel_S32 extends ChecksSelectSparseStandardWta<int[]>{
+public class TestSelectRectSubpixel_F32_F32 extends ChecksSelectRectStandardBase<float[],ImageFloat32> {
 
-	public TestSelectSparseStandardSubpixel_S32() {
-		super(int[].class);
+
+	public TestSelectRectSubpixel_F32_F32() {
+		super(float[].class,ImageFloat32.class);
 	}
 
 	@Override
-	protected SelectSparseStandardWta<int[]> createAlg(int maxError, double texture) {
-		return new SelectSparseStandardSubpixel.S32(maxError,texture);
+	public ImplSelectRectStandardBase_F32<ImageFloat32> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+		return new SelectRectSubpixel.F32_F32(maxError, rightToLeftTolerance, texture);
 	}
 
 	/**
@@ -45,27 +44,24 @@ public class TestSelectSparseStandardSubpixel_S32 extends ChecksSelectSparseStan
 	@Test
 	public void addSubpixelBias() {
 
-		SelectSparseStandardSubpixel.S32 alg = new SelectSparseStandardSubpixel.S32(-1,-1);
+		ImageFloat32 img = new ImageFloat32(w,h);
 
-		int scores[] = new int[30];
-		Arrays.fill(scores,0,10,500);
+		SelectRectSubpixel.F32_F32 alg = new SelectRectSubpixel.F32_F32(-1,-1,-1);
+
+		alg.configure(img,20,2);
 
 		// should be biased towards 4
-		scores[4] = 100;
-		scores[5] = 50;
-		scores[6] = 200;
+		alg.columnScore[4] = 100;
+		alg.columnScore[5] = 50;
+		alg.columnScore[6] = 200;
 
-		assertTrue(alg.select(scores, 10));
-
-		double found = alg.getDisparity();
-		assertTrue( found < 5 && found > 4);
+		alg.setDisparity(4,5);
+		assertTrue( img.data[4] < 5 && img.data[4] > 4);
 
 		// now biased towards 6
-		scores[4] = 200;
-		scores[6] = 100;
-		assertTrue(alg.select(scores, 10));
-		found = alg.getDisparity();
-
-		assertTrue( found < 6 && found > 5);
+		alg.columnScore[4] = 200;
+		alg.columnScore[6] = 100;
+		alg.setDisparity(4,5);
+		assertTrue( img.data[4] < 6 && img.data[4] > 5);
 	}
 }

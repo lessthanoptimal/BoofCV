@@ -104,8 +104,8 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageSingleBand>
 			// test to see if the region lacks sufficient texture
 			if( bestDisparity != 0 && textureThreshold > 0 ) {
 				// find the second best disparity value and exclude its neighbors
-				float secondBest = Float.MAX_VALUE;
-				for( int i = 0; i < bestDisparity-1; i++ ) {
+				float secondBest = columnScore[0];
+				for( int i = 1; i < bestDisparity-1; i++ ) {
 					if( columnScore[i] < secondBest ) {
 						secondBest = columnScore[i];
 					}

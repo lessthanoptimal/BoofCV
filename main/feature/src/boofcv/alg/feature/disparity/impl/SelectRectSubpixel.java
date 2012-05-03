@@ -37,7 +37,7 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class ImplSelectRectSubpixel {
+public class SelectRectSubpixel {
 
 	/**
 	 * For scores of type int[]

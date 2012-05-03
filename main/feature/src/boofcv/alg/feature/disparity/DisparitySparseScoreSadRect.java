@@ -16,12 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.disparity.impl;
+package boofcv.alg.feature.disparity;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.ImageUInt8;
-
-import java.util.Arrays;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Computes disparity SAD scores using a rectangular region at the specified points only along
@@ -29,32 +27,34 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class DisparitySparseScoreSadRect_U8 {
+public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends ImageSingleBand> {
 	// maximum allowed image disparity
-	int maxDisparity;
+	protected int maxDisparity;
 	// maximum disparity at the most recently processed point
-	int localMaxDisparity;
+	protected int localMaxDisparity;
 
 	// radius of the region along x and y axis
-	int radiusX,radiusY;
+	protected int radiusX,radiusY;
 	// size of the region: radius*2 + 1
-	int regionWidth,regionHeight;
-
-	// scores up to the maximum baseline
-	int scores[];
+	protected int regionWidth,regionHeight;
 
 	// input images
-	ImageUInt8 left;
-	ImageUInt8 right;
+	protected Input left;
+	protected Input right;
 
-	public DisparitySparseScoreSadRect_U8(int maxDisparity , int radiusX , int radiusY ) {
+	/**
+	 * Configures disparity calculation.
+	 *
+	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
+	 * @param radiusX Radius of the rectangular region along x-axis.
+	 * @param radiusY Radius of the rectangular region along y-axis.
+	 */
+	public DisparitySparseScoreSadRect(int maxDisparity , int radiusX , int radiusY ) {
 		this.maxDisparity = maxDisparity;
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
 		this.regionWidth = radiusX*2 + 1;
 		this.regionHeight = radiusY*2 + 1;
-
-		scores = new int[ maxDisparity ];
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class DisparitySparseScoreSadRect_U8 {
 	 * @param left Rectified left camera image.
 	 * @param right Rectified right camera image.
 	 */
-	public void setImages( ImageUInt8 left , ImageUInt8 right ) {
+	public void setImages( Input left , Input right ) {
 		InputSanityCheck.checkSameShape(left, right);
 
 		this.left = left;
@@ -77,44 +77,7 @@ public class DisparitySparseScoreSadRect_U8 {
 	 * @param x x-coordinate of point
 	 * @param y y-coordinate of point.
 	 */
-	public void process( int x , int y ) {
-		if( x < radiusX || x >= left.width-radiusX || x < radiusY || x >= right.width-radiusY )
-			throw new IllegalArgumentException("Too close to image border");
-
-		// adjust disparity for image border
-		localMaxDisparity = Math.min(maxDisparity,x-radiusX+1);
-
-		Arrays.fill(scores,0);
-
-		// sum up horizontal errors in the region
-		for( int row = 0; row < regionHeight; row++ ) {
-			// pixel indexes
-			int startLeft = left.startIndex + left.stride*(y-radiusY+row) + x-radiusX;
-			int startRight = right.startIndex + right.stride*(y-radiusY+row) + x-radiusX;
-
-			for( int i = 0; i < localMaxDisparity; i++ ) {
-				int indexLeft = startLeft;
-				int indexRight = startRight-i;
-
-				int score = 0;
-				for( int j = 0; j < regionWidth; j++ ) {
-					int diff = (left.data[ indexLeft++ ] & 0xFF) - (right.data[ indexRight++ ] & 0xFF);
-
-					score += Math.abs(diff);
-				}
-				scores[i] += score;
-			}
-		}
-	}
-
-	/**
-	 * Array containing disparity score values at most recently processed point.  Array
-	 * indices correspond to disparity.  score[i] = score at disparity i.  To know how many
-	 * disparity values there are call {@link #getLocalMaxDisparity()}
-	 */
-	public int[] getScore() {
-		return scores;
-	}
+	public abstract void process( int x , int y );
 
 	/**
 	 * How many disparity values were considered.
@@ -134,4 +97,13 @@ public class DisparitySparseScoreSadRect_U8 {
 	public int getRadiusY() {
 		return radiusY;
 	}
+
+	/**
+	 * Array containing disparity score values at most recently processed point.  Array
+	 * indices correspond to disparity.  score[i] = score at disparity i.  To know how many
+	 * disparity values there are call {@link #getLocalMaxDisparity()}
+	 */
+	public abstract ArrayData getScore();
+
+	public abstract Class<Input> getImageType();
 }

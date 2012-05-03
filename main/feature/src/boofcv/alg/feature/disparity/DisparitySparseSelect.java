@@ -20,7 +20,7 @@ package boofcv.alg.feature.disparity;
 
 /**
  * Computes the disparity given disparity score calculations provided by
- * {@link boofcv.alg.feature.disparity.impl.DisparitySparseScoreSadRect_U8}. Array specifies the
+ * {@link boofcv.alg.feature.disparity.impl.ImplDisparitySparseScoreSadRect_U8}. Array specifies the
  * type of primitive array that stores the scores that it processes,
  *
  * @author Peter Abeles

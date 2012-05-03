@@ -29,11 +29,11 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestDisparitySparseScoreSadRect_U8 {
+public class TestImplDisparitySparseScoreSadRect_U8 {
 
 	Random rand = new Random(234);
 
-	SelectSparseBasicWta_S32 selectAlg = new SelectSparseBasicWta_S32();
+	ImplSelectSparseBasicWta_S32 selectAlg = new ImplSelectSparseBasicWta_S32();
 
 	/**
 	 * Compute disparity using the equivalent dense algorithm and see if the sparse one produces the
@@ -56,7 +56,7 @@ public class TestDisparitySparseScoreSadRect_U8 {
 
 		ImplDisparityScoreSadRect_U8<ImageUInt8> denseAlg =
 				new ImplDisparityScoreSadRect_U8<ImageUInt8>(maxDisparity,radiusX,radiusY,new ImplSelectRectBasicWta_S32_U8());
-		DisparitySparseScoreSadRect_U8 alg = new DisparitySparseScoreSadRect_U8(maxDisparity,radiusX,radiusY);
+		ImplDisparitySparseScoreSadRect_U8 alg = new ImplDisparitySparseScoreSadRect_U8(maxDisparity,radiusX,radiusY);
 
 		denseAlg.process(left, right, expected);
 		alg.setImages(left,right);

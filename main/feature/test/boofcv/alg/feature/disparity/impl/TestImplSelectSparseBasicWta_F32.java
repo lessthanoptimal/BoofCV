@@ -18,8 +18,29 @@
 
 package boofcv.alg.feature.disparity.impl;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Peter Abeles
  */
-public class SelectSparseStandardSubpixel_S32 {
+public class TestImplSelectSparseBasicWta_F32 {
+
+	@Test
+	public void simple() {
+		int maxDisparity = 30;
+
+		float scores[] = new float[50];
+		for( int i = 0; i < maxDisparity; i++) {
+			scores[i] = Math.abs(i-5)+2;
+		}
+
+		ImplSelectSparseBasicWta_F32 alg = new ImplSelectSparseBasicWta_F32();
+
+		assertTrue(alg.select(scores,maxDisparity));
+
+		assertEquals(5,(int)alg.getDisparity());
+	}
 }
