@@ -18,9 +18,8 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.alg.feature.disparity.DisparityScoreSadRect_U8;
+import boofcv.alg.feature.disparity.DisparityScoreSadRect;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
@@ -28,15 +27,15 @@ import boofcv.struct.image.ImageUInt8;
 public class WrapDisparitySadRect <T extends ImageSingleBand, D extends ImageSingleBand>
 		implements StereoDisparity<T,D>
 {
-	DisparityScoreSadRect_U8<D> alg;
+	DisparityScoreSadRect<T,D> alg;
 
-	public WrapDisparitySadRect(DisparityScoreSadRect_U8<T> alg) {
-		this.alg = (DisparityScoreSadRect_U8)alg;
+	public WrapDisparitySadRect(DisparityScoreSadRect<T,D> alg) {
+		this.alg = alg;
 	}
 
 	@Override
 	public void process(T imageLeft, T imageRight, D output) {
-		alg.process((ImageUInt8)imageLeft,(ImageUInt8)imageRight,output);
+		alg.process(imageLeft,imageRight,output);
 	}
 
 	@Override
@@ -56,7 +55,7 @@ public class WrapDisparitySadRect <T extends ImageSingleBand, D extends ImageSin
 
 	@Override
 	public Class<T> getInputType() {
-		return (Class)ImageUInt8.class;
+		return alg.getInputType();
 	}
 
 	@Override
@@ -64,7 +63,7 @@ public class WrapDisparitySadRect <T extends ImageSingleBand, D extends ImageSin
 		return alg.getDisparityType();
 	}
 
-	public DisparityScoreSadRect_U8<D> getAlg() {
+	public DisparityScoreSadRect<T,D> getAlg() {
 		return alg;
 	}
 }

@@ -86,7 +86,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		reverseSpinner.addChangeListener(this);
 		reverseSpinner.setMaximumSize(reverseSpinner.getPreferredSize());
 
-		textureSpinner = new JSpinner(new SpinnerNumberModel(texture,0.0, 0.5, 0.02));
+		textureSpinner = new JSpinner(new SpinnerNumberModel(texture,0.0, 1, 0.02));
 		textureSpinner.addChangeListener(this);
 		textureSpinner.setPreferredSize(new Dimension(60,reverseSpinner.getPreferredSize().height));
 		textureSpinner.setMaximumSize(textureSpinner.getPreferredSize());
