@@ -18,14 +18,24 @@
 
 package boofcv.alg.feature.disparity.impl;
 
+import boofcv.alg.feature.disparity.SelectSparseStandardWta;
 import org.junit.Test;
 
+import static boofcv.alg.feature.disparity.impl.ChecksSelectRectStandardBase.copyToCorrectType;
 import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestSelectSparseStandardWta_S32 {
+public abstract class ChecksSelectSparseStandardWta<ArrayData> {
+
+	Class<ArrayData> arrayType;
+
+	protected ChecksSelectSparseStandardWta(Class<ArrayData> arrayType) {
+		this.arrayType = arrayType;
+	}
+
+	protected abstract SelectSparseStandardWta<ArrayData> createAlg(int maxError, double texture);
 
 	/**
 	 * All validation tests are turned off
@@ -41,9 +51,9 @@ public class TestSelectSparseStandardWta_S32 {
 		// if texture is left on then this will trigger bad stuff
 		scores[8]=3;
 
-		SelectSparseStandardWta_S32 alg = new SelectSparseStandardWta_S32(-1,-1);
+		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,-1);
 
-		assertTrue(alg.select(scores,maxDisparity));
+		assertTrue(alg.select(copyToCorrectType(scores,arrayType),maxDisparity));
 
 		assertEquals(5,(int)alg.getDisparity());
 	}
@@ -56,7 +66,7 @@ public class TestSelectSparseStandardWta_S32 {
 		int minValue = 3;
 		int maxDisparity=10;
 
-		SelectSparseStandardWta_S32 alg = new SelectSparseStandardWta_S32(-1,3);
+		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,3);
 
 		int scores[] = new int[maxDisparity+10];
 
@@ -64,7 +74,7 @@ public class TestSelectSparseStandardWta_S32 {
 			scores[d] = minValue + Math.abs(2-d);
 		}
 
-		assertFalse(alg.select(scores, maxDisparity));
+		assertFalse(alg.select(copyToCorrectType(scores,arrayType), maxDisparity));
 	}
 
 	/**
@@ -79,7 +89,7 @@ public class TestSelectSparseStandardWta_S32 {
 	private void confidenceMultiplePeak(int minValue) {
 		int maxDisparity=10;
 
-		SelectSparseStandardWta_S32 alg = new SelectSparseStandardWta_S32(-1,3);
+		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,3);
 
 		int scores[] = new int[maxDisparity+10];
 
@@ -88,6 +98,6 @@ public class TestSelectSparseStandardWta_S32 {
 		}
 
 
-		assertFalse(alg.select(scores, maxDisparity));
+		assertFalse(alg.select(copyToCorrectType(scores,arrayType), maxDisparity));
 	}
 }

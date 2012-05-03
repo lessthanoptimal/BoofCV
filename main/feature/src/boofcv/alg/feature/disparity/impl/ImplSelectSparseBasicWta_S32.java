@@ -21,13 +21,17 @@ package boofcv.alg.feature.disparity.impl;
 import boofcv.alg.feature.disparity.DisparitySparseSelect;
 
 /**
- * Most basic implementation of Winner Take All (WTA).  Just selects the diparity value
- * with the lowest score.
+ * <p>
+ * Selects the disparity with the lowest score with no additional validation.  Lack
+ * of validation speeds up the code at the cost of reduced signal to noise ratio.  This
+ * strategy of selecting the lowest score is also known as Winner Take All (WTA).
+ * </p>
  *
  * @author Peter Abeles
  */
-public class SelectSparseBasicWta_S32 implements DisparitySparseSelect<int[]> {
+public class ImplSelectSparseBasicWta_S32 implements DisparitySparseSelect<int[]> {
 
+	// selected disparity
 	int disparity;
 
 	@Override

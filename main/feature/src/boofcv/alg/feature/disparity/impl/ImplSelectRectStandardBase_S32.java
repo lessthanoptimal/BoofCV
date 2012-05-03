@@ -46,7 +46,9 @@ public abstract class ImplSelectRectStandardBase_S32<T extends ImageSingleBand>
 
 	public ImplSelectRectStandardBase_S32(int maxError, int rightToLeftTolerance, double texture) {
 		super(maxError,rightToLeftTolerance,texture);
-	}	@Override
+	}
+
+	@Override
 	public void setTexture(double threshold) {
 		textureThreshold = (int)(discretizer*threshold);
 	}
@@ -103,8 +105,8 @@ public abstract class ImplSelectRectStandardBase_S32<T extends ImageSingleBand>
 			// test to see if the region lacks sufficient texture
 			if( bestDisparity != 0 && textureThreshold > 0 ) {
 				// find the second best disparity value and exclude its neighbors
-				int secondBest = Integer.MAX_VALUE;
-				for( int i = 0; i < bestDisparity-1; i++ ) {
+				int secondBest = columnScore[0];
+				for( int i = 1; i < bestDisparity-1; i++ ) {
 					if( columnScore[i] < secondBest ) {
 						secondBest = columnScore[i];
 					}

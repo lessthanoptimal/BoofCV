@@ -18,26 +18,27 @@
 
 package boofcv.abst.feature.disparity;
 
+import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySparseSelect;
-import boofcv.alg.feature.disparity.impl.DisparitySparseScoreSadRect_U8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * @author Peter Abeles
  */
-public class WrapDisparitySparseSadRect implements StereoDisparitySparse<ImageUInt8>
+public class WrapDisparitySparseSadRect <ArrayData,T extends ImageSingleBand>
+		implements StereoDisparitySparse<T>
 {
-	DisparitySparseScoreSadRect_U8 computeScore;
-	DisparitySparseSelect select;
+	DisparitySparseScoreSadRect<ArrayData,T> computeScore;
+	DisparitySparseSelect<ArrayData> select;
 
-	public WrapDisparitySparseSadRect(DisparitySparseScoreSadRect_U8 computeScore,
-									  DisparitySparseSelect select ) {
+	public WrapDisparitySparseSadRect(DisparitySparseScoreSadRect<ArrayData,T> computeScore,
+									  DisparitySparseSelect<ArrayData> select ) {
 		this.computeScore = computeScore;
 		this.select = select;
 	}
 
 	@Override
-	public void setImages(ImageUInt8 imageLeft, ImageUInt8 imageRight ) {
+	public void setImages(T imageLeft, T imageRight ) {
 		computeScore.setImages(imageLeft,imageRight);
 	}
 
@@ -68,7 +69,7 @@ public class WrapDisparitySparseSadRect implements StereoDisparitySparse<ImageUI
 	}
 
 	@Override
-	public Class<ImageUInt8> getInputType() {
-		return ImageUInt8.class;
+	public Class<T> getInputType() {
+		return computeScore.getImageType();
 	}
 }

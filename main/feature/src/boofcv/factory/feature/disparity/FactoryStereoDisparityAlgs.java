@@ -20,6 +20,8 @@ package boofcv.factory.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySelect;
+import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
+import boofcv.alg.feature.disparity.DisparitySparseSelect;
 import boofcv.alg.feature.disparity.impl.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -48,12 +50,38 @@ public class FactoryStereoDisparityAlgs {
 
 	public static DisparitySelect<int[],ImageFloat32>
 	selectDisparitySubpixel_S32( int maxError , int tolR2L , double texture) {
-		return new ImplSelectRectSubpixel.S32_F32(maxError,tolR2L,texture);
+		return new SelectRectSubpixel.S32_F32(maxError,tolR2L,texture);
 	}
 
 	public static DisparitySelect<float[],ImageFloat32>
 	selectDisparitySubpixel_F32( int maxError , int tolR2L , double texture) {
-		return new ImplSelectRectSubpixel.F32_F32(maxError,tolR2L,texture);
+		return new SelectRectSubpixel.F32_F32(maxError,tolR2L,texture);
+	}
+
+	public static DisparitySparseSelect<int[]>
+	selectDisparitySparse_S32( int maxError , double texture) {
+		if( maxError < 0 && texture <= 0 )
+			return new ImplSelectSparseBasicWta_S32();
+		else
+			return new ImplSelectSparseStandardWta_S32(maxError,texture);
+	}
+
+	public static DisparitySparseSelect<float[]>
+	selectDisparitySparse_F32( int maxError , double texture) {
+		if( maxError < 0 && texture <= 0 )
+			return new ImplSelectSparseBasicWta_F32();
+		else
+			return new ImplSelectSparseStandardWta_F32(maxError,texture);
+	}
+
+	public static DisparitySparseSelect<int[]>
+	selectDisparitySparseSubpixel_S32( int maxError , double texture) {
+		return new SelectSparseStandardSubpixel.S32(maxError,texture);
+	}
+
+	public static DisparitySparseSelect<float[]>
+	selectDisparitySparseSubpixel_F32( int maxError , double texture) {
+		return new SelectSparseStandardSubpixel.F32(maxError,texture);
 	}
 
 	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageUInt8,T>
@@ -72,5 +100,21 @@ public class FactoryStereoDisparityAlgs {
 	{
 		return new ImplDisparityScoreSadRect_F32<T>(
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+	}
+
+	public static DisparitySparseScoreSadRect<int[],ImageUInt8>
+	scoreDisparitySparseSadRect_U8( int maxDisparity,
+									int regionRadiusX, int regionRadiusY )
+	{
+		return new ImplDisparitySparseScoreSadRect_U8(
+				maxDisparity,regionRadiusX,regionRadiusY);
+	}
+
+	public static DisparitySparseScoreSadRect<float[],ImageFloat32>
+	scoreDisparitySparseSadRect_F32( int maxDisparity,
+									int regionRadiusX, int regionRadiusY )
+	{
+		return new ImplDisparitySparseScoreSadRect_F32(
+				maxDisparity,regionRadiusX,regionRadiusY);
 	}
 }

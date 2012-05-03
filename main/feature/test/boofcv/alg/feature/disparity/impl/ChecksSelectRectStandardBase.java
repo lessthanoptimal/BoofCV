@@ -78,7 +78,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 			}
 		}
 
-		alg.process(y, copyToCorrectType(scores));
+		alg.process(y, copyToCorrectType(scores,arrayType));
 
 		// Below error threshold and disparity of 1 should be optimal
 		assertEquals(1, getDisparity( 1 + 2, y), 1e-8);
@@ -90,7 +90,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 		// Sanity check, much higher error threshold
 		alg = createSelector(20,-1,-1);
 		alg.configure(disparity,maxDisparity,2);
-		alg.process(y,copyToCorrectType(scores));
+		alg.process(y,copyToCorrectType(scores,arrayType));
 		assertEquals(1, getDisparity( 3+2, y), 1);
 		assertEquals(1, getDisparity(4 + 2, y), 1);
 	}
@@ -125,7 +125,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 			}
 		}
 
-		alg.process(y,copyToCorrectType(scores));
+		alg.process(y,copyToCorrectType(scores,arrayType));
 
 		// These should all be zero since other pixels will have lower scores
 		for( int i = 0; i < 4; i++ )
@@ -139,7 +139,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 		// sanity check, I now set the tolerance to zero
 		alg = createSelector(-1,0,-1);
 		alg.configure(disparity,maxDisparity,2);
-		alg.process(y,copyToCorrectType(scores));
+		alg.process(y,copyToCorrectType(scores,arrayType));
 		assertEquals(0, getDisparity(4 + 2, y), 1e-8);
 	}
 
@@ -162,7 +162,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 			}
 		}
 
-		alg.process(y,copyToCorrectType(scores));
+		alg.process(y,copyToCorrectType(scores,arrayType));
 
 		// it should reject the solution
 		assertEquals(0, getDisparity(4 + 2, y), 1e-8);
@@ -191,13 +191,13 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 			}
 		}
 
-		alg.process(y,copyToCorrectType(scores));
+		alg.process(y,copyToCorrectType(scores,arrayType));
 
 		// it should reject the solution
 		assertEquals(0, getDisparity(4 + 2, y), 1e-8);
 	}
 
-	private ArrayData copyToCorrectType( int scores[] ) {
+	public static <ArrayData> ArrayData copyToCorrectType( int scores[] , Class<ArrayData> arrayType ) {
 
 		if( arrayType == int[].class )
 			return (ArrayData)scores;

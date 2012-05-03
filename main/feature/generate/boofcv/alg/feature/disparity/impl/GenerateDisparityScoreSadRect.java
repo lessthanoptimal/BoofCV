@@ -151,7 +151,7 @@ public class GenerateDisparityScoreSadRect extends CodeGeneratorBase {
 				"\n" +
 				"\t\t// compute score for the top possible row\n" +
 				"\t\tfor( int i = 0; i < lengthHorizontal; i++ ) {\n" +
-				"\t\t\tint sum = 0;\n" +
+				"\t\t\t"+sumType+" sum = 0;\n" +
 				"\t\t\tfor( int row = 0; row < regionHeight; row++ ) {\n" +
 				"\t\t\t\tsum += horizontalScore[row][i];\n" +
 				"\t\t\t}\n" +

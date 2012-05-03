@@ -26,16 +26,16 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestImplSelectRectSubpixel_S32_F32 extends ChecksSelectRectStandardBase<int[],ImageFloat32> {
+public class TestSelectRectSubpixel_S32_F32 extends ChecksSelectRectStandardBase<int[],ImageFloat32> {
 
 
-	public TestImplSelectRectSubpixel_S32_F32() {
+	public TestSelectRectSubpixel_S32_F32() {
 		super(int[].class,ImageFloat32.class);
 	}
 
 	@Override
 	public ImplSelectRectStandardBase_S32<ImageFloat32> createSelector(int maxError, int rightToLeftTolerance, double texture) {
-		return new ImplSelectRectSubpixel.S32_F32(maxError, rightToLeftTolerance, texture);
+		return new SelectRectSubpixel.S32_F32(maxError, rightToLeftTolerance, texture);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class TestImplSelectRectSubpixel_S32_F32 extends ChecksSelectRectStandard
 
 		ImageFloat32 img = new ImageFloat32(w,h);
 
-		ImplSelectRectSubpixel.S32_F32 alg = new ImplSelectRectSubpixel.S32_F32(-1,-1,-1);
+		SelectRectSubpixel.S32_F32 alg = new SelectRectSubpixel.S32_F32(-1,-1,-1);
 
 		alg.configure(img,20,2);
 
