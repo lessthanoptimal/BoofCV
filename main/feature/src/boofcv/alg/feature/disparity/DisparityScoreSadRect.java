@@ -47,8 +47,12 @@ import boofcv.struct.image.ImageSingleBand;
 public abstract class DisparityScoreSadRect
 		<Input extends ImageSingleBand, Disparity extends ImageSingleBand>
 {
+	// the minimum disparity that it will check
+	protected int minDisparity;
 	// maximum allowed image disparity
 	protected int maxDisparity;
+	// difference between max and min
+	protected int rangeDisparity;
 
 	// number of score elements: (image width - regionWidth)*maxDisparity
 	protected int lengthHorizontal;
@@ -61,18 +65,24 @@ public abstract class DisparityScoreSadRect
 	/**
 	 * Configures disparity calculation.
 	 *
+	 * @param minDisparity Minimum disparity that it will check. Must be >= 0 and < maxDisparity
 	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
 	 * @param regionRadiusX Radius of the rectangular region along x-axis.
 	 * @param regionRadiusY Radius of the rectangular region along y-axis.
 	 */
-	public DisparityScoreSadRect(int maxDisparity,
+	public DisparityScoreSadRect(int minDisparity, int maxDisparity,
 								 int regionRadiusX, int regionRadiusY ) {
 		if( maxDisparity <= 0 )
 			throw new IllegalArgumentException("Max disparity must be greater than zero");
+		if( minDisparity < 0 || minDisparity >= maxDisparity )
+			throw new IllegalArgumentException("Min disparity must be >= 0 and < maxDisparity");
 
+		this.minDisparity = minDisparity;
 		this.maxDisparity = maxDisparity;
 		this.radiusX = regionRadiusX;
 		this.radiusY = regionRadiusY;
+
+		this.rangeDisparity = maxDisparity - minDisparity;
 
 		this.regionWidth = regionRadiusX*2+1;
 		this.regionHeight = regionRadiusY*2+1;
@@ -91,6 +101,9 @@ public abstract class DisparityScoreSadRect
 
 	public abstract Class<Disparity> getDisparityType();
 
+	public int getMinDisparity() {
+		return minDisparity;
+	}
 
 	public int getMaxDisparity() {
 		return maxDisparity;

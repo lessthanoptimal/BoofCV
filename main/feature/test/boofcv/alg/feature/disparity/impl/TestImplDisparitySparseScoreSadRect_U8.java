@@ -50,12 +50,13 @@ public class TestImplDisparitySparseScoreSadRect_U8 {
 		GeneralizedImageOps.randomize(left, rand, 0, 20);
 		GeneralizedImageOps.randomize(right,rand,0,20);
 
+		int minDisparity = 0;
 		int maxDisparity = 10;
 		int radiusX = 3;
 		int radiusY = 2;
 
 		ImplDisparityScoreSadRect_U8<ImageUInt8> denseAlg =
-				new ImplDisparityScoreSadRect_U8<ImageUInt8>(maxDisparity,radiusX,radiusY,new ImplSelectRectBasicWta_S32_U8());
+				new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,new ImplSelectRectBasicWta_S32_U8());
 		ImplDisparitySparseScoreSadRect_U8 alg = new ImplDisparitySparseScoreSadRect_U8(maxDisparity,radiusX,radiusY);
 
 		denseAlg.process(left, right, expected);

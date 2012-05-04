@@ -53,18 +53,10 @@ public class ImplDisparityScoreSadRect_F32<Disparity extends ImageSingleBand>
 	// This is simply the sum of like elements in horizontal score
 	float verticalScore[];
 
-	/**
-	 * Configures disparity calculation.
-	 *
-	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
-	 * @param regionRadiusX Radius of the rectangular region along x-axis.
-	 * @param regionRadiusY Radius of the rectangular region along y-axis.
-	 * @param computeDisparity Algorithm which computes the disparity from the score.
-	 */
-	public ImplDisparityScoreSadRect_F32(int maxDisparity,
+	public ImplDisparityScoreSadRect_F32( int minDisparity , int maxDisparity,
 										int regionRadiusX, int regionRadiusY,
 										DisparitySelect<float[],Disparity> computeDisparity) {
-		super(maxDisparity,regionRadiusX,regionRadiusY);
+		super(minDisparity,maxDisparity,regionRadiusX,regionRadiusY);
 
 		this.computeDisparity = computeDisparity;
 	}
