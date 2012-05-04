@@ -56,8 +56,8 @@ public class TestImplDisparityScoreSadRect_U8 {
 					}
 
 					@Override
-					public void initialize(int maxDisparity) {
-						alg = new ImplDisparityScoreSadRect_U8<ImageUInt8>(maxDisparity,2,3,compDisp);
+					public void initialize(int minDisparity , int maxDisparity) {
+						alg = new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,2,3,compDisp);
 					}
 
 					@Override public int getBorderX() { return 2; }
@@ -84,12 +84,13 @@ public class TestImplDisparityScoreSadRect_U8 {
 		GeneralizedImageOps.randomize(left,rand,0,20);
 		GeneralizedImageOps.randomize(right,rand,0,20);
 
+		int minDisparity = 0;
 		int maxDisparity = 10;
 		int radiusX = 3;
 		int radiusY = 2;
 
 		ImplDisparityScoreSadRect_U8<ImageUInt8> alg =
-				new ImplDisparityScoreSadRect_U8<ImageUInt8>(maxDisparity,radiusX,radiusY,compDisp);
+				new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
 		StereoDisparityWtoNaive<ImageUInt8> naive =
 				new StereoDisparityWtoNaive<ImageUInt8>(maxDisparity,radiusX,radiusY);
 

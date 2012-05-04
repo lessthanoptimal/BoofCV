@@ -44,7 +44,7 @@ public class TestStereoDisparityWtoNaive {
 					}
 
 					@Override
-					public void initialize(int maxDisparity) {
+					public void initialize(int minDisparity , int maxDisparity) {
 						alg = new StereoDisparityWtoNaive<ImageUInt8>(maxDisparity,2,3);
 					}
 

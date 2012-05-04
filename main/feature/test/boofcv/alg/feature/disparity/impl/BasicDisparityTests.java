@@ -36,16 +36,17 @@ public abstract class BasicDisparityTests<T extends ImageSingleBand, D extends  
 	int w = 50;
 	int h = 60;
 
+	int minDisparity = 0;
 	int maxDisparity = 40;
 
 	public BasicDisparityTests( Class<T> imageType ) {
 		left = GeneralizedImageOps.createSingleBand(imageType,w,h);
 		right = GeneralizedImageOps.createSingleBand(imageType,w,h);
 
-		initialize(maxDisparity);
+		initialize(minDisparity,maxDisparity);
 	}
 
-	public abstract void initialize( int maxDisparity );
+	public abstract void initialize( int minDisparity , int maxDisparity );
 
 	public abstract int getBorderX();
 

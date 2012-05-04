@@ -249,13 +249,13 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		switch( selectedAlg ) {
 			case 0:
 				changeGuiActive(true,true);
-				return (StereoDisparity)FactoryStereoDisparity.regionWta(
+				return (StereoDisparity)FactoryStereoDisparity.regionWta(control.minDisparity,
 						control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
 						ImageUInt8.class);
 
 			case 1:
 				changeGuiActive(false,false);
-				return (StereoDisparity)FactoryStereoDisparity.regionWta(
+				return (StereoDisparity)FactoryStereoDisparity.regionWta(control.minDisparity,
 						control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
 
 			default:

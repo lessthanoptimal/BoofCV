@@ -68,7 +68,7 @@ public class FactoryStereoDisparity {
 	 * @return
 	 */
 	public static <T extends ImageSingleBand> StereoDisparity<T,ImageUInt8>
-	regionWta( int maxDisparity,
+	regionWta( int minDisparity , int maxDisparity,
 			   int regionRadiusX, int regionRadiusY ,
 			   double maxPerPixelError ,
 			   int validateRtoL ,
@@ -82,12 +82,12 @@ public class FactoryStereoDisparity {
 		if( imageType == ImageUInt8.class ) {
 			DisparitySelect<int[],ImageUInt8> select =
 					selectDisparity_S32((int) maxError, validateRtoL, texture);
-			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(
+			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
 					maxDisparity,regionRadiusX,regionRadiusY,select);
 		} else if( imageType == ImageFloat32.class ) {
 			DisparitySelect<float[],ImageUInt8> select =
 					selectDisparity_F32((int) maxError, validateRtoL, texture);
-			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(
+			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
 					maxDisparity, regionRadiusX, regionRadiusY, select);
 		} else
 			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
@@ -96,7 +96,7 @@ public class FactoryStereoDisparity {
 	}
 
 	public static <T extends ImageSingleBand> StereoDisparity<T,ImageFloat32>
-	regionSubpixelWta( int maxDisparity,
+	regionSubpixelWta( int minDisparity , int maxDisparity,
 					   int regionRadiusX, int regionRadiusY ,
 					   double maxPerPixelError ,
 					   int validateRtoL ,
@@ -110,12 +110,12 @@ public class FactoryStereoDisparity {
 		if( imageType == ImageUInt8.class ) {
 			DisparitySelect<int[],ImageFloat32> select =
 					selectDisparitySubpixel_S32((int) maxError, validateRtoL, texture);
-			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(
+			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
 					maxDisparity,regionRadiusX,regionRadiusY,select);
 		} else if( imageType == ImageFloat32.class ) {
 			DisparitySelect<float[],ImageFloat32> select =
 					selectDisparitySubpixel_F32((int) maxError, validateRtoL, texture);
-			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(
+			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
 					maxDisparity, regionRadiusX, regionRadiusY, select);
 		} else
 			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );

@@ -85,20 +85,20 @@ public class FactoryStereoDisparityAlgs {
 	}
 
 	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageUInt8,T>
-	scoreDisparitySadRect_U8( int maxDisparity,
+	scoreDisparitySadRect_U8( int minDisparity , int maxDisparity,
 						   int regionRadiusX, int regionRadiusY,
 						   DisparitySelect<int[],T> computeDisparity)
 	{
-		return new ImplDisparityScoreSadRect_U8<T>(
+		return new ImplDisparityScoreSadRect_U8<T>(minDisparity,
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 
 	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageFloat32,T>
-	scoreDisparitySadRect_F32( int maxDisparity,
+	scoreDisparitySadRect_F32( int minDisparity , int maxDisparity,
 							  int regionRadiusX, int regionRadiusY,
 							  DisparitySelect<float[],T> computeDisparity)
 	{
-		return new ImplDisparityScoreSadRect_F32<T>(
+		return new ImplDisparityScoreSadRect_F32<T>(minDisparity,
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 

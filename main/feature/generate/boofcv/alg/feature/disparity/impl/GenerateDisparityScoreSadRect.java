@@ -96,18 +96,10 @@ public class GenerateDisparityScoreSadRect extends CodeGeneratorBase {
 	}
 
 	private void printConstructor() {
-		out.print("\t/**\n" +
-				"\t * Configures disparity calculation.\n" +
-				"\t *\n" +
-				"\t * @param maxDisparity Maximum disparity that it will calculate. Must be > 0\n" +
-				"\t * @param regionRadiusX Radius of the rectangular region along x-axis.\n" +
-				"\t * @param regionRadiusY Radius of the rectangular region along y-axis.\n" +
-				"\t * @param computeDisparity Algorithm which computes the disparity from the score.\n" +
-				"\t */\n" +
-				"\tpublic "+className+"(int maxDisparity,\n" +
+		out.print("\tpublic "+className+"( int minDisparity , int maxDisparity,\n" +
 				"\t\t\t\t\t\t\t\t\t\tint regionRadiusX, int regionRadiusY,\n" +
 				"\t\t\t\t\t\t\t\t\t\tDisparitySelect<"+sumType+"[],Disparity> computeDisparity) {\n" +
-				"\t\tsuper(maxDisparity,regionRadiusX,regionRadiusY);\n" +
+				"\t\tsuper(minDisparity,maxDisparity,regionRadiusX,regionRadiusY);\n" +
 				"\n" +
 				"\t\tthis.computeDisparity = computeDisparity;\n" +
 				"\t}\n\n");
