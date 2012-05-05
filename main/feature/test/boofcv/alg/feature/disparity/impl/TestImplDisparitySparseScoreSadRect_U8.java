@@ -25,6 +25,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -57,7 +58,7 @@ public class TestImplDisparitySparseScoreSadRect_U8 {
 
 		ImplDisparityScoreSadRect_U8<ImageUInt8> denseAlg =
 				new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,new ImplSelectRectBasicWta_S32_U8());
-		ImplDisparitySparseScoreSadRect_U8 alg = new ImplDisparitySparseScoreSadRect_U8(maxDisparity,radiusX,radiusY);
+		ImplDisparitySparseScoreSadRect_U8 alg = new ImplDisparitySparseScoreSadRect_U8(0,maxDisparity,radiusX,radiusY);
 
 		denseAlg.process(left, right, expected);
 		alg.setImages(left,right);
@@ -65,11 +66,16 @@ public class TestImplDisparitySparseScoreSadRect_U8 {
 		for( int y = radiusY; y < h-radiusY; y++ ) {
 			for( int x = radiusX; x < w-radiusX; x++ ) {
 				alg.process(x,y);
-				selectAlg.select(alg.scores,alg.getLocalMaxDisparity());
+				selectAlg.select(alg.scores,0,alg.getLocalMaxDisparity());
 				int found = (int)selectAlg.getDisparity();
 
 				assertEquals(x+" "+y,expected.get(x,y),found);
 			}
 		}
+	}
+
+	@Test
+	public void addMinDisparity() {
+		fail("stuff");
 	}
 }

@@ -28,7 +28,8 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends ImageSingleBand> {
-	// maximum allowed image disparity
+	// maximum and minimum allowed image disparity
+	protected int minDisparity;
 	protected int maxDisparity;
 	// maximum disparity at the most recently processed point
 	protected int localMaxDisparity;
@@ -45,11 +46,13 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 	/**
 	 * Configures disparity calculation.
 	 *
+	 * @param minDisparity Minimum disparity that it will consider.  Must be >= 0 && < maxDisparity
 	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
 	 * @param radiusX Radius of the rectangular region along x-axis.
 	 * @param radiusY Radius of the rectangular region along y-axis.
 	 */
-	public DisparitySparseScoreSadRect(int maxDisparity , int radiusX , int radiusY ) {
+	public DisparitySparseScoreSadRect( int minDisparity , int maxDisparity , int radiusX , int radiusY ) {
+		this.minDisparity = minDisparity;
 		this.maxDisparity = maxDisparity;
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
@@ -84,6 +87,10 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 	 */
 	public int getLocalMaxDisparity() {
 		return localMaxDisparity;
+	}
+
+	public int getMinDisparity() {
+		return minDisparity;
 	}
 
 	public int getMaxDisparity() {

@@ -20,7 +20,7 @@ package boofcv.alg.feature.disparity;
 
 /**
  * Computes the disparity given disparity score calculations provided by
- * {@link boofcv.alg.feature.disparity.impl.ImplDisparitySparseScoreSadRect_U8}. Array specifies the
+ * {@link boofcv.alg.feature.disparity.DisparitySparseScoreSadRect}. Array specifies the
  * type of primitive array that stores the scores that it processes,
  *
  * @author Peter Abeles
@@ -32,10 +32,11 @@ public interface DisparitySparseSelect<ArrayType> {
 	 * can be found then false is returned.
 	 *
 	 * @param scores Set of disparity scores.
-	 * @param maxDisparity Maximum allowed disparity at this point
+	 * @param minDisparity Minimum allowed disparity.
+	 * @param maxDisparity Maximum allowed disparity.
 	 * @return true if a valid correspondence was found
 	 */
-	public boolean select( ArrayType scores , int maxDisparity );
+	public boolean select( ArrayType scores , int minDisparity , int maxDisparity );
 
 	/**
 	 * Returns the found disparity

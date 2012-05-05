@@ -34,6 +34,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -101,6 +102,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		if( !rectifiedImages )
 			return;
 
+		GeneralizedImageOps.fill(disparity,0);
 		activeAlg.process(rectLeft, rectRight, disparity);
 		disparityOut = VisualizeImageData.grayMagnitudeTemp(disparity,null,activeAlg.getMaxDisparity());
 

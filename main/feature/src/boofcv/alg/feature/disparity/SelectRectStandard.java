@@ -43,8 +43,10 @@ public abstract class SelectRectStandard <Array , T extends ImageSingleBand>
 {
 	// output containing disparity
 	protected T imageDisparity;
-	// maximum disparity being checked
+	// minimum and maximum disparity that will be checked
+	protected int minDisparity;
 	protected int maxDisparity;
+	protected int rangeDisparity;
 	// max allowed disparity at the current pixel
 	protected int localMax;
 	// radius and width of the region being compared
@@ -74,11 +76,13 @@ public abstract class SelectRectStandard <Array , T extends ImageSingleBand>
 	public abstract void setTexture( double threshold );
 
 	@Override
-	public void configure(T imageDisparity, int maxDisparity , int radiusX ) {
+	public void configure(T imageDisparity, int minDisparity , int maxDisparity , int radiusX ) {
 		this.imageDisparity = imageDisparity;
+		this.minDisparity = minDisparity;
 		this.maxDisparity = maxDisparity;
 		this.radiusX = radiusX;
 
+		rangeDisparity = maxDisparity-minDisparity;
 		regionWidth = radiusX*2+1;
 	}
 
@@ -95,6 +99,6 @@ public abstract class SelectRectStandard <Array , T extends ImageSingleBand>
 	 * as limited by the image border.
 	 */
 	protected int maxDisparityAtColumnL2R( int col) {
-		return 1+col-Math.max(0,col-maxDisparity+1);
+		return 1+col-minDisparity-Math.max(0,col-maxDisparity+1);
 	}
 }

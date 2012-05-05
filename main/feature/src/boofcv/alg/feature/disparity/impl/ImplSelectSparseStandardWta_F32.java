@@ -46,7 +46,7 @@ public class ImplSelectSparseStandardWta_F32 extends SelectSparseStandardWta<flo
 	}
 
 	@Override
-	public boolean select(float[] scores, int maxDisparity) {
+	public boolean select(float[] scores, int minDisparity , int maxDisparity) {
 		int disparity = 0;
 		float best = scores[0];
 

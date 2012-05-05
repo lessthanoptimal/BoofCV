@@ -75,13 +75,13 @@ public class GenerateSelectRectBasicWta extends CodeGeneratorBase {
 				"\t@Override\n" +
 				"\tpublic void process(int row, "+sumType+"[] scores) {\n" +
 				"\n" +
-				"\t\tint indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX;\n" +
+				"\t\tint indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX + minDisparity;\n" +
 				"\n" +
-				"\t\tfor( int col = 0; col <= imageWidth-regionWidth; col++ ) {\n" +
+				"\t\tfor( int col = minDisparity; col <= imageWidth-regionWidth; col++ ) {\n" +
 				"\t\t\t// make sure the disparity search doesn't go outside the image border\n" +
 				"\t\t\tint localMax = maxDisparityAtColumnL2R(col);\n" +
 				"\n" +
-				"\t\t\tint indexScore = col;\n" +
+				"\t\t\tint indexScore = col-minDisparity;\n" +
 				"\n" +
 				"\t\t\tint bestDisparity = 0;\n" +
 				"\t\t\t"+sumType+" scoreBest = scores[indexScore];\n" +
@@ -95,7 +95,7 @@ public class GenerateSelectRectBasicWta extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\timageDisparity.data[indexDisparity++] = ("+dataType+")bestDisparity;\n" +
+				"\t\t\timageDisparity.data[indexDisparity++] = ("+dataType+")(bestDisparity+minDisparity);\n" +
 				"\t\t}\n" +
 				"\t}\n" +
 				"\n" +

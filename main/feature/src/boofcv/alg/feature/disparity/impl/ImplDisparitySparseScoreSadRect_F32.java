@@ -39,8 +39,8 @@ public class ImplDisparitySparseScoreSadRect_F32 extends DisparitySparseScoreSad
 	// scores up to the maximum baseline
 	float scores[];
 
-	public ImplDisparitySparseScoreSadRect_F32(int maxDisparity, int radiusX, int radiusY) {
-		super(maxDisparity,radiusX, radiusY);
+	public ImplDisparitySparseScoreSadRect_F32(int minDisparity , int maxDisparity, int radiusX, int radiusY) {
+		super(minDisparity,maxDisparity,radiusX, radiusY);
 
 		scores = new float[ maxDisparity ];
 	}

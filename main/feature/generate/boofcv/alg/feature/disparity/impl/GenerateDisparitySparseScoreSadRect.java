@@ -75,8 +75,8 @@ public class GenerateDisparitySparseScoreSadRect extends CodeGeneratorBase {
 				"\t// scores up to the maximum baseline\n" +
 				"\t"+sumType+" scores[];\n" +
 				"\n" +
-				"\tpublic "+className+"(int maxDisparity, int radiusX, int radiusY) {\n" +
-				"\t\tsuper(maxDisparity,radiusX, radiusY);\n" +
+				"\tpublic "+className+"( int minDisparity , int maxDisparity, int radiusX, int radiusY) {\n" +
+				"\t\tsuper(minDisparity,maxDisparity,radiusX, radiusY);\n" +
 				"\n" +
 				"\t\tscores = new "+sumType+"[ maxDisparity ];\n" +
 				"\t}\n\n");
