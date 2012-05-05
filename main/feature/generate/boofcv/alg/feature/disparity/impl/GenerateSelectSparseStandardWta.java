@@ -102,7 +102,7 @@ public class GenerateSelectSparseStandardWta extends CodeGeneratorBase {
 
 	private void printSelect() {
 		out.print("\t@Override\n" +
-				"\tpublic boolean select("+sumType+"[] scores, int minDisparity , int maxDisparity) {\n" +
+				"\tpublic boolean select("+sumType+"[] scores, int maxDisparity) {\n" +
 				"\t\tint disparity = 0;\n" +
 				"\t\t"+sumType+" best = scores[0];\n" +
 				"\n" +

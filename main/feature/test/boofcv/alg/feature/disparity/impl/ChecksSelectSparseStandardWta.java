@@ -53,7 +53,7 @@ public abstract class ChecksSelectSparseStandardWta<ArrayData> {
 
 		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,-1);
 
-		assertTrue(alg.select(copyToCorrectType(scores,arrayType),0,maxDisparity));
+		assertTrue(alg.select(copyToCorrectType(scores,arrayType),maxDisparity));
 
 		assertEquals(5,(int)alg.getDisparity());
 	}
@@ -74,7 +74,7 @@ public abstract class ChecksSelectSparseStandardWta<ArrayData> {
 			scores[d] = minValue + Math.abs(2-d);
 		}
 
-		assertFalse(alg.select(copyToCorrectType(scores,arrayType), 0,maxDisparity));
+		assertFalse(alg.select(copyToCorrectType(scores,arrayType), maxDisparity));
 	}
 
 	/**
@@ -97,12 +97,6 @@ public abstract class ChecksSelectSparseStandardWta<ArrayData> {
 			scores[d] = minValue + (d % 3);
 		}
 
-
-		assertFalse(alg.select(copyToCorrectType(scores,arrayType), 0,maxDisparity));
-	}
-
-	@Test
-	public void modifyForMinValue() {
-		fail("implemenbt");
+		assertFalse(alg.select(copyToCorrectType(scores,arrayType), maxDisparity));
 	}
 }

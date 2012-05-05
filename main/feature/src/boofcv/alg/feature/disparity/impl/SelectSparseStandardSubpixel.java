@@ -34,8 +34,8 @@ public class SelectSparseStandardSubpixel {
 		}
 
 		@Override
-		public boolean select(int[] scores, int minDisparity , int maxDisparity) {
-			if( super.select(scores, minDisparity, maxDisparity) ) {
+		public boolean select(int[] scores, int maxDisparity) {
+			if( super.select(scores, maxDisparity) ) {
 
 				int disparityValue = (int)disparity;
 
@@ -65,8 +65,8 @@ public class SelectSparseStandardSubpixel {
 		}
 
 		@Override
-		public boolean select(float[] scores, int minDisparity ,int maxDisparity) {
-			if( super.select(scores, minDisparity, maxDisparity) ) {
+		public boolean select(float[] scores, int maxDisparity) {
+			if( super.select(scores, maxDisparity) ) {
 
 				int disparityValue = (int)disparity;
 

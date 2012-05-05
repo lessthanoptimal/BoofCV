@@ -35,7 +35,7 @@ public class ImplSelectSparseBasicWta_F32 implements DisparitySparseSelect<float
 	int disparity;
 
 	@Override
-	public boolean select(float[] scores, int minDisparity , int maxDisparity) {
+	public boolean select(float[] scores, int maxDisparity) {
 		disparity = 0;
 		float best = scores[0];
 

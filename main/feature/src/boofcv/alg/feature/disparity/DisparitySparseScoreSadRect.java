@@ -31,6 +31,7 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 	// maximum and minimum allowed image disparity
 	protected int minDisparity;
 	protected int maxDisparity;
+	protected int rangeDisparity;
 	// maximum disparity at the most recently processed point
 	protected int localMaxDisparity;
 
@@ -56,6 +57,8 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 		this.maxDisparity = maxDisparity;
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
+
+		this.rangeDisparity = maxDisparity - minDisparity;
 		this.regionWidth = radiusX*2 + 1;
 		this.regionHeight = radiusY*2 + 1;
 	}
@@ -80,7 +83,7 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 	 * @param x x-coordinate of point
 	 * @param y y-coordinate of point.
 	 */
-	public abstract void process( int x , int y );
+	public abstract boolean process( int x , int y );
 
 	/**
 	 * How many disparity values were considered.

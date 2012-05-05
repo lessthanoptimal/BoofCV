@@ -83,12 +83,13 @@ public class GenerateDisparitySparseScoreSadRect extends CodeGeneratorBase {
 	}
 
 	private void printProcess() {
-		out.print("\tpublic void process( int x , int y ) {\n" +
-				"\t\tif( x < radiusX || x >= left.width-radiusX || x < radiusY || x >= right.width-radiusY )\n" +
-				"\t\t\tthrow new IllegalArgumentException(\"Too close to image border\");\n" +
-				"\n" +
+		out.print("\t@Override\n" +
+				"\tpublic boolean process( int x , int y ) {\n" +
 				"\t\t// adjust disparity for image border\n" +
-				"\t\tlocalMaxDisparity = Math.min(maxDisparity,x-radiusX+1);\n" +
+				"\t\tlocalMaxDisparity = Math.min(rangeDisparity,x-radiusX+1-minDisparity);\n" +
+				"\n" +
+				"\t\tif( localMaxDisparity <= 0 || x >= left.width-radiusX || y < radiusY || y >= left.height-radiusY )\n" +
+				"\t\t\treturn false;\n" +
 				"\n" +
 				"\t\tArrays.fill(scores,0);\n" +
 				"\n" +
@@ -96,7 +97,7 @@ public class GenerateDisparitySparseScoreSadRect extends CodeGeneratorBase {
 				"\t\tfor( int row = 0; row < regionHeight; row++ ) {\n" +
 				"\t\t\t// pixel indexes\n" +
 				"\t\t\tint startLeft = left.startIndex + left.stride*(y-radiusY+row) + x-radiusX;\n" +
-				"\t\t\tint startRight = right.startIndex + right.stride*(y-radiusY+row) + x-radiusX;\n" +
+				"\t\t\tint startRight = right.startIndex + right.stride*(y-radiusY+row) + x-radiusX-minDisparity;\n" +
 				"\n" +
 				"\t\t\tfor( int i = 0; i < localMaxDisparity; i++ ) {\n" +
 				"\t\t\t\tint indexLeft = startLeft;\n" +
@@ -111,12 +112,15 @@ public class GenerateDisparitySparseScoreSadRect extends CodeGeneratorBase {
 				"\t\t\t\tscores[i] += score;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\n" +
+				"\t\treturn true;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic "+sumType+"[] getScore() {\n" +
 				"\t\treturn scores;\n" +
 				"\t}\n" +
+				"\n" +
 				"\t@Override\n" +
 				"\tpublic Class<"+typeInput+"> getImageType() {\n" +
 				"\t\treturn "+typeInput+".class;\n" +

@@ -32,11 +32,10 @@ public interface DisparitySparseSelect<ArrayType> {
 	 * can be found then false is returned.
 	 *
 	 * @param scores Set of disparity scores.
-	 * @param minDisparity Minimum allowed disparity.
 	 * @param maxDisparity Maximum allowed disparity.
 	 * @return true if a valid correspondence was found
 	 */
-	public boolean select( ArrayType scores , int minDisparity , int maxDisparity );
+	public boolean select( ArrayType scores , int maxDisparity );
 
 	/**
 	 * Returns the found disparity

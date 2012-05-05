@@ -65,6 +65,13 @@ public interface StereoDisparitySparse<Image extends ImageSingleBand> {
 	public int getBorderY();
 
 	/**
+	 * The minimum disparity which will be checked for.
+	 *
+	 * @return Minimum disparity.
+	 */
+	public int getMinDisparity();
+
+	/**
 	 * The maximum disparity which will be checked for.
 	 *
 	 * @return Maximum disparity.

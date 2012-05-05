@@ -14,9 +14,6 @@
 
 - Trifocal Tensor
 
-- Dense Stereo
-- Sparse Stereo
-
 - Long Term
  * Sparse Bundle Adjustment
  * P3P algorithm
