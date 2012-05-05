@@ -123,7 +123,7 @@ public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
 			}
 		}
 
-		return index;
+		return index-minDisparity;
 	}
 
 	/**

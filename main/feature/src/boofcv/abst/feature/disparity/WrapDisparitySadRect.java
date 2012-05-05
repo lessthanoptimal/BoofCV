@@ -19,6 +19,7 @@
 package boofcv.abst.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityScoreSadRect;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -28,14 +29,24 @@ public class WrapDisparitySadRect <T extends ImageSingleBand, D extends ImageSin
 		implements StereoDisparity<T,D>
 {
 	DisparityScoreSadRect<T,D> alg;
+	D disparity;
 
 	public WrapDisparitySadRect(DisparityScoreSadRect<T,D> alg) {
 		this.alg = alg;
 	}
 
 	@Override
-	public void process(T imageLeft, T imageRight, D output) {
-		alg.process(imageLeft,imageRight,output);
+	public void process(T imageLeft, T imageRight) {
+		if( disparity == null )  {
+			disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(),imageLeft.width,imageLeft.height);
+			GeneralizedImageOps.fill(disparity,getMaxDisparity()+1);
+		}
+
+		alg.process(imageLeft,imageRight,disparity);
+	}
+
+	public D getDisparity() {
+		return disparity;
 	}
 
 	@Override
@@ -46,6 +57,11 @@ public class WrapDisparitySadRect <T extends ImageSingleBand, D extends ImageSin
 	@Override
 	public int getBorderY() {
 		return alg.getBorderY();
+	}
+
+	@Override
+	public int getMinDisparity() {
+		return alg.getMinDisparity();
 	}
 
 	@Override

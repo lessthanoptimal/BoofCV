@@ -95,7 +95,7 @@ public class GenerateSelectRectBasicWta extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\timageDisparity.data[indexDisparity++] = ("+dataType+")(bestDisparity+minDisparity);\n" +
+				"\t\t\timageDisparity.data[indexDisparity++] = ("+dataType+")bestDisparity;\n" +
 				"\t\t}\n" +
 				"\t}\n" +
 				"\n" +

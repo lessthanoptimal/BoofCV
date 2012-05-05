@@ -152,20 +152,19 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 				"\t\t\t// detect bad matches\n" +
 				"\t\t\tif( scoreBest > maxError ) {\n" +
 				"\t\t\t\t// make sure the error isn't too large\n" +
-				"\t\t\t\tbestDisparity = -minDisparity;\n" +
+				"\t\t\t\tbestDisparity = invalidDisparity;\n" +
 				"\t\t\t} else if( rightToLeftTolerance >= 0 ) {\n" +
 				"\t\t\t\t// if the associate is different going the other direction it is probably noise\n" +
 				"\n" +
 				"\t\t\t\tint disparityRtoL = selectRightToLeft(col-bestDisparity-minDisparity,scores);\n" +
 				"\n" +
 				"\t\t\t\tif( Math.abs(disparityRtoL-bestDisparity) > rightToLeftTolerance ) {\n" +
-				"\t\t\t\t\tbestDisparity = -minDisparity;\n" +
-				"\t\t\t\t\t// minDisparity is added later, final output will be zero this way\n" +
+				"\t\t\t\t\tbestDisparity = invalidDisparity;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t\t// test to see if the region lacks sufficient texture if:\n" +
 				"\t\t\t// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated\n" +
-				"\t\t\tif( textureThreshold > 0 && bestDisparity != -minDisparity && localMax >= 3 ) {\n" +
+				"\t\t\tif( textureThreshold > 0 && bestDisparity != invalidDisparity && localMax >= 3 ) {\n" +
 				"\t\t\t\t// find the second best disparity value and exclude its neighbors\n" +
 				"\t\t\t\t"+sumType+" secondBest = "+sumNumType+".MAX_VALUE;\n" +
 				"\t\t\t\tfor( int i = 0; i < bestDisparity-1; i++ ) {\n" +
@@ -186,10 +185,10 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 		} else {
 			out.print("\t\t\t\tif( discretizer *(secondBest-scoreBest) <= textureThreshold*scoreBest )\n");
 		}
-		out.print("\t\t\t\t\tbestDisparity = -minDisparity;\n" +
+		out.print("\t\t\t\t\tbestDisparity = invalidDisparity;\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tsetDisparity(indexDisparity++ , bestDisparity+minDisparity );\n" +
+				"\t\t\tsetDisparity(indexDisparity++ , bestDisparity );\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
@@ -217,7 +216,7 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\treturn indexBest;" +
+				"\t\treturn indexBest;\n" +
 				"\t}\n\n");
 	}
 

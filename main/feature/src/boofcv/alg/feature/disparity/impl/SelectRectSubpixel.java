@@ -50,14 +50,12 @@ public class SelectRectSubpixel {
 		@Override
 		protected void setDisparity(int index, int disparityValue) {
 
-			int indexScore = disparityValue - minDisparity;
-
-			if( indexScore <= 0 || indexScore == localMax-1) {
+			if( disparityValue <= 0 || disparityValue >= localMax-1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
-				int c0 = columnScore[indexScore-1];
-				int c1 = columnScore[indexScore];
-				int c2 = columnScore[indexScore+1];
+				int c0 = columnScore[disparityValue-1];
+				int c1 = columnScore[disparityValue];
+				int c2 = columnScore[disparityValue+1];
 
 				float offset = (float)(c0-c2)/(float)(2*(c0-2*c1+c2));
 
@@ -82,14 +80,12 @@ public class SelectRectSubpixel {
 		@Override
 		protected void setDisparity(int index, int disparityValue) {
 
-			int indexScore = disparityValue - minDisparity;
-
-			if( indexScore <= 0 || indexScore == localMax-1) {
+			if( disparityValue <= 0 || disparityValue >= localMax-1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
-				float c0 = columnScore[indexScore-1];
-				float c1 = columnScore[indexScore];
-				float c2 = columnScore[indexScore+1];
+				float c0 = columnScore[disparityValue-1];
+				float c1 = columnScore[disparityValue];
+				float c2 = columnScore[disparityValue+1];
 
 				float offset = (c0-c2)/(2f*(c0-2f*c1+c2));
 

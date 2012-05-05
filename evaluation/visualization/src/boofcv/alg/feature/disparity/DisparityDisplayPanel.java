@@ -38,6 +38,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 	// selects which image to view
 	JComboBox viewSelector;
+	// toggles if invalid pixels are black or not
+	JCheckBox invalidToggle;
 
 	JSpinner minDisparitySpinner;
 	JSpinner maxDisparitySpinner;
@@ -48,6 +50,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 	// which image to show
 	int selectedView;
+
+	boolean colorInvalid = false;
 
 	// minimum disparity to calculate
 	int minDisparity = 0;
@@ -73,6 +77,11 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		viewSelector.addItemListener(this);
 		viewSelector.setMaximumSize(viewSelector.getPreferredSize());
 
+		invalidToggle = new JCheckBox("Color Invalid");
+		invalidToggle.setSelected(colorInvalid);
+		invalidToggle.addItemListener(this);
+		invalidToggle.setMaximumSize(invalidToggle.getPreferredSize());
+
 		minDisparitySpinner = new JSpinner(new SpinnerNumberModel(minDisparity,0, 255, 5));
 		minDisparitySpinner.addChangeListener(this);
 		minDisparitySpinner.setMaximumSize(minDisparitySpinner.getPreferredSize());
@@ -93,12 +102,13 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		reverseSpinner.addChangeListener(this);
 		reverseSpinner.setMaximumSize(reverseSpinner.getPreferredSize());
 
-		textureSpinner = new JSpinner(new SpinnerNumberModel(texture,0.0, 1, 0.02));
+		textureSpinner = new JSpinner(new SpinnerNumberModel(texture,0.0, 1, 0.05));
 		textureSpinner.addChangeListener(this);
 		textureSpinner.setPreferredSize(new Dimension(60,reverseSpinner.getPreferredSize().height));
 		textureSpinner.setMaximumSize(textureSpinner.getPreferredSize());
 
 		addLabeled(viewSelector, "View ", this);
+		addAlignLeft(invalidToggle,this);
 		addSeparator(100);
 		addLabeled(minDisparitySpinner, "Min Disparity", this);
 		addLabeled(maxDisparitySpinner, "Max Disparity", this);
@@ -144,14 +154,17 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		if( e.getSource() == viewSelector ) {
 			selectedView = viewSelector.getSelectedIndex();
 			listener.disparityGuiChange();
+		} else if( e.getSource() == invalidToggle) {
+			colorInvalid = invalidToggle.isSelected();
+			listener.disparitySettingChange();
 		}
 	}
 
 	public void setActiveGui( boolean error , boolean reverse ) {
-		setEnabled(6,error);
-		setEnabled(7,reverse);
-		setEnabled(8,error);
-		setEnabled(9,reverse);
+		setEnabled(7,error);
+		setEnabled(8,reverse);
+		setEnabled(9,error);
+		setEnabled(10,reverse);
 	}
 
 	public void setListener(Listener listener ) {

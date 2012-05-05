@@ -55,7 +55,7 @@ public class ImplSelectRectBasicWta_S32_U8 extends SelectRectBasicWta<int[],Imag
 				}
 			}
 
-			imageDisparity.data[indexDisparity++] = (byte)(bestDisparity+minDisparity);
+			imageDisparity.data[indexDisparity++] = (byte)bestDisparity;
 		}
 	}
 

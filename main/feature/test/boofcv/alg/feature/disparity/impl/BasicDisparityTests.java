@@ -129,7 +129,7 @@ public abstract class BasicDisparityTests<T extends ImageSingleBand, D extends  
 
 			// check inside image
 			for( int x = borderX+minDisparity; x < w-borderX; x++ ) {
-				double found = GeneralizedImageOps.get(output,x,y);
+				double found = GeneralizedImageOps.get(output,x,y) + minDisparity;
 				// the minimum disparity should  be the closest match
 				assertEquals("x = "+x+" y = "+y,minDisparity,found,1e-8);
 			}
