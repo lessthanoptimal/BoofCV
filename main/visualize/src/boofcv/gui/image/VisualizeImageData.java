@@ -238,6 +238,68 @@ public class VisualizeImageData {
 		return dst;
 	}
 
+	/**
+	 * <p>
+	 * Renders a gray scale image using color values from cold to hot.
+	 * </p>
+	 *
+	 * @param disparity Input disparity image
+	 * @param dst Where the image is rendered into.  If null a new BufferedImage will be created and return.
+	 * @param minDisparity Minimum disparity that can be computed
+	 * @param maxDisparity Maximum disparity that can be computed
+	 * @param invalidColor RGB value for invalid pixels.  Try 0xFF << 8 for green
+	 * @return Rendered image.
+	 */
+	public static BufferedImage disparity( ImageSingleBand disparity, BufferedImage dst,
+										   int minDisparity , int maxDisparity , int invalidColor )
+	{
+		dst = ConvertBufferedImage.checkInputs(disparity, dst);
+
+		if( disparity.getTypeInfo().isInteger() ) {
+			return disparity((ImageInteger) disparity, dst, minDisparity, maxDisparity,invalidColor);
+		} else {
+			throw new RuntimeException("Add support");
+		}
+	}
+
+	private static BufferedImage disparity( ImageInteger src, BufferedImage dst,
+											int minValue , int maxValue , int invalidColor )
+	{
+		int range = maxValue-minValue;
+		int halfValue = range/2 + range%2;
+
+		for( int y = 0; y < src.height; y++ ) {
+			for( int x = 0; x < src.width; x++ ) {
+				int v = src.get(x,y);
+
+				if( v > range ) {
+					dst.setRGB( x,y,invalidColor );
+				} else {
+					int r,b;
+
+					if( v >= halfValue ) {
+						r = 255*(v-halfValue)/halfValue;
+						b = 0;
+					} else {
+						r = 0;
+						b = 255*v/halfValue;
+					}
+
+					if( v == 0 ) {
+						r = b = 0;
+					} else {
+						r = 255*v/maxValue;
+						b = 255*(maxValue-v)/maxValue;
+					}
+
+					dst.setRGB(x,y,r << 16 | b );
+				}
+			}
+		}
+
+		return dst;
+	}
+
 	private static BufferedImage colorizeSign( ImageFloat32 src, BufferedImage dst, float maxAbsValue ) {
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {

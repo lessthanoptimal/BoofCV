@@ -21,10 +21,21 @@ package boofcv.abst.feature.disparity;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
+ * <p>
  * Given two rectified image compute corresponding dense disparity image.  Input images are assumed
  * to be rectified (epipoles are at infinity) along the x-axis, with the left image being to the
- * left (minus x-axis) of the right image.  A disparity of zero indicates no difference between
- * the two pixels or no corresponding match could be found.  Disparity goes from let to right image.
+ * left (minus x-axis) of the right image. Disparity goes from left to right image.  Disparity is searched
+ * through range of minDisparity to maxDisparity and the outside borders of the image are not processed.
+ * </p>
+ *
+ * <p>
+ * Return disparity image contains the disparity for each pixel, but offset from the true value by minDisparity.  This
+ * is done to maximize storage efficiency in the image.  To get the actual disparity value simply extract the value
+ * of a pixel and add minDisparity to it.  Invalid pixels are indicated by having a value greater than
+ * (maxDisparity - minDisparity).
+ * </p>
+ *
+ * @see StereoDisparitySparse
  *
  * @author Peter Abeles
  */
@@ -35,9 +46,22 @@ public interface StereoDisparity<Image extends ImageSingleBand, Disparity extend
 	 *
 	 * @param imageLeft Input left rectified image.
 	 * @param imageRight Input right rectified image.
-	 * @param output Output disparity from left to right image.
 	 */
-	public void process( Image imageLeft , Image imageRight , Disparity output );
+	public void process( Image imageLeft , Image imageRight );
+
+	/**
+	 * Return the computed disparity image.  See comments in class description on disparity image format.
+	 *
+	 * @return Output disparity from left to right image.
+	 */
+	public Disparity getDisparity();
+
+	/**
+	 * The minimum disparity which will be checked for.
+	 *
+	 * @return Minimum disparity.
+	 */
+	public int getMinDisparity();
 
 	/**
 	 * The maximum disparity which will be checked for.

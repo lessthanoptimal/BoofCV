@@ -21,10 +21,19 @@ package boofcv.alg.feature.disparity;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
+ * <p>
  * Selects the best disparity given the set of scores calculated by
  * {@link boofcv.alg.feature.disparity.DisparityScoreSadRect}. The scores
  * are provided as an array of integers or floats.  A disparity of zero either means
  * no match was found or the disparity was in fact zero.
+ * </p>
+ *
+ * <p>
+ * The selected disparity written into the output image is equal to the found disparity minus the minDisparity.
+ * If a pixel is found to be invalid and no disparity found then its value is set to maxDisparity + 1.  The first
+ * requirement maximizes the useful storage of the output image and the second provides an unambiguous way to
+ * identify invalid pixels.
+ * </p>
  *
  * @author Peter Abeles
  */

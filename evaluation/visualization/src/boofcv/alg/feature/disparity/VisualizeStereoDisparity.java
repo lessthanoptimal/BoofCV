@@ -63,7 +63,6 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	T inputRight;
 	T rectLeft;
 	T rectRight;
-	D disparity;
 
 	StereoParameters calib;
 	RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
@@ -102,9 +101,13 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		if( !rectifiedImages )
 			return;
 
-		GeneralizedImageOps.fill(disparity,0);
-		activeAlg.process(rectLeft, rectRight, disparity);
-		disparityOut = VisualizeImageData.grayMagnitudeTemp(disparity,null,activeAlg.getMaxDisparity());
+		int color = control.colorInvalid ? 0x02 << 16 | 0xB0 << 8 | 0x90 : 0;
+
+		activeAlg.process(rectLeft, rectRight);
+		D disparity = activeAlg.getDisparity();
+		disparityOut = VisualizeImageData.disparity(disparity,null,
+				activeAlg.getMinDisparity(),activeAlg.getMaxDisparity(),
+				color);
 
 		changeImageView();
 	}
@@ -170,7 +173,6 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		inputRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
 		rectLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
 		rectRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		disparity = GeneralizedImageOps.createSingleBand(activeAlg.getDisparityType(),w,h);
 
 		ConvertBufferedImage.convertFrom(colorLeft,inputLeft);
 		ConvertBufferedImage.convertFrom(colorRight,inputRight);

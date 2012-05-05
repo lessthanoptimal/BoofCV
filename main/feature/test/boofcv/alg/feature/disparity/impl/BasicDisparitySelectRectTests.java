@@ -143,9 +143,9 @@ public abstract class BasicDisparitySelectRectTests <ArrayData , D extends Image
 
 		// should ramp up to 7 starting at 2
 		for( int i = 0; i < 5; i++ )
-			assertEquals(i+2, GeneralizedImageOps.get(disparity, i+2+minDisparity, y), 1e-8);
+			assertEquals(i+2, minDisparity+GeneralizedImageOps.get(disparity, i+2+minDisparity, y), 1e-8);
 		// should be at 7 for the remainder
 		for( int i = 5; i < w-4-minDisparity; i++ )
-			assertEquals(7, GeneralizedImageOps.get(disparity, i+2+minDisparity, y), 1e-8);
+			assertEquals(7, minDisparity+GeneralizedImageOps.get(disparity, i+2+minDisparity, y), 1e-8);
 	}
 }

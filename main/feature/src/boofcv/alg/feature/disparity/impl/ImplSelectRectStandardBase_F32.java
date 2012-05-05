@@ -89,20 +89,19 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageSingleBand>
 			// detect bad matches
 			if( scoreBest > maxError ) {
 				// make sure the error isn't too large
-				bestDisparity = -minDisparity;
+				bestDisparity = invalidDisparity;
 			} else if( rightToLeftTolerance >= 0 ) {
 				// if the associate is different going the other direction it is probably noise
 
 				int disparityRtoL = selectRightToLeft(col-bestDisparity-minDisparity,scores);
 
 				if( Math.abs(disparityRtoL-bestDisparity) > rightToLeftTolerance ) {
-					bestDisparity = -minDisparity;
-					// minDisparity is added later, final output will be zero this way
+					bestDisparity = invalidDisparity;
 				}
 			}
 			// test to see if the region lacks sufficient texture if:
 			// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated
-			if( textureThreshold > 0 && bestDisparity != -minDisparity && localMax >= 3 ) {
+			if( textureThreshold > 0 && bestDisparity != invalidDisparity && localMax >= 3 ) {
 				// find the second best disparity value and exclude its neighbors
 				float secondBest = Float.MAX_VALUE;
 				for( int i = 0; i < bestDisparity-1; i++ ) {
@@ -119,10 +118,10 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageSingleBand>
 				// similar scores indicate lack of texture
 				// C = (C2-C1)/C1
 				if( secondBest-scoreBest <= textureThreshold*scoreBest )
-					bestDisparity = -minDisparity;
+					bestDisparity = invalidDisparity;
 			}
 
-			setDisparity(indexDisparity++ , bestDisparity+minDisparity );
+			setDisparity(indexDisparity++ , bestDisparity );
 		}
 	}
 
@@ -148,6 +147,7 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageSingleBand>
 			}
 		}
 
-		return indexBest;	}
+		return indexBest;
+	}
 
 }

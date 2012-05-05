@@ -21,7 +21,16 @@ package boofcv.abst.feature.disparity;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
+ * <p>
  * Computes the disparity between two rectified images at specified points only.
+ *  </p>
+ *
+ * <p>
+ * NOTE: Unlike for dense images, the returned disparity is the actual disparity.  No need to add minDisparity
+ * to the returned value.
+ * </p>
+ *
+ * @see StereoDisparity
  *
  * @author Peter Abeles
  */

@@ -33,14 +33,18 @@ import boofcv.struct.image.ImageUInt8;
 import static boofcv.factory.feature.disparity.FactoryStereoDisparityAlgs.*;
 
 /**
+ * <p>
  * Creates high level interfaces for computing the disparity between two rectified stereo images.
  * Algorithms which select the best disparity for each region independent of all the others are
  * referred to as Winner Takes All (WTA) in the literature.  Dense algorithms compute the disparity for the
  * whole image while sparse algorithms do it in a per pixel basis as requested.
+ * </p>
  *
+ * <p>
  * Typically disparity calculations with regions will produce less erratic results, but their precision will
  * be decreased.  This is especially evident along the border of objects.  Computing a wider range of disparities
  * can better results, but is very computationally expensive.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -49,14 +53,15 @@ public class FactoryStereoDisparity {
 
 	/**
 	 * <p>
-	 * Computes disparity by finding the disparity with the smallest error using a single rectangular
-	 * region. Optionally additional validation can be performed to remove some false positives.
+	 * Selects the disparity which minimizes the SAD error within a rectangular region, known as a Winner Takes All
+	 * (WTA) strategy.  Optionally additional validation can be performed to remove some false positives.
 	 * </p>
 	 *
 	 * <p>
 	 * For more detailed information on validation parameters see {@link boofcv.alg.feature.disparity.SelectRectStandard}.
 	 * </p>
 	 *
+	 * @param minDisparity
 	 * @param maxDisparity
 	 * @param regionRadiusX Region's radius along x-axis.
 	 * @param regionRadiusY
@@ -65,7 +70,7 @@ public class FactoryStereoDisparity {
 	 * @param texture
 	 * @param imageType
 	 * @param <T>
-	 * @return
+	 * @return Rectangular region WTA disparity.
 	 */
 	public static <T extends ImageSingleBand> StereoDisparity<T,ImageUInt8>
 	regionWta( int minDisparity , int maxDisparity,

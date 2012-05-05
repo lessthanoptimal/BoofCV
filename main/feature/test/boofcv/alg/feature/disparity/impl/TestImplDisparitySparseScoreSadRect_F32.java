@@ -76,7 +76,7 @@ public class TestImplDisparitySparseScoreSadRect_F32 {
 					selectAlg.select(alg.scores,alg.getLocalMaxDisparity());
 					int found = (int)(alg.getMinDisparity()+selectAlg.getDisparity());
 
-					assertEquals(x+" "+y,expected.get(x,y),found);
+					assertEquals(x+" "+y,minDisparity+expected.get(x,y),found);
 				}
 			}
 		}

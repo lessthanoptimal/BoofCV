@@ -33,6 +33,14 @@ public class ImplSelectRectStandard_S32_U8 extends ImplSelectRectStandardBase_S3
 		super(maxError, rightToLeftTolerance, texture);
 	}
 
+	@Override
+	public void configure(ImageUInt8 imageDisparity, int minDisparity, int maxDisparity, int radiusX) {
+		super.configure(imageDisparity, minDisparity, maxDisparity, radiusX);
+
+		if( rangeDisparity > 254 )
+			throw new IllegalArgumentException("(max - min) disparity must be <= 254");
+	}
+
 	protected void setDisparity( int index , int value ) {
 		imageDisparity.data[index] = (byte)value;
 	}

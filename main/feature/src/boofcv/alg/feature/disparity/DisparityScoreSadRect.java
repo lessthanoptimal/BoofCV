@@ -42,6 +42,13 @@ import boofcv.struct.image.ImageSingleBand;
  * when writing.  Performance boost is about 20%-30% depending on max disparity and image size.
  * </p>
  *
+ * <p>
+ * This implementation is not based off of any individual paper but ideas commonly expressed in several different
+ * sources.  A good study and summary of similar algorithms can be found in:<br>
+ * [1] Wannes van der Mark and Dariu M. Gavrila, "Real-Time Dense Stereo for Intelligent Vehicles"
+ * IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS, VOL. 7, NO. 1, MARCH 2006
+ * </p>
+ *
  * @author Peter Abeles
  */
 public abstract class DisparityScoreSadRect

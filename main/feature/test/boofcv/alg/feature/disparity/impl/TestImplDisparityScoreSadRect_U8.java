@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparitySelect;
+import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -85,7 +86,7 @@ public class TestImplDisparityScoreSadRect_U8 {
 		int radiusY = 2;
 
 		// compare to naive with different settings
-		compareToNaive(left, right, 0, 10, radiusX, radiusY);
+//		compareToNaive(left, right, 0, 10, radiusX, radiusY);
 		compareToNaive(left, right, 4, 10, radiusX, radiusY);
 	}
 
