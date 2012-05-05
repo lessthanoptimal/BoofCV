@@ -58,7 +58,7 @@ public class TestImplDisparitySparseScoreSadRect_F32 {
 
 		ImplDisparityScoreSadRect_F32<ImageUInt8> denseAlg =
 				new ImplDisparityScoreSadRect_F32<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,new ImplSelectRectBasicWta_F32_U8());
-		ImplDisparitySparseScoreSadRect_F32 alg = new ImplDisparitySparseScoreSadRect_F32(maxDisparity,radiusX,radiusY);
+		ImplDisparitySparseScoreSadRect_F32 alg = new ImplDisparitySparseScoreSadRect_F32(0,maxDisparity,radiusX,radiusY);
 
 		denseAlg.process(left, right, expected);
 		alg.setImages(left,right);
@@ -66,7 +66,7 @@ public class TestImplDisparitySparseScoreSadRect_F32 {
 		for( int y = radiusY; y < h-radiusY; y++ ) {
 			for( int x = radiusX; x < w-radiusX; x++ ) {
 				alg.process(x,y);
-				selectAlg.select(alg.scores,alg.getLocalMaxDisparity());
+				selectAlg.select(alg.scores,0,alg.getLocalMaxDisparity());
 				int found = (int)selectAlg.getDisparity();
 
 				assertEquals(x+" "+y,expected.get(x,y),found);

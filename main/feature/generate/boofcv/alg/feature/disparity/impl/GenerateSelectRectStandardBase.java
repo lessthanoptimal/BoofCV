@@ -29,6 +29,7 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 
 	String dataAbr;
 	String sumType;
+	String sumNumType;
 	boolean isFloat;
 
 	@Override
@@ -42,9 +43,11 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 		if( isFloat ) {
 			sumType = "float";
 			dataAbr = "F32";
+			sumNumType = "Float";
 		} else {
 			sumType = "int";
 			dataAbr = "S32";
+			sumNumType = "Integer";
 		}
 
 		setOutputFile("ImplSelectRectStandardBase_"+dataAbr);
@@ -109,8 +112,8 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 
 		out.print("\n" +
 				"\t@Override\n" +
-				"\tpublic void configure(T imageDisparity, int maxDisparity , int radiusX ) {\n" +
-				"\t\tsuper.configure(imageDisparity,maxDisparity,radiusX);\n" +
+				"\tpublic void configure(T imageDisparity, int minDisparity, int maxDisparity , int radiusX ) {\n" +
+				"\t\tsuper.configure(imageDisparity,minDisparity,maxDisparity,radiusX);\n" +
 				"\n" +
 				"\t\tif( columnScore.length < maxDisparity )\n" +
 				"\t\t\tcolumnScore = new "+sumType+"[maxDisparity];\n" +
@@ -122,14 +125,15 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 		out.print("\t@Override\n" +
 				"\tpublic void process(int row, "+sumType+"[] scores ) {\n" +
 				"\n" +
-				"\t\tint indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX;\n" +
+				"\t\tint indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX + minDisparity;\n" +
 				"\n" +
-				"\t\tfor( int col = 0; col <= imageWidth-regionWidth; col++ ) {\n" +
+				"\t\tfor( int col = minDisparity; col <= imageWidth-regionWidth; col++ ) {\n" +
+				"\t\t\t// Determine the number of disparities that can be considered at this column\n" +
 				"\t\t\t// make sure the disparity search doesn't go outside the image border\n" +
 				"\t\t\tlocalMax = maxDisparityAtColumnL2R(col);\n" +
 				"\n" +
 				"\t\t\t// index of the element being examined in the score array\n" +
-				"\t\t\tint indexScore = col;\n" +
+				"\t\t\tint indexScore = col - minDisparity;\n" +
 				"\n" +
 				"\t\t\t// select the best disparity\n" +
 				"\t\t\tint bestDisparity = 0;\n" +
@@ -148,27 +152,28 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 				"\t\t\t// detect bad matches\n" +
 				"\t\t\tif( scoreBest > maxError ) {\n" +
 				"\t\t\t\t// make sure the error isn't too large\n" +
-				"\t\t\t\tbestDisparity = 0;\n" +
+				"\t\t\t\tbestDisparity = -minDisparity;\n" +
 				"\t\t\t} else if( rightToLeftTolerance >= 0 ) {\n" +
-				"\t\t\t\t// if the associate is different going the other direction it is probably\n" +
-				"\t\t\t\t// noise\n" +
+				"\t\t\t\t// if the associate is different going the other direction it is probably noise\n" +
 				"\n" +
-				"\t\t\t\tint disparityRtoL = selectRightToLeft(col-bestDisparity,scores);\n" +
+				"\t\t\t\tint disparityRtoL = selectRightToLeft(col-bestDisparity-minDisparity,scores);\n" +
 				"\n" +
-				"\t\t\t\tif( !(Math.abs(disparityRtoL-bestDisparity) <= rightToLeftTolerance) ) {\n" +
-				"\t\t\t\t\tbestDisparity = 0;\n" +
+				"\t\t\t\tif( Math.abs(disparityRtoL-bestDisparity) > rightToLeftTolerance ) {\n" +
+				"\t\t\t\t\tbestDisparity = -minDisparity;\n" +
+				"\t\t\t\t\t// minDisparity is added later, final output will be zero this way\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
-				"\t\t\t// test to see if the region lacks sufficient texture\n" +
-				"\t\t\tif( bestDisparity != 0 && textureThreshold > 0 ) {\n" +
+				"\t\t\t// test to see if the region lacks sufficient texture if:\n" +
+				"\t\t\t// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated\n" +
+				"\t\t\tif( textureThreshold > 0 && bestDisparity != -minDisparity && localMax >= 3 ) {\n" +
 				"\t\t\t\t// find the second best disparity value and exclude its neighbors\n" +
-				"\t\t\t\t"+sumType+" secondBest = columnScore[0];\n" +
-				"\t\t\t\tfor( int i = 1; i < bestDisparity-1; i++ ) {\n" +
+				"\t\t\t\t"+sumType+" secondBest = "+sumNumType+".MAX_VALUE;\n" +
+				"\t\t\t\tfor( int i = 0; i < bestDisparity-1; i++ ) {\n" +
 				"\t\t\t\t\tif( columnScore[i] < secondBest ) {\n" +
 				"\t\t\t\t\t\tsecondBest = columnScore[i];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tfor( int i = bestDisparity+2; i < localMax-1; i++ ) {\n" +
+				"\t\t\t\tfor( int i = bestDisparity+2; i < localMax; i++ ) {\n" +
 				"\t\t\t\t\tif( columnScore[i] < secondBest ) {\n" +
 				"\t\t\t\t\t\tsecondBest = columnScore[i];\n" +
 				"\t\t\t\t\t}\n" +
@@ -181,10 +186,10 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 		} else {
 			out.print("\t\t\t\tif( discretizer *(secondBest-scoreBest) <= textureThreshold*scoreBest )\n");
 		}
-		out.print("\t\t\t\t\tbestDisparity = 0;\n" +
+		out.print("\t\t\t\t\tbestDisparity = -minDisparity;\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tsetDisparity(indexDisparity++ , bestDisparity );\n" +
+				"\t\t\tsetDisparity(indexDisparity++ , bestDisparity+minDisparity );\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
@@ -196,12 +201,12 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tprivate int selectRightToLeft( int col , "+sumType+"[] scores ) {\n" +
 				"\t\t// see how far it can search\n" +
-				"\t\tint localMax = Math.min(imageWidth-regionWidth,col+maxDisparity)-col;\n" +
-				"\n" +
+				"\t\tint localMax = Math.min(imageWidth-regionWidth,col+maxDisparity)-col-minDisparity;\n" +
 				"\n" +
 				"\t\tint indexBest = 0;\n" +
+				"\t\tint indexScore = col;\n" +
 				"\t\t"+sumType+" scoreBest = scores[col];\n" +
-				"\t\tint indexScore = col + imageWidth + 1;\n" +
+				"\t\tindexScore += imageWidth+1;\n" +
 				"\n" +
 				"\t\tfor( int i = 1; i < localMax; i++ ,indexScore += imageWidth+1) {\n" +
 				"\t\t\t"+sumType+" s = scores[indexScore];\n" +
@@ -212,7 +217,7 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\treturn indexBest;\n" +
+				"\t\treturn indexBest;" +
 				"\t}\n\n");
 	}
 

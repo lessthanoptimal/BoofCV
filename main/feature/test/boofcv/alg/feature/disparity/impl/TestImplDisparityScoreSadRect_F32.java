@@ -65,40 +65,45 @@ public class TestImplDisparityScoreSadRect_F32 {
 					@Override public int getBorderY() { return 3; }
 				};
 
-		alg.checkGradient();
+		alg.allChecks();
 	}
 
-	/**
-	 * Compare to a simplistic implementation of stereo disparity.  Need to turn off special
-	 * configurations
-	 */
 	@Test
 	public void compareToNaive() {
 		int w = 20, h = 25;
 		ImageUInt8 left = new ImageUInt8(w,h);
 		ImageUInt8 right = new ImageUInt8(w,h);
 
-		ImageFloat32 leftF32 = new ImageFloat32(w,h);
-		ImageFloat32 rightF32 = new ImageFloat32(w,h);
-
-		ImageUInt8 found = new ImageUInt8(w,h);
-		ImageFloat32 expected = new ImageFloat32(w,h);
-
-		GeneralizedImageOps.randomize(left, rand, 0, 20);
+		GeneralizedImageOps.randomize(left,rand,0,20);
 		GeneralizedImageOps.randomize(right,rand,0,20);
 
-		GeneralizedImageOps.convert(left,leftF32);
-		GeneralizedImageOps.convert(right,rightF32);
-
-		int minDisparity = 0;
-		int maxDisparity = 10;
 		int radiusX = 3;
 		int radiusY = 2;
+
+		// compare to naive with different settings
+		compareToNaive(left, right, 0, 10, radiusX, radiusY);
+		compareToNaive(left, right, 4, 10, radiusX, radiusY);
+	}
+
+	private void compareToNaive(ImageUInt8 left, ImageUInt8 right,
+								int minDisparity, int maxDisparity,
+								int radiusX, int radiusY)
+	{
+		int w = left.width;
+		int h = left.height;
+
+		ImageFloat32 leftF32 = new ImageFloat32(w,h);
+		ImageFloat32 rightF32 = new ImageFloat32(w,h);
+		GeneralizedImageOps.convert(left,leftF32);
+		GeneralizedImageOps.convert(right,rightF32);
 
 		ImplDisparityScoreSadRect_F32<ImageUInt8> alg =
 				new ImplDisparityScoreSadRect_F32<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
 		StereoDisparityWtoNaive<ImageUInt8> naive =
-				new StereoDisparityWtoNaive<ImageUInt8>(maxDisparity,radiusX,radiusY);
+				new StereoDisparityWtoNaive<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY);
+
+		ImageUInt8 found = new ImageUInt8(w,h);
+		ImageFloat32 expected = new ImageFloat32(w,h);
 
 		alg.process(leftF32,rightF32,found);
 		naive.process(left,right,expected);

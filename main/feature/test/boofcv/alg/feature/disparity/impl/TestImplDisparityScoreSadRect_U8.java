@@ -65,7 +65,7 @@ public class TestImplDisparityScoreSadRect_U8 {
 					@Override public int getBorderY() { return 3; }
 				};
 
-		alg.checkGradient();
+		alg.allChecks();
 	}
 
 	/**
@@ -78,21 +78,31 @@ public class TestImplDisparityScoreSadRect_U8 {
 		ImageUInt8 left = new ImageUInt8(w,h);
 		ImageUInt8 right = new ImageUInt8(w,h);
 
-		ImageUInt8 found = new ImageUInt8(w,h);
-		ImageFloat32 expected = new ImageFloat32(w,h);
-
 		GeneralizedImageOps.randomize(left,rand,0,20);
 		GeneralizedImageOps.randomize(right,rand,0,20);
 
-		int minDisparity = 0;
-		int maxDisparity = 10;
 		int radiusX = 3;
 		int radiusY = 2;
+
+		// compare to naive with different settings
+		compareToNaive(left, right, 0, 10, radiusX, radiusY);
+		compareToNaive(left, right, 4, 10, radiusX, radiusY);
+	}
+
+	private void compareToNaive(ImageUInt8 left, ImageUInt8 right,
+								int minDisparity, int maxDisparity,
+								int radiusX, int radiusY)
+	{
+		int w = left.width;
+		int h = left.height;
 
 		ImplDisparityScoreSadRect_U8<ImageUInt8> alg =
 				new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
 		StereoDisparityWtoNaive<ImageUInt8> naive =
-				new StereoDisparityWtoNaive<ImageUInt8>(maxDisparity,radiusX,radiusY);
+				new StereoDisparityWtoNaive<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY);
+
+		ImageUInt8 found = new ImageUInt8(w,h);
+		ImageFloat32 expected = new ImageFloat32(w,h);
 
 		alg.process(left,right,found);
 		naive.process(left,right,expected);

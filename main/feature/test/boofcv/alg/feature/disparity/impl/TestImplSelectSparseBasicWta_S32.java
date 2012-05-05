@@ -39,7 +39,7 @@ public class TestImplSelectSparseBasicWta_S32 {
 
 		ImplSelectSparseBasicWta_S32 alg = new ImplSelectSparseBasicWta_S32();
 
-		assertTrue(alg.select(scores,maxDisparity));
+		assertTrue(alg.select(scores,0,maxDisparity));
 
 		assertEquals(5,(int)alg.getDisparity());
 	}

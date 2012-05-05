@@ -35,8 +35,10 @@ public abstract class SelectRectBasicWta<Array , Disparity extends ImageSingleBa
 {
 	// Output disparity image
 	protected Disparity imageDisparity;
-	// The maximum disparity it will search
+	// The minimum and maximum disparity it will search
+	protected int minDisparity;
 	protected int maxDisparity;
+	protected int rangeDisparity;
 	// Radius and width of the comparison region
 	protected int radiusX;
 	protected int regionWidth;
@@ -45,11 +47,13 @@ public abstract class SelectRectBasicWta<Array , Disparity extends ImageSingleBa
 	protected int imageWidth;
 
 	@Override
-	public void configure(Disparity imageDisparity, int maxDisparity , int radiusX ) {
+	public void configure(Disparity imageDisparity, int minDisparity , int maxDisparity , int radiusX ) {
 		this.imageDisparity = imageDisparity;
+		this.minDisparity = minDisparity;
 		this.maxDisparity = maxDisparity;
 		this.radiusX = radiusX;
 
+		rangeDisparity = maxDisparity-minDisparity;
 		regionWidth = radiusX*2+1;
 		imageWidth = imageDisparity.width;
 	}
@@ -59,6 +63,6 @@ public abstract class SelectRectBasicWta<Array , Disparity extends ImageSingleBa
 	 * as limited by the image border.
 	 */
 	protected int maxDisparityAtColumnL2R( int col) {
-		return 1+col-Math.max(0,col-maxDisparity+1);
+		return 1+col-minDisparity-Math.max(0,col-maxDisparity+1);
 	}
 }

@@ -48,7 +48,7 @@ public class TestSelectRectSubpixel_S32_F32 extends ChecksSelectRectStandardBase
 
 		SelectRectSubpixel.S32_F32 alg = new SelectRectSubpixel.S32_F32(-1,-1,-1);
 
-		alg.configure(img,20,2);
+		alg.configure(img,0,20,2);
 
 		// should be biased towards 4
 		alg.columnScore[4] = 100;

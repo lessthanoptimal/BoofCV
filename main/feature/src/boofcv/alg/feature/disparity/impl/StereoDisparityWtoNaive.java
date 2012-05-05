@@ -36,6 +36,8 @@ public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
 	I imageLeft;
 	I imageRight;
 
+	// the minimum disparity it will consider
+	int minDisparity;
 	// where the match scores are stored.  Length is max disparity
 	double[] score;
 
@@ -49,11 +51,13 @@ public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
 	/**
 	 * Configure parameters
 	 *
+	 * @param minDisparity Minimum disparity it will consider in pixels.
 	 * @param maxDisparity Maximum allowed disparity in pixels.
 	 * @param radiusWidth Radius of the region along x-axis.
 	 * @param radiusHeight Radius of the region along y-axis.
 	 */
-	public StereoDisparityWtoNaive(int maxDisparity, int radiusWidth, int radiusHeight) {
+	public StereoDisparityWtoNaive( int minDisparity , int maxDisparity, int radiusWidth, int radiusHeight) {
+		this.minDisparity = minDisparity;
 		this.score = new double[maxDisparity];
 		this.radiusX = radiusWidth;
 		this.radiusY = radiusHeight;
@@ -76,7 +80,7 @@ public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
 
 		// Compute disparity for each pixel
 		for( int y = radiusY; y < h-radiusY; y++ ) {
-			for( int x = radiusX; x < w-radiusX; x++ ) {
+			for( int x = radiusX+minDisparity; x < w-radiusX; x++ ) {
 				// take in account image border when computing max disparity
 				int max = x-Math.max(radiusX-1,x-score.length);
 
@@ -96,9 +100,9 @@ public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
 	 * @param c_y Center of region on left image. y-axis
 	 * @param maxDisparity Max allowed disparity
 	 */
-	private void processPixel( int c_x , int c_y , int maxDisparity ) {
+	private void processPixel( int c_x , int c_y ,  int maxDisparity ) {
 
-		for( int i = 0; i < maxDisparity; i++ ) {
+		for( int i = minDisparity; i < maxDisparity; i++ ) {
 			score[i] = computeScore( c_x , c_x-i,c_y);
 		}
 	}
@@ -112,7 +116,7 @@ public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
 	protected double selectBest( int length ) {
 		double best = Double.MAX_VALUE;
 		int index = -1;
-		for( int i = 0; i < length; i++ ) {
+		for( int i = minDisparity; i < length; i++ ) {
 			if( score[i] < best ) {
 				best = score[i];
 				index = i;

@@ -23,7 +23,8 @@ import boofcv.struct.image.ImageSingleBand;
 /**
  * Selects the best disparity given the set of scores calculated by
  * {@link boofcv.alg.feature.disparity.DisparityScoreSadRect}. The scores
- * are provided as an array of integers or floats.
+ * are provided as an array of integers or floats.  A disparity of zero either means
+ * no match was found or the disparity was in fact zero.
  *
  * @author Peter Abeles
  */
@@ -32,10 +33,11 @@ public interface DisparitySelect<Array , T extends ImageSingleBand> {
 	 * Specifies the output and algorithmic configuration.
 	 *
 	 * @param imageDisparity Output disparity image.
+	 * @param minDisparity Minimum disparity that can be computed
 	 * @param maxDisparity Maximum disparity that is calculated
 	 * @param radiusX Radius of the rectangular region being matched along x-axis.
 	 */
-	public void configure(T imageDisparity, int maxDisparity, int radiusX);
+	public void configure(T imageDisparity, int minDisparity , int maxDisparity, int radiusX);
 
 	/**
 	 * Processes the array of scores.

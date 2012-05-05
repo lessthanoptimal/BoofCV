@@ -50,7 +50,7 @@ public class WrapDisparitySparseSadRect <ArrayData,T extends ImageSingleBand>
 	@Override
 	public boolean process(int x, int y) {
 		computeScore.process(x,y);
-		return select.select(computeScore.getScore(),computeScore.getLocalMaxDisparity());
+		return select.select(computeScore.getScore(),computeScore.getMinDisparity(),computeScore.getLocalMaxDisparity());
 	}
 
 	@Override

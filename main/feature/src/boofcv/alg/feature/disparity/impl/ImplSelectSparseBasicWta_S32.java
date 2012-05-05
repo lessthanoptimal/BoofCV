@@ -35,7 +35,7 @@ public class ImplSelectSparseBasicWta_S32 implements DisparitySparseSelect<int[]
 	int disparity;
 
 	@Override
-	public boolean select(int[] scores, int maxDisparity) {
+	public boolean select(int[] scores, int minDisparity , int maxDisparity) {
 		disparity = 0;
 		int best = scores[0];
 

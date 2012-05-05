@@ -45,7 +45,7 @@ public class TestStereoDisparityWtoNaive {
 
 					@Override
 					public void initialize(int minDisparity , int maxDisparity) {
-						alg = new StereoDisparityWtoNaive<ImageUInt8>(maxDisparity,2,3);
+						alg = new StereoDisparityWtoNaive<ImageUInt8>(minDisparity,maxDisparity,2,3);
 					}
 
 					@Override public int getBorderX() { return 2; }
@@ -53,6 +53,6 @@ public class TestStereoDisparityWtoNaive {
 					@Override public int getBorderY() { return 3; }
 				};
 
-		alg.checkGradient();
+		alg.allChecks();
 	}
 }

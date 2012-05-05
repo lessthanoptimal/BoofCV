@@ -1,19 +1,17 @@
 /*
- * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ * Copyright 2011-2012 Peter Abeles
  *
- * This file is part of BoofCV (http://boofcv.org).
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package boofcv.alg.feature.disparity.impl;
@@ -53,8 +51,8 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void configure(T imageDisparity, int maxDisparity , int radiusX ) {
-		super.configure(imageDisparity,maxDisparity,radiusX);
+	public void configure(T imageDisparity, int minDisparity, int maxDisparity , int radiusX ) {
+		super.configure(imageDisparity,minDisparity,maxDisparity,radiusX);
 
 		if( columnScore.length < maxDisparity )
 			columnScore = new float[maxDisparity];
@@ -64,14 +62,15 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageSingleBand>
 	@Override
 	public void process(int row, float[] scores ) {
 
-		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX;
+		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX + minDisparity;
 
-		for( int col = 0; col <= imageWidth-regionWidth; col++ ) {
+		for( int col = minDisparity; col <= imageWidth-regionWidth; col++ ) {
+			// Determine the number of disparities that can be considered at this column
 			// make sure the disparity search doesn't go outside the image border
 			localMax = maxDisparityAtColumnL2R(col);
 
 			// index of the element being examined in the score array
-			int indexScore = col;
+			int indexScore = col - minDisparity;
 
 			// select the best disparity
 			int bestDisparity = 0;
@@ -90,27 +89,28 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageSingleBand>
 			// detect bad matches
 			if( scoreBest > maxError ) {
 				// make sure the error isn't too large
-				bestDisparity = 0;
+				bestDisparity = -minDisparity;
 			} else if( rightToLeftTolerance >= 0 ) {
-				// if the associate is different going the other direction it is probably
-				// noise
+				// if the associate is different going the other direction it is probably noise
 
-				int disparityRtoL = selectRightToLeft(col-bestDisparity,scores);
+				int disparityRtoL = selectRightToLeft(col-bestDisparity-minDisparity,scores);
 
-				if( !(Math.abs(disparityRtoL-bestDisparity) <= rightToLeftTolerance) ) {
-					bestDisparity = 0;
+				if( Math.abs(disparityRtoL-bestDisparity) > rightToLeftTolerance ) {
+					bestDisparity = -minDisparity;
+					// minDisparity is added later, final output will be zero this way
 				}
 			}
-			// test to see if the region lacks sufficient texture
-			if( bestDisparity != 0 && textureThreshold > 0 ) {
+			// test to see if the region lacks sufficient texture if:
+			// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated
+			if( textureThreshold > 0 && bestDisparity != -minDisparity && localMax >= 3 ) {
 				// find the second best disparity value and exclude its neighbors
-				float secondBest = columnScore[0];
-				for( int i = 1; i < bestDisparity-1; i++ ) {
+				float secondBest = Float.MAX_VALUE;
+				for( int i = 0; i < bestDisparity-1; i++ ) {
 					if( columnScore[i] < secondBest ) {
 						secondBest = columnScore[i];
 					}
 				}
-				for( int i = bestDisparity+2; i < localMax-1; i++ ) {
+				for( int i = bestDisparity+2; i < localMax; i++ ) {
 					if( columnScore[i] < secondBest ) {
 						secondBest = columnScore[i];
 					}
@@ -119,10 +119,10 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageSingleBand>
 				// similar scores indicate lack of texture
 				// C = (C2-C1)/C1
 				if( secondBest-scoreBest <= textureThreshold*scoreBest )
-					bestDisparity = 0;
+					bestDisparity = -minDisparity;
 			}
 
-			setDisparity(indexDisparity++ , bestDisparity );
+			setDisparity(indexDisparity++ , bestDisparity+minDisparity );
 		}
 	}
 
@@ -132,12 +132,12 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageSingleBand>
 	 */
 	private int selectRightToLeft( int col , float[] scores ) {
 		// see how far it can search
-		int localMax = Math.min(imageWidth-regionWidth,col+maxDisparity)-col;
-
+		int localMax = Math.min(imageWidth-regionWidth,col+maxDisparity)-col-minDisparity;
 
 		int indexBest = 0;
+		int indexScore = col;
 		float scoreBest = scores[col];
-		int indexScore = col + imageWidth + 1;
+		indexScore += imageWidth+1;
 
 		for( int i = 1; i < localMax; i++ ,indexScore += imageWidth+1) {
 			float s = scores[indexScore];
@@ -148,7 +148,6 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageSingleBand>
 			}
 		}
 
-		return indexBest;
-	}
+		return indexBest;	}
 
 }

@@ -24,6 +24,7 @@ import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Basic tests for selecting disparity
@@ -52,6 +53,11 @@ public abstract class BasicDisparitySelectRectTests <ArrayData , D extends Image
 
 	public abstract DisparitySelect<ArrayData,D> createAlg();
 
+	public void allTests() {
+		simpleTest();
+		minDisparity();
+	}
+
 	/**
 	 * Give it a hand crafted score with known results for WTA.  See if it produces those results
 	 */
@@ -61,8 +67,7 @@ public abstract class BasicDisparitySelectRectTests <ArrayData , D extends Image
 		int y = 3;
 
 		GeneralizedImageOps.fill(disparity,0);
-		alg.configure(disparity,maxDisparity,2);
-
+		alg.configure(disparity,0,maxDisparity,2);
 
 		int scores[] = new int[w*maxDisparity];
 
@@ -102,5 +107,45 @@ public abstract class BasicDisparitySelectRectTests <ArrayData , D extends Image
 		}
 
 		return (ArrayData)ret;
+	}
+
+	/**
+	 * Set the minimum disparity to a non zero number and see if it has the expected behavior
+	 */
+	@Test
+	public void minDisparity() {
+		int minDisparity = 2;
+		int maxDisparity = 10;
+		int r = 2;
+
+		int range = maxDisparity-minDisparity;
+
+		int y = 3;
+
+		GeneralizedImageOps.fill(disparity,0);
+		alg.configure(disparity,minDisparity,maxDisparity,r);
+
+		int scores[] = new int[w*range];
+
+		for( int d = 0; d < range; d++ ) {
+			for( int x = 0; x < w-(r*2+1); x++ ) {
+				scores[w*d+x] = Math.abs(d-5);
+			}
+		}
+
+		alg.process(y,copyToCorrectType(scores));
+
+		// make sure image borders are zero
+		for( int i = 0; i < 2+minDisparity; i++ )
+			assertEquals(0, GeneralizedImageOps.get(disparity, i, y), 1e-8);
+		assertEquals(0, GeneralizedImageOps.get(disparity, w-2, y), 1e-8);
+		assertEquals(0, GeneralizedImageOps.get(disparity, w-1, y), 1e-8);
+
+		// should ramp up to 7 starting at 2
+		for( int i = 0; i < 5; i++ )
+			assertEquals(i+2, GeneralizedImageOps.get(disparity, i+2+minDisparity, y), 1e-8);
+		// should be at 7 for the remainder
+		for( int i = 5; i < w-4-minDisparity; i++ )
+			assertEquals(7, GeneralizedImageOps.get(disparity, i+2+minDisparity, y), 1e-8);
 	}
 }

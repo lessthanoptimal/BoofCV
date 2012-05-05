@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageSingleBand;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Provides a serise of simple tests that check basic functionality at computing image disparity
+ * Provides a series of simple tests that check basic functionality at computing image disparity
  *
  * @author Peter Abeles
  */
@@ -36,14 +36,11 @@ public abstract class BasicDisparityTests<T extends ImageSingleBand, D extends  
 	int w = 50;
 	int h = 60;
 
-	int minDisparity = 0;
 	int maxDisparity = 40;
 
 	public BasicDisparityTests( Class<T> imageType ) {
 		left = GeneralizedImageOps.createSingleBand(imageType,w,h);
 		right = GeneralizedImageOps.createSingleBand(imageType,w,h);
-
-		initialize(minDisparity,maxDisparity);
 	}
 
 	public abstract void initialize( int minDisparity , int maxDisparity );
@@ -54,11 +51,17 @@ public abstract class BasicDisparityTests<T extends ImageSingleBand, D extends  
 
 	public abstract D computeDisparity( T left , T right );
 
+	public void allChecks() {
+		checkGradient();
+		checkMinimumDisparity();
+	}
+
 	/**
 	 * Set the intensity values to have a gradient and see if it generates the correct
 	 * solution
 	 */
 	public void checkGradient() {
+		initialize(0,maxDisparity);
 
 		int disparity = 5;
 
@@ -75,9 +78,60 @@ public abstract class BasicDisparityTests<T extends ImageSingleBand, D extends  
 		int borderY = getBorderY();
 
 		for( int y = borderY; y < h-borderY; y++ ) {
+			// borders should be zero since they are not modified
+			for( int x = 0; x < borderX; x++ ) {
+				double found = GeneralizedImageOps.get(output,x,y);
+				assertEquals("x = "+x+" y = "+y,0,found,1e-8);
+			}
+			for( int x = w-borderX; x < w; x++ ) {
+				double found = GeneralizedImageOps.get(output,x,y);
+				assertEquals("x = "+x+" y = "+y,0,found,1e-8);
+			}
+
+			// check the inside image
 			for( int x = borderX+disparity; x < w-borderX; x++ ) {
 				double found = GeneralizedImageOps.get(output,x,y);
 				assertEquals("x = "+x+" y = "+y,disparity,found,1e-8);
+			}
+		}
+	}
+
+	/**
+	 * Set the minimum disparity to a non-zero value and see if it has the expected results
+	 */
+	public void checkMinimumDisparity() {
+		int disparity = 4;
+		int minDisparity = disparity+2;
+		initialize(disparity+2,maxDisparity);
+
+		for( int y = 0; y < h; y++ ) {
+			for( int x = 0; x < w; x++ ) {
+				GeneralizedImageOps.set(left,x,y,10+x+y);
+				GeneralizedImageOps.set(right,x,y,10+x+disparity+y);
+			}
+		}
+
+		D output = computeDisparity(left,right);
+
+		int borderX = getBorderX();
+		int borderY = getBorderY();
+
+		for( int y = borderY; y < h-borderY; y++ ) {
+			// borders should be zero since they are not modified
+			for( int x = 0; x < borderX+minDisparity; x++ ) {
+				double found = GeneralizedImageOps.get(output,x,y);
+				assertEquals("x = "+x+" y = "+y,0,found,1e-8);
+			}
+			for( int x = w-borderX; x < w; x++ ) {
+				double found = GeneralizedImageOps.get(output,x,y);
+				assertEquals("x = "+x+" y = "+y,0,found,1e-8);
+			}
+
+			// check inside image
+			for( int x = borderX+minDisparity; x < w-borderX; x++ ) {
+				double found = GeneralizedImageOps.get(output,x,y);
+				// the minimum disparity should  be the closest match
+				assertEquals("x = "+x+" y = "+y,minDisparity,found,1e-8);
 			}
 		}
 	}

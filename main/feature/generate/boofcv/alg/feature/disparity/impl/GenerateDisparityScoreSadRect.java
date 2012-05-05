@@ -111,14 +111,14 @@ public class GenerateDisparityScoreSadRect extends CodeGeneratorBase {
 				"\t\t// initialize data structures\n" +
 				"\t\tInputSanityCheck.checkSameShape(left,right,disparity);\n" +
 				"\n" +
-				"\t\tlengthHorizontal = left.width*maxDisparity;\n" +
+				"\t\tlengthHorizontal = left.width*rangeDisparity;\n" +
 				"\t\tif( horizontalScore == null || verticalScore.length < lengthHorizontal ) {\n" +
 				"\t\t\thorizontalScore = new "+sumType+"[regionHeight][lengthHorizontal];\n" +
 				"\t\t\tverticalScore = new "+sumType+"[lengthHorizontal];\n" +
 				"\t\t\telementScore = new "+sumType+"[ left.width ];\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\tcomputeDisparity.configure(disparity,maxDisparity,radiusX);\n" +
+				"\t\tcomputeDisparity.configure(disparity,minDisparity,maxDisparity,radiusX);\n" +
 				"\n" +
 				"\t\t// initialize computation\n" +
 				"\t\tcomputeFirstRow(left, right);\n" +
@@ -200,16 +200,21 @@ public class GenerateDisparityScoreSadRect extends CodeGeneratorBase {
 				"\tprotected void computeScoreRow("+typeInput+" left, "+typeInput+" right, int row, "+sumType+"[] scores) {\n" +
 				"\n" +
 				"\t\t// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations\n" +
-				"\t\tfor( int d = 0; d < maxDisparity; d++ ) {\n" +
-				"\t\t\tfinal int elementMax = left.width-d;\n" +
-				"\t\t\tfinal int scoreMax = elementMax-regionWidth;\n" +
-				"\t\t\tint indexScore = left.width*d+d;\n" +
+				"\t\tfor( int d = minDisparity; d < maxDisparity; d++ ) {\n" +
+				"\t\t\tint dispFromMin = d - minDisparity;\n" +
 				"\n" +
+				"\t\t\t// number of individual columns the error is computed in\n" +
+				"\t\t\tfinal int colMax = left.width-d;\n" +
+				"\t\t\t// number of regions that a score/error is computed in\n" +
+				"\t\t\tfinal int scoreMax = colMax-regionWidth;\n" +
+				"\n" +
+				"\t\t\t// indexes that data is read to/from for different data structures\n" +
+				"\t\t\tint indexScore = left.width*dispFromMin + dispFromMin;\n" +
 				"\t\t\tint indexLeft = left.startIndex + left.stride*row + d;\n" +
-				"\t\t\tint indexRight =  right.startIndex + right.stride*row;\n" +
+				"\t\t\tint indexRight = right.startIndex + right.stride*row;\n" +
 				"\n" +
-				"\t\t\t// Fill elementScore with all the scores for this row at disparity d\n" +
-				"\t\t\tcomputeScoreRow(left, right, elementMax, indexLeft, indexRight);\n" +
+				"\t\t\t// Fill elementScore with scores for individual elements for this row at disparity d\n" +
+				"\t\t\tcomputeScoreRow(left, right, colMax, indexLeft, indexRight);\n" +
 				"\n" +
 				"\t\t\t// score at the first column\n" +
 				"\t\t\t"+sumType+" score = 0;\n" +

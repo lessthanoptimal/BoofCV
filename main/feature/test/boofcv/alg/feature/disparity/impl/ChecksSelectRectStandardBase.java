@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Unit tests for implementers of {@Link SelectRectStandardBase_S32}
@@ -60,7 +61,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 					}
 				};
 
-		test.simpleTest();
+		test.allTests();
 	}
 
 	@Test
@@ -68,7 +69,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 		int y = 3;
 
 		SelectRectStandard<ArrayData,T> alg = createSelector(2,-1,-1);
-		alg.configure(disparity,maxDisparity,2);
+		alg.configure(disparity,0,maxDisparity,2);
 
 		int scores[] = new int[w*maxDisparity];
 
@@ -89,7 +90,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 
 		// Sanity check, much higher error threshold
 		alg = createSelector(20,-1,-1);
-		alg.configure(disparity,maxDisparity,2);
+		alg.configure(disparity,0,maxDisparity,2);
 		alg.process(y,copyToCorrectType(scores,arrayType));
 		assertEquals(1, getDisparity( 3+2, y), 1);
 		assertEquals(1, getDisparity(4 + 2, y), 1);
@@ -112,10 +113,16 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 	@Test
 	public void testRightToLeftValidation() {
 
+		rightToLeftValidation(0);
+		rightToLeftValidation(2);
+	}
+
+	private void rightToLeftValidation( int minDisparity ) {
 		int y = 3;
+		int r = 2;
 
 		SelectRectStandard<ArrayData,T> alg = createSelector(-1,1,-1);
-		alg.configure(disparity,maxDisparity,2);
+		alg.configure(disparity,minDisparity,maxDisparity,r);
 
 		int scores[] = new int[w*maxDisparity];
 
@@ -127,20 +134,23 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 
 		alg.process(y,copyToCorrectType(scores,arrayType));
 
+		// outside the border should be zero
+		for( int i = 0; i < r+minDisparity; i++ )
+			assertEquals(0, getDisparity(i + r, y), 1e-8);
 		// These should all be zero since other pixels will have lower scores
-		for( int i = 0; i < 4; i++ )
-			assertEquals(0, getDisparity(i + 2, y), 1e-8);
+		for( int i = r+minDisparity; i < r+4+minDisparity; i++ )
+			assertEquals(0, getDisparity(i, y), 1e-8);
 		// the tolerance is one, so this should be 4
-		assertEquals(4, getDisparity(4 + 2, y), 1e-8);
+		assertEquals(4+minDisparity, getDisparity(4 + r + minDisparity, y), 1e-8);
 		// should be at 5 for the remainder
-		for( int i = 5; i < w-4; i++ )
-			assertEquals(5, getDisparity(i + 2, y), 1e-8);
+		for( int i = r+minDisparity+5; i < w-r; i++ )
+			assertEquals("i = "+i,5+minDisparity, getDisparity(i, y), 1e-8);
 
 		// sanity check, I now set the tolerance to zero
 		alg = createSelector(-1,0,-1);
-		alg.configure(disparity,maxDisparity,2);
+		alg.configure(disparity,minDisparity,maxDisparity,2);
 		alg.process(y,copyToCorrectType(scores,arrayType));
-		assertEquals(0, getDisparity(4 + 2, y), 1e-8);
+		assertEquals(0, getDisparity(4 + r + minDisparity, y), 1e-8);
 	}
 
 	/**
@@ -152,7 +162,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 		int y = 3;
 
 		SelectRectStandard<ArrayData,T> alg = createSelector(-1,-1,3);
-		alg.configure(disparity,maxDisparity,2);
+		alg.configure(disparity,0,maxDisparity,2);
 
 		int scores[] = new int[w*maxDisparity];
 
@@ -173,15 +183,18 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 	 */
 	@Test
 	public void confidenceMultiplePeak() {
-		confidenceMultiplePeak(3);
-		confidenceMultiplePeak(0);
+		confidenceMultiplePeak(3,0);
+		confidenceMultiplePeak(0,0);
+		confidenceMultiplePeak(3,2);
+		confidenceMultiplePeak(0,2);
 	}
 
-	private void confidenceMultiplePeak(int minValue) {
+	private void confidenceMultiplePeak(int minValue , int minDisparity) {
 		int y = 3;
+		int r = 2;
 
 		SelectRectStandard<ArrayData,T> alg = createSelector(-1,-1,3);
-		alg.configure(disparity,maxDisparity,2);
+		alg.configure(disparity,minDisparity,maxDisparity,r);
 
 		int scores[] = new int[w*maxDisparity];
 
@@ -194,7 +207,8 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 		alg.process(y,copyToCorrectType(scores,arrayType));
 
 		// it should reject the solution
-		assertEquals(0, getDisparity(4 + 2, y), 1e-8);
+		for( int i = r+minDisparity+3; i < w-r; i++)
+			assertEquals("i = "+i,0, getDisparity(i, y), 1e-8);
 	}
 
 	public static <ArrayData> ArrayData copyToCorrectType( int scores[] , Class<ArrayData> arrayType ) {

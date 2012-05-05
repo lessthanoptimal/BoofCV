@@ -1,19 +1,17 @@
 /*
- * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ * Copyright 2011-2012 Peter Abeles
  *
- * This file is part of BoofCV (http://boofcv.org).
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package boofcv.alg.feature.disparity.impl;
@@ -21,8 +19,8 @@ package boofcv.alg.feature.disparity.impl;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.disparity.DisparityScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySelect;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageFloat32;
 
 /**
  * <p>
@@ -66,14 +64,14 @@ public class ImplDisparityScoreSadRect_F32<Disparity extends ImageSingleBand>
 		// initialize data structures
 		InputSanityCheck.checkSameShape(left,right,disparity);
 
-		lengthHorizontal = left.width*maxDisparity;
+		lengthHorizontal = left.width*rangeDisparity;
 		if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
 			horizontalScore = new float[regionHeight][lengthHorizontal];
 			verticalScore = new float[lengthHorizontal];
 			elementScore = new float[ left.width ];
 		}
 
-		computeDisparity.configure(disparity,maxDisparity,radiusX);
+		computeDisparity.configure(disparity,minDisparity,maxDisparity,radiusX);
 
 		// initialize computation
 		computeFirstRow(left, right);
@@ -149,16 +147,21 @@ public class ImplDisparityScoreSadRect_F32<Disparity extends ImageSingleBand>
 	protected void computeScoreRow(ImageFloat32 left, ImageFloat32 right, int row, float[] scores) {
 
 		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-		for( int d = 0; d < maxDisparity; d++ ) {
-			final int elementMax = left.width-d;
-			final int scoreMax = elementMax-regionWidth;
-			int indexScore = left.width*d+d;
+		for( int d = minDisparity; d < maxDisparity; d++ ) {
+			int dispFromMin = d - minDisparity;
 
+			// number of individual columns the error is computed in
+			final int colMax = left.width-d;
+			// number of regions that a score/error is computed in
+			final int scoreMax = colMax-regionWidth;
+
+			// indexes that data is read to/from for different data structures
+			int indexScore = left.width*dispFromMin + dispFromMin;
 			int indexLeft = left.startIndex + left.stride*row + d;
-			int indexRight =  right.startIndex + right.stride*row;
+			int indexRight = right.startIndex + right.stride*row;
 
-			// Fill elementScore with all the scores for this row at disparity d
-			computeScoreRow(left, right, elementMax, indexLeft, indexRight);
+			// Fill elementScore with scores for individual elements for this row at disparity d
+			computeScoreRow(left, right, colMax, indexLeft, indexRight);
 
 			// score at the first column
 			float score = 0;

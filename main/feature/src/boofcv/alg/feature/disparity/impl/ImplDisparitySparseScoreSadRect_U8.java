@@ -39,8 +39,8 @@ public class ImplDisparitySparseScoreSadRect_U8 extends DisparitySparseScoreSadR
 	// scores up to the maximum baseline
 	int scores[];
 
-	public ImplDisparitySparseScoreSadRect_U8(int maxDisparity, int radiusX, int radiusY) {
-		super(maxDisparity,radiusX, radiusY);
+	public ImplDisparitySparseScoreSadRect_U8(int minDisparity , int maxDisparity, int radiusX, int radiusY) {
+		super(minDisparity,maxDisparity,radiusX, radiusY);
 
 		scores = new int[ maxDisparity ];
 	}

@@ -55,7 +55,7 @@ public class TestSelectSparseStandardSubpixel_F32 extends ChecksSelectSparseStan
 		scores[5] = 50;
 		scores[6] = 200;
 
-		assertTrue(alg.select(scores, 10));
+		assertTrue(alg.select(scores, 0,10));
 
 		double found = alg.getDisparity();
 		assertTrue( found < 5 && found > 4);
@@ -63,7 +63,7 @@ public class TestSelectSparseStandardSubpixel_F32 extends ChecksSelectSparseStan
 		// now biased towards 6
 		scores[4] = 200;
 		scores[6] = 100;
-		assertTrue(alg.select(scores, 10));
+		assertTrue(alg.select(scores, 0,10));
 		found = alg.getDisparity();
 
 		assertTrue( found < 6 && found > 5);

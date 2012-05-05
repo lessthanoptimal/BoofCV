@@ -124,7 +124,7 @@ public class FactoryStereoDisparity {
 	}
 
 	public static <T extends ImageSingleBand> StereoDisparitySparse<T>
-	regionSparseWta( int maxDisparity,
+	regionSparseWta( int minDisparity , int maxDisparity,
 					 int regionRadiusX, int regionRadiusY ,
 					 double maxPerPixelError ,
 					 double texture ,
@@ -141,7 +141,7 @@ public class FactoryStereoDisparity {
 				select = selectDisparitySparse_S32((int) maxError, texture);
 
 			DisparitySparseScoreSadRect<int[],ImageUInt8>
-					score = scoreDisparitySparseSadRect_U8(maxDisparity, regionRadiusX, regionRadiusY);
+					score = scoreDisparitySparseSadRect_U8(minDisparity,maxDisparity, regionRadiusX, regionRadiusY);
 
 			return new WrapDisparitySparseSadRect(score,select);
 		} else if( imageType == ImageFloat32.class ) {
@@ -152,7 +152,7 @@ public class FactoryStereoDisparity {
 				select = selectDisparitySparse_F32((int) maxError, texture);
 
 			DisparitySparseScoreSadRect<float[],ImageFloat32>
-					score = scoreDisparitySparseSadRect_F32(maxDisparity, regionRadiusX, regionRadiusY);
+					score = scoreDisparitySparseSadRect_F32(minDisparity,maxDisparity, regionRadiusX, regionRadiusY);
 
 			return new WrapDisparitySparseSadRect(score,select);
 		} else
