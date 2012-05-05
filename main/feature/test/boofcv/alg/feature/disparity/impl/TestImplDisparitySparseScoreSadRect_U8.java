@@ -46,36 +46,38 @@ public class TestImplDisparitySparseScoreSadRect_U8 {
 		ImageUInt8 left = new ImageUInt8(w,h);
 		ImageUInt8 right = new ImageUInt8(w,h);
 
-		ImageUInt8 expected = new ImageUInt8(w,h);
-
 		GeneralizedImageOps.randomize(left, rand, 0, 20);
 		GeneralizedImageOps.randomize(right,rand,0,20);
 
-		int minDisparity = 0;
+		compareToDense(left, right, 0);
+		compareToDense(left, right, 2);
+	}
+
+	private void compareToDense(ImageUInt8 left, ImageUInt8 right, int minDisparity) {
+		int w = left.width; int h = left.height;
 		int maxDisparity = 10;
 		int radiusX = 3;
 		int radiusY = 2;
 
 		ImplDisparityScoreSadRect_U8<ImageUInt8> denseAlg =
 				new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,new ImplSelectRectBasicWta_S32_U8());
-		ImplDisparitySparseScoreSadRect_U8 alg = new ImplDisparitySparseScoreSadRect_U8(0,maxDisparity,radiusX,radiusY);
+		ImplDisparitySparseScoreSadRect_U8 alg = new ImplDisparitySparseScoreSadRect_U8(minDisparity,maxDisparity,radiusX,radiusY);
 
+		ImageUInt8 expected = new ImageUInt8(w,h);
 		denseAlg.process(left, right, expected);
 		alg.setImages(left,right);
 
-		for( int y = radiusY; y < h-radiusY; y++ ) {
-			for( int x = radiusX; x < w-radiusX; x++ ) {
-				alg.process(x,y);
-				selectAlg.select(alg.scores,0,alg.getLocalMaxDisparity());
-				int found = (int)selectAlg.getDisparity();
+		for( int y = 0; y < h; y++ ) {
+			for( int x = 0; x < w; x++ ) {
+				if( !alg.process(x,y) )  {
+					assertEquals(x+" "+y,expected.get(x,y),0);
+				} else {
+					selectAlg.select(alg.scores,alg.getLocalMaxDisparity());
+					int found = (int)(alg.getMinDisparity()+selectAlg.getDisparity());
 
-				assertEquals(x+" "+y,expected.get(x,y),found);
+					assertEquals(x+" "+y,expected.get(x,y),found);
+				}
 			}
 		}
-	}
-
-	@Test
-	public void addMinDisparity() {
-		fail("stuff");
 	}
 }

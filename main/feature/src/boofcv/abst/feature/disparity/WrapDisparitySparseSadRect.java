@@ -31,6 +31,9 @@ public class WrapDisparitySparseSadRect <ArrayData,T extends ImageSingleBand>
 	DisparitySparseScoreSadRect<ArrayData,T> computeScore;
 	DisparitySparseSelect<ArrayData> select;
 
+	// for an insignificant speed boost save this constant as a floating point number
+	double minDisparityFloat;
+
 	public WrapDisparitySparseSadRect(DisparitySparseScoreSadRect<ArrayData,T> computeScore,
 									  DisparitySparseSelect<ArrayData> select ) {
 		this.computeScore = computeScore;
@@ -40,17 +43,20 @@ public class WrapDisparitySparseSadRect <ArrayData,T extends ImageSingleBand>
 	@Override
 	public void setImages(T imageLeft, T imageRight ) {
 		computeScore.setImages(imageLeft,imageRight);
+		minDisparityFloat = computeScore.getMinDisparity();
 	}
 
 	@Override
 	public double getDisparity() {
-		return select.getDisparity();
+		return minDisparityFloat+select.getDisparity();
 	}
 
 	@Override
 	public boolean process(int x, int y) {
-		computeScore.process(x,y);
-		return select.select(computeScore.getScore(),computeScore.getMinDisparity(),computeScore.getLocalMaxDisparity());
+		if( computeScore.process(x,y) ) {
+			return select.select(computeScore.getScore(), computeScore.getLocalMaxDisparity());
+		}
+		return false;
 	}
 
 	@Override
@@ -61,6 +67,11 @@ public class WrapDisparitySparseSadRect <ArrayData,T extends ImageSingleBand>
 	@Override
 	public int getBorderY() {
 		return computeScore.getRadiusY();
+	}
+
+	@Override
+	public int getMinDisparity() {
+		return computeScore.getMinDisparity();
 	}
 
 	@Override

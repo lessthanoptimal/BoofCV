@@ -10,10 +10,6 @@ Trackers
 - Faster association
   - FLANN?
 
-- Disparity
- * Min disparity setting
- * sparse add right to left check
-
 - See KLT list
 
 - Non-Maximum Suppression for edges
