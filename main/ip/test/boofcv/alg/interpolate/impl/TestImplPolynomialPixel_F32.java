@@ -81,8 +81,8 @@ public class TestImplPolynomialPixel_F32 extends GeneralInterpolationPixelChecks
 	}
 
 	@Override
-	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image) {
-		InterpolatePixel<ImageFloat32> ret = new ImplPolynomialPixel_F32(DOF,0,255);
+	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image, int minValue, int maxValue) {
+		InterpolatePixel<ImageFloat32> ret = new ImplPolynomialPixel_F32(DOF,minValue,maxValue);
 		ret.setImage(image);
 		return ret;
 	}

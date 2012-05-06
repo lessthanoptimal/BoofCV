@@ -38,7 +38,7 @@ public class TestImplInterpolatePixelConvolution_S16
 	}
 
 	@Override
-	protected InterpolatePixel<ImageSInt16> wrap(ImageSInt16 image) {
+	protected InterpolatePixel<ImageSInt16> wrap(ImageSInt16 image, int minValue, int maxValue) {
 		InterpolatePixel<ImageSInt16> ret = new ImplInterpolatePixelConvolution_S16(new Dummy(),0,255);
 		ret.setImage(image);
 

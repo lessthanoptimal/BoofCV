@@ -84,7 +84,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		GeneralFeatureDetector<T,D> alg;
 
 		addAlgorithm(0,"Fast Hessian",FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4));
-		alg = FactoryCornerDetector.createKlt(2,1,500,derivType);
+		alg = FactoryCornerDetector.createKlt(2, false, 1,500,derivType);
 		addAlgorithm(0,"KLT",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 
 		addAlgorithm(1,"SURF", FactoryDescribeRegionPoint.surf(true, imageType));

@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageSingleBand;
 public abstract class GeneralBilinearPixelChecks<T extends ImageSingleBand> extends GeneralInterpolationPixelChecks<T> {
 
 	@Override
-	protected InterpolatePixel<T> wrap(T image) {
+	protected InterpolatePixel<T> wrap(T image, int minValue, int maxValue) {
 		return FactoryInterpolation.bilinearPixel(image);
 	}
 

@@ -94,9 +94,9 @@ public class BenchmarkCornerAccuracy {
 		int maxFeatures = corners.size()*2;
 
 		detectCorners("FAST",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createFast( 10 , 11, maxFeatures, ImageUInt8.class));
-		detectCorners("Harris", FactoryCornerDetector.<ImageUInt8,ImageSInt16>createHarris(radius, 0.04f,maxFeatures,ImageSInt16.class));
+		detectCorners("Harris", FactoryCornerDetector.<ImageUInt8,ImageSInt16>createHarris(radius, false, 0.04f,maxFeatures,ImageSInt16.class));
 		detectCorners("KitRos", FactoryCornerDetector.<ImageUInt8,ImageSInt16>createKitRos( radius,1f,maxFeatures,ImageSInt16.class ));
-		detectCorners("KLT",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createKlt(radius,1f,maxFeatures, ImageSInt16.class ));
+		detectCorners("KLT",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createKlt(radius, false, 1f,maxFeatures, ImageSInt16.class ));
 		detectCorners("Median",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createMedian(radius,1,maxFeatures, ImageUInt8.class ));
 	}
 

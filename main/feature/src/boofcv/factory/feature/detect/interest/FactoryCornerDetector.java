@@ -30,7 +30,9 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Creates a family of interest point detectors which are designed to detect the corners of objects..
+ * <p>
+ * Creates interest point detectors that are designed to detect the corners in an image.
+ * </p>
  *
  * <p>
  * NOTE: Sometimes the image border is ignored and some times it is not.  If feature intensities are not
@@ -43,28 +45,32 @@ import boofcv.struct.image.ImageSingleBand;
 public class FactoryCornerDetector {
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<T,D> createHarris( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
+	GeneralFeatureDetector<T,D> createHarris(int featureRadius, boolean weighted,
+											 float cornerThreshold, int maxFeatures, Class<D> derivType)
 	{
-		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.harris(featureRadius, 0.04f, false, derivType);
+		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.harris(featureRadius, 0.04f, weighted, derivType);
 		return createGeneral(cornerIntensity,featureRadius,cornerThreshold,maxFeatures);
 	}
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<T,D> createKlt( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
+	GeneralFeatureDetector<T,D> createKlt(int featureRadius, boolean weighted,
+										  float cornerThreshold, int maxFeatures, Class<D> derivType)
 	{
-		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.klt(featureRadius, false, derivType);
+		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.klt(featureRadius, weighted, derivType);
 		return createGeneral(cornerIntensity,featureRadius,cornerThreshold,maxFeatures);
 	}
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<T,D> createKitRos( int featureRadius , float cornerThreshold , int maxFeatures , Class<D> derivType )
+	GeneralFeatureDetector<T,D> createKitRos( int featureRadius ,
+											  float cornerThreshold , int maxFeatures , Class<D> derivType )
 	{
 		GeneralFeatureIntensity<T,D> intensity = new WrapperKitRosCornerIntensity<T,D>(derivType);
 		return createGeneral(intensity,featureRadius,cornerThreshold,maxFeatures);
 	}
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<T,D> createFast( int featureRadius , int pixelTol , int maxFeatures , Class<T> imageType)
+	GeneralFeatureDetector<T,D> createFast( int featureRadius ,
+											int pixelTol , int maxFeatures , Class<T> imageType)
 	{
 		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast12(pixelTol, 11, imageType);
 		GeneralFeatureIntensity<T,D> intensity = new WrapperFastCornerIntensity<T,D>(alg);
@@ -90,7 +96,8 @@ public class FactoryCornerDetector {
 	GeneralFeatureDetector<T,D> createGeneral( GeneralFeatureIntensity<T,D> intensity ,
 											  int minSeparation , float cornerThreshold , int maxFeatures ) {
 		int intensityBorder = intensity.getIgnoreBorder();
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, cornerThreshold, intensityBorder, false, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.
+				nonmax(minSeparation, cornerThreshold, intensityBorder, false, true);
 		GeneralFeatureDetector<T,D> det = new GeneralFeatureDetector<T,D>(intensity,extractor);
 		det.setMaxFeatures(maxFeatures);
 		

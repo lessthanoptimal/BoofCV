@@ -38,7 +38,7 @@ public class TestImplInterpolatePixelConvolution_U8
 	}
 
 	@Override
-	protected InterpolatePixel<ImageUInt8> wrap(ImageUInt8 image) {
+	protected InterpolatePixel<ImageUInt8> wrap(ImageUInt8 image, int minValue, int maxValue) {
 		InterpolatePixel<ImageUInt8> ret = new ImplInterpolatePixelConvolution_U8(new Dummy(),0,255);
 		ret.setImage(image);
 

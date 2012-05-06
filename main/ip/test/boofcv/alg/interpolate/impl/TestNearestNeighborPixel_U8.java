@@ -32,7 +32,7 @@ public class TestNearestNeighborPixel_U8 extends GeneralInterpolationPixelChecks
 	}
 
 	@Override
-	protected InterpolatePixel<ImageUInt8> wrap(ImageUInt8 image) {
+	protected InterpolatePixel<ImageUInt8> wrap(ImageUInt8 image, int minValue, int maxValue) {
 		return new NearestNeighborPixel_U8(image);
 	}
 

@@ -99,7 +99,7 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 
 		public Harris() {
 			GImageDerivativeOps.sobel(input, derivX,derivY, BorderType.EXTENDED);
-			detector = FactoryCornerDetector.createHarris(radius,1,-1,derivType);
+			detector = FactoryCornerDetector.createHarris(radius, false, 1,-1,derivType);
 		}
 
 		@Override

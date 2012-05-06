@@ -83,7 +83,7 @@ public class FactoryPointSequentialTracker {
 		config.featureRadius = featureRadius;
 
 		GeneralFeatureDetector<I,D> detector =
-				FactoryCornerDetector.createKlt(config.featureRadius,config.config.minDeterminant,config.maxFeatures,config.typeDeriv);
+				FactoryCornerDetector.createKlt(config.featureRadius, false, config.config.minDeterminant,config.maxFeatures,config.typeDeriv);
 		detector.setRegions(spawnSubW,spawnSubH);
 
 		GenericPkltFeatSelector<I, D> featureSelector = new GenericPkltFeatSelector<I,D>(detector,null);

@@ -74,10 +74,14 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 
 		GeneralFeatureDetector<T,D> alg;
 
-		alg = FactoryCornerDetector.createHarris(radius,thresh,maxFeatures,derivType);
+		alg = FactoryCornerDetector.createHarris(radius, false, thresh,maxFeatures,derivType);
 		addAlgorithm(0, "Harris",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
-		alg = FactoryCornerDetector.createKlt(radius,thresh,maxFeatures,derivType);
+		alg = FactoryCornerDetector.createHarris(radius, true, thresh,maxFeatures,derivType);
+		addAlgorithm(0, "Harris Weighted",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
+		alg = FactoryCornerDetector.createKlt(radius, false, thresh,maxFeatures,derivType);
 		addAlgorithm(0, "KLT", FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
+		alg = FactoryCornerDetector.createKlt(radius, true, thresh,maxFeatures,derivType);
+		addAlgorithm(0, "KLT Weighted", FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 		alg = FactoryCornerDetector.createFast(radius,10,maxFeatures,imageType);
 		addAlgorithm(0, "Fast", FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 		alg = FactoryCornerDetector.createKitRos(radius,thresh,maxFeatures,derivType);

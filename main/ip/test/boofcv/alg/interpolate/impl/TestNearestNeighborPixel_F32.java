@@ -32,7 +32,7 @@ public class TestNearestNeighborPixel_F32 extends GeneralInterpolationPixelCheck
 	}
 
 	@Override
-	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image) {
+	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image, int minValue, int maxValue) {
 		return new NearestNeighborPixel_F32(image);
 	}
 

@@ -116,7 +116,7 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 		deriv.setInput(workImage);
 
 		int r = 2;
-		GeneralFeatureDetector<T,D> detector =  FactoryCornerDetector.createHarris(r,1,NUM_FEATURES,derivType);
+		GeneralFeatureDetector<T,D> detector =  FactoryCornerDetector.createHarris(r, false, 1,NUM_FEATURES,derivType);
 
 		D derivX=null,derivY=null,derivXX=null,derivYY=null,derivXY=null;
 
