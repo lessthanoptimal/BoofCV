@@ -62,14 +62,6 @@
 - Improve Sort Median Filter
  * Use bubble sort to avoid resorting each time
 
-- Interpolate
- * Remove unsafe in pixel.
-   * That operation would only be used in specialized cases, which likely could have further optimizations.
-   * Pro of keeping it is that it could make this easier to program in the long run
- * Bicubic seems to have overflow issues
- * Move 1D interpolation into libpja?
- * Add more types to polynomial, improve tests, and refine
-
 - Have a morphological filter section?
  * Add gray scale morphological operators
  * Handle image edges for binary and gray scale

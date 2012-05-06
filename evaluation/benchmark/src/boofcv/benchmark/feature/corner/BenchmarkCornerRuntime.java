@@ -112,7 +112,7 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static GeneralFeatureDetector<?,?> createHarris() {
-		return FactoryCornerDetector.createHarris(windowRadius,1,maxFeatures,derivType);
+		return FactoryCornerDetector.createHarris(windowRadius, false, 1,maxFeatures,derivType);
 	}
 
 	public static GeneralFeatureDetector<?,?> createKitRos() {
@@ -120,7 +120,7 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static GeneralFeatureDetector<?,?> createKlt() {
-		return FactoryCornerDetector.createKlt(windowRadius,1,maxFeatures,derivType);
+		return FactoryCornerDetector.createKlt(windowRadius, false, 1,maxFeatures,derivType);
 	}
 
 	public static void main(String args[]) {

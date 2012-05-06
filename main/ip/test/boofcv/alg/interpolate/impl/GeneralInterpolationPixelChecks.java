@@ -43,10 +43,11 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 
 	protected abstract T createImage( int width , int height );
 
-	protected abstract InterpolatePixel<T> wrap( T image );
+	protected abstract InterpolatePixel<T> wrap(T image, int minValue, int maxValue);
 
 	/**
-	 * Checks value returned by get()
+	 * Checks value returned by get() against values computed using
+	 * an alternative approach.
 	 */
 	@Test
 	public void get() {
@@ -57,7 +58,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	}
 
 	public void get(T img) {
-		InterpolatePixel<T> interp = wrap(img);
+		InterpolatePixel<T> interp = wrap(img, 0, 100);
 
 		assertEquals(compute(img, 10, 10), interp.get(10, 10), 1e-5f);
 		assertEquals(compute(img, 10.1f, 10), interp.get(10.1f, 10), 1e-5f);
@@ -77,7 +78,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	}
 
 	public void get_edges(T img) {
-		InterpolatePixel<T> interp = wrap(img);
+		InterpolatePixel<T> interp = wrap(img, 0, 100);
 
 		compare(interp,img, width-0.01f, height/2);
 		compare(interp,img, 0, height/2);
@@ -94,7 +95,8 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 
 
 	/**
-	 * Compute a bilinear interpolation manually
+	 * Compute the interpolation manually using independently written code.  For
+	 * example, easy to write but inefficient.
 	 */
 	protected abstract float compute(T img, float x, float y);
 
@@ -104,7 +106,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	public void get_outside() {
 		T img = createImage(width, height);
 
-		InterpolatePixel<T> interp = wrap(img);
+		InterpolatePixel<T> interp = wrap(img, 0, 100);
 
 		try {
 			interp.get(500, 10);
@@ -128,7 +130,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	}
 
 	public void get_unsafe(T img) {
-		InterpolatePixel<T> interp = wrap(img);
+		InterpolatePixel<T> interp = wrap(img, 0, 100);
 
 		assertEquals(interp.get(10, 10), interp.get_unsafe(10, 10), 1e-6);
 		assertEquals(interp.get(10.1f, 10), interp.get_unsafe(10.1f, 10), 1e-6);
@@ -139,7 +141,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	@Test
 	public void getImage() {
 		T img = createImage(width, height);
-		InterpolatePixel<T> interp = wrap(img);
+		InterpolatePixel<T> interp = wrap(img, 0, 100);
 		assertTrue(img == interp.getImage());
 	}
 
@@ -151,7 +153,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	public void isInSafeBounds() {
 		T img = createImage(width, height);
 		GeneralizedImageOps.randomize(img, rand, 0,100);
-		InterpolatePixel<T> interp = wrap(img);
+		InterpolatePixel<T> interp = wrap(img, 0, 100);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -171,7 +173,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	public void checkSafeGetAlongBorder() {
 		T img = createImage(width, height);
 		GeneralizedImageOps.randomize(img, rand, 0,100);
-		InterpolatePixel<T> interp = wrap(img);
+		InterpolatePixel<T> interp = wrap(img, 0, 100);
 
 		// will it blow up?
 		interp.get(0,0);
@@ -180,5 +182,22 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 		interp.get(width-1,height-1);
 		interp.get(width/2,height-1);
 		interp.get(width-1,height/2);
+	}
+
+	/**
+	 * Interpolates the whole image and sees if the values returned are within the specified bounds
+	 */
+	@Test
+	public void checkPixelValueBoundsHonored() {
+		T img = createImage(20, 30);
+		GeneralizedImageOps.randomize(img, rand, 0,100);
+		InterpolatePixel<T> interp = wrap(img, 0, 100);
+
+		for( int y = 0; y < img.height; y++ ) {
+			for( int x = 0; x < img.width; x++ ) {
+				float v = interp.get(x,y);
+				assertTrue( v >= 0 && v <= 100 );
+			}
+		}
 	}
 }

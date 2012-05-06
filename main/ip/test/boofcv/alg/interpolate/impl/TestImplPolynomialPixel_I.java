@@ -81,8 +81,8 @@ public class TestImplPolynomialPixel_I extends GeneralInterpolationPixelChecks<I
 	}
 
 	@Override
-	protected InterpolatePixel<ImageUInt8> wrap(ImageUInt8 image) {
-		InterpolatePixel ret = new ImplPolynomialPixel_I(DOF,0,255);
+	protected InterpolatePixel<ImageUInt8> wrap(ImageUInt8 image, int minValue, int maxValue) {
+		InterpolatePixel ret = new ImplPolynomialPixel_I(DOF,minValue,maxValue);
 		ret.setImage(image);
 		return ret;
 	}

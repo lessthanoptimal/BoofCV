@@ -26,7 +26,6 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
@@ -35,11 +34,6 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
 
 /**
  * Compares different types of interpolation algorithms by enlarging an image.
@@ -52,7 +46,6 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 	Class<T> imageType;
 	MultiSpectral<T> color;
 	MultiSpectral<T> scaledImage;
-
 
 	ImagePanel panel = new ImagePanel();
 	boolean hasProcessed = false;

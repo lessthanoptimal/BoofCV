@@ -57,7 +57,8 @@ public class FactoryIntensityPointAlg {
 	}
 
 	/**
-	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity} from different image types.
+	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity} from different
+	 * image types.
 	 *
 	 * @param windowRadius Size of the feature it is detects,Try 2.
 	 * @param kappa Tuning parameter, typically a small number around 0.04
@@ -84,7 +85,8 @@ public class FactoryIntensityPointAlg {
 	}
 
 	/**
-	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} from different image types.
+	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} from
+	 * different image types.
 	 *
 	 * @param windowRadius Size of the feature it detects, Try 2.
 	 * @param weighted Should the it be weighted by a Gaussian kernel?  Unweighted is much faster.

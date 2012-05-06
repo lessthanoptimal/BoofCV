@@ -58,9 +58,9 @@ public class BenchmarkDetectHelper {
 
 		alg = FactoryCornerDetector.createFast(radius,20,maxFeatures,imageType);
 		ret.add( new BenchmarkAlgorithm("Fast", FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );
-		alg = FactoryCornerDetector.createHarris(radius,thresh,maxFeatures,derivType);
+		alg = FactoryCornerDetector.createHarris(radius, false, thresh,maxFeatures,derivType);
 		ret.add( new BenchmarkAlgorithm("Harris",FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );
-		alg = FactoryCornerDetector.createKlt(radius,thresh,maxFeatures,derivType);
+		alg = FactoryCornerDetector.createKlt(radius, false, thresh,maxFeatures,derivType);
 		ret.add( new BenchmarkAlgorithm("KLT", FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );
 		alg = FactoryCornerDetector.createKitRos(radius,thresh,maxFeatures,derivType);
 		ret.add( new BenchmarkAlgorithm("KitRos",FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );

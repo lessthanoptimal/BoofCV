@@ -86,7 +86,7 @@ public class ExampleFundamentalMatrix {
 		DistanceFromModelResidual<DenseMatrix64F,AssociatedPair> errorMetric =
 				new DistanceFromModelResidual<DenseMatrix64F,AssociatedPair>(new FundamentalResidualSampson());
 
-		// Use LMedS to estimate F since it does not require knowledge of the expected error
+		// Use RANSAC to estimate the Fundamental matrix
 		ModelMatcher<DenseMatrix64F,AssociatedPair> robustF =
 				new SimpleInlierRansac<DenseMatrix64F, AssociatedPair>(123123,generateF,errorMetric,
 						3000,7,20,-1,0.2);

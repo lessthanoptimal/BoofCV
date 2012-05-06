@@ -32,7 +32,7 @@ public class TestNearestNeighborPixel_S16 extends GeneralInterpolationPixelCheck
 	}
 
 	@Override
-	protected InterpolatePixel<ImageSInt16> wrap(ImageSInt16 image) {
+	protected InterpolatePixel<ImageSInt16> wrap(ImageSInt16 image, int minValue, int maxValue) {
 		return new NearestNeighborPixel_S16(image);
 	}
 

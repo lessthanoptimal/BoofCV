@@ -43,7 +43,7 @@ public class TestGeneralFeatureDetector extends GenericFeatureDetector {
 	@Override
 	protected Object createDetector( int maxFeatures ) {
 //		return FactoryBlobDetector.createLaplace(2,0,maxFeatures,ImageFloat32.class,HessianBlobIntensity.Type.DETERMINANT);
-		return FactoryCornerDetector.createHarris(2,0,maxFeatures,ImageFloat32.class);
+		return FactoryCornerDetector.createHarris(2, false, 0,maxFeatures,ImageFloat32.class);
 	}
 
 	@Override
