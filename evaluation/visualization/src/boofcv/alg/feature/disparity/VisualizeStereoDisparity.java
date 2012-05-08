@@ -85,7 +85,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		selectedAlg = 0;
 		activeAlg = createAlg();
 		addAlgorithm(0,"WTA Denoised",0);
-		addAlgorithm(0,"WTA",1);
+		addAlgorithm(0,"WTA Five",1);
+		addAlgorithm(0,"WTA",2);
 
 		control.setListener(this);
 
@@ -258,6 +259,12 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 						ImageUInt8.class);
 
 			case 1:
+				changeGuiActive(true,true);
+				return (StereoDisparity)FactoryStereoDisparity.regionFive(control.minDisparity,
+						control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
+						ImageUInt8.class);
+
+			case 2:
 				changeGuiActive(false,false);
 				return (StereoDisparity)FactoryStereoDisparity.regionWta(control.minDisparity,
 						control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);

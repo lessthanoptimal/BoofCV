@@ -18,10 +18,7 @@
 
 package boofcv.factory.feature.disparity;
 
-import boofcv.alg.feature.disparity.DisparityScoreSadRect;
-import boofcv.alg.feature.disparity.DisparitySelect;
-import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
-import boofcv.alg.feature.disparity.DisparitySparseSelect;
+import boofcv.alg.feature.disparity.*;
 import boofcv.alg.feature.disparity.impl.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -99,6 +96,15 @@ public class FactoryStereoDisparityAlgs {
 							  DisparitySelect<float[],T> computeDisparity)
 	{
 		return new ImplDisparityScoreSadRect_F32<T>(minDisparity,
+				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+	}
+
+	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageUInt8,T>
+	scoreDisparitySadRectFive_U8( int minDisparity , int maxDisparity,
+								  int regionRadiusX, int regionRadiusY,
+								  DisparitySelect<int[],T> computeDisparity)
+	{
+		return new DisparityScoreWindowFive(minDisparity,
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 

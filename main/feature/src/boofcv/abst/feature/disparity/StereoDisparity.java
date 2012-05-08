@@ -22,15 +22,15 @@ import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
- * Given two rectified image compute corresponding dense disparity image.  Input images are assumed
- * to be rectified (epipoles are at infinity) along the x-axis, with the left image being to the
- * left (minus x-axis) of the right image. Disparity goes from left to right image.  Disparity is searched
- * through range of minDisparity to maxDisparity and the outside borders of the image are not processed.
+ * Given two rectified images compute the corresponding dense disparity image.  Input images are assumed
+ * to be rectified along the x-axis.  Disparity goes from left to right image, e.g. x_right = x_left + disparity.
+ * To speed up calculations only a limited range of disparities are considered from minDisparity to maxDisparity.
+ * Image borders are not processed and the border size is specified by functions below.
  * </p>
  *
  * <p>
- * Return disparity image contains the disparity for each pixel, but offset from the true value by minDisparity.  This
- * is done to maximize storage efficiency in the image.  To get the actual disparity value simply extract the value
+ * DISPARITY IMAGE FORMAT: Returned disparity image is offset from the true value by minDisparity.  This
+ * is done to maximize storage efficiency.  To get the actual disparity value simply extract the value
  * of a pixel and add minDisparity to it.  Invalid pixels are indicated by having a value greater than
  * (maxDisparity - minDisparity).
  * </p>

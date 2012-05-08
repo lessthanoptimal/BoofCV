@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageSingleBand;
 /**
  * <p>
  * Computes the disparity between two rectified images at specified points only.
- *  </p>
+ * </p>
  *
  * <p>
  * NOTE: Unlike for dense images, the returned disparity is the actual disparity.  No need to add minDisparity

@@ -30,6 +30,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -69,9 +70,9 @@ public class TestWrapDisparitySparseSadRect {
 			for( int x = 0; x < w; x++ ) {
 				if( alg.process(x,y) ) {
 					double found = alg.getDisparity();
-					assertEquals(expected.get(x,y),(int)found);
+					assertEquals(minDisparity+expected.get(x,y),(int)found);
 				} else {
-					assertEquals(expected.get(x,y),maxDisparity+1);
+					assertTrue(expected.get(x, y) > (maxDisparity - minDisparity));
 				}
 			}
 		}
