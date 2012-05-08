@@ -22,7 +22,7 @@ import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.disparity.WrapDisparitySadRect;
 import boofcv.abst.feature.disparity.WrapDisparitySparseSadRect;
-import boofcv.alg.feature.disparity.DisparityScoreSadRect;
+import boofcv.alg.feature.disparity.DisparityScoreRowFormat;
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySparseSelect;
@@ -53,27 +53,27 @@ public class FactoryStereoDisparity {
 
 	/**
 	 * <p>
-	 * Selects the disparity which minimizes the SAD error within a rectangular region, known as a Winner Takes All
-	 * (WTA) strategy.  Optionally additional validation can be performed to remove some false positives.
+	 * Crates algorithms for computing dense disparity images up to pixel level accuracy.
 	 * </p>
 	 *
 	 * <p>
-	 * For more detailed information on validation parameters see {@link boofcv.alg.feature.disparity.SelectRectStandard}.
+	 * NOTE: For RECT_FIVE the size of the sub-regions it uses is what is specified.
 	 * </p>
 	 *
-	 * @param minDisparity
-	 * @param maxDisparity
-	 * @param regionRadiusX Region's radius along x-axis.
-	 * @param regionRadiusY
-	 * @param maxPerPixelError
-	 * @param validateRtoL
-	 * @param texture
-	 * @param imageType
-	 * @param <T>
-	 * @return Rectangular region WTA disparity.
+	 * @param minDisparity Minimum disparity that it will check. Must be >= 0 and < maxDisparity
+	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
+	 * @param regionRadiusX Radius of the rectangular region along x-axis.
+	 * @param regionRadiusY Radius of the rectangular region along y-axis.
+	 * @param maxPerPixelError Maximum allowed error in a region per pixel.  Set to < 0 to disable.
+	 * @param validateRtoL Tolerance for how difference the left to right associated values can be.  Try 6
+	 * @param texture Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
+	 *                Try 0.1
+	 * @param imageType Type of input image.
+	 * @return Rectangular region based WTA disparity.algorithm.
 	 */
 	public static <T extends ImageSingleBand> StereoDisparity<T,ImageUInt8>
-	regionWta( int minDisparity , int maxDisparity,
+	regionWta( DisparityAlgorithms whichAlg ,
+			   int minDisparity , int maxDisparity,
 			   int regionRadiusX, int regionRadiusY ,
 			   double maxPerPixelError ,
 			   int validateRtoL ,
@@ -82,49 +82,75 @@ public class FactoryStereoDisparity {
 
 		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
 
-		DisparityScoreSadRect<T,ImageUInt8> alg;
+		// 3 regions are used not just one in this case
+		if( whichAlg == DisparityAlgorithms.RECT_FIVE )
+			maxError *= 3;
 
+		DisparitySelect select;
 		if( imageType == ImageUInt8.class ) {
-			DisparitySelect<int[],ImageUInt8> select =
-					selectDisparity_S32((int) maxError, validateRtoL, texture);
-			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
-					maxDisparity,regionRadiusX,regionRadiusY,select);
+			select = selectDisparity_S32((int) maxError, validateRtoL, texture);
 		} else if( imageType == ImageFloat32.class ) {
-			DisparitySelect<float[],ImageUInt8> select =
-					selectDisparity_F32((int) maxError, validateRtoL, texture);
-			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
-					maxDisparity, regionRadiusX, regionRadiusY, select);
-		} else
+			select = selectDisparity_F32((int) maxError, validateRtoL, texture);
+		} else {
+			throw new IllegalArgumentException("Unknown image type");
+		}
+
+		DisparityScoreRowFormat<T,ImageUInt8> alg = null;
+
+		switch( whichAlg ) {
+			case RECT:
+				if( imageType == ImageUInt8.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
+							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == ImageFloat32.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
+				}
+				break;
+
+			case RECT_FIVE:
+				if( imageType == ImageUInt8.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
+							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == ImageFloat32.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_F32(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
+				}
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown algorithms "+whichAlg);
+
+		}
+		if( alg == null)
 			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
 
 		return new WrapDisparitySadRect<T,ImageUInt8>(alg);
 	}
 
-	public static <T extends ImageSingleBand> StereoDisparity<T,ImageUInt8>
-	regionFive( int minDisparity , int maxDisparity,
-				int regionRadiusX, int regionRadiusY ,
-				double maxPerPixelError ,
-				int validateRtoL ,
-				double texture ,
-				Class<T> imageType ) {
-
-		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
-
-		DisparityScoreSadRect<T,ImageUInt8> alg;
-
-		if( imageType == ImageUInt8.class ) {
-			DisparitySelect<int[],ImageUInt8> select =
-					selectDisparity_S32((int) maxError, validateRtoL, texture);
-			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
-					maxDisparity,regionRadiusX,regionRadiusY,select);
-		} else
-			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
-
-		return new WrapDisparitySadRect<T,ImageUInt8>(alg);
-	}
-
+	/**
+	 * <p>
+	 * Crates algorithms for computing dense disparity images with sub-pixel accuracy.
+	 * </p>
+	 *
+	 * <p>
+	 * NOTE: For RECT_FIVE the size of the sub-regions it uses is what is specified.
+	 * </p>
+	 *
+	 * @param minDisparity Minimum disparity that it will check. Must be >= 0 and < maxDisparity
+	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
+	 * @param regionRadiusX Radius of the rectangular region along x-axis.
+	 * @param regionRadiusY Radius of the rectangular region along y-axis.
+	 * @param maxPerPixelError Maximum allowed error in a region per pixel.  Set to < 0 to disable.
+	 * @param validateRtoL Tolerance for how difference the left to right associated values can be.  Try 6
+	 * @param texture Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
+	 *                Try 0.1
+	 * @param imageType Type of input image.
+	 * @return Rectangular region based WTA disparity.algorithm.
+	 */
 	public static <T extends ImageSingleBand> StereoDisparity<T,ImageFloat32>
-	regionSubpixelWta( int minDisparity , int maxDisparity,
+	regionSubpixelWta( DisparityAlgorithms whichAlg ,
+					   int minDisparity , int maxDisparity,
 					   int regionRadiusX, int regionRadiusY ,
 					   double maxPerPixelError ,
 					   int validateRtoL ,
@@ -133,19 +159,47 @@ public class FactoryStereoDisparity {
 
 		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
 
-		DisparityScoreSadRect<T,ImageFloat32> alg;
+		// 3 regions are used not just one in this case
+		if( whichAlg == DisparityAlgorithms.RECT_FIVE )
+			maxError *= 3;
 
+		DisparitySelect select;
 		if( imageType == ImageUInt8.class ) {
-			DisparitySelect<int[],ImageFloat32> select =
-					selectDisparitySubpixel_S32((int) maxError, validateRtoL, texture);
-			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
-					maxDisparity,regionRadiusX,regionRadiusY,select);
+			select = selectDisparitySubpixel_S32((int) maxError, validateRtoL, texture);
 		} else if( imageType == ImageFloat32.class ) {
-			DisparitySelect<float[],ImageFloat32> select =
-					selectDisparitySubpixel_F32((int) maxError, validateRtoL, texture);
-			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
-					maxDisparity, regionRadiusX, regionRadiusY, select);
-		} else
+			select = selectDisparitySubpixel_F32((int) maxError, validateRtoL, texture);
+		} else {
+			throw new IllegalArgumentException("Unknown image type");
+		}
+
+		DisparityScoreRowFormat<T,ImageFloat32> alg = null;
+
+		switch( whichAlg ) {
+			case RECT:
+				if( imageType == ImageUInt8.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
+							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == ImageFloat32.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
+				}
+				break;
+
+			case RECT_FIVE:
+				if( imageType == ImageUInt8.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
+							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == ImageFloat32.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_F32(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
+				}
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown algorithms "+whichAlg);
+
+		}
+		if( alg == null)
 			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
 
 		return new WrapDisparitySadRect<T,ImageFloat32>(alg);

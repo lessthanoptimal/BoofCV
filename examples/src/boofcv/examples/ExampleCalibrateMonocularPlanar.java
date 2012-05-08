@@ -32,18 +32,18 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * <p>
- * Example of how to calibrate a single (monocular) camera using a planar calibration grid.  The intrinsic camera
- * parameters and lens distortion are estimated.  Both square grid and chessboard targets are demonstrated by this
- * example. See calibration tutorial for a discussion of different target types and how to collect good calibration
- * images.
- * </p>
+ * Example of how to calibrate a single (monocular) camera using a high level interface that processes images of planar
+ * calibration targets.  The entire calibration target must be observable in the image and for best results images
+ * should be in focus and not blurred.  For a lower level example of camera calibration which processes a set of
+ * observed calibration points see {@link ExampleCalibrateMonocularPlanar}.
  *
- * <<p>
+ * After processing both intrinsic camera parameters and lens distortion are estimated.  Square grid and chessboard
+ * targets are demonstrated by this example. See calibration tutorial for a discussion of different target types
+ * and how to collect good calibration images.
+ *
  * All the image processing and calibration is taken care of inside of {@link CalibrateMonoPlanar}.  The code below
  * loads calibration images as inputs, calibrates, and saves results to an XML file.  See in code comments for tuning
  * and implementation issues.
- * </p>
  *
  * @see CalibrateMonoPlanar
  *

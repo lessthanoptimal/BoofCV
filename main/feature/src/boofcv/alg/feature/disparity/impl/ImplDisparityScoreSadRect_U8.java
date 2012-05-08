@@ -1,17 +1,19 @@
 /*
- * Copyright 2011-2012 Peter Abeles
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * This file is part of BoofCV (http://boofcv.org).
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package boofcv.alg.feature.disparity.impl;
@@ -89,7 +91,8 @@ public class ImplDisparityScoreSadRect_U8<Disparity extends ImageSingleBand>
 
 			int scores[] = horizontalScore[row];
 
-			computeScoreRow(left, right, row, scores);
+			UtilDisparityScore.computeScoreRow(left, right, row, scores,
+					minDisparity, maxDisparity, regionWidth, elementScore);
 		}
 
 		// compute score for the top possible row
@@ -121,7 +124,8 @@ public class ImplDisparityScoreSadRect_U8<Disparity extends ImageSingleBand>
 				verticalScore[i] -= scores[i];
 			}
 
-			computeScoreRow(left, right, row, scores);
+			UtilDisparityScore.computeScoreRow(left, right, row, scores,
+					minDisparity, maxDisparity, regionWidth, elementScore);
 
 			// add the new score
 			for( int i = 0; i < lengthHorizontal; i++ ) {
@@ -130,68 +134,6 @@ public class ImplDisparityScoreSadRect_U8<Disparity extends ImageSingleBand>
 
 			// compute disparity
 			computeDisparity.process(row - regionHeight + 1 + radiusY, verticalScore);
-		}
-	}
-
-	/**
-	 * Computes disparity score for an entire row.
-	 *
-	 * For a given disparity, the score for each region on the left share many components in common.
-	 * Because of this the scores are computed with disparity being the outer most loop
-	 *
-	 * @param left left image
-	 * @param right Right image
-	 * @param row Image row being examined
-	 * @param scores Storage for disparity scores.
-	 */
-	protected void computeScoreRow(ImageUInt8 left, ImageUInt8 right, int row, int[] scores) {
-
-		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-		for( int d = minDisparity; d < maxDisparity; d++ ) {
-			int dispFromMin = d - minDisparity;
-
-			// number of individual columns the error is computed in
-			final int colMax = left.width-d;
-			// number of regions that a score/error is computed in
-			final int scoreMax = colMax-regionWidth;
-
-			// indexes that data is read to/from for different data structures
-			int indexScore = left.width*dispFromMin + dispFromMin;
-			int indexLeft = left.startIndex + left.stride*row + d;
-			int indexRight = right.startIndex + right.stride*row;
-
-			// Fill elementScore with scores for individual elements for this row at disparity d
-			computeScoreRow(left, right, colMax, indexLeft, indexRight);
-
-			// score at the first column
-			int score = 0;
-			for( int i = 0; i < regionWidth; i++ )
-				score += elementScore[i];
-
-			scores[indexScore++] = score;
-
-			// scores for the remaining columns
-			for( int col = 0; col < scoreMax; col++ , indexScore++ ) {
-				scores[indexScore] = score += elementScore[col+regionWidth] - elementScore[col];
-			}
-		}
-	}
-
-	/**
-	 * compute the score for each element all at once to encourage the JVM to optimize and
-	 * encourage the JVM to optimize this section of code.
-	 *
-	 * Was original inline, but was actually slightly slower by about 3% consistently,  It
-	 * is in its own function so that it can be overridden and have different cost functions
-	 * inserted easily.
-	 */
-	protected void computeScoreRow(ImageUInt8 left, ImageUInt8 right,
-								   int elementMax, int indexLeft, int indexRight)
-	{
-		for( int rCol = 0; rCol < elementMax; rCol++ ) {
-			int diff = (left.data[ indexLeft++ ]& 0xFF) - (right.data[ indexRight++ ]& 0xFF);
-
-			elementScore[rCol] = Math.abs(diff);
 		}
 	}
 

@@ -18,10 +18,9 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.alg.feature.disparity.DisparitySparseSelect;
 import boofcv.alg.feature.disparity.impl.ImplDisparitySparseScoreSadRect_F32;
 import boofcv.alg.feature.disparity.impl.ImplSelectSparseBasicWta_F32;
-import boofcv.alg.feature.disparity.impl.SelectSparseStandardSubpixel;
+import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -31,7 +30,6 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -56,7 +54,8 @@ public class TestWrapDisparitySparseSadRect {
 		ImageFloat32 right = new ImageFloat32(w,h);
 
 		StereoDisparity<ImageFloat32,ImageUInt8> validator =
-				FactoryStereoDisparity.regionWta(minDisparity,maxDisparity,r,r,-1,-1,-1,ImageFloat32.class);
+				FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,
+						minDisparity,maxDisparity,r,r,-1,-1,-1,ImageFloat32.class);
 		StereoDisparitySparse<ImageFloat32> alg =
 				new WrapDisparitySparseSadRect<float[],ImageFloat32>(
 						new ImplDisparitySparseScoreSadRect_F32(minDisparity,maxDisparity,r,r),

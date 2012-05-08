@@ -30,24 +30,24 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestImplDisparityScoreSadRect_U8 {
+public class TestImplDisparityScoreSadRectFive_F32 {
 
 	Random rand = new Random(234);
 
-	DisparitySelect<int[],ImageUInt8> compDisp = new ImplSelectRectBasicWta_S32_U8();
+	DisparitySelect<float[],ImageUInt8> compDisp = new ImplSelectRectBasicWta_F32_U8();
 
 	/**
 	 * Basic generic disparity calculation tests
 	 */
 	@Test
 	public void basicTest() {
-		BasicDisparityTests<ImageUInt8,ImageUInt8> alg =
-				new BasicDisparityTests<ImageUInt8,ImageUInt8>(ImageUInt8.class) {
+		BasicDisparityTests<ImageFloat32,ImageUInt8> alg =
+				new BasicDisparityTests<ImageFloat32,ImageUInt8>(ImageFloat32.class) {
 
-					ImplDisparityScoreSadRect_U8<ImageUInt8> alg;
+					ImplDisparityScoreSadRectFive_F32<ImageUInt8> alg;
 
 					@Override
-					public ImageUInt8 computeDisparity(ImageUInt8 left, ImageUInt8 right ) {
+					public ImageUInt8 computeDisparity(ImageFloat32 left, ImageFloat32 right ) {
 						ImageUInt8 ret = new ImageUInt8(left.width,left.height);
 
 						alg.process(left,right,ret);
@@ -57,12 +57,12 @@ public class TestImplDisparityScoreSadRect_U8 {
 
 					@Override
 					public void initialize(int minDisparity , int maxDisparity) {
-						alg = new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,2,3,compDisp);
+						alg = new ImplDisparityScoreSadRectFive_F32<ImageUInt8>(minDisparity,maxDisparity,2,3,compDisp);
 					}
 
-					@Override public int getBorderX() { return 2; }
+					@Override public int getBorderX() { return 2*2; }
 
-					@Override public int getBorderY() { return 3; }
+					@Override public int getBorderY() { return 3*2; }
 				};
 
 		alg.allChecks();
@@ -96,16 +96,21 @@ public class TestImplDisparityScoreSadRect_U8 {
 		int w = left.width;
 		int h = left.height;
 
-		ImplDisparityScoreSadRect_U8<ImageUInt8> alg =
-				new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
-		StereoDisparityWtoNaive<ImageUInt8> naive =
-				new StereoDisparityWtoNaive<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY);
+		ImageFloat32 leftF32 = new ImageFloat32(w,h);
+		ImageFloat32 rightF32 = new ImageFloat32(w,h);
+		GeneralizedImageOps.convert(left,leftF32);
+		GeneralizedImageOps.convert(right,rightF32);
+
+		ImplDisparityScoreSadRectFive_F32<ImageUInt8> alg =
+				new ImplDisparityScoreSadRectFive_F32<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
+		StereoDisparityWtoNaiveFive<ImageUInt8> naive =
+				new StereoDisparityWtoNaiveFive<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY);
 
 		ImageUInt8 found = new ImageUInt8(w,h);
 		ImageFloat32 expected = new ImageFloat32(w,h);
 
-		alg.process(left,right,found);
-		naive.process(left,right,expected);
+		alg.process(leftF32, rightF32, found);
+		naive.process(left, right, expected);
 
 		BoofTesting.assertEqualsGeneric(found, expected, 1, 1);
 	}

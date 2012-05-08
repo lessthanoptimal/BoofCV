@@ -104,6 +104,21 @@ public class BenchmarkDisparityAlgs {
 		}
 	}
 
+	public static class EfficientSadFive_U8 extends PerformerBase {
+
+		//		DisparitySelect<int[],ImageUInt8> compDisp =
+//				new ImplSelectRectBasicWta_S32_U8();
+		DisparitySelect<int[],ImageUInt8> compDisp =
+				new ImplSelectRectStandard_S32_U8(250,2,0.1);
+		ImplDisparityScoreSadRectFive_U8<ImageUInt8> alg =
+				new ImplDisparityScoreSadRectFive_U8<ImageUInt8>(min,max,radiusX,radiusY,compDisp);
+
+		@Override
+		public void process() {
+			alg.process(left,right, outU8);
+		}
+	}
+
 	public static void main( String argsp[ ] ) {
 		System.out.println("=========  Image Size "+ width +" "+height+"  disparity "+max);
 		System.out.println();
@@ -115,6 +130,7 @@ public class BenchmarkDisparityAlgs {
 
 		// the "fastest" seems to always be the first one tested
 		ProfileOperation.printOpsPerSec(new EfficientSad_U8(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new EfficientSadFive_U8(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new EfficientSad_F32(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new EfficientSubpixelSad(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Naive(), TEST_TIME);

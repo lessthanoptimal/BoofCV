@@ -26,6 +26,7 @@ import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
@@ -34,7 +35,6 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -84,9 +84,9 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		selectedAlg = 0;
 		activeAlg = createAlg();
-		addAlgorithm(0,"WTA Denoised",0);
-		addAlgorithm(0,"WTA Five",1);
-		addAlgorithm(0,"WTA",2);
+		addAlgorithm(0,"WTA",0);
+		addAlgorithm(0,"WTA Denoised",1);
+		addAlgorithm(0,"WTA Five",2);
 
 		control.setListener(this);
 
@@ -247,27 +247,29 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		this.calib = calib;
 	}
 
+	@SuppressWarnings("unchecked")
 	public StereoDisparity<T,D> createAlg() {
 
 		int r = control.regionRadius;
 
 		switch( selectedAlg ) {
 			case 0:
-				changeGuiActive(true,true);
-				return (StereoDisparity)FactoryStereoDisparity.regionWta(control.minDisparity,
-						control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
-						ImageUInt8.class);
+				changeGuiActive(false,false);
+				return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,control.minDisparity,
+						control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
 
 			case 1:
 				changeGuiActive(true,true);
-				return (StereoDisparity)FactoryStereoDisparity.regionFive(control.minDisparity,
+				return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,control.minDisparity,
 						control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
 						ImageUInt8.class);
 
 			case 2:
-				changeGuiActive(false,false);
-				return (StereoDisparity)FactoryStereoDisparity.regionWta(control.minDisparity,
-						control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
+				changeGuiActive(true,true);
+				return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT_FIVE,
+						control.minDisparity, control.maxDisparity, r, r,
+						control.pixelError, control.reverseTol, control.texture,
+						ImageUInt8.class);
 
 			default:
 				throw new RuntimeException("Unknown selection");

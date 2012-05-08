@@ -30,7 +30,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestImplDisparityScoreSadRect_U8 {
+public class TestImplDisparityScoreSadRectFive_U8 {
 
 	Random rand = new Random(234);
 
@@ -44,7 +44,7 @@ public class TestImplDisparityScoreSadRect_U8 {
 		BasicDisparityTests<ImageUInt8,ImageUInt8> alg =
 				new BasicDisparityTests<ImageUInt8,ImageUInt8>(ImageUInt8.class) {
 
-					ImplDisparityScoreSadRect_U8<ImageUInt8> alg;
+					ImplDisparityScoreSadRectFive_U8<ImageUInt8> alg;
 
 					@Override
 					public ImageUInt8 computeDisparity(ImageUInt8 left, ImageUInt8 right ) {
@@ -57,12 +57,12 @@ public class TestImplDisparityScoreSadRect_U8 {
 
 					@Override
 					public void initialize(int minDisparity , int maxDisparity) {
-						alg = new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,2,3,compDisp);
+						alg = new ImplDisparityScoreSadRectFive_U8<ImageUInt8>(minDisparity,maxDisparity,2,3,compDisp);
 					}
 
-					@Override public int getBorderX() { return 2; }
+					@Override public int getBorderX() { return 2*2; }
 
-					@Override public int getBorderY() { return 3; }
+					@Override public int getBorderY() { return 3*2; }
 				};
 
 		alg.allChecks();
@@ -96,16 +96,16 @@ public class TestImplDisparityScoreSadRect_U8 {
 		int w = left.width;
 		int h = left.height;
 
-		ImplDisparityScoreSadRect_U8<ImageUInt8> alg =
-				new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
-		StereoDisparityWtoNaive<ImageUInt8> naive =
-				new StereoDisparityWtoNaive<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY);
+		ImplDisparityScoreSadRectFive_U8<ImageUInt8> alg =
+				new ImplDisparityScoreSadRectFive_U8<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
+		StereoDisparityWtoNaiveFive<ImageUInt8> naive =
+				new StereoDisparityWtoNaiveFive<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY);
 
 		ImageUInt8 found = new ImageUInt8(w,h);
 		ImageFloat32 expected = new ImageFloat32(w,h);
 
-		alg.process(left,right,found);
-		naive.process(left,right,expected);
+		alg.process(left, right, found);
+		naive.process(left, right, expected);
 
 		BoofTesting.assertEqualsGeneric(found, expected, 1, 1);
 	}
