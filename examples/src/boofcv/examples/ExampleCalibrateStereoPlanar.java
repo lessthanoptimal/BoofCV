@@ -33,19 +33,16 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * <p>
- * Example of how to calibrate a stereo camera system using a planar calibration grid.  The intrinsic camera parameters
- * are estimated for both cameras individually, then extrinsic parameters for the two cameras relative to each other
- * are found   This example does not rectify the images, which is  required for some algorithms.
- * See {@link ExampleRectifyCalibratedStereo}. Both square grid and chessboard targets are demonstrated in this example.
- * See calibration tutorial for a discussion of different target types and how to collect good calibration images.
- * </p>
+ * Example of how to calibrate a stereo camera system using a planar calibration grid given a set of images.
+ * Intrinsic camera parameters are estimated for both cameras individually, then extrinsic parameters
+ * for the two cameras relative to each other are found   This example does not rectify the images, which is
+ * required for some algorithms. See {@link ExampleRectifyCalibratedStereo}. Both square grid and chessboard targets
+ * are demonstrated in this example. See calibration tutorial for a discussion of different target types and how to
+ * collect good calibration images.
  *
- * <<p>
  * All the image processing and calibration is taken care of inside of {@link CalibrateStereoPlanar}.  The code below
  * loads calibration images as inputs, calibrates, and saves results to an XML file.  See in code comments for tuning
  * and implementation issues.
- * </p>
  *
  * @see ExampleRectifyCalibratedStereo
  * @see CalibrateStereoPlanar

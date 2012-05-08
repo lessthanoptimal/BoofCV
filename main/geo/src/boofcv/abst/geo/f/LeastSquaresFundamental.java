@@ -64,7 +64,7 @@ public class LeastSquaresFundamental implements RefineEpipolarMatrix {
 
 		param = new double[paramModel.getParamLength()];
 
-		ModelObservationResidual residual;
+		ModelObservationResidual<DenseMatrix64F,AssociatedPair> residual;
 		if( useSampson )
 			residual = new FundamentalResidualSampson();
 		else
