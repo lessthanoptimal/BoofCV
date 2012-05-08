@@ -100,6 +100,29 @@ public class FactoryStereoDisparity {
 		return new WrapDisparitySadRect<T,ImageUInt8>(alg);
 	}
 
+	public static <T extends ImageSingleBand> StereoDisparity<T,ImageUInt8>
+	regionFive( int minDisparity , int maxDisparity,
+				int regionRadiusX, int regionRadiusY ,
+				double maxPerPixelError ,
+				int validateRtoL ,
+				double texture ,
+				Class<T> imageType ) {
+
+		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
+
+		DisparityScoreSadRect<T,ImageUInt8> alg;
+
+		if( imageType == ImageUInt8.class ) {
+			DisparitySelect<int[],ImageUInt8> select =
+					selectDisparity_S32((int) maxError, validateRtoL, texture);
+			alg = (DisparityScoreSadRect)FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
+					maxDisparity,regionRadiusX,regionRadiusY,select);
+		} else
+			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
+
+		return new WrapDisparitySadRect<T,ImageUInt8>(alg);
+	}
+
 	public static <T extends ImageSingleBand> StereoDisparity<T,ImageFloat32>
 	regionSubpixelWta( int minDisparity , int maxDisparity,
 					   int regionRadiusX, int regionRadiusY ,
