@@ -30,8 +30,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -55,7 +54,7 @@ public class TestParseStereoCalibrationConfig {
 				"\n   \n\n"; // some white space garbage a person might add
 		
 		String targetDesc =
-				"chess true 3 4 33";
+				"chess false true 3 4 33";
 		
 		m.files.add(s);
 		m.files.add(targetDesc);
@@ -64,7 +63,8 @@ public class TestParseStereoCalibrationConfig {
 		assertTrue(parser.parse("adsasd"));
 		
 		assertTrue(null!=parser.getDetector());
-		assertTrue(parser.adjustLeftToRight);
+		assertFalse(parser.assumeZeroSkew);
+		assertTrue(parser.flipY);
 		assertTrue(null!=parser.getTarget());
 		assertEquals(2,parser.getLeftImages().size());
 		assertEquals(2,parser.getRightImages().size());

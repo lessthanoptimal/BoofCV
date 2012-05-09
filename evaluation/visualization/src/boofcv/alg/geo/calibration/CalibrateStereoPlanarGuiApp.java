@@ -19,7 +19,6 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.abst.calib.WrapPlanarChessTarget;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.UtilIntrinsic;
@@ -172,21 +171,22 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	 *
 	 * @param detector Calibration target detector.
 	 * @param target Description of the target being detected.
-	 * @param convertToRightHanded If true it will convert a left handed image coordinate system into a right handed one.
-	 *                             Normally this should be true.
+	 * @param assumeZeroSkew If true the skew parameter is assumed to be zero
+	 * @param flipY If true the y-axis will be inverted.
 	 * @param leftImages Images taken by left camera.
 	 * @param rightImages Images taken by right camera.
 	 */
 	public void configure( PlanarCalibrationDetector detector ,
 						   PlanarCalibrationTarget target,
-						   boolean convertToRightHanded ,
+						   boolean assumeZeroSkew ,
+						   boolean flipY ,
 						   List<String> leftImages , List<String> rightImages  ) {
 
 		if( leftImages.size() != rightImages.size() )
 			throw new IllegalArgumentException("Number of left and right images must be the same");
 
-		calibrator = new CalibrateStereoPlanar(detector,convertToRightHanded);
-		calibrator.configure(target,true,2);
+		calibrator = new CalibrateStereoPlanar(detector,flipY);
+		calibrator.configure(target,assumeZeroSkew,2);
 		this.leftImages = leftImages;
 		this.rightImages = rightImages;
 	}
@@ -196,7 +196,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		ParseStereoCalibrationConfig parser = new ParseStereoCalibrationConfig(media);
 
 		if( parser.parse(fileName) ) {
-			configure(parser.detector,parser.target,parser.adjustLeftToRight,
+			configure(parser.detector,parser.target,parser.assumeZeroSkew,parser.flipY,
 					parser.getLeftImages(),parser.getRightImages());
 		} else {
 			System.err.println("Configuration failed");
@@ -240,14 +240,14 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-//		PlanarCalibrationDetector detector = new WrapPlanarGridTarget(3,4);
-		PlanarCalibrationDetector detector = new WrapPlanarChessTarget(3,4,6);
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4);
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3,4,6);
 
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
-//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
+//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		List<String> leftImages = BoofMiscOps.directoryList(directory, "left");
 		List<String> rightImages = BoofMiscOps.directoryList(directory, "right");
@@ -256,7 +256,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		Collections.sort(rightImages);
 
 		CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
-		app.configure(detector,target,true, leftImages,rightImages);
+		app.configure(detector,target,true,false, leftImages,rightImages);
 
 		JFrame frame = new JFrame("Planar Stereo Calibration");
 		frame.add(app, BorderLayout.CENTER);

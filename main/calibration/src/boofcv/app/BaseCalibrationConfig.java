@@ -38,7 +38,8 @@ public class BaseCalibrationConfig {
 
 	MediaManager media = DefaultMediaManager.INSTANCE;
 
-	public boolean adjustLeftToRight;
+	public boolean assumeZeroSkew;
+	public boolean flipY;
 	public PlanarCalibrationDetector detector;
 	public PlanarCalibrationTarget target;
 
@@ -56,11 +57,12 @@ public class BaseCalibrationConfig {
 		if( !reader.read(input) )
 			throw new RuntimeException("Parsing configuration failed");
 
-		if( reader.remainingTokens() < 5 )
+		if( reader.remainingTokens() < 6 )
 			throw new RuntimeException("Not enough tokens in config file");
 
 		String type = reader.nextString();
-		adjustLeftToRight = Boolean.parseBoolean(reader.nextString());
+		assumeZeroSkew = Boolean.parseBoolean(reader.nextString());
+		flipY = Boolean.parseBoolean(reader.nextString());
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();
 

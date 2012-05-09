@@ -42,9 +42,15 @@ import org.ejml.data.DenseMatrix64F;
 public class LensDistortionOps {
 
 	/**
+	 * <p>
 	 * Transforms the view such that the entire original image is visible after lens distortion has been removed.
 	 * The appropriate {@link PointTransform_F32} is returned and a new set of intrinsic camera parameters for
 	 * the "virtual" camera that is associated with the returned transformed.
+	 * </p>
+	 *
+	 * <p>
+	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
+	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters.
 	 * @param paramAdj If not null, the new camera parameters are stored here.
@@ -75,16 +81,22 @@ public class LensDistortionOps {
 
 		PointTransform_F32 tranAdj = UtilIntrinsic.adjustIntrinsic_F32(addDistort, false, param, A, paramAdj);
 
-		if( param.leftHanded ) {
-			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
-			return new SequencePointTransform_F32(l2r,tranAdj,l2r);
+		if( param.flipY) {
+			PointTransform_F32 flip = new FlipVertical_F32(param.height);
+			return new SequencePointTransform_F32(flip,tranAdj,flip);
 		} else
 			return tranAdj;
 	}
 
 	/**
+	 * <p>
 	 * Adjusts the view such that each pixel has a correspondence to the original image while maximizing the
 	 * view area. In other words no black regions which can cause problems for some image processing algorithms.
+	 * </p>
+	 *
+	 * <p>
+	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
+	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters.
 	 * @param paramAdj If not null, the new camera parameters are stored here.
@@ -117,9 +129,9 @@ public class LensDistortionOps {
 
 		PointTransform_F32 tranAdj = UtilIntrinsic.adjustIntrinsic_F32(addDistort, false, param, A, paramAdj);
 
-		if( param.leftHanded) {
-			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
-			return new SequencePointTransform_F32(l2r,tranAdj,l2r);
+		if( param.flipY) {
+			PointTransform_F32 flip = new FlipVertical_F32(param.height);
+			return new SequencePointTransform_F32(flip,tranAdj,flip);
 		} else
 			return tranAdj;
 	}
@@ -135,36 +147,21 @@ public class LensDistortionOps {
 		RemoveRadialPtoN_F64 radialDistort = new RemoveRadialPtoN_F64();
 		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
 
-		if( param.leftHanded ) {
-			return new LeftToRightHandedNorm_F64(radialDistort,param.height);
+		if( param.flipY) {
+			return new FlipVerticalNorm_F64(radialDistort,param.height);
 		} else {
 			return radialDistort;
 		}
 	}
 
 	/**
+	 * <p>
 	 * Transform from undistorted image to an image with radial distortion.
-	 * TODO MAKE IT MATCH
+	 * </p>
 	 *
-	 * @param param Intrinsic camera parameters
-	 * @return Transform from undistorted to distorted image.
-	 */
-	public static PointTransform_F32 radialTransform_F32(IntrinsicParameters param )
-	{
-		RemoveRadialPtoP_F32 radialDistort = new RemoveRadialPtoP_F32();
-		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
-
-		if( param.leftHanded ) {
-			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
-			return new SequencePointTransform_F32(l2r,radialDistort,l2r);
-		} else {
-			return radialDistort;
-		}
-	}
-
-
-	/**
-	 * Transform from undistorted image to an image with radial distortion.
+	 * <p>
+	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
+	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters
 	 * @return Transform from undistorted to distorted image.
@@ -174,9 +171,9 @@ public class LensDistortionOps {
 		AddRadialPtoP_F32 radialDistort = new AddRadialPtoP_F32();
 		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
 
-		if( param.leftHanded ) {
-			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
-			return new SequencePointTransform_F32(l2r,radialDistort,l2r);
+		if( param.flipY) {
+			PointTransform_F32 flip = new FlipVertical_F32(param.height);
+			return new SequencePointTransform_F32(flip,radialDistort,flip);
 		} else {
 			return radialDistort;
 		}

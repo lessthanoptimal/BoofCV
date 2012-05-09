@@ -73,6 +73,7 @@ public class GenerateImageTestingOps extends CodeGeneratorBase {
 			printFillRectangle();
 			printRandomize();
 			printComputeMSE();
+			printFlipVertical();
 		}
 	}
 
@@ -232,8 +233,6 @@ public class GenerateImageTestingOps extends CodeGeneratorBase {
 
 	public void printComputeMSE() {
 
-		String sumType = imageType.getSumType();
-
 		out.print("\t/**\n" +
 				"\t * <p>Computes the mean squared error (MSE) between the two images.</p>\n" +
 				"\t *\n" +
@@ -255,6 +254,30 @@ public class GenerateImageTestingOps extends CodeGeneratorBase {
 				"\t\t}\n" +
 				"\n" +
 				"\t\treturn total / (w*h);\n" +
+				"\t}\n\n");
+	}
+
+	public void printFlipVertical() {
+		String sumType = imageType.getSumType();
+
+		out.print("\t/**\n" +
+				"\t * Flips the image from top to bottom\n" +
+				"\t */\n" +
+				"\tpublic static void flipVertical( "+imageName+" img ) {\n" +
+				"\t\tint h2 = img.height/2;\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < h2; y++ ) {\n" +
+				"\t\t\tint index1 = img.getStartIndex() + y * img.getStride();\n" +
+				"\t\t\tint index2 = img.getStartIndex() + (img.height - y - 1) * img.getStride();\n" +
+				"\n" +
+				"\t\t\tint end = index1 + img.width;\n" +
+				"\n" +
+				"\t\t\twhile( index1 < end ) {\n" +
+				"\t\t\t\t"+sumType+" tmp = img.data[index1];\n" +
+				"\t\t\t\timg.data[index1++] = img.data[index2];\n" +
+				"\t\t\t\timg.data[index2++] = ("+dataType+")tmp;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
 				"\t}\n\n");
 	}
 

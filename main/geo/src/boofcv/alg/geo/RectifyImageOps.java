@@ -51,7 +51,6 @@ public class RectifyImageOps {
 	 * for maximum viewing area.  See fullViewLeft and allInsideLeft for adjusting the rectification.
 	 * </p>
 	 *
-	 *
 	 * @return {@link RectifyCalibrated}
 	 */
 	public static RectifyCalibrated createCalibrated() {
@@ -100,7 +99,7 @@ public class RectifyImageOps {
 	{
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new IntrinsicParameters(paramLeft);
-		paramLeft.leftHanded = false;
+		paramLeft.flipY = false;
 
 		PointTransform_F32 tranLeft = rectifyTransform(paramLeft, rectifyLeft);
 
@@ -146,7 +145,6 @@ public class RectifyImageOps {
 		adjustUncalibrated(rectifyLeft, rectifyRight, bound, scale);
 	}
 
-
 	/**
 	 * <p>
 	 * Adjust the rectification such that only pixels which overlap the original left image can be seen.  For use with
@@ -166,7 +164,7 @@ public class RectifyImageOps {
 	{
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new IntrinsicParameters(paramLeft);
-		paramLeft.leftHanded = false;
+		paramLeft.flipY = false;
 
 		PointTransform_F32 tranLeft = rectifyTransform(paramLeft, rectifyLeft);
 
@@ -261,8 +259,14 @@ public class RectifyImageOps {
 
 
 	/**
+	 * <p>
 	 * Creates a transform that goes from rectified to original pixel coordinates.
 	 * Rectification includes removal of lens distortion.  Used for rendering rectified images.
+	 * </p>
+	 *
+	 * <p>
+	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
+	 * </p>
 	 *
 	 * @param param Intrinsic parameters.
 	 * @param rectify Transform for rectifying the image.
@@ -278,16 +282,22 @@ public class RectifyImageOps {
 		CommonOps.invert(rectify,rectifyInv);
 		PointTransformHomography_F32 rectifyDistort = new PointTransformHomography_F32(rectifyInv);
 
-		if( param.leftHanded ) {
-			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
-			return new SequencePointTransform_F32(l2r,rectifyDistort,radialDistort,l2r);
+		if( param.flipY) {
+			PointTransform_F32 flip = new FlipVertical_F32(param.height);
+			return new SequencePointTransform_F32(flip,rectifyDistort,radialDistort,flip);
 		} else {
 			return new SequencePointTransform_F32(rectifyDistort,radialDistort);
 		}
 	}
 
 	/**
+	 * <p>
 	 * Creates a transform that applies rectification to unrectified distorted pixels.
+	 * </p>
+	 *
+	 * <p>
+	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
+	 * </p>
 	 *
 	 * @param param Intrinsic parameters.
 	 * @param rectify Transform for rectifying the image.
@@ -301,9 +311,9 @@ public class RectifyImageOps {
 
 		PointTransformHomography_F32 rectifyDistort = new PointTransformHomography_F32(rectify);
 
-		if( param.leftHanded ) {
-			PointTransform_F32 l2r = new LeftToRightHanded_F32(param.height);
-			return new SequencePointTransform_F32(l2r,radialDistort,rectifyDistort,l2r);
+		if( param.flipY) {
+			PointTransform_F32 flip = new FlipVertical_F32(param.height);
+			return new SequencePointTransform_F32(flip,radialDistort,rectifyDistort,flip);
 		} else {
 			return new SequencePointTransform_F32(radialDistort,rectifyDistort);
 		}

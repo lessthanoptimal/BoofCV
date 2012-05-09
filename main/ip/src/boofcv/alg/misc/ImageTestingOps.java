@@ -109,6 +109,26 @@ public class ImageTestingOps {
 		return total / (w*h);
 	}
 
+	/**
+	 * Flips the image from top to bottom
+	 */
+	public static void flipVertical( ImageInt8 img ) {
+		int h2 = img.height/2;
+
+		for( int y = 0; y < h2; y++ ) {
+			int index1 = img.getStartIndex() + y * img.getStride();
+			int index2 = img.getStartIndex() + (img.height - y - 1) * img.getStride();
+
+			int end = index1 + img.width;
+
+			while( index1 < end ) {
+				int tmp = img.data[index1];
+				img.data[index1++] = img.data[index2];
+				img.data[index2++] = (byte)tmp;
+			}
+		}
+	}
+
 /**
 	 * Fills the whole image with the specified pixel value
 	 *
@@ -184,6 +204,26 @@ public class ImageTestingOps {
 		}
 
 		return total / (w*h);
+	}
+
+	/**
+	 * Flips the image from top to bottom
+	 */
+	public static void flipVertical( ImageInt16 img ) {
+		int h2 = img.height/2;
+
+		for( int y = 0; y < h2; y++ ) {
+			int index1 = img.getStartIndex() + y * img.getStride();
+			int index2 = img.getStartIndex() + (img.height - y - 1) * img.getStride();
+
+			int end = index1 + img.width;
+
+			while( index1 < end ) {
+				int tmp = img.data[index1];
+				img.data[index1++] = img.data[index2];
+				img.data[index2++] = (short)tmp;
+			}
+		}
 	}
 
 /**
@@ -263,6 +303,26 @@ public class ImageTestingOps {
 		return total / (w*h);
 	}
 
+	/**
+	 * Flips the image from top to bottom
+	 */
+	public static void flipVertical( ImageSInt32 img ) {
+		int h2 = img.height/2;
+
+		for( int y = 0; y < h2; y++ ) {
+			int index1 = img.getStartIndex() + y * img.getStride();
+			int index2 = img.getStartIndex() + (img.height - y - 1) * img.getStride();
+
+			int end = index1 + img.width;
+
+			while( index1 < end ) {
+				int tmp = img.data[index1];
+				img.data[index1++] = img.data[index2];
+				img.data[index2++] = (int)tmp;
+			}
+		}
+	}
+
 /**
 	 * Fills the whole image with the specified pixel value
 	 *
@@ -338,6 +398,26 @@ public class ImageTestingOps {
 		}
 
 		return total / (w*h);
+	}
+
+	/**
+	 * Flips the image from top to bottom
+	 */
+	public static void flipVertical( ImageSInt64 img ) {
+		int h2 = img.height/2;
+
+		for( int y = 0; y < h2; y++ ) {
+			int index1 = img.getStartIndex() + y * img.getStride();
+			int index2 = img.getStartIndex() + (img.height - y - 1) * img.getStride();
+
+			int end = index1 + img.width;
+
+			while( index1 < end ) {
+				long tmp = img.data[index1];
+				img.data[index1++] = img.data[index2];
+				img.data[index2++] = (long)tmp;
+			}
+		}
 	}
 
 /**
@@ -417,6 +497,26 @@ public class ImageTestingOps {
 		return total / (w*h);
 	}
 
+	/**
+	 * Flips the image from top to bottom
+	 */
+	public static void flipVertical( ImageFloat32 img ) {
+		int h2 = img.height/2;
+
+		for( int y = 0; y < h2; y++ ) {
+			int index1 = img.getStartIndex() + y * img.getStride();
+			int index2 = img.getStartIndex() + (img.height - y - 1) * img.getStride();
+
+			int end = index1 + img.width;
+
+			while( index1 < end ) {
+				float tmp = img.data[index1];
+				img.data[index1++] = img.data[index2];
+				img.data[index2++] = (float)tmp;
+			}
+		}
+	}
+
 /**
 	 * Fills the whole image with the specified pixel value
 	 *
@@ -492,6 +592,26 @@ public class ImageTestingOps {
 		}
 
 		return total / (w*h);
+	}
+
+	/**
+	 * Flips the image from top to bottom
+	 */
+	public static void flipVertical( ImageFloat64 img ) {
+		int h2 = img.height/2;
+
+		for( int y = 0; y < h2; y++ ) {
+			int index1 = img.getStartIndex() + y * img.getStride();
+			int index2 = img.getStartIndex() + (img.height - y - 1) * img.getStride();
+
+			int end = index1 + img.width;
+
+			while( index1 < end ) {
+				double tmp = img.data[index1];
+				img.data[index1++] = img.data[index2];
+				img.data[index2++] = (double)tmp;
+			}
+		}
 	}
 
 	/**
