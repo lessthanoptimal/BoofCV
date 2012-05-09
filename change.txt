@@ -19,13 +19,21 @@ Version : Alpha 0.8
     - Validation: right to left, max error, texture
     - Precision: Pixel and Subpixel
 - IntrinsicParameters
-  * Added leftHanded to parameter list since it is vital information for many
+  * Added flipY to parameter list since it is vital information for many
     calculations.
 - RectifyImageOps
   * Fixed bug in functions that adjusted the rectification for viewing.
     If left handed the coordinate systems got messed up
 - Changed allInside() so that the annoying single pixel black region is gone
   * RectifyImageOps and LensDistortOps
+- FactoryCornerDetector
+  * Added flag for weighted KLT and Harris
+- Added weighted corners to list of features in some evaluation apps
+- Examples:
+  * ExampleCalibrateMonocularPoints
+  * ExampleDetectCalibrationPoints
+- ImageTestingOps
+  * Flip image 
 
 ---------------------------------------------
 Date    : 2012/04/22
