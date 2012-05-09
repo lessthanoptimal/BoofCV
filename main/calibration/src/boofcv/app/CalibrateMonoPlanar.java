@@ -50,12 +50,10 @@ import java.util.List;
  * </p>
  *
  * <p>
- * If the image coordinates are in a left handed coordinate system, which is standard, then they can be put into
- * a right handed coordinate system by setting the 'leftHanded' constructor flag to true.  If true, then
- * the y-axis coordinate of observations is adjusted so that the image bottom left corner is the (0,0) coordinate
- * and that the y-axis is pointed in the positive direction.  This is accomplished by setting y = height - 1 - obs.y,
- * where height is the image height.  <b>If the camera calibration is adjusted into a right handed coordinate system
- * as just specified then all other references to pixel coordinates need to be adjusted the same way.</b>
+ * <b>Most 3D operations in BoofCV assume that the image coordinate system is right handed and the +Z axis is
+ * pointing out of the camera.</b>  In standard image coordinate the origin (0,0) is at the top left corner with +x going
+ * to the right and +y going down, then if it is right handed +z will be out of the image.  <b>However some times
+ * this pseudo standard is not followed and the y-axis needs to be inverted by setting isInverted to true.</b>
  * </p>
  *
  * @author Peter Abeles
@@ -65,10 +63,8 @@ public class CalibrateMonoPlanar {
 	// detects calibration points inside of images
 	protected PlanarCalibrationDetector detector;
 
-	// are image coordinates in a left-handed coordinate system?
-	// most images have +y pointed down, which makes it left handed and breaks the standard right handed
-	// assumption in other algorithms.  If true then the y-axis is adjusted so that it is pointed up
-	protected boolean convertToRightHanded;
+	// Is the image's y-axis inverted?
+	protected boolean flipY;
 
 	// computes calibration parameters
 	protected CalibrationPlanarGridZhang99 zhang99;
@@ -82,7 +78,7 @@ public class CalibrateMonoPlanar {
 
 	// Information on calibration targets and results
 	protected List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
-	// adjusted observations so that they are in a right handed coordinate system
+	// observations with the y-axis inverted, if flipY is true
 	protected List<List<Point2D_F64>> observationsAdj = new ArrayList<List<Point2D_F64>>();
 	protected List<ImageResults> errors;
 
@@ -96,12 +92,12 @@ public class CalibrateMonoPlanar {
 	 * High level configuration
 	 *
 	 * @param detector Target detection algorithm.
-	 * @param convertToRightHanded If true it will convert a left handed image coordinate system into a right handed one.
-	 *                             Normally this should be true.
+	 * @param flipY If true the y-axis will be inverted to ensure the assumed coordinate system is being used.
+	 *                Normally this should be false.
 	 */
-	public CalibrateMonoPlanar(PlanarCalibrationDetector detector , boolean convertToRightHanded ) {
+	public CalibrateMonoPlanar(PlanarCalibrationDetector detector , boolean flipY) {
 		this.detector = detector;
-		this.convertToRightHanded = convertToRightHanded;
+		this.flipY = flipY;
 	}
 
 	/**
@@ -148,14 +144,14 @@ public class CalibrateMonoPlanar {
 		if( !detector.process(image) )
 			return false;
 		else {
-			int h = image.getHeight()-1;
+			int h = image.getHeight();
 			List<Point2D_F64> points = detector.getPoints();
 			List<Point2D_F64> adjusted = new ArrayList<Point2D_F64>();
 
 			// make it so +y is pointed up not down, and becomes a right handed coordinate system
-			if(convertToRightHanded) {
+			if(flipY) {
 				for( Point2D_F64 p : points ) {
-					Point2D_F64 a = new Point2D_F64(p.x,h-p.y);
+					Point2D_F64 a = new Point2D_F64(p.x,h-p.y-1);
 					adjusted.add(a);
 				}
 			} else {
@@ -182,7 +178,7 @@ public class CalibrateMonoPlanar {
 		errors = computeErrors(observationsAdj, foundZhang,target.points);
 
 		foundIntrinsic = foundZhang.convertToIntrinsic();
-		foundIntrinsic.leftHanded = convertToRightHanded;
+		foundIntrinsic.flipY = flipY;
 		foundIntrinsic.width = widthImg;
 		foundIntrinsic.height = heightImg;
 
@@ -283,7 +279,7 @@ public class CalibrateMonoPlanar {
 		return target;
 	}
 
-	public boolean isConvertToRightHanded() {
-		return convertToRightHanded;
+	public boolean isFlipY() {
+		return flipY;
 	}
 }

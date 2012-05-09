@@ -156,7 +156,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			listener.disparityGuiChange();
 		} else if( e.getSource() == invalidToggle) {
 			colorInvalid = invalidToggle.isSelected();
-			listener.disparitySettingChange();
+			listener.disparityRender();
 		}
 	}
 
@@ -201,5 +201,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		public void disparitySettingChange();
 
 		public void disparityGuiChange();
+
+		public void disparityRender();
 	}
 }

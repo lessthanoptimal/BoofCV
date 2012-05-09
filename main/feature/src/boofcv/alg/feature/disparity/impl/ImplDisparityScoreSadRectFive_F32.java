@@ -159,7 +159,8 @@ public class ImplDisparityScoreSadRectFive_F32<Disparity extends ImageSingleBand
 			// take in account the different in image border between the sub-regions and the effective region
 			int indexSrc = (d-minDisparity)*width + (d-minDisparity) + radiusX;
 			int indexDst = (d-minDisparity)*width + (d-minDisparity);
-			for( int col = d + 2*radiusX; col < width - 2*radiusX; col++ ) {
+			int end = indexSrc + (width-d-4*radiusX);
+			while( indexSrc < end ) {
 				int s = 0;
 
 				// sample four outer regions at the corners around the center region

@@ -30,9 +30,9 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * <p>
  * The selected disparity written into the output image is equal to the found disparity minus the minDisparity.
- * If a pixel is found to be invalid and no disparity found then its value is set to maxDisparity + 1.  The first
- * requirement maximizes the useful storage of the output image and the second provides an unambiguous way to
- * identify invalid pixels.
+ * If a pixel is found to be invalid and no disparity found then its value is set to (maxDisparity-minDisparity) + 1.
+ * The first requirement maximizes the useful storage of the output image and the second provides an unambiguous
+ * way to identify invalid pixels.
  * </p>
  *
  * @author Peter Abeles

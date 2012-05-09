@@ -60,10 +60,10 @@ public class ExampleCalibrateMonocularPlanar {
 	// List of calibration images
 	List<String> images;
 
-	// Most computer images are in a left handed coordinate system.  If set to true it will be changed into
-	// a right handed coordinate system to make processing with 3D vision algorithms easier.  Not always needed
-	// for processing monocular images.
-	boolean isLeftHanded;
+	// Many 3D operations assumed a right handed coordinate system with +Z pointing out of the image.
+	// If the image coordinate system is left handed then the y-axis needs to be flipped to meet
+	// that requirement.  Most of the time this is false.
+	boolean flipY;
 
 	/**
 	 * Images from Zhang's website.  Square grid pattern.
@@ -80,7 +80,7 @@ public class ExampleCalibrateMonocularPlanar {
 		images = BoofMiscOps.directoryList(directory,"CalibIm");
 
 		// standard image format
-		isLeftHanded = true;
+		flipY = false;
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class ExampleCalibrateMonocularPlanar {
 		images = BoofMiscOps.directoryList(directory,"left");
 
 		// standard image format
-		isLeftHanded = true;
+		flipY = false;
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class ExampleCalibrateMonocularPlanar {
 	public void process() {
 
 		// Declare and setup the calibration algorithm
-		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector,isLeftHanded);
+		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector, flipY);
 
 		// tell it type type of target and which parameters to estimate
 		calibrationAlg.configure(target, true, 2);

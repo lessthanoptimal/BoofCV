@@ -79,7 +79,7 @@ public class UtilIntrinsic {
 			CommonOps.mult(A, K, K_adj);
 
 			UtilIntrinsic.matrixToParam(K_adj, parameters.width, parameters.height,
-					parameters.leftHanded,adjustedParam);
+					parameters.flipY,adjustedParam);
 		}
 
 		PointTransformHomography_F32 adjust = new PointTransformHomography_F32(adjustMatrix);
@@ -135,12 +135,11 @@ public class UtilIntrinsic {
 	 * @param K Camera calibration matrix.
 	 * @param width Image width in pixels
 	 * @param height Image height in pixels
-	 * @param leftHanded If the image coordinate is left handed and the y-axis was adjusted using standard technique
-	 *                   to make it right handed.
+	 * @param flipY When calibrated was the y-axis adjusted with: y = (height - y - 1)
 	 * @param param Where the intrinsic parameter are written to.  If null then a new instance is declared.
 	 * @return IntrinsicParameters structure.
 	 */
-	public static IntrinsicParameters matrixToParam( DenseMatrix64F K , int width , int height , boolean leftHanded,
+	public static IntrinsicParameters matrixToParam( DenseMatrix64F K , int width , int height , boolean flipY,
 													 IntrinsicParameters param ) {
 
 		if( param == null )
@@ -154,7 +153,7 @@ public class UtilIntrinsic {
 
 		param.width = width;
 		param.height = height;
-		param.leftHanded = leftHanded;
+		param.flipY = flipY;
 
 		return param;
 	}

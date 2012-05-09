@@ -247,6 +247,8 @@ public class GeneralizedImageOps {
 			return ((ImageFloat32) img).get(x, y);
 		} else if (img instanceof ImageFloat64) {
 			return ((ImageFloat64) img).get(x, y);
+		} else if (img instanceof ImageSInt64) {
+			return ((ImageSInt64) img).get(x, y);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}
@@ -315,6 +317,32 @@ public class GeneralizedImageOps {
 			((ImageFloat64) img).set(x, y, value);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+		}
+	}
+
+	public static void flipVertical( ImageBase img ) {
+		if( img instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.flipVertical((ImageInt8)img);
+			} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.flipVertical((ImageInt16)img);
+			} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.flipVertical((ImageSInt32)img);
+			} else if ( ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.flipVertical((ImageSInt64)img);
+			} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.flipVertical((ImageFloat32)img);
+			} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
+				ImageTestingOps.flipVertical((ImageFloat64)img);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+			}
+		} else if( img instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)img;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				flipVertical(m.getBand(i));
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + img.getClass().getSimpleName());
 		}
 	}
 }

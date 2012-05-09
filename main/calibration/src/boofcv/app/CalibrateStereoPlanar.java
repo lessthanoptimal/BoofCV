@@ -49,10 +49,7 @@ import java.util.List;
  * </p>
  *
  * <p>
- * For the extrinsic parameters to be computed correctly the image coordinates must be right handed.  The most
- * commonly used image coordinate system is left handed, where the +y axis points down.  To fix this problem
- * specify in the constructor if the coordinate system is left handed or not.  When using the found calibration
- * parameters be sure to adjust the y-coordinate as specified in {@link boofcv.app.CalibrateMonoPlanar}.
+ * See comments in {@link boofcv.app.CalibrateMonoPlanar} about when the y-axis should be inverted.
  * </p>
  *
  * @author Peter Abeles
@@ -68,15 +65,16 @@ public class CalibrateStereoPlanar {
 	CalibrateMonoPlanar calibRight;
 
 	/**
+	 * Configures stereo calibration
 	 *
 	 * @param detector Target detection algorithm.
-	 * @param convertToRightHanded If true it will convert a left handed image coordinate system into a right handed one.
-	 *                             Normally this should be true.
+	 * @param flipY If true the y-axis will be inverted to ensure the assumed coordinate system is being used.
+	 *                Most of the time this will be false.
 	 */
-	public CalibrateStereoPlanar(PlanarCalibrationDetector detector, boolean convertToRightHanded)
+	public CalibrateStereoPlanar(PlanarCalibrationDetector detector, boolean flipY)
 	{
-		calibLeft = new CalibrateMonoPlanar(detector,convertToRightHanded);
-		calibRight = new CalibrateMonoPlanar(detector,convertToRightHanded);
+		calibLeft = new CalibrateMonoPlanar(detector,flipY);
+		calibRight = new CalibrateMonoPlanar(detector,flipY);
 	}
 
 	/**
@@ -110,7 +108,7 @@ public class CalibrateStereoPlanar {
 	 * @param left Image of left target.
 	 * @param right Image of right target.
 	 */
-	public boolean addPair( ImageFloat32 left ,ImageFloat32 right ) {
+	public boolean addPair( ImageFloat32 left , ImageFloat32 right ) {
 
 		return( calibLeft.addImage(left) && calibRight.addImage(right ));
 	}
@@ -197,6 +195,6 @@ public class CalibrateStereoPlanar {
 	}
 
 	public boolean isConvertToRightHanded() {
-		return calibLeft.isConvertToRightHanded();
+		return calibLeft.isFlipY();
 	}
 }

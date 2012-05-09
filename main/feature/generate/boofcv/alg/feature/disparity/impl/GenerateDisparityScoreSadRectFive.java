@@ -207,7 +207,8 @@ public class GenerateDisparityScoreSadRectFive extends CodeGeneratorBase {
 				"\t\t\t// take in account the different in image border between the sub-regions and the effective region\n" +
 				"\t\t\tint indexSrc = (d-minDisparity)*width + (d-minDisparity) + radiusX;\n" +
 				"\t\t\tint indexDst = (d-minDisparity)*width + (d-minDisparity);\n" +
-				"\t\t\tfor( int col = d + 2*radiusX; col < width - 2*radiusX; col++ ) {\n" +
+				"\t\t\tint end = indexSrc + (width-d-4*radiusX);\n" +
+				"\t\t\twhile( indexSrc < end ) {\n" +
 				"\t\t\t\tint s = 0;\n" +
 				"\n" +
 				"\t\t\t\t// sample four outer regions at the corners around the center region\n" +

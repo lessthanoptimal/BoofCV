@@ -122,6 +122,6 @@ public class TestUtilIntrinsic {
 		assertTrue(ret.cy == cy);
 		assertTrue(ret.width == 100);
 		assertTrue(ret.height == 200);
-		assertTrue(ret.leftHanded);
+		assertTrue(ret.flipY);
 	}
 }

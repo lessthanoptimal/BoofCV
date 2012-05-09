@@ -41,10 +41,15 @@ import java.io.Serializable;
  * where x' is the distorted pixel, x=(x,y) are pixel coordinates and (u,v)=K<sup>-1</sup>x are normalized image coordinates.
  * </p>
  *
+ * <p>
+ * If flipY axis is true then the y-coordinate was transformed by, y = height - y - 1, (flipped along
+ * the vertical axis) during calibration.  This is done to ensure that the image coordinate system has
+ * the following characteristics, +Z axis points out of the camera optical axis and is right handed.
+ * </p>
+ *
  * @author Peter Abeles
  */
 // todo move distortion parameters into its own class?
-// todo Split width+height + isLeftHanded off into its own data structure?
 public class IntrinsicParameters implements Serializable {
 
 	// serialization version
@@ -53,9 +58,8 @@ public class IntrinsicParameters implements Serializable {
 	// image shape
 	public int width,height;
 
-	// When calibrated was the y-axis adjusted with: y = (height - y - 1)
-	// to change it from a left handed to right handed coordinate system?
-	public boolean leftHanded;
+	// When calibrated was the y-axis flipped: y = (height - y - 1)
+	public boolean flipY;
 
 	// focal length along x and y axis
 	public double fx,fy;
@@ -74,7 +78,7 @@ public class IntrinsicParameters implements Serializable {
 							   double skew,
 							   double cx, double cy,
 							   int width, int height,
-							   boolean leftHanded, double[] radial) {
+							   boolean flipY, double[] radial) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;
@@ -82,12 +86,12 @@ public class IntrinsicParameters implements Serializable {
 		this.cy = cy;
 		this.width = width;
 		this.height = height;
-		this.leftHanded = leftHanded;
+		this.flipY = flipY;
 		this.radial = radial;
 	}
 
 	public IntrinsicParameters( IntrinsicParameters param ) {
-		this(param.fx,param.fy,param.skew,param.cx,param.cy,param.width,param.height,param.leftHanded,null);
+		this(param.fx,param.fy,param.skew,param.cx,param.cy,param.width,param.height,param.flipY,null);
 
 		if( param.radial != null )
 			radial = param.radial.clone();
@@ -157,16 +161,16 @@ public class IntrinsicParameters implements Serializable {
 		this.height = height;
 	}
 
-	public boolean isLeftHanded() {
-		return leftHanded;
+	public boolean isFlipY() {
+		return flipY;
 	}
 
-	public void setLeftHanded(boolean leftHanded) {
-		this.leftHanded = leftHanded;
+	public void setFlipY(boolean flipY) {
+		this.flipY = flipY;
 	}
 
 	public void print() {
-		System.out.println("Shape "+width+" "+height+" left = "+leftHanded);
+		System.out.println("Shape "+width+" "+height+" flipY = "+ flipY);
 		System.out.printf("center %7.2f %7.2f\n", cx, cy);
 		System.out.println("fx = " + fx);
 		System.out.println("fy = "+fy);

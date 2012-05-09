@@ -43,7 +43,7 @@ public class TestImageTestingOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 40;
+		int numExpected = 46;
 		Method methods[] = ImageTestingOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -64,6 +64,8 @@ public class TestImageTestingOps {
 					testAddGaussian(m);
 				} else if( m.getName().compareTo("computeMeanSquaredError") == 0 ) {
 					testComputeMSE(m);
+				} else if( m.getName().compareTo("flipVertical") == 0 ) {
+					testFlipVertical(m);
 				} else {
 					throw new RuntimeException("Unknown function");
 				}
@@ -85,7 +87,7 @@ public class TestImageTestingOps {
 
 		Class<?> param[] = m.getParameterTypes();
 
-		if( param.length < 2 )
+		if( param.length < 1 )
 			return false;
 
 		return ImageSingleBand.class.isAssignableFrom(param[0]);
@@ -234,5 +236,30 @@ public class TestImageTestingOps {
 		double expected = (10.0*10.0)/(width*height);
 
 		assertEquals(expected,error.doubleValue(),1e-8);
+	}
+
+	private void testFlipVertical(Method m) throws InvocationTargetException, IllegalAccessException {
+
+		// test with an even and odd height
+		testFlipVertical(m,height);
+		testFlipVertical(m,height+1);
+	}
+
+	private void testFlipVertical(Method m, int height) throws IllegalAccessException, InvocationTargetException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand imgA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+
+		GeneralizedImageOps.randomize(imgA,rand,0,100);
+		ImageSingleBand imgB = imgA.clone();
+
+		m.invoke(null,imgB);
+
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				double valA = GeneralizedImageOps.get(imgA,x,height-y-1);
+				double valB = GeneralizedImageOps.get(imgB,x,y);
+				assertTrue(valA==valB);
+			}
+		}
 	}
 }

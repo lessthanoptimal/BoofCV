@@ -84,9 +84,9 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		selectedAlg = 0;
 		activeAlg = createAlg();
-		addAlgorithm(0,"WTA",0);
-		addAlgorithm(0,"WTA Denoised",1);
-		addAlgorithm(0,"WTA Five",2);
+		addAlgorithm(0,"Region Basic",0);
+		addAlgorithm(0,"Region",1);
+		addAlgorithm(0,"Five Region",2);
 
 		control.setListener(this);
 
@@ -102,15 +102,9 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		if( !rectifiedImages )
 			return;
 
-		int color = control.colorInvalid ? 0x02 << 16 | 0xB0 << 8 | 0x90 : 0;
-
 		activeAlg.process(rectLeft, rectRight);
-		D disparity = activeAlg.getDisparity();
-		disparityOut = VisualizeImageData.disparity(disparity,null,
-				activeAlg.getMinDisparity(),activeAlg.getMaxDisparity(),
-				color);
 
-		changeImageView();
+		disparityRender();
 	}
 
 	/**
@@ -243,6 +237,18 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		changeImageView();
 	}
 
+	@Override
+	public void disparityRender() {
+		int color = control.colorInvalid ? 0x02 << 16 | 0xB0 << 8 | 0x90 : 0;
+
+		D disparity = activeAlg.getDisparity();
+		disparityOut = VisualizeImageData.disparity(disparity,null,
+				activeAlg.getMinDisparity(),activeAlg.getMaxDisparity(),
+				color);
+
+		changeImageView();
+	}
+
 	public void setCalib(StereoParameters calib) {
 		this.calib = calib;
 	}
@@ -293,15 +299,13 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		VisualizeStereoDisparity app = new VisualizeStereoDisparity();
 
 		String dirCalib = "../data/evaluation/calibration/stereo/Bumblebee2_Chess/";
-		String dirImgs = "/home/pja/a/";
+		String dirImgs = "../data/applet/stereo/";
 
 		StereoParameters calib = BoofMiscOps.loadXML(dirCalib+"stereo.xml");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("Chair 1",dirImgs+"chair01_left.jpg",dirImgs+"chair01_right.jpg"));
 		inputs.add(new PathLabel("Chair 2",dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
-		inputs.add(new PathLabel("Chair 3",dirImgs+"chair03_left.jpg",dirImgs+"chair03_right.jpg"));
-		inputs.add(new PathLabel("Chair 4",dirImgs+"chair04_left.jpg",dirImgs+"chair04_right.jpg"));
 		inputs.add(new PathLabel("Stones 1",dirImgs+"stones01_left.jpg",dirImgs+"stones01_right.jpg"));
 		inputs.add(new PathLabel("Thing 1",dirImgs+"thing01_left.jpg",dirImgs+"thing01_right.jpg"));
 		inputs.add(new PathLabel("Wall 1",dirImgs+"wall01_left.jpg",dirImgs+"wall01_right.jpg"));
