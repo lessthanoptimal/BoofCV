@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.disparity;
+package boofcv.gui.d3;
 
 /**
  * @author Peter Abeles
  */
-public class DisparityPointCloud {
+// todo menu bar - home, scale, offset (x,y), max height? tilt?
+public class PointCloudSidePanel {
 }

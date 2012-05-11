@@ -257,6 +257,8 @@ public class VisualizeImageData {
 
 		if( disparity.getTypeInfo().isInteger() ) {
 			return disparity((ImageInteger) disparity, dst, minDisparity, maxDisparity,invalidColor);
+		} else if( disparity instanceof ImageFloat32 ) {
+			return disparity((ImageFloat32) disparity, dst, minDisparity, maxDisparity,invalidColor);
 		} else {
 			throw new RuntimeException("Add support");
 		}
@@ -277,19 +279,41 @@ public class VisualizeImageData {
 				} else {
 					int r,b;
 
-					if( v >= halfValue ) {
-						r = 255*(v-halfValue)/halfValue;
-						b = 0;
-					} else {
-						r = 0;
-						b = 255*v/halfValue;
-					}
-
 					if( v == 0 ) {
 						r = b = 0;
 					} else {
 						r = 255*v/maxValue;
 						b = 255*(maxValue-v)/maxValue;
+					}
+
+					dst.setRGB(x,y,r << 16 | b );
+				}
+			}
+		}
+
+		return dst;
+	}
+
+	private static BufferedImage disparity( ImageFloat32 src, BufferedImage dst,
+											int minValue , int maxValue , int invalidColor )
+	{
+		float range = maxValue-minValue;
+		float halfValue = range/2 + range%2;
+
+		for( int y = 0; y < src.height; y++ ) {
+			for( int x = 0; x < src.width; x++ ) {
+				float v = src.unsafe_get(x,y);
+
+				if( v > range ) {
+					dst.setRGB( x,y,invalidColor );
+				} else {
+					int r,b;
+
+					if( v == 0 ) {
+						r = b = 0;
+					} else {
+						r = (int)(255*v/maxValue);
+						b = (int)(255*(maxValue-v)/maxValue);
 					}
 
 					dst.setRGB(x,y,r << 16 | b );

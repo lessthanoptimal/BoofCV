@@ -29,6 +29,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
+import boofcv.gui.d3.PointCloudSideViewer;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -48,6 +49,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * TODO comment
+ *
  * @author Peter Abeles
  */
 public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends ImageSingleBand>
@@ -68,7 +71,10 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 	DisparityDisplayPanel control = new DisparityDisplayPanel();
+	JPanel panel = new JPanel();
 	ImagePanel gui = new ImagePanel();
+	PointCloudSideViewer cloudGui = new PointCloudSideViewer();
+	boolean computedCloud;
 
 	int selectedAlg;
 	StereoDisparity<T,D> activeAlg;
@@ -90,7 +96,6 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		control.setListener(this);
 
-		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		panel.add(control, BorderLayout.WEST);
 		panel.add(gui,BorderLayout.CENTER);
@@ -102,6 +107,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		if( !rectifiedImages )
 			return;
 
+		computedCloud = false;
 		activeAlg.process(rectLeft, rectRight);
 
 		disparityRender();
@@ -113,28 +119,46 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	private void changeImageView() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				BufferedImage img;
+				JComponent comp;
+				if( control.selectedView < 3 ) {
+					BufferedImage img;
 
-				switch (control.selectedView) {
-					case 0:
-						img = disparityOut;
-						break;
+					switch (control.selectedView) {
+						case 0:
+							img = disparityOut;
+							break;
 
-					case 1:
-						img = colorLeft;
-						break;
+						case 1:
+							img = colorLeft;
+							break;
 
-					case 2:
-						img = colorRight;
-						break;
+						case 2:
+							img = colorRight;
+							break;
 
-					default:
-						throw new RuntimeException("Unknown option");
+						default:
+							throw new RuntimeException("Unknown option");
+					}
+
+					gui.setBufferedImage(img);
+					gui.setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
+					comp = gui;
+				} else {
+					if( !computedCloud ) {
+						computedCloud = true;
+						double baseline = calib.getRightToLeft().getT().norm();
+						cloudGui.configure(baseline,rectK.get(0,0),rectK.get(1,1),rectK.get(0,2),rectK.get(1,2),
+								control.minDisparity,control.maxDisparity);
+						cloudGui.process(activeAlg.getDisparity(),colorLeft);
+					}
+					comp = cloudGui;
 				}
-
-				gui.setBufferedImage(img);
-				gui.setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
-				gui.repaint();
+				panel.getLayout();
+				panel.remove(gui);
+				panel.remove(cloudGui);
+				panel.add(comp,BorderLayout.CENTER);
+				panel.validate();
+				comp.repaint();
 				processedImage = true;
 			}
 		});
@@ -258,27 +282,52 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		int r = control.regionRadius;
 
-		switch( selectedAlg ) {
-			case 0:
-				changeGuiActive(false,false);
-				return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,control.minDisparity,
-						control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
+		if( control.useSubpixel ) {
+			switch( selectedAlg ) {
+				case 0:
+					changeGuiActive(false,false);
+					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,control.minDisparity,
+							control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
 
-			case 1:
-				changeGuiActive(true,true);
-				return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,control.minDisparity,
-						control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
-						ImageUInt8.class);
+				case 1:
+					changeGuiActive(true,true);
+					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,control.minDisparity,
+							control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
+							ImageUInt8.class);
 
-			case 2:
-				changeGuiActive(true,true);
-				return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT_FIVE,
-						control.minDisparity, control.maxDisparity, r, r,
-						control.pixelError, control.reverseTol, control.texture,
-						ImageUInt8.class);
+				case 2:
+					changeGuiActive(true,true);
+					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
+							control.minDisparity, control.maxDisparity, r, r,
+							control.pixelError, control.reverseTol, control.texture,
+							ImageUInt8.class);
 
-			default:
-				throw new RuntimeException("Unknown selection");
+				default:
+					throw new RuntimeException("Unknown selection");
+			}
+		} else {
+			switch( selectedAlg ) {
+				case 0:
+					changeGuiActive(false,false);
+					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,control.minDisparity,
+							control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
+
+				case 1:
+					changeGuiActive(true,true);
+					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,control.minDisparity,
+							control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
+							ImageUInt8.class);
+
+				case 2:
+					changeGuiActive(true,true);
+					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT_FIVE,
+							control.minDisparity, control.maxDisparity, r, r,
+							control.pixelError, control.reverseTol, control.texture,
+							ImageUInt8.class);
+
+				default:
+					throw new RuntimeException("Unknown selection");
+			}
 		}
 
 	}
@@ -298,7 +347,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		VisualizeStereoDisparity app = new VisualizeStereoDisparity();
 
-		String dirCalib = "../data/evaluation/calibration/stereo/Bumblebee2_Chess/";
+		String dirCalib = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
 		String dirImgs = "../data/applet/stereo/";
 
 		StereoParameters calib = BoofMiscOps.loadXML(dirCalib+"stereo.xml");
@@ -309,6 +358,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		inputs.add(new PathLabel("Stones 1",dirImgs+"stones01_left.jpg",dirImgs+"stones01_right.jpg"));
 		inputs.add(new PathLabel("Thing 1",dirImgs+"thing01_left.jpg",dirImgs+"thing01_right.jpg"));
 		inputs.add(new PathLabel("Wall 1",dirImgs+"wall01_left.jpg",dirImgs+"wall01_right.jpg"));
+		inputs.add(new PathLabel("Garden 1",dirImgs+"garden01_left.jpg",dirImgs+"garden01_right.jpg"));
+		inputs.add(new PathLabel("Garden 2",dirImgs+"garden02_left.jpg",dirImgs+"garden02_right.jpg"));
 
 		app.setCalib(calib);
 		app.setInputList(inputs);

@@ -43,6 +43,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 	JSpinner minDisparitySpinner;
 	JSpinner maxDisparitySpinner;
+	JCheckBox subpixelToggle;
 	JSpinner radiusSpinner;
 	JSpinner errorSpinner;
 	JSpinner reverseSpinner;
@@ -52,6 +53,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	int selectedView;
 
 	boolean colorInvalid = false;
+	boolean useSubpixel = true;
 
 	// minimum disparity to calculate
 	int minDisparity = 0;
@@ -74,6 +76,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		viewSelector.addItem("Disparity");
 		viewSelector.addItem("Left");
 		viewSelector.addItem("Right");
+		viewSelector.addItem("Top View");
 		viewSelector.addItemListener(this);
 		viewSelector.setMaximumSize(viewSelector.getPreferredSize());
 
@@ -89,6 +92,11 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		maxDisparitySpinner = new JSpinner(new SpinnerNumberModel(maxDisparity,1, 255, 5));
 		maxDisparitySpinner.addChangeListener(this);
 		maxDisparitySpinner.setMaximumSize(maxDisparitySpinner.getPreferredSize());
+
+		subpixelToggle = new JCheckBox("Subpixel");
+		subpixelToggle.setSelected(useSubpixel);
+		subpixelToggle.addItemListener(this);
+		subpixelToggle.setMaximumSize(invalidToggle.getPreferredSize());
 
 		radiusSpinner = new JSpinner(new SpinnerNumberModel(regionRadius,1, 30, 1));
 		radiusSpinner.addChangeListener(this);
@@ -112,6 +120,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addSeparator(100);
 		addLabeled(minDisparitySpinner, "Min Disparity", this);
 		addLabeled(maxDisparitySpinner, "Max Disparity", this);
+		addAlignLeft(subpixelToggle,this);
 		addLabeled(radiusSpinner,    "Region Radius", this);
 		addLabeled(errorSpinner,     "Max Error", this);
 		addLabeled(textureSpinner,   "Texture", this);
@@ -157,14 +166,17 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == invalidToggle) {
 			colorInvalid = invalidToggle.isSelected();
 			listener.disparityRender();
+		} else if( e.getSource() == subpixelToggle ) {
+			useSubpixel = subpixelToggle.isSelected();
+			listener.disparitySettingChange();
 		}
 	}
 
 	public void setActiveGui( boolean error , boolean reverse ) {
-		setEnabled(7,error);
-		setEnabled(8,reverse);
-		setEnabled(9,error);
-		setEnabled(10,reverse);
+		setEnabled(8,error);
+		setEnabled(9,reverse);
+		setEnabled(10,error);
+		setEnabled(11,reverse);
 	}
 
 	public void setListener(Listener listener ) {
