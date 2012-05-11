@@ -59,7 +59,7 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 		return unsafe_get(x,y);
 	}
 
-	protected float unsafe_get(int x, int y) {
+	public float unsafe_get(int x, int y) {
 		return data[getIndex(x, y)];
 	}
 
