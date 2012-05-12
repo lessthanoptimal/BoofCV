@@ -58,7 +58,7 @@ import java.awt.image.BufferedImage;
 public class ExampleRectifyCalibratedStereo {
 
 	public static void main( String args[] ) {
-		String dir = "../data/evaluation/calibration/stereo/Bumblebee2_Chess/";
+		String dir = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
 
 		StereoParameters param = BoofMiscOps.loadXML(dir+"stereo.xml");
 

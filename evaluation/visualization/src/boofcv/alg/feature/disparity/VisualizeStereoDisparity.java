@@ -29,7 +29,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
-import boofcv.gui.d3.PointCloudSideViewer;
+import boofcv.gui.d3.PointCloudSidePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -49,7 +49,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO comment
+ * Computes and displays disparity from still disparity images.  The disparity can be viewed
+ * as a color surface plot or as a 3D point cloud.  Different tuning parameters can be adjusted
+ * use a side control panel.
  *
  * @author Peter Abeles
  */
@@ -58,32 +60,43 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	implements DisparityDisplayPanel.Listener
 {
 
-	BufferedImage colorLeft;
-	BufferedImage colorRight;
-	BufferedImage disparityOut;
+	// rectified color image from left and right camera for display
+	private BufferedImage colorLeft;
+	private BufferedImage colorRight;
+	// Output disparity color surface plot
+	private BufferedImage disparityOut;
 
-	T inputLeft;
-	T inputRight;
-	T rectLeft;
-	T rectRight;
+	// gray scale input image before rectification
+	private T inputLeft;
+	private T inputRight;
+	// gray scale input images after rectification
+	private T rectLeft;
+	private T rectRight;
 
-	StereoParameters calib;
-	RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
+	// calibration parameters
+	private StereoParameters calib;
+	// rectification algorithm
+	private RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
-	DisparityDisplayPanel control = new DisparityDisplayPanel();
-	JPanel panel = new JPanel();
-	ImagePanel gui = new ImagePanel();
-	PointCloudSideViewer cloudGui = new PointCloudSideViewer();
-	boolean computedCloud;
+	// GUI components
+	private DisparityDisplayPanel control = new DisparityDisplayPanel();
+	private JPanel panel = new JPanel();
+	private ImagePanel gui = new ImagePanel();
+	private PointCloudSidePanel cloudGui = new PointCloudSidePanel();
 
-	int selectedAlg;
-	StereoDisparity<T,D> activeAlg;
+	// if true the point cloud has already been computed and does not need to be recomputed
+	private boolean computedCloud;
 
-	// camera parameters after rectification
-	DenseMatrix64F rect1,rect2,rectK;
+	// which algorithm has been selected
+	private int selectedAlg;
+	// instance of the selected algorithm
+	private StereoDisparity<T,D> activeAlg;
 
-	boolean processedImage = false;
-	boolean rectifiedImages = false;
+	// camera calibration matrix of rectified iamges
+	private DenseMatrix64F rectK;
+
+	private boolean processedImage = false;
+	private boolean rectifiedImages = false;
 
 	public VisualizeStereoDisparity() {
 		super(1);
@@ -153,7 +166,6 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 					}
 					comp = cloudGui;
 				}
-				panel.getLayout();
 				panel.remove(gui);
 				panel.remove(cloudGui);
 				panel.add(comp,BorderLayout.CENTER);
@@ -212,8 +224,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		// compute rectification matrices
 		rectifyAlg.process(K1,new Se3_F64(),K2,calib.getRightToLeft().invert(null));
 
-		rect1 = rectifyAlg.getRect1();
-		rect2 = rectifyAlg.getRect2();
+		DenseMatrix64F rect1 = rectifyAlg.getRect1();
+		DenseMatrix64F rect2 = rectifyAlg.getRect2();
 		rectK = rectifyAlg.getCalibrationMatrix();
 
 		// adjust view to maximize viewing area while not including black regions
@@ -354,11 +366,11 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("Chair 1",dirImgs+"chair01_left.jpg",dirImgs+"chair01_right.jpg"));
-		inputs.add(new PathLabel("Chair 2",dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
+//		inputs.add(new PathLabel("Chair 2",dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
 		inputs.add(new PathLabel("Stones 1",dirImgs+"stones01_left.jpg",dirImgs+"stones01_right.jpg"));
 		inputs.add(new PathLabel("Thing 1",dirImgs+"thing01_left.jpg",dirImgs+"thing01_right.jpg"));
 		inputs.add(new PathLabel("Wall 1",dirImgs+"wall01_left.jpg",dirImgs+"wall01_right.jpg"));
-		inputs.add(new PathLabel("Garden 1",dirImgs+"garden01_left.jpg",dirImgs+"garden01_right.jpg"));
+//		inputs.add(new PathLabel("Garden 1",dirImgs+"garden01_left.jpg",dirImgs+"garden01_right.jpg"));
 		inputs.add(new PathLabel("Garden 2",dirImgs+"garden02_left.jpg",dirImgs+"garden02_right.jpg"));
 
 		app.setCalib(calib);

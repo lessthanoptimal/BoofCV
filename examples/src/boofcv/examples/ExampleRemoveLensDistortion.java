@@ -54,7 +54,7 @@ import java.awt.image.BufferedImage;
 public class ExampleRemoveLensDistortion {
 
 	public static void main( String args[] ) {
-		String calibDir = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess/";
+		String calibDir = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
 		String imageDir = "../data/evaluation/structure/";
 
 		// load calibration parameters from the previously calibrated camera

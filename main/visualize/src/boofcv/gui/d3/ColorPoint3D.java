@@ -26,5 +26,6 @@ import georegression.struct.point.Point3D_F64;
  * @author Peter Abeles
  */
 public class ColorPoint3D extends Point3D_F64 {
+	// pixel's color as an RGB value
 	public int rgb;
 }
