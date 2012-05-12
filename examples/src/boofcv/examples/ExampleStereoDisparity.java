@@ -114,7 +114,7 @@ public class ExampleStereoDisparity {
 	}
 
 	public static void main( String args[] ) {
-		String calibDir = "../data/evaluation/calibration/stereo/Bumblebee2_Chess/";
+		String calibDir = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
 		String imageDir = "../data/applet/stereo/";
 
 		StereoParameters param = BoofMiscOps.loadXML(calibDir + "stereo.xml");

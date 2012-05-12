@@ -22,32 +22,30 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-import georegression.geometry.UtilPoint3D_F64;
-import georegression.struct.point.Point3D_F64;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 /**
+ * <p>
+ * Renders a disparity image in 3D as viewed from above.
+ * </p>
+ *
+ * <p>
+ * Rendering speed is improved by first rendering onto a grid and only accepting the highest
+ * (closest to viewing camera) point as being visible.
+ * </p>
+ *
  * @author Peter Abeles
  */
-// todo support for ImageFloat32
-// TODO add top control bar to select zoom and to reset to home
-public class PointCloudSideViewer extends JPanel implements MouseListener , MouseMotionListener {
+public class PointCloudSideViewer extends JPanel {
 	FastQueue<ColorPoint3D> cloud = new FastQueue<ColorPoint3D>(200,ColorPoint3D.class,true);
 
-	List<ColorPoint3D> orderedCloud = new ArrayList<ColorPoint3D>();
 	// distance between the two camera centers
 	double baseline;
 
+	// intrinsic camera parameters
 	double focalLengthX;
 	double focalLengthY;
 	double centerX;
@@ -58,20 +56,30 @@ public class PointCloudSideViewer extends JPanel implements MouseListener , Mous
 	// maximum minus minimum disparity
 	int rangeDisparity;
 
-	double scale;
+	// scale, adjust to zoom in and out
+	double scale = 1;
 
+	// view offset
 	double offsetX;
 	double offsetY;
 
-	// previous mouse location
-	int prevX;
-	int prevY;
+	// Data structure that contains the visible point at each pixel
+	// size = width*height, row major format
+	Pixel data[] = new Pixel[0];
 
-	public PointCloudSideViewer() {
-		addMouseListener(this);
-		addMouseMotionListener(this);
-	}
+	// tilt angle in degrees
+	public int tiltAngle = 0;
 
+	/**
+	 * Stereo and intrinsic camera parameters
+	 * @param baseline Stereo baseline (world units)
+	 * @param focalLengthX Focal length parameter x-axis (pixels)
+	 * @param focalLengthY Focal length parameter y-axis (pixels)
+	 * @param centerX Optical center x-axis (pixels)
+	 * @param centerY Optical center y-axis  (pixels)
+	 * @param minDisparity Minimum disparity that's computed (pixels)
+	 * @param maxDisparity Maximum disparity that's computed (pixels)
+	 */
 	public void configure(double baseline,
 						  double focalLengthX, double focalLengthY,
 						  double centerX, double centerY,
@@ -85,30 +93,22 @@ public class PointCloudSideViewer extends JPanel implements MouseListener , Mous
 
 		this.rangeDisparity = maxDisparity-minDisparity;
 	}
+
+	/**
+	 * Given the disparity image compute the 3D location of valid points and save pixel colors
+	 * at that point
+	 *
+	 * @param disparity Disparity image
+	 * @param color Color image of left camera
+	 */
 	public void process( ImageSingleBand disparity , BufferedImage color ) {
 		if( disparity instanceof ImageUInt8 )
 			process((ImageUInt8)disparity,color);
 		else
 			process((ImageFloat32)disparity,color);
-
-		orderedCloud.clear();
-		orderedCloud.addAll(cloud.toList());
-		Collections.sort(orderedCloud,new Comparator<ColorPoint3D>() {
-			@Override
-			public int compare(ColorPoint3D o1, ColorPoint3D o2) {
-				if( o1.y < o2.y )
-					return 1;
-				else if( o1.y == o2.y )
-					return 0;
-				else
-					return -1;
-			}
-		});
 	}
 
 	private void process( ImageUInt8 disparity , BufferedImage color ) {
-
-		scale = 0;
 
 		cloud.reset();
 
@@ -137,8 +137,6 @@ public class PointCloudSideViewer extends JPanel implements MouseListener , Mous
 	}
 
 	private void process( ImageFloat32 disparity , BufferedImage color ) {
-
-		scale = 0;
 
 		cloud.reset();
 
@@ -170,71 +168,87 @@ public class PointCloudSideViewer extends JPanel implements MouseListener , Mous
 	public synchronized void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		// auto set initial scale
-		if( scale == 0 && getHeight() > 0 ) {
-			double midRange = focalLengthY*baseline/(minDisparity+rangeDisparity*0.25);
-			scale = getHeight()/midRange;
-		}
+		projectScene();
 
-		int centerX = getWidth()/2;
-		int height = getHeight();
+		int width = getWidth();
+		int h = getHeight();
+
+		int r = 2;
+		int w = r*2+1;
 
 		Graphics2D g2 = (Graphics2D)g;
 
-		for( int i = 0; i < orderedCloud.size(); i++ ) {
-			ColorPoint3D p = orderedCloud.get(i);
-
-			int x = (int)((p.x+offsetX)*scale ) + centerX;
-			int y = height - (int)((p.z+offsetY)*scale) - 1;
-
-			int r = 2 + (int)(0.01*p.z*scale);
-			int w = r*2+1;
+		int index = 0;
+		for( int y = 0; y < h; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				Pixel p = data[index++];
+				if( p.rgb == 0xFFFFFF )
+					continue;
 
 				g2.setColor(new Color(p.rgb));
-				g2.fillOval(x-r,y-r,w,w);
+				g2.fillRect(x - r, y - r, w, w);
+			}
 		}
 	}
 
-	@Override
-	public synchronized void mouseClicked(MouseEvent e) {
+	private void projectScene() {
+		int w = getWidth();
+		int h = getHeight();
 
-		if( e.isShiftDown())
-			scale *= 0.75;
-		else
-			scale *= 1.5;
+		int N = w*h;
 
-		repaint();
+		if( data.length < N ) {
+			data = new Pixel[ N ];
+			for( int i = 0; i < N; i++ )
+				data[i] = new Pixel();
+		} else {
+			for( int i = 0; i < N; i++ )
+				data[i].reset();
+		}
+
+		int centerX = getWidth()/2;
+
+		double c = Math.cos(tiltAngle*Math.PI/180.0);
+		double s = Math.sin(tiltAngle*Math.PI/180.0);
+
+		for( int i = 0; i < cloud.size(); i++ ) {
+			ColorPoint3D p = cloud.get(i);
+
+			double X = p.x;
+			double Y = c*p.z - s*p.y;
+			double Z = s*p.z + c*p.y;
+
+			int x = (int)((X+offsetX)*scale ) + centerX;
+			int y = h - (int)((Y+offsetY)*scale) - 1;
+
+			if( x < 0 || y < 0 || x >= w || y >= h )
+				continue;
+
+			Pixel d = data[y*w+x];
+			if( d.height > Z ) {
+				d.height = Z;
+				d.rgb = p.rgb;
+			}
+		}
 	}
 
-	@Override
-	public void mousePressed(MouseEvent e) {
-		prevX = e.getX();
-		prevY = e.getY();
+	/**
+	 * Contains information on visible pixels
+	 */
+	private static class Pixel
+	{
+		// the pixel's height.  used to see if it is closer to the  camera or not
+		public double height;
+		// Color of the pixel
+		public int rgb;
+
+		private Pixel() {
+			reset();
+		}
+
+		public void reset() {
+			height = Double.MAX_VALUE;
+			rgb = 0xFFFFFF;
+		}
 	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {}
-
-	@Override
-	public void mouseExited(MouseEvent e) {}
-
-	@Override
-	public synchronized void mouseDragged(MouseEvent e) {
-		final int deltaX = e.getX()-prevX;
-		final int deltaY = e.getY()-prevY;
-
-		offsetX += deltaX/scale;
-		offsetY += -deltaY/scale;
-
-		prevX = e.getX();
-		prevY = e.getY();
-
-		repaint();
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {}
 }
