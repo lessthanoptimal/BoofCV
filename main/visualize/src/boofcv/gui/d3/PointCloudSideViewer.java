@@ -22,6 +22,14 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
+import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,6 +54,7 @@ public class PointCloudSideViewer extends JPanel {
 	double baseline;
 
 	// intrinsic camera parameters
+	DenseMatrix64F K;
 	double focalLengthX;
 	double focalLengthY;
 	double centerX;
@@ -56,8 +65,8 @@ public class PointCloudSideViewer extends JPanel {
 	// maximum minus minimum disparity
 	int rangeDisparity;
 
-	// scale, adjust to zoom in and out
-	double scale = 1;
+	// How far out it should zoom.
+	double zoom = 1;
 
 	// view offset
 	double offsetX;
@@ -69,26 +78,24 @@ public class PointCloudSideViewer extends JPanel {
 
 	// tilt angle in degrees
 	public int tiltAngle = 0;
+	public double radius = 5;
 
 	/**
 	 * Stereo and intrinsic camera parameters
 	 * @param baseline Stereo baseline (world units)
-	 * @param focalLengthX Focal length parameter x-axis (pixels)
-	 * @param focalLengthY Focal length parameter y-axis (pixels)
-	 * @param centerX Optical center x-axis (pixels)
-	 * @param centerY Optical center y-axis  (pixels)
+	 * @param K Intrinsic camera calibration matrix
 	 * @param minDisparity Minimum disparity that's computed (pixels)
 	 * @param maxDisparity Maximum disparity that's computed (pixels)
 	 */
 	public void configure(double baseline,
-						  double focalLengthX, double focalLengthY,
-						  double centerX, double centerY,
+						  DenseMatrix64F K,
 						  int minDisparity, int maxDisparity) {
+		this.K = K;
 		this.baseline = baseline;
-		this.focalLengthX = focalLengthX;
-		this.focalLengthY = focalLengthY;
-		this.centerX = centerX;
-		this.centerY = centerY;
+		this.focalLengthX = K.get(0,0);
+		this.focalLengthY = K.get(1,1);
+		this.centerX = K.get(0,2);
+		this.centerY = K.get(1,2);
 		this.minDisparity = minDisparity;
 
 		this.rangeDisparity = maxDisparity-minDisparity;
@@ -206,30 +213,45 @@ public class PointCloudSideViewer extends JPanel {
 				data[i].reset();
 		}
 
-		int centerX = getWidth()/2;
-
-		double c = Math.cos(tiltAngle*Math.PI/180.0);
-		double s = Math.sin(tiltAngle*Math.PI/180.0);
+		Se3_F64 pose = createWorldToCamera();
+		Point3D_F64 cameraPt = new Point3D_F64();
+		Point2D_F64 pixel = new Point2D_F64();
 
 		for( int i = 0; i < cloud.size(); i++ ) {
 			ColorPoint3D p = cloud.get(i);
 
-			double X = p.x;
-			double Y = c*p.z - s*p.y;
-			double Z = s*p.z + c*p.y;
+			SePointOps_F64.transform(pose,p,cameraPt);
+			pixel.x = cameraPt.x/cameraPt.z;
+			pixel.y = cameraPt.y/cameraPt.z;
 
-			int x = (int)((X+offsetX)*scale ) + centerX;
-			int y = h - (int)((Y+offsetY)*scale) - 1;
+			GeometryMath_F64.mult(K,pixel,pixel);
+
+			int x = (int)pixel.x;
+			int y = (int)pixel.y;
 
 			if( x < 0 || y < 0 || x >= w || y >= h )
 				continue;
 
 			Pixel d = data[y*w+x];
-			if( d.height > Z ) {
-				d.height = Z;
+			if( d.height > cameraPt.z ) {
+				d.height = cameraPt.z;
 				d.rgb = p.rgb;
 			}
 		}
+	}
+
+	public Se3_F64 createWorldToCamera() {
+		// pick an appropriate amount of motion for the scene
+		double z = baseline*focalLengthX/(minDisparity+rangeDisparity);
+
+		Vector3D_F64 rotPt = new Vector3D_F64(offsetX*5,offsetY*5,z*zoom);
+
+		double radians = tiltAngle*Math.PI/180.0;
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(radians,0,0,null);
+
+		Se3_F64 a = new Se3_F64(R,rotPt);
+
+		return a;
 	}
 
 	/**

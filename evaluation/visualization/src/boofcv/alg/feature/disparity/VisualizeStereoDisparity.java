@@ -92,9 +92,13 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	// instance of the selected algorithm
 	private StereoDisparity<T,D> activeAlg;
 
-	// camera calibration matrix of rectified iamges
+	// camera calibration matrix of rectified images
 	private DenseMatrix64F rectK;
 
+	// makes sure process has been called before render disparity is done
+	// There was a threading issue where disparitySettingChange() created a new alg() but render was called before
+	// it could process an image.
+	private volatile boolean processCalled = false;
 	private boolean processedImage = false;
 	private boolean rectifiedImages = false;
 
@@ -122,58 +126,58 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		computedCloud = false;
 		activeAlg.process(rectLeft, rectRight);
+		processCalled = true;
 
-		disparityRender();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				disparityRender();
+			}});
 	}
 
 	/**
 	 * Changes which image is being displayed depending on GUI selection
 	 */
-	private void changeImageView() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				JComponent comp;
-				if( control.selectedView < 3 ) {
-					BufferedImage img;
+	private synchronized void changeImageView() {
 
-					switch (control.selectedView) {
-						case 0:
-							img = disparityOut;
-							break;
+		JComponent comp;
+		if( control.selectedView < 3 ) {
+			BufferedImage img;
 
-						case 1:
-							img = colorLeft;
-							break;
+			switch (control.selectedView) {
+				case 0:
+					img = disparityOut;
+					break;
 
-						case 2:
-							img = colorRight;
-							break;
+				case 1:
+					img = colorLeft;
+					break;
 
-						default:
-							throw new RuntimeException("Unknown option");
-					}
+				case 2:
+					img = colorRight;
+					break;
 
-					gui.setBufferedImage(img);
-					gui.setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
-					comp = gui;
-				} else {
-					if( !computedCloud ) {
-						computedCloud = true;
-						double baseline = calib.getRightToLeft().getT().norm();
-						cloudGui.configure(baseline,rectK.get(0,0),rectK.get(1,1),rectK.get(0,2),rectK.get(1,2),
-								control.minDisparity,control.maxDisparity);
-						cloudGui.process(activeAlg.getDisparity(),colorLeft);
-					}
-					comp = cloudGui;
-				}
-				panel.remove(gui);
-				panel.remove(cloudGui);
-				panel.add(comp,BorderLayout.CENTER);
-				panel.validate();
-				comp.repaint();
-				processedImage = true;
+				default:
+					throw new RuntimeException("Unknown option");
 			}
-		});
+
+			gui.setBufferedImage(img);
+			gui.setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
+			comp = gui;
+		} else {
+			if( !computedCloud ) {
+				computedCloud = true;
+				double baseline = calib.getRightToLeft().getT().norm();
+				cloudGui.configure(baseline,rectK,control.minDisparity,control.maxDisparity);
+				cloudGui.process(activeAlg.getDisparity(),colorLeft);
+			}
+			comp = cloudGui;
+		}
+		panel.remove(gui);
+		panel.remove(cloudGui);
+		panel.add(comp,BorderLayout.CENTER);
+		panel.validate();
+		comp.repaint();
+		processedImage = true;
 	}
 
 	@Override
@@ -264,20 +268,25 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 	@Override
 	public synchronized void disparitySettingChange() {
+		processCalled = false;
 		activeAlg = createAlg();
 		doRefreshAll();
 	}
 
 	@Override
-	public void disparityGuiChange() {
+	public synchronized void disparityGuiChange() {
 		changeImageView();
 	}
 
 	@Override
-	public void disparityRender() {
+	public synchronized void disparityRender() {
+		if( !processCalled )
+			return;
+
 		int color = control.colorInvalid ? 0x02 << 16 | 0xB0 << 8 | 0x90 : 0;
 
 		D disparity = activeAlg.getDisparity();
+
 		disparityOut = VisualizeImageData.disparity(disparity,null,
 				activeAlg.getMinDisparity(),activeAlg.getMaxDisparity(),
 				color);
@@ -368,7 +377,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		inputs.add(new PathLabel("Chair 1",dirImgs+"chair01_left.jpg",dirImgs+"chair01_right.jpg"));
 //		inputs.add(new PathLabel("Chair 2",dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
 		inputs.add(new PathLabel("Stones 1",dirImgs+"stones01_left.jpg",dirImgs+"stones01_right.jpg"));
-		inputs.add(new PathLabel("Thing 1",dirImgs+"thing01_left.jpg",dirImgs+"thing01_right.jpg"));
+		inputs.add(new PathLabel("Lantern 1",dirImgs+"lantern01_left.jpg",dirImgs+"lantern01_right.jpg"));
 		inputs.add(new PathLabel("Wall 1",dirImgs+"wall01_left.jpg",dirImgs+"wall01_right.jpg"));
 //		inputs.add(new PathLabel("Garden 1",dirImgs+"garden01_left.jpg",dirImgs+"garden01_right.jpg"));
 		inputs.add(new PathLabel("Garden 2",dirImgs+"garden02_left.jpg",dirImgs+"garden02_right.jpg"));
