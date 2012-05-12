@@ -19,6 +19,7 @@
 package boofcv.gui.d3;
 
 import boofcv.struct.image.ImageSingleBand;
+import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -41,18 +42,16 @@ public class PointCloudSidePanel extends JPanel
 
 	// when pressed sets the view to "home"
 	JButton homeButton;
-	// Adjusts the scale
-	JSpinner scaleSpinner;
+	// Adjusts the amount of zoom
+	JSpinner zoomSpinner;
 	// Tilts the camera up and down
 	JSlider tiltSlider;
 
-	// scale the default scale by this amount
-	double scaleAdjustment = 1;
+	// how much it should move the camera in and out of the view
+	double zoom = 1;
 	// bounds on scale adjustment
-	double minScale = 0.1;
-	double maxScale = 10;
-	// the default scale, automatically computed if zero
-	double scaleDefault=0;
+	double minZoom = 0;
+	double maxZoom = 20;
 
 	// previous mouse location
 	int prevX;
@@ -77,19 +76,19 @@ public class PointCloudSidePanel extends JPanel
 		homeButton = new JButton("Home");
 		homeButton.addActionListener(this);
 
-		scaleSpinner = new JSpinner(new SpinnerNumberModel(scaleAdjustment, minScale, maxScale, 0.1));
-		scaleSpinner.addChangeListener(this);
-		scaleSpinner.setMaximumSize(scaleSpinner.getPreferredSize());
+		zoomSpinner = new JSpinner(new SpinnerNumberModel(zoom, minZoom, maxZoom, 0.2));
+		zoomSpinner.addChangeListener(this);
+		zoomSpinner.setMaximumSize(zoomSpinner.getPreferredSize());
 
 		tiltSlider = new JSlider(JSlider.HORIZONTAL,
-				0, 120, view.tiltAngle);
+				-120, 120, view.tiltAngle);
 		tiltSlider.addChangeListener(this);
-		tiltSlider.setMajorTickSpacing(30);
+		tiltSlider.setMajorTickSpacing(60);
 		tiltSlider.setPaintLabels(true);
 
 		toolBar.add(homeButton);
-		toolBar.add(new JLabel("Scale:"));
-		toolBar.add(scaleSpinner);
+		toolBar.add(new JLabel("Zoom:"));
+		toolBar.add(zoomSpinner);
 		toolBar.add(new JLabel("Tilt:"));
 		toolBar.add(tiltSlider);
 
@@ -100,10 +99,9 @@ public class PointCloudSidePanel extends JPanel
 	 * Specified intrinsic camera parameters and disparity settings
 	 */
 	public void configure(double baseline,
-						  double focalLengthX, double focalLengthY,
-						  double centerX, double centerY,
+						  DenseMatrix64F K,
 						  int minDisparity, int maxDisparity) {
-		view.configure(baseline,focalLengthX,focalLengthY,centerX,centerY,minDisparity,maxDisparity);
+		view.configure(baseline, K, minDisparity, maxDisparity);
 	}
 
 	/**
@@ -118,35 +116,22 @@ public class PointCloudSidePanel extends JPanel
 	}
 
 	@Override
-	protected void paintComponent(Graphics g) {
-		// auto set initial scale
-		if( scaleDefault == 0 && getHeight() > 0 ) {
-			double midRange = view.focalLengthY*view.baseline/20.0;
-			view.scale = scaleDefault = getHeight()/midRange;
-			this.scaleAdjustment = 1;
-		}
-
-		super.paintComponent(g);
-
-	}
-
-	@Override
 	public void actionPerformed(ActionEvent e) {
 
 		if( e.getSource() == homeButton ) {
 			view.offsetX = 0;
 			view.offsetY = 0;
 			view.tiltAngle = 0;
-			view.scale = scaleDefault;
-			this.scaleAdjustment = 1;
+			view.zoom = 1;
+			this.zoom = 1;
 
 			tiltSlider.removeChangeListener(this);
 			tiltSlider.setValue(view.tiltAngle);
 			tiltSlider.addChangeListener(this);
 
-			scaleSpinner.removeChangeListener(this);
-			scaleSpinner.setValue(scaleAdjustment);
-			scaleSpinner.addChangeListener(this);
+			zoomSpinner.removeChangeListener(this);
+			zoomSpinner.setValue(zoom);
+			zoomSpinner.addChangeListener(this);
 		}
 		view.repaint();
 	}
@@ -154,9 +139,8 @@ public class PointCloudSidePanel extends JPanel
 	@Override
 	public void stateChanged(ChangeEvent e) {
 
-		if( e.getSource() == scaleSpinner ) {
-			scaleAdjustment = ((Number)scaleSpinner.getValue()).doubleValue();
-			view.scale = scaleAdjustment *scaleDefault;
+		if( e.getSource() == zoomSpinner) {
+			view.zoom = ((Number) zoomSpinner.getValue()).doubleValue();
 		} else if( e.getSource() == tiltSlider ) {
 			view.tiltAngle = ((Number)tiltSlider.getValue()).intValue();
 		}
@@ -166,15 +150,15 @@ public class PointCloudSidePanel extends JPanel
 	@Override
 	public synchronized void mouseClicked(MouseEvent e) {
 
-		double scale = this.scaleAdjustment;
+		double scale = this.zoom;
 		if( e.isShiftDown())
 			scale *= 0.75;
 		else
 			scale *= 1.25;
 
-		if( scale < minScale ) scale = minScale;
-		if( scale > maxScale ) scale = maxScale;
-		scaleSpinner.setValue(scale);
+		if( scale < minZoom) scale = minZoom;
+		if( scale > maxZoom) scale = maxZoom;
+		zoomSpinner.setValue(scale);
 	}
 
 	@Override
@@ -197,8 +181,8 @@ public class PointCloudSidePanel extends JPanel
 		final int deltaX = e.getX()-prevX;
 		final int deltaY = e.getY()-prevY;
 
-		view.offsetX += deltaX/view.scale;
-		view.offsetY += -deltaY/view.scale;
+		view.offsetX += deltaX;
+		view.offsetY += deltaY;
 
 		prevX = e.getX();
 		prevY = e.getY();
