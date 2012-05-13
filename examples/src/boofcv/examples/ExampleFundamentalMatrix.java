@@ -51,7 +51,7 @@ import java.util.List;
 /**
  * A Fundamental matrix describes the epipolar relationship between two images.  If two points, one from
  * each image, match, then the inner product around the Fundamental matrix will be zero.  If a fundamental
- * matrix is known, then information about the scene and structure can be extracted.
+ * matrix is known, then information about the scene and its structure can be extracted.
  *
  * Below are two examples of how a Fundamental matrix can be computed using different.
  * The robust technique attempts to find the best fit Fundamental matrix to the data while removing noisy

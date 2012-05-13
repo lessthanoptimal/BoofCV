@@ -268,7 +268,6 @@ public class VisualizeImageData {
 											int minValue , int maxValue , int invalidColor )
 	{
 		int range = maxValue-minValue;
-		int halfValue = range/2 + range%2;
 
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
@@ -298,7 +297,6 @@ public class VisualizeImageData {
 											int minValue , int maxValue , int invalidColor )
 	{
 		float range = maxValue-minValue;
-		float halfValue = range/2 + range%2;
 
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {

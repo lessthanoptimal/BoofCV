@@ -36,10 +36,10 @@ import java.util.List;
 
 /**
  * Example of how to calibrate a single (monocular) camera given a set of observed calibration.
- * points using the Zhang99 algorithm.  Unlike in the other examples the image processing has
+ * points using the Zhang99 algorithm.  Unlike in the other examples, the image processing has
  * not already been done.  In theory you could add your own more exotic targets by writing
  * custom code to detect the target, which is left as an exercise for the reader.  For example,
- * have multiple targets visible.
+ * have multiple targets visible or calibrate using circles.
  *
  * @author Peter Abeles
  */
@@ -74,7 +74,7 @@ public class ExampleCalibrateMonocularPoints {
 	}
 
 	/**
-	 * Loads the location of calibration points in several images.  Not the focus of this example.
+	 * Detects calibration points found in several images and returned as a list. Not the focus of this example.
 	 */
 	public static List<List<Point2D_F64>> loadObservations() {
 

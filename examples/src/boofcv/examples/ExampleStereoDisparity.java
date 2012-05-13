@@ -40,12 +40,13 @@ import java.awt.image.BufferedImage;
 /**
  * The disparity between two stereo images is used to estimate the range of objects inside
  * the camera's view.  Disparity is the difference in position between the viewed location
- * of a point in the left and right stereo images.  The following example demonstrates
- * how to compute the disparity between two calibrated stereo camera images.
+ * of a point in the left and right stereo images.  Because input images are rectified,
+ * corresponding points can be found by only searching along image rows.
  *
- * The disparity image itself is encoded such that the values of each pixel indicate the
- * difference between the left and right image.  If no association was found for a particular
- * pixel then it is assigned an invalid value, which is any value more than (max - min disparity).
+ * Values in the disparity image specify how different the two images are.  A value of X indicates
+ * that the corresponding point in the right image from the left is at "x' = x - X - minDisparity",
+ * where x' and x are the locations in the right and left images respectively.  An invalid value
+ * with no correspondence is set to a value more than (max - min) disparity.
  *
  * @author Peter Abeles
  */
@@ -69,7 +70,7 @@ public class ExampleStereoDisparity {
 		// All of these parameters should be turned
 		StereoDisparity<ImageUInt8,ImageUInt8> disparityAlg =
 				FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, 3, 3, 20, 6, 0.2, ImageUInt8.class);
+						minDisparity, maxDisparity, 3, 3, 20, 1, 0.2, ImageUInt8.class);
 
 		// process and return the results
 		disparityAlg.process(rectLeft,rectRight);
@@ -120,8 +121,8 @@ public class ExampleStereoDisparity {
 		StereoParameters param = BoofMiscOps.loadXML(calibDir + "stereo.xml");
 
 		// load and convert images into a BoofCV format
-		BufferedImage origLeft = UtilImageIO.loadImage(imageDir + "thing01_left.jpg");
-		BufferedImage origRight = UtilImageIO.loadImage(imageDir+"thing01_right.jpg");
+		BufferedImage origLeft = UtilImageIO.loadImage(imageDir + "chair01_left.jpg");
+		BufferedImage origRight = UtilImageIO.loadImage(imageDir + "chair01_right.jpg");
 
 		ImageUInt8 distLeft = ConvertBufferedImage.convertFrom(origLeft,(ImageUInt8)null);
 		ImageUInt8 distRight = ConvertBufferedImage.convertFrom(origRight,(ImageUInt8)null);
@@ -133,10 +134,10 @@ public class ExampleStereoDisparity {
 		rectify(distLeft,distRight,param,rectLeft,rectRight);
 
 		// compute disparity
-		ImageUInt8 disparity = denseDisparity(rectLeft,rectRight,10,150);
+		ImageUInt8 disparity = denseDisparity(rectLeft,rectRight,10,60);
 
 		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,10,150,0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,10,60,0);
 
 		ShowImages.showWindow(rectLeft,"Rectified");
 		ShowImages.showWindow(visualized,"Disparity");
