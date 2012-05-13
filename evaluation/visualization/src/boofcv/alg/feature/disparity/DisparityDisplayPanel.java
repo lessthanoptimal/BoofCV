@@ -76,7 +76,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		viewSelector.addItem("Disparity");
 		viewSelector.addItem("Left");
 		viewSelector.addItem("Right");
-		viewSelector.addItem("Top View");
+		viewSelector.addItem("View 3D");
 		viewSelector.addItemListener(this);
 		viewSelector.setMaximumSize(viewSelector.getPreferredSize());
 

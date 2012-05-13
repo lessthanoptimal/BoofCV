@@ -6,6 +6,8 @@ Date Format: year/month/day
 Date    : 
 Version : Alpha 0.8
 
+*IMPORTANT* Discard old calibration files and calibrate again with latest code!
+
 - Added processing monitor to CalibrateStereoPlanarGuiApp
 - Fixed bug in Zhang99 calibration where Rodrigues coordinates were being parameterized incorrectly
   * Calibration results would be less accurate, but have a lower residual due to the increased degree of freedom
@@ -18,6 +20,9 @@ Version : Alpha 0.8
   * Rectangular region winner take all (WTA)
     - Validation: right to left, max error, texture
     - Precision: Pixel and Subpixel
+  * Algorithms:
+    - Basic rectangular region
+    - Five region adaptive: Hirschmuller, et. al. "Real-Time Correlation-Based Stereo Vision with Reduced Border Errors," 2002
 - IntrinsicParameters
   * Added flipY to parameter list since it is vital information for many
     calculations.
@@ -32,8 +37,10 @@ Version : Alpha 0.8
 - Examples:
   * ExampleCalibrateMonocularPoints
   * ExampleDetectCalibrationPoints
+  * ExampleStereoDisparity
 - ImageTestingOps
-  * Flip image 
+  * Flip image vertical 
+- Fast point cloud viewer
 
 ---------------------------------------------
 Date    : 2012/04/22

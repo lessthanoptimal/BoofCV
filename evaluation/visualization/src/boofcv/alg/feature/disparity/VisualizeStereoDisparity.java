@@ -29,7 +29,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
-import boofcv.gui.d3.PointCloudSidePanel;
+import boofcv.gui.d3.PointCloudTiltPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -82,7 +82,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	private DisparityDisplayPanel control = new DisparityDisplayPanel();
 	private JPanel panel = new JPanel();
 	private ImagePanel gui = new ImagePanel();
-	private PointCloudSidePanel cloudGui = new PointCloudSidePanel();
+	private PointCloudTiltPanel cloudGui = new PointCloudTiltPanel();
 
 	// if true the point cloud has already been computed and does not need to be recomputed
 	private boolean computedCloud;
@@ -131,7 +131,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				disparityRender();
-			}});
+			}
+		});
 	}
 
 	/**
@@ -198,8 +199,9 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 	@Override
 	public synchronized void changeInput(String name, int index) {
-		colorLeft = media.openImage(inputRefs.get(index).getPath(0) );
-		colorRight = media.openImage(inputRefs.get(index).getPath(1) );
+		calib = BoofMiscOps.loadXML(media.openFile(inputRefs.get(index).getPath(0)));
+		colorLeft = media.openImage(inputRefs.get(index).getPath(1) );
+		colorRight = media.openImage(inputRefs.get(index).getPath(2) );
 
 		int w = colorLeft.getWidth();
 		int h = colorLeft.getHeight();
@@ -259,6 +261,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 	@Override
 	public void loadConfigurationFile(String fileName) {
+
 	}
 
 	@Override
@@ -292,10 +295,6 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 				color);
 
 		changeImageView();
-	}
-
-	public void setCalib(StereoParameters calib) {
-		this.calib = calib;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -371,18 +370,15 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		String dirCalib = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
 		String dirImgs = "../data/applet/stereo/";
 
-		StereoParameters calib = BoofMiscOps.loadXML(dirCalib+"stereo.xml");
-
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Chair 1",dirImgs+"chair01_left.jpg",dirImgs+"chair01_right.jpg"));
-//		inputs.add(new PathLabel("Chair 2",dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
-		inputs.add(new PathLabel("Stones 1",dirImgs+"stones01_left.jpg",dirImgs+"stones01_right.jpg"));
-		inputs.add(new PathLabel("Lantern 1",dirImgs+"lantern01_left.jpg",dirImgs+"lantern01_right.jpg"));
-		inputs.add(new PathLabel("Wall 1",dirImgs+"wall01_left.jpg",dirImgs+"wall01_right.jpg"));
-//		inputs.add(new PathLabel("Garden 1",dirImgs+"garden01_left.jpg",dirImgs+"garden01_right.jpg"));
-		inputs.add(new PathLabel("Garden 2",dirImgs+"garden02_left.jpg",dirImgs+"garden02_right.jpg"));
+		inputs.add(new PathLabel("Chair 1",  dirCalib+"stereo.xml",dirImgs+"chair01_left.jpg",dirImgs+"chair01_right.jpg"));
+//		inputs.add(new PathLabel("Chair 2",  dirCalib+"stereo.xml",dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
+		inputs.add(new PathLabel("Stones 1", dirCalib+"stereo.xml",dirImgs+"stones01_left.jpg",dirImgs+"stones01_right.jpg"));
+		inputs.add(new PathLabel("Lantern 1",dirCalib+"stereo.xml",dirImgs+"lantern01_left.jpg",dirImgs+"lantern01_right.jpg"));
+		inputs.add(new PathLabel("Wall 1",   dirCalib+"stereo.xml",dirImgs+"wall01_left.jpg",dirImgs+"wall01_right.jpg"));
+//		inputs.add(new PathLabel("Garden 1", dirCalib+"stereo.xml",dirImgs+"garden01_left.jpg",dirImgs+"garden01_right.jpg"));
+		inputs.add(new PathLabel("Garden 2", dirCalib+"stereo.xml",dirImgs+"garden02_left.jpg",dirImgs+"garden02_right.jpg"));
 
-		app.setCalib(calib);
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
