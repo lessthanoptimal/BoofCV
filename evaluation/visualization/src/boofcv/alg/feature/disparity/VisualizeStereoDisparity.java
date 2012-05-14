@@ -34,7 +34,9 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
+import boofcv.io.ProgressMonitorThread;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -44,6 +46,7 @@ import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +62,10 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		extends SelectAlgorithmAndInputPanel
 	implements DisparityDisplayPanel.Listener
 {
+	// original input before rescaling
+	BufferedImage origLeft;
+	BufferedImage origRight;
+	StereoParameters origCalib;
 
 	// rectified color image from left and right camera for display
 	private BufferedImage colorLeft;
@@ -102,14 +109,15 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	private boolean processedImage = false;
 	private boolean rectifiedImages = false;
 
+
 	public VisualizeStereoDisparity() {
 		super(1);
 
 		selectedAlg = 0;
 		activeAlg = createAlg();
-		addAlgorithm(0,"Region Basic",0);
+		addAlgorithm(0,"Five Region",0);
 		addAlgorithm(0,"Region",1);
-		addAlgorithm(0,"Five Region",2);
+		addAlgorithm(0,"Region Basic",2);
 
 		control.setListener(this);
 
@@ -124,9 +132,14 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		if( !rectifiedImages )
 			return;
 
+		ProcessThread progress = new ProcessThread(this);
+		progress.start();
+
 		computedCloud = false;
 		activeAlg.process(rectLeft, rectRight);
 		processCalled = true;
+
+		progress.stopThread();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -199,30 +212,32 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 	@Override
 	public synchronized void changeInput(String name, int index) {
-		calib = BoofMiscOps.loadXML(media.openFile(inputRefs.get(index).getPath(0)));
-		colorLeft = media.openImage(inputRefs.get(index).getPath(1) );
-		colorRight = media.openImage(inputRefs.get(index).getPath(2) );
+		origCalib = BoofMiscOps.loadXML(media.openFile(inputRefs.get(index).getPath(0)));
 
-		int w = colorLeft.getWidth();
-		int h = colorLeft.getHeight();
+		origLeft = media.openImage(inputRefs.get(index).getPath(1) );
+		origRight = media.openImage(inputRefs.get(index).getPath(2) );
 
-		inputLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		inputRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		rectLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		rectRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
+		changeInputScale();
+	}
 
-		ConvertBufferedImage.convertFrom(colorLeft,inputLeft);
-		ConvertBufferedImage.convertFrom(colorRight,inputRight);
+	private void adjustIntrinsicForScale( IntrinsicParameters param , double scale ) {
+		param.width *= scale;
+		param.height *= scale;
+		param.fx *= scale;
+		param.fy *= scale;
+		param.cx *= scale;
+		param.cy *= scale;
+		param.skew *= scale;
 
-		rectifyInputImages();
-
-		doRefreshAll();
+		// no need to adjust radial distortion parameters since it is computed in normalized
+		// pixel coordinates, which are independent of pixel scaling
 	}
 
 	/**
 	 * Removes distortion and rectifies images.
 	 */
 	private void rectifyInputImages() {
+
 		// get intrinsic camera calibration matrices
 		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(calib.left, null);
 		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(calib.right,null);
@@ -304,7 +319,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		if( control.useSubpixel ) {
 			switch( selectedAlg ) {
-				case 0:
+				case 2:
 					changeGuiActive(false,false);
 					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,control.minDisparity,
 							control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
@@ -315,7 +330,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 							control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
 							ImageUInt8.class);
 
-				case 2:
+				case 0:
 					changeGuiActive(true,true);
 					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
 							control.minDisparity, control.maxDisparity, r, r,
@@ -327,7 +342,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 			}
 		} else {
 			switch( selectedAlg ) {
-				case 0:
+				case 2:
 					changeGuiActive(false,false);
 					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,control.minDisparity,
 							control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
@@ -338,7 +353,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 							control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
 							ImageUInt8.class);
 
-				case 2:
+				case 0:
 					changeGuiActive(true,true);
 					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT_FIVE,
 							control.minDisparity, control.maxDisparity, r, r,
@@ -361,6 +376,58 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 				control.setActiveGui(error,reverse);
 			}
 		});
+	}
+
+	@Override
+	public synchronized void changeInputScale() {
+		calib = new StereoParameters(origCalib);
+
+		double scale = control.inputScale;
+
+		adjustIntrinsicForScale(calib.left,scale);
+		adjustIntrinsicForScale(calib.right,scale);
+
+		int w = (int)(origLeft.getWidth()*scale);
+		int h = (int)(origLeft.getHeight()*scale);
+
+		colorLeft = new BufferedImage(w,h,BufferedImage.TYPE_INT_BGR);
+		colorRight = new BufferedImage(w,h,BufferedImage.TYPE_INT_BGR);
+
+		colorLeft.createGraphics().drawImage(origLeft, AffineTransform.getScaleInstance(scale,scale),null);
+		colorRight.createGraphics().drawImage(origRight, AffineTransform.getScaleInstance(scale,scale),null);
+
+		inputLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
+		inputRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
+		rectLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
+		rectRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
+
+		ConvertBufferedImage.convertFrom(colorLeft,inputLeft);
+		ConvertBufferedImage.convertFrom(colorRight,inputRight);
+
+		rectifyInputImages();
+
+		doRefreshAll();
+	}
+
+	/**
+	 * Displays a progress monitor and updates its state periodically
+	 */
+	public class ProcessThread extends ProgressMonitorThread
+	{
+		int state = 0;
+
+		public ProcessThread( JComponent owner ) {
+			super(new ProgressMonitor(owner, "Computing Disparity", "", 0, 100));
+		}
+
+		@Override
+		public void doRun() {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					monitor.setProgress(state);
+					state = (++state % 100);
+				}});
+		}
 	}
 
 	public static void main( String args[] ) {
