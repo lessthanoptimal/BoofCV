@@ -101,14 +101,19 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		if( !reader.read(r) )
 			throw new RuntimeException("Parsing configuration failed");
 		
-		if( reader.remainingTokens() != 5)
-			throw new RuntimeException("Not enough tokens in config file");
-		
+		if( reader.remainingTokens() != 6) {
+			while( reader.remainingTokens() != 0 ) {
+				System.out.println("token: "+reader.nextString());
+			}
+			throw new RuntimeException("Unexpected number of tokens in config file: "+reader.remainingTokens());
+		}
+
 		if( !(reader.nextString().compareToIgnoreCase("chess") == 0)) {
 			throw new RuntimeException("Not a chessboard config file");
 		}
 
-		boolean isLeftHanded = reader.nextString().compareTo("true") == 0;
+		boolean zeroSkew = reader.nextString().compareTo("true") == 0;
+		boolean flipY = reader.nextString().compareTo("true") == 0;
 
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();

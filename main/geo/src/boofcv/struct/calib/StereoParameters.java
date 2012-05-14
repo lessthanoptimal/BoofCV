@@ -41,12 +41,16 @@ public class StereoParameters implements Serializable {
 	// transform from left camera to right camera
 	public Se3_F64 rightToLeft;
 
+	public StereoParameters(StereoParameters param ) {
+		this(param.left,param.right,param.getRightToLeft());
+	}
+
 	public StereoParameters(IntrinsicParameters left,
 							IntrinsicParameters right,
 							Se3_F64 rightToLeft ) {
-		this.left = left;
-		this.rightToLeft = rightToLeft;
-		this.right = right;
+		this.left = new IntrinsicParameters(left);
+		this.rightToLeft = rightToLeft.copy();
+		this.right = new IntrinsicParameters(right);
 	}
 
 	public StereoParameters() {

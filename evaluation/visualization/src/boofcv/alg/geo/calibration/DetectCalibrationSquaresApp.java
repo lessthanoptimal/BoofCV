@@ -111,14 +111,15 @@ public class DetectCalibrationSquaresApp
 		if( !reader.read(r) )
 			throw new RuntimeException("Parsing configuration failed");
 
-		if( reader.remainingTokens() != 6)
-			throw new RuntimeException("Not enough tokens in config file");
+		if( reader.remainingTokens() != 7)
+			throw new RuntimeException("Unexpected number of tokens in config file: "+reader.remainingTokens());
 
 		if( !(reader.nextString().compareToIgnoreCase("square") == 0)) {
 			throw new RuntimeException("Not a square grid config file");
 		}
 
-		boolean isLeftHanded = reader.nextString().compareTo("true") == 0;
+		boolean zeroSkew = reader.nextString().compareTo("true") == 0;
+		boolean flipY = reader.nextString().compareTo("true") == 0;
 
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();

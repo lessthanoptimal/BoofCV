@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 
+Date    : 2012/05/13
 Version : Alpha 0.8
 
 *IMPORTANT* Discard old calibration files and calibrate again with latest code!

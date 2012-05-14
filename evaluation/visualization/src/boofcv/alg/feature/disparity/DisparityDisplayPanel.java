@@ -36,6 +36,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		implements ChangeListener, ItemListener
 {
 
+	// how much the input should be scaled down by
+	JSpinner inputScaleSpinner;
 	// selects which image to view
 	JComboBox viewSelector;
 	// toggles if invalid pixels are black or not
@@ -58,7 +60,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	// minimum disparity to calculate
 	int minDisparity = 0;
 	// maximum disparity to calculate
-	int maxDisparity = 100;
+	int maxDisparity = 50;
 	// maximum allowed per pixel error
 	int pixelError = 30;
 	// reverse association tolerance
@@ -67,11 +69,19 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	int regionRadius = 3;
 	// How diverse the texture needs to be
 	double texture = 0.1;
+	// scale factor for input images
+	double inputScale = 0.5;
+
 
 	// listener for changes in states
 	Listener listener;
 
 	public DisparityDisplayPanel() {
+
+		inputScaleSpinner = new JSpinner(new SpinnerNumberModel(inputScale,0.25, 1, 0.1));
+		inputScaleSpinner.addChangeListener(this);
+		inputScaleSpinner.setMaximumSize(inputScaleSpinner.getPreferredSize());
+
 		viewSelector = new JComboBox();
 		viewSelector.addItem("Disparity");
 		viewSelector.addItem("Left");
@@ -125,6 +135,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addLabeled(errorSpinner,     "Max Error", this);
 		addLabeled(textureSpinner,   "Texture", this);
 		addLabeled(reverseSpinner,   "Reverse", this);
+		addSeparator(100);
+		addLabeled(inputScaleSpinner, "Image Scale", this);
 		addVerticalGlue(this);
 	}
 
@@ -133,7 +145,11 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		if( listener == null )
 			return;
 
-		if( e.getSource() == reverseSpinner) {
+		if( e.getSource() == inputScaleSpinner) {
+			inputScale = ((Number) inputScaleSpinner.getValue()).doubleValue();
+			listener.changeInputScale();
+			return;
+		} else if( e.getSource() == reverseSpinner) {
 			reverseTol = ((Number) reverseSpinner.getValue()).intValue();
 		} else if( e.getSource() == minDisparitySpinner) {
 			minDisparity = ((Number) minDisparitySpinner.getValue()).intValue();
@@ -173,10 +189,10 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	}
 
 	public void setActiveGui( boolean error , boolean reverse ) {
-		setEnabled(8,error);
-		setEnabled(9,reverse);
-		setEnabled(10,error);
-		setEnabled(11,reverse);
+		setEnabled(12,error);
+		setEnabled(13,reverse);
+		setEnabled(14,error);
+		setEnabled(15,reverse);
 	}
 
 	public void setListener(Listener listener ) {
@@ -215,5 +231,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		public void disparityGuiChange();
 
 		public void disparityRender();
+
+		public void changeInputScale();
 	}
 }

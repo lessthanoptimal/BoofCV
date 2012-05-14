@@ -37,7 +37,7 @@ public class WrapDisparitySadRect <T extends ImageSingleBand, D extends ImageSin
 
 	@Override
 	public void process(T imageLeft, T imageRight) {
-		if( disparity == null )  {
+		if( disparity == null || disparity.width != imageLeft.width || disparity.height != imageLeft.height )  {
 			// make sure the image borders are marked as invalid
 			disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(),imageLeft.width,imageLeft.height);
 			GeneralizedImageOps.fill(disparity,getMaxDisparity()+1);
