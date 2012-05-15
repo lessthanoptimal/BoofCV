@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.disparity;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -88,7 +89,23 @@ public abstract class DisparityScoreRowFormat
 	 * @param right Right rectified stereo image. Input
 	 * @param disparity Disparity between the two images. Output
 	 */
-	public abstract void process( Input left , Input right , Disparity disparity );
+	public void process( Input left , Input right , Disparity disparity ) {
+		// initialize data structures
+		InputSanityCheck.checkSameShape(left, right, disparity);
+
+		if( maxDisparity >  left.width-2*radiusX )
+			throw new RuntimeException(
+					"The maximum disparity is too large for this image size: max size "+(left.width-2*radiusX));
+
+		lengthHorizontal = left.width*rangeDisparity;
+
+		_process(left,right,disparity);
+	}
+
+	/**
+	 * Inner function that computes the disparity.
+	 */
+	public abstract void _process( Input left , Input right , Disparity disparity );
 
 	public abstract Class<Input> getInputType();
 

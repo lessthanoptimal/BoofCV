@@ -21,6 +21,8 @@ package boofcv.alg.feature.disparity.impl;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -28,6 +30,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public abstract class BasicDisparityTests<T extends ImageSingleBand, D extends  ImageSingleBand> {
 	T left;
 	T right;
@@ -37,6 +40,8 @@ public abstract class BasicDisparityTests<T extends ImageSingleBand, D extends  
 	int h = 60;
 
 	int maxDisparity = 40;
+
+	Random rand = new Random();
 
 	public BasicDisparityTests( Class<T> imageType ) {
 		left = GeneralizedImageOps.createSingleBand(imageType,w,h);

@@ -66,8 +66,8 @@ public class GenerateDisparityScoreSadRectFive extends CodeGeneratorBase {
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} which\n" +
-				" * processes {@limk "+typeInput+"} as input images.\n" +
+				" * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} for processing\n" +
+				" * images of type {@link "+typeInput+"}.\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +
@@ -105,11 +105,7 @@ public class GenerateDisparityScoreSadRectFive extends CodeGeneratorBase {
 
 	private void printProcess() {
 		out.print("\t@Override\n" +
-				"\tpublic void process( "+typeInput+" left , "+typeInput+" right , Disparity disparity ) {\n" +
-				"\t\t// initialize data structures\n" +
-				"\t\tInputSanityCheck.checkSameShape(left, right, disparity);\n" +
-				"\n" +
-				"\t\tlengthHorizontal = left.width*rangeDisparity;\n" +
+				"\tpublic void _process( "+typeInput+" left , "+typeInput+" right , Disparity disparity ) {\n" +
 				"\t\tif( horizontalScore == null || verticalScore.length < lengthHorizontal ) {\n" +
 				"\t\t\thorizontalScore = new "+sumType+"[regionHeight][lengthHorizontal];\n" +
 				"\t\t\tverticalScore = new "+sumType+"[regionHeight][lengthHorizontal];\n" +

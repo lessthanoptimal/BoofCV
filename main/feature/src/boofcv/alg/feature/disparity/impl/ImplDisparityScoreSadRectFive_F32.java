@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.disparity.DisparityScoreWindowFive;
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.struct.image.ImageFloat32;
@@ -26,8 +25,8 @@ import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} which
- * processes {@limk ImageFloat32} as input images.
+ * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} for processing
+ * images of type {@link ImageFloat32}.
  * </p>
  *
  * <p>
@@ -63,11 +62,7 @@ public class ImplDisparityScoreSadRectFive_F32<Disparity extends ImageSingleBand
 	}
 
 	@Override
-	public void process( ImageFloat32 left , ImageFloat32 right , Disparity disparity ) {
-		// initialize data structures
-		InputSanityCheck.checkSameShape(left, right, disparity);
-
-		lengthHorizontal = left.width*rangeDisparity;
+	public void _process( ImageFloat32 left , ImageFloat32 right , Disparity disparity ) {
 		if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
 			horizontalScore = new float[regionHeight][lengthHorizontal];
 			verticalScore = new float[regionHeight][lengthHorizontal];

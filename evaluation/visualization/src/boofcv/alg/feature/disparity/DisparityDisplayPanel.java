@@ -166,9 +166,9 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		if( minDisparity >= maxDisparity ) {
 			minDisparity = maxDisparity-1;
 			minDisparitySpinner.setValue(minDisparity);
+		} else {
+			listener.disparitySettingChange();
 		}
-
-		listener.disparitySettingChange();
 	}
 
 	@Override
