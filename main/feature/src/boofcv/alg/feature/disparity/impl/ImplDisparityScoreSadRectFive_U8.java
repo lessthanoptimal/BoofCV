@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.disparity.DisparityScoreWindowFive;
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.struct.image.ImageSingleBand;
@@ -26,8 +25,8 @@ import boofcv.struct.image.ImageUInt8;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} which
- * processes {@limk ImageUInt8} as input images.
+ * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} for processing
+ * images of type {@link ImageUInt8}.
  * </p>
  *
  * <p>
@@ -63,11 +62,7 @@ public class ImplDisparityScoreSadRectFive_U8<Disparity extends ImageSingleBand>
 	}
 
 	@Override
-	public void process( ImageUInt8 left , ImageUInt8 right , Disparity disparity ) {
-		// initialize data structures
-		InputSanityCheck.checkSameShape(left, right, disparity);
-
-		lengthHorizontal = left.width*rangeDisparity;
+	public void _process( ImageUInt8 left , ImageUInt8 right , Disparity disparity ) {
 		if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
 			horizontalScore = new int[regionHeight][lengthHorizontal];
 			verticalScore = new int[regionHeight][lengthHorizontal];

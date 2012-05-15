@@ -114,7 +114,6 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		super(1);
 
 		selectedAlg = 0;
-		activeAlg = createAlg();
 		addAlgorithm(0,"Five Region",0);
 		addAlgorithm(0,"Region",1);
 		addAlgorithm(0,"Region Basic",2);
@@ -175,7 +174,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 			}
 
 			gui.setBufferedImage(img);
-			gui.setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
+			gui.setPreferredSize(new Dimension(origLeft.getWidth(), origLeft.getHeight()));
 			comp = gui;
 		} else {
 			if( !computedCloud ) {
@@ -237,7 +236,6 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	 * Removes distortion and rectifies images.
 	 */
 	private void rectifyInputImages() {
-
 		// get intrinsic camera calibration matrices
 		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(calib.left, null);
 		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(calib.right,null);
@@ -314,26 +312,31 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 	@SuppressWarnings("unchecked")
 	public StereoDisparity<T,D> createAlg() {
+		processCalled = false;
 
 		int r = control.regionRadius;
+
+		// make sure the disparity is in a valid range
+		int maxDisparity = Math.min(colorLeft.getWidth()-2*r,control.maxDisparity);
+		int minDisparity = Math.min(maxDisparity,control.minDisparity);
 
 		if( control.useSubpixel ) {
 			switch( selectedAlg ) {
 				case 2:
 					changeGuiActive(false,false);
-					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,control.minDisparity,
-							control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
+					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,minDisparity,
+							maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
 
 				case 1:
 					changeGuiActive(true,true);
-					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,control.minDisparity,
-							control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
+					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,minDisparity,
+							maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
 							ImageUInt8.class);
 
 				case 0:
 					changeGuiActive(true,true);
 					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-							control.minDisparity, control.maxDisparity, r, r,
+							minDisparity, maxDisparity, r, r,
 							control.pixelError, control.reverseTol, control.texture,
 							ImageUInt8.class);
 
@@ -344,19 +347,19 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 			switch( selectedAlg ) {
 				case 2:
 					changeGuiActive(false,false);
-					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,control.minDisparity,
-							control.maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
+					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,minDisparity,
+							maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
 
 				case 1:
 					changeGuiActive(true,true);
-					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,control.minDisparity,
-							control.maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
+					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,minDisparity,
+							maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
 							ImageUInt8.class);
 
 				case 0:
 					changeGuiActive(true,true);
 					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT_FIVE,
-							control.minDisparity, control.maxDisparity, r, r,
+							minDisparity, maxDisparity, r, r,
 							control.pixelError, control.reverseTol, control.texture,
 							ImageUInt8.class);
 
@@ -395,6 +398,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		colorLeft.createGraphics().drawImage(origLeft, AffineTransform.getScaleInstance(scale,scale),null);
 		colorRight.createGraphics().drawImage(origRight, AffineTransform.getScaleInstance(scale,scale),null);
+
+		activeAlg = createAlg();
 
 		inputLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
 		inputRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
@@ -445,6 +450,7 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		inputs.add(new PathLabel("Wall 1",   dirCalib+"stereo.xml",dirImgs+"wall01_left.jpg",dirImgs+"wall01_right.jpg"));
 //		inputs.add(new PathLabel("Garden 1", dirCalib+"stereo.xml",dirImgs+"garden01_left.jpg",dirImgs+"garden01_right.jpg"));
 		inputs.add(new PathLabel("Garden 2", dirCalib+"stereo.xml",dirImgs+"garden02_left.jpg",dirImgs+"garden02_right.jpg"));
+		inputs.add(new PathLabel("Sundial 1", dirCalib+"stereo.xml",dirImgs+"sundial01_left.jpg",dirImgs+"sundial01_right.jpg"));
 
 		app.setInputList(inputs);
 
