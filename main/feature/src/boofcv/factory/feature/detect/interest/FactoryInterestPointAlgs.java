@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
-import boofcv.abst.feature.detect.intensity.WrapperLaplacianBlobIntensity;
+import boofcv.abst.feature.detect.intensity.WrapperHessianBlobIntensity;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
@@ -88,7 +88,7 @@ public class FactoryInterestPointAlgs {
 												  Class<T> imageType ,
 												  Class<D> derivType)
 	{
-		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
 		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor);
 		detector.setMaxFeatures(maxFeatures);
@@ -115,7 +115,7 @@ public class FactoryInterestPointAlgs {
 										Class<T> imageType ,
 										Class<D> derivType)
 	{
-		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
 		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor);
 		detector.setMaxFeatures(maxFeatures);
@@ -170,7 +170,7 @@ public class FactoryInterestPointAlgs {
 													  Class<T> imageType ,
 													  Class<D> derivType)
 	{
-		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
 		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor);
 		detector.setMaxFeatures(maxFeatures);
@@ -254,7 +254,7 @@ public class FactoryInterestPointAlgs {
 												Class<T> imageType ,
 												Class<D> derivType)
 	{
-		GeneralFeatureIntensity<T, D> intensity = new WrapperLaplacianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType);
 		FeatureExtractor extractor = createExtractor(featureRadius, cornerThreshold, intensity);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensity,extractor);
 		detector.setMaxFeatures(maxFeatures);

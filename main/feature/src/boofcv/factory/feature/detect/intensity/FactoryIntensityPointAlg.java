@@ -20,7 +20,7 @@ package boofcv.factory.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
-import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
+import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.alg.feature.detect.intensity.impl.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageUInt8;
 public class FactoryIntensityPointAlg {
 
 	/**
-	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.KitRosCornerIntensity} from different image types.
+	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.FastCornerIntensity} from different image types.
 	 *
 	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
 	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner.  11 or 12 are good numbers.
@@ -85,7 +85,7 @@ public class FactoryIntensityPointAlg {
 	}
 
 	/**
-	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} from
+	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity} from
 	 * different image types.
 	 *
 	 * @param windowRadius Size of the feature it detects, Try 2.
@@ -94,18 +94,18 @@ public class FactoryIntensityPointAlg {
 	 * @return KLT corner
 	 */
 	public static <D extends ImageSingleBand>
-	KltCornerIntensity<D> klt(int windowRadius, boolean weighted, Class<D> derivType)
+	ShiTomasiCornerIntensity<D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType)
 	{
 		if( derivType == ImageFloat32.class ) {
 			if( weighted )
-				return (KltCornerIntensity<D>)new ImplKltCornerWeighted_F32(windowRadius);
+				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCornerWeighted_F32(windowRadius);
 			else
-				return (KltCornerIntensity<D>)new ImplKltCorner_F32(windowRadius);
+				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCorner_F32(windowRadius);
 		} else if( derivType == ImageSInt16.class ) {
 			if( weighted )
-				return (KltCornerIntensity<D>)new ImplKltCornerWeighted_S16(windowRadius);
+				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCornerWeighted_S16(windowRadius);
 			else
-				return (KltCornerIntensity<D>)new ImplKltCorner_S16(windowRadius);
+				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCorner_S16(windowRadius);
 		} else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
 	}

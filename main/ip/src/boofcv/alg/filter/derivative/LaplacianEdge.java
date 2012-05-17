@@ -61,7 +61,7 @@ public class LaplacianEdge {
 	public static Kernel2D_F32 kernel_F32 = new Kernel2D_F32(3, new float[]{0,1,0,1,-4,1,0,1,0});
 
 	/**
-	 * Computes the Laplacean of 'orig'.
+	 * Computes the Laplacian of 'orig'.
 	 *
 	 * @param orig  Input image.  Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.

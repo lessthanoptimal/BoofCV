@@ -119,8 +119,8 @@ public class BenchmarkCornerRuntime {
 		return FactoryCornerDetector.createKitRos(windowRadius,1,maxFeatures,derivType);
 	}
 
-	public static GeneralFeatureDetector<?,?> createKlt() {
-		return FactoryCornerDetector.createKlt(windowRadius, false, 1,maxFeatures,derivType);
+	public static GeneralFeatureDetector<?,?> createShiTomasi() {
+		return FactoryCornerDetector.createShiTomasi(windowRadius, false, 1,maxFeatures,derivType);
 	}
 
 	public static void main(String args[]) {
@@ -147,7 +147,7 @@ public class BenchmarkCornerRuntime {
 			imageType = ImageFloat32.class;
 			derivType = ImageFloat32.class;
 
-			benchmark(createKlt(), "KLT F32");
+			benchmark(createShiTomasi(), "KLT F32");
 			benchmark(createFast12(), "Fast F32");
 			benchmark(createHarris(), "Harris F32");
 			benchmark(createKitRos(), "Kit Ros F32");
@@ -156,7 +156,7 @@ public class BenchmarkCornerRuntime {
 			imageType = ImageUInt8.class;
 			derivType = ImageSInt16.class;
 
-			benchmark(createKlt(), "KLT U8");
+			benchmark(createShiTomasi(), "KLT U8");
 			benchmark(createFast12(), "Fast U8");
 			benchmark(createHarris(), "Harris U8");
 			benchmark(createKitRos(), "Kit Ros U8");

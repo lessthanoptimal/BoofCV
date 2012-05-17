@@ -402,6 +402,8 @@
     </dictionary>
     <dictionary name="pja">
       <words>
+        <w>convolves</w>
+        <w>convolving</w>
         <w>discretization</w>
         <w>discretized</w>
         <w>epipole</w>

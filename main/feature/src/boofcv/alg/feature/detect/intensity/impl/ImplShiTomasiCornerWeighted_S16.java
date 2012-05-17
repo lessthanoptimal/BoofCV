@@ -18,29 +18,30 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
+import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.struct.image.ImageSInt16;
-
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} based off of {@link ImplSsdCornerNaive}.
+ * Implementation of {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity}
+ * that samples pixels using a Gaussian distribution based off of {@link ImplSsdCornerWeighted_F32}.
  * </p>
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ImplKltCorner_S16 extends ImplSsdCorner_S16 implements KltCornerIntensity<ImageSInt16> {
-	public ImplKltCorner_S16(int windowRadius) {
-		super(windowRadius);
+public class ImplShiTomasiCornerWeighted_S16 extends ImplSsdCornerWeighted_S16
+		implements ShiTomasiCornerIntensity<ImageSInt16>
+{
+	public ImplShiTomasiCornerWeighted_S16(int radius) {
+		super(radius);
 	}
 
 	@Override
-	protected float computeIntensity() {
+	protected float computeResponse() {
 		// compute the smallest eigenvalue
-		double left = (totalXX + totalYY) * 0.5f;
-		double b = (totalXX - totalYY) * 0.5f;
-		double right = Math.sqrt(b * b + (double)totalXY * totalXY);
+		double left = (totalXX + totalYY) * 0.5;
+		double b = (totalXX - totalYY) * 0.5;
+		double right = Math.sqrt(b * b + totalXY * totalXY);
 
 		// the smallest eigenvalue will be minus the right side
 		return (float)(left - right);

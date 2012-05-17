@@ -18,21 +18,21 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
+import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.struct.image.ImageFloat32;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity}
+ * Implementation of {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity}
  * that samples pixels using a Gaussian distribution based off of {@link ImplSsdCornerWeighted_F32}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImplKltCornerWeighted_F32 extends ImplSsdCornerWeighted_F32
-		implements KltCornerIntensity<ImageFloat32>
+public class ImplShiTomasiCornerWeighted_F32 extends ImplSsdCornerWeighted_F32
+		implements ShiTomasiCornerIntensity<ImageFloat32>
 {
-	public ImplKltCornerWeighted_F32(int radius) {
+	public ImplShiTomasiCornerWeighted_F32(int radius) {
 		super(radius);
 	}
 

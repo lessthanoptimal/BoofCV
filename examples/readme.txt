@@ -1,14 +1,35 @@
 Running these examples requires that JDK 1.6 or later has been installed.  The examples can either be run through the provided ant script or by using your favorite IDE.  Instructions for running ant scripts in Linux is provided below.
 
+---------------------------------------------------------
+---- DATA FILES ----
+---------------------------------------------------------
 
+Before you attempt to run any example make sure you have all the data files! If you are not sure if you have the data files already look in the 'boofcv/data' directory and if it is empty you need to download it.
+
+Scenario A: You checkout the git repository.
+
+The data is stored in a submodule which can be grabbed by typing the following:
+
+git submodule init
+git submodule update
+
+Scenario B: You got the source code from somewhere else and there is no data directory:
+
+Checkout the data files from github.  You can also just download them directly from github too:
+
+git@github.com:lessthanoptimal/BoofCV-Data.git
+
+
+---------------------------------------------------------
 ---- Ant Instructions: Linux/Unix ----
+---------------------------------------------------------
 
 First make sure that the JDK and Ant are correctly installed.
 
 Ant:   http://ant.apache.org/
 JDK:   http://www.oracle.com/technetwork/java/index.html
 
-The procedure to compile the example code in linux goes something like this:
+The procedure to compile the example code in Linux goes something like this:
 
 ------------- BEGIN PASTE ----------------------
 cd boofcv/main/

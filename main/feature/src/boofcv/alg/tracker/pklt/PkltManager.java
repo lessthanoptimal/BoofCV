@@ -67,8 +67,8 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	public PkltManager(PkltManagerConfig<I,D> config )
 	{
 		GeneralFeatureDetector<I,D> detector =
-				FactoryCornerDetector.createKlt(config.featureRadius,
-						false, config.config.minDeterminant,config.maxFeatures,config.typeDeriv);
+				FactoryCornerDetector.createShiTomasi(config.featureRadius,
+						false, config.config.minDeterminant, config.maxFeatures, config.typeDeriv);
 
 		GenericPkltFeatSelector<I, D> featureSelector =
 				new GenericPkltFeatSelector<I,D>( detector ,null);
