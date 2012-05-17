@@ -138,7 +138,7 @@ public class HomographyLinear4 {
 			return true;
 
 		if( A.numRows > 8 )
-			SingularOps.nullSpace(svd,H);
+			SingularOps.nullVector(svd,H);
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column

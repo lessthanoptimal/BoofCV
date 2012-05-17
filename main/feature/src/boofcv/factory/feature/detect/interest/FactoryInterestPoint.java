@@ -42,6 +42,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
+// TODO rename.  These detect location, scale and possibly orientation
 public class FactoryInterestPoint {
 
 	/**

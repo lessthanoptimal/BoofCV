@@ -27,6 +27,7 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 
@@ -50,6 +51,8 @@ public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPan
 
 	public ImagePyramidPanel(ImagePyramid<T> pyramid, boolean scaleUp) {
 		set(pyramid,scaleUp);
+		render();
+		setPreferredSize(new Dimension(pyramid.getWidth(0),pyramid.getHeight(0)));
 	}
 
 	public ImagePyramidPanel() {

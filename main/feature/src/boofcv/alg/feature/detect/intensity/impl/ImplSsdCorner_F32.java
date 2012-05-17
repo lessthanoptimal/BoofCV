@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
+import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
 
 
@@ -63,7 +64,7 @@ public abstract class ImplSsdCorner_F32 implements GradientCornerIntensity<Image
 	// the intensity of the found features in the image
 	private ImageFloat32 featureIntensity = new ImageFloat32(1,1);
 
-	// defines the A matrix, from which the eignevalues are computed
+	// defines the A matrix, from which the eigenvalues are computed
 	protected float totalXX, totalYY, totalXY;
 
 	// used to keep track of where it is in the image
@@ -78,7 +79,11 @@ public abstract class ImplSsdCorner_F32 implements GradientCornerIntensity<Image
 		horizYY.reshape(imageWidth,imageHeight);
 		horizXY.reshape(imageWidth,imageHeight);
 
-		featureIntensity.reshape(imageWidth,imageHeight);
+		if( featureIntensity.width != imageWidth || featureIntensity.height != imageHeight ) {
+			featureIntensity.reshape(imageWidth,imageHeight);
+			// make sure the borders are zero
+			ImageTestingOps.fill(featureIntensity,0);
+		}
 
 		if( tempXX.length < imageWidth ) {
 			tempXX = new float[imageWidth];

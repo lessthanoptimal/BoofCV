@@ -23,7 +23,7 @@ import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
+import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -73,7 +73,7 @@ public class FactoryIntensityPoint {
 	}
 
 	/**
-	 * Feature intensity for KLT corner detector.  See {@link KltCornerIntensity} for more details.
+	 * Feature intensity for KLT corner detector.  See {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity} for more details.
 	 *
 	 * @param windowRadius Size of the feature it detects, Try 2.
 	 * @param weighted Should the it be weighted by a Gaussian kernel?  Unweighted is much faster.
@@ -83,8 +83,8 @@ public class FactoryIntensityPoint {
 	 * @return KLT feature intensity
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureIntensity<I,D>  klt(int windowRadius, boolean weighted, Class<D> derivType) {
-		KltCornerIntensity<D> alg =  FactoryIntensityPointAlg.klt(windowRadius, weighted, derivType);
+	GeneralFeatureIntensity<I,D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType) {
+		ShiTomasiCornerIntensity<D> alg =  FactoryIntensityPointAlg.shiTomasi(windowRadius, weighted, derivType);
 		return new WrapperGradientCornerIntensity<I, D>(alg);
 	}
 
@@ -115,15 +115,17 @@ public class FactoryIntensityPoint {
 	}
 
 	/**
-	 * Feature intensity for median corner detector. See {@Link HessianBlobIntensity} for more details.
+	 * Blob detector which uses the image's second order derivatives.
+	 *
+	 * @see HessianBlobIntensity
 	 *
 	 * @param type Type of Hessian
 	 * @param <I> Input image type.
 	 * @param <D> Derivative type.
-	 * @return Median feature intensity
+	 * @return Hessian based blob intensity
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureIntensity<I,D>  laplacian( HessianBlobIntensity.Type type , Class<D> derivType) {
-		return new WrapperLaplacianBlobIntensity<I, D>(type,derivType);
+	GeneralFeatureIntensity<I,D> hessian(HessianBlobIntensity.Type type, Class<D> derivType) {
+		return new WrapperHessianBlobIntensity<I, D>(type,derivType);
 	}
 }

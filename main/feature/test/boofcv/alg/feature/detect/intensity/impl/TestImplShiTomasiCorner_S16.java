@@ -35,7 +35,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestImplKltCorner_S16 {
+public class TestImplShiTomasiCorner_S16 {
 	int width = 15;
 	int height = 20;
 
@@ -45,7 +45,7 @@ public class TestImplKltCorner_S16 {
 
 			@Override
 			public ImageFloat32 computeIntensity() {
-				ImplKltCorner_S16 alg = new ImplKltCorner_S16(1);
+				ImplShiTomasiCorner_S16 alg = new ImplShiTomasiCorner_S16(1);
 				alg.process(derivX_I16,derivY_I16);
 				return alg.getIntensity();
 			}
@@ -75,7 +75,7 @@ public class TestImplKltCorner_S16 {
 		ImplSsdCornerNaive naive = new ImplSsdCornerNaive(width, height, 3, false);
 		naive.process(derivX, derivY);
 
-		ImplKltCorner_S16 fast = new ImplKltCorner_S16(3);
+		ImplShiTomasiCorner_S16 fast = new ImplShiTomasiCorner_S16(3);
 		fast.process(derivX, derivY);
 
 		BoofTesting.assertEquals(naive.getIntensity(), fast.getIntensity());

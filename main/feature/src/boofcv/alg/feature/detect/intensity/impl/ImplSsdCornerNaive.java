@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
+import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_I32;
@@ -26,14 +26,14 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Naive implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} which performs computations in a straight
+ * Naive implementation of {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity} which performs computations in a straight
  * forward but inefficient manor.  This class is used to validate the correctness of more complex but efficient
  * implementations.
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ImplSsdCornerNaive<T extends ImageSingleBand> implements KltCornerIntensity<T> {
+public class ImplSsdCornerNaive<T extends ImageSingleBand> implements ShiTomasiCornerIntensity<T> {
 
 	// feature's radius
 	private int radius;

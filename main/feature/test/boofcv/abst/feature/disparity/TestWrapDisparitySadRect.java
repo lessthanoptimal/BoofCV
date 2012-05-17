@@ -34,7 +34,8 @@ public class TestWrapDisparitySadRect {
 	 */
 	@Test
 	public void borderSetToInvalid() {
-		Foo foo = new Foo(1,11,2,2);
+		int range = 4;
+		Foo foo = new Foo(1,1+range,2,2);
 		WrapDisparitySadRect<ImageFloat32,ImageFloat32> alg = new WrapDisparitySadRect<ImageFloat32, ImageFloat32>(foo);
 
 		ImageFloat32 l = new ImageFloat32(10,20);
@@ -46,7 +47,7 @@ public class TestWrapDisparitySadRect {
 
 		for( int y = 0; y < found.height; y++ )
 			for( int x = 0; x < found.width; x++ )
-				assertTrue(found.get(x,y) > 10 );
+				assertTrue(x+" "+y,found.get(x,y) > range );
 	}
 
 	private static class Foo extends DisparityScoreSadRect<ImageFloat32,ImageFloat32>
@@ -56,7 +57,7 @@ public class TestWrapDisparitySadRect {
 		}
 
 		@Override
-		public void process(ImageFloat32 left, ImageFloat32 right, ImageFloat32 imageFloat32) {
+		public void _process(ImageFloat32 left, ImageFloat32 right, ImageFloat32 imageFloat32) {
 		}
 
 		@Override

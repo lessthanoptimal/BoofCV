@@ -22,7 +22,6 @@ import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityTests;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.core.image.ConvertImage;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_I32;
 import boofcv.struct.image.ImageFloat32;
@@ -36,10 +35,9 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestImplKltCornerWeighted_F32 {
-
+public class TestImplShiTomasiCornerWeighted_S16 {
 	int width = 15;
-	int height = 15;
+	int height = 20;
 
 	@Test
 	public void genericTests() {
@@ -47,8 +45,8 @@ public class TestImplKltCornerWeighted_F32 {
 
 			@Override
 			public ImageFloat32 computeIntensity() {
-				ImplKltCornerWeighted_F32 alg = new ImplKltCornerWeighted_F32(1);
-				alg.process(derivX_F32,derivY_F32);
+				ImplShiTomasiCornerWeighted_S16 alg = new ImplShiTomasiCornerWeighted_S16(1);
+				alg.process(derivX_I16,derivY_I16);
 				return alg.getIntensity();
 			}
 		};
@@ -57,8 +55,6 @@ public class TestImplKltCornerWeighted_F32 {
 	}
 
 	/**
-	 * Sees if the integer version and this version produce the same results.
-	 * <p/>
 	 * Creates a random image and looks for corners in it.  Sees if the naive
 	 * and fast algorithm produce exactly the same results.
 	 */
@@ -67,24 +63,23 @@ public class TestImplKltCornerWeighted_F32 {
 		ImageUInt8 img = new ImageUInt8(width, height);
 		ImageTestingOps.randomize(img, new Random(0xfeed), 0, 100);
 
-		ImageSInt16 derivX_I = new ImageSInt16(img.getWidth(), img.getHeight());
-		ImageSInt16 derivY_I = new ImageSInt16(img.getWidth(), img.getHeight());
+		ImageSInt16 derivX = new ImageSInt16(img.getWidth(), img.getHeight());
+		ImageSInt16 derivY = new ImageSInt16(img.getWidth(), img.getHeight());
 
-		GradientSobel.process(img, derivX_I, derivY_I, new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+		GradientSobel.process(img, derivX, derivY, new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 
-		ImageFloat32 derivX_F = ConvertImage.convert(derivX_I, (ImageFloat32) null);
-		ImageFloat32 derivY_F = ConvertImage.convert(derivY_I, (ImageFloat32)null);
-
-		BoofTesting.checkSubImage(this, "compareToNaive", true, derivX_F, derivY_F);
+		BoofTesting.checkSubImage(this, "compareToNaive", true, derivX, derivY);
 	}
 
-	public void compareToNaive( ImageFloat32 derivX_F, ImageFloat32 derivY_F) {
-		ImplSsdCornerNaive<ImageFloat32> ssd_I = new ImplSsdCornerNaive<ImageFloat32>(width, height, 3, true);
-		ssd_I.process(derivX_F, derivY_F);
+	public void compareToNaive(ImageSInt16 derivX, ImageSInt16 derivY) {
+		ImplSsdCornerNaive naive = new ImplSsdCornerNaive(width, height, 3, true);
+		naive.process(derivX, derivY);
 
-		ImplKltCornerWeighted_F32 ssd_F = new ImplKltCornerWeighted_F32( 3);
-		ssd_F.process(derivX_F, derivY_F);
+		ImplShiTomasiCornerWeighted_S16 fast = new ImplShiTomasiCornerWeighted_S16(3);
+		fast.process(derivX, derivY);
 
-		BoofTesting.assertEquals(ssd_I.getIntensity(), ssd_F.getIntensity(), 3, 1f);
+		// how the weighted is applied is different between these two verisons, which is why the error
+		// tolerance is so high
+		BoofTesting.assertEquals(naive.getIntensity(), fast.getIntensity(),3,0.5);
 	}
 }

@@ -20,6 +20,7 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -52,7 +53,12 @@ public class WrapperMedianCornerIntensity<I extends ImageSingleBand, D extends I
 
 	@Override
 	public void process(I input, D derivX , D derivY , D derivXX , D derivYY , D derivXY ) {
-		intensity.reshape(input.width,input.height);
+		if( intensity.width != input.width || intensity.height != input.height ) {
+			intensity.reshape(input.width,input.height);
+			// zero the image to make sure it's borders values are zero
+			GeneralizedImageOps.fill(intensity, 0);
+		}
+
 		if( medianImage == null ) {
 			medianImage = (I)input._createNew(input.width,input.height);
 		} else {

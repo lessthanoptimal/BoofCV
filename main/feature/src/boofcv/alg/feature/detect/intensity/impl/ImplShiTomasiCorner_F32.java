@@ -18,22 +18,22 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.feature.detect.intensity.KltCornerIntensity;
+import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.struct.image.ImageFloat32;
 
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.KltCornerIntensity} based off of {@link ImplSsdCorner_F32}.
+ * Implementation of {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity} based off of {@link ImplSsdCorner_F32}.
  * </p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ImplKltCorner_F32 extends ImplSsdCorner_F32 implements KltCornerIntensity<ImageFloat32> {
+public class ImplShiTomasiCorner_F32 extends ImplSsdCorner_F32 implements ShiTomasiCornerIntensity<ImageFloat32> {
 
 
-	public ImplKltCorner_F32(int windowRadius) {
+	public ImplShiTomasiCorner_F32(int windowRadius) {
 		super(windowRadius);
 	}
 

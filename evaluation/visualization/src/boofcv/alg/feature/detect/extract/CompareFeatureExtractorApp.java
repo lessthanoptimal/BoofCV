@@ -84,11 +84,11 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		this.imageType = imageType;
 
 		addAlgorithm(0, "Harris", FactoryIntensityPoint.harris(radius, 0.04f, false, imageType));
-		addAlgorithm(0, "KLT", FactoryIntensityPoint.klt(radius, false, derivType));
+		addAlgorithm(0, "KLT", FactoryIntensityPoint.shiTomasi(radius, false, derivType));
 		addAlgorithm(0, "FAST", FactoryIntensityPoint.fast(5, 11, derivType));
 		addAlgorithm(0, "KitRos", FactoryIntensityPoint.kitros(derivType));
-		addAlgorithm(0, "Laplace Det", FactoryIntensityPoint.laplacian(HessianBlobIntensity.Type.DETERMINANT, derivType));
-		addAlgorithm(0, "Laplace Trace", FactoryIntensityPoint.laplacian(HessianBlobIntensity.Type.TRACE, derivType));
+		addAlgorithm(0, "Laplace Det", FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT, derivType));
+		addAlgorithm(0, "Laplace Trace", FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE, derivType));
 
 		deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 

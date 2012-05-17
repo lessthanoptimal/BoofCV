@@ -139,7 +139,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		derivX = GeneralizedImageOps.createSingleBand(derivType,1,1);
 		derivY = GeneralizedImageOps.createSingleBand(derivType,1,1);
 
-		intensityAlg = FactoryIntensityPoint.klt(radius,true,derivType);
+		intensityAlg = FactoryIntensityPoint.shiTomasi(radius, true, derivType);
 //		intensityAlg = FactoryIntensityPoint.harris(radius,0.04f,true,derivType);
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(radius+2,20,radius,false,true);

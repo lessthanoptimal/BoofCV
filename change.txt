@@ -3,6 +3,15 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 
+Version : Alpha 0.9
+
+- Removed FactoryBlobDetector and merged it with FactoryCornerDetector
+- Renamed KLT corner to Shi Tomasi corner, which is more standard
+- Fixed bug various point detectors where if the input image was resized the edge intensity might not be zero when it should be
+
+
+---------------------------------------------
 Date    : 2012/05/13
 Version : Alpha 0.8
 

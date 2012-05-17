@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -31,13 +32,13 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class WrapperLaplacianBlobIntensity <I extends ImageSingleBand, D extends ImageSingleBand> implements GeneralFeatureIntensity<I,D> {
+public class WrapperHessianBlobIntensity<I extends ImageSingleBand, D extends ImageSingleBand> implements GeneralFeatureIntensity<I,D> {
 
 	HessianBlobIntensity.Type type;
 	ImageFloat32 intensity = new ImageFloat32(1,1);
 	Method m;
 
-	public WrapperLaplacianBlobIntensity(HessianBlobIntensity.Type type, Class<D> derivType ) {
+	public WrapperHessianBlobIntensity(HessianBlobIntensity.Type type, Class<D> derivType) {
 		this.type = type;
 		try {
 			switch( type ) {
@@ -60,7 +61,11 @@ public class WrapperLaplacianBlobIntensity <I extends ImageSingleBand, D extends
 	@Override
 	public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
 
-		intensity.reshape(image.width,image.height);
+		if( intensity.width != image.width || intensity.height != image.height ) {
+			intensity.reshape(image.width,image.height);
+			// zero the image to make sure it's borders values are zero
+			GeneralizedImageOps.fill(intensity, 0);
+		}
 
 		try {
 			switch( type ) {

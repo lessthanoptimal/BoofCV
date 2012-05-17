@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageSingleBand;
  * feature intensity image using {@link boofcv.abst.feature.detect.extract.FeatureExtractor}.
  * </p>
  * <p>
- * An important consideration when using this detector in other applications than a KLT tracker is that the
+ * An important consideration when using this detector in some applications is that the
  * selected corners will not lie on the actual corner.  They lie inside of the corner itself.  This can bias
  * measurements when used to extract the location of a physical object in an image.
  * </p>
@@ -45,7 +45,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface KltCornerIntensity<T extends ImageSingleBand> extends GradientCornerIntensity<T> {
+public interface ShiTomasiCornerIntensity<T extends ImageSingleBand> extends GradientCornerIntensity<T> {
 
 	/**
 	 * Returns the radius of the feature being computed.  Features are square in shape with a width = 2*radius+1.

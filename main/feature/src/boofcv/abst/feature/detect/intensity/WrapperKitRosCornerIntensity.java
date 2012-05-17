@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.KitRosCornerIntensity;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -46,7 +47,11 @@ public class WrapperKitRosCornerIntensity<I extends ImageSingleBand,D extends Im
 
 	@Override
 	public void process(I image , D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
-		intensity.reshape(image.width,image.height);
+		if( intensity.width != image.width || intensity.height != image.height ) {
+			intensity.reshape(image.width,image.height);
+			// zero the image to make sure it's borders values are zero
+			GeneralizedImageOps.fill(intensity, 0);
+		}
 
 		try {
 			m.invoke(null,intensity,derivX,derivY,derivXX,derivYY,derivXY);

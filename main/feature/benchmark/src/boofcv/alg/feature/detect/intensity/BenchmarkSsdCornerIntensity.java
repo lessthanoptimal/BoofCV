@@ -54,7 +54,7 @@ public class BenchmarkSsdCornerIntensity {
 	static Random rand = new Random(234);
 
 	public static class KLT_F32 extends PerformerBase {
-		ImplKltCorner_F32 corner = new ImplKltCorner_F32(windowRadius);
+		ImplShiTomasiCorner_F32 corner = new ImplShiTomasiCorner_F32(windowRadius);
 
 		@Override
 		public void process() {
@@ -63,7 +63,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KLT_WEIGHT_F32 extends PerformerBase {
-		ImplKltCornerWeighted_F32 corner = new ImplKltCornerWeighted_F32(windowRadius);
+		ImplShiTomasiCornerWeighted_F32 corner = new ImplShiTomasiCornerWeighted_F32(windowRadius);
 
 		@Override
 		public void process() {
@@ -72,7 +72,7 @@ public class BenchmarkSsdCornerIntensity {
 	}
 
 	public static class KLT_I16 extends PerformerBase {
-		ImplKltCorner_S16 corner = new ImplKltCorner_S16(windowRadius);
+		ImplShiTomasiCorner_S16 corner = new ImplShiTomasiCorner_S16(windowRadius);
 
 		@Override
 		public void process() {
@@ -80,7 +80,7 @@ public class BenchmarkSsdCornerIntensity {
 		}
 	}
 	public static class KLT_WEIGHT_I16 extends PerformerBase {
-		ImplKltCornerWeighted_S16 corner = new ImplKltCornerWeighted_S16(windowRadius);
+		ImplShiTomasiCornerWeighted_S16 corner = new ImplShiTomasiCornerWeighted_S16(windowRadius);
 
 		@Override
 		public void process() {

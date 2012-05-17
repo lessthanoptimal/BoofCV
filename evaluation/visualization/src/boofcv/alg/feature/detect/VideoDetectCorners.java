@@ -130,7 +130,7 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 		int maxCorners = 200;
 		int radius = 2;
 
-		GeneralFeatureIntensity<T,D> intensity = new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.klt(radius, false, derivType));
+		GeneralFeatureIntensity<T,D> intensity = new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.shiTomasi(radius, false, derivType));
 //		GeneralFeatureIntensity<T, D> intensity =
 //				new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.createFast12(imageType, 8 , 12));
 

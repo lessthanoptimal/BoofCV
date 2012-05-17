@@ -22,7 +22,7 @@ import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
- * The Harris corner detector [1] is similar to the {@link KltCornerIntensity} but avoids computing the eigenvalues
+ * The Harris corner detector [1] is similar to the {@link ShiTomasiCornerIntensity} but avoids computing the eigenvalues
  * directly.  In theory this should be more computationally efficient.
  * </p>
  *

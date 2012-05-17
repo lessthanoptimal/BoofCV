@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestImplKltCorner_F32 {
+public class TestImplShiTomasiCorner_F32 {
 
 	int width = 15;
 	int height = 15;
@@ -48,7 +48,7 @@ public class TestImplKltCorner_F32 {
 
 			@Override
 			public ImageFloat32 computeIntensity() {
-				ImplKltCorner_F32 alg = new ImplKltCorner_F32(1);
+				ImplShiTomasiCorner_F32 alg = new ImplShiTomasiCorner_F32(1);
 				alg.process(derivX_F32,derivY_F32);
 				return alg.getIntensity();
 			}
@@ -83,7 +83,7 @@ public class TestImplKltCorner_F32 {
 		ImplSsdCornerNaive<ImageFloat32> ssd_I = new ImplSsdCornerNaive<ImageFloat32>(width, height, 3, false);
 		ssd_I.process(derivX_F, derivY_F);
 
-		ImplKltCorner_F32 ssd_F = new ImplKltCorner_F32( 3);
+		ImplShiTomasiCorner_F32 ssd_F = new ImplShiTomasiCorner_F32( 3);
 		ssd_F.process(derivX_F, derivY_F);
 
 		BoofTesting.assertEquals(ssd_I.getIntensity(), ssd_F.getIntensity(), 0, 1f);

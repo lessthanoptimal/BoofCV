@@ -108,14 +108,14 @@ public class Zhang99CalibrationMatrixFromHomographies {
 				DenseMatrix64F V = svd.getV(false);
 				SpecializedOps.subvector(V, 0, 4, V.numRows, false, 0, b);
 			} else {
-				SingularOps.nullSpace(svd,b);
+				SingularOps.nullVector(svd,b);
 			}
 			computeParam_ZeroSkew();
 		} else {
 			setupA(homographies);
 			if( !svd.decompose(A) )
 				throw new RuntimeException("SVD failed");
-			SingularOps.nullSpace(svd,b);
+			SingularOps.nullVector(svd,b);
 			computeParam();
 		}
 	}

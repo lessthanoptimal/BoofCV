@@ -138,7 +138,7 @@ public class FundamentalLinear8 {
 			return true;
 
 		if( A.numRows > 8 )
-			SingularOps.nullSpace(svd,F);
+			SingularOps.nullVector(svd,F);
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
