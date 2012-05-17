@@ -35,8 +35,10 @@ public abstract class GenericCornerIntensityTests {
 
 	protected ImageUInt8 imageI = new ImageUInt8(width,height);
 	protected ImageFloat32 imageF = new ImageFloat32(width,height);
+	protected ImageFloat32 intensity = new ImageFloat32(width,height);
 
-	public abstract ImageFloat32 computeIntensity();
+
+	public abstract void computeIntensity( ImageFloat32 intensity );
 
 	public void performAllTests() {
 		testLargerCorner();
@@ -72,14 +74,14 @@ public abstract class GenericCornerIntensityTests {
 	private float getResponse() {
 		computeDerivatives();
 
-		ImageFloat32 a = computeIntensity();
+		computeIntensity(intensity);
 
 		// return the sum of the region around the corner
 		// so that the intensity doesn't have to be right on the corner.
 		float sum = 0;
 		for( int i = -1; i <= 1; i++ ) {
 			for( int j = -1; j <= 1; j++ ) {
-				sum += a.get(width/2+j,height/2+j);
+				sum += intensity.get(width/2+j,height/2+j);
 			}
 		}
 		return sum;
@@ -88,9 +90,9 @@ public abstract class GenericCornerIntensityTests {
 	private float getResponseAway() {
 		computeDerivatives();
 
-		ImageFloat32 a = computeIntensity();
+		computeIntensity(intensity);
 
-		return a.get(2,2);
+		return intensity.get(2,2);
 	}
 
 	public ImageUInt8 createUniformI8() {

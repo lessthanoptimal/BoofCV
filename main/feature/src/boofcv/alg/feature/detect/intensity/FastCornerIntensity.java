@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.intensity;
 
 import boofcv.struct.QueueCorner;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -42,8 +43,9 @@ public interface FastCornerIntensity<T extends ImageSingleBand> extends FeatureI
 	 * Extracts corner features from the provided image.
 	 *
 	 * @param input Input image which corners are to be detected inside of.
+	 * @param intensity Output intensity image.
 	 */
-	public void process( T input );
+	public void process( T input , ImageFloat32 intensity );
 
 	/**
 	 * Returns a list of candidate locations for corners.  All other pixels are assumed to not be corners.

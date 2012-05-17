@@ -34,8 +34,7 @@ public class TestImplHarrisCorner_S16 extends GenericCornerIntensityGradientTest
 	}
 
 	@Override
-	public ImageFloat32 computeIntensity() {
-		detector.process(derivX_I16,derivY_I16);
-		return detector.getIntensity();
+	public void computeIntensity( ImageFloat32 intensity ) {
+		detector.process(derivX_I16,derivY_I16,intensity);
 	}
 }

@@ -18,22 +18,10 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
-import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.image.ImageFloat32;
-
-
 /**
  * <p>
- * Several corner detector algorithms work by computing a symmetric matrix whose elements are composed of the convolution
- * of the image's gradient squared.  This is done for X*X, X*Y, and X*X.  Once the matrix has been constructed
- * it is used to estimate how corner like the pixel under consideration is.  This class provides a generalized
- * interface for performing these calculations in an optimized manor.
- * </p>
- * 
- * <p>
- * NOTE: Image borders are not processed.  The zeros in the image border need to be taken in account when
- * extract features using algorithms such as non-max suppression.
+ * Implementation of {@link ImplSsdCornerBase} for {@link ImageFloat32}.
  * </p>
  * 
  * <p>
@@ -42,48 +30,23 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public abstract class ImplSsdCorner_F32 implements GradientCornerIntensity<ImageFloat32> {
-
-	// input image gradient
-	protected ImageFloat32 derivX;
-	protected ImageFloat32 derivY;
-
-	// radius of detected features
-	protected int radius;
-
-	// temporary storage for intensity derivatives summations
-	private ImageFloat32 horizXX = new ImageFloat32(1,1);
-	private ImageFloat32 horizXY = new ImageFloat32(1,1);
-	private ImageFloat32 horizYY = new ImageFloat32(1,1);
+public abstract class ImplSsdCorner_F32 extends ImplSsdCornerBase<ImageFloat32,ImageFloat32> {
 
 	// temporary storage for convolution along in the vertical axis.
 	private float tempXX[] = new float[1];
 	private float tempXY[] = new float[1];
 	private float tempYY[] = new float[1];
 
-	// the intensity of the found features in the image
-	private ImageFloat32 featureIntensity = new ImageFloat32(1,1);
-
 	// defines the A matrix, from which the eigenvalues are computed
 	protected float totalXX, totalYY, totalXY;
 
-	// used to keep track of where it is in the image
-	protected int x, y;
-
 	public ImplSsdCorner_F32( int windowRadius) {
-		this.radius = windowRadius;
+		super(windowRadius,ImageFloat32.class);
 	}
 
+	@Override
 	public void setImageShape( int imageWidth, int imageHeight ) {
-		horizXX.reshape(imageWidth,imageHeight);
-		horizYY.reshape(imageWidth,imageHeight);
-		horizXY.reshape(imageWidth,imageHeight);
-
-		if( featureIntensity.width != imageWidth || featureIntensity.height != imageHeight ) {
-			featureIntensity.reshape(imageWidth,imageHeight);
-			// make sure the borders are zero
-			ImageTestingOps.fill(featureIntensity,0);
-		}
+		super.setImageShape(imageWidth,imageHeight);
 
 		if( tempXX.length < imageWidth ) {
 			tempXX = new float[imageWidth];
@@ -92,49 +55,12 @@ public abstract class ImplSsdCorner_F32 implements GradientCornerIntensity<Image
 		}
 	}
 
-	@Override
-	public int getRadius() {
-		return radius;
-	}
-
-	@Override
-	public ImageFloat32 getIntensity() {
-		return featureIntensity;
-	}
-	
-	/**
-	 * Computes the pixel's corner intensity.
-	 * @return corner intensity.
-	 */
-	protected abstract float computeIntensity();
-
-	@Override
-	public int getIgnoreBorder() {
-		return radius;
-	}
-
-	@Override
-	public void process(ImageFloat32 derivX, ImageFloat32 derivY) {
-		if( tempXX == null ) {
-			if (derivX.getWidth() != derivY.getWidth() || derivX.getHeight() != derivY.getHeight()) {
-				throw new IllegalArgumentException("Input image sizes do not match");
-			}
-			setImageShape(derivX.getWidth(),derivX.getHeight());
-		} else if (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {
-			setImageShape(derivX.getWidth(),derivX.getHeight());
-		}
-		this.derivX = derivX;
-		this.derivY = derivY;
-
-		horizontal();
-		vertical();
-	}
-
 /**
 	 * Compute the derivative sum along the x-axis while taking advantage of duplicate
 	 * calculations for each window.
 	 */
-	private void horizontal() {
+	@Override
+	protected void horizontal() {
 		float[] dataX = derivX.data;
 		float[] dataY = derivY.data;
 
@@ -204,11 +130,12 @@ public abstract class ImplSsdCorner_F32 implements GradientCornerIntensity<Image
 	 * Compute the derivative sum along the y-axis while taking advantage of duplicate
 	 * calculations for each window and avoiding cache misses. Then compute the eigen values
 	 */
-	private void vertical() {
+	@Override
+	protected void vertical( ImageFloat32 intensity ) {
 		float[] hXX = horizXX.data;
 		float[] hXY = horizXY.data;
 		float[] hYY = horizYY.data;
-		final float[] inten = featureIntensity.data;
+		final float[] inten = intensity.data;
 
 		final int imgHeight = horizXX.getHeight();
 		final int imgWidth = horizXX.getWidth();

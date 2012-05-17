@@ -48,7 +48,8 @@ public interface GeneralFeatureIntensity<I extends ImageSingleBand,D extends Ima
 	public void process( I image , D derivX , D derivY , D derivXX , D derivYY , D derivXY );
 
 	/**
-	 * Returns an image containing an intensity mapping showing how corner like each pixel is
+	 * Returns an image containing an intensity mapping showing how corner like each pixel is.
+	 * Unprocessed image borders will have a value of zero.
 	 *
 	 * @return Corner intenisty image.
 	 */

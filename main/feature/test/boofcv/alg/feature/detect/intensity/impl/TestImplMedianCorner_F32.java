@@ -29,7 +29,6 @@ import org.junit.Test;
  */
 public class TestImplMedianCorner_F32 extends GenericCornerIntensityTests
 {
-	ImageFloat32 intensity = new ImageFloat32(width,height);
 	ImageFloat32 median = new ImageFloat32(width,height);
 
 	@Test
@@ -38,9 +37,8 @@ public class TestImplMedianCorner_F32 extends GenericCornerIntensityTests
 	}
 
 	@Override
-	public ImageFloat32 computeIntensity() {
+	public void computeIntensity( ImageFloat32 intensity ) {
 		MedianCornerIntensity.process(intensity,imageF,median);
-		return intensity;
 	}
 
 	@Override

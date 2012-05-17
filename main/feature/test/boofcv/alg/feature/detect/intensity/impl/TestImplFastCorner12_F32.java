@@ -71,6 +71,7 @@ public class TestImplFastCorner12_F32 {
 	public void testPositive() {
 		ImplFastCorner12_F32 corner = new ImplFastCorner12_F32(20, 12);
 		ImageFloat32 img = new ImageFloat32(width, height);
+		ImageFloat32 intensityImg = new ImageFloat32(width, height);
 
 		for( int subImage = 0; subImage < 2; subImage++ ) {
 			// see if it can handle a sub image correctly
@@ -84,13 +85,13 @@ public class TestImplFastCorner12_F32 {
 			for (int i = 0; i < 15; i++) {
 				setSynthetic(img, i, 12, (centerVal - 50));
 
-				corner.process(img);
+				corner.process(img,intensityImg);
 
-				assertEquals(1, countNonZero(corner.getIntensity()));
+				assertEquals(1, countNonZero(intensityImg));
 				assertEquals(1, corner.getCandidates().size());
 				// feature intensity should be positive and more than zero
 				Point2D_I16 c = corner.getCandidates().get(0);
-				float intensity = corner.getIntensity().get(c.x,c.y);
+				float intensity = intensityImg.get(c.x,c.y);
 				assertTrue(intensity > 0);
 			}
 
@@ -98,24 +99,24 @@ public class TestImplFastCorner12_F32 {
 			for (int i = 0; i < 15; i++) {
 				setSynthetic(img, i, 12, (centerVal + 50));
 
-				corner.process(img);
+				corner.process(img,intensityImg);
 
-				assertEquals(1, countNonZero(corner.getIntensity()));
+				assertEquals(1, countNonZero(intensityImg));
 				assertEquals(1, corner.getCandidates().size());
 				Point2D_I16 c = corner.getCandidates().get(0);
-				assertTrue(corner.getIntensity().get(c.x,c.y) > 0 );
+				assertTrue(intensityImg.get(c.x,c.y) > 0 );
 			}
 
 			// longer than needed
 			for (int i = 0; i < 15; i++) {
 				setSynthetic(img, i, 13, (centerVal + 50));
 
-				corner.process(img);
+				corner.process(img,intensityImg);
 
-				assertEquals(1, countNonZero(corner.getIntensity()));
+				assertEquals(1, countNonZero(intensityImg));
 				assertEquals(1, corner.getCandidates().size());
 				Point2D_I16 c = corner.getCandidates().get(0);
-				assertTrue(corner.getIntensity().get(c.x,c.y) > 0 );
+				assertTrue(intensityImg.get(c.x,c.y) > 0 );
 			}
 		}
 
@@ -139,14 +140,15 @@ public class TestImplFastCorner12_F32 {
 	public void testNegativeShort() {
 		ImplFastCorner12_F32 corner = new ImplFastCorner12_F32(20, 12);
 		ImageFloat32 img = new ImageFloat32(width, height);
+		ImageFloat32 intensityImg = new ImageFloat32(width, height);
 		setOffsets(img);
 
 		for (int i = 0; i < 15; i++) {
 			setSynthetic(img, i, 11, (centerVal + 50));
 
-			corner.process(img);
+			corner.process(img,intensityImg);
 
-			assertEquals(0, countNonZero(corner.getIntensity()));
+			assertEquals(0, countNonZero(intensityImg));
 			assertEquals(0, corner.getCandidates().size());
 		}
 	}
@@ -158,6 +160,7 @@ public class TestImplFastCorner12_F32 {
 	public void testNegativeMixed() {
 		ImplFastCorner12_F32 corner = new ImplFastCorner12_F32( 20, 12);
 		ImageFloat32 img = new ImageFloat32(width, height);
+		ImageFloat32 intensityImg = new ImageFloat32(width, height);
 		setOffsets(img);
 
 		for (int i = 0; i < 15; i++) {
@@ -165,9 +168,9 @@ public class TestImplFastCorner12_F32 {
 
 			img.data[offsets[(i + 7) % offsets.length]] = centerVal - 50;
 
-			corner.process(img);
+			corner.process(img,intensityImg);
 
-			assertEquals(0, countNonZero(corner.getIntensity()));
+			assertEquals(0, countNonZero(intensityImg));
 		}
 	}
 

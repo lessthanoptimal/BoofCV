@@ -20,7 +20,6 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -28,8 +27,9 @@ import boofcv.struct.image.ImageSingleBand;
  * 
  * @author Peter Abeles
  */
-public class WrapperFastCornerIntensity<I extends ImageSingleBand, D extends ImageSingleBand> implements GeneralFeatureIntensity<I,D> {
-
+public class WrapperFastCornerIntensity<I extends ImageSingleBand, D extends ImageSingleBand>
+		extends BaseGeneralFeatureIntensity<I,D>
+{
 	FastCornerIntensity<I> alg;
 
 	public WrapperFastCornerIntensity(FastCornerIntensity<I> alg) {
@@ -38,12 +38,8 @@ public class WrapperFastCornerIntensity<I extends ImageSingleBand, D extends Ima
 
 	@Override
 	public void process(I input, D derivX , D derivY , D derivXX , D derivYY , D derivXY ) {
-		alg.process(input);
-	}
-
-	@Override
-	public ImageFloat32 getIntensity() {
-		return alg.getIntensity();
+		init(input.width,input.height);
+		alg.process(input,intensity);
 	}
 
 	@Override

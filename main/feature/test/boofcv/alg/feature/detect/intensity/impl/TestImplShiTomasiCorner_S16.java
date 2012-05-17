@@ -44,10 +44,9 @@ public class TestImplShiTomasiCorner_S16 {
 		GenericCornerIntensityTests generic = new GenericCornerIntensityGradientTests(){
 
 			@Override
-			public ImageFloat32 computeIntensity() {
+			public void computeIntensity( ImageFloat32 intensity ) {
 				ImplShiTomasiCorner_S16 alg = new ImplShiTomasiCorner_S16(1);
-				alg.process(derivX_I16,derivY_I16);
-				return alg.getIntensity();
+				alg.process(derivX_I16,derivY_I16,intensity);
 			}
 		};
 
@@ -72,12 +71,15 @@ public class TestImplShiTomasiCorner_S16 {
 	}
 
 	public void compareToNaive(ImageSInt16 derivX, ImageSInt16 derivY) {
+		ImageFloat32 expected = new ImageFloat32(derivX.width,derivX.height);
+		ImageFloat32 found = new ImageFloat32(derivX.width,derivX.height);
+
 		ImplSsdCornerNaive naive = new ImplSsdCornerNaive(width, height, 3, false);
-		naive.process(derivX, derivY);
+		naive.process(derivX, derivY,expected);
 
 		ImplShiTomasiCorner_S16 fast = new ImplShiTomasiCorner_S16(3);
-		fast.process(derivX, derivY);
+		fast.process(derivX, derivY,found);
 
-		BoofTesting.assertEquals(naive.getIntensity(), fast.getIntensity());
+		BoofTesting.assertEquals(expected, found);
 	}
 }

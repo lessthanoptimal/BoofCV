@@ -47,10 +47,9 @@ public class TestImplShiTomasiCorner_F32 {
 		GenericCornerIntensityTests generic = new GenericCornerIntensityGradientTests(){
 
 			@Override
-			public ImageFloat32 computeIntensity() {
+			public void computeIntensity( ImageFloat32 intensity ) {
 				ImplShiTomasiCorner_F32 alg = new ImplShiTomasiCorner_F32(1);
-				alg.process(derivX_F32,derivY_F32);
-				return alg.getIntensity();
+				alg.process(derivX_F32,derivY_F32,intensity);
 			}
 		};
 
@@ -80,12 +79,15 @@ public class TestImplShiTomasiCorner_F32 {
 	}
 
 	public void compareToNaive( ImageFloat32 derivX_F, ImageFloat32 derivY_F) {
+		ImageFloat32 expected = new ImageFloat32(derivX_F.width,derivX_F.height);
+		ImageFloat32 found = new ImageFloat32(derivX_F.width,derivX_F.height);
+
 		ImplSsdCornerNaive<ImageFloat32> ssd_I = new ImplSsdCornerNaive<ImageFloat32>(width, height, 3, false);
-		ssd_I.process(derivX_F, derivY_F);
+		ssd_I.process(derivX_F, derivY_F,expected);
 
 		ImplShiTomasiCorner_F32 ssd_F = new ImplShiTomasiCorner_F32( 3);
-		ssd_F.process(derivX_F, derivY_F);
+		ssd_F.process(derivX_F, derivY_F,found);
 
-		BoofTesting.assertEquals(ssd_I.getIntensity(), ssd_F.getIntensity(), 0, 1f);
+		BoofTesting.assertEquals(expected, found, 0, 1f);
 	}
 }

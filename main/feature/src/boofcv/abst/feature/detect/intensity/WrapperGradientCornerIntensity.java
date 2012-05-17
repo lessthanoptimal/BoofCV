@@ -20,7 +20,6 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -29,9 +28,8 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public class WrapperGradientCornerIntensity<I extends ImageSingleBand,D extends ImageSingleBand>
-		implements GeneralFeatureIntensity<I,D>
+		extends BaseGeneralFeatureIntensity<I,D>
 {
-
 	GradientCornerIntensity<D> alg;
 
 	public WrapperGradientCornerIntensity(GradientCornerIntensity<D> alg) {
@@ -40,12 +38,8 @@ public class WrapperGradientCornerIntensity<I extends ImageSingleBand,D extends 
 
 	@Override
 	public void process(I image , D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
-		alg.process(derivX,derivY);
-	}
-
-	@Override
-	public ImageFloat32 getIntensity() {
-		return alg.getIntensity();
+		init(image.width,image.height);
+		alg.process(derivX,derivY,intensity);
 	}
 
 	@Override
