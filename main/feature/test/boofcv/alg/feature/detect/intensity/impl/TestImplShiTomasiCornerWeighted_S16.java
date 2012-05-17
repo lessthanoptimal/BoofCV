@@ -44,10 +44,9 @@ public class TestImplShiTomasiCornerWeighted_S16 {
 		GenericCornerIntensityTests generic = new GenericCornerIntensityGradientTests(){
 
 			@Override
-			public ImageFloat32 computeIntensity() {
+			public void computeIntensity( ImageFloat32 intensity ) {
 				ImplShiTomasiCornerWeighted_S16 alg = new ImplShiTomasiCornerWeighted_S16(1);
-				alg.process(derivX_I16,derivY_I16);
-				return alg.getIntensity();
+				alg.process(derivX_I16,derivY_I16,intensity);
 			}
 		};
 
@@ -72,14 +71,17 @@ public class TestImplShiTomasiCornerWeighted_S16 {
 	}
 
 	public void compareToNaive(ImageSInt16 derivX, ImageSInt16 derivY) {
+		ImageFloat32 expected = new ImageFloat32(derivX.width,derivX.height);
+		ImageFloat32 found = new ImageFloat32(derivX.width,derivX.height);
+
 		ImplSsdCornerNaive naive = new ImplSsdCornerNaive(width, height, 3, true);
-		naive.process(derivX, derivY);
+		naive.process(derivX, derivY,expected);
 
 		ImplShiTomasiCornerWeighted_S16 fast = new ImplShiTomasiCornerWeighted_S16(3);
-		fast.process(derivX, derivY);
+		fast.process(derivX, derivY,found);
 
 		// how the weighted is applied is different between these two verisons, which is why the error
 		// tolerance is so high
-		BoofTesting.assertEquals(naive.getIntensity(), fast.getIntensity(),3,0.5);
+		BoofTesting.assertEquals(expected, found,3,0.5);
 	}
 }

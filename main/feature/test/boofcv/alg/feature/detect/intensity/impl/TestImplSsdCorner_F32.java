@@ -70,7 +70,7 @@ public class TestImplSsdCorner_F32 {
 
 		Sdd alg = new Sdd(radius);
 
-		alg.process(derivX,derivY);
+		alg.process(derivX,derivY, new ImageFloat32(width,height));
 	}
 	
 	public float sum( int x , int y , ImageFloat32 img ) {

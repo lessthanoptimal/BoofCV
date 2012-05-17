@@ -18,18 +18,24 @@
 
 package boofcv.abst.feature.detect.intensity;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapperFastCornerIntensity {
-	@Test
-	public void checkReshapeBorder() {
-		fail("implement");
-		// for all implementors, make sure that when the input image changes size that the intensity image border
-		// are still zero
+@SuppressWarnings("unchecked")
+public class TestWrapperFastCornerIntensity extends ChecksGeneralFeatureIntensity
+{
+	public TestWrapperFastCornerIntensity() {
+		addTypes(ImageFloat32.class,ImageFloat32.class);
+		addTypes(ImageUInt8.class,ImageSInt16.class);
+	}
+
+	@Override
+	public GeneralFeatureIntensity createAlg(Class imageType, Class derivType) {
+		return FactoryIntensityPoint.fast(10, 11, imageType);
 	}
 }

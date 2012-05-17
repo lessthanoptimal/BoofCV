@@ -19,7 +19,6 @@
 package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.KitRosCornerIntensity;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -32,9 +31,9 @@ import java.lang.reflect.Method;
  * 
  * @author Peter Abeles
  */
-public class WrapperKitRosCornerIntensity<I extends ImageSingleBand,D extends ImageSingleBand> implements GeneralFeatureIntensity<I,D> {
-
-	ImageFloat32 intensity = new ImageFloat32(1,1);
+public class WrapperKitRosCornerIntensity<I extends ImageSingleBand,D extends ImageSingleBand>
+		extends BaseGeneralFeatureIntensity<I,D>
+{
 	Method m;
 
 	public WrapperKitRosCornerIntensity(Class<D> derivType ) {
@@ -47,11 +46,7 @@ public class WrapperKitRosCornerIntensity<I extends ImageSingleBand,D extends Im
 
 	@Override
 	public void process(I image , D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
-		if( intensity.width != image.width || intensity.height != image.height ) {
-			intensity.reshape(image.width,image.height);
-			// zero the image to make sure it's borders values are zero
-			GeneralizedImageOps.fill(intensity, 0);
-		}
+		init(image.width,image.height);
 
 		try {
 			m.invoke(null,intensity,derivX,derivY,derivXX,derivYY,derivXY);
@@ -60,11 +55,6 @@ public class WrapperKitRosCornerIntensity<I extends ImageSingleBand,D extends Im
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	@Override
-	public ImageFloat32 getIntensity() {
-		return intensity;
 	}
 
 	@Override

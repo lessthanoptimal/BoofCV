@@ -59,7 +59,8 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		out.print("import boofcv.alg.feature.detect.intensity.FastCornerIntensity;\n" +
 				"import boofcv.misc.DiscretizedCircle;\n" +
 				"import boofcv.struct.QueueCorner;\n" +
-				"import boofcv.struct.image.ImageFloat32;\n");
+				"import boofcv.struct.image.ImageFloat32;\n"+
+				"import boofcv.alg.misc.ImageTestingOps;\n");
 		if( typeInput.compareTo("ImageFloat32") != 0 )
 			out.print("import boofcv.struct.image."+typeInput+";\n");
 		out.print("\n" +
@@ -83,11 +84,8 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 				"\t// how similar do the pixel in the circle need to be to the center pixel\n" +
 				"\tprivate "+ sumType +" pixelTol;\n" +
 				"\n" +
-				"\t// corner intensity image\n" +
-				"\tprivate ImageFloat32 featureIntensity;\n" +
-				"\n" +
 				"\t// list of pixels that might be corners.\n" +
-				"\tprivate QueueCorner candidates;\n" +
+				"\tprivate QueueCorner candidates = new QueueCorner(10);\n" +
 				"\n" +
 				"\t/**\n" +
 				"\t * @param pixelTol The difference in intensity value from the center pixel the circle needs to be.\n" +
@@ -99,17 +97,12 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic ImageFloat32 getIntensity() {\n" +
-				"\t\treturn featureIntensity;\n" +
-				"\t}\n" +
-				"\n" +
-				"\t@Override\n" +
 				"\tpublic QueueCorner getCandidates() {\n" +
 				"\t\treturn candidates;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic int getCanonicalRadius() {\n" +
+				"\tpublic int getRadius() {\n" +
 				"\t\treturn radius;\n" +
 				"\t}\n" +
 				"\n" +
@@ -121,14 +114,7 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 
 	public void printDetection() {
 		out.print("\t@Override\n" +
-				"\tpublic void process( "+typeInput+" img ) {\n" +
-				"\t\tif( featureIntensity == null ) {\n" +
-				"\t\t\tfeatureIntensity = new ImageFloat32(img.getWidth(), img.getHeight());\n" +
-				"\t\t\tcandidates = new QueueCorner(img.getWidth());\n" +
-				"\t\t} else if( featureIntensity.width != img.width || featureIntensity.height != img.height ) {\n" +
-				"\t\t\tfeatureIntensity.reshape(img.width,img.height);\n" +
-				"\t\t}\n" +
-				"\n" +
+				"\tpublic void process( "+typeInput+" img , ImageFloat32 featureIntensity ) {\n" +
 				"\t\tcandidates.reset();\n" +
 				"\t\tfinal "+dataInput+"[] data = img.data;\n" +
 				"\n" +
@@ -273,10 +259,6 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\t\tif (isCorner) {\n" +
 				"\t\t\t\t\tinten[intenIndex] = action == -1 ? -totalDiff : totalDiff;\n" +
-				"\t\t\t\t\t// declare room for more features\n" +
-				"\t\t\t\t\tif( candidates.isFull() ) {\n" +
-				"\t\t\t\t\t\tcandidates.resize(candidates.getMaxSize()*2);\n" +
-				"\t\t\t\t\t}\n" +
 				"\t\t\t\t\tcandidates.add( index-rowStart , y );\n" +
 				"\t\t\t\t} else {\n" +
 				"\t\t\t\t\tinten[intenIndex] = 0F;\n" +

@@ -38,15 +38,12 @@ public class ImplSsdCornerNaive<T extends ImageSingleBand> implements ShiTomasiC
 	// feature's radius
 	private int radius;
 
-	// the intensity of the found features in the image
-	private ImageFloat32 featureIntensity;
 	private Kernel2D_I32 weights;
 
 	public ImplSsdCornerNaive(int imageWidth, int imageHeight,
 							  int windowRadius, boolean weighted) {
 		this.radius = windowRadius;
 
-		featureIntensity = new ImageFloat32(imageWidth, imageHeight);
 		if( weighted )
 			weights = FactoryKernelGaussian.gaussian(Kernel2D_I32.class,-1,radius);
 	}
@@ -56,10 +53,6 @@ public class ImplSsdCornerNaive<T extends ImageSingleBand> implements ShiTomasiC
 		return radius;
 	}
 
-	@Override
-	public ImageFloat32 getIntensity() {
-		return featureIntensity;
-	}
 
 	@Override
 	public int getIgnoreBorder() {
@@ -67,7 +60,7 @@ public class ImplSsdCornerNaive<T extends ImageSingleBand> implements ShiTomasiC
 	}
 
 	@Override
-	public void process(T derivX, T derivY) {
+	public void process(T derivX, T derivY, ImageFloat32 intensity ) {
 
 		final int imgHeight = derivX.getHeight();
 		final int imgWidth = derivX.getWidth();
@@ -108,7 +101,7 @@ public class ImplSsdCornerNaive<T extends ImageSingleBand> implements ShiTomasiC
 				double b = (dxdx - dydy) * 0.5;
 				double right = Math.sqrt(b * b + dxdy * dxdy);
 
-				featureIntensity.set(col, row, (float) (left - right));
+				intensity.set(col, row, (float) (left - right));
 			}
 		}
 	}

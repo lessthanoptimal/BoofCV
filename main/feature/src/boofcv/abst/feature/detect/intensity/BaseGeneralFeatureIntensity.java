@@ -16,33 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.intensity;
+package boofcv.abst.feature.detect.intensity;
 
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * <p>
- * Base interface for classes which extract intensity images for image feature detection. In the
- * intensity image higher values indicate that a pixel is more "feature like".  All intensity
- * images are {@link ImageFloat32}.
- * </p>
+ * Provides some basic functionality for implementing {@link GeneralFeatureIntensity}.
  *
  * @author Peter Abeles
  */
-public interface FeatureIntensity<T extends ImageSingleBand> {
+public abstract class BaseGeneralFeatureIntensity <I extends ImageSingleBand, D extends ImageSingleBand>
+		implements GeneralFeatureIntensity<I,D>
+{
+	ImageFloat32 intensity = new ImageFloat32(1,1);
 
-	/**
-	 * Returns the radius of the feature being computed.  Features are square in shape with a width = 2*radius+1.
-	 *
-	 * @return Radius of detected features.
-	 */
-	public int getRadius();
 
-	/**
-	 * Size of the region surrounding the image's border in which pixels are not processed.
-	 *
-	 * @return The ignore border around the image.
-	 */
-	public int getIgnoreBorder();
+	public void init( int width , int height) {
+		if( intensity.width != width || intensity.height != height ) {
+			intensity.reshape(width,height);
+			// zero the image to make sure it's borders values are zero
+			GeneralizedImageOps.fill(intensity, 0);
+		}
+	}
+
+	@Override
+	public ImageFloat32 getIntensity() {
+		return intensity;
+	}
 }

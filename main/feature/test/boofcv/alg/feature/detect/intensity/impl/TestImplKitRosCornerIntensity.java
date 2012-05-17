@@ -47,10 +47,8 @@ public class TestImplKitRosCornerIntensity
 		}
 
 		@Override
-		public ImageFloat32 computeIntensity() {
-			ImageFloat32 intensity = new ImageFloat32(width,height);
+		public void computeIntensity( ImageFloat32 intensity ) {
 			ImplKitRosCornerIntensity.process(intensity,derivX_F32,derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32);
-			return intensity;
 		}
 	}
 
@@ -61,11 +59,8 @@ public class TestImplKitRosCornerIntensity
 			performAllTests();
 		}
 
-		@Override
-		public ImageFloat32 computeIntensity() {
-			ImageFloat32 intensity = new ImageFloat32(width,height);
+		public void computeIntensity( ImageFloat32 intensity ) {
 			ImplKitRosCornerIntensity.process(intensity,derivX_I16,derivY_I16,derivXX_I16,derivYY_I16,derivXY_I16);
-			return intensity;
 		}
 	}
 

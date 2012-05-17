@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.BoofDefaults;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -53,6 +54,7 @@ public class TestImplSsdCorner_S16 {
 	/**
 	 * Manually compute intensity values and see if they are the same
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void compareToManual() {
 		GeneralizedImageOps.randomize(input,rand,0,100);
@@ -72,7 +74,7 @@ public class TestImplSsdCorner_S16 {
 
 		Sdd alg = new Sdd(radius);
 
-		alg.process(derivX,derivY);
+		alg.process(derivX,derivY, new ImageFloat32(width,height));
 	}
 	
 	public int sum( int x , int y , ImageSInt32 img ) {

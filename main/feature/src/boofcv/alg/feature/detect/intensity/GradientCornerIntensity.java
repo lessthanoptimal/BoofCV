@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity;
 
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -56,6 +57,7 @@ public interface GradientCornerIntensity<T extends ImageSingleBand> extends Feat
 	 *
 	 * @param derivX Image derivative along the x-axis.
 	 * @param derivY Image derivative along the y-axis.
+	 * @param intensity Output intensity image
 	 */
-	public void process(T derivX, T derivY);
+	public void process(T derivX, T derivY , ImageFloat32 intensity );
 }

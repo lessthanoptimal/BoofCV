@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
@@ -36,8 +37,6 @@ public abstract class ImplSsdCornerWeighted_F32 implements GradientCornerIntensi
 	ImageFloat32 imgXY = new ImageFloat32(1,1);
 	ImageFloat32 temp = new ImageFloat32(1,1);
 
-	ImageFloat32 intensity = new ImageFloat32(1,1);
-
 	// defines the A matrix, from which the eignevalues are computed
 	protected float totalXX, totalYY, totalXY;
 
@@ -47,7 +46,9 @@ public abstract class ImplSsdCornerWeighted_F32 implements GradientCornerIntensi
 	}
 
 	@Override
-	public void process(ImageFloat32 derivX, ImageFloat32 derivY) {
+	public void process(ImageFloat32 derivX, ImageFloat32 derivY, ImageFloat32 intensity ) {
+		InputSanityCheck.checkSameShape(derivX,derivY,intensity);
+
 		int w = derivX.width;
 		int h = derivX.height;
 		
@@ -99,11 +100,6 @@ public abstract class ImplSsdCornerWeighted_F32 implements GradientCornerIntensi
 	@Override
 	public int getRadius() {
 		return radius;
-	}
-
-	@Override
-	public ImageFloat32 getIntensity() {
-		return intensity;
 	}
 
 	@Override

@@ -50,7 +50,6 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 		sumType = input.getSumType();
 
 		printPreamble();
-		printProcess();
 		printHorizontal();
 		printVertical();
 
@@ -67,19 +66,9 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 			out.print("import boofcv.struct.image.ImageFloat32;\n");
 		}
 
-		out.print("\n" +
-				"\n" +
-				"/**\n" +
+		out.print("/**\n" +
 				" * <p>\n" +
-				" * Several corner detector algorithms work by computing a symmetric matrix whose elements are composed of the convolution\n" +
-				" * of the image's gradient squared.  This is done for X*X, X*Y, and X*X.  Once the matrix has been constructed\n" +
-				" * it is used to estimate how corner like the pixel under consideration is.  This class provides a generalized\n" +
-				" * interface for performing these calculations in an optimized manor.\n" +
-				" * </p>\n" +
-				" * \n" +
-				" * <p>\n" +
-				" * NOTE: Image borders are not processed.  The zeros in the image border need to be taken in account when\n" +
-				" * extract features using algorithms such as non-max suppression.\n" +
+				" * Implementation of {@link ImplSsdCornerBase} for {@link "+typeInput+"}.\n" +
 				" * </p>\n" +
 				" * \n" +
 				" * <p>\n" +
@@ -88,91 +77,29 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public abstract class "+className+" implements GradientCornerIntensity<"+typeInput+"> {\n" +
-				"\n" +
-				"\t// input image gradient\n" +
-				"\tprotected " + typeInput + " derivX;\n" +
-				"\tprotected " + typeInput + " derivY;\n" +
-				"\n" +
-				"\t// radius of detected features\n" +
-				"\tprotected int radius;\n" +
-				"\n" +
-				"\t// temporary storage for intensity derivatives summations\n" +
-				"\tprivate " + typeOutput + " horizXX = new "+typeOutput+"(1,1);\n" +
-				"\tprivate " + typeOutput + " horizXY = new "+typeOutput+"(1,1);\n" +
-				"\tprivate " + typeOutput + " horizYY = new "+typeOutput+"(1,1);\n" +
+				"public abstract class "+className+" extends ImplSsdCornerBase<"+typeInput+","+typeOutput+"> {\n" +
 				"\n" +
 				"\t// temporary storage for convolution along in the vertical axis.\n" +
-				"\tprivate " + sumType + " tempXX[] = new "+sumType+"[1];\n" +
-				"\tprivate " + sumType + " tempXY[] = new "+sumType+"[1];\n" +
-				"\tprivate " + sumType + " tempYY[] = new "+sumType+"[1];\n" +
+				"\tprivate "+dataOutput+" tempXX[] = new "+dataOutput+"[1];\n" +
+				"\tprivate "+dataOutput+" tempXY[] = new "+dataOutput+"[1];\n" +
+				"\tprivate "+dataOutput+" tempYY[] = new "+dataOutput+"[1];\n" +
 				"\n" +
-				"\t// the intensity of the found features in the image\n" +
-				"\tprivate ImageFloat32 featureIntensity = new ImageFloat32(1,1);\n" +
-				"\n" +
-				"\t// defines the A matrix, from which the eignevalues are computed\n" +
-				"\tprotected " + sumType + " totalXX, totalYY, totalXY;\n" +
-				"\n" +
-				"\t// used to keep track of where it is in the image\n" +
-				"\tprotected int x, y;\n" +
+				"\t// defines the A matrix, from which the eigenvalues are computed\n" +
+				"\tprotected "+sumType+" totalXX, totalYY, totalXY;\n" +
 				"\n" +
 				"\tpublic "+className+"( int windowRadius) {\n" +
-				"\t\tthis.radius = windowRadius;\n" +
+				"\t\tsuper(windowRadius,"+typeOutput+".class);\n" +
 				"\t}\n" +
 				"\n" +
+				"\t@Override\n" +
 				"\tpublic void setImageShape( int imageWidth, int imageHeight ) {\n" +
-				"\t\thorizXX.reshape(imageWidth,imageHeight);\n" +
-				"\t\thorizYY.reshape(imageWidth,imageHeight);\n" +
-				"\t\thorizXY.reshape(imageWidth,imageHeight);\n" +
-				"\n" +
-				"\t\tfeatureIntensity.reshape(imageWidth,imageHeight);\n" +
+				"\t\tsuper.setImageShape(imageWidth,imageHeight);\n" +
 				"\n" +
 				"\t\tif( tempXX.length < imageWidth ) {\n" +
-				"\t\t\ttempXX = new "+sumType+"[imageWidth];\n" +
-				"\t\t\ttempXY = new "+sumType+"[imageWidth];\n" +
-				"\t\t\ttempYY = new "+sumType+"[imageWidth];\n" +
+				"\t\t\ttempXX = new "+dataOutput+"[imageWidth];\n" +
+				"\t\t\ttempXY = new "+dataOutput+"[imageWidth];\n" +
+				"\t\t\ttempYY = new "+dataOutput+"[imageWidth];\n" +
 				"\t\t}\n" +
-				"\t}\n"+
-				"\n" +
-				"\t@Override\n" +
-				"\tpublic int getCanonicalRadius() {\n" +
-				"\t\treturn radius;\n" +
-				"\t}\n" +
-				"\n" +
-				"\t@Override\n" +
-				"\tpublic ImageFloat32 getIntensity() {\n" +
-				"\t\treturn featureIntensity;\n" +
-				"\t}\n" +
-				"\t\n" +
-				"\t/**\n" +
-				"\t * Computes the pixel's corner intensity.\n" +
-				"\t * @return corner intensity.\n" +
-				"\t */\n" +
-				"\tprotected abstract float computeIntensity();\n" +
-				"\n" +
-				"\t@Override\n" +
-				"\tpublic int getIgnoreBorder() {\n" +
-				"\t\treturn radius;\n" +
-				"\t}\n" +
-				"\n");
-	}
-
-	public void printProcess() {
-		out.print("\t@Override\n" +
-				"\tpublic void process("+typeInput+" derivX, "+typeInput+" derivY) {\n" +
-				"\t\tif( tempXX == null ) {\n" +
-				"\t\t\tif (derivX.getWidth() != derivY.getWidth() || derivX.getHeight() != derivY.getHeight()) {\n" +
-				"\t\t\t\tthrow new IllegalArgumentException(\"Input image sizes do not match\");\n" +
-				"\t\t\t}\n" +
-				"\t\t\tsetImageShape(derivX.getWidth(),derivX.getHeight());\n" +
-				"\t\t} else if (derivX.getWidth() != horizXX.getWidth() || derivX.getHeight() != horizXX.getHeight()) {\n" +
-				"\t\t\tsetImageShape(derivX.getWidth(),derivX.getHeight());\n" +
-				"\t\t}\n" +
-				"\t\tthis.derivX = derivX;\n" +
-				"\t\tthis.derivY = derivY;\n" +
-				"\n" +
-				"\t\thorizontal();\n" +
-				"\t\tvertical();\n" +
 				"\t}\n\n");
 	}
 
@@ -181,7 +108,8 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t * Compute the derivative sum along the x-axis while taking advantage of duplicate\n" +
 				"\t * calculations for each window.\n" +
 				"\t */\n" +
-				"\tprivate void horizontal() {\n" +
+				"\t@Override\n" +
+				"\tprotected void horizontal() {\n" +
 				"\t\t" + dataInput + "[] dataX = derivX.data;\n" +
 				"\t\t" + dataInput + "[] dataY = derivY.data;\n" +
 				"\n" +
@@ -253,7 +181,8 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t * Compute the derivative sum along the y-axis while taking advantage of duplicate\n" +
 				"\t * calculations for each window and avoiding cache misses. Then compute the eigen values\n" +
 				"\t */\n" +
-				"\tprivate void vertical() {\n" +
+				"\t@Override\n" +
+				"\tprotected void vertical() {\n" +
 				"\t\t"+sumType+"[] hXX = horizXX.data;\n" +
 				"\t\t"+sumType+"[] hXY = horizXY.data;\n" +
 				"\t\t"+sumType+"[] hYY = horizYY.data;\n" +

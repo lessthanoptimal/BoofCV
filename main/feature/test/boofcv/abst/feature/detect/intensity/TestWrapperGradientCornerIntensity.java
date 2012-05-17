@@ -16,26 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.intensity.impl;
+package boofcv.abst.feature.detect.intensity;
 
-import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
+import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.struct.image.ImageFloat32;
-import org.junit.Test;
+import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplHarrisCornerWeighted_F32 extends GenericCornerIntensityGradientTests {
-
-	ImplHarrisCornerWeighted_F32 detector = new ImplHarrisCornerWeighted_F32(1,0.04f);
-
-	@Test
-	public void genericTests() {
-		performAllTests();
+@SuppressWarnings("unchecked")
+public class TestWrapperGradientCornerIntensity extends ChecksGeneralFeatureIntensity{
+	public TestWrapperGradientCornerIntensity() {
+		addTypes(ImageFloat32.class,ImageFloat32.class);
+		addTypes(ImageUInt8.class, ImageSInt16.class);
 	}
 
 	@Override
-	public void computeIntensity( ImageFloat32 intensity ) {
-		detector.process(derivX_F32,derivY_F32,intensity);
+	public GeneralFeatureIntensity<ImageFloat32, ImageFloat32> createAlg(Class imageType, Class derivType) {
+		return FactoryIntensityPoint.shiTomasi(2, false, derivType);
 	}
 }

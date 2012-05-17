@@ -44,11 +44,8 @@ public class ImplFastCorner12_U8 implements FastCornerIntensity<ImageUInt8> {
 	// how similar do the pixel in the circle need to be to the center pixel
 	private int pixelTol;
 
-	// corner intensity image
-	private ImageFloat32 featureIntensity;
-
 	// list of pixels that might be corners.
-	private QueueCorner candidates;
+	private QueueCorner candidates = new QueueCorner(10);
 
 	/**
 	 * @param pixelTol The difference in intensity value from the center pixel the circle needs to be.
@@ -57,11 +54,6 @@ public class ImplFastCorner12_U8 implements FastCornerIntensity<ImageUInt8> {
 	public ImplFastCorner12_U8( int pixelTol, int minCont) {
 		this.pixelTol = pixelTol;
 		this.minCont = minCont;
-	}
-
-	@Override
-	public ImageFloat32 getIntensity() {
-		return featureIntensity;
 	}
 
 	@Override
@@ -80,14 +72,7 @@ public class ImplFastCorner12_U8 implements FastCornerIntensity<ImageUInt8> {
 	}
 
 	@Override
-	public void process( ImageUInt8 img ) {
-		if( featureIntensity == null ) {
-			featureIntensity = new ImageFloat32(img.getWidth(), img.getHeight());
-			candidates = new QueueCorner(img.getWidth());
-		} else if( featureIntensity.width != img.width || featureIntensity.height != img.height ) {
-			featureIntensity.reshape(img.width,img.height);
-		}
-
+	public void process( ImageUInt8 img , ImageFloat32 featureIntensity ) {
 		candidates.reset();
 		final byte[] data = img.data;
 

@@ -58,7 +58,7 @@ public class BenchmarkSsdCornerIntensity {
 
 		@Override
 		public void process() {
-			corner.process(derivX_F32, derivY_F32);
+			corner.process(derivX_F32, derivY_F32,intensity);
 		}
 	}
 
@@ -67,7 +67,7 @@ public class BenchmarkSsdCornerIntensity {
 
 		@Override
 		public void process() {
-			corner.process(derivX_F32, derivY_F32);
+			corner.process(derivX_F32, derivY_F32,intensity);
 		}
 	}
 
@@ -76,7 +76,7 @@ public class BenchmarkSsdCornerIntensity {
 
 		@Override
 		public void process() {
-			corner.process(derivX_I16, derivY_I16);
+			corner.process(derivX_I16, derivY_I16,intensity);
 		}
 	}
 	public static class KLT_WEIGHT_I16 extends PerformerBase {
@@ -84,7 +84,7 @@ public class BenchmarkSsdCornerIntensity {
 
 		@Override
 		public void process() {
-			corner.process(derivX_I16, derivY_I16);
+			corner.process(derivX_I16, derivY_I16,intensity);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class BenchmarkSsdCornerIntensity {
 
 		@Override
 		public void process() {
-			corner.process(derivX_I16, derivY_I16);
+			corner.process(derivX_I16, derivY_I16,intensity);
 		}
 	}
 
@@ -102,7 +102,7 @@ public class BenchmarkSsdCornerIntensity {
 
 		@Override
 		public void process() {
-			corner.process(derivX_F32, derivY_F32);
+			corner.process(derivX_F32, derivY_F32,intensity);
 		}
 	}
 
@@ -111,7 +111,7 @@ public class BenchmarkSsdCornerIntensity {
 
 		@Override
 		public void process() {
-			corner.process(derivX_I16, derivY_I16);
+			corner.process(derivX_I16, derivY_I16,intensity);
 		}
 	}
 

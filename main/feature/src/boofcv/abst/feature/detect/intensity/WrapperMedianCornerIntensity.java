@@ -20,7 +20,6 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -34,9 +33,9 @@ import java.lang.reflect.Method;
  * 
  * @author Peter Abeles
  */
-public class WrapperMedianCornerIntensity<I extends ImageSingleBand, D extends ImageSingleBand> implements GeneralFeatureIntensity<I,D> {
+public class WrapperMedianCornerIntensity<I extends ImageSingleBand, D extends ImageSingleBand>
+		extends BaseGeneralFeatureIntensity<I,D>  {
 
-	ImageFloat32 intensity = new ImageFloat32(1,1);
 	Method m;
 	MedianImageFilter<I> medianFilter;
 	I medianImage;
@@ -53,11 +52,7 @@ public class WrapperMedianCornerIntensity<I extends ImageSingleBand, D extends I
 
 	@Override
 	public void process(I input, D derivX , D derivY , D derivXX , D derivYY , D derivXY ) {
-		if( intensity.width != input.width || intensity.height != input.height ) {
-			intensity.reshape(input.width,input.height);
-			// zero the image to make sure it's borders values are zero
-			GeneralizedImageOps.fill(intensity, 0);
-		}
+		init(input.width,input.height);
 
 		if( medianImage == null ) {
 			medianImage = (I)input._createNew(input.width,input.height);
@@ -73,11 +68,6 @@ public class WrapperMedianCornerIntensity<I extends ImageSingleBand, D extends I
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	@Override
-	public ImageFloat32 getIntensity() {
-		return intensity;
 	}
 
 	@Override
