@@ -39,6 +39,7 @@ public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 	// radial distortion magnitude
 	protected double sum;
 
+	// inverse of camera calibration matrix
 	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
 	private double tol=1e-5f;

@@ -1,7 +1,6 @@
 package boofcv.abst.sfm;
 
 import boofcv.struct.image.ImageBase;
-import georegression.struct.se.Se3_F64;
 
 /**
  * <P>
@@ -20,7 +19,7 @@ import georegression.struct.se.Se3_F64;
  * 
  * @author Peter Abeles
  */
-public interface MonocularVisualOdometry<T extends ImageBase> {
+public interface MonocularVisualOdometry<T extends ImageBase> extends VisualOdometry{
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked
@@ -32,24 +31,4 @@ public interface MonocularVisualOdometry<T extends ImageBase> {
 	 */
 	public boolean process( T input );
 
-	/**
-	 * Forget past history and tracking results, returning it to its initial state.
-	 */
-	public void reset();
-
-	/**
-	 * If {@link #process} returns false then this function needs to be called to see if a fatal
-	 * error has occurred and the the motion estimate has lost track of where it is.
-	 *
-	 * @return true if a fatal error has occurred.
-	 */
-	public boolean isFatal();
-
-	/**
-	 * Returns the estimated motion relative to the first frame in which a fatal error
-	 * does not happen.
-	 *
-	 * @return Found pose.
-	 */
-	public Se3_F64 getCameraToWorld();
 }

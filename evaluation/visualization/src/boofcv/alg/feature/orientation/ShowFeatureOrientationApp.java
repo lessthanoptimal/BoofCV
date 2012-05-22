@@ -24,7 +24,7 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
-import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.FancyInterestPointRender;
@@ -116,7 +116,7 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 		deriv.setInput(workImage);
 
 		int r = 2;
-		GeneralFeatureDetector<T,D> detector =  FactoryCornerDetector.createHarris(r, false, 1,NUM_FEATURES,derivType);
+		GeneralFeatureDetector<T,D> detector =  FactoryDetectPoint.createHarris(r, false, 1, NUM_FEATURES, derivType);
 
 		D derivX=null,derivY=null,derivXX=null,derivYY=null,derivXY=null;
 

@@ -58,10 +58,10 @@ public class DetectFeatureScaleSpaceApp<T extends ImageSingleBand, D extends Ima
 		this.imageType = imageType;
 
 		int r = 2;
-		addAlgorithm(0, "Hessian Laplace",FactoryInterestPointAlgs.hessianLaplace(r,1f,NUM_FEATURES,imageType,derivType));
-		addAlgorithm(0, "Harris Laplace",FactoryInterestPointAlgs.harrisLaplace(r,0.5f,NUM_FEATURES,imageType,derivType));
-		addAlgorithm(0, "Hessian",FactoryInterestPointAlgs.hessianScaleSpace(r,1f,NUM_FEATURES,imageType,derivType));
-		addAlgorithm(0, "Harris",FactoryInterestPointAlgs.harrisScaleSpace(r,0.5f,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Hessian Laplace", FactoryInterestPointAlgs.hessianLaplace(r, 1f, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Harris Laplace", FactoryInterestPointAlgs.harrisLaplace(r, 0.5f, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Hessian", FactoryInterestPointAlgs.hessianScaleSpace(r, 1f, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Harris", FactoryInterestPointAlgs.harrisScaleSpace(r, 0.5f, NUM_FEATURES, imageType, derivType));
 
 		ss = FactoryGaussianScaleSpace.nocache(imageType);
 		ss.setScales(1,1.5,2,3,4,8,12,16,24);
