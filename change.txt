@@ -6,9 +6,15 @@ Date Format: year/month/day
 Date    : 
 Version : Alpha 0.9
 
-- Removed FactoryBlobDetector and merged it with FactoryCornerDetector
+- Renamed factories
+  * FactoryBlobDetector -> FactoryDetectPoint
+  * FactoryCornerDetector -> FactoryDetectPoint
 - Renamed KLT corner to Shi Tomasi corner, which is more standard
 - Fixed bug various point detectors where if the input image was resized the edge intensity might not be zero when it should be
+- Changed some corner detection algorithms to take the intensity image in as an input.
+- Added new Pixel to Normalized transform
+- Created interface for Stereo visual odometry
+  
 
 
 ---------------------------------------------

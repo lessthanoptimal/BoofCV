@@ -80,6 +80,13 @@ public class StereoParameters implements Serializable {
 		this.right = right;
 	}
 
+	/**
+	 * Returns the distance between the optical center of each camera
+	 */
+	public double getBaseline() {
+		return rightToLeft.getT().norm();
+	}
+
 	public void print() {
 		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(rightToLeft.getR());
 		Vector3D_F64 t = rightToLeft.getT();

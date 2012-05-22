@@ -26,7 +26,9 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.distort.SequencePointTransform_F32;
+import boofcv.struct.distort.SequencePointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.shapes.Rectangle2D_F32;
 import org.ejml.data.DenseMatrix64F;
@@ -270,7 +272,7 @@ public class RectifyImageOps {
 	 *
 	 * @param param Intrinsic parameters.
 	 * @param rectify Transform for rectifying the image.
-	 * @return Inverse rectification transform.
+	 * @return Transform from rectified to unrectified pixels
 	 */
 	public static PointTransform_F32 rectifyTransformInv(IntrinsicParameters param,
 														 DenseMatrix64F rectify )
@@ -301,7 +303,7 @@ public class RectifyImageOps {
 	 *
 	 * @param param Intrinsic parameters.
 	 * @param rectify Transform for rectifying the image.
-	 * @return
+	 * @return Transform from unrectified to rectified pixels
 	 */
 	public static PointTransform_F32 rectifyTransform(IntrinsicParameters param,
 													  DenseMatrix64F rectify )
@@ -320,7 +322,41 @@ public class RectifyImageOps {
 	}
 
 	/**
+	 * <p>
+	 * Creates a transform that applies rectification to unrectified distorted pixels and outputs
+	 * normalized pixel coordinates.
+	 * </p>
+	 *
+	 * <p>
+	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
+	 * </p>
+	 *
+	 * @param param Intrinsic parameters.
+	 * @param rectify Transform for rectifying the image.
+	 * @return Transform from unrectified to rectified normalized pixels
+	 */
+	public static PointTransform_F64 rectifyNormalized_F64(IntrinsicParameters param,
+														  DenseMatrix64F rectify )
+	{
+		RemoveRadialPtoP_F64 radialDistort = new RemoveRadialPtoP_F64();
+		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+
+		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
+
+		PixelToNormalized_F64 pixelToNorm = new PixelToNormalized_F64();
+		pixelToNorm.set(param.fx, param.fy, param.skew, param.cx, param.cy);
+
+		if( param.flipY) {
+			FlipVertical_F64 flip = new FlipVertical_F64(param.height);
+			return new SequencePointTransform_F64(flip,radialDistort,rectifyDistort,pixelToNorm);
+		} else {
+			return new SequencePointTransform_F64(radialDistort,rectifyDistort,pixelToNorm);
+		}
+	}
+
+	/**
 	 * Creates an {@link ImageDistort} for rectifying an image given its rectification matrix.
+	 * Lens distortion is assumed to have been previously removed.
 	 *
 	 * @param rectify Transform for rectifying the image.
 	 * @param imageType Type of single band image the transform is to be applied to.

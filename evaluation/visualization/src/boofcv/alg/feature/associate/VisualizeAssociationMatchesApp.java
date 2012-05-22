@@ -28,7 +28,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -83,9 +83,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		this.imageType = imageType;
 
 		GeneralFeatureDetector<T,D> alg;
-		addAlgorithm(0,"Fast Hessian",FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4));
-		alg = FactoryCornerDetector.createShiTomasi(2, false, 1,500,derivType);
-		addAlgorithm(0,"KLT",FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
+		addAlgorithm(0,"Fast Hessian", FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4));
+		alg = FactoryDetectPoint.createShiTomasi(2, false, 1, 500, derivType);
+		addAlgorithm(0,"KLT", FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 
 		addAlgorithm(1,"SURF", FactoryDescribeRegionPoint.surfm(true, imageType));
 		addAlgorithm(1,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));

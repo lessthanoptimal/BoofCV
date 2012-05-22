@@ -27,6 +27,7 @@ import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -139,5 +140,10 @@ public class TestRectifyImageOps {
 		PointTransformHomography_F32 tran = new PointTransformHomography_F32(inv);
 		checkInside(tran);
 		// the right view is not checked since it is not part of the contract
+	}
+
+	@Test
+	public void rectifyNormalized_F64() {
+		fail("implement");
 	}
 }

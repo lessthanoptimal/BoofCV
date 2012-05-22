@@ -35,14 +35,19 @@ import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Factory for creating interest point detectors which conform to the {@link InterestPointDetector}
- * interface.
+ * interface
+ *
+ * <p>
+ * NOTE: Higher level interface than {@link GeneralFeatureDetector}.  This will automatically
+ * compute image derivatives across scale space as needed, unlike GeneralFeatureDetector which
+ * just detects features at a particular scale and requires image derivatives be passed in.
+ * </p>
  *
  * @see FactoryFeatureExtractor
  * @see FactoryInterestPoint
  *
  * @author Peter Abeles
  */
-// TODO rename.  These detect location, scale and possibly orientation
 public class FactoryInterestPoint {
 
 	/**

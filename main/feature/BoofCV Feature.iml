@@ -28,6 +28,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="testing" level="project" />
+    <orderEntry type="module" module-name="ejml" />
   </component>
 </module>
 

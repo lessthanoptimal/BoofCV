@@ -29,7 +29,7 @@ import java.util.Arrays;
 
 /**
  * <p>
- * Generic class for extracting features of different types. Can return all the found features or
+ * Generic class for extracting point features of different types. Can return all the found features or
  * just the features with the highest intensity.  The main advantage of this class over
  * {@link boofcv.abst.feature.detect.interest.InterestPointDetector} is that it allows image derivatives
  * to be passed in, allowing for tighter integration of algorithms.

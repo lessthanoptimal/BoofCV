@@ -24,7 +24,7 @@ import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.filter.derivative.HessianFromGradient;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.QueueCorner;
@@ -93,11 +93,11 @@ public class BenchmarkCornerAccuracy {
 		// todo try different noise levels
 		int maxFeatures = corners.size()*2;
 
-		detectCorners("FAST",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createFast( 10 , 11, maxFeatures, ImageUInt8.class));
-		detectCorners("Harris", FactoryCornerDetector.<ImageUInt8,ImageSInt16>createHarris(radius, false, 0.04f,maxFeatures,ImageSInt16.class));
-		detectCorners("KitRos", FactoryCornerDetector.<ImageUInt8,ImageSInt16>createKitRos( radius,1f,maxFeatures,ImageSInt16.class ));
-		detectCorners("KLT",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createShiTomasi(radius, false, 1f,maxFeatures, ImageSInt16.class ));
-		detectCorners("Median",FactoryCornerDetector.<ImageUInt8,ImageSInt16>createMedian(radius,1,maxFeatures, ImageUInt8.class ));
+		detectCorners("FAST", FactoryDetectPoint.<ImageUInt8,ImageSInt16>createFast(10, 11, maxFeatures, ImageUInt8.class));
+		detectCorners("Harris", FactoryDetectPoint.<ImageUInt8,ImageSInt16>createHarris(radius, false, 0.04f, maxFeatures, ImageSInt16.class));
+		detectCorners("KitRos", FactoryDetectPoint.<ImageUInt8,ImageSInt16>createKitRos(radius, 1f, maxFeatures, ImageSInt16.class));
+		detectCorners("KLT", FactoryDetectPoint.<ImageUInt8,ImageSInt16>createShiTomasi(radius, false, 1f, maxFeatures, ImageSInt16.class));
+		detectCorners("Median", FactoryDetectPoint.<ImageUInt8,ImageSInt16>createMedian(radius, 1, maxFeatures, ImageUInt8.class));
 	}
 
 	private void createTestImage() {

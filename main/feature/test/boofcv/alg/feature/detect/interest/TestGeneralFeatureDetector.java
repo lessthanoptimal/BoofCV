@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.inst.FactoryImageGenerator;
-import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I16;
@@ -43,7 +43,7 @@ public class TestGeneralFeatureDetector extends GenericFeatureDetector {
 	@Override
 	protected Object createDetector( int maxFeatures ) {
 //		return FactoryBlobDetector.createLaplace(2,0,maxFeatures,ImageFloat32.class,HessianBlobIntensity.Type.DETERMINANT);
-		return FactoryCornerDetector.createHarris(2, false, 0,maxFeatures,ImageFloat32.class);
+		return FactoryDetectPoint.createHarris(2, false, 0, maxFeatures, ImageFloat32.class);
 	}
 
 	@Override

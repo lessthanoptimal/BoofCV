@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.KltTracker;
-import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -67,7 +67,7 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	public PkltManager(PkltManagerConfig<I,D> config )
 	{
 		GeneralFeatureDetector<I,D> detector =
-				FactoryCornerDetector.createShiTomasi(config.featureRadius,
+				FactoryDetectPoint.createShiTomasi(config.featureRadius,
 						false, config.config.minDeterminant, config.maxFeatures, config.typeDeriv);
 
 		GenericPkltFeatSelector<I, D> featureSelector =

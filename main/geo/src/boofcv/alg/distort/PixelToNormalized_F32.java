@@ -18,29 +18,40 @@
 
 package boofcv.alg.distort;
 
+import boofcv.struct.distort.PointTransform_F32;
+import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
+import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 /**
- * Removes radial distortion from a pixel coordinate and outputs pixel coordinates
+ * Converts an image pixel coordinate into a normalized pixel coordinate using the
+ * camera's intrinsic parameters.  Lens distortion must have already been removed.
  *
  * @author Peter Abeles
  */
-public class RemoveRadialPtoP_F32 extends RemoveRadialPtoN_F32 {
+public class PixelToNormalized_F32 implements PointTransform_F32 {
 
-	/**
-	 * Removes radial distortion
-	 *
-	 * @param x Distorted x-coordinate pixel
-	 * @param y Distorted y-coordinate pixel
-	 * @param out Undistorted pixel coordinate.
-	 */
+	// inverse of camera calibration matrix
+	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+
+	public void set(double fx, double fy, double skew, double x_c, double y_c ) {
+
+		K_inv.set(0,0,fx);
+		K_inv.set(1,1,fy);
+		K_inv.set(0,1,skew);
+		K_inv.set(0,2,x_c);
+		K_inv.set(1,2,y_c);
+		K_inv.set(2,2,1);
+
+		CommonOps.invert(K_inv);
+	}
+
+
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {
-		//  distorted pixel to undistorted normalized
-		super.compute(x,y,out);
+		out.set(x,y);
 
-
-		out.x = (x+x_c*sum)/(1+sum);
-		out.y = (y+y_c*sum)/(1+sum);
+		GeometryMath_F32.mult(K_inv, out, out);
 	}
 }

@@ -29,7 +29,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
-import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.io.image.UtilImageIO;
@@ -99,7 +99,7 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 
 		public Harris() {
 			GImageDerivativeOps.sobel(input, derivX,derivY, BorderType.EXTENDED);
-			detector = FactoryCornerDetector.createHarris(radius, false, 1,-1,derivType);
+			detector = FactoryDetectPoint.createHarris(radius, false, 1, -1, derivType);
 		}
 
 		@Override

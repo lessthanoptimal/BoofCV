@@ -33,7 +33,8 @@ import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
- * Creates interest point detectors that are designed to detect the corners in an image.
+ * Creates instances of {@link GeneralFeatureDetector}, which detects the location of
+ * point features inside an image.
  * </p>
  *
  * <p>
@@ -44,10 +45,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-// TODO rename
-// Hmm for the name these are all point features which take in the image derivatve
-// These do not estimate the feature's scale or orientation
-public class FactoryCornerDetector {
+public class FactoryDetectPoint {
 
 	/**
 	 * Detects Harris corners.

@@ -26,7 +26,7 @@ import georegression.transform.se.SePointOps_F64;
 
 /**
  * Computes the predicted residual as a simple geometric distance between the observed and predicted
- * point observation.
+ * point observation in normalized pixel coordinates.
  *
  * @author Peter Abeles
  */

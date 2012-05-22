@@ -42,7 +42,7 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.detect.interest.FactoryCornerDetector;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
@@ -83,7 +83,7 @@ public class FactoryPointSequentialTracker {
 		config.featureRadius = featureRadius;
 
 		GeneralFeatureDetector<I,D> detector =
-				FactoryCornerDetector.createShiTomasi(config.featureRadius, false, config.config.minDeterminant, config.maxFeatures, config.typeDeriv);
+				FactoryDetectPoint.createShiTomasi(config.featureRadius, false, config.config.minDeterminant, config.maxFeatures, config.typeDeriv);
 		detector.setRegions(spawnSubW,spawnSubH);
 
 		GenericPkltFeatSelector<I, D> featureSelector = new GenericPkltFeatSelector<I,D>(detector,null);
@@ -153,7 +153,7 @@ public class FactoryPointSequentialTracker {
 	ImagePointTracker<I> brief( int maxFeatures , int maxAssociationError , int pixelDetectTol , Class<I> imageType ) {
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
-		GeneralFeatureDetector<I,?> fast = FactoryCornerDetector.createFast(3, pixelDetectTol, maxFeatures, imageType);
+		GeneralFeatureDetector<I,?> fast = FactoryDetectPoint.createFast(3, pixelDetectTol, maxFeatures, imageType);
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapCorner(fast, imageType, null);
 		ScoreAssociationBrief score = new ScoreAssociationBrief();
 
@@ -177,7 +177,7 @@ public class FactoryPointSequentialTracker {
 	ImagePointTracker<I> pixelNCC( int maxFeatures , int regionWidth , int regionHeight ,
 								   int pixelDetectTol , Class<I> imageType , Class<D> derivType ) {
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType);
-		GeneralFeatureDetector<I,D> corner = FactoryCornerDetector.createFast(2, pixelDetectTol, maxFeatures, imageType);
+		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(2, pixelDetectTol, maxFeatures, imageType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapCorner(corner, imageType, derivType);
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();

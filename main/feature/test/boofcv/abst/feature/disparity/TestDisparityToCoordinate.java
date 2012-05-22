@@ -16,33 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.tracker;
+package boofcv.abst.feature.disparity;
 
-import boofcv.alg.geo.AssociatedPair;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- *
- * observations in normalized pixel coordinates.
- *
  * @author Peter Abeles
  */
-public class KeyFrameTrack extends AssociatedPair {
+public class TestDisparityToCoordinate {
 
-	// observation is pixels
-	AssociatedPair pixel = new AssociatedPair();
-
-	long trackID;
-
-	public void reset() {
-
-	}
-
-	/**
-	 * Location of track in pixel coordinates
-	 *
-	 * @return Associated pair containing pixel coordinates
-	 */
-	public AssociatedPair getPixel() {
-		return pixel;
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

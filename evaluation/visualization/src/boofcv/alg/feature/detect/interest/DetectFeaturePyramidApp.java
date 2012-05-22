@@ -53,10 +53,10 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 		this.imageType = imageType;
 
 		int r = 2;
-		addAlgorithm(0, "Hessian Laplace",FactoryInterestPointAlgs.hessianLaplacePyramid(r,1f,NUM_FEATURES,imageType,derivType));
-		addAlgorithm(0, "Harris Laplace",FactoryInterestPointAlgs.harrisLaplacePyramid(r,1f,NUM_FEATURES,imageType,derivType));
-		addAlgorithm(0, "Hessian",FactoryInterestPointAlgs.hessianPyramid(r,1,NUM_FEATURES,imageType,derivType));
-		addAlgorithm(0, "Harris",FactoryInterestPointAlgs.harrisPyramid(r,1,NUM_FEATURES,imageType,derivType));
+		addAlgorithm(0, "Hessian Laplace", FactoryInterestPointAlgs.hessianLaplacePyramid(r, 1f, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Harris Laplace", FactoryInterestPointAlgs.harrisLaplacePyramid(r, 1f, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Hessian", FactoryInterestPointAlgs.hessianPyramid(r, 1, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Harris", FactoryInterestPointAlgs.harrisPyramid(r, 1, NUM_FEATURES, imageType, derivType));
 
 		ss = new ScaleSpacePyramid<T>(imageType,1,1.5,2,3,4,8,12,16,24);
 

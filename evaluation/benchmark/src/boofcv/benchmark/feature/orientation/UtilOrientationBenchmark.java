@@ -40,7 +40,7 @@ public class UtilOrientationBenchmark {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> defaultDetector( Class<T> imageType , Class<D> derivType ) {
 		return FactoryInterestPoint.<T>fastHessian(1, 2, 200, 1, 9, 4, 4);
-//		GeneralFeatureDetector<T, D> detector = FactoryCornerDetector.createKlt(2,0.1f,150,derivType);
+//		GeneralFeatureDetector<T, D> detector = FactoryDetectPoint.createKlt(2,0.1f,150,derivType);
 //		FeatureScaleSpace<T,D> ff = new FeatureScaleSpace<T,D>(detector,2);
 //		double scales[] = new double[]{1,1.2,1.5,3,4,5,6,7};
 //		return FactoryInterestPoint.wrapDetector(ff,scales,imageType);
