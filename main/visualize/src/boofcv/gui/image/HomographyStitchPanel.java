@@ -31,7 +31,7 @@ import boofcv.struct.image.MultiSpectral;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import georegression.transform.homo.HomographyPointOps;
+import georegression.transform.homo.HomographyPointOps_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -107,7 +107,7 @@ public class HomographyStitchPanel extends JPanel {
 	private Point2D_I32 renderPoint( int x0 , int y0 , Homography2D_F64 fromBtoWork )
 	{
 		Point2D_F64 result = new Point2D_F64();
-		HomographyPointOps.transform(fromBtoWork,new Point2D_F64(x0,y0),result);
+		HomographyPointOps_F64.transform(fromBtoWork, new Point2D_F64(x0, y0), result);
 		return new Point2D_I32((int)result.x,(int)result.y);
 	}
 

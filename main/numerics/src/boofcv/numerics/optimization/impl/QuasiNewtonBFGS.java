@@ -190,8 +190,7 @@ public class QuasiNewtonBFGS
 		updated = false;
 //		System.out.println("QN iterations "+iterations);
 		if( mode == 0 ) {
-			computeSearchDirection();
-			return false;
+			return computeSearchDirection();
 		} else {
 			return performLineSearch();
 		}
@@ -200,7 +199,7 @@ public class QuasiNewtonBFGS
 	/**
 	 * Computes the next search direction using BFGS
 	 */
-	private void computeSearchDirection() {
+	private boolean computeSearchDirection() {
 		// Compute the function's gradient
 		function.computeGradient(temp0_Nx1.data);
 
@@ -226,10 +225,13 @@ public class QuasiNewtonBFGS
 			// do the search again, it can't fail this time
 			CommonOps.mult(-1,B,g, searchVector);
 			setupLineSearch(fx, x.data, g.data, searchVector.data, 1);
+		} else if(Math.abs(derivAtZero) < gtol ) {
+			return terminateSearch(true,null);
 		}
 
 		mode = 1;
 		iterations++;
+		return false;
 	}
 
 	/**
@@ -263,6 +265,8 @@ public class QuasiNewtonBFGS
 		// degenerate case
 		if( derivAtZero > 0 )
 			return false;
+		else if( derivAtZero == 0 )
+			return true;
 
 		// setup line functions
 		function.setLine(startPoint, direction);

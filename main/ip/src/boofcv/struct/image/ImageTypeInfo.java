@@ -59,7 +59,7 @@ public final class ImageTypeInfo <T extends ImageSingleBand> {
 	private double minValue;
 	private Class dataType;
 	private Class sumType;
-	private Class imageClass;
+	private Class<T> imageClass;
 
 	public static ImageTypeInfo classToType( Class imageClass ) {
 		if( imageClass == ImageUInt8.class )
@@ -228,7 +228,7 @@ public final class ImageTypeInfo <T extends ImageSingleBand> {
 	/**
 	 * The image class
 	 */
-	public Class getImageClass() {
+	public Class<T> getImageClass() {
 		return imageClass;
 	}
 

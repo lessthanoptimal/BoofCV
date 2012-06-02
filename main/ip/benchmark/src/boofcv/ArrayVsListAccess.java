@@ -20,6 +20,7 @@ package boofcv;
 
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,11 +65,15 @@ public class ArrayVsListAccess {
 
 	private static class ArrayAccess extends PerformerBase
 	{
-		double data[];
+		Double data[];
 		int ret;
 
 		public ArrayAccess( double data [] ) {
-			this.data = data;
+			this.data = new Double[ data.length ];
+			int i = 0;
+			for( Double d : data ) {
+				this.data[i++] = d;
+			}
 		}
 
 		@Override
@@ -87,6 +92,60 @@ public class ArrayVsListAccess {
 		}
 	}
 
+	private static class FastQueueAccess extends PerformerBase
+	{
+		FastQueue<Double> queue = new FastQueue<Double>(100,Double.class,false);
+		int ret;
+
+		public FastQueueAccess( double data [] ) {
+			for( Double d : data ) {
+				queue.add(d);
+			}
+		}
+
+		@Override
+		public void process() {
+			ret = 0;
+
+			final int N = queue.size;
+			for( int i = 0; i < N; i++ ) {
+				double a = queue.get(i);
+				for( int j = 0; j < N; j++ ) {
+					if( queue.get(j) < a ) {
+						ret++;
+					}
+				}
+			}
+		}
+	}
+
+	private static class FastQueueAccessRaw extends PerformerBase
+	{
+		FastQueue<Double> queue = new FastQueue<Double>(100,Double.class,false);
+		int ret;
+
+		public FastQueueAccessRaw( double data [] ) {
+			for( Double d : data ) {
+				queue.add(d);
+			}
+		}
+
+		@Override
+		public void process() {
+			ret = 0;
+
+			final int N = queue.size;
+			for( int i = 0; i < N; i++ ) {
+				double a = queue.data[i];
+				for( int j = 0; j < N; j++ ) {
+					if( queue.data[j] < a ) {
+						ret++;
+					}
+				}
+			}
+		}
+	}
+
 	public static void main( String args[] ) {
 		Random rand = new Random(2342);
 		double data[] = new double[5000];
@@ -96,11 +155,17 @@ public class ArrayVsListAccess {
 
 		ListAccess list = new ListAccess(data);
 		ArrayAccess array = new ArrayAccess(data);
+		FastQueueAccess fastQueue = new FastQueueAccess(data);
+		FastQueueAccessRaw fastRaw = new FastQueueAccessRaw(data);
 
+		ProfileOperation.printOpsPerSec(fastRaw, TEST_TIME);
+		ProfileOperation.printOpsPerSec(fastQueue, TEST_TIME);
 		ProfileOperation.printOpsPerSec(list, TEST_TIME);
 		ProfileOperation.printOpsPerSec(array, TEST_TIME);
 
 		System.out.println("list.ret = "+list.ret);
 		System.out.println("array.ret = "+array.ret);
+		System.out.println("fast.ret = "+fastQueue.ret);
+		System.out.println("raw.ret = "+fastRaw.ret);
 	}
 }

@@ -33,7 +33,7 @@ import georegression.struct.homo.Homography2D_F32;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.transform.ConvertTransform_F64;
-import georegression.transform.homo.HomographyPointOps;
+import georegression.transform.homo.HomographyPointOps_F32;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -116,7 +116,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 	private boolean closeToBorder( int x , int y , int tolerance , Homography2D_F32 currToWorld) {
 
 		Point2D_F32 pt = new Point2D_F32(x,y);
-		HomographyPointOps.transform(currToWorld, pt, pt);
+		HomographyPointOps_F32.transform(currToWorld, pt, pt);
 
 		
 		if( pt.x < tolerance || pt.y < tolerance )

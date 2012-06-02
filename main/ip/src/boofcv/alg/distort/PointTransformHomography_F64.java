@@ -22,7 +22,7 @@ import boofcv.struct.distort.PointTransform_F64;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.homo.UtilHomography;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homo.HomographyPointOps;
+import georegression.transform.homo.HomographyPointOps_F64;
 import org.ejml.data.DenseMatrix64F;
 
 
@@ -52,7 +52,7 @@ public class PointTransformHomography_F64 implements PointTransform_F64 {
 
 	@Override
 	public void compute(double x, double y, Point2D_F64 out) {
-		HomographyPointOps.transform(homo, x,y, out);
+		HomographyPointOps_F64.transform(homo, x, y, out);
 	}
 
 	public Homography2D_F64 getModel() {

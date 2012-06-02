@@ -23,7 +23,7 @@ import georegression.struct.homo.Homography2D_F32;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.homo.UtilHomography;
 import georegression.struct.point.Point2D_F32;
-import georegression.transform.homo.HomographyPointOps;
+import georegression.transform.homo.HomographyPointOps_F32;
 import org.ejml.data.DenseMatrix64F;
 
 
@@ -55,20 +55,12 @@ public class PointTransformHomography_F32 implements PointTransform_F32 {
 	}
 
 	public void set( Homography2D_F64 transform ) {
-		this.homo.a11 = (float)transform.a11;
-		this.homo.a12 = (float)transform.a12;
-		this.homo.a13 = (float)transform.a13;
-		this.homo.a21 = (float)transform.a21;
-		this.homo.a22 = (float)transform.a22;
-		this.homo.a23 = (float)transform.a23;
-		this.homo.a31 = (float)transform.a31;
-		this.homo.a32 = (float)transform.a32;
-		this.homo.a33 = (float)transform.a33;
+		UtilHomography.convert(transform,homo);
 	}
 
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {
-		HomographyPointOps.transform(homo, x,y, out);
+		HomographyPointOps_F32.transform(homo, x, y, out);
 	}
 
 	public Homography2D_F32 getModel() {

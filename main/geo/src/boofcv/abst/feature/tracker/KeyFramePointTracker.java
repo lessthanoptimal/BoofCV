@@ -47,16 +47,16 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 
 	// applies a distortion to each feature's track location
 	// can be used to convert points into normalized image coordinates
-	PointTransform_F64 pixelTransform;
+	PointTransform_F64 pixelToNorm;
 
 	public KeyFramePointTracker(ImagePointTracker<I> tracker,
 								PointTransform_F64 transform , 
 								Class<R> trackType ) {
 		this.tracker = tracker;
 		if( transform == null )
-			this.pixelTransform = new DoNothingTransform_F64();
+			this.pixelToNorm = new DoNothingTransform_F64();
 		else
-			this.pixelTransform = transform;
+			this.pixelToNorm = transform;
 		this.trackType = trackType;
 	}
 
@@ -80,7 +80,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 		for( PointTrack t : tracks ) {
 			R p = t.getCookie();
 			p.pixel.currLoc.set(t);
-			pixelTransform.compute(t.x,t.y,p.currLoc);
+			pixelToNorm.compute(t.x, t.y, p.currLoc);
 			pairs.add(p);
 		}
 	}
@@ -99,7 +99,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 			R p = t.getCookie();
 			p.pixel.keyLoc.set(t);
 			p.pixel.currLoc.set(t);
-			pixelTransform.compute(t.x, t.y, p.keyLoc);
+			pixelToNorm.compute(t.x, t.y, p.keyLoc);
 			p.currLoc.set(p.keyLoc);
 			pairs.add(p);
 		}
@@ -127,7 +127,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 			p.trackID = t.featureId;
 			p.pixel.keyLoc.set(t);
 			p.pixel.currLoc.set(t);
-			pixelTransform.compute(t.x, t.y, p.keyLoc);
+			pixelToNorm.compute(t.x, t.y, p.keyLoc);
 			p.currLoc.set(p.keyLoc);
 			pairs.add(p);
 			spawned.add(p);

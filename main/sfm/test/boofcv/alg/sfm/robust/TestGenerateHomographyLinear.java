@@ -23,7 +23,7 @@ import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homo.HomographyPointOps;
+import georegression.transform.homo.HomographyPointOps_F64;
 import org.junit.Test;
 
 import java.util.List;
@@ -85,7 +85,7 @@ public class TestGenerateHomographyLinear implements ModelTestingInterface<Homog
 		ret.keyLoc.x = rand.nextDouble()*10;
 		ret.keyLoc.y = rand.nextDouble()*10;
 
-		HomographyPointOps.transform(transform, ret.keyLoc, ret.currLoc);
+		HomographyPointOps_F64.transform(transform, ret.keyLoc, ret.currLoc);
 
 		return ret;
 	}
@@ -95,7 +95,7 @@ public class TestGenerateHomographyLinear implements ModelTestingInterface<Homog
 		Point2D_F64 expected = new Point2D_F64();
 
 		for( AssociatedPair p : dataSet ) {
-			HomographyPointOps.transform(transform,p.keyLoc,expected);
+			HomographyPointOps_F64.transform(transform, p.keyLoc, expected);
 
 			if( expected.distance(p.currLoc) > 0.01 )
 				return false;

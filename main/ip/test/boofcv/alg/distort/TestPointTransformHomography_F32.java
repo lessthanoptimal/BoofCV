@@ -18,16 +18,35 @@
 
 package boofcv.alg.distort;
 
+import georegression.struct.homo.Homography2D_F32;
+import georegression.struct.point.Point2D_F32;
+import georegression.transform.homo.HomographyPointOps_F32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestPointTransformHomography_F32 {
+	/**
+	 * Directly computes the output
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void compareToDirect() {
+		Point2D_F32 input = new Point2D_F32(50,60);
+		Point2D_F32 output = new Point2D_F32();
+		Point2D_F32 expected = new Point2D_F32();
+
+		Homography2D_F32 H = new Homography2D_F32(1,2,3,4,5,6,7,8,9);
+
+		HomographyPointOps_F32.transform(H, input, expected);
+		PointTransformHomography_F32 alg = new PointTransformHomography_F32();
+		alg.set(H);
+
+		alg.compute(input.x,input.y,output);
+
+		assertEquals(expected.x,output.x,1e-4);
+		assertEquals(expected.y,output.y,1e-4);
 	}
 }

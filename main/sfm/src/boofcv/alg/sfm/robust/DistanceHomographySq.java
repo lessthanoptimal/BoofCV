@@ -22,7 +22,7 @@ import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homo.HomographyPointOps;
+import georegression.transform.homo.HomographyPointOps_F64;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64,
 
 	@Override
 	public double computeDistance(AssociatedPair pt) {
-		HomographyPointOps.transform(model, pt.keyLoc, expected);
+		HomographyPointOps_F64.transform(model, pt.keyLoc, expected);
 
 		return expected.distance2(pt.currLoc);
 	}
@@ -59,7 +59,7 @@ public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64,
 	public void computeDistance(List<AssociatedPair> points, double[] distance) {
 		for( int i = 0; i < points.size(); i++ ) {
 			AssociatedPair p = points.get(i);
-			HomographyPointOps.transform(model,p.keyLoc,expected);
+			HomographyPointOps_F64.transform(model, p.keyLoc, expected);
 
 			distance[i] = expected.distance2(p.currLoc);
 		}

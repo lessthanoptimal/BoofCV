@@ -74,6 +74,10 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
 
+		unsafe_set(x,y,value);
+	}
+
+	public void unsafe_set(int x, int y, float value) {
 		data[getIndex(x, y)] = value;
 	}
 

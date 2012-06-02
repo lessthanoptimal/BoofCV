@@ -59,7 +59,7 @@ public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 		return unsafe_get(x,y);
 	}
 
-	protected double unsafe_get(int x, int y) {
+	public double unsafe_get(int x, int y) {
 		return data[getIndex(x, y)];
 	}
 
@@ -74,6 +74,10 @@ public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
 
+		unsafe_set(x,y,value);
+	}
+
+	public void unsafe_set(int x, int y, double value) {
 		data[getIndex(x, y)] = value;
 	}
 

@@ -23,8 +23,15 @@ import boofcv.struct.feature.AssociatedIndex;
 
 
 /**
+ * <p>
  * Generalized interface for associating features.
+ * </p>
  *
+ * <p>
+ * DESIGN NOTE: {@link FastQueue} is used instead of {@link java.util.List} because in the association
+ * micro benchmark it produced results that were about 20% faster consistently.  Which is surprising since
+ * one would think the comparisons would dominate.
+ * </p>
  * @author Peter Abeles
  */
 public interface GeneralAssociation<T> {
