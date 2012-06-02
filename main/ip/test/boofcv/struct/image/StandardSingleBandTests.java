@@ -84,6 +84,33 @@ public abstract class StandardSingleBandTests {
 	}
 
 	/**
+	 * Check for a positive case of get() and set()
+	 */
+	@Test
+	public void unsafe_get_set() {
+		ImageSingleBand img = createImage(10, 20);
+		setRandom(img);
+
+		Number expected = randomNumber();
+		Number orig = (Number) call(img, "unsafe_get", 0, null, 1, 1);
+
+		// make sure the two are not equal
+		assertFalse(expected.equals(orig));
+
+		// set the expected to the point in the image
+		call(img, "unsafe_set", 1, expected, 1, 1);
+		Number found = (Number) call(img, "unsafe_get", 0, null, 1, 1);
+		if (!img.getTypeInfo().isInteger())
+			assertEquals(expected.doubleValue(), found.doubleValue(), 1e-4);
+		else {
+			if( img.getTypeInfo().isSigned() )
+				assertTrue(expected.intValue() == found.intValue());
+			else
+				assertTrue((expected.intValue() & 0xFFFF) == found.intValue());
+		}
+	}
+
+	/**
 	 * Makes sure all the accessors do proper bounds checking
 	 */
 	@Test

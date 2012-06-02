@@ -187,7 +187,7 @@ public class FactoryVisualOdometry {
 		pixelTo3D.configure(stereoParam.getBaseline(),rectK);
 
 		// transform to go from pixel coordinates to normalized coordinates
-		PointTransform_F64 pixelToNormalized = RectifyImageOps.rectifyNormalized_F64(stereoParam.left,rect1);
+		PointTransform_F64 pixelToNormalized = RectifyImageOps.rectifyNormalized_F64(stereoParam.left,rect1,rectK);
 
 		// setup the tracker
 		KeyFramePointTracker<T,PointPoseTrack> keyTracker =

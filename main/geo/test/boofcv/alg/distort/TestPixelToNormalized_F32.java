@@ -18,17 +18,41 @@
 
 package boofcv.alg.distort;
 
+import georegression.geometry.GeometryMath_F32;
+import georegression.struct.point.Point2D_F32;
+import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestPixelToNormalized_F32 {
+	double fx = 200;
+	double fy = 300;
+	double skew = 1.2;
+	double x_c = 400;
+	double y_c = 450;
 
 	@Test
 	public void stuff() {
-		fail("implement");
+		PixelToNormalized_F32 alg = new PixelToNormalized_F32();
+		alg.set(fx,fy,skew,x_c,y_c);
+
+		Point2D_F32 in = new Point2D_F32(100,120);
+		Point2D_F32 out = new Point2D_F32();
+
+		alg.compute(in.x,in.y,out);
+
+		Point2D_F32 expected = new Point2D_F32();
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3,true,fx,skew,x_c,0,fy,y_c,0,0,1);
+		CommonOps.invert(K_inv);
+
+		GeometryMath_F32.mult(K_inv, in, expected);
+
+		assertEquals(expected.x,out.x,1e-5);
+		assertEquals(expected.y,out.y,1e-5);
 	}
 }

@@ -14,7 +14,9 @@ Version : Alpha 0.9
 - Changed some corner detection algorithms to take the intensity image in as an input.
 - Added new Pixel to Normalized transform
 - Created interface for Stereo visual odometry
-  
+- Fixed bug in unsafe_set inside of ImageInt8
+- Added unsafe_set() and unsafe_get() to ImageFloat32, ImageFloat64, ImageSInt64
+- Fixed bug in ImageSInt64.set() where the value was cast into a short  
 
 
 ---------------------------------------------

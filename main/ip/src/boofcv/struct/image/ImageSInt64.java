@@ -56,7 +56,11 @@ public class ImageSInt64 extends ImageSingleBand<ImageSInt64> {
 	public long get(int x, int y) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
-		
+
+		return unsafe_get(x,y);
+	}
+
+	public long unsafe_get(int x, int y) {
 		return data[getIndex(x, y)];
 	}
 
@@ -71,7 +75,11 @@ public class ImageSInt64 extends ImageSingleBand<ImageSInt64> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		data[getIndex(x, y)] = (short) value;
+		unsafe_set(x, y, value);
+	}
+
+	public void unsafe_set(int x, int y, long value) {
+		data[getIndex(x, y)] = value;
 	}
 
 	@Override

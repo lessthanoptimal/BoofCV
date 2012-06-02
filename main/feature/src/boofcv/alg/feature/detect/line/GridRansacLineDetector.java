@@ -166,7 +166,7 @@ public class GridRansacLineDetector {
 	 */
 	private void findLinesInRegion( List<LineSegment2D_F32> gridLines ) {
 
-		List<Edgel> list = edgels.toList(null);
+		List<Edgel> list = edgels.copyIntoList(null);
 
 		int iterations = 0;
 

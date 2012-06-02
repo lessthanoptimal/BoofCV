@@ -38,6 +38,9 @@ public class FastQueue<T> {
 	// if false then
 	private boolean declareInstances;
 
+	// Wrapper around this class for lists
+	private FastQueueList<T> list = new FastQueueList<T>(this);
+
 	public FastQueue(int initialMaxSize, Class<T> type, boolean declareInstances) {
 		this.size = 0;
 		this.type = type;
@@ -54,9 +57,15 @@ public class FastQueue<T> {
 	protected FastQueue(Class<T> type, boolean declareInstances ) {
 		this(0,type,declareInstances);
 	}
-	
+
+	/**
+	 * Returns a wrapper around FastQueue that allows it to act as a read only list.
+	 * There is little overhead in using this interface.
+	 *
+	 * @return List wrapper.
+	 */
 	public List<T> toList() {
-		return new WrapArrayIntoList<T>(data,size);
+		return list;
 	}
 
 	public void removeTail() {
@@ -142,7 +151,7 @@ public class FastQueue<T> {
 		}
 	}
 
-	public List<T> toList(List<T> ret) {
+	public List<T> copyIntoList(List<T> ret) {
 		if( ret == null )
 			ret = new ArrayList<T>(size);
 		for( int i = 0; i < size; i++ ) {

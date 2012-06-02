@@ -30,9 +30,9 @@ import java.util.List;
  */
 public class VideoMjpegCodec {
 	// start of image
-	private static final byte SOI = (byte)0xD8;
+	public static final byte SOI = (byte)0xD8;
 	// end of image
-	private static final byte EOI = (byte)0xD9;
+	public static final byte EOI = (byte)0xD9;
 
 	public List<byte[]> read( InputStream streamIn ) {
 		// read the whole movie in at once to make it faster
@@ -52,6 +52,19 @@ public class VideoMjpegCodec {
 		}
 		return ret;
 	}
+
+	/**
+	 * Read a single frame at a time
+	 */
+	public byte[] readFrame( DataInputStream in ) {
+		try {
+			if( findMarker(in,SOI) && in.available() > 0 ) {
+				return readJpegData(in, EOI);
+			}
+		} catch (IOException e) {}
+		return null;
+	}
+
 
 	private byte[] convertToByteArray(InputStream streamIn) throws IOException {
 		ByteArrayOutputStream temp = new ByteArrayOutputStream(1024);

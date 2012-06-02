@@ -12,6 +12,9 @@ Trackers
 
 - See KLT list
 
+- BRIEF association
+ * Look up table for hamming distance to speed things up
+
 - Non-maximum suppression extraction
  * Faster algorithm from paper
  * Non-Maximum Suppression for edges

@@ -48,7 +48,7 @@ import georegression.struct.homo.Homography2D_F32;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.homo.UtilHomography;
 import georegression.struct.point.Point2D_F32;
-import georegression.transform.homo.HomographyPointOps;
+import georegression.transform.homo.HomographyPointOps_F32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -159,6 +159,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 		stopWorker();
 
 		this.sequence = sequence;
+		sequence.setLoop(true);
 		
 		// save the input image dimension
 		I input = sequence.next();
@@ -299,10 +300,10 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 		Point2D_F32 c = new Point2D_F32(width,height);
 		Point2D_F32 d = new Point2D_F32(0,height);
 
-		HomographyPointOps.transform(currToGlobal,a,a);
-		HomographyPointOps.transform(currToGlobal,b,b);
-		HomographyPointOps.transform(currToGlobal,c,c);
-		HomographyPointOps.transform(currToGlobal,d,d);
+		HomographyPointOps_F32.transform(currToGlobal, a, a);
+		HomographyPointOps_F32.transform(currToGlobal,b,b);
+		HomographyPointOps_F32.transform(currToGlobal,c,c);
+		HomographyPointOps_F32.transform(currToGlobal,d,d);
 
 		a.x = offsetX + a.x*scale; a.y = offsetY + a.y*scale;
 		b.x = offsetX + b.x*scale; b.y = offsetY + b.y*scale;
@@ -327,7 +328,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 		Point2D_F32 distPt = new Point2D_F32();
 
 		for( int i = 0; i < all.size; i++  ) {
-			HomographyPointOps.transform(currToGlobal,all.get(i),distPt);
+			HomographyPointOps_F32.transform(currToGlobal,all.get(i),distPt);
 
 			distPt.x = offsetX + distPt.x*scale;
 			distPt.y = offsetY + distPt.y*scale;
@@ -336,7 +337,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 		}
 
 		for( int i = 0; i < inliers.size; i++  ) {
-			HomographyPointOps.transform(currToGlobal,inliers.get(i),distPt);
+			HomographyPointOps_F32.transform(currToGlobal,inliers.get(i),distPt);
 
 			distPt.x = offsetX + distPt.x*scale;
 			distPt.y = offsetY + distPt.y*scale;

@@ -59,7 +59,7 @@ public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
 
 	@Override
 	public void unsafe_set(int x, int y, int value) {
-		data[get(x,y)] = (byte)value;
+		data[getIndex(x,y)] = (byte)value;
 	}
 
 	@Override

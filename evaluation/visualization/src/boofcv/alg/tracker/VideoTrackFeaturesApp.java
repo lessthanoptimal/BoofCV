@@ -83,6 +83,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 	public void process( SimpleImageSequence<I> sequence ) {
 		stopWorker();
 		this.sequence = sequence;
+		sequence.setLoop(true);
 		doRefreshAll();
 	}
 

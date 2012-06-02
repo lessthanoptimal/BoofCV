@@ -22,7 +22,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import georegression.struct.homo.Homography2D_F32;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
-import georegression.transform.homo.HomographyPointOps;
+import georegression.transform.homo.HomographyPointOps_F32;
 
 
 /**
@@ -63,7 +63,7 @@ public class PixelTransformHomography_F32 extends PixelTransform_F32 {
 
 	@Override
 	public void compute(int x, int y) {
-		HomographyPointOps.transform(homo, x,y, tran);
+		HomographyPointOps_F32.transform(homo, x, y, tran);
 		distX = tran.x;
 		distY = tran.y;
 	}

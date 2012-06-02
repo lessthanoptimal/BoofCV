@@ -23,7 +23,7 @@ import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homo.HomographyPointOps;
+import georegression.transform.homo.HomographyPointOps_F64;
 
 import java.util.Random;
 
@@ -69,7 +69,7 @@ public class TestDistanceHomographySq extends StandardDistanceTest<Homography2D_
 
 		Point2D_F64 result = new Point2D_F64();
 
-		HomographyPointOps.transform(h,associatedPair.keyLoc,result);
+		HomographyPointOps_F64.transform(h, associatedPair.keyLoc, result);
 		return result.distance2(associatedPair.currLoc);
 	}
 }
