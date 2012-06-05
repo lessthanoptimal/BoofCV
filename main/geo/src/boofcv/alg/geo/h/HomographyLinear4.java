@@ -74,10 +74,10 @@ public class HomographyLinear4 {
 	/**
 	 * Configure homography calculation
 	 *
-	 * @param normalize Should image coordinate be normalized?  Needed when coordinates are in units of pixels.
+	 * @param normalizeInput Should image coordinate be normalized?  Needed when coordinates are in units of pixels.
 	 */
-	public HomographyLinear4(boolean normalize) {
-		this.normalize = normalize;
+	public HomographyLinear4(boolean normalizeInput) {
+		this.normalize = normalizeInput;
 	}
 
 	/**

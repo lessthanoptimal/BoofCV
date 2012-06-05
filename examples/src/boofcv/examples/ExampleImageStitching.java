@@ -164,7 +164,7 @@ public class ExampleImageStitching {
 		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(new ScoreAssociateEuclideanSq(),2,-1,true);
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
-		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear();
+		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);
 		DistanceHomographySq distance = new DistanceHomographySq();
 		int minSamples = modelFitter.getMinimumPoints();
 		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher =

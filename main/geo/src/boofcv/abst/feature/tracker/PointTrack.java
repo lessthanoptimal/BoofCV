@@ -70,4 +70,8 @@ public class PointTrack extends Point2D_F64 {
 	public void setDescription( Object description ) {
 		this.description = description;
 	}
+
+	public void setCookie(Object cookie) {
+		this.cookie = cookie;
+	}
 }

@@ -36,9 +36,9 @@ public class FactoryAssociation {
 	 * See {@link AssociateGreedy} for details.
 	 * 
 	 * @param score Computes the fit score between two features.
-	 * @param maxError Maximum allowed error/fit score between two features
+	 * @param maxError Maximum allowed error/fit score between two features.  To disable set to Double.MAX_VALUE
 	 * @param maxMatches  Maximum number of matches returned.  If more than this are found then only the ones with the 
-	 *                  best fit score are returned.
+	 *                  best fit score are returned.  To disable set to a value <= 0.
 	 * @param backwardsValidation If true associations are validated by associating in the reverse direction.  If the 
 	 *                  forward and reverse matches fit an association is excepted.
 	 * @param <D> Data structure being associated
