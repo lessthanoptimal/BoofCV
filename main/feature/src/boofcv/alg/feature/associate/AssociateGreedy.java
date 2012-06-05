@@ -55,6 +55,13 @@ public class AssociateGreedy<T> {
 	// if true backwardsValidation is done
 	private boolean backwardsValidation;
 
+	/**
+	 * Configure association
+	 *
+	 * @param score Computes the association score.
+	 * @param maxFitError Maximum allowed fit error.  To disable set to Double.MAX_VALUE
+	 * @param backwardsValidation If true then backwards validation is performed.
+	 */
 	public AssociateGreedy(ScoreAssociation<T> score,
 						   double maxFitError,
 						   boolean backwardsValidation) {

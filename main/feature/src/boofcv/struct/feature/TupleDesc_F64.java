@@ -44,6 +44,10 @@ public class TupleDesc_F64 extends TupleDesc {
 		return ret;
 	}
 
+	public void set( TupleDesc_F64 src ) {
+		System.arraycopy(src.value,0,this.value,0,this.value.length);
+	}
+
 	public double[] getValue() {
 		return value;
 	}

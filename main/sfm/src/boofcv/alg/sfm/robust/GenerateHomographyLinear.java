@@ -40,7 +40,11 @@ public class GenerateHomographyLinear implements
 		ModelFitter<Homography2D_F64,AssociatedPair>
 {
 
-	HomographyLinear4 alg = new HomographyLinear4(true);
+	HomographyLinear4 alg;
+
+	public GenerateHomographyLinear( boolean normalizeInput ) {
+		alg = new HomographyLinear4(normalizeInput);
+	}
 
 	@Override
 	public Homography2D_F64 createModelInstance() {

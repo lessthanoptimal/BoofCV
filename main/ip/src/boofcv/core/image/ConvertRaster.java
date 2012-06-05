@@ -745,6 +745,17 @@ public class ConvertRaster {
 					dstData[indexDst++] = v << 16 | v << 8 | v;
 				}
 			}
+		} else if( numBands == 4 ) {
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + y * src.stride;
+
+				for (int x = 0; x < src.width; x++) {
+					int v = (int)srcData[indexSrc++];
+
+					dstData[indexDst++] = 0xFF << 24 | v << 16 | v << 8 | v;
+				}
+			}
 		} else {
 			throw new RuntimeException("Code more here");
 		}

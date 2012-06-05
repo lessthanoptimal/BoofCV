@@ -46,7 +46,8 @@ public class FactoryDescribeRegionPoint {
 	/**
 	 * <p>
 	 * Standard SURF descriptor configured to balance speed and descriptor stability. Invariant
-	 * to illumination, orientation, and scale.
+	 * to illumination, orientation, and scale.  Stability is a bit less than the reference
+	 * implementation provided by the original author.
 	 * </p>
 	 *
 	 * @see DescribePointSurf
@@ -73,7 +74,8 @@ public class FactoryDescribeRegionPoint {
 	/**
 	 * <p>
 	 * Modified SURF descriptor configured for optimal descriptor stability.  Runs slower
-	 * than {@link #surf(boolean, Class)}, but produces more stable results.
+	 * than {@link #surf(boolean, Class)}, but produces more stable results.  Stability is very
+	 * similar to reference implementation provided by the original author.
 	 * </p>
 	 *
 	 * @see DescribePointSurf

@@ -43,7 +43,7 @@ public class TestGenerateHomographyLinear implements ModelTestingInterface<Homog
 				new StandardModelFitterTests<Homography2D_F64,AssociatedPair>(this,4) {
 					@Override
 					public ModelFitter<Homography2D_F64,AssociatedPair> createAlg() {
-						return new GenerateHomographyLinear();
+						return new GenerateHomographyLinear(true);
 					}
 				};
 
@@ -56,7 +56,7 @@ public class TestGenerateHomographyLinear implements ModelTestingInterface<Homog
 				new StandardModelGeneratorTests<Homography2D_F64,AssociatedPair>(this,4) {
 					@Override
 					public ModelGenerator<Homography2D_F64,AssociatedPair> createAlg() {
-						return new GenerateHomographyLinear();
+						return new GenerateHomographyLinear(true);
 					}
 				};
 

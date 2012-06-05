@@ -544,7 +544,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 		DistanceFromModel distance;
 		
 		if( fitModel instanceof Homography2D_F64 ) {
-			GenerateHomographyLinear mf = new GenerateHomographyLinear();
+			GenerateHomographyLinear mf = new GenerateHomographyLinear(true);
 			fitter = mf;
 			modelRefiner = (ModelFitter)mf;
 			distance = new DistanceHomographySq();
