@@ -40,6 +40,7 @@ public class PyramidDiscrete<T extends ImageSingleBand> extends ImagePyramidBase
 	 *
 	 * @param imageType Type of image.
 	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of copied.
+	 *                              Set to false if you don't know what you are doing.
 	 * @param scaleFactors (optional) Specifies the scale of each layer in the pyramid.  See restrictions
 	 * on scaleFactor in {@link #setScaleFactors(int...)}.
 	 */
