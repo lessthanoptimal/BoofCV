@@ -153,10 +153,14 @@ public class DistortImageOps {
 
 	/**
 	 * Applies distortion to a single band image.  Place holder for more generic code later on
+	 *
+	 * @param interp Which interpolation it should use.  If null is passed in then bilinear interpolation is used.
 	 */
 	public static <T extends ImageSingleBand>
 	void distortSingle( T input , T output , PixelTransform_F32 model , InterpolatePixel<T> interp ) {
 		Class<T> inputType = (Class<T>)input.getClass();
+		if( interp == null )
+			interp = FactoryInterpolation.bilinearPixel(inputType);
 		ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(inputType, 0),inputType);
 		distorter.setModel(model);
 		distorter.apply(input,output);
