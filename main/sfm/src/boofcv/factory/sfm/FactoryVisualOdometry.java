@@ -162,7 +162,7 @@ public class FactoryVisualOdometry {
 		RectifyImageOps.fullViewLeft(stereoParam.left, rect1, rect2, rectK);
 
 		// inlier error is relative to pixel error, approximate pixel error in normalized image coordinates
-		double focalLength = (stereoParam.getLeft().fx+stereoParam.getLeft().fy)/2.0;
+		double focalLength = rectK.get(0,0);
 		double errorTolNormPixel =  inlierPixelError/focalLength;
 
 		// Estimator for PnP problem
@@ -173,7 +173,7 @@ public class FactoryVisualOdometry {
 		int N = generateMotion.getMinimumPoints();
 		ModelMatcher<Se3_F64,PointPositionPair> computeMotion =
 				new SimpleInlierRansac<Se3_F64,PointPositionPair>(2323,generateMotion,distanceMotion,
-						100,N,N,100000,errorTolNormPixel*errorTolNormPixel);
+						200,N,N,100000,errorTolNormPixel*errorTolNormPixel);
 
 		// Refine the PnP pose estimate
 		RefinePerspectiveNPoint refineMotion = FactoryEpipolar.refinePnP(1e-12, 200);

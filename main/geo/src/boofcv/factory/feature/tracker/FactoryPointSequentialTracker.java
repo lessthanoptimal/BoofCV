@@ -115,7 +115,8 @@ public class FactoryPointSequentialTracker {
 	/**
 	 * Creates a tracker using SURF features.
 	 *
-	 * @param maxMatches When features are associated with each other what is the maximum number of associations.
+	 * @param maxMatches The maximum number of matched features that will be considered.
+	 *                   Set to a value <= 0 to not bound the number of matches.
 	 * @param detectPerScale Controls how many features can be detected.  Try a value of 200 initially.
 	 * @param minSeparation How close together detected features can be.  Recommended value = 2.
 	 * @param imageType Type of image the input is.

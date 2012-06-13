@@ -101,7 +101,7 @@ public class PyramidUpdateGaussianScale< T extends ImageSingleBand> implements P
 			blur.process(prev,tempImage);
 
 			PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,tempImage);
-			DistortImageOps.distortSingle(tempImage,layer,model,interpolate);
+			DistortImageOps.distortSingle(tempImage,layer,model,null,interpolate);
 		}
 	}
 

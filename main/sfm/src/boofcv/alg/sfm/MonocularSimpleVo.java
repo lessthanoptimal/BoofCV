@@ -427,7 +427,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		// spawned at the spane point
 		for( PointPoseTrack t : tracker.getPairs() ) {
 			if( t.active ) {
-				t.keyLoc.set(t.spawnLoc);
+				t.keyLoc.set(t.spawnLoc); // t.spawnLoc is zero?
 			} else {
 				t.active = true;
 			}

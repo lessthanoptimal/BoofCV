@@ -23,4 +23,16 @@ public class PointPoseTrack extends KeyFrameTrack {
 	public void reset() {
 		active = false;
 	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public Point3D_F64 getLocation() {
+		return location;
+	}
+
+	public Point2D_F64 getSpawnLoc() {
+		return spawnLoc;
+	}
 }

@@ -75,6 +75,9 @@ public class ImageHistogramPanel extends JPanel {
 				maxCount = bins[i];
 		}
 
+		if( maxCount == 0 )
+			return;
+
 		g2.setColor(Color.BLACK);
 
 		int w = getWidth();

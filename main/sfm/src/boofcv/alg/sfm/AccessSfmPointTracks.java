@@ -16,37 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.tracker;
+package boofcv.alg.sfm;
 
-import boofcv.alg.geo.AssociatedPair;
+import boofcv.alg.tracker.AccessPointTracks;
+import georegression.struct.point.Point3D_F64;
 
 /**
- *
- * observations in normalized pixel coordinates.
+ * Provides information on point feature based SFM tracking algorithm
  *
  * @author Peter Abeles
  */
-public class KeyFrameTrack extends AssociatedPair {
-
-	// observation is pixels
-	AssociatedPair pixel = new AssociatedPair();
-
-	long trackID;
-
-	public void reset() {
-
-	}
+public interface AccessSfmPointTracks extends AccessPointTracks {
 
 	/**
-	 * Location of track in pixel coordinates
-	 *
-	 * @return Associated pair containing pixel coordinates
+	 * Returns the 3D location of the active track.  If there is no location estimate
+	 * yet then return null.
+	 * @param index The track's index in the active list
+	 * @return Location of the track or null otherwise
 	 */
-	public AssociatedPair getPixel() {
-		return pixel;
-	}
-
-	public long getTrackID() {
-		return trackID;
-	}
+	public Point3D_F64 getTrackLocation( int index );
 }

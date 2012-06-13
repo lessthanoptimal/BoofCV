@@ -65,7 +65,7 @@ public class PyramidUpdateSubsampleScale< T extends ImageSingleBand>
 				s = (float)pyramid.scale[0];
 
 			PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,prev);
-			DistortImageOps.distortSingle(prev,layer,model,interpolate);
+			DistortImageOps.distortSingle(prev,layer,model,null,interpolate);
 		}
 	}
 }

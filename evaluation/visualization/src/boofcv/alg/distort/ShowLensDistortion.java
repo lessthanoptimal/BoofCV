@@ -18,9 +18,8 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -165,13 +164,11 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 						input.width/2,input.height/2,radial1,radial2);
 		PixelTransform_F32 tran=new PointToPixelTransform_F32(ptran);
 
-		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
-
 		for( int i = 0; i < input.getNumBands(); i++ , progress++ ) {
 			T bandIn = input.getBand(i);
 			T bandOut = output.getBand(i);
 
-			DistortImageOps.distortSingle(bandIn,bandOut,tran,interp);
+			DistortImageOps.distortSingle(bandIn,bandOut,tran,false, TypeInterpolate.BILINEAR);
 		}
 		thread.stopThread();
 		ConvertBufferedImage.convertTo(output, renderedImage);
