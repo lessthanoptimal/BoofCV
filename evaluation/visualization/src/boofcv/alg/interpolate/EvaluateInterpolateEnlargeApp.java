@@ -98,7 +98,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 		scaledImage.reshape(panel.getWidth(),panel.getHeight());
 		PixelTransformAffine_F32 model = DistortSupport.transformScale(scaledImage,color);
 		for( int i = 0; i < color.getNumBands(); i++ )
-			DistortImageOps.distortSingle(color.getBand(i),scaledImage.getBand(i),model,interp);
+			DistortImageOps.distortSingle(color.getBand(i),scaledImage.getBand(i),model,null,interp);
 
 		// numerical round off error can cause the interpolation to go outside
 		// of pixel value bounds

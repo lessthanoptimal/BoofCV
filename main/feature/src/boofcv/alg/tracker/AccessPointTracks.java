@@ -31,6 +31,14 @@ import java.util.List;
 public interface AccessPointTracks {
 
 	/**
+	 * Used to get the track ID of an active Track
+	 *
+	 * @param index which track
+	 * @return The track's ID
+	 */
+	public long getTrackId( int index );
+
+	/**
 	 * All the points being actively tracked
 	 *
 	 * @return all active tracks

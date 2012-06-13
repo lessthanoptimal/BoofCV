@@ -22,6 +22,7 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle_F32;
@@ -77,32 +78,89 @@ public class DistortImageOps {
 		PixelTransformAffine_F32 model = new PixelTransformAffine_F32(m);
 		
 		if( input instanceof ImageSingleBand ) {
-			transformSingle((ImageSingleBand)input,(ImageSingleBand)output,interpType,model);
+			distortSingle((ImageSingleBand) input, (ImageSingleBand) output, model, false, interpType);
 		} else if( input instanceof MultiSpectral ) {
-			transformMS((MultiSpectral) input, (MultiSpectral) output, interpType, model);
+			distortMS((MultiSpectral) input, (MultiSpectral) output, model, false, interpType);
 		}
 	}
 
-	private static <T extends ImageSingleBand>
-	void transformSingle( T input , T output ,
-						  TypeInterpolate interpType ,
-						  PixelTransform_F32 transform )
+	/**
+	 * Applies a pixel transform to a single band image.  Easier to use function.
+	 *
+	 * @param input Input (source) image.
+	 * @param output Where the result of transforming the image image is written to.
+	 * @param transform The transform that is being applied to the image
+	 * @param skipOutsidePixels Should pixels that go outside the source image be skipped over
+	 *                          or set to the value of zero.
+	 * @param interpType Which type of pixel interpolation should be used. BILINEAR is in general recommended
+	 */
+	public static <T extends ImageSingleBand>
+	void distortSingle(T input, T output,
+					   PixelTransform_F32 transform,
+					   boolean skipOutsidePixels, TypeInterpolate interpType)
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
 		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
-		ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(inputType, 0), inputType);
+
+		ImageBorder<T> border;
+		if( skipOutsidePixels ) {
+			border = null;
+		} else {
+			border = FactoryImageBorder.value(inputType,0);
+		}
+
+		ImageDistort<T> distorter = FactoryDistort.distort(interp, border, inputType);
 		distorter.setModel(transform);
 		distorter.apply(input,output);
 	}
-	
-	private static <T extends ImageSingleBand,M extends MultiSpectral<T>>
-	void transformMS(M input, M output,
-					 TypeInterpolate interpType,
-					 PixelTransform_F32 transform)
+
+	/**
+	 * Applies a pixel transform to a single band image.  More flexible but order to use function.
+	 *
+	 * @param input Input (source) image.
+	 * @param output Where the result of transforming the image image is written to.
+	 * @param transform The transform that is being applied to the image
+	 * @param border How border pixels are handled.
+	 * @param interp Interpolation algorithm.
+	 */
+	public static <T extends ImageSingleBand>
+	void distortSingle(T input, T output,
+					   PixelTransform_F32 transform,
+					   ImageBorder<T> border,
+					   InterpolatePixel<T> interp )
+	{
+		Class<T> inputType = (Class<T>)input.getClass();
+		ImageDistort<T> distorter = FactoryDistort.distort(interp, border, inputType);
+		distorter.setModel(transform);
+		distorter.apply(input,output);
+	}
+
+	/**
+	 * Applies a pixel transform to a {@link MultiSpectral} image.
+	 *
+	 * @param input Input (source) image.
+	 * @param output Where the result of transforming the image image is written to.
+	 * @param transform The transform that is being applied to the image
+	 * @param skipOutsidePixels Should pixels that go outside the source image be skipped over
+	 *                          or set to the value of zero.
+	 * @param interpType Which type of pixel interpolation should be used.
+	 */
+	public static <T extends ImageSingleBand,M extends MultiSpectral<T>>
+	void distortMS(M input, M output,
+				   PixelTransform_F32 transform, boolean skipOutsidePixels,
+				   TypeInterpolate interpType)
 	{
 		Class<T> bandType = input.getType();
 		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, bandType);
-		ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(bandType, 0), bandType);
+
+		ImageBorder<T> border;
+		if( skipOutsidePixels ) {
+			border = null;
+		} else {
+			border = FactoryImageBorder.value(bandType,0);
+		}
+
+		ImageDistort<T> distorter = FactoryDistort.distort(interp, border, bandType);
 		distorter.setModel(transform);
 
 		distortMS(input,output,distorter);
@@ -145,25 +203,10 @@ public class DistortImageOps {
 		PixelTransformAffine_F32 model = DistortSupport.transformScale(output, input);
 
 		if( input instanceof ImageSingleBand ) {
-			transformSingle((ImageSingleBand)input,(ImageSingleBand)output,interpType,model);
+			distortSingle((ImageSingleBand) input, (ImageSingleBand) output, model, false, interpType);
 		} else if( input instanceof MultiSpectral ) {
-			transformMS((MultiSpectral) input, (MultiSpectral) output, interpType, model);
+			distortMS((MultiSpectral) input, (MultiSpectral) output, model, false, interpType);
 		}
-	}
-
-	/**
-	 * Applies distortion to a single band image.  Place holder for more generic code later on
-	 *
-	 * @param interp Which interpolation it should use.  If null is passed in then bilinear interpolation is used.
-	 */
-	public static <T extends ImageSingleBand>
-	void distortSingle( T input , T output , PixelTransform_F32 model , InterpolatePixel<T> interp ) {
-		Class<T> inputType = (Class<T>)input.getClass();
-		if( interp == null )
-			interp = FactoryInterpolation.bilinearPixel(inputType);
-		ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(inputType, 0),inputType);
-		distorter.setModel(model);
-		distorter.apply(input,output);
 	}
 
 	/**
@@ -193,9 +236,9 @@ public class DistortImageOps {
 				output.width/2-offX,output.height/2-offY,angleInputToOutput);
 
 		if( input instanceof ImageSingleBand ) {
-			transformSingle((ImageSingleBand)input,(ImageSingleBand)output,interpType,model);
+			distortSingle((ImageSingleBand) input, (ImageSingleBand) output, model, false, interpType);
 		} else if( input instanceof MultiSpectral ) {
-			transformMS((MultiSpectral) input, (MultiSpectral) output, interpType, model);
+			distortMS((MultiSpectral) input, (MultiSpectral) output, model, false, interpType);
 		}
 	}
 

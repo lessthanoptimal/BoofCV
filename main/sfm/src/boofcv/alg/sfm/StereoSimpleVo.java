@@ -14,6 +14,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,22 +31,25 @@ public class StereoSimpleVo<T extends ImageBase> {
 	// used to estimate a feature's 3D position from image range data
 	private ComputePixelTo3D<T> pixelTo3D;
 
+	// list of tracks that have been triangulated, for debugging only
+	private List<PointPoseTrack> triangulated = new ArrayList<PointPoseTrack>();
+
 	// triangulate feature's 3D location
 	private TriangulateTwoViewsCalibrated triangulate =
 			FactoryTriangulate.twoGeometric();
 
 	// estimate and refine motion
-	private ModelMatcher<Se3_F64,PointPositionPair> computeMotion;
-	private RefinePerspectiveNPoint refineMotion;
+	protected ModelMatcher<Se3_F64,PointPositionPair> computeMotion;
+	protected RefinePerspectiveNPoint refineMotion;
 
 	// internal storage
-	FastQueue<PointPositionPair> queuePointPose = new FastQueue<PointPositionPair>(200,PointPositionPair.class,true);
+	protected FastQueue<PointPoseD> queuePointPose = new FastQueue<PointPoseD>(200,PointPoseD.class,true);
 
 	// If the angle between two views is greater than this, triangulate the point's location
 	double triangulateAngle = 5*Math.PI/180.0;
 
 	// if the number of tracks is less than this change the keyframe
-	int minInlierTracks = 30;
+	int minInlierTracks = 10;
 
 	// transform from the world frame to key frame
 	Se3_F64 worldToKey = new Se3_F64();
@@ -68,6 +72,7 @@ public class StereoSimpleVo<T extends ImageBase> {
 
 	public boolean process( T leftImage , T rightImage ) {
 		tracker.process(leftImage);
+		triangulated.clear();
 
 		hadFault = false;
 		boolean reset = false;
@@ -84,7 +89,12 @@ public class StereoSimpleVo<T extends ImageBase> {
 			numFaults++;
 		}
 
+		if( tracker.getPairs().size() < 80 ) {
+			reset = true;
+		}
+
 		if( reset ) {
+			System.out.println("************* RESET ******************");
 			// add motion from key frame to global motion
 			worldToKey = worldToKey.concat(keyToCurr,null);
 			keyToCurr.reset();
@@ -116,11 +126,12 @@ public class StereoSimpleVo<T extends ImageBase> {
 			Point2D_F64 loc = t.getPixel().currLoc;
 
 			if( pixelTo3D.process(loc.x,loc.y) ) {
+				// TODO sanity check here with pixel error
 				t.location.set( pixelTo3D.getX(), pixelTo3D.getY(), pixelTo3D.getZ());
 				i++;
 			} else {
 				// drop tracks that it can't triangulate
-				tracker.dropTrack(t);
+				tracker.dropTrack(t);  // TODO don't drop, triangulate later
 			}
 		}
 	}
@@ -131,17 +142,18 @@ public class StereoSimpleVo<T extends ImageBase> {
 	 */
 	protected boolean updateCameraPose() {
 		// convert tracks into PointPositionPair
-		List<PointPoseTrack> tracks = tracker.getPairs();
+		List<PointPoseTrack> tracks = tracker.getPairs();   // todo changes to tracker?
 
 		queuePointPose.reset();
 		for( PointPoseTrack t : tracks ) {
-			PointPositionPair p = queuePointPose.pop();
+			PointPoseD p = queuePointPose.pop();
 			p.setLocation(t.location);
 			p.setObserved(t.currLoc);
+			p.currentPixel = t.getPixel().currLoc;
 		}
 
 		// estimate the camera's new position
-		if( !computeMotion.process(queuePointPose.toList()) )
+		if( !computeMotion.process((List)queuePointPose.toList()) )
 			return false;
 
 		// refine the estimate using non-linear optimization
@@ -149,7 +161,7 @@ public class StereoSimpleVo<T extends ImageBase> {
 		if( !refineMotion.process(computeMotion.getModel(),inliers) )
 			return false;
 
-		System.out.println("PnP inlier size "+inliers.size());
+		System.out.println("PnP inlier size "+inliers.size()+"  tracks "+tracks.size());
 
 		// save the result
 		keyToCurr.set(refineMotion.getRefinement());
@@ -168,6 +180,7 @@ public class StereoSimpleVo<T extends ImageBase> {
 		Vector3D_F64 XtoC1 = new Vector3D_F64();
 		Vector3D_F64 XtoC2 = new Vector3D_F64();
 
+		int numTriangulate = 0;
 		for( PointPoseTrack t : tracks ) {
 
 			// vector from point to first view camera center
@@ -184,13 +197,27 @@ public class StereoSimpleVo<T extends ImageBase> {
 			double theta = Math.acos( dot / (XtoC1.norm()*XtoC2.norm()));
 
 			if( theta > triangulateAngle && triangulate.triangulate(t.keyLoc,t.currLoc,keyToCurr,location) ) {
-				t.location.set(location);
+				// if it is less than zero then something clearly went wrong since it is behind the camera
+				if( location.z > 0 ) {
+					numTriangulate++;
+					t.location.set(location);
+					triangulated.add(t);
+				}
 			}
 		}
+		System.out.println("  total triangulated  "+numTriangulate+"  out of "+tracks.size());
 	}
 
 	public KeyFramePointTracker<T, PointPoseTrack> getTracker() {
 		return tracker;
+	}
+
+	public ModelMatcher<Se3_F64, PointPositionPair> getComputeMotion() {
+		return computeMotion;
+	}
+
+	public List<PointPoseTrack> getTriangulated() {
+		return triangulated;
 	}
 
 	public void setMinInlierTracks(int minInlierTracks) {
@@ -207,5 +234,9 @@ public class StereoSimpleVo<T extends ImageBase> {
 
 	public Se3_F64 getWorldToCamera() {
 		return worldToKey.concat(keyToCurr,null);
+	}
+
+	public static class PointPoseD extends PointPositionPair {
+		public Point2D_F64 currentPixel;
 	}
 }

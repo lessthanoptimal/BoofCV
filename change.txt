@@ -17,6 +17,8 @@ Version : Alpha 0.9
 - Fixed bug in unsafe_set inside of ImageInt8
 - Added unsafe_set() and unsafe_get() to ImageFloat32, ImageFloat64, ImageSInt64
 - Fixed bug in ImageSInt64.set() where the value was cast into a short  
+- Changed transform* functions inside of DistortImageOps so that you can specify how outside image pixels are handled.
+- Fixed bug in ImageHistogramPanel - reported by Ray
 
 
 ---------------------------------------------

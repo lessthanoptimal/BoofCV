@@ -22,6 +22,8 @@ import boofcv.struct.image.*;
 
 
 /**
+ * Contains functions that create classes which handle pixels outside the image border differently.
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
@@ -33,6 +35,12 @@ public class FactoryImageBorder {
 		return ret;
 	}
 
+	/**
+	 * Given an image type return the appropriate {@link ImageBorder} class type.
+	 *
+	 * @param imageType Type of image which is being processed.
+	 * @return The ImageBorder for processing the image type.
+	 */
 	public static Class<ImageBorder> lookupBorderClassType( Class<ImageSingleBand> imageType ) {
 		if( (Class)imageType == ImageFloat32.class )
 			return (Class)ImageBorder1D_F32.class;
@@ -46,7 +54,17 @@ public class FactoryImageBorder {
 			throw new IllegalArgumentException("Unknown image type");
 	}
 
-	public static <T extends ImageSingleBand> ImageBorder<T> general( Class<?> imageType , BorderType borderType ) {
+	/**
+	 * Creates an instance of the requested algorithms for handling borders pixels.  For
+	 * borders that return the same pixel value always use {@link #value(Class, double)} instead.
+	 *
+	 * @param imageType Type of image being processed.
+	 * @param borderType Which border algorithm should it use.
+	 * @return The requested {@link ImageBorder).
+	 */
+	public static <T extends ImageSingleBand> ImageBorder<T>
+	general( Class<?> imageType , BorderType borderType )
+	{
 
 		Class<?> borderClass;
 		switch(borderType) {
@@ -85,13 +103,31 @@ public class FactoryImageBorder {
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 	}
 
-	public static ImageBorder value( ImageSingleBand image , double value ) {
+	/**
+	 * Creates an {@link ImageBorder} that returns the specified value always.
+	 *
+	 * @see ImageBorderValue
+	 *
+	 * @param image The image the border is being created for.
+	 * @param value The value which will be returned.
+	 * @return An {@link ImageBorder}
+	 */
+	public static <T extends ImageSingleBand> ImageBorder<T> value( T image , double value ) {
 		Class borderType = lookupBorderClassType((Class)image.getClass());
 		ImageBorder border = value(borderType,value);
 		border.setImage(image);
 		return border;
 	}
 
+	/**
+	 * Creates an {@link ImageBorder} that returns the specified value always.
+	 *
+	 * @see ImageBorderValue
+	 *
+	 * @param imageType The image type the border is being created for.
+	 * @param value The value which will be returned.
+	 * @return An {@link ImageBorder}
+	 */
 	public static <T extends ImageSingleBand> ImageBorder<T> value( Class<T> imageType , double value ) {
 		if( imageType == ImageFloat32.class ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_F32((float)value);

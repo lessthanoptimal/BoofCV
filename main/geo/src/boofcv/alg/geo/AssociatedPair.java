@@ -37,7 +37,7 @@ public class AssociatedPair {
 	 */
 	public Point2D_F64 keyLoc;
 	/**
-	 * Location of the feature in the current.
+	 * Location of the feature in the current frame.
 	 */
 	public Point2D_F64 currLoc;
 
