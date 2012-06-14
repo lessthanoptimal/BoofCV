@@ -153,7 +153,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 
 	@Override
 	protected void updateAlgGUI(ImageSingleBand frame, BufferedImage imageGUI, double fps) {
-		renderFeatures(sequence.getGuiImage(),fps);
+		renderFeatures((BufferedImage)sequence.getGuiImage(),fps);
 	}
 
 	public static void main( String args[] ) {

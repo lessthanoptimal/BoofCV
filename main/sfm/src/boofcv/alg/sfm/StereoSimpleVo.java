@@ -9,6 +9,7 @@ import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.ComputePixelTo3D;
 import boofcv.struct.image.ImageBase;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -24,6 +25,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO create a new version of this algorithm that uses the essential matrix to estimate motion
 public class StereoSimpleVo<T extends ImageBase> {
 
 	// tracks features in the image
@@ -46,7 +48,7 @@ public class StereoSimpleVo<T extends ImageBase> {
 	protected FastQueue<PointPoseD> queuePointPose = new FastQueue<PointPoseD>(200,PointPoseD.class,true);
 
 	// If the angle between two views is greater than this, triangulate the point's location
-	double triangulateAngle = 5*Math.PI/180.0;
+	double triangulateAngle = 10*Math.PI/180.0;
 
 	// if the number of tracks is less than this change the keyframe
 	int minInlierTracks = 10;
@@ -101,6 +103,8 @@ public class StereoSimpleVo<T extends ImageBase> {
 
 			// initialize new tracks and estimate their 3D coordinates
 			initializeNewTracks(leftImage,rightImage);
+			System.out.println("   spawn size "+tracker.getTracker().getNewTracks().size()+"  total "+tracker.getPairs().size());
+			System.out.println("   dropped size "+tracker.getTracker().getDroppedTracks().size());
 		}
 
 		return !hadFault;
@@ -121,12 +125,11 @@ public class StereoSimpleVo<T extends ImageBase> {
 		// whose 3D location cannot be estimated
 		List<PointPoseTrack> tracks = tracker.getPairs();
 
-		for( int i = 0; i < tracks.size();  ) {
+		for( int i = 0; i < tracks.size(); ) {
 			PointPoseTrack t = tracks.get(i);
 			Point2D_F64 loc = t.getPixel().currLoc;
 
 			if( pixelTo3D.process(loc.x,loc.y) ) {
-				// TODO sanity check here with pixel error
 				t.location.set( pixelTo3D.getX(), pixelTo3D.getY(), pixelTo3D.getZ());
 				i++;
 			} else {
@@ -142,7 +145,7 @@ public class StereoSimpleVo<T extends ImageBase> {
 	 */
 	protected boolean updateCameraPose() {
 		// convert tracks into PointPositionPair
-		List<PointPoseTrack> tracks = tracker.getPairs();   // todo changes to tracker?
+		List<PointPoseTrack> tracks = tracker.getPairs();
 
 		queuePointPose.reset();
 		for( PointPoseTrack t : tracks ) {
@@ -177,24 +180,19 @@ public class StereoSimpleVo<T extends ImageBase> {
 
 		Point3D_F64 location = new Point3D_F64();
 
-		Vector3D_F64 XtoC1 = new Vector3D_F64();
-		Vector3D_F64 XtoC2 = new Vector3D_F64();
+		Vector3D_F64 v1 = new Vector3D_F64();
 
 		int numTriangulate = 0;
+		int numNegative = 0;
 		for( PointPoseTrack t : tracks ) {
 
-			// vector from point to first view camera center
-			XtoC1.x = -t.location.x;
-			XtoC1.y = -t.location.y;
-			XtoC1.z = -t.location.z;
+			// use normalized pixel coordinates to calculate acute angle between the two observation vectors
+			GeometryMath_F64.mult(keyToCurr.getR(),t.keyLoc,v1);
+			Point2D_F64 v2 = t.currLoc;
 
-			// vector from point to second view camera center
-			XtoC2.x = -keyToCurr.T.x-t.location.x;
-			XtoC2.y = -keyToCurr.T.y-t.location.y;
-			XtoC2.z = -keyToCurr.T.z-t.location.z;
+			double dot = v1.x*v2.x + v1.y*v2.y + v1.z;
 
-			double dot = XtoC1.dot(XtoC2);
-			double theta = Math.acos( dot / (XtoC1.norm()*XtoC2.norm()));
+			double theta = Math.acos( dot / (v1.norm()*Math.sqrt(v2.normSq()+1)));
 
 			if( theta > triangulateAngle && triangulate.triangulate(t.keyLoc,t.currLoc,keyToCurr,location) ) {
 				// if it is less than zero then something clearly went wrong since it is behind the camera
@@ -202,10 +200,12 @@ public class StereoSimpleVo<T extends ImageBase> {
 					numTriangulate++;
 					t.location.set(location);
 					triangulated.add(t);
+				} else {
+					numNegative++;
 				}
 			}
 		}
-		System.out.println("  total triangulated  "+numTriangulate+"  out of "+tracks.size());
+		System.out.println("  total triangulated  "+numTriangulate+" negative "+numNegative+"  out of "+tracks.size());
 	}
 
 	public KeyFramePointTracker<T, PointPoseTrack> getTracker() {

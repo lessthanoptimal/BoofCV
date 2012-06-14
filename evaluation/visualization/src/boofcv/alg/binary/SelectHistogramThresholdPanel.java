@@ -48,7 +48,7 @@ public class SelectHistogramThresholdPanel extends JPanel implements ChangeListe
 	    this.valueThreshold = threshold;
 		this.valueDown = directionDown;
 
-		histogramPanel = new HistogramThresholdPanel(200,256);
+		histogramPanel = new HistogramThresholdPanel(256,256);
 		histogramPanel.setPreferredSize(new Dimension(120,60));
 		histogramPanel.setMaximumSize(histogramPanel.getPreferredSize());
 

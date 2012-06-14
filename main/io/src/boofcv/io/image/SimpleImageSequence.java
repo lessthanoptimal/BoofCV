@@ -20,8 +20,6 @@ package boofcv.io.image;
 
 import boofcv.struct.image.ImageBase;
 
-import java.awt.image.BufferedImage;
-
 /**
  * Simplified interface for reading in a sequence of images.  This interface hides the complexities of reading
  * from different file formats and from live video streams.
@@ -45,11 +43,13 @@ public interface SimpleImageSequence<T extends ImageBase> {
 	public T next();
 
 	/**
-	 * Returns a BufferedImage that can be used for display purposes of the current image.
+	 * Returns the image in the original format that it was read in as.  When dealing with swing or any standard
+	 * Java SE environment this will almost always be BufferedImage.  The type has been abstracted out
+	 * to provide better Android support.
 	 *
 	 * @return
 	 */
-	public BufferedImage getGuiImage();
+	public <InternalImage> InternalImage getGuiImage();
 
 	/**
 	 * Call when done reading the image sequence.

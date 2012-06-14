@@ -9,17 +9,36 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="BoofCV IO" />
+    <orderEntry type="module" module-name="BoofCV Image Processing" />
+    <orderEntry type="library" scope="TEST" name="testing" level="project" />
+    <orderEntry type="module" module-name="BoofCV Visualize" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../thirdparty/xuggler-home/share/java/jars/xuggle-xuggler.jar!/" />
+          <root url="jar://$MODULE_DIR$/xuggle-xuggler-5.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="BoofCV Image Processing" />
-    <orderEntry type="library" name="testing" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/xuggle-utils-1.22.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/slf4j-1.6.6/slf4j-api-1.6.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

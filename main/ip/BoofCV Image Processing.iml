@@ -26,7 +26,6 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" name="testing" level="project" />
   </component>
 </module>
 

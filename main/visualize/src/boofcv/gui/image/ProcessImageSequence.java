@@ -101,7 +101,7 @@ public abstract class ProcessImageSequence<T extends ImageSingleBand> implements
 
 			numFrames++;
 
-			updateGUI(sequence.getGuiImage(), image);
+			updateGUI((BufferedImage)sequence.getGuiImage(), image);
 
 			while (paused) {
 				if (step) {
