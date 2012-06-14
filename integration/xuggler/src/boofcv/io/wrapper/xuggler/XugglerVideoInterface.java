@@ -11,6 +11,6 @@ import boofcv.struct.image.ImageBase;
 public class XugglerVideoInterface implements VideoInterface {
 	@Override
 	public <T extends ImageBase> SimpleImageSequence<T> load(String fileName, Class<T> imageType) {
-		return new XugglerSimplified<T>(fileName,imageType);
+		return new XugglerSimplified(fileName,imageType);
 	}
 }

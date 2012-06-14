@@ -17,7 +17,6 @@
     <orderEntry type="library" scope="TEST" name="testing" level="project" />
     <orderEntry type="module" module-name="BoofCV Numerics" />
     <orderEntry type="module" module-name="BoofCV Feature" />
-    <orderEntry type="library" name="testing" level="project" />
   </component>
 </module>
 

@@ -24,18 +24,21 @@ import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
+import boofcv.gui.d3.Orientation3D;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.io.wrapper.images.MjpegStreamSequence;
+import boofcv.io.wrapper.xuggler.XugglerSimplified;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
 import java.awt.*;
@@ -125,12 +128,14 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 	{
 		int frameNumber = 0;
 
+		Orientation3D orientation = new Orientation3D();
 		ImagePanel gui = new ImagePanel();
 		gui.addMouseListener(this);
 		gui.setPreferredSize(new Dimension(640,480));
 		ShowImages.showWindow(gui, "Left Video");
+		ShowImages.showWindow(orientation,"Orientation");
 
-		while( videoLeft.hasNext() ) {
+		while( videoLeft.hasNext() && videoRight.hasNext() ) {
 			ImageFloat32 left = videoLeft.next();
 			ImageFloat32 right = videoRight.next();
 
@@ -138,17 +143,24 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 			boolean worked = alg.process(left,right);
 			long after = System.nanoTime();
 
-			drawFeatures((AccessSfmPointTracks)alg,videoLeft.getGuiImage());
+			BufferedImage imageGuiLeft = videoLeft.getGuiImage();
+			drawFeatures((AccessSfmPointTracks)alg,imageGuiLeft);
 
 			if( worked ) {
 				Se3_F64 pose = alg.getCameraToWorld();
+
+				Vector3D_F64 v = new Vector3D_F64(0,0,1);
+				GeometryMath_F64.mult(pose.getR(), v, v);
+
+				orientation.setVector(v);
+				orientation.repaint();
 
 				System.out.println(frameNumber+"   location: "+pose.getT()+"  ms = "+(after-before)/1e6);
 			} else {
 				System.out.println(frameNumber+"   failed");
 			}
 
-			gui.setBufferedImage(videoLeft.getGuiImage());
+			gui.setBufferedImage(imageGuiLeft);
 			gui.repaint();
 			frameNumber++;
 
@@ -180,10 +192,20 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 
 		StereoParameters stereoParam = BoofMiscOps.loadXML("stereo.xml");
 
+		String fileLeft = "/home/pja/temp/left.mjpeg";
+		String fileRight = "/home/pja/temp/right.mjpeg";
+//		String fileLeft = "/home/pja/temp/left_test.avi";
+//		String fileRight = "/home/pja/temp/right_test.avi";
+
 		SimpleImageSequence<ImageFloat32> videoLeft =
-				new MjpegStreamSequence<ImageFloat32>("/home/pja/temp/left.mjpeg",ImageFloat32.class);
+				new XugglerSimplified<ImageFloat32>(fileLeft, ImageFloat32.class);
 		SimpleImageSequence<ImageFloat32> videoRight =
-				new MjpegStreamSequence<ImageFloat32>("/home/pja/temp/right.mjpeg",ImageFloat32.class);
+				new XugglerSimplified<ImageFloat32>(fileLeft, ImageFloat32.class);
+
+//		SimpleImageSequence<ImageFloat32> videoLeft =
+//				new MjpegStreamSequence<ImageFloat32>(fileLeft,ImageFloat32.class);
+//		SimpleImageSequence<ImageFloat32> videoRight =
+//				new MjpegStreamSequence<ImageFloat32>(fileRight,ImageFloat32.class);
 
 		ImagePointTracker<ImageFloat32> tracker =
 				FactoryPointSequentialTracker.klt(300,new int[]{1,2,4,8},3,3,2,ImageFloat32.class,ImageFloat32.class);

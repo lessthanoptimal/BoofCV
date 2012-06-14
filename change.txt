@@ -19,7 +19,9 @@ Version : Alpha 0.9
 - Fixed bug in ImageSInt64.set() where the value was cast into a short  
 - Changed transform* functions inside of DistortImageOps so that you can specify how outside image pixels are handled.
 - Fixed bug in ImageHistogramPanel - reported by Ray
-
+  * Added support for integer images
+- Updated Xuggler integration code
+- Generalized SimpleImageSequence so that it does not reference BufferedImage and will play nicer with Android
 
 ---------------------------------------------
 Date    : 2012/05/13

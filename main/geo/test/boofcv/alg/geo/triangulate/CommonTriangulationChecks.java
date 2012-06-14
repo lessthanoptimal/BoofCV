@@ -53,7 +53,7 @@ public class CommonTriangulationChecks {
 		Point3D_F64 cameraPoint = new Point3D_F64();
 		
 		for( int i = 0; i < N; i++ ) {
-			// random motion
+			// random motion from world to frame 'i'
 			Se3_F64 tranWtoI = new Se3_F64();
 			if( i > 0 ) {
 				tranWtoI.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2,

@@ -57,7 +57,7 @@ public class TriangulateGeometric {
 		Vector3D_F64 t = fromAtoB.getT();
 		rayB.p.set(-t.x, -t.y, -t.z);
 
-		// rotate into camera B's view
+		// rotate observation in B into camera A's view
 		GeometryMath_F64.multTran(fromAtoB.getR(),rayB.p,rayB.p);
 		GeometryMath_F64.multTran(fromAtoB.getR(),b,rayB.slope);
 

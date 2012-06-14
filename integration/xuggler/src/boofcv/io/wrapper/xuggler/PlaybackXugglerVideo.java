@@ -18,7 +18,7 @@
 
 package boofcv.io.wrapper.xuggler;
 
-import boofcv.io.image.PlaybackImageSequence;
+import boofcv.gui.image.PlaybackImageSequence;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -32,7 +32,7 @@ public class PlaybackXugglerVideo {
 		String fileName;
 
 		if (args.length == 0) {
-			fileName = "/home/pja/uav_video.avi";
+			fileName = "/home/pja/temp/left.mjpeg";
 		} else {
 			fileName = args[0];
 		}

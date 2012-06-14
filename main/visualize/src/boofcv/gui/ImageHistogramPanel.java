@@ -19,6 +19,7 @@
 package boofcv.gui;
 
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
@@ -44,7 +45,9 @@ public class ImageHistogramPanel extends JPanel {
 			bins[i] = 0;
 
 		if( image instanceof ImageFloat32 )
-			update((ImageFloat32)image);
+			update( (ImageFloat32)image );
+		else if( ImageInteger.class.isAssignableFrom(image.getClass()) )
+			update( (ImageInteger)image );
 		else
 			throw new IllegalArgumentException("Image type not yet supported");
 	}
@@ -53,6 +56,19 @@ public class ImageHistogramPanel extends JPanel {
 		for( int y = 0; y < image.height; y++ ) {
 			for( int x = 0; x < image.width; x++ ) {
 				int index = (int)(totalBins*(image.get(x,y)/maxValue));
+				if( index >= totalBins || index < 0 )
+					System.err.println("Bad index in ImageHistogramPanel");
+				else
+					bins[index]++;
+			}
+		}
+	}
+
+	private void update( ImageInteger image ) {
+		int max = (int)maxValue;
+		for( int y = 0; y < image.height; y++ ) {
+			for( int x = 0; x < image.width; x++ ) {
+				int index = totalBins*image.unsafe_get(x,y)/max;
 				if( index >= totalBins || index < 0 )
 					System.err.println("Bad index in ImageHistogramPanel");
 				else

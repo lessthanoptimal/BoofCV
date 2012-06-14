@@ -19,8 +19,9 @@
 package boofcv.io.wrapper.xuggler;
 
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 import com.xuggle.xuggler.*;
 import com.xuggle.xuggler.video.ConverterFactory;
 import com.xuggle.xuggler.video.IConverter;
@@ -32,7 +33,7 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequence<T> {
+public class XugglerSimplified<T extends ImageSingleBand> implements SimpleImageSequence<T> {
 
 	IContainer container;
 	IStreamCoder videoCoder;
@@ -60,6 +61,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 	String fileName;
 
 	public XugglerSimplified(String filename, Class<T> typeOutput) {
+		image = (T)GeneralizedImageOps.createSingleBand(typeOutput,1,1);
 		open(filename,typeOutput);
 	}
 
@@ -141,11 +143,12 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 
 	}
 
+	@Override
 	public boolean hasNext() {
 		while (container.readNextPacket(packet) >= 0) {
 			frameID++;
 
-			// Now we have a packet, let's see if it belongs to our video strea
+			// Now we have a packet, let's see if it belongs to our video stream
 
 			if (packet.getStreamIndex() == videoStreamId) {
 				// We allocate a new picture to get the data out of Xuggle
@@ -208,6 +211,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 		return false;
 	}
 
+	@Override
 	public T next() {
 		if (reducedImage != null) {
 			Graphics2D g2 = reducedImage.createGraphics();
@@ -220,8 +224,13 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 			imageGUI = bufferedImage;
 		}
 
-		image = ConvertBufferedImage.convertFrom(imageGUI, image, typeOutput);
+		image.reshape(imageGUI.getWidth(),imageGUI.getHeight());
+		ConvertBufferedImage.convertFrom(imageGUI, image);
 		return image;
+	}
+
+	@Override
+	public void setLoop(boolean loop) {
 	}
 
 	@Override

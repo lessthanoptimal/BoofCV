@@ -259,8 +259,7 @@ public class ConvertBufferedImage {
 		}
 
 		try {
-			if (src.getRaster() instanceof ByteInterleavedRaster &&
-					src.getType() == BufferedImage.TYPE_BYTE_GRAY ) {
+			if (src.getRaster() instanceof ByteInterleavedRaster ) {
 				ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
 			} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
