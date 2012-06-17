@@ -22,9 +22,9 @@ import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.ModelObservationResidualN;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
 import org.ejml.ops.CommonOps;
 
 /**

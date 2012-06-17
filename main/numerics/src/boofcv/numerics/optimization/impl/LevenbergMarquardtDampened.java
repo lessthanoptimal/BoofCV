@@ -19,10 +19,10 @@
 package boofcv.numerics.optimization.impl;
 
 import boofcv.numerics.optimization.OptimizationException;
-import org.ejml.alg.dense.linsol.LinearSolver;
 import org.ejml.alg.dense.linsol.LinearSolverSafe;
 import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
 import org.ejml.ops.CommonOps;
 
 /**

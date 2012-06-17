@@ -20,9 +20,9 @@ package boofcv.alg.geo;
 
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.alg.dense.decomposition.DecompositionFactory;
-import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
 
@@ -47,8 +47,7 @@ import java.util.List;
  */
 public class DecomposeEssential {
 
-	private SingularValueDecomposition<DenseMatrix64F> svd
-			= DecompositionFactory.svd(3,3,true,true,false);
+	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(3, 3, true, true, false);
 
 	// storage for the four possible solutions
 	List<Se3_F64> solutions = new ArrayList<Se3_F64>();

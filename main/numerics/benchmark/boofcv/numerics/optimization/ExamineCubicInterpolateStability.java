@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 
 package boofcv.numerics.optimization;
 
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
 
 /**
  * Tests to see which stabilization routine is more numerically stable

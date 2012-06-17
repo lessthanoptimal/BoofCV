@@ -22,9 +22,9 @@ import boofcv.numerics.optimization.impl.*;
 import boofcv.numerics.optimization.wrap.WrapLevenbergDampened;
 import boofcv.numerics.optimization.wrap.WrapQuasiNewtonBFGS;
 import boofcv.numerics.optimization.wrap.WrapTrustRegion;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
 
 /**
  * Creates optimization algorithms using easy to use interfaces.  These implementations/interfaces

@@ -18,9 +18,9 @@
 
 package boofcv.numerics.solver;
 
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
 
 /**
  * <p>
@@ -41,7 +41,7 @@ import org.ejml.data.DenseMatrix64F;
  */
 public class FitQuadratic3by3 {
 	
-	LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.leastSquares(9,6);
+	LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.leastSquares(9, 6);
 	DenseMatrix64F X = new DenseMatrix64F(6,1);
 	DenseMatrix64F Y = new DenseMatrix64F(9,1);
 	

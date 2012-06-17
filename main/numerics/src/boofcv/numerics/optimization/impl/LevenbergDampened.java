@@ -20,12 +20,12 @@ package boofcv.numerics.optimization.impl;
 
 import boofcv.numerics.optimization.functions.CoupledJacobian;
 import org.ejml.UtilEjml;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.alg.dense.linsol.LinearSolverSafe;
 import org.ejml.alg.dense.mult.MatrixMultProduct;
 import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
 import org.ejml.ops.CommonOps;
 
 /**

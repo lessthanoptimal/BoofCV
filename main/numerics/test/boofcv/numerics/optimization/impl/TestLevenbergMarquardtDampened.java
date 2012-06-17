@@ -23,9 +23,9 @@ import boofcv.numerics.optimization.NonlinearResults;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
 import boofcv.numerics.optimization.functions.FunctionNtoMxN;
 import boofcv.numerics.optimization.wrap.WrapCoupledJacobian;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

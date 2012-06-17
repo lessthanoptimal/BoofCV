@@ -18,10 +18,10 @@
 
 package boofcv.numerics.optimization.impl;
 
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.NormOps;
 
@@ -92,7 +92,7 @@ public class DoglegStepFtF implements TrustRegionStep {
 	 * Default solver
 	 */
 	public DoglegStepFtF() {
-		this(LinearSolverFactory.leastSquaresQrPivot(true,false));
+		this(LinearSolverFactory.leastSquaresQrPivot(true, false));
 //		this(LinearSolverFactory.pseudoInverse(true));
 	}
 

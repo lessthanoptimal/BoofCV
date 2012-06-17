@@ -24,9 +24,9 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.alg.dense.decomposition.DecompositionFactory;
-import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
 
@@ -69,8 +69,7 @@ public class PoseFromPairLinear6 {
 	private DenseMatrix64F A = new DenseMatrix64F(1,12);
 
 	// used to decompose and compute the null space of A
-	private SingularValueDecomposition<DenseMatrix64F> svd =
-			DecompositionFactory.svd(0,0,true,true,false);
+	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(0, 0, true, true, false);
 
 	// parameterized rotation and translation
 	private DenseMatrix64F x = new DenseMatrix64F(12,1);

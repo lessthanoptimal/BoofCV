@@ -22,9 +22,9 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.alg.dense.decomposition.DecompositionFactory;
-import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.SingularOps;
 
 import java.util.List;
@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class TriangulateLinearDLT {
 
-	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(4,4);
+	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(4, 4,true,true,false);
 	DenseMatrix64F v = new DenseMatrix64F(4,1);
 	DenseMatrix64F A = new DenseMatrix64F(4,4);
 

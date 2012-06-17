@@ -25,12 +25,12 @@ import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.alg.dense.decomposition.DecompositionFactory;
-import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.alg.dense.mult.MatrixVectorMult;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
+import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
 
@@ -101,8 +101,8 @@ import java.util.List;
 public class PnPLepetitEPnP {
 
 	// used to solve various linear problems
-	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(12,12,false,true,false);
-	private LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.leastSquares(6,4);
+	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(12, 12, false, true, false);
+	private LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.leastSquares(6, 4);
 	private LinearSolver<DenseMatrix64F> solverPinv = LinearSolverFactory.pseudoInverse(true);
 
 	// weighting factor to go from control point into world coordinate
