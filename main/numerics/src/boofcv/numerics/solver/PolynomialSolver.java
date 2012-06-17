@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 package boofcv.numerics.solver;
 
 import boofcv.numerics.complex.ComplexMath;
-import org.ejml.alg.dense.decomposition.DecompositionFactory;
-import org.ejml.alg.dense.decomposition.EigenDecomposition;
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.EigenDecomposition;
 
 /**
  * Provides functions for finding the roots of polynomials
@@ -54,7 +54,7 @@ public class PolynomialSolver {
 		}
 
 		// use generalized eigenvalue decomposition to find the roots
-		EigenDecomposition<DenseMatrix64F> evd =  DecompositionFactory.eigGeneral(N, false);
+		EigenDecomposition<DenseMatrix64F> evd =  DecompositionFactory.eig(N, false, false);
 
 		evd.decompose(c);
 

@@ -18,11 +18,11 @@
 
 package boofcv.alg.geo.pose;
 
-import org.ejml.alg.dense.decomposition.DecompositionFactory;
-import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
+import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 
 /**
@@ -56,8 +56,7 @@ public class Relinearlize {
 	// lookup table for indices
 	int table[] = new int[10*10];
 
-	SingularValueDecomposition<DenseMatrix64F> svd =
-			DecompositionFactory.svd(3, 3, false, true, false);
+	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(3, 3, false, true, false);
 
 	// used inside of solveConstraintMatrix
 	DenseMatrix64F AA = new DenseMatrix64F(1,1);

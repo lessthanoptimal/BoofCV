@@ -18,9 +18,9 @@
 
 package boofcv.alg.geo.calibration;
 
-import org.ejml.alg.dense.decomposition.DecompositionFactory;
-import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
 import org.ejml.ops.SpecializedOps;
@@ -60,7 +60,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	// system of equations
 	private DenseMatrix64F A = new DenseMatrix64F(1,1);
 	// computes the SVD of the A matrix
-	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(0,0);
+	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(0, 0,true,true,false);
 
 	// a vectorized description of the B = A^-T * A^-1 matrix.
 	private DenseMatrix64F b;

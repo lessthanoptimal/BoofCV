@@ -24,9 +24,9 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues;
-import org.ejml.alg.dense.decomposition.DecompositionFactory;
-import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 
 /**
@@ -53,8 +53,7 @@ public class CalibPoseAndPointRodriguesCodec
 	DenseMatrix64F R = new DenseMatrix64F(3,3);
 
 	// used to make sure the rotation matrix is in SO(3)
-	SingularValueDecomposition<DenseMatrix64F> svd =
-			DecompositionFactory.svd(3,3,true,true,false);
+	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(3, 3, true, true, false);
 
 	/**
 	 * Specify the number of views and points it can expected

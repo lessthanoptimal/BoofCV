@@ -18,9 +18,9 @@
 
 package boofcv.numerics.solver;
 
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
 
 /**
  * Quadratic solver for an arbitrary 2D region
@@ -29,7 +29,7 @@ import org.ejml.data.DenseMatrix64F;
  */
 public class FitQuadratic2D {
 
-	LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.leastSquares(10,6);
+	LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.leastSquares(10, 6);
 
 	DenseMatrix64F A = new DenseMatrix64F(1,6);
 	DenseMatrix64F b = new DenseMatrix64F(1,1);

@@ -24,9 +24,9 @@ import boofcv.core.image.border.BorderIndex1D_Reflect;
 import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.wavelet.*;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
 
 
 /**

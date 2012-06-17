@@ -21,9 +21,9 @@ package boofcv.alg.geo;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.alg.dense.decomposition.DecompositionFactory;
-import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
 
@@ -50,8 +50,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DecomposeHomography {
-	private SingularValueDecomposition<DenseMatrix64F> svd =
-			DecompositionFactory.svd(3, 3, false, true, false);
+	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(3, 3, false, true, false);
 
 	// storage for the four possible solutions
 	// Camera motion part of the solution

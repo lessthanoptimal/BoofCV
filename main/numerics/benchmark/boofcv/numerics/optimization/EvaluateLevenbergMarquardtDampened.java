@@ -20,9 +20,9 @@ package boofcv.numerics.optimization;
 
 import boofcv.numerics.optimization.impl.LevenbergMarquardtDampened;
 import boofcv.numerics.optimization.wrap.WrapLevenbergDampened;
-import org.ejml.alg.dense.linsol.LinearSolver;
-import org.ejml.alg.dense.linsol.LinearSolverFactory;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolver;
+import org.ejml.factory.LinearSolverFactory;
 
 /**
  * @author Peter Abeles

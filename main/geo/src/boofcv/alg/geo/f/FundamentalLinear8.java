@@ -22,9 +22,9 @@ package boofcv.alg.geo.f;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.UtilEpipolar;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.alg.dense.decomposition.DecompositionFactory;
-import org.ejml.alg.dense.decomposition.SingularValueDecomposition;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
 import org.ejml.ops.SpecializedOps;
@@ -57,8 +57,7 @@ public class FundamentalLinear8 {
 
 	// contains the set of equations that are solved
 	protected DenseMatrix64F A = new DenseMatrix64F(1,9);
-	protected SingularValueDecomposition<DenseMatrix64F> svd
-			= DecompositionFactory.svd(0, 0, true, true, false);
+	protected SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(0, 0, true, true, false);
 
 	// either the fundamental or essential matrix
 	protected DenseMatrix64F F = new DenseMatrix64F(3,3);
