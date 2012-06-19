@@ -180,6 +180,19 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}
 
+	/**
+	 * Normalizes the array such that the absolute value sums up to one.
+	 *
+	 * @param kernel The kernel being normalized.
+	 */
+	public static void normalizeAbsSumToOne(Kernel2D_F32 kernel) {
+
+		float[] data = kernel.data;
+		float total = 0;
+		for (int i = 0; i < data.length; i++) total += Math.abs(data[i]);
+		for (int i = 0; i < data.length; i++) data[i] /= total;
+	}
+
 	public static double sum(Kernel2D_F64 kernel) {
 
 		double[] data = kernel.data;

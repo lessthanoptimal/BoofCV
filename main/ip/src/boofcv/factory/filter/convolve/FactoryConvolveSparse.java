@@ -47,6 +47,15 @@ public class FactoryConvolveSparse {
 		}
 	}
 
+	public static <T extends ImageSingleBand, K extends Kernel2D>
+	ImageConvolveSparse<T,K> create( Class<T> imageType ) {
+		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
+			return (ImageConvolveSparse<T,K>)new Convolve_F32(null);
+		} else {
+			return (ImageConvolveSparse<T,K>)new Convolve_I(null);
+		}
+	}
+
 	public static class Convolve_F32 extends ImageConvolveSparse<ImageFloat32, Kernel2D_F32> {
 
 		public Convolve_F32(Kernel2D_F32 kernel) {

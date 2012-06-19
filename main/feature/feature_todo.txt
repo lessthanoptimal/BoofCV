@@ -12,6 +12,11 @@ Trackers
 
 - See KLT list
 
+- Canonical Radius
+  * FH detector is probably incorrect
+  * Make sure trackers use canonical radius and add a tuning parameter to scale up or down
+    - This will allow detectors to be swapped with less problems
+
 - BRIEF association
  * Look up table for hamming distance to speed things up
 

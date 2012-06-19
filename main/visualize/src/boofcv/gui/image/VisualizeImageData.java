@@ -110,9 +110,9 @@ public class VisualizeImageData {
 
 				int rgb;
 				if( v > 0 ) {
-					rgb = (255*v/normalize) << 16;
+					rgb =  ((255*v/normalize) << 16);
 				} else {
-					rgb = (-255*v/normalize) << 8;
+					rgb = -((255*v/normalize) << 8);
 				}
 				dst.setRGB(x,y,rgb);
 			}

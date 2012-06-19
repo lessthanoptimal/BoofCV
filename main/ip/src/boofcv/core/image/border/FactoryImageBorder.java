@@ -30,7 +30,7 @@ import boofcv.struct.image.*;
 public class FactoryImageBorder {
 
 	public static <T extends ImageSingleBand> ImageBorder<T> general( T image , BorderType borderType ) {
-		ImageBorder<T> ret = general(image.getClass(),borderType);
+		ImageBorder<T> ret = general((Class)image.getClass(),borderType);
 		ret.setImage(image);
 		return ret;
 	}
@@ -63,7 +63,7 @@ public class FactoryImageBorder {
 	 * @return The requested {@link ImageBorder).
 	 */
 	public static <T extends ImageSingleBand> ImageBorder<T>
-	general( Class<?> imageType , BorderType borderType )
+	general( Class<T> imageType , BorderType borderType )
 	{
 
 		Class<?> borderClass;

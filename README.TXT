@@ -44,6 +44,14 @@ Yes, with two commands you can compile BoofCV.  Inside the lib/ directory there 
 
 BoofCV is in general very easy to build on just about any system.  Because it is Java you don't have any of the annoying system dependent or compilor issues that are the source of endless headaches.
 
+========= Dependencies =======================
+
+BoofCV depends on a few other packages and if you are getting lot of errors when compiling your source code you probably forgot to include them.  All libraries that BoofCV depends on are included with BoofCV and are contained in the boofcv/lib directory.
+
+EJML.jar             http://code.google.com/p/efficient-java-matrix-library/
+GeoRegression.jar    http://georegression.org/
+libpja.jar           Various utility functions
+
 ========= Developing With BoofCV =============
 
 BoofCV has been written to be used with an integrated development evironment (IDE) and access to the source code.  IntelliJ and Eclipse are two excellent IDEs for Java.  With IntelliJ being my personally preference.  After you learn the basics of BoofCV it is possible to highly customize the code and discard abstractions that make programming easier, but less efficient.  The best way to write highly optimized code is to start by looking at the factory containing the code you wish to use, then tracing through the algorithms it invokes.  The code is designed to be readable and documentation actually improves inside of low level algorithms. 
@@ -51,3 +59,5 @@ BoofCV has been written to be used with an integrated development evironment (ID
 ========= Contact ===========================
 
 For questions or comments about BoofCV please use the message board.  Only post a bug report after doing some due diligence to make sure it is really a bug and that it has not already been reported.
+
+Message Board        http://groups.google.com/group/boofcv
