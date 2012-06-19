@@ -39,6 +39,6 @@ public class ImplImageDistort_S32<T extends ImageSInt32> extends ImageDistortBas
 
 	@Override
 	protected void assign(int indexDst, float value) {
-		dstImg.data[indexDst] = (byte)value;
+		dstImg.data[indexDst] = (int)value;
 	}
 }

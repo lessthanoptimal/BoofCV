@@ -39,7 +39,7 @@ public class ImplImageDistort_I16<T extends ImageInt16> extends ImageDistortBasi
 
 	@Override
 	protected void assign(int indexDst, float value) {
-		dstImg.data[indexDst] = (byte)value;
+		dstImg.data[indexDst] = (short)value;
 	}
 
 }

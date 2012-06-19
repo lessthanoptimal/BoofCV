@@ -78,6 +78,7 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand> implements Interes
 
 	@Override
 	public double getCanonicalRadius() {
+		// TODO is this correct?
 		return BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
 	}
 
