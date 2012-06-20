@@ -45,7 +45,7 @@ public abstract class UnconstrainedMinimizationEvaluator {
 	 *
 	 * @return Line search algorithm
 	 */
-	protected abstract UnconstrainedMinimization createSearch( double minimumValue );
+	protected abstract UnconstrainedMinimization createSearch();
 
 	/**
 	 * Run the line search algorithm on the two inputs and compute statistics
@@ -65,8 +65,8 @@ public abstract class UnconstrainedMinimizationEvaluator {
 		CallCounterNtoS f = new CallCounterNtoS(func);
 		CallCounterNtoN d = new CallCounterNtoN(deriv);
 
-		UnconstrainedMinimization alg = createSearch(minimValue);
-		alg.setFunction(f,d);
+		UnconstrainedMinimization alg = createSearch();
+		alg.setFunction(f,d,minimValue);
 
 		double initialValue = func.process(initial);
 

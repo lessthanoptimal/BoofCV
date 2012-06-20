@@ -34,22 +34,17 @@ import org.ejml.factory.LinearSolverFactory;
  * @author Peter Abeles
  */
 public class FactoryOptimization {
-	// TODO Move convergence tolerances out of these functions and into the interface?
-	// can't predeclare optimizer and specify the tolerances later with the current design
-
 	/**
 	 * <p>
 	 * Creates a solver for the unconstrained minimization problem.  Here a function has N parameters
 	 * and a single output.  The goal is the minimize the output given the function and its derivative.
 	 * </p>
 	 *
-	 * @param minFunctionValue The smallest possible value out of the function.  Sometimes used to bound
-	 *                         the problem.
 	 * @return UnconstrainedMinimization
 	 */
-	public static UnconstrainedMinimization unconstrained( double minFunctionValue )
+	public static UnconstrainedMinimization unconstrained()
 	{
-		return new WrapQuasiNewtonBFGS(minFunctionValue);
+		return new WrapQuasiNewtonBFGS();
 	}
 
 	/**

@@ -49,8 +49,10 @@ public interface UnconstrainedMinimization extends IterativeOptimization {
 	 * @param function Function being optimized.
 	 * @param gradient Partial derivative for each input in the function. If null a numerical
 	 *                 gradient will be computed.
+	 * @param minFunctionValue Minimum possible value that 'function' can have.  E.g. for least squares problems
+	 *                         this value should be set to zero.
 	 */
-	public void setFunction( FunctionNtoS function , FunctionNtoN gradient );
+	public void setFunction( FunctionNtoS function , FunctionNtoN gradient , double minFunctionValue );
 
 	/**
 	 * Specify the initial set of parameters from which to start from. Call after
