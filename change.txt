@@ -22,6 +22,8 @@ Version : Alpha 0.9
   * Added support for integer images
 - Updated Xuggler integration code
 - Generalized SimpleImageSequence so that it does not reference BufferedImage and will play nicer with Android
+- Fixed bug in ImplImageDistort* where for 16bit and 32 bit images values were being type casted into bytes
+- Changed UnconstrainedMinimization so that the minimum function value is specified in setFunction()
 
 ---------------------------------------------
 Date    : 2012/05/13

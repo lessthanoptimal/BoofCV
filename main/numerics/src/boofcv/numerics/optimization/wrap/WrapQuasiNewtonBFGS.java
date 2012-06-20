@@ -38,15 +38,9 @@ public class WrapQuasiNewtonBFGS implements UnconstrainedMinimization {
 	private static final double line_xtol = 0.1;
 
 	QuasiNewtonBFGS alg;
-	double minFunctionValue;
-
-	public WrapQuasiNewtonBFGS( double minFunctionValue)
-	{
-		this.minFunctionValue = minFunctionValue;
-	}
 
 	@Override
-	public void setFunction(FunctionNtoS function, FunctionNtoN gradient) {
+	public void setFunction(FunctionNtoS function, FunctionNtoN gradient, double minFunctionValue) {
 		LineSearch lineSearch = new LineSearchMore94(line_ftol,line_gtol,line_xtol);
 
 		GradientLineFunction gradLine;

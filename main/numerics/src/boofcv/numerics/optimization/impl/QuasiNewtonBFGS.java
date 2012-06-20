@@ -103,7 +103,7 @@ public class QuasiNewtonBFGS
 	 *
 	 * @param function Function being optimized
 	 * @param lineSearch Line search that selects a solution that meets the Wolfe condition.
-	 * @param funcMinValue Minimum possible function value .
+	 * @param funcMinValue Minimum possible function value. E.g. 0 for least squares.
 	 */
 	public QuasiNewtonBFGS( GradientLineFunction function ,
 							LineSearch lineSearch ,
