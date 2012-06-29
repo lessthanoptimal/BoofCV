@@ -32,7 +32,7 @@ public class PyramidKltFeature {
 	public float x;
 	public float y;
 	// the maximum layer in which this description is valid
-	int maxLayer=-1;
+	public int maxLayer=-1;
 
 	// user specified data, not used by the tracker
 	public Object cookie;
