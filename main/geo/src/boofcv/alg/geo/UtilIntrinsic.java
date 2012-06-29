@@ -117,7 +117,7 @@ public class UtilIntrinsic {
 		if( K == null ) {
 			K = new DenseMatrix64F(3,3);
 		}
-		CommonOps.set(K, 0);
+		CommonOps.fill(K, 0);
 
 		K.data[0] = param.fx;
 		K.data[1] = param.skew;
