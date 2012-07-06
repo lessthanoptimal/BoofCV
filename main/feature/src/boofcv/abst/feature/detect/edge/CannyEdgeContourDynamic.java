@@ -33,6 +33,14 @@ public class CannyEdgeContourDynamic<T extends ImageSingleBand, D extends ImageS
 	// threshold is specified to be
 	float fractionLow, fractionHigh;
 
+	/**
+	 * Constructor and configures algorithm
+	 *
+	 * @param blur Used during the image blur pre-process step.
+	 * @param gradient Computes image gradient.
+	 * @param fractionLow Low threshold specified as fraction of maximum edge intensity
+	 * @param fractionHigh HIgh threshold specified as fraction of maximum edge intensity
+	 */
 	public CannyEdgeContourDynamic(BlurFilter<T> blur, ImageGradient<T, D> gradient ,
 								   float fractionLow , float fractionHigh  ) {
 		super(blur, gradient, 0, 0);

@@ -150,7 +150,7 @@ public class CreateMJpeg {
 
 
 	public static void main( String args[] ) throws IOException {
-		File directory = new File("/home/pja/temp/left");
+		File directory = new File("/home/pja/projects/developmental/data/temp");
 
 		File[] files = directory.listFiles();
 
@@ -162,8 +162,13 @@ public class CreateMJpeg {
 		}
 		Collections.sort(list);
 
+		int i = 0;
+
 		DataOutputStream out = new DataOutputStream(new FileOutputStream("movie.mjpeg"));
 		for( String n : list ) {
+//			if( !(i++ % 4 == 0) )
+//				continue;
+
 			System.out.println("Reading in: "+n);
 			DataInputStream in = new DataInputStream(new FileInputStream(n));
 

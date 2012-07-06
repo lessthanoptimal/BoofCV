@@ -57,7 +57,7 @@ public class RefineCornerCanny {
 	InitialEstimate initial = new InitialEstimate();
 
 	public RefineCornerCanny() {
-		detectEdge = FactoryDetectEdgeContour.cannyDynamic(0.1f, 0.3f, ImageFloat32.class, ImageFloat32.class);
+		detectEdge = FactoryDetectEdgeContour.canny(0.1f, 0.3f, true, ImageFloat32.class, ImageFloat32.class);
 	}
 
 	public void process( ImageFloat32 image ) {

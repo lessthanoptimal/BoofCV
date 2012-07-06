@@ -503,6 +503,7 @@
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../ejml" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../georegression" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../libpjajava" vcs="svn" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
   <component name="XPathView.XPathProjectComponent">
