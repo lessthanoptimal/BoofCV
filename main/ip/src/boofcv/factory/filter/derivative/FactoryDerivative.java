@@ -175,7 +175,7 @@ public class FactoryDerivative {
 			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_I32.class;
 			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,borderType);
 		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Input and derivative types are probably not compatible",e);
 		}
 		return m;
 	}
@@ -187,7 +187,7 @@ public class FactoryDerivative {
 			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_I32.class;
 			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,derivType,borderType);
 		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Input and derivative types are probably not compatible",e);
 		}
 		return m;
 	}
@@ -199,7 +199,7 @@ public class FactoryDerivative {
 			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(imageType) ? ImageBorder_F32.class : ImageBorder_I32.class;
 			m = HessianFromGradient.class.getDeclaredMethod("hessian"+name, imageType,imageType,imageType,imageType,imageType,borderType);
 		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Input and derivative types are probably not compatible",e);
 		}
 		return m;
 	}

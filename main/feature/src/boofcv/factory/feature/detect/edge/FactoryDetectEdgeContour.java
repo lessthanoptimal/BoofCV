@@ -38,36 +38,31 @@ public class FactoryDetectEdgeContour {
 
 	/**
 	 * Detects the edge of an object using the canny edge detector.  This edge detector tends to work
-	 * well but can be slower than others.
+	 * well but can be slower than others.   If dynamic thresholds are set to true then the thresholds
+	 * are relative to the image's maximum edge intensity, which makes it a bit more generic.
 	 *
 	 * @see CannyEdgeContour
 	 *
-	 * @param threshLow Low threshold for flagging edges
-	 * @param threshHigh High threshold for flagging edges.
+	 * @param threshLow Low threshold for flagging edges.  Values are image dependent.
+	 * @param threshHigh High threshold for flagging edges.  Values are image dependent.
+	 * @param dynamicThreshold If true then the thresholds have a range from 0 to 1 and are relative to the
+	 *                         maximum edge intensity, if false then they are absolute intensity values.
 	 * @param imageType Type of input image.
 	 * @param derivType Type of image derivative.
 	 * @return Canny edge detector
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	DetectEdgeContour<T> canny( float threshLow , float threshHigh ,
+	DetectEdgeContour<T> canny( double threshLow , double threshHigh , boolean dynamicThreshold,
 								Class<T> imageType , Class<D> derivType )
 	{
 		// blurring the image first
 		BlurFilter<T> blur = FactoryBlurFilter.gaussian(imageType,-1,2);
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new CannyEdgeContour<T,D>(blur,gradient,threshLow,threshHigh);
-	}
-
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	DetectEdgeContour<T> cannyDynamic( float threshLow , float threshHigh ,
-									   Class<T> imageType , Class<D> derivType )
-	{
-		// blurring the image first
-		BlurFilter<T> blur = FactoryBlurFilter.gaussian(imageType,-1,2);
-		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-
-		return new CannyEdgeContourDynamic<T,D>(blur,gradient,threshLow,threshHigh);
+		if( dynamicThreshold )
+			return new CannyEdgeContourDynamic<T,D>(blur,gradient,(float)threshLow,(float)threshHigh);
+		else
+			return new CannyEdgeContour<T,D>(blur,gradient,(float)threshLow,(float)threshHigh);
 	}
 
 	/**
