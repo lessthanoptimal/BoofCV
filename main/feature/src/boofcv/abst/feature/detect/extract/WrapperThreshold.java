@@ -53,12 +53,12 @@ public class WrapperThreshold implements FeatureExtractor {
 
 	@Override
 	public void setIgnoreBorder(int border) {
-		//To change body of implemented methods use File | Settings | File Templates.
+		throw new RuntimeException("Not implemented yet");
 	}
 
 	@Override
 	public int getIgnoreBorder() {
-		return 0;  //To change body of implemented methods use File | Settings | File Templates.
+		return 0;
 	}
 
 	@Override
@@ -74,5 +74,10 @@ public class WrapperThreshold implements FeatureExtractor {
 	@Override
 	public boolean canDetectBorder() {
 		return true;
+	}
+
+	@Override
+	public int getSearchRadius() {
+		return 0;
 	}
 }

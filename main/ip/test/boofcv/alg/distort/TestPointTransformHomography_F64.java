@@ -18,16 +18,35 @@
 
 package boofcv.alg.distort;
 
+import georegression.struct.homo.Homography2D_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.transform.homo.HomographyPointOps_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestPointTransformHomography_F64 {
+	/**
+	 * Directly computes the output
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void compareToDirect() {
+		Point2D_F64 input = new Point2D_F64(50,60);
+		Point2D_F64 output = new Point2D_F64();
+		Point2D_F64 expected = new Point2D_F64();
+
+		Homography2D_F64 H = new Homography2D_F64(1,2,3,4,5,6,7,8,9);
+
+		HomographyPointOps_F64.transform(H, input, expected);
+		PointTransformHomography_F64 alg = new PointTransformHomography_F64();
+		alg.set(H);
+
+		alg.compute(input.x,input.y,output);
+
+		assertEquals(expected.x,output.x,1e-4);
+		assertEquals(expected.y, output.y, 1e-4);
 	}
 }

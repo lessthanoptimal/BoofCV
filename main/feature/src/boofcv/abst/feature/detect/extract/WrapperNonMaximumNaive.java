@@ -75,4 +75,9 @@ public class WrapperNonMaximumNaive implements FeatureExtractor {
 	public boolean canDetectBorder() {
 		return true;
 	}
+
+	@Override
+	public int getSearchRadius() {
+		return alg.getSearchRadius();
+	}
 }

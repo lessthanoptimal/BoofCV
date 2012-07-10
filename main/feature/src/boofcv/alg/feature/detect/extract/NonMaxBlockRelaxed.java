@@ -90,10 +90,10 @@ public class NonMaxBlockRelaxed extends NonMaxBlock {
 	}
 
 	@Override
-	public void setSearchRadius(int minSeparation) {
-		super.setSearchRadius(minSeparation);
+	public void setSearchRadius(int radius) {
+		super.setSearchRadius(radius);
 
-		int w = 2*radius+1;
+		int w = 2* radius +1;
 
 		local = new Point2D_I32[w*w];
 		for( int i = 0; i < local.length; i++ )

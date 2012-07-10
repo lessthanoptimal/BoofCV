@@ -234,7 +234,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 		// false positives are found around them as an artifact of pixels outside being
 		// treated as being zero.
 		foundFeatures.reset();
-		extractor.setIgnoreBorder(size[level] / (2 * skip));
+		extractor.setIgnoreBorder(size[level] / (2 * skip)+extractor.getSearchRadius());
 		extractor.process(intensity[index1],null,-1,foundFeatures);
 
 		// if configured to do so, only select the features with the highest intensity

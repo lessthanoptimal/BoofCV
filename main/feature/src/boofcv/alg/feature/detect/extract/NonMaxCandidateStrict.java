@@ -148,4 +148,7 @@ public class NonMaxCandidateStrict {
 		return true;
 	}
 
+	public int getSearchRadius() {
+		return radius;
+	}
 }

@@ -253,5 +253,8 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		public boolean canDetectBorder() {
 			return false;
 		}
+
+		@Override
+		public int getSearchRadius() {return 0;}
 	}
 }
