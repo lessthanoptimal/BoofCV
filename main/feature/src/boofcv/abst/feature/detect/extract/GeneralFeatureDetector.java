@@ -149,7 +149,6 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 		int regionMax = maxFeatures/(numColumns*numRows);
 
 		int ignoreBorder = intensity.getIgnoreBorder();
-		extractor.setInputBorder(0);
 
 		foundCorners.reset();
 		for( int i = 0; i < numRows; i++ ) {

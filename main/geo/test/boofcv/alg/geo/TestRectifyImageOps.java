@@ -21,13 +21,18 @@ package boofcv.alg.geo;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.PointTransform_F64;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -37,6 +42,8 @@ public class TestRectifyImageOps {
 	Point2D_F32 p = new Point2D_F32();
 	int width = 300;
 	int height = 350;
+
+	Random rand = new Random(12);
 
 	/**
 	 * After the camera matrix has been adjusted and a forward rectification transform has been applied
@@ -142,8 +149,76 @@ public class TestRectifyImageOps {
 		// the right view is not checked since it is not part of the contract
 	}
 
+	/**
+	 * Transforms and then performs the inverse transform to distorted rectified pixel
+	 */
+	@Test
+	public void rectifyTransform_and_rectifyTransformInv() {
+		rectifyTransform_and_rectifyTransformInv(true);
+		rectifyTransform_and_rectifyTransformInv(false);
+	}
+
+	public void rectifyTransform_and_rectifyTransformInv( boolean flipY ) {
+		IntrinsicParameters param =
+				new IntrinsicParameters(300,320,0,150,130,width,height, flipY, new double[]{0.1,1e-4});
+
+		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
+
+		PointTransform_F32 forward = RectifyImageOps.rectifyTransform(param,rect);
+		PointTransform_F32 inverse = RectifyImageOps.rectifyTransformInv(param, rect);
+
+		float x = 20,y=30;
+		Point2D_F32 out = new Point2D_F32();
+
+		forward.compute(x,y,out);
+
+		// sanity check
+		assertTrue(Math.abs(x - out.x) > 1e-4);
+		assertTrue( Math.abs(y-out.y) > 1e-4);
+
+		inverse.compute(out.x,out.y,out);
+
+		assertEquals(x, out.x, 1e-4);
+		assertEquals(y, out.y, 1e-4);
+	}
+
+	/**
+	 * Test by using other tested functions, then manually applying the last step
+	 */
 	@Test
 	public void rectifyNormalized_F64() {
-		fail("implement");
+		rectifyNormalized_F64(true);
+		rectifyNormalized_F64(false);
+	}
+
+	public void rectifyNormalized_F64( boolean flipY ) {
+		IntrinsicParameters param =
+				new IntrinsicParameters(300,320,0,150,130,width,height, flipY, new double[]{0.1,1e-4});
+
+		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
+		DenseMatrix64F rectK = UtilIntrinsic.calibrationMatrix(param,null);
+
+		DenseMatrix64F rectK_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(rectK,rectK_inv);
+
+		PointTransform_F32 tranRect = RectifyImageOps.rectifyTransform(param,rect);
+		PointTransform_F64 alg = RectifyImageOps.rectifyNormalized_F64(param,rect,rectK);
+
+		double x=10,y=20;
+
+		// compute expected results
+		Point2D_F32 rectified = new Point2D_F32();
+		tranRect.compute((float)x,(float)y,rectified);
+		Point2D_F64 expected = new Point2D_F64();
+		// the transform converts it back into the flipped input coordinates, we don't want that
+		double yFlip = flipY ? param.height-rectified.y-1 : rectified.y;
+		GeometryMath_F64.mult(rectK_inv,new Point2D_F64(rectified.x,yFlip),expected);
+
+		// compute the 'found' results
+		Point2D_F64 found = new Point2D_F64();
+		alg.compute(x,y,found);
+
+		assertEquals(expected.x, found.x, 1e-4);
+		assertEquals(expected.y, found.y, 1e-4);
 	}
 }

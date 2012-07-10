@@ -130,7 +130,7 @@ public class FactoryPointSequentialTracker {
 	{
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, 1, 10, false, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, 1, 10, true);
 
 		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor,detectPerScale, 2, 9,4,4);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(6,1,6,0,integralType);

@@ -103,7 +103,7 @@ public class ExampleFeatureSurf {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(ImageFloat32.class);
 		
 		// define the feature detection algorithm
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 0, 5, false, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 0, 5, true);
 		FastHessianFeatureDetector<II> detector = 
 				new FastHessianFeatureDetector<II>(extractor,200,2, 9,4,4);
 

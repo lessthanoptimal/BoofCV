@@ -133,7 +133,7 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 		DetectEdgeContour<T> detector;
 
 		public Canny() {
-			detector = FactoryDetectEdgeContour.canny(5,50,imageType,derivType);
+			detector = FactoryDetectEdgeContour.canny(5,50,false,imageType,derivType);
 		}
 
 		@Override

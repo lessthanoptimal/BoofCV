@@ -38,21 +38,20 @@ public class NonMaxCandidateStrict {
 	float thresh;
 	// does not process pixels this close to the image border
 	int ignoreBorder;
-	// size of the intensity image's border which can't be touched
-	protected int borderIntensity;
 
 	protected ImageFloat32 input;
-	protected boolean processBorders;
 
-	public NonMaxCandidateStrict(int minSeparation, float thresh, boolean processBorders) {
-		setMinSeparation(minSeparation);
+	public NonMaxCandidateStrict(int searchRadius, float thresh , int ignoreBorder ) {
+		setSearchRadius(searchRadius);
 		this.thresh = thresh;
-		this.processBorders = processBorders;
+		this.ignoreBorder = ignoreBorder;
 	}
 
-	public void setMinSeparation(int minSeparation) {
-		this.radius = minSeparation;
-		this.ignoreBorder = borderIntensity+radius;
+	public NonMaxCandidateStrict() {
+	}
+
+	public void setSearchRadius(int radius) {
+		this.radius = radius;
 	}
 
 	public float getThresh() {
@@ -64,13 +63,12 @@ public class NonMaxCandidateStrict {
 	}
 
 	public void setBorder( int border ) {
-		this.borderIntensity = border;
-		this.ignoreBorder = borderIntensity+radius;
+		this.ignoreBorder = border;
 
 	}
 
 	public int getBorder() {
-		return borderIntensity;
+		return ignoreBorder;
 	}
 
 	/**
@@ -84,8 +82,8 @@ public class NonMaxCandidateStrict {
 	public void process(ImageFloat32 intensityImage, QueueCorner candidates, QueueCorner corners) {
 
 		this.input = intensityImage;
-		final int w = intensityImage.width-ignoreBorder;
-		final int h = intensityImage.height-ignoreBorder;
+		final int w = intensityImage.width-radius;
+		final int h = intensityImage.height-radius;
 
 		final int stride = intensityImage.stride;
 
@@ -94,6 +92,9 @@ public class NonMaxCandidateStrict {
 		for (int iter = 0; iter < candidates.size; iter++) {
 			Point2D_I16 pt = candidates.data[iter];
 
+			if( pt.x < ignoreBorder || pt.y < ignoreBorder ||
+					pt.x >= intensityImage.width-ignoreBorder || pt.y >= intensityImage.height-ignoreBorder )
+				continue;
 
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;
 
@@ -101,8 +102,8 @@ public class NonMaxCandidateStrict {
 			if (val < thresh || val == Float.MAX_VALUE ) continue;
 
 			// see if its too close to the image edge
-			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= w || pt.y >= h ) {
-				if( processBorders && checkBorder(center, val, pt.x, pt.y))
+			if( pt.x < radius || pt.y < radius || pt.x >= w || pt.y >= h ) {
+				if( checkBorder(center, val, pt.x, pt.y))
 					corners.add(pt.x,pt.y);
 			} else if( checkInner(center, val) )
 				corners.add(pt.x, pt.y);
@@ -111,10 +112,10 @@ public class NonMaxCandidateStrict {
 
 	protected boolean checkBorder(int center, float val, int c_x , int c_y )
 	{
-		int x0 = Math.max(borderIntensity,c_x-radius);
-		int y0 = Math.max(borderIntensity,c_y-radius);
-		int x1 = Math.min(input.width - borderIntensity, c_x + radius + 1);
-		int y1 = Math.min(input.height-borderIntensity,c_y+radius+1);
+		int x0 = Math.max(0,c_x-radius);
+		int y0 = Math.max(0,c_y-radius);
+		int x1 = Math.min(input.width, c_x + radius + 1);
+		int y1 = Math.min(input.height,c_y+radius+1);
 
 		for( int i = y0; i < y1; i++ ) {
 			int index = input.startIndex + i * input.stride + x0;
@@ -147,7 +148,4 @@ public class NonMaxCandidateStrict {
 		return true;
 	}
 
-	public boolean canProcessBorder() {
-		return processBorders;
-	}
 }

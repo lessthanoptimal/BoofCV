@@ -262,7 +262,7 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Creates a transform that goes from rectified to original pixel coordinates.
+	 * Creates a transform that goes from rectified to original distorted pixel coordinates.
 	 * Rectification includes removal of lens distortion.  Used for rendering rectified images.
 	 * </p>
 	 *

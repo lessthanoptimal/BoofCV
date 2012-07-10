@@ -29,46 +29,23 @@ public class TestNonMaxCandidateRelaxed {
 
 	@Test
 	public void standardTests() {
-		GenericNonMaxTests tests = new GenericNonMaxTests() {
-
+		GenericNonMaxTests tests = new GenericNonMaxTests(false) {
 			@Override
-			public void findLocalMaximums(ImageFloat32 intensity, float threshold, int radius, boolean useStrict, QueueCorner found) {
-				if( useStrict )
-					throw new RuntimeException("Bad");
+			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border, QueueCorner found) {
+				NonMaxCandidateRelaxed alg = new NonMaxCandidateRelaxed(radius, threshold, border);
 
-				processWithAlg(intensity, threshold, radius, found);
+				QueueCorner candidates = new QueueCorner(100);
+				for( int i = 0; i < intensity.height; i++ ) {
+					for( int j = 0; j < intensity.width; j++ ) {
+						if( intensity.get(j,i) >= threshold )
+							candidates.add(j,i);
+					}
+				}
+
+				alg.process(intensity,candidates,found);
 			}
 		};
-		tests.allStandard(false);
-	}
-
-	@Test
-	public void borderTests() {
-		GenericNonMaxBorderTests tests = new GenericNonMaxBorderTests() {
-
-			@Override
-			public void findLocalMaximums(ImageFloat32 intensity, float threshold, int radius, boolean useStrict, QueueCorner found) {
-				if( useStrict )
-					throw new RuntimeException("Bad");
-
-				processWithAlg(intensity, threshold, radius, found);
-			}
-		};
-		tests.allStandard(false);
-	}
-
-	private void processWithAlg(ImageFloat32 intensity, float threshold, int radius, QueueCorner found) {
-		NonMaxCandidateRelaxed alg = new NonMaxCandidateRelaxed(radius, threshold, true);
-
-		QueueCorner candidates = new QueueCorner(100);
-		for( int i = 0; i < intensity.height; i++ ) {
-			for( int j = 0; j < intensity.width; j++ ) {
-				if( intensity.get(j,i) > 0 )
-					candidates.add(j,i);
-			}
-		}
-
-		alg.process(intensity,candidates,found);
+		tests.allStandard();
 	}
 
 }

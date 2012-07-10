@@ -20,9 +20,8 @@ package boofcv.abst.feature.detect.point;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
-import boofcv.abst.feature.detect.extract.WrapperNonMax;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.alg.feature.detect.extract.FastNonMaxExtractor;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -60,8 +59,7 @@ public class TestGeneralFeatureDetector {
 		intensity.img.set(8,9,10);
 
 		// use a real extractor to see if it is passing in the correct sub-images
-		FeatureExtractor extractor = new WrapperNonMax(
-				new FastNonMaxExtractor(1, 0.001f,true), null);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(1,0.001f,1,true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
 				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
@@ -227,13 +225,12 @@ public class TestGeneralFeatureDetector {
 		}
 
 		@Override
-		public void setInputBorder(int border) {
+		public int getIgnoreBorder() {
+			return 0;
 		}
 
 		@Override
-		public int getInputBorder() {
-			return 0;
-		}
+		public void setIgnoreBorder(int border) {}
 
 		@Override
 		public boolean canDetectBorder() {

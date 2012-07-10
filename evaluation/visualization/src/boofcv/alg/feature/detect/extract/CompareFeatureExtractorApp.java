@@ -157,7 +157,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		float max = PixelMath.maxAbs(intensity);
 		float threshold = max*thresholdFraction;
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, threshold, radius, false, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, threshold, radius, true);
 		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensityAlg,extractor);
 		detector.setMaxFeatures(numFeatures);
 		detector.process(grayImage,derivX,derivY,derivXX,derivYY,derivXY);

@@ -38,7 +38,7 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetector {
 
 	@Override
 	protected Object createDetector( int maxFeatures ) {
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 1, 5, false, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 1, 5, true);
 		return new FastHessianFeatureDetector(extractor,maxFeatures, 1, 9,4,4);
 	}
 

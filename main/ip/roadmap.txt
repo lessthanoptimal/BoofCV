@@ -13,8 +13,8 @@ SFM
      - stereo
      - mono
    * Sparse Bundle Adjustment
-   * Dense Stereo
-   * Image Rectification
+#  * Dense Stereo
+#  * Image Rectification
 #- Geometry 2D
 #  * Image Stabilization
 #  * Image Mosaic

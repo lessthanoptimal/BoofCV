@@ -24,15 +24,10 @@ import boofcv.struct.image.ImageFloat32;
 
 /**
  * <p>
- * Extracts features from an intensity image.  The intensity image indicates the location of features
- * across the image based the intensity value.  Typically local maximums are considered to be the location of
- * features.
- * </p>
+ * Detects features in an intensity image as local maximums.  The extractor can be configured to ignore pixels
+ * along the image's border.  Some implementations can be significantly speed up by using candidate features previously
+ * computed.  If a pixel's value is less than the minimum pixel intensity it cannot be a feature even if it is a local
  *
- * <p>
- * There are many different ways in which features can be extracted.  For example, depending on the application, having features
- * spread across the whole image can be more advantageous than simply selecting the features with the highest
- * intensity can be preferred.  This interface is designed to allow a diverse set of algorithms to be used.
  * </p>
  *
  * <p>
@@ -50,12 +45,6 @@ import boofcv.struct.image.ImageFloat32;
  * <li> Return the specified number of features, always. </li>
  * </ul>
  *
- * <p>
- * DESIGN NOTES:<br>
- * The input border is specified because its faster to ignore it internally than create a sub-image,
- * adjust candidate and output feature positions.  VERIFY THIS WITH BENCHMARK?
- * </p>
- *
  * @author Peter Abeles
  */
 public interface FeatureExtractor {
@@ -65,6 +54,7 @@ public interface FeatureExtractor {
 	 * value == Float.MAX_VALUE it is be ignored.
 	 *
 	 * @param intensity	Feature intensity image.  Can be modified.
+	 * @param candidate Optional list of candidate features computed with the intensity image.
 	 * @param requestedNumber Number of features it should find.  Not always supported.
 	 * @param foundFeature Features which were found.
 	 */
@@ -100,20 +90,18 @@ public interface FeatureExtractor {
 	public void setThreshold( float threshold );
 
 	/**
-	 * Specify the size of the image border which it will not process.  If the extractor
-	 * is configured to only extract whole regions then this will increase the size
-	 * of its own ignore region to avoid these border pixels.
+	 * Pixels which are within 'border' of the image border will not be considered.
 	 *
 	 * @param border Border size in pixels.
 	 */
-	public void setInputBorder(int border);
+	public void setIgnoreBorder(int border);
 
 	/**
 	 * Returns the size of the image border which is not processed.
 	 *
 	 * @return border size
 	 */
-	public int getInputBorder();
+	public int getIgnoreBorder();
 
 	/**
 	 * Can it detect features which are inside the image border.  For example if a feature

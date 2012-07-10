@@ -234,7 +234,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 		// false positives are found around them as an artifact of pixels outside being
 		// treated as being zero.
 		foundFeatures.reset();
-		extractor.setInputBorder(size[level] / (2 * skip));
+		extractor.setIgnoreBorder(size[level] / (2 * skip));
 		extractor.process(intensity[index1],null,-1,foundFeatures);
 
 		// if configured to do so, only select the features with the highest intensity
@@ -254,7 +254,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 			Point2D_I16 f = features.get(i);
 
 			float val = inten1.get(f.x,f.y);
-			
+
 			// see if it is a max in scale-space too
 			if( checkMax(inten0,val,f.x,f.y) && checkMax(inten2,val,f.x,f.y) ) {
 

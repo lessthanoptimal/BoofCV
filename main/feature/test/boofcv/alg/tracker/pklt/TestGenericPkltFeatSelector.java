@@ -20,10 +20,9 @@ package boofcv.alg.tracker.pklt;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
-import boofcv.abst.feature.detect.extract.WrapperNonMax;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
-import boofcv.alg.feature.detect.extract.FastNonMaxExtractor;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
@@ -168,9 +167,7 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
 						FactoryIntensityPointAlg.shiTomasi(3, false, ImageFloat32.class));
 
-		FeatureExtractor extractor = new WrapperNonMax(
-				new FastNonMaxExtractor(3, 0.001f,true), null);
-		extractor.setInputBorder(3);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(3,0.01f,3,true);
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
 				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
@@ -247,13 +244,10 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		}
 
 		@Override
-		public void setInputBorder(int border) {
-		}
+		public int getIgnoreBorder() {return 0;}
 
 		@Override
-		public int getInputBorder() {
-			return 0;
-		}
+		public void setIgnoreBorder(int border) {}
 
 		@Override
 		public boolean canDetectBorder() {

@@ -29,86 +29,84 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class NonMaxExtractorNaive implements NonMaxExtractor {
+public class NonMaxExtractorNaive {
 
 	// size of the search area
 	protected int radius;
 	// the threshold which points must be above to be a feature
 	protected float thresh;
 
+	// border around the image in which pixels will not be considered
 	protected int border;
 
 	// should it use a strict rule for defining the local max?
 	protected boolean useStrictRule;
 
-	public NonMaxExtractorNaive(int minSeparation, float thresh, boolean useStrictRule ) {
-		this.radius = minSeparation;
-		this.thresh = thresh;
+	public NonMaxExtractorNaive( boolean useStrictRule ) {
 		this.useStrictRule = useStrictRule;
 	}
 
-	@Override
-	public void setMinSeparation(int minSeparation) {
+	public void setSearchRadius(int minSeparation) {
 		this.radius = minSeparation;
 	}
 
-	@Override
-	public float getThresh() {
+	public float getThreshold() {
 		return thresh;
 	}
 
-	@Override
-	public void setThresh(float thresh) {
+	public void setThreshold(float thresh) {
 		this.thresh = thresh;
 	}
 
-	@Override
-	public void setInputBorder(int border) {
+	public void setBorder(int border) {
 		this.border = border;
 	}
 
-	@Override
+	public int getBorder() {
+		return border;
+	}
+
 	public boolean isStrict() {
 		return useStrictRule;
 	}
 
-	public int getInputBorder() {
-		return border;
-	}
-
-	@Override
-	public void process(ImageFloat32 intensityImage, QueueCorner corners) {
+	public void process(ImageFloat32 intensityImage, QueueCorner peaks) {
 
 		if( useStrictRule )
-			strictRule(intensityImage, corners);
+			strictRule(intensityImage, peaks);
 		else
-			notStrictRule(intensityImage, corners);
+			notStrictRule(intensityImage, peaks);
 	}
 
 	private void strictRule(ImageFloat32 intensityImage, QueueCorner corners) {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
-		final int stride = intensityImage.stride;
 
 		final float inten[] = intensityImage.data;
 
-		int imageBorder = Math.max(radius,border);
+		for (int y = border; y < imgHeight - border; y++) {
+			int center = intensityImage.startIndex + y*intensityImage.stride + border;
+			for (int x = border; x < imgWidth - border; x++) {
 
-		for (int y = imageBorder; y < imgHeight - imageBorder; y++) {
-			for (int x = imageBorder; x < imgWidth - imageBorder; x++) {
-				int center = intensityImage.startIndex + y * stride + x;
-
-				float val = inten[center];
+				float val = inten[center++];
 				if (val < thresh) continue;
 
 				boolean max = true;
 
+				int x0 = x-radius; int x1 = x+radius;
+				int y0 = y-radius; int y1 = y+radius;
+
+				if( x0 < 0 ) x0 = 0;
+				if( y0 < 0 ) y0 = 0;
+				if( x1 >= imgWidth ) x1 = imgWidth-1;
+				if( y1 >= imgHeight ) y1 = imgHeight-1;
+
 				escape:
-				for (int i = -imageBorder; i <= imageBorder; i++) {
-					int index = center + i * stride - imageBorder;
-					for (int j = -imageBorder; j <= imageBorder; j++, index++) {
+				for (int i = y0; i <= y1; i++) {
+					int index = intensityImage.startIndex + i*intensityImage.stride + x0;
+					for (int j = x0; j <= x1; j++, index++) {
 						// don't compare the center point against itself
-						if (i == 0 && j == 0)
+						if (i == y && j == x)
 							continue;
 
 						if (val <= inten[index]) {
@@ -129,28 +127,30 @@ public class NonMaxExtractorNaive implements NonMaxExtractor {
 	private void notStrictRule(ImageFloat32 intensityImage, QueueCorner corners) {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
-		final int stride = intensityImage.stride;
 
 		final float inten[] = intensityImage.data;
 
-		int imageBorder = Math.max(radius,border);
+		for (int y = border; y < imgHeight - border; y++) {
+			int center = intensityImage.startIndex + y*intensityImage.stride + border;
+			for (int x = border; x < imgWidth - border; x++) {
 
-		for (int y = imageBorder; y < imgHeight - imageBorder; y++) {
-			for (int x = imageBorder; x < imgWidth - imageBorder; x++) {
-				int center = intensityImage.startIndex + y * stride + x;
-
-				float val = inten[center];
+				float val = inten[center++];
 				if (val < thresh) continue;
 
 				boolean max = true;
 
+				int x0 = x-radius; int x1 = x+radius;
+				int y0 = y-radius; int y1 = y+radius;
+
+				if( x0 < 0 ) x0 = 0;
+				if( y0 < 0 ) y0 = 0;
+				if( x1 >= imgWidth ) x1 = imgWidth-1;
+				if( y1 >= imgHeight ) y1 = imgHeight-1;
+
 				escape:
-				for (int i = -imageBorder; i <= imageBorder; i++) {
-					int index = center + i * stride - imageBorder;
-					for (int j = -imageBorder; j <= imageBorder; j++, index++) {
-						// don't compare the center point against itself
-						if (i == 0 && j == 0)
-							continue;
+				for (int i = y0; i <= y1; i++) {
+					int index = intensityImage.startIndex + i*intensityImage.stride + x0;
+					for (int j = x0; j <= x1; j++, index++) {
 
 						if (val < inten[index]) {
 							max = false;
