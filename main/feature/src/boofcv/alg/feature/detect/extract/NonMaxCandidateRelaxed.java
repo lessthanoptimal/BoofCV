@@ -28,18 +28,21 @@ package boofcv.alg.feature.detect.extract;
  */
 public class NonMaxCandidateRelaxed extends NonMaxCandidateStrict {
 
-	public NonMaxCandidateRelaxed(int minSeparation, float thresh, boolean processBorders)
+	public NonMaxCandidateRelaxed(int searchRadius, float thresh, int border )
 	{
-	    super(minSeparation,thresh,processBorders);
+	    super(searchRadius,thresh,border);
+	}
+
+	public NonMaxCandidateRelaxed() {
 	}
 
 	@Override
 	protected boolean checkBorder(int center, float val, int c_x , int c_y )
 	{
-		int x0 = Math.max(borderIntensity,c_x-radius);
-		int y0 = Math.max(borderIntensity,c_y-radius);
-		int x1 = Math.min(input.width - borderIntensity, c_x + radius + 1);
-		int y1 = Math.min(input.height-borderIntensity,c_y+radius+1);
+		int x0 = Math.max(0,c_x-radius);
+		int y0 = Math.max(0,c_y-radius);
+		int x1 = Math.min(input.width, c_x + radius + 1);
+		int y1 = Math.min(input.height,c_y+radius+1);
 
 		for( int i = y0; i < y1; i++ ) {
 			int index = input.startIndex + i * input.stride + x0;

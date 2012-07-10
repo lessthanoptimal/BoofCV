@@ -136,9 +136,9 @@ public class FactoryDetectPoint {
 	protected static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T,D> createGeneral( GeneralFeatureIntensity<T,D> intensity ,
 											  int minSeparation , float cornerThreshold , int maxFeatures ) {
-		int intensityBorder = intensity.getIgnoreBorder();
+		int border = intensity.getIgnoreBorder()+minSeparation;
 		FeatureExtractor extractor = FactoryFeatureExtractor.
-				nonmax(minSeparation, cornerThreshold, intensityBorder, false, true);
+				nonmax(minSeparation, cornerThreshold, border, true);
 		GeneralFeatureDetector<T,D> det = new GeneralFeatureDetector<T,D>(intensity,extractor);
 		det.setMaxFeatures(maxFeatures);
 		

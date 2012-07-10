@@ -25,19 +25,26 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestNonMaxExtractorNaive extends GenericNonMaxTests {
+public class TestNonMaxExtractorNaive {
 
 	@Test
 	public void standardTests() {
-		super.allStandard(true);
-		super.allStandard(false);
+		standardTests(true);
+		standardTests(false);
 	}
 
-	@Override
-	public void findLocalMaximums(ImageFloat32 intensity, float threshold , int radius, boolean useStrict, QueueCorner found) {
-		NonMaxExtractorNaive extractor;
-		extractor = new NonMaxExtractorNaive(radius, threshold,useStrict);
+	private void standardTests( boolean strict ) {
+		new GenericNonMaxTests(strict) {
 
-		extractor.process(intensity,found);
+			@Override
+			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border, QueueCorner found) {
+				NonMaxExtractorNaive alg = new NonMaxExtractorNaive(strict);
+				alg.setSearchRadius(radius);
+				alg.setThreshold(threshold);
+				alg.setBorder(border);
+				alg.process(intensity,found);
+			}
+		}.allStandard();
 	}
+
 }

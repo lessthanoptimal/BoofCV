@@ -40,7 +40,6 @@ import java.util.Random;
  */
 public class ExampleContours {
 
-
 	public static void main( String args[] ) {
 		BufferedImage image = UtilImageIO.loadImage("../data/applet/simple_objects.jpg");
 

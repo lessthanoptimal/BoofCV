@@ -18,8 +18,12 @@
 
 package boofcv.alg.feature.detect.extract;
 
+import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
+import boofcv.abst.feature.detect.extract.WrapperNonMaximumNaive;
+import boofcv.abst.feature.detect.extract.WrapperThreshold;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.misc.PerformerBase;
+import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
@@ -42,33 +46,26 @@ public class BenchmarkExtractors {
 
 	static Random rand = new Random(33456);
 
-	public static class FastNonMax extends PerformerBase {
-		FastNonMaxExtractor corner = new FastNonMaxExtractor(windowRadius, threshold,true);
 
-		@Override
-		public void process() {
-			corners.reset();
-			corner.process(intensity, corners);
+	public static class NM implements Performer {
+		FeatureExtractor alg;
+		String name;
+
+		public NM(String name , FeatureExtractor alg) {
+			this.alg = alg;
+			this.name = name;
+			alg.setThreshold(threshold);
 		}
-	}
-
-	public static class NonMax extends PerformerBase {
-		NonMaxExtractorNaive corner = new NonMaxExtractorNaive(windowRadius, threshold, true);
 
 		@Override
 		public void process() {
 			corners.reset();
-			corner.process(intensity, corners);
+			alg.process(intensity, null,-1,corners);
 		}
-	}
-
-	public static class Threshold extends PerformerBase {
-		ThresholdCornerExtractor corner = new ThresholdCornerExtractor(threshold);
 
 		@Override
-		public void process() {
-			corners.reset();
-			corner.process(intensity, corners);
+		public String getName() {
+			return name;
 		}
 	}
 
@@ -82,14 +79,34 @@ public class BenchmarkExtractors {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
+		ThresholdCornerExtractor algThresh = new ThresholdCornerExtractor();
+		NonMaxBlockStrict algBlockStrict = new NonMaxBlockStrict();
+		NonMaxExtractorNaive algNaiveStrict = new NonMaxExtractorNaive(true);
+		NonMaxBlockRelaxed algBlockRelaxed = new NonMaxBlockRelaxed();
+		NonMaxExtractorNaive algNaiveRelaxed = new NonMaxExtractorNaive(true);
+
+
 		for (int radius = 1; radius < 20; radius += 1) {
 			System.out.println("Radius: " + radius);
 			System.out.println();
 			windowRadius = radius;
 
-			ProfileOperation.printOpsPerSec(new FastNonMax(), TEST_TIME);
-			ProfileOperation.printOpsPerSec(new NonMax(), TEST_TIME);
-			ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
+			algBlockStrict.setSearchRadius(radius);
+			algNaiveStrict.setSearchRadius(radius);
+			algBlockRelaxed.setSearchRadius(radius);
+			algNaiveRelaxed.setSearchRadius(radius);
+
+			NM alg1 = new NM("Threshold",new WrapperThreshold(algThresh));
+			NM alg2 = new NM("Block Strict",new WrapperNonMaximumBlock(algBlockStrict));
+			NM alg3 = new NM("Naive Strict",new WrapperNonMaximumNaive(algNaiveStrict));
+			NM alg4 = new NM("Block Relaxed",new WrapperNonMaximumBlock(algBlockRelaxed));
+			NM alg5 = new NM("Naive Relaxed",new WrapperNonMaximumNaive(algNaiveRelaxed));
+
+			ProfileOperation.printOpsPerSec(alg2, TEST_TIME);
+			ProfileOperation.printOpsPerSec(alg3, TEST_TIME);
+			ProfileOperation.printOpsPerSec(alg4, TEST_TIME);
+			ProfileOperation.printOpsPerSec(alg5, TEST_TIME);
+			ProfileOperation.printOpsPerSec(alg1, TEST_TIME);
 		}
 
 	}

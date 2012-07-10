@@ -31,8 +31,11 @@ import boofcv.struct.image.ImageFloat32;
 public class ThresholdCornerExtractor {
 	private float thresh;
 
-	public ThresholdCornerExtractor(float thresh) {
+	public ThresholdCornerExtractor( float thresh ) {
 		this.thresh = thresh;
+	}
+
+	public ThresholdCornerExtractor() {
 	}
 
 	/**

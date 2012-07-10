@@ -16,30 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.abst.feature.detect.extract;
 
-import georegression.struct.point.Point2D_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Removes radial distortion from a pixel coordinate and outputs pixel coordinates
- *
  * @author Peter Abeles
  */
-public class RemoveRadialPtoP_F64 extends RemoveRadialPtoN_F64 {
+public class TestWrapperNonMax {
 
-	/**
-	 * Removes radial distortion
-	 *
-	 * @param x Distorted x-coordinate pixel
-	 * @param y Distorted y-coordinate pixel
-	 * @param out Undistorted pixel coordinate.
-	 */
-	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
-		//  distorted pixel to undistorted normalized
-		super.compute(x,y,out);
-
-		out.x = (x+x_c*sum)/(1+sum);
-		out.y = (y+y_c*sum)/(1+sum);
+	@Test
+	public void stuff() {
+		// TODO create a generic compliance checker, especially for border cases
+		fail("implement");
 	}
 }

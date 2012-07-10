@@ -39,7 +39,7 @@ import java.awt.image.BufferedImage;
 public class DetectFastHessianApp {
 
 //	static String fileName = "data/evaluation/outdoors01.jpg";
-	static String fileName = "data/sunflowers.png";
+	static String fileName = "../data/evaluation/sunflowers.png";
 //	static String fileName = "data/evaluation/particles01.jpg";
 //	static String fileName = "data/evaluation/scale/beach02.jpg";
 //	static String fileName = "data/evaluation/indoors01.jpg";
@@ -53,7 +53,7 @@ public class DetectFastHessianApp {
 	private static <T extends ImageSingleBand> void doStuff( Class<T> imageType , BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax( 5 , 1 , 5, false, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax( 5 , 1 , 5, true);
 		FastHessianFeatureDetector<T> det = new FastHessianFeatureDetector<T>(extractor,NUM_FEATURES, 2, 9,4,4);
 
 		T integral = GIntegralImageOps.transform(workImage,null);

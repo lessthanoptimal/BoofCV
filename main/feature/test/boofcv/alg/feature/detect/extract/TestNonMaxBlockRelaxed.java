@@ -16,30 +16,32 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.feature.detect.extract;
 
-import georegression.struct.point.Point2D_F64;
+import boofcv.struct.QueueCorner;
+import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
 
 /**
- * Removes radial distortion from a pixel coordinate and outputs pixel coordinates
- *
  * @author Peter Abeles
  */
-public class RemoveRadialPtoP_F64 extends RemoveRadialPtoN_F64 {
+public class TestNonMaxBlockRelaxed extends GenericNonMaxTests {
 
-	/**
-	 * Removes radial distortion
-	 *
-	 * @param x Distorted x-coordinate pixel
-	 * @param y Distorted y-coordinate pixel
-	 * @param out Undistorted pixel coordinate.
-	 */
+	public TestNonMaxBlockRelaxed() {
+		super(false);
+	}
+
+	@Test
+	public void standardTests() {
+		super.allStandard();
+	}
+
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
-		//  distorted pixel to undistorted normalized
-		super.compute(x,y,out);
-
-		out.x = (x+x_c*sum)/(1+sum);
-		out.y = (y+y_c*sum)/(1+sum);
+	public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border, QueueCorner found) {
+		NonMaxBlockRelaxed alg = new NonMaxBlockRelaxed();
+		alg.setThreshold(threshold);
+		alg.setBorder(border);
+		alg.setSearchRadius(radius);
+		alg.process(intensity,found);
 	}
 }

@@ -57,7 +57,7 @@ public class TestHoughTransformLineFootOfNorm {
 			GeneralizedImageOps.set(derivX,5,i,20);
 		}
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(4, 2, 0, true, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(4, 2, 0, true);
 		HoughTransformLineFootOfNorm alg = new HoughTransformLineFootOfNorm(extractor,2);
 
 		alg.transform(derivX,derivY,binary);

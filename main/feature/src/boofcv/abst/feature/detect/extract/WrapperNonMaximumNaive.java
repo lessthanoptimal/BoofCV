@@ -18,8 +18,7 @@
 
 package boofcv.abst.feature.detect.extract;
 
-import boofcv.alg.feature.detect.extract.NonMaxBorderExtractor;
-import boofcv.alg.feature.detect.extract.NonMaxExtractor;
+import boofcv.alg.feature.detect.extract.NonMaxExtractorNaive;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 
@@ -28,40 +27,38 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class WrapperNonMax implements FeatureExtractor {
+public class WrapperNonMaximumNaive implements FeatureExtractor {
 
-	NonMaxExtractor extractor;
-	NonMaxBorderExtractor extractorBorder;
+	NonMaxExtractorNaive alg;
 
-	public WrapperNonMax(NonMaxExtractor extractor,
-						 NonMaxBorderExtractor extractorBorder) {
-		this.extractor = extractor;
-		this.extractorBorder = extractorBorder;
+	public WrapperNonMaximumNaive(NonMaxExtractorNaive alg) {
+		this.alg = alg;
 	}
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
 					QueueCorner foundFeature) {
-		extractor.process(intensity, foundFeature);
-		if( extractorBorder != null )
-			extractorBorder.process(intensity,foundFeature);
+		alg.process(intensity, foundFeature);
 	}
 
 	@Override
 	public float getThreshold() {
-		return extractor.getThresh();
+		return alg.getThreshold();
 	}
 
 	@Override
-	public void setInputBorder(int border) {
-		extractor.setInputBorder(border);
-		if( extractorBorder != null )
-			extractorBorder.setInputBorder(border);
+	public int getIgnoreBorder() {
+		return alg.getBorder();
+	}
+
+	@Override
+	public void setIgnoreBorder(int border) {
+		alg.setBorder(border);
 	}
 
 	@Override
 	public void setThreshold(float threshold) {
-		extractor.setThresh(threshold);
+		alg.setThreshold(threshold);
 	}
 
 	@Override
@@ -75,12 +72,7 @@ public class WrapperNonMax implements FeatureExtractor {
 	}
 
 	@Override
-	public int getInputBorder() {
-		return extractor.getInputBorder();
-	}
-
-	@Override
 	public boolean canDetectBorder() {
-		return extractorBorder!=null;
+		return true;
 	}
 }

@@ -99,7 +99,7 @@ public class DetectLineHoughFoot <I extends ImageSingleBand, D extends ImageSing
 		this.gradient = gradient;
 		this.thresholdEdge = thresholdEdge;
 		this.maxLines = maxLines;
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmaxCandidate(localMaxRadius, minCounts, 0, true, false);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmaxCandidate(localMaxRadius, minCounts, 0, false);
 		alg = new HoughTransformLineFootOfNorm(extractor,minDistanceFromOrigin);
 		derivX = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), 1, 1);
 		derivY = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), 1, 1);

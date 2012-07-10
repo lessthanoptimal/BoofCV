@@ -18,51 +18,52 @@
 
 package boofcv.abst.feature.detect.extract;
 
-import boofcv.alg.feature.detect.extract.NonMaxCandidateStrict;
+import boofcv.alg.feature.detect.extract.NonMaxBlock;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 
 /**
- * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxCandidateStrict} class.
+ * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxExtractorNaive} class.
  *
  * @author Peter Abeles
  */
-public class WrapperNonMaxCandidate implements FeatureExtractor {
-	NonMaxCandidateStrict extractor;
+public class WrapperNonMaximumBlock implements FeatureExtractor {
 
-	public WrapperNonMaxCandidate( NonMaxCandidateStrict extractor ) {
-		this.extractor = extractor;
+	NonMaxBlock alg;
+
+	public WrapperNonMaximumBlock(NonMaxBlock alg) {
+		this.alg = alg;
 	}
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
 					QueueCorner foundFeature) {
-		extractor.process(intensity,candidate, foundFeature);
+		alg.process(intensity, foundFeature);
 	}
 
 	@Override
 	public float getThreshold() {
-		return extractor.getThresh();
-	}
-
-	@Override
-	public void setThreshold(float threshold) {
-		extractor.setThresh(threshold);
-	}
-
-	@Override
-	public void setIgnoreBorder(int border) {
-		extractor.setBorder(border);
+		return alg.getThreshold();
 	}
 
 	@Override
 	public int getIgnoreBorder() {
-		return extractor.getBorder();
+		return alg.getBorder();
+	}
+
+	@Override
+	public void setIgnoreBorder(int border) {
+		alg.setBorder(border);
+	}
+
+	@Override
+	public void setThreshold(float threshold) {
+		alg.setThreshold(threshold);
 	}
 
 	@Override
 	public boolean getUsesCandidates() {
-		return true;
+		return false;
 	}
 
 	@Override

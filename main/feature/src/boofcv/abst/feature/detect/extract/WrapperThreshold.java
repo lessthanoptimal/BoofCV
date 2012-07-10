@@ -47,13 +47,18 @@ public class WrapperThreshold implements FeatureExtractor {
 	}
 
 	@Override
-	public void setInputBorder(int border) {
-
+	public void setThreshold(float threshold) {
+		extractor.setThreshold(threshold);
 	}
 
 	@Override
-	public void setThreshold(float threshold) {
-		extractor.setThreshold(threshold);
+	public void setIgnoreBorder(int border) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	@Override
+	public int getIgnoreBorder() {
+		return 0;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override
@@ -64,11 +69,6 @@ public class WrapperThreshold implements FeatureExtractor {
 	@Override
 	public boolean getAcceptRequest() {
 		return false;
-	}
-
-	@Override
-	public int getInputBorder() {
-		return 0;
 	}
 
 	@Override

@@ -23,16 +23,21 @@ import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
+import georegression.struct.point.Point2D_I16;
+
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Standard tests for  non-maximum suppression algorithms
+ * Standard tests for non-maximum suppression algorithms
  *
  * @author Peter Abeles
  */
-// todo add optional tests for features inside image border
 public abstract class GenericNonMaxTests {
+
+	Random rand = new Random(2134);
 
 	int width = 30;
 	int height = 40;
@@ -40,26 +45,44 @@ public abstract class GenericNonMaxTests {
 	private QueueCorner found = new QueueCorner(100);
 	private ImageFloat32 intensity = new ImageFloat32(width,height);
 
-	public abstract void findLocalMaximums(ImageFloat32 intensity,
-										   float threshold, int radius, boolean useStrict,
-										   QueueCorner found);
+
+	boolean strict;
+
+	protected GenericNonMaxTests( boolean strict ) {
+		this.strict = strict;
+	}
+
+
+	private void findLocalMaximums( ImageFloat32 intensity , float threshold , int radius ,
+									int border ) {
+		found.reset();
+		findMaximums(intensity,threshold,radius,border,found);
+	}
+
+	public abstract void findMaximums( ImageFloat32 intensity ,
+									   float threshold ,
+									   int radius,
+									   int border , QueueCorner found );
 
 
 	public void reset() {
-		found.reset();
 		ImageTestingOps.fill(intensity,0);
 	}
 
-	public void allStandard( boolean useStrictRule ) {
-		if( useStrictRule )
+	public void allStandard() {
+		if( strict )
 			testStrictRule();
-		testRadius(useStrictRule);
-		testThreshold(useStrictRule);
-		exclude_MAX_VALUE(useStrictRule);
-		testSubimage(useStrictRule);
+		else
+			testNotStrictRule();
+		testRadius();
+		testThreshold();
+		exclude_MAX_VALUE();
+		testSubimage();
+		checkIgnoreBorder();
+		compareToNaive();
 	}
 
-	public void testSubimage( boolean useStrict ) {
+	public void testSubimage() {
 		reset();
 
 		intensity.set(5, 5, 30);
@@ -67,15 +90,15 @@ public abstract class GenericNonMaxTests {
 		intensity.set(5, 12, 31);
 
 		// see how many features it finds at various sizes
-		findLocalMaximums(intensity, 5, 2, useStrict,found);
+		findLocalMaximums(intensity,5, 2,0);
 		assertEquals(3,found.size);
 
-		found.reset();
 		ImageFloat32 sub = BoofTesting.createSubImageOf(intensity);
-		findLocalMaximums(sub, 5, 2, useStrict,found);
+		findLocalMaximums(sub, 5, 2 ,0);
 		assertEquals(3,found.size);
 	}
-	public void testThreshold( boolean useStrict ) {
+
+	public void testThreshold() {
 		reset();
 
 		intensity.set(5, 5, 30);
@@ -83,16 +106,16 @@ public abstract class GenericNonMaxTests {
 		intensity.set(5, 12, 31);
 
 		// see how many features it finds at various sizes
-		findLocalMaximums(intensity, 5, 2, useStrict,found);
+		findLocalMaximums(intensity, 5, 2 ,0);
 		assertEquals(3,found.size);
 
 		found.reset();
-		findLocalMaximums(intensity, 35, 2, useStrict,found);
+		findLocalMaximums(intensity, 35, 2,0);
 		assertEquals(1,found.size);
 
 	}
 
-	public void testRadius( boolean useStrict ) {
+	public void testRadius() {
 		reset();
 
 		intensity.set(5, 5, 30);
@@ -100,15 +123,13 @@ public abstract class GenericNonMaxTests {
 		intensity.set(5, 12, 31);
 
 		// see how many features it finds at various sizes
-		findLocalMaximums(intensity, 5, 2,useStrict,found);
+		findLocalMaximums(intensity, 5, 2,0);
 		assertEquals(3,found.size);
 
-		found.reset();
-		findLocalMaximums(intensity, 5, 3,useStrict,found);
+		findLocalMaximums(intensity, 5, 3,0);
 		assertEquals(2,found.size);
 
-		found.reset();
-		findLocalMaximums(intensity, 5, 4,useStrict,found);
+		findLocalMaximums(intensity, 5, 4,0);
 		assertEquals(1,found.size);
 	}
 
@@ -120,24 +141,45 @@ public abstract class GenericNonMaxTests {
 		intensity.set(7, 7, 30);
 
 		// none of these points are a strict maximum
-		findLocalMaximums(intensity, 5, 2,true,found);
+		findLocalMaximums(intensity, 5, 2,0);
 		assertEquals(0,found.size);
 	}
 
-	public void testRelaxedRule() {
+	public void testNotStrictRule() {
 		reset();
 
 		intensity.set(3, 5, 30);
-		intensity.set(5, 7, 30);
-		intensity.set(7, 7, 30);
+		intensity.set(3, 6, 30);
+		intensity.set(4, 5, 30);
 
-		// three points should be returned when the strict rule is not used
-		found.reset();
-		findLocalMaximums(intensity, 5, 2,false,found);
+		// none of these points are a strict maximum and all should be returned
+		findLocalMaximums(intensity, 5, 2,0);
 		assertEquals(3,found.size);
 	}
 
-	public void exclude_MAX_VALUE( boolean useStrict ) {
+	public void checkIgnoreBorder() {
+		reset();
+		int radius = 3;
+
+		intensity.set(0,0,100);
+		intensity.set(radius,radius,50);
+
+		// it should consider the 0,0 pixel
+		findLocalMaximums(intensity, 2, radius ,radius);
+		assertEquals(0,found.size);
+
+		// no ignore border
+		findLocalMaximums(intensity, 2, radius ,0);
+		assertEquals(1,found.size);
+
+		// sanity check
+		intensity.set(0,0,0);
+		findLocalMaximums(intensity, 2, radius ,radius);
+		assertEquals(1,found.size);
+	}
+
+
+	public void exclude_MAX_VALUE() {
 		reset();
 
 		intensity.set(15, 20, Float.MAX_VALUE);
@@ -146,7 +188,7 @@ public abstract class GenericNonMaxTests {
 		intensity.set(11,24,10);
 		intensity.set(25,35,10);
 
-		findLocalMaximums(intensity, 5, 2, useStrict, found);
+		findLocalMaximums(intensity, 5, 2,0);
 
 		// only one feature should be found.  The rest should be MAX_VALUE or too close to MAX_VALUE
 		assertEquals(1, found.size);
@@ -155,5 +197,58 @@ public abstract class GenericNonMaxTests {
 	}
 
 
+	/**
+	 * Compares output against naive algorithm.  Checks for compliance with sub-images
+	 */
+	public void compareToNaive() {
+		ImageFloat32 inten = new ImageFloat32(30, 40);
 
+		QueueCorner naiveCorners = new QueueCorner(inten.getWidth() * inten.getHeight());
+
+		for (int useSubImage = 0; useSubImage <= 1; useSubImage++) {
+			// make sure it handles sub images correctly
+			if (useSubImage == 1) {
+				ImageFloat32 larger = new ImageFloat32(inten.width + 10, inten.height + 8);
+				inten = larger.subimage(5, 5, inten.width+5, inten.height+5);
+			}
+
+			for (int nonMaxWidth = 3; nonMaxWidth <= 9; nonMaxWidth += 2) {
+				int radius = nonMaxWidth / 2;
+				NonMaxExtractorNaive reg = new NonMaxExtractorNaive(strict);
+				reg.setSearchRadius(radius);
+				reg.setThreshold(0.6f);
+
+				for (int i = 0; i < 10; i++) {
+					ImageTestingOps.randomize(inten, rand, 0, 10);
+
+
+					// detect the corners
+					findLocalMaximums(inten, 0.6f, radius,0);
+					naiveCorners.reset();
+					reg.process(inten, naiveCorners);
+
+					// check the number of corners
+					assertTrue(found.size() > 0);
+
+					assertEquals(naiveCorners.size(), found.size());
+
+					for (int j = 0; j < naiveCorners.size(); j++) {
+						Point2D_I16 b = naiveCorners.get(j);
+
+						boolean foundMatch = false;
+						for( int k = 0; k < found.size(); k++ ) {
+							Point2D_I16 a = found.get(k);
+
+							if( a.x == b.x && a.y == b.y ) {
+								foundMatch = true;
+								break;
+							}
+						}
+
+						assertTrue(foundMatch);
+					}
+				}
+			}
+		}
+	}
 }
