@@ -24,6 +24,11 @@ Version : Alpha 0.9
 - Generalized SimpleImageSequence so that it does not reference BufferedImage and will play nicer with Android
 - Fixed bug in ImplImageDistort* where for 16bit and 32 bit images values were being type casted into bytes
 - Changed UnconstrainedMinimization so that the minimum function value is specified in setFunction()
+- Added ExampleContours
+  * Thanks cspnanda for pointing out the lack of documentation
+- New non-maximum suppression algorithm
+  * About the same for 3x3 regions, much faster for larger regions
+  * Tweaked related API and improved unit tests
 
 ---------------------------------------------
 Date    : 2012/05/13

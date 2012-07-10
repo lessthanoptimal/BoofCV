@@ -236,6 +236,9 @@ public class TestGeneralFeatureDetector {
 		public boolean canDetectBorder() {
 			return true;
 		}
+
+		@Override
+		public int getSearchRadius() {return 0;}
 	}
 
 	public class HelperIntensity implements GeneralFeatureIntensity<ImageFloat32,ImageFloat32>

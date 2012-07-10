@@ -111,4 +111,12 @@ public interface FeatureExtractor {
 	 * @return If it can detect features inside the image border.
 	 */
 	public boolean canDetectBorder();
+
+	/**
+	 * Describes how large the region is that is being searched.  The radius is the number of
+	 * pixels away from the center.
+	 *
+	 * @return Search radius
+	 */
+	public int getSearchRadius();
 }

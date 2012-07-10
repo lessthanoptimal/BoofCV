@@ -21,7 +21,6 @@ Trackers
  * Look up table for hamming distance to speed things up
 
 - Non-maximum suppression extraction
- * Faster algorithm from paper
  * Non-Maximum Suppression for edges
    - Add a crude version 4 which just checks to see if gradient is > or < 0 to pick direction of line
  * Add sub-pixel using a polynomial fit

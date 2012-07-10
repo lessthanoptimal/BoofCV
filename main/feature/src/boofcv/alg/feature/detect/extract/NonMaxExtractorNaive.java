@@ -166,4 +166,8 @@ public class NonMaxExtractorNaive {
 			}
 		}
 	}
+
+	public int getSearchRadius() {
+		return radius;
+	}
 }

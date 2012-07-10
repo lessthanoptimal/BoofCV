@@ -74,4 +74,9 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 	public boolean canDetectBorder() {
 		return true;
 	}
+
+	@Override
+	public int getSearchRadius() {
+		return extractor.getSearchRadius();
+	}
 }
