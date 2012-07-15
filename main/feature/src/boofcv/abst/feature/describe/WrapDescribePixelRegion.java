@@ -23,6 +23,7 @@ import boofcv.alg.feature.describe.impl.ImplDescribePointPixelRegion_F32;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc_U8;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -43,6 +44,8 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 
 		if( alg instanceof ImplDescribePointPixelRegion_F32 ) {
 			desc = (D)new TupleDesc_F32(alg.getDescriptorLength());
+		} else {
+			desc = (D)new TupleDesc_U8(alg.getDescriptorLength());
 		}
 	}
 

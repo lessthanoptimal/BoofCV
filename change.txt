@@ -24,6 +24,7 @@ Version : Alpha 0.9
 - Generalized SimpleImageSequence so that it does not reference BufferedImage and will play nicer with Android
 - Fixed bug in ImplImageDistort* where for 16bit and 32 bit images values were being type casted into bytes
 - Changed UnconstrainedMinimization so that the minimum function value is specified in setFunction()
+- Fixed bug in WrapDescrivePixelRegion where the descriptor is not properly configured for integer images
 
 ---------------------------------------------
 Date    : 2012/05/13
