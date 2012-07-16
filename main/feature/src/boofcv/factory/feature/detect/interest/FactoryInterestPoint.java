@@ -155,8 +155,8 @@ public class FactoryInterestPoint {
 	 *
 	 * @see FastHessianFeatureDetector
 	 *
-	 * @param threshold Minimum feature intensity.
-	 * @param nonMaxRadius Radius used for non-max-suppression.  Typically 1 or 2.
+	 * @param detectThreshold Minimum feature intensity. Image dependent.  Start tuning at 1.
+	 * @param extractRadius Radius used for non-max-suppression.  Typically 1 or 2.
 	 * @param maxFeaturesPerScale Number of features it will find or if <= 0 it will return all features it finds.
 	 * @param initialSampleSize How often pixels are sampled in the first octave.  Typically 1 or 2.
 	 * @param initialSize Typically 9.
@@ -165,13 +165,13 @@ public class FactoryInterestPoint {
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageSingleBand>
-	InterestPointDetector<T> fastHessian(float threshold,
-										 int nonMaxRadius, int maxFeaturesPerScale,
+	InterestPointDetector<T> fastHessian(float detectThreshold,
+										 int extractRadius, int maxFeaturesPerScale,
 										 int initialSampleSize, int initialSize,
 										 int numberScalesPerOctave,
 										 int numberOfOctaves)
 	{
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(nonMaxRadius, threshold, 5, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, 5, true);
 		FastHessianFeatureDetector<T> feature = new FastHessianFeatureDetector<T>(extractor,maxFeaturesPerScale,
 				initialSampleSize, initialSize,numberScalesPerOctave,numberOfOctaves);
 
