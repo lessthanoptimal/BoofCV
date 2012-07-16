@@ -29,6 +29,7 @@ Version : Alpha 0.9
 - New non-maximum suppression algorithm
   * About the same for 3x3 regions, much faster for larger regions
   * Tweaked related API and improved unit tests
+- Fixed bug in WrapDescrivePixelRegion where the descriptor is not properly configured for integer images
 
 ---------------------------------------------
 Date    : 2012/05/13
