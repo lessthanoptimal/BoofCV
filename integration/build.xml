@@ -103,9 +103,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         <mkdir dir="${jar.dir}"/>
 	<ant dir="android" inheritAll="false"/>
 	<ant dir="xuggler" inheritAll="false"/>
-	<jar destfile="${lib.dir}/${ant.project.name}.jar">
+	<!--jar destfile="${lib.dir}/${ant.project.name}.jar">
 	  <zipgroupfileset dir="${jar.dir}" includes="*.jar"/> 
-	</jar>
+	</jar-->
     </target>
 
     <target name="main" depends="clean,jar"/>

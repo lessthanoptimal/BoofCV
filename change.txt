@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 
+Date    : 2012/7/22
 Version : Alpha 0.9
 
 - Renamed factories
@@ -20,7 +20,10 @@ Version : Alpha 0.9
 - Changed transform* functions inside of DistortImageOps so that you can specify how outside image pixels are handled.
 - Fixed bug in ImageHistogramPanel - reported by Ray
   * Added support for integer images
-- Updated Xuggler integration code
+- Integration
+  * Created ant build scripts
+  * Updated Xuggler integration code
+  * Added Android
 - Generalized SimpleImageSequence so that it does not reference BufferedImage and will play nicer with Android
 - Fixed bug in ImplImageDistort* where for 16bit and 32 bit images values were being type casted into bytes
 - Changed UnconstrainedMinimization so that the minimum function value is specified in setFunction()
