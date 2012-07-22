@@ -1,0 +1,86 @@
+<project name="BUILD_COMMON" basedir="." default="main">
+  <description>
+    Common build script for BoofCV integration modules.
+  </description>
+
+    <property name="src.dir"     value="src"/>
+    <property name="test.dir"    value="test"/>
+    <property name="lib.dir"     value="../../lib"/>
+
+    <property name="build.dir"   value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="jar.dir"     value="../jar"/>
+
+    <property name="testbuild.dir"   value="build/test"/>
+    <property name="testclasses.dir"   value="${testbuild.dir}/classes"/>
+    <property name="testreport.dir"  value="${testbuild.dir}/report"/>
+
+    <property name="junit.dir"  value="${lib.dir}/testing"/>
+
+    <path id="project.classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+        <fileset dir="${jar.dir}" includes="**/BoofCV_*.jar"/>
+    </path>
+
+    <path id="test.classpath">
+        <path refid="project.classpath"/>
+        <fileset dir="${junit.dir}" includes="junit*.jar"/>
+        <fileset dir="${jar.dir}" includes="**/${ant.project.name}.jar"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false">
+            <classpath refid="project.classpath"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}"/>
+    </target>
+
+    <target name="test" depends="jar">
+        <mkdir dir="${testbuild.dir}"/>
+        <mkdir dir="${testreport.dir}"/>
+        <mkdir dir="${testclasses.dir}"/>
+
+        <javac destdir="${testclasses.dir}" includeantruntime="false">
+	  <src path="${test.dir}"/>
+
+           <classpath>
+                <path refid="test.classpath"/>
+            </classpath>
+        </javac> 
+
+
+        <junit printsummary="yes" showoutput="yes">
+            <classpath>
+                <path refid="test.classpath"/>
+                <pathelement location="${testclasses.dir}"/>
+            </classpath>
+
+            <formatter type="xml"/>
+
+            <batchtest fork="yes" todir="${testreport.dir}">
+                <fileset dir="${test.dir}" includes="**/Test*.java"/>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="testreport">
+        <junitreport todir="${testreport.dir}">
+            <fileset dir="${testreport.dir}" includes="TEST-*.xml"/>
+            <report todir="${testreport.dir}"/>
+        </junitreport>
+    </target>
+
+
+    <target name="clean-build" depends="clean,jar"/>
+
+    <target name="main" depends="clean,jar"/>
+</project>

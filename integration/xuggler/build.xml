@@ -3,40 +3,14 @@
     Build script for Xuggler integration
   </description>
 
-    <!--  Specify where your Xuggler jar directory is here-->
-    <property name="xuggler.dir" value="./"/>
+  <import file="../build_common.xml"/>
 
-    <property name="src.dir"     value="src"/>
-    <property name="test.dir"    value="test"/>
-    <property name="lib.dir"     value="../../lib"/>
+  <!--  Specify where your Xuggler jar directory is here-->
+  <property name="xuggler.dir" value="./"/>
+  
+  <path id="project.classpath">
+    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    <fileset dir="${xuggler.dir}" includes="**/*.jar"/>
+  </path>
 
-    <property name="build.dir"   value="build"/>
-    <property name="classes.dir" value="${build.dir}/classes"/>
-
-
-    <path id="project.classpath">
-        <fileset dir="${lib.dir}" includes="**/*.jar"/>
-        <fileset dir="${xuggler.dir}" includes="**/*.jar"/>
-    </path>
-
-    <target name="clean">
-        <delete dir="${build.dir}"/>
-        <delete file="${lib.dir}/${ant.project.name}.jar"/>
-    </target>
-
-    <target name="compile">
-        <mkdir dir="${classes.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false">
-            <classpath refid="project.classpath"/>
-        </javac>
-    </target>
-
-    <target name="jar" depends="compile">
-        <mkdir dir="${lib.dir}"/>
-        <jar destfile="${lib.dir}/${ant.project.name}.jar" basedir="${classes.dir}"/>
-    </target>
-
-    <target name="clean-build" depends="clean,jar"/>
-
-    <target name="main" depends="clean,jar"/>
 </project>

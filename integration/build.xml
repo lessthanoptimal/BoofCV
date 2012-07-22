@@ -1,22 +1,22 @@
-<project name="BoofCV" basedir="." default="main">
+<project name="integration" basedir="." default="main">
+  <description>
+    Build script for common elements (e.g. JavaDocs) of integration libraries
+  </description>
 
     <property name="lib.dir"     value="${basedir}/../lib"/>
     <property name="jar.dir"     value="${basedir}/jar"/>
     <property name="doc.dir"     value="${basedir}/api"/>
     <property name="testreport.dir"  value="${basedir}/report"/>
 
+    <path id="project.classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
 
     <path id="source.classpath">
-      <pathelement path="ip/src"/>
-      <pathelement path="io/src"/>
-      <pathelement path="numerics/src"/>
-      <pathelement path="feature/src"/>
-      <pathelement path="geo/src"/>
-      <pathelement path="visualize/src"/>
-      <pathelement path="calibration/src"/>
-      <pathelement path="sfm/src"/>
+      <pathelement path="android/src"/>
+      <pathelement path="xuggler/src"/>
     </path>
-    
+
 
     <target name="javadocWeb">
         <javadoc
@@ -71,7 +71,8 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 version="true"
                 use="true"
                 windowtitle="BoofCV"
-	        sourcepathref="source.classpath" >
+	        sourcepathref="source.classpath">
+
 
             <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
             <bottom><![CDATA[<b>Copyright &copy; 2011-2012 Peter Abeles</b>]]></bottom>
@@ -80,14 +81,8 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     </target>
 
     <target name="test">
-	<ant dir="ip/" target="test"/>
-	<ant dir="numerics/" target="test"/>
-	<ant dir="feature/" target="test"/>
-	<ant dir="geo/" target="test"/>
-	<ant dir="io/" target="test"/>
-	<ant dir="visualize/" target="test"/>
-	<ant dir="calibration/" target="test"/>
-	<ant dir="sfm/" target="test"/>
+	<!--ant dir="android/" target="test"/-->
+	<ant dir="xuggler/" target="test"/>
     </target>
 
     <target name="testreport">
@@ -100,27 +95,14 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     <target name="clean">
         <delete dir="${jar.dir}"/>
 	<delete dir="${testreport.dir}"/>
-	<delete file="${lib.dir}/${ant.project.name}.jar"/>
-	<ant dir="ip/" target="clean"/>
-	<ant dir="numerics/" target="clean"/>
-	<ant dir="feature/" target="clean"/>
-	<ant dir="geo/" target="clean"/>
-	<ant dir="io/" target="clean"/>
-	<ant dir="visualize/" target="clean"/>
-	<ant dir="calibration/" target="clean"/>
-	<ant dir="sfm/" target="clean"/>
+	<ant dir="android/" target="clean"/>
+	<ant dir="xuggler/" target="clean"/>
     </target>
 
     <target name="jar">
         <mkdir dir="${jar.dir}"/>
-	<ant dir="ip" inheritAll="false"/>
-	<ant dir="numerics" inheritAll="false"/>
-	<ant dir="feature" inheritAll="false"/>
-	<ant dir="geo" inheritAll="false"/>
-	<ant dir="io" inheritAll="false"/>
-	<ant dir="visualize/" inheritAll="false"/>
-	<ant dir="calibration/" inheritAll="false"/>
-	<ant dir="sfm/" inheritAll="false"/>
+	<ant dir="android" inheritAll="false"/>
+	<ant dir="xuggler" inheritAll="false"/>
 	<jar destfile="${lib.dir}/${ant.project.name}.jar">
 	  <zipgroupfileset dir="${jar.dir}" includes="*.jar"/> 
 	</jar>

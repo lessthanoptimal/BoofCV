@@ -32,10 +32,10 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * Example that demonstrates how to detect targets used for camera calibration.  The point features which
- * are detected inside the targets are found to a high level of precision.  It is assumed that a single
- * image only shows a single target and that the entire target is visible.  If these conditions are not
- * meet the detector is likely to fail.
+ * Example that demonstrates how to detect calibration targets.  Calibration points are found on the
+ * targets to a high level of precision.  It is assumed that a single image only shows a single target
+ * and that the entire target is visible.  If these conditions are not meet then the target is likely
+ * to not be detected.
  *
  * @author Peter Abeles
  */
