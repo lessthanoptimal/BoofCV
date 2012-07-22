@@ -18,9 +18,11 @@
 
 package boofcv.alg.feature.associate;
 
+import boofcv.struct.FastQueue;
+import boofcv.struct.feature.AssociatedIndex;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,7 +30,29 @@ import static org.junit.Assert.fail;
 public class TestEnsureUniqueAssociation {
 
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void basicTest() {
+
+		FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
+
+		matches.pop().setAssociation(0,1,10);
+		matches.pop().setAssociation(1,0,20);
+		matches.pop().setAssociation(2,2,30);
+		// add a duplicate dst
+		matches.pop().setAssociation(3,1,5);
+
+		EnsureUniqueAssociation alg = new EnsureUniqueAssociation();
+
+		alg.process(matches, 3);
+
+		FastQueue<AssociatedIndex> found = alg.getMatches();
+
+		assertEquals(3,found.size);
+		// the other shouldn't matter but it is easier to test this way
+		assertEquals(0,found.get(0).dst);
+		assertEquals(1,found.get(0).src);
+		assertEquals(1,found.get(1).dst);
+		assertEquals(3,found.get(1).src);
+		assertEquals(2,found.get(2).dst);
+		assertEquals(2,found.get(2).src);
 	}
 }

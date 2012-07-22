@@ -21,79 +21,85 @@ package boofcv.examples;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.core.image.ConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 
 /**
- * Demonstrates how to convert between different image types.
+ * Demonstrates how to convert between different BoofCV image types.
  *
  * @author Peter Abeles
  */
 public class ExampleImageConvert {
 
+	// image loaded from a file
+	BufferedImage image;
+	// gray scale image with element values from 0 to 255
+	ImageUInt8 gray;
+	// Derivative of gray image.  Elements are 16-bit signed integers
+	ImageSInt16 derivX,derivY;
+
+	void convert() {
+		// Converting between BoofCV image types is easy with ConvertImage.  ConvertImage copies
+		// the value of a pixel in one image into another image.  When doing so you need to take
+		// in account the storage capabilities of these different class types.
+
+		// Going from an unsigned 8-bit image to unsigned 16-bit image is no problem
+		ImageUInt16 imageU16 = new ImageUInt16(gray.width,gray.height);
+		ConvertImage.convert(gray,imageU16);
+
+		// You can convert back into the 8-bit image from the 16-bit image with no problem
+		// in this situation because imageU16 does not use the full range of 16-bit values
+		ConvertImage.convert(imageU16,gray);
+
+		// Here is an example where you over flow the image after converting
+		// There won't be an exception or any error messages but the output image will be corrupted
+		ImageUInt8 imageBad = new ImageUInt8(derivX.width,derivX.height);
+		ConvertImage.convert(derivX,imageBad);
+
+		// One way to get around this problem rescale and adjust the pixel values so that they
+		// will be within a valid range.
+		ImageSInt16 scaledAbs = new ImageSInt16(derivX.width,derivX.height);
+		GPixelMath.abs(derivX,scaledAbs);
+		GPixelMath.multiply(scaledAbs,scaledAbs,255/GPixelMath.max(scaledAbs));
+
+		// If you just want to see the values of a 16-bit image there are built in utility functions
+		// for visualizing their values too
+		BufferedImage colorX = VisualizeImageData.colorizeSign(derivX, null, -1);
+
+		// Let's see what all the bad image looks like
+		// ConvertBufferedImage is similar to ImageConvert in that it does a direct coversion with out
+		// adjusting the pixel's value
+		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageBad,null),"Bad Conversion");
+		ShowImages.showWindow(ConvertBufferedImage.convertTo(scaledAbs,null),"Scaled");
+		ShowImages.showWindow(colorX,"Visualized");
+	}
+
 	/**
-	 * Computes the image derivative to demonstrate how to convert to and from BufferedImages.  When a gray scale
-	 * image hsa intensity values from 0 to 255 then the faster operations inside of ConvertBufferedImage can be used.
-	 * Otherwise alternative techniques (shown below) are used which rescale the image.
-	 *
-	 * @param input Input BufferedImage.
-	 * @param imageType Image type for work image.
-	 * @param derivType Image type for image derivative.
+	 * Load and generate images
 	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	void convertBufferedImage(BufferedImage input, Class<T> imageType, Class<D> derivType) {
-		// If the gray scale image has a pixel range that includes 0 to 255 then it can
-		T gray = ConvertBufferedImage.convertFromSingle(input, null, imageType);
+	public void createImages() {
+		image = UtilImageIO.loadImage("../data/evaluation/standard/barbara.png");
 
-		// Can also pass in an image instead of having the function declare one each time
-		// T gray = GeneralizedImageOps.createSingleBand(imageType,input.getWidth(),input.getHeight());
-		// ConvertBufferedImage.convertFromSingle(input,gray,imageType);
-
-		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.getWidth(), input.getHeight());
-		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.getWidth(), input.getHeight());
+		gray = ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class);
+		derivX = GeneralizedImageOps.createSingleBand(ImageSInt16.class, gray.getWidth(), gray.getHeight());
+		derivY = GeneralizedImageOps.createSingleBand(ImageSInt16.class, gray.getWidth(), gray.getHeight());
 
 		GImageDerivativeOps.sobel(gray,derivX,derivY, BorderType.EXTENDED);
-
-		// Gray scale images can be converted into buffered images for visualization.
-		// The follow functions normalize the input by the maximum absolute value then either
-		// show it as a gray scale image or a colorized image where different colors represent
-		// positive and negative values
-		BufferedImage grayX = VisualizeImageData.grayMagnitude(derivX,null,-1);
-		BufferedImage colorX = VisualizeImageData.colorizeSign(derivX,null,-1);
-
-		// alternatively the derivative could be rescaled and then convert into a BufferedImage
-		GPixelMath.abs(derivX,derivX);
-		GPixelMath.multiply(derivX,derivX,255/GPixelMath.max(derivX));
-		BufferedImage scaledX = ConvertBufferedImage.convertTo(derivX,null);
-
-		// If the input image's pixel are between 0 and 255 then it can be directly converted directly into
-		// a buffered image efficiently
-		BufferedImage grayBuff = ConvertBufferedImage.convertTo(gray,null);
-
-		// display the results
-		ShowImages.showWindow(grayX,"X-derivative Gray");
-		ShowImages.showWindow(colorX,"X-derivative Color");
-		ShowImages.showWindow(scaledX,"X-derivative Scaled");
-		ShowImages.showWindow(grayBuff,"Input Image");
 	}
-
-	// todo example showing  ConvertImage
-	// edge detect -> uint8 -> corner detect
-
 
 	public static void main( String args[] ) {
-		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/standard/barbara.png");
+		ExampleImageConvert app = new ExampleImageConvert();
 
-//		convertBufferedImage(image, ImageFloat32.class, ImageFloat32.class);
-		convertBufferedImage(image, ImageUInt8.class, ImageSInt16.class);
+		app.createImages();
+		app.convert();
 	}
-
 }

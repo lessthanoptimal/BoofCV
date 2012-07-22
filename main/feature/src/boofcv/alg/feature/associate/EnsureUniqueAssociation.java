@@ -22,24 +22,29 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 
 /**
- * Removes any ambiguous associations.  If there is a possible conflict the one with the lowest score
- * is selected.  If two have the same score, one is arbitrarily selected.
+ * Removes any ambiguous associations.  If multiple features from the 'src' match the same feature
+ * in the 'dst' then only the association with the lowest 'fitScore' is saved.
  *
  * @author Peter Abeles
  */
 public class EnsureUniqueAssociation {
 
+	// An element for each 'dst' feature.  Only the best association with the lowest score is saved here.
 	AssociatedIndex[] bestScores = new AssociatedIndex[1];
+	// The final output list with the best associations
 	FastQueue<AssociatedIndex> unambiguous = new FastQueue<AssociatedIndex>(100,AssociatedIndex.class,false);
 
+	/**
+	 * Removes ambiguous associations.  Call {@link #getMatches()} to get the list of unambiguous
+	 * matches.
+	 *
+	 * @param matches List of candidate associations
+	 * @param sizeDst Number of 'dst' features
+	 */
 	public void process( FastQueue<AssociatedIndex> matches, int sizeDst ) {
 		// initialize data structures
 		if( bestScores.length < sizeDst )
 			bestScores = new AssociatedIndex[sizeDst];
-		else {
-			for( int i = 0; i < sizeDst; i++ )
-				bestScores[i] = null;
-		}
 
 		for( int i = 0; i < matches.size; i++ ) {
 			AssociatedIndex match = matches.data[i];
@@ -52,11 +57,19 @@ public class EnsureUniqueAssociation {
 		// add the best unambiguous pairs back
 		unambiguous.reset();
 		for( int i = 0; i < sizeDst; i++ ) {
-			if( bestScores[i] != null )
+			if( bestScores[i] != null ) {
 				unambiguous.add(bestScores[i]);
+				// clean up so that you don't have a dangling reference
+				bestScores[i] = null;
+			}
 		}
 	}
 
+	/**
+	 * List of unambiguous matches.
+	 *
+	 * @return list of matches
+	 */
 	public FastQueue<AssociatedIndex> getMatches() {
 		return unambiguous;
 	}

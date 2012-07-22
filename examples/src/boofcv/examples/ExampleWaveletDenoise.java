@@ -31,8 +31,8 @@ import java.util.Random;
 
 /**
  * Example of how to "remove" noise from images using wavelet based algorithms.  A simplified interface is used
- * which hides most of the complexity.  Wavelet image processing is still under development and only floating point i
- * mages are currently supported.  Which is why the image  type is hard coded.
+ * which hides most of the complexity.  Wavelet image processing is still under development and only floating point
+ * images are currently supported.  Which is why the image  type is hard coded.
  */
 public class ExampleWaveletDenoise {
 
