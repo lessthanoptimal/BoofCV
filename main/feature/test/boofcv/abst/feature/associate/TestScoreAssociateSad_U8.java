@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
+package boofcv.abst.feature.associate;
 
 import boofcv.struct.feature.TupleDesc_U8;
 import org.junit.Test;

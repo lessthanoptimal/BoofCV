@@ -19,9 +19,9 @@
 package boofcv.factory.feature.associate;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.associate.WrapAssociateGreedy;
 import boofcv.alg.feature.associate.AssociateGreedy;
-import boofcv.alg.feature.associate.ScoreAssociation;
 
 
 /**

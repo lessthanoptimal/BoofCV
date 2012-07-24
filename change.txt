@@ -3,6 +3,15 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2012/
+Version : Alpha 0.10
+
+- Association Score
+  * Pushed implementations of ScoreAssociation into abst package
+  * Put most association distance algorithms into DescriptorDistance
+  * Added hamming lookup table
+
+---------------------------------------------
 Date    : 2012/7/22
 Version : Alpha 0.9
 

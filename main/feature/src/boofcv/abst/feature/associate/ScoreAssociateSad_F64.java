@@ -16,31 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
+package boofcv.abst.feature.associate;
 
-import boofcv.struct.feature.NccFeature;
+import boofcv.alg.feature.associate.DescriptorDistance;
+import boofcv.struct.feature.TupleDesc_F64;
 
 /**
- * Association scorer for NccFeatures.  Computes the normalized cross correlation score.
+ * Computes sum of absolute difference (SAD) score for {@link boofcv.struct.feature.TupleDesc_F64}.
  *
  * @author Peter Abeles
  */
-public class ScoreAssociateNccFeature implements ScoreAssociation<NccFeature>{
+public class ScoreAssociateSad_F64 implements ScoreAssociation<TupleDesc_F64>{
 	@Override
-	public double score(NccFeature a, NccFeature b) {
-		double top = 0;
+	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
 
-		int N = a.value.length;
-		for( int i = 0; i < N; i++ ) {
-			top += a.value[i]*b.value[i];
-		}
-
-		// negative so that smaller values are better
-		return -top/(a.variance*b.variance);
+		return DescriptorDistance.sad(a, b);
 	}
 
 	@Override
 	public boolean isZeroMinimum() {
-		return false;
+		return true;
 	}
 }

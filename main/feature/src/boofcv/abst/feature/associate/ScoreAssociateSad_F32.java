@@ -16,37 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
+package boofcv.abst.feature.associate;
 
-import boofcv.struct.feature.NccFeature;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import boofcv.alg.feature.associate.DescriptorDistance;
+import boofcv.struct.feature.TupleDesc_F32;
 
 /**
+ * Computes sum of absolute difference (SAD) score for {@link boofcv.struct.feature.TupleDesc_F32}.
+ *
  * @author Peter Abeles
  */
-public class TestScoreAssociateNccFeature {
+public class ScoreAssociateSad_F32 implements ScoreAssociation<TupleDesc_F32>{
+	@Override
+	public double score(TupleDesc_F32 a, TupleDesc_F32 b) {
 
-	@Test
-	public void compareToExpected() {
-		ScoreAssociateNccFeature scorer = new ScoreAssociateNccFeature();
-
-		NccFeature a = new NccFeature(5);
-		NccFeature b = new NccFeature(5);
-
-		a.variance=12;
-		b.variance=7;
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
-
-		assertEquals(-0.46429,scorer.score(a,b),1e-2);
+		return DescriptorDistance.sad(a, b);
 	}
 
-	@Test
-	public void checkZeroMinimum() {
-		ScoreAssociateNccFeature scorer = new ScoreAssociateNccFeature();
-		assertFalse(scorer.isZeroMinimum());
+	@Override
+	public boolean isZeroMinimum() {
+		return true;
 	}
 }

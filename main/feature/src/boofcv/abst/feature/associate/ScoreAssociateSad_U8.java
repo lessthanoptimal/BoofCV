@@ -16,28 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
+package boofcv.abst.feature.associate;
 
-import boofcv.struct.feature.TupleDesc_F64;
-
+import boofcv.alg.feature.associate.DescriptorDistance;
+import boofcv.struct.feature.TupleDesc_U8;
 
 /**
+ * Computes sum of absolute difference (SAD) score for {@link TupleDesc_U8}.
+ *
  * @author Peter Abeles
  */
-public class ScoreAssociateCorrelation implements ScoreAssociation<TupleDesc_F64> {
+public class ScoreAssociateSad_U8 implements ScoreAssociation<TupleDesc_U8>{
 	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
-		final int N = a.value.length;
-		double total = 0;
-		for( int i = 0; i < N; i++ ) {
-			total += a.value[i]*b.value[i];
-		}
+	public double score(TupleDesc_U8 a, TupleDesc_U8 b) {
 
-		return -Math.abs(total);
+		return DescriptorDistance.sad(a, b);
 	}
 
 	@Override
 	public boolean isZeroMinimum() {
-		return false;
+		return true;
 	}
 }

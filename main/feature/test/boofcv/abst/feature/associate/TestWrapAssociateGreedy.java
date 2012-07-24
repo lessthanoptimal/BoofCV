@@ -19,7 +19,6 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateGreedy;
-import boofcv.alg.feature.associate.ScoreAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import org.junit.Test;

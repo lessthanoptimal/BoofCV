@@ -18,33 +18,32 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.struct.feature.TupleDesc_F32;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
+ * Lookup table for hamming distance from 8-bit variables
+ *
  * @author Peter Abeles
  */
-public class TestScoreAssociateSad_F32 {
+public class HammingTable8 {
 
-	@Test
-	public void compareToExpected() {
-		ScoreAssociateSad_F32 scorer = new ScoreAssociateSad_F32();
+	public int score[] = new int[256*256];
 
-		TupleDesc_F32 a = new TupleDesc_F32(5);
-		TupleDesc_F32 b = new TupleDesc_F32(5);
-
-		a.value=new float[]{1,2,3,4,5};
-		b.value=new float[]{-1,2,6,3,6};
-
-		assertEquals(7,scorer.score(a,b),1e-2);
+	public HammingTable8() {
+		int index = 0;
+		for( int i = 0; i < 256; i++ ) {
+			for( int j = 0; j < 256; j++ ) {
+				score[index++] = DescriptorDistance.hamming(i, j);
+			}
+		}
 	}
 
-	@Test
-	public void checkZeroMinimum() {
-		ScoreAssociateSad_F32 scorer = new ScoreAssociateSad_F32();
-		assertTrue(scorer.isZeroMinimum());
+	/**
+	 * Looks up the hamming distance from a table
+	 *
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public int lookup( byte a , byte b ) {
+		return score[ ((a & 0xFF) << 8) | (b & 0xFF) ];
 	}
 }

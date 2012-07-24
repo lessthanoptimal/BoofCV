@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.associate;
 
+import boofcv.abst.feature.associate.*;
 import boofcv.alg.feature.describe.brief.BriefFeature;
-import boofcv.alg.feature.describe.brief.ScoreAssociationBrief;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;

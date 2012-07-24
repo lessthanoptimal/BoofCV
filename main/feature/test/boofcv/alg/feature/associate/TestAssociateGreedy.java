@@ -18,6 +18,8 @@
 
 package boofcv.alg.feature.associate;
 
+import boofcv.abst.feature.associate.ScoreAssociateEuclidean;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;

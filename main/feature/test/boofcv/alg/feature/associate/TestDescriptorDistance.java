@@ -16,8 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe.brief;
+package boofcv.alg.feature.associate;
 
+import boofcv.alg.feature.describe.brief.BriefFeature;
+import boofcv.struct.feature.NccFeature;
+import boofcv.struct.feature.TupleDesc_F32;
+import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc_U8;
 import org.junit.Test;
 
 import java.util.Random;
@@ -27,17 +32,92 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestScoreAssociationBrief {
+public class TestDescriptorDistance {
 
-	Random rand = new Random(123);
+	Random rand = new Random(234);
 
-	/**
-	 * Generate random descriptions and see two hamming distance calculations return the same result.
-	 */
 	@Test
-	public void testRandom() {
-		ScoreAssociationBrief scorer = new ScoreAssociationBrief();
+	public void euclidean_F64() {
+		TupleDesc_F64 a = new TupleDesc_F64(5);
+		TupleDesc_F64 b = new TupleDesc_F64(5);
 
+		a.value=new double[]{1,2,3,4,5};
+		b.value=new double[]{2,-1,7,-8,10};
+
+		assertEquals(13.964, DescriptorDistance.euclidean(a, b), 1e-2);
+	}
+
+	@Test
+	public void euclideanSq_F64() {
+
+		TupleDesc_F64 a = new TupleDesc_F64(5);
+		TupleDesc_F64 b = new TupleDesc_F64(5);
+
+		a.value=new double[]{1,2,3,4,5};
+		b.value=new double[]{2,-1,7,-8,10};
+
+		assertEquals(195, DescriptorDistance.euclideanSq(a, b), 1e-4);
+	}
+
+	@Test
+	public void correlation() {
+		TupleDesc_F64 a = new TupleDesc_F64(5);
+		TupleDesc_F64 b = new TupleDesc_F64(5);
+
+		a.value=new double[]{1,2,3,4,5};
+		b.value=new double[]{2,-1,7,-8,10};
+
+		assertEquals(39, DescriptorDistance.correlation(a, b), 1e-2);
+	}
+
+	@Test
+	public void ncc() {
+		NccFeature a = new NccFeature(5);
+		NccFeature b = new NccFeature(5);
+
+		a.variance=12;
+		b.variance=7;
+		a.value=new double[]{1,2,3,4,5};
+		b.value=new double[]{2,-1,7,-8,10};
+
+		assertEquals(0.46429,DescriptorDistance.ncc(a, b),1e-2);
+	}
+
+	@Test
+	public void sad_U8() {
+		TupleDesc_U8 a = new TupleDesc_U8(5);
+		TupleDesc_U8 b = new TupleDesc_U8(5);
+
+		a.value=new byte[]{1,2,3,4,5};
+		b.value=new byte[]{6,2,6,3,6};
+
+		assertEquals(10, DescriptorDistance.sad(a, b), 1e-2);
+	}
+
+	@Test
+	public void sad_F32() {
+		TupleDesc_F32 a = new TupleDesc_F32(5);
+		TupleDesc_F32 b = new TupleDesc_F32(5);
+
+		a.value=new float[]{1,2,3,4,5};
+		b.value=new float[]{-1,2,6,3,6};
+
+		assertEquals(7, DescriptorDistance.sad(a, b), 1e-2);
+	}
+
+	@Test
+	public void sad_F64() {
+		TupleDesc_F64 a = new TupleDesc_F64(5);
+		TupleDesc_F64 b = new TupleDesc_F64(5);
+
+		a.value=new double[]{1,2,3,4,5};
+		b.value=new double[]{-1,2,6,3,6};
+
+		assertEquals(7,DescriptorDistance.sad(a, b),1e-2);
+	}
+
+	@Test
+	public void hamming_I32() {
 		BriefFeature a = new BriefFeature(512);
 		BriefFeature b = new BriefFeature(512);
 
@@ -47,7 +127,7 @@ public class TestScoreAssociationBrief {
 				b.data[i] = rand.nextInt();
 			}
 
-			assertEquals(hamming(a,b),scorer.score(a,b),1e-4);
+			assertEquals(hamming(a,b),DescriptorDistance.hamming(a, b),1e-4);
 		}
 	}
 
@@ -59,7 +139,7 @@ public class TestScoreAssociationBrief {
 		return ret;
 	}
 
-	private int hamming( int a , int b ) {
+	public static int hamming( int a , int b ) {
 		int distance = 0;
 
 		// see which bits are different
