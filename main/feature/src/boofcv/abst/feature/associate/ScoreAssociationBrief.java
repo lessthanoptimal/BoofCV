@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe.brief;
+package boofcv.abst.feature.associate;
 
-import boofcv.alg.feature.associate.ScoreAssociation;
+import boofcv.alg.feature.associate.HammingTable8;
+import boofcv.alg.feature.describe.brief.BriefFeature;
 
 /**
  * Score association between two BRIEF features.  Scoring is done using the Hamming distance.
@@ -27,26 +28,30 @@ import boofcv.alg.feature.associate.ScoreAssociation;
  * @author Peter Abeles
  */
 public class ScoreAssociationBrief implements ScoreAssociation<BriefFeature>{
+
+	HammingTable8 table = new HammingTable8();
+
 	@Override
 	public double score(BriefFeature a, BriefFeature b) {
+
 		int score = 0;
-		final int N = a.data.length;
-		for( int i = 0; i < N; i++ ) {
-			score += hamming(a.data[i],b.data[i]);
+
+		for( int i = 0; i < a.data.length; i++ ) {
+			int dataA = a.data[i];
+			int dataB = b.data[i];
+
+//			score += table.score[ (dataA & 0xFF) << 8 | (dataB & 0xFF) ];
+//			score += table.score[ (dataA>>8 & 0xFF) << 8 | (dataB>>8 & 0xFF) ];
+//			score += table.score[ (dataA>>16 & 0xFF) << 8 | (dataB>>16 & 0xFF) ];
+//			score += table.score[ (dataA>>24 & 0xFF) << 8 | (dataB>>24 & 0xFF) ];
+
+			score += table.lookup( (byte)dataA , (byte)dataB );
+			score += table.lookup( (byte)(dataA >> 8)  , (byte)(dataB >> 8) );
+			score += table.lookup( (byte)(dataA >> 16) , (byte)(dataB >> 16) );
+			score += table.lookup( (byte)(dataA >> 24) , (byte)(dataB >> 24) );
 		}
+
 		return score;
-	}
-
-	public static int hamming( int a , int b ) {
-		int distance = 0;
-		// see which bits are different
-		int val = a ^ b;
-
-		while( val != 0 ) {
-			val &= val - 1;
-			distance++;
-		}
-		return distance;
 	}
 
 	@Override

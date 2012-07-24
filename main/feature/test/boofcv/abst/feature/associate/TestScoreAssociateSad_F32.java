@@ -16,28 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
+package boofcv.abst.feature.associate;
 
-import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.struct.feature.TupleDesc_F32;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Computes sum of absolute difference (SAD) score for {@link TupleDesc_U8}.
- *
  * @author Peter Abeles
  */
-public class ScoreAssociateSad_U8 implements ScoreAssociation<TupleDesc_U8>{
-	@Override
-	public double score(TupleDesc_U8 a, TupleDesc_U8 b) {
+public class TestScoreAssociateSad_F32 {
 
-		int total = 0;
-		for( int i = 0; i < a.value.length; i++ ) {
-			total += Math.abs( (a.value[i] & 0xFF) - (b.value[i] & 0xFF));
-		}
-		return total;
+	@Test
+	public void compareToExpected() {
+		ScoreAssociateSad_F32 scorer = new ScoreAssociateSad_F32();
+
+		TupleDesc_F32 a = new TupleDesc_F32(5);
+		TupleDesc_F32 b = new TupleDesc_F32(5);
+
+		a.value=new float[]{1,2,3,4,5};
+		b.value=new float[]{-1,2,6,3,6};
+
+		assertEquals(7,scorer.score(a,b),1e-2);
 	}
 
-	@Override
-	public boolean isZeroMinimum() {
-		return true;
+	@Test
+	public void checkZeroMinimum() {
+		ScoreAssociateSad_F32 scorer = new ScoreAssociateSad_F32();
+		assertTrue(scorer.isZeroMinimum());
 	}
 }

@@ -19,13 +19,13 @@
 package boofcv.examples;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.RefineEpipolarMatrix;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
-import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.factory.feature.associate.FactoryAssociation;

@@ -18,26 +18,26 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.struct.feature.TupleDesc_F32;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * Computes sum of absolute difference (SAD) score for {@link boofcv.struct.feature.TupleDesc_F32}.
- *
  * @author Peter Abeles
  */
-public class ScoreAssociateSad_F32 implements ScoreAssociation<TupleDesc_F32>{
-	@Override
-	public double score(TupleDesc_F32 a, TupleDesc_F32 b) {
+public class TestHammingTable8 {
 
-		int total = 0;
-		for( int i = 0; i < a.value.length; i++ ) {
-			total += Math.abs( a.value[i] - b.value[i]);
+	@Test
+	public void exhaustive() {
+		HammingTable8 alg = new HammingTable8();
+
+		for( int i = 0; i < 256; i++ ) {
+			for( int j = 0; j < 256; j++ ) {
+				int expected = TestDescriptorDistance.hamming(i,j);
+				int found = alg.lookup((byte)i,(byte)j);
+
+				assertEquals(expected,found);
+			}
 		}
-		return total;
-	}
-
-	@Override
-	public boolean isZeroMinimum() {
-		return true;
 	}
 }

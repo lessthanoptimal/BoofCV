@@ -20,9 +20,9 @@ package boofcv.examples;
 
 
 import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.sfm.robust.DistanceHomographySq;
 import boofcv.alg.sfm.robust.GenerateHomographyLinear;

@@ -18,21 +18,17 @@
 
 package boofcv.factory.feature.tracker;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.*;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.tracker.*;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
-import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
-import boofcv.alg.feature.associate.ScoreAssociateNccFeature;
-import boofcv.alg.feature.associate.ScoreAssociation;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
-import boofcv.alg.feature.describe.brief.ScoreAssociationBrief;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.tracker.pklt.GenericPkltFeatSelector;

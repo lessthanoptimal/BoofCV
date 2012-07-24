@@ -19,6 +19,8 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.ScoreAssociateEuclidean;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;

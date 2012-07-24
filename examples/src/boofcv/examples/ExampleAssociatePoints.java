@@ -19,9 +19,9 @@
 package boofcv.examples;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;

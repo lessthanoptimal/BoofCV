@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
+package boofcv.abst.feature.associate;
 
 /**
  * Scores the quality of fit between two feature descriptions.

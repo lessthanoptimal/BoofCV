@@ -64,7 +64,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
-		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 20, imageType));
+		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 40, imageType));
 		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.surf(300, 200, 2, imageType));
 		// size of the description region has been increased to improve quality.
 		addAlgorithm(0, "NCC", FactoryPointSequentialTracker.pixelNCC(500,11,11,20,imageType,derivType));

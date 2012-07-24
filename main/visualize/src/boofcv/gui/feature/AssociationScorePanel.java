@@ -18,7 +18,7 @@
 
 package boofcv.gui.feature;
 
-import boofcv.alg.feature.associate.ScoreAssociation;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
