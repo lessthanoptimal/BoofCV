@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.alg.feature.associate.HammingTable8;
+import boofcv.alg.feature.associate.HammingTable16;
 import boofcv.alg.feature.describe.brief.BriefFeature;
 
 /**
@@ -29,7 +29,8 @@ import boofcv.alg.feature.describe.brief.BriefFeature;
  */
 public class ScoreAssociationBrief implements ScoreAssociation<BriefFeature>{
 
-	HammingTable8 table = new HammingTable8();
+//	HammingTable8 table = new HammingTable8();
+	HammingTable16 table = new HammingTable16();
 
 	@Override
 	public double score(BriefFeature a, BriefFeature b) {
@@ -45,10 +46,13 @@ public class ScoreAssociationBrief implements ScoreAssociation<BriefFeature>{
 //			score += table.score[ (dataA>>16 & 0xFF) << 8 | (dataB>>16 & 0xFF) ];
 //			score += table.score[ (dataA>>24 & 0xFF) << 8 | (dataB>>24 & 0xFF) ];
 
-			score += table.lookup( (byte)dataA , (byte)dataB );
-			score += table.lookup( (byte)(dataA >> 8)  , (byte)(dataB >> 8) );
-			score += table.lookup( (byte)(dataA >> 16) , (byte)(dataB >> 16) );
-			score += table.lookup( (byte)(dataA >> 24) , (byte)(dataB >> 24) );
+			score += table.lookup( (short)dataA , (short)dataB );
+			score += table.lookup( (short)(dataA >> 16) , (short)(dataB >> 16) );
+
+//			score += table.lookup( (byte)dataA , (byte)dataB );
+//			score += table.lookup( (byte)(dataA >> 8)  , (byte)(dataB >> 8) );
+//			score += table.lookup( (byte)(dataA >> 16) , (byte)(dataB >> 16) );
+//			score += table.lookup( (byte)(dataA >> 24) , (byte)(dataB >> 24) );
 		}
 
 		return score;

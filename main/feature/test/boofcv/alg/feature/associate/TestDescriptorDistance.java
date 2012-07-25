@@ -131,6 +131,16 @@ public class TestDescriptorDistance {
 		}
 	}
 
+	@Test
+	public void hamming_int() {
+		assertEquals(0,DescriptorDistance.hamming(0));
+		assertEquals(1,DescriptorDistance.hamming(0x0800));
+		assertEquals(1,DescriptorDistance.hamming(0x0001));
+		assertEquals(2,DescriptorDistance.hamming(0x0101));
+		assertEquals(4,DescriptorDistance.hamming(0x000F));
+		assertEquals(8,DescriptorDistance.hamming(0xF000000F));
+	}
+
 	private int hamming( BriefFeature a, BriefFeature b) {
 		int ret = 0;
 		for( int i = 0; i < a.data.length; i++ ) {

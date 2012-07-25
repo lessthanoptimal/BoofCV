@@ -162,22 +162,19 @@ public class DescriptorDistance {
 		int score = 0;
 		final int N = a.data.length;
 		for( int i = 0; i < N; i++ ) {
-			score += hamming(a.data[i],b.data[i]);
+			score += hamming(a.data[i] ^ b.data[i]);
 		}
 		return score;
 	}
 
 	/**
-	 * Computes the hamming distance between two 32-bit variables
+	 * Computes the hamming distance.  A bit = 0 is a match and 1 is not match
 	 *
-	 * @param a First variable
-	 * @param b Second variable
+	 * @param val Hamming encoding
 	 * @return The hamming distance
 	 */
-	public static int hamming( int a , int b ) {
+	public static int hamming( int val ) {
 		int distance = 0;
-		// see which bits are different
-		int val = a ^ b;
 
 		while( val != 0 ) {
 			val &= val - 1;

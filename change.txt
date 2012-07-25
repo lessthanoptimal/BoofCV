@@ -10,6 +10,7 @@ Version : Alpha 0.10
   * Pushed implementations of ScoreAssociation into abst package
   * Put most association distance algorithms into DescriptorDistance
   * Added hamming lookup table
+  * Brief now uses a look up table.  About a 7x speed improvement.
 
 ---------------------------------------------
 Date    : 2012/7/22
