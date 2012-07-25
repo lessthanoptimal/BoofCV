@@ -19,31 +19,29 @@
 package boofcv.alg.feature.associate;
 
 /**
- * Lookup table for hamming distance from 8-bit variables
+ * Lookup table for hamming distance from 16-bit variables
  *
  * @author Peter Abeles
  */
-public class HammingTable8 {
+public class HammingTable16 {
 
-	public int score[] = new int[256*256];
+	public int score[] = new int[65536];
 
-	public HammingTable8() {
+	public HammingTable16() {
 		int index = 0;
-		for( int i = 0; i < 256; i++ ) {
-			for( int j = 0; j < 256; j++ ) {
-				score[index++] = DescriptorDistance.hamming(i, j);
-			}
+		for( int i = 0; i < 65536; i++ ) {
+			score[index++] = DescriptorDistance.hamming(i);
 		}
 	}
 
 	/**
 	 * Looks up the hamming distance from a table
 	 *
-	 * @param a
-	 * @param b
-	 * @return
+	 * @param a First feature vector
+	 * @param b Second feature vector
+	 * @return Hamming score
 	 */
-	public int lookup( byte a , byte b ) {
-		return score[ ((a & 0xFF) << 8) | (b & 0xFF) ];
+	public int lookup( short a , short b ) {
+		return score[ (a ^ b) & 0xFFFF ];
 	}
 }

@@ -25,19 +25,23 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestHammingTable8 {
+public class TestHammingTable16 {
 
 	@Test
 	public void exhaustive() {
-		HammingTable8 alg = new HammingTable8();
+		HammingTable16 alg = new HammingTable16();
 
 		for( int i = 0; i < 256; i++ ) {
 			for( int j = 0; j < 256; j++ ) {
 				int expected = TestDescriptorDistance.hamming(i,j);
-				int found = alg.lookup((byte)i,(byte)j);
+				int found = alg.lookup((short)i,(short)j);
 
 				assertEquals(expected,found);
 			}
 		}
+
+		int expected = TestDescriptorDistance.hamming(65533,62003);
+		int found = alg.lookup((short)65533,(short)62003);
+		assertEquals(expected,found);
 	}
 }
