@@ -19,7 +19,6 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
@@ -97,7 +96,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		addAlgorithm(1,"Pixel 5x5", FactoryDescribeRegionPoint.pixel(5,5, imageType));
 		addAlgorithm(1,"NCC 5x5", FactoryDescribeRegionPoint.pixelNCC(5,5, imageType));
 
-		ScoreAssociation<TupleDesc_F64> scorer = new ScoreAssociateEuclideanSq();
+		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 
 		addAlgorithm(2,"Greedy", FactoryAssociation.greedy(scorer, Double.MAX_VALUE, maxMatches, false));
 		addAlgorithm(2,"Backwards", FactoryAssociation.greedy(scorer, Double.MAX_VALUE, maxMatches, true));

@@ -21,8 +21,8 @@ package boofcv.alg.feature.describe.impl;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
-import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageFloat32;
 
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public class ImplDescribePointBrief_F32 extends DescribePointBrief<ImageFloat32>
 	}
 
 	@Override
-	public boolean process( double X , double Y , BriefFeature feature )
+	public boolean process( double X , double Y , TupleDesc_B feature )
 	{
 		int c_x = (int)X;
 		int c_y = (int)Y;

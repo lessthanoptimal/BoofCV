@@ -18,10 +18,9 @@
 
 package boofcv.factory.feature.associate;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.abst.feature.associate.WrapAssociateGreedy;
+import boofcv.abst.feature.associate.*;
 import boofcv.alg.feature.associate.AssociateGreedy;
+import boofcv.struct.feature.*;
 
 
 /**
@@ -29,6 +28,7 @@ import boofcv.alg.feature.associate.AssociateGreedy;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public class FactoryAssociation {
 
 	/**
@@ -53,5 +53,92 @@ public class FactoryAssociation {
 		AssociateGreedy<D> alg = new AssociateGreedy<D>(score,maxError,backwardsValidation);
 		WrapAssociateGreedy<D> ret = new WrapAssociateGreedy<D>(alg,maxMatches);
 		return ret;
+	}
+
+	/**
+	 * Given a feature descriptor type it returns a "reasonable" default {@link ScoreAssociation}.
+	 *
+	 * @param tupleType Class type which extends {@link boofcv.struct.feature.TupleDesc}
+	 * @return A class which can score two potential associations
+	 */
+	public static <D>
+	ScoreAssociation<D> defaultScore( Class<D> tupleType ) {
+		if( tupleType == TupleDesc_F64.class ) {
+			return (ScoreAssociation)new ScoreAssociateEuclideanSq_F64();
+		} else if( tupleType == TupleDesc_F32.class ) {
+			return (ScoreAssociation)new ScoreAssociateEuclideanSq_F32();
+		} else if( tupleType == TupleDesc_U8.class ) {
+			return (ScoreAssociation)new ScoreAssociateSad_U8();
+		} else if( tupleType == TupleDesc_B.class  ) {
+			return (ScoreAssociation)new ScoreAssociateHamming_B();
+		} else {
+			throw new IllegalArgumentException("Unknown tuple type: "+tupleType);
+		}
+	}
+
+	/**
+	 * Scores features based on Sum of Absolute Difference (SAD).
+	 *
+	 * @param tupleType Type of descriptor being scored
+	 * @return SAD scorer
+	 */
+	public static <D>
+	ScoreAssociation<D> scoreSad( Class<D> tupleType ) {
+		if( tupleType == TupleDesc_F64.class ) {
+			return (ScoreAssociation)new ScoreAssociateSad_F64();
+		} else if( tupleType == TupleDesc_F32.class ) {
+			return (ScoreAssociation)new ScoreAssociateSad_F32();
+		} else if( tupleType == TupleDesc_U8.class ) {
+			return (ScoreAssociation)new ScoreAssociateSad_U8();
+		} else {
+			throw new IllegalArgumentException("SAD score not supported for type "+tupleType.getSimpleName());
+		}
+	}
+
+	/**
+	 * Scores features based on their Normalized Cross-Correlation (NCC).
+	 *
+	 * @return NCC score
+	 */
+	public static ScoreAssociation<NccFeature> scoreNcc() {
+		return new ScoreAssociateNccFeature();
+	}
+
+	/**
+	 * Scores features based on the Euclidean distance between them.  The square is often used instead
+	 * of the Euclidean distance since it is much faster to compute.
+	 *
+	 * @param tupleType Type of descriptor being scored
+	 * @param squared IF true the distance squared is returned.  Usually true
+	 * @return Euclidean distance measure
+	 */
+	public static <D>
+	ScoreAssociation<D> scoreEuclidean( Class<D> tupleType , boolean squared ) {
+		if( tupleType == TupleDesc_F64.class ) {
+			if( squared )
+				return (ScoreAssociation)new ScoreAssociateEuclideanSq_F64();
+			else
+				return (ScoreAssociation)new ScoreAssociateEuclidean_F64();
+		} else if( tupleType == TupleDesc_F32.class ) {
+			if( squared )
+				return (ScoreAssociation)new ScoreAssociateEuclideanSq_F32();
+		}
+
+		throw new IllegalArgumentException("Euclidean score not yet supported for type "+tupleType.getSimpleName());
+	}
+
+	/**
+	 * Hamming distance between two binary descriptors.
+	 *
+	 * @param tupleType Type of descriptor being scored
+	 * @return Hamming distance measure
+	 */
+	public static <D>
+	ScoreAssociation<D> scoreHamming( Class<D> tupleType ) {
+		if( tupleType == TupleDesc_B.class ) {
+			return (ScoreAssociation)new ScoreAssociateHamming_B();
+		}
+
+		throw new IllegalArgumentException("Hamming distance not yet supported for type "+tupleType.getSimpleName());
 	}
 }

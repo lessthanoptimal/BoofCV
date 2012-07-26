@@ -18,11 +18,7 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.alg.feature.describe.brief.BriefFeature;
-import boofcv.struct.feature.NccFeature;
-import boofcv.struct.feature.TupleDesc_F32;
-import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.struct.feature.*;
 
 /**
  * Series of simple functions for computing difference distance measures between two descriptors.
@@ -59,6 +55,24 @@ public class DescriptorDistance {
 	public static double euclideanSq(TupleDesc_F64 a, TupleDesc_F64 b) {
 		final int N = a.value.length;
 		double total = 0;
+		for( int i = 0; i < N; i++ ) {
+			double d = a.value[i]-b.value[i];
+			total += d*d;
+		}
+
+		return total;
+	}
+
+	/**
+	 * Returns the Euclidean distance squared between the two descriptors.
+	 *
+	 * @param a First descriptor
+	 * @param b Second descriptor
+	 * @return Euclidean distance squared
+	 */
+	public static double euclideanSq(TupleDesc_F32 a, TupleDesc_F32 b) {
+		final int N = a.value.length;
+		float total = 0;
 		for( int i = 0; i < N; i++ ) {
 			double d = a.value[i]-b.value[i];
 			total += d*d;
@@ -158,7 +172,7 @@ public class DescriptorDistance {
 	 * @param b Second variable
 	 * @return The hamming distance
 	 */
-	public static int hamming( BriefFeature a, BriefFeature b ) {
+	public static int hamming( TupleDesc_B a, TupleDesc_B b ) {
 		int score = 0;
 		final int N = a.data.length;
 		for( int i = 0; i < N; i++ ) {

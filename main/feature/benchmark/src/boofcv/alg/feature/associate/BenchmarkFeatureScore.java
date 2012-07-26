@@ -18,14 +18,15 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.*;
-import boofcv.alg.feature.describe.brief.BriefFeature;
+import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.BriefFeatureQueue;
 import boofcv.struct.feature.TupleDescQueue;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.feature.TupleDesc_F64;
 
 import java.util.Random;
@@ -48,8 +49,8 @@ public class BenchmarkFeatureScore {
 	static final FastQueue<TupleDesc_F64> listA = createSet();
 	static final FastQueue<TupleDesc_F64> listB = createSet();
 
-	static final FastQueue<BriefFeature> briefA = createBriefSet();
-	static final FastQueue<BriefFeature> briefB = createBriefSet();
+	static final FastQueue<TupleDesc_B> briefA = createBriefSet();
+	static final FastQueue<TupleDesc_B> briefB = createBriefSet();
 
 	public static class General implements Performer {
 
@@ -76,7 +77,7 @@ public class BenchmarkFeatureScore {
 
 	public static class Brief extends PerformerBase {
 
-		ScoreAssociationBrief scorer = new ScoreAssociationBrief();
+		ScoreAssociateHamming_B scorer = new ScoreAssociateHamming_B();
 
 		@Override
 		public void process() {
@@ -98,11 +99,11 @@ public class BenchmarkFeatureScore {
 		return ret;
 	}
 
-	private static FastQueue<BriefFeature> createBriefSet() {
-		FastQueue<BriefFeature> ret = new BriefFeatureQueue(DOF_BRIEF);
+	private static FastQueue<TupleDesc_B> createBriefSet() {
+		FastQueue<TupleDesc_B> ret = new BriefFeatureQueue(DOF_BRIEF);
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
-			BriefFeature t = ret.pop();
+			TupleDesc_B t = ret.pop();
 			for( int j = 0; j < t.data.length; j++ ) {
 				t.data[j] = rand.nextInt();
 			}
@@ -115,9 +116,9 @@ public class BenchmarkFeatureScore {
 		System.out.println();
 
 		// the "fastest" seems to always be the first one tested
-		ProfileOperation.printOpsPerSec(new General("Correlation", new ScoreAssociateCorrelation()),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Euclidean", new ScoreAssociateEuclidean()),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Euclidean Sq", new ScoreAssociateEuclideanSq()),TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new General("Correlation", new ScoreAssociateCorrelation()),TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new General("Euclidean", new ScoreAssociateEuclidean_F64()),TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new General("Euclidean Sq", new ScoreAssociateEuclideanSq_F64()),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief(),TEST_TIME);
 
 	}

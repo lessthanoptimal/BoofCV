@@ -18,7 +18,10 @@
 
 package boofcv.factory.feature.tracker;
 
-import boofcv.abst.feature.associate.*;
+import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
+import boofcv.abst.feature.associate.ScoreAssociateNccFeature;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -27,7 +30,6 @@ import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.feature.describe.DescribePointSurf;
-import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.orientation.OrientationIntegral;
@@ -44,6 +46,7 @@ import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.feature.NccFeature;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -132,7 +135,7 @@ public class FactoryPointSequentialTracker {
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(6,1,6,0,integralType);
 		DescribePointSurf<II> describe = new DescribePointSurf<II>(integralType);
 
-		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclideanSq();
+		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
 
 		return new PstWrapperSurf<I,II>(detector,orientation,describe,assoc,integralType);
@@ -152,9 +155,9 @@ public class FactoryPointSequentialTracker {
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 		GeneralFeatureDetector<I,?> fast = FactoryDetectPoint.createFast(3, pixelDetectTol, maxFeatures, imageType);
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapCorner(fast, imageType, null);
-		ScoreAssociationBrief score = new ScoreAssociationBrief();
+		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
-		GeneralAssociation<BriefFeature> association =
+		GeneralAssociation<TupleDesc_B> association =
 				FactoryAssociation.greedy(score,maxAssociationError,maxFeatures,true);
 
 		return new PstWrapperBrief<I>(alg,detector,association);

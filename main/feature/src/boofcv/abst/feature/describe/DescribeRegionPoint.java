@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.describe;
 
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -30,7 +31,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface DescribeRegionPoint<T extends ImageSingleBand> {
+public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleDesc> {
 
 	/**
 	 * Specified the image which is to be processed.

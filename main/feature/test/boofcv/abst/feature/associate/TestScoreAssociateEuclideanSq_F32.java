@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,23 +28,23 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestScoreAssociateEuclideanSq {
+public class TestScoreAssociateEuclideanSq_F32 {
 	@Test
 	public void compareToExpected() {
-		ScoreAssociateEuclideanSq score = new ScoreAssociateEuclideanSq();
+		ScoreAssociateEuclideanSq_F32 score = new ScoreAssociateEuclideanSq_F32();
 
-		TupleDesc_F64 a = new TupleDesc_F64(5);
-		TupleDesc_F64 b = new TupleDesc_F64(5);
+		TupleDesc_F32 a = new TupleDesc_F32(5);
+		TupleDesc_F32 b = new TupleDesc_F32(5);
 
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
+		a.value=new float[]{1,2,3,4,5};
+		b.value=new float[]{2,-1,7,-8,10};
 
 		assertEquals(195,score.score(a,b),1e-4);
 	}
 
 	@Test
 	public void check() {
-		ScoreAssociateEuclideanSq score = new ScoreAssociateEuclideanSq();
+		ScoreAssociateEuclideanSq_F32 score = new ScoreAssociateEuclideanSq_F32();
 		assertTrue(score.isZeroMinimum());
 	}
 }

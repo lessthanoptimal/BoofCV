@@ -19,8 +19,6 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociateCorrelation;
-import boofcv.abst.feature.associate.ScoreAssociateEuclidean;
-import boofcv.abst.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
@@ -28,6 +26,7 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -99,8 +98,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		addAlgorithm(1,"Pixel 5x5", FactoryDescribeRegionPoint.pixel(5, 5, imageType));
 		addAlgorithm(1,"NCC 5x5", FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType));
 
-		addAlgorithm(2,"norm",new ScoreAssociateEuclidean());
-		addAlgorithm(2,"norm^2",new ScoreAssociateEuclideanSq());
+		addAlgorithm(2,"norm",FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,false));
+		addAlgorithm(2,"norm^2", FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true));
 		addAlgorithm(2,"correlation",new ScoreAssociateCorrelation());
 
 		orientation = FactoryOrientationAlgs.nogradient(5, imageType);

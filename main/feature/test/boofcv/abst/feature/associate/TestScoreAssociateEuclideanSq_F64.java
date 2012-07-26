@@ -16,51 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe.brief;
+package boofcv.abst.feature.associate;
 
-
+import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
-import java.util.Random;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * @author Peter Abeles
  */
-public class TestBriefFeature {
-
-	Random rand = new Random(234);
-
+public class TestScoreAssociateEuclideanSq_F64 {
 	@Test
-	public void isBitTrue() {
-		int N = 40;
-		BriefFeature desc = new BriefFeature(N);
+	public void compareToExpected() {
+		ScoreAssociateEuclideanSq_F64 score = new ScoreAssociateEuclideanSq_F64();
 
-		boolean expected[] = new boolean[N];
-		for( int i = 0; i < N; i++ ) {
-			expected[i] = rand.nextBoolean();
+		TupleDesc_F64 a = new TupleDesc_F64(5);
+		TupleDesc_F64 b = new TupleDesc_F64(5);
 
-			int index = i/32;
-			desc.data[index] |= expected[i] ? 1 << (i%32) : 0;
-		}
+		a.value=new double[]{1,2,3,4,5};
+		b.value=new double[]{2,-1,7,-8,10};
 
-		for( int i = 0; i < N; i++ ) {
-			assertEquals(desc.isBitTrue(i),expected[i]);
-		}
+		assertEquals(195,score.score(a,b),1e-4);
 	}
 
 	@Test
-	public void copy() {
-		BriefFeature a = new BriefFeature(512);
-		for( int i = 0; i < a.data.length; i++ ) {
-			a.data[i] = 100+i;
-		}
-
-		BriefFeature b = a.copy();
-		assertEquals(a.numBits,b.numBits);
-		for( int i = 0; i < a.data.length; i++ ) {
-			assertEquals(100+i,a.data[i]);
-		}
+	public void check() {
+		ScoreAssociateEuclideanSq_F64 score = new ScoreAssociateEuclideanSq_F64();
+		assertTrue(score.isZeroMinimum());
 	}
 }

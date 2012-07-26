@@ -19,7 +19,7 @@
 package boofcv.examples;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.associate.ScoreAssociateEuclideanSq;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.geo.EpipolarMatrixEstimator;
@@ -133,8 +133,9 @@ public class ExampleFundamentalMatrix {
 	public static List<AssociatedPair> computeMatches( BufferedImage left , BufferedImage right ) {
 		InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4);
 		DescribeRegionPoint<ImageFloat32> describe = FactoryDescribeRegionPoint.surf(true, ImageFloat32.class);
+		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 		GeneralAssociation<TupleDesc_F64> associate =
-				FactoryAssociation.greedy(new ScoreAssociateEuclideanSq(), 2, -1, true);
+				FactoryAssociation.greedy(scorer, 2, -1, true);
 
 		ExampleAssociatePoints<ImageFloat32> findMatches =
 				new ExampleAssociatePoints<ImageFloat32>(detector, describe, associate, ImageFloat32.class);

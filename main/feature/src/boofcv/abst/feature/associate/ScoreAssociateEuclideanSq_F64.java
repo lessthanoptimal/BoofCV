@@ -18,33 +18,23 @@
 
 package boofcv.abst.feature.associate;
 
+import boofcv.alg.feature.associate.DescriptorDistance;
 import boofcv.struct.feature.TupleDesc_F64;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 /**
+ * Scores based on Euclidean distance squared
+ *
  * @author Peter Abeles
  */
-public class TestScoreAssociateEuclidean {
-	@Test
-	public void compareToExpected() {
-		ScoreAssociateEuclidean score = new ScoreAssociateEuclidean();
-
-		TupleDesc_F64 a = new TupleDesc_F64(5);
-		TupleDesc_F64 b = new TupleDesc_F64(5);
-
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
-
-		assertEquals(13.964,score.score(a,b),1e-2);
+public class ScoreAssociateEuclideanSq_F64 implements ScoreAssociation<TupleDesc_F64> {
+	@Override
+	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
+		return DescriptorDistance.euclideanSq(a, b);
 	}
 
-	@Test
-	public void checkZeroMinimum() {
-		ScoreAssociateEuclidean score = new ScoreAssociateEuclidean();
-		assertTrue(score.isZeroMinimum());
+	@Override
+	public boolean isZeroMinimum() {
+		return true;
 	}
 }
