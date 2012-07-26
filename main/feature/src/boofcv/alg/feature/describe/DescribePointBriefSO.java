@@ -20,9 +20,9 @@ package boofcv.alg.feature.describe;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
-import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
 
@@ -63,8 +63,8 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 		values = new float[ definition.samplePoints.length ];
 	}
 
-	public BriefFeature createFeature() {
-		return new BriefFeature(definition.getLength());
+	public TupleDesc_B createFeature() {
+		return new TupleDesc_B(definition.getLength());
 	}
 
 	public void setImage(T image) {
@@ -73,7 +73,7 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 		interp.setImage(blur);
 	}
 
-	public boolean process( float c_x , float c_y , float orientation , float scale , BriefFeature feature )
+	public boolean process( float c_x , float c_y , float orientation , float scale , TupleDesc_B feature )
 	{
 		int r = definition.radius;
 		float c = (float)Math.cos(orientation);

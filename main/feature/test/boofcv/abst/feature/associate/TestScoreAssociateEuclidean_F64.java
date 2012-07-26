@@ -16,28 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.abst.feature.associate;
 
-import boofcv.struct.FastQueue;
+import boofcv.struct.feature.TupleDesc_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
- * {@link boofcv.struct.FastQueue} for {@link TupleDesc_B}.
- *
  * @author Peter Abeles
  */
-public class BriefFeatureQueue extends FastQueue<TupleDesc_B> {
+public class TestScoreAssociateEuclidean_F64 {
+	@Test
+	public void compareToExpected() {
+		ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
 
-	int numBits;
+		TupleDesc_F64 a = new TupleDesc_F64(5);
+		TupleDesc_F64 b = new TupleDesc_F64(5);
 
-	public BriefFeatureQueue(int numBits) {
-		super(TupleDesc_B.class,true);
-		this.numBits = numBits;
-		growArray(10);
+		a.value=new double[]{1,2,3,4,5};
+		b.value=new double[]{2,-1,7,-8,10};
+
+		assertEquals(13.964,score.score(a,b),1e-2);
 	}
 
-	@Override
-	protected TupleDesc_B createInstance() {
-		return new TupleDesc_B(numBits);
+	@Test
+	public void checkZeroMinimum() {
+		ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
+		assertTrue(score.isZeroMinimum());
 	}
 }

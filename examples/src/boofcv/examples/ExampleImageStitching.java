@@ -20,7 +20,7 @@ package boofcv.examples;
 
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.associate.ScoreAssociateEuclideanSq;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.geo.AssociatedPair;
@@ -161,7 +161,8 @@ public class ExampleImageStitching {
 		// Detect using the standard SURF feature descriptor and describer
 		InterestPointDetector<T> detector = FactoryInterestPoint.fastHessian(1, 2, 400, 1, 9, 4, 4);
 		DescribeRegionPoint<T> describe = FactoryDescribeRegionPoint.surf(true,imageType);
-		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(new ScoreAssociateEuclideanSq(),2,-1,true);
+		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
+		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(scorer,2,-1,true);
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
 		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);

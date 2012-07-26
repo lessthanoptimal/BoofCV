@@ -16,25 +16,40 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.associate;
-
-import boofcv.alg.feature.associate.DescriptorDistance;
-import boofcv.struct.feature.TupleDesc_F64;
-
+package boofcv.struct.feature;
 
 /**
- * Scores based on Euclidean distance
+ * Binary descriptor which is stored inside of an array of ints.
  *
  * @author Peter Abeles
  */
-public class ScoreAssociateEuclidean implements ScoreAssociation<TupleDesc_F64> {
-	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
-		return DescriptorDistance.euclidean(a,b);
+public class TupleDesc_B extends TupleDesc {
+	public int[] data;
+	public int numBits;
+
+	public TupleDesc_B(int numBits) {
+		int numInts = numBits/32;
+		if( numBits % 32 != 0 ) {
+			numInts++;
+		}
+
+		this.numBits = numBits;
+		data = new int[numInts];
 	}
 
-	@Override
-	public boolean isZeroMinimum() {
-		return true;
+	public TupleDesc_B(int numBits, int numInts) {
+		this.numBits = numBits;
+		data = new int[numInts];
+	}
+
+	public boolean isBitTrue( int bit ) {
+		int index = bit/32;
+		return ((data[index] >> (bit%32)) & 0x01) == 1;
+	}
+
+	public TupleDesc_B copy() {
+		TupleDesc_B ret = new TupleDesc_B(numBits);
+		System.arraycopy(data,0,ret.data,0,data.length);
+		return ret;
 	}
 }

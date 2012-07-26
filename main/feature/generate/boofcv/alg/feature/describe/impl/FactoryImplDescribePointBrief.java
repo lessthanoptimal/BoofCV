@@ -53,7 +53,7 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 		out.print("import boofcv.abst.filter.blur.BlurFilter;\n" +
 				"import boofcv.alg.feature.describe.DescribePointBrief;\n" +
 				"import boofcv.alg.feature.describe.brief.BriefDefinition_I32;\n" +
-				"import boofcv.alg.feature.describe.brief.BriefFeature;\n" +
+				"import boofcv.alg.feature.describe.brief.TupleDesc_B;\n" +
 				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import georegression.struct.point.Point2D_I32;\n" +
@@ -81,7 +81,7 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 		String sumType = imageType.getSumType();
 
 		out.print("\t@Override\n" +
-				"\tpublic boolean process( double X , double Y , BriefFeature feature )\n" +
+				"\tpublic boolean process( double X , double Y , TupleDesc_B feature )\n" +
 				"\t{\n" +
 				"\t\tint c_x = (int)X;\n" +
 				"\t\tint c_y = (int)Y;\n"+

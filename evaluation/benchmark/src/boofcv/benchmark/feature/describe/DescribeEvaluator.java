@@ -19,7 +19,6 @@
 package boofcv.benchmark.feature.describe;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -79,7 +78,7 @@ public class DescribeEvaluator<T extends ImageSingleBand>
 		super(borderSize, detector);
 
 		this.orientationAlg = orientationAlg;
-		ScoreAssociation scorer = new ScoreAssociateEuclideanSq();
+		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 
 		matcher = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 	}

@@ -21,7 +21,6 @@ package boofcv.alg.feature.describe;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
-import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.FactoryGImageSingleBand;
@@ -29,6 +28,7 @@ import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I32;
@@ -71,8 +71,8 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 		T input = createImage(width,height);
 
 		DescribePointBrief<T> alg = FactoryDescribePointAlgs.brief(def, filterBlur);
-		BriefFeature desc1 = alg.createFeature();
-		BriefFeature desc2 = alg.createFeature();
+		TupleDesc_B desc1 = alg.createFeature();
+		TupleDesc_B desc2 = alg.createFeature();
 
 		// resize the image and see if it computes the same output
 		alg.setImage(input);
@@ -97,7 +97,7 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 		T inputB = createImage(width-5,height-5);
 
 		DescribePointBrief<T> alg = FactoryDescribePointAlgs.brief(def, filterBlur);
-		BriefFeature desc = alg.createFeature();
+		TupleDesc_B desc = alg.createFeature();
 
 		alg.setImage(inputA);
 		assertTrue(alg.process(inputA.width / 2, inputA.height / 2, desc));
@@ -119,8 +119,8 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 
 		DescribePointBrief<T> alg = FactoryDescribePointAlgs.brief(def, filterBlur);
 
-		BriefFeature desc1 = alg.createFeature();
-		BriefFeature desc2 = alg.createFeature();
+		TupleDesc_B desc1 = alg.createFeature();
+		TupleDesc_B desc2 = alg.createFeature();
 
 		// compute the image from the same image but different intensities
 		alg.setImage(input);
@@ -157,7 +157,7 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 		int c_x = input.width/2;
 		int c_y = input.height/2;
 
-		BriefFeature desc = alg.createFeature();
+		TupleDesc_B desc = alg.createFeature();
 		assertTrue(alg.process(c_x, c_y, desc));
 
 		for( int i = 0; i < def.compare.length; i++ ) {

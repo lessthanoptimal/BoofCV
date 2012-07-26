@@ -19,7 +19,6 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.associate.ScoreAssociateEuclideanSq;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.misc.Performer;
@@ -81,7 +80,7 @@ public class BenchmarkAssociationAlgs {
 		System.out.println("=========  Profile Description Length "+DOF+" ========== Num Features "+NUM_FEATURES);
 		System.out.println();
 
-		ScoreAssociation score = new ScoreAssociateEuclideanSq();
+		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 		int maxMatches = 200;
 
 		ProfileOperation.printOpsPerSec(new General("Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, false)),TEST_TIME);

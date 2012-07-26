@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.DescriptorDistance;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc_F32;
 
 
 /**
@@ -27,9 +27,9 @@ import boofcv.struct.feature.TupleDesc_F64;
  *
  * @author Peter Abeles
  */
-public class ScoreAssociateEuclideanSq implements ScoreAssociation<TupleDesc_F64> {
+public class ScoreAssociateEuclideanSq_F32 implements ScoreAssociation<TupleDesc_F32> {
 	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
+	public double score(TupleDesc_F32 a, TupleDesc_F32 b) {
 		return DescriptorDistance.euclideanSq(a, b);
 	}
 

@@ -19,39 +19,22 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.DescriptorDistance;
-import boofcv.alg.feature.describe.brief.BriefFeature;
-import org.junit.Test;
+import boofcv.struct.feature.TupleDesc_F64;
 
-import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
 
 /**
+ * Scores based on Euclidean distance
+ *
  * @author Peter Abeles
  */
-public class TestScoreAssociationBrief {
+public class ScoreAssociateEuclidean_F64 implements ScoreAssociation<TupleDesc_F64> {
+	@Override
+	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
+		return DescriptorDistance.euclidean(a,b);
+	}
 
-	Random rand = new Random(123);
-
-	/**
-	 * Generate random descriptions and see two hamming distance calculations return the same result.
-	 */
-	@Test
-	public void testRandom() {
-		ScoreAssociationBrief scorer = new ScoreAssociationBrief();
-
-		BriefFeature a = new BriefFeature(512);
-		BriefFeature b = new BriefFeature(512);
-
-		for( int numTries = 0; numTries < 20; numTries++ ) {
-			for( int i = 0; i < a.data.length; i++ ) {
-				a.data[i] = rand.nextInt();
-				b.data[i] = rand.nextInt();
-			}
-
-			int expected = DescriptorDistance.hamming(a,b);
-
-			assertEquals(expected,scorer.score(a,b),1e-4);
-		}
+	@Override
+	public boolean isZeroMinimum() {
+		return true;
 	}
 }

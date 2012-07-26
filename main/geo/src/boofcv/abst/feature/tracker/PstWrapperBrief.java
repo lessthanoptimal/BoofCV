@@ -22,10 +22,10 @@ package boofcv.abst.feature.tracker;
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
-import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BriefFeatureQueue;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
@@ -35,15 +35,15 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class PstWrapperBrief <I extends ImageSingleBand>
-		extends DetectAssociateTracker<I,BriefFeature>
+		extends DetectAssociateTracker<I,TupleDesc_B>
 {
 	private DescribePointBrief<I> alg;
 	private InterestPointDetector<I> detector;
-	private GeneralAssociation<BriefFeature> association;
+	private GeneralAssociation<TupleDesc_B> association;
 
 	public PstWrapperBrief(DescribePointBrief<I> alg,
 						   InterestPointDetector<I> detector,
-						   GeneralAssociation<BriefFeature> association) {
+						   GeneralAssociation<TupleDesc_B> association) {
 		this.alg = alg;
 		this.detector = detector;
 		this.association = association;
@@ -58,25 +58,25 @@ public class PstWrapperBrief <I extends ImageSingleBand>
 	}
 
 	@Override
-	public FastQueue<BriefFeature> createFeatureDescQueue(  boolean declareData  ) {
+	public FastQueue<TupleDesc_B> createFeatureDescQueue(  boolean declareData  ) {
 		if( declareData )
 			return new BriefFeatureQueue(alg.getDefinition().getLength());
 		else
-			return new FastQueue<BriefFeature>(100,BriefFeature.class,false);
+			return new FastQueue<TupleDesc_B>(100,TupleDesc_B.class,false);
 	}
 
 	@Override
-	public BriefFeature createDescription() {
-		return new BriefFeature(alg.getDefinition().getLength());
+	public TupleDesc_B createDescription() {
+		return new TupleDesc_B(alg.getDefinition().getLength());
 	}
 
 	@Override
 	public void detectFeatures(FastQueue<Point2D_F64> location,
-							   FastQueue<BriefFeature> description) {
+							   FastQueue<TupleDesc_B> description) {
 		int N = detector.getNumberOfFeatures();
 
 		Point2D_F64 lp = location.pop();
-		BriefFeature f = description.pop();
+		TupleDesc_B f = description.pop();
 		for( int i = 0; i < N; i++ ) {
 			Point2D_F64 p = detector.getLocation(i);
 
@@ -93,13 +93,13 @@ public class PstWrapperBrief <I extends ImageSingleBand>
 	}
 
 	@Override
-	public FastQueue<AssociatedIndex> associate(FastQueue<BriefFeature> featSrc, FastQueue<BriefFeature> featDst) {
+	public FastQueue<AssociatedIndex> associate(FastQueue<TupleDesc_B> featSrc, FastQueue<TupleDesc_B> featDst) {
 		association.associate(featSrc,featDst);
 		return association.getMatches();
 	}
 
 	@Override
-	protected void setDescription(BriefFeature src, BriefFeature dst) {
+	protected void setDescription(TupleDesc_B src, TupleDesc_B dst) {
 		System.arraycopy(dst.data,0,src.data,0,src.data.length);
 	}
 }

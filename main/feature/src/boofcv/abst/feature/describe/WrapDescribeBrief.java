@@ -19,7 +19,7 @@
 package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointBrief;
-import boofcv.alg.feature.describe.brief.BriefFeature;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -30,12 +30,12 @@ public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeReg
 
 	int length;
 	DescribePointBrief<T> alg;
-	BriefFeature feature;
+	TupleDesc_B feature;
 
 	public WrapDescribeBrief( DescribePointBrief<T> alg ) {
 		this.alg = alg;
 		this.length = alg.getDefinition().getLength();
-		feature = new BriefFeature(length);
+		feature = new TupleDesc_B(length);
 	}
 
 	@Override

@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.ScoreAssociateEuclidean;
+import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDescQueue;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestAssociateGreedy {
 
-	ScoreAssociation score = new ScoreAssociateEuclidean();
+	ScoreAssociation score = new ScoreAssociateEuclidean_F64();
 
 	@Test
 	public void basic() {

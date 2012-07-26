@@ -19,7 +19,7 @@
 package boofcv.examples;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.associate.ScoreAssociateEuclideanSq;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.core.image.ConvertBufferedImage;
@@ -138,7 +138,8 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 		// select which algorithms to use
 		InterestPointDetector detector = FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4);
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surf(true, imageType);
-		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(new ScoreAssociateEuclideanSq(), 2, -1, true);
+		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
+		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(scorer, 2, -1, true);
 
 		// load and match images
 		ExampleAssociatePoints app = new ExampleAssociatePoints(detector,describe,associate,imageType);

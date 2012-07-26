@@ -20,8 +20,8 @@ package boofcv.alg.feature.describe;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
-import boofcv.alg.feature.describe.brief.BriefFeature;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
 
@@ -74,8 +74,8 @@ public abstract class DescribePointBrief<T extends ImageSingleBand> {
 	 *
 	 * @return Creates a bew description.
 	 */
-	public BriefFeature createFeature() {
-		return new BriefFeature(definition.getLength());
+	public TupleDesc_B createFeature() {
+		return new TupleDesc_B(definition.getLength());
 	}
 
 	/**
@@ -110,7 +110,7 @@ public abstract class DescribePointBrief<T extends ImageSingleBand> {
 	 * @param feature Where the descriptor is written to.
 	 * @return true indicates a descriptor could be created and false one was not.
 	 */
-	public abstract boolean process( double c_x , double c_y , BriefFeature feature );
+	public abstract boolean process( double c_x , double c_y , TupleDesc_B feature );
 
 	public BriefDefinition_I32 getDefinition() {
 		return definition;

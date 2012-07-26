@@ -25,6 +25,7 @@ package boofcv.alg.feature.associate;
  */
 public class HammingTable16 {
 
+	// about 10% faster if int[] is used instead of byte[]
 	public int score[] = new int[65536];
 
 	public HammingTable16() {

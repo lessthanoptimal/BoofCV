@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.HammingTable16;
-import boofcv.alg.feature.describe.brief.BriefFeature;
+import boofcv.struct.feature.TupleDesc_B;
 
 /**
  * Score association between two BRIEF features.  Scoring is done using the Hamming distance.
@@ -27,13 +27,12 @@ import boofcv.alg.feature.describe.brief.BriefFeature;
  *
  * @author Peter Abeles
  */
-public class ScoreAssociationBrief implements ScoreAssociation<BriefFeature>{
+public class ScoreAssociateHamming_B implements ScoreAssociation<TupleDesc_B>{
 
-//	HammingTable8 table = new HammingTable8();
 	HammingTable16 table = new HammingTable16();
 
 	@Override
-	public double score(BriefFeature a, BriefFeature b) {
+	public double score(TupleDesc_B a, TupleDesc_B b) {
 
 		int score = 0;
 
@@ -41,18 +40,8 @@ public class ScoreAssociationBrief implements ScoreAssociation<BriefFeature>{
 			int dataA = a.data[i];
 			int dataB = b.data[i];
 
-//			score += table.score[ (dataA & 0xFF) << 8 | (dataB & 0xFF) ];
-//			score += table.score[ (dataA>>8 & 0xFF) << 8 | (dataB>>8 & 0xFF) ];
-//			score += table.score[ (dataA>>16 & 0xFF) << 8 | (dataB>>16 & 0xFF) ];
-//			score += table.score[ (dataA>>24 & 0xFF) << 8 | (dataB>>24 & 0xFF) ];
-
 			score += table.lookup( (short)dataA , (short)dataB );
 			score += table.lookup( (short)(dataA >> 16) , (short)(dataB >> 16) );
-
-//			score += table.lookup( (byte)dataA , (byte)dataB );
-//			score += table.lookup( (byte)(dataA >> 8)  , (byte)(dataB >> 8) );
-//			score += table.lookup( (byte)(dataA >> 16) , (byte)(dataB >> 16) );
-//			score += table.lookup( (byte)(dataA >> 24) , (byte)(dataB >> 24) );
 		}
 
 		return score;

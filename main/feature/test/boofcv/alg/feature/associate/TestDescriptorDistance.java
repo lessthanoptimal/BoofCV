@@ -18,11 +18,7 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.alg.feature.describe.brief.BriefFeature;
-import boofcv.struct.feature.NccFeature;
-import boofcv.struct.feature.TupleDesc_F32;
-import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.struct.feature.*;
 import org.junit.Test;
 
 import java.util.Random;
@@ -55,6 +51,18 @@ public class TestDescriptorDistance {
 
 		a.value=new double[]{1,2,3,4,5};
 		b.value=new double[]{2,-1,7,-8,10};
+
+		assertEquals(195, DescriptorDistance.euclideanSq(a, b), 1e-4);
+	}
+
+	@Test
+	public void euclideanSq_F32() {
+
+		TupleDesc_F32 a = new TupleDesc_F32(5);
+		TupleDesc_F32 b = new TupleDesc_F32(5);
+
+		a.value=new float[]{1,2,3,4,5};
+		b.value=new float[]{2,-1,7,-8,10};
 
 		assertEquals(195, DescriptorDistance.euclideanSq(a, b), 1e-4);
 	}
@@ -118,8 +126,8 @@ public class TestDescriptorDistance {
 
 	@Test
 	public void hamming_I32() {
-		BriefFeature a = new BriefFeature(512);
-		BriefFeature b = new BriefFeature(512);
+		TupleDesc_B a = new TupleDesc_B(512);
+		TupleDesc_B b = new TupleDesc_B(512);
 
 		for( int numTries = 0; numTries < 20; numTries++ ) {
 			for( int i = 0; i < a.data.length; i++ ) {
@@ -141,7 +149,7 @@ public class TestDescriptorDistance {
 		assertEquals(8,DescriptorDistance.hamming(0xF000000F));
 	}
 
-	private int hamming( BriefFeature a, BriefFeature b) {
+	private int hamming( TupleDesc_B a, TupleDesc_B b) {
 		int ret = 0;
 		for( int i = 0; i < a.data.length; i++ ) {
 			ret += hamming(a.data[i],b.data[i]);
