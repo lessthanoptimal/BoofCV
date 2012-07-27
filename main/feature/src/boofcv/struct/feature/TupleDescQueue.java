@@ -20,24 +20,44 @@ package boofcv.struct.feature;
 
 import boofcv.struct.FastQueue;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 
 /**
- * {@link boofcv.struct.FastQueue} for TupleDesc_F64.
+ * {@link boofcv.struct.FastQueue} for TupleDesc.
  *
  * @author Peter Abeles
  */
-public class TupleDescQueue extends FastQueue<TupleDesc_F64> {
+public class TupleDescQueue<D extends TupleDesc> extends FastQueue<D> {
 
 	int numFeatures;
+	Constructor<D> c;
 
-	public TupleDescQueue(int numFeatures, boolean declareInstances) {
-		super(TupleDesc_F64.class,declareInstances);
+	public TupleDescQueue( Class<D> descType , int numFeatures, boolean declareInstances) {
+		super(descType,declareInstances);
 		this.numFeatures = numFeatures;
 		growArray(10);
 	}
 
 	@Override
-	protected TupleDesc_F64 createInstance() {
-		return new TupleDesc_F64(numFeatures);
+	protected D createInstance() {
+		if( c == null ) {
+			try {
+				c = type.getConstructor(int.class);
+			} catch (NoSuchMethodException e) {
+				throw new RuntimeException("Constructor with a parameter for numFeatures expected",e);
+			}
+		}
+
+		try {
+			return c.newInstance(numFeatures);
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

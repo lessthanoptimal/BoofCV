@@ -19,10 +19,8 @@
 package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointPixelRegion;
-import boofcv.alg.feature.describe.impl.ImplDescribePointPixelRegion_F32;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F32;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_U8;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -33,19 +31,19 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleDesc>
-		implements DescribeRegionPoint<T>
+		implements DescribeRegionPoint<T,D>
 {
 	DescribePointPixelRegion<T,D> alg;
 
-	D desc;
-
 	public WrapDescribePixelRegion(DescribePointPixelRegion<T, D> alg) {
 		this.alg = alg;
+	}
 
-		if( alg instanceof ImplDescribePointPixelRegion_F32 ) {
-			desc = (D)new TupleDesc_F32(alg.getDescriptorLength());
+	private D createDescriptor() {
+		if( alg.getDescriptorType() == TupleDesc_F32.class ) {
+			return (D)new TupleDesc_F32(alg.getDescriptorLength());
 		} else {
-			desc = (D)new TupleDesc_U8(alg.getDescriptorLength());
+			return (D)new TupleDesc_U8(alg.getDescriptorLength());
 		}
 	}
 
@@ -65,21 +63,14 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	}
 
 	@Override
-	public TupleDesc_F64 process(double x, double y, double orientation,
-								 double scale, TupleDesc_F64 ret)
+	public D process(double x, double y, double orientation,
+								 double scale, D ret)
 	{
 		if( ret == null ) {
-			ret = new TupleDesc_F64(alg.getDescriptorLength());
+			ret = createDescriptor();
 		}
 
-		alg.process((int)x,(int)y,desc);
-
-		if( desc instanceof TupleDesc_F32 ) {
-			TupleDesc_F32 d = (TupleDesc_F32)desc;
-			for( int i = 0; i < d.value.length; i++ ) {
-				ret.value[i] = d.value[i];
-			}
-		}
+		alg.process((int)x,(int)y,ret);
 
 		return ret;
 	}
@@ -92,5 +83,10 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	@Override
 	public boolean requiresOrientation() {
 		return false;
+	}
+
+	@Override
+	public Class<D> getDescriptorType() {
+		return alg.getDescriptorType();
 	}
 }

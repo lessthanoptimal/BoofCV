@@ -20,22 +20,19 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
  * @author Peter Abeles
  */
-public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeRegionPoint<T> {
+public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeRegionPoint<T,TupleDesc_B> {
 
 	int length;
 	DescribePointBrief<T> alg;
-	TupleDesc_B feature;
 
 	public WrapDescribeBrief( DescribePointBrief<T> alg ) {
 		this.alg = alg;
 		this.length = alg.getDefinition().getLength();
-		feature = new TupleDesc_B(length);
 	}
 
 	@Override
@@ -54,24 +51,13 @@ public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeReg
 	}
 
 	@Override
-	public TupleDesc_F64 process(double x, double y, double orientation, double scale, TupleDesc_F64 ret) {
-
-		if( !alg.process(x,y,feature) )
-			return null;
+	public TupleDesc_B process(double x, double y, double orientation, double scale, TupleDesc_B ret) {
 
 		if( ret == null )
-			ret = new TupleDesc_F64(length);
+			ret = new TupleDesc_B(length);
 
-		for( int i = 0; i < length; i++ ) {
-			int index = i/32;
-			int bit = i%32;
-
-			if( ((feature.data[index] >> bit) & 0x01) == 1 ) {
-				ret.value[i] = 1;
-			} else {
-				ret.value[i] = -1;
-			}
-		}
+		if( !alg.process(x,y,ret) )
+			return null;
 
 		return ret;
 	}
@@ -84,5 +70,10 @@ public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeReg
 	@Override
 	public boolean requiresOrientation() {
 		return false;
+	}
+
+	@Override
+	public Class<TupleDesc_B> getDescriptorType() {
+		return TupleDesc_B.class;
 	}
 }

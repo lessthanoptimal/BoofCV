@@ -65,7 +65,7 @@ public class BenchmarkAssociationAlgs {
 	}
 
 	private static FastQueue<TupleDesc_F64> createSet() {
-		FastQueue<TupleDesc_F64> ret = new TupleDescQueue(DOF, true);
+		FastQueue<TupleDesc_F64> ret = new TupleDescQueue<TupleDesc_F64>(TupleDesc_F64.class,DOF, true);
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			TupleDesc_F64 t = ret.pop();

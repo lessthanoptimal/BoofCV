@@ -24,7 +24,7 @@ package boofcv.struct.feature;
  *
  * @author Peter Abeles
  */
-public class TupleDesc_U8 extends TupleDesc {
+public class TupleDesc_U8 implements TupleDesc<TupleDesc_U8> {
 	public byte value[];
 
 	public TupleDesc_U8(int numFeatures) {
@@ -50,5 +50,20 @@ public class TupleDesc_U8 extends TupleDesc {
 
 	public void setValue(byte[] value) {
 		this.value = value;
+	}
+
+	@Override
+	public void setTo(TupleDesc_U8 source) {
+		System.arraycopy(source.value,0,value,0,value.length);
+	}
+
+	@Override
+	public double getDouble(int index) {
+		return value[index] & 0xFF;
+	}
+
+	@Override
+	public int size() {
+		return value.length;
 	}
 }

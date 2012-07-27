@@ -31,6 +31,10 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.struct.feature.NccFeature;
+import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDesc_B;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 
 import java.util.Random;
@@ -57,7 +61,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T> surf( boolean isOriented , Class<T> imageType) {
+	DescribeRegionPoint<T,TupleDesc_F64> surf( boolean isOriented , Class<T> imageType) {
 		OrientationIntegral<II> orientation = null;
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -85,7 +89,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T> surfm(boolean isOriented, Class<T> imageType) {
+	DescribeRegionPoint<T,TupleDesc_F64> surfm(boolean isOriented, Class<T> imageType) {
 		OrientationIntegral<II> orientation = null;
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -111,7 +115,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return Steerable gaussian descriptor.
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	DescribeRegionPoint<T> gaussian12( int radius ,Class<T> imageType , Class<D> derivType ) {
+	DescribeRegionPoint<T,TupleDesc_F64> gaussian12( int radius ,Class<T> imageType , Class<D> derivType ) {
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 		DescribePointGaussian12<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian12(radius, imageType);
@@ -120,7 +124,7 @@ public class FactoryDescribeRegionPoint {
 	}
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	DescribeRegionPoint<T> steerableGaussian( int radius , boolean normalized ,
+	DescribeRegionPoint<T,TupleDesc_F64> steerableGaussian( int radius , boolean normalized ,
 													Class<T> imageType , Class<D> derivType ) {
 
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
@@ -147,7 +151,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return BRIEF descriptor
 	 */
 	public static <T extends ImageSingleBand>
-	DescribeRegionPoint<T> brief(int radius, int numPoints,
+	DescribeRegionPoint<T,TupleDesc_B> brief(int radius, int numPoints,
 									   double blurSigma, int blurRadius,
 									   boolean isFixed,
 									   Class<T> imageType) {
@@ -177,8 +181,8 @@ public class FactoryDescribeRegionPoint {
 	 * @return Pixel region descriptor
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageSingleBand>
-	DescribeRegionPoint<T> pixel( int regionWidth , int regionHeight , Class<T> imageType ) {
+	public static <T extends ImageSingleBand, D extends TupleDesc>
+	DescribeRegionPoint<T,D> pixel( int regionWidth , int regionHeight , Class<T> imageType ) {
 		return new WrapDescribePixelRegion(FactoryDescribePointAlgs.pixelRegion(regionWidth,regionHeight,imageType));
 	}
 
@@ -195,7 +199,7 @@ public class FactoryDescribeRegionPoint {
 	 */
 	@SuppressWarnings({"unchecked"})
 	public static <T extends ImageSingleBand>
-	DescribeRegionPoint<T> pixelNCC( int regionWidth , int regionHeight , Class<T> imageType ) {
+	DescribeRegionPoint<T,NccFeature> pixelNCC( int regionWidth , int regionHeight , Class<T> imageType ) {
 		return new WrapDescribePixelRegionNCC(FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType));
 	}
 }

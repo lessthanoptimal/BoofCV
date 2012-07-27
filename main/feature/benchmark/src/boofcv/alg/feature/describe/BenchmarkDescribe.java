@@ -115,10 +115,10 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 
 	public class Describe implements Performer {
 
-		DescribeRegionPoint<I> alg;
+		DescribeRegionPoint<I,?> alg;
 		String name;
 
-		public Describe(String name, DescribeRegionPoint<I> alg) {
+		public Describe(String name, DescribeRegionPoint<I,?> alg) {
 			this.alg = alg;
 			this.name = name;
 		}

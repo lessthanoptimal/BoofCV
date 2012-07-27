@@ -45,4 +45,11 @@ public abstract class DescribePointPixelRegion<T extends ImageSingleBand, D exte
 	 * @param desc Where the descriptor is written to
 	 */
 	public abstract void process( int c_x , int c_y , D desc );
+
+	/**
+	 * The type of region descriptor generated
+	 *
+	 * @return Returns the descriptor type.
+	 */
+	public abstract Class<D> getDescriptorType();
 }

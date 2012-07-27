@@ -88,7 +88,7 @@ public class BenchmarkFeatureScore {
 	}
 
 	private static FastQueue<TupleDesc_F64> createSet() {
-		FastQueue<TupleDesc_F64> ret = new TupleDescQueue(DOF_TUPLE, true);
+		FastQueue<TupleDesc_F64> ret = new TupleDescQueue<TupleDesc_F64>(TupleDesc_F64.class,DOF_TUPLE, true);
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			TupleDesc_F64 t = ret.pop();

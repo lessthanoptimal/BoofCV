@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public abstract class WrapScaleToCharacteristic <T extends ImageSingleBand, D extends ImageSingleBand>
-		implements DescribeRegionPoint<T>
+		implements DescribeRegionPoint<T,TupleDesc_F64>
 {
 	protected ImageGradient<T,D> gradient;
 
@@ -103,5 +103,10 @@ public abstract class WrapScaleToCharacteristic <T extends ImageSingleBand, D ex
 	@Override
 	public boolean requiresOrientation() {
 		return true;
+	}
+
+	@Override
+	public Class<TupleDesc_F64> getDescriptorType() {
+		return TupleDesc_F64.class;
 	}
 }
