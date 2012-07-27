@@ -62,14 +62,17 @@ public abstract class WrapScaleToCharacteristic <T extends ImageSingleBand, D ex
 	}
 
 	@Override
-	public void setImage(T image) {
-		this.image = image;
-
+	public TupleDesc_F64 createDescription() {
+		return new TupleDesc_F64(getDescriptionLength());
 	}
 
+	@Override
+	public void setImage(T image) {
+		this.image = image;
+	}
 
 	@Override
-	public TupleDesc_F64 process(double x, double y, double theta , double scale, TupleDesc_F64 ret ) {
+	public boolean process(double x, double y, double theta , double scale, TupleDesc_F64 ret ) {
 		// compute the size of the region at this scale
 		int r = (int)Math.ceil(scale*3)+1;
 
@@ -78,7 +81,7 @@ public abstract class WrapScaleToCharacteristic <T extends ImageSingleBand, D ex
 
 		ImageRectangle area = new ImageRectangle(pixelX-r,pixelY-r,pixelX+r+1,pixelY+r+1);
 		if( !BoofMiscOps.checkInside(image,area) )
-			return null;
+			return false;
 
 		// create a subimage of this region
 		T subImage = (T)image.subimage(area.x0,area.y0,area.x1,area.y1);
@@ -89,11 +92,13 @@ public abstract class WrapScaleToCharacteristic <T extends ImageSingleBand, D ex
 		gradient.process(scaledImage, scaledDerivX, scaledDerivY);
 
 
-		return describe(steerR+1,steerR+1,theta,ret);
 		// +1 to avoid edge conditions
+		describe(steerR+1,steerR+1,theta,ret);
+
+		return true;
 	}
 
-	protected abstract TupleDesc_F64 describe( int x , int y , double angle , TupleDesc_F64 ret );
+	protected abstract boolean describe( int x , int y , double angle , TupleDesc_F64 ret );
 
 	@Override
 	public boolean requiresScale() {

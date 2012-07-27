@@ -27,7 +27,7 @@ import boofcv.gui.feature.SelectRegionDescriptionPanel;
 import boofcv.gui.feature.TupleDescPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
@@ -51,7 +51,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 	Class<T> imageType;
 	T input;
 
-	DescribeRegionPoint<T> describe;
+	DescribeRegionPoint<T,TupleDesc> describe;
 
 	SelectRegionDescriptionPanel panel = new SelectRegionDescriptionPanel();
 
@@ -113,7 +113,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 	@Override
 	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		this.describe = (DescribeRegionPoint<T>)cookie;
+		this.describe = (DescribeRegionPoint<T,TupleDesc>)cookie;
 		if( input != null ) {
 			describe.setImage(input);
 		}
@@ -151,7 +151,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 		if( targetPt != null ) {
 			double scale = targetRadius/describe.getCanonicalRadius();
 
-			TupleDesc_F64 feature = describe.process(targetPt.x,targetPt.y,targetOrientation,scale,null);
+			TupleDesc feature = describe.createDescription();
+			describe.process(targetPt.x,targetPt.y,targetOrientation,scale,feature);
 			tuplePanel.setDescription(feature);
 		} else {
 			tuplePanel.setDescription(null);

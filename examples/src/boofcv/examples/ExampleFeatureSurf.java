@@ -58,8 +58,10 @@ public class ExampleFeatureSurf {
 	public static void easy( ImageFloat32 image ) {
 		// create the detector and descriptors
 		InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(0, 2, 200, 2, 9, 4, 4);
-		// BoofCV has two SURF implementations.  surfm() = slower, but more accurate.  surf() = faster and less accurate
-		DescribeRegionPoint<ImageFloat32> descriptor = FactoryDescribeRegionPoint.surfm(true,ImageFloat32.class);
+		// BoofCV has two SURF implementations.
+		// surfm() = slower, but more accurate.  surf() = faster and less accurate
+		DescribeRegionPoint<ImageFloat32,SurfFeature> descriptor =
+				FactoryDescribeRegionPoint.surfm(true,ImageFloat32.class);
 		
 		// just pointing out that orientation does not need to be passed into the descriptor
 		if( descriptor.requiresOrientation() )
@@ -79,7 +81,8 @@ public class ExampleFeatureSurf {
 			double scale = detector.getScale(i);
 			
 			// extract the SURF description for this region
-			TupleDesc_F64 desc = descriptor.process(p.x,p.y,0,scale,null);
+			SurfFeature desc = descriptor.createDescription();
+			descriptor.process(p.x,p.y,0,scale,desc);
 			
 			// save everything for processing later on
 			descriptions.add(desc);
@@ -122,9 +125,9 @@ public class ExampleFeatureSurf {
 		// tell algorithms which image to process
 		orientation.setImage(integral);
 		descriptor.setImage(integral);
-		
+
 		List<ScalePoint> points = detector.getFoundPoints();
-		
+
 		List<SurfFeature> descriptions = new ArrayList<SurfFeature>();
 
 		for( ScalePoint p : points ) {
@@ -133,7 +136,8 @@ public class ExampleFeatureSurf {
 			double angle = orientation.compute(p.x,p.y);
 			
 			// extract the SURF description for this region
-			SurfFeature desc = descriptor.describe(p.x,p.y,p.scale,angle,null);
+			SurfFeature desc = descriptor.createDescription();
+			descriptor.describe(p.x,p.y,p.scale,angle,desc);
 
 			// save everything for processing later on
 			descriptions.add(desc);

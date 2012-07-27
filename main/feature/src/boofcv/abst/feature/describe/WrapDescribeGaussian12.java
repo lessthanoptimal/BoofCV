@@ -53,8 +53,9 @@ public class WrapDescribeGaussian12<T extends ImageSingleBand, D extends ImageSi
 	}
 
 	@Override
-	protected TupleDesc_F64 describe(int x, int y, double angle, TupleDesc_F64 ret) {
+	protected boolean describe(int x, int y, double angle, TupleDesc_F64 ret) {
 		steer.setImage(scaledImage);
-		return steer.describe(x,y,angle,ret);
+		steer.describe(x,y,angle,ret);
+		return true;
 	}
 }

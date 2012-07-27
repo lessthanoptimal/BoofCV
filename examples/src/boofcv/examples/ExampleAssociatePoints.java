@@ -30,8 +30,8 @@ import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.FastQueue;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDescQueue;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -49,14 +49,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleAssociatePoints<T extends ImageSingleBand> {
+public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleDesc> {
 
 	// algorithm used to detect interest points
 	InterestPointDetector<T> detector;
 	// algorithm used to describe each interest point based on local pixels
-	DescribeRegionPoint<T> describe;
+	DescribeRegionPoint<T, FD> describe;
 	// Associated descriptions together by minimizing an error metric
-	GeneralAssociation<TupleDesc_F64> associate;
+	GeneralAssociation<FD> associate;
 
 	// location of interest points
 	List<Point2D_F64> pointsA;
@@ -65,8 +65,8 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 	Class<T> imageType;
 
 	public ExampleAssociatePoints(InterestPointDetector<T> detector,
-								  DescribeRegionPoint<T> describe,
-								  GeneralAssociation<TupleDesc_F64> associate,
+								  DescribeRegionPoint<T, FD> describe,
+								  GeneralAssociation<FD> associate,
 								  Class<T> imageType) {
 		this.detector = detector;
 		this.describe = describe;
@@ -87,8 +87,8 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 		pointsB = new ArrayList<Point2D_F64>();
 
 		// stores the description of detected interest points
-		FastQueue<TupleDesc_F64> descA = new TupleDescQueue(describe.getDescriptionLength(),true);
-		FastQueue<TupleDesc_F64> descB = new TupleDescQueue(describe.getDescriptionLength(),true);
+		FastQueue<FD> descA = new TupleDescQueue<FD>(describe,false);
+		FastQueue<FD> descB = new TupleDescQueue<FD>(describe,false);
 
 		// describe each image using interest points
 		describeImage(inputA,pointsA,descA);
@@ -108,13 +108,13 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 	/**
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
-	private void describeImage(T input, List<Point2D_F64> points, FastQueue<TupleDesc_F64> descs )
+	private void describeImage(T input, List<Point2D_F64> points, FastQueue<FD> descs )
 	{
 		detector.detect(input);
 		describe.setImage(input);
 
 		descs.reset();
-		TupleDesc_F64 desc = descs.pop();
+		FD desc = describe.createDescription();
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			// get the feature location info
 			Point2D_F64 p = detector.getLocation(i);
@@ -122,13 +122,12 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 			double scale = detector.getScale(i);
 
 			// extract the description and save the results into the provided description
-			if( describe.process(p.x,p.y,yaw,scale,desc) != null ) {
+			if( describe.process(p.x,p.y,yaw,scale,desc)  ) {
 				points.add(p.copy());
-				desc = descs.pop();
+				descs.add(desc);
+				desc = describe.createDescription();
 			}
 		}
-		// remove the last element from the queue, which has not been used.
-		descs.removeTail();
 	}
 
 	public static void main( String args[] ) {
@@ -138,8 +137,10 @@ public class ExampleAssociatePoints<T extends ImageSingleBand> {
 		// select which algorithms to use
 		InterestPointDetector detector = FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4);
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surf(true, imageType);
-		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
-		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(scorer, 2, -1, true);
+//		DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(16,512,-1,4,true, imageType);
+
+		ScoreAssociation scorer = FactoryAssociation.defaultScore(describe.getDescriptorType());
+		GeneralAssociation associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 
 		// load and match images
 		ExampleAssociatePoints app = new ExampleAssociatePoints(detector,describe,associate,imageType);

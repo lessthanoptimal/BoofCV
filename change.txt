@@ -11,6 +11,15 @@ Version : Alpha 0.10
   * Put most association distance algorithms into DescriptorDistance
   * Added hamming lookup table
   * Brief now uses a look up table.  About a 7x speed improvement.
+  * FactoryAssociate now can create instances of ScoreAssociate.
+- DescribeRegionPoint has been redesigned
+  * Now more generic and can work with any feature descriptor
+  * No longer returns the descriptor.  Hopefully more intuitive
+- TupleDesc
+  * changed to an interface
+  * functions added to provide some generic support
+- Brief descriptor renamed to TupleDesc_B
+  * Acts as a generic binary feature descriptor
 
 ---------------------------------------------
 Date    : 2012/7/22

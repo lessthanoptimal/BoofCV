@@ -35,6 +35,7 @@ import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.line.LineParametric2D_F32;
@@ -56,8 +57,8 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 	final T input;
 	final T inputLine;
 
-	final static String imageName = "data/standard/barbara.png";
-	final static String imageLineName = "data/simple_objects.jpg";
+	final static String imageName = "../data/evaluation/standard/barbara.png";
+	final static String imageLineName = "../data/evaluation/simple_objects.jpg";
 	final int radius = 2;
 	final long TEST_TIME = 1000;
 	final Random rand = new Random(234234);
@@ -145,7 +146,7 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 	public class SURF extends PerformerBase
 	{
 		InterestPointDetector<T> detector;
-		DescribeRegionPoint<T> describer;
+		DescribeRegionPoint<T,SurfFeature> describer;
 
 		public SURF() {
 			detector = FactoryInterestPoint.fastHessian(20, 2, -1, 1, 9, 4, 4);

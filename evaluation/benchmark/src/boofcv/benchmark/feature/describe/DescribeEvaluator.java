@@ -29,8 +29,8 @@ import boofcv.evaluation.ErrorStatistics;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDescQueue;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
@@ -45,16 +45,16 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DescribeEvaluator<T extends ImageSingleBand>
+public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 	extends StabilityEvaluatorPoint<T>
 {
 	// list of descriptions from the initial image
-	TupleDescQueue initial;
+	TupleDescQueue<D> initial;
 	// list of descriptions from the current image being considered
-	TupleDescQueue current;
+	TupleDescQueue<D> current;
 	// list of features which maintain the original indexes
-	List<TupleDesc_F64> initList = new ArrayList<TupleDesc_F64>();
-	List<TupleDesc_F64> currentList = new ArrayList<TupleDesc_F64>();
+	List<D> initList = new ArrayList<D>();
+	List<D> currentList = new ArrayList<D>();
 
 	// transform from original index to the index in the queues
 	int initIndexes[];
@@ -68,7 +68,7 @@ public class DescribeEvaluator<T extends ImageSingleBand>
 	double theta[];
 	
 	// associates features together
-	GeneralAssociation<TupleDesc_F64> matcher;
+	GeneralAssociation<D> matcher;
 
 	// computes error statistics
 	ErrorStatistics errors = new ErrorStatistics(500);
@@ -78,9 +78,6 @@ public class DescribeEvaluator<T extends ImageSingleBand>
 		super(borderSize, detector);
 
 		this.orientationAlg = orientationAlg;
-		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
-
-		matcher = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 	}
 
 	@Override
@@ -94,12 +91,15 @@ public class DescribeEvaluator<T extends ImageSingleBand>
 		if( theta == null || theta.length < points.size() )
 			theta = new double[ points.size() ];
 
-		DescribeRegionPoint<T> extract = alg.getAlgorithm();
+		DescribeRegionPoint<T,D> extract = alg.getAlgorithm();
+		ScoreAssociation<D> scorer = FactoryAssociation.scoreEuclidean(extract.getDescriptorType(),true);
+
+		matcher = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 
 		int descLength = extract.getDescriptionLength();
 
-		initial = new TupleDescQueue(descLength, true);
-		current = new TupleDescQueue(descLength, true);
+		initial = new TupleDescQueue<D>(extract.getDescriptorType(),descLength, true);
+		current = new TupleDescQueue<D>(extract.getDescriptorType(),descLength, true);
 
 		initialDescriptions(image, points, extract);
 	}
@@ -109,7 +109,7 @@ public class DescribeEvaluator<T extends ImageSingleBand>
 								  double scale , double theta ,
 								  List<Point2D_F64> points, List<Integer> indexes)
 	{
-		DescribeRegionPoint<T> extract = alg.getAlgorithm();
+		DescribeRegionPoint<T,D> extract = alg.getAlgorithm();
 
 		// extract descriptions from the current image
 		currentDescriptions(image,extract,scale,theta,points,indexes);
@@ -128,18 +128,18 @@ public class DescribeEvaluator<T extends ImageSingleBand>
 	 * Extract feature descriptions from the initial image.  Calculates the
 	 * feature's orientation.
 	 */
-	private void initialDescriptions(T image, List<Point2D_F64> points, DescribeRegionPoint<T> extract) {
+	private void initialDescriptions(T image, List<Point2D_F64> points, DescribeRegionPoint<T,D> extract) {
 		extract.setImage(image);
 		orientationAlg.setImage(image);
 
 		initial.reset();
 		initList.clear();
-		TupleDesc_F64 f = initial.pop();
+		D f = initial.pop();
 		for( int i = 0; i < points.size(); i++  ) {
 			Point2D_F64 p = points.get(i);
 			theta[i] = orientationAlg.compute(p.x,p.y);
-			TupleDesc_F64 result = extract.process(p.x,p.y,theta[i],1,f);
-			if( result != null ) {
+
+			if( extract.process(p.x,p.y,theta[i],1,f) ) {
 				initIndexes[initial.size()-1] = i;
 				initList.add(f);
 				f = initial.pop();
@@ -154,20 +154,20 @@ public class DescribeEvaluator<T extends ImageSingleBand>
 	 * extracts feature description from the current image.  Provide the
 	 * description extractor the "true" orientation of the feature.
 	 */
-	private void currentDescriptions( T image ,DescribeRegionPoint<T> extract ,
+	private void currentDescriptions( T image ,DescribeRegionPoint<T,D> extract ,
 									  double scale , double theta ,
 									  List<Point2D_F64> points, List<Integer> indexes ) {
 		extract.setImage(image);
 		current.reset();
 		currentList.clear();
-		TupleDesc_F64 f = current.pop();
+		D f = current.pop();
 		for( int i = 0; i < points.size(); i++  ) {
 			Point2D_F64 p = points.get(i);
 			// calculate the true orientation of the feature
 			double ang = UtilAngle.bound(this.theta[indexes.get(i)] + theta);
+
 			// extract the description
-			TupleDesc_F64 result = extract.process(p.x,p.y,ang,scale,f);
-			if( result != null ) {
+			if( extract.process(p.x,p.y,ang,scale,f) ) {
 				currentIndexes[current.size()-1] = i;
 				currentList.add(f);
 				f = current.pop();
@@ -205,8 +205,8 @@ public class DescribeEvaluator<T extends ImageSingleBand>
 		errors.reset();
 		for( int i = 0; i < currentToInitialIndex.size(); i++ ) {
 
-			TupleDesc_F64 f = currentList.get(i);
-			TupleDesc_F64 e = initList.get(currentToInitialIndex.get(i));
+			D f = currentList.get(i);
+			D e = initList.get(currentToInitialIndex.get(i));
 
 			if( f != null && e != null ) {
 				// normalize the error based on the magnitude of the descriptor in the first frame
@@ -220,18 +220,18 @@ public class DescribeEvaluator<T extends ImageSingleBand>
 		}
 	}
 
-	private double norm( TupleDesc_F64 desc ) {
+	private double norm( TupleDesc desc ) {
 		double total = 0;
-		for( int i = 0; i < desc.value.length; i++ ) {
-			total += desc.value[i]*desc.value[i];
+		for( int i = 0; i < desc.size(); i++ ) {
+			total += desc.getDouble(i)*desc.getDouble(i);
 		}
 		return Math.sqrt(total);
 	}
 
-	private double errorNorm( TupleDesc_F64 a , TupleDesc_F64 b  ) {
+	private double errorNorm( TupleDesc a , TupleDesc b  ) {
 		double total = 0;
-		for( int i = 0; i < a.value.length; i++ ) {
-			double error = a.value[i] - b.value[i];
+		for( int i = 0; i < a.size(); i++ ) {
+			double error = a.getDouble(i) - b.getDouble(i);
 			total += error*error;
 		}
 		return Math.sqrt(total);

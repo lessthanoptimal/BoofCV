@@ -22,7 +22,6 @@ import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 
 
@@ -30,7 +29,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleBand>
-		implements DescribeRegionPoint<T,TupleDesc_F64> {
+		implements DescribeRegionPoint<T,SurfFeature> {
 
 	// computes SURF feature descriptor
 	DescribePointSurf<II> surf;
@@ -49,16 +48,15 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
+	public SurfFeature createDescription() {
+		return new SurfFeature(surf.getDescriptionLength());
+	}
+
+	@Override
 	public int getCanonicalRadius() {
 		return surf.getRadius();
 	}
 
-	/**
-	 *
-	 *
-	 *
-	 * @param image The image which contains the features.
-	 */
 	@Override
 	public void setImage(T image) {
 		if( ii != null ) {
@@ -78,7 +76,7 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public TupleDesc_F64 process(double x, double y, double orientation , double scale, TupleDesc_F64 ret) {
+	public boolean process(double x, double y, double orientation , double scale, SurfFeature ret) {
 
 		double angle = orientation;
 
@@ -87,14 +85,9 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 			angle = orientationAlg.compute(x,y);
 		}
 
-		SurfFeature f = surf.describe(x,y,scale,angle,null);
-		if( f == null)
-			return null;
-		if( ret != null ) {
-			System.arraycopy(f.value,0,ret.value,0,f.value.length);
-			return ret;
-		}
-		return f;
+		surf.describe(x,y,scale,angle,ret);
+
+		return true;
 	}
 
 	@Override
@@ -108,7 +101,7 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public Class<TupleDesc_F64> getDescriptorType() {
-		return TupleDesc_F64.class;
+	public Class<SurfFeature> getDescriptorType() {
+		return SurfFeature.class;
 	}
 }

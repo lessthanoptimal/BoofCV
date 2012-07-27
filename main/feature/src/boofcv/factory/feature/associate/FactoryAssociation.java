@@ -63,7 +63,7 @@ public class FactoryAssociation {
 	 */
 	public static <D>
 	ScoreAssociation<D> defaultScore( Class<D> tupleType ) {
-		if( tupleType == TupleDesc_F64.class ) {
+		if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
 			return (ScoreAssociation)new ScoreAssociateEuclideanSq_F64();
 		} else if( tupleType == TupleDesc_F32.class ) {
 			return (ScoreAssociation)new ScoreAssociateEuclideanSq_F32();
@@ -84,7 +84,7 @@ public class FactoryAssociation {
 	 */
 	public static <D>
 	ScoreAssociation<D> scoreSad( Class<D> tupleType ) {
-		if( tupleType == TupleDesc_F64.class ) {
+		if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
 			return (ScoreAssociation)new ScoreAssociateSad_F64();
 		} else if( tupleType == TupleDesc_F32.class ) {
 			return (ScoreAssociation)new ScoreAssociateSad_F32();
@@ -114,7 +114,7 @@ public class FactoryAssociation {
 	 */
 	public static <D>
 	ScoreAssociation<D> scoreEuclidean( Class<D> tupleType , boolean squared ) {
-		if( tupleType == TupleDesc_F64.class ) {
+		if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
 			if( squared )
 				return (ScoreAssociation)new ScoreAssociateEuclideanSq_F64();
 			else

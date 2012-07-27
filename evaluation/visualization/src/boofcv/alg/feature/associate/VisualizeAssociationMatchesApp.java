@@ -37,6 +37,7 @@ import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.FastQueue;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
@@ -64,8 +65,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	int maxMatches = 200;
 
 	InterestPointDetector<T> detector;
-	DescribeRegionPoint<T> describe;
-	GeneralAssociation<TupleDesc_F64> matcher;
+	DescribeRegionPoint<T,TupleDesc> describe;
+	GeneralAssociation<TupleDesc> matcher;
 	OrientationImageAverage<T> orientation;
 
 	T imageLeft;
@@ -130,8 +131,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	@Override
 	public synchronized void refreshAll(Object[] cookies) {
 		detector = (InterestPointDetector<T>)cookies[0];
-		describe = (DescribeRegionPoint<T>)cookies[1];
-		matcher = (GeneralAssociation<TupleDesc_F64>)cookies[2];
+		describe = (DescribeRegionPoint<T,TupleDesc>)cookies[1];
+		matcher = (GeneralAssociation<TupleDesc>)cookies[2];
 
 		processImage();
 	}
@@ -147,11 +148,11 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 				break;
 
 			case 1:
-				describe = (DescribeRegionPoint<T>)cookie;
+				describe = (DescribeRegionPoint<T,TupleDesc>)cookie;
 				break;
 
 			case 2:
-				matcher = (GeneralAssociation<TupleDesc_F64>)cookie;
+				matcher = (GeneralAssociation<TupleDesc>)cookie;
 				break;
 		}
 
@@ -161,8 +162,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	private void processImage() {
 		final List<Point2D_F64> leftPts = new ArrayList<Point2D_F64>();
 		final List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
-		TupleDescQueue leftDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
-		TupleDescQueue rightDesc = new TupleDescQueue(describe.getDescriptionLength(), true);
+		TupleDescQueue<TupleDesc> leftDesc = new TupleDescQueue(describe.getDescriptorType(),describe.getDescriptionLength(), true);
+		TupleDescQueue<TupleDesc> rightDesc = new TupleDescQueue(describe.getDescriptorType(),describe.getDescriptionLength(), true);
 		
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Associating Features",
@@ -202,7 +203,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 			}});
 	}
 
-	private void extractImageFeatures( T image , FastQueue<TupleDesc_F64> descs , List<Point2D_F64> locs ) {
+	private void extractImageFeatures( T image , FastQueue<TupleDesc> descs , List<Point2D_F64> locs ) {
 		detector.detect(image);
 		describe.setImage(image);
 		orientation.setImage(image);
@@ -218,9 +219,10 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 					yaw = orientation.compute(pt.x,pt.y);
 				}
 
-				TupleDesc_F64 d = describe.process(pt.x,pt.y,yaw,scale,null);
-				if( d != null ) {
-					descs.pop().set(d.value);
+				TupleDesc d = describe.createDescription();
+
+				if( describe.process(pt.x,pt.y,yaw,scale,d) ) {
+					descs.pop().setTo(d);
 					locs.add( pt.copy());
 				}
 			}
@@ -234,9 +236,10 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 					yaw = orientation.compute(pt.x,pt.y);
 				}
 
-				TupleDesc_F64 d = describe.process(pt.x,pt.y,yaw,1,null);
-				if( d != null ) {
-					descs.pop().set(d.value);
+				TupleDesc d = describe.createDescription();
+
+				if( describe.process(pt.x,pt.y,yaw,1,d) ) {
+					descs.pop().setTo(d);
 					locs.add( pt.copy());
 				}
 			}

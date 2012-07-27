@@ -35,6 +35,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.AssociationScorePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -60,8 +61,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 {
 	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;
-	DescribeRegionPoint<T> describe;
-	ScoreAssociation<TupleDesc_F64> scorer;
+	DescribeRegionPoint<T,TupleDesc> describe;
+	ScoreAssociation<TupleDesc> scorer;
 	OrientationImageAverage<T> orientation;
 
 	// gray scale versions of input image
@@ -70,7 +71,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 	Class<T> imageType;
 
 	// visualizes association score
-	AssociationScorePanel<TupleDesc_F64> scorePanel;
+	AssociationScorePanel<TupleDesc> scorePanel;
 
 	// has the image been processed yet
 	boolean processedImage = false;
@@ -104,7 +105,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 
 		orientation = FactoryOrientationAlgs.nogradient(5, imageType);
 
-		scorePanel = new AssociationScorePanel<TupleDesc_F64>(3);
+		scorePanel = new AssociationScorePanel<TupleDesc>(3);
 		setMainGUI(scorePanel);
 	}
 
@@ -131,8 +132,23 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 	@Override
 	public void refreshAll(Object[] cookies) {
 		detector = (InterestPointDetector<T>)cookies[0];
-		describe = (DescribeRegionPoint<T>)cookies[1];
-		scorer = (ScoreAssociation<TupleDesc_F64>)cookies[2];
+		describe = (DescribeRegionPoint<T,TupleDesc>)cookies[1];
+
+//		int which = (Integer)cookies[2];
+//		switch( which ) {
+//			case 0:
+//				scorer = FactoryAssociation.scoreEuclidean(describe.getDescriptorType(),false);
+//				break;
+//
+//			case 1:
+//				scorer = FactoryAssociation.scoreEuclidean(describe.getDescriptorType(),true);
+//				break;
+//
+//			case 2:
+//				scorer = FactoryAssociation.scoreNcc();
+//				break;
+//		}
+//		scorer = (ScoreAssociation<TupleDesc>)cookies[2];
 
 		processImage();
 	}
@@ -145,11 +161,11 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 				break;
 
 			case 1:
-				describe = (DescribeRegionPoint<T>)cookie;
+				describe = (DescribeRegionPoint<T,TupleDesc>)cookie;
 				break;
 
 			case 2:
-				scorer = (ScoreAssociation<TupleDesc_F64>)cookie;
+				scorer = (ScoreAssociation<TupleDesc>)cookie;
 				break;
 		}
 
@@ -163,8 +179,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 	private void processImage() {
 		final List<Point2D_F64> leftPts = new ArrayList<Point2D_F64>();
 		final List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
-		final List<TupleDesc_F64> leftDesc = new ArrayList<TupleDesc_F64>();
-		final List<TupleDesc_F64> rightDesc = new ArrayList<TupleDesc_F64>();
+		final List<TupleDesc> leftDesc = new ArrayList<TupleDesc>();
+		final List<TupleDesc> rightDesc = new ArrayList<TupleDesc>();
 
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Compute Feature Information",
@@ -187,7 +203,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 	 */
 	private void extractImageFeatures( final ProgressMonitor progressMonitor , final int progress ,
 									   T image ,
-									   List<TupleDesc_F64> descs , List<Point2D_F64> locs ) {
+									   List<TupleDesc> descs , List<Point2D_F64> locs ) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				progressMonitor.setNote("Detecting");
@@ -213,9 +229,10 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 					yaw = orientation.compute(pt.x,pt.y);
 				}
 
-				TupleDesc_F64 d = describe.process(pt.x,pt.y,yaw,scale,null);
-				if( d != null ) {
-					descs.add( d.copy() );
+				TupleDesc d = describe.createDescription();
+
+				if( describe.process(pt.x,pt.y,yaw,scale,d) ) {
+					descs.add( d );
 					locs.add( pt.copy());
 				}
 			}
@@ -230,9 +247,10 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 					yaw = orientation.compute(pt.x,pt.y);
 				}
 
-				TupleDesc_F64 d = describe.process(pt.x,pt.y,yaw,1,null);
-				if( d != null ) {
-					descs.add( d.copy() );
+				TupleDesc d = describe.createDescription();
+
+				if( describe.process(pt.x,pt.y,yaw,1,d) ) {
+					descs.add( d );
 					locs.add( pt.copy());
 				}
 			}
