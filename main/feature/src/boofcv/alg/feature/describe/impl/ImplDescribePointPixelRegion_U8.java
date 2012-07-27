@@ -68,4 +68,9 @@ public class ImplDescribePointPixelRegion_U8 extends DescribePointPixelRegion<Im
 			}
 		}
 	}
+
+	@Override
+	public Class<TupleDesc_U8> getDescriptorType() {
+		return TupleDesc_U8.class;
+	}
 }

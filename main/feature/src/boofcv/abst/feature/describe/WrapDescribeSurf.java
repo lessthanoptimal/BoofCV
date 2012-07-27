@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleBand>
-		implements DescribeRegionPoint<T> {
+		implements DescribeRegionPoint<T,TupleDesc_F64> {
 
 	// computes SURF feature descriptor
 	DescribePointSurf<II> surf;
@@ -105,5 +105,10 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	@Override
 	public boolean requiresOrientation() {
 		return orientationAlg == null;
+	}
+
+	@Override
+	public Class<TupleDesc_F64> getDescriptorType() {
+		return TupleDesc_F64.class;
 	}
 }

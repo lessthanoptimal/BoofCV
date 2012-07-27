@@ -20,7 +20,6 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.struct.feature.NccFeature;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -30,15 +29,12 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
-		implements DescribeRegionPoint<T>
+		implements DescribeRegionPoint<T,NccFeature>
 {
 	DescribePointPixelRegionNCC<T> alg;
 
-	NccFeature desc;
-
 	public WrapDescribePixelRegionNCC(DescribePointPixelRegionNCC<T> alg) {
 		this.alg = alg;
-		desc = new NccFeature( alg.getDescriptorLength() );
 	}
 
 	@Override
@@ -57,15 +53,14 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	}
 
 	@Override
-	public TupleDesc_F64 process(double x, double y, double orientation,
-								 double scale, TupleDesc_F64 ret)
+	public NccFeature process(double x, double y, double orientation,
+								 double scale, NccFeature ret)
 	{
-		if( alg.process((int)x,(int)y,desc) ) {
-			if( ret == null ) {
-				ret = new TupleDesc_F64(alg.getDescriptorLength());
-			}
+		if( ret == null ) {
+			ret = new NccFeature(alg.getDescriptorLength());
+		}
 
-			System.arraycopy(desc.value,0,ret.value,0,desc.value.length);
+		if( alg.process((int)x,(int)y,ret) ) {
 			return ret;
 		} else {
 			return null;
@@ -80,5 +75,10 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	@Override
 	public boolean requiresOrientation() {
 		return false;
+	}
+
+	@Override
+	public Class<NccFeature> getDescriptorType() {
+		return NccFeature.class;
 	}
 }

@@ -23,7 +23,7 @@ package boofcv.struct.feature;
  *
  * @author Peter Abeles
  */
-public class TupleDesc_B extends TupleDesc {
+public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
 	public int[] data;
 	public int numBits;
 
@@ -51,5 +51,23 @@ public class TupleDesc_B extends TupleDesc {
 		TupleDesc_B ret = new TupleDesc_B(numBits);
 		System.arraycopy(data,0,ret.data,0,data.length);
 		return ret;
+	}
+
+	@Override
+	public void setTo(TupleDesc_B source) {
+		System.arraycopy(source.data,0,data,0,data.length);
+	}
+
+	@Override
+	public double getDouble(int index) {
+		if( isBitTrue(index) )
+			return 1;
+		else
+			return -1;
+	}
+
+	@Override
+	public int size() {
+		return numBits;
 	}
 }

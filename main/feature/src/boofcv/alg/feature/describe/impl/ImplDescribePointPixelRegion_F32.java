@@ -68,4 +68,9 @@ public class ImplDescribePointPixelRegion_F32 extends DescribePointPixelRegion<I
 			}
 		}
 	}
+
+	@Override
+	public Class<TupleDesc_F32> getDescriptorType() {
+		return TupleDesc_F32.class;
+	}
 }

@@ -19,7 +19,6 @@
 package boofcv.abst.feature.describe;
 
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 
 
@@ -35,7 +34,7 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 
 	/**
 	 * Specified the image which is to be processed.
-	 * 
+	 *
 	 * @param image The image which contains the features.
 	 */
 	public void setImage( T image );
@@ -61,7 +60,7 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	 * @return  Description of the point.  If one could not be computed then null is returned.
 	 */
 	// todo would this be easier to use if it returned a boolean and required a descriptor be passed in
-	public TupleDesc_F64 process( double x , double y , double orientation , double scale , TupleDesc_F64 ret );
+	public D process( double x , double y , double orientation , double scale , D ret );
 
 	/**
 	 *
@@ -74,4 +73,11 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	 * @return if orientation needs to be provided or not
 	 */
 	public boolean requiresOrientation();
+
+	/**
+	 * The type of region descriptor generated
+	 *
+	 * @return Returns the descriptor type.
+	 */
+	public Class<D> getDescriptorType();
 }

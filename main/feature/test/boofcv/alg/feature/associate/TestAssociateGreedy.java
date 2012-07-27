@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestAssociateGreedy {
 
-	ScoreAssociation score = new ScoreAssociateEuclidean_F64();
+	ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
 
 	@Test
 	public void basic() {
@@ -100,7 +100,7 @@ public class TestAssociateGreedy {
 
 	private FastQueue<TupleDesc_F64> createData( double ...values )
 	{
-		FastQueue<TupleDesc_F64> ret = new TupleDescQueue(1, true);
+		FastQueue<TupleDesc_F64> ret = new TupleDescQueue<TupleDesc_F64>(TupleDesc_F64.class,1, true);
 
 		for( int i = 0; i < values.length; i++ ) {
 			ret.pop().set(values[i]);

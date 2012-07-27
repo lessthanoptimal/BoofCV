@@ -23,5 +23,23 @@ package boofcv.struct.feature;
  *
  * @author Peter Abeles
  */
-public class TupleDesc {
+public interface TupleDesc<T extends TupleDesc> {
+
+	public void setTo( T source );
+
+	/**
+	 * Returns the value of a tuple's element as a double.  In general this function should not be used
+	 * because of how inefficient it is.
+	 *
+	 * @param index Which element
+	 * @return Element's value as a double
+	 */
+	public double getDouble( int index );
+
+	/**
+	 * Number of elements in the tuple.
+	 *
+	 * @return Number of elements in the tuple
+	 */
+	public int size();
 }
