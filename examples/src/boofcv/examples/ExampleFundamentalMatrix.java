@@ -40,7 +40,7 @@ import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 import org.ejml.data.DenseMatrix64F;
 
@@ -132,13 +132,15 @@ public class ExampleFundamentalMatrix {
 	 */
 	public static List<AssociatedPair> computeMatches( BufferedImage left , BufferedImage right ) {
 		InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4);
-		DescribeRegionPoint<ImageFloat32> describe = FactoryDescribeRegionPoint.surf(true, ImageFloat32.class);
-		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
-		GeneralAssociation<TupleDesc_F64> associate =
+		DescribeRegionPoint<ImageFloat32,SurfFeature> describe =
+				FactoryDescribeRegionPoint.surf(true, ImageFloat32.class);
+		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
+		GeneralAssociation<SurfFeature> associate =
 				FactoryAssociation.greedy(scorer, 2, -1, true);
 
-		ExampleAssociatePoints<ImageFloat32> findMatches =
-				new ExampleAssociatePoints<ImageFloat32>(detector, describe, associate, ImageFloat32.class);
+		ExampleAssociatePoints<ImageFloat32,SurfFeature> findMatches =
+				new ExampleAssociatePoints<ImageFloat32,SurfFeature>
+						(detector, describe, associate, ImageFloat32.class);
 
 		findMatches.associate(left,right);
 

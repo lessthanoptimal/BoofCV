@@ -61,12 +61,14 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	public void checkSubImage() {
 		GeneralizedImageOps.randomize(ii, rand, 0, 100);
 		alg.setImage(ii);
-		SurfFeature expected = alg.describe(c_x,c_y,1,0,null);
+		SurfFeature expected = alg.createDescription();
+		alg.describe(c_x,c_y,1,0,expected);
 
 		II sub = BoofTesting.createSubImageOf(ii);
 
 		alg.setImage(sub);
-		SurfFeature found = alg.describe(c_x,c_y,1,0,null);
+		SurfFeature found = alg.createDescription();
+		alg.describe(c_x,c_y,1,0,found);
 
 		assertTrue(isSimilar(expected,found));
 	}
@@ -78,8 +80,10 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	public void changeScale() {
 		GeneralizedImageOps.randomize(ii, rand, 0, 100);
 		alg.setImage(ii);
-		SurfFeature a = alg.describe(c_x,c_y,1,0,null);
-		SurfFeature b = alg.describe(c_x,c_y,1.5,0,null);
+		SurfFeature a = alg.createDescription();
+		SurfFeature b = alg.createDescription();
+		alg.describe(c_x,c_y,1,0,a);
+		alg.describe(c_x,c_y,1.5,0,b);
 
 		assertFalse(isSimilar(a,b));
 	}
@@ -91,8 +95,10 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	public void changeRotation() {
 		GeneralizedImageOps.randomize(ii, rand, 0, 100);
 		alg.setImage(ii);
-		SurfFeature a = alg.describe(c_x,c_y,1,0,null);
-		SurfFeature b = alg.describe(c_x,c_y,1,1,null);
+		SurfFeature a = alg.createDescription();
+		SurfFeature b = alg.createDescription();
+		alg.describe(c_x,c_y,1,0,a);
+		alg.describe(c_x,c_y,1,1,b);
 
 		assertFalse(isSimilar(a,b));
 	}
@@ -136,7 +142,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 		sparse = TestImplSurfDescribeOps.createGradient(ii, 1);
 		alg.setImage(ii);
 		
-		SurfFeature feat = alg.describe(20,20,1,0.75,null);
+		SurfFeature feat = alg.createDescription();
+		alg.describe(20,20,1,0.75,feat);
 
 		for( double f : feat.value )
 			assertEquals(0,f,1e-4);
@@ -156,7 +163,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 
 		// orient the feature along the x-axis
 		alg.setImage(ii);
-		SurfFeature feat = alg.describe(15,15,1,0,null);
+		SurfFeature feat = alg.createDescription();
+		alg.describe(15,15,1,0,feat);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(feat.value[i],feat.value[i+1],1e-4);
@@ -166,7 +174,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 		}
 
 		// now orient the feature along the y-axis
-		feat = alg.describe(15,15,1, Math.PI / 2.0,null);
+		alg.describe(15,15,1, Math.PI / 2.0,feat);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(-feat.value[i+2],feat.value[i+3],1e-4);
@@ -188,7 +196,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 
 		// orient the feature along the x-axis
 		alg.setImage(ii);
-		SurfFeature feat = alg.describe(25,25,1.5,0,null);
+		SurfFeature feat = alg.createDescription();
+		alg.describe(25,25,1.5,0,feat);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(feat.value[i],feat.value[i+1],1e-4);

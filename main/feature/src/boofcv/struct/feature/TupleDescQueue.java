@@ -18,6 +18,7 @@
 
 package boofcv.struct.feature;
 
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.struct.FastQueue;
 
 import java.lang.reflect.Constructor;
@@ -37,6 +38,19 @@ public class TupleDescQueue<D extends TupleDesc> extends FastQueue<D> {
 	public TupleDescQueue( Class<D> descType , int numFeatures, boolean declareInstances) {
 		super(descType,declareInstances);
 		this.numFeatures = numFeatures;
+		growArray(10);
+	}
+
+	/**
+	 * A more convenient constructor which takes the required information out of the passed in
+	 * {@link DescribeRegionPoint}.
+	 *
+	 * @param describe Contains descriptor information
+	 * @param declareInstances Should the list declare new instances or not
+	 */
+	public TupleDescQueue( DescribeRegionPoint<?,D> describe, boolean declareInstances) {
+		super(describe.getDescriptorType(),declareInstances);
+		this.numFeatures = describe.getDescriptionLength();
 		growArray(10);
 	}
 

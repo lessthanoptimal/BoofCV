@@ -38,6 +38,11 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	}
 
 	@Override
+	public NccFeature createDescription() {
+		return new NccFeature(alg.getDescriptorLength());
+	}
+
+	@Override
 	public void setImage(T image) {
 		alg.setImage(image);
 	}
@@ -53,18 +58,10 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	}
 
 	@Override
-	public NccFeature process(double x, double y, double orientation,
-								 double scale, NccFeature ret)
+	public boolean process(double x, double y, double orientation,
+						   double scale, NccFeature ret)
 	{
-		if( ret == null ) {
-			ret = new NccFeature(alg.getDescriptorLength());
-		}
-
-		if( alg.process((int)x,(int)y,ret) ) {
-			return ret;
-		} else {
-			return null;
-		}
+		return alg.process((int)x,(int)y,ret);
 	}
 
 	@Override

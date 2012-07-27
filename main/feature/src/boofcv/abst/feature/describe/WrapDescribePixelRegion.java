@@ -39,7 +39,7 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 		this.alg = alg;
 	}
 
-	private D createDescriptor() {
+	public D createDescription() {
 		if( alg.getDescriptorType() == TupleDesc_F32.class ) {
 			return (D)new TupleDesc_F32(alg.getDescriptorLength());
 		} else {
@@ -63,16 +63,12 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	}
 
 	@Override
-	public D process(double x, double y, double orientation,
+	public boolean process(double x, double y, double orientation,
 								 double scale, D ret)
 	{
-		if( ret == null ) {
-			ret = createDescriptor();
-		}
-
 		alg.process((int)x,(int)y,ret);
 
-		return ret;
+		return true;
 	}
 
 	@Override

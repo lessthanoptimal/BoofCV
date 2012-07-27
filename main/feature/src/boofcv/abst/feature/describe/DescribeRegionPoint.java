@@ -40,6 +40,13 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	public void setImage( T image );
 
 	/**
+	 * Creates new description instance which can be processed by this class
+	 *
+	 * @return New descriptor
+	 */
+	public D createDescription();
+
+	/**
 	 * Returns the descriptor length
 	 */
 	public int getDescriptionLength();
@@ -56,11 +63,11 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	 * @param y Coordinate of the point.
 	 * @param orientation Direction the feature is pointing at in radians. 0 = x-axis PI/2 = y-axis
 	 * @param scale Scale at which the feature was found.
-	 * @param ret Used to store the extracted feature.  If null a new instance will be created.
-	 * @return  Description of the point.  If one could not be computed then null is returned.
+	 * @param ret Used to store the extracted feature.
+	 *
+	 * @return true if a description was successfully computed and false if one could not be extracted
 	 */
-	// todo would this be easier to use if it returned a boolean and required a descriptor be passed in
-	public D process( double x , double y , double orientation , double scale , D ret );
+	public boolean process( double x , double y , double orientation , double scale , D ret );
 
 	/**
 	 *

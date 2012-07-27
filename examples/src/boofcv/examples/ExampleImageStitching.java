@@ -37,8 +37,9 @@ import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDescQueue;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.homo.Homography2D_F64;
@@ -70,11 +71,11 @@ public class ExampleImageStitching {
 	 * Using abstracted code, find a transform which minimizes the difference between corresponding features
 	 * in both images.  This code is completely model independent and is the core algorithms.
 	 */
-	public static<T extends ImageSingleBand> Homography2D_F64
+	public static<T extends ImageSingleBand, FD extends TupleDesc> Homography2D_F64
 	computeTransform( T imageA , T imageB ,
 					  InterestPointDetector<T> detector ,
-					  DescribeRegionPoint<T> describe ,
-					  GeneralAssociation<TupleDesc_F64> associate ,
+					  DescribeRegionPoint<T, FD> describe ,
+					  GeneralAssociation<FD> associate ,
 					  ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher )
 	{
 		// see if the detector has everything that the describer needs
@@ -84,12 +85,10 @@ public class ExampleImageStitching {
 			throw new IllegalArgumentException("Requires scale be provided.");
 
 		// get the length of the description
-		int descriptionDOF = describe.getDescriptionLength();
-
 		List<Point2D_F64> pointsA = new ArrayList<Point2D_F64>();
-		FastQueue<TupleDesc_F64> descA = new TupleDescQueue(descriptionDOF,true);
+		FastQueue<FD> descA = new TupleDescQueue<FD>(describe,false);
 		List<Point2D_F64> pointsB = new ArrayList<Point2D_F64>();
-		FastQueue<TupleDesc_F64> descB = new TupleDescQueue(descriptionDOF,true);
+		FastQueue<FD> descB = new TupleDescQueue<FD>(describe,false);
 
 		// extract feature locations and descriptions from each image
 		describeImage(imageA, detector, describe, pointsA, descA);
@@ -122,17 +121,17 @@ public class ExampleImageStitching {
 	/**
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
-	private static <T extends ImageSingleBand>
+	private static <T extends ImageSingleBand, FD extends TupleDesc>
 	void describeImage(T image,
 					   InterestPointDetector<T> detector,
-					   DescribeRegionPoint<T> describe,
+					   DescribeRegionPoint<T,FD> describe,
 					   List<Point2D_F64> points,
-					   FastQueue<TupleDesc_F64> descs) {
+					   FastQueue<FD> listDescs) {
 		detector.detect(image);
 		describe.setImage(image);
 
-		descs.reset();
-		TupleDesc_F64 desc = descs.pop();
+		listDescs.reset();
+		FD desc = describe.createDescription();
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			// get the feature location info
 			Point2D_F64 p = detector.getLocation(i);
@@ -140,29 +139,28 @@ public class ExampleImageStitching {
 			double scale = detector.getScale(i);
 
 			// extract the description and save the results into the provided description
-			if( describe.process(p.x,p.y,yaw,scale,desc) != null ) {
+			if( describe.process(p.x,p.y,yaw,scale,desc) ) {
 				points.add(p.copy());
-				desc = descs.pop();
+				listDescs.add(desc);
+				desc = describe.createDescription();
 			}
 		}
-		// remove the last element from the queue, which has not been used.
-		descs.removeTail();
 	}
 
 	/**
 	 * Given two input images create and display an image where the two have been overlayed on top of each other.
 	 */
-	public static <T extends ImageSingleBand> void stitch( BufferedImage imageA , BufferedImage imageB ,
-													 Class<T> imageType )
+	public static <T extends ImageSingleBand>
+	void stitch( BufferedImage imageA , BufferedImage imageB , Class<T> imageType )
 	{
 		T inputA = ConvertBufferedImage.convertFromSingle(imageA, null, imageType);
 		T inputB = ConvertBufferedImage.convertFromSingle(imageB, null, imageType);
 
 		// Detect using the standard SURF feature descriptor and describer
 		InterestPointDetector<T> detector = FactoryInterestPoint.fastHessian(1, 2, 400, 1, 9, 4, 4);
-		DescribeRegionPoint<T> describe = FactoryDescribeRegionPoint.surf(true,imageType);
-		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
-		GeneralAssociation<TupleDesc_F64> associate = FactoryAssociation.greedy(scorer,2,-1,true);
+		DescribeRegionPoint<T,SurfFeature> describe = FactoryDescribeRegionPoint.surf(true,imageType);
+		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
+		GeneralAssociation<SurfFeature> associate = FactoryAssociation.greedy(scorer,2,-1,true);
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
 		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);

@@ -36,6 +36,11 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 	}
 
 	@Override
+	public TupleDesc_B createDescription() {
+		return new TupleDesc_B(getDescriptionLength());
+	}
+
+	@Override
 	public int getCanonicalRadius() {
 		return alg.getDefinition().radius;
 	}
@@ -51,15 +56,8 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 	}
 
 	@Override
-	public TupleDesc_B process(double x, double y, double orientation, double scale, TupleDesc_B ret) {
-
-		if( ret == null )
-			ret = new TupleDesc_B(length);
-
-		if( !alg.process((float)x,(float)y,(float)orientation,(float)scale,ret) )
-			return null;
-
-		return ret;
+	public boolean process(double x, double y, double orientation, double scale, TupleDesc_B ret) {
+		return alg.process((float)x,(float)y,(float)orientation,(float)scale,ret);
 	}
 
 	@Override

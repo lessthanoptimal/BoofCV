@@ -31,10 +31,7 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.feature.NccFeature;
-import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.*;
 import boofcv.struct.image.ImageSingleBand;
 
 import java.util.Random;
@@ -61,7 +58,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,TupleDesc_F64> surf( boolean isOriented , Class<T> imageType) {
+	DescribeRegionPoint<T,SurfFeature> surf( boolean isOriented , Class<T> imageType) {
 		OrientationIntegral<II> orientation = null;
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -89,7 +86,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,TupleDesc_F64> surfm(boolean isOriented, Class<T> imageType) {
+	DescribeRegionPoint<T,SurfFeature> surfm(boolean isOriented, Class<T> imageType) {
 		OrientationIntegral<II> orientation = null;
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);

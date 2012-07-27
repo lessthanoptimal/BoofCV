@@ -96,11 +96,9 @@ public class PstWrapperSurf<I extends ImageSingleBand,II extends ImageSingleBand
 			orientation.setScale(p.scale);
 			double angle = orientation.compute(p.x,p.y);
 
-			SurfFeature feat = describe.describe(p.x,p.y,p.scale,angle,tmpFeat);
-			if( feat != null ) {
-				location.pop().set(p.x,p.y);
-				tmpFeat = description.pop();
-			}
+			describe.describe(p.x,p.y,p.scale,angle,tmpFeat);
+			location.pop().set(p.x,p.y);
+			tmpFeat = description.pop();
 		}
 		description.removeTail();
 	}

@@ -27,6 +27,7 @@ import boofcv.benchmark.feature.distort.FactoryBenchmarkFeatureDistort;
 import boofcv.benchmark.feature.distort.StabilityEvaluator;
 import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -85,16 +86,16 @@ public class BenchmarkStabilityDescribe <T extends ImageSingleBand, D extends Im
 
 	private void perform( BenchmarkFeatureDistort<T> benchmark ) {
 		CompileImageResults<T> compile = new CompileImageResults<T>(benchmark);
-		compile.addImage("data/outdoors01.jpg");
-		compile.addImage("data/indoors01.jpg");
-		compile.addImage("data/scale/beach01.jpg");
-		compile.addImage("data/scale/mountain_7p1mm.jpg");
-		compile.addImage("data/sunflowers.png");
+		compile.addImage("../data/evaluation/outdoors01.jpg");
+		compile.addImage("../data/evaluation/indoors01.jpg");
+		compile.addImage("../data/evaluation/scale/beach01.jpg");
+		compile.addImage("../data/evaluation/scale/mountain_7p1mm.jpg");
+		compile.addImage("../data/evaluation/sunflowers.png");
 
 		InterestPointDetector<T> detector = UtilOrientationBenchmark.defaultDetector(imageType,derivType);
 		OrientationImageAverage<T> orientation = FactoryOrientationAlgs.nogradient(radius,imageType);
 		// comment/uncomment to change the evaluator
-		StabilityEvaluator<T> evaluator = new DescribeEvaluator<T>(border,detector,orientation);
+		StabilityEvaluator<T> evaluator = new DescribeEvaluator<T,TupleDesc>(border,detector,orientation);
 
 		compile.setAlgorithms(algs,evaluator);
 

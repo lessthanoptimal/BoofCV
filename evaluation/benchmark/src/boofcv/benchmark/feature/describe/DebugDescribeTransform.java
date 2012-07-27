@@ -23,6 +23,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -38,7 +39,7 @@ import java.util.Random;
 public class DebugDescribeTransform {
 
 	public static <T extends ImageSingleBand> void doStuff( Class<T> imageType ) {
-		DescribeRegionPoint<T> alg =  FactoryDescribeRegionPoint.surf(false, imageType);
+		DescribeRegionPoint<T,SurfFeature> alg =  FactoryDescribeRegionPoint.surf(false, imageType);
 
 		int r = alg.getCanonicalRadius()+8;
 		int w = r*2+1;
@@ -56,10 +57,12 @@ public class DebugDescribeTransform {
 //		DistortImageOps.scale(orig,distorted, TypeInterpolate.BILINEAR);
 
 		alg.setImage(orig);
-		TupleDesc_F64 desc1 = alg.process(r,r,0,1,null);
+		SurfFeature desc1 = alg.createDescription();
+		alg.process(r,r,0,1,desc1);
 
 		alg.setImage(distorted);
-		TupleDesc_F64 desc2 = alg.process(distorted.width/2,distorted.height/2,theta,scale,null);
+		SurfFeature desc2 = alg.createDescription();
+		alg.process(distorted.width/2,distorted.height/2,theta,scale,desc2);
 
 		printDesc(desc1);
 		printDesc(desc2);
