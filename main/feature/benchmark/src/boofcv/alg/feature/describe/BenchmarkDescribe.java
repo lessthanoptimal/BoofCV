@@ -29,6 +29,8 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
@@ -39,6 +41,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleBand, II extends ImageSingleBand> {
 
 	static final long TEST_TIME = 1000;
@@ -91,34 +94,38 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		@Override
 		public void process() {
 			alg.setImage(image);
+			TupleDesc_B f = alg.createFeature();
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				alg.process(p.x,p.y,alg.createFeature());
+				if( alg.isInBounds(p.x,p.y))
+					alg.process(p.x,p.y,f);
 			}
 		}
 	}
 
 	public class BriefO512 extends PerformerBase {
 
-		DescribePointBriefSO alg = FactoryDescribePointAlgs.briefso(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+		DescribePointBriefSO<I> alg = FactoryDescribePointAlgs.briefso(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		@Override
 		public void process() {
 			alg.setImage(image);
+			TupleDesc_B f = alg.createFeature();
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				alg.process(p.x,p.y,(float)yaws[i],(float)scales[i],alg.createFeature());
+				if( alg.isInBounds(p.x,p.y,(float)scales[i]))
+					alg.process(p.x,p.y,(float)yaws[i],(float)scales[i],f);
 			}
 		}
 	}
 
-	public class Describe implements Performer {
+	public class Describe<D extends TupleDesc> implements Performer {
 
-		DescribeRegionPoint<I,?> alg;
+		DescribeRegionPoint<I,D> alg;
 		String name;
 
-		public Describe(String name, DescribeRegionPoint<I,?> alg) {
+		public Describe(String name, DescribeRegionPoint<I,D> alg) {
 			this.alg = alg;
 			this.name = name;
 		}
@@ -126,9 +133,11 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		@Override
 		public void process() {
 			alg.setImage(image);
+			D d = null;
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				alg.process(p.x,p.y,yaws[i],scales[i],null);
+				if( alg.isInBounds(p.x,p.y,yaws[i],scales[i]))
+					d=alg.process(p.x,p.y,yaws[i],scales[i],d);
 			}
 		}
 

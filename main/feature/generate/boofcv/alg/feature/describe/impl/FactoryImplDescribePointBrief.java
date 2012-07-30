@@ -53,10 +53,9 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 		out.print("import boofcv.abst.filter.blur.BlurFilter;\n" +
 				"import boofcv.alg.feature.describe.DescribePointBrief;\n" +
 				"import boofcv.alg.feature.describe.brief.BriefDefinition_I32;\n" +
-				"import boofcv.alg.feature.describe.brief.TupleDesc_B;\n" +
-				"import boofcv.misc.BoofMiscOps;\n" +
+				"import boofcv.struct.feature.TupleDesc_B;\n" +
 				"import boofcv.struct.image.*;\n" +
-				"import georegression.struct.point.Point2D_I32;\n" +
+				"import java.util.Arrays;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -81,15 +80,12 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 		String sumType = imageType.getSumType();
 
 		out.print("\t@Override\n" +
-				"\tpublic boolean process( double X , double Y , TupleDesc_B feature )\n" +
+				"\tpublic void process( double X , double Y , TupleDesc_B feature )\n" +
 				"\t{\n" +
 				"\t\tint c_x = (int)X;\n" +
 				"\t\tint c_y = (int)Y;\n"+
 				"\n" +
-				"\t\tif( !BoofMiscOps.checkInside(blur,c_x,c_y,definition.radius) )\n" +
-				"\t\t\treturn false;\n" +
-				"\n" +
-				"\t\tBoofMiscOps.zero(feature.data,feature.data.length);\n" +
+				"\t\tArrays.fill(feature.data, 0);\n" +
 				"\n" +
 				"\t\tint index = blur.startIndex + blur.stride*c_y + c_x;\n" +
 				"\n" +
@@ -101,8 +97,6 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 				"\t\t\t\tfeature.data[ i/32 ] |= 1 << (i % 32);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
-				"\n" +
-				"\t\treturn true;\n" +
 				"\t}\n\n");
 	}
 

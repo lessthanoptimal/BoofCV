@@ -63,12 +63,19 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation,
-								 double scale, D ret)
+	public boolean isInBounds(double x, double y, double orientation, double scale) {
+		return true;
+	}
+
+	@Override
+	public D process(double x, double y, double orientation, double scale, D ret)
 	{
+		if( ret == null )
+			ret = createDescription();
+
 		alg.process((int)x,(int)y,ret);
 
-		return true;
+		return ret;
 	}
 
 	@Override

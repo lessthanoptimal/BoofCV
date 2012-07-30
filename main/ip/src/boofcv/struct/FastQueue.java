@@ -75,6 +75,10 @@ public class FastQueue<T> {
 			throw new IllegalArgumentException("Size is already zero");
 	}
 
+	public T getTail() {
+		return data[size-1];
+	}
+
 	public void reset() {
 		size = 0;
 	}

@@ -76,7 +76,15 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation , double scale, SurfFeature ret) {
+	public boolean isInBounds(double x, double y, double orientation, double scale) {
+		return true;
+	}
+
+	@Override
+	public SurfFeature process(double x, double y, double orientation , double scale, SurfFeature ret) {
+
+		if( ret == null )
+			ret = createDescription();
 
 		double angle = orientation;
 
@@ -87,7 +95,7 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 
 		surf.describe(x,y,scale,angle,ret);
 
-		return true;
+		return ret;
 	}
 
 	@Override

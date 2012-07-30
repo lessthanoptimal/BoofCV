@@ -87,8 +87,8 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 		pointsB = new ArrayList<Point2D_F64>();
 
 		// stores the description of detected interest points
-		FastQueue<FD> descA = new TupleDescQueue<FD>(describe,false);
-		FastQueue<FD> descB = new TupleDescQueue<FD>(describe,false);
+		FastQueue<FD> descA = new TupleDescQueue<FD>(describe,true);
+		FastQueue<FD> descB = new TupleDescQueue<FD>(describe,true);
 
 		// describe each image using interest points
 		describeImage(inputA,pointsA,descA);
@@ -114,7 +114,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 		describe.setImage(input);
 
 		descs.reset();
-		FD desc = describe.createDescription();
+
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			// get the feature location info
 			Point2D_F64 p = detector.getLocation(i);
@@ -122,10 +122,9 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 			double scale = detector.getScale(i);
 
 			// extract the description and save the results into the provided description
-			if( describe.process(p.x,p.y,yaw,scale,desc)  ) {
+			if( describe.isInBounds(p.x,p.y,yaw,scale)) {
+			   describe.process(p.x, p.y, yaw, scale, descs.pop());
 				points.add(p.copy());
-				descs.add(desc);
-				desc = describe.createDescription();
 			}
 		}
 	}

@@ -106,9 +106,9 @@ public class BenchmarkStabilityDescribe <T extends ImageSingleBand, D extends Im
 		BenchmarkStabilityDescribe<ImageFloat32,ImageFloat32> benchmark
 				= new BenchmarkStabilityDescribe<ImageFloat32,ImageFloat32>(ImageFloat32.class, ImageFloat32.class);
 
-		benchmark.testNoise();
+//		benchmark.testNoise();
 //		benchmark.testIntensity();
-//		benchmark.testRotation();
+		benchmark.testRotation();
 //		benchmark.testScale();
 	}
 }
