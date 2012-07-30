@@ -53,7 +53,8 @@ public class TestImplDescribePointPixelRegionNCC_U8 {
 
 		NccFeature desc = new NccFeature(alg.getDescriptorLength());
 		alg.setImage(image);
-		assertTrue(alg.process(c_x, c_y, desc));
+		assertTrue(alg.isInBounds(c_x, c_y));
+		alg.process(c_x, c_y, desc);
 
 		int y0 = c_y-h/2;
 		int x0 = c_x-w/2;
@@ -95,6 +96,6 @@ public class TestImplDescribePointPixelRegionNCC_U8 {
 
 		NccFeature desc = new NccFeature(alg.getDescriptorLength());
 		alg.setImage(image);
-		assertFalse(alg.process(c_x, c_y, desc));
+		assertFalse(alg.isInBounds(c_x, c_y));
 	}
 }

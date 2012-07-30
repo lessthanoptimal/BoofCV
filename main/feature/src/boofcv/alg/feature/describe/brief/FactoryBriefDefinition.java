@@ -76,13 +76,8 @@ public class FactoryBriefDefinition {
 
 		while( true ) {
 			x = (int)(rand.nextGaussian()*sigma);
-			if( x >= -radius && x <= radius )
-				break;
-		}
-
-		while( true ) {
 			y = (int)(rand.nextGaussian()*sigma);
-			if( y >= -radius && y <= radius )
+			if( Math.sqrt(x*x + y*y) < radius )
 				break;
 		}
 

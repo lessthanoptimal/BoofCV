@@ -92,7 +92,7 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 			theta = new double[ points.size() ];
 
 		DescribeRegionPoint<T,D> extract = alg.getAlgorithm();
-		ScoreAssociation<D> scorer = FactoryAssociation.scoreEuclidean(extract.getDescriptorType(),true);
+		ScoreAssociation<D> scorer = FactoryAssociation.defaultScore(extract.getDescriptorType());
 
 		matcher = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 
@@ -134,20 +134,19 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 
 		initial.reset();
 		initList.clear();
-		D f = initial.pop();
+
 		for( int i = 0; i < points.size(); i++  ) {
 			Point2D_F64 p = points.get(i);
 			theta[i] = orientationAlg.compute(p.x,p.y);
 
-			if( extract.process(p.x,p.y,theta[i],1,f) ) {
+			if( extract.isInBounds(p.x,p.y,theta[i],1) ) {
+				extract.process(p.x,p.y,theta[i],1,initial.pop());
+				initList.add(initial.getTail());
 				initIndexes[initial.size()-1] = i;
-				initList.add(f);
-				f = initial.pop();
 			} else {
 				initList.add(null);
 			}
 		}
-		initial.removeTail();
 	}
 
 	/**
@@ -160,22 +159,21 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 		extract.setImage(image);
 		current.reset();
 		currentList.clear();
-		D f = current.pop();
+
 		for( int i = 0; i < points.size(); i++  ) {
 			Point2D_F64 p = points.get(i);
 			// calculate the true orientation of the feature
 			double ang = UtilAngle.bound(this.theta[indexes.get(i)] + theta);
 
 			// extract the description
-			if( extract.process(p.x,p.y,ang,scale,f) ) {
+			if( extract.isInBounds(p.x, p.y, ang, scale) ) {
+				extract.process(p.x,p.y,ang,scale,current.pop());
+				currentList.add(current.getTail());
 				currentIndexes[current.size()-1] = i;
-				currentList.add(f);
-				f = current.pop();
 			} else {
 				currentList.add(null);
 			}
 		}
-		current.removeTail();
 	}
 
 	private double computeAssociationScore(List<Integer> indexes) {

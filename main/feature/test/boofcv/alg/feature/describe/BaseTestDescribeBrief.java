@@ -76,12 +76,12 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 
 		// resize the image and see if it computes the same output
 		alg.setImage(input);
-		assertTrue(alg.process(input.width / 2, input.height / 2, desc1));
+		process(alg, input.width / 2, input.height / 2, desc1);
 
 		T sub = (T)BoofTesting.createSubImageOf(input);
 
 		alg.setImage(sub);
-		assertTrue(alg.process(input.width / 2, input.height / 2, desc2));
+		process(alg, input.width / 2, input.height / 2, desc2);
 
 		for( int i = 0; i < desc1.data.length; i++ ) {
 			assertEquals(desc1.data[i],desc2.data[i]);
@@ -100,11 +100,11 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 		TupleDesc_B desc = alg.createFeature();
 
 		alg.setImage(inputA);
-		assertTrue(alg.process(inputA.width / 2, inputA.height / 2, desc));
+		process(alg, inputA.width / 2, inputA.height / 2, desc);
 
 		// just see if it blows up or not
 		alg.setImage(inputB);
-		assertTrue(alg.process(inputA.width / 2, inputA.height / 2, desc));
+		process(alg, inputA.width / 2, inputA.height / 2, desc);
 	}
 
 	/**
@@ -124,10 +124,10 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 
 		// compute the image from the same image but different intensities
 		alg.setImage(input);
-		assertTrue(alg.process(input.width / 2, input.height / 2, desc1));
+		process(alg, input.width / 2, input.height / 2, desc1);
 
 		alg.setImage(mod);
-		assertTrue(alg.process(input.width / 2, input.height / 2, desc2));
+		process(alg, input.width / 2, input.height / 2, desc2);
 
 		// compare the descriptions
 		int count = 0;
@@ -158,7 +158,7 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 		int c_y = input.height/2;
 
 		TupleDesc_B desc = alg.createFeature();
-		assertTrue(alg.process(c_x, c_y, desc));
+		process(alg, c_x, c_y, desc);
 
 		for( int i = 0; i < def.compare.length; i++ ) {
 			Point2D_I32 c = def.compare[i];
@@ -169,5 +169,10 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 					< a.get(c_x+p1.x,c_y+p1.y).doubleValue();
 			assertTrue(expected == desc.isBitTrue(i));
 		}
+	}
+
+	private void process( DescribePointBrief<T> alg , double x , double y , TupleDesc_B desc ) {
+		assertTrue(alg.isInBounds(x,y));
+		alg.process(x,y,desc);
 	}
 }

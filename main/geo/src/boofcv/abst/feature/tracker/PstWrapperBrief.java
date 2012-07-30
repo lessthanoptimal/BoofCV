@@ -75,21 +75,15 @@ public class PstWrapperBrief <I extends ImageSingleBand>
 							   FastQueue<TupleDesc_B> description) {
 		int N = detector.getNumberOfFeatures();
 
-		Point2D_F64 lp = location.pop();
-		TupleDesc_B f = description.pop();
 		for( int i = 0; i < N; i++ ) {
 			Point2D_F64 p = detector.getLocation(i);
 
-			if( alg.process(p.x,p.y,f) ) {
-				lp.set(p.x,p.y);
-				// create data for the next feature
-				f = description.pop();
-				lp = location.pop();
+			if( alg.isInBounds((int) p.x, (int) p.y) ) {
+				alg.process((int) p.x, (int) p.y, description.pop());
+
+				location.pop().set(p.x,p.y);
 			}
 		}
-		// the tail hasn't been used
-		location.removeTail();
-		description.removeTail();
 	}
 
 	@Override

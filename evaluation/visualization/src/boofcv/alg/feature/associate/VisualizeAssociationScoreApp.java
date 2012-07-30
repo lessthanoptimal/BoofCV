@@ -18,15 +18,12 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.ScoreAssociateCorrelation;
-import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -36,7 +33,6 @@ import boofcv.gui.feature.AssociationScorePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -51,18 +47,17 @@ import java.util.List;
 /**
  * Shows how tightly focused the score is around the best figure by showing the relative
  * size and number of features which have a similar score visually in the image.  For example,
- * lots of other featurse with similar sized circles means the distribution is spread widely
+ * lots of other features with similar sized circles means the distribution is spread widely
  * while only one or two small figures means it is very narrow.
  *
  * @author Peter Abeles
  */
 public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends ImageSingleBand>
-	extends SelectAlgorithmAndInputPanel
+	extends SelectAlgorithmAndInputPanel implements VisualizeScorePanel.Listener
 {
 	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;
 	DescribeRegionPoint<T,TupleDesc> describe;
-	ScoreAssociation<TupleDesc> scorer;
 	OrientationImageAverage<T> orientation;
 
 	// gray scale versions of input image
@@ -72,6 +67,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 
 	// visualizes association score
 	AssociationScorePanel<TupleDesc> scorePanel;
+	VisualizeScorePanel controlPanel;
 
 	// has the image been processed yet
 	boolean processedImage = false;
@@ -79,7 +75,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 	public VisualizeAssociationScoreApp( Class<T> imageType,
 										 Class<D> derivType )
 	{
-		super(3);
+		super(2);
 		this.imageType = imageType;
 
 		imageLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
@@ -91,7 +87,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		alg = FactoryDetectPoint.createShiTomasi(2, false, 1, 500, derivType);
 		addAlgorithm(0,"KLT", FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
 
-		addAlgorithm(1,"SURF", FactoryDescribeRegionPoint.surf(true, imageType));
+		addAlgorithm(1,"SURF", FactoryDescribeRegionPoint.surfm(true, imageType));
 		addAlgorithm(1,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(1,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(1,"Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
@@ -99,14 +95,18 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		addAlgorithm(1,"Pixel 5x5", FactoryDescribeRegionPoint.pixel(5, 5, imageType));
 		addAlgorithm(1,"NCC 5x5", FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType));
 
-		addAlgorithm(2,"norm",FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,false));
-		addAlgorithm(2,"norm^2", FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true));
-		addAlgorithm(2,"correlation",new ScoreAssociateCorrelation());
-
 		orientation = FactoryOrientationAlgs.nogradient(5, imageType);
 
+		controlPanel = new VisualizeScorePanel(this);
 		scorePanel = new AssociationScorePanel<TupleDesc>(3);
-		setMainGUI(scorePanel);
+
+		JPanel gui = new JPanel();
+		gui.setLayout(new BorderLayout());
+
+		gui.add(controlPanel,BorderLayout.WEST);
+		gui.add(scorePanel,BorderLayout.CENTER);
+
+		setMainGUI(gui);
 	}
 
 	public void process( BufferedImage buffLeft , BufferedImage buffRight ) {
@@ -133,22 +133,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 	public void refreshAll(Object[] cookies) {
 		detector = (InterestPointDetector<T>)cookies[0];
 		describe = (DescribeRegionPoint<T,TupleDesc>)cookies[1];
-
-//		int which = (Integer)cookies[2];
-//		switch( which ) {
-//			case 0:
-//				scorer = FactoryAssociation.scoreEuclidean(describe.getDescriptorType(),false);
-//				break;
-//
-//			case 1:
-//				scorer = FactoryAssociation.scoreEuclidean(describe.getDescriptorType(),true);
-//				break;
-//
-//			case 2:
-//				scorer = FactoryAssociation.scoreNcc();
-//				break;
-//		}
-//		scorer = (ScoreAssociation<TupleDesc>)cookies[2];
+		controlPanel.setFeatureType(describe.getDescriptorType());
 
 		processImage();
 	}
@@ -163,11 +148,9 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 			case 1:
 				describe = (DescribeRegionPoint<T,TupleDesc>)cookie;
 				break;
-
-			case 2:
-				scorer = (ScoreAssociation<TupleDesc>)cookie;
-				break;
 		}
+
+		controlPanel.setFeatureType(describe.getDescriptorType());
 
 		processImage();
 	}
@@ -191,7 +174,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				progressMonitor.close();
-				scorePanel.setScorer(scorer);
+				scorePanel.setScorer(controlPanel.getSelected());
 				scorePanel.setLocation(leftPts,rightPts,leftDesc,rightDesc);
 				repaint();
 			}});
@@ -229,9 +212,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 					yaw = orientation.compute(pt.x,pt.y);
 				}
 
-				TupleDesc d = describe.createDescription();
-
-				if( describe.process(pt.x,pt.y,yaw,scale,d) ) {
+				if( describe.isInBounds(pt.x,pt.y,yaw,scale) ) {
+					TupleDesc d = describe.process(pt.x,pt.y,yaw,scale,null);
 					descs.add( d );
 					locs.add( pt.copy());
 				}
@@ -247,9 +229,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 					yaw = orientation.compute(pt.x,pt.y);
 				}
 
-				TupleDesc d = describe.createDescription();
-
-				if( describe.process(pt.x,pt.y,yaw,1,d) ) {
+				if( describe.isInBounds(pt.x, pt.y, yaw, 1) ) {
+					TupleDesc d = describe.process(pt.x,pt.y,yaw,1,null);
 					descs.add( d );
 					locs.add( pt.copy());
 				}
@@ -275,7 +256,17 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		return processedImage;
 	}
 
-	public static void main( String args[] ) {
+	@Override
+	public void changedSetting() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				scorePanel.setScorer(controlPanel.getSelected());
+				repaint();
+			}
+		});
+	}
+
+		public static void main( String args[] ) {
 
 		Class imageType = ImageFloat32.class;
 		Class derivType = ImageFloat32.class;

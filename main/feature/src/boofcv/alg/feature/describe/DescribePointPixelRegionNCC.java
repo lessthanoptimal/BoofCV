@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -36,12 +37,18 @@ public abstract class DescribePointPixelRegionNCC<T extends ImageSingleBand>
 	}
 
 	/**
+	 * The entire region must be inside the image because any outside pixels will change the statistics
+	 */
+	public boolean isInBounds( int c_x , int c_y ) {
+		return BoofMiscOps.checkInside(image, c_x, c_y, radiusWidth, radiusHeight);
+	}
+
+	/**
 	 * Extracts the descriptor at the specified location.
 	 *
 	 * @param c_x Center of the descriptor region.
 	 * @param c_y Center of the descriptor region.
 	 * @param desc Where the description is written to.
-	 * @return True if a descriptor was created or false if the region went outside image bounds.
 	 */
-	public abstract boolean process( int c_x , int c_y , NccFeature desc );
+	public abstract void process( int c_x , int c_y , NccFeature desc );
 }

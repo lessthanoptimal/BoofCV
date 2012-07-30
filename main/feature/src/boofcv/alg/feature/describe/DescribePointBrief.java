@@ -21,6 +21,7 @@ package boofcv.alg.feature.describe;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
@@ -101,6 +102,10 @@ public abstract class DescribePointBrief<T extends ImageSingleBand> {
 		}
 	}
 
+	public boolean isInBounds( double c_x , double c_y ) {
+		return BoofMiscOps.checkInside(blur,(int)c_x, (int)c_y, definition.radius);
+	}
+
 	/**
 	 * Computes the descriptor at the specified point.  If the region go outside of the image then a description
 	 * will not be made.
@@ -108,9 +113,8 @@ public abstract class DescribePointBrief<T extends ImageSingleBand> {
 	 * @param c_x Center of region being described.
 	 * @param c_y Center of region being described.
 	 * @param feature Where the descriptor is written to.
-	 * @return true indicates a descriptor could be created and false one was not.
 	 */
-	public abstract boolean process( double c_x , double c_y , TupleDesc_B feature );
+	public abstract void process( double c_x , double c_y , TupleDesc_B feature );
 
 	public BriefDefinition_I32 getDefinition() {
 		return definition;

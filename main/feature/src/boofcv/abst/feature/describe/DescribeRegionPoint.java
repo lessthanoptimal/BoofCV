@@ -57,17 +57,26 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	public int getCanonicalRadius();
 
 	/**
-	 * Extract feature information from point at the specified scale.
+	 * Checks to see if a description can be extracted at the specified location.  Some descriptors
+	 * cannot handle intersections with the image boundary and will crash if there is an intersection.
+	 *
+	 * @return true if the feature is inside the legal bounds and can be processed.
+	 */
+	public boolean isInBounds(double x , double y , double orientation , double scale);
+
+	/**
+	 * Extract feature information from point at the specified scale.  Before this function
+	 * is called {@link #isInBounds(double, double,double, double)} should be called it make
+	 * sure it is safe to compute the descriptor.
 	 *
 	 * @param x Coordinate of the point.
 	 * @param y Coordinate of the point.
 	 * @param orientation Direction the feature is pointing at in radians. 0 = x-axis PI/2 = y-axis
 	 * @param scale Scale at which the feature was found.
-	 * @param ret Used to store the extracted feature.
-	 *
-	 * @return true if a description was successfully computed and false if one could not be extracted
+	 * @param ret Storage for extracted feature.  If null a new descriptor will be declared and returned..
+	 * @return The descriptor.
 	 */
-	public boolean process( double x , double y , double orientation , double scale , D ret );
+	public D process( double x , double y , double orientation , double scale , D ret );
 
 	/**
 	 *

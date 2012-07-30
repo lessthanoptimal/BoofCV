@@ -58,10 +58,20 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation,
+	public boolean isInBounds(double x, double y, double orientation, double scale) {
+		return alg.isInBounds((int)x,(int)y);
+	}
+
+	@Override
+	public NccFeature process(double x, double y, double orientation,
 						   double scale, NccFeature ret)
 	{
-		return alg.process((int)x,(int)y,ret);
+		if( ret == null )
+			ret = createDescription();
+
+		alg.process((int)x,(int)y,ret);
+
+		return ret;
 	}
 
 	@Override

@@ -73,6 +73,15 @@ public class TestFastQueue {
 	}
 
 	@Test
+	public void getTail() {
+		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(10,Point2D_I32.class,true);
+
+		alg.pop();alg.pop();
+
+		assertTrue(alg.data[1] == alg.getTail());
+	}
+
+	@Test
 	public void get_pop() {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 

@@ -86,9 +86,9 @@ public class ExampleImageStitching {
 
 		// get the length of the description
 		List<Point2D_F64> pointsA = new ArrayList<Point2D_F64>();
-		FastQueue<FD> descA = new TupleDescQueue<FD>(describe,false);
+		FastQueue<FD> descA = new TupleDescQueue<FD>(describe,true);
 		List<Point2D_F64> pointsB = new ArrayList<Point2D_F64>();
-		FastQueue<FD> descB = new TupleDescQueue<FD>(describe,false);
+		FastQueue<FD> descB = new TupleDescQueue<FD>(describe,true);
 
 		// extract feature locations and descriptions from each image
 		describeImage(imageA, detector, describe, pointsA, descA);
@@ -131,7 +131,6 @@ public class ExampleImageStitching {
 		describe.setImage(image);
 
 		listDescs.reset();
-		FD desc = describe.createDescription();
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			// get the feature location info
 			Point2D_F64 p = detector.getLocation(i);
@@ -139,10 +138,9 @@ public class ExampleImageStitching {
 			double scale = detector.getScale(i);
 
 			// extract the description and save the results into the provided description
-			if( describe.process(p.x,p.y,yaw,scale,desc) ) {
+			if( describe.isInBounds(p.x,p.y,yaw,scale) ) {
+				describe.process(p.x, p.y, yaw, scale, listDescs.pop());
 				points.add(p.copy());
-				listDescs.add(desc);
-				desc = describe.createDescription();
 			}
 		}
 	}

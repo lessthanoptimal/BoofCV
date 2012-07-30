@@ -22,6 +22,7 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
@@ -73,25 +74,15 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 		interp.setImage(blur);
 	}
 
+	public boolean isInBounds( float c_x , float c_y , float scale ) {
+		return BoofMiscOps.checkInside(blur, (int) c_x, (int) c_y, (int)(definition.radius*scale+0.5f));
+	}
+
 	public boolean process( float c_x , float c_y , float orientation , float scale , TupleDesc_B feature )
 	{
-		int r = definition.radius;
+
 		float c = (float)Math.cos(orientation);
 		float s = (float)Math.sin(orientation);
-
-		int pixelX = (int)c_x;
-		int pixelY = (int)c_y;
-
-		// todo modify to handle regions partially inside the image
-		// make sure the region is inside the image
-		if( !checkInBounds(pixelX,pixelY,-r,-r,c,s,scale))
-			return false;
-		else if( !checkInBounds(pixelX,pixelY,-r,r,c,s,scale))
-			return false;
-		else if( !checkInBounds(pixelX,pixelY,r,r,c,s,scale))
-			return false;
-		else if( !checkInBounds(pixelX,pixelY,r,-r,c,s,scale))
-			return false;
 
 		Arrays.fill(feature.data, 0);
 
@@ -113,14 +104,6 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 		}
 
 		return true;
-	}
-
-	private boolean checkInBounds( int c_x , int c_y , int dx , int dy , float c , float s , float scale )
-	{
-		float x = c_x + (c*dx - s*dy)*scale;
-		float y = c_y + (s*dx + c*dy)*scale;
-
-		return interp.isInSafeBounds((int) x, (int) y);
 	}
 
 	public BriefDefinition_I32 getDefinition() {
