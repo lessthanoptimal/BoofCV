@@ -14,12 +14,16 @@ Version : Alpha 0.10
   * FactoryAssociate now can create instances of ScoreAssociate.
 - DescribeRegionPoint has been redesigned
   * Now more generic and can work with any feature descriptor
-  * No longer returns the descriptor.  Hopefully more intuitive
+  * Separate function for checking to see if feature is inside bounds
 - TupleDesc
   * changed to an interface
   * functions added to provide some generic support
 - Brief descriptor renamed to TupleDesc_B
   * Acts as a generic binary feature descriptor
+- Descriptors
+  * BRIEF and BRIEF-SO now can process features along the image border.  Bit set to false in that case.
+- Visualization Apps
+  * VisualizeAssociationScoreApp has score type in a separate panel and can support binary descriptors
 
 ---------------------------------------------
 Date    : 2012/7/22

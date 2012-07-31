@@ -97,8 +97,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 			TupleDesc_B f = alg.createFeature();
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				if( alg.isInBounds(p.x,p.y))
-					alg.process(p.x,p.y,f);
+				alg.process(p.x,p.y,f);
 			}
 		}
 	}
@@ -114,8 +113,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 			TupleDesc_B f = alg.createFeature();
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				if( alg.isInBounds(p.x,p.y,(float)scales[i]))
-					alg.process(p.x,p.y,(float)yaws[i],(float)scales[i],f);
+				alg.process(p.x,p.y,(float)yaws[i],(float)scales[i],f);
 			}
 		}
 	}

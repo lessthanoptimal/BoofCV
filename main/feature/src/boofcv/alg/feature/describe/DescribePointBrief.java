@@ -92,7 +92,7 @@ public abstract class DescribePointBrief<T extends ImageSingleBand> {
 		for( int i = 0; i < definition.samplePoints.length ; i++ ) {
 			Point2D_I32 a = definition.samplePoints[i];
 
-			offsets[i] = blur.startIndex + blur.stride*a.y + a.x;
+			offsets[i] = blur.stride*a.y + a.x;
 		}
 
 		for( int i = 0; i < definition.compare.length ; i++ ) {
@@ -100,10 +100,6 @@ public abstract class DescribePointBrief<T extends ImageSingleBand> {
 			offsetsA[i] = offsets[p.x];
 			offsetsB[i] = offsets[p.y];
 		}
-	}
-
-	public boolean isInBounds( double c_x , double c_y ) {
-		return BoofMiscOps.checkInside(blur,(int)c_x, (int)c_y, definition.radius);
 	}
 
 	/**
@@ -114,7 +110,23 @@ public abstract class DescribePointBrief<T extends ImageSingleBand> {
 	 * @param c_y Center of region being described.
 	 * @param feature Where the descriptor is written to.
 	 */
-	public abstract void process( double c_x , double c_y , TupleDesc_B feature );
+	public void process( double c_x , double c_y , TupleDesc_B feature ) {
+		if( BoofMiscOps.checkInside(blur,(int)c_x, (int)c_y, definition.radius) ) {
+			processInside(c_x,c_y,feature);
+		} else {
+			processBorder(c_x,c_y,feature);
+		}
+	}
+
+	/**
+	 * Called if the descriptor region is contained intirely inside the image
+	 */
+	public abstract void processInside( double c_x , double c_y , TupleDesc_B feature );
+
+	/**
+	 * Called if the descriptor region goes outside the image border
+	 */
+	public abstract void processBorder( double c_x , double c_y , TupleDesc_B feature );
 
 	public BriefDefinition_I32 getDefinition() {
 		return definition;

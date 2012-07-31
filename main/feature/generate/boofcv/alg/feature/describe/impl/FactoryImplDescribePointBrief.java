@@ -55,6 +55,7 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 				"import boofcv.alg.feature.describe.brief.BriefDefinition_I32;\n" +
 				"import boofcv.struct.feature.TupleDesc_B;\n" +
 				"import boofcv.struct.image.*;\n" +
+				"import georegression.struct.point.Point2D_I32;\n" +
 				"import java.util.Arrays;\n" +
 				"\n" +
 				"/**\n" +
@@ -80,7 +81,7 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 		String sumType = imageType.getSumType();
 
 		out.print("\t@Override\n" +
-				"\tpublic void process( double X , double Y , TupleDesc_B feature )\n" +
+				"\tpublic void processInside( double X , double Y , TupleDesc_B feature )\n" +
 				"\t{\n" +
 				"\t\tint c_x = (int)X;\n" +
 				"\t\tint c_y = (int)Y;\n"+
@@ -95,6 +96,32 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\tif( valA < valB ) {\n" +
 				"\t\t\t\tfeature.data[ i/32 ] |= 1 << (i % 32);\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+
+		out.print("\t@Override\n" +
+				"\tpublic void processBorder( double X , double Y , TupleDesc_B feature ) {\n" +
+				"\t\tint c_x = (int)X;\n" +
+				"\t\tint c_y = (int)Y;\n" +
+				"\n" +
+				"\t\tArrays.fill(feature.data, 0);\n" +
+				"\n" +
+				"\t\tint index = blur.startIndex + blur.stride*c_y + c_x;\n" +
+				"\n" +
+				"\t\tfor( int i = 0; i < definition.compare.length; i++ ) {\n" +
+				"\t\t\tPoint2D_I32 c = definition.compare[i];\n" +
+				"\t\t\tPoint2D_I32 p_a = definition.samplePoints[c.x];\n" +
+				"\t\t\tPoint2D_I32 p_b = definition.samplePoints[c.y];\n" +
+				"\n" +
+				"\t\t\tif( blur.isInBounds(p_a.x + c_x , p_a.y + c_y) &&\n" +
+				"\t\t\t\t\tblur.isInBounds(p_b.x + c_x , p_b.y + c_y) ){\n" +
+				"\t\t\t\t"+sumType+" valA = blur.data[index + offsetsA[i]]"+bitwise+";\n" +
+				"\t\t\t\t"+sumType+" valB = blur.data[index + offsetsB[i]]"+bitwise+";\n" +
+				"\n" +
+				"\t\t\t\tif( valA < valB ) {\n" +
+				"\t\t\t\t\tfeature.data[ i/32 ] |= 1 << (i % 32);\n" +
+				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

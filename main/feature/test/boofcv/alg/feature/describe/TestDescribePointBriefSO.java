@@ -76,8 +76,8 @@ public class TestDescribePointBriefSO {
 		TupleDesc_B desc2 = alg.createFeature();
 
 		alg.setImage(input);
-		assertTrue(alg.process(input.width/2,input.height/2,0,1,desc1));
-		assertTrue(alg.process(input.width/2,input.height/2,1,1,desc2));
+		alg.process(input.width/2,input.height/2,0,1,desc1);
+		alg.process(input.width/2,input.height/2,1,1,desc2);
 
 		boolean identical = true;
 		for( int i = 0; i < desc1.data.length; i++ ) {
@@ -100,8 +100,8 @@ public class TestDescribePointBriefSO {
 		TupleDesc_B desc2 = alg.createFeature();
 
 		alg.setImage(input);
-		assertTrue(alg.process(input.width/2,input.height/2,0,1,desc1));
-		assertTrue(alg.process(input.width/2,input.height/2,0,2,desc2));
+		alg.process(input.width/2,input.height/2,0,1,desc1);
+		alg.process(input.width/2,input.height/2,0,2,desc2);
 
 		boolean identical = true;
 		for( int i = 0; i < desc1.data.length; i++ ) {
@@ -130,7 +130,7 @@ public class TestDescribePointBriefSO {
 		ImageFloat32 sub = BoofTesting.createSubImageOf(input);
 
 		alg.setImage(sub);
-		assertTrue(alg.process(input.width/2,input.height/2,0,1,desc2));
+		alg.process(input.width/2,input.height/2,0,1,desc2);
 
 		for( int i = 0; i < desc1.data.length; i++ ) {
 			assertEquals(desc1.data[i],desc2.data[i]);
@@ -149,11 +149,11 @@ public class TestDescribePointBriefSO {
 		TupleDesc_B desc = alg.createFeature();
 
 		alg.setImage(inputA);
-		assertTrue(alg.process(inputA.width/2,inputA.height/2,0,1,desc));
+		alg.process(inputA.width/2,inputA.height/2,0,1,desc);
 
 		// just see if it blows up or not
 		alg.setImage(inputB);
-		assertTrue(alg.process(inputA.width/2,inputA.height/2,0,1,desc));
+		alg.process(inputA.width/2,inputA.height/2,0,1,desc);
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class TestDescribePointBriefSO {
 		alg.process(input.width/2,input.height/2,0,1,desc1);
 
 		alg.setImage(mod);
-		assertTrue(alg.process(input.width/2,input.height/2,0,1,desc2));
+		alg.process(input.width/2,input.height/2,0,1,desc2);
 
 		// compare the descriptions
 		int count = 0;
@@ -206,7 +206,7 @@ public class TestDescribePointBriefSO {
 		int c_y = input.height/2;
 
 		TupleDesc_B desc = alg.createFeature();
-		assertTrue(alg.process(c_x,c_y,0,1,desc));
+		alg.process(c_x,c_y,0,1,desc);
 
 		for( int i = 0; i < def.compare.length; i++ ) {
 			Point2D_I32 c = def.compare[i];
@@ -217,5 +217,29 @@ public class TestDescribePointBriefSO {
 					< a.get(c_x+p1.x,c_y+p1.y).doubleValue();
 			assertTrue(expected == desc.isBitTrue(i));
 		}
+	}
+
+	/**
+	 * See if it handles the image border correctly.
+	 */
+	@Test
+	public void checkBorder() {
+		ImageFloat32 input = createImage(width,height);
+
+		DescribePointBriefSO<ImageFloat32> alg = createAlg();
+
+		alg.setImage(input);
+
+		TupleDesc_B desc = alg.createFeature();
+
+		// part of sanity check
+		assertTrue(desc.data[0] == 0 );
+
+		// just see if it blows up for now.  a more rigorous test would be better
+		alg.process(0, 0, 0.1f , 1.2f,desc);
+		alg.process(width - 1, height - 1, 0.1f, 1.2f, desc);
+
+		// sanity check.  the description should not be zero
+		assertTrue(desc.data[0] != 0 );
 	}
 }

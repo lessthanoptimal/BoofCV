@@ -57,7 +57,7 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 
 	@Override
 	public boolean isInBounds(double x, double y, double orientation, double scale) {
-		return alg.isInBounds((float)x,(float)y,(float)scale);
+		return true;
 	}
 
 	@Override
