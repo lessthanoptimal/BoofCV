@@ -23,6 +23,7 @@ import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageUInt8;
+import georegression.struct.point.Point2D_I32;
 
 import java.util.Arrays;
 
@@ -44,7 +45,7 @@ public class ImplDescribePointBrief_U8 extends DescribePointBrief<ImageUInt8> {
 	}
 
 	@Override
-	public void process( double X , double Y , TupleDesc_B feature )
+	public void processInside( double X , double Y , TupleDesc_B feature )
 	{
 		int c_x = (int)X;
 		int c_y = (int)Y;
@@ -59,6 +60,32 @@ public class ImplDescribePointBrief_U8 extends DescribePointBrief<ImageUInt8> {
 
 			if( valA < valB ) {
 				feature.data[ i/32 ] |= 1 << (i % 32);
+			}
+		}
+	}
+
+	@Override
+	public void processBorder( double X , double Y , TupleDesc_B feature ) {
+		int c_x = (int)X;
+		int c_y = (int)Y;
+
+		Arrays.fill(feature.data, 0);
+
+		int index = blur.startIndex + blur.stride*c_y + c_x;
+
+		for( int i = 0; i < definition.compare.length; i++ ) {
+			Point2D_I32 c = definition.compare[i];
+			Point2D_I32 p_a = definition.samplePoints[c.x];
+			Point2D_I32 p_b = definition.samplePoints[c.y];
+
+			if( blur.isInBounds(p_a.x + c_x , p_a.y + c_y) &&
+					blur.isInBounds(p_b.x + c_x , p_b.y + c_y) ){
+				int valA = blur.data[index + offsetsA[i]]& 0xFF;
+				int valB = blur.data[index + offsetsB[i]]& 0xFF;
+
+				if( valA < valB ) {
+					feature.data[ i/32 ] |= 1 << (i % 32);
+				}
 			}
 		}
 	}

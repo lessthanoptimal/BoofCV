@@ -42,4 +42,11 @@ public interface TupleDesc<T extends TupleDesc> {
 	 * @return Number of elements in the tuple
 	 */
 	public int size();
+
+	/**
+	 * Creates a copy of this description
+	 *
+	 * @return Copy
+	 */
+	public T copy();
 }

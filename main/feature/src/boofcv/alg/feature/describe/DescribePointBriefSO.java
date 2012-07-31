@@ -36,6 +36,10 @@ import java.util.Arrays;
  * it has been sampled.
  * </p>
  *
+ * <p>
+ * Border pixels are handled by setting their value to zero when comparing.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class DescribePointBriefSO<T extends ImageSingleBand> {
@@ -74,25 +78,38 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 		interp.setImage(blur);
 	}
 
-	public boolean isInBounds( float c_x , float c_y , float scale ) {
-		return BoofMiscOps.checkInside(blur, (int) c_x, (int) c_y, (int)(definition.radius*scale+0.5f));
-	}
-
-	public boolean process( float c_x , float c_y , float orientation , float scale , TupleDesc_B feature )
+	public void process( float c_x , float c_y , float orientation , float scale , TupleDesc_B feature )
 	{
+		boolean isInside =
+				BoofMiscOps.checkInside(blur, (int) c_x, (int) c_y, (int)(definition.radius*scale+0.5f));
 
 		float c = (float)Math.cos(orientation);
 		float s = (float)Math.sin(orientation);
 
 		Arrays.fill(feature.data, 0);
 
-		for( int i = 0; i < definition.samplePoints.length; i++ ) {
-			Point2D_I32 a = definition.samplePoints[i];
-			// rotate the points
-			float x0 = c_x + (c*a.x - s*a.y)*scale;
-			float y0 = c_y + (s*a.x + c*a.y)*scale;
+		if( isInside ) {
+			for( int i = 0; i < definition.samplePoints.length; i++ ) {
+				Point2D_I32 a = definition.samplePoints[i];
+				// rotate the points
+				float x0 = c_x + (c*a.x - s*a.y)*scale;
+				float y0 = c_y + (s*a.x + c*a.y)*scale;
 
-			values[i] = interp.get_unsafe(x0,y0);
+				values[i] = interp.get_unsafe(x0,y0);
+			}
+		} else {
+			// handle the image border case
+			for( int i = 0; i < definition.samplePoints.length; i++ ) {
+				Point2D_I32 a = definition.samplePoints[i];
+				// rotate the points
+				float x0 = c_x + (c*a.x - s*a.y)*scale;
+				float y0 = c_y + (s*a.x + c*a.y)*scale;
+
+				if( blur.isInBounds((int) x0, (int) y0) ) {
+					// it might be inside the image but too close to the border for unsafe
+					values[i] = interp.get(x0,y0);
+				}
+			}
 		}
 
 		for( int i = 0; i < definition.compare.length; i++ ) {
@@ -102,8 +119,6 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 				feature.data[ i/32 ] |= 1 << (i % 32);
 			}
 		}
-
-		return true;
 	}
 
 	public BriefDefinition_I32 getDefinition() {

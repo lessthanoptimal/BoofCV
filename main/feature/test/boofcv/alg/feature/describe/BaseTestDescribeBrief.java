@@ -171,8 +171,33 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 		}
 	}
 
+	/**
+	 * See if the border is handled correctly
+	 */
+	@Test
+	public void testImageBorder() {
+		T input = createImage(width,height);
+
+		DescribePointBrief<T> alg = FactoryDescribePointAlgs.brief(def, filterBlur);
+
+		alg.setImage(input);
+
+		TupleDesc_B desc = alg.createFeature();
+
+		// just see if it blows up for now.  a more rigorous test would be better
+		process(alg, 0, 0, desc);
+		process(alg, width-1, height-1, desc);
+
+		// if given a point inside it should produce the same answer
+		alg.processBorder(width/2,height/2,desc);
+		TupleDesc_B descInside = alg.createFeature();
+		alg.processInside(width/2,height/2,descInside);
+
+		for( int i = 0; i < desc.numBits; i++ )
+			assertEquals(desc.getDouble(i),descInside.getDouble(i),1e-8);
+	}
+
 	private void process( DescribePointBrief<T> alg , double x , double y , TupleDesc_B desc ) {
-		assertTrue(alg.isInBounds(x,y));
 		alg.process(x,y,desc);
 	}
 }
