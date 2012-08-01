@@ -30,7 +30,7 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 	int length;
 	DescribePointBriefSO<T> alg;
 
-	public WrapDescribeBriefSo(DescribePointBriefSO<T> alg) {
+	public WrapDescribeBriefSo(DescribePointBriefSO<T> alg ) {
 		this.alg = alg;
 		this.length = alg.getDefinition().getLength();
 	}
@@ -72,7 +72,7 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 
 	@Override
 	public boolean requiresScale() {
-		return false;
+		return true;
 	}
 
 	@Override

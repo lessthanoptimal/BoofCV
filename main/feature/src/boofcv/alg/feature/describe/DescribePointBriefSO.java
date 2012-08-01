@@ -80,6 +80,8 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 
 	public void process( float c_x , float c_y , float orientation , float scale , TupleDesc_B feature )
 	{
+		// NOTE: This doesn't seem to take in account the interpolation border.  Might not work algs
+		// other than bilinear interpolation
 		boolean isInside =
 				BoofMiscOps.checkInside(blur, (int) c_x, (int) c_y, (int)(definition.radius*scale+0.5f));
 

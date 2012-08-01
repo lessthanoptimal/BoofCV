@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public interface InterestPointDetector< T extends ImageSingleBand> {
+public interface InterestPointDetector< T extends ImageSingleBand > {
 
 	/**
 	 * Detects interest points inside the provided image.
