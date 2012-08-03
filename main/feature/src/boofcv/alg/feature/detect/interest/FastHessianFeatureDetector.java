@@ -328,4 +328,11 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 	public List<ScalePoint> getFoundPoints() {
 		return foundPoints;
 	}
+
+	/**
+	 * Returns the width of the smallest feature it can detect
+	 */
+	public int getSmallestWidth() {
+		return initialSize;
+	}
 }

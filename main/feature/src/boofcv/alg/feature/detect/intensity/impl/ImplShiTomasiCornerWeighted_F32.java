@@ -41,9 +41,9 @@ public class ImplShiTomasiCornerWeighted_F32 extends ImplSsdCornerWeighted_F32
 		// compute the smallest eigenvalue
 		float left = (totalXX + totalYY) * 0.5f;
 		float b = (totalXX - totalYY) * 0.5f;
-		double right = Math.sqrt(b * b + totalXY * totalXY);
+		float right = (float)Math.sqrt(b * b + totalXY * totalXY);
 		
 		// the smallest eigenvalue will be minus the right side
-		return (float)(left - right);
+		return left - right;
 	}
 }

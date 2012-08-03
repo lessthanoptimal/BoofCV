@@ -42,9 +42,9 @@ public class ImplShiTomasiCorner_F32 extends ImplSsdCorner_F32 implements ShiTom
 		// compute the smallest eigenvalue
 		float left = (totalXX + totalYY) * 0.5f;
 		float b = (totalXX - totalYY) * 0.5f;
-		double right = Math.sqrt(b * b + totalXY * totalXY);
+		float right = (float)Math.sqrt(b * b + totalXY * totalXY);
 
 		// the smallest eigenvalue will be minus the right side
-		return (float)(left - right);
+		return left - right;
 	}
 }
