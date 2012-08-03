@@ -20,7 +20,6 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -78,8 +77,7 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand> implements Interes
 
 	@Override
 	public double getCanonicalRadius() {
-		// TODO is this correct?
-		return BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
+		return detector.getSmallestWidth()/2;
 	}
 
 	@Override
