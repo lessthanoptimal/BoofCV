@@ -24,6 +24,7 @@ Version : Alpha 0.10
   * BRIEF and BRIEF-SO now can process features along the image border.  Bit set to false in that case.
 - Visualization Apps
   * VisualizeAssociationScoreApp has score type in a separate panel and can support binary descriptors
+- WrapFHtoInterestPoint now returns the correct detection radius
 
 ---------------------------------------------
 Date    : 2012/7/22

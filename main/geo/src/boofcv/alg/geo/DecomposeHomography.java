@@ -100,7 +100,7 @@ public class DecomposeHomography {
 				throw new RuntimeException("SVD failed somehow");
 		}
 
-		DenseMatrix64F V = svd.getV(false);
+		DenseMatrix64F V = svd.getV(null,false);
 		DenseMatrix64F S = svd.getW(null);
 
 		SingularOps.descendingOrder(null,false,S, V,false);

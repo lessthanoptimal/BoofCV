@@ -56,19 +56,19 @@ public class BenchmarkDetectHelper {
 		int thresh = 1;
 
 		alg = FactoryDetectPoint.createFast(radius, 20, maxFeatures, imageType);
-		ret.add( new BenchmarkAlgorithm("Fast", FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );
+		ret.add( new BenchmarkAlgorithm("Fast", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
 		alg = FactoryDetectPoint.createHarris(radius, false, thresh, maxFeatures, derivType);
-		ret.add( new BenchmarkAlgorithm("Harris", FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );
+		ret.add( new BenchmarkAlgorithm("Harris", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
 		alg = FactoryDetectPoint.createShiTomasi(radius, false, thresh, maxFeatures, derivType);
-		ret.add( new BenchmarkAlgorithm("KLT", FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );
+		ret.add( new BenchmarkAlgorithm("KLT", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
 		alg = FactoryDetectPoint.createKitRos(radius, thresh, maxFeatures, derivType);
-		ret.add( new BenchmarkAlgorithm("KitRos", FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );
+		ret.add( new BenchmarkAlgorithm("KitRos", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
 		alg = FactoryDetectPoint.createMedian(radius, thresh, maxFeatures, imageType);
-		ret.add( new BenchmarkAlgorithm("Median", FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );
+		ret.add( new BenchmarkAlgorithm("Median", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
 		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, radius, thresh, maxFeatures, derivType);
-		ret.add( new BenchmarkAlgorithm("Hessian", FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );
+		ret.add( new BenchmarkAlgorithm("Hessian", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
 		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, radius, thresh, maxFeatures, derivType);
-		ret.add( new BenchmarkAlgorithm("Laplace", FactoryInterestPoint.wrapCorner(alg, imageType, derivType)) );
+		ret.add( new BenchmarkAlgorithm("Laplace", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
 
 		FeatureLaplaceScaleSpace<T,D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
 		ret.add( new BenchmarkAlgorithm("Hess Lap SS", FactoryInterestPoint.wrapDetector(flss, scales, imageType)) );

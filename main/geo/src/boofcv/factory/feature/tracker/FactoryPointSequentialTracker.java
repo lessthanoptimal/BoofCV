@@ -154,7 +154,7 @@ public class FactoryPointSequentialTracker {
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 		GeneralFeatureDetector<I,?> fast = FactoryDetectPoint.createFast(3, pixelDetectTol, maxFeatures, imageType);
-		InterestPointDetector<I> detector = FactoryInterestPoint.wrapCorner(fast, imageType, null);
+		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(fast, imageType, null);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		GeneralAssociation<TupleDesc_B> association =
@@ -179,7 +179,7 @@ public class FactoryPointSequentialTracker {
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType);
 		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(2, pixelDetectTol, maxFeatures, imageType);
 
-		InterestPointDetector<I> detector = FactoryInterestPoint.wrapCorner(corner, imageType, derivType);
+		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
 
 		GeneralAssociation<NccFeature> association =

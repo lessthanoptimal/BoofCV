@@ -64,8 +64,8 @@ public class PoseRodriguesCodec implements ModelCodec<Se3_F64> {
 		if( !svd.decompose(se.getR()) )
 			throw new RuntimeException("SVD failed");
 
-		DenseMatrix64F U = svd.getU(false);
-		DenseMatrix64F V = svd.getV(false);
+		DenseMatrix64F U = svd.getU(null,false);
+		DenseMatrix64F V = svd.getV(null,false);
 
 		CommonOps.multTransB(U, V, R);
 

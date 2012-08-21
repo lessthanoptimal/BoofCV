@@ -112,7 +112,7 @@ public class Relinearlize {
 		svd.decompose(L_full);
 
 		// extract null space
-		V = svd.getV(true);
+		V = svd.getV(null,true);
 
 		// compute one possible solution
 		pseudo.setA(L_full);

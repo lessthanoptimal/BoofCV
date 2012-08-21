@@ -332,7 +332,7 @@ public class PnPLepetitEPnP {
 		// find the data's orientation and check to see if it is planar
 		svd.decompose(covar);
 		double []singularValues = svd.getSingularValues();
-		DenseMatrix64F V = svd.getV(false);
+		DenseMatrix64F V = svd.getV(null,false);
 
 		SingularOps.descendingOrder(null,false,singularValues,3,V,false);
 
@@ -460,7 +460,7 @@ public class PnPLepetitEPnP {
 			throw new IllegalArgumentException("SVD failed?!?!");
 
 		double []singularValues = svd.getSingularValues();
-		DenseMatrix64F V = svd.getV(false);
+		DenseMatrix64F V = svd.getV(null,false);
 
 		SingularOps.descendingOrder(null,false,singularValues,3,V,false);
 

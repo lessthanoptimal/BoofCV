@@ -59,7 +59,7 @@ public class FactoryInterestPoint {
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	InterestPointDetector<T> wrapCorner(GeneralFeatureDetector<T, D> feature, Class<T> inputType, Class<D> derivType) {
+	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature, Class<T> inputType, Class<D> derivType) {
 
 		ImageGradient<T,D> gradient = null;
 		ImageHessian<D> hessian = null;
@@ -172,10 +172,10 @@ public class FactoryInterestPoint {
 										 int numberOfOctaves)
 	{
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, 5, true);
-		FastHessianFeatureDetector<T> feature = new FastHessianFeatureDetector<T>(extractor,maxFeaturesPerScale,
+		FastHessianFeatureDetector feature = new FastHessianFeatureDetector<T>(extractor,maxFeaturesPerScale,
 				initialSampleSize, initialSize,numberScalesPerOctave,numberOfOctaves);
 
-		return new WrapFHtoInterestPoint<T>(feature);
+		return new WrapFHtoInterestPoint(feature);
 	}
 
 }

@@ -1,0 +1,5 @@
+- FAST improvements
+ * Tried using look up table instead of searching with two for loops.
+  - Used Float.floatToRawIntBits() to see if floating point numbers were positive or negative
+  - Found to be about 5% faster when a larger than normal number of features are detected
+  - Decided it was not significantly enough of an improvement to warrant a change

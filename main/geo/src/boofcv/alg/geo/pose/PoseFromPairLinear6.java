@@ -190,7 +190,7 @@ public class PoseFromPairLinear6 {
 		if( !svd.decompose(R))
 			throw new RuntimeException("SVD Failed");
 
-		CommonOps.multTransB(svd.getU(false),svd.getV(false),R);
+		CommonOps.multTransB(svd.getU(null,false),svd.getV(null,false),R);
 
 		// determinant should be +1
 		double det = CommonOps.det(R);
