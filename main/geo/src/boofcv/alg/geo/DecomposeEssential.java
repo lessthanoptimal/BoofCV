@@ -85,8 +85,8 @@ public class DecomposeEssential {
 		if( !svd.decompose(E))
 			throw new RuntimeException("Svd some how failed");
 
-		DenseMatrix64F U = svd.getU(false);
-		DenseMatrix64F V = svd.getV(false);
+		DenseMatrix64F U = svd.getU(null,false);
+		DenseMatrix64F V = svd.getV(null,false);
 		DenseMatrix64F S = svd.getW(null);
 
 		decompose(U, S, V);

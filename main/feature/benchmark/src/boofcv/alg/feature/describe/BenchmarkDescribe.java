@@ -102,7 +102,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		}
 	}
 
-	public class BriefO512 extends PerformerBase {
+	public class BriefSO512 extends PerformerBase {
 
 		DescribePointBriefSO<I> alg = FactoryDescribePointAlgs.briefso(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
@@ -154,7 +154,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		ProfileOperation.printOpsPerSec(new Describe("SURF UP", FactoryDescribeRegionPoint.<I,II>surf(false, imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("MSURF UP", FactoryDescribeRegionPoint.<I,II>surfm(false, imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new BriefO512(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new BriefSO512(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Steer r=12", FactoryDescribeRegionPoint.steerableGaussian(12, false, imageType, derivType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Steer Norm r=12", FactoryDescribeRegionPoint.steerableGaussian(12, true, imageType, derivType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=12", FactoryDescribeRegionPoint.gaussian12(12, imageType, derivType)),TEST_TIME);

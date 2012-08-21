@@ -87,7 +87,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		GeneralFeatureDetector<T,D> alg;
 		addAlgorithm(0,"Fast Hessian", FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4));
 		alg = FactoryDetectPoint.createShiTomasi(2, false, 1, 500, derivType);
-		addAlgorithm(0,"KLT", FactoryInterestPoint.wrapCorner(alg, imageType, derivType));
+		addAlgorithm(0,"KLT", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
 
 		addAlgorithm(1,"SURF", FactoryDescribeRegionPoint.surfm(true, imageType));
 		addAlgorithm(1,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));

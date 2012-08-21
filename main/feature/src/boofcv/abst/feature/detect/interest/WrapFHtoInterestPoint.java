@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
+import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageSingleBand;
@@ -32,14 +33,23 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapFHtoInterestPoint<T extends ImageSingleBand> implements InterestPointDetector<T> {
+public class WrapFHtoInterestPoint<T extends ImageSingleBand, II extends ImageSingleBand> implements InterestPointDetector<T> {
 
-	FastHessianFeatureDetector<T> detector;
+	// optionally will compute the feature's orientation
+	OrientationIntegral<II> orientation;
+	// detects the feature's location and scale
+	FastHessianFeatureDetector<II> detector;
 	List<ScalePoint> location;
-	T integral;
+	II integral;
 
-	public WrapFHtoInterestPoint(FastHessianFeatureDetector<T> detector) {
+	public WrapFHtoInterestPoint(FastHessianFeatureDetector<II> detector) {
 		this.detector = detector;
+	}
+
+	public WrapFHtoInterestPoint(FastHessianFeatureDetector<II> detector,
+								 OrientationIntegral<II> orientation ) {
+		this.detector = detector;
+		this.orientation = orientation;
 	}
 
 	@Override
@@ -51,6 +61,8 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand> implements Interes
 		integral = GIntegralImageOps.transform(input,integral);
 
 		detector.detect(integral);
+		if( orientation != null )
+			orientation.setImage(integral);
 
 		location = detector.getFoundPoints();
 	}
@@ -72,6 +84,11 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand> implements Interes
 
 	@Override
 	public double getOrientation(int featureIndex) {
+		if( orientation != null ) {
+			Point2D_F64 p = location.get(featureIndex);
+			orientation.setScale(location.get(featureIndex).scale);
+			return orientation.compute(p.x,p.y);
+		}
 		return 0;
 	}
 
@@ -87,6 +104,6 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand> implements Interes
 
 	@Override
 	public boolean hasOrientation() {
-		return false;
+		return orientation != null;
 	}
 }

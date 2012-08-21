@@ -163,6 +163,19 @@ public class BoofMiscOps {
 		return true;
 	}
 
+	public static boolean checkInside(ImageBase b, float x , float y , float radius ) {
+		if( x-radius < 0 )
+			return false;
+		if( x+radius >= b.width )
+			return false;
+
+		if( y-radius < 0 )
+			return false;
+		if( y+radius >= b.height )
+			return false;
+		return true;
+	}
+
 	public static boolean checkInside(ImageBase b, int x , int y , int radiusWidth , int radiusHeight ) {
 		if( x-radiusWidth < 0 )
 			return false;

@@ -141,7 +141,7 @@ public class HomographyLinear4 {
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
-			DenseMatrix64F V = svd.getV(false);
+			DenseMatrix64F V = svd.getV(null,false);
 			SpecializedOps.subvector(V, 0, 8, V.numCols, false, 0, H);
 		}
 

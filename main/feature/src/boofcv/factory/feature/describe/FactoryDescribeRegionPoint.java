@@ -151,17 +151,14 @@ public class FactoryDescribeRegionPoint {
 	DescribeRegionPoint<T,TupleDesc_B> brief(int radius, int numPoints,
 									   double blurSigma, int blurRadius,
 									   boolean isFixed,
-									   Class<T> imageType) {
+									   Class<T> imageType)
+	{
+		BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
+		BriefDefinition_I32 definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
 
 		if( isFixed) {
-			BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
-			BriefDefinition_I32 definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
-
 			return new WrapDescribeBrief<T>(FactoryDescribePointAlgs.brief(definition,filter));
 		} else {
-			BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
-			BriefDefinition_I32 definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
-
 			return new WrapDescribeBriefSo<T>(FactoryDescribePointAlgs.briefso(definition, filter));
 		}
 	}

@@ -77,7 +77,7 @@ public class FundamentalLinear8 {
 	boolean computeFundamental;
 
 	/**
-	 * When computing the essential matrix normalization is optional because pixel coordinates
+	 * Specifies which type of matrix is to be computed
 	 *
 	 * @param computeFundamental true it computes a fundamental matrix and false for essential
 	 */
@@ -96,17 +96,12 @@ public class FundamentalLinear8 {
 
 	/**
 	 * <p>
-	 * Computes a fundamental matrix from a set of associated points. This formulation requires a minimum
-	 * of eight points.  If input points are poorly condition for linear operations (in pixel coordinates)
-	 * then make sure normalization is turned on.
+	 * Computes a fundamental or essential matrix from a set of associated point correspondences.
 	 * </p>
 	 *
-	 * <p>
-	 * Follows the procedures outlined in "An Invitation to 3-D Vision" 2004 with some minor modifications.
-	 * </p>
-	 *
-	 * @param points List of correlated points in image coordinates from perspectives. Either in pixel or normalized image coordinates.
-	 * @return true if it thinks it succeeded and false if it knows it failed.
+	 * @param points List of corresponding image coordinates. In pixel for fundamental matrix or
+	 *               normalized coordinates for essential matrix.
+	 * @return true If successful or false if it failed
 	 */
 	public boolean process( List<AssociatedPair> points ) {
 		if( points.size() < 8 )
@@ -141,7 +136,7 @@ public class FundamentalLinear8 {
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
-			DenseMatrix64F V = svd.getV(false);
+			DenseMatrix64F V = svd.getV(null,false);
 			SpecializedOps.subvector(V, 0, 8, V.numCols, false, 0, F);
 		}
 
@@ -157,8 +152,8 @@ public class FundamentalLinear8 {
 		if( !svd.decompose(E) ) {
 			return false;
 		}
-		svdV = svd.getV(false);
-		svdU = svd.getU(false);
+		svdV = svd.getV(null,false);
+		svdU = svd.getU(null,false);
 		svdS = svd.getW(null);
 
 		SingularOps.descendingOrder(svdU, false, svdS, svdV, false);
@@ -186,8 +181,8 @@ public class FundamentalLinear8 {
 		if( !svd.decompose(F) ) {
 			return false;
 		}
-		svdV = svd.getV(false);
-		svdU = svd.getU(false);
+		svdV = svd.getV(null,false);
+		svdU = svd.getU(null,false);
 		svdS = svd.getW(null);
 
 		SingularOps.descendingOrder(svdU, false, svdS, svdV, false);

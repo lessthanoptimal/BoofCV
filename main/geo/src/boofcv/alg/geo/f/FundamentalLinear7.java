@@ -67,6 +67,15 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 		super(computeFundamental);
 	}
 
+	/**
+	 * <p>
+	 * Computes a fundamental or essential matrix from a set of associated point correspondences.
+	 * </p>
+	 *
+	 * @param points List of corresponding image coordinates. In pixel for fundamental matrix or
+	 *               normalized coordinates for essential matrix.
+	 * @return true If successful or false if it failed
+	 */
 	@Override
 	public boolean process( List<AssociatedPair> points ) {
 		if( points.size() != 7 )
@@ -107,7 +116,7 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 			return true;
 
 		// extract the two singular vectors
-		DenseMatrix64F V = svd.getV(false);
+		DenseMatrix64F V = svd.getV(null,false);
 		SpecializedOps.subvector(V, 0, 7, V.numCols, false, 0, F1);
 		SpecializedOps.subvector(V, 0, 8, V.numCols, false, 0, F2);
 
