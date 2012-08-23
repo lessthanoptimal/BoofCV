@@ -69,7 +69,8 @@ public class BenchmarkRuntimeRefineFundamental extends ArtificialStereoScene{
 
 		init(NUM_POINTS,FUNDAMENTAL,false);
 
-		EpipolarMatrixEstimator computeAlg = FactoryEpipolar.computeFundamental(FUNDAMENTAL, 8);
+		EpipolarMatrixEstimator computeAlg =
+				FUNDAMENTAL ? FactoryEpipolar.computeFundamental(8) : FactoryEpipolar.computeEssential(8);
 		computeAlg.process(pairs);
 		initialF = computeAlg.getEpipolarMatrix();
 		initialF.data[0] += 0.1;

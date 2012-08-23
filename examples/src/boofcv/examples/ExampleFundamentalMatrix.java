@@ -78,7 +78,7 @@ public class ExampleFundamentalMatrix {
 													List<AssociatedPair> inliers ) {
 
 		// Select which linear algorithm is to be used
-		EpipolarMatrixEstimator estimateF = FactoryEpipolar.computeFundamental(true, 7);
+		EpipolarMatrixEstimator estimateF = FactoryEpipolar.computeFundamental(7);
 		// Wrapper so that this estimator can be used by the robust estimator
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
@@ -114,7 +114,7 @@ public class ExampleFundamentalMatrix {
 	 */
 	public static DenseMatrix64F simpleFundamental( List<AssociatedPair> matches ) {
 		// Use the 8-point algorithm since it will work with an arbitrary number of points
-		EpipolarMatrixEstimator estimateF = FactoryEpipolar.computeFundamental(true, 8);
+		EpipolarMatrixEstimator estimateF = FactoryEpipolar.computeFundamental(8);
 
 		if( !estimateF.process(matches) )
 			throw new IllegalArgumentException("Failed");

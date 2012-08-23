@@ -60,7 +60,7 @@ public class TestSe3FromEssentialGenerator {
 		}
 
 		// create alg
-		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamental(false, 8);
+		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeEssential(8);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 
 		Se3FromEssentialGenerator alg = new Se3FromEssentialGenerator(essentialAlg,triangulate);

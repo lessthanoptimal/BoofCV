@@ -17,11 +17,12 @@
 - Long Term
  * Sparse Bundle Adjustment
  * P3P algorithm
- * 5-pt Fundamental
  * SVD/Linear PnP  See Long Quan paper
  * Switch homography from DenseMatrix64F to Homography2D_F64?
   - Need to add functions to geometry math or create a new class
   - Also add a generic Matrix3x3_F64 to georegression
+
+- Optimize Nister 5-pt Essential
 
 - Move Trackers to Features?
 - Reconsider how DLT is handled

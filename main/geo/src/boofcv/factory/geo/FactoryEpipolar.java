@@ -21,6 +21,7 @@ package boofcv.factory.geo;
 import boofcv.abst.geo.*;
 import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedDense;
 import boofcv.abst.geo.f.LeastSquaresFundamental;
+import boofcv.abst.geo.f.WrapEssentialNister5;
 import boofcv.abst.geo.f.WrapFundamentalLinear;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
 import boofcv.abst.geo.h.LeastSquaresHomography;
@@ -91,15 +92,28 @@ public class FactoryEpipolar {
 	}
 
 	/**
-	 * Returns an algorithm for estimating a fundamental/essential matrix given a set of 
-	 * {@link AssociatedPair}.
-	 * 
-	 * @param isFundamental True if input observations are in pixels, false if they are normalized.
-	 * @param minPoints Selects which algorithms to use.  Only 7 and 8 supported.
+	 * Returns an algorithm for estimating a fundamental matrix given a set of
+	 * {@link AssociatedPair} in pixel coordinates.
+	 *
+	 * @param minPoints Selects which algorithms to use.  Can be 7 or 8.
 	 * @return Fundamental algorithm.
 	 */
-	public static EpipolarMatrixEstimator computeFundamental( boolean isFundamental , int minPoints ) {
-		return new WrapFundamentalLinear(isFundamental,minPoints);
+	public static EpipolarMatrixEstimator computeFundamental( int minPoints ) {
+		return new WrapFundamentalLinear(true,minPoints);
+	}
+
+	/**
+	 * Returns an algorithm for estimating an /essential matrix given a set of
+	 * {@link AssociatedPair} in normalized image coordinates.
+	 *
+	 * @param minPoints Selects which algorithms to use.  Can be 5, 7, or 8.
+	 * @return Fundamental algorithm.
+	 */
+	public static EpipolarMatrixEstimator computeEssential( int minPoints ) {
+		if( minPoints == 5 )
+			return new WrapEssentialNister5();
+		else
+			return new WrapFundamentalLinear(false,minPoints);
 	}
 
 	/**
