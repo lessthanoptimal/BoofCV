@@ -24,6 +24,8 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.EigenDecomposition;
 
+import java.util.List;
+
 /**
  * Provides functions for finding the roots of polynomials
  *
@@ -33,38 +35,23 @@ public class PolynomialSolver {
 
 	/**
 	 * Finds real and imaginary roots in a polynomial using the companion matrix and
-	 * Eigenvalue decomposition.
+	 * Eigenvalue decomposition.  The coefficients order is specified from smallest to largest.
+	 * Example, 5 + 6*x + 7*x^2 + 8*x^3 = [5,6,7,8]
 	 *
-	 * @param coefficients Polynomial coefficients.
+	 * @param coefficients Polynomial coefficients from smallest to largest.
 	 * @return The found roots.
 	 */
+	@SuppressWarnings("ToArrayCallWithZeroLengthArrayArgument")
 	public static Complex64F[] polynomialRootsEVD(double... coefficients) {
 
-		int N = coefficients.length-1;
+		PolynomialRootFinder alg = new RootFinderCompanion();
 
-		// Companion matrix
-		DenseMatrix64F c = new DenseMatrix64F(N,N);
+		if( !alg.process(coefficients) )
+			throw new IllegalArgumentException("Algorithm failed, was the input bad?");
 
-		double a = coefficients[N];
-		for( int i = 0; i < N; i++ ) {
-			c.set(i,N-1,-coefficients[i]/a);
-		}
-		for( int i = 1; i < N; i++ ) {
-			c.set(i,i-1,1);
-		}
+		List<Complex64F> coefs = alg.getRoots();
 
-		// use generalized eigenvalue decomposition to find the roots
-		EigenDecomposition<DenseMatrix64F> evd =  DecompositionFactory.eig(N, false, false);
-
-		evd.decompose(c);
-
-		Complex64F[] roots = new Complex64F[N];
-
-		for( int i = 0; i < N; i++ ) {
-			roots[i] = evd.getEigenvalue(i);
-		}
-
-		return roots;
+		return coefs.toArray(new Complex64F[0]);
 	}
 
 	/**

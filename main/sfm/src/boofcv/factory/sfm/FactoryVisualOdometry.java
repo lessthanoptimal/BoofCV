@@ -61,7 +61,7 @@ public class FactoryVisualOdometry {
 		pixelToNormalized.compute(0,0,tempB);
 		double noise = (Math.abs(tempA.x-tempB.x) + Math.abs(tempA.y-tempB.y))/2;
 		
-		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamental(false, 7);
+		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeEssential(7);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 				
 		ModelGenerator<Se3_F64,AssociatedPair> generateEpipolarMotion =
@@ -109,7 +109,7 @@ public class FactoryVisualOdometry {
 		pixelToNormalized.compute(0,0,tempB);
 		double noise = (Math.abs(tempA.x-tempB.x) + Math.abs(tempA.y-tempB.y))/2;
 
-		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamental(false, 7);
+		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeEssential(7);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 
 		ModelGenerator<Se3_F64,AssociatedPair> generateEpipolarMotion =
