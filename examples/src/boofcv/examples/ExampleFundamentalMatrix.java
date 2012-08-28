@@ -77,8 +77,8 @@ public class ExampleFundamentalMatrix {
 	public static DenseMatrix64F robustFundamental( List<AssociatedPair> matches ,
 													List<AssociatedPair> inliers ) {
 
-		// Select which linear algorithm is to be used
-		EpipolarMatrixEstimator estimateF = FactoryEpipolar.computeFundamental(7);
+		// Select which linear algorithm is to be used.  Try playing with the number of remove ambiguity points
+		EpipolarMatrixEstimator estimateF = FactoryEpipolar.computeFundamentalOne(7, true, 20);
 		// Wrapper so that this estimator can be used by the robust estimator
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
@@ -89,7 +89,7 @@ public class ExampleFundamentalMatrix {
 		// Use RANSAC to estimate the Fundamental matrix
 		ModelMatcher<DenseMatrix64F,AssociatedPair> robustF =
 				new SimpleInlierRansac<DenseMatrix64F, AssociatedPair>(123123,generateF,errorMetric,
-						3000,7,20,-1,0.2);
+						3000,generateF.getMinimumPoints(),20,-1,0.2);
 
 		// Estimate the fundamental matrix while removing outliers
 		if( !robustF.process(matches) )
@@ -114,7 +114,7 @@ public class ExampleFundamentalMatrix {
 	 */
 	public static DenseMatrix64F simpleFundamental( List<AssociatedPair> matches ) {
 		// Use the 8-point algorithm since it will work with an arbitrary number of points
-		EpipolarMatrixEstimator estimateF = FactoryEpipolar.computeFundamental(8);
+		EpipolarMatrixEstimator estimateF = FactoryEpipolar.computeFundamentalOne(8, true, 0);
 
 		if( !estimateF.process(matches) )
 			throw new IllegalArgumentException("Failed");

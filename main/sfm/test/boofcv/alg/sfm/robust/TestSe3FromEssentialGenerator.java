@@ -3,17 +3,13 @@ package boofcv.alg.sfm.robust;
 import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.UtilEpipolar;
 import boofcv.factory.geo.FactoryEpipolar;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.HypothesisList;
-import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.geometry.RotationMatrixGenerator;
-import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
 
@@ -23,7 +19,6 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -60,7 +55,7 @@ public class TestSe3FromEssentialGenerator {
 		}
 
 		// create alg
-		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeEssential(8);
+		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(8, true, 0);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 
 		Se3FromEssentialGenerator alg = new Se3FromEssentialGenerator(essentialAlg,triangulate);

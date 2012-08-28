@@ -29,7 +29,6 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
-import org.ejml.ops.NormOps;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -230,7 +229,7 @@ public class BenchmarkStabilityFundamental {
 		app.createObservations();
 //		app.evaluateMinimal(FactoryEpipolar.computeEssential(8));
 //		app.evaluateMinimal(FactoryEpipolar.computeEssential(7));
-		app.evaluateMinimal(FactoryEpipolar.computeEssential(5));
+		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(5, true));
 
 //		app.evaluateMinimal(FactoryEpipolar.computeFundamental(8));
 
