@@ -19,7 +19,9 @@
 package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.numerics.solver.*;
+import boofcv.numerics.solver.Polynomial;
+import boofcv.numerics.solver.PolynomialFindAllRoots;
+import boofcv.numerics.solver.RootFinderCompanion;
 import boofcv.struct.FastQueue;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.Complex64F;
@@ -27,7 +29,9 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
-import org.ejml.ops.SingularOps;
+import org.ejml.ops.NormOps;
+import org.ejml.simple.SimpleMatrix;
+import org.ejml.simple.SimpleSVD;
 
 import java.util.List;
 
@@ -110,8 +114,13 @@ public class EssentialNister5 {
 		helper.setupA1(A1);
 		helper.setupA2(A2);
 
+		System.out.println("  Condition A1: "+NormOps.conditionP2(A1));
+
 		// instead of Gauss-Jordan elimination LU decomposition is used to solve the system
-		CommonOps.solve(A1,A2,C);
+//		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.pseudoInverse(true);
+//		solver.setA(A1);
+//		solver.solve(A2,C);
+		CommonOps.solve(A1, A2, C);
 
 		// construct the z-polynomial matrix.  Equations 11-14
 		helper.setDeterminantVectors(C);
@@ -119,6 +128,8 @@ public class EssentialNister5 {
 
 		if( !findRoots.process(poly) )
 			return false;
+
+		poly.print();
 
 		for( Complex64F c : findRoots.getRoots() ) {
 			if( !c.isReal() )
@@ -136,6 +147,26 @@ public class EssentialNister5 {
 			E.data[6] = x*X[6] + y*Y[6] + z*Z[6] + W[6];
 			E.data[7] = x*X[7] + y*Y[7] + z*Z[7] + W[7];
 			E.data[8] = x*X[8] + y*Y[8] + z*Z[8] + W[8];
+
+			System.out.println("  Found E: det = "+CommonOps.det(E));
+			System.out.println("          rv   = "+c);
+			System.out.println("          root = "+poly.evaluate(c.real));
+			System.out.print  ("           SV  =");
+			SimpleSVD svd = SimpleMatrix.wrap(E).svd();
+			for( int i = 0; i < 3; i++ )
+				System.out.printf(" %5.2e",svd.getSingleValue(i));
+			System.out.println();
+
+//			SimpleMatrix U = svd.getU();
+//			SimpleMatrix S = svd.getW();
+//			SimpleMatrix V = svd.getV();
+//
+//			S.set(0,0,1);
+//			S.set(1,1,1);
+//			S.set(2,2,0);
+//
+//			E.set(U.mult(S).mult(V.transpose()).getMatrix());
+
 		}
 
 		return true;
@@ -190,17 +221,30 @@ public class EssentialNister5 {
 	private void solveForXandY( double z ) {
 		this.z = z;
 
+		DenseMatrix64F A = new DenseMatrix64F(3,2);
+		DenseMatrix64F Y = new DenseMatrix64F(3,1);
+
 		// solve for x and y using the first two rows of B
-		double B11 = ((helper.K0*z + helper.K1)*z + helper.K2)*z + helper.K3;
-		double B12 = ((helper.K4*z + helper.K5)*z + helper.K6)*z + helper.K7;
-		double B13 = (((helper.K8*z + helper.K9)*z + helper.K10)*z + helper.K11)*z + helper.K12;
+		A.data[0] = ((helper.K0*z + helper.K1)*z + helper.K2)*z + helper.K3;
+		A.data[1] = ((helper.K4*z + helper.K5)*z + helper.K6)*z + helper.K7;
+		Y.data[0] = (((helper.K8*z + helper.K9)*z + helper.K10)*z + helper.K11)*z + helper.K12;
 
-		double B21 = ((helper.L0*z + helper.L1)*z + helper.L2)*z + helper.L3;
-		double B22 = ((helper.L4*z + helper.L5)*z + helper.L6)*z + helper.L7;
-		double B23 = (((helper.L8*z + helper.L9)*z + helper.L10)*z + helper.L11)*z + helper.L12;
+		A.data[2] = ((helper.L0*z + helper.L1)*z + helper.L2)*z + helper.L3;
+		A.data[3] = ((helper.L4*z + helper.L5)*z + helper.L6)*z + helper.L7;
+		Y.data[1] = (((helper.L8*z + helper.L9)*z + helper.L10)*z + helper.L11)*z + helper.L12;
 
-		y = (B13*B21 - B11*B23)/(B22*B11 - B12*B21);
-		x = -(y*B12 + B13)/B11;
+		A.data[4] = ((helper.L0*z + helper.L1)*z + helper.L2)*z + helper.L3;
+		A.data[5] = ((helper.L4*z + helper.L5)*z + helper.L6)*z + helper.L7;
+		Y.data[2] = (((helper.L8*z + helper.L9)*z + helper.L10)*z + helper.L11)*z + helper.L12;
+
+		CommonOps.scale(-1,Y);
+
+		DenseMatrix64F x = new DenseMatrix64F(2,1);
+
+		CommonOps.solve(A,Y,x);
+
+		this.x = x.get(0,0);
+		this.y = x.get(1,0);
 	}
 
 	public List<DenseMatrix64F> getSolutions() {

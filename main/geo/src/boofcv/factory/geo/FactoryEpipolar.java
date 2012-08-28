@@ -20,10 +20,7 @@ package boofcv.factory.geo;
 
 import boofcv.abst.geo.*;
 import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedDense;
-import boofcv.abst.geo.f.LeastSquaresFundamental;
-import boofcv.abst.geo.f.WrapEssentialNister5;
-import boofcv.abst.geo.f.WrapFundamentalLinear7;
-import boofcv.abst.geo.f.WrapFundamentalLinear8;
+import boofcv.abst.geo.f.*;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
 import boofcv.abst.geo.h.LeastSquaresHomography;
 import boofcv.abst.geo.h.WrapHomographyLinear;
@@ -87,43 +84,98 @@ public class FactoryEpipolar {
 
 			default:
 				throw new IllegalArgumentException("Type not supported: "+type);
-		};
+		}
 
 		return new LeastSquaresHomography(tol,maxIterations,residuals);
 	}
 
 	/**
-	 * Returns an algorithm for estimating a fundamental matrix given a set of
-	 * {@link AssociatedPair} in pixel coordinates.
+	 * <p>
+	 * Returns an algorithm for estimating a fundamental or essential matrix given a set of
+	 * {@link AssociatedPair} in pixel coordinates.  The number of hypotheses returned and minimum number of samples
+	 * is dependent on the implementation.  The ambiguity from multiple hypotheses can be resolved using other
+	 * sample points and testing additional constraints.
+	 * </p>
 	 *
-	 * @param minPoints Selects which algorithms to use.  Can be 7 or 8.
-	 * @return Fundamental algorithm.
+	 * <p>
+	 * There are more differences between these algorithms than the minimum number of sample points.  Consult
+	 * the literature for information on critical surfaces which will work or not work with each algorithm.  In
+	 * general, algorithm which require fewer samples have less issues with critical surfaces than the 8-point
+	 * algorithm.
+	 * </p>
+	 *
+	 * <p>
+	 * IMPORTANT: When estimating a fundamental matrix use pixel coordinates.  When estimating an essential matrix
+	 * use normalized image coordinates from a calibrated camera.
+	 * </p>
+	 *
+	 * <p>
+	 * IMPORTANT. The number of allowed sample points varies depending on the algorithm.  The 8 point algorithm can
+	 * process 8 or more points.  Both the 5 an 7 point algorithms require exactly 5 and 7 points exactly. In addition
+	 * the 5-point algorithm is only for the calibrated (essential) case.
+	 * </p>
+	 *
+	 * @see boofcv.alg.geo.f.EssentialNister5
+	 * @see boofcv.alg.geo.f.FundamentalLinear7
+	 * @see boofcv.alg.geo.f.FundamentalLinear8
+	 *
+	 * @param minimumSamples Selects which algorithms to use.  Can be 5, 7 or 8. See above.
+	 * @param isFundamental If true then a Fundamental matrix is estimated, otherwise false for essential matrix.
+	 * @return Fundamental or essential estimation algorithm that returns multiple hypotheses.
 	 */
-	public static EpipolarMatrixEstimatorN computeFundamental( int minPoints ) {
-		if( minPoints == 8 ) {
-//			return new WrapFundamentalLinear8(true);
-		} else {
-			return new WrapFundamentalLinear7(true);
+	public static EpipolarMatrixEstimatorN computeFundamentalMulti( int minimumSamples , boolean isFundamental ) {
+		if( minimumSamples == 8 ) {
+			return new Epipolar1toN(new WrapFundamentalLinear8(isFundamental));
+		} else if( minimumSamples == 7 ) {
+			return new WrapFundamentalLinear7(isFundamental);
+		} else if( minimumSamples == 5 ) {
+			if( isFundamental )
+				throw new IllegalArgumentException("The 5-point algorithm only generates essential matrices");
+			return new WrapEssentialNister5();
 		}
-		throw new IllegalArgumentException("Unexpected number of minimal points");
+		throw new IllegalArgumentException("No algorithm matches specified parameters");
 	}
 
 	/**
-	 * Returns an algorithm for estimating an /essential matrix given a set of
-	 * {@link AssociatedPair} in normalized image coordinates.
+	 * <p>
+	 * Similar to {@link #computeFundamentalMulti(int, boolean)}, but it returns only a single hypothesis.  If
+	 * the underlying algorithm generates multiple hypotheses they are resolved by considering additional
+	 * sample points. For example, if you are using the 7 point algorithm at least one additional sample point
+	 * is required to resolve that ambiguity.  So 8 or more sample points are now required.
+	 * </p>
 	 *
-	 * @param minPoints Selects which algorithms to use.  Can be 5, 7, or 8.
-	 * @return Fundamental algorithm.
+	 * <p>
+	 * See {@link #computeFundamentalMulti(int, boolean)} for a description of the algorithms and what 'minimumSamples'
+	 * and 'isFundamental' do.
+	 * </p>
+	 *
+	 * <p>
+	 * The 8-point algorithm already returns a single hypothesis and ignores the 'numRemoveAmbiguity' parameter.
+	 * All other algorithms require one or more points to remove ambiguity.  Understanding a bit of theory is required
+	 * to understand what a good number of points is.  If a single point is used then to select the correct answer that
+	 * point must be in the inlier set.  If more than one point, say 10, then not all of those points must be in the
+	 * inlier set,
+	 * </p>
+	 *
+	 * @see FundamentalNto1
+	 *
+	 * @param minimumSamples Selects which algorithms to use.  Can be 5, 7 or 8. See above.
+	 * @param isFundamental If true then a Fundamental matrix is estimated, otherwise false for essential matrix.
+	 * @param numRemoveAmbiguity Number of sample points used to prune hypotheses.
+	 * @return Fundamental or essential estimation algorithm that returns a single hypothesis.
 	 */
-	public static EpipolarMatrixEstimatorN computeEssential( int minPoints ) {
-		if( minPoints == 8 ) {
-//			return new WrapFundamentalLinear8(true);
-		} else if( minPoints == 7 ) {
-			return new WrapFundamentalLinear7(true);
-		} else if( minPoints == 5 ) {
-			return new WrapEssentialNister5();
+	public static EpipolarMatrixEstimator computeFundamentalOne( int minimumSamples ,
+																 boolean isFundamental ,
+																 int numRemoveAmbiguity ) {
+		if( minimumSamples == 8 ) {
+			return new WrapFundamentalLinear8(isFundamental);
+		} else {
+			if( numRemoveAmbiguity <= 0 )
+				throw new IllegalArgumentException("numRemoveAmbiguity must be greater than zero");
+
+			EpipolarMatrixEstimatorN alg = computeFundamentalMulti(minimumSamples,isFundamental);
+			return new FundamentalNto1(alg,numRemoveAmbiguity);
 		}
-		throw new IllegalArgumentException("Unexpected number of minimal points");
 	}
 
 	/**

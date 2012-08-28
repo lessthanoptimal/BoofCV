@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestFundamentalNto1 {
+public class TestEpipolar1toN {
 
 	@Test
 	public void stuff() {

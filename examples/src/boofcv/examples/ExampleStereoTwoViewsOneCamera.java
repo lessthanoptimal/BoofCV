@@ -16,20 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.f;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package boofcv.examples;
 
 /**
+ * Example demonstrating how to create a point cloud from a calibrated camera when two views of the same object
+ * have been taken.  For best results the two views should be take from about the same orientation with translation
+ * along the camera's x-axis.
+ *
  * @author Peter Abeles
  */
-public class TestFundamentalNto1 {
-
-	@Test
-	public void stuff() {
-		fail("Implement");
-	}
-
+public class ExampleStereoTwoViewsOneCamera {
 }
