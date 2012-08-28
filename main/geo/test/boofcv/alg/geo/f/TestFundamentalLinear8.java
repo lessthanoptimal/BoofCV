@@ -18,23 +18,48 @@
 
 package boofcv.alg.geo.f;
 
+import boofcv.alg.geo.AssociatedPair;
+import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestFundamentalLinear8 extends CommonFundamentalChecks {
+public class TestFundamentalLinear8 {
 
 	@Test
 	public void perfectFundamental() {
-		checkEpipolarMatrix(8,true,new FundamentalLinear8(true));
-		checkEpipolarMatrix(15,true,new FundamentalLinear8(true));
+		CommonFundamentalChecks checks = createCommonChecks(true);
+
+		checks.checkEpipolarMatrix(8,true);
+		checks.checkEpipolarMatrix(15,true);
 	}
 
 	@Test
 	public void perfectEssential() {
-		checkEpipolarMatrix(8,false,new FundamentalLinear8(false));
-		checkEpipolarMatrix(15,false,new FundamentalLinear8(false));
+		CommonFundamentalChecks checks = createCommonChecks(true);
+
+		checks.checkEpipolarMatrix(8,false);
+		checks.checkEpipolarMatrix(15,false);
+	}
+
+	private CommonFundamentalChecks createCommonChecks( final boolean isFundamental ) {
+		return new CommonFundamentalChecks() {
+			FundamentalLinear8 alg = new FundamentalLinear8(isFundamental);
+
+			@Override
+			public List<DenseMatrix64F> computeFundamental(List<AssociatedPair> pairs) {
+				assertTrue(alg.process(pairs));
+				List<DenseMatrix64F> l = new ArrayList<DenseMatrix64F>();
+				l.add(alg.getF());
+				return l;
+			}
+		};
 	}
 }

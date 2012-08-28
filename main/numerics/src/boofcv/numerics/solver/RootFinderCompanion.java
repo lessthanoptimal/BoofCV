@@ -22,17 +22,18 @@ import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.EigenDecomposition;
-import org.ejml.ops.CommonOps;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Finds the roots of a polynomial using a companion matrix and eigenvalue decomposition.
+ * Finds the roots of a polynomial using a companion matrix and eigenvalue decomposition.  Note that the companion
+ * matrix is not as stable as people think and will some times fail.  To help improve the situations the found roots
+ * are refined.
  *
  * @author Peter Abeles
  */
-public class RootFinderCompanion implements PolynomialRootFinder {
+public class RootFinderCompanion implements PolynomialFindAllRoots {
 
 	// Companion matrix
 	DenseMatrix64F c = new DenseMatrix64F(1,1);
@@ -43,30 +44,56 @@ public class RootFinderCompanion implements PolynomialRootFinder {
 	// storage for found roots
 	List<Complex64F> roots = new ArrayList<Complex64F>();
 
+	// Relative tolerance for last coefficient being zero
+	double tol = 1e-10;
+
+	public RootFinderCompanion() {
+	}
+
+	public RootFinderCompanion(double tol) {
+		this.tol = tol;
+	}
+
 	@Override
-	public boolean process(double[] coefficients) {
-		int N = coefficients.length-1;
+	public boolean process( Polynomial poly ) {
+		int N = poly.size-1;
+
+		while( poly.c[N] == 0.0 && N > 0 )
+			N--;
+
+		if( N <= 0)
+			return false;
 
 		// Companion matrix
 		if( c.numCols != N ) {
 			c.reshape(N,N);
 			c.zero();
+		} else if( evd.inputModified() ) {
+			c.zero();
 		}
 
-		double a = coefficients[N];
+		double a = poly.c[N];
 		for( int i = 0; i < N; i++ ) {
-			c.set(i,N-1,-coefficients[i]/a);
+			c.set(i,N-1,-poly.c[i]/a);
 		}
 		for( int i = 1; i < N; i++ ) {
 			c.set(i,i-1,1);
 		}
 
-		if( !evd.decompose(c) )
+		if( !evd.decompose(c) ) {
 			return false;
+		}
 
 		roots.clear();
 		for( int i = 0; i < N; i++ ) {
-			roots.add(evd.getEigenvalue(i));
+			Complex64F r = evd.getEigenvalue(i);
+
+			// increase the accuracy of real roots
+			if( r.isReal() ) {
+				r.real = PolynomialOps.refineRoot(poly,r.real,30);
+			}
+
+			roots.add(r);
 		}
 
 		return true;

@@ -329,12 +329,12 @@ public class HelperNister5 {
 	}
 
 	/**
-	 * Extracts the polynomial coeffients from det(B) where B = [K;L;M] and the columns are variables (x,y,1)
+	 * Extracts the polynomial coefficients from det(B) where B = [K;L;M] and the columns are variables (x,y,1)
 	 * see paper for a slightly less confusing description.
 	 *
 	 * polynomial = coef[0] + z*coef[1] + z^2*coef[2] + z^3*coef[3] ... etc
 	 *
-	 * @param coefs Array with 11 elements. The index corresponds to the coeffient power.
+	 * @param coefs Array with 11 elements. The index corresponds to the coefficient power.
 	 */
 	public void extractPolynomial( double coefs[] ) {
 		coefs[0] = K12*L3*M7 - K12*L7*M3 - K3*L12*M7 + K3*L7*M12 + K7*L12*M3 - K7*L3*M12;

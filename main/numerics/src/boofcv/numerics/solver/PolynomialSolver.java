@@ -20,9 +20,6 @@ package boofcv.numerics.solver;
 
 import boofcv.numerics.complex.ComplexMath;
 import org.ejml.data.Complex64F;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.factory.EigenDecomposition;
 
 import java.util.List;
 
@@ -32,6 +29,51 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PolynomialSolver {
+
+	/**
+	 * Computes the output of a polynomial function
+	 *
+	 * @param value
+	 * @param coefficients
+	 * @return
+	 */
+	public static double computePolynomial( double value , double coefficients[] ) {
+		double total = 0;
+
+		double p = 1;
+
+		for( int i = 0; i < coefficients.length; i++ ) {
+			total += coefficients[i]*p;
+			p *= value;
+		}
+
+		return total;
+	}
+
+	// TODO try using a linear search alg here
+	public static double refineRoot( double[] poly, double root , int maxIterations ) {
+
+		for( int i = 0; i < maxIterations; i++ ) {
+			double v,d = 0;
+			double p = 1;
+
+			v = poly[0];
+
+			for( int j = 1; j < poly.length; j++ ) {
+				d += j*poly[j]*p;
+				v += poly[j]*p*root;
+
+				p *= root;
+			}
+
+			if( d == 0 )
+				return root;
+
+			root -= v/d;
+		}
+
+		return root;
+	}
 
 	/**
 	 * Finds real and imaginary roots in a polynomial using the companion matrix and
@@ -44,9 +86,9 @@ public class PolynomialSolver {
 	@SuppressWarnings("ToArrayCallWithZeroLengthArrayArgument")
 	public static Complex64F[] polynomialRootsEVD(double... coefficients) {
 
-		PolynomialRootFinder alg = new RootFinderCompanion();
+		PolynomialFindAllRoots alg = new RootFinderCompanion();
 
-		if( !alg.process(coefficients) )
+		if( !alg.process( Polynomial.wrap(coefficients)) )
 			throw new IllegalArgumentException("Algorithm failed, was the input bad?");
 
 		List<Complex64F> coefs = alg.getRoots();

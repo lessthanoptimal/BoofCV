@@ -22,7 +22,8 @@ import boofcv.abst.geo.*;
 import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedDense;
 import boofcv.abst.geo.f.LeastSquaresFundamental;
 import boofcv.abst.geo.f.WrapEssentialNister5;
-import boofcv.abst.geo.f.WrapFundamentalLinear;
+import boofcv.abst.geo.f.WrapFundamentalLinear7;
+import boofcv.abst.geo.f.WrapFundamentalLinear8;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
 import boofcv.abst.geo.h.LeastSquaresHomography;
 import boofcv.abst.geo.h.WrapHomographyLinear;
@@ -98,8 +99,13 @@ public class FactoryEpipolar {
 	 * @param minPoints Selects which algorithms to use.  Can be 7 or 8.
 	 * @return Fundamental algorithm.
 	 */
-	public static EpipolarMatrixEstimator computeFundamental( int minPoints ) {
-		return new WrapFundamentalLinear(true,minPoints);
+	public static EpipolarMatrixEstimatorN computeFundamental( int minPoints ) {
+		if( minPoints == 8 ) {
+//			return new WrapFundamentalLinear8(true);
+		} else {
+			return new WrapFundamentalLinear7(true);
+		}
+		throw new IllegalArgumentException("Unexpected number of minimal points");
 	}
 
 	/**
@@ -109,11 +115,15 @@ public class FactoryEpipolar {
 	 * @param minPoints Selects which algorithms to use.  Can be 5, 7, or 8.
 	 * @return Fundamental algorithm.
 	 */
-	public static EpipolarMatrixEstimator computeEssential( int minPoints ) {
-		if( minPoints == 5 )
+	public static EpipolarMatrixEstimatorN computeEssential( int minPoints ) {
+		if( minPoints == 8 ) {
+//			return new WrapFundamentalLinear8(true);
+		} else if( minPoints == 7 ) {
+			return new WrapFundamentalLinear7(true);
+		} else if( minPoints == 5 ) {
 			return new WrapEssentialNister5();
-		else
-			return new WrapFundamentalLinear(false,minPoints);
+		}
+		throw new IllegalArgumentException("Unexpected number of minimal points");
 	}
 
 	/**

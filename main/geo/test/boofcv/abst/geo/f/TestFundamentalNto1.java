@@ -16,37 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.f;
+package boofcv.abst.geo.f;
 
-import boofcv.alg.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestEssentialNister5 extends EpipolarTestSimulation {
+public class TestFundamentalNto1 {
 
 	@Test
-	public void perfectEssential() {
-		createCommonChecks().checkEpipolarMatrix(5, false);
-	}
-
-	private CommonFundamentalChecks createCommonChecks() {
-		return new CommonFundamentalChecks() {
-			EssentialNister5 alg = new EssentialNister5();
-
-			@Override
-			public List<DenseMatrix64F> computeFundamental(List<AssociatedPair> pairs) {
-				assertTrue(alg.process(pairs));
-				return alg.getSolutions();
-			}
-		};
+	public void stuff() {
+		fail("Implement");
 	}
 }

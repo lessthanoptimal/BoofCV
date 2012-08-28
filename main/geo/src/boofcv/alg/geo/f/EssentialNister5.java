@@ -19,7 +19,7 @@
 package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.numerics.solver.RootFinderCompanion;
+import boofcv.numerics.solver.*;
 import boofcv.struct.FastQueue;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.Complex64F;
@@ -33,14 +33,19 @@ import java.util.List;
 
 /**
  * <p>
- * Finds the essential matrix given 5 or more corresponding points.  The approach is described
+ * Finds the essential matrix given exactly 5 corresponding points.  The approach is described
  * in details in [1] and works by linearlizing the problem then solving for the roots in a polynomial.  It
- * is considered one of the fastest and most stable solutions for this problem.
+ * is considered one of the fastest and most stable solutions for the 5-point problem.
  * </p>
  *
  * <p>
  * THIS IMPLEMENTATION DOES NOT CONTAIN ALL THE OPTIMIZATIONS OUTLIED IN [1].  A full implementation is
  * quite involved.
+ * </p>
+ *
+ * <p>
+ * NOTE: This solution could be generalized for an arbitrary number of points.  However, it would complicate
+ * the algorithm even more and isn't considered to be worth the effort.
  * </p>
  *
  * <p>
@@ -75,8 +80,8 @@ public class EssentialNister5 {
 	DenseMatrix64F A2 = new DenseMatrix64F(10,10);
 	DenseMatrix64F C = new DenseMatrix64F(10,10);
 
-	RootFinderCompanion polyRoot = new RootFinderCompanion();
-	double coefs[] = new double[11];
+	PolynomialFindAllRoots findRoots = new RootFinderCompanion();
+	Polynomial poly = new Polynomial(11);
 
 	// found essential matrix
 	FastQueue<DenseMatrix64F> solutions = new FastQueue<DenseMatrix64F>(11,DenseMatrix64F.class,false);
@@ -93,8 +98,9 @@ public class EssentialNister5 {
 	 * @return true for success or false if a fault has been detected
 	 */
 	public boolean process( List<AssociatedPair> points ) {
-		if( points.size() < 5 )
-			throw new IllegalArgumentException("A minimum of five points are required");
+		if( points.size() != 5 )
+			throw new IllegalArgumentException("Exactly 5 points are required, not "+points.size());
+		solutions.reset();
 
 		// Computes the 4-vector span which contains E.  See equations 7-9
 		computeSpan(points);
@@ -109,18 +115,16 @@ public class EssentialNister5 {
 
 		// construct the z-polynomial matrix.  Equations 11-14
 		helper.setDeterminantVectors(C);
-		helper.extractPolynomial(coefs);
+		helper.extractPolynomial(poly.getCoefficients());
 
-		// Solve for the polynomial roots
-		if( !polyRoot.process(coefs) )
-			throw new RuntimeException("Something went really wrong for polynomial finder to fail");
+		if( !findRoots.process(poly) )
+			return false;
 
-		// compute solutions from real roots
-		solutions.reset();
-		for(Complex64F root : polyRoot.getRoots()) {
-			if( !root.isReal() )
+		for( Complex64F c : findRoots.getRoots() ) {
+			if( !c.isReal() )
 				continue;
-			solveForXandY(z);
+
+			solveForXandY(c.real);
 
 			DenseMatrix64F E = solutions.pop();
 			E.data[0] = x*X[0] + y*Y[0] + z*Z[0] + W[0];
@@ -169,14 +173,9 @@ public class EssentialNister5 {
 
 		svd.getV(V,true);
 
-		// Order singular values if needed
-		if( points.size() > 5 ) {
-			double s[] = svd.getSingularValues();
-			svd.getV(V,true);
-			SingularOps.descendingOrder(null,false,s,svd.numberOfSingularValues(),V,true);
-		}
+		System.out.println(" DET V = "+CommonOps.det(V));
 
-		// extract the span of solutions for E
+		// extract the span of solutions for E from the null space
 		for( int i = 0; i < 9; i++ ) {
 			X[i] = V.unsafe_get(5,i);
 			Y[i] = V.unsafe_get(6,i);
@@ -192,13 +191,13 @@ public class EssentialNister5 {
 		this.z = z;
 
 		// solve for x and y using the first two rows of B
-		double B11 = helper.K0*z*z*z + helper.K1*z*z + helper.K2*z + helper.K3;
-		double B12 = helper.K4*z*z*z + helper.K5*z*z + helper.K6*z + helper.K7;
-		double B13 = helper.K8*z*z*z*z + helper.K9*z*z*z + helper.K10*z*z + helper.K11*z + helper.K12;
+		double B11 = ((helper.K0*z + helper.K1)*z + helper.K2)*z + helper.K3;
+		double B12 = ((helper.K4*z + helper.K5)*z + helper.K6)*z + helper.K7;
+		double B13 = (((helper.K8*z + helper.K9)*z + helper.K10)*z + helper.K11)*z + helper.K12;
 
-		double B21 = helper.L0*z*z*z + helper.L1*z*z + helper.L2*z + helper.L3;
-		double B22 = helper.L4*z*z*z + helper.L5*z*z + helper.L6*z + helper.L7;
-		double B23 = helper.L8*z*z*z*z + helper.L9*z*z*z + helper.L10*z*z + helper.L11*z + helper.L12;
+		double B21 = ((helper.L0*z + helper.L1)*z + helper.L2)*z + helper.L3;
+		double B22 = ((helper.L4*z + helper.L5)*z + helper.L6)*z + helper.L7;
+		double B23 = (((helper.L8*z + helper.L9)*z + helper.L10)*z + helper.L11)*z + helper.L12;
 
 		y = (B13*B21 - B11*B23)/(B22*B11 - B12*B21);
 		x = -(y*B12 + B13)/B11;

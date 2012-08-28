@@ -27,25 +27,15 @@ import org.ejml.data.DenseMatrix64F;
 import java.util.List;
 
 /**
- * Wrapper around either {@link FundamentalLinear8} or {@link FundamentalLinear7}
- * for {@link boofcv.abst.geo.EpipolarMatrixEstimator}.
+ * Wrapper around either {@link FundamentalLinear8} for {@link boofcv.abst.geo.EpipolarMatrixEstimator}.
  * 
  * @author Peter Abeles
  */
-public class WrapFundamentalLinear implements EpipolarMatrixEstimator {
+public class WrapFundamentalLinear8 implements EpipolarMatrixEstimator {
 	FundamentalLinear8 alg;
-	int minPoints;
 
-	public WrapFundamentalLinear( boolean fundamental , int minPoints ) {
-		if( minPoints == 8 ) {
-			alg = new FundamentalLinear8(fundamental);
-		} else if( minPoints == 7 ) {
-			alg = new FundamentalLinear7(fundamental);
-		} else {
-			throw new IllegalArgumentException("minPoints must be 7 or 8");
-		}
-
-		this.minPoints = minPoints;
+	public WrapFundamentalLinear8(boolean fundamental ) {
+		alg = new FundamentalLinear8(fundamental);
 	}
 
 	@Override
@@ -60,6 +50,6 @@ public class WrapFundamentalLinear implements EpipolarMatrixEstimator {
 
 	@Override
 	public int getMinimumPoints() {
-		return minPoints;
+		return 8;
 	}
 }
