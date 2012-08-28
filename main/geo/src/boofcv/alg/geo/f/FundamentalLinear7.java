@@ -20,7 +20,8 @@ package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.UtilEpipolar;
-import boofcv.numerics.solver.PolynomialSolver;
+import boofcv.numerics.solver.*;
+import boofcv.struct.FastQueue;
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -31,8 +32,9 @@ import java.util.List;
 
 /**
  * <p>
- * Computes the essential or fundamental matrix using 7 points with linear algebra.  The number of required points
- * is reduced from 8 to 7 by enforcing the singularity constraint, det(F) = 0.
+ * Computes the essential or fundamental matrix using exactly 7 points with linear algebra.  The number of required points
+ * is reduced from 8 to 7 by enforcing the singularity constraint, det(F) = 0.  The number of solutions found is
+ * either one or three depending on the number of real roots found in the quadratic.
  * </p>
  *
  * <p>
@@ -49,14 +51,18 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FundamentalLinear7 extends FundamentalLinear8 {
+public class FundamentalLinear7 extends FundamentalLinear {
 
 	// extracted from the null space of A
 	protected DenseMatrix64F F1 = new DenseMatrix64F(3,3);
 	protected DenseMatrix64F F2 = new DenseMatrix64F(3,3);
 
 	// temporary storage for cubic coefficients
-	private double[] coefs = new double[4];
+	private Polynomial poly = new Polynomial(4);
+	PolynomialFindAllRoots rootFinger = new RootFinderCompanion();
+
+	// where the found solutions are stored
+	FastQueue<DenseMatrix64F> solutions;
 
 	/**
 	 * When computing the essential matrix normalization is optional because pixel coordinates
@@ -65,6 +71,10 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 	 */
 	public FundamentalLinear7(boolean computeFundamental) {
 		super(computeFundamental);
+
+		solutions = new FastQueue<DenseMatrix64F>(3,DenseMatrix64F.class,false);
+		for( int i = 0; i < 3; i++)
+			solutions.data[i] = new DenseMatrix64F(3,3);
 	}
 
 	/**
@@ -76,10 +86,12 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 	 *               normalized coordinates for essential matrix.
 	 * @return true If successful or false if it failed
 	 */
-	@Override
 	public boolean process( List<AssociatedPair> points ) {
 		if( points.size() != 7 )
 			throw new IllegalArgumentException("Must be exactly 7 points. Not "+points.size()+" you gelatinous piece of pond scum.");
+
+		// reset data structures
+		solutions.reset();
 
 		// must normalize for when points are in either pixel or calibrated units
 		UtilEpipolar.computeNormalization(N1, N2, points);
@@ -93,25 +105,28 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 		undoNormalizationF(F1,N1,N2);
 		undoNormalizationF(F2,N1,N2);
 
-		// enforce the zero determinant constraint and computing weighting
-		// factor between F1 and F2
-		double alpha = enforceZeroDeterminant(F1,F2,coefs);
-		CommonOps.scale(alpha,F1);
-		CommonOps.scale(1-alpha,F2);
-		CommonOps.add(F1,F2,F);
+		// compute polynomial coefficients
+		computeCoefficients(F1, F2, poly.c);
 
-		// enforce final constraints and normalize to canonical scale
-		if( computeFundamental)
-			return projectOntoFundamentalSpace(F);
-		else
-			return projectOntoEssential(F);
+		// Find polynomial roots and solve for Fundamental matrices
+		computeSolutions();
+
+		return true;
+	}
+
+	/**
+	 * Set of found solutions.  Will be one or three.
+	 *
+	 * @return Solutions.
+	 */
+	public List<DenseMatrix64F> getSolutions() {
+		return solutions.toList();
 	}
 
 	/**
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
-	@Override
-	protected boolean process(DenseMatrix64F A) {
+	private boolean process(DenseMatrix64F A) {
 		if( !svd.decompose(A) )
 			return true;
 
@@ -125,43 +140,48 @@ public class FundamentalLinear7 extends FundamentalLinear8 {
 
 	/**
 	 * <p>
+	 * Find the polynomial roots and for each root compute the Fundamental matrix.
 	 * Given the two matrices it will compute an alpha such that the determinant is zero.<br>
 	 *
 	 * det(&alpha*F1 + (1-&alpha;)*F2 ) = 0
 	 * </p>
-	 *
-	 * @param F1 a matrix
-	 * @param F2 a matrix
-	 * @param coefs double array of length 4.  used for temporary storage
-	 * @return alpha
+
 	 */
-	public static double enforceZeroDeterminant( DenseMatrix64F F1 ,
-												 DenseMatrix64F F2 ,
-												 double coefs[] )
+	public void computeSolutions()
 	{
-		computeCoefficients(F1,F2,coefs);
+		if( !rootFinger.process(poly))
+			return;
 
-		// using a specialized algorithm is faster, but this implementation is less numerically stable
-//		double alpha =  PolynomialSolver.cubicRootReal(coefs[0],coefs[1],coefs[2],coefs[3]);
+		List<Complex64F> zeros = rootFinger.getRoots();
 
-		Complex64F[] zeros = PolynomialSolver.polynomialRootsEVD(coefs);
+		for( Complex64F c : zeros ) {
+			if( !c.isReal() && Math.abs(c.imaginary) > 1e-10 )
+				continue;
 
-//		// not because its the biggest
-		double alpha = zeros[0].real;
-		double minImaginary = Math.abs(zeros[0].imaginary);
-		for( int i = 1; i < zeros.length; i++ ) {
-			double img = Math.abs(zeros[i].imaginary);
-			if( img < minImaginary ) {
-				minImaginary = img;
-				alpha = zeros[i].getReal();
+			DenseMatrix64F F = solutions.pop();
+
+			double a = c.real;
+			double b = 1-c.real;
+
+			for( int i = 0; i < 9; i++ ) {
+				F.data[i] = a*F1.data[i] + b*F2.data[i];
 			}
+
+			// Well these procedures might improve the quality of the result, but aren't strictly necessary
+			// since the singularity constraints has already been applied
+//			if( computeFundamental) {
+//				if( !projectOntoFundamentalSpace(F) )
+//					solutions.removeTail();
+//			} else {
+//				if( !projectOntoEssential(F) )
+//					solutions.removeTail();
+//			}
 		}
-		return alpha;
 	}
 
 	/**
 	 * <p>
-	 * Computes the coefficients such that the following is true:
+	 * Computes the coefficients such that the following is true:<br>
 	 *
 	 * det(&alpha*F1 + (1-&alpha;)*F2 ) = c<sub>0</sub> + c<sub>1</sub>*&alpha; + c<sub>2</sub>*&alpha;<sup>2</sup>  + c<sub>2</sub>*&alpha;<sup>3</sup><br>
 	 * </p>

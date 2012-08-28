@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFundamentalResidualSampson extends CommonFundamentalChecks {
+public class TestFundamentalResidualSampson extends EpipolarTestSimulation {
 
 	/**
 	 * First check to see if the error is very low for perfect parameters.  Then

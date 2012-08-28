@@ -24,11 +24,12 @@ import org.ejml.data.DenseMatrix64F;
 import java.util.List;
 
 /**
- * Interface for computing the fundamental, essential, homography matrix given a set of associated pairs.
+ * Interface for computing fundamental, essential, or homography matrix given a set of associated pairs. Returns
+ * a list of solutions.
  *
  * @author Peter Abeles
  */
-public interface EpipolarMatrixEstimator {
+public interface EpipolarMatrixEstimatorN {
 
 	/**
 	 * Estimates the epipolar matrix given a set of observations.
@@ -36,14 +37,14 @@ public interface EpipolarMatrixEstimator {
 	 * @param points Observations. Pixel if fundamental and normalized if essential.
 	 * @return true if successful
 	 */
-	public boolean process( List<AssociatedPair> points );
+	public boolean process(List<AssociatedPair> points);
 
 	/**
-	 * Estimated epipolar 3x3 matrix.
+	 * Set of estimated 3x3 epipolar matrices.
 	 *
-	 * @return Estimated matrix.
+	 * @return Estimated matrices.
 	 */
-	public DenseMatrix64F getEpipolarMatrix();
+	public List<DenseMatrix64F> getSolutions();
 
 	/**
 	 * Minimum number of points required to estimate the fundamental matrix.

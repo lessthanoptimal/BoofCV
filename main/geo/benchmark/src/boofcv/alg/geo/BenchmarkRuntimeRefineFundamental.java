@@ -69,20 +69,20 @@ public class BenchmarkRuntimeRefineFundamental extends ArtificialStereoScene{
 
 		init(NUM_POINTS,FUNDAMENTAL,false);
 
-		EpipolarMatrixEstimator computeAlg =
-				FUNDAMENTAL ? FactoryEpipolar.computeFundamental(8) : FactoryEpipolar.computeEssential(8);
-		computeAlg.process(pairs);
-		initialF = computeAlg.getEpipolarMatrix();
-		initialF.data[0] += 0.1;
-		initialF.data[4] -= 0.15;
-		initialF.data[7] -= 0.2;
-
-		ProfileOperation.printOpsPerSec(new Refine("LS Sampson",refineFundamental(tol, MAX_ITER, EpipolarError.SAMPSON)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Refine("LS Simple",refineFundamental(tol, MAX_ITER, EpipolarError.SIMPLE)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Refine("QN Sampson",new QuasiNewtonFundamentalSampson(tol,MAX_ITER)), TEST_TIME);
-
-		System.out.println();
-		System.out.println("Done");
+//		EpipolarMatrixEstimator computeAlg =
+//				FUNDAMENTAL ? FactoryEpipolar.computeFundamental(8) : FactoryEpipolar.computeEssential(8);
+//		computeAlg.process(pairs);
+//		initialF = computeAlg.getEpipolarMatrix();
+//		initialF.data[0] += 0.1;
+//		initialF.data[4] -= 0.15;
+//		initialF.data[7] -= 0.2;
+//
+//		ProfileOperation.printOpsPerSec(new Refine("LS Sampson",refineFundamental(tol, MAX_ITER, EpipolarError.SAMPSON)), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Refine("LS Simple",refineFundamental(tol, MAX_ITER, EpipolarError.SIMPLE)), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Refine("QN Sampson",new QuasiNewtonFundamentalSampson(tol,MAX_ITER)), TEST_TIME);
+//
+//		System.out.println();
+//		System.out.println("Done");
 	}
 	
 	public static void main( String args[] ) {

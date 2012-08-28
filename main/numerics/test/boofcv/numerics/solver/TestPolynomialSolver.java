@@ -25,13 +25,13 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestPolynomialSolver {
     public static Random rand = new Random(234234);
-
 
 	/**
 	 * Provide a simple test case where one of the roots should be real

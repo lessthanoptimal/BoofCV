@@ -25,6 +25,15 @@ Version : Alpha 0.10
 - Visualization Apps
   * VisualizeAssociationScoreApp has score type in a separate panel and can support binary descriptors
 - WrapFHtoInterestPoint now returns the correct detection radius
+- Fundamental/Essential Matrix
+  * 7-point algorithm now returns all solutions and the algorithm was tweaked
+  * Nister 5-pt Essential Matrix
+  * Abstractions which can handle multiple solutions
+  * Stability evaluator for epipolar matrices
+  * Improved unit tests
+- Polynomials
+  * Various ways to find and polish polynomial roots
+  * New data type and basic operations
 
 ---------------------------------------------
 Date    : 2012/7/22

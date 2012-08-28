@@ -23,24 +23,22 @@ import org.ejml.data.Complex64F;
 import java.util.List;
 
 /**
- * Interface for finding the roots of a polynomial.
+ * Interface for finding the roots of a polynomial. Supports both real and imaginary roots.  Exact behavior is
+ * implementation specific.
  *
  * @author Peter Abeles
  */
-public interface PolynomialRootFinder {
+public interface PolynomialFindAllRoots {
 
 	/**
 	 * <p>
-	 * Finds the roots of a polynomial with the specified coefficients.  The coefficient's index is the
-	 * same as the variables order:<br>
-	 * <br>
-	 * polynomial = c[0] + x*c[1] + x<sup>2</sup>*c[2] + ... + x<sup>n</sup>*c[n]
+	 * Finds the roots of the provided polynomial.
 	 * </p>
 	 *
-	 * @param coefficients Polynomial coefficients in increasing order.
+	 * @param poly Polynomial being considered.  Not modified.
 	 * @return true if successful.
 	 */
-	public boolean process( double []coefficients );
+	public boolean process( Polynomial poly );
 
 	/**
 	 * Returns all the found roots of the polynomial.

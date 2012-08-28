@@ -18,40 +18,46 @@
 
 package boofcv.alg.geo.f;
 
+import boofcv.alg.geo.AssociatedPair;
+import boofcv.numerics.solver.Polynomial;
+import org.ejml.data.DenseMatrix64F;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestFundamentalLinear7 extends CommonFundamentalChecks{
+public class TestFundamentalLinear7 {
+
+	Random rand = new Random(234);
 
 	@Test
 	public void perfectFundamental() {
-		checkEpipolarMatrix(7,true,new FundamentalLinear7(true));
+		createCommonChecks(true).checkEpipolarMatrix(7, true);
 	}
 
 	@Test
 	public void perfectEssential() {
-		checkEpipolarMatrix(7,false,new FundamentalLinear7(false));
+		createCommonChecks(false).checkEpipolarMatrix(7, false);
 	}
 
-	@Test
-	public void enforceZeroDeterminant() {
-		for( int i = 0; i < 20; i++ ) {
-			SimpleMatrix F1 = SimpleMatrix.random(3, 3, 0.1, 2, rand);
-			SimpleMatrix F2 = SimpleMatrix.random(3, 3, 0.1, 2, rand);
+	private CommonFundamentalChecks createCommonChecks( final boolean isFundamental ) {
+		return new CommonFundamentalChecks() {
+			FundamentalLinear7 alg = new FundamentalLinear7(isFundamental);
 
-			double alpha = FundamentalLinear7.enforceZeroDeterminant(F1.getMatrix(),F2.getMatrix(),new double[4]);
-
-			SimpleMatrix F = F1.scale(alpha).plus(F2.scale(1 - alpha));
-
-//			System.out.println("det = "+F.determinant()+"  F1 = "+F1.determinant());
-
-			assertEquals(0, F.determinant(), 1e-8);
-		}
+			@Override
+			public List<DenseMatrix64F> computeFundamental(List<AssociatedPair> pairs) {
+				assertTrue(alg.process(pairs));
+				return alg.getSolutions();
+			}
+		};
 	}
 
 	@Test
@@ -70,4 +76,5 @@ public class TestFundamentalLinear7 extends CommonFundamentalChecks{
 
 		assertEquals(expected,found,1e-8);
 	}
+
 }

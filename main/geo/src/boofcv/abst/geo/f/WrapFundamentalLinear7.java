@@ -16,39 +16,41 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo;
+package boofcv.abst.geo.f;
 
+import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.EpipolarMatrixEstimatorN;
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.alg.geo.f.FundamentalLinear7;
+import boofcv.alg.geo.f.FundamentalLinear8;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
 
 /**
- * Interface for computing the fundamental, essential, homography matrix given a set of associated pairs.
+ * Wrapper around either {@link boofcv.alg.geo.f.FundamentalLinear7} for {@link boofcv.abst.geo.EpipolarMatrixEstimator}.
  *
  * @author Peter Abeles
  */
-public interface EpipolarMatrixEstimator {
+public class WrapFundamentalLinear7 implements EpipolarMatrixEstimatorN {
+	FundamentalLinear7 alg;
 
-	/**
-	 * Estimates the epipolar matrix given a set of observations.
-	 *
-	 * @param points Observations. Pixel if fundamental and normalized if essential.
-	 * @return true if successful
-	 */
-	public boolean process( List<AssociatedPair> points );
+	public WrapFundamentalLinear7(boolean fundamental) {
+		alg = new FundamentalLinear7(fundamental);
+	}
 
-	/**
-	 * Estimated epipolar 3x3 matrix.
-	 *
-	 * @return Estimated matrix.
-	 */
-	public DenseMatrix64F getEpipolarMatrix();
+	@Override
+	public boolean process(List<AssociatedPair> points) {
+		return alg.process(points);
+	}
 
-	/**
-	 * Minimum number of points required to estimate the fundamental matrix.
-	 *
-	 * @return number of points.
-	 */
-	public int getMinimumPoints();
+	@Override
+	public List<DenseMatrix64F> getSolutions() {
+		return alg.getSolutions();
+	}
+
+	@Override
+	public int getMinimumPoints() {
+		return 7;
+	}
 }

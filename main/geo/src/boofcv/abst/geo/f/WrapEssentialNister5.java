@@ -18,19 +18,25 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.EpipolarMatrixEstimatorN;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.f.EssentialNister5;
+import boofcv.alg.geo.f.FundamentalLinear7;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
 
 /**
+ * Wrapper around either {@link boofcv.alg.geo.f.EssentialNister5} for {@link boofcv.abst.geo.EpipolarMatrixEstimator}.
+ *
  * @author Peter Abeles
  */
-public class WrapEssentialNister5 implements EpipolarMatrixEstimator {
+public class WrapEssentialNister5 implements EpipolarMatrixEstimatorN {
+	EssentialNister5 alg;
 
-	EssentialNister5 alg = new EssentialNister5();
+	public WrapEssentialNister5() {
+		alg = new EssentialNister5();
+	}
 
 	@Override
 	public boolean process(List<AssociatedPair> points) {
@@ -38,8 +44,8 @@ public class WrapEssentialNister5 implements EpipolarMatrixEstimator {
 	}
 
 	@Override
-	public DenseMatrix64F getEpipolarMatrix() {
-		return alg.getSolutions().get(0);
+	public List<DenseMatrix64F> getSolutions() {
+		return alg.getSolutions();
 	}
 
 	@Override

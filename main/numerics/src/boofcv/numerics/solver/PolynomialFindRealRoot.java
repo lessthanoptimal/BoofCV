@@ -16,22 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.f;
-
-import boofcv.abst.geo.GeneralTestRefineFundamental;
-import boofcv.abst.geo.RefineEpipolarMatrix;
-import boofcv.alg.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
-
-import java.util.List;
+package boofcv.numerics.solver;
 
 /**
+ * Searches for a real root.
+ *
  * @author Peter Abeles
  */
-public class TestLeastSquaresFundamental extends GeneralTestRefineFundamental {
+public interface PolynomialFindRealRoot {
 
-	@Override
-	public RefineEpipolarMatrix createAlgorithm() {
-		return new LeastSquaresFundamental(1e-16,200,false);
-	}
+	public boolean compute( Polynomial poly );
+
+	public double getRoot();
+
+	public boolean hasRealRoots();
+
+
 }

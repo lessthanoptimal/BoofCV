@@ -19,7 +19,7 @@
 package boofcv.abst.geo;
 
 import boofcv.alg.geo.UtilEpipolar;
-import boofcv.alg.geo.f.CommonFundamentalChecks;
+import boofcv.alg.geo.f.EpipolarTestSimulation;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralTestRefineFundamental extends CommonFundamentalChecks {
+public abstract class GeneralTestRefineFundamental extends EpipolarTestSimulation {
 
 
 	public abstract RefineEpipolarMatrix createAlgorithm();
