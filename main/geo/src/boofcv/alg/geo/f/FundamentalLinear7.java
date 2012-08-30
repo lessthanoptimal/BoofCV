@@ -20,11 +20,12 @@ package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.UtilEpipolar;
-import boofcv.numerics.solver.*;
+import boofcv.numerics.solver.Polynomial;
+import boofcv.numerics.solver.PolynomialRoots;
+import boofcv.numerics.solver.impl.RootFinderCompanion;
 import boofcv.struct.FastQueue;
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
 import org.ejml.ops.SpecializedOps;
 
 import java.util.Arrays;
@@ -59,7 +60,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 
 	// temporary storage for cubic coefficients
 	private Polynomial poly = new Polynomial(4);
-	PolynomialFindAllRoots rootFinger = new RootFinderCompanion();
+	PolynomialRoots rootFinger = new RootFinderCompanion();
 
 	// where the found solutions are stored
 	FastQueue<DenseMatrix64F> solutions;

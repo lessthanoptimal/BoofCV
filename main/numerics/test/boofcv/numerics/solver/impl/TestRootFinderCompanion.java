@@ -16,42 +16,51 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.solver;
+package boofcv.numerics.solver.impl;
 
+import boofcv.numerics.solver.Polynomial;
+import boofcv.numerics.solver.PolynomialOps;
+import boofcv.numerics.solver.PolynomialRoots;
 import org.ejml.data.Complex64F;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestRootFinderCompanion {
 
+	Random rand = new Random(234);
+
 	@Test
 	public void basicTest() {
-//		double coefs[] = new double[]{4,3,2,1};
-//		double coefs[] = new double[]{-1.322309e+02 , 3.713984e+02 , -5.007874e+02 , 3.744386e+02 ,-1.714667e+02  , 4.865014e+01 ,-1.059870e+01  ,  1.642273e+00 ,-2.304341e-01,2.112391e-03,-2.273737e-13 };
-//
-//		PolynomialFindAllRoots alg = new RootFinderCompanion();
-//
-//		assertTrue(alg.process(coefs,coefs.length));
-//
-//		List<Complex64F> roots = alg.getRoots();
-//
-//		int numReal = 0;
-//		for( Complex64F c : roots ) {
-//			if( c.isReal() ) {
-//				assertEquals(0,PolynomialSolver.computePolynomial(c.real,coefs),1e-8);
-//				numReal++;
-//			}
-//		}
-//
-//		assertTrue(numReal>0);
-		fail("Implement again");
+		for( int numCoef = 2; numCoef < 6; numCoef++ ) {
+			Polynomial poly = new Polynomial(numCoef);
+			for( int i = 0; i < numCoef; i++ ) {
+				poly.c[i] = 10*(rand.nextDouble()-0.5);
+			}
+
+			PolynomialRoots alg = new RootFinderCompanion();
+
+			assertTrue(alg.process(poly));
+
+			List<Complex64F> roots = alg.getRoots();
+
+			int numReal = 0;
+			for( Complex64F c : roots ) {
+				if( c.isReal() ) {
+					assertEquals(0,poly.evaluate(c.real),1e-8);
+					numReal++;
+				}
+			}
+
+			int expectedRoots = PolynomialOps.countRealRoots(poly);
+			assertTrue(numReal==expectedRoots);
+		}
 	}
 }

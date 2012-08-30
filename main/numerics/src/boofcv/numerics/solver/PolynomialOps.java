@@ -1,4 +1,27 @@
+/*
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.numerics.solver;
+
+import boofcv.numerics.solver.impl.FindRealRootsSturm;
+import boofcv.numerics.solver.impl.RootFinderCompanion;
+import boofcv.numerics.solver.impl.SturmSequence;
+import boofcv.numerics.solver.impl.WrapRealRootsSturm;
 
 /**
  * @author Peter Abeles
@@ -24,19 +47,6 @@ public class PolynomialOps {
 		for( int i = 1; i < poly.size; i++ ) {
 			deriv.c[i-1] = poly.c[i]*i;
 		}
-	}
-
-
-	public static double findRealRoot( Polynomial poly , double searchSize ) throws RuntimeException {
-		PolynomialFindRealRoot alg = new FindRealRootSturm(poly.size,searchSize,1e-13,300);
-
-		if( !alg.compute(poly) )
-			if( alg.hasRealRoots() )
-				throw new RuntimeException("Can't find root, increase search radius");
-			else
-				throw new RuntimeException("This function has no real roots");
-
-		return alg.getRoot();
 	}
 
 	// TODO try using a linear search alg here
@@ -110,6 +120,26 @@ public class PolynomialOps {
 
 		// The remainder can't be larger than the denominator
 		remainder.size = nd;
+	}
+
+	public static int countRealRoots( Polynomial poly ) {
+		SturmSequence sturm = new SturmSequence(poly.size);
+
+		sturm.initialize(poly);
+
+		return sturm.countRealRoots(Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY);
+	}
+
+	public static PolynomialRoots createRootFinder( int maxCoefficients , int which ) {
+		switch( which ) {
+			case 0:
+				FindRealRootsSturm sturm = new FindRealRootsSturm(maxCoefficients,Double.POSITIVE_INFINITY,1e-10,200);
+				return new WrapRealRootsSturm(sturm);
+
+			case 1:
+				return new RootFinderCompanion();
+		}
+		throw new RuntimeException("Unknown algorithm");
 	}
 
 }

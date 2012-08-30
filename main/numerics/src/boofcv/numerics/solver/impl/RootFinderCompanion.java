@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.solver;
+package boofcv.numerics.solver.impl;
 
+import boofcv.numerics.solver.Polynomial;
+import boofcv.numerics.solver.PolynomialOps;
+import boofcv.numerics.solver.PolynomialRoots;
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
@@ -33,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RootFinderCompanion implements PolynomialFindAllRoots {
+public class RootFinderCompanion implements PolynomialRoots {
 
 	// Companion matrix
 	DenseMatrix64F c = new DenseMatrix64F(1,1);
@@ -90,7 +93,7 @@ public class RootFinderCompanion implements PolynomialFindAllRoots {
 
 			// increase the accuracy of real roots
 			if( r.isReal() ) {
-				r.real = PolynomialOps.refineRoot(poly,r.real,30);
+				r.real = PolynomialOps.refineRoot(poly, r.real, 30);
 			}
 
 			roots.add(r);

@@ -46,14 +46,19 @@ public class Polynomial {
 
 		if( size == 0 ) {
 			return 0;
+		} else if( size() == 1 ) {
+			return c[0];
 		} else if( Double.isInfinite(variable)) {
-			// for infinity only the largest power needs to be evaluated
-			if( size <= 1 )
-				return c[0];
-			else if( size%2 == 1 )
-				return Double.POSITIVE_INFINITY;
-			else
-				return variable;
+
+			// Only the largest power with a non-zero coefficient needs to be evaluated
+			int degree = computeDegree();
+			if( degree%2 == 0 )
+				variable = Double.POSITIVE_INFINITY;
+
+			if( c[degree] < 0 )
+				variable = variable == Double.POSITIVE_INFINITY ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+
+			return variable;
 		}
 
 		// Evaluate using Horner's Method.
@@ -97,10 +102,10 @@ public class Polynomial {
 	 */
 	public int computeDegree() {
 		for( int i = size-1; i >= 0; i-- ) {
-			if( c[i] != i )
+			if( c[i] != 0.0 )
 				return i;
 		}
-		return 0;
+		return -1;
 	}
 
 	public boolean isIdentical( Polynomial p , double tol ) {
