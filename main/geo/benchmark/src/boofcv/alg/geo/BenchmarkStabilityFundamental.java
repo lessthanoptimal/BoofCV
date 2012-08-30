@@ -58,7 +58,7 @@ public class BenchmarkStabilityFundamental {
 	protected Se3_F64 motion;
 
 	// are observations in pixels or normalized image coordinates
-	boolean isPixels = false;
+	public static boolean isPixels = false;
 
 	List<Double> scores;
 
@@ -180,7 +180,7 @@ public class BenchmarkStabilityFundamental {
 				scores.add(score);
 				totalScore += score;
 			}
-			System.out.println("  score = "+totalScore);
+			System.out.println("  score["+i+"] = "+totalScore);
 //			if( totalScore > 1 )
 //				System.out.println("Crap");
 		}
@@ -227,9 +227,9 @@ public class BenchmarkStabilityFundamental {
 //		app.createScenePlane();
 		app.motionTranslate();
 		app.createObservations();
-//		app.evaluateMinimal(FactoryEpipolar.computeEssential(8));
-//		app.evaluateMinimal(FactoryEpipolar.computeEssential(7));
-		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(5, true));
+//		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(8, isPixels));
+//		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(7, isPixels));
+		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(5, isPixels));
 
 //		app.evaluateMinimal(FactoryEpipolar.computeFundamental(8));
 

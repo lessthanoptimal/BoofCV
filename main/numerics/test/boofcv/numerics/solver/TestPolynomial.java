@@ -21,6 +21,7 @@ package boofcv.numerics.solver;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -38,8 +39,12 @@ public class TestPolynomial {
 		assertEquals(2, Polynomial.wrap(2).evaluate(Double.POSITIVE_INFINITY), 1e-8);
 		assertEquals(Double.POSITIVE_INFINITY,Polynomial.wrap(2,3).evaluate(Double.POSITIVE_INFINITY),1e-8);
 		assertEquals(Double.POSITIVE_INFINITY,Polynomial.wrap(2,3,5).evaluate(Double.POSITIVE_INFINITY),1e-8);
+		assertEquals(Double.NEGATIVE_INFINITY,Polynomial.wrap(-2,-3).evaluate(Double.POSITIVE_INFINITY),1e-8);
+		assertEquals(Double.NEGATIVE_INFINITY,Polynomial.wrap(-2,-3,-5).evaluate(Double.POSITIVE_INFINITY),1e-8);
 		assertEquals(Double.NEGATIVE_INFINITY,Polynomial.wrap(2,3).evaluate(Double.NEGATIVE_INFINITY),1e-8);
 		assertEquals(Double.POSITIVE_INFINITY,Polynomial.wrap(2,3,5).evaluate(Double.NEGATIVE_INFINITY),1e-8);
+		assertEquals(Double.POSITIVE_INFINITY,Polynomial.wrap(-2,-3).evaluate(Double.NEGATIVE_INFINITY),1e-8);
+		assertEquals(Double.NEGATIVE_INFINITY,Polynomial.wrap(-2,-3,-5).evaluate(Double.NEGATIVE_INFINITY),1e-8);
 		assertEquals(Double.POSITIVE_INFINITY,Polynomial.wrap(2,3,0,0).evaluate(Double.POSITIVE_INFINITY),1e-8);
 		assertEquals(Double.NEGATIVE_INFINITY,Polynomial.wrap(2,3,0,0).evaluate(Double.NEGATIVE_INFINITY),1e-8);
 
@@ -51,5 +56,25 @@ public class TestPolynomial {
 		p.c[4] = 7;
 
 		assertEquals(8,p.evaluate(2),1e-8);
+	}
+
+	@Test
+	public void degree() {
+		fail("Implement");
+	}
+
+	@Test
+	public void setTo() {
+		fail("Implement");
+	}
+
+	@Test
+	public void resize() {
+		fail("Implement");
+	}
+
+	@Test
+	public void identical() {
+		fail("Implement");
 	}
 }

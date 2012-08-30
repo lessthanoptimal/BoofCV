@@ -16,20 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.solver;
+package boofcv.numerics.solver.impl;
+
+import boofcv.numerics.solver.GeneralPolynomialRootReal;
+import boofcv.numerics.solver.Polynomial;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Searches for a real root.
- *
  * @author Peter Abeles
  */
-public interface PolynomialFindRealRoot {
-
-	public boolean compute( Polynomial poly );
-
-	public double getRoot();
-
-	public boolean hasRealRoots();
+public class TestFindRealRootsSturm extends GeneralPolynomialRootReal {
 
 
+	@Override
+	public List<Double> computeRealRoots(Polynomial poly) {
+		FindRealRootsSturm alg = new FindRealRootsSturm(poly.size,Double.POSITIVE_INFINITY,1e-16,500);
+
+		alg.process(poly);
+
+		int N = alg.getNumberOfRoots();
+		double[] roots = alg.getRoots();
+
+		List<Double> ret = new ArrayList<Double>();
+		for( int i = 0; i < N; i++ )
+			ret.add(roots[i]);
+
+		return ret;
+	}
 }

@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface PolynomialFindAllRoots {
+public interface PolynomialRoots {
 
 	/**
 	 * <p>

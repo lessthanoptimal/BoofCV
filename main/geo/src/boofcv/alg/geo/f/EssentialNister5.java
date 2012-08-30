@@ -20,8 +20,9 @@ package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.solver.Polynomial;
-import boofcv.numerics.solver.PolynomialFindAllRoots;
-import boofcv.numerics.solver.RootFinderCompanion;
+import boofcv.numerics.solver.PolynomialRoots;
+import boofcv.numerics.solver.impl.FindRealRootsSturm;
+import boofcv.numerics.solver.impl.WrapRealRootsSturm;
 import boofcv.struct.FastQueue;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.Complex64F;
@@ -29,9 +30,6 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
-import org.ejml.ops.NormOps;
-import org.ejml.simple.SimpleMatrix;
-import org.ejml.simple.SimpleSVD;
 
 import java.util.List;
 
@@ -84,7 +82,10 @@ public class EssentialNister5 {
 	DenseMatrix64F A2 = new DenseMatrix64F(10,10);
 	DenseMatrix64F C = new DenseMatrix64F(10,10);
 
-	PolynomialFindAllRoots findRoots = new RootFinderCompanion();
+	FindRealRootsSturm sturm = new FindRealRootsSturm(11,50,1e-10,200);
+	PolynomialRoots findRoots = new WrapRealRootsSturm(sturm);
+
+//	PolynomialRoots findRoots = new RootFinderCompanion();
 	Polynomial poly = new Polynomial(11);
 
 	// found essential matrix
@@ -114,7 +115,7 @@ public class EssentialNister5 {
 		helper.setupA1(A1);
 		helper.setupA2(A2);
 
-		System.out.println("  Condition A1: "+NormOps.conditionP2(A1));
+//		System.out.println("  Condition A1: "+NormOps.conditionP2(A1));
 
 		// instead of Gauss-Jordan elimination LU decomposition is used to solve the system
 //		LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.pseudoInverse(true);
@@ -129,7 +130,7 @@ public class EssentialNister5 {
 		if( !findRoots.process(poly) )
 			return false;
 
-		poly.print();
+//		poly.print();
 
 		for( Complex64F c : findRoots.getRoots() ) {
 			if( !c.isReal() )
@@ -138,24 +139,19 @@ public class EssentialNister5 {
 			solveForXandY(c.real);
 
 			DenseMatrix64F E = solutions.pop();
-			E.data[0] = x*X[0] + y*Y[0] + z*Z[0] + W[0];
-			E.data[1] = x*X[1] + y*Y[1] + z*Z[1] + W[1];
-			E.data[2] = x*X[2] + y*Y[2] + z*Z[2] + W[2];
-			E.data[3] = x*X[3] + y*Y[3] + z*Z[3] + W[3];
-			E.data[4] = x*X[4] + y*Y[4] + z*Z[4] + W[4];
-			E.data[5] = x*X[5] + y*Y[5] + z*Z[5] + W[5];
-			E.data[6] = x*X[6] + y*Y[6] + z*Z[6] + W[6];
-			E.data[7] = x*X[7] + y*Y[7] + z*Z[7] + W[7];
-			E.data[8] = x*X[8] + y*Y[8] + z*Z[8] + W[8];
 
-			System.out.println("  Found E: det = "+CommonOps.det(E));
-			System.out.println("          rv   = "+c);
-			System.out.println("          root = "+poly.evaluate(c.real));
-			System.out.print  ("           SV  =");
-			SimpleSVD svd = SimpleMatrix.wrap(E).svd();
-			for( int i = 0; i < 3; i++ )
-				System.out.printf(" %5.2e",svd.getSingleValue(i));
-			System.out.println();
+			for( int i = 0; i < 9; i++ ) {
+				E.data[i] = x*X[i] + y*Y[i] + z*Z[i] + W[i];
+			}
+
+//			System.out.println("  Found E: det = "+CommonOps.det(E));
+//			System.out.println("          rv   = "+c);
+//			System.out.println("          root = "+poly.evaluate(c.real));
+//			System.out.print  ("           SV  =");
+//			SimpleSVD svd = SimpleMatrix.wrap(E).svd();
+//			for( int i = 0; i < 3; i++ )
+//				System.out.printf(" %5.2e",svd.getSingleValue(i));
+//			System.out.println();
 
 //			SimpleMatrix U = svd.getU();
 //			SimpleMatrix S = svd.getW();
@@ -204,7 +200,7 @@ public class EssentialNister5 {
 
 		svd.getV(V,true);
 
-		System.out.println(" DET V = "+CommonOps.det(V));
+//		System.out.println(" DET V = "+CommonOps.det(V));
 
 		// extract the span of solutions for E from the null space
 		for( int i = 0; i < 9; i++ ) {
