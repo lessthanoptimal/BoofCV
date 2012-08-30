@@ -96,8 +96,13 @@ public class SelectHistogramThresholdPanel extends JPanel implements ChangeListe
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == thresholdLevel )
+
+		if( e.getSource() == thresholdLevel )  {
+			int oldValue = valueThreshold;
 			valueThreshold = ((Number)thresholdLevel.getValue()).intValue();
+			if( oldValue == valueThreshold )
+				return;
+		}
 
 		histogramPanel.setThreshold(valueThreshold,valueDown);
 		histogramPanel.repaint();
