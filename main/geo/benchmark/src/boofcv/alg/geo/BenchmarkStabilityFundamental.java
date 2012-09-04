@@ -180,9 +180,7 @@ public class BenchmarkStabilityFundamental {
 				scores.add(score);
 				totalScore += score;
 			}
-			System.out.println("  score["+i+"] = "+totalScore);
-//			if( totalScore > 1 )
-//				System.out.println("Crap");
+//			System.out.println("  score["+i+"] = "+totalScore);
 		}
 
 		Collections.sort(scores);
@@ -227,8 +225,8 @@ public class BenchmarkStabilityFundamental {
 //		app.createScenePlane();
 		app.motionTranslate();
 		app.createObservations();
-//		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(8, isPixels));
-//		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(7, isPixels));
+		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(8, isPixels));
+		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(7, isPixels));
 		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(5, isPixels));
 
 //		app.evaluateMinimal(FactoryEpipolar.computeFundamental(8));

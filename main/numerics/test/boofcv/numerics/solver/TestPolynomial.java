@@ -20,8 +20,7 @@ package boofcv.numerics.solver;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -59,22 +58,73 @@ public class TestPolynomial {
 	}
 
 	@Test
-	public void degree() {
-		fail("Implement");
+	public void computeDegree() {
+		assertEquals(-1,Polynomial.wrap().computeDegree());
+		assertEquals(-1,Polynomial.wrap(0).computeDegree());
+		assertEquals(-1,Polynomial.wrap(0,0).computeDegree());
+		assertEquals(0,Polynomial.wrap(1).computeDegree());
+		assertEquals(0,Polynomial.wrap(1,0).computeDegree());
+		assertEquals(0,Polynomial.wrap(1,0,0).computeDegree());
+		assertEquals(2,Polynomial.wrap(0,1,2).computeDegree());
+		assertEquals(3,Polynomial.wrap(0,1,2,1e-15).computeDegree());
+		assertEquals(2,Polynomial.wrap(-0,-1,-2,-0).computeDegree());
 	}
 
 	@Test
 	public void setTo() {
-		fail("Implement");
+		Polynomial a = new Polynomial(10);
+		Polynomial b = Polynomial.wrap(1,2,3,4);
+
+		a.setTo(b);
+
+		assertEquals(b.size(),a.size());
+		for( int i = 0; i < a.size(); i++ )
+			assertEquals(a.c[i],b.c[i],1e-8);
 	}
 
 	@Test
 	public void resize() {
-		fail("Implement");
+		Polynomial a = new Polynomial(10);
+
+		assertEquals(10,a.size());
+		a.resize(5);
+		assertEquals(5,a.size());
+		a.resize(15);
+		assertEquals(15,a.size());
+		assertEquals(15,a.c.length);
 	}
 
 	@Test
 	public void identical() {
-		fail("Implement");
+		Polynomial a = Polynomial.wrap(0,1,2);
+
+		assertTrue(a.isIdentical(Polynomial.wrap(0, 1, 2), 1e-8));
+		assertTrue(a.isIdentical(Polynomial.wrap(0,1,2,0),1e-8));
+		assertTrue(a.isIdentical(Polynomial.wrap(0,1,2,1e-10),1e-8));
+		assertTrue(Polynomial.wrap(0,1,1e-20).isIdentical(Polynomial.wrap(0, 1, 1e-14), 1e-8));
+		assertTrue(Polynomial.wrap(0,1,1e-20,0).isIdentical(Polynomial.wrap(0,1,0,1e-14),1e-8));
+
+		assertFalse(a.isIdentical(Polynomial.wrap(0, 1, 3), 1e-8));
+		assertFalse(a.isIdentical(Polynomial.wrap(0, 1, 2+1e-5), 1e-8));
+		assertFalse(a.isIdentical(Polynomial.wrap(0, 1, 2,3), 1e-8));
+	}
+
+	@Test
+	public void truncateZeros() {
+
+		Polynomial a = Polynomial.wrap(0,1,2,0);
+		Polynomial b = Polynomial.wrap(0,1,2,1e-15);
+		Polynomial c = Polynomial.wrap(0,1,2);
+		Polynomial d = Polynomial.wrap(0,1,2,-1);
+
+		a.truncateZeros(1e-15);
+		b.truncateZeros(1e-15);
+		c.truncateZeros(1e-15);
+		d.truncateZeros(1e-15);
+
+		assertTrue(a.isIdentical(Polynomial.wrap(0, 1, 2), 1e-8));
+		assertTrue(b.isIdentical(Polynomial.wrap(0, 1, 2), 1e-8));
+		assertTrue(c.isIdentical(Polynomial.wrap(0, 1, 2), 1e-8));
+		assertTrue(d.isIdentical(Polynomial.wrap(0, 1, 2,-1), 1e-8));
 	}
 }

@@ -96,6 +96,7 @@ public class FundamentalNto1 implements EpipolarMatrixEstimator  {
 					score += Math.abs(GeometryMath_F64.innerProd(p.currLoc, F, p.keyLoc));
 				}
 
+//				System.out.println("  score = "+score);
 				if( score < bestScore ) {
 					bestScore = score;
 					best = F;

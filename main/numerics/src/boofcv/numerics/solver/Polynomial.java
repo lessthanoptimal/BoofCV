@@ -37,6 +37,12 @@ public class Polynomial {
 		this.size = maxDegree;
 	}
 
+	public Polynomial( Polynomial original ) {
+		this.size = original.size;
+		c = new double[size];
+		System.arraycopy(original.c,0,c,0,size);
+	}
+
 	/**
 	 * Computes the polynomials output given the variable value  Can handle infinite numbers
 	 *
@@ -46,7 +52,7 @@ public class Polynomial {
 
 		if( size == 0 ) {
 			return 0;
-		} else if( size() == 1 ) {
+		} else if( size == 1 ) {
 			return c[0];
 		} else if( Double.isInfinite(variable)) {
 
@@ -108,20 +114,66 @@ public class Polynomial {
 		return -1;
 	}
 
+	/**
+	 * Checks to see if the coefficients of two polynomials are identical to within tolerance.  If the lengths
+	 * of the polynomials are not the same then the extra coefficients in the longer polynomial must be within tolerance
+	 * of zero.
+	 *
+	 * @param p Polynomial that this polynomial is being compared against.
+	 * @param tol Similarity tolerance.  Try 1e-15 for high confidence
+	 * @return true if the two polynomials are identical to within tolerance.
+	 */
 	public boolean isIdentical( Polynomial p , double tol ) {
-		int na = computeDegree();
-		int nb = p.computeDegree();
+		int m = Math.max(p.size(), size());
 
-		if( na != nb )
-			return false;
+		// make sure trailing coefficients are close to zero
+		for( int i = p.size; i < m; i++ ) {
+			if( Math.abs(c[i]) > tol ) {
+				return false;
+			}
+		}
 
-		for( int i = 0; i <= na; i++ ) {
+		for( int i = size; i < m; i++ ) {
+			if( Math.abs(p.c[i]) > tol ) {
+				return false;
+			}
+		}
+
+		// ensure that the rest of the coefficients are close
+		int n = Math.min(p.size(),size());
+		for( int i = 0; i < n; i++ ) {
 			if( Math.abs(c[i]-p.c[i]) > tol ) {
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Prunes zero coefficients from the end of a sequence.  A coefficient is zero if its absolute value
+	 * is less than or equal to tolerance.
+	 *
+	 * @param tol Tolerance for zero.  Try 1e-15
+	 */
+	public void truncateZeros( double tol ) {
+
+//		double max = 0;
+//		for( int i = 0; i < size; i++ ) {
+//			double d = Math.abs(c[i]);
+//			if( d > max )
+//				max = d;
+//		}
+//
+//		tol *= max;
+
+		int i = size-1;
+
+		for( ; i >= 0; i-- ) {
+			if( Math.abs(c[i]) > tol )
+				break;
+		}
+		size = i+1;
 	}
 
 	@Override

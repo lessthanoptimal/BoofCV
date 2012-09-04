@@ -20,6 +20,8 @@ package boofcv.numerics.solver;
 
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -27,6 +29,8 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestPolynomialOps {
+
+	Random rand = new Random(234);
 
 	@Test
 	public void quadraticVertex() {
@@ -83,5 +87,69 @@ public class TestPolynomialOps {
 
 		assertTrue(expectedQ.isIdentical(q,1e-8));
 		assertTrue(expectedR.isIdentical(r,1e-8));
+	}
+
+	@Test
+	public void multiply() {
+		Polynomial a = PolynomialOps.multiply(Polynomial.wrap(2), Polynomial.wrap(3), null);
+		Polynomial b = PolynomialOps.multiply(Polynomial.wrap(),Polynomial.wrap(3),null);
+		Polynomial c = PolynomialOps.multiply(Polynomial.wrap(),Polynomial.wrap(),null);
+		Polynomial d = PolynomialOps.multiply(Polynomial.wrap(4),Polynomial.wrap(2,3),null);
+		Polynomial e = PolynomialOps.multiply(Polynomial.wrap(2,3),Polynomial.wrap(4),null);
+		Polynomial f = PolynomialOps.multiply(Polynomial.wrap(2,3),Polynomial.wrap(4,8),null);
+
+		assertTrue(Polynomial.wrap(6).isIdentical(a,1e-8));
+		assertTrue(b.size==0);
+		assertTrue(c.size==0);
+		assertTrue(Polynomial.wrap(8,12).isIdentical(d,1e-8));
+		assertTrue(Polynomial.wrap(8,12).isIdentical(e,1e-8));
+		assertTrue(Polynomial.wrap(8,28,24).isIdentical(f,1e-8));
+	}
+
+	/**
+	 * Randomly generate polynomials.  First divide then multiply them back together to reconstruct
+	 * the original.
+	 */
+	@Test
+	public void divide_then_multiply() {
+
+		for( int i = 2; i < 10; i++ ) {
+			Polynomial n = createRandom(i);
+
+			for( int j = 1; j < i; j++ ) {
+				Polynomial d = createRandom(j);
+
+				Polynomial q = new Polynomial(10);
+				Polynomial r = new Polynomial(10);
+
+				PolynomialOps.divide(n,d,q,r);
+
+				Polynomial a = PolynomialOps.multiply(d,q,null);
+				Polynomial b = PolynomialOps.add(a,r,null);
+
+				assertTrue(b.isIdentical(n,1e-8));
+			}
+		}
+	}
+
+	@Test
+	public void add() {
+		Polynomial a = PolynomialOps.add(Polynomial.wrap(0.5,1,1),Polynomial.wrap(0.5,1,2),null);
+		Polynomial b = PolynomialOps.add(Polynomial.wrap(0.5,1),Polynomial.wrap(0.5,1,2),null);
+		Polynomial c = PolynomialOps.add(Polynomial.wrap(0.5,1,1),Polynomial.wrap(0.5,1),null);
+
+		assertTrue(Polynomial.wrap(1,2,3).isIdentical(a,1e-8));
+		assertTrue(Polynomial.wrap(1,2,2).isIdentical(b,1e-8));
+		assertTrue(Polynomial.wrap(1,2,1).isIdentical(c,1e-8));
+	}
+
+	private Polynomial createRandom( int N ) {
+		Polynomial ret = new Polynomial(N);
+
+		for( int i = 0; i < N; i++ ) {
+			ret.c[i] = 5*(rand.nextDouble()-0.5);
+		}
+
+		return ret;
 	}
 }

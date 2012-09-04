@@ -26,10 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Wrapper around {@link FindRealRootsSturm} for {@link PolynomialRoots}.
+ *
  * @author Peter Abeles
  */
 public class WrapRealRootsSturm implements PolynomialRoots {
 
+	// raw algorithm for finding real roots
 	FindRealRootsSturm alg;
 
 	// avoid creating memory by recycling
@@ -39,7 +42,7 @@ public class WrapRealRootsSturm implements PolynomialRoots {
 	public WrapRealRootsSturm(FindRealRootsSturm alg) {
 		this.alg = alg;
 
-		storage = new Complex64F[alg.roots.length];
+		storage = new Complex64F[alg.getMaxRoots()];
 		for( int i = 0; i < storage.length; i++ )
 			storage[i] = new Complex64F();
 	}
