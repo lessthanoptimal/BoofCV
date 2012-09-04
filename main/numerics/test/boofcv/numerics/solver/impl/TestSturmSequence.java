@@ -48,9 +48,9 @@ public class TestSturmSequence {
 		// see if it handles small polynomials correctly
 		assertEquals(0, countRealRoots(Polynomial.wrap(2), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
 		assertEquals(1, countRealRoots(Polynomial.wrap(2, 3), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
-		assertEquals(0,countRealRoots(Polynomial.wrap(2,3),0,Double.POSITIVE_INFINITY));
-		assertEquals(0,countRealRoots(Polynomial.wrap(2,3),Double.NEGATIVE_INFINITY,-10));
-		assertEquals(1,countRealRoots(Polynomial.wrap(2,3),-2,-0.5));
+		assertEquals(0, countRealRoots(Polynomial.wrap(2,3),0,Double.POSITIVE_INFINITY));
+		assertEquals(0, countRealRoots(Polynomial.wrap(2,3),Double.NEGATIVE_INFINITY,-10));
+		assertEquals(1, countRealRoots(Polynomial.wrap(2,3),-2,-0.5));
 		assertEquals(0, countRealRoots(Polynomial.wrap(2, 3, 4), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
 		assertEquals(2, countRealRoots(Polynomial.wrap(2, -1, -4), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
 
@@ -126,6 +126,39 @@ public class TestSturmSequence {
 	}
 
 	/**
+	 * Several consistency checks on random polynomials to the number of roots within a random interval
+	 */
+	@Test
+	public void rootCountConsistency_Random() {
+		for( int i = 3; i < 20; i++ ) {
+			Polynomial p = new Polynomial(i);
+
+			for( int trial = 0; trial < 20; trial++ ) {
+				for( int j = 0; j < p.size; j++ ) {
+					p.c[j] = (rand.nextDouble()-0.5)*2;
+				}
+
+				SturmSequence alg = new SturmSequence(p.size());
+				double low = (rand.nextDouble() - 0.5)*200;
+				double high = low + rand.nextDouble()*200;
+				double middle = (low+high)/2.0;
+
+				alg.initialize(p);
+				int every = alg.countRealRoots(Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY);
+				int all = alg.countRealRoots(low,high);
+				int lowN = alg.countRealRoots(low,middle);
+				int highN = alg.countRealRoots(middle,high);
+
+				assertTrue(all>=0);
+				assertTrue(lowN>=0);
+				assertTrue(highN>=0);
+				assertEquals(all,lowN+highN);
+				assertTrue(all <= every );
+			}
+		}
+	}
+
+	/**
 	 * Examine a case which was found to cause problems
 	 */
 	@Test
@@ -145,6 +178,49 @@ public class TestSturmSequence {
 
 		assertTrue( M <= N);
 	}
+
+
+// This test is commented out because the equation is so degenerate it would require a significant change to the Sturm
+// sequence algorithm to work.
+//
+//	@Test
+//	public void checkSpecificPoly02() {
+//		Polynomial poly = Polynomial.wrap(0.06496129844668003,-0.20388125146277708,-0.5346822141623102,3.8451325925247914,
+//				-8.125384551749551,7.281661653591961,-0.1827681555908356,-4.918274060516843,
+//				3.6136415842421954,-0.8418091530846867,5.662137425588298E-15);
+//
+//		// Compare computed sequence to the standard
+//		compareSequences( poly, 0.012207);
+//
+//		SturmSequence alg = new SturmSequence(poly.size);
+//		alg.initialize(poly);
+//
+//		double low = 0.01220703125;
+//		double high = 1.5743255615234375;
+//		double middle = (low+high)/2.0;
+//
+//		int every = alg.countRealRoots(Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY);
+//		int all = alg.countRealRoots(low,high);
+//		int lowN = alg.countRealRoots(low,middle);
+//		int highN = alg.countRealRoots(middle,high);
+//
+//		RootFinderCompanion alt = new RootFinderCompanion();
+//		alt.process(poly);
+//
+//		List<Complex64F> l = alt.getRoots();
+//		for( Complex64F c : l ) {
+//			System.out.println(c);
+//			if( c.isReal() ) {
+//				System.out.println("   value = "+poly.evaluate(c.real));
+//			}
+//		}
+//
+//		assertTrue(all >= 0);
+//		assertTrue(lowN>=0);
+//		assertTrue(highN>=0);
+//		assertEquals(all,lowN+highN);
+//		assertTrue(all <= every );
+//	}
 
 	private void compareSequences( Polynomial p, double value) {
 		List<Double> expected = computeSturm(p,value);

@@ -19,7 +19,9 @@
 package boofcv.numerics.solver;
 
 import boofcv.numerics.complex.ComplexMath;
+import boofcv.numerics.solver.impl.FindRealRootsSturm;
 import boofcv.numerics.solver.impl.RootFinderCompanion;
+import boofcv.numerics.solver.impl.WrapRealRootsSturm;
 import org.ejml.data.Complex64F;
 
 import java.util.List;
@@ -30,6 +32,27 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PolynomialSolver {
+
+	/**
+	 * Creates a generic polynomial root finding class which will return all real or all real and complex roots
+	 * depending on the algorithm selected.
+	 *
+	 * @param type Which algorithm is to be returned.
+	 * @param maxDegree Maximum degree of the polynomial being considered.
+	 * @return Root finding algorihtm.
+	 */
+	public static PolynomialRoots createRootFinder( RootFinderType type , int maxDegree ) {
+		switch ( type ) {
+			case EVD:
+				return new RootFinderCompanion();
+
+			case STURM:
+				FindRealRootsSturm sturm = new FindRealRootsSturm(maxDegree,-1,1e-10,30,20);
+				return new WrapRealRootsSturm(sturm);
+		}
+
+		throw new IllegalArgumentException("Unknown type");
+	}
 
 
 	/**

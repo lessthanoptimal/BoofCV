@@ -36,6 +36,7 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 
 	List<AssociatedPair> pairs8 = new ArrayList<AssociatedPair>();
 	List<AssociatedPair> pairs7 = new ArrayList<AssociatedPair>();
+	List<AssociatedPair> pairs6 = new ArrayList<AssociatedPair>();
 	List<AssociatedPair> pairs5 = new ArrayList<AssociatedPair>();
 
 	public class Estimate implements Performer {
@@ -70,6 +71,8 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 
 		for( int i = 0; i < 5; i++ )
 			pairs5.add(pairs.get(i));
+		for( int i = 0; i < 6; i++ )
+			pairs6.add(pairs.get(i));
 
 		for( int i = 0; i < 7; i++ ) {
 			pairs7.add(pairs.get(i));
@@ -77,21 +80,11 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 		}
 		pairs8.add(pairs.get(7));
 
-//		System.out.println("Minimum Number");
-//		if( FUNDAMENTAL ) {
-//			ProfileOperation.printOpsPerSec(new Estimate("Linear 8",FactoryEpipolar.computeFundamental(8),pairs8), TEST_TIME);
-//			ProfileOperation.printOpsPerSec(new Estimate("Linear 7",FactoryEpipolar.computeFundamental(7),pairs7), TEST_TIME);
-//
-//			System.out.println("N");
-//			ProfileOperation.printOpsPerSec(new Estimate("Linear 8",FactoryEpipolar.computeFundamental(8),pairs), TEST_TIME);
-//		} else {
-//			ProfileOperation.printOpsPerSec(new Estimate("Linear 8",FactoryEpipolar.computeEssential(8),pairs8), TEST_TIME);
-//			ProfileOperation.printOpsPerSec(new Estimate("Linear 7",FactoryEpipolar.computeEssential(7),pairs7), TEST_TIME);
-//			ProfileOperation.printOpsPerSec(new Estimate("Poly   5",FactoryEpipolar.computeEssential(5),pairs5), TEST_TIME);
-//
-//			System.out.println("N");
-//			ProfileOperation.printOpsPerSec(new Estimate("Linear 8",FactoryEpipolar.computeEssential(8),pairs), TEST_TIME);
-//		}
+		System.out.println("Minimum Number");
+		ProfileOperation.printOpsPerSec(new Estimate("Linear 8",FactoryEpipolar.computeFundamentalOne(8,FUNDAMENTAL,0),pairs8), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("Linear 7",FactoryEpipolar.computeFundamentalOne(7,FUNDAMENTAL,1),pairs8), TEST_TIME);
+		if( !FUNDAMENTAL)
+			ProfileOperation.printOpsPerSec(new Estimate("Linear 5",FactoryEpipolar.computeFundamentalOne(5,false,1),pairs6), TEST_TIME);
 
 	}
 	

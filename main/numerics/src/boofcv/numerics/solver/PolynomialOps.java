@@ -122,6 +122,78 @@ public class PolynomialOps {
 		remainder.size = nd;
 	}
 
+	/**
+	 * Multiplies the two polynomials together.
+	 * @param a Polynomial
+	 * @param b Polynomial
+	 * @param result Optional storage parameter for the results.  Must be have enough coefficients to store the results.
+	 *               If null a new instance is declared.
+	 * @return Results of the multiplication
+	 */
+	public static Polynomial multiply( Polynomial a , Polynomial b , Polynomial result ) {
+
+		int N = Math.max(0,a.size() + b.size() - 1);
+
+		if( result == null ) {
+			result = new Polynomial(N);
+		} else {
+			if( result.size < N )
+				throw new IllegalArgumentException("Unexpected length of 'result'");
+			result.zero();
+		}
+
+		for( int i = 0; i < a.size; i++ ) {
+			double coef = a.c[i];
+
+			int index = i;
+			for( int j = 0; j < b.size; j++ ) {
+				result.c[index++] += coef*b.c[j];
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Adds two polynomials together. The lengths of the polynomials do not need to be the zero, but the 'missing'
+	 * coefficients are assumed to be zero.
+	 *
+	 * @param a Polynomial
+	 * @param b Polynomial
+	 * @param results Optional storage for resulting polynomial.  If null a new instance is declared. If not null
+	 *               its length must be the same as the largest polynomial 'a' or 'b'.
+	 * @return Polynomial 'a' and 'b' added together.
+	 */
+	public static Polynomial add( Polynomial a , Polynomial b , Polynomial results ) {
+		int N = Math.max(a.size,b.size);
+
+		if( results == null ) {
+			results = new Polynomial(N);
+		} else if( results.size < N ) {
+			throw new IllegalArgumentException("storage for results must be at least as large as the the largest polynomial");
+		} else {
+			for( int i = N; i < results.size; i++ ) {
+				results.c[i] = 0;
+			}
+		}
+
+		int M = Math.min(a.size,b.size);
+		for( int i = 0; i < M; i++ ) {
+			results.c[i] = a.c[i] + b.c[i];
+		}
+
+		// copy the non-overlapping coefficients for the larger polynomial
+		if( a.size > b.size ) {
+			for( int i = b.size; i < N; i++ )
+				results.c[i] = a.c[i];
+		} else {
+			for( int i = a.size; i < N; i++ )
+				results.c[i] = b.c[i];
+		}
+
+		return results;
+	}
+
 	public static int countRealRoots( Polynomial poly ) {
 		SturmSequence sturm = new SturmSequence(poly.size);
 
@@ -133,7 +205,7 @@ public class PolynomialOps {
 	public static PolynomialRoots createRootFinder( int maxCoefficients , int which ) {
 		switch( which ) {
 			case 0:
-				FindRealRootsSturm sturm = new FindRealRootsSturm(maxCoefficients,Double.POSITIVE_INFINITY,1e-10,200);
+				FindRealRootsSturm sturm = new FindRealRootsSturm(maxCoefficients,-1,1e-10,200,200);
 				return new WrapRealRootsSturm(sturm);
 
 			case 1:

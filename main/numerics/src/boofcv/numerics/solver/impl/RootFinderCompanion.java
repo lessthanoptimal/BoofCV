@@ -42,19 +42,13 @@ public class RootFinderCompanion implements PolynomialRoots {
 	DenseMatrix64F c = new DenseMatrix64F(1,1);
 
 	// use generalized eigenvalue decomposition to find the roots
-	EigenDecomposition<DenseMatrix64F> evd =  DecompositionFactory.eig(20, false, false);
+	EigenDecomposition<DenseMatrix64F> evd =  DecompositionFactory.eig(11, false, false);
 
 	// storage for found roots
 	List<Complex64F> roots = new ArrayList<Complex64F>();
 
-	// Relative tolerance for last coefficient being zero
-	double tol = 1e-10;
 
 	public RootFinderCompanion() {
-	}
-
-	public RootFinderCompanion(double tol) {
-		this.tol = tol;
 	}
 
 	@Override

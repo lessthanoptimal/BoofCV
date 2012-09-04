@@ -82,7 +82,7 @@ public class EssentialNister5 {
 	DenseMatrix64F A2 = new DenseMatrix64F(10,10);
 	DenseMatrix64F C = new DenseMatrix64F(10,10);
 
-	FindRealRootsSturm sturm = new FindRealRootsSturm(11,50,1e-10,200);
+	FindRealRootsSturm sturm = new FindRealRootsSturm(11,-1,1e-10,20,20);
 	PolynomialRoots findRoots = new WrapRealRootsSturm(sturm);
 
 //	PolynomialRoots findRoots = new RootFinderCompanion();
@@ -129,8 +129,6 @@ public class EssentialNister5 {
 
 		if( !findRoots.process(poly) )
 			return false;
-
-//		poly.print();
 
 		for( Complex64F c : findRoots.getRoots() ) {
 			if( !c.isReal() )
