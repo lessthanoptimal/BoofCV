@@ -32,8 +32,13 @@ Version : Alpha 0.10
   * Stability evaluator for epipolar matrices
   * Improved unit tests
 - Polynomials
-  * Various ways to find and polish polynomial roots
+  * Various ways to find and polish polynomial roots (EVD and Sturm)
   * New data type and basic operations
+- Added ExampleStereoTwoViewsOneCamera
+  * Demonstrates how to perform stereo image processing using a single camera and two views
+- LensDistortionOps
+  * Added normalized to distorted pixel transform
+  * Tweaked some of the function names
 
 ---------------------------------------------
 Date    : 2012/7/22

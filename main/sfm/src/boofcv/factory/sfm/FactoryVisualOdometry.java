@@ -68,7 +68,7 @@ public class FactoryVisualOdometry {
 				new Se3FromEssentialGenerator(essentialAlg,triangulate);
 
 		DistanceFromModel<Se3_F64,AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate);
+				new DistanceSe3SymmetricSq(triangulate,1,1,0); // TODO use intrinsic
 		
 		int N = generateEpipolarMotion.getMinimumPoints();
 
@@ -116,7 +116,7 @@ public class FactoryVisualOdometry {
 				new Se3FromEssentialGenerator(essentialAlg,triangulate);
 
 		DistanceFromModel<Se3_F64,AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate);
+				new DistanceSe3SymmetricSq(triangulate,1,1,0); // TODO use intrinsic
 
 		int N = generateEpipolarMotion.getMinimumPoints();
 

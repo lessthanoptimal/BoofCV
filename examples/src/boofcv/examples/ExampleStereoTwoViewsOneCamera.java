@@ -22,6 +22,7 @@ import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.UtilIntrinsic;
@@ -33,6 +34,8 @@ import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.FactoryEpipolar;
 import boofcv.factory.geo.FactoryTriangulate;
+import boofcv.gui.d3.PointCloudTiltPanel;
+import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.gui.stereo.RectifiedPairPanel;
@@ -43,66 +46,159 @@ import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Example demonstrating how to create a point cloud from a calibrated camera when two views of the same object
- * have been taken.  For best results the two views should be take from about the same orientation with translation
- * along the camera's x-axis.
+ * Example demonstrating how to use to images taken from a single calibrated camera to create a stereo disparity image,
+ * from which a dense 3D point cloud of the scene can be computed.  For this technique to work the camera's motion
+ * needs to be approximately tangential to the direction the camera is pointing.  The code below assumes that the first
+ * image is to the left of the second image.
  *
  * @author Peter Abeles
  */
 public class ExampleStereoTwoViewsOneCamera {
 
+	// Disparity calculation parameters
+	private static int minDisparity = 30;
+	private static int maxDisparity = 160;
 
-	public static Se3_F64 estimateCameraMotion( List<AssociatedPair> matchedCalibrated ) {
-		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(7, false, 1);
+	public static void main( String args[] ) {
+		// specify location of images and calibration
+		String calibDir = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
+		String imageDir = "../data/applet/stereo/";
+
+		// Camera parameters
+		IntrinsicParameters intrinsic = BoofMiscOps.loadXML(calibDir+"intrinsic.xml");
+
+		// Input images from the camera moving left to right
+		BufferedImage origLeft = UtilImageIO.loadImage(imageDir+"mono_wall_01.jpg");
+		BufferedImage origRight = UtilImageIO.loadImage(imageDir+"mono_wall_02.jpg");
+//		BufferedImage origRight = UtilImageIO.loadImage(imageDir+"mono_wall_03.jpg");
+
+		// distorted input images
+		ImageUInt8 distortedLeft = ConvertBufferedImage.convertFrom(origLeft,(ImageUInt8)null);
+		ImageUInt8 distortedRight = ConvertBufferedImage.convertFrom(origRight,(ImageUInt8)null);
+
+		// matched features between the two images
+		List<AssociatedPair> matchedFeatures = ExampleFundamentalMatrix.computeMatches(origLeft,origRight);
+
+		// convert from pixel coordinates into normalized image coordinates
+		List<AssociatedPair> matchedCalibrated = convertToNormalizedCoordinates(matchedFeatures, intrinsic);
+
+		// Robustly estimate camera motion
+		List<AssociatedPair> inliers = new ArrayList<AssociatedPair>();
+		Se3_F64 leftToRight = estimateCameraMotion(intrinsic,matchedCalibrated,inliers);
+
+		drawInliers(origLeft,origRight,intrinsic,inliers);
+
+		// Rectify and remove lens distortion for stereo processing
+		DenseMatrix64F rectifiedK = new DenseMatrix64F(3,3);
+		ImageUInt8 rectifiedLeft = new ImageUInt8(distortedLeft.width,distortedLeft.height);
+		ImageUInt8 rectifiedRight = new ImageUInt8(distortedLeft.width,distortedLeft.height);
+
+		rectifyImages(distortedLeft,distortedRight,leftToRight,intrinsic,rectifiedLeft,rectifiedRight,rectifiedK);
+
+		// compute disparity
+		StereoDisparity<ImageUInt8,ImageFloat32> disparityAlg =
+				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
+						minDisparity, maxDisparity, 5, 5, 20, 1, 0.1, ImageUInt8.class);
+
+		// process and return the results
+		disparityAlg.process(rectifiedLeft,rectifiedRight) ;
+		ImageFloat32 disparity = disparityAlg.getDisparity();
+
+		// show results
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
+
+		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectifiedLeft,null);
+		BufferedImage outRight = ConvertBufferedImage.convertTo(rectifiedRight,null);
+
+		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight),"Rectification");
+		ShowImages.showWindow(visualized,"Disparity");
+
+		showPointCloud(disparity,outLeft,leftToRight,intrinsic,minDisparity,maxDisparity);
+
+		System.out.println("Total found "+matchedCalibrated.size());
+		System.out.println("Total Inliers "+inliers.size());
+	}
+
+	/**
+	 * Estimates the camera motion robustly using RANSAC and a set of associated points.
+	 *
+	 * @param intrinsic Intrinsic camera parameters
+	 * @param matchedNorm set of matched point features in normalized image coordinates
+	 * @param inliers OUTPUT: Set of inlier features from RANSAC
+	 * @return Found camera motion.  Note translation has an arbitrary scale
+	 */
+	public static Se3_F64 estimateCameraMotion( IntrinsicParameters intrinsic , List<AssociatedPair> matchedNorm , List<AssociatedPair> inliers ) {
+		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(5, false, 10);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 		ModelGenerator<Se3_F64,AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg,triangulate);
 
 		DistanceFromModel<Se3_F64,AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate);
+				new DistanceSe3SymmetricSq(triangulate,intrinsic.fx,intrinsic.fy,intrinsic.skew);
 
 		int N = generateEpipolarMotion.getMinimumPoints();
 
+		// 1/2 a pixel tolerance for RANSAC inliers
+		double ransacTOL = 0.5*0.5*2.0;
+
 		ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion =
 				new SimpleInlierRansac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
-						500,N,N,100000,2);
+						250,N,N,100000,ransacTOL);
 
-		if( !epipolarMotion.process(matchedCalibrated) )
+		if( !epipolarMotion.process(matchedNorm) )
 			throw new RuntimeException("Motion estimation failed");
+
+		// save inlier set for debugging purposes
+		inliers.addAll(epipolarMotion.getMatchSet());
 
 		return epipolarMotion.getModel();
 	}
 
-	public static List<AssociatedPair> convertToCalibrated(List<AssociatedPair> matchedFeatures , IntrinsicParameters intrinsic ) {
-		DenseMatrix64F K_inv = UtilIntrinsic.calibrationMatrix(intrinsic, null);
-		if( !CommonOps.invert(K_inv))
-			throw new RuntimeException("Matrix invert failed");
+	/**
+	 * Convert a set of associated point features from pixel coordinates into normalized image coordinates.
+	 */
+	public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, IntrinsicParameters intrinsic) {
+
+		PointTransform_F64 tran = LensDistortionOps.transformRadialToNorm_F64(intrinsic);
 
 		List<AssociatedPair> calibratedFeatures = new ArrayList<AssociatedPair>();
 
 		for( AssociatedPair p : matchedFeatures ) {
 			AssociatedPair c = new AssociatedPair();
-			GeometryMath_F64.mult(K_inv, p.keyLoc, c.keyLoc);
-			GeometryMath_F64.mult(K_inv,p.currLoc,c.currLoc);
 
-			calibratedFeatures.add(p);
+			tran.compute(p.keyLoc.x,p.keyLoc.y,c.keyLoc);
+			tran.compute(p.currLoc.x,p.currLoc.y,c.currLoc);
+
+			calibratedFeatures.add(c);
 		}
 
 		return calibratedFeatures;
 	}
 
+	/**
+	 * Remove lens distortion and rectify stereo images
+	 *
+	 * @param distortedLeft Input distorted image from left camera.
+	 * @param distortedRight Input distorted image from right camera.
+	 * @param leftToRight Camera motion from left to right
+	 * @param intrinsic Intrinsic camera parameters
+	 * @param rectifiedLeft Output rectified image for left camera.
+	 * @param rectifiedRight Output rectified image for right camera.
+	 * @param rectifiedK Output camera calibration matrix for rectified camera
+	 */
 	public static void rectifyImages( ImageUInt8 distortedLeft ,
 									  ImageUInt8 distortedRight ,
 									  Se3_F64 leftToRight ,
@@ -138,56 +234,50 @@ public class ExampleStereoTwoViewsOneCamera {
 		distortRight.apply(distortedRight, rectifiedRight);
 	}
 
-	public static void main( String args[] ) {
-		String calibDir = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
-		String imageDir = "/home/pja/temp/images/";
+	/**
+	 * Draw inliers for debugging purposes.  Need to convert from normalized to pixel coordinates.
+	 */
+	public static void drawInliers( BufferedImage left , BufferedImage right , IntrinsicParameters intrinsic ,
+									List<AssociatedPair> normalized )
+	{
+		PointTransform_F64 tran = LensDistortionOps.transformNormToRadial_F64(intrinsic);
 
-		// Camera parameters
-		IntrinsicParameters intrinsic = BoofMiscOps.loadXML(calibDir+"intrinsic.xml");
+		List<AssociatedPair> pixels = new ArrayList<AssociatedPair>();
 
-		// original image
-		BufferedImage origLeft = UtilImageIO.loadImage(imageDir+"image000001.jpg");
-		BufferedImage origRight = UtilImageIO.loadImage(imageDir+"image000080.jpg");
+		for( AssociatedPair n : normalized ) {
+			AssociatedPair p = new AssociatedPair();
 
-		// distorted input images
-		ImageUInt8 distortedLeft = ConvertBufferedImage.convertFrom(origLeft,(ImageUInt8)null);
-		ImageUInt8 distortedRight = ConvertBufferedImage.convertFrom(origRight,(ImageUInt8)null);
+			tran.compute(n.keyLoc.x,n.keyLoc.y,p.keyLoc);
+			tran.compute(n.currLoc.x,n.currLoc.y,p.currLoc);
 
-		// matched features between the two images
-		List<AssociatedPair> matchedFeatures = ExampleFundamentalMatrix.computeMatches(origLeft,origRight);
+			pixels.add(p);
+		}
 
-		// convert from pixel coordinates into calibrated coordinates
-		List<AssociatedPair> matchedCalibrated = convertToCalibrated(matchedFeatures,intrinsic);
+		// display the results
+		AssociationPanel panel = new AssociationPanel(20);
+		panel.setAssociation(pixels);
+		panel.setImages(left,right);
 
-		// Robustly estimate camera motion
-		Se3_F64 leftToRight = estimateCameraMotion(matchedCalibrated);
+		ShowImages.showWindow(panel,"Inlier Features");
+	}
 
-		// Rectify and remove lens distortion for stereo processing
-		DenseMatrix64F rectifiedK = new DenseMatrix64F(3,3);
-		ImageUInt8 rectifiedLeft = new ImageUInt8(distortedLeft.width,distortedLeft.height);
-		ImageUInt8 rectifiedRight = new ImageUInt8(distortedLeft.width,distortedLeft.height);
+	/**
+	 * Show results as a point cloud
+	 */
+	public static void showPointCloud( ImageSingleBand disparity , BufferedImage left ,
+									   Se3_F64 motion , IntrinsicParameters intrinsic ,
+									   int minDisparity , int maxDisparity ) {
+		PointCloudTiltPanel gui = new PointCloudTiltPanel();
 
-		rectifyImages(distortedLeft,distortedRight,leftToRight,intrinsic,rectifiedLeft,rectifiedRight,rectifiedK);
+		double baseline = motion.getT().norm();
 
-		// compute disparity
-		int minDisparity = 1;
-		int maxDisparity = 250;
-		StereoDisparity<ImageUInt8,ImageFloat32> disparityAlg =
-				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, 5, 5, 40, 6, 0.05, ImageUInt8.class);
+		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(intrinsic,null);
 
-		// process and return the results
-		disparityAlg.process(rectifiedLeft,rectifiedRight) ;
-		ImageFloat32 disparity = disparityAlg.getDisparity();
+		gui.configure(baseline,K,minDisparity,maxDisparity);
+		gui.process(disparity,left);
+		gui.setPreferredSize(new Dimension(left.getWidth(),left.getHeight()));
 
-		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
-
-		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectifiedLeft,null);
-		BufferedImage outRight = ConvertBufferedImage.convertTo(rectifiedRight,null);
-
-		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight),"Rectification");
-		ShowImages.showWindow(visualized,"Disparity");
+		ShowImages.showWindow(gui,"Point Cloud");
 	}
 
 }

@@ -67,7 +67,7 @@ public class ExampleRemoveLensDistortion {
 		// compute the transform to remove lens distortion
 		// The inverse transformation (adds distortion) is used when apply adjusting an image.
 		// In other application the forward transformation (removes distortion) is required.
-		PointTransform_F32 tran = LensDistortionOps.radialTransformInv(param);
+		PointTransform_F32 tran = LensDistortionOps.transformPixelToRadial_F32(param);
 
 		// create new transforms to optimize view area
 		// After distortion the adjusted intrinsic camera parameters should be used.

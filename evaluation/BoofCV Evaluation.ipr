@@ -484,13 +484,7 @@
         <entry key="$PROJECT_DIR$/../../libpjajava">
           <value>
             <SvnBranchConfiguration>
-              <option name="branchUrls">
-                <list>
-                  <option value="svn+ssh://127.0.0.1/opt/repos/libpjajava/branches" />
-                  <option value="svn+ssh://127.0.0.1/opt/repos/libpjajava/tags" />
-                </list>
-              </option>
-              <option name="trunkUrl" value="svn+ssh://127.0.0.1/opt/repos/libpjajava/trunk" />
+              <option name="trunkUrl" value="" />
             </SvnBranchConfiguration>
           </value>
         </entry>
