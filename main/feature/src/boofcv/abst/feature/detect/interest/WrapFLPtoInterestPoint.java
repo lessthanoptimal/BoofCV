@@ -71,11 +71,12 @@ public class WrapFLPtoInterestPoint<T extends ImageSingleBand, D extends ImageSi
 
 	@Override
 	public double getOrientation(int featureIndex) {
-		throw new IllegalArgumentException("Not supported");
+		return 0;
 	}
 
 	@Override
 	public double getCanonicalRadius() {
+		// TODO this is probably dependent upon the feature detector radius
 		return BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
 	}
 
