@@ -34,7 +34,7 @@ public class TestSparseIntegralGradientKernel
 	final static int radius = size/2;
 
 	public TestSparseIntegralGradientKernel() {
-		super(ImageFloat32.class, ImageFloat32.class,size/2);
+		super(ImageFloat32.class, ImageFloat32.class,-radius-1,-radius-1,radius,radius);
 
 		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius);
 		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius);

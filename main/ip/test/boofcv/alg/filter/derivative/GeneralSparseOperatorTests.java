@@ -24,6 +24,7 @@ import boofcv.struct.sparse.SparseImageOperator;
 
 import java.util.Random;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -43,9 +44,20 @@ public abstract class GeneralSparseOperatorTests
 
 	protected T input;
 
+	// Define a relative box in which the sampled region is contained inside
+	protected int sampleBoxX0;
+	protected int sampleBoxX1;
+	protected int sampleBoxY0;
+	protected int sampleBoxY1;
 
-	protected GeneralSparseOperatorTests(Class<T> inputType) {
+	protected GeneralSparseOperatorTests(Class<T> inputType ,
+										 int sampleBoxX0 , int sampleBoxY0 ,
+										 int sampleBoxX1 , int sampleBoxY1 ) {
 		this.inputType = inputType;
+		this.sampleBoxX0 = sampleBoxX0;
+		this.sampleBoxY0 = sampleBoxY0;
+		this.sampleBoxX1 = sampleBoxX1;
+		this.sampleBoxY1 = sampleBoxY1;
 
 		input = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
@@ -59,13 +71,23 @@ public abstract class GeneralSparseOperatorTests
 	public void isInBounds( SparseImageOperator<T> alg ) {
 		alg.setImage(input);
 
+		// should always be inside the image center
 		assertTrue(alg.isInBounds(width/2,height/2));
 
-		assertTrue(!alg.isInBounds(0,0));
-		assertTrue(!alg.isInBounds(width/2,0));
-		assertTrue(!alg.isInBounds(width/2,height-1));
-		assertTrue(!alg.isInBounds(0,height/2));
-		assertTrue(!alg.isInBounds(width-1,height/2));
+		// Extreme points around the image should be outside
+		assertFalse(alg.isInBounds(0, 0));
+		assertFalse(alg.isInBounds(width / 2, 0));
+		assertFalse(alg.isInBounds(width / 2, height - 1));
+		assertFalse(alg.isInBounds(0, height / 2));
+		assertFalse(alg.isInBounds(width - 1, height / 2));
+
+		// now check points that should be just outside
+		assertFalse(alg.isInBounds(-sampleBoxX0 - 1, -sampleBoxY0 - 1));
+		assertFalse(alg.isInBounds(width-sampleBoxX1, height-sampleBoxY1));
+
+		// now check points that should be just inside
+		assertTrue(alg.isInBounds(-sampleBoxX0, -sampleBoxY0));
+		assertTrue(alg.isInBounds(width - sampleBoxX1 - 1, height - sampleBoxY1 - 1));
 	}
 
 

@@ -36,7 +36,7 @@ public class TestSparseIntegralHaar_NoBorder_I32
 	final static int radius = size/2;
 
 	public TestSparseIntegralHaar_NoBorder_I32() {
-		super(ImageSInt32.class, ImageSInt32.class,size);
+		super(ImageSInt32.class, ImageSInt32.class,-radius,-radius,radius,radius);
 
 		alg = new SparseIntegralHaar_NoBorder_I32(radius);
 

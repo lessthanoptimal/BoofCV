@@ -118,6 +118,18 @@ public class FactoryOrientationAlgs {
 						,imageType);
 	}
 
+	/**
+	 * Estimates the orientation without calculating the image derivative.
+	 *
+	 * @see ImplOrientationImageAverageIntegral
+	 *
+	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
+	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
+	 * @param sampleWidth How wide of a kernel should be used to sample. Try 4
+	 * @param weightSigma Sigma for weighting.  zero for unweighted.
+	 * @param imageType Type of image being processed.
+	 * @return OrientationIntegral
+	 */
 	public static <T extends ImageSingleBand>
 	OrientationIntegral<T> image_ii( int radius , double samplePeriod , int sampleWidth,
 									 double weightSigma , Class<T> imageType)

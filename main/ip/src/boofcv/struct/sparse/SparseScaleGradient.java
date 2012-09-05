@@ -42,6 +42,6 @@ public abstract class SparseScaleGradient<T extends ImageSingleBand,G extends Gr
 
 	@Override
 	public boolean isInBounds( int x , int y ) {
-		return( x+x0 >= 0 && y+y0 >= 0 && x+x1 <= input.width && y+y1 <= input.height );
+		return( x+x0 >= 0 && y+y0 >= 0 && x+x1 < input.width && y+y1 < input.height );
 	}
 }

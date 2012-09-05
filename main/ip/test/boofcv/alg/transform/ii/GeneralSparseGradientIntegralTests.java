@@ -33,13 +33,11 @@ public abstract class GeneralSparseGradientIntegralTests
 	IntegralKernel kernelX;
 	IntegralKernel kernelY;
 
-	int radius;
-
 	protected GeneralSparseGradientIntegralTests(Class<T> inputType, Class<D> derivType,
-												 int size )
+												 int sampleBoxX0 , int sampleBoxY0 ,
+												 int sampleBoxX1 , int sampleBoxY1  )
 	{
-		super(inputType, derivType, size/2+1);
-		radius = size/2;
+		super(inputType, derivType, sampleBoxX0,sampleBoxY0,sampleBoxX1,sampleBoxY1);
 	}
 
 	public void setKernels( IntegralKernel kernelX , IntegralKernel kernelY )

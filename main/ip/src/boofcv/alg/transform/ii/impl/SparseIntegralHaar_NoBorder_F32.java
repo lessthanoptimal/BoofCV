@@ -43,10 +43,8 @@ public class SparseIntegralHaar_NoBorder_F32
 	public void setScale(double scale) {
 		super.setScale(scale);
 		w = 2*r;
-		x0=-r;
-		y0=-r;
-		x1=r+1;
-		y1=r+1;
+		x0 = y0 = -r;
+		x1 = y1 = r;
 	}
 
 	@Override

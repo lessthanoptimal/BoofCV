@@ -157,7 +157,7 @@ public class HelperNister5 {
 	}
 
 	/**
-	 * Construct 10 by 10 coeffient matrix for the following coefficients
+	 * Construct 10 by 10 coefficient matrix for the following coefficients
 	 *
 	 * 'x*z^2','x*z','x','y*z^2','y*z','y','z^3','z^2','z','1'
 	 *

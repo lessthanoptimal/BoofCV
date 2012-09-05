@@ -37,7 +37,7 @@ public class TestSparseIntegralGradient_NoBorder_F32
 	final static int radius = size/2;
 
 	public TestSparseIntegralGradient_NoBorder_F32() {
-		super(ImageFloat32.class, ImageFloat32.class,size);
+		super(ImageFloat32.class, ImageFloat32.class,-radius-1,-radius-1,radius,radius);
 
 		alg = new SparseIntegralGradient_NoBorder_F32(size/2);
 		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius);

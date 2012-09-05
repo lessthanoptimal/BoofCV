@@ -60,36 +60,38 @@ import java.util.List;
 public class EssentialNister5 {
 
 	// Linear system describing p'*E*q = 0
-	DenseMatrix64F Q = new DenseMatrix64F(5,9);
+	private DenseMatrix64F Q = new DenseMatrix64F(5,9);
 	// contains the span of A
-	DenseMatrix64F V = new DenseMatrix64F(9,9);
+	private DenseMatrix64F V = new DenseMatrix64F(9,9);
 	// TODO Try using QR-Factorization as in the paper
-	SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(5,9,false,true,false);
+	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(5,9,false,true,false);
 
 	// where all the ugly equations go
-	HelperNister5 helper = new HelperNister5();
+	private HelperNister5 helper = new HelperNister5();
 
 	// the span containing E
-	double []X = new double[9];
-	double []Y = new double[9];
-	double []Z = new double[9];
-	double []W = new double[9];
+	private double []X = new double[9];
+	private double []Y = new double[9];
+	private double []Z = new double[9];
+	private double []W = new double[9];
 
 	// unknowns for E = x*X + y*Y + z*Z + W
-	double x,y,z;
+	private double x,y,z;
 
-	DenseMatrix64F A1 = new DenseMatrix64F(10,10);
-	DenseMatrix64F A2 = new DenseMatrix64F(10,10);
-	DenseMatrix64F C = new DenseMatrix64F(10,10);
+	// Storage for linear systems
+	private DenseMatrix64F A1 = new DenseMatrix64F(10,10);
+	private DenseMatrix64F A2 = new DenseMatrix64F(10,10);
+	private DenseMatrix64F C = new DenseMatrix64F(10,10);
 
-	FindRealRootsSturm sturm = new FindRealRootsSturm(11,-1,1e-10,20,20);
-	PolynomialRoots findRoots = new WrapRealRootsSturm(sturm);
+	// Used for finding polynomial roots
+	private FindRealRootsSturm sturm = new FindRealRootsSturm(11,-1,1e-10,20,20);
+	private PolynomialRoots findRoots = new WrapRealRootsSturm(sturm);
 
-//	PolynomialRoots findRoots = new RootFinderCompanion();
-	Polynomial poly = new Polynomial(11);
+	// private PolynomialRoots findRoots = new RootFinderCompanion();
+	private Polynomial poly = new Polynomial(11);
 
 	// found essential matrix
-	FastQueue<DenseMatrix64F> solutions = new FastQueue<DenseMatrix64F>(11,DenseMatrix64F.class,false);
+	private FastQueue<DenseMatrix64F> solutions = new FastQueue<DenseMatrix64F>(11,DenseMatrix64F.class,false);
 
 	public EssentialNister5() {
 		for( int i = 0; i < solutions.data.length; i++ )

@@ -44,11 +44,11 @@ public class SparseIntegralSample_F32 extends SparseScaleSample<ImageFloat32> {
 			r = 1;
 		
 		x0 = y0 = -r-1;
-		x1 = y1 = r+1;
+		x1 = y1 = r;
 	}
 
 	@Override
 	public double compute(int x, int y) {
-		return IntegralImageOps.block_unsafe(input,x+x0,y+y0,x+x1-1,y+y1-1);
+		return IntegralImageOps.block_unsafe(input,x+x0,y+y0,x+x1,y+y1);
 	}
 }
