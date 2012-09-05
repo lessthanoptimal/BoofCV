@@ -24,7 +24,9 @@ Version : Alpha 0.10
   * BRIEF and BRIEF-SO now can process features along the image border.  Bit set to false in that case.
 - Visualization Apps
   * VisualizeAssociationScoreApp has score type in a separate panel and can support binary descriptors
-- WrapFHtoInterestPoint now returns the correct detection radius
+- InterestPointDetector 
+  * WrapFHtoInterestPoint now returns the correct detection radius
+  * Fixed non-compliant implementations with incorrectly handled unsupported features.  Thanks jasonnn for submitting this bug
 - Fundamental/Essential Matrix
   * 7-point algorithm now returns all solutions and the algorithm was tweaked
   * Nister 5-pt Essential Matrix
@@ -39,6 +41,7 @@ Version : Alpha 0.10
 - LensDistortionOps
   * Added normalized to distorted pixel transform
   * Tweaked some of the function names
+- SparseIntegralSample_I32.isInBounds() did not return that correct value along the right and bottom image border 
 
 ---------------------------------------------
 Date    : 2012/7/22

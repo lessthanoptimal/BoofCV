@@ -45,13 +45,13 @@ public class TestWrapFHtoInterestPoint {
 	public void NO_Orientation() {
 		WrapFHtoInterestPoint alg = new WrapFHtoInterestPoint(detector);
 
-		new GeneralInterestPointDetectorChecks(alg,false,true,ImageUInt8.class).performAllTests();
+		new GeneralInterestPointDetectorChecks(alg,false,true,ImageUInt8.class){}.performAllTests();
 	}
 
 	@Test
 	public void With_Orientation() {
 		WrapFHtoInterestPoint alg = new WrapFHtoInterestPoint(detector,orientation);
 
-		new GeneralInterestPointDetectorChecks(alg,true,true,ImageUInt8.class).performAllTests();
+		new GeneralInterestPointDetectorChecks(alg,true,true,ImageUInt8.class){}.performAllTests();
 	}
 }

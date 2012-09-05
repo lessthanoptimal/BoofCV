@@ -37,7 +37,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public class GeneralInterestPointDetectorChecks<T extends ImageSingleBand> {
+public abstract class GeneralInterestPointDetectorChecks<T extends ImageSingleBand> {
 
 	private Random rand = new Random(234);
 
@@ -51,6 +51,15 @@ public class GeneralInterestPointDetectorChecks<T extends ImageSingleBand> {
 	public GeneralInterestPointDetectorChecks(InterestPointDetector<T> detector,
 											  boolean hasOrientation, boolean hasScale,
 											  Class<T> imageType ) {
+		configure(detector,hasOrientation,hasScale,imageType);
+	}
+
+	public GeneralInterestPointDetectorChecks() {
+	}
+
+	public void configure(InterestPointDetector<T> detector,
+						  boolean hasOrientation, boolean hasScale,
+						  Class<T> imageType ) {
 		this.detector = detector;
 		this.hasOrientation = hasOrientation;
 		this.hasScale = hasScale;
@@ -70,7 +79,7 @@ public class GeneralInterestPointDetectorChecks<T extends ImageSingleBand> {
 	public void checkExpectedCharacteristics() {
 		assertTrue(hasOrientation == detector.hasOrientation());
 		assertTrue(hasScale == detector.hasScale());
-		assertTrue( detector.getCanonicalRadius() > 0 );
+		assertTrue(detector.getCanonicalRadius() > 0 );
 	}
 
 	/**
@@ -95,7 +104,7 @@ public class GeneralInterestPointDetectorChecks<T extends ImageSingleBand> {
 			if( p.x != 0 && p.y != 0 )
 				numPoint++;
 
-			if( scale != 1 && scale != 0 )
+			if( scale != 1 )
 				numScale++;
 
 			if( yaw != 0 )
@@ -106,9 +115,13 @@ public class GeneralInterestPointDetectorChecks<T extends ImageSingleBand> {
 
 		if( hasScale )
 			assertTrue(numScale > 0 );
+		else
+			assertTrue(numScale == 0);
 
 		if( hasOrientation )
 			assertTrue(numYaw > 0 );
+		else
+			assertTrue(numYaw == 0);
 	}
 
 	/**
