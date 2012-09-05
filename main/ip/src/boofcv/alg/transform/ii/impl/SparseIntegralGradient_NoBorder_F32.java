@@ -42,10 +42,8 @@ public class SparseIntegralGradient_NoBorder_F32
 	public void setScale(double scale) {
 		super.setScale(scale);
 
-		x0=-r-1;
-		y0=-r-1;
-		x1=r+1;
-		y1=r+1;
+		x0 = y0 = -r-1;
+		x1 = y1 =  r;
 	}
 
 	@Override

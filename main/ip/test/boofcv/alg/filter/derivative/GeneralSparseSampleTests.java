@@ -33,8 +33,10 @@ public class GeneralSparseSampleTests <T extends ImageSingleBand>
 	SparseImageSample<T> alg;
 
 	protected GeneralSparseSampleTests(Class<T> inputType,
-									   SparseImageSample<T> alg ) {
-		super(inputType);
+									   SparseImageSample<T> alg ,
+									   int sampleBoxX0 , int sampleBoxY0 ,
+									   int sampleBoxX1 , int sampleBoxY1) {
+		super(inputType,sampleBoxX0,sampleBoxY0,sampleBoxX1,sampleBoxY1);
 		this.alg = alg;
 	}
 

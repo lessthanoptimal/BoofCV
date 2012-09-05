@@ -30,7 +30,7 @@ public class TestSparseIntegralSample_I32 extends GeneralSparseSampleTests<Image
 	private static int baseR = 2;
 
 	public TestSparseIntegralSample_I32() {
-		super(ImageSInt32.class, new SparseIntegralSample_I32(baseR));
+		super(ImageSInt32.class, new SparseIntegralSample_I32(baseR),-baseR-1,-baseR-1,baseR,baseR);
 	}
 
 	@Test

@@ -46,14 +46,12 @@ public abstract class GeneralSparseGradientTests
 	// the algorithm being tests
 	protected SparseImageGradient<T,G>  alg;
 
-	// size of the image border
-	int borderRadius;
 
 	protected GeneralSparseGradientTests(Class<T> inputType, Class<D> derivType,
-										 int borderRadius ) {
-		super(inputType);
+										 int sampleBoxX0 , int sampleBoxY0 ,
+										 int sampleBoxX1 , int sampleBoxY1) {
+		super(inputType,sampleBoxX0,sampleBoxY0,sampleBoxX1,sampleBoxY1);
 		this.derivType = derivType;
-		this.borderRadius = borderRadius;
 
 		derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
 		derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
@@ -81,8 +79,8 @@ public abstract class GeneralSparseGradientTests
 	public void testCenterImage() {
 		imageGradient(input,derivX,derivY);
 		alg.setImage(input);
-		for( int y = borderRadius; y < height-borderRadius; y++ ) {
-			for( int x = borderRadius; x < width-borderRadius; x++ ) {
+		for( int y = -sampleBoxY0; y < height-sampleBoxY1-1; y++ ) {
+			for( int x = -sampleBoxX0; x < width-sampleBoxX1-1; x++ ) {
 				G g = alg.compute(x,y);
 				double expectedX = GeneralizedImageOps.get(derivX,x,y);
 				double expectedY = GeneralizedImageOps.get(derivY,x,y);
@@ -102,8 +100,8 @@ public abstract class GeneralSparseGradientTests
 		T subImage = BoofTesting.createSubImageOf(input);
 		alg.setImage(subImage);
 
-		for( int y = borderRadius; y < height-borderRadius; y++ ) {
-			for( int x = borderRadius; x < width-borderRadius; x++ ) {
+		for( int y = -sampleBoxY0; y < height-sampleBoxY1-1; y++ ) {
+			for( int x = -sampleBoxX0; x < width-sampleBoxX1-1; x++ ) {
 				G g = alg.compute(x,y);
 				double expectedX = GeneralizedImageOps.get(derivX,x,y);
 				double expectedY = GeneralizedImageOps.get(derivY,x,y);
@@ -122,9 +120,9 @@ public abstract class GeneralSparseGradientTests
 		imageGradient(input,derivX,derivY);
 		alg.setImage(input);
 		for( int y = 0; y < height; y++ ) {
-			if( y < borderRadius || y >= height-borderRadius) {
+			if( y < -sampleBoxY0 || y >= height-sampleBoxY1-1) {
 				for( int x = 0; x < width; x++ ) {
-					if( y < borderRadius || y >= height-borderRadius) {
+					if( x < sampleBoxX0 || x >= width-sampleBoxX1-1) {
 						G g = alg.compute(x,y);
 						double expectedX = GeneralizedImageOps.get(derivX,x,y);
 						double expectedY = GeneralizedImageOps.get(derivY,x,y);

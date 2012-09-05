@@ -60,10 +60,11 @@ public abstract class OrientationIntegralBase<T extends ImageSingleBand,G extend
 
 	Class<T> imageType;
 	/**
+	 * Configure orientation estimation.
 	 *
 	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
 	 * @param period How often the image is sampled.  This number is scaled.  Typically 1.   
-	 * @param sampleWidth How wide of a kernel should be used to sample.
+	 * @param sampleWidth How wide of a kernel should be used to sample. Try 4
 	 * @param weightSigma Sigma for weighting.  zero for unweighted.
 	 */
 	public OrientationIntegralBase(int radius, double period, 

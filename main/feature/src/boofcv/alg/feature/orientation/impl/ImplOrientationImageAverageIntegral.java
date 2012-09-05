@@ -42,7 +42,7 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 	// sine values for each pixel
 	protected Kernel2D_F64 kerSine;
 
-	SparseScaleSample<T> sampler;
+	private SparseScaleSample<T> sampler;
 	
 	/**
 	 *
@@ -114,9 +114,15 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 				int pixelX = (int)(tl_x + x * samplePeriod);
 
 				if( sampler.isInBounds(pixelX,pixelY)) {
-					double val = sampler.compute(pixelX,pixelY);
-					Dx += kerCosine.data[i]*val;
-					Dy += kerSine.data[i]*val;
+					try {
+						double val = sampler.compute(pixelX,pixelY);
+						Dx += kerCosine.data[i]*val;
+						Dy += kerSine.data[i]*val;
+					} catch( RuntimeException e ) {
+						sampler.isInBounds(pixelX,pixelY);
+						sampler.compute(pixelX,pixelY);
+						throw e;
+					}
 				}
 			}
 		}
