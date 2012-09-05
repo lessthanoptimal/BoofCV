@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -21,7 +22,7 @@ public class TestDistanceSe3SymmetricSq {
 	DistanceSe3SymmetricSq alg;
 	
 	public TestDistanceSe3SymmetricSq() {
-		alg = new DistanceSe3SymmetricSq(triangulate);
+		alg = new DistanceSe3SymmetricSq(triangulate,1,1,0);
 	}
 	
 	@Test
@@ -88,6 +89,11 @@ public class TestDistanceSe3SymmetricSq {
 
 		alg.setModel(keyToCurr);
 		assertTrue(Double.MAX_VALUE == alg.computeDistance(obs));
+	}
+
+	@Test
+	public void testIntrinsicParameters() {
+		fail("Implement0");
 	}
 
 }

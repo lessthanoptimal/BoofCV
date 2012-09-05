@@ -244,7 +244,9 @@ public class PointCloudViewer extends JPanel {
 		// pick an appropriate amount of motion for the scene
 		double z = baseline*focalLengthX/(minDisparity+rangeDisparity);
 
-		Vector3D_F64 rotPt = new Vector3D_F64(offsetX*5,offsetY*5,z* range);
+		double adjust = baseline/20.0;
+
+		Vector3D_F64 rotPt = new Vector3D_F64(offsetX*adjust,offsetY*adjust,z* range);
 
 		double radians = tiltAngle*Math.PI/180.0;
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(radians,0,0,null);

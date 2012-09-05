@@ -26,10 +26,7 @@ import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.distort.SequencePointTransform_F32;
+import boofcv.struct.distort.*;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.shapes.Rectangle2D_F32;
 import org.ejml.data.DenseMatrix64F;
@@ -142,7 +139,7 @@ public class LensDistortionOps {
 	 * @param param Intrinsic camera parameters
 	 * @return Distorted pixel to normalized image coordinates
 	 */
-	public static PointTransform_F64 removeRadialToNorm( IntrinsicParameters param )
+	public static PointTransform_F64 transformRadialToNorm_F64(IntrinsicParameters param)
 	{
 		RemoveRadialPtoN_F64 radialDistort = new RemoveRadialPtoN_F64();
 		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
@@ -155,18 +152,39 @@ public class LensDistortionOps {
 	}
 
 	/**
+	 * Converts normalized image coordinates into distorted pixel coordinates.
+	 *
+	 * @param param Intrinsic camera parameters
+	 * @return Transform from normalized image coordinates into distorted pixel coordinates
+	 */
+	public static PointTransform_F64 transformNormToRadial_F64(IntrinsicParameters param)
+	{
+		AddRadialNtoN_F64 addRadial = new AddRadialNtoN_F64();
+		addRadial.set(param.radial);
+
+		NormalizedToPixel_F64 toPixel = new NormalizedToPixel_F64();
+		toPixel.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+
+		if( param.flipY ) {
+			return new SequencePointTransform_F64(addRadial,toPixel,new FlipVertical_F64(param.height));
+		} else {
+			return new SequencePointTransform_F64(addRadial,toPixel);
+		}
+	}
+
+	/**
 	 * <p>
-	 * Transform from undistorted image to an image with radial distortion.
+	 * Transform from undistorted pixel coordinates to distorted with radial pixel coordinates
 	 * </p>
 	 *
 	 * <p>
-	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
+	 * NOTE: The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
 	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters
 	 * @return Transform from undistorted to distorted image.
 	 */
-	public static PointTransform_F32 radialTransformInv(IntrinsicParameters param )
+	public static PointTransform_F32 transformPixelToRadial_F32(IntrinsicParameters param)
 	{
 		AddRadialPtoP_F32 radialDistort = new AddRadialPtoP_F32();
 		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
@@ -196,7 +214,7 @@ public class LensDistortionOps {
 		// only compute the transform once
 		ImageDistort<T> ret = FactoryDistort.distortCached(interp, border, imageType);
 
-		PointTransform_F32 transform = radialTransformInv( param );
+		PointTransform_F32 transform = transformPixelToRadial_F32(param);
 
 		ret.setModel(new PointToPixelTransform_F32(transform));
 

@@ -139,12 +139,12 @@ public class FactoryStereoDisparity {
 	 *
 	 * @param minDisparity Minimum disparity that it will check. Must be >= 0 and < maxDisparity
 	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
-	 * @param regionRadiusX Radius of the rectangular region along x-axis.
-	 * @param regionRadiusY Radius of the rectangular region along y-axis.
+	 * @param regionRadiusX Radius of the rectangular region along x-axis. Try 3.
+	 * @param regionRadiusY Radius of the rectangular region along y-axis. Try 3.
 	 * @param maxPerPixelError Maximum allowed error in a region per pixel.  Set to < 0 to disable.
 	 * @param validateRtoL Tolerance for how difference the left to right associated values can be.  Try 6
-	 * @param texture Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
-	 *                Try 0.1
+	 * @param texture Tolerance for how similar optimal region is to other region.  Disable with a value <= 0.
+	 *                Closer to zero is more tolerant. Try 0.1
 	 * @param imageType Type of input image.
 	 * @return Rectangular region based WTA disparity.algorithm.
 	 */

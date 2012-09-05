@@ -83,7 +83,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		});
 
 		// add different types of adjustments
-		PointTransform_F32 tran = LensDistortionOps.radialTransformInv(param);
+		PointTransform_F32 tran = LensDistortionOps.transformPixelToRadial_F32(param);
 		addUndistorted("No Adjustment", tran);
 		PointTransform_F32 allInside = LensDistortionOps.allInside(param, null);
 		addUndistorted("All Inside", allInside);

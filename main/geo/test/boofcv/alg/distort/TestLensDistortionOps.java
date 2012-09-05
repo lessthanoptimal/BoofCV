@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -36,6 +37,22 @@ public class TestLensDistortionOps {
 	Point2D_F32 p = new Point2D_F32();
 	int width = 300;
 	int height = 350;
+
+
+	@Test
+	public void transformRadialToNorm_F64() {
+		fail("implement");
+	}
+
+	@Test
+	public void transformNormToRadial_F64() {
+		fail("implement");
+	}
+
+	@Test
+	public void transformPixelToRadial_F32() {
+		fail("implement");
+	}
 
 	/**
 	 * If a transform contains the full view then the border of the transform will only

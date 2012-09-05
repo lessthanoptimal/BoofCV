@@ -73,8 +73,8 @@ public abstract class SelectRectStandard <Array , T extends ImageSingleBand>
 	 * @param maxError The maximum allowed error.  Note this is sum error and not per pixel error.
 	 *                 Try (region width*height)*30.
 	 * @param rightToLeftTolerance Tolerance for how difference the left to right associated values can be.  Try 6
-	 * @param texture Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
-	 *                Try 0.1
+	 * @param texture Tolerance for how similar optimal region is to other region.  Disable with a value <= 0.
+	 *                Closer to zero is more tolerant. Try 0.1
 	 */
 	public SelectRectStandard(int maxError, int rightToLeftTolerance, double texture) {
 		this.maxError = maxError <= 0 ? Integer.MAX_VALUE : maxError;
