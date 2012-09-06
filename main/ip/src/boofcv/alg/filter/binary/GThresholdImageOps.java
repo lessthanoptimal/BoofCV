@@ -93,22 +93,24 @@ public class GThresholdImageOps {
 	 * @return Number of blobs found.
 	 */
 	public static <T extends ImageSingleBand>
-			void hysteresisLabel4( T input , ImageSInt32 output ,
+			int hysteresisLabel4( T input , ImageSInt32 output ,
 								   double lowerThreshold , double upperThreshold , boolean down ,
 								   ImageUInt8 work )
 	{
 		if( input instanceof ImageFloat32 ) {
-			ThresholdImageOps.hysteresisLabel4((ImageFloat32)input,output,(float)lowerThreshold,(float)upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel4((ImageFloat32)input,output,(float)lowerThreshold,(float)upperThreshold,down,work);
 		} else if( input instanceof ImageFloat64 ) {
-			ThresholdImageOps.hysteresisLabel4((ImageFloat64)input,output,lowerThreshold,upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel4((ImageFloat64)input,output,lowerThreshold,upperThreshold,down,work);
 		} else if( input instanceof ImageUInt8 ) {
-			ThresholdImageOps.hysteresisLabel4((ImageUInt8)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel4((ImageUInt8)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
 		} else if( input instanceof ImageSInt16) {
-			ThresholdImageOps.hysteresisLabel4((ImageSInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel4((ImageSInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
 		} else if( input instanceof ImageUInt16) {
-			ThresholdImageOps.hysteresisLabel4((ImageUInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel4((ImageUInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
 		} else if( input instanceof ImageSInt32) {
-			ThresholdImageOps.hysteresisLabel4((ImageSInt32)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel4((ImageSInt32)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -134,22 +136,24 @@ public class GThresholdImageOps {
 	 * @return Number of blobs found.
 	 */
 	public static <T extends ImageSingleBand>
-			void hysteresisLabel8( T input , ImageSInt32 output ,
+			int hysteresisLabel8( T input , ImageSInt32 output ,
 								   double lowerThreshold , double upperThreshold , boolean down ,
 								   ImageUInt8 work )
 	{
 		if( input instanceof ImageFloat32 ) {
-			ThresholdImageOps.hysteresisLabel8((ImageFloat32)input,output,(float)lowerThreshold,(float)upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel8((ImageFloat32)input,output,(float)lowerThreshold,(float)upperThreshold,down,work);
 		} else if( input instanceof ImageFloat64 ) {
-			ThresholdImageOps.hysteresisLabel8((ImageFloat64)input,output,lowerThreshold,upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel8((ImageFloat64)input,output,lowerThreshold,upperThreshold,down,work);
 		} else if( input instanceof ImageUInt8 ) {
-			ThresholdImageOps.hysteresisLabel8((ImageUInt8)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel8((ImageUInt8)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
 		} else if( input instanceof ImageSInt16) {
-			ThresholdImageOps.hysteresisLabel8((ImageSInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel8((ImageSInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
 		} else if( input instanceof ImageUInt16) {
-			ThresholdImageOps.hysteresisLabel8((ImageUInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel8((ImageUInt16)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
 		} else if( input instanceof ImageSInt32) {
-			ThresholdImageOps.hysteresisLabel8((ImageSInt32)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+			return ThresholdImageOps.hysteresisLabel8((ImageSInt32)input,output,(int)lowerThreshold,(int)upperThreshold,down,work);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
 	}
 }
