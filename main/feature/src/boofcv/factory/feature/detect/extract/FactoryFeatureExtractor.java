@@ -19,49 +19,47 @@
 package boofcv.factory.feature.detect.extract;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.extract.WrapperNonMaxCandidate;
 import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.extract.*;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Creates {@link FeatureExtractor} for finding local maximums in feature intensity images.
  *
- * @see boofcv.factory.feature.detect.intensity.FactoryIntensityPoint
- *
  * @author Peter Abeles
+ * @see boofcv.factory.feature.detect.intensity.FactoryIntensityPoint
  */
-public class FactoryFeatureExtractor
-{
+public class FactoryFeatureExtractor {
 	/**
 	 * Creates a generalized feature detector/extractor that adds n-best capability to {@link FeatureExtractor}
 	 * and performs other house keeping tasks. Handles calling {@link GeneralFeatureIntensity} itself.
 	 *
-	 * @param intensity Feature intensity algorithm
-	 * @param extractor Feature extraction algorithm.
+	 * @param intensity   Feature intensity algorithm
+	 * @param extractor   Feature extraction algorithm.
 	 * @param maxFeatures Maximum number of features it should return. -1 to return them all.
-	 * @param <I> Input image type.
-	 * @param <D> Image derivative type.
+	 * @param <I>         Input image type.
+	 * @param <D>         Image derivative type.
 	 * @return General feature detector
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<I,D> general( GeneralFeatureIntensity<I, D> intensity,
+	GeneralFeatureDetector<I, D> general(GeneralFeatureIntensity<I, D> intensity,
 										 FeatureExtractor extractor,
 										 int maxFeatures) {
-		GeneralFeatureDetector<I,D> det = new GeneralFeatureDetector<I,D>(intensity,extractor);
+		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<I, D>(intensity, extractor);
 		det.setMaxFeatures(maxFeatures);
 
 		return det;
 	}
-	
+
 	/**
 	 * Standard non-max feature extractor.
 	 *
-	 * @param searchRadius Radius of the non-maximum region.
-	 * @param threshold Minimum feature intensity it will consider
-	 * @param ignoreBorder Size of border around the image in which pixels are not considered.
+	 * @param searchRadius  Radius of the non-maximum region.
+	 * @param threshold     Minimum feature intensity it will consider
+	 * @param ignoreBorder  Size of border around the image in which pixels are not considered.
 	 * @param useStrictRule Is a strict test used to test for local maximums.
 	 * @return A feature extractor.
 	 */
@@ -70,8 +68,8 @@ public class FactoryFeatureExtractor
 										  int ignoreBorder,
 										  boolean useStrictRule) {
 
-		NonMaxBlock ret = null;
-		if( useStrictRule ) {
+		NonMaxBlock ret;
+		if (useStrictRule) {
 			ret = new NonMaxBlockStrict();
 		} else {
 			ret = new NonMaxBlockRelaxed();
@@ -87,9 +85,9 @@ public class FactoryFeatureExtractor
 	/**
 	 * Non-max feature extractor which saves a candidate list of all the found local maximums..
 	 *
-	 * @param searchRadius Minimum separation between found features.
-	 * @param threshold Minimum feature intensity it will consider
-	 * @param ignoreBorder Size of border around the image in which pixels are not considered.
+	 * @param searchRadius  Minimum separation between found features.
+	 * @param threshold     Minimum feature intensity it will consider
+	 * @param ignoreBorder  Size of border around the image in which pixels are not considered.
 	 * @param useStrictRule Is a strict test used to test for local maximums.
 	 * @return A feature extractor.
 	 */
@@ -97,10 +95,10 @@ public class FactoryFeatureExtractor
 												   int ignoreBorder, boolean useStrictRule) {
 		WrapperNonMaxCandidate ret;
 
-		if( useStrictRule )
-			ret = new WrapperNonMaxCandidate(new NonMaxCandidateStrict(searchRadius,threshold, ignoreBorder));
+		if (useStrictRule)
+			ret = new WrapperNonMaxCandidate(new NonMaxCandidateStrict(searchRadius, threshold, ignoreBorder));
 		else
-			ret = new WrapperNonMaxCandidate(new NonMaxCandidateRelaxed(searchRadius,threshold, ignoreBorder));
+			ret = new WrapperNonMaxCandidate(new NonMaxCandidateRelaxed(searchRadius, threshold, ignoreBorder));
 
 		return ret;
 	}

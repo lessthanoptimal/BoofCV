@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.pklt;
 
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.KltTracker;
@@ -42,7 +42,7 @@ import java.util.List;
 @SuppressWarnings({"unchecked"})
 public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	// configuration for the track manager
-	protected PkltManagerConfig<I,D> config;
+	protected PkltManagerConfig<I, D> config;
 
 	// list of features which are actively being tracked
 	protected List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
@@ -64,14 +64,13 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	 *
 	 * @param config Configuration for the tracker/manager.
 	 */
-	public PkltManager(PkltManagerConfig<I,D> config )
-	{
-		GeneralFeatureDetector<I,D> detector =
+	public PkltManager(PkltManagerConfig<I, D> config) {
+		GeneralFeatureDetector<I, D> detector =
 				FactoryDetectPoint.createShiTomasi(config.featureRadius,
 						false, config.config.minDeterminant, config.maxFeatures, config.typeDeriv);
 
 		GenericPkltFeatSelector<I, D> featureSelector =
-				new GenericPkltFeatSelector<I,D>( detector ,null);
+				new GenericPkltFeatSelector<I, D>(detector, null);
 
 		configure(config,
 				FactoryInterpolation.<I>bilinearRectangle(config.typeInput),
@@ -82,7 +81,7 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	public PkltManager() {
 	}
 
-	public void configure(PkltManagerConfig<I,D> config,
+	public void configure(PkltManagerConfig<I, D> config,
 						  InterpolateRectangle<I> interpInput,
 						  InterpolateRectangle<D> interpDeriv,
 						  GenericPkltFeatSelector<I, D> featureSelector) {
@@ -90,8 +89,8 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 		this.config = config;
 		this.featureSelector = featureSelector;
 
-		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput,interpDeriv,config.config);
-		tracker = new PyramidKltTracker<I,D>(klt);
+		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, config.config);
+		tracker = new PyramidKltTracker<I, D>(klt);
 		featureSelector.setTracker(tracker);
 
 		// pre-declare image features
@@ -106,14 +105,14 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	 *
 	 * @return if the new feature was added or not.
 	 */
-	public boolean addTrack( float x , float y ) {
-		if( unused.isEmpty() )
+	public boolean addTrack(float x, float y) {
+		if (unused.isEmpty())
 			return false;
 
-		PyramidKltFeature f = unused.remove( unused.size()-1 );
-		f.setPosition(x,y);
+		PyramidKltFeature f = unused.remove(unused.size() - 1);
+		f.setPosition(x, y);
 		tracker.setDescription(f);
-		if( f.maxLayer == -1 ) {
+		if (f.maxLayer == -1) {
 			unused.add(f);
 			return false;
 		}
@@ -127,22 +126,22 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	/**
 	 * Processes the next image in the sequence.  Updates tracks.
 	 *
-	 * @param image Image
+	 * @param image  Image
 	 * @param derivX Image derivative x-axis
 	 * @param derivY Image derivative y-axis
 	 */
-	public void processFrame( ImagePyramid<I> image ,
-							  ImagePyramid<D> derivX ,
-							  ImagePyramid<D> derivY ) {
+	public void processFrame(ImagePyramid<I> image,
+							 ImagePyramid<D> derivX,
+							 ImagePyramid<D> derivY) {
 
 		spawned.clear();
 		dropped.clear();
-		tracker.setImage(image,derivX,derivY);
-		
-		for( int i = active.size()-1; i >= 0; i-- ) {
+		tracker.setImage(image, derivX, derivY);
+
+		for (int i = active.size() - 1; i >= 0; i--) {
 			PyramidKltFeature f = active.get(i);
 			KltTrackFault result = tracker.track(f);
-			if( result != KltTrackFault.SUCCESS ) {
+			if (result != KltTrackFault.SUCCESS) {
 //				System.out.println("Dropping feature: "+result);
 				unused.add(f);
 				active.remove(i);
@@ -193,7 +192,7 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	}
 
 	public void dropTrack(PyramidKltFeature feature) {
-		if( !active.remove(feature))
+		if (!active.remove(feature))
 			throw new IllegalArgumentException("Feature not in active list");
 		dropped.add(feature);
 		unused.add(feature);
@@ -202,17 +201,17 @@ public class PkltManager<I extends ImageSingleBand, D extends ImageSingleBand> {
 	/**
 	 * Automatically detects and creates new tracks.
 	 */
-	public void spawnTracks( ImagePyramid<I> image ,
-							 ImagePyramid<D> derivX ,
-							 ImagePyramid<D> derivY ) {
+	public void spawnTracks(ImagePyramid<I> image,
+							ImagePyramid<D> derivX,
+							ImagePyramid<D> derivY) {
 		spawned.clear();
 		int numBefore = active.size();
-		featureSelector.setInputs(image,derivX,derivY);
-		featureSelector.compute(active,unused);
+		featureSelector.setInputs(image, derivX, derivY);
+		featureSelector.compute(active, unused);
 
 		// add new features which were just added
-		for( int i = numBefore; i < active.size(); i++ ) {
-			spawned.add( active.get(i));
+		for (int i = numBefore; i < active.size(); i++) {
+			spawned.add(active.get(i));
 		}
 	}
 }

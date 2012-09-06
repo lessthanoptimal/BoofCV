@@ -27,9 +27,9 @@ import boofcv.struct.image.ImageFloat32;
  * Detects features in an intensity image as local maximums.  The extractor can be configured to ignore pixels
  * along the image's border.  Some implementations can be significantly speed up by using candidate features previously
  * computed.  If a pixel's value is less than the minimum pixel intensity it cannot be a feature even if it is a local
- *
+ * <p/>
  * </p>
- *
+ * <p/>
  * <p>
  * Almost all feature extraction algorithms use a threshold to determine what can be a feature or not.  Pixels
  * whose intensity is less than the threshold cannot be a feature.  This interface allows the threshold to be changed,
@@ -37,8 +37,8 @@ import boofcv.struct.image.ImageFloat32;
  * a pixel has an intensity of Float.MAX_VALUE then it is ignored and not returned.  This technique is often used to
  * ignore features which have already been detected.
  * </p>
- *
- * <p>
+ * <p/>
+ * <p/>
  * Depending in the implementation the following may or may not be supported:
  * <ul>
  * <li> Ignore existing corners.  Corners which are passed in will be ignored. </li>
@@ -53,13 +53,13 @@ public interface FeatureExtractor {
 	 * Process a feature intensity image to extract the point features.  If a pixel has an intensity
 	 * value == Float.MAX_VALUE it is be ignored.
 	 *
-	 * @param intensity	Feature intensity image.  Can be modified.
-	 * @param candidate Optional list of candidate features computed with the intensity image.
+	 * @param intensity       Feature intensity image.  Can be modified.
+	 * @param candidate       Optional list of candidate features computed with the intensity image.
 	 * @param requestedNumber Number of features it should find.  Not always supported.
-	 * @param foundFeature Features which were found.
+	 * @param foundFeature    Features which were found.
 	 */
 	public void process(ImageFloat32 intensity, QueueCorner candidate,
-						int requestedNumber ,
+						int requestedNumber,
 						QueueCorner foundFeature);
 
 	/**
@@ -71,6 +71,7 @@ public interface FeatureExtractor {
 
 	/**
 	 * If it accepts requests to find a specific number of features or not.
+	 *
 	 * @return If requests are accepted for number of features.
 	 */
 	public boolean getAcceptRequest();
@@ -87,7 +88,7 @@ public interface FeatureExtractor {
 	 *
 	 * @param threshold The new selection threshold.
 	 */
-	public void setThreshold( float threshold );
+	public void setThreshold(float threshold);
 
 	/**
 	 * Pixels which are within 'border' of the image border will not be considered.
@@ -111,6 +112,13 @@ public interface FeatureExtractor {
 	 * @return If it can detect features inside the image border.
 	 */
 	public boolean canDetectBorder();
+
+	/**
+	 * Species the search radius for the feature
+	 *
+	 * @param radius Radius in pixels
+	 */
+	public void setSearchRadius(int radius);
 
 	/**
 	 * Describes how large the region is that is being searched.  The radius is the number of

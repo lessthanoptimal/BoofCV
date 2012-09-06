@@ -18,7 +18,7 @@
 
 package boofcv.benchmark.feature.detect;
 
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
 import boofcv.alg.feature.detect.interest.FeatureLaplaceScaleSpace;
@@ -40,10 +40,9 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class BenchmarkDetectHelper {
-	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	List<BenchmarkAlgorithm> createAlgs( BenchmarkInterestParameters<T,D> param )
-	{
-	    int radius = param.radius;
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	List<BenchmarkAlgorithm> createAlgs(BenchmarkInterestParameters<T, D> param) {
+		int radius = param.radius;
 		Class<T> imageType = param.imageType;
 		Class<D> derivType = param.derivType;
 		int maxFeatures = param.maxFeatures;
@@ -52,33 +51,33 @@ public class BenchmarkDetectHelper {
 
 		List<BenchmarkAlgorithm> ret = new ArrayList<BenchmarkAlgorithm>();
 
-		GeneralFeatureDetector<T,D> alg;
+		GeneralFeatureDetector<T, D> alg;
 		int thresh = 1;
 
 		alg = FactoryDetectPoint.createFast(radius, 20, maxFeatures, imageType);
-		ret.add( new BenchmarkAlgorithm("Fast", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
+		ret.add(new BenchmarkAlgorithm("Fast", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)));
 		alg = FactoryDetectPoint.createHarris(radius, false, thresh, maxFeatures, derivType);
-		ret.add( new BenchmarkAlgorithm("Harris", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
+		ret.add(new BenchmarkAlgorithm("Harris", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)));
 		alg = FactoryDetectPoint.createShiTomasi(radius, false, thresh, maxFeatures, derivType);
-		ret.add( new BenchmarkAlgorithm("KLT", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
+		ret.add(new BenchmarkAlgorithm("KLT", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)));
 		alg = FactoryDetectPoint.createKitRos(radius, thresh, maxFeatures, derivType);
-		ret.add( new BenchmarkAlgorithm("KitRos", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
+		ret.add(new BenchmarkAlgorithm("KitRos", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)));
 		alg = FactoryDetectPoint.createMedian(radius, thresh, maxFeatures, imageType);
-		ret.add( new BenchmarkAlgorithm("Median", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
+		ret.add(new BenchmarkAlgorithm("Median", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)));
 		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, radius, thresh, maxFeatures, derivType);
-		ret.add( new BenchmarkAlgorithm("Hessian", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
+		ret.add(new BenchmarkAlgorithm("Hessian", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)));
 		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, radius, thresh, maxFeatures, derivType);
-		ret.add( new BenchmarkAlgorithm("Laplace", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)) );
+		ret.add(new BenchmarkAlgorithm("Laplace", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)));
 
-		FeatureLaplaceScaleSpace<T,D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
-		ret.add( new BenchmarkAlgorithm("Hess Lap SS", FactoryInterestPoint.wrapDetector(flss, scales, imageType)) );
-		FeatureLaplacePyramid<T,D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
-		ret.add( new BenchmarkAlgorithm("Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, imageType)) );
-		FeatureScaleSpace<T,D> fss = FactoryInterestPointAlgs.hessianScaleSpace(radius, thresh, maxScaleFeatures, imageType, derivType);
-		ret.add( new BenchmarkAlgorithm("Hessian SS", FactoryInterestPoint.wrapDetector(fss, scales, imageType)) );
-		FeaturePyramid<T,D> fp = FactoryInterestPointAlgs.hessianPyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
-		ret.add( new BenchmarkAlgorithm("Hessian P", FactoryInterestPoint.wrapDetector(fp, scales, imageType)) );
-		ret.add( new BenchmarkAlgorithm("FastHessian", FactoryInterestPoint.<T>fastHessian(1, 2, maxScaleFeatures, 1, 9, 4, 4)) );
+		FeatureLaplaceScaleSpace<T, D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
+		ret.add(new BenchmarkAlgorithm("Hess Lap SS", FactoryInterestPoint.wrapDetector(flss, scales, imageType)));
+		FeatureLaplacePyramid<T, D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
+		ret.add(new BenchmarkAlgorithm("Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, imageType)));
+		FeatureScaleSpace<T, D> fss = FactoryInterestPointAlgs.hessianScaleSpace(radius, thresh, maxScaleFeatures, imageType, derivType);
+		ret.add(new BenchmarkAlgorithm("Hessian SS", FactoryInterestPoint.wrapDetector(fss, scales, imageType)));
+		FeaturePyramid<T, D> fp = FactoryInterestPointAlgs.hessianPyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
+		ret.add(new BenchmarkAlgorithm("Hessian P", FactoryInterestPoint.wrapDetector(fp, scales, imageType)));
+		ret.add(new BenchmarkAlgorithm("FastHessian", FactoryInterestPoint.<T>fastHessian(1, 2, maxScaleFeatures, 1, 9, 4, 4)));
 
 		return ret;
 	}

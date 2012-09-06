@@ -39,19 +39,19 @@ import java.util.List;
 @SuppressWarnings({"unchecked"})
 public class BoofTesting {
 
-	public static <T>T convertToGenericType( Class<?> type ) {
-		if( type == ImageSInt8.class || type == ImageUInt8.class )
-			return (T)ImageInt8.class;
-		if( type == ImageSInt16.class || type == ImageUInt16.class )
-			return (T)ImageInt16.class;
-		return (T)type;
+	public static <T> T convertToGenericType(Class<?> type) {
+		if (type == ImageSInt8.class || type == ImageUInt8.class)
+			return (T) ImageInt8.class;
+		if (type == ImageSInt16.class || type == ImageUInt16.class)
+			return (T) ImageInt16.class;
+		return (T) type;
 	}
 
-	public static ImageTypeInfo convertToGenericType( ImageTypeInfo<?> type ) {
-		if( type.isInteger() ) {
-			if( type.getNumBits() == 8 )
+	public static ImageTypeInfo convertToGenericType(ImageTypeInfo<?> type) {
+		if (type.isInteger()) {
+			if (type.getNumBits() == 8)
 				return ImageTypeInfo.I8;
-			else if( type.getNumBits() == 16 )
+			else if (type.getNumBits() == 16)
 				return ImageTypeInfo.I16;
 		}
 
@@ -60,14 +60,14 @@ public class BoofTesting {
 
 	/**
 	 * If an image is to be created then the generic type can't be used a specific one needs to be.  An arbitrary
-	 * specific image type is returned here. 
+	 * specific image type is returned here.
 	 */
-	public static <T>T convertGenericToSpecificType( Class<?> type ) {
-		if( type == ImageInt8.class )
-			return (T)ImageUInt8.class;
-		if( type == ImageInt16.class )
-			return (T)ImageSInt16.class;
-		return (T)type;
+	public static <T> T convertGenericToSpecificType(Class<?> type) {
+		if (type == ImageInt8.class)
+			return (T) ImageUInt8.class;
+		if (type == ImageInt16.class)
+			return (T) ImageSInt16.class;
+		return (T) type;
 	}
 
 	/**
@@ -167,9 +167,9 @@ public class BoofTesting {
 	 * have one input parameter of type {@link boofcv.struct.image.ImageUInt8}.
 	 *
 	 * @param testClass   Instance of the class that contains the function being tested.
-	 * @param function	The name of the function being tested.
+	 * @param function    The name of the function being tested.
 	 * @param checkEquals Checks to see if the two images have been modified the same way on output
-	 * @param inputParam	The original input parameters
+	 * @param inputParam  The original input parameters
 	 */
 	// TODO make sure pixels outside are not modified of sub-matrix
 	// todo have the submatrices be from different shaped inputs
@@ -185,8 +185,8 @@ public class BoofTesting {
 			Object[] inputModified = new Object[inputParam.length];
 
 			for (int i = 0; i < inputParam.length; i++) {
-				if( ImageSingleBand.class.isAssignableFrom(inputParam[i].getClass())) {
-					ImageSingleBand<?> img = (ImageSingleBand<?>)inputParam[i];
+				if (ImageSingleBand.class.isAssignableFrom(inputParam[i].getClass())) {
+					ImageSingleBand<?> img = (ImageSingleBand<?>) inputParam[i];
 
 					// copy the original image inside of a larger image
 					larger[i] = img._createNew(img.getWidth() + 10, img.getHeight() + 12);
@@ -195,7 +195,7 @@ public class BoofTesting {
 					subImg[i].setTo(img);
 
 				}
-				
+
 				// the first time it is called use the original inputs
 				inputModified[i] = inputParam[i];
 				paramDesc[i] = inputParam[i].getClass();
@@ -208,8 +208,8 @@ public class BoofTesting {
 			m.invoke(testClass, inputModified);
 
 			// now try it with the sub-image
-			for( int i = 0; i < inputModified.length; i++ ) {
-				if( subImg[i] != null )
+			for (int i = 0; i < inputModified.length; i++) {
+				if (subImg[i] != null)
 					inputModified[i] = subImg[i];
 			}
 			m.invoke(testClass, inputModified);
@@ -217,9 +217,9 @@ public class BoofTesting {
 			// the result should be the identical
 			if (checkEquals) {
 				for (int i = 0; i < inputParam.length; i++) {
-					if( subImg[i] == null )
+					if (subImg[i] == null)
 						continue;
-					if( ImageInteger.class.isAssignableFrom(inputParam[i].getClass()))
+					if (ImageInteger.class.isAssignableFrom(inputParam[i].getClass()))
 						assertEquals((ImageInteger) inputModified[i], (ImageInteger) subImg[i], 0);
 					else if (inputParam[i] instanceof ImageInterleavedInt8)
 						assertEquals((ImageInterleavedInt8) inputParam[i], (ImageInterleavedInt8) subImg[i]);
@@ -244,7 +244,7 @@ public class BoofTesting {
 	 * to see if any matches that could accept an input of the specified type.  If there
 	 * is only one such match that is returned.
 	 */
-	public static Method findMethod(Class<?> type, String name,  Class<?>... params ) {
+	public static Method findMethod(Class<?> type, String name, Class<?>... params) {
 		Method methods[] = type.getMethods();
 
 		List<Method> found = new ArrayList<Method>();
@@ -272,23 +272,23 @@ public class BoofTesting {
 			// see if it could be called with these parameters
 			match = true;
 			for (int i = 0; i < a.length; i++) {
-				if( params[i] == a[i] )
+				if (params[i] == a[i])
 					continue;
-				if( a[i].isPrimitive() ) {
-					if( a[i] == Byte.TYPE &&  params[i] == Byte.class )
+				if (a[i].isPrimitive()) {
+					if (a[i] == Byte.TYPE && params[i] == Byte.class)
 						continue;
-					if( a[i] == Short.TYPE &&  params[i] == Short.class )
+					if (a[i] == Short.TYPE && params[i] == Short.class)
 						continue;
-					if( a[i] == Integer.TYPE &&  params[i] == Integer.class )
+					if (a[i] == Integer.TYPE && params[i] == Integer.class)
 						continue;
-					if( a[i] == Long.TYPE &&  params[i] == Long.class )
+					if (a[i] == Long.TYPE && params[i] == Long.class)
 						continue;
-					if( a[i] == Float.TYPE &&  params[i] == Float.class )
+					if (a[i] == Float.TYPE && params[i] == Float.class)
 						continue;
-					if( a[i] == Double.TYPE &&  params[i] == Double.class )
+					if (a[i] == Double.TYPE && params[i] == Double.class)
 						continue;
 				}
-				if ( !a[i].isAssignableFrom(params[i])) {
+				if (!a[i].isAssignableFrom(params[i])) {
 					match = false;
 					break;
 				}
@@ -318,18 +318,18 @@ public class BoofTesting {
 	 * @param targetMethod
 	 * @return The number of times 'targetMethod' was found and called.
 	 */
-	public static int findMethodThenCall( Object owner ,  String ownerMethod , Class target , String targetMethod  ) {
+	public static int findMethodThenCall(Object owner, String ownerMethod, Class target, String targetMethod) {
 		int total = 0;
 		Method[] list = target.getMethods();
 
 		try {
-			Method om = owner.getClass().getMethod(ownerMethod,Method.class);
+			Method om = owner.getClass().getMethod(ownerMethod, Method.class);
 
-			for( Method m : list ) {
-				if( !m.getName().equals(targetMethod))
+			for (Method m : list) {
+				if (!m.getName().equals(targetMethod))
 					continue;
 
-				om.invoke(owner,m);
+				om.invoke(owner, m);
 
 				total++;
 			}
@@ -344,35 +344,35 @@ public class BoofTesting {
 		return total;
 	}
 
-	public static void assertEquals( double a[] , double b[], double tol ) {
-		for( int i = 0; i < a.length; i++ ) {
+	public static void assertEquals(double a[], double b[], double tol) {
+		for (int i = 0; i < a.length; i++) {
 			double diff = Math.abs(a[i] - b[i]);
-			if( diff > tol )
-				throw new RuntimeException("Element "+i+" not equals. "+a[i]+" "+b[i]);
+			if (diff > tol)
+				throw new RuntimeException("Element " + i + " not equals. " + a[i] + " " + b[i]);
 		}
 	}
 
-	public static void assertEquals( double a[] , float b[], double tol ) {
-		for( int i = 0; i < a.length; i++ ) {
+	public static void assertEquals(double a[], float b[], double tol) {
+		for (int i = 0; i < a.length; i++) {
 			double diff = Math.abs(a[i] - b[i]);
-			if( diff > tol )
-				throw new RuntimeException("Element "+i+" not equals. "+a[i]+" "+b[i]);
+			if (diff > tol)
+				throw new RuntimeException("Element " + i + " not equals. " + a[i] + " " + b[i]);
 		}
 	}
 
-	public static void assertEquals( double a[] , int b[] ) {
-		for( int i = 0; i < a.length; i++ ) {
-			double diff = Math.abs((int)a[i] - b[i]);
-			if( diff != 0 )
-				throw new RuntimeException("Element "+i+" not equals. "+a[i]+" "+b[i]);
+	public static void assertEquals(double a[], int b[]) {
+		for (int i = 0; i < a.length; i++) {
+			double diff = Math.abs((int) a[i] - b[i]);
+			if (diff != 0)
+				throw new RuntimeException("Element " + i + " not equals. " + a[i] + " " + b[i]);
 		}
 	}
 
-	public static void assertEquals( float a[] , float b[], float tol ) {
-		for( int i = 0; i < a.length; i++ ) {
+	public static void assertEquals(float a[], float b[], float tol) {
+		for (int i = 0; i < a.length; i++) {
 			double diff = Math.abs(a[i] - b[i]);
-			if( diff > tol )
-				throw new RuntimeException("Element "+i+" not equals. "+a[i]+" "+b[i]);
+			if (diff > tol)
+				throw new RuntimeException("Element " + i + " not equals. " + a[i] + " " + b[i]);
 		}
 	}
 
@@ -385,31 +385,31 @@ public class BoofTesting {
 	 */
 	public static void assertEqualsGeneric(ImageSingleBand imgA, ImageSingleBand imgB, int tolInt, double tolFloat) {
 
-		if( imgA.getTypeInfo().isInteger() && imgB.getTypeInfo().isInteger() ) {
-			assertEquals((ImageInteger)imgA,(ImageInteger)imgB,tolInt);
-		} else if( imgA.getTypeInfo().isInteger() || imgB.getTypeInfo().isInteger() ) {
-			ImageInteger imgInt = (ImageInteger)(imgA.getTypeInfo().isInteger() ? imgA : imgB);
-			ImageFloat imgFloat = (ImageFloat)(imgA.getTypeInfo().isInteger() ? imgB : imgA);
+		if (imgA.getTypeInfo().isInteger() && imgB.getTypeInfo().isInteger()) {
+			assertEquals((ImageInteger) imgA, (ImageInteger) imgB, tolInt);
+		} else if (imgA.getTypeInfo().isInteger() || imgB.getTypeInfo().isInteger()) {
+			ImageInteger imgInt = (ImageInteger) (imgA.getTypeInfo().isInteger() ? imgA : imgB);
+			ImageFloat imgFloat = (ImageFloat) (imgA.getTypeInfo().isInteger() ? imgB : imgA);
 
-			assertEquals(imgInt,imgFloat,tolInt);
+			assertEquals(imgInt, imgFloat, tolInt);
 		} else {
-			assertEquals((ImageFloat) imgA, (ImageFloat) imgB, 0, (float)tolFloat);
+			assertEquals((ImageFloat) imgA, (ImageFloat) imgB, 0, (float) tolFloat);
 		}
 	}
 
 	public static void assertEqualsGeneric(ImageSingleBand imgA, ImageSingleBand imgB, int tolInt, double tolFloat,
-										   int ignoreBorder ) {
+										   int ignoreBorder) {
 
 		if (ImageInteger.class.isAssignableFrom(imgA.getClass())) {
-			if( ImageInteger.class.isAssignableFrom(imgB.getClass()) ) {
+			if (ImageInteger.class.isAssignableFrom(imgB.getClass())) {
 				assertEquals((ImageInteger) imgA, (ImageInteger) imgB, ignoreBorder);
 			} else {
 				assertEquals((ImageInteger) imgA, (ImageFloat32) imgB, ignoreBorder);
 			}
-		} else if( ImageInteger.class.isAssignableFrom(imgB.getClass()) ) {
+		} else if (ImageInteger.class.isAssignableFrom(imgB.getClass())) {
 			assertEquals((ImageInteger) imgB, (ImageFloat32) imgA, ignoreBorder);
 		} else {
-			assertEquals((ImageFloat32) imgA, (ImageFloat32) imgB, ignoreBorder, (float)tolFloat);
+			assertEquals((ImageFloat32) imgA, (ImageFloat32) imgB, ignoreBorder, (float) tolFloat);
 		}
 	}
 
@@ -417,8 +417,8 @@ public class BoofTesting {
 	 * Checks to see if two images are equivalent.  Note that this is not the same
 	 * as identical since they can be sub-images.
 	 *
-	 * @param imgA		 An image.
-	 * @param imgB		 An image.
+	 * @param imgA         An image.
+	 * @param imgB         An image.
 	 * @param ignoreBorder
 	 */
 	public static void assertEquals(ImageInteger imgA, ImageInteger imgB, int ignoreBorder) {
@@ -431,7 +431,7 @@ public class BoofTesting {
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
 				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + imgB.get(x, y)+" Subimages = "+imgA.isSubimage()+" "+imgB.isSubimage());
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + imgB.get(x, y) + " Subimages = " + imgA.isSubimage() + " " + imgB.isSubimage());
 			}
 		}
 	}
@@ -445,8 +445,8 @@ public class BoofTesting {
 
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				if (imgA.get(x, y) != (int)imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + (int)imgB.get(x, y));
+				if (imgA.get(x, y) != (int) imgB.get(x, y))
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + (int) imgB.get(x, y));
 			}
 		}
 	}
@@ -460,8 +460,8 @@ public class BoofTesting {
 
 		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				if (imgA.get(x, y) != (int)imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + (int)imgB.get(x, y));
+				if (imgA.get(x, y) != (int) imgB.get(x, y))
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + (int) imgB.get(x, y));
 			}
 		}
 	}
@@ -503,7 +503,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static void assertEquals( ImageInteger imgA, ImageFloat imgB, int tol) {
+	public static void assertEquals(ImageInteger imgA, ImageFloat imgB, int tol) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -515,13 +515,13 @@ public class BoofTesting {
 
 		for (int y = 0; y < imgA.getHeight(); y++) {
 			for (int x = 0; x < imgA.getWidth(); x++) {
-				if( Math.abs(a.get(x, y).intValue() - b.get(x, y).intValue()) > tol)
+				if (Math.abs(a.get(x, y).intValue() - b.get(x, y).intValue()) > tol)
 					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
 			}
 		}
 	}
 
-	public static void assertEquals( ImageFloat imgA, ImageFloat imgB, int ignoreBorder, double tol) {
+	public static void assertEquals(ImageFloat imgA, ImageFloat imgB, int ignoreBorder, double tol) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -560,7 +560,7 @@ public class BoofTesting {
 	/**
 	 * Checks to see if only the image borders are equal to each other within tolerance
 	 */
-	public static void assertEqualsBorder( ImageSingleBand imgA, ImageSingleBand imgB, double tol, int borderX , int borderY ) {
+	public static void assertEqualsBorder(ImageSingleBand imgA, ImageSingleBand imgB, double tol, int borderX, int borderY) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -574,16 +574,16 @@ public class BoofTesting {
 			for (int x = 0; x < borderX; x++) {
 				compareValues(tol, a, b, x, y);
 			}
-			for (int x = imgA.getWidth()-borderX; x < imgA.getWidth(); x++) {
+			for (int x = imgA.getWidth() - borderX; x < imgA.getWidth(); x++) {
 				compareValues(tol, a, b, x, y);
 			}
 		}
 
-		for (int x = borderX; x < imgA.getWidth()-borderX; x++) {
+		for (int x = borderX; x < imgA.getWidth() - borderX; x++) {
 			for (int y = 0; y < borderY; y++) {
 				compareValues(tol, a, b, x, y);
 			}
-			for (int y = imgA.getHeight()-borderY; y < imgA.getHeight(); y++) {
+			for (int y = imgA.getHeight() - borderY; y < imgA.getHeight(); y++) {
 				compareValues(tol, a, b, x, y);
 			}
 		}
@@ -591,20 +591,20 @@ public class BoofTesting {
 
 	private static void compareValues(double tol, GImageSingleBand a, GImageSingleBand b, int x, int y) {
 		double normalizer = Math.abs(a.get(x, y).doubleValue()) + Math.abs(b.get(x, y).doubleValue());
-		if( normalizer < 1.0 ) normalizer = 1.0;
-		if (Math.abs(a.get(x, y).doubleValue() - b.get(x, y).doubleValue())/normalizer > tol)
+		if (normalizer < 1.0) normalizer = 1.0;
+		if (Math.abs(a.get(x, y).doubleValue() - b.get(x, y).doubleValue()) / normalizer > tol)
 			throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
 	}
 
-	public static void checkEquals(BufferedImage imgA, ImageBase imgB , double tol ) {
-		if( ImageUInt8.class == imgB.getClass()) {
-			checkEquals(imgA,(ImageUInt8)imgB);
-		} else if( ImageFloat32.class == imgB.getClass()) {
-			checkEquals(imgA,(ImageFloat32)imgB,(float)tol);
-		} else if( ImageInterleavedInt8.class == imgB.getClass()) {
-			checkEquals(imgA,(ImageInterleavedInt8)imgB);
-		} else if( MultiSpectral.class == imgB.getClass() ) {
-			checkEquals(imgA,(MultiSpectral)imgB,(float)tol);
+	public static void checkEquals(BufferedImage imgA, ImageBase imgB, double tol) {
+		if (ImageUInt8.class == imgB.getClass()) {
+			checkEquals(imgA, (ImageUInt8) imgB);
+		} else if (ImageFloat32.class == imgB.getClass()) {
+			checkEquals(imgA, (ImageFloat32) imgB, (float) tol);
+		} else if (ImageInterleavedInt8.class == imgB.getClass()) {
+			checkEquals(imgA, (ImageInterleavedInt8) imgB);
+		} else if (MultiSpectral.class == imgB.getClass()) {
+			checkEquals(imgA, (MultiSpectral) imgB, (float) tol);
 		}
 	}
 
@@ -614,7 +614,7 @@ public class BoofTesting {
 	 * @param imgA BufferedImage
 	 * @param imgB ImageUInt8
 	 */
-	public static void checkEquals(BufferedImage imgA, ImageUInt8 imgB ) {
+	public static void checkEquals(BufferedImage imgA, ImageUInt8 imgB) {
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
@@ -625,9 +625,9 @@ public class BoofTesting {
 					for (int j = 0; j < imgA.getWidth(); j++) {
 						int valB = imgB.get(j, i);
 						int valA = raster.getDataStorage()[i * imgA.getWidth() + j];
-						if( !imgB.getTypeInfo().isSigned() )
+						if (!imgB.getTypeInfo().isSigned())
 							valA &= 0xFF;
-						
+
 						if (valA != valB)
 							throw new RuntimeException("Images are not equal");
 					}
@@ -642,11 +642,11 @@ public class BoofTesting {
 
 				int gray = (byte) ((((rgb >>> 16) & 0xFF) + ((rgb >>> 8) & 0xFF) + (rgb & 0xFF)) / 3);
 				int grayB = imgB.get(x, y);
-				if( !imgB.getTypeInfo().isSigned() )
+				if (!imgB.getTypeInfo().isSigned())
 					gray &= 0xFF;
 
 				if (Math.abs(gray - grayB) != 0) {
-					throw new RuntimeException("images are not equal: ("+x+" , "+y+") A = "+gray+" B = "+grayB);
+					throw new RuntimeException("images are not equal: (" + x + " , " + y + ") A = " + gray + " B = " + grayB);
 				}
 			}
 		}
@@ -658,7 +658,7 @@ public class BoofTesting {
 	 * @param imgA BufferedImage
 	 * @param imgB ImageUInt8
 	 */
-	public static void checkEquals(BufferedImage imgA, ImageFloat32 imgB, float tol ) {
+	public static void checkEquals(BufferedImage imgA, ImageFloat32 imgB, float tol) {
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
@@ -672,7 +672,7 @@ public class BoofTesting {
 						valA &= 0xFF;
 
 						if (Math.abs(valA - valB) > tol)
-							throw new RuntimeException("Images are not equal: A = "+valA+" B = "+valB);
+							throw new RuntimeException("Images are not equal: A = " + valA + " B = " + valB);
 					}
 				}
 				return;
@@ -687,7 +687,7 @@ public class BoofTesting {
 				float grayB = imgB.get(x, y);
 
 				if (Math.abs(gray - grayB) > tol) {
-					throw new RuntimeException("images are not equal: A = "+gray+" B = "+grayB);
+					throw new RuntimeException("images are not equal: A = " + gray + " B = " + grayB);
 				}
 			}
 		}
@@ -737,7 +737,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static void checkEquals(BufferedImage imgA, MultiSpectral imgB, float tol ) {
+	public static void checkEquals(BufferedImage imgA, MultiSpectral imgB, float tol) {
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
@@ -753,25 +753,33 @@ public class BoofTesting {
 						valA &= 0xFF;
 
 						if (Math.abs(valA - valB) > tol)
-							throw new RuntimeException("Images are not equal: A = "+valA+" B = "+valB);
+							throw new RuntimeException("Images are not equal: A = " + valA + " B = " + valB);
 					}
 				}
 				return;
 			}
 		}
 
-		GImageSingleBand band1,band2,band3;
-		boolean swap = imgA.getType() == BufferedImage.TYPE_3BYTE_BGR ||
-				imgA.getType() == BufferedImage.TYPE_INT_BGR;
+		GImageSingleBand band1, band2, band3;
 
-		if( swap ) {
+		if (imgA.getType() == BufferedImage.TYPE_3BYTE_BGR || imgA.getType() == BufferedImage.TYPE_INT_BGR) {
 			band1 = FactoryGImageSingleBand.wrap(imgB.getBand(2));
 			band2 = FactoryGImageSingleBand.wrap(imgB.getBand(1));
 			band3 = FactoryGImageSingleBand.wrap(imgB.getBand(0));
-		} else {
+		} else if (imgA.getType() == BufferedImage.TYPE_INT_RGB) {
 			band1 = FactoryGImageSingleBand.wrap(imgB.getBand(0));
 			band2 = FactoryGImageSingleBand.wrap(imgB.getBand(1));
 			band3 = FactoryGImageSingleBand.wrap(imgB.getBand(2));
+		} else if (imgA.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
+			band1 = FactoryGImageSingleBand.wrap(imgB.getBand(3));
+			band2 = FactoryGImageSingleBand.wrap(imgB.getBand(2));
+			band3 = FactoryGImageSingleBand.wrap(imgB.getBand(1));
+		} else if (imgA.getType() == BufferedImage.TYPE_INT_ARGB) {
+			band1 = FactoryGImageSingleBand.wrap(imgB.getBand(1));
+			band2 = FactoryGImageSingleBand.wrap(imgB.getBand(2));
+			band3 = FactoryGImageSingleBand.wrap(imgB.getBand(3));
+		} else {
+			throw new RuntimeException("Handle this case");
 		}
 
 		for (int y = 0; y < imgA.getHeight(); y++) {
@@ -788,46 +796,45 @@ public class BoofTesting {
 
 
 				if (Math.abs(val1 - mult1) > tol) {
-					throw new RuntimeException("images are not equal: A = "+val1+" B = "+mult1);
+					throw new RuntimeException("images are not equal: A = " + val1 + " B = " + mult1);
 				}
 				if (Math.abs(val2 - mult2) > tol) {
-					throw new RuntimeException("images are not equal: A = "+val2+" B = "+mult2);
+					throw new RuntimeException("images are not equal: A = " + val2 + " B = " + mult2);
 				}
 				if (Math.abs(val3 - mult3) > tol) {
-					throw new RuntimeException("images are not equal: A = "+val3+" B = "+mult3);
+					throw new RuntimeException("images are not equal: A = " + val3 + " B = " + mult3);
 				}
 			}
 		}
 	}
-
 
 
 	public static void checkBorderZero(ImageSingleBand outputImage, int border) {
 		GImageSingleBand img = FactoryGImageSingleBand.wrap(outputImage);
 
 		for (int y = 0; y < img.getHeight(); y++) {
-			if( y >= border && y < img.getHeight()-border )
+			if (y >= border && y < img.getHeight() - border)
 				continue;
 
 			for (int x = 0; x < img.getWidth(); x++) {
-				if( x >= border && x < img.getWidth()-border )
+				if (x >= border && x < img.getWidth() - border)
 					continue;
-				if( img.get(x,y).intValue() != 0 )
+				if (img.get(x, y).intValue() != 0)
 					throw new RuntimeException("The border is not zero");
 			}
 		}
 	}
 
-	public static void printDiff( ImageSingleBand imgA , ImageSingleBand imgB ) {
+	public static void printDiff(ImageSingleBand imgA, ImageSingleBand imgB) {
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(imgA);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(imgB);
 
 		System.out.println("------- Difference -----------");
-		for( int y = 0; y < imgA.getHeight(); y++ ) {
-			for( int x = 0; x < imgA.getWidth(); x++ ) {
-				double diff = Math.abs(a.get(x,y).doubleValue()-b.get(x,y).doubleValue());
-				System.out.printf("%2d ",(int)diff);
+		for (int y = 0; y < imgA.getHeight(); y++) {
+			for (int x = 0; x < imgA.getWidth(); x++) {
+				double diff = Math.abs(a.get(x, y).doubleValue() - b.get(x, y).doubleValue());
+				System.out.printf("%2d ", (int) diff);
 			}
 			System.out.println();
 		}

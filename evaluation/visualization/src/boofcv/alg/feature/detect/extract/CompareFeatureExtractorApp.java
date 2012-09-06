@@ -19,8 +19,8 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -51,8 +51,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmAndInputPanel implements GeneralExtractConfigPanel.Listener
-{
+		extends SelectAlgorithmAndInputPanel implements GeneralExtractConfigPanel.Listener {
 	T grayImage;
 
 	Class<T> imageType;
@@ -63,9 +62,9 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 	BufferedImage input;
 	BufferedImage intensityImage;
 	BufferedImage workImage;
-	AnyImageDerivative<T,D> deriv;
+	AnyImageDerivative<T, D> deriv;
 
-	GeneralFeatureIntensity<T,D> intensityAlg;
+	GeneralFeatureIntensity<T, D> intensityAlg;
 	int minSeparation = 5;
 
 	// which image is being viewed in the GUI
@@ -103,37 +102,39 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		configPanel.setImageIndex(viewImage);
 		configPanel.setListener(this);
 
-		gui.add(configPanel,BorderLayout.WEST);
-		gui.add(imagePanel,BorderLayout.CENTER);
+		gui.add(configPanel, BorderLayout.WEST);
+		gui.add(imagePanel, BorderLayout.CENTER);
 
 		setMainGUI(gui);
 	}
 
-	public void process( BufferedImage input ) {
+	public void process(BufferedImage input) {
 		this.input = input;
 		grayImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_BGR);
+		workImage = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_BGR);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				doRefreshAll();
-			}});
+			}
+		});
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void loadConfigurationFile(String fileName) {
+	}
 
 	@Override
 	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
+		setActiveAlgorithm(0, null, cookies[0]);
 	}
 
 	@Override
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( input == null )
+		if (input == null)
 			return;
 
-		intensityAlg = (GeneralFeatureIntensity<T,D>)cookie;
+		intensityAlg = (GeneralFeatureIntensity<T, D>) cookie;
 
 		doProcess();
 	}
@@ -144,9 +145,9 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		deriv.setInput(grayImage);
 		D derivX = deriv.getDerivative(true);
 		D derivY = deriv.getDerivative(false);
-		D derivXX = deriv.getDerivative(true,true);
-		D derivYY = deriv.getDerivative(false,false);
-		D derivXY = deriv.getDerivative(true,false);
+		D derivXX = deriv.getDerivative(true, true);
+		D derivYY = deriv.getDerivative(false, false);
+		D derivXY = deriv.getDerivative(true, false);
 
 		// todo modifying buffered images which might be actively being displayed, could mess up swing
 
@@ -155,23 +156,23 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		intensityImage = VisualizeImageData.colorizeSign(intensityAlg.getIntensity(), null, PixelMath.maxAbs(intensity));
 
 		float max = PixelMath.maxAbs(intensity);
-		float threshold = max*thresholdFraction;
+		float threshold = max * thresholdFraction;
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, threshold, radius, true);
-		GeneralFeatureDetector<T,D> detector = new GeneralFeatureDetector<T,D>(intensityAlg,extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensityAlg, extractor);
 		detector.setMaxFeatures(numFeatures);
-		detector.process(grayImage,derivX,derivY,derivXX,derivYY,derivXY);
+		detector.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);
 		QueueCorner foundCorners = detector.getFeatures();
 
 		render.reset();
 
-		for( int i = 0; i < foundCorners.size(); i++ ) {
+		for (int i = 0; i < foundCorners.size(); i++) {
 			Point2D_I16 p = foundCorners.get(i);
-			render.addPoint(p.x,p.y,3, Color.RED);
+			render.addPoint(p.x, p.y, 3, Color.RED);
 		}
 
 		Graphics2D g2 = workImage.createGraphics();
-		g2.drawImage(input,0,0,grayImage.width,grayImage.height,null);
+		g2.drawImage(input, 0, 0, grayImage.width, grayImage.height, null);
 		render.draw(g2);
 		drawImage();
 
@@ -181,7 +182,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 	public void changeInput(String name, int index) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		if( image != null ) {
+		if (image != null) {
 			process(image);
 		}
 	}
@@ -200,7 +201,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 	private void drawImage() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				switch( viewImage ) {
+				switch (viewImage) {
 					case 0:
 						imagePanel.setBufferedImage(input);
 						break;
@@ -214,11 +215,12 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 						break;
 				}
 				BufferedImage b = imagePanel.getImage();
-				imagePanel.setPreferredSize(new Dimension(b.getWidth(),b.getHeight()));
+				imagePanel.setPreferredSize(new Dimension(b.getWidth(), b.getHeight()));
 				imagePanel.repaint();
 
 				processImage = true;
-			}});
+			}
+		});
 	}
 
 	@Override
@@ -229,7 +231,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 
 	@Override
 	public synchronized void changeThreshold(double value) {
-		this.thresholdFraction = (float)value;
+		this.thresholdFraction = (float) value;
 		doProcess();
 	}
 
@@ -239,22 +241,22 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		doProcess();
 	}
 
-	public static void main( String args[] ) {
-		CompareFeatureExtractorApp app = new CompareFeatureExtractorApp(ImageFloat32.class,ImageFloat32.class);
+	public static void main(String args[]) {
+		CompareFeatureExtractorApp app = new CompareFeatureExtractorApp(ImageFloat32.class, ImageFloat32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
-		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
-		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
+		inputs.add(new PathLabel("shapes", "../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers", "../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("beach", "../data/evaluation/scale/beach02.jpg"));
 
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
+		while (!app.getHasProcessedImage()) {
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Feature Extraction");
+		ShowImages.showWindow(app, "Feature Extraction");
 
 		System.out.println("Done");
 	}

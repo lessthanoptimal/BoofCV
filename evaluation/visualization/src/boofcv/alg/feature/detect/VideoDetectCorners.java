@@ -19,10 +19,10 @@
 package boofcv.alg.feature.detect;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.extract.NonMaxBlockStrict;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
@@ -63,8 +63,8 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 	ImagePanel panel;
 
 	public VideoDetectCorners(SimpleImageSequence<T> sequence,
-									   GeneralFeatureDetector<T, D> detector,
-									   Class<D> derivType ) {
+							  GeneralFeatureDetector<T, D> detector,
+							  Class<D> derivType) {
 		super(sequence);
 
 		this.derivType = derivType;
@@ -75,7 +75,7 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 	@Override
 	public void processFrame(T image) {
 
-		if( detector.getRequiresGradient() ) {
+		if (detector.getRequiresGradient()) {
 			if (derivX == null) {
 				derivX = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
 				derivY = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
@@ -85,7 +85,7 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 			GImageDerivativeOps.sobel(image, derivX, derivY, BoofDefaults.DERIV_BORDER_TYPE);
 		}
 
-		if( detector.getRequiresHessian() ) {
+		if (detector.getRequiresHessian()) {
 			if (derivXX == null) {
 				derivXX = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
 				derivYY = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
@@ -93,10 +93,10 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 			}
 
 			// compute the image gradient
-			GImageDerivativeOps.hessianThree(image, derivXX, derivYY,derivXY, BoofDefaults.DERIV_BORDER_TYPE);
+			GImageDerivativeOps.hessianThree(image, derivXX, derivYY, derivXY, BoofDefaults.DERIV_BORDER_TYPE);
 		}
 
-		detector.process(image,derivX, derivY, derivXX , derivYY, derivXY);
+		detector.process(image, derivX, derivY, derivXX, derivYY, derivXY);
 		corners = detector.getFeatures();
 	}
 
@@ -123,14 +123,13 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 	}
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	void perform( String fileName , Class<T> imageType , Class<D> derivType )
-	{
+	void perform(String fileName, Class<T> imageType, Class<D> derivType) {
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, imageType);
 
 		int maxCorners = 200;
 		int radius = 2;
 
-		GeneralFeatureIntensity<T,D> intensity = new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.shiTomasi(radius, false, derivType));
+		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(FactoryIntensityPointAlg.shiTomasi(radius, false, derivType));
 //		GeneralFeatureIntensity<T, D> intensity =
 //				new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.createFast12(imageType, 8 , 12));
 
@@ -143,7 +142,7 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		detector.setMaxFeatures(maxCorners);
 
-		VideoDetectCorners<T,D> display = new VideoDetectCorners<T,D>(sequence, detector, derivType);
+		VideoDetectCorners<T, D> display = new VideoDetectCorners<T, D>(sequence, detector, derivType);
 
 		display.process();
 	}
@@ -158,6 +157,6 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 		}
 
 //		perform(fileName,ImageUInt8.class,ImageSInt16.class);
-		perform(fileName, ImageFloat32.class,ImageFloat32.class);
+		perform(fileName, ImageFloat32.class, ImageFloat32.class);
 	}
 }

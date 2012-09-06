@@ -19,9 +19,9 @@
 package boofcv.alg.tracker.pklt;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.struct.QueueCorner;
@@ -53,49 +53,49 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 	 */
 	@Test
 	public void handlesBottomLayerNotOne() {
-		setup(2,4);// override initial scaling
+		setup(2, 4);// override initial scaling
 
 		// set the first layer to not be one
-		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(new DummyIntensity(), new DummyExtractor());
+		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(new DummyIntensity(), new DummyExtractor());
 		detector.setMaxFeatures(100);
 		GenericPkltFeatSelector<ImageFloat32, ImageFloat32> selector =
-				new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,tracker);
+				new GenericPkltFeatSelector<ImageFloat32, ImageFloat32>(detector, tracker);
 
 		List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
 		List<PyramidKltFeature> available = new ArrayList<PyramidKltFeature>();
-		for( int i = 0; i < maxFeatures-5; i++ ) {
-			available.add( new PyramidKltFeature(pyramid.getNumLayers(),featureReadius));
+		for (int i = 0; i < maxFeatures - 5; i++) {
+			available.add(new PyramidKltFeature(pyramid.getNumLayers(), featureReadius));
 		}
-		for( int i = 0; i < 5; i++ ) {
-			active.add( new PyramidKltFeature(pyramid.getNumLayers(),featureReadius));
+		for (int i = 0; i < 5; i++) {
+			active.add(new PyramidKltFeature(pyramid.getNumLayers(), featureReadius));
 		}
 
 		// set some features along the border
-		active.get(0).setPosition(width-1,height-1);
-		active.get(1).setPosition(width-1,2);
-		active.get(2).setPosition(2,height-1);
+		active.get(0).setPosition(width - 1, height - 1);
+		active.get(1).setPosition(width - 1, 2);
+		active.get(2).setPosition(2, height - 1);
 
-		tracker.setImage(pyramid,derivX,derivY);
-		selector.setInputs(pyramid,derivX,derivY);
-		selector.compute(active,available);
+		tracker.setImage(pyramid, derivX, derivY);
+		selector.setInputs(pyramid, derivX, derivY);
+		selector.compute(active, available);
 
 		// check to see that feature descriptions were removed from the available list
 		// and added to the active list
-		assertTrue(active.size()>0);
-		assertTrue((available.size()+active.size())==maxFeatures);
+		assertTrue(active.size() > 0);
+		assertTrue((available.size() + active.size()) == maxFeatures);
 
 		// see how many features are in the outside quadrant
 		int numOutside = 0;
-		for( PyramidKltFeature f : active ) {
-			if( f.x > width/2 )
+		for (PyramidKltFeature f : active) {
+			if (f.x > width / 2)
 				numOutside++;
-			else if( f.y > height/2 )
+			else if (f.y > height / 2)
 				numOutside++;
 		}
 
 		// the three known before and the one added by the extractor
-		assertTrue(numOutside==4);
+		assertTrue(numOutside == 4);
 	}
 
 	/**
@@ -109,24 +109,24 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 
 		List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
 		List<PyramidKltFeature> available = new ArrayList<PyramidKltFeature>();
-		for( int i = 0; i < maxFeatures; i++ ) {
-			available.add( new PyramidKltFeature(pyramid.getNumLayers(),featureReadius));
+		for (int i = 0; i < maxFeatures; i++) {
+			available.add(new PyramidKltFeature(pyramid.getNumLayers(), featureReadius));
 		}
-		tracker.setImage(pyramid,derivX,derivY);
-		selector.setInputs(pyramid,derivX,derivY);
-		selector.compute(active,available);
+		tracker.setImage(pyramid, derivX, derivY);
+		selector.setInputs(pyramid, derivX, derivY);
+		selector.compute(active, available);
 
 		// check to see that feature descriptions were removed from the available list
 		// and added to the active list
-		assertTrue(active.size()>0);
-		assertTrue((available.size()+active.size())==maxFeatures);
+		assertTrue(active.size() > 0);
+		assertTrue((available.size() + active.size()) == maxFeatures);
 
 		// see if the description has been modified
 		// only the bottom layer is checked because the upper ones might not have changed.
-		for( PyramidKltFeature f : active ) {
-			assertTrue(f.x!=0);
-			assertTrue(f.y!=0);
-			assertTrue(f.maxLayer>=0);
+		for (PyramidKltFeature f : active) {
+			assertTrue(f.x != 0);
+			assertTrue(f.y != 0);
+			assertTrue(f.maxLayer >= 0);
 		}
 	}
 
@@ -140,48 +140,48 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 
 		List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
 		List<PyramidKltFeature> available = new ArrayList<PyramidKltFeature>();
-		for( int i = 0; i < maxFeatures; i++ ) {
-			available.add( new PyramidKltFeature(pyramid.getNumLayers(),featureReadius));
+		for (int i = 0; i < maxFeatures; i++) {
+			available.add(new PyramidKltFeature(pyramid.getNumLayers(), featureReadius));
 		}
-		tracker.setImage(pyramid,derivX,derivY);
-		selector.setInputs(pyramid,derivX,derivY);
-		selector.compute(active,available);
+		tracker.setImage(pyramid, derivX, derivY);
+		selector.setInputs(pyramid, derivX, derivY);
+		selector.compute(active, available);
 		int numBefore = active.size();
 
 		// swap the order so it can see if it just flushed the list or not
 		PyramidKltFeature a = active.get(4);
 		PyramidKltFeature b = active.get(5);
-		active.set(5,a);
-		active.set(4,b);
+		active.set(5, a);
+		active.set(4, b);
 
-		selector.compute(active,available);
+		selector.compute(active, available);
 
 		// should find the same number of features
-		assertEquals(numBefore,active.size());
+		assertEquals(numBefore, active.size());
 		assertTrue(a == active.get(5));
 		assertTrue(b == active.get(4));
 	}
 
 	private GenericPkltFeatSelector<ImageFloat32, ImageFloat32> createSelector() {
-		GeneralFeatureIntensity<ImageFloat32,ImageFloat32> intensity =
-				new WrapperGradientCornerIntensity<ImageFloat32,ImageFloat32>(
+		GeneralFeatureIntensity<ImageFloat32, ImageFloat32> intensity =
+				new WrapperGradientCornerIntensity<ImageFloat32, ImageFloat32>(
 						FactoryIntensityPointAlg.shiTomasi(3, false, ImageFloat32.class));
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(3,0.01f,3,true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(3, 0.01f, 3, true);
 
-		GeneralFeatureDetector<ImageFloat32,ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,extractor);
+		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 		detector.setMaxFeatures(maxFeatures);
 
-		return new GenericPkltFeatSelector<ImageFloat32,ImageFloat32>(detector,tracker);
+		return new GenericPkltFeatSelector<ImageFloat32, ImageFloat32>(detector, tracker);
 	}
 
-	private static class DummyIntensity implements GeneralFeatureIntensity<ImageFloat32,ImageFloat32> {
+	private static class DummyIntensity implements GeneralFeatureIntensity<ImageFloat32, ImageFloat32> {
 		ImageFloat32 intensity;
 
 		@Override
 		public void process(ImageFloat32 image, ImageFloat32 derivX, ImageFloat32 derivY, ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY) {
-			intensity = new ImageFloat32(image.width,image.height);
+			intensity = new ImageFloat32(image.width, image.height);
 		}
 
 		@Override
@@ -215,13 +215,12 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		}
 	}
 
-	private class DummyExtractor implements FeatureExtractor
-	{
+	private class DummyExtractor implements FeatureExtractor {
 
 		@Override
 		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner foundFeature) {
 			// add a corner on the image boundary for scaled down
-			foundFeature.add(width/2-2,height/2-2);
+			foundFeature.add(width / 2 - 2, height / 2 - 2);
 		}
 
 		@Override
@@ -244,10 +243,13 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		}
 
 		@Override
-		public int getIgnoreBorder() {return 0;}
+		public int getIgnoreBorder() {
+			return 0;
+		}
 
 		@Override
-		public void setIgnoreBorder(int border) {}
+		public void setIgnoreBorder(int border) {
+		}
 
 		@Override
 		public boolean canDetectBorder() {
@@ -255,6 +257,12 @@ public class TestGenericPkltFeatSelector extends PyramidKltTestBase {
 		}
 
 		@Override
-		public int getSearchRadius() {return 0;}
+		public void setSearchRadius(int radius) {
+		}
+
+		@Override
+		public int getSearchRadius() {
+			return 0;
+		}
 	}
 }

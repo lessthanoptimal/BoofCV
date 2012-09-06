@@ -42,12 +42,12 @@ public class NonMaxExtractorNaive {
 	// should it use a strict rule for defining the local max?
 	protected boolean useStrictRule;
 
-	public NonMaxExtractorNaive( boolean useStrictRule ) {
+	public NonMaxExtractorNaive(boolean useStrictRule) {
 		this.useStrictRule = useStrictRule;
 	}
 
-	public void setSearchRadius(int minSeparation) {
-		this.radius = minSeparation;
+	public void setSearchRadius(int radius) {
+		this.radius = radius;
 	}
 
 	public float getThreshold() {
@@ -72,7 +72,7 @@ public class NonMaxExtractorNaive {
 
 	public void process(ImageFloat32 intensityImage, QueueCorner peaks) {
 
-		if( useStrictRule )
+		if (useStrictRule)
 			strictRule(intensityImage, peaks);
 		else
 			notStrictRule(intensityImage, peaks);
@@ -85,7 +85,7 @@ public class NonMaxExtractorNaive {
 		final float inten[] = intensityImage.data;
 
 		for (int y = border; y < imgHeight - border; y++) {
-			int center = intensityImage.startIndex + y*intensityImage.stride + border;
+			int center = intensityImage.startIndex + y * intensityImage.stride + border;
 			for (int x = border; x < imgWidth - border; x++) {
 
 				float val = inten[center++];
@@ -93,17 +93,19 @@ public class NonMaxExtractorNaive {
 
 				boolean max = true;
 
-				int x0 = x-radius; int x1 = x+radius;
-				int y0 = y-radius; int y1 = y+radius;
+				int x0 = x - radius;
+				int x1 = x + radius;
+				int y0 = y - radius;
+				int y1 = y + radius;
 
-				if( x0 < 0 ) x0 = 0;
-				if( y0 < 0 ) y0 = 0;
-				if( x1 >= imgWidth ) x1 = imgWidth-1;
-				if( y1 >= imgHeight ) y1 = imgHeight-1;
+				if (x0 < 0) x0 = 0;
+				if (y0 < 0) y0 = 0;
+				if (x1 >= imgWidth) x1 = imgWidth - 1;
+				if (y1 >= imgHeight) y1 = imgHeight - 1;
 
 				escape:
 				for (int i = y0; i <= y1; i++) {
-					int index = intensityImage.startIndex + i*intensityImage.stride + x0;
+					int index = intensityImage.startIndex + i * intensityImage.stride + x0;
 					for (int j = x0; j <= x1; j++, index++) {
 						// don't compare the center point against itself
 						if (i == y && j == x)
@@ -131,7 +133,7 @@ public class NonMaxExtractorNaive {
 		final float inten[] = intensityImage.data;
 
 		for (int y = border; y < imgHeight - border; y++) {
-			int center = intensityImage.startIndex + y*intensityImage.stride + border;
+			int center = intensityImage.startIndex + y * intensityImage.stride + border;
 			for (int x = border; x < imgWidth - border; x++) {
 
 				float val = inten[center++];
@@ -139,17 +141,19 @@ public class NonMaxExtractorNaive {
 
 				boolean max = true;
 
-				int x0 = x-radius; int x1 = x+radius;
-				int y0 = y-radius; int y1 = y+radius;
+				int x0 = x - radius;
+				int x1 = x + radius;
+				int y0 = y - radius;
+				int y1 = y + radius;
 
-				if( x0 < 0 ) x0 = 0;
-				if( y0 < 0 ) y0 = 0;
-				if( x1 >= imgWidth ) x1 = imgWidth-1;
-				if( y1 >= imgHeight ) y1 = imgHeight-1;
+				if (x0 < 0) x0 = 0;
+				if (y0 < 0) y0 = 0;
+				if (x1 >= imgWidth) x1 = imgWidth - 1;
+				if (y1 >= imgHeight) y1 = imgHeight - 1;
 
 				escape:
 				for (int i = y0; i <= y1; i++) {
-					int index = intensityImage.startIndex + i*intensityImage.stride + x0;
+					int index = intensityImage.startIndex + i * intensityImage.stride + x0;
 					for (int j = x0; j <= x1; j++, index++) {
 
 						if (val < inten[index]) {

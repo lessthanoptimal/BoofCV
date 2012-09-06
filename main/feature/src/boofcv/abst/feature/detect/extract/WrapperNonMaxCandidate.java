@@ -30,14 +30,14 @@ import boofcv.struct.image.ImageFloat32;
 public class WrapperNonMaxCandidate implements FeatureExtractor {
 	NonMaxCandidateStrict extractor;
 
-	public WrapperNonMaxCandidate( NonMaxCandidateStrict extractor ) {
+	public WrapperNonMaxCandidate(NonMaxCandidateStrict extractor) {
 		this.extractor = extractor;
 	}
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
-					QueueCorner foundFeature) {
-		extractor.process(intensity,candidate, foundFeature);
+						QueueCorner foundFeature) {
+		extractor.process(intensity, candidate, foundFeature);
 	}
 
 	@Override
@@ -73,6 +73,11 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 	@Override
 	public boolean canDetectBorder() {
 		return true;
+	}
+
+	@Override
+	public void setSearchRadius(int radius) {
+		extractor.setSearchRadius(radius);
 	}
 
 	@Override

@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
@@ -36,21 +36,21 @@ public class TestFeaturePyramid extends GenericFeatureScaleDetector {
 
 	@Override
 	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {
-		AnyImageDerivative<ImageFloat32,ImageFloat32> deriv = GImageDerivativeOps.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
+		AnyImageDerivative<ImageFloat32, ImageFloat32> deriv = GImageDerivativeOps.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
 
-		return new FeaturePyramid<ImageFloat32,ImageFloat32>(detector,deriv,1);
+		return new FeaturePyramid<ImageFloat32, ImageFloat32>(detector, deriv, 1);
 	}
 
 	@Override
 	protected List<Point2D_I32> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
-		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class,scales);
+		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class, scales);
 		ss.setImage(input);
 
-		FeaturePyramid<ImageFloat32,ImageFloat32> alg =
-				(FeaturePyramid<ImageFloat32,ImageFloat32>)detector;
+		FeaturePyramid<ImageFloat32, ImageFloat32> alg =
+				(FeaturePyramid<ImageFloat32, ImageFloat32>) detector;
 		alg.detect(ss);
 
-		return (List)alg.getInterestPoints();
+		return (List) alg.getInterestPoints();
 	}
 
 }

@@ -79,7 +79,7 @@ public class TestConvertBufferedImage {
 	@Test
 	public void extractImageInt8_fail() {
 		try {
-			BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 2, rand);
+			BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
 			ConvertBufferedImage.extractImageInt8(origImg);
 			fail("Should have had an unexpected number of bands");
 		} catch (IllegalArgumentException e) {
@@ -88,7 +88,7 @@ public class TestConvertBufferedImage {
 		try {
 			BufferedImage origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
 			ConvertBufferedImage.extractImageInt8(origImg);
-			fail("Should hbe the wrong type");
+			fail("Should be the wrong type");
 		} catch (IllegalArgumentException e) {
 		}
 	}
@@ -127,16 +127,16 @@ public class TestConvertBufferedImage {
 	 */
 	@Test
 	public void convertFrom_single_ms() {
-		Class[] types = new Class[]{ImageUInt8.class,ImageFloat32.class};
-		
-		
-		for( Class t : types ) {
-			for( int i = 0; i < 2; i++ ) {
+		Class[] types = new Class[]{ImageUInt8.class, ImageFloat32.class};
+
+
+		for (Class t : types) {
+			for (int i = 0; i < 2; i++) {
 				ImageBase image;
-				if( i == 0 ) {
-					image = GeneralizedImageOps.createSingleBand(t,imgWidth,imgHeight);
+				if (i == 0) {
+					image = GeneralizedImageOps.createSingleBand(t, imgWidth, imgHeight);
 				} else {
-					image = new MultiSpectral(t,imgWidth,imgHeight,3);
+					image = new MultiSpectral(t, imgWidth, imgHeight, 3);
 				}
 
 				BoofTesting.checkSubImage(this, "convertFrom_single_ms", false, image);
@@ -144,7 +144,7 @@ public class TestConvertBufferedImage {
 		}
 	}
 
-	public void convertFrom_single_ms( ImageBase dstImg) {
+	public void convertFrom_single_ms(ImageBase dstImg) {
 		BufferedImage origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
 		ConvertBufferedImage.convertFrom(origImg, dstImg);
 
@@ -156,12 +156,12 @@ public class TestConvertBufferedImage {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
 
 		ImageUInt8 imgInt8 = ConvertBufferedImage.convertFromSingle(origImg, (ImageUInt8) null, ImageUInt8.class);
-		assertEquals(imgWidth,imgInt8.width);
-		assertEquals(imgHeight,imgInt8.height);
+		assertEquals(imgWidth, imgInt8.width);
+		assertEquals(imgHeight, imgInt8.height);
 
 		ImageFloat32 imgF32 = ConvertBufferedImage.convertFromSingle(origImg, (ImageFloat32) null, ImageFloat32.class);
-		assertEquals(imgWidth,imgF32.width);
-		assertEquals(imgHeight,imgF32.height);
+		assertEquals(imgWidth, imgF32.width);
+		assertEquals(imgHeight, imgF32.height);
 	}
 
 	@Test
@@ -169,11 +169,11 @@ public class TestConvertBufferedImage {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
 
 		MultiSpectral<ImageUInt8> imgInt8 = ConvertBufferedImage.convertFromMulti(origImg, null, ImageUInt8.class);
-		assertEquals(imgWidth,imgInt8.width);
+		assertEquals(imgWidth, imgInt8.width);
 		assertEquals(imgHeight, imgInt8.height);
 
 		MultiSpectral<ImageFloat32> imgF32 = ConvertBufferedImage.convertFromMulti(origImg, null, ImageFloat32.class);
-		assertEquals(imgWidth,imgF32.width);
+		assertEquals(imgWidth, imgF32.width);
 		assertEquals(imgHeight, imgF32.height);
 	}
 
@@ -182,16 +182,16 @@ public class TestConvertBufferedImage {
 	 */
 	@Test
 	public void convertTo_single_ms() {
-		Class[] types = new Class[]{ImageUInt8.class,ImageFloat32.class};
+		Class[] types = new Class[]{ImageUInt8.class, ImageFloat32.class};
 
 
-		for( Class t : types ) {
-			for( int i = 0; i < 2; i++ ) {
+		for (Class t : types) {
+			for (int i = 0; i < 2; i++) {
 				ImageBase image;
-				if( i == 0 ) {
-					image = GeneralizedImageOps.createSingleBand(t,imgWidth,imgHeight);
+				if (i == 0) {
+					image = GeneralizedImageOps.createSingleBand(t, imgWidth, imgHeight);
 				} else {
-					image = new MultiSpectral(t,imgWidth,imgHeight,3);
+					image = new MultiSpectral(t, imgWidth, imgHeight, 3);
 				}
 				GeneralizedImageOps.randomize(image, rand, 0, 100);
 
@@ -204,7 +204,7 @@ public class TestConvertBufferedImage {
 		BufferedImage dstImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
 		ConvertBufferedImage.convertTo(srcImg, dstImg);
 
-		BoofTesting.checkEquals(dstImg, srcImg,1);
+		BoofTesting.checkEquals(dstImg, srcImg, 1);
 	}
 
 	@Test
@@ -225,10 +225,10 @@ public class TestConvertBufferedImage {
 
 		// could check to see that the pixels are not all uniform....
 	}
-	
+
 	@Test
 	public void orderBandsIntoRGB() {
-		MultiSpectral<ImageUInt8> input = new MultiSpectral<ImageUInt8>(ImageUInt8.class,10,10,3);
+		MultiSpectral<ImageUInt8> input = new MultiSpectral<ImageUInt8>(ImageUInt8.class, 10, 10, 3);
 
 		ImageUInt8 band0 = input.getBand(0);
 		ImageUInt8 band1 = input.getBand(1);
@@ -236,23 +236,23 @@ public class TestConvertBufferedImage {
 
 
 		// test no swap first
-		BufferedImage orig = new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB);
-		ConvertBufferedImage.orderBandsIntoRGB(input,orig);
-		assertTrue(band0==input.getBand(0));
-		assertTrue(band1==input.getBand(1));
-		assertTrue(band2==input.getBand(2));
+		BufferedImage orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+		ConvertBufferedImage.orderBandsIntoRGB(input, orig);
+		assertTrue(band0 == input.getBand(0));
+		assertTrue(band1 == input.getBand(1));
+		assertTrue(band2 == input.getBand(2));
 
 		// check swaps now
-		orig = new BufferedImage(10,10,BufferedImage.TYPE_3BYTE_BGR);
-		ConvertBufferedImage.orderBandsIntoRGB(input,orig);
-		assertTrue(band2==input.getBand(0));
-		assertTrue(band1==input.getBand(1));
-		assertTrue(band0==input.getBand(2));
+		orig = new BufferedImage(10, 10, BufferedImage.TYPE_3BYTE_BGR);
+		ConvertBufferedImage.orderBandsIntoRGB(input, orig);
+		assertTrue(band2 == input.getBand(0));
+		assertTrue(band1 == input.getBand(1));
+		assertTrue(band0 == input.getBand(2));
 
-		orig = new BufferedImage(10,10,BufferedImage.TYPE_INT_BGR);
-		ConvertBufferedImage.orderBandsIntoRGB(input,orig);
-		assertTrue(band0==input.getBand(0));
-		assertTrue(band1==input.getBand(1));
-		assertTrue(band2==input.getBand(2));
+		orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_BGR);
+		ConvertBufferedImage.orderBandsIntoRGB(input, orig);
+		assertTrue(band0 == input.getBand(0));
+		assertTrue(band1 == input.getBand(1));
+		assertTrue(band2 == input.getBand(2));
 	}
 }

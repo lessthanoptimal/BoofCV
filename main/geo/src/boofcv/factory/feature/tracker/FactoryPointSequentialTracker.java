@@ -23,7 +23,7 @@ import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.associate.ScoreAssociateNccFeature;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.tracker.*;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
@@ -63,29 +63,28 @@ public class FactoryPointSequentialTracker {
 	/**
 	 * Creates a tracker using KLT features/tracker.
 	 *
-	 * @param maxFeatures Maximum number of features it can detect/track. Try 200 initially.
-	 * @param scaling Scales in the image pyramid. Recommend [1,2,4] or [2,4]
+	 * @param maxFeatures   Maximum number of features it can detect/track. Try 200 initially.
+	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
 	 * @param featureRadius Feature radius.  Try 3 or 5
-	 * @param spawnSubW Forces a more even distribution of features.  Width.  Try 2
-	 * @param spawnSubH Forces a more even distribution of features.  Height.  Try 3
-	 * @param imageType Input image type.
-	 * @param derivType Image derivative  type.
+	 * @param spawnSubW     Forces a more even distribution of features.  Width.  Try 2
+	 * @param spawnSubH     Forces a more even distribution of features.  Height.  Try 3
+	 * @param imageType     Input image type.
+	 * @param derivType     Image derivative  type.
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> klt( int maxFeatures , int scaling[] , int featureRadius , int spawnSubW , int spawnSubH , Class<I> imageType , Class<D> derivType )
-	{
+	ImagePointTracker<I> klt(int maxFeatures, int scaling[], int featureRadius, int spawnSubW, int spawnSubH, Class<I> imageType, Class<D> derivType) {
 		PkltManagerConfig<I, D> config =
-				PkltManagerConfig.createDefault(imageType,derivType);
+				PkltManagerConfig.createDefault(imageType, derivType);
 		config.pyramidScaling = scaling;
 		config.maxFeatures = maxFeatures;
 		config.featureRadius = featureRadius;
 
-		GeneralFeatureDetector<I,D> detector =
+		GeneralFeatureDetector<I, D> detector =
 				FactoryDetectPoint.createShiTomasi(config.featureRadius, false, config.config.minDeterminant, config.maxFeatures, config.typeDeriv);
-		detector.setRegions(spawnSubW,spawnSubH);
+		detector.setRegions(spawnSubW, spawnSubH);
 
-		GenericPkltFeatSelector<I, D> featureSelector = new GenericPkltFeatSelector<I,D>(detector,null);
+		GenericPkltFeatSelector<I, D> featureSelector = new GenericPkltFeatSelector<I, D>(detector, null);
 
 
 		PkltManager<I, D> trackManager = new PkltManager<I, D>();
@@ -94,7 +93,7 @@ public class FactoryPointSequentialTracker {
 				FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv),
 				featureSelector);
 
-		return new PstWrapperKltPyramid<I,D>(trackManager);
+		return new PstWrapperKltPyramid<I, D>(trackManager);
 	}
 
 	/**
@@ -104,87 +103,85 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> klt( PkltManagerConfig<I, D> config )
-	{
+	ImagePointTracker<I> klt(PkltManagerConfig<I, D> config) {
 		PkltManager<I, D> trackManager = new PkltManager<I, D>(config);
 
-		return new PstWrapperKltPyramid<I,D>(trackManager);
+		return new PstWrapperKltPyramid<I, D>(trackManager);
 	}
 
 	/**
 	 * Creates a tracker using SURF features.
 	 *
-	 * @param maxMatches The maximum number of matched features that will be considered.
-	 *                   Set to a value <= 0 to not bound the number of matches.
+	 * @param maxMatches     The maximum number of matched features that will be considered.
+	 *                       Set to a value <= 0 to not bound the number of matches.
 	 * @param detectPerScale Controls how many features can be detected.  Try a value of 200 initially.
-	 * @param minSeparation How close together detected features can be.  Recommended value = 2.
-	 * @param imageType Type of image the input is.
-	 * @param <I> Input image type.
-	 * @param <II> Integral image type.
+	 * @param minSeparation  How close together detected features can be.  Recommended value = 2.
+	 * @param imageType      Type of image the input is.
+	 * @param <I>            Input image type.
+	 * @param <II>           Integral image type.
 	 * @return SURF based tracker.
 	 */
-	public static <I extends ImageSingleBand,II extends ImageSingleBand>
-	ImagePointTracker<I> surf( int maxMatches , int detectPerScale , int minSeparation ,
-									Class<I> imageType )
-	{
+	public static <I extends ImageSingleBand, II extends ImageSingleBand>
+	ImagePointTracker<I> surf(int maxMatches, int detectPerScale, int minSeparation,
+							  Class<I> imageType) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, 1, 10, true);
 
-		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor,detectPerScale, 2, 9,4,4);
-		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(6,1,6,0,integralType);
+		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor, detectPerScale, 2, 9, 4, 4);
+		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(6, 1, 6, 0, integralType);
 		DescribePointSurf<II> describe = new DescribePointSurf<II>(integralType);
 
-		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
+		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
 
-		return new PstWrapperSurf<I,II>(detector,orientation,describe,assoc,integralType);
+		return new PstWrapperSurf<I, II>(detector, orientation, describe, assoc, integralType);
 	}
 
 	/**
 	 * Creates a tracker for BRIEF features.
 	 *
-	 * @param maxFeatures Maximum number of features it will track.
+	 * @param maxFeatures         Maximum number of features it will track.
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
-	 * @param pixelDetectTol Tolerance for detecting FAST features.  Try 20.
-	 * @param imageType Type of image being processed.
+	 * @param pixelDetectTol      Tolerance for detecting FAST features.  Try 20.
+	 * @param imageType           Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand>
-	ImagePointTracker<I> brief( int maxFeatures , int maxAssociationError , int pixelDetectTol , Class<I> imageType ) {
+	ImagePointTracker<I> brief(int maxFeatures, int maxAssociationError, int pixelDetectTol, Class<I> imageType) {
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
-		GeneralFeatureDetector<I,?> fast = FactoryDetectPoint.createFast(3, pixelDetectTol, maxFeatures, imageType);
+		GeneralFeatureDetector<I, ?> fast = FactoryDetectPoint.createFast(3, pixelDetectTol, maxFeatures, imageType);
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(fast, imageType, null);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		GeneralAssociation<TupleDesc_B> association =
-				FactoryAssociation.greedy(score,maxAssociationError,maxFeatures,true);
+				FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true);
 
-		return new PstWrapperBrief<I>(alg,detector,association);
+		return new PstWrapperBrief<I>(alg, detector, association);
 	}
 
 	/**
 	 * Creates a tracker for rectangular pixel regions that are associated using normalized
 	 * cross correlation (NCC)..
 	 *
-	 * @param maxFeatures Maximum number of features it will track.
-	 * @param regionWidth How wide the region is.  Try 5
-	 * @param regionHeight How tall the region is.  Try 5
+	 * @param maxFeatures    Maximum number of features it will track.
+	 * @param regionWidth    How wide the region is.  Try 5
+	 * @param regionHeight   How tall the region is.  Try 5
 	 * @param pixelDetectTol Tolerance for detecting features.  Try 20.
-	 * @param imageType Type of image being processed.
+	 * @param imageType      Type of image being processed.
 	 */
-	public static <I extends ImageSingleBand,D extends ImageSingleBand>
-	ImagePointTracker<I> pixelNCC( int maxFeatures , int regionWidth , int regionHeight ,
-								   int pixelDetectTol , Class<I> imageType , Class<D> derivType ) {
-		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType);
-		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(2, pixelDetectTol, maxFeatures, imageType);
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	ImagePointTracker<I> pixelNCC(int maxFeatures, int regionWidth, int regionHeight,
+								  int pixelDetectTol, Class<I> imageType, Class<D> derivType) {
+		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth, regionHeight, imageType);
+		GeneralFeatureDetector<I, D> corner = FactoryDetectPoint.createFast(2, pixelDetectTol, maxFeatures, imageType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
 
 		GeneralAssociation<NccFeature> association =
-				FactoryAssociation.greedy(score,0,maxFeatures,true);
+				FactoryAssociation.greedy(score, 0, maxFeatures, true);
 
-		return new PstWrapperPixelNcc<I>(alg,detector,association);
+		return new PstWrapperPixelNcc<I>(alg, detector, association);
 	}
 }

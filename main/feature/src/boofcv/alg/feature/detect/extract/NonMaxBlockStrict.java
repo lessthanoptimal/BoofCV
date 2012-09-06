@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class NonMaxBlockStrict extends NonMaxBlock{
+public class NonMaxBlockStrict extends NonMaxBlock {
 
 	public NonMaxBlockStrict() {
 	}
@@ -37,19 +37,19 @@ public class NonMaxBlockStrict extends NonMaxBlock{
 	}
 
 	@Override
-	protected void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img ) {
+	protected void searchBlock(int x0, int y0, int x1, int y1, ImageFloat32 img) {
 
-		int peakX=0;
-		int peakY=0;
+		int peakX = 0;
+		int peakY = 0;
 
-		float peakVal = -1;
+		float peakVal = -Float.MAX_VALUE;
 
-		for( int y = y0; y < y1; y++ ) {
-			int index = img.startIndex + y*img.stride+x0;
-			for( int x = x0; x < x1; x++ ) {
+		for (int y = y0; y < y1; y++) {
+			int index = img.startIndex + y * img.stride + x0;
+			for (int x = x0; x < x1; x++) {
 				float v = img.data[index++];
 
-				if( v > peakVal ) {
+				if (v > peakVal) {
 					peakVal = v;
 					peakX = x;
 					peakY = y;
@@ -57,28 +57,28 @@ public class NonMaxBlockStrict extends NonMaxBlock{
 			}
 		}
 
-		if( peakVal >= threshold && peakVal != Float.MAX_VALUE ) {
-			checkLocalMax(peakX,peakY,peakVal,img);
+		if (peakVal >= threshold && peakVal != Float.MAX_VALUE) {
+			checkLocalMax(peakX, peakY, peakVal, img);
 		}
 	}
 
-	protected void checkLocalMax( int x_c , int y_c , float peakVal , ImageFloat32 img ) {
-		int x0 = x_c-radius;
-		int x1 = x_c+radius;
-		int y0 = y_c-radius;
-		int y1 = y_c+radius;
+	protected void checkLocalMax(int x_c, int y_c, float peakVal, ImageFloat32 img) {
+		int x0 = x_c - radius;
+		int x1 = x_c + radius;
+		int y0 = y_c - radius;
+		int y1 = y_c + radius;
 
-		if( x0 < 0 ) x0 = 0;
-		if( y0 < 0 ) y0 = 0;
-		if( x1 >= img.width ) x1 = img.width-1;
-		if( y1 >= img.height ) y1 = img.height-1;
+		if (x0 < 0) x0 = 0;
+		if (y0 < 0) y0 = 0;
+		if (x1 >= img.width) x1 = img.width - 1;
+		if (y1 >= img.height) y1 = img.height - 1;
 
-		for( int y = y0; y <= y1; y++ ) {
-			int index = img.startIndex + y*img.stride+x0;
-			for( int x = x0; x <= x1; x++ ) {
+		for (int y = y0; y <= y1; y++) {
+			int index = img.startIndex + y * img.stride + x0;
+			for (int x = x0; x <= x1; x++) {
 				float v = img.data[index++];
 
-				if( v >= peakVal && !(x == x_c && y == y_c)) {
+				if (v >= peakVal && !(x == x_c && y == y_c)) {
 					// not a local max
 					return;
 				}
@@ -86,6 +86,6 @@ public class NonMaxBlockStrict extends NonMaxBlock{
 		}
 
 		// save location of local max
-		peaks.add(x_c,y_c);
+		peaks.add(x_c, y_c);
 	}
 }
